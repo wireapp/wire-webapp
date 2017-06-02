@@ -342,10 +342,9 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.confirm_dialog = $('#participants').confirm({
       confirm: () => {
         const next_conversation_et = this.conversation_repository.get_next_conversation(this.conversation());
-        this.participants_bubble.hide();
 
-        this.user_repository.block_user(user_et)
-          .then(() => amplify.publish(z.event.WebApp.CONVERSATION.SWITCH, this.conversation(), next_conversation_et));
+        this.participants_bubble.hide();
+        this.user_repository.block_user(user_et, next_conversation_et);
       },
       data: {
         user: user_et,

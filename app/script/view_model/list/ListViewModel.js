@@ -263,17 +263,18 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
   }
 
   click_on_archive_action(conversation_et) {
-    this.conversation_repository.archive_conversation(conversation_et);
+    const next_conversation_et = this._get_next_conversation(conversation_et);
+
+    this.conversation_repository.archive_conversation(conversation_et, next_conversation_et);
   }
 
   click_on_block_action(conversation_et) {
-    const next_conversation_et = this.conversation_repository.get_next_conversation(conversation_et);
-    const user_et = conversation_et.participating_user_ets()[0];
+    const next_conversation_et = this._get_next_conversation(conversation_et);
+    const [user_et] = conversation_et.participating_user_ets();
 
     amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.BLOCK, {
       action: () => {
-        this.user_repository.block_user(user_et)
-          .then(() => amplify.publish(z.event.WebApp.CONVERSATION.SWITCH, conversation_et, next_conversation_et));
+        this.user_repository.block_user(user_et, next_conversation_et);
       },
       data: user_et.first_name(),
     }
@@ -281,8 +282,10 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
   }
 
   click_on_cancel_action(conversation_et) {
-    const next_conversation_et = this.conversation_repository.get_next_conversation(conversation_et);
-    this.user_repository.cancel_connection_request(conversation_et.participating_user_ets()[0], next_conversation_et);
+    const next_conversation_et = this._get_next_conversation(conversation_et);
+    const [user_et] = conversation_et.participating_user_ets();
+
+    this.user_repository.cancel_connection_request(user_et, next_conversation_et);
   }
 
   click_on_mute_action(conversation_et) {
@@ -290,9 +293,11 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
   }
 
   click_on_clear_action(conversation_et) {
+    const next_conversation = this._get_next_conversation(conversation_et);
+
     amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CLEAR, {
       action: (leave = false) => {
-        this.conversation_repository.clear_conversation(conversation_et, leave);
+        this.conversation_repository.clear_conversation(conversation_et, next_conversation, leave);
       },
       conversation: conversation_et,
       data: conversation_et.display_name(),
@@ -300,7 +305,7 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
   }
 
   click_on_leave_action(conversation_et) {
-    const next_conversation_et = this.conversation_repository.get_next_conversation(conversation_et);
+    const next_conversation_et = this._get_next_conversation(conversation_et);
 
     amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.LEAVE, {
       action: () => this.conversation_repository.leave_conversation(conversation_et, next_conversation_et),
@@ -316,5 +321,14 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
           this.switch_list(z.ViewModel.list.LIST_STATE.CONVERSATIONS);
         }
       });
+  }
+
+  _get_next_conversation(conversation_et) {
+    const in_conversations = this.list_state() === z.ViewModel.list.LIST_STATE.CONVERSATIONS;
+    const is_active_conversation = this.conversation_repository.is_active_conversation(conversation_et);
+
+    if (in_conversations && is_active_conversation) {
+      return this.conversation_repository.get_next_conversation(conversation_et);
+    }
   }
 };

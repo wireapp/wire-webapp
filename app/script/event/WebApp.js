@@ -113,7 +113,6 @@ z.event.WebApp = {
     },
     PERSIST_STATE: 'wire.webapp.conversation.persist_state',
     SHOW: 'wire.webapp.conversation.show',
-    SWITCH: 'wire.webapp.conversation.switch',
     UNREAD: 'wire.webapp.conversation.unread',
   },
   DEBUG: {

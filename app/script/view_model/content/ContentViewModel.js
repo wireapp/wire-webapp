@@ -112,7 +112,6 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
   _init_subscriptions() {
     amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, this.switch_content.bind(this));
     amplify.subscribe(z.event.WebApp.CONVERSATION.SHOW, this.show_conversation.bind(this));
-    amplify.subscribe(z.event.WebApp.CONVERSATION.SWITCH, this.switch_conversation.bind(this));
     amplify.subscribe(z.event.WebApp.LIST.SCROLL, this.conversation_input.show_separator);
     amplify.subscribe(z.event.WebApp.PEOPLE.TOGGLE, this.participants.toggle_participants_bubble);
     amplify.subscribe(z.event.WebApp.WINDOW.RESIZE.HEIGHT, this.message_list.scroll_height);
@@ -197,18 +196,6 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
     if (this.content_state() !== new_content_state) {
       this._release_content(new_content_state);
       this._show_content(this._check_content_availability(new_content_state));
-    }
-  }
-
-  /**
-   * Switches the conversation if the other one is shown.
-   * @param {z.entity.Conversation} conversation_et - Conversation entity to be verified as currently active for the switch
-   * @param {z.entity.Conversation} next_conversation_et - Conversation entity to be shown
-   * @returns {undefined} No return value
-   */
-  switch_conversation(conversation_et, next_conversation_et) {
-    if (this.conversation_repository.is_active_conversation(conversation_et)) {
-      this.show_conversation(next_conversation_et);
     }
   }
 

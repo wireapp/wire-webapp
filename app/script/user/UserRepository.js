@@ -82,22 +82,30 @@ z.user.UserRepository = class UserRepository {
 
   /**
    * Block a user.
+   *
    * @param {z.entity.User} user_et - User to block
+   * @param {z.entity.Conversation} [next_conversation_et] - Optional conversation to be switched to
    * @returns {Promise} Promise that resolves when the user was blocked
    */
-  block_user(user_et) {
-    return this._update_connection_status(user_et, z.user.ConnectionStatus.BLOCKED);
+  block_user(user_et, next_conversation_et) {
+    return this._update_connection_status(user_et, z.user.ConnectionStatus.BLOCKED)
+      .then(() => {
+        if (next_conversation_et) {
+          amplify.publish(z.event.WebApp.CONVERSATION.SHOW, next_conversation_et);
+        }
+      });
   }
 
   /**
    * Cancel a connection request.
+   *
    * @param {z.entity.User} user_et - User to cancel the sent connection request
-   * @param {z.entity.Conversation} next_conversation_et - Optional conversation to be switched to
+   * @param {z.entity.Conversation} [next_conversation_et] - Optional conversation to be switched to
    * @returns {Promise} Promise that resolves when an outgoing connection request was cancelled
    */
   cancel_connection_request(user_et, next_conversation_et) {
     return this._update_connection_status(user_et, z.user.ConnectionStatus.CANCELLED)
-      .then(function() {
+      .then(() => {
         if (next_conversation_et) {
           amplify.publish(z.event.WebApp.CONVERSATION.SHOW, next_conversation_et);
         }
@@ -106,6 +114,7 @@ z.user.UserRepository = class UserRepository {
 
   /**
    * Create a connection request.
+   *
    * @param {z.entity.User} user_et - User to connect to
    * @param {boolean} [show_conversation=false] - Should we open the new conversation
    * @returns {Promise} Promise that resolves when the connection request was successfully created
