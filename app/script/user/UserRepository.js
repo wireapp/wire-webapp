@@ -58,7 +58,11 @@ z.user.UserRepository = class UserRepository {
         .filter((user_et) => user_et.is_connected());
     }).extend({rateLimit: 1000});
 
-    this.number_of_connected_users = ko.pureComputed(() => this.connected_users().length);
+    this.number_of_connected_users = ko.pureComputed(() => {
+      return this.connected_users()
+        .filter((user_et) => !user_et.is_bot)
+        .length;
+    });
     this.number_of_connected_users.subscribe((number_of_connected_users) => {
       amplify.publish(z.event.WebApp.ANALYTICS.CUSTOM_DIMENSION, z.tracking.CustomDimension.CONTACTS, number_of_connected_users);
     });
