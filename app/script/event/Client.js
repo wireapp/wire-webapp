@@ -38,10 +38,8 @@ z.event.Client = {
     MESSAGE_HIDDEN: 'conversation.message-hidden',
     MISSED_MESSAGES: 'conversation.missed-messages',
     REACTION: 'conversation.reaction',
+    TEAM_MEMBER_LEAVE: 'conversation.team-member-leave',
     UNABLE_TO_DECRYPT: 'conversation.unable-to-decrypt',
     VERIFICATION: 'conversation.verification',
-  },
-  TEAM: {
-    MEMBER_LEAVE: 'team.member-leave',
   },
 };

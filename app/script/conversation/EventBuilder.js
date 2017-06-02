@@ -97,7 +97,7 @@ z.conversation.EventBuilder = (function() {
       from: user_id,
       id: z.util.create_random_uuid(),
       time: new Date().toISOString(),
-      type: z.event.Client.TEAM.MEMBER_LEAVE,
+      type: z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE,
     };
   };
 

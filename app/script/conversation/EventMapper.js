@@ -92,7 +92,7 @@ z.conversation.EventMapper = class EventMapper {
         message_et = this._map_event_member_join(event, conversation_et);
         break;
       case z.event.Backend.CONVERSATION.MEMBER_LEAVE:
-      case z.event.Client.TEAM.MEMBER_LEAVE:
+      case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE:
         message_et = this._map_event_member_leave(event);
         break;
       case z.event.Backend.CONVERSATION.MEMBER_UPDATE:
