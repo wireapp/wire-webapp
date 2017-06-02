@@ -250,12 +250,27 @@ z.event.EventRepository = class EventRepository {
    * Get the last notification.
    * @returns {Promise} Resolves with the last handled notification ID
    */
-  get_last_notification_id_from_db() {
+  get_last_notification_id() {
     return this.notification_service.get_last_notification_id_from_db()
-    .then((last_notification_id) => {
-      this.last_notification_id(last_notification_id);
-      return this.last_notification_id();
-    });
+      .then((last_notification_id) => {
+        this.last_notification_id(last_notification_id);
+        return this.last_notification_id();
+      })
+      .catch((error) => {
+        if (error.type !== z.event.EventError.TYPE.NO_LAST_ID) {
+          throw error;
+        }
+
+        return this.notification_service.get_notifications_last()
+          .then(({id: notification_id}) => {
+            if (notification_id) {
+              this._update_last_notification_id(notification_id);
+              amplify.publish(z.event.WebApp.CONVERSATION.MISSED_EVENTS);
+              return this.last_notification_id();
+            }
+            throw error;
+          });
+      });
   }
 
   /**
@@ -265,10 +280,10 @@ z.event.EventRepository = class EventRepository {
    */
   initialize_last_notification_id(client_id) {
     return this.notification_service.get_notifications_last(client_id)
-    .then((response) => {
-      this._update_last_notification_id(response.id);
-      this.logger.info(`Set starting point on notification stream to '${this.last_notification_id()}'`);
-    });
+      .then((response) => {
+        this._update_last_notification_id(response.id);
+        this.logger.info(`Set starting point on notification stream to '${this.last_notification_id()}'`);
+      });
   }
 
   /**
@@ -276,7 +291,7 @@ z.event.EventRepository = class EventRepository {
    * @returns {Promise} Resolves when all notifications have been handled
    */
   initialize_from_notification_stream() {
-    return this.get_last_notification_id_from_db()
+    return this.get_last_notification_id()
       .then((last_notification_id) => {
         return this._update_from_notification_stream(last_notification_id);
       })
