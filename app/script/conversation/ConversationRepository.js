@@ -593,6 +593,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   /**
    * Get the next unarchived conversation.
+   *
    * @param {Conversation} conversation_et - Conversation to start from
    * @returns {Conversation} Next conversation
    */
@@ -917,11 +918,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * It will be unarchived once it is opened through search. We use the archive flag to distinguish states.
    *
    * @param {Conversation} conversation_et - Conversation to clear
+   * @param {Conversation} [next_conversation_et] - Optional next conversation to be shown
    * @param {boolean} [leave=false] - Should we leave the conversation before clearing the content?
    * @returns {Promise} No return value
    */
-  clear_conversation(conversation_et, leave = false) {
-    const next_conversation_et = this.get_next_conversation(conversation_et);
+  clear_conversation(conversation_et, next_conversation_et, leave = false) {
     const promise = leave ? this.leave_conversation(conversation_et, next_conversation_et, false) : Promise.resolve();
     return promise
       .then(() => {
@@ -929,7 +930,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
           conversation_et.status(z.conversation.ConversationStatus.PAST_MEMBER);
         }
         this._delete_conversation(conversation_et);
-        amplify.publish(z.event.WebApp.CONVERSATION.SHOW, next_conversation_et);
+        if (next_conversation_et) {
+          amplify.publish(z.event.WebApp.CONVERSATION.SHOW, next_conversation_et);
+        }
       });
   }
 
@@ -959,7 +962,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Leave conversation.
    *
    * @param {Conversation} conversation_et - Conversation to leave
-   * @param {Conversation} next_conversation_et - Next conversation in list
+   * @param {Conversation} [next_conversation_et] - Optional next conversation in list
    * @param {boolean} handle_response - Set to false if conversation is deleted
    * @returns {Promise} Resolves when the conversation was left
    */
@@ -1154,7 +1157,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Archive a conversation.
    *
    * @param {Conversation} conversation_et - Conversation to rename
-   * @param {Conversation} next_conversation_et - Next conversation to potentially switch to
+   * @param {Conversation} [next_conversation_et] - Next conversation to potentially switch to
    * @returns {Promise} Resolves when the conversation was archived
    */
   archive_conversation(conversation_et, next_conversation_et) {
@@ -2641,22 +2644,18 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @private
    * @param {Conversation} conversation_et - Conversation entity that will be updated
    * @param {Object} event_json - JSON data of 'conversation.member-update' event
-   * @param {Conversation} [next_conversation_et] - Next conversation in list
+   * @param {Conversation} [next_conversation_et] - Optional next conversation in list
    * @returns {Promise} Resolves when the event was handled
    */
   _on_member_update(conversation_et, event_json, next_conversation_et) {
     const previously_archived = conversation_et.is_archived();
 
-    if (!next_conversation_et) {
-      next_conversation_et = this.get_next_conversation(conversation_et);
-    }
-
     this.conversation_mapper.update_self_status(conversation_et, event_json.data);
 
     if (previously_archived && !conversation_et.is_archived()) {
       return this._fetch_users_and_events(conversation_et);
-    } else if (conversation_et.is_archived()) {
-      amplify.publish(z.event.WebApp.CONVERSATION.SWITCH, conversation_et, next_conversation_et);
+    } else if (conversation_et.is_archived() && next_conversation_et) {
+      amplify.publish(z.event.WebApp.CONVERSATION.SHOW, next_conversation_et);
     }
   }
 

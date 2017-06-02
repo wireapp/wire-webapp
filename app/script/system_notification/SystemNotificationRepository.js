@@ -704,8 +704,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
           hide_notification = true;
         }
 
-        const active_conversation_id = this.conversation_repository.active_conversation() ? this.conversation_repository.active_conversation().id : undefined;
-        const in_active_conversation = conversation_et.id === active_conversation_id;
+        const in_active_conversation = this.conversation_repository.is_active_conversation(conversation_et);
         const in_conversation_view = document.hasFocus() && wire.app.view.content.content_state() === z.ViewModel.content.CONTENT_STATE.CONVERSATION;
         const in_maximized_call = this.calling_repository.joined_call() && !wire.app.view.content.multitasking.is_minimized();
         if (in_conversation_view && in_active_conversation && !in_maximized_call) {
