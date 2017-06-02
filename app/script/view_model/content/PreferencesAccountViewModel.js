@@ -66,7 +66,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   change_name(name, event) {
-    const new_name = event.target.value;
+    const new_name = event.target.value.trim();
 
     if (new_name === this.self_user().name()) {
       event.target.blur();
