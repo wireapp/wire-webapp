@@ -43,29 +43,6 @@ describe('Event Repository', function() {
     test_factory.exposeEventActors()
       .then(function(event_repository) {
         event_repository.web_socket_service = websocket_service_mock;
-        TestFactory.notification_service.get_notifications = () =>
-          new Promise(function(resolve) {
-            return window.setTimeout(() =>
-                resolve({
-                  has_more: false,
-                  notifications: [
-                    {id: z.util.create_random_uuid(), payload: []},
-                    {id: z.util.create_random_uuid(), payload: []},
-                  ],
-                })
-
-              , 10);
-          })
-        ;
-
-        TestFactory.notification_service.get_last_notification_id_from_db = function() {
-          if (last_notification_id) {
-            return Promise.resolve(last_notification_id);
-          }
-          return Promise.reject(new z.event.EventError(z.event.EventError.TYPE.NO_LAST_ID));
-        };
-
-        TestFactory.notification_service.save_last_notification_id_to_db = () => Promise.resolve(z.event.NotificationService.prototype.PRIMARY_KEY_LAST_NOTIFICATION);
 
         last_notification_id = undefined;
         done();
@@ -80,16 +57,49 @@ describe('Event Repository', function() {
       spyOn(TestFactory.event_repository, '_handle_buffered_notifications').and.callThrough();
       spyOn(TestFactory.event_repository, '_handle_event');
       spyOn(TestFactory.event_repository, '_distribute_event');
-      spyOn(TestFactory.notification_service, 'get_notifications').and.callThrough();
-      spyOn(TestFactory.notification_service, 'get_last_notification_id_from_db').and.callThrough();
+
+      spyOn(TestFactory.notification_service, 'get_notifications')
+        .and.callFake(() => {
+          return new Promise((resolve) => {
+            window.setTimeout(() => {
+              resolve({
+                has_more: false,
+                notifications: [
+                  {id: z.util.create_random_uuid(), payload: []},
+                  {id: z.util.create_random_uuid(), payload: []},
+                ],
+              });
+            }, 10);
+          });
+        });
+
+      spyOn(TestFactory.notification_service, 'get_notifications_last')
+        .and.returnValue(Promise.resolve({id: z.util.create_random_uuid(), payload: []}));
+
+      spyOn(TestFactory.notification_service, 'get_last_notification_id_from_db')
+        .and.callFake(() => {
+          if (last_notification_id) {
+            return Promise.resolve(last_notification_id);
+          }
+          return Promise.reject(new z.event.EventError(z.event.EventError.TYPE.NO_LAST_ID));
+        });
+
+      spyOn(TestFactory.notification_service, 'save_last_notification_id_to_db')
+        .and.returnValue(Promise.resolve(z.event.NotificationService.prototype.PRIMARY_KEY_LAST_NOTIFICATION));
     });
 
-    it('should skip fetching notifications if last notification ID not found in storage', function(done) {
+    it('should fetch last notifications ID from backend if not found in storage', function(done) {
+      const missed_events_spy = jasmine.createSpy();
+      amplify.unsubscribeAll(z.event.WebApp.CONVERSATION.MISSED_EVENTS);
+      amplify.subscribe(z.event.WebApp.CONVERSATION.MISSED_EVENTS, missed_events_spy);
+
       TestFactory.event_repository.connect_web_socket();
       TestFactory.event_repository.initialize_from_notification_stream()
         .then(function() {
           expect(TestFactory.notification_service.get_last_notification_id_from_db).toHaveBeenCalled();
-          expect(TestFactory.notification_service.get_notifications).not.toHaveBeenCalled();
+          expect(TestFactory.notification_service.get_notifications_last).toHaveBeenCalled();
+          expect(TestFactory.notification_service.get_notifications).toHaveBeenCalled();
+          expect(missed_events_spy).toHaveBeenCalled();
           done();
         })
         .catch(done.fail);
