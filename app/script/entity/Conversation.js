@@ -190,8 +190,13 @@ z.entity.Conversation = class Conversation {
      */
     this.display_name = ko.pureComputed(() => {
       if (this.is_request() || this.is_one2one()) {
-        if (this.participating_user_ets()[0] && this.participating_user_ets()[0].name) {
-          return this.participating_user_ets()[0].name();
+        if (this.team_id && this.name()) {
+          return this.name();
+        }
+
+        const [user_et] = this.participating_user_ets();
+        if (user_et && user_et.name) {
+          return user_et.name();
         }
 
         return '…';
@@ -215,7 +220,7 @@ z.entity.Conversation = class Conversation {
         return '…';
       }
 
-      return this.name();
+      return this.name() || '…';
     });
 
     this.persist_state = _.debounce(() => {
