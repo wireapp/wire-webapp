@@ -302,59 +302,60 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
       if (!this.user()) {
         return 'user-profile-footer-empty';
       }
+      const user_et = this.user();
 
       // When used in conversation!
       if (typeof this.conversation === 'function') {
-        const type = this.conversation().type();
+        const conversation_et = this.conversation();
 
-        if ([z.conversation.ConversationType.ONE2ONE, z.conversation.ConversationType.CONNECT].includes(type)) {
-          if (this.user().is_me) {
+        if (conversation_et.is_one2one() || conversation_et.is_request()) {
+          if (user_et.is_me) {
             return 'user-profile-footer-profile';
           }
 
-          if (this.user().is_connected()) {
+          if (user_et.is_connected() || conversation_et.team_id) {
             return 'user-profile-footer-add-block';
           }
 
-          if (this.user().is_outgoing_request()) {
+          if (user_et.is_outgoing_request()) {
             return 'user-profile-footer-pending';
           }
 
-        } else if (type === z.conversation.ConversationType.REGULAR) {
-          if (this.user().is_me) {
+        } else if (conversation_et.is_group()) {
+          if (user_et.is_me) {
             return 'user-profile-footer-profile-leave';
           }
 
-          if (this.user().is_unknown()) {
-            return this.conversation().team_id ? 'user-profile-footer-message-remove' : 'user-profile-footer-connect-remove';
+          if (user_et.is_unknown()) {
+            return conversation_et.team_id ? 'user-profile-footer-message-remove' : 'user-profile-footer-connect-remove';
           }
-          if (this.user().is_ignored() || this.user().is_request()) {
+          if (user_et.is_ignored() || user_et.is_request()) {
             return 'user-profile-footer-pending-remove';
           }
 
-          if (this.user().is_connected()) {
+          if (user_et.is_connected()) {
             return 'user-profile-footer-message-remove';
           }
 
-          if (this.user().is_blocked()) {
+          if (user_et.is_blocked()) {
             return 'user-profile-footer-unblock-remove';
           }
         }
       // When used in Search!
       } else {
-        if (this.user().is_blocked()) {
+        if (user_et.is_blocked()) {
           return 'user-profile-footer-unblock';
         }
 
-        if (this.user().is_outgoing_request()) {
+        if (user_et.is_outgoing_request()) {
           return 'user-profile-footer-pending';
         }
 
-        if (this.user().is_ignored() || this.user().is_incoming_request()) {
+        if (user_et.is_ignored() || this.user().is_incoming_request()) {
           return 'user-profile-footer-ignore-accept';
         }
 
-        if (this.user().is_unknown()) {
+        if (user_et.is_unknown()) {
           return 'user-profile-footer-add';
         }
       }
