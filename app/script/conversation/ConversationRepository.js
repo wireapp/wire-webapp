@@ -919,7 +919,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return promise
       .then(() => {
         if (leave) {
-          conversation_et.status(conversation_et.ConversationStatus.PAST_MEMBER);
+          conversation_et.status(z.conversation.ConversationStatus.PAST_MEMBER);
         }
         this._delete_conversation(conversation_et);
         amplify.publish(z.event.WebApp.CONVERSATION.SHOW, next_conversation_et);
