@@ -363,7 +363,6 @@ z.main.App = class App {
    */
   _check_user_information(user_et) {
     if (!user_et.medium_picture_resource()) {
-      this.view.list.first_run(true);
       this.repository.user.set_default_picture();
     }
     if (!user_et.username()) {
