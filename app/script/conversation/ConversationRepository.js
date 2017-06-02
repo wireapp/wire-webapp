@@ -75,7 +75,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
           return false;
         }
 
-        return !(conversation_et.is_cleared() && conversation_et.removed_from_conversation());
+        if (conversation_et.is_cleared() && conversation_et.removed_from_conversation()) {
+          this.conversation_service.delete_conversation_from_in_db(conversation_et.id);
+          this.delete_conversation(conversation_et.id);
+          return false;
+        }
+
+        return true;
       });
     });
 
@@ -443,6 +449,15 @@ z.conversation.ConversationRepository = class ConversationRepository {
   //##############################################################################
   // Repository interactions
   //##############################################################################
+
+  /**
+   * Deletes a conversation from the repository.
+   * @param {string} conversation_id - ID of conversation to be deleted from the repository
+   * @returns {undefined} No return value
+   */
+  delete_conversation(conversation_id) {
+    this.conversations.remove((conversation_et) => conversation_et.id === conversation_id);
+  }
 
   /**
    * Find a local conversation by ID.
@@ -900,11 +915,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   clear_conversation(conversation_et, leave = false) {
     const next_conversation_et = this.get_next_conversation(conversation_et);
-    const promise = leave ? this.leave_conversation(conversation_et, next_conversation_et) : Promise.resolve();
+    const promise = leave ? this.leave_conversation(conversation_et, next_conversation_et, false) : Promise.resolve();
     return promise
       .then(() => {
-        this._update_cleared_timestamp(conversation_et);
-        this._delete_messages(conversation_et);
+        if (leave) {
+          conversation_et.status(z.conversation.ConversationStatus.PAST_MEMBER);
+        }
+        this._delete_conversation(conversation_et);
         amplify.publish(z.event.WebApp.CONVERSATION.SHOW, next_conversation_et);
       });
   }
@@ -936,16 +953,19 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {Conversation} conversation_et - Conversation to leave
    * @param {Conversation} next_conversation_et - Next conversation in list
+   * @param {boolean} handle_response - Set to false if conversation is deleted
    * @returns {Promise} Resolves when the conversation was left
    */
-  leave_conversation(conversation_et, next_conversation_et) {
+  leave_conversation(conversation_et, next_conversation_et, handle_response = true) {
     return this.conversation_service.delete_members(conversation_et.id, this.user_repository.self().id)
       .then((response) => {
-        amplify.publish(z.event.WebApp.EVENT.INJECT, response);
-        return this._on_member_leave(conversation_et, response);
-      })
-      .then(() => {
-        return this.archive_conversation(conversation_et, next_conversation_et);
+        if (handle_response) {
+          amplify.publish(z.event.WebApp.EVENT.INJECT, response);
+          return this._on_member_leave(conversation_et, response)
+            .then(() => {
+              return this.archive_conversation(conversation_et, next_conversation_et);
+            });
+        }
       });
   }
 
@@ -1070,7 +1090,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   team_member_leave(team_id, user_id) {
     this.conversations()
-      .filter((conversation_et) => conversation_et.team_id === team_id)
+      .filter((conversation_et) => conversation_et.team_id === team_id && !conversation_et.removed_from_conversation())
       .forEach((conversation_et) => {
         if (user_id) {
           if (conversation_et.participating_user_ids().includes(user_id)) {
@@ -1078,8 +1098,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
             amplify.publish(z.event.WebApp.EVENT.INJECT, member_leave_event, false);
           }
         } else {
-          this._update_cleared_timestamp(conversation_et);
-          this._delete_messages(conversation_et);
+          this._delete_conversation(conversation_et);
         }
       });
   }
@@ -1181,6 +1200,22 @@ z.conversation.ConversationRepository = class ConversationRepository {
         this.logger.info(`Unarchived conversation '${conversation_et.id}' on '${payload.otr_archived_ref}'`);
       });
 
+  }
+
+  /**
+   * Deletes a conversation from the local storage.
+   *
+   * @private
+   * @param {Conversation} conversation_et - Conversation entity to delete
+   * @returns {undefined} No return value
+   */
+  _delete_conversation(conversation_et) {
+    this._update_cleared_timestamp(conversation_et);
+    this._delete_messages(conversation_et);
+    if (conversation_et.removed_from_conversation()) {
+      this.conversation_service.delete_conversation_from_in_db(conversation_et.id);
+      this.delete_conversation(conversation_et.id);
+    }
   }
 
   /**
