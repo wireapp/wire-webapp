@@ -246,10 +246,14 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     }
 
     if (!conversation_et.is_group()) {
-      entries.push({
-        click: () => this.click_on_block_action(conversation_et),
-        label: z.l10n.text(z.string.conversations_popover_block),
-      });
+      const [user_et] = conversation_et.participating_user_ets();
+
+      if (user_et.is_connected() || user_et.is_request()) {
+        entries.push({
+          click: () => this.click_on_block_action(conversation_et),
+          label: z.l10n.text(z.string.conversations_popover_block),
+        });
+      }
     }
 
     if (conversation_et.is_group() && !conversation_et.removed_from_conversation()) {
