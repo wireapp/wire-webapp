@@ -65,7 +65,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.user_repository.change_accent_color(id);
   }
 
-  change_name(name, event) {
+  change_name(view_model, event) {
     const new_name = event.target.value.trim();
 
     if (new_name === this.self_user().name()) {
