@@ -425,12 +425,14 @@ z.event.EventRepository = class EventRepository {
    * @note Don't add unable to decrypt to self conversation
    *
    * @param {Object} event - Event payload to be injected
+   * @param {boolean} [can_create_notification=true] - Can message generate a notification
    * @returns {undefined} No return value
    */
-  inject_event(event) {
+  inject_event(event, can_create_notification = true) {
     if (event.conversation !== this.user_repository.self().id) {
       this.logger.info(`Injected event ID '${event.id}' of type '${event.type}'`, event);
-      this._handle_event(event, EventRepository.NOTIFICATION_SOURCE.INJECTED);
+      const source = can_create_notification ? EventRepository.NOTIFICATION_SOURCE.INJECTED : EventRepository.NOTIFICATION_SOURCE.STREAM;
+      this._handle_event(event, source);
     }
   }
 

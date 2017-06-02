@@ -92,6 +92,7 @@ z.conversation.EventMapper = class EventMapper {
         message_et = this._map_event_member_join(event, conversation_et);
         break;
       case z.event.Backend.CONVERSATION.MEMBER_LEAVE:
+      case z.event.Client.TEAM.MEMBER_LEAVE:
         message_et = this._map_event_member_leave(event);
         break;
       case z.event.Backend.CONVERSATION.MEMBER_UPDATE:
@@ -279,7 +280,7 @@ z.conversation.EventMapper = class EventMapper {
   }
 
   /**
-   * Maps JSON data of conversation.member_join message into message entity
+   * Maps JSON data of conversation.member_leave or conversation.team_leave message into message entity
    *
    * @private
    * @param {Object} event_data - Message data

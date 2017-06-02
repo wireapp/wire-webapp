@@ -226,7 +226,7 @@
     <div class="message-header">
       <div class="message-header-icon text-graphite">
         <span class="icon-chat" data-bind="visible: message.member_message_type === z.message.SystemMessageType.CONVERSATION_CREATE || message.member_message_type === z.message.SystemMessageType.CONVERSATION_RESUME"></span>
-        <span class="icon-minus" data-bind="visible: message.type === z.event.Backend.CONVERSATION.MEMBER_LEAVE"></span>
+        <span class="icon-minus" data-bind="visible: message.type === z.event.Backend.CONVERSATION.MEMBER_LEAVE || message.type === z.event.Client.TEAM.MEMBER_LEAVE"></span>
         <span class="icon-plus" data-bind="visible: message.type === z.event.Backend.CONVERSATION.MEMBER_JOIN"></span>
       </div>
       <div class="message-header-label">
@@ -234,7 +234,7 @@
         <span class="ellipsis" data-bind="text: message.caption()"></span>
         <hr class="message-header-line" />
       </div>
-      <!-- ko if: message.type === z.event.Backend.CONVERSATION.MEMBER_JOIN || message.type === z.event.Backend.CONVERSATION.MEMBER_LEAVE -->
+      <!-- ko if: message.type === z.event.Backend.CONVERSATION.MEMBER_JOIN || message.type === z.event.Backend.CONVERSATION.MEMBER_LEAVE || message.type === z.event.Client.TEAM.MEMBER_LEAVE-->
       <div class="message-body-actions">
         <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}"></time>
       </div>
@@ -248,9 +248,9 @@
                        data-placement="vertical"
                        params="user: $data, click: $parents[1].on_message_user_click"></user-avatar>
         <!-- /ko -->
-        <!-- ko if: message.type === z.event.Backend.CONVERSATION.MEMBER_JOIN || message.type === z.event.Backend.CONVERSATION.MEMBER_LEAVE -->
+        <!-- ko if: message.type === z.event.Backend.CONVERSATION.MEMBER_JOIN || message.type === z.event.Backend.CONVERSATION.MEMBER_LEAVE || message.type === z.event.Client.TEAM.MEMBER_LEAVE -->
           <user-avatar class="user-avatar-xs"
-                       data-bind="css: {'translucent': message.type === z.event.Backend.CONVERSATION.MEMBER_LEAVE}"
+                       data-bind="css: {'translucent': message.type === z.event.Backend.CONVERSATION.MEMBER_LEAVE || message.type === z.event.Client.TEAM.MEMBER_LEAVE}"
                        data-bubble="#participants-bubble"
                        data-placement="vertical"
                        params="user: $data, click: $parents[1].on_message_user_click"></user-avatar>

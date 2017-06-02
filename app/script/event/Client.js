@@ -41,4 +41,7 @@ z.event.Client = {
     UNABLE_TO_DECRYPT: 'conversation.unable-to-decrypt',
     VERIFICATION: 'conversation.verification',
   },
+  TEAM: {
+    MEMBER_LEAVE: 'team.member-leave',
+  },
 };
