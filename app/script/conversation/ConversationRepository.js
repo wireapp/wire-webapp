@@ -1090,7 +1090,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   team_member_leave(team_id, user_id) {
     this.conversations()
-      .filter((conversation_et) => conversation_et.team_id === team_id)
+      .filter((conversation_et) => conversation_et.team_id === team_id && !conversation_et.removed_from_conversation())
       .forEach((conversation_et) => {
         if (user_id) {
           if (conversation_et.participating_user_ids().includes(user_id)) {
