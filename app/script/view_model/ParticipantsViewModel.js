@@ -118,8 +118,8 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.connected_users = ko.pureComputed(() => {
       return this.user_repository.connected_users()
         .filter((user_et) => {
-          for (const group_participant of this.participants()) {
-            if (user_et.id === group_participant.id) {
+          for (const conversation_participant of this.participants()) {
+            if (user_et.id === conversation_participant.id) {
               return false;
             }
           }
@@ -139,11 +139,12 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.team_members = ko.pureComputed(() => {
       return this.active_team().members()
         .filter((user_et) => {
-          for (const group_participant of this.participants()) {
-            if (user_et.id === group_participant.id) {
+          for (const conversation_participant of this.participants()) {
+            if (user_et.id === conversation_participant.id) {
               return false;
             }
           }
+          return true;
         });
     });
 
