@@ -1248,8 +1248,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
         })
         .catch((error) => {
           this.logger.error(`Error (${error.label}): ${error.message}`);
-          error = new Error('Event response is undefined');
-          Raygun.send(error, {source: 'Sending encrypted last read'});
+          error = new Error('Failed to update last read timestamp');
+          Raygun.send(error, {label: error.label, message: error.message});
         });
     }
   }
