@@ -803,7 +803,7 @@ z.user.UserRepository = class UserRepository {
         .then(() => this.self().name(name));
     }
 
-    return Promise.reject(new z.user.UserError(z.userUserError.TYPE.INVALID_UPDATE))
+    return Promise.reject(new z.user.UserError(z.userUserError.TYPE.INVALID_UPDATE));
   }
 
   /**
@@ -872,7 +872,7 @@ z.user.UserRepository = class UserRepository {
         });
     }
 
-    return Promise.reject(new z.user.UserError(z.userUserError.TYPE.INVALID_UPDATE))
+    return Promise.reject(new z.user.UserError(z.userUserError.TYPE.INVALID_UPDATE));
   }
 
   /**
