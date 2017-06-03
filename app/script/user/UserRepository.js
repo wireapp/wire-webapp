@@ -295,13 +295,17 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise} Promise that resolves when the connection status was updated
    */
   _update_connection_status(user_et, status, show_conversation = false) {
-    return Promise.resolve()
-      .then(() => {
-        if (user_et.connection().status() === status) {
-          return;
-        }
-        return this.user_service.update_connection_status(user_et.id, status);
-      })
+    if (!user_et) {
+      this.logger.error('Cannot update connection without a user);
+      return Promise.reject();
+    }
+
+    if (user_et.connection().status() === status) {
+      this.logger.info(`Requested connection status change to '${status}' for user '${user_et.id}' is current status`);
+      return Promise.resolve();
+    }
+
+    return this.user_service.update_connection_status(user_et.id, status)
       .then((response) => {
         return this.user_connection(response, z.event.EventRepository.NOTIFICATION_SOURCE.INJECTED, show_conversation);
       })
