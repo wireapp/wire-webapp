@@ -35,7 +35,9 @@ z.client.Client = class Client {
     this.model = Client.CONFIG.PLACEHOLDER;
 
     for (const member in payload) {
-      this[member] = payload[member];
+      if (payload.hasOwnProperty(member) && payload.member !== undefined) {
+        this[member] = payload[member];
+      }
     }
 
     // Metadata maintained by us
@@ -90,7 +92,7 @@ z.client.Client = class Client {
     delete json_object.session;
 
     for (const member in json_object) {
-      if (json_object.hasOwnProperty(member) && json_object.member === Client.CONFIG.PLACEHOLDER) {
+      if (json_object.hasOwnProperty(member) && json_object[member] === Client.CONFIG.PLACEHOLDER) {
         delete json_object.member;
       }
     }
