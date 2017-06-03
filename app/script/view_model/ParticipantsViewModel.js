@@ -158,7 +158,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     });
 
     amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, this.switch_content.bind(this));
-    amplify.subscribe(z.event.WebApp.PEOPLE.SHOW, this.show_participant.bind(this));
+    amplify.subscribe(z.event.WebApp.PEOPLE.SHOW, this.show_participant);
     amplify.subscribe(z.event.WebApp.PEOPLE.TOGGLE, this.toggle_participants_bubble.bind(this));
   }
 
@@ -249,10 +249,6 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
       },
       template: '#template-confirm-leave',
     });
-  }
-
-  show_participant(user_et) {
-    this.user_profile(user_et);
   }
 
   rename_conversation(data, event) {
