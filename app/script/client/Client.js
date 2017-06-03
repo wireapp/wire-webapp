@@ -82,6 +82,15 @@ z.client.Client = class Client {
   to_json() {
     const real_json = JSON.parse(ko.toJSON(this));
     delete real_json.session;
+
+    for (const member of real_json) {
+      if (real_json.hasOwnProperty(member)) {
+        if (real_json.member === '?') {
+          delete real_json.member;
+        }
+      }
+    }
+
     return real_json;
   }
 };
