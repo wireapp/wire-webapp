@@ -609,7 +609,7 @@ z.conversation.ConversationService = class ConversationService {
             return this.storage_service.db.transaction('rw', z.storage.StorageService.OBJECT_STORE.EVENTS, () => {
               return this.load_event_from_db(conversation_id, message_et.id)
                 .then((record) => {
-                  if (record && (changes.version === ((record.version || 1) + 1))) {
+                  if (record && changes.version === (record.version || 1) + 1) {
                     return this.storage_service.update(z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key, changes);
                   }
                   throw new z.storage.StorageError(z.storage.StorageError.TYPE.NON_SEQUENTIAL_UPDATE);
