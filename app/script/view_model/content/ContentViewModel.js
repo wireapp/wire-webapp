@@ -113,7 +113,6 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
     amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, this.switch_content.bind(this));
     amplify.subscribe(z.event.WebApp.CONVERSATION.SHOW, this.show_conversation.bind(this));
     amplify.subscribe(z.event.WebApp.LIST.SCROLL, this.conversation_input.show_separator);
-    amplify.subscribe(z.event.WebApp.PEOPLE.TOGGLE, this.participants.toggle_participants_bubble);
     amplify.subscribe(z.event.WebApp.WINDOW.RESIZE.HEIGHT, this.message_list.scroll_height);
   }
 
