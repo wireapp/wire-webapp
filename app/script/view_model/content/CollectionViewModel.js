@@ -104,7 +104,7 @@ z.ViewModel.content.CollectionViewModel = class CollectionViewModel {
         })
         .then(() => {
           this._track_opened_collection(conversation_et, this.no_items_found());
-       });
+        });
     }
   }
 
