@@ -65,6 +65,7 @@ z.entity.Conversation = class Conversation {
     });
     this.is_request = ko.pureComputed(() => this.type() === z.conversation.ConversationType.CONNECT);
     this.is_self = ko.pureComputed(() => this.type() === z.conversation.ConversationType.SELF);
+    this.is_team_group = ko.pureComputed(() => this.is_one2one() && this.team_id && this.name());
 
     // in case this is a one2one conversation this is the connection to that user
     this.connection = ko.observable(new z.entity.Connection());
