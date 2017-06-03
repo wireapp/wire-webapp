@@ -2770,10 +2770,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
       })
       .catch((error) => {
-        if (error.type === z.storage.StorageError.TYPE.NON_SEQUENTIAL_UPDATE) {
-          Raygun.send('Failed sequential database update');
-        }
-
         if (error.type !== z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
           this.logger.error(`Failed to handle reaction to message '${event_json.data.message_id}' in conversation '${conversation_et.id}'`, {error, event: event_json});
           throw error;
