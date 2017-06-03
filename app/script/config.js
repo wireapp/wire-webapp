@@ -89,8 +89,6 @@ window.z.config = {
     WIDTH: 320,
   },
 
-  MINIMUM_USERNAME_LENGTH: 2,
-
   // measured in pixel
   SCROLL_TO_LAST_MESSAGE_THRESHOLD: 100,
 
