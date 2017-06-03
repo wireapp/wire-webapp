@@ -192,7 +192,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
       })
       .catch((error) => {
         if (error.type !== z.user.UserError.TYPE.INVALID_UPDATE) {
-          throw error
+          throw error;
         }
       });
   }
@@ -226,12 +226,12 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
       });
 
       this._show_upload_warning(warning_file_size);
-      return Promise.reject(new z.user.UserError(z.user.UserError.TYPE.INVALID_UPDATE))
+      return Promise.reject(new z.user.UserError(z.user.UserError.TYPE.INVALID_UPDATE));
     }
 
     if (!z.config.SUPPORTED_PROFILE_IMAGE_TYPES.includes(new_user_picture.type)) {
       this._show_upload_warning(z.l10n.text(z.string.alert_upload_file_format));
-      return Promise.reject(new z.user.UserError(z.user.UserError.TYPE.INVALID_UPDATE))
+      return Promise.reject(new z.user.UserError(z.user.UserError.TYPE.INVALID_UPDATE));
     }
 
     const min_height = z.user.UserRepository.CONFIG.MINIMUM_PICTURE_SIZE.HEIGHT;
@@ -242,7 +242,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
       }
 
       this._show_upload_warning(z.l10n.text(z.string.alert_upload_too_small));
-      return Promise.reject(new z.user.UserError(z.user.UserError.TYPE.INVALID_UPDATE))
+      return Promise.reject(new z.user.UserError(z.user.UserError.TYPE.INVALID_UPDATE));
     });
   }
 
