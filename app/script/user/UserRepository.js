@@ -915,7 +915,7 @@ z.user.UserRepository = class UserRepository {
   /**
    * Change the profile image.
    * @param {string|Object} picture - New user picture
-   * @returns {undefined} No return value
+   * @returns {Promise} Resolves when the picture was updated
    */
   change_picture(picture) {
     return this.asset_service.upload_profile_image(picture)
