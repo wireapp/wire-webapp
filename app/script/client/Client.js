@@ -80,17 +80,15 @@ z.client.Client = class Client {
    * @returns {Object} Client data as JSON object
    */
   to_json() {
-    const real_json = JSON.parse(ko.toJSON(this));
-    delete real_json.session;
+    const json_object = JSON.parse(ko.toJSON(this));
+    delete json_object.session;
 
-    for (const member of real_json) {
-      if (real_json.hasOwnProperty(member)) {
-        if (real_json.member === '?') {
-          delete real_json.member;
-        }
+    for (const member of json_object) {
+      if (json_object.hasOwnProperty(member) && json_object.member === '?') {
+        delete json_object.member;
       }
     }
 
-    return real_json;
+    return json_object;
   }
 };
