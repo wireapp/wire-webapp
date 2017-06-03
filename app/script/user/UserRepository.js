@@ -788,13 +788,15 @@ z.user.UserRepository = class UserRepository {
   /**
    * Change name.
    * @param {string} name - New name
-   * @returns {undefined} No return value
+   * @returns {Promise} Resolves when the username has been changed
    */
   change_name(name) {
     if (name.length >= z.config.MINIMUM_USERNAME_LENGTH) {
       return this.user_service.update_own_user_profile({name})
         .then(() => this.self().name(name));
     }
+
+    return Promise.reject(new z.user.UserError(z.userUserError.TYPE.INVALID_UPDATE))
   }
 
   /**
