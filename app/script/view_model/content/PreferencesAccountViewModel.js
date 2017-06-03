@@ -234,13 +234,15 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
     const min_height = z.user.UserRepository.CONFIG.MINIMUM_PICTURE_SIZE.HEIGHT;
     const min_width = z.user.UserRepository.CONFIG.MINIMUM_PICTURE_SIZE.WIDTH;
-    z.util.valid_profile_image_size(new_user_picture, min_width, min_height, (valid) => {
-      if (valid) {
-        return this.user_repository.change_picture(new_user_picture);
-      }
 
-      return this._show_upload_warning(z.l10n.text(z.string.alert_upload_too_small));
-    });
+    return z.util.valid_profile_image_size(new_user_picture, min_width, min_height)
+      .then((valid) => {
+        if (valid) {
+          return this.user_repository.change_picture(new_user_picture);
+        }
+
+        return this._show_upload_warning(z.l10n.text(z.string.alert_upload_too_small));
+      });
   }
 
   _show_upload_warning(warning) {
