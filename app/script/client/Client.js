@@ -34,9 +34,9 @@ z.client.Client = class Client {
     this.label = Client.CONFIG.DEFAULT_VALUE;
     this.model = Client.CONFIG.DEFAULT_VALUE;
 
-    for (const member in payload) {
-      if (payload.hasOwnProperty(member) && payload.member !== undefined) {
-        this[member] = payload[member];
+    for (const property in payload) {
+      if (payload.hasOwnProperty(property) && payload[property] !== undefined) {
+        this[property] = payload[property];
       }
     }
 
@@ -91,9 +91,9 @@ z.client.Client = class Client {
     const json_object = JSON.parse(ko.toJSON(this));
     delete json_object.session;
 
-    for (const member in json_object) {
-      if (json_object.hasOwnProperty(member) && json_object[member] === Client.CONFIG.DEFAULT_VALUE) {
-        delete json_object.member;
+    for (const property in json_object) {
+      if (json_object.hasOwnProperty(property) && json_object[property] === Client.CONFIG.DEFAULT_VALUE) {
+        delete json_object.property;
       }
     }
 
