@@ -25,14 +25,14 @@ window.z.client = z.client || {};
 z.client.Client = class Client {
   static get CONFIG() {
     return {
-      PLACEHOLDER: '?', 
+      DEFAULT_VALUE: '?', 
     };
   }
 
   constructor(payload = {}) {
-    this.class = Client.CONFIG.PLACEHOLDER;
-    this.label = Client.CONFIG.PLACEHOLDER;
-    this.model = Client.CONFIG.PLACEHOLDER;
+    this.class = Client.CONFIG.DEFAULT_VALUE;
+    this.label = Client.CONFIG.DEFAULT_VALUE;
+    this.model = Client.CONFIG.DEFAULT_VALUE;
 
     for (const member in payload) {
       if (payload.hasOwnProperty(member) && payload.member !== undefined) {
@@ -92,7 +92,7 @@ z.client.Client = class Client {
     delete json_object.session;
 
     for (const member in json_object) {
-      if (json_object.hasOwnProperty(member) && json_object[member] === Client.CONFIG.PLACEHOLDER) {
+      if (json_object.hasOwnProperty(member) && json_object[member] === Client.CONFIG.DEFAULT_VALUE) {
         delete json_object.member;
       }
     }
