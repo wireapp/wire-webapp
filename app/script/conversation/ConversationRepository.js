@@ -630,15 +630,17 @@ z.conversation.ConversationRepository = class ConversationRepository {
     for (const conversation_et of this.conversations()) {
       const with_expected_user = user_et.id === conversation_et.participating_user_ids()[0];
 
-      if (team_id) {
-        const active_1to1_conversation = !conversation_et.is_group() && !conversation_et.name() && !conversation_et.removed_from_conversation();
-        const in_active_team = team_id === conversation_et.team_id;
+      if (with_expected_user) {
+        if (team_id) {
+          const active_1to1_conversation = conversation_et.is_one2one() && !conversation_et.is_team_group() && !conversation_et.removed_from_conversation();
+          const in_active_team = team_id === conversation_et.team_id;
 
-        if (active_1to1_conversation && in_active_team && with_expected_user) {
+          if (active_1to1_conversation && in_active_team) {
+            return Promise.resolve(conversation_et);
+          }
+        } else if (conversation_et.is_one2one() || conversation_et.is_request()) {
           return Promise.resolve(conversation_et);
         }
-      } else if (with_expected_user && (conversation_et.is_one2one() || conversation_et.is_request())) {
-        return Promise.resolve(conversation_et);
       }
     }
 
