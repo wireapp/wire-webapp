@@ -187,7 +187,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     const [new_user_picture] = Array.from(files);
 
     this.set_picture(new_user_picture)
-      .then() => {
+      .then(() => {
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PROFILE_PICTURE_CHANGED, {source: 'fromPhotoLibrary'});
       })
       .catch((error) => {
@@ -234,8 +234,8 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
       return Promise.reject(new z.user.UserError(z.user.UserError.TYPE.INVALID_UPDATE))
     }
 
-    const min_height = z.user.UserRepository.CONFIG.MINIMUM_PROFILE_IMAGE_SIZE.HEIGHT;
-    const min_width = z.user.UserRepository.CONFIG.MINIMUM_PROFILE_IMAGE_SIZE.WIDTH;
+    const min_height = z.user.UserRepository.CONFIG.MINIMUM_PICTURE_SIZE.HEIGHT;
+    const min_width = z.user.UserRepository.CONFIG.MINIMUM_PICTURE_SIZE.WIDTH;
     z.util.valid_profile_image_size(new_user_picture, min_width, min_height, (valid) => {
       if (valid) {
         return this.user_repository.change_picture(new_user_picture);
