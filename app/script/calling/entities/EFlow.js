@@ -1107,31 +1107,35 @@ z.calling.entities.EFlow = class EFlow {
    * @returns {undefined} No return value
    */
   _add_media_stream(media_stream) {
-    if (media_stream.type === z.media.MediaType.AUDIO) {
-      media_stream = this.audio.wrap_audio_input_stream(media_stream);
-    }
+    if (media_stream) {
+      if (media_stream.type === z.media.MediaType.AUDIO) {
+        media_stream = this.audio.wrap_audio_input_stream(media_stream);
+      }
 
-    if (this.peer_connection.addTrack) {
-      return media_stream.getTracks()
-        .forEach((media_stream_track) => {
-          this.peer_connection.addTrack(media_stream_track, media_stream);
+      if (this.peer_connection.addTrack) {
+        return media_stream.getTracks()
+          .forEach((media_stream_track) => {
+            this.peer_connection.addTrack(media_stream_track, media_stream);
 
-          this.logger.debug(`Added local '${media_stream_track.kind}' MediaStreamTrack to PeerConnection`,
-            {
-              audio_tracks: media_stream.getAudioTracks(),
-              stream: media_stream,
-              video_tracks: media_stream.getVideoTracks(),
-            });
+            this.logger.debug(`Added local '${media_stream_track.kind}' MediaStreamTrack to PeerConnection`,
+              {
+                audio_tracks: media_stream.getAudioTracks(),
+                stream: media_stream,
+                video_tracks: media_stream.getVideoTracks(),
+              });
+          });
+      }
+
+      this.peer_connection.addStream(media_stream);
+      this.logger.debug(`Added local '${media_stream.type}' MediaStream to PeerConnection`,
+        {
+          audio_tracks: media_stream.getAudioTracks(),
+          stream: media_stream,
+          video_tracks: media_stream.getVideoTracks(),
         });
+    } else {
+      throw new Error('Failed to add MediaStream: Provided MediaStream undefined')
     }
-
-    this.peer_connection.addStream(media_stream);
-    this.logger.debug(`Added local '${media_stream.type}' MediaStream to PeerConnection`,
-      {
-        audio_tracks: media_stream.getAudioTracks(),
-        stream: media_stream,
-        video_tracks: media_stream.getVideoTracks(),
-      });
   }
 
   /**
