@@ -609,9 +609,22 @@ z.conversation.ConversationService = class ConversationService {
             return this.storage_service.db.transaction('rw', z.storage.StorageService.OBJECT_STORE.EVENTS, () => {
               return this.load_event_from_db(conversation_id, message_et.id)
                 .then((record) => {
-                  if (record && changes.version === (record.version || 1) + 1) {
-                    return this.storage_service.update(z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key, changes);
+                  let custom_data;
+
+                  if (record) {
+                    const database_version = record.version || 1;
+
+                    if (changes.version === database_version + 1) {
+                      return this.storage_service.update(z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key, changes);
+                    }
+
+                    custom_data = {
+                      database_version: database_version,
+                      update_version: changes.version,
+                    };
                   }
+
+                  Raygun.send('Failed sequential database update', custom_data);
                   throw new z.storage.StorageError(z.storage.StorageError.TYPE.NON_SEQUENTIAL_UPDATE);
                 });
             });
