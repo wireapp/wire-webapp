@@ -191,7 +191,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PROFILE_PICTURE_CHANGED, {source: 'fromPhotoLibrary'});
       })
       .catch((error) => {
-        if (error.type !== (z.user.UserError.TYPE.INVALID_UPDATE) {
+        if (error.type !== z.user.UserError.TYPE.INVALID_UPDATE) {
           throw error
         }
       });
