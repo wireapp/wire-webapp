@@ -229,7 +229,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     if (this.confirm_dialog) {
       this.confirm_dialog.destroy();
     }
-    this.user_profile(this.placeholder_participant)
+    this.user_profile(this.placeholder_participant);
     $(`#${this.element_id}`).removeClass('single-user-mode');
   }
 
