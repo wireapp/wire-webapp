@@ -32,7 +32,8 @@ z.user.UserError = class UserError extends Error {
 
     switch (this.type) {
       case UserError.TYPE.INVALID_UPDATE:
-        this.message = 'False input data for requested update'
+        this.message = 'False input data for requested update';
+        break;
       case UserError.TYPE.PRE_KEY_NOT_FOUND:
         this.message = 'Pre-key not found';
         break;
