@@ -184,19 +184,26 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   click_on_change_picture(files) {
-    this.set_picture(files, () => {
-      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PROFILE_PICTURE_CHANGED, {source: 'fromPhotoLibrary'});
-    });
+    const [new_user_picture] = Array.from(files);
+
+    this.set_picture(new_user_picture)
+      .then() => {
+        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PROFILE_PICTURE_CHANGED, {source: 'fromPhotoLibrary'});
+      })
+      .catch((error) => {
+        if (error.type !== (z.user.UserError.TYPE.INVALID_UPDATE) {
+          throw error
+        }
+      });
   }
 
   click_on_delete_account() {
-    return amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.DELETE_ACCOUNT, {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.DELETE_ACCOUNT, {
       action: () => {
         return this.user_repository.delete_me();
       },
       data: this.self_user().email(),
-    }
-    );
+    });
   }
 
   click_on_logout() {
@@ -208,10 +215,8 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     return z.util.safe_window_open(`${z.util.Environment.backend.website_url()}${z.l10n.text(z.string.url_password_reset)}`);
   }
 
-  set_picture(files) {
-    const [input_picture] = files;
-
-    if (input_picture.size > z.config.MAXIMUM_IMAGE_FILE_SIZE) {
+  set_picture(new_user_picture) {
+    if (new_user_picture.size > z.config.MAXIMUM_IMAGE_FILE_SIZE) {
       const warning_file_size = z.localization.Localizer.get_text({
         id: z.string.alert_upload_too_large,
         replace: {
@@ -220,21 +225,24 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
         },
       });
 
-      return this._show_upload_warning(warning_file_size);
+      this._show_upload_warning(warning_file_size);
+      return Promise.reject(new z.user.UserError(z.user.UserError.TYPE.INVALID_UPDATE))
     }
 
-    if (!z.config.SUPPORTED_PROFILE_IMAGE_TYPES.includes(input_picture.type)) {
-      return this._show_upload_warning(z.l10n.text(z.string.alert_upload_file_format));
+    if (!z.config.SUPPORTED_PROFILE_IMAGE_TYPES.includes(new_user_picture.type)) {
+      this._show_upload_warning(z.l10n.text(z.string.alert_upload_file_format));
+      return Promise.reject(new z.user.UserError(z.user.UserError.TYPE.INVALID_UPDATE))
     }
 
-    const max_width = z.config.MINIMUM_PROFILE_IMAGE_SIZE.WIDTH;
-    const max_height = z.config.MINIMUM_PROFILE_IMAGE_SIZE.HEIGHT;
-    z.util.valid_profile_image_size(input_picture, max_width, max_height, (valid) => {
+    const min_height = z.user.UserRepository.CONFIG.MINIMUM_PROFILE_IMAGE_SIZE.HEIGHT;
+    const min_width = z.user.UserRepository.CONFIG.MINIMUM_PROFILE_IMAGE_SIZE.WIDTH;
+    z.util.valid_profile_image_size(new_user_picture, min_width, min_height, (valid) => {
       if (valid) {
-        return this.user_repository.change_picture(input_picture);
+        return this.user_repository.change_picture(new_user_picture);
       }
 
-      return this._show_upload_warning(z.l10n.text(z.string.alert_upload_too_small));
+      this._show_upload_warning(z.l10n.text(z.string.alert_upload_too_small));
+      return Promise.reject(new z.user.UserError(z.user.UserError.TYPE.INVALID_UPDATE))
     });
   }
 
