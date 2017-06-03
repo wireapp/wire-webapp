@@ -83,7 +83,7 @@ z.client.Client = class Client {
     const json_object = JSON.parse(ko.toJSON(this));
     delete json_object.session;
 
-    for (const member of json_object) {
+    for (const member in json_object) {
       if (json_object.hasOwnProperty(member) && json_object.member === '?') {
         delete json_object.member;
       }
