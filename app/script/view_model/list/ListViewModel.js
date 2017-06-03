@@ -277,13 +277,14 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     const next_conversation_et = this._get_next_conversation(conversation_et);
     const [user_et] = conversation_et.participating_user_ets();
 
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.BLOCK, {
-      action: () => {
-        this.user_repository.block_user(user_et, next_conversation_et);
-      },
-      data: user_et.first_name(),
+    if (user_et) {
+      amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.BLOCK, {
+        action: () => {
+          this.user_repository.block_user(user_et, next_conversation_et);
+        },
+        data: user_et.first_name(),
+      });
     }
-    );
   }
 
   click_on_cancel_action(conversation_et) {
