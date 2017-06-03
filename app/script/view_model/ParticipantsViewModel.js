@@ -163,8 +163,10 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     });
 
     amplify.subscribe(z.event.WebApp.PEOPLE.SHOW, (user_et) => {
-      this.user_profile(user_et);
-      $(`#${this.element_id}`).addClass('single-user-mode');
+      if (user_et) {
+        this.user_profile(user_et);
+        $(`#${this.element_id}`).addClass('single-user-mode');
+      }
     });
   }
 
