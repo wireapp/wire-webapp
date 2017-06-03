@@ -3163,12 +3163,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolve when message was updated
    */
   update_message_as_upload_failed(message_et) {
-    const asset_et = message_et.get_first_asset();
+    if (message_et) {
+      const asset_et = message_et.get_first_asset();
 
-    asset_et.status(z.assets.AssetTransferState.UPLOAD_FAILED);
-    asset_et.upload_failed_reason(z.assets.AssetUploadFailedReason.FAILED);
+      if (asset_et) {
+        asset_et.status(z.assets.AssetTransferState.UPLOAD_FAILED);
+        asset_et.upload_failed_reason(z.assets.AssetUploadFailedReason.FAILED);
+      }
 
-    return this.conversation_service.update_asset_as_failed_in_db(message_et.primary_key);
+      return this.conversation_service.update_asset_as_failed_in_db(message_et.primary_key);
+    }
   }
 
   /**
