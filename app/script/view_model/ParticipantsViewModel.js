@@ -62,6 +62,8 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.participants_verified = ko.observableArray();
     this.participants_unverified = ko.observableArray();
 
+    this.placeholder_participant = new z.entity.User();
+
     ko.computed(() => {
       const conversation_et = this.conversation();
       const participants = []
@@ -85,7 +87,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.confirm_dialog = undefined;
 
     // Selected group user
-    this.user_profile = ko.observable(new z.entity.User());
+    this.user_profile = ko.observable(this.placeholder_participant);
 
     // Switch between div and input field to edit the conversation name
     this.editing = ko.observable(false);
@@ -182,7 +184,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
         if (user_et && !this.conversation().is_group() && !this.conversation().is_team_group()) {
           this.user_profile(user_et);
         } else {
-          this.user_profile(new z.entity.User());
+          this.user_profile(this.placeholder_participant);
         }
 
         this.render_participants(true);
@@ -218,7 +220,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   change_conversation(conversation_et) {
     this.participants_bubble.hide();
     this.conversation(conversation_et);
-    this.user_profile(new z.entity.User());
+    this.user_profile(this.placeholder_participant);
   }
 
   reset_view() {
@@ -227,6 +229,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     if (this.confirm_dialog) {
       this.confirm_dialog.destroy();
     }
+    this.user_profile(this.placeholder_participant)
     $(`#${this.element_id}`).removeClass('single-user-mode');
   }
 
@@ -297,7 +300,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   }
 
   close() {
-    this.user_profile(new z.entity.User());
+    this.user_profile(this.placeholder_participant);
     this.reset_view();
   }
 
