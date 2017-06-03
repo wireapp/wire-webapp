@@ -173,10 +173,11 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
       if (!this.participants_bubble.is_visible()) {
         this.reset_view();
 
-        if (this.conversation().is_group()) {
-          this.user_profile(new z.entity.User());
+        const [user_et] = this.participants();
+        if (user_et && !this.conversation().is_group() && !this.conversation().is_team_group()) {
+          this.user_profile(user_et);
         } else {
-          this.user_profile(this.participants()[0]);
+          this.user_profile(new z.entity.User());
         }
 
         this.render_participants(true);
