@@ -31,6 +31,8 @@ z.user.UserError = class UserError extends Error {
     this.type = type || UserError.TYPE.UNKNOWN;
 
     switch (this.type) {
+      case UserError.TYPE.INVALID_UPDATE:
+        this.message = 'False input data for requested update'
       case UserError.TYPE.PRE_KEY_NOT_FOUND:
         this.message = 'Pre-key not found';
         break;
@@ -53,6 +55,7 @@ z.user.UserError = class UserError extends Error {
 
   static get TYPE() {
     return {
+      INVALID_UPDATE: 'z.user.UserError.TYPE.INVALID_UPDATE',
       PRE_KEY_NOT_FOUND: 'z.user.UserError.TYPE.PRE_KEY_NOT_FOUND',
       REQUEST_FAILURE: 'z.user.UserError.TYPE.REQUEST_FAILURE',
       UNKNOWN: 'z.user.UserError.TYPE.UNKNOWN',
