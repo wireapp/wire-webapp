@@ -23,6 +23,13 @@ window.z = window.z || {};
 window.z.user = z.user || {};
 
 z.user.UserRepository = class UserRepository {
+  static get CONFIG() {
+    return {
+      MINIMUM_NAME_LENGTH: 2,
+      MINIMUM_USERNAME_LENGTH: 2,
+    };
+  }
+
   /**
    * Construct a new User repository.
    * @class z.user.UserRepository
@@ -791,7 +798,7 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise} Resolves when the username has been changed
    */
   change_name(name) {
-    if (name.length >= z.config.MINIMUM_USERNAME_LENGTH) {
+    if (name.length >= UserRepository.CONFIG.MINIMUM_NAME_LENGTH) {
       return this.user_service.update_own_user_profile({name})
         .then(() => this.self().name(name));
     }
@@ -851,17 +858,21 @@ z.user.UserRepository = class UserRepository {
    * @returns {undefined} No return value
    */
   change_username(username) {
-    return this.user_service.change_own_username(username)
-      .then(() => {
-        this.should_set_username = false;
-        return this.self().username(username);
-      })
-      .catch(function(error) {
-        if ([z.service.BackendClientError.STATUS_CODE.CONFLICT, z.service.BackendClientError.STATUS_CODE.BAD_REQUEST].includes(error.code)) {
-          throw new z.user.UserError(z.user.UserError.TYPE.USERNAME_TAKEN);
-        }
-        throw new z.user.UserError(z.user.UserError.TYPE.REQUEST_FAILURE);
-      });
+    if (username.length >= UserRepository.CONFIG.MINIMUM_USERNAME_LENGTH) {
+      return this.user_service.change_own_username(username)
+        .then(() => {
+          this.should_set_username = false;
+          return this.self().username(username);
+        })
+        .catch(function(error) {
+          if ([z.service.BackendClientError.STATUS_CODE.CONFLICT, z.service.BackendClientError.STATUS_CODE.BAD_REQUEST].includes(error.code)) {
+            throw new z.user.UserError(z.user.UserError.TYPE.USERNAME_TAKEN);
+          }
+          throw new z.user.UserError(z.user.UserError.TYPE.REQUEST_FAILURE);
+        });
+    }
+
+    return Promise.reject(new z.user.UserError(z.userUserError.TYPE.INVALID_UPDATE))
   }
 
   /**
