@@ -23,6 +23,13 @@ window.z = window.z || {};
 window.z.user = z.user || {};
 
 z.user.UserRepository = class UserRepository {
+  static get CONFIG() {
+    return {
+      MINIMUM_NAME_LENGTH: 2,
+      MINIMUM_USERNAME_LENGTH: 2,
+    };
+  }
+
   /**
    * Construct a new User repository.
    * @class z.user.UserRepository
@@ -733,7 +740,7 @@ z.user.UserRepository = class UserRepository {
   /**
    * Update a local user from the backend by ID.
    * @param {string} user_id - User ID
-   * @returns {undefined} No return value
+   * @returns {Promise} Resolves when user was updated
    */
   update_user_by_id(user_id) {
     return this.find_user_by_id(user_id)
@@ -778,7 +785,7 @@ z.user.UserRepository = class UserRepository {
   /**
    * Change the accent color.
    * @param {number} accent_id - New accent color
-   * @returns {undefined} No return value
+   * @returns {Promise} Resolves when accent color was changed
    */
   change_accent_color(accent_id) {
     return this.user_service.update_own_user_profile({accent_id})
@@ -788,13 +795,15 @@ z.user.UserRepository = class UserRepository {
   /**
    * Change name.
    * @param {string} name - New name
-   * @returns {undefined} No return value
+   * @returns {Promise} Resolves when the name was changed
    */
   change_name(name) {
-    if (name.length >= z.config.MINIMUM_USERNAME_LENGTH) {
+    if (name.length >= UserRepository.CONFIG.MINIMUM_NAME_LENGTH) {
       return this.user_service.update_own_user_profile({name})
         .then(() => this.self().name(name));
     }
+
+    return Promise.reject(new z.user.UserError(z.userUserError.TYPE.INVALID_UPDATE));
   }
 
   /**
@@ -807,7 +816,7 @@ z.user.UserRepository = class UserRepository {
 
   /**
    * Tries to generate a username suggestion.
-   * @returns {undefined} No return value
+   * @returns {Promise} Resolves with the username suggestions
    */
   get_username_suggestion() {
     let suggestions = null;
@@ -846,20 +855,24 @@ z.user.UserRepository = class UserRepository {
   /**
    * Change username.
    * @param {string} username - New username
-   * @returns {undefined} No return value
+   * @returns {Promise} Resolves when the username was changed
    */
   change_username(username) {
-    return this.user_service.change_own_username(username)
-      .then(() => {
-        this.should_set_username = false;
-        return this.self().username(username);
-      })
-      .catch(function(error) {
-        if ([z.service.BackendClientError.STATUS_CODE.CONFLICT, z.service.BackendClientError.STATUS_CODE.BAD_REQUEST].includes(error.code)) {
-          throw new z.user.UserError(z.user.UserError.TYPE.USERNAME_TAKEN);
-        }
-        throw new z.user.UserError(z.user.UserError.TYPE.REQUEST_FAILURE);
-      });
+    if (username.length >= UserRepository.CONFIG.MINIMUM_USERNAME_LENGTH) {
+      return this.user_service.change_own_username(username)
+        .then(() => {
+          this.should_set_username = false;
+          return this.self().username(username);
+        })
+        .catch(function(error) {
+          if ([z.service.BackendClientError.STATUS_CODE.CONFLICT, z.service.BackendClientError.STATUS_CODE.BAD_REQUEST].includes(error.code)) {
+            throw new z.user.UserError(z.user.UserError.TYPE.USERNAME_TAKEN);
+          }
+          throw new z.user.UserError(z.user.UserError.TYPE.REQUEST_FAILURE);
+        });
+    }
+
+    return Promise.reject(new z.user.UserError(z.userUserError.TYPE.INVALID_UPDATE));
   }
 
   /**

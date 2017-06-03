@@ -72,14 +72,16 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
       event.target.blur();
     }
 
-    this.user_repository.change_name(new_name)
-      .then(() => {
-        this.name_saved(true);
-        event.target.blur();
-        window.setTimeout(() => {
-          this.name_saved(false);
-        }, PreferencesAccountViewModel.SAVED_ANIMATION_TIMEOUT);
-      });
+    if (new_name.length < z.user.UserRepository.CONFIG.MINIMUM_NAME_LENGTH) {
+      this.user_repository.change_name(new_name)
+        .then(() => {
+          this.name_saved(true);
+          event.target.blur();
+          window.setTimeout(() => {
+            this.name_saved(false);
+          }, PreferencesAccountViewModel.SAVED_ANIMATION_TIMEOUT);
+        });
+    }
   }
 
   reset_name_input() {
@@ -115,7 +117,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   change_username(username, event) {
     const entered_username = event.target.value;
 
-    if (entered_username.length < 2) {
+    if (entered_username.length < z.user.UserRepository.CONFIG.MINIMUM_USERNAME_LENGTH) {
       this.username_error(null);
       return;
     }
