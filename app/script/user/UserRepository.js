@@ -296,7 +296,7 @@ z.user.UserRepository = class UserRepository {
    */
   _update_connection_status(user_et, status, show_conversation = false) {
     if (!user_et) {
-      this.logger.error('Cannot update connection without a user);
+      this.logger.error('Cannot update connection without a user');
       return Promise.reject();
     }
 
