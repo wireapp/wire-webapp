@@ -94,18 +94,19 @@ z.ViewModel.content.CollectionViewModel = class CollectionViewModel {
     [this.images, this.files, this.links, this.audio].forEach((array) => array.removeAll());
   }
 
-  set_conversation(conversation_et) {
-    this.conversation_et(conversation_et);
+  set_conversation(conversation_et = this.conversation_repository.active_conversation()) {
+    if (conversation_et) {
+      this.conversation_et(conversation_et);
 
-    this.conversation_repository.get_events_for_category(conversation_et, z.message.MessageCategory.LINK_PREVIEW)
-      .then((message_ets) => {
-        return this._populate_items(message_ets);
-      })
-      .then(() => {
-        this._track_opened_collection(conversation_et, this.no_items_found());
-      });
+      this.conversation_repository.get_events_for_category(conversation_et, z.message.MessageCategory.LINK_PREVIEW)
+        .then((message_ets) => {
+          return this._populate_items(message_ets);
+        })
+        .then(() => {
+          this._track_opened_collection(conversation_et, this.no_items_found());
+       });
+    }
   }
-
 
   _populate_items(message_ets) {
     message_ets.map((message_et) => {
