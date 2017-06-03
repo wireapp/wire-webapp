@@ -1134,7 +1134,7 @@ z.calling.entities.EFlow = class EFlow {
           video_tracks: media_stream.getVideoTracks(),
         });
     } else {
-      throw new Error('Failed to add MediaStream: Provided MediaStream undefined')
+      throw new Error('Failed to add MediaStream: Provided MediaStream undefined');
     }
   }
 
