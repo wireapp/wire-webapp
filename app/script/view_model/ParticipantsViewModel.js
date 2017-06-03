@@ -40,7 +40,6 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.pending = this.pending.bind(this);
     this.remove = this.remove.bind(this);
     this.show_participant = this.show_participant.bind(this);
-    this.toggle_participants_bubble = this.toggle_participants_bubble.bind(this);
     this.unblock = this.unblock.bind(this);
 
     this.element_id = element_id;
@@ -156,18 +155,22 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
       },
     });
 
-    amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, (content_state) => {
-      if (content_state === z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS) {
-        this.participants_bubble.hide();
-      }
-    });
+    amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, this.switch_content.bind(this));
+    amplify.subscribe(z.event.WebApp.PEOPLE.SHOW, this.show_participant.bind(this));
+    amplify.subscribe(z.event.WebApp.PEOPLE.TOGGLE, this.toggle_participants_bubble.bind(this));
+  }
 
-    amplify.subscribe(z.event.WebApp.PEOPLE.SHOW, (user_et) => {
-      if (user_et) {
-        this.user_profile(user_et);
-        $(`#${this.element_id}`).addClass('single-user-mode');
-      }
-    });
+  show_participant(user_et) {
+    if (user_et) {
+      this.user_profile(user_et);
+      $(`#${this.element_id}`).addClass('single-user-mode');
+    }
+  }
+
+  switch_content(content_state) {
+    if (content_state === z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS) {
+      this.participants_bubble.hide();
+    }
   }
 
   toggle_participants_bubble(add_people = false) {
