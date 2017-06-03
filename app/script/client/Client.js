@@ -23,10 +23,16 @@ window.z = window.z || {};
 window.z.client = z.client || {};
 
 z.client.Client = class Client {
+  static get CONFIG() {
+    return {
+      PLACEHOLDER: '?', 
+    };
+  }
+
   constructor(payload = {}) {
-    this.class = '?';
-    this.label = '?';
-    this.model = '?';
+    this.class = Client.CONFIG.PLACEHOLDER;
+    this.label = Client.CONFIG.PLACEHOLDER;
+    this.model = Client.CONFIG.PLACEHOLDER;
 
     for (const member in payload) {
       this[member] = payload[member];
@@ -47,7 +53,7 @@ z.client.Client = class Client {
    * @returns {Object} Object containing the user ID & client ID
    */
   static dismantle_user_client_id(id) {
-    const [user_id, client_id] = (id != null ? id.split('@') : undefined) || [];
+    const [user_id, client_id] = (id ? id.split('@') : undefined) || [];
     return {
       client_id: client_id,
       user_id: user_id,
@@ -84,7 +90,7 @@ z.client.Client = class Client {
     delete json_object.session;
 
     for (const member in json_object) {
-      if (json_object.hasOwnProperty(member) && json_object.member === '?') {
+      if (json_object.hasOwnProperty(member) && json_object.member === Client.CONFIG.PLACEHOLDER) {
         delete json_object.member;
       }
     }
