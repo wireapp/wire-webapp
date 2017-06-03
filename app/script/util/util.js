@@ -558,9 +558,10 @@ z.util.naked_url = function(url = '') {
 };
 
 z.util.valid_profile_image_size = function(file, min_width, min_height, callback) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     const image = new Image();
     image.onload = () => resolve((image.width >= min_width) && (image.height >= min_height));
+    image.onerror = () => reject(new Error('Failed to load profile picture for size validation'));
     image.src = window.URL.createObjectURL(file);
   });
 };
