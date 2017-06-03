@@ -24,11 +24,9 @@ window.z.client = z.client || {};
 
 z.client.Client = class Client {
   constructor(payload = {}) {
-    if (payload.address) {
-      this.class = payload.class || '?';
-      this.label = payload.label || '?';
-      this.model = payload.model || '?';
-    }
+    this.class = payload.class || '?';
+    this.label = payload.label || '?';
+    this.model = payload.model || '?';
 
     for (const member in payload) {
       this[member] = payload[member];
