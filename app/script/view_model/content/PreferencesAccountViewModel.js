@@ -225,13 +225,11 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
         },
       });
 
-      this._show_upload_warning(warning_file_size);
-      return Promise.reject(new z.user.UserError(z.user.UserError.TYPE.INVALID_UPDATE));
+      return this._show_upload_warning(warning_file_size);
     }
 
     if (!z.config.SUPPORTED_PROFILE_IMAGE_TYPES.includes(new_user_picture.type)) {
-      this._show_upload_warning(z.l10n.text(z.string.alert_upload_file_format));
-      return Promise.reject(new z.user.UserError(z.user.UserError.TYPE.INVALID_UPDATE));
+      return this._show_upload_warning(z.l10n.text(z.string.alert_upload_file_format));
     }
 
     const min_height = z.user.UserRepository.CONFIG.MINIMUM_PICTURE_SIZE.HEIGHT;
@@ -241,17 +239,16 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
         return this.user_repository.change_picture(new_user_picture);
       }
 
-      this._show_upload_warning(z.l10n.text(z.string.alert_upload_too_small));
-      return Promise.reject(new z.user.UserError(z.user.UserError.TYPE.INVALID_UPDATE));
+      return this._show_upload_warning(z.l10n.text(z.string.alert_upload_too_small));
     });
   }
 
   _show_upload_warning(warning) {
     amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
     window.setTimeout(function() {
-      Promise.reject(new Error('Failed to set new user picture'));
       window.alert(warning);
     }, 200);
+    return Promise.reject(new z.user.UserError(z.user.UserError.TYPE.INVALID_UPDATE));
   }
 
   on_client_add(user_id, client_et) {
