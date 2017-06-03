@@ -83,12 +83,6 @@ window.z.config = {
 
   MINIMUM_PASSWORD_LENGTH: 8,
 
-  // self profile image size in pixel
-  MINIMUM_PROFILE_IMAGE_SIZE: {
-    HEIGHT: 320,
-    WIDTH: 320,
-  },
-
   // measured in pixel
   SCROLL_TO_LAST_MESSAGE_THRESHOLD: 100,
 
