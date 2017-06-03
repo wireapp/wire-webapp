@@ -40,7 +40,6 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.pending = this.pending.bind(this);
     this.remove = this.remove.bind(this);
     this.show_participant = this.show_participant.bind(this);
-    this.toggle_participants_bubble = this.toggle_participants_bubble.bind(this);
     this.unblock = this.unblock.bind(this);
 
     this.element_id = element_id;
@@ -62,6 +61,8 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.participants = ko.observableArray();
     this.participants_verified = ko.observableArray();
     this.participants_unverified = ko.observableArray();
+
+    this.placeholder_participant = new z.entity.User();
 
     ko.computed(() => {
       const conversation_et = this.conversation();
@@ -86,7 +87,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.confirm_dialog = undefined;
 
     // Selected group user
-    this.user_profile = ko.observable(new z.entity.User());
+    this.user_profile = ko.observable(this.placeholder_participant);
 
     // Switch between div and input field to edit the conversation name
     this.editing = ko.observable(false);
@@ -156,16 +157,22 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
       },
     });
 
-    amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, (content_state) => {
-      if (content_state === z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS) {
-        this.participants_bubble.hide();
-      }
-    });
+    amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, this.switch_content.bind(this));
+    amplify.subscribe(z.event.WebApp.PEOPLE.SHOW, this.show_participant);
+    amplify.subscribe(z.event.WebApp.PEOPLE.TOGGLE, this.toggle_participants_bubble.bind(this));
+  }
 
-    amplify.subscribe(z.event.WebApp.PEOPLE.SHOW, (user_et) => {
+  show_participant(user_et) {
+    if (user_et) {
       this.user_profile(user_et);
       $(`#${this.element_id}`).addClass('single-user-mode');
-    });
+    }
+  }
+
+  switch_content(content_state) {
+    if (content_state === z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS) {
+      this.participants_bubble.hide();
+    }
   }
 
   toggle_participants_bubble(add_people = false) {
@@ -173,10 +180,11 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
       if (!this.participants_bubble.is_visible()) {
         this.reset_view();
 
-        if (this.conversation().is_group()) {
-          this.user_profile(new z.entity.User());
+        const [user_et] = this.participants();
+        if (user_et && !this.conversation().is_group() && !this.conversation().is_team_group()) {
+          this.user_profile(user_et);
         } else {
-          this.user_profile(this.participants()[0]);
+          this.user_profile(this.placeholder_participant);
         }
 
         this.render_participants(true);
@@ -212,7 +220,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   change_conversation(conversation_et) {
     this.participants_bubble.hide();
     this.conversation(conversation_et);
-    this.user_profile(new z.entity.User());
+    this.user_profile(this.placeholder_participant);
   }
 
   reset_view() {
@@ -221,6 +229,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     if (this.confirm_dialog) {
       this.confirm_dialog.destroy();
     }
+    this.user_profile(this.placeholder_participant);
     $(`#${this.element_id}`).removeClass('single-user-mode');
   }
 
@@ -240,10 +249,6 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
       },
       template: '#template-confirm-leave',
     });
-  }
-
-  show_participant(user_et) {
-    this.user_profile(user_et);
   }
 
   rename_conversation(data, event) {
@@ -291,7 +296,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   }
 
   close() {
-    this.user_profile(new z.entity.User());
+    this.user_profile(this.placeholder_participant);
     this.reset_view();
   }
 
