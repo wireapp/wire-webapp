@@ -740,7 +740,7 @@ z.user.UserRepository = class UserRepository {
   /**
    * Update a local user from the backend by ID.
    * @param {string} user_id - User ID
-   * @returns {undefined} No return value
+   * @returns {Promise} Resolves when user was updated
    */
   update_user_by_id(user_id) {
     return this.find_user_by_id(user_id)
@@ -785,7 +785,7 @@ z.user.UserRepository = class UserRepository {
   /**
    * Change the accent color.
    * @param {number} accent_id - New accent color
-   * @returns {undefined} No return value
+   * @returns {Promise} Resolves when accent color was changed
    */
   change_accent_color(accent_id) {
     return this.user_service.update_own_user_profile({accent_id})
@@ -795,7 +795,7 @@ z.user.UserRepository = class UserRepository {
   /**
    * Change name.
    * @param {string} name - New name
-   * @returns {Promise} Resolves when the username has been changed
+   * @returns {Promise} Resolves when the name was changed
    */
   change_name(name) {
     if (name.length >= UserRepository.CONFIG.MINIMUM_NAME_LENGTH) {
@@ -816,7 +816,7 @@ z.user.UserRepository = class UserRepository {
 
   /**
    * Tries to generate a username suggestion.
-   * @returns {undefined} No return value
+   * @returns {Promise} Resolves with the username suggestions
    */
   get_username_suggestion() {
     let suggestions = null;
@@ -855,7 +855,7 @@ z.user.UserRepository = class UserRepository {
   /**
    * Change username.
    * @param {string} username - New username
-   * @returns {undefined} No return value
+   * @returns {Promise} Resolves when the username was changed
    */
   change_username(username) {
     if (username.length >= UserRepository.CONFIG.MINIMUM_USERNAME_LENGTH) {
