@@ -26,6 +26,10 @@ z.user.UserRepository = class UserRepository {
   static get CONFIG() {
     return {
       MINIMUM_NAME_LENGTH: 2,
+      MINIMUM_PICTURE_SIZE: {
+        HEIGHT: 320,
+        WIDTH: 320,
+      },
       MINIMUM_USERNAME_LENGTH: 2,
     };
   }
