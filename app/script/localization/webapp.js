@@ -47,6 +47,10 @@ z.string.auth_account_sign_in_phone = 'Phone';
 z.string.auth_account_terms_of_use = 'Terms of Use';
 z.string.auth_account_terms_of_use_detail = 'I accept';
 
+// Authentication: BLOCKED section
+z.string.auth_blocked_database = 'Wire needs access to local storage to display your messages. Local storage is not available in private mode.';
+z.string.auth_blocked_tabs = 'Wire is already open in another tab.';
+
 // Authentication: VERIFY section
 z.string.auth_verify_account_add = 'Add';
 z.string.auth_verify_account_detail = 'This lets you use Wire on multiple devices.';
@@ -65,10 +69,6 @@ z.string.auth_limit_description = 'Remove one of your other devices to start usi
 z.string.auth_limit_button_manage = 'Manage devices';
 z.string.auth_limit_button_sign_out = 'Log out';
 z.string.auth_limit_devices_current = '(Current)';
-
-// Authentication: TABS section
-z.string.auth_tabs_headline = 'Wire is so much nicer in a single tab';
-z.string.auth_tabs_detail = 'Wire is already running in another tab in this browser. This will be a mess. Do not try this.';
 
 // Authentication: HISTORY section
 z.string.auth_history_headline = 'It’s the first time you’re using Wire on this device.';

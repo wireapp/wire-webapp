@@ -25,6 +25,7 @@ window.z.auth = z.auth || {};
 z.auth.SignOutReason = {
   APP_INIT: 'app_init',
   CLIENT_REMOVED: 'client_removed',
+  INDEXED_DB: 'indexed_db',
   MULTIPLE_TABS: 'multiple_tabs',
   NOT_SIGNED_IN: 'not_signed_in',
   SESSION_EXPIRED: 'session_expired',

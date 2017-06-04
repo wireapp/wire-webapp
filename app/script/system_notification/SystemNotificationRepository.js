@@ -125,6 +125,22 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
   }
 
   /**
+   * Close all notifications.
+   * @returns {undefined} No return value
+   */
+  clear_notifications() {
+    this.notifications.forEach((notification) => {
+      const {close, data: notification_data} = notification;
+
+      close();
+      if (notification_data) {
+        const {notification_conversation_id, notification_message_id} = notification_data;
+        this.logger.info(`Notification for '${notification_message_id}' in '${notification_conversation_id}' closed on unload.`);
+      }
+    });
+  }
+
+  /**
    * Display browser notification and play sound notification.
    * @param {z.entity.Conversation} conversation_et - Conversation entity
    * @param {z.entity.Message} message_et - Message entity
@@ -735,15 +751,5 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
 
     this.notifications.push(notification);
     this.logger.info(`Added notification for '${message_id}' in '${conversation_id}' to queue.`);
-
-    window.onunload = () => {
-      this.notifications.forEach((browser_notification) => {
-        browser_notification.close();
-        if (browser_notification.data) {
-          const {notification_conversation_id, notification_message_id} = browser_notification.data;
-          this.logger.info(`Notification for '${notification_message_id}' in '${notification_conversation_id}' closed by redirect.`);
-        }
-      });
-    };
   }
 };

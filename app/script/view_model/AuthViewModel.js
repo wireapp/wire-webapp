@@ -239,6 +239,10 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       return login_modes.includes(this.account_mode());
     });
 
+    this.blocked_mode = ko.observable(undefined);
+    this.blocked_mode_database = ko.pureComputed(() => this.blocked_mode() === z.auth.AuthView.MODE.BLOCKED_DATABASE);
+    this.blocked_mode_tabs = ko.pureComputed(() => this.blocked_mode() === z.auth.AuthView.MODE.BLOCKED_TABS);
+
     this.posted_mode = ko.observable(undefined);
     this.posted_mode_offline = ko.pureComputed(() => this.posted_mode() === z.auth.AuthView.MODE.POSTED_OFFLINE);
     this.posted_mode_pending = ko.pureComputed(() => this.posted_mode() === z.auth.AuthView.MODE.POSTED_PENDING);
@@ -282,13 +286,14 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
   }
 
   _init_page() {
-    this._check_single_instance()
+    this._check_database()
+      .then(() => this._check_single_instance())
       .then(() => {
         this._init_url_parameter();
         this._init_url_hash();
       })
       .catch((error) => {
-        if (error.message !== z.main.App.CONFIG.COOKIE_ERROR) {
+        if (!(error instanceof z.auth.AuthError)) {
           throw error;
         }
       });
@@ -298,7 +303,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     const modes_to_block = [
       z.auth.AuthView.MODE.HISTORY,
       z.auth.AuthView.MODE.LIMIT,
-      z.auth.AuthView.MODE.MULTIPLE_TABS,
+      z.auth.AuthView.MODE.BLOCKED_TABS,
       z.auth.AuthView.MODE.POSTED,
       z.auth.AuthView.MODE.POSTED_PENDING,
       z.auth.AuthView.MODE.POSTED_RETRY,
@@ -340,8 +345,29 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
 
   //##############################################################################
-  // Multiple tabs check
+  // Private mode and & multiple tabs check
   //##############################################################################
+
+  /**
+   * Check that we are not in unsupported private mode browser.
+   * @returns {Promise} Resolves when the database check has passed
+   */
+  _check_database() {
+    const current_hash = this._get_hash();
+
+    return z.util.check_indexed_db()
+      .then(() => {
+        if (current_hash === z.auth.AuthView.MODE.BLOCKED_DATABASE) {
+          this._set_hash();
+        }
+      })
+      .catch((error) => {
+        if (current_hash !== z.auth.AuthView.MODE.BLOCKED_DATABASE) {
+          this._set_hash(z.auth.AuthView.MODE.BLOCKED_DATABASE);
+          throw error;
+        }
+      });
+  }
 
   /**
    * Check that this is the single instance tab of the app.
@@ -350,8 +376,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
    */
   _check_single_instance(set_check_interval = true) {
     if (Cookies.get(z.main.App.CONFIG.COOKIE_NAME)) {
-      this._handle_multiple_tabs(set_check_interval);
-      return Promise.reject(new Error(z.main.App.CONFIG.COOKIE_ERROR));
+      this._handle_blocked_tabs(set_check_interval);
+      return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.MULTIPLE_TABS));
     }
 
     if (set_check_interval) {
@@ -365,14 +391,14 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     this.tabs_check_interval_id = undefined;
   }
 
-  _handle_multiple_tabs(set_check_interval) {
+  _handle_blocked_tabs(set_check_interval) {
     const current_hash = this._get_hash();
-    const is_multiple_tabs_hash = current_hash === z.auth.AuthView.MODE.MULTIPLE_TABS;
+    const is_blocked_tabs_hash = current_hash === z.auth.AuthView.MODE.BLOCKED_TABS;
 
-    if (!is_multiple_tabs_hash) {
+    if (!is_blocked_tabs_hash) {
       if (!this.tabs_check_hash) {
         this.tabs_check_hash = current_hash;
-        this._set_hash(z.auth.AuthView.MODE.MULTIPLE_TABS);
+        this._set_hash(z.auth.AuthView.MODE.BLOCKED_TABS);
       }
 
       if (set_check_interval) {
@@ -387,10 +413,10 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     this.tabs_check_interval_id = window.setInterval(() => {
       this._check_single_instance()
         .catch((error) => {
-          if (error.message !== z.main.App.CONFIG.COOKIE_ERROR) {
+          if (error.type !== z.auth.AuthError.TYPE.MULTIPLE_TABS) {
             throw error;
           }
-          this._handle_multiple_tabs();
+          this._handle_blocked_tabs();
         });
     }, 500);
   }
@@ -412,7 +438,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
           this._init_url_hash();
         })
         .catch((error) => {
-          if (error.message !== z.main.App.CONFIG.COOKIE_ERROR) {
+          if (error.type !== z.auth.AuthError.TYPE.MULTIPLE_TABS) {
             throw error;
           }
         });
@@ -810,6 +836,12 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
         this._remove_error(event.currentTarget.classList[1]);
       }
     }
+  }
+  clicked_on_blocked_learn_more() {
+    if (this.blocked_mode === z.auth.AuthView.MODE.BLOCKED_TABS) {
+      return z.util.safe_window_open(z.string.url_support_multiple_tabs);
+    }
+    z.util.safe_window_open(z.string.url_support_private_mode);
   }
 
   clicked_on_change_email() {
@@ -1217,6 +1249,24 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.REGISTRATION.OPENED_EMAIL_SIGN_UP, {context: this.registration_context});
   }
 
+  _show_blocked_database() {
+    const switch_params = {
+      mode: z.auth.AuthView.MODE.BLOCKED_DATABASE,
+      section: z.auth.AuthView.SECTION.BLOCKED,
+    };
+
+    this.switch_ui(switch_params);
+  }
+
+  _show_blocked_tabs() {
+    const switch_params = {
+      mode: z.auth.AuthView.MODE.BLOCKED_TABS,
+      section: z.auth.AuthView.SECTION.BLOCKED,
+    };
+
+    this.switch_ui(switch_params);
+  }
+
   _show_history() {
     const switch_params = {
       mode: z.auth.AuthView.MODE.HISTORY,
@@ -1230,15 +1280,6 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     const switch_params = {
       mode: z.auth.AuthView.MODE.LIMIT,
       section: z.auth.AuthView.SECTION.LIMIT,
-    };
-
-    this.switch_ui(switch_params);
-  }
-
-  _show_tabs() {
-    const switch_params = {
-      mode: z.auth.AuthView.MODE.MULTIPLE_TABS,
-      section: z.auth.AuthView.SECTION.MULTIPLE_TABS,
     };
 
     this.switch_ui(switch_params);
@@ -1362,6 +1403,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
     if (switch_params.section === z.auth.AuthView.SECTION.ACCOUNT) {
       this.account_mode(switch_params.mode);
+    } else if (switch_params.section === z.auth.AuthView.SECTION.BLOCKED) {
+      this.blocked_mode(switch_params.mode);
     } else if (switch_params.section === z.auth.AuthView.SECTION.POSTED) {
       this.posted_mode(switch_params.mode);
     }
@@ -1564,16 +1607,20 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
         this._show_account_phone();
         break;
 
+      case z.auth.AuthView.MODE.BLOCKED_DATABASE:
+        this._show_blocked_database();
+        break;
+
+      case z.auth.AuthView.MODE.BLOCKED_TABS:
+        this._show_blocked_tabs();
+        break;
+
       case z.auth.AuthView.MODE.HISTORY:
         this._show_history();
         break;
 
       case z.auth.AuthView.MODE.LIMIT:
         this._show_limit();
-        break;
-
-      case z.auth.AuthView.MODE.MULTIPLE_TABS:
-        this._show_tabs();
         break;
 
       case z.auth.AuthView.MODE.POSTED:
