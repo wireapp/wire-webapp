@@ -28,12 +28,14 @@
     "grunt-postcss": "0.8.0",
     "grunt-shell": "2.1.0",
     "grunt-todo": "0.5.0",
+    "husky": "0.13.4",
     "jasmine-ajax": "3.2.0",
     "jasmine-core": "2.5.2",
     "karma": "1.7.0",
     "karma-chrome-launcher": "2.1.1",
     "karma-coverage": "1.1.1",
     "karma-jasmine": "1.1.0",
+    "lint-staged": "3.6.0",
     "load-grunt-tasks": "3.5.2",
     "request": "2.81.0",
     "sinon": "2.3.1",
@@ -48,6 +50,7 @@
     "lint-scripts": "eslint -c .eslintrc.yaml --ignore-path .gitignore --quiet app/script/ test/ bin/ grunt/ Gruntfile.js",
     "lint-styles": "stylelint app/style/**/*.less --syntax less",
     "postinstall": "grunt init",
+    "precommit": "lint-staged",
     "start": "grunt",
     "test": "yarn lint && grunt check && grunt test"
   },
@@ -55,5 +58,15 @@
     "type": "git",
     "url": "https://github.com/wireapp/wire-webapp.git"
   },
-  "private": true
+  "private": true,
+  "lint-staged": {
+    "*.js": [
+      "yarn lint-scripts",
+      "git add"
+    ],
+    "*.less": [
+      "yarn lint-styles",
+      "git add"
+    ]
+  }
 }
