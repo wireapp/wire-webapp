@@ -23,6 +23,13 @@ window.z = window.z || {};
 window.z.main = z.main || {};
 
 z.main.App = class App {
+  static get CONFIG() {
+    return {
+      COOKIE_ERROR: 'App already opened in another tab',
+      COOKIE_NAME: 'app_opened',
+    };
+  }
+
   /**
    * Construct a new app.
    * @param {z.main.Auth} auth - Authentication component
@@ -191,7 +198,8 @@ z.main.App = class App {
    * @returns {undefined} No return value
    */
   init_app(is_reload = this._is_reload()) {
-    this._load_access_token(is_reload)
+    this._check_single_instance()
+    .then(() => this._load_access_token(is_reload))
     .then(() => {
       this.view.loading.update_progress(2.5, z.string.init_received_access_token);
       this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
@@ -281,6 +289,10 @@ z.main.App = class App {
       }
 
       this.logger.info(error_message, {error});
+      if (error.message === App.CONFIG.COOKIE_ERROR) {
+        return this._redirect_to_login(z.auth.SignOutReason.MULTIPLE_TABS);
+      }
+
       this.logger.debug(`App reload: '${is_reload}', Document referrer: '${document.referrer}', Location: '${window.location.href}'`);
 
       if (is_reload && ![z.client.ClientError.TYPE.MISSING_ON_BACKEND, z.client.ClientError.TYPE.NO_LOCAL_CLIENT].includes(error.type)) {
@@ -288,11 +300,11 @@ z.main.App = class App {
       }
 
       if (navigator.onLine) {
-        this.logger.error(`Caused by: ${(error != null ? error.message : undefined) || error}`, error);
+        this.logger.error(`Caused by: ${(error ? error.message : undefined) || error}`, error);
         if (error instanceof z.storage.StorageError) {
           Raygun.send(error);
         }
-        return this.logout('init_app');
+        return this.logout(z.auth.SignOutReason.APP_INIT);
       }
 
       this.logger.warn('No connectivity. Trigger reload on regained connectivity.', error);
@@ -371,6 +383,21 @@ z.main.App = class App {
   }
 
   /**
+   * Check that this is the single instance tab of the app.
+   * @returns {Promise} Resolves when page is the first tab
+   */
+  _check_single_instance() {
+    const cookie_name = App.CONFIG.COOKIE_NAME;
+    if (Cookies.get(cookie_name)) {
+      return Promise.reject(new Error(App.CONFIG.COOKIE_ERROR));
+    }
+
+    Cookies.set(cookie_name, true);
+    window.onunload = () => Cookies.remove(cookie_name);
+    return Promise.resolve();
+  }
+
+  /**
    * Handle URL params.
    * @returns {undefined} Not return value
    */
@@ -415,7 +442,7 @@ z.main.App = class App {
           if ([z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN, z.auth.AccessTokenError.TYPE.NOT_FOUND_IN_CACHE].includes(error.type)) {
             this.logger.error(`Session expired on page reload: ${error.message}`, error);
             Raygun.send(new Error(('Session expired on page reload'), error));
-            return this._redirect_to_login(true);
+            return this._redirect_to_login(z.auth.SignOutReason.SESSION_EXPIRED);
           }
           this.logger.warn('Connectivity issues. Trigger reload on regained connectivity.', error);
           return this.auth.client.execute_on_connectivity(z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_RETRIEVAL)
@@ -430,10 +457,10 @@ z.main.App = class App {
             case z.auth.AccessTokenError.TYPE.RETRIES_EXCEEDED:
             case z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN:
               this.logger.warn(`Redirecting to login: ${error.message}`, error);
-              return this._redirect_to_login(false);
+              return this._redirect_to_login(z.auth.SignOutReason.NOT_SIGNED_IN);
             default:
               this.logger.error(`Could not get access token: ${error.message}. Logging out user.`, error);
-              return this.logout('init_app');
+              return this.logout(z.auth.SignOutReason.APP_INIT);
           }
         }
 
@@ -503,12 +530,11 @@ z.main.App = class App {
   /**
    * Logs the user out on the backend and deletes cached data.
    *
-   * @param {string} cause - Cause for logout
+   * @param {z.auth.SignOutReason} sign_out_reason - Cause for logout
    * @param {boolean} clear_data - Keep data in database
-   * @param {boolean} session_expired - Redirect the user to the login page
    * @returns {undefined} No return value
    */
-  logout(cause, clear_data = false, session_expired = false) {
+  logout(sign_out_reason, clear_data = false) {
     const _logout = () => {
       // Disconnect from our backend, end tracking and clear cached data
       this.repository.event.disconnect_web_socket(z.event.WebSocketService.CHANGE_TRIGGER.LOGOUT);
@@ -532,6 +558,7 @@ z.main.App = class App {
           }
         });
 
+        const session_expired = sign_out_reason === z.auth.SignOutReason.SESSION_EXPIRED;
         this.repository.cache.clear_cache(session_expired, do_not_delete);
       }
 
@@ -542,21 +569,21 @@ z.main.App = class App {
           return this.logger.error('Failed to delete database before logout', error);
         })
         .then(() => {
-          this._redirect_to_login(session_expired);
+          this._redirect_to_login(sign_out_reason);
         });
       } else {
-        this._redirect_to_login(session_expired);
+        this._redirect_to_login(sign_out_reason);
       }
     };
 
     const _logout_on_backend = () => {
-      this.logger.info(`Logout triggered by '${cause}': Disconnecting user from the backend.`);
+      this.logger.info(`Logout triggered by '${sign_out_reason}': Disconnecting user from the backend.`);
       this.auth.repository.logout()
       .then(() => _logout())
-      .catch(() => this._redirect_to_login(false));
+      .catch(() => this._redirect_to_login(sign_out_reason));
     };
 
-    if (session_expired) {
+    if (sign_out_reason === z.auth.SignOutReason.SESSION_EXPIRED) {
       return _logout();
     }
 
@@ -594,17 +621,19 @@ z.main.App = class App {
 
   /**
    * Redirect to the login page after internet connectivity has been verified.
-   * @param {boolean} session_expired - Redirect triggered by session expiration
+   * @param {z.auth.SignOutReason} sign_out_reason - Redirect triggered by session expiration
    * @returns {undefined} No return value
    */
-  _redirect_to_login(session_expired) {
-    this.logger.info(`Redirecting to login after connectivity verification. Session expired: ${session_expired}`);
+  _redirect_to_login(sign_out_reason) {
+    this.logger.info(`Redirecting to login after connectivity verification. Reason: ${sign_out_reason}`);
     this.auth.client.execute_on_connectivity(z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.LOGIN_REDIRECT)
-    .then(function() {
+    .then(() => {
       let url = `/auth/${location.search}`;
-      if (session_expired) {
+
+      if (sign_out_reason === z.auth.SignOutReason.SESSION_EXPIRED) {
         url = z.util.append_url_parameter(url, z.auth.URLParameter.EXPIRED);
       }
+
       window.location.replace(url);
     });
   }

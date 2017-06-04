@@ -59,14 +59,18 @@ z.string.auth_verify_code_resend_timer = 'You can request a new code %expiration
 z.string.auth_verify_code_change_phone = 'Change phone number';
 z.string.auth_verify_password_headline = 'Enter your password';
 
-// Authentication: limit section
+// Authentication: LIMIT section
 z.string.auth_limit_devices_headline = 'Devices';
 z.string.auth_limit_description = 'Remove one of your other devices to start using Wire on this one.';
 z.string.auth_limit_button_manage = 'Manage devices';
 z.string.auth_limit_button_sign_out = 'Log out';
 z.string.auth_limit_devices_current = '(Current)';
 
-// Authentication: limit section
+// Authentication: TABS section
+z.string.auth_tabs_headline = 'Wire is so much nicer in a single tab';
+z.string.auth_tabs_detail = 'Wire is already running in another tab in this browser. This will be a mess. Do not try this.';
+
+// Authentication: HISTORY section
 z.string.auth_history_headline = 'It’s the first time you’re using Wire on this device.';
 z.string.auth_history_description = 'For privacy reasons, your conversation history will not appear here.';
 z.string.auth_history_reuse_headline = 'You’ve used Wire on this device before.';

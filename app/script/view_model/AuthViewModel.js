@@ -258,6 +258,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     ko.applyBindings(this, document.getElementById(element_id));
 
     this.show_initial_animation = false;
+    this.tabs_check_interval_id = undefined;
+    this.tabs_check_hash = undefined;
 
     this._init_base();
     this._track_app_launch();
@@ -265,13 +267,12 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
   }
 
   _init_base() {
-    this._init_url_parameter();
-    this._init_url_hash();
-
     $(window)
       .on('dragover drop', () => false)
       .on('hashchange', this._on_hash_change.bind(this))
       .on('keydown', this.keydown_auth.bind(this));
+
+    this._init_page();
 
     // Select country based on location of user IP
     this.country_code((z.util.CountryCodes.get_country_code($('[name=geoip]').attr('country')) || 1).toString());
@@ -280,10 +281,24 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     this.audio_repository.init();
   }
 
+  _init_page() {
+    this._check_single_instance()
+      .then(() => {
+        this._init_url_parameter();
+        this._init_url_hash();
+      })
+      .catch((error) => {
+        if (error.message !== z.main.App.CONFIG.COOKIE_ERROR) {
+          throw error;
+        }
+      });
+  }
+
   _init_url_hash() {
     const modes_to_block = [
       z.auth.AuthView.MODE.HISTORY,
       z.auth.AuthView.MODE.LIMIT,
+      z.auth.AuthView.MODE.MULTIPLE_TABS,
       z.auth.AuthView.MODE.POSTED,
       z.auth.AuthView.MODE.POSTED_PENDING,
       z.auth.AuthView.MODE.POSTED_RETRY,
@@ -321,6 +336,87 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     if (is_expired) {
       this.session_expired(true);
     }
+  }
+
+
+  //##############################################################################
+  // Multiple tabs check
+  //##############################################################################
+
+  /**
+   * Check that this is the single instance tab of the app.
+   * @param {boolean} [set_check_interval=true] - Set check interval
+   * @returns {Promise} Resolves when page is the first tab
+   */
+  _check_single_instance(set_check_interval = true) {
+    if (Cookies.get(z.main.App.CONFIG.COOKIE_NAME)) {
+      this._handle_multiple_tabs(set_check_interval);
+      return Promise.reject(new Error(z.main.App.CONFIG.COOKIE_ERROR));
+    }
+
+    if (set_check_interval) {
+      this._set_tabs_check_interval();
+    }
+    return Promise.resolve();
+  }
+
+  _clear_tabs_check_interval() {
+    window.clearInterval(this.tabs_check_interval_id);
+    this.tabs_check_interval_id = undefined;
+  }
+
+  _handle_multiple_tabs(set_check_interval) {
+    const current_hash = this._get_hash();
+    const is_multiple_tabs_hash = current_hash === z.auth.AuthView.MODE.MULTIPLE_TABS;
+
+    if (!is_multiple_tabs_hash) {
+      if (!this.tabs_check_hash) {
+        this.tabs_check_hash = current_hash;
+        this._set_hash(z.auth.AuthView.MODE.MULTIPLE_TABS);
+      }
+
+      if (set_check_interval) {
+        this._set_tabs_recheck_interval();
+      }
+    }
+  }
+
+  _set_tabs_check_interval() {
+    this._clear_tabs_check_interval();
+
+    this.tabs_check_interval_id = window.setInterval(() => {
+      this._check_single_instance()
+        .catch((error) => {
+          if (error.message !== z.main.App.CONFIG.COOKIE_ERROR) {
+            throw error;
+          }
+          this._handle_multiple_tabs();
+        });
+    }, 500);
+  }
+
+  _set_tabs_recheck_interval() {
+    this._clear_tabs_check_interval();
+
+    this.tabs_check_interval_id = window.setInterval(() => {
+      this._check_single_instance(false)
+        .then(() => {
+          this._set_tabs_check_interval();
+          this._init_url_parameter();
+
+          if (this.tabs_check_hash) {
+            this._set_hash(this.tabs_check_hash);
+            return this.tabs_check_hash = undefined;
+          }
+
+          this._init_url_hash();
+        })
+        .catch((error) => {
+          if (error.message !== z.main.App.CONFIG.COOKIE_ERROR) {
+            throw error;
+          }
+        });
+    }, 500);
   }
 
 
@@ -1139,6 +1235,15 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     this.switch_ui(switch_params);
   }
 
+  _show_tabs() {
+    const switch_params = {
+      mode: z.auth.AuthView.MODE.MULTIPLE_TABS,
+      section: z.auth.AuthView.SECTION.MULTIPLE_TABS,
+    };
+
+    this.switch_ui(switch_params);
+  }
+
   _show_posted_offline() {
     this._show_icon_error();
 
@@ -1465,6 +1570,10 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
       case z.auth.AuthView.MODE.LIMIT:
         this._show_limit();
+        break;
+
+      case z.auth.AuthView.MODE.MULTIPLE_TABS:
+        this._show_tabs();
         break;
 
       case z.auth.AuthView.MODE.POSTED:

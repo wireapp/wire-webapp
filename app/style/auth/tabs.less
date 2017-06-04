@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2016 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,16 +17,32 @@
  *
  */
 
-'use strict';
+#section-tabs {
+  .tabs-icon {
+    margin-bottom: 32px;
+    height: @icon-size-md;
+    position: relative;
+    width: @icon-size-md;
 
-window.z = window.z || {};
-window.z.auth = z.auth || {};
+    [class^='icon-'], [class*=' icon-'] {
+      font-size: @icon-size-md;
+      height: @icon-size-md;
+      line-height: @icon-size-md;
+      position: absolute;
+      width: @icon-size-md;
+    }
+  }
 
-z.auth.SignOutReason = {
-  APP_INIT: 'app_init',
-  CLIENT_REMOVED: 'client_removed',
-  MULTIPLE_TABS: 'multiple_tabs',
-  NOT_SIGNED_IN: 'not_signed_in',
-  SESSION_EXPIRED: 'session_expired',
-  USER_REQUESTED: 'user_requested',
-};
+  .form-tabs {
+    height: 256px;
+
+    .tabs-content {
+      position: absolute;
+      bottom: 24px;
+    }
+  }
+
+  .tabs-message-detail {
+    margin: 16px 8px 64px 0px;
+  }
+}
