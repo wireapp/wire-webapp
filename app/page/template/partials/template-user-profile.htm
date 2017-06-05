@@ -109,7 +109,9 @@
     <div class="button-icon icon-people-add"></div>
     <span data-bind="l10n_text: z.string.people_button_create"></span>
   </div>
-  <div class="button-icon icon-block pull-right" data-bind="click: on_block, l10n_tooltip: z.string.tooltip_people_block" data-uie-name="do-block"></div>
+  <!-- ko if: user().is_connected() -->
+    <div class="button-icon icon-block pull-right" data-bind="click: on_block, l10n_tooltip: z.string.tooltip_people_block" data-uie-name="do-block"></div>
+  <!-- /ko -->
 </script>
 
 <script type="text/html" id="user-profile-footer-unblock">

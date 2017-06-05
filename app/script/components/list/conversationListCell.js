@@ -45,10 +45,10 @@ ko.components.register('conversation-list-cell', {
   template: `
     <div class="conversation-list-cell" data-bind="attr: {'data-uie-uid': conversation.id, 'data-uie-value': conversation.display_name}, css: {'conversation-list-cell-active': is_selected(conversation)}">
       <div class="conversation-list-cell-left" data-bind="css: {'conversation-list-cell-left-opaque': conversation.removed_from_conversation() || conversation.participating_user_ids().length === 0}">
-        <!-- ko if: conversation.is_group() && (!conversation.team_id  || users().length > 1)  -->
+        <!-- ko if: conversation.is_group() || conversation.is_team_group()  -->
           <group-avatar class="conversation-list-cell-avatar-arrow" params="users: users(), conversation: conversation"></group-avatar>
         <!-- /ko -->
-        <!-- ko if: users().length === 1 && (!conversation.is_group() || conversation.team_id) -->
+        <!-- ko if: !conversation.is_group() && !conversation.is_team_group() && users().length === 1 -->
           <user-avatar class="user-avatar-s" params="user: users()[0]"></user-avatar>
         <!-- /ko -->
       </div>

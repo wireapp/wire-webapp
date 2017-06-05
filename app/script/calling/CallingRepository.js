@@ -266,25 +266,19 @@ z.calling.CallingRepository = class CallingRepository {
    * User action to toggle the call state.
    *
    * @param {boolean} [video_send=false] - Is this a video call
-   * @param {Conversation} conversation_et - Conversation for which state will be toggled
+   * @param {Conversation} [conversation_et=this.conversation_repository.active_conversation()] - Conversation for which state will be toggled
    * @returns {undefined} No return value
    */
-  toggle_state(video_send, conversation_et) {
-    if (!conversation_et) {
-      if (this.conversation_repository.active_conversation()) {
-        conversation_et = this.conversation_repository.active_conversation();
+  toggle_state(video_send, conversation_et = this.conversation_repository.active_conversation()) {
+    if (conversation_et) {
+      if (video_send && conversation_et.is_group()) {
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALL_NO_VIDEO_IN_GROUP);
       } else {
-        this.logger.info('No conversation selected to toggle call state in');
+        if (conversation_et.id === this._self_client_on_a_call()) {
+          return this.switch_call_center(z.calling.enum.CALL_ACTION.LEAVE, [conversation_et.id]);
+        }
+        this.join_call(conversation_et.id, video_send);
       }
-    }
-
-    if (video_send && conversation_et.is_group()) {
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALL_NO_VIDEO_IN_GROUP);
-    } else {
-      if (conversation_et.id === this._self_client_on_a_call()) {
-        return this.switch_call_center(z.calling.enum.CALL_ACTION.LEAVE, [conversation_et.id]);
-      }
-      this.join_call(conversation_et.id, video_send);
     }
   }
 

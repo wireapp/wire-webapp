@@ -64,7 +64,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     });
 
     this.filtered_conversations = ko.pureComputed(() => {
-      return this.conversations().filter(function(conversation_et) {
+      return this.conversations().filter((conversation_et) => {
         const states_to_filter = [
           z.user.ConnectionStatus.BLOCKED,
           z.user.ConnectionStatus.CANCELLED,
@@ -96,7 +96,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.conversations_call = ko.observableArray([]);
     this.conversations_cleared = ko.observableArray([]);
     this.conversations_unarchived = ko.observableArray([]);
-    this.conversations_unarchived.subscribe((conversation_ets) => this.update_conversations(conversation_ets));
 
     this._init_subscriptions();
   }
@@ -143,7 +142,21 @@ z.conversation.ConversationRepository = class ConversationRepository {
     amplify.subscribe(z.event.WebApp.CONVERSATION.MISSED_EVENTS, this.on_missed_events.bind(this));
     amplify.subscribe(z.event.WebApp.CONVERSATION.PERSIST_STATE, this.save_conversation_state_in_db.bind(this));
     amplify.subscribe(z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, this.set_notification_handling_state.bind(this));
+    amplify.subscribe(z.event.WebApp.TEAM.MEMBER_LEAVE, this.team_member_leave.bind(this));
     amplify.subscribe(z.event.WebApp.USER.UNBLOCKED, this.unblocked_user.bind(this));
+  }
+
+  /**
+   * Remove obsolete conversations locally.
+   * @returns {undefined} No return value
+   */
+  cleanup_conversations() {
+    this.conversations().forEach((conversation_et) => {
+      if (conversation_et.is_group() && conversation_et.is_cleared() && conversation_et.removed_from_conversation()) {
+        this.conversation_service.delete_conversation_from_in_db(conversation_et.id);
+        this.delete_conversation(conversation_et.id);
+      }
+    });
   }
 
   /**
@@ -155,6 +168,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     if (team_et) {
       if (team_et.id !== this.active_team().id) {
         this.active_team(team_et);
+        this.update_conversations(this.conversations_unarchived());
         amplify.publish(z.event.WebApp.CONVERSATION.SHOW, this.get_most_recent_conversation());
       }
     } else {
@@ -203,9 +217,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         this.logger.info(`Fetched conversation '${conversation_id}' from backend`);
         this.save_conversation(conversation_et);
 
-        this.fetching_conversations[conversation_id].forEach(function({resolve_fn}) {
-          resolve_fn(conversation_et);
-        });
+        this.fetching_conversations[conversation_id].forEach(({resolve_fn}) => resolve_fn(conversation_et));
         delete this.fetching_conversations[conversation_id];
 
         return conversation_et;
@@ -213,9 +225,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .catch(() => {
         const error = new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.NOT_FOUND);
 
-        this.fetching_conversations[conversation_id].forEach(function({reject_fn}) {
-          reject_fn(error);
-        });
+        this.fetching_conversations[conversation_id].forEach(({reject_fn}) => reject_fn(error));
         delete this.fetching_conversations[conversation_id];
 
         throw error;
@@ -444,6 +454,15 @@ z.conversation.ConversationRepository = class ConversationRepository {
   //##############################################################################
 
   /**
+   * Deletes a conversation from the repository.
+   * @param {string} conversation_id - ID of conversation to be deleted from the repository
+   * @returns {undefined} No return value
+   */
+  delete_conversation(conversation_id) {
+    this.conversations.remove((conversation_et) => conversation_et.id === conversation_id);
+  }
+
+  /**
    * Find a local conversation by ID.
    * @param {string} conversation_id - ID of conversation to get
    * @returns {Promise} Resolves with the conversation entity
@@ -570,6 +589,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   /**
    * Get the next unarchived conversation.
+   *
    * @param {Conversation} conversation_et - Conversation to start from
    * @returns {Conversation} Next conversation
    */
@@ -596,7 +616,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then((conversation_ids) => {
         return conversation_ids
           .map((conversation_id) => this._find_conversation_by_id(conversation_id))
-          .filter((conversation_et) => conversation_et);
+          .filter((conversation_et) => conversation_et && conversation_et.team_id === this.active_team().id);
       });
   }
 
@@ -610,16 +630,17 @@ z.conversation.ConversationRepository = class ConversationRepository {
     for (const conversation_et of this.conversations()) {
       const with_expected_user = user_et.id === conversation_et.participating_user_ids()[0];
 
-      if (team_id) {
-        const active_group_conversation = conversation_et.is_group() && !conversation_et.removed_from_conversation();
-        const with_one_participant = conversation_et.participating_user_ids().length === 1;
-        const in_active_team = team_id === conversation_et.team_id;
+      if (with_expected_user) {
+        if (team_id) {
+          const active_1to1_conversation = conversation_et.is_one2one() && !conversation_et.is_team_group() && !conversation_et.removed_from_conversation();
+          const in_active_team = team_id === conversation_et.team_id;
 
-        if (active_group_conversation && in_active_team && with_one_participant && with_expected_user) {
+          if (active_1to1_conversation && in_active_team) {
+            return Promise.resolve(conversation_et);
+          }
+        } else if (conversation_et.is_one2one() || conversation_et.is_request()) {
           return Promise.resolve(conversation_et);
         }
-      } else if (with_expected_user && (conversation_et.is_one2one() || conversation_et.is_request())) {
-        return Promise.resolve(conversation_et);
       }
     }
 
@@ -895,17 +916,21 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * It will be unarchived once it is opened through search. We use the archive flag to distinguish states.
    *
    * @param {Conversation} conversation_et - Conversation to clear
+   * @param {Conversation} [next_conversation_et] - Optional next conversation to be shown
    * @param {boolean} [leave=false] - Should we leave the conversation before clearing the content?
    * @returns {Promise} No return value
    */
-  clear_conversation(conversation_et, leave = false) {
-    const next_conversation_et = this.get_next_conversation(conversation_et);
-    const promise = leave ? this.leave_conversation(conversation_et, next_conversation_et) : Promise.resolve();
+  clear_conversation(conversation_et, next_conversation_et, leave = false) {
+    const promise = leave ? this.leave_conversation(conversation_et, next_conversation_et, false) : Promise.resolve();
     return promise
       .then(() => {
-        this._update_cleared_timestamp(conversation_et);
-        this._delete_messages(conversation_et);
-        amplify.publish(z.event.WebApp.CONVERSATION.SHOW, next_conversation_et);
+        if (leave) {
+          conversation_et.status(z.conversation.ConversationStatus.PAST_MEMBER);
+        }
+        this._delete_conversation(conversation_et);
+        if (next_conversation_et) {
+          amplify.publish(z.event.WebApp.CONVERSATION.SHOW, next_conversation_et);
+        }
       });
   }
 
@@ -935,17 +960,20 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Leave conversation.
    *
    * @param {Conversation} conversation_et - Conversation to leave
-   * @param {Conversation} next_conversation_et - Next conversation in list
+   * @param {Conversation} [next_conversation_et] - Optional next conversation in list
+   * @param {boolean} handle_response - Set to false if conversation is deleted
    * @returns {Promise} Resolves when the conversation was left
    */
-  leave_conversation(conversation_et, next_conversation_et) {
+  leave_conversation(conversation_et, next_conversation_et, handle_response = true) {
     return this.conversation_service.delete_members(conversation_et.id, this.user_repository.self().id)
       .then((response) => {
-        amplify.publish(z.event.WebApp.EVENT.INJECT, response);
-        return this._on_member_leave(conversation_et, response);
-      })
-      .then(() => {
-        return this.archive_conversation(conversation_et, next_conversation_et);
+        if (handle_response) {
+          amplify.publish(z.event.WebApp.EVENT.INJECT, response);
+          return this._on_member_leave(conversation_et, response)
+            .then(() => {
+              return this.archive_conversation(conversation_et, next_conversation_et);
+            });
+        }
       });
   }
 
@@ -1063,6 +1091,27 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
+   * Team member was removed.
+   * @param {string} team_id - ID of team member left
+   * @param {string} [user_id] - Optional ID of user to leave
+   * @returns {undefined} No return value
+   */
+  team_member_leave(team_id, user_id) {
+    this.conversations()
+      .filter((conversation_et) => conversation_et.team_id === team_id && !conversation_et.removed_from_conversation())
+      .forEach((conversation_et) => {
+        if (user_id) {
+          if (conversation_et.participating_user_ids().includes(user_id)) {
+            const member_leave_event = z.conversation.EventBuilder.build_team_member_leave(conversation_et, user_id);
+            amplify.publish(z.event.WebApp.EVENT.INJECT, member_leave_event, false);
+          }
+        } else {
+          this._delete_conversation(conversation_et);
+        }
+      });
+  }
+
+  /**
    * Toggle a conversation between silence and notify.
    * @param {Conversation} conversation_et - Conversation to rename
    * @returns {Promise} Resolves when the muted stated was toggled
@@ -1106,7 +1155,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Archive a conversation.
    *
    * @param {Conversation} conversation_et - Conversation to rename
-   * @param {Conversation} next_conversation_et - Next conversation to potentially switch to
+   * @param {Conversation} [next_conversation_et] - Next conversation to potentially switch to
    * @returns {Promise} Resolves when the conversation was archived
    */
   archive_conversation(conversation_et, next_conversation_et) {
@@ -1162,6 +1211,22 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
+   * Deletes a conversation from the local storage.
+   *
+   * @private
+   * @param {Conversation} conversation_et - Conversation entity to delete
+   * @returns {undefined} No return value
+   */
+  _delete_conversation(conversation_et) {
+    this._update_cleared_timestamp(conversation_et);
+    this._delete_messages(conversation_et);
+    if (conversation_et.removed_from_conversation()) {
+      this.conversation_service.delete_conversation_from_in_db(conversation_et.id);
+      this.delete_conversation(conversation_et.id);
+    }
+  }
+
+  /**
    * Update last read of conversation using timestamp.
    *
    * @private
@@ -1183,8 +1248,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
         })
         .catch((error) => {
           this.logger.error(`Error (${error.label}): ${error.message}`);
-          error = new Error('Event response is undefined');
-          Raygun.send(error, {source: 'Sending encrypted last read'});
+          error = new Error('Failed to update last read timestamp');
+          Raygun.send(error, {label: error.label, message: error.message});
         });
     }
   }
@@ -2305,6 +2370,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           case z.event.Backend.CONVERSATION.MEMBER_JOIN:
             return this._on_member_join(conversation_et, event_json);
           case z.event.Backend.CONVERSATION.MEMBER_LEAVE:
+          case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE:
             return this._on_member_leave(conversation_et, event_json);
           case z.event.Backend.CONVERSATION.MEMBER_UPDATE:
             return this._on_member_update(conversation_et, event_json);
@@ -2576,22 +2642,18 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @private
    * @param {Conversation} conversation_et - Conversation entity that will be updated
    * @param {Object} event_json - JSON data of 'conversation.member-update' event
-   * @param {Conversation} [next_conversation_et] - Next conversation in list
+   * @param {Conversation} [next_conversation_et] - Optional next conversation in list
    * @returns {Promise} Resolves when the event was handled
    */
   _on_member_update(conversation_et, event_json, next_conversation_et) {
     const previously_archived = conversation_et.is_archived();
 
-    if (!next_conversation_et) {
-      next_conversation_et = this.get_next_conversation(conversation_et);
-    }
-
     this.conversation_mapper.update_self_status(conversation_et, event_json.data);
 
     if (previously_archived && !conversation_et.is_archived()) {
       return this._fetch_users_and_events(conversation_et);
-    } else if (conversation_et.is_archived()) {
-      amplify.publish(z.event.WebApp.CONVERSATION.SWITCH, conversation_et, next_conversation_et);
+    } else if (conversation_et.is_archived() && next_conversation_et) {
+      amplify.publish(z.event.WebApp.CONVERSATION.SHOW, next_conversation_et);
     }
   }
 
@@ -2708,10 +2770,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
       })
       .catch((error) => {
-        if (error.type === z.storage.StorageError.TYPE.NON_SEQUENTIAL_UPDATE) {
-          Raygun.send('Failed sequential database update');
-        }
-
         if (error.type !== z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
           this.logger.error(`Failed to handle reaction to message '${event_json.data.message_id}' in conversation '${conversation_et.id}'`, {error, event: event_json});
           throw error;
@@ -3069,11 +3127,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @private
    * @param {Conversation} conversation_et - Conversation that contains the message
-   * @returns {Promise} Resolves when messages were deleted
+   * @returns {undefined} No return value
    */
   _delete_messages(conversation_et) {
     conversation_et.remove_messages();
-    return this.conversation_service.delete_messages_from_db(conversation_et.id);
+    this.conversation_service.delete_messages_from_db(conversation_et.id);
   }
 
   /**
@@ -3101,12 +3159,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolve when message was updated
    */
   update_message_as_upload_failed(message_et) {
-    const asset_et = message_et.get_first_asset();
+    if (message_et) {
+      const asset_et = message_et.get_first_asset();
 
-    asset_et.status(z.assets.AssetTransferState.UPLOAD_FAILED);
-    asset_et.upload_failed_reason(z.assets.AssetUploadFailedReason.FAILED);
+      if (asset_et) {
+        asset_et.status(z.assets.AssetTransferState.UPLOAD_FAILED);
+        asset_et.upload_failed_reason(z.assets.AssetUploadFailedReason.FAILED);
+      }
 
-    return this.conversation_service.update_asset_as_failed_in_db(message_et.primary_key);
+      return this.conversation_service.update_asset_as_failed_in_db(message_et.primary_key);
+    }
   }
 
   /**

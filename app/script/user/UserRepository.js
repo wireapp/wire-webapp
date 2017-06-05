@@ -23,6 +23,17 @@ window.z = window.z || {};
 window.z.user = z.user || {};
 
 z.user.UserRepository = class UserRepository {
+  static get CONFIG() {
+    return {
+      MINIMUM_NAME_LENGTH: 2,
+      MINIMUM_PICTURE_SIZE: {
+        HEIGHT: 320,
+        WIDTH: 320,
+      },
+      MINIMUM_USERNAME_LENGTH: 2,
+    };
+  }
+
   /**
    * Construct a new User repository.
    * @class z.user.UserRepository
@@ -48,6 +59,8 @@ z.user.UserRepository = class UserRepository {
     this.users = ko.observableArray([]);
     this.connections = ko.observableArray([]);
 
+    this.fetching_users = {};
+
     this.connect_requests = ko.pureComputed(() => {
       return this.users()
         .filter((user_et) => user_et.is_incoming_request());
@@ -58,8 +71,13 @@ z.user.UserRepository = class UserRepository {
         .filter((user_et) => user_et.is_connected());
     }).extend({rateLimit: 1000});
 
-    this.connected_users.subscribe((user_ets) => {
-      amplify.publish(z.event.WebApp.ANALYTICS.CUSTOM_DIMENSION, z.tracking.CustomDimension.CONTACTS, user_ets.length);
+    this.number_of_connected_users = ko.pureComputed(() => {
+      return this.connected_users()
+        .filter((user_et) => !user_et.is_bot)
+        .length;
+    });
+    this.number_of_connected_users.subscribe((number_of_connected_users) => {
+      amplify.publish(z.event.WebApp.ANALYTICS.CUSTOM_DIMENSION, z.tracking.CustomDimension.CONTACTS, number_of_connected_users);
     });
 
     amplify.subscribe(z.event.Backend.USER.CONNECTION, this.user_connection.bind(this));
@@ -81,22 +99,30 @@ z.user.UserRepository = class UserRepository {
 
   /**
    * Block a user.
+   *
    * @param {z.entity.User} user_et - User to block
+   * @param {z.entity.Conversation} [next_conversation_et] - Optional conversation to be switched to
    * @returns {Promise} Promise that resolves when the user was blocked
    */
-  block_user(user_et) {
-    return this._update_connection_status(user_et, z.user.ConnectionStatus.BLOCKED);
+  block_user(user_et, next_conversation_et) {
+    return this._update_connection_status(user_et, z.user.ConnectionStatus.BLOCKED)
+      .then(() => {
+        if (next_conversation_et) {
+          amplify.publish(z.event.WebApp.CONVERSATION.SHOW, next_conversation_et);
+        }
+      });
   }
 
   /**
    * Cancel a connection request.
+   *
    * @param {z.entity.User} user_et - User to cancel the sent connection request
-   * @param {z.entity.Conversation} next_conversation_et - Optional conversation to be switched to
+   * @param {z.entity.Conversation} [next_conversation_et] - Optional conversation to be switched to
    * @returns {Promise} Promise that resolves when an outgoing connection request was cancelled
    */
   cancel_connection_request(user_et, next_conversation_et) {
     return this._update_connection_status(user_et, z.user.ConnectionStatus.CANCELLED)
-      .then(function() {
+      .then(() => {
         if (next_conversation_et) {
           amplify.publish(z.event.WebApp.CONVERSATION.SHOW, next_conversation_et);
         }
@@ -105,6 +131,7 @@ z.user.UserRepository = class UserRepository {
 
   /**
    * Create a connection request.
+   *
    * @param {z.entity.User} user_et - User to connect to
    * @param {boolean} [show_conversation=false] - Should we open the new conversation
    * @returns {Promise} Promise that resolves when the connection request was successfully created
@@ -279,13 +306,17 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise} Promise that resolves when the connection status was updated
    */
   _update_connection_status(user_et, status, show_conversation = false) {
-    return Promise.resolve()
-      .then(() => {
-        if (user_et.connection().status() === status) {
-          return;
-        }
-        return this.user_service.update_connection_status(user_et.id, status);
-      })
+    if (!user_et) {
+      this.logger.error('Cannot update connection without a user');
+      return Promise.reject(new z.user.UserError(z.user.UserError.TYPE.USER_NOT_FOUND));
+    }
+
+    if (user_et.connection().status() === status) {
+      this.logger.info(`Requested connection status change to '${status}' for user '${user_et.id}' is current status`);
+      return Promise.resolve();
+    }
+
+    return this.user_service.update_connection_status(user_et.id, status)
       .then((response) => {
         return this.user_connection(response, z.event.EventRepository.NOTIFICATION_SOURCE.INJECTED, show_conversation);
       })
@@ -482,6 +513,20 @@ z.user.UserRepository = class UserRepository {
       return Promise.resolve([]);
     }
 
+    const user_ids_ongoing = [];
+    const user_ids_to_fetch = [];
+
+    const get_user_promises = user_ids
+      .map((user_id) => {
+        if (this.fetching_users.hasOwnProperty(user_id)) {
+          user_ids_ongoing.push(user_id);
+          return new Promise((resolve, reject) => this.fetching_users[user_id].push({reject_fn: reject, resolve_fn: resolve}));
+        }
+
+        user_ids_to_fetch.push(user_id);
+      })
+      .filter((get_promise) => get_promise);
+
     const _get_users = (user_id_chunk) => {
       return this.user_service.get_users(user_id_chunk)
         .then((response) => {
@@ -490,7 +535,7 @@ z.user.UserRepository = class UserRepository {
           }
           return [];
         })
-        .catch(function(error) {
+        .catch((error) => {
           if (error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
             return [];
           }
@@ -498,18 +543,33 @@ z.user.UserRepository = class UserRepository {
         });
     };
 
-    const user_id_chunks = z.util.ArrayUtil.chunk(user_ids, z.config.MAXIMUM_USERS_PER_REQUEST);
-    const get_users_promises = user_id_chunks.map((user_id_chunk) => _get_users(user_id_chunk));
-    return Promise.all(get_users_promises)
+    let fetch_user_promises = [];
+    if (user_ids_to_fetch.length) {
+      const user_id_chunks = z.util.ArrayUtil.chunk(user_ids_to_fetch, z.config.MAXIMUM_USERS_PER_REQUEST);
+      fetch_user_promises = user_id_chunks.map((user_id_chunk) => _get_users(user_id_chunk));
+    }
+
+    return Promise.all(fetch_user_promises)
+      .then((resolve_array) => {
+        const new_user_ets = _.flatten(resolve_array);
+
+        new_user_ets.forEach((user_et) => {
+          if (this.fetching_users.hasOwnProperty(user_et.id)) {
+            this.fetching_users[user_et.id].forEach(({resolve_fn}) => resolve_fn(user_et));
+          }
+        });
+
+        return Promise.all(get_user_promises.concat(this.save_users(new_user_ets)));
+      })
       .then((resolve_array) => {
         let fetched_user_ets = _.flatten(resolve_array);
 
-        // If the difference is 1 then we most likely have a case with a suspended user
+        // If there is a difference then we most likely have a case with a suspended user
         if (user_ids.length !== fetched_user_ets.length) {
           fetched_user_ets = this._add_suspended_users(user_ids, fetched_user_ets);
         }
 
-        return this.save_users(fetched_user_ets).then(() => fetched_user_ets);
+        return fetched_user_ets;
       });
   }
 
@@ -658,7 +718,7 @@ z.user.UserRepository = class UserRepository {
   /**
    * Save multiple users at once.
    * @param {Array<z.entity.User>} user_ets - Array of user entities to be stored
-   * @returns {undefined} No return value
+   * @returns {Promise} Resolves with users passed as parameter
    */
   save_users(user_ets) {
     const _user_exists = (user_et) => {
@@ -677,14 +737,14 @@ z.user.UserRepository = class UserRepository {
       .then((existing_user_ets) => {
         const new_user_ets = existing_user_ets.filter((user_et) => user_et);
         z.util.ko_array_push_all(this.users, new_user_ets);
-        return new_user_ets;
+        return user_ets;
       });
   }
 
   /**
    * Update a local user from the backend by ID.
    * @param {string} user_id - User ID
-   * @returns {undefined} No return value
+   * @returns {Promise} Resolves when user was updated
    */
   update_user_by_id(user_id) {
     return this.find_user_by_id(user_id)
@@ -729,7 +789,7 @@ z.user.UserRepository = class UserRepository {
   /**
    * Change the accent color.
    * @param {number} accent_id - New accent color
-   * @returns {undefined} No return value
+   * @returns {Promise} Resolves when accent color was changed
    */
   change_accent_color(accent_id) {
     return this.user_service.update_own_user_profile({accent_id})
@@ -739,13 +799,15 @@ z.user.UserRepository = class UserRepository {
   /**
    * Change name.
    * @param {string} name - New name
-   * @returns {undefined} No return value
+   * @returns {Promise} Resolves when the name was changed
    */
   change_name(name) {
-    if (name.length >= z.config.MINIMUM_USERNAME_LENGTH) {
+    if (name.length >= UserRepository.CONFIG.MINIMUM_NAME_LENGTH) {
       return this.user_service.update_own_user_profile({name})
         .then(() => this.self().name(name));
     }
+
+    return Promise.reject(new z.user.UserError(z.userUserError.TYPE.INVALID_UPDATE));
   }
 
   /**
@@ -758,7 +820,7 @@ z.user.UserRepository = class UserRepository {
 
   /**
    * Tries to generate a username suggestion.
-   * @returns {undefined} No return value
+   * @returns {Promise} Resolves with the username suggestions
    */
   get_username_suggestion() {
     let suggestions = null;
@@ -797,20 +859,24 @@ z.user.UserRepository = class UserRepository {
   /**
    * Change username.
    * @param {string} username - New username
-   * @returns {undefined} No return value
+   * @returns {Promise} Resolves when the username was changed
    */
   change_username(username) {
-    return this.user_service.change_own_username(username)
-      .then(() => {
-        this.should_set_username = false;
-        return this.self().username(username);
-      })
-      .catch(function(error) {
-        if ([z.service.BackendClientError.STATUS_CODE.CONFLICT, z.service.BackendClientError.STATUS_CODE.BAD_REQUEST].includes(error.code)) {
-          throw new z.user.UserError(z.user.UserError.TYPE.USERNAME_TAKEN);
-        }
-        throw new z.user.UserError(z.user.UserError.TYPE.REQUEST_FAILURE);
-      });
+    if (username.length >= UserRepository.CONFIG.MINIMUM_USERNAME_LENGTH) {
+      return this.user_service.change_own_username(username)
+        .then(() => {
+          this.should_set_username = false;
+          return this.self().username(username);
+        })
+        .catch(function(error) {
+          if ([z.service.BackendClientError.STATUS_CODE.CONFLICT, z.service.BackendClientError.STATUS_CODE.BAD_REQUEST].includes(error.code)) {
+            throw new z.user.UserError(z.user.UserError.TYPE.USERNAME_TAKEN);
+          }
+          throw new z.user.UserError(z.user.UserError.TYPE.REQUEST_FAILURE);
+        });
+    }
+
+    return Promise.reject(new z.user.UserError(z.userUserError.TYPE.INVALID_UPDATE));
   }
 
   /**
@@ -849,7 +915,7 @@ z.user.UserRepository = class UserRepository {
   /**
    * Change the profile image.
    * @param {string|Object} picture - New user picture
-   * @returns {undefined} No return value
+   * @returns {Promise} Resolves when the picture was updated
    */
   change_picture(picture) {
     return this.asset_service.upload_profile_image(picture)

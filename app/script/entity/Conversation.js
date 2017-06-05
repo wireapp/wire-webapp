@@ -46,12 +46,26 @@ z.entity.Conversation = class Conversation {
     this.self = undefined;
     this.number_of_participants = ko.pureComputed(() => this.participating_user_ids().length);
 
-    this.is_group = ko.pureComputed(() => this.type() === z.conversation.ConversationType.REGULAR);
     this.is_guest = false;
     this.is_managed = false;
-    this.is_one2one = ko.pureComputed(() => this.type() === z.conversation.ConversationType.ONE2ONE);
+
+    this.is_group = ko.pureComputed(() => {
+      const group_type = this.type() === z.conversation.ConversationType.REGULAR;
+      const group_conversation = group_type && !this.team_id;
+      const team_group_conversation = group_type && this.team_id && this.participating_user_ids().length !== 1;
+
+      return group_conversation || team_group_conversation;
+    });
+    this.is_one2one = ko.pureComputed(() => {
+      const group_type = this.type() === z.conversation.ConversationType.REGULAR;
+      const one2one_conversation = this.type() === z.conversation.ConversationType.ONE2ONE;
+      const team_one2one_conversation = group_type && this.team_id && this.participating_user_ids().length === 1;
+
+      return one2one_conversation || team_one2one_conversation;
+    });
     this.is_request = ko.pureComputed(() => this.type() === z.conversation.ConversationType.CONNECT);
     this.is_self = ko.pureComputed(() => this.type() === z.conversation.ConversationType.SELF);
+    this.is_team_group = ko.pureComputed(() => this.is_one2one() && this.team_id && this.name());
 
     // in case this is a one2one conversation this is the connection to that user
     this.connection = ko.observable(new z.entity.Connection());
@@ -176,9 +190,14 @@ z.entity.Conversation = class Conversation {
      * - "..." if the user entities have not yet been attached yet
      */
     this.display_name = ko.pureComputed(() => {
-      if ([z.conversation.ConversationType.CONNECT, z.conversation.ConversationType.ONE2ONE].includes(this.type())) {
-        if (this.participating_user_ets()[0] && this.participating_user_ets()[0].name) {
-          return this.participating_user_ets()[0].name();
+      if (this.is_request() || this.is_one2one()) {
+        if (this.team_id && this.name()) {
+          return this.name();
+        }
+
+        const [user_et] = this.participating_user_ets();
+        if (user_et && user_et.name) {
+          return user_et.name();
         }
 
         return '…';
@@ -202,7 +221,7 @@ z.entity.Conversation = class Conversation {
         return '…';
       }
 
-      return this.name();
+      return this.name() || '…';
     });
 
     this.persist_state = _.debounce(() => {

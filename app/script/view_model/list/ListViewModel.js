@@ -58,8 +58,6 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     this.list_modal = ko.observable();
     this.webapp_loaded = ko.observable(false);
 
-    this.first_run = ko.observable(false);
-
     // Nested view models
     /* eslint-disable no-multi-spaces */
     this.archive       = new z.ViewModel.list.ArchiveViewModel('archive', this, this.conversation_repository);
@@ -89,9 +87,9 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     amplify.subscribe(z.event.WebApp.SEARCH.SHOW, this.open_start_ui.bind(this));
     amplify.subscribe(z.event.WebApp.TAKEOVER.SHOW, this.show_takeover.bind(this));
     amplify.subscribe(z.event.WebApp.TAKEOVER.DISMISS, this.dismiss_takeover.bind(this));
-    amplify.subscribe(z.event.WebApp.SHORTCUT.ARCHIVE, () => this.click_on_archive_action(this.conversation_repository.active_conversation()));
-    amplify.subscribe(z.event.WebApp.SHORTCUT.DELETE, () => this.click_on_clear_action(this.conversation_repository.active_conversation()));
-    amplify.subscribe(z.event.WebApp.SHORTCUT.SILENCE, () => this.click_on_mute_action(this.conversation_repository.active_conversation()));
+    amplify.subscribe(z.event.WebApp.SHORTCUT.ARCHIVE, this.click_on_archive_action.bind(this));
+    amplify.subscribe(z.event.WebApp.SHORTCUT.DELETE, this.click_on_clear_action.bind(this));
+    amplify.subscribe(z.event.WebApp.SHORTCUT.SILENCE, this.click_on_mute_action.bind(this));
   }
 
   open_preferences_account() {
@@ -150,7 +148,6 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
         amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT);
         break;
       default:
-        this.first_run(false);
         if (respect_last_state) {
           this.content_view_model.switch_previous_content();
         }
@@ -249,10 +246,14 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     }
 
     if (!conversation_et.is_group()) {
-      entries.push({
-        click: () => this.click_on_block_action(conversation_et),
-        label: z.l10n.text(z.string.conversations_popover_block),
-      });
+      const [user_et] = conversation_et.participating_user_ets();
+
+      if (user_et.is_connected() || user_et.is_request()) {
+        entries.push({
+          click: () => this.click_on_block_action(conversation_et),
+          label: z.l10n.text(z.string.conversations_popover_block),
+        });
+      }
     }
 
     if (conversation_et.is_group() && !conversation_et.removed_from_conversation()) {
@@ -265,51 +266,62 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     z.ui.Context.from(event, entries, 'conversation-list-options-menu');
   }
 
-  click_on_archive_action(conversation_et) {
-    this.conversation_repository.archive_conversation(conversation_et);
+  click_on_archive_action(conversation_et = this.conversation_repository.active_conversation()) {
+    if (conversation_et) {
+      const next_conversation_et = this._get_next_conversation(conversation_et);
+      this.conversation_repository.archive_conversation(conversation_et, next_conversation_et);
+    }
   }
 
   click_on_block_action(conversation_et) {
-    const next_conversation_et = this.conversation_repository.get_next_conversation(conversation_et);
-    const user_et = conversation_et.participating_user_ets()[0];
+    const next_conversation_et = this._get_next_conversation(conversation_et);
+    const [user_et] = conversation_et.participating_user_ets();
 
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.BLOCK, {
-      action: () => {
-        this.user_repository.block_user(user_et)
-          .then(() => amplify.publish(z.event.WebApp.CONVERSATION.SWITCH, conversation_et, next_conversation_et));
-      },
-      data: user_et.first_name(),
+    if (user_et) {
+      amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.BLOCK, {
+        action: () => {
+          this.user_repository.block_user(user_et, next_conversation_et);
+        },
+        data: user_et.first_name(),
+      });
     }
-    );
   }
 
   click_on_cancel_action(conversation_et) {
-    const next_conversation_et = this.conversation_repository.get_next_conversation(conversation_et);
-    this.user_repository.cancel_connection_request(conversation_et.participating_user_ets()[0], next_conversation_et);
+    const next_conversation_et = this._get_next_conversation(conversation_et);
+    const [user_et] = conversation_et.participating_user_ets();
+
+    this.user_repository.cancel_connection_request(user_et, next_conversation_et);
   }
 
-  click_on_mute_action(conversation_et) {
-    this.conversation_repository.toggle_silence_conversation(conversation_et);
-  }
+  click_on_clear_action(conversation_et = this.conversation_repository.active_conversation()) {
+    if (conversation_et) {
+      const next_conversation = this._get_next_conversation(conversation_et);
 
-  click_on_clear_action(conversation_et) {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CLEAR, {
-      action: (leave = false) => {
-        this.conversation_repository.clear_conversation(conversation_et, leave);
-      },
-      conversation: conversation_et,
-      data: conversation_et.display_name(),
-    });
+      amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CLEAR, {
+        action: (leave = false) => {
+          this.conversation_repository.clear_conversation(conversation_et, next_conversation, leave);
+        },
+        conversation: conversation_et,
+        data: conversation_et.display_name(),
+      });
+    }
   }
 
   click_on_leave_action(conversation_et) {
-    const next_conversation_et = this.conversation_repository.get_next_conversation(conversation_et);
+    const next_conversation_et = this._get_next_conversation(conversation_et);
 
     amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.LEAVE, {
       action: () => this.conversation_repository.leave_conversation(conversation_et, next_conversation_et),
       data: conversation_et.display_name(),
     }
     );
+  }
+
+  click_on_mute_action(conversation_et = this.conversation_repository.active_conversation()) {
+    if (conversation_et) {
+      this.conversation_repository.toggle_silence_conversation(conversation_et);
+    }
   }
 
   click_on_unarchive_action(conversation_et) {
@@ -319,5 +331,14 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
           this.switch_list(z.ViewModel.list.LIST_STATE.CONVERSATIONS);
         }
       });
+  }
+
+  _get_next_conversation(conversation_et) {
+    const in_conversations = this.list_state() === z.ViewModel.list.LIST_STATE.CONVERSATIONS;
+    const is_active_conversation = this.conversation_repository.is_active_conversation(conversation_et);
+
+    if (in_conversations && is_active_conversation) {
+      return this.conversation_repository.get_next_conversation(conversation_et);
+    }
   }
 };
