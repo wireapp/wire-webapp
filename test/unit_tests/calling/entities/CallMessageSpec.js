@@ -17,17 +17,17 @@
  *
  */
 
-// grunt test_init && grunt test_run:calling/entities/ECallMessage
+// grunt test_init && grunt test_run:calling/entities/CallMessage
 
 'use strict';
 
-describe('z.calling.entities.ECallMessage', function() {
+describe('z.calling.entities.CallMessage', function() {
   describe('_create_session_id', function() {
-    const e_call_message_et = new z.calling.entities.ECallMessage();
+    const call_message_et = new z.calling.entities.CallMessage();
 
     it('always returns an alphanumeric string of length four', function() {
       _.range(100).map(function() {
-        expect(e_call_message_et._create_session_id()).toMatch(/(\w|\d){4}/);
+        expect(call_message_et._create_session_id()).toMatch(/(\w|\d){4}/);
       });
     });
   });

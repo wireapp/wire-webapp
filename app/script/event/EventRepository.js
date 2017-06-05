@@ -105,7 +105,6 @@ z.event.EventRepository = class EventRepository {
       } else if (this.notifications_loaded() && this.notification_handling_state() !== z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET) {
         this.logger.info(`Done handling '${this.notifications_total}' notifications from the stream`);
         this.notification_handling_state(z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
-        this._find_ongoing_calls();
         this.notifications_loaded(false);
         this.notifications_promises[0](this.last_notification_id());
       }
@@ -329,40 +328,6 @@ z.event.EventRepository = class EventRepository {
   }
 
   /**
-   * Check for conversations with ongoing calls.
-   * @private
-   * @returns {undefined} No return value
-   */
-  _find_ongoing_calls() {
-    this.logger.info('Checking for ongoing calls');
-    this.conversation_service.load_events_with_types([z.event.Backend.CONVERSATION.VOICE_CHANNEL_ACTIVATE, z.event.Backend.CONVERSATION.VOICE_CHANNEL_DEACTIVATE])
-    .then(function(events) {
-      const filtered_conversations = {};
-
-      for (const {conversation: conversation_id, protocol_version, type} of events) {
-        if (type === z.event.Backend.CONVERSATION.VOICE_CHANNEL_ACTIVATE) {
-          if (protocol_version !== z.calling.enum.PROTOCOL.VERSION_3) {
-            filtered_conversations[conversation_id] = null;
-          }
-        } else if (type === z.event.Backend.CONVERSATION.VOICE_CHANNEL_DEACTIVATE) {
-          if (protocol_version !== z.calling.enum.PROTOCOL.VERSION_3) {
-            delete filtered_conversations[conversation_id];
-          }
-        }
-      }
-
-      return Object.keys(filtered_conversations);
-    })
-    .then((conversation_ids) => {
-      this.logger.info(`Identified '${conversation_ids.length}' conversations that possibly have an ongoing call`, conversation_ids);
-      conversation_ids.map((conversation_id) => amplify.publish(z.event.WebApp.CALL.STATE.CHECK, conversation_id));
-    })
-    .catch((error) => {
-      this.logger.error('Could not check for active calls', error);
-    });
-  }
-
-  /**
    * Get the ID of the last known notification.
    * @note Notifications that have not yet been handled but are in the queue should not be fetched again on recovery
    *
@@ -396,7 +361,6 @@ z.event.EventRepository = class EventRepository {
       .catch((error) => {
         this.notification_handling_state(z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
         if (error.type === z.event.EventError.TYPE.NO_NOTIFICATIONS) {
-          this._find_ongoing_calls();
           this.logger.info('No notifications found for this user', error);
           return 0;
         }
@@ -641,7 +605,7 @@ z.event.EventRepository = class EventRepository {
    */
   _validate_call_event_lifetime(event) {
     if (this.notification_handling_state() === z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET) return true;
-    if (event.content.type === z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL) return true;
+    if (event.content.type === z.calling.enum.CALL_MESSAGE_TYPE.CANCEL) return true;
 
     const corrected_timestamp = Date.now() - this.clock_drift;
     const event_timestamp = new Date(event.time).getTime();
