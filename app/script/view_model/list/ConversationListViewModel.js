@@ -182,7 +182,7 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
   }
 
   is_selected_conversation(conversation_et) {
-    const is_selected_conversation = conversation_et.id === this.active_conversation_id();
+    const is_selected_conversation = this.conversation_repository.is_active_conversation(conversation_et);
     const is_selected_state = [
       z.ViewModel.content.CONTENT_STATE.COLLECTION,
       z.ViewModel.content.CONTENT_STATE.COLLECTION_DETAILS,

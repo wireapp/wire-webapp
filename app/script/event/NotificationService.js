@@ -86,16 +86,16 @@ z.event.NotificationService = class NotificationService {
    */
   get_last_notification_id_from_db() {
     return this.storage_service.load(z.storage.StorageService.OBJECT_STORE.AMPLIFY, NotificationService.CONFIG.PRIMARY_KEY_LAST_NOTIFICATION)
-    .then(function(record) {
-      if (record && record.value) {
-        return record.value;
-      }
-      throw new z.event.EventError(z.event.EventError.TYPE.NO_LAST_ID);
-    })
-    .catch((error) => {
-      this.logger.error(`Failed to get last notification ID from storage: ${error.message}`, error);
-      throw new z.event.EventError(z.event.EventError.TYPE.DATABASE_FAILURE);
-    });
+      .then((record) => {
+        if (record && record.value) {
+          return record.value;
+        }
+        throw new z.event.EventError(z.event.EventError.TYPE.NO_LAST_ID);
+      })
+      .catch((error) => {
+        this.logger.error(`Failed to get last notification ID from storage: ${error.message}`, error);
+        throw new z.event.EventError(z.event.EventError.TYPE.DATABASE_FAILURE);
+      });
   }
 
   /**

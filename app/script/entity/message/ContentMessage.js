@@ -103,13 +103,13 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
     return this.assets()[0];
   }
 
-  update_reactions(event_json) {
+  update_reactions({data: event_data, from}) {
     const reactions = this.reactions();
 
-    if (event_json.data.reaction) {
-      reactions[event_json.from] = event_json.data.reaction;
+    if (event_data.reaction) {
+      reactions[from] = event_data.reaction;
     } else {
-      delete reactions[event_json.from];
+      delete reactions[from];
     }
 
     if (reactions !== this.reactions) {
