@@ -37,7 +37,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.user_repository = user_repository;
     this.logger = new z.util.Logger(
       'z.ViewModel.content.PreferencesAccountViewModel',
-      z.config.LOGGER.OPTIONS,
+      z.config.LOGGER.OPTIONS
     );
 
     this.self_user = this.user_repository.self;
@@ -58,11 +58,11 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   _init_subscriptions() {
     amplify.subscribe(
       z.event.WebApp.CLIENT.ADD_OWN_CLIENT,
-      this.on_client_add.bind(this),
+      this.on_client_add.bind(this)
     );
     amplify.subscribe(
       z.event.WebApp.CLIENT.REMOVE,
-      this.on_client_remove.bind(this),
+      this.on_client_remove.bind(this)
     );
   }
 
@@ -114,7 +114,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     if (event.charCode !== 0) {
       // Automation is missing key prop
       return z.user.UserHandleGenerator.validate_character(
-        String.fromCharCode(event.charCode),
+        String.fromCharCode(event.charCode)
       );
     }
     return true;
@@ -123,7 +123,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   click_on_username() {
     amplify.publish(
       z.event.WebApp.ANALYTICS.EVENT,
-      z.tracking.EventName.SETTINGS.EDITED_USERNAME,
+      z.tracking.EventName.SETTINGS.EDITED_USERNAME
     );
   }
 
@@ -155,7 +155,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
             z.tracking.EventName.SETTINGS.SET_USERNAME,
             {
               length: entered_username.length,
-            },
+            }
           );
 
           event.target.blur();
@@ -215,10 +215,10 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
           secondary() {
             amplify.publish(
               z.event.WebApp.CONTENT.SWITCH,
-              z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES,
+              z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES
             );
           },
-        },
+        }
       );
     }
   }
@@ -233,7 +233,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
           z.tracking.EventName.PROFILE_PICTURE_CHANGED,
           {
             source: 'fromPhotoLibrary',
-          },
+          }
         );
       })
       .catch(error => {
@@ -252,7 +252,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
           return this.user_repository.delete_me();
         },
         data: this.self_user().email(),
-      },
+      }
     );
   }
 
@@ -264,12 +264,12 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     amplify.publish(
       z.event.WebApp.ANALYTICS.EVENT,
       z.tracking.EventName.PASSWORD_RESET,
-      {value: 'fromProfile'},
+      {value: 'fromProfile'}
     );
     return z.util.safe_window_open(
       `${z.util.Environment.backend.website_url()}${z.l10n.text(
-        z.string.url_password_reset,
-      )}`,
+        z.string.url_password_reset
+      )}`
     );
   }
 
@@ -290,7 +290,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
       !z.config.SUPPORTED_PROFILE_IMAGE_TYPES.includes(new_user_picture.type)
     ) {
       return this._show_upload_warning(
-        z.l10n.text(z.string.alert_upload_file_format),
+        z.l10n.text(z.string.alert_upload_file_format)
       );
     }
 
@@ -305,7 +305,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
         }
 
         return this._show_upload_warning(
-          z.l10n.text(z.string.alert_upload_too_small),
+          z.l10n.text(z.string.alert_upload_too_small)
         );
       });
   }
@@ -316,7 +316,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
       window.alert(warning);
     }, 200);
     return Promise.reject(
-      new z.user.UserError(z.user.UserError.TYPE.INVALID_UPDATE),
+      new z.user.UserError(z.user.UserError.TYPE.INVALID_UPDATE)
     );
   }
 

@@ -56,7 +56,7 @@ z.entity.Text = class Text extends z.entity.Asset {
     if (!this.previews().length) {
       message = z.media.MediaParser.render_media_embeds(
         message,
-        this.theme_color,
+        this.theme_color
       );
     }
     return message;

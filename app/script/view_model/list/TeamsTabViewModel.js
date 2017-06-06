@@ -28,7 +28,7 @@ z.ViewModel.list.TeamsTabViewModel = class TeamsTabViewModel {
     list_view_model,
     conversation_repository,
     team_repository,
-    user_repository,
+    user_repository
   ) {
     this.list_view_model = list_view_model;
 
@@ -41,7 +41,7 @@ z.ViewModel.list.TeamsTabViewModel = class TeamsTabViewModel {
     this.teams = ko.pureComputed(() =>
       this.team_repository
         .teams()
-        .sort((team_a, team_b) => team_a.name() > team_b.name()),
+        .sort((team_a, team_b) => team_a.name() > team_b.name())
     );
 
     this.active_team = this.team_repository.active_team;
@@ -63,10 +63,10 @@ z.ViewModel.list.TeamsTabViewModel = class TeamsTabViewModel {
 
   _init_subscriptions() {
     amplify.subscribe(z.event.WebApp.SEARCH.BADGE.SHOW, () =>
-      this.show_badge(true),
+      this.show_badge(true)
     );
     amplify.subscribe(z.event.WebApp.SEARCH.BADGE.HIDE, () =>
-      this.show_badge(false),
+      this.show_badge(false)
     );
   }
 
@@ -90,11 +90,11 @@ z.ViewModel.list.TeamsTabViewModel = class TeamsTabViewModel {
       z.ViewModel.list.LIST_STATE.PREFERENCES
     ) {
       this.list_view_model.switch_list(
-        z.ViewModel.list.LIST_STATE.CONVERSATIONS,
+        z.ViewModel.list.LIST_STATE.CONVERSATIONS
       );
       amplify.publish(
         z.event.WebApp.CONVERSATION.SHOW,
-        this.conversation_repository.get_most_recent_conversation(),
+        this.conversation_repository.get_most_recent_conversation()
       );
     }
   }

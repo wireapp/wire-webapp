@@ -28,14 +28,14 @@ z.ViewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
     this.properties_repository = properties_repository;
     this.logger = new z.util.Logger(
       'z.ViewModel.content.PreferencesOptionsViewModel',
-      z.config.LOGGER.OPTIONS,
+      z.config.LOGGER.OPTIONS
     );
 
     this.option_privacy = ko.observable();
     this.option_privacy.subscribe(privacy_preference => {
       this.properties_repository.save_preference(
         z.properties.PROPERTIES_TYPE.PRIVACY,
-        privacy_preference,
+        privacy_preference
       );
     });
 
@@ -56,14 +56,14 @@ z.ViewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
 
       this.properties_repository.save_preference(
         z.properties.PROPERTIES_TYPE.SOUND_ALERTS,
-        audio_preference,
+        audio_preference
       );
       amplify.publish(
         z.event.WebApp.ANALYTICS.EVENT,
         z.tracking.EventName.SOUND_SETTINGS_CHANGED,
         {
           value: tracking_value,
-        },
+        }
       );
     });
 
@@ -71,27 +71,27 @@ z.ViewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
     this.option_notifications.subscribe(notifications_preference => {
       this.properties_repository.save_preference(
         z.properties.PROPERTIES_TYPE.NOTIFICATIONS,
-        notifications_preference,
+        notifications_preference
       );
     });
 
     amplify.subscribe(
       z.event.WebApp.PROPERTIES.UPDATED,
-      this.update_properties.bind(this),
+      this.update_properties.bind(this)
     );
   }
 
   connect_google_contacts() {
     amplify.publish(
       z.event.WebApp.CONNECT.IMPORT_CONTACTS,
-      z.connect.ConnectSource.GMAIL,
+      z.connect.ConnectSource.GMAIL
     );
   }
 
   connect_macos_contacts() {
     amplify.publish(
       z.event.WebApp.CONNECT.IMPORT_CONTACTS,
-      z.connect.ConnectSource.ICLOUD,
+      z.connect.ConnectSource.ICLOUD
     );
   }
 

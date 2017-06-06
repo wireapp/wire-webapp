@@ -32,32 +32,32 @@ z.entity.Connection = class Connection {
     this.to = null;
 
     this.is_blocked = ko.pureComputed(
-      () => this.status() === z.user.ConnectionStatus.BLOCKED,
+      () => this.status() === z.user.ConnectionStatus.BLOCKED
     );
     this.is_canceled = ko.pureComputed(
-      () => this.status() === z.user.ConnectionStatus.CANCELLED,
+      () => this.status() === z.user.ConnectionStatus.CANCELLED
     );
     this.is_connected = ko.pureComputed(
-      () => this.status() === z.user.ConnectionStatus.ACCEPTED,
+      () => this.status() === z.user.ConnectionStatus.ACCEPTED
     );
     this.is_ignored = ko.pureComputed(
-      () => this.status() === z.user.ConnectionStatus.IGNORED,
+      () => this.status() === z.user.ConnectionStatus.IGNORED
     );
     this.is_incoming_request = ko.pureComputed(
-      () => this.status() === z.user.ConnectionStatus.PENDING,
+      () => this.status() === z.user.ConnectionStatus.PENDING
     );
     this.is_outgoing_request = ko.pureComputed(
-      () => this.status() === z.user.ConnectionStatus.SENT,
+      () => this.status() === z.user.ConnectionStatus.SENT
     );
     this.is_unknown = ko.pureComputed(() =>
       [
         z.user.ConnectionStatus.CANCELLED,
         z.user.ConnectionStatus.UNKNOWN,
-      ].includes(this.status()),
+      ].includes(this.status())
     );
 
     this.is_request = ko.pureComputed(
-      () => this.is_incoming_request() || this.is_outgoing_request(),
+      () => this.is_incoming_request() || this.is_outgoing_request()
     );
   }
 };

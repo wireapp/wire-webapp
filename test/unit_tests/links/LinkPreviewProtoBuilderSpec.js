@@ -47,7 +47,7 @@ describe('LinkPreviewProtoBuilder', function() {
 
   it('returns undefined if data is an empty object', function() {
     const link_preview = z.links.LinkPreviewProtoBuilder.build_from_open_graph_data(
-      {},
+      {}
     );
     expect(link_preview).not.toBeDefined();
   });
@@ -58,7 +58,7 @@ describe('LinkPreviewProtoBuilder', function() {
     delete mock.title;
     const link_preview = z.links.LinkPreviewProtoBuilder.build_from_open_graph_data(
       mock,
-      url,
+      url
     );
     expect(link_preview).not.toBeDefined();
   });
@@ -68,7 +68,7 @@ describe('LinkPreviewProtoBuilder', function() {
     const mock = OpenGraphMocks.getWireMock();
     const link_preview = z.links.LinkPreviewProtoBuilder.build_from_open_graph_data(
       mock,
-      url,
+      url
     );
     compare_article_with_mock(url, 0, link_preview, mock);
   });
@@ -79,7 +79,7 @@ describe('LinkPreviewProtoBuilder', function() {
     delete mock.image;
     const link_preview = z.links.LinkPreviewProtoBuilder.build_from_open_graph_data(
       mock,
-      url,
+      url
     );
     compare_article_with_mock(url, 0, link_preview, mock);
   });
@@ -90,7 +90,7 @@ describe('LinkPreviewProtoBuilder', function() {
     const link_preview = z.links.LinkPreviewProtoBuilder.build_from_open_graph_data(
       mock,
       url,
-      12,
+      12
     );
     compare_article_with_mock(url, 12, link_preview, mock);
   });
@@ -101,7 +101,7 @@ describe('LinkPreviewProtoBuilder', function() {
     delete mock.type;
     const link_preview = z.links.LinkPreviewProtoBuilder.build_from_open_graph_data(
       mock,
-      url,
+      url
     );
     compare_article_with_mock(url, 0, link_preview, mock);
   });
@@ -112,7 +112,7 @@ describe('LinkPreviewProtoBuilder', function() {
     delete mock.description;
     const link_preview = z.links.LinkPreviewProtoBuilder.build_from_open_graph_data(
       mock,
-      url,
+      url
     );
     compare_article_with_mock(url, 0, link_preview, mock);
   });

@@ -42,7 +42,7 @@ z.conversation.EventBuilder = (function() {
     conversation_et,
     e_call_message,
     user_id,
-    client_id,
+    client_id
   ) => {
     return {
       content: e_call_message,
@@ -73,7 +73,7 @@ z.conversation.EventBuilder = (function() {
     conversation_id,
     message_id,
     time,
-    message_to_delete_et,
+    message_to_delete_et
   ) => {
     return {
       conversation: conversation_id,
@@ -140,7 +140,7 @@ z.conversation.EventBuilder = (function() {
   const _build_voice_channel_deactivate = (
     e_call_message_et,
     creating_user_et,
-    reason = z.calling.enum.TERMINATION_REASON.COMPLETED,
+    reason = z.calling.enum.TERMINATION_REASON.COMPLETED
   ) => {
     const {
       conversation_id,

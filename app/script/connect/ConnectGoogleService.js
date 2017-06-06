@@ -36,7 +36,7 @@ z.connect.ConnectGoogleService = class ConnectGoogleService {
     this.client = client;
     this.logger = new z.util.Logger(
       'z.connect.ConnectGoogleService',
-      z.config.LOGGER.OPTIONS,
+      z.config.LOGGER.OPTIONS
     );
     this.client_id =
       '481053726221-71f8tbhghg4ug5put5v3j5pluv0di2fc.apps.googleusercontent.com';
@@ -55,7 +55,7 @@ z.connect.ConnectGoogleService = class ConnectGoogleService {
       .catch(error => {
         this.logger.error(
           `Failed to import contacts from Google: ${error.message}`,
-          error,
+          error
         );
       });
   }
@@ -81,7 +81,7 @@ z.connect.ConnectGoogleService = class ConnectGoogleService {
 
       return window.gapi.auth.authorize(
         {client_id: this.client_id, immediate: false, scope: this.scopes},
-        on_response,
+        on_response
       );
     });
   }
@@ -97,7 +97,7 @@ z.connect.ConnectGoogleService = class ConnectGoogleService {
         if (auth_token) {
           this.logger.info(
             'Using cached access token to access Google contacts',
-            auth_token,
+            auth_token
           );
           return resolve(auth_token.access_token);
         }
@@ -106,7 +106,7 @@ z.connect.ConnectGoogleService = class ConnectGoogleService {
 
       this.logger.warn('Google Auth Client for JavaScript not loaded');
       const error = new z.connect.ConnectError(
-        z.connect.ConnectError.TYPE.GOOGLE_CLIENT,
+        z.connect.ConnectError.TYPE.GOOGLE_CLIENT
       );
       Raygun.send(error);
       return reject(error);
@@ -122,7 +122,7 @@ z.connect.ConnectGoogleService = class ConnectGoogleService {
   _get_contacts(access_token) {
     return fetch(
       `${this
-        .url}?access_token=${access_token}&alt=json&max-results=15000&v=3.0`,
+        .url}?access_token=${access_token}&alt=json&max-results=15000&v=3.0`
     )
       .then(response => response.json())
       .then(({feed}) => {
@@ -153,7 +153,7 @@ z.connect.ConnectGoogleService = class ConnectGoogleService {
       const script_element = document.getElementsByTagName('script')[0];
       return script_element.parentNode.insertBefore(
         script_node,
-        script_element,
+        script_element
       );
     });
   }

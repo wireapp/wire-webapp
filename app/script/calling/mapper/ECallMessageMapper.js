@@ -28,12 +28,12 @@ z.calling.mapper.ECallMessageMapper = (function() {
     type,
     response,
     session_id,
-    additional_payload,
+    additional_payload
   ) {
     const e_call_message_et = new z.calling.entities.ECallMessage(
       type,
       response,
-      session_id,
+      session_id
     );
 
     if (additional_payload) {
@@ -48,59 +48,59 @@ z.calling.mapper.ECallMessageMapper = (function() {
       z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL,
       response,
       session_id,
-      additional_payload,
+      additional_payload
     );
   };
 
   const _build_group_check = function(
     response,
     session_id,
-    additional_payload,
+    additional_payload
   ) {
     return _build_e_call_message(
       z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_CHECK,
       response,
       session_id,
-      additional_payload,
+      additional_payload
     );
   };
 
   const _build_group_leave = function(
     response,
     session_id,
-    additional_payload,
+    additional_payload
   ) {
     return _build_e_call_message(
       z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_LEAVE,
       response,
       session_id,
-      additional_payload,
+      additional_payload
     );
   };
 
   const _build_group_setup = function(
     response,
     session_id,
-    additional_payload,
+    additional_payload
   ) {
     return _build_e_call_message(
       z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_SETUP,
       response,
       session_id,
-      additional_payload,
+      additional_payload
     );
   };
 
   const _build_group_start = function(
     response,
     session_id,
-    additional_payload,
+    additional_payload
   ) {
     return _build_e_call_message(
       z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_START,
       response,
       session_id,
-      additional_payload,
+      additional_payload
     );
   };
 
@@ -109,7 +109,7 @@ z.calling.mapper.ECallMessageMapper = (function() {
       z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP,
       response,
       session_id,
-      additional_payload,
+      additional_payload
     );
   };
 
@@ -118,7 +118,7 @@ z.calling.mapper.ECallMessageMapper = (function() {
       z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC,
       response,
       session_id,
-      additional_payload,
+      additional_payload
     );
   };
 
@@ -127,7 +127,7 @@ z.calling.mapper.ECallMessageMapper = (function() {
       z.calling.enum.E_CALL_MESSAGE_TYPE.REJECT,
       response,
       session_id,
-      additional_payload,
+      additional_payload
     );
   };
 
@@ -136,7 +136,7 @@ z.calling.mapper.ECallMessageMapper = (function() {
       z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP,
       response,
       session_id,
-      additional_payload,
+      additional_payload
     );
   };
 
@@ -145,7 +145,7 @@ z.calling.mapper.ECallMessageMapper = (function() {
       z.calling.enum.E_CALL_MESSAGE_TYPE.UPDATE,
       response,
       session_id,
-      additional_payload,
+      additional_payload
     );
   };
 
@@ -224,7 +224,7 @@ z.calling.mapper.ECallMessageMapper = (function() {
     const e_call_message_et = new z.calling.entities.ECallMessage(
       type,
       response,
-      session_id,
+      session_id
     );
 
     e_call_message_et.add_properties(additional_properties);

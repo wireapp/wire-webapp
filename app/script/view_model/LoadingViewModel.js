@@ -34,7 +34,7 @@ z.ViewModel.LoadingViewModel = class LoadingViewModel {
 
     amplify.subscribe(
       z.event.WebApp.APP.UPDATE_PROGRESS,
-      this.update_progress.bind(this),
+      this.update_progress.bind(this)
     );
 
     ko.applyBindings(this, document.getElementById(element_id));

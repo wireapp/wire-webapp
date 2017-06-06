@@ -61,8 +61,8 @@ z.location = (() => {
       if (latitude == null || longitude == null) {
         reject(
           new Error(
-            'You need to specify latitude and longitude in order to retrieve the location',
-          ),
+            'You need to specify latitude and longitude in order to retrieve the location'
+          )
         );
       }
       $.ajax({
@@ -75,7 +75,7 @@ z.location = (() => {
           return resolve();
         })
         .fail((jqXHR, textStatus, errorThrown) =>
-          reject(new Error(errorThrown)),
+          reject(new Error(errorThrown))
         );
     });
   };

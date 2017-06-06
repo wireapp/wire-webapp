@@ -36,7 +36,7 @@ describe('ConversationServiceNoCompound', function() {
         ({storage_service} = storage_repository);
         conversation_service = new z.conversation.ConversationServiceNoCompound(
           client,
-          storage_service,
+          storage_service
         );
 
         conversation_mapper = new z.conversation.ConversationMapper();
@@ -91,9 +91,9 @@ describe('ConversationServiceNoCompound', function() {
           storage_service.save(
             z.storage.StorageService.OBJECT_STORE.EVENTS,
             undefined,
-            message,
-          ),
-        ),
+            message
+          )
+        )
       )
         .then(done)
         .catch(done.fail);
@@ -103,7 +103,7 @@ describe('ConversationServiceNoCompound', function() {
       conversation_service
         .load_event_from_db(
           conversation_id,
-          '4af67f76-09f9-4831-b3a4-9df877b8c29a',
+          '4af67f76-09f9-4831-b3a4-9df877b8c29a'
         )
         .then(function(message_et) {
           expect(message_et).toEqual(messages[1]);
@@ -157,7 +157,7 @@ describe('ConversationServiceNoCompound', function() {
         .catch(function(error) {
           expect(error).toEqual(jasmine.any(z.conversation.ConversationError));
           expect(error.type).toBe(
-            z.conversation.ConversationError.TYPE.NO_CHANGES,
+            z.conversation.ConversationError.TYPE.NO_CHANGES
           );
           done();
         });
@@ -182,9 +182,9 @@ describe('ConversationServiceNoCompound', function() {
           storage_service.save(
             z.storage.StorageService.OBJECT_STORE.EVENTS,
             undefined,
-            message,
-          ),
-        ),
+            message
+          )
+        )
       )
         .then(done)
         .catch(done.fail);
@@ -195,7 +195,7 @@ describe('ConversationServiceNoCompound', function() {
         .load_preceding_events_from_db(
           'invalid_id',
           new Date(30),
-          new Date(1479903546808),
+          new Date(1479903546808)
         )
         .then(function(events) {
           expect(events.length).toBe(0);
@@ -247,7 +247,7 @@ describe('ConversationServiceNoCompound', function() {
         .load_preceding_events_from_db(
           conversation_id,
           undefined,
-          new Date(1479903546803),
+          new Date(1479903546803)
         )
         .then(function(events) {
           expect(events.length).toBe(4);
@@ -265,7 +265,7 @@ describe('ConversationServiceNoCompound', function() {
         .load_preceding_events_from_db(
           conversation_id,
           new Date(1479903546806),
-          new Date(1479903546807),
+          new Date(1479903546807)
         )
         .then(function(events) {
           expect(events.length).toBe(1);
@@ -276,14 +276,14 @@ describe('ConversationServiceNoCompound', function() {
     });
 
     it('loads events with upper and lower bound and a fetch limit', function(
-      done,
+      done
     ) {
       conversation_service
         .load_preceding_events_from_db(
           conversation_id,
           new Date(1479903546800),
           new Date(1479903546807),
-          2,
+          2
         )
         .then(function(events) {
           expect(events.length).toBe(2);
@@ -331,7 +331,7 @@ describe('ConversationServiceNoCompound', function() {
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
       // @formatter:on
       const conversation_et = conversation_mapper.map_conversation(
-        conversation_payload,
+        conversation_payload
       );
 
       conversation_service
@@ -397,9 +397,9 @@ describe('ConversationServiceNoCompound', function() {
           storage_service.save(
             z.storage.StorageService.OBJECT_STORE.EVENTS,
             undefined,
-            message,
-          ),
-        ),
+            message
+          )
+        )
       )
         .then(function(ids) {
           primary_keys = ids;
@@ -412,12 +412,12 @@ describe('ConversationServiceNoCompound', function() {
       conversation_service
         .delete_message_with_key_from_db(primary_keys[1])
         .then(() =>
-          conversation_service.load_preceding_events_from_db(conversation_id),
+          conversation_service.load_preceding_events_from_db(conversation_id)
         )
         .then(function(events) {
           expect(events.length).toBe(2);
           events.forEach(event =>
-            expect(event.primary_key).not.toBe(primary_keys[1]),
+            expect(event.primary_key).not.toBe(primary_keys[1])
           );
           done();
         })
@@ -428,7 +428,7 @@ describe('ConversationServiceNoCompound', function() {
       conversation_service
         .delete_message_with_key_from_db('wrongKey')
         .then(() =>
-          conversation_service.load_preceding_events_from_db(conversation_id),
+          conversation_service.load_preceding_events_from_db(conversation_id)
         )
         .then(function(events) {
           expect(events.length).toBe(3);
@@ -516,15 +516,15 @@ describe('ConversationServiceNoCompound', function() {
             storage_service.save(
               z.storage.StorageService.OBJECT_STORE.EVENTS,
               undefined,
-              event,
-            ),
-          ),
+              event
+            )
+          )
       )
         .then(() =>
           conversation_service.load_events_with_category_from_db(
             events[0].conversation,
-            z.message.MessageCategory.IMAGE,
-          ),
+            z.message.MessageCategory.IMAGE
+          )
         )
         .then(function(result) {
           expect(result.length).toBe(0);
@@ -539,15 +539,15 @@ describe('ConversationServiceNoCompound', function() {
           storage_service.save(
             z.storage.StorageService.OBJECT_STORE.EVENTS,
             undefined,
-            event,
-          ),
-        ),
+            event
+          )
+        )
       )
         .then(() =>
           conversation_service.load_events_with_category_from_db(
             events[0].conversation,
-            z.message.MessageCategory.IMAGE,
-          ),
+            z.message.MessageCategory.IMAGE
+          )
         )
         .then(function(result) {
           expect(result.length).toBe(2);

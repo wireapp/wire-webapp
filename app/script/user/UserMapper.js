@@ -32,7 +32,7 @@ z.user.UserMapper = class UserMapper {
     this.asset_service = asset_service;
     this.logger = new z.util.Logger(
       'z.user.UserMapper',
-      z.config.LOGGER.OPTIONS,
+      z.config.LOGGER.OPTIONS
     );
   }
 
@@ -96,7 +96,7 @@ z.user.UserMapper = class UserMapper {
     } else if (user_et.id !== '' && data.id !== user_et.id) {
       // We are trying to update non-matching users
       throw new Error(
-        `Updating wrong user entity. User ID '${user_et.id}' does not match data ID '${data.id}'.`,
+        `Updating wrong user entity. User ID '${user_et.id}' does not match data ID '${data.id}'.`
       );
     }
 
@@ -138,13 +138,13 @@ z.user.UserMapper = class UserMapper {
   _map_profile_pictures(user_et, picture) {
     if (picture[0]) {
       user_et.preview_picture_resource(
-        z.assets.AssetRemoteData.v1(user_et.id, picture[0].id, true),
+        z.assets.AssetRemoteData.v1(user_et.id, picture[0].id, true)
       );
     }
 
     if (picture[1]) {
       return user_et.medium_picture_resource(
-        z.assets.AssetRemoteData.v1(user_et.id, picture[1].id, true),
+        z.assets.AssetRemoteData.v1(user_et.id, picture[1].id, true)
       );
     }
   }
@@ -154,12 +154,12 @@ z.user.UserMapper = class UserMapper {
       switch (asset.size) {
         case 'preview':
           user_et.preview_picture_resource(
-            z.assets.AssetRemoteData.v3(asset.key, true),
+            z.assets.AssetRemoteData.v3(asset.key, true)
           );
           break;
         case 'complete':
           user_et.medium_picture_resource(
-            z.assets.AssetRemoteData.v3(asset.key, true),
+            z.assets.AssetRemoteData.v3(asset.key, true)
           );
           break;
         default:

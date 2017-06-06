@@ -27,7 +27,7 @@ z.telemetry.app_init.AppInitTelemetry = class AppInitTelemetry {
   constructor() {
     this.logger = new z.util.Logger(
       'z.telemetry.app_init.AppInitTelemetry',
-      z.config.LOGGER.OPTIONS,
+      z.config.LOGGER.OPTIONS
     );
     this.timings = new z.telemetry.app_init.AppInitTimings();
     this.statistics = new z.telemetry.app_init.AppInitStatistics();
@@ -60,7 +60,7 @@ z.telemetry.app_init.AppInitTelemetry = class AppInitTelemetry {
     statistics.app_version = z.util.Environment.version(false);
     this.logger.debug('App initialization telemetry');
     this.logger.info(
-      `App version '${statistics.app_version}' initialized within ${statistics.loading_time}s`,
+      `App version '${statistics.app_version}' initialized within ${statistics.loading_time}s`
     );
     this.log_statistics();
     this.log_timings();
@@ -68,7 +68,7 @@ z.telemetry.app_init.AppInitTelemetry = class AppInitTelemetry {
     amplify.publish(
       z.event.WebApp.ANALYTICS.EVENT,
       z.tracking.EventName.TELEMETRY.APP_INITIALIZATION,
-      statistics,
+      statistics
     );
   }
 

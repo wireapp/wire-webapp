@@ -36,7 +36,7 @@ describe('z.media.MediaStreamHandler', function() {
     beforeEach(function() {
       spyOn(
         TestFactory.media_repository.stream_handler,
-        '_toggle_audio_send',
+        '_toggle_audio_send'
       ).and.returnValue(Promise.resolve());
     });
 
@@ -47,7 +47,7 @@ describe('z.media.MediaStreamHandler', function() {
         .toggle_audio_send()
         .then(function() {
           expect(
-            TestFactory.media_repository.stream_handler._toggle_audio_send,
+            TestFactory.media_repository.stream_handler._toggle_audio_send
           ).toHaveBeenCalled();
           done();
         })
@@ -63,7 +63,7 @@ describe('z.media.MediaStreamHandler', function() {
         .catch(function(error) {
           expect(error).toEqual(jasmine.any(z.media.MediaError));
           expect(error.type).toBe(
-            z.media.MediaError.TYPE.NO_AUDIO_STREAM_FOUND,
+            z.media.MediaError.TYPE.NO_AUDIO_STREAM_FOUND
           );
           done();
         });
@@ -74,30 +74,30 @@ describe('z.media.MediaStreamHandler', function() {
     beforeEach(function() {
       spyOn(
         TestFactory.media_repository.stream_handler,
-        '_toggle_video_send',
+        '_toggle_video_send'
       ).and.returnValue(Promise.resolve());
       return spyOn(
         TestFactory.media_repository.stream_handler,
-        'replace_input_source',
+        'replace_input_source'
       ).and.returnValue(Promise.resolve());
     });
 
     it('toggles the video stream if available and in video mode', function(
-      done,
+      done
     ) {
       TestFactory.media_repository.stream_handler.local_media_stream(true);
       TestFactory.media_repository.stream_handler.local_media_type(
-        z.media.MediaType.VIDEO,
+        z.media.MediaType.VIDEO
       );
 
       TestFactory.media_repository.stream_handler
         .toggle_video_send()
         .then(function() {
           expect(
-            TestFactory.media_repository.stream_handler._toggle_video_send,
+            TestFactory.media_repository.stream_handler._toggle_video_send
           ).toHaveBeenCalled();
           expect(
-            TestFactory.media_repository.stream_handler.replace_input_source,
+            TestFactory.media_repository.stream_handler.replace_input_source
           ).not.toHaveBeenCalled();
           done();
         })
@@ -107,17 +107,17 @@ describe('z.media.MediaStreamHandler', function() {
     it('turns on the video stream if it does not exist', function(done) {
       TestFactory.media_repository.stream_handler.local_media_stream(undefined);
       TestFactory.media_repository.stream_handler.local_media_type(
-        z.media.MediaType.VIDEO,
+        z.media.MediaType.VIDEO
       );
 
       TestFactory.media_repository.stream_handler
         .toggle_video_send()
         .then(function() {
           expect(
-            TestFactory.media_repository.stream_handler._toggle_video_send,
+            TestFactory.media_repository.stream_handler._toggle_video_send
           ).not.toHaveBeenCalled();
           expect(
-            TestFactory.media_repository.stream_handler.replace_input_source,
+            TestFactory.media_repository.stream_handler.replace_input_source
           ).toHaveBeenCalledWith(z.media.MediaType.VIDEO);
           done();
         })
@@ -127,17 +127,17 @@ describe('z.media.MediaStreamHandler', function() {
     it('turns on the video stream if not in video mode', function(done) {
       TestFactory.media_repository.stream_handler.local_media_stream(true);
       TestFactory.media_repository.stream_handler.local_media_type(
-        z.media.MediaType.SCREEN,
+        z.media.MediaType.SCREEN
       );
 
       TestFactory.media_repository.stream_handler
         .toggle_video_send()
         .then(function() {
           expect(
-            TestFactory.media_repository.stream_handler._toggle_video_send,
+            TestFactory.media_repository.stream_handler._toggle_video_send
           ).not.toHaveBeenCalled();
           expect(
-            TestFactory.media_repository.stream_handler.replace_input_source,
+            TestFactory.media_repository.stream_handler.replace_input_source
           ).toHaveBeenCalledWith(z.media.MediaType.VIDEO);
           done();
         })
@@ -149,30 +149,30 @@ describe('z.media.MediaStreamHandler', function() {
     beforeEach(function() {
       spyOn(
         TestFactory.media_repository.stream_handler,
-        '_toggle_screen_send',
+        '_toggle_screen_send'
       ).and.returnValue(Promise.resolve());
       spyOn(
         TestFactory.media_repository.stream_handler,
-        'replace_input_source',
+        'replace_input_source'
       ).and.returnValue(Promise.resolve());
     });
 
     it('toggles screen sharing if available and in screen sharing mode', function(
-      done,
+      done
     ) {
       TestFactory.media_repository.stream_handler.local_media_stream(true);
       TestFactory.media_repository.stream_handler.local_media_type(
-        z.media.MediaType.SCREEN,
+        z.media.MediaType.SCREEN
       );
 
       TestFactory.media_repository.stream_handler
         .toggle_screen_send()
         .then(function() {
           expect(
-            TestFactory.media_repository.stream_handler._toggle_screen_send,
+            TestFactory.media_repository.stream_handler._toggle_screen_send
           ).toHaveBeenCalled();
           expect(
-            TestFactory.media_repository.stream_handler.replace_input_source,
+            TestFactory.media_repository.stream_handler.replace_input_source
           ).not.toHaveBeenCalled();
           done();
         })
@@ -180,21 +180,21 @@ describe('z.media.MediaStreamHandler', function() {
     });
 
     it('turns on the screen sharing stream if it does not exist', function(
-      done,
+      done
     ) {
       TestFactory.media_repository.stream_handler.local_media_stream(undefined);
       TestFactory.media_repository.stream_handler.local_media_type(
-        z.media.MediaType.SCREEN,
+        z.media.MediaType.SCREEN
       );
 
       TestFactory.media_repository.stream_handler
         .toggle_screen_send()
         .then(function() {
           expect(
-            TestFactory.media_repository.stream_handler._toggle_screen_send,
+            TestFactory.media_repository.stream_handler._toggle_screen_send
           ).not.toHaveBeenCalled();
           expect(
-            TestFactory.media_repository.stream_handler.replace_input_source,
+            TestFactory.media_repository.stream_handler.replace_input_source
           ).toHaveBeenCalledWith(z.media.MediaType.SCREEN);
           done();
         })
@@ -202,21 +202,21 @@ describe('z.media.MediaStreamHandler', function() {
     });
 
     it('turns on the video stream if not in screen sharing mode', function(
-      done,
+      done
     ) {
       TestFactory.media_repository.stream_handler.local_media_stream(true);
       TestFactory.media_repository.stream_handler.local_media_type(
-        z.media.MediaType.VIDEO,
+        z.media.MediaType.VIDEO
       );
 
       TestFactory.media_repository.stream_handler
         .toggle_screen_send()
         .then(function() {
           expect(
-            TestFactory.media_repository.stream_handler._toggle_screen_send,
+            TestFactory.media_repository.stream_handler._toggle_screen_send
           ).not.toHaveBeenCalled();
           expect(
-            TestFactory.media_repository.stream_handler.replace_input_source,
+            TestFactory.media_repository.stream_handler.replace_input_source
           ).toHaveBeenCalledWith(z.media.MediaType.SCREEN);
           done();
         })

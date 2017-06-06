@@ -33,7 +33,7 @@ z.ViewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
 
     this.logger = new z.util.Logger(
       'z.ViewModel.CollectionDetailsViewModel',
-      z.config.LOGGER.OPTIONS,
+      z.config.LOGGER.OPTIONS
     );
 
     this.template = ko.observable();
@@ -47,11 +47,11 @@ z.ViewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
   set_conversation(conversation_et, category, items) {
     amplify.subscribe(
       z.event.WebApp.CONVERSATION.MESSAGE.ADDED,
-      this.item_added,
+      this.item_added
     );
     amplify.subscribe(
       z.event.WebApp.CONVERSATION.MESSAGE.REMOVED,
-      this.item_removed,
+      this.item_removed
     );
     this.template(category);
     this.conversation_et(conversation_et);
@@ -95,11 +95,11 @@ z.ViewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
   removed_from_view() {
     amplify.unsubscribe(
       z.event.WebApp.CONVERSATION.MESSAGE.ADDED,
-      this.item_added,
+      this.item_added
     );
     amplify.unsubscribe(
       z.event.WebApp.CONVERSATION.MESSAGE.REMOVED,
-      this.item_removed,
+      this.item_removed
     );
     this.last_message_timestamp = undefined;
     this.conversation_et(null);
@@ -109,7 +109,7 @@ z.ViewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
   click_on_back_button() {
     amplify.publish(
       z.event.WebApp.CONTENT.SWITCH,
-      z.ViewModel.content.CONTENT_STATE.COLLECTION,
+      z.ViewModel.content.CONTENT_STATE.COLLECTION
     );
   }
 
@@ -118,7 +118,7 @@ z.ViewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
       z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW,
       message_et,
       this.items(),
-      'collection',
+      'collection'
     );
   }
 
@@ -131,7 +131,7 @@ z.ViewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
     // We passed today
     if (
       !moment(message_et.timestamp()).is_same_day(
-        this.last_message_timestamp,
+        this.last_message_timestamp
       ) &&
       moment(this.last_message_timestamp).is_today()
     ) {

@@ -38,7 +38,7 @@ z.cryptography.CryptographyService = class CryptographyService {
     this.client = client;
     this.logger = new z.util.Logger(
       'z.cryptography.CryptographyService',
-      z.config.LOGGER.OPTIONS,
+      z.config.LOGGER.OPTIONS
     );
   }
 
@@ -54,7 +54,7 @@ z.cryptography.CryptographyService = class CryptographyService {
       data: user_client_map,
       type: 'POST',
       url: this.client.create_url(
-        `${CryptographyService.CONFIG.URL_USERS}/prekeys`,
+        `${CryptographyService.CONFIG.URL_USERS}/prekeys`
       ),
     });
   }
@@ -73,7 +73,7 @@ z.cryptography.CryptographyService = class CryptographyService {
       },
       type: 'PUT',
       url: this.client.create_url(
-        `${CryptographyService.CONFIG.URL_CLIENTS}/${client_id}`,
+        `${CryptographyService.CONFIG.URL_CLIENTS}/${client_id}`
       ),
     });
   }

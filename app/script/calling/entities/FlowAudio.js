@@ -34,7 +34,7 @@ z.calling.entities.FlowAudio = class FlowAudio {
     this.media_repository = media_repository;
     this.logger = new z.util.Logger(
       `z.calling.FlowAudio (${this.flow_et.id})`,
-      z.config.LOGGER.OPTIONS,
+      z.config.LOGGER.OPTIONS
     );
 
     this.audio_context = undefined;
@@ -47,7 +47,7 @@ z.calling.entities.FlowAudio = class FlowAudio {
     }
     this.panning.subscribe(updated_panning_value => {
       this.logger.debug(
-        `Panning of ${this.flow_et.remote_user.name()} changed to '${updated_panning_value}'`,
+        `Panning of ${this.flow_et.remote_user.name()} changed to '${updated_panning_value}'`
       );
       this.set_pan(updated_panning_value);
     });
@@ -59,7 +59,7 @@ z.calling.entities.FlowAudio = class FlowAudio {
 
     amplify.subscribe(
       z.event.WebApp.CALL.MEDIA.MUTE_AUDIO,
-      this.set_gain_node.bind(this),
+      this.set_gain_node.bind(this)
     );
   }
 
@@ -137,7 +137,7 @@ z.calling.entities.FlowAudio = class FlowAudio {
 
       if (audio_context) {
         const remote_source = audio_context.createMediaStreamSource(
-          media_stream,
+          media_stream
         );
         const audio_output_device = audio_context.createMediaStreamDestination();
 
@@ -150,7 +150,7 @@ z.calling.entities.FlowAudio = class FlowAudio {
         $.extend(true, media_stream, audio_output_device.stream);
         this.logger.debug(
           `Wrapped audio stream to speaker to create stereo. Initial panning set to '${this.panning()}'.`,
-          media_stream,
+          media_stream
         );
       }
     }

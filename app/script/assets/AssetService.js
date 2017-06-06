@@ -32,7 +32,7 @@ z.assets.AssetService = class AssetService {
     this.client = client;
     this.logger = new z.util.Logger(
       'z.assets.AssetService',
-      z.config.LOGGER.OPTIONS,
+      z.config.LOGGER.OPTIONS
     );
   }
 
@@ -78,7 +78,7 @@ z.assets.AssetService = class AssetService {
         return this.post_asset(
           new Uint8Array(cipher_text),
           options,
-          xhr_accessor_function,
+          xhr_accessor_function
         ).then(({key, token}) => ({
           key,
           key_bytes,
@@ -109,7 +109,7 @@ z.assets.AssetService = class AssetService {
         const asset = new z.proto.Asset();
         asset.set(
           'uploaded',
-          new z.proto.Asset.RemoteData(key_bytes, sha256, key, token),
+          new z.proto.Asset.RemoteData(key_bytes, sha256, key, token)
         );
         return asset;
       });
@@ -127,7 +127,7 @@ z.assets.AssetService = class AssetService {
    */
   upload_image_asset(image, options) {
     return this._compress_image(
-      image,
+      image
     ).then(([compressed_image, compressed_bytes]) => {
       return this._upload_asset(compressed_bytes, options).then(function({
         key,
@@ -137,7 +137,7 @@ z.assets.AssetService = class AssetService {
       }) {
         const image_meta_data = new z.proto.Asset.ImageMetaData(
           compressed_image.width,
-          compressed_image.height,
+          compressed_image.height
         );
         const asset = new z.proto.Asset();
         asset.set(
@@ -146,12 +146,12 @@ z.assets.AssetService = class AssetService {
             image.type,
             compressed_bytes.length,
             null,
-            image_meta_data,
-          ),
+            image_meta_data
+          )
         );
         asset.set(
           'uploaded',
-          new z.proto.Asset.RemoteData(key_bytes, sha256, key, token),
+          new z.proto.Asset.RemoteData(key_bytes, sha256, key, token)
         );
         return asset;
       });
@@ -188,7 +188,7 @@ z.assets.AssetService = class AssetService {
    */
   generate_asset_url_v2(asset_id, conversation_id, force_caching) {
     const url = this.client.create_url(
-      `/conversations/${conversation_id}/otr/assets/${asset_id}`,
+      `/conversations/${conversation_id}/otr/assets/${asset_id}`
     );
     let asset_url = `${url}?access_token=${this.client.access_token}`;
     if (force_caching) {
@@ -236,7 +236,7 @@ z.assets.AssetService = class AssetService {
           public: false,
           retention: z.assets.AssetRetentionPolicy.PERSISTENT,
         },
-        metadata,
+        metadata
       );
 
       metadata = JSON.stringify(metadata);
@@ -258,11 +258,11 @@ z.assets.AssetService = class AssetService {
       xhr.open('POST', this.client.create_url('/assets/v3'));
       xhr.setRequestHeader(
         'Content-Type',
-        `multipart/mixed; boundary=${BOUNDARY}`,
+        `multipart/mixed; boundary=${BOUNDARY}`
       );
       xhr.setRequestHeader(
         'Authorization',
-        `${this.client.access_token_type} ${this.client.access_token}`,
+        `${this.client.access_token_type} ${this.client.access_token}`
       );
       xhr.onload = function(event) {
         if (this.status === 201) {
@@ -289,7 +289,7 @@ z.assets.AssetService = class AssetService {
     return this._compress_image_with_worker(
       'worker/image-worker.js',
       image,
-      () => image.type === 'image/gif',
+      () => image.type === 'image/gif'
     );
   }
 
@@ -301,7 +301,7 @@ z.assets.AssetService = class AssetService {
   _compress_profile_image(image) {
     return this._compress_image_with_worker(
       'worker/profile-image-worker.js',
-      image,
+      image
     );
   }
 

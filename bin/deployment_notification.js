@@ -72,7 +72,7 @@ new wire.User(login, box)
   .then(function(service) {
     return service.conversation.sendTextMessage(
       content.conversationId,
-      content.message,
+      content.message
     );
   })
   .then(function(service) {

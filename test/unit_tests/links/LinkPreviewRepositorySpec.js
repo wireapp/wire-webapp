@@ -33,7 +33,7 @@ describe('z.links.LinkPreviewRepository', function() {
   describe('get_link_preview', function() {
     beforeEach(function() {
       spyOn(link_preview_repository, '_fetch_open_graph_data').and.returnValue(
-        Promise.resolve(),
+        Promise.resolve()
       );
     });
 
@@ -48,7 +48,7 @@ describe('z.links.LinkPreviewRepository', function() {
     });
 
     it('should fetch open graph data if openGraph lib is available', function(
-      done,
+      done
     ) {
       window.openGraph = {};
 
@@ -57,10 +57,10 @@ describe('z.links.LinkPreviewRepository', function() {
         .then(done.fail)
         .catch(function(error) {
           expect(
-            link_preview_repository._fetch_open_graph_data,
+            link_preview_repository._fetch_open_graph_data
           ).toHaveBeenCalled();
           expect(error.type).toBe(
-            z.links.LinkPreviewError.TYPE.NO_DATA_AVAILABLE,
+            z.links.LinkPreviewError.TYPE.NO_DATA_AVAILABLE
           );
           done();
         });

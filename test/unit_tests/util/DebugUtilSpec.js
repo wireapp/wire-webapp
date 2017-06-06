@@ -31,7 +31,7 @@ describe('z.util.DebugUtil', function() {
       .then(function(conversation_repository) {
         debug_util = new z.util.DebugUtil(
           TestFactory.user_repository,
-          conversation_repository,
+          conversation_repository
         );
         done();
       })
@@ -59,7 +59,7 @@ describe('z.util.DebugUtil', function() {
       second_user_et.devices.push(third_client);
 
       const conversation_et = conversation_repository.conversation_mapper.map_conversation(
-        entities.conversation,
+        entities.conversation
       );
       conversation_et.participating_user_ets.push(user_et);
       conversation_et.participating_user_ets.push(second_user_et);

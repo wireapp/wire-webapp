@@ -139,7 +139,7 @@ z.entity.File = class File extends z.entity.Asset {
     amplify.publish(
       z.event.WebApp.ANALYTICS.EVENT,
       z.tracking.EventName.FILE.DOWNLOAD_INITIATED,
-      tracking_data,
+      tracking_data
     );
 
     return this.load()
@@ -152,7 +152,7 @@ z.entity.File = class File extends z.entity.Asset {
         return amplify.publish(
           z.event.WebApp.ANALYTICS.EVENT,
           z.tracking.EventName.FILE.DOWNLOAD_SUCCESSFUL,
-          $.extend(tracking_data, {time: download_duration}),
+          $.extend(tracking_data, {time: download_duration})
         );
       })
       .catch(error => {
@@ -160,7 +160,7 @@ z.entity.File = class File extends z.entity.Asset {
         return amplify.publish(
           z.event.WebApp.ANALYTICS.EVENT,
           z.tracking.EventName.FILE.DOWNLOAD_FAILED,
-          tracking_data,
+          tracking_data
         );
       });
   }
@@ -189,7 +189,7 @@ z.entity.File = class File extends z.entity.Asset {
           25,
         ]),
         type: z.util.get_file_extension(this.file_name),
-      },
+      }
     );
   }
 

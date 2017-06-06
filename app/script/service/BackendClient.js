@@ -85,7 +85,7 @@ z.service.BackendClient = class BackendClient {
   constructor(settings) {
     this.logger = new z.util.Logger(
       'z.service.BackendClient',
-      z.config.LOGGER.OPTIONS,
+      z.config.LOGGER.OPTIONS
     );
 
     z.util.Environment.backend.current = settings.environment;
@@ -101,7 +101,7 @@ z.service.BackendClient = class BackendClient {
       name: 'BackendClient.Request',
     });
     this.request_queue_blocked_state = ko.observable(
-      z.service.RequestQueueBlockedState.NONE,
+      z.service.RequestQueueBlockedState.NONE
     );
 
     this.access_token = '';
@@ -109,7 +109,7 @@ z.service.BackendClient = class BackendClient {
 
     this.number_of_requests = ko.observable(0);
     this.number_of_requests.subscribe(new_value =>
-      amplify.publish(z.event.WebApp.TELEMETRY.BACKEND_REQUESTS, new_value),
+      amplify.publish(z.event.WebApp.TELEMETRY.BACKEND_REQUESTS, new_value)
     );
 
     // http://stackoverflow.com/a/18996758/451634
@@ -149,7 +149,7 @@ z.service.BackendClient = class BackendClient {
    * @returns {Promise} Resolves once the connectivity is verified
    */
   execute_on_connectivity(
-    source = BackendClient.CONNECTIVITY_CHECK_TRIGGER.UNKNOWN,
+    source = BackendClient.CONNECTIVITY_CHECK_TRIGGER.UNKNOWN
   ) {
     this.logger.info(`Connectivity check requested by '${source}'`);
 
@@ -164,7 +164,7 @@ z.service.BackendClient = class BackendClient {
           if (jqXHR.readyState === 4) {
             this.logger.info(
               `Connectivity verified by server error '${jqXHR.status}'`,
-              jqXHR,
+              jqXHR
             );
             this.connectivity_queue.pause(false);
             this.connectivity_timeout = undefined;
@@ -173,7 +173,7 @@ z.service.BackendClient = class BackendClient {
             this.connectivity_queue.pause();
             this.connectivity_timeout = window.setTimeout(
               _check_status,
-              BackendClient.CONFIG.CONNECTIVITY_CHECK.RECHECK_TIMEOUT,
+              BackendClient.CONFIG.CONNECTIVITY_CHECK.RECHECK_TIMEOUT
             );
           }
         });
@@ -181,12 +181,12 @@ z.service.BackendClient = class BackendClient {
 
     this.connectivity_queue.pause();
     const queued_promise = this.connectivity_queue.push(() =>
-      Promise.resolve(),
+      Promise.resolve()
     );
     if (!this.connectivity_timeout) {
       this.connectivity_timeout = window.setTimeout(
         _check_status,
-        BackendClient.CONFIG.CONNECTIVITY_CHECK.INITIAL_TIMEOUT,
+        BackendClient.CONFIG.CONNECTIVITY_CHECK.INITIAL_TIMEOUT
       );
     }
 
@@ -200,7 +200,7 @@ z.service.BackendClient = class BackendClient {
   execute_request_queue() {
     if (this.access_token && this.request_queue.get_length()) {
       this.logger.info(
-        `Executing '${this.request_queue.get_length()}' queued requests`,
+        `Executing '${this.request_queue.get_length()}' queued requests`
       );
       this.request_queue.pause(false);
     }
@@ -250,7 +250,7 @@ z.service.BackendClient = class BackendClient {
     ) {
       return this._push_to_request_queue(
         config,
-        this.request_queue_blocked_state(),
+        this.request_queue_blocked_state()
       );
     }
 
@@ -268,7 +268,7 @@ z.service.BackendClient = class BackendClient {
   _push_to_request_queue(config, reason) {
     this.logger.info(
       `Adding '${config.type}' request to '${config.url}' to queue due to '${reason}'`,
-      config,
+      config
     );
     return this.request_queue.push(() => this._send_request(config));
   }
@@ -310,7 +310,7 @@ z.service.BackendClient = class BackendClient {
             this.logger.debug(
               this.logger.levels.OFF,
               `Server Response '${wire_request.request_id}' from '${config.url}':`,
-              data,
+              data
             );
           }
           resolve(data);
@@ -321,19 +321,19 @@ z.service.BackendClient = class BackendClient {
               .CONNECTIVITY_PROBLEM: {
               this.request_queue.pause();
               this.request_queue_blocked_state(
-                z.service.RequestQueueBlockedState.CONNECTIVITY_PROBLEM,
+                z.service.RequestQueueBlockedState.CONNECTIVITY_PROBLEM
               );
 
               this._push_to_request_queue(
                 config,
-                this.request_queue_blocked_state(),
+                this.request_queue_blocked_state()
               )
                 .then(resolve)
                 .catch(reject);
 
               return this.execute_on_connectivity().then(() => {
                 this.request_queue_blocked_state(
-                  z.service.RequestQueueBlockedState.NONE,
+                  z.service.RequestQueueBlockedState.NONE
                 );
                 this.execute_request_queue();
               });
@@ -342,13 +342,13 @@ z.service.BackendClient = class BackendClient {
             case z.service.BackendClientError.STATUS_CODE.UNAUTHORIZED: {
               this._push_to_request_queue(
                 config,
-                z.service.RequestQueueBlockedState.ACCESS_TOKEN_REFRESH,
+                z.service.RequestQueueBlockedState.ACCESS_TOKEN_REFRESH
               )
                 .then(resolve)
                 .catch(reject);
               return amplify.publish(
                 z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW,
-                z.auth.AuthRepository.ACCESS_TOKEN_TRIGGER.UNAUTHORIZED_REQUEST,
+                z.auth.AuthRepository.ACCESS_TOKEN_TRIGGER.UNAUTHORIZED_REQUEST
               );
             }
 
@@ -360,7 +360,7 @@ z.service.BackendClient = class BackendClient {
                   this.logger.warn(`Server request failed: ${response.label}`);
                 } else {
                   Raygun.send(
-                    new Error(`Server request failed: ${response.label}`),
+                    new Error(`Server request failed: ${response.label}`)
                   );
                 }
               }
@@ -374,7 +374,7 @@ z.service.BackendClient = class BackendClient {
             }
           }
           return reject(
-            response || new z.service.BackendClientError(status_code),
+            response || new z.service.BackendClientError(status_code)
           );
         });
     });

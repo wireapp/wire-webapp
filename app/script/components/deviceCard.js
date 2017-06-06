@@ -68,7 +68,7 @@ z.components.DeviceCard = class DeviceCard {
           content: `<span class='label-bold-xs'>${location}</span>`,
           placeholder: '%location',
         },
-      }),
+      })
     );
   }
 
@@ -79,7 +79,7 @@ z.components.DeviceCard = class DeviceCard {
         .then(retrieved_location => {
           if (retrieved_location) {
             this._update_activation_location(
-              `${retrieved_location.place}, ${retrieved_location.country_code}`,
+              `${retrieved_location.place}, ${retrieved_location.country_code}`
             );
           }
         });

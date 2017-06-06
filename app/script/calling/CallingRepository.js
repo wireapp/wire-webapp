@@ -61,7 +61,7 @@ z.calling.CallingRepository = class CallingRepository {
     client_repository,
     conversation_repository,
     media_repository,
-    user_repository,
+    user_repository
   ) {
     this.get_config = this.get_config.bind(this);
 
@@ -73,7 +73,7 @@ z.calling.CallingRepository = class CallingRepository {
     this.user_repository = user_repository;
     this.logger = new z.util.Logger(
       'z.calling.CallingRepository',
-      z.config.LOGGER.OPTIONS,
+      z.config.LOGGER.OPTIONS
     );
 
     this.calling_config = undefined;
@@ -84,14 +84,14 @@ z.calling.CallingRepository = class CallingRepository {
       this.call_service,
       this.conversation_repository,
       this.media_repository,
-      this.user_repository,
+      this.user_repository
     );
     this.v3_call_center = new z.calling.v3.CallCenter(
       this,
       this.client_repository,
       this.conversation_repository,
       this.media_repository,
-      this.user_repository,
+      this.user_repository
     );
 
     this.calls = ko.pureComputed(() => {
@@ -133,7 +133,7 @@ z.calling.CallingRepository = class CallingRepository {
           conversation_id,
           media_type,
         ]);
-      },
+      }
     );
 
     amplify.subscribe(z.event.WebApp.CALL.STATE.DELETE, conversation_id => {
@@ -144,7 +144,7 @@ z.calling.CallingRepository = class CallingRepository {
 
     amplify.subscribe(
       z.event.WebApp.CALL.STATE.JOIN,
-      this.join_call.bind(this),
+      this.join_call.bind(this)
     );
 
     amplify.subscribe(
@@ -154,7 +154,7 @@ z.calling.CallingRepository = class CallingRepository {
           conversation_id,
           termination_reason,
         ]);
-      },
+      }
     );
 
     amplify.subscribe(z.event.WebApp.CALL.STATE.REJECT, conversation_id => {
@@ -170,21 +170,21 @@ z.calling.CallingRepository = class CallingRepository {
           conversation_id,
           user_id,
         ]);
-      },
+      }
     );
 
     amplify.subscribe(
       z.event.WebApp.CALL.STATE.TOGGLE,
-      this.toggle_state.bind(this),
+      this.toggle_state.bind(this)
     );
     amplify.subscribe(
       z.event.WebApp.DEBUG.UPDATE_LAST_CALL_STATUS,
-      this.store_flow_status.bind(this),
+      this.store_flow_status.bind(this)
     );
     amplify.subscribe(z.event.WebApp.LOADED, this.get_config);
     amplify.subscribe(
       z.util.Logger.prototype.LOG_ON_DEBUG,
-      this.set_logging.bind(this),
+      this.set_logging.bind(this)
     );
   }
 
@@ -247,18 +247,18 @@ z.calling.CallingRepository = class CallingRepository {
         ) {
           return amplify.publish(
             z.event.WebApp.WARNING.SHOW,
-            z.ViewModel.WarningType.UNSUPPORTED_OUTGOING_CALL,
+            z.ViewModel.WarningType.UNSUPPORTED_OUTGOING_CALL
           );
         }
 
         return this._check_concurrent_joined_call(
           conversation_id,
-          call_state,
+          call_state
         ).then(() =>
           this.switch_call_center(z.calling.enum.CALL_ACTION.JOIN, [
             conversation_id,
             video_send,
-          ]),
+          ])
         );
       });
   }
@@ -297,7 +297,7 @@ z.calling.CallingRepository = class CallingRepository {
           {
             conversation_id: conversation_id,
             use_v3_api: this.use_v3_api,
-          },
+          }
         );
 
         return protocol_version;
@@ -333,7 +333,7 @@ z.calling.CallingRepository = class CallingRepository {
               return this.v3_call_center[fn_name](...args);
             default:
               throw new z.calling.v3.CallError(
-                z.calling.v3.CallError.TYPE.UNSUPPORTED_VERSION,
+                z.calling.v3.CallError.TYPE.UNSUPPORTED_VERSION
               );
           }
         }
@@ -349,13 +349,13 @@ z.calling.CallingRepository = class CallingRepository {
    */
   toggle_state(
     video_send,
-    conversation_et = this.conversation_repository.active_conversation(),
+    conversation_et = this.conversation_repository.active_conversation()
   ) {
     if (conversation_et) {
       if (video_send && conversation_et.is_group()) {
         amplify.publish(
           z.event.WebApp.WARNING.MODAL,
-          z.ViewModel.ModalType.CALL_NO_VIDEO_IN_GROUP,
+          z.ViewModel.ModalType.CALL_NO_VIDEO_IN_GROUP
         );
       } else {
         if (conversation_et.id === this._self_client_on_a_call()) {
@@ -381,7 +381,7 @@ z.calling.CallingRepository = class CallingRepository {
         .then(protocol_version => {
           if (protocol_version === z.calling.enum.PROTOCOL.VERSION_2) {
             return this.v2_call_center.state_handler.leave_call(
-              conversation_id,
+              conversation_id
             );
           }
         })
@@ -414,7 +414,7 @@ z.calling.CallingRepository = class CallingRepository {
               amplify.publish(
                 z.event.WebApp.CALL.STATE.LEAVE,
                 ongoing_call_id,
-                z.calling.enum.TERMINATION_REASON.CONCURRENT_CALL,
+                z.calling.enum.TERMINATION_REASON.CONCURRENT_CALL
               );
               window.setTimeout(resolve, 1000);
             },
@@ -424,10 +424,10 @@ z.calling.CallingRepository = class CallingRepository {
               }
             },
             data: call_state,
-          },
+          }
         );
         this.logger.warn(
-          `You cannot join a second call while calling in conversation '${ongoing_call_id}'.`,
+          `You cannot join a second call while calling in conversation '${ongoing_call_id}'.`
         );
       } else {
         resolve();
@@ -485,17 +485,17 @@ z.calling.CallingRepository = class CallingRepository {
 
         this.logger.info(
           `Updated calling configuration - next update in ${renewal_timeout_in_seconds}s`,
-          calling_config,
+          calling_config
         );
         this.calling_config = calling_config;
 
         this.calling_config_timeouts.push = window.setTimeout(
           this.get_config,
-          renewal_timeout_in_seconds * 1000,
+          renewal_timeout_in_seconds * 1000
         );
         this.calling_config_timeouts.push = window.setTimeout(
           this._clear_calling_config,
-          clear_timeout_in_seconds * 1000,
+          clear_timeout_in_seconds * 1000
         );
         return this.calling_config;
       }
@@ -509,7 +509,7 @@ z.calling.CallingRepository = class CallingRepository {
   _clear_calling_config_timeouts() {
     if (this.calling_config_timeouts.length) {
       this.calling_config_timeouts.forEach(timeout =>
-        window.clearTimeout(timeout),
+        window.clearTimeout(timeout)
       );
       this.calling_config_timeouts.length = 0;
     }
@@ -527,7 +527,7 @@ z.calling.CallingRepository = class CallingRepository {
   set_logging(is_logging_enabled) {
     if (adapter) {
       this.logger.debug(
-        `Set logging for WebRTC Adapter: ${is_logging_enabled}`,
+        `Set logging for WebRTC Adapter: ${is_logging_enabled}`
       );
       adapter.disableLog = !is_logging_enabled;
     }
@@ -563,7 +563,7 @@ z.calling.CallingRepository = class CallingRepository {
       .then(call_et => {
         if (call_et) {
           return this._send_report(
-            call_et.get_flows().map(flow_et => flow_et.report_status()),
+            call_et.get_flows().map(flow_et => flow_et.report_status())
           );
         }
 
@@ -587,7 +587,7 @@ z.calling.CallingRepository = class CallingRepository {
     this.logger.debug(
       `Reported status of flow id '${custom_data.meta
         .flow_id}' for call analysis`,
-      custom_data,
+      custom_data
     );
   }
 };

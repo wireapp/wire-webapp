@@ -52,7 +52,7 @@ z.ViewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
 
     amplify.subscribe(
       z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW,
-      this.show.bind(this),
+      this.show.bind(this)
     );
 
     ko.applyBindings(this, document.getElementById(this.element_id));
@@ -69,11 +69,11 @@ z.ViewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
     this.source = undefined;
     amplify.unsubscribe(
       z.event.WebApp.CONVERSATION.MESSAGE.ADDED,
-      this.message_added,
+      this.message_added
     );
     amplify.unsubscribe(
       z.event.WebApp.CONVERSATION.MESSAGE.REMOVED,
-      this.message_removed,
+      this.message_removed
     );
   }
 
@@ -84,11 +84,11 @@ z.ViewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
 
     amplify.subscribe(
       z.event.WebApp.CONVERSATION.MESSAGE.ADDED,
-      this.message_added,
+      this.message_added
     );
     amplify.subscribe(
       z.event.WebApp.CONVERSATION.MESSAGE.REMOVED,
-      this.message_removed,
+      this.message_removed
     );
     if (this.image_modal) {
       this.image_modal.destroy();
@@ -96,7 +96,7 @@ z.ViewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
     this.image_modal = new zeta.webapp.module.Modal(
       '#detail-view',
       this.hide_callback,
-      this.before_hide_callback,
+      this.before_hide_callback
     );
     this.image_modal.show();
 
@@ -155,16 +155,16 @@ z.ViewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
             this._track_item_action(
               this.conversation_et(),
               'delete_for_me',
-              'image',
+              'image'
             );
           }
           this.conversation_repository.delete_message(
             this.conversation_et(),
-            this.message_et(),
+            this.message_et()
           );
           this.image_modal.hide();
         },
-      },
+      }
     );
   }
 
@@ -178,16 +178,16 @@ z.ViewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
             this._track_item_action(
               this.conversation_et(),
               'delete_for_everyone',
-              'image',
+              'image'
             );
           }
           this.conversation_repository.delete_message_everyone(
             this.conversation_et(),
-            this.message_et(),
+            this.message_et()
           );
           this.image_modal.hide();
         },
-      },
+      }
     );
   }
 
@@ -203,12 +203,12 @@ z.ViewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
       this._track_item_action(
         this.conversation_et(),
         this.message_et().is_liked(),
-        'image',
+        'image'
       );
     }
     return this.conversation_repository.toggle_like(
       this.conversation_et(),
-      this.message_et(),
+      this.message_et()
     );
   }
 
@@ -216,7 +216,7 @@ z.ViewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
     event.stopPropagation();
     const next_messsage_et = z.util.ArrayUtil.iterate_item(
       this.items(),
-      this.message_et(),
+      this.message_et()
     );
 
     if (next_messsage_et) {
@@ -230,12 +230,12 @@ z.ViewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
     const previous_message_et = z.util.ArrayUtil.iterate_item(
       this.items(),
       this.message_et(),
-      true,
+      true
     );
 
     if (previous_message_et) {
       this.message_et(
-        z.util.ArrayUtil.iterate_item(this.items(), this.message_et(), true),
+        z.util.ArrayUtil.iterate_item(this.items(), this.message_et(), true)
       );
       this._load_image();
     }
@@ -250,11 +250,11 @@ z.ViewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
       {
         action: like_action,
         conversation_type: z.tracking.helpers.get_conversation_type(
-          conversation_et,
+          conversation_et
         ),
         type: type,
         with_bot: conversation_et.is_with_bot(),
-      },
+      }
     );
   }
 };

@@ -29,7 +29,7 @@ z.components.InputElement = class InputElement {
 
     this.change = (data, event) => {
       const new_name = z.util.StringUtil.remove_line_breaks(
-        event.target.value.trim(),
+        event.target.value.trim()
       );
       const old_name = this.value().trim();
       event.target.value = old_name;

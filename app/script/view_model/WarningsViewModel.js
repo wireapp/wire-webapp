@@ -63,7 +63,7 @@ z.ViewModel.WarningsViewModel = class WarningsViewModel {
   constructor(element_id) {
     this.logger = new z.util.Logger(
       'z.ViewModel.WarningsViewModel',
-      z.config.LOGGER.OPTIONS,
+      z.config.LOGGER.OPTIONS
     );
 
     // Array of warning banners
@@ -73,7 +73,7 @@ z.ViewModel.WarningsViewModel = class WarningsViewModel {
         return this.warnings()[this.warnings().length - 1];
       },
       this,
-      {deferEvaluation: true},
+      {deferEvaluation: true}
     );
 
     this.warnings.subscribe(function(warnings) {
@@ -109,17 +109,17 @@ z.ViewModel.WarningsViewModel = class WarningsViewModel {
           return false;
         },
         this,
-        {deferEvaluation: true},
+        {deferEvaluation: true}
       )
       .extend({rateLimit: 200});
 
     amplify.subscribe(
       z.event.WebApp.WARNING.SHOW,
-      this.show_warning.bind(this),
+      this.show_warning.bind(this)
     );
     amplify.subscribe(
       z.event.WebApp.WARNING.DISMISS,
-      this.dismiss_warning.bind(this),
+      this.dismiss_warning.bind(this)
     );
 
     ko.applyBindings(this, document.getElementById(element_id));
@@ -142,17 +142,17 @@ z.ViewModel.WarningsViewModel = class WarningsViewModel {
           {
             action() {
               z.util.safe_window_open(
-                z.l10n.text(z.string.url_support_mic_access_denied),
+                z.l10n.text(z.string.url_support_mic_access_denied)
               );
             },
-          },
+          }
         );
         break;
       case z.ViewModel.WarningType.REQUEST_NOTIFICATION:
         // We block subsequent permission requests for notifications when the user ignores the request.
         amplify.publish(
           z.event.WebApp.SYSTEM_NOTIFICATION.PERMISSION_STATE,
-          z.system_notification.PermissionStatusState.IGNORED,
+          z.system_notification.PermissionStatusState.IGNORED
         );
         break;
       default:

@@ -34,7 +34,7 @@ z.components.AudioAssetComponent = class AudioAssetComponent {
     this.dispose = this.dispose.bind(this);
     this.logger = new z.util.Logger(
       'AudioAssetComponent',
-      z.config.LOGGER.OPTIONS,
+      z.config.LOGGER.OPTIONS
     );
 
     this.message = ko.unwrap(params.message);
@@ -115,7 +115,7 @@ z.components.AudioAssetComponent = class AudioAssetComponent {
         ]),
         duration_actual: duration,
         type: z.util.get_file_extension(this.asset.file_name),
-      },
+      }
     );
   }
 

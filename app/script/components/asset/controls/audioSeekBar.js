@@ -49,7 +49,7 @@ z.components.AudioSeekBarComponent = class AudioSeekBarComponent {
     if (this.asset.meta !== null && this.asset.meta.loudness !== null) {
       this.loudness = this._normalize_loudness(
         this.asset.meta.loudness,
-        component_info.element.clientHeight,
+        component_info.element.clientHeight
       );
     }
 
@@ -71,11 +71,11 @@ z.components.AudioSeekBarComponent = class AudioSeekBarComponent {
 
   _render_levels() {
     const number_of_levels_fit_on_screen = Math.floor(
-      this.element.clientWidth / 3,
+      this.element.clientWidth / 3
     ); // 2px + 1px
     const scaled_loudness = z.util.ArrayUtil.interpolate(
       this.loudness,
-      number_of_levels_fit_on_screen,
+      number_of_levels_fit_on_screen
     );
 
     $(this.element).empty();
@@ -101,7 +101,7 @@ z.components.AudioSeekBarComponent = class AudioSeekBarComponent {
     const index = Math.floor(
       this.audio_element.currentTime /
         this.audio_element.duration *
-        $levels.length,
+        $levels.length
     );
     this._add_theme(index);
   }

@@ -38,7 +38,7 @@ z.team.TeamService = class TeamService {
     this.client = client;
     this.logger = new z.util.Logger(
       'z.team.TeamService',
-      z.config.LOGGER.OPTIONS,
+      z.config.LOGGER.OPTIONS
     );
   }
 
@@ -46,7 +46,7 @@ z.team.TeamService = class TeamService {
     return this.client.send_json({
       type: 'DELETE',
       url: this.client.create_url(
-        `${TeamService.URL.TEAMS}/${team_id}/members/${user_id}`,
+        `${TeamService.URL.TEAMS}/${team_id}/members/${user_id}`
       ),
     });
   }
@@ -62,7 +62,7 @@ z.team.TeamService = class TeamService {
     return this.client.send_request({
       type: 'GET',
       url: this.client.create_url(
-        `${TeamService.URL.TEAMS}/${team_id}/members`,
+        `${TeamService.URL.TEAMS}/${team_id}/members`
       ),
     });
   }
@@ -92,7 +92,7 @@ z.team.TeamService = class TeamService {
       },
       type: 'POST',
       url: this.client.create_url(
-        `${TeamService.URL.TEAMS}/${team_id}/members`,
+        `${TeamService.URL.TEAMS}/${team_id}/members`
       ),
     });
   }

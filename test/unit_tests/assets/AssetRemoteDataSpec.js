@@ -30,7 +30,7 @@ describe('z.assets.AssetRemoteData', function() {
       const asset_id = z.util.create_random_uuid();
       remote_data = z.assets.AssetRemoteData.v1(conversation_id, asset_id);
       spyOn(remote_data, '_load_buffer').and.returnValue(
-        Promise.resolve([video_bytes.buffer, video_type]),
+        Promise.resolve([video_bytes.buffer, video_type])
       );
     });
 
@@ -60,10 +60,10 @@ describe('z.assets.AssetRemoteData', function() {
             conversation_id,
             asset_id,
             new Uint8Array(key_bytes),
-            new Uint8Array(sha256),
+            new Uint8Array(sha256)
           );
           spyOn(remote_data, '_load_buffer').and.returnValue(
-            Promise.resolve([cipher_text, video_type]),
+            Promise.resolve([cipher_text, video_type])
           );
           done();
         })

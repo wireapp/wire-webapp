@@ -28,7 +28,7 @@ z.ui.WindowHandler = class WindowHandler {
     this._listen_to_window_resize = this._listen_to_window_resize.bind(this);
     this.logger = new z.util.Logger(
       'z.ui.WindowHandler',
-      z.config.LOGGER.OPTIONS,
+      z.config.LOGGER.OPTIONS
     );
 
     this.height = 0;
@@ -62,7 +62,7 @@ z.ui.WindowHandler = class WindowHandler {
           this.lost_focus_interval = window.setInterval(
             () => this._check_for_timeout(),
             z.tracking.EventTrackingRepository.CONFIG.LOCALYTICS
-              .SESSION_INTERVAL,
+              .SESSION_INTERVAL
           );
         }
       }
@@ -98,7 +98,7 @@ z.ui.WindowHandler = class WindowHandler {
             .DEGRADED_CONVERSATION_CANCELLATION
       ) {
         this.logger.log(
-          'User has canceled sending a message to a degraded conversation.',
+          'User has canceled sending a message to a degraded conversation.'
         );
         promise_rejection_event.preventDefault();
         promise_rejection_event.stopPropagation();

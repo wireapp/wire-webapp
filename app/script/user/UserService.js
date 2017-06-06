@@ -41,7 +41,7 @@ z.user.UserService = class UserService {
     this.client = client;
     this.logger = new z.util.Logger(
       'z.search.SearchService',
-      z.config.LOGGER.OPTIONS,
+      z.config.LOGGER.OPTIONS
     );
   }
 
@@ -239,7 +239,7 @@ z.user.UserService = class UserService {
     return this.client.send_request({
       type: 'HEAD',
       url: this.client.create_url(
-        `${UserService.URL.USERS}/handles/${username}`,
+        `${UserService.URL.USERS}/handles/${username}`
       ),
     });
   }

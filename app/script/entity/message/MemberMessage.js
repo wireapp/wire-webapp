@@ -47,11 +47,11 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
     });
 
     this._generate_name_string = (
-      declension = z.string.Declension.ACCUSATIVE,
+      declension = z.string.Declension.ACCUSATIVE
     ) => {
       return z.util.LocalizerUtil.join_names(
         this.joined_user_ets(),
-        declension,
+        declension
       );
     };
 
@@ -105,17 +105,17 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
           case z.message.SystemMessageType.CONVERSATION_CREATE:
             if (this.user().is_me) {
               return this._get_caption_with_names(
-                z.string.conversation_create_you,
+                z.string.conversation_create_you
               );
             }
             return this._get_caption_with_names(
               z.string.conversation_create,
-              z.string.Declension.DATIVE,
+              z.string.Declension.DATIVE
             );
           case z.message.SystemMessageType.CONVERSATION_RESUME:
             return this._get_caption_with_names(
               z.string.conversation_resume,
-              z.string.Declension.DATIVE,
+              z.string.Declension.DATIVE
             );
           default:
             break;
@@ -131,20 +131,20 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
             }
             if (this.user().is_me) {
               return this._get_caption_with_names(
-                z.string.conversation_member_leave_removed_you,
+                z.string.conversation_member_leave_removed_you
               );
             }
             return this._get_caption_with_names(
-              z.string.conversation_member_leave_removed,
+              z.string.conversation_member_leave_removed
             );
           case z.event.Backend.CONVERSATION.MEMBER_JOIN:
             if (this.user().is_me) {
               return this._get_caption_with_names(
-                z.string.conversation_member_join_you,
+                z.string.conversation_member_join_you
               );
             }
             return this._get_caption_with_names(
-              z.string.conversation_member_join,
+              z.string.conversation_member_join
             );
           case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE:
             return z.l10n.text(z.string.conversation_team_leave);
@@ -153,7 +153,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
         }
       },
       this,
-      {deferEvaluation: true},
+      {deferEvaluation: true}
     );
   }
 

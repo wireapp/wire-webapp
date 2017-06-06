@@ -178,7 +178,7 @@ window.z.ui = z.ui || {};
     if (z.util.StringUtil.includes(platform_specific_shortcut, 'graveaccent')) {
       const replaced_shortcut = platform_specific_shortcut.replace(
         'graveaccent',
-        'n',
+        'n'
       );
       _register_event(replaced_shortcut, event);
     }
@@ -218,7 +218,7 @@ window.z.ui = z.ui || {};
       .replace('down', '↓')
       .replace('graveaccent', 'n')
       .replace(/\w+/g, string =>
-        z.util.StringUtil.capitalize_first_char(string),
+        z.util.StringUtil.capitalize_first_char(string)
       );
   }
 

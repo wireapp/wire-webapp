@@ -40,7 +40,7 @@ z.auth.AuthService = class AuthService {
     this.client = client;
     this.logger = new z.util.Logger(
       'z.auth.AuthService',
-      z.config.LOGGER.OPTIONS,
+      z.config.LOGGER.OPTIONS
     );
   }
 
@@ -70,7 +70,7 @@ z.auth.AuthService = class AuthService {
     return this.client.send_request({
       type: 'GET',
       url: this.client.create_url(
-        `${AuthService.CONFIG.URL_INVITATIONS}/info?code=${code}`,
+        `${AuthService.CONFIG.URL_INVITATIONS}/info?code=${code}`
       ),
     });
   }
@@ -86,7 +86,7 @@ z.auth.AuthService = class AuthService {
   post_access(retry_attempt = 1) {
     return new Promise((resolve, reject) => {
       this.client.request_queue_blocked_state(
-        z.service.RequestQueueBlockedState.ACCESS_TOKEN_REFRESH,
+        z.service.RequestQueueBlockedState.ACCESS_TOKEN_REFRESH
       );
 
       const config = {
@@ -101,14 +101,14 @@ z.auth.AuthService = class AuthService {
       if (this.client.access_token) {
         config.headers = {
           Authorization: `Bearer ${window.decodeURIComponent(
-            this.client.access_token,
+            this.client.access_token
           )}`,
         };
       }
 
       config.success = data => {
         this.client.request_queue_blocked_state(
-          z.service.RequestQueueBlockedState.NONE,
+          z.service.RequestQueueBlockedState.NONE
         );
         this.save_access_token_in_client(data.token_type, data.access_token);
         resolve(data);
@@ -120,12 +120,12 @@ z.auth.AuthService = class AuthService {
         ) {
           this.logger.error(
             `Requesting access token failed after ${retry_attempt} attempt(s): ${errorThrown}`,
-            jqXHR,
+            jqXHR
           );
           reject(
             new z.auth.AccessTokenError(
-              z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN,
-            ),
+              z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN
+            )
           );
         }
 
@@ -140,16 +140,16 @@ z.auth.AuthService = class AuthService {
             z.service.BackendClientError.STATUS_CODE.CONNECTIVITY_PROBLEM
           ) {
             this.logger.warn(
-              'Access token refresh delayed due to suspected connectivity issue',
+              'Access token refresh delayed due to suspected connectivity issue'
             );
             return this.client
               .execute_on_connectivity(
                 z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER
-                  .ACCESS_TOKEN_REFRESH,
+                  .ACCESS_TOKEN_REFRESH
               )
               .then(() => {
                 this.logger.info(
-                  'Continuing access token refresh after verifying connectivity',
+                  'Continuing access token refresh after verifying connectivity'
                 );
                 return _retry();
               });
@@ -157,19 +157,19 @@ z.auth.AuthService = class AuthService {
 
           return window.setTimeout(() => {
             this.logger.info(
-              `Trying to get a new access token: '${retry_attempt}' attempt`,
+              `Trying to get a new access token: '${retry_attempt}' attempt`
             );
             return _retry();
           }, AuthService.CONFIG.POST_ACCESS_RETRY_TIMEOUT);
         }
         this.client.request_queue_blocked_state(
-          z.service.RequestQueueBlockedState.NONE,
+          z.service.RequestQueueBlockedState.NONE
         );
         this.save_access_token_in_client();
         return reject(
           new z.auth.AccessTokenError(
-            z.auth.AccessTokenError.TYPE.RETRIES_EXCEEDED,
-          ),
+            z.auth.AccessTokenError.TYPE.RETRIES_EXCEEDED
+          )
         );
       };
 
@@ -239,7 +239,7 @@ z.auth.AuthService = class AuthService {
         processData: false,
         type: 'POST',
         url: `${this.client.create_url(
-          `${AuthService.CONFIG.URL_LOGIN}?persist=${persist}`,
+          `${AuthService.CONFIG.URL_LOGIN}?persist=${persist}`
         )}`,
         xhrFields: {
           withCredentials: true,
@@ -260,7 +260,7 @@ z.auth.AuthService = class AuthService {
             this.post_cookies_remove(
               login.email,
               login.password,
-              undefined,
+              undefined
             ).then(() => {
               reject(jqXHR.responseJSON || errorThrown);
             });
@@ -325,7 +325,7 @@ z.auth.AuthService = class AuthService {
         processData: false,
         type: 'POST',
         url: `${this.client.create_url(
-          `${AuthService.CONFIG.URL_REGISTER}?challenge_cookie=true`,
+          `${AuthService.CONFIG.URL_REGISTER}?challenge_cookie=true`
         )}`,
         xhrFields: {
           withCredentials: true,

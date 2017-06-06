@@ -75,7 +75,7 @@ describe('z.announce.AnnounceService', function() {
       server.respondWith(
         'GET',
         'https://staging-website.zinfra.io/api/v1/announce/?order=created&active=true',
-        [200, {'Content-Type': 'application/json'}, JSON.stringify(response)],
+        [200, {'Content-Type': 'application/json'}, JSON.stringify(response)]
       );
     });
 
@@ -101,7 +101,7 @@ describe('z.announce.AnnounceService', function() {
       server.respondWith(
         'GET',
         'https://staging-website.zinfra.io/api/v1/announce/?order=created&active=true',
-        [404, {}, ''],
+        [404, {}, '']
       );
     });
 

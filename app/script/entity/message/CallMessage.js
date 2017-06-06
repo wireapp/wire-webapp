@@ -33,13 +33,13 @@ z.entity.CallMessage = class CallMessage extends z.entity.Message {
       () => {
         if (this.user().is_me) {
           return z.l10n.text(
-            z.string.conversation_voice_channel_deactivate_you,
+            z.string.conversation_voice_channel_deactivate_you
           );
         }
         return z.l10n.text(z.string.conversation_voice_channel_deactivate);
       },
       this,
-      {deferEvaluation: true},
+      {deferEvaluation: true}
     );
   }
 

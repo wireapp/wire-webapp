@@ -44,7 +44,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     properties_repository,
     search_repository,
     team_repository,
-    user_repository,
+    user_repository
   ) {
     this.click_on_close = this.click_on_close.bind(this);
     this.click_on_group = this.click_on_group.bind(this);
@@ -67,7 +67,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.user_repository = user_repository;
     this.logger = new z.util.Logger(
       'z.ViewModel.list.StartUIViewModel',
-      z.config.LOGGER.OPTIONS,
+      z.config.LOGGER.OPTIONS
     );
 
     this.submitted_search = false;
@@ -92,7 +92,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
               } else {
                 const non_member_others = user_ets.filter(
                   user_et =>
-                    !this.search_results.team_members().includes(user_et),
+                    !this.search_results.team_members().includes(user_et)
                 );
                 this.search_results.others(non_member_others);
               }
@@ -101,30 +101,30 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
           .catch(error => {
             this.logger.error(
               `Error searching for contacts: ${error.message}`,
-              error,
+              error
             );
           });
         this.search_results.contacts(
           this.user_repository.search_for_connected_users(
             normalized_query,
-            is_username,
-          ),
+            is_username
+          )
         );
         this.search_results.groups(
           this.conversation_repository.get_groups_by_name(
             normalized_query,
-            is_username,
-          ),
+            is_username
+          )
         );
 
         if (!this.is_personal_space()) {
           this.search_results.team_members(
-            this.search_for_member(normalized_query, is_username),
+            this.search_for_member(normalized_query, is_username)
           );
           const non_member_contacts = this.search_results
             .contacts()
             .filter(
-              user_et => !this.search_results.team_members().includes(user_et),
+              user_et => !this.search_results.team_members().includes(user_et)
             );
           this.search_results.contacts(non_member_contacts);
         }
@@ -140,7 +140,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
         {
           by_username_only: query.startsWith('@'),
           context: 'startui',
-        },
+        }
       );
     });
 
@@ -165,7 +165,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.has_created_conversation = ko.observable(false);
     this.show_hint = ko.pureComputed(
       () =>
-        this.selected_people().length === 1 && !this.has_created_conversation(),
+        this.selected_people().length === 1 && !this.has_created_conversation()
     );
 
     this.group_hint_text = z.l10n.text(z.string.search_group_hint);
@@ -181,8 +181,8 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
         .sort((user_a, user_b) =>
           z.util.StringUtil.sort_by_priority(
             user_a.first_name(),
-            user_b.first_name(),
-          ),
+            user_b.first_name()
+          )
         );
     });
 
@@ -195,8 +195,8 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
           .sort((user_a, user_b) =>
             z.util.StringUtil.sort_by_priority(
               user_a.first_name(),
-              user_b.first_name(),
-            ),
+              user_b.first_name()
+            )
           );
       }
 
@@ -232,7 +232,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     });
 
     this.show_connections = ko.pureComputed(
-      () => this.is_personal_space() && !this.show_suggestions(),
+      () => this.is_personal_space() && !this.show_suggestions()
     );
 
     this.show_invite = ko.pureComputed(() => {
@@ -269,10 +269,10 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     });
 
     this.show_team_member = ko.pureComputed(
-      () => !this.is_personal_space() && this.team_members().length,
+      () => !this.is_personal_space() && this.team_members().length
     );
     this.show_top_people = ko.pureComputed(
-      () => this.is_personal_space() && this.top_users().length,
+      () => this.is_personal_space() && this.top_users().length
     );
 
     // Invite bubble states
@@ -328,7 +328,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       return z.l10n.text(
         this.show_invite_form_only()
           ? z.string.people_invite
-          : z.string.people_bring_your_friends,
+          : z.string.people_bring_your_friends
       );
     });
 
@@ -344,19 +344,19 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
     amplify.subscribe(
       z.event.WebApp.CONNECT.IMPORT_CONTACTS,
-      this.import_contacts.bind(this),
+      this.import_contacts.bind(this)
     );
     amplify.subscribe(
       z.event.WebApp.PROPERTIES.UPDATE.CONTACTS,
-      this.update_properties,
+      this.update_properties
     );
     amplify.subscribe(
       z.event.WebApp.PROPERTIES.UPDATE.HAS_CREATED_CONVERSATION,
-      this.update_properties,
+      this.update_properties
     );
     amplify.subscribe(
       z.event.WebApp.PROPERTIES.UPDATED,
-      this.update_properties,
+      this.update_properties
     );
   }
 
@@ -379,7 +379,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       {
         outcome: error ? 'fail' : 'success',
         source: source,
-      },
+      }
     );
   }
 
@@ -407,7 +407,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
         if (error.type !== z.connect.ConnectError.TYPE.NO_CONTACTS) {
           this.logger.error(
             `Importing contacts from '${source}' failed: ${error.message}`,
-            error,
+            error
           );
 
           amplify.publish(
@@ -415,7 +415,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
             z.ViewModel.ModalType.CONTACTS,
             {
               action: () => this.import_contacts(source),
-            },
+            }
           );
         }
       })
@@ -447,7 +447,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       .catch(error => {
         this.logger.error(
           `Could not show the on-boarding results: ${error.message}`,
-          error,
+          error
         );
       });
   }
@@ -460,13 +460,13 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
           return z.util.StringUtil.sort_by_priority(
             user_a.username(),
             user_b.username(),
-            query,
+            query
           );
         }
         return z.util.StringUtil.sort_by_priority(
           user_a.name(),
           user_b.name(),
-          query,
+          query
         );
       });
   }
@@ -526,7 +526,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
             conversation_et.is_team_group()
             ? 'group'
             : 'one_to_one',
-        },
+        }
       );
       this._close_list();
     });
@@ -552,7 +552,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
           }
         })(),
         context: 'startui',
-      },
+      }
     );
 
     const create_bubble = element_id => {
@@ -566,7 +566,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
         },
         on_show() {
           return $(
-            '.start-ui-user-bubble .user-profile-connect-message',
+            '.start-ui-user-bubble .user-profile-connect-message'
           ).focus();
         },
         scroll_selector: '.start-ui-list',
@@ -639,7 +639,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       {
         common_users_count: user_et.mutual_friends_total(),
         context: 'startui',
-      },
+      }
     );
   }
 
@@ -700,7 +700,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
         z.tracking.EventName.CONNECT.OPENED_GENERIC_INVITE_MENU,
         {
           context: 'banner',
-        },
+        }
       );
 
       const self = this.user_repository.self();
@@ -715,7 +715,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
                 placeholder: '%username',
               },
             ],
-          }),
+          })
         );
       } else {
         this.invite_message(z.l10n.text(z.string.invite_message_no_email));
@@ -798,7 +798,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
             z.tracking.EventName.CONNECT.OPENED_CONVERSATION,
             {
               source: 'top_user',
-            },
+            }
           );
           this.click_on_group(conversation_et);
           this.submitted_search = false;
@@ -817,7 +817,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
         .create_new_conversation(user_ids, null)
         .then(({conversation_et}) => {
           this.properties_repository.save_preference(
-            z.properties.PROPERTIES_TYPE.HAS_CREATED_CONVERSATION,
+            z.properties.PROPERTIES_TYPE.HAS_CREATED_CONVERSATION
           );
           amplify.publish(
             z.event.WebApp.ANALYTICS.EVENT,
@@ -825,7 +825,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
             {
               creationContext: 'search',
               numberOfParticipants: user_ids.length,
-            },
+            }
           );
           this.click_on_group(conversation_et);
           this.submitted_search = false;
@@ -846,7 +846,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
           amplify.publish(
             z.event.WebApp.CALL.STATE.TOGGLE,
             false,
-            conversation_et,
+            conversation_et
           );
         }, 500);
       }
@@ -870,7 +870,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
           amplify.publish(
             z.event.WebApp.CALL.STATE.TOGGLE,
             true,
-            conversation_et,
+            conversation_et
           );
         }, 500);
       }

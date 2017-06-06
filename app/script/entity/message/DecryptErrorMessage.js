@@ -40,7 +40,7 @@ z.entity.DecryptErrorMessage = class DecryptErrorMessage extends z.entity
         id: caption_id,
         replace: {
           content: `<span class='label-bold-xs'>${z.util.escape_html(
-            this.user().first_name(),
+            this.user().first_name()
           )}</span>`,
           placeholder: '%@name',
         },
@@ -65,11 +65,10 @@ z.entity.DecryptErrorMessage = class DecryptErrorMessage extends z.entity
 
       if (this.error_code) {
         const error_text = z.l10n.text(
-          z.string.conversation_unable_to_decrypt_error_message,
+          z.string.conversation_unable_to_decrypt_error_message
         );
         parts.push(
-          `${error_text}: <span class='label-bold-xs'>${this
-            .error_code}</span>`,
+          `${error_text}: <span class='label-bold-xs'>${this.error_code}</span>`
         );
       }
 

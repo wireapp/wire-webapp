@@ -33,7 +33,7 @@ z.client.ClientService = class ClientService {
     this.storage_service = storage_service;
     this.logger = new z.util.Logger(
       'z.client.ClientService',
-      z.config.LOGGER.OPTIONS,
+      z.config.LOGGER.OPTIONS
     );
   }
 
@@ -56,7 +56,7 @@ z.client.ClientService = class ClientService {
       },
       type: 'DELETE',
       url: this.client.create_url(
-        `${z.client.ClientService.URL_CLIENTS}/${client_id}`,
+        `${z.client.ClientService.URL_CLIENTS}/${client_id}`
       ),
     });
   }
@@ -71,7 +71,7 @@ z.client.ClientService = class ClientService {
       data: {},
       type: 'DELETE',
       url: this.client.create_url(
-        `${z.client.ClientService.URL_CLIENTS}/${client_id}`,
+        `${z.client.ClientService.URL_CLIENTS}/${client_id}`
       ),
     });
   }
@@ -87,7 +87,7 @@ z.client.ClientService = class ClientService {
     return this.client.send_request({
       type: 'GET',
       url: this.client.create_url(
-        `${z.client.ClientService.URL_CLIENTS}/${client_id}`,
+        `${z.client.ClientService.URL_CLIENTS}/${client_id}`
       ),
     });
   }
@@ -116,7 +116,7 @@ z.client.ClientService = class ClientService {
       type: 'GET',
       url: this.client.create_url(
         `${z.client.ClientService.URL_USERS}/${user_id}${z.client.ClientService
-          .URL_CLIENTS}`,
+          .URL_CLIENTS}`
       ),
     });
   }
@@ -154,7 +154,7 @@ z.client.ClientService = class ClientService {
   delete_client_from_db(primary_key) {
     return this.storage_service.delete(
       z.storage.StorageService.OBJECT_STORE.CLIENTS,
-      primary_key,
+      primary_key
     );
   }
 
@@ -164,7 +164,7 @@ z.client.ClientService = class ClientService {
    */
   load_all_clients_from_db() {
     return this.storage_service.get_all(
-      z.storage.StorageService.OBJECT_STORE.CLIENTS,
+      z.storage.StorageService.OBJECT_STORE.CLIENTS
     );
   }
 
@@ -183,13 +183,13 @@ z.client.ClientService = class ClientService {
       .then(client_record => {
         if (client_record === undefined) {
           this.logger.info(
-            `Client with primary key '${primary_key}' not found in database`,
+            `Client with primary key '${primary_key}' not found in database`
           );
           return primary_key;
         }
         this.logger.info(
           `Loaded client record from database '${primary_key}'`,
-          client_record,
+          client_record
         );
         return client_record;
       });
@@ -213,12 +213,12 @@ z.client.ClientService = class ClientService {
       .save(
         z.storage.StorageService.OBJECT_STORE.CLIENTS,
         primary_key,
-        client_payload,
+        client_payload
       )
       .then(() => {
         this.logger.info(
           `Client '${client_payload.id}' stored with primary key '${primary_key}'`,
-          client_payload,
+          client_payload
         );
         return client_payload;
       });
@@ -235,7 +235,7 @@ z.client.ClientService = class ClientService {
     return this.storage_service.update(
       z.storage.StorageService.OBJECT_STORE.CLIENTS,
       primary_key,
-      changes,
+      changes
     );
   }
 };

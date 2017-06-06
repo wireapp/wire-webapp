@@ -28,7 +28,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
   constructor(protocol_version) {
     this.logger = new z.util.Logger(
       'z.telemetry.calling.CallTelemetry',
-      z.config.LOGGER.OPTIONS,
+      z.config.LOGGER.OPTIONS
     );
 
     this.sessions = {};
@@ -153,7 +153,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
           version: this.protocol_version,
           with_bot: conversation_et.is_with_bot(),
         },
-        attributes,
+        attributes
       );
 
       if (this.media_type === z.media.MediaType.VIDEO) {

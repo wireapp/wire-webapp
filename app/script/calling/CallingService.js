@@ -30,7 +30,7 @@ z.calling.CallingService = class CallingService {
   constructor(client) {
     this.logger = new z.util.Logger(
       'z.calling.CallingService',
-      z.config.LOGGER.OPTIONS,
+      z.config.LOGGER.OPTIONS
     );
     this.client = client;
   }

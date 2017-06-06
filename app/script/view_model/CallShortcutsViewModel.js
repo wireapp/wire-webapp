@@ -34,7 +34,7 @@ z.ViewModel.CallShortcutsViewModel = class CallShortcutsViewModel {
     this.calling_repository = calling_repository;
     this.logger = new z.util.Logger(
       'z.ViewModel.CallShortcutsViewModel',
-      z.config.LOGGER.OPTIONS,
+      z.config.LOGGER.OPTIONS
     );
 
     this.joined_call = this.calling_repository.joined_call;
@@ -74,7 +74,7 @@ z.ViewModel.CallShortcutsViewModel = class CallShortcutsViewModel {
     amplify.unsubscribe(z.event.WebApp.SHORTCUT.CALL_MUTE, this.on_mute_call);
     amplify.unsubscribe(
       z.event.WebApp.SHORTCUT.CALL_REJECT,
-      this.on_reject_call,
+      this.on_reject_call
     );
   }
 
@@ -83,7 +83,7 @@ z.ViewModel.CallShortcutsViewModel = class CallShortcutsViewModel {
       amplify.publish(
         z.event.WebApp.CALL.MEDIA.TOGGLE,
         this.joined_call().id,
-        z.media.MediaType.AUDIO,
+        z.media.MediaType.AUDIO
       );
     }
   }

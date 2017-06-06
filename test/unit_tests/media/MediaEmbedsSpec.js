@@ -53,7 +53,7 @@ describe('MediaEmbeds', function() {
   const build_spotify_iframe = function(link, partial_link) {
     partial_link = partial_link.replace(/\//g, ':');
     return `<a href="${link}" target="_blank" rel="nofollow">${link}</a><div class="iframe-container"><iframe class="spotify" width="100%" height="80px" src="https://embed.spotify.com/?uri=spotify%3A${window.encodeURIComponent(
-      partial_link,
+      partial_link
     )}" frameborder="0"></iframe></div>`;
   };
 
@@ -70,30 +70,30 @@ describe('MediaEmbeds', function() {
       it('should match valid Spotify URLs', function() {
         expect(
           'https://play.spotify.com/artist/7Ln80lUS6He07XvHI8qqHH'.match(
-            re_spotify,
-          ),
+            re_spotify
+          )
         ).not.toBeNull();
         expect(
           'https://open.spotify.com/track/26fwlVGkISUr5P91hAeTW8'.match(
-            re_spotify,
-          ),
+            re_spotify
+          )
         ).not.toBeNull();
         expect(
           'https://open.spotify.com/album/7iN0r7Sl624EkOUNUCOGu9'.match(
-            re_spotify,
-          ),
+            re_spotify
+          )
         ).not.toBeNull();
         expect(
           'https://open.spotify.com/user/1123867741/playlist/2w63WroxrrIbNg4WIxdoBn'.match(
-            re_spotify,
-          ),
+            re_spotify
+          )
         ).not.toBeNull();
       });
 
       // since this is not a link it will not render
       xit('matches spotify:track:3EpA2bm37w6ho1iPn9YFQ8', function() {
         expect(
-          'spotify:track:3EpA2bm37w6ho1iPn9YFQ8'.match(re_spotify),
+          'spotify:track:3EpA2bm37w6ho1iPn9YFQ8'.match(re_spotify)
         ).not.toBeNull();
       });
 
@@ -108,24 +108,24 @@ describe('MediaEmbeds', function() {
       it('should match valid SoundCloud URLs', function() {
         expect(
           'https://soundcloud.com/ago_music/ago-royal-oats-ft-waldo-prod'.match(
-            re_soundcloud,
-          ),
+            re_soundcloud
+          )
         ).not.toBeNull();
         expect(
           'https://soundcloud.com/onedirectionmusic/sets/liams-you-i-remix-playlist'.match(
-            re_soundcloud,
-          ),
+            re_soundcloud
+          )
         ).not.toBeNull();
         expect(
           'https://soundcloud.com/groups/playlist-digital-sintonia'.match(
-            re_soundcloud,
-          ),
+            re_soundcloud
+          )
         ).not.toBeNull();
       });
 
       it('doesn’t match https://soundcloud.com/dp-conference', function() {
         expect(
-          'https://soundcloud.com/dp-conference'.match(re_soundcloud),
+          'https://soundcloud.com/dp-conference'.match(re_soundcloud)
         ).toBeNull();
       });
 
@@ -343,14 +343,14 @@ describe('MediaEmbeds', function() {
 
       it('renders profiles without embeds (https://soundcloud.com/dp-conference)', function() {
         const message = build_message_with_anchor(
-          'https://soundcloud.com/dp-conference',
+          'https://soundcloud.com/dp-conference'
         );
         expect(z.media.MediaParser.render_media_embeds(message)).toBe(message);
       });
 
       it('renders profiles without embeds even if profiles have a trailing slash (https://soundcloud.com/dp-conference/)', function() {
         const message = build_message_with_anchor(
-          'https://soundcloud.com/dp-conference/',
+          'https://soundcloud.com/dp-conference/'
         );
         expect(z.media.MediaParser.render_media_embeds(message)).toBe(message);
       });
@@ -456,16 +456,16 @@ describe('MediaEmbeds', function() {
         const iframe = build_vimeo_iframe(link, id);
 
         expect(z.media.MediaParser.render_media_embeds(message, '#333')).toBe(
-          iframe,
+          iframe
         );
       });
 
       it('doesn’t render user https://vimeo.com/user38597062', function() {
         const message = build_message_with_anchor(
-          'https://vimeo.com/user38597062',
+          'https://vimeo.com/user38597062'
         );
         expect(z.media.MediaParser.render_media_embeds(message, '#333')).toBe(
-          message,
+          message
         );
       });
 
@@ -478,7 +478,7 @@ describe('MediaEmbeds', function() {
         const iframe = build_vimeo_iframe(link, id);
 
         expect(z.media.MediaParser.render_media_embeds(message, '#333')).toBe(
-          iframe,
+          iframe
         );
       });
     });
@@ -487,37 +487,37 @@ describe('MediaEmbeds', function() {
   describe('convert_youtube_timestamp_to_seconds', function() {
     it('doesn´t convert timestamp that only contains numbers', function() {
       expect(
-        z.media.MediaEmbeds.convert_youtube_timestamp_to_seconds('125'),
+        z.media.MediaEmbeds.convert_youtube_timestamp_to_seconds('125')
       ).toBe(125);
     });
 
     it('converts timestamp with only seconds', function() {
       expect(
-        z.media.MediaEmbeds.convert_youtube_timestamp_to_seconds('25s'),
+        z.media.MediaEmbeds.convert_youtube_timestamp_to_seconds('25s')
       ).toBe(25);
     });
 
     it('converts timestamp with only minutes and seconds', function() {
       expect(
-        z.media.MediaEmbeds.convert_youtube_timestamp_to_seconds('31m08s'),
+        z.media.MediaEmbeds.convert_youtube_timestamp_to_seconds('31m08s')
       ).toBe(1868);
     });
 
     it('converts timestamp with hours, minutes and seconds', function() {
       expect(
-        z.media.MediaEmbeds.convert_youtube_timestamp_to_seconds('1h1m1s'),
+        z.media.MediaEmbeds.convert_youtube_timestamp_to_seconds('1h1m1s')
       ).toBe(3661);
     });
 
     it('converts invalid values to 0', function() {
       expect(
-        z.media.MediaEmbeds.convert_youtube_timestamp_to_seconds('hms'),
+        z.media.MediaEmbeds.convert_youtube_timestamp_to_seconds('hms')
       ).toBe(0);
       expect(
-        z.media.MediaEmbeds.convert_youtube_timestamp_to_seconds(null),
+        z.media.MediaEmbeds.convert_youtube_timestamp_to_seconds(null)
       ).toBe(0);
       expect(z.media.MediaEmbeds.convert_youtube_timestamp_to_seconds()).toBe(
-        0,
+        0
       );
     });
   });

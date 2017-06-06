@@ -37,7 +37,7 @@ z.ViewModel.content.ConnectRequestsViewModel = class ConnectRequestsViewModel {
     this.user_repository = user_repository;
     this.logger = new z.util.Logger(
       'z.ViewModel.content.ConnectRequestsViewModel',
-      z.config.LOGGER.OPTIONS,
+      z.config.LOGGER.OPTIONS
     );
 
     this.connect_requests = this.user_repository.connect_requests;
@@ -58,7 +58,7 @@ z.ViewModel.content.ConnectRequestsViewModel = class ConnectRequestsViewModel {
   after_render(elements, request) {
     if (z.util.ArrayUtil.is_last_item(this.connect_requests(), request)) {
       window.requestAnimationFrame(() =>
-        $('.connect-requests').scroll_to_bottom(),
+        $('.connect-requests').scroll_to_bottom()
       );
     }
   }
@@ -71,7 +71,7 @@ z.ViewModel.content.ConnectRequestsViewModel = class ConnectRequestsViewModel {
   click_on_accept(user_et) {
     this.user_repository.accept_connection_request(
       user_et,
-      this.connect_requests().length === 1,
+      this.connect_requests().length === 1
     );
   }
 

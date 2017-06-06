@@ -57,7 +57,7 @@ describe('User Service', function() {
         expect(response.connections.length).toBe(2);
         expect(response.connections[0].status).toEqual('accepted');
         expect(response.connections[1].conversation).toEqual(
-          '45c8f986-6c8f-465b-9ac9-bd5405e8c944',
+          '45c8f986-6c8f-465b-9ac9-bd5405e8c944'
         );
         done();
       })
@@ -100,7 +100,7 @@ describe('User Service', function() {
         .then(done.fail)
         .catch(function(error) {
           expect(error.code).toBe(
-            z.service.BackendClientError.STATUS_CODE.NOT_FOUND,
+            z.service.BackendClientError.STATUS_CODE.NOT_FOUND
           );
           done();
         });
@@ -147,7 +147,7 @@ describe('User Service', function() {
         .then(done.fail)
         .catch(function(error) {
           expect(error.code).toBe(
-            z.service.BackendClientError.STATUS_CODE.NOT_FOUND,
+            z.service.BackendClientError.STATUS_CODE.NOT_FOUND
           );
           done();
         });
@@ -156,7 +156,7 @@ describe('User Service', function() {
     });
 
     it('can fetch the existing users from the servers in a group with fakes', function(
-      done,
+      done
     ) {
       const request_url = `${urls.rest_url}/users?ids=d5a39ffb-6ce3-4cc8-9048-0e15d031b4c5%2C7025598b-ffac-4993-8a81-af3f35b71425`;
       server.respondWith('GET', request_url, [

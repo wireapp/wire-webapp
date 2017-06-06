@@ -88,7 +88,7 @@ z.entity.Message = class Message {
         return z.util.get_first_name(this.user());
       },
       this,
-      {deferEvaluation: true},
+      {deferEvaluation: true}
     );
 
     this.accent_color = ko.pureComputed(() => {
@@ -319,7 +319,7 @@ z.entity.Message = class Message {
 
     if (this.ephemeral_status() === z.message.EphemeralStatusType.INACTIVE) {
       this.ephemeral_expires(
-        new Date(Date.now() + this.ephemeral_expires()).getTime().toString(),
+        new Date(Date.now() + this.ephemeral_expires()).getTime().toString()
       );
       this.ephemeral_started(new Date(Date.now()).getTime().toString());
     }
@@ -329,14 +329,14 @@ z.entity.Message = class Message {
     this.ephemeral_interval_id = window.setInterval(() => {
       this.ephemeral_remaining(this.ephemeral_expires() - Date.now());
       return this.ephemeral_caption(
-        z.util.format_time_remaining(this.ephemeral_remaining()),
+        z.util.format_time_remaining(this.ephemeral_remaining())
       );
     }, 250);
 
     return (this.ephemeral_timeout_id = window.setTimeout(() => {
       amplify.publish(
         z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT,
-        this,
+        this
       );
       return window.clearInterval(this.ephemeral_interval_id);
     }, this.ephemeral_remaining()));

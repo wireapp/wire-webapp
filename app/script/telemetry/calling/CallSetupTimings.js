@@ -30,7 +30,7 @@ z.telemetry.calling.CallSetupTimings = class CallSetupTimings {
     this.call_id = call_id;
     this.logger = new z.util.Logger(
       'z.telemetry.calling.CallSetupTimings',
-      z.config.LOGGER.OPTIONS,
+      z.config.LOGGER.OPTIONS
     );
     this.is_answer = false;
     this.flow_id = undefined;
@@ -72,20 +72,20 @@ z.telemetry.calling.CallSetupTimings = class CallSetupTimings {
   log() {
     this.logger.info(
       `Call setup duration for flow ID '${this.flow_id}' of call ID '${this
-        .call_id}'`,
+        .call_id}'`
     );
 
     this._steps_order().forEach(step => {
       if (this.hasOwnProperty(step)) {
         const placeholder_key = Array.from(Math.max(26 - step.length, 1)).join(
-          ' ',
+          ' '
         );
         const placeholder_value = Array.from(
-          Math.max(6 - this[step].toString().length, 1),
+          Math.max(6 - this[step].toString().length, 1)
         ).join(' ');
 
         this.logger.info(
-          `Step${placeholder_key}'${step}':${placeholder_value}${this[step]}ms`,
+          `Step${placeholder_key}'${step}':${placeholder_value}${this[step]}ms`
         );
       }
     });

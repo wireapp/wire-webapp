@@ -30,7 +30,7 @@ describe('AssetsCrypto', function() {
         return z.assets.AssetCrypto.decrypt_aes_asset(
           cipher_text,
           key_bytes,
-          sha256,
+          sha256
         );
       })
       .then(function(buffer) {
@@ -50,7 +50,7 @@ describe('AssetsCrypto', function() {
         return z.assets.AssetCrypto.decrypt_aes_asset(
           cipher_text,
           key_bytes,
-          null,
+          null
         );
       })
       .then(done.fail)
@@ -67,7 +67,7 @@ describe('AssetsCrypto', function() {
         return z.assets.AssetCrypto.decrypt_aes_asset(
           cipher_text,
           key_bytes,
-          new Uint8Array([]),
+          new Uint8Array([])
         );
       })
       .then(done.fail)

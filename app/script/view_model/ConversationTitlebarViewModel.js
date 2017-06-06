@@ -28,7 +28,7 @@ z.ViewModel.ConversationTitlebarViewModel = class ConversationTitlebarViewModel 
     element_id,
     calling_repository,
     conversation_repository,
-    multitasking,
+    multitasking
   ) {
     this.added_to_view = this.added_to_view.bind(this);
 
@@ -37,7 +37,7 @@ z.ViewModel.ConversationTitlebarViewModel = class ConversationTitlebarViewModel 
     this.multitasking = multitasking;
     this.logger = new z.util.Logger(
       'z.ViewModel.ConversationTitlebarViewModel',
-      z.config.LOGGER.OPTIONS,
+      z.config.LOGGER.OPTIONS
     );
 
     // TODO remove the titlebar for now to ensure that buttons are clickable in macOS wrappers
@@ -116,10 +116,10 @@ z.ViewModel.ConversationTitlebarViewModel = class ConversationTitlebarViewModel 
   added_to_view() {
     window.setTimeout(() => {
       amplify.subscribe(z.event.WebApp.SHORTCUT.PEOPLE, () =>
-        this.show_participants(),
+        this.show_participants()
       );
       amplify.subscribe(z.event.WebApp.SHORTCUT.ADD_PEOPLE, () =>
-        this.show_participants(true),
+        this.show_participants(true)
       );
     }, 50);
   }
@@ -137,7 +137,7 @@ z.ViewModel.ConversationTitlebarViewModel = class ConversationTitlebarViewModel 
     this.multitasking.auto_minimize(false);
     this.multitasking.is_minimized(false);
     this.logger.info(
-      `Maximizing call '${this.joined_call().id}' on user click`,
+      `Maximizing call '${this.joined_call().id}' on user click`
     );
   }
 
@@ -152,7 +152,7 @@ z.ViewModel.ConversationTitlebarViewModel = class ConversationTitlebarViewModel 
   click_on_collection_button() {
     amplify.publish(
       z.event.WebApp.CONTENT.SWITCH,
-      z.ViewModel.content.CONTENT_STATE.COLLECTION,
+      z.ViewModel.content.CONTENT_STATE.COLLECTION
     );
   }
 
