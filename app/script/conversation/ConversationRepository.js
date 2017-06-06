@@ -420,7 +420,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   unblocked_user(user_et) {
-    this.get_one_to_one_conversation(user_et)
+    this.get_1to1_conversation(user_et)
       .then((conversation_et) => conversation_et.status(z.conversation.ConversationStatus.CURRENT_MEMBER));
   }
 
@@ -627,7 +627,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {string} [team_id] - Team ID in which the conversation should be searched
    * @returns {Promise} Resolves with the conversation with requested user
    */
-  get_one_to_one_conversation(user_et, team_id = this.active_team().id) {
+  get_1to1_conversation(user_et, team_id = this.active_team().id) {
     for (const conversation_et of this.conversations()) {
       const with_expected_user = user_et.id === conversation_et.participating_user_ids()[0];
 

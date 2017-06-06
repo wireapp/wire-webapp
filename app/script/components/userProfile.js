@@ -198,7 +198,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
             this.user_repository.cancel_connection_request(this.user());
           }
 
-          this.conversation_repository.get_one_to_one_conversation(this.user())
+          this.conversation_repository.get_1to1_conversation(this.user())
             .then((conversation_et) => {
               if (this.conversation_repository.is_active_conversation(conversation_et)) {
                 amplify.publish(z.event.WebApp.CONVERSATION.PEOPLE.HIDE);
@@ -223,7 +223,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
     this.on_open = () => {
       amplify.publish(z.event.WebApp.CONVERSATION.PEOPLE.HIDE);
 
-      this.conversation_repository.get_one_to_one_conversation(this.user())
+      this.conversation_repository.get_1to1_conversation(this.user())
         .then((conversation_et) => {
           if (conversation_et.is_archived()) {
             this.conversation_repository.unarchive_conversation(conversation_et);
