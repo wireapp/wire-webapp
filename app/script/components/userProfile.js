@@ -299,10 +299,10 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
 
     // footer
     this.get_footer_template = ko.pureComputed(() => {
-      if (!this.user()) {
+      const user_et = this.user();
+      if (!user_et || this.tab_index() === 1) {
         return 'user-profile-footer-empty';
       }
-      const user_et = this.user();
 
       // When used in conversation!
       if (typeof this.conversation === 'function') {
