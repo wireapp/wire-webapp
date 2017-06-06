@@ -24,7 +24,10 @@ window.z.team = z.team || {};
 
 z.team.TeamRepository = class TeamRepository {
   constructor(team_service, user_repository) {
-    this.logger = new z.util.Logger('z.team.TeamRepository', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger(
+      'z.team.TeamRepository',
+      z.config.LOGGER.OPTIONS
+    );
 
     this.team_mapper = new z.team.TeamMapper();
     this.team_service = team_service;
@@ -35,9 +38,14 @@ z.team.TeamRepository = class TeamRepository {
 
     this.active_team = ko.observable(this.personal_space);
 
-    this.known_team_ids = ko.pureComputed(() => this.teams().map(team_et => team_et.id));
+    this.known_team_ids = ko.pureComputed(() =>
+      this.teams().map(team_et => team_et.id)
+    );
 
-    amplify.subscribe(z.event.WebApp.TEAM.EVENT_FROM_BACKEND, this.on_team_event.bind(this));
+    amplify.subscribe(
+      z.event.WebApp.TEAM.EVENT_FROM_BACKEND,
+      this.on_team_event.bind(this)
+    );
   }
 
   add_members() {
@@ -110,7 +118,10 @@ z.team.TeamRepository = class TeamRepository {
    * @param {z.event.EventRepository.NOTIFICATION_SOURCE} source - Source of event
    * @returns {Promise} Resolves when event was handled
    */
-  on_team_event(event_json, source = z.event.EventRepository.NOTIFICATION_SOURCE.STREAM) {
+  on_team_event(
+    event_json,
+    source = z.event.EventRepository.NOTIFICATION_SOURCE.STREAM
+  ) {
     const type = event_json.type;
 
     this.logger.info(`»» Event: '${type}'`, {
@@ -207,7 +218,9 @@ z.team.TeamRepository = class TeamRepository {
 
     return this.get_team_by_id(team_id).then(team_et => {
       if (this.user_repository.self().id !== user_id) {
-        this.user_repository.get_users_by_id([user_id]).then(([user_et]) => this._add_user_to_team(user_et, team_et));
+        this.user_repository
+          .get_users_by_id([user_id])
+          .then(([user_et]) => this._add_user_to_team(user_et, team_et));
       } else {
         this.update_team_members(team_et);
         this._add_team(team_et);
@@ -228,7 +241,10 @@ z.team.TeamRepository = class TeamRepository {
   }
 
   _on_unhandled(event_json) {
-    this.logger.log(`Received '${event_json.type}' event from backend which is not yet handled`, event_json);
+    this.logger.log(
+      `Received '${event_json.type}' event from backend which is not yet handled`,
+      event_json
+    );
   }
 
   _on_update(event_json) {
@@ -240,6 +256,8 @@ z.team.TeamRepository = class TeamRepository {
   }
 
   _update_teams(team_ets) {
-    return Promise.resolve().then(() => z.util.ko_array_push_all(this.teams, team_ets)).then(() => team_ets);
+    return Promise.resolve()
+      .then(() => z.util.ko_array_push_all(this.teams, team_ets))
+      .then(() => team_ets);
   }
 };

@@ -38,7 +38,12 @@ z.conversation.EventBuilder = (function() {
     };
   };
 
-  const _build_calling = (conversation_et, e_call_message, user_id, client_id) => {
+  const _build_calling = (
+    conversation_et,
+    e_call_message,
+    user_id,
+    client_id
+  ) => {
     return {
       content: e_call_message,
       conversation: conversation_et.id,
@@ -64,7 +69,12 @@ z.conversation.EventBuilder = (function() {
     };
   };
 
-  const _build_delete = (conversation_id, message_id, time, message_to_delete_et) => {
+  const _build_delete = (
+    conversation_id,
+    message_id,
+    time,
+    message_to_delete_et
+  ) => {
     return {
       conversation: conversation_id,
       data: {
@@ -132,7 +142,11 @@ z.conversation.EventBuilder = (function() {
     creating_user_et,
     reason = z.calling.enum.TERMINATION_REASON.COMPLETED
   ) => {
-    const {conversation_id, user_id, time = new Date().toISOString()} = e_call_message_et;
+    const {
+      conversation_id,
+      user_id,
+      time = new Date().toISOString()
+    } = e_call_message_et;
 
     return {
       conversation: conversation_id,

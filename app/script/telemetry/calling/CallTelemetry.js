@@ -26,10 +26,16 @@ window.z.telemetry.calling = z.telemetry.calling || {};
 // Call traces entity.
 z.telemetry.calling.CallTelemetry = class CallTelemetry {
   constructor(protocol_version) {
-    this.logger = new z.util.Logger('z.telemetry.calling.CallTelemetry', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger(
+      'z.telemetry.calling.CallTelemetry',
+      z.config.LOGGER.OPTIONS
+    );
 
     this.sessions = {};
-    this.protocol_version = protocol_version === z.calling.enum.PROTOCOL.VERSION_2 ? 'C2' : 'C3';
+    this.protocol_version = protocol_version ===
+      z.calling.enum.PROTOCOL.VERSION_2
+      ? 'C2'
+      : 'C3';
     this.remote_version = undefined;
 
     this.media_type = z.media.MediaType.AUDIO;
@@ -102,7 +108,9 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
    * @returns {undefined} No return value
    */
   set_media_type(video_send = false) {
-    this.media_type = video_send ? z.media.MediaType.VIDEO : z.media.MediaType.AUDIO;
+    this.media_type = video_send
+      ? z.media.MediaType.VIDEO
+      : z.media.MediaType.AUDIO;
     this.logger.info(`Set media type to '${this.media_type}'`);
   }
 

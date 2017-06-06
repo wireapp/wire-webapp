@@ -56,7 +56,10 @@ z.ViewModel.MODAL_CONSENT_TYPE = {
 
 z.ViewModel.ModalsViewModel = class ModalsViewModel {
   constructor(element_id) {
-    this.logger = new z.util.Logger('z.ViewModel.ModalsViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger(
+      'z.ViewModel.ModalsViewModel',
+      z.config.LOGGER.OPTIONS
+    );
 
     this.modals = {};
 
@@ -90,7 +93,11 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
         this._show_modal_call_full_voice_channel(options.data, message_element);
         break;
       case z.ViewModel.ModalType.CALL_START_ANOTHER:
-        this._show_modal_call_start_another(options.data, title_element, message_element);
+        this._show_modal_call_start_another(
+          options.data,
+          title_element,
+          message_element
+        );
         break;
       case z.ViewModel.ModalType.CLEAR:
         type = this._show_modal_clear(options, type);
@@ -102,7 +109,12 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
         this._show_modal_leave(options.data, title_element);
         break;
       case z.ViewModel.ModalType.NEW_DEVICE:
-        this._show_modal_new_device(options.data, title_element, message_element, action_element);
+        this._show_modal_new_device(
+          options.data,
+          title_element,
+          message_element,
+          action_element
+        );
         break;
       case z.ViewModel.ModalType.REMOVE_DEVICE:
         this._show_modal_remove_device(options.data, title_element);
@@ -228,15 +240,26 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
    * @returns {undefined} No return value
    */
   _show_modal_call_start_another(call_state, title_element, message_element) {
-    const action_element = $(z.ViewModel.ModalType.CALL_START_ANOTHER).find('.modal-action');
+    const action_element = $(z.ViewModel.ModalType.CALL_START_ANOTHER).find(
+      '.modal-action'
+    );
 
-    action_element.text(z.l10n.text(z.string[`modal_call_second_${call_state}_action`]));
-    message_element.text(z.l10n.text(z.string[`modal_call_second_${call_state}_message`]));
-    return title_element.text(z.l10n.text(z.string[`modal_call_second_${call_state}_headline`]));
+    action_element.text(
+      z.l10n.text(z.string[`modal_call_second_${call_state}_action`])
+    );
+    message_element.text(
+      z.l10n.text(z.string[`modal_call_second_${call_state}_message`])
+    );
+    return title_element.text(
+      z.l10n.text(z.string[`modal_call_second_${call_state}_headline`])
+    );
   }
 
   _show_modal_clear(options, type) {
-    if (options.conversation.is_group() && !options.conversation.removed_from_conversation()) {
+    if (
+      options.conversation.is_group() &&
+      !options.conversation.removed_from_conversation()
+    ) {
       type = z.ViewModel.ModalType.CLEAR_GROUP;
     }
 
@@ -255,14 +278,22 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
   }
 
   _show_modal_connected_device(devices) {
-    const devices_element = $(z.ViewModel.ModalType.CONNECTED_DEVICE).find('.modal-connected-devices');
+    const devices_element = $(z.ViewModel.ModalType.CONNECTED_DEVICE).find(
+      '.modal-connected-devices'
+    );
 
     devices_element.empty();
 
     devices.map(device => {
-      $('<div>').text(`${moment(device.time).format('MMMM Do YYYY, HH:mm')} - UTC`).appendTo(devices_element);
+      $('<div>')
+        .text(`${moment(device.time).format('MMMM Do YYYY, HH:mm')} - UTC`)
+        .appendTo(devices_element);
 
-      $('<div>').text(`${z.l10n.text(z.string.modal_connected_device_from)} ${device.model}`).appendTo(devices_element);
+      $('<div>')
+        .text(
+          `${z.l10n.text(z.string.modal_connected_device_from)} ${device.model}`
+        )
+        .appendTo(devices_element);
     });
   }
 
@@ -278,10 +309,18 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
     );
   }
 
-  _show_modal_new_device(content, title_element, message_element, action_element) {
+  _show_modal_new_device(
+    content,
+    title_element,
+    message_element,
+    action_element
+  ) {
     let action_id, message_id;
     const joined_names = z.util.StringUtil.capitalize_first_char(
-      z.util.LocalizerUtil.join_names(content.user_ets, z.string.Declension.NOMINATIVE)
+      z.util.LocalizerUtil.join_names(
+        content.user_ets,
+        z.string.Declension.NOMINATIVE
+      )
     );
 
     let string_id;

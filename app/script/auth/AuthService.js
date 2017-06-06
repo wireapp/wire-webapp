@@ -38,7 +38,10 @@ z.auth.AuthService = class AuthService {
 
   constructor(client) {
     this.client = client;
-    this.logger = new z.util.Logger('z.auth.AuthService', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger(
+      'z.auth.AuthService',
+      z.config.LOGGER.OPTIONS
+    );
   }
 
   /**
@@ -66,7 +69,9 @@ z.auth.AuthService = class AuthService {
   get_invitations_info(code) {
     return this.client.send_request({
       type: 'GET',
-      url: this.client.create_url(`${AuthService.CONFIG.URL_INVITATIONS}/info?code=${code}`)
+      url: this.client.create_url(
+        `${AuthService.CONFIG.URL_INVITATIONS}/info?code=${code}`
+      )
     });
   }
 
@@ -80,7 +85,9 @@ z.auth.AuthService = class AuthService {
    */
   post_access(retry_attempt = 1) {
     return new Promise((resolve, reject) => {
-      this.client.request_queue_blocked_state(z.service.RequestQueueBlockedState.ACCESS_TOKEN_REFRESH);
+      this.client.request_queue_blocked_state(
+        z.service.RequestQueueBlockedState.ACCESS_TOKEN_REFRESH
+      );
 
       const config = {
         crossDomain: true,
@@ -93,45 +100,77 @@ z.auth.AuthService = class AuthService {
 
       if (this.client.access_token) {
         config.headers = {
-          Authorization: `Bearer ${window.decodeURIComponent(this.client.access_token)}`
+          Authorization: `Bearer ${window.decodeURIComponent(
+            this.client.access_token
+          )}`
         };
       }
 
       config.success = data => {
-        this.client.request_queue_blocked_state(z.service.RequestQueueBlockedState.NONE);
+        this.client.request_queue_blocked_state(
+          z.service.RequestQueueBlockedState.NONE
+        );
         this.save_access_token_in_client(data.token_type, data.access_token);
         resolve(data);
       };
 
       config.error = (jqXHR, textStatus, errorThrown) => {
-        if (jqXHR.status === z.service.BackendClientError.STATUS_CODE.FORBIDDEN) {
-          this.logger.error(`Requesting access token failed after ${retry_attempt} attempt(s): ${errorThrown}`, jqXHR);
-          reject(new z.auth.AccessTokenError(z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN));
+        if (
+          jqXHR.status === z.service.BackendClientError.STATUS_CODE.FORBIDDEN
+        ) {
+          this.logger.error(
+            `Requesting access token failed after ${retry_attempt} attempt(s): ${errorThrown}`,
+            jqXHR
+          );
+          reject(
+            new z.auth.AccessTokenError(
+              z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN
+            )
+          );
         }
 
         if (retry_attempt <= AuthService.CONFIG.POST_ACCESS_RETRY_LIMIT) {
           retry_attempt++;
 
-          const _retry = () => this.post_access(retry_attempt).then(resolve).catch(reject);
+          const _retry = () =>
+            this.post_access(retry_attempt).then(resolve).catch(reject);
 
-          if (jqXHR.status === z.service.BackendClientError.STATUS_CODE.CONNECTIVITY_PROBLEM) {
-            this.logger.warn('Access token refresh delayed due to suspected connectivity issue');
+          if (
+            jqXHR.status ===
+            z.service.BackendClientError.STATUS_CODE.CONNECTIVITY_PROBLEM
+          ) {
+            this.logger.warn(
+              'Access token refresh delayed due to suspected connectivity issue'
+            );
             return this.client
-              .execute_on_connectivity(z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_REFRESH)
+              .execute_on_connectivity(
+                z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER
+                  .ACCESS_TOKEN_REFRESH
+              )
               .then(() => {
-                this.logger.info('Continuing access token refresh after verifying connectivity');
+                this.logger.info(
+                  'Continuing access token refresh after verifying connectivity'
+                );
                 return _retry();
               });
           }
 
           return window.setTimeout(() => {
-            this.logger.info(`Trying to get a new access token: '${retry_attempt}' attempt`);
+            this.logger.info(
+              `Trying to get a new access token: '${retry_attempt}' attempt`
+            );
             return _retry();
           }, AuthService.CONFIG.POST_ACCESS_RETRY_TIMEOUT);
         }
-        this.client.request_queue_blocked_state(z.service.RequestQueueBlockedState.NONE);
+        this.client.request_queue_blocked_state(
+          z.service.RequestQueueBlockedState.NONE
+        );
         this.save_access_token_in_client();
-        return reject(new z.auth.AccessTokenError(z.auth.AccessTokenError.TYPE.RETRIES_EXCEEDED));
+        return reject(
+          new z.auth.AccessTokenError(
+            z.auth.AccessTokenError.TYPE.RETRIES_EXCEEDED
+          )
+        );
       };
 
       $.ajax(config);
@@ -199,7 +238,9 @@ z.auth.AuthService = class AuthService {
         },
         processData: false,
         type: 'POST',
-        url: `${this.client.create_url(`${AuthService.CONFIG.URL_LOGIN}?persist=${persist}`)}`,
+        url: `${this.client.create_url(
+          `${AuthService.CONFIG.URL_LOGIN}?persist=${persist}`
+        )}`,
         xhrFields: {
           withCredentials: true
         }
@@ -210,9 +251,17 @@ z.auth.AuthService = class AuthService {
           resolve(data);
         })
         .fail((jqXHR, textStatus, errorThrown) => {
-          if (jqXHR.status === z.service.BackendClientError.STATUS_CODE.TOO_MANY_REQUESTS && login.email) {
+          if (
+            jqXHR.status ===
+              z.service.BackendClientError.STATUS_CODE.TOO_MANY_REQUESTS &&
+            login.email
+          ) {
             // Backend blocked our user account from login, so we have to reset our cookies
-            this.post_cookies_remove(login.email, login.password, undefined).then(() => {
+            this.post_cookies_remove(
+              login.email,
+              login.password,
+              undefined
+            ).then(() => {
               reject(jqXHR.responseJSON || errorThrown);
             });
           } else {
@@ -275,7 +324,9 @@ z.auth.AuthService = class AuthService {
         },
         processData: false,
         type: 'POST',
-        url: `${this.client.create_url(`${AuthService.CONFIG.URL_REGISTER}?challenge_cookie=true`)}`,
+        url: `${this.client.create_url(
+          `${AuthService.CONFIG.URL_REGISTER}?challenge_cookie=true`
+        )}`,
         xhrFields: {
           withCredentials: true
         }

@@ -38,7 +38,9 @@ describe('z.calling.CallingRepository', function() {
       );
       group_conversation_et.id = group_conversation_id;
       group_conversation_et.type(z.conversation.ConversationType.REGULAR);
-      TestFactory.conversation_repository.conversations.push(group_conversation_et);
+      TestFactory.conversation_repository.conversations.push(
+        group_conversation_et
+      );
 
       const conversation_et = TestFactory.conversation_repository.conversation_mapper.map_conversation(
         entities.conversation
@@ -56,29 +58,39 @@ describe('z.calling.CallingRepository', function() {
         .then(function(protocol_version) {
           expect(protocol_version).toBe(z.calling.enum.PROTOCOL.VERSION_3);
 
-          return TestFactory.calling_repository.set_protocol_version(group_conversation_id);
+          return TestFactory.calling_repository.set_protocol_version(
+            group_conversation_id
+          );
         })
         .then(function(protocol_version) {
           expect(protocol_version).toBe(z.calling.enum.PROTOCOL.VERSION_3);
 
           TestFactory.calling_repository.use_v3_api = true;
-          return TestFactory.calling_repository.set_protocol_version(conversation_id);
+          return TestFactory.calling_repository.set_protocol_version(
+            conversation_id
+          );
         })
         .then(function(protocol_version) {
           expect(protocol_version).toBe(z.calling.enum.PROTOCOL.VERSION_3);
 
-          return TestFactory.calling_repository.set_protocol_version(group_conversation_id);
+          return TestFactory.calling_repository.set_protocol_version(
+            group_conversation_id
+          );
         })
         .then(function(protocol_version) {
           expect(protocol_version).toBe(z.calling.enum.PROTOCOL.VERSION_3);
 
           TestFactory.calling_repository.use_v3_api = false;
-          return TestFactory.calling_repository.set_protocol_version(conversation_id);
+          return TestFactory.calling_repository.set_protocol_version(
+            conversation_id
+          );
         })
         .then(function(protocol_version) {
           expect(protocol_version).toBe(z.calling.enum.PROTOCOL.VERSION_3);
 
-          return TestFactory.calling_repository.set_protocol_version(group_conversation_id);
+          return TestFactory.calling_repository.set_protocol_version(
+            group_conversation_id
+          );
         })
         .then(function(protocol_version) {
           expect(protocol_version).toBe(z.calling.enum.PROTOCOL.VERSION_2);

@@ -25,7 +25,9 @@ describe('z.util.render_message', function() {
   it('renders a normal link', function() {
     const expected =
       'Check this: <a href="http://www.wire.com/" target="_blank" rel="nofollow noopener noreferrer">http://www.wire.com/</a>';
-    expect(z.util.render_message('Check this: http://www.wire.com/')).toBe(expected);
+    expect(z.util.render_message('Check this: http://www.wire.com/')).toBe(
+      expected
+    );
   });
 
   it('renders a normal link without protocol', function() {
@@ -68,13 +70,15 @@ describe('z.util.render_message', function() {
   });
 
   it('renders links with IP addresses', function() {
-    const link = 'http://192.168.10.44:8080//job/webapp_atomic_test/4290/cucumber-html-reports';
+    const link =
+      'http://192.168.10.44:8080//job/webapp_atomic_test/4290/cucumber-html-reports';
     const expected = `<a href=\"${link}\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">${link}</a>`;
     expect(z.util.render_message(link)).toBe(expected);
   });
 
   it('renders URLs with @-signs correctly', function() {
-    const link = 'https://www.mail-archive.com/debian-bugs-dist@lists.debian.org/msg1448956.html';
+    const link =
+      'https://www.mail-archive.com/debian-bugs-dist@lists.debian.org/msg1448956.html';
     const expected = `<a href=\"${link}\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">${link}</a>`;
     expect(z.util.render_message(link)).toBe(expected);
   });
@@ -82,36 +86,49 @@ describe('z.util.render_message', function() {
   it('renders URLs with @-signs and text correctly', function() {
     const link = 'https://t.facdn.net/22382738@400-1485204208.jpg';
     const expected = `Just click <a href=\"${link}\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">${link}</a> and download it`;
-    expect(z.util.render_message(`Just click ${link} and download it`)).toBe(expected);
+    expect(z.util.render_message(`Just click ${link} and download it`)).toBe(
+      expected
+    );
   });
 
   it('escapes links when they are posted as plain HTML', function() {
-    const expected = '&lt;a href=&quot;javascript:alert(&#x27;ohoh!&#x27;)&quot;&gt;what?&lt;/a&gt;';
-    expect(z.util.render_message('<a href="javascript:alert(\'ohoh!\')">what?</a>')).toBe(expected);
+    const expected =
+      '&lt;a href=&quot;javascript:alert(&#x27;ohoh!&#x27;)&quot;&gt;what?&lt;/a&gt;';
+    expect(
+      z.util.render_message('<a href="javascript:alert(\'ohoh!\')">what?</a>')
+    ).toBe(expected);
   });
 
   it('renders an email address', function() {
     const expected =
       'send it over to <a href="#" onclick="z.util.safe_mailto_open(\'hello@wire.com\')">hello@wire.com</a>';
-    expect(z.util.render_message('send it over to hello@wire.com')).toBe(expected);
+    expect(z.util.render_message('send it over to hello@wire.com')).toBe(
+      expected
+    );
   });
 
   it('renders an email address with pluses', function() {
     const expected =
       'send it over to <a href="#" onclick="z.util.safe_mailto_open(\'hello+world@wire.com\')">hello+world@wire.com</a>';
-    expect(z.util.render_message('send it over to hello+world@wire.com')).toBe(expected);
+    expect(z.util.render_message('send it over to hello+world@wire.com')).toBe(
+      expected
+    );
   });
 
   it('renders an email long domains', function() {
     const expected =
       'send it over to <a href="#" onclick="z.util.safe_mailto_open(\'janedoe@school.university.edu\')">janedoe@school.university.edu</a>';
-    expect(z.util.render_message('send it over to janedoe@school.university.edu')).toBe(expected);
+    expect(
+      z.util.render_message('send it over to janedoe@school.university.edu')
+    ).toBe(expected);
   });
 
   it('renders an email with multiple subdomains', function() {
     const expected =
       'send it over to <a href="#" onclick="z.util.safe_mailto_open(\'bla@foo.co.uk\')">bla@foo.co.uk</a>';
-    expect(z.util.render_message('send it over to bla@foo.co.uk')).toBe(expected);
+    expect(z.util.render_message('send it over to bla@foo.co.uk')).toBe(
+      expected
+    );
   });
 
   // The tag "<br />" is preferred for compatibility sake.
@@ -135,9 +152,9 @@ describe('z.util.render_message', function() {
   });
 
   it('does not render emails within <code> tags', function() {
-    expect(z.util.render_message('```this.isValid("opensource@wire.com")```')).toBe(
-      '<code>this.isValid(&quot;opensource@wire.com&quot;)</code>'
-    );
+    expect(
+      z.util.render_message('```this.isValid("opensource@wire.com")```')
+    ).toBe('<code>this.isValid(&quot;opensource@wire.com&quot;)</code>');
   });
 
   xit('renders an emoticon of someone shrugging', function() {
@@ -147,7 +164,9 @@ describe('z.util.render_message', function() {
 
 describe('z.util.array_to_md5_base64', function() {
   it('can convert typed array to base64', function() {
-    expect(z.util.array_to_md5_base64(new Uint8Array([8, 8]))).toBe('w+7NCDwPSCf1JgWbA7deTA==');
+    expect(z.util.array_to_md5_base64(new Uint8Array([8, 8]))).toBe(
+      'w+7NCDwPSCf1JgWbA7deTA=='
+    );
   });
 });
 
@@ -165,17 +184,21 @@ describe('z.util.encode_base64', function() {
 
 describe('z.util.encode_base64_sha256', function() {
   it('encodes Base64 and SHA-256 empty string', function() {
-    expect(z.util.encode_sha256_base64('')).toBe('47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=');
+    expect(z.util.encode_sha256_base64('')).toBe(
+      '47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU='
+    );
   });
 
   it('encodes Base64 and SHA-256 text', function() {
-    expect(z.util.encode_sha256_base64('Hello, world!')).toBe('MV9b23bQeMQ7isAGTkoBZGErH853yGk0W/yUx1iU7dM=');
+    expect(z.util.encode_sha256_base64('Hello, world!')).toBe(
+      'MV9b23bQeMQ7isAGTkoBZGErH853yGk0W/yUx1iU7dM='
+    );
   });
 
   it('encodes Base64 and SHA-256 symbols', function() {
-    expect(z.util.encode_sha256_base64('Hello, world!@#$%^&*()_+{}[]|<>,.?/~`"')).toBe(
-      'lt/heVPfGQB07sONclI2TZBZHuIMH86noUEWEbahMw4='
-    );
+    expect(
+      z.util.encode_sha256_base64('Hello, world!@#$%^&*()_+{}[]|<>,.?/~`"')
+    ).toBe('lt/heVPfGQB07sONclI2TZBZHuIMH86noUEWEbahMw4=');
   });
 });
 
@@ -192,7 +215,9 @@ describe('z.util.create_random_uuid', function() {
   it('has the expected format', function() {
     expect(z.util.create_random_uuid().length).toBe(36);
     expect(z.util.create_random_uuid().split('-').length).toBe(5);
-    expect(z.util.create_random_uuid()).not.toEqual(z.util.create_random_uuid());
+    expect(z.util.create_random_uuid()).not.toEqual(
+      z.util.create_random_uuid()
+    );
   });
 });
 
@@ -3965,7 +3990,9 @@ describe('z.util.strip_data_uri', function() {
     const base64 = 'AAAAAAA';
     const plain_text = z.util.strip_data_uri(base64);
     const text_html = z.util.strip_data_uri(`data:text/html,${base64}`);
-    const base64_text_plain = z.util.strip_data_uri(`data:text/plain;base64,${base64}`);
+    const base64_text_plain = z.util.strip_data_uri(
+      `data:text/plain;base64,${base64}`
+    );
     const base64_gif = z.util.strip_data_uri(`data:image/gif;base64,${base64}`);
     const base64_png = z.util.strip_data_uri(`data:image/png;base64,${base64}`);
     const base64_jpg = z.util.strip_data_uri(`data:image/jpg;base64,${base64}`);
@@ -3980,11 +4007,15 @@ describe('z.util.strip_data_uri', function() {
 
 describe('z.util.phone_number_to_e164', function() {
   it('can convert a US number', function() {
-    expect(z.util.phone_number_to_e164('555-666-7777', 'US')).toBe('+15556667777');
+    expect(z.util.phone_number_to_e164('555-666-7777', 'US')).toBe(
+      '+15556667777'
+    );
   });
 
   it('can convert a GR number', function() {
-    expect(z.util.phone_number_to_e164('2310 863871', 'GR')).toBe('+302310863871');
+    expect(z.util.phone_number_to_e164('2310 863871', 'GR')).toBe(
+      '+302310863871'
+    );
   });
 
   it('can convert an unknown number', function() {
@@ -4066,15 +4097,21 @@ describe('z.util.sort_groups_by_last_event', function() {
 
 describe('z.util.strip_url_wrapper', function() {
   it('return the string without url wrapper (single quotes)', function() {
-    expect(z.util.strip_url_wrapper('url("/path/to/image/image.png")')).toBe('/path/to/image/image.png');
+    expect(z.util.strip_url_wrapper('url("/path/to/image/image.png")')).toBe(
+      '/path/to/image/image.png'
+    );
   });
 
   it('return the string without url wrapper (quotes)', function() {
-    expect(z.util.strip_url_wrapper('url("/path/to/image/image.png")')).toBe('/path/to/image/image.png');
+    expect(z.util.strip_url_wrapper('url("/path/to/image/image.png")')).toBe(
+      '/path/to/image/image.png'
+    );
   });
 
   it('return the string without url wrapper (without quotes)', function() {
-    expect(z.util.strip_url_wrapper('url(/path/to/image/image.png)')).toBe('/path/to/image/image.png');
+    expect(z.util.strip_url_wrapper('url(/path/to/image/image.png)')).toBe(
+      '/path/to/image/image.png'
+    );
   });
 });
 
@@ -4096,7 +4133,9 @@ describe('z.util.naked_url', function() {
       'wire.com/'
     ];
 
-    const all_urls_naked = urls.map(url => z.util.naked_url(url)).every(url => url === expected_url);
+    const all_urls_naked = urls
+      .map(url => z.util.naked_url(url))
+      .every(url => url === expected_url);
 
     expect(all_urls_naked).toBeTruthy();
   });
@@ -4108,11 +4147,15 @@ describe('z.util.naked_url', function() {
 
 describe('z.util.append_url_parameter', function() {
   it('append param with & when url contains param', function() {
-    expect(z.util.append_url_parameter('foo.com?bar=true', 'fum=true')).toBe('foo.com?bar=true&fum=true');
+    expect(z.util.append_url_parameter('foo.com?bar=true', 'fum=true')).toBe(
+      'foo.com?bar=true&fum=true'
+    );
   });
 
   it('append param with ? when url contains param', function() {
-    expect(z.util.append_url_parameter('foo.com', 'fum=true')).toBe('foo.com?fum=true');
+    expect(z.util.append_url_parameter('foo.com', 'fum=true')).toBe(
+      'foo.com?fum=true'
+    );
   });
 });
 
@@ -4129,38 +4172,50 @@ describe('z.util.forward_url_parameter', function() {
         return true;
       }
     };
-    expect(z.util.forward_url_parameter('foo.com', z.auth.URLParameter.LOCALYTICS)).toBe('foo.com?localytics=true');
+    expect(
+      z.util.forward_url_parameter('foo.com', z.auth.URLParameter.LOCALYTICS)
+    ).toBe('foo.com?localytics=true');
 
     z.util.get_url_parameter = function(parameter_value) {
       if (parameter_value === z.auth.URLParameter.LOCALYTICS) {
         return false;
       }
     };
-    expect(z.util.forward_url_parameter('foo.com', z.auth.URLParameter.LOCALYTICS)).toBe('foo.com?localytics=false');
+    expect(
+      z.util.forward_url_parameter('foo.com', z.auth.URLParameter.LOCALYTICS)
+    ).toBe('foo.com?localytics=false');
 
     z.util.get_url_parameter = function(parameter_value) {
       if (parameter_value === z.auth.URLParameter.LOCALYTICS) {
         return 'bar';
       }
     };
-    expect(z.util.forward_url_parameter('foo.com', z.auth.URLParameter.LOCALYTICS)).toBe('foo.com?localytics=bar');
+    expect(
+      z.util.forward_url_parameter('foo.com', z.auth.URLParameter.LOCALYTICS)
+    ).toBe('foo.com?localytics=bar');
 
     z.util.get_url_parameter = function(parameter_value) {
       if (parameter_value === z.auth.URLParameter.LOCALYTICS) {
         return null;
       }
     };
-    expect(z.util.forward_url_parameter('foo.com', z.auth.URLParameter.LOCALYTICS)).toBe('foo.com');
+    expect(
+      z.util.forward_url_parameter('foo.com', z.auth.URLParameter.LOCALYTICS)
+    ).toBe('foo.com');
   });
 });
 
 describe('Markdown for bold text', function() {
   it('renders bold text', function() {
-    expect(z.util.render_message('**bold text (not italic)**')).toBe('<strong>bold text (not italic)</strong>');
+    expect(z.util.render_message('**bold text (not italic)**')).toBe(
+      '<strong>bold text (not italic)</strong>'
+    );
   });
 
   it('renders a bold word within a sentence', function() {
-    expect(z.util.render_message('Markdown **just** rocks!')).toEqual('Markdown <strong>just</strong> rocks!');
+    expect(z.util.render_message('Markdown **just** rocks!')).toEqual(
+      'Markdown <strong>just</strong> rocks!'
+    );
   });
 
   it('renders bold text with italic words', function() {
@@ -4188,11 +4243,15 @@ describe('Markdown for bold text', function() {
 
 describe('Markdown for italic text', function() {
   it('renders italic text', function() {
-    expect(z.util.render_message('*This text is italic.*')).toBe('<em>This text is italic.</em>');
+    expect(z.util.render_message('*This text is italic.*')).toBe(
+      '<em>This text is italic.</em>'
+    );
   });
 
   it('renders partially italic text', function() {
-    expect(z.util.render_message('This text is *partially* italic')).toBe('This text is <em>partially</em> italic');
+    expect(z.util.render_message('This text is *partially* italic')).toBe(
+      'This text is <em>partially</em> italic'
+    );
   });
 
   it('renders text with multiple italic words', function() {
@@ -4208,29 +4267,41 @@ describe('Markdown for italic text', function() {
   });
 
   it('renders words which are bold-italic', function() {
-    expect(z.util.render_message('***A***')).toBe('<strong><em>A</em></strong>');
+    expect(z.util.render_message('***A***')).toBe(
+      '<strong><em>A</em></strong>'
+    );
   });
 });
 
 describe('Markdown for code snippets', function() {
   it('renders code blocks', function() {
-    expect(z.util.render_message("```console.log('A')```")).toEqual('<code>console.log(&#x27;A&#x27;)</code>');
+    expect(z.util.render_message("```console.log('A')```")).toEqual(
+      '<code>console.log(&#x27;A&#x27;)</code>'
+    );
   });
 
   it('can escape HTML in rendered code blocks', function() {
-    expect(z.util.render_message('```<b>Hello</b>```')).toEqual('<code>&lt;b&gt;Hello&lt;/b&gt;</code>');
+    expect(z.util.render_message('```<b>Hello</b>```')).toEqual(
+      '<code>&lt;b&gt;Hello&lt;/b&gt;</code>'
+    );
   });
 
   it('renders code within code spans', function() {
-    expect(z.util.render_message('This is `code`.')).toEqual('This is <code>code</code>.');
+    expect(z.util.render_message('This is `code`.')).toEqual(
+      'This is <code>code</code>.'
+    );
   });
 
   it('renders code within code blocks', function() {
-    expect(z.util.render_message('This is ```code```.')).toEqual('This is <code>code</code>.');
+    expect(z.util.render_message('This is ```code```.')).toEqual(
+      'This is <code>code</code>.'
+    );
   });
 
   it('doesn’t render code within a code span', function() {
-    expect(z.util.render_message('`com.ibm.icu`')).toEqual('<code>com.ibm.icu</code>');
+    expect(z.util.render_message('`com.ibm.icu`')).toEqual(
+      '<code>com.ibm.icu</code>'
+    );
   });
 
   it('doesn’t render links within code blocks', function() {
@@ -4276,20 +4347,28 @@ describe('Markdown for code snippets', function() {
   it('renders escaped HTML code blocks', function() {
     const expected =
       '<pre><code class="lang-html">&lt;<span class="hljs-selector-tag">a</span> href=<span class="hljs-string">"javascript:wire.app.logout()"</span>&gt;This is <span class="hljs-selector-tag">a</span> trick&lt;/a&gt;<br /></code></pre>';
-    expect(z.util.render_message('```html\n<a href="javascript:wire.app.logout()">This is a trick</a>\n```')).toEqual(
-      expected
-    );
+    expect(
+      z.util.render_message(
+        '```html\n<a href="javascript:wire.app.logout()">This is a trick</a>\n```'
+      )
+    ).toEqual(expected);
   });
 
   it('renders escaped HTML code spans', function() {
-    const expected = '<code>&lt;a href=&quot;javascript:wire.app.logout()&quot;&gt;This is a trick&lt;/a&gt;</code>';
-    expect(z.util.render_message('`<a href="javascript:wire.app.logout()">This is a trick</a>`')).toEqual(expected);
+    const expected =
+      '<code>&lt;a href=&quot;javascript:wire.app.logout()&quot;&gt;This is a trick&lt;/a&gt;</code>';
+    expect(
+      z.util.render_message(
+        '`<a href="javascript:wire.app.logout()">This is a trick</a>`'
+      )
+    ).toEqual(expected);
   });
 });
 
 describe('Markdown with mixed markups', function() {
   it('renders font weights together with links', function() {
-    const link_1 = '<a href="http://www.link.com" target="_blank" rel="nofollow noopener noreferrer">www.link.com</a>';
+    const link_1 =
+      '<a href="http://www.link.com" target="_blank" rel="nofollow noopener noreferrer">www.link.com</a>';
     const link_2 =
       '<a href="http://www.anotherlink.net" target="_blank" rel="nofollow noopener noreferrer">www.anotherlink.net</a>';
     const expected = `This is <em>italic</em> and <strong>bold</strong> and <strong><em>bold-italic</em></strong> with a ${link_1} and ${link_2}.`;
@@ -4304,7 +4383,9 @@ describe('Markdown with mixed markups', function() {
 
 describe('Ignored Markdown syntax', function() {
   it('only renders correct Markdown syntax', function() {
-    expect(z.util.render_message('This text is not italic.')).toBe('This text is not italic.');
+    expect(z.util.render_message('This text is not italic.')).toBe(
+      'This text is not italic.'
+    );
   });
 
   it('does not render bold text when there is only a single asterisk', function() {
@@ -4325,10 +4406,13 @@ describe('Markdown exceptions', function() {
     expect(z.util.render_message(text)).toBe(text);
   });
 
-  xit('does not render underscores to italic when they are within a sentence', function() {
-    const text = 'calling__voice_channel__fulltitle';
-    expect(z.util.render_message(text)).toBe(text);
-  });
+  xit(
+    'does not render underscores to italic when they are within a sentence',
+    function() {
+      const text = 'calling__voice_channel__fulltitle';
+      expect(z.util.render_message(text)).toBe(text);
+    }
+  );
 });
 
 describe('z.util.print_devices_id', function() {
@@ -4409,11 +4493,17 @@ describe('z.util.format_milliseconds_short', function() {
   });
 
   it('should format duration over 1 hour', function() {
-    expect(z.util.format_milliseconds_short(1000 * 60 * 60 * 3)).toEqual([3, 'h']);
+    expect(z.util.format_milliseconds_short(1000 * 60 * 60 * 3)).toEqual([
+      3,
+      'h'
+    ]);
   });
 
   it('should format duration over 1 day', function() {
-    expect(z.util.format_milliseconds_short(1000 * 60 * 60 * 24 * 3)).toEqual([3, 'd']);
+    expect(z.util.format_milliseconds_short(1000 * 60 * 60 * 24 * 3)).toEqual([
+      3,
+      'd'
+    ]);
   });
 });
 
@@ -4423,59 +4513,99 @@ describe('z.util.is_same_location', function() {
   });
 
   it('returns false if page was accessed from https://wire.com', function() {
-    expect(z.util.is_same_location('https://wire.com', 'https://app.wire.com')).toBeFalsy();
+    expect(
+      z.util.is_same_location('https://wire.com', 'https://app.wire.com')
+    ).toBeFalsy();
   });
 
   it('returns false if page was accessed from https://wire.com/download', function() {
-    expect(z.util.is_same_location('https://wire.com/download', 'https://app.wire.com')).toBeFalsy();
+    expect(
+      z.util.is_same_location(
+        'https://wire.com/download',
+        'https://app.wire.com'
+      )
+    ).toBeFalsy();
   });
 
   it('returns false if page was accessed from https://get.wire.com', function() {
-    expect(z.util.is_same_location('https://get.wire.com', 'https://app.wire.com')).toBeFalsy();
+    expect(
+      z.util.is_same_location('https://get.wire.com', 'https://app.wire.com')
+    ).toBeFalsy();
   });
 
   it('returns false if page was accessed from an external link', function() {
-    expect(z.util.is_same_location('http://www.heise.de', 'https://app.wire.com')).toBeFalsy();
+    expect(
+      z.util.is_same_location('http://www.heise.de', 'https://app.wire.com')
+    ).toBeFalsy();
   });
 
   it('returns false if redirected from auth', function() {
-    expect(z.util.is_same_location('https://app.wire.com/auth', 'https://app.wire.com')).toBeFalsy();
+    expect(
+      z.util.is_same_location(
+        'https://app.wire.com/auth',
+        'https://app.wire.com'
+      )
+    ).toBeFalsy();
   });
 
   it('returns false if redirected from auth with parameter', function() {
     expect(
-      z.util.is_same_location('https://app.wire.com/auth/?env=staging', 'https://app.wire.com/?env=staging')
+      z.util.is_same_location(
+        'https://app.wire.com/auth/?env=staging',
+        'https://app.wire.com/?env=staging'
+      )
     ).toBeFalsy();
   });
 
   it('returns false if redirected from auth with history hashtag', function() {
     expect(
-      z.util.is_same_location('https://app.wire.com/auth/#history', 'https://app.wire.com/?env=staging')
+      z.util.is_same_location(
+        'https://app.wire.com/auth/#history',
+        'https://app.wire.com/?env=staging'
+      )
     ).toBeFalsy();
   });
 
   it('returns false if redirected from auth with login hashtag', function() {
     expect(
-      z.util.is_same_location('https://app.wire.com/auth/?env=staging#login', 'https://app.wire.com/?env=staging')
+      z.util.is_same_location(
+        'https://app.wire.com/auth/?env=staging#login',
+        'https://app.wire.com/?env=staging'
+      )
     ).toBeFalsy();
   });
 
   it('returns false if redirected from auth with registration hashtag', function() {
     expect(
-      z.util.is_same_location('https://app.wire.com/auth/?env=staging#register', 'https://app.wire.com/?env=staging')
+      z.util.is_same_location(
+        'https://app.wire.com/auth/?env=staging#register',
+        'https://app.wire.com/?env=staging'
+      )
     ).toBeFalsy();
   });
 
   it('returns true if auth with login hashtag was reloaded', function() {
-    expect(z.util.is_same_location('https://app.wire.com/auth/#register', 'https://app.wire.com/auth/')).toBeFalsy();
+    expect(
+      z.util.is_same_location(
+        'https://app.wire.com/auth/#register',
+        'https://app.wire.com/auth/'
+      )
+    ).toBeFalsy();
   });
 
   it('returns true if page was reloaded', function() {
-    expect(z.util.is_same_location('https://app.wire.com', 'https://app.wire.com')).toBeTruthy();
+    expect(
+      z.util.is_same_location('https://app.wire.com', 'https://app.wire.com')
+    ).toBeTruthy();
   });
 
   it('returns true if page was reloaded with parameters', function() {
-    expect(z.util.is_same_location('https://app.wire.com/?hl=de', 'https://app.wire.com/?hl=de')).toBeTruthy();
+    expect(
+      z.util.is_same_location(
+        'https://app.wire.com/?hl=de',
+        'https://app.wire.com/?hl=de'
+      )
+    ).toBeTruthy();
   });
 });
 
@@ -4489,12 +4619,16 @@ describe('bucket_values', function() {
     expect(z.util.bucket_values(1, [0, 5, 10, 15, 20, 25])).toBe('1-5');
     expect(z.util.bucket_values(5.5, [0, 5, 10, 15, 20, 25])).toBe('1-5');
     expect(z.util.bucket_values(13, [0, 5, 10, 15, 20, 25])).toBe('11-15');
-    expect(z.util.bucket_values(1023, [0, 100, 200, 500, 1000, 2000])).toBe('1001-2000');
+    expect(z.util.bucket_values(1023, [0, 100, 200, 500, 1000, 2000])).toBe(
+      '1001-2000'
+    );
   });
 
   it('returns the correct bucket if value is above the given limits', function() {
     expect(z.util.bucket_values(100, [0, 5, 10, 15, 20, 25])).toBe('26-');
-    expect(z.util.bucket_values(10023, [0, 100, 200, 500, 1000, 2000])).toBe('2001-');
+    expect(z.util.bucket_values(10023, [0, 100, 200, 500, 1000, 2000])).toBe(
+      '2001-'
+    );
   });
 });
 

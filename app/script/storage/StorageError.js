@@ -75,7 +75,8 @@ z.storage.StorageError = class StorageError extends Error {
       NO_CONVERSATION_ID: 'z.storage.StorageError.TYPE.NO_CONVERSATION_ID',
       NO_SENDER_ID: 'z.storage.StorageError.TYPE.NO_SENDER_ID',
       NO_TIME: 'z.storage.StorageError.TYPE.NO_TIME',
-      NON_SEQUENTIAL_UPDATE: 'z.storage.StorageError.TYPE.NON_SEQUENTIAL_UPDATE',
+      NON_SEQUENTIAL_UPDATE:
+        'z.storage.StorageError.TYPE.NON_SEQUENTIAL_UPDATE',
       NOT_FOUND: 'z.storage.StorageError.TYPE.NOT_FOUND',
       SKIP_LOADING: 'z.storage.StorageError:TYPE.SKIP_SESSIONS',
       UNKNOWN: 'z.storage.StorageError.TYPE.UNKNOWN'

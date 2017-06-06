@@ -28,7 +28,10 @@ z.message.MessageCategorization = (function() {
       let category = z.message.MessageCategory.TEXT;
 
       if (event.data.previews && event.data.previews.length > 0) {
-        category = category | z.message.MessageCategory.LINK | z.message.MessageCategory.LINK_PREVIEW;
+        category =
+          category |
+          z.message.MessageCategory.LINK |
+          z.message.MessageCategory.LINK_PREVIEW;
       }
 
       return category;
@@ -74,7 +77,13 @@ z.message.MessageCategorization = (function() {
         return z.message.MessageCategory.NONE;
       }
 
-      for (const check of [_check_text, _check_image, _check_file, _check_ping, _check_location]) {
+      for (const check of [
+        _check_text,
+        _check_image,
+        _check_file,
+        _check_ping,
+        _check_location
+      ]) {
         const temp_category = check(event);
         if (temp_category) {
           category = temp_category;
@@ -82,7 +91,10 @@ z.message.MessageCategorization = (function() {
         }
       }
 
-      if (_.isObject(event.reactions) && Object.keys(event.reactions).length > 0) {
+      if (
+        _.isObject(event.reactions) &&
+        Object.keys(event.reactions).length > 0
+      ) {
         category = category | z.message.MessageCategory.LIKED;
       }
 

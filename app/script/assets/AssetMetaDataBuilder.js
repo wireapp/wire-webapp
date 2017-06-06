@@ -61,7 +61,13 @@ z.assets.AssetMetaDataBuilder = {
       const url = window.URL.createObjectURL(videofile);
       const video = document.createElement('video');
       video.onloadedmetadata = () => {
-        resolve(new z.proto.Asset.VideoMetaData(video.videoWidth, video.videoHeight, video.duration));
+        resolve(
+          new z.proto.Asset.VideoMetaData(
+            video.videoWidth,
+            video.videoHeight,
+            video.duration
+          )
+        );
         window.URL.revokeObjectURL(url);
       };
       video.onerror = error => {
@@ -80,7 +86,9 @@ z.assets.AssetMetaDataBuilder = {
     const buckets = z.util.ArrayUtil.chunk(channel, bucket_size);
 
     const preview = buckets.map(bucket => {
-      return z.util.NumberUtil.cap_to_byte(AMPLIFIER * z.util.NumberUtil.root_mean_square(bucket));
+      return z.util.NumberUtil.cap_to_byte(
+        AMPLIFIER * z.util.NumberUtil.root_mean_square(bucket)
+      );
     });
 
     return new Uint8Array(preview);

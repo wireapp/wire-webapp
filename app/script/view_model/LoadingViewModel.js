@@ -32,7 +32,10 @@ z.ViewModel.LoadingViewModel = class LoadingViewModel {
       return `${this.loading_progress()}%`;
     });
 
-    amplify.subscribe(z.event.WebApp.APP.UPDATE_PROGRESS, this.update_progress.bind(this));
+    amplify.subscribe(
+      z.event.WebApp.APP.UPDATE_PROGRESS,
+      this.update_progress.bind(this)
+    );
 
     ko.applyBindings(this, document.getElementById(element_id));
   }

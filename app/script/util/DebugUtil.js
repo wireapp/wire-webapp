@@ -25,7 +25,10 @@ window.z.util = z.util || {};
 z.util.DebugUtil = class DebugUtil {
   constructor(user_repository, conversation_repository) {
     this.conversation_repository = conversation_repository;
-    this.logger = new z.util.Logger('z.util.DebugUtil', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger(
+      'z.util.DebugUtil',
+      z.config.LOGGER.OPTIONS
+    );
     this.user_repository = user_repository;
   }
 
@@ -62,7 +65,9 @@ z.util.DebugUtil = class DebugUtil {
   }
 
   get_number_of_clients_in_conversation() {
-    const user_ets = this.conversation_repository.active_conversation().participating_user_ets();
+    const user_ets = this.conversation_repository
+      .active_conversation()
+      .participating_user_ets();
 
     const other_clients = user_ets
       .map(user_et => user_et.devices().length)
@@ -84,44 +89,67 @@ z.util.DebugUtil = class DebugUtil {
       })
       .then(user_et => {
         debug_information.user = user_et;
-        const log_message = `Hey ${this.user_repository.self().name()}, this is for you:`;
+        const log_message = `Hey ${this.user_repository
+          .self()
+          .name()}, this is for you:`;
         this.logger.warn(log_message, debug_information);
-        this.logger.warn(`Conversation: ${debug_information.conversation.name()}`, debug_information.conversation);
-        this.logger.warn(`From: ${debug_information.user.name()}`, debug_information.user);
+        this.logger.warn(
+          `Conversation: ${debug_information.conversation.name()}`,
+          debug_information.conversation
+        );
+        this.logger.warn(
+          `From: ${debug_information.user.name()}`,
+          debug_information.user
+        );
         return debug_information;
       });
   }
 
   get_serialised_session(session_id) {
-    return wire.app.repository.storage.storage_service.load('sessions', session_id).then(function(record) {
-      const base64_encoded_payload = z.util.array_to_base64(record.serialised);
-      record.serialised = base64_encoded_payload;
-      return record;
-    });
+    return wire.app.repository.storage.storage_service
+      .load('sessions', session_id)
+      .then(function(record) {
+        const base64_encoded_payload = z.util.array_to_base64(
+          record.serialised
+        );
+        record.serialised = base64_encoded_payload;
+        return record;
+      });
   }
 
   get_serialised_identity() {
-    return wire.app.repository.storage.storage_service.load('keys', 'local_identity').then(function(record) {
-      const base64_encoded_payload = z.util.array_to_base64(record.serialised);
-      record.serialised = base64_encoded_payload;
-      return record;
-    });
+    return wire.app.repository.storage.storage_service
+      .load('keys', 'local_identity')
+      .then(function(record) {
+        const base64_encoded_payload = z.util.array_to_base64(
+          record.serialised
+        );
+        record.serialised = base64_encoded_payload;
+        return record;
+      });
   }
 
   get_notification_from_stream(notification_id, notification_id_since) {
     const client_id = wire.app.repository.client.current_client().id;
 
     const _got_notifications = ({has_more, notifications}) => {
-      const matching_notifications = notifications.filter(notification => notification.id === notification_id);
+      const matching_notifications = notifications.filter(
+        notification => notification.id === notification_id
+      );
       if (matching_notifications.length) {
         return matching_notifications[0];
       }
 
       if (has_more) {
         const last_notification = notifications[notifications.length - 1];
-        return this.get_notification_from_stream(notification_id, last_notification.id);
+        return this.get_notification_from_stream(
+          notification_id,
+          last_notification.id
+        );
       }
-      this.logger.log(`Notification '${notification_id}' was not found in encrypted notification stream`);
+      this.logger.log(
+        `Notification '${notification_id}' was not found in encrypted notification stream`
+      );
     };
 
     return wire.app.service.notification
@@ -129,7 +157,12 @@ z.util.DebugUtil = class DebugUtil {
       .then(_got_notifications);
   }
 
-  get_notifications_from_stream(remote_user_id, remote_client_id, matching_notifications, notification_id_since) {
+  get_notifications_from_stream(
+    remote_user_id,
+    remote_client_id,
+    matching_notifications,
+    notification_id_since
+  ) {
     if (matching_notifications == null) {
       matching_notifications = [];
     }
@@ -137,20 +170,26 @@ z.util.DebugUtil = class DebugUtil {
     const local_user_id = wire.app.repository.user.self().id;
 
     const _got_notifications = ({has_more, notifications}) => {
-      const additional_notifications = notifications.filter(function(notification) {
+      const additional_notifications = notifications.filter(function(
+        notification
+      ) {
         const {payload} = notification;
         for (const {data, from} of payload) {
           if (data && [local_user_id, remote_user_id].includes(from)) {
             const {sender, recipient} = data;
-            const incoming_event = sender === remote_client_id && recipient === local_client_id;
-            const outgoing_event = sender === local_client_id && recipient === remote_client_id;
+            const incoming_event =
+              sender === remote_client_id && recipient === local_client_id;
+            const outgoing_event =
+              sender === local_client_id && recipient === remote_client_id;
             return incoming_event || outgoing_event;
           }
         }
         return false;
       });
 
-      matching_notifications = matching_notifications.concat(additional_notifications);
+      matching_notifications = matching_notifications.concat(
+        additional_notifications
+      );
       if (has_more) {
         const last_notification = notifications[notifications.length - 1];
         return this.get_notifications_from_stream(
@@ -167,7 +206,9 @@ z.util.DebugUtil = class DebugUtil {
       return matching_notifications;
     };
 
-    const client_scope = remote_user_id === local_user_id ? undefined : local_client_id;
+    const client_scope = remote_user_id === local_user_id
+      ? undefined
+      : local_client_id;
     return wire.app.service.notification
       .get_notifications(client_scope, notification_id_since, 10000)
       .then(_got_notifications);
@@ -201,7 +242,9 @@ z.util.DebugUtil = class DebugUtil {
     });
   }
 
-  get_v2_call_participants(conversation_id = wire.app.repository.conversation.active_conversation().id) {
+  get_v2_call_participants(
+    conversation_id = wire.app.repository.conversation.active_conversation().id
+  ) {
     return wire.app.service.call.get_state(conversation_id).then(response => {
       const participants = [];
 
@@ -212,10 +255,15 @@ z.util.DebugUtil = class DebugUtil {
         }
       }
 
-      this.logger.debug(`Call in '${conversation_id}' has '${participants.length}' joined participant/s`, participants);
+      this.logger.debug(
+        `Call in '${conversation_id}' has '${participants.length}' joined participant/s`,
+        participants
+      );
 
       for (const participant of participants) {
-        this.logger.log(`User '${participant.name()}' with ID '${participant.id}' has state 'joined'.`);
+        this.logger.log(
+          `User '${participant.name()}' with ID '${participant.id}' has state 'joined'.`
+        );
       }
     });
   }
@@ -223,7 +271,12 @@ z.util.DebugUtil = class DebugUtil {
   log_connection_status() {
     this.logger.log('Online Status');
     this.logger.log(`-- Browser online: ${window.navigator.onLine}`);
-    this.logger.log(`-- IndexedDB open: ${wire.app.repository.storage.storage_service.db.isOpen()}`);
-    this.logger.log(`-- WebSocket ready state: ${window.wire.app.service.web_socket.socket.readyState}`);
+    this.logger.log(
+      `-- IndexedDB open: ${wire.app.repository.storage.storage_service.db.isOpen()}`
+    );
+    this.logger.log(
+      `-- WebSocket ready state: ${window.wire.app.service.web_socket.socket
+        .readyState}`
+    );
   }
 };

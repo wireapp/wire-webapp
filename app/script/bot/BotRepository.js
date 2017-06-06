@@ -24,7 +24,10 @@ window.z.bot = z.bot || {};
 
 z.bot.BotRepository = class BotRepository {
   constructor(bot_service, conversation_repository) {
-    this.logger = new z.util.Logger('z.bot.BotRepository', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger(
+      'z.bot.BotRepository',
+      z.config.LOGGER.OPTIONS
+    );
     this.bot_service = bot_service;
     this.conversation_repository = conversation_repository;
   }
@@ -44,14 +47,21 @@ z.bot.BotRepository = class BotRepository {
         bot_result = result;
         this.logger.info(`Info for bot '${bot_name}' retrieved`, bot_result);
         if (create_conversation) {
-          return this.conversation_repository.create_new_conversation([], bot_result.name || bot_name);
+          return this.conversation_repository.create_new_conversation(
+            [],
+            bot_result.name || bot_name
+          );
         }
         return {
           conversation_et: this.conversation_repository.active_conversation()
         };
       })
       .then(({conversation_et}) => {
-        this.conversation_repository.add_bot(conversation_et, bot_result.provider, bot_result.service);
+        this.conversation_repository.add_bot(
+          conversation_et,
+          bot_result.provider,
+          bot_result.service
+        );
         amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversation_et);
       });
   }

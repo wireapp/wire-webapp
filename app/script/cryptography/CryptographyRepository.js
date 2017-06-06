@@ -35,7 +35,10 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
   constructor(cryptography_service, storage_repository) {
     this.cryptography_service = cryptography_service;
     this.storage_repository = storage_repository;
-    this.logger = new z.util.Logger('z.cryptography.CryptographyRepository', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger(
+      'z.cryptography.CryptographyRepository',
+      z.config.LOGGER.OPTIONS
+    );
 
     this.cryptography_mapper = new z.cryptography.CryptographyMapper();
 
@@ -51,25 +54,41 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
   init(db) {
     return Promise.resolve()
       .then(() => {
-        this.logger.info(`Initializing Cryptobox with database '${db.name}'...`);
-        this.cryptobox = new cryptobox.Cryptobox(new cryptobox.store.IndexedDB(db), 10);
+        this.logger.info(
+          `Initializing Cryptobox with database '${db.name}'...`
+        );
+        this.cryptobox = new cryptobox.Cryptobox(
+          new cryptobox.store.IndexedDB(db),
+          10
+        );
 
         this.cryptobox.on(cryptobox.Cryptobox.TOPIC.NEW_PREKEYS, pre_keys => {
           const serialized_pre_keys = pre_keys.map(pre_key => {
             return this.cryptobox.serialize_prekey(pre_key);
           });
 
-          this.logger.log(`Received '${pre_keys.length}' new PreKeys.`, serialized_pre_keys);
+          this.logger.log(
+            `Received '${pre_keys.length}' new PreKeys.`,
+            serialized_pre_keys
+          );
           return this.cryptography_service
             .put_client_prekeys(this.current_client().id, serialized_pre_keys)
             .then(() => {
-              this.logger.log(`Successfully uploaded '${serialized_pre_keys.length}' PreKeys.`);
+              this.logger.log(
+                `Successfully uploaded '${serialized_pre_keys.length}' PreKeys.`
+              );
             });
         });
 
         this.cryptobox.on(cryptobox.Cryptobox.TOPIC.NEW_SESSION, session_id => {
-          const {user_id, client_id} = z.client.Client.dismantle_user_client_id(session_id);
-          amplify.publish(z.event.WebApp.CLIENT.ADD, user_id, new z.client.Client({id: client_id}));
+          const {user_id, client_id} = z.client.Client.dismantle_user_client_id(
+            session_id
+          );
+          amplify.publish(
+            z.event.WebApp.CLIENT.ADD,
+            user_id,
+            new z.client.Client({id: client_id})
+          );
         });
 
         return this.cryptobox.init();
@@ -108,7 +127,9 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
    * @returns {Promise} Resolves with the remote fingerprint
    */
   get_remote_fingerprint(user_id, client_id) {
-    return this._load_session(user_id, client_id).then(cryptobox_session => cryptobox_session.fingerprint_remote());
+    return this._load_session(user_id, client_id).then(cryptobox_session =>
+      cryptobox_session.fingerprint_remote()
+    );
   }
 
   /**
@@ -117,23 +138,37 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
    * @returns {Promise} Resolves with a map of pre-keys for the requested clients
    */
   get_users_pre_keys(user_client_map) {
-    return this.cryptography_service.get_users_pre_keys(user_client_map).catch(error => {
-      if (error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
-        throw new z.user.UserError(z.user.UserError.prototype.TYPE.PRE_KEY_NOT_FOUND);
-      }
-      this.logger.error(`Failed to get pre-key from backend: ${error.message}`);
-      throw new z.user.UserError(z.user.UserError.prototype.TYPE.REQUEST_FAILURE);
-    });
+    return this.cryptography_service
+      .get_users_pre_keys(user_client_map)
+      .catch(error => {
+        if (error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
+          throw new z.user.UserError(
+            z.user.UserError.prototype.TYPE.PRE_KEY_NOT_FOUND
+          );
+        }
+        this.logger.error(
+          `Failed to get pre-key from backend: ${error.message}`
+        );
+        throw new z.user.UserError(
+          z.user.UserError.prototype.TYPE.REQUEST_FAILURE
+        );
+      });
   }
 
   _load_session(user_id, client_id) {
-    return this.cryptobox.session_load(this._construct_session_id(user_id, client_id)).catch(() => {
-      return this.get_users_pre_keys({
-        [user_id]: [client_id]
-      }).then(user_pre_key_map => {
-        return this._session_from_encoded_prekey_payload(user_pre_key_map[user_id][client_id], user_id, client_id);
+    return this.cryptobox
+      .session_load(this._construct_session_id(user_id, client_id))
+      .catch(() => {
+        return this.get_users_pre_keys({
+          [user_id]: [client_id]
+        }).then(user_pre_key_map => {
+          return this._session_from_encoded_prekey_payload(
+            user_pre_key_map[user_id][client_id],
+            user_id,
+            client_id
+          );
+        });
       });
-    });
   }
 
   /**
@@ -158,7 +193,9 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
   create_user_session_map() {
     const user_session_map = {};
     for (const session_id in this.storage_repository.sessions) {
-      const {user_id, client_id} = z.client.Client.dismantle_user_client_id(session_id);
+      const {user_id, client_id} = z.client.Client.dismantle_user_client_id(
+        session_id
+      );
       user_session_map[user_id] = user_session_map[user_id] || [];
       user_session_map[user_id].push(client_id);
     }
@@ -178,7 +215,9 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
   }
 
   delete_session(user_id, client_id) {
-    return this.cryptobox.session_delete(this._construct_session_id(user_id, client_id));
+    return this.cryptobox.session_delete(
+      this._construct_session_id(user_id, client_id)
+    );
   }
 
   /**
@@ -201,13 +240,18 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
       payload.recipients[user_id] = payload.recipients[user_id] || {};
       client_ids.forEach(client_id => {
         cipher_payload_promises.push(
-          this._encrypt_payload_for_session(this._construct_session_id(user_id, client_id), generic_message)
+          this._encrypt_payload_for_session(
+            this._construct_session_id(user_id, client_id),
+            generic_message
+          )
         );
       });
     }
 
     this.logger.log(
-      `Encrypting message of type '${generic_message.content}' for '${Object.keys(payload.recipients).length}' users.`,
+      `Encrypting message of type '${generic_message.content}' for '${Object.keys(
+        payload.recipients
+      ).length}' users.`,
       payload.recipients
     );
 
@@ -216,19 +260,27 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
         const user_client_map_for_missing_sessions = {};
 
         cipher_payloads.forEach(({cipher_text, session_id}) => {
-          const {user_id, client_id} = z.client.Client.dismantle_user_client_id(session_id);
+          const {user_id, client_id} = z.client.Client.dismantle_user_client_id(
+            session_id
+          );
           if (cipher_text) {
             return (payload.recipients[user_id][client_id] = cipher_text);
           }
-          user_client_map_for_missing_sessions[user_id] = user_client_map_for_missing_sessions[user_id] || [];
+          user_client_map_for_missing_sessions[user_id] =
+            user_client_map_for_missing_sessions[user_id] || [];
           user_client_map_for_missing_sessions[user_id].push(client_id);
         });
 
-        return this._encrypt_generic_message_for_new_sessions(user_client_map_for_missing_sessions, generic_message);
+        return this._encrypt_generic_message_for_new_sessions(
+          user_client_map_for_missing_sessions,
+          generic_message
+        );
       })
       .then(additional_cipher_payloads => {
         additional_cipher_payloads.forEach(({cipher_text, session_id}) => {
-          const {user_id, client_id} = z.client.Client.dismantle_user_client_id(session_id);
+          const {user_id, client_id} = z.client.Client.dismantle_user_client_id(
+            session_id
+          );
           payload.recipients[user_id] = payload.recipients[user_id] || {};
           payload.recipients[user_id][client_id] = cipher_text;
         });
@@ -262,11 +314,18 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
       });
   }
 
-  _encrypt_generic_message_for_new_sessions(user_client_map_for_missing_sessions, generic_message) {
+  _encrypt_generic_message_for_new_sessions(
+    user_client_map_for_missing_sessions,
+    generic_message
+  ) {
     if (Object.keys(user_client_map_for_missing_sessions).length) {
       return this.get_users_pre_keys(user_client_map_for_missing_sessions)
         .then(user_pre_key_map => {
-          this.logger.info(`Fetched pre-keys for '${Object.keys(user_pre_key_map).length}' users.`, user_pre_key_map);
+          this.logger.info(
+            `Fetched pre-keys for '${Object.keys(user_pre_key_map)
+              .length}' users.`,
+            user_pre_key_map
+          );
 
           const new_session_promises = [];
 
@@ -274,7 +333,13 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
             const client_pre_key_map = user_pre_key_map[user_id];
             for (const client_id in client_pre_key_map) {
               const remote_pre_key = client_pre_key_map[client_id];
-              new_session_promises.push(this._session_from_encoded_prekey_payload(remote_pre_key, user_id, client_id));
+              new_session_promises.push(
+                this._session_from_encoded_prekey_payload(
+                  remote_pre_key,
+                  user_id,
+                  client_id
+                )
+              );
             }
           }
 
@@ -285,7 +350,12 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
 
           cryptobox_sessions.forEach(cryptobox_session => {
             if (cryptobox_session) {
-              cipher_payload_promises.push(this._encrypt_payload_for_session(cryptobox_session.id, generic_message));
+              cipher_payload_promises.push(
+                this._encrypt_payload_for_session(
+                  cryptobox_session.id,
+                  generic_message
+                )
+              );
             }
           });
 
@@ -330,7 +400,9 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
       })
       .catch(error => {
         if (error instanceof cryptobox.store.RecordNotFoundError) {
-          this.logger.log(`Session '${session_id}' needs to get initialized...`);
+          this.logger.log(
+            `Session '${session_id}' needs to get initialized...`
+          );
           return {session_id: session_id};
         }
         this.logger.warn(
@@ -350,21 +422,33 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
    */
   decrypt_event(event) {
     if (!event.data) {
-      this.logger.error(`Encrypted event with ID '${event.id}' does not contain it's data payload`, event);
+      this.logger.error(
+        `Encrypted event with ID '${event.id}' does not contain it's data payload`,
+        event
+      );
       return Promise.reject(
-        new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.NO_DATA_CONTENT)
+        new z.cryptography.CryptographyError(
+          z.cryptography.CryptographyError.TYPE.NO_DATA_CONTENT
+        )
       );
     }
 
     if (event.data.text === CryptographyRepository.REMOTE_ENCRYPTION_FAILURE) {
       return Promise.reject(
-        new Proteus.errors.DecryptError.InvalidMessage("The sending client couldn't encrypt a message for our client.")
+        new Proteus.errors.DecryptError.InvalidMessage(
+          "The sending client couldn't encrypt a message for our client."
+        )
       );
     }
 
-    const cipher_text = z.util.base64_to_array(event.data.text || event.data.key).buffer;
+    const cipher_text = z.util.base64_to_array(
+      event.data.text || event.data.key
+    ).buffer;
     return this.cryptobox
-      .decrypt(this._construct_session_id(event.from, event.data.sender), cipher_text)
+      .decrypt(
+        this._construct_session_id(event.from, event.data.sender),
+        cipher_text
+      )
       .then(plaintext => z.proto.GenericMessage.decode(plaintext));
   }
 };

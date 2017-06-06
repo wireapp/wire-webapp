@@ -83,7 +83,9 @@ z.media.MediaEmbeds = (function() {
    */
   const _append_iframe = function(link, message, iframe) {
     const link_string = link.outerHTML.replace(/&amp;/g, '&');
-    return message.replace(/&amp;/g, '&').replace(link_string, `${link_string}${iframe}`);
+    return message
+      .replace(/&amp;/g, '&')
+      .replace(link_string, `${link_string}${iframe}`);
   };
 
   /**
@@ -106,7 +108,11 @@ z.media.MediaEmbeds = (function() {
         .substr(url.indexOf('?'), url.length)
         .replace(/^[?]/, '&')
         .replace(/[&]v=[a-zA-Z0-9_-]{11}/, '')
-        .replace(/[&#]t=([a-z0-9]+)/, (temp, timestamp) => `&start=${_convert_youtube_timestamp_to_seconds(timestamp)}`)
+        .replace(
+          /[&#]t=([a-z0-9]+)/,
+          (temp, timestamp) =>
+            `&start=${_convert_youtube_timestamp_to_seconds(timestamp)}`
+        )
         .replace(/[&]?autoplay=1/, ''); // remove autoplay param
 
       // append html5 parameter to youtube src to force html5 mode
@@ -129,10 +135,15 @@ z.media.MediaEmbeds = (function() {
       }
 
       const _extract_unit = function(unit) {
-        return window.parseInt((timestamp.match(new RegExp(`([0-9]+)(?=${unit})`)) || [0])[0], 10);
+        return window.parseInt(
+          (timestamp.match(new RegExp(`([0-9]+)(?=${unit})`)) || [0])[0],
+          10
+        );
       };
 
-      return _extract_unit('h') * 3600 + _extract_unit('m') * 60 + _extract_unit('s');
+      return (
+        _extract_unit('h') * 3600 + _extract_unit('m') * 60 + _extract_unit('s')
+      );
     }
     return 0;
   };
@@ -166,7 +177,10 @@ z.media.MediaEmbeds = (function() {
 
         if (slashes_in_link === 3) {
           is_single_track = true;
-        } else if (slashes_in_link > 3 && link_path_name.indexOf('sets') === -1) {
+        } else if (
+          slashes_in_link > 3 &&
+          link_path_name.indexOf('sets') === -1
+        ) {
           // Fix for WEBAPP-1137
           return message;
         }
@@ -230,7 +244,9 @@ z.media.MediaEmbeds = (function() {
      */
     vimeo(link, message, theme_color) {
       const link_src = link.href;
-      const vimeo_color = theme_color ? theme_color.replace('#', '') : undefined;
+      const vimeo_color = theme_color
+        ? theme_color.replace('#', '')
+        : undefined;
 
       if (link_src.match(_regex.vimeo)) {
         if (z.util.StringUtil.includes(link_src, '/user')) return message;
@@ -241,7 +257,10 @@ z.media.MediaEmbeds = (function() {
         });
 
         let embed = '';
-        link_src.replace(_regex.vimeo, (match, group1) => (embed = iframe.replace('$1', group1)));
+        link_src.replace(
+          _regex.vimeo,
+          (match, group1) => (embed = iframe.replace('$1', group1))
+        );
 
         message = _append_iframe(link, message, embed);
       }

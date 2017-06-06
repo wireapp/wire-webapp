@@ -52,12 +52,15 @@ describe('Localizer', function() {
         }
       ]
     });
-    expect(text).toBe('I’m on Wire. Search for jd@wire.com or visit html://LINK to connect with me.');
+    expect(text).toBe(
+      'I’m on Wire. Search for jd@wire.com or visit html://LINK to connect with me.'
+    );
   });
 
   it('can replace user names in the localization', function() {
     const text = z.localization.Localizer.get_text({
-      id: '%@.first_name won’t see you in search results and won’t be able to send you messages.',
+      id:
+        '%@.first_name won’t see you in search results and won’t be able to send you messages.',
       replace: {
         content: '<span class="user"></span>',
         placeholder: '%@.first_name'

@@ -37,7 +37,9 @@ describe('Conversation Mapper', function() {
 
     it('maps a conversation', function() {
       const {conversation} = entities;
-      const conversation_et = conversation_mapper.map_conversation(conversation);
+      const conversation_et = conversation_mapper.map_conversation(
+        conversation
+      );
 
       const expected_participant_ids = [
         conversation.members.others[0].id,
@@ -46,20 +48,32 @@ describe('Conversation Mapper', function() {
         conversation.members.others[3].id
       ];
 
-      expect(conversation_et.participating_user_ids()).toEqual(expected_participant_ids);
+      expect(conversation_et.participating_user_ids()).toEqual(
+        expected_participant_ids
+      );
       expect(conversation_et.id).toBe(conversation.id);
       expect(conversation_et.name()).toBe(conversation.name);
-      expect(conversation_et.type()).toBe(z.conversation.ConversationType.REGULAR);
+      expect(conversation_et.type()).toBe(
+        z.conversation.ConversationType.REGULAR
+      );
       expect(conversation_et.is_group()).toBeTruthy();
-      expect(conversation_et.number_of_participants()).toBe(conversation.members.others.length);
-      expect(conversation_et.is_muted()).toBe(conversation.members.self.otr_muted);
-      expect(conversation_et.muted_timestamp()).toEqual(new Date(conversation.members.self.otr_muted_ref).getTime());
+      expect(conversation_et.number_of_participants()).toBe(
+        conversation.members.others.length
+      );
+      expect(conversation_et.is_muted()).toBe(
+        conversation.members.self.otr_muted
+      );
+      expect(conversation_et.muted_timestamp()).toEqual(
+        new Date(conversation.members.self.otr_muted_ref).getTime()
+      );
       expect(conversation_et.team_id).toEqual(conversation.team);
     });
 
     it('maps conversations', function() {
       const {conversations} = payload.conversations.get;
-      const conversation_ets = conversation_mapper.map_conversations(conversations);
+      const conversation_ets = conversation_mapper.map_conversations(
+        conversations
+      );
 
       expect(conversation_ets.length).toBe(conversations.length);
       expect(conversation_ets[0].id).toBe(conversations[0].id);
@@ -113,13 +127,18 @@ describe('Conversation Mapper', function() {
   describe('update_properties', () => {
     it('can update the properties of a conversation', function() {
       const creator_id = z.util.create_random_uuid();
-      const conversation_et = conversation_mapper._create_conversation_et(payload.conversations.get.conversations[0]);
+      const conversation_et = conversation_mapper._create_conversation_et(
+        payload.conversations.get.conversations[0]
+      );
       const data = {
         creator: creator_id,
         id: 'd5a39ffb-6ce3-4cc8-9048-0123456789abc',
         name: 'New foo bar conversation name'
       };
-      const updated_conversation_et = conversation_mapper.update_properties(conversation_et, data);
+      const updated_conversation_et = conversation_mapper.update_properties(
+        conversation_et,
+        data
+      );
 
       expect(updated_conversation_et.name()).toBe(data.name);
       expect(updated_conversation_et.id).not.toBe(data.id);
@@ -131,21 +150,28 @@ describe('Conversation Mapper', function() {
     let conversation_et = undefined;
 
     beforeEach(function() {
-      conversation_et = conversation_mapper._create_conversation_et(payload.conversations.get.conversations[0]);
+      conversation_et = conversation_mapper._create_conversation_et(
+        payload.conversations.get.conversations[0]
+      );
     });
 
     it('returns without updating if conversation entity does not exist', function() {
       conversation_et = undefined;
       const self_status = {muted: false};
       expect(conversation_et).toBe(undefined);
-      expect(conversation_mapper.update_self_status(conversation_et, self_status)).toBeFalsy();
+      expect(
+        conversation_mapper.update_self_status(conversation_et, self_status)
+      ).toBeFalsy();
     });
 
     it('can update the self status if the user leaves a conversation', function() {
       const self_status = {
         status: z.conversation.ConversationStatus.PAST_MEMBER
       };
-      const updated_conversation_et = conversation_mapper.update_self_status(conversation_et, self_status);
+      const updated_conversation_et = conversation_mapper.update_self_status(
+        conversation_et,
+        self_status
+      );
       expect(updated_conversation_et.removed_from_conversation()).toBeTruthy();
     });
 
@@ -153,27 +179,38 @@ describe('Conversation Mapper', function() {
       const self_status = {
         status: z.conversation.ConversationStatus.CURRENT_MEMBER
       };
-      const updated_conversation_et = conversation_mapper.update_self_status(conversation_et, self_status);
+      const updated_conversation_et = conversation_mapper.update_self_status(
+        conversation_et,
+        self_status
+      );
       expect(updated_conversation_et.removed_from_conversation()).toBeFalsy();
     });
 
     it('can update the self status with last event timestamp', function() {
       const time = Date.now();
       const self_status = {last_event_timestamp: time};
-      const updated_conversation_et = conversation_mapper.update_self_status(conversation_et, self_status);
+      const updated_conversation_et = conversation_mapper.update_self_status(
+        conversation_et,
+        self_status
+      );
       expect(updated_conversation_et.last_event_timestamp()).toBe(time);
     });
 
     it('can update the self status using otr_archived', function() {
       const time = Date.now();
       conversation_et.last_event_timestamp(time);
-      const otr_archived_ref = new Date(conversation_et.last_event_timestamp()).toISOString();
+      const otr_archived_ref = new Date(
+        conversation_et.last_event_timestamp()
+      ).toISOString();
 
       const self_status = {
         otr_archived: true,
         otr_archived_ref: otr_archived_ref
       };
-      const updated_conversation_et = conversation_mapper.update_self_status(conversation_et, self_status);
+      const updated_conversation_et = conversation_mapper.update_self_status(
+        conversation_et,
+        self_status
+      );
 
       expect(updated_conversation_et.archived_timestamp()).toBe(time);
       expect(updated_conversation_et.archived_state()).toBe(true);
@@ -186,7 +223,10 @@ describe('Conversation Mapper', function() {
         archived_state: true,
         archived_timestamp: archived_timestamp
       };
-      const updated_conversation_et = conversation_mapper.update_self_status(conversation_et, self_status);
+      const updated_conversation_et = conversation_mapper.update_self_status(
+        conversation_et,
+        self_status
+      );
       expect(updated_conversation_et.archived_timestamp()).toBe(time);
       expect(updated_conversation_et.archived_state()).toBe(true);
     });
@@ -197,8 +237,13 @@ describe('Conversation Mapper', function() {
         archived_state: false,
         archived_timestamp: archived_timestamp
       };
-      const updated_conversation_et = conversation_mapper.update_self_status(conversation_et, self_status);
-      expect(updated_conversation_et.archived_timestamp()).toBe(archived_timestamp);
+      const updated_conversation_et = conversation_mapper.update_self_status(
+        conversation_et,
+        self_status
+      );
+      expect(updated_conversation_et.archived_timestamp()).toBe(
+        archived_timestamp
+      );
       expect(updated_conversation_et.archived_state()).toBe(false);
     });
 
@@ -211,7 +256,10 @@ describe('Conversation Mapper', function() {
         last_event_timestamp: last_event_timestamp
       };
 
-      const updated_conversation_et = conversation_mapper.update_self_status(conversation_et, self_status);
+      const updated_conversation_et = conversation_mapper.update_self_status(
+        conversation_et,
+        self_status
+      );
 
       expect(updated_conversation_et.last_event_timestamp()).toBe(time);
       expect(updated_conversation_et.cleared_timestamp()).toBe(time);
@@ -220,20 +268,28 @@ describe('Conversation Mapper', function() {
     it('can update the self status if a conversation is read', function() {
       const time = Date.now();
       const self_status = {last_read_timestamp: time};
-      const updated_conversation_et = conversation_mapper.update_self_status(conversation_et, self_status);
+      const updated_conversation_et = conversation_mapper.update_self_status(
+        conversation_et,
+        self_status
+      );
       expect(updated_conversation_et.last_read_timestamp()).toBe(time);
     });
 
     it('can update the self status if a conversation is muted', function() {
       const time = Date.now();
       conversation_et.last_event_timestamp(time);
-      const otr_muted_ref = new Date(conversation_et.last_event_timestamp()).toISOString();
+      const otr_muted_ref = new Date(
+        conversation_et.last_event_timestamp()
+      ).toISOString();
       const self_status = {
         otr_muted: true,
         otr_muted_ref: otr_muted_ref
       };
 
-      const updated_conversation_et = conversation_mapper.update_self_status(conversation_et, self_status);
+      const updated_conversation_et = conversation_mapper.update_self_status(
+        conversation_et,
+        self_status
+      );
 
       expect(updated_conversation_et.last_event_timestamp()).toBe(time);
       expect(updated_conversation_et.muted_state()).toBe(true);
@@ -242,9 +298,17 @@ describe('Conversation Mapper', function() {
     it('accepts string values which must be parsed later on', function() {
       conversation_et.last_read_timestamp(0);
       const self_status = {last_read_timestamp: '1480339377099'};
-      const last_read_timestamp_number = window.parseInt(self_status.last_read_timestamp, 10);
-      const updated_conversation_et = conversation_mapper.update_self_status(conversation_et, self_status);
-      expect(updated_conversation_et.last_read_timestamp()).toBe(last_read_timestamp_number);
+      const last_read_timestamp_number = window.parseInt(
+        self_status.last_read_timestamp,
+        10
+      );
+      const updated_conversation_et = conversation_mapper.update_self_status(
+        conversation_et,
+        self_status
+      );
+      expect(updated_conversation_et.last_read_timestamp()).toBe(
+        last_read_timestamp_number
+      );
     });
   });
 
@@ -298,7 +362,10 @@ describe('Conversation Mapper', function() {
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
       // @formatter:on
 
-      const merged_conversations = conversation_mapper.merge_conversations([local_data], [remote_data]);
+      const merged_conversations = conversation_mapper.merge_conversations(
+        [local_data],
+        [remote_data]
+      );
       const merged_data = merged_conversations[0];
 
       expect(merged_data.creator).toBe(remote_data.creator);
@@ -309,15 +376,23 @@ describe('Conversation Mapper', function() {
       expect(merged_data.type).toBe(remote_data.type);
 
       expect(merged_data.archived_state).toBe(local_data.archived_state);
-      expect(merged_data.archived_timestamp).toBe(local_data.archived_timestamp);
+      expect(merged_data.archived_timestamp).toBe(
+        local_data.archived_timestamp
+      );
       expect(merged_data.cleared_timestamp).toBe(local_data.cleared_timestamp);
       expect(merged_data.ephemeral_timer).toBe(local_data.ephemeral_timer);
       expect(merged_data.id).toBe(local_data.id);
-      expect(merged_data.last_event_timestamp).toBe(local_data.last_event_timestamp);
-      expect(merged_data.last_read_timestamp).toBe(local_data.last_read_timestamp);
+      expect(merged_data.last_event_timestamp).toBe(
+        local_data.last_event_timestamp
+      );
+      expect(merged_data.last_read_timestamp).toBe(
+        local_data.last_read_timestamp
+      );
       expect(merged_data.muted_state).toBe(local_data.muted_state);
       expect(merged_data.muted_timestamp).toBe(local_data.muted_timestamp);
-      expect(merged_data.verification_state).toBe(local_data.verification_state);
+      expect(merged_data.verification_state).toBe(
+        local_data.verification_state
+      );
     });
 
     it('should set muted and archived data on local data if not present', function() {
@@ -364,7 +439,10 @@ describe('Conversation Mapper', function() {
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
       // @formatter:on
 
-      const merged_conversations = conversation_mapper.merge_conversations([local_data], [remote_data]);
+      const merged_conversations = conversation_mapper.merge_conversations(
+        [local_data],
+        [remote_data]
+      );
       const merged_data = merged_conversations[0];
 
       expect(merged_data.creator).toBe(remote_data.creator);
@@ -376,15 +454,27 @@ describe('Conversation Mapper', function() {
       expect(merged_data.cleared_timestamp).toBe(local_data.cleared_timestamp);
       expect(merged_data.ephemeral_timer).toBe(local_data.ephemeral_timer);
       expect(merged_data.id).toBe(local_data.id);
-      expect(merged_data.last_event_timestamp).toBe(local_data.last_event_timestamp);
-      expect(merged_data.last_read_timestamp).toBe(local_data.last_read_timestamp);
-      expect(merged_data.verification_state).toBe(local_data.verification_state);
+      expect(merged_data.last_event_timestamp).toBe(
+        local_data.last_event_timestamp
+      );
+      expect(merged_data.last_read_timestamp).toBe(
+        local_data.last_read_timestamp
+      );
+      expect(merged_data.verification_state).toBe(
+        local_data.verification_state
+      );
 
-      expect(merged_data.archived_state).toBe(remote_data.members.self.otr_archived);
-      expect(merged_data.archived_timestamp).toBe(new Date(remote_data.members.self.otr_archived_ref).getTime());
+      expect(merged_data.archived_state).toBe(
+        remote_data.members.self.otr_archived
+      );
+      expect(merged_data.archived_timestamp).toBe(
+        new Date(remote_data.members.self.otr_archived_ref).getTime()
+      );
 
       expect(merged_data.muted_state).toBe(remote_data.members.self.otr_muted);
-      expect(merged_data.muted_timestamp).toBe(new Date(remote_data.members.self.otr_muted_ref).getTime());
+      expect(merged_data.muted_timestamp).toBe(
+        new Date(remote_data.members.self.otr_muted_ref).getTime()
+      );
     });
 
     it('merged data contains remote data', function() {
@@ -423,7 +513,10 @@ describe('Conversation Mapper', function() {
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
       // @formatter:on
 
-      const merged_conversations = conversation_mapper.merge_conversations([], [remote_data]);
+      const merged_conversations = conversation_mapper.merge_conversations(
+        [],
+        [remote_data]
+      );
       const merged_data = merged_conversations[0];
 
       expect(merged_data.creator).toBe(remote_data.creator);
@@ -481,7 +574,10 @@ describe('Conversation Mapper', function() {
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
       // @formatter:on
 
-      const merged_conversations = conversation_mapper.merge_conversations([local_data], [remote_data]);
+      const merged_conversations = conversation_mapper.merge_conversations(
+        [local_data],
+        [remote_data]
+      );
       const merged_data = merged_conversations[0];
 
       expect(merged_data.creator).toBe(remote_data.creator);
@@ -493,18 +589,30 @@ describe('Conversation Mapper', function() {
       expect(merged_data.cleared_timestamp).toBe(local_data.cleared_timestamp);
       expect(merged_data.ephemeral_timer).toBe(local_data.ephemeral_timer);
       expect(merged_data.id).toBe(local_data.id);
-      expect(merged_data.last_event_timestamp).toBe(local_data.last_event_timestamp);
-      expect(merged_data.last_read_timestamp).toBe(local_data.last_read_timestamp);
+      expect(merged_data.last_event_timestamp).toBe(
+        local_data.last_event_timestamp
+      );
+      expect(merged_data.last_read_timestamp).toBe(
+        local_data.last_read_timestamp
+      );
 
       expect(merged_data.muted_timestamp).toBe(local_data.muted_timestamp);
-      expect(merged_data.verification_state).toBe(local_data.verification_state);
+      expect(merged_data.verification_state).toBe(
+        local_data.verification_state
+      );
 
       // remote one is newer
-      expect(merged_data.archived_state).toBe(remote_data.members.self.otr_archived);
-      expect(merged_data.archived_timestamp).toBe(new Date(remote_data.members.self.otr_archived_ref).getTime());
+      expect(merged_data.archived_state).toBe(
+        remote_data.members.self.otr_archived
+      );
+      expect(merged_data.archived_timestamp).toBe(
+        new Date(remote_data.members.self.otr_archived_ref).getTime()
+      );
 
       expect(merged_data.muted_state).toBe(remote_data.members.self.otr_muted);
-      expect(merged_data.muted_timestamp).toBe(new Date(remote_data.members.self.otr_muted_ref).getTime());
+      expect(merged_data.muted_timestamp).toBe(
+        new Date(remote_data.members.self.otr_muted_ref).getTime()
+      );
     });
 
     it('only maps other participants if they are still in the conversation', function() {
@@ -548,7 +656,10 @@ describe('Conversation Mapper', function() {
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
       // @formatter:on
 
-      const merged_conversations = conversation_mapper.merge_conversations([], [remote_data]);
+      const merged_conversations = conversation_mapper.merge_conversations(
+        [],
+        [remote_data]
+      );
       const merged_data = merged_conversations[0];
 
       expect(merged_data.others.length).toBe(2);

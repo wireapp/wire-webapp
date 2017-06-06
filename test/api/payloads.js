@@ -179,7 +179,10 @@ window.payload = {
   clients: {
     get: {
       one: entities.clients.john_doe.permanent,
-      many: [entities.clients.john_doe.temporary, entities.clients.john_doe.permanent]
+      many: [
+        entities.clients.john_doe.temporary,
+        entities.clients.john_doe.permanent
+      ]
     }
   },
   connections: {

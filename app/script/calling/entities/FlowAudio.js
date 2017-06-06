@@ -32,7 +32,10 @@ z.calling.entities.FlowAudio = class FlowAudio {
   constructor(flow_et, media_repository) {
     this.flow_et = flow_et;
     this.media_repository = media_repository;
-    this.logger = new z.util.Logger(`z.calling.FlowAudio (${this.flow_et.id})`, z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger(
+      `z.calling.FlowAudio (${this.flow_et.id})`,
+      z.config.LOGGER.OPTIONS
+    );
 
     this.audio_context = undefined;
 
@@ -43,7 +46,9 @@ z.calling.entities.FlowAudio = class FlowAudio {
       this.panning = this.flow_et.participant_et.panning;
     }
     this.panning.subscribe(updated_panning_value => {
-      this.logger.debug(`Panning of ${this.flow_et.remote_user.name()} changed to '${updated_panning_value}'`);
+      this.logger.debug(
+        `Panning of ${this.flow_et.remote_user.name()} changed to '${updated_panning_value}'`
+      );
       this.set_pan(updated_panning_value);
     });
 
@@ -52,7 +57,10 @@ z.calling.entities.FlowAudio = class FlowAudio {
     this.audio_source = undefined;
     this.audio_remote = undefined;
 
-    amplify.subscribe(z.event.WebApp.CALL.MEDIA.MUTE_AUDIO, this.set_gain_node.bind(this));
+    amplify.subscribe(
+      z.event.WebApp.CALL.MEDIA.MUTE_AUDIO,
+      this.set_gain_node.bind(this)
+    );
   }
 
   /**
@@ -128,7 +136,9 @@ z.calling.entities.FlowAudio = class FlowAudio {
       const audio_context = this._get_audio_context();
 
       if (audio_context) {
-        const remote_source = audio_context.createMediaStreamSource(media_stream);
+        const remote_source = audio_context.createMediaStreamSource(
+          media_stream
+        );
         const audio_output_device = audio_context.createMediaStreamDestination();
 
         this.pan_node = audio_context.createStereoPanner();
@@ -153,7 +163,11 @@ z.calling.entities.FlowAudio = class FlowAudio {
    * @returns {AudioContext} Active AudioContext
    */
   _get_audio_context() {
-    if (!this.audio_context || this.audio_context.state === z.media.MediaRepository.AUDIO_CONTEXT_STATE.CLOSED) {
+    if (
+      !this.audio_context ||
+      this.audio_context.state ===
+        z.media.MediaRepository.AUDIO_CONTEXT_STATE.CLOSED
+    ) {
       this.audio_context = this.media_repository.get_audio_context();
     }
     return this.audio_context;

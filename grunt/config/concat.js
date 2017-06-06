@@ -22,7 +22,9 @@
 module.exports = {
   deploy: {
     files: {
-      'deploy/min/wire-vendor.min.js': ['deploy/min/wire-vendor.min.js'].concat('<%= scripts_minified.vendor %>')
+      'deploy/min/wire-vendor.min.js': ['deploy/min/wire-vendor.min.js'].concat(
+        '<%= scripts_minified.vendor %>'
+      )
     }
   }
 };

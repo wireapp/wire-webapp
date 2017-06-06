@@ -54,24 +54,33 @@ describe('Giphy Repository', function() {
           type: 'gif',
           id: 'GKLmFicoabZrW',
           url: 'http://giphy.com/gifs/big-thank-indulging-GKLmFicoabZrW',
-          image_original_url: 'http://s3.amazonaws.com/giphygifs/media/GKLmFicoabZrW/giphy.gif',
-          image_url: 'http://s3.amazonaws.com/giphygifs/media/GKLmFicoabZrW/giphy.gif',
-          image_mp4_url: 'http://s3.amazonaws.com/giphygifs/media/GKLmFicoabZrW/giphy.mp4',
+          image_original_url:
+            'http://s3.amazonaws.com/giphygifs/media/GKLmFicoabZrW/giphy.gif',
+          image_url:
+            'http://s3.amazonaws.com/giphygifs/media/GKLmFicoabZrW/giphy.gif',
+          image_mp4_url:
+            'http://s3.amazonaws.com/giphygifs/media/GKLmFicoabZrW/giphy.mp4',
           image_frames: '10',
           image_width: '320',
           image_height: '244',
-          fixed_height_downsampled_url: 'http://s3.amazonaws.com/giphygifs/media/GKLmFicoabZrW/200_d.gif',
+          fixed_height_downsampled_url:
+            'http://s3.amazonaws.com/giphygifs/media/GKLmFicoabZrW/200_d.gif',
           fixed_height_downsampled_width: '262',
           fixed_height_downsampled_height: '200',
-          fixed_width_downsampled_url: 'http://s3.amazonaws.com/giphygifs/media/GKLmFicoabZrW/200w_d.gif',
+          fixed_width_downsampled_url:
+            'http://s3.amazonaws.com/giphygifs/media/GKLmFicoabZrW/200w_d.gif',
           fixed_width_downsampled_width: '200',
           fixed_width_downsampled_height: '153',
-          fixed_height_small_url: 'http://s3.amazonaws.com/giphygifs/media/GKLmFicoabZrW/100.gif',
-          fixed_height_small_still_url: 'http://s3.amazonaws.com/giphygifs/media/GKLmFicoabZrW/100_s.gif',
+          fixed_height_small_url:
+            'http://s3.amazonaws.com/giphygifs/media/GKLmFicoabZrW/100.gif',
+          fixed_height_small_still_url:
+            'http://s3.amazonaws.com/giphygifs/media/GKLmFicoabZrW/100_s.gif',
           fixed_height_small_width: '131',
           fixed_height_small_height: '100',
-          fixed_width_small_url: 'http://s3.amazonaws.com/giphygifs/media/GKLmFicoabZrW/100w.gif',
-          fixed_width_small_still_url: 'http://s3.amazonaws.com/giphygifs/media/GKLmFicoabZrW/100w_s.gif',
+          fixed_width_small_url:
+            'http://s3.amazonaws.com/giphygifs/media/GKLmFicoabZrW/100w.gif',
+          fixed_width_small_still_url:
+            'http://s3.amazonaws.com/giphygifs/media/GKLmFicoabZrW/100w_s.gif',
           fixed_width_small_width: '100',
           fixed_width_small_height: '76'
         },
@@ -94,7 +103,8 @@ describe('Giphy Repository', function() {
           bitly_url: 'http://gph.is/1Q95Wje',
           embed_url: 'https://giphy.com/embed/GKLmFicoabZrW',
           username: '',
-          source: 'http://jezebel.com/big-sean-is-indulging-in-some-me-time-thank-you-1701548048',
+          source:
+            'http://jezebel.com/big-sean-is-indulging-in-some-me-time-thank-you-1701548048',
           rating: 'pg',
           caption: '',
           content_url: '',

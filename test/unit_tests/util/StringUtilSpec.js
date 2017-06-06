@@ -24,35 +24,49 @@
 describe('z.util.StringUtil', function() {
   describe('compare_transliteration', function() {
     it('René equals Rene', function() {
-      expect(z.util.StringUtil.compare_transliteration('René', 'Rene')).toBeTruthy();
+      expect(
+        z.util.StringUtil.compare_transliteration('René', 'Rene')
+      ).toBeTruthy();
     });
 
     it('Παναγιώτα equals Panagiota', function() {
-      expect(z.util.StringUtil.compare_transliteration('Παναγιώτα', 'Panagiota')).toBeTruthy();
+      expect(
+        z.util.StringUtil.compare_transliteration('Παναγιώτα', 'Panagiota')
+      ).toBeTruthy();
     });
 
     it('ΠΑΝΑΓΙΩΤΑ equals PANAGIOTA', function() {
-      expect(z.util.StringUtil.compare_transliteration('ΠΑΝΑΓΙΩΤΑ', 'PANAGIOTA')).toBeTruthy();
+      expect(
+        z.util.StringUtil.compare_transliteration('ΠΑΝΑΓΙΩΤΑ', 'PANAGIOTA')
+      ).toBeTruthy();
     });
 
     it('Björn equals Bjoern', function() {
-      expect(z.util.StringUtil.compare_transliteration('Björn', 'Bjoern')).toBeTruthy();
+      expect(
+        z.util.StringUtil.compare_transliteration('Björn', 'Bjoern')
+      ).toBeTruthy();
     });
 
     it('Bjørn equals Bjorn', function() {
-      expect(z.util.StringUtil.compare_transliteration('Bjørn', 'Bjorn')).toBeTruthy();
+      expect(
+        z.util.StringUtil.compare_transliteration('Bjørn', 'Bjorn')
+      ).toBeTruthy();
     });
   });
 
   describe('format', function() {
     it('returns string with replaced placeholder', function() {
-      expect(z.util.StringUtil.format('foo={0}&bar={1}', 1, 2)).toBe('foo=1&bar=2');
+      expect(z.util.StringUtil.format('foo={0}&bar={1}', 1, 2)).toBe(
+        'foo=1&bar=2'
+      );
     });
   });
 
   describe('get_random_character', function() {
     it('always returns an alphanumeric character', function() {
-      _.range(1000).map(() => expect(z.util.StringUtil.get_random_character()).toMatch(/(\w|\d){1}/));
+      _.range(1000).map(() =>
+        expect(z.util.StringUtil.get_random_character()).toMatch(/(\w|\d){1}/)
+      );
     });
   });
 
@@ -105,7 +119,9 @@ describe('z.util.StringUtil', function() {
 
   describe('remove_line_breaks', function() {
     it('removes all the line breaks', function() {
-      expect(z.util.StringUtil.remove_line_breaks('\nA\nB\nC\nD\n')).toBe('ABCD');
+      expect(z.util.StringUtil.remove_line_breaks('\nA\nB\nC\nD\n')).toBe(
+        'ABCD'
+      );
     });
   });
 
@@ -114,13 +130,23 @@ describe('z.util.StringUtil', function() {
       const string_1 = 'a b';
       const string_2 = 'c d';
 
-      expect(z.util.StringUtil.sort_by_priority(string_1, string_2)).toEqual(-1);
+      expect(z.util.StringUtil.sort_by_priority(string_1, string_2)).toEqual(
+        -1
+      );
       expect(z.util.StringUtil.sort_by_priority(string_2, string_1)).toEqual(1);
       expect(z.util.StringUtil.sort_by_priority(string_1, string_1)).toEqual(0);
-      expect(z.util.StringUtil.sort_by_priority(string_1, string_2, 'a')).toEqual(-1);
-      expect(z.util.StringUtil.sort_by_priority(string_1, string_2, 'c')).toEqual(1);
-      expect(z.util.StringUtil.sort_by_priority(string_1, string_2, 'A')).toEqual(-1);
-      expect(z.util.StringUtil.sort_by_priority(string_1, string_2, 'C')).toEqual(1);
+      expect(
+        z.util.StringUtil.sort_by_priority(string_1, string_2, 'a')
+      ).toEqual(-1);
+      expect(
+        z.util.StringUtil.sort_by_priority(string_1, string_2, 'c')
+      ).toEqual(1);
+      expect(
+        z.util.StringUtil.sort_by_priority(string_1, string_2, 'A')
+      ).toEqual(-1);
+      expect(
+        z.util.StringUtil.sort_by_priority(string_1, string_2, 'C')
+      ).toEqual(1);
     });
   });
 
@@ -139,37 +165,58 @@ describe('z.util.StringUtil', function() {
 
   describe('z.util.trim_line_breaks', function() {
     it('removes line breaks at the beginning and/or end', function() {
-      expect(z.util.StringUtil.trim_line_breaks('\n\n\n\n\nB\nC\nD')).toBe('B\nC\nD');
-      expect(z.util.StringUtil.trim_line_breaks('B\nC\nD\n\n\n\n\n')).toBe('B\nC\nD');
-      expect(z.util.StringUtil.trim_line_breaks('\n\n\n\nB\nC\n\n\n\n\n')).toBe('B\nC');
+      expect(z.util.StringUtil.trim_line_breaks('\n\n\n\n\nB\nC\nD')).toBe(
+        'B\nC\nD'
+      );
+      expect(z.util.StringUtil.trim_line_breaks('B\nC\nD\n\n\n\n\n')).toBe(
+        'B\nC\nD'
+      );
+      expect(z.util.StringUtil.trim_line_breaks('\n\n\n\nB\nC\n\n\n\n\n')).toBe(
+        'B\nC'
+      );
     });
 
     it('does not remove line breaks in between', function() {
-      expect(z.util.StringUtil.trim_line_breaks('A\nB\nC\nD')).toBe('A\nB\nC\nD');
+      expect(z.util.StringUtil.trim_line_breaks('A\nB\nC\nD')).toBe(
+        'A\nB\nC\nD'
+      );
     });
   });
 
   describe('truncate', function() {
     it('returns the full string if it is shorter than the target length', function() {
-      const text = z.util.StringUtil.truncate(`${lorem_ipsum.substr(0, 80)}`, 90);
+      const text = z.util.StringUtil.truncate(
+        `${lorem_ipsum.substr(0, 80)}`,
+        90
+      );
       expect(text.length).toBe(80);
       expect(text.charAt(79)).not.toBe('…');
     });
 
     it('returns a truncated string of correct length if it is longer than the target length', function() {
-      const text = z.util.StringUtil.truncate(`${lorem_ipsum.substr(0, 80)}`, 70);
+      const text = z.util.StringUtil.truncate(
+        `${lorem_ipsum.substr(0, 80)}`,
+        70
+      );
       expect(text.length).toBe(64);
       expect(text.charAt(63)).toBe('…');
     });
 
     it('returns a truncated string of correct length if word boundary is disabled', function() {
-      const text = z.util.StringUtil.truncate(`${lorem_ipsum.substr(0, 80)}`, 70, false);
+      const text = z.util.StringUtil.truncate(
+        `${lorem_ipsum.substr(0, 80)}`,
+        70,
+        false
+      );
       expect(text.length).toBe(70);
       expect(text.charAt(69)).toBe('…');
     });
 
     it('returns a truncated string of correct length if word boundary is disabled and there are no whitespaces in the string', function() {
-      const text = z.util.StringUtil.truncate(`${lorem_ipsum.replace(/\s/g, '').substr(0, 80)}`, 70);
+      const text = z.util.StringUtil.truncate(
+        `${lorem_ipsum.replace(/\s/g, '').substr(0, 80)}`,
+        70
+      );
       expect(text.length).toBe(70);
       expect(text.charAt(69)).toBe('…');
     });

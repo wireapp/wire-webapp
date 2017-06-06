@@ -34,12 +34,14 @@ ko.bindingHandlers.focus_on_keydown = {
             }
 
             const meta_key_is_pressed = event.metaKey || event.ctrlKey;
-            const is_paste_action = meta_key_is_pressed && event.keyCode === z.util.KEYCODE.KEY_V;
+            const is_paste_action =
+              meta_key_is_pressed && event.keyCode === z.util.KEYCODE.KEY_V;
             const is_arrow_key = z.util.KEYCODE.is_arrow_key(event.keyCode);
 
             // check for activeElement needed, cause in IE11 i could be undefined under some circumstances
             const active_element_is_input =
-              document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName);
+              document.activeElement &&
+              ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName);
 
             if (!active_element_is_input && !is_arrow_key) {
               if (!meta_key_is_pressed || is_paste_action) {
@@ -65,7 +67,8 @@ ko.bindingHandlers.show_all_timestamps = {
 
     $element.on('mousemove mouseout', function(event) {
       const rect = $(this).find('.messages')[0].getBoundingClientRect();
-      const show_timestamps = event.clientX > rect.right - 64 && event.clientX < rect.right;
+      const show_timestamps =
+        event.clientX > rect.right - 64 && event.clientX < rect.right;
       $('.time').toggleClass('show-timestamp', show_timestamps);
     });
   }
@@ -106,7 +109,9 @@ ko.bindingHandlers.background_image = {
     const asset_remote_data = valueAccessor();
 
     const viewport_changed = allBindingsAccessor.get('viewport_changed');
-    const viewport_subscription = viewport_changed.subscribe(_on_viewport_change);
+    const viewport_subscription = viewport_changed.subscribe(
+      _on_viewport_change
+    );
     const asset_subscription = asset_remote_data.subscribe(_on_viewport_change);
 
     _on_viewport_change();
@@ -147,7 +152,9 @@ ko.bindingHandlers.relative_timestamp = (function() {
     }
 
     if (current_day === yesterday) {
-      return `${z.l10n.text(z.string.conversation_yesterday)} ${date.local().format('HH:mm')}`;
+      return `${z.l10n.text(
+        z.string.conversation_yesterday
+      )} ${date.local().format('HH:mm')}`;
     }
 
     if (moment().diff(date, 'days') < 7) {
@@ -172,11 +179,15 @@ ko.bindingHandlers.relative_timestamp = (function() {
     }
 
     if (current_day === today) {
-      return `${z.l10n.text(z.string.conversation_today)} ${date.local().format('HH:mm')}`;
+      return `${z.l10n.text(z.string.conversation_today)} ${date
+        .local()
+        .format('HH:mm')}`;
     }
 
     if (current_day === yesterday) {
-      return `${z.l10n.text(z.string.conversation_yesterday)} ${date.local().format('HH:mm')}`;
+      return `${z.l10n.text(
+        z.string.conversation_yesterday
+      )} ${date.local().format('HH:mm')}`;
     }
 
     if (moment().diff(date, 'days') < 7) {
@@ -205,7 +216,11 @@ ko.bindingHandlers.relative_timestamp = (function() {
   return {
     init(element, valueAccessor, allBindings) {
       const timestamp_func = function() {
-        calculate(element, valueAccessor(), allBindings.get('relative_timestamp_day'));
+        calculate(
+          element,
+          valueAccessor(),
+          allBindings.get('relative_timestamp_day')
+        );
       };
 
       timestamp_func();
