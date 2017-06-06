@@ -9,7 +9,7 @@ plugins:
   - jsdoc
 
 extends:
-  "eslint:recommended"
+  - prettier
 
 globals:
   $: true
@@ -50,11 +50,6 @@ globals:
   zeta: true
 
 rules:
-  constructor-super: 2
-  default-case: 2
-  func-call-spacing: 2
-  handle-callback-err: 2
-  id-length: [2, {exceptions: ['z']}]
   jsdoc/require-hyphen-before-param-description: 2
   no-console: 0
   no-const-assign: 2
@@ -79,7 +74,6 @@ rules:
   ]
   sort-keys: [2, asc, {caseSensitive: true, natural: true}]
   sort-vars: 2
-  spaced-comment: [2, always, {exceptions: ["#"]}]
   strict: [2, global]
   valid-jsdoc:
     - error
