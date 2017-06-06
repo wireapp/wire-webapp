@@ -759,7 +759,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
       wire.app.view.content.multitasking.is_minimized(true);
       notification_content.trigger();
       this.logger.info(`Notification for '${message_id} in '${conversation_id}' closed by click.`);
-      return notification.close();
+      notification.close();
     };
 
     notification.onclose = () => {
@@ -770,13 +770,13 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
 
     notification.onerror = () => {
       this.logger.error(`Notification for '${message_id}' in '${conversation_id}' closed by error.`);
-      return notification.close();
+      notification.close();
     };
 
     notification.onshow = () => {
-      return timeout_trigger_id = window.setTimeout(() => {
+      timeout_trigger_id = window.setTimeout(() => {
         this.logger.info(`Notification for '${message_id}' in '${conversation_id}' closed by timeout.`);
-        return notification.close();
+        notification.close();
       }
       , notification_content.timeout);
     };
