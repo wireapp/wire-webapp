@@ -396,9 +396,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
           .unblock_user(user_et)
           .then(() => {
             this.participants_bubble.hide();
-            return this.conversation_repository.get_one_to_one_conversation(
-              user_et,
-            );
+            return this.conversation_repository.get_1to1_conversation(user_et);
           })
           .then(conversation_et => {
             this.conversation_repository.update_participating_user_ets(

@@ -57,7 +57,7 @@ z.entity.Conversation = class Conversation {
       () => this.participating_user_ids().length,
     );
 
-    this.is_guest = false;
+    this.is_guest = ko.observable(false);
     this.is_managed = false;
 
     this.is_group = ko.pureComputed(() => {
@@ -297,6 +297,7 @@ z.entity.Conversation = class Conversation {
       this.archived_state,
       this.cleared_timestamp,
       this.ephemeral_timer,
+      this.is_guest,
       this.last_event_timestamp,
       this.last_read_timestamp,
       this.muted_state,
@@ -742,7 +743,7 @@ z.entity.Conversation = class Conversation {
       cleared_timestamp: this.cleared_timestamp(),
       ephemeral_timer: this.ephemeral_timer(),
       id: this.id,
-      is_guest: this.is_guest,
+      is_guest: this.is_guest(),
       is_managed: this.is_managed,
       last_event_timestamp: this.last_event_timestamp(),
       last_read_timestamp: this.last_read_timestamp(),

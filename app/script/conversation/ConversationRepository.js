@@ -68,6 +68,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.conversations = ko.observableArray([]);
 
     this.active_team = this.team_repository.active_team;
+    this.team_repository.teams.subscribe(() => this.map_guest_status());
 
     this.block_event_handling = true;
     this.fetching_conversations = {};
@@ -145,8 +146,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const {team_id} = conversation_et;
 
         const is_team_conversation = team_id === active_team_id;
-        const is_guest_conversation =
-          !active_team_id && team_id && conversation_et.is_guest;
+        const is_guest_conversation = !active_team_id && team_id && conversation_et.is_guest();
 
         if (is_team_conversation || is_guest_conversation) {
           if (conversation_et.has_active_call()) {
@@ -568,9 +568,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   unblocked_user(user_et) {
-    this.get_one_to_one_conversation(user_et).then(conversation_et =>
-      conversation_et.status(z.conversation.ConversationStatus.CURRENT_MEMBER),
-    );
+    this.get_1to1_conversation(user_et)
+      .then((conversation_et) => conversation_et.status(z.conversation.ConversationStatus.CURRENT_MEMBER));
   }
 
   /**
@@ -825,7 +824,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {string} [team_id] - Team ID in which the conversation should be searched
    * @returns {Promise} Resolves with the conversation with requested user
    */
-  get_one_to_one_conversation(user_et, team_id = this.active_team().id) {
+  get_1to1_conversation(user_et, team_id = this.active_team().id) {
     for (const conversation_et of this.conversations()) {
       const with_expected_user =
         user_et.id === conversation_et.participating_user_ids()[0];
@@ -987,24 +986,25 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   map_conversations(payload) {
-    const is_guest_mapping = conversation_et => {
-      const team_id = conversation_et.team_id;
-      conversation_et.is_guest = !!(
-        team_id && !this.team_repository.known_team_ids().includes(team_id)
-      );
-    };
-
     if (payload.length) {
-      const conversation_ets = this.conversation_mapper.map_conversations(
-        payload,
-      );
-      conversation_ets.forEach(is_guest_mapping);
+      const conversation_ets = this.conversation_mapper.map_conversations(payload);
+      conversation_ets.forEach((conversation_et) => this._map_guest_status(conversation_et));
       return conversation_ets;
     }
 
     const conversation_et = this.conversation_mapper.map_conversation(payload);
-    is_guest_mapping(conversation_et);
+    this._map_guest_status(conversation_et);
     return conversation_et;
+  }
+
+  map_guest_status() {
+    this.filtered_conversations().forEach((conversation_et) => this._map_guest_status(conversation_et));
+  }
+
+  _map_guest_status(conversation_et) {
+    const team_id = conversation_et.team_id;
+    const is_guest = !!(team_id && !this.team_repository.known_team_ids().includes(team_id));
+    conversation_et.is_guest(is_guest);
   }
 
   /**
