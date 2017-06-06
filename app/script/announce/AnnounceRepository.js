@@ -27,14 +27,14 @@ z.announce.AnnounceRepository = class AnnounceRepository {
     return {
       CHECK_INTERVAL: 3 * 60 * 60 * 1000,
       CHECK_TIMEOUT: 5 * 60 * 1000,
-      UPDATE_INTERVAL: 6 * 60 * 60 * 1000
+      UPDATE_INTERVAL: 6 * 60 * 60 * 1000,
     };
   }
 
   constructor(announce_service) {
     this.logger = new z.util.Logger(
       'z.announce.AnnounceRepository',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
     this.announce_service = announce_service;
   }
@@ -59,13 +59,13 @@ z.announce.AnnounceRepository = class AnnounceRepository {
       return this.announce_service.get_version().then(server_version => {
         const local_version = z.util.Environment.version(false, true);
         this.logger.info(
-          `Checking current webapp version. Server '${server_version}' vs. local '${local_version}'`
+          `Checking current webapp version. Server '${server_version}' vs. local '${local_version}'`,
         );
 
         if (server_version > z.util.Environment.version(false, true)) {
           amplify.publish(
             z.event.WebApp.LIFECYCLE.UPDATE,
-            z.announce.UPDATE_SOURCE.WEBAPP
+            z.announce.UPDATE_SOURCE.WEBAPP,
           );
         }
       });
@@ -130,15 +130,15 @@ z.announce.AnnounceRepository = class AnnounceRepository {
               ? ''
               : '/image/logo/notification.png',
             requireInteraction: true,
-            sticky: true
+            sticky: true,
           });
 
           amplify.publish(
             z.event.WebApp.ANALYTICS.EVENT,
             z.tracking.EventName.ANNOUNCE.SENT,
             {
-              campaign: announcement.campaign
-            }
+              campaign: announcement.campaign,
+            },
           );
           this.logger.info(`Announcement '${announcement.title}' shown`);
 
@@ -147,8 +147,8 @@ z.announce.AnnounceRepository = class AnnounceRepository {
               z.event.WebApp.ANALYTICS.EVENT,
               z.tracking.EventName.ANNOUNCE.CLICKED,
               {
-                campaign: announcement.campaign
-              }
+                campaign: announcement.campaign,
+              },
             );
             this.logger.info(`Announcement '${announcement.title}' clicked`);
 

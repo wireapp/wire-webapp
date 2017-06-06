@@ -26,7 +26,7 @@ z.team.TeamMapper = class TeamMapper {
   constructor() {
     this.logger = new z.util.Logger(
       'z.team.TeamMapper',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
   }
 

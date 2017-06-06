@@ -58,17 +58,17 @@ $(function() {
     settings = {
       environment: z.service.BackendEnvironment.STAGING,
       rest_url: 'https://staging-nginz-https.zinfra.io',
-      web_socket_url: 'wss://staging-nginz-ssl.zinfra.io'
+      web_socket_url: 'wss://staging-nginz-ssl.zinfra.io',
     };
   } else {
     settings = {
       environment: z.service.BackendEnvironment.PRODUCTION,
       rest_url: 'https://prod-nginz-https.wire.com',
-      web_socket_url: 'wss://prod-nginz-ssl.wire.com'
+      web_socket_url: 'wss://prod-nginz-ssl.wire.com',
     };
   }
 
   window.wire = {
-    auth: new z.main.Auth(settings)
+    auth: new z.main.Auth(settings),
   };
 });

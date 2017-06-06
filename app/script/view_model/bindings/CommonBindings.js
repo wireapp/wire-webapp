@@ -56,12 +56,12 @@ ko.bindingHandlers.drop_file = {
         event: {
           dragleave: fileDragLeave,
           dragover: fileDragOver,
-          drop: fileSelectHandler
-        }
+          drop: fileSelectHandler,
+        },
       },
-      context
+      context,
     );
-  }
+  },
 };
 
 /**
@@ -89,12 +89,12 @@ ko.bindingHandlers.paste_file = {
       window,
       {
         event: {
-          paste: on_paste
-        }
+          paste: on_paste,
+        },
       },
-      context
+      context,
     );
-  }
+  },
 };
 
 /**
@@ -112,12 +112,12 @@ ko.bindingHandlers.ignore_drop_file = {
           },
           drop(_data, event) {
             event.preventDefault();
-          }
-        }
+          },
+        },
       },
-      context
+      context,
     );
-  }
+  },
 };
 
 /**
@@ -127,7 +127,7 @@ ko.bindingHandlers.ignore_drop_file = {
 ko.bindingHandlers.stopBinding = {
   init() {
     return {controlsDescendantBindings: true};
-  }
+  },
 };
 
 ko.virtualElements.allowedBindings.stopBinding = true;
@@ -154,7 +154,7 @@ ko.bindingHandlers.resize = (function() {
       last_height = current_height;
       const max_height = window.parseInt(
         getComputedStyle(element).maxHeight,
-        10
+        10,
       );
 
       if (current_height === max_height) {
@@ -181,10 +181,10 @@ ko.bindingHandlers.resize = (function() {
               },
               input() {
                 resize_textarea(element);
-              }
-            }
+              },
+            },
           },
-          context
+          context,
         );
       }
     },
@@ -193,7 +193,7 @@ ko.bindingHandlers.resize = (function() {
       resize_observable = ko.unwrap(valueAccessor());
       resize_textarea(element);
       resize_callback = allBindings.get('resize_callback');
-    }
+    },
   };
 })();
 
@@ -221,12 +221,12 @@ ko.bindingHandlers.enter = {
       element,
       {
         event: {
-          keypress: wrapper
-        }
+          keypress: wrapper,
+        },
       },
-      context
+      context,
     );
-  }
+  },
 };
 
 /**
@@ -253,12 +253,12 @@ ko.bindingHandlers.file_select = {
           change: wrapper,
           focus(_data, event) {
             return $(event.target).blur();
-          }
-        }
+          },
+        },
       },
-      context
+      context,
     );
-  }
+  },
 };
 
 /**
@@ -270,7 +270,7 @@ ko.bindingHandlers.load_image = {
     const image = new Image();
     image.onload = () => (element.style.backgroundImage = `url(${image_src})`);
     image.src = image_src;
-  }
+  },
 };
 
 /**
@@ -297,7 +297,7 @@ ko.bindingHandlers.load_image_on_hover = {
           $(this).css({backgroundImage: `url(${static_image})`});
         });
     }
-  }
+  },
 };
 
 /**
@@ -313,7 +313,7 @@ ko.subscribable.fn.trimmed = function() {
     write(value) {
       this(value.trim());
       this.valueHasMutated();
-    }
+    },
   });
 };
 
@@ -331,7 +331,7 @@ ko.subscribable.fn.subscribe_once = function(handler, owner, event_name) {
       handler(new_value);
     },
     owner,
-    event_name
+    event_name,
   );
 };
 
@@ -343,7 +343,7 @@ ko.bindingHandlers.antiscroll = {
     let trigger_subscription;
     $(element).antiscroll({
       autoHide: true,
-      autoWrap: true
+      autoWrap: true,
     });
 
     const parent_element = $(element).parent();
@@ -362,7 +362,7 @@ ko.bindingHandlers.antiscroll = {
         resize_event,
         _.throttle(() => {
           antiscroll.rebuild();
-        }, 100)
+        }, 100),
       );
 
       ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
@@ -373,7 +373,7 @@ ko.bindingHandlers.antiscroll = {
         }
       });
     }
-  }
+  },
 };
 
 ko.bindingHandlers.electron_remove = {
@@ -381,7 +381,7 @@ ko.bindingHandlers.electron_remove = {
     if (z.util.Environment.electron) {
       $(element).remove();
     }
-  }
+  },
 };
 
 ko.bindingHandlers.visibility = (function() {
@@ -391,7 +391,7 @@ ko.bindingHandlers.visibility = (function() {
   };
   return {
     init: setVisibility,
-    update: setVisibility
+    update: setVisibility,
   };
 })();
 
@@ -428,7 +428,7 @@ ko.bindingHandlers.relative_timestamp = (function() {
       return $(element).text(
         `${z.l10n.text(z.string.conversation_yesterday)} ${date
           .local()
-          .format('HH:mm')}`
+          .format('HH:mm')}`,
       );
     }
 
@@ -449,7 +449,7 @@ ko.bindingHandlers.relative_timestamp = (function() {
         const timestamp_index = timestamps.indexOf(timestamp_func);
         timestamps.splice(timestamp_index, 1);
       });
-    }
+    },
   };
 })();
 
@@ -482,7 +482,7 @@ ko.bindingHandlers.hide_controls = {
         element.classList.add('hide-controls');
       }, timeout);
     };
-  }
+  },
 };
 
 /**
@@ -492,7 +492,7 @@ ko.bindingHandlers.added_to_view = {
   init(element, valueAccessor) {
     const callback = valueAccessor();
     callback();
-  }
+  },
 };
 
 /**
@@ -502,7 +502,7 @@ ko.bindingHandlers.removed_from_view = {
   init(element, valueAccessor) {
     const callback = valueAccessor();
     ko.utils.domNodeDisposal.addDisposeCallback(element, () => callback());
-  }
+  },
 };
 
 /**
@@ -553,6 +553,6 @@ ko.bindingHandlers.in_viewport = (function() {
       window.setTimeout(_check_element, allBindingsAccessor.get('delay') || 0);
 
       ko.utils.domNodeDisposal.addDisposeCallback(element, _dispose);
-    }
+    },
   };
 })();

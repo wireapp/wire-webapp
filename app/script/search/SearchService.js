@@ -31,7 +31,7 @@ z.search.SearchService = class SearchService {
     this.client = client;
     this.logger = new z.util.Logger(
       'z.search.SearchService',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
   }
 
@@ -46,8 +46,8 @@ z.search.SearchService = class SearchService {
     return this.client.send_request({
       type: 'GET',
       url: this.client.create_url(
-        `/search/contacts?q=${encodeURIComponent(query)}&size=${size}`
-      )
+        `/search/contacts?q=${encodeURIComponent(query)}&size=${size}`,
+      ),
     });
   }
 };

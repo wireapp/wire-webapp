@@ -26,7 +26,7 @@ describe('z.util.render_message', function() {
     const expected =
       'Check this: <a href="http://www.wire.com/" target="_blank" rel="nofollow noopener noreferrer">http://www.wire.com/</a>';
     expect(z.util.render_message('Check this: http://www.wire.com/')).toBe(
-      expected
+      expected,
     );
   });
 
@@ -87,7 +87,7 @@ describe('z.util.render_message', function() {
     const link = 'https://t.facdn.net/22382738@400-1485204208.jpg';
     const expected = `Just click <a href=\"${link}\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">${link}</a> and download it`;
     expect(z.util.render_message(`Just click ${link} and download it`)).toBe(
-      expected
+      expected,
     );
   });
 
@@ -95,7 +95,7 @@ describe('z.util.render_message', function() {
     const expected =
       '&lt;a href=&quot;javascript:alert(&#x27;ohoh!&#x27;)&quot;&gt;what?&lt;/a&gt;';
     expect(
-      z.util.render_message('<a href="javascript:alert(\'ohoh!\')">what?</a>')
+      z.util.render_message('<a href="javascript:alert(\'ohoh!\')">what?</a>'),
     ).toBe(expected);
   });
 
@@ -103,7 +103,7 @@ describe('z.util.render_message', function() {
     const expected =
       'send it over to <a href="#" onclick="z.util.safe_mailto_open(\'hello@wire.com\')">hello@wire.com</a>';
     expect(z.util.render_message('send it over to hello@wire.com')).toBe(
-      expected
+      expected,
     );
   });
 
@@ -111,7 +111,7 @@ describe('z.util.render_message', function() {
     const expected =
       'send it over to <a href="#" onclick="z.util.safe_mailto_open(\'hello+world@wire.com\')">hello+world@wire.com</a>';
     expect(z.util.render_message('send it over to hello+world@wire.com')).toBe(
-      expected
+      expected,
     );
   });
 
@@ -119,7 +119,7 @@ describe('z.util.render_message', function() {
     const expected =
       'send it over to <a href="#" onclick="z.util.safe_mailto_open(\'janedoe@school.university.edu\')">janedoe@school.university.edu</a>';
     expect(
-      z.util.render_message('send it over to janedoe@school.university.edu')
+      z.util.render_message('send it over to janedoe@school.university.edu'),
     ).toBe(expected);
   });
 
@@ -127,7 +127,7 @@ describe('z.util.render_message', function() {
     const expected =
       'send it over to <a href="#" onclick="z.util.safe_mailto_open(\'bla@foo.co.uk\')">bla@foo.co.uk</a>';
     expect(z.util.render_message('send it over to bla@foo.co.uk')).toBe(
-      expected
+      expected,
     );
   });
 
@@ -135,25 +135,25 @@ describe('z.util.render_message', function() {
   // @see http://stackoverflow.com/a/1946442/451634
   it('renders endlines to <br />', function() {
     expect(z.util.render_message('Hello,\nworld!\nHow is it going?\n')).toBe(
-      'Hello,<br />world!<br />How is it going?'
+      'Hello,<br />world!<br />How is it going?',
     );
   });
 
   it('renders text with more than one newline in between', function() {
     expect(z.util.render_message('Hello,\n\n\n\n\n\n\nworld!')).toBe(
-      'Hello,<br /><br /><br /><br /><br /><br /><br />world!'
+      'Hello,<br /><br /><br /><br /><br /><br /><br />world!',
     );
   });
 
   it('does not render URLs within <code> tags', function() {
     expect(z.util.render_message('```Url url = new Url("wire.com");```')).toBe(
-      '<code>Url url = new Url(&quot;wire.com&quot;);</code>'
+      '<code>Url url = new Url(&quot;wire.com&quot;);</code>',
     );
   });
 
   it('does not render emails within <code> tags', function() {
     expect(
-      z.util.render_message('```this.isValid("opensource@wire.com")```')
+      z.util.render_message('```this.isValid("opensource@wire.com")```'),
     ).toBe('<code>this.isValid(&quot;opensource@wire.com&quot;)</code>');
   });
 
@@ -165,7 +165,7 @@ describe('z.util.render_message', function() {
 describe('z.util.array_to_md5_base64', function() {
   it('can convert typed array to base64', function() {
     expect(z.util.array_to_md5_base64(new Uint8Array([8, 8]))).toBe(
-      'w+7NCDwPSCf1JgWbA7deTA=='
+      'w+7NCDwPSCf1JgWbA7deTA==',
     );
   });
 });
@@ -177,7 +177,7 @@ describe('z.util.encode_base64', function() {
 
   it('encodes symbols', function() {
     expect(z.util.encode_base64('Hello, world!@#$%^&*()_+{}[]|<>,.?/~`"')).toBe(
-      'SGVsbG8sIHdvcmxkIUAjJCVeJiooKV8re31bXXw8PiwuPy9+YCI='
+      'SGVsbG8sIHdvcmxkIUAjJCVeJiooKV8re31bXXw8PiwuPy9+YCI=',
     );
   });
 });
@@ -185,19 +185,19 @@ describe('z.util.encode_base64', function() {
 describe('z.util.encode_base64_sha256', function() {
   it('encodes Base64 and SHA-256 empty string', function() {
     expect(z.util.encode_sha256_base64('')).toBe(
-      '47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU='
+      '47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=',
     );
   });
 
   it('encodes Base64 and SHA-256 text', function() {
     expect(z.util.encode_sha256_base64('Hello, world!')).toBe(
-      'MV9b23bQeMQ7isAGTkoBZGErH853yGk0W/yUx1iU7dM='
+      'MV9b23bQeMQ7isAGTkoBZGErH853yGk0W/yUx1iU7dM=',
     );
   });
 
   it('encodes Base64 and SHA-256 symbols', function() {
     expect(
-      z.util.encode_sha256_base64('Hello, world!@#$%^&*()_+{}[]|<>,.?/~`"')
+      z.util.encode_sha256_base64('Hello, world!@#$%^&*()_+{}[]|<>,.?/~`"'),
     ).toBe('lt/heVPfGQB07sONclI2TZBZHuIMH86noUEWEbahMw4=');
   });
 });
@@ -216,7 +216,7 @@ describe('z.util.create_random_uuid', function() {
     expect(z.util.create_random_uuid().length).toBe(36);
     expect(z.util.create_random_uuid().split('-').length).toBe(5);
     expect(z.util.create_random_uuid()).not.toEqual(
-      z.util.create_random_uuid()
+      z.util.create_random_uuid(),
     );
   });
 });
@@ -298,7 +298,7 @@ describe('z.util.ko_array_unshift_all', function() {
 describe('z.util.base64_to_array', function() {
   it('can convert a gif', function() {
     const actual = z.util.base64_to_array(
-      'data:image/gif;base64,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'
+      'data:image/gif;base64,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',
     );
     /* eslint-disable comma-spacing */
     const expected = new Uint8Array([
@@ -3970,7 +3970,7 @@ describe('z.util.base64_to_array', function() {
       11,
       1,
       0,
-      59
+      59,
     ]);
     /* eslint-enable comma-spacing */
     expect(actual).toEqual(expected);
@@ -3991,7 +3991,7 @@ describe('z.util.strip_data_uri', function() {
     const plain_text = z.util.strip_data_uri(base64);
     const text_html = z.util.strip_data_uri(`data:text/html,${base64}`);
     const base64_text_plain = z.util.strip_data_uri(
-      `data:text/plain;base64,${base64}`
+      `data:text/plain;base64,${base64}`,
     );
     const base64_gif = z.util.strip_data_uri(`data:image/gif;base64,${base64}`);
     const base64_png = z.util.strip_data_uri(`data:image/png;base64,${base64}`);
@@ -4008,13 +4008,13 @@ describe('z.util.strip_data_uri', function() {
 describe('z.util.phone_number_to_e164', function() {
   it('can convert a US number', function() {
     expect(z.util.phone_number_to_e164('555-666-7777', 'US')).toBe(
-      '+15556667777'
+      '+15556667777',
     );
   });
 
   it('can convert a GR number', function() {
     expect(z.util.phone_number_to_e164('2310 863871', 'GR')).toBe(
-      '+302310863871'
+      '+302310863871',
     );
   });
 
@@ -4030,7 +4030,7 @@ describe('z.util.phone_number_to_e164', function() {
 describe('z.util.get_content_type_from_data_url', () =>
   it('can extract the type of a an image', function() {
     const actual = z.util.get_content_type_from_data_url(
-      'data:image/gif;base64,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'
+      'data:image/gif;base64,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',
     );
     expect(actual).toEqual('image/gif');
   }));
@@ -4098,19 +4098,19 @@ describe('z.util.sort_groups_by_last_event', function() {
 describe('z.util.strip_url_wrapper', function() {
   it('return the string without url wrapper (single quotes)', function() {
     expect(z.util.strip_url_wrapper('url("/path/to/image/image.png")')).toBe(
-      '/path/to/image/image.png'
+      '/path/to/image/image.png',
     );
   });
 
   it('return the string without url wrapper (quotes)', function() {
     expect(z.util.strip_url_wrapper('url("/path/to/image/image.png")')).toBe(
-      '/path/to/image/image.png'
+      '/path/to/image/image.png',
     );
   });
 
   it('return the string without url wrapper (without quotes)', function() {
     expect(z.util.strip_url_wrapper('url(/path/to/image/image.png)')).toBe(
-      '/path/to/image/image.png'
+      '/path/to/image/image.png',
     );
   });
 });
@@ -4130,7 +4130,7 @@ describe('z.util.naked_url', function() {
       'http://wire.com',
       'www.wire.com/',
       'www.wire.com',
-      'wire.com/'
+      'wire.com/',
     ];
 
     const all_urls_naked = urls
@@ -4148,13 +4148,13 @@ describe('z.util.naked_url', function() {
 describe('z.util.append_url_parameter', function() {
   it('append param with & when url contains param', function() {
     expect(z.util.append_url_parameter('foo.com?bar=true', 'fum=true')).toBe(
-      'foo.com?bar=true&fum=true'
+      'foo.com?bar=true&fum=true',
     );
   });
 
   it('append param with ? when url contains param', function() {
     expect(z.util.append_url_parameter('foo.com', 'fum=true')).toBe(
-      'foo.com?fum=true'
+      'foo.com?fum=true',
     );
   });
 });
@@ -4173,7 +4173,7 @@ describe('z.util.forward_url_parameter', function() {
       }
     };
     expect(
-      z.util.forward_url_parameter('foo.com', z.auth.URLParameter.LOCALYTICS)
+      z.util.forward_url_parameter('foo.com', z.auth.URLParameter.LOCALYTICS),
     ).toBe('foo.com?localytics=true');
 
     z.util.get_url_parameter = function(parameter_value) {
@@ -4182,7 +4182,7 @@ describe('z.util.forward_url_parameter', function() {
       }
     };
     expect(
-      z.util.forward_url_parameter('foo.com', z.auth.URLParameter.LOCALYTICS)
+      z.util.forward_url_parameter('foo.com', z.auth.URLParameter.LOCALYTICS),
     ).toBe('foo.com?localytics=false');
 
     z.util.get_url_parameter = function(parameter_value) {
@@ -4191,7 +4191,7 @@ describe('z.util.forward_url_parameter', function() {
       }
     };
     expect(
-      z.util.forward_url_parameter('foo.com', z.auth.URLParameter.LOCALYTICS)
+      z.util.forward_url_parameter('foo.com', z.auth.URLParameter.LOCALYTICS),
     ).toBe('foo.com?localytics=bar');
 
     z.util.get_url_parameter = function(parameter_value) {
@@ -4200,7 +4200,7 @@ describe('z.util.forward_url_parameter', function() {
       }
     };
     expect(
-      z.util.forward_url_parameter('foo.com', z.auth.URLParameter.LOCALYTICS)
+      z.util.forward_url_parameter('foo.com', z.auth.URLParameter.LOCALYTICS),
     ).toBe('foo.com');
   });
 });
@@ -4208,31 +4208,31 @@ describe('z.util.forward_url_parameter', function() {
 describe('Markdown for bold text', function() {
   it('renders bold text', function() {
     expect(z.util.render_message('**bold text (not italic)**')).toBe(
-      '<strong>bold text (not italic)</strong>'
+      '<strong>bold text (not italic)</strong>',
     );
   });
 
   it('renders a bold word within a sentence', function() {
     expect(z.util.render_message('Markdown **just** rocks!')).toEqual(
-      'Markdown <strong>just</strong> rocks!'
+      'Markdown <strong>just</strong> rocks!',
     );
   });
 
   it('renders bold text with italic words', function() {
     expect(z.util.render_message('**bold text with *italic* !!**')).toBe(
-      '<strong>bold text with <em>italic</em> !!</strong>'
+      '<strong>bold text with <em>italic</em> !!</strong>',
     );
   });
 
   it('renders text which is partly bold and partly italic', function() {
     expect(z.util.render_message('**part bold,** *part italic*')).toBe(
-      '<strong>part bold,</strong> <em>part italic</em>'
+      '<strong>part bold,</strong> <em>part italic</em>',
     );
   });
 
   it('renders mixed text with bold and italic words', function() {
     expect(z.util.render_message('*italic* **bold** *italic* **bold**')).toBe(
-      '<em>italic</em> <strong>bold</strong> <em>italic</em> <strong>bold</strong>'
+      '<em>italic</em> <strong>bold</strong> <em>italic</em> <strong>bold</strong>',
     );
   });
 
@@ -4244,31 +4244,31 @@ describe('Markdown for bold text', function() {
 describe('Markdown for italic text', function() {
   it('renders italic text', function() {
     expect(z.util.render_message('*This text is italic.*')).toBe(
-      '<em>This text is italic.</em>'
+      '<em>This text is italic.</em>',
     );
   });
 
   it('renders partially italic text', function() {
     expect(z.util.render_message('This text is *partially* italic')).toBe(
-      'This text is <em>partially</em> italic'
+      'This text is <em>partially</em> italic',
     );
   });
 
   it('renders text with multiple italic words', function() {
     expect(z.util.render_message('This text has *two* *italic* bits')).toBe(
-      'This text has <em>two</em> <em>italic</em> bits'
+      'This text has <em>two</em> <em>italic</em> bits',
     );
   });
 
   it('renders italic text with bold words', function() {
     expect(z.util.render_message('*italic text **with bold** *')).toBe(
-      '<em>italic text <strong>with bold</strong> </em>'
+      '<em>italic text <strong>with bold</strong> </em>',
     );
   });
 
   it('renders words which are bold-italic', function() {
     expect(z.util.render_message('***A***')).toBe(
-      '<strong><em>A</em></strong>'
+      '<strong><em>A</em></strong>',
     );
   });
 });
@@ -4276,31 +4276,31 @@ describe('Markdown for italic text', function() {
 describe('Markdown for code snippets', function() {
   it('renders code blocks', function() {
     expect(z.util.render_message("```console.log('A')```")).toEqual(
-      '<code>console.log(&#x27;A&#x27;)</code>'
+      '<code>console.log(&#x27;A&#x27;)</code>',
     );
   });
 
   it('can escape HTML in rendered code blocks', function() {
     expect(z.util.render_message('```<b>Hello</b>```')).toEqual(
-      '<code>&lt;b&gt;Hello&lt;/b&gt;</code>'
+      '<code>&lt;b&gt;Hello&lt;/b&gt;</code>',
     );
   });
 
   it('renders code within code spans', function() {
     expect(z.util.render_message('This is `code`.')).toEqual(
-      'This is <code>code</code>.'
+      'This is <code>code</code>.',
     );
   });
 
   it('renders code within code blocks', function() {
     expect(z.util.render_message('This is ```code```.')).toEqual(
-      'This is <code>code</code>.'
+      'This is <code>code</code>.',
     );
   });
 
   it('doesn’t render code within a code span', function() {
     expect(z.util.render_message('`com.ibm.icu`')).toEqual(
-      '<code>com.ibm.icu</code>'
+      '<code>com.ibm.icu</code>',
     );
   });
 
@@ -4309,8 +4309,8 @@ describe('Markdown for code snippets', function() {
       '<pre><code class="lang-xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br />  <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>com.ibm.icu<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br />  <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>icu4j<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br />  <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>53.1<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br /><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br /></code></pre>';
     expect(
       z.util.render_message(
-        '```xml\n<dependency>\n  <groupId>com.ibm.icu</groupId>\n  <artifactId>icu4j</artifactId>\n  <version>53.1</version>\n</dependency>\n```'
-      )
+        '```xml\n<dependency>\n  <groupId>com.ibm.icu</groupId>\n  <artifactId>icu4j</artifactId>\n  <version>53.1</version>\n</dependency>\n```',
+      ),
     ).toEqual(expected);
   });
 
@@ -4319,8 +4319,8 @@ describe('Markdown for code snippets', function() {
       '<pre><code class="lang-ruby"><span class="hljs-built_in">require</span> <span class="hljs-string">\'redcarpet\'</span><br />markdown = Redcarpet.<span class="hljs-keyword">new</span>(<span class="hljs-string">"Hello World!"</span>)<br />puts markdown.to_html<br /></code></pre>';
     expect(
       z.util.render_message(
-        '```ruby\nrequire \'redcarpet\'\nmarkdown = Redcarpet.new("Hello World!")\nputs markdown.to_html\n```'
-      )
+        '```ruby\nrequire \'redcarpet\'\nmarkdown = Redcarpet.new("Hello World!")\nputs markdown.to_html\n```',
+      ),
     ).toEqual(expected);
   });
 
@@ -4329,8 +4329,8 @@ describe('Markdown for code snippets', function() {
       '<pre><code class="lang-js">$(<span class="hljs-built_in">document</span>).ready(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{<br />  $(<span class="hljs-string">\'pre code\'</span>).each(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">i, block</span>) </span>{<br />    hljs.highlightBlock(block);<br />  });<br />});<br /></code></pre>';
     expect(
       z.util.render_message(
-        "```js\n$(document).ready(function() {\n  $('pre code').each(function(i, block) {\n    hljs.highlightBlock(block);\n  });\n});```"
-      )
+        "```js\n$(document).ready(function() {\n  $('pre code').each(function(i, block) {\n    hljs.highlightBlock(block);\n  });\n});```",
+      ),
     ).toEqual(expected);
   });
 
@@ -4339,8 +4339,8 @@ describe('Markdown for code snippets', function() {
       '<pre><code class="lang-coffeescript"><span class="hljs-comment"># <span class="hljs-doctag">TODO:</span> This is not a general utility:</span><br /><span class="hljs-comment"># It should be part of a view model as it\'s UI related.</span><br />  z.util.convert_timestamps = <span class="hljs-function">-&gt;</span><br />    <span class="hljs-keyword">if</span> $(<span class="hljs-string">\'time\'</span>).length &gt; <span class="hljs-number">0</span><br /><span class="hljs-function">      <span class="hljs-title">recalculate</span> = -&gt;</span><br /></code></pre>';
     expect(
       z.util.render_message(
-        "```coffeescript\n# TODO: This is not a general utility:\n# It should be part of a view model as it's UI related.\n  z.util.convert_timestamps = ->\n    if $('time').length > 0\n      recalculate = ->```"
-      )
+        "```coffeescript\n# TODO: This is not a general utility:\n# It should be part of a view model as it's UI related.\n  z.util.convert_timestamps = ->\n    if $('time').length > 0\n      recalculate = ->```",
+      ),
     ).toEqual(expected);
   });
 
@@ -4349,8 +4349,8 @@ describe('Markdown for code snippets', function() {
       '<pre><code class="lang-html">&lt;<span class="hljs-selector-tag">a</span> href=<span class="hljs-string">"javascript:wire.app.logout()"</span>&gt;This is <span class="hljs-selector-tag">a</span> trick&lt;/a&gt;<br /></code></pre>';
     expect(
       z.util.render_message(
-        '```html\n<a href="javascript:wire.app.logout()">This is a trick</a>\n```'
-      )
+        '```html\n<a href="javascript:wire.app.logout()">This is a trick</a>\n```',
+      ),
     ).toEqual(expected);
   });
 
@@ -4359,8 +4359,8 @@ describe('Markdown for code snippets', function() {
       '<code>&lt;a href=&quot;javascript:wire.app.logout()&quot;&gt;This is a trick&lt;/a&gt;</code>';
     expect(
       z.util.render_message(
-        '`<a href="javascript:wire.app.logout()">This is a trick</a>`'
-      )
+        '`<a href="javascript:wire.app.logout()">This is a trick</a>`',
+      ),
     ).toEqual(expected);
   });
 });
@@ -4375,8 +4375,8 @@ describe('Markdown with mixed markups', function() {
 
     expect(
       z.util.render_message(
-        'This is *italic* and **bold** and ***bold-italic*** with a www.link.com and www.anotherlink.net.'
-      )
+        'This is *italic* and **bold** and ***bold-italic*** with a www.link.com and www.anotherlink.net.',
+      ),
     ).toEqual(expected);
   });
 });
@@ -4384,7 +4384,7 @@ describe('Markdown with mixed markups', function() {
 describe('Ignored Markdown syntax', function() {
   it('only renders correct Markdown syntax', function() {
     expect(z.util.render_message('This text is not italic.')).toBe(
-      'This text is not italic.'
+      'This text is not italic.',
     );
   });
 
@@ -4394,7 +4394,7 @@ describe('Ignored Markdown syntax', function() {
 
   it('does not render horizontal lines', function() {
     expect(z.util.render_message('***\nNo horizontal lines\n***')).toBe(
-      '<strong><em><br />No horizontal lines<br /></em></strong>'
+      '<strong><em><br />No horizontal lines<br /></em></strong>',
     );
   });
 });
@@ -4411,20 +4411,20 @@ describe('Markdown exceptions', function() {
     function() {
       const text = 'calling__voice_channel__fulltitle';
       expect(z.util.render_message(text)).toBe(text);
-    }
+    },
   );
 });
 
 describe('z.util.print_devices_id', function() {
   it('can print device id', function() {
     expect(z.util.print_devices_id('66e66c79e8d1dea4')).toBe(
-      "<span class='device-id-part'>66</span><span class='device-id-part'>e6</span><span class='device-id-part'>6c</span><span class='device-id-part'>79</span><span class='device-id-part'>e8</span><span class='device-id-part'>d1</span><span class='device-id-part'>de</span><span class='device-id-part'>a4</span>"
+      "<span class='device-id-part'>66</span><span class='device-id-part'>e6</span><span class='device-id-part'>6c</span><span class='device-id-part'>79</span><span class='device-id-part'>e8</span><span class='device-id-part'>d1</span><span class='device-id-part'>de</span><span class='device-id-part'>a4</span>",
     );
   });
 
   it('can print device id and apply padding', function() {
     expect(z.util.print_devices_id('6e66c79e8d1dea4')).toBe(
-      "<span class='device-id-part'>06</span><span class='device-id-part'>e6</span><span class='device-id-part'>6c</span><span class='device-id-part'>79</span><span class='device-id-part'>e8</span><span class='device-id-part'>d1</span><span class='device-id-part'>de</span><span class='device-id-part'>a4</span>"
+      "<span class='device-id-part'>06</span><span class='device-id-part'>e6</span><span class='device-id-part'>6c</span><span class='device-id-part'>79</span><span class='device-id-part'>e8</span><span class='device-id-part'>d1</span><span class='device-id-part'>de</span><span class='device-id-part'>a4</span>",
     );
   });
 });
@@ -4495,14 +4495,14 @@ describe('z.util.format_milliseconds_short', function() {
   it('should format duration over 1 hour', function() {
     expect(z.util.format_milliseconds_short(1000 * 60 * 60 * 3)).toEqual([
       3,
-      'h'
+      'h',
     ]);
   });
 
   it('should format duration over 1 day', function() {
     expect(z.util.format_milliseconds_short(1000 * 60 * 60 * 24 * 3)).toEqual([
       3,
-      'd'
+      'd',
     ]);
   });
 });
@@ -4514,7 +4514,7 @@ describe('z.util.is_same_location', function() {
 
   it('returns false if page was accessed from https://wire.com', function() {
     expect(
-      z.util.is_same_location('https://wire.com', 'https://app.wire.com')
+      z.util.is_same_location('https://wire.com', 'https://app.wire.com'),
     ).toBeFalsy();
   });
 
@@ -4522,20 +4522,20 @@ describe('z.util.is_same_location', function() {
     expect(
       z.util.is_same_location(
         'https://wire.com/download',
-        'https://app.wire.com'
-      )
+        'https://app.wire.com',
+      ),
     ).toBeFalsy();
   });
 
   it('returns false if page was accessed from https://get.wire.com', function() {
     expect(
-      z.util.is_same_location('https://get.wire.com', 'https://app.wire.com')
+      z.util.is_same_location('https://get.wire.com', 'https://app.wire.com'),
     ).toBeFalsy();
   });
 
   it('returns false if page was accessed from an external link', function() {
     expect(
-      z.util.is_same_location('http://www.heise.de', 'https://app.wire.com')
+      z.util.is_same_location('http://www.heise.de', 'https://app.wire.com'),
     ).toBeFalsy();
   });
 
@@ -4543,8 +4543,8 @@ describe('z.util.is_same_location', function() {
     expect(
       z.util.is_same_location(
         'https://app.wire.com/auth',
-        'https://app.wire.com'
-      )
+        'https://app.wire.com',
+      ),
     ).toBeFalsy();
   });
 
@@ -4552,8 +4552,8 @@ describe('z.util.is_same_location', function() {
     expect(
       z.util.is_same_location(
         'https://app.wire.com/auth/?env=staging',
-        'https://app.wire.com/?env=staging'
-      )
+        'https://app.wire.com/?env=staging',
+      ),
     ).toBeFalsy();
   });
 
@@ -4561,8 +4561,8 @@ describe('z.util.is_same_location', function() {
     expect(
       z.util.is_same_location(
         'https://app.wire.com/auth/#history',
-        'https://app.wire.com/?env=staging'
-      )
+        'https://app.wire.com/?env=staging',
+      ),
     ).toBeFalsy();
   });
 
@@ -4570,8 +4570,8 @@ describe('z.util.is_same_location', function() {
     expect(
       z.util.is_same_location(
         'https://app.wire.com/auth/?env=staging#login',
-        'https://app.wire.com/?env=staging'
-      )
+        'https://app.wire.com/?env=staging',
+      ),
     ).toBeFalsy();
   });
 
@@ -4579,8 +4579,8 @@ describe('z.util.is_same_location', function() {
     expect(
       z.util.is_same_location(
         'https://app.wire.com/auth/?env=staging#register',
-        'https://app.wire.com/?env=staging'
-      )
+        'https://app.wire.com/?env=staging',
+      ),
     ).toBeFalsy();
   });
 
@@ -4588,14 +4588,14 @@ describe('z.util.is_same_location', function() {
     expect(
       z.util.is_same_location(
         'https://app.wire.com/auth/#register',
-        'https://app.wire.com/auth/'
-      )
+        'https://app.wire.com/auth/',
+      ),
     ).toBeFalsy();
   });
 
   it('returns true if page was reloaded', function() {
     expect(
-      z.util.is_same_location('https://app.wire.com', 'https://app.wire.com')
+      z.util.is_same_location('https://app.wire.com', 'https://app.wire.com'),
     ).toBeTruthy();
   });
 
@@ -4603,8 +4603,8 @@ describe('z.util.is_same_location', function() {
     expect(
       z.util.is_same_location(
         'https://app.wire.com/?hl=de',
-        'https://app.wire.com/?hl=de'
-      )
+        'https://app.wire.com/?hl=de',
+      ),
     ).toBeTruthy();
   });
 });
@@ -4620,14 +4620,14 @@ describe('bucket_values', function() {
     expect(z.util.bucket_values(5.5, [0, 5, 10, 15, 20, 25])).toBe('1-5');
     expect(z.util.bucket_values(13, [0, 5, 10, 15, 20, 25])).toBe('11-15');
     expect(z.util.bucket_values(1023, [0, 100, 200, 500, 1000, 2000])).toBe(
-      '1001-2000'
+      '1001-2000',
     );
   });
 
   it('returns the correct bucket if value is above the given limits', function() {
     expect(z.util.bucket_values(100, [0, 5, 10, 15, 20, 25])).toBe('26-');
     expect(z.util.bucket_values(10023, [0, 100, 200, 500, 1000, 2000])).toBe(
-      '2001-'
+      '2001-',
     );
   });
 });

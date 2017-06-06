@@ -44,7 +44,7 @@ z.links.LinkPreviewProtoBuilder = {
       const article = new z.proto.Article(
         data.url,
         data.title,
-        data.description
+        data.description,
       ); // deprecated format
       const preview = new z.proto.LinkPreview(
         url,
@@ -52,7 +52,7 @@ z.links.LinkPreviewProtoBuilder = {
         article,
         data.url,
         data.title,
-        data.description
+        data.description,
       );
 
       if (data.site_name === 'Twitter') {
@@ -65,5 +65,5 @@ z.links.LinkPreviewProtoBuilder = {
 
       return preview;
     }
-  }
+  },
 };

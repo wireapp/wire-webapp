@@ -27,9 +27,9 @@ describe('z.util.ObjectUtil', () => {
       const object = {
         age: '<b>25</b>',
         favorite: {
-          place: '<b>Berlin</b>'
+          place: '<b>Berlin</b>',
         },
-        name: 'Lara'
+        name: 'Lara',
       };
 
       const escaped_object = z.util.ObjectUtil.escape_properties(object);

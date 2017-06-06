@@ -61,12 +61,12 @@ z.location = (() => {
       if (latitude == null || longitude == null) {
         reject(
           new Error(
-            'You need to specify latitude and longitude in order to retrieve the location'
-          )
+            'You need to specify latitude and longitude in order to retrieve the location',
+          ),
         );
       }
       $.ajax({
-        url: `${GOOGLE_GEOCODING_BASE_URL}?latlng=${latitude},${longitude}&key=${API_KEY}`
+        url: `${GOOGLE_GEOCODING_BASE_URL}?latlng=${latitude},${longitude}&key=${API_KEY}`,
       })
         .done(response => {
           if (response.status === 'OK') {
@@ -75,7 +75,7 @@ z.location = (() => {
           return resolve();
         })
         .fail((jqXHR, textStatus, errorThrown) =>
-          reject(new Error(errorThrown))
+          reject(new Error(errorThrown)),
         );
     });
   };
@@ -104,6 +104,6 @@ z.location = (() => {
 
   return {
     get_location,
-    get_maps_url
+    get_maps_url,
   };
 })();

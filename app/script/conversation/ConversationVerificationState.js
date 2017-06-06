@@ -25,5 +25,5 @@ window.z.conversation = z.conversation || {};
 z.conversation.ConversationVerificationState = {
   DEGRADED: 2,
   UNVERIFIED: 0,
-  VERIFIED: 1
+  VERIFIED: 1,
 };

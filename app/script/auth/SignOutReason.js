@@ -25,5 +25,5 @@ window.z.auth = z.auth || {};
 z.auth.SignOutReason = {
   CLIENT_REMOVED: 'client_removed',
   SESSION_EXPIRED: 'session_expired',
-  USER_REQUESTED: 'user_requested'
+  USER_REQUESTED: 'user_requested',
 };

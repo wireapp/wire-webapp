@@ -25,5 +25,5 @@ window.z.calling.enum = z.calling.enum || {};
 
 z.calling.enum.SDP_SOURCE = {
   LOCAL: 'local',
-  REMOTE: 'remote'
+  REMOTE: 'remote',
 };

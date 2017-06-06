@@ -26,7 +26,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   static get STATE() {
     return {
       PARTICIPANTS: 'participants',
-      SEARCH: 'search'
+      SEARCH: 'search',
     };
   }
 
@@ -35,7 +35,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     user_repository,
     conversation_repository,
     search_repository,
-    team_repository
+    team_repository,
   ) {
     this.add_people = this.add_people.bind(this);
     this.block = this.block.bind(this);
@@ -56,7 +56,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.team_repository = team_repository;
     this.logger = new z.util.Logger(
       'z.ViewModel.ParticipantsViewModel',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
 
     this.state = ko.observable(ParticipantsViewModel.STATE.PARTICIPANTS);
@@ -83,8 +83,8 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
         .sort((user_a, user_b) =>
           z.util.StringUtil.sort_by_priority(
             user_a.first_name(),
-            user_b.first_name()
-          )
+            user_b.first_name(),
+          ),
         );
 
       this.participants(participants);
@@ -109,7 +109,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     // Switch between div and input field to edit the conversation name
     this.editing = ko.observable(false);
     this.editable = ko.pureComputed(
-      () => !this.conversation().removed_from_conversation()
+      () => !this.conversation().removed_from_conversation(),
     );
     this.edit = function() {
       if (this.editable()) {
@@ -129,7 +129,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
       host_selector: '#show-participants',
       modal: true,
       on_hide: () => this.reset_view(),
-      scroll_selector: '.messages-wrap'
+      scroll_selector: '.messages-wrap',
     });
 
     // @todo create a viewmodel search?
@@ -159,12 +159,12 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
           .sort((user_a, user_b) =>
             z.util.StringUtil.sort_by_priority(
               user_a.first_name(),
-              user_b.first_name()
-            )
+              user_b.first_name(),
+            ),
           );
       },
       this,
-      {deferEvaluation: true}
+      {deferEvaluation: true},
     );
     this.team_members = ko.pureComputed(() => {
       return this.active_team().members().filter(user_et => {
@@ -181,20 +181,20 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
       id: z.string.tooltip_people_add,
       replace: {
         content: z.ui.Shortcut.get_shortcut_tooltip(
-          z.ui.ShortcutType.ADD_PEOPLE
+          z.ui.ShortcutType.ADD_PEOPLE,
         ),
-        placeholder: '%shortcut'
-      }
+        placeholder: '%shortcut',
+      },
     });
 
     amplify.subscribe(
       z.event.WebApp.CONTENT.SWITCH,
-      this.switch_content.bind(this)
+      this.switch_content.bind(this),
     );
     amplify.subscribe(z.event.WebApp.PEOPLE.SHOW, this.show_participant);
     amplify.subscribe(
       z.event.WebApp.PEOPLE.TOGGLE,
-      this.toggle_participants_bubble.bind(this)
+      this.toggle_participants_bubble.bind(this),
     );
   }
 
@@ -291,21 +291,21 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.confirm_dialog = $('#participants').confirm({
       confirm: () => {
         const next_conversation_et = this.conversation_repository.get_next_conversation(
-          this.conversation()
+          this.conversation(),
         );
         this.participants_bubble.hide();
         this.conversation_repository.leave_conversation(
           this.conversation(),
-          next_conversation_et
+          next_conversation_et,
         );
       },
-      template: '#template-confirm-leave'
+      template: '#template-confirm-leave',
     });
   }
 
   rename_conversation(data, event) {
     const new_name = z.util.StringUtil.remove_line_breaks(
-      event.target.value.trim()
+      event.target.value.trim(),
     );
     const old_name = this.conversation().display_name().trim();
 
@@ -314,7 +314,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     if (new_name.length && new_name !== old_name) {
       this.conversation_repository.rename_conversation(
         this.conversation(),
-        new_name
+        new_name,
       );
     }
   }
@@ -332,8 +332,8 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
             z.tracking.EventName.CONVERSATION.ADD_TO_GROUP_CONVERSATION,
             {
               numberOfGroupParticipants: this.conversation().number_of_participants(),
-              numberOfParticipantsAdded: user_ids.length
-            }
+              numberOfParticipantsAdded: user_ids.length,
+            },
           );
         });
     } else {
@@ -347,8 +347,8 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
             z.tracking.EventName.CONVERSATION.CREATE_GROUP_CONVERSATION,
             {
               creationContext: 'addedToOneToOne',
-              numberOfParticipants: user_ids.length
-            }
+              numberOfParticipants: user_ids.length,
+            },
           );
 
           amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversation_et);
@@ -379,9 +379,9 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
           });
       },
       data: {
-        user: user_et
+        user: user_et,
       },
-      template: '#template-confirm-remove'
+      template: '#template-confirm-remove',
     });
   }
 
@@ -400,14 +400,14 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
           })
           .then(conversation_et => {
             this.conversation_repository.update_participating_user_ets(
-              conversation_et
+              conversation_et,
             );
           });
       },
       data: {
-        user: user_et
+        user: user_et,
       },
-      template: '#template-confirm-unblock'
+      template: '#template-confirm-unblock',
     });
   }
 
@@ -417,16 +417,16 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.confirm_dialog = $('#participants').confirm({
       confirm: () => {
         const next_conversation_et = this.conversation_repository.get_next_conversation(
-          this.conversation()
+          this.conversation(),
         );
 
         this.participants_bubble.hide();
         this.user_repository.block_user(user_et, next_conversation_et);
       },
       data: {
-        user: user_et
+        user: user_et,
       },
-      template: '#template-confirm-block'
+      template: '#template-confirm-block',
     });
   }
 
@@ -439,8 +439,8 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
       z.tracking.EventName.CONNECT.SENT_CONNECT_REQUEST,
       {
         common_users_count: user_et.mutual_friends_total(),
-        context: 'participants'
-      }
+        context: 'participants',
+      },
     );
   }
 
@@ -459,9 +459,9 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
           .then(() => on_success());
       },
       data: {
-        user: this.user_profile()
+        user: this.user_profile(),
       },
-      template: '#template-confirm-connect'
+      template: '#template-confirm-connect',
     });
   }
 };

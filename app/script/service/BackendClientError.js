@@ -63,7 +63,7 @@ z.service.BackendClientError = class BackendClientError extends Error {
       TOO_MANY_MEMBERS: 'too-many-members',
       UNAUTHORIZED: 'unauthorized',
       UNKNOWN_CLIENT: 'unknown-client',
-      VOICE_CHANNEL_FULL: 'voice-channel-full'
+      VOICE_CHANNEL_FULL: 'voice-channel-full',
     };
   }
 
@@ -84,7 +84,7 @@ z.service.BackendClientError = class BackendClientError extends Error {
       REQUEST_TIMEOUT: 408,
       REQUEST_TOO_LARGE: 413,
       TOO_MANY_REQUESTS: 429,
-      UNAUTHORIZED: 401
+      UNAUTHORIZED: 401,
     };
   }
 };

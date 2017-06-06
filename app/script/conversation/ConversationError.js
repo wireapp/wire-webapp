@@ -75,7 +75,7 @@ z.conversation.ConversationError = class ConversationError extends Error {
       NOT_FOUND: 'z.conversation.ConversationError.TYPE.NOT_FOUND',
       REQUEST_FAILURE: 'z.conversation.ConversationError.TYPE.REQUEST_FAILURE',
       UNKNOWN: 'z.conversation.ConversationError.TYPE.UNKNOWN',
-      WRONG_USER: 'z.conversation.ConversationError.TYPE.WRONG_USER'
+      WRONG_USER: 'z.conversation.ConversationError.TYPE.WRONG_USER',
     };
   }
 };

@@ -33,7 +33,7 @@ z.conversation.EventMapper = class EventMapper {
     this.asset_service = asset_service;
     this.logger = new z.util.Logger(
       'z.conversation.EventMapper',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
   }
 
@@ -50,7 +50,7 @@ z.conversation.EventMapper = class EventMapper {
       .reverse()
       .filter(event => event)
       .map(event =>
-        this.map_json_event(event, conversation_et, should_create_dummy_image)
+        this.map_json_event(event, conversation_et, should_create_dummy_image),
       )
       .filter(message_et => message_et);
   }
@@ -68,12 +68,12 @@ z.conversation.EventMapper = class EventMapper {
       return this._map_json_event(
         event,
         conversation_et,
-        should_create_dummy_image
+        should_create_dummy_image,
       );
     } catch (error) {
       this.logger.error(`Failed to map event: ${error.message}`, {
         error,
-        event
+        event,
       });
       return undefined;
     }
@@ -94,7 +94,7 @@ z.conversation.EventMapper = class EventMapper {
       case z.event.Backend.CONVERSATION.ASSET_ADD:
         message_et = this._map_event_asset_add(
           event,
-          should_create_dummy_image
+          should_create_dummy_image,
         );
         break;
       case z.event.Backend.CONVERSATION.KNOCK:
@@ -168,7 +168,7 @@ z.conversation.EventMapper = class EventMapper {
     if (window.isNaN(message_et.timestamp())) {
       this.logger.warn(
         `Could not get timestamp for message '${message_et.id}'. Skipping it.`,
-        event
+        event,
       );
       message_et = undefined;
     }
@@ -193,7 +193,7 @@ z.conversation.EventMapper = class EventMapper {
     const message_et = new z.entity.ContentMessage();
 
     message_et.assets.push(
-      this._map_asset_image(event, should_create_dummy_image)
+      this._map_asset_image(event, should_create_dummy_image),
     );
     message_et.nonce = event_data.info.nonce;
 
@@ -278,7 +278,7 @@ z.conversation.EventMapper = class EventMapper {
     if (
       [
         z.conversation.ConversationType.CONNECT,
-        z.conversation.ConversationType.ONE2ONE
+        z.conversation.ConversationType.ONE2ONE,
       ].includes(conversation_et.type())
     ) {
       if (
@@ -348,7 +348,7 @@ z.conversation.EventMapper = class EventMapper {
     message_et.nonce = event_data.nonce;
     message_et.replacing_message_id = event_data.replacing_message_id;
     message_et.edited_timestamp = new Date(
-      edited_time || event_data.edited_time
+      edited_time || event_data.edited_time,
     ).getTime();
 
     return message_et;
@@ -451,7 +451,7 @@ z.conversation.EventMapper = class EventMapper {
     message_et.call_message_type = z.message.CALL_MESSAGE_TYPE.DEACTIVATED;
     message_et.finished_reason = event_data.reason;
     message_et.visible(
-      message_et.finished_reason === z.calling.enum.TERMINATION_REASON.MISSED
+      message_et.finished_reason === z.calling.enum.TERMINATION_REASON.MISSED,
     );
 
     return message_et;
@@ -487,11 +487,11 @@ z.conversation.EventMapper = class EventMapper {
     const {key, otr_key, sha256, token} = event_data;
     if (key) {
       asset_et.original_resource(
-        z.assets.AssetRemoteData.v3(key, otr_key, sha256, token)
+        z.assets.AssetRemoteData.v3(key, otr_key, sha256, token),
       );
     } else {
       asset_et.original_resource(
-        z.assets.AssetRemoteData.v2(conversation_id, id, otr_key, sha256)
+        z.assets.AssetRemoteData.v2(conversation_id, id, otr_key, sha256),
       );
     }
 
@@ -501,7 +501,7 @@ z.conversation.EventMapper = class EventMapper {
       preview_key,
       preview_otr_key,
       preview_sha256,
-      preview_token
+      preview_token,
     } = event_data;
     if (preview_otr_key) {
       if (preview_key) {
@@ -511,8 +511,8 @@ z.conversation.EventMapper = class EventMapper {
             preview_otr_key,
             preview_sha256,
             preview_token,
-            true
-          )
+            true,
+          ),
         );
       } else {
         asset_et.preview_resource(
@@ -521,8 +521,8 @@ z.conversation.EventMapper = class EventMapper {
             preview_id,
             preview_otr_key,
             preview_sha256,
-            true
-          )
+            true,
+          ),
         );
       }
     }
@@ -549,13 +549,13 @@ z.conversation.EventMapper = class EventMapper {
         title,
         url,
         url_offset,
-        meta_data
+        meta_data,
       } = link_preview;
       const {
         image: article_image,
         title: article_title,
         summary: article_summary,
-        permanent_url: article_permanent_url
+        permanent_url: article_permanent_url,
       } =
         link_preview.article || {};
 
@@ -582,8 +582,8 @@ z.conversation.EventMapper = class EventMapper {
             otr_key,
             sha256,
             asset_token,
-            true
-          )
+            true,
+          ),
         );
       }
 
@@ -601,7 +601,7 @@ z.conversation.EventMapper = class EventMapper {
   _map_asset_link_previews(link_previews = []) {
     return link_previews
       .map(encoded_link_preview =>
-        z.proto.LinkPreview.decode64(encoded_link_preview)
+        z.proto.LinkPreview.decode64(encoded_link_preview),
       )
       .map(link_preview => this._map_asset_link_preview(link_preview))
       .filter(link_preview_et => link_preview_et);
@@ -646,7 +646,7 @@ z.conversation.EventMapper = class EventMapper {
     const {key, otr_key, sha256, token} = event_data;
     if (key) {
       asset_et.resource(
-        z.assets.AssetRemoteData.v3(key, otr_key, sha256, token, true)
+        z.assets.AssetRemoteData.v3(key, otr_key, sha256, token, true),
       );
     } else {
       asset_et.resource(
@@ -655,8 +655,8 @@ z.conversation.EventMapper = class EventMapper {
           asset_id,
           otr_key,
           sha256,
-          true
-        )
+          true,
+        ),
       );
     }
 

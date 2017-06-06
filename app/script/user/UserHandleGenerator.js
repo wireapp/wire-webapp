@@ -126,7 +126,7 @@ window.z.user = z.user || {};
     'witty',
     'yellow',
     'young',
-    'zinc'
+    'zinc',
   ];
   const RANDOM_WORDS_2 = [
     'alligator',
@@ -255,12 +255,12 @@ window.z.user = z.user || {};
     'wolf',
     'wombat',
     'yak',
-    'zebra'
+    'zebra',
   ];
 
   function get_random_word_combination() {
     return `${z.util.ArrayUtil.random_element(
-      RANDOM_WORDS_1
+      RANDOM_WORDS_1,
     )}${z.util.ArrayUtil.random_element(RANDOM_WORDS_2)}`;
   }
 
@@ -274,7 +274,7 @@ window.z.user = z.user || {};
     return _.range(1, number_of_variations + 1).map(function(value) {
       return append_random_digits(
         handle.slice(0, MAX_HANDLE_LENGTH - value),
-        value
+        value,
       );
     });
   }
@@ -287,7 +287,7 @@ window.z.user = z.user || {};
    */
   function append_random_digits(handle, additional_numbers) {
     const random_digits = _.range(additional_numbers).map(() =>
-      z.util.get_random_int(1, 9)
+      z.util.get_random_int(1, 9),
     );
     return `${handle}${random_digits.join('')}`;
   }
@@ -329,7 +329,7 @@ window.z.user = z.user || {};
     if (normalized_name) {
       suggestions.push(normalized_name);
       const normalized_name_variations = generate_handle_variations(
-        normalized_name
+        normalized_name,
       );
       suggestions = suggestions.concat(normalized_name_variations);
     }
@@ -344,6 +344,6 @@ window.z.user = z.user || {};
     create_suggestions: create_suggestions,
     generate_handle_variations: generate_handle_variations,
     normalize_name: normalize_name,
-    validate_character: validate_character
+    validate_character: validate_character,
   };
 })();

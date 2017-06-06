@@ -31,7 +31,7 @@ z.components.EphemeralTimer = class EphemeralTimer {
     this.ephemeral_duration = ko.computed(
       () =>
         this.message_et.ephemeral_expires() -
-        this.message_et.ephemeral_started()
+        this.message_et.ephemeral_started(),
     );
 
     this.progress = ko.observable(0);
@@ -44,7 +44,7 @@ z.components.EphemeralTimer = class EphemeralTimer {
         }
         const elapsed_time = this.ephemeral_duration() - remaining_time;
         return this.progress(elapsed_time / this.ephemeral_duration());
-      }
+      },
     );
 
     this.bullet_count = [0, 1, 2, 3, 4];
@@ -75,5 +75,5 @@ ko.components.register('ephemeral-timer', {
       <!-- /ko -->
     </ul>
   `,
-  viewModel: z.components.EphemeralTimer
+  viewModel: z.components.EphemeralTimer,
 });

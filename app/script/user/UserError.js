@@ -62,7 +62,7 @@ z.user.UserError = class UserError extends Error {
       UNKNOWN: 'z.user.UserError.TYPE.UNKNOWN',
       USER_MISSING_EMAIL: 'z.user.UserError.TYPE.USER_MISSING_EMAIL',
       USER_NOT_FOUND: 'z.user.UserError.TYPE.USER_NOT_FOUND',
-      USERNAME_TAKEN: 'z.user.UserError.TYPE.USERNAME_TAKEN'
+      USERNAME_TAKEN: 'z.user.UserError.TYPE.USERNAME_TAKEN',
     };
   }
 };

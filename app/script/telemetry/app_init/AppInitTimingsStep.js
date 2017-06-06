@@ -34,5 +34,5 @@ z.telemetry.app_init.AppInitTimingsStep = {
   UPDATED_FROM_NOTIFICATIONS: 'updated_from_notifications',
   APP_PRE_LOADED: 'app_pre_loaded',
   APP_LOADED: 'app_loaded',
-  UPDATED_CONVERSATIONS: 'updated_conversations'
+  UPDATED_CONVERSATIONS: 'updated_conversations',
 };

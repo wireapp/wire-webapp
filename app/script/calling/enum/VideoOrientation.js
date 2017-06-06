@@ -25,5 +25,5 @@ window.z.calling.enum = z.calling.enum || {};
 
 z.calling.enum.VIDEO_ORIENTATION = {
   LANDSCAPE: 'landscape',
-  PORTRAIT: 'portrait'
+  PORTRAIT: 'portrait',
 };

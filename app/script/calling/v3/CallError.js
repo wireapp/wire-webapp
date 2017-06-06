@@ -89,7 +89,7 @@ z.calling.v3.CallError = class CallError extends Error {
       WRONG_CONVERSATION_TYPE:
         'z.calling.v3.CallError.TYPE.WRONG_CONVERSATION_TYPE',
       WRONG_PAYLOAD_FORMAT: 'z.calling.v3.CallError.TYPE.WRONG_PAYLOAD_FORMAT',
-      WRONG_SENDER: 'z.calling.v3.CallError.TYPE.WRONG_SENDER'
+      WRONG_SENDER: 'z.calling.v3.CallError.TYPE.WRONG_SENDER',
     };
   }
 };

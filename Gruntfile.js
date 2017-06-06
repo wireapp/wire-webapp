@@ -24,11 +24,11 @@ module.exports = grunt => {
 
   const config = {
     aws: {
-      port: 5000
+      port: 5000,
     },
     server: {
-      port: 8888
-    }
+      port: 8888,
+    },
   };
 
   /* eslint-disable sort-keys */
@@ -40,19 +40,19 @@ module.exports = grunt => {
       page: 'app/page',
       script: 'app/script',
       style: 'app/style',
-      template_dist: 'app/page/template/_dist'
+      template_dist: 'app/page/template/_dist',
     },
     aws_: 'aws',
     aws: {
       s3: 'aws/s3',
       static: 'aws/static',
-      templates: 'aws/templates'
+      templates: 'aws/templates',
     },
     deploy: 'deploy',
     dist: 'dist',
     docs: {
       api: 'docs/api',
-      coverage: 'docs/coverage'
+      coverage: 'docs/coverage',
     },
     temp: 'temp',
     test_: 'test',
@@ -60,8 +60,8 @@ module.exports = grunt => {
       api: 'test/api',
       coverage: 'test/coverage',
       lib: 'test/lib',
-      unit_tests: 'test/unit_tests'
-    }
+      unit_tests: 'test/unit_tests',
+    },
   };
 
   grunt.initConfig({
@@ -86,7 +86,7 @@ module.exports = grunt => {
     shell: require('./grunt/config/shell'),
     todo: require('./grunt/config/todo'),
     uglify: require('./grunt/config/uglify'),
-    watch: require('./grunt/config/watch')
+    watch: require('./grunt/config/watch'),
   });
   /* eslint-enable sort-keys */
 
@@ -100,12 +100,12 @@ module.exports = grunt => {
   grunt.registerTask('app_deploy_staging', [
     'gitinfo',
     'set_version:staging',
-    'aws_deploy'
+    'aws_deploy',
   ]);
   grunt.registerTask('app_deploy_prod', [
     'gitinfo',
     'set_version:prod',
-    'aws_deploy'
+    'aws_deploy',
   ]);
 
   grunt.registerTask('app_deploy_travis', target => {
@@ -114,18 +114,18 @@ module.exports = grunt => {
         `set_version:${target}`,
         'init',
         `prepare_${target}`,
-        'aws_prepare'
+        'aws_prepare',
       );
     } else if (target === 'dev') {
       grunt.task.run(
         'set_version:staging',
         'init',
         'prepare_staging',
-        'aws_prepare'
+        'aws_prepare',
       );
     } else {
       grunt.fail.warn(
-        'Invalid target specified. Valid targets are: "prod" & "staging"'
+        'Invalid target specified. Valid targets are: "prod" & "staging"',
       );
     }
   });
@@ -137,8 +137,8 @@ module.exports = grunt => {
       'scripts',
       'test_init',
       'test_prepare',
-      'karma:test'
-    ])
+      'karma:test',
+    ]),
   );
 
   grunt.registerTask('test_prepare', test_name => {
@@ -151,13 +151,13 @@ module.exports = grunt => {
 
     const helper_files = grunt.config.get('karma.options.files');
     const app_files = prepare_file_names(
-      scripts_minified.app.concat(scripts.app)
+      scripts_minified.app.concat(scripts.app),
     );
     const component_files = prepare_file_names(
-      scripts_minified.component.concat(scripts.component)
+      scripts_minified.component.concat(scripts.component),
     );
     const vendor_files = prepare_file_names(
-      scripts_minified.vendor.concat(scripts.vendor)
+      scripts_minified.vendor.concat(scripts.vendor),
     );
     const test_files = test_name
       ? [`../test/unit_tests/${test_name}Spec.js`]
@@ -168,7 +168,7 @@ module.exports = grunt => {
       vendor_files,
       component_files,
       app_files,
-      test_files
+      test_files,
     );
 
     grunt.config('karma.options.files', files);
@@ -183,7 +183,7 @@ module.exports = grunt => {
       'newer:coffee:dist',
       'newer:copy:dist_js',
       `test_prepare:${test_name}`,
-      'karma:test'
+      'karma:test',
     ]);
   });
 };

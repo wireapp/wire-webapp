@@ -46,6 +46,6 @@ z.assets.AssetURLCache = (function() {
 
   return {
     get_url,
-    set_url
+    set_url,
   };
 })();

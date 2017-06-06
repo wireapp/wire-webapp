@@ -35,7 +35,7 @@ z.assets.AssetMetaDataBuilder = {
       .then(audio_buffer => {
         return new z.proto.Asset.AudioMetaData(
           audio_buffer.duration * 1000,
-          z.assets.AssetMetaDataBuilder._normalise_loudness(audio_buffer)
+          z.assets.AssetMetaDataBuilder._normalise_loudness(audio_buffer),
         );
       });
   },
@@ -65,8 +65,8 @@ z.assets.AssetMetaDataBuilder = {
           new z.proto.Asset.VideoMetaData(
             video.videoWidth,
             video.videoHeight,
-            video.duration
-          )
+            video.duration,
+          ),
         );
         window.URL.revokeObjectURL(url);
       };
@@ -87,7 +87,7 @@ z.assets.AssetMetaDataBuilder = {
 
     const preview = buckets.map(bucket => {
       return z.util.NumberUtil.cap_to_byte(
-        AMPLIFIER * z.util.NumberUtil.root_mean_square(bucket)
+        AMPLIFIER * z.util.NumberUtil.root_mean_square(bucket),
       );
     });
 
@@ -124,5 +124,5 @@ z.assets.AssetMetaDataBuilder = {
 
   is_video(file) {
     return file && file.type.startsWith('video');
-  }
+  },
 };

@@ -34,7 +34,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
       BODY_LENGTH: 80,
       ICON_URL: '/image/logo/notification.png',
       TIMEOUT: 5000,
-      TITLE_LENGTH: 38
+      TITLE_LENGTH: 38,
     };
   }
 
@@ -45,7 +45,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
       z.message.SuperType.MEMBER,
       z.message.SuperType.PING,
       z.message.SuperType.REACTION,
-      z.message.SuperType.SYSTEM
+      z.message.SuperType.SYSTEM,
     ];
   }
 
@@ -59,14 +59,14 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
     this.conversation_repository = conversation_repository;
     this.logger = new z.util.Logger(
       'z.system_notification.SystemNotificationRepository',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
 
     this.notifications = [];
 
     this.subscribe_to_events();
     this.notifications_preference = ko.observable(
-      z.system_notification.SystemNotificationPreference.ON
+      z.system_notification.SystemNotificationPreference.ON,
     );
     this.notifications_preference.subscribe(notifications_preference => {
       if (
@@ -84,23 +84,23 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
   subscribe_to_events() {
     amplify.subscribe(
       z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY,
-      this.notify.bind(this)
+      this.notify.bind(this),
     );
     amplify.subscribe(
       z.event.WebApp.SYSTEM_NOTIFICATION.PERMISSION_STATE,
-      this.set_permission_state.bind(this)
+      this.set_permission_state.bind(this),
     );
     amplify.subscribe(
       z.event.WebApp.SYSTEM_NOTIFICATION.REMOVE_READ,
-      this.remove_read_notifications.bind(this)
+      this.remove_read_notifications.bind(this),
     );
     amplify.subscribe(
       z.event.WebApp.PROPERTIES.UPDATED,
-      this.updated_properties.bind(this)
+      this.updated_properties.bind(this),
     );
     amplify.subscribe(
       z.event.WebApp.PROPERTIES.UPDATE.NOTIFICATIONS,
-      this.updated_notifications_property.bind(this)
+      this.updated_notifications_property.bind(this),
     );
   }
 
@@ -113,7 +113,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
       [
         z.system_notification.PermissionStatusState.GRANTED,
         z.system_notification.PermissionStatusState.IGNORED,
-        z.system_notification.PermissionStatusState.UNSUPPORTED
+        z.system_notification.PermissionStatusState.UNSUPPORTED,
       ].includes(this.permission_state)
     ) {
       return Promise.resolve(this.permission_state);
@@ -121,7 +121,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
 
     if (!z.util.Environment.browser.supports.notifications) {
       this.set_permission_state(
-        z.system_notification.PermissionStatusState.UNSUPPORTED
+        z.system_notification.PermissionStatusState.UNSUPPORTED,
       );
       return Promise.resolve(this.permission_state);
     }
@@ -170,7 +170,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
 
       if (
         SystemNotificationRepository.EVENTS_TO_NOTIFY.includes(
-          message_et.super_type
+          message_et.super_type,
         )
       ) {
         this._notify_sound(message_et);
@@ -190,7 +190,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
             if (is_read) {
               notification.close();
               this.logger.info(
-                `Removed read notification for '${message_id}' in '${conversation_id}'.`
+                `Removed read notification for '${message_id}' in '${conversation_id}'.`,
               );
             }
           });
@@ -246,7 +246,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
         if (asset_et.is_text() && !asset_et.previews().length) {
           return z.util.StringUtil.truncate(
             asset_et.text,
-            SystemNotificationRepository.CONFIG.BODY_LENGTH
+            SystemNotificationRepository.CONFIG.BODY_LENGTH,
           );
         }
       }
@@ -281,13 +281,13 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
       replace: [
         {
           content: message_et.user().first_name(),
-          placeholder: '%s.first_name'
+          placeholder: '%s.first_name',
         },
         {
           content: message_et.name,
-          placeholder: '%name'
-        }
-      ]
+          placeholder: '%name',
+        },
+      ],
     });
   }
 
@@ -305,16 +305,16 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
         replace: [
           {
             content: message_et.user().first_name(),
-            placeholder: '%s.first_name'
+            placeholder: '%s.first_name',
           },
           {
             content: z.util.get_first_name(
               message_et.user_ets()[0],
-              z.string.Declension.ACCUSATIVE
+              z.string.Declension.ACCUSATIVE,
             ),
-            placeholder: '%@.first_name'
-          }
-        ]
+            placeholder: '%@.first_name',
+          },
+        ],
       });
     }
 
@@ -323,13 +323,13 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
       replace: [
         {
           content: message_et.user().first_name(),
-          placeholder: '%s.first_name'
+          placeholder: '%s.first_name',
         },
         {
           content: message_et.user_ids().length,
-          placeholder: '%no'
-        }
-      ]
+          placeholder: '%no',
+        },
+      ],
     });
   }
 
@@ -347,8 +347,8 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
           id: z.string.system_notification_member_leave_left,
           replace: {
             content: message_et.user().first_name(),
-            placeholder: '%s.first_name'
-          }
+            placeholder: '%s.first_name',
+          },
         });
       }
 
@@ -357,16 +357,16 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
         replace: [
           {
             content: message_et.user().first_name(),
-            placeholder: '%s.first_name'
+            placeholder: '%s.first_name',
           },
           {
             content: z.util.get_first_name(
               message_et.user_ets()[0],
-              z.string.Declension.ACCUSATIVE
+              z.string.Declension.ACCUSATIVE,
             ),
-            placeholder: '%@.first_name'
-          }
-        ]
+            placeholder: '%@.first_name',
+          },
+        ],
       });
     }
 
@@ -375,13 +375,13 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
       replace: [
         {
           content: message_et.user().first_name(),
-          placeholder: '%s.first_name'
+          placeholder: '%s.first_name',
         },
         {
           content: message_et.user_ets().length,
-          placeholder: '%no'
-        }
-      ]
+          placeholder: '%no',
+        },
+      ],
     });
   }
 
@@ -421,13 +421,13 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
           id: z.string.system_notification_conversation_create,
           replace: {
             content: message_et.user().first_name(),
-            placeholder: '%s.first_name'
-          }
+            placeholder: '%s.first_name',
+          },
         });
       default:
         this.logger.log(
           this.logger.levels.OFF,
-          `Notification for '${message_et.id} in '${conversation_et.id}' does not show notification.`
+          `Notification for '${message_et.id} in '${conversation_et.id}' does not show notification.`,
         );
     }
   }
@@ -461,8 +461,8 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
       id: z.string.system_notification_reaction,
       replace: {
         content: message_et.reaction,
-        placeholder: '%reaction'
-      }
+        placeholder: '%reaction',
+      },
     });
   }
 
@@ -499,7 +499,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
           return this._should_obfuscate_notification_sender(message_et);
         }
         throw new z.system_notification.SystemNotificationError(
-          z.system_notification.SystemNotificationError.TYPE.HIDE_NOTIFICATION
+          z.system_notification.SystemNotificationError.TYPE.HIDE_NOTIFICATION,
         );
       })
       .then(should_obfuscate_sender => {
@@ -511,16 +511,16 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
             data: this._create_options_data(conversation_et, message_et),
             icon: this._create_options_icon(
               should_obfuscate_sender,
-              message_et.user()
+              message_et.user(),
             ),
             silent: true, // @note When Firefox supports this we can remove the fix for WEBAPP-731
-            tag: this._create_options_tag(conversation_et)
+            tag: this._create_options_tag(conversation_et),
           },
           timeout: SystemNotificationRepository.CONFIG.TIMEOUT,
           title: should_obfuscate_sender
             ? this._create_title_obfuscated()
             : this._create_title(conversation_et, message_et),
-          trigger: this._create_trigger(conversation_et, message_et)
+          trigger: this._create_trigger(conversation_et, message_et),
         };
       });
   }
@@ -551,7 +551,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
         default:
           this.logger.log(
             this.logger.levels.OFF,
-            `Notification for '${message_et.id} in '${conversation_et.id}' does not show notification.`
+            `Notification for '${message_et.id} in '${conversation_et.id}' does not show notification.`,
           );
       }
     });
@@ -568,7 +568,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
   _create_options_data(input, message_et) {
     return {
       conversation_id: input.id || input.conversation_id,
-      message_id: message_et.id
+      message_id: message_et.id,
     };
   }
 
@@ -620,19 +620,19 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
             .user()
             .first_name()} in ${conversation_et.display_name()}`,
           SystemNotificationRepository.CONFIG.TITLE_LENGTH,
-          false
+          false,
         );
       }
       return z.util.StringUtil.truncate(
         conversation_et.display_name(),
         SystemNotificationRepository.CONFIG.TITLE_LENGTH,
-        false
+        false,
       );
     }
     return z.util.StringUtil.truncate(
       message_et.user().name(),
       SystemNotificationRepository.CONFIG.TITLE_LENGTH,
-      false
+      false,
     );
   }
 
@@ -645,7 +645,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
     return z.util.StringUtil.truncate(
       z.l10n.text(z.string.system_notification_obfuscated_title),
       SystemNotificationRepository.CONFIG.TITLE_LENGTH,
-      false
+      false,
     );
   }
 
@@ -664,18 +664,18 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
           return () =>
             amplify.publish(
               z.event.WebApp.CONVERSATION.SHOW,
-              conversation_et.conversation_id
+              conversation_et.conversation_id,
             );
         case z.message.SystemMessageType.CONNECTION_REQUEST:
           return () =>
             amplify.publish(
               z.event.WebApp.CONTENT.SWITCH,
-              z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS
+              z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS,
             );
         default:
           this.logger.log(
             this.logger.levels.OFF,
-            `Notification for member message '${message_et.id} in '${conversation_et.id}' does not have specific trigger.`
+            `Notification for member message '${message_et.id} in '${conversation_et.id}' does not have specific trigger.`,
           );
       }
     }
@@ -736,7 +736,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
         if (!message_et.user().is_me) {
           amplify.publish(
             z.event.WebApp.AUDIO.PLAY,
-            z.audio.AudioType.NEW_MESSAGE
+            z.audio.AudioType.NEW_MESSAGE,
           );
         }
         break;
@@ -744,14 +744,14 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
         if (!message_et.user().is_me) {
           amplify.publish(
             z.event.WebApp.AUDIO.PLAY,
-            z.audio.AudioType.INCOMING_PING
+            z.audio.AudioType.INCOMING_PING,
           );
         }
         break;
       default:
         this.logger.log(
           this.logger.levels.OFF,
-          `Notification for message '${message_et.id} does not play sound.`
+          `Notification for message '${message_et.id} does not play sound.`,
         );
     }
   }
@@ -761,7 +761,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
     return new Promise(resolve => {
       amplify.publish(
         z.event.WebApp.WARNING.SHOW,
-        z.ViewModel.WarningType.REQUEST_NOTIFICATION
+        z.ViewModel.WarningType.REQUEST_NOTIFICATION,
       );
       // Note: The callback will be only triggered in Chrome.
       // If you ignore a permission request on Firefox, then the callback will not be triggered.
@@ -769,7 +769,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
         window.Notification.requestPermission(permission_state => {
           amplify.publish(
             z.event.WebApp.WARNING.DISMISS,
-            z.ViewModel.WarningType.REQUEST_NOTIFICATION
+            z.ViewModel.WarningType.REQUEST_NOTIFICATION,
           );
           this.set_permission_state(permission_state);
           return resolve(this.permission_state);
@@ -789,7 +789,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
       message_et.is_ephemeral() ||
       [
         z.system_notification.SystemNotificationPreference.OBFUSCATE,
-        z.system_notification.SystemNotificationPreference.OBFUSCATE_MESSAGE
+        z.system_notification.SystemNotificationPreference.OBFUSCATE_MESSAGE,
       ].includes(this.notifications_preference())
     );
   }
@@ -839,7 +839,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
       }
 
       const in_active_conversation = this.conversation_repository.is_active_conversation(
-        conversation_et
+        conversation_et,
       );
       const in_conversation_view =
         document.hasFocus() &&
@@ -858,7 +858,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
 
       if (hide_notification) {
         throw new z.system_notification.SystemNotificationError(
-          z.system_notification.SystemNotificationError.TYPE.HIDE_NOTIFICATION
+          z.system_notification.SystemNotificationError.TYPE.HIDE_NOTIFICATION,
         );
       }
     });
@@ -877,7 +877,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
   _show_notification(notification_content) {
     amplify.publish(
       z.event.WebApp.SYSTEM_NOTIFICATION.SHOW,
-      notification_content
+      notification_content,
     );
     this._show_notification_in_browser(notification_content);
   }
@@ -901,7 +901,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
     this.remove_read_notifications();
     const notification = new window.Notification(
       notification_content.title,
-      notification_content.options
+      notification_content.options,
     );
     const {conversation_id, message_id} = notification_content.options.data;
     let timeout_trigger_id = undefined;
@@ -912,7 +912,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
       wire.app.view.content.multitasking.is_minimized(true);
       notification_content.trigger();
       this.logger.info(
-        `Notification for '${message_id} in '${conversation_id}' closed by click.`
+        `Notification for '${message_id} in '${conversation_id}' closed by click.`,
       );
       notification.close();
     };
@@ -921,13 +921,13 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
       window.clearTimeout(timeout_trigger_id);
       this.notifications.splice(this.notifications.indexOf(notification), 1);
       this.logger.info(
-        `Removed notification for '${message_id}' in '${conversation_id}' locally.`
+        `Removed notification for '${message_id}' in '${conversation_id}' locally.`,
       );
     };
 
     notification.onerror = () => {
       this.logger.error(
-        `Notification for '${message_id}' in '${conversation_id}' closed by error.`
+        `Notification for '${message_id}' in '${conversation_id}' closed by error.`,
       );
       notification.close();
     };
@@ -935,7 +935,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
     notification.onshow = () => {
       timeout_trigger_id = window.setTimeout(() => {
         this.logger.info(
-          `Notification for '${message_id}' in '${conversation_id}' closed by timeout.`
+          `Notification for '${message_id}' in '${conversation_id}' closed by timeout.`,
         );
         notification.close();
       }, notification_content.timeout);
@@ -943,7 +943,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
 
     this.notifications.push(notification);
     this.logger.info(
-      `Added notification for '${message_id}' in '${conversation_id}' to queue.`
+      `Added notification for '${message_id}' in '${conversation_id}' to queue.`,
     );
 
     window.onunload = () => {
@@ -952,10 +952,10 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
         if (browser_notification.data) {
           const {
             notification_conversation_id,
-            notification_message_id
+            notification_message_id,
           } = browser_notification.data;
           this.logger.info(
-            `Notification for '${notification_message_id}' in '${notification_conversation_id}' closed by redirect.`
+            `Notification for '${notification_message_id}' in '${notification_conversation_id}' closed by redirect.`,
           );
         }
       });

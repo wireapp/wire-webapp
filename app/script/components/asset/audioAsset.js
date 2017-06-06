@@ -34,7 +34,7 @@ z.components.AudioAssetComponent = class AudioAssetComponent {
     this.dispose = this.dispose.bind(this);
     this.logger = new z.util.Logger(
       'AudioAssetComponent',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
 
     this.message = ko.unwrap(params.message);
@@ -59,7 +59,7 @@ z.components.AudioAssetComponent = class AudioAssetComponent {
 
     $(component_info.element).attr({
       'data-uie-name': 'audio-asset',
-      'data-uie-value': this.asset.file_name
+      'data-uie-value': this.asset.file_name,
     });
 
     this.on_play_button_clicked = this.on_play_button_clicked.bind(this);
@@ -111,11 +111,11 @@ z.components.AudioAssetComponent = class AudioAssetComponent {
           60,
           300,
           900,
-          1800
+          1800,
         ]),
         duration_actual: duration,
-        type: z.util.get_file_extension(this.asset.file_name)
-      }
+        type: z.util.get_file_extension(this.asset.file_name),
+      },
     );
   }
 
@@ -167,6 +167,6 @@ ko.components.register('audio-asset', {
   viewModel: {
     createViewModel(params, component_info) {
       return new z.components.AudioAssetComponent(params, component_info);
-    }
-  }
+    },
+  },
 });

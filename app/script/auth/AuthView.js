@@ -27,7 +27,7 @@ z.auth.AuthView = {
     HORIZONTAL_LEFT: 'horizontal-left',
     HORIZONTAL_RIGHT: 'horizontal-right',
     VERTICAL_BOTTOM: 'vertical-bottom',
-    VERTICAL_TOP: 'vertical-top'
+    VERTICAL_TOP: 'vertical-top',
   },
   MODE: {
     ACCOUNT_LOGIN: 'login',
@@ -44,19 +44,19 @@ z.auth.AuthView = {
     POSTED_VERIFY: 'verify',
     VERIFY_ACCOUNT: 'account',
     VERIFY_CODE: 'code',
-    VERIFY_PASSWORD: 'phone-password'
+    VERIFY_PASSWORD: 'phone-password',
   },
   REGISTRATION_CONTEXT: {
     EMAIL: 'email',
     GENERIC_INVITE: 'generic_invite',
-    PERSONAL_INVITE: 'personal_invite'
+    PERSONAL_INVITE: 'personal_invite',
   },
   SECTION: {
     ACCOUNT: 'account',
     HISTORY: 'history',
     LIMIT: 'limit',
     POSTED: 'posted',
-    VERIFY: 'verify'
+    VERIFY: 'verify',
   },
   TYPE: {
     CODE: 'code',
@@ -67,6 +67,6 @@ z.auth.AuthView = {
     PASSWORD: 'password',
     PHONE: 'phone',
     SECTION: 'section',
-    TERMS: 'terms'
-  }
+    TERMS: 'terms',
+  },
 };

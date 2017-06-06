@@ -27,5 +27,5 @@ z.ViewModel.list.LIST_STATE = {
   ARCHIVE: 'z.ViewModel.list.LIST_STATE.ARCHIVE',
   CONVERSATIONS: 'z.ViewModel.list.LIST_STATE.CONVERSATIONS',
   PREFERENCES: 'z.ViewModel.list.LIST_STATE.PREFERENCES',
-  START_UI: 'z.ViewModel.list.LIST_STATE.START_UI'
+  START_UI: 'z.ViewModel.list.LIST_STATE.START_UI',
 };

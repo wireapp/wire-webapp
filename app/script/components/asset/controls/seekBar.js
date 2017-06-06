@@ -44,7 +44,7 @@ z.components.SeekBarComponent = class SeekBarComponent {
     this.seek_bar_mouse_over = ko.observable(false);
     this.seek_bar_thumb_dragged = ko.observable(false);
     this.show_seek_bar_thumb = ko.pureComputed(
-      () => this.seek_bar_thumb_dragged() || this.seek_bar_mouse_over()
+      () => this.seek_bar_thumb_dragged() || this.seek_bar_mouse_over(),
     );
 
     this.on_mouse_down = this.on_mouse_down.bind(this);
@@ -133,6 +133,6 @@ ko.components.register('seek-bar', {
   viewModel: {
     createViewModel(params, component_info) {
       return new z.components.SeekBarComponent(params, component_info);
-    }
-  }
+    },
+  },
 });

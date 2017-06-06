@@ -25,7 +25,7 @@ window.z.ViewModel = z.ViewModel || {};
 z.ViewModel.GiphyViewModel = class GiphyViewModel {
   static get CONFIG() {
     return {
-      NUMBER_OF_GIFS: 6
+      NUMBER_OF_GIFS: 6,
     };
   }
 
@@ -34,7 +34,7 @@ z.ViewModel.GiphyViewModel = class GiphyViewModel {
       DEFAULT: '',
       ERROR: 'error',
       LOADING: 'loading',
-      RESULTS: 'results'
+      RESULTS: 'results',
     };
   }
   constructor(element_id, conversation_repository, giphy_repository) {
@@ -45,7 +45,7 @@ z.ViewModel.GiphyViewModel = class GiphyViewModel {
     this.giphy_repository = giphy_repository;
     this.logger = new z.util.Logger(
       'z.ViewModel.GiphyViewModel',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
 
     this.modal = undefined;
@@ -69,7 +69,7 @@ z.ViewModel.GiphyViewModel = class GiphyViewModel {
   _init_subscriptions() {
     amplify.subscribe(
       z.event.WebApp.EXTENSIONS.GIPHY.SHOW,
-      this.show_giphy.bind(this)
+      this.show_giphy.bind(this),
     );
   }
 
@@ -112,12 +112,12 @@ z.ViewModel.GiphyViewModel = class GiphyViewModel {
           const event = new z.tracking.event.PictureTakenEvent(
             'conversation',
             'giphy',
-            'button'
+            'button',
           );
           amplify.publish(
             z.event.WebApp.ANALYTICS.EVENT,
             event.name,
-            event.attributes
+            event.attributes,
           );
           amplify.publish(z.event.WebApp.EXTENSIONS.GIPHY.SEND);
         });
@@ -167,7 +167,7 @@ z.ViewModel.GiphyViewModel = class GiphyViewModel {
 
       this.giphy_repository
         .get_random_gif({
-          tag: this.query()
+          tag: this.query(),
         })
         .then(gif => {
           this.gif(gif);
@@ -190,7 +190,7 @@ z.ViewModel.GiphyViewModel = class GiphyViewModel {
       this.giphy_repository
         .get_gifs({
           number: GiphyViewModel.CONFIG.NUMBER_OF_GIFS,
-          query: this.query()
+          query: this.query(),
         })
         .then(gifs => {
           this.gifs(gifs);

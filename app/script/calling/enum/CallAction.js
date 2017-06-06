@@ -29,5 +29,5 @@ z.calling.enum.CALL_ACTION = {
   LEAVE: 'leave_call',
   PARTICIPANT_LEFT: 'participant_left',
   REJECT: 'reject_call',
-  TOGGLE_MEDIA: 'toggle_media'
+  TOGGLE_MEDIA: 'toggle_media',
 };

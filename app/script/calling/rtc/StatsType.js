@@ -29,5 +29,5 @@ z.calling.rtc.STATS_TYPE = {
   GOOGLE_CANDIDATE_PAIR: 'googCandidatePair',
   INBOUND_RTP: 'inbound-rtp',
   OUTBOUND_RTP: 'outbound-rtp',
-  SSRC: 'ssrc'
+  SSRC: 'ssrc',
 };

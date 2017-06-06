@@ -50,7 +50,7 @@ describe('z.announce.AnnounceRepository', function() {
           title: 'New Blog post',
           version: 1464166352,
           version_max: 'dev',
-          version_min: '2016.04.14.0921'
+          version_min: '2016.04.14.0921',
         },
         {
           active: true,
@@ -65,16 +65,16 @@ describe('z.announce.AnnounceRepository', function() {
           title: 'Click me to refresh..',
           version: 1464166352,
           version_max: '2016.06.14.0921',
-          version_min: 'dev'
-        }
+          version_min: 'dev',
+        },
       ],
-      status: 'success'
+      status: 'success',
     };
 
     server.respondWith(
       'GET',
       'https://staging-website.zinfra.io/api/v1/announce/?order=created&active=true',
-      [200, {'Content-Type': 'application/json'}, JSON.stringify(response)]
+      [200, {'Content-Type': 'application/json'}, JSON.stringify(response)],
     );
   });
 

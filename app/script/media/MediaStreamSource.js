@@ -24,5 +24,5 @@ window.z.media = z.media || {};
 
 z.media.MediaStreamSource = {
   LOCAL: 'local',
-  REMOTE: 'remote'
+  REMOTE: 'remote',
 };

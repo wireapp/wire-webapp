@@ -26,5 +26,5 @@ z.media.MediaDeviceType = {
   AUDIO_INPUT: 'audioinput',
   AUDIO_OUTPUT: 'audiooutput',
   SCREEN_INPUT: 'screeninput',
-  VIDEO_INPUT: 'videoinput'
+  VIDEO_INPUT: 'videoinput',
 };

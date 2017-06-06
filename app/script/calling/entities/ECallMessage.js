@@ -27,7 +27,7 @@ z.calling.entities.ECallMessage = class ECallMessage {
   static get CONFIG() {
     return {
       SESSION_ID_LENGTH: 4,
-      VERSION: '3.0'
+      VERSION: '3.0',
     };
   }
 
@@ -66,14 +66,14 @@ z.calling.entities.ECallMessage = class ECallMessage {
       resp: this.response,
       sessid: this.session_id,
       type: this.type,
-      version: ECallMessage.CONFIG.VERSION
+      version: ECallMessage.CONFIG.VERSION,
     };
 
     const extended_message_types = [
       z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_SETUP,
       z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC,
       z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP,
-      z.calling.enum.E_CALL_MESSAGE_TYPE.UPDATE
+      z.calling.enum.E_CALL_MESSAGE_TYPE.UPDATE,
     ];
 
     if (extended_message_types.includes(this.type)) {
@@ -86,7 +86,7 @@ z.calling.entities.ECallMessage = class ECallMessage {
     const targeted_message_types = [
       z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL,
       z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_SETUP,
-      z.calling.enum.E_CALL_MESSAGE_TYPE.UPDATE
+      z.calling.enum.E_CALL_MESSAGE_TYPE.UPDATE,
     ];
 
     if (targeted_message_types.includes(this.type)) {

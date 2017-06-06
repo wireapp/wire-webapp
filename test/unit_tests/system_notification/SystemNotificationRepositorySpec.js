@@ -43,15 +43,15 @@ describe('z.system_notification.SystemNotificationRepository', function() {
       .then(function() {
         amplify.publish(
           z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE,
-          z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET
+          z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET,
         );
 
         // Create entities
         user_et = TestFactory.user_repository.user_mapper.map_user_from_object(
-          payload.users.get.one[0]
+          payload.users.get.one[0],
         );
         conversation_et = TestFactory.conversation_repository.conversation_mapper.map_conversation(
-          entities.conversation
+          entities.conversation,
         );
         conversation_et.team_id = undefined;
 
@@ -61,11 +61,11 @@ describe('z.system_notification.SystemNotificationRepository', function() {
             body: '',
             data: {
               conversation_id: conversation_et.id,
-              message_id: '0'
+              message_id: '0',
             },
             icon: '/image/logo/notification.png',
             silent: true,
-            tag: conversation_et.id
+            tag: conversation_et.id,
           },
           timeout:
             z.system_notification.SystemNotificationRepository.CONFIG.TIMEOUT,
@@ -73,8 +73,8 @@ describe('z.system_notification.SystemNotificationRepository', function() {
             conversation_et.display_name(),
             z.system_notification.SystemNotificationRepository.CONFIG
               .TITLE_LENGTH,
-            false
-          )
+            false,
+          ),
         };
 
         // Mocks
@@ -87,21 +87,21 @@ describe('z.system_notification.SystemNotificationRepository', function() {
             asset: {
               generate_asset_url() {
                 return '/image/logo/notification.png';
-              }
-            }
+              },
+            },
           },
           view: {
             content: {
               content_state: ko.observable(
-                z.ViewModel.content.CONTENT_STATE.CONVERSATION
+                z.ViewModel.content.CONTENT_STATE.CONVERSATION,
               ),
               multitasking: {
                 is_minimized() {
                   return true;
-                }
-              }
-            }
-          }
+                },
+              },
+            },
+          },
         };
 
         spyOn(TestFactory.system_notification_repository, '_show_notification');
@@ -111,7 +111,7 @@ describe('z.system_notification.SystemNotificationRepository', function() {
           _done,
           _conversation,
           _message,
-          _expected_body
+          _expected_body,
         ) {
           TestFactory.system_notification_repository
             .notify(_conversation, _message)
@@ -125,23 +125,23 @@ describe('z.system_notification.SystemNotificationRepository', function() {
                   title,
                   z.system_notification.SystemNotificationRepository.CONFIG
                     .TITLE_LENGTH,
-                  false
+                  false,
                 );
               } else {
                 notification_content.title = '…';
               }
               notification_content.trigger = TestFactory.system_notification_repository._create_trigger(
                 conversation_et,
-                message_et
+                message_et,
               );
 
               const result = JSON.stringify(
                 TestFactory.system_notification_repository._show_notification.calls.first()
-                  .args[0]
+                  .args[0],
               );
               expect(result).toEqual(JSON.stringify(notification_content));
               expect(
-                TestFactory.system_notification_repository._show_notification
+                TestFactory.system_notification_repository._show_notification,
               ).toHaveBeenCalledTimes(1);
               _done();
             })
@@ -151,7 +151,7 @@ describe('z.system_notification.SystemNotificationRepository', function() {
         verify_notification_ephemeral = function(
           _done,
           _conversation,
-          _message
+          _message,
         ) {
           TestFactory.system_notification_repository
             .notify(_conversation, _message)
@@ -162,16 +162,16 @@ describe('z.system_notification.SystemNotificationRepository', function() {
                 z.string.system_notification_obfuscated_title;
               notification_content.trigger = TestFactory.system_notification_repository._create_trigger(
                 conversation_et,
-                message_et
+                message_et,
               );
 
               const result = JSON.stringify(
                 TestFactory.system_notification_repository._show_notification.calls.first()
-                  .args[0]
+                  .args[0],
               );
               expect(result).toEqual(JSON.stringify(notification_content));
               expect(
-                TestFactory.system_notification_repository._show_notification
+                TestFactory.system_notification_repository._show_notification,
               ).toHaveBeenCalledTimes(1);
               _done();
             })
@@ -182,7 +182,7 @@ describe('z.system_notification.SystemNotificationRepository', function() {
           _done,
           _conversation,
           _message,
-          _setting
+          _setting,
         ) {
           TestFactory.system_notification_repository
             .notify(_conversation, _message)
@@ -201,7 +201,7 @@ describe('z.system_notification.SystemNotificationRepository', function() {
                   title,
                   z.system_notification.SystemNotificationRepository.CONFIG
                     .TITLE_LENGTH,
-                  false
+                  false,
                 );
               } else {
                 notification_content.options.body =
@@ -211,16 +211,16 @@ describe('z.system_notification.SystemNotificationRepository', function() {
               }
               notification_content.trigger = TestFactory.system_notification_repository._create_trigger(
                 conversation_et,
-                message_et
+                message_et,
               );
 
               const result = JSON.stringify(
                 TestFactory.system_notification_repository._show_notification.calls.first()
-                  .args[0]
+                  .args[0],
               );
               expect(result).toEqual(JSON.stringify(notification_content));
               expect(
-                TestFactory.system_notification_repository._show_notification
+                TestFactory.system_notification_repository._show_notification,
               ).toHaveBeenCalledTimes(1);
               _done();
             })
@@ -232,7 +232,7 @@ describe('z.system_notification.SystemNotificationRepository', function() {
           _conversation,
           _message,
           _expected_body,
-          _expected_title
+          _expected_title,
         ) {
           TestFactory.system_notification_repository
             .notify(_conversation, _message)
@@ -246,16 +246,16 @@ describe('z.system_notification.SystemNotificationRepository', function() {
               }
               notification_content.trigger = TestFactory.system_notification_repository._create_trigger(
                 conversation_et,
-                message_et
+                message_et,
               );
 
               const result = JSON.stringify(
                 TestFactory.system_notification_repository._show_notification.calls.first()
-                  .args[0]
+                  .args[0],
               );
               expect(result).toEqual(JSON.stringify(notification_content));
               expect(
-                TestFactory.system_notification_repository._show_notification
+                TestFactory.system_notification_repository._show_notification,
               ).toHaveBeenCalledTimes(1);
               _done();
             })
@@ -280,7 +280,7 @@ describe('z.system_notification.SystemNotificationRepository', function() {
         .notify(conversation_et, message_et)
         .then(function() {
           expect(
-            TestFactory.system_notification_repository._show_notification
+            TestFactory.system_notification_repository._show_notification,
           ).not.toHaveBeenCalled();
           done();
         })
@@ -288,7 +288,7 @@ describe('z.system_notification.SystemNotificationRepository', function() {
     });
 
     it('if the browser tab has focus and conversation is active', function(
-      done
+      done,
     ) {
       TestFactory.conversation_repository.active_conversation(conversation_et);
       document.hasFocus = () => true;
@@ -298,7 +298,7 @@ describe('z.system_notification.SystemNotificationRepository', function() {
         .notify(conversation_et, message_et)
         .then(function() {
           expect(
-            TestFactory.system_notification_repository._show_notification
+            TestFactory.system_notification_repository._show_notification,
           ).not.toHaveBeenCalled();
 
           window.wire.app.view.content.multitasking.is_minimized = () => false;
@@ -307,7 +307,7 @@ describe('z.system_notification.SystemNotificationRepository', function() {
             .notify(conversation_et, message_et)
             .then(function() {
               expect(
-                TestFactory.system_notification_repository._show_notification
+                TestFactory.system_notification_repository._show_notification,
               ).toHaveBeenCalledTimes(1);
               done();
             });
@@ -322,7 +322,7 @@ describe('z.system_notification.SystemNotificationRepository', function() {
         .notify(conversation_et, message_et)
         .then(function() {
           expect(
-            TestFactory.system_notification_repository._show_notification
+            TestFactory.system_notification_repository._show_notification,
           ).not.toHaveBeenCalled();
           done();
         })
@@ -336,7 +336,7 @@ describe('z.system_notification.SystemNotificationRepository', function() {
         .notify(conversation_et, message_et)
         .then(function() {
           expect(
-            TestFactory.system_notification_repository._show_notification
+            TestFactory.system_notification_repository._show_notification,
           ).not.toHaveBeenCalled();
           done();
         })
@@ -352,7 +352,7 @@ describe('z.system_notification.SystemNotificationRepository', function() {
         .notify(conversation_et, message_et)
         .then(function() {
           expect(
-            TestFactory.system_notification_repository._show_notification
+            TestFactory.system_notification_repository._show_notification,
           ).not.toHaveBeenCalled();
           done();
         })
@@ -361,14 +361,14 @@ describe('z.system_notification.SystemNotificationRepository', function() {
 
     it('if preference is set to none', function(done) {
       TestFactory.system_notification_repository.notifications_preference(
-        z.system_notification.SystemNotificationPreference.NONE
+        z.system_notification.SystemNotificationPreference.NONE,
       );
 
       TestFactory.system_notification_repository
         .notify(conversation_et, message_et)
         .then(function() {
           expect(
-            TestFactory.system_notification_repository._show_notification
+            TestFactory.system_notification_repository._show_notification,
           ).not.toHaveBeenCalled();
           done();
         })
@@ -383,7 +383,7 @@ describe('z.system_notification.SystemNotificationRepository', function() {
         .notify(conversation_et, message_et)
         .then(function() {
           expect(
-            TestFactory.system_notification_repository._show_notification
+            TestFactory.system_notification_repository._show_notification,
           ).not.toHaveBeenCalled();
           done();
         })
@@ -461,13 +461,13 @@ describe('z.system_notification.SystemNotificationRepository', function() {
         const notification_preference =
           z.system_notification.SystemNotificationPreference.OBFUSCATE_MESSAGE;
         TestFactory.system_notification_repository.notifications_preference(
-          notification_preference
+          notification_preference,
         );
         verify_notification_obfuscated(
           done,
           conversation_et,
           message_et,
-          notification_preference
+          notification_preference,
         );
       });
 
@@ -475,13 +475,13 @@ describe('z.system_notification.SystemNotificationRepository', function() {
         const notification_preference =
           z.system_notification.SystemNotificationPreference.OBFUSCATE;
         TestFactory.system_notification_repository.notifications_preference(
-          notification_preference
+          notification_preference,
         );
         verify_notification_obfuscated(
           done,
           conversation_et,
           message_et,
-          notification_preference
+          notification_preference,
         );
       });
     });
@@ -505,13 +505,13 @@ describe('z.system_notification.SystemNotificationRepository', function() {
         const notification_preference =
           z.system_notification.SystemNotificationPreference.OBFUSCATE_MESSAGE;
         TestFactory.system_notification_repository.notifications_preference(
-          notification_preference
+          notification_preference,
         );
         verify_notification_obfuscated(
           done,
           conversation_et,
           message_et,
-          notification_preference
+          notification_preference,
         );
       });
 
@@ -519,13 +519,13 @@ describe('z.system_notification.SystemNotificationRepository', function() {
         const notification_preference =
           z.system_notification.SystemNotificationPreference.OBFUSCATE;
         TestFactory.system_notification_repository.notifications_preference(
-          notification_preference
+          notification_preference,
         );
         verify_notification_obfuscated(
           done,
           conversation_et,
           message_et,
-          notification_preference
+          notification_preference,
         );
       });
     });
@@ -549,13 +549,13 @@ describe('z.system_notification.SystemNotificationRepository', function() {
         const notification_preference =
           z.system_notification.SystemNotificationPreference.OBFUSCATE_MESSAGE;
         TestFactory.system_notification_repository.notifications_preference(
-          notification_preference
+          notification_preference,
         );
         verify_notification_obfuscated(
           done,
           conversation_et,
           message_et,
-          notification_preference
+          notification_preference,
         );
       });
 
@@ -563,13 +563,13 @@ describe('z.system_notification.SystemNotificationRepository', function() {
         const notification_preference =
           z.system_notification.SystemNotificationPreference.OBFUSCATE;
         TestFactory.system_notification_repository.notifications_preference(
-          notification_preference
+          notification_preference,
         );
         verify_notification_obfuscated(
           done,
           conversation_et,
           message_et,
-          notification_preference
+          notification_preference,
         );
       });
     });
@@ -604,7 +604,7 @@ describe('z.system_notification.SystemNotificationRepository', function() {
       notification_content.title = z.util.StringUtil.truncate(
         title,
         z.system_notification.SystemNotificationRepository.CONFIG.TITLE_LENGTH,
-        false
+        false,
       );
     });
 
@@ -620,7 +620,7 @@ describe('z.system_notification.SystemNotificationRepository', function() {
         done,
         conversation_et,
         message_et,
-        expected_body
+        expected_body,
       );
     });
 
@@ -634,7 +634,7 @@ describe('z.system_notification.SystemNotificationRepository', function() {
         done,
         conversation_et,
         message_et,
-        expected_body
+        expected_body,
       );
     });
   });
@@ -647,7 +647,7 @@ describe('z.system_notification.SystemNotificationRepository', function() {
       message_et.user(user_et);
       message_et.member_message_type = z.message.SystemMessageType.NORMAL;
       other_user_et = TestFactory.user_repository.user_mapper.map_user_from_object(
-        payload.users.get.many[1]
+        payload.users.get.many[1],
       );
     });
 
@@ -661,7 +661,7 @@ describe('z.system_notification.SystemNotificationRepository', function() {
           title,
           z.system_notification.SystemNotificationRepository.CONFIG
             .TITLE_LENGTH,
-          false
+          false,
         );
       });
 
@@ -674,7 +674,7 @@ describe('z.system_notification.SystemNotificationRepository', function() {
           done,
           conversation_et,
           message_et,
-          expected_body
+          expected_body,
         );
       });
 
@@ -687,7 +687,7 @@ describe('z.system_notification.SystemNotificationRepository', function() {
           done,
           conversation_et,
           message_et,
-          expected_body
+          expected_body,
         );
       });
 
@@ -700,7 +700,7 @@ describe('z.system_notification.SystemNotificationRepository', function() {
           done,
           conversation_et,
           message_et,
-          expected_body
+          expected_body,
         );
       });
     });
@@ -715,7 +715,7 @@ describe('z.system_notification.SystemNotificationRepository', function() {
           title,
           z.system_notification.SystemNotificationRepository.CONFIG
             .TITLE_LENGTH,
-          false
+          false,
         );
       });
 
@@ -723,14 +723,14 @@ describe('z.system_notification.SystemNotificationRepository', function() {
         message_et.user_ets([other_user_et]);
 
         const first_name_removed = `${entities.user.jane_roe.name.split(
-          ' '
+          ' ',
         )[0]}`;
         const expected_body = `${first_name} removed ${first_name_removed} from the conversation`;
         verify_notification_system(
           done,
           conversation_et,
           message_et,
-          expected_body
+          expected_body,
         );
       });
 
@@ -743,15 +743,15 @@ describe('z.system_notification.SystemNotificationRepository', function() {
           done,
           conversation_et,
           message_et,
-          expected_body
+          expected_body,
         );
       });
 
       it('with multiple users being removed from the conversation', function(
-        done
+        done,
       ) {
         const user_ets = TestFactory.user_repository.user_mapper.map_users_from_object(
-          payload.users.get.many
+          payload.users.get.many,
         );
         message_et.user_ets(user_ets);
 
@@ -760,7 +760,7 @@ describe('z.system_notification.SystemNotificationRepository', function() {
           done,
           conversation_et,
           message_et,
-          expected_body
+          expected_body,
         );
       });
 
@@ -772,7 +772,7 @@ describe('z.system_notification.SystemNotificationRepository', function() {
           done,
           conversation_et,
           message_et,
-          expected_body
+          expected_body,
         );
       });
     });
@@ -787,7 +787,7 @@ describe('z.system_notification.SystemNotificationRepository', function() {
 
       const user_connection_mapper = new z.user.UserConnectionMapper();
       connection_et = user_connection_mapper.map_user_connection_from_json(
-        entities.connection
+        entities.connection,
       );
       message_et = new z.entity.MemberMessage();
       message_et.user(user_et);
@@ -804,7 +804,7 @@ describe('z.system_notification.SystemNotificationRepository', function() {
         conversation_et,
         message_et,
         expected_body,
-        expected_title
+        expected_title,
       );
     });
 
@@ -818,7 +818,7 @@ describe('z.system_notification.SystemNotificationRepository', function() {
         conversation_et,
         message_et,
         expected_body,
-        expected_title
+        expected_title,
       );
     });
 
@@ -832,7 +832,7 @@ describe('z.system_notification.SystemNotificationRepository', function() {
         conversation_et,
         message_et,
         expected_body,
-        expected_title
+        expected_title,
       );
     });
   });
@@ -842,7 +842,7 @@ describe('z.system_notification.SystemNotificationRepository', function() {
 
     beforeAll(function() {
       user_et = TestFactory.user_repository.user_mapper.map_user_from_object(
-        payload.users.get.one[0]
+        payload.users.get.one[0],
       );
     });
 

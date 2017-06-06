@@ -74,7 +74,7 @@ z.client.ClientError = class ClientError extends Error {
       REQUEST_FAILURE: 'z.client.ClientError.TYPE.REQUEST_FAILURE',
       REQUEST_FORBIDDEN: 'z.client.ClientError.TYPE.REQUEST_FORBIDDEN',
       TOO_MANY_CLIENTS: 'z.client.ClientError.TYPE.TOO_MANY_CLIENTS',
-      UNKNOWN: 'z.client.ClientError.TYPE.UNKNOWN'
+      UNKNOWN: 'z.client.ClientError.TYPE.UNKNOWN',
     };
   }
 };

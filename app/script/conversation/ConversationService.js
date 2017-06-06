@@ -26,7 +26,7 @@ window.z.conversation = z.conversation || {};
 z.conversation.ConversationService = class ConversationService {
   static get CONFIG() {
     return {
-      URL_CONVERSATIONS: '/conversations'
+      URL_CONVERSATIONS: '/conversations',
     };
   }
 
@@ -40,7 +40,7 @@ z.conversation.ConversationService = class ConversationService {
     this.storage_service = storage_service;
     this.logger = new z.util.Logger(
       'z.conversation.ConversationService',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
   }
 
@@ -62,20 +62,20 @@ z.conversation.ConversationService = class ConversationService {
   create_conversation(user_ids, name, team_id) {
     const payload = {
       name: name,
-      users: user_ids
+      users: user_ids,
     };
 
     if (team_id) {
       payload.team = {
         managed: false,
-        teamid: team_id
+        teamid: team_id,
       };
     }
 
     return this.client.send_json({
       data: payload,
       type: 'POST',
-      url: this.client.create_url(ConversationService.CONFIG.URL_CONVERSATIONS)
+      url: this.client.create_url(ConversationService.CONFIG.URL_CONVERSATIONS),
     });
   }
 
@@ -96,10 +96,10 @@ z.conversation.ConversationService = class ConversationService {
     return this.client.send_request({
       data: {
         size: limit,
-        start: conversation_id
+        start: conversation_id,
       },
       type: 'GET',
-      url: this.client.create_url(ConversationService.CONFIG.URL_CONVERSATIONS)
+      url: this.client.create_url(ConversationService.CONFIG.URL_CONVERSATIONS),
     });
   }
 
@@ -114,7 +114,7 @@ z.conversation.ConversationService = class ConversationService {
     const _get_conversations = conversation_id => {
       return this.get_conversations(limit, conversation_id).then(function({
         conversations,
-        has_more
+        has_more,
       }) {
         if (conversations.length) {
           all_conversations = all_conversations.concat(conversations);
@@ -143,8 +143,8 @@ z.conversation.ConversationService = class ConversationService {
     return this.client.send_request({
       type: 'GET',
       url: this.client.create_url(
-        `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversation_id}`
-      )
+        `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversation_id}`,
+      ),
     });
   }
 
@@ -160,12 +160,12 @@ z.conversation.ConversationService = class ConversationService {
   update_conversation_properties(conversation_id, name) {
     return this.client.send_json({
       data: {
-        name: name
+        name: name,
       },
       type: 'PUT',
       url: this.client.create_url(
-        `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversation_id}`
-      )
+        `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversation_id}`,
+      ),
     });
   }
 
@@ -184,8 +184,8 @@ z.conversation.ConversationService = class ConversationService {
       type: 'PUT',
       url: this.client.create_url(
         `${ConversationService.CONFIG
-          .URL_CONVERSATIONS}/${conversation_id}/self`
-      )
+          .URL_CONVERSATIONS}/${conversation_id}/self`,
+      ),
     });
   }
 
@@ -205,8 +205,8 @@ z.conversation.ConversationService = class ConversationService {
       type: 'DELETE',
       url: this.client.create_url(
         `${ConversationService.CONFIG
-          .URL_CONVERSATIONS}/${conversation_id}/bots/${bot_user_id}`
-      )
+          .URL_CONVERSATIONS}/${conversation_id}/bots/${bot_user_id}`,
+      ),
     });
   }
 
@@ -224,8 +224,8 @@ z.conversation.ConversationService = class ConversationService {
       type: 'DELETE',
       url: this.client.create_url(
         `${ConversationService.CONFIG
-          .URL_CONVERSATIONS}/${conversation_id}/members/${user_id}`
-      )
+          .URL_CONVERSATIONS}/${conversation_id}/members/${user_id}`,
+      ),
     });
   }
 
@@ -241,13 +241,13 @@ z.conversation.ConversationService = class ConversationService {
     return this.client.send_json({
       data: {
         provider: provider_id,
-        service: service_id
+        service: service_id,
       },
       type: 'POST',
       url: this.client.create_url(
         `${ConversationService.CONFIG
-          .URL_CONVERSATIONS}/${conversation_id}/bots`
-      )
+          .URL_CONVERSATIONS}/${conversation_id}/bots`,
+      ),
     });
   }
 
@@ -276,7 +276,7 @@ z.conversation.ConversationService = class ConversationService {
   post_encrypted_message(conversation_id, payload, precondition_option) {
     let url = this.client.create_url(
       `${ConversationService.CONFIG
-        .URL_CONVERSATIONS}/${conversation_id}/otr/messages`
+        .URL_CONVERSATIONS}/${conversation_id}/otr/messages`,
     );
 
     if (_.isArray(precondition_option)) {
@@ -288,7 +288,7 @@ z.conversation.ConversationService = class ConversationService {
     return this.client.send_json({
       data: payload,
       type: 'POST',
-      url: url
+      url: url,
     });
   }
 
@@ -304,13 +304,13 @@ z.conversation.ConversationService = class ConversationService {
   post_members(conversation_id, user_ids) {
     return this.client.send_json({
       data: {
-        users: user_ids
+        users: user_ids,
       },
       type: 'POST',
       url: this.client.create_url(
         `${ConversationService.CONFIG
-          .URL_CONVERSATIONS}/${conversation_id}/members`
-      )
+          .URL_CONVERSATIONS}/${conversation_id}/members`,
+      ),
     });
   }
 
@@ -327,12 +327,12 @@ z.conversation.ConversationService = class ConversationService {
     return this.storage_service
       .delete(
         z.storage.StorageService.OBJECT_STORE.CONVERSATIONS,
-        conversation_id
+        conversation_id,
       )
       .then(primary_key => {
         this.logger.log(
           this.logger.levels.INFO,
-          `State of conversation '${primary_key}' was deleted`
+          `State of conversation '${primary_key}' was deleted`,
         );
         return primary_key;
       });
@@ -402,7 +402,7 @@ z.conversation.ConversationService = class ConversationService {
         }, {});
 
         return Object.keys(conversations).sort(
-          (id_a, id_b) => conversations[id_b] - conversations[id_a]
+          (id_a, id_b) => conversations[id_b] - conversations[id_a],
         );
       });
   }
@@ -413,7 +413,7 @@ z.conversation.ConversationService = class ConversationService {
    */
   load_conversation_states_from_db() {
     return this.storage_service.get_all(
-      z.storage.StorageService.OBJECT_STORE.CONVERSATIONS
+      z.storage.StorageService.OBJECT_STORE.CONVERSATIONS,
     );
   }
 
@@ -433,7 +433,7 @@ z.conversation.ConversationService = class ConversationService {
       .catch(error => {
         this.logger.error(
           `Failed to get event for conversation '${conversation_id}': ${error.message}`,
-          error
+          error,
         );
         throw error;
       });
@@ -450,7 +450,7 @@ z.conversation.ConversationService = class ConversationService {
   load_events_with_category_from_db(
     conversation_id,
     category_min,
-    category_max = z.message.MessageCategory.LIKED
+    category_max = z.message.MessageCategory.LIKED,
   ) {
     return this.storage_service.db[z.storage.StorageService.OBJECT_STORE.EVENTS]
       .where('[conversation+category]')
@@ -458,7 +458,7 @@ z.conversation.ConversationService = class ConversationService {
         [conversation_id, category_min],
         [conversation_id, category_max],
         true,
-        true
+        true,
       )
       .sortBy('time');
   }
@@ -489,15 +489,15 @@ z.conversation.ConversationService = class ConversationService {
     conversation_id,
     lower_bound = new Date(0),
     upper_bound = new Date(),
-    limit = Number.MAX_SAFE_INTEGER
+    limit = Number.MAX_SAFE_INTEGER,
   ) {
     if (!_.isDate(lower_bound) || !_.isDate(upper_bound)) {
       throw new Error(
-        `Lower bound (${typeof lower_bound}) and upper bound (${typeof upper_bound}) must be of type 'Date'.`
+        `Lower bound (${typeof lower_bound}) and upper bound (${typeof upper_bound}) must be of type 'Date'.`,
       );
     } else if (lower_bound.getTime() > upper_bound.getTime()) {
       throw new Error(
-        `Lower bound (${lower_bound.getTime()}) cannot be greater than upper bound (${upper_bound.getTime()}).`
+        `Lower bound (${lower_bound.getTime()}) cannot be greater than upper bound (${upper_bound.getTime()}).`,
       );
     }
 
@@ -507,14 +507,14 @@ z.conversation.ConversationService = class ConversationService {
         [conversation_id, lower_bound.toISOString()],
         [conversation_id, upper_bound.toISOString()],
         true,
-        false
+        false,
       )
       .reverse()
       .limit(limit)
       .toArray()
       .catch(error => {
         this.logger.error(
-          `Failed to load events for conversation '${conversation_id}' from database: '${error.message}'`
+          `Failed to load events for conversation '${conversation_id}' from database: '${error.message}'`,
         );
         throw error;
       });
@@ -533,11 +533,11 @@ z.conversation.ConversationService = class ConversationService {
     conversation_id,
     upper_bound,
     limit = Number.MAX_SAFE_INTEGER,
-    include_upper_bound = true
+    include_upper_bound = true,
   ) {
     if (!_.isDate(upper_bound)) {
       throw new Error(
-        `Upper bound (${typeof upper_bound}) must be of type 'Date'.`
+        `Upper bound (${typeof upper_bound}) must be of type 'Date'.`,
       );
     }
 
@@ -547,7 +547,7 @@ z.conversation.ConversationService = class ConversationService {
         [conversation_id, upper_bound.toISOString()],
         [conversation_id, new Date().toISOString()],
         include_upper_bound,
-        true
+        true,
       )
       .limit(limit)
       .toArray();
@@ -589,12 +589,12 @@ z.conversation.ConversationService = class ConversationService {
       .save(
         z.storage.StorageService.OBJECT_STORE.CONVERSATIONS,
         conversation_et.id,
-        conversation_et.serialize()
+        conversation_et.serialize(),
       )
       .then(primary_key => {
         this.logger.log(
           this.logger.levels.INFO,
-          `State of conversation '${primary_key}' was stored`
+          `State of conversation '${primary_key}' was stored`,
         );
         return conversation_et;
       });
@@ -617,10 +617,10 @@ z.conversation.ConversationService = class ConversationService {
     return this.load_events_with_category_from_db(
       conversation_id,
       category_min,
-      category_max
+      category_max,
     ).then(events => {
       return events.filter(({data: event_data}) =>
-        z.search.FullTextSearch.search(event_data.content, query)
+        z.search.FullTextSearch.search(event_data.content, query),
       );
     });
   }
@@ -645,7 +645,7 @@ z.conversation.ConversationService = class ConversationService {
         return this.storage_service.update(
           z.storage.StorageService.OBJECT_STORE.EVENTS,
           primary_key,
-          record
+          record,
         );
       })
       .then(() => {
@@ -672,7 +672,7 @@ z.conversation.ConversationService = class ConversationService {
         return this.storage_service.update(
           z.storage.StorageService.OBJECT_STORE.EVENTS,
           primary_key,
-          record
+          record,
         );
       })
       .then(() => {
@@ -696,7 +696,7 @@ z.conversation.ConversationService = class ConversationService {
         return this.storage_service.update(
           z.storage.StorageService.OBJECT_STORE.EVENTS,
           primary_key,
-          record
+          record,
         );
       })
       .then(() => {
@@ -722,7 +722,7 @@ z.conversation.ConversationService = class ConversationService {
             () => {
               return this.load_event_from_db(
                 conversation_id,
-                message_et.id
+                message_et.id,
               ).then(record => {
                 let custom_data;
 
@@ -733,34 +733,34 @@ z.conversation.ConversationService = class ConversationService {
                     return this.storage_service.update(
                       z.storage.StorageService.OBJECT_STORE.EVENTS,
                       primary_key,
-                      changes
+                      changes,
                     );
                   }
 
                   custom_data = {
                     database_version: database_version,
-                    update_version: changes.version
+                    update_version: changes.version,
                   };
                 }
 
                 Raygun.send('Failed sequential database update', custom_data);
                 throw new z.storage.StorageError(
-                  z.storage.StorageError.TYPE.NON_SEQUENTIAL_UPDATE
+                  z.storage.StorageError.TYPE.NON_SEQUENTIAL_UPDATE,
                 );
               });
-            }
+            },
           );
         }
 
         return this.storage_service.update(
           z.storage.StorageService.OBJECT_STORE.EVENTS,
           primary_key,
-          changes
+          changes,
         );
       }
 
       throw new z.conversation.ConversationError(
-        z.conversation.ConversationError.TYPE.NO_CHANGES
+        z.conversation.ConversationError.TYPE.NO_CHANGES,
       );
     });
   }

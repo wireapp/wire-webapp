@@ -124,6 +124,6 @@ ko.components.register('file-asset', {
   viewModel: {
     createViewModel(params, component_info) {
       return new z.components.FileAssetComponent(params, component_info);
-    }
-  }
+    },
+  },
 });

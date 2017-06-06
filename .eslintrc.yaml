@@ -70,7 +70,7 @@ rules:
   prefer-template: 2
   prettier/prettier: [2, {
       singleQuote: true,
-      trailingComma: none,
+      trailingComma: all,
       bracketSpacing: false,
       printWidth: 80
     }

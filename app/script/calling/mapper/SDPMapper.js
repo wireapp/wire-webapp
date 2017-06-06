@@ -26,7 +26,7 @@ window.z.calling.mapper = z.calling.mapper || {};
 z.calling.mapper.SDPMapper = {
   CONFIG: {
     AUDIO_BITRATE: '30',
-    AUDIO_PTIME: '60'
+    AUDIO_PTIME: '60',
   },
 
   /**
@@ -53,7 +53,7 @@ z.calling.mapper.SDPMapper = {
       sdp: sdp_string,
       type: response === true
         ? z.calling.rtc.SDP_TYPE.ANSWER
-        : z.calling.rtc.SDP_TYPE.OFFER
+        : z.calling.rtc.SDP_TYPE.OFFER,
     };
 
     return Promise.resolve(new window.RTCSessionDescription(sdp));
@@ -67,7 +67,7 @@ z.calling.mapper.SDPMapper = {
   map_event_to_object(event) {
     const sdp = {
       sdp: event.sdp,
-      type: event.state
+      type: event.state,
     };
 
     return new window.RTCSessionDescription(sdp);
@@ -100,11 +100,11 @@ z.calling.mapper.SDPMapper = {
             .Environment.browser.version}`;
           if (z.util.Environment.electron) {
             outline = `a=tool:electron ${z.util.Environment.version()} ${z.util.Environment.version(
-              false
+              false,
             )} (${browser_string})`;
           } else {
             outline = `a=tool:webapp ${z.util.Environment.version(
-              false
+              false,
             )} (${browser_string})`;
           }
         }
@@ -160,5 +160,5 @@ z.calling.mapper.SDPMapper = {
 
     rtc_sdp.sdp = sdp_lines.join('\r\n');
     return Promise.resolve({ice_candidates: ice_candidates, sdp: rtc_sdp});
-  }
+  },
 };

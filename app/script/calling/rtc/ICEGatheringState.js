@@ -28,5 +28,5 @@ window.z.calling.rtc = z.calling.rtc || {};
 z.calling.rtc.ICE_GATHERING_STATE = {
   COMPLETE: 'complete',
   GATHERING: 'gathering',
-  NEW: 'new'
+  NEW: 'new',
 };

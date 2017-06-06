@@ -29,5 +29,5 @@ z.system_notification.PermissionStatusState = {
   GRANTED: 'granted',
   IGNORED: 'ignored',
   PROMPT: 'prompt',
-  UNSUPPORTED: 'unsupported'
+  UNSUPPORTED: 'unsupported',
 };

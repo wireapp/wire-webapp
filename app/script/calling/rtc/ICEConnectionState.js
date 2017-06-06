@@ -32,5 +32,5 @@ z.calling.rtc.ICE_CONNECTION_STATE = {
   CONNECTED: 'connected',
   DISCONNECTED: 'disconnected',
   FAILED: 'failed',
-  NEW: 'new'
+  NEW: 'new',
 };

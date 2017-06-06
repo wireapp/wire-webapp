@@ -26,5 +26,5 @@ z.assets.AssetType = {
   FILE: 'File',
   IMAGE: 'Image',
   LOCATION: 'Location',
-  TEXT: 'Text'
+  TEXT: 'Text',
 };

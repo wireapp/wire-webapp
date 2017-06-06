@@ -35,7 +35,7 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
     this.user_repository = user_repository;
     this.logger = new z.util.Logger(
       'z.ViewModel.ConversationInputViewModel',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
 
     this.conversation_et = this.conversation_repository.active_conversation;
@@ -62,11 +62,11 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
             id: z.string.conversation_send_pasted_file,
             replace: {
               content: moment(blob.lastModifiedDate).format(
-                'MMMM Do YYYY, h:mm:ss a'
+                'MMMM Do YYYY, h:mm:ss a',
               ),
-              placeholder: '%date'
-            }
-          })
+              placeholder: '%date',
+            },
+          }),
         );
       } else {
         this.pasted_file_preview_url(null);
@@ -134,15 +134,15 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
         if (this.conversation_et()) {
           this.conversation_et().input(value);
         }
-      }
+      },
     });
 
     this.ping_tooltip = z.localization.Localizer.get_text({
       id: z.string.tooltip_conversation_ping,
       replace: {
         content: z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.PING),
-        placeholder: '%shortcut'
-      }
+        placeholder: '%shortcut',
+      },
     });
 
     this.picture_tooltip = z.l10n.text(z.string.tooltip_conversation_picture);
@@ -167,22 +167,22 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
 
   _init_subscriptions() {
     amplify.subscribe(z.event.WebApp.SEARCH.SHOW, () =>
-      this.conversation_has_focus(false)
+      this.conversation_has_focus(false),
     );
     amplify.subscribe(z.event.WebApp.SEARCH.HIDE, () =>
-      window.requestAnimationFrame(() => this.conversation_has_focus(true))
+      window.requestAnimationFrame(() => this.conversation_has_focus(true)),
     );
     amplify.subscribe(
       z.event.WebApp.EXTENSIONS.GIPHY.SEND,
-      this.send_giphy.bind(this)
+      this.send_giphy.bind(this),
     );
     amplify.subscribe(
       z.event.WebApp.CONVERSATION.IMAGE.SEND,
-      this.upload_images.bind(this)
+      this.upload_images.bind(this),
     );
     amplify.subscribe(
       z.event.WebApp.CONVERSATION.MESSAGE.EDIT,
-      this.edit_message.bind(this)
+      this.edit_message.bind(this),
     );
   }
 
@@ -223,7 +223,7 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
     if (message.length > 0) {
       this.conversation_repository.send_text_with_link_preview(
         message,
-        this.conversation_et()
+        this.conversation_et(),
       );
     }
   }
@@ -234,7 +234,7 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
     if (!message.length) {
       return this.conversation_repository.delete_message_everyone(
         this.conversation_et(),
-        message_et
+        message_et,
       );
     }
 
@@ -242,7 +242,7 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
       this.conversation_repository.send_message_edit(
         message,
         message_et,
-        this.conversation_et()
+        this.conversation_et(),
       );
     }
   }
@@ -251,13 +251,13 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
     if (!millis) {
       this.conversation_et().ephemeral_timer(false);
       return this.logger.info(
-        `Ephemeral timer for conversation '${this.conversation_et().display_name()}' turned off.`
+        `Ephemeral timer for conversation '${this.conversation_et().display_name()}' turned off.`,
       );
     }
 
     this.conversation_et().ephemeral_timer(millis);
     this.logger.info(
-      `Ephemeral timer for conversation '${this.conversation_et().display_name()}' is now at '${this.conversation_et().ephemeral_timer()}'.`
+      `Ephemeral timer for conversation '${this.conversation_et().display_name()}' is now at '${this.conversation_et().ephemeral_timer()}'.`,
     );
   }
 
@@ -271,7 +271,7 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
 
       this.conversation_repository.upload_images(
         this.conversation_et(),
-        images
+        images,
       );
     }
   }
@@ -285,8 +285,8 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
             z.tracking.EventName.FILE.UPLOAD_TOO_BIG,
             {
               size: file.size,
-              type: file.type
-            }
+              type: file.type,
+            },
           );
           amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
           window.setTimeout(function() {
@@ -294,8 +294,8 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
               z.event.WebApp.WARNING.MODAL,
               z.ViewModel.ModalType.UPLOAD_TOO_LARGE,
               {
-                data: z.util.format_bytes(z.config.MAXIMUM_ASSET_FILE_SIZE)
-              }
+                data: z.util.format_bytes(z.config.MAXIMUM_ASSET_FILE_SIZE),
+              },
             );
           }, 200);
           return;
@@ -347,20 +347,20 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
         : z.string.alert_upload_too_large,
       replace: {
         content: z.config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024,
-        placeholder: '%no'
-      }
+        placeholder: '%no',
+      },
     });
 
     const attributes = {
       reason: 'too large',
       size: image.size,
-      type: image.type
+      type: image.type,
     };
 
     amplify.publish(
       z.event.WebApp.ANALYTICS.EVENT,
       z.tracking.EventName.IMAGE_SENT_ERROR,
-      attributes
+      attributes,
     );
     amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
     window.setTimeout(() => window.alert(warning), 200);
@@ -376,8 +376,8 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
         z.event.WebApp.WARNING.MODAL,
         z.ViewModel.ModalType.UPLOAD_PARALLEL,
         {
-          data: z.config.MAXIMUM_ASSET_UPLOADS
-        }
+          data: z.config.MAXIMUM_ASSET_UPLOADS,
+        },
       );
     }
 
@@ -430,12 +430,12 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
               z.event.WebApp.ANALYTICS.EVENT,
               z.tracking.EventName.CONVERSATION.CHARACTER_LIMIT_REACHED,
               {
-                characters: message.length
-              }
+                characters: message.length,
+              },
             );
           },
-          data: z.config.MAXIMUM_MESSAGE_LENGTH
-        }
+          data: z.config.MAXIMUM_MESSAGE_LENGTH,
+        },
       );
       return;
     }
@@ -461,7 +461,7 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
           if (!this.input().length) {
             this.edit_message(
               this.conversation_et().get_last_editable_message(),
-              event.target
+              event.target,
             );
           }
           break;
@@ -522,7 +522,7 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
       () =>
         (input_element.selectionStart = input_element.selectionEnd =
           input_element.value.length * 2),
-      0
+      0,
     );
   }
 
@@ -566,17 +566,17 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
     const entries = [
       {
         click: () => this.set_ephemeral_timer(0),
-        label: z.l10n.text(z.string.ephememal_units_none)
-      }
+        label: z.l10n.text(z.string.ephememal_units_none),
+      },
     ].concat(
       z.ephemeral.timings.get_values().map(milliseconds => {
         const [number, unit] = z.util.format_milliseconds_short(milliseconds);
         const unit_locale = this._get_localized_unit_string(number, unit);
         return {
           click: () => this.set_ephemeral_timer(milliseconds),
-          label: `${number} ${unit_locale}`
+          label: `${number} ${unit_locale}`,
         };
-      })
+      }),
     );
 
     z.ui.Context.from(event, entries, 'ephemeral-options-menu');

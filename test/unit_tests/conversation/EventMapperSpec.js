@@ -45,12 +45,12 @@ describe('Event Mapper', function() {
         conversation: conversation_et.id,
         data: {
           content: 'foo',
-          nonce: event_id
+          nonce: event_id,
         },
         from: z.util.create_random_uuid,
         id: event_id,
         time: new Date().toISOString(),
-        type: z.event.Backend.CONVERSATION.MESSAGE_ADD
+        type: z.event.Backend.CONVERSATION.MESSAGE_ADD,
       };
 
       const message_et = event_mapper.map_json_event(event, conversation_et);
@@ -65,7 +65,7 @@ describe('Event Mapper', function() {
       const article = new z.proto.Article(
         'test.com',
         'Test title',
-        'Test description'
+        'Test description',
       );
       const link_preview = new z.proto.LinkPreview('test.com', 0, article);
 
@@ -74,12 +74,12 @@ describe('Event Mapper', function() {
         data: {
           content: 'test.com',
           nonce: event_id,
-          previews: [link_preview.encode64()]
+          previews: [link_preview.encode64()],
         },
         from: z.util.create_random_uuid,
         id: event_id,
         time: new Date().toISOString(),
-        type: z.event.Backend.CONVERSATION.MESSAGE_ADD
+        type: z.event.Backend.CONVERSATION.MESSAGE_ADD,
       };
 
       const message_et = event_mapper.map_json_event(event, conversation_et);
@@ -87,7 +87,7 @@ describe('Event Mapper', function() {
       expect(message_et.get_first_asset().nonce).toBe(event.data.nonce);
       expect(message_et.get_first_asset().previews().length).toBe(1);
       expect(message_et.get_first_asset().previews()[0].original_url).toBe(
-        'test.com'
+        'test.com',
       );
       expect(message_et).toBeDefined();
     });
@@ -101,7 +101,7 @@ describe('Event Mapper', function() {
         null,
         'test.com/perm',
         'Test title',
-        'Test description'
+        'Test description',
       );
 
       const event = {
@@ -109,12 +109,12 @@ describe('Event Mapper', function() {
         data: {
           content: 'test.com',
           nonce: event_id,
-          previews: [link_preview.encode64()]
+          previews: [link_preview.encode64()],
         },
         from: z.util.create_random_uuid,
         id: event_id,
         time: new Date().toISOString(),
-        type: z.event.Backend.CONVERSATION.MESSAGE_ADD
+        type: z.event.Backend.CONVERSATION.MESSAGE_ADD,
       };
 
       const message_et = event_mapper.map_json_event(event, conversation_et);
@@ -122,10 +122,10 @@ describe('Event Mapper', function() {
       expect(message_et.get_first_asset().nonce).toBe(event.data.nonce);
       expect(message_et.get_first_asset().previews().length).toBe(1);
       expect(message_et.get_first_asset().previews()[0].original_url).toBe(
-        link_preview.url
+        link_preview.url,
       );
       expect(message_et.get_first_asset().previews()[0].permanent_url).toBe(
-        link_preview.permanent_url
+        link_preview.permanent_url,
       );
       expect(message_et).toBeDefined();
     });
@@ -145,7 +145,7 @@ describe('Event Mapper', function() {
             height: 905,
             nonce: '72554b6b-edc3-4dde-a177-5552df09df43',
             tag: 'medium',
-            width: 1448
+            width: 1448,
           },
           key: '3-2-dc080e34-72d8-478e-a1bf-fdda44b47872',
           otr_key: {
@@ -180,7 +180,7 @@ describe('Event Mapper', function() {
             '28': 132,
             '29': 190,
             '30': 94,
-            '31': 213
+            '31': 213,
           },
           sha256: {
             '0': 24,
@@ -214,13 +214,13 @@ describe('Event Mapper', function() {
             '28': 4,
             '29': 12,
             '30': 118,
-            '31': 26
+            '31': 26,
           },
-          token: 'aV0TGxF3ugpawm3wAYPmew=='
+          token: 'aV0TGxF3ugpawm3wAYPmew==',
         },
         type: 'conversation.asset-add',
         category: 128,
-        primary_key: 94
+        primary_key: 94,
       };
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
@@ -228,17 +228,17 @@ describe('Event Mapper', function() {
       expect(message_et.get_first_asset().width).toBe(event.data.info.width);
       expect(message_et.get_first_asset().height).toBe(event.data.info.height);
       expect(message_et.get_first_asset().file_size).toBe(
-        event.data.content_length
+        event.data.content_length,
       );
       expect(message_et.get_first_asset().file_type).toBe(
-        event.data.content_type
+        event.data.content_type,
       );
       expect(message_et.get_first_asset().type).toBe(z.assets.AssetType.IMAGE);
       expect(message_et.get_first_asset().resource().otr_key).toBe(
-        event.data.otr_key
+        event.data.otr_key,
       );
       expect(message_et.get_first_asset().resource().sha256).toBe(
-        event.data.sha256
+        event.data.sha256,
       );
       expect(message_et).toBeDefined();
     });
@@ -254,9 +254,9 @@ describe('Event Mapper', function() {
         data: {
           content: 'Message with timestamp',
           nonce: '4cec0f75-d963-486d-9401-415240ac2ad8',
-          previews: []
+          previews: [],
         },
-        type: 'conversation.message-add'
+        type: 'conversation.message-add',
       };
       const bad_message = {
         conversation: conversation_et.id,
@@ -264,16 +264,16 @@ describe('Event Mapper', function() {
         from: '532af01e-1e24-4366-aacf-33b67d4ee376',
         data: {
           content: 'Knock, are you there? :)',
-          nonce: 'aeac8355-739b-4dfc-a119-891a52c6a8dc'
+          nonce: 'aeac8355-739b-4dfc-a119-891a52c6a8dc',
         },
-        type: 'conversation.message-add'
+        type: 'conversation.message-add',
       };
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
       // @formatter:on
 
       const message_ets = event_mapper.map_json_events(
         [good_message, bad_message],
-        conversation_et
+        conversation_et,
       );
       expect(message_ets.length).toBe(1);
     });
@@ -293,7 +293,7 @@ describe('Event Mapper', function() {
         id: 'cb4972e0-9586-42a2-90cc-1798ec0cb648',
         primary_key: 9,
         time: '2017-04-03T12:58:04.301Z',
-        type: 'conversation.unable-to-decrypt'
+        type: 'conversation.unable-to-decrypt',
       };
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
       // @formatter:on

@@ -33,5 +33,5 @@ z.calling.enum.E_CALL_MESSAGE_TYPE = {
   PROP_SYNC: 'PROPSYNC',
   REJECT: 'REJECT',
   SETUP: 'SETUP',
-  UPDATE: 'UPDATE'
+  UPDATE: 'UPDATE',
 };

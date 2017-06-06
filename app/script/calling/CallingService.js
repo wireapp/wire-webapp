@@ -30,7 +30,7 @@ z.calling.CallingService = class CallingService {
   constructor(client) {
     this.logger = new z.util.Logger(
       'z.calling.CallingService',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
     this.client = client;
   }
@@ -43,7 +43,7 @@ z.calling.CallingService = class CallingService {
     return this.client.send_request({
       cache: false,
       type: 'GET',
-      url: this.client.create_url('/calls/config')
+      url: this.client.create_url('/calls/config'),
     });
   }
 };

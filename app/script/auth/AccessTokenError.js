@@ -57,7 +57,7 @@ z.auth.AccessTokenError = class AccessTokenError extends Error {
       REQUEST_FAILED: 'z.auth.AccessTokenError.TYPE.REQUEST_FAILED',
       REQUEST_FORBIDDEN: 'z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN',
       RETRIES_EXCEEDED: 'z.auth.AccessTokenError.TYPE.RETRIES_EXCEEDED',
-      UNKNOWN: 'z.auth.AccessTokenError.TYPE.UNKNOWN'
+      UNKNOWN: 'z.auth.AccessTokenError.TYPE.UNKNOWN',
     };
   }
 };

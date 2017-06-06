@@ -88,6 +88,6 @@ ko.components.register('device-remove', {
   viewModel: {
     createViewModel(params, component_info) {
       return new z.components.DeviceRemove(params, component_info);
-    }
-  }
+    },
+  },
 });

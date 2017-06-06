@@ -29,12 +29,12 @@ z.conversation.EventBuilder = (function() {
     return {
       conversation: id,
       data: {
-        type: z.message.VerificationMessageType.VERIFIED
+        type: z.message.VerificationMessageType.VERIFIED,
       },
       from: self.id,
       id: z.util.create_random_uuid(),
       time: new Date().toISOString(),
-      type: z.event.Client.CONVERSATION.VERIFICATION
+      type: z.event.Client.CONVERSATION.VERIFICATION,
     };
   };
 
@@ -42,14 +42,14 @@ z.conversation.EventBuilder = (function() {
     conversation_et,
     e_call_message,
     user_id,
-    client_id
+    client_id,
   ) => {
     return {
       content: e_call_message,
       conversation: conversation_et.id,
       from: user_id,
       sender: client_id,
-      type: z.event.Client.CALL.E_CALL
+      type: z.event.Client.CALL.E_CALL,
     };
   };
 
@@ -60,12 +60,12 @@ z.conversation.EventBuilder = (function() {
       conversation: id,
       data: {
         type: type,
-        user_ids: user_ids
+        user_ids: user_ids,
       },
       from: self.id,
       id: z.util.create_random_uuid(),
       time: new Date().toISOString(),
-      type: z.event.Client.CONVERSATION.VERIFICATION
+      type: z.event.Client.CONVERSATION.VERIFICATION,
     };
   };
 
@@ -73,17 +73,17 @@ z.conversation.EventBuilder = (function() {
     conversation_id,
     message_id,
     time,
-    message_to_delete_et
+    message_to_delete_et,
   ) => {
     return {
       conversation: conversation_id,
       data: {
-        deleted_time: time
+        deleted_time: time,
       },
       from: message_to_delete_et.from,
       id: message_id,
       time: new Date(message_to_delete_et.timestamp()).toISOString(),
-      type: z.event.Client.CONVERSATION.DELETE_EVERYWHERE
+      type: z.event.Client.CONVERSATION.DELETE_EVERYWHERE,
     };
   };
 
@@ -93,7 +93,7 @@ z.conversation.EventBuilder = (function() {
       from: self_user_et.id,
       id: z.util.create_random_uuid(),
       time: new Date().toISOString(),
-      type: z.event.Client.CONVERSATION.MISSED_MESSAGES
+      type: z.event.Client.CONVERSATION.MISSED_MESSAGES,
     };
   };
 
@@ -101,12 +101,12 @@ z.conversation.EventBuilder = (function() {
     return {
       conversation: conversation_et.id,
       data: {
-        user_ids: [user_id]
+        user_ids: [user_id],
       },
       from: user_id,
       id: z.util.create_random_uuid(),
       time: new Date().toISOString(),
-      type: z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE
+      type: z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE,
     };
   };
 
@@ -120,7 +120,7 @@ z.conversation.EventBuilder = (function() {
       from: from,
       id: z.util.create_random_uuid(),
       time: time,
-      type: z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT
+      type: z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT,
     };
   };
 
@@ -133,31 +133,31 @@ z.conversation.EventBuilder = (function() {
       id: z.util.create_random_uuid(),
       protocol_version: z.calling.enum.PROTOCOL.VERSION_3,
       time: time,
-      type: z.event.Backend.CONVERSATION.VOICE_CHANNEL_ACTIVATE
+      type: z.event.Backend.CONVERSATION.VOICE_CHANNEL_ACTIVATE,
     };
   };
 
   const _build_voice_channel_deactivate = (
     e_call_message_et,
     creating_user_et,
-    reason = z.calling.enum.TERMINATION_REASON.COMPLETED
+    reason = z.calling.enum.TERMINATION_REASON.COMPLETED,
   ) => {
     const {
       conversation_id,
       user_id,
-      time = new Date().toISOString()
+      time = new Date().toISOString(),
     } = e_call_message_et;
 
     return {
       conversation: conversation_id,
       data: {
-        reason: reason
+        reason: reason,
       },
       from: creating_user_et ? creating_user_et.id : user_id,
       id: z.util.create_random_uuid(),
       protocol_version: z.calling.enum.PROTOCOL.VERSION_3,
       time: time,
-      type: z.event.Backend.CONVERSATION.VOICE_CHANNEL_DEACTIVATE
+      type: z.event.Backend.CONVERSATION.VOICE_CHANNEL_DEACTIVATE,
     };
   };
 
@@ -170,6 +170,6 @@ z.conversation.EventBuilder = (function() {
     build_team_member_leave: _build_team_member_leave,
     build_unable_to_decrypt: _build_unable_to_decrypt,
     build_voice_channel_activate: _build_voice_channel_activate,
-    build_voice_channel_deactivate: _build_voice_channel_deactivate
+    build_voice_channel_deactivate: _build_voice_channel_deactivate,
   };
 })();

@@ -41,26 +41,26 @@ z.conversation.ConversationCellState = (() => {
             activity_strings.push(
               z.l10n.text(
                 z.string.conversations_secondary_line_new_message,
-                count
-              )
+                count,
+              ),
             );
           } else if (count > 1) {
             activity_strings.push(
               z.l10n.text(
                 z.string.conversations_secondary_line_new_messages,
-                count
-              )
+                count,
+              ),
             );
           }
           break;
         case 'ping':
           if (count === 1) {
             activity_strings.push(
-              z.l10n.text(z.string.conversations_secondary_line_ping, count)
+              z.l10n.text(z.string.conversations_secondary_line_ping, count),
             );
           } else if (count > 1) {
             activity_strings.push(
-              z.l10n.text(z.string.conversations_secondary_line_pings, count)
+              z.l10n.text(z.string.conversations_secondary_line_pings, count),
             );
           }
           break;
@@ -69,15 +69,15 @@ z.conversation.ConversationCellState = (() => {
             activity_strings.push(
               z.l10n.text(
                 z.string.conversations_secondary_line_missed_call,
-                count
-              )
+                count,
+              ),
             );
           } else if (count > 1) {
             activity_strings.push(
               z.l10n.text(
                 z.string.conversations_secondary_line_missed_calls,
-                count
-              )
+                count,
+              ),
             );
           }
           break;
@@ -93,7 +93,7 @@ z.conversation.ConversationCellState = (() => {
     const activities = {
       call: 0,
       message: 0,
-      ping: 0
+      ping: 0,
     };
 
     for (const message_et of unread_events) {
@@ -115,7 +115,7 @@ z.conversation.ConversationCellState = (() => {
     },
     icon() {
       return z.conversation.ConversationStatusIcon.NONE;
-    }
+    },
   };
 
   const empty_state = {
@@ -127,7 +127,7 @@ z.conversation.ConversationCellState = (() => {
     },
     match(conversation_et) {
       return conversation_et.participating_user_ids().length === 0;
-    }
+    },
   };
 
   const removed_state = {
@@ -139,7 +139,7 @@ z.conversation.ConversationCellState = (() => {
     },
     match(conversation_et) {
       return conversation_et.removed_from_conversation();
-    }
+    },
   };
 
   const muted_state = {
@@ -151,7 +151,7 @@ z.conversation.ConversationCellState = (() => {
     },
     match(conversation_et) {
       return conversation_et.is_muted();
-    }
+    },
   };
 
   const alert_state = {
@@ -172,7 +172,7 @@ z.conversation.ConversationCellState = (() => {
         conversation_et.unread_event_count() > 0 &&
         conversation_et.unread_events().find(is_alert) !== undefined
       );
-    }
+    },
   };
 
   const group_activity_state = {
@@ -187,12 +187,12 @@ z.conversation.ConversationCellState = (() => {
           if (remote_user_count === 1) {
             message_text = z.l10n.text(
               z.string.conversations_secondary_line_person_left,
-              remote_user_count
+              remote_user_count,
             );
           } else if (remote_user_count > 1) {
             message_text = z.l10n.text(
               z.string.conversations_secondary_line_people_left,
-              remote_user_count
+              remote_user_count,
             );
           }
           break;
@@ -205,13 +205,13 @@ z.conversation.ConversationCellState = (() => {
               z.string.conversations_secondary_line_person_added,
               {
                 user1: sender_name,
-                user2: remote_name
-              }
+                user2: remote_name,
+              },
             );
           } else if (remote_user_count > 1) {
             message_text = z.l10n.text(
               z.string.conversations_secondary_line_people_added,
-              remote_user_count
+              remote_user_count,
             );
           }
           break;
@@ -235,7 +235,7 @@ z.conversation.ConversationCellState = (() => {
         conversation_et.unread_event_count() > 0 &&
         conversation_et.get_last_message().is_member()
       );
-    }
+    },
   };
 
   const unread_message_state = {
@@ -245,7 +245,7 @@ z.conversation.ConversationCellState = (() => {
 
       if (last_message_et.is_ephemeral()) {
         message_text = z.l10n.text(
-          z.string.conversations_secondary_line_timed_message
+          z.string.conversations_secondary_line_timed_message,
         );
       } else if (last_message_et.is_ping()) {
         message_text = z.l10n.text(z.string.system_notification_ping);
@@ -262,7 +262,7 @@ z.conversation.ConversationCellState = (() => {
         }
       } else if (last_message_et.has_asset_location()) {
         message_text = z.l10n.text(
-          z.string.system_notification_shared_location
+          z.string.system_notification_shared_location,
         );
       } else if (last_message_et.has_asset_image()) {
         message_text = z.l10n.text(z.string.system_notification_asset_add);
@@ -278,7 +278,7 @@ z.conversation.ConversationCellState = (() => {
     },
     match(conversation_et) {
       return conversation_et.unread_event_count() > 0;
-    }
+    },
   };
 
   const pending_state = {
@@ -293,7 +293,7 @@ z.conversation.ConversationCellState = (() => {
     },
     match(conversation_et) {
       return conversation_et.is_request();
-    }
+    },
   };
 
   function generate(conversation_et) {
@@ -304,21 +304,21 @@ z.conversation.ConversationCellState = (() => {
       alert_state,
       group_activity_state,
       unread_message_state,
-      pending_state
+      pending_state,
     ];
     const icon_state = states.find(state => state.match(conversation_et));
     const description_state = states.find(state =>
-      state.match(conversation_et)
+      state.match(conversation_et),
     );
 
     return {
       description: (description_state || default_state)
         .description(conversation_et),
-      icon: (icon_state || default_state).icon(conversation_et)
+      icon: (icon_state || default_state).icon(conversation_et),
     };
   }
 
   return {
-    generate
+    generate,
   };
 })();

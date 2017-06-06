@@ -39,5 +39,5 @@ ko.components.register('location-asset', {
     <div class="location-asset-title" data-uie-name="location-name" data-bind="text: asset.name"></div>
     <a target="_blank" rel="nofollow noopener noreferrer" class="label-xs text-theme" data-bind="attr: {href: asset.link_src}, l10n_text: z.string.conversation_location_link"></a>
   `,
-  viewModel: z.components.LocationAssetComponent
+  viewModel: z.components.LocationAssetComponent,
 });

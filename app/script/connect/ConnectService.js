@@ -31,7 +31,7 @@ z.connect.ConnectService = class ConnectService {
     this.client = client;
     this.logger = new z.util.Logger(
       'z.connect.ConnectService',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
   }
 
@@ -46,7 +46,7 @@ z.connect.ConnectService = class ConnectService {
     return this.client.send_json({
       data: phone_book,
       type: 'POST',
-      url: this.client.create_url('/onboarding/v3')
+      url: this.client.create_url('/onboarding/v3'),
     });
   }
 };

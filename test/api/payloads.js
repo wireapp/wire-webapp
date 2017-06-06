@@ -40,8 +40,8 @@ window.entities = {
         correlation_id: '0d095659-68b7-477e-a7d2-7cecd876617f',
         original_height: 1333,
         nonce: '0d095659-68b7-477e-a7d2-7cecd876617f',
-        public: true
-      }
+        public: true,
+      },
     },
     {
       content_length: 179848,
@@ -57,9 +57,9 @@ window.entities = {
         correlation_id: '0d095659-68b7-477e-a7d2-7cecd876617f',
         original_height: 1333,
         nonce: '0d095659-68b7-477e-a7d2-7cecd876617f',
-        public: true
-      }
-    }
+        public: true,
+      },
+    },
   ],
   connection: {
     status: 'accepted',
@@ -67,7 +67,7 @@ window.entities = {
     to: '7025598b-ffac-4993-8a81-af3f35b7147f',
     from: 'd5a39ffb-6ce3-4cc8-9048-0e15d031b4c5',
     last_update: '2015-01-07T16:08:36.537Z',
-    message: 'Hi Jane Doe,\nLet’s connect.\nJohn Doe'
+    message: 'Hi Jane Doe,\nLet’s connect.\nJohn Doe',
   },
   conversation: {
     creator: 'd5a39ffb-6ce3-4cc8-9048-0e15d031b4c5',
@@ -81,34 +81,34 @@ window.entities = {
         status_time: '2015-01-13T10:41:55.032Z',
         status_ref: '0.0',
         id: 'd5a39ffb-6ce3-4cc8-9048-0e15d031b4c5',
-        archived: null
+        archived: null,
       },
       others: [
         {
           status: 0,
-          id: '2441243e-6d3e-4ebc-9f04-f3236e9b5862'
+          id: '2441243e-6d3e-4ebc-9f04-f3236e9b5862',
         },
         {
           status: 0,
-          id: '7025598b-ffac-4993-8a81-af3f35b7147f'
+          id: '7025598b-ffac-4993-8a81-af3f35b7147f',
         },
         {
           status: 0,
-          id: '7a3740af-8591-4f92-ae8f-9f0c4a9ca19a'
+          id: '7a3740af-8591-4f92-ae8f-9f0c4a9ca19a',
         },
         {
           status: 0,
-          id: 'e6ebfe31-25d1-408f-97fa-8e601b8ee352'
-        }
-      ]
+          id: 'e6ebfe31-25d1-408f-97fa-8e601b8ee352',
+        },
+      ],
     },
     name: 'Very funny conversation about foo bar',
     id: '537992e5-3782-4b6c-8718-a5db2cb786ee',
     type: 0,
     last_event_time: '2015-01-13T10:41:55.032Z',
     last_event: '1.800122000a4b6e15',
-    team: '537992e5-3782-4b6c-8718-a5db2cc786ee'
-  }
+    team: '537992e5-3782-4b6c-8718-a5db2cc786ee',
+  },
 };
 
 entities.clients = {
@@ -118,40 +118,40 @@ entities.clients = {
       time: '2016-03-15T19:59:20.278Z',
       location: {
         lat: 52.5233,
-        lon: 13.4138
+        lon: 13.4138,
       },
       address: '62.96.148.44',
       model: 'Chrome',
       id: '93fa36b916a91118',
       type: 'permanent',
       class: 'desktop',
-      label: 'Windows 10'
+      label: 'Windows 10',
     },
     plain: {
       class: 'desktop',
-      id: '93fa36b916a91118'
+      id: '93fa36b916a91118',
     },
     temporary: {
       cookie: 'webapp@2153234453@temporary@1458070104403',
       time: '2016-03-15T19:28:25.685Z',
       location: {
         lat: 52.5233,
-        lon: 13.4138
+        lon: 13.4138,
       },
       address: '62.96.148.44',
       model: 'Chrome (Temporary)',
       id: '9d1b37cab836df45',
       type: 'temporary',
       class: 'desktop',
-      label: 'Windows 10'
-    }
+      label: 'Windows 10',
+    },
   },
   jane_roe: {
     plain: {
       class: 'phone',
-      id: '2b22b7c59aab5f8'
-    }
-  }
+      id: '2b22b7c59aab5f8',
+    },
+  },
 };
 
 entities.user = {
@@ -162,7 +162,7 @@ entities.user = {
     picture: entities.picture,
     name: 'John Doe',
     id: 'd5a39ffb-6ce3-4cc8-9048-0e15d031b4c5',
-    locale: 'en'
+    locale: 'en',
   },
   jane_roe: {
     email: 'jr@wire.com',
@@ -171,8 +171,8 @@ entities.user = {
     picture: entities.picture,
     name: 'Jane Roe',
     'handle:': 'jaro',
-    id: '7025598b-ffac-4993-8a81-af3f35b7147f'
-  }
+    id: '7025598b-ffac-4993-8a81-af3f35b7147f',
+  },
 };
 
 window.payload = {
@@ -181,20 +181,20 @@ window.payload = {
       one: entities.clients.john_doe.permanent,
       many: [
         entities.clients.john_doe.temporary,
-        entities.clients.john_doe.permanent
-      ]
-    }
+        entities.clients.john_doe.permanent,
+      ],
+    },
   },
   connections: {
     get: {
       has_more: false,
-      connections: [entities.connection, entities.connection]
-    }
+      connections: [entities.connection, entities.connection],
+    },
   },
   conversations: {
     get: {
       has_more: false,
-      conversations: [entities.conversation, entities.conversation]
+      conversations: [entities.conversation, entities.conversation],
     },
     last_events: {
       get: {
@@ -202,38 +202,38 @@ window.payload = {
         conversations: [
           {
             event: '13c.800122000a64b3ee',
-            id: '00b9f353-ab33-4432-86ae-c97c8e3551a0'
+            id: '00b9f353-ab33-4432-86ae-c97c8e3551a0',
           },
           {
             event: '5b9.800122000a65563d',
-            id: '0245764a-fad1-4640-b0f6-731d8bd76ead'
+            id: '0245764a-fad1-4640-b0f6-731d8bd76ead',
           },
           {
             event: '31.800122000a64b25f',
-            id: '032f6fb9-524f-4a76-a12a-948033bfff86'
+            id: '032f6fb9-524f-4a76-a12a-948033bfff86',
           },
           {
             event: '7.800112314201e3bf',
-            id: '0595ee86-32bb-40cc-bc13-d8fd594d4f68'
+            id: '0595ee86-32bb-40cc-bc13-d8fd594d4f68',
           },
           {
             event: '1.800122000a64b529',
-            id: '0925d3a9-65a8-4445-b6dd-56f82a1ec75b'
-          }
-        ]
-      }
+            id: '0925d3a9-65a8-4445-b6dd-56f82a1ec75b',
+          },
+        ],
+      },
     },
     knock: {
       post: {
         conversation: 'aaab1f35-b6cd-4766-8c42-f465b2bc86a5',
         time: Date.now(),
         data: {
-          nonce: '37f91c89-29e5-471f-8b52-4cecd94c9279'
+          nonce: '37f91c89-29e5-471f-8b52-4cecd94c9279',
         },
         from: 'd5a39ffb-6ce3-4cc8-9048-0e15d031b4c5',
         id: '4.800122000a4b6a29',
-        type: 'conversation.knock'
-      }
+        type: 'conversation.knock',
+      },
     },
     hot_knock: {
       post: {
@@ -241,13 +241,13 @@ window.payload = {
         time: Date.now(),
         data: {
           nonce: '37f91c89-29e5-471f-8b52-4cecd94c9279',
-          ref: '4.800122000a4b6a29'
+          ref: '4.800122000a4b6a29',
         },
         from: 'd5a39ffb-6ce3-4cc8-9048-0e15d031b4c5',
         id: '5.800122000a4b6a2a',
-        type: 'conversation.hot-knock'
-      }
-    }
+        type: 'conversation.hot-knock',
+      },
+    },
   },
   search: {
     suggestions: {
@@ -265,7 +265,7 @@ window.payload = {
             name: 'John Doe',
             id: 'd5a39ffb-6ce3-4cc8-9048-0e15d031b4c5',
             blocked: false,
-            level: 1
+            level: 1,
           },
           {
             email: 'jr@wire.com',
@@ -277,20 +277,20 @@ window.payload = {
             name: 'Jane Roe',
             id: '7025598b-ffac-4993-8a81-af3f35b7147f',
             blocked: false,
-            level: 1
-          }
+            level: 1,
+          },
         ],
-        returned: 2
-      }
-    }
+        returned: 2,
+      },
+    },
   },
   self: {
-    get: entities.user.john_doe
+    get: entities.user.john_doe,
   },
   users: {
     get: {
       one: [entities.user.john_doe],
-      many: [entities.user.john_doe, entities.user.jane_roe]
-    }
-  }
+      many: [entities.user.john_doe, entities.user.jane_roe],
+    },
+  },
 };

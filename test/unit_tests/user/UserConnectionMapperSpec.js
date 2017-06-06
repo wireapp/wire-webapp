@@ -36,7 +36,7 @@ describe('z.user.UserConnectionMapper', function() {
         last_update: '2017-02-14T12:43:31.460Z',
         message: '',
         status: 'accepted',
-        to: '39b7f597-dfd1-4dff-86f5-fe1b79cb70a0'
+        to: '39b7f597-dfd1-4dff-86f5-fe1b79cb70a0',
       };
 
       const connection_et = mapper.map_user_connection_from_json(payload);

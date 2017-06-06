@@ -30,5 +30,5 @@ z.message.EphemeralStatusType = {
   ACTIVE: 1,
   INACTIVE: 2,
   NONE: 0,
-  TIMED_OUT: 3
+  TIMED_OUT: 3,
 };

@@ -79,7 +79,7 @@ z.storage.StorageError = class StorageError extends Error {
         'z.storage.StorageError.TYPE.NON_SEQUENTIAL_UPDATE',
       NOT_FOUND: 'z.storage.StorageError.TYPE.NOT_FOUND',
       SKIP_LOADING: 'z.storage.StorageError:TYPE.SKIP_SESSIONS',
-      UNKNOWN: 'z.storage.StorageError.TYPE.UNKNOWN'
+      UNKNOWN: 'z.storage.StorageError.TYPE.UNKNOWN',
     };
   }
 };

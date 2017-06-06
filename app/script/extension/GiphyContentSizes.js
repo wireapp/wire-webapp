@@ -38,5 +38,5 @@ z.extension.GiphyContentSizes = {
   FIXED_WIDTH_SMALL_STILL: 'fixed_width_small_still',
   FIXED_WIDTH_STILL: 'fixed_width_still',
   ORIGINAL: 'original',
-  ORIGINAL_STILL: 'original_still'
+  ORIGINAL_STILL: 'original_still',
 };

@@ -83,6 +83,6 @@ ko.components.register('user-input', {
   viewModel: {
     createViewModel(params, component_info) {
       return new z.components.UserListInputViewModel(params, component_info);
-    }
-  }
+    },
+  },
 });

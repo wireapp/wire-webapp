@@ -27,5 +27,5 @@ z.conversation.ConversationUpdateType = {
   CLEARED_TIMESTAMP: 'cleared_timestamp',
   LAST_EVENT_TIMESTAMP: 'last_event_timestamp',
   LAST_READ_TIMESTAMP: 'last_read_timestamp',
-  MUTED_TIMESTAMP: 'muted_timestamp'
+  MUTED_TIMESTAMP: 'muted_timestamp',
 };

@@ -29,18 +29,18 @@ z.ViewModel.WindowTitleViewModel = class WindowTitleViewModel {
     this.conversation_repository = conversation_repository;
     this.logger = new z.util.Logger(
       'z.ViewModel.WindowTitleViewModel',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
 
     this.update_window_title = false;
 
     amplify.subscribe(
       z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE,
-      this.set_update_state.bind(this)
+      this.set_update_state.bind(this),
     );
     amplify.subscribe(
       z.event.WebApp.LIFECYCLE.LOADED,
-      this.initiate_title_updates.bind(this)
+      this.initiate_title_updates.bind(this),
     );
   }
 
@@ -83,12 +83,12 @@ z.ViewModel.WindowTitleViewModel = class WindowTitleViewModel {
                   id: z.string.conversations_connection_request_many,
                   replace: {
                     content: number_of_connect_requests,
-                    placeholder: '%no'
-                  }
+                    placeholder: '%no',
+                  },
                 });
               } else {
                 window_title += z.l10n.text(
-                  z.string.conversations_connection_request_one
+                  z.string.conversations_connection_request_one,
                 );
               }
               break;
@@ -155,7 +155,7 @@ z.ViewModel.WindowTitleViewModel = class WindowTitleViewModel {
     if (this.update_window_title !== update_window_title) {
       this.update_window_title = update_window_title;
       this.logger.debug(
-        `Set window title update state to '${this.update_window_title}'`
+        `Set window title update state to '${this.update_window_title}'`,
       );
     }
   }

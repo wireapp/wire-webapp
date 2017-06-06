@@ -46,5 +46,5 @@ ko.components.register('group-list', {
       </div>
     </div>
   `,
-  viewModel: z.components.GroupListViewModel
+  viewModel: z.components.GroupListViewModel,
 });

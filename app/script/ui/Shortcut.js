@@ -31,13 +31,13 @@ window.z.ui = z.ui || {};
       electron: {
         macos: 'command + shift + k',
         menu: true,
-        pc: 'ctrl + shift + k'
+        pc: 'ctrl + shift + k',
       },
       webapp: {
         macos: 'command + shift + k',
-        pc: 'ctrl + shift + k'
-      }
-    }
+        pc: 'ctrl + shift + k',
+      },
+    },
   };
 
   shortcut_map[z.ui.ShortcutType.ARCHIVE] = {
@@ -46,13 +46,13 @@ window.z.ui = z.ui || {};
       electron: {
         macos: 'command + d',
         menu: true,
-        pc: 'ctrl + d'
+        pc: 'ctrl + d',
       },
       webapp: {
         macos: 'command + alt + shift + d',
-        pc: 'ctrl + alt + d'
-      }
-    }
+        pc: 'ctrl + alt + d',
+      },
+    },
   };
 
   shortcut_map[z.ui.ShortcutType.CALL_REJECT] = {
@@ -60,13 +60,13 @@ window.z.ui = z.ui || {};
     shortcut: {
       electron: {
         macos: 'command + .',
-        pc: 'ctrl + .'
+        pc: 'ctrl + .',
       },
       webapp: {
         macos: 'command + alt + .',
-        pc: 'ctrl + alt + .'
-      }
-    }
+        pc: 'ctrl + alt + .',
+      },
+    },
   };
 
   shortcut_map[z.ui.ShortcutType.CALL_MUTE] = {
@@ -74,13 +74,13 @@ window.z.ui = z.ui || {};
     shortcut: {
       electron: {
         macos: 'command + alt + m',
-        pc: 'ctrl + alt + m'
+        pc: 'ctrl + alt + m',
       },
       webapp: {
         macos: 'command + alt + m',
-        pc: 'ctrl + alt + m'
-      }
-    }
+        pc: 'ctrl + alt + m',
+      },
+    },
   };
 
   shortcut_map[z.ui.ShortcutType.PREV] = {
@@ -89,13 +89,13 @@ window.z.ui = z.ui || {};
       electron: {
         macos: 'command + alt + down',
         menu: true,
-        pc: 'alt + shift + down'
+        pc: 'alt + shift + down',
       },
       webapp: {
         macos: 'command + alt + down',
-        pc: 'alt + shift + down'
-      }
-    }
+        pc: 'alt + shift + down',
+      },
+    },
   };
 
   shortcut_map[z.ui.ShortcutType.NEXT] = {
@@ -104,13 +104,13 @@ window.z.ui = z.ui || {};
       electron: {
         macos: 'command + alt + up',
         menu: true,
-        pc: 'alt + shift + up'
+        pc: 'alt + shift + up',
       },
       webapp: {
         macos: 'command + alt + up',
-        pc: 'alt + shift + up'
-      }
-    }
+        pc: 'alt + shift + up',
+      },
+    },
   };
 
   shortcut_map[z.ui.ShortcutType.PING] = {
@@ -119,13 +119,13 @@ window.z.ui = z.ui || {};
       electron: {
         macos: 'command + k',
         menu: true,
-        pc: 'ctrl + k'
+        pc: 'ctrl + k',
       },
       webapp: {
         macos: 'command + alt + k',
-        pc: 'ctrl + alt + k'
-      }
-    }
+        pc: 'ctrl + alt + k',
+      },
+    },
   };
 
   shortcut_map[z.ui.ShortcutType.PEOPLE] = {
@@ -134,13 +134,13 @@ window.z.ui = z.ui || {};
       electron: {
         macos: 'command + i',
         menu: true,
-        pc: 'ctrl + i'
+        pc: 'ctrl + i',
       },
       webapp: {
         macos: 'command + alt + shift + i',
-        pc: 'ctrl + alt + i'
-      }
-    }
+        pc: 'ctrl + alt + i',
+      },
+    },
   };
 
   shortcut_map[z.ui.ShortcutType.SILENCE] = {
@@ -149,13 +149,13 @@ window.z.ui = z.ui || {};
       electron: {
         macos: 'command + alt + s',
         menu: true,
-        pc: 'ctrl + alt + s'
+        pc: 'ctrl + alt + s',
       },
       webapp: {
         macos: 'command + alt + s',
-        pc: 'ctrl + alt + s'
-      }
-    }
+        pc: 'ctrl + alt + s',
+      },
+    },
   };
 
   shortcut_map[z.ui.ShortcutType.START] = {
@@ -164,13 +164,13 @@ window.z.ui = z.ui || {};
       electron: {
         macos: 'command + n',
         menu: true,
-        pc: 'ctrl + n'
+        pc: 'ctrl + n',
       },
       webapp: {
         macos: 'command + alt + graveaccent', // KeyboardJS fires this when using cmd + alt + n
-        pc: 'ctrl + alt + graveaccent'
-      }
-    }
+        pc: 'ctrl + alt + graveaccent',
+      },
+    },
   };
 
   function _register_event(platform_specific_shortcut, event) {
@@ -178,7 +178,7 @@ window.z.ui = z.ui || {};
     if (z.util.StringUtil.includes(platform_specific_shortcut, 'graveaccent')) {
       const replaced_shortcut = platform_specific_shortcut.replace(
         'graveaccent',
-        'n'
+        'n',
       );
       _register_event(replaced_shortcut, event);
     }
@@ -218,7 +218,7 @@ window.z.ui = z.ui || {};
       .replace('down', '↓')
       .replace('graveaccent', 'n')
       .replace(/\w+/g, string =>
-        z.util.StringUtil.capitalize_first_char(string)
+        z.util.StringUtil.capitalize_first_char(string),
       );
   }
 
@@ -260,6 +260,6 @@ window.z.ui = z.ui || {};
     get_beautified_shortcut_win: get_beautified_shortcut_win,
     get_shortcut: get_shortcut,
     get_shortcut_tooltip: get_shortcut_tooltip,
-    shortcut_map: shortcut_map
+    shortcut_map: shortcut_map,
   };
 })();

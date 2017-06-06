@@ -30,5 +30,5 @@ z.telemetry.app_init.AppInitStatisticsValue = {
   CONNECTIONS: 'connections',
   CONVERSATIONS: 'conversations',
   NOTIFICATIONS: 'notifications',
-  SESSIONS: 'sessions'
+  SESSIONS: 'sessions',
 };

@@ -24,5 +24,5 @@ window.z.connect = z.connect || {};
 
 z.connect.ConnectSource = {
   GMAIL: 'gmail',
-  ICLOUD: 'icloud'
+  ICLOUD: 'icloud',
 };

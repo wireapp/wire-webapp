@@ -31,5 +31,5 @@ z.calling.enum.CALL_STATE = {
   ONGOING: 'ongoing',
   OUTGOING: 'outgoing',
   REJECTED: 'rejected',
-  UNKNOWN: 'unknown'
+  UNKNOWN: 'unknown',
 };

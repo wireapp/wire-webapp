@@ -29,7 +29,7 @@ z.search.SearchResultMapper = class SearchResultMapper {
   constructor() {
     this.logger = new z.util.Logger(
       'z.search.SearchResultMapper',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
   }
 
@@ -45,7 +45,7 @@ z.search.SearchResultMapper = class SearchResultMapper {
       const search_ets = search_results.map(search_result => {
         return {
           id: search_result.id,
-          mutual_friends_total: search_result.total_mutual_friends
+          mutual_friends_total: search_result.total_mutual_friends,
         };
       });
 

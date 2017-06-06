@@ -31,7 +31,7 @@ z.telemetry.calling.CallSetupStepsOrder = {
     z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SET,
     z.telemetry.calling.CallSetupSteps.ICE_GATHERING_COMPLETED,
     z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SEND,
-    z.telemetry.calling.CallSetupSteps.ICE_CONNECTION_CONNECTED
+    z.telemetry.calling.CallSetupSteps.ICE_CONNECTION_CONNECTED,
   ],
   OFFER: [
     z.telemetry.calling.CallSetupSteps.STREAM_RECEIVED,
@@ -40,6 +40,6 @@ z.telemetry.calling.CallSetupStepsOrder = {
     z.telemetry.calling.CallSetupSteps.ICE_GATHERING_COMPLETED,
     z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SEND,
     z.telemetry.calling.CallSetupSteps.REMOTE_SDP_SET,
-    z.telemetry.calling.CallSetupSteps.ICE_CONNECTION_CONNECTED
-  ]
+    z.telemetry.calling.CallSetupSteps.ICE_CONNECTION_CONNECTED,
+  ],
 };

@@ -53,7 +53,7 @@ z.components.InputLevel = class InputLevel {
       16,
       17,
       18,
-      19
+      19,
     ];
   }
 
@@ -77,5 +77,5 @@ ko.components.register('input-level', {
       <!-- /ko -->
     </ul>\
   `,
-  viewModel: z.components.InputLevel
+  viewModel: z.components.InputLevel,
 });

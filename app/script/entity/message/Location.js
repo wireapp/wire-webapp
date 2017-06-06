@@ -37,7 +37,7 @@ z.entity.Location = class Location extends z.entity.Asset {
         this.latitude,
         this.longitude,
         this.name,
-        this.zoom
+        this.zoom,
       );
     });
   }

@@ -25,7 +25,7 @@ window.z.util = z.util || {};
 z.util.PromiseQueue = class PromiseQueue {
   static get CONFIG() {
     return {
-      UNBLOCK_INTERVAL: 60 * 1000
+      UNBLOCK_INTERVAL: 60 * 1000,
     };
   }
 
@@ -42,12 +42,12 @@ z.util.PromiseQueue = class PromiseQueue {
     const {
       name,
       paused = false,
-      timeout = PromiseQueue.CONFIG.UNBLOCK_INTERVAL
+      timeout = PromiseQueue.CONFIG.UNBLOCK_INTERVAL,
     } = options;
 
     this.logger = new z.util.Logger(
       name ? `z.util.PromiseQueue (${name})` : 'z.util.PromiseQueue',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
 
     this._blocked = false;
@@ -74,7 +74,7 @@ z.util.PromiseQueue = class PromiseQueue {
           window.clearInterval(this._interval);
           this.logger.error(
             'Promise queue failed, unblocking queue',
-            this._queue
+            this._queue,
           );
           this.execute();
         }
@@ -130,7 +130,7 @@ z.util.PromiseQueue = class PromiseQueue {
       const queue_entry = {
         fn: fn,
         reject_fn: reject,
-        resolve_fn: resolve
+        resolve_fn: resolve,
       };
 
       this._queue.push(queue_entry);

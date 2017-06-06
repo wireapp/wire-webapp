@@ -40,23 +40,23 @@ describe('z.cryptography.CryptographyRepository', function() {
       john_doe = {
         clients: {
           desktop_id: 'b29034060fed476e',
-          phone_id: '4b0a0fbf418d264c'
+          phone_id: '4b0a0fbf418d264c',
         },
-        id: entities.user.john_doe.id
+        id: entities.user.john_doe.id,
       };
 
       return (jane_roe = {
         clients: {
-          phone_id: '55cdd1dbe3c2ed74'
+          phone_id: '55cdd1dbe3c2ed74',
         },
-        id: entities.user.jane_roe.id
+        id: entities.user.jane_roe.id,
       });
     });
 
     it('encrypts a generic message', function(done) {
       spyOn(
         TestFactory.cryptography_service,
-        'get_users_pre_keys'
+        'get_users_pre_keys',
       ).and.callFake(user_client_map =>
         Promise.resolve().then(function() {
           const prekey_map = {};
@@ -71,28 +71,28 @@ describe('z.cryptography.CryptographyRepository', function() {
                 prekey_map[user_id][client_id] = {
                   id: 65535,
                   key:
-                    'pQABARn//wKhAFgg3OpuTCUwDZMt1fklZB4M+fjDx/3fyx78gJ6j3H3dM2YDoQChAFggQU1orulueQHLv5YDYqEYl3D4O0zA9d+TaGGXXaBJmK0E9g=='
+                    'pQABARn//wKhAFgg3OpuTCUwDZMt1fklZB4M+fjDx/3fyx78gJ6j3H3dM2YDoQChAFggQU1orulueQHLv5YDYqEYl3D4O0zA9d+TaGGXXaBJmK0E9g==',
                 };
               });
             }
           }
 
           return prekey_map;
-        })
+        }),
       );
 
       const generic_message = new z.proto.GenericMessage(
-        z.util.create_random_uuid()
+        z.util.create_random_uuid(),
       );
       generic_message.set(
         z.cryptography.GENERIC_MESSAGE_TYPE.TEXT,
-        new z.proto.Text('Unit test')
+        new z.proto.Text('Unit test'),
       );
 
       const user_client_map = {};
       user_client_map[john_doe.id] = [
         john_doe.clients.phone_id,
-        john_doe.clients.desktop_id
+        john_doe.clients.desktop_id,
       ];
       user_client_map[jane_roe.id] = [jane_roe.clients.phone_id];
 
@@ -105,8 +105,8 @@ describe('z.cryptography.CryptographyRepository', function() {
           expect(Object.keys(payload.recipients[jane_roe.id]).length).toBe(1);
           expect(
             _.isString(
-              payload.recipients[jane_roe.id][jane_roe.clients.phone_id]
-            )
+              payload.recipients[jane_roe.id][jane_roe.clients.phone_id],
+            ),
           ).toBeTruthy();
           done();
         })
@@ -123,10 +123,10 @@ describe('z.cryptography.CryptographyRepository', function() {
         data: {
           text: '💣',
           sender: 'e35e4ee5b80a1a9d',
-          recipient: '7481c47f2f7336d8'
+          recipient: '7481c47f2f7336d8',
         },
         from: 'e3ff8dab-1407-4890-b9d3-e1aab49233e8',
-        type: 'conversation.otr-message-add'
+        type: 'conversation.otr-message-add',
       };
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
@@ -134,7 +134,7 @@ describe('z.cryptography.CryptographyRepository', function() {
         .decrypt_event(event)
         .catch(function(error) {
           expect(error).toEqual(
-            jasmine.any(Proteus.errors.DecryptError.InvalidMessage)
+            jasmine.any(Proteus.errors.DecryptError.InvalidMessage),
           );
           done();
         })

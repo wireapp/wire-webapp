@@ -25,7 +25,7 @@ window.z.components = z.components || {};
 z.components.UserProfileMode = {
   DEFAULT: 'default',
   PEOPLE: 'people',
-  SEARCH: 'search'
+  SEARCH: 'search',
 };
 
 z.components.UserProfileViewModel = class UserProfileViewModel {
@@ -37,7 +37,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
 
     this.logger = new z.util.Logger(
       'z.components.UserProfileViewModel',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
 
     this.user = params.user;
@@ -139,7 +139,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
     this.selected_device_subscription = this.selected_device.subscribe(() => {
       if (this.selected_device()) {
         this.fingerprint_local(
-          this.cryptography_repository.get_local_fingerprint()
+          this.cryptography_repository.get_local_fingerprint(),
         );
         this.fingerprint_remote('');
         this.cryptography_repository
@@ -152,10 +152,10 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
       id: z.string.tooltip_people_add,
       replace: {
         content: z.ui.Shortcut.get_shortcut_tooltip(
-          z.ui.ShortcutType.ADD_PEOPLE
+          z.ui.ShortcutType.ADD_PEOPLE,
         ),
-        placeholder: '%shortcut'
-      }
+        placeholder: '%shortcut',
+      },
     });
 
     this.device_headline = ko.pureComputed(() => {
@@ -163,8 +163,8 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
         id: z.string.people_tabs_devices_headline,
         replace: {
           content: this.user().first_name(),
-          placeholder: '%@.name'
-        }
+          placeholder: '%@.name',
+        },
       });
     });
 
@@ -173,8 +173,8 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
         id: z.string.people_tabs_no_devices_headline,
         replace: {
           content: this.user().first_name(),
-          placeholder: '%@.name'
-        }
+          placeholder: '%@.name',
+        },
       });
     });
 
@@ -184,17 +184,17 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
         replace: [
           {
             content: "<span class='user-profile-device-detail-highlight'>",
-            placeholder: '%bold'
+            placeholder: '%bold',
           },
           {
             content: z.util.escape_html(this.user().first_name()),
-            placeholder: '%@.name'
+            placeholder: '%@.name',
           },
           {
             content: '</span>',
-            placeholder: '%end'
-          }
-        ]
+            placeholder: '%end',
+          },
+        ],
       });
     });
 
@@ -217,17 +217,17 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
             .then(conversation_et => {
               if (
                 this.conversation_repository.is_active_conversation(
-                  conversation_et
+                  conversation_et,
                 )
               ) {
                 amplify.publish(z.event.WebApp.CONVERSATION.PEOPLE.HIDE);
                 const next_conversation_et = this.conversation_repository.get_next_conversation(
-                  conversation_et
+                  conversation_et,
                 );
                 window.setTimeout(function() {
                   amplify.publish(
                     z.event.WebApp.CONVERSATION.SHOW,
-                    next_conversation_et
+                    next_conversation_et,
                   );
                 }, SHOW_CONVERSATION_DELAY);
               }
@@ -238,9 +238,9 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
           }
         },
         data: {
-          user: this.user()
+          user: this.user(),
         },
-        template: '#template-confirm-cancel_request'
+        template: '#template-confirm-cancel_request',
       });
     };
 
@@ -252,7 +252,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
         .then(conversation_et => {
           if (conversation_et.is_archived()) {
             this.conversation_repository.unarchive_conversation(
-              conversation_et
+              conversation_et,
             );
           }
 
@@ -294,7 +294,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
         }
       },
       this,
-      {deferEvaluation: true}
+      {deferEvaluation: true},
     );
 
     this.show_gray_image = ko.pureComputed(
@@ -306,7 +306,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
         return !this.user().is_me && !this.user.is_connected();
       },
       this,
-      {deferEvaluation: true}
+      {deferEvaluation: true},
     );
 
     this.connection_is_not_established = ko.pureComputed(
@@ -316,7 +316,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
         }
       },
       this,
-      {deferEvaluation: true}
+      {deferEvaluation: true},
     );
 
     this.user_is_removed_from_conversation = ko.pureComputed(
@@ -329,7 +329,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
         return !participating_user_ets.includes(this.user());
       },
       this,
-      {deferEvaluation: true}
+      {deferEvaluation: true},
     );
 
     this.render_avatar = ko.observable(false);
@@ -429,9 +429,9 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
           amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_DEVICES);
         },
         device: this.client_repository.current_client,
-        fingerprint_local: this.fingerprint_local
+        fingerprint_local: this.fingerprint_local,
       },
-      template: '#template-confirm-my-fingerprint'
+      template: '#template-confirm-my-fingerprint',
     });
   }
 
@@ -447,7 +447,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
       .reset_session(
         this.user().id,
         this.selected_device().id,
-        this.conversation().id
+        this.conversation().id,
       )
       .then(() => reset_progress())
       .catch(() => reset_progress());
@@ -459,7 +459,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
     this.client_repository
       .verify_client(this.user().id, this.selected_device(), toggle_verified)
       .catch(error =>
-        this.logger.warn(`Client cannot be updated: ${error.message}`)
+        this.logger.warn(`Client cannot be updated: ${error.message}`),
       );
   }
 
@@ -473,7 +473,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
         })
         .catch(error => {
           this.logger.error(
-            `Unable to retrieve clients data for user '${user_id}': ${error}`
+            `Unable to retrieve clients data for user '${user_id}': ${error}`,
           );
         });
     }
@@ -488,11 +488,11 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
 
 ko.components.register('user-profile', {
   template: {
-    element: 'user-profile-template'
+    element: 'user-profile-template',
   },
   viewModel: {
     createViewModel(params, component_info) {
       return new z.components.UserProfileViewModel(params, component_info);
-    }
-  }
+    },
+  },
 });

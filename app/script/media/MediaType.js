@@ -27,5 +27,5 @@ z.media.MediaType = {
   AUDIO_VIDEO: 'audio/video',
   NONE: 'none',
   SCREEN: 'screen',
-  VIDEO: 'video'
+  VIDEO: 'video',
 };

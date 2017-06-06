@@ -28,7 +28,7 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
     return {
       CONFIRMATION: 'confirmation',
       ONGOING: 'ongoing',
-      RESET: 'reset'
+      RESET: 'reset',
     };
   }
 
@@ -36,14 +36,14 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
     element_id,
     client_repository,
     conversation_repository,
-    cryptography_repository
+    cryptography_repository,
   ) {
     this.client_repository = client_repository;
     this.conversation_repository = conversation_repository;
     this.cryptography_repository = cryptography_repository;
     this.logger = new z.util.Logger(
       'z.ViewModel.content.PreferencesDeviceDetailsViewModel',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
 
     this.self_user = this.client_repository.self_user;
@@ -53,7 +53,7 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
       if (device_et) {
         this.session_reset_state(
           z.ViewModel.content.PreferencesDeviceDetailsViewModel
-            .SESSION_RESET_STATE.RESET
+            .SESSION_RESET_STATE.RESET,
         );
         this.fingerprint('');
         this._update_fingerprint();
@@ -67,15 +67,15 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
 
     this.session_reset_state = ko.observable(
       z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE
-        .RESET
+        .RESET,
     );
     this.fingerprint = ko.observable('');
 
     this.activated_in = ko.observable(
-      z.l10n.text(z.string.preferences_devices_activated_in)
+      z.l10n.text(z.string.preferences_devices_activated_in),
     );
     this.activated_on = ko.observable(
-      z.l10n.text(z.string.preferences_devices_activated_on)
+      z.l10n.text(z.string.preferences_devices_activated_on),
     );
   }
 
@@ -85,9 +85,9 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
         id: z.string.preferences_devices_activated_in,
         replace: {
           content: `<span class='preferences-devices-activated-bold'>${location}</span>`,
-          placeholder: '%location'
-        }
-      })
+          placeholder: '%location',
+        },
+      }),
     );
   }
 
@@ -97,11 +97,11 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
         id: z.string.preferences_devices_activated_on,
         replace: {
           content: `<span class='preferences-devices-activated-bold'>${z.util.format_timestamp(
-            time
+            time,
           )}</span>`,
-          placeholder: '%time'
-        }
-      })
+          placeholder: '%time',
+        },
+      }),
     );
   }
 
@@ -111,7 +111,7 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
       .then(retrieved_location => {
         if (retrieved_location) {
           this._update_activation_location(
-            `${retrieved_location.place}, ${retrieved_location.country_code}`
+            `${retrieved_location.place}, ${retrieved_location.country_code}`,
           );
         }
       });
@@ -128,7 +128,7 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
   click_on_details_close() {
     amplify.publish(
       z.event.WebApp.CONTENT.SWITCH,
-      z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES
+      z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES,
     );
     this.device(null);
   }
@@ -136,34 +136,34 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
   click_on_reset_session() {
     this.session_reset_state(
       z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE
-        .ONGOING
+        .ONGOING,
     );
 
     this.conversation_repository
       .reset_session(
         this.self_user().id,
         this.device().id,
-        this.conversation_repository.self_conversation().id
+        this.conversation_repository.self_conversation().id,
       )
       .then(() => {
         window.setTimeout(() => {
           this.session_reset_state(
             z.ViewModel.content.PreferencesDeviceDetailsViewModel
-              .SESSION_RESET_STATE.CONFIRMATION
+              .SESSION_RESET_STATE.CONFIRMATION,
           );
         }, 550);
 
         window.setTimeout(() => {
           this.session_reset_state(
             z.ViewModel.content.PreferencesDeviceDetailsViewModel
-              .SESSION_RESET_STATE.RESET
+              .SESSION_RESET_STATE.RESET,
           );
         }, 5000);
       })
       .catch(error => {
         this.session_reset_state(
           z.ViewModel.content.PreferencesDeviceDetailsViewModel
-            .SESSION_RESET_STATE.RESET
+            .SESSION_RESET_STATE.RESET,
         );
         throw error;
       });
@@ -182,8 +182,8 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
               this.click_on_details_close();
             });
         },
-        data: this.device().model
-      }
+        data: this.device().model,
+      },
     );
   }
 
@@ -192,7 +192,7 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
     this.client_repository.verify_client(
       this.self_user().id,
       this.device(),
-      toggle_verified
+      toggle_verified,
     );
   }
 };

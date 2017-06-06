@@ -42,5 +42,5 @@ z.string.uk = z.string.uk || {};
 z.string.Declension = {
   ACCUSATIVE: 'accusative',
   DATIVE: 'dative',
-  NOMINATIVE: 'nominative'
+  NOMINATIVE: 'nominative',
 };

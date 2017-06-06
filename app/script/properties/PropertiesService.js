@@ -25,7 +25,7 @@ window.z.properties = z.properties || {};
 z.properties.PropertiesService = class PropertiesService {
   static get CONFIG() {
     return {
-      URL_PROPERTIES: '/properties'
+      URL_PROPERTIES: '/properties',
     };
   }
 
@@ -37,7 +37,7 @@ z.properties.PropertiesService = class PropertiesService {
     this.client = client;
     this.logger = new z.util.Logger(
       'z.properties.PropertiesService',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
   }
 
@@ -49,7 +49,7 @@ z.properties.PropertiesService = class PropertiesService {
   delete_properties() {
     return this.client.send_request({
       type: 'DELETE',
-      url: this.client.create_url(PropertiesService.CONFIG.URL_PROPERTIES)
+      url: this.client.create_url(PropertiesService.CONFIG.URL_PROPERTIES),
     });
   }
 
@@ -63,8 +63,8 @@ z.properties.PropertiesService = class PropertiesService {
     return this.client.send_request({
       type: 'DELETE',
       url: this.client.create_url(
-        `${PropertiesService.CONFIG.URL_PROPERTIES}/${key}`
-      )
+        `${PropertiesService.CONFIG.URL_PROPERTIES}/${key}`,
+      ),
     });
   }
 
@@ -76,7 +76,7 @@ z.properties.PropertiesService = class PropertiesService {
   get_properties() {
     return this.client.send_request({
       type: 'GET',
-      url: this.client.create_url(PropertiesService.CONFIG.URL_PROPERTIES)
+      url: this.client.create_url(PropertiesService.CONFIG.URL_PROPERTIES),
     });
   }
 
@@ -91,8 +91,8 @@ z.properties.PropertiesService = class PropertiesService {
     return this.client.send_request({
       type: 'GET',
       url: this.client.create_url(
-        `${PropertiesService.CONFIG.URL_PROPERTIES}/${key}`
-      )
+        `${PropertiesService.CONFIG.URL_PROPERTIES}/${key}`,
+      ),
     });
   }
 
@@ -109,8 +109,8 @@ z.properties.PropertiesService = class PropertiesService {
       data: properties,
       type: 'PUT',
       url: this.client.create_url(
-        `${PropertiesService.CONFIG.URL_PROPERTIES}/${key}`
-      )
+        `${PropertiesService.CONFIG.URL_PROPERTIES}/${key}`,
+      ),
     });
   }
 };

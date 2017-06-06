@@ -49,11 +49,11 @@ z.util.ObjectUtil = {
       if (object.hasOwnProperty(property)) {
         new_object[property] = z.util.ObjectUtil.map_recursive(
           object[property],
-          mapping_function
+          mapping_function,
         );
       }
     }
 
     return new_object;
-  }
+  },
 };

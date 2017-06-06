@@ -28,7 +28,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
   constructor(protocol_version) {
     this.logger = new z.util.Logger(
       'z.telemetry.calling.CallTelemetry',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
 
     this.sessions = {};
@@ -72,7 +72,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
   track_session(conversation_id, {session: session_id}) {
     this.sessions[session_id] = new z.calling.v2.CallTrackingInfo({
       conversation_id: conversation_id,
-      session_id: session_id
+      session_id: session_id,
     });
   }
 
@@ -146,14 +146,14 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
             : z.tracking.attribute.ConversationType.ONE_TO_ONE,
           remote_version: [
             z.tracking.EventName.CALLING.ESTABLISHED_CALL,
-            z.tracking.EventName.CALLING.JOINED_CALL
+            z.tracking.EventName.CALLING.JOINED_CALL,
           ].includes(event_name)
             ? this.remote_version
             : undefined,
           version: this.protocol_version,
-          with_bot: conversation_et.is_with_bot()
+          with_bot: conversation_et.is_with_bot(),
         },
-        attributes
+        attributes,
       );
 
       if (this.media_type === z.media.MediaType.VIDEO) {
@@ -176,7 +176,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
       is_group,
       termination_reason,
       timer_start,
-      max_number_of_participants
+      max_number_of_participants,
     } = call_et;
     const duration = Math.floor((Date.now() - timer_start) / 1000);
 
@@ -211,7 +211,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
         reason: termination_reason,
         remote_version: this.remote_version,
         version: this.protocol_version,
-        with_bot: conversation_et.is_with_bot()
+        with_bot: conversation_et.is_with_bot(),
       };
 
       let event_name = z.tracking.EventName.CALLING.ENDED_CALL;

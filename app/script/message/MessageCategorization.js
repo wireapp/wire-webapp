@@ -82,7 +82,7 @@ z.message.MessageCategorization = (function() {
         _check_image,
         _check_file,
         _check_ping,
-        _check_location
+        _check_location,
       ]) {
         const temp_category = check(event);
         if (temp_category) {
@@ -105,6 +105,6 @@ z.message.MessageCategorization = (function() {
   };
 
   return {
-    category_from_event: _category_from_event
+    category_from_event: _category_from_event,
   };
 })();

@@ -39,7 +39,7 @@ z.assets.AssetCrypto = (() => {
             key_bytes,
             'AES-CBC',
             false,
-            ['decrypt']
+            ['decrypt'],
           );
         }
 
@@ -51,7 +51,7 @@ z.assets.AssetCrypto = (() => {
         return window.crypto.subtle.decrypt(
           {iv: iv, name: 'AES-CBC'},
           key,
-          img_ciphertext
+          img_ciphertext,
         );
       });
   }
@@ -75,7 +75,7 @@ z.assets.AssetCrypto = (() => {
         return window.crypto.subtle.encrypt(
           {iv: iv.buffer, name: 'AES-CBC'},
           key,
-          plaintext
+          plaintext,
         );
       })
       .then(function(ciphertext) {
@@ -93,7 +93,7 @@ z.assets.AssetCrypto = (() => {
       .then(key_bytes => ({
         cipher_text: iv_ciphertext.buffer,
         key_bytes: key_bytes,
-        sha256: computed_sha256
+        sha256: computed_sha256,
       }));
   }
 
@@ -108,7 +108,7 @@ z.assets.AssetCrypto = (() => {
 
   function _generate_random_bytes(length) {
     const randomValues = new Uint32Array(length / 4).map(() =>
-      libsodium.getRandomValue()
+      libsodium.getRandomValue(),
     );
     const ramdonBytes = new Uint8Array(randomValues.buffer);
     if (ramdonBytes.length > 0 && !ramdonBytes.every(byte => byte === 0)) {
@@ -119,6 +119,6 @@ z.assets.AssetCrypto = (() => {
 
   return {
     decrypt_aes_asset,
-    encrypt_aes_asset
+    encrypt_aes_asset,
   };
 })();

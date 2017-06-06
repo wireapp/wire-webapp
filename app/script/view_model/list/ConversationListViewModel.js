@@ -40,7 +40,7 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
     content_view_model,
     calling_repository,
     conversation_repository,
-    user_repository
+    user_repository,
   ) {
     this.click_on_conversation = this.click_on_conversation.bind(this);
     this.is_selected_conversation = this.is_selected_conversation.bind(this);
@@ -52,7 +52,7 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
     this.user_repository = user_repository;
     this.logger = new z.util.Logger(
       'z.ViewModel.list.ConversationListViewModel',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
 
     this.joined_call = this.calling_repository.joined_call;
@@ -71,8 +71,8 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
           id: z.string.conversations_connection_request_many,
           replace: {
             content: count,
-            placeholder: '%no'
-          }
+            placeholder: '%no',
+          },
         });
       }
       return z.l10n.text(z.string.conversations_connection_request_one);
@@ -114,8 +114,8 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
         id: z.string.tooltip_conversations_archived,
         replace: {
           content: this.conversations_archived().length,
-          placeholder: '%no'
-        }
+          placeholder: '%no',
+        },
       });
     });
 
@@ -123,8 +123,8 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
       id: z.string.tooltip_conversations_tooltip_start,
       replace: {
         content: z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.START),
-        placeholder: '%shortcut'
-      }
+        placeholder: '%shortcut',
+      },
     });
 
     this.show_connect_requests = ko.pureComputed(() => {
@@ -137,7 +137,7 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
     this.self_stream_state = this.calling_repository.self_stream_state;
 
     this.show_toggle_screen = ko.pureComputed(
-      () => z.calling.CallingRepository.supports_screen_sharing
+      () => z.calling.CallingRepository.supports_screen_sharing,
     );
     this.show_toggle_video = ko.pureComputed(() => {
       if (this.joined_call()) {
@@ -155,7 +155,7 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
 
   click_on_connect_requests() {
     this.content_view_model.switch_content(
-      z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS
+      z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS,
     );
   }
 
@@ -178,23 +178,23 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
   _init_subscriptions() {
     amplify.subscribe(
       z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE,
-      this.set_show_calls_state.bind(this)
+      this.set_show_calls_state.bind(this),
     );
     amplify.subscribe(
       z.event.WebApp.LIFECYCLE.LOADED,
-      this.on_webapp_loaded.bind(this)
+      this.on_webapp_loaded.bind(this),
     );
     amplify.subscribe(
       z.event.WebApp.SHORTCUT.NEXT,
-      this._go_to_next_conversation.bind(this)
+      this._go_to_next_conversation.bind(this),
     );
     amplify.subscribe(
       z.event.WebApp.SHORTCUT.PREV,
-      this._go_to_prev_conversation.bind(this)
+      this._go_to_prev_conversation.bind(this),
     );
     amplify.subscribe(
       z.event.WebApp.SHORTCUT.START,
-      this.click_on_people_button.bind(this)
+      this.click_on_people_button.bind(this),
     );
   }
 
@@ -202,7 +202,7 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
     const conversations = this.conversation_repository.conversations_unarchived();
     const next_index =
       conversations.indexOf(
-        this.conversation_repository.active_conversation()
+        this.conversation_repository.active_conversation(),
       ) - 1;
     const next_conversation_et = conversations[next_index];
 
@@ -215,7 +215,7 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
     const conversations = this.conversation_repository.conversations_unarchived();
     const prev_index =
       conversations.indexOf(
-        this.conversation_repository.active_conversation()
+        this.conversation_repository.active_conversation(),
       ) + 1;
     const prev_conversation_et = conversations[prev_index];
 
@@ -226,12 +226,12 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
 
   is_selected_conversation(conversation_et) {
     const is_selected_conversation = this.conversation_repository.is_active_conversation(
-      conversation_et
+      conversation_et,
     );
     const is_selected_state = [
       z.ViewModel.content.CONTENT_STATE.COLLECTION,
       z.ViewModel.content.CONTENT_STATE.COLLECTION_DETAILS,
-      z.ViewModel.content.CONTENT_STATE.CONVERSATION
+      z.ViewModel.content.CONTENT_STATE.CONVERSATION,
     ].includes(this.content_state());
 
     return is_selected_conversation && is_selected_state;
@@ -257,7 +257,7 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
     amplify.publish(
       z.event.WebApp.CALL.STATE.LEAVE,
       conversation_et.id,
-      z.calling.enum.TERMINATION_REASON.SELF_USER
+      z.calling.enum.TERMINATION_REASON.SELF_USER,
     );
   }
 
@@ -269,14 +269,14 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
     amplify.publish(
       z.event.WebApp.CALL.MEDIA.TOGGLE,
       conversation_et.id,
-      z.media.MediaType.AUDIO
+      z.media.MediaType.AUDIO,
     );
   }
 
   on_toggle_screen(conversation_et) {
     amplify.publish(
       z.event.WebApp.CALL.MEDIA.CHOOSE_SCREEN,
-      conversation_et.id
+      conversation_et.id,
     );
   }
 
@@ -284,7 +284,7 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
     amplify.publish(
       z.event.WebApp.CALL.MEDIA.TOGGLE,
       conversation_et.id,
-      z.media.MediaType.VIDEO
+      z.media.MediaType.VIDEO,
     );
   }
 

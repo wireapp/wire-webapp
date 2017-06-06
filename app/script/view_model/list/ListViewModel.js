@@ -44,7 +44,7 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     conversation_repository,
     search_repository,
     properties_repository,
-    team_repository
+    team_repository,
   ) {
     this.switch_list = this.switch_list.bind(this);
     this.on_context_menu = this.on_context_menu.bind(this);
@@ -58,7 +58,7 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     this.team_repository = team_repository;
     this.logger = new z.util.Logger(
       'z.ViewModel.list.ListViewModel',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
 
     // Repositories
@@ -75,7 +75,7 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     this.archive = new z.ViewModel.list.ArchiveViewModel(
       'archive',
       this,
-      this.conversation_repository
+      this.conversation_repository,
     );
     this.conversations = new z.ViewModel.list.ConversationListViewModel(
       'conversations',
@@ -83,12 +83,12 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
       this.content_view_model,
       this.calling_repository,
       this.conversation_repository,
-      this.user_repository
+      this.user_repository,
     );
     this.preferences = new z.ViewModel.list.PreferencesListViewModel(
       'preferences',
       this,
-      this.content_view_model
+      this.content_view_model,
     );
     this.start_ui = new z.ViewModel.list.StartUIViewModel(
       'start-ui',
@@ -98,18 +98,18 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
       this.properties_repository,
       this.search_repository,
       this.team_repository,
-      this.user_repository
+      this.user_repository,
     );
     this.takeover = new z.ViewModel.list.TakeoverViewModel(
       'takeover',
       this.conversation_repository,
-      this.user_repository
+      this.user_repository,
     );
     this.teams_tabs = new z.ViewModel.list.TeamsTabViewModel(
       this,
       this.conversation_repository,
       this.team_repository,
-      this.user_repository
+      this.user_repository,
     );
     /* eslint-enable no-multi-spaces */
 
@@ -126,49 +126,49 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
 
   _init_subscriptions() {
     amplify.subscribe(z.event.WebApp.CONVERSATION.SHOW, () =>
-      this.switch_list(z.ViewModel.list.LIST_STATE.CONVERSATIONS, false)
+      this.switch_list(z.ViewModel.list.LIST_STATE.CONVERSATIONS, false),
     );
     amplify.subscribe(z.event.WebApp.LIFECYCLE.LOADED, () =>
-      this.webapp_loaded(true)
+      this.webapp_loaded(true),
     );
     amplify.subscribe(
       z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT,
-      this.open_preferences_account.bind(this)
+      this.open_preferences_account.bind(this),
     );
     amplify.subscribe(
       z.event.WebApp.PREFERENCES.MANAGE_DEVICES,
-      this.open_preferences_devices.bind(this)
+      this.open_preferences_devices.bind(this),
     );
     amplify.subscribe(
       z.event.WebApp.SEARCH.SHOW,
-      this.open_start_ui.bind(this)
+      this.open_start_ui.bind(this),
     );
     amplify.subscribe(
       z.event.WebApp.TAKEOVER.SHOW,
-      this.show_takeover.bind(this)
+      this.show_takeover.bind(this),
     );
     amplify.subscribe(
       z.event.WebApp.TAKEOVER.DISMISS,
-      this.dismiss_takeover.bind(this)
+      this.dismiss_takeover.bind(this),
     );
     amplify.subscribe(
       z.event.WebApp.SHORTCUT.ARCHIVE,
-      this.click_on_archive_action.bind(this)
+      this.click_on_archive_action.bind(this),
     );
     amplify.subscribe(
       z.event.WebApp.SHORTCUT.DELETE,
-      this.click_on_clear_action.bind(this)
+      this.click_on_clear_action.bind(this),
     );
     amplify.subscribe(
       z.event.WebApp.SHORTCUT.SILENCE,
-      this.click_on_mute_action.bind(this)
+      this.click_on_mute_action.bind(this),
     );
   }
 
   open_preferences_account() {
     this.switch_list(z.ViewModel.list.LIST_STATE.PREFERENCES);
     this.content_view_model.switch_content(
-      z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT
+      z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT,
     );
   }
 
@@ -178,12 +178,12 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     if (device_et) {
       this.content_view_model.preferences_device_details.device(device_et);
       return this.content_view_model.switch_content(
-        z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS
+        z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS,
       );
     }
 
     return this.content_view_model.switch_content(
-      z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES
+      z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES,
     );
   }
 
@@ -201,14 +201,14 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
 
   _hide_list() {
     $(`#${this._get_element_id_of_list(this.list_state())}`).removeClass(
-      'left-list-is-visible'
+      'left-list-is-visible',
     );
     $(document).off('keydown.list_view');
   }
 
   _show_list(new_list_state) {
     $(`#${this._get_element_id_of_list(new_list_state)}`).addClass(
-      'left-list-is-visible'
+      'left-list-is-visible',
     );
     this.list_state(new_list_state);
     this.last_update(Date.now());
@@ -230,7 +230,7 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
       case z.ViewModel.list.LIST_STATE.PREFERENCES:
         amplify.publish(
           z.event.WebApp.CONTENT.SWITCH,
-          z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT
+          z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT,
         );
         break;
       default:
@@ -277,20 +277,20 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
         id: z.string.tooltip_conversations_notify,
         replace: {
           content: z.ui.Shortcut.get_shortcut_tooltip(
-            z.ui.ShortcutType.SILENCE
+            z.ui.ShortcutType.SILENCE,
           ),
-          placeholder: '%shortcut'
-        }
+          placeholder: '%shortcut',
+        },
       });
 
       const silence_conversation_tooltip = z.localization.Localizer.get_text({
         id: z.string.tooltip_conversations_silence,
         replace: {
           content: z.ui.Shortcut.get_shortcut_tooltip(
-            z.ui.ShortcutType.SILENCE
+            z.ui.ShortcutType.SILENCE,
           ),
-          placeholder: '%shortcut'
-        }
+          placeholder: '%shortcut',
+        },
       });
 
       label = conversation_et.is_muted()
@@ -302,44 +302,44 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
       entries.push({
         click: () => this.click_on_mute_action(conversation_et),
         label: z.l10n.text(label),
-        title: title
+        title: title,
       });
     }
 
     if (conversation_et.is_archived()) {
       entries.push({
         click: () => this.click_on_unarchive_action(conversation_et),
-        label: z.l10n.text(z.string.conversations_popover_unarchive)
+        label: z.l10n.text(z.string.conversations_popover_unarchive),
       });
     } else {
       const archive_conversation_tooltip = z.localization.Localizer.get_text({
         id: z.string.tooltip_conversations_archive,
         replace: {
           content: z.ui.Shortcut.get_shortcut_tooltip(
-            z.ui.ShortcutType.ARCHIVE
+            z.ui.ShortcutType.ARCHIVE,
           ),
-          placeholder: '%shortcut'
-        }
+          placeholder: '%shortcut',
+        },
       });
 
       entries.push({
         click: () => this.click_on_archive_action(conversation_et),
         label: z.l10n.text(z.string.conversations_popover_archive),
-        title: archive_conversation_tooltip
+        title: archive_conversation_tooltip,
       });
     }
 
     if (conversation_et.is_request()) {
       entries.push({
         click: () => this.click_on_cancel_action(conversation_et),
-        label: z.l10n.text(z.string.conversations_popover_cancel)
+        label: z.l10n.text(z.string.conversations_popover_cancel),
       });
     }
 
     if (!conversation_et.is_request() && !conversation_et.is_cleared()) {
       entries.push({
         click: () => this.click_on_clear_action(conversation_et),
-        label: z.l10n.text(z.string.conversations_popover_clear)
+        label: z.l10n.text(z.string.conversations_popover_clear),
       });
     }
 
@@ -349,7 +349,7 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
       if (user_et.is_connected() || user_et.is_request()) {
         entries.push({
           click: () => this.click_on_block_action(conversation_et),
-          label: z.l10n.text(z.string.conversations_popover_block)
+          label: z.l10n.text(z.string.conversations_popover_block),
         });
       }
     }
@@ -360,7 +360,7 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     ) {
       entries.push({
         click: () => this.click_on_leave_action(conversation_et),
-        label: z.l10n.text(z.string.conversations_popover_leave)
+        label: z.l10n.text(z.string.conversations_popover_leave),
       });
     }
 
@@ -368,13 +368,13 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
   }
 
   click_on_archive_action(
-    conversation_et = this.conversation_repository.active_conversation()
+    conversation_et = this.conversation_repository.active_conversation(),
   ) {
     if (conversation_et) {
       const next_conversation_et = this._get_next_conversation(conversation_et);
       this.conversation_repository.archive_conversation(
         conversation_et,
-        next_conversation_et
+        next_conversation_et,
       );
     }
   }
@@ -391,8 +391,8 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
           action: () => {
             this.user_repository.block_user(user_et, next_conversation_et);
           },
-          data: user_et.first_name()
-        }
+          data: user_et.first_name(),
+        },
       );
     }
   }
@@ -403,12 +403,12 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
 
     this.user_repository.cancel_connection_request(
       user_et,
-      next_conversation_et
+      next_conversation_et,
     );
   }
 
   click_on_clear_action(
-    conversation_et = this.conversation_repository.active_conversation()
+    conversation_et = this.conversation_repository.active_conversation(),
   ) {
     if (conversation_et) {
       const next_conversation = this._get_next_conversation(conversation_et);
@@ -421,12 +421,12 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
             this.conversation_repository.clear_conversation(
               conversation_et,
               next_conversation,
-              leave
+              leave,
             );
           },
           conversation: conversation_et,
-          data: conversation_et.display_name()
-        }
+          data: conversation_et.display_name(),
+        },
       );
     }
   }
@@ -438,14 +438,14 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
       action: () =>
         this.conversation_repository.leave_conversation(
           conversation_et,
-          next_conversation_et
+          next_conversation_et,
         ),
-      data: conversation_et.display_name()
+      data: conversation_et.display_name(),
     });
   }
 
   click_on_mute_action(
-    conversation_et = this.conversation_repository.active_conversation()
+    conversation_et = this.conversation_repository.active_conversation(),
   ) {
     if (conversation_et) {
       this.conversation_repository.toggle_silence_conversation(conversation_et);
@@ -466,12 +466,12 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     const in_conversations =
       this.list_state() === z.ViewModel.list.LIST_STATE.CONVERSATIONS;
     const is_active_conversation = this.conversation_repository.is_active_conversation(
-      conversation_et
+      conversation_et,
     );
 
     if (in_conversations && is_active_conversation) {
       return this.conversation_repository.get_next_conversation(
-        conversation_et
+        conversation_et,
       );
     }
   }

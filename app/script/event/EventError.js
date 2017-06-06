@@ -65,7 +65,7 @@ z.event.EventError = class EventError extends Error {
       NO_LAST_ID: 'z.event.EventError.TYPE.NO_LAST_ID',
       NO_NOTIFICATIONS: 'z.event.EventError.TYPE.NO_NOTIFICATIONS',
       OUTDATED_E_CALL_EVENT: 'z.event.EventError.OUTDATED_E_CALL_EVENT',
-      REQUEST_FAILURE: 'z.event.EventError.TYPE.REQUEST_FAILURE'
+      REQUEST_FAILURE: 'z.event.EventError.TYPE.REQUEST_FAILURE',
     };
   }
 };

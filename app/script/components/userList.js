@@ -26,7 +26,7 @@ z.components.UserListMode = {
   COMPACT: 'compact',
   DEFAULT: 'default',
   INFO: 'info',
-  TEAM_MEMBERS: 'team_members'
+  TEAM_MEMBERS: 'team_members',
 };
 
 z.components.UserListViewModel = class UserListViewModel {
@@ -82,7 +82,7 @@ z.components.UserListViewModel = class UserListViewModel {
     if (this.user_filter) {
       this.filtered_user_ets = ko.pureComputed(() => {
         const normalized_query = z.search.SearchRepository.normalize_query(
-          this.user_filter()
+          this.user_filter(),
         );
         return this.user_ets().filter(user_et => {
           const is_username = this.user_filter().trim().startsWith('@');
@@ -160,5 +160,5 @@ ko.components.register('user-list', {
       <!-- /ko -->
     <!-- /ko -->
   `,
-  viewModel: z.components.UserListViewModel
+  viewModel: z.components.UserListViewModel,
 });

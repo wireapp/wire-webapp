@@ -24,5 +24,5 @@ window.z.client = z.client || {};
 
 z.client.ClientType = {
   PERMANENT: 'permanent',
-  TEMPORARY: 'temporary'
+  TEMPORARY: 'temporary',
 };

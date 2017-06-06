@@ -24,23 +24,23 @@ const wire = require('wire-webapp-core');
 
 const login = {
   email: process.env.WIRE_WEBAPP_BOT_EMAIL,
-  password: process.env.WIRE_WEBAPP_BOT_PASSWORD
+  password: process.env.WIRE_WEBAPP_BOT_PASSWORD,
 };
 
 const commit = {
   author: process.argv[2],
   branch: process.env.TRAVIS_BRANCH,
-  message: process.argv[3]
+  message: process.argv[3],
 };
 
 const build = {
   number: process.env.TRAVIS_BUILD_NUMBER,
-  url: ''
+  url: '',
 };
 
 const content = {
   conversationId: '9fe8b359-b9e0-4624-b63c-71747664e4fa',
-  message: 'Hello World'
+  message: 'Hello World',
 };
 
 switch (commit.branch) {
@@ -72,7 +72,7 @@ new wire.User(login, box)
   .then(function(service) {
     return service.conversation.sendTextMessage(
       content.conversationId,
-      content.message
+      content.message,
     );
   })
   .then(function(service) {

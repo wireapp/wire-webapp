@@ -28,7 +28,7 @@ z.event.NotificationService = class NotificationService {
       PRIMARY_KEY_LAST_NOTIFICATION:
         'z.storage.StorageKey.NOTIFICATION.LAST_ID',
       URL_NOTIFICATIONS: '/notifications',
-      URL_NOTIFICATIONS_LAST: '/notifications/last'
+      URL_NOTIFICATIONS_LAST: '/notifications/last',
     };
   }
 
@@ -40,16 +40,16 @@ z.event.NotificationService = class NotificationService {
    */
   constructor(client, storage_service) {
     this.get_last_notification_id_from_db = this.get_last_notification_id_from_db.bind(
-      this
+      this,
     );
     this.save_last_notification_id_to_db = this.save_last_notification_id_to_db.bind(
-      this
+      this,
     );
     this.client = client;
     this.storage_service = storage_service;
     this.logger = new z.util.Logger(
       'z.event.NotificationService',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
   }
 
@@ -66,10 +66,10 @@ z.event.NotificationService = class NotificationService {
       data: {
         client: client_id,
         since: notification_id,
-        size: size
+        size: size,
       },
       type: 'GET',
-      url: this.client.create_url(NotificationService.CONFIG.URL_NOTIFICATIONS)
+      url: this.client.create_url(NotificationService.CONFIG.URL_NOTIFICATIONS),
     });
   }
 
@@ -81,12 +81,12 @@ z.event.NotificationService = class NotificationService {
   get_notifications_last(client_id) {
     return this.client.send_request({
       data: {
-        client: client_id
+        client: client_id,
       },
       type: 'GET',
       url: this.client.create_url(
-        NotificationService.CONFIG.URL_NOTIFICATIONS_LAST
-      )
+        NotificationService.CONFIG.URL_NOTIFICATIONS_LAST,
+      ),
     });
   }
 
@@ -98,12 +98,12 @@ z.event.NotificationService = class NotificationService {
     return this.storage_service
       .load(
         z.storage.StorageService.OBJECT_STORE.AMPLIFY,
-        NotificationService.CONFIG.PRIMARY_KEY_LAST_NOTIFICATION
+        NotificationService.CONFIG.PRIMARY_KEY_LAST_NOTIFICATION,
       )
       .catch(error => {
         this.logger.error(
           `Failed to get last notification ID from storage: ${error.message}`,
-          error
+          error,
         );
         throw new z.event.EventError(z.event.EventError.TYPE.DATABASE_FAILURE);
       })
@@ -124,7 +124,7 @@ z.event.NotificationService = class NotificationService {
     return this.storage_service.save(
       z.storage.StorageService.OBJECT_STORE.AMPLIFY,
       NotificationService.CONFIG.PRIMARY_KEY_LAST_NOTIFICATION,
-      {value: notification_id}
+      {value: notification_id},
     );
   }
 };

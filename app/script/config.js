@@ -29,7 +29,7 @@ window.z.config = {
     PINK: 6,
     PURPLE: 7,
     RED: 4,
-    YELLOW: 3
+    YELLOW: 3,
   },
 
   ACCOUNT_PRODUCTION_URL: 'https://account-wire.com/',
@@ -52,10 +52,10 @@ window.z.config = {
         },
         'zinfra.io': function() {
           return 300;
-        }
+        },
       },
-      name_length: 65
-    }
+      name_length: 65,
+    },
   },
 
   // 10 seconds until phone code expires
@@ -92,7 +92,7 @@ window.z.config = {
     'image/jpeg',
     'image/png',
     'image/bmp',
-    'image/gif'
+    'image/gif',
   ],
 
   SUPPORTED_PROFILE_IMAGE_TYPES: [
@@ -100,11 +100,11 @@ window.z.config = {
     'image/jpg',
     'image/jpeg',
     'image/png',
-    'image/bmp'
+    'image/bmp',
   ],
 
   UNSPLASH_URL: 'https://source.unsplash.com/1200x1200/?landscape',
 
   WEBSITE_PRODUCTION_URL: 'https://wire.com/',
-  WEBSITE_STAGING_URL: 'https://staging-website.zinfra.io/'
+  WEBSITE_STAGING_URL: 'https://staging-website.zinfra.io/',
 };

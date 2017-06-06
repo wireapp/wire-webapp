@@ -26,7 +26,7 @@ window.z.audio.AudioRepository = class AudioRepository {
   constructor() {
     this.logger = new z.util.Logger(
       'z.audio.AudioRepository',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
     this.audio_elements = {};
     this.currently_looping = {};
@@ -108,7 +108,7 @@ window.z.audio.AudioRepository = class AudioRepository {
       if (z.audio.AudioType.hasOwnProperty(type)) {
         const audio_id = z.audio.AudioType[type];
         this.audio_elements[audio_id] = this._create_audio_element(
-          `/audio/${audio_id}.mp3`
+          `/audio/${audio_id}.mp3`,
         );
       }
     }
@@ -126,7 +126,7 @@ window.z.audio.AudioRepository = class AudioRepository {
   _play(audio_id, audio_element, play_in_loop = false) {
     if (!audio_id || !audio_element) {
       return Promise.reject(
-        new z.audio.AudioError(z.audio.AudioError.TYPE.NOT_FOUND)
+        new z.audio.AudioError(z.audio.AudioError.TYPE.NOT_FOUND),
       );
     }
 
@@ -150,7 +150,7 @@ window.z.audio.AudioRepository = class AudioRepository {
         if (play_promise) {
           play_promise.then(_play_success).catch(() => {
             reject(
-              new z.audio.AudioError(z.audio.AudioError.TYPE.FAILED_TO_PLAY)
+              new z.audio.AudioError(z.audio.AudioError.TYPE.FAILED_TO_PLAY),
             );
           });
         } else {
@@ -216,7 +216,7 @@ window.z.audio.AudioRepository = class AudioRepository {
           this.muted = updated_muted_state_muted_state;
           this.logger.debug(`Set muted state to '${this.muted}'`);
         }
-      }
+      },
     );
 
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this, properties => {
@@ -228,7 +228,7 @@ window.z.audio.AudioRepository = class AudioRepository {
       this,
       audio_preference => {
         this.audio_preference(audio_preference);
-      }
+      },
     );
   }
 
@@ -272,13 +272,13 @@ window.z.audio.AudioRepository = class AudioRepository {
       .then(audio_element => {
         this.logger.info(
           `Playing sound '${audio_id}' (loop: '${play_in_loop}')`,
-          audio_element
+          audio_element,
         );
       })
       .catch(error => {
         if (!(error instanceof z.audio.AudioError)) {
           this.logger.error(
-            `Failed playing sound '${audio_id}': ${error.message}`
+            `Failed playing sound '${audio_id}': ${error.message}`,
           );
           throw error;
         }
@@ -304,7 +304,7 @@ window.z.audio.AudioRepository = class AudioRepository {
       })
       .catch(error => {
         this.logger.error(
-          `Failed stopping sound '${audio_id}': ${error.message}`
+          `Failed stopping sound '${audio_id}': ${error.message}`,
         );
         throw error;
       });

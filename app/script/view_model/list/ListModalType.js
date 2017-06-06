@@ -24,5 +24,5 @@ window.z.ViewModel = z.ViewModel || {};
 window.z.ViewModel.list = z.ViewModel.list || {};
 
 z.ViewModel.list.LIST_MODAL_TYPE = {
-  TAKEOVER: 'z.ViewModel.list.LIST_MODAL_TYPE.TAKEOVER'
+  TAKEOVER: 'z.ViewModel.list.LIST_MODAL_TYPE.TAKEOVER',
 };

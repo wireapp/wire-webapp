@@ -29,7 +29,7 @@ z.audio.AudioPlayingType = {
     z.audio.AudioType.NETWORK_INTERRUPTION,
     z.audio.AudioType.OUTGOING_CALL,
     z.audio.AudioType.READY_TO_TALK,
-    z.audio.AudioType.TALK_LATER
+    z.audio.AudioType.TALK_LATER,
   ],
   SOME: [
     z.audio.AudioType.CALL_DROP,
@@ -39,6 +39,6 @@ z.audio.AudioPlayingType = {
     z.audio.AudioType.OUTGOING_CALL,
     z.audio.AudioType.OUTGOING_PING,
     z.audio.AudioType.READY_TO_TALK,
-    z.audio.AudioType.TALK_LATER
-  ]
+    z.audio.AudioType.TALK_LATER,
+  ],
 };

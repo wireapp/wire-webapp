@@ -40,6 +40,6 @@ z.util.Crypto = {
       hash = uint32.addMod32(hash, uint32.shiftLeft(hash, 15));
 
       return hash;
-    }
-  }
+    },
+  },
 };

@@ -25,14 +25,14 @@ window.z.announce = z.announce || {};
 z.announce.AnnounceService = class AnnounceService {
   static get CONFIG() {
     return {
-      URL: 'api/v1/announce/'
+      URL: 'api/v1/announce/',
     };
   }
 
   constructor() {
     this.logger = new z.util.Logger(
       'z.announce.AnnounceService',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
     this.url = `${z.util.Environment.backend.website_url()}${AnnounceService
       .CONFIG.URL}?order=created&active=true`;

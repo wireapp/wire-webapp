@@ -35,7 +35,7 @@ ko.bindingHandlers.switch_background = (function() {
           .load()
           .then(function(blob) {
             background_next.find('.background-image').css({
-              'background-image': `url(${window.URL.createObjectURL(blob)})`
+              'background-image': `url(${window.URL.createObjectURL(blob)})`,
             });
           })
           .then(function() {
@@ -44,6 +44,6 @@ ko.bindingHandlers.switch_background = (function() {
               .one(z.util.alias.animationend, background_last.remove);
           });
       }
-    }
+    },
   };
 })();

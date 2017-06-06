@@ -51,7 +51,7 @@ describe('z.announce.AnnounceService', function() {
             title: 'New Blog post',
             version: 1464166352,
             version_max: '2016.06.14.0921',
-            version_min: '2016.04.14.0921'
+            version_min: '2016.04.14.0921',
           },
           {
             active: true,
@@ -66,16 +66,16 @@ describe('z.announce.AnnounceService', function() {
             title: 'Click me to refresh..',
             version: 1464166352,
             version_max: '2016.06.14.0921',
-            version_min: '2016.04.14.0921'
-          }
+            version_min: '2016.04.14.0921',
+          },
         ],
-        status: 'success'
+        status: 'success',
       };
 
       server.respondWith(
         'GET',
         'https://staging-website.zinfra.io/api/v1/announce/?order=created&active=true',
-        [200, {'Content-Type': 'application/json'}, JSON.stringify(response)]
+        [200, {'Content-Type': 'application/json'}, JSON.stringify(response)],
       );
     });
 
@@ -101,7 +101,7 @@ describe('z.announce.AnnounceService', function() {
       server.respondWith(
         'GET',
         'https://staging-website.zinfra.io/api/v1/announce/?order=created&active=true',
-        [404, {}, '']
+        [404, {}, ''],
       );
     });
 
@@ -122,7 +122,7 @@ describe('z.announce.AnnounceService', function() {
 
   describe('get_version', function() {
     const response = {
-      version: '2017-03-14-15-05-prod'
+      version: '2017-03-14-15-05-prod',
     };
 
     beforeEach(function() {
@@ -131,7 +131,7 @@ describe('z.announce.AnnounceService', function() {
       server.respondWith('GET', 'version/', [
         200,
         {'Content-Type': 'application/json'},
-        JSON.stringify(response)
+        JSON.stringify(response),
       ]);
     });
 

@@ -27,17 +27,17 @@ ko.bindingHandlers.bordered_list = (function() {
         const archive_column = $($element).parent();
         if ($element.height() <= 0 || !$element.is_scrollable()) {
           return archive_column.removeClass(
-            'left-list-center-border-bottom conversations-center-border-top'
+            'left-list-center-border-bottom conversations-center-border-top',
           );
         }
 
         archive_column.toggleClass(
           'left-list-center-border-top',
-          !$element.is_scrolled_top()
+          !$element.is_scrolled_top(),
         );
         archive_column.toggleClass(
           'left-list-center-border-bottom',
-          !$element.is_scrolled_bottom()
+          !$element.is_scrolled_bottom(),
         );
       });
     }
@@ -50,13 +50,13 @@ ko.bindingHandlers.bordered_list = (function() {
       $('.left').on('click', () => calculate_borders($element));
       $(window).on('resize', () => calculate_borders($element));
       amplify.subscribe(z.event.WebApp.LIFECYCLE.LOADED, () =>
-        calculate_borders($element)
+        calculate_borders($element),
       );
     },
 
     update(element, valueAccessor) {
       ko.unwrap(valueAccessor());
       calculate_borders($(element));
-    }
+    },
   };
 })();

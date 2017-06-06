@@ -34,7 +34,7 @@ z.ViewModel.LoadingViewModel = class LoadingViewModel {
 
     amplify.subscribe(
       z.event.WebApp.APP.UPDATE_PROGRESS,
-      this.update_progress.bind(this)
+      this.update_progress.bind(this),
     );
 
     ko.applyBindings(this, document.getElementById(element_id));
@@ -56,8 +56,8 @@ z.ViewModel.LoadingViewModel = class LoadingViewModel {
             id: message_locator,
             replace: {
               content: this.user_repository.self().first_name(),
-              placeholder: '%name'
-            }
+              placeholder: '%name',
+            },
           });
           break;
         }
@@ -67,8 +67,8 @@ z.ViewModel.LoadingViewModel = class LoadingViewModel {
             id: message_locator,
             replace: [
               {content: replace_content[0], placeholder: '%progress'},
-              {content: replace_content[1], placeholder: '%total'}
-            ]
+              {content: replace_content[1], placeholder: '%total'},
+            ],
           });
           break;
         }

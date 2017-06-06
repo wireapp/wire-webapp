@@ -37,7 +37,7 @@ describe('z.audio.AudioRepository', function() {
   describe('_check_sound_setting', function() {
     beforeAll(function() {
       TestFactory.audio_repository.audio_preference(
-        z.audio.AudioPreference.SOME
+        z.audio.AudioPreference.SOME,
       );
     });
 
@@ -103,7 +103,7 @@ describe('z.audio.AudioRepository', function() {
           TestFactory.audio_repository.audio_elements[
             z.audio.AudioType.OUTGOING_CALL
           ],
-          false
+          false,
         )
         .then(function(audio_element) {
           expect(audio_element).toEqual(jasmine.any(HTMLAudioElement));
@@ -120,7 +120,7 @@ describe('z.audio.AudioRepository', function() {
           TestFactory.audio_repository.audio_elements[
             z.audio.AudioType.OUTGOING_CALL
           ],
-          true
+          true,
         )
         .then(function(audio_element) {
           expect(audio_element).toEqual(jasmine.any(HTMLAudioElement));
@@ -140,7 +140,7 @@ describe('z.audio.AudioRepository', function() {
             z.audio.AudioType.OUTGOING_CALL,
             TestFactory.audio_repository.audio_elements[
               z.audio.AudioType.OUTGOING_CALL
-            ]
+            ],
           );
         })
         .then(done.fail)
@@ -158,7 +158,7 @@ describe('z.audio.AudioRepository', function() {
           undefined,
           TestFactory.audio_repository.audio_elements[
             z.audio.AudioType.OUTGOING_CALL
-          ]
+          ],
         )
         .catch(function(error) {
           expect(error).toEqual(jasmine.any(z.audio.AudioError));

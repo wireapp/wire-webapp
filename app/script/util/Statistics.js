@@ -58,5 +58,5 @@ z.util.Statistics = {
     return values.reduce((sum, value) => {
       return sum + value;
     }, 0);
-  }
+  },
 };

@@ -141,5 +141,5 @@ z.util.ArrayUtil = {
     if (index > -1) {
       return array.splice(index, 1);
     }
-  }
+  },
 };

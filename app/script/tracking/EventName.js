@@ -30,11 +30,11 @@ window.z.tracking = z.tracking || {};
 z.tracking.EventName = {
   ACCOUNT: {
     LOGGED_IN: 'account.logged_in',
-    OPENED_LOGIN: 'account.opened_login'
+    OPENED_LOGIN: 'account.opened_login',
   },
   ANNOUNCE: {
     CLICKED: 'announce.clicked',
-    SENT: 'announce.sent'
+    SENT: 'announce.sent',
   },
   APP_LAUNCH: 'appLaunch',
   CALLING: {
@@ -46,23 +46,23 @@ z.tracking.EventName = {
     INITIATED_CALL: 'calling.initiated_call',
     JOINED_CALL: 'calling.joined_call',
     RECEIVED_CALL: 'calling.received_call',
-    SHARED_SCREEN: 'calling.shared_screen'
+    SHARED_SCREEN: 'calling.shared_screen',
   },
   COLLECTION: {
     DID_ITEM_ACTION: 'collections.did_item_action',
     ENTERED_SEARCH: 'collection.entered_search',
     OPENED_COLLECTIONS: 'collections.opened_collections',
     OPENED_ITEM: 'collections.opened_item',
-    SELECTED_SEARCH_RESULT: 'collection.selected_search_result'
+    SELECTED_SEARCH_RESULT: 'collection.selected_search_result',
   },
   CONNECT: {
     OPENED_CONVERSATION: 'connect.opened_conversation',
     OPENED_GENERIC_INVITE_MENU: 'connect.opened_generic_invite_menu',
     SELECTED_USER_FROM_SEARCH: 'connect.selected_user_from_search',
-    SENT_CONNECT_REQUEST: 'connect.sent_connect_request'
+    SENT_CONNECT_REQUEST: 'connect.sent_connect_request',
   },
   CONTACTS: {
-    ENTERED_SEARCH: 'contacts.entered_search'
+    ENTERED_SEARCH: 'contacts.entered_search',
   },
   CONVERSATION: {
     ADD_TO_GROUP_CONVERSATION: 'addContactToGroupConversation',
@@ -71,10 +71,10 @@ z.tracking.EventName = {
     DELETED_MESSAGE: 'conversation.deleted_message',
     EDITED_MESSAGE: 'conversation.edited_message',
     REACTED_TO_MESSAGE: 'conversation.reacted_to_message',
-    SELECTED_MESSAGE: 'conversation.selected_message'
+    SELECTED_MESSAGE: 'conversation.selected_message',
   },
   E2EE: {
-    CANNOT_DECRYPT_MESSAGE: 'e2ee.cannot_decrypt_message'
+    CANNOT_DECRYPT_MESSAGE: 'e2ee.cannot_decrypt_message',
   },
   FILE: {
     DOWNLOAD_FAILED: 'file.failed_file_download',
@@ -84,17 +84,17 @@ z.tracking.EventName = {
     UPLOAD_FAILED: 'file.failed_file_upload',
     UPLOAD_INITIATED: 'file.initiated_file_upload',
     UPLOAD_SUCCESSFUL: 'file.successfully_uploaded_file',
-    UPLOAD_TOO_BIG: 'file.attempted_too_big_file_upload'
+    UPLOAD_TOO_BIG: 'file.attempted_too_big_file_upload',
   },
   IMAGE_SENT_ERROR: 'Image Sent Error',
   MEDIA: {
     COMPLETED_MEDIA_ACTION: 'media.completed_media_action',
     PLAYED_AUDIO_MESSAGE: 'media.played_audio_message',
-    PLAYED_VIDEO_MESSAGE: 'media.played_video_message'
+    PLAYED_VIDEO_MESSAGE: 'media.played_video_message',
   },
   NAVIGATION: {
     OPENED_TERMS: 'navigation.opened_terms',
-    OPENED_WIRE_WEBSITE: 'navigation.opened_wire_website'
+    OPENED_WIRE_WEBSITE: 'navigation.opened_wire_website',
   },
   ONBOARDING: {
     ADDED_PHOTO: 'onboarding.added_photo',
@@ -102,32 +102,32 @@ z.tracking.EventName = {
     KEPT_GENERATED_USERNAME: 'onboarding.kept_generated_username',
     OPENED_USERNAME_FAQ: 'onboarding.opened_username_faq',
     OPENED_USERNAME_SETTINGS: 'onboarding.opened_username_settings',
-    SEEN_USERNAME_SCREEN: 'onboarding.seen_username_screen'
+    SEEN_USERNAME_SCREEN: 'onboarding.seen_username_screen',
   },
   PASSWORD_RESET: 'resetPassword',
   PREFERENCES: {
-    IMPORTED_CONTACTS: 'preferences.imported_contacts'
+    IMPORTED_CONTACTS: 'preferences.imported_contacts',
   },
   PROFILE_PICTURE_CHANGED: 'changedProfilePicture',
   REGISTRATION: {
     ENTERED_CREDENTIALS: 'registration.entered_credentials',
     OPENED_EMAIL_SIGN_UP: 'registration.opened_email_signup',
     RESENT_EMAIL_VERIFICATION: 'registration.resent_email_verification',
-    SUCCEEDED: 'registration.succeeded'
+    SUCCEEDED: 'registration.succeeded',
   },
   SETTINGS: {
     EDITED_USERNAME: 'settings.edited_username',
     REMOVED_DEVICE: 'settings.removed_device',
     SET_USERNAME: 'settings.set_username',
-    VIEWED_DEVICE: 'settings.viewed_device'
+    VIEWED_DEVICE: 'settings.viewed_device',
   },
   SOUND_SETTINGS_CHANGED: 'soundIntensityPreference',
   TELEMETRY: {
-    APP_INITIALIZATION: 'telemetry.app_initialization'
+    APP_INITIALIZATION: 'telemetry.app_initialization',
   },
   TRACKING: {
     OPT_IN: 'Opt-in',
-    OPT_OUT: 'Opt-out'
+    OPT_OUT: 'Opt-out',
   },
-  UPLOADED_CONTACTS: 'uploadedContacts' // "source": "Gmail"
+  UPLOADED_CONTACTS: 'uploadedContacts', // "source": "Gmail"
 };

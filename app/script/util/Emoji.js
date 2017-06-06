@@ -36,5 +36,5 @@ z.util.emoji = {
       is_valid_string(text) &&
       remove_emojies(remove_whitespace(text)).length === 0
     );
-  }
+  },
 };

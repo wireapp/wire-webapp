@@ -27,5 +27,5 @@ z.conversation.ConversationType = {
   CONNECT: 3,
   ONE2ONE: 2,
   REGULAR: 0,
-  SELF: 1
+  SELF: 1,
 };

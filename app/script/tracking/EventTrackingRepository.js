@@ -37,11 +37,11 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
         APP_KEY: LOCALYTICS_APP_KEY,
         DISABLED_DOMAINS: ['localhost', 'zinfra.io'],
         SESSION_INTERVAL: 60 * 1000, // milliseconds
-        SESSION_TIMEOUT: 3 * 60 * 1000
+        SESSION_TIMEOUT: 3 * 60 * 1000,
       },
       RAYGUN: {
-        API_KEY: RAYGUN_API_KEY
-      }
+        API_KEY: RAYGUN_API_KEY,
+      },
     };
   }
 
@@ -59,7 +59,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   constructor(conversation_repository, user_repository) {
     this.logger = new z.util.Logger(
       'z.tracking.EventTrackingRepository',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
 
     this.conversation_repository = conversation_repository;
@@ -93,14 +93,14 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
       }
       this.set_custom_dimension(
         z.tracking.CustomDimension.CONTACTS,
-        this.user_repository.connected_users().length
+        this.user_repository.connected_users().length,
       );
       this._subscribe_to_events();
     }
 
     amplify.subscribe(
       z.event.WebApp.PROPERTIES.UPDATE.PRIVACY,
-      this.updated_privacy.bind(this)
+      this.updated_privacy.bind(this),
     );
   }
 
@@ -119,7 +119,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
       this.set_custom_dimension(z.tracking.CustomDimension.CONTACTS, -1);
       amplify.subscribe(
         z.event.WebApp.ANALYTICS.EVENT,
-        this.tag_event.bind(this)
+        this.tag_event.bind(this),
       );
     }
   }
@@ -131,7 +131,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
         this.start_session();
         this.set_custom_dimension(
           z.tracking.CustomDimension.CONTACTS,
-          this.user_repository.connected_users().length
+          this.user_repository.connected_users().length,
         );
         this._subscribe_to_events();
         this.tag_event(z.tracking.EventName.TRACKING.OPT_IN);
@@ -157,19 +157,19 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   _subscribe_to_events() {
     amplify.subscribe(
       z.event.WebApp.ANALYTICS.CLOSE_SESSION,
-      this.close_session.bind(this)
+      this.close_session.bind(this),
     );
     amplify.subscribe(
       z.event.WebApp.ANALYTICS.CUSTOM_DIMENSION,
-      this.set_custom_dimension.bind(this)
+      this.set_custom_dimension.bind(this),
     );
     amplify.subscribe(
       z.event.WebApp.ANALYTICS.EVENT,
-      this.tag_event.bind(this)
+      this.tag_event.bind(this),
     );
     amplify.subscribe(
       z.event.WebApp.ANALYTICS.START_SESSION,
-      this.start_session.bind(this)
+      this.start_session.bind(this),
     );
   }
 
@@ -201,7 +201,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   set_custom_dimension(custom_dimension, value) {
     if (this.localytics) {
       this.logger.info(
-        `Set Localytics custom dimension '${custom_dimension}' to value '${value}'`
+        `Set Localytics custom dimension '${custom_dimension}' to value '${value}'`,
       );
       this.localytics('setCustomDimension', custom_dimension, value);
     }
@@ -218,7 +218,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
       this.localytics('upload');
       this.session_interval = window.setInterval(
         this.upload_session,
-        EventTrackingRepository.CONFIG.LOCALYTICS.SESSION_INTERVAL
+        EventTrackingRepository.CONFIG.LOCALYTICS.SESSION_INTERVAL,
       );
     }
   }
@@ -228,8 +228,8 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
       if (attributes) {
         this.logger.info(
           `Localytics event '${event_name}' with attributes: ${JSON.stringify(
-            attributes
-          )}`
+            attributes,
+          )}`,
         );
       } else {
         this.logger.info(`Localytics event '${event_name}' without attributes`);
@@ -251,7 +251,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
       window.ll = undefined;
       this.localytics = undefined;
       this.logger.debug(
-        'Localytics reporting was disabled due to user preferences'
+        'Localytics reporting was disabled due to user preferences',
       );
     }
   }
@@ -261,7 +261,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     let element_node;
     const options = {
       appVersion: z.util.Environment.version(),
-      customDimensions: [z.tracking.helpers.get_platform()]
+      customDimensions: [z.tracking.helpers.get_platform()],
     };
 
     this.localytics = function() {
@@ -279,13 +279,13 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     script_element.src = 'https://web.localytics.com/v3/localytics.min.js';
 
     (element_node = document.getElementsByTagName(
-      'script'
+      'script',
     )[0]).parentNode.insertBefore(script_element, element_node);
 
     this.localytics(
       'init',
       EventTrackingRepository.CONFIG.LOCALYTICS.APP_KEY,
-      options
+      options,
     );
     this.logger.debug('Localytics reporting is enabled');
   }
@@ -316,7 +316,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   _attach_promise_rejection_handler() {
     window.onunhandledrejection = ({
       reason: error,
-      promise: rejected_promise
+      promise: rejected_promise,
     }) => {
       if (window.onerror) {
         if (error) {
@@ -329,7 +329,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
               error.fileName,
               error.lineNumber,
               error.columnNumber,
-              error
+              error,
             );
           }
         }
@@ -340,7 +340,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
               this.logger.log(
                 this.logger.levels.OFF,
                 'Handled uncaught Promise in error reporting',
-                promise_error
+                promise_error,
               );
             });
           }, 0);
@@ -384,7 +384,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     this.logger.debug('Disabling Raygun error reporting');
     Raygun.detach();
     Raygun.init(EventTrackingRepository.CONFIG.RAYGUN.API_KEY, {
-      disableErrorTracking: true
+      disableErrorTracking: true,
     });
     this._detach_promise_rejection_handler();
   }
@@ -396,14 +396,14 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
       excludedHostnames: ['localhost', 'wire.ms'],
       ignore3rdPartyErrors: true,
       ignoreAjaxAbort: true,
-      ignoreAjaxError: true
+      ignoreAjaxError: true,
     };
 
     options.debugMode = !z.util.Environment.frontend.is_production();
 
     Raygun.init(
       EventTrackingRepository.CONFIG.RAYGUN.API_KEY,
-      options
+      options,
     ).attach();
 
     /*
@@ -416,7 +416,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     }
     if (z.util.Environment.electron) {
       Raygun.withCustomData({
-        electron_version: z.util.Environment.version(true)
+        electron_version: z.util.Environment.version(true),
       });
     }
     Raygun.onBeforeSend(this._check_error_payload.bind(this));

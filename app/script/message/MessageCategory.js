@@ -41,5 +41,5 @@ z.message.MessageCategory = {
   SYSTEM: 1 << 3,
   TEXT: 1 << 4,
   UNDEFINED: 1 << 0,
-  VIDEO: 1 << 11
+  VIDEO: 1 << 11,
 };

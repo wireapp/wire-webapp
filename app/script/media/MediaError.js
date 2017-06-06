@@ -70,7 +70,7 @@ z.media.MediaError = class MediaError extends Error {
         'z.media.MediaError.TYPE.NO_VIDEO_INPUT_DEVICE_FOUND',
       SCREEN_NOT_SUPPORTED: 'z.media.MediaError.TYPE.SCREEN_NOT_SUPPORTED',
       UNHANDLED_MEDIA_TYPE: 'z.media.MediaError.UNHANDLED_MEDIA_TYPE',
-      UNKNOWN: 'z.media.MediaError.TYPE.UNKNOWN'
+      UNKNOWN: 'z.media.MediaError.TYPE.UNKNOWN',
     };
   }
 };

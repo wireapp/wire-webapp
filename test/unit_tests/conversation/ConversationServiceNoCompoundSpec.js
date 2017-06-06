@@ -36,7 +36,7 @@ describe('ConversationServiceNoCompound', function() {
         ({storage_service} = storage_repository);
         conversation_service = new z.conversation.ConversationServiceNoCompound(
           client,
-          storage_service
+          storage_service,
         );
 
         conversation_mapper = new z.conversation.ConversationMapper();
@@ -65,9 +65,9 @@ describe('ConversationServiceNoCompound', function() {
         data: {
           content: 'First message',
           nonce: '68a28ab1-d7f8-4014-8b52-5e99a05ea3b1',
-          previews: []
+          previews: [],
         },
-        type: 'conversation.message-add'
+        type: 'conversation.message-add',
       },
       {
         conversation: '35a9a89d-70dc-4d9e-88a2-4d8758458a6a',
@@ -77,10 +77,10 @@ describe('ConversationServiceNoCompound', function() {
         data: {
           content: 'Second message',
           nonce: '4af67f76-09f9-4831-b3a4-9df877b8c29a',
-          previews: []
+          previews: [],
         },
-        type: 'conversation.message-add'
-      }
+        type: 'conversation.message-add',
+      },
     ];
     /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
     // @formatter:on
@@ -91,9 +91,9 @@ describe('ConversationServiceNoCompound', function() {
           storage_service.save(
             z.storage.StorageService.OBJECT_STORE.EVENTS,
             undefined,
-            message
-          )
-        )
+            message,
+          ),
+        ),
       )
         .then(done)
         .catch(done.fail);
@@ -103,7 +103,7 @@ describe('ConversationServiceNoCompound', function() {
       conversation_service
         .load_event_from_db(
           conversation_id,
-          '4af67f76-09f9-4831-b3a4-9df877b8c29a'
+          '4af67f76-09f9-4831-b3a4-9df877b8c29a',
         )
         .then(function(message_et) {
           expect(message_et).toEqual(messages[1]);
@@ -134,9 +134,9 @@ describe('ConversationServiceNoCompound', function() {
       data: {
         content: 'Second message',
         nonce: '4af67f76-09f9-4831-b3a4-9df877b8c29a',
-        previews: []
+        previews: [],
       },
-      type: 'conversation.message-add'
+      type: 'conversation.message-add',
     };
     /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
     // @formatter:on
@@ -157,7 +157,7 @@ describe('ConversationServiceNoCompound', function() {
         .catch(function(error) {
           expect(error).toEqual(jasmine.any(z.conversation.ConversationError));
           expect(error.type).toBe(
-            z.conversation.ConversationError.TYPE.NO_CHANGES
+            z.conversation.ConversationError.TYPE.NO_CHANGES,
           );
           done();
         });
@@ -173,7 +173,7 @@ describe('ConversationServiceNoCompound', function() {
       messages = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(function(index) {
         return {
           conversation: conversation_id,
-          time: new Date(timestamp + index).toISOString()
+          time: new Date(timestamp + index).toISOString(),
         };
       });
 
@@ -182,9 +182,9 @@ describe('ConversationServiceNoCompound', function() {
           storage_service.save(
             z.storage.StorageService.OBJECT_STORE.EVENTS,
             undefined,
-            message
-          )
-        )
+            message,
+          ),
+        ),
       )
         .then(done)
         .catch(done.fail);
@@ -195,7 +195,7 @@ describe('ConversationServiceNoCompound', function() {
         .load_preceding_events_from_db(
           'invalid_id',
           new Date(30),
-          new Date(1479903546808)
+          new Date(1479903546808),
         )
         .then(function(events) {
           expect(events.length).toBe(0);
@@ -247,7 +247,7 @@ describe('ConversationServiceNoCompound', function() {
         .load_preceding_events_from_db(
           conversation_id,
           undefined,
-          new Date(1479903546803)
+          new Date(1479903546803),
         )
         .then(function(events) {
           expect(events.length).toBe(4);
@@ -265,7 +265,7 @@ describe('ConversationServiceNoCompound', function() {
         .load_preceding_events_from_db(
           conversation_id,
           new Date(1479903546806),
-          new Date(1479903546807)
+          new Date(1479903546807),
         )
         .then(function(events) {
           expect(events.length).toBe(1);
@@ -276,14 +276,14 @@ describe('ConversationServiceNoCompound', function() {
     });
 
     it('loads events with upper and lower bound and a fetch limit', function(
-      done
+      done,
     ) {
       conversation_service
         .load_preceding_events_from_db(
           conversation_id,
           new Date(1479903546800),
           new Date(1479903546807),
-          2
+          2,
         )
         .then(function(events) {
           expect(events.length).toBe(2);
@@ -318,20 +318,20 @@ describe('ConversationServiceNoCompound', function() {
             cleared: null,
             otr_muted: false,
             otr_archived_ref: '2016-07-25T11:30:07.883Z',
-            archived: null
+            archived: null,
           },
-          others: [{status: 0, id: '0410795a-58dc-40d8-b216-cbc2360be21a'}]
+          others: [{status: 0, id: '0410795a-58dc-40d8-b216-cbc2360be21a'}],
         },
         name: 'Michael',
         id: '573b6978-7700-443e-9ce5-ff78b35ac590',
         type: 2,
         last_event_time: '2016-06-21T22:53:41.778Z',
-        last_event: '24fe.800122000b16c279'
+        last_event: '24fe.800122000b16c279',
       };
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
       // @formatter:on
       const conversation_et = conversation_mapper.map_conversation(
-        conversation_payload
+        conversation_payload,
       );
 
       conversation_service
@@ -359,9 +359,9 @@ describe('ConversationServiceNoCompound', function() {
         data: {
           content: 'First message',
           nonce: '68a28ab1-d7f8-4014-8b52-5e99a05ea3b1',
-          previews: []
+          previews: [],
         },
-        type: 'conversation.message-add'
+        type: 'conversation.message-add',
       },
       {
         conversation: '35a9a89d-70dc-4d9e-88a2-4d8758458a6a',
@@ -371,9 +371,9 @@ describe('ConversationServiceNoCompound', function() {
         data: {
           content: 'Second message',
           nonce: '4af67f76-09f9-4831-b3a4-9df877b8c29a',
-          previews: []
+          previews: [],
         },
-        type: 'conversation.message-add'
+        type: 'conversation.message-add',
       },
       {
         conversation: '35a9a89d-70dc-4d9e-88a2-4d8758458a6a',
@@ -383,10 +383,10 @@ describe('ConversationServiceNoCompound', function() {
         data: {
           content: 'Second message (Duplicate)',
           nonce: '4af67f76-09f9-4831-b3a4-9df877b8c29a',
-          previews: []
+          previews: [],
         },
-        type: 'conversation.message-add'
-      }
+        type: 'conversation.message-add',
+      },
     ];
     /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
     // @formatter:on
@@ -397,9 +397,9 @@ describe('ConversationServiceNoCompound', function() {
           storage_service.save(
             z.storage.StorageService.OBJECT_STORE.EVENTS,
             undefined,
-            message
-          )
-        )
+            message,
+          ),
+        ),
       )
         .then(function(ids) {
           primary_keys = ids;
@@ -412,12 +412,12 @@ describe('ConversationServiceNoCompound', function() {
       conversation_service
         .delete_message_with_key_from_db(primary_keys[1])
         .then(() =>
-          conversation_service.load_preceding_events_from_db(conversation_id)
+          conversation_service.load_preceding_events_from_db(conversation_id),
         )
         .then(function(events) {
           expect(events.length).toBe(2);
           events.forEach(event =>
-            expect(event.primary_key).not.toBe(primary_keys[1])
+            expect(event.primary_key).not.toBe(primary_keys[1]),
           );
           done();
         })
@@ -428,7 +428,7 @@ describe('ConversationServiceNoCompound', function() {
       conversation_service
         .delete_message_with_key_from_db('wrongKey')
         .then(() =>
-          conversation_service.load_preceding_events_from_db(conversation_id)
+          conversation_service.load_preceding_events_from_db(conversation_id),
         )
         .then(function(events) {
           expect(events.length).toBe(3);
@@ -454,10 +454,10 @@ describe('ConversationServiceNoCompound', function() {
           data: {
             content: 'test',
             nonce: 'b6498d81-92e8-4da7-afd2-054239595da7',
-            previews: []
+            previews: [],
           },
           type: 'conversation.message-add',
-          category: 16
+          category: 16,
         },
         {
           conversation: '34e7f58e-b834-4d84-b628-b89b295d46c0',
@@ -473,13 +473,13 @@ describe('ConversationServiceNoCompound', function() {
               tag: 'medium',
               width: 1448,
               height: 905,
-              nonce: 'b77e8639-a32d-4ba7-88b9-7a0ae461e90d'
+              nonce: 'b77e8639-a32d-4ba7-88b9-7a0ae461e90d',
             },
             otr_key: {},
-            sha256: {}
+            sha256: {},
           },
           type: 'conversation.asset-add',
-          category: 128
+          category: 128,
         },
         {
           conversation: '34e7f58e-b834-4d84-b628-b89b295d46c0',
@@ -495,14 +495,14 @@ describe('ConversationServiceNoCompound', function() {
               tag: 'medium',
               width: 1448,
               height: 905,
-              nonce: 'b77e8639-a32d-4ba7-88b9-7a0ae461e90d'
+              nonce: 'b77e8639-a32d-4ba7-88b9-7a0ae461e90d',
             },
             otr_key: {},
-            sha256: {}
+            sha256: {},
           },
           type: 'conversation.asset-add',
-          category: 128
-        }
+          category: 128,
+        },
       ];
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       // @formatter:on
@@ -516,15 +516,15 @@ describe('ConversationServiceNoCompound', function() {
             storage_service.save(
               z.storage.StorageService.OBJECT_STORE.EVENTS,
               undefined,
-              event
-            )
-          )
+              event,
+            ),
+          ),
       )
         .then(() =>
           conversation_service.load_events_with_category_from_db(
             events[0].conversation,
-            z.message.MessageCategory.IMAGE
-          )
+            z.message.MessageCategory.IMAGE,
+          ),
         )
         .then(function(result) {
           expect(result.length).toBe(0);
@@ -539,15 +539,15 @@ describe('ConversationServiceNoCompound', function() {
           storage_service.save(
             z.storage.StorageService.OBJECT_STORE.EVENTS,
             undefined,
-            event
-          )
-        )
+            event,
+          ),
+        ),
       )
         .then(() =>
           conversation_service.load_events_with_category_from_db(
             events[0].conversation,
-            z.message.MessageCategory.IMAGE
-          )
+            z.message.MessageCategory.IMAGE,
+          ),
         )
         .then(function(result) {
           expect(result.length).toBe(2);

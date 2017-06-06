@@ -33,7 +33,7 @@ z.calling.mapper.ICECandidateMapper = {
     const candidate_info = {
       candidate: ice_message.sdp,
       sdpMLineIndex: ice_message.sdp_mline_index,
-      sdpMid: ice_message.sdp_mid
+      sdpMid: ice_message.sdp_mid,
     };
 
     return new RTCIceCandidate(candidate_info);
@@ -48,7 +48,7 @@ z.calling.mapper.ICECandidateMapper = {
     return {
       sdp: ice_candidate.candidate,
       sdp_mid: ice_candidate.sdpMid,
-      sdp_mline_index: ice_candidate.sdpMLineIndex
+      sdp_mline_index: ice_candidate.sdpMLineIndex,
     };
-  }
+  },
 };

@@ -57,5 +57,5 @@ ko.components.register('top-people', {
       </div>
     </div>
   `,
-  viewModel: z.components.TopPeopleViewModel
+  viewModel: z.components.TopPeopleViewModel,
 });

@@ -112,11 +112,11 @@ describe('Conversation', function() {
       const message_et = new z.entity.Message();
       message_et.timestamp(new Date('2014-12-15T09:21:14.225Z').getTime());
       conversation_et.last_event_timestamp(
-        new Date('2014-12-14T09:21:14.225Z').getTime()
+        new Date('2014-12-14T09:21:14.225Z').getTime(),
       );
       conversation_et.add_message(message_et);
       expect(conversation_et.last_event_timestamp()).toBe(
-        message_et.timestamp()
+        message_et.timestamp(),
       );
     });
 
@@ -130,7 +130,7 @@ describe('Conversation', function() {
       message_two_et.should_effect_conversation_timestamp = false;
       conversation_et.add_message(message_two_et);
       expect(conversation_et.last_event_timestamp()).toBe(
-        message_et.timestamp()
+        message_et.timestamp(),
       );
     });
   });
@@ -141,20 +141,20 @@ describe('Conversation', function() {
 
     it('should update with newer timestamp', function() {
       expect(
-        conversation_et._increment_time_only(first_date, second_date)
+        conversation_et._increment_time_only(first_date, second_date),
       ).toBe(second_date);
     });
 
     it('should not update with older timestamp', function() {
       expect(
-        conversation_et._increment_time_only(second_date, first_date)
+        conversation_et._increment_time_only(second_date, first_date),
       ).toBeFalsy();
     });
 
     // TODO: Flaky test
     xit('should not update with same timestamp', function() {
       expect(
-        conversation_et._increment_time_only(first_date, first_date)
+        conversation_et._increment_time_only(first_date, first_date),
       ).toBeFalsy();
     });
   });
@@ -192,7 +192,7 @@ describe('Conversation', function() {
         conversation_et.muted_state(true);
         expect(conversation_et.is_muted()).toBeTruthy();
         expect(conversation_et.is_archived()).toBeTruthy();
-      }
+      },
     );
   });
 
@@ -266,12 +266,12 @@ describe('Conversation', function() {
       conversation_et.participating_user_ets.push(other_user);
       conversation_et.type(z.conversation.ConversationType.ONE2ONE);
       expect(conversation_et.display_name()).toBe(
-        conversation_et.participating_user_ets()[0].name()
+        conversation_et.participating_user_ets()[0].name(),
       );
 
       conversation_et.type(z.conversation.ConversationType.CONNECT);
       expect(conversation_et.display_name()).toBe(
-        conversation_et.participating_user_ets()[0].name()
+        conversation_et.participating_user_ets()[0].name(),
       );
     });
 
@@ -301,7 +301,7 @@ describe('Conversation', function() {
     it('displays "Empty Conversation" if no other participants are in the conversation', function() {
       conversation_et.type(z.conversation.ConversationType.REGULAR);
       expect(conversation_et.display_name()).toBe(
-        z.string.conversations_empty_conversation
+        z.string.conversations_empty_conversation,
       );
     });
 
@@ -336,7 +336,7 @@ describe('Conversation', function() {
       conversation_et.muted_state(false);
 
       expect(
-        conversation_et._subscribe_to_states_updates.calls.count()
+        conversation_et._subscribe_to_states_updates.calls.count(),
       ).toEqual(1);
     }));
 
@@ -450,7 +450,7 @@ describe('Conversation', function() {
       const creation_message = conversation_et._creation_message();
       expect(creation_message).toBeDefined();
       expect(creation_message.member_message_type).toBe(
-        z.message.SystemMessageType.CONNECTION_REQUEST
+        z.message.SystemMessageType.CONNECTION_REQUEST,
       );
     });
 
@@ -459,7 +459,7 @@ describe('Conversation', function() {
       const creation_message = conversation_et._creation_message();
       expect(creation_message).toBeDefined();
       expect(creation_message.member_message_type).toBe(
-        z.message.SystemMessageType.CONNECTION_ACCEPTED
+        z.message.SystemMessageType.CONNECTION_ACCEPTED,
       );
     });
 
@@ -469,7 +469,7 @@ describe('Conversation', function() {
       const creation_message = conversation_et._creation_message();
       expect(creation_message).toBeDefined();
       expect(creation_message.member_message_type).toBe(
-        z.message.SystemMessageType.CONVERSATION_CREATE
+        z.message.SystemMessageType.CONVERSATION_CREATE,
       );
       expect(creation_message.user().id).toBe(self_user.id);
     });
@@ -480,7 +480,7 @@ describe('Conversation', function() {
       const creation_message = conversation_et._creation_message();
       expect(creation_message).toBeDefined();
       expect(creation_message.member_message_type).toBe(
-        z.message.SystemMessageType.CONVERSATION_CREATE
+        z.message.SystemMessageType.CONVERSATION_CREATE,
       );
       expect(creation_message.user().id).toBe(other_user.id);
     });
@@ -491,7 +491,7 @@ describe('Conversation', function() {
       const creation_message = conversation_et._creation_message();
       expect(creation_message).toBeDefined();
       expect(creation_message.member_message_type).toBe(
-        z.message.SystemMessageType.CONVERSATION_RESUME
+        z.message.SystemMessageType.CONVERSATION_RESUME,
       );
       expect(creation_message.user().id).toBe('');
     });
@@ -517,7 +517,7 @@ describe('Conversation', function() {
 
       expect(conversation_et.messages_visible().length).toBe(1);
       expect(conversation_et.messages_visible()[0].super_type).toBe(
-        z.message.SuperType.MEMBER
+        z.message.SuperType.MEMBER,
       );
 
       const member_message = new z.entity.MemberMessage();
@@ -527,7 +527,7 @@ describe('Conversation', function() {
 
       expect(conversation_et.messages_visible().length).toBe(2);
       expect(conversation_et.messages_visible()[0].super_type).toBe(
-        z.message.SuperType.MEMBER
+        z.message.SuperType.MEMBER,
       );
     });
 
@@ -560,10 +560,10 @@ describe('Conversation', function() {
   describe('last read', function() {
     it('should update last read if last message was send from self user', function() {
       const last_read_timestamp = new Date(
-        'December 24, 2000 18:00:00'
+        'December 24, 2000 18:00:00',
       ).getTime();
       const last_message_timestamp = new Date(
-        'December 24, 2000 18:01:00'
+        'December 24, 2000 18:01:00',
       ).getTime();
 
       conversation_et.last_read_timestamp(last_read_timestamp);
@@ -576,16 +576,16 @@ describe('Conversation', function() {
       expect(conversation_et.last_read_timestamp()).toBe(last_read_timestamp);
       conversation_et.add_message(message_et);
       expect(conversation_et.last_read_timestamp()).toBe(
-        last_message_timestamp
+        last_message_timestamp,
       );
     });
 
     it('should not update last read if last message was not send from self user', function() {
       const last_read_timestamp = new Date(
-        'December 24, 2000 18:00:00'
+        'December 24, 2000 18:00:00',
       ).getTime();
       const last_message_timestamp = new Date(
-        'December 24, 2000 18:01:00'
+        'December 24, 2000 18:01:00',
       ).getTime();
 
       conversation_et.last_read_timestamp(last_read_timestamp);
@@ -603,10 +603,10 @@ describe('Conversation', function() {
   describe('release', function() {
     it('should not release messages if conversation has unread messages', function() {
       const last_read_timestamp = new Date(
-        'December 24, 2000 18:00:00'
+        'December 24, 2000 18:00:00',
       ).getTime();
       const last_message_timestamp = new Date(
-        'December 24, 2000 18:01:00'
+        'December 24, 2000 18:01:00',
       ).getTime();
 
       conversation_et.last_read_timestamp(last_read_timestamp);
@@ -625,7 +625,7 @@ describe('Conversation', function() {
 
     it('should release messages if conversation has no unread messages', function() {
       const last_message_timestamp = new Date(
-        'December 24, 2000 18:01:00'
+        'December 24, 2000 18:01:00',
       ).getTime();
 
       const message_et = new z.entity.Message();
@@ -668,7 +668,7 @@ describe('Conversation', function() {
 
       conversation_et._check_for_duplicate_nonce(
         older_message_et,
-        newer_message_et
+        newer_message_et,
       );
 
       expect(older_message_et.visible()).toBeTruthy();
@@ -775,7 +775,7 @@ describe('Conversation', function() {
 
       expect(conversation_et.get_last_editable_message()).toBeDefined();
       expect(conversation_et.get_last_editable_message().id).toBe(
-        message_et.id
+        message_et.id,
       );
     });
 
@@ -794,7 +794,7 @@ describe('Conversation', function() {
 
       expect(conversation_et.get_last_editable_message()).toBeDefined();
       expect(conversation_et.get_last_editable_message().id).toBe(
-        next_message_et.id
+        next_message_et.id,
       );
     });
 
@@ -814,7 +814,7 @@ describe('Conversation', function() {
 
       expect(conversation_et.get_last_editable_message()).toBeDefined();
       expect(conversation_et.get_last_editable_message().id).toBe(
-        message_et.id
+        message_et.id,
       );
     });
   });
@@ -836,7 +836,7 @@ describe('Conversation', function() {
       delivered_message_et.status(z.message.StatusType.DELIVERED);
       conversation_et.add_message(delivered_message_et);
       expect(conversation_et.get_last_delivered_message()).toBe(
-        delivered_message_et
+        delivered_message_et,
       );
 
       const next_sent_message_et = new z.entity.ContentMessage();
@@ -844,7 +844,7 @@ describe('Conversation', function() {
       next_sent_message_et.status(z.message.StatusType.SENT);
       conversation_et.add_message(next_sent_message_et);
       expect(conversation_et.get_last_delivered_message()).toBe(
-        delivered_message_et
+        delivered_message_et,
       );
 
       const next_delivered_message_et = new z.entity.ContentMessage();
@@ -852,7 +852,7 @@ describe('Conversation', function() {
       next_delivered_message_et.status(z.message.StatusType.DELIVERED);
       conversation_et.add_message(next_delivered_message_et);
       expect(conversation_et.get_last_delivered_message()).toBe(
-        next_delivered_message_et
+        next_delivered_message_et,
       );
     });
   });
@@ -865,7 +865,7 @@ describe('Conversation', function() {
       const new_lrt_number = window.parseInt(new_lrt_string, 10);
       conversation_et.set_timestamp(
         new_lrt_string,
-        z.conversation.ConversationUpdateType.LAST_READ_TIMESTAMP
+        z.conversation.ConversationUpdateType.LAST_READ_TIMESTAMP,
       );
       expect(conversation_et.last_read_timestamp()).toBe(new_lrt_number);
     }));
@@ -882,7 +882,7 @@ describe('Conversation', function() {
         to: `${connector_user_id}`,
         from: '616cbbeb-1360-4e17-b333-e000662257bd',
         last_update: '2017-05-10T11:34:18.396Z',
-        message: ' '
+        message: ' ',
       };
       const payload_conversation = {
         access: ['private'],
@@ -904,33 +904,33 @@ describe('Conversation', function() {
             cleared: null,
             otr_muted: false,
             otr_archived_ref: null,
-            archived: null
+            archived: null,
           },
-          others: []
+          others: [],
         },
         name: 'Marco',
         id: '15a7f358-8eba-4b8e-bcf2-61a08eb53349',
         type: 3,
         last_event_time: '2017-05-10T11:34:18.376Z',
-        last_event: '2.800122000a73cb63'
+        last_event: '2.800122000a73cb63',
       };
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
       // @formatter:on
 
       const user_connection_mapper = new z.user.UserConnectionMapper();
       const connection_et = user_connection_mapper.map_user_connection_from_json(
-        payload_connection
+        payload_connection,
       );
 
       const conversation_mapper = new z.conversation.ConversationMapper();
       const new_conversation = conversation_mapper._create_conversation_et(
-        payload_conversation
+        payload_conversation,
       );
       new_conversation.connection(connection_et);
 
       expect(new_conversation.participating_user_ids().length).toBe(1);
       expect(new_conversation.participating_user_ids()[0]).toBe(
-        connector_user_id
+        connector_user_id,
       );
     });
   });

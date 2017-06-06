@@ -31,12 +31,12 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
       .exposeConversationActors()
       .then(function(conversation_repository) {
         const content_state = ko.observable(
-          z.ViewModel.content.CONTENT_STATE.CONVERSATION
+          z.ViewModel.content.CONTENT_STATE.CONVERSATION,
         );
         title_view_model = new z.ViewModel.WindowTitleViewModel(
           content_state,
           TestFactory.user_repository,
-          conversation_repository
+          conversation_repository,
         );
         done();
       })
@@ -52,12 +52,12 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
 
     it('sets the name of the conversation (when the conversation is selected)', function() {
       const selected_conversation = new z.entity.Conversation(
-        z.util.create_random_uuid()
+        z.util.create_random_uuid(),
       );
       selected_conversation.name('Selected Conversation');
       selected_conversation.type(z.conversation.ConversationType.REGULAR);
       title_view_model.conversation_repository.active_conversation(
-        selected_conversation
+        selected_conversation,
       );
 
       const expected_title = `${selected_conversation.name()} · ${suffix}`;
@@ -71,17 +71,17 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
       message.timestamp(Date.now());
 
       const conversation = new z.entity.Conversation(
-        z.util.create_random_uuid()
+        z.util.create_random_uuid(),
       );
       conversation.add_message(message);
       conversation.name('Birthday Bash');
       conversation.type(z.conversation.ConversationType.REGULAR);
 
       title_view_model.conversation_repository.conversations_unarchived.push(
-        conversation
+        conversation,
       );
       title_view_model.conversation_repository.active_conversation(
-        conversation
+        conversation,
       );
       title_view_model.initiate_title_updates();
 
@@ -91,16 +91,16 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
 
     it('does not change the title if muted conversations receive messages', function() {
       const selected_conversation = new z.entity.Conversation(
-        z.util.create_random_uuid()
+        z.util.create_random_uuid(),
       );
       selected_conversation.name('Selected Conversation');
       selected_conversation.type(z.conversation.ConversationType.REGULAR);
       title_view_model.conversation_repository.active_conversation(
-        selected_conversation
+        selected_conversation,
       );
 
       const muted_conversation = new z.entity.Conversation(
-        z.util.create_random_uuid()
+        z.util.create_random_uuid(),
       );
       muted_conversation.muted_state(true);
       muted_conversation.name('Muted Conversation');
@@ -109,17 +109,17 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
       // Add conversations to conversation repository
       expect(
         title_view_model.conversation_repository.conversations_unarchived()
-          .length
+          .length,
       ).toBe(0);
       title_view_model.conversation_repository.conversations_unarchived.push(
-        selected_conversation
+        selected_conversation,
       );
       title_view_model.conversation_repository.conversations_unarchived.push(
-        muted_conversation
+        muted_conversation,
       );
       expect(
         title_view_model.conversation_repository.conversations_unarchived()
-          .length
+          .length,
       ).toBe(2);
 
       // Check title when there are no messages
@@ -160,7 +160,7 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
 
     it('sets the name when opening the preferences about page', function() {
       title_view_model.content_state(
-        z.ViewModel.content.CONTENT_STATE.PREFERENCES_ABOUT
+        z.ViewModel.content.CONTENT_STATE.PREFERENCES_ABOUT,
       );
 
       const expected_title = `${z.string.preferences_about} · ${suffix}`;
@@ -170,7 +170,7 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
 
     it('sets the name when opening the preferences account page', function() {
       title_view_model.content_state(
-        z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT
+        z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT,
       );
 
       const expected_title = `${z.string.preferences_account} · ${suffix}`;
@@ -180,7 +180,7 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
 
     it('sets the name when opening the preferences av page', function() {
       title_view_model.content_state(
-        z.ViewModel.content.CONTENT_STATE.PREFERENCES_AV
+        z.ViewModel.content.CONTENT_STATE.PREFERENCES_AV,
       );
 
       const expected_title = `${z.string.preferences_av} · ${suffix}`;
@@ -190,7 +190,7 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
 
     it('sets the name when opening the preferences device details page', function() {
       title_view_model.content_state(
-        z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS
+        z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS,
       );
 
       const expected_title = `${z.string
@@ -201,7 +201,7 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
 
     it('sets the name when opening the preferences devices page', function() {
       title_view_model.content_state(
-        z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES
+        z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES,
       );
 
       const expected_title = `${z.string.preferences_devices} · ${suffix}`;
@@ -211,7 +211,7 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
 
     it('sets the name when opening the preferences options page', function() {
       title_view_model.content_state(
-        z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS
+        z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS,
       );
 
       const expected_title = `${z.string.preferences_options} · ${suffix}`;
@@ -221,7 +221,7 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
 
     it('shows the number of connection requests when viewing the inbox', function() {
       title_view_model.content_state(
-        z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS
+        z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS,
       );
 
       const pending_connection = new z.entity.Connection();
@@ -253,8 +253,8 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
         id: z.string.conversations_connection_request_many,
         replace: {
           content: waiting_people,
-          placeholder: '%no'
-        }
+          placeholder: '%no',
+        },
       });
 
       expected_title = `(${waiting_people}) · ${message} · ${suffix}`;
@@ -268,21 +268,21 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
       message.timestamp(Date.now());
 
       const conversation = new z.entity.Conversation(
-        z.util.create_random_uuid()
+        z.util.create_random_uuid(),
       );
       conversation.add_message(message);
       conversation.name('Birthday Bash');
       conversation.type(z.conversation.ConversationType.REGULAR);
 
       title_view_model.conversation_repository.conversations_unarchived.push(
-        conversation
+        conversation,
       );
       title_view_model.conversation_repository.active_conversation(
-        conversation
+        conversation,
       );
 
       amplify.subscribe(z.event.WebApp.CONVERSATION.UNREAD, function(
-        badge_count
+        badge_count,
       ) {
         expect(badge_count).toBe(1);
         done();

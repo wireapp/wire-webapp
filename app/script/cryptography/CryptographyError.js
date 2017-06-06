@@ -72,7 +72,7 @@ z.cryptography.CryptographyError = class CryptographyError extends Error {
       PREVIOUSLY_STORED:
         'z.cryptography.CryptographyError.TYPE.PREVIOUSLY_STORED',
       UNHANDLED_TYPE: 'z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE',
-      UNKNOWN: 'z.cryptography.CryptographyError.TYPE.UNKNOWN'
+      UNKNOWN: 'z.cryptography.CryptographyError.TYPE.UNKNOWN',
     };
   }
 };

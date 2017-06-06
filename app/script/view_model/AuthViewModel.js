@@ -28,13 +28,13 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     return {
       ANIMATION_TIMEOUT: {
         LONG: 2000,
-        SHORT: 500
+        SHORT: 500,
       },
       FORWARDED_URL_PARAMETERS: [
         z.auth.URLParameter.BOT,
         z.auth.URLParameter.ENVIRONMENT,
-        z.auth.URLParameter.LOCALYTICS
-      ]
+        z.auth.URLParameter.LOCALYTICS,
+      ],
     };
   }
 
@@ -46,13 +46,13 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
    */
   constructor(element_id, auth) {
     this.click_on_remove_device_submit = this.click_on_remove_device_submit.bind(
-      this
+      this,
     );
 
     this.auth = auth;
     this.logger = new z.util.Logger(
       'z.ViewModel.AuthViewModel',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
 
     this.event_tracker = new z.tracking.EventTrackingRepository();
@@ -64,23 +64,23 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     // @todo Don't operate with the service directly. Get a repository!
     this.storage_service = new z.storage.StorageService();
     this.storage_repository = new z.storage.StorageRepository(
-      this.storage_service
+      this.storage_service,
     );
 
     this.cryptography_service = new z.cryptography.CryptographyRepository(
-      this.auth.client
+      this.auth.client,
     );
     this.cryptography_repository = new z.cryptography.CryptographyRepository(
       this.cryptography_service,
-      this.storage_repository
+      this.storage_repository,
     );
     this.client_service = new z.client.ClientService(
       this.auth.client,
-      this.storage_service
+      this.storage_service,
     );
     this.client_repository = new z.client.ClientRepository(
       this.client_service,
-      this.cryptography_repository
+      this.cryptography_repository,
     );
 
     this.user_mapper = new z.user.UserMapper(this.asset_service);
@@ -89,19 +89,19 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       this.user_service,
       this.asset_service,
       undefined,
-      this.client_repository
+      this.client_repository,
     );
 
     this.notification_service = new z.event.NotificationService(
       this.auth.client,
-      this.storage_service
+      this.storage_service,
     );
     this.web_socket_service = new z.event.WebSocketService(this.auth.client);
     this.event_repository = new z.event.EventRepository(
       this.web_socket_service,
       this.notification_service,
       this.cryptography_repository,
-      this.user_repository
+      this.user_repository,
     );
 
     this.pending_server_request = ko.observable(false);
@@ -121,7 +121,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
     this.is_public_computer = ko.observable(false);
     this.is_public_computer.subscribe(is_public_computer =>
-      this.persist(!is_public_computer)
+      this.persist(!is_public_computer),
     );
 
     this.client_type = ko.pureComputed(() => {
@@ -152,7 +152,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       ko.observable(''),
       ko.observable(''),
       ko.observable(''),
-      ko.observable('')
+      ko.observable(''),
     ]);
     this.code = ko.pureComputed(() => {
       return this.code_digits().map(digit => digit()).join('').substr(0, 6);
@@ -193,7 +193,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     this.failed_validation_terms = ko.observable(false);
     this.accepted_terms_of_use = ko.observable(false);
     this.accepted_terms_of_use.subscribe(() =>
-      this.clear_error(z.auth.AuthView.TYPE.TERMS)
+      this.clear_error(z.auth.AuthView.TYPE.TERMS),
     );
 
     this.can_login_password = ko.pureComputed(() => {
@@ -226,15 +226,15 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     });
 
     this.can_resend_registration = ko.pureComputed(
-      () => !this.disabled_by_animation() && this.username().length
+      () => !this.disabled_by_animation() && this.username().length,
     );
 
     this.can_resend_verification = ko.pureComputed(
-      () => !this.disabled_by_animation() && this.username().length
+      () => !this.disabled_by_animation() && this.username().length,
     );
 
     this.can_verify_password = ko.pureComputed(
-      () => !this.disabled_by_animation() && this.password().length
+      () => !this.disabled_by_animation() && this.password().length,
     );
 
     this.account_retry_text = ko.pureComputed(() => {
@@ -242,8 +242,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
         id: z.string.auth_posted_retry,
         replace: {
           content: this.username(),
-          placeholder: '%email'
-        }
+          placeholder: '%email',
+        },
       });
     });
 
@@ -252,8 +252,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
         id: z.string.auth_posted_resend,
         replace: {
           content: this.username(),
-          placeholder: '%email'
-        }
+          placeholder: '%email',
+        },
       });
     });
 
@@ -261,14 +261,14 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       const phone_number =
         PhoneFormat.formatNumberForMobileDialing(
           '',
-          this.phone_number_e164()
+          this.phone_number_e164(),
         ) || this.phone_number_e164();
       return z.localization.Localizer.get_text({
         id: z.string.auth_verify_code_description,
         replace: {
           content: phone_number,
-          placeholder: '%@number'
-        }
+          placeholder: '%@number',
+        },
       });
     });
 
@@ -277,8 +277,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
         id: z.string.auth_verify_code_resend_timer,
         replace: {
           content: this.code_expiration_in(),
-          placeholder: '%expiration'
-        }
+          placeholder: '%expiration',
+        },
       });
     });
 
@@ -291,26 +291,26 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       const login_modes = [
         z.auth.AuthView.MODE.ACCOUNT_LOGIN,
         z.auth.AuthView.MODE.ACCOUNT_PASSWORD,
-        z.auth.AuthView.MODE.ACCOUNT_PHONE
+        z.auth.AuthView.MODE.ACCOUNT_PHONE,
       ];
       return login_modes.includes(this.account_mode());
     });
 
     this.posted_mode = ko.observable(undefined);
     this.posted_mode_offline = ko.pureComputed(
-      () => this.posted_mode() === z.auth.AuthView.MODE.POSTED_OFFLINE
+      () => this.posted_mode() === z.auth.AuthView.MODE.POSTED_OFFLINE,
     );
     this.posted_mode_pending = ko.pureComputed(
-      () => this.posted_mode() === z.auth.AuthView.MODE.POSTED_PENDING
+      () => this.posted_mode() === z.auth.AuthView.MODE.POSTED_PENDING,
     );
     this.posted_mode_resend = ko.pureComputed(
-      () => this.posted_mode() === z.auth.AuthView.MODE.POSTED_RESEND
+      () => this.posted_mode() === z.auth.AuthView.MODE.POSTED_RESEND,
     );
     this.posted_mode_retry = ko.pureComputed(
-      () => this.posted_mode() === z.auth.AuthView.MODE.POSTED_RETRY
+      () => this.posted_mode() === z.auth.AuthView.MODE.POSTED_RETRY,
     );
     this.posted_mode_verify = ko.pureComputed(
-      () => this.posted_mode() === z.auth.AuthView.MODE.POSTED_VERIFY
+      () => this.posted_mode() === z.auth.AuthView.MODE.POSTED_VERIFY,
     );
 
     // Debugging
@@ -343,9 +343,9 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     // Select country based on location of user IP
     this.country_code(
       (z.util.CountryCodes.get_country_code(
-        $('[name=geoip]').attr('country')
+        $('[name=geoip]').attr('country'),
       ) || 1)
-        .toString()
+        .toString(),
     );
     this.changed_country_code();
 
@@ -362,7 +362,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       z.auth.AuthView.MODE.POSTED_VERIFY,
       z.auth.AuthView.MODE.VERIFY_ACCOUNT,
       z.auth.AuthView.MODE.VERIFY_CODE,
-      z.auth.AuthView.MODE.VERIFY_PASSWORD
+      z.auth.AuthView.MODE.VERIFY_PASSWORD,
     ];
 
     if (
@@ -422,7 +422,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
         ) {
           return Raygun.send(new Error('Invitation not found'), {
             error: error,
-            invite_code: invite
+            invite_code: invite,
           });
         }
       })
@@ -447,7 +447,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     ) {
       this.pending_server_request(true);
       const payload = this._create_payload(
-        z.auth.AuthView.MODE.ACCOUNT_PASSWORD
+        z.auth.AuthView.MODE.ACCOUNT_PASSWORD,
       );
 
       this.auth.repository
@@ -461,8 +461,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
             z.tracking.EventName.ACCOUNT.LOGGED_IN,
             {
               context: login_context,
-              remember_me: this.persist()
-            }
+              remember_me: this.persist(),
+            },
           );
           this._authentication_successful();
         })
@@ -480,7 +480,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
               }
               this._add_error(z.string.auth_error_sign_in, [
                 z.auth.AuthView.TYPE.EMAIL,
-                z.auth.AuthView.TYPE.PASSWORD
+                z.auth.AuthView.TYPE.PASSWORD,
               ]);
             } else {
               this._add_error(z.string.auth_error_misc);
@@ -507,11 +507,11 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
         window.clearInterval(this.code_interval_id);
         if (response.expires_in) {
           this.code_expiration_timestamp(
-            z.util.get_unix_timestamp() + response.expires_in
+            z.util.get_unix_timestamp() + response.expires_in,
           );
         } else if (!response.label) {
           this.code_expiration_timestamp(
-            z.util.get_unix_timestamp() + z.config.LOGIN_CODE_EXPIRATION
+            z.util.get_unix_timestamp() + z.config.LOGIN_CODE_EXPIRATION,
           );
         }
         this._set_hash(z.auth.AuthView.MODE.VERIFY_CODE);
@@ -531,13 +531,13 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
               case z.service.BackendClientError.LABEL.BAD_REQUEST:
                 this._add_error(
                   z.string.auth_error_phone_number_invalid,
-                  z.auth.AuthView.TYPE.PHONE
+                  z.auth.AuthView.TYPE.PHONE,
                 );
                 break;
               case z.service.BackendClientError.LABEL.INVALID_PHONE:
                 this._add_error(
                   z.string.auth_error_phone_number_unknown,
-                  z.auth.AuthView.TYPE.PHONE
+                  z.auth.AuthView.TYPE.PHONE,
                 );
                 break;
               case z.service.BackendClientError.LABEL.PASSWORD_EXISTS:
@@ -549,7 +549,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
               case z.service.BackendClientError.LABEL.UNAUTHORIZED:
                 this._add_error(
                   z.string.auth_error_phone_number_forbidden,
-                  z.auth.AuthView.TYPE.PHONE
+                  z.auth.AuthView.TYPE.PHONE,
                 );
                 break;
               default:
@@ -576,7 +576,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       this.pending_server_request(true);
       this.persist(true);
       const payload = this._create_payload(
-        z.auth.AuthView.MODE.ACCOUNT_REGISTER
+        z.auth.AuthView.MODE.ACCOUNT_REGISTER,
       );
 
       this.auth.repository
@@ -587,8 +587,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
             z.event.WebApp.ANALYTICS.EVENT,
             z.tracking.EventName.REGISTRATION.ENTERED_CREDENTIALS,
             {
-              outcome: 'success'
-            }
+              outcome: 'success',
+            },
           );
 
           // Track if the user changed the pre-filled email
@@ -643,25 +643,25 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
               case z.service.BackendClientError.LABEL.BLACKLISTED_EMAIL:
                 this._add_error(
                   z.string.auth_error_email_forbidden,
-                  z.auth.AuthView.TYPE.EMAIL
+                  z.auth.AuthView.TYPE.EMAIL,
                 );
                 break;
               case z.service.BackendClientError.LABEL.KEY_EXISTS:
                 this._add_error(
                   z.string.auth_error_email_exists,
-                  z.auth.AuthView.TYPE.EMAIL
+                  z.auth.AuthView.TYPE.EMAIL,
                 );
                 break;
               case z.service.BackendClientError.LABEL.INVALID_EMAIL:
                 this._add_error(
                   z.string.auth_error_email_malformed,
-                  z.auth.AuthView.TYPE.EMAIL
+                  z.auth.AuthView.TYPE.EMAIL,
                 );
                 break;
               default:
                 this._add_error(
                   z.string.auth_error_email_malformed,
-                  z.auth.AuthView.TYPE.EMAIL
+                  z.auth.AuthView.TYPE.EMAIL,
                 );
             }
             return this._has_errors();
@@ -687,8 +687,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
             z.tracking.EventName.ACCOUNT.LOGGED_IN,
             {
               context: z.auth.AuthView.TYPE.PHONE,
-              remember_me: this.persist()
-            }
+              remember_me: this.persist(),
+            },
           );
           this._authentication_successful();
         })
@@ -696,7 +696,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
           if (!this.validation_errors().length) {
             this._add_error(
               z.string.auth_error_code,
-              z.auth.AuthView.TYPE.CODE
+              z.auth.AuthView.TYPE.CODE,
             );
             this._has_errors();
           }
@@ -716,7 +716,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     ) {
       this.pending_server_request(true);
       const payload = this._create_payload(
-        z.auth.AuthView.MODE.VERIFY_PASSWORD
+        z.auth.AuthView.MODE.VERIFY_PASSWORD,
       );
 
       this.auth.repository
@@ -727,8 +727,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
             z.tracking.EventName.ACCOUNT.LOGGED_IN,
             {
               context: z.auth.AuthView.TYPE.PHONE,
-              remember_me: this.persist()
-            }
+              remember_me: this.persist(),
+            },
           );
           this._authentication_successful();
         })
@@ -745,7 +745,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
               }
               this._add_error(
                 z.string.auth_error_sign_in,
-                z.auth.AuthView.TYPE.PASSWORD
+                z.auth.AuthView.TYPE.PASSWORD,
               );
             } else {
               this._add_error(z.string.auth_error_misc);
@@ -774,18 +774,18 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
         payload = {
           label: this.client_repository.construct_cookie_label(
             username,
-            this.client_type()
+            this.client_type(),
           ),
           label_key: this.client_repository.construct_cookie_label_key(
             username,
-            this.client_type()
+            this.client_type(),
           ),
-          password: this.password()
+          password: this.password(),
         };
 
         const phone = z.util.phone_number_to_e164(
           username,
-          this.country() || navigator.language
+          this.country() || navigator.language,
         );
         if (z.util.is_valid_email(username)) {
           payload.email = username;
@@ -800,7 +800,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       case z.auth.AuthView.MODE.ACCOUNT_PHONE: {
         payload = {
           force: false,
-          phone: this.phone_number_e164()
+          phone: this.phone_number_e164(),
         };
         break;
       }
@@ -811,22 +811,22 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
           invitation_code: z.util.get_url_parameter(z.auth.URLParameter.INVITE),
           label: this.client_repository.construct_cookie_label(
             username,
-            this.client_type()
+            this.client_type(),
           ),
           label_key: this.client_repository.construct_cookie_label_key(
             username,
-            this.client_type()
+            this.client_type(),
           ),
           locale: moment.locale(),
           name: this.name().trim(),
-          password: this.password()
+          password: this.password(),
         };
         break;
       }
 
       case z.auth.AuthView.MODE.POSTED_RESEND: {
         payload = {
-          email: username
+          email: username,
         };
         break;
       }
@@ -836,13 +836,13 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
           code: this.code(),
           label: this.client_repository.construct_cookie_label(
             this.phone_number_e164(),
-            this.client_type()
+            this.client_type(),
           ),
           label_key: this.client_repository.construct_cookie_label_key(
             this.phone_number_e164(),
-            this.client_type()
+            this.client_type(),
           ),
-          phone: this.phone_number_e164()
+          phone: this.phone_number_e164(),
         };
         break;
       }
@@ -851,14 +851,14 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
         payload = {
           label: this.client_repository.construct_cookie_label(
             this.phone_number_e164(),
-            this.client_type()
+            this.client_type(),
           ),
           label_key: this.client_repository.construct_cookie_label_key(
             this.phone_number_e164(),
-            this.client_type()
+            this.client_type(),
           ),
           password: this.password(),
-          phone: this.phone_number_e164()
+          phone: this.phone_number_e164(),
         };
         break;
       }
@@ -914,7 +914,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     if (input_value.length && !this.phone_number().length) {
       this._add_error(
         z.string.auth_error_phone_number_invalid,
-        z.auth.AuthView.TYPE.PHONE
+        z.auth.AuthView.TYPE.PHONE,
       );
     }
   }
@@ -965,12 +965,12 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     amplify.publish(
       z.event.WebApp.ANALYTICS.EVENT,
       z.tracking.EventName.PASSWORD_RESET,
-      {value: 'fromSignIn'}
+      {value: 'fromSignIn'},
     );
     z.util.safe_window_open(
       `${z.util.Environment.backend.website_url()}${z.l10n.text(
-        z.string.url_password_reset
-      )}`
+        z.string.url_password_reset,
+      )}`,
     );
   }
 
@@ -988,14 +988,14 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     if (this.can_resend_registration()) {
       amplify.publish(
         z.event.WebApp.ANALYTICS.EVENT,
-        z.tracking.EventName.REGISTRATION.RESENT_EMAIL_VERIFICATION
+        z.tracking.EventName.REGISTRATION.RESENT_EMAIL_VERIFICATION,
       );
       this._fade_in_icon_spinner();
 
       if (!this.pending_server_request()) {
         this.pending_server_request(true);
         const payload = this._create_payload(
-          z.auth.AuthView.MODE.POSTED_RESEND
+          z.auth.AuthView.MODE.POSTED_RESEND,
         );
 
         this.auth.repository
@@ -1035,7 +1035,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       if (!this.pending_server_request()) {
         this.pending_server_request(true);
         const payload = this._create_payload(
-          z.auth.AuthView.MODE.ACCOUNT_REGISTER
+          z.auth.AuthView.MODE.ACCOUNT_REGISTER,
         );
 
         this.auth.repository
@@ -1049,7 +1049,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
   clicked_on_terms() {
     amplify.publish(
       z.event.WebApp.ANALYTICS.EVENT,
-      z.tracking.EventName.NAVIGATION.OPENED_TERMS
+      z.tracking.EventName.NAVIGATION.OPENED_TERMS,
     );
     z.util.safe_window_open(z.l10n.text(z.string.url_terms_of_use));
   }
@@ -1061,7 +1061,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
   clicked_on_wire_link() {
     amplify.publish(
       z.event.WebApp.ANALYTICS.EVENT,
-      z.tracking.EventName.NAVIGATION.OPENED_WIRE_WEBSITE
+      z.tracking.EventName.NAVIGATION.OPENED_WIRE_WEBSITE,
     );
     z.util.safe_window_open(z.l10n.text(z.string.url_wire));
   }
@@ -1125,7 +1125,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
     const target_id = event.currentTarget.id;
     const target_digit = window.parseInt(
-      target_id.substr(target_id.length - 1)
+      target_id.substr(target_id.length - 1),
     );
 
     let focus_digit;
@@ -1167,7 +1167,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
   input_phone_code(view_model, event) {
     const target_id = event.currentTarget.id;
     const target_digit = window.parseInt(
-      target_id.substr(target_id.length - 1)
+      target_id.substr(target_id.length - 1),
     );
     const array_digit = target_digit - 1;
     const target_value_matches = event.currentTarget.value.match(/\d+/g) || [];
@@ -1178,7 +1178,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       $(`#wire-phone-code-digit-${Math.min(6, focus_digit)}`).focus();
       const digits = input_value.substr(0, 6 - array_digit).split('');
       digits.map((digit, index) =>
-        this.code_digits()[array_digit + index](digit)
+        this.code_digits()[array_digit + index](digit),
       );
     } else {
       this.code_digits()[array_digit](null);
@@ -1232,13 +1232,13 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       case z.service.BackendClientError.LABEL.UNAUTHORIZED:
         this._add_error(
           z.string.auth_error_email_forbidden,
-          z.auth.AuthView.TYPE.EMAIL
+          z.auth.AuthView.TYPE.EMAIL,
         );
         break;
 
       case z.service.BackendClientError.LABEL.KEY_EXISTS: {
         const payload = this._create_payload(
-          z.auth.AuthView.MODE.ACCOUNT_PASSWORD
+          z.auth.AuthView.MODE.ACCOUNT_PASSWORD,
         );
 
         this.auth.repository
@@ -1249,15 +1249,15 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
               z.tracking.EventName.ACCOUNT.LOGGED_IN,
               {
                 context: z.auth.AuthView.MODE.ACCOUNT_REGISTER,
-                remember_me: this.persist()
-              }
+                remember_me: this.persist(),
+              },
             );
             this._authentication_successful();
           })
           .catch(() => {
             this._add_error(
               z.string.auth_error_email_exists,
-              z.auth.AuthView.TYPE.EMAIL
+              z.auth.AuthView.TYPE.EMAIL,
             );
             this._has_errors();
           });
@@ -1267,7 +1267,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       case z.service.BackendClientError.LABEL.MISSING_IDENTITY:
         this._add_error(
           z.string.auth_error_email_missing,
-          z.auth.AuthView.TYPE.EMAIL
+          z.auth.AuthView.TYPE.EMAIL,
         );
         break;
 
@@ -1281,8 +1281,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
         z.tracking.EventName.REGISTRATION.ENTERED_CREDENTIALS,
         {
           outcome: 'fail',
-          reason: error.label
-        }
+          reason: error.label,
+        },
       );
       return;
     }
@@ -1326,7 +1326,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
   _wait_for_activate() {
     this.logger.info(
-      'Opened WebSocket connection to wait for account activation'
+      'Opened WebSocket connection to wait for account activation',
     );
 
     this.web_socket_service.connect(notification => {
@@ -1334,7 +1334,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
       this.logger.info(`»» Event: '${event.type}'`, {
         event_json: JSON.stringify(event),
-        event_object: event
+        event_object: event,
       });
       if (event.type === z.event.Backend.USER.ACTIVATE) {
         this._account_verified();
@@ -1350,7 +1350,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
       this.logger.info(`»» Event: '${event.type}'`, {
         event_json: JSON.stringify(event),
-        event_object: event
+        event_object: event,
       });
       if (event.type === z.event.Backend.USER.UPDATE && event.user.email) {
         this._account_verified(false);
@@ -1366,7 +1366,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     const switch_params = {
       focus: 'wire-login-username',
       mode: z.auth.AuthView.MODE.ACCOUNT_LOGIN,
-      section: z.auth.AuthView.SECTION.ACCOUNT
+      section: z.auth.AuthView.SECTION.ACCOUNT,
     };
 
     this.switch_ui(switch_params);
@@ -1374,8 +1374,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       z.event.WebApp.ANALYTICS.EVENT,
       z.tracking.EventName.ACCOUNT.OPENED_LOGIN,
       {
-        context: this.visible_method()
-      }
+        context: this.visible_method(),
+      },
     );
   }
 
@@ -1384,7 +1384,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       focus: 'wire-login-username',
       method: z.auth.AuthView.MODE.ACCOUNT_PASSWORD,
       mode: z.auth.AuthView.MODE.ACCOUNT_LOGIN,
-      section: z.auth.AuthView.SECTION.ACCOUNT
+      section: z.auth.AuthView.SECTION.ACCOUNT,
     };
 
     this.switch_ui(switch_params);
@@ -1392,8 +1392,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       z.event.WebApp.ANALYTICS.EVENT,
       z.tracking.EventName.ACCOUNT.OPENED_LOGIN,
       {
-        context: z.auth.AuthView.TYPE.EMAIL
-      }
+        context: z.auth.AuthView.TYPE.EMAIL,
+      },
     );
   }
 
@@ -1402,7 +1402,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       focus: 'wire-login-phone',
       method: z.auth.AuthView.MODE.ACCOUNT_PHONE,
       mode: z.auth.AuthView.MODE.ACCOUNT_LOGIN,
-      section: z.auth.AuthView.SECTION.ACCOUNT
+      section: z.auth.AuthView.SECTION.ACCOUNT,
     };
 
     this.switch_ui(switch_params);
@@ -1410,8 +1410,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       z.event.WebApp.ANALYTICS.EVENT,
       z.tracking.EventName.ACCOUNT.OPENED_LOGIN,
       {
-        context: z.auth.AuthView.TYPE.PHONE
-      }
+        context: z.auth.AuthView.TYPE.PHONE,
+      },
     );
   }
 
@@ -1419,7 +1419,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     const switch_params = {
       focus: focus,
       mode: z.auth.AuthView.MODE.ACCOUNT_REGISTER,
-      section: z.auth.AuthView.SECTION.ACCOUNT
+      section: z.auth.AuthView.SECTION.ACCOUNT,
     };
 
     this.switch_ui(switch_params);
@@ -1427,15 +1427,15 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       z.event.WebApp.ANALYTICS.EVENT,
       z.tracking.EventName.REGISTRATION.OPENED_EMAIL_SIGN_UP,
       {
-        context: this.registration_context
-      }
+        context: this.registration_context,
+      },
     );
   }
 
   _show_history() {
     const switch_params = {
       mode: z.auth.AuthView.MODE.HISTORY,
-      section: z.auth.AuthView.SECTION.HISTORY
+      section: z.auth.AuthView.SECTION.HISTORY,
     };
 
     this.switch_ui(switch_params);
@@ -1444,7 +1444,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
   _show_limit() {
     const switch_params = {
       mode: z.auth.AuthView.MODE.LIMIT,
-      section: z.auth.AuthView.SECTION.LIMIT
+      section: z.auth.AuthView.SECTION.LIMIT,
     };
 
     this.switch_ui(switch_params);
@@ -1455,7 +1455,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
     const switch_params = {
       mode: z.auth.AuthView.MODE.POSTED_OFFLINE,
-      section: z.auth.AuthView.SECTION.POSTED
+      section: z.auth.AuthView.SECTION.POSTED,
     };
 
     this.switch_ui(switch_params);
@@ -1466,7 +1466,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
     const switch_params = {
       mode: z.auth.AuthView.MODE.POSTED_PENDING,
-      section: z.auth.AuthView.SECTION.POSTED
+      section: z.auth.AuthView.SECTION.POSTED,
     };
 
     this.switch_ui(switch_params);
@@ -1477,7 +1477,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
     const switch_params = {
       mode: z.auth.AuthView.MODE.POSTED_RESEND,
-      section: z.auth.AuthView.SECTION.POSTED
+      section: z.auth.AuthView.SECTION.POSTED,
     };
 
     this.switch_ui(switch_params);
@@ -1488,7 +1488,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
     const switch_params = {
       mode: z.auth.AuthView.MODE.POSTED_RETRY,
-      section: z.auth.AuthView.SECTION.POSTED
+      section: z.auth.AuthView.SECTION.POSTED,
     };
 
     this.switch_ui(switch_params);
@@ -1499,7 +1499,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
     const switch_params = {
       mode: z.auth.AuthView.MODE.POSTED_VERIFY,
-      section: z.auth.AuthView.SECTION.POSTED
+      section: z.auth.AuthView.SECTION.POSTED,
     };
 
     this.switch_ui(switch_params);
@@ -1509,7 +1509,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     const switch_params = {
       focus: 'wire-verify-account-email',
       mode: z.auth.AuthView.MODE.VERIFY_ACCOUNT,
-      section: z.auth.AuthView.SECTION.VERIFY
+      section: z.auth.AuthView.SECTION.VERIFY,
     };
 
     this.switch_ui(switch_params);
@@ -1519,7 +1519,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     const switch_params = {
       focus: 'wire-verify-code-digit-1',
       mode: z.auth.AuthView.MODE.VERIFY_CODE,
-      section: z.auth.AuthView.SECTION.VERIFY
+      section: z.auth.AuthView.SECTION.VERIFY,
     };
 
     this.switch_ui(switch_params);
@@ -1530,7 +1530,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     const switch_params = {
       focus: 'wire-verify-password-input',
       mode: z.auth.AuthView.MODE.VERIFY_PASSWORD,
-      section: z.auth.AuthView.SECTION.VERIFY
+      section: z.auth.AuthView.SECTION.VERIFY,
     };
 
     this.switch_ui(switch_params);
@@ -1576,7 +1576,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       animation_params = {
         direction: direction,
         section: switch_params.section,
-        type: z.auth.AuthView.TYPE.SECTION
+        type: z.auth.AuthView.TYPE.SECTION,
       };
       this._shift_ui(animation_params);
     }
@@ -1587,7 +1587,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
         direction: direction,
         section: switch_params.section,
         selector: switch_params.mode,
-        type: z.auth.AuthView.TYPE.FORM
+        type: z.auth.AuthView.TYPE.FORM,
       };
       this._shift_ui(animation_params);
     }
@@ -1622,11 +1622,11 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
   _shift_ui(animation_params) {
     const old_component = $(`.${animation_params.type}:visible`);
     let new_component = $(
-      `#${animation_params.type}-${animation_params.section}`
+      `#${animation_params.type}-${animation_params.section}`,
     );
     if (animation_params.selector) {
       new_component = $(
-        `#${animation_params.type}-${animation_params.section}-${animation_params.selector}`
+        `#${animation_params.type}-${animation_params.section}-${animation_params.selector}`,
       );
     }
     new_component.show();
@@ -1645,7 +1645,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     if (!animation_params.direction) {
       old_component.css({
         display: '',
-        opacity: ''
+        opacity: '',
       });
       new_component.css({opacity: 1});
       _change_visible();
@@ -1664,10 +1664,10 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
                   resolve();
                   $(this).css({
                     display: '',
-                    opacity: ''
+                    opacity: '',
                   });
                 });
-            })
+            }),
           );
         }
 
@@ -1680,7 +1680,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
                   resolve();
                   $(this).css({opacity: 1});
                 });
-            })
+            }),
           );
         }
 
@@ -1696,10 +1696,10 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     $(`.${type}`)
       .off(z.util.alias.animationend)
       .removeClass((index, css) =>
-        (css.match(/\boutgoing-\S+/g) || []).join(' ')
+        (css.match(/\boutgoing-\S+/g) || []).join(' '),
       )
       .removeClass((index, css) =>
-        (css.match(/\bincoming-\S+/g) || []).join(' ')
+        (css.match(/\bincoming-\S+/g) || []).join(' '),
       );
   }
 
@@ -1891,7 +1891,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
   _get_error_by_type(type) {
     return ko.utils.arrayFirst(
       this.validation_errors(),
-      ({types: error_types}) => error_types.includes(type)
+      ({types: error_types}) => error_types.includes(type),
     );
   }
 
@@ -1969,14 +1969,14 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     if (!username.length) {
       return this._add_error(
         z.string.auth_error_email_missing,
-        z.auth.AuthView.TYPE.EMAIL
+        z.auth.AuthView.TYPE.EMAIL,
       );
     }
 
     if (!z.util.is_valid_email(username)) {
       this._add_error(
         z.string.auth_error_email_malformed,
-        z.auth.AuthView.TYPE.EMAIL
+        z.auth.AuthView.TYPE.EMAIL,
       );
     }
   }
@@ -1997,7 +1997,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
     const email_modes = [
       z.auth.AuthView.MODE.ACCOUNT_REGISTER,
-      z.auth.AuthView.MODE.VERIFY_ACCOUNT
+      z.auth.AuthView.MODE.VERIFY_ACCOUNT,
     ];
     if (email_modes.includes(mode)) {
       this._validate_email();
@@ -2007,7 +2007,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       z.auth.AuthView.MODE.ACCOUNT_PASSWORD,
       z.auth.AuthView.MODE.ACCOUNT_REGISTER,
       z.auth.AuthView.MODE.VERIFY_ACCOUNT,
-      z.auth.AuthView.MODE.VERIFY_PASSWORD
+      z.auth.AuthView.MODE.VERIFY_PASSWORD,
     ];
     if (password_modes.includes(mode)) {
       this._validate_password(mode);
@@ -2019,7 +2019,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
     const phone_modes = [
       z.auth.AuthView.MODE.ACCOUNT_PHONE,
-      z.auth.AuthView.MODE.VERIFY_PASSWORD
+      z.auth.AuthView.MODE.VERIFY_PASSWORD,
     ];
     if (phone_modes.includes(mode)) {
       this._validate_phone();
@@ -2037,7 +2037,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     if (this.name().length < z.user.UserRepository.CONFIG.MINIMUM_NAME_LENGTH) {
       return this._add_error(
         z.string.auth_error_name_short,
-        z.auth.AuthView.TYPE.NAME
+        z.auth.AuthView.TYPE.NAME,
       );
     }
   }
@@ -2054,12 +2054,12 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       if (mode === z.auth.AuthView.MODE.ACCOUNT_PASSWORD) {
         return this._add_error(
           z.string.auth_error_password_wrong,
-          z.auth.AuthView.TYPE.PASSWORD
+          z.auth.AuthView.TYPE.PASSWORD,
         );
       }
       this._add_error(
         z.string.auth_error_password_short,
-        z.auth.AuthView.TYPE.PASSWORD
+        z.auth.AuthView.TYPE.PASSWORD,
       );
     }
   }
@@ -2073,7 +2073,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     if (!z.util.is_valid_phone_number(this.phone_number_e164())) {
       this._add_error(
         z.string.auth_error_phone_number_invalid,
-        z.auth.AuthView.TYPE.PHONE
+        z.auth.AuthView.TYPE.PHONE,
       );
     }
   }
@@ -2089,13 +2089,13 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     if (!username.length) {
       return this._add_error(
         z.string.auth_error_email_missing,
-        z.auth.AuthView.TYPE.EMAIL
+        z.auth.AuthView.TYPE.EMAIL,
       );
     }
 
     const phone = z.util.phone_number_to_e164(
       username,
-      this.country() || navigator.language
+      this.country() || navigator.language,
     );
     if (
       !z.util.is_valid_email(username) &&
@@ -2104,7 +2104,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     ) {
       this._add_error(
         z.string.auth_error_email_malformed,
-        z.auth.AuthView.TYPE.EMAIL
+        z.auth.AuthView.TYPE.EMAIL,
       );
     }
   }
@@ -2138,8 +2138,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
         z.event.WebApp.ANALYTICS.EVENT,
         z.tracking.EventName.REGISTRATION.SUCCEEDED,
         {
-          content: this.registration_context
-        }
+          content: this.registration_context,
+        },
       );
     }
     this._authentication_successful();
@@ -2152,7 +2152,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
    */
   _append_existing_parameters(url) {
     AuthViewModel.CONFIG.FORWARDED_URL_PARAMETERS.forEach(function(
-      parameter_name
+      parameter_name,
     ) {
       url = z.util.forward_url_parameter(url, parameter_name);
     });
@@ -2181,11 +2181,11 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
         this.logger.info(
           `No valid local client found: ${error.message}`,
-          error
+          error,
         );
         if (error.type === z.client.ClientError.TYPE.MISSING_ON_BACKEND) {
           this.logger.info(
-            'Local client rejected as invalid by backend. Reinitializing storage.'
+            'Local client rejected as invalid by backend. Reinitializing storage.',
           );
           return this.storage_service.init(this.self_user().id);
         }
@@ -2263,14 +2263,14 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       .then(client_observable => {
         this.event_repository.current_client = client_observable;
         return this.event_repository.initialize_last_notification_id(
-          client_observable().id
+          client_observable().id,
         );
       })
       .catch(error => {
         if (error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
           return this.logger.warn(
             `Cannot set starting point on notification stream: ${error.message}`,
-            error
+            error,
           );
         }
         throw error;
@@ -2282,7 +2282,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
         const number_of_clients = client_ets ? client_ets.length : 0;
         this.logger.info(
           `User has '${number_of_clients}' registered clients`,
-          client_ets
+          client_ets,
         );
 
         // Show history screen if there are already registered clients
@@ -2305,13 +2305,13 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
         if (error.type === z.client.ClientError.TYPE.TOO_MANY_CLIENTS) {
           this.logger.warn(
             'User has already registered the maximum number of clients',
-            error
+            error,
           );
           return (window.location.hash = z.auth.AuthView.MODE.LIMIT);
         }
         this.logger.error(
           `Failed to register a new client: ${error.message}`,
-          error
+          error,
         );
       });
   }
@@ -2331,7 +2331,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     amplify.publish(
       z.event.WebApp.ANALYTICS.EVENT,
       z.tracking.EventName.APP_LAUNCH,
-      {mechanism}
+      {mechanism},
     );
   }
 };
@@ -2351,5 +2351,5 @@ $.fn.extend({
         $(this).focus();
       }, 0);
     });
-  }
+  },
 });

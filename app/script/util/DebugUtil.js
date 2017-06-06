@@ -27,7 +27,7 @@ z.util.DebugUtil = class DebugUtil {
     this.conversation_repository = conversation_repository;
     this.logger = new z.util.Logger(
       'z.util.DebugUtil',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
     this.user_repository = user_repository;
   }
@@ -50,13 +50,13 @@ z.util.DebugUtil = class DebugUtil {
           created: Date.now(),
           id: session_id,
           serialised: cryptobox_session.session.serialise(),
-          version: 'broken_by_qa'
+          version: 'broken_by_qa',
         };
 
         return wire.app.repository.storage.storage_service.save(
           z.storage.StorageService.OBJECT_STORE.SESSIONS,
           session_id,
-          record
+          record,
         );
       })
       .then(() => {
@@ -95,11 +95,11 @@ z.util.DebugUtil = class DebugUtil {
         this.logger.warn(log_message, debug_information);
         this.logger.warn(
           `Conversation: ${debug_information.conversation.name()}`,
-          debug_information.conversation
+          debug_information.conversation,
         );
         this.logger.warn(
           `From: ${debug_information.user.name()}`,
-          debug_information.user
+          debug_information.user,
         );
         return debug_information;
       });
@@ -110,7 +110,7 @@ z.util.DebugUtil = class DebugUtil {
       .load('sessions', session_id)
       .then(function(record) {
         const base64_encoded_payload = z.util.array_to_base64(
-          record.serialised
+          record.serialised,
         );
         record.serialised = base64_encoded_payload;
         return record;
@@ -122,7 +122,7 @@ z.util.DebugUtil = class DebugUtil {
       .load('keys', 'local_identity')
       .then(function(record) {
         const base64_encoded_payload = z.util.array_to_base64(
-          record.serialised
+          record.serialised,
         );
         record.serialised = base64_encoded_payload;
         return record;
@@ -134,7 +134,7 @@ z.util.DebugUtil = class DebugUtil {
 
     const _got_notifications = ({has_more, notifications}) => {
       const matching_notifications = notifications.filter(
-        notification => notification.id === notification_id
+        notification => notification.id === notification_id,
       );
       if (matching_notifications.length) {
         return matching_notifications[0];
@@ -144,11 +144,11 @@ z.util.DebugUtil = class DebugUtil {
         const last_notification = notifications[notifications.length - 1];
         return this.get_notification_from_stream(
           notification_id,
-          last_notification.id
+          last_notification.id,
         );
       }
       this.logger.log(
-        `Notification '${notification_id}' was not found in encrypted notification stream`
+        `Notification '${notification_id}' was not found in encrypted notification stream`,
       );
     };
 
@@ -161,7 +161,7 @@ z.util.DebugUtil = class DebugUtil {
     remote_user_id,
     remote_client_id,
     matching_notifications,
-    notification_id_since
+    notification_id_since,
   ) {
     if (matching_notifications == null) {
       matching_notifications = [];
@@ -171,7 +171,7 @@ z.util.DebugUtil = class DebugUtil {
 
     const _got_notifications = ({has_more, notifications}) => {
       const additional_notifications = notifications.filter(function(
-        notification
+        notification,
       ) {
         const {payload} = notification;
         for (const {data, from} of payload) {
@@ -188,7 +188,7 @@ z.util.DebugUtil = class DebugUtil {
       });
 
       matching_notifications = matching_notifications.concat(
-        additional_notifications
+        additional_notifications,
       );
       if (has_more) {
         const last_notification = notifications[notifications.length - 1];
@@ -196,12 +196,12 @@ z.util.DebugUtil = class DebugUtil {
           remote_user_id,
           remote_client_id,
           matching_notifications,
-          last_notification.id
+          last_notification.id,
         );
       }
       this.logger.log(
         `Found '${matching_notifications.length}' notification between '${local_client_id}' and '${remote_client_id}'`,
-        matching_notifications
+        matching_notifications,
       );
       return matching_notifications;
     };
@@ -218,12 +218,12 @@ z.util.DebugUtil = class DebugUtil {
     return Promise.all([
       this.get_notification_from_stream(notification_id.toLowerCase()),
       this.get_serialised_identity(),
-      this.get_serialised_session(session_id.toLowerCase())
+      this.get_serialised_session(session_id.toLowerCase()),
     ]).then(resolve_array => {
       return JSON.stringify({
         identity: resolve_array[1],
         notification: resolve_array[0],
-        session: resolve_array[2]
+        session: resolve_array[2],
       });
     });
   }
@@ -232,18 +232,18 @@ z.util.DebugUtil = class DebugUtil {
     return Promise.all([
       this.get_notifications_from_stream(remote_user_id, remote_client_id),
       this.get_serialised_identity(),
-      this.get_serialised_session(`${remote_user_id}@${remote_client_id}`)
+      this.get_serialised_session(`${remote_user_id}@${remote_client_id}`),
     ]).then(resolve_array => {
       return JSON.stringify({
         identity: resolve_array[1],
         notifications: resolve_array[0],
-        session: resolve_array[2]
+        session: resolve_array[2],
       });
     });
   }
 
   get_v2_call_participants(
-    conversation_id = wire.app.repository.conversation.active_conversation().id
+    conversation_id = wire.app.repository.conversation.active_conversation().id,
   ) {
     return wire.app.service.call.get_state(conversation_id).then(response => {
       const participants = [];
@@ -257,12 +257,12 @@ z.util.DebugUtil = class DebugUtil {
 
       this.logger.debug(
         `Call in '${conversation_id}' has '${participants.length}' joined participant/s`,
-        participants
+        participants,
       );
 
       for (const participant of participants) {
         this.logger.log(
-          `User '${participant.name()}' with ID '${participant.id}' has state 'joined'.`
+          `User '${participant.name()}' with ID '${participant.id}' has state 'joined'.`,
         );
       }
     });
@@ -272,11 +272,11 @@ z.util.DebugUtil = class DebugUtil {
     this.logger.log('Online Status');
     this.logger.log(`-- Browser online: ${window.navigator.onLine}`);
     this.logger.log(
-      `-- IndexedDB open: ${wire.app.repository.storage.storage_service.db.isOpen()}`
+      `-- IndexedDB open: ${wire.app.repository.storage.storage_service.db.isOpen()}`,
     );
     this.logger.log(
       `-- WebSocket ready state: ${window.wire.app.service.web_socket.socket
-        .readyState}`
+        .readyState}`,
     );
   }
 };

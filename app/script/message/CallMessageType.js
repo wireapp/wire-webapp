@@ -28,5 +28,5 @@ window.z.message = z.message || {};
  */
 z.message.CALL_MESSAGE_TYPE = {
   ACTIVATED: 'activated',
-  DEACTIVATED: 'deactivated'
+  DEACTIVATED: 'deactivated',
 };
