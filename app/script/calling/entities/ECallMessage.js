@@ -111,8 +111,6 @@ z.calling.entities.ECallMessage = class ECallMessage {
    * @returns {string} Random char session ID of length ECallMessage.CONFIG.SESSION_ID_LENGTH
    */
   _create_session_id() {
-    return _.range(ECallMessage.CONFIG.SESSION_ID_LENGTH)
-      .map(() => z.util.StringUtil.get_random_character())
-      .join('');
+    return _.range(ECallMessage.CONFIG.SESSION_ID_LENGTH).map(() => z.util.StringUtil.get_random_character()).join('');
   }
 };

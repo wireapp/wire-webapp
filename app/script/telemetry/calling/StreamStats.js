@@ -23,8 +23,7 @@ window.z = window.z || {};
 window.z.telemetry = z.telemetry || {};
 window.z.telemetry.calling = z.telemetry.calling || {};
 
-z.telemetry.calling.StreamStats = class StreamStats extends z.telemetry.calling
-  .Stats {
+z.telemetry.calling.StreamStats = class StreamStats extends z.telemetry.calling.Stats {
   /**
    * Construct a new stream stats report.
    * @param {Date} timestamp - Creation date
