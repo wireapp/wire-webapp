@@ -55,17 +55,12 @@ rules:
   func-call-spacing: 2
   handle-callback-err: 2
   id-length: [2, {exceptions: ['z']}]
-  indent: [2, 2, {SwitchCase: 1}]
   jsdoc/require-hyphen-before-param-description: 2
-  key-spacing: 2
-  keyword-spacing: 2
   no-console: 0
   no-const-assign: 2
   no-dupe-class-members: 2
   no-else-return: 2
   no-lonely-if: 2
-  no-multi-spaces: 2
-  no-multiple-empty-lines: [2, {max: 2, maxBOF: 0, maxEOF: 0}]
   no-shadow: 2
   no-unused-expressions: 2
   no-unused-vars: [2, {args: none}]
