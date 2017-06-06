@@ -420,7 +420,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   unblocked_user(user_et) {
     this.get_one_to_one_conversation(user_et)
-      .then((conversation_et) => conversation_et.status(z.conversation.ConversationStatus.PAST_MEMBER));
+      .then((conversation_et) => conversation_et.status(z.conversation.ConversationStatus.CURRENT_MEMBER));
   }
 
   /**
@@ -1106,6 +1106,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
             amplify.publish(z.event.WebApp.EVENT.INJECT, member_leave_event, false);
           }
         } else {
+          conversation_et.status(z.conversation.ConversationStatus.PAST_MEMBER);
           this._delete_conversation(conversation_et);
         }
       });
