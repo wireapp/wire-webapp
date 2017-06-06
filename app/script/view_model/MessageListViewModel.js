@@ -363,7 +363,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
    */
   _focus_message(message_et) {
     const message_element = $(`.message[data-uie-uid=\"${message_et.id}\"]`);
-  
+
     if (message_element.length) {
       const message_list_element = $('.messages-wrap');
       message_list_element.scroll_by(message_element.offset().top - (message_list_element.height() / 2));

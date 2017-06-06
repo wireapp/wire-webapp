@@ -125,6 +125,12 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
       this.is_resetting_session(false);
     });
 
+    this.show_back_button = ko.pureComputed(() => {
+      if (typeof this.conversation === 'function') {
+        return this.conversation().is_group() || this.conversation().is_team_group();
+      }
+    });
+
     this.selected_device_subscription = this.selected_device.subscribe(() => {
       if (this.selected_device()) {
         this.fingerprint_local(this.cryptography_repository.get_local_fingerprint());

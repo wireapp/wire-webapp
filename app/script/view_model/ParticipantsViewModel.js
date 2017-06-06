@@ -34,6 +34,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.add_people = this.add_people.bind(this);
     this.block = this.block.bind(this);
     this.close = this.close.bind(this);
+    this.click_on_participant = this.click_on_participant.bind(this);
     this.connect = this.connect.bind(this);
     this.leave_conversation = this.leave_conversation.bind(this);
     this.on_search_close = this.on_search_close.bind(this);
@@ -57,6 +58,8 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.active_team = this.team_repository.active_team;
 
     this.render_participants = ko.observable(false);
+
+    this.group_mode = ko.observable(false);
 
     this.participants = ko.observableArray();
     this.participants_verified = ko.observableArray();
@@ -162,9 +165,14 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     amplify.subscribe(z.event.WebApp.PEOPLE.TOGGLE, this.toggle_participants_bubble.bind(this));
   }
 
-  show_participant(user_et) {
+  click_on_participant(user_et) {
+    this.show_participant(user_et, true);
+  }
+
+  show_participant(user_et, group_mode = false) {
     if (user_et) {
       this.user_profile(user_et);
+      this.group_mode(group_mode);
     }
   }
 
