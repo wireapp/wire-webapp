@@ -26,9 +26,13 @@ describe('z.util.DebugUtil', function() {
   const test_factory = new TestFactory();
 
   beforeAll(function(done) {
-    test_factory.exposeConversationActors()
+    test_factory
+      .exposeConversationActors()
       .then(function(conversation_repository) {
-        debug_util = new z.util.DebugUtil(TestFactory.user_repository, conversation_repository);
+        debug_util = new z.util.DebugUtil(
+          TestFactory.user_repository,
+          conversation_repository,
+        );
         done();
       })
       .catch(done.fail);
@@ -54,7 +58,9 @@ describe('z.util.DebugUtil', function() {
       const second_user_et = new z.entity.User();
       second_user_et.devices.push(third_client);
 
-      const conversation_et = conversation_repository.conversation_mapper.map_conversation(entities.conversation);
+      const conversation_et = conversation_repository.conversation_mapper.map_conversation(
+        entities.conversation,
+      );
       conversation_et.participating_user_ets.push(user_et);
       conversation_et.participating_user_ets.push(second_user_et);
 
@@ -63,6 +69,5 @@ describe('z.util.DebugUtil', function() {
 
       const amount = debug_util.get_number_of_clients_in_conversation();
       expect(amount).toBe(4);
-    })
-  );
+    }));
 });

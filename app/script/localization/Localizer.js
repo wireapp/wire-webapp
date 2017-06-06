@@ -27,10 +27,15 @@ class Localizer {
     const DEFAULT_LOCALE = 'en';
     const query_param = z.util.get_url_parameter(z.auth.URLParameter.LOCALE);
     const current_browser_locale = navigator.language.substr(0, 2);
-    let stored_locale = z.util.StorageUtil.get_value(z.storage.StorageKey.LOCALIZATION.LOCALE);
+    let stored_locale = z.util.StorageUtil.get_value(
+      z.storage.StorageKey.LOCALIZATION.LOCALE,
+    );
 
     if (query_param) {
-      stored_locale = z.util.StorageUtil.set_value(z.storage.StorageKey.LOCALIZATION.LOCALE, query_param);
+      stored_locale = z.util.StorageUtil.set_value(
+        z.storage.StorageKey.LOCALIZATION.LOCALE,
+        query_param,
+      );
     }
 
     this.locale = stored_locale || current_browser_locale || DEFAULT_LOCALE;
@@ -79,7 +84,6 @@ class Localizer {
 z.localization.Localizer = new Localizer();
 
 z.l10n = (() => {
-
   function replaceWithString(string, substitute) {
     return string.replace(/{{\w+}}/, substitute);
   }
@@ -87,14 +91,16 @@ z.l10n = (() => {
   function replaceWithObject(string, substitute) {
     for (const identifier in substitute) {
       if (substitute.hasOwnProperty(identifier)) {
-        string = string.replace(new RegExp(`{{${identifier}}}`, 'g'), substitute[identifier]);
+        string = string.replace(
+          new RegExp(`{{${identifier}}}`, 'g'),
+          substitute[identifier],
+        );
       }
     }
     return string;
   }
 
   return {
-
     /**
      * Retrieve localized string and replace placeholders
      *
@@ -122,47 +128,67 @@ z.l10n = (() => {
       return string;
     },
   };
-
 })();
 
 ko.bindingHandlers.l10n_href = {
   update(element, valueAccessor) {
-    element.setAttribute('href', z.localization.Localizer.get_text(valueAccessor()));
+    element.setAttribute(
+      'href',
+      z.localization.Localizer.get_text(valueAccessor()),
+    );
   },
 };
 
 ko.bindingHandlers.l10n_input = {
   update(element, valueAccessor) {
-    element.setAttribute('value', z.localization.Localizer.get_text(valueAccessor()));
+    element.setAttribute(
+      'value',
+      z.localization.Localizer.get_text(valueAccessor()),
+    );
   },
 };
 
 ko.bindingHandlers.l10n_placeholder = {
   update(element, valueAccessor) {
-    element.setAttribute('placeholder', z.localization.Localizer.get_text(valueAccessor()));
+    element.setAttribute(
+      'placeholder',
+      z.localization.Localizer.get_text(valueAccessor()),
+    );
   },
 };
 
 ko.bindingHandlers.l10n_text = {
   update(element, valueAccessor) {
-    ko.utils.setTextContent(element, z.localization.Localizer.get_text(valueAccessor()));
+    ko.utils.setTextContent(
+      element,
+      z.localization.Localizer.get_text(valueAccessor()),
+    );
   },
 };
 
 ko.bindingHandlers.l10n_html = {
   update(element, valueAccessor) {
-    ko.utils.setHtml(element, z.localization.Localizer.get_text(valueAccessor()));
+    ko.utils.setHtml(
+      element,
+      z.localization.Localizer.get_text(valueAccessor()),
+    );
   },
 };
 
 ko.bindingHandlers.l10n_tooltip = {
   update(element, valueAccessor) {
-    element.setAttribute('title', z.localization.Localizer.get_text(valueAccessor()));
+    element.setAttribute(
+      'title',
+      z.localization.Localizer.get_text(valueAccessor()),
+    );
   },
 };
 
 ko.bindingHandlers.l10n_aria_label = {
   update(element, valueAccessor) {
-    element.setAttribute('aria-label', z.localization.Localizer.get_text(valueAccessor()));
+    element.setAttribute(
+      'aria-label',
+      z.localization.Localizer.get_text(valueAccessor()),
+    );
   },
 };

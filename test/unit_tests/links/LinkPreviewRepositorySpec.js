@@ -32,11 +32,14 @@ describe('z.links.LinkPreviewRepository', function() {
 
   describe('get_link_preview', function() {
     beforeEach(function() {
-      spyOn(link_preview_repository, '_fetch_open_graph_data').and.returnValue(Promise.resolve());
+      spyOn(link_preview_repository, '_fetch_open_graph_data').and.returnValue(
+        Promise.resolve(),
+      );
     });
 
     it('should reject if open graph lib is not available', function(done) {
-      link_preview_repository.get_link_preview()
+      link_preview_repository
+        .get_link_preview()
         .then(done.fail)
         .catch(function(error) {
           expect(error.type).toBe(z.links.LinkPreviewError.TYPE.NOT_SUPPORTED);
@@ -44,14 +47,21 @@ describe('z.links.LinkPreviewRepository', function() {
         });
     });
 
-    it('should fetch open graph data if openGraph lib is available', function(done) {
+    it('should fetch open graph data if openGraph lib is available', function(
+      done,
+    ) {
       window.openGraph = {};
 
-      link_preview_repository.get_link_preview()
+      link_preview_repository
+        .get_link_preview()
         .then(done.fail)
         .catch(function(error) {
-          expect(link_preview_repository._fetch_open_graph_data).toHaveBeenCalled();
-          expect(error.type).toBe(z.links.LinkPreviewError.TYPE.NO_DATA_AVAILABLE);
+          expect(
+            link_preview_repository._fetch_open_graph_data,
+          ).toHaveBeenCalled();
+          expect(error.type).toBe(
+            z.links.LinkPreviewError.TYPE.NO_DATA_AVAILABLE,
+          );
           done();
         });
     });
@@ -59,7 +69,8 @@ describe('z.links.LinkPreviewRepository', function() {
     it('should reject if link is blacklisted', function(done) {
       window.openGraph = {};
 
-      link_preview_repository.get_link_preview('youtube.com')
+      link_preview_repository
+        .get_link_preview('youtube.com')
         .then(done.fail)
         .catch(function(error) {
           expect(error.type).toBe(z.links.LinkPreviewError.TYPE.BLACKLISTED);

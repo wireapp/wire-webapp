@@ -96,8 +96,7 @@ describe('z.entity.User', function() {
       user_et.add_client(second_client);
 
       expect(user_et.devices().length).toBe(2);
-    })
-  );
+    }));
 
   describe('accent_theme', () =>
     it('can change the accent theme', function() {
@@ -126,8 +125,7 @@ describe('z.entity.User', function() {
 
       user_et.accent_id(undefined);
       expect(user_et.accent_theme()).toBe(z.entity.User.THEME.BLUE);
-    })
-  );
+    }));
 
   describe('accent_color', () =>
     it('can change the accent color', function() {
@@ -156,6 +154,5 @@ describe('z.entity.User', function() {
 
       user_et.accent_id(undefined);
       expect(user_et.accent_color()).toBe(z.entity.User.ACCENT_COLOR.BLUE);
-    })
-  );
+    }));
 });

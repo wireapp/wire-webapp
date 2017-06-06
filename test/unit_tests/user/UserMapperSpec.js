@@ -84,8 +84,7 @@ describe('User Mapper', function() {
       expect(user_et.is_me).toBeTruthy();
       expect(user_et.locale).toBe('en');
       expect(user_et.accent_id()).toBe(z.config.ACCENT_ID.YELLOW);
-    })
-  );
+    }));
 
   describe('map_users_from_object', function() {
     it('can convert JSON into multiple user entities', function() {
@@ -112,7 +111,7 @@ describe('User Mapper', function() {
     it('can update the accent color', function() {
       const user_et = new z.entity.User();
       user_et.id = entities.user.john_doe.id;
-      const data = {'accent_id': 1, 'id': entities.user.john_doe.id};
+      const data = {accent_id: 1, id: entities.user.john_doe.id};
       const updated_user_et = mapper.update_user_from_object(user_et, data);
       expect(updated_user_et.accent_id()).toBe(z.config.ACCENT_ID.BLUE);
     });
@@ -120,7 +119,10 @@ describe('User Mapper', function() {
     it('can update the user name', function() {
       const user_et = new z.entity.User();
       user_et.id = entities.user.john_doe.id;
-      const data = {'id': entities.user.john_doe.id, 'name': entities.user.jane_roe.name};
+      const data = {
+        id: entities.user.john_doe.id,
+        name: entities.user.jane_roe.name,
+      };
       const updated_user_et = mapper.update_user_from_object(user_et, data);
       expect(updated_user_et.name()).toBe(entities.user.jane_roe.name);
     });
@@ -128,7 +130,10 @@ describe('User Mapper', function() {
     it('can update the user handle', function() {
       const user_et = new z.entity.User();
       user_et.id = entities.user.john_doe.id;
-      const data = {'handle': entities.user.jane_roe.handle, 'id': entities.user.john_doe.id};
+      const data = {
+        handle: entities.user.jane_roe.handle,
+        id: entities.user.john_doe.id,
+      };
       const updated_user_et = mapper.update_user_from_object(user_et, data);
       expect(updated_user_et.username()).toBe(entities.user.jane_roe.handle);
     });
@@ -136,7 +141,10 @@ describe('User Mapper', function() {
     it('cannot update the user name of a wrong user', function() {
       const user_et = new z.entity.User();
       user_et.id = entities.user.john_doe.id;
-      const data = {'id': entities.user.jane_roe.id, 'name': entities.user.jane_roe.name};
+      const data = {
+        id: entities.user.jane_roe.id,
+        name: entities.user.jane_roe.name,
+      };
       const func = () => mapper.update_user_from_object(user_et, data);
       expect(func).toThrow();
     });
@@ -145,12 +153,12 @@ describe('User Mapper', function() {
       const user_et = new z.entity.User();
       user_et.id = entities.user.john_doe.id;
       const data = {
-        'assets': [
+        assets: [
           {key: z.util.create_random_uuid(), size: 'preview', type: 'image'},
           {key: z.util.create_random_uuid(), size: 'complete', type: 'image'},
         ],
-        'id': entities.user.john_doe.id,
-        'name': entities.user.jane_roe.name,
+        id: entities.user.john_doe.id,
+        name: entities.user.jane_roe.name,
       };
       const updated_user_et = mapper.update_user_from_object(user_et, data);
       expect(updated_user_et.preview_picture_resource()).toBeDefined();

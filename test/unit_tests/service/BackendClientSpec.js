@@ -52,7 +52,8 @@ describe('z.service.BackendClient', function() {
     });
 
     it('executes callback when backend status is ok', function(done) {
-      backend_client.execute_on_connectivity()
+      backend_client
+        .execute_on_connectivity()
         .then(function() {
           expect(backend_client.status).toHaveBeenCalled();
           expect(backend_client.status).toHaveBeenCalledTimes(1);
@@ -65,7 +66,8 @@ describe('z.service.BackendClient', function() {
     });
 
     it('executes callback when backend status return an error', function(done) {
-      backend_client.execute_on_connectivity()
+      backend_client
+        .execute_on_connectivity()
         .then(function() {
           expect(backend_client.status).toHaveBeenCalled();
           expect(backend_client.status).toHaveBeenCalledTimes(1);
@@ -78,8 +80,9 @@ describe('z.service.BackendClient', function() {
     });
 
     it('does not execute callback when request times out', function(done) {
-      backend_client.execute_on_connectivity()
-        .then((response) => done.fail(response))
+      backend_client
+        .execute_on_connectivity()
+        .then(response => done.fail(response))
         .catch(done.fail);
 
       jasmine.clock().tick(250);
@@ -91,7 +94,8 @@ describe('z.service.BackendClient', function() {
     });
 
     it('executes callback when it retries after failure', function(done) {
-      backend_client.execute_on_connectivity()
+      backend_client
+        .execute_on_connectivity()
         .then(function() {
           expect(backend_client.status).toHaveBeenCalledTimes(2);
           done();
@@ -106,9 +110,12 @@ describe('z.service.BackendClient', function() {
       server.requests[1].respond(401);
     });
 
-    it('does not execute the callback when it retries after failure and fails again', function(done) {
-      backend_client.execute_on_connectivity()
-        .then((response) => done.fail(response))
+    it('does not execute the callback when it retries after failure and fails again', function(
+      done,
+    ) {
+      backend_client
+        .execute_on_connectivity()
+        .then(response => done.fail(response))
         .catch(done.fail);
 
       jasmine.clock().tick(750);
@@ -143,18 +150,20 @@ describe('z.service.BackendClient', function() {
     });
 
     it('should resolve with the request payload', function(done) {
-      backend_client.send_request(config)
-        .then(done)
-        .catch(done.fail);
+      backend_client.send_request(config).then(done).catch(done.fail);
       server.requests[0].respond(200);
     });
 
     it('should cache the request if it was unauthorized', function(done) {
       const token_refresh = jasmine.createSpy('token_refresh');
-      amplify.subscribe(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, token_refresh);
+      amplify.subscribe(
+        z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW,
+        token_refresh,
+      );
 
-      backend_client.send_request(config)
-        .then((response) => done.fail(response))
+      backend_client
+        .send_request(config)
+        .then(response => done.fail(response))
         .catch(done.fail);
       server.requests[0].respond(401);
 
@@ -165,10 +174,13 @@ describe('z.service.BackendClient', function() {
     });
 
     it('should cache the request if it timed out', function(done) {
-      spyOn(backend_client, 'execute_on_connectivity').and.returnValue(Promise.resolve());
+      spyOn(backend_client, 'execute_on_connectivity').and.returnValue(
+        Promise.resolve(),
+      );
 
-      backend_client.send_request(config)
-        .then((response) => done.fail(response))
+      backend_client
+        .send_request(config)
+        .then(response => done.fail(response))
         .catch(done.fail);
 
       jasmine.clock().tick(150);
@@ -199,7 +211,9 @@ describe('z.service.BackendClient', function() {
       spyOn(backend_client, 'send_request').and.callFake(function(config) {
         expect(config.callback).toBe(original_config.callback);
         expect(config.contentType).toBe('application/json; charset=utf-8');
-        expect(config.headers['X-TEST-HEADER']).toBe(original_config.headers['X-TEST-HEADER']);
+        expect(config.headers['X-TEST-HEADER']).toBe(
+          original_config.headers['X-TEST-HEADER'],
+        );
         expect(config.headers['Content-Encoding']).toBe('gzip');
         expect(config.data).toBeDefined();
         expect(config.processData).toBe(original_config.processData);

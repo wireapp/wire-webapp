@@ -47,7 +47,10 @@ z.components.AudioSeekBarComponent = class AudioSeekBarComponent {
     });
 
     if (this.asset.meta !== null && this.asset.meta.loudness !== null) {
-      this.loudness = this._normalize_loudness(this.asset.meta.loudness, component_info.element.clientHeight);
+      this.loudness = this._normalize_loudness(
+        this.asset.meta.loudness,
+        component_info.element.clientHeight,
+      );
     }
 
     this._on_resize_fired = _.debounce(() => {
@@ -67,31 +70,39 @@ z.components.AudioSeekBarComponent = class AudioSeekBarComponent {
   }
 
   _render_levels() {
-    const number_of_levels_fit_on_screen = Math.floor(this.element.clientWidth / 3); // 2px + 1px
-    const scaled_loudness = z.util.ArrayUtil.interpolate(this.loudness, number_of_levels_fit_on_screen);
+    const number_of_levels_fit_on_screen = Math.floor(
+      this.element.clientWidth / 3,
+    ); // 2px + 1px
+    const scaled_loudness = z.util.ArrayUtil.interpolate(
+      this.loudness,
+      number_of_levels_fit_on_screen,
+    );
 
     $(this.element).empty();
-    scaled_loudness.map((level) => {
-      $('<span>')
-        .height(level)
-        .appendTo(this.element);
+    scaled_loudness.map(level => {
+      $('<span>').height(level).appendTo(this.element);
     });
   }
 
   _normalize_loudness(loudness, max) {
     const peak = Math.max(...loudness);
-    return peak > max ? loudness.map((level) => (level * max) / peak) : loudness;
+    return peak > max ? loudness.map(level => level * max / peak) : loudness;
   }
 
   _on_level_click(event) {
     const mouse_x = event.pageX - $(event.currentTarget).offset().left;
-    this.audio_element.currentTime = (this.audio_element.duration * mouse_x) / event.currentTarget.clientWidth;
+    this.audio_element.currentTime =
+      this.audio_element.duration * mouse_x / event.currentTarget.clientWidth;
     this._on_time_update();
   }
 
   _on_time_update() {
     const $levels = this._clear_theme();
-    const index = Math.floor((this.audio_element.currentTime / this.audio_element.duration) * $levels.length);
+    const index = Math.floor(
+      this.audio_element.currentTime /
+        this.audio_element.duration *
+        $levels.length,
+    );
     this._add_theme(index);
   }
 
@@ -100,17 +111,11 @@ z.components.AudioSeekBarComponent = class AudioSeekBarComponent {
   }
 
   _clear_theme() {
-    return $(this.element)
-      .children()
-      .removeClass('bg-theme');
+    return $(this.element).children().removeClass('bg-theme');
   }
 
   _add_theme(index) {
-    $(this.element)
-      .children()
-      .eq(index)
-      .prevAll()
-      .addClass('bg-theme');
+    $(this.element).children().eq(index).prevAll().addClass('bg-theme');
   }
 
   dispose() {

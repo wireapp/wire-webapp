@@ -23,13 +23,14 @@ window.z = window.z || {};
 window.z.telemetry = z.telemetry || {};
 window.z.telemetry.calling = z.telemetry.calling || {};
 
-z.telemetry.calling.AudioStreamStats = class AudioStreamStats extends z.telemetry.calling.MediaStreamStats {
+z.telemetry.calling.AudioStreamStats = class AudioStreamStats extends z
+  .telemetry.calling.MediaStreamStats {
   /**
    * Construct a new AudioStream stats report.
    * @param {Date} timestamp - Creation date
    * @returns {AudioStreamStats} The new AudioStream stats entity
    */
-  constructor(timestamp) {
+    constructor(timestamp) {
     super(timestamp);
     this.media_type = z.media.MediaType.AUDIO;
     this.volume_received = 0;

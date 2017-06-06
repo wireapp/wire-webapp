@@ -6,6 +6,7 @@
     "coffeelint": "1.16.0",
     "eslint": "3.19.0",
     "eslint-plugin-jsdoc": "3.1.0",
+    "eslint-plugin-prettier": "2.1.1",
     "grunt": "1.0.1",
     "grunt-aws-s3": "1.0.0",
     "grunt-bower-task": "0.4.0",
@@ -35,6 +36,7 @@
     "karma-coverage": "1.1.1",
     "karma-jasmine": "1.1.0",
     "load-grunt-tasks": "3.5.2",
+    "prettier": "1.4.2",
     "request": "2.81.0",
     "sinon": "2.3.1",
     "stylelint": "7.10.1"

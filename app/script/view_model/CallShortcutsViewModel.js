@@ -32,11 +32,14 @@ z.ViewModel.CallShortcutsViewModel = class CallShortcutsViewModel {
     this.on_reject_call = this.on_reject_call.bind(this);
 
     this.calling_repository = calling_repository;
-    this.logger = new z.util.Logger('z.ViewModel.CallShortcutsViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger(
+      'z.ViewModel.CallShortcutsViewModel',
+      z.config.LOGGER.OPTIONS,
+    );
 
     this.joined_call = this.calling_repository.joined_call;
 
-    this.joined_call.subscribe((call_et) => {
+    this.joined_call.subscribe(call_et => {
       this._update_shortcut_subscription(call_et);
     });
   }
@@ -69,12 +72,19 @@ z.ViewModel.CallShortcutsViewModel = class CallShortcutsViewModel {
 
   _unsubscribe_shortcuts() {
     amplify.unsubscribe(z.event.WebApp.SHORTCUT.CALL_MUTE, this.on_mute_call);
-    amplify.unsubscribe(z.event.WebApp.SHORTCUT.CALL_REJECT, this.on_reject_call);
+    amplify.unsubscribe(
+      z.event.WebApp.SHORTCUT.CALL_REJECT,
+      this.on_reject_call,
+    );
   }
 
   on_mute_call() {
     if (this.joined_call()) {
-      amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, this.joined_call().id, z.media.MediaType.AUDIO);
+      amplify.publish(
+        z.event.WebApp.CALL.MEDIA.TOGGLE,
+        this.joined_call().id,
+        z.media.MediaType.AUDIO,
+      );
     }
   }
 

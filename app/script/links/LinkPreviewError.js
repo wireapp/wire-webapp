@@ -26,15 +26,17 @@ z.links.LinkPreviewError = class LinkPreviewError extends Error {
   constructor(type) {
     super();
     this.name = this.constructor.name;
-    this.stack = (new Error()).stack;
+    this.stack = new Error().stack;
     this.type = type || z.links.LinkPreviewError.TYPE.UNKNOWN;
 
     switch (this.type) {
       case z.links.LinkPreviewError.TYPE.NOT_SUPPORTED:
-        this.message = 'Your client cannot render link previews using Open Graph data.';
+        this.message =
+          'Your client cannot render link previews using Open Graph data.';
         break;
       case z.links.LinkPreviewError.TYPE.UNSUPPORTED_TYPE:
-        this.message = 'Open Graph data from the given link does not provide necessary attributes.';
+        this.message =
+          'Open Graph data from the given link does not provide necessary attributes.';
         break;
       case z.links.LinkPreviewError.TYPE.NO_DATA_AVAILABLE:
         this.message = 'Link does not provide Open Graph data.';

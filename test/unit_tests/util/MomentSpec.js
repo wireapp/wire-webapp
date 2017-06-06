@@ -44,21 +44,37 @@ describe('z.util.moment', () => {
 
   describe('is_same_day', () => {
     it('should return true if two dates are from the same day', () => {
-      expect(moment('2011-10-05T14:48:00.000').is_same_day('2011-10-05T12:48:00.000')).toBeTruthy();
+      expect(
+        moment('2011-10-05T14:48:00.000').is_same_day(
+          '2011-10-05T12:48:00.000',
+        ),
+      ).toBeTruthy();
     });
 
     it('should return false if two dates are not from the same day', () => {
-      expect(moment('2011-10-05T14:48:00.000').is_same_day('2011-10-04T12:48:00.000')).toBeFalsy();
+      expect(
+        moment('2011-10-05T14:48:00.000').is_same_day(
+          '2011-10-04T12:48:00.000',
+        ),
+      ).toBeFalsy();
     });
   });
 
   describe('is_same_month', () => {
     it('should return true if two dates are from the same month', () => {
-      expect(moment('2011-10-06T14:48:00.000').is_same_month('2011-10-05T12:48:00.000')).toBeTruthy();
+      expect(
+        moment('2011-10-06T14:48:00.000').is_same_month(
+          '2011-10-05T12:48:00.000',
+        ),
+      ).toBeTruthy();
     });
 
     it('should return false if two dates are not from the same day', () => {
-      expect(moment('2011-11-05T14:48:00.000').is_same_month('2011-10-05T12:48:00.000')).toBeFalsy();
+      expect(
+        moment('2011-11-05T14:48:00.000').is_same_month(
+          '2011-10-05T12:48:00.000',
+        ),
+      ).toBeFalsy();
     });
   });
 });

@@ -48,17 +48,18 @@ z.ViewModel.ModalType = {
   UPLOAD_TOO_LARGE: '.modal-asset-upload-too-large',
 };
 
-
 z.ViewModel.MODAL_CONSENT_TYPE = {
   INCOMING_CALL: 'incoming_call',
   MESSAGE: 'message',
   OUTGOING_CALL: 'outgoing_call',
 };
 
-
 z.ViewModel.ModalsViewModel = class ModalsViewModel {
   constructor(element_id) {
-    this.logger = new z.util.Logger('z.ViewModel.ModalsViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger(
+      'z.ViewModel.ModalsViewModel',
+      z.config.LOGGER.OPTIONS,
+    );
 
     this.modals = {};
 
@@ -92,7 +93,11 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
         this._show_modal_call_full_voice_channel(options.data, message_element);
         break;
       case z.ViewModel.ModalType.CALL_START_ANOTHER:
-        this._show_modal_call_start_another(options.data, title_element, message_element);
+        this._show_modal_call_start_another(
+          options.data,
+          title_element,
+          message_element,
+        );
         break;
       case z.ViewModel.ModalType.CLEAR:
         type = this._show_modal_clear(options, type);
@@ -104,7 +109,12 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
         this._show_modal_leave(options.data, title_element);
         break;
       case z.ViewModel.ModalType.NEW_DEVICE:
-        this._show_modal_new_device(options.data, title_element, message_element, action_element);
+        this._show_modal_new_device(
+          options.data,
+          title_element,
+          message_element,
+          action_element,
+        );
         break;
       case z.ViewModel.ModalType.REMOVE_DEVICE:
         this._show_modal_remove_device(options.data, title_element);
@@ -126,17 +136,11 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
     }
 
     const modal = new zeta.webapp.module.Modal(type, null, function() {
-      $(type)
-        .find('.modal-close')
-        .off('click');
+      $(type).find('.modal-close').off('click');
 
-      $(type)
-        .find('.modal-action')
-        .off('click');
+      $(type).find('.modal-action').off('click');
 
-      $(type)
-        .find('.modal-secondary')
-        .off('click');
+      $(type).find('.modal-secondary').off('click');
 
       modal.destroy();
 
@@ -145,38 +149,32 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
       }
     });
 
-    $(type)
-      .find('.modal-close')
-      .click(() => modal.hide());
+    $(type).find('.modal-close').click(() => modal.hide());
 
-    $(type)
-      .find('.modal-secondary')
-      .click(() => {
-        modal.hide(() => {
-          if (typeof options.secondary === 'function') {
-            options.secondary();
-          }
-        });
-      });
-
-    $(type)
-      .find('.modal-action')
-      .click(function() {
-        const checkbox = $(type).find('.modal-checkbox');
-        const input = $(type).find('.modal-input');
-
-        if (checkbox.length) {
-          options.action(checkbox.is(':checked'));
-          checkbox.prop('checked', false);
-        } else if (input.length) {
-          options.action(input.val());
-          input.val('');
-        } else if (typeof options.action === 'function') {
-          options.action();
+    $(type).find('.modal-secondary').click(() => {
+      modal.hide(() => {
+        if (typeof options.secondary === 'function') {
+          options.secondary();
         }
-
-        modal.hide();
       });
+    });
+
+    $(type).find('.modal-action').click(function() {
+      const checkbox = $(type).find('.modal-checkbox');
+      const input = $(type).find('.modal-input');
+
+      if (checkbox.length) {
+        options.action(checkbox.is(':checked'));
+        checkbox.prop('checked', false);
+      } else if (input.length) {
+        options.action(input.val());
+        input.val('');
+      } else if (typeof options.action === 'function') {
+        options.action();
+      }
+
+      modal.hide();
+    });
 
     if (!modal.is_shown()) {
       this.logger.info(`Show modal of type '${type}'`);
@@ -185,41 +183,49 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
   }
 
   _show_modal_block(content, title_element, message_element) {
-    title_element.text(z.localization.Localizer.get_text({
-      id: z.string.modal_block_conversation_headline,
-      replace: {
-        content: content,
-        placeholder: '%@.name',
-      },
-    }));
+    title_element.text(
+      z.localization.Localizer.get_text({
+        id: z.string.modal_block_conversation_headline,
+        replace: {
+          content: content,
+          placeholder: '%@.name',
+        },
+      }),
+    );
 
-    message_element.text(z.localization.Localizer.get_text({
-      id: z.string.modal_block_conversation_message,
-      replace: {
-        content: content,
-        placeholder: '%@.name',
-      },
-    }));
+    message_element.text(
+      z.localization.Localizer.get_text({
+        id: z.string.modal_block_conversation_message,
+        replace: {
+          content: content,
+          placeholder: '%@.name',
+        },
+      }),
+    );
   }
 
   _show_modal_call_full_conversation(content, message_element) {
-    message_element.text(z.localization.Localizer.get_text({
-      id: z.string.modal_call_conversation_full_message,
-      replace: {
-        content: content,
-        placeholder: '%no',
-      },
-    }));
+    message_element.text(
+      z.localization.Localizer.get_text({
+        id: z.string.modal_call_conversation_full_message,
+        replace: {
+          content: content,
+          placeholder: '%no',
+        },
+      }),
+    );
   }
 
   _show_modal_call_full_voice_channel(content, message_element) {
-    message_element.text(z.localization.Localizer.get_text({
-      id: z.string.modal_call_voice_channel_full_message,
-      replace: {
-        content: content,
-        placeholder: '%no',
-      },
-    }));
+    message_element.text(
+      z.localization.Localizer.get_text({
+        id: z.string.modal_call_voice_channel_full_message,
+        replace: {
+          content: content,
+          placeholder: '%no',
+        },
+      }),
+    );
   }
 
   /**
@@ -234,74 +240,109 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
    * @returns {undefined} No return value
    */
   _show_modal_call_start_another(call_state, title_element, message_element) {
-    const action_element = $(z.ViewModel.ModalType.CALL_START_ANOTHER).find('.modal-action');
+    const action_element = $(z.ViewModel.ModalType.CALL_START_ANOTHER).find(
+      '.modal-action',
+    );
 
-    action_element.text(z.l10n.text(z.string[`modal_call_second_${call_state}_action`]));
-    message_element.text(z.l10n.text(z.string[`modal_call_second_${call_state}_message`]));
-    return title_element.text(z.l10n.text(z.string[`modal_call_second_${call_state}_headline`]));
+    action_element.text(
+      z.l10n.text(z.string[`modal_call_second_${call_state}_action`]),
+    );
+    message_element.text(
+      z.l10n.text(z.string[`modal_call_second_${call_state}_message`]),
+    );
+    return title_element.text(
+      z.l10n.text(z.string[`modal_call_second_${call_state}_headline`]),
+    );
   }
 
   _show_modal_clear(options, type) {
-    if (options.conversation.is_group() && !options.conversation.removed_from_conversation()) {
+    if (
+      options.conversation.is_group() &&
+      !options.conversation.removed_from_conversation()
+    ) {
       type = z.ViewModel.ModalType.CLEAR_GROUP;
     }
 
     const title_element = $(type).find('.modal-title');
-    title_element.text(z.localization.Localizer.get_text({
-      id: z.string.modal_clear_conversation_headline,
-      replace: {
-        content: options.data,
-        placeholder: '%@.name',
-      },
-    }));
+    title_element.text(
+      z.localization.Localizer.get_text({
+        id: z.string.modal_clear_conversation_headline,
+        replace: {
+          content: options.data,
+          placeholder: '%@.name',
+        },
+      }),
+    );
 
     return type;
   }
 
   _show_modal_connected_device(devices) {
-    const devices_element = $(z.ViewModel.ModalType.CONNECTED_DEVICE).find('.modal-connected-devices');
+    const devices_element = $(z.ViewModel.ModalType.CONNECTED_DEVICE).find(
+      '.modal-connected-devices',
+    );
 
     devices_element.empty();
 
-    devices.map((device) => {
+    devices.map(device => {
       $('<div>')
         .text(`${moment(device.time).format('MMMM Do YYYY, HH:mm')} - UTC`)
         .appendTo(devices_element);
 
       $('<div>')
-        .text(`${z.l10n.text(z.string.modal_connected_device_from)} ${device.model}`)
+        .text(
+          `${z.l10n.text(
+            z.string.modal_connected_device_from,
+          )} ${device.model}`,
+        )
         .appendTo(devices_element);
     });
   }
 
   _show_modal_leave(content, title_element) {
-    title_element.text(z.localization.Localizer.get_text({
-      id: z.string.modal_leave_conversation_headline,
-      replace: {
-        content: content,
-        placeholder: '%@.name',
-      },
-    }));
+    title_element.text(
+      z.localization.Localizer.get_text({
+        id: z.string.modal_leave_conversation_headline,
+        replace: {
+          content: content,
+          placeholder: '%@.name',
+        },
+      }),
+    );
   }
 
-  _show_modal_new_device(content, title_element, message_element, action_element) {
+  _show_modal_new_device(
+    content,
+    title_element,
+    message_element,
+    action_element,
+  ) {
     let action_id, message_id;
-    const joined_names = z.util.StringUtil.capitalize_first_char(z.util.LocalizerUtil.join_names(content.user_ets, z.string.Declension.NOMINATIVE));
+    const joined_names = z.util.StringUtil.capitalize_first_char(
+      z.util.LocalizerUtil.join_names(
+        content.user_ets,
+        z.string.Declension.NOMINATIVE,
+      ),
+    );
 
     let string_id;
     if (content.user_ets.length === 1) {
-      string_id = content.user_ets[0].is_me ? z.string.modal_new_device_headline_you : z.string.modal_new_device_headline;
+      string_id = content.user_ets[0].is_me
+        ? z.string.modal_new_device_headline_you
+        : z.string.modal_new_device_headline;
     } else {
       string_id = z.string.modal_new_device_headline_many;
     }
 
-    title_element.text(z.localization.Localizer.get_text({
-      id: string_id,
-      replace: {
-        content: joined_names,
-        placeholder: content.user_ets.length === 1 ? '%@.name' : '%@.names',
-      },
-    }));
+    title_element.text(
+      z.localization.Localizer.get_text({
+        id: string_id,
+        replace: {
+          content: joined_names,
+          placeholder: content.user_ets.length === 1 ? '%@.name' : '%@.names',
+        },
+      }),
+    );
 
     switch (content.consent_type) {
       case z.ViewModel.MODAL_CONSENT_TYPE.INCOMING_CALL:
@@ -322,56 +363,68 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
   }
 
   _show_modal_remove_device(content, title_element) {
-    title_element.text(z.localization.Localizer.get_text({
-      id: z.string.modal_remove_device_headline,
-      replace: {
-        content: content,
-        placeholder: '%device_name',
-      },
-    }));
+    title_element.text(
+      z.localization.Localizer.get_text({
+        id: z.string.modal_remove_device_headline,
+        replace: {
+          content: content,
+          placeholder: '%device_name',
+        },
+      }),
+    );
   }
 
   _show_modal_too_many_members(content, message_element) {
-    message_element.text(z.localization.Localizer.get_text({
-      id: z.string.modal_too_many_members_message,
-      replace: [{
-        content: content.open_spots,
-        placeholder: '%no',
-      },
-      {
-        content: content.max,
-        placeholder: '%max',
-      }],
-    }));
+    message_element.text(
+      z.localization.Localizer.get_text({
+        id: z.string.modal_too_many_members_message,
+        replace: [
+          {
+            content: content.open_spots,
+            placeholder: '%no',
+          },
+          {
+            content: content.max,
+            placeholder: '%max',
+          },
+        ],
+      }),
+    );
   }
 
   _show_modal_upload_parallel(content, title_element) {
-    title_element.text(z.localization.Localizer.get_text({
-      id: z.string.modal_uploads_parallel,
-      replace: {
-        content: content,
-        placeholder: '%no',
-      },
-    }));
+    title_element.text(
+      z.localization.Localizer.get_text({
+        id: z.string.modal_uploads_parallel,
+        replace: {
+          content: content,
+          placeholder: '%no',
+        },
+      }),
+    );
   }
 
   _show_modal_upload_too_large(content, title_element) {
-    title_element.text(z.localization.Localizer.get_text({
-      id: z.string.conversation_asset_upload_too_large,
-      replace: {
-        content: content,
-        placeholder: '%no',
-      },
-    }));
+    title_element.text(
+      z.localization.Localizer.get_text({
+        id: z.string.conversation_asset_upload_too_large,
+        replace: {
+          content: content,
+          placeholder: '%no',
+        },
+      }),
+    );
   }
 
   _show_modal_message_too_long(content, message_element) {
-    message_element.text(z.localization.Localizer.get_text({
-      id: z.string.modal_too_long_message,
-      replace: {
-        content: content,
-        placeholder: '%no',
-      },
-    }));
+    message_element.text(
+      z.localization.Localizer.get_text({
+        id: z.string.modal_too_long_message,
+        replace: {
+          content: content,
+          placeholder: '%no',
+        },
+      }),
+    );
   }
 };

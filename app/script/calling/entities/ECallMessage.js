@@ -23,7 +23,6 @@ window.z = window.z || {};
 window.z.calling = z.calling || {};
 window.z.calling.entities = z.calling.entities || {};
 
-
 z.calling.entities.ECallMessage = class ECallMessage {
   static get CONFIG() {
     return {

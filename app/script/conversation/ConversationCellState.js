@@ -23,9 +23,10 @@ window.z = window.z || {};
 window.z.conversation = z.conversation || {};
 
 z.conversation.ConversationCellState = (() => {
-
   function is_alert(message_et) {
-    return message_et.is_ping() || message_et.is_call() && message_et.was_missed();
+    return (
+      message_et.is_ping() || (message_et.is_call() && message_et.was_missed())
+    );
   }
 
   function generate_activity_string(activities) {
@@ -37,23 +38,47 @@ z.conversation.ConversationCellState = (() => {
       switch (activity) {
         case 'message':
           if (count === 1) {
-            activity_strings.push(z.l10n.text(z.string.conversations_secondary_line_new_message, count));
+            activity_strings.push(
+              z.l10n.text(
+                z.string.conversations_secondary_line_new_message,
+                count,
+              ),
+            );
           } else if (count > 1) {
-            activity_strings.push(z.l10n.text(z.string.conversations_secondary_line_new_messages, count));
+            activity_strings.push(
+              z.l10n.text(
+                z.string.conversations_secondary_line_new_messages,
+                count,
+              ),
+            );
           }
           break;
         case 'ping':
           if (count === 1) {
-            activity_strings.push(z.l10n.text(z.string.conversations_secondary_line_ping, count));
+            activity_strings.push(
+              z.l10n.text(z.string.conversations_secondary_line_ping, count),
+            );
           } else if (count > 1) {
-            activity_strings.push(z.l10n.text(z.string.conversations_secondary_line_pings, count));
+            activity_strings.push(
+              z.l10n.text(z.string.conversations_secondary_line_pings, count),
+            );
           }
           break;
         case 'call':
           if (count === 1) {
-            activity_strings.push(z.l10n.text(z.string.conversations_secondary_line_missed_call, count));
+            activity_strings.push(
+              z.l10n.text(
+                z.string.conversations_secondary_line_missed_call,
+                count,
+              ),
+            );
           } else if (count > 1) {
-            activity_strings.push(z.l10n.text(z.string.conversations_secondary_line_missed_calls, count));
+            activity_strings.push(
+              z.l10n.text(
+                z.string.conversations_secondary_line_missed_calls,
+                count,
+              ),
+            );
           }
           break;
         default:
@@ -66,9 +91,9 @@ z.conversation.ConversationCellState = (() => {
   function accumulate_activity(conversation_et) {
     const unread_events = conversation_et.unread_events();
     const activities = {
-      'call': 0,
-      'message': 0,
-      'ping': 0,
+      call: 0,
+      message: 0,
+      ping: 0,
     };
 
     for (const message_et of unread_events) {
@@ -143,7 +168,10 @@ z.conversation.ConversationCellState = (() => {
       }
     },
     match(conversation_et) {
-      return conversation_et.unread_event_count() > 0 && conversation_et.unread_events().find(is_alert) !== undefined;
+      return (
+        conversation_et.unread_event_count() > 0 &&
+        conversation_et.unread_events().find(is_alert) !== undefined
+      );
     },
   };
 
@@ -157,17 +185,31 @@ z.conversation.ConversationCellState = (() => {
       switch (last_message_et.type) {
         case z.event.Backend.CONVERSATION.MEMBER_LEAVE:
           if (remote_user_count === 1) {
-            message_text = z.l10n.text(z.string.conversations_secondary_line_person_left, remote_user_count);
+            message_text = z.l10n.text(
+              z.string.conversations_secondary_line_person_left,
+              remote_user_count,
+            );
           } else if (remote_user_count > 1) {
-            message_text = z.l10n.text(z.string.conversations_secondary_line_people_left, remote_user_count);
+            message_text = z.l10n.text(
+              z.string.conversations_secondary_line_people_left,
+              remote_user_count,
+            );
           }
           break;
         case z.event.Backend.CONVERSATION.MEMBER_JOIN:
           if (remote_user_count === 1) {
-            const remote_name = last_message_et.remote_user_ets()[0].first_name();
-            message_text = z.l10n.text(z.string.conversations_secondary_line_person_added, {user1: sender_name, user2: remote_name});
+            const remote_name = last_message_et
+              .remote_user_ets()[0]
+              .first_name();
+            message_text = z.l10n.text(
+              z.string.conversations_secondary_line_person_added,
+              {user1: sender_name, user2: remote_name},
+            );
           } else if (remote_user_count > 1) {
-            message_text = z.l10n.text(z.string.conversations_secondary_line_people_added, remote_user_count);
+            message_text = z.l10n.text(
+              z.string.conversations_secondary_line_people_added,
+              remote_user_count,
+            );
           }
           break;
         default:
@@ -185,7 +227,11 @@ z.conversation.ConversationCellState = (() => {
       }
     },
     match(conversation_et) {
-      return conversation_et.is_group() && conversation_et.unread_event_count() > 0 && conversation_et.get_last_message().is_member();
+      return (
+        conversation_et.is_group() &&
+        conversation_et.unread_event_count() > 0 &&
+        conversation_et.get_last_message().is_member()
+      );
     },
   };
 
@@ -195,7 +241,9 @@ z.conversation.ConversationCellState = (() => {
       let message_text = '';
 
       if (last_message_et.is_ephemeral()) {
-        message_text = z.l10n.text(z.string.conversations_secondary_line_timed_message);
+        message_text = z.l10n.text(
+          z.string.conversations_secondary_line_timed_message,
+        );
       } else if (last_message_et.is_ping()) {
         message_text = z.l10n.text(z.string.system_notification_ping);
       } else if (last_message_et.has_asset_text()) {
@@ -210,7 +258,9 @@ z.conversation.ConversationCellState = (() => {
           message_text = z.l10n.text(z.string.system_notification_shared_file);
         }
       } else if (last_message_et.has_asset_location()) {
-        message_text = z.l10n.text(z.string.system_notification_shared_location);
+        message_text = z.l10n.text(
+          z.string.system_notification_shared_location,
+        );
       } else if (last_message_et.has_asset_image()) {
         message_text = z.l10n.text(z.string.system_notification_asset_add);
       }
@@ -231,7 +281,9 @@ z.conversation.ConversationCellState = (() => {
   const pending_state = {
     description(conversation_et) {
       const [participating_user_et] = conversation_et.participating_user_ets();
-      return participating_user_et ? `@${participating_user_et.username()}` : '';
+      return participating_user_et
+        ? `@${participating_user_et.username()}`
+        : '';
     },
     icon() {
       return z.conversation.ConversationStatusIcon.PENDING_CONNECTION;
@@ -242,12 +294,23 @@ z.conversation.ConversationCellState = (() => {
   };
 
   function generate(conversation_et) {
-    const states = [empty_state, removed_state, muted_state, alert_state, group_activity_state, unread_message_state, pending_state];
-    const icon_state = states.find((state) => state.match(conversation_et));
-    const description_state = states.find((state) => state.match(conversation_et));
+    const states = [
+      empty_state,
+      removed_state,
+      muted_state,
+      alert_state,
+      group_activity_state,
+      unread_message_state,
+      pending_state,
+    ];
+    const icon_state = states.find(state => state.match(conversation_et));
+    const description_state = states.find(state =>
+      state.match(conversation_et),
+    );
 
     return {
-      description: (description_state || default_state).description(conversation_et),
+      description: (description_state || default_state)
+        .description(conversation_et),
       icon: (icon_state || default_state).icon(conversation_et),
     };
   }
@@ -255,5 +318,4 @@ z.conversation.ConversationCellState = (() => {
   return {
     generate,
   };
-
 })();

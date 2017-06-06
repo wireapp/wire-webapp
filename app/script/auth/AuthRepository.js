@@ -27,7 +27,8 @@ z.auth.AuthRepository = class AuthRepository {
     return {
       IMMEDIATE: 'AuthRepository.ACCESS_TOKEN_TRIGGER.IMMEDIATE',
       SCHEDULED: 'AuthRepository.ACCESS_TOKEN_TRIGGER.SCHEDULED',
-      UNAUTHORIZED_REQUEST: 'AuthRepository.ACCESS_TOKEN_TRIGGER.UNAUTHORIZED_REQUEST',
+      UNAUTHORIZED_REQUEST:
+        'AuthRepository.ACCESS_TOKEN_TRIGGER.UNAUTHORIZED_REQUEST',
       WEB_SOCKET: 'AuthRepository.ACCESS_TOKEN_TRIGGER.WEB_SOCKET',
     };
   }
@@ -39,8 +40,14 @@ z.auth.AuthRepository = class AuthRepository {
   constructor(auth_service) {
     this.access_token_refresh = undefined;
     this.auth_service = auth_service;
-    this.logger = new z.util.Logger('z.auth.AuthRepository', z.config.LOGGER.OPTIONS);
-    amplify.subscribe(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, this.renew_access_token.bind(this));
+    this.logger = new z.util.Logger(
+      'z.auth.AuthRepository',
+      z.config.LOGGER.OPTIONS,
+    );
+    amplify.subscribe(
+      z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW,
+      this.renew_access_token.bind(this),
+    );
   }
 
   /**
@@ -48,8 +55,9 @@ z.auth.AuthRepository = class AuthRepository {
    * @returns {undefined} No return value
    */
   list_cookies() {
-    this.auth_service.get_cookies()
-      .then((cookies) => {
+    this.auth_service
+      .get_cookies()
+      .then(cookies => {
         this.logger.force_log('Backend cookies:');
         cookies.forEach((cookie, index) => {
           const expiration = z.util.format_timestamp(cookie.time, false);
@@ -57,7 +65,7 @@ z.auth.AuthRepository = class AuthRepository {
           this.logger.force_log(`Cookie No. ${index + 1} | ${log}`);
         });
       })
-      .catch((error) => {
+      .catch(error => {
         this.logger.force_log('Could not list user cookies', error);
       });
   }
@@ -74,13 +82,12 @@ z.auth.AuthRepository = class AuthRepository {
    * @returns {Promise} Promise that resolves with the received access token
    */
   login(login, persist) {
-    return this.auth_service.post_login(login, persist)
-      .then((response) => {
-        this.save_access_token(response);
-        z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.PERSIST, persist);
-        z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.SHOW_LOGIN, true);
-        return response;
-      });
+    return this.auth_service.post_login(login, persist).then(response => {
+      this.save_access_token(response);
+      z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.PERSIST, persist);
+      z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.SHOW_LOGIN, true);
+      return response;
+    });
   }
 
   /**
@@ -88,11 +95,12 @@ z.auth.AuthRepository = class AuthRepository {
    * @returns {Promise} Will always resolve
    */
   logout() {
-    return this.auth_service.post_logout()
+    return this.auth_service
+      .post_logout()
       .then(() => {
         this.logger.info('Log out on backend successful');
       })
-      .catch((error) => {
+      .catch(error => {
         this.logger.warn(`Log out on backend failed: ${error.message}`, error);
       });
   }
@@ -108,17 +116,19 @@ z.auth.AuthRepository = class AuthRepository {
    * @returns {Promise} Resolves on success
    */
   register(new_user) {
-    return this.auth_service.post_register(new_user)
-      .then((response) => {
-        z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.PERSIST, true);
-        z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.SHOW_LOGIN, true);
-        z.util.StorageUtil.set_value(new_user.label_key, new_user.label);
-        this.logger.info(`COOKIE::'${new_user.label}' Saved cookie label with key '${new_user.label_key}' in Local Storage`, {
+    return this.auth_service.post_register(new_user).then(response => {
+      z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.PERSIST, true);
+      z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.SHOW_LOGIN, true);
+      z.util.StorageUtil.set_value(new_user.label_key, new_user.label);
+      this.logger.info(
+        `COOKIE::'${new_user.label}' Saved cookie label with key '${new_user.label_key}' in Local Storage`,
+        {
           key: new_user.label_key,
           value: new_user.label,
-        });
-        return response;
-      });
+        },
+      );
+      return response;
+    });
   }
 
   /**
@@ -163,16 +173,33 @@ z.auth.AuthRepository = class AuthRepository {
         this.auth_service.client.execute_request_queue();
         amplify.publish(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEWED);
       })
-      .catch((error) => {
-        if ((error.type === z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN) || z.util.Environment.frontend.is_localhost()) {
-          this.logger.warn(`Session expired on access token refresh: ${error.message}`, error);
+      .catch(error => {
+        if (
+          error.type === z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN ||
+          z.util.Environment.frontend.is_localhost()
+        ) {
+          this.logger.warn(
+            `Session expired on access token refresh: ${error.message}`,
+            error,
+          );
           Raygun.send(error);
-          return amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReason.SESSION_EXPIRED, false, true);
+          return amplify.publish(
+            z.event.WebApp.LIFECYCLE.SIGN_OUT,
+            z.auth.SignOutReason.SESSION_EXPIRED,
+            false,
+            true,
+          );
         }
 
         if (error.type !== z.auth.AccessTokenError.TYPE.REFRESH_IN_PROGRESS) {
-          this.logger.error(`Refreshing access token failed: '${error.type}'`, error);
-          amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECONNECT);
+          this.logger.error(
+            `Refreshing access token failed: '${error.type}'`,
+            error,
+          );
+          amplify.publish(
+            z.event.WebApp.WARNING.SHOW,
+            z.ViewModel.WarningType.CONNECTIVITY_RECONNECT,
+          );
         }
       });
   }
@@ -182,8 +209,12 @@ z.auth.AuthRepository = class AuthRepository {
    * @returns {undefined} No return value
    */
   delete_access_token() {
-    z.util.StorageUtil.reset_value(z.storage.StorageKey.AUTH.ACCESS_TOKEN.VALUE);
-    z.util.StorageUtil.reset_value(z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION);
+    z.util.StorageUtil.reset_value(
+      z.storage.StorageKey.AUTH.ACCESS_TOKEN.VALUE,
+    );
+    z.util.StorageUtil.reset_value(
+      z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION,
+    );
     z.util.StorageUtil.reset_value(z.storage.StorageKey.AUTH.ACCESS_TOKEN.TTL);
     z.util.StorageUtil.reset_value(z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE);
   }
@@ -193,19 +224,36 @@ z.auth.AuthRepository = class AuthRepository {
    * @returns {Promise} Resolves when the access token was retrieved
    */
   get_cached_access_token() {
-    return new Promise(((resolve, reject) => {
-      const access_token = z.util.StorageUtil.get_value(z.storage.StorageKey.AUTH.ACCESS_TOKEN.VALUE);
-      const access_token_type = z.util.StorageUtil.get_value(z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE);
+    return new Promise((resolve, reject) => {
+      const access_token = z.util.StorageUtil.get_value(
+        z.storage.StorageKey.AUTH.ACCESS_TOKEN.VALUE,
+      );
+      const access_token_type = z.util.StorageUtil.get_value(
+        z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE,
+      );
 
       if (access_token) {
-        this.logger.info('Cached access token found in Local Storage', {access_token});
-        this.auth_service.save_access_token_in_client(access_token_type, access_token);
-        this._schedule_token_refresh(z.util.StorageUtil.get_value(z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION));
+        this.logger.info('Cached access token found in Local Storage', {
+          access_token,
+        });
+        this.auth_service.save_access_token_in_client(
+          access_token_type,
+          access_token,
+        );
+        this._schedule_token_refresh(
+          z.util.StorageUtil.get_value(
+            z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION,
+          ),
+        );
         return resolve();
       }
 
-      return reject(new z.auth.AccessTokenError(z.auth.AccessTokenError.TYPE.NOT_FOUND_IN_CACHE));
-    }));
+      return reject(
+        new z.auth.AccessTokenError(
+          z.auth.AccessTokenError.TYPE.NOT_FOUND_IN_CACHE,
+        ),
+      );
+    });
   }
 
   /**
@@ -213,15 +261,21 @@ z.auth.AuthRepository = class AuthRepository {
    * @returns {Promise} Resolves with the access token data
    */
   get_access_token() {
-    if (this.auth_service.client.request_queue_blocked_state() === z.service.RequestQueueBlockedState.ACCESS_TOKEN_REFRESH) {
-      return Promise.reject(new z.auth.AccessTokenError(z.auth.AccessTokenError.TYPE.REFRESH_IN_PROGRESS));
+    if (
+      this.auth_service.client.request_queue_blocked_state() ===
+      z.service.RequestQueueBlockedState.ACCESS_TOKEN_REFRESH
+    ) {
+      return Promise.reject(
+        new z.auth.AccessTokenError(
+          z.auth.AccessTokenError.TYPE.REFRESH_IN_PROGRESS,
+        ),
+      );
     }
 
-    return this.auth_service.post_access()
-      .then((access_token) => {
-        this.save_access_token(access_token);
-        return access_token;
-      });
+    return this.auth_service.post_access().then(access_token => {
+      this.save_access_token(access_token);
+      return access_token;
+    });
   }
 
   /**
@@ -243,12 +297,31 @@ z.auth.AuthRepository = class AuthRepository {
     const expires_in_millis = 1000 * access_token_data.expires_in;
     const expiration_timestamp = Date.now() + expires_in_millis;
 
-    z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.ACCESS_TOKEN.VALUE, access_token_data.access_token, access_token_data.expires_in);
-    z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION, expiration_timestamp, access_token_data.expires_in);
-    z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.ACCESS_TOKEN.TTL, expires_in_millis, access_token_data.expires_in);
-    z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE, access_token_data.token_type, access_token_data.expires_in);
+    z.util.StorageUtil.set_value(
+      z.storage.StorageKey.AUTH.ACCESS_TOKEN.VALUE,
+      access_token_data.access_token,
+      access_token_data.expires_in,
+    );
+    z.util.StorageUtil.set_value(
+      z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION,
+      expiration_timestamp,
+      access_token_data.expires_in,
+    );
+    z.util.StorageUtil.set_value(
+      z.storage.StorageKey.AUTH.ACCESS_TOKEN.TTL,
+      expires_in_millis,
+      access_token_data.expires_in,
+    );
+    z.util.StorageUtil.set_value(
+      z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE,
+      access_token_data.token_type,
+      access_token_data.expires_in,
+    );
 
-    this.auth_service.save_access_token_in_client(access_token_data.token_type, access_token_data.access_token);
+    this.auth_service.save_access_token_in_client(
+      access_token_data.token_type,
+      access_token_data.access_token,
+    );
 
     this._log_access_token_update(access_token_data, expiration_timestamp);
     this._schedule_token_refresh(expiration_timestamp);
@@ -267,7 +340,10 @@ z.auth.AuthRepository = class AuthRepository {
    */
   _log_access_token_update(access_token_data, expiration_timestamp) {
     const expiration_log = z.util.format_timestamp(expiration_timestamp, false);
-    this.logger.info(`Saved updated access token. It will expire on: ${expiration_log}`, access_token_data);
+    this.logger.info(
+      `Saved updated access token. It will expire on: ${expiration_log}`,
+      access_token_data,
+    );
   }
 
   /**
@@ -285,23 +361,27 @@ z.auth.AuthRepository = class AuthRepository {
     const callback_timestamp = expiration_timestamp - 60000;
 
     if (callback_timestamp < Date.now()) {
-      return this.renew_access_token(AuthRepository.ACCESS_TOKEN_TRIGGER.IMMEDIATE);
+      return this.renew_access_token(
+        AuthRepository.ACCESS_TOKEN_TRIGGER.IMMEDIATE,
+      );
     }
     const time = z.util.format_timestamp(callback_timestamp, false);
     this.logger.info(`Scheduling next access token refresh for '${time}'`);
 
     this.access_token_refresh = window.setTimeout(() => {
-      if (callback_timestamp > (Date.now() + 15000)) {
-        this.logger.info(`Access token refresh scheduled for '${time}' skipped because it was executed late`);
+      if (callback_timestamp > Date.now() + 15000) {
+        this.logger.info(
+          `Access token refresh scheduled for '${time}' skipped because it was executed late`,
+        );
       }
 
       if (navigator.onLine) {
         return this.renew_access_token(`Schedule for '${time}'`);
       }
 
-      this.logger.info(`Access token refresh scheduled for '${time}' skipped because we are offline`);
-
+      this.logger.info(
+        `Access token refresh scheduled for '${time}' skipped because we are offline`,
+      );
     }, callback_timestamp - Date.now());
-
   }
 };

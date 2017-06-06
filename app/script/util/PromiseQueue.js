@@ -39,9 +39,16 @@ z.util.PromiseQueue = class PromiseQueue {
    * @returns {PromiseQueue} Process Promises sequentially
    */
   constructor(options = {}) {
-    const {name, paused = false, timeout = PromiseQueue.CONFIG.UNBLOCK_INTERVAL} = options;
+    const {
+      name,
+      paused = false,
+      timeout = PromiseQueue.CONFIG.UNBLOCK_INTERVAL,
+    } = options;
 
-    this.logger = new z.util.Logger((name ? `z.util.PromiseQueue (${name})` : 'z.util.PromiseQueue'), z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger(
+      name ? `z.util.PromiseQueue (${name})` : 'z.util.PromiseQueue',
+      z.config.LOGGER.OPTIONS,
+    );
 
     this._blocked = false;
     this._interval = undefined;
@@ -65,29 +72,31 @@ z.util.PromiseQueue = class PromiseQueue {
         if (!this._paused) {
           this._blocked = false;
           window.clearInterval(this._interval);
-          this.logger.error('Promise queue failed, unblocking queue', this._queue);
+          this.logger.error(
+            'Promise queue failed, unblocking queue',
+            this._queue,
+          );
           this.execute();
         }
-      },
-      this._timeout);
+      }, this._timeout);
 
-      queue_entry.fn()
-      .catch((error) => {
-        queue_entry.resolve_fn = undefined;
-        queue_entry.reject_fn(error);
-      })
-      .then((response) => {
-        if (queue_entry.resolve_fn) {
-          queue_entry.resolve_fn(response);
-        }
-        window.clearInterval(this._interval);
-        this._blocked = false;
-        this._queue.shift();
-        window.setTimeout(() => {
-          return this.execute();
-        },
-        0);
-      });
+      queue_entry
+        .fn()
+        .catch(error => {
+          queue_entry.resolve_fn = undefined;
+          queue_entry.reject_fn(error);
+        })
+        .then(response => {
+          if (queue_entry.resolve_fn) {
+            queue_entry.resolve_fn(response);
+          }
+          window.clearInterval(this._interval);
+          this._blocked = false;
+          this._queue.shift();
+          window.setTimeout(() => {
+            return this.execute();
+          }, 0);
+        });
     }
   }
 

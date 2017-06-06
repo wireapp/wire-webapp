@@ -4,6 +4,10 @@ env:
   jasmine: true
   node: true
 
+plugins:
+  - prettier
+  - jsdoc
+
 extends:
   "eslint:recommended"
 
@@ -45,9 +49,6 @@ globals:
   z: true
   zeta: true
 
-plugins:
-  - jsdoc
-
 rules:
   array-bracket-spacing: [2, never]
   arrow-parens: [2, always]
@@ -87,6 +88,12 @@ rules:
   prefer-promise-reject-errors: 2
   prefer-spread: 2
   prefer-template: 2
+  prettier/prettier: [2, {
+      singleQuote: true,
+      trailingComma: all,
+      bracketSpacing: false,
+    }
+  ]
   quotes: [2, single, avoid-escape]
   semi: [2, always]
   semi-spacing: [2, {before: false, after: true}]

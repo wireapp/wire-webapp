@@ -23,13 +23,14 @@ window.z = window.z || {};
 window.z.telemetry = z.telemetry || {};
 window.z.telemetry.calling = z.telemetry.calling || {};
 
-z.telemetry.calling.MediaStreamStats = class MediaStreamStats extends z.telemetry.calling.Stats {
+z.telemetry.calling.MediaStreamStats = class MediaStreamStats extends z
+  .telemetry.calling.Stats {
   /**
    * Construct a new MediaStream stats report.
    * @param {Date} timestamp - Creation date
    * @returns {MediaStreamStats} The new MediaStream stats entity
    */
-  constructor(timestamp) {
+    constructor(timestamp) {
     super(timestamp);
     this.bit_rate_current_received = 0;
     this.bit_rate_current_sent = 0;

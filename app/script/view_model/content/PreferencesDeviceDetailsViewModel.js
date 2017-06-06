@@ -32,18 +32,29 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
     };
   }
 
-  constructor(element_id, client_repository, conversation_repository, cryptography_repository) {
+  constructor(
+    element_id,
+    client_repository,
+    conversation_repository,
+    cryptography_repository,
+  ) {
     this.client_repository = client_repository;
     this.conversation_repository = conversation_repository;
     this.cryptography_repository = cryptography_repository;
-    this.logger = new z.util.Logger('z.ViewModel.content.PreferencesDeviceDetailsViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger(
+      'z.ViewModel.content.PreferencesDeviceDetailsViewModel',
+      z.config.LOGGER.OPTIONS,
+    );
 
     this.self_user = this.client_repository.self_user;
 
     this.device = ko.observable();
-    this.device.subscribe((device_et) => {
+    this.device.subscribe(device_et => {
       if (device_et) {
-        this.session_reset_state(z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET);
+        this.session_reset_state(
+          z.ViewModel.content.PreferencesDeviceDetailsViewModel
+            .SESSION_RESET_STATE.RESET,
+        );
         this.fingerprint('');
         this._update_fingerprint();
         this._update_activation_location('?');
@@ -54,88 +65,134 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
       }
     });
 
-    this.session_reset_state = ko.observable(z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET);
+    this.session_reset_state = ko.observable(
+      z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE
+        .RESET,
+    );
     this.fingerprint = ko.observable('');
 
-    this.activated_in = ko.observable(z.l10n.text(z.string.preferences_devices_activated_in));
-    this.activated_on = ko.observable(z.l10n.text(z.string.preferences_devices_activated_on));
+    this.activated_in = ko.observable(
+      z.l10n.text(z.string.preferences_devices_activated_in),
+    );
+    this.activated_on = ko.observable(
+      z.l10n.text(z.string.preferences_devices_activated_on),
+    );
   }
 
   _update_activation_location(location) {
-    this.activated_in(z.localization.Localizer.get_text({
-      id: z.string.preferences_devices_activated_in,
-      replace: {
-        content: `<span class='preferences-devices-activated-bold'>${location}</span>`,
-        placeholder: '%location',
-      },
-    }));
+    this.activated_in(
+      z.localization.Localizer.get_text({
+        id: z.string.preferences_devices_activated_in,
+        replace: {
+          content: `<span class='preferences-devices-activated-bold'>${location}</span>`,
+          placeholder: '%location',
+        },
+      }),
+    );
   }
 
   _update_activation_time(time) {
-    this.activated_on(z.localization.Localizer.get_text({
-      id: z.string.preferences_devices_activated_on,
-      replace: {
-        content: `<span class='preferences-devices-activated-bold'>${z.util.format_timestamp(time)}</span>`,
-        placeholder: '%time',
-      },
-    }));
+    this.activated_on(
+      z.localization.Localizer.get_text({
+        id: z.string.preferences_devices_activated_on,
+        replace: {
+          content: `<span class='preferences-devices-activated-bold'>${z.util.format_timestamp(
+            time,
+          )}</span>`,
+          placeholder: '%time',
+        },
+      }),
+    );
   }
 
   _update_device_location(location) {
-    z.location.get_location(location.lat, location.lon)
-      .then((retrieved_location) => {
+    z.location
+      .get_location(location.lat, location.lon)
+      .then(retrieved_location => {
         if (retrieved_location) {
-          this._update_activation_location(`${retrieved_location.place}, ${retrieved_location.country_code}`);
+          this._update_activation_location(
+            `${retrieved_location.place}, ${retrieved_location.country_code}`,
+          );
         }
       });
   }
 
   _update_fingerprint() {
-    this.cryptography_repository.get_remote_fingerprint(this.self_user().id, this.device().id)
-      .then((fingerprint) => {
+    this.cryptography_repository
+      .get_remote_fingerprint(this.self_user().id, this.device().id)
+      .then(fingerprint => {
         this.fingerprint(fingerprint);
       });
   }
 
   click_on_details_close() {
-    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES);
+    amplify.publish(
+      z.event.WebApp.CONTENT.SWITCH,
+      z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES,
+    );
     this.device(null);
   }
 
   click_on_reset_session() {
-    this.session_reset_state(z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.ONGOING);
+    this.session_reset_state(
+      z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE
+        .ONGOING,
+    );
 
-    this.conversation_repository.reset_session(this.self_user().id, this.device().id, this.conversation_repository.self_conversation().id)
+    this.conversation_repository
+      .reset_session(
+        this.self_user().id,
+        this.device().id,
+        this.conversation_repository.self_conversation().id,
+      )
       .then(() => {
         window.setTimeout(() => {
-          this.session_reset_state(z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.CONFIRMATION);
+          this.session_reset_state(
+            z.ViewModel.content.PreferencesDeviceDetailsViewModel
+              .SESSION_RESET_STATE.CONFIRMATION,
+          );
         }, 550);
 
         window.setTimeout(() => {
-          this.session_reset_state(z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET);
+          this.session_reset_state(
+            z.ViewModel.content.PreferencesDeviceDetailsViewModel
+              .SESSION_RESET_STATE.RESET,
+          );
         }, 5000);
       })
-      .catch((error) => {
-        this.session_reset_state(z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET);
+      .catch(error => {
+        this.session_reset_state(
+          z.ViewModel.content.PreferencesDeviceDetailsViewModel
+            .SESSION_RESET_STATE.RESET,
+        );
         throw error;
       });
   }
 
   click_on_remove_device() {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.REMOVE_DEVICE, {
-      action: (password) => {
-        // @todo Add failure case ux WEBAPP-3570
-        this.client_repository.delete_client(this.device().id, password)
-          .then(() => {
-            this.click_on_details_close();
-          });
+    amplify.publish(
+      z.event.WebApp.WARNING.MODAL,
+      z.ViewModel.ModalType.REMOVE_DEVICE,
+      {
+        action: password => {
+          // @todo Add failure case ux WEBAPP-3570
+          this.client_repository
+            .delete_client(this.device().id, password)
+            .then(() => {
+              this.click_on_details_close();
+            });
+        },
+        data: this.device().model,
       },
-      data: this.device().model,
-    });
+    );
   }
 
   toggle_device_verification() {
     const toggle_verified = !this.device().meta.is_verified();
-    this.client_repository.verify_client(this.self_user().id, this.device(), toggle_verified);
+    this.client_repository.verify_client(
+      this.self_user().id,
+      this.device(),
+      toggle_verified,
+    );
   }
 };

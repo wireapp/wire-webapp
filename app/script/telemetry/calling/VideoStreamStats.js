@@ -23,13 +23,14 @@ window.z = window.z || {};
 window.z.telemetry = z.telemetry || {};
 window.z.telemetry.calling = z.telemetry.calling || {};
 
-z.telemetry.calling.VideoStreamStats = class VideoStreamStats extends z.telemetry.calling.MediaStreamStats {
+z.telemetry.calling.VideoStreamStats = class VideoStreamStats extends z
+  .telemetry.calling.MediaStreamStats {
   /**
    * Construct a new VideoStream stats report.
    * @param {Date} timestamp - Creation date
    * @returns {VideoStreamStats} The new VideoStream stats entity
    */
-  constructor(timestamp) {
+    constructor(timestamp) {
     super(timestamp);
     this.media_type = z.media.MediaType.VIDEO;
     this.frame_height_received = 0;

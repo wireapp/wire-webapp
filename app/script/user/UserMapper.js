@@ -30,7 +30,10 @@ z.user.UserMapper = class UserMapper {
    */
   constructor(asset_service) {
     this.asset_service = asset_service;
-    this.logger = new z.util.Logger('z.user.UserMapper', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger(
+      'z.user.UserMapper',
+      z.config.LOGGER.OPTIONS,
+    );
   }
 
   /**
@@ -67,8 +70,8 @@ z.user.UserMapper = class UserMapper {
   map_users_from_object(data) {
     if (data) {
       return data
-        .filter((user_et) => user_et)
-        .map((user_et) => this.map_user_from_object(user_et));
+        .filter(user_et => user_et)
+        .map(user_et => this.map_user_from_object(user_et));
     }
     this.logger.warn('We got no user data from the backend');
     return [];
@@ -86,22 +89,24 @@ z.user.UserMapper = class UserMapper {
       return;
     }
 
-    if ((user_et.id === '') && (data.id !== '')) {
+    if (user_et.id === '' && data.id !== '') {
       // It's a new user
       user_et.id = data.id;
       user_et.joaat_hash = z.util.Crypto.Hashing.joaat_hash(data.id);
-    } else if ((user_et.id !== '') && (data.id !== user_et.id)) {
+    } else if (user_et.id !== '' && data.id !== user_et.id) {
       // We are trying to update non-matching users
-      throw new Error(`Updating wrong user entity. User ID '${user_et.id}' does not match data ID '${data.id}'.`);
+      throw new Error(
+        `Updating wrong user entity. User ID '${user_et.id}' does not match data ID '${data.id}'.`,
+      );
     }
 
     if (data.accent_id && data.accent_id !== 0) {
       user_et.accent_id(data.accent_id);
     }
 
-    if (data.assets && (data.assets.length > 0)) {
+    if (data.assets && data.assets.length > 0) {
       this._map_profile_assets(user_et, data.assets);
-    } else if (data.picture && (data.picture.length > 0)) {
+    } else if (data.picture && data.picture.length > 0) {
       this._map_profile_pictures(user_et, data.picture);
     }
 
@@ -132,28 +137,34 @@ z.user.UserMapper = class UserMapper {
 
   _map_profile_pictures(user_et, picture) {
     if (picture[0]) {
-      user_et.preview_picture_resource(z.assets.AssetRemoteData.v1(user_et.id, picture[0].id, true));
+      user_et.preview_picture_resource(
+        z.assets.AssetRemoteData.v1(user_et.id, picture[0].id, true),
+      );
     }
 
     if (picture[1]) {
-      return user_et.medium_picture_resource(z.assets.AssetRemoteData.v1(user_et.id, picture[1].id, true));
+      return user_et.medium_picture_resource(
+        z.assets.AssetRemoteData.v1(user_et.id, picture[1].id, true),
+      );
     }
   }
 
   _map_profile_assets(user_et, assets) {
-    return assets
-      .filter((asset) => asset.type === 'image')
-      .map((asset) => {
-        switch (asset.size) {
-          case 'preview':
-            user_et.preview_picture_resource(z.assets.AssetRemoteData.v3(asset.key, true));
-            break;
-          case 'complete':
-            user_et.medium_picture_resource(z.assets.AssetRemoteData.v3(asset.key, true));
-            break;
-          default:
-            break;
-        }
-      });
+    return assets.filter(asset => asset.type === 'image').map(asset => {
+      switch (asset.size) {
+        case 'preview':
+          user_et.preview_picture_resource(
+            z.assets.AssetRemoteData.v3(asset.key, true),
+          );
+          break;
+        case 'complete':
+          user_et.medium_picture_resource(
+            z.assets.AssetRemoteData.v3(asset.key, true),
+          );
+          break;
+        default:
+          break;
+      }
+    });
   }
 };

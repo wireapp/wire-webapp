@@ -28,7 +28,7 @@ z.util.NumberUtil = {
     return Math.floor(Math.random() * (maximum - minimum + 1) + minimum);
   },
   in_range: function(value, lower_bound, upper_bound) {
-    return (value >= lower_bound) && (value <= upper_bound);
+    return value >= lower_bound && value <= upper_bound;
   },
   root_mean_square: function(float_array) {
     const pow = float_array.map((number) => Math.pow(number, 2));

@@ -61,22 +61,26 @@ z.components.DeviceCard = class DeviceCard {
   }
 
   _update_activation_location(location) {
-    this.activated_in(z.localization.Localizer.get_text({
-      id: z.string.preferences_devices_activated_in,
-      replace: {
-        content: `<span class='label-bold-xs'>${location}</span>`,
-        placeholder: '%location',
-      },
-    })
+    this.activated_in(
+      z.localization.Localizer.get_text({
+        id: z.string.preferences_devices_activated_in,
+        replace: {
+          content: `<span class='label-bold-xs'>${location}</span>`,
+          placeholder: '%location',
+        },
+      }),
     );
   }
 
   _update_location() {
     if (this.device && this.device.location) {
-      z.location.get_location(this.device.location.lat, this.device.location.lon)
-        .then((retrieved_location) => {
+      z.location
+        .get_location(this.device.location.lat, this.device.location.lon)
+        .then(retrieved_location => {
           if (retrieved_location) {
-            this._update_activation_location(`${retrieved_location.place}, ${retrieved_location.country_code}`);
+            this._update_activation_location(
+              `${retrieved_location.place}, ${retrieved_location.country_code}`,
+            );
           }
         });
     }

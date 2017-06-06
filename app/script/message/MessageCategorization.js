@@ -23,13 +23,15 @@ window.z = window.z || {};
 window.z.message = z.message || {};
 
 z.message.MessageCategorization = (function() {
-
   const _check_text = function(event) {
     if (event.type === z.event.Backend.CONVERSATION.MESSAGE_ADD) {
       let category = z.message.MessageCategory.TEXT;
 
       if (event.data.previews && event.data.previews.length > 0) {
-        category = category | z.message.MessageCategory.LINK | z.message.MessageCategory.LINK_PREVIEW;
+        category =
+          category |
+          z.message.MessageCategory.LINK |
+          z.message.MessageCategory.LINK_PREVIEW;
       }
 
       return category;
@@ -70,11 +72,18 @@ z.message.MessageCategorization = (function() {
     try {
       let category = z.message.MessageCategory.NONE;
 
-      if (event.ephemeral_expires) { // String, Number, true
+      if (event.ephemeral_expires) {
+        // String, Number, true
         return z.message.MessageCategory.NONE;
       }
 
-      for (const check of [_check_text, _check_image, _check_file, _check_ping, _check_location]) {
+      for (const check of [
+        _check_text,
+        _check_image,
+        _check_file,
+        _check_ping,
+        _check_location,
+      ]) {
         const temp_category = check(event);
         if (temp_category) {
           category = temp_category;
@@ -82,12 +91,14 @@ z.message.MessageCategorization = (function() {
         }
       }
 
-      if (_.isObject(event.reactions) && (Object.keys(event.reactions).length > 0)) {
+      if (
+        _.isObject(event.reactions) &&
+        Object.keys(event.reactions).length > 0
+      ) {
         category = category | z.message.MessageCategory.LIKED;
       }
 
       return category;
-
     } catch (error) {
       return z.message.MessageCategory.UNDEFINED;
     }

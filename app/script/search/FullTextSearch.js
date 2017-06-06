@@ -23,7 +23,6 @@ window.z = window.z || {};
 window.z.search = z.search || {};
 
 z.search.FullTextSearch = (function() {
-
   const _get_search_regex = function(query) {
     const delimiter = ' ';
     const flags = 'gumi';

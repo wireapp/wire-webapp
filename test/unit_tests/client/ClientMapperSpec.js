@@ -124,15 +124,19 @@ describe('z.client.ClientMapper', function() {
       expect(client_ets[0].is_temporary()).toBeTruthy();
       expect(client_ets[1].id).toBe(entities.clients.john_doe.permanent.id);
       expect(client_ets[1].is_permanent()).toBeTruthy();
-    })
-  );
+    }));
 
   describe('update_client', function() {
     it('can map changes into a client', function() {
-      const initial_client_et = mapper.map_client(entities.clients.john_doe.plain);
+      const initial_client_et = mapper.map_client(
+        entities.clients.john_doe.plain,
+      );
       const client_payload = entities.clients.john_doe.permanent;
 
-      const {client: client_et, was_updated} = mapper.update_client(initial_client_et, client_payload);
+      const {client: client_et, was_updated} = mapper.update_client(
+        initial_client_et,
+        client_payload,
+      );
 
       expect(was_updated).toBeTruthy();
       expect(client_et.address).toBe(client_payload.address);
@@ -155,7 +159,10 @@ describe('z.client.ClientMapper', function() {
       const client_payload = entities.clients.john_doe.permanent;
       const initial_client_et = mapper.map_client(client_payload);
 
-      const {client: client_et, was_updated} = mapper.update_client(initial_client_et, client_payload);
+      const {client: client_et, was_updated} = mapper.update_client(
+        initial_client_et,
+        client_payload,
+      );
 
       expect(was_updated).toBeFalsy();
       expect(client_et.address).toBe(client_payload.address);

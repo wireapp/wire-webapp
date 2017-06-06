@@ -111,7 +111,7 @@ archiver-utils@^1.3.0:
     normalize-path "^2.0.0"
     readable-stream "^2.0.0"
 
-archiver@^1.0.0:
+archiver@^1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/archiver/-/archiver-1.3.0.tgz#4f2194d6d8f99df3f531e6881f14f15d55faaf22"
   dependencies:
@@ -252,7 +252,18 @@ asynckit@^0.4.0:
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/asynckit/-/asynckit-0.4.0.tgz#c79ed97f7f34cb8f2ba1bc9790bcc366474b4b79"
 
-autoprefixer@6.7.7, autoprefixer@^6.0.0:
+autoprefixer@7.1.1:
+  version "7.1.1"
+  resolved "https://registry.yarnpkg.com/autoprefixer/-/autoprefixer-7.1.1.tgz#97bc854c7d0b979f8d6489de547a0d17fb307f6d"
+  dependencies:
+    browserslist "^2.1.3"
+    caniuse-lite "^1.0.30000670"
+    normalize-range "^0.1.2"
+    num2fraction "^1.2.2"
+    postcss "^6.0.1"
+    postcss-value-parser "^3.2.3"
+
+autoprefixer@^6.0.0:
   version "6.7.7"
   resolved "https://registry.yarnpkg.com/autoprefixer/-/autoprefixer-6.7.7.tgz#1dbd1c835658e35ce3f9984099db00585c782014"
   dependencies:
@@ -523,6 +534,13 @@ browserslist@^1.1.1, browserslist@^1.1.3, browserslist@^1.7.6:
     caniuse-db "^1.0.30000639"
     electron-to-chromium "^1.2.7"
 
+browserslist@^2.1.3:
+  version "2.1.4"
+  resolved "https://registry.yarnpkg.com/browserslist/-/browserslist-2.1.4.tgz#cc526af4a1312b7d2e05653e56d0c8ab70c0e053"
+  dependencies:
+    caniuse-lite "^1.0.30000670"
+    electron-to-chromium "^1.3.11"
+
 buffer-crc32@^0.2.1:
   version "0.2.13"
   resolved "https://registry.yarnpkg.com/buffer-crc32/-/buffer-crc32-0.2.13.tgz#0d333e3f00eac50aa1454abd30ef8c2a5d9a7242"
@@ -579,6 +597,10 @@ camelcase@^2.0.0:
 caniuse-db@^1.0.30000187, caniuse-db@^1.0.30000634, caniuse-db@^1.0.30000639:
   version "1.0.30000644"
   resolved "https://registry.yarnpkg.com/caniuse-db/-/caniuse-db-1.0.30000644.tgz#9d7eccf1ef1d11cbd6741b9fb390f9923ff42261"
+
+caniuse-lite@^1.0.30000670:
+  version "1.0.30000679"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000679.tgz#0fb5bb3658d4d4448f8f86a1c48df15664aa05ef"
 
 cardinal@0.4.0:
   version "0.4.0"
@@ -1130,17 +1152,15 @@ electron-to-chromium@^1.2.7:
   version "1.2.8"
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.2.8.tgz#22c2e6200d350da27d6050db7e3f6f85d18cf4ed"
 
+electron-to-chromium@^1.3.11:
+  version "1.3.13"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.13.tgz#1b3a5eace6e087bb5e257a100b0cbfe81b2891fc"
+
 encodeurl@~1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/encodeurl/-/encodeurl-1.0.1.tgz#79e3d58655346909fe6f0f45a5de68103b294d20"
 
-end-of-stream@^1.0.0:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/end-of-stream/-/end-of-stream-1.4.0.tgz#7a90d833efda6cfa6eac0f4949dbb0fad3a63206"
-  dependencies:
-    once "^1.4.0"
-
-end-of-stream@~1.0.0:
+end-of-stream@^1.0.0, end-of-stream@~1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/end-of-stream/-/end-of-stream-1.0.0.tgz#d4596e702734a93e40e9af864319eabd99ff2f0e"
   dependencies:
@@ -1305,12 +1325,19 @@ escope@^3.6.0:
     esrecurse "^4.1.0"
     estraverse "^4.1.1"
 
-eslint-plugin-jsdoc@3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-3.0.0.tgz#6063b4f1c9801ad35a9a70ece75b0c9804a1e449"
+eslint-plugin-jsdoc@3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-3.1.0.tgz#6f2b22a70919aac23e8d2f78217d28731f6e444d"
   dependencies:
     comment-parser "^0.4.0"
     lodash "^4.5.1"
+
+eslint-plugin-prettier@2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-prettier/-/eslint-plugin-prettier-2.1.1.tgz#2fb7e2ab961f2b61d2c8cf91bc17716ca8c53868"
+  dependencies:
+    fast-diff "^1.1.1"
+    jest-docblock "^20.0.1"
 
 eslint@3.19.0:
   version "3.19.0"
@@ -1469,6 +1496,10 @@ extglob@^0.3.1:
 extsprintf@1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/extsprintf/-/extsprintf-1.0.2.tgz#e1080e0658e300b06294990cc70e1502235fd550"
+
+fast-diff@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/fast-diff/-/fast-diff-1.1.1.tgz#0aea0e4e605b6a2189f0e936d4b7fbaf1b7cfd9b"
 
 fast-levenshtein@~2.0.4:
   version "2.0.6"
@@ -1718,9 +1749,9 @@ glob@^5.0.15, glob@~5.0.0:
     once "^1.3.0"
     path-is-absolute "^1.0.0"
 
-glob@^7.0.0, glob@^7.0.5, glob@^7.1.1, glob@~7.1.1:
-  version "7.1.1"
-  resolved "https://registry.yarnpkg.com/glob/-/glob-7.1.1.tgz#805211df04faaf1c63a3600306cdf5ade50b2ec8"
+glob@^7.0.0, glob@^7.0.3, glob@^7.0.5, glob@^7.0.6, glob@~7.0.0:
+  version "7.0.6"
+  resolved "https://registry.yarnpkg.com/glob/-/glob-7.0.6.tgz#211bafaf49e525b8cd93260d14ab136152b3f57a"
   dependencies:
     fs.realpath "^1.0.0"
     inflight "^1.0.4"
@@ -1729,9 +1760,9 @@ glob@^7.0.0, glob@^7.0.5, glob@^7.1.1, glob@~7.1.1:
     once "^1.3.0"
     path-is-absolute "^1.0.0"
 
-glob@^7.0.3, glob@^7.0.6, glob@~7.0.0:
-  version "7.0.6"
-  resolved "https://registry.yarnpkg.com/glob/-/glob-7.0.6.tgz#211bafaf49e525b8cd93260d14ab136152b3f57a"
+glob@^7.1.1, glob@~7.1.1:
+  version "7.1.1"
+  resolved "https://registry.yarnpkg.com/glob/-/glob-7.1.1.tgz#805211df04faaf1c63a3600306cdf5ade50b2ec8"
   dependencies:
     fs.realpath "^1.0.0"
     inflight "^1.0.4"
@@ -1810,9 +1841,9 @@ graceful-fs@~2.0.0:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-2.0.3.tgz#7cd2cdb228a4a3f36e95efa6cc142de7d1a136d0"
 
-grunt-aws-s3@0.14.5:
-  version "0.14.5"
-  resolved "https://registry.yarnpkg.com/grunt-aws-s3/-/grunt-aws-s3-0.14.5.tgz#f55019acfbeb05b89b245a51ccf1a81dbf868df4"
+grunt-aws-s3@1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/grunt-aws-s3/-/grunt-aws-s3-1.0.0.tgz#c4ead28195c503fb6596067d1438373590af36c0"
   dependencies:
     async "0.9.x"
     aws-sdk "2.0.x"
@@ -1863,15 +1894,24 @@ grunt-contrib-coffee@1.0.0:
     lodash "~4.3.0"
     uri-path "~1.0.0"
 
-grunt-contrib-compress@1.3.0:
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/grunt-contrib-compress/-/grunt-contrib-compress-1.3.0.tgz#5e5c26a200490823c7f77288afd2d7350d95c63d"
+grunt-contrib-compress@1.4.3:
+  version "1.4.3"
+  resolved "https://registry.yarnpkg.com/grunt-contrib-compress/-/grunt-contrib-compress-1.4.3.tgz#01ceffb9c637f52e7081f463750983d0a3b0fa73"
   dependencies:
-    archiver "^1.0.0"
+    archiver "^1.3.0"
     chalk "^1.1.1"
     lodash "^4.7.0"
-    pretty-bytes "^3.0.1"
+    pretty-bytes "^4.0.2"
     stream-buffers "^2.1.0"
+  optionalDependencies:
+    iltorb "^1.0.13"
+
+grunt-contrib-concat@1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/grunt-contrib-concat/-/grunt-contrib-concat-1.0.1.tgz#61509863084e871d7e86de48c015259ed97745bd"
+  dependencies:
+    chalk "^1.0.0"
+    source-map "^0.5.3"
 
 grunt-contrib-connect@1.0.2:
   version "1.0.2"
@@ -2203,6 +2243,13 @@ ignore@^3.0.9, ignore@^3.2.0:
   version "3.2.6"
   resolved "https://registry.yarnpkg.com/ignore/-/ignore-3.2.6.tgz#26e8da0644be0bb4cb39516f6c79f0e0f4ffe48c"
 
+iltorb@^1.0.13:
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/iltorb/-/iltorb-1.3.1.tgz#47270458ec6837c422c26c9282f00e63196e95f9"
+  dependencies:
+    nan "^2.6.1"
+    node-pre-gyp "^0.6.34"
+
 image-size@~0.5.0:
   version "0.5.1"
   resolved "https://registry.yarnpkg.com/image-size/-/image-size-0.5.1.tgz#28eea8548a4b1443480ddddc1e083ae54652439f"
@@ -2495,6 +2542,10 @@ jasmine-core@2.5.2:
   version "2.5.2"
   resolved "https://registry.yarnpkg.com/jasmine-core/-/jasmine-core-2.5.2.tgz#6f61bd79061e27f43e6f9355e44b3c6cab6ff297"
 
+jest-docblock@^20.0.1:
+  version "20.0.3"
+  resolved "https://registry.yarnpkg.com/jest-docblock/-/jest-docblock-20.0.3.tgz#17bea984342cc33d83c50fbe1545ea0efaa44712"
+
 jodid25519@^1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/jodid25519/-/jodid25519-1.0.2.tgz#06d4912255093419477d425633606e0e90782967"
@@ -2572,9 +2623,9 @@ junk@~1.0.0:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/junk/-/junk-1.0.3.tgz#87be63488649cbdca6f53ab39bec9ccd2347f592"
 
-karma-chrome-launcher@2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/karma-chrome-launcher/-/karma-chrome-launcher-2.0.0.tgz#c2790c5a32b15577d0fff5a4d5a2703b3b439c25"
+karma-chrome-launcher@2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/karma-chrome-launcher/-/karma-chrome-launcher-2.1.1.tgz#216879c68ac04d8d5140e99619ba04b59afd46cf"
   dependencies:
     fs-access "^1.0.0"
     which "^1.2.1"
@@ -2593,9 +2644,9 @@ karma-jasmine@1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/karma-jasmine/-/karma-jasmine-1.1.0.tgz#22e4c06bf9a182e5294d1f705e3733811b810acf"
 
-karma@1.6.0:
-  version "1.6.0"
-  resolved "https://registry.yarnpkg.com/karma/-/karma-1.6.0.tgz#0e871d4527d5eac56c41d181f03c5c0a7e6dbf3e"
+karma@1.7.0:
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/karma/-/karma-1.7.0.tgz#6f7a1a406446fa2e187ec95398698f4cee476269"
   dependencies:
     bluebird "^3.3.0"
     body-parser "^1.16.1"
@@ -2985,6 +3036,10 @@ nan@^2.3.0:
   version "2.5.1"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.5.1.tgz#d5b01691253326a97a2bbee9e61c55d8d60351e2"
 
+nan@^2.6.1:
+  version "2.6.2"
+  resolved "https://registry.yarnpkg.com/nan/-/nan-2.6.2.tgz#e4ff34e6c95fdfb5aecc08de6596f43605a7db45"
+
 native-promise-only@^0.8.1:
   version "0.8.1"
   resolved "https://registry.yarnpkg.com/native-promise-only/-/native-promise-only-0.8.1.tgz#20a318c30cb45f71fe7adfbf7b21c99c1472ef11"
@@ -3009,7 +3064,7 @@ next-tick@~0.2.2:
   version "0.2.2"
   resolved "https://registry.yarnpkg.com/next-tick/-/next-tick-0.2.2.tgz#75da4a927ee5887e39065880065b7336413b310d"
 
-node-pre-gyp@^0.6.29:
+node-pre-gyp@^0.6.29, node-pre-gyp@^0.6.34:
   version "0.6.34"
   resolved "https://registry.yarnpkg.com/node-pre-gyp/-/node-pre-gyp-0.6.34.tgz#94ad1c798a11d7fc67381b50d47f8cc18d9799f7"
   dependencies:
@@ -3179,7 +3234,7 @@ on-headers@~1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/on-headers/-/on-headers-1.0.1.tgz#928f5d0f470d49342651ea6794b0857c100693f7"
 
-once@1.x, once@^1.3.0, once@^1.3.3, once@^1.4.0:
+once@1.x, once@^1.3.0, once@^1.3.3:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/once/-/once-1.4.0.tgz#583b1aa775961d4b113ac17d9c50baef9dd76bd1"
   dependencies:
@@ -3474,6 +3529,14 @@ postcss@^5.0.0, postcss@^5.0.18, postcss@^5.0.20, postcss@^5.0.21, postcss@^5.0.
     source-map "^0.5.6"
     supports-color "^3.2.3"
 
+postcss@^6.0.1:
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/postcss/-/postcss-6.0.1.tgz#000dbd1f8eef217aa368b9a212c5fc40b2a8f3f2"
+  dependencies:
+    chalk "^1.1.3"
+    source-map "^0.5.6"
+    supports-color "^3.2.3"
+
 prelude-ls@~1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/prelude-ls/-/prelude-ls-1.1.2.tgz#21932a549f5e52ffd9a827f570e04be62a97da54"
@@ -3482,6 +3545,10 @@ preserve@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/preserve/-/preserve-0.2.0.tgz#815ed1f6ebc65926f865b310c0713bcb3315ce4b"
 
+prettier@1.4.2:
+  version "1.4.2"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.4.2.tgz#bcdd95ed1eca434ac7f98ca26ea4d25a2af6a2ac"
+
 pretty-bytes@^1.0.0:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/pretty-bytes/-/pretty-bytes-1.0.4.tgz#0a22e8210609ad35542f8c8d5d2159aff0751c84"
@@ -3489,11 +3556,9 @@ pretty-bytes@^1.0.0:
     get-stdin "^4.0.1"
     meow "^3.1.0"
 
-pretty-bytes@^3.0.1:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/pretty-bytes/-/pretty-bytes-3.0.1.tgz#27d0008d778063a0b4811bb35c79f1bd5d5fbccf"
-  dependencies:
-    number-is-nan "^1.0.0"
+pretty-bytes@^4.0.2:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/pretty-bytes/-/pretty-bytes-4.0.2.tgz#b2bf82e7350d65c6c33aa95aaa5a4f6327f61cd9"
 
 process-nextick-args@~1.0.6:
   version "1.0.7"
@@ -3916,17 +3981,17 @@ semver-diff@^0.1.0:
   dependencies:
     semver "^2.2.1"
 
-"semver@2 || 3 || 4", "semver@2 || 3 || 4 || 5", semver@~4.3.3:
-  version "4.3.6"
-  resolved "https://registry.yarnpkg.com/semver/-/semver-4.3.6.tgz#300bc6e0e86374f7ba61068b5b1ecd57fc6532da"
-
-semver@^2.2.1, semver@~2.3.0:
+"semver@2 || 3 || 4", "semver@2 || 3 || 4 || 5", semver@^2.2.1, semver@~2.3.0:
   version "2.3.2"
   resolved "https://registry.yarnpkg.com/semver/-/semver-2.3.2.tgz#b9848f25d6cf36333073ec9ef8856d42f1233e52"
 
 semver@^5.0.1, semver@^5.3.0:
   version "5.3.0"
   resolved "https://registry.yarnpkg.com/semver/-/semver-5.3.0.tgz#9b2ce5d3de02d17c6012ad326aa6b4d0cf54f94f"
+
+semver@~4.3.3:
+  version "4.3.6"
+  resolved "https://registry.yarnpkg.com/semver/-/semver-4.3.6.tgz#300bc6e0e86374f7ba61068b5b1ecd57fc6532da"
 
 send@0.15.1:
   version "0.15.1"
@@ -4008,9 +4073,9 @@ signal-exit@^3.0.0:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/signal-exit/-/signal-exit-3.0.2.tgz#b5fdc08f1287ea1178628e415e25132b73646c6d"
 
-sinon@2.2.0:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/sinon/-/sinon-2.2.0.tgz#3b1b42ff5defcbf51a52a62aca6d61171b9fd262"
+sinon@2.3.1:
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/sinon/-/sinon-2.3.1.tgz#48c9c758b4d0bb86327486833f1c4298919ce9ee"
   dependencies:
     diff "^3.1.0"
     formatio "1.2.0"
@@ -4527,16 +4592,7 @@ typedarray@^0.0.6:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
 
-uglify-js@^2.6:
-  version "2.8.16"
-  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-2.8.16.tgz#d286190b6eefc6fd65eb0ecac6551e0b0e8839a4"
-  dependencies:
-    source-map "~0.5.1"
-    yargs "~3.10.0"
-  optionalDependencies:
-    uglify-to-browserify "~1.0.0"
-
-uglify-js@mishoo/UglifyJS2#harmony-v2.8.22:
+uglify-js@^2.6, uglify-js@mishoo/UglifyJS2#harmony-v2.8.22:
   version "2.8.22"
   resolved "https://codeload.github.com/mishoo/UglifyJS2/tar.gz/278577f3cb75e72320564805ee91be63e5f9c806"
   dependencies:

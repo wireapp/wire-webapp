@@ -29,7 +29,10 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
    */
   constructor(media_repository) {
     this.media_repository = media_repository;
-    this.logger = new z.util.Logger('z.media.MediaDevicesHandler', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger(
+      'z.media.MediaDevicesHandler',
+      z.config.LOGGER.OPTIONS,
+    );
 
     this.available_devices = {
       audio_input: ko.observableArray([]),
@@ -52,8 +55,12 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
       video_input: ko.observable(0),
     };
 
-    this.has_camera = ko.pureComputed(() => this.available_devices.video_input().length > 0);
-    this.has_microphone = ko.pureComputed(() => this.available_devices.audio_input().length > 0);
+    this.has_camera = ko.pureComputed(
+      () => this.available_devices.video_input().length > 0,
+    );
+    this.has_microphone = ko.pureComputed(
+      () => this.available_devices.audio_input().length > 0,
+    );
 
     this.initialize_media_devices();
   }
@@ -65,12 +72,11 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
   initialize_media_devices() {
     if (!z.media.MediaRepository.supports_media_devices()) return;
 
-    this.get_media_devices()
-      .then(() => {
-        this._set_current_devices();
-        this._subscribe_to_observables();
-        this._subscribe_to_devices();
-      });
+    this.get_media_devices().then(() => {
+      this._set_current_devices();
+      this._subscribe_to_observables();
+      this._subscribe_to_devices();
+    });
   }
 
   /**
@@ -78,13 +84,27 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
    * @returns {undefined} No return value
    */
   _set_current_devices() {
-    this.current_device_id.audio_input(z.util.StorageUtil.get_value(z.media.MediaDeviceType.AUDIO_INPUT) || 'default');
-    this.current_device_id.audio_output(z.util.StorageUtil.get_value(z.media.MediaDeviceType.AUDIO_OUTPUT) || 'default');
-    this.current_device_id.video_input(z.util.StorageUtil.get_value(z.media.MediaDeviceType.VIDEO_INPUT));
+    this.current_device_id.audio_input(
+      z.util.StorageUtil.get_value(z.media.MediaDeviceType.AUDIO_INPUT) ||
+        'default',
+    );
+    this.current_device_id.audio_output(
+      z.util.StorageUtil.get_value(z.media.MediaDeviceType.AUDIO_OUTPUT) ||
+        'default',
+    );
+    this.current_device_id.video_input(
+      z.util.StorageUtil.get_value(z.media.MediaDeviceType.VIDEO_INPUT),
+    );
 
-    if (!this.current_device_id.video_input() && this.available_devices.video_input().length) {
-      const default_device_index = this.available_devices.video_input().length - 1;
-      this.current_device_id.video_input(this.available_devices.video_input()[default_device_index].deviceId);
+    if (
+      !this.current_device_id.video_input() &&
+      this.available_devices.video_input().length
+    ) {
+      const default_device_index =
+        this.available_devices.video_input().length - 1;
+      this.current_device_id.video_input(
+        this.available_devices.video_input()[default_device_index].deviceId,
+      );
       this.current_device_index.video_input(default_device_index);
     }
 
@@ -109,58 +129,112 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
    * @returns {undefined} No return value
    */
   _subscribe_to_observables() {
-    this.available_devices.audio_input.subscribe((media_devices) => {
+    this.available_devices.audio_input.subscribe(media_devices => {
       if (media_devices.length) {
-        this._update_current_index_from_devices(z.media.MediaDeviceType.AUDIO_INPUT, media_devices);
+        this._update_current_index_from_devices(
+          z.media.MediaDeviceType.AUDIO_INPUT,
+          media_devices,
+        );
       }
     });
 
-    this.available_devices.audio_output.subscribe((media_devices) => {
+    this.available_devices.audio_output.subscribe(media_devices => {
       if (media_devices.length) {
-        this._update_current_index_from_devices(z.media.MediaDeviceType.AUDIO_OUTPUT, media_devices);
+        this._update_current_index_from_devices(
+          z.media.MediaDeviceType.AUDIO_OUTPUT,
+          media_devices,
+        );
       }
     });
 
-    this.available_devices.screen_input.subscribe((media_devices) => {
+    this.available_devices.screen_input.subscribe(media_devices => {
       if (media_devices.length) {
-        this._update_current_index_from_devices(z.media.MediaDeviceType.SCREEN_INPUT, media_devices);
+        this._update_current_index_from_devices(
+          z.media.MediaDeviceType.SCREEN_INPUT,
+          media_devices,
+        );
       }
     });
 
-    this.available_devices.video_input.subscribe((media_devices) => {
+    this.available_devices.video_input.subscribe(media_devices => {
       if (media_devices.length) {
-        this._update_current_index_from_devices(z.media.MediaDeviceType.VIDEO_INPUT, media_devices);
+        this._update_current_index_from_devices(
+          z.media.MediaDeviceType.VIDEO_INPUT,
+          media_devices,
+        );
       }
     });
 
-    this.current_device_id.audio_input.subscribe((media_device_id) => {
-      z.util.StorageUtil.set_value(z.media.MediaDeviceType.AUDIO_INPUT, media_device_id);
-      if (media_device_id && this.media_repository.stream_handler.local_media_stream()) {
-        this.media_repository.stream_handler.replace_input_source(z.media.MediaType.AUDIO);
-        this._update_current_index_from_id(z.media.MediaDeviceType.AUDIO_INPUT, media_device_id);
+    this.current_device_id.audio_input.subscribe(media_device_id => {
+      z.util.StorageUtil.set_value(
+        z.media.MediaDeviceType.AUDIO_INPUT,
+        media_device_id,
+      );
+      if (
+        media_device_id &&
+        this.media_repository.stream_handler.local_media_stream()
+      ) {
+        this.media_repository.stream_handler.replace_input_source(
+          z.media.MediaType.AUDIO,
+        );
+        this._update_current_index_from_id(
+          z.media.MediaDeviceType.AUDIO_INPUT,
+          media_device_id,
+        );
       }
     });
 
-    this.current_device_id.audio_output.subscribe((media_device_id) => {
-      z.util.StorageUtil.set_value(z.media.MediaDeviceType.AUDIO_OUTPUT, media_device_id);
+    this.current_device_id.audio_output.subscribe(media_device_id => {
+      z.util.StorageUtil.set_value(
+        z.media.MediaDeviceType.AUDIO_OUTPUT,
+        media_device_id,
+      );
       if (media_device_id) {
-        this.media_repository.element_handler.switch_media_element_output(media_device_id);
-        this._update_current_index_from_id(z.media.MediaDeviceType.AUDIO_OUTPUT, media_device_id);
+        this.media_repository.element_handler.switch_media_element_output(
+          media_device_id,
+        );
+        this._update_current_index_from_id(
+          z.media.MediaDeviceType.AUDIO_OUTPUT,
+          media_device_id,
+        );
       }
     });
 
-    this.current_device_id.screen_input.subscribe((media_device_id) => {
-      if (media_device_id && this.media_repository.stream_handler.local_media_stream() && (this.media_repository.stream_handler.local_media_type() === z.media.MediaType.SCREEN)) {
-        this.media_repository.stream_handler.replace_input_source(z.media.MediaType.SCREEN);
-        this._update_current_index_from_id(z.media.MediaDeviceType.SCREEN_INPUT, media_device_id);
+    this.current_device_id.screen_input.subscribe(media_device_id => {
+      if (
+        media_device_id &&
+        this.media_repository.stream_handler.local_media_stream() &&
+        this.media_repository.stream_handler.local_media_type() ===
+          z.media.MediaType.SCREEN
+      ) {
+        this.media_repository.stream_handler.replace_input_source(
+          z.media.MediaType.SCREEN,
+        );
+        this._update_current_index_from_id(
+          z.media.MediaDeviceType.SCREEN_INPUT,
+          media_device_id,
+        );
       }
     });
 
-    this.current_device_id.video_input.subscribe((media_device_id) => {
-      z.util.StorageUtil.set_value(z.media.MediaDeviceType.VIDEO_INPUT, media_device_id);
-      if (media_device_id && this.media_repository.stream_handler.local_media_stream() && (this.media_repository.stream_handler.local_media_type() === z.media.MediaType.VIDEO)) {
-        this.media_repository.stream_handler.replace_input_source(z.media.MediaType.VIDEO);
-        this._update_current_index_from_id(z.media.MediaDeviceType.VIDEO_INPUT, media_device_id);
+    this.current_device_id.video_input.subscribe(media_device_id => {
+      z.util.StorageUtil.set_value(
+        z.media.MediaDeviceType.VIDEO_INPUT,
+        media_device_id,
+      );
+      if (
+        media_device_id &&
+        this.media_repository.stream_handler.local_media_stream() &&
+        this.media_repository.stream_handler.local_media_type() ===
+          z.media.MediaType.VIDEO
+      ) {
+        this.media_repository.stream_handler.replace_input_source(
+          z.media.MediaType.VIDEO,
+        );
+        this._update_current_index_from_id(
+          z.media.MediaDeviceType.VIDEO_INPUT,
+          media_device_id,
+        );
       }
     });
   }
@@ -170,12 +244,16 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
    * @returns {Promise} Resolves with all MediaDevices when the list has been updated
    */
   get_media_devices() {
-    return navigator.mediaDevices.enumerateDevices()
-      .catch((error) => {
-        this.logger.error(`Failed to update MediaDevice list: ${error.message}`, error);
+    return navigator.mediaDevices
+      .enumerateDevices()
+      .catch(error => {
+        this.logger.error(
+          `Failed to update MediaDevice list: ${error.message}`,
+          error,
+        );
         throw error;
       })
-      .then((media_devices) => {
+      .then(media_devices => {
         this._remove_all_devices();
 
         if (media_devices) {
@@ -183,7 +261,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
           const audio_output_devices = [];
           const video_input_devices = [];
 
-          media_devices.forEach((media_device) => {
+          media_devices.forEach(media_device => {
             switch (media_device.kind) {
               case z.media.MediaDeviceType.AUDIO_INPUT:
                 audio_input_devices.push(media_device);
@@ -195,18 +273,31 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
                 video_input_devices.push(media_device);
                 break;
               default:
-                throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
+                throw new z.media.MediaError(
+                  z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE,
+                );
             }
           });
 
-          z.util.ko_array_push_all(this.available_devices.audio_input, audio_input_devices);
-          z.util.ko_array_push_all(this.available_devices.audio_output, audio_output_devices);
-          z.util.ko_array_push_all(this.available_devices.video_input, video_input_devices);
+          z.util.ko_array_push_all(
+            this.available_devices.audio_input,
+            audio_input_devices,
+          );
+          z.util.ko_array_push_all(
+            this.available_devices.audio_output,
+            audio_output_devices,
+          );
+          z.util.ko_array_push_all(
+            this.available_devices.video_input,
+            video_input_devices,
+          );
 
           this.logger.info('Updated MediaDevice list', media_devices);
           return media_devices;
         }
-        throw new z.media.MediaError(z.media.MediaError.TYPE.NO_MEDIA_DEVICES_FOUND);
+        throw new z.media.MediaError(
+          z.media.MediaError.TYPE.NO_MEDIA_DEVICES_FOUND,
+        );
       });
   }
 
@@ -224,18 +315,27 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
         types: ['screen'],
       };
 
-      return window.desktopCapturer.getSources(options, (error, screen_sources) => {
-        if (error) return reject(error);
+      return window.desktopCapturer.getSources(
+        options,
+        (error, screen_sources) => {
+          if (error) return reject(error);
 
-        this.logger.info(`Found '${screen_sources.length}' possible sources for screen sharing on Electron`, screen_sources);
-        this.available_devices.screen_input(screen_sources);
-        if (screen_sources.length === 1) {
-          this.current_device_id.screen_input('');
-          this.logger.info(`Selected '${screen_sources[0].name}' for screen sharing`, screen_sources[0]);
-          this.current_device_id.screen_input(screen_sources[0].id);
-        }
-        return resolve(screen_sources);
-      });
+          this.logger.info(
+            `Found '${screen_sources.length}' possible sources for screen sharing on Electron`,
+            screen_sources,
+          );
+          this.available_devices.screen_input(screen_sources);
+          if (screen_sources.length === 1) {
+            this.current_device_id.screen_input('');
+            this.logger.info(
+              `Selected '${screen_sources[0].name}' for screen sharing`,
+              screen_sources[0],
+            );
+            this.current_device_id.screen_input(screen_sources[0].id);
+          }
+          return resolve(screen_sources);
+        },
+      );
     });
   }
 
@@ -244,16 +344,28 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
    * @returns {Promise} Resolves when camera has been toggled.
    */
   toggle_next_camera() {
-    return this.get_media_devices()
-      .then(() => {
-        const {current_device} = this._get_current_device(this.available_devices.video_input(), this.current_device_id.video_input());
-        const next_device = this.available_devices.video_input()[z.util.ArrayUtil.iterate_index(this.available_devices.video_input(), this.current_device_index.video_input()) || 0];
+    return this.get_media_devices().then(() => {
+      const {current_device} = this._get_current_device(
+        this.available_devices.video_input(),
+        this.current_device_id.video_input(),
+      );
+      const next_device = this.available_devices.video_input()[
+        z.util.ArrayUtil.iterate_index(
+          this.available_devices.video_input(),
+          this.current_device_index.video_input(),
+        ) || 0
+      ];
 
-        this.current_device_id.video_input(next_device.deviceId);
+      this.current_device_id.video_input(next_device.deviceId);
 
-        const current_device_name = current_device ? (current_device.name || current_device.id) : undefined;
-        this.logger.info(`Switching the active camera from '${current_device_name}' to '${next_device.label || next_device.deviceId}'`);
-      });
+      const current_device_name = current_device
+        ? current_device.name || current_device.id
+        : undefined;
+      this.logger.info(
+        `Switching the active camera from '${current_device_name}' to '${next_device.label ||
+          next_device.deviceId}'`,
+      );
+    });
   }
 
   /**
@@ -261,16 +373,28 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
    * @returns {Promise} Resolves when screen has been toggled.
    */
   toggle_next_screen() {
-    return this.get_screen_sources()
-      .then(() => {
-        const {current_device} = this._get_current_device(this.available_devices.screen_input(), this.current_device_id.screen_input());
-        const next_device = this.available_devices.screen_input()[z.util.ArrayUtil.iterate_index(this.available_devices.screen_input(), this.current_device_index.screen_input()) || 0];
+    return this.get_screen_sources().then(() => {
+      const {current_device} = this._get_current_device(
+        this.available_devices.screen_input(),
+        this.current_device_id.screen_input(),
+      );
+      const next_device = this.available_devices.screen_input()[
+        z.util.ArrayUtil.iterate_index(
+          this.available_devices.screen_input(),
+          this.current_device_index.screen_input(),
+        ) || 0
+      ];
 
-        this.current_device_id.screen_input(next_device.id);
+      this.current_device_id.screen_input(next_device.id);
 
-        const current_device_name = current_device ? (current_device.name || current_device.id) : undefined;
-        this.logger.info(`Switching the active screen from '${current_device_name}' to '${next_device.name || next_device.id}'`);
-      });
+      const current_device_name = current_device
+        ? current_device.name || current_device.id
+        : undefined;
+      this.logger.info(
+        `Switching the active screen from '${current_device_name}' to '${next_device.name ||
+          next_device.id}'`,
+      );
+    });
   }
 
   /**
@@ -279,33 +403,48 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
    * @returns {Promise} Resolves when the current device has been updated
    */
   update_current_devices(video_send) {
-    return this.get_media_devices()
-      .then(() => {
-        const _check_device = (media_type, device_type) => {
-          device_type = this._type_conversion(device_type);
+    return this.get_media_devices().then(() => {
+      const _check_device = (media_type, device_type) => {
+        device_type = this._type_conversion(device_type);
 
-          const device_id_observable = this.current_device_id[`${device_type}`];
-          const media_devices = this.available_devices[`${device_type}`]();
-          const {current_device: media_device} = this._get_current_device(media_devices, device_id_observable());
+        const device_id_observable = this.current_device_id[`${device_type}`];
+        const media_devices = this.available_devices[`${device_type}`]();
+        const {current_device: media_device} = this._get_current_device(
+          media_devices,
+          device_id_observable(),
+        );
 
-          if (!media_device) {
-            const updated_device = this.available_devices[`${device_type}`]()[0];
+        if (!media_device) {
+          const updated_device = this.available_devices[`${device_type}`]()[0];
 
-            if (updated_device) {
-              this.logger.warn(`Selected '${media_type}' device '${device_id_observable()}' not found and replaced by '${updated_device.label || updated_device.deviceId}'`, media_devices);
-              return device_id_observable(updated_device.deviceId);
-            }
-
-            this.logger.warn(`Selected '${media_type}' device '${device_id_observable()}' not found and reset'`, media_devices);
-            return device_id_observable('');
+          if (updated_device) {
+            this.logger.warn(
+              `Selected '${media_type}' device '${device_id_observable()}' not found and replaced by '${updated_device.label ||
+                updated_device.deviceId}'`,
+              media_devices,
+            );
+            return device_id_observable(updated_device.deviceId);
           }
-        };
 
-        _check_device(z.media.MediaType.AUDIO, z.media.MediaDeviceType.AUDIO_INPUT);
-        if (video_send) {
-          _check_device(z.media.MediaType.VIDEO, z.media.MediaDeviceType.VIDEO_INPUT);
+          this.logger.warn(
+            `Selected '${media_type}' device '${device_id_observable()}' not found and reset'`,
+            media_devices,
+          );
+          return device_id_observable('');
         }
-      });
+      };
+
+      _check_device(
+        z.media.MediaType.AUDIO,
+        z.media.MediaDeviceType.AUDIO_INPUT,
+      );
+      if (video_send) {
+        _check_device(
+          z.media.MediaType.VIDEO,
+          z.media.MediaDeviceType.VIDEO_INPUT,
+        );
+      }
+    });
   }
 
   /**
@@ -317,7 +456,10 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
    */
   _get_current_device(media_devices, current_device_id) {
     for (const [index, media_device] of media_devices.entries()) {
-      if (media_device.deviceId === current_device_id || media_device.id === current_device_id) {
+      if (
+        media_device.deviceId === current_device_id ||
+        media_device.id === current_device_id
+      ) {
         return {current_device: media_device, current_device_index: index};
       }
     }
@@ -355,8 +497,15 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
    * @param {string} current_device_id - Current device ID to look for
    * @returns {undefined} No return value
    */
-  _update_current_device_index(index_observable, available_devices, current_device_id) {
-    const {current_device_index} = this._get_current_device(available_devices, current_device_id);
+  _update_current_device_index(
+    index_observable,
+    available_devices,
+    current_device_id,
+  ) {
+    const {current_device_index} = this._get_current_device(
+      available_devices,
+      current_device_id,
+    );
 
     if (_.isNumber(current_device_index)) {
       index_observable(current_device_index);
@@ -372,7 +521,11 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
    */
   _update_current_index_from_devices(device_type, available_devices) {
     device_type = this._type_conversion(device_type);
-    this._update_current_device_index(this.current_device_index[`${device_type}`], available_devices, this.current_device_id[`${device_type}`]());
+    this._update_current_device_index(
+      this.current_device_index[`${device_type}`],
+      available_devices,
+      this.current_device_id[`${device_type}`](),
+    );
   }
 
   /**
@@ -384,6 +537,10 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
    */
   _update_current_index_from_id(device_type, selected_input_device_id) {
     device_type = this._type_conversion(device_type);
-    this._update_current_device_index(this.current_device_index[`${device_type}`], this.available_devices[`${device_type}`](), selected_input_device_id);
+    this._update_current_device_index(
+      this.current_device_index[`${device_type}`],
+      this.available_devices[`${device_type}`](),
+      selected_input_device_id,
+    );
   }
 };

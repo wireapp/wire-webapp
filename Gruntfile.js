@@ -19,7 +19,7 @@
 
 'use strict';
 
-module.exports = (grunt) => {
+module.exports = grunt => {
   require('load-grunt-tasks')(grunt);
 
   const config = {
@@ -97,44 +97,86 @@ module.exports = (grunt) => {
 
   // Deploy to different environments
   grunt.registerTask('app_deploy', ['gitinfo', 'aws_deploy']);
-  grunt.registerTask('app_deploy_staging', ['gitinfo', 'set_version:staging', 'aws_deploy']);
-  grunt.registerTask('app_deploy_prod', ['gitinfo', 'set_version:prod', 'aws_deploy']);
+  grunt.registerTask('app_deploy_staging', [
+    'gitinfo',
+    'set_version:staging',
+    'aws_deploy',
+  ]);
+  grunt.registerTask('app_deploy_prod', [
+    'gitinfo',
+    'set_version:prod',
+    'aws_deploy',
+  ]);
 
-  grunt.registerTask('app_deploy_travis', (target) => {
+  grunt.registerTask('app_deploy_travis', target => {
     if (target === 'prod' || target === 'staging') {
-      grunt.task.run(`set_version:${target}`, 'init', `prepare_${target}`, 'aws_prepare');
+      grunt.task.run(
+        `set_version:${target}`,
+        'init',
+        `prepare_${target}`,
+        'aws_prepare',
+      );
     } else if (target === 'dev') {
-      grunt.task.run('set_version:staging', 'init', 'prepare_staging', 'aws_prepare');
+      grunt.task.run(
+        'set_version:staging',
+        'init',
+        'prepare_staging',
+        'aws_prepare',
+      );
     } else {
-      grunt.fail.warn('Invalid target specified. Valid targets are: "prod" & "staging"');
+      grunt.fail.warn(
+        'Invalid target specified. Valid targets are: "prod" & "staging"',
+      );
     }
   });
 
   // Test Related
-  grunt.registerTask('test', () => grunt.task.run(['clean:docs_coverage', 'scripts', 'test_init', 'test_prepare', 'karma:test']));
+  grunt.registerTask('test', () =>
+    grunt.task.run([
+      'clean:docs_coverage',
+      'scripts',
+      'test_init',
+      'test_prepare',
+      'karma:test',
+    ]),
+  );
 
-  grunt.registerTask('test_prepare', (test_name) => {
+  grunt.registerTask('test_prepare', test_name => {
     const scripts = grunt.config('scripts');
     const scripts_minified = grunt.config('scripts_minified');
 
-    const prepare_file_names = (file_name_array) => {
-      return file_name_array.map((file_name) => file_name.replace('deploy/', ''));
+    const prepare_file_names = file_name_array => {
+      return file_name_array.map(file_name => file_name.replace('deploy/', ''));
     };
 
     const helper_files = grunt.config.get('karma.options.files');
-    const app_files = prepare_file_names(scripts_minified.app.concat(scripts.app));
-    const component_files = prepare_file_names(scripts_minified.component.concat(scripts.component));
-    const vendor_files = prepare_file_names(scripts_minified.vendor.concat(scripts.vendor));
-    const test_files = test_name ? [`../test/unit_tests/${test_name}Spec.js`] : ['../test/unit_tests/**/*Spec.js'];
+    const app_files = prepare_file_names(
+      scripts_minified.app.concat(scripts.app),
+    );
+    const component_files = prepare_file_names(
+      scripts_minified.component.concat(scripts.component),
+    );
+    const vendor_files = prepare_file_names(
+      scripts_minified.vendor.concat(scripts.vendor),
+    );
+    const test_files = test_name
+      ? [`../test/unit_tests/${test_name}Spec.js`]
+      : ['../test/unit_tests/**/*Spec.js'];
 
-    const files = [].concat(helper_files, vendor_files, component_files, app_files, test_files);
+    const files = [].concat(
+      helper_files,
+      vendor_files,
+      component_files,
+      app_files,
+      test_files,
+    );
 
     grunt.config('karma.options.files', files);
   });
 
   grunt.registerTask('test_init', ['prepare_dist']);
 
-  grunt.registerTask('test_run', (test_name) => {
+  grunt.registerTask('test_run', test_name => {
     grunt.config('karma.options.reporters', ['progress']);
     grunt.task.run([
       'scripts',

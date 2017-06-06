@@ -28,10 +28,13 @@ z.util.emoji = {
     // http://crocodillon.com/blog/parsing-emoji-unicode-in-javascript
     const emoji_regex = /\ud83c[\udf00-\udfff]|\ud83c[\udde6-\uddff]|\ud83d[\udc00-\udeff]|\ud83e[\udd10-\uddff]|[\u231a-\u27ff][\ufe0f]?/g;
 
-    const is_valid_string = (string) => _.isString(string) && (string.length > 0);
+    const is_valid_string = (string) => _.isString(string) && string.length > 0;
     const remove_emojies = (string) => string.replace(emoji_regex, '');
     const remove_whitespace = (string) => string.replace(/\s/g, '');
 
-    return is_valid_string(text) && (remove_emojies(remove_whitespace(text)).length === 0);
+    return (
+      is_valid_string(text) &&
+      remove_emojies(remove_whitespace(text)).length === 0
+    );
   },
 };

@@ -24,7 +24,13 @@ window.z.ViewModel = z.ViewModel || {};
 window.z.ViewModel.content = z.ViewModel.content || {};
 
 z.ViewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewModel {
-  constructor(element_id, preferences_device_details, client_repository, conversation_repository, cryptography_repository) {
+  constructor(
+    element_id,
+    preferences_device_details,
+    client_repository,
+    conversation_repository,
+    cryptography_repository,
+  ) {
     this.click_on_remove_device = this.click_on_remove_device.bind(this);
     this.click_on_show_device = this.click_on_show_device.bind(this);
     this.update_device_info = this.update_device_info.bind(this);
@@ -33,71 +39,98 @@ z.ViewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
     this.client_repository = client_repository;
     this.conversation_repository = conversation_repository;
     this.cryptography_repository = cryptography_repository;
-    this.logger = new z.util.Logger('z.ViewModel.content.PreferencesDevicesViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger(
+      'z.ViewModel.content.PreferencesDevicesViewModel',
+      z.config.LOGGER.OPTIONS,
+    );
 
     this.self_user = this.client_repository.self_user;
 
     this.current_client = this.client_repository.current_client;
 
-    this.activated_in = ko.observable(z.l10n.text(z.string.preferences_devices_activated_in));
-    this.activated_on = ko.observable(z.l10n.text(z.string.preferences_devices_activated_on));
+    this.activated_in = ko.observable(
+      z.l10n.text(z.string.preferences_devices_activated_in),
+    );
+    this.activated_on = ko.observable(
+      z.l10n.text(z.string.preferences_devices_activated_on),
+    );
     this.devices = ko.observableArray();
     this.fingerprint = ko.observable('');
 
-    this.should_update_scrollbar = ko.computed(() => {
-      return this.devices();
-    }).extend({notify: 'always', rateLimit: 500});
+    this.should_update_scrollbar = ko
+      .computed(() => {
+        return this.devices();
+      })
+      .extend({notify: 'always', rateLimit: 500});
 
     this._update_activation_location('?');
 
     // All clients except the current client
-    this.client_repository.clients.subscribe((client_ets) => {
-      const devices = client_ets.filter((client_et) => client_et.id !== this.current_client().id);
+    this.client_repository.clients.subscribe(client_ets => {
+      const devices = client_ets.filter(
+        client_et => client_et.id !== this.current_client().id,
+      );
       this.devices(devices);
     });
   }
 
   _update_activation_location(location) {
-    this.activated_in(z.localization.Localizer.get_text({
-      id: z.string.preferences_devices_activated_in,
-      replace: {
-        content: `<span class='preferences-devices-activated-bold'>${location}</span>`,
-        placeholder: '%location',
-      },
-    }));
+    this.activated_in(
+      z.localization.Localizer.get_text({
+        id: z.string.preferences_devices_activated_in,
+        replace: {
+          content: `<span class='preferences-devices-activated-bold'>${location}</span>`,
+          placeholder: '%location',
+        },
+      }),
+    );
   }
 
   _update_activation_time(time) {
-    this.activated_on(z.localization.Localizer.get_text({
-      id: z.string.preferences_devices_activated_on,
-      replace: {
-        content: `<span class='preferences-devices-activated-bold'>${z.util.format_timestamp(time)}</span>`,
-        placeholder: '%time',
-      },
-    }));
+    this.activated_on(
+      z.localization.Localizer.get_text({
+        id: z.string.preferences_devices_activated_on,
+        replace: {
+          content: `<span class='preferences-devices-activated-bold'>${z.util.format_timestamp(
+            time,
+          )}</span>`,
+          placeholder: '%time',
+        },
+      }),
+    );
   }
 
   _update_device_location(location) {
-    z.location.get_location(location.lat, location.lon)
-      .then((retrieved_location) => {
+    z.location
+      .get_location(location.lat, location.lon)
+      .then(retrieved_location => {
         if (retrieved_location) {
-          this._update_activation_location(`${retrieved_location.place}, ${retrieved_location.country_code}`);
+          this._update_activation_location(
+            `${retrieved_location.place}, ${retrieved_location.country_code}`,
+          );
         }
       });
   }
 
   click_on_show_device(device_et) {
     this.preferences_device_details.device(device_et);
-    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS);
+    amplify.publish(
+      z.event.WebApp.CONTENT.SWITCH,
+      z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS,
+    );
   }
 
   click_on_remove_device(device_et, event) {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.REMOVE_DEVICE, {
-      action: (password) => {
-        this.client_repository.delete_client(device_et.id, password);
+    amplify.publish(
+      z.event.WebApp.WARNING.MODAL,
+      z.ViewModel.ModalType.REMOVE_DEVICE,
+      {
+        action: password => {
+          this.client_repository.delete_client(device_et.id, password);
+        },
+        data: device_et.model,
       },
-      data: device_et.model,
-    });
+    );
     event.stopPropagation();
   }
 

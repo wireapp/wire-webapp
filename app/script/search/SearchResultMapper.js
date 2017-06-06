@@ -27,7 +27,10 @@ z.search.SearchResultMapper = class SearchResultMapper {
    * Construct a new Search Result Mapper.
    */
   constructor() {
-    this.logger = new z.util.Logger('z.search.SearchResultMapper', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger(
+      'z.search.SearchResultMapper',
+      z.config.LOGGER.OPTIONS,
+    );
   }
 
   /**
@@ -38,10 +41,8 @@ z.search.SearchResultMapper = class SearchResultMapper {
    * @returns {Promise} Resolves with the mapped search results
    */
   map_results(search_results = [], search_mode) {
-    return Promise.resolve()
-    .then(function() {
-
-      const search_ets = search_results.map((search_result) => {
+    return Promise.resolve().then(function() {
+      const search_ets = search_results.map(search_result => {
         return {
           id: search_result.id,
           mutual_friends_total: search_result.total_mutual_friends,
