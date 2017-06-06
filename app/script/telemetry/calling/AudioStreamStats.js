@@ -30,7 +30,7 @@ z.telemetry.calling.AudioStreamStats = class AudioStreamStats extends z
    * @param {Date} timestamp - Creation date
    * @returns {AudioStreamStats} The new AudioStream stats entity
    */
-    constructor(timestamp) {
+  constructor(timestamp) {
     super(timestamp);
     this.media_type = z.media.MediaType.AUDIO;
     this.volume_received = 0;

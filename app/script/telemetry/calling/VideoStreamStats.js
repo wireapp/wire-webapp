@@ -30,7 +30,7 @@ z.telemetry.calling.VideoStreamStats = class VideoStreamStats extends z
    * @param {Date} timestamp - Creation date
    * @returns {VideoStreamStats} The new VideoStream stats entity
    */
-    constructor(timestamp) {
+  constructor(timestamp) {
     super(timestamp);
     this.media_type = z.media.MediaType.VIDEO;
     this.frame_height_received = 0;

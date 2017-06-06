@@ -30,7 +30,7 @@ z.telemetry.calling.MediaStreamStats = class MediaStreamStats extends z
    * @param {Date} timestamp - Creation date
    * @returns {MediaStreamStats} The new MediaStream stats entity
    */
-    constructor(timestamp) {
+  constructor(timestamp) {
     super(timestamp);
     this.bit_rate_current_received = 0;
     this.bit_rate_current_sent = 0;

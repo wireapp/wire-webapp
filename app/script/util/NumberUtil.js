@@ -31,7 +31,7 @@ z.util.NumberUtil = {
     return value >= lower_bound && value <= upper_bound;
   },
   root_mean_square: function(float_array) {
-    const pow = float_array.map((number) => Math.pow(number, 2));
+    const pow = float_array.map(number => Math.pow(number, 2));
     const sum = pow.reduce((power, number) => power + number);
     return Math.sqrt(sum) / float_array.length;
   },

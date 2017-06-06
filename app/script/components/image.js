@@ -41,7 +41,7 @@ z.components.Image = class Image {
 
     this.load_image_asset = () => {
       this.asset_is_loading(true);
-      this.asset.load().then((blob) => {
+      this.asset.load().then(blob => {
         this.asset_is_loading(false);
         this.asset_src(window.URL.createObjectURL(blob));
       });

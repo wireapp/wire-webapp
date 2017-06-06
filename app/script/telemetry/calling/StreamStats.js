@@ -30,7 +30,7 @@ z.telemetry.calling.StreamStats = class StreamStats extends z.telemetry.calling
    * @param {Date} timestamp - Creation date
    * @returns {StreamStats} The new stream stats entity
    */
-    constructor(timestamp) {
+  constructor(timestamp) {
     super(timestamp);
     this.local_candidate_type = '';
     this.remote_candidate_type = '';
