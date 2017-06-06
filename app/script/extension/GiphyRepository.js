@@ -31,7 +31,7 @@ z.extension.GiphyRepository = class GiphyRepository {
     this.giphy_service = giphy_service;
     this.logger = new z.util.Logger(
       'z.extension.GiphyRepository',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
     this.gif_query_cache = {};
   }
@@ -51,13 +51,13 @@ z.extension.GiphyRepository = class GiphyRepository {
         max_size: 3 * 1024 * 1024,
         retry: 3,
       },
-      options
+      options,
     );
 
     const _get_random_gif = (retries = 0) => {
       if (options.retry === retries) {
         throw new Error(
-          `Unable to fetch a proper gif within ${options.retry} retries`
+          `Unable to fetch a proper gif within ${options.retry} retries`,
         );
       }
 
@@ -73,7 +73,7 @@ z.extension.GiphyRepository = class GiphyRepository {
 
           if (animated_gif.size > options.max_size) {
             this.logger.info(
-              `Gif size (${animated_gif.size}) is over maximum size (${animated_gif.size})`
+              `Gif size (${animated_gif.size}) is over maximum size (${animated_gif.size})`,
             );
             return _get_random_gif(retries + 1);
           }
@@ -110,7 +110,7 @@ z.extension.GiphyRepository = class GiphyRepository {
         random: true,
         sorting: 'relevant',
       },
-      options
+      options,
     );
 
     if (!options.query) {
@@ -171,7 +171,7 @@ z.extension.GiphyRepository = class GiphyRepository {
       .catch(error => {
         this.logger.info(
           `Unable to fetch gif for query: ${options.query}`,
-          error
+          error,
         );
         throw error;
       });

@@ -48,7 +48,7 @@ z.extension.GiphyService = class GiphyService {
     return this.client.send_json({
       type: 'GET',
       url: this.client.create_url(
-        `${GiphyService.CONFIG.ENDPOINT_BASE}/${ids.join(',')}`
+        `${GiphyService.CONFIG.ENDPOINT_BASE}/${ids.join(',')}`,
       ),
     });
   }
@@ -63,8 +63,8 @@ z.extension.GiphyService = class GiphyService {
       type: 'GET',
       url: this.client.create_url(
         `${GiphyService.CONFIG.ENDPOINT_BASE}/random?tag=${encodeURIComponent(
-          tag
-        )}`
+          tag,
+        )}`,
       ),
     });
   }
@@ -86,7 +86,7 @@ z.extension.GiphyService = class GiphyService {
         offset: 0,
         sorting: 'relevant',
       },
-      options
+      options,
     );
 
     const url =

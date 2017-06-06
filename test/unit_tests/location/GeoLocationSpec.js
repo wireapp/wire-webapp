@@ -26,7 +26,7 @@
 describe('z.location', function() {
   describe('get_location', function() {
     it('resolves a latitude & longitude via Google Maps API into a location name', function(
-      done
+      done,
     ) {
       // @formatter:off
       const locations = [
@@ -394,7 +394,7 @@ describe('z.location', function() {
     });
 
     it('prevents potential Cross-Site-Scripting (XSS) attacks via Google Maps API', function(
-      done
+      done,
     ) {
       // @formatter:off
       const locations = [
@@ -459,7 +459,7 @@ describe('z.location', function() {
         .get_location(latitude, longitude)
         .then(location => {
           expect(location.country_code).toBe(
-            '&lt;script&gt;alert(&quot;malicious&quot;)&lt;/script&gt;'
+            '&lt;script&gt;alert(&quot;malicious&quot;)&lt;/script&gt;',
           );
           expect(location.place).toBe('Berlin');
           done();
@@ -471,16 +471,16 @@ describe('z.location', function() {
   describe('get_maps_url', function() {
     it('should return the proper urls', function() {
       expect(z.location.get_maps_url(52, 13)).toBe(
-        'https://google.com/maps/@52,13'
+        'https://google.com/maps/@52,13',
       );
       expect(z.location.get_maps_url(52, 13, null, 14)).toBe(
-        'https://google.com/maps/@52,13,14z'
+        'https://google.com/maps/@52,13,14z',
       );
       expect(z.location.get_maps_url(52, 13, 'Berlin')).toBe(
-        'https://google.com/maps/place/Berlin/@52,13'
+        'https://google.com/maps/place/Berlin/@52,13',
       );
       expect(z.location.get_maps_url(52, 13, 'Berlin', 14)).toBe(
-        'https://google.com/maps/place/Berlin/@52,13,14z'
+        'https://google.com/maps/place/Berlin/@52,13,14z',
       );
     });
   });

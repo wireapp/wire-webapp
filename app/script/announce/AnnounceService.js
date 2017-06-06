@@ -32,7 +32,7 @@ z.announce.AnnounceService = class AnnounceService {
   constructor() {
     this.logger = new z.util.Logger(
       'z.announce.AnnounceService',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
     this.url = `${z.util.Environment.backend.website_url()}${AnnounceService
       .CONFIG.URL}?order=created&active=true`;

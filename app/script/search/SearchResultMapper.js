@@ -29,7 +29,7 @@ z.search.SearchResultMapper = class SearchResultMapper {
   constructor() {
     this.logger = new z.util.Logger(
       'z.search.SearchResultMapper',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
   }
 

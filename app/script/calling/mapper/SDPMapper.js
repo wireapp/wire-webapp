@@ -100,11 +100,11 @@ z.calling.mapper.SDPMapper = {
             .Environment.browser.version}`;
           if (z.util.Environment.electron) {
             outline = `a=tool:electron ${z.util.Environment.version()} ${z.util.Environment.version(
-              false
+              false,
             )} (${browser_string})`;
           } else {
             outline = `a=tool:webapp ${z.util.Environment.version(
-              false
+              false,
             )} (${browser_string})`;
           }
         }

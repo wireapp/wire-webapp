@@ -45,7 +45,7 @@ describe('PromiseQueue', function() {
     });
 
     it('should process promises that are added during execution', function(
-      done
+      done,
     ) {
       let counter = 0;
       const result = [];
@@ -90,7 +90,7 @@ describe('PromiseQueue', function() {
     });
 
     it('should process promises even when one of them times out (with retries)', function(
-      done
+      done,
     ) {
       let counter = 0;
 

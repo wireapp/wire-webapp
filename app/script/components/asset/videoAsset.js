@@ -33,7 +33,7 @@ z.components.VideoAssetComponent = class VideoAssetComponent {
   constructor(params, component_info) {
     this.logger = new z.util.Logger(
       'VideoAssetComponent',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
 
     this.message = ko.unwrap(params.message);
@@ -50,14 +50,14 @@ z.components.VideoAssetComponent = class VideoAssetComponent {
     this.show_bottom_controls = ko.observable(false);
 
     this.video_time_rest = ko.pureComputed(
-      () => this.video_element.duration - this.video_time()
+      () => this.video_element.duration - this.video_time(),
     );
 
     if (this.asset.preview_resource()) {
       this._load_video_preview();
     } else {
       this.preview_subscription = this.asset.preview_resource.subscribe(
-        this._load_video_preview.bind(this)
+        this._load_video_preview.bind(this),
       );
     }
 
@@ -69,7 +69,7 @@ z.components.VideoAssetComponent = class VideoAssetComponent {
     this.asset.load_preview().then(blob => {
       this.video_element.setAttribute(
         'poster',
-        window.URL.createObjectURL(blob)
+        window.URL.createObjectURL(blob),
       );
       this.video_element.style.backgroundColor = '#000';
     });
@@ -137,7 +137,7 @@ z.components.VideoAssetComponent = class VideoAssetComponent {
           1800,
         ]),
         duration_actual: duration,
-      }
+      },
     );
   }
 

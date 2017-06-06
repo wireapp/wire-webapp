@@ -53,7 +53,7 @@ ko.bindingHandlers.focus_on_keydown = {
           },
         },
       },
-      context
+      context,
     );
   },
 };
@@ -110,7 +110,7 @@ ko.bindingHandlers.background_image = {
 
     const viewport_changed = allBindingsAccessor.get('viewport_changed');
     const viewport_subscription = viewport_changed.subscribe(
-      _on_viewport_change
+      _on_viewport_change,
     );
     const asset_subscription = asset_remote_data.subscribe(_on_viewport_change);
 
@@ -153,7 +153,7 @@ ko.bindingHandlers.relative_timestamp = (function() {
 
     if (current_day === yesterday) {
       return `${z.l10n.text(
-        z.string.conversation_yesterday
+        z.string.conversation_yesterday,
       )} ${date.local().format('HH:mm')}`;
     }
 
@@ -186,7 +186,7 @@ ko.bindingHandlers.relative_timestamp = (function() {
 
     if (current_day === yesterday) {
       return `${z.l10n.text(
-        z.string.conversation_yesterday
+        z.string.conversation_yesterday,
       )} ${date.local().format('HH:mm')}`;
     }
 
@@ -219,7 +219,7 @@ ko.bindingHandlers.relative_timestamp = (function() {
         calculate(
           element,
           valueAccessor(),
-          allBindings.get('relative_timestamp_day')
+          allBindings.get('relative_timestamp_day'),
         );
       };
 

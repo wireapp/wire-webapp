@@ -34,8 +34,8 @@ describe('z.search.FullTextSearch', function() {
       expect(
         z.search.FullTextSearch.search(
           'youtube.com/watch?v=pQHX-Sj',
-          'youtube.com/watch?v=pQHX-Sj'
-        )
+          'youtube.com/watch?v=pQHX-Sj',
+        ),
       ).toBeTruthy();
     });
 
@@ -61,13 +61,13 @@ describe('z.search.FullTextSearch', function() {
 
     it('special cases', function() {
       expect(
-        z.search.FullTextSearch.search('aa 11:45 am bb', '11:45')
+        z.search.FullTextSearch.search('aa 11:45 am bb', '11:45'),
       ).toBeTruthy();
       expect(
         z.search.FullTextSearch.search(
           'https://www.link.com/something-to-read?q=12&second#reader',
-          'something to read'
-        )
+          'something to read',
+        ),
       ).toBeTruthy();
       expect(z.search.FullTextSearch.search('@peter', 'peter')).toBeTruthy();
       // expect(z.search.FullTextSearch.search('René', 'rene')).toBeTruthy()

@@ -113,7 +113,7 @@ z.components.UserAvatar = class UserAvatar {
             image.src = url;
             this.element.find('.user-avatar-image').empty().append(image);
             this.element.addClass(
-              'user-avatar-image-loaded user-avatar-loading-transition'
+              'user-avatar-image-loaded user-avatar-loading-transition',
             );
             this.avatar_loading_blocked = false;
           });
@@ -126,7 +126,7 @@ z.components.UserAvatar = class UserAvatar {
         if (this.avatar_entered_viewport) {
           this._load_avatar_picture();
         }
-      }
+      },
     );
   }
 

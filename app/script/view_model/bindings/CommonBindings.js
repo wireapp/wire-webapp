@@ -59,7 +59,7 @@ ko.bindingHandlers.drop_file = {
           drop: fileSelectHandler,
         },
       },
-      context
+      context,
     );
   },
 };
@@ -92,7 +92,7 @@ ko.bindingHandlers.paste_file = {
           paste: on_paste,
         },
       },
-      context
+      context,
     );
   },
 };
@@ -115,7 +115,7 @@ ko.bindingHandlers.ignore_drop_file = {
           },
         },
       },
-      context
+      context,
     );
   },
 };
@@ -154,7 +154,7 @@ ko.bindingHandlers.resize = (function() {
       last_height = current_height;
       const max_height = window.parseInt(
         getComputedStyle(element).maxHeight,
-        10
+        10,
       );
 
       if (current_height === max_height) {
@@ -184,7 +184,7 @@ ko.bindingHandlers.resize = (function() {
               },
             },
           },
-          context
+          context,
         );
       }
     },
@@ -224,7 +224,7 @@ ko.bindingHandlers.enter = {
           keypress: wrapper,
         },
       },
-      context
+      context,
     );
   },
 };
@@ -256,7 +256,7 @@ ko.bindingHandlers.file_select = {
           },
         },
       },
-      context
+      context,
     );
   },
 };
@@ -331,7 +331,7 @@ ko.subscribable.fn.subscribe_once = function(handler, owner, event_name) {
       handler(new_value);
     },
     owner,
-    event_name
+    event_name,
   );
 };
 
@@ -362,7 +362,7 @@ ko.bindingHandlers.antiscroll = {
         resize_event,
         _.throttle(() => {
           antiscroll.rebuild();
-        }, 100)
+        }, 100),
       );
 
       ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
@@ -428,7 +428,7 @@ ko.bindingHandlers.relative_timestamp = (function() {
       return $(element).text(
         `${z.l10n.text(z.string.conversation_yesterday)} ${date
           .local()
-          .format('HH:mm')}`
+          .format('HH:mm')}`,
       );
     }
 

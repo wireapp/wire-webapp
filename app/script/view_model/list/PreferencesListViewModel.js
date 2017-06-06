@@ -36,7 +36,7 @@ z.ViewModel.list.PreferencesListViewModel = class PreferencesListViewModel {
     this.content_view_model = content_view_model;
     this.logger = new z.util.Logger(
       'z.ViewModel.list.PreferencesListViewModel',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
 
     this.preferences_state = this.content_view_model.content_state;
@@ -49,28 +49,28 @@ z.ViewModel.list.PreferencesListViewModel = class PreferencesListViewModel {
     this.selected_about = ko.pureComputed(
       () =>
         this.preferences_state() ===
-        z.ViewModel.content.CONTENT_STATE.PREFERENCES_ABOUT
+        z.ViewModel.content.CONTENT_STATE.PREFERENCES_ABOUT,
     );
     this.selected_account = ko.pureComputed(
       () =>
         this.preferences_state() ===
-        z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT
+        z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT,
     );
     this.selected_av = ko.pureComputed(
       () =>
         this.preferences_state() ===
-        z.ViewModel.content.CONTENT_STATE.PREFERENCES_AV
+        z.ViewModel.content.CONTENT_STATE.PREFERENCES_AV,
     );
     this.selected_devices = ko.pureComputed(() =>
       [
         z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS,
         z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES,
-      ].includes(this.preferences_state())
+      ].includes(this.preferences_state()),
     );
     this.selected_options = ko.pureComputed(
       () =>
         this.preferences_state() ===
-        z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS
+        z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS,
     );
   }
 
@@ -80,31 +80,31 @@ z.ViewModel.list.PreferencesListViewModel = class PreferencesListViewModel {
 
   click_on_about() {
     this.content_view_model.switch_content(
-      z.ViewModel.content.CONTENT_STATE.PREFERENCES_ABOUT
+      z.ViewModel.content.CONTENT_STATE.PREFERENCES_ABOUT,
     );
   }
 
   click_on_account() {
     this.content_view_model.switch_content(
-      z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT
+      z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT,
     );
   }
 
   click_on_av() {
     this.content_view_model.switch_content(
-      z.ViewModel.content.CONTENT_STATE.PREFERENCES_AV
+      z.ViewModel.content.CONTENT_STATE.PREFERENCES_AV,
     );
   }
 
   click_on_devices() {
     this.content_view_model.switch_content(
-      z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES
+      z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES,
     );
   }
 
   click_on_options() {
     this.content_view_model.switch_content(
-      z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS
+      z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS,
     );
   }
 };

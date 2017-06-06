@@ -28,7 +28,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
   constructor() {
     this.logger = new z.util.Logger(
       'z.conversation.ConversationMapper',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
   }
 
@@ -100,14 +100,14 @@ z.conversation.ConversationMapper = class ConversationMapper {
       if (self.last_event_timestamp) {
         conversation_et.set_timestamp(
           self.last_event_timestamp,
-          z.conversation.ConversationUpdateType.LAST_EVENT_TIMESTAMP
+          z.conversation.ConversationUpdateType.LAST_EVENT_TIMESTAMP,
         );
       }
 
       if (self.archived_timestamp) {
         conversation_et.set_timestamp(
           self.archived_timestamp,
-          z.conversation.ConversationUpdateType.ARCHIVED_TIMESTAMP
+          z.conversation.ConversationUpdateType.ARCHIVED_TIMESTAMP,
         );
         conversation_et.archived_state(self.archived_state);
       }
@@ -115,21 +115,21 @@ z.conversation.ConversationMapper = class ConversationMapper {
       if (self.cleared_timestamp) {
         conversation_et.set_timestamp(
           self.cleared_timestamp,
-          z.conversation.ConversationUpdateType.CLEARED_TIMESTAMP
+          z.conversation.ConversationUpdateType.CLEARED_TIMESTAMP,
         );
       }
 
       if (self.last_read_timestamp) {
         conversation_et.set_timestamp(
           self.last_read_timestamp,
-          z.conversation.ConversationUpdateType.LAST_READ_TIMESTAMP
+          z.conversation.ConversationUpdateType.LAST_READ_TIMESTAMP,
         );
       }
 
       if (self.muted_timestamp) {
         conversation_et.set_timestamp(
           self.muted_timestamp,
-          z.conversation.ConversationUpdateType.MUTED_TIMESTAMP
+          z.conversation.ConversationUpdateType.MUTED_TIMESTAMP,
         );
         conversation_et.muted_state(self.muted_state);
       }
@@ -141,11 +141,11 @@ z.conversation.ConversationMapper = class ConversationMapper {
       // Backend states
       if (self.otr_archived !== undefined) {
         const otr_archived_timestamp = new Date(
-          self.otr_archived_ref
+          self.otr_archived_ref,
         ).getTime();
         conversation_et.set_timestamp(
           otr_archived_timestamp,
-          z.conversation.ConversationUpdateType.ARCHIVED_TIMESTAMP
+          z.conversation.ConversationUpdateType.ARCHIVED_TIMESTAMP,
         );
         conversation_et.archived_state(self.otr_archived);
       }
@@ -154,7 +154,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
         const otr_muted_timestamp = new Date(self.otr_muted_ref).getTime();
         conversation_et.set_timestamp(
           otr_muted_timestamp,
-          z.conversation.ConversationUpdateType.MUTED_TIMESTAMP
+          z.conversation.ConversationUpdateType.MUTED_TIMESTAMP,
         );
         conversation_et.muted_state(self.otr_muted);
       }
@@ -187,7 +187,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
     } else {
       conversation_et = this.update_self_status(
         conversation_et,
-        conversation_data
+        conversation_data,
       );
     }
 
@@ -202,7 +202,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
       const participating_user_ids = members.others
         .filter(
           other =>
-            other.status === z.conversation.ConversationStatus.CURRENT_MEMBER
+            other.status === z.conversation.ConversationStatus.CURRENT_MEMBER,
         )
         .map(other => other.id);
 
@@ -250,7 +250,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
       local_conversation.others = members.others
         .filter(
           other =>
-            other.status === z.conversation.ConversationStatus.CURRENT_MEMBER
+            other.status === z.conversation.ConversationStatus.CURRENT_MEMBER,
         )
         .map(other => other.id);
 
@@ -266,7 +266,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
         archived_timestamp: local_archived_timestamp,
       } = local_conversation;
       const remote_archived_timestamp = new Date(
-        members.self.otr_archived_ref
+        members.self.otr_archived_ref,
       ).getTime();
       const is_remote_archived_timestamp_newer =
         local_archived_timestamp !== undefined &&
@@ -285,7 +285,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
         muted_timestamp: local_muted_timestamp,
       } = local_conversation;
       const remote_muted_timestamp = new Date(
-        members.self.otr_muted_ref
+        members.self.otr_muted_ref,
       ).getTime();
       const is_remote_muted_timestamp_newer =
         local_muted_timestamp !== undefined &&

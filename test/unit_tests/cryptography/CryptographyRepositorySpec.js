@@ -56,7 +56,7 @@ describe('z.cryptography.CryptographyRepository', function() {
     it('encrypts a generic message', function(done) {
       spyOn(
         TestFactory.cryptography_service,
-        'get_users_pre_keys'
+        'get_users_pre_keys',
       ).and.callFake(user_client_map =>
         Promise.resolve().then(function() {
           const prekey_map = {};
@@ -78,15 +78,15 @@ describe('z.cryptography.CryptographyRepository', function() {
           }
 
           return prekey_map;
-        })
+        }),
       );
 
       const generic_message = new z.proto.GenericMessage(
-        z.util.create_random_uuid()
+        z.util.create_random_uuid(),
       );
       generic_message.set(
         z.cryptography.GENERIC_MESSAGE_TYPE.TEXT,
-        new z.proto.Text('Unit test')
+        new z.proto.Text('Unit test'),
       );
 
       const user_client_map = {};
@@ -105,8 +105,8 @@ describe('z.cryptography.CryptographyRepository', function() {
           expect(Object.keys(payload.recipients[jane_roe.id]).length).toBe(1);
           expect(
             _.isString(
-              payload.recipients[jane_roe.id][jane_roe.clients.phone_id]
-            )
+              payload.recipients[jane_roe.id][jane_roe.clients.phone_id],
+            ),
           ).toBeTruthy();
           done();
         })
@@ -134,7 +134,7 @@ describe('z.cryptography.CryptographyRepository', function() {
         .decrypt_event(event)
         .catch(function(error) {
           expect(error).toEqual(
-            jasmine.any(Proteus.errors.DecryptError.InvalidMessage)
+            jasmine.any(Proteus.errors.DecryptError.InvalidMessage),
           );
           done();
         })

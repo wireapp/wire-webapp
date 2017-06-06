@@ -78,7 +78,7 @@ z.entity.User = class User {
         }
       },
       this,
-      {deferEvaluation: true}
+      {deferEvaluation: true},
     );
 
     this.accent_color = ko.pureComputed(
@@ -103,7 +103,7 @@ z.entity.User = class User {
         }
       },
       this,
-      {deferEvaluation: true}
+      {deferEvaluation: true},
     );
 
     this.email = ko.observable();
@@ -145,10 +145,10 @@ z.entity.User = class User {
     this.is_connected = ko.pureComputed(() => this.connection().is_connected());
     this.is_ignored = ko.pureComputed(() => this.connection().is_ignored());
     this.is_incoming_request = ko.pureComputed(() =>
-      this.connection().is_incoming_request()
+      this.connection().is_incoming_request(),
     );
     this.is_outgoing_request = ko.pureComputed(() =>
-      this.connection().is_outgoing_request()
+      this.connection().is_outgoing_request(),
     );
     this.is_unknown = ko.pureComputed(() => this.connection().is_unknown());
 
@@ -176,7 +176,7 @@ z.entity.User = class User {
     if (this.is_me) {
       this.devices.sort(
         (client_a, client_b) =>
-          new Date(client_b.time) - new Date(client_a.time)
+          new Date(client_b.time) - new Date(client_a.time),
       );
     }
 

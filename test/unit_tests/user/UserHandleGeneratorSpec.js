@@ -28,7 +28,7 @@ describe('UserHandleGenerator', function() {
       const number_of_variations = 10;
       const variations = z.user.UserHandleGenerator.generate_handle_variations(
         handle,
-        number_of_variations
+        number_of_variations,
       );
       expect(variations.length).toBe(number_of_variations);
       variations.forEach(variation => expect(variation).not.toBe(handle));
@@ -38,16 +38,16 @@ describe('UserHandleGenerator', function() {
   describe('normalize_name', function() {
     it('should normalize user names', function() {
       expect(
-        z.user.UserHandleGenerator.normalize_name('Maria LaRochelle')
+        z.user.UserHandleGenerator.normalize_name('Maria LaRochelle'),
       ).toBe('marialarochelle');
       expect(
-        z.user.UserHandleGenerator.normalize_name('Mêrié "LaRöche\'lle"')
+        z.user.UserHandleGenerator.normalize_name('Mêrié "LaRöche\'lle"'),
       ).toBe('merielaroechelle');
       expect(z.user.UserHandleGenerator.normalize_name('Maria I ❤️🍕')).toBe(
-        'mariai'
+        'mariai',
       );
       expect(z.user.UserHandleGenerator.normalize_name('.-/Maria-.')).toBe(
-        'maria'
+        'maria',
       );
       // expect(z.user.UserHandleGenerator.normalize_name('苹果')).toBe 'pingguo'
       // expect(z.user.UserHandleGenerator.normalize_name('תפוח ')).toBe 'tpwh'
@@ -58,17 +58,17 @@ describe('UserHandleGenerator', function() {
       expect(z.user.UserHandleGenerator.normalize_name('ᑭᒻᒥᓇᐅᔭᖅ')).toBe('');
       expect(
         z.user.UserHandleGenerator.normalize_name(
-          '    Maria LaRochelle Von Schwerigstein '
-        )
+          '    Maria LaRochelle Von Schwerigstein ',
+        ),
       ).toBe('marialarochellevonsch');
       expect(
         z.user.UserHandleGenerator.normalize_name(
-          ' \n\t Maria LaRochelle Von Schwerigstein '
-        )
+          ' \n\t Maria LaRochelle Von Schwerigstein ',
+        ),
       ).toBe('marialarochellevonsch');
       expect(z.user.UserHandleGenerator.normalize_name('🐙☀️')).toBe('');
       expect(z.user.UserHandleGenerator.normalize_name('name@mail.com')).toBe(
-        'namemailcom'
+        'namemailcom',
       );
     });
   });
@@ -110,8 +110,8 @@ describe('UserHandleGenerator', function() {
         .concat(numbers, allow_characters)
         .forEach(character =>
           expect(
-            z.user.UserHandleGenerator.validate_character(character)
-          ).toBeTruthy()
+            z.user.UserHandleGenerator.validate_character(character),
+          ).toBeTruthy(),
         );
     });
 
@@ -135,13 +135,13 @@ describe('UserHandleGenerator', function() {
       const additional_numbers = 5;
       const string_with_digits = z.user.UserHandleGenerator.append_random_digits(
         'foo',
-        additional_numbers
+        additional_numbers,
       );
       expect(string_with_digits.length).toBe(
-        handle.length + additional_numbers
+        handle.length + additional_numbers,
       );
       expect(string_with_digits.match(/[1-9]*$/)[0].length).toBe(
-        additional_numbers
+        additional_numbers,
       );
     });
   });
@@ -150,7 +150,7 @@ describe('UserHandleGenerator', function() {
     it('appends random digits to the end of the string', function() {
       const username = 'memphis';
       const suggestions = z.user.UserHandleGenerator.create_suggestions(
-        username
+        username,
       );
       expect(suggestions.length).toBe(12);
       expect(suggestions.shift()).toBe(username);

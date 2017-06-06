@@ -33,7 +33,7 @@ z.cache.CacheRepository = class CacheRepository {
   constructor() {
     this.logger = new z.util.Logger(
       'z.auth.CacheRepository',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
   }
 
@@ -46,7 +46,7 @@ z.cache.CacheRepository = class CacheRepository {
    */
   clear_cache(
     keep_conversation_input = false,
-    protected_key_patterns = [z.storage.StorageKey.AUTH.SHOW_LOGIN]
+    protected_key_patterns = [z.storage.StorageKey.AUTH.SHOW_LOGIN],
   ) {
     const deleted_keys = [];
 

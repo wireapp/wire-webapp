@@ -1483,7 +1483,7 @@ window.z.util = z.util || {};
       }
 
       countries = countries.sort(
-        (country_a, country_b) => country_a.population - country_b.population
+        (country_a, country_b) => country_a.population - country_b.population,
       );
 
       const country = countries.pop();

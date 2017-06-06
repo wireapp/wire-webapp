@@ -42,7 +42,7 @@ z.entity.VerificationMessage = class VerificationMessage extends z.entity
     this.caption_user = ko.pureComputed(() => {
       return z.util.LocalizerUtil.join_names(
         this.user_ets(),
-        z.string.Declension.NOMINATIVE
+        z.string.Declension.NOMINATIVE,
       );
     });
 

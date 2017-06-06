@@ -70,7 +70,7 @@ z.util.load_url_buffer = function(url, xhr_accessor_function) {
         return resolve([xhr.response, xhr.getResponseHeader('content-type')]);
       }
       return reject(
-        new Error(`Requesting arraybuffer failed with status ${xhr.status}`)
+        new Error(`Requesting arraybuffer failed with status ${xhr.status}`),
       );
     };
     xhr.onerror = reject;
@@ -98,7 +98,7 @@ z.util.forward_url_parameter = function(url, parameter_name) {
   if (parameter_value != null) {
     return (url = z.util.append_url_parameter(
       url,
-      `${parameter_name}=${parameter_value}`
+      `${parameter_name}=${parameter_value}`,
     ));
   }
   return url;
@@ -299,7 +299,7 @@ z.util.download_blob = function(blob, filename) {
 z.util.phone_number_to_e164 = function(phone_number, country_code) {
   return window.PhoneFormat.formatE164(
     `${country_code}`.toUpperCase(),
-    `${phone_number}`
+    `${phone_number}`,
   );
 };
 
@@ -344,7 +344,7 @@ z.util.alias = {
 z.util.add_blank_targets = function(text_with_anchors) {
   return `${text_with_anchors}`.replace(
     /rel="nofollow"/gi,
-    'target="_blank" rel="nofollow noopener noreferrer"'
+    'target="_blank" rel="nofollow noopener noreferrer"',
   );
 };
 
@@ -407,7 +407,7 @@ z.util.cut_last_characters = function(message, amount) {
 z.util.markup_links = function(message) {
   return message.replace(
     /<a\s+href=/gi,
-    '<a target="_blank" rel="nofollow noopener noreferrer" href='
+    '<a target="_blank" rel="nofollow noopener noreferrer" href=',
   );
 };
 
@@ -527,7 +527,7 @@ z.util.format_timestamp = function(timestamp, long_format = true) {
  */
 z.util.is_iso_string = function(date_string) {
   return /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z)/.test(
-    date_string
+    date_string,
   );
 };
 
@@ -582,7 +582,7 @@ z.util.valid_profile_image_size = function(
   file,
   min_width,
   min_height,
-  callback
+  callback,
 ) {
   return new Promise((resolve, reject) => {
     const image = new Image();
@@ -704,7 +704,7 @@ z.util.get_unix_timestamp = function() {
 
 z.util.get_first_name = function(
   user_et,
-  declension = z.string.Declension.NOMINATIVE
+  declension = z.string.Declension.NOMINATIVE,
 ) {
   if (user_et.is_me) {
     if (declension === z.string.Declension.NOMINATIVE) {
@@ -763,31 +763,31 @@ z.util.format_time_remaining = function(time_remaining) {
   let title = '';
   if (moment_duration.asHours() === 1) {
     title += `${moment_duration.hours()} ${z.l10n.text(
-      z.string.ephememal_units_hour
+      z.string.ephememal_units_hour,
     )}, `;
   } else if (moment_duration.asHours() > 1) {
     title += `${moment_duration.hours()} ${z.l10n.text(
-      z.string.ephememal_units_hours
+      z.string.ephememal_units_hours,
     )}, `;
   }
 
   if (moment_duration.asMinutes() === 1) {
     title += `${moment_duration.minutes()} ${z.l10n.text(
-      z.string.ephememal_units_minute
+      z.string.ephememal_units_minute,
     )} ${z.l10n.text(z.string.and)} `;
   } else if (moment_duration.asMinutes() > 1) {
     title += `${moment_duration.minutes()} ${z.l10n.text(
-      z.string.ephememal_units_minutes
+      z.string.ephememal_units_minutes,
     )} ${z.l10n.text(z.string.and)} `;
   }
 
   if (moment_duration.asSeconds() === 1) {
     title += `${moment_duration.seconds()} ${z.l10n.text(
-      z.string.ephememal_units_second
+      z.string.ephememal_units_second,
     )}`;
   } else if (moment_duration.asSeconds() > 1) {
     title += `${moment_duration.seconds()} ${z.l10n.text(
-      z.string.ephememal_units_seconds
+      z.string.ephememal_units_seconds,
     )}`;
   }
 

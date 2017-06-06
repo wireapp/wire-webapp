@@ -1,8 +1,10 @@
 env:
   browser: true
-  es6: true
   jasmine: true
   node: true
+
+parserOptions:
+  ecmaVersion: 2017
 
 plugins:
   - prettier
@@ -67,7 +69,7 @@ rules:
   prefer-template: 2
   prettier/prettier: [2, {
       singleQuote: true,
-      trailingComma: es5,
+      trailingComma: all,
       bracketSpacing: false,
       printWidth: 80
     }

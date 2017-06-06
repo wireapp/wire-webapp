@@ -36,7 +36,7 @@ z.ViewModel.list.TakeoverViewModel = class TakeoverViewModel {
     this.user_repository = user_repository;
     this.logger = new z.util.Logger(
       'z.ViewModel.list.TakeoverViewModel',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
 
     this.self_user = this.user_repository.self;
@@ -64,7 +64,7 @@ z.ViewModel.list.TakeoverViewModel = class TakeoverViewModel {
         } else if (this.user_repository.connect_requests().length) {
           amplify.publish(
             z.event.WebApp.CONTENT.SWITCH,
-            z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS
+            z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS,
           );
         }
 
@@ -73,7 +73,7 @@ z.ViewModel.list.TakeoverViewModel = class TakeoverViewModel {
           z.tracking.EventName.ONBOARDING.KEPT_GENERATED_USERNAME,
           {
             outcome: 'success',
-          }
+          },
         );
       })
       .catch(function() {
@@ -83,7 +83,7 @@ z.ViewModel.list.TakeoverViewModel = class TakeoverViewModel {
           z.tracking.EventName.ONBOARDING.KEPT_GENERATED_USERNAME,
           {
             outcome: 'fail',
-          }
+          },
         );
       })
       .then(() => amplify.publish(z.event.WebApp.TAKEOVER.DISMISS));
@@ -92,25 +92,25 @@ z.ViewModel.list.TakeoverViewModel = class TakeoverViewModel {
   choose_username() {
     amplify.publish(
       z.event.WebApp.ANALYTICS.EVENT,
-      z.tracking.EventName.ONBOARDING.OPENED_USERNAME_SETTINGS
+      z.tracking.EventName.ONBOARDING.OPENED_USERNAME_SETTINGS,
     );
     amplify.publish(z.event.WebApp.TAKEOVER.DISMISS);
     window.requestAnimationFrame(() =>
-      amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT)
+      amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT),
     );
   }
 
   on_added_to_view() {
     amplify.publish(
       z.event.WebApp.ANALYTICS.EVENT,
-      z.tracking.EventName.ONBOARDING.SEEN_USERNAME_SCREEN
+      z.tracking.EventName.ONBOARDING.SEEN_USERNAME_SCREEN,
     );
   }
 
   on_link_click() {
     amplify.publish(
       z.event.WebApp.ANALYTICS.EVENT,
-      z.tracking.EventName.ONBOARDING.OPENED_USERNAME_FAQ
+      z.tracking.EventName.ONBOARDING.OPENED_USERNAME_FAQ,
     );
     return true;
   }

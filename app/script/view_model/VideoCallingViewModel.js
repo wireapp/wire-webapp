@@ -29,7 +29,7 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
     conversation_repository,
     media_repository,
     user_repository,
-    multitasking
+    multitasking,
   ) {
     this.clicked_on_cancel_screen = this.clicked_on_cancel_screen.bind(this);
     this.clicked_on_choose_screen = this.clicked_on_choose_screen.bind(this);
@@ -42,7 +42,7 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
     this.multitasking = multitasking;
     this.logger = new z.util.Logger(
       'z.ViewModel.VideoCallingViewModel',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
 
     this.self_user = this.user_repository.self;
@@ -71,7 +71,7 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
     this.videod_call = ko.pureComputed(() => {
       for (const call_et of this.calls()) {
         const is_active = z.calling.enum.CALL_STATE_GROUP.IS_ACTIVE.includes(
-          call_et.state()
+          call_et.state(),
         );
         const self_video_send =
           (call_et.self_client_joined() &&
@@ -191,7 +191,7 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
       }
     });
     this.show_toggle_screen = ko.pureComputed(
-      () => z.calling.CallingRepository.supports_screen_sharing
+      () => z.calling.CallingRepository.supports_screen_sharing,
     );
     this.disable_toggle_screen = ko.pureComputed(() => {
       if (this.joined_call()) {
@@ -208,14 +208,14 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
             this.multitasking.is_minimized(false);
             return this.logger.info(
               `Maximizing video call '${joined_call.id}' to full-screen`,
-              joined_call
+              joined_call,
             );
           }
 
           this.multitasking.is_minimized(true);
           this.logger.info(
             `Minimizing audio call '${joined_call.id}' from full-screen`,
-            joined_call
+            joined_call,
           );
         }
       } else {
@@ -258,7 +258,7 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
 
         this.logger.info(
           `Scheduled minimizing call '${this.videod_call()
-            .id}' on timeout as remote user '${remote_user_name}' is not videod`
+            .id}' on timeout as remote user '${remote_user_name}' is not videod`,
         );
         this.minimize_timeout = window.setTimeout(() => {
           if (!this.is_choosing_screen()) {
@@ -266,7 +266,7 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
           }
           this.logger.info(
             `Minimizing call '${this.videod_call()
-              .id}' on timeout as remote user '${remote_user_name}' is not videod`
+              .id}' on timeout as remote user '${remote_user_name}' is not videod`,
           );
         }, 4000);
       }
@@ -274,7 +274,7 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
 
     amplify.subscribe(
       z.event.WebApp.CALL.MEDIA.CHOOSE_SCREEN,
-      this.choose_shared_screen
+      this.choose_shared_screen,
     );
 
     ko.applyBindings(this, document.getElementById(element_id));
@@ -289,7 +289,7 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
         amplify.publish(
           z.event.WebApp.CALL.MEDIA.TOGGLE,
           conversation_id,
-          z.media.MediaType.SCREEN
+          z.media.MediaType.SCREEN,
         );
       } else if (z.util.Environment.electron) {
         amplify.publish(
@@ -302,7 +302,7 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
             kind_of_call_when_sharing: this.joined_call().is_remote_video_send()
               ? 'video'
               : 'audio',
-          }
+          },
         );
 
         this.media_repository.devices_handler
@@ -318,14 +318,14 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
               amplify.publish(
                 z.event.WebApp.CALL.MEDIA.TOGGLE,
                 conversation_id,
-                z.media.MediaType.SCREEN
+                z.media.MediaType.SCREEN,
               );
             }
           })
           .catch(error => {
             this.logger.error(
               'Unable to get screens sources for sharing',
-              error
+              error,
             );
           });
       }
@@ -341,7 +341,7 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
       amplify.publish(
         z.event.WebApp.CALL.STATE.LEAVE,
         this.joined_call().id,
-        z.calling.enum.TERMINATION_REASON.SELF_USER
+        z.calling.enum.TERMINATION_REASON.SELF_USER,
       );
     }
   }
@@ -351,7 +351,7 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
       amplify.publish(
         z.event.WebApp.CALL.MEDIA.TOGGLE,
         this.joined_call().id,
-        z.media.MediaType.AUDIO
+        z.media.MediaType.AUDIO,
       );
     }
   }
@@ -367,14 +367,14 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
 
     this.logger.info(
       `Selected '${screen_source.name}' for screen sharing`,
-      screen_source
+      screen_source,
     );
     this.is_choosing_screen(false);
     this.current_device_id.screen_input(screen_source.id);
     amplify.publish(
       z.event.WebApp.CALL.MEDIA.TOGGLE,
       this.joined_call().id,
-      z.media.MediaType.SCREEN
+      z.media.MediaType.SCREEN,
     );
 
     if (this.multitasking.reset_minimize()) {
@@ -382,7 +382,7 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
       this.multitasking.reset_minimize(false);
       this.logger.info(
         `Minimizing call '${this.joined_call()
-          .id}' on screen selection to return to previous state`
+          .id}' on screen selection to return to previous state`,
       );
     }
   }
@@ -392,7 +392,7 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
       amplify.publish(
         z.event.WebApp.CALL.MEDIA.TOGGLE,
         this.joined_call().id,
-        z.media.MediaType.VIDEO
+        z.media.MediaType.VIDEO,
       );
     }
   }
@@ -408,21 +408,21 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
   clicked_on_minimize() {
     this.multitasking.is_minimized(true);
     this.logger.info(
-      `Minimizing call '${this.videod_call().id}' on user click`
+      `Minimizing call '${this.videod_call().id}' on user click`,
     );
   }
 
   clicked_on_maximize() {
     this.multitasking.is_minimized(false);
     this.logger.info(
-      `Maximizing call '${this.videod_call().id}' on user click`
+      `Maximizing call '${this.videod_call().id}' on user click`,
     );
   }
 
   double_clicked_on_remote_video() {
     this.remote_video_element_contain(!this.remote_video_element_contain());
     this.logger.info(
-      `Switched remote video object-fit. Contain is '${this.remote_video_element_contain()}'`
+      `Switched remote video object-fit. Contain is '${this.remote_video_element_contain()}'`,
     );
   }
 

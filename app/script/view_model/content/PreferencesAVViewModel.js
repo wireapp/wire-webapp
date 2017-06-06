@@ -31,7 +31,7 @@ z.ViewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
     this.media_repository = media_repository;
     this.logger = new z.util.Logger(
       'z.ViewModel.content.PreferencesAVViewModel',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
 
     this.media_devices_handler = this.media_repository.devices_handler;
@@ -100,12 +100,12 @@ z.ViewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
     return this.media_stream_handler
       .get_media_stream_constraints(
         this.available_devices.audio_input().length,
-        this.available_devices.video_input().length
+        this.available_devices.video_input().length,
       )
       .then(({media_stream_constraints, media_type}) => {
         return this.media_stream_handler.request_media_stream(
           media_type,
-          media_stream_constraints
+          media_stream_constraints,
         );
       })
       .then(media_stream_info => {
@@ -119,7 +119,7 @@ z.ViewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
       .catch(error => {
         this.logger.error(
           `Requesting MediaStream failed: ${error.message}`,
-          error
+          error,
         );
         if (
           [
@@ -149,7 +149,7 @@ z.ViewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
     this.audio_analyser.fftSize = 1024;
     this.audio_analyser.smoothingTimeConstant = 0.2;
     this.audio_data_array = new Float32Array(
-      this.audio_analyser.frequencyBinCount
+      this.audio_analyser.frequencyBinCount,
     );
 
     this.audio_interval = window.setInterval(() => {
@@ -166,7 +166,7 @@ z.ViewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
     }, 100);
 
     this.audio_source = this.audio_context.createMediaStreamSource(
-      media_stream
+      media_stream,
     );
     this.audio_source.connect(this.audio_analyser);
   }

@@ -53,7 +53,7 @@ describe('Localizer', function() {
       ],
     });
     expect(text).toBe(
-      'I’m on Wire. Search for jd@wire.com or visit html://LINK to connect with me.'
+      'I’m on Wire. Search for jd@wire.com or visit html://LINK to connect with me.',
     );
   });
 
@@ -67,7 +67,7 @@ describe('Localizer', function() {
       },
     });
     expect(text).toBe(
-      '<span class="user"></span> won’t see you in search results and won’t be able to send you messages.'
+      '<span class="user"></span> won’t see you in search results and won’t be able to send you messages.',
     );
   });
 });

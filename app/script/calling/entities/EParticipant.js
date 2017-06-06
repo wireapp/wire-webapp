@@ -39,7 +39,7 @@ z.calling.entities.EParticipant = class EParticipant {
 
     this.logger = new z.util.Logger(
       `z.calling.entities.EParticipant (${this.id})`,
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
 
     this.is_connected = ko.observable(false);
@@ -56,14 +56,14 @@ z.calling.entities.EParticipant = class EParticipant {
       this.e_call_et,
       this,
       timings,
-      e_call_message_et
+      e_call_message_et,
     );
 
     this.is_connected.subscribe(function(is_connected) {
       if (is_connected && !this.was_connected) {
         amplify.publish(
           z.event.WebApp.AUDIO.PLAY,
-          z.audio.AudioType.READY_TO_TALK
+          z.audio.AudioType.READY_TO_TALK,
         );
         this.was_connected = true;
       }
@@ -128,19 +128,19 @@ z.calling.entities.EParticipant = class EParticipant {
 
         if (audio_send !== undefined) {
           this.state.audio_send(
-            audio_send === z.calling.enum.PROPERTY_STATE.TRUE
+            audio_send === z.calling.enum.PROPERTY_STATE.TRUE,
           );
         }
 
         if (screen_send !== undefined) {
           this.state.screen_send(
-            screen_send === z.calling.enum.PROPERTY_STATE.TRUE
+            screen_send === z.calling.enum.PROPERTY_STATE.TRUE,
           );
         }
 
         if (video_send !== undefined) {
           this.state.video_send(
-            video_send === z.calling.enum.PROPERTY_STATE.TRUE
+            video_send === z.calling.enum.PROPERTY_STATE.TRUE,
           );
         }
       }
@@ -159,17 +159,17 @@ z.calling.entities.EParticipant = class EParticipant {
       if (connected_client_id && client_id !== connected_client_id) {
         this.logger.warn(
           `State change requested from '${client_id}' while we are connected to '${connected_client_id}'`,
-          this
+          this,
         );
         throw new z.calling.v3.CallError(
-          z.calling.v3.CallError.TYPE.WRONG_SENDER
+          z.calling.v3.CallError.TYPE.WRONG_SENDER,
         );
       }
       this.e_flow_et.remote_client_id = client_id;
     } else {
       throw new z.calling.v3.CallError(
         z.calling.v3.CallError.TYPE.WRONG_SENDER,
-        'Sender ID missing'
+        'Sender ID missing',
       );
     }
   }

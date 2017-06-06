@@ -31,7 +31,7 @@ z.user.UserConnectionMapper = class UserConnectionMapper {
   constructor() {
     this.logger = new z.util.Logger(
       'z.user.UserConnectionMapper',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
 
     /**

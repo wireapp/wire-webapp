@@ -59,7 +59,7 @@ z.media.MediaEmbeds = (function() {
       options.height,
       options.src,
       options.frameborder,
-      options.allowfullscreen
+      options.allowfullscreen,
     );
   };
 
@@ -111,7 +111,7 @@ z.media.MediaEmbeds = (function() {
         .replace(
           /[&#]t=([a-z0-9]+)/,
           (temp, timestamp) =>
-            `&start=${_convert_youtube_timestamp_to_seconds(timestamp)}`
+            `&start=${_convert_youtube_timestamp_to_seconds(timestamp)}`,
         )
         .replace(/[&]?autoplay=1/, ''); // remove autoplay param
 
@@ -137,7 +137,7 @@ z.media.MediaEmbeds = (function() {
       const _extract_unit = function(unit) {
         return window.parseInt(
           (timestamp.match(new RegExp(`([0-9]+)(?=${unit})`)) || [0])[0],
-          10
+          10,
         );
       };
 
@@ -259,7 +259,7 @@ z.media.MediaEmbeds = (function() {
         let embed = '';
         link_src.replace(
           _regex.vimeo,
-          (match, group1) => (embed = iframe.replace('$1', group1))
+          (match, group1) => (embed = iframe.replace('$1', group1)),
         );
 
         message = _append_iframe(link, message, embed);

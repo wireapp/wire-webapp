@@ -25,12 +25,12 @@ window.z.links = z.links || {};
 z.links.LinkPreviewRepository = class LinkPreviewRepository {
   constructor(asset_service) {
     this.get_link_preview_from_string = this.get_link_preview_from_string.bind(
-      this
+      this,
     );
     this.asset_service = asset_service;
     this.logger = new z.util.Logger(
       'z.links.LinkPreviewRepository',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
   }
 
@@ -43,12 +43,12 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
   get_link_preview_from_string(string) {
     return Promise.resolve().then(() => {
       const data = z.links.LinkPreviewHelpers.get_first_link_with_offset(
-        string
+        string,
       );
 
       if (data) {
         return this.get_link_preview(data.url, data.offset).catch(function(
-          error
+          error,
         ) {
           if (!(error instanceof z.links.LinkPreviewError)) {
             throw error;
@@ -72,14 +72,14 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
       .then(() => {
         if (z.links.LinkPreviewBlackList.is_blacklisted(url)) {
           throw new z.links.LinkPreviewError(
-            z.links.LinkPreviewError.TYPE.BLACKLISTED
+            z.links.LinkPreviewError.TYPE.BLACKLISTED,
           );
         }
         if (window.openGraph) {
           return this._fetch_open_graph_data(url);
         }
         throw new z.links.LinkPreviewError(
-          z.links.LinkPreviewError.TYPE.NOT_SUPPORTED
+          z.links.LinkPreviewError.TYPE.NOT_SUPPORTED,
         );
       })
       .then(data => {
@@ -88,11 +88,11 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
           return z.links.LinkPreviewProtoBuilder.build_from_open_graph_data(
             open_graph_data,
             url,
-            offset
+            offset,
           );
         }
         throw new z.links.LinkPreviewError(
-          z.links.LinkPreviewError.TYPE.NO_DATA_AVAILABLE
+          z.links.LinkPreviewError.TYPE.NO_DATA_AVAILABLE,
         );
       })
       .then(function(link_preview) {
@@ -103,7 +103,7 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
           .links.LinkPreviewError(z.links.LinkPreviewError.TYPE.UNSUPPORTED_TYPE);
       })
       .then(link_preview =>
-        this._fetch_preview_image(link_preview, open_graph_data.image)
+        this._fetch_preview_image(link_preview, open_graph_data.image),
       );
   }
 
@@ -134,7 +134,7 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
   _fetch_open_graph_data(link) {
     return new Promise(resolve => {
       return window.openGraph(link, (error, data) =>
-        resolve(error ? null : data)
+        resolve(error ? null : data),
       );
     });
   }
@@ -146,7 +146,7 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
   */
   _upload_preview_image(data_URI) {
     return Promise.resolve(z.util.base64_to_blob(data_URI)).then(blob =>
-      this.asset_service.upload_image_asset(blob, {public: true})
+      this.asset_service.upload_image_asset(blob, {public: true}),
     );
   }
 };

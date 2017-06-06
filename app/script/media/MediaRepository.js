@@ -46,7 +46,7 @@ z.media.MediaRepository = class MediaRepository {
   constructor() {
     this.logger = new z.util.Logger(
       'z.media.MediaRepository',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
 
     this.devices_handler = new z.media.MediaDevicesHandler(this);
@@ -95,7 +95,7 @@ z.media.MediaRepository = class MediaRepository {
     }
 
     this.logger.error(
-      'The flow audio cannot use the Web Audio API as it is unavailable.'
+      'The flow audio cannot use the Web Audio API as it is unavailable.',
     );
     return undefined;
   }

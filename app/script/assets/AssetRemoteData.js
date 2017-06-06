@@ -53,7 +53,7 @@ z.assets.AssetRemoteData = class AssetRemoteData {
       wire.app.service.asset.generate_asset_url_v3(
         asset_key,
         asset_token,
-        force_caching
+        force_caching,
       );
     remote_data.identifier = `${asset_key}`;
     return remote_data;
@@ -75,7 +75,7 @@ z.assets.AssetRemoteData = class AssetRemoteData {
       wire.app.service.asset.generate_asset_url_v2(
         asset_id,
         conversation_id,
-        force_caching
+        force_caching,
       );
     remote_data.identifier = `${conversation_id}${asset_id}`;
     return remote_data;
@@ -96,7 +96,7 @@ z.assets.AssetRemoteData = class AssetRemoteData {
       wire.app.service.asset.generate_asset_url(
         asset_id,
         conversation_id,
-        force_caching
+        force_caching,
       );
     remote_data.identifier = `${conversation_id}${asset_id}`;
     return remote_data;
@@ -116,7 +116,7 @@ z.assets.AssetRemoteData = class AssetRemoteData {
           return z.assets.AssetCrypto.decrypt_aes_asset(
             buffer,
             this.otr_key.buffer,
-            this.sha256.buffer
+            this.sha256.buffer,
           );
         }
         return buffer;
@@ -137,8 +137,8 @@ z.assets.AssetRemoteData = class AssetRemoteData {
     return this.load().then(blob =>
       z.assets.AssetURLCache.set_url(
         this.identifier,
-        window.URL.createObjectURL(blob)
-      )
+        window.URL.createObjectURL(blob),
+      ),
     );
   }
 

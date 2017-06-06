@@ -58,7 +58,7 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
   constructor(element_id) {
     this.logger = new z.util.Logger(
       'z.ViewModel.ModalsViewModel',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
 
     this.modals = {};
@@ -96,7 +96,7 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
         this._show_modal_call_start_another(
           options.data,
           title_element,
-          message_element
+          message_element,
         );
         break;
       case z.ViewModel.ModalType.CLEAR:
@@ -113,7 +113,7 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
           options.data,
           title_element,
           message_element,
-          action_element
+          action_element,
         );
         break;
       case z.ViewModel.ModalType.REMOVE_DEVICE:
@@ -190,7 +190,7 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
           content: content,
           placeholder: '%@.name',
         },
-      })
+      }),
     );
 
     message_element.text(
@@ -200,7 +200,7 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
           content: content,
           placeholder: '%@.name',
         },
-      })
+      }),
     );
   }
 
@@ -212,7 +212,7 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
           content: content,
           placeholder: '%no',
         },
-      })
+      }),
     );
   }
 
@@ -224,7 +224,7 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
           content: content,
           placeholder: '%no',
         },
-      })
+      }),
     );
   }
 
@@ -241,17 +241,17 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
    */
   _show_modal_call_start_another(call_state, title_element, message_element) {
     const action_element = $(z.ViewModel.ModalType.CALL_START_ANOTHER).find(
-      '.modal-action'
+      '.modal-action',
     );
 
     action_element.text(
-      z.l10n.text(z.string[`modal_call_second_${call_state}_action`])
+      z.l10n.text(z.string[`modal_call_second_${call_state}_action`]),
     );
     message_element.text(
-      z.l10n.text(z.string[`modal_call_second_${call_state}_message`])
+      z.l10n.text(z.string[`modal_call_second_${call_state}_message`]),
     );
     return title_element.text(
-      z.l10n.text(z.string[`modal_call_second_${call_state}_headline`])
+      z.l10n.text(z.string[`modal_call_second_${call_state}_headline`]),
     );
   }
 
@@ -271,7 +271,7 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
           content: options.data,
           placeholder: '%@.name',
         },
-      })
+      }),
     );
 
     return type;
@@ -279,7 +279,7 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
 
   _show_modal_connected_device(devices) {
     const devices_element = $(z.ViewModel.ModalType.CONNECTED_DEVICE).find(
-      '.modal-connected-devices'
+      '.modal-connected-devices',
     );
 
     devices_element.empty();
@@ -291,7 +291,9 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
 
       $('<div>')
         .text(
-          `${z.l10n.text(z.string.modal_connected_device_from)} ${device.model}`
+          `${z.l10n.text(
+            z.string.modal_connected_device_from,
+          )} ${device.model}`,
         )
         .appendTo(devices_element);
     });
@@ -305,7 +307,7 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
           content: content,
           placeholder: '%@.name',
         },
-      })
+      }),
     );
   }
 
@@ -313,14 +315,14 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
     content,
     title_element,
     message_element,
-    action_element
+    action_element,
   ) {
     let action_id, message_id;
     const joined_names = z.util.StringUtil.capitalize_first_char(
       z.util.LocalizerUtil.join_names(
         content.user_ets,
-        z.string.Declension.NOMINATIVE
-      )
+        z.string.Declension.NOMINATIVE,
+      ),
     );
 
     let string_id;
@@ -339,7 +341,7 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
           content: joined_names,
           placeholder: content.user_ets.length === 1 ? '%@.name' : '%@.names',
         },
-      })
+      }),
     );
 
     switch (content.consent_type) {
@@ -368,7 +370,7 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
           content: content,
           placeholder: '%device_name',
         },
-      })
+      }),
     );
   }
 
@@ -386,7 +388,7 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
             placeholder: '%max',
           },
         ],
-      })
+      }),
     );
   }
 
@@ -398,7 +400,7 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
           content: content,
           placeholder: '%no',
         },
-      })
+      }),
     );
   }
 
@@ -410,7 +412,7 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
           content: content,
           placeholder: '%no',
         },
-      })
+      }),
     );
   }
 
@@ -422,7 +424,7 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
           content: content,
           placeholder: '%no',
         },
-      })
+      }),
     );
   }
 };

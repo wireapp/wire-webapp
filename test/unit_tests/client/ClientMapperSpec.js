@@ -129,13 +129,13 @@ describe('z.client.ClientMapper', function() {
   describe('update_client', function() {
     it('can map changes into a client', function() {
       const initial_client_et = mapper.map_client(
-        entities.clients.john_doe.plain
+        entities.clients.john_doe.plain,
       );
       const client_payload = entities.clients.john_doe.permanent;
 
       const {client: client_et, was_updated} = mapper.update_client(
         initial_client_et,
-        client_payload
+        client_payload,
       );
 
       expect(was_updated).toBeTruthy();
@@ -161,7 +161,7 @@ describe('z.client.ClientMapper', function() {
 
       const {client: client_et, was_updated} = mapper.update_client(
         initial_client_et,
-        client_payload
+        client_payload,
       );
 
       expect(was_updated).toBeFalsy();

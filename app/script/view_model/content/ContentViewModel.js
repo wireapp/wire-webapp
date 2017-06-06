@@ -32,7 +32,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
     media_repository,
     properties_repository,
     search_repository,
-    team_repository
+    team_repository,
   ) {
     this.show_conversation = this.show_conversation.bind(this);
     this.switch_content = this.switch_content.bind(this);
@@ -47,7 +47,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
     this.team_repository = team_repository;
     this.logger = new z.util.Logger(
       'z.ViewModel.ContentViewModel',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
 
     // Repositories
@@ -57,7 +57,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
 
     // Dtate
     this.content_state = ko.observable(
-      z.ViewModel.content.CONTENT_STATE.WATERMARK
+      z.ViewModel.content.CONTENT_STATE.WATERMARK,
     );
     this.multitasking = {
       auto_minimize: ko.observable(true),
@@ -68,7 +68,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
     // Nested view models
     /* eslint-disable no-multi-spaces */
     this.call_shortcuts = new z.ViewModel.CallShortcutsViewModel(
-      this.calling_repository
+      this.calling_repository,
     );
     this.video_calling = new z.ViewModel.VideoCallingViewModel(
       'video-calling',
@@ -76,64 +76,64 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
       this.conversation_repository,
       this.media_repository,
       this.user_repository,
-      this.multitasking
+      this.multitasking,
     );
     this.collection_details = new z.ViewModel.content
       .CollectionDetailsViewModel('collection-details');
     this.collection = new z.ViewModel.content.CollectionViewModel(
       'collection',
       this.conversation_repository,
-      this.collection_details
+      this.collection_details,
     );
     this.connect_requests = new z.ViewModel.content.ConnectRequestsViewModel(
       'connect-requests',
-      this.user_repository
+      this.user_repository,
     );
     this.conversation_titlebar = new z.ViewModel.ConversationTitlebarViewModel(
       'conversation-titlebar',
       this.calling_repository,
       this.conversation_repository,
-      this.multitasking
+      this.multitasking,
     );
     this.conversation_input = new z.ViewModel.ConversationInputViewModel(
       'conversation-input',
       this.conversation_repository,
-      this.user_repository
+      this.user_repository,
     );
     this.message_list = new z.ViewModel.MessageListViewModel(
       'message-list',
       this.conversation_repository,
-      this.user_repository
+      this.user_repository,
     );
     this.participants = new z.ViewModel.ParticipantsViewModel(
       'participants',
       this.user_repository,
       this.conversation_repository,
       this.search_repository,
-      this.team_repository
+      this.team_repository,
     );
     this.giphy = new z.ViewModel.GiphyViewModel(
       'giphy-modal',
       this.conversation_repository,
-      this.giphy_repository
+      this.giphy_repository,
     );
 
     this.preferences_account = new z.ViewModel.content
       .PreferencesAccountViewModel(
       'preferences-account',
       this.client_repository,
-      this.user_repository
+      this.user_repository,
     );
     this.preferences_av = new z.ViewModel.content.PreferencesAVViewModel(
       'preferences-av',
-      this.media_repository
+      this.media_repository,
     );
     this.preferences_device_details = new z.ViewModel.content
       .PreferencesDeviceDetailsViewModel(
       'preferences-devices',
       this.client_repository,
       this.conversation_repository,
-      this.cryptography_repository
+      this.cryptography_repository,
     );
     this.preferences_devices = new z.ViewModel.content
       .PreferencesDevicesViewModel(
@@ -141,12 +141,12 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
       this.preferences_device_details,
       this.client_repository,
       this.conversation_repository,
-      this.cryptography_repository
+      this.cryptography_repository,
     );
     this.preferences_options = new z.ViewModel.content
       .PreferencesOptionsViewModel(
       'preferences-options',
-      this.properties_repository
+      this.properties_repository,
     );
     /* eslint-enable no-multi-spaces */
 
@@ -184,7 +184,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
         !requests.length
       ) {
         this.show_conversation(
-          this.conversation_repository.get_most_recent_conversation()
+          this.conversation_repository.get_most_recent_conversation(),
         );
       }
     });
@@ -197,19 +197,19 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
   _init_subscriptions() {
     amplify.subscribe(
       z.event.WebApp.CONTENT.SWITCH,
-      this.switch_content.bind(this)
+      this.switch_content.bind(this),
     );
     amplify.subscribe(
       z.event.WebApp.CONVERSATION.SHOW,
-      this.show_conversation.bind(this)
+      this.show_conversation.bind(this),
     );
     amplify.subscribe(
       z.event.WebApp.LIST.SCROLL,
-      this.conversation_input.show_separator
+      this.conversation_input.show_separator,
     );
     amplify.subscribe(
       z.event.WebApp.WINDOW.RESIZE.HEIGHT,
-      this.message_list.scroll_height
+      this.message_list.scroll_height,
     );
   }
 
@@ -243,7 +243,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
   show_conversation(conversation, message_et) {
     if (!conversation) {
       return this.switch_content(
-        z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS
+        z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS,
       );
     }
 
@@ -252,7 +252,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
       conversation_promise = Promise.resolve(conversation);
     } else {
       conversation_promise = this.conversation_repository.get_conversation_by_id_async(
-        conversation
+        conversation,
       );
     }
 
@@ -306,7 +306,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
         z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS
       ) {
         this.switch_content(
-          z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS
+          z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS,
         );
       }
 

@@ -29,7 +29,7 @@ z.util.StringUtil = {
   compare_transliteration: function(name_a, name_b) {
     return z.util.StringUtil.includes(
       window.getSlug(name_a),
-      window.getSlug(name_b)
+      window.getSlug(name_b),
     );
   },
   format: function() {

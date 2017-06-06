@@ -37,7 +37,7 @@ z.client.ClientMapper = class ClientMapper {
       client_et.meta.is_verified(client_payload.meta.is_verified);
       client_et.meta.primary_key = client_payload.meta.primary_key;
       client_et.meta.user_id = z.client.Client.dismantle_user_client_id(
-        client_payload.meta.primary_key
+        client_payload.meta.primary_key,
       ).user_id;
     }
 
@@ -51,7 +51,7 @@ z.client.ClientMapper = class ClientMapper {
    */
   map_clients(clients_payload) {
     return clients_payload.map(client_payload =>
-      this.map_client(client_payload)
+      this.map_client(client_payload),
     );
   }
 

@@ -45,7 +45,7 @@ describe('z.user.UserRepository', function() {
 
       beforeEach(function() {
         const connection_et = new z.entity.Connection(
-          z.util.create_random_uuid()
+          z.util.create_random_uuid(),
         );
         connection_et.to = entities.user.jane_roe.id;
 
@@ -55,7 +55,7 @@ describe('z.user.UserRepository', function() {
         TestFactory.user_repository.connections.push(connection_et);
         spyOn(
           TestFactory.user_repository,
-          '_update_connection_status'
+          '_update_connection_status',
         ).and.returnValue(Promise.resolve());
       });
 
@@ -64,7 +64,7 @@ describe('z.user.UserRepository', function() {
           .cancel_connection_request(user_et)
           .then(function() {
             expect(
-              TestFactory.user_repository._update_connection_status
+              TestFactory.user_repository._update_connection_status,
             ).toHaveBeenCalled();
             done();
           })
@@ -79,7 +79,7 @@ describe('z.user.UserRepository', function() {
           .cancel_connection_request(user_et, new z.entity.Conversation())
           .then(function() {
             expect(
-              TestFactory.user_repository._update_connection_status
+              TestFactory.user_repository._update_connection_status,
             ).toHaveBeenCalled();
             expect(spy).toHaveBeenCalled();
             done();
@@ -109,12 +109,12 @@ describe('z.user.UserRepository', function() {
 
       it('should return the expected connection for the given conversation id', function() {
         let connection_et = TestFactory.user_repository.get_connection_by_conversation_id(
-          connection_et_a.conversation_id
+          connection_et_a.conversation_id,
         );
         expect(connection_et).toBe(connection_et_a);
 
         connection_et = TestFactory.user_repository.get_connection_by_conversation_id(
-          ''
+          '',
         );
         expect(connection_et).not.toBeDefined();
       });
@@ -130,7 +130,7 @@ describe('z.user.UserRepository', function() {
             200,
             {'Content-Type': 'application/json'},
             JSON.stringify(payload.connections.get),
-          ]
+          ],
         );
 
         server.respondWith(
@@ -141,7 +141,7 @@ describe('z.user.UserRepository', function() {
             200,
             {'Content-Type': 'application/json'},
             JSON.stringify(payload.users.get.many),
-          ]
+          ],
         );
 
         TestFactory.user_repository
@@ -149,10 +149,10 @@ describe('z.user.UserRepository', function() {
           .then(function() {
             expect(TestFactory.user_repository.connections().length).toBe(2);
             expect(
-              TestFactory.user_repository.connections()[0].status()
+              TestFactory.user_repository.connections()[0].status(),
             ).toEqual(z.user.ConnectionStatus.ACCEPTED);
             expect(
-              TestFactory.user_repository.connections()[1].conversation_id
+              TestFactory.user_repository.connections()[1].conversation_id,
             ).toEqual('45c8f986-6c8f-465b-9ac9-bd5405e8c944');
             done();
           })
@@ -245,7 +245,7 @@ describe('z.user.UserRepository', function() {
 
       it('finds the correct user by searching for the full name', function() {
         const result = TestFactory.user_repository.search_for_connected_users(
-          'Gregor'
+          'Gregor',
         );
         expect(result.length).toBe(1);
         expect(result[0].id).toBe(user_et_b.id);
@@ -253,7 +253,7 @@ describe('z.user.UserRepository', function() {
 
       it('finds the correct user by searching for the full name (transliteration)', function() {
         const result = TestFactory.user_repository.search_for_connected_users(
-          'Rene'
+          'Rene',
         );
         expect(result.length).toBe(1);
         expect(result[0].id).toBe(user_et_a.id);
@@ -261,7 +261,7 @@ describe('z.user.UserRepository', function() {
 
       it('finds the correct user by searching for the username', function() {
         const result = TestFactory.user_repository.search_for_connected_users(
-          'foo'
+          'foo',
         );
         expect(result.length).toBe(1);
         expect(result[0].id).toBe(user_et_a.id);
@@ -269,7 +269,7 @@ describe('z.user.UserRepository', function() {
 
       it('finds the correct users', function() {
         const result = TestFactory.user_repository.search_for_connected_users(
-          'e'
+          'e',
         );
         expect(result.length).toBe(2);
         expect(result[0].id).toBe(user_et_b.id);
@@ -324,13 +324,13 @@ describe('z.user.UserRepository', function() {
           .save_users([user_jane_roe, user_john_doe])
           .then(function() {
             const permanent_client = TestFactory.client_repository.client_mapper.map_client(
-              entities.clients.john_doe.permanent
+              entities.clients.john_doe.permanent,
             );
             const plain_client = TestFactory.client_repository.client_mapper.map_client(
-              entities.clients.jane_roe.plain
+              entities.clients.jane_roe.plain,
             );
             const temporary_client = TestFactory.client_repository.client_mapper.map_client(
-              entities.clients.john_doe.temporary
+              entities.clients.john_doe.temporary,
             );
             const user_client_map = {
               [entities.user.john_doe.id]: [permanent_client, temporary_client],
@@ -339,7 +339,7 @@ describe('z.user.UserRepository', function() {
 
             spyOn(
               TestFactory.client_repository,
-              'get_all_clients_from_db'
+              'get_all_clients_from_db',
             ).and.returnValue(Promise.resolve(user_client_map));
             done();
           })
@@ -355,18 +355,18 @@ describe('z.user.UserRepository', function() {
           ._assign_all_clients()
           .then(function() {
             expect(
-              TestFactory.client_repository.get_all_clients_from_db
+              TestFactory.client_repository.get_all_clients_from_db,
             ).toHaveBeenCalled();
             expect(user_jane_roe.devices().length).toBe(1);
             expect(user_jane_roe.devices()[0].id).toBe(
-              entities.clients.jane_roe.plain.id
+              entities.clients.jane_roe.plain.id,
             );
             expect(user_john_doe.devices().length).toBe(2);
             expect(user_john_doe.devices()[0].id).toBe(
-              entities.clients.john_doe.permanent.id
+              entities.clients.john_doe.permanent.id,
             );
             expect(user_john_doe.devices()[1].id).toBe(
-              entities.clients.john_doe.temporary.id
+              entities.clients.john_doe.temporary.id,
             );
             done();
           })
@@ -380,7 +380,11 @@ describe('z.user.UserRepository', function() {
         server.respondWith(
           'POST',
           `${test_factory.settings.connection.rest_url}/users/handles`,
-          [200, {'Content-Type': 'application/json'}, JSON.stringify(usernames)]
+          [
+            200,
+            {'Content-Type': 'application/json'},
+            JSON.stringify(usernames),
+          ],
         );
 
         TestFactory.user_repository
@@ -397,7 +401,7 @@ describe('z.user.UserRepository', function() {
         server.respondWith(
           'POST',
           `${test_factory.settings.connection.rest_url}/users/handles`,
-          [200, {'Content-Type': 'application/json'}, JSON.stringify([])]
+          [200, {'Content-Type': 'application/json'}, JSON.stringify([])],
         );
 
         TestFactory.user_repository
@@ -417,7 +421,7 @@ describe('z.user.UserRepository', function() {
           'HEAD',
           `${test_factory.settings.connection
             .rest_url}/users/handles/${username}`,
-          [404, {}, '']
+          [404, {}, ''],
         );
 
         TestFactory.user_repository
@@ -435,7 +439,7 @@ describe('z.user.UserRepository', function() {
           'HEAD',
           `${test_factory.settings.connection
             .rest_url}/users/handles/${username}`,
-          [200, {}, '']
+          [200, {}, ''],
         );
 
         TestFactory.user_repository

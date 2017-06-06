@@ -45,11 +45,11 @@ z.search.SearchRepository = class SearchRepository {
     this.user_repository = user_repository;
     this.logger = new z.util.Logger(
       'z.search.SearchRepository',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
 
     this.search_result_mapper = new z.search.SearchResultMapper(
-      this.user_repository
+      this.user_repository,
     );
   }
 
@@ -66,14 +66,14 @@ z.search.SearchRepository = class SearchRepository {
       .then(({documents: matches}) =>
         this.search_result_mapper.map_results(
           matches,
-          z.search.SEARCH_MODE.CONTACTS
-        )
+          z.search.SEARCH_MODE.CONTACTS,
+        ),
       )
       .then(({results, mode}) => this._prepare_search_result(results, mode))
       .then(user_ets => {
         if (is_username) {
           user_ets = user_ets.filter(user_et =>
-            z.util.StringUtil.starts_with(user_et.username(), name)
+            z.util.StringUtil.starts_with(user_et.username(), name),
           );
         }
 
@@ -83,13 +83,13 @@ z.search.SearchRepository = class SearchRepository {
               return z.util.StringUtil.sort_by_priority(
                 user_a.username(),
                 user_b.username(),
-                name
+                name,
               );
             }
             return z.util.StringUtil.sort_by_priority(
               user_a.name(),
               user_b.name(),
-              name
+              name,
             );
           })
           .slice(0, max_results);
@@ -111,7 +111,7 @@ z.search.SearchRepository = class SearchRepository {
         let connections_promise;
         if (response['auto-connects'] && response['auto-connects'].length) {
           connections_promise = this.user_repository.get_user_by_id(
-            response['auto-connects'].map(result => result.id)
+            response['auto-connects'].map(result => result.id),
           );
         } else {
           connections_promise = Promise.resolve([]);
@@ -142,7 +142,7 @@ z.search.SearchRepository = class SearchRepository {
           .map(function(user_et) {
             const search_et = ko.utils.arrayFirst(
               search_ets,
-              user => user.id === user_et.id
+              user => user.id === user_et.id,
             );
             user_et.mutual_friends_total(search_et.mutual_friends_total);
 

@@ -39,7 +39,7 @@ z.ViewModel.content.CollectionViewModel = class CollectionViewModel {
     this.collection_details = collection_details;
     this.logger = new z.util.Logger(
       'z.ViewModel.CollectionViewModel',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
 
     this.conversation_et = ko.observable();
@@ -64,17 +64,17 @@ z.ViewModel.content.CollectionViewModel = class CollectionViewModel {
   added_to_view() {
     amplify.subscribe(
       z.event.WebApp.CONVERSATION.MESSAGE.ADDED,
-      this.item_added
+      this.item_added,
     );
     amplify.subscribe(
       z.event.WebApp.CONVERSATION.MESSAGE.REMOVED,
-      this.item_removed
+      this.item_removed,
     );
     $(document).on('keydown.collection', event => {
       if (event.keyCode === z.util.KEYCODE.ESC) {
         amplify.publish(
           z.event.WebApp.CONVERSATION.SHOW,
-          this.conversation_et()
+          this.conversation_et(),
         );
       }
     });
@@ -83,7 +83,7 @@ z.ViewModel.content.CollectionViewModel = class CollectionViewModel {
   search_in_conversation(query) {
     return this.conversation_repository.search_in_conversation(
       this.conversation_et(),
-      query
+      query,
     );
   }
 
@@ -94,7 +94,7 @@ z.ViewModel.content.CollectionViewModel = class CollectionViewModel {
   on_result() {
     amplify.publish(
       z.event.WebApp.ANALYTICS.EVENT,
-      z.tracking.EventName.COLLECTION.ENTERED_SEARCH
+      z.tracking.EventName.COLLECTION.ENTERED_SEARCH,
     );
   }
 
@@ -107,29 +107,29 @@ z.ViewModel.content.CollectionViewModel = class CollectionViewModel {
   item_removed(removed_message_id) {
     const _remove_item = message_et => message_et.id === removed_message_id;
     [this.audio, this.files, this.images, this.links].forEach(array =>
-      array.remove(_remove_item)
+      array.remove(_remove_item),
     );
   }
 
   removed_from_view() {
     amplify.unsubscribe(
       z.event.WebApp.CONVERSATION.MESSAGE.ADDED,
-      this.item_added
+      this.item_added,
     );
     amplify.unsubscribe(
       z.event.WebApp.CONVERSATION.MESSAGE.REMOVED,
-      this.item_removed
+      this.item_removed,
     );
     $(document).off('keydown.collection');
     this.conversation_et(null);
     this.search_input('');
     [this.images, this.files, this.links, this.audio].forEach(array =>
-      array.removeAll()
+      array.removeAll(),
     );
   }
 
   set_conversation(
-    conversation_et = this.conversation_repository.active_conversation()
+    conversation_et = this.conversation_repository.active_conversation(),
   ) {
     if (conversation_et) {
       this.conversation_et(conversation_et);
@@ -137,7 +137,7 @@ z.ViewModel.content.CollectionViewModel = class CollectionViewModel {
       this.conversation_repository
         .get_events_for_category(
           conversation_et,
-          z.message.MessageCategory.LINK_PREVIEW
+          z.message.MessageCategory.LINK_PREVIEW,
         )
         .then(message_ets => {
           return this._populate_items(message_ets);
@@ -171,12 +171,12 @@ z.ViewModel.content.CollectionViewModel = class CollectionViewModel {
   click_on_message(message_et) {
     amplify.publish(
       z.event.WebApp.ANALYTICS.EVENT,
-      z.tracking.EventName.COLLECTION.SELECTED_SEARCH_RESULT
+      z.tracking.EventName.COLLECTION.SELECTED_SEARCH_RESULT,
     );
     amplify.publish(
       z.event.WebApp.CONVERSATION.SHOW,
       this.conversation_et(),
-      message_et
+      message_et,
     );
   }
 
@@ -188,11 +188,11 @@ z.ViewModel.content.CollectionViewModel = class CollectionViewModel {
     this.collection_details.set_conversation(
       this.conversation_et(),
       category,
-      [].concat(items)
+      [].concat(items),
     );
     amplify.publish(
       z.event.WebApp.CONTENT.SWITCH,
-      z.ViewModel.content.CONTENT_STATE.COLLECTION_DETAILS
+      z.ViewModel.content.CONTENT_STATE.COLLECTION_DETAILS,
     );
   }
 
@@ -201,7 +201,7 @@ z.ViewModel.content.CollectionViewModel = class CollectionViewModel {
       z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW,
       message_et,
       this.images(),
-      'collection'
+      'collection',
     );
     this._track_opened_item(this.conversation_et(), 'image');
   }
@@ -212,12 +212,12 @@ z.ViewModel.content.CollectionViewModel = class CollectionViewModel {
       z.tracking.EventName.COLLECTION.OPENED_COLLECTIONS,
       {
         conversation_type: z.tracking.helpers.get_conversation_type(
-          conversation_et
+          conversation_et,
         ),
         is_empty: is_empty,
         with_bot: conversation_et.is_with_bot(),
         with_search_result: false,
-      }
+      },
     );
   }
 
@@ -227,11 +227,11 @@ z.ViewModel.content.CollectionViewModel = class CollectionViewModel {
       z.tracking.EventName.COLLECTION.OPENED_ITEM,
       {
         conversation_type: z.tracking.helpers.get_conversation_type(
-          conversation_et
+          conversation_et,
         ),
         type: type,
         with_bot: conversation_et.is_with_bot(),
-      }
+      },
     );
   }
 };

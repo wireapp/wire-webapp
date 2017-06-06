@@ -57,7 +57,7 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
           return is_liked_provisional;
         }
         const likes = this.reactions_user_ets().filter(
-          user_et => user_et.is_me
+          user_et => user_et.is_me,
         );
         return likes.length === 1;
       },
@@ -148,7 +148,7 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
     if (!file_name) {
       const date = moment(this.timestamp());
       file_name = `Wire ${date.format('YYYY-MM-DD')} at ${date.format(
-        'H.mm.ss'
+        'H.mm.ss',
       )}`;
     }
 

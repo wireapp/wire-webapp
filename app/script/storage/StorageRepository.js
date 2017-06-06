@@ -31,7 +31,7 @@ z.storage.StorageRepository = class StorageRepository {
     this.storage_service = storage_service;
     this.logger = new z.util.Logger(
       'z.storage.StorageRepository',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
   }
 
@@ -43,7 +43,7 @@ z.storage.StorageRepository = class StorageRepository {
     return this.storage_service
       .clear_all_stores()
       .then(() =>
-        this.logger.info(`Cleared database '${this.storage_service.db_name}'`)
+        this.logger.info(`Cleared database '${this.storage_service.db_name}'`),
       );
   }
 
@@ -100,7 +100,7 @@ z.storage.StorageRepository = class StorageRepository {
     return this.storage_service.save(
       z.storage.StorageService.OBJECT_STORE.AMPLIFY,
       primary_key,
-      {value: value}
+      {value: value},
     );
   }
 

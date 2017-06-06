@@ -168,12 +168,12 @@ window.z.util = z.util || {};
     frontend: {
       is_localhost() {
         return [APP_ENV.LOCALHOST, APP_ENV.VIRTUAL_HOST].includes(
-          window.location.hostname
+          window.location.hostname,
         );
       },
       is_production() {
         return [APP_ENV.PRODUCTION, APP_ENV.PROD_NEXT].includes(
-          window.location.hostname
+          window.location.hostname,
         );
       },
     },

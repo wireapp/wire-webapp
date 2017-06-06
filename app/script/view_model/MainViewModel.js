@@ -27,7 +27,7 @@ z.ViewModel.MainViewModel = class MainViewModel {
     this.user_repository = user_repository;
     this.logger = new z.util.Logger(
       'z.ViewModel.MainViewModel',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
 
     this.user = this.user_repository.self;

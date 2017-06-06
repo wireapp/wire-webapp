@@ -26,7 +26,7 @@ z.bot.BotRepository = class BotRepository {
   constructor(bot_service, conversation_repository) {
     this.logger = new z.util.Logger(
       'z.bot.BotRepository',
-      z.config.LOGGER.OPTIONS
+      z.config.LOGGER.OPTIONS,
     );
     this.bot_service = bot_service;
     this.conversation_repository = conversation_repository;
@@ -49,7 +49,7 @@ z.bot.BotRepository = class BotRepository {
         if (create_conversation) {
           return this.conversation_repository.create_new_conversation(
             [],
-            bot_result.name || bot_name
+            bot_result.name || bot_name,
           );
         }
         return {
@@ -60,7 +60,7 @@ z.bot.BotRepository = class BotRepository {
         this.conversation_repository.add_bot(
           conversation_et,
           bot_result.provider,
-          bot_result.service
+          bot_result.service,
         );
         amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversation_et);
       });
