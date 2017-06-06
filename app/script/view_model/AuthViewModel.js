@@ -32,7 +32,6 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       },
       FORWARDED_URL_PARAMETERS: [
         z.auth.URLParameter.BOT,
-        z.auth.URLParameter.CALLING_V3,
         z.auth.URLParameter.ENVIRONMENT,
         z.auth.URLParameter.LOCALYTICS,
       ],
@@ -1715,7 +1714,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
    * @returns {undefined} No return value
    */
   _validate_name() {
-    if (this.name().length < z.config.MINIMUM_USERNAME_LENGTH) {
+    if (this.name().length < z.user.UserRepository.CONFIG.MINIMUM_NAME_LENGTH) {
       return this._add_error(z.string.auth_error_name_short, z.auth.AuthView.TYPE.NAME);
     }
   }

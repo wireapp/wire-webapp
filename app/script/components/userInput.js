@@ -46,7 +46,7 @@ z.components.UserListInputViewModel = class UserListInputViewModel {
 
     this.placeholder = ko.pureComputed(() => {
       if ((this.input() === '') && (this.selected().length === 0)) {
-        return z.localization.Localizer.get_text(params.placeholder);
+        return z.l10n.text(params.placeholder);
       }
 
       return '';

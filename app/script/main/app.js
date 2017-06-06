@@ -63,12 +63,12 @@ z.main.App = class App {
 
     repositories.announce            = new z.announce.AnnounceRepository(this.service.announce);
     repositories.audio               = this.auth.audio;
-    repositories.storage             = new z.storage.StorageRepository(this.service.storage);
     repositories.cache               = new z.cache.CacheRepository();
-    repositories.cryptography        = new z.cryptography.CryptographyRepository(this.service.cryptography, repositories.storage);
     repositories.giphy               = new z.extension.GiphyRepository(this.service.giphy);
     repositories.media               = new z.media.MediaRepository();
+    repositories.storage             = new z.storage.StorageRepository(this.service.storage);
 
+    repositories.cryptography        = new z.cryptography.CryptographyRepository(this.service.cryptography, repositories.storage);
     repositories.client              = new z.client.ClientRepository(this.service.client, repositories.cryptography);
     repositories.user                = new z.user.UserRepository(this.service.user, this.service.asset, this.service.search, repositories.client, repositories.cryptography);
     repositories.event               = new z.event.EventRepository(this.service.web_socket, this.service.notification, repositories.cryptography, repositories.user, this.service.conversation);
@@ -76,6 +76,7 @@ z.main.App = class App {
     repositories.properties          = new z.properties.PropertiesRepository(this.service.properties);
     repositories.connect             = new z.connect.ConnectRepository(this.service.connect, this.service.connect_google, repositories.properties);
     repositories.links               = new z.links.LinkPreviewRepository(this.service.asset);
+    repositories.team                = new z.team.TeamRepository(this.service.team, repositories.user);
 
     repositories.conversation        = new z.conversation.ConversationRepository(
       this.service.conversation,
@@ -83,7 +84,8 @@ z.main.App = class App {
       repositories.user,
       repositories.giphy,
       repositories.cryptography,
-      repositories.links
+      repositories.links,
+      repositories.team
     );
 
     repositories.bot                 = new z.bot.BotRepository(this.service.bot, repositories.conversation);
@@ -111,6 +113,7 @@ z.main.App = class App {
     services.giphy          = new z.extension.GiphyService(this.auth.client);
     services.search         = new z.search.SearchService(this.auth.client);
     services.storage        = new z.storage.StorageService();
+    services.team           = new z.team.TeamService(this.auth.client);
     services.user           = new z.user.UserService(this.auth.client);
     services.properties     = new z.properties.PropertiesService(this.auth.client);
     services.web_socket     = new z.event.WebSocketService(this.auth.client);
@@ -146,8 +149,8 @@ z.main.App = class App {
     const view_models = {};
 
     view_models.main              = new z.ViewModel.MainViewModel('wire-main', this.repository.user);
-    view_models.content           = new z.ViewModel.content.ContentViewModel('right', this.repository.calling, this.repository.client, this.repository.conversation, this.repository.media, this.repository.search, this.repository.properties);
-    view_models.list              = new z.ViewModel.list.ListViewModel('left', view_models.content, this.repository.calling, this.repository.connect, this.repository.conversation, this.repository.search, this.repository.properties);
+    view_models.content           = new z.ViewModel.content.ContentViewModel('right', this.repository.calling, this.repository.client, this.repository.conversation, this.repository.media, this.repository.properties, this.repository.search, this.repository.team);
+    view_models.list              = new z.ViewModel.list.ListViewModel('left', view_models.content, this.repository.calling, this.repository.connect, this.repository.conversation, this.repository.search, this.repository.properties, this.repository.team);
     view_models.title             = new z.ViewModel.WindowTitleViewModel(view_models.content.content_state, this.repository.user, this.repository.conversation);
     view_models.lightbox          = new z.ViewModel.ImageDetailViewViewModel('detail-view', this.repository.conversation);
     view_models.warnings          = new z.ViewModel.WarningsViewModel('warnings');
@@ -223,6 +226,7 @@ z.main.App = class App {
       return Promise.all([
         this.repository.conversation.get_conversations(),
         this.repository.user.get_connections(),
+        this.repository.team.get_teams(),
       ]);
     })
     .then(([conversation_ets, connection_ets]) => {
@@ -268,6 +272,7 @@ z.main.App = class App {
       this.repository.announce.init();
       this.repository.audio.init(true);
       this.repository.client.cleanup_clients_and_sessions(true);
+      this.repository.conversation.cleanup_conversations();
       this.logger.info('App fully loaded');
     })
     .catch((error) => {
@@ -359,7 +364,6 @@ z.main.App = class App {
    */
   _check_user_information(user_et) {
     if (!user_et.medium_picture_resource()) {
-      this.view.list.first_run(true);
       this.repository.user.set_default_picture();
     }
     if (!user_et.username()) {
@@ -379,11 +383,6 @@ z.main.App = class App {
     if (bot_name) {
       this.logger.info(`Found bot token '${bot_name}'`);
       this.repository.bot.add_bot(bot_name);
-    }
-
-    const calling_v3 = z.util.get_url_parameter(z.auth.URLParameter.CALLING_V3);
-    if (_.isBoolean(calling_v3)) {
-      return this.repository.calling.use_v3_api = calling_v3;
     }
   }
 

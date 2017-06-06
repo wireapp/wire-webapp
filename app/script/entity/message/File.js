@@ -25,6 +25,8 @@ window.z.entity = z.entity || {};
 z.entity.File = class File extends z.entity.Asset {
   constructor(id) {
     super(id);
+    this.cancel_download = this.cancel_download.bind(this);
+
     this.type = z.assets.AssetType.FILE;
     this.logger = new z.util.Logger('z.entity.File', z.config.LOGGER.OPTIONS);
 

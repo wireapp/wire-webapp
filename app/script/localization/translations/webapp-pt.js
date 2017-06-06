@@ -271,7 +271,18 @@ z.string.pt.conversations_popover_notify = 'Notificar';
 z.string.pt.conversations_popover_silence = 'Sem som';
 z.string.pt.conversations_popover_unarchive = 'Desarquivar';
 
+z.string.pt.conversations_secondary_line_missed_call = '{{number}} chamada perdida';
+z.string.pt.conversations_secondary_line_missed_calls = '{{number}} chamadas perdidas';
+z.string.pt.conversations_secondary_line_new_message = '{{number}} nova mensagem';
+z.string.pt.conversations_secondary_line_new_messages = '{{number}} novas mensagens';
+z.string.pt.conversations_secondary_line_ping = '{{number}} ping';
+z.string.pt.conversations_secondary_line_pings = '{{number}} pings';
+z.string.pt.conversations_secondary_line_person_left = '{{number}} pessoa saiu';
+z.string.pt.conversations_secondary_line_people_left = '{{number}} pessoas saíram';
+z.string.pt.conversations_secondary_line_person_added = '{{user1}} adicionou {{user2}}';
+z.string.pt.conversations_secondary_line_people_added = '{{user}} adicionou pessoas';
 z.string.pt.conversations_secondary_line_timed_message = 'Mensagem temporizada';
+z.string.pt.conversations_secondary_line_renamed = '{{user}} renomeou';
 
 z.string.pt.takeover_headline = 'Nomes de usuário estão aqui.';
 z.string.pt.takeover_sub = 'Revindicar seu nome único no Wire.';
@@ -428,6 +439,8 @@ z.string.pt.search_connect = 'Conectar';
 z.string.pt.search_connections = 'Conexões';
 z.string.pt.search_groups = 'Grupos';
 z.string.pt.search_placeholder = 'Procurar por nome ou nome de usuário';
+z.string.pt.search_team_groups = 'Conversas de equipe';
+z.string.pt.search_team_members = 'Membros da equipe';
 z.string.pt.search_top_people = 'Contatos frequentes';
 z.string.pt.search_try_search = 'Encontre pessoas pelo \nnome ou nome de usuário';
 z.string.pt.search_no_contacts_on_wire = 'Você não tem nenhum contato no Wire. \nTente encontrar pessoas pelo\nnome ou nome de usuário.';

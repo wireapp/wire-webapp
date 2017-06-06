@@ -44,7 +44,7 @@ class MediaParser {
   render_media_embeds(message, theme_color) {
     const div = document.createElement('div');
     div.innerHTML = message;
-    const links = div.querySelectorAll('a');
+    const links = Array.from(div.querySelectorAll('a'));
 
     for (const link of links) {
       for (const embed of this.embeds) {

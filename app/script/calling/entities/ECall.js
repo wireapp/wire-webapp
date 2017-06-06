@@ -49,7 +49,7 @@ z.calling.entities.ECall = class ECall {
     this.v3_call_center = v3_call_center;
 
     const {id: conversation_id, is_group} = conversation_et;
-    const {calling_config, media_stream_handler, media_repository, self_state, telemetry, user_repository} = this.v3_call_center;
+    const {media_stream_handler, media_repository, self_state, telemetry, user_repository} = this.v3_call_center;
 
     this.logger = new z.util.Logger(`z.calling.entities.ECall (${conversation_id})`, z.config.LOGGER.OPTIONS);
 
@@ -58,7 +58,6 @@ z.calling.entities.ECall = class ECall {
     this.timings = undefined;
 
     this.media_repository = media_repository;
-    this.config = calling_config;
     this.self_user = user_repository.self();
     this.self_state = self_state;
     this.telemetry = telemetry;
@@ -71,7 +70,7 @@ z.calling.entities.ECall = class ECall {
     this.termination_reason = undefined;
 
     this.is_connected = ko.observable(false);
-    this.is_group = is_group;
+    this.is_group = is_group();
 
     this.self_client_joined = ko.observable(false);
     this.self_user_joined = ko.observable(false);
@@ -98,7 +97,7 @@ z.calling.entities.ECall = class ECall {
     this.is_remote_video_send = ko.pureComputed(() => this.remote_media_type() === z.media.MediaType.VIDEO);
 
     this.network_interruption = ko.pureComputed(() => {
-      if (this.is_connected() && !this.is_group()) {
+      if (this.is_connected() && !this.is_group) {
         return this.interrupted_participants().length > 0;
       }
 
@@ -110,7 +109,7 @@ z.calling.entities.ECall = class ECall {
     // Observable subscriptions
     this.is_connected.subscribe((is_connected) => {
       if (is_connected) {
-        if (this.is_group()) {
+        if (this.is_group) {
           this.schedule_group_check();
         }
 
@@ -178,7 +177,7 @@ z.calling.entities.ECall = class ECall {
       this.previous_state = state;
     });
 
-    if (this.is_group()) {
+    if (this.is_group) {
       this.schedule_group_check();
     }
 
@@ -231,7 +230,7 @@ z.calling.entities.ECall = class ECall {
       this.state(z.calling.enum.CALL_STATE.CONNECTING);
     }
 
-    if (this.is_group()) {
+    if (this.is_group) {
       const response = this.state() !== z.calling.enum.CALL_STATE.OUTGOING;
       const additional_payload = this.v3_call_center.create_additional_payload(this.id);
       const prop_sync_payload = this.v3_call_center.create_payload_prop_sync(z.media.MediaType.AUDIO, false, additional_payload);
@@ -253,7 +252,7 @@ z.calling.entities.ECall = class ECall {
   leave_call(termination_reason) {
     this._clear_timeouts();
 
-    if (this.state() === z.calling.enum.CALL_STATE.ONGOING && !this.is_group()) {
+    if (this.state() === z.calling.enum.CALL_STATE.ONGOING && !this.is_group) {
       this.state(z.calling.enum.CALL_STATE.DISCONNECTING);
     }
 
@@ -275,7 +274,7 @@ z.calling.entities.ECall = class ECall {
       .then(() => {
         const additional_payload = this.v3_call_center.create_additional_payload(this.id);
 
-        if (this.is_group()) {
+        if (this.is_group) {
           e_call_message_et = z.calling.mapper.ECallMessageMapper.build_group_leave(false, this.session_id, additional_payload);
           this.send_e_call_event(e_call_message_et);
         } else {
@@ -399,11 +398,15 @@ z.calling.entities.ECall = class ECall {
 
     this.logger.debug(`Set sending group check after random timeout of '${timeout_in_seconds}s'`);
     this.group_check_timeout = window.setTimeout(() => {
-      this.logger.debug(`Sending group check after random timeout of '${timeout_in_seconds}s'`);
-      const additional_payload = this.v3_call_center.create_additional_payload(this.id);
+      if (this.participants().length) {
+        this.logger.debug(`Sending group check after random timeout of '${timeout_in_seconds}s'`);
+        const additional_payload = this.v3_call_center.create_additional_payload(this.id);
 
-      this.send_e_call_event(z.calling.mapper.ECallMessageMapper.build_group_check(true, this.session_id, additional_payload));
-      this.schedule_group_check();
+        this.send_e_call_event(z.calling.mapper.ECallMessageMapper.build_group_check(true, this.session_id, additional_payload));
+        this.schedule_group_check();
+      } else {
+        this.leave_call(z.calling.enum.TERMINATION_REASON.OTHER_USER);
+      }
     }, timeout_in_seconds * 1000);
   }
 
@@ -545,7 +548,7 @@ z.calling.entities.ECall = class ECall {
       this._stop_ring_tone(is_incoming);
 
       if (is_incoming) {
-        if (this.is_group()) {
+        if (this.is_group) {
           return this.state(z.calling.enum.CALL_STATE.REJECTED);
         }
 

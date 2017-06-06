@@ -54,7 +54,6 @@ z.calling.entities.EFlow = class EFlow {
 
     // States
     this.is_answer = ko.observable(undefined);
-    this.is_group = this.e_call_et.is_group;
 
     // Audio
     this.audio = new z.calling.entities.FlowAudio(this, this.v3_call_center.media_repository);
@@ -347,14 +346,16 @@ z.calling.entities.EFlow = class EFlow {
   start_negotiation(negotiation_mode = z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT, media_stream = this.media_stream()) {
     this.logger.info(`Start negotiating PeerConnection with '${this.remote_user.name()}' triggered by '${negotiation_mode}'`);
 
-    this._create_peer_connection();
-    this._add_media_stream(media_stream);
-    this.audio.hookup(true);
-    this._set_sdp_states();
-    this.negotiation_mode(negotiation_mode);
-    this.negotiation_needed(true);
-    this.pc_initialized(true);
-    this._set_negotiation_failed_timeout();
+    this._create_peer_connection()
+      .then(() => {
+        this._add_media_stream(media_stream);
+        this.audio.hookup(true);
+        this._set_sdp_states();
+        this.negotiation_mode(negotiation_mode);
+        this.negotiation_needed(true);
+        this.pc_initialized(true);
+        this._set_negotiation_failed_timeout();
+      });
   }
 
   /**
@@ -419,14 +420,17 @@ z.calling.entities.EFlow = class EFlow {
   /**
    * Create the PeerConnection configuration.
    * @private
-   * @returns {RTCConfiguration} Configuration object to initialize PeerConnection
+   * @returns {Promise} Resolves with the configuration object to initialize PeerConnection
    */
   _create_peer_connection_configuration() {
-    return {
-      bundlePolicy: 'max-bundle',
-      iceServers: this.e_call_et.config().ice_servers,
-      rtcpMuxPolicy: 'require', // @deprecated Default value beginning Chrome 57
-    };
+    return this.e_call_et.v3_call_center.get_config()
+      .then((calling_config) => {
+        return {
+          bundlePolicy: 'max-bundle',
+          iceServers: calling_config.ice_servers,
+          rtcpMuxPolicy: 'require', // @deprecated Default value beginning Chrome 57
+        };
+      });
   }
 
   /**
@@ -434,23 +438,26 @@ z.calling.entities.EFlow = class EFlow {
    *
    * @see https://developer.mozilla.org/en-US/docs/Web/API/RTCConfiguration
    * @private
-   * @returns {undefined} No return value
+   * @returns {Promise} Resolves when the PeerConnection was created
    */
   _create_peer_connection() {
-    this.peer_connection = new window.RTCPeerConnection(this._create_peer_connection_configuration());
-    this.telemetry.time_step(z.telemetry.calling.CallSetupSteps.PEER_CONNECTION_CREATED);
-    this.signaling_state(this.peer_connection.signalingState);
-    this.logger.debug(`PeerConnection with '${this.remote_user.name()}' created - is_answer '${this.is_answer()}'`, this.e_call_et.config().ice_servers);
+    return this._create_peer_connection_configuration()
+      .then((pc_configuration) => {
+        this.peer_connection = new window.RTCPeerConnection(pc_configuration);
+        this.telemetry.time_step(z.telemetry.calling.CallSetupSteps.PEER_CONNECTION_CREATED);
+        this.signaling_state(this.peer_connection.signalingState);
+        this.logger.debug(`PeerConnection with '${this.remote_user.name()}' created - is_answer '${this.is_answer()}'`, pc_configuration);
 
-    this.peer_connection.onaddstream = this._on_add_stream.bind(this);
-    this.peer_connection.ontrack = this._on_track.bind(this);
-    this.peer_connection.ondatachannel = this._on_data_channel.bind(this);
-    this.peer_connection.onicecandidate = this._on_ice_candidate.bind(this);
-    this.peer_connection.oniceconnectionstatechange = this._on_ice_connection_state_change.bind(this);
-    this.peer_connection.onremovestream = this._on_remove_stream.bind(this);
-    this.peer_connection.onsignalingstatechange = this._on_signaling_state_change.bind(this);
+        this.peer_connection.onaddstream = this._on_add_stream.bind(this);
+        this.peer_connection.ontrack = this._on_track.bind(this);
+        this.peer_connection.ondatachannel = this._on_data_channel.bind(this);
+        this.peer_connection.onicecandidate = this._on_ice_candidate.bind(this);
+        this.peer_connection.oniceconnectionstatechange = this._on_ice_connection_state_change.bind(this);
+        this.peer_connection.onremovestream = this._on_remove_stream.bind(this);
+        this.peer_connection.onsignalingstatechange = this._on_signaling_state_change.bind(this);
 
-    this.telemetry.set_peer_connection(this.peer_connection);
+        this.telemetry.set_peer_connection(this.peer_connection);
+      });
   }
 
   /**
@@ -735,7 +742,7 @@ z.calling.entities.EFlow = class EFlow {
         }
 
         this.remote_sdp(remote_sdp);
-        this.logger.debug(`Saved remote '${this.remote_sdp().type}' SDP`, this.remote_sdp());
+        this.logger.debug(`Saved remote '${remote_sdp.type}' SDP`, this.remote_sdp());
       });
   }
 
@@ -758,14 +765,14 @@ z.calling.entities.EFlow = class EFlow {
           }
         }
 
-        this.logger.debug(`Sending local '${this.local_sdp().type}' SDP containing '${ice_candidates.length}' ICE candidates for flow with '${this.remote_user.name()}'\n${this.local_sdp().sdp}`);
+        this.logger.debug(`Sending local '${local_sdp.type}' SDP containing '${ice_candidates.length}' ICE candidates for flow with '${this.remote_user.name()}'\n${this.local_sdp().sdp}`);
         this.should_send_local_sdp(false);
 
-        const response = this.local_sdp().type === z.calling.rtc.SDP_TYPE.ANSWER;
+        const response = local_sdp.type === z.calling.rtc.SDP_TYPE.ANSWER;
         let e_call_message_et;
 
         if (this.negotiation_mode() === z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT) {
-          if (this.e_call_et.is_group()) {
+          if (this.e_call_et.is_group) {
             e_call_message_et = z.calling.mapper.ECallMessageMapper.build_group_setup(response, this.e_call_et.session_id, this._create_additional_payload());
           } else {
             e_call_message_et = z.calling.mapper.ECallMessageMapper.build_setup(response, this.e_call_et.session_id, this._create_additional_payload());
@@ -777,7 +784,7 @@ z.calling.entities.EFlow = class EFlow {
         return this.e_call_et.send_e_call_event(e_call_message_et)
           .then(() => {
             this.telemetry.time_step(z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SEND);
-            this.logger.debug(`Sending local '${this.local_sdp().type}' SDP successful`, this.local_sdp());
+            this.logger.debug(`Sending local '${local_sdp.type}' SDP successful`, this.local_sdp());
           });
       })
       .catch((error) => {
@@ -1100,31 +1107,35 @@ z.calling.entities.EFlow = class EFlow {
    * @returns {undefined} No return value
    */
   _add_media_stream(media_stream) {
-    if (media_stream.type === z.media.MediaType.AUDIO) {
-      media_stream = this.audio.wrap_audio_input_stream(media_stream);
-    }
+    if (media_stream) {
+      if (media_stream.type === z.media.MediaType.AUDIO) {
+        media_stream = this.audio.wrap_audio_input_stream(media_stream);
+      }
 
-    if (this.peer_connection.addTrack) {
-      return media_stream.getTracks()
-        .forEach((media_stream_track) => {
-          this.peer_connection.addTrack(media_stream_track, media_stream);
+      if (this.peer_connection.addTrack) {
+        return media_stream.getTracks()
+          .forEach((media_stream_track) => {
+            this.peer_connection.addTrack(media_stream_track, media_stream);
 
-          this.logger.debug(`Added local '${media_stream_track.kind}' MediaStreamTrack to PeerConnection`,
-            {
-              audio_tracks: media_stream.getAudioTracks(),
-              stream: media_stream,
-              video_tracks: media_stream.getVideoTracks(),
-            });
+            this.logger.debug(`Added local '${media_stream_track.kind}' MediaStreamTrack to PeerConnection`,
+              {
+                audio_tracks: media_stream.getAudioTracks(),
+                stream: media_stream,
+                video_tracks: media_stream.getVideoTracks(),
+              });
+          });
+      }
+
+      this.peer_connection.addStream(media_stream);
+      this.logger.debug(`Added local '${media_stream.type}' MediaStream to PeerConnection`,
+        {
+          audio_tracks: media_stream.getAudioTracks(),
+          stream: media_stream,
+          video_tracks: media_stream.getVideoTracks(),
         });
+    } else {
+      throw new Error('Failed to add MediaStream: Provided MediaStream undefined');
     }
-
-    this.peer_connection.addStream(media_stream);
-    this.logger.debug(`Added local '${media_stream.type}' MediaStream to PeerConnection`,
-      {
-        audio_tracks: media_stream.getAudioTracks(),
-        stream: media_stream,
-        video_tracks: media_stream.getVideoTracks(),
-      });
   }
 
   /**

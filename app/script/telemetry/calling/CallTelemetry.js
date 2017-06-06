@@ -135,7 +135,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
       attributes = $.extend({
         conversation_participants: conversation_et.number_of_participants(),
         conversation_participants_in_call: max_number_of_participants,
-        conversation_type: is_group() ? z.tracking.attribute.ConversationType.GROUP : z.tracking.attribute.ConversationType.ONE_TO_ONE,
+        conversation_type: is_group ? z.tracking.attribute.ConversationType.GROUP : z.tracking.attribute.ConversationType.ONE_TO_ONE,
         remote_version: [z.tracking.EventName.CALLING.ESTABLISHED_CALL, z.tracking.EventName.CALLING.JOINED_CALL].includes(event_name) ? this.remote_version : undefined,
         version: this.protocol_version,
         with_bot: conversation_et.is_with_bot(),
@@ -182,7 +182,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
       const attributes = {
         conversation_participants: conversation_et.number_of_participants(),
         conversation_participants_in_call: max_number_of_participants,
-        conversation_type: is_group() ? z.tracking.attribute.ConversationType.GROUP : z.tracking.attribute.ConversationType.ONE_TO_ONE,
+        conversation_type: is_group ? z.tracking.attribute.ConversationType.GROUP : z.tracking.attribute.ConversationType.ONE_TO_ONE,
         duration: duration_bucket,
         duration_sec: duration,
         reason: termination_reason,

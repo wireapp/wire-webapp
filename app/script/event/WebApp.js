@@ -113,7 +113,6 @@ z.event.WebApp = {
     },
     PERSIST_STATE: 'wire.webapp.conversation.persist_state',
     SHOW: 'wire.webapp.conversation.show',
-    SWITCH: 'wire.webapp.conversation.switch',
     UNREAD: 'wire.webapp.conversation.unread',
   },
   DEBUG: {
@@ -213,6 +212,10 @@ z.event.WebApp = {
   TAKEOVER: {
     DISMISS: 'wire.webapp.takeover.dismiss',
     SHOW: 'wire.webapp.takeover.show',
+  },
+  TEAM: {
+    EVENT_FROM_BACKEND: 'wire.webapp.team.event_from_backend',
+    MEMBER_LEAVE: 'wire.webapp.team.member_leave',
   },
   TELEMETRY: {
     BACKEND_REQUESTS: 'wire.webapp.telemetry.backend_requests',

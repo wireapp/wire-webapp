@@ -30,23 +30,24 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     };
   }
 
-  constructor(element_id, user_repository, conversation_repository, search_repository) {
+  constructor(element_id, user_repository, conversation_repository, search_repository, team_repository) {
     this.add_people = this.add_people.bind(this);
     this.block = this.block.bind(this);
     this.close = this.close.bind(this);
+    this.click_on_participant = this.click_on_participant.bind(this);
     this.connect = this.connect.bind(this);
     this.leave_conversation = this.leave_conversation.bind(this);
     this.on_search_close = this.on_search_close.bind(this);
     this.pending = this.pending.bind(this);
     this.remove = this.remove.bind(this);
     this.show_participant = this.show_participant.bind(this);
-    this.toggle_participants_bubble = this.toggle_participants_bubble.bind(this);
     this.unblock = this.unblock.bind(this);
 
     this.element_id = element_id;
     this.user_repository = user_repository;
     this.conversation_repository = conversation_repository;
     this.search_repository = search_repository;
+    this.team_repository = team_repository;
     this.logger = new z.util.Logger('z.ViewModel.ParticipantsViewModel', z.config.LOGGER.OPTIONS);
 
     this.state = ko.observable(ParticipantsViewModel.STATE.PARTICIPANTS);
@@ -54,11 +55,17 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.conversation = ko.observable(new z.entity.Conversation());
     this.conversation.subscribe(() => this.render_participants(false));
 
+    this.active_team = this.team_repository.active_team;
+
     this.render_participants = ko.observable(false);
+
+    this.group_mode = ko.observable(false);
 
     this.participants = ko.observableArray();
     this.participants_verified = ko.observableArray();
     this.participants_unverified = ko.observableArray();
+
+    this.placeholder_participant = new z.entity.User();
 
     ko.computed(() => {
       const conversation_et = this.conversation();
@@ -83,7 +90,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.confirm_dialog = undefined;
 
     // Selected group user
-    this.user_profile = ko.observable(new z.entity.User());
+    this.user_profile = ko.observable(this.placeholder_participant);
 
     // Switch between div and input field to edit the conversation name
     this.editing = ko.observable(false);
@@ -115,9 +122,17 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.connected_users = ko.pureComputed(() => {
       return this.user_repository.connected_users()
         .filter((user_et) => {
-          for (const group_participant of this.participants()) {
-            if (user_et.id === group_participant.id) {
+          for (const conversation_participant of this.participants()) {
+            if (user_et.id === conversation_participant.id) {
               return false;
+            }
+          }
+
+          if (this.active_team().id) {
+            for (const team_member of this.team_members()) {
+              if (user_et.id === team_member.id) {
+                return false;
+              }
             }
           }
 
@@ -125,6 +140,17 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
         })
         .sort((user_a, user_b) => z.util.StringUtil.sort_by_priority(user_a.first_name(), user_b.first_name()));
     }, this, {deferEvaluation: true});
+    this.team_members = ko.pureComputed(() => {
+      return this.active_team().members()
+        .filter((user_et) => {
+          for (const conversation_participant of this.participants()) {
+            if (user_et.id === conversation_participant.id) {
+              return false;
+            }
+          }
+          return true;
+        });
+    });
 
     this.add_people_tooltip = z.localization.Localizer.get_text({
       id: z.string.tooltip_people_add,
@@ -134,16 +160,26 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
       },
     });
 
-    amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, (content_state) => {
-      if (content_state === z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS) {
-        this.participants_bubble.hide();
-      }
-    });
+    amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, this.switch_content.bind(this));
+    amplify.subscribe(z.event.WebApp.PEOPLE.SHOW, this.show_participant);
+    amplify.subscribe(z.event.WebApp.PEOPLE.TOGGLE, this.toggle_participants_bubble.bind(this));
+  }
 
-    amplify.subscribe(z.event.WebApp.PEOPLE.SHOW, (user_et) => {
+  click_on_participant(user_et) {
+    this.show_participant(user_et, true);
+  }
+
+  show_participant(user_et, group_mode = false) {
+    if (user_et) {
       this.user_profile(user_et);
-      $(`#${this.element_id}`).addClass('single-user-mode');
-    });
+      this.group_mode(group_mode);
+    }
+  }
+
+  switch_content(content_state) {
+    if (content_state === z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS) {
+      this.participants_bubble.hide();
+    }
   }
 
   toggle_participants_bubble(add_people = false) {
@@ -151,14 +187,14 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
       if (!this.participants_bubble.is_visible()) {
         this.reset_view();
 
-        if (this.conversation().is_group()) {
-          this.user_profile(new z.entity.User());
+        const [user_et] = this.participants();
+        if (user_et && !this.conversation().is_group() && !this.conversation().is_team_group()) {
+          this.user_profile(user_et);
         } else {
-          this.user_profile(this.participants()[0]);
+          this.user_profile(this.placeholder_participant);
         }
 
         this.render_participants(true);
-        $(`#${this.element_id}`).removeClass('single-user-mode');
       }
 
       if (add_people) {
@@ -190,7 +226,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   change_conversation(conversation_et) {
     this.participants_bubble.hide();
     this.conversation(conversation_et);
-    this.user_profile(new z.entity.User());
+    this.user_profile(this.placeholder_participant);
   }
 
   reset_view() {
@@ -199,7 +235,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     if (this.confirm_dialog) {
       this.confirm_dialog.destroy();
     }
-    $(`#${this.element_id}`).removeClass('single-user-mode');
+    this.user_profile(this.placeholder_participant);
   }
 
   add_people() {
@@ -218,10 +254,6 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
       },
       template: '#template-confirm-leave',
     });
-  }
-
-  show_participant(user_et) {
-    this.user_profile(user_et);
   }
 
   rename_conversation(data, event) {
@@ -269,7 +301,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   }
 
   close() {
-    this.user_profile(new z.entity.User());
+    this.user_profile(this.placeholder_participant);
     this.reset_view();
   }
 
@@ -321,10 +353,9 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.confirm_dialog = $('#participants').confirm({
       confirm: () => {
         const next_conversation_et = this.conversation_repository.get_next_conversation(this.conversation());
-        this.participants_bubble.hide();
 
-        this.user_repository.block_user(user_et)
-          .then(() => amplify.publish(z.event.WebApp.CONVERSATION.SWITCH, this.conversation(), next_conversation_et));
+        this.participants_bubble.hide();
+        this.user_repository.block_user(user_et, next_conversation_et);
       },
       data: {
         user: user_et,
@@ -335,6 +366,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
   connect(user_et) {
     this.participants_bubble.hide();
+    this.active_team(this.team_repository.personal_space);
 
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.SENT_CONNECT_REQUEST, {
       common_users_count: user_et.mutual_friends_total(),
