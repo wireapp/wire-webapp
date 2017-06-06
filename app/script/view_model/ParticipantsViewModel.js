@@ -165,7 +165,6 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   show_participant(user_et) {
     if (user_et) {
       this.user_profile(user_et);
-      $(`#${this.element_id}`).addClass('single-user-mode');
     }
   }
 
@@ -188,7 +187,6 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
         }
 
         this.render_participants(true);
-        $(`#${this.element_id}`).removeClass('single-user-mode');
       }
 
       if (add_people) {
@@ -230,7 +228,6 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
       this.confirm_dialog.destroy();
     }
     this.user_profile(this.placeholder_participant);
-    $(`#${this.element_id}`).removeClass('single-user-mode');
   }
 
   add_people() {
