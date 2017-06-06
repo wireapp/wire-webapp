@@ -261,6 +261,7 @@ z.event.EventRepository = class EventRepository {
           throw error;
         }
 
+        this.logger.warn('Last notification ID not found in database. Resetting...');
         return this.notification_service.get_notifications_last()
           .then(({id: notification_id}) => {
             if (notification_id) {
