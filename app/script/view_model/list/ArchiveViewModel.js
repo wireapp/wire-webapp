@@ -32,18 +32,13 @@ z.ViewModel.list.ArchiveViewModel = class ArchiveViewModel {
    * @param {z.conversation.ConversationRepository} conversation_repository - Conversation repository
    */
   constructor(element_id, list_view_model, conversation_repository) {
-    this.click_on_archived_conversation = this.click_on_archived_conversation.bind(
-      this,
-    );
+    this.click_on_archived_conversation = this.click_on_archived_conversation.bind(this);
     this.click_on_close_archive = this.click_on_close_archive.bind(this);
     this.update_list = this.update_list.bind(this);
 
     this.list_view_model = list_view_model;
     this.conversation_repository = conversation_repository;
-    this.logger = new z.util.Logger(
-      'z.ViewModel.list.ArchiveViewModel',
-      z.config.LOGGER.OPTIONS,
-    );
+    this.logger = new z.util.Logger('z.ViewModel.list.ArchiveViewModel', z.config.LOGGER.OPTIONS);
 
     this.conversations_archived = this.conversation_repository.conversations_archived;
 
@@ -65,8 +60,6 @@ z.ViewModel.list.ArchiveViewModel = class ArchiveViewModel {
   }
 
   update_list() {
-    this.conversation_repository.update_conversations(
-      this.conversation_repository.conversations_archived(),
-    );
+    this.conversation_repository.update_conversations(this.conversation_repository.conversations_archived());
   }
 };

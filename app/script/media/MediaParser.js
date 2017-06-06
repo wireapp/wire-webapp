@@ -29,7 +29,7 @@ class MediaParser {
       z.media.MediaEmbeds.soundcloud,
       z.media.MediaEmbeds.spotify,
       z.media.MediaEmbeds.vimeo,
-      z.media.MediaEmbeds.youtube,
+      z.media.MediaEmbeds.youtube
     ];
   }
 

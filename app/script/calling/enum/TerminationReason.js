@@ -35,5 +35,5 @@ z.calling.enum.TERMINATION_REASON = {
   SDP_FAILED: 'failed_sdp',
   SELF_USER: 'self',
   TIMEOUT: 'timeout',
-  UNKNOWN: 'unknown',
+  UNKNOWN: 'unknown'
 };

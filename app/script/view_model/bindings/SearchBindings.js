@@ -35,7 +35,7 @@ ko.bindingHandlers.input_hint = {
             hint
               .css({
                 left: rect.left,
-                top: rect.top - 30,
+                top: rect.top - 30
               })
               .appendTo(document.body);
 
@@ -46,5 +46,5 @@ ko.bindingHandlers.input_hint = {
         }
       });
     }
-  },
+  }
 };

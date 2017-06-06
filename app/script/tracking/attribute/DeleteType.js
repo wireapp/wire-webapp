@@ -25,5 +25,5 @@ window.z.tracking.attribute = z.tracking.attribute || {};
 
 z.tracking.attribute.DeleteType = {
   EVERYWHERE: 'everywhere',
-  LOCAL: 'local',
+  LOCAL: 'local'
 };

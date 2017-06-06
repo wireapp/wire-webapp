@@ -152,6 +152,6 @@ z.ui.Context = (() => {
   }
 
   return {
-    from,
+    from
   };
 })();

@@ -25,7 +25,7 @@ window.z.client = z.client || {};
 z.client.Client = class Client {
   static get CONFIG() {
     return {
-      DEFAULT_VALUE: '?',
+      DEFAULT_VALUE: '?'
     };
   }
 
@@ -43,7 +43,7 @@ z.client.Client = class Client {
     // Metadata maintained by us
     this.meta = {
       is_verified: ko.observable(false),
-      primary_key: undefined,
+      primary_key: undefined
     };
 
     this.session = {};
@@ -58,7 +58,7 @@ z.client.Client = class Client {
     const [user_id, client_id] = (id ? id.split('@') : undefined) || [];
     return {
       client_id: client_id,
-      user_id: user_id,
+      user_id: user_id
     };
   }
 

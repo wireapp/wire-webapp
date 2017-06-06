@@ -34,5 +34,5 @@ z.util.NumberUtil = {
     const pow = float_array.map(number => Math.pow(number, 2));
     const sum = pow.reduce((power, number) => power + number);
     return Math.sqrt(sum) / float_array.length;
-  },
+  }
 };

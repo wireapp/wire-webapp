@@ -24,5 +24,5 @@ window.z.assets = z.assets || {};
 
 z.assets.AssetUploadFailedReason = {
   CANCELLED: 0,
-  FAILED: 1,
+  FAILED: 1
 };

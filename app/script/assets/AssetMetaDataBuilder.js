@@ -35,7 +35,7 @@ z.assets.AssetMetaDataBuilder = {
       .then(audio_buffer => {
         return new z.proto.Asset.AudioMetaData(
           audio_buffer.duration * 1000,
-          z.assets.AssetMetaDataBuilder._normalise_loudness(audio_buffer),
+          z.assets.AssetMetaDataBuilder._normalise_loudness(audio_buffer)
         );
       });
   },
@@ -61,13 +61,7 @@ z.assets.AssetMetaDataBuilder = {
       const url = window.URL.createObjectURL(videofile);
       const video = document.createElement('video');
       video.onloadedmetadata = () => {
-        resolve(
-          new z.proto.Asset.VideoMetaData(
-            video.videoWidth,
-            video.videoHeight,
-            video.duration,
-          ),
-        );
+        resolve(new z.proto.Asset.VideoMetaData(video.videoWidth, video.videoHeight, video.duration));
         window.URL.revokeObjectURL(url);
       };
       video.onerror = error => {
@@ -86,9 +80,7 @@ z.assets.AssetMetaDataBuilder = {
     const buckets = z.util.ArrayUtil.chunk(channel, bucket_size);
 
     const preview = buckets.map(bucket => {
-      return z.util.NumberUtil.cap_to_byte(
-        AMPLIFIER * z.util.NumberUtil.root_mean_square(bucket),
-      );
+      return z.util.NumberUtil.cap_to_byte(AMPLIFIER * z.util.NumberUtil.root_mean_square(bucket));
     });
 
     return new Uint8Array(preview);
@@ -124,5 +116,5 @@ z.assets.AssetMetaDataBuilder = {
 
   is_video(file) {
     return file && file.type.startsWith('video');
-  },
+  }
 };

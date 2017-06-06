@@ -32,24 +32,24 @@ describe('z.team.TeamRepository', () => {
         icon_key: null,
         icon: '',
         id: 'e6d3adc5-9140-477a-abc1-8279d210ceab',
-        name: 'Wire GmbH',
+        name: 'Wire GmbH'
       },
       {
         creator: 'e82019bc-5ee1-4835-8057-cfbe2229582b',
         icon_key: null,
         icon: '',
         id: 'f9310b63-0c04-4f13-a051-c19d24b78ed5',
-        name: 'My Awesome Company',
-      },
+        name: 'My Awesome Company'
+      }
     ],
-    has_more: false,
+    has_more: false
   };
   const team_metadata = teams_data.teams[0];
   const team_members = {
     members: [
       {user: 'bac6597b-5396-4a6a-8de9-d5aa75c998bf', permissions: 4},
-      {user: '74fa64dc-8318-4426-9935-82590ff8aa3e', permissions: 8},
-    ],
+      {user: '74fa64dc-8318-4426-9935-82590ff8aa3e', permissions: 8}
+    ]
   };
   /* eslint sort-keys: "off" */
 
@@ -70,28 +70,23 @@ describe('z.team.TeamRepository', () => {
     server = sinon.fakeServer.create();
     server.autoRespond = true;
 
-    server.respondWith(
-      'GET',
-      `${test_factory.settings.connection.rest_url}/teams?size=100`,
-      [200, {'Content-Type': 'application/json'}, JSON.stringify(teams_data)],
-    );
+    server.respondWith('GET', `${test_factory.settings.connection.rest_url}/teams?size=100`, [
+      200,
+      {'Content-Type': 'application/json'},
+      JSON.stringify(teams_data)
+    ]);
 
-    server.respondWith(
-      'GET',
-      `${test_factory.settings.connection.rest_url}/teams/${team_metadata.id}`,
-      [
-        200,
-        {'Content-Type': 'application/json'},
-        JSON.stringify(team_metadata),
-      ],
-    );
+    server.respondWith('GET', `${test_factory.settings.connection.rest_url}/teams/${team_metadata.id}`, [
+      200,
+      {'Content-Type': 'application/json'},
+      JSON.stringify(team_metadata)
+    ]);
 
-    server.respondWith(
-      'GET',
-      `${test_factory.settings.connection
-        .rest_url}/teams/${team_metadata.id}/members`,
-      [200, {'Content-Type': 'application/json'}, JSON.stringify(team_members)],
-    );
+    server.respondWith('GET', `${test_factory.settings.connection.rest_url}/teams/${team_metadata.id}/members`, [
+      200,
+      {'Content-Type': 'application/json'},
+      JSON.stringify(team_members)
+    ]);
   });
 
   afterEach(function() {
@@ -133,9 +128,7 @@ describe('z.team.TeamRepository', () => {
         .then(entities => {
           expect(entities.length).toEqual(team_members.members.length);
           expect(entities[0].user).toEqual(team_members.members[0].user);
-          expect(entities[0].permissions).toEqual(
-            team_members.members[0].permissions,
-          );
+          expect(entities[0].permissions).toEqual(team_members.members[0].permissions);
           done();
         })
         .catch(done.fail);

@@ -25,27 +25,12 @@ window.z.conversation = z.conversation || {};
 z.conversation.ConversationVerificationStateHandler = class ConversationVerificationStateHandler {
   constructor(conversation_repository) {
     this.conversation_repository = conversation_repository;
-    this.logger = new z.util.Logger(
-      'z.conversation.ConversationVerificationStateHandler',
-      z.config.LOGGER.OPTIONS,
-    );
+    this.logger = new z.util.Logger('z.conversation.ConversationVerificationStateHandler', z.config.LOGGER.OPTIONS);
 
-    amplify.subscribe(
-      z.event.WebApp.USER.CLIENT_ADDED,
-      this.on_client_add.bind(this),
-    );
-    amplify.subscribe(
-      z.event.WebApp.USER.CLIENT_REMOVED,
-      this.on_client_removed.bind(this),
-    );
-    amplify.subscribe(
-      z.event.WebApp.USER.CLIENTS_UPDATED,
-      this.on_clients_updated.bind(this),
-    );
-    amplify.subscribe(
-      z.event.WebApp.CLIENT.VERIFICATION_STATE_CHANGED,
-      this.on_client_verification_changed.bind(this),
-    );
+    amplify.subscribe(z.event.WebApp.USER.CLIENT_ADDED, this.on_client_add.bind(this));
+    amplify.subscribe(z.event.WebApp.USER.CLIENT_REMOVED, this.on_client_removed.bind(this));
+    amplify.subscribe(z.event.WebApp.USER.CLIENTS_UPDATED, this.on_clients_updated.bind(this));
+    amplify.subscribe(z.event.WebApp.CLIENT.VERIFICATION_STATE_CHANGED, this.on_client_verification_changed.bind(this));
   }
 
   /**
@@ -61,14 +46,11 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
           z.conversation.EventBuilder.build_degraded(
             conversation_et,
             [user_id],
-            z.message.VerificationMessageType.UNVERIFIED,
-          ),
+            z.message.VerificationMessageType.UNVERIFIED
+          )
         );
       } else if (this._will_change_to_verified(conversation_et)) {
-        amplify.publish(
-          z.event.WebApp.EVENT.INJECT,
-          z.conversation.EventBuilder.build_all_verified(conversation_et),
-        );
+        amplify.publish(z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_all_verified(conversation_et));
       }
     });
   }
@@ -87,9 +69,7 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
       if (this._will_change_to_degraded(conversation_et)) {
         const user_ids_in_conversation = _.intersection(
           user_ids,
-          conversation_et
-            .participating_user_ids()
-            .concat(conversation_et.self.id),
+          conversation_et.participating_user_ids().concat(conversation_et.self.id)
         );
 
         if (user_ids_in_conversation.length) {
@@ -98,8 +78,8 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
             z.conversation.EventBuilder.build_degraded(
               conversation_et,
               user_ids,
-              z.message.VerificationMessageType.NEW_DEVICE,
-            ),
+              z.message.VerificationMessageType.NEW_DEVICE
+            )
           );
         }
       }
@@ -113,10 +93,7 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
   on_client_removed() {
     this._get_active_conversations().forEach(conversation_et => {
       if (this._will_change_to_verified(conversation_et)) {
-        amplify.publish(
-          z.event.WebApp.EVENT.INJECT,
-          z.conversation.EventBuilder.build_all_verified(conversation_et),
-        );
+        amplify.publish(z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_all_verified(conversation_et));
       }
     });
   }
@@ -134,14 +111,11 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
           z.conversation.EventBuilder.build_degraded(
             conversation_et,
             [user_id],
-            z.message.VerificationMessageType.NEW_DEVICE,
-          ),
+            z.message.VerificationMessageType.NEW_DEVICE
+          )
         );
       } else if (this._will_change_to_verified(conversation_et)) {
-        amplify.publish(
-          z.event.WebApp.EVENT.INJECT,
-          z.conversation.EventBuilder.build_all_verified(conversation_et),
-        );
+        amplify.publish(z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_all_verified(conversation_et));
       }
     });
   }
@@ -163,8 +137,8 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
         z.conversation.EventBuilder.build_degraded(
           conversation_et,
           user_ids,
-          z.message.VerificationMessageType.NEW_MEMBER,
-        ),
+          z.message.VerificationMessageType.NEW_MEMBER
+        )
       );
     }
   }
@@ -176,10 +150,7 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
    */
   on_member_left(conversation_et) {
     if (this._will_change_to_verified(conversation_et)) {
-      amplify.publish(
-        z.event.WebApp.EVENT.INJECT,
-        z.conversation.EventBuilder.build_all_verified(conversation_et),
-      );
+      amplify.publish(z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_all_verified(conversation_et));
     }
   }
 
@@ -205,13 +176,8 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
       return false;
     }
 
-    if (
-      state === z.conversation.ConversationVerificationState.VERIFIED &&
-      !conversation_et.is_verified()
-    ) {
-      conversation_et.verification_state(
-        z.conversation.ConversationVerificationState.DEGRADED,
-      );
+    if (state === z.conversation.ConversationVerificationState.VERIFIED && !conversation_et.is_verified()) {
+      conversation_et.verification_state(z.conversation.ConversationVerificationState.DEGRADED);
       return true;
     }
 
@@ -224,17 +190,12 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
    * @returns {boolean} Conversation changing to verified
    */
   _will_change_to_verified(conversation_et) {
-    if (
-      conversation_et.verification_state() ===
-      z.conversation.ConversationVerificationState.VERIFIED
-    ) {
+    if (conversation_et.verification_state() === z.conversation.ConversationVerificationState.VERIFIED) {
       return false;
     }
 
     if (conversation_et.is_verified()) {
-      conversation_et.verification_state(
-        z.conversation.ConversationVerificationState.VERIFIED,
-      );
+      conversation_et.verification_state(z.conversation.ConversationVerificationState.VERIFIED);
       return true;
     }
 

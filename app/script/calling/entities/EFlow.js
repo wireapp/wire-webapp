@@ -30,7 +30,7 @@ z.calling.entities.EFlow = class EFlow {
       NEGOTIATION_FAILED_TIMEOUT: 30 * 1000 + 500,
       NEGOTIATION_RESTART_TIMEOUT: 2500,
       SDP_SEND_TIMEOUT: 5 * 1000,
-      SDP_SEND_TIMEOUT_RESET: 1000,
+      SDP_SEND_TIMEOUT_RESET: 1000
     };
   }
 
@@ -47,10 +47,7 @@ z.calling.entities.EFlow = class EFlow {
 
     this.e_call_et = e_call_et;
     this.e_participant_et = e_participant_et;
-    this.logger = new z.util.Logger(
-      `z.calling.entities.EFlow (${this.e_participant_et.id})`,
-      z.config.LOGGER.OPTIONS,
-    );
+    this.logger = new z.util.Logger(`z.calling.entities.EFlow (${this.e_participant_et.id})`, z.config.LOGGER.OPTIONS);
 
     this.id = this.e_participant_et.id;
     this.conversation_id = this.e_call_et.id;
@@ -59,10 +56,7 @@ z.calling.entities.EFlow = class EFlow {
     this.is_answer = ko.observable(undefined);
 
     // Audio
-    this.audio = new z.calling.entities.FlowAudio(
-      this,
-      this.v3_call_center.media_repository,
-    );
+    this.audio = new z.calling.entities.FlowAudio(this, this.v3_call_center.media_repository);
 
     // Users
     this.remote_client_id = undefined;
@@ -71,12 +65,7 @@ z.calling.entities.EFlow = class EFlow {
     this.self_user_id = this.e_call_et.self_user.id;
 
     // Telemetry
-    this.telemetry = new z.telemetry.calling.FlowTelemetry(
-      this.id,
-      this.remote_user_id,
-      this.e_call_et,
-      timings,
-    );
+    this.telemetry = new z.telemetry.calling.FlowTelemetry(this.id, this.remote_user_id, this.e_call_et, timings);
 
     //##############################################################################
     // PeerConnection
@@ -89,9 +78,7 @@ z.calling.entities.EFlow = class EFlow {
     this.data_channel = undefined;
     this.data_channel_opened = false;
 
-    this.connection_state = ko.observable(
-      z.calling.rtc.ICE_CONNECTION_STATE.NEW,
-    );
+    this.connection_state = ko.observable(z.calling.rtc.ICE_CONNECTION_STATE.NEW);
     this.gathering_state = ko.observable(z.calling.rtc.ICE_GATHERING_STATE.NEW);
     this.signaling_state = ko.observable(z.calling.rtc.SIGNALING_STATE.NEW);
 
@@ -121,10 +108,7 @@ z.calling.entities.EFlow = class EFlow {
           this.e_participant_et.is_connected(false);
 
           if (this.e_call_et.self_client_joined()) {
-            this.e_call_et.delete_e_participant(
-              this.e_participant_et.id,
-              this.remote_client_id,
-            );
+            this.e_call_et.delete_e_participant(this.e_participant_et.id, this.remote_client_id);
           }
           break;
         }
@@ -150,13 +134,8 @@ z.calling.entities.EFlow = class EFlow {
     this.signaling_state.subscribe(signaling_state => {
       switch (signaling_state) {
         case z.calling.rtc.SIGNALING_STATE.CLOSED: {
-          this.logger.info(
-            `PeerConnection with '${this.remote_user.name()}' was closed`,
-          );
-          this.e_call_et.delete_e_participant(
-            this.e_participant_et.id,
-            this.remote_client_id,
-          );
+          this.logger.info(`PeerConnection with '${this.remote_user.name()}' was closed`);
+          this.e_call_et.delete_e_participant(this.e_participant_et.id, this.remote_client_id);
           break;
         }
 
@@ -176,9 +155,7 @@ z.calling.entities.EFlow = class EFlow {
       }
     });
 
-    this.negotiation_mode = ko.observable(
-      z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT,
-    );
+    this.negotiation_mode = ko.observable(z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT);
     this.negotiation_needed = ko.observable(false);
     this.negotiation_timeout = undefined;
 
@@ -209,26 +186,19 @@ z.calling.entities.EFlow = class EFlow {
     this.proper_local_sdp_state = ko.pureComputed(() => {
       const is_answer = this.local_sdp_type() === z.calling.rtc.SDP_TYPE.ANSWER;
       const is_offer = this.local_sdp_type() === z.calling.rtc.SDP_TYPE.OFFER;
-      const in_remote_offer_state =
-        this.signaling_state() === z.calling.rtc.SIGNALING_STATE.REMOTE_OFFER;
-      const in_stable_state =
-        this.signaling_state() === z.calling.rtc.SIGNALING_STATE.STABLE;
+      const in_remote_offer_state = this.signaling_state() === z.calling.rtc.SIGNALING_STATE.REMOTE_OFFER;
+      const in_stable_state = this.signaling_state() === z.calling.rtc.SIGNALING_STATE.STABLE;
 
-      return (
-        (is_offer && in_stable_state) || (is_answer && in_remote_offer_state)
-      );
+      return (is_offer && in_stable_state) || (is_answer && in_remote_offer_state);
     });
 
     this.can_set_local_sdp = ko.pureComputed(() => {
-      const in_connection_progress =
-        this.connection_state() === z.calling.rtc.ICE_CONNECTION_STATE.CHECKING;
+      const in_connection_progress = this.connection_state() === z.calling.rtc.ICE_CONNECTION_STATE.CHECKING;
       const progress_gathering_states = [
         z.calling.rtc.ICE_GATHERING_STATE.COMPLETE,
-        z.calling.rtc.ICE_GATHERING_STATE.GATHERING,
+        z.calling.rtc.ICE_GATHERING_STATE.GATHERING
       ];
-      const in_progress =
-        in_connection_progress &&
-        progress_gathering_states.includes(this.gathering_state());
+      const in_progress = in_connection_progress && progress_gathering_states.includes(this.gathering_state());
 
       return (
         this.local_sdp() &&
@@ -262,17 +232,12 @@ z.calling.entities.EFlow = class EFlow {
     this.should_set_remote_sdp = ko.observable(false);
 
     this.proper_remote_sdp_state = ko.pureComputed(() => {
-      const is_answer =
-        this.remote_sdp_type() === z.calling.rtc.SDP_TYPE.ANSWER;
+      const is_answer = this.remote_sdp_type() === z.calling.rtc.SDP_TYPE.ANSWER;
       const is_offer = this.remote_sdp_type() === z.calling.rtc.SDP_TYPE.OFFER;
-      const in_local_offer_state =
-        this.signaling_state() === z.calling.rtc.SIGNALING_STATE.LOCAL_OFFER;
-      const in_stable_state =
-        this.signaling_state() === z.calling.rtc.SIGNALING_STATE.STABLE;
+      const in_local_offer_state = this.signaling_state() === z.calling.rtc.SIGNALING_STATE.LOCAL_OFFER;
+      const in_stable_state = this.signaling_state() === z.calling.rtc.SIGNALING_STATE.STABLE;
 
-      return (
-        (is_offer && in_stable_state) || (is_answer && in_local_offer_state)
-      );
+      return (is_offer && in_stable_state) || (is_answer && in_local_offer_state);
     });
 
     this.can_set_remote_sdp = ko.pureComputed(() => {
@@ -296,15 +261,12 @@ z.calling.entities.EFlow = class EFlow {
 
     this.can_create_sdp = ko.pureComputed(() => {
       const in_state_for_creation =
-        this.negotiation_needed() &&
-        this.signaling_state() !== z.calling.rtc.SIGNALING_STATE.CLOSED;
+        this.negotiation_needed() && this.signaling_state() !== z.calling.rtc.SIGNALING_STATE.CLOSED;
       return this.pc_initialized() && in_state_for_creation;
     });
 
     this.can_create_sdp_answer = ko.pureComputed(() => {
-      const answer_state =
-        this.is_answer() &&
-        this.signaling_state() === z.calling.rtc.SIGNALING_STATE.REMOTE_OFFER;
+      const answer_state = this.is_answer() && this.signaling_state() === z.calling.rtc.SIGNALING_STATE.REMOTE_OFFER;
       return this.can_create_sdp() && answer_state;
     });
 
@@ -315,9 +277,7 @@ z.calling.entities.EFlow = class EFlow {
     });
 
     this.can_create_sdp_offer = ko.pureComputed(() => {
-      const offer_state =
-        !this.is_answer() &&
-        this.signaling_state() === z.calling.rtc.SIGNALING_STATE.STABLE;
+      const offer_state = !this.is_answer() && this.signaling_state() === z.calling.rtc.SIGNALING_STATE.STABLE;
       return this.can_create_sdp() && offer_state;
     });
 
@@ -370,9 +330,7 @@ z.calling.entities.EFlow = class EFlow {
     this.is_answer(is_answer);
     this._reset_sdp();
 
-    if (
-      negotiation_mode !== z.calling.enum.SDP_NEGOTIATION_MODE.STATE_COLLISION
-    ) {
+    if (negotiation_mode !== z.calling.enum.SDP_NEGOTIATION_MODE.STATE_COLLISION) {
       this.start_negotiation(negotiation_mode, media_stream);
     }
   }
@@ -398,10 +356,10 @@ z.calling.entities.EFlow = class EFlow {
    */
   start_negotiation(
     negotiation_mode = z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT,
-    media_stream = this.media_stream(),
+    media_stream = this.media_stream()
   ) {
     this.logger.info(
-      `Start negotiating PeerConnection with '${this.remote_user.name()}' triggered by '${negotiation_mode}'`,
+      `Start negotiating PeerConnection with '${this.remote_user.name()}' triggered by '${negotiation_mode}'`
     );
 
     this._create_peer_connection().then(() => {
@@ -429,7 +387,7 @@ z.calling.entities.EFlow = class EFlow {
       .delete_e_participant(
         this.e_participant_et.id,
         this.remote_client_id,
-        z.calling.enum.TERMINATION_REASON.CONNECTION_DROP,
+        z.calling.enum.TERMINATION_REASON.CONNECTION_DROP
       )
       .then(() => {
         if (!this.e_call_et.participants().length) {
@@ -438,11 +396,7 @@ z.calling.entities.EFlow = class EFlow {
               ? z.calling.enum.TERMINATION_REASON.CONNECTION_DROP
               : z.calling.enum.TERMINATION_REASON.CONNECTION_FAILED;
           }
-          amplify.publish(
-            z.event.WebApp.CALL.STATE.LEAVE,
-            this.e_call_et.id,
-            termination_reason,
-          );
+          amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, this.e_call_et.id, termination_reason);
         }
       });
   }
@@ -470,28 +424,19 @@ z.calling.entities.EFlow = class EFlow {
   _close_peer_connection() {
     if (this.peer_connection) {
       this.peer_connection.oniceconnectionstatechange = () => {
-        this.logger.log(
-          this.logger.levels.OFF,
-          'State change ignored - ICE connection',
-        );
+        this.logger.log(this.logger.levels.OFF, 'State change ignored - ICE connection');
       };
 
       this.peer_connection.onsignalingstatechange = () => {
         this.logger.log(
           this.logger.levels.OFF,
-          `State change ignored - signaling state: ${this.peer_connection
-            .signalingState}`,
+          `State change ignored - signaling state: ${this.peer_connection.signalingState}`
         );
       };
 
-      if (
-        this.peer_connection.signalingState !==
-        z.calling.rtc.SIGNALING_STATE.CLOSED
-      ) {
+      if (this.peer_connection.signalingState !== z.calling.rtc.SIGNALING_STATE.CLOSED) {
         this.peer_connection.close();
-        this.logger.info(
-          `Closing PeerConnection '${this.remote_user.name()}' successful`,
-        );
+        this.logger.info(`Closing PeerConnection '${this.remote_user.name()}' successful`);
       }
     }
   }
@@ -506,7 +451,7 @@ z.calling.entities.EFlow = class EFlow {
       return {
         bundlePolicy: 'max-bundle',
         iceServers: calling_config.ice_servers,
-        rtcpMuxPolicy: 'require', // @deprecated Default value beginning Chrome 57
+        rtcpMuxPolicy: 'require' // @deprecated Default value beginning Chrome 57
       };
     });
   }
@@ -519,33 +464,25 @@ z.calling.entities.EFlow = class EFlow {
    * @returns {Promise} Resolves when the PeerConnection was created
    */
   _create_peer_connection() {
-    return this._create_peer_connection_configuration().then(
-      pc_configuration => {
-        this.peer_connection = new window.RTCPeerConnection(pc_configuration);
-        this.telemetry.time_step(
-          z.telemetry.calling.CallSetupSteps.PEER_CONNECTION_CREATED,
-        );
-        this.signaling_state(this.peer_connection.signalingState);
-        this.logger.debug(
-          `PeerConnection with '${this.remote_user.name()}' created - is_answer '${this.is_answer()}'`,
-          pc_configuration,
-        );
+    return this._create_peer_connection_configuration().then(pc_configuration => {
+      this.peer_connection = new window.RTCPeerConnection(pc_configuration);
+      this.telemetry.time_step(z.telemetry.calling.CallSetupSteps.PEER_CONNECTION_CREATED);
+      this.signaling_state(this.peer_connection.signalingState);
+      this.logger.debug(
+        `PeerConnection with '${this.remote_user.name()}' created - is_answer '${this.is_answer()}'`,
+        pc_configuration
+      );
 
-        this.peer_connection.onaddstream = this._on_add_stream.bind(this);
-        this.peer_connection.ontrack = this._on_track.bind(this);
-        this.peer_connection.ondatachannel = this._on_data_channel.bind(this);
-        this.peer_connection.onicecandidate = this._on_ice_candidate.bind(this);
-        this.peer_connection.oniceconnectionstatechange = this._on_ice_connection_state_change.bind(
-          this,
-        );
-        this.peer_connection.onremovestream = this._on_remove_stream.bind(this);
-        this.peer_connection.onsignalingstatechange = this._on_signaling_state_change.bind(
-          this,
-        );
+      this.peer_connection.onaddstream = this._on_add_stream.bind(this);
+      this.peer_connection.ontrack = this._on_track.bind(this);
+      this.peer_connection.ondatachannel = this._on_data_channel.bind(this);
+      this.peer_connection.onicecandidate = this._on_ice_candidate.bind(this);
+      this.peer_connection.oniceconnectionstatechange = this._on_ice_connection_state_change.bind(this);
+      this.peer_connection.onremovestream = this._on_remove_stream.bind(this);
+      this.peer_connection.onsignalingstatechange = this._on_signaling_state_change.bind(this);
 
-        this.telemetry.set_peer_connection(this.peer_connection);
-      },
-    );
+      this.telemetry.set_peer_connection(this.peer_connection);
+    });
   }
 
   /**
@@ -560,12 +497,10 @@ z.calling.entities.EFlow = class EFlow {
     this.logger.info('Remote MediaStream added to PeerConnection', {
       audio_tracks: media_stream.getAudioTracks(),
       stream: media_stream,
-      video_tracks: media_stream.getVideoTracks(),
+      video_tracks: media_stream.getVideoTracks()
     });
 
-    media_stream = z.media.MediaStreamHandler.detect_media_stream_type(
-      media_stream,
-    );
+    media_stream = z.media.MediaStreamHandler.detect_media_stream_type(media_stream);
     if (media_stream.type === z.media.MediaType.AUDIO) {
       media_stream = this.audio.wrap_audio_output_stream(media_stream);
     }
@@ -574,7 +509,7 @@ z.calling.entities.EFlow = class EFlow {
       z.media.MediaStreamSource.REMOTE,
       this.remote_user.id,
       media_stream,
-      this.e_call_et,
+      this.e_call_et
     );
     amplify.publish(z.event.WebApp.CALL.MEDIA.ADD_STREAM, media_stream_info);
   }
@@ -589,12 +524,8 @@ z.calling.entities.EFlow = class EFlow {
   _on_ice_candidate({candidate: ice_candidate}) {
     if (!ice_candidate) {
       if (this.should_send_local_sdp()) {
-        this.logger.info(
-          'Generation of ICE candidates completed - sending SDP',
-        );
-        this.telemetry.time_step(
-          z.telemetry.calling.CallSetupSteps.ICE_GATHERING_COMPLETED,
-        );
+        this.logger.info('Generation of ICE candidates completed - sending SDP');
+        this.telemetry.time_step(z.telemetry.calling.CallSetupSteps.ICE_GATHERING_COMPLETED);
         this.send_local_sdp();
       }
     }
@@ -608,22 +539,13 @@ z.calling.entities.EFlow = class EFlow {
    * @returns {undefined} No return value
    */
   _on_ice_connection_state_change(event) {
-    const ending_call_states = [
-      z.calling.enum.CALL_STATE.DISCONNECTING,
-      z.calling.enum.CALL_STATE.ENDED,
-    ];
+    const ending_call_states = [z.calling.enum.CALL_STATE.DISCONNECTING, z.calling.enum.CALL_STATE.ENDED];
     const is_ending_call = ending_call_states.includes(this.e_call_et.state());
 
     if (this.peer_connection || !is_ending_call) {
       this.logger.info('State changed - ICE connection', event);
-      this.logger.log(
-        this.logger.levels.LEVEL_1,
-        `ICE connection state: ${this.peer_connection.iceConnectionState}`,
-      );
-      this.logger.log(
-        this.logger.levels.LEVEL_1,
-        `ICE gathering state: ${this.peer_connection.iceGatheringState}`,
-      );
+      this.logger.log(this.logger.levels.LEVEL_1, `ICE connection state: ${this.peer_connection.iceConnectionState}`);
+      this.logger.log(this.logger.levels.LEVEL_1, `ICE gathering state: ${this.peer_connection.iceGatheringState}`);
 
       this.gathering_state(this.peer_connection.iceGatheringState);
       this.connection_state(this.peer_connection.iceConnectionState);
@@ -649,10 +571,7 @@ z.calling.entities.EFlow = class EFlow {
    * @returns {undefined} No return value
    */
   _on_signaling_state_change(event) {
-    this.logger.info(
-      `State changed - signaling state: ${this.peer_connection.signalingState}`,
-      event,
-    );
+    this.logger.info(`State changed - signaling state: ${this.peer_connection.signalingState}`, event);
     this.signaling_state(this.peer_connection.signalingState);
   }
 
@@ -684,25 +603,18 @@ z.calling.entities.EFlow = class EFlow {
         this.data_channel.send(e_call_message_et.to_content_string());
         this.logger.info(
           `Send e-call '${type}' message to conversation '${conversation_id}' via data channel`,
-          e_call_message_et.to_JSON(),
+          e_call_message_et.to_JSON()
         );
         return;
       } catch (error) {
         if (!response) {
-          this.logger.warn(
-            `Failed to send calling message via data channel: ${error.name}`,
-            error,
-          );
-          throw new z.calling.v3.CallError(
-            z.calling.v3.CallError.TYPE.NO_DATA_CHANNEL,
-          );
+          this.logger.warn(`Failed to send calling message via data channel: ${error.name}`, error);
+          throw new z.calling.v3.CallError(z.calling.v3.CallError.TYPE.NO_DATA_CHANNEL);
         }
       }
     }
 
-    throw new z.calling.v3.CallError(
-      z.calling.v3.CallError.TYPE.NO_DATA_CHANNEL,
-    );
+    throw new z.calling.v3.CallError(z.calling.v3.CallError.TYPE.NO_DATA_CHANNEL);
   }
 
   /**
@@ -712,9 +624,7 @@ z.calling.entities.EFlow = class EFlow {
    */
   _close_data_channel() {
     if (this.data_channel) {
-      if (
-        this.data_channel.readyState === z.calling.rtc.DATA_CHANNEL_STATE.OPEN
-      ) {
+      if (this.data_channel.readyState === z.calling.rtc.DATA_CHANNEL_STATE.OPEN) {
         this.data_channel.close();
       }
       delete this.data_channel;
@@ -730,10 +640,7 @@ z.calling.entities.EFlow = class EFlow {
   _initialize_data_channel() {
     if (this.peer_connection.createDataChannel && !this.data_channel) {
       this._setup_data_channel(
-        this.peer_connection.createDataChannel(
-          EFlow.CONFIG.DATA_CHANNEL_LABEL,
-          {ordered: true},
-        ),
+        this.peer_connection.createDataChannel(EFlow.CONFIG.DATA_CHANNEL_LABEL, {ordered: true})
       );
     }
   }
@@ -772,15 +679,9 @@ z.calling.entities.EFlow = class EFlow {
    * @returns {undefined} No return value
    */
   _on_close({target: data_channel}) {
-    this.logger.info(
-      `Data channel '${data_channel.label}' was closed`,
-      data_channel,
-    );
+    this.logger.info(`Data channel '${data_channel.label}' was closed`, data_channel);
 
-    if (
-      this.data_channel &&
-      this.data_channel.readyState === z.calling.rtc.DATA_CHANNEL_STATE.CLOSED
-    ) {
+    if (this.data_channel && this.data_channel.readyState === z.calling.rtc.DATA_CHANNEL_STATE.CLOSED) {
       delete this.data_channel;
       this.data_channel_opened = false;
     }
@@ -810,27 +711,21 @@ z.calling.entities.EFlow = class EFlow {
     const {conversation_et} = this.e_call_et;
 
     if (response === true) {
-      this.logger.debug(
-        `Received confirmation for e-call '${type}' message via data channel`,
-        e_call_message,
-      );
+      this.logger.debug(`Received confirmation for e-call '${type}' message via data channel`, e_call_message);
     } else {
-      this.logger.debug(
-        `Received e-call '${type}' (response: ${response}) message via data channel`,
-        e_call_message,
-      );
+      this.logger.debug(`Received e-call '${type}' (response: ${response}) message via data channel`, e_call_message);
     }
 
     const call_event = z.conversation.EventBuilder.build_calling(
       conversation_et,
       e_call_message,
       this.remote_user_id,
-      this.remote_client_id,
+      this.remote_client_id
     );
     amplify.publish(
       z.event.WebApp.CALL.EVENT_FROM_BACKEND,
       call_event,
-      z.event.EventRepository.NOTIFICATION_SOURCE.WEB_SOCKET,
+      z.event.EventRepository.NOTIFICATION_SOURCE.WEB_SOCKET
     );
   }
 
@@ -842,10 +737,7 @@ z.calling.entities.EFlow = class EFlow {
    * @returns {undefined} No return value
    */
   _on_open({target: data_channel}) {
-    this.logger.info(
-      `Data channel '${data_channel.label}' was opened and can be used`,
-      data_channel,
-    );
+    this.logger.info(`Data channel '${data_channel.label}' was opened and can be used`, data_channel);
     this.data_channel_opened = true;
   }
 
@@ -861,13 +753,7 @@ z.calling.entities.EFlow = class EFlow {
   save_remote_sdp(e_call_message_et) {
     return z.calling.mapper.SDPMapper
       .map_e_call_message_to_object(e_call_message_et)
-      .then(rtc_sdp =>
-        z.calling.mapper.SDPMapper.rewrite_sdp(
-          rtc_sdp,
-          z.calling.enum.SDP_SOURCE.REMOTE,
-          this,
-        ),
-      )
+      .then(rtc_sdp => z.calling.mapper.SDPMapper.rewrite_sdp(rtc_sdp, z.calling.enum.SDP_SOURCE.REMOTE, this))
       .then(({sdp: remote_sdp}) => {
         const {type} = e_call_message_et;
 
@@ -875,9 +761,7 @@ z.calling.entities.EFlow = class EFlow {
           switch (this.signaling_state()) {
             case z.calling.rtc.SIGNALING_STATE.LOCAL_OFFER: {
               if (this._solve_colliding_states()) {
-                throw new z.calling.v3.CallError(
-                  z.calling.v3.CallError.TYPE.SDP_STATE_COLLISION,
-                );
+                throw new z.calling.v3.CallError(z.calling.v3.CallError.TYPE.SDP_STATE_COLLISION);
               }
               break;
             }
@@ -894,18 +778,12 @@ z.calling.entities.EFlow = class EFlow {
           }
 
           if (type === z.calling.enum.E_CALL_MESSAGE_TYPE.UPDATE) {
-            this.restart_negotiation(
-              z.calling.enum.SDP_NEGOTIATION_MODE.STREAM_CHANGE,
-              true,
-            );
+            this.restart_negotiation(z.calling.enum.SDP_NEGOTIATION_MODE.STREAM_CHANGE, true);
           }
         }
 
         this.remote_sdp(remote_sdp);
-        this.logger.debug(
-          `Saved remote '${remote_sdp.type}' SDP`,
-          this.remote_sdp(),
-        );
+        this.logger.debug(`Saved remote '${remote_sdp.type}' SDP`, this.remote_sdp());
       });
   }
 
@@ -918,23 +796,15 @@ z.calling.entities.EFlow = class EFlow {
     this._clear_send_sdp_timeout();
 
     z.calling.mapper.SDPMapper
-      .rewrite_sdp(
-        this.peer_connection.localDescription,
-        z.calling.enum.SDP_SOURCE.LOCAL,
-        this,
-      )
+      .rewrite_sdp(this.peer_connection.localDescription, z.calling.enum.SDP_SOURCE.LOCAL, this)
       .then(({ice_candidates, sdp: local_sdp}) => {
         this.local_sdp(local_sdp);
 
-        if (
-          sending_on_timeout &&
-          this.negotiation_mode() ===
-            z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT
-        ) {
+        if (sending_on_timeout && this.negotiation_mode() === z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT) {
           if (!this._contains_relay_candidate(ice_candidates)) {
             this.logger.warn(
               `Local SDP does not contain any relay ICE candidates, resetting timeout\n${ice_candidates}`,
-              ice_candidates,
+              ice_candidates
             );
             return this._set_send_sdp_timeout(false);
           }
@@ -942,46 +812,38 @@ z.calling.entities.EFlow = class EFlow {
 
         this.logger.debug(
           `Sending local '${local_sdp.type}' SDP containing '${ice_candidates.length}' ICE candidates for flow with '${this.remote_user.name()}'\n${this.local_sdp()
-            .sdp}`,
+            .sdp}`
         );
         this.should_send_local_sdp(false);
 
         const response = local_sdp.type === z.calling.rtc.SDP_TYPE.ANSWER;
         let e_call_message_et;
 
-        if (
-          this.negotiation_mode() ===
-          z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT
-        ) {
+        if (this.negotiation_mode() === z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT) {
           if (this.e_call_et.is_group) {
             e_call_message_et = z.calling.mapper.ECallMessageMapper.build_group_setup(
               response,
               this.e_call_et.session_id,
-              this._create_additional_payload(),
+              this._create_additional_payload()
             );
           } else {
             e_call_message_et = z.calling.mapper.ECallMessageMapper.build_setup(
               response,
               this.e_call_et.session_id,
-              this._create_additional_payload(),
+              this._create_additional_payload()
             );
           }
         } else {
           e_call_message_et = z.calling.mapper.ECallMessageMapper.build_update(
             response,
             this.e_call_et.session_id,
-            this._create_additional_payload(),
+            this._create_additional_payload()
           );
         }
 
         return this.e_call_et.send_e_call_event(e_call_message_et).then(() => {
-          this.telemetry.time_step(
-            z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SEND,
-          );
-          this.logger.debug(
-            `Sending local '${local_sdp.type}' SDP successful`,
-            this.local_sdp(),
-          );
+          this.telemetry.time_step(z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SEND);
+          this.logger.debug(`Sending local '${local_sdp.type}' SDP successful`, this.local_sdp());
         });
       })
       .catch(error => {
@@ -1038,17 +900,12 @@ z.calling.entities.EFlow = class EFlow {
    */
   _create_sdp_answer() {
     this.negotiation_needed(false);
-    this.logger.debug(
-      `Creating '${z.calling.rtc.SDP_TYPE
-        .ANSWER}' for flow with '${this.remote_user.name()}'`,
-    );
+    this.logger.debug(`Creating '${z.calling.rtc.SDP_TYPE.ANSWER}' for flow with '${this.remote_user.name()}'`);
 
     this.peer_connection
       .createAnswer()
       .then(rtc_sdp => this._create_sdp_success(rtc_sdp))
-      .catch(error =>
-        this._create_sdp_failure(error, z.calling.rtc.SDP_TYPE.ANSWER),
-      );
+      .catch(error => this._create_sdp_failure(error, z.calling.rtc.SDP_TYPE.ANSWER));
   }
 
   /**
@@ -1061,23 +918,12 @@ z.calling.entities.EFlow = class EFlow {
    */
   _create_sdp_failure(error, sdp_type) {
     const {message, name} = error;
-    this.logger.error(
-      `Creating '${sdp_type}' failed: ${name} - ${message}`,
-      error,
-    );
+    this.logger.error(`Creating '${sdp_type}' failed: ${name} - ${message}`, error);
 
     const attributes = {cause: name, step: 'create_sdp', type: sdp_type};
-    this.e_call_et.telemetry.track_event(
-      z.tracking.EventName.CALLING.FAILED_RTC,
-      undefined,
-      attributes,
-    );
+    this.e_call_et.telemetry.track_event(z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes);
 
-    amplify.publish(
-      z.event.WebApp.CALL.STATE.LEAVE,
-      this.e_call_et.id,
-      z.calling.enum.TERMINATION_REASON.SDP_FAILED,
-    );
+    amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, this.e_call_et.id, z.calling.enum.TERMINATION_REASON.SDP_FAILED);
   }
 
   /**
@@ -1111,20 +957,15 @@ z.calling.entities.EFlow = class EFlow {
       iceRestart: restart,
       offerToReceiveAudio: true,
       offerToReceiveVideo: true,
-      voiceActivityDetection: true,
+      voiceActivityDetection: true
     };
 
-    this.logger.debug(
-      `Creating '${z.calling.rtc.SDP_TYPE
-        .OFFER}' for flow with '${this.remote_user.name()}'`,
-    );
+    this.logger.debug(`Creating '${z.calling.rtc.SDP_TYPE.OFFER}' for flow with '${this.remote_user.name()}'`);
 
     this.peer_connection
       .createOffer(offer_options)
       .then(rtc_sdp => this._create_sdp_success(rtc_sdp))
-      .catch(error =>
-        this._create_sdp_failure(error, z.calling.rtc.SDP_TYPE.OFFER),
-      );
+      .catch(error => this._create_sdp_failure(error, z.calling.rtc.SDP_TYPE.OFFER));
   }
 
   /**
@@ -1136,17 +977,14 @@ z.calling.entities.EFlow = class EFlow {
     const payload = this.v3_call_center.create_additional_payload(
       this.e_call_et.id,
       this.remote_user_id,
-      this.remote_client_id,
+      this.remote_client_id
     );
-    const additional_payload = $.extend(
-      {remote_user: this.remote_user, sdp: this.local_sdp().sdp},
-      payload,
-    );
+    const additional_payload = $.extend({remote_user: this.remote_user, sdp: this.local_sdp().sdp}, payload);
 
     return this.v3_call_center.create_payload_prop_sync(
       this.e_call_et.self_state.video_send(),
       false,
-      additional_payload,
+      additional_payload
     );
   }
 
@@ -1157,33 +995,22 @@ z.calling.entities.EFlow = class EFlow {
    */
   _set_local_sdp() {
     this.sdp_state_changing(true);
-    this.logger.debug(
-      `Setting local '${this.local_sdp().type}' SDP`,
-      this.local_sdp(),
-    );
+    this.logger.debug(`Setting local '${this.local_sdp().type}' SDP`, this.local_sdp());
 
     this.peer_connection
       .setLocalDescription(this.local_sdp())
       .then(() => {
         this.logger.info(
           `Setting local '${this.local_sdp().type}' SDP successful`,
-          this.peer_connection.localDescription,
+          this.peer_connection.localDescription
         );
-        this.telemetry.time_step(
-          z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SET,
-        );
+        this.telemetry.time_step(z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SET);
 
         this.should_set_local_sdp(false);
         this.sdp_state_changing(false);
         this._set_send_sdp_timeout();
       })
-      .catch(error =>
-        this._set_sdp_failure(
-          error,
-          z.calling.enum.SDP_SOURCE.LOCAL,
-          this.local_sdp().type,
-        ),
-      );
+      .catch(error => this._set_sdp_failure(error, z.calling.enum.SDP_SOURCE.LOCAL, this.local_sdp().type));
   }
 
   /**
@@ -1193,33 +1020,21 @@ z.calling.entities.EFlow = class EFlow {
    */
   _set_remote_sdp() {
     this.sdp_state_changing(false);
-    this.logger.debug(
-      `Setting remote '${this.remote_sdp().type}' SDP\n${this.remote_sdp()
-        .sdp}`,
-      this.remote_sdp(),
-    );
+    this.logger.debug(`Setting remote '${this.remote_sdp().type}' SDP\n${this.remote_sdp().sdp}`, this.remote_sdp());
 
     this.peer_connection
       .setRemoteDescription(this.remote_sdp())
       .then(() => {
         this.logger.info(
           `Setting remote '${this.remote_sdp().type}' SDP successful`,
-          this.peer_connection.remoteDescription,
+          this.peer_connection.remoteDescription
         );
-        this.telemetry.time_step(
-          z.telemetry.calling.CallSetupSteps.REMOTE_SDP_SET,
-        );
+        this.telemetry.time_step(z.telemetry.calling.CallSetupSteps.REMOTE_SDP_SET);
 
         this.should_set_remote_sdp(false);
         this.sdp_state_changing(false);
       })
-      .catch(error =>
-        this._set_sdp_failure(
-          error,
-          z.calling.enum.SDP_SOURCE.REMOTE,
-          this.remote_sdp().type,
-        ),
-      );
+      .catch(error => this._set_sdp_failure(error, z.calling.enum.SDP_SOURCE.REMOTE, this.remote_sdp().type));
   }
 
   /**
@@ -1234,40 +1049,25 @@ z.calling.entities.EFlow = class EFlow {
   _set_sdp_failure(error, sdp_source, sdp_type) {
     const {message, name} = error;
 
-    const failed_local_sdp =
-      sdp_source === z.calling.enum.SDP_SOURCE.LOCAL &&
-      !this.proper_local_sdp_state();
-    const failed_remote_sdp =
-      sdp_source === z.calling.enum.SDP_SOURCE.REMOTE &&
-      !this.proper_remote_sdp_state();
+    const failed_local_sdp = sdp_source === z.calling.enum.SDP_SOURCE.LOCAL && !this.proper_local_sdp_state();
+    const failed_remote_sdp = sdp_source === z.calling.enum.SDP_SOURCE.REMOTE && !this.proper_remote_sdp_state();
 
     if (failed_local_sdp || failed_remote_sdp) {
       this._solve_colliding_sdps(failed_local_sdp);
       return this.sdp_state_changing(false);
     }
 
-    this.logger.error(
-      `Setting ${sdp_source} '${sdp_type}' SDP failed: ${name} - ${message}`,
-      error,
-    );
+    this.logger.error(`Setting ${sdp_source} '${sdp_type}' SDP failed: ${name} - ${message}`, error);
 
     const attributes = {
       cause: name,
       location: sdp_source,
       step: 'set_sdp',
-      type: sdp_type,
+      type: sdp_type
     };
-    this.e_call_et.telemetry.track_event(
-      z.tracking.EventName.CALLING.FAILED_RTC,
-      undefined,
-      attributes,
-    );
+    this.e_call_et.telemetry.track_event(z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes);
 
-    amplify.publish(
-      z.event.WebApp.CALL.STATE.LEAVE,
-      this.e_call_et.id,
-      z.calling.enum.TERMINATION_REASON.SDP_FAILED,
-    );
+    amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, this.e_call_et.id, z.calling.enum.TERMINATION_REASON.SDP_FAILED);
   }
 
   /**
@@ -1289,18 +1089,12 @@ z.calling.entities.EFlow = class EFlow {
    */
   _set_negotiation_restart_timeout() {
     this.negotiation_timeout = window.setTimeout(() => {
-      this.e_call_et.termination_reason =
-        z.calling.enum.TERMINATION_REASON.CONNECTION_DROP;
+      this.e_call_et.termination_reason = z.calling.enum.TERMINATION_REASON.CONNECTION_DROP;
       this.e_participant_et.is_connected(false);
 
       this.e_call_et.interrupted_participants.push(this.e_participant_et);
-      if (
-        this.negotiation_mode() === z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT
-      ) {
-        return this.restart_negotiation(
-          z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART,
-          false,
-        );
+      if (this.negotiation_mode() === z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT) {
+        return this.restart_negotiation(z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART, false);
       }
     }, EFlow.CONFIG.NEGOTIATION_RESTART_TIMEOUT);
   }
@@ -1332,20 +1126,13 @@ z.calling.entities.EFlow = class EFlow {
    */
   _solve_colliding_states(force_renegotiation = false) {
     if (this.self_user_id < this.remote_user_id || force_renegotiation) {
-      this.logger.warn(
-        `We need to switch SDP state of flow with '${this.remote_user.name()}' to answer.`,
-      );
+      this.logger.warn(`We need to switch SDP state of flow with '${this.remote_user.name()}' to answer.`);
 
-      this.restart_negotiation(
-        z.calling.enum.SDP_NEGOTIATION_MODE.STATE_COLLISION,
-        true,
-      );
+      this.restart_negotiation(z.calling.enum.SDP_NEGOTIATION_MODE.STATE_COLLISION, true);
       return force_renegotiation || false;
     }
 
-    this.logger.warn(
-      `Remote side '${this.remote_user.name()}' needs to switch SDP state flow to answer.`,
-    );
+    this.logger.warn(`Remote side '${this.remote_user.name()}' needs to switch SDP state flow to answer.`);
     return true;
   }
 
@@ -1377,14 +1164,11 @@ z.calling.entities.EFlow = class EFlow {
       const {message, type} = error;
       const expected_error_types = [
         z.calling.v3.CallError.TYPE.NO_REPLACEABLE_TRACK,
-        z.calling.v3.CallError.TYPE.RTP_SENDER_NOT_SUPPORTED,
+        z.calling.v3.CallError.TYPE.RTP_SENDER_NOT_SUPPORTED
       ];
 
       if (expected_error_types.includes(type)) {
-        this.logger.debug(
-          `Replacement of MediaStream and renegotiation necessary: ${message}`,
-          error,
-        );
+        this.logger.debug(`Replacement of MediaStream and renegotiation necessary: ${message}`, error);
         return this._replace_media_stream(media_stream_info);
       }
       throw error;
@@ -1408,30 +1192,22 @@ z.calling.entities.EFlow = class EFlow {
         return media_stream.getTracks().forEach(media_stream_track => {
           this.peer_connection.addTrack(media_stream_track, media_stream);
 
-          this.logger.debug(
-            `Added local '${media_stream_track.kind}' MediaStreamTrack to PeerConnection`,
-            {
-              audio_tracks: media_stream.getAudioTracks(),
-              stream: media_stream,
-              video_tracks: media_stream.getVideoTracks(),
-            },
-          );
+          this.logger.debug(`Added local '${media_stream_track.kind}' MediaStreamTrack to PeerConnection`, {
+            audio_tracks: media_stream.getAudioTracks(),
+            stream: media_stream,
+            video_tracks: media_stream.getVideoTracks()
+          });
         });
       }
 
       this.peer_connection.addStream(media_stream);
-      this.logger.debug(
-        `Added local '${media_stream.type}' MediaStream to PeerConnection`,
-        {
-          audio_tracks: media_stream.getAudioTracks(),
-          stream: media_stream,
-          video_tracks: media_stream.getVideoTracks(),
-        },
-      );
+      this.logger.debug(`Added local '${media_stream.type}' MediaStream to PeerConnection`, {
+        audio_tracks: media_stream.getAudioTracks(),
+        stream: media_stream,
+        video_tracks: media_stream.getVideoTracks()
+      });
     } else {
-      throw new Error(
-        'Failed to add MediaStream: Provided MediaStream undefined',
-      );
+      throw new Error('Failed to add MediaStream: Provided MediaStream undefined');
     }
   }
 
@@ -1448,18 +1224,14 @@ z.calling.entities.EFlow = class EFlow {
 
       if (media_stream_track.kind === media_type) {
         if (!rtp_sender.replaceTrack) {
-          throw new z.calling.v3.CallError(
-            z.calling.v3.CallError.TYPE.RTP_SENDER_NOT_SUPPORTED,
-          );
+          throw new z.calling.v3.CallError(z.calling.v3.CallError.TYPE.RTP_SENDER_NOT_SUPPORTED);
         }
 
         return rtp_sender;
       }
     }
 
-    throw new z.calling.v3.CallError(
-      z.calling.v3.CallError.TYPE.NO_REPLACEABLE_TRACK,
-    );
+    throw new z.calling.v3.CallError(z.calling.v3.CallError.TYPE.NO_REPLACEABLE_TRACK);
   }
 
   /**
@@ -1474,27 +1246,14 @@ z.calling.entities.EFlow = class EFlow {
       .then(() => this._remove_media_stream(this.media_stream()))
       .then(() => this._upgrade_media_stream(media_stream_info))
       .then(upgraded_media_stream_info => {
-        const {
-          stream: media_stream,
-          type: media_type,
-        } = upgraded_media_stream_info;
+        const {stream: media_stream, type: media_type} = upgraded_media_stream_info;
 
-        this.logger.info(
-          `Upgraded the MediaStream to update '${media_type}' successfully`,
-          media_stream,
-        );
-        this.restart_negotiation(
-          z.calling.enum.SDP_NEGOTIATION_MODE.STREAM_CHANGE,
-          false,
-          media_stream,
-        );
+        this.logger.info(`Upgraded the MediaStream to update '${media_type}' successfully`, media_stream);
+        this.restart_negotiation(z.calling.enum.SDP_NEGOTIATION_MODE.STREAM_CHANGE, false, media_stream);
         return upgraded_media_stream_info;
       })
       .catch(error => {
-        this.logger.error(
-          `Failed to replace local MediaStream: ${error.message}`,
-          error,
-        );
+        this.logger.error(`Failed to replace local MediaStream: ${error.message}`, error);
         throw error;
       });
   }
@@ -1515,9 +1274,7 @@ z.calling.entities.EFlow = class EFlow {
           return this._get_rtc_sender(media_type);
         }
 
-        throw new z.calling.v3.CallError(
-          z.calling.v3.CallError.TYPE.RTP_SENDER_NOT_SUPPORTED,
-        );
+        throw new z.calling.v3.CallError(z.calling.v3.CallError.TYPE.RTP_SENDER_NOT_SUPPORTED);
       })
       .then(rtp_sender => {
         const [media_stream_track] = media_stream.getTracks();
@@ -1534,13 +1291,10 @@ z.calling.entities.EFlow = class EFlow {
         if (
           ![
             z.calling.v3.CallError.TYPE.NO_REPLACEABLE_TRACK,
-            z.calling.v3.CallError.TYPE.RTP_SENDER_NOT_SUPPORTED,
+            z.calling.v3.CallError.TYPE.RTP_SENDER_NOT_SUPPORTED
           ].includes(type)
         ) {
-          this.logger.error(
-            `Failed to replace the '${media_type}' track: ${name} - ${message}`,
-            error,
-          );
+          this.logger.error(`Failed to replace the '${media_type}' track: ${name} - ${message}`, error);
         }
         throw error;
       });
@@ -1560,9 +1314,7 @@ z.calling.entities.EFlow = class EFlow {
 
       if (media_stream_track.id === track_id) {
         this.peer_connection.removeTrack(rtp_sender);
-        this.logger.debug(
-          `Removed local '${media_type}' MediaStreamTrack from PeerConnection`,
-        );
+        this.logger.debug(`Removed local '${media_type}' MediaStreamTrack from PeerConnection`);
         break;
       }
     }
@@ -1578,9 +1330,7 @@ z.calling.entities.EFlow = class EFlow {
   _remove_media_stream_tracks(media_stream) {
     media_stream
       .getTracks()
-      .forEach(({id: track_id, kind: media_type}) =>
-        this._remove_media_stream_track(track_id, media_type),
-      );
+      .forEach(({id: track_id, kind: media_type}) => this._remove_media_stream_track(track_id, media_type));
   }
 
   /**
@@ -1592,33 +1342,20 @@ z.calling.entities.EFlow = class EFlow {
    */
   _remove_media_stream(media_stream) {
     if (this.peer_connection) {
-      const signaling_state_stable =
-        this.peer_connection.signalingState ===
-        z.calling.rtc.SIGNALING_STATE.STABLE;
+      const signaling_state_stable = this.peer_connection.signalingState === z.calling.rtc.SIGNALING_STATE.STABLE;
 
-      if (
-        signaling_state_stable &&
-        typeof this.peer_connection.removeTrack === 'function'
-      ) {
+      if (signaling_state_stable && typeof this.peer_connection.removeTrack === 'function') {
         return this._remove_media_stream_tracks(media_stream);
       }
 
-      const signaling_state_not_closed =
-        this.peer_connection.signalingState !==
-        z.calling.rtc.SIGNALING_STATE.CLOSED;
-      if (
-        signaling_state_not_closed &&
-        typeof this.peer_connection.removeStream === 'function'
-      ) {
+      const signaling_state_not_closed = this.peer_connection.signalingState !== z.calling.rtc.SIGNALING_STATE.CLOSED;
+      if (signaling_state_not_closed && typeof this.peer_connection.removeStream === 'function') {
         this.peer_connection.removeStream(media_stream);
-        this.logger.debug(
-          `Removed local '${media_stream.type}' MediaStream from PeerConnection`,
-          {
-            audio_tracks: media_stream.getAudioTracks(),
-            stream: media_stream,
-            video_tracks: media_stream.getVideoTracks(),
-          },
-        );
+        this.logger.debug(`Removed local '${media_stream.type}' MediaStream from PeerConnection`, {
+          audio_tracks: media_stream.getAudioTracks(),
+          stream: media_stream,
+          video_tracks: media_stream.getVideoTracks()
+        });
       }
     }
   }
@@ -1634,30 +1371,22 @@ z.calling.entities.EFlow = class EFlow {
     if (this.media_stream()) {
       const {stream: new_media_stream, type: media_type} = media_stream_info;
 
-      z.media.MediaStreamHandler
-        .get_media_tracks(this.media_stream(), media_type)
-        .forEach(media_stream_track => {
-          this.media_stream().removeTrack(media_stream_track);
-          media_stream_track.stop();
-          this.logger.debug(
-            `Stopping MediaStreamTrack of kind '${media_stream_track.kind}' successful`,
-            media_stream_track,
-          );
-        });
+      z.media.MediaStreamHandler.get_media_tracks(this.media_stream(), media_type).forEach(media_stream_track => {
+        this.media_stream().removeTrack(media_stream_track);
+        media_stream_track.stop();
+        this.logger.debug(
+          `Stopping MediaStreamTrack of kind '${media_stream_track.kind}' successful`,
+          media_stream_track
+        );
+      });
 
       const media_stream = this.media_stream().clone();
 
       z.media.MediaStreamHandler
         .get_media_tracks(new_media_stream, media_type)
-        .forEach(media_stream_track =>
-          media_stream.addTrack(media_stream_track),
-        );
+        .forEach(media_stream_track => media_stream.addTrack(media_stream_track));
 
-      return new z.media.MediaStreamInfo(
-        z.media.MediaStreamSource.LOCAL,
-        'self',
-        media_stream,
-      );
+      return new z.media.MediaStreamInfo(z.media.MediaStreamSource.LOCAL, 'self', media_stream);
     }
 
     return media_stream_info;

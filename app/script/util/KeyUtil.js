@@ -63,5 +63,5 @@ z.util.KeyUtil = {
     }
 
     textArea.scrollTop = scrollPos;
-  },
+  }
 };

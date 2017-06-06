@@ -24,5 +24,5 @@ window.z.announce = z.announce || {};
 
 window.z.announce.UPDATE_SOURCE = {
   DESKTOP: 'desktop',
-  WEBAPP: 'webapp',
+  WEBAPP: 'webapp'
 };

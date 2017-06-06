@@ -24,10 +24,7 @@ window.z.team = z.team || {};
 
 z.team.TeamMapper = class TeamMapper {
   constructor() {
-    this.logger = new z.util.Logger(
-      'z.team.TeamMapper',
-      z.config.LOGGER.OPTIONS,
-    );
+    this.logger = new z.util.Logger('z.team.TeamMapper', z.config.LOGGER.OPTIONS);
   }
 
   map_teams_from_array(team_data) {

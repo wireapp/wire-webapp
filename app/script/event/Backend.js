@@ -30,7 +30,7 @@ z.event.Backend = {
     REMOTE_CANDIDATES_ADD: 'call.remote-candidates-add',
     REMOTE_CANDIDATES_UPDATE: 'call.remote-candidates-update',
     REMOTE_SDP: 'call.remote-sdp',
-    STATE: 'call.state',
+    STATE: 'call.state'
   },
   CONVERSATION: {
     ASSET_ADD: 'conversation.asset-add',
@@ -46,7 +46,7 @@ z.event.Backend = {
     RENAME: 'conversation.rename',
     TYPING: 'conversation.typing',
     VOICE_CHANNEL_ACTIVATE: 'conversation.voice-channel-activate',
-    VOICE_CHANNEL_DEACTIVATE: 'conversation.voice-channel-deactivate',
+    VOICE_CHANNEL_DEACTIVATE: 'conversation.voice-channel-deactivate'
   },
   TEAM: {
     CONVERSATION_CREATE: 'team.conversation-create',
@@ -56,7 +56,7 @@ z.event.Backend = {
     MEMBER_JOIN: 'team.member-join',
     MEMBER_LEAVE: 'team.member-leave',
     MEMBER_UPDATE: 'team-member-update',
-    UPDATE: 'team.update',
+    UPDATE: 'team.update'
   },
   USER: {
     ACTIVATE: 'user.activate',
@@ -64,6 +64,6 @@ z.event.Backend = {
     CLIENT_REMOVE: 'user.client-remove',
     CONNECTION: 'user.connection',
     DELETE: 'user.delete',
-    UPDATE: 'user.update',
-  },
+    UPDATE: 'user.update'
+  }
 };

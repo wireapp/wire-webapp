@@ -31,5 +31,5 @@ z.calling.rtc.SDP_TYPE = {
   OFFER: 'offer',
   PROVISIONAL_ANSWER: 'pranswer',
   REMOTE: 'remote',
-  ROLLBACK: 'rollback',
+  ROLLBACK: 'rollback'
 };

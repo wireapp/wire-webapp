@@ -25,7 +25,7 @@ window.z.extension = z.extension || {};
 z.extension.GiphyService = class GiphyService {
   static get CONFIG() {
     return {
-      ENDPOINT_BASE: '/giphy/v1/gifs',
+      ENDPOINT_BASE: '/giphy/v1/gifs'
     };
   }
 
@@ -47,9 +47,7 @@ z.extension.GiphyService = class GiphyService {
 
     return this.client.send_json({
       type: 'GET',
-      url: this.client.create_url(
-        `${GiphyService.CONFIG.ENDPOINT_BASE}/${ids.join(',')}`,
-      ),
+      url: this.client.create_url(`${GiphyService.CONFIG.ENDPOINT_BASE}/${ids.join(',')}`)
     });
   }
 
@@ -61,11 +59,7 @@ z.extension.GiphyService = class GiphyService {
   get_random(tag) {
     return this.client.send_json({
       type: 'GET',
-      url: this.client.create_url(
-        `${GiphyService.CONFIG.ENDPOINT_BASE}/random?tag=${encodeURIComponent(
-          tag,
-        )}`,
-      ),
+      url: this.client.create_url(`${GiphyService.CONFIG.ENDPOINT_BASE}/random?tag=${encodeURIComponent(tag)}`)
     });
   }
 
@@ -84,9 +78,9 @@ z.extension.GiphyService = class GiphyService {
       {
         limit: 25,
         offset: 0,
-        sorting: 'relevant',
+        sorting: 'relevant'
       },
-      options,
+      options
     );
 
     const url =
@@ -98,7 +92,7 @@ z.extension.GiphyService = class GiphyService {
 
     return this.client.send_json({
       type: 'GET',
-      url: this.client.create_url(url),
+      url: this.client.create_url(url)
     });
   }
 };

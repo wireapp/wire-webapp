@@ -42,7 +42,7 @@ z.system_notification.SystemNotificationError = class SystemNotificationError ex
   static get TYPE() {
     return {
       HIDE_NOTIFICATION: 'z.system_notification.SystemNotificationError.TYPE.HIDE_NOTIFICATION',
-      UNKNOWN: 'z.system_notification.SystemNotificationError.TYPE.UNKNOWN',
+      UNKNOWN: 'z.system_notification.SystemNotificationError.TYPE.UNKNOWN'
     };
   }
 };

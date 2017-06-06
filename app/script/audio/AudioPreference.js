@@ -25,5 +25,5 @@ window.z.audio = z.audio || {};
 z.audio.AudioPreference = {
   ALL: 'all',
   NONE: 'none',
-  SOME: 'some',
+  SOME: 'some'
 };

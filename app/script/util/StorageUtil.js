@@ -34,5 +34,5 @@ z.util.StorageUtil = {
       return amplify.store(key, value, {expires: seconds_to_expire * 1000});
     }
     return amplify.store(key, value);
-  },
+  }
 };

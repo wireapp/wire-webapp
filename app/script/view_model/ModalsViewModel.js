@@ -45,21 +45,18 @@ z.ViewModel.ModalType = {
   TOO_LONG_MESSAGE: '.modal-too-long-message',
   TOO_MANY_MEMBERS: '.modal-too-many-members',
   UPLOAD_PARALLEL: '.modal-asset-upload-parallel',
-  UPLOAD_TOO_LARGE: '.modal-asset-upload-too-large',
+  UPLOAD_TOO_LARGE: '.modal-asset-upload-too-large'
 };
 
 z.ViewModel.MODAL_CONSENT_TYPE = {
   INCOMING_CALL: 'incoming_call',
   MESSAGE: 'message',
-  OUTGOING_CALL: 'outgoing_call',
+  OUTGOING_CALL: 'outgoing_call'
 };
 
 z.ViewModel.ModalsViewModel = class ModalsViewModel {
   constructor(element_id) {
-    this.logger = new z.util.Logger(
-      'z.ViewModel.ModalsViewModel',
-      z.config.LOGGER.OPTIONS,
-    );
+    this.logger = new z.util.Logger('z.ViewModel.ModalsViewModel', z.config.LOGGER.OPTIONS);
 
     this.modals = {};
 
@@ -93,11 +90,7 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
         this._show_modal_call_full_voice_channel(options.data, message_element);
         break;
       case z.ViewModel.ModalType.CALL_START_ANOTHER:
-        this._show_modal_call_start_another(
-          options.data,
-          title_element,
-          message_element,
-        );
+        this._show_modal_call_start_another(options.data, title_element, message_element);
         break;
       case z.ViewModel.ModalType.CLEAR:
         type = this._show_modal_clear(options, type);
@@ -109,12 +102,7 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
         this._show_modal_leave(options.data, title_element);
         break;
       case z.ViewModel.ModalType.NEW_DEVICE:
-        this._show_modal_new_device(
-          options.data,
-          title_element,
-          message_element,
-          action_element,
-        );
+        this._show_modal_new_device(options.data, title_element, message_element, action_element);
         break;
       case z.ViewModel.ModalType.REMOVE_DEVICE:
         this._show_modal_remove_device(options.data, title_element);
@@ -188,9 +176,9 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
         id: z.string.modal_block_conversation_headline,
         replace: {
           content: content,
-          placeholder: '%@.name',
-        },
-      }),
+          placeholder: '%@.name'
+        }
+      })
     );
 
     message_element.text(
@@ -198,9 +186,9 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
         id: z.string.modal_block_conversation_message,
         replace: {
           content: content,
-          placeholder: '%@.name',
-        },
-      }),
+          placeholder: '%@.name'
+        }
+      })
     );
   }
 
@@ -210,9 +198,9 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
         id: z.string.modal_call_conversation_full_message,
         replace: {
           content: content,
-          placeholder: '%no',
-        },
-      }),
+          placeholder: '%no'
+        }
+      })
     );
   }
 
@@ -222,9 +210,9 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
         id: z.string.modal_call_voice_channel_full_message,
         replace: {
           content: content,
-          placeholder: '%no',
-        },
-      }),
+          placeholder: '%no'
+        }
+      })
     );
   }
 
@@ -240,26 +228,15 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
    * @returns {undefined} No return value
    */
   _show_modal_call_start_another(call_state, title_element, message_element) {
-    const action_element = $(z.ViewModel.ModalType.CALL_START_ANOTHER).find(
-      '.modal-action',
-    );
+    const action_element = $(z.ViewModel.ModalType.CALL_START_ANOTHER).find('.modal-action');
 
-    action_element.text(
-      z.l10n.text(z.string[`modal_call_second_${call_state}_action`]),
-    );
-    message_element.text(
-      z.l10n.text(z.string[`modal_call_second_${call_state}_message`]),
-    );
-    return title_element.text(
-      z.l10n.text(z.string[`modal_call_second_${call_state}_headline`]),
-    );
+    action_element.text(z.l10n.text(z.string[`modal_call_second_${call_state}_action`]));
+    message_element.text(z.l10n.text(z.string[`modal_call_second_${call_state}_message`]));
+    return title_element.text(z.l10n.text(z.string[`modal_call_second_${call_state}_headline`]));
   }
 
   _show_modal_clear(options, type) {
-    if (
-      options.conversation.is_group() &&
-      !options.conversation.removed_from_conversation()
-    ) {
+    if (options.conversation.is_group() && !options.conversation.removed_from_conversation()) {
       type = z.ViewModel.ModalType.CLEAR_GROUP;
     }
 
@@ -269,33 +246,23 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
         id: z.string.modal_clear_conversation_headline,
         replace: {
           content: options.data,
-          placeholder: '%@.name',
-        },
-      }),
+          placeholder: '%@.name'
+        }
+      })
     );
 
     return type;
   }
 
   _show_modal_connected_device(devices) {
-    const devices_element = $(z.ViewModel.ModalType.CONNECTED_DEVICE).find(
-      '.modal-connected-devices',
-    );
+    const devices_element = $(z.ViewModel.ModalType.CONNECTED_DEVICE).find('.modal-connected-devices');
 
     devices_element.empty();
 
     devices.map(device => {
-      $('<div>')
-        .text(`${moment(device.time).format('MMMM Do YYYY, HH:mm')} - UTC`)
-        .appendTo(devices_element);
+      $('<div>').text(`${moment(device.time).format('MMMM Do YYYY, HH:mm')} - UTC`).appendTo(devices_element);
 
-      $('<div>')
-        .text(
-          `${z.l10n.text(
-            z.string.modal_connected_device_from,
-          )} ${device.model}`,
-        )
-        .appendTo(devices_element);
+      $('<div>').text(`${z.l10n.text(z.string.modal_connected_device_from)} ${device.model}`).appendTo(devices_element);
     });
   }
 
@@ -305,24 +272,16 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
         id: z.string.modal_leave_conversation_headline,
         replace: {
           content: content,
-          placeholder: '%@.name',
-        },
-      }),
+          placeholder: '%@.name'
+        }
+      })
     );
   }
 
-  _show_modal_new_device(
-    content,
-    title_element,
-    message_element,
-    action_element,
-  ) {
+  _show_modal_new_device(content, title_element, message_element, action_element) {
     let action_id, message_id;
     const joined_names = z.util.StringUtil.capitalize_first_char(
-      z.util.LocalizerUtil.join_names(
-        content.user_ets,
-        z.string.Declension.NOMINATIVE,
-      ),
+      z.util.LocalizerUtil.join_names(content.user_ets, z.string.Declension.NOMINATIVE)
     );
 
     let string_id;
@@ -339,9 +298,9 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
         id: string_id,
         replace: {
           content: joined_names,
-          placeholder: content.user_ets.length === 1 ? '%@.name' : '%@.names',
-        },
-      }),
+          placeholder: content.user_ets.length === 1 ? '%@.name' : '%@.names'
+        }
+      })
     );
 
     switch (content.consent_type) {
@@ -368,9 +327,9 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
         id: z.string.modal_remove_device_headline,
         replace: {
           content: content,
-          placeholder: '%device_name',
-        },
-      }),
+          placeholder: '%device_name'
+        }
+      })
     );
   }
 
@@ -381,14 +340,14 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
         replace: [
           {
             content: content.open_spots,
-            placeholder: '%no',
+            placeholder: '%no'
           },
           {
             content: content.max,
-            placeholder: '%max',
-          },
-        ],
-      }),
+            placeholder: '%max'
+          }
+        ]
+      })
     );
   }
 
@@ -398,9 +357,9 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
         id: z.string.modal_uploads_parallel,
         replace: {
           content: content,
-          placeholder: '%no',
-        },
-      }),
+          placeholder: '%no'
+        }
+      })
     );
   }
 
@@ -410,9 +369,9 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
         id: z.string.conversation_asset_upload_too_large,
         replace: {
           content: content,
-          placeholder: '%no',
-        },
-      }),
+          placeholder: '%no'
+        }
+      })
     );
   }
 
@@ -422,9 +381,9 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
         id: z.string.modal_too_long_message,
         replace: {
           content: content,
-          placeholder: '%no',
-        },
-      }),
+          placeholder: '%no'
+        }
+      })
     );
   }
 };

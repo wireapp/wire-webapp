@@ -46,5 +46,5 @@ ko.components.register('choose-screen', {
            data-bind="click: on_cancel"></div>
     </div>
   `,
-  viewModel: z.components.ChooseScreen,
+  viewModel: z.components.ChooseScreen
 });

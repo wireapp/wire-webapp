@@ -42,6 +42,6 @@ z.search.FullTextSearch = (function() {
 
   return {
     get_search_regex: _get_search_regex,
-    search: _search,
+    search: _search
   };
 })();

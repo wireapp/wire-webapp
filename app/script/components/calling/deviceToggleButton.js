@@ -39,5 +39,5 @@ ko.components.register('device-toggle-button', {
       <!-- /ko -->
     </div>
   `,
-  viewModel: z.components.DeviceToggleButton,
+  viewModel: z.components.DeviceToggleButton
 });

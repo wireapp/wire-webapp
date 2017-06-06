@@ -24,7 +24,7 @@ window.z.event = z.event || {};
 
 z.event.Client = {
   CALL: {
-    E_CALL: 'call.e-call',
+    E_CALL: 'call.e-call'
   },
   CONVERSATION: {
     ASSET_META: 'conversation.asset-meta',
@@ -40,6 +40,6 @@ z.event.Client = {
     REACTION: 'conversation.reaction',
     TEAM_MEMBER_LEAVE: 'conversation.team-member-leave',
     UNABLE_TO_DECRYPT: 'conversation.unable-to-decrypt',
-    VERIFICATION: 'conversation.verification',
-  },
+    VERIFICATION: 'conversation.verification'
+  }
 };

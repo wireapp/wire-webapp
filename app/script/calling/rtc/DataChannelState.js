@@ -29,5 +29,5 @@ z.calling.rtc.DATA_CHANNEL_STATE = {
   CLOSED: 'closed',
   CLOSING: 'closing',
   CONNECTING: 'connecting',
-  OPEN: 'open',
+  OPEN: 'open'
 };

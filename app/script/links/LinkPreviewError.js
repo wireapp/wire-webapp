@@ -50,7 +50,7 @@ z.links.LinkPreviewError = class LinkPreviewError extends Error {
       NO_DATA_AVAILABLE: 'z.links.LinkPreviewError.TYPE.NO_DATA_AVAILABLE',
       NOT_SUPPORTED: 'z.links.LinkPreviewError.TYPE.NOT_SUPPORTED',
       UNKNOWN: 'z.links.LinkPreviewError.TYPE.UNKNOWN',
-      UNSUPPORTED_TYPE: 'z.links.LinkPreviewError.TYPE.UNSUPPORTED_TYPE',
+      UNSUPPORTED_TYPE: 'z.links.LinkPreviewError.TYPE.UNSUPPORTED_TYPE'
     };
   }
 };

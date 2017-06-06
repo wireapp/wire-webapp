@@ -27,7 +27,7 @@ z.announce.AnnounceRepository = class AnnounceRepository {
     return {
       CHECK_INTERVAL: 3 * 60 * 60 * 1000,
       CHECK_TIMEOUT: 5 * 60 * 1000,
-      UPDATE_INTERVAL: 6 * 60 * 60 * 1000,
+      UPDATE_INTERVAL: 6 * 60 * 60 * 1000
     };
   }
 
@@ -106,17 +106,17 @@ z.announce.AnnounceRepository = class AnnounceRepository {
             body: announcement.message,
             icon: z.util.Environment.electron && z.util.Environment.os.mac ? '' : '/image/logo/notification.png',
             requireInteraction: true,
-            sticky: true,
+            sticky: true
           });
 
           amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ANNOUNCE.SENT, {
-            campaign: announcement.campaign,
+            campaign: announcement.campaign
           });
           this.logger.info(`Announcement '${announcement.title}' shown`);
 
           notification.onclick = () => {
             amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ANNOUNCE.CLICKED, {
-              campaign: announcement.campaign,
+              campaign: announcement.campaign
             });
             this.logger.info(`Announcement '${announcement.title}' clicked`);
 

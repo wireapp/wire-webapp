@@ -28,14 +28,14 @@ z.event.EventTypeHandling = {
     z.event.Backend.CONVERSATION.KNOCK,
     z.event.Backend.CONVERSATION.MESSAGE_ADD,
     z.event.Client.CONVERSATION.LOCATION,
-    z.event.Client.CONVERSATION.REACTION,
+    z.event.Client.CONVERSATION.REACTION
   ],
   DECRYPT: [z.event.Backend.CONVERSATION.OTR_ASSET_ADD, z.event.Backend.CONVERSATION.OTR_MESSAGE_ADD],
   IGNORE: [
     z.event.Backend.CONVERSATION.ASSET_ADD,
     z.event.Backend.CONVERSATION.KNOCK,
     z.event.Backend.CONVERSATION.MESSAGE_ADD,
-    z.event.Backend.CONVERSATION.TYPING,
+    z.event.Backend.CONVERSATION.TYPING
   ],
   STORE: [
     z.event.Backend.CONVERSATION.ASSET_ADD,
@@ -52,6 +52,6 @@ z.event.EventTypeHandling = {
     z.event.Client.CONVERSATION.MISSED_MESSAGES,
     z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE,
     z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT,
-    z.event.Client.CONVERSATION.VERIFICATION,
-  ],
+    z.event.Client.CONVERSATION.VERIFICATION
+  ]
 };

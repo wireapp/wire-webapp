@@ -29,5 +29,5 @@ z.tracking.attribute.MessageType = {
   LOCATION: 'location',
   PING: 'ping',
   SYSTEM: 'system',
-  TEXT: 'text',
+  TEXT: 'text'
 };

@@ -55,5 +55,5 @@ ko.components.register('input-level', {
       <!-- /ko -->
     </ul>\
   `,
-  viewModel: z.components.InputLevel,
+  viewModel: z.components.InputLevel
 });

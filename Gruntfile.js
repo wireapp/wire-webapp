@@ -24,11 +24,11 @@ module.exports = grunt => {
 
   const config = {
     aws: {
-      port: 5000,
+      port: 5000
     },
     server: {
-      port: 8888,
-    },
+      port: 8888
+    }
   };
 
   /* eslint-disable sort-keys */
@@ -40,19 +40,19 @@ module.exports = grunt => {
       page: 'app/page',
       script: 'app/script',
       style: 'app/style',
-      template_dist: 'app/page/template/_dist',
+      template_dist: 'app/page/template/_dist'
     },
     aws_: 'aws',
     aws: {
       s3: 'aws/s3',
       static: 'aws/static',
-      templates: 'aws/templates',
+      templates: 'aws/templates'
     },
     deploy: 'deploy',
     dist: 'dist',
     docs: {
       api: 'docs/api',
-      coverage: 'docs/coverage',
+      coverage: 'docs/coverage'
     },
     temp: 'temp',
     test_: 'test',
@@ -60,8 +60,8 @@ module.exports = grunt => {
       api: 'test/api',
       coverage: 'test/coverage',
       lib: 'test/lib',
-      unit_tests: 'test/unit_tests',
-    },
+      unit_tests: 'test/unit_tests'
+    }
   };
 
   grunt.initConfig({
@@ -86,7 +86,7 @@ module.exports = grunt => {
     shell: require('./grunt/config/shell'),
     todo: require('./grunt/config/todo'),
     uglify: require('./grunt/config/uglify'),
-    watch: require('./grunt/config/watch'),
+    watch: require('./grunt/config/watch')
   });
   /* eslint-enable sort-keys */
 
@@ -112,7 +112,7 @@ module.exports = grunt => {
 
   // Test Related
   grunt.registerTask('test', () =>
-    grunt.task.run(['clean:docs_coverage', 'scripts', 'test_init', 'test_prepare', 'karma:test']),
+    grunt.task.run(['clean:docs_coverage', 'scripts', 'test_init', 'test_prepare', 'karma:test'])
   );
 
   grunt.registerTask('test_prepare', test_name => {

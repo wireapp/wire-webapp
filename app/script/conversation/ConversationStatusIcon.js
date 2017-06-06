@@ -30,5 +30,5 @@ z.conversation.ConversationStatusIcon = {
   PENDING_CONNECTION: 'pending',
   TYPING: 'typing',
   UNREAD_MESSAGES: 'messages',
-  UNREAD_PING: 'ping',
+  UNREAD_PING: 'ping'
 };

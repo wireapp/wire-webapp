@@ -28,9 +28,7 @@ z.components.InputElement = class InputElement {
     this.value = params.value;
 
     this.change = (data, event) => {
-      const new_name = z.util.StringUtil.remove_line_breaks(
-        event.target.value.trim(),
-      );
+      const new_name = z.util.StringUtil.remove_line_breaks(event.target.value.trim());
       const old_name = this.value().trim();
       event.target.value = old_name;
       this.editing(false);
@@ -51,9 +49,7 @@ z.components.InputElement = class InputElement {
           }
         });
       } else {
-        $(component_info.element)
-          .find('textarea')
-          .off('keydown', 'esc', this.abort);
+        $(component_info.element).find('textarea').off('keydown', 'esc', this.abort);
       }
     });
 
@@ -74,6 +70,6 @@ ko.components.register('input-element', {
   viewModel: {
     createViewModel(params, component_info) {
       return new z.components.InputElement(params, component_info);
-    },
-  },
+    }
+  }
 });

@@ -25,7 +25,7 @@ window.z.calling.payloads = z.calling.payloads || {};
 
 z.calling.payloads.FlowDeletionReason = {
   RELEASED: 'released',
-  TIMEOUT: 'timeout',
+  TIMEOUT: 'timeout'
 };
 
 z.calling.payloads.FlowDeletionInfo = class FlowDeletionInfo {

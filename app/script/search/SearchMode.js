@@ -25,5 +25,5 @@ window.z.search = z.search || {};
 // Enum of different search modes.
 z.search.SEARCH_MODE = {
   CONTACTS: 'contacts',
-  ON_BOARDING: 'onboarding',
+  ON_BOARDING: 'onboarding'
 };

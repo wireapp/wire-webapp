@@ -25,5 +25,5 @@ window.z.tracking.attribute = z.tracking.attribute || {};
 
 z.tracking.attribute.ConversationType = {
   GROUP: 'group',
-  ONE_TO_ONE: 'one_to_one',
+  ONE_TO_ONE: 'one_to_one'
 };

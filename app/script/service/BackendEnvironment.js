@@ -24,5 +24,5 @@ window.z.service = z.service || {};
 
 z.service.BackendEnvironment = {
   PRODUCTION: 'production',
-  STAGING: 'staging',
+  STAGING: 'staging'
 };

@@ -35,9 +35,9 @@ window.TestFactory = function(logger_level) {
     connection: {
       environment: 'test',
       rest_url: 'http://localhost',
-      websocket_url: 'wss://localhost',
+      websocket_url: 'wss://localhost'
     },
-    logging_level: logger_level,
+    logging_level: logger_level
   };
 
   this.client = new z.service.BackendClient(this.settings.connection);
@@ -70,9 +70,7 @@ window.TestFactory.prototype.exposeAuthActors = function() {
     TestFactory.auth_service = new z.auth.AuthService(this.client);
     TestFactory.auth_service.logger.level = this.settings.logging_level;
 
-    TestFactory.auth_repository = new z.auth.AuthRepository(
-      TestFactory.auth_service,
-    );
+    TestFactory.auth_repository = new z.auth.AuthRepository(TestFactory.auth_service);
     TestFactory.auth_repository.logger.level = this.settings.logging_level;
     return TestFactory.auth_repository;
   });
@@ -91,9 +89,7 @@ window.TestFactory.prototype.exposeStorageActors = function() {
       return TestFactory.storage_service.init(entities.user.john_doe.id);
     })
     .then(() => {
-      TestFactory.storage_repository = new z.storage.StorageRepository(
-        TestFactory.storage_service,
-      );
+      TestFactory.storage_repository = new z.storage.StorageRepository(TestFactory.storage_service);
       TestFactory.storage_repository.logger.level = this.settings.logging_level;
       return TestFactory.storage_repository;
     });
@@ -113,26 +109,19 @@ window.TestFactory.prototype.exposeCryptographyActors = function() {
       this.logger.info('✓ exposedStorageActors');
 
       const current_client = new z.client.Client({
-        id: entities.clients.john_doe.permanent.id,
+        id: entities.clients.john_doe.permanent.id
       });
-      TestFactory.cryptography_service = new z.cryptography.CryptographyService(
-        this.client,
-      );
+      TestFactory.cryptography_service = new z.cryptography.CryptographyService(this.client);
       TestFactory.cryptography_service.logger.level = this.settings.logging_level;
 
-      TestFactory.cryptography_repository = new z.cryptography
-        .CryptographyRepository(
+      TestFactory.cryptography_repository = new z.cryptography.CryptographyRepository(
         TestFactory.cryptography_service,
-        TestFactory.storage_repository,
+        TestFactory.storage_repository
       );
-      TestFactory.cryptography_repository.current_client = ko.observable(
-        current_client,
-      );
+      TestFactory.cryptography_repository.current_client = ko.observable(current_client);
       TestFactory.cryptography_repository.logger.level = this.settings.logging_level;
 
-      return TestFactory.cryptography_repository.init(
-        TestFactory.storage_service.db,
-      );
+      return TestFactory.cryptography_repository.init(TestFactory.storage_service.db);
     })
     .then(function() {
       return TestFactory.cryptography_repository;
@@ -155,7 +144,7 @@ window.TestFactory.prototype.exposeClientActors = function() {
       const client = new z.client.Client({
         address: '192.168.0.1',
         class: 'desktop',
-        id: '60aee26b7f55a99f',
+        id: '60aee26b7f55a99f'
       });
 
       const user = new z.entity.User(entities.user.john_doe.id);
@@ -166,15 +155,12 @@ window.TestFactory.prototype.exposeClientActors = function() {
       user.name(entities.user.john_doe.name);
       user.phone(entities.user.john_doe.phone);
 
-      TestFactory.client_service = new z.client.ClientService(
-        this.client,
-        TestFactory.storage_service,
-      );
+      TestFactory.client_service = new z.client.ClientService(this.client, TestFactory.storage_service);
       TestFactory.client_service.logger.level = this.settings.logging_level;
 
       TestFactory.client_repository = new z.client.ClientRepository(
         TestFactory.client_service,
-        TestFactory.cryptography_repository,
+        TestFactory.cryptography_repository
       );
       TestFactory.client_repository.logger.level = this.settings.logging_level;
       TestFactory.client_repository.init(user);
@@ -188,7 +174,7 @@ window.TestFactory.prototype.exposeClientActors = function() {
         meta: {is_verified: true, primary_key: 'local_identity'},
         model: 'Chrome (Temporary)',
         time: '2016-10-07T16:01:42.133Z',
-        type: 'temporary',
+        type: 'temporary'
       };
       const current_client = new z.client.Client(payload);
       TestFactory.client_repository.current_client(current_client);
@@ -210,21 +196,15 @@ window.TestFactory.prototype.exposeEventActors = function() {
     .then(() => {
       this.logger.info('✓ exposedCryptographyActors');
 
-      TestFactory.web_socket_service = new z.event.WebSocketService(
-        this.client,
-        TestFactory.storage_service,
-      );
+      TestFactory.web_socket_service = new z.event.WebSocketService(this.client, TestFactory.storage_service);
       TestFactory.web_socket_service.logger.level = this.settings.logging_level;
 
-      TestFactory.notification_service = new z.event.NotificationService(
-        this.client,
-        TestFactory.storage_service,
-      );
+      TestFactory.notification_service = new z.event.NotificationService(this.client, TestFactory.storage_service);
       TestFactory.notification_service.logger.level = this.settings.logging_level;
 
       TestFactory.conversation_service = new z.conversation.ConversationService(
         this.client,
-        TestFactory.storage_service,
+        TestFactory.storage_service
       );
       TestFactory.conversation_service.logger.level = this.settings.logging_level;
 
@@ -233,12 +213,10 @@ window.TestFactory.prototype.exposeEventActors = function() {
         TestFactory.notification_service,
         TestFactory.cryptography_repository,
         undefined,
-        TestFactory.conversation_service,
+        TestFactory.conversation_service
       );
       TestFactory.event_repository.logger.level = this.settings.logging_level;
-      TestFactory.event_repository.current_client = ko.observable(
-        TestFactory.cryptography_repository.current_client(),
-      );
+      TestFactory.event_repository.current_client = ko.observable(TestFactory.cryptography_repository.current_client());
 
       return TestFactory.event_repository;
     });
@@ -271,13 +249,10 @@ window.TestFactory.prototype.exposeUserActors = function() {
         TestFactory.asset_service,
         TestFactory.search_service,
         TestFactory.client_repository,
-        TestFactory.cryptography_repository,
+        TestFactory.cryptography_repository
       );
       TestFactory.user_repository.logger.level = this.settings.logging_level;
-      TestFactory.user_repository.save_user(
-        TestFactory.client_repository.self_user(),
-        true,
-      );
+      TestFactory.user_repository.save_user(TestFactory.client_repository.self_user(), true);
 
       return TestFactory.user_repository;
     });
@@ -299,15 +274,13 @@ window.TestFactory.prototype.exposeConnectActors = function() {
       TestFactory.connect_service = new z.connect.ConnectService(this.client);
       TestFactory.connect_service.logger.level = this.settings.logging_level;
 
-      TestFactory.connect_google_service = new z.connect.ConnectGoogleService(
-        this.client,
-      );
+      TestFactory.connect_google_service = new z.connect.ConnectGoogleService(this.client);
       TestFactory.connect_google_service.logger.level = this.settings.logging_level;
 
       TestFactory.connect_repository = new z.connect.ConnectRepository(
         TestFactory.connect_service,
         TestFactory.connect_google_service,
-        TestFactory.user_repository,
+        TestFactory.user_repository
       );
       TestFactory.connect_repository.logger.level = this.settings.logging_level;
 
@@ -333,7 +306,7 @@ window.TestFactory.prototype.exposeSearchActors = function() {
 
       TestFactory.search_repository = new z.search.SearchRepository(
         TestFactory.search_service,
-        TestFactory.user_repository,
+        TestFactory.user_repository
       );
       TestFactory.search_repository.logger.level = this.settings.logging_level;
 
@@ -355,10 +328,7 @@ window.TestFactory.prototype.exposeTeamActors = function() {
       return TestFactory.team_service;
     })
     .then(() => {
-      TestFactory.team_repository = new z.team.TeamRepository(
-        TestFactory.team_service,
-        TestFactory.user_repository,
-      );
+      TestFactory.team_repository = new z.team.TeamRepository(TestFactory.team_service, TestFactory.user_repository);
       TestFactory.team_repository.logger.level = this.settings.logging_level;
       return TestFactory.team_repository;
     });
@@ -379,19 +349,18 @@ window.TestFactory.prototype.exposeConversationActors = function() {
 
       TestFactory.conversation_service = new z.conversation.ConversationService(
         this.client,
-        TestFactory.storage_service,
+        TestFactory.storage_service
       );
       TestFactory.conversation_service.logger.level = this.settings.logging_level;
 
-      TestFactory.conversation_repository = new z.conversation
-        .ConversationRepository(
+      TestFactory.conversation_repository = new z.conversation.ConversationRepository(
         TestFactory.conversation_service,
         TestFactory.asset_service,
         TestFactory.user_repository,
         undefined,
         TestFactory.cryptography_repository,
         undefined,
-        TestFactory.team_repository,
+        TestFactory.team_repository
       );
       TestFactory.conversation_repository.logger.level = this.settings.logging_level;
 
@@ -412,9 +381,7 @@ window.TestFactory.prototype.exposeMediaActors = function() {
     .then(() => {
       this.logger.info('✓ exposedAudioActors');
 
-      TestFactory.media_repository = new z.media.MediaRepository(
-        TestFactory.audio_repository,
-      );
+      TestFactory.media_repository = new z.media.MediaRepository(TestFactory.audio_repository);
       TestFactory.media_repository.logger.level = this.settings.logging_level;
 
       TestFactory.media_repository.devices_handler.logger.level = this.settings.logging_level;
@@ -454,18 +421,16 @@ window.TestFactory.prototype.exposeCallingActors = function() {
         TestFactory.client_repository,
         TestFactory.conversation_repository,
         TestFactory.media_repository,
-        TestFactory.user_repository,
+        TestFactory.user_repository
       );
       TestFactory.calling_repository.logger.level = this.settings.logging_level;
 
-      TestFactory.v2_call_center =
-        TestFactory.calling_repository.v2_call_center;
+      TestFactory.v2_call_center = TestFactory.calling_repository.v2_call_center;
       TestFactory.v2_call_center.logger.level = this.settings.logging_level;
       TestFactory.v2_call_center.state_handler.logger.level = this.settings.logging_level;
       TestFactory.v2_call_center.signaling_handler.logger.level = this.settings.logging_level;
 
-      TestFactory.v3_call_center =
-        TestFactory.calling_repository.v3_call_center;
+      TestFactory.v3_call_center = TestFactory.calling_repository.v3_call_center;
       TestFactory.v3_call_center.logger.level = this.settings.logging_level;
 
       return TestFactory.calling_repository;
@@ -489,10 +454,9 @@ window.TestFactory.prototype.exposeSystemNotificationActors = function() {
     .then(() => {
       this.logger.info('✓ exposedCallingActors');
 
-      TestFactory.system_notification_repository = new z.system_notification
-        .SystemNotificationRepository(
+      TestFactory.system_notification_repository = new z.system_notification.SystemNotificationRepository(
         TestFactory.v2_call_center,
-        TestFactory.conversation_repository,
+        TestFactory.conversation_repository
       );
       TestFactory.system_notification_repository.logger.level = this.settings.logging_level;
 
@@ -515,7 +479,7 @@ window.TestFactory.prototype.exposeTrackingActors = function() {
 
       TestFactory.tracking_repository = new z.tracking.EventTrackingRepository(
         TestFactory.conversation_repository,
-        TestFactory.user_repository,
+        TestFactory.user_repository
       );
       TestFactory.tracking_repository.logger.level = this.settings.logging_level;
 
@@ -533,9 +497,7 @@ window.TestFactory.prototype.exposeAnnounceActors = function() {
     TestFactory.announce_service = new z.announce.AnnounceService();
     TestFactory.announce_service.logger.level = this.settings.logging_level;
 
-    TestFactory.announce_repository = new z.announce.AnnounceRepository(
-      TestFactory.announce_service,
-    );
+    TestFactory.announce_repository = new z.announce.AnnounceRepository(TestFactory.announce_service);
     TestFactory.announce_repository.logger.level = this.settings.logging_level;
     return TestFactory.announce_repository;
   });

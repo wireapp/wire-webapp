@@ -33,5 +33,5 @@ window.z.tracking = z.tracking || {};
  */
 z.tracking.CustomDimension = {
   APP: 0,
-  CONTACTS: 1,
+  CONTACTS: 1
 };

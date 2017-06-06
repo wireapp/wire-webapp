@@ -25,7 +25,7 @@ describe('Giphy Repository', function() {
   let server = null;
   const urls = {
     rest_url: 'http://localhost',
-    websocket_url: 'wss://localhost',
+    websocket_url: 'wss://localhost'
   };
 
   let client = null;
@@ -73,10 +73,10 @@ describe('Giphy Repository', function() {
           fixed_width_small_url: 'http://s3.amazonaws.com/giphygifs/media/GKLmFicoabZrW/100w.gif',
           fixed_width_small_still_url: 'http://s3.amazonaws.com/giphygifs/media/GKLmFicoabZrW/100w_s.gif',
           fixed_width_small_width: '100',
-          fixed_width_small_height: '76',
+          fixed_width_small_height: '76'
         },
-        meta: {status: 200, msg: 'OK'},
-      }),
+        meta: {status: 200, msg: 'OK'}
+      })
     ]);
     /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
@@ -109,12 +109,12 @@ describe('Giphy Repository', function() {
               mp4: 'https://media4.giphy.com/media/GKLmFicoabZrW/200.mp4',
               mp4_size: '178927',
               webp: 'https://media4.giphy.com/media/GKLmFicoabZrW/200.webp',
-              webp_size: '88838',
+              webp_size: '88838'
             },
             fixed_height_still: {
               url: 'https://media4.giphy.com/media/GKLmFicoabZrW/200_s.gif',
               width: '262',
-              height: '200',
+              height: '200'
             },
             fixed_height_downsampled: {
               url: 'https://media4.giphy.com/media/GKLmFicoabZrW/200_d.gif',
@@ -122,7 +122,7 @@ describe('Giphy Repository', function() {
               height: '200',
               size: '149525',
               webp: 'https://media4.giphy.com/media/GKLmFicoabZrW/200_d.webp',
-              webp_size: '53016',
+              webp_size: '53016'
             },
             fixed_width: {
               url: 'https://media4.giphy.com/media/GKLmFicoabZrW/200w.gif',
@@ -132,12 +132,12 @@ describe('Giphy Repository', function() {
               mp4: 'https://media4.giphy.com/media/GKLmFicoabZrW/200w.mp4',
               mp4_size: '120356',
               webp: 'https://media4.giphy.com/media/GKLmFicoabZrW/200w.webp',
-              webp_size: '57810',
+              webp_size: '57810'
             },
             fixed_width_still: {
               url: 'https://media4.giphy.com/media/GKLmFicoabZrW/200w_s.gif',
               width: '200',
-              height: '153',
+              height: '153'
             },
             fixed_width_downsampled: {
               url: 'https://media4.giphy.com/media/GKLmFicoabZrW/200w_d.gif',
@@ -145,7 +145,7 @@ describe('Giphy Repository', function() {
               height: '153',
               size: '227351',
               webp: 'https://media4.giphy.com/media/GKLmFicoabZrW/200w_d.webp',
-              webp_size: '34448',
+              webp_size: '34448'
             },
             fixed_height_small: {
               url: 'https://media4.giphy.com/media/GKLmFicoabZrW/100.gif',
@@ -155,12 +155,12 @@ describe('Giphy Repository', function() {
               mp4: 'https://media4.giphy.com/media/GKLmFicoabZrW/100.mp4',
               mp4_size: '66464',
               webp: 'https://media4.giphy.com/media/GKLmFicoabZrW/100.webp',
-              webp_size: '32982',
+              webp_size: '32982'
             },
             fixed_height_small_still: {
               url: 'https://media4.giphy.com/media/GKLmFicoabZrW/100_s.gif',
               width: '131',
-              height: '100',
+              height: '100'
             },
             fixed_width_small: {
               url: 'https://media4.giphy.com/media/GKLmFicoabZrW/100w.gif',
@@ -170,23 +170,23 @@ describe('Giphy Repository', function() {
               mp4: 'https://media4.giphy.com/media/GKLmFicoabZrW/100w.mp4',
               mp4_size: '46951',
               webp: 'https://media4.giphy.com/media/GKLmFicoabZrW/100w.webp',
-              webp_size: '23174',
+              webp_size: '23174'
             },
             fixed_width_small_still: {
               url: 'https://media4.giphy.com/media/GKLmFicoabZrW/100w_s.gif',
               width: '100',
-              height: '76',
+              height: '76'
             },
             downsized: {
               url: 'https://media4.giphy.com/media/GKLmFicoabZrW/giphy.gif',
               width: '320',
               height: '244',
-              size: '514699',
+              size: '514699'
             },
             downsized_still: {
               url: 'https://media4.giphy.com/media/GKLmFicoabZrW/giphy_s.gif',
               width: '320',
-              height: '244',
+              height: '244'
             },
             downsized_large: {url: '', width: '0', height: '0', size: '0'},
             original: {
@@ -198,17 +198,17 @@ describe('Giphy Repository', function() {
               mp4: 'https://media4.giphy.com/media/GKLmFicoabZrW/giphy.mp4',
               mp4_size: '710329',
               webp: 'https://media4.giphy.com/media/GKLmFicoabZrW/giphy.webp',
-              webp_size: '116528',
+              webp_size: '116528'
             },
             original_still: {
               url: 'https://media4.giphy.com/media/GKLmFicoabZrW/giphy_s.gif',
               width: '320',
-              height: '244',
-            },
-          },
+              height: '244'
+            }
+          }
         },
-        meta: {status: 200, msg: 'OK'},
-      }),
+        meta: {status: 200, msg: 'OK'}
+      })
     ]);
     /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
   });

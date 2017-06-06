@@ -37,7 +37,7 @@ z.media.MediaEmbeds = (function() {
       height: '100%',
       type: 'default',
       video: true,
-      width: '100%',
+      width: '100%'
     };
 
     options = _.extend(defaults, options);
@@ -59,7 +59,7 @@ z.media.MediaEmbeds = (function() {
       options.height,
       options.src,
       options.frameborder,
-      options.allowfullscreen,
+      options.allowfullscreen
     );
   };
 
@@ -69,7 +69,7 @@ z.media.MediaEmbeds = (function() {
     soundcloud: /(https?:\/\/(?:www\.|m\.)?)?soundcloud\.com(\/[\w\-]+){2,3}/g,
     spotify: /https?:\/\/(?:play\.|open\.)*spotify\.com\/([\w\-/]+)/g,
     vimeo: /https?:\/\/(?:vimeo\.com\/|player\.vimeo\.com\/)(?:video\/|(?:channels\/staffpicks\/|channels\/)|)((\w|-){7,9})/g,
-    youtube: /(?:youtube(?:-nocookie|)\.com\/\S*(?:(?:\/e(?:mbed))?\/|watch\/?\?(?:\S*?&?v\=))|youtu\.be\/)([a-zA-Z0-9_-]{6,11})/g,
+    youtube: /(?:youtube(?:-nocookie|)\.com\/\S*(?:(?:\/e(?:mbed))?\/|watch\/?\?(?:\S*?&?v\=))|youtu\.be\/)([a-zA-Z0-9_-]{6,11})/g
   };
 
   /**
@@ -83,9 +83,7 @@ z.media.MediaEmbeds = (function() {
    */
   const _append_iframe = function(link, message, iframe) {
     const link_string = link.outerHTML.replace(/&amp;/g, '&');
-    return message
-      .replace(/&amp;/g, '&')
-      .replace(link_string, `${link_string}${iframe}`);
+    return message.replace(/&amp;/g, '&').replace(link_string, `${link_string}${iframe}`);
   };
 
   /**
@@ -108,11 +106,7 @@ z.media.MediaEmbeds = (function() {
         .substr(url.indexOf('?'), url.length)
         .replace(/^[?]/, '&')
         .replace(/[&]v=[a-zA-Z0-9_-]{11}/, '')
-        .replace(
-          /[&#]t=([a-z0-9]+)/,
-          (temp, timestamp) =>
-            `&start=${_convert_youtube_timestamp_to_seconds(timestamp)}`,
-        )
+        .replace(/[&#]t=([a-z0-9]+)/, (temp, timestamp) => `&start=${_convert_youtube_timestamp_to_seconds(timestamp)}`)
         .replace(/[&]?autoplay=1/, ''); // remove autoplay param
 
       // append html5 parameter to youtube src to force html5 mode
@@ -135,15 +129,10 @@ z.media.MediaEmbeds = (function() {
       }
 
       const _extract_unit = function(unit) {
-        return window.parseInt(
-          (timestamp.match(new RegExp(`([0-9]+)(?=${unit})`)) || [0])[0],
-          10,
-        );
+        return window.parseInt((timestamp.match(new RegExp(`([0-9]+)(?=${unit})`)) || [0])[0], 10);
       };
 
-      return (
-        _extract_unit('h') * 3600 + _extract_unit('m') * 60 + _extract_unit('s')
-      );
+      return _extract_unit('h') * 3600 + _extract_unit('m') * 60 + _extract_unit('s');
     }
     return 0;
   };
@@ -177,10 +166,7 @@ z.media.MediaEmbeds = (function() {
 
         if (slashes_in_link === 3) {
           is_single_track = true;
-        } else if (
-          slashes_in_link > 3 &&
-          link_path_name.indexOf('sets') === -1
-        ) {
+        } else if (slashes_in_link > 3 && link_path_name.indexOf('sets') === -1) {
           // Fix for WEBAPP-1137
           return message;
         }
@@ -192,7 +178,7 @@ z.media.MediaEmbeds = (function() {
           src:
             'https://w.soundcloud.com/player/?url={1}&visual=false&show_comments=false&buying=false&show_playcount=false&liking=false&sharing=false&hide_related=true',
           type: 'soundcloud',
-          video: false,
+          video: false
         });
 
         const embed = z.util.StringUtil.format(iframe, height, link_src);
@@ -217,7 +203,7 @@ z.media.MediaEmbeds = (function() {
           height: '80px',
           src: 'https://embed.spotify.com/?uri=spotify$1',
           type: 'spotify',
-          video: false,
+          video: false
         });
 
         // convert spotify uri: album/23... -> album:23... -> album%3A23...
@@ -244,23 +230,18 @@ z.media.MediaEmbeds = (function() {
      */
     vimeo(link, message, theme_color) {
       const link_src = link.href;
-      const vimeo_color = theme_color
-        ? theme_color.replace('#', '')
-        : undefined;
+      const vimeo_color = theme_color ? theme_color.replace('#', '') : undefined;
 
       if (link_src.match(_regex.vimeo)) {
         if (z.util.StringUtil.includes(link_src, '/user')) return message;
 
         const iframe = _create_iframe_container({
           src: `https://player.vimeo.com/video/$1?portrait=0&color=${vimeo_color}&badge=0`,
-          type: 'vimeo',
+          type: 'vimeo'
         });
 
         let embed = '';
-        link_src.replace(
-          _regex.vimeo,
-          (match, group1) => (embed = iframe.replace('$1', group1)),
-        );
+        link_src.replace(_regex.vimeo, (match, group1) => (embed = iframe.replace('$1', group1)));
 
         message = _append_iframe(link, message, embed);
       }
@@ -281,7 +262,7 @@ z.media.MediaEmbeds = (function() {
       if (embed_url) {
         const iframe = _create_iframe_container({
           src: embed_url,
-          type: 'youtube',
+          type: 'youtube'
         });
 
         message = _append_iframe(link, message, iframe);
@@ -289,6 +270,6 @@ z.media.MediaEmbeds = (function() {
       }
 
       return message;
-    },
+    }
   };
 })();

@@ -38,5 +38,5 @@ z.calling.rtc.MEDIA_STREAM_ERROR = {
   SECURITY_ERROR: 'SecurityError',
   SOURCE_UNAVAILABLE_ERROR: 'SourceUnavailableError',
   TRACK_START_ERROR: 'TrackStartError',
-  TYPE_ERROR: 'TypeError',
+  TYPE_ERROR: 'TypeError'
 };

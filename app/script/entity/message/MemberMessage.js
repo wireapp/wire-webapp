@@ -34,25 +34,16 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
 
     // Users joined the conversation without sender
     this.joined_user_ets = ko.pureComputed(() => {
-      return this.user_ets()
-        .filter(user_et => user_et.id !== this.user().id)
-        .map(user_et => user_et);
+      return this.user_ets().filter(user_et => user_et.id !== this.user().id).map(user_et => user_et);
     });
 
     // Users joined the conversation without self
     this.remote_user_ets = ko.pureComputed(() => {
-      return this.user_ets()
-        .filter(user_et => !user_et.is_me)
-        .map(user_et => user_et);
+      return this.user_ets().filter(user_et => !user_et.is_me).map(user_et => user_et);
     });
 
-    this._generate_name_string = (
-      declension = z.string.Declension.ACCUSATIVE,
-    ) => {
-      return z.util.LocalizerUtil.join_names(
-        this.joined_user_ets(),
-        declension,
-      );
+    this._generate_name_string = (declension = z.string.Declension.ACCUSATIVE) => {
+      return z.util.LocalizerUtil.join_names(this.joined_user_ets(), declension);
     };
 
     this._get_caption_connection = function(user_et) {
@@ -72,15 +63,15 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
         id: key,
         replace: {
           content: this._generate_name_string(declension),
-          placeholder: '%@names',
-        },
+          placeholder: '%@names'
+        }
       });
     };
 
     this.show_large_avatar = () => {
       const large_avatar_types = [
         z.message.SystemMessageType.CONNECTION_ACCEPTED,
-        z.message.SystemMessageType.CONNECTION_REQUEST,
+        z.message.SystemMessageType.CONNECTION_REQUEST
       ];
       return large_avatar_types.includes(this.member_message_type);
     };
@@ -104,19 +95,11 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
             return this._get_caption_connection(this.other_user());
           case z.message.SystemMessageType.CONVERSATION_CREATE:
             if (this.user().is_me) {
-              return this._get_caption_with_names(
-                z.string.conversation_create_you,
-              );
+              return this._get_caption_with_names(z.string.conversation_create_you);
             }
-            return this._get_caption_with_names(
-              z.string.conversation_create,
-              z.string.Declension.DATIVE,
-            );
+            return this._get_caption_with_names(z.string.conversation_create, z.string.Declension.DATIVE);
           case z.message.SystemMessageType.CONVERSATION_RESUME:
-            return this._get_caption_with_names(
-              z.string.conversation_resume,
-              z.string.Declension.DATIVE,
-            );
+            return this._get_caption_with_names(z.string.conversation_resume, z.string.Declension.DATIVE);
           default:
             break;
         }
@@ -130,22 +113,14 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
               return z.l10n.text(z.string.conversation_member_leave_left);
             }
             if (this.user().is_me) {
-              return this._get_caption_with_names(
-                z.string.conversation_member_leave_removed_you,
-              );
+              return this._get_caption_with_names(z.string.conversation_member_leave_removed_you);
             }
-            return this._get_caption_with_names(
-              z.string.conversation_member_leave_removed,
-            );
+            return this._get_caption_with_names(z.string.conversation_member_leave_removed);
           case z.event.Backend.CONVERSATION.MEMBER_JOIN:
             if (this.user().is_me) {
-              return this._get_caption_with_names(
-                z.string.conversation_member_join_you,
-              );
+              return this._get_caption_with_names(z.string.conversation_member_join_you);
             }
-            return this._get_caption_with_names(
-              z.string.conversation_member_join,
-            );
+            return this._get_caption_with_names(z.string.conversation_member_join);
           case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE:
             return z.l10n.text(z.string.conversation_team_leave);
           default:
@@ -153,15 +128,14 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
         }
       },
       this,
-      {deferEvaluation: true},
+      {deferEvaluation: true}
     );
   }
 
   is_connection() {
-    return [
-      z.message.SystemMessageType.CONNECTION_ACCEPTED,
-      z.message.SystemMessageType.CONNECTION_REQUEST,
-    ].includes(this.member_message_type);
+    return [z.message.SystemMessageType.CONNECTION_ACCEPTED, z.message.SystemMessageType.CONNECTION_REQUEST].includes(
+      this.member_message_type
+    );
   }
 
   is_creation() {
@@ -169,7 +143,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
       z.message.SystemMessageType.CONNECTION_ACCEPTED,
       z.message.SystemMessageType.CONNECTION_REQUEST,
       z.message.SystemMessageType.CONVERSATION_CREATE,
-      z.message.SystemMessageType.CONVERSATION_RESUME,
+      z.message.SystemMessageType.CONVERSATION_RESUME
     ].includes(this.member_message_type);
   }
 };

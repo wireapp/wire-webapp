@@ -66,23 +66,19 @@ z.components.DeviceCard = class DeviceCard {
         id: z.string.preferences_devices_activated_in,
         replace: {
           content: `<span class='label-bold-xs'>${location}</span>`,
-          placeholder: '%location',
-        },
-      }),
+          placeholder: '%location'
+        }
+      })
     );
   }
 
   _update_location() {
     if (this.device && this.device.location) {
-      z.location
-        .get_location(this.device.location.lat, this.device.location.lon)
-        .then(retrieved_location => {
-          if (retrieved_location) {
-            this._update_activation_location(
-              `${retrieved_location.place}, ${retrieved_location.country_code}`,
-            );
-          }
-        });
+      z.location.get_location(this.device.location.lat, this.device.location.lon).then(retrieved_location => {
+        if (retrieved_location) {
+          this._update_activation_location(`${retrieved_location.place}, ${retrieved_location.country_code}`);
+        }
+      });
     }
   }
 };
@@ -115,6 +111,6 @@ ko.components.register('device-card', {
   viewModel: {
     createViewModel(params, component_info) {
       return new z.components.DeviceCard(params, component_info);
-    },
-  },
+    }
+  }
 });

@@ -47,8 +47,8 @@ z.links.LinkPreviewHelpers = {
       const link_offset = text.indexOf(first_link.value);
       return {
         offset: link_offset,
-        url: first_link.value,
+        url: first_link.value
       };
     }
-  },
+  }
 };

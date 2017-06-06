@@ -27,6 +27,6 @@
     highlight(code) {
       return hljs.highlightAuto(code).value;
     },
-    renderer: custom_renderer,
+    renderer: custom_renderer
   });
 })();

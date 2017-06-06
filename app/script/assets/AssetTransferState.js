@@ -27,5 +27,5 @@ z.assets.AssetTransferState = {
   UPLOAD_CANCELED: 'upload-canceled',
   UPLOAD_FAILED: 'upload-failed',
   UPLOADED: 'uploaded',
-  UPLOADING: 'uploading',
+  UPLOADING: 'uploading'
 };

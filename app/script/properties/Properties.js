@@ -29,15 +29,15 @@ z.properties.Properties = class Properties {
       notifications: z.system_notification.SystemNotificationPreference.ON,
       privacy: {
         improve_wire: true,
-        report_errors: true,
+        report_errors: true
       },
       sound: {
-        alerts: z.audio.AudioPreference.ALL,
-      },
+        alerts: z.audio.AudioPreference.ALL
+      }
     };
     this.contact_import = {
       google: undefined,
-      macos: undefined,
+      macos: undefined
     };
     this[z.properties.PROPERTIES_TYPE.HAS_CREATED_CONVERSATION] = false;
     this[z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING] = false;

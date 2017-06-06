@@ -43,10 +43,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
 
     this.conversation_repository = conversation_repository;
     this.user_repository = user_repository;
-    this.logger = new z.util.Logger(
-      'z.ViewModel.MessageListViewModel',
-      z.config.LOGGER.OPTIONS,
-    );
+    this.logger = new z.util.Logger('z.ViewModel.MessageListViewModel', z.config.LOGGER.OPTIONS);
 
     this.conversation = ko.observable(new z.entity.Conversation());
     this.center_messages = ko.pureComputed(() => {
@@ -128,9 +125,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
           this._mark_conversation_as_read_on_focus(this.conversation());
         }
 
-        this.should_scroll_to_bottom =
-          scroll_position >
-          scroll_end - z.config.SCROLL_TO_LAST_MESSAGE_THRESHOLD;
+        this.should_scroll_to_bottom = scroll_position > scroll_end - z.config.SCROLL_TO_LAST_MESSAGE_THRESHOLD;
         amplify.publish(z.event.WebApp.LIST.SCROLL, scrolled_bottom);
       }
     }, 100);
@@ -142,22 +137,14 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
       .on('focus', () => {
         if (this.mark_as_read_on_focus) {
           window.setTimeout(() => {
-            this.conversation_repository.mark_as_read(
-              this.mark_as_read_on_focus,
-            );
+            this.conversation_repository.mark_as_read(this.mark_as_read_on_focus);
             this.mark_as_read_on_focus = undefined;
           }, 1000);
         }
       });
 
-    amplify.subscribe(
-      z.event.WebApp.CONVERSATION.PEOPLE.HIDE,
-      this.hide_bubble.bind(this),
-    );
-    amplify.subscribe(
-      z.event.WebApp.CONVERSATION.INPUT.CLICK,
-      this.on_conversation_input_click.bind(this),
-    );
+    amplify.subscribe(z.event.WebApp.CONVERSATION.PEOPLE.HIDE, this.hide_bubble.bind(this));
+    amplify.subscribe(z.event.WebApp.CONVERSATION.INPUT.CLICK, this.on_conversation_input_click.bind(this));
   }
 
   /**
@@ -210,9 +197,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
 
     // Keep last read timestamp to render unread when entering conversation
     if (this.conversation().unread_event_count()) {
-      this.conversation_last_read_timestamp(
-        this.conversation().last_read_timestamp(),
-      );
+      this.conversation_last_read_timestamp(this.conversation().last_read_timestamp());
     }
 
     // @todo Rethink conversation.is_loaded
@@ -224,22 +209,13 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
       .update_participating_user_ets(conversation_et)
       .then(_conversation_et => {
         if (this.marked_message()) {
-          return this.conversation_repository.get_messages_with_offset(
-            _conversation_et,
-            this.marked_message(),
-          );
+          return this.conversation_repository.get_messages_with_offset(_conversation_et, this.marked_message());
         }
-        return this.conversation_repository.get_preceding_messages(
-          _conversation_et,
-        );
+        return this.conversation_repository.get_preceding_messages(_conversation_et);
       })
       .then(() => {
         const last_message = this.conversation().get_last_message();
-        if (
-          last_message &&
-          last_message.timestamp() ===
-            this.conversation().last_event_timestamp()
-        ) {
+        if (last_message && last_message.timestamp() === this.conversation().last_event_timestamp()) {
           this.conversation_reached_bottom = true;
         }
         conversation_et.is_loaded(true);
@@ -265,9 +241,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
       window.setTimeout(() => {
         const is_current_conversation = conversation_et === this.conversation();
         if (!is_current_conversation) {
-          this.logger.info(
-            `Skipped re-loading current conversation '${conversation_et.display_name()}'`,
-          );
+          this.logger.info(`Skipped re-loading current conversation '${conversation_et.display_name()}'`);
           return resolve();
         }
 
@@ -284,10 +258,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
           if (this.marked_message()) {
             this._focus_message(this.marked_message());
           } else if (unread_message.length) {
-            const unread_message_position = unread_message
-              .parent()
-              .parent()
-              .position();
+            const unread_message_position = unread_message.parent().parent().position();
 
             messages_container.scroll_by(unread_message_position.top);
           } else {
@@ -301,7 +272,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
         this.messages_subscription = conversation_et.messages_visible.subscribe(
           this._on_message_add,
           null,
-          'arrayChange',
+          'arrayChange'
         );
         resolve();
       }, 100);
@@ -325,17 +296,13 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
 
     if (last_message) {
       // Message was prepended
-      if (
-        last_message.timestamp() !== this.conversation().last_event_timestamp()
-      ) {
+      if (last_message.timestamp() !== this.conversation().last_event_timestamp()) {
         return;
       }
 
       // Scroll to bottom if self user send the message
       if (last_message.from === this.user_repository.self().id) {
-        window.requestAnimationFrame(() =>
-          messages_container.scroll_to_bottom(),
-        );
+        window.requestAnimationFrame(() => messages_container.scroll_to_bottom());
         return;
       }
     }
@@ -360,21 +327,16 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
    * @returns {undefined} No return value
    */
   _pull_messages() {
-    if (
-      !this.conversation().is_pending() &&
-      this.conversation().has_further_messages()
-    ) {
+    if (!this.conversation().is_pending() && this.conversation().has_further_messages()) {
       const inner_container = $('.messages-wrap').children()[0];
       const old_list_height = inner_container.scrollHeight;
 
       this.capture_scrolling_event = false;
-      this.conversation_repository
-        .get_preceding_messages(this.conversation())
-        .then(() => {
-          const new_list_height = inner_container.scrollHeight;
-          $('.messages-wrap').scrollTop(new_list_height - old_list_height);
-          this.capture_scrolling_event = true;
-        });
+      this.conversation_repository.get_preceding_messages(this.conversation()).then(() => {
+        const new_list_height = inner_container.scrollHeight;
+        $('.messages-wrap').scrollTop(new_list_height - old_list_height);
+        this.capture_scrolling_event = true;
+      });
     }
   }
 
@@ -410,9 +372,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
 
     if (message_element.length) {
       const message_list_element = $('.messages-wrap');
-      message_list_element.scroll_by(
-        message_element.offset().top - message_list_element.height() / 2,
-      );
+      message_list_element.scroll_by(message_element.offset().top - message_list_element.height() / 2);
     }
   }
 
@@ -443,12 +403,8 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
     const list_height = $('.message-list').height();
     const element_rect = element.getBoundingClientRect();
     const element_distance_top = element_rect.top;
-    const element_distance_bottom =
-      list_height - element_rect.top - element_rect.height;
-    const largest_distance = Math.max(
-      element_distance_top,
-      element_distance_bottom,
-    );
+    const element_distance_bottom = list_height - element_rect.top - element_rect.height;
+    const largest_distance = Math.max(element_distance_top, element_distance_bottom);
     const difference = BUBBLE_HEIGHT - largest_distance;
 
     const create_bubble = element_id => {
@@ -464,7 +420,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
         on_show() {
           amplify.publish(z.event.WebApp.PEOPLE.SHOW, user_et);
         },
-        scroll_selector: '.messages-wrap',
+        scroll_selector: '.messages-wrap'
       });
       this.participant_bubble.toggle();
     };
@@ -475,10 +431,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
       }
 
       // We clicked on the same bubble
-      if (
-        this.participant_bubble &&
-        this.participant_bubble_last_id === element.id
-      ) {
+      if (this.participant_bubble && this.participant_bubble_last_id === element.id) {
         this.participant_bubble.toggle();
         return;
       }
@@ -516,19 +469,12 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
     const reset_progress = () =>
       window.setTimeout(function() {
         message_et.is_resetting_session(false);
-        amplify.publish(
-          z.event.WebApp.WARNING.MODAL,
-          z.ViewModel.ModalType.SESSION_RESET,
-        );
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.SESSION_RESET);
       }, 550);
 
     message_et.is_resetting_session(true);
     this.conversation_repository
-      .reset_session(
-        message_et.from,
-        message_et.client_id,
-        this.conversation().id,
-      )
+      .reset_session(message_et.from, message_et.client_id, this.conversation().id)
       .then(() => reset_progress())
       .catch(() => reset_progress());
   }
@@ -573,10 +519,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
       case z.message.SuperType.PING:
         return 'message-ping';
       case z.message.SuperType.SYSTEM:
-        if (
-          message.system_message_type ===
-          z.message.SystemMessageType.CONVERSATION_RENAME
-        ) {
+        if (message.system_message_type === z.message.SystemMessageType.CONVERSATION_RENAME) {
           return 'message-system message-rename';
         }
         break;
@@ -595,17 +538,11 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
    * @returns {undefined} No return value
    */
   _track_context_menu(message_et) {
-    amplify.publish(
-      z.event.WebApp.ANALYTICS.EVENT,
-      z.tracking.EventName.CONVERSATION.SELECTED_MESSAGE,
-      {
-        context: 'single',
-        conversation_type: z.tracking.helpers.get_conversation_type(
-          this.conversation(),
-        ),
-        type: z.tracking.helpers.get_message_type(message_et),
-      },
-    );
+    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.SELECTED_MESSAGE, {
+      context: 'single',
+      conversation_type: z.tracking.helpers.get_conversation_type(this.conversation()),
+      type: z.tracking.helpers.get_message_type(message_et)
+    });
   }
 
   /**
@@ -616,33 +553,19 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
    * @returns {undefined} No return value
    */
   show_detail(message_et, event) {
-    if (
-      message_et.is_expired() ||
-      $(event.currentTarget).hasClass('image-loading')
-    ) {
+    if (message_et.is_expired() || $(event.currentTarget).hasClass('image-loading')) {
       return;
     }
 
     this.conversation_repository
-      .get_events_for_category(
-        this.conversation(),
-        z.message.MessageCategory.IMAGE,
-      )
+      .get_events_for_category(this.conversation(), z.message.MessageCategory.IMAGE)
       .then(function(items) {
         const message_ets = items.filter(
-          item =>
-            item.category & z.message.MessageCategory.IMAGE &&
-            !(item.category & z.message.MessageCategory.GIF),
+          item => item.category & z.message.MessageCategory.IMAGE && !(item.category & z.message.MessageCategory.GIF)
         );
-        const [image_message_et] = message_ets.filter(
-          item => item.id === message_et.id,
-        );
+        const [image_message_et] = message_ets.filter(item => item.id === message_et.id);
 
-        amplify.publish(
-          z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW,
-          image_message_et || message_et,
-          message_ets,
-        );
+        amplify.publish(z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, image_message_et || message_et, message_ets);
       });
   }
 
@@ -653,9 +576,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
         return '';
       }
 
-      if (
-        last_message.timestamp() === this.conversation_last_read_timestamp()
-      ) {
+      if (last_message.timestamp() === this.conversation_last_read_timestamp()) {
         return 'message-timestamp-visible message-timestamp-unread';
       }
 
@@ -688,11 +609,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
     }
 
     const last_message = this.conversation().get_previous_message(message_et);
-    return (
-      last_message &&
-      last_message.is_content() &&
-      last_message.user().id === message_et.user().id
-    );
+    return last_message && last_message.is_content() && last_message.user().id === message_et.user().id;
   }
 
   /**
@@ -706,20 +623,13 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
 
   click_on_cancel_request(message_et) {
     const next_conversation_et = this.conversation_repository.get_next_conversation(
-      this.conversation_repository.active_conversation(),
+      this.conversation_repository.active_conversation()
     );
-    this.user_repository.cancel_connection_request(
-      message_et.other_user(),
-      next_conversation_et,
-    );
+    this.user_repository.cancel_connection_request(message_et.other_user(), next_conversation_et);
   }
 
   click_on_like(message_et, button = true) {
-    this.conversation_repository.toggle_like(
-      this.conversation(),
-      message_et,
-      button,
-    );
+    this.conversation_repository.toggle_like(this.conversation(), message_et, button);
   }
 
   /**
@@ -755,54 +665,39 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
     if (message_et.is_downloadable() && !message_et.is_ephemeral()) {
       entries.push({
         click: () => message_et.download(),
-        label: z.string.conversation_context_menu_download,
+        label: z.string.conversation_context_menu_download
       });
     }
 
-    if (
-      message_et.is_reactable() &&
-      !this.conversation().removed_from_conversation()
-    ) {
+    if (message_et.is_reactable() && !this.conversation().removed_from_conversation()) {
       if (message_et.is_liked()) {
         entries.push({
           click: () => this.click_on_like(message_et, false),
-          label: z.string.conversation_context_menu_unlike,
+          label: z.string.conversation_context_menu_unlike
         });
       } else {
         entries.push({
           click: () => this.click_on_like(message_et, false),
-          label: z.string.conversation_context_menu_like,
+          label: z.string.conversation_context_menu_like
         });
       }
     }
 
-    if (
-      message_et.is_editable() &&
-      !this.conversation().removed_from_conversation()
-    ) {
+    if (message_et.is_editable() && !this.conversation().removed_from_conversation()) {
       entries.push({
-        click: () =>
-          amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.EDIT, message_et),
-        label: z.string.conversation_context_menu_edit,
+        click: () => amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.EDIT, message_et),
+        label: z.string.conversation_context_menu_edit
       });
     }
 
     if (message_et.is_deletable()) {
       entries.push({
         click: () => {
-          amplify.publish(
-            z.event.WebApp.WARNING.MODAL,
-            z.ViewModel.ModalType.DELETE_MESSAGE,
-            {
-              action: () =>
-                this.conversation_repository.delete_message(
-                  this.conversation(),
-                  message_et,
-                ),
-            },
-          );
+          amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.DELETE_MESSAGE, {
+            action: () => this.conversation_repository.delete_message(this.conversation(), message_et)
+          });
         },
-        label: z.string.conversation_context_menu_delete,
+        label: z.string.conversation_context_menu_delete
       });
     }
 
@@ -813,19 +708,11 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
     ) {
       entries.push({
         click: () => {
-          amplify.publish(
-            z.event.WebApp.WARNING.MODAL,
-            z.ViewModel.ModalType.DELETE_EVERYONE_MESSAGE,
-            {
-              action: () =>
-                this.conversation_repository.delete_message_everyone(
-                  this.conversation(),
-                  message_et,
-                ),
-            },
-          );
+          amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.DELETE_EVERYONE_MESSAGE, {
+            action: () => this.conversation_repository.delete_message_everyone(this.conversation(), message_et)
+          });
         },
-        label: z.string.conversation_context_menu_delete_everyone,
+        label: z.string.conversation_context_menu_delete_everyone
       });
     }
 

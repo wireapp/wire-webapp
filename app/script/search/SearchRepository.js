@@ -43,14 +43,9 @@ z.search.SearchRepository = class SearchRepository {
   constructor(search_service, user_repository) {
     this.search_service = search_service;
     this.user_repository = user_repository;
-    this.logger = new z.util.Logger(
-      'z.search.SearchRepository',
-      z.config.LOGGER.OPTIONS,
-    );
+    this.logger = new z.util.Logger('z.search.SearchRepository', z.config.LOGGER.OPTIONS);
 
-    this.search_result_mapper = new z.search.SearchResultMapper(
-      this.user_repository,
-    );
+    this.search_result_mapper = new z.search.SearchResultMapper(this.user_repository);
   }
 
   /**
@@ -63,34 +58,19 @@ z.search.SearchRepository = class SearchRepository {
   search_by_name(name, is_username, max_results = 10) {
     return this.search_service
       .get_contacts(name, 30)
-      .then(({documents: matches}) =>
-        this.search_result_mapper.map_results(
-          matches,
-          z.search.SEARCH_MODE.CONTACTS,
-        ),
-      )
+      .then(({documents: matches}) => this.search_result_mapper.map_results(matches, z.search.SEARCH_MODE.CONTACTS))
       .then(({results, mode}) => this._prepare_search_result(results, mode))
       .then(user_ets => {
         if (is_username) {
-          user_ets = user_ets.filter(user_et =>
-            z.util.StringUtil.starts_with(user_et.username(), name),
-          );
+          user_ets = user_ets.filter(user_et => z.util.StringUtil.starts_with(user_et.username(), name));
         }
 
         return user_ets
           .sort((user_a, user_b) => {
             if (is_username) {
-              return z.util.StringUtil.sort_by_priority(
-                user_a.username(),
-                user_b.username(),
-                name,
-              );
+              return z.util.StringUtil.sort_by_priority(user_a.username(), user_b.username(), name);
             }
-            return z.util.StringUtil.sort_by_priority(
-              user_a.name(),
-              user_b.name(),
-              name,
-            );
+            return z.util.StringUtil.sort_by_priority(user_a.name(), user_b.name(), name);
           })
           .slice(0, max_results);
       });
@@ -110,16 +90,14 @@ z.search.SearchRepository = class SearchRepository {
       .then(suggested_user_ets => {
         let connections_promise;
         if (response['auto-connects'] && response['auto-connects'].length) {
-          connections_promise = this.user_repository.get_user_by_id(
-            response['auto-connects'].map(result => result.id),
-          );
+          connections_promise = this.user_repository.get_user_by_id(response['auto-connects'].map(result => result.id));
         } else {
           connections_promise = Promise.resolve([]);
         }
         return connections_promise.then(function(connected_user_ets) {
           return {
             connections: connected_user_ets,
-            suggestions: suggested_user_ets,
+            suggestions: suggested_user_ets
           };
         });
       });
@@ -135,35 +113,30 @@ z.search.SearchRepository = class SearchRepository {
    * @returns {Promise} Resolves with search results
    */
   _prepare_search_result(search_ets, search_mode) {
-    return this.user_repository
-      .get_users_by_id(search_ets.map(result => result.id))
-      .then(function(user_ets) {
-        return user_ets
-          .map(function(user_et) {
-            const search_et = ko.utils.arrayFirst(
-              search_ets,
-              user => user.id === user_et.id,
-            );
-            user_et.mutual_friends_total(search_et.mutual_friends_total);
+    return this.user_repository.get_users_by_id(search_ets.map(result => result.id)).then(function(user_ets) {
+      return user_ets
+        .map(function(user_et) {
+          const search_et = ko.utils.arrayFirst(search_ets, user => user.id === user_et.id);
+          user_et.mutual_friends_total(search_et.mutual_friends_total);
 
-            /*
+          /*
          Skipping some results to adjust for slow backend updates.
 
          Only show connected people among your top people.
          Do not show already connected people when uploading address book.
          */
-            switch (search_mode) {
-              case z.search.SEARCH_MODE.CONTACTS:
-              case z.search.SEARCH_MODE.ON_BOARDING:
-                if (!user_et.is_connected()) {
-                  return user_et;
-                }
-                break;
-              default:
+          switch (search_mode) {
+            case z.search.SEARCH_MODE.CONTACTS:
+            case z.search.SEARCH_MODE.ON_BOARDING:
+              if (!user_et.is_connected()) {
                 return user_et;
-            }
-          })
-          .filter(user_et => user_et != null);
-      });
+              }
+              break;
+            default:
+              return user_et;
+          }
+        })
+        .filter(user_et => user_et != null);
+    });
   }
 };

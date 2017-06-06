@@ -36,5 +36,5 @@ z.message.SystemMessageType = {
   CONVERSATION_RESUME: 'resume',
   MEMBER_JOIN: 'join',
   MEMBER_LEAVE: 'leave',
-  NORMAL: 'normal',
+  NORMAL: 'normal'
 };

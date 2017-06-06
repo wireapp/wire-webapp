@@ -30,5 +30,5 @@ z.message.VerificationMessageType = {
   NEW_DEVICE: 'new-device',
   NEW_MEMBER: 'new-member',
   UNVERIFIED: 'unverified',
-  VERIFIED: 'verified',
+  VERIFIED: 'verified'
 };

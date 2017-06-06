@@ -25,7 +25,7 @@ window.z.team = z.team || {};
 z.team.TeamService = class TeamService {
   static get URL() {
     return {
-      TEAMS: '/teams',
+      TEAMS: '/teams'
     };
   }
 
@@ -36,34 +36,27 @@ z.team.TeamService = class TeamService {
    */
   constructor(client) {
     this.client = client;
-    this.logger = new z.util.Logger(
-      'z.team.TeamService',
-      z.config.LOGGER.OPTIONS,
-    );
+    this.logger = new z.util.Logger('z.team.TeamService', z.config.LOGGER.OPTIONS);
   }
 
   delete_member(team_id, user_id) {
     return this.client.send_json({
       type: 'DELETE',
-      url: this.client.create_url(
-        `${TeamService.URL.TEAMS}/${team_id}/members/${user_id}`,
-      ),
+      url: this.client.create_url(`${TeamService.URL.TEAMS}/${team_id}/members/${user_id}`)
     });
   }
 
   delete_team() {
     return this.client.send_json({
       type: 'DELETE',
-      url: this.client.create_url(TeamService.URL.TEAMS),
+      url: this.client.create_url(TeamService.URL.TEAMS)
     });
   }
 
   get_team_members(team_id) {
     return this.client.send_request({
       type: 'GET',
-      url: this.client.create_url(
-        `${TeamService.URL.TEAMS}/${team_id}/members`,
-      ),
+      url: this.client.create_url(`${TeamService.URL.TEAMS}/${team_id}/members`)
     });
   }
 
@@ -71,29 +64,27 @@ z.team.TeamService = class TeamService {
     return this.client.send_request({
       data: {
         size: limit,
-        start: team_ids,
+        start: team_ids
       },
       type: 'GET',
-      url: this.client.create_url(TeamService.URL.TEAMS),
+      url: this.client.create_url(TeamService.URL.TEAMS)
     });
   }
 
   get_team_metadata(team_id) {
     return this.client.send_request({
       type: 'GET',
-      url: this.client.create_url(`${TeamService.URL.TEAMS}/${team_id}`),
+      url: this.client.create_url(`${TeamService.URL.TEAMS}/${team_id}`)
     });
   }
 
   post_members(team_id, members) {
     return this.client.send_json({
       data: {
-        members: members,
+        members: members
       },
       type: 'POST',
-      url: this.client.create_url(
-        `${TeamService.URL.TEAMS}/${team_id}/members`,
-      ),
+      url: this.client.create_url(`${TeamService.URL.TEAMS}/${team_id}/members`)
     });
   }
 
@@ -103,10 +94,10 @@ z.team.TeamService = class TeamService {
         icon: icon,
         icon_key: icon_key,
         members: members,
-        name: name,
+        name: name
       },
       type: 'POST',
-      url: this.client.create_url(TeamService.URL.TEAMS),
+      url: this.client.create_url(TeamService.URL.TEAMS)
     });
   }
 
@@ -115,10 +106,10 @@ z.team.TeamService = class TeamService {
       data: {
         icon: icon,
         icon_key: icon_key,
-        name: name,
+        name: name
       },
       type: 'PUT',
-      url: this.client.create_url(`${TeamService.URL.TEAMS}/${team_id}`),
+      url: this.client.create_url(`${TeamService.URL.TEAMS}/${team_id}`)
     });
   }
 };

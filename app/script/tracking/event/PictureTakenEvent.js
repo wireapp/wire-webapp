@@ -39,7 +39,7 @@ z.tracking.event.PictureTakenEvent = class PictureTakenEvent {
     this.attributes = {
       context: this.context,
       source: this.source,
-      trigger: this.trigger,
+      trigger: this.trigger
     };
   }
 };

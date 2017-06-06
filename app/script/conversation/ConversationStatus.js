@@ -25,5 +25,5 @@ window.z.conversation = z.conversation || {};
 // Enum of a user's participation status in a conversation.
 z.conversation.ConversationStatus = {
   CURRENT_MEMBER: 0,
-  PAST_MEMBER: 1,
+  PAST_MEMBER: 1
 };

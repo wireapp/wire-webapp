@@ -121,6 +121,6 @@ ko.components.register('media-button', {
   viewModel: {
     createViewModel(params, component_info) {
       return new z.components.MediaButtonComponent(params, component_info);
-    },
-  },
+    }
+  }
 });

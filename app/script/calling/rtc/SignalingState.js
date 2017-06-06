@@ -32,5 +32,5 @@ z.calling.rtc.SIGNALING_STATE = {
   NEW: 'new',
   REMOTE_OFFER: 'have-remote-offer',
   REMOTE_PROVISIONAL_ANSWER: 'have-remote-pranswer',
-  STABLE: 'stable',
+  STABLE: 'stable'
 };

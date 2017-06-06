@@ -34,7 +34,7 @@ describe('z.util.Crypto', function() {
       '62e52f9e-0a69-49eb-9a02-b89e440f8950': 3345908844,
       'fb303c6d-aa88-4ddc-81c1-fc51e5fc0ed8': 3615181544,
       '17fa9af0-5e83-4b10-a3e6-0059591fabea': 3869474815,
-      'e1b6e9f0-aafd-4ba9-8030-6dd053531afd': 4118671235,
+      'e1b6e9f0-aafd-4ba9-8030-6dd053531afd': 4118671235
     };
     /* eslint-enable sort-keys */
 
@@ -71,9 +71,7 @@ describe('z.util.Crypto', function() {
 
     it('returns the same value for upper and lowercase strings', function() {
       const key = 'E1b6e9f0-aafd-4ba9-8030-6Dd053531afd';
-      expect(z.util.Crypto.Hashing.joaat_hash(key)).toEqual(
-        sample[key.toLowerCase()],
-      );
+      expect(z.util.Crypto.Hashing.joaat_hash(key)).toEqual(sample[key.toLowerCase()]);
     });
   });
 });

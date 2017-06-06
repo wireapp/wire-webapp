@@ -28,5 +28,5 @@ window.z.message = z.message || {};
  */
 z.message.ReactionType = {
   LIKE: '❤️',
-  NONE: '',
+  NONE: ''
 };

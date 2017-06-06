@@ -29,10 +29,7 @@ z.extension.GiphyRepository = class GiphyRepository {
    */
   constructor(giphy_service) {
     this.giphy_service = giphy_service;
-    this.logger = new z.util.Logger(
-      'z.extension.GiphyRepository',
-      z.config.LOGGER.OPTIONS,
-    );
+    this.logger = new z.util.Logger('z.extension.GiphyRepository', z.config.LOGGER.OPTIONS);
     this.gif_query_cache = {};
   }
 
@@ -49,16 +46,14 @@ z.extension.GiphyRepository = class GiphyRepository {
     options = $.extend(
       {
         max_size: 3 * 1024 * 1024,
-        retry: 3,
+        retry: 3
       },
-      options,
+      options
     );
 
     const _get_random_gif = (retries = 0) => {
       if (options.retry === retries) {
-        throw new Error(
-          `Unable to fetch a proper gif within ${options.retry} retries`,
-        );
+        throw new Error(`Unable to fetch a proper gif within ${options.retry} retries`);
       }
 
       return this.giphy_service
@@ -67,21 +62,18 @@ z.extension.GiphyRepository = class GiphyRepository {
           return this.giphy_service.get_by_id(random_gif.id);
         })
         .then(({data: {images, url}}) => {
-          const static_gif =
-            images[z.extension.GiphyContentSizes.FIXED_WIDTH_STILL];
+          const static_gif = images[z.extension.GiphyContentSizes.FIXED_WIDTH_STILL];
           const animated_gif = images[z.extension.GiphyContentSizes.DOWNSIZED];
 
           if (animated_gif.size > options.max_size) {
-            this.logger.info(
-              `Gif size (${animated_gif.size}) is over maximum size (${animated_gif.size})`,
-            );
+            this.logger.info(`Gif size (${animated_gif.size}) is over maximum size (${animated_gif.size})`);
             return _get_random_gif(retries + 1);
           }
 
           return {
             animated: animated_gif.url,
             static: static_gif.url,
-            url: url,
+            url: url
           };
         });
     };
@@ -108,9 +100,9 @@ z.extension.GiphyRepository = class GiphyRepository {
         max_size: 3 * 1024 * 1024,
         number: 6,
         random: true,
-        sorting: 'relevant',
+        sorting: 'relevant'
       },
-      options,
+      options
     );
 
     if (!options.query) {
@@ -138,7 +130,7 @@ z.extension.GiphyRepository = class GiphyRepository {
         limit: 100,
         offset: offset,
         query: options.query,
-        sorting: options.sorting,
+        sorting: options.sorting
       })
       .then(({data: gifs, pagination}) => {
         const result = [];
@@ -153,15 +145,14 @@ z.extension.GiphyRepository = class GiphyRepository {
 
         for (const gif of gifs.slice(0, options.number)) {
           const {images} = gif;
-          const static_gif =
-            images[z.extension.GiphyContentSizes.FIXED_WIDTH_STILL];
+          const static_gif = images[z.extension.GiphyContentSizes.FIXED_WIDTH_STILL];
           const animation_gif = images[z.extension.GiphyContentSizes.DOWNSIZED];
 
           if (animation_gif.size <= options.max_size) {
             result.push({
               animated: animation_gif.url,
               static: static_gif.url,
-              url: gif.url,
+              url: gif.url
             });
           }
         }
@@ -169,10 +160,7 @@ z.extension.GiphyRepository = class GiphyRepository {
         return result;
       })
       .catch(error => {
-        this.logger.info(
-          `Unable to fetch gif for query: ${options.query}`,
-          error,
-        );
+        this.logger.info(`Unable to fetch gif for query: ${options.query}`, error);
         throw error;
       });
   }

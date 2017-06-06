@@ -93,6 +93,6 @@ z.message.MessageCategorization = (function() {
   };
 
   return {
-    category_from_event: _category_from_event,
+    category_from_event: _category_from_event
   };
 })();

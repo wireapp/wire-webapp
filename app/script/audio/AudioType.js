@@ -32,5 +32,5 @@ z.audio.AudioType = {
   OUTGOING_CALL: 'ringing_from_me',
   OUTGOING_PING: 'ping_from_me',
   READY_TO_TALK: 'ready_to_talk',
-  TALK_LATER: 'talk_later',
+  TALK_LATER: 'talk_later'
 };

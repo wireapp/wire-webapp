@@ -25,5 +25,5 @@ window.z.calling.enum = z.calling.enum || {};
 
 z.calling.enum.PROTOCOL = {
   VERSION_2: '2.0',
-  VERSION_3: '3.0',
+  VERSION_3: '3.0'
 };

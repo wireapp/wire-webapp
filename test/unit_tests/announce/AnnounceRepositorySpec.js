@@ -41,8 +41,7 @@ describe('z.announce.AnnounceRepository', function() {
           created: '2016-05-25T09:12:53.316350',
           id: 5656058538229760,
           key: 'ag5lfndpcmUtd2Vic2l0ZXIVCxIIQW5ub3VuY2UYgICAgPyEhgoM',
-          link:
-            'https://medium.com/@wireapp/safe-harbor-and-data-privacy-at-wire-86aa7b43d435',
+          link: 'https://medium.com/@wireapp/safe-harbor-and-data-privacy-at-wire-86aa7b43d435',
           message: 'Safe Harbor and data privacy at Wire..',
           modified: '2016-05-25T12:56:17.363980',
           production: true,
@@ -50,7 +49,7 @@ describe('z.announce.AnnounceRepository', function() {
           title: 'New Blog post',
           version: 1464166352,
           version_max: 'dev',
-          version_min: '2016.04.14.0921',
+          version_min: '2016.04.14.0921'
         },
         {
           active: true,
@@ -65,17 +64,17 @@ describe('z.announce.AnnounceRepository', function() {
           title: 'Click me to refresh..',
           version: 1464166352,
           version_max: '2016.06.14.0921',
-          version_min: 'dev',
-        },
+          version_min: 'dev'
+        }
       ],
-      status: 'success',
+      status: 'success'
     };
 
-    server.respondWith(
-      'GET',
-      'https://staging-website.zinfra.io/api/v1/announce/?order=created&active=true',
-      [200, {'Content-Type': 'application/json'}, JSON.stringify(response)],
-    );
+    server.respondWith('GET', 'https://staging-website.zinfra.io/api/v1/announce/?order=created&active=true', [
+      200,
+      {'Content-Type': 'application/json'},
+      JSON.stringify(response)
+    ]);
   });
 
   afterEach(function() {
@@ -83,9 +82,6 @@ describe('z.announce.AnnounceRepository', function() {
   });
 
   it('can fetch an announcement', function(done) {
-    TestFactory.announce_repository
-      .check_announcements()
-      .then(done)
-      .catch(done.fail);
+    TestFactory.announce_repository.check_announcements().then(done).catch(done.fail);
   });
 });

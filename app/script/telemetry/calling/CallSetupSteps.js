@@ -31,5 +31,5 @@ z.telemetry.calling.CallSetupSteps = {
   PEER_CONNECTION_CREATED: 'peer_connection_created',
   REMOTE_SDP_SET: 'remote_sdp_set',
   STARTED: 'started',
-  STREAM_RECEIVED: 'stream_received',
+  STREAM_RECEIVED: 'stream_received'
 };

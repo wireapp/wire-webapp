@@ -36,5 +36,5 @@ ko.components.register('group-avatar', {
       <!-- /ko -->
     </div>
   `,
-  viewModel: z.components.GroupAvatar,
+  viewModel: z.components.GroupAvatar
 });

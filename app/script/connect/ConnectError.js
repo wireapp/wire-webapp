@@ -54,7 +54,7 @@ z.connect.ConnectError = class ConnectError extends Error {
       GOOGLE_DOWNLOAD: 'z.connect.ConnectError.TYPE.GOOGLE_DOWNLOAD',
       NO_CONTACTS: 'z.connect.ConnectError.TYPE.NO_CONTACTS',
       UNKNOWN: 'z.connect.ConnectError.TYPE.UNKNOWN',
-      UPLOAD: 'z.connect.ConnectError.TYPE.UPLOAD',
+      UPLOAD: 'z.connect.ConnectError.TYPE.UPLOAD'
     };
   }
 };

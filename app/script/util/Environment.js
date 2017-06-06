@@ -27,7 +27,7 @@ window.z.util = z.util || {};
     LOCALHOST: 'localhost',
     PROD_NEXT: 'wire-webapp-prod-next.wire.com',
     PRODUCTION: 'app.wire.com',
-    VIRTUAL_HOST: 'wire.ms', // The domain "wire.ms" is our virtual host for testing contact uploads
+    VIRTUAL_HOST: 'wire.ms' // The domain "wire.ms" is our virtual host for testing contact uploads
   };
 
   const BROWSER_NAME = {
@@ -35,12 +35,12 @@ window.z.util = z.util || {};
     EDGE: 'Microsoft Edge',
     ELECTRON: 'Electron',
     FIREFOX: 'Firefox',
-    OPERA: 'Opera',
+    OPERA: 'Opera'
   };
 
   const PLATFORM_NAME = {
     MACINTOSH: 'Mac',
-    WINDOWS: 'Win',
+    WINDOWS: 'Win'
   };
 
   const _check = {
@@ -96,7 +96,7 @@ window.z.util = z.util || {};
         return true;
       }
       return this.is_firefox();
-    },
+    }
   };
 
   const os = {
@@ -105,14 +105,12 @@ window.z.util = z.util || {};
     },
     is_windows() {
       return navigator.platform.includes(PLATFORM_NAME.WINDOWS);
-    },
+    }
   };
 
   // add body information
   const os_css_class = os.is_mac() ? 'os-mac' : 'os-pc';
-  const platform_css_class = _check.is_electron()
-    ? 'platform-electron'
-    : 'platform-web';
+  const platform_css_class = _check.is_electron() ? 'platform-electron' : 'platform-web';
   $(document.body).addClass(`${os_css_class} ${platform_css_class}`);
 
   const app_version = function() {
@@ -130,24 +128,18 @@ window.z.util = z.util || {};
   z.util.Environment = {
     backend: {
       account_url: function() {
-        if (
-          z.util.Environment.backend.current ===
-          z.service.BackendEnvironment.PRODUCTION
-        ) {
+        if (z.util.Environment.backend.current === z.service.BackendEnvironment.PRODUCTION) {
           return z.config.ACCOUNT_PRODUCTION_URL;
         }
         return z.config.ACCOUNT_STAGING_URL;
       },
       current: undefined,
       website_url: function() {
-        if (
-          z.util.Environment.backend.current ===
-          z.service.BackendEnvironment.PRODUCTION
-        ) {
+        if (z.util.Environment.backend.current === z.service.BackendEnvironment.PRODUCTION) {
           return z.config.WEBSITE_PRODUCTION_URL;
         }
         return z.config.WEBSITE_STAGING_URL;
-      },
+      }
     },
     browser: {
       chrome: _check.is_chrome(),
@@ -160,27 +152,23 @@ window.z.util = z.util || {};
         calling: _check.supports_calling(),
         media_devices: _check.supports_media_devices(),
         notifications: _check.supports_notifications(),
-        screen_sharing: _check.supports_screen_sharing(),
+        screen_sharing: _check.supports_screen_sharing()
       },
-      version: _check.get_version(),
+      version: _check.get_version()
     },
     electron: _check.is_electron(),
     frontend: {
       is_localhost() {
-        return [APP_ENV.LOCALHOST, APP_ENV.VIRTUAL_HOST].includes(
-          window.location.hostname,
-        );
+        return [APP_ENV.LOCALHOST, APP_ENV.VIRTUAL_HOST].includes(window.location.hostname);
       },
       is_production() {
-        return [APP_ENV.PRODUCTION, APP_ENV.PROD_NEXT].includes(
-          window.location.hostname,
-        );
-      },
+        return [APP_ENV.PRODUCTION, APP_ENV.PROD_NEXT].includes(window.location.hostname);
+      }
     },
     os: {
       linux: !os.is_mac() && !os.is_windows(),
       mac: os.is_mac(),
-      win: os.is_windows(),
+      win: os.is_windows()
     },
     version: function(show_wrapper_version = true, do_not_format = false) {
       if (z.util.Environment.frontend.is_localhost()) {
@@ -196,6 +184,6 @@ window.z.util = z.util || {};
       }
 
       return formatted_app_version();
-    },
+    }
   };
 })();

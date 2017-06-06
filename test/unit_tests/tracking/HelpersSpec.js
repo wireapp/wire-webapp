@@ -24,22 +24,18 @@
 describe('z.tracking.helpers', function() {
   describe('get_conversation_type', function() {
     it('returns correct type for one on one conversation', function() {
-      const conversation_et = new z.entity.Conversation(
-        z.util.create_random_uuid(),
-      );
+      const conversation_et = new z.entity.Conversation(z.util.create_random_uuid());
       conversation_et.type(z.conversation.ConversationType.ONE2ONE);
       expect(z.tracking.helpers.get_conversation_type(conversation_et)).toBe(
-        z.tracking.attribute.ConversationType.ONE_TO_ONE,
+        z.tracking.attribute.ConversationType.ONE_TO_ONE
       );
     });
 
     it('returns correct type for group conversation', function() {
-      const conversation_et = new z.entity.Conversation(
-        z.util.create_random_uuid(),
-      );
+      const conversation_et = new z.entity.Conversation(z.util.create_random_uuid());
       conversation_et.type(z.conversation.ConversationType.GROUP);
       expect(z.tracking.helpers.get_conversation_type(conversation_et)).toBe(
-        z.tracking.attribute.ConversationType.GROUP,
+        z.tracking.attribute.ConversationType.GROUP
       );
     });
 
@@ -53,37 +49,31 @@ describe('z.tracking.helpers', function() {
     it('returns correct type for text message', function() {
       const message_et = new z.entity.ContentMessage();
       message_et.add_asset(new z.entity.Text());
-      expect(z.tracking.helpers.get_message_type(message_et)).toBe(
-        z.tracking.attribute.MessageType.TEXT,
-      );
+      expect(z.tracking.helpers.get_message_type(message_et)).toBe(z.tracking.attribute.MessageType.TEXT);
     });
 
     it('returns correct type for image message', function() {
       const message_et = new z.entity.ContentMessage();
       message_et.add_asset(new z.entity.MediumImage());
-      expect(z.tracking.helpers.get_message_type(message_et)).toBe(
-        z.tracking.attribute.MessageType.IMAGE,
-      );
+      expect(z.tracking.helpers.get_message_type(message_et)).toBe(z.tracking.attribute.MessageType.IMAGE);
     });
 
     it('returns correct type for text message', function() {
       const message_et = new z.entity.ContentMessage();
       message_et.add_asset(new z.entity.File());
-      expect(z.tracking.helpers.get_message_type(message_et)).toBe(
-        z.tracking.attribute.MessageType.FILE,
-      );
+      expect(z.tracking.helpers.get_message_type(message_et)).toBe(z.tracking.attribute.MessageType.FILE);
     });
 
     it('returns correct type for ping message', function() {
-      expect(
-        z.tracking.helpers.get_message_type(new z.entity.PingMessage()),
-      ).toBe(z.tracking.attribute.MessageType.PING);
+      expect(z.tracking.helpers.get_message_type(new z.entity.PingMessage())).toBe(
+        z.tracking.attribute.MessageType.PING
+      );
     });
 
     it('returns correct type for system message', function() {
-      expect(
-        z.tracking.helpers.get_message_type(new z.entity.SystemMessage()),
-      ).toBe(z.tracking.attribute.MessageType.SYSTEM);
+      expect(z.tracking.helpers.get_message_type(new z.entity.SystemMessage())).toBe(
+        z.tracking.attribute.MessageType.SYSTEM
+      );
     });
 
     it('returns undefined if type cannot be determined', function() {

@@ -52,5 +52,5 @@ ko.components.register('accent-color-picker', {
       <label data-bind="attr: {'for': 'accent' + $data},css: 'accent-color-' + $data"></label>
     <!-- /ko -->
   `,
-  viewModel: z.components.AccentColorPicker,
+  viewModel: z.components.AccentColorPicker
 });

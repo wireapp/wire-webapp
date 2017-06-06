@@ -24,27 +24,27 @@ window.z.storage = z.storage || {};
 
 z.storage.StorageKey = {
   ANNOUNCE: {
-    ANNOUNCE_KEY: 'z.storage.StorageKey.ANNOUNCE.ANNOUNCE_KEY',
+    ANNOUNCE_KEY: 'z.storage.StorageKey.ANNOUNCE.ANNOUNCE_KEY'
   },
   AUTH: {
     ACCESS_TOKEN: {
       EXPIRATION: 'z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION',
       TTL: 'z.storage.StorageKey.AUTH.ACCESS_TOKEN.TTL',
       TYPE: 'z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE',
-      VALUE: 'z.storage.StorageKey.AUTH.ACCESS_TOKEN.VALUE',
+      VALUE: 'z.storage.StorageKey.AUTH.ACCESS_TOKEN.VALUE'
     },
     COOKIE_LABEL: 'z.storage.StorageKey.AUTH.COOKIE_LABEL',
     PERSIST: 'z.storage.StorageKey.AUTH.PERSIST',
-    SHOW_LOGIN: 'z.storage.StorageKey.AUTH.SHOW_LOGIN',
+    SHOW_LOGIN: 'z.storage.StorageKey.AUTH.SHOW_LOGIN'
   },
   CONVERSATION: {
     EMOJI_USAGE_COUNT: 'z.storage.StorageKey.CONVERSATION.EMOJI_USAGE_COUNT',
-    INPUT: 'z.storage.StorageKey.CONVERSATION.INPUT',
+    INPUT: 'z.storage.StorageKey.CONVERSATION.INPUT'
   },
   LOCALIZATION: {
-    LOCALE: 'z.storage.StorageKey.LOCALIZATION.LOCALE',
+    LOCALE: 'z.storage.StorageKey.LOCALIZATION.LOCALE'
   },
   SEARCH: {
-    SUGGESTED_SEARCH_ETS: 'z.storage.StorageKey.SEARCH.SUGGESTED_SEARCH_ETS',
-  },
+    SUGGESTED_SEARCH_ETS: 'z.storage.StorageKey.SEARCH.SUGGESTED_SEARCH_ETS'
+  }
 };

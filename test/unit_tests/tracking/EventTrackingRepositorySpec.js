@@ -38,18 +38,10 @@ describe('z.tracking.EventTrackingRepository', function() {
   describe('Initialization', function() {
     it('initializes error reporting on an init event', function() {
       spyOn(TestFactory.tracking_repository, 'init').and.callThrough();
-      spyOn(
-        TestFactory.tracking_repository,
-        '_enable_error_reporting',
-      ).and.callThrough();
+      spyOn(TestFactory.tracking_repository, '_enable_error_reporting').and.callThrough();
 
-      amplify.publish(
-        z.event.WebApp.ANALYTICS.INIT,
-        new z.properties.Properties(),
-      );
-      expect(
-        TestFactory.tracking_repository._enable_error_reporting,
-      ).toHaveBeenCalled();
+      amplify.publish(z.event.WebApp.ANALYTICS.INIT, new z.properties.Properties());
+      expect(TestFactory.tracking_repository._enable_error_reporting).toHaveBeenCalled();
     });
   });
 
@@ -58,10 +50,7 @@ describe('z.tracking.EventTrackingRepository', function() {
 
     beforeEach(function() {
       TestFactory.tracking_repository.tag_event = jasmine.createSpy();
-      amplify.subscribe(
-        z.event.WebApp.ANALYTICS.EVENT,
-        TestFactory.tracking_repository.tag_event,
-      );
+      amplify.subscribe(z.event.WebApp.ANALYTICS.EVENT, TestFactory.tracking_repository.tag_event);
     });
 
     afterEach(function() {
@@ -71,32 +60,24 @@ describe('z.tracking.EventTrackingRepository', function() {
     it('immediately reports events', function() {
       amplify.publish(z.event.WebApp.ANALYTICS.EVENT, 'i_am_an_event');
       expect(TestFactory.tracking_repository.tag_event).toHaveBeenCalled();
-      expect(TestFactory.tracking_repository.tag_event).toHaveBeenCalledTimes(
-        1,
-      );
+      expect(TestFactory.tracking_repository.tag_event).toHaveBeenCalledTimes(1);
     });
 
     it('allows additional parameters for events', function() {
       event_name = 'ArticleView';
       const attributes = {
         'Page Name': 'Baseball-Headlines',
-        Section: 'Sports',
+        Section: 'Sports'
       };
 
       amplify.publish(z.event.WebApp.ANALYTICS.EVENT, event_name, attributes);
-      expect(TestFactory.tracking_repository.tag_event).toHaveBeenCalledWith(
-        event_name,
-        attributes,
-      );
+      expect(TestFactory.tracking_repository.tag_event).toHaveBeenCalledWith(event_name, attributes);
     });
   });
 
   describe('Error Reporting', function() {
     beforeAll(function() {
-      TestFactory.tracking_repository.init(
-        new z.properties.Properties(),
-        TestFactory.user_repository.self(),
-      );
+      TestFactory.tracking_repository.init(new z.properties.Properties(), TestFactory.user_repository.self());
     });
 
     beforeEach(function() {
@@ -120,49 +101,46 @@ describe('z.tracking.EventTrackingRepository', function() {
                 LineNumber: 129,
                 ColumnNumber: 13,
                 ClassName: 'line 129, column 13',
-                FileName:
-                  'http://localhost:8888/script/view_model/ConversationInputViewModel.js',
+                FileName: 'http://localhost:8888/script/view_model/ConversationInputViewModel.js',
                 MethodName:
-                  'ConversationInputViewModel.z.ViewModel.ConversationInputViewModel.ConversationInputViewModel.send_message',
+                  'ConversationInputViewModel.z.ViewModel.ConversationInputViewModel.ConversationInputViewModel.send_message'
               },
               {
                 LineNumber: 2,
                 ColumnNumber: 61,
                 ClassName: 'line 2, column 61',
-                FileName:
-                  'http://localhost:8888/script/view_model/ConversationInputViewModel.js',
-                MethodName: 'ConversationInputViewModel.send_message',
+                FileName: 'http://localhost:8888/script/view_model/ConversationInputViewModel.js',
+                MethodName: 'ConversationInputViewModel.send_message'
               },
               {
                 LineNumber: 121,
                 ColumnNumber: 17,
                 ClassName: 'line 121, column 17',
-                FileName:
-                  'http://localhost:8888/script/view_model/bindings/CommonBindings.js',
-                MethodName: 'ConversationInputViewModel.wrapper',
+                FileName: 'http://localhost:8888/script/view_model/bindings/CommonBindings.js',
+                MethodName: 'ConversationInputViewModel.wrapper'
               },
               {
                 LineNumber: 4190,
                 ColumnNumber: 62,
                 ClassName: 'line 4190, column 62',
                 FileName: 'http://localhost:8888/ext/js/knockout.debug.js',
-                MethodName: 'HTMLTextAreaElement.<anonymous>',
+                MethodName: 'HTMLTextAreaElement.<anonymous>'
               },
               {
                 LineNumber: 4435,
                 ColumnNumber: 9,
                 ClassName: 'line 4435, column 9',
                 FileName: 'http://localhost:8888/ext/js/jquery.js',
-                MethodName: 'HTMLTextAreaElement.dispatch',
+                MethodName: 'HTMLTextAreaElement.dispatch'
               },
               {
                 LineNumber: 4121,
                 ColumnNumber: 28,
                 ClassName: 'line 4121, column 28',
                 FileName: 'http://localhost:8888/ext/js/jquery.js',
-                MethodName: 'HTMLTextAreaElement.elemData.handle',
-              },
-            ],
+                MethodName: 'HTMLTextAreaElement.elemData.handle'
+              }
+            ]
           },
           Environment: {
             UtcOffset: 2,
@@ -175,7 +153,7 @@ describe('z.tracking.EventTrackingRepository', function() {
             'Browser-Name': 'Netscape',
             'Browser-Version':
               '5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.79 Safari/537.36',
-            Platform: 'Win32',
+            Platform: 'Win32'
           },
           Client: {Name: 'raygun-js', Version: '2.3.2'},
           UserCustomData: {},
@@ -187,45 +165,28 @@ describe('z.tracking.EventTrackingRepository', function() {
               'User-Agent':
                 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.79 Safari/537.36',
               Referer: 'http://localhost:8888/?env=staging',
-              Host: 'localhost',
-            },
+              Host: 'localhost'
+            }
           },
           Version: 'Not supplied',
-          User: {Identifier: '3b449a8d-0a50-4a56-b131-7fe3f58a4280'},
-        },
+          User: {Identifier: '3b449a8d-0a50-4a56-b131-7fe3f58a4280'}
+        }
       };
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
-      let error_payload = TestFactory.tracking_repository._check_error_payload(
-        raygun_payload,
-      );
+      let error_payload = TestFactory.tracking_repository._check_error_payload(raygun_payload);
       expect(error_payload).toBe(raygun_payload);
 
-      _.times(
-        100,
-        () =>
-          (error_payload = TestFactory.tracking_repository._check_error_payload(
-            raygun_payload,
-          )),
-      );
+      _.times(100, () => (error_payload = TestFactory.tracking_repository._check_error_payload(raygun_payload)));
       expect(error_payload).toBe(false);
 
       jasmine.clock().mockDate(Date.now());
-      jasmine
-        .clock()
-        .tick(
-          z.tracking.EventTrackingRepository.CONFIG.ERROR_REPORTING_THRESHOLD *
-            2,
-        );
+      jasmine.clock().tick(z.tracking.EventTrackingRepository.CONFIG.ERROR_REPORTING_THRESHOLD * 2);
 
-      error_payload = TestFactory.tracking_repository._check_error_payload(
-        raygun_payload,
-      );
+      error_payload = TestFactory.tracking_repository._check_error_payload(raygun_payload);
       expect(error_payload).toBe(raygun_payload);
 
-      error_payload = TestFactory.tracking_repository._check_error_payload(
-        raygun_payload,
-      );
+      error_payload = TestFactory.tracking_repository._check_error_payload(raygun_payload);
       expect(error_payload).toBe(false);
     });
   });
@@ -241,16 +202,8 @@ describe('z.tracking.EventTrackingRepository', function() {
       TestFactory.tracking_repository._detach_promise_rejection_handler();
     });
 
-    it('handles a Promise rejected with an Error that is uncaught', function(
-      done,
-    ) {
-      window.onerror = function(
-        error_message,
-        file_name,
-        line_number,
-        column_number,
-        error,
-      ) {
+    it('handles a Promise rejected with an Error that is uncaught', function(done) {
+      window.onerror = function(error_message, file_name, line_number, column_number, error) {
         expect(error_message).toBe(error_description);
         expect(error.message).toBe(error_description);
         done();
@@ -259,9 +212,7 @@ describe('z.tracking.EventTrackingRepository', function() {
       Promise.reject(new Error('Unit test error'));
     });
 
-    it('handles a Promise rejected with a String that is uncaught', function(
-      done,
-    ) {
+    it('handles a Promise rejected with a String that is uncaught', function(done) {
       window.onerror = function(error_message, file_name) {
         expect(error_message).toBe(error_description);
         expect(file_name).toBeNull();

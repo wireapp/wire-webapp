@@ -4,6 +4,9 @@ env:
   jasmine: true
   node: true
 
+parserOptions:
+  ecmaVersion: 2017
+
 plugins:
   - prettier
   - jsdoc
@@ -67,7 +70,7 @@ rules:
   prefer-template: 2
   prettier/prettier: [2, {
       singleQuote: true,
-      trailingComma: all,
+      trailingComma: none,
       bracketSpacing: false,
       printWidth: 120
     }

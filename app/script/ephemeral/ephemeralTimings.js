@@ -28,6 +28,6 @@ z.ephemeral.timings = (() => {
   const map_to_closest_timing = milliseconds => z.util.ArrayUtil.find_closest(timings, milliseconds);
   return {
     get_values,
-    map_to_closest_timing,
+    map_to_closest_timing
   };
 })();

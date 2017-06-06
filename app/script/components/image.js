@@ -67,6 +67,6 @@ ko.components.register('image-component', {
   viewModel: {
     createViewModel(params, component_info) {
       return new z.components.Image(params, component_info);
-    },
-  },
+    }
+  }
 });

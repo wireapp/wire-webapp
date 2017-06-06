@@ -76,5 +76,5 @@ z.tracking.helpers = {
       return z.tracking.attribute.PlatformType.DESKTOP_LINUX;
     }
     return z.tracking.attribute.PlatformType.BROWSER_APP;
-  },
+  }
 };

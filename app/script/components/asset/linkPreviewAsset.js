@@ -94,6 +94,6 @@ ko.components.register('link-preview-asset', {
   viewModel: {
     createViewModel(params, component_info) {
       return new z.components.LinkPreviewAssetComponent(params, component_info);
-    },
-  },
+    }
+  }
 });

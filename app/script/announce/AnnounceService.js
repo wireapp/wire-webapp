@@ -25,7 +25,7 @@ window.z.announce = z.announce || {};
 z.announce.AnnounceService = class AnnounceService {
   static get CONFIG() {
     return {
-      URL: 'api/v1/announce/',
+      URL: 'api/v1/announce/'
     };
   }
 

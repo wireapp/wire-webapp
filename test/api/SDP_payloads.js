@@ -100,7 +100,7 @@ const sdp_payloads = {
         'a=ssrc:2255821848 msid:vmYtSQeNol6s2SCJ4LwWRDmzJnEGZPNcvMw7 68dc6bc0-c2c8-4f6d-b07d-3a4e00434eca\r\n' +
         'a=ssrc:2255821848 mslabel:vmYtSQeNol6s2SCJ4LwWRDmzJnEGZPNcvMw7\r\n' +
         'a=ssrc:2255821848 label:68dc6bc0-c2c8-4f6d-b07d-3a4e00434eca',
-    type: 'offer',
+    type: 'offer'
   },
   original_fingerprint: {
     sdp:
@@ -119,7 +119,7 @@ const sdp_payloads = {
         'a=setup:actpass\r\n' +
         'a=mid:audio\r\n' +
         'a=extmap:1 urn:ietf:params:rtp-hdrext:ssrc-audio-level',
-    type: 'offer',
+    type: 'offer'
   },
   rewritten_codecs: {
     sdp:
@@ -198,7 +198,7 @@ const sdp_payloads = {
         'a=ssrc:2255821848 msid:vmYtSQeNol6s2SCJ4LwWRDmzJnEGZPNcvMw7 68dc6bc0-c2c8-4f6d-b07d-3a4e00434eca\r\n' +
         'a=ssrc:2255821848 mslabel:vmYtSQeNol6s2SCJ4LwWRDmzJnEGZPNcvMw7\r\n' +
         'a=ssrc:2255821848 label:68dc6bc0-c2c8-4f6d-b07d-3a4e00434eca',
-    type: 'offer',
+    type: 'offer'
   },
   rewritten_fingerprint: {
     sdp:
@@ -217,8 +217,8 @@ const sdp_payloads = {
         'a=setup:actpass\r\n' +
         'a=mid:audio\r\n' +
         'a=extmap:1 urn:ietf:params:rtp-hdrext:ssrc-audio-level',
-    type: 'offer',
-  },
+    type: 'offer'
+  }
 };
 
 window.sdp_payloads = sdp_payloads;

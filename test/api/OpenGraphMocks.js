@@ -25,13 +25,13 @@ window.OpenGraphMocks = {
       description:
         'Eine Woche nach ihrer Ankunft im System hat die NASA-Sonde Juno ein erstes Bild aus dem Orbit um den Jupiter gemacht und zur Erde geschickt. Es zeigt den Gasriesen plus drei Monde und wie weit die Sonde auf ihrer Umlaufbahn ausschwenkt.',
       image: {
-        url: 'http://www.heise.de/imgs/18/1/8/5/1/3/4/6/PIA20707-68c99730783b54fb.jpeg',
+        url: 'http://www.heise.de/imgs/18/1/8/5/1/3/4/6/PIA20707-68c99730783b54fb.jpeg'
       },
       locale: 'de_DE',
       site_name: 'heise online',
       title: 'Jupiter-Sonde Juno: Das erste Foto aus dem Orbit',
       type: 'website',
-      url: 'http://www.heise.de/newsticker/meldung/Jupiter-Sonde-Juno-Das-erste-Foto-aus-dem-Orbit-3265536.html',
+      url: 'http://www.heise.de/newsticker/meldung/Jupiter-Sonde-Juno-Das-erste-Foto-aus-dem-Orbit-3265536.html'
     };
   },
 
@@ -41,11 +41,11 @@ window.OpenGraphMocks = {
         'HD quality calls, private and group chats with inline photos, music and video. Secure and perfectly synced across your devices.',
       image: {
         url:
-          'https://lh3.ggpht.com/ElqTCcY1N0c3EAX27MRFoXynZlbTaJD2KEqYNXAPn5YQPZa6Bvsux4NCgEMoUhazdIWWelAU__Kzmr55j55EsgM=s1024',
+          'https://lh3.ggpht.com/ElqTCcY1N0c3EAX27MRFoXynZlbTaJD2KEqYNXAPn5YQPZa6Bvsux4NCgEMoUhazdIWWelAU__Kzmr55j55EsgM=s1024'
       },
       title: 'Wire · Modern communication, full privacy. For iOS, Android, macOS, Windows and web.',
       type: 'website',
-      url: 'https://wire.com/',
+      url: 'https://wire.com/'
     };
-  },
+  }
 };

@@ -28,6 +28,6 @@ z.links.LinkPreviewBlackList = (function() {
   return {
     is_blacklisted(url) {
       return new RegExp(BLACKLIST.join('|')).test(url);
-    },
+    }
   };
 })();

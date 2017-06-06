@@ -37,5 +37,5 @@ z.cryptography.GENERIC_MESSAGE_TYPE = {
   LAST_READ: 'lastRead',
   LOCATION: 'location',
   REACTION: 'reaction',
-  TEXT: 'text',
+  TEXT: 'text'
 };

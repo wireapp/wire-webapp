@@ -25,7 +25,7 @@ describe('User Mapper', function() {
   const asset_service = {
     generate_asset_url() {
       return 'FooBarURL';
-    },
+    }
   };
 
   const mapper = new z.user.UserMapper(asset_service);
@@ -121,7 +121,7 @@ describe('User Mapper', function() {
       user_et.id = entities.user.john_doe.id;
       const data = {
         id: entities.user.john_doe.id,
-        name: entities.user.jane_roe.name,
+        name: entities.user.jane_roe.name
       };
       const updated_user_et = mapper.update_user_from_object(user_et, data);
       expect(updated_user_et.name()).toBe(entities.user.jane_roe.name);
@@ -132,7 +132,7 @@ describe('User Mapper', function() {
       user_et.id = entities.user.john_doe.id;
       const data = {
         handle: entities.user.jane_roe.handle,
-        id: entities.user.john_doe.id,
+        id: entities.user.john_doe.id
       };
       const updated_user_et = mapper.update_user_from_object(user_et, data);
       expect(updated_user_et.username()).toBe(entities.user.jane_roe.handle);
@@ -143,7 +143,7 @@ describe('User Mapper', function() {
       user_et.id = entities.user.john_doe.id;
       const data = {
         id: entities.user.jane_roe.id,
-        name: entities.user.jane_roe.name,
+        name: entities.user.jane_roe.name
       };
       const func = () => mapper.update_user_from_object(user_et, data);
       expect(func).toThrow();
@@ -155,10 +155,10 @@ describe('User Mapper', function() {
       const data = {
         assets: [
           {key: z.util.create_random_uuid(), size: 'preview', type: 'image'},
-          {key: z.util.create_random_uuid(), size: 'complete', type: 'image'},
+          {key: z.util.create_random_uuid(), size: 'complete', type: 'image'}
         ],
         id: entities.user.john_doe.id,
-        name: entities.user.jane_roe.name,
+        name: entities.user.jane_roe.name
       };
       const updated_user_et = mapper.update_user_from_object(user_et, data);
       expect(updated_user_et.preview_picture_resource()).toBeDefined();

@@ -32,8 +32,8 @@ describe('Localizer', function() {
       id: 'Talk, message, share.',
       replace: {
         content: '<br>',
-        placeholder: '%nl',
-      },
+        placeholder: '%nl'
+      }
     });
     expect(text).toBe('Talk, message, share.');
   });
@@ -44,30 +44,27 @@ describe('Localizer', function() {
       replace: [
         {
           content: entities.user.john_doe.email,
-          placeholder: '%email',
+          placeholder: '%email'
         },
         {
           content: 'html://LINK',
-          placeholder: '%url',
-        },
-      ],
+          placeholder: '%url'
+        }
+      ]
     });
-    expect(text).toBe(
-      'I’m on Wire. Search for jd@wire.com or visit html://LINK to connect with me.',
-    );
+    expect(text).toBe('I’m on Wire. Search for jd@wire.com or visit html://LINK to connect with me.');
   });
 
   it('can replace user names in the localization', function() {
     const text = z.localization.Localizer.get_text({
-      id:
-        '%@.first_name won’t see you in search results and won’t be able to send you messages.',
+      id: '%@.first_name won’t see you in search results and won’t be able to send you messages.',
       replace: {
         content: '<span class="user"></span>',
-        placeholder: '%@.first_name',
-      },
+        placeholder: '%@.first_name'
+      }
     });
     expect(text).toBe(
-      '<span class="user"></span> won’t see you in search results and won’t be able to send you messages.',
+      '<span class="user"></span> won’t see you in search results and won’t be able to send you messages.'
     );
   });
 });
@@ -96,7 +93,7 @@ describe('l10n', function() {
   it('can replace placeholders in localized strings using a more complex object', function() {
     const text = z.l10n.text('{{greeting}} {{name}}', {
       greeting: 'Hey',
-      name: 'Tod',
+      name: 'Tod'
     });
     expect(text).toBe('Hey Tod');
   });
@@ -104,7 +101,7 @@ describe('l10n', function() {
   it('can replace duplicate placeholders in localized strings using a more complex object', function() {
     const text = z.l10n.text('{{greeting}} {{greeting}} {{name}}', {
       greeting: 'Hey',
-      name: 'Tod',
+      name: 'Tod'
     });
     expect(text).toBe('Hey Hey Tod');
   });

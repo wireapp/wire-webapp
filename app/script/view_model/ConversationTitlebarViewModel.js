@@ -24,21 +24,13 @@ window.z.ViewModel = z.ViewModel || {};
 
 // Parent: z.ViewModel.ConversationTitlebarViewModel
 z.ViewModel.ConversationTitlebarViewModel = class ConversationTitlebarViewModel {
-  constructor(
-    element_id,
-    calling_repository,
-    conversation_repository,
-    multitasking,
-  ) {
+  constructor(element_id, calling_repository, conversation_repository, multitasking) {
     this.added_to_view = this.added_to_view.bind(this);
 
     this.calling_repository = calling_repository;
     this.conversation_repository = conversation_repository;
     this.multitasking = multitasking;
-    this.logger = new z.util.Logger(
-      'z.ViewModel.ConversationTitlebarViewModel',
-      z.config.LOGGER.OPTIONS,
-    );
+    this.logger = new z.util.Logger('z.ViewModel.ConversationTitlebarViewModel', z.config.LOGGER.OPTIONS);
 
     // TODO remove the titlebar for now to ensure that buttons are clickable in macOS wrappers
     window.setTimeout(() => $('.titlebar').remove(), 1000);
@@ -62,10 +54,7 @@ z.ViewModel.ConversationTitlebarViewModel = class ConversationTitlebarViewModel 
         return false;
       }
 
-      return (
-        this.has_call() &&
-        this.joined_call().state() === z.calling.enum.CALL_STATE.ONGOING
-      );
+      return this.has_call() && this.joined_call().state() === z.calling.enum.CALL_STATE.ONGOING;
     });
 
     this.show_maximize_control = ko.pureComputed(() => {
@@ -73,19 +62,11 @@ z.ViewModel.ConversationTitlebarViewModel = class ConversationTitlebarViewModel 
         return false;
       }
 
-      const has_local_video =
-        this.self_stream_state.video_send() ||
-        this.self_stream_state.screen_send();
+      const has_local_video = this.self_stream_state.video_send() || this.self_stream_state.screen_send();
       const has_remote_video =
-        (this.joined_call().is_remote_screen_send() ||
-          this.joined_call().is_remote_video_send()) &&
+        (this.joined_call().is_remote_screen_send() || this.joined_call().is_remote_video_send()) &&
         this.remote_media_streams.video();
-      return (
-        this.has_ongoing_call() &&
-        this.multitasking.is_minimized() &&
-        has_local_video &&
-        !has_remote_video
-      );
+      return this.has_ongoing_call() && this.multitasking.is_minimized() && has_local_video && !has_remote_video;
     });
 
     this.show_call_controls = ko.computed(() => {
@@ -93,34 +74,25 @@ z.ViewModel.ConversationTitlebarViewModel = class ConversationTitlebarViewModel 
         return false;
       }
 
-      const is_supported_conversation =
-        this.conversation_et().is_group() ||
-        this.conversation_et().is_one2one();
+      const is_supported_conversation = this.conversation_et().is_group() || this.conversation_et().is_one2one();
       const is_active_conversation =
-        this.conversation_et().participating_user_ids().length &&
-        !this.conversation_et().removed_from_conversation();
-      return (
-        !this.has_call() && is_supported_conversation && is_active_conversation
-      );
+        this.conversation_et().participating_user_ids().length && !this.conversation_et().removed_from_conversation();
+      return !this.has_call() && is_supported_conversation && is_active_conversation;
     });
 
     this.people_tooltip = z.localization.Localizer.get_text({
       id: z.string.tooltip_conversation_people,
       replace: {
         content: z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.PEOPLE),
-        placeholder: '%shortcut',
-      },
+        placeholder: '%shortcut'
+      }
     });
   }
 
   added_to_view() {
     window.setTimeout(() => {
-      amplify.subscribe(z.event.WebApp.SHORTCUT.PEOPLE, () =>
-        this.show_participants(),
-      );
-      amplify.subscribe(z.event.WebApp.SHORTCUT.ADD_PEOPLE, () =>
-        this.show_participants(true),
-      );
+      amplify.subscribe(z.event.WebApp.SHORTCUT.PEOPLE, () => this.show_participants());
+      amplify.subscribe(z.event.WebApp.SHORTCUT.ADD_PEOPLE, () => this.show_participants(true));
     }, 50);
   }
 
@@ -136,9 +108,7 @@ z.ViewModel.ConversationTitlebarViewModel = class ConversationTitlebarViewModel 
   click_on_maximize() {
     this.multitasking.auto_minimize(false);
     this.multitasking.is_minimized(false);
-    this.logger.info(
-      `Maximizing call '${this.joined_call().id}' on user click`,
-    );
+    this.logger.info(`Maximizing call '${this.joined_call().id}' on user click`);
   }
 
   click_on_participants() {
@@ -150,10 +120,7 @@ z.ViewModel.ConversationTitlebarViewModel = class ConversationTitlebarViewModel 
   }
 
   click_on_collection_button() {
-    amplify.publish(
-      z.event.WebApp.CONTENT.SWITCH,
-      z.ViewModel.content.CONTENT_STATE.COLLECTION,
-    );
+    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.COLLECTION);
   }
 
   show_participants(add_people) {

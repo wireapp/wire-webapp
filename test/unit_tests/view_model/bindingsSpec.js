@@ -33,7 +33,7 @@ describe('ko.bindingHandlers', function() {
       handler = {
         on_enter() {
           return 'yay';
-        },
+        }
       };
 
       // we need the callFake since the spyOn will overwrite the on_enter property
@@ -67,7 +67,7 @@ describe('ko.bindingHandlers', function() {
       handler = {
         callback() {
           return 'yay';
-        },
+        }
       };
 
       spyOn(handler, 'callback');

@@ -32,5 +32,5 @@ z.message.StatusType = {
   SEEN: 4,
   SENDING: 1,
   SENT: 2,
-  UNSPECIFIED: -1,
+  UNSPECIFIED: -1
 };

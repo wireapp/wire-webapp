@@ -26,7 +26,7 @@ z.cryptography.CryptographyService = class CryptographyService {
   static get CONFIG() {
     return {
       URL_CLIENTS: '/clients',
-      URL_USERS: '/users',
+      URL_USERS: '/users'
     };
   }
 
@@ -36,10 +36,7 @@ z.cryptography.CryptographyService = class CryptographyService {
    */
   constructor(client) {
     this.client = client;
-    this.logger = new z.util.Logger(
-      'z.cryptography.CryptographyService',
-      z.config.LOGGER.OPTIONS,
-    );
+    this.logger = new z.util.Logger('z.cryptography.CryptographyService', z.config.LOGGER.OPTIONS);
   }
 
   /**
@@ -53,9 +50,7 @@ z.cryptography.CryptographyService = class CryptographyService {
     return this.client.send_json({
       data: user_client_map,
       type: 'POST',
-      url: this.client.create_url(
-        `${CryptographyService.CONFIG.URL_USERS}/prekeys`,
-      ),
+      url: this.client.create_url(`${CryptographyService.CONFIG.URL_USERS}/prekeys`)
     });
   }
 
@@ -69,12 +64,10 @@ z.cryptography.CryptographyService = class CryptographyService {
   put_client_prekeys(client_id, serialized_pre_keys) {
     return this.client.send_json({
       data: {
-        prekeys: serialized_pre_keys,
+        prekeys: serialized_pre_keys
       },
       type: 'PUT',
-      url: this.client.create_url(
-        `${CryptographyService.CONFIG.URL_CLIENTS}/${client_id}`,
-      ),
+      url: this.client.create_url(`${CryptographyService.CONFIG.URL_CLIENTS}/${client_id}`)
     });
   }
 };
