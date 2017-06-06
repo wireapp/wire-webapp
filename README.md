@@ -16,25 +16,25 @@ For clarity, if you compile the open source software that we make available from
 
 No license is granted to the Wire trademark and its associated logos, all of which will continue to be owned exclusively by Wire Swiss GmbH. Any use of the Wire trademark and/or its associated logos is expressly prohibited without the express prior written consent of Wire Swiss GmbH.
 
-# How to build the open source client
+# Wire for Web
 
-## Build
+[![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 
-### Installation
+## Installation
 
 1. Install [Node.js](https://nodejs.org/)
 2. Install [Yarn](https://yarnpkg.com): `npm install -g yarn`
 3. Run `yarn`
 
-### Execution
+## Execution
 
 Run `yarn start` and Wire's web app will be available at:
  [localhost:8888/auth/#login](http://localhost:8888/auth/#login)
 
-### Status
+## Status
 
 [![Build Status](https://travis-ci.org/wireapp/wire-webapp.svg?branch=dev)](https://travis-ci.org/wireapp/wire-webapp)
 
-### Translations
+## Translations
 
 All Wire translations are crowdsourced via [Crowdin](https://crowdin.com/projects/wire).
