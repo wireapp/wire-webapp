@@ -45,12 +45,9 @@ z.service.BackendClientError = class BackendClientError extends Error {
       BLACKLISTED_EMAIL: 'blacklisted-email',
       BLACKLISTED_PHONE: 'blacklisted-phone',
       CONNECTIVITY_PROBLEM: 'connectivity-problem',
-      CONVERSATION_TOO_BIG: 'conv-too-big',
-      IN_USE: 'in-use',
       INVALID_CREDENTIALS: 'invalid-credentials',
       INVALID_EMAIL: 'invalid-email',
       INVALID_INVITATION_CODE: 'invalid-invitation-code',
-      INVALID_OPERATION: 'invalid-op',
       INVALID_PHONE: 'invalid-phone',
       KEY_EXISTS: 'key-exists',
       MISSING_AUTH: 'missing-auth',
@@ -63,7 +60,6 @@ z.service.BackendClientError = class BackendClientError extends Error {
       TOO_MANY_MEMBERS: 'too-many-members',
       UNAUTHORIZED: 'unauthorized',
       UNKNOWN_CLIENT: 'unknown-client',
-      VOICE_CHANNEL_FULL: 'voice-channel-full',
     };
   }
 
