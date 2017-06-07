@@ -94,7 +94,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     });
 
     this.conversations_archived = ko.observableArray([]);
-    this.conversations_call = ko.observableArray([]);
+    this.conversations_calls = ko.observableArray([]);
     this.conversations_cleared = ko.observableArray([]);
     this.conversations_unarchived = ko.observableArray([]);
 
@@ -129,7 +129,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       });
 
       this.conversations_archived(archived);
-      this.conversations_call(calls);
+      this.conversations_calls(calls);
       this.conversations_cleared(cleared);
       this.conversations_unarchived(unarchived);
     });

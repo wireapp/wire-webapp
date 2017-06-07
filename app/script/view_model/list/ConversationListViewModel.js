@@ -68,7 +68,7 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
       return z.l10n.text(z.string.conversations_connection_request_one);
     });
 
-    this.conversations_calls = this.conversation_repository.conversations_call;
+    this.conversations_calls = this.conversation_repository.conversations_calls;
     this.conversations_archived = this.conversation_repository.conversations_archived;
     this.conversations_unarchived = this.conversation_repository.conversations_unarchived;
 
