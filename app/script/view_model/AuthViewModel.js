@@ -185,44 +185,20 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     this.can_verify_password = ko.pureComputed(() => !this.disabled_by_animation() && this.password().length);
 
     this.account_retry_text = ko.pureComputed(() => {
-      return z.localization.Localizer.get_text({
-        id: z.string.auth_posted_retry,
-        replace: {
-          content: this.username(),
-          placeholder: '%email',
-        },
-      });
+      return z.l10n.text(z.string.auth_posted_retry, this.username());
     });
 
     this.account_resend_text = ko.pureComputed(() => {
-      return z.localization.Localizer.get_text({
-        id: z.string.auth_posted_resend,
-        replace: {
-          content: this.username(),
-          placeholder: '%email',
-        },
-      });
+      return z.l10n.text(z.string.auth_posted_resend, this.username());
     });
 
     this.verify_code_text = ko.pureComputed(() => {
       const phone_number = PhoneFormat.formatNumberForMobileDialing('', this.phone_number_e164()) || this.phone_number_e164();
-      return z.localization.Localizer.get_text({
-        id: z.string.auth_verify_code_description,
-        replace: {
-          content: phone_number,
-          placeholder: '%@number',
-        },
-      });
+      return z.l10n.text(z.string.auth_verify_code_description, phone_number);
     });
 
     this.verify_code_timer_text = ko.pureComputed(() => {
-      return z.localization.Localizer.get_text({
-        id: z.string.auth_verify_code_resend_timer,
-        replace: {
-          content: this.code_expiration_in(),
-          placeholder: '%expiration',
-        },
-      });
+      return z.l10n.text(z.string.auth_verify_code_resend_timer, this.code_expiration_in());
     });
 
     this.visible_section = ko.observable(undefined);

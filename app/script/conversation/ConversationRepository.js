@@ -1119,17 +1119,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
       tag = z.l10n.text(z.string.extensions_giphy_random);
     }
 
-    const message = z.localization.Localizer.get_text({
-      id: z.string.extensions_giphy_message,
-      replace: {
-        content: tag,
-        placeholder: '%tag',
-      },
-    });
-
     return z.util.load_url_blob(url)
       .then((blob) => {
-        this.send_text(message, conversation_et);
+        this.send_text(z.l10n.text(z.string.extensions_giphy_message, tag), conversation_et);
         return this.upload_images(conversation_et, [blob]);
       });
   }

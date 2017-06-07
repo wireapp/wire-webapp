@@ -217,15 +217,8 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
   set_picture(new_user_picture) {
     if (new_user_picture.size > z.config.MAXIMUM_IMAGE_FILE_SIZE) {
-      const warning_file_size = z.localization.Localizer.get_text({
-        id: z.string.alert_upload_too_large,
-        replace: {
-          content: z.config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024,
-          placeholder: '%no',
-        },
-      });
-
-      return this._show_upload_warning(warning_file_size);
+      const maximum_size_in_mb = z.config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024;
+      return this._show_upload_warning(z.l10n.text(z.string.alert_upload_too_large, maximum_size_in_mb));
     }
 
     if (!z.config.SUPPORTED_PROFILE_IMAGE_TYPES.includes(new_user_picture.type)) {

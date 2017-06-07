@@ -87,22 +87,10 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
     });
 
     this.archive_tooltip = ko.pureComputed(() => {
-      return z.localization.Localizer.get_text({
-        id: z.string.tooltip_conversations_archived,
-        replace: {
-          content: this.conversations_archived().length,
-          placeholder: '%no',
-        },
-      });
+      return z.l10n.text(z.string.tooltip_conversations_archived, this.conversations_archived().length);
     });
 
-    this.start_tooltip = z.localization.Localizer.get_text({
-      id: z.string.tooltip_conversations_tooltip_start,
-      replace: {
-        content: z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.START),
-        placeholder: '%shortcut',
-      },
-    });
+    this.start_tooltip = z.l10n.text(z.string.tooltip_conversations_tooltip_start, z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.START));
 
     this.show_connect_requests = ko.pureComputed(() => {
       const team_et = this.conversation_repository.active_team();
