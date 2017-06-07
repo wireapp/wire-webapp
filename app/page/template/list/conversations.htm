@@ -193,15 +193,15 @@
       <!-- /ko -->
     </ul>
     <!-- /ko -->
-    <!-- ko if: $root.first_run() || (conversations_unarchived().length === 0 && connect_requests().length === 0) -->
-      <!-- ko if: conversations_archived().length === 0 || $root.first_run()  -->
-        <div class="conversation-hint-container" data-uie-name="start-conversation-hint">
-          <div class="conversation-hint-container-text" data-bind="l10n_text: z.string.conversations_no_conversations"></div>
-          <span class="arrow-down"></span>
+    <!-- ko if: conversations_unarchived().length === 0 && connect_requests().length === 0 -->
+      <!-- ko if: conversations_archived().length === 0 -->
+        <div class="conversation-hint" data-uie-name="status-start-conversation-hint">
+          <div class="conversation-hint-header" data-bind="l10n_text: z.string.conversations_no_conversations"></div>
+          <div class="conversation-hint-detail" data-bind="l10n_text: z.string.conversations_no_conversations_detail"></div>
         </div>
       <!-- /ko -->
-      <!-- ko if: conversations_archived().length > 0 && !$root.first_run() -->
-        <div class="full-screen flex-center label-xs text-white" data-bind="l10n_text: z.string.conversations_all_archived"></div>
+      <!-- ko if: conversations_archived().length > 0 -->
+        <div class="conversation-hint" data-bind="l10n_text: z.string.conversations_all_archived"></div>
       <!-- /ko -->
     <!-- /ko -->
   </div>

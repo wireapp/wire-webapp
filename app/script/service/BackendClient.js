@@ -62,6 +62,7 @@ z.service.BackendClient = class BackendClient {
 
   static get IGNORED_BACKEND_LABELS() {
     return [
+      z.service.BackendClientError.LABEL.INVALID_CREDENTIALS,
       z.service.BackendClientError.LABEL.PASSWORD_EXISTS,
       z.service.BackendClientError.LABEL.TOO_MANY_CLIENTS,
       z.service.BackendClientError.LABEL.TOO_MANY_MEMBERS,

@@ -48,7 +48,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
     this.conversation = ko.observable(new z.entity.Conversation());
     this.center_messages = ko.pureComputed(() => {
       const [first_visible_message] = this.conversation().messages_visible();
-      if (first_visible_message) {
+      if (first_visible_message && first_visible_message.is_member()) {
         return !this.conversation().has_further_messages() && (this.conversation().messages_visible().length === 1) && first_visible_message.is_connection();
       }
     });
@@ -363,8 +363,11 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
    */
   _focus_message(message_et) {
     const message_element = $(`.message[data-uie-uid=\"${message_et.id}\"]`);
-    const message_list_element = $('.messages-wrap');
-    message_list_element.scroll_by(message_element.offset().top - (message_list_element.height() / 2));
+
+    if (message_element.length) {
+      const message_list_element = $('.messages-wrap');
+      message_list_element.scroll_by(message_element.offset().top - (message_list_element.height() / 2));
+    }
   }
 
   scroll_height(change_in_height) {

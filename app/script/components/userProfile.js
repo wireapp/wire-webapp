@@ -125,6 +125,12 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
       this.is_resetting_session(false);
     });
 
+    this.show_back_button = ko.pureComputed(() => {
+      if (typeof this.conversation === 'function') {
+        return this.conversation().is_group() || this.conversation().is_team_group();
+      }
+    });
+
     this.selected_device_subscription = this.selected_device.subscribe(() => {
       if (this.selected_device()) {
         this.fingerprint_local(this.cryptography_repository.get_local_fingerprint());
@@ -192,7 +198,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
             this.user_repository.cancel_connection_request(this.user());
           }
 
-          this.conversation_repository.get_one_to_one_conversation(this.user())
+          this.conversation_repository.get_1to1_conversation(this.user())
             .then((conversation_et) => {
               if (this.conversation_repository.is_active_conversation(conversation_et)) {
                 amplify.publish(z.event.WebApp.CONVERSATION.PEOPLE.HIDE);
@@ -217,7 +223,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
     this.on_open = () => {
       amplify.publish(z.event.WebApp.CONVERSATION.PEOPLE.HIDE);
 
-      this.conversation_repository.get_one_to_one_conversation(this.user())
+      this.conversation_repository.get_1to1_conversation(this.user())
         .then((conversation_et) => {
           if (conversation_et.is_archived()) {
             this.conversation_repository.unarchive_conversation(conversation_et);
@@ -299,62 +305,63 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
 
     // footer
     this.get_footer_template = ko.pureComputed(() => {
-      if (!this.user()) {
+      const user_et = this.user();
+      if (!user_et || this.tab_index() === 1) {
         return 'user-profile-footer-empty';
       }
 
       // When used in conversation!
       if (typeof this.conversation === 'function') {
-        const type = this.conversation().type();
+        const conversation_et = this.conversation();
 
-        if ([z.conversation.ConversationType.ONE2ONE, z.conversation.ConversationType.CONNECT].includes(type)) {
-          if (this.user().is_me) {
+        if (conversation_et.is_one2one() || conversation_et.is_request()) {
+          if (user_et.is_me) {
             return 'user-profile-footer-profile';
           }
 
-          if (this.user().is_connected()) {
+          if (user_et.is_connected() || conversation_et.team_id) {
             return 'user-profile-footer-add-block';
           }
 
-          if (this.user().is_outgoing_request()) {
+          if (user_et.is_outgoing_request()) {
             return 'user-profile-footer-pending';
           }
 
-        } else if (type === z.conversation.ConversationType.REGULAR) {
-          if (this.user().is_me) {
+        } else if (conversation_et.is_group()) {
+          if (user_et.is_me) {
             return 'user-profile-footer-profile-leave';
           }
 
-          if (this.user().is_unknown()) {
-            return 'user-profile-footer-connect-remove';
+          if (user_et.is_unknown()) {
+            return conversation_et.team_id ? 'user-profile-footer-message-remove' : 'user-profile-footer-connect-remove';
           }
-          if (this.user().is_ignored() || this.user().is_request()) {
+          if (user_et.is_ignored() || user_et.is_request()) {
             return 'user-profile-footer-pending-remove';
           }
 
-          if (this.user().is_connected()) {
+          if (user_et.is_connected()) {
             return 'user-profile-footer-message-remove';
           }
 
-          if (this.user().is_blocked()) {
+          if (user_et.is_blocked()) {
             return 'user-profile-footer-unblock-remove';
           }
         }
       // When used in Search!
       } else {
-        if (this.user().is_blocked()) {
+        if (user_et.is_blocked()) {
           return 'user-profile-footer-unblock';
         }
 
-        if (this.user().is_outgoing_request()) {
+        if (user_et.is_outgoing_request()) {
           return 'user-profile-footer-pending';
         }
 
-        if (this.user().is_ignored() || this.user().is_incoming_request()) {
+        if (user_et.is_ignored() || this.user().is_incoming_request()) {
           return 'user-profile-footer-ignore-accept';
         }
 
-        if (this.user().is_unknown()) {
+        if (user_et.is_unknown()) {
           return 'user-profile-footer-add';
         }
       }
