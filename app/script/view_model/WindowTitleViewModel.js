@@ -23,10 +23,11 @@ window.z = window.z || {};
 window.z.ViewModel = z.ViewModel || {};
 
 z.ViewModel.WindowTitleViewModel = class WindowTitleViewModel {
-  constructor(content_state, user_repository, conversation_repository) {
+  constructor(content_state, user_repository, conversation_repository, team_repository) {
     this.content_state = content_state;
     this.user_repository = user_repository;
     this.conversation_repository = conversation_repository;
+    this.team_repository = team_repository;
     this.logger = new z.util.Logger('z.ViewModel.WindowTitleViewModel', z.config.LOGGER.OPTIONS);
 
     this.update_window_title = false;
@@ -45,11 +46,15 @@ z.ViewModel.WindowTitleViewModel = class WindowTitleViewModel {
         let number_of_unread_conversations = 0;
         const number_of_connect_requests = this.user_repository.connect_requests().length;
 
-        this.conversation_repository.conversations_unarchived().forEach(function(conversation_et) {
-          if (!conversation_et.is_request() && !conversation_et.is_muted() && conversation_et.unread_message_count()) {
-            number_of_unread_conversations++;
-          }
-        });
+        this.team_repository.teams().concat(this.team_repository.personal_space)
+          .forEach((team_et) => {
+            team_et.conversations_unarchived()
+              .forEach((conversation_et) => {
+                if (!conversation_et.is_request() && !conversation_et.is_muted() && conversation_et.unread_message_count()) {
+                  number_of_unread_conversations++;
+                }
+              });
+          });
 
         const badge_count = number_of_connect_requests + number_of_unread_conversations;
         if (badge_count > 0) {
