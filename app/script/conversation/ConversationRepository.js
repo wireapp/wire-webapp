@@ -98,6 +98,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.conversations_cleared = ko.pureComputed(() => this.active_team().conversations_cleared());
     this.conversations_unarchived = ko.pureComputed(() => this.active_team().conversations_unarchived());
 
+    this.all_unarchived_conversations = ko.pureComputed(() => {
+      const conversations = this.team_repository.teams()
+        .concat(this.team_repository.personal_space)
+        .map((team_et) => team_et.conversations_unarchived());
+
+      return _.flatten(conversations);
+    });
+
     this._init_subscriptions();
   }
 
@@ -186,7 +194,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
     if (team_et) {
       if (team_et.id !== this.active_team().id) {
         this.active_team(team_et);
-        this.update_conversations(this.conversations_unarchived());
         amplify.publish(z.event.WebApp.CONVERSATION.SHOW, this.get_most_recent_conversation());
       }
     } else {
@@ -442,28 +449,44 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
+   * Update users and events for archived conversations currently visible.
+   * @returns {undefined} No return value
+   */
+  update_conversations_archived() {
+    this._update_conversations(this.conversations_archived());
+  }
+
+  /**
+   * Map users to all conversations without any backend requests.
+   * @returns {undefined} No return value
+   */
+  update_conversations_offline() {
+    this.sorted_conversations().map((conversation_et) => this.update_participating_user_ets(conversation_et, true));
+  }
+
+  /**
+   * Update users and events for all unarchived conversations.
+   * @returns {undefined} No return value
+   */
+  update_conversations_unarchived() {
+    this._update_conversations(this.all_unarchived_conversations());
+  }
+
+  /**
    * Get users and events for conversations.
    *
    * @note To reduce the number of backend calls we merge the user IDs of all conversations first.
+   * @private
    * @param {Array<Conversation>} conversation_ets - Array of conversation entities to be updated
    * @returns {undefined} No return value
    */
-  update_conversations(conversation_ets) {
+  _update_conversations(conversation_ets) {
     const user_ids = _.flatten(conversation_ets.map((conversation_et) => conversation_et.participating_user_ids()));
 
     this.user_repository.get_users_by_id(user_ids)
       .then(() => {
         conversation_ets.forEach((conversation_et) => this._fetch_users_and_events(conversation_et));
       });
-  }
-
-  /**
-   * Map users to conversations without any backend requests.
-   * @param {Array<Conversation>} conversation_ets - Array of conversation entities to be updated
-   * @returns {undefined} No return value
-   */
-  update_conversations_offline(conversation_ets) {
-    conversation_ets.map((conversation_et) => this.update_participating_user_ets(conversation_et, true));
   }
 
 
@@ -715,7 +738,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(() => {
         this.logger.info('Updating group participants offline');
         this._init_state_updates();
-        this.update_conversations_offline(this.sorted_conversations());
+        this.update_conversations_offline();
       });
   }
 

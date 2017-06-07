@@ -150,7 +150,7 @@ z.main.App = class App {
     view_models.main              = new z.ViewModel.MainViewModel('wire-main', this.repository.user);
     view_models.content           = new z.ViewModel.content.ContentViewModel('right', this.repository.calling, this.repository.client, this.repository.conversation, this.repository.media, this.repository.properties, this.repository.search, this.repository.team);
     view_models.list              = new z.ViewModel.list.ListViewModel('left', view_models.content, this.repository.calling, this.repository.connect, this.repository.conversation, this.repository.search, this.repository.properties, this.repository.team);
-    view_models.title             = new z.ViewModel.WindowTitleViewModel(view_models.content.content_state, this.repository.user, this.repository.conversation, this.repository.team);
+    view_models.title             = new z.ViewModel.WindowTitleViewModel(view_models.content.content_state, this.repository.user, this.repository.conversation);
     view_models.lightbox          = new z.ViewModel.ImageDetailViewViewModel('detail-view', this.repository.conversation);
     view_models.warnings          = new z.ViewModel.WarningsViewModel('warnings');
     view_models.modals            = new z.ViewModel.ModalsViewModel('modals');
@@ -264,7 +264,7 @@ z.main.App = class App {
       amplify.publish(z.event.WebApp.LIFECYCLE.LOADED);
       amplify.publish(z.event.WebApp.LOADED); // todo: deprecated - remove when user base of wrappers version >= 2.12 is large enough
       this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.APP_LOADED);
-      return this.repository.conversation.update_conversations(this.repository.conversation.conversations_unarchived());
+      return this.repository.conversation.update_conversations_unarchived();
     })
     .then(() => {
       this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.UPDATED_CONVERSATIONS);
