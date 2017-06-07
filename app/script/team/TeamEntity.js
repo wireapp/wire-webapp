@@ -30,5 +30,10 @@ z.team.TeamEntity = class TeamEntity {
     this.members = ko.observableArray([]);
     this.id = id;
     this.name = ko.observable('');
+
+    this.conversations_archived = ko.observableArray([]);
+    this.conversations_calls = ko.observableArray([]);
+    this.conversations_cleared = ko.observableArray([]);
+    this.conversations_unarchived = ko.observableArray([]);
   }
 };

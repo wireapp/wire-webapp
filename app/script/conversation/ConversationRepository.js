@@ -93,45 +93,57 @@ z.conversation.ConversationRepository = class ConversationRepository {
       this.sending_queue.pause(request_queue_blocked || this.block_event_handling);
     });
 
-    this.conversations_archived = ko.observableArray([]);
-    this.conversations_calls = ko.observableArray([]);
-    this.conversations_cleared = ko.observableArray([]);
-    this.conversations_unarchived = ko.observableArray([]);
+    this.conversations_archived = ko.pureComputed(() => this.active_team.conversations_archived());
+    this.conversations_calls = ko.pureComputed(() => this.active_team.conversations_calls());
+    this.conversations_cleared = ko.pureComputed(() => this.active_team.conversations_cleared());
+    this.conversations_unarchived = ko.pureComputed(() => this.active_team.conversations_unarchived());
 
     this._init_subscriptions();
   }
 
   _init_state_updates() {
     ko.computed(() => {
-      const archived = [];
-      const calls = [];
-      const cleared = [];
-      const unarchived = [];
-      const active_team_id = this.active_team().id;
+      const team_conversations = {
+        personal_space: [],
+      };
 
       this.sorted_conversations().forEach((conversation_et) => {
-        const {team_id} = conversation_et;
+        let {team_id} = conversation_et;
 
-        const is_team_conversation = team_id === active_team_id;
-        const is_guest_conversation = !active_team_id && team_id && conversation_et.is_guest();
+        if (!this.team_repository.known_team_ids().includes(team_id)) {
+          team_id = 'personal_space';
+        }
 
-        if (is_team_conversation || is_guest_conversation) {
-          if (conversation_et.has_active_call()) {
-            calls.push(conversation_et);
-          } else if (conversation_et.is_cleared()) {
-            cleared.push(conversation_et);
-          } else if (conversation_et.is_archived()) {
-            archived.push(conversation_et);
-          } else {
-            unarchived.push(conversation_et);
-          }
+        team_conversations[team_id] = team_conversations[team_id] || {archived: [], calls: [], cleared: [], unarchived: []};
+
+        if (conversation_et.has_active_call()) {
+          team_conversations[team_id].calls.push(conversation_et);
+        } else if (conversation_et.is_cleared()) {
+          team_conversations[team_id].cleared.push(conversation_et);
+        } else if (conversation_et.is_archived()) {
+          team_conversations[team_id].archived.push(conversation_et);
+        } else {
+          team_conversations[team_id].unarchived.push(conversation_et);
         }
       });
 
-      this.conversations_archived(archived);
-      this.conversations_calls(calls);
-      this.conversations_cleared(cleared);
-      this.conversations_unarchived(unarchived);
+      for (const team_id in team_conversations) {
+        if (team_conversations.hasOwnProperty(team_id)) {
+          let team_et;
+          const conversations = team_conversations[team_id];
+
+          if (team_id !== 'personal_space') {
+            [team_et] = this.team_repository.teams().filter((team_et) => team_et.id === team_id);
+          } else {
+            team_et = this.team_repository.personal_space;
+          }
+
+          team_et.conversations_archived(conversations.archived);
+          team_et.conversations_calls(conversations.calls);
+          team_et.conversations_cleared(conversations.cleared);
+          team_et.conversations_unarchived(conversations.unarchived);
+        }
+      }
     });
   }
 
