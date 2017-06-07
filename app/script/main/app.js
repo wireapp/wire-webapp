@@ -272,6 +272,7 @@ z.main.App = class App {
       this.repository.announce.init();
       this.repository.audio.init(true);
       this.repository.client.cleanup_clients_and_sessions(true);
+      this.repository.conversation.cleanup_conversations();
       this.logger.info('App fully loaded');
     })
     .catch((error) => {
@@ -363,7 +364,6 @@ z.main.App = class App {
    */
   _check_user_information(user_et) {
     if (!user_et.medium_picture_resource()) {
-      this.view.list.first_run(true);
       this.repository.user.set_default_picture();
     }
     if (!user_et.username()) {

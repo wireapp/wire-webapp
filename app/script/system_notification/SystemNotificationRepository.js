@@ -704,8 +704,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
           hide_notification = true;
         }
 
-        const active_conversation_id = this.conversation_repository.active_conversation() ? this.conversation_repository.active_conversation().id : undefined;
-        const in_active_conversation = conversation_et.id === active_conversation_id;
+        const in_active_conversation = this.conversation_repository.is_active_conversation(conversation_et);
         const in_conversation_view = document.hasFocus() && wire.app.view.content.content_state() === z.ViewModel.content.CONTENT_STATE.CONVERSATION;
         const in_maximized_call = this.calling_repository.joined_call() && !wire.app.view.content.multitasking.is_minimized();
         if (in_conversation_view && in_active_conversation && !in_maximized_call) {
@@ -760,7 +759,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
       wire.app.view.content.multitasking.is_minimized(true);
       notification_content.trigger();
       this.logger.info(`Notification for '${message_id} in '${conversation_id}' closed by click.`);
-      return notification.close();
+      notification.close();
     };
 
     notification.onclose = () => {
@@ -771,13 +770,13 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
 
     notification.onerror = () => {
       this.logger.error(`Notification for '${message_id}' in '${conversation_id}' closed by error.`);
-      return notification.close();
+      notification.close();
     };
 
     notification.onshow = () => {
-      return timeout_trigger_id = window.setTimeout(() => {
+      timeout_trigger_id = window.setTimeout(() => {
         this.logger.info(`Notification for '${message_id}' in '${conversation_id}' closed by timeout.`);
-        return notification.close();
+        notification.close();
       }
       , notification_content.timeout);
     };

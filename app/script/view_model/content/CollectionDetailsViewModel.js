@@ -97,7 +97,7 @@ z.ViewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
   }
 
   should_show_header(message_et) {
-    if (this.last_message_timestamp) {
+    if (!this.last_message_timestamp) {
       this.last_message_timestamp = message_et.timestamp();
       return true;
     }

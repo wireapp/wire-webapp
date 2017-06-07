@@ -6,7 +6,7 @@
       <div class="user-profile-header">
         <div class="name popover-title ellipsis" data-bind="text: user().name(), attr: {'data-uie-uid': user().id, 'data-uie-value': user().name()}" data-uie-name="status-user"></div>
         <div class="username popover-meta label-username" data-bind="text: user().username(), attr: {'data-uie-value': user().name()}" data-uie-name="status-username"></div>
-        <!-- ko if: conversation && conversation().is_group() -->
+        <!-- ko if: show_back_button() && $parent.group_mode()-->
           <div class="user-profile-back-button button-icon icon-back" data-bind="click: on_close, l10n_tooltip: z.string.tooltip_people_back" data-uie-name="do-back"></div>
         <!-- /ko -->
         <!-- ko if: user().is_verified() -->
@@ -109,7 +109,9 @@
     <div class="button-icon icon-people-add"></div>
     <span data-bind="l10n_text: z.string.people_button_create"></span>
   </div>
-  <div class="button-icon icon-block pull-right" data-bind="click: on_block, l10n_tooltip: z.string.tooltip_people_block" data-uie-name="do-block"></div>
+  <!-- ko if: user().is_connected() -->
+    <div class="button-icon icon-block pull-right" data-bind="click: on_block, l10n_tooltip: z.string.tooltip_people_block" data-uie-name="do-block"></div>
+  <!-- /ko -->
 </script>
 
 <script type="text/html" id="user-profile-footer-unblock">

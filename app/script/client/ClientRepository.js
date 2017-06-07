@@ -481,15 +481,17 @@ z.client.ClientRepository = class ClientRepository {
   }
 
   logout_client() {
-    if (this.current_client().type === z.client.ClientType.PERMANENT) {
-      return amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.LOGOUT, {
-        action(clear_data) {
-          return amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReason.USER_REQUESTED, clear_data);
-        },
-      });
+    if (this.current_client()) {
+      if (this.current_client().type === z.client.ClientType.PERMANENT) {
+        return amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.LOGOUT, {
+          action(clear_data) {
+            return amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReason.USER_REQUESTED, clear_data);
+          },
+        });
+      }
+      return this.delete_temporary_client()
+        .then(() => amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReason.USER_REQUESTED, true));
     }
-    return this.delete_temporary_client()
-    .then(() => amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReason.USER_REQUESTED, true));
   }
 
   /**

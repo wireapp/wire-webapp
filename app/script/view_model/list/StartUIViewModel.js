@@ -384,16 +384,21 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
   }
 
   click_on_group(conversation_et) {
-    const promise = conversation_et instanceof z.entity.User ? this.conversation_repository.get_one_to_one_conversation(conversation_et) : Promise.resolve(conversation_et);
+    const promise = conversation_et instanceof z.entity.User ? this.conversation_repository.get_1to1_conversation(conversation_et) : Promise.resolve(conversation_et);
 
     promise
       .then((_conversation_et) => {
         if (_conversation_et.is_archived()) {
           this.conversation_repository.unarchive_conversation(_conversation_et);
         }
+
+        if (_conversation_et.is_cleared()) {
+          _conversation_et.cleared_timestamp(0);
+        }
+
         amplify.publish(z.event.WebApp.CONVERSATION.SHOW, _conversation_et);
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.OPENED_CONVERSATION, {
-          conversation_type: conversation_et.is_group() ? 'group' : 'one_to_one',
+          conversation_type: (conversation_et.is_group() || conversation_et.is_team_group()) ? 'group' : 'one_to_one',
         });
         this._close_list();
       });
@@ -638,7 +643,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.submitted_search = true;
 
     if (this.selected_people().length === 1) {
-      return this.conversation_repository.get_one_to_one_conversation(this.selected_people()[0])
+      return this.conversation_repository.get_1to1_conversation(this.selected_people()[0])
         .then((conversation_et) => {
           amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.OPENED_CONVERSATION, {source: 'top_user'});
           this.click_on_group(conversation_et);

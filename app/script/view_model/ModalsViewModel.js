@@ -325,7 +325,7 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
     title_element.text(z.localization.Localizer.get_text({
       id: z.string.modal_remove_device_headline,
       replace: {
-        content: content.max,
+        content: content,
         placeholder: '%device_name',
       },
     }));

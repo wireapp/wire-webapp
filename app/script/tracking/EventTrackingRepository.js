@@ -210,10 +210,12 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   }
 
   _disable_localytics() {
-    this.localytics('close');
-    window.ll = undefined;
-    this.localytics = undefined;
-    this.logger.debug('Localytics reporting was disabled due to user preferences');
+    if (this.localytics) {
+      this.localytics('close');
+      window.ll = undefined;
+      this.localytics = undefined;
+      this.logger.debug('Localytics reporting was disabled due to user preferences');
+    }
   }
 
   // @see http://docs.localytics.com/#Dev/Integrate/web-options.html
