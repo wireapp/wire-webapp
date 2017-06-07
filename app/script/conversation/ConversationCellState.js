@@ -107,7 +107,18 @@ z.conversation.ConversationCellState = (() => {
   };
 
   const removed_state = {
-    description() {
+    description(conversation_et) {
+      const last_message_et = conversation_et.get_last_message();
+      const self_user_id = wire.app.repository.user.self().id;
+
+      if (last_message_et.is_member() && last_message_et.is_member_removal() && last_message_et.user_ids().includes(self_user_id)) {
+        if (last_message_et.user().id === self_user_id) {
+          return z.l10n.text(z.string.conversations_secondary_line_you_left);
+        }
+
+        return z.l10n.text(z.string.conversations_secondary_line_you_were_removed);
+      }
+
       return '';
     },
     icon() {
@@ -153,32 +164,35 @@ z.conversation.ConversationCellState = (() => {
       const last_message_et = conversation_et.get_last_message();
       const remote_user_count = last_message_et.remote_user_ets().length;
       const sender_name = last_message_et.sender_name();
-      let message_text;
 
-      switch (last_message_et.type) {
-        case z.event.Backend.CONVERSATION.MEMBER_LEAVE:
-          if (remote_user_count === 1) {
-            message_text = z.l10n.text(z.string.conversations_secondary_line_person_left, remote_user_count);
-          } else if (remote_user_count > 1) {
-            message_text = z.l10n.text(z.string.conversations_secondary_line_people_left, remote_user_count);
+      if (last_message_et.is_member()) {
+        if (last_message_et.is_member_join()) {
+          if (remote_user_count === 0) {
+            return z.l10n.text(z.string.conversations_secondary_line_person_added_you, sender_name);
           }
-          break;
-        case z.event.Backend.CONVERSATION.MEMBER_JOIN:
+
           if (remote_user_count === 1) {
-            const remote_name = last_message_et.remote_user_ets()[0].first_name();
-            message_text = z.l10n.text(z.string.conversations_secondary_line_person_added, {user1: sender_name, user2: remote_name});
-          } else if (remote_user_count > 1) {
-            message_text = z.l10n.text(z.string.conversations_secondary_line_people_added, remote_user_count);
+            const [remote_user_et] = last_message_et.remote_user_ets();
+            return z.l10n.text(z.string.conversations_secondary_line_person_added, {user1: sender_name, user2: remote_user_et.name()});
           }
-          break;
-        default:
-          message_text = '';
+
+          if (remote_user_count > 1) {
+            return z.l10n.text(z.string.conversations_secondary_line_people_added, remote_user_count);
+          }
+        }
+
+        if (last_message_et.is_member_removal()) {
+          if (remote_user_count === 1) {
+            return z.l10n.text(z.string.conversations_secondary_line_person_left, remote_user_count);
+          } else if (remote_user_count > 1) {
+            return z.l10n.text(z.string.conversations_secondary_line_people_left, remote_user_count);
+          }
+        }
       }
-      return message_text;
     },
     icon(conversation_et) {
       const last_message_et = conversation_et.get_last_message();
-      if (last_message_et.type === z.event.Backend.CONVERSATION.MEMBER_LEAVE) {
+      if (last_message_et.is_member() && last_message_et.is_member_removal()) {
         if (conversation_et.is_muted()) {
           return z.conversation.ConversationStatusIcon.MUTED;
         }

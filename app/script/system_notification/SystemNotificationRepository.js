@@ -353,10 +353,10 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
     switch (message_et.member_message_type) {
       case z.message.SystemMessageType.NORMAL:
         if (is_group_conversation) {
-          if (message_et.type === z.event.Backend.CONVERSATION.MEMBER_JOIN) {
+          if (message_et.is_member_join()) {
             return this._create_body_member_join(message_et);
           }
-          if (message_et.type === z.event.Backend.CONVERSATION.MEMBER_LEAVE) {
+          if (message_et.is_member_leave()) {
             return this._create_body_member_leave(message_et);
           }
         }
