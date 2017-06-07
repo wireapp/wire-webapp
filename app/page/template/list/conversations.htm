@@ -193,7 +193,7 @@
       <!-- /ko -->
     </ul>
     <!-- /ko -->
-    <!-- ko if: conversations_unarchived().length === 0 && connect_requests().length === 0 -->
+    <!-- ko if: conversations_unarchived().length === 0 && connect_requests().length === 0 && conversations_call().length === 0 -->
       <!-- ko if: conversations_archived().length === 0 -->
         <div class="conversation-hint" data-uie-name="status-start-conversation-hint">
           <div class="conversation-hint-header" data-bind="l10n_text: z.string.conversations_no_conversations"></div>
