@@ -23,7 +23,6 @@ window.z = window.z || {};
 window.z.conversation = z.conversation || {};
 
 z.conversation.ConversationCellState = (() => {
-
   function is_alert(message_et) {
     return message_et.is_ping() || message_et.is_call() && message_et.was_missed();
   }
@@ -32,31 +31,33 @@ z.conversation.ConversationCellState = (() => {
     const activity_strings = [];
 
     for (const activity in activities) {
-      const count = activities[activity];
+      if (activities.hasOwnProperty(activity)) {
+        const count = activities[activity];
 
-      switch (activity) {
-        case 'message':
-          if (count === 1) {
-            activity_strings.push(z.l10n.text(z.string.conversations_secondary_line_new_message, count));
-          } else if (count > 1) {
-            activity_strings.push(z.l10n.text(z.string.conversations_secondary_line_new_messages, count));
-          }
-          break;
-        case 'ping':
-          if (count === 1) {
-            activity_strings.push(z.l10n.text(z.string.conversations_secondary_line_ping, count));
-          } else if (count > 1) {
-            activity_strings.push(z.l10n.text(z.string.conversations_secondary_line_pings, count));
-          }
-          break;
-        case 'call':
-          if (count === 1) {
-            activity_strings.push(z.l10n.text(z.string.conversations_secondary_line_missed_call, count));
-          } else if (count > 1) {
-            activity_strings.push(z.l10n.text(z.string.conversations_secondary_line_missed_calls, count));
-          }
-          break;
-        default:
+        switch (activity) {
+          case 'message':
+            if (count === 1) {
+              activity_strings.push(z.l10n.text(z.string.conversations_secondary_line_new_message, count));
+            } else if (count > 1) {
+              activity_strings.push(z.l10n.text(z.string.conversations_secondary_line_new_messages, count));
+            }
+            break;
+          case 'ping':
+            if (count === 1) {
+              activity_strings.push(z.l10n.text(z.string.conversations_secondary_line_ping, count));
+            } else if (count > 1) {
+              activity_strings.push(z.l10n.text(z.string.conversations_secondary_line_pings, count));
+            }
+            break;
+          case 'call':
+            if (count === 1) {
+              activity_strings.push(z.l10n.text(z.string.conversations_secondary_line_missed_call, count));
+            } else if (count > 1) {
+              activity_strings.push(z.l10n.text(z.string.conversations_secondary_line_missed_calls, count));
+            }
+            break;
+          default:
+        }
       }
     }
 
@@ -242,7 +243,7 @@ z.conversation.ConversationCellState = (() => {
     },
   };
 
-  function generate(conversation_et) {
+  function _generate(conversation_et) {
     const states = [empty_state, removed_state, muted_state, alert_state, group_activity_state, unread_message_state, pending_state];
     const icon_state = states.find((state) => state.match(conversation_et));
     const description_state = states.find((state) => state.match(conversation_et));
@@ -254,7 +255,6 @@ z.conversation.ConversationCellState = (() => {
   }
 
   return {
-    generate,
+    generate: _generate,
   };
-
 })();

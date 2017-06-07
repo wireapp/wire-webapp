@@ -172,6 +172,15 @@ z.entity.Conversation = class Conversation {
 
     this.unread_event_count = ko.pureComputed(() => this.unread_events().length);
 
+    this.unread_message_count = ko.pureComputed(() => {
+      return this.unread_events()
+        .filter((message_et) => {
+          const is_missed_call = message_et.is_call() && message_et.was_missed();
+          return is_missed_call || message_et.is_ping() || message_et.is_content();
+        })
+        .length;
+    });
+
     /**
      * Display name strategy:
      *
