@@ -76,7 +76,7 @@ z.conversation.ConversationCellState = (() => {
         activities.call = activities.call + 1;
       } else if (message_et.is_ping()) {
         activities.ping = activities.ping + 1;
-      } else {
+      } else if (message_et.is_content()) {
         activities.message = activities.message + 1;
       }
     }
@@ -215,7 +215,7 @@ z.conversation.ConversationCellState = (() => {
         message_text = z.l10n.text(z.string.system_notification_asset_add);
       }
 
-      if (conversation_et.is_group()) {
+      if (message_text && conversation_et.is_group()) {
         message_text = `${last_message_et.sender_name()}: ${message_text}`;
       }
       return message_text;
