@@ -93,10 +93,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
       this.sending_queue.pause(request_queue_blocked || this.block_event_handling);
     });
 
-    this.conversations_archived = ko.pureComputed(() => this.active_team.conversations_archived());
-    this.conversations_calls = ko.pureComputed(() => this.active_team.conversations_calls());
-    this.conversations_cleared = ko.pureComputed(() => this.active_team.conversations_cleared());
-    this.conversations_unarchived = ko.pureComputed(() => this.active_team.conversations_unarchived());
+    this.conversations_archived = ko.pureComputed(() => this.active_team().conversations_archived());
+    this.conversations_calls = ko.pureComputed(() => this.active_team().conversations_calls());
+    this.conversations_cleared = ko.pureComputed(() => this.active_team().conversations_cleared());
+    this.conversations_unarchived = ko.pureComputed(() => this.active_team().conversations_unarchived());
 
     this._init_subscriptions();
   }
@@ -104,7 +104,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
   _init_state_updates() {
     ko.computed(() => {
       const team_conversations = {
-        personal_space: [],
+        personal_space: {
+          archived: [],
+          calls: [],
+          cleared: [],
+          unarchived: [],
+        },
       };
 
       this.sorted_conversations().forEach((conversation_et) => {
@@ -133,7 +138,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           const conversations = team_conversations[team_id];
 
           if (team_id !== 'personal_space') {
-            [team_et] = this.team_repository.teams().filter((team_et) => team_et.id === team_id);
+            [team_et] = this.team_repository.teams().filter((team) => team.id === team_id);
           } else {
             team_et = this.team_repository.personal_space;
           }

@@ -66,13 +66,7 @@ z.ViewModel.WindowTitleViewModel = class WindowTitleViewModel {
         switch (this.content_state()) {
           case z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS: {
             if (number_of_connect_requests > 1) {
-              window_title += z.localization.Localizer.get_text({
-                id: z.string.conversations_connection_request_many,
-                replace: {
-                  content: number_of_connect_requests,
-                  placeholder: '%no',
-                },
-              });
+              window_title += z.l10n.text(z.string.conversations_connection_request_many, number_of_connect_requests);
             } else {
               window_title += z.l10n.text(z.string.conversations_connection_request_one);
             }
