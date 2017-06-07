@@ -211,7 +211,7 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
         amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, conversation_id, z.media.MediaType.SCREEN);
       } else if (z.util.Environment.electron) {
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CALLING.SHARED_SCREEN, {
-          conversation_type: this.joined_call().is_group() ? z.tracking.attribute.ConversationType.GROUP : z.tracking.attribute.ConversationType.ONE_TO_ONE,
+          conversation_type: this.joined_call().is_group ? z.tracking.attribute.ConversationType.GROUP : z.tracking.attribute.ConversationType.ONE_TO_ONE,
           kind_of_call_when_sharing: this.joined_call().is_remote_video_send() ? 'video' : 'audio',
         });
 
