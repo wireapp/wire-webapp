@@ -230,8 +230,9 @@ z.conversation.ConversationCellState = (() => {
 
   const pending_state = {
     description(conversation_et) {
-      const [participating_user_et] = conversation_et.participating_user_ets();
-      return participating_user_et ? `@${participating_user_et.username()}` : '';
+      const [user_et] = conversation_et.participating_user_ets();
+      const has_username = user_et && user_et.username();
+      return has_username ? `@${user_et.username()}` : '';
     },
     icon() {
       return z.conversation.ConversationStatusIcon.PENDING_CONNECTION;
