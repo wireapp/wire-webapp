@@ -758,7 +758,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
       window.focus();
       wire.app.view.content.multitasking.is_minimized(true);
       notification_content.trigger();
-      this.logger.info(`Notification for message '${message_id} in '${conversation_id}' closed by click.`);
+      this.logger.info(`Notification for message '${message_id} in conversation '${conversation_id}' closed by click.`);
       notification.close();
     };
 
