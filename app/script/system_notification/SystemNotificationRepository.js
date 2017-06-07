@@ -298,46 +298,11 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    * @returns {string} Notification message body
    */
   _create_body_member_leave(message_et) {
-    if (message_et.user_ets().length === 1) {
-      if (message_et.user_ets()[0] === message_et.user()) {
-        return z.localization.Localizer.get_text({
-          id: z.string.system_notification_member_leave_left,
-          replace: {
-            content: message_et.user().first_name(),
-            placeholder: '%s.first_name',
-          },
-        });
-      }
-
-      return z.localization.Localizer.get_text({
-        id: z.string.system_notification_member_leave_removed_one,
-        replace: [
-          {
-            content: message_et.user().first_name(),
-            placeholder: '%s.first_name',
-          },
-          {
-            content: z.util.get_first_name(message_et.user_ets()[0], z.string.Declension.ACCUSATIVE),
-            placeholder: '%@.first_name',
-          },
-        ],
-      });
+    if (message_et.user_ets().length === 1 && !message_et.remote_user_ets().length) {
+      return z.l10n.text(z.string.system_notification_member_leave_removed_you, message_et.user().first_name());
     }
-
-    return z.localization.Localizer.get_text({
-      id: z.string.system_notification_member_leave_removed_many,
-      replace: [
-        {
-          content: message_et.user().first_name(),
-          placeholder: '%s.first_name',
-        },
-        {
-          content: message_et.user_ets().length,
-          placeholder: '%no',
-        },
-      ],
-    });
   }
+
 
   /**
    * Selects the type of system message that the notification body needs to be created for.
