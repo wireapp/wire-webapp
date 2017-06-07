@@ -23,21 +23,23 @@ window.z = window.z || {};
 window.z.calling = z.calling || {};
 window.z.calling.entities = z.calling.entities || {};
 
-z.calling.entities.EParticipant = class EParticipant {
+z.calling.entities.Participant = class Participant {
   /**
-   * Construct a new e-participant.
-   * @param {ECall} e_call_et - E-call entity
+   * Construct a new participant.
+   *
+   * @class z.calling.entities.Participant
+   * @param {Call} call_et - Call entity
    * @param {z.entity.User} user - User entity to base the participant on
    * @param {CallSetupTimings} timings - Timing statistics of call setup steps
-   * @param {ECallMessage} e_call_message_et - E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
+   * @param {CallMessage} call_message_et - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
    */
-  constructor(e_call_et, user, timings, e_call_message_et) {
-    this.e_call_et = e_call_et;
+  constructor(call_et, user, timings, call_message_et) {
+    this.call_et = call_et;
     this.user = user;
     this.id = this.user.id;
     this.session_id = undefined;
 
-    this.logger = new z.util.Logger(`z.calling.entities.EParticipant (${this.id})`, z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger(`z.calling.entities.Participant (${this.id})`, z.config.LOGGER.OPTIONS);
 
     this.is_connected = ko.observable(false);
     this.panning = ko.observable(0.0);
@@ -49,7 +51,7 @@ z.calling.entities.EParticipant = class EParticipant {
       video_send: ko.observable(false),
     };
 
-    this.e_flow_et = new z.calling.entities.EFlow(this.e_call_et, this, timings, e_call_message_et);
+    this.flow_et = new z.calling.entities.Flow(this.call_et, this, timings, call_message_et);
 
     this.is_connected.subscribe(function(is_connected) {
       if (is_connected && !this.was_connected) {
@@ -64,8 +66,8 @@ z.calling.entities.EParticipant = class EParticipant {
    * @returns {undefined} No return value
    */
   reset_participant() {
-    if (this.e_flow_et) {
-      this.e_flow_et.reset_flow();
+    if (this.flow_et) {
+      this.flow_et.reset_flow();
     }
   }
 
@@ -74,28 +76,28 @@ z.calling.entities.EParticipant = class EParticipant {
    * @returns {undefined} No return value
    */
   start_negotiation() {
-    this.e_flow_et.start_negotiation();
+    this.flow_et.start_negotiation();
   }
 
   /**
    * Update the participant state.
-   * @param {ECallMessage} e_call_message_et - E-call message to update state from.
+   * @param {CallMessage} call_message_et - Call message to update state from.
    * @returns {Promise} Resolves with the participant when the state was updated
    */
-  update_state(e_call_message_et) {
-    if (!e_call_message_et) {
+  update_state(call_message_et) {
+    if (!call_message_et) {
       return Promise.resolve(this);
     }
 
-    const {client_id, props, sdp: rtc_sdp, session_id} = e_call_message_et;
+    const {client_id, props, sdp: rtc_sdp, session_id} = call_message_et;
 
     return this.update_properties(props)
       .then(() => {
         this.session_id = session_id;
-        this.e_flow_et.set_remote_client_id(client_id);
+        this.flow_et.set_remote_client_id(client_id);
 
         if (rtc_sdp) {
-          return this.e_flow_et.save_remote_sdp(e_call_message_et);
+          return this.flow_et.save_remote_sdp(call_message_et);
         }
       })
       .then(() => this);
@@ -134,15 +136,15 @@ z.calling.entities.EParticipant = class EParticipant {
    */
   verify_client_id(client_id) {
     if (client_id) {
-      const connected_client_id = this.e_flow_et.remote_client_id;
+      const connected_client_id = this.flow_et.remote_client_id;
 
       if (connected_client_id && client_id !== connected_client_id) {
         this.logger.warn(`State change requested from '${client_id}' while we are connected to '${connected_client_id}'`, this);
-        throw new z.calling.v3.CallError(z.calling.v3.CallError.TYPE.WRONG_SENDER);
+        throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_SENDER);
       }
-      this.e_flow_et.remote_client_id = client_id;
+      this.flow_et.remote_client_id = client_id;
     } else {
-      throw new z.calling.v3.CallError(z.calling.v3.CallError.TYPE.WRONG_SENDER, 'Sender ID missing');
+      throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_SENDER, 'Sender ID missing');
     }
   }
 };

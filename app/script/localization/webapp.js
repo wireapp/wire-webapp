@@ -134,9 +134,6 @@ z.string.modal_block_conversation_button = 'Block';
 // Cannot create the call because there is nobody to call (conversation_empty)
 z.string.modal_call_conversation_empty_headline = 'No one to call';
 z.string.modal_call_conversation_empty_message = 'There is no one left here.';
-// Cannot create the call because there are too many participants (conversation_full)
-z.string.modal_call_conversation_full_headline = 'Too many people to call';
-z.string.modal_call_conversation_full_message = 'Calls work in conversations with up to %no people.';
 // Cannot video call in group conversations
 z.string.modal_call_no_video_in_group_headline = 'No video calls in groups';
 z.string.modal_call_no_video_in_group_message = 'Video calls are not available in group conversations.';
@@ -152,9 +149,6 @@ z.string.modal_call_second_ongoing_action = 'Hang Up';
 z.string.modal_call_second_outgoing_headline = 'Hang up current call?';
 z.string.modal_call_second_outgoing_message = 'You can only be in one call at a time.';
 z.string.modal_call_second_outgoing_action = 'Hang Up';
-// Cannot join the call because there are too many participants (voice_channel_full)
-z.string.modal_call_voice_channel_full_headline = 'Full house';
-z.string.modal_call_voice_channel_full_message = 'There’s only room for %no people in here.';
 // Clear a conversation
 z.string.modal_clear_conversation_headline = 'Delete "%@.name" content?';
 z.string.modal_clear_conversation_message = 'This will clear the conversation history and remove it from your list.';

@@ -188,7 +188,7 @@ describe('z.system_notification.SystemNotificationRepository', function() {
     it('if the browser tab has focus and conversation is active', function(done) {
       TestFactory.conversation_repository.active_conversation(conversation_et);
       document.hasFocus = () => true;
-      TestFactory.v2_call_center.joined_call = () => true;
+      TestFactory.calling_repository.joined_call = () => true;
 
       TestFactory.system_notification_repository.notify(conversation_et, message_et)
         .then(function() {

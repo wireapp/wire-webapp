@@ -23,7 +23,7 @@ window.z = window.z || {};
 window.z.calling = z.calling || {};
 window.z.calling.entities = z.calling.entities || {};
 
-z.calling.entities.ECall = class ECall {
+z.calling.entities.Call = class Call {
   static get CONFIG() {
     return {
       GROUP_CHECK_ACTIVITY_TIMEOUT: 2 * 60,
@@ -36,22 +36,24 @@ z.calling.entities.ECall = class ECall {
   }
 
   /**
-   * Construct a new e-call entity.
+   * Construct a new call entity.
+   *
+   * @class z.calling.entities.Call
    * @param {z.entity.Conversation} conversation_et - Conversation the call takes place in
    * @param {z.entity.User} creating_user - Entity of user starting the call
    * @param {string} session_id - Session ID to identify call
-   * @param {z.calling.v3.CallCenter} v3_call_center - V3 call center
+   * @param {z.calling.CallingRepository} calling_repository - Calling Repository
    */
-  constructor(conversation_et, creating_user, session_id, v3_call_center) {
+  constructor(conversation_et, creating_user, session_id, calling_repository) {
     this.conversation_et = conversation_et;
     this.creating_user = creating_user;
     this.session_id = session_id;
-    this.v3_call_center = v3_call_center;
+    this.calling_repository = calling_repository;
 
     const {id: conversation_id, is_group} = conversation_et;
-    const {media_stream_handler, media_repository, self_state, telemetry, user_repository} = this.v3_call_center;
+    const {media_stream_handler, media_repository, self_state, telemetry, user_repository} = this.calling_repository;
 
-    this.logger = new z.util.Logger(`z.calling.entities.ECall (${conversation_id})`, z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger(`z.calling.entities.Call (${conversation_id})`, z.config.LOGGER.OPTIONS);
 
     // IDs and references
     this.id = conversation_id;
@@ -114,13 +116,13 @@ z.calling.entities.ECall = class ECall {
         }
 
         this.telemetry.track_event(z.tracking.EventName.CALLING.ESTABLISHED_CALL, this);
-        this.timer_start = Date.now() - ECall.CONFIG.TIMER_UPDATE_START;
+        this.timer_start = Date.now() - Call.CONFIG.TIMER_UPDATE_START;
 
         this.call_timer_interval = window.setInterval(() => {
           const duration_in_seconds = Math.floor((Date.now() - this.timer_start) / 1000);
 
           this.duration_time(duration_in_seconds);
-        }, ECall.CONFIG.TIMER_UPDATE_INTERVAL);
+        }, Call.CONFIG.TIMER_UPDATE_INTERVAL);
       }
     });
 
@@ -154,12 +156,12 @@ z.calling.entities.ECall = class ECall {
         }
 
         this._reset_timer();
-        this._reset_e_flows();
+        this._reset_flows();
       }
     });
 
     this.state.subscribe((state) => {
-      this.logger.info(`E-call state '${this.id}' changed to '${state}'`);
+      this.logger.info(`Call state '${this.id}' changed to '${state}'`);
 
       this._clear_state_timeout();
 
@@ -192,21 +194,21 @@ z.calling.entities.ECall = class ECall {
   /**
    * Deactivate the call.
    *
-   * @param {ECallMessage} e_call_message_et - E-call message for deactivation
+   * @param {CallMessage} call_message_et - Call message for deactivation
    * @param {z.calling.enum.TERMINATION_REASON} [termination_reason=z.calling.enum.TERMINATION_REASON.SELF_USER] - Call termination reason
    * @returns {undefined} No return value
    */
-  deactivate_call(e_call_message_et, termination_reason = z.calling.enum.TERMINATION_REASON.SELF_USER) {
+  deactivate_call(call_message_et, termination_reason = z.calling.enum.TERMINATION_REASON.SELF_USER) {
     const was_missed = z.calling.enum.CALL_STATE_GROUP.WAS_MISSED.includes(this.state());
     const reason = was_missed ? z.calling.enum.TERMINATION_REASON.MISSED : z.calling.enum.TERMINATION_REASON.COMPLETED;
 
     this.termination_reason = termination_reason;
-    this.v3_call_center.inject_deactivate_event(e_call_message_et, this.creating_user, reason);
+    this.calling_repository.inject_deactivate_event(call_message_et, this.creating_user, reason);
 
     if (this.participants().length <= 1) {
-      this.v3_call_center.delete_call(this.id);
+      this.calling_repository.delete_call(this.id);
     } else {
-      this.v3_call_center.media_stream_handler.reset_media_stream();
+      this.calling_repository.media_stream_handler.reset_media_stream();
     }
   }
 
@@ -232,15 +234,15 @@ z.calling.entities.ECall = class ECall {
 
     if (this.is_group) {
       const response = this.state() !== z.calling.enum.CALL_STATE.OUTGOING;
-      const additional_payload = this.v3_call_center.create_additional_payload(this.id);
-      const prop_sync_payload = this.v3_call_center.create_payload_prop_sync(z.media.MediaType.AUDIO, false, additional_payload);
+      const additional_payload = z.calling.CallMessageBuilder.create_payload(this.id, this.self_user.id);
+      const prop_sync_payload = z.calling.CallMessageBuilder.create_payload_prop_sync(this.self_state, z.media.MediaType.AUDIO, false, additional_payload);
 
-      this.send_e_call_event(z.calling.mapper.ECallMessageMapper.build_group_start(response, this.session_id, prop_sync_payload));
+      this.send_call_message(z.calling.CallMessageBuilder.build_group_start(response, this.session_id, prop_sync_payload));
     } else {
       const [user_id] = this.conversation_et.participating_user_ids();
 
-      this.v3_call_center.user_repository.get_user_by_id(user_id)
-        .then((remote_user_et) => this.add_e_participant(remote_user_et));
+      this.calling_repository.user_repository.get_user_by_id(user_id)
+        .then((remote_user_et) => this.add_participant(remote_user_et));
     }
   }
 
@@ -256,49 +258,49 @@ z.calling.entities.ECall = class ECall {
       this.state(z.calling.enum.CALL_STATE.DISCONNECTING);
     }
 
-    let e_call_message_et = undefined;
+    let call_message_et = undefined;
     if (this.is_connected()) {
-      e_call_message_et = z.calling.mapper.ECallMessageMapper.build_hangup(false, this.session_id);
+      call_message_et = z.calling.CallMessageBuilder.build_hangup(false, this.session_id);
     } else {
-      e_call_message_et = z.calling.mapper.ECallMessageMapper.build_cancel(false, this.session_id);
+      call_message_et = z.calling.CallMessageBuilder.build_cancel(false, this.session_id);
     }
 
     const event_promises = this.get_flows()
       .map(({remote_client_id, remote_user_id}) => {
-        e_call_message_et.add_properties(this.v3_call_center.create_additional_payload(this.id, remote_user_id, remote_client_id));
-        return this.send_e_call_event(e_call_message_et);
+        call_message_et.add_properties(z.calling.CallMessageBuilder.create_payload(this.id, this.self_user.id, remote_user_id, remote_client_id));
+        return this.send_call_message(call_message_et);
       });
 
     Promise.all(event_promises)
-      .then(() => Promise.all(this.participants().map(({id}) => this.reset_e_participant(id))))
+      .then(() => Promise.all(this.participants().map(({id}) => this.reset_participant(id))))
       .then(() => {
-        const additional_payload = this.v3_call_center.create_additional_payload(this.id);
+        const additional_payload = z.calling.CallMessageBuilder.create_payload(this.id, this.self_user.id);
 
         if (this.is_group) {
-          e_call_message_et = z.calling.mapper.ECallMessageMapper.build_group_leave(false, this.session_id, additional_payload);
-          this.send_e_call_event(e_call_message_et);
+          call_message_et = z.calling.CallMessageBuilder.build_group_leave(false, this.session_id, additional_payload);
+          this.send_call_message(call_message_et);
         } else {
-          e_call_message_et.add_properties(additional_payload);
+          call_message_et.add_properties(additional_payload);
         }
 
         this.set_self_state(false, termination_reason);
-        this.deactivate_call(e_call_message_et, termination_reason);
+        this.deactivate_call(call_message_et, termination_reason);
       });
   }
 
   /**
    * Check if group call should continue after participant left.
-   * @param {ECallMessage} e_call_message_et - Last member leaving call
+   * @param {CallMessage} call_message_et - Last member leaving call
    * @param {z.calling.enum.TERMINATION_REASON} termination_reason - Reason for call participant to leave
    * @returns {undefined} No return value
    */
-  participant_left(e_call_message_et, termination_reason) {
+  participant_left(call_message_et, termination_reason) {
     if (!this.participants().length) {
       if (this.self_client_joined()) {
         return this.leave_call(termination_reason);
       }
 
-      this.deactivate_call(e_call_message_et, termination_reason);
+      this.deactivate_call(call_message_et, termination_reason);
     }
   }
 
@@ -307,15 +309,15 @@ z.calling.entities.ECall = class ECall {
    * @returns {undefined} No return value
    */
   reject_call() {
-    const additional_payload = this.v3_call_center.create_additional_payload(this.id);
+    const additional_payload = z.calling.CallMessageBuilder.create_payload(this.id, this.self_user.id);
 
     this.state(z.calling.enum.CALL_STATE.REJECTED);
 
     if (this.is_remote_video_send()) {
-      this.v3_call_center.media_stream_handler.reset_media_stream();
+      this.calling_repository.media_stream_handler.reset_media_stream();
     }
 
-    this.send_e_call_event(z.calling.mapper.ECallMessageMapper.build_reject(false, this.session_id, additional_payload));
+    this.send_call_message(z.calling.CallMessageBuilder.build_reject(false, this.session_id, additional_payload));
   }
 
   /**
@@ -352,15 +354,15 @@ z.calling.entities.ECall = class ECall {
    * @returns {Promise} Resolves when state has been toggled
    */
   toggle_media(media_type) {
-    const e_call_event_promises = this.get_flows()
+    const call_event_promises = this.get_flows()
       .map(({remote_client_id, remote_user_id}) => {
-        const additional_payload = this.v3_call_center.create_additional_payload(this.id, remote_user_id, remote_client_id);
-        const prop_sync_payload = this.v3_call_center.create_payload_prop_sync(media_type, true, additional_payload);
+        const additional_payload = z.calling.CallMessageBuilder.create_payload(this.id, this.self_user.id, remote_user_id, remote_client_id);
+        const prop_sync_payload = z.calling.CallMessageBuilder.create_payload_prop_sync(this.self_state, media_type, true, additional_payload);
 
-        return this.send_e_call_event(z.calling.mapper.ECallMessageMapper.build_prop_sync(false, this.session_id, prop_sync_payload));
+        return this.send_call_message(z.calling.CallMessageBuilder.build_prop_sync(false, this.session_id, prop_sync_payload));
       });
 
-    return Promise.all(e_call_event_promises);
+    return Promise.all(call_event_promises);
   }
 
   /**
@@ -381,7 +383,7 @@ z.calling.entities.ECall = class ECall {
    * @returns {undefined} No return value
    */
   _clear_timeouts() {
-    this.get_flows().map((e_flow_et) => e_flow_et.clear_timeouts());
+    this.get_flows().map((flow_et) => flow_et.clear_timeouts());
     this._clear_group_check_timeout();
     this._clear_state_timeout();
   }
@@ -392,17 +394,17 @@ z.calling.entities.ECall = class ECall {
    * @returns {undefined} No return value
    */
   _set_send_group_check_timeout() {
-    const maximum_timeout = ECall.CONFIG.GROUP_CHECK_MAXIMUM_TIMEOUT;
-    const minimum_timeout = ECall.CONFIG.GROUP_CHECK_MINIMUM_TIMEOUT;
+    const maximum_timeout = Call.CONFIG.GROUP_CHECK_MAXIMUM_TIMEOUT;
+    const minimum_timeout = Call.CONFIG.GROUP_CHECK_MINIMUM_TIMEOUT;
     const timeout_in_seconds = z.util.NumberUtil.get_random_number(minimum_timeout, maximum_timeout);
 
     this.logger.debug(`Set sending group check after random timeout of '${timeout_in_seconds}s'`);
     this.group_check_timeout = window.setTimeout(() => {
       if (this.participants().length) {
         this.logger.debug(`Sending group check after random timeout of '${timeout_in_seconds}s'`);
-        const additional_payload = this.v3_call_center.create_additional_payload(this.id);
+        const additional_payload = z.calling.CallMessageBuilder.create_payload(this.id, this.self_user.id);
 
-        this.send_e_call_event(z.calling.mapper.ECallMessageMapper.build_group_check(true, this.session_id, additional_payload));
+        this.send_call_message(z.calling.CallMessageBuilder.build_group_check(true, this.session_id, additional_payload));
         this.schedule_group_check();
       } else {
         this.leave_call(z.calling.enum.TERMINATION_REASON.OTHER_USER);
@@ -416,15 +418,15 @@ z.calling.entities.ECall = class ECall {
    * @returns {undefined} No return value
    */
   _set_verify_group_check_timeout() {
-    const timeout_in_seconds = ECall.CONFIG.GROUP_CHECK_ACTIVITY_TIMEOUT;
+    const timeout_in_seconds = Call.CONFIG.GROUP_CHECK_ACTIVITY_TIMEOUT;
 
     this.logger.debug(`Set verifying group check after '${timeout_in_seconds}s'`);
     this.group_check_timeout = window.setTimeout(() => {
       this.logger.debug('Removing on group check timeout');
-      const additional_payload = this.v3_call_center.create_additional_payload(this.id, this.creating_user.id);
-      const e_call_message_et = z.calling.mapper.ECallMessageMapper.build_group_leave(false, this.session_id, additional_payload);
+      const additional_payload = z.calling.CallMessageBuilder.create_payload(this.id, this.self_user.id, this.creating_user.id);
+      const call_message_et = z.calling.CallMessageBuilder.build_group_leave(false, this.session_id, additional_payload);
 
-      this.deactivate_call(e_call_message_et, z.calling.enum.TERMINATION_REASON.MISSED);
+      this.deactivate_call(call_message_et, z.calling.enum.TERMINATION_REASON.MISSED);
     }, timeout_in_seconds * 1000);
   }
 
@@ -435,56 +437,56 @@ z.calling.entities.ECall = class ECall {
 
   /**
    * Confirm an incoming message.
-   * @param {ECallMessage} incoming_e_call_message_et - Incoming e-call message to be confirmed
+   * @param {CallMessage} incoming_call_message_et - Incoming call message to be confirmed
    * @returns {Promise} Resolves when message was confirmed
    */
-  confirm_message(incoming_e_call_message_et) {
-    const {client_id, type, user_id} = incoming_e_call_message_et;
+  confirm_message(incoming_call_message_et) {
+    const {client_id, type, user_id} = incoming_call_message_et;
 
-    const additional_payload = this.v3_call_center.create_additional_payload(this.id, user_id, client_id);
-    let e_call_message_et;
+    const additional_payload = z.calling.CallMessageBuilder.create_payload(this.id, this.self_user.id, user_id, client_id);
+    let call_message_et;
 
     switch (type) {
-      case z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP: {
-        e_call_message_et = z.calling.mapper.ECallMessageMapper.build_hangup(true, this.session_id, additional_payload);
+      case z.calling.enum.CALL_MESSAGE_TYPE.HANGUP: {
+        call_message_et = z.calling.CallMessageBuilder.build_hangup(true, this.session_id, additional_payload);
         break;
       }
 
-      case z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC: {
-        const prop_sync_payload = this.v3_call_center.create_payload_prop_sync(z.media.MediaType.VIDEO, false, additional_payload);
+      case z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC: {
+        const prop_sync_payload = z.calling.CallMessageBuilder.create_payload_prop_sync(this.self_state, z.media.MediaType.VIDEO, false, additional_payload);
 
-        e_call_message_et = z.calling.mapper.ECallMessageMapper.build_prop_sync(true, this.session_id, prop_sync_payload);
+        call_message_et = z.calling.CallMessageBuilder.build_prop_sync(true, this.session_id, prop_sync_payload);
         break;
       }
 
       default: {
-        this.logger.error(`Tried to confirm e-call event of wrong type '${type}'`, e_call_message_et);
+        this.logger.error(`Tried to confirm call event of wrong type '${type}'`, call_message_et);
         return Promise.resolve();
       }
     }
 
-    return this.send_e_call_event(e_call_message_et);
+    return this.send_call_message(call_message_et);
   }
 
   /**
-   * Send e-call message.
-   * @param {ECallMessage} e_call_message_et - E-call message to be send
+   * Send call message.
+   * @param {CallMessage} call_message_et - Call message to be send
    * @returns {Promise} Resolves when the event has been send
    */
-  send_e_call_event(e_call_message_et) {
-    return this.v3_call_center.send_e_call_event(this.conversation_et, e_call_message_et);
+  send_call_message(call_message_et) {
+    return this.calling_repository.send_call_message(this.conversation_et, call_message_et);
   }
 
   /**
    * Set remote version of call
-   * @param {ECallMessage} e_call_message_et - E-call message to get remote version from
+   * @param {CallMessage} call_message_et - Call message to get remote version from
    * @returns {undefined} No return value
    */
-  set_remote_version(e_call_message_et) {
-    const {sdp: rtc_sdp} = e_call_message_et;
+  set_remote_version(call_message_et) {
+    const {sdp: rtc_sdp} = call_message_et;
 
     if (rtc_sdp) {
-      this.telemetry.set_remote_version(z.calling.mapper.SDPMapper.get_tool_version(rtc_sdp));
+      this.telemetry.set_remote_version(z.calling.SDPMapper.get_tool_version(rtc_sdp));
     }
   }
 
@@ -557,7 +559,7 @@ z.calling.entities.ECall = class ECall {
 
       return amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, this.id, z.calling.enum.TERMINATION_REASON.TIMEOUT);
     },
-    ECall.CONFIG.STATE_TIMEOUT);
+    Call.CONFIG.STATE_TIMEOUT);
   }
 
   /**
@@ -600,18 +602,18 @@ z.calling.entities.ECall = class ECall {
    * Update the state on participant change.
    *
    * @private
-   * @param {EParticipant} e_participant_et - Updated participant
+   * @param {Participant} participant_et - Updated participant
    * @param {boolean} negotiate - Should negotiation be started immediately
-   * @returns {EParticipant} Changed e-participant
+   * @returns {Participant} Changed participant
    */
-  _update_state(e_participant_et, negotiate) {
+  _update_state(participant_et, negotiate) {
     this._update_remote_state();
 
     if (negotiate) {
-      e_participant_et.start_negotiation();
+      participant_et.start_negotiation();
     }
 
-    return e_participant_et;
+    return participant_et;
   }
 
 
@@ -620,61 +622,61 @@ z.calling.entities.ECall = class ECall {
   //##############################################################################
 
   /**
-   * Add an e-participant to the e-call.
+   * Add an participant to the call.
    *
-   * @param {z.entities.User} user_et - User entity to be added to the e-call
-   * @param {ECallMessage} e_call_message_et - E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
+   * @param {z.entities.User} user_et - User entity to be added to the call
+   * @param {CallMessage} call_message_et - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
    * @param {boolean} [negotiate=true] - Should negotiation be started immediately
    * @returns {Promise} Resolves with added participant
    */
-  add_e_participant(user_et, e_call_message_et, negotiate = true) {
+  add_participant(user_et, call_message_et, negotiate = true) {
     const {id: user_id} = user_et;
 
-    return this.get_e_participant_by_id(user_id)
-      .then(() => this.update_e_participant(user_id, e_call_message_et, negotiate))
+    return this.get_participant_by_id(user_id)
+      .then(() => this.update_participant(user_id, call_message_et, negotiate))
       .catch((error) => {
-        if (error.type !== z.calling.v3.CallError.TYPE.NOT_FOUND) {
+        if (error.type !== z.calling.CallError.TYPE.NOT_FOUND) {
           throw error;
         }
 
-        const e_participant_et = new z.calling.entities.EParticipant(this, user_et, this.timings, e_call_message_et);
+        const participant_et = new z.calling.entities.Participant(this, user_et, this.timings, call_message_et);
 
-        this.logger.info(`Adding e-call participant '${user_et.name()}'`, e_participant_et);
-        this.participants.push(e_participant_et);
+        this.logger.info(`Adding call participant '${user_et.name()}'`, participant_et);
+        this.participants.push(participant_et);
 
-        return e_participant_et.update_state(e_call_message_et)
+        return participant_et.update_state(call_message_et)
           .catch(function(_error) {
-            if (_error.type !== z.calling.v3.CallError.TYPE.SDP_STATE_COLLISION) {
+            if (_error.type !== z.calling.CallError.TYPE.SDP_STATE_COLLISION) {
               throw error;
             }
 
             negotiate = false;
           })
-          .then(() => this._update_state(e_participant_et, negotiate));
+          .then(() => this._update_state(participant_et, negotiate));
       });
   }
 
   /**
-   * Remove an e-participant from the call.
+   * Remove an participant from the call.
    *
-   * @param {string} user_id - ID of user to be removed from the e-call
-   * @param {string} client_id - ID of client that requested the removal from the e-call
+   * @param {string} user_id - ID of user to be removed from the call
+   * @param {string} client_id - ID of client that requested the removal from the call
    * @param {z.calling.enum.TERMINATION_REASON} termination_reason - Call termination reason
-   * @returns {Promise} Resolves with the e-call entity
+   * @returns {Promise} Resolves with the call entity
    */
-  delete_e_participant(user_id, client_id, termination_reason) {
-    return this.get_e_participant_by_id(user_id)
-      .then((e_participant_et) => {
+  delete_participant(user_id, client_id, termination_reason) {
+    return this.get_participant_by_id(user_id)
+      .then((participant_et) => {
         if (client_id) {
-          e_participant_et.verify_client_id(client_id);
+          participant_et.verify_client_id(client_id);
         }
 
-        e_participant_et.reset_participant();
-        this.interrupted_participants.remove(e_participant_et);
-        this.participants.remove(e_participant_et);
+        participant_et.reset_participant();
+        this.interrupted_participants.remove(participant_et);
+        this.participants.remove(participant_et);
 
         this._update_remote_state();
-        this.v3_call_center.media_element_handler.remove_media_element(user_id);
+        this.calling_repository.media_element_handler.remove_media_element(user_id);
 
         if (this.self_client_joined()) {
           switch (termination_reason) {
@@ -695,11 +697,11 @@ z.calling.entities.ECall = class ECall {
           }
         }
 
-        this.logger.info(`Removed e-call participant '${e_participant_et.user.name()}'`);
+        this.logger.info(`Removed call participant '${participant_et.user.name()}'`);
         return this;
       })
       .catch((error) => {
-        if (error.type !== z.calling.v3.CallError.TYPE.NOT_FOUND) {
+        if (error.type !== z.calling.CallError.TYPE.NOT_FOUND) {
           throw error;
         }
 
@@ -723,94 +725,94 @@ z.calling.entities.ECall = class ECall {
   /**
    * Get a call participant by his id.
    * @param {string} user_id - User ID of participant to be returned
-   * @returns {Promise} Resolves with the e-call participant that matches given user ID
+   * @returns {Promise} Resolves with the call participant that matches given user ID
    */
-  get_e_participant_by_id(user_id) {
-    for (const e_participant_et of this.participants()) {
-      if (e_participant_et.id === user_id) {
-        return Promise.resolve(e_participant_et);
+  get_participant_by_id(user_id) {
+    for (const participant_et of this.participants()) {
+      if (participant_et.id === user_id) {
+        return Promise.resolve(participant_et);
       }
     }
 
-    return Promise.reject(new z.calling.v3.CallError(z.calling.v3.CallError.TYPE.NOT_FOUND, 'No participant for given user ID found'));
+    return Promise.reject(new z.calling.CallError(z.calling.CallError.TYPE.NOT_FOUND, 'No participant for given user ID found'));
   }
 
   /**
-   * Remove an e-participant from the call.
-   * @param {string} user_id - ID of user to be removed from the e-call
-   * @returns {Promise} Resolves with the e-call entity
+   * Remove an participant from the call.
+   * @param {string} user_id - ID of user to be removed from the call
+   * @returns {Promise} Resolves with the call entity
    */
-  reset_e_participant(user_id) {
-    return this.get_e_participant_by_id(user_id)
-      .then((e_participant_et) => {
-        e_participant_et.reset_participant();
-        this.interrupted_participants.remove(e_participant_et);
+  reset_participant(user_id) {
+    return this.get_participant_by_id(user_id)
+      .then((participant_et) => {
+        participant_et.reset_participant();
+        this.interrupted_participants.remove(participant_et);
 
         this._update_remote_state();
-        this.v3_call_center.media_element_handler.remove_media_element(user_id);
+        this.calling_repository.media_element_handler.remove_media_element(user_id);
       });
   }
 
   /**
-   * Update e-call participant with e-call message.
+   * Update call participant with call message.
    *
    * @param {string} user_id - ID of participant to update
-   * @param {ECallMessage} e_call_message_et - E-call message to update user with
+   * @param {CallMessage} call_message_et - Call message to update user with
    * @param {boolean} [negotiate=false] - Should negotiation be started
    * @returns {Promise} Resolves when participant was updated
    */
-  update_e_participant(user_id, e_call_message_et, negotiate = false) {
-    return this.get_e_participant_by_id(user_id)
-      .then((e_participant_et) => {
-        if (e_call_message_et) {
-          const {client_id} = e_call_message_et;
+  update_participant(user_id, call_message_et, negotiate = false) {
+    return this.get_participant_by_id(user_id)
+      .then((participant_et) => {
+        if (call_message_et) {
+          const {client_id} = call_message_et;
 
           if (client_id) {
-            e_participant_et.verify_client_id(client_id);
+            participant_et.verify_client_id(client_id);
           }
 
-          this.logger.info(`Updating e-call participant '${e_participant_et.user.name()}'`, e_call_message_et);
-          return e_participant_et.update_state(e_call_message_et);
+          this.logger.info(`Updating call participant '${participant_et.user.name()}'`, call_message_et);
+          return participant_et.update_state(call_message_et);
         }
 
-        return e_participant_et;
+        return participant_et;
       })
       .catch(function(error) {
-        if (error.type !== z.calling.v3.CallError.TYPE.SDP_STATE_COLLISION) {
+        if (error.type !== z.calling.CallError.TYPE.SDP_STATE_COLLISION) {
           throw error;
         }
 
         negotiate = false;
       })
-      .then((e_participant_et) => this._update_state(e_participant_et, negotiate))
+      .then((participant_et) => this._update_state(participant_et, negotiate))
       .catch(function(error) {
-        if (error.type !== z.calling.v3.CallError.TYPE.NOT_FOUND) {
+        if (error.type !== z.calling.CallError.TYPE.NOT_FOUND) {
           throw error;
         }
       });
   }
 
   /**
-   * Verify e-call message belongs to e-call by session id.
+   * Verify call message belongs to call by session id.
    *
    * @private
-   * @param {ECallMessage} e_call_message_et - E-call message entity
-   * @returns {Promise} Resolves with the e-call entity if verification passed
+   * @param {CallMessage} call_message_et - Call message entity
+   * @returns {Promise} Resolves with the Call entity if verification passed
    */
-  verify_session_id(e_call_message_et) {
-    const {user_id, session_id} = e_call_message_et;
+  verify_session_id(call_message_et) {
+    const {user_id, session_id} = call_message_et;
 
     if (session_id === this.session_id) {
       return Promise.resolve(this);
     }
 
-    return this.get_e_participant_by_id(user_id)
+    return this.get_participant_by_id(user_id)
       .then(({session_id: participant_session_id}) => {
         if (session_id === participant_session_id) {
           return this;
         }
 
-        throw new z.calling.v3.CallError(z.calling.v3.CallError.TYPE.WRONG_SENDER, 'Session IDs not matching');
+        throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_SENDER, 'Session IDs not matching');
       });
   }
 
@@ -825,8 +827,8 @@ z.calling.entities.ECall = class ECall {
    */
   get_flows() {
     return this.participants()
-      .filter((e_participant_et) => e_participant_et.e_flow_et)
-      .map((e_participant_et) => e_participant_et.e_flow_et);
+      .filter((participant_et) => participant_et.flow_et)
+      .map((participant_et) => participant_et.flow_et);
   }
 
   /**
@@ -834,7 +836,7 @@ z.calling.entities.ECall = class ECall {
    * @returns {Array<Object>} Array of flow telemetry reports for calling service automation
    */
   get_flow_telemetry() {
-    return this.get_flows().map((e_flow_et) => e_flow_et.get_telemetry());
+    return this.get_flows().map((flow_et) => flow_et.get_telemetry());
   }
 
   /**
@@ -879,11 +881,11 @@ z.calling.entities.ECall = class ECall {
     if (this.participants().length >= 2) {
       this.participants
         .sort((participant_a, participant_b) => participant_a.user.joaat_hash - participant_b.user.joaat_hash)
-        .forEach((e_participant_et, index) => {
+        .forEach((participant_et, index) => {
           const panning = this._calculate_panning(index, this.participants().length);
 
-          this.logger.debug(`Panning for '${e_participant_et.user.name()}' recalculated to '${panning}'`);
-          e_participant_et.panning(panning);
+          this.logger.debug(`Panning for '${participant_et.user.name()}' recalculated to '${panning}'`);
+          participant_et.panning(panning);
         });
 
       const panning_order = this.participants()
@@ -930,8 +932,8 @@ z.calling.entities.ECall = class ECall {
    * @private
    * @returns {undefined} No return value
    */
-  _reset_e_flows() {
-    this.get_flows().forEach((e_flow_et) => e_flow_et.reset_flow());
+  _reset_flows() {
+    this.get_flows().forEach((flow_et) => flow_et.reset_flow());
   }
 
 
@@ -944,7 +946,7 @@ z.calling.entities.ECall = class ECall {
    * @returns {undefined} No return value
    */
   log_status() {
-    this.get_flows().forEach((e_flow_et) => e_flow_et.log_status());
+    this.get_flows().forEach((flow_et) => flow_et.log_status());
   }
 
   /**
@@ -952,6 +954,6 @@ z.calling.entities.ECall = class ECall {
    * @returns {undefined} No return value
    */
   log_timings() {
-    this.get_flows().forEach((e_flow_et) => e_flow_et.log_timings());
+    this.get_flows().forEach((flow_et) => flow_et.log_timings());
   }
 };
