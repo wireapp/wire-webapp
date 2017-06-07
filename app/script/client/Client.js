@@ -25,14 +25,17 @@ window.z.client = z.client || {};
 z.client.Client = class Client {
   static get CONFIG() {
     return {
-      DEFAULT_VALUE: '?', 
+      DEFAULT_VALUE: '?',
     };
   }
 
   constructor(payload = {}) {
     this.class = Client.CONFIG.DEFAULT_VALUE;
-    this.label = Client.CONFIG.DEFAULT_VALUE;
-    this.model = Client.CONFIG.DEFAULT_VALUE;
+
+    if (payload.address) {
+      this.label = Client.CONFIG.DEFAULT_VALUE;
+      this.model = Client.CONFIG.DEFAULT_VALUE;
+    }
 
     for (const property in payload) {
       if (payload.hasOwnProperty(property) && payload[property] !== undefined) {
