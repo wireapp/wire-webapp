@@ -750,7 +750,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
     */
     this.remove_read_notifications();
     const notification = new window.Notification(notification_content.title, notification_content.options);
-    const {conversation_id, message_id} = notification_content.options.data;
+    const {conversation_id, message_id = 'ID not specified'} = notification_content.options.data;
     let timeout_trigger_id = undefined;
 
     notification.onclick = () => {
@@ -758,7 +758,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
       window.focus();
       wire.app.view.content.multitasking.is_minimized(true);
       notification_content.trigger();
-      this.logger.info(`Notification for '${message_id} in '${conversation_id}' closed by click.`);
+      this.logger.info(`Notification for message '${message_id} in '${conversation_id}' closed by click.`);
       notification.close();
     };
 
