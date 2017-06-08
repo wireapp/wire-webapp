@@ -156,7 +156,7 @@ z.calling.entities.Call = class Call {
       }
     });
 
-    this.network_interruption.subscribe(function(is_interrupted) {
+    this.network_interruption.subscribe(is_interrupted => {
       if (is_interrupted) {
         return amplify.publish(
           z.event.WebApp.AUDIO.PLAY_IN_LOOP,
@@ -840,7 +840,7 @@ z.calling.entities.Call = class Call {
 
         return participant_et
           .update_state(call_message_et)
-          .catch(function(_error) {
+          .catch(_error => {
             if (_error.type !== z.calling.CallError.TYPE.SDP_STATE_COLLISION) {
               throw error;
             }
@@ -991,7 +991,7 @@ z.calling.entities.Call = class Call {
 
         return participant_et;
       })
-      .catch(function(error) {
+      .catch(error => {
         if (error.type !== z.calling.CallError.TYPE.SDP_STATE_COLLISION) {
           throw error;
         }
@@ -999,7 +999,7 @@ z.calling.entities.Call = class Call {
         negotiate = false;
       })
       .then(participant_et => this._update_state(participant_et, negotiate))
-      .catch(function(error) {
+      .catch(error => {
         if (error.type !== z.calling.CallError.TYPE.NOT_FOUND) {
           throw error;
         }
