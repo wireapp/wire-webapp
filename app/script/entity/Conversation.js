@@ -158,6 +158,7 @@ z.entity.Conversation = class Conversation {
     this.unread_events = ko.pureComputed(() => {
       const unread_event = [];
       const messages = this.messages();
+
       for (let index = messages.length - 1; index >= 0; index--) {
         const message_et = messages[index];
         if (message_et.visible()) {
@@ -167,6 +168,7 @@ z.entity.Conversation = class Conversation {
           unread_event.push(message_et);
         }
       }
+
       return unread_event;
     });
 

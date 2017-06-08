@@ -109,7 +109,7 @@ z.conversation.ConversationCellState = (() => {
   const removed_state = {
     description(conversation_et) {
       const last_message_et = conversation_et.get_last_message();
-      const self_user_id = wire.app.repository.user.self().id;
+      const self_user_id = conversation_et.self.id;
 
       if (last_message_et.is_member() && last_message_et.is_member_removal() && last_message_et.user_ids().includes(self_user_id)) {
         if (last_message_et.user().id === self_user_id) {
@@ -162,9 +162,10 @@ z.conversation.ConversationCellState = (() => {
   const group_activity_state = {
     description(conversation_et) {
       const last_message_et = conversation_et.get_last_message();
-      const user_count = last_message_et.user_ets().length;
 
       if (last_message_et.is_member()) {
+        const user_count = last_message_et.user_ets().length;
+
         if (last_message_et.is_member_join()) {
           if (user_count === 1) {
             if (!last_message_et.remote_user_ets().length) {
@@ -210,40 +211,46 @@ z.conversation.ConversationCellState = (() => {
       }
     },
     match(conversation_et) {
-      return conversation_et.is_group() && conversation_et.unread_event_count() > 0 && conversation_et.get_last_message().is_member();
+      const last_message_et = conversation_et.get_last_message();
+      const expected_message_type = last_message_et ? (last_message_et.is_member() || last_message_et.is_system()) : false;
+      return conversation_et.is_group() && conversation_et.unread_event_count() > 0 && expected_message_type;
     },
   };
 
   const unread_message_state = {
     description(conversation_et) {
-      const last_message_et = conversation_et.get_last_message();
-      let message_text = '';
+      for (const message_et of conversation_et.unread_events()) {
+        let message_text;
 
-      if (last_message_et.is_ephemeral()) {
-        message_text = z.l10n.text(z.string.conversations_secondary_line_timed_message);
-      } else if (last_message_et.is_ping()) {
-        message_text = z.l10n.text(z.string.system_notification_ping);
-      } else if (last_message_et.has_asset_text()) {
-        message_text = last_message_et.get_first_asset().text;
-      } else if (last_message_et.has_asset()) {
-        const asset_et = last_message_et.get_first_asset();
-        if (asset_et.is_audio()) {
-          message_text = z.l10n.text(z.string.system_notification_shared_audio);
-        } else if (asset_et.is_video()) {
-          message_text = z.l10n.text(z.string.system_notification_shared_video);
-        } else {
-          message_text = z.l10n.text(z.string.system_notification_shared_file);
+        if (message_et.is_ephemeral()) {
+          message_text = z.l10n.text(z.string.conversations_secondary_line_timed_message);
+        } else if (message_et.is_ping()) {
+          message_text = z.l10n.text(z.string.system_notification_ping);
+        } else if (message_et.has_asset_text()) {
+          message_text = message_et.get_first_asset().text;
+        } else if (message_et.has_asset()) {
+          const asset_et = message_et.get_first_asset();
+          if (asset_et.is_audio()) {
+            message_text = z.l10n.text(z.string.system_notification_shared_audio);
+          } else if (asset_et.is_video()) {
+            message_text = z.l10n.text(z.string.system_notification_shared_video);
+          } else {
+            message_text = z.l10n.text(z.string.system_notification_shared_file);
+          }
+        } else if (message_et.has_asset_location()) {
+          message_text = z.l10n.text(z.string.system_notification_shared_location);
+        } else if (message_et.has_asset_image()) {
+          message_text = z.l10n.text(z.string.system_notification_asset_add);
         }
-      } else if (last_message_et.has_asset_location()) {
-        message_text = z.l10n.text(z.string.system_notification_shared_location);
-      } else if (last_message_et.has_asset_image()) {
-        message_text = z.l10n.text(z.string.system_notification_asset_add);
-      }
 
-      if (message_text && conversation_et.is_group()) {
-        message_text = `${last_message_et.sender_name()}: ${message_text}`;
+        if (message_text) {
+          if (conversation_et.is_group()) {
+            return `${message_et.sender_name()}: ${message_text}`;
+          }
+
+          return message_text;
+        }
       }
-      return message_text;
     },
     icon() {
       return z.conversation.ConversationStatusIcon.UNREAD_MESSAGES;
