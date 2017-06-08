@@ -303,7 +303,6 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
     }
   }
 
-
   /**
    * Selects the type of system message that the notification body needs to be created for.
    *

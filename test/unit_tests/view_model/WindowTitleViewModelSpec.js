@@ -55,7 +55,7 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
     });
 
     it('sets the name of the conversation and a badge count (when the conversation is selected and when there are unread messages)', function() {
-      const message = new z.entity.Message();
+      const message = new z.entity.ContentMessage();
       message.id = z.util.create_random_uuid();
       message.timestamp(Date.now());
 
@@ -95,12 +95,12 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
       expect(window.document.title).toBe(expected_title);
 
       // Add messages to the muted conversation
-      let message = new z.entity.Message();
+      let message = new z.entity.ContentMessage();
       message.id = z.util.create_random_uuid();
       message.timestamp(Date.now());
       muted_conversation.add_message(message);
 
-      message = new z.entity.Message();
+      message = new z.entity.ContentMessage();
       message.id = z.util.create_random_uuid();
       message.timestamp(Date.now());
       muted_conversation.add_message(message);
@@ -114,7 +114,7 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
       expect(window.document.title).toBe(expected_title);
 
       // Add messages to the selected conversation
-      message = new z.entity.Message();
+      message = new z.entity.ContentMessage();
       message.id = z.util.create_random_uuid();
       message.timestamp(Date.now());
       selected_conversation.add_message(message);
@@ -213,7 +213,7 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
     });
 
     it('publishes the badge count (for Wire\'s wrapper)', function(done) {
-      const message = new z.entity.Message();
+      const message = new z.entity.ContentMessage();
       message.id = z.util.create_random_uuid();
       message.timestamp(Date.now());
 
