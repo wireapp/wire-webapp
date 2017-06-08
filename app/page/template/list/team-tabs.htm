@@ -1,17 +1,23 @@
 <div id="teams" class="teams" data-bind="with: $root.teams_tabs">
   <div class="teams-items">
     <div class="team team-personal" data-uie-name="item-team-personal">
-      <!-- self() -->
+      <!-- ko if: self() -->
         <div class="user-avatar-halo" data-bind="css: {'user-avatar-halo-active': active_team_id() === null && teams().length > 0}">
           <user-avatar class="user-avatar-s" data-bind="click: click_on_personal" params="user: self()"></user-avatar>
+          <!-- ko if: personal_space.has_unread_conversation() && !active_team_id() -->
+            <div class="team-unread-indicator" data-bind="css: accent_color()"></div>
+          <!-- /ko -->
         </div>
       <!-- /ko -->
     </div>
     <!-- ko foreach: teams -->
       <div class="team" data-bind="attr: {'data-uie-name': 'item-team', 'data-uie-uid': $data.id, 'data-uie-value': $data.name(), title: $data.name()}, click: $parent.click_on_team">
-        <svg class="team-active absolute-center" data-bind="visible: $parent.active_team() && $data.id === $parent.active_team_id()" width="38" height="38" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg"><path d="M22.706 1.82l9.52 5.375C34.444 8.445 36 11.112 36 13.655v10.69c0 2.546-1.553 5.207-3.773 6.46l-9.52 5.375c-2.183 1.233-5.228 1.234-7.413 0l-9.52-5.375C3.556 29.555 2 26.888 2 24.345v-10.69c0-2.546 1.553-5.207 3.773-6.46l9.52-5.375c2.183-1.233 5.228-1.234 7.413 0zm-6.43 1.74l-9.52 5.376C5.164 9.836 4 11.83 4 13.656v10.69c0 1.82 1.168 3.82 2.756 4.718l9.52 5.375c1.575.888 3.875.887 5.447 0l9.52-5.376c1.593-.9 2.757-2.894 2.757-4.72v-10.69c0-1.82-1.168-3.82-2.756-4.718l-9.52-5.375c-1.575-.888-3.875-.887-5.447 0z" fill-rule="nonzero"/></svg>
-        <svg class="absolute-center" width="38" height="38" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg"><path d="M17.26 5.303c.96-.543 2.514-.545 3.48 0l9.52 5.375c.96.542 1.74 1.878 1.74 2.977v10.69c0 1.102-.774 2.432-1.74 2.977l-9.52 5.375c-.96.543-2.514.545-3.48 0l-9.52-5.375C6.78 26.78 6 25.444 6 24.345v-10.69c0-1.102.774-2.432 1.74-2.977l9.52-5.375z" fill-rule="evenodd"/></svg>
+        <svg class="team-active absolute-center" data-bind="visible: $parent.active_team() && $data.id === $parent.active_team_id()" width="38" height="38" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg"><path d="M22.706 1.82l9.52 5.375C34.444 8.445 36 11.112 36 13.655v10.69c0 2.546-1.553 5.207-3.773 6.46l-9.52 5.375c-2.183 1.233-5.228 1.234-7.413 0l-9.52-5.375C3.556 29.555 2 26.888 2 24.345v-10.69c0-2.546 1.553-5.207 3.773-6.46l9.52-5.375c2.183-1.233 5.228-1.234 7.413 0zm-6.43 1.74l-9.52 5.376C5.164 9.836 4 11.83 4 13.656v10.69c0 1.82 1.168 3.82 2.756 4.718l9.52 5.375c1.575.888 3.875.887 5.447 0l9.52-5.376c1.593-.9 2.757-2.894 2.757-4.72v-10.69c0-1.82-1.168-3.82-2.756-4.718l-9.52-5.375c-1.575-.888-3.875-.887-5.447 0z" fill-rule="nonzero"></path></svg>
+        <svg class="absolute-center" width="38" height="38" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg"><path d="M17.26 5.303c.96-.543 2.514-.545 3.48 0l9.52 5.375c.96.542 1.74 1.878 1.74 2.977v10.69c0 1.102-.774 2.432-1.74 2.977l-9.52 5.375c-.96.543-2.514.545-3.48 0l-9.52-5.375C6.78 26.78 6 25.444 6 24.345v-10.69c0-1.102.774-2.432 1.74-2.977l9.52-5.375z" fill-rule="evenodd"></path></svg>
         <span class="absolute-center label-bold-xs text-graphite-dark" data-bind="text: z.util.StringUtil.get_first_character($data.name())"></span>
+        <!-- ko if: has_unread_conversation() && $data.id !== $parent.active_team_id()-->
+          <div class="team-unread-indicator" data-bind="css: $parent.accent_color()"></div>
+        <!-- /ko -->
       </div>
     <!-- /ko -->
   </div>

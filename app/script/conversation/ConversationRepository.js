@@ -93,45 +93,70 @@ z.conversation.ConversationRepository = class ConversationRepository {
       this.sending_queue.pause(request_queue_blocked || this.block_event_handling);
     });
 
-    this.conversations_archived = ko.observableArray([]);
-    this.conversations_calls = ko.observableArray([]);
-    this.conversations_cleared = ko.observableArray([]);
-    this.conversations_unarchived = ko.observableArray([]);
+    this.conversations_archived = ko.pureComputed(() => this.active_team().conversations_archived());
+    this.conversations_calls = ko.pureComputed(() => this.active_team().conversations_calls());
+    this.conversations_cleared = ko.pureComputed(() => this.active_team().conversations_cleared());
+    this.conversations_unarchived = ko.pureComputed(() => this.active_team().conversations_unarchived());
+
+    this.all_unarchived_conversations = ko.pureComputed(() => {
+      const conversations = this.team_repository.teams()
+        .concat(this.team_repository.personal_space)
+        .map((team_et) => team_et.conversations_unarchived());
+
+      return _.flatten(conversations);
+    });
 
     this._init_subscriptions();
   }
 
   _init_state_updates() {
     ko.computed(() => {
-      const archived = [];
-      const calls = [];
-      const cleared = [];
-      const unarchived = [];
-      const active_team_id = this.active_team().id;
+      const team_conversations = {
+        personal_space: {
+          archived: [],
+          calls: [],
+          cleared: [],
+          unarchived: [],
+        },
+      };
 
       this.sorted_conversations().forEach((conversation_et) => {
-        const {team_id} = conversation_et;
+        let {team_id} = conversation_et;
 
-        const is_team_conversation = team_id === active_team_id;
-        const is_guest_conversation = !active_team_id && team_id && conversation_et.is_guest();
+        if (!this.team_repository.known_team_ids().includes(team_id)) {
+          team_id = 'personal_space';
+        }
 
-        if (is_team_conversation || is_guest_conversation) {
-          if (conversation_et.has_active_call()) {
-            calls.push(conversation_et);
-          } else if (conversation_et.is_cleared()) {
-            cleared.push(conversation_et);
-          } else if (conversation_et.is_archived()) {
-            archived.push(conversation_et);
-          } else {
-            unarchived.push(conversation_et);
-          }
+        team_conversations[team_id] = team_conversations[team_id] || {archived: [], calls: [], cleared: [], unarchived: []};
+
+        if (conversation_et.has_active_call()) {
+          team_conversations[team_id].calls.push(conversation_et);
+        } else if (conversation_et.is_cleared()) {
+          team_conversations[team_id].cleared.push(conversation_et);
+        } else if (conversation_et.is_archived()) {
+          team_conversations[team_id].archived.push(conversation_et);
+        } else {
+          team_conversations[team_id].unarchived.push(conversation_et);
         }
       });
 
-      this.conversations_archived(archived);
-      this.conversations_calls(calls);
-      this.conversations_cleared(cleared);
-      this.conversations_unarchived(unarchived);
+      for (const team_id in team_conversations) {
+        if (team_conversations.hasOwnProperty(team_id)) {
+          let team_et;
+          const conversations = team_conversations[team_id];
+
+          if (team_id !== 'personal_space') {
+            [team_et] = this.team_repository.teams().filter((team) => team.id === team_id);
+          } else {
+            team_et = this.team_repository.personal_space;
+          }
+
+          team_et.conversations_archived(conversations.archived);
+          team_et.conversations_calls(conversations.calls);
+          team_et.conversations_cleared(conversations.cleared);
+          team_et.conversations_unarchived(conversations.unarchived);
+        }
+      }
     });
   }
 
@@ -169,7 +194,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
     if (team_et) {
       if (team_et.id !== this.active_team().id) {
         this.active_team(team_et);
-        this.update_conversations(this.conversations_unarchived());
         amplify.publish(z.event.WebApp.CONVERSATION.SHOW, this.get_most_recent_conversation());
       }
     } else {
@@ -425,28 +449,44 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
+   * Update users and events for archived conversations currently visible.
+   * @returns {undefined} No return value
+   */
+  update_conversations_archived() {
+    this._update_conversations(this.conversations_archived());
+  }
+
+  /**
+   * Map users to all conversations without any backend requests.
+   * @returns {undefined} No return value
+   */
+  update_conversations_offline() {
+    this.sorted_conversations().map((conversation_et) => this.update_participating_user_ets(conversation_et, true));
+  }
+
+  /**
+   * Update users and events for all unarchived conversations.
+   * @returns {undefined} No return value
+   */
+  update_conversations_unarchived() {
+    this._update_conversations(this.all_unarchived_conversations());
+  }
+
+  /**
    * Get users and events for conversations.
    *
    * @note To reduce the number of backend calls we merge the user IDs of all conversations first.
+   * @private
    * @param {Array<Conversation>} conversation_ets - Array of conversation entities to be updated
    * @returns {undefined} No return value
    */
-  update_conversations(conversation_ets) {
+  _update_conversations(conversation_ets) {
     const user_ids = _.flatten(conversation_ets.map((conversation_et) => conversation_et.participating_user_ids()));
 
     this.user_repository.get_users_by_id(user_ids)
       .then(() => {
         conversation_ets.forEach((conversation_et) => this._fetch_users_and_events(conversation_et));
       });
-  }
-
-  /**
-   * Map users to conversations without any backend requests.
-   * @param {Array<Conversation>} conversation_ets - Array of conversation entities to be updated
-   * @returns {undefined} No return value
-   */
-  update_conversations_offline(conversation_ets) {
-    conversation_ets.map((conversation_et) => this.update_participating_user_ets(conversation_et, true));
   }
 
 
@@ -698,7 +738,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(() => {
         this.logger.info('Updating group participants offline');
         this._init_state_updates();
-        this.update_conversations_offline(this.sorted_conversations());
+        this.update_conversations_offline();
       });
   }
 

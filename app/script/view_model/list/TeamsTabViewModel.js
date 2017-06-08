@@ -42,6 +42,14 @@ z.ViewModel.list.TeamsTabViewModel = class TeamsTabViewModel {
       }
     });
 
+    this.accent_color = ko.pureComputed(() => {
+      const self_user_et = this.user_repository.self();
+      if (self_user_et) {
+        return `accent-color-${self_user_et.accent_id()}`;
+      }
+      return '';
+    });
+
     this.show_badge = ko.observable(false);
 
     this.click_on_team = this.click_on_team.bind(this);

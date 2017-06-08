@@ -291,7 +291,7 @@ z.string.archive_header = 'Archive';
 // Conversations
 z.string.conversations_all_archived = 'Everything archived';
 z.string.conversations_contacts = 'Contacts';
-z.string.conversations_connection_request_many = '%no people waiting';
+z.string.conversations_connection_request_many = '{{number}} people waiting';
 z.string.conversations_connection_request_one = '1 person waiting';
 z.string.conversations_empty_conversation = 'Group conversation';
 z.string.conversations_empty_conversation_description = 'Everyone left';
