@@ -73,7 +73,7 @@ z.calling.SDPMapper = {
     const sdp_lines = [];
     const ice_candidates = [];
 
-    rtc_sdp.sdp.split('\r\n').forEach(function(sdp_line) {
+    rtc_sdp.sdp.split('\r\n').forEach((sdp_line) => {
       let outline = sdp_line;
 
       if (sdp_line.startsWith('t=')) {
