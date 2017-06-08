@@ -546,7 +546,7 @@ z.calling.CallingRepository = class CallingRepository {
     const {conversation_id, type} = call_message_et;
 
     return this.conversation_repository.get_conversation_by_id_async(conversation_id)
-      .then(function(conversation_et) {
+      .then((conversation_et) => {
         if (conversation_et.is_one2one()) {
           const group_message_types = [
             z.calling.enum.CALL_MESSAGE_TYPE.GROUP_CHECK,
@@ -584,7 +584,7 @@ z.calling.CallingRepository = class CallingRepository {
    * @param {CallMessage} call_message_et - call message entity
    * @returns {Promise} Resolves when the event has been sent
    */
-  send_e_call_event(conversation_et, call_message_et) {
+  send_call_message(conversation_et, call_message_et) {
     if (!_.isObject(call_message_et)) {
       throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_PAYLOAD_FORMAT);
     }
@@ -936,7 +936,7 @@ z.calling.CallingRepository = class CallingRepository {
   _check_calling_support(conversation_id, call_state) {
     return this.conversation_repository.get_conversation_by_id_async(conversation_id)
       .then(({participating_user_ids}) => {
-        if (!participating_user_ids.length) {
+        if (!participating_user_ids().length) {
           amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALL_EMPTY_CONVERSATION);
           throw new z.calling.CallError(z.calling.CallError.TYPE.NOT_SUPPORTED);
         }

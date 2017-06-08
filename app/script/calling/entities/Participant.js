@@ -53,7 +53,7 @@ z.calling.entities.Participant = class Participant {
 
     this.flow_et = new z.calling.entities.Flow(this.call_et, this, timings, call_message_et);
 
-    this.is_connected.subscribe(function(is_connected) {
+    this.is_connected.subscribe((is_connected) => {
       if (is_connected && !this.was_connected) {
         amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.READY_TO_TALK);
         this.was_connected = true;
