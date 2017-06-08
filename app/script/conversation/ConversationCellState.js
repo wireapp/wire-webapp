@@ -162,32 +162,42 @@ z.conversation.ConversationCellState = (() => {
   const group_activity_state = {
     description(conversation_et) {
       const last_message_et = conversation_et.get_last_message();
-      const remote_user_count = last_message_et.remote_user_ets().length;
-      const sender_name = last_message_et.sender_name();
+      const user_count = last_message_et.user_ets().length;
 
       if (last_message_et.is_member()) {
         if (last_message_et.is_member_join()) {
-          if (remote_user_count === 0) {
-            return z.l10n.text(z.string.conversations_secondary_line_person_added_you, sender_name);
-          }
+          if (user_count === 1) {
+            if (!last_message_et.remote_user_ets().length) {
+              return z.l10n.text(z.string.conversations_secondary_line_person_added_you, last_message_et.user().name());
+            }
 
-          if (remote_user_count === 1) {
             const [remote_user_et] = last_message_et.remote_user_ets();
-            return z.l10n.text(z.string.conversations_secondary_line_person_added, {user1: sender_name, user2: remote_user_et.name()});
+            return z.l10n.text(z.string.conversations_secondary_line_person_added, remote_user_et.name());
           }
 
-          if (remote_user_count > 1) {
-            return z.l10n.text(z.string.conversations_secondary_line_people_added, remote_user_count);
+          if (user_count > 1) {
+            return z.l10n.text(z.string.conversations_secondary_line_people_added, user_count);
           }
         }
 
         if (last_message_et.is_member_removal()) {
-          if (remote_user_count === 1) {
-            return z.l10n.text(z.string.conversations_secondary_line_person_left, remote_user_count);
-          } else if (remote_user_count > 1) {
-            return z.l10n.text(z.string.conversations_secondary_line_people_left, remote_user_count);
+          if (user_count === 1) {
+            const [remote_user_et] = last_message_et.remote_user_ets();
+            if (remote_user_et === last_message_et.user()) {
+              return z.l10n.text(z.string.conversations_secondary_line_person_left, remote_user_et.name());
+            }
+
+            return z.l10n.text(z.string.conversations_secondary_line_person_removed, remote_user_et.name());
+          }
+
+          if (user_count > 1) {
+            return z.l10n.text(z.string.conversations_secondary_line_people_left, user_count);
           }
         }
+      }
+
+      if (last_message_et.is_system() && last_message_et.is_conversation_rename()) {
+        return z.l10n.text(z.string.conversations_secondary_line_renamed, last_message_et.user().name());
       }
     },
     icon(conversation_et) {

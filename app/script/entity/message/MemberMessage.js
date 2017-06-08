@@ -166,15 +166,15 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
   }
 
   is_member_join() {
-    return this.type() === z.event.Backend.CONVERSATION.MEMBER_JOIN;
+    return this.type === z.event.Backend.CONVERSATION.MEMBER_JOIN;
   }
 
   is_member_leave() {
-    return this.type() === z.event.Backend.CONVERSATION.MEMBER_LEAVE;
+    return this.type === z.event.Backend.CONVERSATION.MEMBER_LEAVE;
   }
 
   is_team_member_leave() {
-    return this.type() === z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE;
+    return this.type === z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE;
   }
 
   is_member_removal() {
