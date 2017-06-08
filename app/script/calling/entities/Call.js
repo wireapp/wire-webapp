@@ -67,6 +67,7 @@ z.calling.entities.Call = class Call {
     // States
     this.call_timer_interval = undefined;
     this.timer_start = undefined;
+    this.direction = undefined;
     this.duration_time = ko.observable(0);
     this.group_check_timeout = undefined;
     this.termination_reason = undefined;
@@ -115,7 +116,8 @@ z.calling.entities.Call = class Call {
           this.schedule_group_check();
         }
 
-        this.telemetry.track_event(z.tracking.EventName.CALLING.ESTABLISHED_CALL, this);
+        const attributes = {direction: this.direction};
+        this.telemetry.track_event(z.tracking.EventName.CALLING.ESTABLISHED_CALL, this, attributes);
         this.timer_start = Date.now() - Call.CONFIG.TIMER_UPDATE_START;
 
         this.call_timer_interval = window.setInterval(() => {
@@ -172,7 +174,7 @@ z.calling.entities.Call = class Call {
       }
 
       if (state === z.calling.enum.CALL_STATE.CONNECTING) {
-        const attributes = {direction: this.previous_state === z.calling.enum.CALL_STATE.OUTGOING ? z.calling.enum.CALL_STATE.OUTGOING : z.calling.enum.CALL_STATE.INCOMING};
+        const attributes = {direction: this.direction};
         this.telemetry.track_event(z.tracking.EventName.CALLING.JOINED_CALL, this, attributes);
       }
 
