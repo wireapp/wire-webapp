@@ -439,55 +439,6 @@ z.main.App = class App {
             .family}' '${z.util.Environment.version()}'`;
         }
 
-        this._watch_online_status();
-        return this.repository.client.get_clients_for_self();
-      })
-      .then(client_ets => {
-        this.view.loading.update_progress(97.5);
-
-        this.telemetry.add_statistic(
-          z.telemetry.app_init.AppInitStatisticsValue.CLIENTS,
-          client_ets.length,
-        );
-        this.telemetry.time_step(
-          z.telemetry.app_init.AppInitTimingsStep.APP_PRE_LOADED,
-        );
-
-        this.repository.user.self().devices(client_ets);
-        this.logger.info('App pre-loading completed');
-        return this._handle_url_params();
-      })
-      .then(() => {
-        this._show_ui();
-        this.telemetry.report();
-        amplify.publish(z.event.WebApp.LIFECYCLE.LOADED);
-        amplify.publish(z.event.WebApp.LOADED); // todo: deprecated - remove when user base of wrappers version >= 2.12 is large enough
-        this.telemetry.time_step(
-          z.telemetry.app_init.AppInitTimingsStep.APP_LOADED,
-        );
-        return this.repository.conversation.update_conversations(
-          this.repository.conversation.conversations_unarchived(),
-        );
-      })
-      .then(() => {
-        this.telemetry.time_step(
-          z.telemetry.app_init.AppInitTimingsStep.UPDATED_CONVERSATIONS,
-        );
-        this.repository.announce.init();
-        this.repository.audio.init(true);
-        this.repository.client.cleanup_clients_and_sessions(true);
-        this.repository.conversation.cleanup_conversations();
-        this.logger.info('App fully loaded');
-      })
-      .catch(error => {
-        let error_message = `Error during initialization of app version '${z.util.Environment.version(
-          false,
-        )}'`;
-        if (z.util.Environment.electron) {
-          error_message = `${error_message} - Electron '${platform.os
-            .family}' '${z.util.Environment.version()}'`;
-        }
-
         this.logger.info(error_message, {error});
         this.logger.debug(
           `App reload: '${is_reload}', Document referrer: '${document.referrer}', Location: '${window

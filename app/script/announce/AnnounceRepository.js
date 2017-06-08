@@ -57,9 +57,11 @@ z.announce.AnnounceRepository = class AnnounceRepository {
   check_version() {
     if (navigator.onLine) {
       return this.announce_service.get_version().then(server_version => {
-        const local_version = z.util.Environment.version(false, true);
         this.logger.info(
-          `Checking current webapp version. Server '${server_version}' vs. local '${local_version}'`,
+          `Checking current webapp version. Server '${server_version}' vs. local '${z.util.Environment.version(
+            false,
+            true,
+          )}'`,
         );
 
         if (server_version > z.util.Environment.version(false, true)) {
@@ -136,9 +138,7 @@ z.announce.AnnounceRepository = class AnnounceRepository {
           amplify.publish(
             z.event.WebApp.ANALYTICS.EVENT,
             z.tracking.EventName.ANNOUNCE.SENT,
-            {
-              campaign: announcement.campaign,
-            },
+            {campaign: announcement.campaign},
           );
           this.logger.info(`Announcement '${announcement.title}' shown`);
 
@@ -146,9 +146,7 @@ z.announce.AnnounceRepository = class AnnounceRepository {
             amplify.publish(
               z.event.WebApp.ANALYTICS.EVENT,
               z.tracking.EventName.ANNOUNCE.CLICKED,
-              {
-                campaign: announcement.campaign,
-              },
+              {campaign: announcement.campaign},
             );
             this.logger.info(`Announcement '${announcement.title}' clicked`);
 

@@ -61,9 +61,7 @@ z.ViewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
       amplify.publish(
         z.event.WebApp.ANALYTICS.EVENT,
         z.tracking.EventName.SOUND_SETTINGS_CHANGED,
-        {
-          value: tracking_value,
-        },
+        {value: tracking_value},
       );
     });
 

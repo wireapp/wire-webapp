@@ -79,12 +79,7 @@ z.assets.AssetService = class AssetService {
           new Uint8Array(cipher_text),
           options,
           xhr_accessor_function,
-        ).then(({key, token}) => ({
-          key,
-          key_bytes,
-          sha256,
-          token,
-        }));
+        ).then(({key, token}) => ({key, key_bytes, sha256, token}));
       });
   }
 

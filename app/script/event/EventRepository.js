@@ -764,9 +764,7 @@ z.event.EventRepository = class EventRepository {
     amplify.publish(
       z.event.WebApp.ANALYTICS.EVENT,
       z.tracking.EventName.E2EE.CANNOT_DECRYPT_MESSAGE,
-      {
-        cause: decryption_error.code || decryption_error.message,
-      },
+      {cause: decryption_error.code || decryption_error.message},
     );
 
     const custom_data = {

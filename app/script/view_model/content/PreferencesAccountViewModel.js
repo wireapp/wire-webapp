@@ -153,9 +153,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
           amplify.publish(
             z.event.WebApp.ANALYTICS.EVENT,
             z.tracking.EventName.SETTINGS.SET_USERNAME,
-            {
-              length: entered_username.length,
-            },
+            {length: entered_username.length},
           );
 
           event.target.blur();
@@ -231,9 +229,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
         amplify.publish(
           z.event.WebApp.ANALYTICS.EVENT,
           z.tracking.EventName.PROFILE_PICTURE_CHANGED,
-          {
-            source: 'fromPhotoLibrary',
-          },
+          {source: 'fromPhotoLibrary'},
         );
       })
       .catch(error => {

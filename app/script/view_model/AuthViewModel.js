@@ -459,10 +459,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
           amplify.publish(
             z.event.WebApp.ANALYTICS.EVENT,
             z.tracking.EventName.ACCOUNT.LOGGED_IN,
-            {
-              context: login_context,
-              remember_me: this.persist(),
-            },
+            {context: login_context, remember_me: this.persist()},
           );
           this._authentication_successful();
         })
@@ -586,9 +583,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
           amplify.publish(
             z.event.WebApp.ANALYTICS.EVENT,
             z.tracking.EventName.REGISTRATION.ENTERED_CREDENTIALS,
-            {
-              outcome: 'success',
-            },
+            {outcome: 'success'},
           );
 
           // Track if the user changed the pre-filled email
@@ -685,10 +680,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
           amplify.publish(
             z.event.WebApp.ANALYTICS.EVENT,
             z.tracking.EventName.ACCOUNT.LOGGED_IN,
-            {
-              context: z.auth.AuthView.TYPE.PHONE,
-              remember_me: this.persist(),
-            },
+            {context: z.auth.AuthView.TYPE.PHONE, remember_me: this.persist()},
           );
           this._authentication_successful();
         })
@@ -725,10 +717,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
           amplify.publish(
             z.event.WebApp.ANALYTICS.EVENT,
             z.tracking.EventName.ACCOUNT.LOGGED_IN,
-            {
-              context: z.auth.AuthView.TYPE.PHONE,
-              remember_me: this.persist(),
-            },
+            {context: z.auth.AuthView.TYPE.PHONE, remember_me: this.persist()},
           );
           this._authentication_successful();
         })
@@ -1279,10 +1268,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       amplify.publish(
         z.event.WebApp.ANALYTICS.EVENT,
         z.tracking.EventName.REGISTRATION.ENTERED_CREDENTIALS,
-        {
-          outcome: 'fail',
-          reason: error.label,
-        },
+        {outcome: 'fail', reason: error.label},
       );
       return;
     }
@@ -1373,9 +1359,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     amplify.publish(
       z.event.WebApp.ANALYTICS.EVENT,
       z.tracking.EventName.ACCOUNT.OPENED_LOGIN,
-      {
-        context: this.visible_method(),
-      },
+      {context: this.visible_method()},
     );
   }
 
@@ -1391,9 +1375,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     amplify.publish(
       z.event.WebApp.ANALYTICS.EVENT,
       z.tracking.EventName.ACCOUNT.OPENED_LOGIN,
-      {
-        context: z.auth.AuthView.TYPE.EMAIL,
-      },
+      {context: z.auth.AuthView.TYPE.EMAIL},
     );
   }
 
@@ -1409,9 +1391,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     amplify.publish(
       z.event.WebApp.ANALYTICS.EVENT,
       z.tracking.EventName.ACCOUNT.OPENED_LOGIN,
-      {
-        context: z.auth.AuthView.TYPE.PHONE,
-      },
+      {context: z.auth.AuthView.TYPE.PHONE},
     );
   }
 
@@ -1426,9 +1406,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     amplify.publish(
       z.event.WebApp.ANALYTICS.EVENT,
       z.tracking.EventName.REGISTRATION.OPENED_EMAIL_SIGN_UP,
-      {
-        context: this.registration_context,
-      },
+      {context: this.registration_context},
     );
   }
 
@@ -2137,9 +2115,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       amplify.publish(
         z.event.WebApp.ANALYTICS.EVENT,
         z.tracking.EventName.REGISTRATION.SUCCEEDED,
-        {
-          content: this.registration_context,
-        },
+        {content: this.registration_context},
       );
     }
     this._authentication_successful();

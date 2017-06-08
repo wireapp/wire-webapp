@@ -596,9 +596,7 @@ z.client.ClientRepository = class ClientRepository {
         amplify.publish(
           z.event.WebApp.ANALYTICS.EVENT,
           z.tracking.EventName.SETTINGS.REMOVED_DEVICE,
-          {
-            outcome: 'success',
-          },
+          {outcome: 'success'},
         );
         amplify.publish(
           z.event.WebApp.USER.CLIENT_REMOVED,
@@ -615,9 +613,7 @@ z.client.ClientRepository = class ClientRepository {
         amplify.publish(
           z.event.WebApp.ANALYTICS.EVENT,
           z.tracking.EventName.SETTINGS.REMOVED_DEVICE,
-          {
-            outcome: 'fail',
-          },
+          {outcome: 'fail'},
         );
 
         if (error.code === z.service.BackendClientError.STATUS_CODE.FORBIDDEN) {

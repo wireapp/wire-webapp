@@ -131,7 +131,9 @@ z.entity.Conversation = class Conversation {
 
     this.is_verified = ko.pureComputed(() => {
       const all_users = [this.self].concat(this.participating_user_ets());
-      return all_users.every((user_et) => user_et ? user_et.is_verified() : undefined);
+      return all_users.every(
+        user_et => (user_et ? user_et.is_verified() : undefined),
+      );
     });
 
     this.status = ko.observable(
@@ -164,19 +166,30 @@ z.entity.Conversation = class Conversation {
 
     this.has_further_messages = ko.observable(true);
 
-    this.messages_visible = ko.pureComputed(() => {
-      if (this.id === '') {
-        return [];
-      }
+    this.messages_visible = ko
+      .pureComputed(() => {
+        if (this.id === '') {
+          return [];
+        }
 
-      const message_ets = this.messages().filter((message_et) => message_et.visible());
+        const message_ets = this.messages().filter(message_et =>
+          message_et.visible(),
+        );
 
-      const first_message = this.get_first_message();
-      if (!this.has_further_messages() && !((first_message ? first_message.is_member() : undefined) && first_message.is_creation())) {
-        this.creation_message = this.creation_message || this._creation_message();
+        const first_message = this.get_first_message();
+        if (
+          !this.has_further_messages() &&
+          !(
+            (first_message ? first_message.is_member() : undefined) &&
+            first_message.is_creation()
+          )
+        ) {
+          this.creation_message =
+            this.creation_message || this._creation_message();
 
-        if (this.creation_message) {
-          message_ets.unshift(this.creation_message);
+          if (this.creation_message) {
+            message_ets.unshift(this.creation_message);
+          }
         }
         return message_ets;
       })
@@ -220,12 +233,12 @@ z.entity.Conversation = class Conversation {
     );
 
     this.unread_message_count = ko.pureComputed(() => {
-      return this.unread_events()
-        .filter((message_et) => {
-          const is_missed_call = message_et.is_call() && message_et.was_missed();
-          return is_missed_call || message_et.is_ping() || message_et.is_content();
-        })
-        .length;
+      return this.unread_events().filter(message_et => {
+        const is_missed_call = message_et.is_call() && message_et.was_missed();
+        return (
+          is_missed_call || message_et.is_ping() || message_et.is_content()
+        );
+      }).length;
     });
 
     /**
@@ -566,8 +579,15 @@ z.entity.Conversation = class Conversation {
    * @returns {undefined} No return value
    */
   update_latest_from_message(message_et) {
-    if (message_et && message_et.visible() && message_et.should_effect_conversation_timestamp) {
-      this.set_timestamp(message_et.timestamp(), z.conversation.ConversationUpdateType.LAST_EVENT_TIMESTAMP);
+    if (
+      message_et &&
+      message_et.visible() &&
+      message_et.should_effect_conversation_timestamp
+    ) {
+      this.set_timestamp(
+        message_et.timestamp(),
+        z.conversation.ConversationUpdateType.LAST_EVENT_TIMESTAMP,
+      );
     }
   }
 

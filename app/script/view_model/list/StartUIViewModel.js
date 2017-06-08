@@ -699,9 +699,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       amplify.publish(
         z.event.WebApp.ANALYTICS.EVENT,
         z.tracking.EventName.CONNECT.OPENED_GENERIC_INVITE_MENU,
-        {
-          context: 'banner',
-        },
+        {context: 'banner'},
       );
 
       const self = this.user_repository.self();

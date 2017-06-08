@@ -71,9 +71,7 @@ z.ViewModel.list.TakeoverViewModel = class TakeoverViewModel {
         amplify.publish(
           z.event.WebApp.ANALYTICS.EVENT,
           z.tracking.EventName.ONBOARDING.KEPT_GENERATED_USERNAME,
-          {
-            outcome: 'success',
-          },
+          {outcome: 'success'},
         );
       })
       .catch(function() {
@@ -81,9 +79,7 @@ z.ViewModel.list.TakeoverViewModel = class TakeoverViewModel {
         amplify.publish(
           z.event.WebApp.ANALYTICS.EVENT,
           z.tracking.EventName.ONBOARDING.KEPT_GENERATED_USERNAME,
-          {
-            outcome: 'fail',
-          },
+          {outcome: 'fail'},
         );
       })
       .then(() => amplify.publish(z.event.WebApp.TAKEOVER.DISMISS));

@@ -283,10 +283,7 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
           amplify.publish(
             z.event.WebApp.ANALYTICS.EVENT,
             z.tracking.EventName.FILE.UPLOAD_TOO_BIG,
-            {
-              size: file.size,
-              type: file.type,
-            },
+            {size: file.size, type: file.type},
           );
           amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
           window.setTimeout(function() {
@@ -375,9 +372,7 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
       amplify.publish(
         z.event.WebApp.WARNING.MODAL,
         z.ViewModel.ModalType.UPLOAD_PARALLEL,
-        {
-          data: z.config.MAXIMUM_ASSET_UPLOADS,
-        },
+        {data: z.config.MAXIMUM_ASSET_UPLOADS},
       );
     }
 
@@ -429,9 +424,7 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
             amplify.publish(
               z.event.WebApp.ANALYTICS.EVENT,
               z.tracking.EventName.CONVERSATION.CHARACTER_LIMIT_REACHED,
-              {
-                characters: message.length,
-              },
+              {characters: message.length},
             );
           },
           data: z.config.MAXIMUM_MESSAGE_LENGTH,

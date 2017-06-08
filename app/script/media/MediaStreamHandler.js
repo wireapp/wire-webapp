@@ -271,10 +271,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
         amplify.publish(
           z.event.WebApp.ANALYTICS.EVENT,
           z.tracking.EventName.CALLING.FAILED_REQUESTING_MEDIA,
-          {
-            cause: error.name || error.message,
-            video: video_send,
-          },
+          {cause: error.name || error.message, video: video_send},
         );
         throw error;
       });
