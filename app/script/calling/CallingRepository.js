@@ -1034,6 +1034,7 @@ z.calling.CallingRepository = class CallingRepository {
               call_et.state(z.calling.enum.CALL_STATE.INCOMING);
             }
 
+            call_et.direction = z.calling.enum.CALL_STATE.INCOMING;
             call_et.set_remote_version(call_message_et);
             return call_et.add_participant(remote_user_et, call_message_et, false)
               .then(() => {
@@ -1070,6 +1071,7 @@ z.calling.CallingRepository = class CallingRepository {
         this.logger.info(`Outgoing '${media_type}' call in conversation '${call_et.conversation_et.display_name()}'`, call_et);
 
         call_et.state(z.calling.enum.CALL_STATE.OUTGOING);
+        call_et.direction = z.calling.enum.CALL_STATE.OUTGOING;
         this.telemetry.set_media_type(media_type === z.media.MediaType.VIDEO);
         this.telemetry.track_event(z.tracking.EventName.CALLING.INITIATED_CALL, call_et);
         return call_et;
