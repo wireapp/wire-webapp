@@ -55,15 +55,9 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
 
     this.connect_requests = this.user_repository.connect_requests;
     this.connect_requests_text = ko.pureComputed(() => {
-      const count = this.connect_requests().length;
-      if (count > 1) {
-        return z.localization.Localizer.get_text({
-          id: z.string.conversations_connection_request_many,
-          replace: {
-            content: count,
-            placeholder: '%no',
-          },
-        });
+      const number_of_requests = this.connect_requests().length;
+      if (number_of_requests > 1) {
+        return z.l10n.text(z.string.conversations_connection_request_many, number_of_requests);
       }
       return z.l10n.text(z.string.conversations_connection_request_one);
     });
