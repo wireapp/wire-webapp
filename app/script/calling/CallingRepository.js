@@ -1003,7 +1003,7 @@ z.calling.CallingRepository = class CallingRepository {
           .then((conversation_et) => {
             const call_et = new z.calling.entities.Call(conversation_et, creating_user_et, session_id, this);
 
-            this.e_calls.push(call_et);
+            this.calls.push(call_et);
             return call_et;
           });
       });
@@ -1115,7 +1115,7 @@ z.calling.CallingRepository = class CallingRepository {
    */
   get_call_by_id(conversation_id) {
     if (conversation_id) {
-      for (const call_et of this.e_calls()) {
+      for (const call_et of this.calls()) {
         if (call_et.id === conversation_id) {
           return Promise.resolve(call_et);
         }
