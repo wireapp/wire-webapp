@@ -310,8 +310,12 @@ z.calling.CallingRepository = class CallingRepository {
 
     this.get_call_by_id(conversation_id)
       .then((call_et) => {
+        if (call_et.state() === z.calling.enum.CALL_STATE.OUTGOING) {
+          throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_SENDER);
+        }
+
         if (user_id === this.self_user_id()) {
-          call_et.self_user_joined(true);
+          call_et.self_user_joined(false);
           return call_et;
         }
 
@@ -359,7 +363,7 @@ z.calling.CallingRepository = class CallingRepository {
 
         if (user_id === this.self_user_id()) {
           call_et.self_user_joined(true);
-          call_et.state(z.calling.enum.CALL_STATE.REJECTED);
+          return call_et.state(z.calling.enum.CALL_STATE.REJECTED);
         }
 
         if (call_et.state() === z.calling.enum.CALL_STATE.OUTGOING) {
@@ -396,7 +400,7 @@ z.calling.CallingRepository = class CallingRepository {
         .then((call_et) => call_et.verify_session_id(call_message_et))
         .then((call_et) => this._confirm_call_message(call_et, call_message_et))
         .then((call_et) => call_et.delete_participant(user_id, client_id, termination_reason))
-        .then(function(call_et) {
+        .then((call_et) => {
           if (!call_et.is_group) {
             call_et.deactivate_call(call_message_et, termination_reason);
           }
@@ -758,7 +762,7 @@ z.calling.CallingRepository = class CallingRepository {
         this.calls.remove((call) => call.id === conversation_id);
         this.media_stream_handler.reset_media_stream();
       })
-      .catch(function(error) {
+      .catch((error) => {
         if (error.type !== z.calling.CallError.TYPE.NOT_FOUND) {
           throw error;
         }
@@ -838,7 +842,7 @@ z.calling.CallingRepository = class CallingRepository {
         this.media_stream_handler.release_media_stream();
         call_et.leave_call(termination_reason);
       })
-      .catch(function(error) {
+      .catch((error) => {
         if (error.type !== z.calling.CallError.TYPE.NOT_FOUND) {
           throw error;
         }
@@ -871,7 +875,7 @@ z.calling.CallingRepository = class CallingRepository {
 
         call_et.reject_call();
       })
-      .catch(function(error) {
+      .catch((error) => {
         if (error.type !== z.calling.CallError.TYPE.NOT_FOUND) {
           throw error;
         }
@@ -900,7 +904,7 @@ z.calling.CallingRepository = class CallingRepository {
             throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
         }
       })
-      .catch(function(error) {
+      .catch((error) => {
         if (error.type !== z.calling.CallError.TYPE.NOT_FOUND) {
           throw error;
         }
@@ -963,11 +967,11 @@ z.calling.CallingRepository = class CallingRepository {
 
       if (ongoing_call_id) {
         amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALL_START_ANOTHER, {
-          action: function() {
+          action() {
             amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, ongoing_call_id, z.calling.enum.TERMINATION_REASON.CONCURRENT_CALL);
             window.setTimeout(resolve, 1000);
           },
-          close: function() {
+          close() {
             if (call_state === z.calling.enum.CALL_STATE.INCOMING) {
               amplify.publish(z.event.WebApp.CALL.STATE.REJECT, new_call_id);
             }
