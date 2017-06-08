@@ -181,8 +181,12 @@ z.calling.CallingRepository = class CallingRepository {
     const {type: event_type, content: event_content} = event;
 
     if (event_type === z.event.Client.CALL.E_CALL) {
-      if (event_content.version !== z.calling.entities.CallMessage.CONFIG.VERSION) {
-        throw new z.calling.CallError(z.calling.CallError.TYPE.UNSUPPORTED_VERSION);
+      if (
+        event_content.version !== z.calling.entities.CallMessage.CONFIG.VERSION
+      ) {
+        throw new z.calling.CallError(
+          z.calling.CallError.TYPE.UNSUPPORTED_VERSION,
+        );
       }
       const call_message_et = z.calling.CallMessageMapper.map_event(event);
 
