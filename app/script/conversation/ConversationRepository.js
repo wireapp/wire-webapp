@@ -194,7 +194,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
     if (team_et) {
       if (team_et.id !== this.active_team().id) {
         this.active_team(team_et);
-        amplify.publish(z.event.WebApp.CONVERSATION.SHOW, this.get_most_recent_conversation());
       }
     } else {
       throw new TypeError('Missing team entity');
@@ -643,9 +642,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Conversation} Most recent conversation
    */
   get_most_recent_conversation() {
-    if (this.conversations_unarchived()) {
-      return this.conversations_unarchived()[0];
-    }
+    const [conversation_et] = this.conversations_unarchived();
+    return conversation_et;
   }
 
   /**
