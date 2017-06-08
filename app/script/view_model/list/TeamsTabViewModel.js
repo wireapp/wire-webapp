@@ -77,12 +77,16 @@ z.ViewModel.list.TeamsTabViewModel = class TeamsTabViewModel {
   }
 
   _show_last_conversation(team_et) {
-    if (this.list_view_model.list_state() === z.ViewModel.list.LIST_STATE.PREFERENCES) {
+    const preferences_state = this.list_view_model.list_state() === z.ViewModel.list.LIST_STATE.PREFERENCES;
+    if (preferences_state) {
       this.list_view_model.switch_list(z.ViewModel.list.LIST_STATE.CONVERSATIONS, false);
     }
 
-    const last_conversation = team_et.last_active_conversation;
-    const conversation_et = last_conversation ? last_conversation : this.conversation_repository.get_most_recent_conversation();
-    amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversation_et);
+    const start_ui_state = this.list_view_model.list_state() === z.ViewModel.list.LIST_STATE.START_UI;
+    if (!start_ui_state) {
+      const last_conversation = team_et.last_active_conversation;
+      const conversation_et = last_conversation ? last_conversation : this.conversation_repository.get_most_recent_conversation();
+      amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversation_et);
+    }
   }
 };
