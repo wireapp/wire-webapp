@@ -46,7 +46,7 @@ z.ViewModel.WindowTitleViewModel = class WindowTitleViewModel {
         const number_of_connect_requests = this.user_repository.connect_requests().length;
 
         this.conversation_repository.conversations_unarchived().forEach(function(conversation_et) {
-          if (!conversation_et.is_request() && !conversation_et.is_muted() && conversation_et.unread_event_count()) {
+          if (!conversation_et.is_request() && !conversation_et.is_muted() && conversation_et.unread_message_count()) {
             number_of_unread_conversations++;
           }
         });
