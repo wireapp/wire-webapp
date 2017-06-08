@@ -126,7 +126,6 @@ z.main.App = class App {
       repositories.conversation,
     );
     repositories.calling = new z.calling.CallingRepository(
-      this.service.call,
       this.service.calling,
       repositories.client,
       repositories.conversation,
@@ -155,7 +154,6 @@ z.main.App = class App {
 
     services.asset = new z.assets.AssetService(this.auth.client);
     services.bot = new z.bot.BotService();
-    services.call = new z.calling.v2.CallService(this.auth.client);
     services.calling = new z.calling.CallingService(this.auth.client);
     services.connect = new z.connect.ConnectService(this.auth.client);
     services.connect_google = new z.connect.ConnectGoogleService(
@@ -374,7 +372,7 @@ z.main.App = class App {
         this.repository.conversation.initialize_connections(
           this.repository.user.connections(),
         );
-        this._subscribe_to_beforeunload();
+        this._subscribe_to_unload_events();
         return this.repository.event.initialize_from_notification_stream();
       })
       .then(notifications_count => {
@@ -391,6 +389,55 @@ z.main.App = class App {
           notifications_count,
           100,
         );
+
+        this._watch_online_status();
+        return this.repository.client.get_clients_for_self();
+      })
+      .then(client_ets => {
+        this.view.loading.update_progress(97.5);
+
+        this.telemetry.add_statistic(
+          z.telemetry.app_init.AppInitStatisticsValue.CLIENTS,
+          client_ets.length,
+        );
+        this.telemetry.time_step(
+          z.telemetry.app_init.AppInitTimingsStep.APP_PRE_LOADED,
+        );
+
+        this.repository.user.self().devices(client_ets);
+        this.logger.info('App pre-loading completed');
+        return this._handle_url_params();
+      })
+      .then(() => {
+        this._show_ui();
+        this.telemetry.report();
+        amplify.publish(z.event.WebApp.LIFECYCLE.LOADED);
+        amplify.publish(z.event.WebApp.LOADED); // todo: deprecated - remove when user base of wrappers version >= 2.12 is large enough
+        this.telemetry.time_step(
+          z.telemetry.app_init.AppInitTimingsStep.APP_LOADED,
+        );
+        return this.repository.conversation.update_conversations(
+          this.repository.conversation.conversations_unarchived(),
+        );
+      })
+      .then(() => {
+        this.telemetry.time_step(
+          z.telemetry.app_init.AppInitTimingsStep.UPDATED_CONVERSATIONS,
+        );
+        this.repository.announce.init();
+        this.repository.audio.init(true);
+        this.repository.client.cleanup_clients_and_sessions(true);
+        this.repository.conversation.cleanup_conversations();
+        this.logger.info('App fully loaded');
+      })
+      .catch(error => {
+        let error_message = `Error during initialization of app version '${z.util.Environment.version(
+          false,
+        )}'`;
+        if (z.util.Environment.electron) {
+          error_message = `${error_message} - Electron '${platform.os
+            .family}' '${z.util.Environment.version()}'`;
+        }
 
         this._watch_online_status();
         return this.repository.client.get_clients_for_self();
@@ -704,7 +751,7 @@ z.main.App = class App {
    * Subscribe to 'beforeunload' to stop calls and disconnect the WebSocket.
    * @returns {undefined} No return value
    */
-  _subscribe_to_beforeunload() {
+  _subscribe_to_unload_events() {
     $(window).on('beforeunload', () => {
       this.logger.info(
         "'window.onbeforeunload' was triggered, so we will disconnect from the backend.",
@@ -712,8 +759,14 @@ z.main.App = class App {
       this.repository.event.disconnect_web_socket(
         z.event.WebSocketService.CHANGE_TRIGGER.PAGE_NAVIGATION,
       );
-      this.repository.calling.leave_call_on_beforeunload();
-      this.repository.storage.terminate('window.onbeforeunload');
+    });
+
+    $(window).on('unload', () => {
+      this.logger.info(
+        "'window.unload' was triggered, so we will tear down calls.",
+      );
+      this.repository.calling.leave_call_on_unload();
+      this.repository.storage.terminate('window.onunload');
     });
   }
 

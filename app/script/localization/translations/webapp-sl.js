@@ -142,9 +142,6 @@ z.string.sl.modal_block_conversation_message =
 z.string.sl.modal_block_conversation_button = 'Blokiraj';
 z.string.sl.modal_call_conversation_empty_headline = 'Ni nikogar za klic';
 z.string.sl.modal_call_conversation_empty_message = 'Nikogar ni več tukaj.';
-z.string.sl.modal_call_conversation_full_headline = 'Preveč oseb za klic';
-z.string.sl.modal_call_conversation_full_message =
-  'Klici delujejo v pogovorih do %no oseb.';
 z.string.sl.modal_call_no_video_in_group_headline =
   'Nobenih videoklicev v skupinah';
 z.string.sl.modal_call_no_video_in_group_message =
@@ -162,9 +159,6 @@ z.string.sl.modal_call_second_outgoing_headline = 'Odloži trenutni klic?';
 z.string.sl.modal_call_second_outgoing_message =
   'Naenkrat ste lahko samo v enem klicu.';
 z.string.sl.modal_call_second_outgoing_action = 'Odloži';
-z.string.sl.modal_call_voice_channel_full_headline = 'Polna hiša';
-z.string.sl.modal_call_voice_channel_full_message =
-  'Tukaj je prostora le za %no oseb.';
 z.string.sl.modal_clear_conversation_headline = 'Izbris vsebine "%@.name"?';
 z.string.sl.modal_clear_conversation_message =
   'To bo izbrisalo zgodovino pogovora in ga odstranilo iz vašega seznama.';
@@ -260,6 +254,7 @@ z.string.sl.conversation_message_delivered = 'Dostavljeno';
 z.string.sl.conversation_rename = ' je preimenoval(-a) pogovor';
 z.string.sl.conversation_rename_you = ' je preimenoval(-a) pogovor';
 z.string.sl.conversation_resume = 'Začni pogovor s/z %@names';
+z.string.sl.conversation_team_leave = ' je bil(-a) odstranjen(-a) iz ekipe';
 z.string.sl.conversation_ping = ' je pingal(-a)';
 z.string.sl.conversation_ping_you = ' je pingal(-a)';
 z.string.sl.conversation_today = 'danes';
@@ -312,8 +307,9 @@ z.string.sl.conversations_connection_request_one = '1 oseba čaka';
 z.string.sl.conversations_empty_conversation = 'Skupinski pogovor';
 z.string.sl.conversations_empty_conversation_description =
   'Vsi so zapustili pogovor';
-z.string.sl.conversations_no_conversations =
-  'Začni pogovor ali povabi stike na Wire.';
+z.string.sl.conversations_no_conversations = 'Še ni pogovorov';
+z.string.sl.conversations_no_conversations_detail =
+  'Začni pogovor, ustvari skupino ali povabi stike na Wire.';
 z.string.sl.conversations_popover_archive = 'Arhiviraj';
 z.string.sl.conversations_popover_block = 'Blokiraj';
 z.string.sl.conversations_popover_cancel = 'Prekliči prošnjo';
@@ -333,16 +329,11 @@ z.string.sl.conversations_secondary_line_new_messages =
   '{{number}} novih sporočil';
 z.string.sl.conversations_secondary_line_ping = '{{number}} ping';
 z.string.sl.conversations_secondary_line_pings = '{{number}} pingov';
-z.string.sl.conversations_secondary_line_person_left =
-  '{{number}} oseba je zapustila pogovor';
 z.string.sl.conversations_secondary_line_people_left =
   '{{number}} oseb je zapustilo pogovor';
-z.string.sl.conversations_secondary_line_person_added =
-  '{{user1}} dodal(-a) {{user2}}';
 z.string.sl.conversations_secondary_line_people_added =
   '{{user}} oseb je bilo dodanih';
 z.string.sl.conversations_secondary_line_timed_message = 'Časovno sporočilo';
-z.string.sl.conversations_secondary_line_renamed = '{{user}} preimenovan(-a)';
 
 z.string.sl.takeover_headline = 'Uporabniška imena so tukaj.';
 z.string.sl.takeover_sub = 'Zavzemite vaše unikatno ime na Wire.';
@@ -631,12 +622,6 @@ z.string.sl.system_notification_member_join_many =
   '%s.first_name je dodal(-a) %no oseb v pogovor';
 z.string.sl.system_notification_member_join_one =
   '%s.first_name je dodal(-a) %@.first_name v pogovor';
-z.string.sl.system_notification_member_leave_left =
-  '%s.first_name je zapustil(-a) pogovor';
-z.string.sl.system_notification_member_leave_removed_many =
-  '%s.first_name je odstranil(-a) %no oseb iz pogovora';
-z.string.sl.system_notification_member_leave_removed_one =
-  '%s.first_name je odstranil(-a) %@.first_name iz pogovora';
 z.string.sl.system_notification_obfuscated = 'Vam je poslal(-a) sporočilo';
 z.string.sl.system_notification_obfuscated_title = 'Nekdo';
 z.string.sl.system_notification_ping = 'Je pingal(-a)';

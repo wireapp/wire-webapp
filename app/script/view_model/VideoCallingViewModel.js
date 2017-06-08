@@ -296,7 +296,7 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
           z.event.WebApp.ANALYTICS.EVENT,
           z.tracking.EventName.CALLING.SHARED_SCREEN,
           {
-            conversation_type: this.joined_call().is_group()
+            conversation_type: this.joined_call().is_group
               ? z.tracking.attribute.ConversationType.GROUP
               : z.tracking.attribute.ConversationType.ONE_TO_ONE,
             kind_of_call_when_sharing: this.joined_call().is_remote_video_send()

@@ -143,10 +143,6 @@ z.string.da.modal_block_conversation_message =
 z.string.da.modal_block_conversation_button = 'Blokér';
 z.string.da.modal_call_conversation_empty_headline = 'Ingen at ringe til';
 z.string.da.modal_call_conversation_empty_message = 'Der er ingen tilbage her.';
-z.string.da.modal_call_conversation_full_headline =
-  'For mange personer at ringe til';
-z.string.da.modal_call_conversation_full_message =
-  'Opkald virker i samtaler med op til %no personer.';
 z.string.da.modal_call_no_video_in_group_headline =
   'Ingen video opkald i grupper';
 z.string.da.modal_call_no_video_in_group_message =
@@ -163,9 +159,6 @@ z.string.da.modal_call_second_outgoing_headline = 'Læg nuværende opkald på?';
 z.string.da.modal_call_second_outgoing_message =
   'Du kan kun være i et opkald af gangen.';
 z.string.da.modal_call_second_outgoing_action = 'Læg På';
-z.string.da.modal_call_voice_channel_full_headline = 'Fuldt hus';
-z.string.da.modal_call_voice_channel_full_message =
-  'Der er kun plads til %no personer herinde.';
 z.string.da.modal_clear_conversation_headline = 'Slet "%@.name" indhold?';
 z.string.da.modal_clear_conversation_message =
   'Dette vil fjerne samtale historikken og fjerne den fra din liste.';
@@ -310,8 +303,6 @@ z.string.da.conversations_connection_request_one = '1 person venter';
 z.string.da.conversations_empty_conversation = 'Gruppesamtale';
 z.string.da.conversations_empty_conversation_description =
   'Alle forlod gruppen';
-z.string.da.conversations_no_conversations =
-  'Start en samtale og inviter personer til at deltage.';
 z.string.da.conversations_popover_archive = 'Arkivér';
 z.string.da.conversations_popover_block = 'Blokér';
 z.string.da.conversations_popover_cancel = 'Annuller anmodning';
@@ -599,12 +590,6 @@ z.string.da.system_notification_member_join_many =
   '%s.first_name tilføjede %no personer til samtalen';
 z.string.da.system_notification_member_join_one =
   '%s.first_name tilføjede %@.first_name til samtalen';
-z.string.da.system_notification_member_leave_left =
-  '%s.first_name forlod samtalen';
-z.string.da.system_notification_member_leave_removed_many =
-  '%s.first_name fjernede %no personer fra samtalen';
-z.string.da.system_notification_member_leave_removed_one =
-  '%s.first_name fjernede %@.first_name fra samtalen';
 z.string.da.system_notification_obfuscated = 'Sendte dig en besked';
 z.string.da.system_notification_obfuscated_title = 'Nogen';
 z.string.da.system_notification_ping = 'Pingede';

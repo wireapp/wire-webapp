@@ -150,10 +150,6 @@ z.string.es.modal_block_conversation_message =
 z.string.es.modal_block_conversation_button = 'Bloquear';
 z.string.es.modal_call_conversation_empty_headline = 'Nadie para llamar';
 z.string.es.modal_call_conversation_empty_message = 'No hay nadie aqui.';
-z.string.es.modal_call_conversation_full_headline =
-  'Demasiadas personas para llamar';
-z.string.es.modal_call_conversation_full_message =
-  'Las llamadas funcionan en conversaciones con hasta %n personas.';
 z.string.es.modal_call_no_video_in_group_headline =
   'No hay videollamadas en grupos';
 z.string.es.modal_call_no_video_in_group_message =
@@ -171,9 +167,6 @@ z.string.es.modal_call_second_outgoing_headline = '¿Colgar llamada actual?';
 z.string.es.modal_call_second_outgoing_message =
   'Solo puedes estar en una llamada a la vez.';
 z.string.es.modal_call_second_outgoing_action = 'Colgar';
-z.string.es.modal_call_voice_channel_full_headline = 'Llamada llena';
-z.string.es.modal_call_voice_channel_full_message =
-  'Sólo hay espacio en esta llamada para %no personas.';
 z.string.es.modal_clear_conversation_headline =
   '¿Borrar contenido de "%@.name"?';
 z.string.es.modal_clear_conversation_message =
@@ -317,8 +310,6 @@ z.string.es.conversations_all_archived = 'Todo archivado';
 z.string.es.conversations_contacts = 'Contactos';
 z.string.es.conversations_connection_request_many = '%no personas en espera';
 z.string.es.conversations_connection_request_one = '1 persona en espera';
-z.string.es.conversations_no_conversations =
-  'Iniciar una conversación o invitar personas a unirse.';
 z.string.es.conversations_popover_archive = 'Archivar';
 z.string.es.conversations_popover_block = 'Bloquear';
 z.string.es.conversations_popover_cancel = 'Cancelar solicitud';
@@ -615,12 +606,6 @@ z.string.es.system_notification_member_join_many =
   '%s.first_name agregó a %no personas a la conversación';
 z.string.es.system_notification_member_join_one =
   '%s.first_name agregó a %@.first_name a la conversación';
-z.string.es.system_notification_member_leave_left =
-  '%s.first_name ha dejado la conversación';
-z.string.es.system_notification_member_leave_removed_many =
-  '%s.first_name eliminó a %no personas de la conversación';
-z.string.es.system_notification_member_leave_removed_one =
-  '%@.first_name eliminó a %s.first_name de la conversación';
 z.string.es.system_notification_obfuscated = 'Te envió un mensaje';
 z.string.es.system_notification_obfuscated_title = 'Alguien';
 z.string.es.system_notification_ping = 'Hizo ping';

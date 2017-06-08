@@ -148,10 +148,6 @@ z.string.ru.modal_block_conversation_message =
 z.string.ru.modal_block_conversation_button = 'Заблокировать';
 z.string.ru.modal_call_conversation_empty_headline = 'Некому звонить';
 z.string.ru.modal_call_conversation_empty_message = 'Здесь никого не осталось.';
-z.string.ru.modal_call_conversation_full_headline =
-  'Слишком много людей для группового звонка';
-z.string.ru.modal_call_conversation_full_message =
-  'Звонки работают в разговорах до %no участников.';
 z.string.ru.modal_call_no_video_in_group_headline =
   'В группах нет видеозвонков';
 z.string.ru.modal_call_no_video_in_group_message =
@@ -169,9 +165,6 @@ z.string.ru.modal_call_second_outgoing_headline = 'Завершить текущ
 z.string.ru.modal_call_second_outgoing_message =
   'Вы можете одновременно участвовать только в одном звонке.';
 z.string.ru.modal_call_second_outgoing_action = 'Завершить вызов';
-z.string.ru.modal_call_voice_channel_full_headline = 'Канал переполнен';
-z.string.ru.modal_call_voice_channel_full_message =
-  'Здесь хватит места только для %no человек.';
 z.string.ru.modal_clear_conversation_headline =
   'Удалить историю разговоров с "%@.name"?';
 z.string.ru.modal_clear_conversation_message =
@@ -270,6 +263,7 @@ z.string.ru.conversation_message_delivered = 'Доставлено';
 z.string.ru.conversation_rename = ' переименовал(а) разговор';
 z.string.ru.conversation_rename_you = ' переименовал(а) разговор';
 z.string.ru.conversation_resume = 'Начать разговор с %@names';
+z.string.ru.conversation_team_leave = ' был исключён из команды';
 z.string.ru.conversation_ping = ' отправил(а) пинг';
 z.string.ru.conversation_ping_you = ' отправил(а) пинг';
 z.string.ru.conversation_today = 'сегодня';
@@ -321,8 +315,9 @@ z.string.ru.conversations_connection_request_many = '%no ожидающих';
 z.string.ru.conversations_connection_request_one = '1 человек ожидает';
 z.string.ru.conversations_empty_conversation = 'Групповой разговор';
 z.string.ru.conversations_empty_conversation_description = 'Все вышли';
-z.string.ru.conversations_no_conversations =
-  'Начни разговор или пригласи людей присоединиться.';
+z.string.ru.conversations_no_conversations = 'Разговоров пока нет';
+z.string.ru.conversations_no_conversations_detail =
+  'Начните разговор, создайте группу или пригласите людей присоединиться.';
 z.string.ru.conversations_popover_archive = 'Архивировать';
 z.string.ru.conversations_popover_block = 'Заблокировать';
 z.string.ru.conversations_popover_cancel = 'Отклонить запрос';
@@ -342,17 +337,11 @@ z.string.ru.conversations_secondary_line_new_messages =
   '{{number}} новых сообщения';
 z.string.ru.conversations_secondary_line_ping = '{{number}} пинг';
 z.string.ru.conversations_secondary_line_pings = '{{number}} пинга';
-z.string.ru.conversations_secondary_line_person_left =
-  '{{number}} человек покинул';
 z.string.ru.conversations_secondary_line_people_left =
   '{{number}} человек(а) покинули';
-z.string.ru.conversations_secondary_line_person_added =
-  '{{user1}} добавил(-а) {{user2}}';
 z.string.ru.conversations_secondary_line_people_added =
   '{{user}} человек были добавлены';
 z.string.ru.conversations_secondary_line_timed_message = 'Временное сообщение';
-z.string.ru.conversations_secondary_line_renamed =
-  '{{user}} переименовал группу';
 
 z.string.ru.takeover_headline = 'Имена пользователей уже здесь.';
 z.string.ru.takeover_sub = 'Зарегистрируйте своё уникальное имя в Wire.';
@@ -645,12 +634,6 @@ z.string.ru.system_notification_member_join_many =
   '%s.first_name добавил %no человек(а) в разговор';
 z.string.ru.system_notification_member_join_one =
   '%s.first_name добавил %@.first_name в разговор';
-z.string.ru.system_notification_member_leave_left =
-  '%s.first_name покинул разговор';
-z.string.ru.system_notification_member_leave_removed_many =
-  '%s.first_name удалил %no человек из разговора';
-z.string.ru.system_notification_member_leave_removed_one =
-  '%s.first_name удалил %@.first_name из разговора';
 z.string.ru.system_notification_obfuscated = 'Отправил(-а) Вам сообщение';
 z.string.ru.system_notification_obfuscated_title = 'Кто-то';
 z.string.ru.system_notification_ping = 'Отправил(а) пинг';

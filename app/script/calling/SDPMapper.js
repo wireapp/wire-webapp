@@ -21,9 +21,8 @@
 
 window.z = window.z || {};
 window.z.calling = z.calling || {};
-window.z.calling.mapper = z.calling.mapper || {};
 
-z.calling.mapper.SDPMapper = {
+z.calling.SDPMapper = {
   CONFIG: {
     AUDIO_BITRATE: '30',
     AUDIO_PTIME: '60',
@@ -43,12 +42,12 @@ z.calling.mapper.SDPMapper = {
   },
 
   /**
-   * Map e-call setup message to RTCSessionDescription.
-   * @param {ECallMessage} e_call_message_et - E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
+   * Map call setup message to RTCSessionDescription.
+   * @param {CallMessage} call_message_et - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
    * @returns {Promise} Resolves with a webRTC standard compliant RTCSessionDescription
    */
-  map_e_call_message_to_object(e_call_message_et) {
-    const {response, sdp: sdp_string} = e_call_message_et;
+  map_call_message_to_object(call_message_et) {
+    const {response, sdp: sdp_string} = call_message_et;
     const sdp = {
       sdp: sdp_string,
       type: response === true
@@ -60,25 +59,11 @@ z.calling.mapper.SDPMapper = {
   },
 
   /**
-   * Map call event to RTCSessionDescription.
-   * @param {Object} event - Call message containing SDP
-   * @returns {RTCSessionDescription} webRTC standard compliant RTCSessionDescription
-   */
-  map_event_to_object(event) {
-    const sdp = {
-      sdp: event.sdp,
-      type: event.state,
-    };
-
-    return new window.RTCSessionDescription(sdp);
-  },
-
-  /**
    * Rewrite the SDP for compatibility reasons.
    *
    * @param {RTCSessionDescription} rtc_sdp - Session Description Protocol to be rewritten
    * @param {z.calling.enum.SDP_SOURCE} [sdp_source=z.calling.enum.SDP_SOURCE.REMOTE] - Source of the SDP - local or remote
-   * @param {EFlow|z.calling.entities.Flow} flow_et - Flow entity
+   * @param {Flow} flow_et - Flow entity
    * @returns {Object} Object containing rewritten Session Description Protocol and number of ICE candidates
    */
   rewrite_sdp(rtc_sdp, sdp_source = z.calling.enum.SDP_SOURCE.REMOTE, flow_et) {
@@ -131,7 +116,7 @@ z.calling.mapper.SDPMapper = {
           (sdp_source === z.calling.enum.SDP_SOURCE.LOCAL && flow_et.is_group)
         ) {
           sdp_lines.push(sdp_line);
-          outline = `b=AS:${z.calling.mapper.SDPMapper.CONFIG.AUDIO_BITRATE}`;
+          outline = `b=AS:${z.calling.SDPMapper.CONFIG.AUDIO_BITRATE}`;
         }
       } else if (sdp_line.startsWith('a=rtpmap')) {
         if (
@@ -141,8 +126,7 @@ z.calling.mapper.SDPMapper = {
         ) {
           if (z.util.StringUtil.includes(sdp_line, 'opus')) {
             sdp_lines.push(sdp_line);
-            outline = `a=ptime:${z.calling.mapper.SDPMapper.CONFIG
-              .AUDIO_PTIME}`;
+            outline = `a=ptime:${z.calling.SDPMapper.CONFIG.AUDIO_PTIME}`;
           }
         }
 

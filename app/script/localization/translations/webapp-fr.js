@@ -150,10 +150,6 @@ z.string.fr.modal_block_conversation_button = 'Bloquer';
 z.string.fr.modal_call_conversation_empty_headline = 'Personne à appeler';
 z.string.fr.modal_call_conversation_empty_message =
   'Il n’y a plus personne ici.';
-z.string.fr.modal_call_conversation_full_headline =
-  'Trop de personnes pour appeler';
-z.string.fr.modal_call_conversation_full_message =
-  'Les appels fonctionnent dans des conversations avec jusqu’à %no personnes.';
 z.string.fr.modal_call_no_video_in_group_headline =
   'Pas d’appel vidéo en groupe';
 z.string.fr.modal_call_no_video_in_group_message =
@@ -172,9 +168,6 @@ z.string.fr.modal_call_second_outgoing_headline =
 z.string.fr.modal_call_second_outgoing_message =
   'Vous ne pouvez être que dans un appel à la fois.';
 z.string.fr.modal_call_second_outgoing_action = 'Raccrocher';
-z.string.fr.modal_call_voice_channel_full_headline = 'Maison pleine';
-z.string.fr.modal_call_voice_channel_full_message =
-  'Il n’y a de place que pour %no personnes ici.';
 z.string.fr.modal_clear_conversation_headline =
   'Supprimer le contenu "%@.name" ?';
 z.string.fr.modal_clear_conversation_message =
@@ -328,8 +321,6 @@ z.string.fr.conversations_connection_request_one = '1 personne en attente';
 z.string.fr.conversations_empty_conversation = 'Conversation de groupe';
 z.string.fr.conversations_empty_conversation_description =
   'Tout le monde est parti';
-z.string.fr.conversations_no_conversations =
-  'Démarrez une conversation ou invitez des personnes à vous rejoindre.';
 z.string.fr.conversations_popover_archive = 'Archiver';
 z.string.fr.conversations_popover_block = 'Bloquer';
 z.string.fr.conversations_popover_cancel = 'Annuler la demande';
@@ -349,12 +340,8 @@ z.string.fr.conversations_secondary_line_new_messages =
   '{{number}} nouveaux messages';
 z.string.fr.conversations_secondary_line_ping = '{{number}} ping';
 z.string.fr.conversations_secondary_line_pings = '{{number}} pings';
-z.string.fr.conversations_secondary_line_person_left =
-  '{{number}} personne est partie';
 z.string.fr.conversations_secondary_line_people_left =
   '{{number}} personnes sont parties';
-z.string.fr.conversations_secondary_line_person_added =
-  '{{user1}} a ajouté {{user2}}';
 z.string.fr.conversations_secondary_line_people_added =
   '{{user}} ont été ajoutés';
 z.string.fr.conversations_secondary_line_timed_message = 'Message éphémère';
@@ -654,12 +641,6 @@ z.string.fr.system_notification_member_join_many =
   '%s.first_name a ajouté %no personnes à la conversation';
 z.string.fr.system_notification_member_join_one =
   '%s.first_name a ajouté %@.first_name à la conversation';
-z.string.fr.system_notification_member_leave_left =
-  '%s.first_name a quitté la conversation';
-z.string.fr.system_notification_member_leave_removed_many =
-  '%s.first_name a exclu %no personnes de la conversation';
-z.string.fr.system_notification_member_leave_removed_one =
-  '%s.first_name a exclu %@.first_name de la conversation';
 z.string.fr.system_notification_obfuscated = 'vous a envoyé un message';
 z.string.fr.system_notification_obfuscated_title = 'Quelqu’un';
 z.string.fr.system_notification_ping = 'a fait un signe';

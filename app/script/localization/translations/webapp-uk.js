@@ -147,10 +147,6 @@ z.string.uk.modal_block_conversation_message =
 z.string.uk.modal_block_conversation_button = 'Заблокувати';
 z.string.uk.modal_call_conversation_empty_headline = 'Нікому дзвонити';
 z.string.uk.modal_call_conversation_empty_message = 'Тут більше нікого немає.';
-z.string.uk.modal_call_conversation_full_headline =
-  'Забагато учасників для здійснення дзвінка';
-z.string.uk.modal_call_conversation_full_message =
-  'Дзвінки можливі в розмовах до %no учасників.';
 z.string.uk.modal_call_no_video_in_group_headline =
   'Відеодзвінки в групах не підтримуються';
 z.string.uk.modal_call_no_video_in_group_message =
@@ -168,10 +164,6 @@ z.string.uk.modal_call_second_outgoing_headline = 'Завершити поточ
 z.string.uk.modal_call_second_outgoing_message =
   'Ви можете здійснювати тільки один дзвінок за один раз.';
 z.string.uk.modal_call_second_outgoing_action = 'Завершити';
-z.string.uk.modal_call_voice_channel_full_headline =
-  'Голосовий канал переповнений';
-z.string.uk.modal_call_voice_channel_full_message =
-  'Тут залишилось місце тільки для %no учасників.';
 z.string.uk.modal_clear_conversation_headline =
   'Видалити історію розмов з "%@.name"?';
 z.string.uk.modal_clear_conversation_message =
@@ -323,8 +315,6 @@ z.string.uk.conversations_connection_request_many = '%no людей очікує
 z.string.uk.conversations_connection_request_one = '1 людина очікує';
 z.string.uk.conversations_empty_conversation = 'Групова розмова';
 z.string.uk.conversations_empty_conversation_description = 'Всі вийшли';
-z.string.uk.conversations_no_conversations =
-  'Розпочніть розмову або запросіть більше людей приєднатися до неї.';
 z.string.uk.conversations_popover_archive = 'Архівувати';
 z.string.uk.conversations_popover_block = 'Заблокувати';
 z.string.uk.conversations_popover_cancel = 'Скасувати запит';
@@ -344,17 +334,12 @@ z.string.uk.conversations_secondary_line_new_messages =
   '{{number}} нових повідомлень';
 z.string.uk.conversations_secondary_line_ping = '{{number}} пінг';
 z.string.uk.conversations_secondary_line_pings = '{{number}} пінгів';
-z.string.uk.conversations_secondary_line_person_left =
-  '{{number}} учасник вийшов';
 z.string.uk.conversations_secondary_line_people_left =
   '{{number}} учасників вийшло';
-z.string.uk.conversations_secondary_line_person_added =
-  '{{user1}} додав(-ла) {{user2}}';
 z.string.uk.conversations_secondary_line_people_added =
   '{{user}} учасників було додано';
 z.string.uk.conversations_secondary_line_timed_message =
   'Тимчасове повідомлення';
-z.string.uk.conversations_secondary_line_renamed = '{{user}} перейменував(-ла)';
 
 z.string.uk.takeover_headline = 'Ніки вже тут.';
 z.string.uk.takeover_sub = 'Зарезервуйте свій унікальний нік в Wire.';
@@ -541,6 +526,8 @@ z.string.uk.search_connect = 'Додати до контактів';
 z.string.uk.search_connections = 'Контакти';
 z.string.uk.search_groups = 'Групи';
 z.string.uk.search_placeholder = 'Пошук за іменем або ніком';
+z.string.uk.search_team_groups = 'Розмови в команді';
+z.string.uk.search_team_members = 'Учасники команди';
 z.string.uk.search_top_people = 'Топ-контакти';
 z.string.uk.search_try_search = 'Шукайте людай\nза іменем або ніком';
 z.string.uk.search_no_contacts_on_wire =
@@ -644,12 +631,6 @@ z.string.uk.system_notification_member_join_many =
   '%s.first_name додав(-ла) %no учасників до розмови';
 z.string.uk.system_notification_member_join_one =
   '%s.first_name додав(-ла) %@.first_name до розмови';
-z.string.uk.system_notification_member_leave_left =
-  '%s.first_name вийшов(-ла) з розмови';
-z.string.uk.system_notification_member_leave_removed_many =
-  '%s.first_name видалив(-ла) %no учасників з розмови';
-z.string.uk.system_notification_member_leave_removed_one =
-  '%s.first_name видалив(-ла) %@.first_name з розмови';
 z.string.uk.system_notification_obfuscated = 'Надіслав вам повідомлення';
 z.string.uk.system_notification_obfuscated_title = 'Хтось';
 z.string.uk.system_notification_ping = 'Надіслав(-ла) пінг';

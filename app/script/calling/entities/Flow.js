@@ -23,7 +23,7 @@ window.z = window.z || {};
 window.z.calling = z.calling || {};
 window.z.calling.entities = z.calling.entities || {};
 
-z.calling.entities.EFlow = class EFlow {
+z.calling.entities.Flow = class Flow {
   static get CONFIG() {
     return {
       DATA_CHANNEL_LABEL: 'calling-3.0',
@@ -35,25 +35,26 @@ z.calling.entities.EFlow = class EFlow {
   }
 
   /**
-   * Construct a new e-flow entity.
+   * Construct a new flow entity.
    *
-   * @param {ECall} e_call_et - E-Call entity that the e-flow belongs to
-   * @param {EParticipant} e_participant_et - E-Participant entity that the e-flow belongs to
+   * @class z.calling.entities.Flow
+   * @param {Call} call_et - Call entity that the flow belongs to
+   * @param {Participant} participant_et - Participant entity that the flow belongs to
    * @param {CallSetupTimings} timings - Timing statistics of call setup steps
-   * @param {ECallMessage} e_call_message_et - Optional e-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
+   * @param {CallMessage} call_message_et - Optional call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
    */
-  constructor(e_call_et, e_participant_et, timings, e_call_message_et) {
-    this.v3_call_center = e_call_et.v3_call_center;
+  constructor(call_et, participant_et, timings, call_message_et) {
+    this.calling_repository = call_et.calling_repository;
 
-    this.e_call_et = e_call_et;
-    this.e_participant_et = e_participant_et;
+    this.call_et = call_et;
+    this.participant_et = participant_et;
     this.logger = new z.util.Logger(
-      `z.calling.entities.EFlow (${this.e_participant_et.id})`,
+      `z.calling.entities.Flow (${this.participant_et.id})`,
       z.config.LOGGER.OPTIONS,
     );
 
-    this.id = this.e_participant_et.id;
-    this.conversation_id = this.e_call_et.id;
+    this.id = this.participant_et.id;
+    this.conversation_id = this.call_et.id;
 
     // States
     this.is_answer = ko.observable(undefined);
@@ -61,20 +62,20 @@ z.calling.entities.EFlow = class EFlow {
     // Audio
     this.audio = new z.calling.entities.FlowAudio(
       this,
-      this.v3_call_center.media_repository,
+      this.calling_repository.media_repository,
     );
 
     // Users
     this.remote_client_id = undefined;
-    this.remote_user = this.e_participant_et.user;
+    this.remote_user = this.participant_et.user;
     this.remote_user_id = this.remote_user.id;
-    this.self_user_id = this.e_call_et.self_user.id;
+    this.self_user_id = this.call_et.self_user_id;
 
     // Telemetry
     this.telemetry = new z.telemetry.calling.FlowTelemetry(
       this.id,
       this.remote_user_id,
-      this.e_call_et,
+      this.call_et,
       timings,
     );
 
@@ -85,7 +86,7 @@ z.calling.entities.EFlow = class EFlow {
     this.peer_connection = undefined;
     this.pc_initialized = ko.observable(false);
 
-    this.media_stream = this.e_call_et.local_media_stream;
+    this.media_stream = this.call_et.local_media_stream;
     this.data_channel = undefined;
     this.data_channel_opened = false;
 
@@ -98,7 +99,7 @@ z.calling.entities.EFlow = class EFlow {
     this.connection_state.subscribe(ice_connection_state => {
       switch (ice_connection_state) {
         case z.calling.rtc.ICE_CONNECTION_STATE.CHECKING: {
-          this.telemetry.schedule_check(this.e_call_et.telemetry.media_type);
+          this.telemetry.schedule_check(this.call_et.telemetry.media_type);
           break;
         }
 
@@ -108,21 +109,21 @@ z.calling.entities.EFlow = class EFlow {
           this.negotiation_mode(z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT);
           this.telemetry.start_statistics();
 
-          this.e_call_et.is_connected(true);
-          this.e_participant_et.is_connected(true);
+          this.call_et.is_connected(true);
+          this.participant_et.is_connected(true);
 
-          this.e_call_et.interrupted_participants.remove(this.e_participant_et);
-          this.e_call_et.state(z.calling.enum.CALL_STATE.ONGOING);
-          this.e_call_et.termination_reason = undefined;
+          this.call_et.interrupted_participants.remove(this.participant_et);
+          this.call_et.state(z.calling.enum.CALL_STATE.ONGOING);
+          this.call_et.termination_reason = undefined;
           break;
         }
 
         case z.calling.rtc.ICE_CONNECTION_STATE.CLOSED: {
-          this.e_participant_et.is_connected(false);
+          this.participant_et.is_connected(false);
 
-          if (this.e_call_et.self_client_joined()) {
-            this.e_call_et.delete_e_participant(
-              this.e_participant_et.id,
+          if (this.call_et.self_client_joined()) {
+            this.call_et.delete_participant(
+              this.participant_et.id,
               this.remote_client_id,
             );
           }
@@ -135,7 +136,7 @@ z.calling.entities.EFlow = class EFlow {
         }
 
         case z.calling.rtc.ICE_CONNECTION_STATE.FAILED: {
-          if (this.e_call_et.self_client_joined()) {
+          if (this.call_et.self_client_joined()) {
             this._remove_participant();
           }
           break;
@@ -153,8 +154,8 @@ z.calling.entities.EFlow = class EFlow {
           this.logger.info(
             `PeerConnection with '${this.remote_user.name()}' was closed`,
           );
-          this.e_call_et.delete_e_participant(
-            this.e_participant_et.id,
+          this.call_et.delete_participant(
+            this.participant_et.id,
             this.remote_client_id,
           );
           break;
@@ -327,24 +328,24 @@ z.calling.entities.EFlow = class EFlow {
       }
     });
 
-    this.initialize_e_flow(e_call_message_et);
+    this.initialize_flow(call_message_et);
   }
 
   /**
-   * Initialize the e-flow.
+   * Initialize the flow.
    *
-   * @note Magic here is that if an e_call_message is present, the remote user is the creator of the flow
-   * @param {ECallMessage} e_call_message_et - Optional e-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
+   * @note Magic here is that if an call_message is present, the remote user is the creator of the flow
+   * @param {CallMessage} call_message_et - Optional call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
    * @returns {undefined} No return value
    */
-  initialize_e_flow(e_call_message_et) {
-    if (e_call_message_et) {
-      const {client_id, sdp: rtc_sdp} = e_call_message_et;
+  initialize_flow(call_message_et) {
+    if (call_message_et) {
+      const {client_id, sdp: rtc_sdp} = call_message_et;
 
       this.set_remote_client_id(client_id);
 
       if (rtc_sdp) {
-        return this.save_remote_sdp(e_call_message_et);
+        return this.save_remote_sdp(call_message_et);
       }
     }
 
@@ -423,24 +424,24 @@ z.calling.entities.EFlow = class EFlow {
    * @returns {undefined} No return value
    */
   _remove_participant(termination_reason) {
-    this.e_participant_et.is_connected(false);
+    this.participant_et.is_connected(false);
 
-    this.e_call_et
-      .delete_e_participant(
-        this.e_participant_et.id,
+    this.call_et
+      .delete_participant(
+        this.participant_et.id,
         this.remote_client_id,
         z.calling.enum.TERMINATION_REASON.CONNECTION_DROP,
       )
       .then(() => {
-        if (!this.e_call_et.participants().length) {
+        if (!this.call_et.participants().length) {
           if (!termination_reason) {
-            termination_reason = this.e_call_et.is_connected()
+            termination_reason = this.call_et.is_connected()
               ? z.calling.enum.TERMINATION_REASON.CONNECTION_DROP
               : z.calling.enum.TERMINATION_REASON.CONNECTION_FAILED;
           }
           amplify.publish(
             z.event.WebApp.CALL.STATE.LEAVE,
-            this.e_call_et.id,
+            this.call_et.id,
             termination_reason,
           );
         }
@@ -502,7 +503,7 @@ z.calling.entities.EFlow = class EFlow {
    * @returns {Promise} Resolves with the configuration object to initialize PeerConnection
    */
   _create_peer_connection_configuration() {
-    return this.e_call_et.v3_call_center.get_config().then(calling_config => {
+    return this.calling_repository.get_config().then(calling_config => {
       return {
         bundlePolicy: 'max-bundle',
         iceServers: calling_config.ice_servers,
@@ -574,7 +575,7 @@ z.calling.entities.EFlow = class EFlow {
       z.media.MediaStreamSource.REMOTE,
       this.remote_user.id,
       media_stream,
-      this.e_call_et,
+      this.call_et,
     );
     amplify.publish(z.event.WebApp.CALL.MEDIA.ADD_STREAM, media_stream_info);
   }
@@ -612,7 +613,7 @@ z.calling.entities.EFlow = class EFlow {
       z.calling.enum.CALL_STATE.DISCONNECTING,
       z.calling.enum.CALL_STATE.ENDED,
     ];
-    const is_ending_call = ending_call_states.includes(this.e_call_et.state());
+    const is_ending_call = ending_call_states.includes(this.call_et.state());
 
     if (this.peer_connection || !is_ending_call) {
       this.logger.info('State changed - ICE connection', event);
@@ -672,19 +673,19 @@ z.calling.entities.EFlow = class EFlow {
   //##############################################################################
 
   /**
-   * Send an e-call message through the data channel.
-   * @param {ECallMessage} e_call_message_et - E-call message to be send
+   * Send an call message through the data channel.
+   * @param {CallMessage} call_message_et - Call message to be send
    * @returns {undefined} No return value
    */
-  send_message(e_call_message_et) {
-    const {conversation_id, response, type} = e_call_message_et;
+  send_message(call_message_et) {
+    const {conversation_id, response, type} = call_message_et;
 
     if (this.data_channel && this.data_channel_opened) {
       try {
-        this.data_channel.send(e_call_message_et.to_content_string());
+        this.data_channel.send(call_message_et.to_content_string());
         this.logger.info(
-          `Send e-call '${type}' message to conversation '${conversation_id}' via data channel`,
-          e_call_message_et.to_JSON(),
+          `Send call '${type}' message to conversation '${conversation_id}' via data channel`,
+          call_message_et.to_JSON(),
         );
         return;
       } catch (error) {
@@ -693,16 +694,14 @@ z.calling.entities.EFlow = class EFlow {
             `Failed to send calling message via data channel: ${error.name}`,
             error,
           );
-          throw new z.calling.v3.CallError(
-            z.calling.v3.CallError.TYPE.NO_DATA_CHANNEL,
+          throw new z.calling.CallError(
+            z.calling.CallError.TYPE.NO_DATA_CHANNEL,
           );
         }
       }
     }
 
-    throw new z.calling.v3.CallError(
-      z.calling.v3.CallError.TYPE.NO_DATA_CHANNEL,
-    );
+    throw new z.calling.CallError(z.calling.CallError.TYPE.NO_DATA_CHANNEL);
   }
 
   /**
@@ -730,10 +729,9 @@ z.calling.entities.EFlow = class EFlow {
   _initialize_data_channel() {
     if (this.peer_connection.createDataChannel && !this.data_channel) {
       this._setup_data_channel(
-        this.peer_connection.createDataChannel(
-          EFlow.CONFIG.DATA_CHANNEL_LABEL,
-          {ordered: true},
-        ),
+        this.peer_connection.createDataChannel(Flow.CONFIG.DATA_CHANNEL_LABEL, {
+          ordered: true,
+        }),
       );
     }
   }
@@ -805,25 +803,25 @@ z.calling.entities.EFlow = class EFlow {
    * @returns {undefined} No return value
    */
   _on_message({data: message}) {
-    const e_call_message = JSON.parse(message);
-    const {resp: response, type} = e_call_message;
-    const {conversation_et} = this.e_call_et;
+    const call_message = JSON.parse(message);
+    const {resp: response, type} = call_message;
+    const {conversation_et} = this.call_et;
 
     if (response === true) {
       this.logger.debug(
-        `Received confirmation for e-call '${type}' message via data channel`,
-        e_call_message,
+        `Received confirmation for call '${type}' message via data channel`,
+        call_message,
       );
     } else {
       this.logger.debug(
-        `Received e-call '${type}' (response: ${response}) message via data channel`,
-        e_call_message,
+        `Received call '${type}' (response: ${response}) message via data channel`,
+        call_message,
       );
     }
 
     const call_event = z.conversation.EventBuilder.build_calling(
       conversation_et,
-      e_call_message,
+      call_message,
       this.remote_user_id,
       this.remote_client_id,
     );
@@ -854,29 +852,29 @@ z.calling.entities.EFlow = class EFlow {
   //##############################################################################
 
   /**
-   * Save the remote SDP received via an e-call message within the e-flow.
-   * @param {ECallMessage} e_call_message_et - E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
+   * Save the remote SDP received via an call message within the flow.
+   * @param {CallMessage} call_message_et - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
    * @returns {Promise} Resolves when remote SDP was saved
    */
-  save_remote_sdp(e_call_message_et) {
-    return z.calling.mapper.SDPMapper
-      .map_e_call_message_to_object(e_call_message_et)
+  save_remote_sdp(call_message_et) {
+    return z.calling.SDPMapper
+      .map_call_message_to_object(call_message_et)
       .then(rtc_sdp =>
-        z.calling.mapper.SDPMapper.rewrite_sdp(
+        z.calling.SDPMapper.rewrite_sdp(
           rtc_sdp,
           z.calling.enum.SDP_SOURCE.REMOTE,
           this,
         ),
       )
       .then(({sdp: remote_sdp}) => {
-        const {type} = e_call_message_et;
+        const {type} = call_message_et;
 
         if (remote_sdp.type === z.calling.rtc.SDP_TYPE.OFFER) {
           switch (this.signaling_state()) {
             case z.calling.rtc.SIGNALING_STATE.LOCAL_OFFER: {
               if (this._solve_colliding_states()) {
-                throw new z.calling.v3.CallError(
-                  z.calling.v3.CallError.TYPE.SDP_STATE_COLLISION,
+                throw new z.calling.CallError(
+                  z.calling.CallError.TYPE.SDP_STATE_COLLISION,
                 );
               }
               break;
@@ -893,7 +891,7 @@ z.calling.entities.EFlow = class EFlow {
             }
           }
 
-          if (type === z.calling.enum.E_CALL_MESSAGE_TYPE.UPDATE) {
+          if (type === z.calling.enum.CALL_MESSAGE_TYPE.UPDATE) {
             this.restart_negotiation(
               z.calling.enum.SDP_NEGOTIATION_MODE.STREAM_CHANGE,
               true,
@@ -917,7 +915,7 @@ z.calling.entities.EFlow = class EFlow {
   send_local_sdp(sending_on_timeout = false) {
     this._clear_send_sdp_timeout();
 
-    z.calling.mapper.SDPMapper
+    z.calling.SDPMapper
       .rewrite_sdp(
         this.peer_connection.localDescription,
         z.calling.enum.SDP_SOURCE.LOCAL,
@@ -947,34 +945,34 @@ z.calling.entities.EFlow = class EFlow {
         this.should_send_local_sdp(false);
 
         const response = local_sdp.type === z.calling.rtc.SDP_TYPE.ANSWER;
-        let e_call_message_et;
+        let call_message_et;
 
         if (
           this.negotiation_mode() ===
           z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT
         ) {
-          if (this.e_call_et.is_group) {
-            e_call_message_et = z.calling.mapper.ECallMessageMapper.build_group_setup(
+          if (this.call_et.is_group) {
+            call_message_et = z.calling.CallMessageBuilder.build_group_setup(
               response,
-              this.e_call_et.session_id,
+              this.call_et.session_id,
               this._create_additional_payload(),
             );
           } else {
-            e_call_message_et = z.calling.mapper.ECallMessageMapper.build_setup(
+            call_message_et = z.calling.CallMessageBuilder.build_setup(
               response,
-              this.e_call_et.session_id,
+              this.call_et.session_id,
               this._create_additional_payload(),
             );
           }
         } else {
-          e_call_message_et = z.calling.mapper.ECallMessageMapper.build_update(
+          call_message_et = z.calling.CallMessageBuilder.build_update(
             response,
-            this.e_call_et.session_id,
+            this.call_et.session_id,
             this._create_additional_payload(),
           );
         }
 
-        return this.e_call_et.send_e_call_event(e_call_message_et).then(() => {
+        return this.call_et.send_call_message(call_message_et).then(() => {
           this.telemetry.time_step(
             z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SEND,
           );
@@ -1067,7 +1065,7 @@ z.calling.entities.EFlow = class EFlow {
     );
 
     const attributes = {cause: name, step: 'create_sdp', type: sdp_type};
-    this.e_call_et.telemetry.track_event(
+    this.call_et.telemetry.track_event(
       z.tracking.EventName.CALLING.FAILED_RTC,
       undefined,
       attributes,
@@ -1075,7 +1073,7 @@ z.calling.entities.EFlow = class EFlow {
 
     amplify.publish(
       z.event.WebApp.CALL.STATE.LEAVE,
-      this.e_call_et.id,
+      this.call_et.id,
       z.calling.enum.TERMINATION_REASON.SDP_FAILED,
     );
   }
@@ -1090,7 +1088,7 @@ z.calling.entities.EFlow = class EFlow {
   _create_sdp_success(rct_sdp) {
     this.logger.info(`Creating '${rct_sdp.type}' successful`, rct_sdp);
 
-    z.calling.mapper.SDPMapper
+    z.calling.SDPMapper
       .rewrite_sdp(rct_sdp, z.calling.enum.SDP_SOURCE.LOCAL, this)
       .then(({sdp: local_sdp}) => this.local_sdp(local_sdp));
   }
@@ -1133,8 +1131,9 @@ z.calling.entities.EFlow = class EFlow {
    * @returns {Object} Additional payload
    */
   _create_additional_payload() {
-    const payload = this.v3_call_center.create_additional_payload(
-      this.e_call_et.id,
+    const payload = z.calling.CallMessageBuilder.create_payload(
+      this.id,
+      this.self_user_id,
       this.remote_user_id,
       this.remote_client_id,
     );
@@ -1143,8 +1142,9 @@ z.calling.entities.EFlow = class EFlow {
       payload,
     );
 
-    return this.v3_call_center.create_payload_prop_sync(
-      this.e_call_et.self_state.video_send(),
+    return z.calling.CallMessageBuilder.create_payload_prop_sync(
+      this.call_et.self_state,
+      this.call_et.self_state.video_send(),
       false,
       additional_payload,
     );
@@ -1257,7 +1257,7 @@ z.calling.entities.EFlow = class EFlow {
       step: 'set_sdp',
       type: sdp_type,
     };
-    this.e_call_et.telemetry.track_event(
+    this.call_et.telemetry.track_event(
       z.tracking.EventName.CALLING.FAILED_RTC,
       undefined,
       attributes,
@@ -1265,7 +1265,7 @@ z.calling.entities.EFlow = class EFlow {
 
     amplify.publish(
       z.event.WebApp.CALL.STATE.LEAVE,
-      this.e_call_et.id,
+      this.call_et.id,
       z.calling.enum.TERMINATION_REASON.SDP_FAILED,
     );
   }
@@ -1279,7 +1279,7 @@ z.calling.entities.EFlow = class EFlow {
     this.negotiation_timeout = window.setTimeout(() => {
       this.logger.info('Removing call participant on negotiation timeout');
       this._remove_participant(z.calling.enum.TERMINATION_REASON.RENEGOTIATION);
-    }, EFlow.CONFIG.NEGOTIATION_FAILED_TIMEOUT);
+    }, Flow.CONFIG.NEGOTIATION_FAILED_TIMEOUT);
   }
 
   /**
@@ -1289,11 +1289,11 @@ z.calling.entities.EFlow = class EFlow {
    */
   _set_negotiation_restart_timeout() {
     this.negotiation_timeout = window.setTimeout(() => {
-      this.e_call_et.termination_reason =
+      this.call_et.termination_reason =
         z.calling.enum.TERMINATION_REASON.CONNECTION_DROP;
-      this.e_participant_et.is_connected(false);
+      this.participant_et.is_connected(false);
 
-      this.e_call_et.interrupted_participants.push(this.e_participant_et);
+      this.call_et.interrupted_participants.push(this.participant_et);
       if (
         this.negotiation_mode() === z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT
       ) {
@@ -1302,7 +1302,7 @@ z.calling.entities.EFlow = class EFlow {
           false,
         );
       }
-    }, EFlow.CONFIG.NEGOTIATION_RESTART_TIMEOUT);
+    }, Flow.CONFIG.NEGOTIATION_RESTART_TIMEOUT);
   }
 
   /**
@@ -1315,7 +1315,7 @@ z.calling.entities.EFlow = class EFlow {
     this.send_sdp_timeout = window.setTimeout(() => {
       this.logger.info('Sending local SDP on timeout');
       this.send_local_sdp(true);
-    }, initial_timeout ? EFlow.CONFIG.SDP_SEND_TIMEOUT : EFlow.CONFIG.SDP_SEND_TIMEOUT_RESET);
+    }, initial_timeout ? Flow.CONFIG.SDP_SEND_TIMEOUT : Flow.CONFIG.SDP_SEND_TIMEOUT_RESET);
   }
 
   //##############################################################################
@@ -1376,8 +1376,8 @@ z.calling.entities.EFlow = class EFlow {
     return this._replace_media_track(media_stream_info).catch(error => {
       const {message, type} = error;
       const expected_error_types = [
-        z.calling.v3.CallError.TYPE.NO_REPLACEABLE_TRACK,
-        z.calling.v3.CallError.TYPE.RTP_SENDER_NOT_SUPPORTED,
+        z.calling.CallError.TYPE.NO_REPLACEABLE_TRACK,
+        z.calling.CallError.TYPE.RTP_SENDER_NOT_SUPPORTED,
       ];
 
       if (expected_error_types.includes(type)) {
@@ -1448,8 +1448,8 @@ z.calling.entities.EFlow = class EFlow {
 
       if (media_stream_track.kind === media_type) {
         if (!rtp_sender.replaceTrack) {
-          throw new z.calling.v3.CallError(
-            z.calling.v3.CallError.TYPE.RTP_SENDER_NOT_SUPPORTED,
+          throw new z.calling.CallError(
+            z.calling.CallError.TYPE.RTP_SENDER_NOT_SUPPORTED,
           );
         }
 
@@ -1457,8 +1457,8 @@ z.calling.entities.EFlow = class EFlow {
       }
     }
 
-    throw new z.calling.v3.CallError(
-      z.calling.v3.CallError.TYPE.NO_REPLACEABLE_TRACK,
+    throw new z.calling.CallError(
+      z.calling.CallError.TYPE.NO_REPLACEABLE_TRACK,
     );
   }
 
@@ -1515,8 +1515,8 @@ z.calling.entities.EFlow = class EFlow {
           return this._get_rtc_sender(media_type);
         }
 
-        throw new z.calling.v3.CallError(
-          z.calling.v3.CallError.TYPE.RTP_SENDER_NOT_SUPPORTED,
+        throw new z.calling.CallError(
+          z.calling.CallError.TYPE.RTP_SENDER_NOT_SUPPORTED,
         );
       })
       .then(rtp_sender => {
@@ -1533,8 +1533,8 @@ z.calling.entities.EFlow = class EFlow {
 
         if (
           ![
-            z.calling.v3.CallError.TYPE.NO_REPLACEABLE_TRACK,
-            z.calling.v3.CallError.TYPE.RTP_SENDER_NOT_SUPPORTED,
+            z.calling.CallError.TYPE.NO_REPLACEABLE_TRACK,
+            z.calling.CallError.TYPE.RTP_SENDER_NOT_SUPPORTED,
           ].includes(type)
         ) {
           this.logger.error(
@@ -1736,7 +1736,7 @@ z.calling.entities.EFlow = class EFlow {
    * @returns {undefined} No return value
    */
   log_status() {
-    this.telemetry.log_status(this.e_participant_et);
+    this.telemetry.log_status(this.participant_et);
   }
 
   /**

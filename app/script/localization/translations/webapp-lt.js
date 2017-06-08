@@ -148,10 +148,6 @@ z.string.lt.modal_block_conversation_message =
 z.string.lt.modal_block_conversation_button = 'Užblokuoti';
 z.string.lt.modal_call_conversation_empty_headline = 'Nėra kam skambinti';
 z.string.lt.modal_call_conversation_empty_message = 'Čia daugiau nieko nėra.';
-z.string.lt.modal_call_conversation_full_headline =
-  'Per daug žmonių, norint skambinti';
-z.string.lt.modal_call_conversation_full_message =
-  'Skambučiai veikia pokalbiuose, kuriuose yra ne daugiau %no žmonių.';
 z.string.lt.modal_call_no_video_in_group_headline =
   'Vaizdo skambučiai grupėse nepalaikomi';
 z.string.lt.modal_call_no_video_in_group_message =
@@ -169,10 +165,6 @@ z.string.lt.modal_call_second_outgoing_headline = 'Užbaigti esamą skambutį?';
 z.string.lt.modal_call_second_outgoing_message =
   'Jūs vienu metu galite dalyvauti tik viename skambutyje.';
 z.string.lt.modal_call_second_outgoing_action = 'Užbaigti';
-z.string.lt.modal_call_voice_channel_full_headline =
-  'Balso kanalas perpildytas';
-z.string.lt.modal_call_voice_channel_full_message =
-  'Čia liko vietos tik %no žmonėms.';
 z.string.lt.modal_clear_conversation_headline =
   'Ištrinti pokalbio su "%@.name" turinį?';
 z.string.lt.modal_clear_conversation_message =
@@ -322,8 +314,6 @@ z.string.lt.conversations_connection_request_many = 'Laukia %no žmonės';
 z.string.lt.conversations_connection_request_one = '1 asmuo laukia';
 z.string.lt.conversations_empty_conversation = 'Grupės pokalbis';
 z.string.lt.conversations_empty_conversation_description = 'Visi išėjo';
-z.string.lt.conversations_no_conversations =
-  'Pradėkite pokalbį arba pakvieskite žmones prisijungti.';
 z.string.lt.conversations_popover_archive = 'Archyvuoti';
 z.string.lt.conversations_popover_block = 'Užblokuoti';
 z.string.lt.conversations_popover_cancel = 'Atsisakyti užklausos';
@@ -343,15 +333,11 @@ z.string.lt.conversations_secondary_line_new_messages =
   '{{number}} naujų žinučių';
 z.string.lt.conversations_secondary_line_ping = '{{number}} ryšio tikrinimas';
 z.string.lt.conversations_secondary_line_pings = '{{number}} ryšio tikrinimų';
-z.string.lt.conversations_secondary_line_person_left = '{{number}} asmuo išėjo';
 z.string.lt.conversations_secondary_line_people_left =
   '{{number}} žmonių išėjo';
-z.string.lt.conversations_secondary_line_person_added =
-  '{{user1}} pridėjo {{user2}}';
 z.string.lt.conversations_secondary_line_people_added =
   'Buvo pridėta {{user}} žmonių';
 z.string.lt.conversations_secondary_line_timed_message = 'Laikina žinutė';
-z.string.lt.conversations_secondary_line_renamed = '{{user}} pervadino';
 
 z.string.lt.takeover_headline = 'Naudotojo vardai jau čia.';
 z.string.lt.takeover_sub = 'Užsirezervuokite savo unikalų Wire vardą.';
@@ -644,12 +630,6 @@ z.string.lt.system_notification_member_join_many =
   '%s.first_name pridėjo %no žmones(-ių) į pokalbį';
 z.string.lt.system_notification_member_join_one =
   '%s.first_name pridėjo %@.first_name į pokalbį';
-z.string.lt.system_notification_member_leave_left =
-  '%s.first_name išėjo iš pokalbio';
-z.string.lt.system_notification_member_leave_removed_many =
-  '%s.first_name pašalino %no žmones iš pokalbio';
-z.string.lt.system_notification_member_leave_removed_one =
-  '%s.first_name pašalino %@.first_name iš pokalbio';
 z.string.lt.system_notification_obfuscated = 'Išsiuntė jums žinutę';
 z.string.lt.system_notification_obfuscated_title = 'Kažkas';
 z.string.lt.system_notification_ping = 'Patikrino ryšį';

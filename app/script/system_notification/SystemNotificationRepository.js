@@ -341,48 +341,15 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    * @returns {string} Notification message body
    */
   _create_body_member_leave(message_et) {
-    if (message_et.user_ets().length === 1) {
-      if (message_et.user_ets()[0] === message_et.user()) {
-        return z.localization.Localizer.get_text({
-          id: z.string.system_notification_member_leave_left,
-          replace: {
-            content: message_et.user().first_name(),
-            placeholder: '%s.first_name',
-          },
-        });
-      }
-
-      return z.localization.Localizer.get_text({
-        id: z.string.system_notification_member_leave_removed_one,
-        replace: [
-          {
-            content: message_et.user().first_name(),
-            placeholder: '%s.first_name',
-          },
-          {
-            content: z.util.get_first_name(
-              message_et.user_ets()[0],
-              z.string.Declension.ACCUSATIVE,
-            ),
-            placeholder: '%@.first_name',
-          },
-        ],
-      });
+    if (
+      message_et.user_ets().length === 1 &&
+      !message_et.remote_user_ets().length
+    ) {
+      return z.l10n.text(
+        z.string.system_notification_member_leave_removed_you,
+        message_et.user().first_name(),
+      );
     }
-
-    return z.localization.Localizer.get_text({
-      id: z.string.system_notification_member_leave_removed_many,
-      replace: [
-        {
-          content: message_et.user().first_name(),
-          placeholder: '%s.first_name',
-        },
-        {
-          content: message_et.user_ets().length,
-          placeholder: '%no',
-        },
-      ],
-    });
   }
 
   /**
@@ -402,10 +369,10 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
     switch (message_et.member_message_type) {
       case z.message.SystemMessageType.NORMAL:
         if (is_group_conversation) {
-          if (message_et.type === z.event.Backend.CONVERSATION.MEMBER_JOIN) {
+          if (message_et.is_member_join()) {
             return this._create_body_member_join(message_et);
           }
-          if (message_et.type === z.event.Backend.CONVERSATION.MEMBER_LEAVE) {
+          if (message_et.is_member_leave()) {
             return this._create_body_member_leave(message_et);
           }
         }
@@ -903,7 +870,10 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
       notification_content.title,
       notification_content.options,
     );
-    const {conversation_id, message_id} = notification_content.options.data;
+    const {
+      conversation_id,
+      message_id = 'ID not specified',
+    } = notification_content.options.data;
     let timeout_trigger_id = undefined;
 
     notification.onclick = () => {
@@ -912,7 +882,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
       wire.app.view.content.multitasking.is_minimized(true);
       notification_content.trigger();
       this.logger.info(
-        `Notification for '${message_id} in '${conversation_id}' closed by click.`,
+        `Notification for message '${message_id} in conversation '${conversation_id}' closed by click.`,
       );
       notification.close();
     };

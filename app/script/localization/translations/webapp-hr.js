@@ -138,9 +138,6 @@ z.string.hr.modal_block_conversation_button = 'Blokiraj';
 z.string.hr.modal_call_conversation_empty_headline = 'Nemam koga zvati';
 z.string.hr.modal_call_conversation_empty_message =
   'Nema osoba u konverzaciji.';
-z.string.hr.modal_call_conversation_full_headline = 'Previše ljudi za poziv';
-z.string.hr.modal_call_conversation_full_message =
-  'Pozive radi u razgovorima s %no ljudi.';
 z.string.hr.modal_call_no_video_in_group_headline =
   'Nema video poziva u grupama';
 z.string.hr.modal_call_no_video_in_group_message =
@@ -158,9 +155,6 @@ z.string.hr.modal_call_second_outgoing_headline = 'Prekinuti trenutni poziv?';
 z.string.hr.modal_call_second_outgoing_message =
   'Možete biti u samo jednom pozivu u isto vrijeme.';
 z.string.hr.modal_call_second_outgoing_action = 'Poklopi';
-z.string.hr.modal_call_voice_channel_full_headline = 'Puna kuća';
-z.string.hr.modal_call_voice_channel_full_message =
-  'Ima mjesta za još %no korisnika.';
 z.string.hr.modal_clear_conversation_headline = 'Izbriši sadržaj "%@.name"?';
 z.string.hr.modal_clear_conversation_message =
   'Ovo će izbrisati povijest razgovora i ukloniti ga s Vašeg popisa.';
@@ -272,8 +266,6 @@ z.string.hr.conversations_all_archived = 'Sve arhivirano';
 z.string.hr.conversations_contacts = 'Kontakti';
 z.string.hr.conversations_connection_request_many = '%no ljudi čekaju';
 z.string.hr.conversations_connection_request_one = '1 osoba čeka';
-z.string.hr.conversations_no_conversations =
-  'Započni razgovor ili pozovi ljude.';
 z.string.hr.conversations_popover_archive = 'Arhiviraj';
 z.string.hr.conversations_popover_block = 'Blokiraj';
 z.string.hr.conversations_popover_cancel = 'Poništi zahtjev';
@@ -548,12 +540,6 @@ z.string.hr.system_notification_member_join_many =
   '%s.First_NAME dodala/o %no ljudi u razgovor';
 z.string.hr.system_notification_member_join_one =
   '%s.First_NAME dodala/o %@.first_name u razgovor';
-z.string.hr.system_notification_member_leave_left =
-  '%s.First_NAME napustila/o razgovor';
-z.string.hr.system_notification_member_leave_removed_many =
-  '%s.First_NAME uklonila/o %no ljudi iz razgovora';
-z.string.hr.system_notification_member_leave_removed_one =
-  '%s.First_NAME uklonila/o %@.first_name iz razgovora';
 z.string.hr.system_notification_obfuscated = 'Poslao ti je poruku';
 z.string.hr.system_notification_obfuscated_title = 'Netko';
 z.string.hr.system_notification_ping = 'Pingala/o';

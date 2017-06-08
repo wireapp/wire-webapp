@@ -147,9 +147,6 @@ z.string.hu.modal_block_conversation_message =
 z.string.hu.modal_block_conversation_button = 'Blokkolás';
 z.string.hu.modal_call_conversation_empty_headline = 'Senki sem hívja';
 z.string.hu.modal_call_conversation_empty_message = 'Senki nem maradt itt.';
-z.string.hu.modal_call_conversation_full_headline = 'Túl sok ember hívja';
-z.string.hu.modal_call_conversation_full_message =
-  'A beszélgetéseket egyszerre akár %no partnerrel is folytathatja.';
 z.string.hu.modal_call_no_video_in_group_headline =
   'Nincs videó hívás a csoportban';
 z.string.hu.modal_call_no_video_in_group_message =
@@ -166,9 +163,6 @@ z.string.hu.modal_call_second_outgoing_headline = 'Bontsa az aktuális hívást?
 z.string.hu.modal_call_second_outgoing_message =
   'Egyszerre csak egy hívás lehetséges.';
 z.string.hu.modal_call_second_outgoing_action = 'Hívás befejezése';
-z.string.hu.modal_call_voice_channel_full_headline = 'Telt ház';
-z.string.hu.modal_call_voice_channel_full_message =
-  'A beszélgetésben maximum %no partner vehet részt.';
 z.string.hu.modal_clear_conversation_headline =
   'Biztosan törli "%@.name" beszélgetés tartalmát?';
 z.string.hu.modal_clear_conversation_message =
@@ -341,16 +335,11 @@ z.string.hu.conversations_secondary_line_new_message = '{{number}} új üzenet';
 z.string.hu.conversations_secondary_line_new_messages = '{{number}} új üzenet';
 z.string.hu.conversations_secondary_line_ping = '{{number}} kopogás';
 z.string.hu.conversations_secondary_line_pings = '{{number}} kopogás';
-z.string.hu.conversations_secondary_line_person_left =
-  '{{number}} személy elhagyta a beszélgetést';
 z.string.hu.conversations_secondary_line_people_left =
   '{{number}} partner elhagyta a beszélgetést';
-z.string.hu.conversations_secondary_line_person_added =
-  '{{user1}} hozzáadta {{user2}} partnert';
 z.string.hu.conversations_secondary_line_people_added =
   '{{user}} partnerek lettek hozzáadva';
 z.string.hu.conversations_secondary_line_timed_message = 'Időzített üzenet';
-z.string.hu.conversations_secondary_line_renamed = '{{user}} átnevezve';
 
 z.string.hu.takeover_headline = 'Felhasználónevek itt találhatóak.';
 z.string.hu.takeover_sub = 'Igényeljen egyedei nevet a Wire-ön.';
@@ -643,12 +632,6 @@ z.string.hu.system_notification_member_join_many =
   '%s.first_name hozzáadott %no partnert a beszélgetéshez';
 z.string.hu.system_notification_member_join_one =
   '%s.first_name hozzáadta %@.first_name a beszélgetéshez';
-z.string.hu.system_notification_member_leave_left =
-  '%s.first_name elhagyta a beszélgetést';
-z.string.hu.system_notification_member_leave_removed_many =
-  '%s.first_name eltávolított %no partnert a beszélgetésből';
-z.string.hu.system_notification_member_leave_removed_one =
-  '%s.first_name eltávolította %@.first_name a beszélgetésből';
 z.string.hu.system_notification_obfuscated = 'Küldött egy üzenetet';
 z.string.hu.system_notification_obfuscated_title = 'Valaki';
 z.string.hu.system_notification_ping = 'Kopogott';

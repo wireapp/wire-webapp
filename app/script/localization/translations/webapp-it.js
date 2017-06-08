@@ -142,10 +142,6 @@ z.string.it.modal_block_conversation_message =
 z.string.it.modal_block_conversation_button = 'Blocca';
 z.string.it.modal_call_conversation_empty_headline = 'Nessuno da chiamare';
 z.string.it.modal_call_conversation_empty_message = 'Non c’è più nessuno qui.';
-z.string.it.modal_call_conversation_full_headline =
-  'Troppe persone da chiamare';
-z.string.it.modal_call_conversation_full_message =
-  'Le chiamate funzionano in conversazioni fino a %no persone.';
 z.string.it.modal_call_no_video_in_group_headline =
   'Nessuna video chiamata nei gruppi';
 z.string.it.modal_call_no_video_in_group_message =
@@ -164,9 +160,6 @@ z.string.it.modal_call_second_outgoing_headline =
 z.string.it.modal_call_second_outgoing_message =
   'È possibile partecipare a una sola chiamata alla volta.';
 z.string.it.modal_call_second_outgoing_action = 'Riattacca';
-z.string.it.modal_call_voice_channel_full_headline = 'Chiamata piena';
-z.string.it.modal_call_voice_channel_full_message =
-  'C’è spazio solo per %no persone qui.';
 z.string.it.modal_clear_conversation_headline =
   'Eliminare il contenuto di "%@.name"?';
 z.string.it.modal_clear_conversation_message =
@@ -270,11 +263,11 @@ z.string.it.conversation_rename_you = ' ha rinominato la conversazione';
 z.string.it.conversation_resume = 'Inizia una conversazione con %@names';
 z.string.it.conversation_team_leave = ' è stato rimosso dal team';
 z.string.it.conversation_ping = ' ha fatto un trillo';
-z.string.it.conversation_ping_you = ' ha fatto un trillo';
+z.string.it.conversation_ping_you = ' hai fatto un trillo';
 z.string.it.conversation_today = 'oggi';
 z.string.it.conversation_verified = 'Verificato';
 z.string.it.conversation_voice_channel_deactivate = ' ha chiamato';
-z.string.it.conversation_voice_channel_deactivate_you = ' ha chiamato';
+z.string.it.conversation_voice_channel_deactivate_you = ' hai chiamato';
 z.string.it.conversation_yesterday = 'Ieri';
 z.string.it.conversation_unable_to_decrypt_1 =
   'un messaggio da %@name non è stato ricevuto.';
@@ -344,16 +337,11 @@ z.string.it.conversations_secondary_line_new_messages =
   '{{number}} nuovi messaggi';
 z.string.it.conversations_secondary_line_ping = '{{number}} trillo';
 z.string.it.conversations_secondary_line_pings = '{{number}} trilli';
-z.string.it.conversations_secondary_line_person_left =
-  '{{number}} utente ha abbandonato';
 z.string.it.conversations_secondary_line_people_left =
   '{{number}} utenti hanno abbandonato';
-z.string.it.conversations_secondary_line_person_added =
-  '{{user1}} ha aggiunto {{user2}}';
 z.string.it.conversations_secondary_line_people_added =
   '{{user}} persone sono state aggiunte';
 z.string.it.conversations_secondary_line_timed_message = 'Messaggio a tempo';
-z.string.it.conversations_secondary_line_renamed = '{{user}} rinominato';
 
 z.string.it.takeover_headline = 'Usernames sono qui.';
 z.string.it.takeover_sub = 'Rivendica il tuo username su Wire.';
@@ -636,12 +624,6 @@ z.string.it.system_notification_member_join_many =
   '%s.first_name ha aggiunto %no persone alla conversazione';
 z.string.it.system_notification_member_join_one =
   '%s.first_name ha aggiunto %@.first_name alla conversazione';
-z.string.it.system_notification_member_leave_left =
-  '%s.first_name ha lasciato la conversazione';
-z.string.it.system_notification_member_leave_removed_many =
-  '%s.first_name ha rimosso %no persone dalla conversazione';
-z.string.it.system_notification_member_leave_removed_one =
-  '%s.first_name ha rimosso %@.first_name dalla conversazione';
 z.string.it.system_notification_obfuscated = 'Ti ha inviato un messaggio';
 z.string.it.system_notification_obfuscated_title = 'Qualcuno';
 z.string.it.system_notification_ping = 'Ha fatto un trillo';

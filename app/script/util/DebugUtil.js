@@ -242,32 +242,6 @@ z.util.DebugUtil = class DebugUtil {
     });
   }
 
-  get_v2_call_participants(
-    conversation_id = wire.app.repository.conversation.active_conversation().id,
-  ) {
-    return wire.app.service.call.get_state(conversation_id).then(response => {
-      const participants = [];
-
-      for (const id in response.participants) {
-        const participant = response.participants[id];
-        if (participant.state === z.calling.enum.ParticipantState.JOINED) {
-          participants.push(wire.app.repository.user.get_user_by_id(id));
-        }
-      }
-
-      this.logger.debug(
-        `Call in '${conversation_id}' has '${participants.length}' joined participant/s`,
-        participants,
-      );
-
-      for (const participant of participants) {
-        this.logger.log(
-          `User '${participant.name()}' with ID '${participant.id}' has state 'joined'.`,
-        );
-      }
-    });
-  }
-
   log_connection_status() {
     this.logger.log('Online Status');
     this.logger.log(`-- Browser online: ${window.navigator.onLine}`);

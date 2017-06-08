@@ -48,30 +48,15 @@ z.ViewModel.WindowTitleViewModel = class WindowTitleViewModel {
     this.logger.info('Starting to update window title');
     this.update_window_title = true;
 
-    ko
-      .computed(() => {
-        if (this.update_window_title) {
-          let window_title = '';
-          let number_of_unread_conversations = 0;
-          const number_of_connect_requests = this.user_repository.connect_requests()
-            .length;
+    ko.computed(() => {
+      if (this.update_window_title) {
+        let window_title = '';
+        let number_of_unread_conversations = 0;
+        const number_of_connect_requests = this.user_repository.connect_requests().length;
 
-          this.conversation_repository
-            .conversations_unarchived()
-            .forEach(function(conversation_et) {
-              if (
-                !conversation_et.is_request() &&
-                !conversation_et.is_muted() &&
-                conversation_et.unread_event_count()
-              ) {
-                number_of_unread_conversations++;
-              }
-            });
-
-          const badge_count =
-            number_of_connect_requests + number_of_unread_conversations;
-          if (badge_count > 0) {
-            window_title = `(${badge_count}) · `;
+        this.conversation_repository.conversations_unarchived().forEach(function(conversation_et) {
+          if (!conversation_et.is_request() && !conversation_et.is_muted() && conversation_et.unread_message_count()) {
+            number_of_unread_conversations++;
           }
 
           amplify.publish(z.event.WebApp.CONVERSATION.UNREAD, badge_count);

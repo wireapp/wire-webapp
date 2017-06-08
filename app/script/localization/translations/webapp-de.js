@@ -149,9 +149,6 @@ z.string.de.modal_block_conversation_button = 'Blockieren';
 z.string.de.modal_call_conversation_empty_headline = 'Niemand um anzurufen';
 z.string.de.modal_call_conversation_empty_message =
   'Es ist niemand mehr in der Unterhaltung.';
-z.string.de.modal_call_conversation_full_headline = 'Zu viele Teilnehmer';
-z.string.de.modal_call_conversation_full_message =
-  'Anrufe sind nur in Unterhaltungen mit bis zu %no Teilnehmern möglich.';
 z.string.de.modal_call_no_video_in_group_headline =
   'Keine Videoanrufe in Gruppen';
 z.string.de.modal_call_no_video_in_group_message =
@@ -169,9 +166,6 @@ z.string.de.modal_call_second_outgoing_headline = 'Aktuellen Anruf beenden?';
 z.string.de.modal_call_second_outgoing_message =
   'Nur ein zeitgleicher Anruf möglich.';
 z.string.de.modal_call_second_outgoing_action = 'Beenden';
-z.string.de.modal_call_voice_channel_full_headline = 'Volles Haus';
-z.string.de.modal_call_voice_channel_full_message =
-  'Die maximale Teilnehmeranzahl beträgt %no Personen.';
 z.string.de.modal_clear_conversation_headline =
   'Unterhaltungsverlauf "%@.name" löschen?';
 z.string.de.modal_clear_conversation_message =
@@ -350,16 +344,25 @@ z.string.de.conversations_secondary_line_new_messages =
   '{{number}} neue Nachrichten';
 z.string.de.conversations_secondary_line_ping = '{{number}} Ping';
 z.string.de.conversations_secondary_line_pings = '{{number}} Ping';
-z.string.de.conversations_secondary_line_person_left =
-  '{{number}} Person entfernt';
 z.string.de.conversations_secondary_line_people_left =
   '{{number}} Personen entfernt';
-z.string.de.conversations_secondary_line_person_added =
-  '{{user1}} hat {{user2}} hinzugefügt';
+z.string.de.conversations_secondary_line_person_left =
+  '{{user}} hat die Unterhaltung verlassen';
+z.string.de.conversations_secondary_line_person_removed =
+  '{{user}} wurde entfernt';
 z.string.de.conversations_secondary_line_people_added =
   '{{user}} Kontakte wurden hinzugefügt';
+z.string.de.conversations_secondary_line_person_added =
+  '{{user}} wurde hinzugefügt';
+z.string.de.conversations_secondary_line_person_added_you =
+  '{{user}} hat dich hinzugefügt';
+z.string.de.conversations_secondary_line_renamed =
+  '{{user}} hat die Unterhaltung umbenannt';
 z.string.de.conversations_secondary_line_timed_message = 'Temporäre Nachricht';
-z.string.de.conversations_secondary_line_renamed = '{{user}} umbenannt';
+z.string.de.conversations_secondary_line_you_left =
+  'Du hast die Unterhaltung verlassen';
+z.string.de.conversations_secondary_line_you_were_removed =
+  'Du wurdest entfent';
 
 z.string.de.takeover_headline = 'Benutzernamen sind da.';
 z.string.de.takeover_sub =
@@ -654,12 +657,8 @@ z.string.de.system_notification_member_join_many =
   '%s.first_name hat %no Kontakte zur Unterhaltung hinzugefügt';
 z.string.de.system_notification_member_join_one =
   '%s.first_name hat %@.first_name zur Unterhaltung hinzugefügt';
-z.string.de.system_notification_member_leave_left =
-  '%s.first_name hat die Unterhaltung verlassen';
-z.string.de.system_notification_member_leave_removed_many =
-  '%s.first_name hat %no Kontakte aus der Unterhaltung entfernt';
-z.string.de.system_notification_member_leave_removed_one =
-  '%s.first_name hat %@.first_name aus der Unterhaltung entfernt';
+z.string.de.system_notification_member_leave_removed_you =
+  '{{user}} hat dich aus der Unterhaltung entfernt';
 z.string.de.system_notification_obfuscated = 'Hat dir eine Nachricht gesendet';
 z.string.de.system_notification_obfuscated_title = 'Jemand';
 z.string.de.system_notification_ping = 'Hat gepingt';

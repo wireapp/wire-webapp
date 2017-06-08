@@ -127,7 +127,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     );
 
     this.conversations_archived = ko.observableArray([]);
-    this.conversations_call = ko.observableArray([]);
+    this.conversations_calls = ko.observableArray([]);
     this.conversations_cleared = ko.observableArray([]);
     this.conversations_unarchived = ko.observableArray([]);
 
@@ -163,7 +163,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       });
 
       this.conversations_archived(archived);
-      this.conversations_call(calls);
+      this.conversations_calls(calls);
       this.conversations_cleared(cleared);
       this.conversations_unarchived(unarchived);
     });
@@ -1892,17 +1892,17 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
-   * Send e-call message in specified conversation.
+   * Send call message in specified conversation.
    *
-   * @param {Conversation} conversation_et - Conversation to send e-call message to
-   * @param {ECallMessage} e_call_message_et - E-call message
+   * @param {Conversation} conversation_et - Conversation to send call message to
+   * @param {CallMessage} call_message_et - Content for call message
    * @param {Object} user_client_map - Contains the intended recipient users and clients
    * @param {Array<string>|boolean} precondition_option - Optional level that backend checks for missing clients
    * @returns {Promise} Resolves when the confirmation was sent
    */
   send_e_call(
     conversation_et,
-    e_call_message_et,
+    call_message_et,
     user_client_map,
     precondition_option,
   ) {
@@ -1911,7 +1911,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     );
     generic_message.set(
       z.cryptography.GENERIC_MESSAGE_TYPE.CALLING,
-      new z.proto.Calling(e_call_message_et.to_content_string()),
+      new z.proto.Calling(call_message_et.to_content_string()),
     );
 
     return this.sending_queue
@@ -1925,15 +1925,15 @@ z.conversation.ConversationRepository = class ConversationRepository {
       })
       .then(() => {
         const initiating_call_message = [
-          z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_START,
-          z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP,
+          z.calling.enum.CALL_MESSAGE_TYPE.GROUP_START,
+          z.calling.enum.CALL_MESSAGE_TYPE.SETUP,
         ];
 
-        if (initiating_call_message.includes(e_call_message_et.type)) {
+        if (initiating_call_message.includes(call_message_et.type)) {
           return this._track_completed_media_action(
             conversation_et,
             generic_message,
-            e_call_message_et,
+            call_message_et,
           );
         }
       });
@@ -4452,13 +4452,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @private
    * @param {Conversation} conversation_et - Conversation entity
    * @param {z.protobuf.GenericMessage} generic_message - Protobuf message
-   * @param {ECallMessage} e_call_message_et - Optional e-call message
+   * @param {CallMessage} call_message_et - Optional call message
    * @returns {undefined} No return value
    */
   _track_completed_media_action(
     conversation_et,
     generic_message,
-    e_call_message_et,
+    call_message_et,
   ) {
     let ephemeral_time, is_ephemeral, message, message_content_type;
 
@@ -4487,7 +4487,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       }
 
       case 'calling': {
-        const {props: properties} = e_call_message_et;
+        const {props: properties} = call_message_et;
         action_type = properties.videosend ===
           z.calling.enum.PROPERTY_STATE.TRUE
           ? 'video_call'
