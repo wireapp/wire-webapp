@@ -171,7 +171,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
         const team_id = conversation_et.team_id;
         if (this.team_repository.active_team().id !== team_id) {
           let team_promise;
-          if (team_id) {
+          if (team_id && !conversation_et.is_guest()) {
             team_promise = this.team_repository.get_team_by_id(team_id);
           } else {
             team_promise = Promise.resolve(this.team_repository.personal_space);
