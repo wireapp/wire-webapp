@@ -45,5 +45,7 @@ z.team.TeamEntity = class TeamEntity {
 
       return false;
     });
+
+    this.last_active_conversation = undefined;
   }
 };
