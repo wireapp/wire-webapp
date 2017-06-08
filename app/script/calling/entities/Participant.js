@@ -61,7 +61,7 @@ z.calling.entities.Participant = class Participant {
       call_message_et,
     );
 
-    this.is_connected.subscribe((is_connected) => {
+    this.is_connected.subscribe(is_connected => {
       if (is_connected && !this.was_connected) {
         amplify.publish(
           z.event.WebApp.AUDIO.PLAY,
