@@ -663,9 +663,8 @@ z.calling.CallingRepository = class CallingRepository {
   _validate_message_type(call_message_et) {
     const {conversation_id, type} = call_message_et;
 
-    return this.conversation_repository
-      .get_conversation_by_id_async(conversation_id)
-      .then(conversation_et => {
+    return this.conversation_repository.get_conversation_by_id_async(conversation_id)
+      .then((conversation_et) => {
         if (conversation_et.is_one2one()) {
           const group_message_types = [
             z.calling.enum.CALL_MESSAGE_TYPE.GROUP_CHECK,
@@ -1145,10 +1144,7 @@ z.calling.CallingRepository = class CallingRepository {
       .get_conversation_by_id_async(conversation_id)
       .then(({participating_user_ids}) => {
         if (!participating_user_ids().length) {
-          amplify.publish(
-            z.event.WebApp.WARNING.MODAL,
-            z.ViewModel.ModalType.CALL_EMPTY_CONVERSATION,
-          );
+          amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALL_EMPTY_CONVERSATION);
           throw new z.calling.CallError(z.calling.CallError.TYPE.NOT_SUPPORTED);
         }
 
