@@ -102,7 +102,7 @@ z.entity.Conversation = class Conversation {
 
     this.is_verified = ko.pureComputed(() => {
       const all_users = [this.self].concat(this.participating_user_ets());
-      return all_users.every((user_et) => user_et != null ? user_et.is_verified() : undefined);
+      return all_users.every((user_et) => user_et ? user_et.is_verified() : undefined);
     });
 
     this.status = ko.observable(z.conversation.ConversationStatus.CURRENT_MEMBER);
@@ -135,11 +135,10 @@ z.entity.Conversation = class Conversation {
       const message_ets = this.messages().filter((message_et) => message_et.visible());
 
       const first_message = this.get_first_message();
-      if (!this.has_further_messages() && !((first_message != null ? first_message.is_member() : undefined) && first_message.is_creation())) {
-        if (this.creation_message == null) {
-          this.creation_message = this._creation_message();
-        }
-        if (this.creation_message != null) {
+      if (!this.has_further_messages() && !((first_message ? first_message.is_member() : undefined) && first_message.is_creation())) {
+        this.creation_message = this.creation_message || this._creation_message();
+
+        if (this.creation_message) {
           message_ets.unshift(this.creation_message);
         }
       }
@@ -486,7 +485,7 @@ z.entity.Conversation = class Conversation {
    * @returns {undefined} No return value
    */
   update_latest_from_message(message_et) {
-    if ((message_et != null) && message_et.visible() && message_et.should_effect_conversation_timestamp) {
+    if (message_et && message_et.visible() && message_et.should_effect_conversation_timestamp) {
       this.set_timestamp(message_et.timestamp(), z.conversation.ConversationUpdateType.LAST_EVENT_TIMESTAMP);
     }
   }

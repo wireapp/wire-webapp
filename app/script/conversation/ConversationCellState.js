@@ -260,22 +260,26 @@ z.conversation.ConversationCellState = (() => {
     },
   };
 
-  const pending_state = {
+  const user_name_state = {
     description(conversation_et) {
       const [user_et] = conversation_et.participating_user_ets();
       const has_username = user_et && user_et.username();
       return has_username ? `@${user_et.username()}` : '';
     },
-    icon() {
-      return z.conversation.ConversationStatusIcon.PENDING_CONNECTION;
+    icon(conversation_et) {
+      if (conversation_et.is_request()) {
+        return z.conversation.ConversationStatusIcon.PENDING_CONNECTION;
+      }
     },
     match(conversation_et) {
-      return conversation_et.is_request();
+      const last_message_et = conversation_et.get_last_message();
+      const is_member_join = last_message_et && last_message_et.is_member() && last_message_et.is_member_join();
+      return conversation_et.is_request() || (conversation_et.is_one2one() && is_member_join);
     },
   };
 
   function _generate(conversation_et) {
-    const states = [empty_state, removed_state, muted_state, alert_state, group_activity_state, unread_message_state, pending_state];
+    const states = [empty_state, removed_state, muted_state, alert_state, group_activity_state, unread_message_state, user_name_state];
     const icon_state = states.find((state) => state.match(conversation_et));
     const description_state = states.find((state) => state.match(conversation_et));
 
