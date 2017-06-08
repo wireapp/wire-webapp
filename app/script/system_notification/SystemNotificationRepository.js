@@ -558,7 +558,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    * @returns {Promise} Resolves when notification was handled
    */
   _notify_banner(conversation_et, message_et) {
-    return this._should_hide_notification(conversation_et, message_et)
+    return this._should_show_notification(conversation_et, message_et)
       .then(() => {
         return this._create_notification_content(conversation_et, message_et);
       })
@@ -648,37 +648,25 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    * @private
    * @param {z.entity.Conversation} conversation_et - Conversation entity
    * @param {z.entity.Message} message_et - Message entity
-   * @returns {Promise<boolean>} Resolves whether notification should be hidden
+   * @returns {Promise} Resolves if the notification should be shown
    */
-  _should_hide_notification(conversation_et, message_et) {
-    return Promise.resolve()
-      .then(() => {
-        let hide_notification = false;
+  _should_show_notification(conversation_et, message_et) {
+    const in_active_conversation = this.conversation_repository.is_active_conversation(conversation_et);
+    const in_conversation_view = document.hasFocus() && wire.app.view.content.content_state() === z.ViewModel.content.CONTENT_STATE.CONVERSATION;
+    const in_maximized_call = this.calling_repository.joined_call() && !wire.app.view.content.multitasking.is_minimized();
 
-        if (this.notifications_preference() === z.system_notification.SystemNotificationPreference.NONE) {
-          hide_notification = true;
-        }
-        if (!z.util.Environment.browser.supports.notifications) {
-          hide_notification = true;
-        }
-        if (this.permission_state === z.system_notification.PermissionStatusState.DENIED) {
-          hide_notification = true;
-        }
-        if (message_et.user().is_me) {
-          hide_notification = true;
-        }
+    const active_conversation = in_conversation_view && in_active_conversation && !in_maximized_call;
+    const message_from_self = message_et.user().is_me;
+    const permission_denied = this.permission_state === z.system_notification.PermissionStatusState.DENIED;
+    const preference_none = this.notifications_preference() === z.system_notification.SystemNotificationPreference.NONE;
+    const supports_notification = z.util.Environment.browser.supports.notifications;
 
-        const in_active_conversation = this.conversation_repository.is_active_conversation(conversation_et);
-        const in_conversation_view = document.hasFocus() && wire.app.view.content.content_state() === z.ViewModel.content.CONTENT_STATE.CONVERSATION;
-        const in_maximized_call = this.calling_repository.joined_call() && !wire.app.view.content.multitasking.is_minimized();
-        if (in_conversation_view && in_active_conversation && !in_maximized_call) {
-          hide_notification = true;
-        }
+    const hide_notification = active_conversation || message_from_self || permission_denied || preference_none || !supports_notification;
 
-        if (hide_notification) {
-          throw new z.system_notification.SystemNotificationError(z.system_notification.SystemNotificationError.TYPE.HIDE_NOTIFICATION);
-        }
-      });
+    if (hide_notification) {
+      return Promise.reject(new z.system_notification.SystemNotificationError(z.system_notification.SystemNotificationError.TYPE.HIDE_NOTIFICATION));
+    }
+    return Promise.resolve();
   }
 
   /**
