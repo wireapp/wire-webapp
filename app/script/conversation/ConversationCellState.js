@@ -111,7 +111,8 @@ z.conversation.ConversationCellState = (() => {
       const last_message_et = conversation_et.get_last_message();
       const self_user_id = conversation_et.self.id;
 
-      if (last_message_et.is_member() && last_message_et.is_member_removal() && last_message_et.user_ids().includes(self_user_id)) {
+      const is_removal_message = last_message_et && last_message_et.is_member() && last_message_et.is_member_removal();
+      if (is_removal_message && last_message_et.user_ids().includes(self_user_id)) {
         if (last_message_et.user().id === self_user_id) {
           return z.l10n.text(z.string.conversations_secondary_line_you_left);
         }
