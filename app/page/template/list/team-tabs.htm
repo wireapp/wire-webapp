@@ -4,7 +4,7 @@
       <!-- ko if: self() -->
         <div class="user-avatar-halo" data-bind="css: {'user-avatar-halo-active': active_team_id() === null && teams().length > 0}">
           <user-avatar class="user-avatar-s" data-bind="click: click_on_personal" params="user: self()"></user-avatar>
-          <!-- ko if: personal_space.has_unread_conversation() && !active_team_id() -->
+          <!-- ko if: personal_space.has_unread_conversation() && active_team_id() -->
             <div class="team-unread-indicator" data-bind="css: accent_color()"></div>
           <!-- /ko -->
         </div>
