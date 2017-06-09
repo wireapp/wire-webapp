@@ -134,9 +134,6 @@ z.string.modal_block_conversation_button = 'Block';
 // Cannot create the call because there is nobody to call (conversation_empty)
 z.string.modal_call_conversation_empty_headline = 'No one to call';
 z.string.modal_call_conversation_empty_message = 'There is no one left here.';
-// Cannot create the call because there are too many participants (conversation_full)
-z.string.modal_call_conversation_full_headline = 'Too many people to call';
-z.string.modal_call_conversation_full_message = 'Calls work in conversations with up to %no people.';
 // Cannot video call in group conversations
 z.string.modal_call_no_video_in_group_headline = 'No video calls in groups';
 z.string.modal_call_no_video_in_group_message = 'Video calls are not available in group conversations.';
@@ -152,9 +149,6 @@ z.string.modal_call_second_ongoing_action = 'Hang Up';
 z.string.modal_call_second_outgoing_headline = 'Hang up current call?';
 z.string.modal_call_second_outgoing_message = 'You can only be in one call at a time.';
 z.string.modal_call_second_outgoing_action = 'Hang Up';
-// Cannot join the call because there are too many participants (voice_channel_full)
-z.string.modal_call_voice_channel_full_headline = 'Full house';
-z.string.modal_call_voice_channel_full_message = 'There’s only room for %no people in here.';
 // Clear a conversation
 z.string.modal_clear_conversation_headline = 'Delete "%@.name" content?';
 z.string.modal_clear_conversation_message = 'This will clear the conversation history and remove it from your list.';
@@ -297,7 +291,7 @@ z.string.archive_header = 'Archive';
 // Conversations
 z.string.conversations_all_archived = 'Everything archived';
 z.string.conversations_contacts = 'Contacts';
-z.string.conversations_connection_request_many = '%no people waiting';
+z.string.conversations_connection_request_many = '{{number}} people waiting';
 z.string.conversations_connection_request_one = '1 person waiting';
 z.string.conversations_empty_conversation = 'Group conversation';
 z.string.conversations_empty_conversation_description = 'Everyone left';
@@ -319,12 +313,16 @@ z.string.conversations_secondary_line_new_message = '{{number}} new message';
 z.string.conversations_secondary_line_new_messages = '{{number}} new messages';
 z.string.conversations_secondary_line_ping = '{{number}} ping';
 z.string.conversations_secondary_line_pings = '{{number}} pings';
-z.string.conversations_secondary_line_person_left = '{{number}} person left';
 z.string.conversations_secondary_line_people_left = '{{number}} people left';
-z.string.conversations_secondary_line_person_added = '{{user1}} added {{user2}}';
+z.string.conversations_secondary_line_person_left = '{{user}} left';
+z.string.conversations_secondary_line_person_removed = '{{user}} was removed';
 z.string.conversations_secondary_line_people_added = '{{user}} people were added';
+z.string.conversations_secondary_line_person_added = '{{user}} was added';
+z.string.conversations_secondary_line_person_added_you = '{{user}} added you';
+z.string.conversations_secondary_line_renamed = '{{user}} renamed conversation';
 z.string.conversations_secondary_line_timed_message = 'Timed message';
-z.string.conversations_secondary_line_renamed = '{{user}} renamed';
+z.string.conversations_secondary_line_you_left = 'You left';
+z.string.conversations_secondary_line_you_were_removed = 'You were removed';
 
 // Takeover
 z.string.takeover_headline = 'Usernames are here.';
@@ -570,9 +568,7 @@ z.string.system_notification_conversation_create = '%s.first_name started a conv
 z.string.system_notification_conversation_rename = '%s.first_name renamed the conversation to %name';
 z.string.system_notification_member_join_many = '%s.first_name added %no people to the conversation';
 z.string.system_notification_member_join_one = '%s.first_name added %@.first_name to the conversation';
-z.string.system_notification_member_leave_left = '%s.first_name left the conversation';
-z.string.system_notification_member_leave_removed_many = '%s.first_name removed %no people from the conversation';
-z.string.system_notification_member_leave_removed_one = '%s.first_name removed %@.first_name from the conversation';
+z.string.system_notification_member_leave_removed_you = '{{user}} removed you from the conversation';
 z.string.system_notification_obfuscated = 'Sent you a message';
 z.string.system_notification_obfuscated_title = 'Someone';
 z.string.system_notification_ping = 'Pinged';

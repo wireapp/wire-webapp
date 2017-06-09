@@ -225,16 +225,16 @@
   <!-- ko ifnot: show_large_avatar() -->
     <div class="message-header">
       <div class="message-header-icon text-graphite">
-        <span class="icon-chat" data-bind="visible: message.member_message_type === z.message.SystemMessageType.CONVERSATION_CREATE || message.member_message_type === z.message.SystemMessageType.CONVERSATION_RESUME"></span>
-        <span class="icon-minus" data-bind="visible: message.type === z.event.Backend.CONVERSATION.MEMBER_LEAVE || message.type === z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE"></span>
-        <span class="icon-plus" data-bind="visible: message.type === z.event.Backend.CONVERSATION.MEMBER_JOIN"></span>
+        <span class="icon-chat" data-bind="visible: message.is_conversation_initialization()"></span>
+        <span class="icon-minus" data-bind="visible: message.is_member_removal()"></span>
+        <span class="icon-plus" data-bind="visible: message.is_member_join()"></span>
       </div>
       <div class="message-header-label">
         <span class="label-bold" data-bind='text: message.sender_name()'></span>
         <span class="ellipsis" data-bind="text: message.caption()"></span>
         <hr class="message-header-line" />
       </div>
-      <!-- ko if: message.type === z.event.Backend.CONVERSATION.MEMBER_JOIN || message.type === z.event.Backend.CONVERSATION.MEMBER_LEAVE || message.type === z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE -->
+      <!-- ko if: message.is_member_change() -->
       <div class="message-body-actions">
         <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}"></time>
       </div>
@@ -242,15 +242,15 @@
     </div>
     <div class="message-body">
       <!-- ko foreach: remote_user_ets -->
-        <!-- ko if: message.member_message_type === z.message.SystemMessageType.CONVERSATION_CREATE || message.member_message_type === z.message.SystemMessageType.CONVERSATION_RESUME -->
+        <!-- ko if: message.is_conversation_initialization() -->
           <user-avatar class="user-avatar-sm user-avatar-no-border"
                        data-bubble="#participants-bubble"
                        data-placement="vertical"
                        params="user: $data, click: $parents[1].on_message_user_click"></user-avatar>
         <!-- /ko -->
-        <!-- ko if: message.type === z.event.Backend.CONVERSATION.MEMBER_JOIN || message.type === z.event.Backend.CONVERSATION.MEMBER_LEAVE || message.type === z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE -->
+        <!-- ko if: message.is_member_change() -->
           <user-avatar class="user-avatar-xs"
-                       data-bind="css: {'translucent': message.type === z.event.Backend.CONVERSATION.MEMBER_LEAVE || message.type === z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE}"
+                       data-bind="css: {'translucent': message.is_member_removal()}"
                        data-bubble="#participants-bubble"
                        data-placement="vertical"
                        params="user: $data, click: $parents[1].on_message_user_click"></user-avatar>

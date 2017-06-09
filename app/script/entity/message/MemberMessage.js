@@ -148,4 +148,36 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
       z.message.SystemMessageType.CONVERSATION_RESUME,
     ].includes(this.member_message_type);
   }
+
+  is_conversation_create() {
+    return this.member_message_type === z.message.SystemMessageType.CONVERSATION_CREATE;
+  }
+
+  is_conversation_initialization() {
+    return this.is_conversation_create() || this.is_conversation_resume();
+  }
+
+  is_conversation_resume() {
+    return this.member_message_type === z.message.SystemMessageType.CONVERSATION_RESUME;
+  }
+
+  is_member_change() {
+    return this.is_member_join() || this.is_member_leave() || this.is_team_member_leave();
+  }
+
+  is_member_join() {
+    return this.type === z.event.Backend.CONVERSATION.MEMBER_JOIN;
+  }
+
+  is_member_leave() {
+    return this.type === z.event.Backend.CONVERSATION.MEMBER_LEAVE;
+  }
+
+  is_team_member_leave() {
+    return this.type === z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE;
+  }
+
+  is_member_removal() {
+    return this.is_member_leave() || this.is_team_member_leave();
+  }
 };

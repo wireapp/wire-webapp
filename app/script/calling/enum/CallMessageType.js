@@ -21,22 +21,17 @@
 
 window.z = window.z || {};
 window.z.calling = z.calling || {};
-window.z.calling.rtc = z.calling.rtc || {};
+window.z.calling.enum = z.calling.enum || {};
 
-// https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia#Errors
-z.calling.rtc.MEDIA_STREAM_ERROR = {
-  ABORT_ERROR: 'AbortError',
-  DEVICES_NOT_FOUND_ERROR: 'DevicesNotFoundError',
-  INTERNAL_ERROR: 'InternalError',
-  INVALID_STATE_ERROR: 'InvalidStateError',
-  NOT_ALLOWED_ERROR: 'NotAllowedError',
-  NOT_FOUND_ERROR: 'NotFoundError',
-  NOT_READABLE_ERROR: 'NotReadableError',
-  OVER_CONSTRAINED_ERROR: 'OverConstrainedError',
-  PERMISSION_DENIED_ERROR: 'PermissionDeniedError',
-  PERMISSION_DISMISSED_ERROR: 'PermissionDismissedError',
-  SECURITY_ERROR: 'SecurityError',
-  SOURCE_UNAVAILABLE_ERROR: 'SourceUnavailableError',
-  TRACK_START_ERROR: 'TrackStartError',
-  TYPE_ERROR: 'TypeError',
+z.calling.enum.CALL_MESSAGE_TYPE = {
+  CANCEL: 'CANCEL',
+  GROUP_CHECK: 'GROUPCHECK',
+  GROUP_LEAVE: 'GROUPLEAVE',
+  GROUP_SETUP: 'GROUPSETUP',
+  GROUP_START: 'GROUPSTART',
+  HANGUP: 'HANGUP',
+  PROP_SYNC: 'PROPSYNC',
+  REJECT: 'REJECT',
+  SETUP: 'SETUP',
+  UPDATE: 'UPDATE',
 };

@@ -99,7 +99,8 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
     });
 
     this.user_repository.connect_requests.subscribe((requests) => {
-      if ((this.content_state() === z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS) && !requests.length) {
+      const requests_state = this.content_state() === z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS;
+      if (requests_state && !requests.length) {
         this.show_conversation(this.conversation_repository.get_most_recent_conversation());
       }
     });
@@ -166,12 +167,12 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
           return;
         }
 
-        this._release_content();
+        this._release_content(this.content_state(), conversation_et);
 
         const team_id = conversation_et.team_id;
         if (this.team_repository.active_team().id !== team_id) {
           let team_promise;
-          if (team_id) {
+          if (team_id && !conversation_et.is_guest()) {
             team_promise = this.team_repository.get_team_by_id(team_id);
           } else {
             team_promise = Promise.resolve(this.team_repository.personal_space);
@@ -248,17 +249,29 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
     }
   }
 
-  _release_content(new_content_state) {
+  _release_content(new_content_state, conversation_et) {
     this.previous_state = this.content_state();
 
-    if ((this.previous_state === z.ViewModel.content.CONTENT_STATE.CONVERSATION) && [z.ViewModel.content.CONTENT_STATE.COLLECTION, z.ViewModel.content.CONTENT_STATE.COLLECTION_DETAILS].includes(!new_content_state)) {
-      this.conversation_repository.active_conversation(null);
+    const conversation_state = this.previous_state === z.ViewModel.content.CONTENT_STATE.CONVERSATION;
+    if (conversation_state) {
+      if (conversation_et) {
+        this.team_repository.active_team().last_active_conversation = conversation_et;
+      }
+
+      const collection_states = [
+        z.ViewModel.content.CONTENT_STATE.COLLECTION,
+        z.ViewModel.content.CONTENT_STATE.COLLECTION_DETAILS,
+      ];
+      if (!collection_states.includes(new_content_state)) {
+        this.conversation_repository.active_conversation(null);
+      }
+
+      return this.message_list.release_conversation();
     }
 
-    if (this.previous_state === z.ViewModel.content.CONTENT_STATE.CONVERSATION) {
-      return this.message_list.release_conversation();
-    } else if (this.previous_state === z.ViewModel.content.CONTENT_STATE.PREFERENCES_AV) {
-      return this.preferences_av.release_devices();
+    const preferences_av_state = this.previous_state === z.ViewModel.content.CONTENT_STATE.PREFERENCES_AV;
+    if (preferences_av_state) {
+      this.preferences_av.release_devices();
     }
   }
 

@@ -30,5 +30,22 @@ z.team.TeamEntity = class TeamEntity {
     this.members = ko.observableArray([]);
     this.id = id;
     this.name = ko.observable('');
+
+    this.conversations_archived = ko.observableArray([]);
+    this.conversations_calls = ko.observableArray([]);
+    this.conversations_cleared = ko.observableArray([]);
+    this.conversations_unarchived = ko.observableArray([]);
+
+    this.has_unread_conversation = ko.pureComputed(() => {
+      for (const conversation_et of this.conversations_unarchived()) {
+        if (!conversation_et.is_request() && !conversation_et.is_muted() && conversation_et.unread_event_count()) {
+          return true;
+        }
+      }
+
+      return false;
+    });
+
+    this.last_active_conversation = undefined;
   }
 };

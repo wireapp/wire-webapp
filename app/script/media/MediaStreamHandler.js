@@ -353,13 +353,13 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     .catch((error) => {
       this.logger.warn(`MediaStream request failed: ${error.name} ${error.message}`);
       this._clear_permission_request_hint(media_type);
-      if (z.calling.rtc.MEDIA_STREAM_ERROR_TYPES.DEVICE.includes(error.name)) {
+      if (z.media.MEDIA_STREAM_ERROR_TYPES.DEVICE.includes(error.name)) {
         throw new z.media.MediaError(z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE, media_type);
       }
-      if (z.calling.rtc.MEDIA_STREAM_ERROR_TYPES.MISC.includes(error.name)) {
+      if (z.media.MEDIA_STREAM_ERROR_TYPES.MISC.includes(error.name)) {
         throw new z.media.MediaError(z.media.MediaError.TYPE.MEDIA_STREAM_MISC, media_type);
       }
-      if (z.calling.rtc.MEDIA_STREAM_ERROR_TYPES.PERMISSION.includes(error.name)) {
+      if (z.media.MEDIA_STREAM_ERROR_TYPES.PERMISSION.includes(error.name)) {
         throw new z.media.MediaError(z.media.MediaError.TYPE.MEDIA_STREAM_PERMISSION, media_type);
       }
       throw error;
