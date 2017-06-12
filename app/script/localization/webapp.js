@@ -604,6 +604,7 @@ z.string.tooltip_conversations_archive = 'Archive ({{shortcut}})';
 z.string.tooltip_conversations_archived = 'Show archive ({{number}})';
 z.string.tooltip_conversations_more = 'More';
 z.string.tooltip_conversations_notify = 'Unmute ({{shortcut}})';
+z.string.tooltip_conversations_preferences = 'Open preferences';
 z.string.tooltip_conversations_silence = 'Mute ({{shortcut}})';
 z.string.tooltip_conversations_start = 'Start conversation ({{shortcut}})';
 
