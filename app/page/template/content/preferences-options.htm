@@ -69,14 +69,23 @@
       </section>
 
       <section class="preferences-section">
-        <header class="preferences-header" data-bind="l10n_text: z.string.preferences_options_emoji"></header>
+        <header class="preferences-header" data-bind="l10n_text: z.string.preferences_options_popular"></header>
         <div class="preferences-option">
           <div class="preferences-option-icon checkbox text-theme">
-            <input type="checkbox" id="replace-inline-emoji-checkbox" data-bind="attr: {'data-uie-value': option_replace_inline_emoji}, checked: option_replace_inline_emoji">
-            <label class="preferences-options-checkbox-label" for="replace-inline-emoji-checkbox" data-bind="l10n_text: z.string.preferences_options_replace_inline_emoji_checkbox"></label>
+            <input type="checkbox" id="replace-inline-emoji-checkbox" data-bind="attr: {'data-uie-value': option_emoji_replace_inline}, checked: option_emoji_replace_inline">
+            <label class="preferences-options-checkbox-label" for="replace-inline-emoji-checkbox" data-bind="l10n_text: z.string.preferences_options_emoji_replace_checkbox"></label>
           </div>
         </div>
-        <div class="preferences-detail" data-bind="l10n_text: z.string.preferences_options_replace_inline_emoji_detail"></div>
+        <div class="preferences-detail" data-bind="l10n_html: emoji_replace_text"></div>
+        <!-- ko if: z.util.Environment.electron -->
+          <div class="preferences-option preferences-options-multiple">
+            <div class="preferences-option-icon checkbox text-theme">
+              <input type="checkbox" id="send-preview-checkbox" data-bind="attr: {'data-uie-value': option_previews_send}, checked: option_previews_send">
+              <label class="preferences-options-checkbox-label" for="send-preview-checkbox" data-bind="l10n_text: z.string.preferences_options_previews_send_checkbox"></label>
+            </div>
+          </div>
+          <div class="preferences-detail" data-bind="l10n_text: z.string.preferences_options_previews_send_detail"></div>
+        <!-- /ko -->
       </section>
 
       <section class="preferences-section">
