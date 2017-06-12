@@ -109,11 +109,10 @@ module.exports = (grunt) => {
 
     if (file !== undefined) {
       const files = [file];
-      grunt.config('coffeelint.deploy.files.src', files);
       grunt.config('todo.src', files);
     }
 
-    grunt.task.run(['coffeelint:deploy', 'todo']);
+    grunt.task.run(['todo']);
   });
 
   return grunt.registerTask('host', function(port, open = true) {
