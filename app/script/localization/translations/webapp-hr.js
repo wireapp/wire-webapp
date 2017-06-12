@@ -42,7 +42,6 @@ z.string.hr.auth_account_sign_in_phone = 'Telefon';
 z.string.hr.auth_account_terms_of_use = 'Uvjeti korištenja';
 z.string.hr.auth_account_terms_of_use_detail = 'Prihvaćam';
 
-
 z.string.hr.auth_verify_account_add = 'Dodaj';
 z.string.hr.auth_verify_account_detail = 'Ovo Vam omogućuje da koristite Wire na više uređaja.';
 z.string.hr.auth_verify_account_headline = 'Dodajte email adresu i lozinku.';
@@ -441,7 +440,6 @@ z.string.hr.warning_tell_me_how = 'Recite mi kako';
 z.string.hr.warning_connectivity_connection_lost = 'Povezivanje u tijeku. Postoji mogućnost da Wire neće moći isporučiti poruke.';
 z.string.hr.warning_connectivity_no_internet = 'Nema Interneta. Nećete moći slati ili primati poruke.';
 
-
 z.string.hr.system_notification_asset_add = 'Podijelila/o sliku';
 z.string.hr.system_notification_connection_accepted = 'Prihvatila/o zahtjev za vezu';
 z.string.hr.system_notification_connection_request = 'Želi se povezati';
@@ -467,6 +465,7 @@ z.string.hr.tooltip_conversation_file = 'Dodaj datoteku';
 z.string.hr.tooltip_conversation_input_placeholder = 'Upiši poruku';
 z.string.hr.tooltip_conversation_people = 'Ljudi ({{shortcut}})';
 z.string.hr.tooltip_conversation_picture = 'Dodaj sliku';
+z.string.hr.tooltip_conversation_ping = 'Ping ({{shortcut}})';
 z.string.hr.tooltip_conversation_video_call = 'Video poziv';
 
 z.string.hr.tooltip_conversations_archive = 'Arhiva ({{shortcut}})';

@@ -43,7 +43,6 @@ z.string.it.auth_account_sign_in_phone = 'Telefono';
 z.string.it.auth_account_terms_of_use = 'Termini di utilizzo';
 z.string.it.auth_account_terms_of_use_detail = 'Accetto';
 
-
 z.string.it.auth_verify_account_add = 'Aggiungi';
 z.string.it.auth_verify_account_detail = 'Questo ti consente di usare Wire su più dispositivi.';
 z.string.it.auth_verify_account_headline = 'Aggiungi indirizzo email e password.';

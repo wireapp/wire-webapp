@@ -44,7 +44,6 @@ z.string.lt.auth_account_sign_in_phone = 'Telefonas';
 z.string.lt.auth_account_terms_of_use = 'Naudojimosi sąlygos';
 z.string.lt.auth_account_terms_of_use_detail = 'Aš sutinku su';
 
-
 z.string.lt.auth_verify_account_add = 'Pridėti';
 z.string.lt.auth_verify_account_detail = 'Tai leidžia jums naudoti Wire keliuose įrenginiuose.';
 z.string.lt.auth_verify_account_headline = 'Pridėkite el. pašto adresą ir slaptažodį.';

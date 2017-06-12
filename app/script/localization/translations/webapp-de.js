@@ -387,6 +387,7 @@ z.string.de.preferences_about_support = 'Support';
 z.string.de.preferences_about_support_website = 'Support-Webseite';
 z.string.de.preferences_about_support_contact = 'Kontaktiere den Support';
 z.string.de.preferences_about_terms_of_use = 'Nutzungsbedingungen';
+z.string.de.preferences_about_version = 'Version {{version}}';
 z.string.de.preferences_about_website = 'Wire-Webseite';
 
 z.string.de.preferences_account_reset_password = 'Passwort zurücksetzen';
@@ -402,6 +403,7 @@ z.string.de.preferences_av_microphone = 'Mikrofon';
 z.string.de.preferences_av_permission_detail = 'In deinen Browser-Einstellungen aktivieren';
 z.string.de.preferences_av_speakers = 'Lautsprecher';
 
+z.string.de.preferences_devices_activated_in = 'in {{location}}';
 z.string.de.preferences_devices_activated_on = 'Aktiviert am {{date}}';
 z.string.de.preferences_devices_active = 'Aktiv';
 z.string.de.preferences_devices_active_detail = 'Falls du eines dieser Geräte nicht erkennst, entferne es und setze dein Passwort zurück.';
@@ -536,6 +538,7 @@ z.string.de.tooltip_conversation_file = 'Datei senden';
 z.string.de.tooltip_conversation_input_placeholder = 'Schreibe eine Nachricht';
 z.string.de.tooltip_conversation_people = 'Unterhaltungsübersicht ({{shortcut}})';
 z.string.de.tooltip_conversation_picture = 'Bild senden';
+z.string.de.tooltip_conversation_ping = 'Ping ({{shortcut}})';
 z.string.de.tooltip_conversation_video_call = 'Videoanruf';
 
 z.string.de.tooltip_conversations_archive = 'Archivieren ({{shortcut}})';

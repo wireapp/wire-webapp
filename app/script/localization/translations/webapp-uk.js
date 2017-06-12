@@ -43,7 +43,6 @@ z.string.uk.auth_account_sign_in_phone = 'Номер телефону';
 z.string.uk.auth_account_terms_of_use = 'Умови використання';
 z.string.uk.auth_account_terms_of_use_detail = 'Я приймаю';
 
-
 z.string.uk.auth_verify_account_add = 'Додати';
 z.string.uk.auth_verify_account_detail = 'Це дасть змогу використовувати Wire на різних пристроях.';
 z.string.uk.auth_verify_account_headline = 'Додайте email та пароль.';

@@ -42,7 +42,6 @@ z.string.fi.auth_account_sign_in_phone = 'Puhelinnumero';
 z.string.fi.auth_account_terms_of_use = 'Käyttöehdot';
 z.string.fi.auth_account_terms_of_use_detail = 'Hyväksyn';
 
-
 z.string.fi.auth_verify_account_add = 'Lisää';
 z.string.fi.auth_verify_account_detail = 'Tämä mahdollistaa Wiren käytön useilla laitteilla.';
 z.string.fi.auth_verify_account_headline = 'Lisää sähköpostiosoitteesi ja salasanasi.';
@@ -228,7 +227,6 @@ z.string.fi.collection_show_all = 'Näytä kaikki {{number}}';
 z.string.fi.collection_section_links = 'Linkit';
 z.string.fi.collection_section_images = 'Kuvat';
 z.string.fi.collection_section_files = 'Tiedostot';
-
 
 z.string.fi.archive_header = 'Arkistoi';
 
@@ -452,7 +450,6 @@ z.string.fi.warning_tell_me_how = 'Kerro miten';
 
 z.string.fi.warning_connectivity_connection_lost = 'Yritetään yhdistää. Wire ei mahdollisesti pysty toimitttamaan viestejä perille.';
 z.string.fi.warning_connectivity_no_internet = 'Ei Internetiä. Et pysty lähettämään tai vastaanottamaan viestejä.';
-
 
 z.string.fi.system_notification_asset_add = 'Jakoi kuvan';
 z.string.fi.system_notification_connection_accepted = 'Hyväksyi yhteyspyyntösi';

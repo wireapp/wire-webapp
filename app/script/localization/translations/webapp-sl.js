@@ -44,7 +44,6 @@ z.string.sl.auth_account_sign_in_phone = 'Telefon';
 z.string.sl.auth_account_terms_of_use = 'Pogoji uporabe';
 z.string.sl.auth_account_terms_of_use_detail = 'Sprejmem';
 
-
 z.string.sl.auth_verify_account_add = 'Dodaj';
 z.string.sl.auth_verify_account_detail = 'To vam omogoča uporabo Wire na večih napravah.';
 z.string.sl.auth_verify_account_headline = 'Dodajte e-poštni naslov in geslo.';
@@ -530,6 +529,7 @@ z.string.sl.tooltip_conversation_file = 'Dodaj zbirko';
 z.string.sl.tooltip_conversation_input_placeholder = 'Napiši sporočilo';
 z.string.sl.tooltip_conversation_people = 'Osebe ({{shortcut}})';
 z.string.sl.tooltip_conversation_picture = 'Dodaj sliko';
+z.string.sl.tooltip_conversation_ping = 'Ping ({{shortcut}})';
 z.string.sl.tooltip_conversation_video_call = 'Videoklic';
 
 z.string.sl.tooltip_conversations_archive = 'Arhiviraj ({{shortcut}})';

@@ -43,7 +43,6 @@ z.string.tr.auth_account_sign_in_phone = 'Telefon';
 z.string.tr.auth_account_terms_of_use = 'Kullanım Şartları';
 z.string.tr.auth_account_terms_of_use_detail = 'Kabul ediyorum';
 
-
 z.string.tr.auth_verify_account_add = 'Ekle';
 z.string.tr.auth_verify_account_detail = 'Bu sizin Wire’ı birden fazla cihazda kullanmanıza olanak sağlar.';
 z.string.tr.auth_verify_account_headline = 'Bir e-posta adresi ve şifre ekleyin.';

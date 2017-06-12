@@ -537,6 +537,7 @@ z.string.sk.tooltip_conversation_file = 'Pridať súbor';
 z.string.sk.tooltip_conversation_input_placeholder = 'Napísať správu';
 z.string.sk.tooltip_conversation_people = 'Ľudia ({{shortcut}})';
 z.string.sk.tooltip_conversation_picture = 'Pridať obrázok';
+z.string.sk.tooltip_conversation_ping = 'Ping ({{shortcut}})';
 z.string.sk.tooltip_conversation_video_call = 'Videohovor';
 
 z.string.sk.tooltip_conversations_archive = 'Archív ({{shortcut}})';

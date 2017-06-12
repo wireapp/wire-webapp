@@ -43,7 +43,6 @@ z.string.da.auth_account_sign_in_phone = 'Telefon';
 z.string.da.auth_account_terms_of_use = 'Vilkår for anvendelse';
 z.string.da.auth_account_terms_of_use_detail = 'Jeg accepterer';
 
-
 z.string.da.auth_verify_account_add = 'Tilføj';
 z.string.da.auth_verify_account_detail = 'Dette gør, at du kan bruge Wire på flere enheder.';
 z.string.da.auth_verify_account_headline = 'Tilføj email adresse og adgangskode.';
@@ -506,11 +505,14 @@ z.string.da.tooltip_conversation_file = 'Tilføj fil';
 z.string.da.tooltip_conversation_input_placeholder = 'Skriv en besked';
 z.string.da.tooltip_conversation_people = 'Personer ({{shortcut}})';
 z.string.da.tooltip_conversation_picture = 'Tilføj billede';
+z.string.da.tooltip_conversation_ping = 'Ping ({{shortcut}})';
 z.string.da.tooltip_conversation_video_call = 'Videoopkald';
 
 z.string.da.tooltip_conversations_archive = 'Arkiv ({{shortcut}})';
 z.string.da.tooltip_conversations_archived = 'Vis arkiv ({{number}})';
 z.string.da.tooltip_conversations_more = 'Mere';
+z.string.da.tooltip_conversations_notify = 'Unmute ({{shortcut}})';
+z.string.da.tooltip_conversations_silence = 'Mute ({{shortcut}})';
 z.string.da.tooltip_conversations_tooltip_start = 'Start samtale ({{shortcut}})';
 
 z.string.da.tooltip_people_add = 'Tilføj personer til samtalen ({{shortcut}})';
