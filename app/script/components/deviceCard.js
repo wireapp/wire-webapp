@@ -61,14 +61,8 @@ z.components.DeviceCard = class DeviceCard {
   }
 
   _update_activation_location(location) {
-    this.activated_in(z.localization.Localizer.get_text({
-      id: z.string.preferences_devices_activated_in,
-      replace: {
-        content: `<span class='label-bold-xs'>${location}</span>`,
-        placeholder: '%location',
-      },
-    })
-    );
+    const location_content = `<span class='label-bold-xs'>${location}</span>`;
+    this.activated_in(z.l10n.text(z.string.preferences_devices_activated_in, location_content));
   }
 
   _update_location() {

@@ -4,7 +4,7 @@
     <div class="warning" data-bind="css:{'warning-dimmed': warning_dimmed}">
       <!-- ko if: top_warning() === z.ViewModel.WarningType.REQUEST_CAMERA -->
         <div class="warning-bar warning-bar-feature bg-theme">
-          <div class="warning-bar-message" data-bind="l10n_html: {'id': z.string.warning_permission_request_camera, 'replace': {'placeholder': '%icon', 'content': '<span class=\'warning-bar-icon icon-camera\'></span>'}}"></div>
+          <div class="warning-bar-message" data-bind="l10n_html: {'id': z.string.warning_permission_request_camera, 'substitute': '<span class=\'warning-bar-icon icon-camera\'></span>'}"></div>
           <span class="warning-bar-close icon-close button-icon" data-bind="click: close_warning"></span>
         </div>
       <!-- /ko -->
@@ -21,7 +21,7 @@
 
       <!-- ko if: top_warning() === z.ViewModel.WarningType.REQUEST_MICROPHONE -->
         <div class="warning-bar warning-bar-feature bg-theme">
-          <div class="warning-bar-message" data-bind="l10n_html: {'id': z.string.warning_permission_request_microphone, 'replace': {'placeholder': '%icon', 'content': '<span class=\'warning-bar-icon icon-microphone\'></span>'}}"></div>
+          <div class="warning-bar-message" data-bind="l10n_html: {'id': z.string.warning_permission_request_microphone, 'substitute': '<span class=\'warning-bar-icon icon-microphone\'></span>'}"></div>
           <span class="warning-bar-close icon-close button-round button-round-dark" data-bind="click: close_warning"></span>
         </div>
       <!-- /ko -->
@@ -38,7 +38,7 @@
 
       <!-- ko if: top_warning() === z.ViewModel.WarningType.REQUEST_SCREEN -->
         <div class="warning-bar warning-bar-feature bg-theme">
-          <div class="warning-bar-message" data-bind="l10n_html: {'id': z.string.warning_permission_request_screen, 'replace': {'placeholder': '%icon', 'content': '<span class=\'warning-bar-icon icon-screensharing\'></span>'}}"></div>
+          <div class="warning-bar-message" data-bind="l10n_html: {'id': z.string.warning_permission_request_screen, 'substitute': '<span class=\'warning-bar-icon icon-screensharing\'></span>'}"></div>
           <span class="warning-bar-close icon-close button-icon" data-bind="click: close_warning"></span>
         </div>
       <!-- /ko -->
@@ -76,7 +76,7 @@
       <!-- ko if: top_warning() === z.ViewModel.WarningType.REQUEST_NOTIFICATION -->
         <div class="warning-bar warning-bar-feature bg-theme">
           <div class="warning-bar-message"
-               data-bind="l10n_html: {'id': z.string.warning_permission_request_notification, 'replace': {'placeholder': '%icon', 'content': '<span class=\'warning-bar-icon icon-envelope\'></span>'}}"></div>
+               data-bind="l10n_html: {'id': z.string.warning_permission_request_notification, 'substitute': '<span class=\'warning-bar-icon icon-envelope\'></span>'}"></div>
           <span class="warning-bar-close icon-close button-round button-round-dark"
                 data-bind="click: close_warning"
                 data-uie-name="do-close-warning"></span>
@@ -86,7 +86,7 @@
       <!-- ko if: top_warning() === z.ViewModel.WarningType.UNSUPPORTED_INCOMING_CALL -->
         <div class="warning-bar warning-bar-feature bg-theme">
           <!-- ko ifnot: z.util.Environment.browser.chrome -->
-            <div class="warning-bar-message"><span data-bind="l10n_text: {'id': z.string.warning_call_unsupported_incoming, replace: {'placeholder': '%s.first_name', 'content': z.util.escape_html(first_name())}}"></span>&nbsp;<a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="l10n_href: z.string.url_support_calling, l10n_text: z.string.warning_learn_more"></a></div>
+            <div class="warning-bar-message"><span data-bind="l10n_text: {'id': z.string.warning_call_unsupported_incoming, substitute: z.util.escape_html(first_name())}"></span>&nbsp;<a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="l10n_href: z.string.url_support_calling, l10n_text: z.string.warning_learn_more"></a></div>
           <!-- /ko -->
           <!-- ko if: z.util.Environment.browser.chrome -->
             <!-- ko if: z.util.Environment.electron -->
