@@ -44,6 +44,7 @@ z.string.ro.auth_account_sign_in_phone = 'Telefon';
 z.string.ro.auth_account_terms_of_use = 'Termeni de folosire';
 z.string.ro.auth_account_terms_of_use_detail = 'Sunt de acord';
 
+
 z.string.ro.auth_verify_account_add = 'Adaugă';
 z.string.ro.auth_verify_account_detail = 'Aceasta îți permite să folosești Wire pe mai multe dispozitive.';
 z.string.ro.auth_verify_account_headline = 'Adaugă o adresă de e-mail și o parolă.';
@@ -520,7 +521,6 @@ z.string.ro.tooltip_conversation_file = 'Adaugă fișier';
 z.string.ro.tooltip_conversation_input_placeholder = 'Scrie un mesaj';
 z.string.ro.tooltip_conversation_people = 'Persoane ({{shortcut}})';
 z.string.ro.tooltip_conversation_picture = 'Adaugă poză';
-z.string.ro.tooltip_conversation_ping = 'Ping ({{shortcut}})';
 z.string.ro.tooltip_conversation_video_call = 'Apel video';
 
 z.string.ro.tooltip_conversations_archive = 'Arhivează ({{shortcut}})';

@@ -42,6 +42,7 @@ z.string.fi.auth_account_sign_in_phone = 'Puhelinnumero';
 z.string.fi.auth_account_terms_of_use = 'Käyttöehdot';
 z.string.fi.auth_account_terms_of_use_detail = 'Hyväksyn';
 
+
 z.string.fi.auth_verify_account_add = 'Lisää';
 z.string.fi.auth_verify_account_detail = 'Tämä mahdollistaa Wiren käytön useilla laitteilla.';
 z.string.fi.auth_verify_account_headline = 'Lisää sähköpostiosoitteesi ja salasanasi.';

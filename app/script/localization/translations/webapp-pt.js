@@ -43,6 +43,7 @@ z.string.pt.auth_account_sign_in_phone = 'Telefone';
 z.string.pt.auth_account_terms_of_use = 'Termos de uso';
 z.string.pt.auth_account_terms_of_use_detail = 'Eu aceito';
 
+
 z.string.pt.auth_verify_account_add = 'Adicionar';
 z.string.pt.auth_verify_account_detail = 'Isso permite que você use Wire em vários dispositivos.';
 z.string.pt.auth_verify_account_headline = 'Adicionar o endereço de e-mail e senha.';
@@ -521,7 +522,6 @@ z.string.pt.tooltip_conversation_file = 'Adicionar arquivo';
 z.string.pt.tooltip_conversation_input_placeholder = 'Digite uma mensagem';
 z.string.pt.tooltip_conversation_people = 'Pessoas ({{shortcut}})';
 z.string.pt.tooltip_conversation_picture = 'Adicionar Foto';
-z.string.pt.tooltip_conversation_ping = 'Ping ({{shortcut}})';
 z.string.pt.tooltip_conversation_video_call = 'Vídeo Chamada';
 
 z.string.pt.tooltip_conversations_archive = 'Arquivo ({{shortcut}})';

@@ -44,6 +44,7 @@ z.string.ru.auth_account_sign_in_phone = 'Телефон';
 z.string.ru.auth_account_terms_of_use = 'Условия использования';
 z.string.ru.auth_account_terms_of_use_detail = 'Я принимаю';
 
+
 z.string.ru.auth_verify_account_add = 'Добавить';
 z.string.ru.auth_verify_account_detail = 'Это позволит использовать Wire на нескольких устройствах.';
 z.string.ru.auth_verify_account_headline = 'Добавить email и пароль.';

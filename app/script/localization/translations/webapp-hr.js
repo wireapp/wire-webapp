@@ -42,6 +42,7 @@ z.string.hr.auth_account_sign_in_phone = 'Telefon';
 z.string.hr.auth_account_terms_of_use = 'Uvjeti korištenja';
 z.string.hr.auth_account_terms_of_use_detail = 'Prihvaćam';
 
+
 z.string.hr.auth_verify_account_add = 'Dodaj';
 z.string.hr.auth_verify_account_detail = 'Ovo Vam omogućuje da koristite Wire na više uređaja.';
 z.string.hr.auth_verify_account_headline = 'Dodajte email adresu i lozinku.';
@@ -220,6 +221,7 @@ z.string.hr.conversation_delete_timestamp = 'Izbrisano na {{date}}';
 z.string.hr.conversation_edit_timestamp = 'Promijenjeno na {{date}}';
 z.string.hr.conversation_likes_caption = '{{number}} ljudi';
 z.string.hr.conversation_send_pasted_file = 'Slika zaljepljena na {{date}}';
+
 
 
 z.string.hr.archive_header = 'Arhiviraj';
@@ -466,7 +468,6 @@ z.string.hr.tooltip_conversation_file = 'Dodaj datoteku';
 z.string.hr.tooltip_conversation_input_placeholder = 'Upiši poruku';
 z.string.hr.tooltip_conversation_people = 'Ljudi ({{shortcut}})';
 z.string.hr.tooltip_conversation_picture = 'Dodaj sliku';
-z.string.hr.tooltip_conversation_ping = 'Ping ({{shortcut}})';
 z.string.hr.tooltip_conversation_video_call = 'Video poziv';
 
 z.string.hr.tooltip_conversations_archive = 'Arhiva ({{shortcut}})';

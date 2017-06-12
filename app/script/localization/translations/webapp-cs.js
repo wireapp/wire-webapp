@@ -42,6 +42,7 @@ z.string.cs.auth_account_sign_in_phone = 'Telefon';
 z.string.cs.auth_account_terms_of_use = 'Podmínky používání';
 z.string.cs.auth_account_terms_of_use_detail = 'Souhlasím';
 
+
 z.string.cs.auth_verify_account_add = 'Přidat';
 z.string.cs.auth_verify_account_detail = 'To umožňuje používat Wire na více zařízeních.';
 z.string.cs.auth_verify_account_headline = 'Přidat emailovou adresu a heslo.';
@@ -219,6 +220,7 @@ z.string.cs.conversation_context_menu_unlike = 'Nelíbí';
 z.string.cs.conversation_delete_timestamp = 'Smazáno v {{date}}';
 z.string.cs.conversation_edit_timestamp = 'Upraveno v {{date}}';
 z.string.cs.conversation_likes_caption = '{{number}} lidí';
+
 
 
 z.string.cs.archive_header = 'Archivovat';
@@ -437,7 +439,6 @@ z.string.cs.tooltip_conversation_file = 'Přidat soubor';
 z.string.cs.tooltip_conversation_input_placeholder = 'Napsat zprávu';
 z.string.cs.tooltip_conversation_people = 'Kontakty ({{shortcut}})';
 z.string.cs.tooltip_conversation_picture = 'Přidat obrázek';
-z.string.cs.tooltip_conversation_ping = 'Ping ({{shortcut}})';
 z.string.cs.tooltip_conversation_video_call = 'Videohovor';
 
 z.string.cs.tooltip_conversations_archive = 'Archivovat ({{shortcut}})';

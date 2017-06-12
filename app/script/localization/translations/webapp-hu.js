@@ -44,6 +44,8 @@ z.string.hu.auth_account_sign_in_phone = 'Telefon';
 z.string.hu.auth_account_terms_of_use = 'Felhasználási feltételek';
 z.string.hu.auth_account_terms_of_use_detail = 'Elfogadom';
 
+z.string.hu.auth_blocked_database = 'A Wire-nek hozzáférést kell biztosítania a helyi tárhelyhez az üzenetek megjelenítéséhez. A helyi tároló nem áll rendelkezésre privát módban.';
+z.string.hu.auth_blocked_tabs = 'A Wire már nyitva van egy másik lapon.';
 
 z.string.hu.auth_verify_account_add = 'Hozzáadás';
 z.string.hu.auth_verify_account_detail = 'Lehetővé teszi, hogy használja a Wire-t több eszközön.';
@@ -280,6 +282,7 @@ z.string.hu.conversations_secondary_line_pings = '{{number}} kopogás';
 z.string.hu.conversations_secondary_line_people_left = '{{number}} partner elhagyta a beszélgetést';
 z.string.hu.conversations_secondary_line_person_left = '{{user}} kilépett';
 z.string.hu.conversations_secondary_line_people_added = '{{user}} partnerek lettek hozzáadva';
+z.string.hu.conversations_secondary_line_renamed = '{{user}} átnevezte a beszélgetést';
 z.string.hu.conversations_secondary_line_timed_message = 'Időzített üzenet';
 z.string.hu.conversations_secondary_line_you_left = 'Ön kilépett';
 
@@ -427,6 +430,8 @@ z.string.hu.preferences_options_contacts_detail = 'Mi a névjegyeit használjuk,
 z.string.hu.preferences_options_data = 'Használati adatok és hibajelentések';
 z.string.hu.preferences_options_data_checkbox = 'Használati adatok és hibajelentések';
 z.string.hu.preferences_options_data_detail = 'Segítsen nekünk, hogy a Wire-t anonim információk küldésével javíthassuk.';
+z.string.hu.preferences_options_popular = 'Közkívánatra';
+z.string.hu.preferences_options_previews_send_detail = 'Hivatkozás tartalmának előnézete.';
 z.string.hu.preferences_options_notifications = 'Értesítések';
 z.string.hu.preferences_options_notifications_none = 'Kikapcsolás';
 z.string.hu.preferences_options_notifications_obfuscate = 'Részletek elrejtése';

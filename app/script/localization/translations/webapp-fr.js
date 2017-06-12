@@ -44,6 +44,7 @@ z.string.fr.auth_account_sign_in_phone = 'Téléphone';
 z.string.fr.auth_account_terms_of_use = 'Conditions d’utilisation';
 z.string.fr.auth_account_terms_of_use_detail = 'J’accepte';
 
+
 z.string.fr.auth_verify_account_add = 'Ajouter';
 z.string.fr.auth_verify_account_detail = 'Cela vous permet d’utiliser Wire sur plusieurs appareils.';
 z.string.fr.auth_verify_account_headline = 'Ajouter une adresse email et un mot de passe.';
@@ -374,7 +375,6 @@ z.string.fr.preferences_about_support = 'Assistance';
 z.string.fr.preferences_about_support_website = 'Site d’aide';
 z.string.fr.preferences_about_support_contact = 'Contacter le support technique';
 z.string.fr.preferences_about_terms_of_use = 'Conditions d’utilisation';
-z.string.fr.preferences_about_version = 'Version {{version}}';
 z.string.fr.preferences_about_website = 'Site de Wire';
 
 z.string.fr.preferences_account_reset_password = 'Réinitialiser le mot de passe';
