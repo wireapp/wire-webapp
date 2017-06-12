@@ -29,7 +29,10 @@ z.connect.ConnectService = class ConnectService {
    */
   constructor(client) {
     this.client = client;
-    this.logger = new z.util.Logger('z.connect.ConnectService', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger(
+      'z.connect.ConnectService',
+      z.config.LOGGER.OPTIONS
+    );
   }
 
   /**

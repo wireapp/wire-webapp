@@ -34,7 +34,10 @@ describe('ConversationServiceNoCompound', function() {
       .then(function(storage_repository) {
         const {client} = test_factory;
         ({storage_service} = storage_repository);
-        conversation_service = new z.conversation.ConversationServiceNoCompound(client, storage_service);
+        conversation_service = new z.conversation.ConversationServiceNoCompound(
+          client,
+          storage_service
+        );
 
         conversation_mapper = new z.conversation.ConversationMapper();
         server = sinon.fakeServer.create();
@@ -84,7 +87,13 @@ describe('ConversationServiceNoCompound', function() {
 
     beforeEach(function(done) {
       Promise.all(
-        messages.map(message => storage_service.save(z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, message))
+        messages.map(message =>
+          storage_service.save(
+            z.storage.StorageService.OBJECT_STORE.EVENTS,
+            undefined,
+            message
+          )
+        )
       )
         .then(done)
         .catch(done.fail);
@@ -92,7 +101,10 @@ describe('ConversationServiceNoCompound', function() {
 
     it('returns mapped message_et if event with id is found', function(done) {
       conversation_service
-        .load_event_from_db(conversation_id, '4af67f76-09f9-4831-b3a4-9df877b8c29a')
+        .load_event_from_db(
+          conversation_id,
+          '4af67f76-09f9-4831-b3a4-9df877b8c29a'
+        )
         .then(function(message_et) {
           expect(message_et).toEqual(messages[1]);
           done();
@@ -132,15 +144,23 @@ describe('ConversationServiceNoCompound', function() {
     it('updated event in the database', function(done) {
       event.time = new Date().toISOString();
       event.primary_key = 1337;
-      conversation_service.update_message_in_db(event, {time: event.time}).then(done).catch(done.fail);
+      conversation_service
+        .update_message_in_db(event, {time: event.time})
+        .then(done)
+        .catch(done.fail);
     });
 
     it('fails if changes are not specified', function(done) {
-      conversation_service.update_message_in_db(event, undefined).then(done.fail).catch(function(error) {
-        expect(error).toEqual(jasmine.any(z.conversation.ConversationError));
-        expect(error.type).toBe(z.conversation.ConversationError.TYPE.NO_CHANGES);
-        done();
-      });
+      conversation_service
+        .update_message_in_db(event, undefined)
+        .then(done.fail)
+        .catch(function(error) {
+          expect(error).toEqual(jasmine.any(z.conversation.ConversationError));
+          expect(error.type).toBe(
+            z.conversation.ConversationError.TYPE.NO_CHANGES
+          );
+          done();
+        });
     });
   });
 
@@ -158,7 +178,13 @@ describe('ConversationServiceNoCompound', function() {
       });
 
       Promise.all(
-        messages.map(message => storage_service.save(z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, message))
+        messages.map(message =>
+          storage_service.save(
+            z.storage.StorageService.OBJECT_STORE.EVENTS,
+            undefined,
+            message
+          )
+        )
       )
         .then(done)
         .catch(done.fail);
@@ -166,7 +192,11 @@ describe('ConversationServiceNoCompound', function() {
 
     it("doesn't load events for invalid conversation id", function(done) {
       conversation_service
-        .load_preceding_events_from_db('invalid_id', new Date(30), new Date(1479903546808))
+        .load_preceding_events_from_db(
+          'invalid_id',
+          new Date(30),
+          new Date(1479903546808)
+        )
         .then(function(events) {
           expect(events.length).toBe(0);
           done();
@@ -214,7 +244,11 @@ describe('ConversationServiceNoCompound', function() {
 
     it('loads events with upper bound', function(done) {
       conversation_service
-        .load_preceding_events_from_db(conversation_id, undefined, new Date(1479903546803))
+        .load_preceding_events_from_db(
+          conversation_id,
+          undefined,
+          new Date(1479903546803)
+        )
         .then(function(events) {
           expect(events.length).toBe(4);
           expect(events[0].time).toBe('2016-11-23T12:19:06.802Z');
@@ -228,7 +262,11 @@ describe('ConversationServiceNoCompound', function() {
 
     it('loads events with upper and lower bound', function(done) {
       conversation_service
-        .load_preceding_events_from_db(conversation_id, new Date(1479903546806), new Date(1479903546807))
+        .load_preceding_events_from_db(
+          conversation_id,
+          new Date(1479903546806),
+          new Date(1479903546807)
+        )
         .then(function(events) {
           expect(events.length).toBe(1);
           expect(events[0].time).toBe('2016-11-23T12:19:06.806Z');
@@ -237,9 +275,16 @@ describe('ConversationServiceNoCompound', function() {
         .catch(done.fail);
     });
 
-    it('loads events with upper and lower bound and a fetch limit', function(done) {
+    it('loads events with upper and lower bound and a fetch limit', function(
+      done
+    ) {
       conversation_service
-        .load_preceding_events_from_db(conversation_id, new Date(1479903546800), new Date(1479903546807), 2)
+        .load_preceding_events_from_db(
+          conversation_id,
+          new Date(1479903546800),
+          new Date(1479903546807),
+          2
+        )
         .then(function(events) {
           expect(events.length).toBe(2);
           expect(events[0].time).toBe('2016-11-23T12:19:06.806Z');
@@ -285,7 +330,9 @@ describe('ConversationServiceNoCompound', function() {
       };
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
       // @formatter:on
-      const conversation_et = conversation_mapper.map_conversation(conversation_payload);
+      const conversation_et = conversation_mapper.map_conversation(
+        conversation_payload
+      );
 
       conversation_service
         .save_conversation_state_in_db(conversation_et)
@@ -346,7 +393,13 @@ describe('ConversationServiceNoCompound', function() {
 
     beforeEach(function(done) {
       Promise.all(
-        messages.map(message => storage_service.save(z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, message))
+        messages.map(message =>
+          storage_service.save(
+            z.storage.StorageService.OBJECT_STORE.EVENTS,
+            undefined,
+            message
+          )
+        )
       )
         .then(function(ids) {
           primary_keys = ids;
@@ -358,10 +411,14 @@ describe('ConversationServiceNoCompound', function() {
     it('deletes message with the given key', function(done) {
       conversation_service
         .delete_message_with_key_from_db(primary_keys[1])
-        .then(() => conversation_service.load_preceding_events_from_db(conversation_id))
+        .then(() =>
+          conversation_service.load_preceding_events_from_db(conversation_id)
+        )
         .then(function(events) {
           expect(events.length).toBe(2);
-          events.forEach(event => expect(event.primary_key).not.toBe(primary_keys[1]));
+          events.forEach(event =>
+            expect(event.primary_key).not.toBe(primary_keys[1])
+          );
           done();
         })
         .catch(done.fail);
@@ -370,7 +427,9 @@ describe('ConversationServiceNoCompound', function() {
     it('does not delete the event if key is wrong', function(done) {
       conversation_service
         .delete_message_with_key_from_db('wrongKey')
-        .then(() => conversation_service.load_preceding_events_from_db(conversation_id))
+        .then(() =>
+          conversation_service.load_preceding_events_from_db(conversation_id)
+        )
         .then(function(events) {
           expect(events.length).toBe(3);
           done();
@@ -453,7 +512,13 @@ describe('ConversationServiceNoCompound', function() {
       Promise.all(
         events
           .slice(0, 1)
-          .map(event => storage_service.save(z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, event))
+          .map(event =>
+            storage_service.save(
+              z.storage.StorageService.OBJECT_STORE.EVENTS,
+              undefined,
+              event
+            )
+          )
       )
         .then(() =>
           conversation_service.load_events_with_category_from_db(
@@ -470,7 +535,13 @@ describe('ConversationServiceNoCompound', function() {
 
     it('should get images in the correct order', function(done) {
       Promise.all(
-        events.map(event => storage_service.save(z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, event))
+        events.map(event =>
+          storage_service.save(
+            z.storage.StorageService.OBJECT_STORE.EVENTS,
+            undefined,
+            event
+          )
+        )
       )
         .then(() =>
           conversation_service.load_events_with_category_from_db(

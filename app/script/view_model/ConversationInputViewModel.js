@@ -24,7 +24,12 @@ window.z.ViewModel = z.ViewModel || {};
 
 // Parent: z.ViewModel.ContentViewModel
 z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
-  constructor(element_id, conversation_repository, user_repository, properties_repository) {
+  constructor(
+    element_id,
+    conversation_repository,
+    user_repository,
+    properties_repository
+  ) {
     this.added_to_view = this.added_to_view.bind(this);
     this.on_drop_files = this.on_drop_files.bind(this);
     this.on_paste_files = this.on_paste_files.bind(this);
@@ -33,7 +38,10 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
 
     this.conversation_repository = conversation_repository;
     this.user_repository = user_repository;
-    this.logger = new z.util.Logger('z.ViewModel.ConversationInputViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger(
+      'z.ViewModel.ConversationInputViewModel',
+      z.config.LOGGER.OPTIONS
+    );
 
     this.conversation_et = this.conversation_repository.active_conversation;
     this.conversation_et.subscribe(() => {
@@ -54,8 +62,12 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
           this.pasted_file_preview_url(URL.createObjectURL(blob));
         }
 
-        const date = moment(blob.lastModifiedDate).format('MMMM Do YYYY, h:mm:ss a');
-        this.pasted_file_name(z.l10n.text(z.string.conversation_send_pasted_file, date));
+        const date = moment(blob.lastModifiedDate).format(
+          'MMMM Do YYYY, h:mm:ss a'
+        );
+        this.pasted_file_name(
+          z.l10n.text(z.string.conversation_send_pasted_file, date)
+        );
       } else {
         this.pasted_file_preview_url(null);
         this.pasted_file_name(null);
@@ -79,7 +91,9 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
       }
     });
 
-    this.conversation_has_focus = ko.observable(true).extend({notify: 'always'});
+    this.conversation_has_focus = ko
+      .observable(true)
+      .extend({notify: 'always'});
     this.browser_has_focus = ko.observable(true);
 
     this.blinking_cursor = ko
@@ -94,7 +108,9 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
 
     this.show_giphy_button = ko.pureComputed(() => {
       if (this.conversation_et()) {
-        return this.has_text_input() && this.conversation_et().input().length <= 256;
+        return (
+          this.has_text_input() && this.conversation_et().input().length <= 256
+        );
       }
     });
 
@@ -135,21 +151,35 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
     this.picture_tooltip = z.l10n.text(z.string.tooltip_conversation_picture);
     this.ping_disabled = ko.observable(false);
 
-    $(window).blur(() => this.browser_has_focus(false)).focus(() => this.browser_has_focus(true));
+    $(window)
+      .blur(() => this.browser_has_focus(false))
+      .focus(() => this.browser_has_focus(true));
 
-    this.conversation_input_emoji = new z.ViewModel.ConversationInputEmojiViewModel(properties_repository);
+    this.conversation_input_emoji = new z.ViewModel
+      .ConversationInputEmojiViewModel(properties_repository);
 
     this._init_subscriptions();
   }
 
   _init_subscriptions() {
-    amplify.subscribe(z.event.WebApp.SEARCH.SHOW, () => this.conversation_has_focus(false));
+    amplify.subscribe(z.event.WebApp.SEARCH.SHOW, () =>
+      this.conversation_has_focus(false)
+    );
     amplify.subscribe(z.event.WebApp.SEARCH.HIDE, () =>
       window.requestAnimationFrame(() => this.conversation_has_focus(true))
     );
-    amplify.subscribe(z.event.WebApp.EXTENSIONS.GIPHY.SEND, this.send_giphy.bind(this));
-    amplify.subscribe(z.event.WebApp.CONVERSATION.IMAGE.SEND, this.upload_images.bind(this));
-    amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.EDIT, this.edit_message.bind(this));
+    amplify.subscribe(
+      z.event.WebApp.EXTENSIONS.GIPHY.SEND,
+      this.send_giphy.bind(this)
+    );
+    amplify.subscribe(
+      z.event.WebApp.CONVERSATION.IMAGE.SEND,
+      this.upload_images.bind(this)
+    );
+    amplify.subscribe(
+      z.event.WebApp.CONVERSATION.MESSAGE.EDIT,
+      this.edit_message.bind(this)
+    );
   }
 
   added_to_view() {
@@ -169,11 +199,13 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
   ping() {
     if (!this.ping_disabled()) {
       this.ping_disabled(true);
-      this.conversation_repository.send_knock(this.conversation_et()).then(() => {
-        window.setTimeout(() => {
-          this.ping_disabled(false);
-        }, 2000);
-      });
+      this.conversation_repository
+        .send_knock(this.conversation_et())
+        .then(() => {
+          window.setTimeout(() => {
+            this.ping_disabled(false);
+          }, 2000);
+        });
     }
   }
 
@@ -185,7 +217,10 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
 
   send_message(message) {
     if (message.length > 0) {
-      this.conversation_repository.send_text_with_link_preview(message, this.conversation_et());
+      this.conversation_repository.send_text_with_link_preview(
+        message,
+        this.conversation_et()
+      );
     }
   }
 
@@ -193,11 +228,18 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
     this.cancel_edit();
 
     if (!message.length) {
-      return this.conversation_repository.delete_message_everyone(this.conversation_et(), message_et);
+      return this.conversation_repository.delete_message_everyone(
+        this.conversation_et(),
+        message_et
+      );
     }
 
     if (message !== message_et.get_first_asset().text) {
-      this.conversation_repository.send_message_edit(message, message_et, this.conversation_et());
+      this.conversation_repository.send_message_edit(
+        message,
+        message_et,
+        this.conversation_et()
+      );
     }
   }
 
@@ -223,7 +265,10 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
         }
       }
 
-      this.conversation_repository.upload_images(this.conversation_et(), images);
+      this.conversation_repository.upload_images(
+        this.conversation_et(),
+        images
+      );
     }
   }
 
@@ -231,15 +276,23 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
     if (!this._is_hitting_upload_limit(files)) {
       for (const file of files) {
         if (file.size > z.config.MAXIMUM_ASSET_FILE_SIZE) {
-          amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_TOO_BIG, {
-            size: file.size,
-            type: file.type,
-          });
+          amplify.publish(
+            z.event.WebApp.ANALYTICS.EVENT,
+            z.tracking.EventName.FILE.UPLOAD_TOO_BIG,
+            {
+              size: file.size,
+              type: file.type,
+            }
+          );
           amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
           window.setTimeout(function() {
-            amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.UPLOAD_TOO_LARGE, {
-              data: z.util.format_bytes(z.config.MAXIMUM_ASSET_FILE_SIZE),
-            });
+            amplify.publish(
+              z.event.WebApp.WARNING.MODAL,
+              z.ViewModel.ModalType.UPLOAD_TOO_LARGE,
+              {
+                data: z.util.format_bytes(z.config.MAXIMUM_ASSET_FILE_SIZE),
+              }
+            );
           }, 200);
           return;
         }
@@ -284,8 +337,13 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
   }
 
   _show_upload_warning(image) {
-    const string_id = image.type === 'image/gif' ? z.string.alert_gif_too_large : z.string.alert_upload_too_large;
-    const warning_text = z.l10n.text(string_id, z.config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024);
+    const string_id = image.type === 'image/gif'
+      ? z.string.alert_gif_too_large
+      : z.string.alert_upload_too_large;
+    const warning_text = z.l10n.text(
+      string_id,
+      z.config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024
+    );
 
     const attributes = {
       reason: 'too large',
@@ -293,19 +351,28 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
       type: image.type,
     };
 
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.IMAGE_SENT_ERROR, attributes);
+    amplify.publish(
+      z.event.WebApp.ANALYTICS.EVENT,
+      z.tracking.EventName.IMAGE_SENT_ERROR,
+      attributes
+    );
     amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
     window.setTimeout(() => window.alert(warning_text), 200);
   }
 
   _is_hitting_upload_limit(files) {
     const pending_uploads = this.conversation_repository.get_number_of_pending_uploads();
-    const is_hitting_upload_limit = pending_uploads + files.length > z.config.MAXIMUM_ASSET_UPLOADS;
+    const is_hitting_upload_limit =
+      pending_uploads + files.length > z.config.MAXIMUM_ASSET_UPLOADS;
 
     if (is_hitting_upload_limit) {
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.UPLOAD_PARALLEL, {
-        data: z.config.MAXIMUM_ASSET_UPLOADS,
-      });
+      amplify.publish(
+        z.event.WebApp.WARNING.MODAL,
+        z.ViewModel.ModalType.UPLOAD_PARALLEL,
+        {
+          data: z.config.MAXIMUM_ASSET_UPLOADS,
+        }
+      );
     }
 
     return is_hitting_upload_limit;
@@ -348,14 +415,22 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
     const message = z.util.StringUtil.trim_line_breaks(this.input());
 
     if (message.length > z.config.MAXIMUM_MESSAGE_LENGTH) {
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.TOO_LONG_MESSAGE, {
-        close() {
-          amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.CHARACTER_LIMIT_REACHED, {
-            characters: message.length,
-          });
-        },
-        data: z.config.MAXIMUM_MESSAGE_LENGTH,
-      });
+      amplify.publish(
+        z.event.WebApp.WARNING.MODAL,
+        z.ViewModel.ModalType.TOO_LONG_MESSAGE,
+        {
+          close() {
+            amplify.publish(
+              z.event.WebApp.ANALYTICS.EVENT,
+              z.tracking.EventName.CONVERSATION.CHARACTER_LIMIT_REACHED,
+              {
+                characters: message.length,
+              }
+            );
+          },
+          data: z.config.MAXIMUM_MESSAGE_LENGTH,
+        }
+      );
       return;
     }
 
@@ -378,7 +453,10 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
       switch (event.keyCode) {
         case z.util.KEYCODE.ARROW_UP: {
           if (!this.input().length) {
-            this.edit_message(this.conversation_et().get_last_editable_message(), event.target);
+            this.edit_message(
+              this.conversation_et().get_last_editable_message(),
+              event.target
+            );
           }
           break;
         }
@@ -410,7 +488,10 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
   }
 
   edit_message(message_et, input_element) {
-    if (message_et && (message_et.is_editable() && message_et !== this.edit_message_et())) {
+    if (
+      message_et &&
+      (message_et.is_editable() && message_et !== this.edit_message_et())
+    ) {
       this.cancel_edit();
       this.edit_message_et(message_et);
       this.edit_message_et().is_editing(true);
@@ -432,7 +513,9 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
 
   _move_cursor_to_end(input_element) {
     window.setTimeout(
-      () => (input_element.selectionStart = input_element.selectionEnd = input_element.value.length * 2),
+      () =>
+        (input_element.selectionStart = input_element.selectionEnd =
+          input_element.value.length * 2),
       0
     );
   }

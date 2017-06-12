@@ -26,7 +26,11 @@ z.search.FullTextSearch = (function() {
   const _get_search_regex = function(query) {
     const delimiter = ' ';
     const flags = 'gumi';
-    const regex = query.trim().split(delimiter).map(word => `(${z.util.escape_regex(word)})`).join('(?:.*)');
+    const regex = query
+      .trim()
+      .split(delimiter)
+      .map(word => `(${z.util.escape_regex(word)})`)
+      .join('(?:.*)');
 
     return new RegExp(regex, flags);
   };

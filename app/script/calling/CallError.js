@@ -84,11 +84,13 @@ z.calling.CallError = class CallError extends Error {
       NO_USER_ID: 'z.calling.CallError.TYPE.NO_USER_ID',
       NOT_FOUND: 'z.calling.CallError.TYPE.NOT_FOUND',
       NOT_SUPPORTED: 'z.calling.CallError.TYPE.NOT_SUPPORTED',
-      RTP_SENDER_NOT_SUPPORTED: 'z.calling.CallError.TYPE.RTP_SENDER_NOT_SUPPORTED',
+      RTP_SENDER_NOT_SUPPORTED:
+        'z.calling.CallError.TYPE.RTP_SENDER_NOT_SUPPORTED',
       SDP_STATE_COLLISION: 'z.calling.CallError.TYPE.SDP_STATE_COLLISION',
       UNKNOWN: 'z.calling.CallError.TYPE.UNKNOWN',
       UNSUPPORTED_VERSION: 'z.calling.CallError.TYPE.UNSUPPORTED_VERSION',
-      WRONG_CONVERSATION_TYPE: 'z.calling.CallError.TYPE.WRONG_CONVERSATION_TYPE',
+      WRONG_CONVERSATION_TYPE:
+        'z.calling.CallError.TYPE.WRONG_CONVERSATION_TYPE',
       WRONG_PAYLOAD_FORMAT: 'z.calling.CallError.TYPE.WRONG_PAYLOAD_FORMAT',
       WRONG_SENDER: 'z.calling.CallError.TYPE.WRONG_SENDER',
     };

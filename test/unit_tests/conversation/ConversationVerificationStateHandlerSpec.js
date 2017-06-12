@@ -43,9 +43,13 @@ describe('z.conversation.ConversationVerificationStateHandler', function() {
       .exposeConversationActors()
       .then(function(_conversation_repository) {
         conversation_repository = _conversation_repository;
-        state_handler = new z.conversation.ConversationVerificationStateHandler(conversation_repository);
+        state_handler = new z.conversation.ConversationVerificationStateHandler(
+          conversation_repository
+        );
 
-        conversation_ab = new z.entity.Conversation(z.util.create_random_uuid());
+        conversation_ab = new z.entity.Conversation(
+          z.util.create_random_uuid()
+        );
         conversation_b = new z.entity.Conversation(z.util.create_random_uuid());
         conversation_c = new z.entity.Conversation(z.util.create_random_uuid());
 
@@ -66,13 +70,19 @@ describe('z.conversation.ConversationVerificationStateHandler', function() {
         conversation_ab.self = user_self;
         conversation_ab.participating_user_ids.push(user_a.id, user_b.id);
         conversation_ab.participating_user_ets.push(user_a, user_b);
-        conversation_ab.verification_state(z.conversation.ConversationVerificationState.VERIFIED);
+        conversation_ab.verification_state(
+          z.conversation.ConversationVerificationState.VERIFIED
+        );
         conversation_b.self = user_self;
         conversation_b.participating_user_ids.push(user_b.id);
-        conversation_b.verification_state(z.conversation.ConversationVerificationState.VERIFIED);
+        conversation_b.verification_state(
+          z.conversation.ConversationVerificationState.VERIFIED
+        );
         conversation_b.participating_user_ets.push(user_b);
         conversation_c.self = user_self;
-        conversation_c.verification_state(z.conversation.ConversationVerificationState.VERIFIED);
+        conversation_c.verification_state(
+          z.conversation.ConversationVerificationState.VERIFIED
+        );
 
         conversation_repository.conversations.removeAll();
         return Promise.all([
@@ -94,10 +104,16 @@ describe('z.conversation.ConversationVerificationStateHandler', function() {
       user_b.devices.push(new_client_b);
 
       state_handler.on_client_add(user_b.id);
-      expect(conversation_ab.verification_state()).toBe(z.conversation.ConversationVerificationState.DEGRADED);
-      expect(conversation_b.verification_state()).toBe(z.conversation.ConversationVerificationState.DEGRADED);
+      expect(conversation_ab.verification_state()).toBe(
+        z.conversation.ConversationVerificationState.DEGRADED
+      );
+      expect(conversation_b.verification_state()).toBe(
+        z.conversation.ConversationVerificationState.DEGRADED
+      );
       expect(conversation_ab.is_verified()).toBeFalsy();
-      expect(z.conversation.EventBuilder.build_degraded.calls.count()).toEqual(2);
+      expect(z.conversation.EventBuilder.build_degraded.calls.count()).toEqual(
+        2
+      );
     });
 
     it('should not change VERIFIED state if new verified client was added', function() {
@@ -108,9 +124,13 @@ describe('z.conversation.ConversationVerificationStateHandler', function() {
       user_b.devices.push(new_client_b);
 
       state_handler.on_client_add(user_b.id);
-      expect(conversation_ab.verification_state()).toBe(z.conversation.ConversationVerificationState.VERIFIED);
+      expect(conversation_ab.verification_state()).toBe(
+        z.conversation.ConversationVerificationState.VERIFIED
+      );
       expect(conversation_ab.is_verified()).toBeTruthy();
-      expect(z.conversation.EventBuilder.build_all_verified).not.toHaveBeenCalled();
+      expect(
+        z.conversation.EventBuilder.build_all_verified
+      ).not.toHaveBeenCalled();
     });
   });
 
@@ -124,17 +144,33 @@ describe('z.conversation.ConversationVerificationStateHandler', function() {
       user_self.devices.push(new_client);
 
       state_handler.on_client_add(user_self.id);
-      expect(conversation_ab.verification_state()).toBe(z.conversation.ConversationVerificationState.DEGRADED);
-      expect(conversation_b.verification_state()).toBe(z.conversation.ConversationVerificationState.DEGRADED);
-      expect(conversation_c.verification_state()).toBe(z.conversation.ConversationVerificationState.DEGRADED);
-      expect(z.conversation.EventBuilder.build_degraded.calls.count()).toEqual(3);
+      expect(conversation_ab.verification_state()).toBe(
+        z.conversation.ConversationVerificationState.DEGRADED
+      );
+      expect(conversation_b.verification_state()).toBe(
+        z.conversation.ConversationVerificationState.DEGRADED
+      );
+      expect(conversation_c.verification_state()).toBe(
+        z.conversation.ConversationVerificationState.DEGRADED
+      );
+      expect(z.conversation.EventBuilder.build_degraded.calls.count()).toEqual(
+        3
+      );
 
       user_self.devices.remove(new_client);
       state_handler.on_client_removed(user_self.id);
-      expect(conversation_ab.verification_state()).toBe(z.conversation.ConversationVerificationState.VERIFIED);
-      expect(conversation_b.verification_state()).toBe(z.conversation.ConversationVerificationState.VERIFIED);
-      expect(conversation_c.verification_state()).toBe(z.conversation.ConversationVerificationState.VERIFIED);
-      expect(z.conversation.EventBuilder.build_all_verified.calls.count()).toEqual(3);
+      expect(conversation_ab.verification_state()).toBe(
+        z.conversation.ConversationVerificationState.VERIFIED
+      );
+      expect(conversation_b.verification_state()).toBe(
+        z.conversation.ConversationVerificationState.VERIFIED
+      );
+      expect(conversation_c.verification_state()).toBe(
+        z.conversation.ConversationVerificationState.VERIFIED
+      );
+      expect(
+        z.conversation.EventBuilder.build_all_verified.calls.count()
+      ).toEqual(3);
     });
   });
 
@@ -148,17 +184,33 @@ describe('z.conversation.ConversationVerificationStateHandler', function() {
       user_self.devices.push(new_client);
 
       state_handler.on_client_add(user_self.id);
-      expect(conversation_ab.verification_state()).toBe(z.conversation.ConversationVerificationState.DEGRADED);
-      expect(conversation_b.verification_state()).toBe(z.conversation.ConversationVerificationState.DEGRADED);
-      expect(conversation_c.verification_state()).toBe(z.conversation.ConversationVerificationState.DEGRADED);
-      expect(z.conversation.EventBuilder.build_degraded.calls.count()).toEqual(3);
+      expect(conversation_ab.verification_state()).toBe(
+        z.conversation.ConversationVerificationState.DEGRADED
+      );
+      expect(conversation_b.verification_state()).toBe(
+        z.conversation.ConversationVerificationState.DEGRADED
+      );
+      expect(conversation_c.verification_state()).toBe(
+        z.conversation.ConversationVerificationState.DEGRADED
+      );
+      expect(z.conversation.EventBuilder.build_degraded.calls.count()).toEqual(
+        3
+      );
 
       user_self.devices.remove(new_client);
       state_handler.on_clients_updated(user_self.id);
-      expect(conversation_ab.verification_state()).toBe(z.conversation.ConversationVerificationState.VERIFIED);
-      expect(conversation_b.verification_state()).toBe(z.conversation.ConversationVerificationState.VERIFIED);
-      expect(conversation_c.verification_state()).toBe(z.conversation.ConversationVerificationState.VERIFIED);
-      expect(z.conversation.EventBuilder.build_all_verified.calls.count()).toEqual(3);
+      expect(conversation_ab.verification_state()).toBe(
+        z.conversation.ConversationVerificationState.VERIFIED
+      );
+      expect(conversation_b.verification_state()).toBe(
+        z.conversation.ConversationVerificationState.VERIFIED
+      );
+      expect(conversation_c.verification_state()).toBe(
+        z.conversation.ConversationVerificationState.VERIFIED
+      );
+      expect(
+        z.conversation.EventBuilder.build_all_verified.calls.count()
+      ).toEqual(3);
     });
   });
 
@@ -176,9 +228,13 @@ describe('z.conversation.ConversationVerificationStateHandler', function() {
 
       state_handler.on_member_joined(conversation_ab, new_user.id);
 
-      expect(conversation_ab.verification_state()).toBe(z.conversation.ConversationVerificationState.DEGRADED);
+      expect(conversation_ab.verification_state()).toBe(
+        z.conversation.ConversationVerificationState.DEGRADED
+      );
       expect(conversation_ab.is_verified()).toBeFalsy();
-      expect(z.conversation.EventBuilder.build_degraded.calls.count()).toEqual(1);
+      expect(z.conversation.EventBuilder.build_degraded.calls.count()).toEqual(
+        1
+      );
     });
 
     it('should not change state if new user with verified client was added to conversation', function() {
@@ -194,7 +250,9 @@ describe('z.conversation.ConversationVerificationStateHandler', function() {
 
       state_handler.on_member_joined(conversation_ab, new_user.id);
 
-      expect(conversation_ab.verification_state()).toBe(z.conversation.ConversationVerificationState.VERIFIED);
+      expect(conversation_ab.verification_state()).toBe(
+        z.conversation.ConversationVerificationState.VERIFIED
+      );
       expect(conversation_ab.is_verified()).toBeTruthy();
       expect(z.conversation.EventBuilder.build_degraded).not.toHaveBeenCalled();
     });
@@ -205,8 +263,12 @@ describe('z.conversation.ConversationVerificationStateHandler', function() {
       client_a.meta.is_verified(false);
 
       state_handler.on_client_verification_changed(user_a.id, client_a.id);
-      expect(conversation_ab.verification_state()).toBe(z.conversation.ConversationVerificationState.DEGRADED);
-      expect(conversation_b.verification_state()).toBe(z.conversation.ConversationVerificationState.VERIFIED);
+      expect(conversation_ab.verification_state()).toBe(
+        z.conversation.ConversationVerificationState.DEGRADED
+      );
+      expect(conversation_b.verification_state()).toBe(
+        z.conversation.ConversationVerificationState.VERIFIED
+      );
       expect(conversation_ab.is_verified()).toBeFalsy();
     });
   });

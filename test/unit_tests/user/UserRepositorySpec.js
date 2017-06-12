@@ -44,21 +44,28 @@ describe('z.user.UserRepository', function() {
       let user_et = undefined;
 
       beforeEach(function() {
-        const connection_et = new z.entity.Connection(z.util.create_random_uuid());
+        const connection_et = new z.entity.Connection(
+          z.util.create_random_uuid()
+        );
         connection_et.to = entities.user.jane_roe.id;
 
         user_et = new z.entity.User(entities.user.john_doe.id);
         user_et.connection(connection_et);
 
         TestFactory.user_repository.connections.push(connection_et);
-        spyOn(TestFactory.user_repository, '_update_connection_status').and.returnValue(Promise.resolve());
+        spyOn(
+          TestFactory.user_repository,
+          '_update_connection_status'
+        ).and.returnValue(Promise.resolve());
       });
 
       it('sets the connection status to cancelled', function(done) {
         TestFactory.user_repository
           .cancel_connection_request(user_et)
           .then(function() {
-            expect(TestFactory.user_repository._update_connection_status).toHaveBeenCalled();
+            expect(
+              TestFactory.user_repository._update_connection_status
+            ).toHaveBeenCalled();
             done();
           })
           .catch(done.fail);
@@ -71,7 +78,9 @@ describe('z.user.UserRepository', function() {
         TestFactory.user_repository
           .cancel_connection_request(user_et, new z.entity.Conversation())
           .then(function() {
-            expect(TestFactory.user_repository._update_connection_status).toHaveBeenCalled();
+            expect(
+              TestFactory.user_repository._update_connection_status
+            ).toHaveBeenCalled();
             expect(spy).toHaveBeenCalled();
             done();
           })
@@ -85,10 +94,12 @@ describe('z.user.UserRepository', function() {
 
       beforeEach(function() {
         connection_et_a = new z.entity.Connection();
-        connection_et_a.conversation_id = '874d2afe-821d-4f8c-9d3d-3b0fea948e43';
+        connection_et_a.conversation_id =
+          '874d2afe-821d-4f8c-9d3d-3b0fea948e43';
         TestFactory.user_repository.connections.push(connection_et_a);
         connection_et_b = new z.entity.Connection();
-        connection_et_a.conversation_id = 'a8566a3b-0f24-448e-a0dc-85992c140fb5';
+        connection_et_a.conversation_id =
+          'a8566a3b-0f24-448e-a0dc-85992c140fb5';
         TestFactory.user_repository.connections.push(connection_et_b);
       });
 
@@ -102,7 +113,9 @@ describe('z.user.UserRepository', function() {
         );
         expect(connection_et).toBe(connection_et_a);
 
-        connection_et = TestFactory.user_repository.get_connection_by_conversation_id('');
+        connection_et = TestFactory.user_repository.get_connection_by_conversation_id(
+          ''
+        );
         expect(connection_et).not.toBeDefined();
       });
     });
@@ -110,27 +123,37 @@ describe('z.user.UserRepository', function() {
     describe('get_connections', function() {
       // TODO: This test seems to be flaky!
       xit('should return the connected users', function(done) {
-        server.respondWith('GET', `${test_factory.settings.connection.rest_url}/connections?size=500`, [
-          200,
-          {'Content-Type': 'application/json'},
-          JSON.stringify(payload.connections.get),
-        ]);
+        server.respondWith(
+          'GET',
+          `${test_factory.settings.connection.rest_url}/connections?size=500`,
+          [
+            200,
+            {'Content-Type': 'application/json'},
+            JSON.stringify(payload.connections.get),
+          ]
+        );
 
         server.respondWith(
           'GET',
-          `${test_factory.settings.connection.rest_url}/users?ids=${entities.user.jane_roe.id}%2C${entities.user
-            .jane_roe.id}`,
-          [200, {'Content-Type': 'application/json'}, JSON.stringify(payload.users.get.many)]
+          `${test_factory.settings.connection.rest_url}/users?ids=${entities
+            .user.jane_roe.id}%2C${entities.user.jane_roe.id}`,
+          [
+            200,
+            {'Content-Type': 'application/json'},
+            JSON.stringify(payload.users.get.many),
+          ]
         );
 
         TestFactory.user_repository
           .get_connections()
           .then(function() {
             expect(TestFactory.user_repository.connections().length).toBe(2);
-            expect(TestFactory.user_repository.connections()[0].status()).toEqual(z.user.ConnectionStatus.ACCEPTED);
-            expect(TestFactory.user_repository.connections()[1].conversation_id).toEqual(
-              '45c8f986-6c8f-465b-9ac9-bd5405e8c944'
-            );
+            expect(
+              TestFactory.user_repository.connections()[0].status()
+            ).toEqual(z.user.ConnectionStatus.ACCEPTED);
+            expect(
+              TestFactory.user_repository.connections()[1].conversation_id
+            ).toEqual('45c8f986-6c8f-465b-9ac9-bd5405e8c944');
             done();
           })
           .catch(done.fail);
@@ -145,7 +168,11 @@ describe('z.user.UserRepository', function() {
           .fetch_users_by_id()
           .then(function(response) {
             expect(response.length).toBe(0);
-            return TestFactory.user_repository.fetch_users_by_id([undefined, undefined, undefined]);
+            return TestFactory.user_repository.fetch_users_by_id([
+              undefined,
+              undefined,
+              undefined,
+            ]);
           })
           .then(function(response) {
             expect(response.length).toBe(0);
@@ -179,10 +206,13 @@ describe('z.user.UserRepository', function() {
       });
 
       it('should not find an unknown user', function(done) {
-        TestFactory.user_repository.find_user_by_id('1').then(done.fail).catch(function(error) {
-          expect(error.type).toBe(z.user.UserError.TYPE.USER_NOT_FOUND);
-          done();
-        });
+        TestFactory.user_repository
+          .find_user_by_id('1')
+          .then(done.fail)
+          .catch(function(error) {
+            expect(error.type).toBe(z.user.UserError.TYPE.USER_NOT_FOUND);
+            done();
+          });
       });
     });
 
@@ -203,7 +233,10 @@ describe('z.user.UserRepository', function() {
         user_et_b.name('Gregor');
         user_et_b.connection(connection_et);
 
-        TestFactory.user_repository.save_users([user_et_a, user_et_b]).then(done).catch(done.fail);
+        TestFactory.user_repository
+          .save_users([user_et_a, user_et_b])
+          .then(done)
+          .catch(done.fail);
       });
 
       afterEach(function() {
@@ -211,25 +244,33 @@ describe('z.user.UserRepository', function() {
       });
 
       it('finds the correct user by searching for the full name', function() {
-        const result = TestFactory.user_repository.search_for_connected_users('Gregor');
+        const result = TestFactory.user_repository.search_for_connected_users(
+          'Gregor'
+        );
         expect(result.length).toBe(1);
         expect(result[0].id).toBe(user_et_b.id);
       });
 
       it('finds the correct user by searching for the full name (transliteration)', function() {
-        const result = TestFactory.user_repository.search_for_connected_users('Rene');
+        const result = TestFactory.user_repository.search_for_connected_users(
+          'Rene'
+        );
         expect(result.length).toBe(1);
         expect(result[0].id).toBe(user_et_a.id);
       });
 
       it('finds the correct user by searching for the username', function() {
-        const result = TestFactory.user_repository.search_for_connected_users('foo');
+        const result = TestFactory.user_repository.search_for_connected_users(
+          'foo'
+        );
         expect(result.length).toBe(1);
         expect(result[0].id).toBe(user_et_a.id);
       });
 
       it('finds the correct users', function() {
-        const result = TestFactory.user_repository.search_for_connected_users('e');
+        const result = TestFactory.user_repository.search_for_connected_users(
+          'e'
+        );
         expect(result.length).toBe(2);
         expect(result[0].id).toBe(user_et_b.id);
         expect(result[1].id).toBe(user_et_a.id);
@@ -296,9 +337,10 @@ describe('z.user.UserRepository', function() {
               [entities.user.jane_roe.id]: [plain_client],
             };
 
-            spyOn(TestFactory.client_repository, 'get_all_clients_from_db').and.returnValue(
-              Promise.resolve(user_client_map)
-            );
+            spyOn(
+              TestFactory.client_repository,
+              'get_all_clients_from_db'
+            ).and.returnValue(Promise.resolve(user_client_map));
             done();
           })
           .catch(done.fail);
@@ -312,12 +354,20 @@ describe('z.user.UserRepository', function() {
         TestFactory.user_repository
           ._assign_all_clients()
           .then(function() {
-            expect(TestFactory.client_repository.get_all_clients_from_db).toHaveBeenCalled();
+            expect(
+              TestFactory.client_repository.get_all_clients_from_db
+            ).toHaveBeenCalled();
             expect(user_jane_roe.devices().length).toBe(1);
-            expect(user_jane_roe.devices()[0].id).toBe(entities.clients.jane_roe.plain.id);
+            expect(user_jane_roe.devices()[0].id).toBe(
+              entities.clients.jane_roe.plain.id
+            );
             expect(user_john_doe.devices().length).toBe(2);
-            expect(user_john_doe.devices()[0].id).toBe(entities.clients.john_doe.permanent.id);
-            expect(user_john_doe.devices()[1].id).toBe(entities.clients.john_doe.temporary.id);
+            expect(user_john_doe.devices()[0].id).toBe(
+              entities.clients.john_doe.permanent.id
+            );
+            expect(user_john_doe.devices()[1].id).toBe(
+              entities.clients.john_doe.temporary.id
+            );
             done();
           })
           .catch(done.fail);
@@ -327,11 +377,11 @@ describe('z.user.UserRepository', function() {
     describe('verify_usernames', function() {
       it('resolves with username when username is not taken', function(done) {
         const usernames = ['john_doe'];
-        server.respondWith('POST', `${test_factory.settings.connection.rest_url}/users/handles`, [
-          200,
-          {'Content-Type': 'application/json'},
-          JSON.stringify(usernames),
-        ]);
+        server.respondWith(
+          'POST',
+          `${test_factory.settings.connection.rest_url}/users/handles`,
+          [200, {'Content-Type': 'application/json'}, JSON.stringify(usernames)]
+        );
 
         TestFactory.user_repository
           .verify_usernames(usernames)
@@ -344,11 +394,11 @@ describe('z.user.UserRepository', function() {
 
       it('rejects when username is taken', function(done) {
         const usernames = ['john_doe'];
-        server.respondWith('POST', `${test_factory.settings.connection.rest_url}/users/handles`, [
-          200,
-          {'Content-Type': 'application/json'},
-          JSON.stringify([]),
-        ]);
+        server.respondWith(
+          'POST',
+          `${test_factory.settings.connection.rest_url}/users/handles`,
+          [200, {'Content-Type': 'application/json'}, JSON.stringify([])]
+        );
 
         TestFactory.user_repository
           .verify_usernames(usernames)
@@ -363,11 +413,12 @@ describe('z.user.UserRepository', function() {
     describe('verify_username', function() {
       it('resolves with username when username is not taken', function(done) {
         const username = 'john_doe';
-        server.respondWith('HEAD', `${test_factory.settings.connection.rest_url}/users/handles/${username}`, [
-          404,
-          {},
-          '',
-        ]);
+        server.respondWith(
+          'HEAD',
+          `${test_factory.settings.connection
+            .rest_url}/users/handles/${username}`,
+          [404, {}, '']
+        );
 
         TestFactory.user_repository
           .verify_username(username)
@@ -380,13 +431,17 @@ describe('z.user.UserRepository', function() {
 
       it('rejects when username is taken', function(done) {
         const username = 'john_doe';
-        server.respondWith('HEAD', `${test_factory.settings.connection.rest_url}/users/handles/${username}`, [
-          200,
-          {},
-          '',
-        ]);
+        server.respondWith(
+          'HEAD',
+          `${test_factory.settings.connection
+            .rest_url}/users/handles/${username}`,
+          [200, {}, '']
+        );
 
-        TestFactory.user_repository.verify_username(username).then(done.fail).catch(done);
+        TestFactory.user_repository
+          .verify_username(username)
+          .then(done.fail)
+          .catch(done);
       });
     });
   });

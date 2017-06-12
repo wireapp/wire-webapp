@@ -36,7 +36,9 @@ describe('z.audio.AudioRepository', function() {
 
   describe('_check_sound_setting', function() {
     beforeAll(function() {
-      TestFactory.audio_repository.audio_preference(z.audio.AudioPreference.SOME);
+      TestFactory.audio_repository.audio_preference(
+        z.audio.AudioPreference.SOME
+      );
     });
 
     it('plays a sound that should be played', function(done) {
@@ -47,11 +49,14 @@ describe('z.audio.AudioRepository', function() {
     });
 
     it('ignores a sound that should not be played', function(done) {
-      TestFactory.audio_repository._check_sound_setting(z.audio.AudioType.ALERT).then(done.fail).catch(function(error) {
-        expect(error).toEqual(jasmine.any(z.audio.AudioError));
-        expect(error.type).toBe(z.audio.AudioError.TYPE.IGNORED_SOUND);
-        done();
-      });
+      TestFactory.audio_repository
+        ._check_sound_setting(z.audio.AudioType.ALERT)
+        .then(done.fail)
+        .catch(function(error) {
+          expect(error).toEqual(jasmine.any(z.audio.AudioError));
+          expect(error.type).toBe(z.audio.AudioError.TYPE.IGNORED_SOUND);
+          done();
+        });
     });
   });
 
@@ -67,30 +72,37 @@ describe('z.audio.AudioRepository', function() {
     });
 
     it('handles a missing sound', function(done) {
-      TestFactory.audio_repository._get_sound_by_id('foo').then(done.fail).catch(function(error) {
-        expect(error).toEqual(jasmine.any(z.audio.AudioError));
-        expect(error.type).toBe(z.audio.AudioError.TYPE.NOT_FOUND);
-        done();
-      });
+      TestFactory.audio_repository
+        ._get_sound_by_id('foo')
+        .then(done.fail)
+        .catch(function(error) {
+          expect(error).toEqual(jasmine.any(z.audio.AudioError));
+          expect(error.type).toBe(z.audio.AudioError.TYPE.NOT_FOUND);
+          done();
+        });
     });
   });
 
   xdescribe('_play', function() {
     beforeEach(function() {
-      TestFactory.audio_repository.audio_elements[z.audio.AudioType.OUTGOING_CALL] = new Audio(
-        `/audio/${z.audio.AudioType.OUTGOING_CALL}.mp3`
-      );
+      TestFactory.audio_repository.audio_elements[
+        z.audio.AudioType.OUTGOING_CALL
+      ] = new Audio(`/audio/${z.audio.AudioType.OUTGOING_CALL}.mp3`);
     });
 
     afterEach(function() {
-      TestFactory.audio_repository.audio_elements[z.audio.AudioType.OUTGOING_CALL].pause();
+      TestFactory.audio_repository.audio_elements[
+        z.audio.AudioType.OUTGOING_CALL
+      ].pause();
     });
 
     it('plays an available sound', function(done) {
       TestFactory.audio_repository
         ._play(
           z.audio.AudioType.OUTGOING_CALL,
-          TestFactory.audio_repository.audio_elements[z.audio.AudioType.OUTGOING_CALL],
+          TestFactory.audio_repository.audio_elements[
+            z.audio.AudioType.OUTGOING_CALL
+          ],
           false
         )
         .then(function(audio_element) {
@@ -105,7 +117,9 @@ describe('z.audio.AudioRepository', function() {
       TestFactory.audio_repository
         ._play(
           z.audio.AudioType.OUTGOING_CALL,
-          TestFactory.audio_repository.audio_elements[z.audio.AudioType.OUTGOING_CALL],
+          TestFactory.audio_repository.audio_elements[
+            z.audio.AudioType.OUTGOING_CALL
+          ],
           true
         )
         .then(function(audio_element) {
@@ -117,12 +131,16 @@ describe('z.audio.AudioRepository', function() {
     });
 
     it('does not play a sound twice concurrently', function(done) {
-      TestFactory.audio_repository.audio_elements[z.audio.AudioType.OUTGOING_CALL]
+      TestFactory.audio_repository.audio_elements[
+        z.audio.AudioType.OUTGOING_CALL
+      ]
         .play()
         .then(function() {
           TestFactory.audio_repository._play(
             z.audio.AudioType.OUTGOING_CALL,
-            TestFactory.audio_repository.audio_elements[z.audio.AudioType.OUTGOING_CALL]
+            TestFactory.audio_repository.audio_elements[
+              z.audio.AudioType.OUTGOING_CALL
+            ]
           );
         })
         .then(done.fail)
@@ -136,7 +154,12 @@ describe('z.audio.AudioRepository', function() {
 
     it('handles a missing audio id sound', function(done) {
       TestFactory.audio_repository
-        ._play(undefined, TestFactory.audio_repository.audio_elements[z.audio.AudioType.OUTGOING_CALL])
+        ._play(
+          undefined,
+          TestFactory.audio_repository.audio_elements[
+            z.audio.AudioType.OUTGOING_CALL
+          ]
+        )
         .catch(function(error) {
           expect(error).toEqual(jasmine.any(z.audio.AudioError));
           expect(error.type).toBe(z.audio.AudioError.TYPE.NOT_FOUND);

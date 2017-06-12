@@ -25,7 +25,9 @@ module.exports = grunt => {
   grunt.registerTask('aws_deploy', () => {
     grunt.task.run('init');
 
-    const target = grunt.option('target' || grunt.config('gitinfo.local.branch.current.name'));
+    const target = grunt.option(
+      'target' || grunt.config('gitinfo.local.branch.current.name')
+    );
 
     if (target === 'prod') {
       grunt.task.run('prepare_prod');
@@ -40,10 +42,17 @@ module.exports = grunt => {
       'aws.deploy.options.application_versions',
       'https://eu-west-1.console.aws.amazon.com/elasticbeanstalk/home?region=eu-west-1#/application/versions?applicationName=Webapp'
     );
-    grunt.task.run('aws_prepare', 'aws_s3:default', 'shell:aws_deploy', 'open:ebs');
+    grunt.task.run(
+      'aws_prepare',
+      'aws_s3:default',
+      'shell:aws_deploy',
+      'open:ebs'
+    );
   });
 
-  grunt.registerTask('aws_version_file', () => grunt.file.write(path.join('aws', 'version'), grunt.option('version')));
+  grunt.registerTask('aws_version_file', () =>
+    grunt.file.write(path.join('aws', 'version'), grunt.option('version'))
+  );
 
   grunt.registerTask('aws_prepare', [
     'aws_version_file',
@@ -54,5 +63,11 @@ module.exports = grunt => {
     'clean:aws_s3',
     'compress:aws',
   ]);
-  grunt.registerTask('aws_run', ['init', 'prepare_prod', 'aws_prepare', 'open:aws', 'shell:aws']);
+  grunt.registerTask('aws_run', [
+    'init',
+    'prepare_prod',
+    'aws_prepare',
+    'open:aws',
+    'shell:aws',
+  ]);
 };

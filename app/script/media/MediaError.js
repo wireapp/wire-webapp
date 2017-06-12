@@ -62,10 +62,12 @@ z.media.MediaError = class MediaError extends Error {
     return {
       MEDIA_STREAM_DEVICE: 'z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE',
       MEDIA_STREAM_MISC: 'z.media.MediaError.TYPE.MEDIA_STREAM_MISC',
-      MEDIA_STREAM_PERMISSION: 'z.media.MediaError.TYPE.MEDIA_STREAM_PERMISSION',
+      MEDIA_STREAM_PERMISSION:
+        'z.media.MediaError.TYPE.MEDIA_STREAM_PERMISSION',
       NO_AUDIO_STREAM_FOUND: 'z.media.MediaError.TYPE.NO_AUDIO_STREAM_FOUND',
       NO_MEDIA_DEVICES_FOUND: 'z.media.MediaError.TYPE.NO_MEDIA_DEVICES_FOUND',
-      NO_VIDEO_INPUT_DEVICE_FOUND: 'z.media.MediaError.TYPE.NO_VIDEO_INPUT_DEVICE_FOUND',
+      NO_VIDEO_INPUT_DEVICE_FOUND:
+        'z.media.MediaError.TYPE.NO_VIDEO_INPUT_DEVICE_FOUND',
       SCREEN_NOT_SUPPORTED: 'z.media.MediaError.TYPE.SCREEN_NOT_SUPPORTED',
       UNHANDLED_MEDIA_TYPE: 'z.media.MediaError.UNHANDLED_MEDIA_TYPE',
       UNKNOWN: 'z.media.MediaError.TYPE.UNKNOWN',

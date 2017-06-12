@@ -27,7 +27,8 @@ module.exports = {
   deploy: {
     files: [
       {
-        '<%= dir.deploy %>/style/auth.css': '<%= dir.app.style %>/auth/auth.less',
+        '<%= dir.deploy %>/style/auth.css':
+          '<%= dir.app.style %>/auth/auth.less',
         '<%= dir.deploy %>/style/main.css': '<%= dir.app.style %>/main.less',
       },
     ],

@@ -31,7 +31,10 @@ z.components.VideoAssetComponent = class VideoAssetComponent {
    * @param {Object} component_info - Component information
    */
   constructor(params, component_info) {
-    this.logger = new z.util.Logger('VideoAssetComponent', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger(
+      'VideoAssetComponent',
+      z.config.LOGGER.OPTIONS
+    );
 
     this.message = ko.unwrap(params.message);
     this.asset = this.message.get_first_asset();
@@ -46,12 +49,16 @@ z.components.VideoAssetComponent = class VideoAssetComponent {
     this.video_playback_error = ko.observable(false);
     this.show_bottom_controls = ko.observable(false);
 
-    this.video_time_rest = ko.pureComputed(() => this.video_element.duration - this.video_time());
+    this.video_time_rest = ko.pureComputed(
+      () => this.video_element.duration - this.video_time()
+    );
 
     if (this.asset.preview_resource()) {
       this._load_video_preview();
     } else {
-      this.preview_subscription = this.asset.preview_resource.subscribe(this._load_video_preview.bind(this));
+      this.preview_subscription = this.asset.preview_resource.subscribe(
+        this._load_video_preview.bind(this)
+      );
     }
 
     this.on_play_button_clicked = this.on_play_button_clicked.bind(this);
@@ -60,7 +67,10 @@ z.components.VideoAssetComponent = class VideoAssetComponent {
 
   _load_video_preview() {
     this.asset.load_preview().then(blob => {
-      this.video_element.setAttribute('poster', window.URL.createObjectURL(blob));
+      this.video_element.setAttribute(
+        'poster',
+        window.URL.createObjectURL(blob)
+      );
       this.video_element.style.backgroundColor = '#000';
     });
   }
@@ -113,10 +123,22 @@ z.components.VideoAssetComponent = class VideoAssetComponent {
   _send_tracking_event() {
     const duration = Math.floor(this.video_element.duration);
 
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.PLAYED_VIDEO_MESSAGE, {
-      duration: z.util.bucket_values(duration, [0, 10, 30, 60, 300, 900, 1800]),
-      duration_actual: duration,
-    });
+    amplify.publish(
+      z.event.WebApp.ANALYTICS.EVENT,
+      z.tracking.EventName.MEDIA.PLAYED_VIDEO_MESSAGE,
+      {
+        duration: z.util.bucket_values(duration, [
+          0,
+          10,
+          30,
+          60,
+          300,
+          900,
+          1800,
+        ]),
+        duration_actual: duration,
+      }
+    );
   }
 
   dispose() {

@@ -112,6 +112,8 @@ z.calling.entities.CallMessage = class CallMessage {
    * @returns {string} Random char session ID of length CallMessage.CONFIG.SESSION_ID_LENGTH
    */
   _create_session_id() {
-    return _.range(CallMessage.CONFIG.SESSION_ID_LENGTH).map(() => z.util.StringUtil.get_random_character()).join('');
+    return _.range(CallMessage.CONFIG.SESSION_ID_LENGTH)
+      .map(() => z.util.StringUtil.get_random_character())
+      .join('');
   }
 };

@@ -69,10 +69,10 @@ rules:
   prefer-spread: 2
   prefer-template: 2
   prettier/prettier: [2, {
+      bracketSpacing: false,
+      printWidth: 80,
       singleQuote: true,
       trailingComma: es5,
-      bracketSpacing: false,
-      printWidth: 120
     }
   ]
   sort-keys: [2, asc, {caseSensitive: true, natural: true}]

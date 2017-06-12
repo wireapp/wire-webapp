@@ -31,7 +31,10 @@ window.z.cache = z.cache || {};
  */
 z.cache.CacheRepository = class CacheRepository {
   constructor() {
-    this.logger = new z.util.Logger('z.auth.CacheRepository', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger(
+      'z.auth.CacheRepository',
+      z.config.LOGGER.OPTIONS
+    );
   }
 
   /**
@@ -41,7 +44,10 @@ z.cache.CacheRepository = class CacheRepository {
    * @param {Array<string>} [protected_key_patterns=[z.storage.StorageKey.AUTH.SHOW_LOGIN]] - Keys which should NOT be deleted from the cache
    * @returns {Array<string>} Keys which have been deleted from the cache
    */
-  clear_cache(keep_conversation_input = false, protected_key_patterns = [z.storage.StorageKey.AUTH.SHOW_LOGIN]) {
+  clear_cache(
+    keep_conversation_input = false,
+    protected_key_patterns = [z.storage.StorageKey.AUTH.SHOW_LOGIN]
+  ) {
     const deleted_keys = [];
 
     if (keep_conversation_input) {

@@ -35,12 +35,17 @@ z.service.BackendClient = class BackendClient {
 
   static get CONNECTIVITY_CHECK_TRIGGER() {
     return {
-      ACCESS_TOKEN_REFRESH: 'BackendClient.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_REFRESH',
-      ACCESS_TOKEN_RETRIEVAL: 'BackendClient.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_RETRIEVAL',
-      APP_INIT_RELOAD: '.BackendClient.CONNECTIVITY_CHECK_TRIGGER.APP_INIT_RELOAD',
-      CONNECTION_REGAINED: 'BackendClient.CONNECTIVITY_CHECK_TRIGGER.CONNECTION_REGAINED',
+      ACCESS_TOKEN_REFRESH:
+        'BackendClient.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_REFRESH',
+      ACCESS_TOKEN_RETRIEVAL:
+        'BackendClient.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_RETRIEVAL',
+      APP_INIT_RELOAD:
+        '.BackendClient.CONNECTIVITY_CHECK_TRIGGER.APP_INIT_RELOAD',
+      CONNECTION_REGAINED:
+        'BackendClient.CONNECTIVITY_CHECK_TRIGGER.CONNECTION_REGAINED',
       LOGIN_REDIRECT: 'BackendClient.CONNECTIVITY_CHECK_TRIGGER.LOGIN_REDIRECT',
-      REQUEST_FAILURE: 'BackendClient.CONNECTIVITY_CHECK_TRIGGER.REQUEST_FAILURE',
+      REQUEST_FAILURE:
+        'BackendClient.CONNECTIVITY_CHECK_TRIGGER.REQUEST_FAILURE',
       UNKNOWN: 'BackendClient.CONNECTIVITY_CHECK_TRIGGER.UNKNOWN',
     };
   }
@@ -78,7 +83,10 @@ z.service.BackendClient = class BackendClient {
    * @param {string} settings.web_socket_url - Backend WebSocket URL
   */
   constructor(settings) {
-    this.logger = new z.util.Logger('z.service.BackendClient', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger(
+      'z.service.BackendClient',
+      z.config.LOGGER.OPTIONS
+    );
 
     z.util.Environment.backend.current = settings.environment;
     this.rest_url = settings.rest_url;
@@ -92,7 +100,9 @@ z.service.BackendClient = class BackendClient {
     this.request_queue = new z.util.PromiseQueue({
       name: 'BackendClient.Request',
     });
-    this.request_queue_blocked_state = ko.observable(z.service.RequestQueueBlockedState.NONE);
+    this.request_queue_blocked_state = ko.observable(
+      z.service.RequestQueueBlockedState.NONE
+    );
 
     this.access_token = '';
     this.access_token_type = '';
@@ -138,7 +148,9 @@ z.service.BackendClient = class BackendClient {
    * @param {BackendClient.CONNECTIVITY_CHECK_TRIGGER} [source=BackendClient.CONNECTIVITY_CHECK_TRIGGER.UNKNOWN] - Trigger that requested connectivity check
    * @returns {Promise} Resolves once the connectivity is verified
    */
-  execute_on_connectivity(source = BackendClient.CONNECTIVITY_CHECK_TRIGGER.UNKNOWN) {
+  execute_on_connectivity(
+    source = BackendClient.CONNECTIVITY_CHECK_TRIGGER.UNKNOWN
+  ) {
     this.logger.info(`Connectivity check requested by '${source}'`);
 
     const _check_status = () => {
@@ -150,7 +162,10 @@ z.service.BackendClient = class BackendClient {
         })
         .fail(jqXHR => {
           if (jqXHR.readyState === 4) {
-            this.logger.info(`Connectivity verified by server error '${jqXHR.status}'`, jqXHR);
+            this.logger.info(
+              `Connectivity verified by server error '${jqXHR.status}'`,
+              jqXHR
+            );
             this.connectivity_queue.pause(false);
             this.connectivity_timeout = undefined;
           } else {
@@ -165,7 +180,9 @@ z.service.BackendClient = class BackendClient {
     };
 
     this.connectivity_queue.pause();
-    const queued_promise = this.connectivity_queue.push(() => Promise.resolve());
+    const queued_promise = this.connectivity_queue.push(() =>
+      Promise.resolve()
+    );
     if (!this.connectivity_timeout) {
       this.connectivity_timeout = window.setTimeout(
         _check_status,
@@ -182,7 +199,9 @@ z.service.BackendClient = class BackendClient {
    */
   execute_request_queue() {
     if (this.access_token && this.request_queue.get_length()) {
-      this.logger.info(`Executing '${this.request_queue.get_length()}' queued requests`);
+      this.logger.info(
+        `Executing '${this.request_queue.get_length()}' queued requests`
+      );
       this.request_queue.pause(false);
     }
   }
@@ -225,8 +244,14 @@ z.service.BackendClient = class BackendClient {
    * @returns {Promise} Resolves when the request has been executed
    */
   send_request(config) {
-    if (this.request_queue_blocked_state() !== z.service.RequestQueueBlockedState.NONE) {
-      return this._push_to_request_queue(config, this.request_queue_blocked_state());
+    if (
+      this.request_queue_blocked_state() !==
+      z.service.RequestQueueBlockedState.NONE
+    ) {
+      return this._push_to_request_queue(
+        config,
+        this.request_queue_blocked_state()
+      );
     }
 
     return this._send_request(config);
@@ -241,7 +266,10 @@ z.service.BackendClient = class BackendClient {
    * @returns {Promise} Resolved when the request has been executed
    */
   _push_to_request_queue(config, reason) {
-    this.logger.info(`Adding '${config.type}' request to '${config.url}' to queue due to '${reason}'`, config);
+    this.logger.info(
+      `Adding '${config.type}' request to '${config.url}' to queue due to '${reason}'`,
+      config
+    );
     return this.request_queue.push(() => this._send_request(config));
   }
 
@@ -289,20 +317,33 @@ z.service.BackendClient = class BackendClient {
         })
         .fail(({responseJSON: response, status: status_code}) => {
           switch (status_code) {
-            case z.service.BackendClientError.STATUS_CODE.CONNECTIVITY_PROBLEM: {
+            case z.service.BackendClientError.STATUS_CODE
+              .CONNECTIVITY_PROBLEM: {
               this.request_queue.pause();
-              this.request_queue_blocked_state(z.service.RequestQueueBlockedState.CONNECTIVITY_PROBLEM);
+              this.request_queue_blocked_state(
+                z.service.RequestQueueBlockedState.CONNECTIVITY_PROBLEM
+              );
 
-              this._push_to_request_queue(config, this.request_queue_blocked_state()).then(resolve).catch(reject);
+              this._push_to_request_queue(
+                config,
+                this.request_queue_blocked_state()
+              )
+                .then(resolve)
+                .catch(reject);
 
               return this.execute_on_connectivity().then(() => {
-                this.request_queue_blocked_state(z.service.RequestQueueBlockedState.NONE);
+                this.request_queue_blocked_state(
+                  z.service.RequestQueueBlockedState.NONE
+                );
                 this.execute_request_queue();
               });
             }
 
             case z.service.BackendClientError.STATUS_CODE.UNAUTHORIZED: {
-              this._push_to_request_queue(config, z.service.RequestQueueBlockedState.ACCESS_TOKEN_REFRESH)
+              this._push_to_request_queue(
+                config,
+                z.service.RequestQueueBlockedState.ACCESS_TOKEN_REFRESH
+              )
                 .then(resolve)
                 .catch(reject);
               return amplify.publish(
@@ -313,10 +354,14 @@ z.service.BackendClient = class BackendClient {
 
             case z.service.BackendClientError.STATUS_CODE.FORBIDDEN: {
               if (response) {
-                if (BackendClient.IGNORED_BACKEND_LABELS.includes(response.label)) {
+                if (
+                  BackendClient.IGNORED_BACKEND_LABELS.includes(response.label)
+                ) {
                   this.logger.warn(`Server request failed: ${response.label}`);
                 } else {
-                  Raygun.send(new Error(`Server request failed: ${response.label}`));
+                  Raygun.send(
+                    new Error(`Server request failed: ${response.label}`)
+                  );
                 }
               }
               break;
@@ -328,7 +373,9 @@ z.service.BackendClient = class BackendClient {
               }
             }
           }
-          return reject(response || new z.service.BackendClientError(status_code));
+          return reject(
+            response || new z.service.BackendClientError(status_code)
+          );
         });
     });
   }

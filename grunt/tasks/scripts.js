@@ -39,7 +39,9 @@ module.exports = grunt => {
           current_files = grunt.config('scripts_minified');
           current_files[target].push(`deploy${source}`);
           grunt.config('scripts_minified', current_files);
-          grunt.log.writeln(`Minified script '${source}' for target '${target}' will not get uglified.`);
+          grunt.log.writeln(
+            `Minified script '${source}' for target '${target}' will not get uglified.`
+          );
         } else {
           current_files = grunt.config('scripts');
           current_files[target].push(`deploy${source}`);

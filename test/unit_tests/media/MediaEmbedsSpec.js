@@ -34,7 +34,8 @@ describe('MediaEmbeds', function() {
     expect(`www.${site}.com`.match(re)).toBe(null);
   };
 
-  const build_message_with_anchor = link => `<a href="${link}" target="_blank" rel="nofollow">${link}</a>`;
+  const build_message_with_anchor = link =>
+    `<a href="${link}" target="_blank" rel="nofollow">${link}</a>`;
 
   const build_youtube_iframe = function(link) {
     const embed_url = z.media.MediaEmbeds.generate_youtube_embed_url(link);
@@ -67,17 +68,33 @@ describe('MediaEmbeds', function() {
       const re_spotify = regex.spotify;
 
       it('should match valid Spotify URLs', function() {
-        expect('https://play.spotify.com/artist/7Ln80lUS6He07XvHI8qqHH'.match(re_spotify)).not.toBeNull();
-        expect('https://open.spotify.com/track/26fwlVGkISUr5P91hAeTW8'.match(re_spotify)).not.toBeNull();
-        expect('https://open.spotify.com/album/7iN0r7Sl624EkOUNUCOGu9'.match(re_spotify)).not.toBeNull();
         expect(
-          'https://open.spotify.com/user/1123867741/playlist/2w63WroxrrIbNg4WIxdoBn'.match(re_spotify)
+          'https://play.spotify.com/artist/7Ln80lUS6He07XvHI8qqHH'.match(
+            re_spotify
+          )
+        ).not.toBeNull();
+        expect(
+          'https://open.spotify.com/track/26fwlVGkISUr5P91hAeTW8'.match(
+            re_spotify
+          )
+        ).not.toBeNull();
+        expect(
+          'https://open.spotify.com/album/7iN0r7Sl624EkOUNUCOGu9'.match(
+            re_spotify
+          )
+        ).not.toBeNull();
+        expect(
+          'https://open.spotify.com/user/1123867741/playlist/2w63WroxrrIbNg4WIxdoBn'.match(
+            re_spotify
+          )
         ).not.toBeNull();
       });
 
       // since this is not a link it will not render
       xit('matches spotify:track:3EpA2bm37w6ho1iPn9YFQ8', function() {
-        expect('spotify:track:3EpA2bm37w6ho1iPn9YFQ8'.match(re_spotify)).not.toBeNull();
+        expect(
+          'spotify:track:3EpA2bm37w6ho1iPn9YFQ8'.match(re_spotify)
+        ).not.toBeNull();
       });
 
       it('doesn’t match normal Spotify links', function() {
@@ -89,15 +106,27 @@ describe('MediaEmbeds', function() {
       const re_soundcloud = regex.soundcloud;
 
       it('should match valid SoundCloud URLs', function() {
-        expect('https://soundcloud.com/ago_music/ago-royal-oats-ft-waldo-prod'.match(re_soundcloud)).not.toBeNull();
         expect(
-          'https://soundcloud.com/onedirectionmusic/sets/liams-you-i-remix-playlist'.match(re_soundcloud)
+          'https://soundcloud.com/ago_music/ago-royal-oats-ft-waldo-prod'.match(
+            re_soundcloud
+          )
         ).not.toBeNull();
-        expect('https://soundcloud.com/groups/playlist-digital-sintonia'.match(re_soundcloud)).not.toBeNull();
+        expect(
+          'https://soundcloud.com/onedirectionmusic/sets/liams-you-i-remix-playlist'.match(
+            re_soundcloud
+          )
+        ).not.toBeNull();
+        expect(
+          'https://soundcloud.com/groups/playlist-digital-sintonia'.match(
+            re_soundcloud
+          )
+        ).not.toBeNull();
       });
 
       it('doesn’t match https://soundcloud.com/dp-conference', function() {
-        expect('https://soundcloud.com/dp-conference'.match(re_soundcloud)).toBeNull();
+        expect(
+          'https://soundcloud.com/dp-conference'.match(re_soundcloud)
+        ).toBeNull();
       });
 
       it('doesn’t match normal SoundCloud links', function() {
@@ -121,7 +150,8 @@ describe('MediaEmbeds', function() {
   describe('iframe creation', function() {
     describe('no rich media content', function() {
       it('renders a normal link', function() {
-        const message = '<a href="https://www.google.com" target="_blank" rel="nofollow">https://www.google.com</a>';
+        const message =
+          '<a href="https://www.google.com" target="_blank" rel="nofollow">https://www.google.com</a>';
         expect(z.media.MediaParser.render_media_embeds(message)).toBe(message);
       });
 
@@ -148,14 +178,16 @@ describe('MediaEmbeds', function() {
       });
 
       it('https://www.youtube-nocookie.com/playlist?list=PLNy867I3fkD6LqNQdk5rAPb6xAI-SbZOd', function() {
-        const link = 'https://www.youtube-nocookie.com/playlist?list=PLNy867I3fkD6LqNQdk5rAPb6xAI-SbZOd';
+        const link =
+          'https://www.youtube-nocookie.com/playlist?list=PLNy867I3fkD6LqNQdk5rAPb6xAI-SbZOd';
         const message = build_message_with_anchor(link);
 
         expect(z.media.MediaParser.render_media_embeds(message)).toBe(message);
       });
 
       it('renders link with params (http://www.youtube-nocookie.com/watch?v=6o-nmK9WRGE&feature=player_embedded)', function() {
-        const link = 'http://www.youtube-nocookie.com/watch?v=6o-nmK9WRGE&feature=player_embedded';
+        const link =
+          'http://www.youtube-nocookie.com/watch?v=6o-nmK9WRGE&feature=player_embedded';
 
         const message = build_message_with_anchor(link);
         const iframe = build_youtube_iframe(link);
@@ -164,7 +196,8 @@ describe('MediaEmbeds', function() {
       });
 
       it('renders link with params (http://www.youtube-nocookie.com/watch?v=0zM3nApSvMg&feature=feedrec_grec_index)', function() {
-        const link = 'http://www.youtube-nocookie.com/watch?v=0zM3nApSvMg&feature=feedrec_grec_index';
+        const link =
+          'http://www.youtube-nocookie.com/watch?v=0zM3nApSvMg&feature=feedrec_grec_index';
 
         const message = build_message_with_anchor(link);
         const iframe = build_youtube_iframe(link);
@@ -173,7 +206,8 @@ describe('MediaEmbeds', function() {
       });
 
       it('renders link with params (http://www.youtube-nocookie.com/v/0zM3nApSvMg?fs=1&hl=en_US&rel=0)', function() {
-        const link = 'http://www.youtube-nocookie.com/v/0zM3nApSvMg?fs=1&hl=en_US&rel=0';
+        const link =
+          'http://www.youtube-nocookie.com/v/0zM3nApSvMg?fs=1&hl=en_US&rel=0';
 
         const message = build_message_with_anchor(link);
         const iframe = build_youtube_iframe(link);
@@ -182,7 +216,8 @@ describe('MediaEmbeds', function() {
       });
 
       it('renders link with timestamp (http://www.youtube-nocookie.com/watch?v=0zM3nApSvMg#t=0m10s)', function() {
-        const link = 'http://www.youtube-nocookie.com/watch?v=0zM3nApSvMg#t=0m10s';
+        const link =
+          'http://www.youtube-nocookie.com/watch?v=0zM3nApSvMg#t=0m10s';
 
         const message = build_message_with_anchor(link);
         const iframe = build_youtube_iframe(link);
@@ -190,7 +225,8 @@ describe('MediaEmbeds', function() {
       });
 
       it('renders link with timestamp inverted (https://www.youtube-nocookie.com/watch?t=125&v=CfEWiV8PoZo)', function() {
-        const link = 'https://www.youtube-nocookie.com/watch?t=125&v=CfEWiV8PoZo';
+        const link =
+          'https://www.youtube-nocookie.com/watch?t=125&v=CfEWiV8PoZo';
 
         const message = build_message_with_anchor(link);
         const iframe = build_youtube_iframe(link);
@@ -225,7 +261,8 @@ describe('MediaEmbeds', function() {
       });
 
       it('renders a short link playlist (https://youtu.be/oL1xf_X0W2s?list=PLuKg-WhduhkmIcFMN7wxfVWYu8qnk0jMN)', function() {
-        const link = 'https://youtu.be/oL1xf_X0W2s?list=PLuKg-WhduhkmIcFMN7wxfVWYu8qnk0jMN';
+        const link =
+          'https://youtu.be/oL1xf_X0W2s?list=PLuKg-WhduhkmIcFMN7wxfVWYu8qnk0jMN';
 
         const message = build_message_with_anchor(link);
         const iframe = build_youtube_iframe(link);
@@ -243,7 +280,8 @@ describe('MediaEmbeds', function() {
       });
 
       it('renders another mobile link (https://www.youtube-nocookie.com/watch?v=1w4Gf97q2oU&feature=youtu.be)', function() {
-        const link = 'https://www.youtube-nocookie.com/watch?v=1w4Gf97q2oU&feature=youtu.be';
+        const link =
+          'https://www.youtube-nocookie.com/watch?v=1w4Gf97q2oU&feature=youtu.be';
 
         const message = build_message_with_anchor(link);
         const iframe = build_youtube_iframe(link);
@@ -260,7 +298,8 @@ describe('MediaEmbeds', function() {
       });
 
       it('removes autoplay param from url (https://www.youtube-nocookie.com/watch?v=oHg5SJYRHA0&autoplay=1)', function() {
-        const link = 'https://www.youtube-nocookie.com/watch?v=oHg5SJYRHA0&autoplay=1';
+        const link =
+          'https://www.youtube-nocookie.com/watch?v=oHg5SJYRHA0&autoplay=1';
 
         const message = build_message_with_anchor(link);
         const iframe =
@@ -270,7 +309,8 @@ describe('MediaEmbeds', function() {
       });
 
       return it('removes autoplay param from url (https://www.youtube-nocookie.com/watch?autoplay=1&v=oHg5SJYRHA0)', function() {
-        const link = 'https://www.youtube-nocookie.com/watch?autoplay=1&v=oHg5SJYRHA0';
+        const link =
+          'https://www.youtube-nocookie.com/watch?autoplay=1&v=oHg5SJYRHA0';
 
         const message = build_message_with_anchor(link);
         const iframe =
@@ -282,7 +322,8 @@ describe('MediaEmbeds', function() {
 
     describe('SoundCloud', function() {
       it('renders a track (https://soundcloud.com/ago_music/ago-royal-oats-ft-waldo-prod)', function() {
-        const link = 'https://soundcloud.com/ago_music/ago-royal-oats-ft-waldo-prod';
+        const link =
+          'https://soundcloud.com/ago_music/ago-royal-oats-ft-waldo-prod';
 
         const message = build_message_with_anchor(link);
         const iframe = build_soundcloud_iframe_for_tracks(link);
@@ -291,7 +332,8 @@ describe('MediaEmbeds', function() {
       });
 
       it('renders a playlist (https://soundcloud.com/onedirectionmusic/sets/liams-you-i-remix-playlist)', function() {
-        const link = 'https://soundcloud.com/onedirectionmusic/sets/liams-you-i-remix-playlist';
+        const link =
+          'https://soundcloud.com/onedirectionmusic/sets/liams-you-i-remix-playlist';
 
         const message = build_message_with_anchor(link);
         const iframe = build_soundcloud_iframe_for_playlists(link);
@@ -300,12 +342,16 @@ describe('MediaEmbeds', function() {
       });
 
       it('renders profiles without embeds (https://soundcloud.com/dp-conference)', function() {
-        const message = build_message_with_anchor('https://soundcloud.com/dp-conference');
+        const message = build_message_with_anchor(
+          'https://soundcloud.com/dp-conference'
+        );
         expect(z.media.MediaParser.render_media_embeds(message)).toBe(message);
       });
 
       it('renders profiles without embeds even if profiles have a trailing slash (https://soundcloud.com/dp-conference/)', function() {
-        const message = build_message_with_anchor('https://soundcloud.com/dp-conference/');
+        const message = build_message_with_anchor(
+          'https://soundcloud.com/dp-conference/'
+        );
         expect(z.media.MediaParser.render_media_embeds(message)).toBe(message);
       });
 
@@ -319,7 +365,8 @@ describe('MediaEmbeds', function() {
       });
 
       it('renders a track without trailing slash (https://soundcloud.com/florian-paetzold/limp-bizkit-my-way-florian-paetzold-remix-free-download)', function() {
-        const link = 'https://soundcloud.com/florian-paetzold/limp-bizkit-my-way-florian-paetzold-remix-free-download';
+        const link =
+          'https://soundcloud.com/florian-paetzold/limp-bizkit-my-way-florian-paetzold-remix-free-download';
 
         const message = build_message_with_anchor(link);
         const iframe = build_soundcloud_iframe_for_tracks(link);
@@ -328,7 +375,8 @@ describe('MediaEmbeds', function() {
       });
 
       it('renders a track with trailing slash (https://soundcloud.com/florian-paetzold/limp-bizkit-my-way-florian-paetzold-remix-free-download/)', function() {
-        const link = 'https://soundcloud.com/florian-paetzold/limp-bizkit-my-way-florian-paetzold-remix-free-download/';
+        const link =
+          'https://soundcloud.com/florian-paetzold/limp-bizkit-my-way-florian-paetzold-remix-free-download/';
 
         const message = build_message_with_anchor(link);
         const iframe = build_soundcloud_iframe_for_tracks(link);
@@ -337,7 +385,8 @@ describe('MediaEmbeds', function() {
       });
 
       return it('doesn’t render links which cannot be rendered (https://soundcloud.com/fdvm/lulleaux-fdvm-up-to-you-original-mix/recommended)', function() {
-        const link = 'https://soundcloud.com/fdvm/lulleaux-fdvm-up-to-you-original-mix/recommended';
+        const link =
+          'https://soundcloud.com/fdvm/lulleaux-fdvm-up-to-you-original-mix/recommended';
         const message = `<a href="${link}" target="_blank" rel="nofollow">${link}</a>`;
         expect(z.media.MediaParser.render_media_embeds(message)).toBe(message);
       });
@@ -345,7 +394,8 @@ describe('MediaEmbeds', function() {
 
     describe('Spotify', function() {
       it('renders artists (https://open.spotify.com/user/1123867741/playlist/2w63WroxrrIbNg4WIxdoBn)', function() {
-        const link = 'https://open.spotify.com/user/1123867741/playlist/2w63WroxrrIbNg4WIxdoBn';
+        const link =
+          'https://open.spotify.com/user/1123867741/playlist/2w63WroxrrIbNg4WIxdoBn';
         const partial_link = 'user/1123867741/playlist/2w63WroxrrIbNg4WIxdoBn';
 
         const message = build_message_with_anchor(link);
@@ -375,7 +425,8 @@ describe('MediaEmbeds', function() {
       });
 
       it('renders playlist (https://open.spotify.com/user/1123867741/playlist/2w63WroxrrIbNg4WIxdoBn)', function() {
-        const link = 'https://open.spotify.com/user/1123867741/playlist/2w63WroxrrIbNg4WIxdoBn';
+        const link =
+          'https://open.spotify.com/user/1123867741/playlist/2w63WroxrrIbNg4WIxdoBn';
         const partial_link = 'user/1123867741/playlist/2w63WroxrrIbNg4WIxdoBn';
 
         const message = build_message_with_anchor(link);
@@ -404,47 +455,70 @@ describe('MediaEmbeds', function() {
         const message = build_message_with_anchor(link);
         const iframe = build_vimeo_iframe(link, id);
 
-        expect(z.media.MediaParser.render_media_embeds(message, '#333')).toBe(iframe);
+        expect(z.media.MediaParser.render_media_embeds(message, '#333')).toBe(
+          iframe
+        );
       });
 
       it('doesn’t render user https://vimeo.com/user38597062', function() {
-        const message = build_message_with_anchor('https://vimeo.com/user38597062');
-        expect(z.media.MediaParser.render_media_embeds(message, '#333')).toBe(message);
+        const message = build_message_with_anchor(
+          'https://vimeo.com/user38597062'
+        );
+        expect(z.media.MediaParser.render_media_embeds(message, '#333')).toBe(
+          message
+        );
       });
 
       return it('renders link with params (https://vimeo.com/channels/staffpicks/127053285?utm_source=social&utm_campaign=9914)', function() {
         const id = '127053285';
-        const link = 'https://vimeo.com/channels/staffpicks/127053285?utm_source=social&utm_campaign=9914';
+        const link =
+          'https://vimeo.com/channels/staffpicks/127053285?utm_source=social&utm_campaign=9914';
 
         const message = build_message_with_anchor(link);
         const iframe = build_vimeo_iframe(link, id);
 
-        expect(z.media.MediaParser.render_media_embeds(message, '#333')).toBe(iframe);
+        expect(z.media.MediaParser.render_media_embeds(message, '#333')).toBe(
+          iframe
+        );
       });
     });
   });
 
   describe('convert_youtube_timestamp_to_seconds', function() {
     it('doesn´t convert timestamp that only contains numbers', function() {
-      expect(z.media.MediaEmbeds.convert_youtube_timestamp_to_seconds('125')).toBe(125);
+      expect(
+        z.media.MediaEmbeds.convert_youtube_timestamp_to_seconds('125')
+      ).toBe(125);
     });
 
     it('converts timestamp with only seconds', function() {
-      expect(z.media.MediaEmbeds.convert_youtube_timestamp_to_seconds('25s')).toBe(25);
+      expect(
+        z.media.MediaEmbeds.convert_youtube_timestamp_to_seconds('25s')
+      ).toBe(25);
     });
 
     it('converts timestamp with only minutes and seconds', function() {
-      expect(z.media.MediaEmbeds.convert_youtube_timestamp_to_seconds('31m08s')).toBe(1868);
+      expect(
+        z.media.MediaEmbeds.convert_youtube_timestamp_to_seconds('31m08s')
+      ).toBe(1868);
     });
 
     it('converts timestamp with hours, minutes and seconds', function() {
-      expect(z.media.MediaEmbeds.convert_youtube_timestamp_to_seconds('1h1m1s')).toBe(3661);
+      expect(
+        z.media.MediaEmbeds.convert_youtube_timestamp_to_seconds('1h1m1s')
+      ).toBe(3661);
     });
 
     it('converts invalid values to 0', function() {
-      expect(z.media.MediaEmbeds.convert_youtube_timestamp_to_seconds('hms')).toBe(0);
-      expect(z.media.MediaEmbeds.convert_youtube_timestamp_to_seconds(null)).toBe(0);
-      expect(z.media.MediaEmbeds.convert_youtube_timestamp_to_seconds()).toBe(0);
+      expect(
+        z.media.MediaEmbeds.convert_youtube_timestamp_to_seconds('hms')
+      ).toBe(0);
+      expect(
+        z.media.MediaEmbeds.convert_youtube_timestamp_to_seconds(null)
+      ).toBe(0);
+      expect(z.media.MediaEmbeds.convert_youtube_timestamp_to_seconds()).toBe(
+        0
+      );
     });
   });
 });

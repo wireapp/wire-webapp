@@ -44,7 +44,9 @@ describe('PromiseQueue', function() {
         .catch(done.fail);
     });
 
-    it('should process promises that are added during execution', function(done) {
+    it('should process promises that are added during execution', function(
+      done
+    ) {
       let counter = 0;
       const result = [];
 
@@ -79,14 +81,17 @@ describe('PromiseQueue', function() {
     it('should process promises even when one of them rejects', function(done) {
       const resolving_promise = () => Promise.resolve();
 
-      const rejecting_promise = () => Promise.reject(new Error('Unit test error'));
+      const rejecting_promise = () =>
+        Promise.reject(new Error('Unit test error'));
 
       const queue = new z.util.PromiseQueue();
       queue.push(rejecting_promise);
       queue.push(resolving_promise).then(done).catch(done.fail);
     });
 
-    it('should process promises even when one of them times out (with retries)', function(done) {
+    it('should process promises even when one of them times out (with retries)', function(
+      done
+    ) {
       let counter = 0;
 
       const resolving_promise = () => Promise.resolve(counter++);

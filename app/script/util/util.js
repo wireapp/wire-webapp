@@ -31,9 +31,13 @@ window.LOG = function() {
 z.util.check_indexed_db = function() {
   if (!z.util.Environment.browser.supports.indexed_db) {
     if (z.util.Environment.browser.edge) {
-      return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.PRIVATE_MODE));
+      return Promise.reject(
+        new z.auth.AuthError(z.auth.AuthError.TYPE.PRIVATE_MODE)
+      );
     }
-    return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.INDEXED_DB_UNSUPPORTED));
+    return Promise.reject(
+      new z.auth.AuthError(z.auth.AuthError.TYPE.INDEXED_DB_UNSUPPORTED)
+    );
   }
 
   if (z.util.Environment.browser.firefox) {
@@ -42,7 +46,9 @@ z.util.check_indexed_db = function() {
     try {
       db = window.indexedDB.open('test');
     } catch (error) {
-      return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.PRIVATE_MODE));
+      return Promise.reject(
+        new z.auth.AuthError(z.auth.AuthError.TYPE.PRIVATE_MODE)
+      );
     }
 
     return new Promise((resolve, reject) => {
@@ -55,7 +61,9 @@ z.util.check_indexed_db = function() {
 
         if (db.readyState === 'done' && !db.result) {
           window.clearInterval(interval_id);
-          return reject(new z.auth.AuthError(z.auth.AuthError.TYPE.PRIVATE_MODE));
+          return reject(
+            new z.auth.AuthError(z.auth.AuthError.TYPE.PRIVATE_MODE)
+          );
         }
 
         if (current_attempt >= max_retry) {
@@ -110,7 +118,9 @@ z.util.load_url_buffer = function(url, xhr_accessor_function) {
       if (xhr.status === 200) {
         return resolve([xhr.response, xhr.getResponseHeader('content-type')]);
       }
-      return reject(new Error(`Requesting arraybuffer failed with status ${xhr.status}`));
+      return reject(
+        new Error(`Requesting arraybuffer failed with status ${xhr.status}`)
+      );
     };
     xhr.onerror = reject;
     if (typeof xhr_accessor_function === 'function') {
@@ -135,7 +145,10 @@ z.util.append_url_parameter = function(url, parameter) {
 z.util.forward_url_parameter = function(url, parameter_name) {
   const parameter_value = z.util.get_url_parameter(parameter_name);
   if (parameter_value != null) {
-    return (url = z.util.append_url_parameter(url, `${parameter_name}=${parameter_value}`));
+    return (url = z.util.append_url_parameter(
+      url,
+      `${parameter_name}=${parameter_value}`
+    ));
   }
   return url;
 };
@@ -206,7 +219,10 @@ z.util.format_bytes = function(bytes, decimals) {
   decimals = decimals + 1 || 2;
   const unit = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
   const index = Math.floor(Math.log(bytes) / Math.log(kilobytes));
-  return parseFloat((bytes / Math.pow(kilobytes, index)).toFixed(decimals)) + unit[index];
+  return (
+    parseFloat((bytes / Math.pow(kilobytes, index)).toFixed(decimals)) +
+    unit[index]
+  );
 };
 
 /**
@@ -226,7 +242,10 @@ z.util.format_seconds = function(duration) {
   const divisor_for_seconds = divisor_for_minutes % 60;
   const seconds = Math.ceil(divisor_for_seconds);
 
-  const components = [z.util.zero_padding(minutes), z.util.zero_padding(seconds)];
+  const components = [
+    z.util.zero_padding(minutes),
+    z.util.zero_padding(seconds),
+  ];
 
   if (hours > 0) {
     components.unshift(hours);
@@ -327,7 +346,10 @@ z.util.download_blob = function(blob, filename) {
 };
 
 z.util.phone_number_to_e164 = function(phone_number, country_code) {
-  return window.PhoneFormat.formatE164(`${country_code}`.toUpperCase(), `${phone_number}`);
+  return window.PhoneFormat.formatE164(
+    `${country_code}`.toUpperCase(),
+    `${phone_number}`
+  );
 };
 
 z.util.create_random_uuid = function() {
@@ -364,11 +386,15 @@ z.util.escape_regex = function(string) {
 
 // Note IE10 listens to "transitionend" instead of "animationend"
 z.util.alias = {
-  animationend: 'transitionend animationend oAnimationEnd MSAnimationEnd mozAnimationEnd webkitAnimationEnd',
+  animationend:
+    'transitionend animationend oAnimationEnd MSAnimationEnd mozAnimationEnd webkitAnimationEnd',
 };
 
 z.util.add_blank_targets = function(text_with_anchors) {
-  return `${text_with_anchors}`.replace(/rel="nofollow"/gi, 'target="_blank" rel="nofollow noopener noreferrer"');
+  return `${text_with_anchors}`.replace(
+    /rel="nofollow"/gi,
+    'target="_blank" rel="nofollow noopener noreferrer"'
+  );
 };
 
 /**
@@ -428,7 +454,10 @@ z.util.cut_last_characters = function(message, amount) {
 };
 
 z.util.markup_links = function(message) {
-  return message.replace(/<a\s+href=/gi, '<a target="_blank" rel="nofollow noopener noreferrer" href=');
+  return message.replace(
+    /<a\s+href=/gi,
+    '<a target="_blank" rel="nofollow noopener noreferrer" href='
+  );
 };
 
 // Note: We are using "Underscore.js" to escape HTML in the original message
@@ -532,7 +561,9 @@ z.util.format_timestamp = function(timestamp, long_format = true) {
   let format = 'DD.MM.YYYY (HH:mm:ss)';
 
   if (long_format) {
-    format = moment().year() === time.year() ? 'ddd D MMM, HH:mm' : 'ddd D MMM YYYY, HH:mm';
+    format = moment().year() === time.year()
+      ? 'ddd D MMM, HH:mm'
+      : 'ddd D MMM YYYY, HH:mm';
   }
 
   return time.format(format);
@@ -544,7 +575,9 @@ z.util.format_timestamp = function(timestamp, long_format = true) {
  * @returns {boolean} True, if input string follows ISO 8601
  */
 z.util.is_iso_string = function(date_string) {
-  return /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z)/.test(date_string);
+  return /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z)/.test(
+    date_string
+  );
 };
 
 z.util.sort_groups_by_last_event = function(group_a, group_b) {
@@ -594,11 +627,18 @@ z.util.naked_url = function(url = '') {
     .replace('www.', '');
 };
 
-z.util.valid_profile_image_size = function(file, min_width, min_height, callback) {
+z.util.valid_profile_image_size = function(
+  file,
+  min_width,
+  min_height,
+  callback
+) {
   return new Promise((resolve, reject) => {
     const image = new Image();
-    image.onload = () => resolve(image.width >= min_width && image.height >= min_height);
-    image.onerror = () => reject(new Error('Failed to load profile picture for size validation'));
+    image.onload = () =>
+      resolve(image.width >= min_width && image.height >= min_height);
+    image.onerror = () =>
+      reject(new Error('Failed to load profile picture for size validation'));
     image.src = window.URL.createObjectURL(file);
   });
 };
@@ -617,7 +657,10 @@ z.util.is_valid_email = function(email) {
 z.util.is_valid_phone_number = function(phone_number) {
   let regular_expression;
 
-  if (z.util.Environment.backend.current === z.service.BackendEnvironment.PRODUCTION) {
+  if (
+    z.util.Environment.backend.current ===
+    z.service.BackendEnvironment.PRODUCTION
+  ) {
     regular_expression = /^\+[1-9]\d{1,14}$/;
   } else {
     regular_expression = /^\+[0-9]\d{1,14}$/;
@@ -649,13 +692,16 @@ z.util.murmurhash3 = function(key, seed) {
       ((key.charCodeAt(++index) & 0xff) << 24);
     ++index;
 
-    k1 = ((k1 & 0xffff) * c1 + ((((k1 >>> 16) * c1) & 0xffff) << 16)) & 0xffffffff;
+    k1 =
+      ((k1 & 0xffff) * c1 + ((((k1 >>> 16) * c1) & 0xffff) << 16)) & 0xffffffff;
     k1 = (k1 << 15) | (k1 >>> 17);
-    k1 = ((k1 & 0xffff) * c2 + ((((k1 >>> 16) * c2) & 0xffff) << 16)) & 0xffffffff;
+    k1 =
+      ((k1 & 0xffff) * c2 + ((((k1 >>> 16) * c2) & 0xffff) << 16)) & 0xffffffff;
 
     h1 ^= k1;
     h1 = (h1 << 13) | (h1 >>> 19);
-    const h1b = ((h1 & 0xffff) * 5 + ((((h1 >>> 16) * 5) & 0xffff) << 16)) & 0xffffffff;
+    const h1b =
+      ((h1 & 0xffff) * 5 + ((((h1 >>> 16) * 5) & 0xffff) << 16)) & 0xffffffff;
     h1 = (h1b & 0xffff) + 0x6b64 + ((((h1b >>> 16) + 0xe654) & 0xffff) << 16);
   }
 
@@ -671,9 +717,13 @@ z.util.murmurhash3 = function(key, seed) {
     case 1:
       k1 ^= key.charCodeAt(index) & 0xff;
 
-      k1 = ((k1 & 0xffff) * c1 + ((((k1 >>> 16) * c1) & 0xffff) << 16)) & 0xffffffff;
+      k1 =
+        ((k1 & 0xffff) * c1 + ((((k1 >>> 16) * c1) & 0xffff) << 16)) &
+        0xffffffff;
       k1 = (k1 << 15) | (k1 >>> 17);
-      k1 = ((k1 & 0xffff) * c2 + ((((k1 >>> 16) * c2) & 0xffff) << 16)) & 0xffffffff;
+      k1 =
+        ((k1 & 0xffff) * c2 + ((((k1 >>> 16) * c2) & 0xffff) << 16)) &
+        0xffffffff;
       h1 ^= k1;
       break;
     default:
@@ -683,9 +733,15 @@ z.util.murmurhash3 = function(key, seed) {
   h1 ^= key.length;
 
   h1 ^= h1 >>> 16;
-  h1 = ((h1 & 0xffff) * 0x85ebca6b + ((((h1 >>> 16) * 0x85ebca6b) & 0xffff) << 16)) & 0xffffffff;
+  h1 =
+    ((h1 & 0xffff) * 0x85ebca6b +
+      ((((h1 >>> 16) * 0x85ebca6b) & 0xffff) << 16)) &
+    0xffffffff;
   h1 ^= h1 >>> 13;
-  h1 = ((h1 & 0xffff) * 0xc2b2ae35 + ((((h1 >>> 16) * 0xc2b2ae35) & 0xffff) << 16)) & 0xffffffff;
+  h1 =
+    ((h1 & 0xffff) * 0xc2b2ae35 +
+      ((((h1 >>> 16) * 0xc2b2ae35) & 0xffff) << 16)) &
+    0xffffffff;
   h1 ^= h1 >>> 16;
 
   return h1 >>> 0;
@@ -695,7 +751,10 @@ z.util.get_unix_timestamp = function() {
   return Math.floor(Date.now() / 1000);
 };
 
-z.util.get_first_name = function(user_et, declension = z.string.Declension.NOMINATIVE) {
+z.util.get_first_name = function(
+  user_et,
+  declension = z.string.Declension.NOMINATIVE
+) {
   if (user_et.is_me) {
     if (declension === z.string.Declension.NOMINATIVE) {
       return z.l10n.text(z.string.conversation_you_nominative);
@@ -752,25 +811,33 @@ z.util.format_time_remaining = function(time_remaining) {
 
   let title = '';
   if (moment_duration.asHours() === 1) {
-    title += `${moment_duration.hours()} ${z.l10n.text(z.string.ephememal_units_hour)}, `;
+    title += `${moment_duration.hours()} ${z.l10n.text(
+      z.string.ephememal_units_hour
+    )}, `;
   } else if (moment_duration.asHours() > 1) {
-    title += `${moment_duration.hours()} ${z.l10n.text(z.string.ephememal_units_hours)}, `;
+    title += `${moment_duration.hours()} ${z.l10n.text(
+      z.string.ephememal_units_hours
+    )}, `;
   }
 
   if (moment_duration.asMinutes() === 1) {
-    title += `${moment_duration.minutes()} ${z.l10n.text(z.string.ephememal_units_minute)} ${z.l10n.text(
-      z.string.and
-    )} `;
+    title += `${moment_duration.minutes()} ${z.l10n.text(
+      z.string.ephememal_units_minute
+    )} ${z.l10n.text(z.string.and)} `;
   } else if (moment_duration.asMinutes() > 1) {
-    title += `${moment_duration.minutes()} ${z.l10n.text(z.string.ephememal_units_minutes)} ${z.l10n.text(
-      z.string.and
-    )} `;
+    title += `${moment_duration.minutes()} ${z.l10n.text(
+      z.string.ephememal_units_minutes
+    )} ${z.l10n.text(z.string.and)} `;
   }
 
   if (moment_duration.asSeconds() === 1) {
-    title += `${moment_duration.seconds()} ${z.l10n.text(z.string.ephememal_units_second)}`;
+    title += `${moment_duration.seconds()} ${z.l10n.text(
+      z.string.ephememal_units_second
+    )}`;
   } else if (moment_duration.asSeconds() > 1) {
-    title += `${moment_duration.seconds()} ${z.l10n.text(z.string.ephememal_units_seconds)}`;
+    title += `${moment_duration.seconds()} ${z.l10n.text(
+      z.string.ephememal_units_seconds
+    )}`;
   }
 
   return title || '';

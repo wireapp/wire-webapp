@@ -25,32 +25,35 @@ module.exports = grunt => {
     grunt.log.writeln(`Deployed: ${pkg.name} (v${pkg.version})`);
   });
 
-  grunt.registerTask('set_version', (target = grunt.config('gitinfo.local.branch.current.name')) => {
-    grunt.option('target', target);
-    grunt.log.ok(`Version target set to ${grunt.option('target')}`);
+  grunt.registerTask(
+    'set_version',
+    (target = grunt.config('gitinfo.local.branch.current.name')) => {
+      grunt.option('target', target);
+      grunt.log.ok(`Version target set to ${grunt.option('target')}`);
 
-    let user = grunt.config('gitinfo.local.branch.current.currentUser');
-    if (user) {
-      user = user.substr(0, user.indexOf(' ')).toLowerCase();
+      let user = grunt.config('gitinfo.local.branch.current.currentUser');
+      if (user) {
+        user = user.substr(0, user.indexOf(' ')).toLowerCase();
+      }
+
+      const date = new Date();
+      const month = `0${date.getMonth() + 1}`.slice(-2);
+      const day = `0${date.getDate()}`.slice(-2);
+      const hour = `0${date.getHours()}`.slice(-2);
+      const minute = `0${date.getMinutes()}`.slice(-2);
+
+      let version = `${date.getFullYear()}-${month}-${day}-${hour}-${minute}`;
+      if (user) {
+        version = `${version}-${user}`;
+      }
+      if (target) {
+        version = `${version}-${target}`;
+      }
+
+      grunt.option('version', version);
+      grunt.log.ok(`Version set to ${version}`);
     }
-
-    const date = new Date();
-    const month = `0${date.getMonth() + 1}`.slice(-2);
-    const day = `0${date.getDate()}`.slice(-2);
-    const hour = `0${date.getHours()}`.slice(-2);
-    const minute = `0${date.getMinutes()}`.slice(-2);
-
-    let version = `${date.getFullYear()}-${month}-${day}-${hour}-${minute}`;
-    if (user) {
-      version = `${version}-${user}`;
-    }
-    if (target) {
-      version = `${version}-${target}`;
-    }
-
-    grunt.option('version', version);
-    grunt.log.ok(`Version set to ${version}`);
-  });
+  );
 
   grunt.registerTask('prepare_dist', [
     'clean:dist',

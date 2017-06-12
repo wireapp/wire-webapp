@@ -29,7 +29,10 @@ window.z.user = z.user || {};
 z.user.UserConnectionMapper = class UserConnectionMapper {
   // Construct a new user mapper.
   constructor() {
-    this.logger = new z.util.Logger('z.user.UserConnectionMapper', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger(
+      'z.user.UserConnectionMapper',
+      z.config.LOGGER.OPTIONS
+    );
 
     /**
      * Converts JSON connection into connection entity.

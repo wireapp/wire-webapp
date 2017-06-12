@@ -50,7 +50,11 @@ z.entity.Asset = class Asset {
    * @returns {boolean} Is asset of type file
    */
   is_file() {
-    return this.type === z.assets.AssetType.FILE && !this.is_video() && !this.is_audio();
+    return (
+      this.type === z.assets.AssetType.FILE &&
+      !this.is_video() &&
+      !this.is_audio()
+    );
   }
 
   /**
@@ -67,9 +71,13 @@ z.entity.Asset = class Asset {
    */
   is_video() {
     const is_video_asset =
-      this.type === z.assets.AssetType.FILE && this.file_type && this.file_type.startsWith('video');
+      this.type === z.assets.AssetType.FILE &&
+      this.file_type &&
+      this.file_type.startsWith('video');
     if (is_video_asset) {
-      const can_play = document.createElement('video').canPlayType(this.file_type);
+      const can_play = document
+        .createElement('video')
+        .canPlayType(this.file_type);
       if (can_play !== '') {
         return true;
       }
@@ -83,9 +91,13 @@ z.entity.Asset = class Asset {
    */
   is_audio() {
     const is_audio_asset =
-      this.type === z.assets.AssetType.FILE && this.file_type && this.file_type.startsWith('audio');
+      this.type === z.assets.AssetType.FILE &&
+      this.file_type &&
+      this.file_type.startsWith('audio');
     if (is_audio_asset) {
-      const can_play = document.createElement('audio').canPlayType(this.file_type);
+      const can_play = document
+        .createElement('audio')
+        .canPlayType(this.file_type);
       if (can_play !== '') {
         return true;
       }

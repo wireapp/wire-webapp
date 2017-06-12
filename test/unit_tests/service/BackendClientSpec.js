@@ -80,7 +80,10 @@ describe('z.service.BackendClient', function() {
     });
 
     it('does not execute callback when request times out', function(done) {
-      backend_client.execute_on_connectivity().then(response => done.fail(response)).catch(done.fail);
+      backend_client
+        .execute_on_connectivity()
+        .then(response => done.fail(response))
+        .catch(done.fail);
 
       jasmine.clock().tick(250);
       expect(backend_client.status).toHaveBeenCalled();
@@ -107,8 +110,13 @@ describe('z.service.BackendClient', function() {
       server.requests[1].respond(401);
     });
 
-    it('does not execute the callback when it retries after failure and fails again', function(done) {
-      backend_client.execute_on_connectivity().then(response => done.fail(response)).catch(done.fail);
+    it('does not execute the callback when it retries after failure and fails again', function(
+      done
+    ) {
+      backend_client
+        .execute_on_connectivity()
+        .then(response => done.fail(response))
+        .catch(done.fail);
 
       jasmine.clock().tick(750);
       expect(backend_client.status).toHaveBeenCalled();
@@ -148,9 +156,15 @@ describe('z.service.BackendClient', function() {
 
     it('should cache the request if it was unauthorized', function(done) {
       const token_refresh = jasmine.createSpy('token_refresh');
-      amplify.subscribe(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, token_refresh);
+      amplify.subscribe(
+        z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW,
+        token_refresh
+      );
 
-      backend_client.send_request(config).then(response => done.fail(response)).catch(done.fail);
+      backend_client
+        .send_request(config)
+        .then(response => done.fail(response))
+        .catch(done.fail);
       server.requests[0].respond(401);
 
       jasmine.clock().tick(750);
@@ -160,9 +174,14 @@ describe('z.service.BackendClient', function() {
     });
 
     it('should cache the request if it timed out', function(done) {
-      spyOn(backend_client, 'execute_on_connectivity').and.returnValue(Promise.resolve());
+      spyOn(backend_client, 'execute_on_connectivity').and.returnValue(
+        Promise.resolve()
+      );
 
-      backend_client.send_request(config).then(response => done.fail(response)).catch(done.fail);
+      backend_client
+        .send_request(config)
+        .then(response => done.fail(response))
+        .catch(done.fail);
 
       jasmine.clock().tick(150);
       expect(backend_client.request_queue.get_length()).toBe(1);
@@ -192,7 +211,9 @@ describe('z.service.BackendClient', function() {
       spyOn(backend_client, 'send_request').and.callFake(function(config) {
         expect(config.callback).toBe(original_config.callback);
         expect(config.contentType).toBe('application/json; charset=utf-8');
-        expect(config.headers['X-TEST-HEADER']).toBe(original_config.headers['X-TEST-HEADER']);
+        expect(config.headers['X-TEST-HEADER']).toBe(
+          original_config.headers['X-TEST-HEADER']
+        );
         expect(config.headers['Content-Encoding']).toBe('gzip');
         expect(config.data).toBeDefined();
         expect(config.processData).toBe(original_config.processData);

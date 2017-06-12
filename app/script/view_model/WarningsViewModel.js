@@ -61,7 +61,10 @@ z.ViewModel.WarningsViewModel = class WarningsViewModel {
   }
 
   constructor(element_id) {
-    this.logger = new z.util.Logger('z.ViewModel.WarningsViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger(
+      'z.ViewModel.WarningsViewModel',
+      z.config.LOGGER.OPTIONS
+    );
 
     // Array of warning banners
     this.warnings = ko.observableArray();
@@ -79,7 +82,9 @@ z.ViewModel.WarningsViewModel = class WarningsViewModel {
       const top_warning = warnings[warnings.length - 1];
       if (!warnings.length) {
         top_margin = '0';
-      } else if (top_warning === z.ViewModel.WarningType.CONNECTIVITY_RECOVERY) {
+      } else if (
+        top_warning === z.ViewModel.WarningType.CONNECTIVITY_RECOVERY
+      ) {
         top_margin = '0';
       } else if (WarningsViewModel.CONFIG.MINI_MODES.includes(top_warning)) {
         top_margin = '32px';
@@ -108,8 +113,14 @@ z.ViewModel.WarningsViewModel = class WarningsViewModel {
       )
       .extend({rateLimit: 200});
 
-    amplify.subscribe(z.event.WebApp.WARNING.SHOW, this.show_warning.bind(this));
-    amplify.subscribe(z.event.WebApp.WARNING.DISMISS, this.dismiss_warning.bind(this));
+    amplify.subscribe(
+      z.event.WebApp.WARNING.SHOW,
+      this.show_warning.bind(this)
+    );
+    amplify.subscribe(
+      z.event.WebApp.WARNING.DISMISS,
+      this.dismiss_warning.bind(this)
+    );
 
     ko.applyBindings(this, document.getElementById(element_id));
   }
@@ -125,11 +136,17 @@ z.ViewModel.WarningsViewModel = class WarningsViewModel {
 
     switch (warning_to_remove) {
       case z.ViewModel.WarningType.REQUEST_MICROPHONE:
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALLING, {
-          action() {
-            z.util.safe_window_open(z.l10n.text(z.string.url_support_mic_access_denied));
-          },
-        });
+        amplify.publish(
+          z.event.WebApp.WARNING.MODAL,
+          z.ViewModel.ModalType.CALLING,
+          {
+            action() {
+              z.util.safe_window_open(
+                z.l10n.text(z.string.url_support_mic_access_denied)
+              );
+            },
+          }
+        );
         break;
       case z.ViewModel.WarningType.REQUEST_NOTIFICATION:
         // We block subsequent permission requests for notifications when the user ignores the request.
@@ -155,7 +172,8 @@ z.ViewModel.WarningsViewModel = class WarningsViewModel {
       z.ViewModel.WarningType.CONNECTIVITY_RECONNECT,
       z.ViewModel.WarningType.NO_INTERNET,
     ].includes(type);
-    const top_warning_is_not_lifecycle_update = this.top_warning() !== z.ViewModel.WarningType.LIFECYCLE_UPDATE;
+    const top_warning_is_not_lifecycle_update =
+      this.top_warning() !== z.ViewModel.WarningType.LIFECYCLE_UPDATE;
     if (is_connectivity_warning && top_warning_is_not_lifecycle_update) {
       this.dismiss_warning(this.top_warning());
     }

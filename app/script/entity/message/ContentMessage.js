@@ -39,7 +39,10 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
     });
 
     this.display_edited_timestamp = () => {
-      return z.l10n.text(z.string.conversation_edit_timestamp, moment(this.edited_timestamp).format('HH:mm'));
+      return z.l10n.text(
+        z.string.conversation_edit_timestamp,
+        moment(this.edited_timestamp).format('HH:mm')
+      );
     };
 
     this.is_liked_provisional = ko.observable();
@@ -50,7 +53,9 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
           this.is_liked_provisional(null);
           return is_liked_provisional;
         }
-        const likes = this.reactions_user_ets().filter(user_et => user_et.is_me);
+        const likes = this.reactions_user_ets().filter(
+          user_et => user_et.is_me
+        );
         return likes.length === 1;
       },
       write: value => {
@@ -64,9 +69,14 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
 
     this.like_caption = ko.pureComputed(() => {
       if (this.reactions_user_ets().length <= 5) {
-        return this.reactions_user_ets().map(user_et => user_et.first_name()).join(', ');
+        return this.reactions_user_ets()
+          .map(user_et => user_et.first_name())
+          .join(', ');
       }
-      return z.l10n.text(z.string.conversation_likes_caption, this.reactions_user_ets().length);
+      return z.l10n.text(
+        z.string.conversation_likes_caption,
+        this.reactions_user_ets().length
+      );
     });
   }
 
@@ -131,7 +141,9 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
 
     if (!file_name) {
       const date = moment(this.timestamp());
-      file_name = `Wire ${date.format('YYYY-MM-DD')} at ${date.format('H.mm.ss')}`;
+      file_name = `Wire ${date.format('YYYY-MM-DD')} at ${date.format(
+        'H.mm.ss'
+      )}`;
     }
 
     if (asset_et.file_type) {

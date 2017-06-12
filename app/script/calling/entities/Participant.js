@@ -39,7 +39,10 @@ z.calling.entities.Participant = class Participant {
     this.id = this.user.id;
     this.session_id = undefined;
 
-    this.logger = new z.util.Logger(`z.calling.entities.Participant (${this.id})`, z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger(
+      `z.calling.entities.Participant (${this.id})`,
+      z.config.LOGGER.OPTIONS
+    );
 
     this.is_connected = ko.observable(false);
     this.panning = ko.observable(0.0);
@@ -51,11 +54,19 @@ z.calling.entities.Participant = class Participant {
       video_send: ko.observable(false),
     };
 
-    this.flow_et = new z.calling.entities.Flow(this.call_et, this, timings, call_message_et);
+    this.flow_et = new z.calling.entities.Flow(
+      this.call_et,
+      this,
+      timings,
+      call_message_et
+    );
 
     this.is_connected.subscribe(is_connected => {
       if (is_connected && !this.was_connected) {
-        amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.READY_TO_TALK);
+        amplify.publish(
+          z.event.WebApp.AUDIO.PLAY,
+          z.audio.AudioType.READY_TO_TALK
+        );
         this.was_connected = true;
       }
     });
@@ -111,18 +122,28 @@ z.calling.entities.Participant = class Participant {
   update_properties(properties) {
     return Promise.resolve().then(() => {
       if (properties) {
-        const {audiosend: audio_send, screensend: screen_send, videosend: video_send} = properties;
+        const {
+          audiosend: audio_send,
+          screensend: screen_send,
+          videosend: video_send,
+        } = properties;
 
         if (audio_send !== undefined) {
-          this.state.audio_send(audio_send === z.calling.enum.PROPERTY_STATE.TRUE);
+          this.state.audio_send(
+            audio_send === z.calling.enum.PROPERTY_STATE.TRUE
+          );
         }
 
         if (screen_send !== undefined) {
-          this.state.screen_send(screen_send === z.calling.enum.PROPERTY_STATE.TRUE);
+          this.state.screen_send(
+            screen_send === z.calling.enum.PROPERTY_STATE.TRUE
+          );
         }
 
         if (video_send !== undefined) {
-          this.state.video_send(video_send === z.calling.enum.PROPERTY_STATE.TRUE);
+          this.state.video_send(
+            video_send === z.calling.enum.PROPERTY_STATE.TRUE
+          );
         }
       }
     });
@@ -146,7 +167,10 @@ z.calling.entities.Participant = class Participant {
       }
       this.flow_et.remote_client_id = client_id;
     } else {
-      throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_SENDER, 'Sender ID missing');
+      throw new z.calling.CallError(
+        z.calling.CallError.TYPE.WRONG_SENDER,
+        'Sender ID missing'
+      );
     }
   }
 };

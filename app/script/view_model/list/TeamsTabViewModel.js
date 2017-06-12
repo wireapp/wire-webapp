@@ -24,7 +24,12 @@ window.z.ViewModel = z.ViewModel || {};
 window.z.ViewModel.list = z.ViewModel.list || {};
 
 z.ViewModel.list.TeamsTabViewModel = class TeamsTabViewModel {
-  constructor(list_view_model, conversation_repository, team_repository, user_repository) {
+  constructor(
+    list_view_model,
+    conversation_repository,
+    team_repository,
+    user_repository
+  ) {
     this.list_view_model = list_view_model;
 
     this.conversation_repository = conversation_repository;
@@ -34,12 +39,17 @@ z.ViewModel.list.TeamsTabViewModel = class TeamsTabViewModel {
     this.personal_space = this.team_repository.personal_space;
     this.self = this.user_repository.self;
     this.teams = ko.pureComputed(() =>
-      this.team_repository.teams().sort((team_a, team_b) => team_a.name() > team_b.name())
+      this.team_repository
+        .teams()
+        .sort((team_a, team_b) => team_a.name() > team_b.name())
     );
 
     this.active_team = this.team_repository.active_team;
     this.active_team_id = ko.pureComputed(() => {
-      if (this.list_view_model.list_state() !== z.ViewModel.list.LIST_STATE.PREFERENCES) {
+      if (
+        this.list_view_model.list_state() !==
+        z.ViewModel.list.LIST_STATE.PREFERENCES
+      ) {
         return this.active_team().id || null;
       }
     });
@@ -60,8 +70,12 @@ z.ViewModel.list.TeamsTabViewModel = class TeamsTabViewModel {
   }
 
   _init_subscriptions() {
-    amplify.subscribe(z.event.WebApp.SEARCH.BADGE.SHOW, () => this.show_badge(true));
-    amplify.subscribe(z.event.WebApp.SEARCH.BADGE.HIDE, () => this.show_badge(false));
+    amplify.subscribe(z.event.WebApp.SEARCH.BADGE.SHOW, () =>
+      this.show_badge(true)
+    );
+    amplify.subscribe(z.event.WebApp.SEARCH.BADGE.HIDE, () =>
+      this.show_badge(false)
+    );
   }
 
   click_on_personal() {
@@ -79,12 +93,19 @@ z.ViewModel.list.TeamsTabViewModel = class TeamsTabViewModel {
   }
 
   _show_last_conversation(team_et) {
-    const preferences_state = this.list_view_model.list_state() === z.ViewModel.list.LIST_STATE.PREFERENCES;
+    const preferences_state =
+      this.list_view_model.list_state() ===
+      z.ViewModel.list.LIST_STATE.PREFERENCES;
     if (preferences_state) {
-      this.list_view_model.switch_list(z.ViewModel.list.LIST_STATE.CONVERSATIONS, false);
+      this.list_view_model.switch_list(
+        z.ViewModel.list.LIST_STATE.CONVERSATIONS,
+        false
+      );
     }
 
-    const start_ui_state = this.list_view_model.list_state() === z.ViewModel.list.LIST_STATE.START_UI;
+    const start_ui_state =
+      this.list_view_model.list_state() ===
+      z.ViewModel.list.LIST_STATE.START_UI;
     if (!start_ui_state) {
       const last_conversation = team_et.last_active_conversation;
       const conversation_et = last_conversation

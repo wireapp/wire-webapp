@@ -37,11 +37,15 @@ describe('z.conversation.EventBuilder', function() {
   });
 
   it('build_all_verified', function() {
-    const event = z.conversation.EventBuilder.build_all_verified(conversation_et);
+    const event = z.conversation.EventBuilder.build_all_verified(
+      conversation_et
+    );
     const message_et = event_mapper.map_json_event(event, conversation_et);
     expect(message_et).toBeDefined();
     expect(message_et.super_type).toBe(z.message.SuperType.VERIFICATION);
-    expect(message_et.verification_message_type).toBe(z.message.VerificationMessageType.VERIFIED);
+    expect(message_et.verification_message_type).toBe(
+      z.message.VerificationMessageType.VERIFIED
+    );
     expect(message_et.from).toBe(conversation_et.self.id);
     expect(message_et.conversation_id).toBe(conversation_et.id);
   });
@@ -56,14 +60,19 @@ describe('z.conversation.EventBuilder', function() {
     const message_et = event_mapper.map_json_event(event, conversation_et);
     expect(message_et).toBeDefined();
     expect(message_et.super_type).toBe(z.message.SuperType.VERIFICATION);
-    expect(message_et.verification_message_type).toBe(z.message.VerificationMessageType.NEW_DEVICE);
+    expect(message_et.verification_message_type).toBe(
+      z.message.VerificationMessageType.NEW_DEVICE
+    );
     expect(message_et.from).toBe(conversation_et.self.id);
     expect(message_et.conversation_id).toBe(conversation_et.id);
     expect(message_et.user_ids()).toEqual(user_ids);
   });
 
   it('build_missed', function() {
-    const event = z.conversation.EventBuilder.build_missed(conversation_et, self_user_et);
+    const event = z.conversation.EventBuilder.build_missed(
+      conversation_et,
+      self_user_et
+    );
     const message_et = event_mapper.map_json_event(event, conversation_et);
     expect(message_et).toBeDefined();
     expect(message_et.super_type).toBe(z.message.SuperType.MISSED);
