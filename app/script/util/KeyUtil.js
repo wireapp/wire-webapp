@@ -32,7 +32,9 @@ z.util.KeyUtil = {
 
     const scrollPos = textArea.scrollTop;
     let strPos = 0;
-    const br = ((textArea.selectionStart || textArea.selectionStart === '0') ? 'ff' : (document.selection ? 'ie' : false));
+    const br = textArea.selectionStart || textArea.selectionStart === '0'
+      ? 'ff'
+      : document.selection ? 'ie' : false;
 
     if (br === 'ie') {
       textArea.focus();
@@ -43,8 +45,8 @@ z.util.KeyUtil = {
       strPos = textArea.selectionStart;
     }
 
-    const front = (textArea.value).substring(0, strPos);
-    const back = (textArea.value).substring(strPos, textArea.value.length);
+    const front = textArea.value.substring(0, strPos);
+    const back = textArea.value.substring(strPos, textArea.value.length);
 
     textArea.value = `${front}${text}${back}`;
     strPos = strPos + text.length;

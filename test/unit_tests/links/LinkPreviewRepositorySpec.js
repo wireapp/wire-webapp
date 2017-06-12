@@ -23,7 +23,11 @@ describe('z.links.LinkPreviewRepository', function() {
   let link_preview_repository = null;
 
   beforeEach(function() {
-    link_preview_repository = new z.links.LinkPreviewRepository();
+    const properties_repository = new z.properties.PropertiesRepository();
+    link_preview_repository = new z.links.LinkPreviewRepository(
+      undefined,
+      properties_repository,
+    );
   });
 
   afterEach(function() {

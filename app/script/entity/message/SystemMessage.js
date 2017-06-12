@@ -30,6 +30,9 @@ z.entity.SystemMessage = class SystemMessage extends z.entity.Message {
   }
 
   is_conversation_rename() {
-    return this.system_message_type === z.message.SystemMessageType.CONVERSATION_RENAME;
+    return (
+      this.system_message_type ===
+      z.message.SystemMessageType.CONVERSATION_RENAME
+    );
   }
 };

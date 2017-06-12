@@ -41,7 +41,7 @@ window.z.config = {
         'app.wire.com': function() {
           return 0;
         },
-        'localhost': function() {
+        localhost: function() {
           return 300;
         },
         'wire.ms': function() {

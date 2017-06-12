@@ -21,57 +21,6 @@
 
 'use strict';
 
-describe('Localizer', function() {
-  it('can get localized strings', function() {
-    const text = z.localization.Localizer.get_text(z.string.upload_choose);
-    expect(text).toBe(z.string.upload_choose);
-  });
-
-  it('can replace line single strings in the localization', function() {
-    const text = z.localization.Localizer.get_text({
-      id: 'Talk, message, share.',
-      replace: {
-        content: '<br>',
-        placeholder: '%nl',
-      },
-    });
-    expect(text).toBe('Talk, message, share.');
-  });
-
-  it('can replace multiple strings in the localization', function() {
-    const text = z.localization.Localizer.get_text({
-      id: 'I’m on Wire. Search for %email or visit %url to connect with me.',
-      replace: [
-        {
-          content: entities.user.john_doe.email,
-          placeholder: '%email',
-        },
-        {
-          content: 'html://LINK',
-          placeholder: '%url',
-        },
-      ],
-    });
-    expect(text).toBe(
-      'I’m on Wire. Search for jd@wire.com or visit html://LINK to connect with me.',
-    );
-  });
-
-  it('can replace user names in the localization', function() {
-    const text = z.localization.Localizer.get_text({
-      id:
-        '%@.first_name won’t see you in search results and won’t be able to send you messages.',
-      replace: {
-        content: '<span class="user"></span>',
-        placeholder: '%@.first_name',
-      },
-    });
-    expect(text).toBe(
-      '<span class="user"></span> won’t see you in search results and won’t be able to send you messages.',
-    );
-  });
-});
-
 describe('l10n', function() {
   it('can get localized strings', function() {
     const text = z.l10n.text(z.string.wire);

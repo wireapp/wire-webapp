@@ -77,7 +77,9 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
       conversation.name('Birthday Bash');
       conversation.type(z.conversation.ConversationType.REGULAR);
 
-      title_view_model.conversation_repository.conversations_unarchived.push(
+      const team_repository =
+        title_view_model.conversation_repository.team_repository;
+      team_repository.personal_space.conversations_unarchived.push(
         conversation,
       );
       title_view_model.conversation_repository.active_conversation(
@@ -111,10 +113,13 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
         title_view_model.conversation_repository.conversations_unarchived()
           .length,
       ).toBe(0);
-      title_view_model.conversation_repository.conversations_unarchived.push(
+
+      const team_repository =
+        title_view_model.conversation_repository.team_repository;
+      team_repository.personal_space.conversations_unarchived.push(
         selected_conversation,
       );
-      title_view_model.conversation_repository.conversations_unarchived.push(
+      team_repository.personal_space.conversations_unarchived.push(
         muted_conversation,
       );
       expect(
@@ -244,13 +249,10 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
       waiting_people = title_view_model.user_repository.connect_requests()
         .length;
 
-      message = z.localization.Localizer.get_text({
-        id: z.string.conversations_connection_request_many,
-        replace: {
-          content: waiting_people,
-          placeholder: '%no',
-        },
-      });
+      message = z.l10n.text(
+        z.string.conversations_connection_request_many,
+        waiting_people,
+      );
 
       expected_title = `(${waiting_people}) · ${message} · ${suffix}`;
       title_view_model.initiate_title_updates();
@@ -269,7 +271,9 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
       conversation.name('Birthday Bash');
       conversation.type(z.conversation.ConversationType.REGULAR);
 
-      title_view_model.conversation_repository.conversations_unarchived.push(
+      const team_repository =
+        title_view_model.conversation_repository.team_repository;
+      team_repository.personal_space.conversations_unarchived.push(
         conversation,
       );
       title_view_model.conversation_repository.active_conversation(

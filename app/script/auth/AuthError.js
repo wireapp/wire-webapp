@@ -27,7 +27,7 @@ z.auth.AuthError = class AuthError extends Error {
     super();
 
     this.name = this.constructor.name;
-    this.stack = (new Error()).stack;
+    this.stack = new Error().stack;
     this.type = type || AuthError.TYPE.UNKNOWN;
 
     switch (this.type) {

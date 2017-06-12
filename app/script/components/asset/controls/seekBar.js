@@ -43,7 +43,9 @@ z.components.SeekBarComponent = class SeekBarComponent {
     this.seek_bar = $(component_info.element).find('input')[0];
     this.seek_bar_mouse_over = ko.observable(false);
     this.seek_bar_thumb_dragged = ko.observable(false);
-    this.show_seek_bar_thumb = ko.pureComputed(() => this.seek_bar_thumb_dragged() || this.seek_bar_mouse_over());
+    this.show_seek_bar_thumb = ko.pureComputed(
+      () => this.seek_bar_thumb_dragged() || this.seek_bar_mouse_over(),
+    );
 
     this.on_mouse_down = this.on_mouse_down.bind(this);
     this.on_mouse_up = this.on_mouse_up.bind(this);
@@ -81,11 +83,13 @@ z.components.SeekBarComponent = class SeekBarComponent {
   }
 
   on_change() {
-    this.media_element.currentTime = this.media_element.duration * (this.seek_bar.value / 100);
+    this.media_element.currentTime =
+      this.media_element.duration * (this.seek_bar.value / 100);
   }
 
   on_timeupdate() {
-    const value = (100 / this.media_element.duration) * this.media_element.currentTime;
+    const value =
+      100 / this.media_element.duration * this.media_element.currentTime;
     this._update_seek_bar(value);
   }
 
@@ -94,7 +98,7 @@ z.components.SeekBarComponent = class SeekBarComponent {
   }
 
   _update_seek_bar(progress) {
-    if (this.media_element.paused && (progress < 100)) {
+    if (this.media_element.paused && progress < 100) {
       return;
     }
 
@@ -105,10 +109,10 @@ z.components.SeekBarComponent = class SeekBarComponent {
   _update_seek_bar_style(progress) {
     // TODO check if we can find a css solution
     if (this.dark_mode) {
-      return this.seek_bar.style.backgroundImage = `linear-gradient(to right, currentColor ${progress}%, rgba(141,152,159,0.24) ${progress}%)`;
+      return (this.seek_bar.style.backgroundImage = `linear-gradient(to right, currentColor ${progress}%, rgba(141,152,159,0.24) ${progress}%)`);
     }
 
-    return this.seek_bar.style.backgroundImage = `linear-gradient(to right, currentColor ${progress}%, rgba(255,255,255,0.4) ${progress}%)`;
+    return (this.seek_bar.style.backgroundImage = `linear-gradient(to right, currentColor ${progress}%, rgba(255,255,255,0.4) ${progress}%)`);
   }
 
   dispose() {

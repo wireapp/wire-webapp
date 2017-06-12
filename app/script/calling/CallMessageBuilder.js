@@ -23,9 +23,17 @@ window.z = window.z || {};
 window.z.calling = z.calling || {};
 
 z.calling.CallMessageBuilder = (function() {
-
-  const _build_call_message = function(type, response, session_id, additional_payload) {
-    const call_message_et = new z.calling.entities.CallMessage(type, response, session_id);
+  const _build_call_message = function(
+    type,
+    response,
+    session_id,
+    additional_payload,
+  ) {
+    const call_message_et = new z.calling.entities.CallMessage(
+      type,
+      response,
+      session_id,
+    );
 
     if (additional_payload) {
       call_message_et.add_properties(additional_payload);
@@ -35,43 +43,109 @@ z.calling.CallMessageBuilder = (function() {
   };
 
   const _build_cancel = function(response, session_id, additional_payload) {
-    return _build_call_message(z.calling.enum.CALL_MESSAGE_TYPE.CANCEL, response, session_id, additional_payload);
+    return _build_call_message(
+      z.calling.enum.CALL_MESSAGE_TYPE.CANCEL,
+      response,
+      session_id,
+      additional_payload,
+    );
   };
 
-  const _build_group_check = function(response, session_id, additional_payload) {
-    return _build_call_message(z.calling.enum.CALL_MESSAGE_TYPE.GROUP_CHECK, response, session_id, additional_payload);
+  const _build_group_check = function(
+    response,
+    session_id,
+    additional_payload,
+  ) {
+    return _build_call_message(
+      z.calling.enum.CALL_MESSAGE_TYPE.GROUP_CHECK,
+      response,
+      session_id,
+      additional_payload,
+    );
   };
 
-  const _build_group_leave = function(response, session_id, additional_payload) {
-    return _build_call_message(z.calling.enum.CALL_MESSAGE_TYPE.GROUP_LEAVE, response, session_id, additional_payload);
+  const _build_group_leave = function(
+    response,
+    session_id,
+    additional_payload,
+  ) {
+    return _build_call_message(
+      z.calling.enum.CALL_MESSAGE_TYPE.GROUP_LEAVE,
+      response,
+      session_id,
+      additional_payload,
+    );
   };
 
-  const _build_group_setup = function(response, session_id, additional_payload) {
-    return _build_call_message(z.calling.enum.CALL_MESSAGE_TYPE.GROUP_SETUP, response, session_id, additional_payload);
+  const _build_group_setup = function(
+    response,
+    session_id,
+    additional_payload,
+  ) {
+    return _build_call_message(
+      z.calling.enum.CALL_MESSAGE_TYPE.GROUP_SETUP,
+      response,
+      session_id,
+      additional_payload,
+    );
   };
 
-  const _build_group_start = function(response, session_id, additional_payload) {
-    return _build_call_message(z.calling.enum.CALL_MESSAGE_TYPE.GROUP_START, response, session_id, additional_payload);
+  const _build_group_start = function(
+    response,
+    session_id,
+    additional_payload,
+  ) {
+    return _build_call_message(
+      z.calling.enum.CALL_MESSAGE_TYPE.GROUP_START,
+      response,
+      session_id,
+      additional_payload,
+    );
   };
 
   const _build_hangup = function(response, session_id, additional_payload) {
-    return _build_call_message(z.calling.enum.CALL_MESSAGE_TYPE.HANGUP, response, session_id, additional_payload);
+    return _build_call_message(
+      z.calling.enum.CALL_MESSAGE_TYPE.HANGUP,
+      response,
+      session_id,
+      additional_payload,
+    );
   };
 
   const _build_prop_sync = function(response, session_id, additional_payload) {
-    return _build_call_message(z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC, response, session_id, additional_payload);
+    return _build_call_message(
+      z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC,
+      response,
+      session_id,
+      additional_payload,
+    );
   };
 
   const _build_reject = function(response, session_id, additional_payload) {
-    return _build_call_message(z.calling.enum.CALL_MESSAGE_TYPE.REJECT, response, session_id, additional_payload);
+    return _build_call_message(
+      z.calling.enum.CALL_MESSAGE_TYPE.REJECT,
+      response,
+      session_id,
+      additional_payload,
+    );
   };
 
   const _build_setup = function(response, session_id, additional_payload) {
-    return _build_call_message(z.calling.enum.CALL_MESSAGE_TYPE.SETUP, response, session_id, additional_payload);
+    return _build_call_message(
+      z.calling.enum.CALL_MESSAGE_TYPE.SETUP,
+      response,
+      session_id,
+      additional_payload,
+    );
   };
 
   const _build_update = function(response, session_id, additional_payload) {
-    return _build_call_message(z.calling.enum.CALL_MESSAGE_TYPE.UPDATE, response, session_id, additional_payload);
+    return _build_call_message(
+      z.calling.enum.CALL_MESSAGE_TYPE.UPDATE,
+      response,
+      session_id,
+      additional_payload,
+    );
   };
 
   /**
@@ -83,7 +157,12 @@ z.calling.CallMessageBuilder = (function() {
    * @param {string} [remote_client_id] - Optional ID of remote client
    * @returns {{conversation_id: string, remote_client_id: string, remote_user_id: *, time: string, user_id: string}} Additional payload
    */
-  const _create_payload = function(conversation_id, self_user_id, remote_user_id, remote_client_id) {
+  const _create_payload = function(
+    conversation_id,
+    self_user_id,
+    remote_user_id,
+    remote_client_id,
+  ) {
     return {
       conversation_id: conversation_id,
       remote_client_id: remote_client_id,
@@ -102,7 +181,12 @@ z.calling.CallMessageBuilder = (function() {
    * @param {Object} additional_payload - Optional additional payload to be added
    * @returns {Object} call message props object
    */
-  const _create_payload_prop_sync = function(self_state, payload_type, invert, additional_payload) {
+  const _create_payload_prop_sync = function(
+    self_state,
+    payload_type,
+    invert,
+    additional_payload,
+  ) {
     let payload;
 
     if (_.isBoolean(payload_type)) {
@@ -112,7 +196,9 @@ z.calling.CallMessageBuilder = (function() {
         },
       };
     } else {
-      let audio_send_state, screen_send_state, video_send_state = undefined;
+      let audio_send_state,
+        screen_send_state,
+        video_send_state = undefined;
 
       switch (payload_type) {
         case z.media.MediaType.AUDIO: {
@@ -122,16 +208,24 @@ z.calling.CallMessageBuilder = (function() {
 
           payload = {
             props: {
-              audiosend: `${audio_send_state}`},
+              audiosend: `${audio_send_state}`,
+            },
           };
           break;
         }
 
         case z.media.MediaType.SCREEN: {
-          const {screen_send: screen_self_state, video_send: video_self_state} = self_state;
+          const {
+            screen_send: screen_self_state,
+            video_send: video_self_state,
+          } = self_state;
 
-          screen_send_state = invert ? !screen_self_state() : screen_self_state();
-          video_send_state = invert ? z.calling.enum.PROPERTY_STATE.FALSE : video_self_state();
+          screen_send_state = invert
+            ? !screen_self_state()
+            : screen_self_state();
+          video_send_state = invert
+            ? z.calling.enum.PROPERTY_STATE.FALSE
+            : video_self_state();
 
           payload = {
             props: {
@@ -143,9 +237,14 @@ z.calling.CallMessageBuilder = (function() {
         }
 
         case z.media.MediaType.VIDEO: {
-          const {screen_send: screen_self_state, video_send: video_self_state} = self_state;
+          const {
+            screen_send: screen_self_state,
+            video_send: video_self_state,
+          } = self_state;
 
-          screen_send_state = invert ? z.calling.enum.PROPERTY_STATE.FALSE : screen_self_state();
+          screen_send_state = invert
+            ? z.calling.enum.PROPERTY_STATE.FALSE
+            : screen_self_state();
           video_send_state = invert ? !video_self_state() : video_self_state();
 
           payload = {
@@ -158,7 +257,9 @@ z.calling.CallMessageBuilder = (function() {
         }
 
         default:
-          throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
+          throw new z.media.MediaError(
+            z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE,
+          );
       }
     }
 

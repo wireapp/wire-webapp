@@ -23,7 +23,6 @@ window.z = window.z || {};
 window.z.media = z.media || {};
 
 z.media.MediaEmbeds = (function() {
-
   /**
    * Create and iframe.
    * @private
@@ -53,7 +52,15 @@ z.media.MediaEmbeds = (function() {
       options.allowfullscreen = '';
     }
 
-    return z.util.StringUtil.format(iframe_container, options.class, options.width, options.height, options.src, options.frameborder, options.allowfullscreen);
+    return z.util.StringUtil.format(
+      iframe_container,
+      options.class,
+      options.width,
+      options.height,
+      options.src,
+      options.frameborder,
+      options.allowfullscreen,
+    );
   };
 
   // Enum of different regex for the supported services.
@@ -90,7 +97,6 @@ z.media.MediaEmbeds = (function() {
   */
   const _generate_youtube_embed_url = function(url) {
     if (url.match(_regex.youtube)) {
-
       const video_id = url.match(/(?:embed\/|v=|v\/|be\/)([a-zA-Z0-9_-]{11})/);
       if (!video_id) {
         return;
@@ -102,7 +108,11 @@ z.media.MediaEmbeds = (function() {
         .substr(url.indexOf('?'), url.length)
         .replace(/^[?]/, '&')
         .replace(/[&]v=[a-zA-Z0-9_-]{11}/, '')
-        .replace(/[&#]t=([a-z0-9]+)/, (temp, timestamp) => `&start=${_convert_youtube_timestamp_to_seconds(timestamp)}`)
+        .replace(
+          /[&#]t=([a-z0-9]+)/,
+          (temp, timestamp) =>
+            `&start=${_convert_youtube_timestamp_to_seconds(timestamp)}`,
+        )
         .replace(/[&]?autoplay=1/, ''); // remove autoplay param
 
       // append html5 parameter to youtube src to force html5 mode
@@ -125,10 +135,15 @@ z.media.MediaEmbeds = (function() {
       }
 
       const _extract_unit = function(unit) {
-        return window.parseInt((timestamp.match(new RegExp(`([0-9]+)(?=${unit})`)) || [0])[0], 10);
+        return window.parseInt(
+          (timestamp.match(new RegExp(`([0-9]+)(?=${unit})`)) || [0])[0],
+          10,
+        );
       };
 
-      return (_extract_unit('h') * 3600) + (_extract_unit('m') * 60) + (_extract_unit('s'));
+      return (
+        _extract_unit('h') * 3600 + _extract_unit('m') * 60 + _extract_unit('s')
+      );
     }
     return 0;
   };
@@ -162,7 +177,10 @@ z.media.MediaEmbeds = (function() {
 
         if (slashes_in_link === 3) {
           is_single_track = true;
-        } else if ((slashes_in_link > 3) && (link_path_name.indexOf('sets') === -1)) {
+        } else if (
+          slashes_in_link > 3 &&
+          link_path_name.indexOf('sets') === -1
+        ) {
           // Fix for WEBAPP-1137
           return message;
         }
@@ -171,7 +189,8 @@ z.media.MediaEmbeds = (function() {
 
         const iframe = _create_iframe_container({
           height: height,
-          src: 'https://w.soundcloud.com/player/?url={1}&visual=false&show_comments=false&buying=false&show_playcount=false&liking=false&sharing=false&hide_related=true',
+          src:
+            'https://w.soundcloud.com/player/?url={1}&visual=false&show_comments=false&buying=false&show_playcount=false&liking=false&sharing=false&hide_related=true',
           type: 'soundcloud',
           video: false,
         });
@@ -206,7 +225,7 @@ z.media.MediaEmbeds = (function() {
         link_src.replace(_regex.spotify, function(match, group1) {
           const replace_slashes = group1.replace(/\//g, ':');
           const encoded_params = encodeURIComponent(`:${replace_slashes}`);
-          return embed = iframe.replace('$1', encoded_params);
+          return (embed = iframe.replace('$1', encoded_params));
         });
 
         message = _append_iframe(link, message, embed);
@@ -225,7 +244,9 @@ z.media.MediaEmbeds = (function() {
      */
     vimeo(link, message, theme_color) {
       const link_src = link.href;
-      const vimeo_color = theme_color ? theme_color.replace('#', '') : undefined;
+      const vimeo_color = theme_color
+        ? theme_color.replace('#', '')
+        : undefined;
 
       if (link_src.match(_regex.vimeo)) {
         if (z.util.StringUtil.includes(link_src, '/user')) return message;
@@ -236,7 +257,10 @@ z.media.MediaEmbeds = (function() {
         });
 
         let embed = '';
-        link_src.replace(_regex.vimeo, (match, group1) => embed = iframe.replace('$1', group1));
+        link_src.replace(
+          _regex.vimeo,
+          (match, group1) => (embed = iframe.replace('$1', group1)),
+        );
 
         message = _append_iframe(link, message, embed);
       }

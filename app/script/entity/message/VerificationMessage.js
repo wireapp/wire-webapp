@@ -22,7 +22,8 @@
 window.z = window.z || {};
 window.z.entity = z.entity || {};
 
-z.entity.VerificationMessage = class VerificationMessage extends z.entity.Message {
+z.entity.VerificationMessage = class VerificationMessage extends z.entity
+  .Message {
   constructor() {
     super();
     this.super_type = z.message.SuperType.VERIFICATION;
@@ -33,11 +34,16 @@ z.entity.VerificationMessage = class VerificationMessage extends z.entity.Messag
     this.user_ids = ko.observableArray();
 
     this.is_self_device = ko.pureComputed(() => {
-      return (this.user_ids().length === 1) && (this.user_ids()[0] === this.user().id);
+      return (
+        this.user_ids().length === 1 && this.user_ids()[0] === this.user().id
+      );
     });
 
     this.caption_user = ko.pureComputed(() => {
-      return z.util.LocalizerUtil.join_names(this.user_ets(), z.string.Declension.NOMINATIVE);
+      return z.util.LocalizerUtil.join_names(
+        this.user_ets(),
+        z.string.Declension.NOMINATIVE,
+      );
     });
 
     this.caption_started_using = ko.pureComputed(() => {
@@ -58,7 +64,10 @@ z.entity.VerificationMessage = class VerificationMessage extends z.entity.Messag
       if (this.is_self_device()) {
         return z.l10n.text(z.string.conversation_device_your_devices);
       }
-      return z.l10n.text(z.string.conversation_device_user_devices, this.user_ets()[0].first_name());
+      return z.l10n.text(
+        z.string.conversation_device_user_devices,
+        this.user_ets()[0].first_name(),
+      );
     });
   }
 

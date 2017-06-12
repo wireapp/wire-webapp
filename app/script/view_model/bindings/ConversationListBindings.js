@@ -25,16 +25,23 @@ ko.bindingHandlers.bordered_list = (function() {
     if ($element) {
       window.requestAnimationFrame(function() {
         const archive_column = $($element).parent();
-        if (($element.height() <= 0) || !$element.is_scrollable()) {
-          return archive_column.removeClass('left-list-center-border-bottom conversations-center-border-top');
+        if ($element.height() <= 0 || !$element.is_scrollable()) {
+          return archive_column.removeClass(
+            'left-list-center-border-bottom conversations-center-border-top',
+          );
         }
 
-        archive_column.toggleClass('left-list-center-border-top', !$element.is_scrolled_top());
-        archive_column.toggleClass('left-list-center-border-bottom', !$element.is_scrolled_bottom());
+        archive_column.toggleClass(
+          'left-list-center-border-top',
+          !$element.is_scrolled_top(),
+        );
+        archive_column.toggleClass(
+          'left-list-center-border-bottom',
+          !$element.is_scrolled_bottom(),
+        );
       });
     }
-  }
-  , 100);
+  }, 100);
 
   return {
     init(element) {
@@ -42,7 +49,9 @@ ko.bindingHandlers.bordered_list = (function() {
       $element.on('scroll', () => calculate_borders($element));
       $('.left').on('click', () => calculate_borders($element));
       $(window).on('resize', () => calculate_borders($element));
-      amplify.subscribe(z.event.WebApp.LIFECYCLE.LOADED, () => calculate_borders($element));
+      amplify.subscribe(z.event.WebApp.LIFECYCLE.LOADED, () =>
+        calculate_borders($element),
+      );
     },
 
     update(element, valueAccessor) {

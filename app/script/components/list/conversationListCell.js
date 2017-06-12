@@ -28,12 +28,18 @@ z.components.ConversationListCell = class ConversationListCell {
     this.is_selected = is_selected;
     this.on_click = click;
 
-    this.users = ko.pureComputed(() => this.conversation.participating_user_ets());
+    this.users = ko.pureComputed(() =>
+      this.conversation.participating_user_ets(),
+    );
 
     this.cell_state = ko.observable('');
-    this.cell_state_observable = ko.computed(() => {
-      this.cell_state(z.conversation.ConversationCellState.generate(this.conversation));
-    }).extend({rateLimit: 500});
+    this.cell_state_observable = ko
+      .computed(() => {
+        this.cell_state(
+          z.conversation.ConversationCellState.generate(this.conversation),
+        );
+      })
+      .extend({rateLimit: 500});
   }
 
   destroy() {

@@ -23,7 +23,6 @@ window.z = window.z || {};
 window.z.ui = z.ui || {};
 
 z.ui.Context = (() => {
-
   function addListeners() {
     window.addEventListener('wheel', onWheel);
     window.addEventListener('keydown', onKeyDown);
@@ -36,7 +35,10 @@ z.ui.Context = (() => {
 
     if (event.keyCode === z.util.KEYCODE.ESC) {
       cleanup();
-    } else if (event.keyCode === z.util.KEYCODE.ARROW_UP || event.keyCode === z.util.KEYCODE.ARROW_DOWN) {
+    } else if (
+      event.keyCode === z.util.KEYCODE.ARROW_UP ||
+      event.keyCode === z.util.KEYCODE.ARROW_DOWN
+    ) {
       rotateItem(event.keyCode);
     } else if (event.keyCode === z.util.KEYCODE.ENTER) {
       triggerItem();
@@ -70,12 +72,17 @@ z.ui.Context = (() => {
     }
 
     if (entry === null) {
-      const index = keyCode === z.util.KEYCODE.ARROW_UP ? entries.length - 1 : 0;
+      const index = keyCode === z.util.KEYCODE.ARROW_UP
+        ? entries.length - 1
+        : 0;
       return entries[index].classList.add('selected');
     }
 
     const direction = keyCode === z.util.KEYCODE.ARROW_UP ? -1 : 1;
-    const nextEntry = entries[((entries.indexOf(entry) + direction) + entries.length) % entries.length];
+    const nextEntry =
+      entries[
+        (entries.indexOf(entry) + direction + entries.length) % entries.length
+      ];
     nextEntry.classList.add('selected');
     entry.classList.remove('selected');
   }
@@ -88,7 +95,7 @@ z.ui.Context = (() => {
   }
 
   function cleanup() {
-    [...document.querySelectorAll('.ctx-menu')].forEach((menu) => menu.remove());
+    [...document.querySelectorAll('.ctx-menu')].forEach(menu => menu.remove());
     removeListeners();
   }
 
@@ -145,8 +152,12 @@ z.ui.Context = (() => {
     const menuWidth = menu.offsetWidth;
     const menuHeight = menu.offsetHeight;
 
-    menu.style.left = `${(((windowWidth - click_x) < menuWidth) ? click_x - menuWidth : click_x)}px`;
-    menu.style.top = `${(((windowHeight - click_y) < menuHeight) ? click_y - menuHeight : click_y)}px`;
+    menu.style.left = `${windowWidth - click_x < menuWidth
+      ? click_x - menuWidth
+      : click_x}px`;
+    menu.style.top = `${windowHeight - click_y < menuHeight
+      ? click_y - menuHeight
+      : click_y}px`;
     menu.style.visibility = '';
 
     addListeners();
@@ -155,5 +166,4 @@ z.ui.Context = (() => {
   return {
     from,
   };
-
 })();

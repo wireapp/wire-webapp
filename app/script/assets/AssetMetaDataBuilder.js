@@ -25,15 +25,19 @@ window.z.assets = z.assets || {};
 // Builder for creating all kinds of asset metadata
 z.assets.AssetMetaDataBuilder = {
   _build_audio_metdadata(audiofile) {
-    return z.util.load_file_buffer(audiofile)
-    .then((buffer) => {
-      const audioContext = new AudioContext();
-      audioContext.close();
-      return audioContext.decodeAudioData(buffer);
-    })
-    .then((audio_buffer) => {
-      return new z.proto.Asset.AudioMetaData(audio_buffer.duration * 1000, z.assets.AssetMetaDataBuilder._normalise_loudness(audio_buffer));
-    });
+    return z.util
+      .load_file_buffer(audiofile)
+      .then(buffer => {
+        const audioContext = new AudioContext();
+        audioContext.close();
+        return audioContext.decodeAudioData(buffer);
+      })
+      .then(audio_buffer => {
+        return new z.proto.Asset.AudioMetaData(
+          audio_buffer.duration * 1000,
+          z.assets.AssetMetaDataBuilder._normalise_loudness(audio_buffer),
+        );
+      });
   },
 
   _build_image_metdadata(imagefile) {
@@ -44,7 +48,7 @@ z.assets.AssetMetaDataBuilder = {
         resolve(new z.proto.Asset.ImageMetaData(img.width, img.height));
         window.URL.revokeObjectURL(url);
       };
-      img.onerror = (error) => {
+      img.onerror = error => {
         reject(error);
         window.URL.revokeObjectURL(url);
       };
@@ -57,10 +61,16 @@ z.assets.AssetMetaDataBuilder = {
       const url = window.URL.createObjectURL(videofile);
       const video = document.createElement('video');
       video.onloadedmetadata = () => {
-        resolve(new z.proto.Asset.VideoMetaData(video.videoWidth, video.videoHeight, video.duration));
+        resolve(
+          new z.proto.Asset.VideoMetaData(
+            video.videoWidth,
+            video.videoHeight,
+            video.duration,
+          ),
+        );
         window.URL.revokeObjectURL(url);
       };
-      video.onerror = (error) => {
+      video.onerror = error => {
         reject(error);
         window.URL.revokeObjectURL(url);
       };
@@ -75,8 +85,10 @@ z.assets.AssetMetaDataBuilder = {
     const bucket_size = parseInt(channel.length / MAX_SAMPLES);
     const buckets = z.util.ArrayUtil.chunk(channel, bucket_size);
 
-    const preview = buckets.map((bucket) => {
-      return z.util.NumberUtil.cap_to_byte(AMPLIFIER * z.util.NumberUtil.root_mean_square(bucket));
+    const preview = buckets.map(bucket => {
+      return z.util.NumberUtil.cap_to_byte(
+        AMPLIFIER * z.util.NumberUtil.root_mean_square(bucket),
+      );
     });
 
     return new Uint8Array(preview);
@@ -101,7 +113,6 @@ z.assets.AssetMetaDataBuilder = {
     }
     return Promise.resolve();
   },
-
 
   is_audio(file) {
     return file && file.type.startsWith('audio');

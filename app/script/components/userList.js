@@ -59,7 +59,7 @@ z.components.UserListViewModel = class UserListViewModel {
     });
 
     this.show_buttons = () => {
-      return (this.user_connect !== undefined);
+      return this.user_connect !== undefined;
     };
 
     this.filtered_user_ets = this.user_ets;
@@ -81,15 +81,14 @@ z.components.UserListViewModel = class UserListViewModel {
     // Filter all list items if a filter is provided
     if (this.user_filter) {
       this.filtered_user_ets = ko.pureComputed(() => {
-        const normalized_query = z.search.SearchRepository.normalize_query(this.user_filter());
-        return this.user_ets()
-          .filter((user_et) => {
-            const is_username = this.user_filter()
-              .trim()
-              .startsWith('@');
+        const normalized_query = z.search.SearchRepository.normalize_query(
+          this.user_filter(),
+        );
+        return this.user_ets().filter(user_et => {
+          const is_username = this.user_filter().trim().startsWith('@');
 
-            return user_et.matches(normalized_query, is_username);
-          });
+          return user_et.matches(normalized_query, is_username);
+        });
       });
     }
 
@@ -100,7 +99,7 @@ z.components.UserListViewModel = class UserListViewModel {
 
     // List will be selectable if select is provided
     if (this.user_selected) {
-      this.on_select = (user_et) => {
+      this.on_select = user_et => {
         const is_selected = this.is_selected(user_et);
         if (is_selected) {
           this.user_selected.remove(user_et);
@@ -113,13 +112,12 @@ z.components.UserListViewModel = class UserListViewModel {
         }
       };
 
-      this.is_selected = (user_et) => {
+      this.is_selected = user_et => {
         return this.user_selected().includes(user_et);
       };
     }
   }
 };
-
 
 ko.components.register('user-list', {
   template: `

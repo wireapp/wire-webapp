@@ -19,7 +19,6 @@
 
 'use strict';
 
-
 ko.bindingHandlers.l10n_href = {
   update(element, valueAccessor) {
     const {id = valueAccessor(), substitute} = valueAccessor();

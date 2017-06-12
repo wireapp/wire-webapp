@@ -34,7 +34,14 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
    * @param {z.conversation.ConversationRepository} conversation_repository - Conversation repository
    * @param {z.user.UserRepository} user_repository - User repository
   */
-  constructor(element_id, list_view_model, content_view_model, calling_repository, conversation_repository, user_repository) {
+  constructor(
+    element_id,
+    list_view_model,
+    content_view_model,
+    calling_repository,
+    conversation_repository,
+    user_repository,
+  ) {
     this.click_on_conversation = this.click_on_conversation.bind(this);
     this.is_selected_conversation = this.is_selected_conversation.bind(this);
 
@@ -43,7 +50,10 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
     this.calling_repository = calling_repository;
     this.conversation_repository = conversation_repository;
     this.user_repository = user_repository;
-    this.logger = new z.util.Logger('z.ViewModel.list.ConversationListViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger(
+      'z.ViewModel.list.ConversationListViewModel',
+      z.config.LOGGER.OPTIONS,
+    );
 
     this.joined_call = this.calling_repository.joined_call;
     this.show_calls = ko.observable(false);
@@ -57,7 +67,10 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
     this.connect_requests_text = ko.pureComputed(() => {
       const number_of_requests = this.connect_requests().length;
       if (number_of_requests > 1) {
-        return z.l10n.text(z.string.conversations_connection_request_many, number_of_requests);
+        return z.l10n.text(
+          z.string.conversations_connection_request_many,
+          number_of_requests,
+        );
       }
       return z.l10n.text(z.string.conversations_connection_request_one);
     });
@@ -68,9 +81,16 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
 
     this.webapp_is_loaded = ko.observable(false);
 
-    this.should_update_scrollbar = ko.computed(() => {
-      return this.webapp_is_loaded() || this.conversations_unarchived().length || this.connect_requests().length || this.conversations_calls().length;
-    }).extend({notify: 'always', rateLimit: 500});
+    this.should_update_scrollbar = ko
+      .computed(() => {
+        return (
+          this.webapp_is_loaded() ||
+          this.conversations_unarchived().length ||
+          this.connect_requests().length ||
+          this.conversations_calls().length
+        );
+      })
+      .extend({notify: 'always', rateLimit: 500});
 
     this.active_team_name = ko.pureComputed(() => {
       const team_et = this.conversation_repository.active_team();
@@ -87,10 +107,16 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
     });
 
     this.archive_tooltip = ko.pureComputed(() => {
-      return z.l10n.text(z.string.tooltip_conversations_archived, this.conversations_archived().length);
+      return z.l10n.text(
+        z.string.tooltip_conversations_archived,
+        this.conversations_archived().length,
+      );
     });
 
-    this.start_tooltip = z.l10n.text(z.string.tooltip_conversations_tooltip_start, z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.START));
+    this.start_tooltip = z.l10n.text(
+      z.string.tooltip_conversations_tooltip_start,
+      z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.START),
+    );
 
     this.show_connect_requests = ko.pureComputed(() => {
       const team_et = this.conversation_repository.active_team();
@@ -101,7 +127,9 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
 
     this.self_stream_state = this.calling_repository.self_stream_state;
 
-    this.show_toggle_screen = ko.pureComputed(() => z.calling.CallingRepository.supports_screen_sharing);
+    this.show_toggle_screen = ko.pureComputed(
+      () => z.calling.CallingRepository.supports_screen_sharing,
+    );
     this.show_toggle_video = ko.pureComputed(() => {
       if (this.joined_call()) {
         return this.joined_call().conversation_et.is_one2one();
@@ -117,7 +145,9 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
   }
 
   click_on_connect_requests() {
-    this.content_view_model.switch_content(z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS);
+    this.content_view_model.switch_content(
+      z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS,
+    );
   }
 
   click_on_conversation(conversation_et) {
@@ -127,7 +157,8 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
   }
 
   set_show_calls_state(handling_notifications) {
-    const updated_show_calls_state = handling_notifications === z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
+    const updated_show_calls_state =
+      handling_notifications === z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
     if (this.show_calls !== updated_show_calls_state) {
       this.show_calls(updated_show_calls_state);
@@ -136,16 +167,34 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
   }
 
   _init_subscriptions() {
-    amplify.subscribe(z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, this.set_show_calls_state.bind(this));
-    amplify.subscribe(z.event.WebApp.LIFECYCLE.LOADED, this.on_webapp_loaded.bind(this));
-    amplify.subscribe(z.event.WebApp.SHORTCUT.NEXT, this._go_to_next_conversation.bind(this));
-    amplify.subscribe(z.event.WebApp.SHORTCUT.PREV, this._go_to_prev_conversation.bind(this));
-    amplify.subscribe(z.event.WebApp.SHORTCUT.START, this.click_on_people_button.bind(this));
+    amplify.subscribe(
+      z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE,
+      this.set_show_calls_state.bind(this),
+    );
+    amplify.subscribe(
+      z.event.WebApp.LIFECYCLE.LOADED,
+      this.on_webapp_loaded.bind(this),
+    );
+    amplify.subscribe(
+      z.event.WebApp.SHORTCUT.NEXT,
+      this._go_to_next_conversation.bind(this),
+    );
+    amplify.subscribe(
+      z.event.WebApp.SHORTCUT.PREV,
+      this._go_to_prev_conversation.bind(this),
+    );
+    amplify.subscribe(
+      z.event.WebApp.SHORTCUT.START,
+      this.click_on_people_button.bind(this),
+    );
   }
 
   _go_to_next_conversation() {
     const conversations = this.conversation_repository.conversations_unarchived();
-    const next_index = conversations.indexOf(this.conversation_repository.active_conversation()) - 1;
+    const next_index =
+      conversations.indexOf(
+        this.conversation_repository.active_conversation(),
+      ) - 1;
     const next_conversation_et = conversations[next_index];
 
     if (next_conversation_et) {
@@ -155,7 +204,10 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
 
   _go_to_prev_conversation() {
     const conversations = this.conversation_repository.conversations_unarchived();
-    const prev_index = conversations.indexOf(this.conversation_repository.active_conversation()) + 1;
+    const prev_index =
+      conversations.indexOf(
+        this.conversation_repository.active_conversation(),
+      ) + 1;
     const prev_conversation_et = conversations[prev_index];
 
     if (prev_conversation_et) {
@@ -164,7 +216,9 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
   }
 
   is_selected_conversation(conversation_et) {
-    const is_selected_conversation = this.conversation_repository.is_active_conversation(conversation_et);
+    const is_selected_conversation = this.conversation_repository.is_active_conversation(
+      conversation_et,
+    );
     const is_selected_state = [
       z.ViewModel.content.CONTENT_STATE.COLLECTION,
       z.ViewModel.content.CONTENT_STATE.COLLECTION_DETAILS,
@@ -177,7 +231,6 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
   on_webapp_loaded() {
     this.webapp_is_loaded(true);
   }
-
 
   //##############################################################################
   // Call stuff
@@ -192,7 +245,11 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
   }
 
   on_leave_call(conversation_et) {
-    amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, conversation_et.id, z.calling.enum.TERMINATION_REASON.SELF_USER);
+    amplify.publish(
+      z.event.WebApp.CALL.STATE.LEAVE,
+      conversation_et.id,
+      z.calling.enum.TERMINATION_REASON.SELF_USER,
+    );
   }
 
   on_reject_call(conversation_et) {
@@ -200,17 +257,27 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
   }
 
   on_toggle_audio(conversation_et) {
-    amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, conversation_et.id, z.media.MediaType.AUDIO);
+    amplify.publish(
+      z.event.WebApp.CALL.MEDIA.TOGGLE,
+      conversation_et.id,
+      z.media.MediaType.AUDIO,
+    );
   }
 
   on_toggle_screen(conversation_et) {
-    amplify.publish(z.event.WebApp.CALL.MEDIA.CHOOSE_SCREEN, conversation_et.id);
+    amplify.publish(
+      z.event.WebApp.CALL.MEDIA.CHOOSE_SCREEN,
+      conversation_et.id,
+    );
   }
 
   on_toggle_video(conversation_et) {
-    amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, conversation_et.id, z.media.MediaType.VIDEO);
+    amplify.publish(
+      z.event.WebApp.CALL.MEDIA.TOGGLE,
+      conversation_et.id,
+      z.media.MediaType.VIDEO,
+    );
   }
-
 
   //##############################################################################
   // Footer actions
@@ -223,7 +290,6 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
   click_on_people_button() {
     this.list_view_model.switch_list(z.ViewModel.list.LIST_STATE.START_UI);
   }
-
 
   //##############################################################################
   // Legacy

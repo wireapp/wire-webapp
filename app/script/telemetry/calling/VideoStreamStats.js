@@ -23,7 +23,8 @@ window.z = window.z || {};
 window.z.telemetry = z.telemetry || {};
 window.z.telemetry.calling = z.telemetry.calling || {};
 
-z.telemetry.calling.VideoStreamStats = class VideoStreamStats extends z.telemetry.calling.MediaStreamStats {
+z.telemetry.calling.VideoStreamStats = class VideoStreamStats extends z
+  .telemetry.calling.MediaStreamStats {
   /**
    * Construct a new VideoStream stats report.
    * @param {Date} timestamp - Creation date

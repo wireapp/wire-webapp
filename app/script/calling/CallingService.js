@@ -28,7 +28,10 @@ z.calling.CallingService = class CallingService {
    * @param {z.client.Client} client - Local client entity
    */
   constructor(client) {
-    this.logger = new z.util.Logger('z.calling.CallingService', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger(
+      'z.calling.CallingService',
+      z.config.LOGGER.OPTIONS,
+    );
     this.client = client;
   }
 
