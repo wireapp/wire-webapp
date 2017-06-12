@@ -556,7 +556,7 @@ z.string.pt.tooltip_conversations_archived = 'Mostrar arquivo ({{number}})';
 z.string.pt.tooltip_conversations_more = 'Ver mais';
 z.string.pt.tooltip_conversations_notify = 'Tirar do silencioso ({{shortcut}})';
 z.string.pt.tooltip_conversations_silence = 'Silenciar ({{shortcut}})';
-z.string.pt.tooltip_conversations_tooltip_start = 'Iniciar conversa ({{shortcut}})';
+z.string.pt.tooltip_conversations_start = 'Iniciar conversa ({{shortcut}})';
 
 z.string.pt.tooltip_people_add = 'Adicionar pessoas à conversa ({{shortcut}})';
 z.string.pt.tooltip_people_back = 'Voltar';

@@ -550,7 +550,7 @@ z.string.it.tooltip_conversations_archived = 'Mostra archivio ({{number}})';
 z.string.it.tooltip_conversations_more = 'Altro';
 z.string.it.tooltip_conversations_notify = 'Riattiva audio ({{shortcut}})';
 z.string.it.tooltip_conversations_silence = 'Silenzia ({{shortcut}})';
-z.string.it.tooltip_conversations_tooltip_start = 'Avvia conversazione ({{shortcut}})';
+z.string.it.tooltip_conversations_start = 'Avvia conversazione ({{shortcut}})';
 
 z.string.it.tooltip_people_add = 'Aggiungi persone alla conversazione ({{shortcut}})';
 z.string.it.tooltip_people_back = 'Indietro';

@@ -560,7 +560,7 @@ z.string.fr.tooltip_conversations_archived = 'Voir les archives ({{number}})';
 z.string.fr.tooltip_conversations_more = 'Plus';
 z.string.fr.tooltip_conversations_notify = 'Activer les notifications ({{shortcut}})';
 z.string.fr.tooltip_conversations_silence = 'Désactiver les notifications ({{shortcut}})';
-z.string.fr.tooltip_conversations_tooltip_start = 'Démarrer une conversation ({{shortcut}})';
+z.string.fr.tooltip_conversations_start = 'Démarrer une conversation ({{shortcut}})';
 
 z.string.fr.tooltip_people_add = 'Ajouter des personnes à la conversation ({{shortcut}})';
 z.string.fr.tooltip_people_back = 'Précédent';

@@ -559,7 +559,7 @@ z.string.tr.tooltip_conversations_archived = 'Arşivi göster ({{number}})';
 z.string.tr.tooltip_conversations_more = 'Daha';
 z.string.tr.tooltip_conversations_notify = 'Sesi aç ({{shortcut}})';
 z.string.tr.tooltip_conversations_silence = 'Sessize al ({{shortcut}})';
-z.string.tr.tooltip_conversations_tooltip_start = 'Konuşma başlat ({{shortcut}})';
+z.string.tr.tooltip_conversations_start = 'Konuşma başlat ({{shortcut}})';
 
 z.string.tr.tooltip_people_add = 'Konuşmaya birilerini ekle ({{shortcut}})';
 z.string.tr.tooltip_people_back = 'Geri';

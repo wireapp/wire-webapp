@@ -565,7 +565,7 @@ z.string.ru.tooltip_conversations_archived = 'Показать архив ({{num
 z.string.ru.tooltip_conversations_more = 'Больше';
 z.string.ru.tooltip_conversations_notify = 'Включить звук ({{shortcut}})';
 z.string.ru.tooltip_conversations_silence = 'Выключить звук ({{shortcut}})';
-z.string.ru.tooltip_conversations_tooltip_start = 'Начать разговор ({{shortcut}})';
+z.string.ru.tooltip_conversations_start = 'Начать разговор ({{shortcut}})';
 
 z.string.ru.tooltip_people_add = 'Добавить людей в разговор ({{shortcut}})';
 z.string.ru.tooltip_people_back = 'Назад';

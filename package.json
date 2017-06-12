@@ -40,7 +40,7 @@
     "prettier": "1.4.2",
     "request": "2.81.0",
     "sinon": "2.3.1",
-    "stylelint": "7.10.1"
+    "stylelint": "7.11.0"
   },
   "scripts": {
     "deploy-travis-dev": "grunt app_deploy_travis:dev",

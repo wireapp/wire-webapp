@@ -550,7 +550,7 @@ z.string.ro.tooltip_conversations_archived = 'Arată arhiva ({{number}})';
 z.string.ro.tooltip_conversations_more = 'Mai multe';
 z.string.ro.tooltip_conversations_notify = 'Demutizează ({{shortcut}})';
 z.string.ro.tooltip_conversations_silence = 'Mutizează ({{shortcut}})';
-z.string.ro.tooltip_conversations_tooltip_start = 'Începe conversația ({{shortcut}})';
+z.string.ro.tooltip_conversations_start = 'Începe conversația ({{shortcut}})';
 
 z.string.ro.tooltip_people_add = 'Adaugă persoane la conversație ({{shortcut}})';
 z.string.ro.tooltip_people_back = 'Înapoi';
