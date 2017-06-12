@@ -43,17 +43,19 @@ z.components.ConversationListCell = class ConversationListCell {
 
 ko.components.register('conversation-list-cell', {
   template: `
-    <div class="conversation-list-cell" data-bind="attr: {'data-uie-uid': conversation.id, 'data-uie-value': conversation.display_name}, css: {'conversation-list-cell-active': is_selected(conversation)}">
+    <div class="conversation-list-cell" data-bind="attr: {'data-uie-uid': conversation.id, 'data-uie-value': conversation.display_name}">
       <div class="conversation-list-cell-left" data-bind="css: {'conversation-list-cell-left-opaque': conversation.removed_from_conversation() || conversation.participating_user_ids().length === 0}">
         <!-- ko if: conversation.is_group() || conversation.is_team_group()  -->
-          <group-avatar class="conversation-list-cell-avatar-arrow" params="users: users(), conversation: conversation"></group-avatar>
+          <group-avatar class="conversation-list-cell-avatar-arrow" data-bind="css: {'group-avatar-active': is_selected(conversation)}" params="users: users(), conversation: conversation"></group-avatar>
         <!-- /ko -->
         <!-- ko if: !conversation.is_group() && !conversation.is_team_group() && users().length === 1 -->
-          <user-avatar class="user-avatar-s" params="user: users()[0]"></user-avatar>
+          <div class="user-avatar-halo" data-bind="css: {'user-avatar-halo-active': is_selected(conversation)}">
+            <user-avatar class="user-avatar-s" params="user: users()[0]"></user-avatar>
+          </div>
         <!-- /ko -->
       </div>
       <div class="conversation-list-cell-center">
-        <span class="conversation-list-cell-name" data-bind="text: conversation.display_name()"></span>
+        <span class="conversation-list-cell-name" data-bind="text: conversation.display_name(), css: {'text-theme': is_selected(conversation)}"></span>
         <span class="conversation-list-cell-description" data-bind="text: cell_state().description" data-uie-name="secondary-line"></span>
       </div>
       <div class="conversation-list-cell-right">
