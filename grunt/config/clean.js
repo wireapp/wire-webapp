@@ -21,6 +21,9 @@
 
 // https://github.com/gruntjs/grunt-contrib-clean
 
+
+/* eslint sort-keys: "off"*/
+
 module.exports = {
 //##############################################################################
 // Local/Test deployment related

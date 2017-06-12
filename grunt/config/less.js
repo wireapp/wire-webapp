@@ -26,8 +26,8 @@ module.exports = {
 //##############################################################################
   deploy: {
     files: [{
-      '<%= dir.deploy %>/style/main.css': '<%= dir.app.style %>/main.less',
       '<%= dir.deploy %>/style/auth.css': '<%= dir.app.style %>/auth/auth.less',
+      '<%= dir.deploy %>/style/main.css': '<%= dir.app.style %>/main.less',
     }],
     options: {
       compress: true,
@@ -41,8 +41,8 @@ module.exports = {
   dist: {
 
     files: [{
-      '<%= dir.dist %>/style/main.css': '<%= dir.app.style %>/main.less',
       '<%= dir.dist %>/style/auth.css': '<%= dir.app.style %>/auth/auth.less',
+      '<%= dir.dist %>/style/main.css': '<%= dir.app.style %>/main.less',
     }],
     options: {
       paths: '<%= dir.app_ %>',

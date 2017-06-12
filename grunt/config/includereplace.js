@@ -22,75 +22,10 @@
 // https://github.com/alanshaw/grunt-include-replace
 
 module.exports = {
-//##############################################################################
-// Local deployment related
-//##############################################################################
-  dist_index: {
-    cwd: '<%= dir.app.page %>',
-    dest: '<%= dir.dist %>',
-    expand: true,
-    options: {
-      globals: {
-        dest: '_dist',
-      },
-      includesDir: '<%= dir.app.page %>/template',
-      prefix: '#',
-    },
-    src: 'index.html',
-  },
-
-  dist_auth: {
-    cwd: '<%= dir.app.page %>',
-    dest: '<%= dir.dist %>/auth',
-    expand: true,
-    options: {
-      globals: {
-        dest: '_dist',
-      },
-      includesDir: '<%= dir.app.page %>/template',
-      prefix: '#',
-    },
-    rename(dest, src) {
-      return `${dest}/index.html`;
-    },
-    src: 'auth.html',
-  },
-
-  dist_demo: {
-    cwd: '<%= dir.app.demo %>',
-    dest: '<%= dir.dist %>/demo',
-    expand: true,
-    options: {
-      globals: {
-        dest: '_dist',
-      },
-      includesDir: '<%= dir.app.demo %>/template',
-      prefix: '#',
-    },
-    rename(dest, src) {
-      return `${dest}/index.html`;
-    },
-    src: 'demo.html',
-  },
-
 
 //##############################################################################
 // Edge/Staging deployment related
 //##############################################################################
-  deploy_index: {
-    cwd: '<%= dir.app.page %>',
-    dest: '<%= dir.deploy %>',
-    expand: true,
-    options: {
-      globals: {
-        dest: '_deploy',
-      },
-      includesDir: '<%= dir.app.page %>/template',
-      prefix: '#',
-    },
-    src: 'index.html',
-  },
-
   deploy_auth: {
     cwd: '<%= dir.app.page %>',
     dest: '<%= dir.deploy %>/auth',
@@ -125,16 +60,13 @@ module.exports = {
     src: 'demo.html',
   },
 
-//##############################################################################
-// Production deployment related
-//##############################################################################
-  prod_index: {
+  deploy_index: {
     cwd: '<%= dir.app.page %>',
     dest: '<%= dir.deploy %>',
     expand: true,
     options: {
       globals: {
-        dest: '_prod',
+        dest: '_deploy',
       },
       includesDir: '<%= dir.app.page %>/template',
       prefix: '#',
@@ -142,6 +74,60 @@ module.exports = {
     src: 'index.html',
   },
 
+//##############################################################################
+// Local deployment related
+//##############################################################################
+  dist_auth: {
+    cwd: '<%= dir.app.page %>',
+    dest: '<%= dir.dist %>/auth',
+    expand: true,
+    options: {
+      globals: {
+        dest: '_dist',
+      },
+      includesDir: '<%= dir.app.page %>/template',
+      prefix: '#',
+    },
+    rename(dest, src) {
+      return `${dest}/index.html`;
+    },
+    src: 'auth.html',
+  },
+
+  dist_demo: {
+    cwd: '<%= dir.app.demo %>',
+    dest: '<%= dir.dist %>/demo',
+    expand: true,
+    options: {
+      globals: {
+        dest: '_dist',
+      },
+      includesDir: '<%= dir.app.demo %>/template',
+      prefix: '#',
+    },
+    rename(dest, src) {
+      return `${dest}/index.html`;
+    },
+    src: 'demo.html',
+  },
+
+  dist_index: {
+    cwd: '<%= dir.app.page %>',
+    dest: '<%= dir.dist %>',
+    expand: true,
+    options: {
+      globals: {
+        dest: '_dist',
+      },
+      includesDir: '<%= dir.app.page %>/template',
+      prefix: '#',
+    },
+    src: 'index.html',
+  },
+
+//##############################################################################
+// Production deployment related
+//##############################################################################
   prod_auth: {
     cwd: '<%= dir.app.page %>',
     dest: '<%= dir.deploy %>/auth',
@@ -175,4 +161,19 @@ module.exports = {
     },
     src: 'demo.html',
   },
+
+  prod_index: {
+    cwd: '<%= dir.app.page %>',
+    dest: '<%= dir.deploy %>',
+    expand: true,
+    options: {
+      globals: {
+        dest: '_prod',
+      },
+      includesDir: '<%= dir.app.page %>/template',
+      prefix: '#',
+    },
+    src: 'index.html',
+  },
+
 };
