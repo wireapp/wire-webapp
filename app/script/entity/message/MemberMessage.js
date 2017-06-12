@@ -52,14 +52,14 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
 
     this._get_caption_connection = function(user_et) {
       if (user_et.is_blocked()) {
-        return z.localization.Localizer.get_text(z.string.conversation_connection_blocked);
+        return z.l10n.text(z.string.conversation_connection_blocked);
       }
 
       if (user_et.is_outgoing_request()) {
         return '';
       }
 
-      return z.localization.Localizer.get_text(z.string.conversation_connection_accepted);
+      return z.l10n.text(z.string.conversation_connection_accepted);
     };
 
     this._get_caption_with_names = (key, declension) => {
@@ -112,9 +112,9 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
         case z.event.Backend.CONVERSATION.MEMBER_LEAVE:
           if (this.other_user().id === this.user().id) {
             if (this.user().is_me) {
-              return z.localization.Localizer.get_text(z.string.conversation_member_leave_left_you);
+              return z.l10n.text(z.string.conversation_member_leave_left_you);
             }
-            return z.localization.Localizer.get_text(z.string.conversation_member_leave_left);
+            return z.l10n.text(z.string.conversation_member_leave_left);
           }
           if (this.user().is_me) {
             return this._get_caption_with_names(z.string.conversation_member_leave_removed_you);
@@ -125,6 +125,8 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
             return this._get_caption_with_names(z.string.conversation_member_join_you);
           }
           return this._get_caption_with_names(z.string.conversation_member_join);
+        case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE:
+          return z.l10n.text(z.string.conversation_team_leave);
         default:
           break;
       }
@@ -145,5 +147,37 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
       z.message.SystemMessageType.CONVERSATION_CREATE,
       z.message.SystemMessageType.CONVERSATION_RESUME,
     ].includes(this.member_message_type);
+  }
+
+  is_conversation_create() {
+    return this.member_message_type === z.message.SystemMessageType.CONVERSATION_CREATE;
+  }
+
+  is_conversation_initialization() {
+    return this.is_conversation_create() || this.is_conversation_resume();
+  }
+
+  is_conversation_resume() {
+    return this.member_message_type === z.message.SystemMessageType.CONVERSATION_RESUME;
+  }
+
+  is_member_change() {
+    return this.is_member_join() || this.is_member_leave() || this.is_team_member_leave();
+  }
+
+  is_member_join() {
+    return this.type === z.event.Backend.CONVERSATION.MEMBER_JOIN;
+  }
+
+  is_member_leave() {
+    return this.type === z.event.Backend.CONVERSATION.MEMBER_LEAVE;
+  }
+
+  is_team_member_leave() {
+    return this.type === z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE;
+  }
+
+  is_member_removal() {
+    return this.is_member_leave() || this.is_team_member_leave();
   }
 };

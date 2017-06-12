@@ -54,14 +54,24 @@ z.conversation.ConversationService = class ConversationService {
    *
    * @param {Array<string>} user_ids - IDs of users (excluding the requestor) to be part of the conversation
    * @param {string} name - User defined name for the Conversation (optional)
+   * @param {string} team_id - ID of team conversation belongs to
    * @returns {Promise} Resolves when the conversation was created
    */
-  create_conversation(user_ids, name) {
+  create_conversation(user_ids, name, team_id) {
+    const payload = {
+      name: name,
+      users: user_ids,
+    };
+
+    if (team_id) {
+      payload.team = {
+        managed: false,
+        teamid: team_id,
+      };
+    }
+
     return this.client.send_json({
-      data: {
-        name: name,
-        users: user_ids,
-      },
+      data: payload,
       type: 'POST',
       url: this.client.create_url(ConversationService.CONFIG.URL_CONVERSATIONS),
     });
@@ -284,6 +294,19 @@ z.conversation.ConversationService = class ConversationService {
   //##############################################################################
   // Database interactions
   //##############################################################################
+
+  /**
+   * Deletes a conversation entity from the local database.
+   * @param {string} conversation_id - ID of conversation to be deleted
+   * @returns {Promise} Resolves when the entity was deleted
+   */
+  delete_conversation_from_in_db(conversation_id) {
+    return this.storage_service.delete(z.storage.StorageService.OBJECT_STORE.CONVERSATIONS, conversation_id)
+      .then((primary_key) => {
+        this.logger.log(this.logger.levels.INFO, `State of conversation '${primary_key}' was deleted`);
+        return primary_key;
+      });
+  }
 
   /**
    * Delete a message from a conversation. Duplicates are delete as well.
@@ -586,9 +609,22 @@ z.conversation.ConversationService = class ConversationService {
             return this.storage_service.db.transaction('rw', z.storage.StorageService.OBJECT_STORE.EVENTS, () => {
               return this.load_event_from_db(conversation_id, message_et.id)
                 .then((record) => {
-                  if (record && (changes.version === ((record.version || 1) + 1))) {
-                    return this.storage_service.update(z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key, changes);
+                  let custom_data;
+
+                  if (record) {
+                    const database_version = record.version || 1;
+
+                    if (changes.version === database_version + 1) {
+                      return this.storage_service.update(z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key, changes);
+                    }
+
+                    custom_data = {
+                      database_version: database_version,
+                      update_version: changes.version,
+                    };
                   }
+
+                  Raygun.send('Failed sequential database update', custom_data);
                   throw new z.storage.StorageError(z.storage.StorageError.TYPE.NON_SEQUENTIAL_UPDATE);
                 });
             });

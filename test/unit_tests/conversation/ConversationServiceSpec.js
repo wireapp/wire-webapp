@@ -43,7 +43,7 @@ describe('ConversationService', function() {
 
   afterEach(function() {
     storage_service.clear_all_stores();
-    return server.restore();
+    server.restore();
   });
 
   describe('load_preceding_events_from_db', function() {

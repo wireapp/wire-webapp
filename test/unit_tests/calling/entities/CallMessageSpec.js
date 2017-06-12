@@ -17,13 +17,18 @@
  *
  */
 
+// grunt test_init && grunt test_run:calling/entities/CallMessage
+
 'use strict';
 
-window.z = window.z || {};
-window.z.calling = z.calling || {};
-window.z.calling.enum = z.calling.enum || {};
+describe('z.calling.entities.CallMessage', function() {
+  describe('_create_session_id', function() {
+    const call_message_et = new z.calling.entities.CallMessage();
 
-z.calling.enum.PROTOCOL = {
-  VERSION_2: '2.0',
-  VERSION_3: '3.0',
-};
+    it('always returns an alphanumeric string of length four', function() {
+      _.range(100).map(function() {
+        expect(call_message_et._create_session_id()).toMatch(/(\w|\d){4}/);
+      });
+    });
+  });
+});

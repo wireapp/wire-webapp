@@ -105,7 +105,6 @@ z.event.EventRepository = class EventRepository {
       } else if (this.notifications_loaded() && this.notification_handling_state() !== z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET) {
         this.logger.info(`Done handling '${this.notifications_total}' notifications from the stream`);
         this.notification_handling_state(z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
-        this._find_ongoing_calls();
         this.notifications_loaded(false);
         this.notifications_promises[0](this.last_notification_id());
       }
@@ -250,12 +249,28 @@ z.event.EventRepository = class EventRepository {
    * Get the last notification.
    * @returns {Promise} Resolves with the last handled notification ID
    */
-  get_last_notification_id_from_db() {
+  get_last_notification_id() {
     return this.notification_service.get_last_notification_id_from_db()
-    .then((last_notification_id) => {
-      this.last_notification_id(last_notification_id);
-      return this.last_notification_id();
-    });
+      .then((last_notification_id) => {
+        this.last_notification_id(last_notification_id);
+        return this.last_notification_id();
+      })
+      .catch((error) => {
+        if (error.type !== z.event.EventError.TYPE.NO_LAST_ID) {
+          throw error;
+        }
+
+        this.logger.warn('Last notification ID not found in database. Resetting...');
+        return this.notification_service.get_notifications_last()
+          .then(({id: notification_id}) => {
+            if (notification_id) {
+              this._update_last_notification_id(notification_id);
+              amplify.publish(z.event.WebApp.CONVERSATION.MISSED_EVENTS);
+              return this.last_notification_id();
+            }
+            throw error;
+          });
+      });
   }
 
   /**
@@ -265,10 +280,10 @@ z.event.EventRepository = class EventRepository {
    */
   initialize_last_notification_id(client_id) {
     return this.notification_service.get_notifications_last(client_id)
-    .then((response) => {
-      this._update_last_notification_id(response.id);
-      this.logger.info(`Set starting point on notification stream to '${this.last_notification_id()}'`);
-    });
+      .then((response) => {
+        this._update_last_notification_id(response.id);
+        this.logger.info(`Set starting point on notification stream to '${this.last_notification_id()}'`);
+      });
   }
 
   /**
@@ -276,7 +291,7 @@ z.event.EventRepository = class EventRepository {
    * @returns {Promise} Resolves when all notifications have been handled
    */
   initialize_from_notification_stream() {
-    return this.get_last_notification_id_from_db()
+    return this.get_last_notification_id()
       .then((last_notification_id) => {
         return this._update_from_notification_stream(last_notification_id);
       })
@@ -313,40 +328,6 @@ z.event.EventRepository = class EventRepository {
   }
 
   /**
-   * Check for conversations with ongoing calls.
-   * @private
-   * @returns {undefined} No return value
-   */
-  _find_ongoing_calls() {
-    this.logger.info('Checking for ongoing calls');
-    this.conversation_service.load_events_with_types([z.event.Backend.CONVERSATION.VOICE_CHANNEL_ACTIVATE, z.event.Backend.CONVERSATION.VOICE_CHANNEL_DEACTIVATE])
-    .then(function(events) {
-      const filtered_conversations = {};
-
-      for (const {conversation: conversation_id, protocol_version, type} of events) {
-        if (type === z.event.Backend.CONVERSATION.VOICE_CHANNEL_ACTIVATE) {
-          if (protocol_version !== z.calling.enum.PROTOCOL.VERSION_3) {
-            filtered_conversations[conversation_id] = null;
-          }
-        } else if (type === z.event.Backend.CONVERSATION.VOICE_CHANNEL_DEACTIVATE) {
-          if (protocol_version !== z.calling.enum.PROTOCOL.VERSION_3) {
-            delete filtered_conversations[conversation_id];
-          }
-        }
-      }
-
-      return Object.keys(filtered_conversations);
-    })
-    .then((conversation_ids) => {
-      this.logger.info(`Identified '${conversation_ids.length}' conversations that possibly have an ongoing call`, conversation_ids);
-      conversation_ids.map((conversation_id) => amplify.publish(z.event.WebApp.CALL.STATE.CHECK, conversation_id));
-    })
-    .catch((error) => {
-      this.logger.error('Could not check for active calls', error);
-    });
-  }
-
-  /**
    * Get the ID of the last known notification.
    * @note Notifications that have not yet been handled but are in the queue should not be fetched again on recovery
    *
@@ -380,7 +361,6 @@ z.event.EventRepository = class EventRepository {
       .catch((error) => {
         this.notification_handling_state(z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
         if (error.type === z.event.EventError.TYPE.NO_NOTIFICATIONS) {
-          this._find_ongoing_calls();
           this.logger.info('No notifications found for this user', error);
           return 0;
         }
@@ -425,12 +405,14 @@ z.event.EventRepository = class EventRepository {
    * @note Don't add unable to decrypt to self conversation
    *
    * @param {Object} event - Event payload to be injected
+   * @param {boolean} [can_create_notification=true] - Can message generate a notification
    * @returns {undefined} No return value
    */
-  inject_event(event) {
+  inject_event(event, can_create_notification = true) {
     if (event.conversation !== this.user_repository.self().id) {
       this.logger.info(`Injected event ID '${event.id}' of type '${event.type}'`, event);
-      this._handle_event(event, EventRepository.NOTIFICATION_SOURCE.INJECTED);
+      const source = can_create_notification ? EventRepository.NOTIFICATION_SOURCE.INJECTED : EventRepository.NOTIFICATION_SOURCE.STREAM;
+      this._handle_event(event, source);
     }
   }
 
@@ -455,6 +437,9 @@ z.event.EventRepository = class EventRepository {
         break;
       case 'conversation':
         amplify.publish(z.event.WebApp.CONVERSATION.EVENT_FROM_BACKEND, event, source);
+        break;
+      case 'team':
+        amplify.publish(z.event.WebApp.TEAM.EVENT_FROM_BACKEND, event, source);
         break;
       default:
         amplify.publish(event.type, event, source);
@@ -620,7 +605,7 @@ z.event.EventRepository = class EventRepository {
    */
   _validate_call_event_lifetime(event) {
     if (this.notification_handling_state() === z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET) return true;
-    if (event.content.type === z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL) return true;
+    if (event.content.type === z.calling.enum.CALL_MESSAGE_TYPE.CANCEL) return true;
 
     const corrected_timestamp = Date.now() - this.clock_drift;
     const event_timestamp = new Date(event.time).getTime();

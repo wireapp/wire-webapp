@@ -20,20 +20,11 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.calling = z.calling || {};
-window.z.calling.payloads = z.calling.payloads || {};
+window.z.team = z.team || {};
 
-z.calling.payloads.ICECandidateInfo = class ICECandidateInfo {
-  /**
-   * Object to keep an ICE candidate bundled with signaling information.
-   *
-   * @param {string} conversation_id - Conversation ID
-   * @param {string} flow_id - Flow ID
-   * @param {RTCIceCandidate} ice_candidate - Interactive Connectivity Establishment (ICE) Candidate
-   */
-  constructor(conversation_id, flow_id, ice_candidate) {
-    this.conversation_id = conversation_id;
-    this.flow_id = flow_id;
-    this.ice_candidate = ice_candidate;
+z.team.TeamMemberEntity = class TeamMemberEntity {
+  constructor() {
+    this.permissions = undefined;
+    this.user_id = undefined;
   }
 };

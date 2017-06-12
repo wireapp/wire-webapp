@@ -52,24 +52,17 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
     this.selected_conversation = ko.observable();
 
     this.user = this.user_repository.self;
-    this.show_badge = ko.observable(false);
 
     this.connect_requests = this.user_repository.connect_requests;
     this.connect_requests_text = ko.pureComputed(() => {
-      const count = this.connect_requests().length;
-      if (count > 1) {
-        return z.localization.Localizer.get_text({
-          id: z.string.conversations_connection_request_many,
-          replace: {
-            content: count,
-            placeholder: '%no',
-          },
-        });
+      const number_of_requests = this.connect_requests().length;
+      if (number_of_requests > 1) {
+        return z.l10n.text(z.string.conversations_connection_request_many, number_of_requests);
       }
       return z.l10n.text(z.string.conversations_connection_request_one);
     });
 
-    this.conversations_calls = this.conversation_repository.conversations_call;
+    this.conversations_calls = this.conversation_repository.conversations_calls;
     this.conversations_archived = this.conversation_repository.conversations_archived;
     this.conversations_unarchived = this.conversation_repository.conversations_unarchived;
 
@@ -78,6 +71,14 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
     this.should_update_scrollbar = ko.computed(() => {
       return this.webapp_is_loaded() || this.conversations_unarchived().length || this.connect_requests().length || this.conversations_calls().length;
     }).extend({notify: 'always', rateLimit: 500});
+
+    this.active_team_name = ko.pureComputed(() => {
+      const team_et = this.conversation_repository.active_team();
+      if (team_et && team_et.name()) {
+        return team_et.name();
+      }
+      return this.user_repository.self().name();
+    });
 
     this.active_conversation_id = ko.pureComputed(() => {
       if (this.conversation_repository.active_conversation()) {
@@ -101,6 +102,13 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
         content: z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.START),
         placeholder: '%shortcut',
       },
+    });
+
+    this.show_connect_requests = ko.pureComputed(() => {
+      const team_et = this.conversation_repository.active_team();
+      const is_personal_team = team_et && !team_et.name();
+
+      return is_personal_team && this.connect_requests().length;
     });
 
     this.self_stream_state = this.calling_repository.self_stream_state;
@@ -142,8 +150,6 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
   _init_subscriptions() {
     amplify.subscribe(z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, this.set_show_calls_state.bind(this));
     amplify.subscribe(z.event.WebApp.LIFECYCLE.LOADED, this.on_webapp_loaded.bind(this));
-    amplify.subscribe(z.event.WebApp.SEARCH.BADGE.SHOW, () => this.show_badge(true));
-    amplify.subscribe(z.event.WebApp.SEARCH.BADGE.HIDE, () => this.show_badge(false));
     amplify.subscribe(z.event.WebApp.SHORTCUT.NEXT, this._go_to_next_conversation.bind(this));
     amplify.subscribe(z.event.WebApp.SHORTCUT.PREV, this._go_to_prev_conversation.bind(this));
     amplify.subscribe(z.event.WebApp.SHORTCUT.START, this.click_on_people_button.bind(this));
@@ -170,7 +176,7 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
   }
 
   is_selected_conversation(conversation_et) {
-    const is_selected_conversation = conversation_et.id === this.active_conversation_id();
+    const is_selected_conversation = this.conversation_repository.is_active_conversation(conversation_et);
     const is_selected_state = [
       z.ViewModel.content.CONTENT_STATE.COLLECTION,
       z.ViewModel.content.CONTENT_STATE.COLLECTION_DETAILS,
@@ -224,10 +230,6 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
 
   click_on_archived_button() {
     this.list_view_model.switch_list(z.ViewModel.list.LIST_STATE.ARCHIVE);
-  }
-
-  click_on_preferences_button() {
-    this.list_view_model.switch_list(z.ViewModel.list.LIST_STATE.PREFERENCES);
   }
 
   click_on_people_button() {

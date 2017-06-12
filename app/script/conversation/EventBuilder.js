@@ -88,6 +88,19 @@ z.conversation.EventBuilder = (function() {
     };
   };
 
+  const _build_team_member_leave = (conversation_et, user_id) => {
+    return {
+      conversation: conversation_et.id,
+      data: {
+        user_ids: [user_id],
+      },
+      from: user_id,
+      id: z.util.create_random_uuid(),
+      time: new Date().toISOString(),
+      type: z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE,
+    };
+  };
+
   const _build_unable_to_decrypt = (event, decrypt_error, error_code) => {
     const {conversation: conversation_id, data: event_data, from, time} = event;
 
@@ -102,21 +115,21 @@ z.conversation.EventBuilder = (function() {
     };
   };
 
-  const _build_voice_channel_activate = (e_call_message_et) => {
-    const {conversation_id, user_id, time} = e_call_message_et;
+  const _build_voice_channel_activate = (call_message_et) => {
+    const {conversation_id, user_id, time} = call_message_et;
 
     return {
       conversation: conversation_id,
       from: user_id,
       id: z.util.create_random_uuid(),
-      protocol_version: z.calling.enum.PROTOCOL.VERSION_3,
+      protocol_version: z.calling.CallingRepository.CONFIG.PROTOCOL_VERSION,
       time: time,
       type: z.event.Backend.CONVERSATION.VOICE_CHANNEL_ACTIVATE,
     };
   };
 
-  const _build_voice_channel_deactivate = (e_call_message_et, creating_user_et, reason = z.calling.enum.TERMINATION_REASON.COMPLETED) => {
-    const {conversation_id, user_id, time = new Date().toISOString()} = e_call_message_et;
+  const _build_voice_channel_deactivate = (call_message_et, creating_user_et, reason = z.calling.enum.TERMINATION_REASON.COMPLETED) => {
+    const {conversation_id, user_id, time = new Date().toISOString()} = call_message_et;
 
     return {
       conversation: conversation_id,
@@ -125,7 +138,7 @@ z.conversation.EventBuilder = (function() {
       },
       from: creating_user_et ? creating_user_et.id : user_id,
       id: z.util.create_random_uuid(),
-      protocol_version: z.calling.enum.PROTOCOL.VERSION_3,
+      protocol_version: z.calling.CallingRepository.CONFIG.PROTOCOL_VERSION,
       time: time,
       type: z.event.Backend.CONVERSATION.VOICE_CHANNEL_DEACTIVATE,
     };
@@ -137,6 +150,7 @@ z.conversation.EventBuilder = (function() {
     build_degraded: _build_degraded,
     build_delete: _build_delete,
     build_missed: _build_missed,
+    build_team_member_leave: _build_team_member_leave,
     build_unable_to_decrypt: _build_unable_to_decrypt,
     build_voice_channel_activate: _build_voice_channel_activate,
     build_voice_channel_deactivate: _build_voice_channel_deactivate,

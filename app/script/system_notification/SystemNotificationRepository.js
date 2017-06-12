@@ -125,6 +125,22 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
   }
 
   /**
+   * Close all notifications.
+   * @returns {undefined} No return value
+   */
+  clear_notifications() {
+    this.notifications.forEach((notification) => {
+      const {close, data: notification_data} = notification;
+
+      close();
+      if (notification_data) {
+        const {notification_conversation_id, notification_message_id} = notification_data;
+        this.logger.info(`Notification for '${notification_message_id}' in '${notification_conversation_id}' closed on unload.`);
+      }
+    });
+  }
+
+  /**
    * Display browser notification and play sound notification.
    * @param {z.entity.Conversation} conversation_et - Conversation entity
    * @param {z.entity.Message} message_et - Message entity
@@ -298,45 +314,9 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    * @returns {string} Notification message body
    */
   _create_body_member_leave(message_et) {
-    if (message_et.user_ets().length === 1) {
-      if (message_et.user_ets()[0] === message_et.user()) {
-        return z.localization.Localizer.get_text({
-          id: z.string.system_notification_member_leave_left,
-          replace: {
-            content: message_et.user().first_name(),
-            placeholder: '%s.first_name',
-          },
-        });
-      }
-
-      return z.localization.Localizer.get_text({
-        id: z.string.system_notification_member_leave_removed_one,
-        replace: [
-          {
-            content: message_et.user().first_name(),
-            placeholder: '%s.first_name',
-          },
-          {
-            content: z.util.get_first_name(message_et.user_ets()[0], z.string.Declension.ACCUSATIVE),
-            placeholder: '%@.first_name',
-          },
-        ],
-      });
+    if (message_et.user_ets().length === 1 && !message_et.remote_user_ets().length) {
+      return z.l10n.text(z.string.system_notification_member_leave_removed_you, message_et.user().first_name());
     }
-
-    return z.localization.Localizer.get_text({
-      id: z.string.system_notification_member_leave_removed_many,
-      replace: [
-        {
-          content: message_et.user().first_name(),
-          placeholder: '%s.first_name',
-        },
-        {
-          content: message_et.user_ets().length,
-          placeholder: '%no',
-        },
-      ],
-    });
   }
 
   /**
@@ -353,10 +333,10 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
     switch (message_et.member_message_type) {
       case z.message.SystemMessageType.NORMAL:
         if (is_group_conversation) {
-          if (message_et.type === z.event.Backend.CONVERSATION.MEMBER_JOIN) {
+          if (message_et.is_member_join()) {
             return this._create_body_member_join(message_et);
           }
-          if (message_et.type === z.event.Backend.CONVERSATION.MEMBER_LEAVE) {
+          if (message_et.is_member_leave()) {
             return this._create_body_member_leave(message_et);
           }
         }
@@ -594,7 +574,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    * @returns {Promise} Resolves when notification was handled
    */
   _notify_banner(conversation_et, message_et) {
-    return this._should_hide_notification(conversation_et, message_et)
+    return this._should_show_notification(conversation_et, message_et)
       .then(() => {
         return this._create_notification_content(conversation_et, message_et);
       })
@@ -684,38 +664,25 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    * @private
    * @param {z.entity.Conversation} conversation_et - Conversation entity
    * @param {z.entity.Message} message_et - Message entity
-   * @returns {Promise<boolean>} Resolves whether notification should be hidden
+   * @returns {Promise} Resolves if the notification should be shown
    */
-  _should_hide_notification(conversation_et, message_et) {
-    return Promise.resolve()
-      .then(() => {
-        let hide_notification = false;
+  _should_show_notification(conversation_et, message_et) {
+    const in_active_conversation = this.conversation_repository.is_active_conversation(conversation_et);
+    const in_conversation_view = document.hasFocus() && wire.app.view.content.content_state() === z.ViewModel.content.CONTENT_STATE.CONVERSATION;
+    const in_maximized_call = this.calling_repository.joined_call() && !wire.app.view.content.multitasking.is_minimized();
 
-        if (this.notifications_preference() === z.system_notification.SystemNotificationPreference.NONE) {
-          hide_notification = true;
-        }
-        if (!z.util.Environment.browser.supports.notifications) {
-          hide_notification = true;
-        }
-        if (this.permission_state === z.system_notification.PermissionStatusState.DENIED) {
-          hide_notification = true;
-        }
-        if (message_et.user().is_me) {
-          hide_notification = true;
-        }
+    const active_conversation = in_conversation_view && in_active_conversation && !in_maximized_call;
+    const message_from_self = message_et.user().is_me;
+    const permission_denied = this.permission_state === z.system_notification.PermissionStatusState.DENIED;
+    const preference_none = this.notifications_preference() === z.system_notification.SystemNotificationPreference.NONE;
+    const supports_notification = z.util.Environment.browser.supports.notifications;
 
-        const active_conversation_id = this.conversation_repository.active_conversation() ? this.conversation_repository.active_conversation().id : undefined;
-        const in_active_conversation = conversation_et.id === active_conversation_id;
-        const in_conversation_view = document.hasFocus() && wire.app.view.content.content_state() === z.ViewModel.content.CONTENT_STATE.CONVERSATION;
-        const in_maximized_call = this.calling_repository.joined_call() && !wire.app.view.content.multitasking.is_minimized();
-        if (in_conversation_view && in_active_conversation && !in_maximized_call) {
-          hide_notification = true;
-        }
+    const hide_notification = active_conversation || message_from_self || permission_denied || preference_none || !supports_notification;
 
-        if (hide_notification) {
-          throw new z.system_notification.SystemNotificationError(z.system_notification.SystemNotificationError.TYPE.HIDE_NOTIFICATION);
-        }
-      });
+    if (hide_notification) {
+      return Promise.reject(new z.system_notification.SystemNotificationError(z.system_notification.SystemNotificationError.TYPE.HIDE_NOTIFICATION));
+    }
+    return Promise.resolve();
   }
 
   /**
@@ -751,7 +718,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
     */
     this.remove_read_notifications();
     const notification = new window.Notification(notification_content.title, notification_content.options);
-    const {conversation_id, message_id} = notification_content.options.data;
+    const {conversation_id, message_id = 'ID not specified'} = notification_content.options.data;
     let timeout_trigger_id = undefined;
 
     notification.onclick = () => {
@@ -759,8 +726,8 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
       window.focus();
       wire.app.view.content.multitasking.is_minimized(true);
       notification_content.trigger();
-      this.logger.info(`Notification for '${message_id} in '${conversation_id}' closed by click.`);
-      return notification.close();
+      this.logger.info(`Notification for message '${message_id} in conversation '${conversation_id}' closed by click.`);
+      notification.close();
     };
 
     notification.onclose = () => {
@@ -771,28 +738,18 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
 
     notification.onerror = () => {
       this.logger.error(`Notification for '${message_id}' in '${conversation_id}' closed by error.`);
-      return notification.close();
+      notification.close();
     };
 
     notification.onshow = () => {
-      return timeout_trigger_id = window.setTimeout(() => {
+      timeout_trigger_id = window.setTimeout(() => {
         this.logger.info(`Notification for '${message_id}' in '${conversation_id}' closed by timeout.`);
-        return notification.close();
+        notification.close();
       }
       , notification_content.timeout);
     };
 
     this.notifications.push(notification);
     this.logger.info(`Added notification for '${message_id}' in '${conversation_id}' to queue.`);
-
-    window.onunload = () => {
-      this.notifications.forEach((browser_notification) => {
-        browser_notification.close();
-        if (browser_notification.data) {
-          const {notification_conversation_id, notification_message_id} = browser_notification.data;
-          this.logger.info(`Notification for '${notification_message_id}' in '${notification_conversation_id}' closed by redirect.`);
-        }
-      });
-    };
   }
 };

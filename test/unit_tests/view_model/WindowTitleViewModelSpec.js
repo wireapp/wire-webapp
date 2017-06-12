@@ -22,7 +22,7 @@
 // grunt test_init && grunt test_run:view_model/WindowTitleViewModel
 
 describe('z.ViewModel.WindowTitleViewModel', function() {
-  const suffix = z.localization.Localizer.get_text(z.string.wire);
+  const suffix = z.l10n.text(z.string.wire);
   const test_factory = new TestFactory();
   let title_view_model = undefined;
 
@@ -55,7 +55,7 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
     });
 
     it('sets the name of the conversation and a badge count (when the conversation is selected and when there are unread messages)', function() {
-      const message = new z.entity.Message();
+      const message = new z.entity.ContentMessage();
       message.id = z.util.create_random_uuid();
       message.timestamp(Date.now());
 
@@ -64,7 +64,8 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
       conversation.name('Birthday Bash');
       conversation.type(z.conversation.ConversationType.REGULAR);
 
-      title_view_model.conversation_repository.conversations_unarchived.push(conversation);
+      const team_repository = title_view_model.conversation_repository.team_repository;
+      team_repository.personal_space.conversations_unarchived.push(conversation);
       title_view_model.conversation_repository.active_conversation(conversation);
       title_view_model.initiate_title_updates();
 
@@ -85,8 +86,10 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
 
       // Add conversations to conversation repository
       expect(title_view_model.conversation_repository.conversations_unarchived().length).toBe(0);
-      title_view_model.conversation_repository.conversations_unarchived.push(selected_conversation);
-      title_view_model.conversation_repository.conversations_unarchived.push(muted_conversation);
+
+      const team_repository = title_view_model.conversation_repository.team_repository;
+      team_repository.personal_space.conversations_unarchived.push(selected_conversation);
+      team_repository.personal_space.conversations_unarchived.push(muted_conversation);
       expect(title_view_model.conversation_repository.conversations_unarchived().length).toBe(2);
 
       // Check title when there are no messages
@@ -95,29 +98,24 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
       expect(window.document.title).toBe(expected_title);
 
       // Add messages to the muted conversation
-      let message = new z.entity.Message();
-      message.id = z.util.create_random_uuid();
-      message.timestamp(Date.now());
-      muted_conversation.add_message(message);
+      const message_in_muted = new z.entity.ContentMessage();
+      message_in_muted.id = z.util.create_random_uuid();
+      message_in_muted.timestamp(Date.now());
+      muted_conversation.add_message(message_in_muted);
 
-      message = new z.entity.Message();
-      message.id = z.util.create_random_uuid();
-      message.timestamp(Date.now());
-      muted_conversation.add_message(message);
-
-      expect(muted_conversation.messages().length).toBe(2);
-      expect(muted_conversation.messages_unordered().length).toBe(2);
-      expect(muted_conversation.unread_events().length).toBe(2);
+      expect(muted_conversation.messages().length).toBe(1);
+      expect(muted_conversation.messages_unordered().length).toBe(1);
+      expect(muted_conversation.unread_events().length).toBe(1);
 
       // Check title when there are messages in the muted conversation
       title_view_model.initiate_title_updates();
       expect(window.document.title).toBe(expected_title);
 
       // Add messages to the selected conversation
-      message = new z.entity.Message();
-      message.id = z.util.create_random_uuid();
-      message.timestamp(Date.now());
-      selected_conversation.add_message(message);
+      const message_in_selected = new z.entity.ContentMessage();
+      message_in_selected.id = z.util.create_random_uuid();
+      message_in_selected.timestamp(Date.now());
+      selected_conversation.add_message(message_in_selected);
 
       // Check title when there are messages in the selected conversation
       title_view_model.initiate_title_updates();
@@ -185,7 +183,7 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
       // Test one connect request message
       title_view_model.user_repository.users.push(user_et);
 
-      let message = z.localization.Localizer.get_text(z.string.conversations_connection_request_one);
+      let message = z.l10n.text(z.string.conversations_connection_request_one);
       let waiting_people = title_view_model.user_repository.connect_requests().length;
 
       let expected_title = `(${waiting_people}) · ${message} · ${suffix}`;
@@ -199,13 +197,7 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
       title_view_model.user_repository.users.push(another_user_et);
       waiting_people = title_view_model.user_repository.connect_requests().length;
 
-      message = z.localization.Localizer.get_text({
-        id: z.string.conversations_connection_request_many,
-        replace: {
-          content: waiting_people,
-          placeholder: '%no',
-        },
-      });
+      message = z.l10n.text(z.string.conversations_connection_request_many, waiting_people);
 
       expected_title = `(${waiting_people}) · ${message} · ${suffix}`;
       title_view_model.initiate_title_updates();
@@ -213,7 +205,7 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
     });
 
     it('publishes the badge count (for Wire\'s wrapper)', function(done) {
-      const message = new z.entity.Message();
+      const message = new z.entity.ContentMessage();
       message.id = z.util.create_random_uuid();
       message.timestamp(Date.now());
 
@@ -222,7 +214,8 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
       conversation.name('Birthday Bash');
       conversation.type(z.conversation.ConversationType.REGULAR);
 
-      title_view_model.conversation_repository.conversations_unarchived.push(conversation);
+      const team_repository = title_view_model.conversation_repository.team_repository;
+      team_repository.personal_space.conversations_unarchived.push(conversation);
       title_view_model.conversation_repository.active_conversation(conversation);
 
       amplify.subscribe(z.event.WebApp.CONVERSATION.UNREAD, function(badge_count) {

@@ -24,7 +24,7 @@ window.z.ViewModel = z.ViewModel || {};
 window.z.ViewModel.content = z.ViewModel.content || {};
 
 z.ViewModel.content.ContentViewModel = class ContentViewModel {
-  constructor(element_id, calling_repository, client_repository, conversation_repository, media_repository, search_repository, properties_repository) {
+  constructor(element_id, calling_repository, client_repository, conversation_repository, media_repository, properties_repository, search_repository, team_repository) {
     this.show_conversation = this.show_conversation.bind(this);
     this.switch_content = this.switch_content.bind(this);
     this.switch_previous_content = this.switch_previous_content.bind(this);
@@ -33,8 +33,9 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
     this.client_repository = client_repository;
     this.conversation_repository = conversation_repository;
     this.media_repository = media_repository;
-    this.search_repository = search_repository;
     this.properties_repository = properties_repository;
+    this.search_repository = search_repository;
+    this.team_repository = team_repository;
     this.logger = new z.util.Logger('z.ViewModel.ContentViewModel', z.config.LOGGER.OPTIONS);
 
     // Repositories
@@ -60,7 +61,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
     this.conversation_titlebar =      new z.ViewModel.ConversationTitlebarViewModel('conversation-titlebar', this.calling_repository, this.conversation_repository, this.multitasking);
     this.conversation_input =         new z.ViewModel.ConversationInputViewModel('conversation-input', this.conversation_repository, this.user_repository, this.properties_repository);
     this.message_list =               new z.ViewModel.MessageListViewModel('message-list', this.conversation_repository, this.user_repository);
-    this.participants =               new z.ViewModel.ParticipantsViewModel('participants', this.user_repository, this.conversation_repository, this.search_repository);
+    this.participants =               new z.ViewModel.ParticipantsViewModel('participants', this.user_repository, this.conversation_repository, this.search_repository, this.team_repository);
     this.giphy =                      new z.ViewModel.GiphyViewModel('giphy-modal', this.conversation_repository, this.giphy_repository);
 
     this.preferences_account =        new z.ViewModel.content.PreferencesAccountViewModel('preferences-account', this.client_repository, this.user_repository);
@@ -98,7 +99,8 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
     });
 
     this.user_repository.connect_requests.subscribe((requests) => {
-      if ((this.content_state() === z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS) && !requests.length) {
+      const requests_state = this.content_state() === z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS;
+      if (requests_state && !requests.length) {
         this.show_conversation(this.conversation_repository.get_most_recent_conversation());
       }
     });
@@ -111,9 +113,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
   _init_subscriptions() {
     amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, this.switch_content.bind(this));
     amplify.subscribe(z.event.WebApp.CONVERSATION.SHOW, this.show_conversation.bind(this));
-    amplify.subscribe(z.event.WebApp.CONVERSATION.SWITCH, this.switch_conversation.bind(this));
     amplify.subscribe(z.event.WebApp.LIST.SCROLL, this.conversation_input.show_separator);
-    amplify.subscribe(z.event.WebApp.PEOPLE.TOGGLE, this.participants.toggle_participants_bubble);
     amplify.subscribe(z.event.WebApp.WINDOW.RESIZE.HEIGHT, this.message_list.scroll_height);
   }
 
@@ -167,7 +167,20 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
           return;
         }
 
-        this._release_content();
+        this._release_content(this.content_state(), conversation_et);
+
+        const team_id = conversation_et.team_id;
+        if (this.team_repository.active_team().id !== team_id) {
+          let team_promise;
+          if (team_id && !conversation_et.is_guest()) {
+            team_promise = this.team_repository.get_team_by_id(team_id);
+          } else {
+            team_promise = Promise.resolve(this.team_repository.personal_space);
+          }
+
+          team_promise.then((team_et) => this.team_repository.active_team(team_et));
+        }
+
         this.content_state(z.ViewModel.content.CONTENT_STATE.CONVERSATION);
         this.conversation_repository.active_conversation(conversation_et);
         this.message_list.change_conversation(conversation_et, message_et)
@@ -183,18 +196,6 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
     if (this.content_state() !== new_content_state) {
       this._release_content(new_content_state);
       this._show_content(this._check_content_availability(new_content_state));
-    }
-  }
-
-  /**
-   * Switches the conversation if the other one is shown.
-   * @param {z.entity.Conversation} conversation_et - Conversation entity to be verified as currently active for the switch
-   * @param {z.entity.Conversation} next_conversation_et - Conversation entity to be shown
-   * @returns {undefined} No return value
-   */
-  switch_conversation(conversation_et, next_conversation_et) {
-    if (this.conversation_repository.is_active_conversation(conversation_et)) {
-      this.show_conversation(next_conversation_et);
     }
   }
 
@@ -214,7 +215,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
 
   _check_content_availability(content_state) {
     if (content_state === z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS) {
-      if (!this.user_repository.connect_requests().length) {
+      if (this.team_repository.active_team().id || !this.user_repository.connect_requests().length) {
         return z.ViewModel.content.CONTENT_STATE.WATERMARK;
       }
     }
@@ -248,17 +249,29 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
     }
   }
 
-  _release_content(new_content_state) {
+  _release_content(new_content_state, conversation_et) {
     this.previous_state = this.content_state();
 
-    if ((this.previous_state === z.ViewModel.content.CONTENT_STATE.CONVERSATION) && [z.ViewModel.content.CONTENT_STATE.COLLECTION, z.ViewModel.content.CONTENT_STATE.COLLECTION_DETAILS].includes(!new_content_state)) {
-      this.conversation_repository.active_conversation(null);
+    const conversation_state = this.previous_state === z.ViewModel.content.CONTENT_STATE.CONVERSATION;
+    if (conversation_state) {
+      if (conversation_et) {
+        this.team_repository.active_team().last_active_conversation = conversation_et;
+      }
+
+      const collection_states = [
+        z.ViewModel.content.CONTENT_STATE.COLLECTION,
+        z.ViewModel.content.CONTENT_STATE.COLLECTION_DETAILS,
+      ];
+      if (!collection_states.includes(new_content_state)) {
+        this.conversation_repository.active_conversation(null);
+      }
+
+      return this.message_list.release_conversation();
     }
 
-    if (this.previous_state === z.ViewModel.content.CONTENT_STATE.CONVERSATION) {
-      return this.message_list.release_conversation();
-    } else if (this.previous_state === z.ViewModel.content.CONTENT_STATE.PREFERENCES_AV) {
-      return this.preferences_av.release_devices();
+    const preferences_av_state = this.previous_state === z.ViewModel.content.CONTENT_STATE.PREFERENCES_AV;
+    if (preferences_av_state) {
+      this.preferences_av.release_devices();
     }
   }
 

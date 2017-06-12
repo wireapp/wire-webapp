@@ -12,6 +12,7 @@ globals:
   _: true
   adapter: true
   amplify: true
+  Cookies: true
   cryptobox: true
   CryptoJS: true
   dcodeIO: true

@@ -33,6 +33,80 @@ describe('Conversation', function() {
     other_user = new z.entity.User(entities.user.jane_roe.id);
   });
 
+  describe('Conversation type checks', function() {
+    beforeEach(function() {
+      conversation_et = new z.entity.Conversation();
+    });
+
+    it('should return the expected value for personal conversations', function() {
+      conversation_et.type(z.conversation.ConversationType.CONNECT);
+      expect(conversation_et.is_group()).toBeFalsy();
+      expect(conversation_et.is_one2one()).toBeFalsy();
+      expect(conversation_et.is_request()).toBeTruthy();
+      expect(conversation_et.is_self()).toBeFalsy();
+
+      conversation_et.type(z.conversation.ConversationType.ONE2ONE);
+      expect(conversation_et.is_group()).toBeFalsy();
+      expect(conversation_et.is_one2one()).toBeTruthy();
+      expect(conversation_et.is_request()).toBeFalsy();
+      expect(conversation_et.is_self()).toBeFalsy();
+
+      conversation_et.type(z.conversation.ConversationType.SELF);
+      expect(conversation_et.is_group()).toBeFalsy();
+      expect(conversation_et.is_one2one()).toBeFalsy();
+      expect(conversation_et.is_request()).toBeFalsy();
+      expect(conversation_et.is_self()).toBeTruthy();
+
+      conversation_et.type(z.conversation.ConversationType.REGULAR);
+      expect(conversation_et.is_group()).toBeTruthy();
+      expect(conversation_et.is_one2one()).toBeFalsy();
+      expect(conversation_et.is_request()).toBeFalsy();
+      expect(conversation_et.is_self()).toBeFalsy();
+    });
+
+    it('should return the expected value for team conversations', function() {
+      conversation_et.team_id = z.util.create_random_uuid();
+
+      conversation_et.type(z.conversation.ConversationType.CONNECT);
+      expect(conversation_et.is_group()).toBeFalsy();
+      expect(conversation_et.is_one2one()).toBeFalsy();
+      expect(conversation_et.is_request()).toBeTruthy();
+      expect(conversation_et.is_self()).toBeFalsy();
+
+      conversation_et.type(z.conversation.ConversationType.ONE2ONE);
+      expect(conversation_et.is_group()).toBeFalsy();
+      expect(conversation_et.is_one2one()).toBeTruthy();
+      expect(conversation_et.is_request()).toBeFalsy();
+      expect(conversation_et.is_self()).toBeFalsy();
+
+      conversation_et.type(z.conversation.ConversationType.SELF);
+      expect(conversation_et.is_group()).toBeFalsy();
+      expect(conversation_et.is_one2one()).toBeFalsy();
+      expect(conversation_et.is_request()).toBeFalsy();
+      expect(conversation_et.is_self()).toBeTruthy();
+
+      conversation_et.type(z.conversation.ConversationType.REGULAR);
+      expect(conversation_et.is_group()).toBeTruthy();
+      expect(conversation_et.is_one2one()).toBeFalsy();
+      expect(conversation_et.is_request()).toBeFalsy();
+      expect(conversation_et.is_self()).toBeFalsy();
+
+      conversation_et.participating_user_ids.push(z.util.create_random_uuid());
+      conversation_et.type(z.conversation.ConversationType.REGULAR);
+      expect(conversation_et.is_group()).toBeFalsy();
+      expect(conversation_et.is_one2one()).toBeTruthy();
+      expect(conversation_et.is_request()).toBeFalsy();
+      expect(conversation_et.is_self()).toBeFalsy();
+
+      conversation_et.participating_user_ids.push(z.util.create_random_uuid());
+      conversation_et.type(z.conversation.ConversationType.REGULAR);
+      expect(conversation_et.is_group()).toBeTruthy();
+      expect(conversation_et.is_one2one()).toBeFalsy();
+      expect(conversation_et.is_request()).toBeFalsy();
+      expect(conversation_et.is_self()).toBeFalsy();
+    });
+  });
+
   describe('timestamp', function() {
     it('adding a message should update the conversation timestamp', function() {
       const message_et = new z.entity.Message();
@@ -67,7 +141,8 @@ describe('Conversation', function() {
       expect(conversation_et._increment_time_only(second_date, first_date)).toBeFalsy();
     });
 
-    it('should not update with same timestamp', function() {
+    // TODO: Flaky test
+    xit('should not update with same timestamp', function() {
       expect(conversation_et._increment_time_only(first_date, first_date)).toBeFalsy();
     });
   });
@@ -216,7 +291,7 @@ describe('Conversation', function() {
 
     it('displays the conversation name for a self conversation', function() {
       conversation_et.type(z.conversation.ConversationType.SELF);
-      expect(conversation_et.display_name()).toBe(undefined);
+      expect(conversation_et.display_name()).toBe('…');
 
       const conversation_name = 'My favorite music band';
       conversation_et.name(conversation_name);

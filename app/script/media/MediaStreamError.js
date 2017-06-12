@@ -20,25 +20,22 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.calling = z.calling || {};
-window.z.calling.payloads = z.calling.payloads || {};
+window.z.media = z.media || {};
 
-z.calling.payloads.FlowDeletionReason = {
-  RELEASED: 'released',
-  TIMEOUT: 'timeout',
-};
-
-z.calling.payloads.FlowDeletionInfo = class FlowDeletionInfo {
-  /**
-   * Object to keep an flow deletion information.
-   *
-   * @param {string} conversation_id - Conversation ID
-   * @param {string} flow_id - Flow ID
-   * @param {z.calling.payloads.FlowDeletionReason} reason - Reason for flow to be deleted
-   */
-  constructor(conversation_id, flow_id, reason) {
-    this.conversation_id = conversation_id;
-    this.flow_id = flow_id;
-    this.reason = reason;
-  }
+// https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia#Errors
+z.media.MEDIA_STREAM_ERROR = {
+  ABORT_ERROR: 'AbortError',
+  DEVICES_NOT_FOUND_ERROR: 'DevicesNotFoundError',
+  INTERNAL_ERROR: 'InternalError',
+  INVALID_STATE_ERROR: 'InvalidStateError',
+  NOT_ALLOWED_ERROR: 'NotAllowedError',
+  NOT_FOUND_ERROR: 'NotFoundError',
+  NOT_READABLE_ERROR: 'NotReadableError',
+  OVER_CONSTRAINED_ERROR: 'OverConstrainedError',
+  PERMISSION_DENIED_ERROR: 'PermissionDeniedError',
+  PERMISSION_DISMISSED_ERROR: 'PermissionDismissedError',
+  SECURITY_ERROR: 'SecurityError',
+  SOURCE_UNAVAILABLE_ERROR: 'SourceUnavailableError',
+  TRACK_START_ERROR: 'TrackStartError',
+  TYPE_ERROR: 'TypeError',
 };

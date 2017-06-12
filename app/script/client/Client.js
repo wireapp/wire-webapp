@@ -23,15 +23,24 @@ window.z = window.z || {};
 window.z.client = z.client || {};
 
 z.client.Client = class Client {
+  static get CONFIG() {
+    return {
+      DEFAULT_VALUE: '?',
+    };
+  }
+
   constructor(payload = {}) {
+    this.class = Client.CONFIG.DEFAULT_VALUE;
+
     if (payload.address) {
-      this.class = payload.class || '?';
-      this.label = payload.label || '?';
-      this.model = payload.model || '?';
+      this.label = Client.CONFIG.DEFAULT_VALUE;
+      this.model = Client.CONFIG.DEFAULT_VALUE;
     }
 
-    for (const member in payload) {
-      this[member] = payload[member];
+    for (const property in payload) {
+      if (payload.hasOwnProperty(property) && payload[property] !== undefined) {
+        this[property] = payload[property];
+      }
     }
 
     // Metadata maintained by us
@@ -49,7 +58,7 @@ z.client.Client = class Client {
    * @returns {Object} Object containing the user ID & client ID
    */
   static dismantle_user_client_id(id) {
-    const [user_id, client_id] = (id != null ? id.split('@') : undefined) || [];
+    const [user_id, client_id] = (id ? id.split('@') : undefined) || [];
     return {
       client_id: client_id,
       user_id: user_id,
@@ -82,8 +91,15 @@ z.client.Client = class Client {
    * @returns {Object} Client data as JSON object
    */
   to_json() {
-    const real_json = JSON.parse(ko.toJSON(this));
-    delete real_json.session;
-    return real_json;
+    const json_object = JSON.parse(ko.toJSON(this));
+    delete json_object.session;
+
+    for (const property in json_object) {
+      if (json_object.hasOwnProperty(property) && json_object[property] === Client.CONFIG.DEFAULT_VALUE) {
+        delete json_object[property];
+      }
+    }
+
+    return json_object;
   }
 };

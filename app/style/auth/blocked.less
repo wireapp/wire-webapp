@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2016 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,18 +17,8 @@
  *
  */
 
-// grunt test_init && grunt test_run:calling/entities/ECallMessage
-
-'use strict';
-
-describe('z.calling.entities.ECallMessage', function() {
-  describe('_create_session_id', function() {
-    const e_call_message_et = new z.calling.entities.ECallMessage();
-
-    it('always returns an alphanumeric string of length four', function() {
-      _.range(100).map(function() {
-        expect(e_call_message_et._create_session_id()).toMatch(/(\w|\d){4}/);
-      });
-    });
-  });
-});
+#section-blocked {
+  .form-blocked {
+    height: 256px;
+  }
+}

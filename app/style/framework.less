@@ -33,12 +33,7 @@
     bottom: 0;
     left: 0;
     color: @left-color;
-    width: @left-width;
-
-    // Large
-    @media (min-width: @screen-lg-min) {
-      width: @left-fluid-width;
-    }
+    width: @left-width + @teams-width;
   }
 
   .right {
@@ -46,11 +41,6 @@
     top: 0;
     right: 0;
     bottom: 0;
-    left: @left-width;
-
-    // Large
-    @media (min-width: @screen-lg-min) {
-      left: @left-fluid-width;
-    }
+    left: @left-width + @teams-width;
   }
 }

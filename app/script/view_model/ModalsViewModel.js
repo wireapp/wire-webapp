@@ -25,8 +25,6 @@ window.z.ViewModel = z.ViewModel || {};
 z.ViewModel.ModalType = {
   BLOCK: '.modal-block',
   CALL_EMPTY_CONVERSATION: '.modal-call-conversation-empty',
-  CALL_FULL_CONVERSATION: '.modal-call-conversation-full',
-  CALL_FULL_VOICE_CHANNEL: '.modal-call-voice-channel-full',
   CALL_NO_VIDEO_IN_GROUP: '.modal-call-no-video-in-group',
   CALL_START_ANOTHER: '.modal-call-second',
   CALLING: '.modal-calling',
@@ -87,9 +85,6 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
         break;
       case z.ViewModel.ModalType.CALL_FULL_CONVERSATION:
         this._show_modal_call_full_conversation(options.data, message_element);
-        break;
-      case z.ViewModel.ModalType.CALL_FULL_VOICE_CHANNEL:
-        this._show_modal_call_full_voice_channel(options.data, message_element);
         break;
       case z.ViewModel.ModalType.CALL_START_ANOTHER:
         this._show_modal_call_start_another(options.data, title_element, message_element);
@@ -202,26 +197,6 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
     }));
   }
 
-  _show_modal_call_full_conversation(content, message_element) {
-    message_element.text(z.localization.Localizer.get_text({
-      id: z.string.modal_call_conversation_full_message,
-      replace: {
-        content: content,
-        placeholder: '%no',
-      },
-    }));
-  }
-
-  _show_modal_call_full_voice_channel(content, message_element) {
-    message_element.text(z.localization.Localizer.get_text({
-      id: z.string.modal_call_voice_channel_full_message,
-      replace: {
-        content: content,
-        placeholder: '%no',
-      },
-    }));
-  }
-
   /**
    * Show modal for second call.
    *
@@ -325,7 +300,7 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
     title_element.text(z.localization.Localizer.get_text({
       id: z.string.modal_remove_device_headline,
       replace: {
-        content: content.max,
+        content: content,
         placeholder: '%device_name',
       },
     }));
