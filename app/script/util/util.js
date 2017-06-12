@@ -28,6 +28,47 @@ window.LOG = function() {
   }
 };
 
+z.util.check_indexed_db = function() {
+  if (!z.util.Environment.browser.supports.indexed_db) {
+    if (z.util.Environment.browser.edge) {
+      return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.PRIVATE_MODE));
+    }
+    return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.INDEXED_DB_UNSUPPORTED));
+  }
+
+  if (z.util.Environment.browser.firefox) {
+    let db;
+
+    try {
+      db = window.indexedDB.open('test');
+    } catch (error) {
+      return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.PRIVATE_MODE));
+    }
+
+    return new Promise((resolve, reject) => {
+      let current_attempt = 0;
+      const interval = 10;
+      const max_retry = 50;
+
+      const interval_id = window.setInterval(() => {
+        current_attempt = current_attempt + 1;
+
+        if (db.readyState === 'done' && !db.result) {
+          window.clearInterval(interval_id);
+          return reject(new z.auth.AuthError(z.auth.AuthError.TYPE.PRIVATE_MODE));
+        }
+
+        if (current_attempt >= max_retry) {
+          window.clearInterval(interval_id);
+          resolve();
+        }
+      }, interval);
+    });
+  }
+
+  return Promise.resolve();
+};
+
 z.util.dummy_image = function(width, height) {
   return `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${width} ${height}' width='${width}' height='${height}'></svg>`;
 };
@@ -558,9 +599,12 @@ z.util.naked_url = function(url = '') {
 };
 
 z.util.valid_profile_image_size = function(file, min_width, min_height, callback) {
-  const image = new Image();
-  image.onload = () => callback((image.width >= min_width) && (image.height >= min_height));
-  return image.src = window.URL.createObjectURL(file);
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve((image.width >= min_width) && (image.height >= min_height));
+    image.onerror = () => reject(new Error('Failed to load profile picture for size validation'));
+    image.src = window.URL.createObjectURL(file);
+  });
 };
 
 z.util.is_valid_email = function(email) {
@@ -658,11 +702,11 @@ z.util.get_unix_timestamp = function() {
 z.util.get_first_name = function(user_et, declension = z.string.Declension.NOMINATIVE) {
   if (user_et.is_me) {
     if (declension === z.string.Declension.NOMINATIVE) {
-      return z.localization.Localizer.get_text(z.string.conversation_you_nominative);
+      return z.l10n.text(z.string.conversation_you_nominative);
     } else if (declension === z.string.Declension.DATIVE) {
-      return z.localization.Localizer.get_text(z.string.conversation_you_dative);
+      return z.l10n.text(z.string.conversation_you_dative);
     } else if (declension === z.string.Declension.ACCUSATIVE) {
-      return z.localization.Localizer.get_text(z.string.conversation_you_accusative);
+      return z.l10n.text(z.string.conversation_you_accusative);
     }
   }
   return user_et.first_name();
@@ -712,21 +756,21 @@ z.util.format_time_remaining = function(time_remaining) {
 
   let title = '';
   if (moment_duration.asHours() === 1) {
-    title += `${moment_duration.hours()} ${z.localization.Localizer.get_text(z.string.ephememal_units_hour)}, `;
+    title += `${moment_duration.hours()} ${z.l10n.text(z.string.ephememal_units_hour)}, `;
   } else if (moment_duration.asHours() > 1) {
-    title += `${moment_duration.hours()} ${z.localization.Localizer.get_text(z.string.ephememal_units_hours)}, `;
+    title += `${moment_duration.hours()} ${z.l10n.text(z.string.ephememal_units_hours)}, `;
   }
 
   if (moment_duration.asMinutes() === 1) {
-    title += `${moment_duration.minutes()} ${z.localization.Localizer.get_text(z.string.ephememal_units_minute)} ${z.localization.Localizer.get_text(z.string.and)} `;
+    title += `${moment_duration.minutes()} ${z.l10n.text(z.string.ephememal_units_minute)} ${z.l10n.text(z.string.and)} `;
   } else if (moment_duration.asMinutes() > 1) {
-    title += `${moment_duration.minutes()} ${z.localization.Localizer.get_text(z.string.ephememal_units_minutes)} ${z.localization.Localizer.get_text(z.string.and)} `;
+    title += `${moment_duration.minutes()} ${z.l10n.text(z.string.ephememal_units_minutes)} ${z.l10n.text(z.string.and)} `;
   }
 
   if (moment_duration.asSeconds() === 1) {
-    title += `${moment_duration.seconds()} ${z.localization.Localizer.get_text(z.string.ephememal_units_second)}`;
+    title += `${moment_duration.seconds()} ${z.l10n.text(z.string.ephememal_units_second)}`;
   } else if (moment_duration.asSeconds() > 1) {
-    title += `${moment_duration.seconds()} ${z.localization.Localizer.get_text(z.string.ephememal_units_seconds)}`;
+    title += `${moment_duration.seconds()} ${z.l10n.text(z.string.ephememal_units_seconds)}`;
   }
 
   return title || '';

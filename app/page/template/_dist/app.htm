@@ -26,6 +26,12 @@
 <script src="/script/storage/StorageKey.js"></script>
 <script src="/script/storage/StorageRepository.js"></script>
 <script src="/script/storage/StorageService.js"></script>
+<!-- Team -->
+<script src="/script/team/TeamEntity.js"></script>
+<script src="/script/team/TeamMapper.js"></script>
+<script src="/script/team/TeamMemberEntity.js"></script>
+<script src="/script/team/TeamRepository.js"></script>
+<script src="/script/team/TeamService.js"></script>
 <!-- Config -->
 <script src="/script/config.js"></script>
 <!-- Client -->
@@ -45,6 +51,7 @@
 <script src="/script/event/WebSocketService.js"></script>
 <!-- Authentication -->
 <script src="/script/auth/AccessTokenError.js"></script>
+<script src="/script/auth/AuthError.js"></script>
 <script src="/script/auth/AuthService.js"></script>
 <script src="/script/auth/AuthRepository.js"></script>
 <script src="/script/auth/SignOutReason.js"></script>
@@ -78,6 +85,8 @@
 <script src="/script/media/MediaError.js"></script>
 <script src="/script/media/MediaParser.js"></script>
 <script src="/script/media/MediaRepository.js"></script>
+<script src="/script/media/MediaStreamError.js"></script>
+<script src="/script/media/MediaStreamErrorTypes.js"></script>
 <script src="/script/media/MediaStreamHandler.js"></script>
 <script src="/script/media/MediaStreamSource.js"></script>
 <script src="/script/media/MediaStreamInfo.js"></script>
@@ -225,6 +234,8 @@
 <script src="/script/view_model/list/PreferencesListViewModel.js"></script>
 <script src="/script/view_model/list/StartUIViewModel.js"></script>
 <script src="/script/view_model/list/TakeoverViewModel.js"></script>
+<script src="/script/view_model/list/TeamsTabViewModel.js"></script>
+
 <!-- Bindings -->
 <script src="/script/view_model/bindings/CommonBindings.js"></script>
 <script src="/script/view_model/bindings/ConversationListBindings.js"></script>
@@ -309,58 +320,34 @@
 <script src="/script/telemetry/calling/FlowTelemetry.js"></script>
 <script src="/script/telemetry/calling/CallTelemetry.js"></script>
 <!-- Calling/Enums -->
-<script src="/script/calling/enum/CallAction.js"></script>
+<script src="/script/calling/enum/CallMessageType.js"></script>
 <script src="/script/calling/enum/CallState.js"></script>
-<script src="/script/calling/enum/CallStateEventCause.js"></script>
 <script src="/script/calling/enum/CallStateGroup.js"></script>
-<script src="/script/calling/enum/ECallMessageType.js"></script>
-<script src="/script/calling/enum/ParticipantState.js"></script>
 <script src="/script/calling/enum/PropertyState.js"></script>
-<script src="/script/calling/enum/Protocol.js"></script>
 <script src="/script/calling/enum/SDPNegotiationMode.js"></script>
 <script src="/script/calling/enum/SDPSource.js"></script>
 <script src="/script/calling/enum/TerminationReason.js"></script>
 <script src="/script/calling/enum/VideoOrientation.js"></script>
-<!-- Calling/Payloads -->
-<script src="/script/calling/payloads/FlowDeletionInfo.js"></script>
-<script src="/script/calling/payloads/ICECandidateInfo.js"></script>
-<script src="/script/calling/payloads/SDPInfo.js"></script>
 <!-- Calling/Rtc -->
 <script src="/script/calling/rtc/DataChannelState.js"></script>
 <script src="/script/calling/rtc/ICEConnectionState.js"></script>
 <script src="/script/calling/rtc/ICEGatheringState.js"></script>
-<script src="/script/calling/rtc/MediaStreamError.js"></script>
-<script src="/script/calling/rtc/MediaStreamErrorTypes.js"></script>
 <script src="/script/calling/rtc/SDPType.js"></script>
 <script src="/script/calling/rtc/SignalingState.js"></script>
 <script src="/script/calling/rtc/StatsType.js"></script>
-<!-- Calling/Handler -->
-<script src="/script/calling/handler/CallSignalingHandler.js"></script>
-<script src="/script/calling/handler/CallStateHandler.js"></script>
-<!-- Calling/Mapper -->
-<script src="/script/calling/mapper/ECallMessageMapper.js"></script>
-<script src="/script/calling/mapper/ICECandidateMapper.js"></script>
-<script src="/script/calling/mapper/SDPMapper.js"></script>
 <!-- Calling/Entities -->
 <script src="/script/calling/entities/Call.js"></script>
-<script src="/script/calling/entities/ECall.js"></script>
-<script src="/script/calling/entities/ECallMessage.js"></script>
-<script src="/script/calling/entities/EFlow.js"></script>
-<script src="/script/calling/entities/EParticipant.js"></script>
+<script src="/script/calling/entities/CallMessage.js"></script>
 <script src="/script/calling/entities/Flow.js"></script>
 <script src="/script/calling/entities/FlowAudio.js"></script>
 <script src="/script/calling/entities/Participant.js"></script>
-<!-- Calling/v2 -->
-<script src="/script/calling/v2/CallCenter.js"></script>
-<script src="/script/calling/v2/CallError.js"></script>
-<script src="/script/calling/v2/CallService.js"></script>
-<script src="/script/calling/v2/CallTrackingInfo.js"></script>
-<!-- Calling/v3 -->
-<script src="/script/calling/v3/CallCenter.js"></script>
-<script src="/script/calling/v3/CallError.js"></script>
 <!-- Calling -->
+<script src="/script/calling/CallError.js"></script>
 <script src="/script/calling/CallingRepository.js"></script>
 <script src="/script/calling/CallingService.js"></script>
+<script src="/script/calling/CallMessageBuilder.js"></script>
+<script src="/script/calling/CallMessageMapper.js"></script>
+<script src="/script/calling/SDPMapper.js"></script>
 <!-- View -->
 <script src="/script/ui/ContextMenu.js"></script>
 <script src="/script/ui/ShortcutType.js"></script>

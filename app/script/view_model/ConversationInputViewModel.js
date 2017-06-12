@@ -24,8 +24,10 @@ window.z.ViewModel = z.ViewModel || {};
 
 // Parent: z.ViewModel.ContentViewModel
 z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
-  constructor(element_id, conversation_repository, user_repository) {
+  constructor(element_id, conversation_repository, user_repository, properties_repository) {
     this.added_to_view = this.added_to_view.bind(this);
+    this.on_drop_files = this.on_drop_files.bind(this);
+    this.on_paste_files = this.on_paste_files.bind(this);
     this.on_window_click = this.on_window_click.bind(this);
     this.show_separator = this.show_separator.bind(this);
 
@@ -144,7 +146,7 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
       .blur(() => this.browser_has_focus(false))
       .focus(() => this.browser_has_focus(true));
 
-    this.conversation_input_emoji = new z.ViewModel.ConversationInputEmojiViewModel();
+    this.conversation_input_emoji = new z.ViewModel.ConversationInputEmojiViewModel(properties_repository);
 
     this._init_subscriptions();
   }

@@ -67,10 +67,10 @@ z.ViewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
     amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.message_removed);
   }
 
-  show(message_ets, message_et, source) {
+  show(message_et, message_ets, source) {
     this.items(message_ets);
-    this.source = source;
     this.message_et(message_et);
+    this.source = source;
 
     amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, this.message_added);
     amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.message_removed);
@@ -169,14 +169,22 @@ z.ViewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
 
   click_on_show_next(view_model, event) {
     event.stopPropagation();
-    this.message_et(z.util.ArrayUtil.iterate_item(this.items(), this.message_et()));
-    this._load_image();
+    const next_messsage_et = z.util.ArrayUtil.iterate_item(this.items(), this.message_et());
+
+    if (next_messsage_et) {
+      this.message_et(next_messsage_et);
+      this._load_image();
+    }
   }
 
   click_on_show_previous(view_model, event) {
     event.stopPropagation();
-    this.message_et(z.util.ArrayUtil.iterate_item(this.items(), this.message_et(), true));
-    this._load_image();
+    const previous_message_et = z.util.ArrayUtil.iterate_item(this.items(), this.message_et(), true);
+
+    if (previous_message_et) {
+      this.message_et(z.util.ArrayUtil.iterate_item(this.items(), this.message_et(), true));
+      this._load_image();
+    }
   }
 
   _track_item_action(conversation_et, is_liked, type) {

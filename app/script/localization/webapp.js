@@ -47,6 +47,10 @@ z.string.auth_account_sign_in_phone = 'Phone';
 z.string.auth_account_terms_of_use = 'Terms of Use';
 z.string.auth_account_terms_of_use_detail = 'I accept';
 
+// Authentication: BLOCKED section
+z.string.auth_blocked_database = 'Wire needs access to local storage to display your messages. Local storage is not available in private mode.';
+z.string.auth_blocked_tabs = 'Wire is already open in another tab.';
+
 // Authentication: VERIFY section
 z.string.auth_verify_account_add = 'Add';
 z.string.auth_verify_account_detail = 'This lets you use Wire on multiple devices.';
@@ -59,14 +63,14 @@ z.string.auth_verify_code_resend_timer = 'You can request a new code %expiration
 z.string.auth_verify_code_change_phone = 'Change phone number';
 z.string.auth_verify_password_headline = 'Enter your password';
 
-// Authentication: limit section
+// Authentication: LIMIT section
 z.string.auth_limit_devices_headline = 'Devices';
 z.string.auth_limit_description = 'Remove one of your other devices to start using Wire on this one.';
 z.string.auth_limit_button_manage = 'Manage devices';
 z.string.auth_limit_button_sign_out = 'Log out';
 z.string.auth_limit_devices_current = '(Current)';
 
-// Authentication: limit section
+// Authentication: HISTORY section
 z.string.auth_history_headline = 'It’s the first time you’re using Wire on this device.';
 z.string.auth_history_description = 'For privacy reasons, your conversation history will not appear here.';
 z.string.auth_history_reuse_headline = 'You’ve used Wire on this device before.';
@@ -134,9 +138,6 @@ z.string.modal_block_conversation_button = 'Block';
 // Cannot create the call because there is nobody to call (conversation_empty)
 z.string.modal_call_conversation_empty_headline = 'No one to call';
 z.string.modal_call_conversation_empty_message = 'There is no one left here.';
-// Cannot create the call because there are too many participants (conversation_full)
-z.string.modal_call_conversation_full_headline = 'Too many people to call';
-z.string.modal_call_conversation_full_message = 'Calls work in conversations with up to %no people.';
 // Cannot video call in group conversations
 z.string.modal_call_no_video_in_group_headline = 'No video calls in groups';
 z.string.modal_call_no_video_in_group_message = 'Video calls are not available in group conversations.';
@@ -152,9 +153,6 @@ z.string.modal_call_second_ongoing_action = 'Hang Up';
 z.string.modal_call_second_outgoing_headline = 'Hang up current call?';
 z.string.modal_call_second_outgoing_message = 'You can only be in one call at a time.';
 z.string.modal_call_second_outgoing_action = 'Hang Up';
-// Cannot join the call because there are too many participants (voice_channel_full)
-z.string.modal_call_voice_channel_full_headline = 'Full house';
-z.string.modal_call_voice_channel_full_message = 'There’s only room for %no people in here.';
 // Clear a conversation
 z.string.modal_clear_conversation_headline = 'Delete "%@.name" content?';
 z.string.modal_clear_conversation_message = 'This will clear the conversation history and remove it from your list.';
@@ -249,6 +247,7 @@ z.string.conversation_message_delivered = 'Delivered';
 z.string.conversation_rename = ' renamed the conversation';
 z.string.conversation_rename_you = ' renamed the conversation';
 z.string.conversation_resume = 'Start a conversation with %@names';
+z.string.conversation_team_leave = ' was removed from the team';
 z.string.conversation_ping = ' pinged';
 z.string.conversation_ping_you = ' pinged';
 z.string.conversation_today = 'today';
@@ -296,11 +295,12 @@ z.string.archive_header = 'Archive';
 // Conversations
 z.string.conversations_all_archived = 'Everything archived';
 z.string.conversations_contacts = 'Contacts';
-z.string.conversations_connection_request_many = '%no people waiting';
+z.string.conversations_connection_request_many = '{{number}} people waiting';
 z.string.conversations_connection_request_one = '1 person waiting';
 z.string.conversations_empty_conversation = 'Group conversation';
 z.string.conversations_empty_conversation_description = 'Everyone left';
-z.string.conversations_no_conversations = 'Start a conversation or invite people to join.';
+z.string.conversations_no_conversations = 'No conversations yet';
+z.string.conversations_no_conversations_detail = 'Start a conversation, create a group or invite people to join.';
 z.string.conversations_popover_archive = 'Archive';
 z.string.conversations_popover_block = 'Block';
 z.string.conversations_popover_cancel = 'Cancel request';
@@ -317,12 +317,16 @@ z.string.conversations_secondary_line_new_message = '{{number}} new message';
 z.string.conversations_secondary_line_new_messages = '{{number}} new messages';
 z.string.conversations_secondary_line_ping = '{{number}} ping';
 z.string.conversations_secondary_line_pings = '{{number}} pings';
-z.string.conversations_secondary_line_person_left = '{{number}} person left';
 z.string.conversations_secondary_line_people_left = '{{number}} people left';
-z.string.conversations_secondary_line_person_added = '{{user1}} added {{user2}}';
+z.string.conversations_secondary_line_person_left = '{{user}} left';
+z.string.conversations_secondary_line_person_removed = '{{user}} was removed';
 z.string.conversations_secondary_line_people_added = '{{user}} people were added';
+z.string.conversations_secondary_line_person_added = '{{user}} was added';
+z.string.conversations_secondary_line_person_added_you = '{{user}} added you';
+z.string.conversations_secondary_line_renamed = '{{user}} renamed conversation';
 z.string.conversations_secondary_line_timed_message = 'Timed message';
-z.string.conversations_secondary_line_renamed = '{{user}} renamed';
+z.string.conversations_secondary_line_you_left = 'You left';
+z.string.conversations_secondary_line_you_were_removed = 'You were removed';
 
 // Takeover
 z.string.takeover_headline = 'Usernames are here.';
@@ -479,8 +483,11 @@ z.string.preferences_options_contacts_gmail = 'Import from Gmail';
 z.string.preferences_options_contacts_macos = 'Import from Contacts';
 z.string.preferences_options_contacts_detail = 'We use your contact data to connect you with others. We anonymize all information and do not share it with anyone else.';
 z.string.preferences_options_data = 'Usage and crash reports';
-z.string.preferences_options_data_checkbox = 'Usage and crash reports';
+z.string.preferences_options_data_checkbox = 'Send anonymous data';
 z.string.preferences_options_data_detail = 'Make Wire better by sending anonymous information.';
+z.string.preferences_options_emoji = 'Emoji';
+z.string.preferences_options_replace_inline_emoji_checkbox = 'Inline replacement';
+z.string.preferences_options_replace_inline_emoji_detail = 'Replace ASCII emoticons with emojis while typing, e.g. :-) → 🙂';
 z.string.preferences_options_notifications = 'Notifications';
 z.string.preferences_options_notifications_none = 'Off';
 z.string.preferences_options_notifications_obfuscate = 'Hide details';
@@ -493,6 +500,8 @@ z.string.search_connect = 'Connect';
 z.string.search_connections = 'Connections';
 z.string.search_groups = 'Groups';
 z.string.search_placeholder = 'Search by name or username';
+z.string.search_team_groups = 'Team conversations';
+z.string.search_team_members = 'Team members';
 z.string.search_top_people = 'Top people';
 z.string.search_try_search = 'Find people by\nname or username';
 z.string.search_no_contacts_on_wire = 'You have no contacts on Wire.\nTry finding people by\nname or username.';
@@ -566,9 +575,7 @@ z.string.system_notification_conversation_create = '%s.first_name started a conv
 z.string.system_notification_conversation_rename = '%s.first_name renamed the conversation to %name';
 z.string.system_notification_member_join_many = '%s.first_name added %no people to the conversation';
 z.string.system_notification_member_join_one = '%s.first_name added %@.first_name to the conversation';
-z.string.system_notification_member_leave_left = '%s.first_name left the conversation';
-z.string.system_notification_member_leave_removed_many = '%s.first_name removed %no people from the conversation';
-z.string.system_notification_member_leave_removed_one = '%s.first_name removed %@.first_name from the conversation';
+z.string.system_notification_member_leave_removed_you = '{{user}} removed you from the conversation';
 z.string.system_notification_obfuscated = 'Sent you a message';
 z.string.system_notification_obfuscated_title = 'Someone';
 z.string.system_notification_ping = 'Pinged';

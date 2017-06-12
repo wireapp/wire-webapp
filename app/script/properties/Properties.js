@@ -26,6 +26,9 @@ z.properties.Properties = class Properties {
   constructor() {
     this[z.properties.PROPERTIES_TYPE.VERSION] = 1;
     this.settings = {
+      emoji: {
+        replace_inline: true,
+      },
       notifications: z.system_notification.SystemNotificationPreference.ON,
       privacy: {
         improve_wire: true,

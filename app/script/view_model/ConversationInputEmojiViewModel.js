@@ -95,7 +95,7 @@ const EMOJI_INLINE_REPLACEMENT = [
 const EMOJI_INLINE_MAX_LENGTH = Math.max(...EMOJI_INLINE_REPLACEMENT.map((item) => item.shortcut.length));
 
 z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewModel {
-  constructor() {
+  constructor(properties_repository) {
     const emoji_div_class = 'conversation-input-emoji-list';
 
     this.emoji_list = [];
@@ -145,6 +145,9 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
       });
 
     this.bound_remove_emoji_list = this.remove_emoji_popup.bind(this);
+
+    this.should_replace_inline_emoji = properties_repository.get_preference(z.properties.PROPERTIES_TYPE.EMOJI.REPLACE_INLINE);
+
     this._init_subscriptions();
   }
 
@@ -226,9 +229,18 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
 
   _init_subscriptions() {
     amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, () => this.remove_emoji_popup());
+    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE, this.updated_replace_inline_emoji_property.bind(this));
+    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, (properties) => this.updated_replace_inline_emoji_property(properties.settings.emoji.replace_inline));
+  }
+
+  updated_replace_inline_emoji_property(preference) {
+    return this.should_replace_inline_emoji = preference;
   }
 
   _try_replace_inline_emoji(input) {
+    if (!this.should_replace_inline_emoji) {
+      return false;
+    }
     const text = input.value || '';
     const text_until_cursor = text.substring(Math.max(0, input.selectionStart - EMOJI_INLINE_MAX_LENGTH - 1), input.selectionStart);
 
@@ -248,6 +260,9 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
   }
 
   _replace_all_inline_emoji(input) {
+    if (!this.should_replace_inline_emoji) {
+      return false;
+    }
     let text_before_cursor = input.value.substr(0, input.selectionStart);
     let text_after_cursor = input.value.substr(input.selectionStart);
 
@@ -340,8 +355,9 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
   _enter_emoji(input, emoji_icon) {
     const text_before_emoji = input.value.substr(0, this.emoji_start_pos - 1);
     const text_after_emoji = input.value.substr(input.selectionStart);
+    const new_cursor_pos = text_before_emoji.length + emoji_icon.length;
     input.value = `${text_before_emoji}${emoji_icon}${text_after_emoji}`;
-    input.setSelectionRange(this.emoji_start_pos, this.emoji_start_pos);
+    input.setSelectionRange(new_cursor_pos, new_cursor_pos);
     this.remove_emoji_popup();
     $(input).change();
     $(input).focus();
