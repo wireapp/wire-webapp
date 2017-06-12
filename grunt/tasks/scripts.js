@@ -67,7 +67,7 @@ module.exports = (grunt) => {
     grunt.config('scripts', directories);
     grunt.config('scripts_minified', directories);
 
-    directories.forEach((directory_name) => {
+    Object.keys(directories).forEach((directory_name) => {
       extract_sources(`${dist_path}/${directory_name}.htm`, directory_name);
     });
   });
