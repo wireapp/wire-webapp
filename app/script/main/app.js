@@ -25,7 +25,6 @@ window.z.main = z.main || {};
 z.main.App = class App {
   static get CONFIG() {
     return {
-      COOKIE_ERROR: 'App already opened in another tab',
       COOKIE_NAME: 'app_opened',
     };
   }
