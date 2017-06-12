@@ -35,10 +35,7 @@ z.properties.PropertiesService = class PropertiesService {
    */
   constructor(client) {
     this.client = client;
-    this.logger = new z.util.Logger(
-      'z.properties.PropertiesService',
-      z.config.LOGGER.OPTIONS,
-    );
+    this.logger = new z.util.Logger('z.properties.PropertiesService', z.config.LOGGER.OPTIONS);
   }
 
   /**
@@ -62,9 +59,7 @@ z.properties.PropertiesService = class PropertiesService {
   delete_properties_by_key(key) {
     return this.client.send_request({
       type: 'DELETE',
-      url: this.client.create_url(
-        `${PropertiesService.CONFIG.URL_PROPERTIES}/${key}`,
-      ),
+      url: this.client.create_url(`${PropertiesService.CONFIG.URL_PROPERTIES}/${key}`),
     });
   }
 
@@ -90,9 +85,7 @@ z.properties.PropertiesService = class PropertiesService {
   get_properties_by_key(key) {
     return this.client.send_request({
       type: 'GET',
-      url: this.client.create_url(
-        `${PropertiesService.CONFIG.URL_PROPERTIES}/${key}`,
-      ),
+      url: this.client.create_url(`${PropertiesService.CONFIG.URL_PROPERTIES}/${key}`),
     });
   }
 
@@ -108,9 +101,7 @@ z.properties.PropertiesService = class PropertiesService {
     return this.client.send_json({
       data: properties,
       type: 'PUT',
-      url: this.client.create_url(
-        `${PropertiesService.CONFIG.URL_PROPERTIES}/${key}`,
-      ),
+      url: this.client.create_url(`${PropertiesService.CONFIG.URL_PROPERTIES}/${key}`),
     });
   }
 };

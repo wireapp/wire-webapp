@@ -66,51 +66,30 @@ describe('z.util.ArrayUtil', function() {
     const filter = item => item !== second_item;
 
     it('returns the second item when first item was given', function() {
-      expect(z.util.ArrayUtil.get_next_item(array, first_item)).toEqual(
-        second_item,
-      );
+      expect(z.util.ArrayUtil.get_next_item(array, first_item)).toEqual(second_item);
     });
 
     it('returns the third item when first item was given and filter skips the second item', function() {
-      expect(z.util.ArrayUtil.get_next_item(array, first_item, filter)).toEqual(
-        third_item,
-      );
+      expect(z.util.ArrayUtil.get_next_item(array, first_item, filter)).toEqual(third_item);
     });
 
     it('returns the second item when last item was given', function() {
-      expect(z.util.ArrayUtil.get_next_item(array, third_item)).toEqual(
-        second_item,
-      );
+      expect(z.util.ArrayUtil.get_next_item(array, third_item)).toEqual(second_item);
     });
 
     it('returns undefined when item is not in the array', function() {
-      expect(
-        z.util.ArrayUtil.get_next_item(array, unknown_item),
-      ).toBeUndefined();
+      expect(z.util.ArrayUtil.get_next_item(array, unknown_item)).toBeUndefined();
     });
   });
 
   describe('interpolate', function() {
     it('interpolates arrays with bigger lengths', function() {
-      expect(z.util.ArrayUtil.interpolate([1, 5, 3], 5)).toEqual([
-        1,
-        3,
-        5,
-        4,
-        3,
-      ]);
-      expect(z.util.ArrayUtil.interpolate([1, 3, 5, 4, 3], 3)).toEqual([
-        1,
-        5,
-        3,
-      ]);
+      expect(z.util.ArrayUtil.interpolate([1, 5, 3], 5)).toEqual([1, 3, 5, 4, 3]);
+      expect(z.util.ArrayUtil.interpolate([1, 3, 5, 4, 3], 3)).toEqual([1, 5, 3]);
     });
 
     it('keeps the first and the last value', function() {
-      const interpolated_array = z.util.ArrayUtil.interpolate(
-        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-        5,
-      );
+      const interpolated_array = z.util.ArrayUtil.interpolate([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 5);
       expect(interpolated_array[0]).toEqual(0);
       expect(interpolated_array[interpolated_array.length - 1]).toEqual(9);
     });

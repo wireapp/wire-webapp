@@ -43,10 +43,7 @@ z.ViewModel.GiphyViewModel = class GiphyViewModel {
     this.element_id = element_id;
     this.conversation_repository = conversation_repository;
     this.giphy_repository = giphy_repository;
-    this.logger = new z.util.Logger(
-      'z.ViewModel.GiphyViewModel',
-      z.config.LOGGER.OPTIONS,
-    );
+    this.logger = new z.util.Logger('z.ViewModel.GiphyViewModel', z.config.LOGGER.OPTIONS);
 
     this.modal = undefined;
     this.state = ko.observable(GiphyViewModel.STATE.DEFAULT);
@@ -67,10 +64,7 @@ z.ViewModel.GiphyViewModel = class GiphyViewModel {
   }
 
   _init_subscriptions() {
-    amplify.subscribe(
-      z.event.WebApp.EXTENSIONS.GIPHY.SHOW,
-      this.show_giphy.bind(this),
-    );
+    amplify.subscribe(z.event.WebApp.EXTENSIONS.GIPHY.SHOW, this.show_giphy.bind(this));
   }
 
   show_giphy() {
@@ -105,22 +99,12 @@ z.ViewModel.GiphyViewModel = class GiphyViewModel {
       const conversation_et = this.conversation_repository.active_conversation();
       this.sending_giphy_message = true;
 
-      this.conversation_repository
-        .send_gif(conversation_et, this.selected_gif().animated, this.query())
-        .then(() => {
-          this.sending_giphy_message = false;
-          const event = new z.tracking.event.PictureTakenEvent(
-            'conversation',
-            'giphy',
-            'button',
-          );
-          amplify.publish(
-            z.event.WebApp.ANALYTICS.EVENT,
-            event.name,
-            event.attributes,
-          );
-          amplify.publish(z.event.WebApp.EXTENSIONS.GIPHY.SEND);
-        });
+      this.conversation_repository.send_gif(conversation_et, this.selected_gif().animated, this.query()).then(() => {
+        this.sending_giphy_message = false;
+        const event = new z.tracking.event.PictureTakenEvent('conversation', 'giphy', 'button');
+        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, event.name, event.attributes);
+        amplify.publish(z.event.WebApp.EXTENSIONS.GIPHY.SEND);
+      });
 
       this.modal.hide();
     }

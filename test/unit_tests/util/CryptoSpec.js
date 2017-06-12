@@ -71,9 +71,7 @@ describe('z.util.Crypto', function() {
 
     it('returns the same value for upper and lowercase strings', function() {
       const key = 'E1b6e9f0-aafd-4ba9-8030-6Dd053531afd';
-      expect(z.util.Crypto.Hashing.joaat_hash(key)).toEqual(
-        sample[key.toLowerCase()],
-      );
+      expect(z.util.Crypto.Hashing.joaat_hash(key)).toEqual(sample[key.toLowerCase()]);
     });
   });
 });

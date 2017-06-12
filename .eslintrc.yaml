@@ -72,7 +72,7 @@ rules:
       singleQuote: true,
       trailingComma: all,
       bracketSpacing: false,
-      printWidth: 80
+      printWidth: 120
     }
   ]
   sort-keys: [2, asc, {caseSensitive: true, natural: true}]

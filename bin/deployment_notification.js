@@ -70,10 +70,7 @@ const box = new cryptobox.Cryptobox(store, 1);
 new wire.User(login, box)
   .login(false)
   .then(function(service) {
-    return service.conversation.sendTextMessage(
-      content.conversationId,
-      content.message,
-    );
+    return service.conversation.sendTextMessage(content.conversationId, content.message);
   })
   .then(function(service) {
     return service.user.logout();

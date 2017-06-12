@@ -54,10 +54,7 @@ z.event.WebSocketService = class WebSocketService {
     this.send_ping = this.send_ping.bind(this);
 
     this.client = client;
-    this.logger = new z.util.Logger(
-      'z.event.WebSocketService',
-      z.config.LOGGER.OPTIONS,
-    );
+    this.logger = new z.util.Logger('z.event.WebSocketService', z.config.LOGGER.OPTIONS);
 
     this.client_id = undefined;
     this.connection_url = '';
@@ -80,13 +77,9 @@ z.event.WebSocketService = class WebSocketService {
   connect(on_notification) {
     return new Promise((resolve, reject) => {
       this.on_notification = on_notification;
-      this.connection_url = `${this.client
-        .web_socket_url}/await?access_token=${this.client.access_token}`;
+      this.connection_url = `${this.client.web_socket_url}/await?access_token=${this.client.access_token}`;
       if (this.client_id) {
-        this.connection_url = z.util.append_url_parameter(
-          this.connection_url,
-          `client=${this.client_id}`,
-        );
+        this.connection_url = z.util.append_url_parameter(this.connection_url, `client=${this.client_id}`);
       }
 
       if (typeof this.socket === 'object') {
@@ -100,13 +93,8 @@ z.event.WebSocketService = class WebSocketService {
       delete this.socket.URL;
 
       this.socket.onopen = () => {
-        this.logger.info(
-          `Connected WebSocket to: ${this.client.web_socket_url}/await`,
-        );
-        this.ping_interval_id = window.setInterval(
-          this.send_ping,
-          WebSocketService.CONFIG.PING_INTERVAL,
-        );
+        this.logger.info(`Connected WebSocket to: ${this.client.web_socket_url}/await`);
+        this.ping_interval_id = window.setInterval(this.send_ping, WebSocketService.CONFIG.PING_INTERVAL);
         resolve();
       };
 
@@ -139,9 +127,7 @@ z.event.WebSocketService = class WebSocketService {
    */
   pending_reconnect(trigger) {
     amplify.unsubscribeAll(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEWED);
-    this.logger.info(
-      `Executing pending WebSocket reconnect triggered by '${trigger}' after access token refresh`,
-    );
+    this.logger.info(`Executing pending WebSocket reconnect triggered by '${trigger}' after access token refresh`);
     this.reconnect(trigger);
   }
 
@@ -151,18 +137,10 @@ z.event.WebSocketService = class WebSocketService {
    * @returns {undefined} No return value
    */
   reconnect(trigger) {
-    if (
-      !z.util.StorageUtil.get_value(
-        z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION,
-      )
-    ) {
-      this.logger.info(
-        `Access token has to be refreshed before reconnecting the WebSocket triggered by '${trigger}'`,
-      );
+    if (!z.util.StorageUtil.get_value(z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION)) {
+      this.logger.info(`Access token has to be refreshed before reconnecting the WebSocket triggered by '${trigger}'`);
       amplify.unsubscribeAll(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEWED);
-      amplify.subscribe(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEWED, () =>
-        this.pending_reconnect(trigger),
-      );
+      amplify.subscribe(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEWED, () => this.pending_reconnect(trigger));
       return amplify.publish(
         z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW,
         z.auth.AuthRepository.ACCESS_TOKEN_TRIGGER.WEB_SOCKET,
@@ -171,10 +149,7 @@ z.event.WebSocketService = class WebSocketService {
 
     this.reconnect_count++;
     const reconnect = () => {
-      this.logger.info(
-        `Trying to re-establish WebSocket connection. Try #${this
-          .reconnect_count}`,
-      );
+      this.logger.info(`Trying to re-establish WebSocket connection. Try #${this.reconnect_count}`);
       return this.connect(this.on_notification).then(() => {
         this.reconnect_count = 0;
         this.logger.info(`Reconnect to WebSocket triggered by '${trigger}'`);
@@ -185,10 +160,7 @@ z.event.WebSocketService = class WebSocketService {
     if (this.reconnect_count === 1) {
       return reconnect();
     }
-    this.reconnect_timeout_id = window.setTimeout(
-      () => reconnect(),
-      WebSocketService.CONFIG.RECONNECT_INTERVAL,
-    );
+    this.reconnect_timeout_id = window.setTimeout(() => reconnect(), WebSocketService.CONFIG.RECONNECT_INTERVAL);
   }
 
   /**
@@ -196,13 +168,8 @@ z.event.WebSocketService = class WebSocketService {
    * @returns {undefined} No return value
    */
   reconnected() {
-    amplify.publish(
-      z.event.WebApp.WARNING.DISMISS,
-      z.ViewModel.WarningType.CONNECTIVITY_RECONNECT,
-    );
-    this.logger.warn(
-      'Re-established WebSocket connection. Recovering from Notification Stream...',
-    );
+    amplify.publish(z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.CONNECTIVITY_RECONNECT);
+    this.logger.warn('Re-established WebSocket connection. Recovering from Notification Stream...');
     amplify.publish(z.event.WebApp.CONNECTION.ONLINE);
   }
 
@@ -224,10 +191,7 @@ z.event.WebSocketService = class WebSocketService {
     }
 
     if (reconnect) {
-      amplify.publish(
-        z.event.WebApp.WARNING.SHOW,
-        z.ViewModel.WarningType.CONNECTIVITY_RECONNECT,
-      );
+      amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECONNECT);
       this.reconnect(trigger);
     }
   }
@@ -246,8 +210,7 @@ z.event.WebSocketService = class WebSocketService {
 
       if (
         ping_interval_diff >
-        WebSocketService.CONFIG.PING_INTERVAL +
-          WebSocketService.CONFIG.PING_INTERVAL_THRESHOLD
+        WebSocketService.CONFIG.PING_INTERVAL + WebSocketService.CONFIG.PING_INTERVAL_THRESHOLD
       ) {
         this.logger.warn('Ping interval check failed');
         return this.reconnect(WebSocketService.CHANGE_TRIGGER.PING_INTERVAL);
@@ -256,10 +219,7 @@ z.event.WebSocketService = class WebSocketService {
       return this.socket.send('Wire is so much nicer with internet!');
     }
 
-    this.logger.warn(
-      `WebSocket connection is closed. Current ready state: ${this.socket
-        .readyState}`,
-    );
+    this.logger.warn(`WebSocket connection is closed. Current ready state: ${this.socket.readyState}`);
     this.reconnect(WebSocketService.CHANGE_TRIGGER.READY_STATE);
   }
 };

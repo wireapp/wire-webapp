@@ -29,10 +29,7 @@ z.extension.GiphyRepository = class GiphyRepository {
    */
   constructor(giphy_service) {
     this.giphy_service = giphy_service;
-    this.logger = new z.util.Logger(
-      'z.extension.GiphyRepository',
-      z.config.LOGGER.OPTIONS,
-    );
+    this.logger = new z.util.Logger('z.extension.GiphyRepository', z.config.LOGGER.OPTIONS);
     this.gif_query_cache = {};
   }
 
@@ -56,9 +53,7 @@ z.extension.GiphyRepository = class GiphyRepository {
 
     const _get_random_gif = (retries = 0) => {
       if (options.retry === retries) {
-        throw new Error(
-          `Unable to fetch a proper gif within ${options.retry} retries`,
-        );
+        throw new Error(`Unable to fetch a proper gif within ${options.retry} retries`);
       }
 
       return this.giphy_service
@@ -67,14 +62,11 @@ z.extension.GiphyRepository = class GiphyRepository {
           return this.giphy_service.get_by_id(random_gif.id);
         })
         .then(({data: {images, url}}) => {
-          const static_gif =
-            images[z.extension.GiphyContentSizes.FIXED_WIDTH_STILL];
+          const static_gif = images[z.extension.GiphyContentSizes.FIXED_WIDTH_STILL];
           const animated_gif = images[z.extension.GiphyContentSizes.DOWNSIZED];
 
           if (animated_gif.size > options.max_size) {
-            this.logger.info(
-              `Gif size (${animated_gif.size}) is over maximum size (${animated_gif.size})`,
-            );
+            this.logger.info(`Gif size (${animated_gif.size}) is over maximum size (${animated_gif.size})`);
             return _get_random_gif(retries + 1);
           }
 
@@ -153,8 +145,7 @@ z.extension.GiphyRepository = class GiphyRepository {
 
         for (const gif of gifs.slice(0, options.number)) {
           const {images} = gif;
-          const static_gif =
-            images[z.extension.GiphyContentSizes.FIXED_WIDTH_STILL];
+          const static_gif = images[z.extension.GiphyContentSizes.FIXED_WIDTH_STILL];
           const animation_gif = images[z.extension.GiphyContentSizes.DOWNSIZED];
 
           if (animation_gif.size <= options.max_size) {
@@ -169,10 +160,7 @@ z.extension.GiphyRepository = class GiphyRepository {
         return result;
       })
       .catch(error => {
-        this.logger.info(
-          `Unable to fetch gif for query: ${options.query}`,
-          error,
-        );
+        this.logger.info(`Unable to fetch gif for query: ${options.query}`, error);
         throw error;
       });
   }

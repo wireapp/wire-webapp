@@ -50,11 +50,7 @@ z.assets.AssetRemoteData = class AssetRemoteData {
   static v3(asset_key, otr_key, sha256, asset_token, force_caching = false) {
     const remote_data = new z.assets.AssetRemoteData(otr_key, sha256);
     remote_data.generate_url = () =>
-      wire.app.service.asset.generate_asset_url_v3(
-        asset_key,
-        asset_token,
-        force_caching,
-      );
+      wire.app.service.asset.generate_asset_url_v3(asset_key, asset_token, force_caching);
     remote_data.identifier = `${asset_key}`;
     return remote_data;
   }
@@ -72,11 +68,7 @@ z.assets.AssetRemoteData = class AssetRemoteData {
   static v2(conversation_id, asset_id, otr_key, sha256, force_caching = false) {
     const remote_data = new z.assets.AssetRemoteData(otr_key, sha256);
     remote_data.generate_url = () =>
-      wire.app.service.asset.generate_asset_url_v2(
-        asset_id,
-        conversation_id,
-        force_caching,
-      );
+      wire.app.service.asset.generate_asset_url_v2(asset_id, conversation_id, force_caching);
     remote_data.identifier = `${conversation_id}${asset_id}`;
     return remote_data;
   }
@@ -93,11 +85,7 @@ z.assets.AssetRemoteData = class AssetRemoteData {
   static v1(conversation_id, asset_id, force_caching = false) {
     const remote_data = new z.assets.AssetRemoteData();
     remote_data.generate_url = () =>
-      wire.app.service.asset.generate_asset_url(
-        asset_id,
-        conversation_id,
-        force_caching,
-      );
+      wire.app.service.asset.generate_asset_url(asset_id, conversation_id, force_caching);
     remote_data.identifier = `${conversation_id}${asset_id}`;
     return remote_data;
   }
@@ -113,11 +101,7 @@ z.assets.AssetRemoteData = class AssetRemoteData {
       .then(([buffer, type]) => {
         mime_type = type;
         if (this.otr_key != null && this.sha256 != null) {
-          return z.assets.AssetCrypto.decrypt_aes_asset(
-            buffer,
-            this.otr_key.buffer,
-            this.sha256.buffer,
-          );
+          return z.assets.AssetCrypto.decrypt_aes_asset(buffer, this.otr_key.buffer, this.sha256.buffer);
         }
         return buffer;
       })
@@ -134,18 +118,12 @@ z.assets.AssetRemoteData = class AssetRemoteData {
       return Promise.resolve(object_url);
     }
 
-    return this.load().then(blob =>
-      z.assets.AssetURLCache.set_url(
-        this.identifier,
-        window.URL.createObjectURL(blob),
-      ),
-    );
+    return this.load().then(blob => z.assets.AssetURLCache.set_url(this.identifier, window.URL.createObjectURL(blob)));
   }
 
   _load_buffer() {
     return z.util.load_url_buffer(this.generate_url(), xhr => {
-      xhr.onprogress = event =>
-        this.download_progress(Math.round(event.loaded / event.total * 100));
+      xhr.onprogress = event => this.download_progress(Math.round(event.loaded / event.total * 100));
       return (this.cancel_download = () => xhr.abort.call(xhr));
     });
   }

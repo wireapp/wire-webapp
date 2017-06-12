@@ -50,9 +50,7 @@ z.calling.SDPMapper = {
     const {response, sdp: sdp_string} = call_message_et;
     const sdp = {
       sdp: sdp_string,
-      type: response === true
-        ? z.calling.rtc.SDP_TYPE.ANSWER
-        : z.calling.rtc.SDP_TYPE.OFFER,
+      type: response === true ? z.calling.rtc.SDP_TYPE.ANSWER : z.calling.rtc.SDP_TYPE.OFFER,
     };
 
     return Promise.resolve(new window.RTCSessionDescription(sdp));
@@ -81,16 +79,13 @@ z.calling.SDPMapper = {
         if (sdp_source === z.calling.enum.SDP_SOURCE.LOCAL) {
           sdp_lines.push(sdp_line);
 
-          const browser_string = `${z.util.Environment.browser.name} ${z.util
-            .Environment.browser.version}`;
+          const browser_string = `${z.util.Environment.browser.name} ${z.util.Environment.browser.version}`;
           if (z.util.Environment.electron) {
             outline = `a=tool:electron ${z.util.Environment.version()} ${z.util.Environment.version(
               false,
             )} (${browser_string})`;
           } else {
-            outline = `a=tool:webapp ${z.util.Environment.version(
-              false,
-            )} (${browser_string})`;
+            outline = `a=tool:webapp ${z.util.Environment.version(false)} (${browser_string})`;
           }
         }
       } else if (sdp_line.startsWith('a=candidate')) {
@@ -111,8 +106,7 @@ z.calling.SDPMapper = {
         // Code to nail in bit-rate and ptime settings for improved performance and experience
       } else if (sdp_line.startsWith('m=audio')) {
         if (
-          flow_et.negotiation_mode() ===
-            z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART ||
+          flow_et.negotiation_mode() === z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART ||
           (sdp_source === z.calling.enum.SDP_SOURCE.LOCAL && flow_et.is_group)
         ) {
           sdp_lines.push(sdp_line);
@@ -120,8 +114,7 @@ z.calling.SDPMapper = {
         }
       } else if (sdp_line.startsWith('a=rtpmap')) {
         if (
-          flow_et.negotiation_mode() ===
-            z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART ||
+          flow_et.negotiation_mode() === z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART ||
           (sdp_source === z.calling.enum.SDP_SOURCE.LOCAL && flow_et.is_group)
         ) {
           if (z.util.StringUtil.includes(sdp_line, 'opus')) {

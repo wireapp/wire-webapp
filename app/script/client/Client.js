@@ -95,10 +95,7 @@ z.client.Client = class Client {
     delete json_object.session;
 
     for (const property in json_object) {
-      if (
-        json_object.hasOwnProperty(property) &&
-        json_object[property] === Client.CONFIG.DEFAULT_VALUE
-      ) {
+      if (json_object.hasOwnProperty(property) && json_object[property] === Client.CONFIG.DEFAULT_VALUE) {
         delete json_object[property];
       }
     }

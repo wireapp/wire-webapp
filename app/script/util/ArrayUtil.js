@@ -117,9 +117,7 @@ z.util.ArrayUtil = {
         return;
       }
 
-      return array[
-        z.util.ArrayUtil.iterate_index(array, current_index, reverse)
-      ];
+      return array[z.util.ArrayUtil.iterate_index(array, current_index, reverse)];
     }
   },
   /**

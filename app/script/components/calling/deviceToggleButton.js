@@ -26,9 +26,7 @@ z.components.DeviceToggleButton = class DeviceToggleButton {
   constructor(params) {
     this.current_device_index = params.index;
     this.number_of_devices = params.length;
-    this.icon_class = params.type === z.media.MediaDeviceType.VIDEO_INPUT
-      ? 'icon-video'
-      : 'icon-screensharing';
+    this.icon_class = params.type === z.media.MediaDeviceType.VIDEO_INPUT ? 'icon-video' : 'icon-screensharing';
   }
 };
 

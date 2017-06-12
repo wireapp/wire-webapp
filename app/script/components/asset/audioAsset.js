@@ -32,10 +32,7 @@ z.components.AudioAssetComponent = class AudioAssetComponent {
    */
   constructor(params, component_info) {
     this.dispose = this.dispose.bind(this);
-    this.logger = new z.util.Logger(
-      'AudioAssetComponent',
-      z.config.LOGGER.OPTIONS,
-    );
+    this.logger = new z.util.Logger('AudioAssetComponent', z.config.LOGGER.OPTIONS);
 
     this.message = ko.unwrap(params.message);
     this.asset = this.message.get_first_asset();
@@ -78,9 +75,7 @@ z.components.AudioAssetComponent = class AudioAssetComponent {
     Promise.resolve()
       .then(() => {
         if (!this.audio_src()) {
-          return this.asset
-            .load()
-            .then(blob => this.audio_src(window.URL.createObjectURL(blob)));
+          return this.asset.load().then(blob => this.audio_src(window.URL.createObjectURL(blob)));
         }
       })
       .then(() => {
@@ -100,23 +95,11 @@ z.components.AudioAssetComponent = class AudioAssetComponent {
   _send_tracking_event() {
     const duration = Math.floor(this.audio_element.duration);
 
-    amplify.publish(
-      z.event.WebApp.ANALYTICS.EVENT,
-      z.tracking.EventName.MEDIA.PLAYED_AUDIO_MESSAGE,
-      {
-        duration: z.util.bucket_values(duration, [
-          0,
-          10,
-          30,
-          60,
-          300,
-          900,
-          1800,
-        ]),
-        duration_actual: duration,
-        type: z.util.get_file_extension(this.asset.file_name),
-      },
-    );
+    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.PLAYED_AUDIO_MESSAGE, {
+      duration: z.util.bucket_values(duration, [0, 10, 30, 60, 300, 900, 1800]),
+      duration_actual: duration,
+      type: z.util.get_file_extension(this.asset.file_name),
+    });
   }
 
   dispose() {

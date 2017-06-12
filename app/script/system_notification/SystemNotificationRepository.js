@@ -57,22 +57,14 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
   constructor(calling_repository, conversation_repository) {
     this.calling_repository = calling_repository;
     this.conversation_repository = conversation_repository;
-    this.logger = new z.util.Logger(
-      'z.system_notification.SystemNotificationRepository',
-      z.config.LOGGER.OPTIONS,
-    );
+    this.logger = new z.util.Logger('z.system_notification.SystemNotificationRepository', z.config.LOGGER.OPTIONS);
 
     this.notifications = [];
 
     this.subscribe_to_events();
-    this.notifications_preference = ko.observable(
-      z.system_notification.SystemNotificationPreference.ON,
-    );
+    this.notifications_preference = ko.observable(z.system_notification.SystemNotificationPreference.ON);
     this.notifications_preference.subscribe(notifications_preference => {
-      if (
-        notifications_preference !==
-        z.system_notification.SystemNotificationPreference.NONE
-      ) {
+      if (notifications_preference !== z.system_notification.SystemNotificationPreference.NONE) {
         this.check_permission();
       }
     });
@@ -82,26 +74,11 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
   }
 
   subscribe_to_events() {
-    amplify.subscribe(
-      z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY,
-      this.notify.bind(this),
-    );
-    amplify.subscribe(
-      z.event.WebApp.SYSTEM_NOTIFICATION.PERMISSION_STATE,
-      this.set_permission_state.bind(this),
-    );
-    amplify.subscribe(
-      z.event.WebApp.SYSTEM_NOTIFICATION.REMOVE_READ,
-      this.remove_read_notifications.bind(this),
-    );
-    amplify.subscribe(
-      z.event.WebApp.PROPERTIES.UPDATED,
-      this.updated_properties.bind(this),
-    );
-    amplify.subscribe(
-      z.event.WebApp.PROPERTIES.UPDATE.NOTIFICATIONS,
-      this.updated_notifications_property.bind(this),
-    );
+    amplify.subscribe(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, this.notify.bind(this));
+    amplify.subscribe(z.event.WebApp.SYSTEM_NOTIFICATION.PERMISSION_STATE, this.set_permission_state.bind(this));
+    amplify.subscribe(z.event.WebApp.SYSTEM_NOTIFICATION.REMOVE_READ, this.remove_read_notifications.bind(this));
+    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.updated_properties.bind(this));
+    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.NOTIFICATIONS, this.updated_notifications_property.bind(this));
   }
 
   /**
@@ -120,28 +97,24 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
     }
 
     if (!z.util.Environment.browser.supports.notifications) {
-      this.set_permission_state(
-        z.system_notification.PermissionStatusState.UNSUPPORTED,
-      );
+      this.set_permission_state(z.system_notification.PermissionStatusState.UNSUPPORTED);
       return Promise.resolve(this.permission_state);
     }
 
     if (navigator.permissions) {
-      return navigator.permissions
-        .query({name: 'notifications'})
-        .then(permission_status => {
-          this.permission_status = permission_status;
-          this.permission_status.onchange = () => {
-            return this.set_permission_state(this.permission_status.state);
-          };
+      return navigator.permissions.query({name: 'notifications'}).then(permission_status => {
+        this.permission_status = permission_status;
+        this.permission_status.onchange = () => {
+          return this.set_permission_state(this.permission_status.state);
+        };
 
-          switch (permission_status.state) {
-            case z.system_notification.PermissionStatusState.PROMPT:
-              return this._request_permission();
-            default:
-              return this.set_permission_state(permission_status.state);
-          }
-        });
+        switch (permission_status.state) {
+          case z.system_notification.PermissionStatusState.PROMPT:
+            return this._request_permission();
+          default:
+            return this.set_permission_state(permission_status.state);
+        }
+      });
     }
     switch (window.Notification.permission) {
       case z.system_notification.PermissionStatusState.DEFAULT:
@@ -162,10 +135,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
 
       close();
       if (notification_data) {
-        const {
-          notification_conversation_id,
-          notification_message_id,
-        } = notification_data;
+        const {notification_conversation_id, notification_message_id} = notification_data;
         this.logger.info(
           `Notification for '${notification_message_id}' in '${notification_conversation_id}' closed on unload.`,
         );
@@ -189,11 +159,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
         return;
       }
 
-      if (
-        SystemNotificationRepository.EVENTS_TO_NOTIFY.includes(
-          message_et.super_type,
-        )
-      ) {
+      if (SystemNotificationRepository.EVENTS_TO_NOTIFY.includes(message_et.super_type)) {
         this._notify_sound(message_et);
         return this._notify_banner(conversation_et, message_et);
       }
@@ -205,16 +171,12 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
     this.notifications.forEach(notification => {
       if (notification.data) {
         const {conversation_id, message_id} = notification.data;
-        this.conversation_repository
-          .is_message_read(conversation_id, message_id)
-          .then(is_read => {
-            if (is_read) {
-              notification.close();
-              this.logger.info(
-                `Removed read notification for '${message_id}' in '${conversation_id}'.`,
-              );
-            }
-          });
+        this.conversation_repository.is_message_read(conversation_id, message_id).then(is_read => {
+          if (is_read) {
+            notification.close();
+            this.logger.info(`Removed read notification for '${message_id}' in '${conversation_id}'.`);
+          }
+        });
       }
     });
   }
@@ -246,10 +208,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
     if (message_et.is_activation()) {
       return z.l10n.text(z.string.system_notification_voice_channel_activate);
     }
-    if (
-      message_et.is_deactivation() &&
-      message_et.finished_reason === z.calling.enum.TERMINATION_REASON.MISSED
-    ) {
+    if (message_et.is_deactivation() && message_et.finished_reason === z.calling.enum.TERMINATION_REASON.MISSED) {
       return z.l10n.text(z.string.system_notification_voice_channel_deactivate);
     }
   }
@@ -265,10 +224,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
     if (message_et.has_asset_text()) {
       for (const asset_et of message_et.assets()) {
         if (asset_et.is_text() && !asset_et.previews().length) {
-          return z.util.StringUtil.truncate(
-            asset_et.text,
-            SystemNotificationRepository.CONFIG.BODY_LENGTH,
-          );
+          return z.util.StringUtil.truncate(asset_et.text, SystemNotificationRepository.CONFIG.BODY_LENGTH);
         }
       }
     } else if (message_et.has_asset_image()) {
@@ -312,10 +268,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    */
   _create_body_member_join(message_et) {
     if (message_et.user_ets().length === 1) {
-      const user2_name = z.util.get_first_name(
-        message_et.user_ets()[0],
-        z.string.Declension.ACCUSATIVE,
-      );
+      const user2_name = z.util.get_first_name(message_et.user_ets()[0], z.string.Declension.ACCUSATIVE);
       return z.l10n.text(z.string.system_notification_member_join_one, {
         user1: message_et.user().first_name(),
         user2: user2_name,
@@ -336,14 +289,8 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    * @returns {string} Notification message body
    */
   _create_body_member_leave(message_et) {
-    if (
-      message_et.user_ets().length === 1 &&
-      !message_et.remote_user_ets().length
-    ) {
-      return z.l10n.text(
-        z.string.system_notification_member_leave_removed_you,
-        message_et.user().first_name(),
-      );
+    if (message_et.user_ets().length === 1 && !message_et.remote_user_ets().length) {
+      return z.l10n.text(z.string.system_notification_member_leave_removed_you, message_et.user().first_name());
     }
   }
 
@@ -356,10 +303,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    * @returns {string} Notification message body
    */
   _create_body_member_update(message_et, conversation_et) {
-    const is_group_conversation = conversation_et instanceof
-      z.entity.Conversation
-      ? conversation_et.is_group()
-      : false;
+    const is_group_conversation = conversation_et instanceof z.entity.Conversation ? conversation_et.is_group() : false;
 
     switch (message_et.member_message_type) {
       case z.message.SystemMessageType.NORMAL:
@@ -379,10 +323,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
       case z.message.SystemMessageType.CONNECTION_REQUEST:
         return z.l10n.text(z.string.system_notification_connection_request);
       case z.message.SystemMessageType.CONVERSATION_CREATE:
-        return z.l10n.text(
-          z.string.system_notification_conversation_create,
-          message_et.user().first_name(),
-        );
+        return z.l10n.text(z.string.system_notification_conversation_create, message_et.user().first_name());
       default:
         this.logger.log(
           this.logger.levels.OFF,
@@ -416,10 +357,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    * @returns {string} Notification message body
    */
   _create_body_reaction(message_et) {
-    return z.l10n.text(
-      z.string.system_notification_reaction,
-      message_et.reaction,
-    );
+    return z.l10n.text(z.string.system_notification_reaction, message_et.reaction);
   }
 
   /**
@@ -430,10 +368,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    * @returns {string} Notification message body
    */
   _create_body_system(message_et) {
-    if (
-      message_et.system_message_type ===
-      z.message.SystemMessageType.CONVERSATION_RENAME
-    ) {
+    if (message_et.system_message_type === z.message.SystemMessageType.CONVERSATION_RENAME) {
       return this._create_body_conversation_rename(message_et);
     }
   }
@@ -465,10 +400,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
               ? this._create_body_obfuscated()
               : options_body,
             data: this._create_options_data(conversation_et, message_et),
-            icon: this._create_options_icon(
-              should_obfuscate_sender,
-              message_et.user(),
-            ),
+            icon: this._create_options_icon(should_obfuscate_sender, message_et.user()),
             silent: true, // @note When Firefox supports this we can remove the fix for WEBAPP-731
             tag: this._create_options_tag(conversation_et),
           },
@@ -566,15 +498,10 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    * @returns {string} Notification message title
    */
   _create_title(conversation_et, message_et) {
-    if (
-      conversation_et instanceof z.entity.Conversation &&
-      conversation_et.display_name()
-    ) {
+    if (conversation_et instanceof z.entity.Conversation && conversation_et.display_name()) {
       if (conversation_et.is_group()) {
         return z.util.StringUtil.truncate(
-          `${message_et
-            .user()
-            .first_name()} in ${conversation_et.display_name()}`,
+          `${message_et.user().first_name()} in ${conversation_et.display_name()}`,
           SystemNotificationRepository.CONFIG.TITLE_LENGTH,
           false,
         );
@@ -617,17 +544,10 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
     if (message_et.is_member()) {
       switch (message_et.member_message_type) {
         case z.message.SystemMessageType.CONNECTION_ACCEPTED:
-          return () =>
-            amplify.publish(
-              z.event.WebApp.CONVERSATION.SHOW,
-              conversation_et.conversation_id,
-            );
+          return () => amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversation_et.conversation_id);
         case z.message.SystemMessageType.CONNECTION_REQUEST:
           return () =>
-            amplify.publish(
-              z.event.WebApp.CONTENT.SWITCH,
-              z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS,
-            );
+            amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS);
         default:
           this.logger.log(
             this.logger.levels.OFF,
@@ -635,8 +555,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
           );
       }
     }
-    return () =>
-      amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversation_et);
+    return () => amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversation_et);
   }
 
   /**
@@ -655,19 +574,13 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
       })
       .then(notification_content => {
         return this.check_permission().then(permission_state => {
-          if (
-            permission_state ===
-            z.system_notification.PermissionStatusState.GRANTED
-          ) {
+          if (permission_state === z.system_notification.PermissionStatusState.GRANTED) {
             return this._show_notification(notification_content);
           }
         });
       })
       .catch(function(error) {
-        if (
-          error.type !==
-          z.system_notification.SystemNotificationError.TYPE.HIDE_NOTIFICATION
-        ) {
+        if (error.type !== z.system_notification.SystemNotificationError.TYPE.HIDE_NOTIFICATION) {
           throw error;
         }
       });
@@ -680,53 +593,34 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    * @returns {undefined} No return value
    */
   _notify_sound(message_et) {
-    if (
-      !document.hasFocus() &&
-      z.util.Environment.browser.firefox &&
-      z.util.Environment.os.mac
-    ) {
+    if (!document.hasFocus() && z.util.Environment.browser.firefox && z.util.Environment.os.mac) {
       return;
     }
     switch (message_et.super_type) {
       case z.message.SuperType.CONTENT:
         if (!message_et.user().is_me) {
-          amplify.publish(
-            z.event.WebApp.AUDIO.PLAY,
-            z.audio.AudioType.NEW_MESSAGE,
-          );
+          amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.NEW_MESSAGE);
         }
         break;
       case z.message.SuperType.PING:
         if (!message_et.user().is_me) {
-          amplify.publish(
-            z.event.WebApp.AUDIO.PLAY,
-            z.audio.AudioType.INCOMING_PING,
-          );
+          amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.INCOMING_PING);
         }
         break;
       default:
-        this.logger.log(
-          this.logger.levels.OFF,
-          `Notification for message '${message_et.id} does not play sound.`,
-        );
+        this.logger.log(this.logger.levels.OFF, `Notification for message '${message_et.id} does not play sound.`);
     }
   }
 
   // Request browser permission for notifications.
   _request_permission() {
     return new Promise(resolve => {
-      amplify.publish(
-        z.event.WebApp.WARNING.SHOW,
-        z.ViewModel.WarningType.REQUEST_NOTIFICATION,
-      );
+      amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.REQUEST_NOTIFICATION);
       // Note: The callback will be only triggered in Chrome.
       // If you ignore a permission request on Firefox, then the callback will not be triggered.
       if (window.Notification.requestPermission) {
         window.Notification.requestPermission(permission_state => {
-          amplify.publish(
-            z.event.WebApp.WARNING.DISMISS,
-            z.ViewModel.WarningType.REQUEST_NOTIFICATION,
-          );
+          amplify.publish(z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.REQUEST_NOTIFICATION);
           this.set_permission_state(permission_state);
           return resolve(this.permission_state);
         });
@@ -759,8 +653,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
   _should_obfuscate_notification_sender(message_et) {
     return (
       message_et.is_ephemeral() ||
-      this.notifications_preference() ===
-        z.system_notification.SystemNotificationPreference.OBFUSCATE
+      this.notifications_preference() === z.system_notification.SystemNotificationPreference.OBFUSCATE
     );
   }
 
@@ -772,35 +665,20 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    * @returns {Promise} Resolves if the notification should be shown
    */
   _should_show_notification(conversation_et, message_et) {
-    const in_active_conversation = this.conversation_repository.is_active_conversation(
-      conversation_et,
-    );
+    const in_active_conversation = this.conversation_repository.is_active_conversation(conversation_et);
     const in_conversation_view =
-      document.hasFocus() &&
-      wire.app.view.content.content_state() ===
-        z.ViewModel.content.CONTENT_STATE.CONVERSATION;
+      document.hasFocus() && wire.app.view.content.content_state() === z.ViewModel.content.CONTENT_STATE.CONVERSATION;
     const in_maximized_call =
-      this.calling_repository.joined_call() &&
-      !wire.app.view.content.multitasking.is_minimized();
+      this.calling_repository.joined_call() && !wire.app.view.content.multitasking.is_minimized();
 
-    const active_conversation =
-      in_conversation_view && in_active_conversation && !in_maximized_call;
+    const active_conversation = in_conversation_view && in_active_conversation && !in_maximized_call;
     const message_from_self = message_et.user().is_me;
-    const permission_denied =
-      this.permission_state ===
-      z.system_notification.PermissionStatusState.DENIED;
-    const preference_none =
-      this.notifications_preference() ===
-      z.system_notification.SystemNotificationPreference.NONE;
-    const supports_notification =
-      z.util.Environment.browser.supports.notifications;
+    const permission_denied = this.permission_state === z.system_notification.PermissionStatusState.DENIED;
+    const preference_none = this.notifications_preference() === z.system_notification.SystemNotificationPreference.NONE;
+    const supports_notification = z.util.Environment.browser.supports.notifications;
 
     const hide_notification =
-      active_conversation ||
-      message_from_self ||
-      permission_denied ||
-      preference_none ||
-      !supports_notification;
+      active_conversation || message_from_self || permission_denied || preference_none || !supports_notification;
 
     if (hide_notification) {
       return Promise.reject(
@@ -823,10 +701,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    * @returns {undefined} No return value
    */
   _show_notification(notification_content) {
-    amplify.publish(
-      z.event.WebApp.SYSTEM_NOTIFICATION.SHOW,
-      notification_content,
-    );
+    amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.SHOW, notification_content);
     this._show_notification_in_browser(notification_content);
   }
 
@@ -847,14 +722,8 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
     @see https://developer.mozilla.org/en-US/docs/Web/API/Notification/data
     */
     this.remove_read_notifications();
-    const notification = new window.Notification(
-      notification_content.title,
-      notification_content.options,
-    );
-    const {
-      conversation_id,
-      message_id = 'ID not specified',
-    } = notification_content.options.data;
+    const notification = new window.Notification(notification_content.title, notification_content.options);
+    const {conversation_id, message_id = 'ID not specified'} = notification_content.options.data;
     let timeout_trigger_id = undefined;
 
     notification.onclick = () => {
@@ -862,39 +731,29 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
       window.focus();
       wire.app.view.content.multitasking.is_minimized(true);
       notification_content.trigger();
-      this.logger.info(
-        `Notification for message '${message_id} in conversation '${conversation_id}' closed by click.`,
-      );
+      this.logger.info(`Notification for message '${message_id} in conversation '${conversation_id}' closed by click.`);
       notification.close();
     };
 
     notification.onclose = () => {
       window.clearTimeout(timeout_trigger_id);
       this.notifications.splice(this.notifications.indexOf(notification), 1);
-      this.logger.info(
-        `Removed notification for '${message_id}' in '${conversation_id}' locally.`,
-      );
+      this.logger.info(`Removed notification for '${message_id}' in '${conversation_id}' locally.`);
     };
 
     notification.onerror = () => {
-      this.logger.error(
-        `Notification for '${message_id}' in '${conversation_id}' closed by error.`,
-      );
+      this.logger.error(`Notification for '${message_id}' in '${conversation_id}' closed by error.`);
       notification.close();
     };
 
     notification.onshow = () => {
       timeout_trigger_id = window.setTimeout(() => {
-        this.logger.info(
-          `Notification for '${message_id}' in '${conversation_id}' closed by timeout.`,
-        );
+        this.logger.info(`Notification for '${message_id}' in '${conversation_id}' closed by timeout.`);
         notification.close();
       }, notification_content.timeout);
     };
 
     this.notifications.push(notification);
-    this.logger.info(
-      `Added notification for '${message_id}' in '${conversation_id}' to queue.`,
-    );
+    this.logger.info(`Added notification for '${message_id}' in '${conversation_id}' to queue.`);
   }
 };

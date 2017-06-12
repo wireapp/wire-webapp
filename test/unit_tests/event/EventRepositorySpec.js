@@ -53,25 +53,13 @@ describe('Event Repository', function() {
 
   describe('update_from_notification_stream', function() {
     beforeEach(function() {
-      spyOn(
-        TestFactory.event_repository,
-        '_handle_notification',
-      ).and.callThrough();
-      spyOn(
-        TestFactory.event_repository,
-        '_buffer_web_socket_notification',
-      ).and.callThrough();
-      spyOn(
-        TestFactory.event_repository,
-        '_handle_buffered_notifications',
-      ).and.callThrough();
+      spyOn(TestFactory.event_repository, '_handle_notification').and.callThrough();
+      spyOn(TestFactory.event_repository, '_buffer_web_socket_notification').and.callThrough();
+      spyOn(TestFactory.event_repository, '_handle_buffered_notifications').and.callThrough();
       spyOn(TestFactory.event_repository, '_handle_event');
       spyOn(TestFactory.event_repository, '_distribute_event');
 
-      spyOn(
-        TestFactory.notification_service,
-        'get_notifications',
-      ).and.callFake(() => {
+      spyOn(TestFactory.notification_service, 'get_notifications').and.callFake(() => {
         return new Promise(resolve => {
           window.setTimeout(() => {
             resolve({
@@ -85,58 +73,34 @@ describe('Event Repository', function() {
         });
       });
 
-      spyOn(
-        TestFactory.notification_service,
-        'get_notifications_last',
-      ).and.returnValue(
+      spyOn(TestFactory.notification_service, 'get_notifications_last').and.returnValue(
         Promise.resolve({id: z.util.create_random_uuid(), payload: []}),
       );
 
-      spyOn(
-        TestFactory.notification_service,
-        'get_last_notification_id_from_db',
-      ).and.callFake(() => {
+      spyOn(TestFactory.notification_service, 'get_last_notification_id_from_db').and.callFake(() => {
         if (last_notification_id) {
           return Promise.resolve(last_notification_id);
         }
-        return Promise.reject(
-          new z.event.EventError(z.event.EventError.TYPE.NO_LAST_ID),
-        );
+        return Promise.reject(new z.event.EventError(z.event.EventError.TYPE.NO_LAST_ID));
       });
 
-      spyOn(
-        TestFactory.notification_service,
-        'save_last_notification_id_to_db',
-      ).and.returnValue(
-        Promise.resolve(
-          z.event.NotificationService.prototype.PRIMARY_KEY_LAST_NOTIFICATION,
-        ),
+      spyOn(TestFactory.notification_service, 'save_last_notification_id_to_db').and.returnValue(
+        Promise.resolve(z.event.NotificationService.prototype.PRIMARY_KEY_LAST_NOTIFICATION),
       );
     });
 
-    it('should fetch last notifications ID from backend if not found in storage', function(
-      done,
-    ) {
+    it('should fetch last notifications ID from backend if not found in storage', function(done) {
       const missed_events_spy = jasmine.createSpy();
       amplify.unsubscribeAll(z.event.WebApp.CONVERSATION.MISSED_EVENTS);
-      amplify.subscribe(
-        z.event.WebApp.CONVERSATION.MISSED_EVENTS,
-        missed_events_spy,
-      );
+      amplify.subscribe(z.event.WebApp.CONVERSATION.MISSED_EVENTS, missed_events_spy);
 
       TestFactory.event_repository.connect_web_socket();
       TestFactory.event_repository
         .initialize_from_notification_stream()
         .then(function() {
-          expect(
-            TestFactory.notification_service.get_last_notification_id_from_db,
-          ).toHaveBeenCalled();
-          expect(
-            TestFactory.notification_service.get_notifications_last,
-          ).toHaveBeenCalled();
-          expect(
-            TestFactory.notification_service.get_notifications,
-          ).toHaveBeenCalled();
+          expect(TestFactory.notification_service.get_last_notification_id_from_db).toHaveBeenCalled();
+          expect(TestFactory.notification_service.get_notifications_last).toHaveBeenCalled();
+          expect(TestFactory.notification_service.get_notifications).toHaveBeenCalled();
           expect(missed_events_spy).toHaveBeenCalled();
           done();
         })
@@ -150,21 +114,15 @@ describe('Event Repository', function() {
         id: z.util.create_random_uuid(),
         payload: [],
       });
-      expect(
-        TestFactory.event_repository._buffer_web_socket_notification,
-      ).toHaveBeenCalled();
-      expect(
-        TestFactory.event_repository._handle_notification,
-      ).not.toHaveBeenCalled();
+      expect(TestFactory.event_repository._buffer_web_socket_notification).toHaveBeenCalled();
+      expect(TestFactory.event_repository._handle_notification).not.toHaveBeenCalled();
       expect(TestFactory.event_repository.notification_handling_state()).toBe(
         z.event.NOTIFICATION_HANDLING_STATE.STREAM,
       );
       expect(TestFactory.event_repository.web_socket_buffer.length).toBe(1);
     });
 
-    it('should handle buffered notifications after notifications stream was processed', function(
-      done,
-    ) {
+    it('should handle buffered notifications after notifications stream was processed', function(done) {
       last_notification_id = z.util.create_random_uuid();
       const last_published_notification_id = z.util.create_random_uuid();
       TestFactory.event_repository.last_notification_id(last_notification_id);
@@ -181,16 +139,12 @@ describe('Event Repository', function() {
       TestFactory.event_repository
         .initialize_from_notification_stream()
         .then(function() {
-          expect(
-            TestFactory.event_repository._handle_buffered_notifications,
-          ).toHaveBeenCalled();
+          expect(TestFactory.event_repository._handle_buffered_notifications).toHaveBeenCalled();
           expect(TestFactory.event_repository.web_socket_buffer.length).toBe(0);
-          expect(TestFactory.event_repository.last_notification_id()).toBe(
-            last_published_notification_id,
+          expect(TestFactory.event_repository.last_notification_id()).toBe(last_published_notification_id);
+          expect(TestFactory.event_repository.notification_handling_state()).toBe(
+            z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET,
           );
-          expect(
-            TestFactory.event_repository.notification_handling_state(),
-          ).toBe(z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
           done();
         })
         .catch(done.fail);
@@ -205,72 +159,51 @@ describe('Event Repository', function() {
       TestFactory.event_repository.last_notification_id(last_notification_id);
     });
 
-    it('should not update last notification id if transient is true', function(
-      done,
-    ) {
+    it('should not update last notification id if transient is true', function(done) {
       const notification_payload = {
         id: z.util.create_random_uuid(),
         payload: [],
         transient: true,
       };
 
-      TestFactory.event_repository
-        ._handle_notification(notification_payload)
-        .then(() => {
-          expect(TestFactory.event_repository.last_notification_id()).toBe(
-            last_notification_id,
-          );
-          done();
-        });
+      TestFactory.event_repository._handle_notification(notification_payload).then(() => {
+        expect(TestFactory.event_repository.last_notification_id()).toBe(last_notification_id);
+        done();
+      });
     });
 
-    it('should update last notification id if transient is false', function(
-      done,
-    ) {
+    it('should update last notification id if transient is false', function(done) {
       const notification_payload = {
         id: z.util.create_random_uuid(),
         payload: [],
         transient: false,
       };
 
-      TestFactory.event_repository
-        ._handle_notification(notification_payload)
-        .then(() => {
-          expect(TestFactory.event_repository.last_notification_id()).toBe(
-            notification_payload.id,
-          );
-          done();
-        });
+      TestFactory.event_repository._handle_notification(notification_payload).then(() => {
+        expect(TestFactory.event_repository.last_notification_id()).toBe(notification_payload.id);
+        done();
+      });
     });
 
-    it('should update last notification id if transient is not present', function(
-      done,
-    ) {
+    it('should update last notification id if transient is not present', function(done) {
       const notification_payload = {
         id: z.util.create_random_uuid(),
         payload: [],
       };
 
-      TestFactory.event_repository
-        ._handle_notification(notification_payload)
-        .then(() => {
-          expect(TestFactory.event_repository.last_notification_id()).toBe(
-            notification_payload.id,
-          );
-          done();
-        });
+      TestFactory.event_repository._handle_notification(notification_payload).then(() => {
+        expect(TestFactory.event_repository.last_notification_id()).toBe(notification_payload.id);
+        done();
+      });
     });
   });
 
   describe('_handle_event', function() {
     beforeEach(function() {
-      TestFactory.event_repository.notification_handling_state(
-        z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET,
+      TestFactory.event_repository.notification_handling_state(z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
+      spyOn(TestFactory.event_repository.conversation_service, 'save_event').and.returnValue(
+        Promise.resolve({data: 'dummy content'}),
       );
-      spyOn(
-        TestFactory.event_repository.conversation_service,
-        'save_event',
-      ).and.returnValue(Promise.resolve({data: 'dummy content'}));
       spyOn(TestFactory.event_repository, '_distribute_event');
     });
 
@@ -278,12 +211,8 @@ describe('Event Repository', function() {
       TestFactory.event_repository
         ._handle_event({type: z.event.Backend.USER.UPDATE})
         .then(function() {
-          expect(
-            TestFactory.event_repository.conversation_service.save_event,
-          ).not.toHaveBeenCalled();
-          expect(
-            TestFactory.event_repository._distribute_event,
-          ).toHaveBeenCalled();
+          expect(TestFactory.event_repository.conversation_service.save_event).not.toHaveBeenCalled();
+          expect(TestFactory.event_repository._distribute_event).toHaveBeenCalled();
           done();
         })
         .catch(done.fail);
@@ -293,37 +222,25 @@ describe('Event Repository', function() {
       TestFactory.event_repository
         ._handle_event({type: z.event.Backend.CALL.FLOW_ACTIVE})
         .then(function() {
-          expect(
-            TestFactory.event_repository.conversation_service.save_event,
-          ).not.toHaveBeenCalled();
-          expect(
-            TestFactory.event_repository._distribute_event,
-          ).toHaveBeenCalled();
+          expect(TestFactory.event_repository.conversation_service.save_event).not.toHaveBeenCalled();
+          expect(TestFactory.event_repository._distribute_event).toHaveBeenCalled();
           done();
         })
         .catch(done.fail);
     });
 
-    it('should not save but distribute conversation.create event', function(
-      done,
-    ) {
+    it('should not save but distribute conversation.create event', function(done) {
       TestFactory.event_repository
         ._handle_event({type: z.event.Backend.CONVERSATION.CREATE})
         .then(function() {
-          expect(
-            TestFactory.event_repository.conversation_service.save_event,
-          ).not.toHaveBeenCalled();
-          expect(
-            TestFactory.event_repository._distribute_event,
-          ).toHaveBeenCalled();
+          expect(TestFactory.event_repository.conversation_service.save_event).not.toHaveBeenCalled();
+          expect(TestFactory.event_repository._distribute_event).toHaveBeenCalled();
           done();
         })
         .catch(done.fail);
     });
 
-    it('skips outdated "conversation.message-add" events arriving', function(
-      done,
-    ) {
+    it('skips outdated "conversation.message-add" events arriving', function(done) {
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const event = {
         conversation: '9fe8b359-b9e0-4624-b63c-71747664e4fa',
@@ -339,12 +256,8 @@ describe('Event Repository', function() {
         ._handle_event(event)
         .then(function(result) {
           expect(result).toBeTruthy();
-          expect(
-            TestFactory.event_repository.conversation_service.save_event,
-          ).not.toHaveBeenCalled();
-          expect(
-            TestFactory.event_repository._distribute_event,
-          ).not.toHaveBeenCalled();
+          expect(TestFactory.event_repository.conversation_service.save_event).not.toHaveBeenCalled();
+          expect(TestFactory.event_repository._distribute_event).not.toHaveBeenCalled();
           done();
         })
         .catch(done.fail);
@@ -381,12 +294,8 @@ describe('Event Repository', function() {
         ._handle_event(event)
         .then(function(result) {
           expect(result).toBeTruthy();
-          expect(
-            TestFactory.event_repository.conversation_service.save_event,
-          ).not.toHaveBeenCalled();
-          expect(
-            TestFactory.event_repository._distribute_event,
-          ).not.toHaveBeenCalled();
+          expect(TestFactory.event_repository.conversation_service.save_event).not.toHaveBeenCalled();
+          expect(TestFactory.event_repository._distribute_event).not.toHaveBeenCalled();
           done();
         })
         .catch(done.fail);
@@ -408,23 +317,15 @@ describe('Event Repository', function() {
         ._handle_event(event)
         .then(function(result) {
           expect(result).toBeTruthy();
-          expect(
-            TestFactory.event_repository.conversation_service.save_event,
-          ).not.toHaveBeenCalled();
-          expect(
-            TestFactory.event_repository._distribute_event,
-          ).not.toHaveBeenCalled();
+          expect(TestFactory.event_repository.conversation_service.save_event).not.toHaveBeenCalled();
+          expect(TestFactory.event_repository._distribute_event).not.toHaveBeenCalled();
           done();
         })
         .catch(done.fail);
     });
 
-    it('skips outdated events arriving via notification stream', function(
-      done,
-    ) {
-      TestFactory.event_repository.notification_handling_state(
-        z.event.NOTIFICATION_HANDLING_STATE.STREAM,
-      );
+    it('skips outdated events arriving via notification stream', function(done) {
+      TestFactory.event_repository.notification_handling_state(z.event.NOTIFICATION_HANDLING_STATE.STREAM);
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const event = {
         conversation: '9fe8b359-b9e0-4624-b63c-71747664e4fa',
@@ -440,12 +341,8 @@ describe('Event Repository', function() {
         ._handle_event(event)
         .then(function(result) {
           expect(result).toBeTruthy();
-          expect(
-            TestFactory.event_repository.conversation_service.save_event,
-          ).not.toHaveBeenCalled();
-          expect(
-            TestFactory.event_repository._distribute_event,
-          ).not.toHaveBeenCalled();
+          expect(TestFactory.event_repository.conversation_service.save_event).not.toHaveBeenCalled();
+          expect(TestFactory.event_repository._distribute_event).not.toHaveBeenCalled();
           done();
         })
         .catch(done.fail);
@@ -466,12 +363,8 @@ describe('Event Repository', function() {
       TestFactory.event_repository
         ._handle_event(event)
         .then(function() {
-          expect(
-            TestFactory.event_repository.conversation_service.save_event,
-          ).toHaveBeenCalled();
-          expect(
-            TestFactory.event_repository._distribute_event,
-          ).toHaveBeenCalled();
+          expect(TestFactory.event_repository.conversation_service.save_event).toHaveBeenCalled();
+          expect(TestFactory.event_repository._distribute_event).toHaveBeenCalled();
           done();
         })
         .catch(done.fail);
@@ -492,12 +385,8 @@ describe('Event Repository', function() {
       TestFactory.event_repository
         ._handle_event(event)
         .then(function() {
-          expect(
-            TestFactory.event_repository.conversation_service.save_event,
-          ).toHaveBeenCalled();
-          expect(
-            TestFactory.event_repository._distribute_event,
-          ).toHaveBeenCalled();
+          expect(TestFactory.event_repository.conversation_service.save_event).toHaveBeenCalled();
+          expect(TestFactory.event_repository._distribute_event).toHaveBeenCalled();
           done();
         })
         .catch(done.fail);
@@ -518,20 +407,14 @@ describe('Event Repository', function() {
       TestFactory.event_repository
         ._handle_event(event)
         .then(function() {
-          expect(
-            TestFactory.event_repository.conversation_service.save_event,
-          ).toHaveBeenCalled();
-          expect(
-            TestFactory.event_repository._distribute_event,
-          ).toHaveBeenCalled();
+          expect(TestFactory.event_repository.conversation_service.save_event).toHaveBeenCalled();
+          expect(TestFactory.event_repository._distribute_event).toHaveBeenCalled();
           done();
         })
         .catch(done.fail);
     });
 
-    it('accepts conversation.voice-channel-deactivate (missed call) events', function(
-      done,
-    ) {
+    it('accepts conversation.voice-channel-deactivate (missed call) events', function(done) {
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const event = {
         conversation: '64dcb45f-bf8d-4eac-a263-649a60d69305',
@@ -546,12 +429,8 @@ describe('Event Repository', function() {
       TestFactory.event_repository
         ._handle_event(event)
         .then(function() {
-          expect(
-            TestFactory.event_repository.conversation_service.save_event,
-          ).toHaveBeenCalled();
-          expect(
-            TestFactory.event_repository._distribute_event,
-          ).toHaveBeenCalled();
+          expect(TestFactory.event_repository.conversation_service.save_event).toHaveBeenCalled();
+          expect(TestFactory.event_repository._distribute_event).toHaveBeenCalled();
           done();
         })
         .catch(done.fail);
@@ -573,12 +452,8 @@ describe('Event Repository', function() {
       TestFactory.event_repository
         ._handle_event(event)
         .then(function() {
-          expect(
-            TestFactory.event_repository.conversation_service.save_event,
-          ).toHaveBeenCalled();
-          expect(
-            TestFactory.event_repository._distribute_event,
-          ).toHaveBeenCalled();
+          expect(TestFactory.event_repository.conversation_service.save_event).toHaveBeenCalled();
+          expect(TestFactory.event_repository._distribute_event).toHaveBeenCalled();
           done();
         })
         .catch(done.fail);

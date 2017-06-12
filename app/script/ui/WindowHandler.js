@@ -26,10 +26,7 @@ z.ui.WindowHandler = class WindowHandler {
   constructor() {
     this.init = this.init.bind(this);
     this._listen_to_window_resize = this._listen_to_window_resize.bind(this);
-    this.logger = new z.util.Logger(
-      'z.ui.WindowHandler',
-      z.config.LOGGER.OPTIONS,
-    );
+    this.logger = new z.util.Logger('z.ui.WindowHandler', z.config.LOGGER.OPTIONS);
 
     this.height = 0;
     this.width = 0;
@@ -61,8 +58,7 @@ z.ui.WindowHandler = class WindowHandler {
           this.lost_focus_on = Date.now();
           this.lost_focus_interval = window.setInterval(
             () => this._check_for_timeout(),
-            z.tracking.EventTrackingRepository.CONFIG.LOCALYTICS
-              .SESSION_INTERVAL,
+            z.tracking.EventTrackingRepository.CONFIG.LOCALYTICS.SESSION_INTERVAL,
           );
         }
       }
@@ -93,13 +89,9 @@ z.ui.WindowHandler = class WindowHandler {
 
       if (
         promise_error &&
-        promise_error.type ===
-          z.conversation.ConversationError.TYPE
-            .DEGRADED_CONVERSATION_CANCELLATION
+        promise_error.type === z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION
       ) {
-        this.logger.log(
-          'User has canceled sending a message to a degraded conversation.',
-        );
+        this.logger.log('User has canceled sending a message to a degraded conversation.');
         promise_rejection_event.preventDefault();
         promise_rejection_event.stopPropagation();
         return false;
@@ -109,10 +101,7 @@ z.ui.WindowHandler = class WindowHandler {
 
   _check_for_timeout() {
     const in_background_since = Date.now() - this.lost_focus_on;
-    if (
-      in_background_since >=
-      z.tracking.EventTrackingRepository.CONFIG.LOCALYTICS.SESSION_TIMEOUT
-    ) {
+    if (in_background_since >= z.tracking.EventTrackingRepository.CONFIG.LOCALYTICS.SESSION_TIMEOUT) {
       return amplify.publish(z.event.WebApp.ANALYTICS.CLOSE_SESSION);
     }
   }

@@ -43,19 +43,13 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
   constructor(id, remote_user_id, call_et, timings) {
     this.remote_user_id = remote_user_id;
     this.call_et = call_et;
-    this.logger = new z.util.Logger(
-      `z.telemetry.calling.FlowTelemetry (${id})`,
-      z.config.LOGGER.OPTIONS,
-    );
+    this.logger = new z.util.Logger(`z.telemetry.calling.FlowTelemetry (${id})`, z.config.LOGGER.OPTIONS);
 
     this.id = id;
     this.is_answer = false;
     this.peer_connection = undefined;
 
-    this.timings = $.extend(
-      new z.telemetry.calling.CallSetupTimings(this.id),
-      timings ? timings.get() : {},
-    );
+    this.timings = $.extend(new z.telemetry.calling.CallSetupTimings(this.id), timings ? timings.get() : {});
     this.statistics = new z.telemetry.calling.ConnectionStats();
 
     this.statistics_interval = undefined;
@@ -139,32 +133,22 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
 
       const seconds = attempt * FlowTelemetry.CONFIG.MEDIA_CHECK_TIMEOUT / 1000;
       if (stats.bytes_received === 0 && stats.bytes_sent === 0) {
-        return this.logger.warn(
-          `No '${media_type}' flowing in either direction on stream after ${seconds} seconds`,
-        );
+        return this.logger.warn(`No '${media_type}' flowing in either direction on stream after ${seconds} seconds`);
       }
 
       if (stats.bytes_received === 0) {
-        return this.logger.warn(
-          `No incoming '${media_type}' received on stream after ${seconds} seconds`,
-        );
+        return this.logger.warn(`No incoming '${media_type}' received on stream after ${seconds} seconds`);
       }
 
       if (stats.bytes_sent === 0) {
-        return this.logger.warn(
-          `No outgoing '${media_type}' sent on stream after ${seconds} seconds`,
-        );
+        return this.logger.warn(`No outgoing '${media_type}' sent on stream after ${seconds} seconds`);
       }
 
-      return this.logger.debug(
-        `Stream has '${media_type}' flowing properly both ways`,
-      );
+      return this.logger.debug(`Stream has '${media_type}' flowing properly both ways`);
     }
 
     if (this.is_answer) {
-      this.logger.info(
-        `Check '${media_type}' statistics on stream delayed as we created this flow`,
-      );
+      this.logger.info(`Check '${media_type}' statistics on stream delayed as we created this flow`);
 
       const stream_check_timeout = window.setTimeout(() => {
         this.check_stream(media_type, attempt++);
@@ -200,10 +184,7 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
    */
   set_peer_connection(peer_connection) {
     this.peer_connection = peer_connection;
-    this.logger.debug(
-      'Set or updated PeerConnection for telemetry checks',
-      this.peer_connection,
-    );
+    this.logger.debug('Set or updated PeerConnection for telemetry checks', this.peer_connection);
   }
 
   /**
@@ -246,14 +227,8 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
       this._clear_stream_check_timeouts();
 
       this._update_statistics().then(() => {
-        this.logger.info(
-          'Network stats updated for the last time',
-          this.statistics,
-        );
-        amplify.publish(
-          z.event.WebApp.DEBUG.UPDATE_LAST_CALL_STATUS,
-          this.create_report(),
-        );
+        this.logger.info('Network stats updated for the last time', this.statistics);
+        amplify.publish(z.event.WebApp.DEBUG.UPDATE_LAST_CALL_STATUS, this.create_report());
         this.statistics = {};
       });
     }
@@ -266,9 +241,7 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
   start_statistics() {
     if (!this.statistics_interval) {
       // Track call stats
-      this.time_step(
-        z.telemetry.calling.CallSetupSteps.ICE_CONNECTION_CONNECTED,
-      );
+      this.time_step(z.telemetry.calling.CallSetupSteps.ICE_CONNECTION_CONNECTED);
       $.extend(this.statistics, new z.telemetry.calling.ConnectionStats());
       this.connected();
 
@@ -276,15 +249,10 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
       const stream_check_timeout = window.setTimeout(() => {
         this._update_statistics()
           .then(() => {
-            this.logger.info(
-              'Network stats updated for the first time',
-              this.statistics,
-            );
+            this.logger.info('Network stats updated for the first time', this.statistics);
           })
           .catch(error => {
-            this.logger.warn(
-              `Failed to update flow networks stats: ${error.message}`,
-            );
+            this.logger.warn(`Failed to update flow networks stats: ${error.message}`);
           });
       }, FlowTelemetry.CONFIG.STATS_CHECK_TIMEOUT);
 
@@ -339,71 +307,40 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
         rtc_stats_report.forEach(report => {
           switch (report.type) {
             case z.calling.rtc.STATS_TYPE.CANDIDATE_PAIR: {
-              connection_stats = this._update_from_candidate_pair(
-                report,
-                rtc_stats_report,
-                connection_stats,
-              );
+              connection_stats = this._update_from_candidate_pair(report, rtc_stats_report, connection_stats);
               break;
             }
 
             case z.calling.rtc.STATS_TYPE.GOOGLE_CANDIDATE_PAIR: {
-              connection_stats = this._update_peer_connection_bytes(
-                report,
-                connection_stats,
-              );
-              connection_stats = this._update_from_google_candidate_pair(
-                report,
-                rtc_stats_report,
-                connection_stats,
-              );
+              connection_stats = this._update_peer_connection_bytes(report, connection_stats);
+              connection_stats = this._update_from_google_candidate_pair(report, rtc_stats_report, connection_stats);
               break;
             }
 
             case z.calling.rtc.STATS_TYPE.INBOUND_RTP: {
-              connection_stats = this._update_peer_connection_bytes(
-                report,
-                connection_stats,
-              );
-              connection_stats = this._update_from_inbound_rtp(
-                report,
-                connection_stats,
-              );
+              connection_stats = this._update_peer_connection_bytes(report, connection_stats);
+              connection_stats = this._update_from_inbound_rtp(report, connection_stats);
               break;
             }
 
             case z.calling.rtc.STATS_TYPE.OUTBOUND_RTP: {
-              connection_stats = this._update_peer_connection_bytes(
-                report,
-                connection_stats,
-              );
-              connection_stats = this._update_from_outbound_rtp(
-                report,
-                connection_stats,
-              );
+              connection_stats = this._update_peer_connection_bytes(report, connection_stats);
+              connection_stats = this._update_from_outbound_rtp(report, connection_stats);
               break;
             }
 
             case z.calling.rtc.STATS_TYPE.SSRC: {
-              connection_stats = this._update_from_ssrc(
-                report,
-                connection_stats,
-              );
+              connection_stats = this._update_from_ssrc(report, connection_stats);
               break;
             }
 
             default:
-              this.logger.log(
-                this.logger.levels.OFF,
-                `Unhandled stats report type '${report.type}'`,
-                report,
-              );
+              this.logger.log(this.logger.levels.OFF, `Unhandled stats report type '${report.type}'`, report);
           }
         });
 
         const _calc_rate = (key, timestamp, type) => {
-          const bytes =
-            connection_stats[key][type] - this.statistics[key][type];
+          const bytes = connection_stats[key][type] - this.statistics[key][type];
           const time_span = connection_stats.timestamp - timestamp;
           return window.parseInt(1000.0 * bytes / time_span, 10);
         };
@@ -418,21 +355,13 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
                 this.statistics.connected,
                 'bytes_received',
               );
-              connection_stats[key].bit_rate_mean_sent = _calc_rate(
-                key,
-                this.statistics.connected,
-                'bytes_sent',
-              );
+              connection_stats[key].bit_rate_mean_sent = _calc_rate(key, this.statistics.connected, 'bytes_sent');
               connection_stats[key].bit_rate_current_received = _calc_rate(
                 key,
                 this.statistics.timestamp,
                 'bytes_received',
               );
-              connection_stats[key].bit_rate_current_sent = _calc_rate(
-                key,
-                this.statistics.timestamp,
-                'bytes_sent',
-              );
+              connection_stats[key].bit_rate_current_sent = _calc_rate(key, this.statistics.timestamp, 'bytes_sent');
             }
           }
         }
@@ -473,16 +402,9 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
    * @param {ConnectionStats} connection_stats - Parsed flow statistics
    * @returns {ConnectionStats} updated_stats
    */
-  _update_from_google_candidate_pair(
-    report,
-    rtc_stats_report,
-    connection_stats,
-  ) {
+  _update_from_google_candidate_pair(report, rtc_stats_report, connection_stats) {
     if (report.googActiveConnection === 'true') {
-      connection_stats.peer_connection.round_trip_time = window.parseInt(
-        report.googRtt,
-        10,
-      );
+      connection_stats.peer_connection.round_trip_time = window.parseInt(report.googRtt, 10);
       connection_stats.peer_connection.local_candidate_type = rtc_stats_report.get(
         report.localCandidateId,
       ).candidateType;
@@ -502,19 +424,12 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
    * @returns {ConnectionStats} updated_stats
    */
   _update_from_inbound_rtp(report, connection_stats) {
-    if (
-      [z.media.MediaType.AUDIO, z.media.MediaType.VIDEO].includes(
-        report.mediaType,
-      )
-    ) {
+    if ([z.media.MediaType.AUDIO, z.media.MediaType.VIDEO].includes(report.mediaType)) {
       if (report.bytesReceived) {
-        connection_stats[report.mediaType].bytes_received +=
-          report.bytesReceived;
+        connection_stats[report.mediaType].bytes_received += report.bytesReceived;
       }
       if (report.framerateMean) {
-        connection_stats[
-          report.mediaType
-        ].frame_rate_received = window.parseInt(report.framerateMean, 10);
+        connection_stats[report.mediaType].frame_rate_received = window.parseInt(report.framerateMean, 10);
       }
     }
 
@@ -529,19 +444,12 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
    * @returns {ConnectionStats} Updated connection stats
    */
   _update_from_outbound_rtp(report, connection_stats) {
-    if (
-      [z.media.MediaType.AUDIO, z.media.MediaType.VIDEO].includes(
-        report.mediaType,
-      )
-    ) {
+    if ([z.media.MediaType.AUDIO, z.media.MediaType.VIDEO].includes(report.mediaType)) {
       if (report.bytesSent) {
         connection_stats[report.mediaType].bytes_sent += report.bytesSent;
       }
       if (report.framerateMean) {
-        connection_stats[report.mediaType].frame_rate_sent = window.parseInt(
-          report.framerateMean,
-          10,
-        );
+        connection_stats[report.mediaType].frame_rate_sent = window.parseInt(report.framerateMean, 10);
       }
     }
 
@@ -557,16 +465,10 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
    */
   _update_peer_connection_bytes(report, connection_stats) {
     if (report.bytesReceived) {
-      connection_stats.peer_connection.bytes_received += window.parseInt(
-        report.bytesReceived,
-        10,
-      );
+      connection_stats.peer_connection.bytes_received += window.parseInt(report.bytesReceived, 10);
     }
     if (report.bytesSent) {
-      connection_stats.peer_connection.bytes_sent += window.parseInt(
-        report.bytesSent,
-        10,
-      );
+      connection_stats.peer_connection.bytes_sent += window.parseInt(report.bytesSent, 10);
     }
 
     return connection_stats;
@@ -589,50 +491,26 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
 
     if (report.audioOutputLevel) {
       stream_stats = connection_stats.audio;
-      stream_stats.volume_received = window.parseInt(
-        report.audioOutputLevel,
-        10,
-      );
+      stream_stats.volume_received = window.parseInt(report.audioOutputLevel, 10);
       stream_stats.codec_received = codec;
     } else if (report.audioInputLevel) {
       stream_stats = connection_stats.audio;
       stream_stats.volume_sent = window.parseInt(report.audioInputLevel, 10);
       stream_stats.codec_sent = codec;
-    } else if (
-      this.call_et.is_remote_screen_send() ||
-      this.call_et.is_remote_video_send()
-    ) {
+    } else if (this.call_et.is_remote_screen_send() || this.call_et.is_remote_video_send()) {
       stream_stats = connection_stats.video;
       if (report.googFrameHeightReceived) {
-        stream_stats.frame_height_received = window.parseInt(
-          report.googFrameHeightReceived,
-          10,
-        );
-        stream_stats.frame_rate_received = window.parseInt(
-          report.googFrameRateReceived,
-          10,
-        );
-        stream_stats.frame_width_received = window.parseInt(
-          report.googFrameWidthReceived,
-          10,
-        );
+        stream_stats.frame_height_received = window.parseInt(report.googFrameHeightReceived, 10);
+        stream_stats.frame_rate_received = window.parseInt(report.googFrameRateReceived, 10);
+        stream_stats.frame_width_received = window.parseInt(report.googFrameWidthReceived, 10);
         stream_stats.codec_received = codec;
       } else if (report.googFrameHeightSent) {
-        stream_stats.frame_height_sent = window.parseInt(
-          report.googFrameHeightSent,
-          10,
-        );
+        stream_stats.frame_height_sent = window.parseInt(report.googFrameHeightSent, 10);
         if (report.googFrameRateSent) {
-          stream_stats.frame_rate_sent = window.parseInt(
-            report.googFrameRateSent,
-            10,
-          );
+          stream_stats.frame_rate_sent = window.parseInt(report.googFrameRateSent, 10);
         }
         if (report.googFrameWidthSent) {
-          stream_stats.frame_width_sent = window.parseInt(
-            report.googFrameWidthSent,
-            10,
-          );
+          stream_stats.frame_width_sent = window.parseInt(report.googFrameWidthSent, 10);
         }
         stream_stats.codec_sent = codec;
       }
@@ -640,14 +518,10 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
 
     if (stream_stats) {
       if (report.bytesReceived) {
-        stream_stats.bytes_received += window.parseInt(
-          report.bytesReceived,
-          10,
-        );
+        stream_stats.bytes_received += window.parseInt(report.bytesReceived, 10);
       }
       if (stream_stats.bytes_received === 0) {
-        stream_stats.bytes_received =
-          connection_stats.peer_connection.bytes_received;
+        stream_stats.bytes_received = connection_stats.peer_connection.bytes_received;
       }
       if (report.bytesSent) {
         stream_stats.bytes_sent += window.parseInt(report.bytesSent, 10);
@@ -710,38 +584,23 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
     this.logger.force_log(`-- ID: ${this.id}`);
 
     if (this.remote_user !== undefined) {
-      this.logger.force_log(
-        `-- Remote user: ${participant_et.user.name()} (${participant_et.user
-          .id})`,
-      );
+      this.logger.force_log(`-- Remote user: ${participant_et.user.name()} (${participant_et.user.id})`);
     }
 
-    this.logger.force_log(
-      `-- User is connected: ${participant_et.is_connected()}`,
-    );
+    this.logger.force_log(`-- User is connected: ${participant_et.is_connected()}`);
     this.logger.force_log(`-- Flow is answer: ${this.is_answer}`);
 
     if (this.peer_connection) {
-      this.logger.force_log(
-        `-- ICE connection: ${this.peer_connection.iceConnectionState}`,
-      );
-      this.logger.force_log(
-        `-- ICE gathering: ${this.peer_connection.iceGatheringState}`,
-      );
+      this.logger.force_log(`-- ICE connection: ${this.peer_connection.iceConnectionState}`);
+      this.logger.force_log(`-- ICE gathering: ${this.peer_connection.iceGatheringState}`);
     }
 
     const statistics = this.get_statistics();
     if (statistics) {
       // @note Types are 'none' if we cannot connect to the user (0 bytes flow)
       this.logger.force_log('PeerConnection network statistics', statistics);
-      this.logger.force_log(
-        `-- Remote ICE candidate type: ${statistics.peer_connection
-          .remote_candidate_type}`,
-      );
-      this.logger.force_log(
-        `-- Local ICE candidate type: ${statistics.peer_connection
-          .local_candidate_type}`,
-      );
+      this.logger.force_log(`-- Remote ICE candidate type: ${statistics.peer_connection.remote_candidate_type}`);
+      this.logger.force_log(`-- Local ICE candidate type: ${statistics.peer_connection.local_candidate_type}`);
 
       // PeerConnection Stats
       for (const key in statistics) {
@@ -749,32 +608,21 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
           const value = statistics[key];
           if (_.isObject(value)) {
             this.logger.force_log(`Statistics for '${key}':`);
-            this.logger.force_log(
-              `-- Bit rate received: ${value.bit_rate_received}`,
-            );
+            this.logger.force_log(`-- Bit rate received: ${value.bit_rate_received}`);
             this.logger.force_log(`-- Bit rate sent: ${value.bit_rate_sent}`);
             this.logger.force_log(`-- Bytes sent: ${value.bytes_sent}`);
             this.logger.force_log(`-- Bytes received: ${value.bytes_received}`);
             this.logger.force_log(`-- Rtt: ${value.rtt}`);
 
-            if (
-              z.util.Environment.browser.chrome &&
-              [z.media.MediaType.AUDIO, z.media.MediaType.VIDEO].includes(key)
-            ) {
-              this.logger.force_log(
-                `-- Codec received: ${value.codec_received}`,
-              );
+            if (z.util.Environment.browser.chrome && [z.media.MediaType.AUDIO, z.media.MediaType.VIDEO].includes(key)) {
+              this.logger.force_log(`-- Codec received: ${value.codec_received}`);
               this.logger.force_log(`-- Codec sent: ${value.codec_sent}`);
               this.logger.force_log(`-- Delay in ms: ${value.delay}`);
             }
 
             if (key === z.media.MediaType.VIDEO) {
-              this.logger.force_log(
-                `-- Frame rate received: ${value.frame_rate_received}`,
-              );
-              this.logger.force_log(
-                `-- Frame rate sent: ${value.frame_rate_sent}`,
-              );
+              this.logger.force_log(`-- Frame rate received: ${value.frame_rate_received}`);
+              this.logger.force_log(`-- Frame rate sent: ${value.frame_rate_sent}`);
 
               if (!z.util.Environment.browser.chrome) {
                 continue;
@@ -782,16 +630,10 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
 
               const received_resolution = `${value.frame_width_received}x${value.frame_height_received}`;
               const sent_resolution = `${value.frame_width_sent}x${value.frame_height_sent}`;
-              this.logger.force_log(
-                `-- Frame resolution received: ${received_resolution}`,
-              );
-              this.logger.force_log(
-                `-- Frame resolution sent: ${sent_resolution}`,
-              );
+              this.logger.force_log(`-- Frame resolution received: ${received_resolution}`);
+              this.logger.force_log(`-- Frame resolution sent: ${sent_resolution}`);
             } else if (key === z.media.MediaType.AUDIO) {
-              this.logger.force_log(
-                `-- Volume received: ${value.volume_received}`,
-              );
+              this.logger.force_log(`-- Volume received: ${value.volume_received}`);
               this.logger.force_log(`-- Volume sent: ${value.volume_sent}`);
             }
           }
@@ -835,19 +677,13 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
 
   report_status() {
     const custom_data = this.create_report();
-    this.logger.info(
-      'Created flow status for call failure report',
-      custom_data,
-    );
+    this.logger.info('Created flow status for call failure report', custom_data);
     return custom_data;
   }
 
   report_timings() {
     const custom_data = this.timings.log();
     Raygun.send(new Error('Call setup step timings'), custom_data);
-    this.logger.info(
-      `Reported setup step timings of flow id '${this.id}' for call analysis`,
-      custom_data,
-    );
+    this.logger.info(`Reported setup step timings of flow id '${this.id}' for call analysis`, custom_data);
   }
 };

@@ -27,21 +27,12 @@ z.ViewModel.WindowTitleViewModel = class WindowTitleViewModel {
     this.content_state = content_state;
     this.user_repository = user_repository;
     this.conversation_repository = conversation_repository;
-    this.logger = new z.util.Logger(
-      'z.ViewModel.WindowTitleViewModel',
-      z.config.LOGGER.OPTIONS,
-    );
+    this.logger = new z.util.Logger('z.ViewModel.WindowTitleViewModel', z.config.LOGGER.OPTIONS);
 
     this.update_window_title = false;
 
-    amplify.subscribe(
-      z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE,
-      this.set_update_state.bind(this),
-    );
-    amplify.subscribe(
-      z.event.WebApp.LIFECYCLE.LOADED,
-      this.initiate_title_updates.bind(this),
-    );
+    amplify.subscribe(z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, this.set_update_state.bind(this));
+    amplify.subscribe(z.event.WebApp.LIFECYCLE.LOADED, this.initiate_title_updates.bind(this));
   }
 
   initiate_title_updates() {
@@ -53,23 +44,19 @@ z.ViewModel.WindowTitleViewModel = class WindowTitleViewModel {
         if (this.update_window_title) {
           let window_title = '';
           let number_of_unread_conversations = 0;
-          const number_of_requests = this.user_repository.connect_requests()
-            .length;
+          const number_of_requests = this.user_repository.connect_requests().length;
 
-          this.conversation_repository
-            .all_unarchived_conversations()
-            .forEach(conversation_et => {
-              if (
-                !conversation_et.is_request() &&
-                !conversation_et.is_muted() &&
-                conversation_et.unread_message_count()
-              ) {
-                number_of_unread_conversations++;
-              }
-            });
+          this.conversation_repository.all_unarchived_conversations().forEach(conversation_et => {
+            if (
+              !conversation_et.is_request() &&
+              !conversation_et.is_muted() &&
+              conversation_et.unread_message_count()
+            ) {
+              number_of_unread_conversations++;
+            }
+          });
 
-          const badge_count =
-            number_of_requests + number_of_unread_conversations;
+          const badge_count = number_of_requests + number_of_unread_conversations;
           if (badge_count > 0) {
             window_title = `(${badge_count}) · `;
           }
@@ -79,23 +66,16 @@ z.ViewModel.WindowTitleViewModel = class WindowTitleViewModel {
           switch (this.content_state()) {
             case z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS: {
               if (number_of_requests > 1) {
-                window_title += z.l10n.text(
-                  z.string.conversations_connection_request_many,
-                  number_of_requests,
-                );
+                window_title += z.l10n.text(z.string.conversations_connection_request_many, number_of_requests);
               } else {
-                window_title += z.l10n.text(
-                  z.string.conversations_connection_request_one,
-                );
+                window_title += z.l10n.text(z.string.conversations_connection_request_one);
               }
               break;
             }
 
             case z.ViewModel.content.CONTENT_STATE.CONVERSATION: {
               if (this.conversation_repository.active_conversation()) {
-                window_title += this.conversation_repository
-                  .active_conversation()
-                  .display_name();
+                window_title += this.conversation_repository.active_conversation().display_name();
               }
               break;
             }
@@ -146,14 +126,11 @@ z.ViewModel.WindowTitleViewModel = class WindowTitleViewModel {
   }
 
   set_update_state(handling_notifications) {
-    const update_window_title =
-      handling_notifications === z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
+    const update_window_title = handling_notifications === z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
     if (this.update_window_title !== update_window_title) {
       this.update_window_title = update_window_title;
-      this.logger.debug(
-        `Set window title update state to '${this.update_window_title}'`,
-      );
+      this.logger.debug(`Set window title update state to '${this.update_window_title}'`);
     }
   }
 };

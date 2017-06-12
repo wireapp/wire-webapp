@@ -25,9 +25,7 @@
 
 describe('z.location', function() {
   describe('get_location', function() {
-    it('resolves a latitude & longitude via Google Maps API into a location name', function(
-      done,
-    ) {
+    it('resolves a latitude & longitude via Google Maps API into a location name', function(done) {
       // @formatter:off
       const locations = [
         {
@@ -77,12 +75,7 @@ describe('z.location', function() {
             {
               long_name: 'Berlin (Alexanderplatz)',
               short_name: 'Berlin (Alexanderplatz)',
-              types: [
-                'bus_station',
-                'establishment',
-                'point_of_interest',
-                'transit_station',
-              ],
+              types: ['bus_station', 'establishment', 'point_of_interest', 'transit_station'],
             },
             {
               long_name: 'Mitte',
@@ -106,8 +99,7 @@ describe('z.location', function() {
             },
             {long_name: '10178', short_name: '10178', types: ['postal_code']},
           ],
-          formatted_address:
-            'Berlin (Alexanderplatz), 10178 Berlin, Deutschland',
+          formatted_address: 'Berlin (Alexanderplatz), 10178 Berlin, Deutschland',
           geometry: {
             location: {lat: 52.523198, lng: 13.414529},
             location_type: 'APPROXIMATE',
@@ -117,12 +109,7 @@ describe('z.location', function() {
             },
           },
           place_id: 'ChIJHTq-2R5OqEcRNJ0lG6qK3T4',
-          types: [
-            'bus_station',
-            'establishment',
-            'point_of_interest',
-            'transit_station',
-          ],
+          types: ['bus_station', 'establishment', 'point_of_interest', 'transit_station'],
         },
         {
           address_components: [
@@ -281,12 +268,7 @@ describe('z.location', function() {
             {
               long_name: 'Berlin',
               short_name: 'Berlin',
-              types: [
-                'administrative_area_level_1',
-                'establishment',
-                'point_of_interest',
-                'political',
-              ],
+              types: ['administrative_area_level_1', 'establishment', 'point_of_interest', 'political'],
             },
             {
               long_name: 'Deutschland',
@@ -308,12 +290,7 @@ describe('z.location', function() {
             },
           },
           place_id: 'ChIJ8_KccStOqEcRhtFXjKWPuo0',
-          types: [
-            'administrative_area_level_1',
-            'establishment',
-            'point_of_interest',
-            'political',
-          ],
+          types: ['administrative_area_level_1', 'establishment', 'point_of_interest', 'political'],
         },
         {
           address_components: [
@@ -393,9 +370,7 @@ describe('z.location', function() {
         .catch(done.fail);
     });
 
-    it('prevents potential Cross-Site-Scripting (XSS) attacks via Google Maps API', function(
-      done,
-    ) {
+    it('prevents potential Cross-Site-Scripting (XSS) attacks via Google Maps API', function(done) {
       // @formatter:off
       const locations = [
         {
@@ -458,9 +433,7 @@ describe('z.location', function() {
       z.location
         .get_location(latitude, longitude)
         .then(location => {
-          expect(location.country_code).toBe(
-            '&lt;script&gt;alert(&quot;malicious&quot;)&lt;/script&gt;',
-          );
+          expect(location.country_code).toBe('&lt;script&gt;alert(&quot;malicious&quot;)&lt;/script&gt;');
           expect(location.place).toBe('Berlin');
           done();
         })
@@ -470,18 +443,10 @@ describe('z.location', function() {
 
   describe('get_maps_url', function() {
     it('should return the proper urls', function() {
-      expect(z.location.get_maps_url(52, 13)).toBe(
-        'https://google.com/maps/@52,13',
-      );
-      expect(z.location.get_maps_url(52, 13, null, 14)).toBe(
-        'https://google.com/maps/@52,13,14z',
-      );
-      expect(z.location.get_maps_url(52, 13, 'Berlin')).toBe(
-        'https://google.com/maps/place/Berlin/@52,13',
-      );
-      expect(z.location.get_maps_url(52, 13, 'Berlin', 14)).toBe(
-        'https://google.com/maps/place/Berlin/@52,13,14z',
-      );
+      expect(z.location.get_maps_url(52, 13)).toBe('https://google.com/maps/@52,13');
+      expect(z.location.get_maps_url(52, 13, null, 14)).toBe('https://google.com/maps/@52,13,14z');
+      expect(z.location.get_maps_url(52, 13, 'Berlin')).toBe('https://google.com/maps/place/Berlin/@52,13');
+      expect(z.location.get_maps_url(52, 13, 'Berlin', 14)).toBe('https://google.com/maps/place/Berlin/@52,13,14z');
     });
   });
 });

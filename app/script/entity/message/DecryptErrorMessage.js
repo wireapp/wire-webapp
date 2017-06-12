@@ -22,8 +22,7 @@
 window.z = window.z || {};
 window.z.entity = z.entity || {};
 
-z.entity.DecryptErrorMessage = class DecryptErrorMessage extends z.entity
-  .Message {
+z.entity.DecryptErrorMessage = class DecryptErrorMessage extends z.entity.Message {
   constructor() {
     super();
     this.super_type = z.message.SuperType.UNABLE_TO_DECRYPT;
@@ -32,11 +31,8 @@ z.entity.DecryptErrorMessage = class DecryptErrorMessage extends z.entity
     this.client_id = '';
 
     this.caption = ko.pureComputed(() => {
-      const content = `<span class='label-bold-xs'>${z.util.escape_html(
-        this.user().first_name(),
-      )}</span>`;
-      const string_id = this.error_code ===
-        Proteus.errors.DecodeError.CODE.CASE_204
+      const content = `<span class='label-bold-xs'>${z.util.escape_html(this.user().first_name())}</span>`;
+      const string_id = this.error_code === Proteus.errors.DecodeError.CODE.CASE_204
         ? z.string.conversation_unable_to_decrypt_2
         : z.string.conversation_unable_to_decrypt_1;
 
@@ -44,8 +40,7 @@ z.entity.DecryptErrorMessage = class DecryptErrorMessage extends z.entity
     });
 
     this.link = ko.pureComputed(() => {
-      const string_id = this.error_code ===
-        Proteus.errors.DecodeError.CODE.CASE_204
+      const string_id = this.error_code === Proteus.errors.DecodeError.CODE.CASE_204
         ? z.string.url_decrypt_error_2
         : z.string.url_decrypt_error_1;
       return z.l10n.text(string_id);
@@ -61,13 +56,8 @@ z.entity.DecryptErrorMessage = class DecryptErrorMessage extends z.entity
       const parts = [];
 
       if (this.error_code) {
-        const error_text = z.l10n.text(
-          z.string.conversation_unable_to_decrypt_error_message,
-        );
-        parts.push(
-          `${error_text}: <span class='label-bold-xs'>${this
-            .error_code}</span>`,
-        );
+        const error_text = z.l10n.text(z.string.conversation_unable_to_decrypt_error_message);
+        parts.push(`${error_text}: <span class='label-bold-xs'>${this.error_code}</span>`);
       }
 
       if (this.client_id) {

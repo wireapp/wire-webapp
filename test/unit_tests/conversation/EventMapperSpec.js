@@ -26,10 +26,7 @@ describe('Event Mapper', function() {
   let event_mapper = null;
 
   beforeAll(function(done) {
-    z.util.protobuf
-      .load_protos('ext/proto/generic-message-proto/messages.proto')
-      .then(done)
-      .catch(done.fail);
+    z.util.protobuf.load_protos('ext/proto/generic-message-proto/messages.proto').then(done).catch(done.fail);
   });
 
   beforeEach(function() {
@@ -62,11 +59,7 @@ describe('Event Mapper', function() {
     it('maps text messages with deprecated link preview format', function() {
       const event_id = z.util.create_random_uuid;
 
-      const article = new z.proto.Article(
-        'test.com',
-        'Test title',
-        'Test description',
-      );
+      const article = new z.proto.Article('test.com', 'Test title', 'Test description');
       const link_preview = new z.proto.LinkPreview('test.com', 0, article);
 
       const event = {
@@ -86,9 +79,7 @@ describe('Event Mapper', function() {
       expect(message_et.get_first_asset().text).toBe(event.data.content);
       expect(message_et.get_first_asset().nonce).toBe(event.data.nonce);
       expect(message_et.get_first_asset().previews().length).toBe(1);
-      expect(message_et.get_first_asset().previews()[0].original_url).toBe(
-        'test.com',
-      );
+      expect(message_et.get_first_asset().previews()[0].original_url).toBe('test.com');
       expect(message_et).toBeDefined();
     });
 
@@ -121,12 +112,8 @@ describe('Event Mapper', function() {
       expect(message_et.get_first_asset().text).toBe(event.data.content);
       expect(message_et.get_first_asset().nonce).toBe(event.data.nonce);
       expect(message_et.get_first_asset().previews().length).toBe(1);
-      expect(message_et.get_first_asset().previews()[0].original_url).toBe(
-        link_preview.url,
-      );
-      expect(message_et.get_first_asset().previews()[0].permanent_url).toBe(
-        link_preview.permanent_url,
-      );
+      expect(message_et.get_first_asset().previews()[0].original_url).toBe(link_preview.url);
+      expect(message_et.get_first_asset().previews()[0].permanent_url).toBe(link_preview.permanent_url);
       expect(message_et).toBeDefined();
     });
 
@@ -227,19 +214,11 @@ describe('Event Mapper', function() {
       const message_et = event_mapper.map_json_event(event, conversation_et);
       expect(message_et.get_first_asset().width).toBe(event.data.info.width);
       expect(message_et.get_first_asset().height).toBe(event.data.info.height);
-      expect(message_et.get_first_asset().file_size).toBe(
-        event.data.content_length,
-      );
-      expect(message_et.get_first_asset().file_type).toBe(
-        event.data.content_type,
-      );
+      expect(message_et.get_first_asset().file_size).toBe(event.data.content_length);
+      expect(message_et.get_first_asset().file_type).toBe(event.data.content_type);
       expect(message_et.get_first_asset().type).toBe(z.assets.AssetType.IMAGE);
-      expect(message_et.get_first_asset().resource().otr_key).toBe(
-        event.data.otr_key,
-      );
-      expect(message_et.get_first_asset().resource().sha256).toBe(
-        event.data.sha256,
-      );
+      expect(message_et.get_first_asset().resource().otr_key).toBe(event.data.otr_key);
+      expect(message_et.get_first_asset().resource().sha256).toBe(event.data.sha256);
       expect(message_et).toBeDefined();
     });
 
@@ -271,10 +250,7 @@ describe('Event Mapper', function() {
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
       // @formatter:on
 
-      const message_ets = event_mapper.map_json_events(
-        [good_message, bad_message],
-        conversation_et,
-      );
+      const message_ets = event_mapper.map_json_events([good_message, bad_message], conversation_et);
       expect(message_ets.length).toBe(1);
     });
   });

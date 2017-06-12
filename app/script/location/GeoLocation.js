@@ -22,8 +22,7 @@
 window.z = window.z || {};
 
 z.location = (() => {
-  const GOOGLE_GEOCODING_BASE_URL =
-    'https://maps.googleapis.com/maps/api/geocode/json';
+  const GOOGLE_GEOCODING_BASE_URL = 'https://maps.googleapis.com/maps/api/geocode/json';
   const API_KEY = 'AIzaSyCKxxKw5JBZ5zEFtoirtgnw8omvH7gWzfo';
   const _parse_results = results => {
     const res = {};
@@ -59,11 +58,7 @@ z.location = (() => {
   const get_location = (latitude, longitude) => {
     return new Promise((resolve, reject) => {
       if (latitude == null || longitude == null) {
-        reject(
-          new Error(
-            'You need to specify latitude and longitude in order to retrieve the location',
-          ),
-        );
+        reject(new Error('You need to specify latitude and longitude in order to retrieve the location'));
       }
       $.ajax({
         url: `${GOOGLE_GEOCODING_BASE_URL}?latlng=${latitude},${longitude}&key=${API_KEY}`,
@@ -74,9 +69,7 @@ z.location = (() => {
           }
           return resolve();
         })
-        .fail((jqXHR, textStatus, errorThrown) =>
-          reject(new Error(errorThrown)),
-        );
+        .fail((jqXHR, textStatus, errorThrown) => reject(new Error(errorThrown)));
     });
   };
 

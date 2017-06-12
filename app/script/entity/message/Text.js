@@ -42,11 +42,7 @@ z.entity.Text = class Text extends z.entity.Asset {
         return false;
       }
       const has_link_previews = this.previews().length > 0;
-      return (
-        !has_link_previews ||
-        (has_link_previews &&
-          !z.links.LinkPreviewHelpers.contains_only_link(this.text))
-      );
+      return !has_link_previews || (has_link_previews && !z.links.LinkPreviewHelpers.contains_only_link(this.text));
     });
   }
 
@@ -54,10 +50,7 @@ z.entity.Text = class Text extends z.entity.Asset {
   render() {
     let message = z.util.render_message(this.text);
     if (!this.previews().length) {
-      message = z.media.MediaParser.render_media_embeds(
-        message,
-        this.theme_color,
-      );
+      message = z.media.MediaParser.render_media_embeds(message, this.theme_color);
     }
     return message;
   }

@@ -29,10 +29,7 @@ z.storage.StorageRepository = class StorageRepository {
    */
   constructor(storage_service) {
     this.storage_service = storage_service;
-    this.logger = new z.util.Logger(
-      'z.storage.StorageRepository',
-      z.config.LOGGER.OPTIONS,
-    );
+    this.logger = new z.util.Logger('z.storage.StorageRepository', z.config.LOGGER.OPTIONS);
   }
 
   /**
@@ -42,9 +39,7 @@ z.storage.StorageRepository = class StorageRepository {
   clear_all_stores() {
     return this.storage_service
       .clear_all_stores()
-      .then(() =>
-        this.logger.info(`Cleared database '${this.storage_service.db_name}'`),
-      );
+      .then(() => this.logger.info(`Cleared database '${this.storage_service.db_name}'`));
   }
 
   /**
@@ -79,14 +74,12 @@ z.storage.StorageRepository = class StorageRepository {
    * @returns {Promise} Resolves with the retrieved value
    */
   get_value(primary_key) {
-    return this.storage_service
-      .load(z.storage.StorageService.OBJECT_STORE.AMPLIFY, primary_key)
-      .then(function(record) {
-        if (record && record.value) {
-          return record.value;
-        }
-        throw new z.storage.StorageError(z.storage.StorageError.TYPE.NOT_FOUND);
-      });
+    return this.storage_service.load(z.storage.StorageService.OBJECT_STORE.AMPLIFY, primary_key).then(function(record) {
+      if (record && record.value) {
+        return record.value;
+      }
+      throw new z.storage.StorageError(z.storage.StorageError.TYPE.NOT_FOUND);
+    });
   }
 
   /**
@@ -97,11 +90,9 @@ z.storage.StorageRepository = class StorageRepository {
    * @returns {Promise} Resolves with the primary key
   */
   save_value(primary_key, value) {
-    return this.storage_service.save(
-      z.storage.StorageService.OBJECT_STORE.AMPLIFY,
-      primary_key,
-      {value: value},
-    );
+    return this.storage_service.save(z.storage.StorageService.OBJECT_STORE.AMPLIFY, primary_key, {
+      value: value,
+    });
   }
 
   /**
