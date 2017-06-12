@@ -371,6 +371,7 @@ z.string.da.preferences_about_support = 'Support';
 z.string.da.preferences_about_support_website = 'Support hjemmeside';
 z.string.da.preferences_about_support_contact = 'Kontakt Support';
 z.string.da.preferences_about_terms_of_use = 'Vilkår for anvendelse';
+z.string.da.preferences_about_version = 'Version {{version}}';
 z.string.da.preferences_about_website = 'Wire hjemmeside';
 
 z.string.da.preferences_account_reset_password = 'Nulstil adgangskode';
