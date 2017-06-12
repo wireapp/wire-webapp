@@ -26,8 +26,7 @@ z.string.da.nonexistent_user = 'Slet bruger';
 z.string.da.and = 'og';
 
 z.string.da.alert_upload_file_format = 'Kan ikke anvende dette billede. Vælg venligst en PNG eller JPEG-fil.';
-z.string.da.alert_upload_too_small =
-  'Kan ikke anvende dette billede. Vælg venligst et billede der er mindst 320 x 320 px.';
+z.string.da.alert_upload_too_small = 'Kan ikke anvende dette billede. Vælg venligst et billede der er mindst 320 x 320 px.';
 z.string.da.alert_upload_too_large = 'Dette billede er for stort. Du kan uploade filer op til {{number}} MB.';
 z.string.da.alert_gif_too_large = 'Animationen er for stor. Den maksimale størrelse er {{number}} MB.';
 
@@ -35,8 +34,7 @@ z.string.da.auth_account_country_code = 'Landekode';
 z.string.da.auth_account_create = 'Opret';
 z.string.da.auth_account_create_account = 'Opret en konto';
 z.string.da.auth_account_expiration = 'Du er blevet logget af, da din session udløb. Log venligst ind igen.';
-z.string.da.auth_account_get_wire =
-  'Simpel, privat og sikker messenger til chat, opkald, deling af billeder, musik, videoer, GIF’s og mere.';
+z.string.da.auth_account_get_wire = 'Simpel, privat og sikker messenger til chat, opkald, deling af billeder, musik, videoer, GIF’s og mere.';
 z.string.da.auth_account_password_forgot = 'Glemt adgangskode';
 z.string.da.auth_account_public_computer = 'Dette er en offentlig computer';
 z.string.da.auth_account_sign_in = 'Log ind';
@@ -118,8 +116,7 @@ z.string.da.modal_button_ok = 'Ok';
 z.string.da.modal_button_send = 'Send';
 
 z.string.da.modal_block_conversation_headline = 'Blokkér {{user}}?';
-z.string.da.modal_block_conversation_message =
-  '{{user}} vil ikke kunne kontakte dig eller tilføje dig til gruppesamtaler.';
+z.string.da.modal_block_conversation_message = '{{user}} vil ikke kunne kontakte dig eller tilføje dig til gruppesamtaler.';
 z.string.da.modal_block_conversation_button = 'Blokér';
 z.string.da.modal_call_conversation_empty_headline = 'Ingen at ringe til';
 z.string.da.modal_call_conversation_empty_message = 'Der er ingen tilbage her.';
@@ -144,8 +141,7 @@ z.string.da.modal_connected_device_message = 'Hvis du ikke gjorde dette, slet en
 z.string.da.modal_connected_device_manage_devices = 'administrér enheder';
 z.string.da.modal_delete_account_action = 'Slet';
 z.string.da.modal_delete_account_headline = 'Slet konto';
-z.string.da.modal_delete_account_message =
-  'Vi vil sende dig en besked via email eller SMS. Følg linket for at permanent slette din konto.';
+z.string.da.modal_delete_account_message = 'Vi vil sende dig en besked via email eller SMS. Følg linket for at permanent slette din konto.';
 z.string.da.modal_delete_button = 'Slet';
 z.string.da.modal_delete_headline = 'Slet kun for mig?';
 z.string.da.modal_delete_message = 'Dette kan ikke fortrydes.';
@@ -178,8 +174,7 @@ z.string.da.modal_session_reset_message_1 = 'Hvis problemet ikke er løst,';
 z.string.da.modal_session_reset_message_link = 'kontakt';
 z.string.da.modal_session_reset_message_2 = 'os.';
 z.string.da.modal_too_many_members_headline = 'Fuldt hus';
-z.string.da.modal_too_many_members_message =
-  'Op til {{number1}} personer kan deltage i en samtale. Der er plads til {{number2}} personer mere herinde.';
+z.string.da.modal_too_many_members_message = 'Op til {{number1}} personer kan deltage i en samtale. Der er plads til {{number2}} personer mere herinde.';
 z.string.da.modal_uploads_parallel = 'Du kan sende op til {{number}} filer på én gang.';
 
 z.string.da.connection_request_connect = 'Forbind';
@@ -227,8 +222,7 @@ z.string.da.conversation_unable_to_decrypt_2 = '{{user}}’s enheds identitet er
 z.string.da.conversation_unable_to_decrypt_link = 'Hvorfor?';
 z.string.da.conversation_unable_to_decrypt_error_message = 'Fejl';
 z.string.da.conversation_unable_to_decrypt_reset_session = 'Nulstil session';
-z.string.da.conversation_missed_messages =
-  'Du har ikke brugt denne enhed i et stykke tid. Nogle meddelelser vises måske ikke her.';
+z.string.da.conversation_missed_messages = 'Du har ikke brugt denne enhed i et stykke tid. Nogle meddelelser vises måske ikke her.';
 z.string.da.conversation_asset_uploading = 'Uploader…';
 z.string.da.conversation_asset_downloading = 'Downloader…';
 z.string.da.conversation_asset_upload_failed = 'Upload Mislykkedes';
@@ -312,21 +306,18 @@ z.string.da.people_no_matches = 'Ingen passende resultater.\nPrøv at indtaste e
 z.string.da.people_invite = 'Invitér personer';
 z.string.da.people_share = 'Del Kontakter';
 z.string.da.people_bring_your_friends = 'Tag dine venner med til Wire';
-z.string.da.people_invite_detail =
-  'At dele dine kontakter hjælper med at forbinde til andre. Vi anonymiserer al information og deler det ikke med nogen andre.';
+z.string.da.people_invite_detail = 'At dele dine kontakter hjælper med at forbinde til andre. Vi anonymiserer al information og deler det ikke med nogen andre.';
 z.string.da.people_invite_button_contacts = 'Fra Kontakter';
 z.string.da.people_invite_button_gmail = 'Fra Gmail';
 z.string.da.people_invite_headline = 'Få dine venner med';
 z.string.da.people_tabs_details = 'Detaljer';
 z.string.da.people_tabs_devices = 'Enheder';
-z.string.da.people_tabs_devices_headline =
-  'Wire giver hver enhed et unikt fingeraftryk. Sammenlign dem med {{user}} og bekræft din samtale.';
+z.string.da.people_tabs_devices_headline = 'Wire giver hver enhed et unikt fingeraftryk. Sammenlign dem med {{user}} og bekræft din samtale.';
 z.string.da.people_tabs_devices_why_verify = 'Hvorfor bekræfte samtale?';
 z.string.da.people_tabs_no_devices_headline = '{{user}} bruger en gammel version af Wire. Ingen enheder er vist her.';
 z.string.da.people_tabs_device_detail_all_my_devices = 'Vis alle mine enheder';
 z.string.da.people_tabs_device_detail_device_fingerprint = 'Enheds fingeraftryk';
-z.string.da.people_tabs_device_detail_headline =
-  'Bekræft at dette passer med fingeraftrykket vist på {{html1}}{{user}}’s enhed{{html2}}.';
+z.string.da.people_tabs_device_detail_headline = 'Bekræft at dette passer med fingeraftrykket vist på {{html1}}{{user}}’s enhed{{html2}}.';
 z.string.da.people_tabs_device_detail_how_to = 'Hvordan gør jeg det?';
 z.string.da.people_tabs_device_detail_reset_session = 'Nulstil session';
 z.string.da.people_tabs_device_detail_show_my_device = 'Vis min enheds fingeraftryk';
@@ -346,8 +337,7 @@ z.string.da.people_leave_headline = 'Forlad samtalen?';
 z.string.da.people_leave_message = 'Du vil ikke være i stand til at sende og modtage beskeder i denne samtale.';
 
 z.string.da.people_remove_headline = 'Fjern?';
-z.string.da.people_remove_message =
-  '{{user}} vil ikke være i stand til at sende eller modtage beskeder i denne samtale.';
+z.string.da.people_remove_message = '{{user}} vil ikke være i stand til at sende eller modtage beskeder i denne samtale.';
 
 z.string.da.people_unblock_headline = 'Fjern Blokering?';
 z.string.da.people_unblock_message = '{{user}} vil igen kunne kontakte dig og tilføje dig til gruppesamtaler.';
@@ -400,20 +390,16 @@ z.string.da.preferences_av_speakers = 'Højtalere';
 z.string.da.preferences_devices_activated_in = 'i {{location}}';
 z.string.da.preferences_devices_activated_on = 'Aktiveret på {{date}}';
 z.string.da.preferences_devices_active = 'Aktiv';
-z.string.da.preferences_devices_active_detail =
-  'Hvis du ikke kan genkende en enhed ovenfor, fjern den og nulstil din adgangskode.';
+z.string.da.preferences_devices_active_detail = 'Hvis du ikke kan genkende en enhed ovenfor, fjern den og nulstil din adgangskode.';
 z.string.da.preferences_devices_current = 'Aktuel';
 z.string.da.preferences_devices_fingerprint = 'Nøgle fingeraftryk';
-z.string.da.preferences_devices_fingerprint_detail =
-  'Wire giver hver enhed et unikt fingeraftryk. Sammenlign dem og bekræft dine enheder og samtaler.';
+z.string.da.preferences_devices_fingerprint_detail = 'Wire giver hver enhed et unikt fingeraftryk. Sammenlign dem og bekræft dine enheder og samtaler.';
 z.string.da.preferences_devices_id = 'ID: ';
 z.string.da.preferences_devices_remove = 'Fjern';
 z.string.da.preferences_devices_remove_cancel = 'Annuller';
-z.string.da.preferences_devices_remove_detail =
-  'Fjern denne enhed, hvis du ikke bruger den længere. Du bliver logget ud af enheden med det samme.';
+z.string.da.preferences_devices_remove_detail = 'Fjern denne enhed, hvis du ikke bruger den længere. Du bliver logget ud af enheden med det samme.';
 z.string.da.preferences_devices_session_confirmation = 'Sessionen er blevet nulstillet.';
-z.string.da.preferences_devices_session_detail =
-  'Hvis fingeraftrykkene ikke stemmer overens, nulstil sessionen for at generere nye krypteringsnøgler hos begge parter.';
+z.string.da.preferences_devices_session_detail = 'Hvis fingeraftrykkene ikke stemmer overens, nulstil sessionen for at generere nye krypteringsnøgler hos begge parter.';
 z.string.da.preferences_devices_session_reset = 'Nulstil session';
 z.string.da.preferences_devices_session_ongoing = 'Nulstiller session…';
 z.string.da.preferences_devices_verification = 'Bekræftet';
@@ -428,8 +414,7 @@ z.string.da.preferences_options_audio_some_detail = 'Ping og opkald';
 z.string.da.preferences_options_contacts = 'Kontakter';
 z.string.da.preferences_options_contacts_gmail = 'Importér fra Gmail';
 z.string.da.preferences_options_contacts_macos = 'Omportér fra Kontakter';
-z.string.da.preferences_options_contacts_detail =
-  'Vi bruger dine kontaktdata til at forbinde dig med andre. Vi anonymisere alle oplysninger og deler ikke det med alle andre.';
+z.string.da.preferences_options_contacts_detail = 'Vi bruger dine kontaktdata til at forbinde dig med andre. Vi anonymisere alle oplysninger og deler ikke det med alle andre.';
 z.string.da.preferences_options_data = 'Forbrug og rapporter om nedbrud';
 z.string.da.preferences_options_data_checkbox = 'Forbrug og rapporter om nedbrud';
 z.string.da.preferences_options_data_detail = 'Gøre Wire bedre ved at sende anonyme oplysninger.';
@@ -446,16 +431,13 @@ z.string.da.search_groups = 'Grupper';
 z.string.da.search_placeholder = 'Søg på navn eller brugernavn';
 z.string.da.search_top_people = 'Top personer';
 z.string.da.search_try_search = 'Find personer ved navn eller Brugernavn';
-z.string.da.search_no_contacts_on_wire =
-  'Du har ingen kontakter på Wire. Prøv at finde folk ved navn eller brugernavn.';
+z.string.da.search_no_contacts_on_wire = 'Du har ingen kontakter på Wire. Prøv at finde folk ved navn eller brugernavn.';
 z.string.da.search_others = 'Forbind';
 
 z.string.da.upload_google_headline = 'Finde personer at snakke med.';
-z.string.da.upload_google_message =
-  'Vi bruger dine kontaktdata til at forbinde dig med andre. Vi anonymisere alle oplysninger og deler ikke det med alle andre.';
+z.string.da.upload_google_message = 'Vi bruger dine kontaktdata til at forbinde dig med andre. Vi anonymisere alle oplysninger og deler ikke det med alle andre.';
 z.string.da.upload_google_headline_error = 'Noget \ngik galt.';
-z.string.da.upload_google_message_error =
-  'Vi har ikke modtaget dine oplysninger. Venligst prøv at importere dine kontakter igen.';
+z.string.da.upload_google_message_error = 'Vi har ikke modtaget dine oplysninger. Venligst prøv at importere dine kontakter igen.';
 z.string.da.upload_google_button_again = 'Prøv igen';
 
 z.string.da.url_password_reset = 'glemt/';
@@ -483,8 +465,7 @@ z.string.da.warning_learn_more = 'Lær mere';
 z.string.da.warning_not_found_camera = 'Du kan ikke ringe, fordi din computer har ikke et kamera.';
 z.string.da.warning_not_found_microphone = 'Du kan ikke ringe, fordi din computer har ikke en mikrofon.';
 z.string.da.warning_permission_denied_camera = 'Du kan ikke ringe, fordi din browser ikke har adgang til kameraet.';
-z.string.da.warning_permission_denied_microphone =
-  'Du kan ikke ringe, fordi din browser ikke har adgang til mikrofonen.';
+z.string.da.warning_permission_denied_microphone = 'Du kan ikke ringe, fordi din browser ikke har adgang til mikrofonen.';
 z.string.da.warning_permission_denied_screen = 'Din browser skal have tilladelse til at dele din skærm.';
 z.string.da.warning_permission_request_camera = '{{icon}} Tillad adgang til kamera';
 z.string.da.warning_permission_request_microphone = '{{icon}} Tillad adgang til mikrofon';

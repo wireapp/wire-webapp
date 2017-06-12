@@ -27,18 +27,15 @@ z.string.de.nonexistent_user = 'Gelöschte Person';
 z.string.de.and = 'und';
 
 z.string.de.alert_upload_file_format = 'Das Bild kann nicht verwendet werden. Bitte wähle eine PNG- oder JPEG-Datei.';
-z.string.de.alert_upload_too_small =
-  'Das Bild kann nicht verwendet werden. Bitte wähle ein Bild mit mindestens 320 x 320 Pixeln.';
+z.string.de.alert_upload_too_small = 'Das Bild kann nicht verwendet werden. Bitte wähle ein Bild mit mindestens 320 x 320 Pixeln.';
 z.string.de.alert_upload_too_large = 'Das Bild ist zu groß. Du kannst Dateien bis zu {{number}} MB hochladen.';
 z.string.de.alert_gif_too_large = 'Das GIF ist zu groß. Die maximale Größe beträgt {{number}} MB.';
 
 z.string.de.auth_account_country_code = 'Landesvorwahl';
 z.string.de.auth_account_create = 'Erstellen';
 z.string.de.auth_account_create_account = 'Konto erstellen';
-z.string.de.auth_account_expiration =
-  'Du wurdest abgemeldet, da deine Session abgelaufen ist. Bitte melde dich erneut an.';
-z.string.de.auth_account_get_wire =
-  'Ein moderner und sicherer Messenger für Unterhaltungen, Anrufe, Bilder, Musik, Videos, GIFs und mehr.';
+z.string.de.auth_account_expiration = 'Du wurdest abgemeldet, da deine Session abgelaufen ist. Bitte melde dich erneut an.';
+z.string.de.auth_account_get_wire = 'Ein moderner und sicherer Messenger für Unterhaltungen, Anrufe, Bilder, Musik, Videos, GIFs und mehr.';
 z.string.de.auth_account_password_forgot = 'Passwort vergessen';
 z.string.de.auth_account_public_computer = 'Dies ist ein öffentlicher Computer';
 z.string.de.auth_account_sign_in = 'Login';
@@ -47,8 +44,7 @@ z.string.de.auth_account_sign_in_phone = 'Handy';
 z.string.de.auth_account_terms_of_use = 'Nutzungsbedingungen';
 z.string.de.auth_account_terms_of_use_detail = 'Ich akzeptiere die';
 
-z.string.de.auth_blocked_database =
-  'Wire benötigt zum Anzeigen deiner Nachrichten Zugriff auf den lokalen Speicher. In Privaten Fenstern ist dieser nicht verfügbar.';
+z.string.de.auth_blocked_database = 'Wire benötigt zum Anzeigen deiner Nachrichten Zugriff auf den lokalen Speicher. In Privaten Fenstern ist dieser nicht verfügbar.';
 z.string.de.auth_blocked_tabs = 'Wire ist bereits in einem anderen Tab geöffnet.';
 
 z.string.de.auth_verify_account_add = 'Hinzufügen';
@@ -71,8 +67,7 @@ z.string.de.auth_limit_devices_current = '(Aktuelles Gerät)';
 z.string.de.auth_history_headline = 'Du benutzt Wire zum ersten Mal auf diesem Gerät.';
 z.string.de.auth_history_description = 'Aus Datenschutzgründen wird dein bisheriger Gesprächsverlauf nicht angezeigt.';
 z.string.de.auth_history_reuse_headline = 'Du hast Wire auf diesem Gerät bereits früher genutzt.';
-z.string.de.auth_history_reuse_description =
-  'Nachrichten, die in der Zwischenzeit gesendet wurden, werden nicht angezeigt.';
+z.string.de.auth_history_reuse_description = 'Nachrichten, die in der Zwischenzeit gesendet wurden, werden nicht angezeigt.';
 z.string.de.auth_history_button = 'Verstanden';
 
 z.string.de.auth_posted_change_email = 'E-Mail-Adresse ändern';
@@ -125,8 +120,7 @@ z.string.de.modal_button_ok = 'Ok';
 z.string.de.modal_button_send = 'Senden';
 
 z.string.de.modal_block_conversation_headline = '{{user}} blockieren?';
-z.string.de.modal_block_conversation_message =
-  '{{user}} wird dich nicht länger kontaktieren oder zu Gruppen hinzufügen können.';
+z.string.de.modal_block_conversation_message = '{{user}} wird dich nicht länger kontaktieren oder zu Gruppen hinzufügen können.';
 z.string.de.modal_block_conversation_button = 'Blockieren';
 z.string.de.modal_call_conversation_empty_headline = 'Niemand um anzurufen';
 z.string.de.modal_call_conversation_empty_message = 'Es ist niemand mehr in der Unterhaltung.';
@@ -147,13 +141,11 @@ z.string.de.modal_clear_conversation_option = 'Unterhaltung auch verlassen';
 z.string.de.modal_clear_conversation_button = 'Löschen';
 z.string.de.modal_connected_device_headline = 'Dein Benutzerkonto wurde verwendet:';
 z.string.de.modal_connected_device_from = 'Mit:';
-z.string.de.modal_connected_device_message =
-  'Falls du dieses Gerät nicht hinzugefügt hast, entferne es und setze dein Passwort zurück.';
+z.string.de.modal_connected_device_message = 'Falls du dieses Gerät nicht hinzugefügt hast, entferne es und setze dein Passwort zurück.';
 z.string.de.modal_connected_device_manage_devices = 'Geräte verwalten';
 z.string.de.modal_delete_account_action = 'Löschen';
 z.string.de.modal_delete_account_headline = 'Benutzerkonto löschen';
-z.string.de.modal_delete_account_message =
-  'In Kürze erhältst du eine Nachricht per E-Mail oder SMS. Folge dem Link darin, um dein Konto zu löschen.';
+z.string.de.modal_delete_account_message = 'In Kürze erhältst du eine Nachricht per E-Mail oder SMS. Folge dem Link darin, um dein Konto zu löschen.';
 z.string.de.modal_delete_button = 'Löschen';
 z.string.de.modal_delete_headline = 'Nur für mich löschen?';
 z.string.de.modal_delete_message = 'Dies kann nicht rückgängig gemacht werden.';
@@ -163,12 +155,10 @@ z.string.de.modal_delete_everyone_message = 'Dies kann nicht rückgängig gemach
 z.string.de.modal_too_long_headline = 'Nachricht zu lang';
 z.string.de.modal_too_long_message = 'Du kannst Nachrichten mit bis zu {{number}} Zeichen senden.';
 z.string.de.modal_leave_conversation_headline = 'Unterhaltung "{{user}}" verlassen?';
-z.string.de.modal_leave_conversation_message =
-  'Die Personen werden benachrichtigt und die Unterhaltung aus deiner Liste entfernt.';
+z.string.de.modal_leave_conversation_message = 'Die Personen werden benachrichtigt und die Unterhaltung aus deiner Liste entfernt.';
 z.string.de.modal_leave_conversation_button = 'Verlassen';
 z.string.de.modal_logout_headline = 'Daten löschen?';
-z.string.de.modal_logout_message =
-  'Deine persönlichen Daten und Unterhaltungen vollständig von diesem Gerät entfernen.';
+z.string.de.modal_logout_message = 'Deine persönlichen Daten und Unterhaltungen vollständig von diesem Gerät entfernen.';
 z.string.de.modal_logout_button = 'Abmelden';
 z.string.de.modal_new_device_headline = '{{user}} hat begonnen ein neues Gerät zu nutzen';
 z.string.de.modal_new_device_headline_many = '{{user}}s haben begonnen neue Geräte zu nutzen';
@@ -188,8 +178,7 @@ z.string.de.modal_session_reset_message_1 = 'Wenn das Problem weiterhin besteht,
 z.string.de.modal_session_reset_message_link = 'kontaktiere';
 z.string.de.modal_session_reset_message_2 = 'uns.';
 z.string.de.modal_too_many_members_headline = 'Volles Haus';
-z.string.de.modal_too_many_members_message =
-  'An einer Unterhaltung für eine Gruppe können bis zu {{number1}} Personen teilnehmen. Hier ist noch Platz für {{number2}} Personen.';
+z.string.de.modal_too_many_members_message = 'An einer Unterhaltung für eine Gruppe können bis zu {{number1}} Personen teilnehmen. Hier ist noch Platz für {{number2}} Personen.';
 z.string.de.modal_uploads_parallel = 'Du kannst bis zu {{number}} Dateien auf einmal senden.';
 
 z.string.de.connection_request_connect = 'Kontakt hinzufügen';
@@ -234,13 +223,11 @@ z.string.de.conversation_voice_channel_deactivate = ' hat versucht anzurufen';
 z.string.de.conversation_voice_channel_deactivate_you = ' hast versucht anzurufen';
 z.string.de.conversation_yesterday = 'Gestern';
 z.string.de.conversation_unable_to_decrypt_1 = 'eine Nachricht von {{user}} wurde nicht empfangen.';
-z.string.de.conversation_unable_to_decrypt_2 =
-  '{{users}} Geräte-Identität hat sich geändert. Nachricht kann nicht entschlüsselt werden.';
+z.string.de.conversation_unable_to_decrypt_2 = '{{users}} Geräte-Identität hat sich geändert. Nachricht kann nicht entschlüsselt werden.';
 z.string.de.conversation_unable_to_decrypt_link = 'Warum?';
 z.string.de.conversation_unable_to_decrypt_error_message = 'Fehler';
 z.string.de.conversation_unable_to_decrypt_reset_session = 'Session zurücksetzen';
-z.string.de.conversation_missed_messages =
-  'Du hast Wire eine Weile nicht benutzt. Einige ältere Nachrichten könnten nicht angezeigt werden.';
+z.string.de.conversation_missed_messages = 'Du hast Wire eine Weile nicht benutzt. Einige ältere Nachrichten könnten nicht angezeigt werden.';
 z.string.de.conversation_asset_uploading = 'Hochladen…';
 z.string.de.conversation_asset_downloading = 'Herunterladen…';
 z.string.de.conversation_asset_upload_failed = 'Hochladen fehlgeschlagen';
@@ -276,8 +263,7 @@ z.string.de.conversations_connection_request_one = 'Eine Kontaktanfrage';
 z.string.de.conversations_empty_conversation = 'Gruppenunterhaltung';
 z.string.de.conversations_empty_conversation_description = 'Leere Unterhaltung';
 z.string.de.conversations_no_conversations = 'Noch keine Unterhaltungen';
-z.string.de.conversations_no_conversations_detail =
-  'Beginne eine Unterhaltung, erstelle eine Gruppe oder lade weitere Freunde ein.';
+z.string.de.conversations_no_conversations_detail = 'Beginne eine Unterhaltung, erstelle eine Gruppe oder lade weitere Freunde ein.';
 z.string.de.conversations_popover_archive = 'Archivieren';
 z.string.de.conversations_popover_block = 'Blockieren';
 z.string.de.conversations_popover_cancel = 'Anfrage abbrechen';
@@ -336,22 +322,18 @@ z.string.de.people_no_matches = 'Kein passendes Ergebnis.\nSuche nach einen\nand
 z.string.de.people_invite = 'Freunde einladen';
 z.string.de.people_share = 'Teile deine Kontakte';
 z.string.de.people_bring_your_friends = 'Hole deine Freunde zu Wire';
-z.string.de.people_invite_detail =
-  'Wir verwenden deine Kontaktdaten, um Kontakte für dich zu erstellen. Wir anonymisieren alle Informationen und geben sie nicht weiter.';
+z.string.de.people_invite_detail = 'Wir verwenden deine Kontaktdaten, um Kontakte für dich zu erstellen. Wir anonymisieren alle Informationen und geben sie nicht weiter.';
 z.string.de.people_invite_button_contacts = 'Aus Kontakte';
 z.string.de.people_invite_button_gmail = 'Aus Gmail';
 z.string.de.people_invite_headline = 'Hole deine Freunde';
 z.string.de.people_tabs_details = 'Details';
 z.string.de.people_tabs_devices = 'Geräte';
-z.string.de.people_tabs_devices_headline =
-  'Wire gibt jedem Gerät einen einzigartigen Fingerabdruck. Vergleiche diese mit {{user}} und überprüfe deine Unterhaltung.';
+z.string.de.people_tabs_devices_headline = 'Wire gibt jedem Gerät einen einzigartigen Fingerabdruck. Vergleiche diese mit {{user}} und überprüfe deine Unterhaltung.';
 z.string.de.people_tabs_devices_why_verify = 'Warum sollte ich meine Unterhaltungen verifizieren?';
-z.string.de.people_tabs_no_devices_headline =
-  '{{user}} benutzt eine ältere Version von Wire. Es werden keine Geräte angezeigt.';
+z.string.de.people_tabs_no_devices_headline = '{{user}} benutzt eine ältere Version von Wire. Es werden keine Geräte angezeigt.';
 z.string.de.people_tabs_device_detail_all_my_devices = 'Alle meine Geräte anzeigen';
 z.string.de.people_tabs_device_detail_device_fingerprint = 'Fingerabdruck des Geräts';
-z.string.de.people_tabs_device_detail_headline =
-  'Überprüfe, ob dieser Fingerabdruck mit dem auf {{html1}}{{user}}s Gerät{{html2}} übereinstimmt.';
+z.string.de.people_tabs_device_detail_headline = 'Überprüfe, ob dieser Fingerabdruck mit dem auf {{html1}}{{user}}s Gerät{{html2}} übereinstimmt.';
 z.string.de.people_tabs_device_detail_how_to = 'Wie mache ich das?';
 z.string.de.people_tabs_device_detail_reset_session = 'Session zurücksetzen';
 z.string.de.people_tabs_device_detail_show_my_device = 'Zeige meinen Fingerabdruck';
@@ -362,8 +344,7 @@ z.string.de.people_block_headline = 'Blockieren?';
 z.string.de.people_block_message = '{{user}} wird dich nicht länger kontaktieren oder zu Gruppen hinzufügen können.';
 
 z.string.de.people_connect_headline = 'Annehmen?';
-z.string.de.people_connect_message =
-  '{{user}} wird zu deinen Kontakten hinzugefügt und die Unterhaltung mit ihm geöffnet.';
+z.string.de.people_connect_message = '{{user}} wird zu deinen Kontakten hinzugefügt und die Unterhaltung mit ihm geöffnet.';
 
 z.string.de.people_cancel_request_headline = 'Kontaktanfrage abbrechen?';
 z.string.de.people_cancel_request_message = 'Ziehe die Kontaktanfrage an {{user}} zurück.';
@@ -372,8 +353,7 @@ z.string.de.people_leave_headline = 'Unterhaltung verlassen?';
 z.string.de.people_leave_message = 'Du wirst keine Nachrichten in dieser Unterhaltung senden oder empfangen können.';
 
 z.string.de.people_remove_headline = 'Entfernen?';
-z.string.de.people_remove_message =
-  '{{user}} wird in dieser Unterhaltung keine Nachrichten schicken oder empfangen können.';
+z.string.de.people_remove_message = '{{user}} wird in dieser Unterhaltung keine Nachrichten schicken oder empfangen können.';
 
 z.string.de.people_unblock_headline = 'Freigeben?';
 z.string.de.people_unblock_message = '{{user}} wird dich wieder kontaktieren und zu Gruppen hinzufügen können.';
@@ -426,20 +406,16 @@ z.string.de.preferences_av_speakers = 'Lautsprecher';
 z.string.de.preferences_devices_activated_in = 'in {{location}}';
 z.string.de.preferences_devices_activated_on = 'Aktiviert am {{date}}';
 z.string.de.preferences_devices_active = 'Aktiv';
-z.string.de.preferences_devices_active_detail =
-  'Falls du eines dieser Geräte nicht erkennst, entferne es und setze dein Passwort zurück.';
+z.string.de.preferences_devices_active_detail = 'Falls du eines dieser Geräte nicht erkennst, entferne es und setze dein Passwort zurück.';
 z.string.de.preferences_devices_current = 'Dieses Gerät';
 z.string.de.preferences_devices_fingerprint = 'Schlüssel-Fingerabdruck';
-z.string.de.preferences_devices_fingerprint_detail =
-  'Wire gibt jedem Gerät einen einzigartigen Fingerabdruck. Vergleiche diese und verifiziere deine Geräte und Unterhaltungen.';
+z.string.de.preferences_devices_fingerprint_detail = 'Wire gibt jedem Gerät einen einzigartigen Fingerabdruck. Vergleiche diese und verifiziere deine Geräte und Unterhaltungen.';
 z.string.de.preferences_devices_id = 'ID: ';
 z.string.de.preferences_devices_remove = 'Entfernen';
 z.string.de.preferences_devices_remove_cancel = 'Abbrechen';
-z.string.de.preferences_devices_remove_detail =
-  'Entferne das Gerät, wenn du es nicht mehr nutzt. Du wirst auf diesem Gerät umgehend abgemeldet.';
+z.string.de.preferences_devices_remove_detail = 'Entferne das Gerät, wenn du es nicht mehr nutzt. Du wirst auf diesem Gerät umgehend abgemeldet.';
 z.string.de.preferences_devices_session_confirmation = 'Die Session wurde zurückgesetzt.';
-z.string.de.preferences_devices_session_detail =
-  'Falls die Fingerabdrücke nicht übereinstimmen, setze die Session zurück um neue Verschlüsselungs-Schlüssel auf beiden Seiten zu erstellen.';
+z.string.de.preferences_devices_session_detail = 'Falls die Fingerabdrücke nicht übereinstimmen, setze die Session zurück um neue Verschlüsselungs-Schlüssel auf beiden Seiten zu erstellen.';
 z.string.de.preferences_devices_session_reset = 'Session zurücksetzen';
 z.string.de.preferences_devices_session_ongoing = 'Setze Session zurück…';
 z.string.de.preferences_devices_verification = 'Verifiziert';
@@ -454,12 +430,10 @@ z.string.de.preferences_options_audio_some_detail = 'Pings und Anrufe';
 z.string.de.preferences_options_contacts = 'Kontakte';
 z.string.de.preferences_options_contacts_gmail = 'Aus Gmail importieren';
 z.string.de.preferences_options_contacts_macos = 'Aus Kontakte importieren';
-z.string.de.preferences_options_contacts_detail =
-  'Wir verwenden deine Daten, um Kontakte für dich zu erstellen. Wir anonymisieren alle Informationen und teilen sie mit niemand anderem.';
+z.string.de.preferences_options_contacts_detail = 'Wir verwenden deine Daten, um Kontakte für dich zu erstellen. Wir anonymisieren alle Informationen und teilen sie mit niemand anderem.';
 z.string.de.preferences_options_data = 'Nutzungs- und Fehlerberichte';
 z.string.de.preferences_options_data_checkbox = 'Anonyme Nutzungsdaten senden';
-z.string.de.preferences_options_data_detail =
-  'Hilf uns, Wire durch das Senden anonymisierter Informationen zu verbessern.';
+z.string.de.preferences_options_data_detail = 'Hilf uns, Wire durch das Senden anonymisierter Informationen zu verbessern.';
 z.string.de.preferences_options_popular = 'Auf allgemeinen Wunsch';
 z.string.de.preferences_options_emoji_replace_checkbox = 'Ersetze Schrift-Emoticons mit Emojis';
 z.string.de.preferences_options_emoji_replace_detail = ':-) → {{icon}}';
@@ -484,11 +458,9 @@ z.string.de.search_no_contacts_on_wire = 'Du hast keine Kontakte auf Wire.\nSuch
 z.string.de.search_others = 'Suchergebnisse';
 
 z.string.de.upload_google_headline = 'Finde Kontakte \nauf Wire.';
-z.string.de.upload_google_message =
-  'Wir verwenden deine Daten, um Kontakte für dich zu erstellen. Wir anonymisieren alle Informationen und teilen sie mit niemand anderem.';
+z.string.de.upload_google_message = 'Wir verwenden deine Daten, um Kontakte für dich zu erstellen. Wir anonymisieren alle Informationen und teilen sie mit niemand anderem.';
 z.string.de.upload_google_headline_error = 'Ein Fehler ist aufgetreten.';
-z.string.de.upload_google_message_error =
-  'Wir haben die Informationen nicht erhalten. Bitte importiere deine Kontakte erneut.';
+z.string.de.upload_google_message_error = 'Wir haben die Informationen nicht erhalten. Bitte importiere deine Kontakte erneut.';
 z.string.de.upload_google_button_again = 'Erneut versuchen';
 
 z.string.de.url_password_reset = 'forgot/?hl=de';
@@ -523,10 +495,8 @@ z.string.de.warning_call_upgrade_browser = 'Für Anrufe aktualisiere Google Chro
 z.string.de.warning_learn_more = 'Erfahre mehr';
 z.string.de.warning_not_found_camera = 'Du kannst nicht anrufen, da dein Computer keine Kamera hat.';
 z.string.de.warning_not_found_microphone = 'Du kannst nicht anrufen, da dein Computer kein Mikrofon hat.';
-z.string.de.warning_permission_denied_camera =
-  'Du kannst nicht anrufen, da dein Browser keinen Zugriff auf die Kamera hat.';
-z.string.de.warning_permission_denied_microphone =
-  'Du kannst nicht anrufen, da dein Browser keinen Zugriff auf das Mikrofon hat.';
+z.string.de.warning_permission_denied_camera = 'Du kannst nicht anrufen, da dein Browser keinen Zugriff auf die Kamera hat.';
+z.string.de.warning_permission_denied_microphone = 'Du kannst nicht anrufen, da dein Browser keinen Zugriff auf das Mikrofon hat.';
 z.string.de.warning_permission_denied_screen = 'Der Browser braucht die Berechtigung deinen Bildschirm zu teilen.';
 z.string.de.warning_permission_request_camera = '{{icon}} Zugriff auf Kamera gewähren';
 z.string.de.warning_permission_request_microphone = '{{icon}} Zugriff auf Mikrofon gewähren';
@@ -534,10 +504,8 @@ z.string.de.warning_permission_request_notification = '{{icon}} Benachrichtigung
 z.string.de.warning_permission_request_screen = '{{icon}} Zugriff auf Bildschirm gewähren';
 z.string.de.warning_tell_me_how = 'Zeig mir wie';
 
-z.string.de.warning_connectivity_connection_lost =
-  'Verbindung wird wiederhergestellt. Wire kann Nachrichten möglicherweise nicht empfangen.';
-z.string.de.warning_connectivity_no_internet =
-  'Keine Internetverbindung. Du kannst keine Nachrichten senden und empfangen.';
+z.string.de.warning_connectivity_connection_lost = 'Verbindung wird wiederhergestellt. Wire kann Nachrichten möglicherweise nicht empfangen.';
+z.string.de.warning_connectivity_no_internet = 'Keine Internetverbindung. Du kannst keine Nachrichten senden und empfangen.';
 
 z.string.de.warning_lifecycle_update = 'Eine neue Version von Wire ist verfügbar.';
 z.string.de.warning_lifecycle_update_notes = 'Was ist neu';

@@ -25,20 +25,16 @@ z.string.it.wire_linux = 'Wire per Linux';
 z.string.it.nonexistent_user = 'Elimina utente';
 z.string.it.and = 'e';
 
-z.string.it.alert_upload_file_format =
-  'Non è possibile utilizzare questa immagine. \nSi prega di scegliere un file PNG o JPEG.';
-z.string.it.alert_upload_too_small =
-  'Non è possibile utilizzare questa immagine. \nSi prega di scegliere una foto di almeno 320 x 320 pixels.';
+z.string.it.alert_upload_file_format = 'Non è possibile utilizzare questa immagine. \nSi prega di scegliere un file PNG o JPEG.';
+z.string.it.alert_upload_too_small = 'Non è possibile utilizzare questa immagine. \nSi prega di scegliere una foto di almeno 320 x 320 pixels.';
 z.string.it.alert_upload_too_large = 'Questa immagine è troppo grande. È possibile caricare file fino a {{number}} MB.';
 z.string.it.alert_gif_too_large = 'L’animazione è troppo grande. La dimensione massima è {{number}} MB.';
 
 z.string.it.auth_account_country_code = 'Codice del paese';
 z.string.it.auth_account_create = 'Creare';
 z.string.it.auth_account_create_account = 'Crea un account';
-z.string.it.auth_account_expiration =
-  'L’accesso è stato revocato perché la sessione è scaduta. Effettua il login nuovamente.';
-z.string.it.auth_account_get_wire =
-  'Un app di messaggistica semplice, privata & sicura per la chat, chiamate, condivisione di foto, musica, video, gif e altro.';
+z.string.it.auth_account_expiration = 'L’accesso è stato revocato perché la sessione è scaduta. Effettua il login nuovamente.';
+z.string.it.auth_account_get_wire = 'Un app di messaggistica semplice, privata & sicura per la chat, chiamate, condivisione di foto, musica, video, gif e altro.';
 z.string.it.auth_account_password_forgot = 'Ho dimenticato la password';
 z.string.it.auth_account_public_computer = 'Questo computer è pubblico';
 z.string.it.auth_account_sign_in = 'Accedi';
@@ -120,8 +116,7 @@ z.string.it.modal_button_ok = 'Ok';
 z.string.it.modal_button_send = 'Invia';
 
 z.string.it.modal_block_conversation_headline = 'Bloccare {{user}}?';
-z.string.it.modal_block_conversation_message =
-  '{{user}} non sarà in grado di contattarti o aggiungerti alle conversazioni di gruppo.';
+z.string.it.modal_block_conversation_message = '{{user}} non sarà in grado di contattarti o aggiungerti alle conversazioni di gruppo.';
 z.string.it.modal_block_conversation_button = 'Blocca';
 z.string.it.modal_call_conversation_empty_headline = 'Nessuno da chiamare';
 z.string.it.modal_call_conversation_empty_message = 'Non c’è più nessuno qui.';
@@ -137,8 +132,7 @@ z.string.it.modal_call_second_outgoing_headline = 'Riagganciare la chiamata corr
 z.string.it.modal_call_second_outgoing_message = 'È possibile partecipare a una sola chiamata alla volta.';
 z.string.it.modal_call_second_outgoing_action = 'Riattacca';
 z.string.it.modal_clear_conversation_headline = 'Eliminare il contenuto di "{{user}}"?';
-z.string.it.modal_clear_conversation_message =
-  'Questo cancellerà la cronologia e rimuoverà la conversazione dall’elenco.';
+z.string.it.modal_clear_conversation_message = 'Questo cancellerà la cronologia e rimuoverà la conversazione dall’elenco.';
 z.string.it.modal_clear_conversation_option = 'In aggiunta, abbandona la conversazione';
 z.string.it.modal_clear_conversation_button = 'Elimina';
 z.string.it.modal_connected_device_headline = 'Il tuo account è stato utilizzato su:';
@@ -147,8 +141,7 @@ z.string.it.modal_connected_device_message = 'Se non sei stato tu, riuovi il dis
 z.string.it.modal_connected_device_manage_devices = 'gestisci dispositivi';
 z.string.it.modal_delete_account_action = 'Elimina';
 z.string.it.modal_delete_account_headline = 'Elimina account';
-z.string.it.modal_delete_account_message =
-  'Ti invieremo un SMS o una email. Segui il link per eliminare definitivamente il tuo account.';
+z.string.it.modal_delete_account_message = 'Ti invieremo un SMS o una email. Segui il link per eliminare definitivamente il tuo account.';
 z.string.it.modal_delete_button = 'Elimina';
 z.string.it.modal_delete_headline = 'Eliminare solo per me?';
 z.string.it.modal_delete_message = 'Questa azione non può essere annullata.';
@@ -158,8 +151,7 @@ z.string.it.modal_delete_everyone_message = 'Questa azione non può essere annul
 z.string.it.modal_too_long_headline = 'Messaggio troppo lungo';
 z.string.it.modal_too_long_message = 'È possibile inviare messaggi fino a {{number}} caratteri.';
 z.string.it.modal_leave_conversation_headline = 'Lasciare la conversazione "{{user}}"?';
-z.string.it.modal_leave_conversation_message =
-  'I partecipanti saranno informati e la conversazione rimossa dalla tua lista.';
+z.string.it.modal_leave_conversation_message = 'I partecipanti saranno informati e la conversazione rimossa dalla tua lista.';
 z.string.it.modal_leave_conversation_button = 'Abbandona';
 z.string.it.modal_logout_headline = 'Cancella dati?';
 z.string.it.modal_logout_message = 'Elimina tutti i tuoi dati personali e le conversazioni su questo dispositivo.';
@@ -182,8 +174,7 @@ z.string.it.modal_session_reset_message_1 = 'Se il problema non viene risolto,';
 z.string.it.modal_session_reset_message_link = 'contatta';
 z.string.it.modal_session_reset_message_2 = 'Wire.';
 z.string.it.modal_too_many_members_headline = 'Chiamata piena';
-z.string.it.modal_too_many_members_message =
-  'Fino a {{number1}} persone possono partecipare a una conversazione. C’è spazio per ancora {{number2}} persone qui dentro.';
+z.string.it.modal_too_many_members_message = 'Fino a {{number1}} persone possono partecipare a una conversazione. C’è spazio per ancora {{number2}} persone qui dentro.';
 z.string.it.modal_uploads_parallel = 'È possibile inviare fino a {{number}} file in una sola volta.';
 
 z.string.it.connection_request_connect = 'Connetti';
@@ -228,13 +219,11 @@ z.string.it.conversation_voice_channel_deactivate = ' ha chiamato';
 z.string.it.conversation_voice_channel_deactivate_you = ' hai chiamato';
 z.string.it.conversation_yesterday = 'Ieri';
 z.string.it.conversation_unable_to_decrypt_1 = 'un messaggio da {{user}} non è stato ricevuto.';
-z.string.it.conversation_unable_to_decrypt_2 =
-  'L’identità dei dispositivi {{user}}´s è cambiata. Messaggi non consegnati.';
+z.string.it.conversation_unable_to_decrypt_2 = 'L’identità dei dispositivi {{user}}´s è cambiata. Messaggi non consegnati.';
 z.string.it.conversation_unable_to_decrypt_link = 'Perchè?';
 z.string.it.conversation_unable_to_decrypt_error_message = 'Errore';
 z.string.it.conversation_unable_to_decrypt_reset_session = 'Resetta la sessione';
-z.string.it.conversation_missed_messages =
-  'È da un po’ di tempo che non utilizzi questo dispositivo. Alcuni messaggi potrebbero non apparire qui.';
+z.string.it.conversation_missed_messages = 'È da un po’ di tempo che non utilizzi questo dispositivo. Alcuni messaggi potrebbero non apparire qui.';
 z.string.it.conversation_asset_uploading = 'Caricamento…';
 z.string.it.conversation_asset_downloading = 'Download in corso…';
 z.string.it.conversation_asset_upload_failed = 'Caricamento fallito';
@@ -270,8 +259,7 @@ z.string.it.conversations_connection_request_one = '1 persona in attesa';
 z.string.it.conversations_empty_conversation = 'Conversazione di gruppo';
 z.string.it.conversations_empty_conversation_description = 'Tutti i partecipanti hanno abbandonato la conversazione';
 z.string.it.conversations_no_conversations = 'Nessuna conversazione';
-z.string.it.conversations_no_conversations_detail =
-  'Inizia una conversazione, crea un gruppo o invita delle persone a partecipare.';
+z.string.it.conversations_no_conversations_detail = 'Inizia una conversazione, crea un gruppo o invita delle persone a partecipare.';
 z.string.it.conversations_popover_archive = 'Archivia';
 z.string.it.conversations_popover_block = 'Blocca';
 z.string.it.conversations_popover_cancel = 'Annulla richiesta';
@@ -323,22 +311,18 @@ z.string.it.people_no_matches = 'Nessun risultato corrispondente. Provare ad ins
 z.string.it.people_invite = 'Invita persone';
 z.string.it.people_share = 'Condividi contatti';
 z.string.it.people_bring_your_friends = 'Porta i tuoi amici su Wire';
-z.string.it.people_invite_detail =
-  'Condividere i contatti dalla rubrica ti aiuta a connetterti con gli altri. Rendiamo tutte le informazioni dei contatti anonime e non sono cedute a nessun altro.';
+z.string.it.people_invite_detail = 'Condividere i contatti dalla rubrica ti aiuta a connetterti con gli altri. Rendiamo tutte le informazioni dei contatti anonime e non sono cedute a nessun altro.';
 z.string.it.people_invite_button_contacts = 'Dalla rubrica';
 z.string.it.people_invite_button_gmail = 'Da Gmail';
 z.string.it.people_invite_headline = 'Invita i tuoi amici';
 z.string.it.people_tabs_details = 'Dettagli';
 z.string.it.people_tabs_devices = 'Dispositivi';
-z.string.it.people_tabs_devices_headline =
-  'Wire dà un’impronta unica a ogni dispositivo. Confrontale con {{user}} e verifica la tua conversazione.';
+z.string.it.people_tabs_devices_headline = 'Wire dà un’impronta unica a ogni dispositivo. Confrontale con {{user}} e verifica la tua conversazione.';
 z.string.it.people_tabs_devices_why_verify = 'Perché verificare la conversazione?';
-z.string.it.people_tabs_no_devices_headline =
-  '{{user}} sta utilizzando una vecchia versione di Wire. Nessun dispositivo da visualizzare qui.';
+z.string.it.people_tabs_no_devices_headline = '{{user}} sta utilizzando una vecchia versione di Wire. Nessun dispositivo da visualizzare qui.';
 z.string.it.people_tabs_device_detail_all_my_devices = 'Mostra tutti i miei dispositivi';
 z.string.it.people_tabs_device_detail_device_fingerprint = 'Impronta digitale dispositivo';
-z.string.it.people_tabs_device_detail_headline =
-  'Verifica che questo corrisponda all’impronta digitale sul {{html1}}dispositivo di {{user}}{{html2}}.';
+z.string.it.people_tabs_device_detail_headline = 'Verifica che questo corrisponda all’impronta digitale sul {{html1}}dispositivo di {{user}}{{html2}}.';
 z.string.it.people_tabs_device_detail_how_to = 'Come si fa?';
 z.string.it.people_tabs_device_detail_reset_session = 'Resetta la sessione';
 z.string.it.people_tabs_device_detail_show_my_device = 'Visualizza impronta digitale del dispositivo';
@@ -346,8 +330,7 @@ z.string.it.people_tabs_device_detail_verify = 'Verificato';
 z.string.it.people_verified = 'Verificato';
 
 z.string.it.people_block_headline = 'Blocca?';
-z.string.it.people_block_message =
-  '{{user}} non sarà in grado di contattarti o aggiungerti alle conversazioni di gruppo.';
+z.string.it.people_block_message = '{{user}} non sarà in grado di contattarti o aggiungerti alle conversazioni di gruppo.';
 
 z.string.it.people_connect_headline = 'Accettare?';
 z.string.it.people_connect_message = 'Questo ti collegherà e aprirà la conversazione con {{user}}.';
@@ -359,12 +342,10 @@ z.string.it.people_leave_headline = 'Abbandonare la conversazione?';
 z.string.it.people_leave_message = 'Non sarai più in grado di inviare o ricevere messaggi in questa conversazione.';
 
 z.string.it.people_remove_headline = 'Rimuovere?';
-z.string.it.people_remove_message =
-  '{{user}} non sarà in grado di inviare o ricevere messaggi in questa conversazione.';
+z.string.it.people_remove_message = '{{user}} non sarà in grado di inviare o ricevere messaggi in questa conversazione.';
 
 z.string.it.people_unblock_headline = 'Sblocca?';
-z.string.it.people_unblock_message =
-  '{{user}} sarà in grado di contattarti e aggiungerti alle conversazioni di gruppo di nuovo.';
+z.string.it.people_unblock_message = '{{user}} sarà in grado di contattarti e aggiungerti alle conversazioni di gruppo di nuovo.';
 
 z.string.it.people_button_add = 'Aggiungi persone';
 z.string.it.people_button_block = 'Blocca';
@@ -413,20 +394,16 @@ z.string.it.preferences_av_speakers = 'Altoparlanti';
 z.string.it.preferences_devices_activated_in = 'a {{location}}';
 z.string.it.preferences_devices_activated_on = 'Attivato il {{date}}';
 z.string.it.preferences_devices_active = 'Attivi';
-z.string.it.preferences_devices_active_detail =
-  'Se non riconosci un dispositivo qui sopra, rimuovilo e reimposta la password.';
+z.string.it.preferences_devices_active_detail = 'Se non riconosci un dispositivo qui sopra, rimuovilo e reimposta la password.';
 z.string.it.preferences_devices_current = 'Attuale';
 z.string.it.preferences_devices_fingerprint = 'Impronta digitale della chiave';
-z.string.it.preferences_devices_fingerprint_detail =
-  'Wire dà un impronta digitale unica a ogni dispositivo. Confrontale per verificare i tuoi dispositivi e le conversazioni.';
+z.string.it.preferences_devices_fingerprint_detail = 'Wire dà un impronta digitale unica a ogni dispositivo. Confrontale per verificare i tuoi dispositivi e le conversazioni.';
 z.string.it.preferences_devices_id = 'ID: ';
 z.string.it.preferences_devices_remove = 'Rimuovi';
 z.string.it.preferences_devices_remove_cancel = 'Annulla';
-z.string.it.preferences_devices_remove_detail =
-  'RimuovI questo dispositivo se hai smesso di usarlo. Verrai disconnesso immediatamente.';
+z.string.it.preferences_devices_remove_detail = 'RimuovI questo dispositivo se hai smesso di usarlo. Verrai disconnesso immediatamente.';
 z.string.it.preferences_devices_session_confirmation = 'La sessione è stata resettata.';
-z.string.it.preferences_devices_session_detail =
-  'Se le impronte digitali non corrispondono, è necessario resettare la sessione per generare nuove chiavi di crittografia da entrambe le parti.';
+z.string.it.preferences_devices_session_detail = 'Se le impronte digitali non corrispondono, è necessario resettare la sessione per generare nuove chiavi di crittografia da entrambe le parti.';
 z.string.it.preferences_devices_session_reset = 'Resetta la sessione';
 z.string.it.preferences_devices_session_ongoing = 'Resettando la sessione…';
 z.string.it.preferences_devices_verification = 'Verificato';
@@ -441,8 +418,7 @@ z.string.it.preferences_options_audio_some_detail = 'Trilli e chiamate';
 z.string.it.preferences_options_contacts = 'Contatti';
 z.string.it.preferences_options_contacts_gmail = 'Importa da Gmail';
 z.string.it.preferences_options_contacts_macos = 'Importa dalla rubrica';
-z.string.it.preferences_options_contacts_detail =
-  'Utilizziamo i dati del tuo contatto per connetterti con gli altri. Rendiamo anonime tutte le informazioni e non le condividiamo con nessuno.';
+z.string.it.preferences_options_contacts_detail = 'Utilizziamo i dati del tuo contatto per connetterti con gli altri. Rendiamo anonime tutte le informazioni e non le condividiamo con nessuno.';
 z.string.it.preferences_options_data = 'Segnalazioni di crash e dati di utilizzo';
 z.string.it.preferences_options_data_checkbox = 'Segnalazioni di crash e dati di utilizzo';
 z.string.it.preferences_options_data_detail = 'Migliora Wire con l’invio di informazioni anonime.';
@@ -461,16 +437,13 @@ z.string.it.search_team_groups = 'Conversazioni di Team';
 z.string.it.search_team_members = 'Membri del team';
 z.string.it.search_top_people = 'Contattati frequenti';
 z.string.it.search_try_search = 'Trova le persone per nome o username';
-z.string.it.search_no_contacts_on_wire =
-  'Non hai nessun contatto su Wire. Prova a trovare persone per nome o username.';
+z.string.it.search_no_contacts_on_wire = 'Non hai nessun contatto su Wire. Prova a trovare persone per nome o username.';
 z.string.it.search_others = 'Connetti';
 
 z.string.it.upload_google_headline = 'Trova persone con cui parlare.';
-z.string.it.upload_google_message =
-  'Utilizziamo i dati del tuo contatto per connetterti con gli altri. Rendiamo anonime tutte le informazioni e non le condividiamo con nessuno.';
+z.string.it.upload_google_message = 'Utilizziamo i dati del tuo contatto per connetterti con gli altri. Rendiamo anonime tutte le informazioni e non le condividiamo con nessuno.';
 z.string.it.upload_google_headline_error = 'Qualcosa è andato storto.';
-z.string.it.upload_google_message_error =
-  'Non abbiamo ricevuto i tuoi dati. Per favore riprova ad importare i tuoi contatti.';
+z.string.it.upload_google_message_error = 'Non abbiamo ricevuto i tuoi dati. Per favore riprova ad importare i tuoi contatti.';
 z.string.it.upload_google_button_again = 'Riprova';
 
 z.string.it.url_password_reset = 'forgot/';
@@ -498,8 +471,7 @@ z.string.it.warning_learn_more = 'Ulteriori informazioni';
 z.string.it.warning_not_found_camera = 'Non puoi chiamare perchè il tuo computer non ha una webcam.';
 z.string.it.warning_not_found_microphone = 'Non puoi chiamare perchè il tuo computer non ha un microfono.';
 z.string.it.warning_permission_denied_camera = 'Non puoi chiamare perchè il tuo browser non ha accesso alla webcam.';
-z.string.it.warning_permission_denied_microphone =
-  'Non puoi chiamare perchè il tuo browser non ha accesso al microfono.';
+z.string.it.warning_permission_denied_microphone = 'Non puoi chiamare perchè il tuo browser non ha accesso al microfono.';
 z.string.it.warning_permission_denied_screen = 'Il browser richiede l’autorizzazione per condividere il tuo schermo.';
 z.string.it.warning_permission_request_camera = '{{icon}} Consenti accesso alla webcam';
 z.string.it.warning_permission_request_microphone = '{{icon}} Consenti accesso al microfono';
@@ -507,10 +479,8 @@ z.string.it.warning_permission_request_notification = '{{icon}} Consenti notific
 z.string.it.warning_permission_request_screen = '{{icon}} Consenti accesso allo schermo';
 z.string.it.warning_tell_me_how = 'Dimmi come';
 
-z.string.it.warning_connectivity_connection_lost =
-  'Tentativo di connessione. Wire non è in grado di consegnare i messaggi.';
-z.string.it.warning_connectivity_no_internet =
-  'Nessuna connessione. Non sarai in grado di inviare o ricevere messaggi.';
+z.string.it.warning_connectivity_connection_lost = 'Tentativo di connessione. Wire non è in grado di consegnare i messaggi.';
+z.string.it.warning_connectivity_no_internet = 'Nessuna connessione. Non sarai in grado di inviare o ricevere messaggi.';
 
 z.string.it.warning_lifecycle_update = 'Una nuova versione di Wire è disponibile.';
 z.string.it.warning_lifecycle_update_notes = 'Novità';

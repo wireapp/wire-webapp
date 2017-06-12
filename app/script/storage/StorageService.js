@@ -396,11 +396,10 @@ z.storage.StorageService = class StorageService {
       return Promise.reject(new z.storage.StorageError(z.storage.StorageError.TYPE.NO_DATA));
     }
 
-    return this.db[store_name].put(entity, primary_key)
-      .catch((error) => {
-        this.logger.error(`Failed to put '${primary_key}' into store '${store_name}'`, error);
-        throw error;
-      });
+    return this.db[store_name].put(entity, primary_key).catch(error => {
+      this.logger.error(`Failed to put '${primary_key}' into store '${store_name}'`, error);
+      throw error;
+    });
   }
 
   /**

@@ -25,8 +25,7 @@ z.string.tr.wire_linux = 'Linux için Wire';
 z.string.tr.nonexistent_user = 'Silinmiş Kullanıcı';
 z.string.tr.and = 've';
 
-z.string.tr.alert_upload_file_format =
-  'Bu fotoğrafı kullanamazsınız.\nLütfen PNG veya JPEG formatında bir dosya seçin.';
+z.string.tr.alert_upload_file_format = 'Bu fotoğrafı kullanamazsınız.\nLütfen PNG veya JPEG formatında bir dosya seçin.';
 z.string.tr.alert_upload_too_small = 'Bu resmi kullanamazsınız.\nLütfen en az 320x320 piksellik bir resim seçin.';
 z.string.tr.alert_upload_too_large = 'Bu resim çok büyük.\nEn fazla {{number}} MB’lık dosyalar yükleyebilirsiniz.';
 z.string.tr.alert_gif_too_large = 'Animasyon çok büyük.\nMaksimum dosya boyutu {{number}} MB.';
@@ -35,8 +34,7 @@ z.string.tr.auth_account_country_code = 'Ülke Kodu';
 z.string.tr.auth_account_create = 'Oluştur';
 z.string.tr.auth_account_create_account = 'Bir hesap oluştur';
 z.string.tr.auth_account_expiration = 'Oturumunuzun süresi dolduğu için çıkış yapıldı. Lütfen tekrar giriş yapın.';
-z.string.tr.auth_account_get_wire =
-  'Konuşma, arama; fotoğraf, video, müzik ve GIF paylaşmak için basit, gizli ve güvenli mesajlaşma uygulaması.';
+z.string.tr.auth_account_get_wire = 'Konuşma, arama; fotoğraf, video, müzik ve GIF paylaşmak için basit, gizli ve güvenli mesajlaşma uygulaması.';
 z.string.tr.auth_account_password_forgot = 'Şifremi unuttum';
 z.string.tr.auth_account_public_computer = 'Bu ortak bir bilgisayar';
 z.string.tr.auth_account_sign_in = 'Giriş yap';
@@ -118,8 +116,7 @@ z.string.tr.modal_button_ok = 'Tamam';
 z.string.tr.modal_button_send = 'Gönder';
 
 z.string.tr.modal_block_conversation_headline = '{{user}} engellensin mi?';
-z.string.tr.modal_block_conversation_message =
-  '{{user}} sizinle iletişim kuramayacak ve sizi grup konuşmalarına ekleyemeyecek.';
+z.string.tr.modal_block_conversation_message = '{{user}} sizinle iletişim kuramayacak ve sizi grup konuşmalarına ekleyemeyecek.';
 z.string.tr.modal_block_conversation_button = 'Engelle';
 z.string.tr.modal_call_conversation_empty_headline = 'Arayacak kimse yok';
 z.string.tr.modal_call_conversation_empty_message = 'Burada kimse kalmadı.';
@@ -135,19 +132,16 @@ z.string.tr.modal_call_second_outgoing_headline = 'Mevcut konuşmayı sonlandır
 z.string.tr.modal_call_second_outgoing_message = 'Aynı anda tek bir aramada bulunabilirsiniz.';
 z.string.tr.modal_call_second_outgoing_action = 'Kapat';
 z.string.tr.modal_clear_conversation_headline = '{{user}}’e ait içerikler silinsin mi?';
-z.string.tr.modal_clear_conversation_message =
-  'Bu işlem konuşma geçmişini temizleyecek ve konuşmayı listenizden silecektir.';
+z.string.tr.modal_clear_conversation_message = 'Bu işlem konuşma geçmişini temizleyecek ve konuşmayı listenizden silecektir.';
 z.string.tr.modal_clear_conversation_option = 'Ayrıca konuşmadan da ayrıl';
 z.string.tr.modal_clear_conversation_button = 'Sil';
 z.string.tr.modal_connected_device_headline = 'Hesabınız şurada kullanılmış:';
 z.string.tr.modal_connected_device_from = 'Cihaz:';
-z.string.tr.modal_connected_device_message =
-  'Eğer bunu yapan siz değilseniz, cihazı kaldırın ben şifrenizi sıfırlayın.';
+z.string.tr.modal_connected_device_message = 'Eğer bunu yapan siz değilseniz, cihazı kaldırın ben şifrenizi sıfırlayın.';
 z.string.tr.modal_connected_device_manage_devices = 'cihazları yönet';
 z.string.tr.modal_delete_account_action = 'Sil';
 z.string.tr.modal_delete_account_headline = 'Hesabı Sil';
-z.string.tr.modal_delete_account_message =
-  'Size kısa mesaj veya e-posta aracılığıyla bir mesaj göndereceğiz. Mesajdaki bağlantıyı takip ederek hesabınızı kalıcı olarak silebilirsiniz.';
+z.string.tr.modal_delete_account_message = 'Size kısa mesaj veya e-posta aracılığıyla bir mesaj göndereceğiz. Mesajdaki bağlantıyı takip ederek hesabınızı kalıcı olarak silebilirsiniz.';
 z.string.tr.modal_delete_button = 'Sil';
 z.string.tr.modal_delete_headline = 'Sadece benim için sil?';
 z.string.tr.modal_delete_message = 'Bu işlem geri alınamaz.';
@@ -180,8 +174,7 @@ z.string.tr.modal_session_reset_message_1 = 'Eğer sorun çözülmemişse,';
 z.string.tr.modal_session_reset_message_link = 'iletişime geç';
 z.string.tr.modal_session_reset_message_2 = 'biz.';
 z.string.tr.modal_too_many_members_headline = 'Dolup taşmış';
-z.string.tr.modal_too_many_members_message =
-  'Görüşmeye en fazla {{number1}} kişi katılabilir. Burada {{number2}} kişi için daha boş yer var.';
+z.string.tr.modal_too_many_members_message = 'Görüşmeye en fazla {{number1}} kişi katılabilir. Burada {{number2}} kişi için daha boş yer var.';
 z.string.tr.modal_uploads_parallel = 'Tek seferde en fazla {{number}} boyutunda dosya gönderebilirsiniz.';
 
 z.string.tr.connection_request_connect = 'Bağlan';
@@ -265,8 +258,7 @@ z.string.tr.conversations_connection_request_one = 'Bir kişi bekliyor';
 z.string.tr.conversations_empty_conversation = 'Grup sohbeti';
 z.string.tr.conversations_empty_conversation_description = 'Herkes ayrıldı';
 z.string.tr.conversations_no_conversations = 'Hiç konuşma yok';
-z.string.tr.conversations_no_conversations_detail =
-  'Bir konuşma başlatın, bir grup oluşturun veya katılmak için insanları davet edin.';
+z.string.tr.conversations_no_conversations_detail = 'Bir konuşma başlatın, bir grup oluşturun veya katılmak için insanları davet edin.';
 z.string.tr.conversations_popover_archive = 'Arşivle';
 z.string.tr.conversations_popover_block = 'Engelle';
 z.string.tr.conversations_popover_cancel = 'İsteği iptal et';
@@ -325,22 +317,18 @@ z.string.tr.people_no_matches = 'Eşleşen sonuç yok.\nBaşka bir isim girmeyi 
 z.string.tr.people_invite = 'İnsanları davet et';
 z.string.tr.people_share = 'Kişileri Paylaş';
 z.string.tr.people_bring_your_friends = 'Arkadaşlarını Wire’a getir';
-z.string.tr.people_invite_detail =
-  'Kişileriniz paylaşmak, başkalarıyla bağlanmanızı kolaylaştırır. Tüm bilgilerinizi gizler ve kimseyle paylaşmayız.';
+z.string.tr.people_invite_detail = 'Kişileriniz paylaşmak, başkalarıyla bağlanmanızı kolaylaştırır. Tüm bilgilerinizi gizler ve kimseyle paylaşmayız.';
 z.string.tr.people_invite_button_contacts = 'Kişilerden';
 z.string.tr.people_invite_button_gmail = 'Gmail’den';
 z.string.tr.people_invite_headline = 'Arkadaşlarınızı getirin';
 z.string.tr.people_tabs_details = 'Detaylar';
 z.string.tr.people_tabs_devices = 'Cihazlar';
-z.string.tr.people_tabs_devices_headline =
-  'Wire her cihaza eşsiz bir parmak izi verir. {{user}} ile karşılaştırın ve konuşmayı doğrulayın.';
+z.string.tr.people_tabs_devices_headline = 'Wire her cihaza eşsiz bir parmak izi verir. {{user}} ile karşılaştırın ve konuşmayı doğrulayın.';
 z.string.tr.people_tabs_devices_why_verify = 'Neden konuşmayı doğrulamalıyız?';
-z.string.tr.people_tabs_no_devices_headline =
-  '{{user}}, Wire’ın eski bir versiyonunu kullanıyor. Hiçbir cihaz burada gösterilmiyor.';
+z.string.tr.people_tabs_no_devices_headline = '{{user}}, Wire’ın eski bir versiyonunu kullanıyor. Hiçbir cihaz burada gösterilmiyor.';
 z.string.tr.people_tabs_device_detail_all_my_devices = 'Tüm cihazlarımı göster';
 z.string.tr.people_tabs_device_detail_device_fingerprint = 'Cihaz parmak izi';
-z.string.tr.people_tabs_device_detail_headline =
-  'Bunun {{html1}}{{user}}s’in aygıtında gösterilen{{html2}} parmak iziyle eşleştiğini doğrulayın.';
+z.string.tr.people_tabs_device_detail_headline = 'Bunun {{html1}}{{user}}s’in aygıtında gösterilen{{html2}} parmak iziyle eşleştiğini doğrulayın.';
 z.string.tr.people_tabs_device_detail_how_to = 'Bunu nasıl yapıyoruz?';
 z.string.tr.people_tabs_device_detail_reset_session = 'Oturumu Sıfırla';
 z.string.tr.people_tabs_device_detail_show_my_device = 'Cihaz parmak izimi göster';
@@ -363,8 +351,7 @@ z.string.tr.people_remove_headline = 'Çıkar?';
 z.string.tr.people_remove_message = '{{user}} bu konuşmaya mesaj gönderemeyecek ve bu konuşmadan mesaj alamayacak.';
 
 z.string.tr.people_unblock_headline = 'Engeli kaldır?';
-z.string.tr.people_unblock_message =
-  '{{user}} sizinle tekrardan iletişim kurabilecek ve sizi grup konuşmalarına ekleyebilecek.';
+z.string.tr.people_unblock_message = '{{user}} sizinle tekrardan iletişim kurabilecek ve sizi grup konuşmalarına ekleyebilecek.';
 
 z.string.tr.people_button_add = 'Kişileri Ekle';
 z.string.tr.people_button_block = 'Engelle';
@@ -414,20 +401,16 @@ z.string.tr.preferences_av_speakers = 'Hoparlörler';
 z.string.tr.preferences_devices_activated_in = '{{location}} ’de';
 z.string.tr.preferences_devices_activated_on = '{{date}} ’da aktif edildi';
 z.string.tr.preferences_devices_active = 'Aktif';
-z.string.tr.preferences_devices_active_detail =
-  'Eğer yukarıdaki cihazı tanımıyorsanız, cihazı kaldırın ve şifrenizi sıfırlayın.';
+z.string.tr.preferences_devices_active_detail = 'Eğer yukarıdaki cihazı tanımıyorsanız, cihazı kaldırın ve şifrenizi sıfırlayın.';
 z.string.tr.preferences_devices_current = 'Mevcut';
 z.string.tr.preferences_devices_fingerprint = 'Anahtar Parmak İzi';
-z.string.tr.preferences_devices_fingerprint_detail =
-  'Wire her cihaza kendine has bir parmak izi verir. Cihazlarınızı ve konuşmalarınızı doğrulamak için parmak izlerinizi karşılaştırın.';
+z.string.tr.preferences_devices_fingerprint_detail = 'Wire her cihaza kendine has bir parmak izi verir. Cihazlarınızı ve konuşmalarınızı doğrulamak için parmak izlerinizi karşılaştırın.';
 z.string.tr.preferences_devices_id = 'ID: ';
 z.string.tr.preferences_devices_remove = 'Çıkart';
 z.string.tr.preferences_devices_remove_cancel = 'İptal';
-z.string.tr.preferences_devices_remove_detail =
-  'Eğer bu cihazı kullanmayı bıraktıysanız, cihazı kaldırın. Ardından cihazdan otomatik olarak çıkış yapılacaktır.';
+z.string.tr.preferences_devices_remove_detail = 'Eğer bu cihazı kullanmayı bıraktıysanız, cihazı kaldırın. Ardından cihazdan otomatik olarak çıkış yapılacaktır.';
 z.string.tr.preferences_devices_session_confirmation = 'Oturum sıfırlandı.';
-z.string.tr.preferences_devices_session_detail =
-  'Parmak izleri eşleşmezse, her iki tarafta da yeni şifreleme anahtarları oluşturmak için oturumu sıfırlayın.';
+z.string.tr.preferences_devices_session_detail = 'Parmak izleri eşleşmezse, her iki tarafta da yeni şifreleme anahtarları oluşturmak için oturumu sıfırlayın.';
 z.string.tr.preferences_devices_session_reset = 'Oturumu Sıfırla';
 z.string.tr.preferences_devices_session_ongoing = 'Oturum sıfırlanıyor…';
 z.string.tr.preferences_devices_verification = 'Doğrulanmış';
@@ -442,8 +425,7 @@ z.string.tr.preferences_options_audio_some_detail = 'Pingler ve aramalar';
 z.string.tr.preferences_options_contacts = 'Kişiler';
 z.string.tr.preferences_options_contacts_gmail = 'Gmail’den içe aktar';
 z.string.tr.preferences_options_contacts_macos = 'Kişilerden içe aktar';
-z.string.tr.preferences_options_contacts_detail =
-  'İletişim verilerinizi sizi başkalarıyla bağlayabilmek için kullanıyoruz. Tüm bilgilerinizi gizler ve kimseyle paylaşmayız.';
+z.string.tr.preferences_options_contacts_detail = 'İletişim verilerinizi sizi başkalarıyla bağlayabilmek için kullanıyoruz. Tüm bilgilerinizi gizler ve kimseyle paylaşmayız.';
 z.string.tr.preferences_options_data = 'Kullanım ve kilitlenme raporları';
 z.string.tr.preferences_options_data_checkbox = 'Kullanım ve kilitlenme raporları';
 z.string.tr.preferences_options_data_detail = 'Anonim bilgiler göndererek Wire’ın daha iyi olmasını sağlayabilirsiniz.';
@@ -462,13 +444,11 @@ z.string.tr.search_team_groups = 'Takım Konuşmaları';
 z.string.tr.search_team_members = 'Takım Üyeleri';
 z.string.tr.search_top_people = 'Enler';
 z.string.tr.search_try_search = 'İnsanları isimlerine veya kullanıcı adlarına göre bul';
-z.string.tr.search_no_contacts_on_wire =
-  'Wire’da hiç kişiniz yok. İnsanları isimlerine veya kullanıcı adlarına göre bulmayı deneyin.';
+z.string.tr.search_no_contacts_on_wire = 'Wire’da hiç kişiniz yok. İnsanları isimlerine veya kullanıcı adlarına göre bulmayı deneyin.';
 z.string.tr.search_others = 'Bağlan';
 
 z.string.tr.upload_google_headline = 'Konuşmak için\ninsanları bul.';
-z.string.tr.upload_google_message =
-  'İletişim verilerinizi sizi başkalarıyla bağlayabilmek için kullanıyoruz. Tüm bilgilerinizi gizler ve kimseyle paylaşmayız.';
+z.string.tr.upload_google_message = 'İletişim verilerinizi sizi başkalarıyla bağlayabilmek için kullanıyoruz. Tüm bilgilerinizi gizler ve kimseyle paylaşmayız.';
 z.string.tr.upload_google_headline_error = 'Bir şeyler \nyanlış gitti.';
 z.string.tr.upload_google_message_error = 'Bilgilerinzi alamadık. Lütfen kişileriniz yeniden içe aktarmayı deneyin.';
 z.string.tr.upload_google_button_again = 'Tekrar deneyin';
@@ -505,10 +485,8 @@ z.string.tr.warning_call_upgrade_browser = 'Arama yapmak için, Google Chrome’
 z.string.tr.warning_learn_more = 'Daha fazla bilgi';
 z.string.tr.warning_not_found_camera = 'Arama yapamıyorsunuz çünkü bilgisayarınızda bir kamera bulunmamaktadır.';
 z.string.tr.warning_not_found_microphone = 'Arama yapamıyorsunuz çünkü bilgisayarınızda bir mikrofon bulunmamaktadır.';
-z.string.tr.warning_permission_denied_camera =
-  'Arama yapamıyorsunuz çünkü tarayıcınızın kameraya erişim izni bulunmamaktadır.';
-z.string.tr.warning_permission_denied_microphone =
-  'Arama yapamıyorsunuz çünkü tarayıcınızın mikrofona erişim izni bulunmamaktadır.';
+z.string.tr.warning_permission_denied_camera = 'Arama yapamıyorsunuz çünkü tarayıcınızın kameraya erişim izni bulunmamaktadır.';
+z.string.tr.warning_permission_denied_microphone = 'Arama yapamıyorsunuz çünkü tarayıcınızın mikrofona erişim izni bulunmamaktadır.';
 z.string.tr.warning_permission_denied_screen = 'Tarayıcınız ekranınızı paylaşmak için gerekli izinleri sağlamalıdır.';
 z.string.tr.warning_permission_request_camera = '{{icon}} Kameraya erişime izin ver';
 z.string.tr.warning_permission_request_microphone = '{{icon}} Mikrofona erişime izin ver';
@@ -516,8 +494,7 @@ z.string.tr.warning_permission_request_notification = '{{icon}} Bildirimlere izi
 z.string.tr.warning_permission_request_screen = '{{icon}} Ekrana erişime izin ver';
 z.string.tr.warning_tell_me_how = 'Anlat bana';
 
-z.string.tr.warning_connectivity_connection_lost =
-  'Bağlanmaya çalışılıyor. Wire mesajlarınızı teslim etmekte sorun yaşayabilir.';
+z.string.tr.warning_connectivity_connection_lost = 'Bağlanmaya çalışılıyor. Wire mesajlarınızı teslim etmekte sorun yaşayabilir.';
 z.string.tr.warning_connectivity_no_internet = 'İnternet bağlantısı yok. Mesaj gönderemez veya mesaj alamazsınız.';
 
 z.string.tr.warning_lifecycle_update = 'Wire’ın yeni bir versiyonu mevcut.';

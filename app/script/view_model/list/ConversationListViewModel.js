@@ -104,7 +104,10 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
       return z.l10n.text(z.string.tooltip_conversations_archived, this.conversations_archived().length);
     });
 
-    this.start_tooltip = z.l10n.text(z.string.tooltip_conversations_start, z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.START));
+    this.start_tooltip = z.l10n.text(
+      z.string.tooltip_conversations_start,
+      z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.START),
+    );
 
     this.show_connect_requests = ko.pureComputed(() => {
       const team_et = this.conversation_repository.active_team();

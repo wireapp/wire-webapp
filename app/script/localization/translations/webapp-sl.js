@@ -35,8 +35,7 @@ z.string.sl.auth_account_country_code = 'Koda države';
 z.string.sl.auth_account_create = 'Ustvari';
 z.string.sl.auth_account_create_account = 'Ustvari račun';
 z.string.sl.auth_account_expiration = 'Ker je vaša seja potekla, ste bili odjavljeni. Prosimo prijavite se ponovno.';
-z.string.sl.auth_account_get_wire =
-  'Preprosta, zasebna in varna aplikacija za klepet, klice, skupno rabo slik, glasbo, video posnetke, GIFe in še več.';
+z.string.sl.auth_account_get_wire = 'Preprosta, zasebna in varna aplikacija za klepet, klice, skupno rabo slik, glasbo, video posnetke, GIFe in še več.';
 z.string.sl.auth_account_password_forgot = 'Pozabljeno geslo';
 z.string.sl.auth_account_public_computer = 'To je javni računalnik';
 z.string.sl.auth_account_sign_in = 'Prijava';
@@ -143,8 +142,7 @@ z.string.sl.modal_connected_device_message = 'Če tega niste storili, odstranite
 z.string.sl.modal_connected_device_manage_devices = 'upravljanje naprav';
 z.string.sl.modal_delete_account_action = 'Izbriši';
 z.string.sl.modal_delete_account_headline = 'Izbriši račun';
-z.string.sl.modal_delete_account_message =
-  'Poslali bomo sporočilo preko e-pošte ali SMS. Sledite povezavi za trajni izbris vašega računa.';
+z.string.sl.modal_delete_account_message = 'Poslali bomo sporočilo preko e-pošte ali SMS. Sledite povezavi za trajni izbris vašega računa.';
 z.string.sl.modal_delete_button = 'Izbriši';
 z.string.sl.modal_delete_headline = 'Izbriši le zame?';
 z.string.sl.modal_delete_message = 'To dejanje ne more biti razveljavljeno.';
@@ -177,8 +175,7 @@ z.string.sl.modal_session_reset_message_1 = 'Če težave niste odpravili,';
 z.string.sl.modal_session_reset_message_link = 'kontaktirajte';
 z.string.sl.modal_session_reset_message_2 = 'nas.';
 z.string.sl.modal_too_many_members_headline = 'Polna hiša';
-z.string.sl.modal_too_many_members_message =
-  'Do {{number1}} oseb se lahko pridruži pogovoru. Tukaj je prostora še za {{number2}} oseb.';
+z.string.sl.modal_too_many_members_message = 'Do {{number1}} oseb se lahko pridruži pogovoru. Tukaj je prostora še za {{number2}} oseb.';
 z.string.sl.modal_uploads_parallel = 'Lahko pošljete do {{number}} zbirk naenkrat.';
 
 z.string.sl.connection_request_connect = 'Poveži';
@@ -223,13 +220,11 @@ z.string.sl.conversation_voice_channel_deactivate = ' je klical(-a)';
 z.string.sl.conversation_voice_channel_deactivate_you = ' je klical(-a)';
 z.string.sl.conversation_yesterday = 'Včeraj';
 z.string.sl.conversation_unable_to_decrypt_1 = 'sporočilo od {{user}} ni bilo prejeto.';
-z.string.sl.conversation_unable_to_decrypt_2 =
-  'Identita naprave od {{user}} je bila spremenjena. Sporočilo ni dostavljeno.';
+z.string.sl.conversation_unable_to_decrypt_2 = 'Identita naprave od {{user}} je bila spremenjena. Sporočilo ni dostavljeno.';
 z.string.sl.conversation_unable_to_decrypt_link = 'Zakaj?';
 z.string.sl.conversation_unable_to_decrypt_error_message = 'Napaka';
 z.string.sl.conversation_unable_to_decrypt_reset_session = 'Ponastavi sejo';
-z.string.sl.conversation_missed_messages =
-  'Te naprave nekaj časa niste uporabljali. Nekatera sporočila se morda tukaj ne bodo pojavila.';
+z.string.sl.conversation_missed_messages = 'Te naprave nekaj časa niste uporabljali. Nekatera sporočila se morda tukaj ne bodo pojavila.';
 z.string.sl.conversation_asset_uploading = 'Nalaganje…';
 z.string.sl.conversation_asset_downloading = 'Prenašanje…';
 z.string.sl.conversation_asset_upload_failed = 'Nalaganje ni uspelo';
@@ -323,22 +318,18 @@ z.string.sl.people_no_matches = 'Brez ujemanja rezultatov. \nPoizkusite vnesti d
 z.string.sl.people_invite = 'Povabite osebe';
 z.string.sl.people_share = 'Deli Stike';
 z.string.sl.people_bring_your_friends = 'Pripeljite svoje prijatelje na Wire';
-z.string.sl.people_invite_detail =
-  'Deljenje vaših stikov pomaga pri povezovanju z drugimi. Vse informacije anonimiziramo in ne delimo z drugimi.';
+z.string.sl.people_invite_detail = 'Deljenje vaših stikov pomaga pri povezovanju z drugimi. Vse informacije anonimiziramo in ne delimo z drugimi.';
 z.string.sl.people_invite_button_contacts = 'Iz imenika stikov';
 z.string.sl.people_invite_button_gmail = 'Iz Gmail';
 z.string.sl.people_invite_headline = 'Pripeljite vaše prijatelje';
 z.string.sl.people_tabs_details = 'Podrobnosti';
 z.string.sl.people_tabs_devices = 'Naprave';
-z.string.sl.people_tabs_devices_headline =
-  'Wire dodeli vsaki napravi edinstven prstni odtis. Primerjajte jih z {{user}} in preverite vaš pogovor.';
+z.string.sl.people_tabs_devices_headline = 'Wire dodeli vsaki napravi edinstven prstni odtis. Primerjajte jih z {{user}} in preverite vaš pogovor.';
 z.string.sl.people_tabs_devices_why_verify = 'Zakaj preveriti pogovor?';
-z.string.sl.people_tabs_no_devices_headline =
-  '{{user}} uporablja starejšo različico Wire. Nobenih naprav tukaj ni prikazano.';
+z.string.sl.people_tabs_no_devices_headline = '{{user}} uporablja starejšo različico Wire. Nobenih naprav tukaj ni prikazano.';
 z.string.sl.people_tabs_device_detail_all_my_devices = 'Prikaži vse moje naprave';
 z.string.sl.people_tabs_device_detail_device_fingerprint = 'Prstni odtis naprave';
-z.string.sl.people_tabs_device_detail_headline =
-  'Preveri, da se to ujema s prstnim odtisom na {{html1}}napravi od {{user}}{{html2}}.';
+z.string.sl.people_tabs_device_detail_headline = 'Preveri, da se to ujema s prstnim odtisom na {{html1}}napravi od {{user}}{{html2}}.';
 z.string.sl.people_tabs_device_detail_how_to = 'Kako to storim?';
 z.string.sl.people_tabs_device_detail_reset_session = 'Ponastavi sejo';
 z.string.sl.people_tabs_device_detail_show_my_device = 'Prikaži prstni odtis moje naprave';
@@ -411,20 +402,16 @@ z.string.sl.preferences_av_speakers = 'Zvočniki';
 z.string.sl.preferences_devices_activated_in = 'v {{location}}';
 z.string.sl.preferences_devices_activated_on = 'Aktiviran ob {{date}}';
 z.string.sl.preferences_devices_active = 'Aktivno';
-z.string.sl.preferences_devices_active_detail =
-  'Če ne prepoznate zgornje naprave, jo odstranite in ponastavite vaše geslo.';
+z.string.sl.preferences_devices_active_detail = 'Če ne prepoznate zgornje naprave, jo odstranite in ponastavite vaše geslo.';
 z.string.sl.preferences_devices_current = 'Trenutna';
 z.string.sl.preferences_devices_fingerprint = 'Ključ prstnega odtisa naprave';
-z.string.sl.preferences_devices_fingerprint_detail =
-  'Wire dodeli vsaki napravi edinstven prstni odtis. Primerjajte jih, preverite vaše naprave in pogovore.';
+z.string.sl.preferences_devices_fingerprint_detail = 'Wire dodeli vsaki napravi edinstven prstni odtis. Primerjajte jih, preverite vaše naprave in pogovore.';
 z.string.sl.preferences_devices_id = 'ID: ';
 z.string.sl.preferences_devices_remove = 'Odstrani';
 z.string.sl.preferences_devices_remove_cancel = 'Prekliči';
-z.string.sl.preferences_devices_remove_detail =
-  'Odstrani to napravo, če ste jo prenehali uporabljati. Takoj boste iz nje odjavljeni.';
+z.string.sl.preferences_devices_remove_detail = 'Odstrani to napravo, če ste jo prenehali uporabljati. Takoj boste iz nje odjavljeni.';
 z.string.sl.preferences_devices_session_confirmation = 'Seja je bila ponastavljena.';
-z.string.sl.preferences_devices_session_detail =
-  'Če se prstni odtisi naprav ne ujemajo, ponastavite sejo za ustvaritev novih šifrirnih ključev na obeh straneh.';
+z.string.sl.preferences_devices_session_detail = 'Če se prstni odtisi naprav ne ujemajo, ponastavite sejo za ustvaritev novih šifrirnih ključev na obeh straneh.';
 z.string.sl.preferences_devices_session_reset = 'Ponastavi sejo';
 z.string.sl.preferences_devices_session_ongoing = 'Ponastavljanje seje…';
 z.string.sl.preferences_devices_verification = 'Preverjena';
@@ -439,8 +426,7 @@ z.string.sl.preferences_options_audio_some_detail = 'Pingi in klici';
 z.string.sl.preferences_options_contacts = 'Stiki';
 z.string.sl.preferences_options_contacts_gmail = 'Uvozi iz Gmail';
 z.string.sl.preferences_options_contacts_macos = 'Uvozi iz imenika stikov';
-z.string.sl.preferences_options_contacts_detail =
-  'Uporabljamo vaše podatke stikov pri povezovanju z drugimi. Vse informacije anonimiziramo in ne delimo z drugimi.';
+z.string.sl.preferences_options_contacts_detail = 'Uporabljamo vaše podatke stikov pri povezovanju z drugimi. Vse informacije anonimiziramo in ne delimo z drugimi.';
 z.string.sl.preferences_options_data = 'Podatki o uporabi in poročila o prisilnih ustavitvah';
 z.string.sl.preferences_options_data_checkbox = 'Podatki o uporabi in poročila o prisilnih ustavitvah';
 z.string.sl.preferences_options_data_detail = 'Izboljšajte Wire s pošiljanjem anonimnih informacij.';
@@ -459,13 +445,11 @@ z.string.sl.search_team_groups = 'Ekipni pogovori';
 z.string.sl.search_team_members = 'Člani ekipe';
 z.string.sl.search_top_people = 'Top osebe';
 z.string.sl.search_try_search = 'Najdi osebe po imenu ali uporabniškem imenu';
-z.string.sl.search_no_contacts_on_wire =
-  'Nimate nobenih stikov na Wire.\nPoizkusite najti osebe po imenu\nali uporabniškem imenu.';
+z.string.sl.search_no_contacts_on_wire = 'Nimate nobenih stikov na Wire.\nPoizkusite najti osebe po imenu\nali uporabniškem imenu.';
 z.string.sl.search_others = 'Poveži';
 
 z.string.sl.upload_google_headline = 'Poiščite osebe\nza pogovor.';
-z.string.sl.upload_google_message =
-  'Uporabljamo vaše podatke stikov pri povezovanju z drugimi. Vse informacije anonimiziramo in ne delimo z drugimi.';
+z.string.sl.upload_google_message = 'Uporabljamo vaše podatke stikov pri povezovanju z drugimi. Vse informacije anonimiziramo in ne delimo z drugimi.';
 z.string.sl.upload_google_headline_error = 'Nekaj je\nšlo narobe.';
 z.string.sl.upload_google_message_error = 'Nismo prejeli vaših podatkov. Prosimo poizkusite ponovno uvoziti stike.';
 z.string.sl.upload_google_button_again = 'Poskusite ponovno';

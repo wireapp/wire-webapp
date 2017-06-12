@@ -27,18 +27,15 @@ z.string.lt.nonexistent_user = 'Ištrintas naudotojas';
 z.string.lt.and = 'ir';
 
 z.string.lt.alert_upload_file_format = 'Nepavyksta naudoti šio paveikslo.\nPrašome pasirinkti PNG arba JPEG failą.';
-z.string.lt.alert_upload_too_small =
-  'Nepavyksta naudoti šio paveikslo.\nPrašome pasirinkti paveikslą, kuris būtų bent 320 x 320 pikselių.';
+z.string.lt.alert_upload_too_small = 'Nepavyksta naudoti šio paveikslo.\nPrašome pasirinkti paveikslą, kuris būtų bent 320 x 320 pikselių.';
 z.string.lt.alert_upload_too_large = 'Šis paveikslas yra per didelis.\nJūs galite įkelti failus iki {{number}} MB.';
 z.string.lt.alert_gif_too_large = 'Animacija yra per didelė.\nDidžiausias dydis yra {{number}} MB.';
 
 z.string.lt.auth_account_country_code = 'Šalies kodas';
 z.string.lt.auth_account_create = 'Sukurti';
 z.string.lt.auth_account_create_account = 'Sukurti paskyrą';
-z.string.lt.auth_account_expiration =
-  'Jūs buvote atjungti, kadangi baigėsi jūsų seansas. Prašome prisijungti dar kartą.';
-z.string.lt.auth_account_get_wire =
-  'Paprasta, privati ir saugi pokalbių programa, skirta pokalbiams, skambučiams bei paveikslų, muzikos, vaizdo įrašų, GIF ir kitų failų bendrinimui.';
+z.string.lt.auth_account_expiration = 'Jūs buvote atjungti, kadangi baigėsi jūsų seansas. Prašome prisijungti dar kartą.';
+z.string.lt.auth_account_get_wire = 'Paprasta, privati ir saugi pokalbių programa, skirta pokalbiams, skambučiams bei paveikslų, muzikos, vaizdo įrašų, GIF ir kitų failų bendrinimui.';
 z.string.lt.auth_account_password_forgot = 'Pamiršau slaptažodį';
 z.string.lt.auth_account_public_computer = 'Tai yra viešas kompiuteris';
 z.string.lt.auth_account_sign_in = 'Prisijungti';
@@ -59,8 +56,7 @@ z.string.lt.auth_verify_code_change_phone = 'Pakeisti telefono numerį';
 z.string.lt.auth_verify_password_headline = 'Įveskite savo slaptažodį';
 
 z.string.lt.auth_limit_devices_headline = 'Įrenginiai';
-z.string.lt.auth_limit_description =
-  'Norėdami pradėti naudoti Wire šiame įrenginyje, pašalinkite vieną iš savo kitų įrenginių.';
+z.string.lt.auth_limit_description = 'Norėdami pradėti naudoti Wire šiame įrenginyje, pašalinkite vieną iš savo kitų įrenginių.';
 z.string.lt.auth_limit_button_manage = 'Tvarkyti įrenginius';
 z.string.lt.auth_limit_button_sign_out = 'Atsijungti';
 z.string.lt.auth_limit_devices_current = '(Esamas)';
@@ -121,8 +117,7 @@ z.string.lt.modal_button_ok = 'Gerai';
 z.string.lt.modal_button_send = 'Siųsti';
 
 z.string.lt.modal_block_conversation_headline = 'Užblokuoti {{user}}?';
-z.string.lt.modal_block_conversation_message =
-  '{{user}} negalės su jumis susisiekti ar pridėti jus į grupės pokalbius.';
+z.string.lt.modal_block_conversation_message = '{{user}} negalės su jumis susisiekti ar pridėti jus į grupės pokalbius.';
 z.string.lt.modal_block_conversation_button = 'Užblokuoti';
 z.string.lt.modal_call_conversation_empty_headline = 'Nėra kam skambinti';
 z.string.lt.modal_call_conversation_empty_message = 'Čia daugiau nieko nėra.';
@@ -143,13 +138,11 @@ z.string.lt.modal_clear_conversation_option = 'Taip pat išeiti iš pokalbio';
 z.string.lt.modal_clear_conversation_button = 'Ištrinti';
 z.string.lt.modal_connected_device_headline = 'Jūsų paskyra buvo naudota:';
 z.string.lt.modal_connected_device_from = 'Iš:';
-z.string.lt.modal_connected_device_message =
-  'Jeigu jūs to nedarėte, pašalinkite įrenginį ir atstatykite savo slaptažodį.';
+z.string.lt.modal_connected_device_message = 'Jeigu jūs to nedarėte, pašalinkite įrenginį ir atstatykite savo slaptažodį.';
 z.string.lt.modal_connected_device_manage_devices = 'tvarkyti įrenginius';
 z.string.lt.modal_delete_account_action = 'Ištrinti';
 z.string.lt.modal_delete_account_headline = 'Ištrinti paskyrą';
-z.string.lt.modal_delete_account_message =
-  'Mes išsiųsime jums pranešimą el. paštu arba SMS žinute. Pereikite nuorodos adresu, kad visiems laikams ištrintumėte savo paskyrą.';
+z.string.lt.modal_delete_account_message = 'Mes išsiųsime jums pranešimą el. paštu arba SMS žinute. Pereikite nuorodos adresu, kad visiems laikams ištrintumėte savo paskyrą.';
 z.string.lt.modal_delete_button = 'Ištrinti';
 z.string.lt.modal_delete_headline = 'Ištrinti tik man?';
 z.string.lt.modal_delete_message = 'To negalima bus atšaukti.';
@@ -182,8 +175,7 @@ z.string.lt.modal_session_reset_message_1 = 'Jeigu problema neišspręsta,';
 z.string.lt.modal_session_reset_message_link = 'susisiekite';
 z.string.lt.modal_session_reset_message_2 = 'su mumis.';
 z.string.lt.modal_too_many_members_headline = 'Balso kanalas perpildytas';
-z.string.lt.modal_too_many_members_message =
-  'Prie pokalbio gali prisijungti iki {{number1}} žmonių. Čia yra vietos tik dar {{number2}} žmonėms.';
+z.string.lt.modal_too_many_members_message = 'Prie pokalbio gali prisijungti iki {{number1}} žmonių. Čia yra vietos tik dar {{number2}} žmonėms.';
 z.string.lt.modal_uploads_parallel = 'Jūs vienu metu galite siųsti iki {{number}} failų.';
 
 z.string.lt.connection_request_connect = 'Užmegzti kontaktą';
@@ -231,8 +223,7 @@ z.string.lt.conversation_unable_to_decrypt_2 = 'Pasikeitė {{user}} įrenginio t
 z.string.lt.conversation_unable_to_decrypt_link = 'Kodėl?';
 z.string.lt.conversation_unable_to_decrypt_error_message = 'Klaida';
 z.string.lt.conversation_unable_to_decrypt_reset_session = 'Atstatyti seansą';
-z.string.lt.conversation_missed_messages =
-  'Jūs kurį laiką nenaudojote šio įrenginio. Kai kurios žinutės čia gali neatsirasti.';
+z.string.lt.conversation_missed_messages = 'Jūs kurį laiką nenaudojote šio įrenginio. Kai kurios žinutės čia gali neatsirasti.';
 z.string.lt.conversation_asset_uploading = 'Įkeliama…';
 z.string.lt.conversation_asset_downloading = 'Atsiunčiama…';
 z.string.lt.conversation_asset_upload_failed = 'Įkėlimas nepavyko';
@@ -318,21 +309,18 @@ z.string.lt.people_no_matches = 'Nėra atitinkančių rezultatų.\nPabandykite �
 z.string.lt.people_invite = 'Pakviesti žmones';
 z.string.lt.people_share = 'Dalintis kontaktais';
 z.string.lt.people_bring_your_friends = 'Pasikvieskite savo draugus į Wire';
-z.string.lt.people_invite_detail =
-  'Dalinimasis kontaktais padeda jums užmegzti kontaktą su kitais žmonėmis. Mes padarome visą informaciją anoniminę ir su niekuo ja nesidaliname.';
+z.string.lt.people_invite_detail = 'Dalinimasis kontaktais padeda jums užmegzti kontaktą su kitais žmonėmis. Mes padarome visą informaciją anoniminę ir su niekuo ja nesidaliname.';
 z.string.lt.people_invite_button_contacts = 'Iš kontaktų';
 z.string.lt.people_invite_button_gmail = 'Iš Gmail';
 z.string.lt.people_invite_headline = 'Pasikvieskite savo draugus';
 z.string.lt.people_tabs_details = 'Išsamiau';
 z.string.lt.people_tabs_devices = 'Įrenginiai';
-z.string.lt.people_tabs_devices_headline =
-  'Wire kiekvienam įrenginiui suteikia unikalų kontrolinį kodą. Palyginkite juos su {{user}} ir patvirtinkite savo pokalbį.';
+z.string.lt.people_tabs_devices_headline = 'Wire kiekvienam įrenginiui suteikia unikalų kontrolinį kodą. Palyginkite juos su {{user}} ir patvirtinkite savo pokalbį.';
 z.string.lt.people_tabs_devices_why_verify = 'Kam patvirtinti pokalbį?';
 z.string.lt.people_tabs_no_devices_headline = '{{user}} naudoja seną Wire versiją. Čia nerodomi jokie įrenginiai.';
 z.string.lt.people_tabs_device_detail_all_my_devices = 'Rodyti visus mano įrenginius';
 z.string.lt.people_tabs_device_detail_device_fingerprint = 'Įrenginio kontrolinis kodas';
-z.string.lt.people_tabs_device_detail_headline =
-  'Įsitikinkite, kad šis kontrolinis kodas yra toks pats, kaip ir įrenginyje, kurį naudoja {{html1}}{{user}}{{html2}}.';
+z.string.lt.people_tabs_device_detail_headline = 'Įsitikinkite, kad šis kontrolinis kodas yra toks pats, kaip ir įrenginyje, kurį naudoja {{html1}}{{user}}{{html2}}.';
 z.string.lt.people_tabs_device_detail_how_to = 'Kaip tai padaryti?';
 z.string.lt.people_tabs_device_detail_reset_session = 'Atstatyti seansą';
 z.string.lt.people_tabs_device_detail_show_my_device = 'Rodyti mano įrenginio kontrolinį kodą';
@@ -405,20 +393,16 @@ z.string.lt.preferences_av_speakers = 'Garsiakalbiai';
 z.string.lt.preferences_devices_activated_in = 'šalia {{location}}';
 z.string.lt.preferences_devices_activated_on = 'Aktyvuotas {{date}}';
 z.string.lt.preferences_devices_active = 'Aktyvus';
-z.string.lt.preferences_devices_active_detail =
-  'Jeigu jūs neatpažįstate aukščiau esančio įrenginio, pašalinkite jį ir atstatykite savo slaptažodį.';
+z.string.lt.preferences_devices_active_detail = 'Jeigu jūs neatpažįstate aukščiau esančio įrenginio, pašalinkite jį ir atstatykite savo slaptažodį.';
 z.string.lt.preferences_devices_current = 'Esamas';
 z.string.lt.preferences_devices_fingerprint = 'Rakto kontrolinis kodas';
-z.string.lt.preferences_devices_fingerprint_detail =
-  'Wire kiekvienam įrenginiui suteikia unikalų kontrolinį kodą. Palyginkite juos ir patvirtinkite savo įrenginius ir pokalbius.';
+z.string.lt.preferences_devices_fingerprint_detail = 'Wire kiekvienam įrenginiui suteikia unikalų kontrolinį kodą. Palyginkite juos ir patvirtinkite savo įrenginius ir pokalbius.';
 z.string.lt.preferences_devices_id = 'ID: ';
 z.string.lt.preferences_devices_remove = 'Šalinti';
 z.string.lt.preferences_devices_remove_cancel = 'Atsisakyti';
-z.string.lt.preferences_devices_remove_detail =
-  'Jeigu nebenaudojate šį įrenginį, pašalinkite jį. Jūs būsite nedelsiant atjungti iš šio įrenginio.';
+z.string.lt.preferences_devices_remove_detail = 'Jeigu nebenaudojate šį įrenginį, pašalinkite jį. Jūs būsite nedelsiant atjungti iš šio įrenginio.';
 z.string.lt.preferences_devices_session_confirmation = 'Seansas buvo atstatytas.';
-z.string.lt.preferences_devices_session_detail =
-  'Jeigu kontroliniai kodai nesutampa, atstatykite seansą, kad abiejose pusėse būtų sugeneruoti nauji šifravimo raktai.';
+z.string.lt.preferences_devices_session_detail = 'Jeigu kontroliniai kodai nesutampa, atstatykite seansą, kad abiejose pusėse būtų sugeneruoti nauji šifravimo raktai.';
 z.string.lt.preferences_devices_session_reset = 'Atstatyti seansą';
 z.string.lt.preferences_devices_session_ongoing = 'Atstatomas seansas…';
 z.string.lt.preferences_devices_verification = 'Patvirtintas';
@@ -433,8 +417,7 @@ z.string.lt.preferences_options_audio_some_detail = 'Ryšio tikrinimai ir skambu
 z.string.lt.preferences_options_contacts = 'Kontaktai';
 z.string.lt.preferences_options_contacts_gmail = 'Importuoti iš Gmail';
 z.string.lt.preferences_options_contacts_macos = 'Importuoti iš kontaktų';
-z.string.lt.preferences_options_contacts_detail =
-  'Mes naudojame jūsų kontaktinius duomenis tam, kad padėtume jums užmegzti kontaktą su kitais. Mes padarome visą informaciją anoniminę ir su niekuo ja nesidaliname.';
+z.string.lt.preferences_options_contacts_detail = 'Mes naudojame jūsų kontaktinius duomenis tam, kad padėtume jums užmegzti kontaktą su kitais. Mes padarome visą informaciją anoniminę ir su niekuo ja nesidaliname.';
 z.string.lt.preferences_options_data = 'Naudojimosi ir strigčių ataskaitos';
 z.string.lt.preferences_options_data_checkbox = 'Naudojimosi ir strigčių ataskaitos';
 z.string.lt.preferences_options_data_detail = 'Padarykite Wire geresnę, siųsdami anoniminę informaciją.';
@@ -453,16 +436,13 @@ z.string.lt.search_team_groups = 'Komandos pokalbiai';
 z.string.lt.search_team_members = 'Komandos dalyviai';
 z.string.lt.search_top_people = 'Mėgstami žmonės';
 z.string.lt.search_try_search = 'Raskite žmones pagal vardą arba naudotojo vardą';
-z.string.lt.search_no_contacts_on_wire =
-  'Jūs neturite Wire kontaktų.\nPabandykite rasti žmones pagal\nvardą arba naudotojo vardą.';
+z.string.lt.search_no_contacts_on_wire = 'Jūs neturite Wire kontaktų.\nPabandykite rasti žmones pagal\nvardą arba naudotojo vardą.';
 z.string.lt.search_others = 'Užmegzti kontaktą';
 
 z.string.lt.upload_google_headline = 'Raskite žmones\nsu kuriais pasikalbėti.';
-z.string.lt.upload_google_message =
-  'Mes naudojame jūsų kontaktinius duomenis tam, kad padėtume jums užmegzti kontaktą su kitais. Mes padarome visą informaciją anoniminę ir su niekuo ja nesidaliname.';
+z.string.lt.upload_google_message = 'Mes naudojame jūsų kontaktinius duomenis tam, kad padėtume jums užmegzti kontaktą su kitais. Mes padarome visą informaciją anoniminę ir su niekuo ja nesidaliname.';
 z.string.lt.upload_google_headline_error = 'Kažkas\nnutiko.';
-z.string.lt.upload_google_message_error =
-  'Mes negavome jūsų informacijos. Prašome pabandyti importuoti savo kontaktus dar kartą.';
+z.string.lt.upload_google_message_error = 'Mes negavome jūsų informacijos. Prašome pabandyti importuoti savo kontaktus dar kartą.';
 z.string.lt.upload_google_button_again = 'Bandyti dar kartą';
 
 z.string.lt.url_password_reset = 'forgot/';
@@ -497,10 +477,8 @@ z.string.lt.warning_call_upgrade_browser = 'Norėdami skambinti, atnaujinkite Go
 z.string.lt.warning_learn_more = 'Sužinoti daugiau';
 z.string.lt.warning_not_found_camera = 'Jūs negalite skambinti, nes jūsų kompiuteryje nėra kameros.';
 z.string.lt.warning_not_found_microphone = 'Jūs negalite skambinti, nes jūsų kompiuteryje nėra mikrofono.';
-z.string.lt.warning_permission_denied_camera =
-  'Jūs negalite skambinti, nes jūsų naršyklė neturi prieigos prie kameros.';
-z.string.lt.warning_permission_denied_microphone =
-  'Jūs negalite skambinti, nes jūsų naršyklė neturi prieigos prie mikrofono.';
+z.string.lt.warning_permission_denied_camera = 'Jūs negalite skambinti, nes jūsų naršyklė neturi prieigos prie kameros.';
+z.string.lt.warning_permission_denied_microphone = 'Jūs negalite skambinti, nes jūsų naršyklė neturi prieigos prie mikrofono.';
 z.string.lt.warning_permission_denied_screen = 'Norint bendrinti ekraną, jūsų naršyklei reikia leidimų.';
 z.string.lt.warning_permission_request_camera = '{{icon}} Leisti prieigą prie kameros';
 z.string.lt.warning_permission_request_microphone = '{{icon}} Leisti prieigą prie mikrofono';
@@ -508,8 +486,7 @@ z.string.lt.warning_permission_request_notification = '{{icon}} Leisti pranešim
 z.string.lt.warning_permission_request_screen = '{{icon}} Leisti prieigą prie ekrano';
 z.string.lt.warning_tell_me_how = 'Paaiškinkite kaip';
 
-z.string.lt.warning_connectivity_connection_lost =
-  'Bandoma prisijungti. Gali būti, kad Wire negalės pristatyti žinučių.';
+z.string.lt.warning_connectivity_connection_lost = 'Bandoma prisijungti. Gali būti, kad Wire negalės pristatyti žinučių.';
 z.string.lt.warning_connectivity_no_internet = 'Nėra interneto. Jūs negalėsite siųsti ir gauti žinutes.';
 
 z.string.lt.warning_lifecycle_update = 'Yra prieinama nauja Wire versija.';

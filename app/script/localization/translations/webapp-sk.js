@@ -27,18 +27,15 @@ z.string.sk.nonexistent_user = 'Odstránený používateľ';
 z.string.sk.and = 'a';
 
 z.string.sk.alert_upload_file_format = 'Tento obrázok nie je možné použiť.\nVyberte prosím súbor PNG alebo JPG.';
-z.string.sk.alert_upload_too_small =
-  'Tento obrázok nie je možné použiť.\nVyberte prosím obrázok minimálne 320 x 320 px.';
+z.string.sk.alert_upload_too_small = 'Tento obrázok nie je možné použiť.\nVyberte prosím obrázok minimálne 320 x 320 px.';
 z.string.sk.alert_upload_too_large = 'Tento obrázok je príliš veľký. Môžete nahrať súbory maximálne {{number}} MB.';
 z.string.sk.alert_gif_too_large = 'Animácia je príliš veľká. Maximálna veľkosť je {{number}} MB.';
 
 z.string.sk.auth_account_country_code = 'Kód krajiny';
 z.string.sk.auth_account_create = 'Vytvoriť';
 z.string.sk.auth_account_create_account = 'Vytvoriť konto';
-z.string.sk.auth_account_expiration =
-  'Boli ste odhlásení pretože vypršala platnosť Vášho sedenia. Prihláste sa prosím znova.';
-z.string.sk.auth_account_get_wire =
-  'Jednoduchý, súkromný & bezpečný messenger pre rozhovory, volania, zdieľanie fotiek, hudby, videí, obrázkov vo formáte GIF a ešte viac.';
+z.string.sk.auth_account_expiration = 'Boli ste odhlásení pretože vypršala platnosť Vášho sedenia. Prihláste sa prosím znova.';
+z.string.sk.auth_account_get_wire = 'Jednoduchý, súkromný & bezpečný messenger pre rozhovory, volania, zdieľanie fotiek, hudby, videí, obrázkov vo formáte GIF a ešte viac.';
 z.string.sk.auth_account_password_forgot = 'Zabudnuté heslo';
 z.string.sk.auth_account_public_computer = 'Toto je verejný počítač';
 z.string.sk.auth_account_sign_in = 'Prihlásenie';
@@ -123,8 +120,7 @@ z.string.sk.modal_button_ok = 'OK';
 z.string.sk.modal_button_send = 'Poslať';
 
 z.string.sk.modal_block_conversation_headline = 'Blokovať {{user}}?';
-z.string.sk.modal_block_conversation_message =
-  '{{user}} Vás nebude môcť kontaktovať, alebo Vás pozvať do skupinového rozhovoru.';
+z.string.sk.modal_block_conversation_message = '{{user}} Vás nebude môcť kontaktovať, alebo Vás pozvať do skupinového rozhovoru.';
 z.string.sk.modal_block_conversation_button = 'Blokovať';
 z.string.sk.modal_call_conversation_empty_headline = 'Nie je koho zavolať';
 z.string.sk.modal_call_conversation_empty_message = 'Už tu nikto nezostal.';
@@ -149,8 +145,7 @@ z.string.sk.modal_connected_device_message = 'Ak ste to neboli Vy, odpojte zaria
 z.string.sk.modal_connected_device_manage_devices = 'správa zariadení';
 z.string.sk.modal_delete_account_action = 'Zmazať';
 z.string.sk.modal_delete_account_headline = 'Vymazať účet';
-z.string.sk.modal_delete_account_message =
-  'Zašleme Vám e-mail, alebo SMS. Použite odkaz pre trvalé zmazanie Vášho účtu.';
+z.string.sk.modal_delete_account_message = 'Zašleme Vám e-mail, alebo SMS. Použite odkaz pre trvalé zmazanie Vášho účtu.';
 z.string.sk.modal_delete_button = 'Zmazať';
 z.string.sk.modal_delete_headline = 'Zmazať iba pre mňa?';
 z.string.sk.modal_delete_message = 'Táto akcia sa nedá vrátiť.';
@@ -232,8 +227,7 @@ z.string.sk.conversation_unable_to_decrypt_2 = '{{user}}´s zariadenie sa zmenil
 z.string.sk.conversation_unable_to_decrypt_link = 'Prečo?';
 z.string.sk.conversation_unable_to_decrypt_error_message = 'Chyba';
 z.string.sk.conversation_unable_to_decrypt_reset_session = 'Obnovenie spojenia';
-z.string.sk.conversation_missed_messages =
-  'Na chvíľu ste nepoužili toto zariadenie. Niektoré správy sa nemusia zobraziť.';
+z.string.sk.conversation_missed_messages = 'Na chvíľu ste nepoužili toto zariadenie. Niektoré správy sa nemusia zobraziť.';
 z.string.sk.conversation_asset_uploading = 'Nahrávanie…';
 z.string.sk.conversation_asset_downloading = 'Sťahovanie…';
 z.string.sk.conversation_asset_upload_failed = 'Nahrávanie zlyhalo';
@@ -328,22 +322,18 @@ z.string.sk.people_no_matches = 'Žiadne výsledky. Skúste zadať iné meno.';
 z.string.sk.people_invite = 'Pozvať ľudí';
 z.string.sk.people_share = 'Zdieľať kontakty';
 z.string.sk.people_bring_your_friends = 'Predstavte Vašim priateľom Wire';
-z.string.sk.people_invite_detail =
-  'Zdieľanie kontaktov Vám pomôže spojiť sa s ostatnými. Anonymizujeme všetky informácie a nezdieľame ich s nikým iným.';
+z.string.sk.people_invite_detail = 'Zdieľanie kontaktov Vám pomôže spojiť sa s ostatnými. Anonymizujeme všetky informácie a nezdieľame ich s nikým iným.';
 z.string.sk.people_invite_button_contacts = 'Z kontaktov';
 z.string.sk.people_invite_button_gmail = 'Z Gmailu';
 z.string.sk.people_invite_headline = 'Pozvať priateľov';
 z.string.sk.people_tabs_details = 'Detaily';
 z.string.sk.people_tabs_devices = 'Zariadenia';
-z.string.sk.people_tabs_devices_headline =
-  'Wire dáva každému zariadeniu jedinečný identifikátor. Porovnajte ich s {{user}} a overte Vaše rozhovory.';
+z.string.sk.people_tabs_devices_headline = 'Wire dáva každému zariadeniu jedinečný identifikátor. Porovnajte ich s {{user}} a overte Vaše rozhovory.';
 z.string.sk.people_tabs_devices_why_verify = 'Prečo overiť rozhovor?';
-z.string.sk.people_tabs_no_devices_headline =
-  '{{user}} používa staršiu verziu Wire. Žiadne zariadenia sa tu nezobrazujú.';
+z.string.sk.people_tabs_no_devices_headline = '{{user}} používa staršiu verziu Wire. Žiadne zariadenia sa tu nezobrazujú.';
 z.string.sk.people_tabs_device_detail_all_my_devices = 'Zobraziť všetky moje zariadenia';
 z.string.sk.people_tabs_device_detail_device_fingerprint = 'Identifikátor zaradenia';
-z.string.sk.people_tabs_device_detail_headline =
-  'Overte, že to zodpovedá identifikátoru zobrazenému na {{html1}}zariadení {{user}}{{html2}}.';
+z.string.sk.people_tabs_device_detail_headline = 'Overte, že to zodpovedá identifikátoru zobrazenému na {{html1}}zariadení {{user}}{{html2}}.';
 z.string.sk.people_tabs_device_detail_how_to = 'Ako to urobiť?';
 z.string.sk.people_tabs_device_detail_reset_session = 'Obnovenie spojenia';
 z.string.sk.people_tabs_device_detail_show_my_device = 'Zobraziť identifikátor môjho zariadenia';
@@ -419,16 +409,13 @@ z.string.sk.preferences_devices_active = 'Aktívne';
 z.string.sk.preferences_devices_active_detail = 'Ak nepoznáte zariadenie vyššie, odstráňte ho a nastavte nové heslo.';
 z.string.sk.preferences_devices_current = 'Aktuálny';
 z.string.sk.preferences_devices_fingerprint = 'Identifikátor kľúča';
-z.string.sk.preferences_devices_fingerprint_detail =
-  'Wire dáva každému zariadeniu jedinečný identifikátor. Porovnajte ich a overte Vaše zariadenia a rozhovory.';
+z.string.sk.preferences_devices_fingerprint_detail = 'Wire dáva každému zariadeniu jedinečný identifikátor. Porovnajte ich a overte Vaše zariadenia a rozhovory.';
 z.string.sk.preferences_devices_id = 'ID: ';
 z.string.sk.preferences_devices_remove = 'Odstrániť';
 z.string.sk.preferences_devices_remove_cancel = 'Zrušiť';
-z.string.sk.preferences_devices_remove_detail =
-  'Odstráňte toto zariadenie, ak ste ho prestali používať. Budete z neho ihneď odhlásený.';
+z.string.sk.preferences_devices_remove_detail = 'Odstráňte toto zariadenie, ak ste ho prestali používať. Budete z neho ihneď odhlásený.';
 z.string.sk.preferences_devices_session_confirmation = 'Relácia bola obnovená.';
-z.string.sk.preferences_devices_session_detail =
-  'Ak sa identifikátory nezhodujú, začnite novú reláciu pre vygenerovanie nových kľúčov na oboch stranách.';
+z.string.sk.preferences_devices_session_detail = 'Ak sa identifikátory nezhodujú, začnite novú reláciu pre vygenerovanie nových kľúčov na oboch stranách.';
 z.string.sk.preferences_devices_session_reset = 'Obnovenie spojenia';
 z.string.sk.preferences_devices_session_ongoing = 'Obnovovanie relácie…';
 z.string.sk.preferences_devices_verification = 'Overený';
@@ -443,8 +430,7 @@ z.string.sk.preferences_options_audio_some_detail = 'Pingy a hovory';
 z.string.sk.preferences_options_contacts = 'Kontakty';
 z.string.sk.preferences_options_contacts_gmail = 'Import z Gmailu';
 z.string.sk.preferences_options_contacts_macos = 'Import z Kontaktov';
-z.string.sk.preferences_options_contacts_detail =
-  'Vaše údaje o kontaktoch používame na pripojenie k iným užívateľom. Všetky informácie anonymizujeme a nezdieľame ich s nikým iným.';
+z.string.sk.preferences_options_contacts_detail = 'Vaše údaje o kontaktoch používame na pripojenie k iným užívateľom. Všetky informácie anonymizujeme a nezdieľame ich s nikým iným.';
 z.string.sk.preferences_options_data = 'Využitie údajov a správy o zlyhaní';
 z.string.sk.preferences_options_data_checkbox = 'Využitie údajov a správy o zlyhaní';
 z.string.sk.preferences_options_data_detail = 'Vylepšiť Wire odosielaním anonymných informácií.';
@@ -467,16 +453,13 @@ z.string.sk.search_team_groups = 'Tímové konverzácie';
 z.string.sk.search_team_members = 'Členovia tímu';
 z.string.sk.search_top_people = 'Top kontakty';
 z.string.sk.search_try_search = 'Nájsť ľudí podľa názvu, alebo užívateľského mena';
-z.string.sk.search_no_contacts_on_wire =
-  'Nemáte žiadne kontakty Wire. Skúste nájsť ľudí podľa názvu alebo užívateľského mena.';
+z.string.sk.search_no_contacts_on_wire = 'Nemáte žiadne kontakty Wire. Skúste nájsť ľudí podľa názvu alebo užívateľského mena.';
 z.string.sk.search_others = 'Pripojiť';
 
 z.string.sk.upload_google_headline = 'Nájsť ľudí\npre rozhovor.';
-z.string.sk.upload_google_message =
-  'Vaše údaje o kontaktoch používame na pripojenie k iným užívateľom. Všetky informácie anonymizujeme a nezdieľame ich s nikým iným.';
+z.string.sk.upload_google_message = 'Vaše údaje o kontaktoch používame na pripojenie k iným užívateľom. Všetky informácie anonymizujeme a nezdieľame ich s nikým iným.';
 z.string.sk.upload_google_headline_error = 'Niečo sa pokazilo.';
-z.string.sk.upload_google_message_error =
-  'Neprijali sme Vaše informácie. Skúste prosím znovu importovať Vaše kontakty.';
+z.string.sk.upload_google_message_error = 'Neprijali sme Vaše informácie. Skúste prosím znovu importovať Vaše kontakty.';
 z.string.sk.upload_google_button_again = 'Skúsiť znova';
 
 z.string.sk.url_password_reset = 'zabudnutý';
@@ -520,8 +503,7 @@ z.string.sk.warning_permission_request_notification = '{{icon}} Povoliť oznáme
 z.string.sk.warning_permission_request_screen = '{{icon}} Povoliť prístup k obrazovke';
 z.string.sk.warning_tell_me_how = 'Povedz mi, ako';
 
-z.string.sk.warning_connectivity_connection_lost =
-  'Prebieha pokus o pripojenie. Wire nemusí byť schopný doručiť správy.';
+z.string.sk.warning_connectivity_connection_lost = 'Prebieha pokus o pripojenie. Wire nemusí byť schopný doručiť správy.';
 z.string.sk.warning_connectivity_no_internet = 'Bez prístupu na internet. Nebudete môcť odosielať ani prijímať správy.';
 
 z.string.sk.warning_lifecycle_update = 'Je dostupná nová verzia programu.';

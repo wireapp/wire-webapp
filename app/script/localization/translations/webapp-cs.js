@@ -26,18 +26,15 @@ z.string.cs.nonexistent_user = 'Smazaný uživatel';
 z.string.cs.and = 'a';
 
 z.string.cs.alert_upload_file_format = 'Tento obrázek nelze použít.\nVyberte prosím PNG nebo JPEG soubor.';
-z.string.cs.alert_upload_too_small =
-  'Tento obrázek nelze použít.\nVyberte prosím obrázek, který je veliký alespoň 320 x 320 px.';
-z.string.cs.alert_upload_too_large =
-  'Tento obrázek je příliš veliký.\nMůžete nahrávat soubory až do velikosti {{number}} MB.';
+z.string.cs.alert_upload_too_small = 'Tento obrázek nelze použít.\nVyberte prosím obrázek, který je veliký alespoň 320 x 320 px.';
+z.string.cs.alert_upload_too_large = 'Tento obrázek je příliš veliký.\nMůžete nahrávat soubory až do velikosti {{number}} MB.';
 z.string.cs.alert_gif_too_large = 'Animace je příliš veliká.\nMaximální velikost je {{number}} MB.';
 
 z.string.cs.auth_account_country_code = 'Kód země';
 z.string.cs.auth_account_create = 'Vytvořit';
 z.string.cs.auth_account_create_account = 'Vytvořit účet';
 z.string.cs.auth_account_expiration = 'Byli jste odhlášeni, protože platnost relace vypršela. Přihlaste se znovu.';
-z.string.cs.auth_account_get_wire =
-  'Jednoduchá, soukromá & bezpečná aplikace pro chat, hovory, sdílení fotek, hudby, videa, GIFů a dalších.';
+z.string.cs.auth_account_get_wire = 'Jednoduchá, soukromá & bezpečná aplikace pro chat, hovory, sdílení fotek, hudby, videa, GIFů a dalších.';
 z.string.cs.auth_account_password_forgot = 'Zapomenuté heslo';
 z.string.cs.auth_account_sign_in = 'Přihlásit se';
 z.string.cs.auth_account_sign_in_email = 'Email';
@@ -57,8 +54,7 @@ z.string.cs.auth_verify_code_change_phone = 'Změnit telefonní číslo';
 z.string.cs.auth_verify_password_headline = 'Zadejte své heslo';
 
 z.string.cs.auth_limit_devices_headline = 'Přístroje';
-z.string.cs.auth_limit_description =
-  'Odeberte jeden ze svých přístrojů abyste mohli začít používat Wire na tomto zařízení.';
+z.string.cs.auth_limit_description = 'Odeberte jeden ze svých přístrojů abyste mohli začít používat Wire na tomto zařízení.';
 z.string.cs.auth_limit_button_manage = 'Spravovat přístroje';
 z.string.cs.auth_limit_button_sign_out = 'Odhlásit se';
 z.string.cs.auth_limit_devices_current = '(Aktuální)';
@@ -137,13 +133,11 @@ z.string.cs.modal_clear_conversation_option = 'Také opustit konverzaci';
 z.string.cs.modal_clear_conversation_button = 'Smazat';
 z.string.cs.modal_connected_device_headline = 'Váš účet byl naposledy použit:';
 z.string.cs.modal_connected_device_from = 'Od:';
-z.string.cs.modal_connected_device_message =
-  'Pokud jste to nebyli vy sami, odeberte použité zařízení a změňte si heslo.';
+z.string.cs.modal_connected_device_message = 'Pokud jste to nebyli vy sami, odeberte použité zařízení a změňte si heslo.';
 z.string.cs.modal_connected_device_manage_devices = 'spravovat přístroje';
 z.string.cs.modal_delete_account_action = 'Smazat';
 z.string.cs.modal_delete_account_headline = 'Smazat účet';
-z.string.cs.modal_delete_account_message =
-  'Obdržíte od nás zprávu přes email nebo SMS. Pro trvalé smazání svého účtu otevřete zaslaný odkaz.';
+z.string.cs.modal_delete_account_message = 'Obdržíte od nás zprávu přes email nebo SMS. Pro trvalé smazání svého účtu otevřete zaslaný odkaz.';
 z.string.cs.modal_delete_button = 'Smazat';
 z.string.cs.modal_delete_headline = 'Smazat pouze u mně?';
 z.string.cs.modal_delete_message = 'Tuto operaci nelze vrátit.';
@@ -153,8 +147,7 @@ z.string.cs.modal_delete_everyone_message = 'Tuto operaci nelze vrátit.';
 z.string.cs.modal_too_long_headline = 'Zpráva je příliš dlouhá';
 z.string.cs.modal_too_long_message = 'Můžete posílat zprávy dlouhé až {{number}} znaků.';
 z.string.cs.modal_leave_conversation_headline = 'Opustit konverzaci "{{user}}"?';
-z.string.cs.modal_leave_conversation_message =
-  'Účastníci budou informováni a konverzace bude odstraněna z vašeho seznamu.';
+z.string.cs.modal_leave_conversation_message = 'Účastníci budou informováni a konverzace bude odstraněna z vašeho seznamu.';
 z.string.cs.modal_leave_conversation_button = 'Odejít';
 z.string.cs.modal_logout_headline = 'Vyčistit data?';
 z.string.cs.modal_logout_message = 'Smazat všechny osobní informace a konverzace z tohoto přístroje.';
@@ -170,8 +163,7 @@ z.string.cs.modal_session_reset_message_1 = 'Pokud problém není vyřešen,';
 z.string.cs.modal_session_reset_message_link = 'kontaktujte';
 z.string.cs.modal_session_reset_message_2 = 'nás.';
 z.string.cs.modal_too_many_members_headline = 'Přeplněné kupé';
-z.string.cs.modal_too_many_members_message =
-  'Ke konverzaci se může připojit az {{number1}} účastníků. Je zde ještě místo pro {{number2}}.';
+z.string.cs.modal_too_many_members_message = 'Ke konverzaci se může připojit az {{number1}} účastníků. Je zde ještě místo pro {{number2}}.';
 z.string.cs.modal_uploads_parallel = 'Najednou můžete poslat až {{number}} souborů.';
 
 z.string.cs.connection_request_connect = 'Připojit';
@@ -228,6 +220,7 @@ z.string.cs.conversation_delete_timestamp = 'Smazáno v {{date}}';
 z.string.cs.conversation_edit_timestamp = 'Upraveno v {{date}}';
 z.string.cs.conversation_likes_caption = '{{number}} lidí';
 
+
 z.string.cs.archive_header = 'Archivovat';
 
 z.string.cs.conversations_all_archived = 'Vše archivováno';
@@ -276,15 +269,12 @@ z.string.cs.people_invite_button_gmail = 'Z Gmailu';
 z.string.cs.people_invite_headline = 'Přiveďte své přátele';
 z.string.cs.people_tabs_details = 'Podrobnosti';
 z.string.cs.people_tabs_devices = 'Přístroje';
-z.string.cs.people_tabs_devices_headline =
-  'Wire přiřazuje každému přístroji jedinečný identifikátor. Porovnejte je s {{user}} a ověřte svou konverzaci.';
+z.string.cs.people_tabs_devices_headline = 'Wire přiřazuje každému přístroji jedinečný identifikátor. Porovnejte je s {{user}} a ověřte svou konverzaci.';
 z.string.cs.people_tabs_devices_why_verify = 'Proč mám ověřovat konverzaci?';
-z.string.cs.people_tabs_no_devices_headline =
-  '{{user}} používá starší verzi aplikace Wire. Nejsou zde zobrazeny žádné přístroje.';
+z.string.cs.people_tabs_no_devices_headline = '{{user}} používá starší verzi aplikace Wire. Nejsou zde zobrazeny žádné přístroje.';
 z.string.cs.people_tabs_device_detail_all_my_devices = 'Zobrazit všechny mé přístroje';
 z.string.cs.people_tabs_device_detail_device_fingerprint = 'Identifikátor přístoje';
-z.string.cs.people_tabs_device_detail_headline =
-  'Ověřte, že to odpovídá identifikátoru zobrazeném na {{html1}}uživatele {{user}}{{html2}}.';
+z.string.cs.people_tabs_device_detail_headline = 'Ověřte, že to odpovídá identifikátoru zobrazeném na {{html1}}uživatele {{user}}{{html2}}.';
 z.string.cs.people_tabs_device_detail_how_to = 'Jak to mám udělat?';
 z.string.cs.people_tabs_device_detail_reset_session = 'Resetovat sezení';
 z.string.cs.people_tabs_device_detail_show_my_device = 'Zorazit identifikátor mého přístroje';
@@ -354,16 +344,13 @@ z.string.cs.preferences_devices_active = 'Aktivní';
 z.string.cs.preferences_devices_active_detail = 'Pokud nepoznáváte přístroj výše, odstraňte ho a změňte své heslo.';
 z.string.cs.preferences_devices_current = 'Aktuální';
 z.string.cs.preferences_devices_fingerprint = 'Identifikátor klíče';
-z.string.cs.preferences_devices_fingerprint_detail =
-  'Aplikace Wire přiděluje každému přístroji unikátní identifikátor. Jejich porovnáním ověříte své přístroje a konverzace.';
+z.string.cs.preferences_devices_fingerprint_detail = 'Aplikace Wire přiděluje každému přístroji unikátní identifikátor. Jejich porovnáním ověříte své přístroje a konverzace.';
 z.string.cs.preferences_devices_id = 'ID: ';
 z.string.cs.preferences_devices_remove = 'Odstranit';
 z.string.cs.preferences_devices_remove_cancel = 'Zrušit';
-z.string.cs.preferences_devices_remove_detail =
-  'Jestliže jste přestali používat toto zařízení, odeberte jej. Poté z něj budete okamžitě odhlášeni.';
+z.string.cs.preferences_devices_remove_detail = 'Jestliže jste přestali používat toto zařízení, odeberte jej. Poté z něj budete okamžitě odhlášeni.';
 z.string.cs.preferences_devices_session_confirmation = 'Sezení bylo zresetováno.';
-z.string.cs.preferences_devices_session_detail =
-  'Pokud se identifikátory neshodují, resetujte své sezení pro vygenerování nových klíčů na obou stranách.';
+z.string.cs.preferences_devices_session_detail = 'Pokud se identifikátory neshodují, resetujte své sezení pro vygenerování nových klíčů na obou stranách.';
 z.string.cs.preferences_devices_session_reset = 'Resetovat sezení';
 z.string.cs.preferences_devices_session_ongoing = 'Obnovení relace…';
 z.string.cs.preferences_devices_verification = 'Ověreno';
@@ -378,8 +365,7 @@ z.string.cs.preferences_options_audio_some_detail = 'Chaty a hovory';
 z.string.cs.preferences_options_contacts = 'Kontakty';
 z.string.cs.preferences_options_contacts_gmail = 'Importovat ze služby Gmail';
 z.string.cs.preferences_options_contacts_macos = 'Import z kontaktů';
-z.string.cs.preferences_options_contacts_detail =
-  'Vaše údaje o kontaktech používáme k propojení s ostatními uživateli. Všechny informace anonymizujeme a nesdílíme je s nikým dalším.';
+z.string.cs.preferences_options_contacts_detail = 'Vaše údaje o kontaktech používáme k propojení s ostatními uživateli. Všechny informace anonymizujeme a nesdílíme je s nikým dalším.';
 z.string.cs.preferences_options_data = 'Použití a zprávy o pádech';
 z.string.cs.preferences_options_data_checkbox = 'Použití a zprávy o pádech';
 z.string.cs.preferences_options_data_detail = 'Přispějte k vylepšení aplikace Wire odesíláním anonymních informací.';
@@ -395,8 +381,7 @@ z.string.cs.search_top_people = 'Nejaktivnější kontakty';
 z.string.cs.search_others = 'Připojit';
 
 z.string.cs.upload_google_headline = 'Najít kontakty\npro konverzaci.';
-z.string.cs.upload_google_message =
-  'Vaše údaje o kontaktech používáme k propojení s ostatními uživateli. Všechny informace anonymizujeme a nesdílíme je s nikým dalším.';
+z.string.cs.upload_google_message = 'Vaše údaje o kontaktech používáme k propojení s ostatními uživateli. Všechny informace anonymizujeme a nesdílíme je s nikým dalším.';
 z.string.cs.upload_google_headline_error = 'Něco se\npokazilo.';
 z.string.cs.upload_google_message_error = 'Neobdrželi jsme vaše data. Zkuste prosím kontakty importovat znovu.';
 z.string.cs.upload_google_button_again = 'Zkusit znovu';

@@ -27,18 +27,15 @@ z.string.ro.nonexistent_user = 'Utilizator șters';
 z.string.ro.and = 'și';
 
 z.string.ro.alert_upload_file_format = 'Nu se poate folosi această imagine.\nTe rugăm să alegi un fișier PNG sau JPEG.';
-z.string.ro.alert_upload_too_small =
-  'Nu se poate utiliza această imagine.\nTe rugăm să alegi o imagine de cel puțin 320 x 320 px.';
+z.string.ro.alert_upload_too_small = 'Nu se poate utiliza această imagine.\nTe rugăm să alegi o imagine de cel puțin 320 x 320 px.';
 z.string.ro.alert_upload_too_large = 'Această imagine este prea mare.\nPoți încărca fișiere până la {{number}} MB.';
 z.string.ro.alert_gif_too_large = 'Animația este prea mare.\nMărimea maximă este {{number}} MB.';
 
 z.string.ro.auth_account_country_code = 'Codul țării';
 z.string.ro.auth_account_create = 'Creează';
 z.string.ro.auth_account_create_account = 'Creează un cont';
-z.string.ro.auth_account_expiration =
-  'Ai fost scos din sesiune pentru că sesiunea ta a expirat. Te rugăm să te autentifici din nou.';
-z.string.ro.auth_account_get_wire =
-  'Program de mesagerie simplu, privat și sigur pentru chat, apeluri, partajarea de imagini, muzică, videouri, GIF-uri și altele.';
+z.string.ro.auth_account_expiration = 'Ai fost scos din sesiune pentru că sesiunea ta a expirat. Te rugăm să te autentifici din nou.';
+z.string.ro.auth_account_get_wire = 'Program de mesagerie simplu, privat și sigur pentru chat, apeluri, partajarea de imagini, muzică, videouri, GIF-uri și altele.';
 z.string.ro.auth_account_password_forgot = 'Am uitat parola';
 z.string.ro.auth_account_public_computer = 'Acesta este un calculator public';
 z.string.ro.auth_account_sign_in = 'Autentificare';
@@ -136,8 +133,7 @@ z.string.ro.modal_call_second_outgoing_headline = 'Închide apelul curent?';
 z.string.ro.modal_call_second_outgoing_message = 'Nu poți fi decât într-un singur apel la un moment dat.';
 z.string.ro.modal_call_second_outgoing_action = 'Închide';
 z.string.ro.modal_clear_conversation_headline = 'Șterge conversația „{{user}}”?';
-z.string.ro.modal_clear_conversation_message =
-  'Aceasta va elimina istoricul conversațiilor și le va scoate din lista ta.';
+z.string.ro.modal_clear_conversation_message = 'Aceasta va elimina istoricul conversațiilor și le va scoate din lista ta.';
 z.string.ro.modal_clear_conversation_option = 'Părăsește conversația';
 z.string.ro.modal_clear_conversation_button = 'Șterge';
 z.string.ro.modal_connected_device_headline = 'Contul tău a fost folosit în data de:';
@@ -146,8 +142,7 @@ z.string.ro.modal_connected_device_message = 'Dacă nu ai făcut asta, elimină 
 z.string.ro.modal_connected_device_manage_devices = 'gestionare dispozitive';
 z.string.ro.modal_delete_account_action = 'Șterge';
 z.string.ro.modal_delete_account_headline = 'Șterge contul';
-z.string.ro.modal_delete_account_message =
-  'Îți vom trimite un mesaj pe e-mail sau SMS. Urmează linkul pentru a șterge permanent contul tău.';
+z.string.ro.modal_delete_account_message = 'Îți vom trimite un mesaj pe e-mail sau SMS. Urmează linkul pentru a șterge permanent contul tău.';
 z.string.ro.modal_delete_button = 'Șterge';
 z.string.ro.modal_delete_headline = 'Șterge doar pentru mine?';
 z.string.ro.modal_delete_message = 'Operațiunea nu poate fi anulată.';
@@ -157,8 +152,7 @@ z.string.ro.modal_delete_everyone_message = 'Operațiunea nu poate fi anulată.'
 z.string.ro.modal_too_long_headline = 'Mesajul este prea lung';
 z.string.ro.modal_too_long_message = 'Nu poți trimite mesaje mai lungi de {{number}} caractere.';
 z.string.ro.modal_leave_conversation_headline = 'Părăsește conversația cu „{{user}}”?';
-z.string.ro.modal_leave_conversation_message =
-  'Participanții vor fi notificați și conversația va fi scoasă din lista ta.';
+z.string.ro.modal_leave_conversation_message = 'Participanții vor fi notificați și conversația va fi scoasă din lista ta.';
 z.string.ro.modal_leave_conversation_button = 'Ieși';
 z.string.ro.modal_logout_headline = 'Curăță datele?';
 z.string.ro.modal_logout_message = 'Șterge toate informațiile personale și conversațiile de pe acest dispozitiv.';
@@ -181,8 +175,7 @@ z.string.ro.modal_session_reset_message_1 = 'Dacă problema nu este rezolvată,'
 z.string.ro.modal_session_reset_message_link = 'contactează-';
 z.string.ro.modal_session_reset_message_2 = 'ne.';
 z.string.ro.modal_too_many_members_headline = 'Canalul este plin';
-z.string.ro.modal_too_many_members_message =
-  'Maxim {{number1}} persoane se pot alătura conversației. Mai este loc pentru {{number2}} persoane aici.';
+z.string.ro.modal_too_many_members_message = 'Maxim {{number1}} persoane se pot alătura conversației. Mai este loc pentru {{number2}} persoane aici.';
 z.string.ro.modal_uploads_parallel = 'Poți trimite maxim {{number}} fișiere simultan.';
 
 z.string.ro.connection_request_connect = 'Conectare';
@@ -227,13 +220,11 @@ z.string.ro.conversation_voice_channel_deactivate = ' sunat';
 z.string.ro.conversation_voice_channel_deactivate_you = ' sunat';
 z.string.ro.conversation_yesterday = 'ieri';
 z.string.ro.conversation_unable_to_decrypt_1 = 'ai primit un mesaj de la {{user}}.';
-z.string.ro.conversation_unable_to_decrypt_2 =
-  'identitatea dispozitivului lui {{user}} s-a schimbat. Mesajul nu a fost livrat.';
+z.string.ro.conversation_unable_to_decrypt_2 = 'identitatea dispozitivului lui {{user}} s-a schimbat. Mesajul nu a fost livrat.';
 z.string.ro.conversation_unable_to_decrypt_link = 'De ce?';
 z.string.ro.conversation_unable_to_decrypt_error_message = 'Eroare';
 z.string.ro.conversation_unable_to_decrypt_reset_session = 'Resetează sesiunea';
-z.string.ro.conversation_missed_messages =
-  'Nu ai folosit acest dispozitiv de ceva timp. Unele mesaje ar putea să nu apară aici.';
+z.string.ro.conversation_missed_messages = 'Nu ai folosit acest dispozitiv de ceva timp. Unele mesaje ar putea să nu apară aici.';
 z.string.ro.conversation_asset_uploading = 'Se încarcă…';
 z.string.ro.conversation_asset_downloading = 'Se descarcă…';
 z.string.ro.conversation_asset_upload_failed = 'Încărcarea a eșuat';
@@ -268,8 +259,7 @@ z.string.ro.conversations_connection_request_many = '{{number}} persoane așteap
 z.string.ro.conversations_connection_request_one = '1 persoană așteaptă';
 z.string.ro.conversations_empty_conversation_description = 'Toată lumea a plecat';
 z.string.ro.conversations_no_conversations = 'Nu sunt încă conversații';
-z.string.ro.conversations_no_conversations_detail =
-  'Începe o conversație, creează un grup sau invită oameni să se alăture.';
+z.string.ro.conversations_no_conversations_detail = 'Începe o conversație, creează un grup sau invită oameni să se alăture.';
 z.string.ro.conversations_popover_archive = 'Arhivă';
 z.string.ro.conversations_popover_block = 'Blochează';
 z.string.ro.conversations_popover_cancel = 'Anulează cererea';
@@ -320,22 +310,18 @@ z.string.ro.people_no_matches = 'Nu s-a găsit nimic.\nÎncearcă să scrii un a
 z.string.ro.people_invite = 'Invită persoane';
 z.string.ro.people_share = 'Împărtășește contacte';
 z.string.ro.people_bring_your_friends = 'Invită prietenii pe Wire';
-z.string.ro.people_invite_detail =
-  'Împărtășirea contactelor ne ajută să te conectăm cu alții. Noi anonimizăm toate informațiile și nu le împărtășim cu terți.';
+z.string.ro.people_invite_detail = 'Împărtășirea contactelor ne ajută să te conectăm cu alții. Noi anonimizăm toate informațiile și nu le împărtășim cu terți.';
 z.string.ro.people_invite_button_contacts = 'Din Contacte';
 z.string.ro.people_invite_button_gmail = 'Din Gmail';
 z.string.ro.people_invite_headline = 'Invită prietenii';
 z.string.ro.people_tabs_details = 'Detalii';
 z.string.ro.people_tabs_devices = 'Dispozitive';
-z.string.ro.people_tabs_devices_headline =
-  'Wire oferă fiecărui dispozitiv o amprentă unică. Compară amprentele cu {{user}} și verifică conversația.';
+z.string.ro.people_tabs_devices_headline = 'Wire oferă fiecărui dispozitiv o amprentă unică. Compară amprentele cu {{user}} și verifică conversația.';
 z.string.ro.people_tabs_devices_why_verify = 'De ce să verific această conversație?';
-z.string.ro.people_tabs_no_devices_headline =
-  '{{user}} folosește o versiune veche de Wire. Nu sunt afișate dispozitive.';
+z.string.ro.people_tabs_no_devices_headline = '{{user}} folosește o versiune veche de Wire. Nu sunt afișate dispozitive.';
 z.string.ro.people_tabs_device_detail_all_my_devices = 'Arată toate dispozitivele mele';
 z.string.ro.people_tabs_device_detail_device_fingerprint = 'Amprentă dispozitiv';
-z.string.ro.people_tabs_device_detail_headline =
-  'Verifică dacă aceasta se potrivește cu amprenta arătată în {{html1}}dispozitivul al lui {{user}}{{html2}}.';
+z.string.ro.people_tabs_device_detail_headline = 'Verifică dacă aceasta se potrivește cu amprenta arătată în {{html1}}dispozitivul al lui {{user}}{{html2}}.';
 z.string.ro.people_tabs_device_detail_how_to = 'Cum fac asta?';
 z.string.ro.people_tabs_device_detail_reset_session = 'Resetează sesiunea';
 z.string.ro.people_tabs_device_detail_show_my_device = 'Arată amprenta dispozitivului';
@@ -408,20 +394,16 @@ z.string.ro.preferences_av_speakers = 'Difuzoare';
 z.string.ro.preferences_devices_activated_in = 'în {{location}}';
 z.string.ro.preferences_devices_activated_on = 'Activat la {{date}}';
 z.string.ro.preferences_devices_active = 'Activ';
-z.string.ro.preferences_devices_active_detail =
-  'Dacă nu recunoști un dispozitiv de mai sus, elimină-l și resetează parola.';
+z.string.ro.preferences_devices_active_detail = 'Dacă nu recunoști un dispozitiv de mai sus, elimină-l și resetează parola.';
 z.string.ro.preferences_devices_current = 'Curent';
 z.string.ro.preferences_devices_fingerprint = 'Amprentă cheie';
-z.string.ro.preferences_devices_fingerprint_detail =
-  'Wire generează câte o amprentă unică pentru fiecare dispozitiv. Compară-le și verifică dispozitivele și conversațiile tale.';
+z.string.ro.preferences_devices_fingerprint_detail = 'Wire generează câte o amprentă unică pentru fiecare dispozitiv. Compară-le și verifică dispozitivele și conversațiile tale.';
 z.string.ro.preferences_devices_id = 'ID: ';
 z.string.ro.preferences_devices_remove = 'Șterge';
 z.string.ro.preferences_devices_remove_cancel = 'Renunță';
-z.string.ro.preferences_devices_remove_detail =
-  'Elimină acest dispozitiv dacă nu-l mai folosești. Vei fi deconectat de pe acest dispozitiv imediat.';
+z.string.ro.preferences_devices_remove_detail = 'Elimină acest dispozitiv dacă nu-l mai folosești. Vei fi deconectat de pe acest dispozitiv imediat.';
 z.string.ro.preferences_devices_session_confirmation = 'Sesiunea a fost resetată.';
-z.string.ro.preferences_devices_session_detail =
-  'Dacă amprentele nu se potrivesc, resetează sesiunea pentru a genera un nou set de chei de criptare pentru ambele părți.';
+z.string.ro.preferences_devices_session_detail = 'Dacă amprentele nu se potrivesc, resetează sesiunea pentru a genera un nou set de chei de criptare pentru ambele părți.';
 z.string.ro.preferences_devices_session_reset = 'Resetează sesiunea';
 z.string.ro.preferences_devices_session_ongoing = 'Se resetează sesiunea…';
 z.string.ro.preferences_devices_verification = 'Verificat';
@@ -436,8 +418,7 @@ z.string.ro.preferences_options_audio_some_detail = 'Bipuri și apeluri';
 z.string.ro.preferences_options_contacts = 'Contacte';
 z.string.ro.preferences_options_contacts_gmail = 'Importă din Gmail';
 z.string.ro.preferences_options_contacts_macos = 'Importă din contacte';
-z.string.ro.preferences_options_contacts_detail =
-  'Vom folosi datele tale de contact pentru a te conecta cu alții. Vom anonimiza toate informațiile și nu le vom împărtăși cu altcineva.';
+z.string.ro.preferences_options_contacts_detail = 'Vom folosi datele tale de contact pentru a te conecta cu alții. Vom anonimiza toate informațiile și nu le vom împărtăși cu altcineva.';
 z.string.ro.preferences_options_data = 'Rapoarte de folosire și de avarie';
 z.string.ro.preferences_options_data_checkbox = 'Rapoarte de folosire și de avarie';
 z.string.ro.preferences_options_data_detail = 'Ajută la îmbunătățirea Wire prin trimiterea de informații anonime.';
@@ -456,13 +437,11 @@ z.string.ro.search_team_groups = 'Conversații de echipă';
 z.string.ro.search_team_members = 'Membrii echipei';
 z.string.ro.search_top_people = 'Top persoane';
 z.string.ro.search_try_search = 'Caută oameni după\nnume sau nume utilizator';
-z.string.ro.search_no_contacts_on_wire =
-  'Nu ai contacte pe Wire.\nÎncearcă să găsește oameni după\nnume sau nume utilizator.';
+z.string.ro.search_no_contacts_on_wire = 'Nu ai contacte pe Wire.\nÎncearcă să găsește oameni după\nnume sau nume utilizator.';
 z.string.ro.search_others = 'Conectare';
 
 z.string.ro.upload_google_headline = 'Caută persoane\ncu care să vorbești.';
-z.string.ro.upload_google_message =
-  'Vom folosi datele tale de contact pentru a te conecta cu alții. Vom anonimiza toate informațiile și nu le vom împărtăși cu altcineva.';
+z.string.ro.upload_google_message = 'Vom folosi datele tale de contact pentru a te conecta cu alții. Vom anonimiza toate informațiile și nu le vom împărtăși cu altcineva.';
 z.string.ro.upload_google_headline_error = 'Ceva\na mers prost.';
 z.string.ro.upload_google_message_error = 'Nu am primit nicio informație. Încearcă importarea contactelor din nou.';
 z.string.ro.upload_google_button_again = 'Reîncearcă';
@@ -508,8 +487,7 @@ z.string.ro.warning_permission_request_notification = '{{icon}} permite notific�
 z.string.ro.warning_permission_request_screen = '{{icon}} permite accesul la ecran';
 z.string.ro.warning_tell_me_how = 'Spune-mi cum';
 
-z.string.ro.warning_connectivity_connection_lost =
-  'Se încearcă conectarea. Wire ar putea să nu trimită mesaje în acest timp.';
+z.string.ro.warning_connectivity_connection_lost = 'Se încearcă conectarea. Wire ar putea să nu trimită mesaje în acest timp.';
 z.string.ro.warning_connectivity_no_internet = 'Nu este conexiune la internet. Nu vei putea trimite sau primi mesaje.';
 
 z.string.ro.warning_lifecycle_update = 'Este disponibilă o nouă versiune de Wire.';

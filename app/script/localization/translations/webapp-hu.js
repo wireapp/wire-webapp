@@ -35,8 +35,7 @@ z.string.hu.auth_account_country_code = 'Ország hívószáma';
 z.string.hu.auth_account_create = 'Létrehozás';
 z.string.hu.auth_account_create_account = 'Fiók létrehozása';
 z.string.hu.auth_account_expiration = 'Ön kijelentkezett, mert a munkamenet lejárt. Kérjük, jelentkezzen be úja.';
-z.string.hu.auth_account_get_wire =
-  'Egyszerű, privát és biztonságos beszélgetések, hívások, kép megosztás, zene, videók, GIF és még sok más.';
+z.string.hu.auth_account_get_wire = 'Egyszerű, privát és biztonságos beszélgetések, hívások, kép megosztás, zene, videók, GIF és még sok más.';
 z.string.hu.auth_account_password_forgot = 'Elfelejtett jelszó';
 z.string.hu.auth_account_public_computer = 'Ez egy nyilvános számítógép';
 z.string.hu.auth_account_sign_in = 'Bejelentkezés';
@@ -45,12 +44,9 @@ z.string.hu.auth_account_sign_in_phone = 'Telefon';
 z.string.hu.auth_account_terms_of_use = 'Felhasználási feltételek';
 z.string.hu.auth_account_terms_of_use_detail = 'Elfogadom';
 
-<<<<<<< HEAD
-=======
 z.string.hu.auth_blocked_database = 'A Wire-nek hozzáférést kell biztosítania a helyi tárhelyhez az üzenetek megjelenítéséhez. A helyi tároló nem áll rendelkezésre privát módban.';
 z.string.hu.auth_blocked_tabs = 'A Wire már nyitva van egy másik lapon.';
 
->>>>>>> dev
 z.string.hu.auth_verify_account_add = 'Hozzáadás';
 z.string.hu.auth_verify_account_detail = 'Lehetővé teszi, hogy használja a Wire-t több eszközön.';
 z.string.hu.auth_verify_account_headline = 'Adja meg e-mail címét és jelszavát.';
@@ -124,8 +120,7 @@ z.string.hu.modal_button_ok = 'Ok';
 z.string.hu.modal_button_send = 'Küldés';
 
 z.string.hu.modal_block_conversation_headline = 'Tiltja {{user}}?';
-z.string.hu.modal_block_conversation_message =
-  '{{user}} nem lesz képes Önnel kapcsolatba lépni, vagy meghívni csoportos beszélgetésbe.';
+z.string.hu.modal_block_conversation_message = '{{user}} nem lesz képes Önnel kapcsolatba lépni, vagy meghívni csoportos beszélgetésbe.';
 z.string.hu.modal_block_conversation_button = 'Blokkolás';
 z.string.hu.modal_call_conversation_empty_headline = 'Senki sem hívja';
 z.string.hu.modal_call_conversation_empty_message = 'Senki nem maradt itt.';
@@ -150,8 +145,7 @@ z.string.hu.modal_connected_device_message = 'Ha nem ez, távolítsa el az eszk�
 z.string.hu.modal_connected_device_manage_devices = 'eszközök kezelése';
 z.string.hu.modal_delete_account_action = 'Törlés';
 z.string.hu.modal_delete_account_headline = 'Fiók törlése';
-z.string.hu.modal_delete_account_message =
-  'Küldünk egy üzenetet e-mailben vagy SMS-ben. Kövesse a linket, hogy véglegesen törölni tudja fiókját.';
+z.string.hu.modal_delete_account_message = 'Küldünk egy üzenetet e-mailben vagy SMS-ben. Kövesse a linket, hogy véglegesen törölni tudja fiókját.';
 z.string.hu.modal_delete_button = 'Törlés';
 z.string.hu.modal_delete_headline = 'Törlés csak nálam?';
 z.string.hu.modal_delete_message = 'Ezt a műveletet nem lehet visszavonni.';
@@ -161,8 +155,7 @@ z.string.hu.modal_delete_everyone_message = 'Ezt a műveletet nem lehet visszavo
 z.string.hu.modal_too_long_headline = 'Az üzenet túl hosszú';
 z.string.hu.modal_too_long_message = 'Ön {{number}} karakter hosszú üzenetet küldhet.';
 z.string.hu.modal_leave_conversation_headline = 'Elhagyja "{{user}}" beszélgetését?';
-z.string.hu.modal_leave_conversation_message =
-  'A résztvevők értesítést fognak kapni és a beszélgetést eltávolítjuk a listádból.';
+z.string.hu.modal_leave_conversation_message = 'A résztvevők értesítést fognak kapni és a beszélgetést eltávolítjuk a listádból.';
 z.string.hu.modal_leave_conversation_button = 'Elhagyás';
 z.string.hu.modal_logout_headline = 'Adatok törlése?';
 z.string.hu.modal_logout_message = 'Törli az összes személyes adatait és beszélgetéseit ezen az eszközön.';
@@ -185,8 +178,7 @@ z.string.hu.modal_session_reset_message_1 = 'Ha a probléma továbbra is fennál
 z.string.hu.modal_session_reset_message_link = 'kapcsolatba';
 z.string.hu.modal_session_reset_message_2 = 'velünk.';
 z.string.hu.modal_too_many_members_headline = 'Telt ház';
-z.string.hu.modal_too_many_members_message =
-  'Legfeljebb {{number1}} partner tud csatlakozni a beszélgetéshez. Még {{number2}} partner számára van hely a csoportban.';
+z.string.hu.modal_too_many_members_message = 'Legfeljebb {{number1}} partner tud csatlakozni a beszélgetéshez. Még {{number2}} partner számára van hely a csoportban.';
 z.string.hu.modal_uploads_parallel = 'Egyszerre {{number}} fájt küldhet.';
 
 z.string.hu.connection_request_connect = 'Csatlakozás';
@@ -235,8 +227,7 @@ z.string.hu.conversation_unable_to_decrypt_2 = '{{user}} eszköz azonosítója m
 z.string.hu.conversation_unable_to_decrypt_link = 'Miért?';
 z.string.hu.conversation_unable_to_decrypt_error_message = 'Hiba';
 z.string.hu.conversation_unable_to_decrypt_reset_session = 'Visszaállítás';
-z.string.hu.conversation_missed_messages =
-  'Ön nem használta ezt a készüléket egy ideje. Egyes üzenetek itt nem jelennek meg.';
+z.string.hu.conversation_missed_messages = 'Ön nem használta ezt a készüléket egy ideje. Egyes üzenetek itt nem jelennek meg.';
 z.string.hu.conversation_asset_uploading = 'Feltöltés…';
 z.string.hu.conversation_asset_downloading = 'Letöltés…';
 z.string.hu.conversation_asset_upload_failed = 'A feltöltés sikertelen';
@@ -272,8 +263,7 @@ z.string.hu.conversations_connection_request_one = '1 partner várakozik';
 z.string.hu.conversations_empty_conversation = 'Csoportos beszélgetés';
 z.string.hu.conversations_empty_conversation_description = 'Mindenki elhagyta a beszélgetést';
 z.string.hu.conversations_no_conversations = 'Még nincsenek beszélgetések';
-z.string.hu.conversations_no_conversations_detail =
-  'Indítson el egy beszélgetést, hozzon létre egy csoportot vagy hívjon meg partnereket, hogy csatlakozzanak.';
+z.string.hu.conversations_no_conversations_detail = 'Indítson el egy beszélgetést, hozzon létre egy csoportot vagy hívjon meg partnereket, hogy csatlakozzanak.';
 z.string.hu.conversations_popover_archive = 'Archiválás';
 z.string.hu.conversations_popover_block = 'Blokkolás';
 z.string.hu.conversations_popover_cancel = 'Kérelem visszavonása';
@@ -307,10 +297,8 @@ z.string.hu.invite_meta_key_pc = 'Ctrl';
 z.string.hu.invite_hint_selected = 'Nyomja meg {{meta_key}} + C billentyűt a másoláshoz';
 z.string.hu.invite_hint_unselected = 'Válassza ki, majd nyomja meg {{meta_key}} + C';
 z.string.hu.invite_headline = 'Partner meghívása a Wire-be';
-z.string.hu.invite_message =
-  'Fent vagyok a Wire-ön. Keress rá felhasználónevemre: {{username}} vagy látogasd meg ezt a weboldalt: get.wire.com.';
-z.string.hu.invite_message_no_email =
-  'Fent vagyok a Wire-ön. Látogass el a https://get.wire.com weboldalára és kerülj kapcsolatba velem.';
+z.string.hu.invite_message = 'Fent vagyok a Wire-ön. Keress rá felhasználónevemre: {{username}} vagy látogasd meg ezt a weboldalt: get.wire.com.';
+z.string.hu.invite_message_no_email = 'Fent vagyok a Wire-ön. Látogass el a https://get.wire.com weboldalára és kerülj kapcsolatba velem.';
 
 z.string.hu.extensions_bubble_button_gif = 'Gif';
 
@@ -325,28 +313,23 @@ z.string.hu.search_open_group = 'Csoport létrehozása';
 z.string.hu.people_confirm_label = 'Hozzáadás a beszélgetéshez';
 z.string.hu.people_people = '{{number}} Partner';
 z.string.hu.people_search_placeholder = 'Keresés név szerint';
-z.string.hu.people_everyone_participates =
-  'Mindenki, \nakivel már felvette a kapcsolatot,\nebben a beszélgetésben van.';
+z.string.hu.people_everyone_participates = 'Mindenki, \nakivel már felvette a kapcsolatot,\nebben a beszélgetésben van.';
 z.string.hu.people_no_matches = 'Nincs találat. \nPróbáljon megy egy másik nevet.';
 z.string.hu.people_invite = 'Partner meghívása';
 z.string.hu.people_share = 'Névjegyek megosztása';
 z.string.hu.people_bring_your_friends = 'Hívja meg barátait a Wire-be';
-z.string.hu.people_invite_detail =
-  'Kapcsolatai megosztása segít Önnek kapcsolatba lépni másokkal. Mi anonimizáljuk az összes információt és nem osztjuk meg senki mással.';
+z.string.hu.people_invite_detail = 'Kapcsolatai megosztása segít Önnek kapcsolatba lépni másokkal. Mi anonimizáljuk az összes információt és nem osztjuk meg senki mással.';
 z.string.hu.people_invite_button_contacts = 'Névjegyekből';
 z.string.hu.people_invite_button_gmail = 'Gmail-ből';
 z.string.hu.people_invite_headline = 'Hozza magával barátait';
 z.string.hu.people_tabs_details = 'Részletek';
 z.string.hu.people_tabs_devices = 'Eszközök';
-z.string.hu.people_tabs_devices_headline =
-  'A Wire minden eszköznek egyedi ujjlenyomatot ad. Hasonlítsa össze vele: {{user}} majd ellenőrizze a beszélgetést.';
+z.string.hu.people_tabs_devices_headline = 'A Wire minden eszköznek egyedi ujjlenyomatot ad. Hasonlítsa össze vele: {{user}} majd ellenőrizze a beszélgetést.';
 z.string.hu.people_tabs_devices_why_verify = 'Mért ellenőrizze a beszélgetést?';
-z.string.hu.people_tabs_no_devices_headline =
-  '{{user}} a Wire régi verzióját használja. Eszközei itt nem jeleníthetőek meg.';
+z.string.hu.people_tabs_no_devices_headline = '{{user}} a Wire régi verzióját használja. Eszközei itt nem jeleníthetőek meg.';
 z.string.hu.people_tabs_device_detail_all_my_devices = 'Eszközei megjelenítése';
 z.string.hu.people_tabs_device_detail_device_fingerprint = 'Eszköz ujjlenyomata';
-z.string.hu.people_tabs_device_detail_headline =
-  'Ellenőrizze, hogy egyezik-e az ujjlenyomata a megjelenített: {{html1}}{{user}} eszközével{{html2}}.';
+z.string.hu.people_tabs_device_detail_headline = 'Ellenőrizze, hogy egyezik-e az ujjlenyomata a megjelenített: {{html1}}{{user}} eszközével{{html2}}.';
 z.string.hu.people_tabs_device_detail_how_to = 'Hogyan csináljam?';
 z.string.hu.people_tabs_device_detail_reset_session = 'Visszaállítás';
 z.string.hu.people_tabs_device_detail_show_my_device = 'Eszköz ujjlenyomatának megjelenítése';
@@ -354,8 +337,7 @@ z.string.hu.people_tabs_device_detail_verify = 'Megerősítve';
 z.string.hu.people_verified = 'Megerősítve';
 
 z.string.hu.people_block_headline = 'Tiltja?';
-z.string.hu.people_block_message =
-  '{{user}} nem lesz képes Önnel kapcsolatba lépni, vagy meghívni csoportos beszélgetésbe.';
+z.string.hu.people_block_message = '{{user}} nem lesz képes Önnel kapcsolatba lépni, vagy meghívni csoportos beszélgetésbe.';
 
 z.string.hu.people_connect_headline = 'Elfogadja?';
 z.string.hu.people_connect_message = 'Csatlakozni fog Önhöz, nyissa meg a beszélgetést vele: {{user}}.';
@@ -370,8 +352,7 @@ z.string.hu.people_remove_headline = 'Eltávolítja?';
 z.string.hu.people_remove_message = '{{user}} nem tud üzenetet küldeni és fogadni ebben a beszélgetésben.';
 
 z.string.hu.people_unblock_headline = 'Tiltás feloldása?';
-z.string.hu.people_unblock_message =
-  '{{user}} képes lesz Önnel kapcsolatba lépni, vagy meghívni csoportos beszélgetésbe.';
+z.string.hu.people_unblock_message = '{{user}} képes lesz Önnel kapcsolatba lépni, vagy meghívni csoportos beszélgetésbe.';
 
 z.string.hu.people_button_add = 'Partner hozzáadása';
 z.string.hu.people_button_block = 'Blokkolás';
@@ -421,20 +402,16 @@ z.string.hu.preferences_av_speakers = 'Hangszórók';
 z.string.hu.preferences_devices_activated_in = 'itt: {{location}}';
 z.string.hu.preferences_devices_activated_on = 'Aktiválva {{date}}';
 z.string.hu.preferences_devices_active = 'Aktív';
-z.string.hu.preferences_devices_active_detail =
-  'Ha nem ismer fel egy eszközt, akkor kérjük, távolítsa el és változtassa meg a jelszavát.';
+z.string.hu.preferences_devices_active_detail = 'Ha nem ismer fel egy eszközt, akkor kérjük, távolítsa el és változtassa meg a jelszavát.';
 z.string.hu.preferences_devices_current = 'Ez az eszköz';
 z.string.hu.preferences_devices_fingerprint = 'Ujjlenyomat kulcs';
-z.string.hu.preferences_devices_fingerprint_detail =
-  'A Wire minden eszköznek egyedi ujjlenyomatot ad. Hasonlítsa össze és ellenőrizze az eszközöket és a beszélgetéseket.';
+z.string.hu.preferences_devices_fingerprint_detail = 'A Wire minden eszköznek egyedi ujjlenyomatot ad. Hasonlítsa össze és ellenőrizze az eszközöket és a beszélgetéseket.';
 z.string.hu.preferences_devices_id = 'ID: ';
 z.string.hu.preferences_devices_remove = 'Eltávolít';
 z.string.hu.preferences_devices_remove_cancel = 'Mégse';
-z.string.hu.preferences_devices_remove_detail =
-  'Távolítsa el a készüléket, ha már nem használja. Ezen a készüléken teljes körűen kijelentkezik.';
+z.string.hu.preferences_devices_remove_detail = 'Távolítsa el a készüléket, ha már nem használja. Ezen a készüléken teljes körűen kijelentkezik.';
 z.string.hu.preferences_devices_session_confirmation = 'A munkamenet alaphelyzetbe lett állítva.';
-z.string.hu.preferences_devices_session_detail =
-  'Ha az ujjlenyomatok nem egyeznek, állítsa vissza a munkamenet és hozzon létre egy új titkosítási kulcsok mindkét oldalon.';
+z.string.hu.preferences_devices_session_detail = 'Ha az ujjlenyomatok nem egyeznek, állítsa vissza a munkamenet és hozzon létre egy új titkosítási kulcsok mindkét oldalon.';
 z.string.hu.preferences_devices_session_reset = 'Visszaállítás';
 z.string.hu.preferences_devices_session_ongoing = 'Munkamenet visszaállítása…';
 z.string.hu.preferences_devices_verification = 'Megerősítve';
@@ -449,8 +426,7 @@ z.string.hu.preferences_options_audio_some_detail = 'Kopogások és hívások';
 z.string.hu.preferences_options_contacts = 'Névjegyek';
 z.string.hu.preferences_options_contacts_gmail = 'Importálás Gmail-ről';
 z.string.hu.preferences_options_contacts_macos = 'Importálás Névjegyek-ből';
-z.string.hu.preferences_options_contacts_detail =
-  'Mi a névjegyeit használjuk, hogy kapcsolatba lépjen másokkal. Minden információt névtelenítünk, és nem osszuk meg másoknak.';
+z.string.hu.preferences_options_contacts_detail = 'Mi a névjegyeit használjuk, hogy kapcsolatba lépjen másokkal. Minden információt névtelenítünk, és nem osszuk meg másoknak.';
 z.string.hu.preferences_options_data = 'Használati adatok és hibajelentések';
 z.string.hu.preferences_options_data_checkbox = 'Használati adatok és hibajelentések';
 z.string.hu.preferences_options_data_detail = 'Segítsen nekünk, hogy a Wire-t anonim információk küldésével javíthassuk.';
@@ -462,8 +438,7 @@ z.string.hu.preferences_options_notifications_obfuscate = 'Részletek elrejtése
 z.string.hu.preferences_options_notifications_obfuscate_message = 'Feladó mutatása';
 z.string.hu.preferences_options_notifications_on = 'Feladó és üzenet megjelenítése';
 
-z.string.hu.search_group_hint =
-  'Gépeljen be neveket, vagy válasszon ki több partnert, hogy létre hozhasson egy csoportot';
+z.string.hu.search_group_hint = 'Gépeljen be neveket, vagy válasszon ki több partnert, hogy létre hozhasson egy csoportot';
 z.string.hu.search_connect = 'Csatlakozás';
 z.string.hu.search_connections = 'Kapcsolatok';
 z.string.hu.search_groups = 'Csoportok';
@@ -472,13 +447,11 @@ z.string.hu.search_team_groups = 'Csapat beszélgetés';
 z.string.hu.search_team_members = 'Csapattagok';
 z.string.hu.search_top_people = 'Top Partnerek';
 z.string.hu.search_try_search = 'Találjon partnerekre név vagy felhasználónév alapján';
-z.string.hu.search_no_contacts_on_wire =
-  'Nincsenek névjegyei a Wire-ben.\nKeressen partnereket, \nnév vagy felhasználónév alapján.';
+z.string.hu.search_no_contacts_on_wire = 'Nincsenek névjegyei a Wire-ben.\nKeressen partnereket, \nnév vagy felhasználónév alapján.';
 z.string.hu.search_others = 'Csatlakozás';
 
 z.string.hu.upload_google_headline = 'Keressen partnereket\na Wire-ön.';
-z.string.hu.upload_google_message =
-  'Mi a névjegyeit használjuk, hogy kapcsolatba lépjen másokkal. Minden információt névtelenítünk, és nem osszuk meg másoknak.';
+z.string.hu.upload_google_message = 'Mi a névjegyeit használjuk, hogy kapcsolatba lépjen másokkal. Minden információt névtelenítünk, és nem osszuk meg másoknak.';
 z.string.hu.upload_google_headline_error = 'Valami nem stimmel.';
 z.string.hu.upload_google_message_error = 'Nem kaptuk meg adatait. Kérjük, próbálja meg újra a névjegyek importálását.';
 z.string.hu.upload_google_button_again = 'Próbáld újra';
@@ -506,8 +479,7 @@ z.string.hu.url_support_usernames = 'https://wire.com/support/username';
 z.string.hu.url_decrypt_error_1 = 'https://wire.com/privacy/error-1';
 z.string.hu.url_decrypt_error_2 = 'https://wire.com/privacy/error-2';
 
-z.string.hu.warning_call_detail =
-  'Böngészőjének hozzáférésre van szüksége a mikrofonjához, a beszélgetés megkezdéséhez.';
+z.string.hu.warning_call_detail = 'Böngészőjének hozzáférésre van szüksége a mikrofonjához, a beszélgetés megkezdéséhez.';
 z.string.hu.warning_call_headline = 'Nem kezdeményezhet hívást mikrofon nélkül';
 z.string.hu.warning_call_unsupported_incoming = '{{user}} hívja. Böngészője nem támogatja a hívásokat.';
 z.string.hu.warning_call_unsupported_outgoing = 'Nem kezdeményezhet hívást, mert böngészője nem támogatja a hívásokat.';
@@ -516,10 +488,8 @@ z.string.hu.warning_call_upgrade_browser = 'Híváshoz, kérem frissítse a Goog
 z.string.hu.warning_learn_more = 'További információk';
 z.string.hu.warning_not_found_camera = 'Nem kezdeményezhet hívást, mert számítógépe nem fér hozzá kamerájához.';
 z.string.hu.warning_not_found_microphone = 'Nem kezdeményezhet hívást, mert számítógépe nem fér hozzá mikrofonjához.';
-z.string.hu.warning_permission_denied_camera =
-  'Nem kezdeményezhet hívást, mert böngészőjében nem engedélyezte a kamera használatát.';
-z.string.hu.warning_permission_denied_microphone =
-  'Nem kezdeményezhet hívást, mert böngészőjében nem engedélyezte a mikrofon használatát.';
+z.string.hu.warning_permission_denied_camera = 'Nem kezdeményezhet hívást, mert böngészőjében nem engedélyezte a kamera használatát.';
+z.string.hu.warning_permission_denied_microphone = 'Nem kezdeményezhet hívást, mert böngészőjében nem engedélyezte a mikrofon használatát.';
 z.string.hu.warning_permission_denied_screen = 'Böngészőjének engedélyre van szüksége, hogy megossza képernyőjét.';
 z.string.hu.warning_permission_request_camera = '{{icon}} Kamera hozzáférés engedélyezése';
 z.string.hu.warning_permission_request_microphone = '{{icon}} Mikrofon hozzáférés engedélyezése';

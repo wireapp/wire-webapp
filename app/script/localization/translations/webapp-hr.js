@@ -34,8 +34,7 @@ z.string.hr.auth_account_country_code = 'Pozivni broj';
 z.string.hr.auth_account_create = 'Stvori';
 z.string.hr.auth_account_create_account = 'Stvaranje računa';
 z.string.hr.auth_account_expiration = 'Odjavljeni ste jer je vaša sesija istekla. Molimo prijavite se ponovno.';
-z.string.hr.auth_account_get_wire =
-  'Jednostavan, privatan i siguran klijent za razgovor, pozive, dijeljenje slika, glazbe, videa, animacija i više.';
+z.string.hr.auth_account_get_wire = 'Jednostavan, privatan i siguran klijent za razgovor, pozive, dijeljenje slika, glazbe, videa, animacija i više.';
 z.string.hr.auth_account_password_forgot = 'Zaboravljena lozinka';
 z.string.hr.auth_account_sign_in = 'Prijava';
 z.string.hr.auth_account_sign_in_email = 'Email';
@@ -55,8 +54,7 @@ z.string.hr.auth_verify_code_change_phone = 'Promjeni broj telefona';
 z.string.hr.auth_verify_password_headline = 'Upišite Vašu šifru';
 
 z.string.hr.auth_limit_devices_headline = 'Uređaji';
-z.string.hr.auth_limit_description =
-  'Uklonite jedan od Vaših ostalih uređaja kako bi ste počeli koristiti Wire na ovom.';
+z.string.hr.auth_limit_description = 'Uklonite jedan od Vaših ostalih uređaja kako bi ste počeli koristiti Wire na ovom.';
 z.string.hr.auth_limit_button_manage = 'Upravljanje uređajima';
 z.string.hr.auth_limit_button_sign_out = 'Odjava';
 z.string.hr.auth_limit_devices_current = '(Trenutno)';
@@ -139,8 +137,7 @@ z.string.hr.modal_connected_device_message = 'Ako niste to učinili, uklonite ur
 z.string.hr.modal_connected_device_manage_devices = 'upravljanje uređajima';
 z.string.hr.modal_delete_account_action = 'Obriši';
 z.string.hr.modal_delete_account_headline = 'Brisanje računa';
-z.string.hr.modal_delete_account_message =
-  'Poslati ćemo Vam poslati poruku putem e-maila ili SMS-a. Slijedite link za trajno brisanje računa.';
+z.string.hr.modal_delete_account_message = 'Poslati ćemo Vam poslati poruku putem e-maila ili SMS-a. Slijedite link za trajno brisanje računa.';
 z.string.hr.modal_delete_button = 'Obriši';
 z.string.hr.modal_delete_headline = 'Izbriši samo za mene?';
 z.string.hr.modal_delete_message = 'Ovo se ne može poništiti.';
@@ -166,8 +163,7 @@ z.string.hr.modal_session_reset_message_1 = 'Ako problem nije razriješen,';
 z.string.hr.modal_session_reset_message_link = 'kontaktirajte';
 z.string.hr.modal_session_reset_message_2 = 'nas.';
 z.string.hr.modal_too_many_members_headline = 'Puna kuća';
-z.string.hr.modal_too_many_members_message =
-  'Do {{number1}} ljudi može pristupiti razgovoru. Ima mjesta za još {{number2}} ljudi ovdje.';
+z.string.hr.modal_too_many_members_message = 'Do {{number1}} ljudi može pristupiti razgovoru. Ima mjesta za još {{number2}} ljudi ovdje.';
 z.string.hr.modal_uploads_parallel = 'Možete poslati {{number}} datoteke odjednom.';
 
 z.string.hr.connection_request_connect = 'Poveži se';
@@ -225,6 +221,7 @@ z.string.hr.conversation_edit_timestamp = 'Promijenjeno na {{date}}';
 z.string.hr.conversation_likes_caption = '{{number}} ljudi';
 z.string.hr.conversation_send_pasted_file = 'Slika zaljepljena na {{date}}';
 
+
 z.string.hr.archive_header = 'Arhiviraj';
 
 z.string.hr.conversations_all_archived = 'Sve arhivirano';
@@ -277,14 +274,12 @@ z.string.hr.people_invite_button_gmail = 'Iz Gmaila';
 z.string.hr.people_invite_headline = 'Pozovi prijatelje';
 z.string.hr.people_tabs_details = 'Detalji';
 z.string.hr.people_tabs_devices = 'Uređaji';
-z.string.hr.people_tabs_devices_headline =
-  'Wire daje svakom uređaju jedinstveni otisak. Usporedite otiske s {{user}} da bi verificirali razgovor.';
+z.string.hr.people_tabs_devices_headline = 'Wire daje svakom uređaju jedinstveni otisak. Usporedite otiske s {{user}} da bi verificirali razgovor.';
 z.string.hr.people_tabs_devices_why_verify = 'Zašto verifikacija razgovora?';
 z.string.hr.people_tabs_no_devices_headline = '{{user}} koristi staru verziju Wire. Nema novih uređaja.';
 z.string.hr.people_tabs_device_detail_all_my_devices = 'Pokaži sve uređaje';
 z.string.hr.people_tabs_device_detail_device_fingerprint = 'Otisak uređaja';
-z.string.hr.people_tabs_device_detail_headline =
-  'Provjerite da je otisak prikazan na {{html1}}{{user}}’s device{{html2}}.';
+z.string.hr.people_tabs_device_detail_headline = 'Provjerite da je otisak prikazan na {{html1}}{{user}}’s device{{html2}}.';
 z.string.hr.people_tabs_device_detail_how_to = 'Kako to da učinim?';
 z.string.hr.people_tabs_device_detail_reset_session = 'Resetiraj sesiju';
 z.string.hr.people_tabs_device_detail_show_my_device = 'Pokaži otisak mog uređaja';
@@ -355,20 +350,16 @@ z.string.hr.preferences_av_speakers = 'Zvučnici';
 z.string.hr.preferences_devices_activated_in = 'u {{location}}';
 z.string.hr.preferences_devices_activated_on = 'Aktiviran u {{date}}';
 z.string.hr.preferences_devices_active = 'Aktivno';
-z.string.hr.preferences_devices_active_detail =
-  'Ako ne prepoznajete neki od navedenih uređaja, uklonite ga i resetirajte Vašu lozinku.';
+z.string.hr.preferences_devices_active_detail = 'Ako ne prepoznajete neki od navedenih uređaja, uklonite ga i resetirajte Vašu lozinku.';
 z.string.hr.preferences_devices_current = 'Trenutno';
 z.string.hr.preferences_devices_fingerprint = 'Otisak prsta';
-z.string.hr.preferences_devices_fingerprint_detail =
-  'Wire daje svakom uređaju jedinstveni otisak. Usporedite otiske da bi verificirali uređaje i razgovore.';
+z.string.hr.preferences_devices_fingerprint_detail = 'Wire daje svakom uređaju jedinstveni otisak. Usporedite otiske da bi verificirali uređaje i razgovore.';
 z.string.hr.preferences_devices_id = 'ID: ';
 z.string.hr.preferences_devices_remove = 'Ukloni';
 z.string.hr.preferences_devices_remove_cancel = 'Odustani';
-z.string.hr.preferences_devices_remove_detail =
-  'Uklonite ovaj uređaj ako ste ga prestali koristiti. Odmah ćete biti automatski odjavljeni.';
+z.string.hr.preferences_devices_remove_detail = 'Uklonite ovaj uređaj ako ste ga prestali koristiti. Odmah ćete biti automatski odjavljeni.';
 z.string.hr.preferences_devices_session_confirmation = 'Sesija je resetirana.';
-z.string.hr.preferences_devices_session_detail =
-  'Ako otisci prstiju ne odgovaraju, resetirajte sesiju da bi generirali nove ključeve za šifriranje na obje strane.';
+z.string.hr.preferences_devices_session_detail = 'Ako otisci prstiju ne odgovaraju, resetirajte sesiju da bi generirali nove ključeve za šifriranje na obje strane.';
 z.string.hr.preferences_devices_session_reset = 'Resetiraj sesiju';
 z.string.hr.preferences_devices_session_ongoing = 'Resetiranje sesije…';
 z.string.hr.preferences_devices_verification = 'Verificirano';
@@ -383,8 +374,7 @@ z.string.hr.preferences_options_audio_some_detail = 'Pingovi i pozivi';
 z.string.hr.preferences_options_contacts = 'Kontakti';
 z.string.hr.preferences_options_contacts_gmail = 'Uvezi iz Gmaila';
 z.string.hr.preferences_options_contacts_macos = 'Uvezi iz kontakata';
-z.string.hr.preferences_options_contacts_detail =
-  'Mi koristimo vaše kontakt podatke za povezivanje s drugima. Sve informacije su anonimiziane i nisu dijeljene s drugima.';
+z.string.hr.preferences_options_contacts_detail = 'Mi koristimo vaše kontakt podatke za povezivanje s drugima. Sve informacije su anonimiziane i nisu dijeljene s drugima.';
 z.string.hr.preferences_options_data = 'Izvješće o korištenju i rušenju aplikacije';
 z.string.hr.preferences_options_data_checkbox = 'Izvješće o korištenju i rušenju aplikacije';
 z.string.hr.preferences_options_data_detail = 'Poboljšaj Wire slanjem anonimnih informacija.';
@@ -403,8 +393,7 @@ z.string.hr.search_no_contacts_on_wire = 'Nemate veza na Wire. Pokušajte prona�
 z.string.hr.search_others = 'Poveži se';
 
 z.string.hr.upload_google_headline = 'Pronađi ljude za razgovor.';
-z.string.hr.upload_google_message =
-  'Mi koristimo vaše kontakt podatke za povezivanje s drugima. Sve informacije su anonimiziane i nisu dijeljene s drugima.';
+z.string.hr.upload_google_message = 'Mi koristimo vaše kontakt podatke za povezivanje s drugima. Sve informacije su anonimiziane i nisu dijeljene s drugima.';
 z.string.hr.upload_google_headline_error = 'Nešto je pogrešno.';
 z.string.hr.upload_google_message_error = 'Nismo dobili podatke. Pokušajte ponovno uvesti svoje kontakte.';
 z.string.hr.upload_google_button_again = 'Pokušaj ponovno';
@@ -448,8 +437,7 @@ z.string.hr.warning_permission_request_notification = '{{icon}} Dopusti notifika
 z.string.hr.warning_permission_request_screen = '{{icon}} dopusti pristup zaslonu';
 z.string.hr.warning_tell_me_how = 'Recite mi kako';
 
-z.string.hr.warning_connectivity_connection_lost =
-  'Povezivanje u tijeku. Postoji mogućnost da Wire neće moći isporučiti poruke.';
+z.string.hr.warning_connectivity_connection_lost = 'Povezivanje u tijeku. Postoji mogućnost da Wire neće moći isporučiti poruke.';
 z.string.hr.warning_connectivity_no_internet = 'Nema Interneta. Nećete moći slati ili primati poruke.';
 
 z.string.hr.system_notification_asset_add = 'Podijelila/o sliku';

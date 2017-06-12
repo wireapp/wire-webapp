@@ -34,8 +34,7 @@ z.string.fi.auth_account_country_code = 'Maakoodi';
 z.string.fi.auth_account_create = 'Luo';
 z.string.fi.auth_account_create_account = 'Luo käyttäjätili';
 z.string.fi.auth_account_expiration = 'Sinut kirjattiin ulos, koska istuntosi päättyi. Kirjaudu sisään uudelleen.';
-z.string.fi.auth_account_get_wire =
-  'Yksinkertainen, privaatti ja turvallinen pikaviestin chattailuun, puheluihin sekä muun muassa kuvien, videoiden ja animaatioiden jakamiseen.';
+z.string.fi.auth_account_get_wire = 'Yksinkertainen, privaatti ja turvallinen pikaviestin chattailuun, puheluihin sekä muun muassa kuvien, videoiden ja animaatioiden jakamiseen.';
 z.string.fi.auth_account_password_forgot = 'Unohdin salasanani';
 z.string.fi.auth_account_sign_in = 'Kirjaudu sisään';
 z.string.fi.auth_account_sign_in_email = 'Sähköposti';
@@ -67,8 +66,7 @@ z.string.fi.auth_history_button = 'OK';
 z.string.fi.auth_posted_change_email = 'Vaihda sähköpostiosoite';
 z.string.fi.auth_posted_offline_detail = 'Tarkista internet-yhteytesi ja yritä uudelleen.';
 z.string.fi.auth_posted_offline_headline = 'Wire on mukavampi internettiin kytkettynä.';
-z.string.fi.auth_posted_pending_detail =
-  'Tarkista sähköpostisi saapuneet-kansio tai lähetä aktivointiviesti uudelleen.';
+z.string.fi.auth_posted_pending_detail = 'Tarkista sähköpostisi saapuneet-kansio tai lähetä aktivointiviesti uudelleen.';
 z.string.fi.auth_posted_pending_headline = 'Tili on jo vireillä';
 z.string.fi.auth_posted_resend = 'Lähetä uudelleen sähköpostiosoitteeseen: {{email}}';
 z.string.fi.auth_posted_resend_action = 'Eikö sähköposti saavu perille?';
@@ -139,8 +137,7 @@ z.string.fi.modal_connected_device_message = 'Jos et tehnyt tätä, poista laite
 z.string.fi.modal_connected_device_manage_devices = 'hallitse laitteita';
 z.string.fi.modal_delete_account_action = 'Poista';
 z.string.fi.modal_delete_account_headline = 'Poista tili';
-z.string.fi.modal_delete_account_message =
-  'Lähetämme viestin sähköpostina tai tekstiviestinä. Paina viestissä olevaa linkkiä poistaaksesi tilisi lopullisesti.';
+z.string.fi.modal_delete_account_message = 'Lähetämme viestin sähköpostina tai tekstiviestinä. Paina viestissä olevaa linkkiä poistaaksesi tilisi lopullisesti.';
 z.string.fi.modal_delete_button = 'Poista';
 z.string.fi.modal_delete_headline = 'Poista ainoastaan minulta?';
 z.string.fi.modal_delete_message = 'Tätä ei voi perua.';
@@ -168,8 +165,7 @@ z.string.fi.modal_session_reset_message_1 = 'Jos ongelma ei ole ratkennut';
 z.string.fi.modal_session_reset_message_link = 'ota yhteys';
 z.string.fi.modal_session_reset_message_2 = 'meihin.';
 z.string.fi.modal_too_many_members_headline = 'Kaikki puhelukanavat varattuja';
-z.string.fi.modal_too_many_members_message =
-  'Maksimissaan {{number1}} henkilöä voi liittyä keskusteluun. Tässä keskustelussa on tilaa {{number2}} hengelle.';
+z.string.fi.modal_too_many_members_message = 'Maksimissaan {{number1}} henkilöä voi liittyä keskusteluun. Tässä keskustelussa on tilaa {{number2}} hengelle.';
 z.string.fi.modal_uploads_parallel = 'Voit lähettää jopa {{number}} tiedostoa samaan aikaan.';
 
 z.string.fi.connection_request_connect = 'Yhdistä';
@@ -281,21 +277,18 @@ z.string.fi.people_no_matches = 'Ei vastaavia tuloksia. Yritä toisella nimellä
 z.string.fi.people_invite = 'Kutsu ihmisiä';
 z.string.fi.people_share = 'Jaa yhteystietoja';
 z.string.fi.people_bring_your_friends = 'Tuo ystäväsi Wireen';
-z.string.fi.people_invite_detail =
-  'Yhteystietojesi jakaminen auttaa sinua löytämään uusia kontakteja. Anonymisoimme kaiken tiedon ja emme jaa sitä ulkopuolisille.';
+z.string.fi.people_invite_detail = 'Yhteystietojesi jakaminen auttaa sinua löytämään uusia kontakteja. Anonymisoimme kaiken tiedon ja emme jaa sitä ulkopuolisille.';
 z.string.fi.people_invite_button_contacts = 'Kontakteista';
 z.string.fi.people_invite_button_gmail = 'Gmailista';
 z.string.fi.people_invite_headline = 'Kutsu kavereitasi';
 z.string.fi.people_tabs_details = 'Lisätietoja';
 z.string.fi.people_tabs_devices = 'Laitteet';
-z.string.fi.people_tabs_devices_headline =
-  'Wire antaa jokaiselle laitteelle yksilöllisen sormenjäljen. Vertaa niitä {{user}} kanssa ja vahvista keskustelusi.';
+z.string.fi.people_tabs_devices_headline = 'Wire antaa jokaiselle laitteelle yksilöllisen sormenjäljen. Vertaa niitä {{user}} kanssa ja vahvista keskustelusi.';
 z.string.fi.people_tabs_devices_why_verify = 'Miksi vahvistaa keskustelu?';
 z.string.fi.people_tabs_no_devices_headline = '{{user}} käyttää vanhaa Wire-versiota. Laitteita ei näytetä täällä.';
 z.string.fi.people_tabs_device_detail_all_my_devices = 'Näytä kaikki laitteeni';
 z.string.fi.people_tabs_device_detail_device_fingerprint = 'Laitteen sormenjälki';
-z.string.fi.people_tabs_device_detail_headline =
-  'Vahvista että tämä vastaa sormenjälkeä joka näkyy {{html1}}{{user}}’s n laitteella{{html2}}.';
+z.string.fi.people_tabs_device_detail_headline = 'Vahvista että tämä vastaa sormenjälkeä joka näkyy {{html1}}{{user}}’s n laitteella{{html2}}.';
 z.string.fi.people_tabs_device_detail_how_to = 'Miten teen sen?';
 z.string.fi.people_tabs_device_detail_reset_session = 'Nollaa istunto';
 z.string.fi.people_tabs_device_detail_show_my_device = 'Näytä laitteeni sormenjälki';
@@ -369,16 +362,13 @@ z.string.fi.preferences_devices_active = 'Aktiivinen';
 z.string.fi.preferences_devices_active_detail = 'Jos et tunnista yllä olevaa laitetta, poista se ja vaihda salasanasi.';
 z.string.fi.preferences_devices_current = 'Nykyinen';
 z.string.fi.preferences_devices_fingerprint = 'Sormenjälki avain';
-z.string.fi.preferences_devices_fingerprint_detail =
-  'Wire antaa jokaiselle laitteelle yksilöllisen sormenjäljen. Vertaa niitä ja varmenna laitteesi ja keskustelusi.';
+z.string.fi.preferences_devices_fingerprint_detail = 'Wire antaa jokaiselle laitteelle yksilöllisen sormenjäljen. Vertaa niitä ja varmenna laitteesi ja keskustelusi.';
 z.string.fi.preferences_devices_id = 'ID: ';
 z.string.fi.preferences_devices_remove = 'Poista';
 z.string.fi.preferences_devices_remove_cancel = 'Peruuta';
-z.string.fi.preferences_devices_remove_detail =
-  'Poista tämä laite jos olet lakannut käyttämästä sitä. Sinut kirjataan ulos tästä laitteesta välittömästi.';
+z.string.fi.preferences_devices_remove_detail = 'Poista tämä laite jos olet lakannut käyttämästä sitä. Sinut kirjataan ulos tästä laitteesta välittömästi.';
 z.string.fi.preferences_devices_session_confirmation = 'Istunto on nollattu.';
-z.string.fi.preferences_devices_session_detail =
-  'Jos sormenjäljet eivät täsmää, nollaa istunto luodaksesi uudet salausavaimet molemmille osapuolille.';
+z.string.fi.preferences_devices_session_detail = 'Jos sormenjäljet eivät täsmää, nollaa istunto luodaksesi uudet salausavaimet molemmille osapuolille.';
 z.string.fi.preferences_devices_session_reset = 'Nollaa istunto';
 z.string.fi.preferences_devices_session_ongoing = 'Nollataan istuntoa…';
 z.string.fi.preferences_devices_verification = 'Vahvistettu';
@@ -393,8 +383,7 @@ z.string.fi.preferences_options_audio_some_detail = 'Pingit ja puhelut';
 z.string.fi.preferences_options_contacts = 'Yhteystiedot';
 z.string.fi.preferences_options_contacts_gmail = 'Tuo Gmailista';
 z.string.fi.preferences_options_contacts_macos = 'Tuo Yhteystiedoista';
-z.string.fi.preferences_options_contacts_detail =
-  'Käytämme sinun kontaktitietoja yhdistääksemme sinut muiden kanssa. Anonymisoimme kaiken tiedon ja emme jaa sitä ulkopuolisille.';
+z.string.fi.preferences_options_contacts_detail = 'Käytämme sinun kontaktitietoja yhdistääksemme sinut muiden kanssa. Anonymisoimme kaiken tiedon ja emme jaa sitä ulkopuolisille.';
 z.string.fi.preferences_options_data = 'Käyttö- ja vikaraportit';
 z.string.fi.preferences_options_data_checkbox = 'Käyttö- ja vikaraportit';
 z.string.fi.preferences_options_data_detail = 'Tee Wirestä parempi lähetämällä anonyymiä tietoa.';
@@ -411,16 +400,13 @@ z.string.fi.search_groups = 'Ryhmät';
 z.string.fi.search_placeholder = 'Etsi nimellä tai käyttäjänimellä';
 z.string.fi.search_top_people = 'Eniten käytetyt kontaktit';
 z.string.fi.search_try_search = 'Etsi käyttäjiä nimellä tai käyttäjänimellä';
-z.string.fi.search_no_contacts_on_wire =
-  'Sinulla ei ole kontakteja Wiressä. Yritä etsiä muita käyttäjiä nimellä tai käyttäjänimellä.';
+z.string.fi.search_no_contacts_on_wire = 'Sinulla ei ole kontakteja Wiressä. Yritä etsiä muita käyttäjiä nimellä tai käyttäjänimellä.';
 z.string.fi.search_others = 'Yhdistä';
 
 z.string.fi.upload_google_headline = 'Etsi ihmisiä joiden kanssa jutella.';
-z.string.fi.upload_google_message =
-  'Käytämme sinun kontaktitietoja yhdistääksemme sinut muiden kanssa. Anonymisoimme kaiken tiedon ja emme jaa sitä ulkopuolisille.';
+z.string.fi.upload_google_message = 'Käytämme sinun kontaktitietoja yhdistääksemme sinut muiden kanssa. Anonymisoimme kaiken tiedon ja emme jaa sitä ulkopuolisille.';
 z.string.fi.upload_google_headline_error = 'Jotain meni pieleen.';
-z.string.fi.upload_google_message_error =
-  'Emme vastaanottaneet tietojasi. Ole hyvä ja yritä tuoda kontaktisi uudelleen.';
+z.string.fi.upload_google_message_error = 'Emme vastaanottaneet tietojasi. Ole hyvä ja yritä tuoda kontaktisi uudelleen.';
 z.string.fi.upload_google_button_again = 'Yritä uudelleen';
 
 z.string.fi.url_legal = 'https://wire.com/legal/';
@@ -444,8 +430,7 @@ z.string.fi.url_support_usernames = 'https://wire.com/support/username';
 z.string.fi.url_decrypt_error_1 = 'https://wire.com/privacy/error-1';
 z.string.fi.url_decrypt_error_2 = 'https://wire.com/privacy/error-2';
 
-z.string.fi.warning_call_detail =
-  'Selaimellasi täytyy olla käyttöoikeus mikrofoniisi voidaksesi käydä puhelinkeskusteluja.';
+z.string.fi.warning_call_detail = 'Selaimellasi täytyy olla käyttöoikeus mikrofoniisi voidaksesi käydä puhelinkeskusteluja.';
 z.string.fi.warning_call_headline = 'Et voi käydä puhelinkeskusteluja ilman mikrofonia';
 z.string.fi.warning_call_unsupported_incoming = '{{user}} soittaa. Selaimesi ei tue puheluja.';
 z.string.fi.warning_call_unsupported_outgoing = 'Et voi soittaa puhelua koska selaimesi ei tue puheluja.';
@@ -454,10 +439,8 @@ z.string.fi.warning_call_upgrade_browser = 'Soittaaksesi puhelun, päivitä Goog
 z.string.fi.warning_learn_more = 'Lue lisää';
 z.string.fi.warning_not_found_camera = 'Et voi soittaa puhelua koska tietokoneessasi ei ole kameraa.';
 z.string.fi.warning_not_found_microphone = 'Et voi soittaa puhelua koska tietokoneessasi ei ole mikrofonia.';
-z.string.fi.warning_permission_denied_camera =
-  'Et voi soittaa puhelua koska selaimellasi ei ole oikeutta käyttä kameraa.';
-z.string.fi.warning_permission_denied_microphone =
-  'Et voi soittaa puhelua koska selaimellasi ei ole oikeuta käyttää mikrofonia.';
+z.string.fi.warning_permission_denied_camera = 'Et voi soittaa puhelua koska selaimellasi ei ole oikeutta käyttä kameraa.';
+z.string.fi.warning_permission_denied_microphone = 'Et voi soittaa puhelua koska selaimellasi ei ole oikeuta käyttää mikrofonia.';
 z.string.fi.warning_permission_denied_screen = 'Selaimesi tarvitsee luvan jakaa näyttösi.';
 z.string.fi.warning_permission_request_camera = '{{icon}} Anna käyttöoikeus kameraan';
 z.string.fi.warning_permission_request_microphone = '{{icon}} Anna käyttöoikeus mikrofoniin';
@@ -465,8 +448,7 @@ z.string.fi.warning_permission_request_notification = '{{icon}} Salli ilmoitukse
 z.string.fi.warning_permission_request_screen = '{{icon}} Salli näytön käyttö';
 z.string.fi.warning_tell_me_how = 'Kerro miten';
 
-z.string.fi.warning_connectivity_connection_lost =
-  'Yritetään yhdistää. Wire ei mahdollisesti pysty toimitttamaan viestejä perille.';
+z.string.fi.warning_connectivity_connection_lost = 'Yritetään yhdistää. Wire ei mahdollisesti pysty toimitttamaan viestejä perille.';
 z.string.fi.warning_connectivity_no_internet = 'Ei Internetiä. Et pysty lähettämään tai vastaanottamaan viestejä.';
 
 z.string.fi.system_notification_asset_add = 'Jakoi kuvan';
