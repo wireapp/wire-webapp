@@ -97,14 +97,14 @@ z.conversation.ConversationMapper = class ConversationMapper {
       if (self.last_event_timestamp) {
         conversation_et.set_timestamp(
           self.last_event_timestamp,
-          z.conversation.ConversationUpdateType.LAST_EVENT_TIMESTAMP,
+          z.conversation.ConversationUpdateType.LAST_EVENT_TIMESTAMP
         );
       }
 
       if (self.archived_timestamp) {
         conversation_et.set_timestamp(
           self.archived_timestamp,
-          z.conversation.ConversationUpdateType.ARCHIVED_TIMESTAMP,
+          z.conversation.ConversationUpdateType.ARCHIVED_TIMESTAMP
         );
         conversation_et.archived_state(self.archived_state);
       }
@@ -116,7 +116,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
       if (self.last_read_timestamp) {
         conversation_et.set_timestamp(
           self.last_read_timestamp,
-          z.conversation.ConversationUpdateType.LAST_READ_TIMESTAMP,
+          z.conversation.ConversationUpdateType.LAST_READ_TIMESTAMP
         );
       }
 

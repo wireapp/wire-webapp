@@ -75,7 +75,7 @@ describe('z.cryptography.CryptographyRepository', function() {
           }
 
           return prekey_map;
-        }),
+        })
       );
 
       const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());

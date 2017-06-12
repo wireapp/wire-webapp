@@ -112,7 +112,7 @@ module.exports = grunt => {
 
   // Test Related
   grunt.registerTask('test', () =>
-    grunt.task.run(['clean:docs_coverage', 'scripts', 'test_init', 'test_prepare', 'karma:test']),
+    grunt.task.run(['clean:docs_coverage', 'scripts', 'test_init', 'test_prepare', 'karma:test'])
   );
 
   grunt.registerTask('test_prepare', test_name => {

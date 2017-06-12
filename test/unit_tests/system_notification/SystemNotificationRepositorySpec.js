@@ -43,13 +43,13 @@ describe('z.system_notification.SystemNotificationRepository', function() {
       .then(function() {
         amplify.publish(
           z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE,
-          z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET,
+          z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET
         );
 
         // Create entities
         user_et = TestFactory.user_repository.user_mapper.map_user_from_object(payload.users.get.one[0]);
         conversation_et = TestFactory.conversation_repository.conversation_mapper.map_conversation(
-          entities.conversation,
+          entities.conversation
         );
         conversation_et.team_id = undefined;
 
@@ -69,7 +69,7 @@ describe('z.system_notification.SystemNotificationRepository', function() {
           title: z.util.StringUtil.truncate(
             conversation_et.display_name(),
             z.system_notification.SystemNotificationRepository.CONFIG.TITLE_LENGTH,
-            false,
+            false
           ),
         };
 
@@ -111,18 +111,18 @@ describe('z.system_notification.SystemNotificationRepository', function() {
                 notification_content.title = z.util.StringUtil.truncate(
                   title,
                   z.system_notification.SystemNotificationRepository.CONFIG.TITLE_LENGTH,
-                  false,
+                  false
                 );
               } else {
                 notification_content.title = '…';
               }
               notification_content.trigger = TestFactory.system_notification_repository._create_trigger(
                 conversation_et,
-                message_et,
+                message_et
               );
 
               const result = JSON.stringify(
-                TestFactory.system_notification_repository._show_notification.calls.first().args[0],
+                TestFactory.system_notification_repository._show_notification.calls.first().args[0]
               );
               expect(result).toEqual(JSON.stringify(notification_content));
               expect(TestFactory.system_notification_repository._show_notification).toHaveBeenCalledTimes(1);
@@ -139,11 +139,11 @@ describe('z.system_notification.SystemNotificationRepository', function() {
               notification_content.title = z.string.system_notification_obfuscated_title;
               notification_content.trigger = TestFactory.system_notification_repository._create_trigger(
                 conversation_et,
-                message_et,
+                message_et
               );
 
               const result = JSON.stringify(
-                TestFactory.system_notification_repository._show_notification.calls.first().args[0],
+                TestFactory.system_notification_repository._show_notification.calls.first().args[0]
               );
               expect(result).toEqual(JSON.stringify(notification_content));
               expect(TestFactory.system_notification_repository._show_notification).toHaveBeenCalledTimes(1);
@@ -162,7 +162,7 @@ describe('z.system_notification.SystemNotificationRepository', function() {
                 notification_content.title = z.util.StringUtil.truncate(
                   title,
                   z.system_notification.SystemNotificationRepository.CONFIG.TITLE_LENGTH,
-                  false,
+                  false
                 );
               } else {
                 notification_content.options.body = z.string.system_notification_obfuscated;
@@ -170,11 +170,11 @@ describe('z.system_notification.SystemNotificationRepository', function() {
               }
               notification_content.trigger = TestFactory.system_notification_repository._create_trigger(
                 conversation_et,
-                message_et,
+                message_et
               );
 
               const result = JSON.stringify(
-                TestFactory.system_notification_repository._show_notification.calls.first().args[0],
+                TestFactory.system_notification_repository._show_notification.calls.first().args[0]
               );
               expect(result).toEqual(JSON.stringify(notification_content));
               expect(TestFactory.system_notification_repository._show_notification).toHaveBeenCalledTimes(1);
@@ -195,11 +195,11 @@ describe('z.system_notification.SystemNotificationRepository', function() {
               }
               notification_content.trigger = TestFactory.system_notification_repository._create_trigger(
                 conversation_et,
-                message_et,
+                message_et
               );
 
               const result = JSON.stringify(
-                TestFactory.system_notification_repository._show_notification.calls.first().args[0],
+                TestFactory.system_notification_repository._show_notification.calls.first().args[0]
               );
               expect(result).toEqual(JSON.stringify(notification_content));
               expect(TestFactory.system_notification_repository._show_notification).toHaveBeenCalledTimes(1);
@@ -291,7 +291,7 @@ describe('z.system_notification.SystemNotificationRepository', function() {
 
     it('if preference is set to none', function(done) {
       TestFactory.system_notification_repository.notifications_preference(
-        z.system_notification.SystemNotificationPreference.NONE,
+        z.system_notification.SystemNotificationPreference.NONE
       );
 
       TestFactory.system_notification_repository
@@ -478,7 +478,7 @@ describe('z.system_notification.SystemNotificationRepository', function() {
       notification_content.title = z.util.StringUtil.truncate(
         title,
         z.system_notification.SystemNotificationRepository.CONFIG.TITLE_LENGTH,
-        false,
+        false
       );
     });
 
@@ -519,7 +519,7 @@ describe('z.system_notification.SystemNotificationRepository', function() {
         notification_content.title = z.util.StringUtil.truncate(
           title,
           z.system_notification.SystemNotificationRepository.CONFIG.TITLE_LENGTH,
-          false,
+          false
         );
       });
 
@@ -555,7 +555,7 @@ describe('z.system_notification.SystemNotificationRepository', function() {
         notification_content.title = z.util.StringUtil.truncate(
           title,
           z.system_notification.SystemNotificationRepository.CONFIG.TITLE_LENGTH,
-          false,
+          false
         );
       });
 

@@ -31,7 +31,7 @@ describe('Conversation Mapper', function() {
   describe('map_conversation', function() {
     it('throws an error if conversation data is missing', function() {
       expect(() => conversation_mapper.map_conversation()).toThrow(
-        new Error('Cannot create conversation entity without data'),
+        new Error('Cannot create conversation entity without data')
       );
     });
 

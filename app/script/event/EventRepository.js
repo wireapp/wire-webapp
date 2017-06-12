@@ -52,7 +52,7 @@ z.event.EventRepository = class EventRepository {
     notification_service,
     cryptography_repository,
     user_repository,
-    conversation_service,
+    conversation_service
   ) {
     this.web_socket_service = web_socket_service;
     this.notification_service = notification_service;
@@ -96,7 +96,7 @@ z.event.EventRepository = class EventRepository {
             .catch(error => {
               this.logger.warn(
                 `We failed to handle a notification but will continue with queue: ${error.message}`,
-                error,
+                error
               );
             })
             .then(() => {
@@ -511,19 +511,19 @@ z.event.EventRepository = class EventRepository {
                 // Session is broken, let's see what's really causing it...
                 this.logger.error(
                   `Session '${session_id}' with user '${remote_user_id}' (client '${remote_client_id}') is broken or out of sync. Reset the session and decryption is likely to work again. Error: ${decryption_error.message}`,
-                  decryption_error,
+                  decryption_error
                 );
               } else if (decryption_error instanceof Proteus.errors.DecryptError.RemoteIdentityChanged) {
                 // Remote identity changed
                 this.logger.error(
                   `Remote identity of client '${remote_client_id}' from user '${remote_user_id}' changed: ${decryption_error.message}`,
-                  decryption_error,
+                  decryption_error
                 );
               }
 
               this.logger.warn(
                 `Could not decrypt an event from client ID '${remote_client_id}' of user ID '${remote_user_id}' in session ID '${session_id}'.\nError Code: '${error_code}'\nError Message: ${decryption_error.message}`,
-                decryption_error,
+                decryption_error
               );
               this._report_decrypt_error(decryption_error, event);
 
@@ -651,7 +651,7 @@ z.event.EventRepository = class EventRepository {
     if (corrected_timestamp > event_timestamp + EventRepository.CONFIG.E_CALL_EVENT_LIFETIME) {
       this.logger.info(
         `Ignored outdated '${event.type}' event in conversation '${event.conversation}' - Event: '${event_timestamp}', Local: '${corrected_timestamp}'`,
-        {event_json: JSON.stringify(event), event_object: event},
+        {event_json: JSON.stringify(event), event_object: event}
       );
       throw new z.event.EventError(z.event.EventError.TYPE.OUTDATED_E_CALL_EVENT);
     }

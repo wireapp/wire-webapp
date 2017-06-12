@@ -75,7 +75,7 @@ z.main.App = class App {
 
     repositories.cryptography = new z.cryptography.CryptographyRepository(
       this.service.cryptography,
-      repositories.storage,
+      repositories.storage
     );
     repositories.client = new z.client.ClientRepository(this.service.client, repositories.cryptography);
     repositories.user = new z.user.UserRepository(
@@ -83,21 +83,21 @@ z.main.App = class App {
       this.service.asset,
       this.service.search,
       repositories.client,
-      repositories.cryptography,
+      repositories.cryptography
     );
     repositories.event = new z.event.EventRepository(
       this.service.web_socket,
       this.service.notification,
       repositories.cryptography,
       repositories.user,
-      this.service.conversation,
+      this.service.conversation
     );
     repositories.search = new z.search.SearchRepository(this.service.search, repositories.user);
     repositories.properties = new z.properties.PropertiesRepository(this.service.properties);
     repositories.connect = new z.connect.ConnectRepository(
       this.service.connect,
       this.service.connect_google,
-      repositories.properties,
+      repositories.properties
     );
     repositories.links = new z.links.LinkPreviewRepository(this.service.asset, repositories.properties);
     repositories.team = new z.team.TeamRepository(this.service.team, repositories.user);
@@ -109,7 +109,7 @@ z.main.App = class App {
       repositories.giphy,
       repositories.cryptography,
       repositories.links,
-      repositories.team,
+      repositories.team
     );
 
     repositories.bot = new z.bot.BotRepository(this.service.bot, repositories.conversation);
@@ -118,12 +118,12 @@ z.main.App = class App {
       repositories.client,
       repositories.conversation,
       repositories.media,
-      repositories.user,
+      repositories.user
     );
     repositories.event_tracker = new z.tracking.EventTrackingRepository(repositories.conversation, repositories.user);
     repositories.system_notification = new z.system_notification.SystemNotificationRepository(
       repositories.calling,
-      repositories.conversation,
+      repositories.conversation
     );
 
     return repositories;
@@ -191,7 +191,7 @@ z.main.App = class App {
       this.repository.media,
       this.repository.properties,
       this.repository.search,
-      this.repository.team,
+      this.repository.team
     );
     view_models.list = new z.ViewModel.list.ListViewModel(
       'left',
@@ -201,12 +201,12 @@ z.main.App = class App {
       this.repository.conversation,
       this.repository.search,
       this.repository.properties,
-      this.repository.team,
+      this.repository.team
     );
     view_models.title = new z.ViewModel.WindowTitleViewModel(
       view_models.content.content_state,
       this.repository.user,
-      this.repository.conversation,
+      this.repository.conversation
     );
     view_models.lightbox = new z.ViewModel.ImageDetailViewViewModel('detail-view', this.repository.conversation);
     view_models.warnings = new z.ViewModel.WarningsViewModel('warnings');
@@ -257,7 +257,7 @@ z.main.App = class App {
         return Promise.all([
           this._get_user_self(),
           z.util.protobuf.load_protos(
-            `ext/proto/generic-message-proto/messages.proto?${z.util.Environment.version(false)}`,
+            `ext/proto/generic-message-proto/messages.proto?${z.util.Environment.version(false)}`
           ),
         ]);
       })
@@ -292,12 +292,12 @@ z.main.App = class App {
         this.telemetry.add_statistic(
           z.telemetry.app_init.AppInitStatisticsValue.CONVERSATIONS,
           conversation_ets.length,
-          50,
+          50
         );
         this.telemetry.add_statistic(
           z.telemetry.app_init.AppInitStatisticsValue.CONNECTIONS,
           connection_ets.length,
-          50,
+          50
         );
 
         this.repository.conversation.initialize_connections(this.repository.user.connections());
@@ -315,7 +315,7 @@ z.main.App = class App {
         this.telemetry.add_statistic(
           z.telemetry.app_init.AppInitStatisticsValue.NOTIFICATIONS,
           notifications_count,
-          100,
+          100
         );
 
         this._watch_online_status();
@@ -362,13 +362,13 @@ z.main.App = class App {
         }
 
         this.logger.debug(
-          `App reload: '${is_reload}', Document referrer: '${document.referrer}', Location: '${window.location.href}'`,
+          `App reload: '${is_reload}', Document referrer: '${document.referrer}', Location: '${window.location.href}'`
         );
 
         if (
           is_reload &&
           ![z.client.ClientError.TYPE.MISSING_ON_BACKEND, z.client.ClientError.TYPE.NO_LOCAL_CLIENT].includes(
-            error.type,
+            error.type
           )
         ) {
           return this.auth.client
@@ -495,7 +495,7 @@ z.main.App = class App {
   _is_reload() {
     const is_reload = z.util.is_same_location(document.referrer, window.location.href);
     this.logger.debug(
-      `App reload: '${is_reload}', Document referrer: '${document.referrer}', Location: '${window.location.href}'`,
+      `App reload: '${is_reload}', Document referrer: '${document.referrer}', Location: '${window.location.href}'`
     );
     return is_reload;
   }
@@ -518,7 +518,7 @@ z.main.App = class App {
         if (is_reload) {
           if (
             [z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN, z.auth.AccessTokenError.TYPE.NOT_FOUND_IN_CACHE].includes(
-              error.type,
+              error.type
             )
           ) {
             this.logger.error(`Session expired on page reload: ${error.message}`, error);
@@ -631,7 +631,7 @@ z.main.App = class App {
       const self_user = this.repository.user.self();
       if (self_user) {
         const cookie_label_key = this.repository.client.construct_cookie_label_key(
-          self_user.email() || self_user.phone(),
+          self_user.email() || self_user.phone()
         );
 
         Object.keys(amplify.store()).forEach(function(amplify_key) {

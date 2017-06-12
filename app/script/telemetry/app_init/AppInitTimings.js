@@ -72,7 +72,7 @@ z.telemetry.app_init.AppInitTimings = class AppInitTimings {
           const placeholder_key = new Array(placeholder_key_length).join(' ');
           const placeholder_value_length = Math.max(
             AppInitTimings.CONFIG.LOG_LENGTH_VALUE - value.toString().length,
-            1,
+            1
           );
           const placeholder_value = new Array(placeholder_value_length).join(' ');
 

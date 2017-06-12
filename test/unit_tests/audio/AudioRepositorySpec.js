@@ -78,7 +78,7 @@ describe('z.audio.AudioRepository', function() {
   xdescribe('_play', function() {
     beforeEach(function() {
       TestFactory.audio_repository.audio_elements[z.audio.AudioType.OUTGOING_CALL] = new Audio(
-        `/audio/${z.audio.AudioType.OUTGOING_CALL}.mp3`,
+        `/audio/${z.audio.AudioType.OUTGOING_CALL}.mp3`
       );
     });
 
@@ -91,7 +91,7 @@ describe('z.audio.AudioRepository', function() {
         ._play(
           z.audio.AudioType.OUTGOING_CALL,
           TestFactory.audio_repository.audio_elements[z.audio.AudioType.OUTGOING_CALL],
-          false,
+          false
         )
         .then(function(audio_element) {
           expect(audio_element).toEqual(jasmine.any(HTMLAudioElement));
@@ -106,7 +106,7 @@ describe('z.audio.AudioRepository', function() {
         ._play(
           z.audio.AudioType.OUTGOING_CALL,
           TestFactory.audio_repository.audio_elements[z.audio.AudioType.OUTGOING_CALL],
-          true,
+          true
         )
         .then(function(audio_element) {
           expect(audio_element).toEqual(jasmine.any(HTMLAudioElement));
@@ -122,7 +122,7 @@ describe('z.audio.AudioRepository', function() {
         .then(function() {
           TestFactory.audio_repository._play(
             z.audio.AudioType.OUTGOING_CALL,
-            TestFactory.audio_repository.audio_elements[z.audio.AudioType.OUTGOING_CALL],
+            TestFactory.audio_repository.audio_elements[z.audio.AudioType.OUTGOING_CALL]
           );
         })
         .then(done.fail)

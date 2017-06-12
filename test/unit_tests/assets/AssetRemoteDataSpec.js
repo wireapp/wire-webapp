@@ -58,7 +58,7 @@ describe('z.assets.AssetRemoteData', function() {
             conversation_id,
             asset_id,
             new Uint8Array(key_bytes),
-            new Uint8Array(sha256),
+            new Uint8Array(sha256)
           );
           spyOn(remote_data, '_load_buffer').and.returnValue(Promise.resolve([cipher_text, video_type]));
           done();

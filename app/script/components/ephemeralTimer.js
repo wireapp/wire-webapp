@@ -29,7 +29,7 @@ z.components.EphemeralTimer = class EphemeralTimer {
     this.message_et = params.message;
 
     this.ephemeral_duration = ko.computed(
-      () => this.message_et.ephemeral_expires() - this.message_et.ephemeral_started(),
+      () => this.message_et.ephemeral_expires() - this.message_et.ephemeral_started()
     );
 
     this.progress = ko.observable(0);

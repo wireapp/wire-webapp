@@ -118,13 +118,13 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
         }
       },
       this,
-      {deferEvaluation: true},
+      {deferEvaluation: true}
     );
   }
 
   is_connection() {
     return [z.message.SystemMessageType.CONNECTION_ACCEPTED, z.message.SystemMessageType.CONNECTION_REQUEST].includes(
-      this.member_message_type,
+      this.member_message_type
     );
   }
 

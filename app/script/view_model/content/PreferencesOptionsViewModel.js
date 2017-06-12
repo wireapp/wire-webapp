@@ -53,7 +53,7 @@ z.ViewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
     this.option_emoji_replace_inline.subscribe(emoji_replace_inline_preference => {
       this.properties_repository.save_preference(
         z.properties.PROPERTIES_TYPE.EMOJI.REPLACE_INLINE,
-        emoji_replace_inline_preference,
+        emoji_replace_inline_preference
       );
     });
 

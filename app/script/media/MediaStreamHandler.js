@@ -280,7 +280,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     if (this.joined_call()) {
       this._set_stream_state(media_stream_info);
       update_promise = Promise.all(
-        this.joined_call().get_flows().map(flow_et => flow_et.update_media_stream(media_stream_info)),
+        this.joined_call().get_flows().map(flow_et => flow_et.update_media_stream(media_stream_info))
       );
     } else {
       update_promise = Promise.resolve(media_stream_info);
@@ -340,12 +340,12 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
   request_media_stream(media_type, media_stream_constraints) {
     if (!this.media_repository.devices_handler.has_microphone()) {
       return Promise.reject(
-        new z.media.MediaError(z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE, z.media.MediaType.VIDEO),
+        new z.media.MediaError(z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE, z.media.MediaType.VIDEO)
       );
     }
     if (!this.media_repository.devices_handler.has_camera() && media_type === z.media.MediaType.VIDEO) {
       return Promise.reject(
-        new z.media.MediaError(z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE, z.media.MediaType.VIDEO),
+        new z.media.MediaError(z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE, z.media.MediaType.VIDEO)
       );
     }
 
@@ -501,7 +501,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
           media_stream_track.stop();
           this.logger.info(
             `Stopping MediaStreamTrack of kind '${media_stream_track.kind}' successful`,
-            media_stream_track,
+            media_stream_track
           );
         });
         return true;
@@ -702,7 +702,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     if ([z.media.MediaType.AUDIO, z.media.MediaType.AUDIO_VIDEO].includes(media_stream_info.type)) {
       const audio_stream_tracks = z.media.MediaStreamHandler.get_media_tracks(
         media_stream_info.stream,
-        z.media.MediaType.AUDIO,
+        z.media.MediaType.AUDIO
       );
       audio_stream_tracks[0].enabled = this.self_stream_state.audio_send();
     }
@@ -710,7 +710,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     if ([z.media.MediaType.AUDIO_VIDEO, z.media.MediaType.VIDEO].includes(media_stream_info.type)) {
       const video_stream_tracks = z.media.MediaStreamHandler.get_media_tracks(
         media_stream_info.stream,
-        z.media.MediaType.VIDEO,
+        z.media.MediaType.VIDEO
       );
       video_stream_tracks[0].enabled = this.self_stream_state.screen_send() || this.self_stream_state.video_send();
     }
@@ -725,7 +725,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     return this._toggle_stream_enabled(
       z.media.MediaType.AUDIO,
       this.local_media_stream(),
-      this.self_stream_state.audio_send,
+      this.self_stream_state.audio_send
     ).then(audio_tracks => {
       this.logger.info(`Microphone enabled: ${this.self_stream_state.audio_send()}`, audio_tracks);
       this.self_stream_state.audio_send();
@@ -741,7 +741,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     return this._toggle_stream_enabled(
       z.media.MediaType.VIDEO,
       this.local_media_stream(),
-      this.self_stream_state.screen_send,
+      this.self_stream_state.screen_send
     ).then(video_tracks => {
       this.logger.info(`Screen enabled: ${this.self_stream_state.screen_send()}`, video_tracks);
       this.self_stream_state.screen_send();
@@ -757,7 +757,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     return this._toggle_stream_enabled(
       z.media.MediaType.VIDEO,
       this.local_media_stream(),
-      this.self_stream_state.video_send,
+      this.self_stream_state.video_send
     ).then(video_tracks => {
       this.logger.info(`Camera enabled: ${this.self_stream_state.video_send()}`, video_tracks);
       this.self_stream_state.video_send();

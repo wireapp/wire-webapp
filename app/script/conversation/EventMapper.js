@@ -260,7 +260,7 @@ z.conversation.EventMapper = class EventMapper {
 
     if (
       [z.conversation.ConversationType.CONNECT, z.conversation.ConversationType.ONE2ONE].includes(
-        conversation_et.type(),
+        conversation_et.type()
       )
     ) {
       if (from === conversation_et.creator && event_data.user_ids.length === 1) {
@@ -467,11 +467,11 @@ z.conversation.EventMapper = class EventMapper {
     if (preview_otr_key) {
       if (preview_key) {
         asset_et.preview_resource(
-          z.assets.AssetRemoteData.v3(preview_key, preview_otr_key, preview_sha256, preview_token, true),
+          z.assets.AssetRemoteData.v3(preview_key, preview_otr_key, preview_sha256, preview_token, true)
         );
       } else {
         asset_et.preview_resource(
-          z.assets.AssetRemoteData.v2(conversation_id, preview_id, preview_otr_key, preview_sha256, true),
+          z.assets.AssetRemoteData.v2(conversation_id, preview_id, preview_otr_key, preview_sha256, true)
         );
       }
     }

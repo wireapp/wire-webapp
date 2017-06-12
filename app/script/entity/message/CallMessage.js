@@ -37,7 +37,7 @@ z.entity.CallMessage = class CallMessage extends z.entity.Message {
         return z.l10n.text(z.string.conversation_voice_channel_deactivate);
       },
       this,
-      {deferEvaluation: true},
+      {deferEvaluation: true}
     );
   }
 

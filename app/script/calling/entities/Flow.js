@@ -357,10 +357,10 @@ z.calling.entities.Flow = class Flow {
    */
   start_negotiation(
     negotiation_mode = z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT,
-    media_stream = this.media_stream(),
+    media_stream = this.media_stream()
   ) {
     this.logger.info(
-      `Start negotiating PeerConnection with '${this.remote_user.name()}' triggered by '${negotiation_mode}'`,
+      `Start negotiating PeerConnection with '${this.remote_user.name()}' triggered by '${negotiation_mode}'`
     );
 
     this._create_peer_connection().then(() => {
@@ -388,7 +388,7 @@ z.calling.entities.Flow = class Flow {
       .delete_participant(
         this.participant_et.id,
         this.remote_client_id,
-        z.calling.enum.TERMINATION_REASON.CONNECTION_DROP,
+        z.calling.enum.TERMINATION_REASON.CONNECTION_DROP
       )
       .then(() => {
         if (!this.call_et.participants().length) {
@@ -431,7 +431,7 @@ z.calling.entities.Flow = class Flow {
       this.peer_connection.onsignalingstatechange = () => {
         this.logger.log(
           this.logger.levels.OFF,
-          `State change ignored - signaling state: ${this.peer_connection.signalingState}`,
+          `State change ignored - signaling state: ${this.peer_connection.signalingState}`
         );
       };
 
@@ -471,7 +471,7 @@ z.calling.entities.Flow = class Flow {
       this.signaling_state(this.peer_connection.signalingState);
       this.logger.debug(
         `PeerConnection with '${this.remote_user.name()}' created - is_answer '${this.is_answer()}'`,
-        pc_configuration,
+        pc_configuration
       );
 
       this.peer_connection.onaddstream = this._on_add_stream.bind(this);
@@ -510,7 +510,7 @@ z.calling.entities.Flow = class Flow {
       z.media.MediaStreamSource.REMOTE,
       this.remote_user.id,
       media_stream,
-      this.call_et,
+      this.call_et
     );
     amplify.publish(z.event.WebApp.CALL.MEDIA.ADD_STREAM, media_stream_info);
   }
@@ -604,7 +604,7 @@ z.calling.entities.Flow = class Flow {
         this.data_channel.send(call_message_et.to_content_string());
         this.logger.info(
           `Send call '${type}' message to conversation '${conversation_id}' via data channel`,
-          call_message_et.to_JSON(),
+          call_message_et.to_JSON()
         );
         return;
       } catch (error) {
@@ -643,7 +643,7 @@ z.calling.entities.Flow = class Flow {
       this._setup_data_channel(
         this.peer_connection.createDataChannel(Flow.CONFIG.DATA_CHANNEL_LABEL, {
           ordered: true,
-        }),
+        })
       );
     }
   }
@@ -723,12 +723,12 @@ z.calling.entities.Flow = class Flow {
       conversation_et,
       call_message,
       this.remote_user_id,
-      this.remote_client_id,
+      this.remote_client_id
     );
     amplify.publish(
       z.event.WebApp.CALL.EVENT_FROM_BACKEND,
       call_event,
-      z.event.EventRepository.NOTIFICATION_SOURCE.WEB_SOCKET,
+      z.event.EventRepository.NOTIFICATION_SOURCE.WEB_SOCKET
     );
   }
 
@@ -807,7 +807,7 @@ z.calling.entities.Flow = class Flow {
           if (!this._contains_relay_candidate(ice_candidates)) {
             this.logger.warn(
               `Local SDP does not contain any relay ICE candidates, resetting timeout\n${ice_candidates}`,
-              ice_candidates,
+              ice_candidates
             );
             return this._set_send_sdp_timeout(false);
           }
@@ -815,7 +815,7 @@ z.calling.entities.Flow = class Flow {
 
         this.logger.debug(
           `Sending local '${local_sdp.type}' SDP containing '${ice_candidates.length}' ICE candidates for flow with '${this.remote_user.name()}'\n${this.local_sdp()
-            .sdp}`,
+            .sdp}`
         );
         this.should_send_local_sdp(false);
 
@@ -827,20 +827,20 @@ z.calling.entities.Flow = class Flow {
             call_message_et = z.calling.CallMessageBuilder.build_group_setup(
               response,
               this.call_et.session_id,
-              this._create_additional_payload(),
+              this._create_additional_payload()
             );
           } else {
             call_message_et = z.calling.CallMessageBuilder.build_setup(
               response,
               this.call_et.session_id,
-              this._create_additional_payload(),
+              this._create_additional_payload()
             );
           }
         } else {
           call_message_et = z.calling.CallMessageBuilder.build_update(
             response,
             this.call_et.session_id,
-            this._create_additional_payload(),
+            this._create_additional_payload()
           );
         }
 
@@ -981,7 +981,7 @@ z.calling.entities.Flow = class Flow {
       this.id,
       this.self_user_id,
       this.remote_user_id,
-      this.remote_client_id,
+      this.remote_client_id
     );
     const additional_payload = $.extend({remote_user: this.remote_user, sdp: this.local_sdp().sdp}, payload);
 
@@ -989,7 +989,7 @@ z.calling.entities.Flow = class Flow {
       this.call_et.self_state,
       this.call_et.self_state.video_send(),
       false,
-      additional_payload,
+      additional_payload
     );
   }
 
@@ -1007,7 +1007,7 @@ z.calling.entities.Flow = class Flow {
       .then(() => {
         this.logger.info(
           `Setting local '${this.local_sdp().type}' SDP successful`,
-          this.peer_connection.localDescription,
+          this.peer_connection.localDescription
         );
         this.telemetry.time_step(z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SET);
 
@@ -1032,7 +1032,7 @@ z.calling.entities.Flow = class Flow {
       .then(() => {
         this.logger.info(
           `Setting remote '${this.remote_sdp().type}' SDP successful`,
-          this.peer_connection.remoteDescription,
+          this.peer_connection.remoteDescription
         );
         this.telemetry.time_step(z.telemetry.calling.CallSetupSteps.REMOTE_SDP_SET);
 
@@ -1295,7 +1295,7 @@ z.calling.entities.Flow = class Flow {
 
         if (
           ![z.calling.CallError.TYPE.NO_REPLACEABLE_TRACK, z.calling.CallError.TYPE.RTP_SENDER_NOT_SUPPORTED].includes(
-            type,
+            type
           )
         ) {
           this.logger.error(`Failed to replace the '${media_type}' track: ${name} - ${message}`, error);
@@ -1380,7 +1380,7 @@ z.calling.entities.Flow = class Flow {
         media_stream_track.stop();
         this.logger.debug(
           `Stopping MediaStreamTrack of kind '${media_stream_track.kind}' successful`,
-          media_stream_track,
+          media_stream_track
         );
       });
 

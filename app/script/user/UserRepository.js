@@ -78,7 +78,7 @@ z.user.UserRepository = class UserRepository {
       amplify.publish(
         z.event.WebApp.ANALYTICS.CUSTOM_DIMENSION,
         z.tracking.CustomDimension.CONTACTS,
-        number_of_connected_users,
+        number_of_connected_users
       );
     });
 
@@ -267,7 +267,7 @@ z.user.UserRepository = class UserRepository {
     return this.client_repository.get_all_clients_from_db().then(user_client_map => {
       this.logger.info(
         `Found locally stored clients for '${Object.keys(user_client_map).length}' users`,
-        user_client_map,
+        user_client_map
       );
       const user_ids = Object.keys(user_client_map);
 
@@ -276,7 +276,7 @@ z.user.UserRepository = class UserRepository {
           if (user_client_map[user_et.id].length > 8) {
             this.logger.warn(
               `Found '${user_client_map[user_et.id].length}' clients for '${user_et.name()}'`,
-              user_client_map[user_et.id],
+              user_client_map[user_et.id]
             );
           }
           user_et.devices(user_client_map[user_et.id]);
@@ -328,7 +328,7 @@ z.user.UserRepository = class UserRepository {
       .catch(error => {
         this.logger.error(
           `Connection status change to '${status}' for user '${user_et.id}' failed: ${error.message}`,
-          error,
+          error
         );
 
         const custom_data = {

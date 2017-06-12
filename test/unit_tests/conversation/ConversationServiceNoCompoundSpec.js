@@ -84,7 +84,7 @@ describe('ConversationServiceNoCompound', function() {
 
     beforeEach(function(done) {
       Promise.all(
-        messages.map(message => storage_service.save(z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, message)),
+        messages.map(message => storage_service.save(z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, message))
       )
         .then(done)
         .catch(done.fail);
@@ -158,7 +158,7 @@ describe('ConversationServiceNoCompound', function() {
       });
 
       Promise.all(
-        messages.map(message => storage_service.save(z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, message)),
+        messages.map(message => storage_service.save(z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, message))
       )
         .then(done)
         .catch(done.fail);
@@ -346,7 +346,7 @@ describe('ConversationServiceNoCompound', function() {
 
     beforeEach(function(done) {
       Promise.all(
-        messages.map(message => storage_service.save(z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, message)),
+        messages.map(message => storage_service.save(z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, message))
       )
         .then(function(ids) {
           primary_keys = ids;
@@ -453,13 +453,13 @@ describe('ConversationServiceNoCompound', function() {
       Promise.all(
         events
           .slice(0, 1)
-          .map(event => storage_service.save(z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, event)),
+          .map(event => storage_service.save(z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, event))
       )
         .then(() =>
           conversation_service.load_events_with_category_from_db(
             events[0].conversation,
-            z.message.MessageCategory.IMAGE,
-          ),
+            z.message.MessageCategory.IMAGE
+          )
         )
         .then(function(result) {
           expect(result.length).toBe(0);
@@ -470,13 +470,13 @@ describe('ConversationServiceNoCompound', function() {
 
     it('should get images in the correct order', function(done) {
       Promise.all(
-        events.map(event => storage_service.save(z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, event)),
+        events.map(event => storage_service.save(z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, event))
       )
         .then(() =>
           conversation_service.load_events_with_category_from_db(
             events[0].conversation,
-            z.message.MessageCategory.IMAGE,
-          ),
+            z.message.MessageCategory.IMAGE
+          )
         )
         .then(function(result) {
           expect(result.length).toBe(2);

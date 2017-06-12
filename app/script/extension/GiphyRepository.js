@@ -48,7 +48,7 @@ z.extension.GiphyRepository = class GiphyRepository {
         max_size: 3 * 1024 * 1024,
         retry: 3,
       },
-      options,
+      options
     );
 
     const _get_random_gif = (retries = 0) => {
@@ -102,7 +102,7 @@ z.extension.GiphyRepository = class GiphyRepository {
         random: true,
         sorting: 'relevant',
       },
-      options,
+      options
     );
 
     if (!options.query) {

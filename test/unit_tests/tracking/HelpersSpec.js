@@ -27,7 +27,7 @@ describe('z.tracking.helpers', function() {
       const conversation_et = new z.entity.Conversation(z.util.create_random_uuid());
       conversation_et.type(z.conversation.ConversationType.ONE2ONE);
       expect(z.tracking.helpers.get_conversation_type(conversation_et)).toBe(
-        z.tracking.attribute.ConversationType.ONE_TO_ONE,
+        z.tracking.attribute.ConversationType.ONE_TO_ONE
       );
     });
 
@@ -35,7 +35,7 @@ describe('z.tracking.helpers', function() {
       const conversation_et = new z.entity.Conversation(z.util.create_random_uuid());
       conversation_et.type(z.conversation.ConversationType.GROUP);
       expect(z.tracking.helpers.get_conversation_type(conversation_et)).toBe(
-        z.tracking.attribute.ConversationType.GROUP,
+        z.tracking.attribute.ConversationType.GROUP
       );
     });
 
@@ -66,13 +66,13 @@ describe('z.tracking.helpers', function() {
 
     it('returns correct type for ping message', function() {
       expect(z.tracking.helpers.get_message_type(new z.entity.PingMessage())).toBe(
-        z.tracking.attribute.MessageType.PING,
+        z.tracking.attribute.MessageType.PING
       );
     });
 
     it('returns correct type for system message', function() {
       expect(z.tracking.helpers.get_message_type(new z.entity.SystemMessage())).toBe(
-        z.tracking.attribute.MessageType.SYSTEM,
+        z.tracking.attribute.MessageType.SYSTEM
       );
     });
 

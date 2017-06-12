@@ -143,7 +143,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
           .sort((user_a, user_b) => z.util.StringUtil.sort_by_priority(user_a.first_name(), user_b.first_name()));
       },
       this,
-      {deferEvaluation: true},
+      {deferEvaluation: true}
     );
     this.team_members = ko.pureComputed(() => {
       return this.active_team().members().filter(user_et => {

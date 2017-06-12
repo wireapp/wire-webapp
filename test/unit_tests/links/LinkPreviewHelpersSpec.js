@@ -79,7 +79,7 @@ describe('get_first_link_with_offset', function() {
 
   it('should return correct link and offset for single link surrounded by text )', function() {
     const link_preview = z.links.LinkPreviewHelpers.get_first_link_with_offset(
-      'wire.com wire.com wire.com wire.com wire.com',
+      'wire.com wire.com wire.com wire.com wire.com'
     );
     expect(link_preview.offset).toEqual(0);
     expect(link_preview.url).toEqual('wire.com');

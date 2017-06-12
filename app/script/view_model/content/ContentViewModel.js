@@ -32,7 +32,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
     media_repository,
     properties_repository,
     search_repository,
-    team_repository,
+    team_repository
   ) {
     this.show_conversation = this.show_conversation.bind(this);
     this.switch_content = this.switch_content.bind(this);
@@ -69,63 +69,63 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
       this.conversation_repository,
       this.media_repository,
       this.user_repository,
-      this.multitasking,
+      this.multitasking
     );
     this.collection_details = new z.ViewModel.content.CollectionDetailsViewModel('collection-details');
     this.collection = new z.ViewModel.content.CollectionViewModel(
       'collection',
       this.conversation_repository,
-      this.collection_details,
+      this.collection_details
     );
     this.connect_requests = new z.ViewModel.content.ConnectRequestsViewModel('connect-requests', this.user_repository);
     this.conversation_titlebar = new z.ViewModel.ConversationTitlebarViewModel(
       'conversation-titlebar',
       this.calling_repository,
       this.conversation_repository,
-      this.multitasking,
+      this.multitasking
     );
     this.conversation_input = new z.ViewModel.ConversationInputViewModel(
       'conversation-input',
       this.conversation_repository,
       this.user_repository,
-      this.properties_repository,
+      this.properties_repository
     );
     this.message_list = new z.ViewModel.MessageListViewModel(
       'message-list',
       this.conversation_repository,
-      this.user_repository,
+      this.user_repository
     );
     this.participants = new z.ViewModel.ParticipantsViewModel(
       'participants',
       this.user_repository,
       this.conversation_repository,
       this.search_repository,
-      this.team_repository,
+      this.team_repository
     );
     this.giphy = new z.ViewModel.GiphyViewModel('giphy-modal', this.conversation_repository, this.giphy_repository);
 
     this.preferences_account = new z.ViewModel.content.PreferencesAccountViewModel(
       'preferences-account',
       this.client_repository,
-      this.user_repository,
+      this.user_repository
     );
     this.preferences_av = new z.ViewModel.content.PreferencesAVViewModel('preferences-av', this.media_repository);
     this.preferences_device_details = new z.ViewModel.content.PreferencesDeviceDetailsViewModel(
       'preferences-devices',
       this.client_repository,
       this.conversation_repository,
-      this.cryptography_repository,
+      this.cryptography_repository
     );
     this.preferences_devices = new z.ViewModel.content.PreferencesDevicesViewModel(
       'preferences-devices',
       this.preferences_device_details,
       this.client_repository,
       this.conversation_repository,
-      this.cryptography_repository,
+      this.cryptography_repository
     );
     this.preferences_options = new z.ViewModel.content.PreferencesOptionsViewModel(
       'preferences-options',
-      this.properties_repository,
+      this.properties_repository
     );
     /* eslint-enable no-multi-spaces */
 

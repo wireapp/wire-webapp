@@ -78,7 +78,7 @@ z.entity.User = class User {
         }
       },
       this,
-      {deferEvaluation: true},
+      {deferEvaluation: true}
     );
 
     this.accent_color = ko.pureComputed(
@@ -103,7 +103,7 @@ z.entity.User = class User {
         }
       },
       this,
-      {deferEvaluation: true},
+      {deferEvaluation: true}
     );
 
     this.email = ko.observable();

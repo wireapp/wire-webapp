@@ -38,7 +38,7 @@ z.entity.Connection = class Connection {
     this.is_incoming_request = ko.pureComputed(() => this.status() === z.user.ConnectionStatus.PENDING);
     this.is_outgoing_request = ko.pureComputed(() => this.status() === z.user.ConnectionStatus.SENT);
     this.is_unknown = ko.pureComputed(() =>
-      [z.user.ConnectionStatus.CANCELLED, z.user.ConnectionStatus.UNKNOWN].includes(this.status()),
+      [z.user.ConnectionStatus.CANCELLED, z.user.ConnectionStatus.UNKNOWN].includes(this.status())
     );
 
     this.is_request = ko.pureComputed(() => this.is_incoming_request() || this.is_outgoing_request());

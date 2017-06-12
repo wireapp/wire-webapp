@@ -106,7 +106,7 @@ z.client.ClientService = class ClientService {
     return this.client.send_request({
       type: 'GET',
       url: this.client.create_url(
-        `${z.client.ClientService.URL_USERS}/${user_id}${z.client.ClientService.URL_CLIENTS}`,
+        `${z.client.ClientService.URL_USERS}/${user_id}${z.client.ClientService.URL_CLIENTS}`
       ),
     });
   }

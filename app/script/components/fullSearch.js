@@ -59,7 +59,7 @@ z.components.FullSearchViewModel = class FullSearchViewModel {
             this.message_ets_rendered(this.message_ets.splice(0, this.number_of_message_to_render));
           }
         });
-      }, 100),
+      }, 100)
     );
 
     this.transform_text = message_et => {
@@ -103,7 +103,7 @@ z.components.FullSearchViewModel = class FullSearchViewModel {
       if ($(event.currentTarget).is_scrolled_bottom() && this.message_ets.length > 0) {
         z.util.ko_array_push_all(
           this.message_ets_rendered,
-          this.message_ets.splice(0, this.number_of_message_to_render),
+          this.message_ets.splice(0, this.number_of_message_to_render)
         );
       }
     });

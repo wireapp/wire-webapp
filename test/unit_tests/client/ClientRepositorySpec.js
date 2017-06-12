@@ -50,7 +50,7 @@ describe('z.client.ClientRepository', function() {
           {class: 'desktop', id: '8e11e06549c8cf1a'},
           {class: 'tablet', id: 'c411f97b139c818b'},
           {class: 'desktop', id: 'cbf3ea49214702d8'},
-        ]),
+        ])
       );
 
       TestFactory.client_repository
@@ -98,7 +98,7 @@ describe('z.client.ClientRepository', function() {
 
     it('resolves with a valid client', function(done) {
       spyOn(TestFactory.client_service, 'load_client_from_db').and.returnValue(
-        Promise.resolve(client_payload_database),
+        Promise.resolve(client_payload_database)
       );
 
       server.respondWith('GET', client_url, [
@@ -119,7 +119,7 @@ describe('z.client.ClientRepository', function() {
 
     it('rejects with an error if no client found locally', function(done) {
       spyOn(TestFactory.client_service, 'load_client_from_db').and.returnValue(
-        Promise.resolve(z.client.ClientRepository.PRIMARY_KEY_CURRENT_CLIENT),
+        Promise.resolve(z.client.ClientRepository.PRIMARY_KEY_CURRENT_CLIENT)
       );
 
       TestFactory.client_repository.get_valid_local_client().then(done.fail).catch(function(error) {
@@ -131,7 +131,7 @@ describe('z.client.ClientRepository', function() {
 
     it('rejects with an error if client removed on backend', function(done) {
       spyOn(TestFactory.client_service, 'load_client_from_db').and.returnValue(
-        Promise.resolve(client_payload_database),
+        Promise.resolve(client_payload_database)
       );
       spyOn(TestFactory.storage_service, 'delete_everything').and.returnValue(Promise.resolve(true));
 
@@ -144,10 +144,10 @@ describe('z.client.ClientRepository', function() {
 
     it('rejects with an error if database deletion fails', function(done) {
       spyOn(TestFactory.client_service, 'load_client_from_db').and.returnValue(
-        Promise.resolve(client_payload_database),
+        Promise.resolve(client_payload_database)
       );
       spyOn(TestFactory.storage_repository, 'delete_cryptography').and.returnValue(
-        Promise.reject(new Error('Expected unit test error')),
+        Promise.reject(new Error('Expected unit test error'))
       );
 
       TestFactory.client_repository.get_valid_local_client().then(done.fail).catch(function(error) {
@@ -159,7 +159,7 @@ describe('z.client.ClientRepository', function() {
 
     it('rejects with an error if something else fails', function(done) {
       spyOn(TestFactory.client_service, 'load_client_from_db').and.returnValue(
-        Promise.reject(new Error('Expected unit test error')),
+        Promise.reject(new Error('Expected unit test error'))
       );
 
       TestFactory.client_repository.get_valid_local_client().then(done.fail).catch(function(error) {

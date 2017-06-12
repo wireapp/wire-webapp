@@ -36,10 +36,10 @@ z.entity.Conversation = class Conversation {
     this.type = ko.observable();
 
     this.input = ko.observable(
-      z.util.StorageUtil.get_value(`${z.storage.StorageKey.CONVERSATION.INPUT}|${this.id}`) || '',
+      z.util.StorageUtil.get_value(`${z.storage.StorageKey.CONVERSATION.INPUT}|${this.id}`) || ''
     );
     this.input.subscribe(text =>
-      z.util.StorageUtil.set_value(`${z.storage.StorageKey.CONVERSATION.INPUT}|${this.id}`, text),
+      z.util.StorageUtil.set_value(`${z.storage.StorageKey.CONVERSATION.INPUT}|${this.id}`, text)
     );
 
     this.is_loaded = ko.observable(false);
@@ -110,7 +110,7 @@ z.entity.Conversation = class Conversation {
 
     this.status = ko.observable(z.conversation.ConversationStatus.CURRENT_MEMBER);
     this.removed_from_conversation = ko.pureComputed(
-      () => this.status() === z.conversation.ConversationStatus.PAST_MEMBER,
+      () => this.status() === z.conversation.ConversationStatus.PAST_MEMBER
     );
 
     this.removed_from_conversation.subscribe(is_removed => {
@@ -126,7 +126,7 @@ z.entity.Conversation = class Conversation {
     this.messages = ko.pureComputed(() =>
       this.messages_unordered().sort((message_a, message_b) => {
         return message_a.timestamp() - message_b.timestamp();
-      }),
+      })
     );
     this.messages.subscribe(() => this.update_latest_from_message(this.get_last_message()));
 
@@ -505,7 +505,7 @@ z.entity.Conversation = class Conversation {
 
         const user_et = ko.utils.arrayFirst(
           this.participating_user_ets(),
-          current_user_et => current_user_et.id === this.creator,
+          current_user_et => current_user_et.id === this.creator
         );
 
         if (user_et) {

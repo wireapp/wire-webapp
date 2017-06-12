@@ -40,7 +40,7 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
     content_view_model,
     calling_repository,
     conversation_repository,
-    user_repository,
+    user_repository
   ) {
     this.click_on_conversation = this.click_on_conversation.bind(this);
     this.is_selected_conversation = this.is_selected_conversation.bind(this);
@@ -106,7 +106,7 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
 
     this.start_tooltip = z.l10n.text(
       z.string.tooltip_conversations_start,
-      z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.START),
+      z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.START)
     );
 
     this.show_connect_requests = ko.pureComputed(() => {

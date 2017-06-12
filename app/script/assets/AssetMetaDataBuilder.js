@@ -35,7 +35,7 @@ z.assets.AssetMetaDataBuilder = {
       .then(audio_buffer => {
         return new z.proto.Asset.AudioMetaData(
           audio_buffer.duration * 1000,
-          z.assets.AssetMetaDataBuilder._normalise_loudness(audio_buffer),
+          z.assets.AssetMetaDataBuilder._normalise_loudness(audio_buffer)
         );
       });
   },

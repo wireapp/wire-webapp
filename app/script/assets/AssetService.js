@@ -197,7 +197,7 @@ z.assets.AssetService = class AssetService {
           public: false,
           retention: z.assets.AssetRetentionPolicy.PERSISTENT,
         },
-        metadata,
+        metadata
       );
 
       metadata = JSON.stringify(metadata);

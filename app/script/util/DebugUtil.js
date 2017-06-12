@@ -53,7 +53,7 @@ z.util.DebugUtil = class DebugUtil {
         return wire.app.repository.storage.storage_service.save(
           z.storage.StorageService.OBJECT_STORE.SESSIONS,
           session_id,
-          record,
+          record
         );
       })
       .then(() => {
@@ -157,12 +157,12 @@ z.util.DebugUtil = class DebugUtil {
           remote_user_id,
           remote_client_id,
           matching_notifications,
-          last_notification.id,
+          last_notification.id
         );
       }
       this.logger.log(
         `Found '${matching_notifications.length}' notification between '${local_client_id}' and '${remote_client_id}'`,
-        matching_notifications,
+        matching_notifications
       );
       return matching_notifications;
     };

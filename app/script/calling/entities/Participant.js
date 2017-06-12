@@ -140,7 +140,7 @@ z.calling.entities.Participant = class Participant {
       if (connected_client_id && client_id !== connected_client_id) {
         this.logger.warn(
           `State change requested from '${client_id}' while we are connected to '${connected_client_id}'`,
-          this,
+          this
         );
         throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_SENDER);
       }

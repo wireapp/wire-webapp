@@ -132,7 +132,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
           version: this.protocol_version,
           with_bot: conversation_et.is_with_bot(),
         },
-        attributes,
+        attributes
       );
 
       if (this.media_type === z.media.MediaType.VIDEO) {

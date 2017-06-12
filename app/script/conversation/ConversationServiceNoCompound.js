@@ -59,11 +59,11 @@ z.conversation.ConversationServiceNoCompound = class ConversationServiceNoCompou
   load_preceding_events_from_db(conversation_id, lower_bound = new Date(0), upper_bound = new Date(), limit) {
     if (!_.isDate(lower_bound) || !_.isDate(upper_bound)) {
       throw new Error(
-        `Lower bound (${typeof lower_bound}) and upper bound (${typeof upper_bound}) must be of type 'Date'.`,
+        `Lower bound (${typeof lower_bound}) and upper bound (${typeof upper_bound}) must be of type 'Date'.`
       );
     } else if (lower_bound.getTime() > upper_bound.getTime()) {
       throw new Error(
-        `Lower bound (${lower_bound.getTime()}) cannot be greater than upper bound (${upper_bound.getTime()}).`,
+        `Lower bound (${lower_bound.getTime()}) cannot be greater than upper bound (${upper_bound.getTime()}).`
       );
     }
 

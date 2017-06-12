@@ -80,7 +80,7 @@ z.extension.GiphyService = class GiphyService {
         offset: 0,
         sorting: 'relevant',
       },
-      options,
+      options
     );
 
     const url =

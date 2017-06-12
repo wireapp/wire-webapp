@@ -191,7 +191,7 @@ z.conversation.ConversationService = class ConversationService {
     return this.client.send_request({
       type: 'DELETE',
       url: this.client.create_url(
-        `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversation_id}/bots/${bot_user_id}`,
+        `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversation_id}/bots/${bot_user_id}`
       ),
     });
   }
@@ -209,7 +209,7 @@ z.conversation.ConversationService = class ConversationService {
     return this.client.send_request({
       type: 'DELETE',
       url: this.client.create_url(
-        `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversation_id}/members/${user_id}`,
+        `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversation_id}/members/${user_id}`
       ),
     });
   }
@@ -440,15 +440,15 @@ z.conversation.ConversationService = class ConversationService {
     conversation_id,
     lower_bound = new Date(0),
     upper_bound = new Date(),
-    limit = Number.MAX_SAFE_INTEGER,
+    limit = Number.MAX_SAFE_INTEGER
   ) {
     if (!_.isDate(lower_bound) || !_.isDate(upper_bound)) {
       throw new Error(
-        `Lower bound (${typeof lower_bound}) and upper bound (${typeof upper_bound}) must be of type 'Date'.`,
+        `Lower bound (${typeof lower_bound}) and upper bound (${typeof upper_bound}) must be of type 'Date'.`
       );
     } else if (lower_bound.getTime() > upper_bound.getTime()) {
       throw new Error(
-        `Lower bound (${lower_bound.getTime()}) cannot be greater than upper bound (${upper_bound.getTime()}).`,
+        `Lower bound (${lower_bound.getTime()}) cannot be greater than upper bound (${upper_bound.getTime()}).`
       );
     }
 
@@ -460,7 +460,7 @@ z.conversation.ConversationService = class ConversationService {
       .toArray()
       .catch(error => {
         this.logger.error(
-          `Failed to load events for conversation '${conversation_id}' from database: '${error.message}'`,
+          `Failed to load events for conversation '${conversation_id}' from database: '${error.message}'`
         );
         throw error;
       });
@@ -479,7 +479,7 @@ z.conversation.ConversationService = class ConversationService {
     conversation_id,
     upper_bound,
     limit = Number.MAX_SAFE_INTEGER,
-    include_upper_bound = true,
+    include_upper_bound = true
   ) {
     if (!_.isDate(upper_bound)) {
       throw new Error(`Upper bound (${typeof upper_bound}) must be of type 'Date'.`);
@@ -491,7 +491,7 @@ z.conversation.ConversationService = class ConversationService {
         [conversation_id, upper_bound.toISOString()],
         [conversation_id, new Date().toISOString()],
         include_upper_bound,
-        true,
+        true
       )
       .limit(limit)
       .toArray();
@@ -640,7 +640,7 @@ z.conversation.ConversationService = class ConversationService {
                   return this.storage_service.update(
                     z.storage.StorageService.OBJECT_STORE.EVENTS,
                     primary_key,
-                    changes,
+                    changes
                   );
                 }
 

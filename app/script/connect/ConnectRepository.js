@@ -57,7 +57,7 @@ z.connect.ConnectRepository = class ConnectRepository {
         this.logger.info(
           `Gmail contacts upload successful: ${response.results.length} matches, ${response['auto-connects']
             .length} auto connects`,
-          response,
+          response
         );
         this.properties_repository.save_preference(z.properties.PROPERTIES_TYPE.CONTACT_IMPORT.GOOGLE);
         return response;
@@ -103,7 +103,7 @@ z.connect.ConnectRepository = class ConnectRepository {
           this.logger.info(
             `macOS contacts upload successful: ${response.results.length} matches, ${response['auto-connects']
               .length} auto connects`,
-            response,
+            response
           );
           this.properties_repository.save_preference(z.properties.PROPERTIES_TYPE.CONTACT_IMPORT.MACOS);
           return response;
@@ -139,7 +139,7 @@ z.connect.ConnectRepository = class ConnectRepository {
         this.logger.info(
           `macOS contacts upload successful: ${response.results.length} matches, ${response['auto-connects']
             .length} auto connects`,
-          response,
+          response
         );
         this.properties_repository.save_preference(z.properties.PROPERTIES_TYPE.CONTACT_IMPORT.MACOS);
         return response;
@@ -226,7 +226,7 @@ z.connect.ConnectRepository = class ConnectRepository {
             }
           });
           return resolve(this._encode_phone_book(phone_book));
-        },
+        }
       );
     });
   }

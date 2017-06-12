@@ -118,7 +118,7 @@ z.auth.AuthRepository = class AuthRepository {
         {
           key: new_user.label_key,
           value: new_user.label,
-        },
+        }
       );
       return response;
     });
@@ -255,22 +255,22 @@ z.auth.AuthRepository = class AuthRepository {
     z.util.StorageUtil.set_value(
       z.storage.StorageKey.AUTH.ACCESS_TOKEN.VALUE,
       access_token_data.access_token,
-      access_token_data.expires_in,
+      access_token_data.expires_in
     );
     z.util.StorageUtil.set_value(
       z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION,
       expiration_timestamp,
-      access_token_data.expires_in,
+      access_token_data.expires_in
     );
     z.util.StorageUtil.set_value(
       z.storage.StorageKey.AUTH.ACCESS_TOKEN.TTL,
       expires_in_millis,
-      access_token_data.expires_in,
+      access_token_data.expires_in
     );
     z.util.StorageUtil.set_value(
       z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE,
       access_token_data.token_type,
-      access_token_data.expires_in,
+      access_token_data.expires_in
     );
 
     this.auth_service.save_access_token_in_client(access_token_data.token_type, access_token_data.access_token);

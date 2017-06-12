@@ -261,7 +261,7 @@ z.storage.StorageService = class StorageService {
         .catch(error => {
           this.logger.error(
             `Failed to initialize database '${this.db_name}' for Storage Service: ${error.message || error}`,
-            {error: error},
+            {error: error}
           );
           reject(new z.storage.StorageError(z.storage.StorageError.TYPE.FAILED_TO_OPEN));
         });
@@ -427,7 +427,7 @@ z.storage.StorageService = class StorageService {
       .then(number_of_updates => {
         this.logger.info(
           `Updated ${number_of_updates} record(s) with key '${primary_key}' in store '${store_name}'`,
-          changes,
+          changes
         );
         return number_of_updates;
       })

@@ -44,22 +44,22 @@ z.ViewModel.list.PreferencesListViewModel = class PreferencesListViewModel {
       .extend({notify: 'always', rateLimit: 500});
 
     this.selected_about = ko.pureComputed(
-      () => this.preferences_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_ABOUT,
+      () => this.preferences_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_ABOUT
     );
     this.selected_account = ko.pureComputed(
-      () => this.preferences_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT,
+      () => this.preferences_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT
     );
     this.selected_av = ko.pureComputed(
-      () => this.preferences_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_AV,
+      () => this.preferences_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_AV
     );
     this.selected_devices = ko.pureComputed(() =>
       [
         z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS,
         z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES,
-      ].includes(this.preferences_state()),
+      ].includes(this.preferences_state())
     );
     this.selected_options = ko.pureComputed(
-      () => this.preferences_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS,
+      () => this.preferences_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS
     );
   }
 

@@ -189,7 +189,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
       this.localytics('upload');
       this.session_interval = window.setInterval(
         this.upload_session,
-        EventTrackingRepository.CONFIG.LOCALYTICS.SESSION_INTERVAL,
+        EventTrackingRepository.CONFIG.LOCALYTICS.SESSION_INTERVAL
       );
     }
   }

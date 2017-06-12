@@ -38,7 +38,7 @@ module.exports = grunt => {
     grunt.config('aws.deploy.options.version', version);
     grunt.config(
       'aws.deploy.options.application_versions',
-      'https://eu-west-1.console.aws.amazon.com/elasticbeanstalk/home?region=eu-west-1#/application/versions?applicationName=Webapp',
+      'https://eu-west-1.console.aws.amazon.com/elasticbeanstalk/home?region=eu-west-1#/application/versions?applicationName=Webapp'
     );
     grunt.task.run('aws_prepare', 'aws_s3:default', 'shell:aws_deploy', 'open:ebs');
   });

@@ -137,7 +137,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
       if (notification_data) {
         const {notification_conversation_id, notification_message_id} = notification_data;
         this.logger.info(
-          `Notification for '${notification_message_id}' in '${notification_conversation_id}' closed on unload.`,
+          `Notification for '${notification_message_id}' in '${notification_conversation_id}' closed on unload.`
         );
       }
     });
@@ -327,7 +327,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
       default:
         this.logger.log(
           this.logger.levels.OFF,
-          `Notification for '${message_et.id} in '${conversation_et.id}' does not show notification.`,
+          `Notification for '${message_et.id} in '${conversation_et.id}' does not show notification.`
         );
     }
   }
@@ -390,7 +390,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
           return this._should_obfuscate_notification_sender(message_et);
         }
         throw new z.system_notification.SystemNotificationError(
-          z.system_notification.SystemNotificationError.TYPE.HIDE_NOTIFICATION,
+          z.system_notification.SystemNotificationError.TYPE.HIDE_NOTIFICATION
         );
       })
       .then(should_obfuscate_sender => {
@@ -439,7 +439,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
         default:
           this.logger.log(
             this.logger.levels.OFF,
-            `Notification for '${message_et.id} in '${conversation_et.id}' does not show notification.`,
+            `Notification for '${message_et.id} in '${conversation_et.id}' does not show notification.`
           );
       }
     });
@@ -503,19 +503,19 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
         return z.util.StringUtil.truncate(
           `${message_et.user().first_name()} in ${conversation_et.display_name()}`,
           SystemNotificationRepository.CONFIG.TITLE_LENGTH,
-          false,
+          false
         );
       }
       return z.util.StringUtil.truncate(
         conversation_et.display_name(),
         SystemNotificationRepository.CONFIG.TITLE_LENGTH,
-        false,
+        false
       );
     }
     return z.util.StringUtil.truncate(
       message_et.user().name(),
       SystemNotificationRepository.CONFIG.TITLE_LENGTH,
-      false,
+      false
     );
   }
 
@@ -528,7 +528,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
     return z.util.StringUtil.truncate(
       z.l10n.text(z.string.system_notification_obfuscated_title),
       SystemNotificationRepository.CONFIG.TITLE_LENGTH,
-      false,
+      false
     );
   }
 
@@ -551,7 +551,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
         default:
           this.logger.log(
             this.logger.levels.OFF,
-            `Notification for member message '${message_et.id} in '${conversation_et.id}' does not have specific trigger.`,
+            `Notification for member message '${message_et.id} in '${conversation_et.id}' does not have specific trigger.`
           );
       }
     }
@@ -683,8 +683,8 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
     if (hide_notification) {
       return Promise.reject(
         new z.system_notification.SystemNotificationError(
-          z.system_notification.SystemNotificationError.TYPE.HIDE_NOTIFICATION,
-        ),
+          z.system_notification.SystemNotificationError.TYPE.HIDE_NOTIFICATION
+        )
       );
     }
     return Promise.resolve();

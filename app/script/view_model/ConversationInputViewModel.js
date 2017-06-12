@@ -130,7 +130,7 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
     });
     this.ping_tooltip = z.l10n.text(
       z.string.tooltip_conversation_ping,
-      z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.PING),
+      z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.PING)
     );
     this.picture_tooltip = z.l10n.text(z.string.tooltip_conversation_picture);
     this.ping_disabled = ko.observable(false);
@@ -145,7 +145,7 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
   _init_subscriptions() {
     amplify.subscribe(z.event.WebApp.SEARCH.SHOW, () => this.conversation_has_focus(false));
     amplify.subscribe(z.event.WebApp.SEARCH.HIDE, () =>
-      window.requestAnimationFrame(() => this.conversation_has_focus(true)),
+      window.requestAnimationFrame(() => this.conversation_has_focus(true))
     );
     amplify.subscribe(z.event.WebApp.EXTENSIONS.GIPHY.SEND, this.send_giphy.bind(this));
     amplify.subscribe(z.event.WebApp.CONVERSATION.IMAGE.SEND, this.upload_images.bind(this));
@@ -205,13 +205,13 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
     if (!millis) {
       this.conversation_et().ephemeral_timer(false);
       return this.logger.info(
-        `Ephemeral timer for conversation '${this.conversation_et().display_name()}' turned off.`,
+        `Ephemeral timer for conversation '${this.conversation_et().display_name()}' turned off.`
       );
     }
 
     this.conversation_et().ephemeral_timer(millis);
     this.logger.info(
-      `Ephemeral timer for conversation '${this.conversation_et().display_name()}' is now at '${this.conversation_et().ephemeral_timer()}'.`,
+      `Ephemeral timer for conversation '${this.conversation_et().display_name()}' is now at '${this.conversation_et().ephemeral_timer()}'.`
     );
   }
 
@@ -433,7 +433,7 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
   _move_cursor_to_end(input_element) {
     window.setTimeout(
       () => (input_element.selectionStart = input_element.selectionEnd = input_element.value.length * 2),
-      0,
+      0
     );
   }
 
@@ -487,7 +487,7 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
           click: () => this.set_ephemeral_timer(milliseconds),
           label: `${number} ${unit_locale}`,
         };
-      }),
+      })
     );
 
     z.ui.Context.from(event, entries, 'ephemeral-options-menu');

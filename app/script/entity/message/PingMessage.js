@@ -32,7 +32,7 @@ z.entity.PingMessage = class PingMessage extends z.entity.Message {
         return z.l10n.text(this.user().is_me ? z.string.conversation_ping_you : z.string.conversation_ping);
       },
       this,
-      {deferEvaluation: true},
+      {deferEvaluation: true}
     );
 
     this.get_icon_classes = ko.pureComputed(() => {

@@ -143,7 +143,7 @@ z.event.WebSocketService = class WebSocketService {
       amplify.subscribe(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEWED, () => this.pending_reconnect(trigger));
       return amplify.publish(
         z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW,
-        z.auth.AuthRepository.ACCESS_TOKEN_TRIGGER.WEB_SOCKET,
+        z.auth.AuthRepository.ACCESS_TOKEN_TRIGGER.WEB_SOCKET
       );
     }
 

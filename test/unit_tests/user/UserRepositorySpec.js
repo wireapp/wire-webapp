@@ -98,7 +98,7 @@ describe('z.user.UserRepository', function() {
 
       it('should return the expected connection for the given conversation id', function() {
         let connection_et = TestFactory.user_repository.get_connection_by_conversation_id(
-          connection_et_a.conversation_id,
+          connection_et_a.conversation_id
         );
         expect(connection_et).toBe(connection_et_a);
 
@@ -120,7 +120,7 @@ describe('z.user.UserRepository', function() {
           'GET',
           `${test_factory.settings.connection.rest_url}/users?ids=${entities.user.jane_roe.id}%2C${entities.user
             .jane_roe.id}`,
-          [200, {'Content-Type': 'application/json'}, JSON.stringify(payload.users.get.many)],
+          [200, {'Content-Type': 'application/json'}, JSON.stringify(payload.users.get.many)]
         );
 
         TestFactory.user_repository
@@ -129,7 +129,7 @@ describe('z.user.UserRepository', function() {
             expect(TestFactory.user_repository.connections().length).toBe(2);
             expect(TestFactory.user_repository.connections()[0].status()).toEqual(z.user.ConnectionStatus.ACCEPTED);
             expect(TestFactory.user_repository.connections()[1].conversation_id).toEqual(
-              '45c8f986-6c8f-465b-9ac9-bd5405e8c944',
+              '45c8f986-6c8f-465b-9ac9-bd5405e8c944'
             );
             done();
           })
@@ -283,13 +283,13 @@ describe('z.user.UserRepository', function() {
           .save_users([user_jane_roe, user_john_doe])
           .then(function() {
             const permanent_client = TestFactory.client_repository.client_mapper.map_client(
-              entities.clients.john_doe.permanent,
+              entities.clients.john_doe.permanent
             );
             const plain_client = TestFactory.client_repository.client_mapper.map_client(
-              entities.clients.jane_roe.plain,
+              entities.clients.jane_roe.plain
             );
             const temporary_client = TestFactory.client_repository.client_mapper.map_client(
-              entities.clients.john_doe.temporary,
+              entities.clients.john_doe.temporary
             );
             const user_client_map = {
               [entities.user.john_doe.id]: [permanent_client, temporary_client],
@@ -297,7 +297,7 @@ describe('z.user.UserRepository', function() {
             };
 
             spyOn(TestFactory.client_repository, 'get_all_clients_from_db').and.returnValue(
-              Promise.resolve(user_client_map),
+              Promise.resolve(user_client_map)
             );
             done();
           })

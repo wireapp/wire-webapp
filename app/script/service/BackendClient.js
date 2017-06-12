@@ -99,7 +99,7 @@ z.service.BackendClient = class BackendClient {
 
     this.number_of_requests = ko.observable(0);
     this.number_of_requests.subscribe(new_value =>
-      amplify.publish(z.event.WebApp.TELEMETRY.BACKEND_REQUESTS, new_value),
+      amplify.publish(z.event.WebApp.TELEMETRY.BACKEND_REQUESTS, new_value)
     );
 
     // http://stackoverflow.com/a/18996758/451634
@@ -158,7 +158,7 @@ z.service.BackendClient = class BackendClient {
             this.connectivity_queue.pause();
             this.connectivity_timeout = window.setTimeout(
               _check_status,
-              BackendClient.CONFIG.CONNECTIVITY_CHECK.RECHECK_TIMEOUT,
+              BackendClient.CONFIG.CONNECTIVITY_CHECK.RECHECK_TIMEOUT
             );
           }
         });
@@ -169,7 +169,7 @@ z.service.BackendClient = class BackendClient {
     if (!this.connectivity_timeout) {
       this.connectivity_timeout = window.setTimeout(
         _check_status,
-        BackendClient.CONFIG.CONNECTIVITY_CHECK.INITIAL_TIMEOUT,
+        BackendClient.CONFIG.CONNECTIVITY_CHECK.INITIAL_TIMEOUT
       );
     }
 
@@ -282,7 +282,7 @@ z.service.BackendClient = class BackendClient {
             this.logger.debug(
               this.logger.levels.OFF,
               `Server Response '${wire_request.request_id}' from '${config.url}':`,
-              data,
+              data
             );
           }
           resolve(data);
@@ -307,7 +307,7 @@ z.service.BackendClient = class BackendClient {
                 .catch(reject);
               return amplify.publish(
                 z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW,
-                z.auth.AuthRepository.ACCESS_TOKEN_TRIGGER.UNAUTHORIZED_REQUEST,
+                z.auth.AuthRepository.ACCESS_TOKEN_TRIGGER.UNAUTHORIZED_REQUEST
               );
             }
 

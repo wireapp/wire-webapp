@@ -44,7 +44,7 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     conversation_repository,
     search_repository,
     properties_repository,
-    team_repository,
+    team_repository
   ) {
     this.switch_list = this.switch_list.bind(this);
     this.on_context_menu = this.on_context_menu.bind(this);
@@ -76,7 +76,7 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
       this.content_view_model,
       this.calling_repository,
       this.conversation_repository,
-      this.user_repository,
+      this.user_repository
     );
     this.preferences = new z.ViewModel.list.PreferencesListViewModel('preferences', this, this.content_view_model);
     this.start_ui = new z.ViewModel.list.StartUIViewModel(
@@ -87,18 +87,18 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
       this.properties_repository,
       this.search_repository,
       this.team_repository,
-      this.user_repository,
+      this.user_repository
     );
     this.takeover = new z.ViewModel.list.TakeoverViewModel(
       'takeover',
       this.conversation_repository,
-      this.user_repository,
+      this.user_repository
     );
     this.teams_tabs = new z.ViewModel.list.TeamsTabViewModel(
       this,
       this.conversation_repository,
       this.team_repository,
-      this.user_repository,
+      this.user_repository
     );
     /* eslint-enable no-multi-spaces */
 
@@ -115,7 +115,7 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
 
   _init_subscriptions() {
     amplify.subscribe(z.event.WebApp.CONVERSATION.SHOW, () =>
-      this.switch_list(z.ViewModel.list.LIST_STATE.CONVERSATIONS, false),
+      this.switch_list(z.ViewModel.list.LIST_STATE.CONVERSATIONS, false)
     );
     amplify.subscribe(z.event.WebApp.LIFECYCLE.LOADED, () => this.webapp_loaded(true));
     amplify.subscribe(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT, this.open_preferences_account.bind(this));

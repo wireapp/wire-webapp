@@ -353,13 +353,13 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
               connection_stats[key].bit_rate_mean_received = _calc_rate(
                 key,
                 this.statistics.connected,
-                'bytes_received',
+                'bytes_received'
               );
               connection_stats[key].bit_rate_mean_sent = _calc_rate(key, this.statistics.connected, 'bytes_sent');
               connection_stats[key].bit_rate_current_received = _calc_rate(
                 key,
                 this.statistics.timestamp,
-                'bytes_received',
+                'bytes_received'
               );
               connection_stats[key].bit_rate_current_sent = _calc_rate(key, this.statistics.timestamp, 'bytes_sent');
             }
@@ -384,10 +384,10 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
   _update_from_candidate_pair(report, rtc_stats_report, connection_stats) {
     if (report.selected) {
       connection_stats.peer_connection.local_candidate_type = rtc_stats_report.get(
-        report.localCandidateId,
+        report.localCandidateId
       ).candidateType;
       connection_stats.peer_connection.remote_candidate_type = rtc_stats_report.get(
-        report.remoteCandidateId,
+        report.remoteCandidateId
       ).candidateType;
     }
 
@@ -406,10 +406,10 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
     if (report.googActiveConnection === 'true') {
       connection_stats.peer_connection.round_trip_time = window.parseInt(report.googRtt, 10);
       connection_stats.peer_connection.local_candidate_type = rtc_stats_report.get(
-        report.localCandidateId,
+        report.localCandidateId
       ).candidateType;
       connection_stats.peer_connection.remote_candidate_type = rtc_stats_report.get(
-        report.remoteCandidateId,
+        report.remoteCandidateId
       ).candidateType;
     }
 

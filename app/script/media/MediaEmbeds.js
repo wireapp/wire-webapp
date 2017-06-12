@@ -59,7 +59,7 @@ z.media.MediaEmbeds = (function() {
       options.height,
       options.src,
       options.frameborder,
-      options.allowfullscreen,
+      options.allowfullscreen
     );
   };
 

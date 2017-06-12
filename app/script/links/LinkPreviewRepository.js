@@ -150,7 +150,7 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
    */
   _upload_preview_image(data_URI) {
     return Promise.resolve(z.util.base64_to_blob(data_URI)).then(blob =>
-      this.asset_service.upload_image_asset(blob, {public: true}),
+      this.asset_service.upload_image_asset(blob, {public: true})
     );
   }
 };

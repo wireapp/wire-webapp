@@ -46,7 +46,7 @@ z.media.MediaElementHandler = class MediaElementHandler {
       this.remote_media_elements.push(remote_media_element);
       this.logger.info(
         `Created MediaElement of type '${remote_media_element.nodeName.toLowerCase()}' for MediaStream of flow '${media_stream_info.flow_id}'`,
-        remote_media_element,
+        remote_media_element
       );
     }
   }
@@ -62,7 +62,7 @@ z.media.MediaElementHandler = class MediaElementHandler {
       this._destroy_media_element(media_element);
       this.remote_media_elements.remove(media_element);
       this.logger.info(
-        `Deleted MediaElement of type '${media_element.tagName.toLocaleLowerCase()}' for flow '${flow_id}'`,
+        `Deleted MediaElement of type '${media_element.tagName.toLocaleLowerCase()}' for flow '${flow_id}'`
       );
     });
   }
@@ -74,7 +74,7 @@ z.media.MediaElementHandler = class MediaElementHandler {
    */
   switch_media_element_output(media_device_id) {
     this.remote_media_elements().forEach(media_element =>
-      this._set_media_element_output(media_element, media_device_id),
+      this._set_media_element_output(media_element, media_device_id)
     );
   }
 
@@ -142,7 +142,7 @@ z.media.MediaElementHandler = class MediaElementHandler {
         .then(() => {
           this.logger.info(
             `Audio output device '${sink_id}' attached to flow '${media_element.dataset['flow_id']}`,
-            media_element,
+            media_element
           );
         })
         .catch(error => {
@@ -150,7 +150,7 @@ z.media.MediaElementHandler = class MediaElementHandler {
             `Failed to attach audio output device '${sink_id}' to flow '${media_element.dataset[
               'flow_id'
             ]}': ${error.message}`,
-            error,
+            error
           );
         });
     }

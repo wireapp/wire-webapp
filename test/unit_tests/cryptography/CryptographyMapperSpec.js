@@ -97,7 +97,7 @@ describe('z.cryptography.CryptographyMapper', function() {
           expect(event_json.data.info.nonce).toBe(generic_message.message_id);
           expect(event_json.data.meta.duration).toEqual(original_asset.audio.duration_in_millis / 1000);
           expect(event_json.data.meta.loudness).toEqual(
-            new Uint8Array(original_asset.audio.normalized_loudness.toArrayBuffer()),
+            new Uint8Array(original_asset.audio.normalized_loudness.toArrayBuffer())
           );
           done();
         })
@@ -116,7 +116,7 @@ describe('z.cryptography.CryptographyMapper', function() {
         uploaded.otr_key,
         uploaded.sha256,
         uploaded.key,
-        uploaded.token,
+        uploaded.token
       );
       const asset = new z.proto.Asset();
       asset.set('uploaded', uploaded_asset);
@@ -248,7 +248,7 @@ describe('z.cryptography.CryptographyMapper', function() {
       const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
       generic_message.set(
         z.cryptography.GENERIC_MESSAGE_TYPE.HIDDEN,
-        new z.proto.MessageHide(conversation_id, message_id),
+        new z.proto.MessageHide(conversation_id, message_id)
       );
 
       mapper
@@ -307,7 +307,7 @@ describe('z.cryptography.CryptographyMapper', function() {
         image.original_width,
         image.original_height,
         image.mime_type,
-        image.size,
+        image.size
       );
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.IMAGE, image_asset);
 
@@ -391,7 +391,7 @@ describe('z.cryptography.CryptographyMapper', function() {
         image.original_width,
         image.original_height,
         image.mime_type,
-        image.size,
+        image.size
       );
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.IMAGE, image_asset);
 
@@ -474,7 +474,7 @@ describe('z.cryptography.CryptographyMapper', function() {
       const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
       generic_message.set(
         z.cryptography.GENERIC_MESSAGE_TYPE.REACTION,
-        new z.proto.Reaction(z.message.ReactionType.LIKE, generic_message.message_id),
+        new z.proto.Reaction(z.message.ReactionType.LIKE, generic_message.message_id)
       );
 
       mapper
@@ -582,7 +582,7 @@ describe('z.cryptography.CryptographyMapper', function() {
       const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
       generic_message.set(
         z.cryptography.GENERIC_MESSAGE_TYPE.LOCATION,
-        new z.proto.Location(52.520645, 13.409779, 'Berlin', 1),
+        new z.proto.Location(52.520645, 13.409779, 'Berlin', 1)
       );
 
       mapper
@@ -635,7 +635,7 @@ describe('z.cryptography.CryptographyMapper', function() {
       const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
       generic_message.set(
         z.cryptography.GENERIC_MESSAGE_TYPE.CALLING,
-        new z.proto.Calling(JSON.stringify(content_message)),
+        new z.proto.Calling(JSON.stringify(content_message))
       );
 
       mapper

@@ -64,7 +64,7 @@ describe('z.media.MediaStreamHandler', function() {
     beforeEach(function() {
       spyOn(TestFactory.media_repository.stream_handler, '_toggle_video_send').and.returnValue(Promise.resolve());
       return spyOn(TestFactory.media_repository.stream_handler, 'replace_input_source').and.returnValue(
-        Promise.resolve(),
+        Promise.resolve()
       );
     });
 
@@ -91,7 +91,7 @@ describe('z.media.MediaStreamHandler', function() {
         .then(function() {
           expect(TestFactory.media_repository.stream_handler._toggle_video_send).not.toHaveBeenCalled();
           expect(TestFactory.media_repository.stream_handler.replace_input_source).toHaveBeenCalledWith(
-            z.media.MediaType.VIDEO,
+            z.media.MediaType.VIDEO
           );
           done();
         })
@@ -107,7 +107,7 @@ describe('z.media.MediaStreamHandler', function() {
         .then(function() {
           expect(TestFactory.media_repository.stream_handler._toggle_video_send).not.toHaveBeenCalled();
           expect(TestFactory.media_repository.stream_handler.replace_input_source).toHaveBeenCalledWith(
-            z.media.MediaType.VIDEO,
+            z.media.MediaType.VIDEO
           );
           done();
         })
@@ -144,7 +144,7 @@ describe('z.media.MediaStreamHandler', function() {
         .then(function() {
           expect(TestFactory.media_repository.stream_handler._toggle_screen_send).not.toHaveBeenCalled();
           expect(TestFactory.media_repository.stream_handler.replace_input_source).toHaveBeenCalledWith(
-            z.media.MediaType.SCREEN,
+            z.media.MediaType.SCREEN
           );
           done();
         })
@@ -160,7 +160,7 @@ describe('z.media.MediaStreamHandler', function() {
         .then(function() {
           expect(TestFactory.media_repository.stream_handler._toggle_screen_send).not.toHaveBeenCalled();
           expect(TestFactory.media_repository.stream_handler.replace_input_source).toHaveBeenCalledWith(
-            z.media.MediaType.SCREEN,
+            z.media.MediaType.SCREEN
           );
           done();
         })

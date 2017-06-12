@@ -240,11 +240,11 @@ z.calling.entities.Call = class Call {
         this.self_state,
         z.media.MediaType.AUDIO,
         false,
-        additional_payload,
+        additional_payload
       );
 
       this.send_call_message(
-        z.calling.CallMessageBuilder.build_group_start(response, this.session_id, prop_sync_payload),
+        z.calling.CallMessageBuilder.build_group_start(response, this.session_id, prop_sync_payload)
       );
     } else {
       const [user_id] = this.conversation_et.participating_user_ids();
@@ -276,7 +276,7 @@ z.calling.entities.Call = class Call {
 
     const event_promises = this.get_flows().map(({remote_client_id, remote_user_id}) => {
       call_message_et.add_properties(
-        z.calling.CallMessageBuilder.create_payload(this.id, this.self_user.id, remote_user_id, remote_client_id),
+        z.calling.CallMessageBuilder.create_payload(this.id, this.self_user.id, remote_user_id, remote_client_id)
       );
       return this.send_call_message(call_message_et);
     });
@@ -369,17 +369,17 @@ z.calling.entities.Call = class Call {
         this.id,
         this.self_user.id,
         remote_user_id,
-        remote_client_id,
+        remote_client_id
       );
       const prop_sync_payload = z.calling.CallMessageBuilder.create_payload_prop_sync(
         this.self_state,
         media_type,
         true,
-        additional_payload,
+        additional_payload
       );
 
       return this.send_call_message(
-        z.calling.CallMessageBuilder.build_prop_sync(false, this.session_id, prop_sync_payload),
+        z.calling.CallMessageBuilder.build_prop_sync(false, this.session_id, prop_sync_payload)
       );
     });
 
@@ -426,7 +426,7 @@ z.calling.entities.Call = class Call {
         const additional_payload = z.calling.CallMessageBuilder.create_payload(this.id, this.self_user.id);
 
         this.send_call_message(
-          z.calling.CallMessageBuilder.build_group_check(true, this.session_id, additional_payload),
+          z.calling.CallMessageBuilder.build_group_check(true, this.session_id, additional_payload)
         );
         this.schedule_group_check();
       } else {
@@ -449,12 +449,12 @@ z.calling.entities.Call = class Call {
       const additional_payload = z.calling.CallMessageBuilder.create_payload(
         this.id,
         this.self_user.id,
-        this.creating_user.id,
+        this.creating_user.id
       );
       const call_message_et = z.calling.CallMessageBuilder.build_group_leave(
         false,
         this.session_id,
-        additional_payload,
+        additional_payload
       );
 
       this.deactivate_call(call_message_et, z.calling.enum.TERMINATION_REASON.MISSED);
@@ -477,7 +477,7 @@ z.calling.entities.Call = class Call {
       this.id,
       this.self_user.id,
       user_id,
-      client_id,
+      client_id
     );
     let call_message_et;
 
@@ -492,7 +492,7 @@ z.calling.entities.Call = class Call {
           this.self_state,
           z.media.MediaType.VIDEO,
           false,
-          additional_payload,
+          additional_payload
         );
 
         call_message_et = z.calling.CallMessageBuilder.build_prop_sync(true, this.session_id, prop_sync_payload);
@@ -774,7 +774,7 @@ z.calling.entities.Call = class Call {
     }
 
     return Promise.reject(
-      new z.calling.CallError(z.calling.CallError.TYPE.NOT_FOUND, 'No participant for given user ID found'),
+      new z.calling.CallError(z.calling.CallError.TYPE.NOT_FOUND, 'No participant for given user ID found')
     );
   }
 

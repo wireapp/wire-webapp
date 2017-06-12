@@ -237,7 +237,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
         }
       },
       this,
-      {deferEvaluation: true},
+      {deferEvaluation: true}
     );
 
     this.show_gray_image = ko.pureComputed(
@@ -249,7 +249,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
         return !this.user().is_me && !this.user.is_connected();
       },
       this,
-      {deferEvaluation: true},
+      {deferEvaluation: true}
     );
 
     this.connection_is_not_established = ko.pureComputed(
@@ -259,7 +259,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
         }
       },
       this,
-      {deferEvaluation: true},
+      {deferEvaluation: true}
     );
 
     this.user_is_removed_from_conversation = ko.pureComputed(
@@ -272,7 +272,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
         return !participating_user_ets.includes(this.user());
       },
       this,
-      {deferEvaluation: true},
+      {deferEvaluation: true}
     );
 
     this.render_avatar = ko.observable(false);

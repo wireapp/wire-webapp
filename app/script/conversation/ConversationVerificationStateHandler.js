@@ -46,8 +46,8 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
           z.conversation.EventBuilder.build_degraded(
             conversation_et,
             [user_id],
-            z.message.VerificationMessageType.UNVERIFIED,
-          ),
+            z.message.VerificationMessageType.UNVERIFIED
+          )
         );
       } else if (this._will_change_to_verified(conversation_et)) {
         amplify.publish(z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_all_verified(conversation_et));
@@ -69,7 +69,7 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
       if (this._will_change_to_degraded(conversation_et)) {
         const user_ids_in_conversation = _.intersection(
           user_ids,
-          conversation_et.participating_user_ids().concat(conversation_et.self.id),
+          conversation_et.participating_user_ids().concat(conversation_et.self.id)
         );
 
         if (user_ids_in_conversation.length) {
@@ -78,8 +78,8 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
             z.conversation.EventBuilder.build_degraded(
               conversation_et,
               user_ids,
-              z.message.VerificationMessageType.NEW_DEVICE,
-            ),
+              z.message.VerificationMessageType.NEW_DEVICE
+            )
           );
         }
       }
@@ -111,8 +111,8 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
           z.conversation.EventBuilder.build_degraded(
             conversation_et,
             [user_id],
-            z.message.VerificationMessageType.NEW_DEVICE,
-          ),
+            z.message.VerificationMessageType.NEW_DEVICE
+          )
         );
       } else if (this._will_change_to_verified(conversation_et)) {
         amplify.publish(z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_all_verified(conversation_et));
@@ -137,8 +137,8 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
         z.conversation.EventBuilder.build_degraded(
           conversation_et,
           user_ids,
-          z.message.VerificationMessageType.NEW_MEMBER,
-        ),
+          z.message.VerificationMessageType.NEW_MEMBER
+        )
       );
     }
   }

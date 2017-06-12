@@ -44,7 +44,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     properties_repository,
     search_repository,
     team_repository,
-    user_repository,
+    user_repository
   ) {
     this.click_on_close = this.click_on_close.bind(this);
     this.click_on_group = this.click_on_group.bind(this);
@@ -85,7 +85,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
                 this.search_results.others(user_ets);
               } else {
                 const non_member_others = user_ets.filter(
-                  user_et => !this.search_results.team_members().includes(user_et),
+                  user_et => !this.search_results.team_members().includes(user_et)
                 );
                 this.search_results.others(non_member_others);
               }

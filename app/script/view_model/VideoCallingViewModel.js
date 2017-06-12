@@ -29,7 +29,7 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
     conversation_repository,
     media_repository,
     user_repository,
-    multitasking,
+    multitasking
   ) {
     this.clicked_on_cancel_screen = this.clicked_on_cancel_screen.bind(this);
     this.clicked_on_choose_screen = this.clicked_on_choose_screen.bind(this);
@@ -223,14 +223,14 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
 
         this.logger.info(
           `Scheduled minimizing call '${this.videod_call()
-            .id}' on timeout as remote user '${remote_user_name}' is not videod`,
+            .id}' on timeout as remote user '${remote_user_name}' is not videod`
         );
         this.minimize_timeout = window.setTimeout(() => {
           if (!this.is_choosing_screen()) {
             this.multitasking.is_minimized(true);
           }
           this.logger.info(
-            `Minimizing call '${this.videod_call().id}' on timeout as remote user '${remote_user_name}' is not videod`,
+            `Minimizing call '${this.videod_call().id}' on timeout as remote user '${remote_user_name}' is not videod`
           );
         }, 4000);
       }
@@ -282,7 +282,7 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
       amplify.publish(
         z.event.WebApp.CALL.STATE.LEAVE,
         this.joined_call().id,
-        z.calling.enum.TERMINATION_REASON.SELF_USER,
+        z.calling.enum.TERMINATION_REASON.SELF_USER
       );
     }
   }

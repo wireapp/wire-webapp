@@ -109,7 +109,7 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
     this.emoji_usage_count = z.util.StorageUtil.get_value(z.storage.StorageKey.CONVERSATION.EMOJI_USAGE_COUNT) || {};
 
     this.should_replace_inline_emoji = properties_repository.get_preference(
-      z.properties.PROPERTIES_TYPE.EMOJI.REPLACE_INLINE,
+      z.properties.PROPERTIES_TYPE.EMOJI.REPLACE_INLINE
     );
 
     $(document).on('click', `.${emoji_div_class}`, event => {
@@ -244,7 +244,7 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
     const text = input.value || '';
     const text_until_cursor = text.substring(
       Math.max(0, input.selectionStart - EMOJI_INLINE_MAX_LENGTH - 1),
-      input.selectionStart,
+      input.selectionStart
     );
 
     for (const replacement of EMOJI_INLINE_REPLACEMENT) {
@@ -299,7 +299,7 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
         .filter(emoji => {
           const emoji_name_words = emoji.name.split(' ');
           return query_words.every(query_word =>
-            emoji_name_words.some(emoji_name_word => emoji_name_word.startsWith(query_word)),
+            emoji_name_words.some(emoji_name_word => emoji_name_word.startsWith(query_word))
           );
         })
         .reduce((acc, emoji, index) => {
@@ -319,7 +319,7 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
         .slice(0, EMOJI_LIST_LENGTH)
         .map(
           emoji =>
-            `<div class='emoji'><span class='symbol'>${emoji.icon}</span><span class='name'>${emoji.name}</span></div>`,
+            `<div class='emoji'><span class='symbol'>${emoji.icon}</span><span class='name'>${emoji.name}</span></div>`
         )
         .join('');
 

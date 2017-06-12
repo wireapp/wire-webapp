@@ -167,7 +167,7 @@ z.calling.CallingRepository = class CallingRepository {
 
     this.logger.info(
       `Received call '${type}' message (response: ${response}) from user '${user_id}' in conversation '${conversation_id}'`,
-      call_message_et,
+      call_message_et
     );
 
     this._validate_message_type(call_message_et).then(() => {
@@ -374,7 +374,7 @@ z.calling.CallingRepository = class CallingRepository {
         this.user_repository
           .get_user_by_id(user_id)
           .then(remote_user_et =>
-            call_et.add_participant(remote_user_et, call_message_et, call_et.self_client_joined()),
+            call_et.add_participant(remote_user_et, call_message_et, call_et.self_client_joined())
           );
       })
       .catch(error => {
@@ -471,7 +471,7 @@ z.calling.CallingRepository = class CallingRepository {
         if (response) {
           if (user_id === this.self_user_id()) {
             this.logger.info(
-              `Incoming call in conversation '${call_et.conversation_et.display_name()}' accepted on other device`,
+              `Incoming call in conversation '${call_et.conversation_et.display_name()}' accepted on other device`
             );
             return this.delete_call(conversation_id);
           }
@@ -542,7 +542,7 @@ z.calling.CallingRepository = class CallingRepository {
 
       if (dest_user_id !== this.self_user_id() || dest_client_id !== this.client_repository.current_client().id) {
         this.logger.log(
-          `Ignored non-targeted call '${type}' message intended for client '${dest_client_id}' of user '${dest_user_id}'`,
+          `Ignored non-targeted call '${type}' message intended for client '${dest_client_id}' of user '${dest_user_id}'`
         );
         throw new z.calling.CallError(z.calling.CallError.TYPE.MISTARGETED_MESSAGE);
       }
@@ -623,7 +623,7 @@ z.calling.CallingRepository = class CallingRepository {
 
         this.logger.info(
           `Sending call '${type}' message (response: ${response}) to conversation '${conversation_id}'`,
-          call_message_et.to_JSON(),
+          call_message_et.to_JSON()
         );
 
         return this._limit_message_recipients(call_message_et).then(({precondition_option, user_client_map}) => {
@@ -635,7 +635,7 @@ z.calling.CallingRepository = class CallingRepository {
             conversation_et,
             call_message_et,
             user_client_map,
-            precondition_option,
+            precondition_option
           );
         });
       });
@@ -813,10 +813,10 @@ z.calling.CallingRepository = class CallingRepository {
               this.self_state,
               video_send,
               false,
-              {conversation_id: conversation_id},
+              {conversation_id: conversation_id}
             );
             return this._create_outgoing_call(
-              z.calling.CallMessageBuilder.build_prop_sync(false, undefined, prop_sync_payload),
+              z.calling.CallMessageBuilder.build_prop_sync(false, undefined, prop_sync_payload)
             );
           });
       })
@@ -856,7 +856,7 @@ z.calling.CallingRepository = class CallingRepository {
       .then(call_et => {
         this.logger.info(
           `Leaving call in conversation '${conversation_id}' triggered by '${termination_reason}'`,
-          call_et,
+          call_et
         );
 
         if (call_et.state() !== z.calling.enum.CALL_STATE.ONGOING) {
@@ -884,7 +884,7 @@ z.calling.CallingRepository = class CallingRepository {
     const additional_payload = z.calling.CallMessageBuilder.create_payload(
       conversation_id,
       this.self_user_id(),
-      user_id,
+      user_id
     );
     const call_message_et = z.calling.CallMessageBuilder.build_group_leave(false, this.session_id, additional_payload);
 
@@ -1000,7 +1000,7 @@ z.calling.CallingRepository = class CallingRepository {
             amplify.publish(
               z.event.WebApp.CALL.STATE.LEAVE,
               ongoing_call_id,
-              z.calling.enum.TERMINATION_REASON.CONCURRENT_CALL,
+              z.calling.enum.TERMINATION_REASON.CONCURRENT_CALL
             );
             window.setTimeout(resolve, 1000);
           },
@@ -1061,9 +1061,9 @@ z.calling.CallingRepository = class CallingRepository {
         return this._create_call(call_message_et, remote_user_et).then(call_et => {
           this.logger.info(
             `Incoming '${this._get_media_type_from_properties(
-              props,
+              props
             )}' call in conversation '${call_et.conversation_et.display_name()}'`,
-            call_et,
+            call_et
           );
 
           if (silent) {
@@ -1106,7 +1106,7 @@ z.calling.CallingRepository = class CallingRepository {
       const media_type = this._get_media_type_from_properties(props);
       this.logger.info(
         `Outgoing '${media_type}' call in conversation '${call_et.conversation_et.display_name()}'`,
-        call_et,
+        call_et
       );
 
       call_et.state(z.calling.enum.CALL_STATE.OUTGOING);
@@ -1142,7 +1142,7 @@ z.calling.CallingRepository = class CallingRepository {
     const deactivate_event = z.conversation.EventBuilder.build_voice_channel_deactivate(
       call_message_et,
       creating_user_et,
-      reason,
+      reason
     );
     amplify.publish(z.event.WebApp.EVENT.INJECT, deactivate_event);
   }
@@ -1268,14 +1268,14 @@ z.calling.CallingRepository = class CallingRepository {
 
         this.logger.info(
           `Updated calling configuration - next update in ${renewal_timeout_in_seconds}s`,
-          calling_config,
+          calling_config
         );
         this.calling_config = calling_config;
 
         this.calling_config_timeouts.push = window.setTimeout(this.get_config, renewal_timeout_in_seconds * 1000);
         this.calling_config_timeouts.push = window.setTimeout(
           this._clear_calling_config,
-          clear_timeout_in_seconds * 1000,
+          clear_timeout_in_seconds * 1000
         );
         return this.calling_config;
       }

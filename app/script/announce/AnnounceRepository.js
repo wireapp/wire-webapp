@@ -57,8 +57,8 @@ z.announce.AnnounceRepository = class AnnounceRepository {
         this.logger.info(
           `Checking current webapp version. Server '${server_version}' vs. local '${z.util.Environment.version(
             false,
-            true,
-          )}'`,
+            true
+          )}'`
         );
 
         if (server_version > z.util.Environment.version(false, true)) {

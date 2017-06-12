@@ -46,10 +46,10 @@ describe('UserHandleGenerator', function() {
       // expect(z.user.UserHandleGenerator.normalize_name('خطای سطح دسترسی')).toBe 'khtaysthdstrsy'
       expect(z.user.UserHandleGenerator.normalize_name('ᑭᒻᒥᓇᐅᔭᖅ')).toBe('');
       expect(z.user.UserHandleGenerator.normalize_name('    Maria LaRochelle Von Schwerigstein ')).toBe(
-        'marialarochellevonsch',
+        'marialarochellevonsch'
       );
       expect(z.user.UserHandleGenerator.normalize_name(' \n\t Maria LaRochelle Von Schwerigstein ')).toBe(
-        'marialarochellevonsch',
+        'marialarochellevonsch'
       );
       expect(z.user.UserHandleGenerator.normalize_name('🐙☀️')).toBe('');
       expect(z.user.UserHandleGenerator.normalize_name('name@mail.com')).toBe('namemailcom');

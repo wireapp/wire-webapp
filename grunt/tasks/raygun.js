@@ -71,7 +71,7 @@ module.exports = grunt => {
           number = response.request.headers.WireRequest;
 
           grunt.log.error(
-            `Upload of file #${number} ${file['cyan']} failed with code ${response.statusCode.toString()['cyan']}`,
+            `Upload of file #${number} ${file['cyan']} failed with code ${response.statusCode.toString()['cyan']}`
           );
           failed_upload_count++;
         }

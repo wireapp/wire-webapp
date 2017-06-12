@@ -94,7 +94,7 @@ z.ViewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
     return this.media_stream_handler
       .get_media_stream_constraints(
         this.available_devices.audio_input().length,
-        this.available_devices.video_input().length,
+        this.available_devices.video_input().length
       )
       .then(({media_stream_constraints, media_type}) => {
         return this.media_stream_handler.request_media_stream(media_type, media_stream_constraints);
@@ -111,7 +111,7 @@ z.ViewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
         this.logger.error(`Requesting MediaStream failed: ${error.message}`, error);
         if (
           [z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE, z.media.MediaError.TYPE.MEDIA_STREAM_PERMISSION].includes(
-            error.type,
+            error.type
           )
         ) {
           this.permission_denied(true);

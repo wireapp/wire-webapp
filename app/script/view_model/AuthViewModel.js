@@ -63,7 +63,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     this.cryptography_service = new z.cryptography.CryptographyRepository(this.auth.client);
     this.cryptography_repository = new z.cryptography.CryptographyRepository(
       this.cryptography_service,
-      this.storage_repository,
+      this.storage_repository
     );
     this.client_service = new z.client.ClientService(this.auth.client, this.storage_service);
     this.client_repository = new z.client.ClientRepository(this.client_service, this.cryptography_repository);
@@ -74,7 +74,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       this.user_service,
       this.asset_service,
       undefined,
-      this.client_repository,
+      this.client_repository
     );
 
     this.notification_service = new z.event.NotificationService(this.auth.client, this.storage_service);
@@ -83,7 +83,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       this.web_socket_service,
       this.notification_service,
       this.cryptography_repository,
-      this.user_repository,
+      this.user_repository
     );
 
     this.pending_server_request = ko.observable(false);
@@ -1543,7 +1543,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
                     opacity: '',
                   });
                 });
-            }),
+            })
           );
         }
 
@@ -1556,7 +1556,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
                   resolve();
                   $(this).css({opacity: 1});
                 });
-            }),
+            })
           );
         }
 

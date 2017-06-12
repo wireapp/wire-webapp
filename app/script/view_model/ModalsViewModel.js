@@ -219,7 +219,7 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
   _show_modal_new_device(content, title_element, message_element, action_element) {
     let action_id, message_id;
     const joined_names = z.util.StringUtil.capitalize_first_char(
-      z.util.LocalizerUtil.join_names(content.user_ets, z.string.Declension.NOMINATIVE),
+      z.util.LocalizerUtil.join_names(content.user_ets, z.string.Declension.NOMINATIVE)
     );
 
     if (content.user_ets.length > 1) {
@@ -257,7 +257,7 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
       z.l10n.text(z.string.modal_too_many_members_message, {
         number1: content.max,
         number2: content.open_spots,
-      }),
+      })
     );
   }
 

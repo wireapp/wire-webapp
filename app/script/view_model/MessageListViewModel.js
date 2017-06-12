@@ -272,7 +272,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
         this.messages_subscription = conversation_et.messages_visible.subscribe(
           this._on_message_add,
           null,
-          'arrayChange',
+          'arrayChange'
         );
         resolve();
       }, 100);
@@ -561,7 +561,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
       .get_events_for_category(this.conversation(), z.message.MessageCategory.IMAGE)
       .then(function(items) {
         const message_ets = items.filter(
-          item => item.category & z.message.MessageCategory.IMAGE && !(item.category & z.message.MessageCategory.GIF),
+          item => item.category & z.message.MessageCategory.IMAGE && !(item.category & z.message.MessageCategory.GIF)
         );
         const [image_message_et] = message_ets.filter(item => item.id === message_et.id);
 
@@ -623,7 +623,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
 
   click_on_cancel_request(message_et) {
     const next_conversation_et = this.conversation_repository.get_next_conversation(
-      this.conversation_repository.active_conversation(),
+      this.conversation_repository.active_conversation()
     );
     this.user_repository.cancel_connection_request(message_et.other_user(), next_conversation_et);
   }

@@ -108,7 +108,7 @@ z.event.NotificationService = class NotificationService {
     return this.storage_service.save(
       z.storage.StorageService.OBJECT_STORE.AMPLIFY,
       NotificationService.CONFIG.PRIMARY_KEY_LAST_NOTIFICATION,
-      {value: notification_id},
+      {value: notification_id}
     );
   }
 };

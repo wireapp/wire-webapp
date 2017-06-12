@@ -59,7 +59,7 @@ ko.bindingHandlers.drop_file = {
           drop: fileSelectHandler,
         },
       },
-      context,
+      context
     );
   },
 };
@@ -92,7 +92,7 @@ ko.bindingHandlers.paste_file = {
           paste: on_paste,
         },
       },
-      context,
+      context
     );
   },
 };
@@ -115,7 +115,7 @@ ko.bindingHandlers.ignore_drop_file = {
           },
         },
       },
-      context,
+      context
     );
   },
 };
@@ -181,7 +181,7 @@ ko.bindingHandlers.resize = (function() {
               },
             },
           },
-          context,
+          context
         );
       }
     },
@@ -217,7 +217,7 @@ ko.bindingHandlers.enter = {
           keypress: wrapper,
         },
       },
-      context,
+      context
     );
   },
 };
@@ -249,7 +249,7 @@ ko.bindingHandlers.file_select = {
           },
         },
       },
-      context,
+      context
     );
   },
 };
@@ -323,7 +323,7 @@ ko.subscribable.fn.subscribe_once = function(handler, owner, event_name) {
       handler(new_value);
     },
     owner,
-    event_name,
+    event_name
   );
 };
 
@@ -354,7 +354,7 @@ ko.bindingHandlers.antiscroll = {
         resize_event,
         _.throttle(() => {
           antiscroll.rebuild();
-        }, 100),
+        }, 100)
       );
 
       ko.utils.domNodeDisposal.addDisposeCallback(element, () => {

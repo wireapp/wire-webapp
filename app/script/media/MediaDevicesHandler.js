@@ -79,7 +79,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
   _set_current_devices() {
     this.current_device_id.audio_input(z.util.StorageUtil.get_value(z.media.MediaDeviceType.AUDIO_INPUT) || 'default');
     this.current_device_id.audio_output(
-      z.util.StorageUtil.get_value(z.media.MediaDeviceType.AUDIO_OUTPUT) || 'default',
+      z.util.StorageUtil.get_value(z.media.MediaDeviceType.AUDIO_OUTPUT) || 'default'
     );
     this.current_device_id.video_input(z.util.StorageUtil.get_value(z.media.MediaDeviceType.VIDEO_INPUT));
 
@@ -239,7 +239,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
 
         this.logger.info(
           `Found '${screen_sources.length}' possible sources for screen sharing on Electron`,
-          screen_sources,
+          screen_sources
         );
         this.available_devices.screen_input(screen_sources);
         if (screen_sources.length === 1) {
@@ -260,7 +260,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
     return this.get_media_devices().then(() => {
       const {current_device} = this._get_current_device(
         this.available_devices.video_input(),
-        this.current_device_id.video_input(),
+        this.current_device_id.video_input()
       );
       const next_device = this.available_devices.video_input()[
         z.util.ArrayUtil.iterate_index(this.available_devices.video_input(), this.current_device_index.video_input()) ||
@@ -271,7 +271,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
 
       const current_device_name = current_device ? current_device.name || current_device.id : undefined;
       this.logger.info(
-        `Switching the active camera from '${current_device_name}' to '${next_device.label || next_device.deviceId}'`,
+        `Switching the active camera from '${current_device_name}' to '${next_device.label || next_device.deviceId}'`
       );
     });
   }
@@ -284,12 +284,12 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
     return this.get_screen_sources().then(() => {
       const {current_device} = this._get_current_device(
         this.available_devices.screen_input(),
-        this.current_device_id.screen_input(),
+        this.current_device_id.screen_input()
       );
       const next_device = this.available_devices.screen_input()[
         z.util.ArrayUtil.iterate_index(
           this.available_devices.screen_input(),
-          this.current_device_index.screen_input(),
+          this.current_device_index.screen_input()
         ) || 0
       ];
 
@@ -297,7 +297,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
 
       const current_device_name = current_device ? current_device.name || current_device.id : undefined;
       this.logger.info(
-        `Switching the active screen from '${current_device_name}' to '${next_device.name || next_device.id}'`,
+        `Switching the active screen from '${current_device_name}' to '${next_device.name || next_device.id}'`
       );
     });
   }
@@ -323,14 +323,14 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
             this.logger.warn(
               `Selected '${media_type}' device '${device_id_observable()}' not found and replaced by '${updated_device.label ||
                 updated_device.deviceId}'`,
-              media_devices,
+              media_devices
             );
             return device_id_observable(updated_device.deviceId);
           }
 
           this.logger.warn(
             `Selected '${media_type}' device '${device_id_observable()}' not found and reset'`,
-            media_devices,
+            media_devices
           );
           return device_id_observable('');
         }
@@ -410,7 +410,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
     this._update_current_device_index(
       this.current_device_index[`${device_type}`],
       available_devices,
-      this.current_device_id[`${device_type}`](),
+      this.current_device_id[`${device_type}`]()
     );
   }
 
@@ -426,7 +426,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
     this._update_current_device_index(
       this.current_device_index[`${device_type}`],
       this.available_devices[`${device_type}`](),
-      selected_input_device_id,
+      selected_input_device_id
     );
   }
 };

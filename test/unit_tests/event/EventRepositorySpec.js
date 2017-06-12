@@ -74,7 +74,7 @@ describe('Event Repository', function() {
       });
 
       spyOn(TestFactory.notification_service, 'get_notifications_last').and.returnValue(
-        Promise.resolve({id: z.util.create_random_uuid(), payload: []}),
+        Promise.resolve({id: z.util.create_random_uuid(), payload: []})
       );
 
       spyOn(TestFactory.notification_service, 'get_last_notification_id_from_db').and.callFake(() => {
@@ -85,7 +85,7 @@ describe('Event Repository', function() {
       });
 
       spyOn(TestFactory.notification_service, 'save_last_notification_id_to_db').and.returnValue(
-        Promise.resolve(z.event.NotificationService.prototype.PRIMARY_KEY_LAST_NOTIFICATION),
+        Promise.resolve(z.event.NotificationService.prototype.PRIMARY_KEY_LAST_NOTIFICATION)
       );
     });
 
@@ -117,7 +117,7 @@ describe('Event Repository', function() {
       expect(TestFactory.event_repository._buffer_web_socket_notification).toHaveBeenCalled();
       expect(TestFactory.event_repository._handle_notification).not.toHaveBeenCalled();
       expect(TestFactory.event_repository.notification_handling_state()).toBe(
-        z.event.NOTIFICATION_HANDLING_STATE.STREAM,
+        z.event.NOTIFICATION_HANDLING_STATE.STREAM
       );
       expect(TestFactory.event_repository.web_socket_buffer.length).toBe(1);
     });
@@ -143,7 +143,7 @@ describe('Event Repository', function() {
           expect(TestFactory.event_repository.web_socket_buffer.length).toBe(0);
           expect(TestFactory.event_repository.last_notification_id()).toBe(last_published_notification_id);
           expect(TestFactory.event_repository.notification_handling_state()).toBe(
-            z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET,
+            z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET
           );
           done();
         })
@@ -202,7 +202,7 @@ describe('Event Repository', function() {
     beforeEach(function() {
       TestFactory.event_repository.notification_handling_state(z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
       spyOn(TestFactory.event_repository.conversation_service, 'save_event').and.returnValue(
-        Promise.resolve({data: 'dummy content'}),
+        Promise.resolve({data: 'dummy content'})
       );
       spyOn(TestFactory.event_repository, '_distribute_event');
     });

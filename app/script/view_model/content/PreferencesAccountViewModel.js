@@ -226,7 +226,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
       value: 'fromProfile',
     });
     return z.util.safe_window_open(
-      `${z.util.Environment.backend.website_url()}${z.l10n.text(z.string.url_password_reset)}`,
+      `${z.util.Environment.backend.website_url()}${z.l10n.text(z.string.url_password_reset)}`
     );
   }
 

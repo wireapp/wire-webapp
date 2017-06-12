@@ -92,7 +92,7 @@ describe('Event Mapper', function() {
         null,
         'test.com/perm',
         'Test title',
-        'Test description',
+        'Test description'
       );
 
       const event = {

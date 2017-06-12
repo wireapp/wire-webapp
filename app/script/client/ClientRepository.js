@@ -110,7 +110,7 @@ z.client.ClientRepository = class ClientRepository {
         if (_.isString(client_payload)) {
           this.logger.info(
             `No current local client connected to '${z.client.ClientRepository
-              .PRIMARY_KEY_CURRENT_CLIENT}' found in database`,
+              .PRIMARY_KEY_CURRENT_CLIENT}' found in database`
           );
           throw new z.client.ClientError(z.client.ClientError.TYPE.NO_LOCAL_CLIENT);
         }
@@ -119,7 +119,7 @@ z.client.ClientRepository = class ClientRepository {
         this.logger.info(
           `Loaded local client '${client_et.id}' connected to '${z.client.ClientRepository
             .PRIMARY_KEY_CURRENT_CLIENT}'`,
-          this.current_client(),
+          this.current_client()
         );
         return this.current_client();
       });
@@ -270,7 +270,7 @@ z.client.ClientRepository = class ClientRepository {
             .catch(database_error => {
               this.logger.error(
                 `Deleting crypto database after failed client validation unsuccessful: ${database_error.message}`,
-                database_error,
+                database_error
               );
               throw new z.client.ClientError(z.client.ClientError.TYPE.DATABASE_FAILURE);
             })
@@ -313,7 +313,7 @@ z.client.ClientRepository = class ClientRepository {
       .then(response => {
         this.logger.info(
           `Registered '${response.type}' client '${response.id}' with cookie label '${response.cookie}'`,
-          response,
+          response
         );
         this.current_client(this.client_mapper.map_client(response));
         return this._save_current_client_in_db(response);
@@ -411,7 +411,7 @@ z.client.ClientRepository = class ClientRepository {
     const indexed_db_key = z.storage.StorageKey.AUTH.COOKIE_LABEL;
     const local_storage_key = this.construct_cookie_label_key(
       this.self_user().email() || this.self_user().phone(),
-      client_type,
+      client_type
     );
 
     if (cookie_label === undefined) {
@@ -517,7 +517,7 @@ z.client.ClientRepository = class ClientRepository {
         });
       }
       return this.delete_temporary_client().then(() =>
-        amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReason.USER_REQUESTED, true),
+        amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReason.USER_REQUESTED, true)
       );
     }
   }
@@ -603,7 +603,7 @@ z.client.ClientRepository = class ClientRepository {
         {
           clients: client_ets,
           sessions: client_ids,
-        },
+        }
       );
       for (const client_id of client_ids) {
         let deleted_client = true;
@@ -747,7 +747,7 @@ z.client.ClientRepository = class ClientRepository {
           amplify.publish(
             z.event.WebApp.LIFECYCLE.SIGN_OUT,
             z.auth.SignOutReason.CLIENT_REMOVED,
-            this.current_client().is_temporary(),
+            this.current_client().is_temporary()
           );
         });
       }

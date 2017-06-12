@@ -34,7 +34,7 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
         title_view_model = new z.ViewModel.WindowTitleViewModel(
           content_state,
           TestFactory.user_repository,
-          conversation_repository,
+          conversation_repository
         );
         done();
       })

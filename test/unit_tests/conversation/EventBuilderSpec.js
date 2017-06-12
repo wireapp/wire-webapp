@@ -51,7 +51,7 @@ describe('z.conversation.EventBuilder', function() {
     const event = z.conversation.EventBuilder.build_degraded(
       conversation_et,
       user_ids,
-      z.message.VerificationMessageType.NEW_DEVICE,
+      z.message.VerificationMessageType.NEW_DEVICE
     );
     const message_et = event_mapper.map_json_event(event, conversation_et);
     expect(message_et).toBeDefined();

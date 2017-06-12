@@ -88,7 +88,7 @@ z.entity.Message = class Message {
         return z.util.get_first_name(this.user());
       },
       this,
-      {deferEvaluation: true},
+      {deferEvaluation: true}
     );
 
     this.accent_color = ko.pureComputed(() => {
@@ -208,7 +208,7 @@ z.entity.Message = class Message {
       return true;
     }
     return ![z.assets.AssetTransferState.DOWNLOADING, z.assets.AssetTransferState.UPLOADING].includes(
-      this.get_first_asset().status(),
+      this.get_first_asset().status()
     );
   }
 

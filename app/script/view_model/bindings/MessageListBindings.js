@@ -51,7 +51,7 @@ ko.bindingHandlers.focus_on_keydown = {
           },
         },
       },
-      context,
+      context
     );
   },
 };

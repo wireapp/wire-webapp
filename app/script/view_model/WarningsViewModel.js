@@ -70,7 +70,7 @@ z.ViewModel.WarningsViewModel = class WarningsViewModel {
         return this.warnings()[this.warnings().length - 1];
       },
       this,
-      {deferEvaluation: true},
+      {deferEvaluation: true}
     );
 
     this.warnings.subscribe(function(warnings) {
@@ -104,7 +104,7 @@ z.ViewModel.WarningsViewModel = class WarningsViewModel {
           return false;
         },
         this,
-        {deferEvaluation: true},
+        {deferEvaluation: true}
       )
       .extend({rateLimit: 200});
 
@@ -135,7 +135,7 @@ z.ViewModel.WarningsViewModel = class WarningsViewModel {
         // We block subsequent permission requests for notifications when the user ignores the request.
         amplify.publish(
           z.event.WebApp.SYSTEM_NOTIFICATION.PERMISSION_STATE,
-          z.system_notification.PermissionStatusState.IGNORED,
+          z.system_notification.PermissionStatusState.IGNORED
         );
         break;
       default:

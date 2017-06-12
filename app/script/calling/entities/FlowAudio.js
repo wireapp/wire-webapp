@@ -138,7 +138,7 @@ z.calling.entities.FlowAudio = class FlowAudio {
         $.extend(true, media_stream, audio_output_device.stream);
         this.logger.debug(
           `Wrapped audio stream to speaker to create stereo. Initial panning set to '${this.panning()}'.`,
-          media_stream,
+          media_stream
         );
       }
     }

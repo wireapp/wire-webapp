@@ -40,7 +40,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
   map_generic_message(generic_message, event) {
     if (generic_message === undefined) {
       return Promise.reject(
-        new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.NO_GENERIC_MESSAGE),
+        new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.NO_GENERIC_MESSAGE)
       );
     }
     return Promise.resolve()
@@ -59,7 +59,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
             status: event.status,
             time: event.time,
           },
-          specific_content,
+          specific_content
         );
       });
   }
@@ -70,7 +70,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
         return this._map_asset(
           generic_message.asset,
           generic_message.message_id,
-          event.data !== null ? event.data.id : undefined,
+          event.data !== null ? event.data.id : undefined
         );
       case z.cryptography.GENERIC_MESSAGE_TYPE.CALLING:
         return this._map_calling(generic_message.calling, event.data);
@@ -101,7 +101,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
       default:
         this.logger.debug(
           `Skipped event '${generic_message.message_id}' of unhandled type '${generic_message.content}'`,
-          {event, generic_message},
+          {event, generic_message}
         );
         throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE);
     }
@@ -161,7 +161,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
       return {
         duration: original.audio.duration_in_millis.toNumber() / 1000,
         loudness: new Uint8Array(
-          original.audio.normalized_loudness !== null ? original.audio.normalized_loudness.toArrayBuffer() : [],
+          original.audio.normalized_loudness !== null ? original.audio.normalized_loudness.toArrayBuffer() : []
         ),
       };
     }
@@ -240,7 +240,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
             default:
               throw new z.cryptography.CryptographyError(
                 z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE,
-                'Unhandled confirmation type',
+                'Unhandled confirmation type'
               );
           }
         })(),

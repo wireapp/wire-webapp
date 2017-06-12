@@ -82,7 +82,7 @@ z.ViewModel.ConversationTitlebarViewModel = class ConversationTitlebarViewModel 
 
     this.people_tooltip = z.l10n.text(
       z.string.tooltip_conversation_people,
-      z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.PEOPLE),
+      z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.PEOPLE)
     );
   }
 

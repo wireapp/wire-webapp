@@ -759,11 +759,11 @@ z.util.format_time_remaining = function(time_remaining) {
 
   if (moment_duration.asMinutes() === 1) {
     title += `${moment_duration.minutes()} ${z.l10n.text(z.string.ephememal_units_minute)} ${z.l10n.text(
-      z.string.and,
+      z.string.and
     )} `;
   } else if (moment_duration.asMinutes() > 1) {
     title += `${moment_duration.minutes()} ${z.l10n.text(z.string.ephememal_units_minutes)} ${z.l10n.text(
-      z.string.and,
+      z.string.and
     )} `;
   }
 

@@ -29,7 +29,7 @@ z.ViewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
     preferences_device_details,
     client_repository,
     conversation_repository,
-    cryptography_repository,
+    cryptography_repository
   ) {
     this.click_on_remove_device = this.click_on_remove_device.bind(this);
     this.click_on_show_device = this.click_on_show_device.bind(this);

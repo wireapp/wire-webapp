@@ -55,7 +55,7 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
     });
 
     this.session_reset_state = ko.observable(
-      z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET,
+      z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET
     );
     this.fingerprint = ko.observable('');
 
@@ -100,7 +100,7 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
       .then(() => {
         window.setTimeout(() => {
           this.session_reset_state(
-            z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.CONFIRMATION,
+            z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.CONFIRMATION
           );
         }, 550);
 

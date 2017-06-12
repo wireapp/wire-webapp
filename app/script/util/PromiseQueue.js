@@ -43,7 +43,7 @@ z.util.PromiseQueue = class PromiseQueue {
 
     this.logger = new z.util.Logger(
       name ? `z.util.PromiseQueue (${name})` : 'z.util.PromiseQueue',
-      z.config.LOGGER.OPTIONS,
+      z.config.LOGGER.OPTIONS
     );
 
     this._blocked = false;
