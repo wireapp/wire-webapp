@@ -536,7 +536,7 @@ z.string.uk.tooltip_conversations_archived = 'Показати архів ({{num
 z.string.uk.tooltip_conversations_more = 'Більше';
 z.string.uk.tooltip_conversations_notify = 'Увімкнути звук ({{shortcut}})';
 z.string.uk.tooltip_conversations_silence = 'Вимкнути звук ({{shortcut}})';
-z.string.uk.tooltip_conversations_tooltip_start = 'Почати розмову ({{shortcut}})';
+z.string.uk.tooltip_conversations_start = 'Почати розмову ({{shortcut}})';
 
 z.string.uk.tooltip_people_add = 'Додати людей до розмови ({{shortcut}})';
 z.string.uk.tooltip_people_back = 'Назад';

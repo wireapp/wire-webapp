@@ -444,7 +444,7 @@ z.string.cs.tooltip_conversations_archived = 'Zobrazit archiv ({{number}})';
 z.string.cs.tooltip_conversations_more = 'Další';
 z.string.cs.tooltip_conversations_notify = 'Zapnout zvuk ({{shortcut}})';
 z.string.cs.tooltip_conversations_silence = 'Ztlumit ({{shortcut}})';
-z.string.cs.tooltip_conversations_tooltip_start = 'Spustit konverzaci ({{shortcut}})';
+z.string.cs.tooltip_conversations_start = 'Spustit konverzaci ({{shortcut}})';
 
 z.string.cs.tooltip_people_add = 'Přidat kontakty ke konverzaci ({{shortcut}})';
 z.string.cs.tooltip_people_back = 'Zpět';

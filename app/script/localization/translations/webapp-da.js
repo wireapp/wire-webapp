@@ -514,7 +514,7 @@ z.string.da.tooltip_conversations_archived = 'Vis arkiv ({{number}})';
 z.string.da.tooltip_conversations_more = 'Mere';
 z.string.da.tooltip_conversations_notify = 'Unmute ({{shortcut}})';
 z.string.da.tooltip_conversations_silence = 'Mute ({{shortcut}})';
-z.string.da.tooltip_conversations_tooltip_start = 'Start samtale ({{shortcut}})';
+z.string.da.tooltip_conversations_start = 'Start samtale ({{shortcut}})';
 
 z.string.da.tooltip_people_add = 'Tilføj personer til samtalen ({{shortcut}})';
 z.string.da.tooltip_people_back = 'Tilbage';

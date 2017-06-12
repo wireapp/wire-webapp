@@ -537,7 +537,7 @@ z.string.sl.tooltip_conversations_archived = 'Prikaži arhiv ({{number}})';
 z.string.sl.tooltip_conversations_more = 'Več';
 z.string.sl.tooltip_conversations_notify = 'Povrni zvok ({{shortcut}})';
 z.string.sl.tooltip_conversations_silence = 'Utišaj ({{shortcut}})';
-z.string.sl.tooltip_conversations_tooltip_start = 'Začni pogovor ({{shortcut}})';
+z.string.sl.tooltip_conversations_start = 'Začni pogovor ({{shortcut}})';
 
 z.string.sl.tooltip_people_add = 'Dodaj osebe v pogovor ({{shortcut}})';
 z.string.sl.tooltip_people_back = 'Nazaj';

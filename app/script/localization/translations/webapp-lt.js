@@ -527,7 +527,7 @@ z.string.lt.tooltip_conversations_archived = 'Rodyti archyvą ({{number}})';
 z.string.lt.tooltip_conversations_more = 'Daugiau';
 z.string.lt.tooltip_conversations_notify = 'Įjungti pranešimus ({{shortcut}})';
 z.string.lt.tooltip_conversations_silence = 'Išjungti pranešimus ({{shortcut}})';
-z.string.lt.tooltip_conversations_tooltip_start = 'Pradėti pokalbį ({{shortcut}})';
+z.string.lt.tooltip_conversations_start = 'Pradėti pokalbį ({{shortcut}})';
 
 z.string.lt.tooltip_people_add = 'Pridėti žmones į pokalbį ({{shortcut}})';
 z.string.lt.tooltip_people_back = 'Atgal';

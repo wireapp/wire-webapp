@@ -473,7 +473,7 @@ z.string.hr.tooltip_conversations_archived = 'Pokaži arhivu ({{number}})';
 z.string.hr.tooltip_conversations_more = 'Više';
 z.string.hr.tooltip_conversations_notify = 'Uključi zvukove ({{shortcut}})';
 z.string.hr.tooltip_conversations_silence = 'Isključi zvukove ({{shortcut}})';
-z.string.hr.tooltip_conversations_tooltip_start = 'Početak razgovora ({{shortcut}})';
+z.string.hr.tooltip_conversations_start = 'Početak razgovora ({{shortcut}})';
 
 z.string.hr.tooltip_people_add = 'Dodaj ljude u razgovor ({{shortcut}})';
 z.string.hr.tooltip_people_back = 'Natrag';

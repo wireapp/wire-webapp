@@ -545,7 +545,7 @@ z.string.sk.tooltip_conversations_archived = 'Zobraziť archív ({{number}})';
 z.string.sk.tooltip_conversations_more = 'Viac';
 z.string.sk.tooltip_conversations_notify = 'Zrušiť stlmenie ({{shortcut}})';
 z.string.sk.tooltip_conversations_silence = 'Stlmiť ({{shortcut}})';
-z.string.sk.tooltip_conversations_tooltip_start = 'Začať rozhovor ({{shortcut}})';
+z.string.sk.tooltip_conversations_start = 'Začať rozhovor ({{shortcut}})';
 
 z.string.sk.tooltip_people_add = 'Pridať ľudí do rozhovoru ({{shortcut}})';
 z.string.sk.tooltip_people_back = 'Späť';

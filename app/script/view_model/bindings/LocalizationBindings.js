@@ -21,49 +21,49 @@
 
 
 ko.bindingHandlers.l10n_href = {
-  update(element, valueAccessor) {
+  update(element, valueAccessor = z.util.noop) {
     const {id = valueAccessor(), substitute} = valueAccessor();
     element.setAttribute('href', z.l10n.text(id, substitute));
   },
 };
 
 ko.bindingHandlers.l10n_input = {
-  update(element, valueAccessor) {
+  update(element, valueAccessor = z.util.noop) {
     const {id = valueAccessor(), substitute} = valueAccessor();
     element.setAttribute('value', z.l10n.text(id, substitute));
   },
 };
 
 ko.bindingHandlers.l10n_placeholder = {
-  update(element, valueAccessor) {
+  update(element, valueAccessor = z.util.noop) {
     const {id = valueAccessor(), substitute} = valueAccessor();
     element.setAttribute('placeholder', z.l10n.text(id, substitute));
   },
 };
 
 ko.bindingHandlers.l10n_text = {
-  update(element, valueAccessor) {
+  update(element, valueAccessor = z.util.noop) {
     const {id = valueAccessor(), substitute} = valueAccessor();
     ko.utils.setTextContent(element, z.l10n.text(id, substitute));
   },
 };
 
 ko.bindingHandlers.l10n_html = {
-  update(element, valueAccessor) {
+  update(element, valueAccessor = z.util.noop) {
     const {id = valueAccessor(), substitute} = valueAccessor();
     ko.utils.setHtml(element, z.l10n.text(id, substitute));
   },
 };
 
 ko.bindingHandlers.l10n_tooltip = {
-  update(element, valueAccessor) {
+  update(element, valueAccessor = z.util.noop) {
     const {id = valueAccessor(), substitute} = valueAccessor();
     element.setAttribute('title', z.l10n.text(id, substitute));
   },
 };
 
 ko.bindingHandlers.l10n_aria_label = {
-  update(element, valueAccessor) {
+  update(element, valueAccessor = z.util.noop) {
     const {id = valueAccessor(), substitute} = valueAccessor();
     element.setAttribute('aria-label', z.l10n.text(id, substitute));
   },

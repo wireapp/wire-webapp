@@ -539,7 +539,7 @@ z.string.hu.tooltip_conversations_archived = 'Archívum megtekintése ({{number}
 z.string.hu.tooltip_conversations_more = 'Továbbiak';
 z.string.hu.tooltip_conversations_notify = 'Némítás feloldása ({{shortcut}})';
 z.string.hu.tooltip_conversations_silence = 'Némítás ({{shortcut}})';
-z.string.hu.tooltip_conversations_tooltip_start = 'Beszélgetés megkezdése ({{shortcut}})';
+z.string.hu.tooltip_conversations_start = 'Beszélgetés megkezdése ({{shortcut}})';
 
 z.string.hu.tooltip_people_add = 'Partner hozzáadása a beszélgetéshez ({{shortcut}})';
 z.string.hu.tooltip_people_back = 'Vissza';

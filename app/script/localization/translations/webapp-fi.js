@@ -484,7 +484,7 @@ z.string.fi.tooltip_conversations_archived = 'Näytä arkisto ({{number}})';
 z.string.fi.tooltip_conversations_more = 'Lisää';
 z.string.fi.tooltip_conversations_notify = 'Poist mykistys ({{shortcut}})';
 z.string.fi.tooltip_conversations_silence = 'Mykistä ({{shortcut}})';
-z.string.fi.tooltip_conversations_tooltip_start = 'Aloita keskustelu ({{shortcut}})';
+z.string.fi.tooltip_conversations_start = 'Aloita keskustelu ({{shortcut}})';
 
 z.string.fi.tooltip_people_add = 'Lisää ihmisiä keskusteluun ({{shortcut}})';
 z.string.fi.tooltip_people_back = 'Takaisin';
