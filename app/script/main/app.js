@@ -233,7 +233,6 @@ z.main.App = class App {
       return Promise.all([
         this.repository.conversation.get_conversations(),
         this.repository.user.get_connections(),
-        this.repository.team.get_teams(),
       ]);
     })
     .then(([conversation_ets, connection_ets]) => {
@@ -245,9 +244,13 @@ z.main.App = class App {
 
       this.repository.conversation.initialize_connections(this.repository.user.connections());
       this._subscribe_to_unload_events();
-      return this.repository.event.initialize_from_notification_stream();
+
+      return Promise.all([
+        this.repository.event.initialize_from_notification_stream(),
+        this.repository.team.get_teams(),
+      ]);
     })
-    .then((notifications_count) => {
+    .then(([notifications_count, team_ets]) => {
       this.view.loading.update_progress(95, z.string.init_updated_from_notifications);
 
       this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
