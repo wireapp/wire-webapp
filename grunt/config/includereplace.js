@@ -30,10 +30,10 @@ module.exports = {
     dest: '<%= dir.dist %>',
     expand: true,
     options: {
-      includesDir: '<%= dir.app.page %>/template',
       globals: {
         dest: '_dist',
       },
+      includesDir: '<%= dir.app.page %>/template',
       prefix: '#',
     },
     src: 'index.html',
@@ -44,10 +44,10 @@ module.exports = {
     dest: '<%= dir.dist %>/auth',
     expand: true,
     options: {
-      includesDir: '<%= dir.app.page %>/template',
       globals: {
         dest: '_dist',
       },
+      includesDir: '<%= dir.app.page %>/template',
       prefix: '#',
     },
     rename(dest, src) {
@@ -61,10 +61,10 @@ module.exports = {
     dest: '<%= dir.dist %>/demo',
     expand: true,
     options: {
-      includesDir: '<%= dir.app.demo %>/template',
       globals: {
         dest: '_dist',
       },
+      includesDir: '<%= dir.app.demo %>/template',
       prefix: '#',
     },
     rename(dest, src) {
@@ -82,10 +82,10 @@ module.exports = {
     dest: '<%= dir.deploy %>',
     expand: true,
     options: {
-      includesDir: '<%= dir.app.page %>/template',
       globals: {
         dest: '_deploy',
       },
+      includesDir: '<%= dir.app.page %>/template',
       prefix: '#',
     },
     src: 'index.html',
@@ -96,10 +96,10 @@ module.exports = {
     dest: '<%= dir.deploy %>/auth',
     expand: true,
     options: {
-      includesDir: '<%= dir.app.page %>/template',
       globals: {
         dest: '_deploy',
       },
+      includesDir: '<%= dir.app.page %>/template',
       prefix: '#',
     },
     rename(dest, src) {
@@ -113,10 +113,10 @@ module.exports = {
     dest: '<%= dir.deploy %>/demo',
     expand: true,
     options: {
-      includesDir: '<%= dir.app.demo %>/template',
       globals: {
         dest: '_deploy',
       },
+      includesDir: '<%= dir.app.demo %>/template',
       prefix: '#',
     },
     rename(dest, src) {
@@ -133,10 +133,10 @@ module.exports = {
     dest: '<%= dir.deploy %>',
     expand: true,
     options: {
-      includesDir: '<%= dir.app.page %>/template',
       globals: {
         dest: '_prod',
       },
+      includesDir: '<%= dir.app.page %>/template',
       prefix: '#',
     },
     src: 'index.html',
@@ -147,10 +147,10 @@ module.exports = {
     dest: '<%= dir.deploy %>/auth',
     expand: true,
     options: {
-      includesDir: '<%= dir.app.page %>/template',
       globals: {
         dest: '_prod',
       },
+      includesDir: '<%= dir.app.page %>/template',
       prefix: '#',
     },
     rename(dest, src) {
@@ -164,10 +164,10 @@ module.exports = {
     dest: '<%= dir.deploy %>/demo',
     expand: true,
     options: {
-      includesDir: '<%= dir.app.demo %>/template',
       globals: {
         dest: '_prod',
       },
+      includesDir: '<%= dir.app.demo %>/template',
       prefix: '#',
     },
     rename(dest, src) {

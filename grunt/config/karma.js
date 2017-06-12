@@ -25,9 +25,9 @@ module.exports = {
   options: {
     configFile: 'karma.conf.js',
     files: [
-      {pattern: 'ext/proto/generic-message-proto/messages.proto', included: false, served: true, nocache: true},
-      {pattern: 'audio/*.mp3', included: false, served: true, nocache: false},
-      {pattern: 'worker/*.js', included: false, served: true, nocache: true},
+      {pattern: 'ext/proto/generic-message-proto/messages.proto', included: false, nocache: true, served: true},
+      {pattern: 'audio/*.mp3', included: false, nocache: false, served: true},
+      {pattern: 'worker/*.js', included: false, nocache: true, served: true},
       // helper files
       '../node_modules/jasmine-ajax/lib/mock-ajax.js',
       '../node_modules/sinon/pkg/sinon.js',
