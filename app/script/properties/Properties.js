@@ -30,6 +30,9 @@ z.properties.Properties = class Properties {
         replace_inline: true,
       },
       notifications: z.system_notification.SystemNotificationPreference.ON,
+      previews: {
+        send: true,
+      },
       privacy: {
         improve_wire: true,
         report_errors: true,

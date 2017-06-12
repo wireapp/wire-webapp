@@ -1599,7 +1599,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this._send_and_inject_generic_message(conversation_et, generic_message, false)
       .then(() => {
         this._track_edit_message(conversation_et, original_message_et);
-        return this.send_link_preview(message, conversation_et, generic_message);
+        if (z.util.Environment.electron) {
+          return this.send_link_preview(message, conversation_et, generic_message);
+        }
       })
       .catch((error) => {
         if (error.type !== z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
@@ -1702,7 +1704,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
   send_text_with_link_preview(message, conversation_et) {
     return this.send_text(message, conversation_et)
       .then((generic_message) => {
-        return this.send_link_preview(message, conversation_et, generic_message);
+        if (z.util.Environment.electron) {
+          return this.send_link_preview(message, conversation_et, generic_message);
+        }
       })
       .catch((error) => {
         if (error.type !== z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {

@@ -96,6 +96,9 @@ const EMOJI_INLINE_MAX_LENGTH = Math.max(...EMOJI_INLINE_REPLACEMENT.map((item) 
 
 z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewModel {
   constructor(properties_repository) {
+    this.remove_emoji_popup = this.remove_emoji_popup.bind(this);
+    this.updated_emoji_replace_preference = this.updated_emoji_replace_preference.bind(this);
+
     const emoji_div_class = 'conversation-input-emoji-list';
 
     this.emoji_list = [];
@@ -104,6 +107,8 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
     this.emoji_div = $(`<div class='${emoji_div_class}' />`);
     this.emoji_start_pos = -1;
     this.emoji_usage_count = z.util.StorageUtil.get_value(z.storage.StorageKey.CONVERSATION.EMOJI_USAGE_COUNT) || {};
+
+    this.should_replace_inline_emoji = properties_repository.get_preference(z.properties.PROPERTIES_TYPE.EMOJI.REPLACE_INLINE);
 
     $(document).on('click', `.${emoji_div_class}`, (event) => {
       const clicked = $(event.target);
@@ -143,10 +148,6 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
           });
         }
       });
-
-    this.bound_remove_emoji_list = this.remove_emoji_popup.bind(this);
-
-    this.should_replace_inline_emoji = properties_repository.get_preference(z.properties.PROPERTIES_TYPE.EMOJI.REPLACE_INLINE);
 
     this._init_subscriptions();
   }
@@ -228,12 +229,14 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
   }
 
   _init_subscriptions() {
-    amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, () => this.remove_emoji_popup());
-    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE, this.updated_replace_inline_emoji_property.bind(this));
-    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, (properties) => this.updated_replace_inline_emoji_property(properties.settings.emoji.replace_inline));
+    amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, this.remove_emoji_popup);
+    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE, this.updated_emoji_replace_preference);
+    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, (properties) => {
+      this.updated_emoji_replace_preference(properties.settings.emoji.replace_inline);
+    });
   }
 
-  updated_replace_inline_emoji_property(preference) {
+  updated_emoji_replace_preference(preference) {
     return this.should_replace_inline_emoji = preference;
   }
 
@@ -318,7 +321,7 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
       if (emoji_matched === '') {
         this._close_emoji_popup();
       } else {
-        window.addEventListener('click', this.bound_remove_emoji_list);
+        window.addEventListener('click', this.remove_emoji_popup);
         this.emoji_div
           .html(emoji_matched)
           .appendTo('body')
@@ -364,7 +367,7 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
   }
 
   _close_emoji_popup() {
-    window.removeEventListener('click', this.bound_remove_emoji_list);
+    window.removeEventListener('click', this.remove_emoji_popup);
     this.emoji_div.remove();
   }
 
