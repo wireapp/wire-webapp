@@ -44,6 +44,9 @@ z.string.de.auth_account_sign_in_phone = 'Handy';
 z.string.de.auth_account_terms_of_use = 'Nutzungsbedingungen';
 z.string.de.auth_account_terms_of_use_detail = 'Ich akzeptiere die';
 
+z.string.de.auth_blocked_database = 'Wire benötigt zum Anzeigen deiner Nachrichten Zugriff auf den lokalen Speicher. In Privaten Fenstern ist dieser nicht verfügbar.';
+z.string.de.auth_blocked_tabs = 'Wire ist bereits in einem anderen Tab geöffnet.';
+
 z.string.de.auth_verify_account_add = 'Hinzufügen';
 z.string.de.auth_verify_account_detail = 'Hiermit kannst du Wire auf mehreren Geräten verwenden.';
 z.string.de.auth_verify_account_headline = 'E-Mail-Adresse und Passwort hinzufügen.';
@@ -255,7 +258,7 @@ z.string.de.archive_header = 'Archivieren';
 
 z.string.de.conversations_all_archived = 'Alle Unterhaltungen archiviert';
 z.string.de.conversations_contacts = 'Kontakte';
-z.string.de.conversations_connection_request_many = '%no Kontaktanfragen';
+z.string.de.conversations_connection_request_many = '{{number}} Kontaktanfragen';
 z.string.de.conversations_connection_request_one = 'Eine Kontaktanfrage';
 z.string.de.conversations_empty_conversation = 'Gruppenunterhaltung';
 z.string.de.conversations_empty_conversation_description = 'Leere Unterhaltung';
@@ -429,7 +432,7 @@ z.string.de.preferences_options_contacts_gmail = 'Aus Gmail importieren';
 z.string.de.preferences_options_contacts_macos = 'Aus Kontakte importieren';
 z.string.de.preferences_options_contacts_detail = 'Wir verwenden deine Daten, um Kontakte für dich zu erstellen. Wir anonymisieren alle Informationen und teilen sie mit niemand anderem.';
 z.string.de.preferences_options_data = 'Nutzungs- und Fehlerberichte';
-z.string.de.preferences_options_data_checkbox = 'Nutzungs- und Fehlerberichte';
+z.string.de.preferences_options_data_checkbox = 'Anonymisierte Daten senden';
 z.string.de.preferences_options_data_detail = 'Hilf uns, Wire durch das Senden anonymisierter Informationen zu verbessern.';
 z.string.de.preferences_options_notifications = 'Benachrichtigungen';
 z.string.de.preferences_options_notifications_none = 'Aus';
