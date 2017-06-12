@@ -546,7 +546,7 @@ z.string.de.tooltip_conversations_archived = 'Archiv anzeigen ({{number}})';
 z.string.de.tooltip_conversations_more = 'Mehr';
 z.string.de.tooltip_conversations_notify = 'Benachrichtigen ({{shortcut}})';
 z.string.de.tooltip_conversations_silence = 'Stummschalten ({{shortcut}})';
-z.string.de.tooltip_conversations_tooltip_start = 'Unterhaltung beginnen ({{shortcut}})';
+z.string.de.tooltip_conversations_start = 'Unterhaltung beginnen ({{shortcut}})';
 
 z.string.de.tooltip_people_add = 'Kontakte zur Unterhaltung hinzufügen ({{shortcut}})';
 z.string.de.tooltip_people_back = 'Zurück';

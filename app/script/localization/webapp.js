@@ -605,7 +605,7 @@ z.string.tooltip_conversations_archived = 'Show archive ({{number}})';
 z.string.tooltip_conversations_more = 'More';
 z.string.tooltip_conversations_notify = 'Unmute ({{shortcut}})';
 z.string.tooltip_conversations_silence = 'Mute ({{shortcut}})';
-z.string.tooltip_conversations_tooltip_start = 'Start conversation ({{shortcut}})';
+z.string.tooltip_conversations_start = 'Start conversation ({{shortcut}})';
 
 z.string.tooltip_people_add = 'Add people to conversation ({{shortcut}})';
 z.string.tooltip_people_back = 'Back';
