@@ -23,11 +23,18 @@ window.z = window.z || {};
 window.z.links = z.links || {};
 
 z.links.LinkPreviewBlackList = (function() {
-  const BLACKLIST = ['soundcloud', 'spotify', 'youtu[.]?be', 'vimeo'];
+
+  const BLACKLIST = [
+    'soundcloud',
+    'spotify',
+    'youtu[.]?be',
+    'vimeo',
+  ];
 
   return {
     is_blacklisted(url) {
       return new RegExp(BLACKLIST.join('|')).test(url);
     },
   };
+
 })();

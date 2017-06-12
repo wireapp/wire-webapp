@@ -26,7 +26,7 @@ z.audio.AudioError = class AudioError extends Error {
   constructor(type) {
     super();
     this.name = this.constructor.name;
-    this.stack = new Error().stack;
+    this.stack = (new Error()).stack;
     this.type = type || z.audio.AudioError.TYPE.UNKNOWN;
     switch (this.type) {
       case z.audio.AudioError.TYPE.ALREADY_PLAYING:

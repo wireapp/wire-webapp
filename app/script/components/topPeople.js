@@ -32,7 +32,7 @@ z.components.TopPeopleViewModel = class TopPeopleViewModel {
       return this.user_ets().slice(0, this.max_users);
     });
 
-    this.on_select = user_et => {
+    this.on_select = (user_et) => {
       if (this.is_selected(user_et)) {
         return this.user_selected.remove(user_et);
       }
@@ -40,7 +40,7 @@ z.components.TopPeopleViewModel = class TopPeopleViewModel {
       return this.user_selected.push(user_et);
     };
 
-    this.is_selected = user_et => {
+    this.is_selected = (user_et) => {
       return this.user_selected().includes(user_et);
     };
   }

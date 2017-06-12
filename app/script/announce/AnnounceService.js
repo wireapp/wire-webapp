@@ -30,12 +30,8 @@ z.announce.AnnounceService = class AnnounceService {
   }
 
   constructor() {
-    this.logger = new z.util.Logger(
-      'z.announce.AnnounceService',
-      z.config.LOGGER.OPTIONS,
-    );
-    this.url = `${z.util.Environment.backend.website_url()}${AnnounceService
-      .CONFIG.URL}?order=created&active=true`;
+    this.logger = new z.util.Logger('z.announce.AnnounceService', z.config.LOGGER.OPTIONS);
+    this.url = `${z.util.Environment.backend.website_url()}${AnnounceService.CONFIG.URL}?order=created&active=true`;
     if (z.util.Environment.frontend.is_production()) {
       this.url += '&production=true';
     }
@@ -44,7 +40,7 @@ z.announce.AnnounceService = class AnnounceService {
   get_announcements() {
     return new Promise((resolve, reject) => {
       $.get(this.url)
-        .done(data => {
+        .done((data) => {
           resolve(data['result']);
         })
         .fail((jqXHR, textStatus, errorThrown) => {
@@ -56,7 +52,7 @@ z.announce.AnnounceService = class AnnounceService {
   get_version() {
     return new Promise((resolve, reject) => {
       $.get('version/')
-        .done(data => {
+        .done((data) => {
           resolve(data['version']);
         })
         .fail((jqXHR, textStatus, errorThrown) => {

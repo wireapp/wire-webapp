@@ -24,18 +24,17 @@ window.z.tracking = z.tracking || {};
 
 z.tracking.EventTrackingRepository = class EventTrackingRepository {
   static get CONFIG() {
-    const RAYGUN_API_KEY = z.util.Environment.frontend.is_production()
-      ? 'lAkLCPLx3ysnsXktajeHmw=='
-      : '5hvAMmz8wTXaHBYqu2TFUQ==';
-    const LOCALYTICS_APP_KEY = z.util.Environment.frontend.is_production()
-      ? 'f19c50ccf7bff11992798f0-59fac3b8-ad88-11e6-ff9e-00ae30fe7875'
-      : '905792736c9f17c3464fd4e-60d90c82-d14a-11e4-af66-009c5fda0a25';
+    const RAYGUN_API_KEY = z.util.Environment.frontend.is_production() ? 'lAkLCPLx3ysnsXktajeHmw==' : '5hvAMmz8wTXaHBYqu2TFUQ==';
+    const LOCALYTICS_APP_KEY = z.util.Environment.frontend.is_production() ? 'f19c50ccf7bff11992798f0-59fac3b8-ad88-11e6-ff9e-00ae30fe7875' : '905792736c9f17c3464fd4e-60d90c82-d14a-11e4-af66-009c5fda0a25';
 
     return {
       ERROR_REPORTING_THRESHOLD: 60 * 1000, // in milliseconds
       LOCALYTICS: {
         APP_KEY: LOCALYTICS_APP_KEY,
-        DISABLED_DOMAINS: ['localhost', 'zinfra.io'],
+        DISABLED_DOMAINS: [
+          'localhost',
+          'zinfra.io',
+        ],
         SESSION_INTERVAL: 60 * 1000, // milliseconds
         SESSION_TIMEOUT: 3 * 60 * 1000,
       },
@@ -57,10 +56,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
    * @returns {EventTrackingRepository} The new repository for user actions
    */
   constructor(conversation_repository, user_repository) {
-    this.logger = new z.util.Logger(
-      'z.tracking.EventTrackingRepository',
-      z.config.LOGGER.OPTIONS,
-    );
+    this.logger = new z.util.Logger('z.tracking.EventTrackingRepository', z.config.LOGGER.OPTIONS);
 
     this.conversation_repository = conversation_repository;
     this.user_repository = user_repository;
@@ -91,17 +87,11 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
       if (!this.localytics) {
         this._init_localytics();
       }
-      this.set_custom_dimension(
-        z.tracking.CustomDimension.CONTACTS,
-        this.user_repository.connected_users().length,
-      );
+      this.set_custom_dimension(z.tracking.CustomDimension.CONTACTS, this.user_repository.connected_users().length);
       this._subscribe_to_events();
     }
 
-    amplify.subscribe(
-      z.event.WebApp.PROPERTIES.UPDATE.PRIVACY,
-      this.updated_privacy.bind(this),
-    );
+    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.PRIVACY, this.updated_privacy.bind(this));
   }
 
   /**
@@ -117,10 +107,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
         this._init_localytics();
       }
       this.set_custom_dimension(z.tracking.CustomDimension.CONTACTS, -1);
-      amplify.subscribe(
-        z.event.WebApp.ANALYTICS.EVENT,
-        this.tag_event.bind(this),
-      );
+      amplify.subscribe(z.event.WebApp.ANALYTICS.EVENT, this.tag_event.bind(this));
     }
   }
 
@@ -129,10 +116,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
       this._enable_error_reporting();
       if (!this._localytics_disabled()) {
         this.start_session();
-        this.set_custom_dimension(
-          z.tracking.CustomDimension.CONTACTS,
-          this.user_repository.connected_users().length,
-        );
+        this.set_custom_dimension(z.tracking.CustomDimension.CONTACTS, this.user_repository.connected_users().length);
         this._subscribe_to_events();
         this.tag_event(z.tracking.EventName.TRACKING.OPT_IN);
       }
@@ -155,22 +139,10 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   }
 
   _subscribe_to_events() {
-    amplify.subscribe(
-      z.event.WebApp.ANALYTICS.CLOSE_SESSION,
-      this.close_session.bind(this),
-    );
-    amplify.subscribe(
-      z.event.WebApp.ANALYTICS.CUSTOM_DIMENSION,
-      this.set_custom_dimension.bind(this),
-    );
-    amplify.subscribe(
-      z.event.WebApp.ANALYTICS.EVENT,
-      this.tag_event.bind(this),
-    );
-    amplify.subscribe(
-      z.event.WebApp.ANALYTICS.START_SESSION,
-      this.start_session.bind(this),
-    );
+    amplify.subscribe(z.event.WebApp.ANALYTICS.CLOSE_SESSION, this.close_session.bind(this));
+    amplify.subscribe(z.event.WebApp.ANALYTICS.CUSTOM_DIMENSION, this.set_custom_dimension.bind(this));
+    amplify.subscribe(z.event.WebApp.ANALYTICS.EVENT, this.tag_event.bind(this));
+    amplify.subscribe(z.event.WebApp.ANALYTICS.START_SESSION, this.start_session.bind(this));
   }
 
   _unsubscribe_from_events() {
@@ -179,6 +151,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     amplify.unsubscribeAll(z.event.WebApp.ANALYTICS.EVENT);
     amplify.unsubscribeAll(z.event.WebApp.ANALYTICS.START_SESSION);
   }
+
 
   //##############################################################################
   // Localytics
@@ -200,9 +173,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
   set_custom_dimension(custom_dimension, value) {
     if (this.localytics) {
-      this.logger.info(
-        `Set Localytics custom dimension '${custom_dimension}' to value '${value}'`,
-      );
+      this.logger.info(`Set Localytics custom dimension '${custom_dimension}' to value '${value}'`);
       this.localytics('setCustomDimension', custom_dimension, value);
     }
   }
@@ -216,21 +187,14 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
       this.logger.info('Starting new Localytics session');
       this.localytics('open');
       this.localytics('upload');
-      this.session_interval = window.setInterval(
-        this.upload_session,
-        EventTrackingRepository.CONFIG.LOCALYTICS.SESSION_INTERVAL,
-      );
+      this.session_interval = window.setInterval(this.upload_session, EventTrackingRepository.CONFIG.LOCALYTICS.SESSION_INTERVAL);
     }
   }
 
   tag_event(event_name, attributes) {
     if (this.localytics) {
       if (attributes) {
-        this.logger.info(
-          `Localytics event '${event_name}' with attributes: ${JSON.stringify(
-            attributes,
-          )}`,
-        );
+        this.logger.info(`Localytics event '${event_name}' with attributes: ${JSON.stringify(attributes)}`);
       } else {
         this.logger.info(`Localytics event '${event_name}' without attributes`);
       }
@@ -250,9 +214,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
       this.localytics('close');
       window.ll = undefined;
       this.localytics = undefined;
-      this.logger.debug(
-        'Localytics reporting was disabled due to user preferences',
-      );
+      this.logger.debug('Localytics reporting was disabled due to user preferences');
     }
   }
 
@@ -278,22 +240,15 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     const script_element = document.createElement('script');
     script_element.src = 'https://web.localytics.com/v3/localytics.min.js';
 
-    (element_node = document.getElementsByTagName(
-      'script',
-    )[0]).parentNode.insertBefore(script_element, element_node);
+    (element_node = document.getElementsByTagName('script')[0]).parentNode.insertBefore(script_element, element_node);
 
-    this.localytics(
-      'init',
-      EventTrackingRepository.CONFIG.LOCALYTICS.APP_KEY,
-      options,
-    );
+    this.localytics('init', EventTrackingRepository.CONFIG.LOCALYTICS.APP_KEY, options);
     this.logger.debug('Localytics reporting is enabled');
   }
 
   _localytics_disabled() {
     if (!z.util.get_url_parameter(z.auth.URLParameter.LOCALYTICS)) {
-      for (const domain of EventTrackingRepository.CONFIG.LOCALYTICS
-        .DISABLED_DOMAINS) {
+      for (const domain of EventTrackingRepository.CONFIG.LOCALYTICS.DISABLED_DOMAINS) {
         if (z.util.StringUtil.includes(window.location.hostname, domain)) {
           this.logger.debug('Localytics reporting is disabled due to domain');
 
@@ -305,6 +260,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     return false;
   }
 
+
   //##############################################################################
   // Raygun
   //##############################################################################
@@ -314,36 +270,23 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
    * @returns {undefined} No return value
    */
   _attach_promise_rejection_handler() {
-    window.onunhandledrejection = ({
-      reason: error,
-      promise: rejected_promise,
-    }) => {
+    window.onunhandledrejection = ({reason: error, promise: rejected_promise}) => {
       if (window.onerror) {
         if (error) {
           if (_.isString(error)) {
             window.onerror.call(this, error, null, null, null);
           } else if (error.message) {
-            window.onerror.call(
-              this,
-              error.message,
-              error.fileName,
-              error.lineNumber,
-              error.columnNumber,
-              error,
-            );
+            window.onerror.call(this, error.message, error.fileName, error.lineNumber, error.columnNumber, error);
           }
         }
 
         if (rejected_promise) {
           window.setTimeout(() => {
-            rejected_promise.catch(promise_error => {
-              this.logger.log(
-                this.logger.levels.OFF,
-                'Handled uncaught Promise in error reporting',
-                promise_error,
-              );
+            rejected_promise.catch((promise_error) => {
+              this.logger.log(this.logger.levels.OFF, 'Handled uncaught Promise in error reporting', promise_error);
             });
-          }, 0);
+          },
+          0);
         }
       }
     };
@@ -364,10 +307,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     }
 
     const time_since_last_report = Date.now() - this.last_report;
-    if (
-      time_since_last_report >
-      EventTrackingRepository.CONFIG.ERROR_REPORTING_THRESHOLD
-    ) {
+    if (time_since_last_report > EventTrackingRepository.CONFIG.ERROR_REPORTING_THRESHOLD) {
       this.last_report = Date.now();
 
       return raygun_payload;
@@ -383,9 +323,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   _disable_error_reporting() {
     this.logger.debug('Disabling Raygun error reporting');
     Raygun.detach();
-    Raygun.init(EventTrackingRepository.CONFIG.RAYGUN.API_KEY, {
-      disableErrorTracking: true,
-    });
+    Raygun.init(EventTrackingRepository.CONFIG.RAYGUN.API_KEY, {disableErrorTracking: true});
     this._detach_promise_rejection_handler();
   }
 
@@ -393,7 +331,10 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     this.logger.debug('Enabling Raygun error reporting');
     const options = {
       disableErrorTracking: false,
-      excludedHostnames: ['localhost', 'wire.ms'],
+      excludedHostnames: [
+        'localhost',
+        'wire.ms',
+      ],
       ignore3rdPartyErrors: true,
       ignoreAjaxAbort: true,
       ignoreAjaxError: true,
@@ -401,10 +342,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
     options.debugMode = !z.util.Environment.frontend.is_production();
 
-    Raygun.init(
-      EventTrackingRepository.CONFIG.RAYGUN.API_KEY,
-      options,
-    ).attach();
+    Raygun.init(EventTrackingRepository.CONFIG.RAYGUN.API_KEY, options).attach();
 
     /*
     Adding a version to the Raygun reports to identify which version of the Wire ran into the issue.
@@ -415,9 +353,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
       Raygun.setVersion(z.util.Environment.version(false));
     }
     if (z.util.Environment.electron) {
-      Raygun.withCustomData({
-        electron_version: z.util.Environment.version(true),
-      });
+      Raygun.withCustomData({electron_version: z.util.Environment.version(true)});
     }
     Raygun.onBeforeSend(this._check_error_payload.bind(this));
     this._attach_promise_rejection_handler();

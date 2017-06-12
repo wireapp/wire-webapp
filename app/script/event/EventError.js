@@ -27,7 +27,7 @@ z.event.EventError = class EventError extends Error {
     super();
 
     this.name = this.constructor.name;
-    this.stack = new Error().stack;
+    this.stack = (new Error()).stack;
     this.type = type || z.event.EventError.TYPE.UNKNOWN;
 
     switch (this.type) {
@@ -54,6 +54,7 @@ z.event.EventError = class EventError extends Error {
         break;
       default:
         this.message = 'Unknown EventError';
+
     }
   }
 

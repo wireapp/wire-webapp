@@ -24,6 +24,7 @@ window.z.entity = z.entity || {};
 
 z.entity.LinkPreview = class LinkPreview {
   constructor() {
+
     this.original_url = '';
     this.permanent_url = '';
     this.summary = '';

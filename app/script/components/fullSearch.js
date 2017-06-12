@@ -36,35 +36,34 @@ z.components.FullSearchViewModel = class FullSearchViewModel {
     this.show_no_results_text = ko.observable(false);
 
     this.input = ko.observable();
-    this.input.subscribe(
-      _.debounce(query => {
-        query = query.trim();
+    this.input.subscribe(_.debounce((query) => {
+      query = query.trim();
 
-        this.on_change(query);
+      this.on_change(query);
 
-        if (query.length < 2) {
-          this.message_ets = [];
-          this.message_ets_rendered([]);
-          this.show_no_results_text(false);
-          return;
-        }
+      if (query.length < 2) {
+        this.message_ets = [];
+        this.message_ets_rendered([]);
+        this.show_no_results_text(false);
+        return;
+      }
 
-        this.search_provider(query).then(([message_ets, _query]) => {
+      this.search_provider(query)
+        .then(([message_ets, _query]) => {
           if (_query === this.input().trim()) {
             if (message_ets.length > 0) {
               this.on_result();
             }
             this.show_no_results_text(message_ets.length === 0);
             this.message_ets = message_ets;
-            this.message_ets_rendered(
-              this.message_ets.splice(0, this.number_of_message_to_render),
-            );
+            this.message_ets_rendered(this.message_ets.splice(0, this.number_of_message_to_render));
           }
         });
-      }, 100),
+    }
+    , 100)
     );
 
-    this.transform_text = message_et => {
+    this.transform_text = (message_et) => {
       const MAX_TEXT_LENGTH = 60;
       const MAX_OFFSET_INDEX = 30;
       const PRE_MARKED_OFFSET = 20;
@@ -73,19 +72,16 @@ z.components.FullSearchViewModel = class FullSearchViewModel {
       const input = _.escape(this.input());
 
       message_et.matches_count = 0;
-      let transformed_text = text.replace(
-        z.search.FullTextSearch.get_search_regex(input),
-        function(match) {
-          message_et.matches_count += 1;
-          return `<mark class='full-search-marked' data-uie-name='full-search-item-mark'>${match}</mark>`;
-        },
-      );
+      let transformed_text = text.replace(z.search.FullTextSearch.get_search_regex(input), function(match) {
+        message_et.matches_count += 1;
+        return `<mark class='full-search-marked' data-uie-name='full-search-item-mark'>${match}</mark>`;
+      });
 
       const mark_offset = transformed_text.indexOf('<mark') - 1;
       let slice_offset = mark_offset;
 
       for (const index of _.range(mark_offset).reverse()) {
-        if (index < mark_offset - PRE_MARKED_OFFSET) {
+        if (index < (mark_offset - PRE_MARKED_OFFSET)) {
           break;
         }
 
@@ -96,7 +92,7 @@ z.components.FullSearchViewModel = class FullSearchViewModel {
         }
       }
 
-      if (mark_offset > MAX_OFFSET_INDEX && text.length > MAX_TEXT_LENGTH) {
+      if ((mark_offset > MAX_OFFSET_INDEX) && (text.length > MAX_TEXT_LENGTH)) {
         transformed_text = `…${transformed_text.slice(slice_offset)}`;
       }
 
@@ -104,15 +100,9 @@ z.components.FullSearchViewModel = class FullSearchViewModel {
     };
 
     // binding?
-    $('.collection-list').on('scroll', event => {
-      if (
-        $(event.currentTarget).is_scrolled_bottom() &&
-        this.message_ets.length > 0
-      ) {
-        z.util.ko_array_push_all(
-          this.message_ets_rendered,
-          this.message_ets.splice(0, this.number_of_message_to_render),
-        );
+    $('.collection-list').on('scroll', (event) => {
+      if ($(event.currentTarget).is_scrolled_bottom() && (this.message_ets.length > 0)) {
+        z.util.ko_array_push_all(this.message_ets_rendered, this.message_ets.splice(0, this.number_of_message_to_render));
       }
     });
   }

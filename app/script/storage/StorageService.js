@@ -40,10 +40,7 @@ z.storage.StorageService = class StorageService {
    * Construct an new StorageService.
    */
   constructor() {
-    this.logger = new z.util.Logger(
-      'z.storage.StorageService',
-      z.config.LOGGER.OPTIONS,
-    );
+    this.logger = new z.util.Logger('z.storage.StorageService', z.config.LOGGER.OPTIONS);
 
     this.db = undefined;
     this.db_name = undefined;
@@ -62,23 +59,17 @@ z.storage.StorageService = class StorageService {
    */
   init(user_id = this.user_id) {
     return new Promise((resolve, reject) => {
-      const is_permanent = z.util.StorageUtil.get_value(
-        z.storage.StorageKey.AUTH.PERSIST,
-      );
-      const client_type = is_permanent
-        ? z.client.ClientType.PERMANENT
-        : z.client.ClientType.TEMPORARY;
+      const is_permanent = z.util.StorageUtil.get_value(z.storage.StorageKey.AUTH.PERSIST);
+      const client_type = is_permanent ? z.client.ClientType.PERMANENT : z.client.ClientType.TEMPORARY;
 
       this.user_id = user_id;
-      this.db_name = `wire@${z.util.Environment.backend
-        .current}@${user_id}@${client_type}`;
+      this.db_name = `wire@${z.util.Environment.backend.current}@${user_id}@${client_type}`;
 
       // https://github.com/dfahlander/Dexie.js/wiki/Version.stores()
       const version_1 = {
         [StorageService.OBJECT_STORE.AMPLIFY]: '',
         [StorageService.OBJECT_STORE.CLIENTS]: '',
-        [StorageService.OBJECT_STORE.CONVERSATION_EVENTS]:
-          ', raw.conversation, raw.time, meta.timestamp',
+        [StorageService.OBJECT_STORE.CONVERSATION_EVENTS]: ', raw.conversation, raw.time, meta.timestamp',
         [StorageService.OBJECT_STORE.KEYS]: '',
         [StorageService.OBJECT_STORE.PRE_KEYS]: '',
         [StorageService.OBJECT_STORE.SESSIONS]: '',
@@ -87,8 +78,7 @@ z.storage.StorageService = class StorageService {
       const version_2 = {
         [StorageService.OBJECT_STORE.AMPLIFY]: '',
         [StorageService.OBJECT_STORE.CLIENTS]: '',
-        [StorageService.OBJECT_STORE.CONVERSATION_EVENTS]:
-          ', raw.conversation, raw.time, raw.type, meta.timestamp',
+        [StorageService.OBJECT_STORE.CONVERSATION_EVENTS]: ', raw.conversation, raw.time, raw.type, meta.timestamp',
         [StorageService.OBJECT_STORE.KEYS]: '',
         [StorageService.OBJECT_STORE.PRE_KEYS]: '',
         [StorageService.OBJECT_STORE.SESSIONS]: '',
@@ -97,10 +87,8 @@ z.storage.StorageService = class StorageService {
       const version_3 = {
         [StorageService.OBJECT_STORE.AMPLIFY]: '',
         [StorageService.OBJECT_STORE.CLIENTS]: '',
-        [StorageService.OBJECT_STORE.CONVERSATION_EVENTS]:
-          ', raw.conversation, raw.time, raw.type, meta.timestamp',
-        [StorageService.OBJECT_STORE.CONVERSATIONS]:
-          ', id, last_event_timestamp',
+        [StorageService.OBJECT_STORE.CONVERSATION_EVENTS]: ', raw.conversation, raw.time, raw.type, meta.timestamp',
+        [StorageService.OBJECT_STORE.CONVERSATIONS]: ', id, last_event_timestamp',
         [StorageService.OBJECT_STORE.KEYS]: '',
         [StorageService.OBJECT_STORE.PRE_KEYS]: '',
         [StorageService.OBJECT_STORE.SESSIONS]: '',
@@ -109,10 +97,8 @@ z.storage.StorageService = class StorageService {
       const version_4 = {
         [StorageService.OBJECT_STORE.AMPLIFY]: '',
         [StorageService.OBJECT_STORE.CLIENTS]: ', meta.primary_key',
-        [StorageService.OBJECT_STORE.CONVERSATION_EVENTS]:
-          ', raw.conversation, raw.time, raw.type, meta.timestamp',
-        [StorageService.OBJECT_STORE.CONVERSATIONS]:
-          ', id, last_event_timestamp',
+        [StorageService.OBJECT_STORE.CONVERSATION_EVENTS]: ', raw.conversation, raw.time, raw.type, meta.timestamp',
+        [StorageService.OBJECT_STORE.CONVERSATIONS]: ', id, last_event_timestamp',
         [StorageService.OBJECT_STORE.KEYS]: '',
         [StorageService.OBJECT_STORE.PRE_KEYS]: '',
         [StorageService.OBJECT_STORE.SESSIONS]: '',
@@ -121,10 +107,8 @@ z.storage.StorageService = class StorageService {
       const version_5 = {
         [StorageService.OBJECT_STORE.AMPLIFY]: '',
         [StorageService.OBJECT_STORE.CLIENTS]: ', meta.primary_key',
-        [StorageService.OBJECT_STORE.CONVERSATION_EVENTS]:
-          ', conversation, time, type',
-        [StorageService.OBJECT_STORE.CONVERSATIONS]:
-          ', id, last_event_timestamp',
+        [StorageService.OBJECT_STORE.CONVERSATION_EVENTS]: ', conversation, time, type',
+        [StorageService.OBJECT_STORE.CONVERSATIONS]: ', id, last_event_timestamp',
         [StorageService.OBJECT_STORE.KEYS]: '',
         [StorageService.OBJECT_STORE.PRE_KEYS]: '',
         [StorageService.OBJECT_STORE.SESSIONS]: '',
@@ -133,10 +117,8 @@ z.storage.StorageService = class StorageService {
       const version_9 = {
         [StorageService.OBJECT_STORE.AMPLIFY]: '',
         [StorageService.OBJECT_STORE.CLIENTS]: ', meta.primary_key',
-        [StorageService.OBJECT_STORE.CONVERSATION_EVENTS]:
-          ', conversation, time, type, [conversation+time]',
-        [StorageService.OBJECT_STORE.CONVERSATIONS]:
-          ', id, last_event_timestamp',
+        [StorageService.OBJECT_STORE.CONVERSATION_EVENTS]: ', conversation, time, type, [conversation+time]',
+        [StorageService.OBJECT_STORE.CONVERSATIONS]: ', id, last_event_timestamp',
         [StorageService.OBJECT_STORE.KEYS]: '',
         [StorageService.OBJECT_STORE.PRE_KEYS]: '',
         [StorageService.OBJECT_STORE.SESSIONS]: '',
@@ -145,10 +127,8 @@ z.storage.StorageService = class StorageService {
       const version_10 = {
         [StorageService.OBJECT_STORE.AMPLIFY]: '',
         [StorageService.OBJECT_STORE.CLIENTS]: ', meta.primary_key',
-        [StorageService.OBJECT_STORE.CONVERSATION_EVENTS]:
-          ', category, conversation, time, type, [conversation+time], [conversation+category]',
-        [StorageService.OBJECT_STORE.CONVERSATIONS]:
-          ', id, last_event_timestamp',
+        [StorageService.OBJECT_STORE.CONVERSATION_EVENTS]: ', category, conversation, time, type, [conversation+time], [conversation+category]',
+        [StorageService.OBJECT_STORE.CONVERSATIONS]: ', id, last_event_timestamp',
         [StorageService.OBJECT_STORE.KEYS]: '',
         [StorageService.OBJECT_STORE.PRE_KEYS]: '',
         [StorageService.OBJECT_STORE.SESSIONS]: '',
@@ -157,10 +137,8 @@ z.storage.StorageService = class StorageService {
       const version_11 = {
         [StorageService.OBJECT_STORE.AMPLIFY]: '',
         [StorageService.OBJECT_STORE.CLIENTS]: ', meta.primary_key',
-        [StorageService.OBJECT_STORE.CONVERSATION_EVENTS]:
-          ', category, conversation, time, type, [conversation+time], [conversation+category]',
-        [StorageService.OBJECT_STORE.CONVERSATIONS]:
-          ', id, last_event_timestamp',
+        [StorageService.OBJECT_STORE.CONVERSATION_EVENTS]: ', category, conversation, time, type, [conversation+time], [conversation+category]',
+        [StorageService.OBJECT_STORE.CONVERSATIONS]: ', id, last_event_timestamp',
         [StorageService.OBJECT_STORE.KEYS]: '',
         [StorageService.OBJECT_STORE.PRE_KEYS]: '',
         [StorageService.OBJECT_STORE.SESSIONS]: '',
@@ -169,12 +147,9 @@ z.storage.StorageService = class StorageService {
       const version_12 = {
         [StorageService.OBJECT_STORE.AMPLIFY]: '',
         [StorageService.OBJECT_STORE.CLIENTS]: ', meta.primary_key',
-        [StorageService.OBJECT_STORE.CONVERSATION_EVENTS]:
-          ', category, conversation, time, type, [conversation+time], [conversation+category]',
-        [StorageService.OBJECT_STORE.CONVERSATIONS]:
-          ', id, last_event_timestamp',
-        [StorageService.OBJECT_STORE.EVENTS]:
-          '++primary_key, id, category, conversation, time, type, [conversation+time], [conversation+category]',
+        [StorageService.OBJECT_STORE.CONVERSATION_EVENTS]: ', category, conversation, time, type, [conversation+time], [conversation+category]',
+        [StorageService.OBJECT_STORE.CONVERSATIONS]: ', id, last_event_timestamp',
+        [StorageService.OBJECT_STORE.EVENTS]: '++primary_key, id, category, conversation, time, type, [conversation+time], [conversation+category]',
         [StorageService.OBJECT_STORE.KEYS]: '',
         [StorageService.OBJECT_STORE.PRE_KEYS]: '',
         [StorageService.OBJECT_STORE.SESSIONS]: '',
@@ -191,153 +166,113 @@ z.storage.StorageService = class StorageService {
       this.db.version(1).stores(version_1);
       this.db.version(2).stores(version_2);
       this.db.version(3).stores(version_3);
-      this.db.version(4).stores(version_4).upgrade(transaction => {
-        this.logger.warn('Database upgrade to version 4', transaction);
-        transaction[StorageService.OBJECT_STORE.CLIENTS]
-          .toCollection()
-          .modify(function(client) {
-            return (client.meta = {
+      this.db.version(4).stores(version_4)
+        .upgrade((transaction) => {
+          this.logger.warn('Database upgrade to version 4', transaction);
+          transaction[StorageService.OBJECT_STORE.CLIENTS].toCollection().modify(function(client) {
+            return client.meta = {
               is_verified: true,
               primary_key: 'local_identity',
-            });
+            };
           });
-      });
+        });
       this.db.version(5).stores(version_4);
-      this.db.version(6).stores(version_4).upgrade(transaction => {
-        this.logger.warn('Database upgrade to version 6', transaction);
-        transaction[StorageService.OBJECT_STORE.CONVERSATIONS]
-          .toCollection()
-          .eachKey(key => {
-            this.db[StorageService.OBJECT_STORE.CONVERSATIONS].update(key, {
-              id: key,
+      this.db.version(6).stores(version_4)
+        .upgrade((transaction) => {
+          this.logger.warn('Database upgrade to version 6', transaction);
+          transaction[StorageService.OBJECT_STORE.CONVERSATIONS].toCollection()
+            .eachKey((key) => {
+              this.db[StorageService.OBJECT_STORE.CONVERSATIONS].update(key, {id: key});
             });
-          });
-        transaction[StorageService.OBJECT_STORE.SESSIONS]
-          .toCollection()
-          .eachKey(key => {
-            this.db[StorageService.OBJECT_STORE.SESSIONS].update(key, {
-              id: key,
+          transaction[StorageService.OBJECT_STORE.SESSIONS].toCollection()
+            .eachKey((key) => {
+              this.db[StorageService.OBJECT_STORE.SESSIONS].update(key, {id: key});
             });
-          });
-        transaction[StorageService.OBJECT_STORE.PRE_KEYS]
-          .toCollection()
-          .eachKey(key => {
-            this.db[StorageService.OBJECT_STORE.PRE_KEYS].update(key, {
-              id: key,
+          transaction[StorageService.OBJECT_STORE.PRE_KEYS].toCollection()
+            .eachKey((key) => {
+              this.db[StorageService.OBJECT_STORE.PRE_KEYS].update(key, {id: key});
             });
-          });
-      });
-      this.db.version(7).stores(version_5).upgrade(transaction => {
-        this.logger.warn('Database upgrade to version 7', transaction);
-        transaction[StorageService.OBJECT_STORE.CONVERSATION_EVENTS]
-          .toCollection()
-          .modify(function(event) {
-            const mapped_event = event.mapped || event.raw;
-            delete event.mapped;
-            delete event.raw;
-            delete event.meta;
-            $.extend(event, mapped_event);
-          });
-      });
-      this.db.version(8).stores(version_5).upgrade(transaction => {
-        this.logger.warn('Database upgrade to version 8', transaction);
-        transaction[StorageService.OBJECT_STORE.CONVERSATION_EVENTS]
-          .toCollection()
-          .modify(function(event) {
-            if (event.type === z.event.Client.CONVERSATION.DELETE_EVERYWHERE) {
-              event.time = new Date(event.time).toISOString();
-            }
-          });
-      });
+        });
+      this.db.version(7).stores(version_5)
+        .upgrade((transaction) => {
+          this.logger.warn('Database upgrade to version 7', transaction);
+          transaction[StorageService.OBJECT_STORE.CONVERSATION_EVENTS].toCollection()
+            .modify(function(event) {
+              const mapped_event = event.mapped || event.raw;
+              delete event.mapped;
+              delete event.raw;
+              delete event.meta;
+              $.extend(event, mapped_event);
+            });
+        });
+      this.db.version(8).stores(version_5)
+        .upgrade((transaction) => {
+          this.logger.warn('Database upgrade to version 8', transaction);
+          transaction[StorageService.OBJECT_STORE.CONVERSATION_EVENTS].toCollection()
+            .modify(function(event) {
+              if (event.type === z.event.Client.CONVERSATION.DELETE_EVERYWHERE) {
+                event.time = new Date(event.time).toISOString();
+              }
+            });
+        });
       this.db.version(9).stores(version_9);
-      this.db.version(10).stores(version_10).upgrade(transaction => {
-        this.logger.warn('Database upgrade to version 10', transaction);
-        transaction[StorageService.OBJECT_STORE.CONVERSATION_EVENTS]
-          .toCollection()
-          .modify(function(event) {
-            event.category = z.message.MessageCategorization.category_from_event(
-              event,
-            );
-          });
-      });
-      this.db.version(11).stores(version_11).upgrade(transaction => {
-        this.logger.warn('Database upgrade to version 11', transaction);
-        const expected_primary_key =
-          z.client.ClientRepository.PRIMARY_KEY_CURRENT_CLIENT;
-        transaction[StorageService.OBJECT_STORE.CLIENTS]
-          .toCollection()
-          .each((client, cursor) => {
-            if (
-              client.meta.primary_key === expected_primary_key &&
-              client.primary_key !== expected_primary_key
-            ) {
-              transaction[StorageService.OBJECT_STORE.CLIENTS].delete(
-                cursor.primaryKey,
-              );
-              transaction[StorageService.OBJECT_STORE.CLIENTS].put(
-                client,
-                expected_primary_key,
-              );
-            }
-          });
-      });
-      this.db.version(12).stores(version_11).upgrade(transaction => {
-        this.logger.warn('Database upgrade to version 12', transaction);
-        transaction[StorageService.OBJECT_STORE.KEYS]
-          .toCollection()
-          .modify(function(record) {
-            return (record.serialised = z.util.base64_to_array(
-              record.serialised,
-            ).buffer);
-          });
-        transaction[StorageService.OBJECT_STORE.PRE_KEYS]
-          .toCollection()
-          .modify(function(record) {
-            return (record.serialised = z.util.base64_to_array(
-              record.serialised,
-            ).buffer);
-          });
-        transaction[StorageService.OBJECT_STORE.SESSIONS]
-          .toCollection()
-          .modify(function(record) {
-            return (record.serialised = z.util.base64_to_array(
-              record.serialised,
-            ).buffer);
-          });
-      });
-      this.db.version(13).stores(version_12).upgrade(transaction => {
-        this.logger.warn('Database upgrade to version 13', transaction);
-        transaction[StorageService.OBJECT_STORE.CONVERSATION_EVENTS]
-          .toCollection()
-          .toArray()
-          .then(items => {
-            this.db[StorageService.OBJECT_STORE.EVENTS].bulkPut(items);
-          });
-      });
+      this.db.version(10).stores(version_10)
+        .upgrade((transaction) => {
+          this.logger.warn('Database upgrade to version 10', transaction);
+          transaction[StorageService.OBJECT_STORE.CONVERSATION_EVENTS].toCollection()
+            .modify(function(event) {
+              event.category = z.message.MessageCategorization.category_from_event(event);
+            });
+        });
+      this.db.version(11).stores(version_11)
+        .upgrade((transaction) => {
+          this.logger.warn('Database upgrade to version 11', transaction);
+          const expected_primary_key = z.client.ClientRepository.PRIMARY_KEY_CURRENT_CLIENT;
+          transaction[StorageService.OBJECT_STORE.CLIENTS].toCollection()
+            .each((client, cursor) => {
+              if ((client.meta.primary_key === expected_primary_key) && (client.primary_key !== expected_primary_key)) {
+                transaction[StorageService.OBJECT_STORE.CLIENTS].delete(cursor.primaryKey);
+                transaction[StorageService.OBJECT_STORE.CLIENTS].put(client, expected_primary_key);
+              }
+            });
+        });
+      this.db.version(12).stores(version_11)
+        .upgrade((transaction) => {
+          this.logger.warn('Database upgrade to version 12', transaction);
+          transaction[StorageService.OBJECT_STORE.KEYS].toCollection()
+            .modify(function(record) {
+              return record.serialised = z.util.base64_to_array(record.serialised).buffer;
+            });
+          transaction[StorageService.OBJECT_STORE.PRE_KEYS].toCollection()
+            .modify(function(record) {
+              return record.serialised = z.util.base64_to_array(record.serialised).buffer;
+            });
+          transaction[StorageService.OBJECT_STORE.SESSIONS].toCollection()
+            .modify(function(record) {
+              return record.serialised = z.util.base64_to_array(record.serialised).buffer;
+            });
+        });
+      this.db.version(13).stores(version_12)
+        .upgrade((transaction) => {
+          this.logger.warn('Database upgrade to version 13', transaction);
+          transaction[StorageService.OBJECT_STORE.CONVERSATION_EVENTS].toCollection().toArray()
+            .then((items) => {
+              this.db[StorageService.OBJECT_STORE.EVENTS].bulkPut(items);
+            });
+        });
 
-      this.db
-        .open()
+      this.db.open()
         .then(() => {
-          this.logger.info(
-            `Storage Service initialized with database '${this
-              .db_name}' version '${this.db.verno}'`,
-          );
+          this.logger.info(`Storage Service initialized with database '${this.db_name}' version '${this.db.verno}'`);
           resolve(this.db_name);
         })
-        .catch(error => {
-          this.logger.error(
-            `Failed to initialize database '${this
-              .db_name}' for Storage Service: ${error.message || error}`,
-            {error: error},
-          );
-          reject(
-            new z.storage.StorageError(
-              z.storage.StorageError.TYPE.FAILED_TO_OPEN,
-            ),
-          );
+        .catch((error) => {
+          this.logger.error(`Failed to initialize database '${this.db_name}' for Storage Service: ${error.message || error}`, {error: error});
+          reject(new z.storage.StorageError(z.storage.StorageError.TYPE.FAILED_TO_OPEN));
         });
     });
   }
+
 
   //##############################################################################
   // Interactions
@@ -348,9 +283,7 @@ z.storage.StorageService = class StorageService {
    * @returns {Promise} Resolves when all stores have been cleared
    */
   clear_all_stores() {
-    const delete_store_promises = Object.keys(
-      this.db._dbSchema,
-    ).map(store_name => {
+    const delete_store_promises = Object.keys(this.db._dbSchema).map((store_name) => {
       this.delete_store(store_name);
     });
 
@@ -367,27 +300,17 @@ z.storage.StorageService = class StorageService {
   delete(store_name, primary_key) {
     return new Promise((resolve, reject) => {
       if (this.db[store_name]) {
-        return this.db[store_name]
-          .delete(primary_key)
+        return this.db[store_name].delete(primary_key)
           .then(() => {
-            this.logger.info(
-              `Deleted '${primary_key}' from object store '${store_name}'`,
-            );
+            this.logger.info(`Deleted '${primary_key}' from object store '${store_name}'`);
             resolve(primary_key);
           })
-          .catch(error => {
-            this.logger.error(
-              `Failed to delete '${primary_key}' from store '${store_name}'`,
-              error,
-            );
+          .catch((error) => {
+            this.logger.error(`Failed to delete '${primary_key}' from store '${store_name}'`, error);
             reject(error);
           });
       }
-      return reject(
-        new z.storage.StorageError(
-          z.storage.StorageError.TYPE.DATA_STORE_NOT_FOUND,
-        ),
-      );
+      return reject(new z.storage.StorageError(z.storage.StorageError.TYPE.DATA_STORE_NOT_FOUND));
     });
   }
 
@@ -398,13 +321,12 @@ z.storage.StorageService = class StorageService {
   delete_everything() {
     return new Promise((resolve, reject) => {
       if (this.db) {
-        return this.db
-          .delete()
+        return this.db.delete()
           .then(() => {
             this.logger.info(`Clearing IndexedDB '${this.db_name}' successful`);
             resolve(true);
           })
-          .catch(error => {
+          .catch((error) => {
             this.logger.error(`Clearing IndexedDB '${this.db_name}' failed`);
             reject(error);
           });
@@ -420,9 +342,7 @@ z.storage.StorageService = class StorageService {
    * @returns {Promise} Resolves when the store has been deleted
    */
   delete_store(store_name) {
-    this.logger.info(
-      `Clearing object store '${store_name}' in database '${this.db_name}'`,
-    );
+    this.logger.info(`Clearing object store '${store_name}' in database '${this.db_name}'`);
     return this.db[store_name].clear();
   }
 
@@ -432,7 +352,7 @@ z.storage.StorageService = class StorageService {
    * @returns {Promise} Resolves when the stores have been deleted
    */
   delete_stores(store_names) {
-    const delete_store_promises = store_names.map(store_name => {
+    const delete_store_promises = store_names.map((store_name) => {
       return this.delete_store(store_name);
     });
 
@@ -446,14 +366,10 @@ z.storage.StorageService = class StorageService {
    * @returns {Promise} Resolves with the records from the object store
    */
   get_all(store_name) {
-    return this.db[store_name]
-      .toArray()
-      .then(result_array => result_array.filter(result => result))
-      .catch(error => {
-        this.logger.error(
-          `Failed to load objects from store '${store_name}'`,
-          error,
-        );
+    return this.db[store_name].toArray()
+      .then((result_array) => result_array.filter((result) => result))
+      .catch((error) => {
+        this.logger.error(`Failed to load objects from store '${store_name}'`, error);
         throw error;
       });
   }
@@ -467,13 +383,11 @@ z.storage.StorageService = class StorageService {
    * @returns {Promise} Resolves with the record matching the primary key
    */
   load(store_name, primary_key) {
-    return this.db[store_name].get(primary_key).catch(error => {
-      this.logger.error(
-        `Failed to load '${primary_key}' from store '${store_name}'`,
-        error,
-      );
-      throw error;
-    });
+    return this.db[store_name].get(primary_key)
+      .catch((error) => {
+        this.logger.error(`Failed to load '${primary_key}' from store '${store_name}'`, error);
+        throw error;
+      });
   }
 
   /**
@@ -485,13 +399,11 @@ z.storage.StorageService = class StorageService {
    * @returns {Promise} Resolves with the primary key of the persisted object
    */
   save(store_name, primary_key, entity) {
-    return this.db[store_name].put(entity, primary_key).catch(error => {
-      this.logger.error(
-        `Failed to put '${primary_key}' into store '${store_name}'`,
-        error,
-      );
-      throw error;
-    });
+    return this.db[store_name].put(entity, primary_key)
+      .catch((error) => {
+        this.logger.error(`Failed to put '${primary_key}' into store '${store_name}'`, error);
+        throw error;
+      });
   }
 
   /**
@@ -501,10 +413,7 @@ z.storage.StorageService = class StorageService {
    * @returns {undefined} No return value
    */
   terminate(reason = 'unknown reason') {
-    this.logger.info(
-      `Closing database connection with '${this.db
-        .name}' because of '${reason}'.`,
-    );
+    this.logger.info(`Closing database connection with '${this.db.name}' because of '${reason}'.`);
     this.db.close();
   }
 
@@ -517,20 +426,13 @@ z.storage.StorageService = class StorageService {
    * @returns {Promise} Promise with the number of updated records (0 if no records were changed).
    */
   update(store_name, primary_key, changes) {
-    return this.db[store_name]
-      .update(primary_key, changes)
-      .then(number_of_updates => {
-        this.logger.info(
-          `Updated ${number_of_updates} record(s) with key '${primary_key}' in store '${store_name}'`,
-          changes,
-        );
+    return this.db[store_name].update(primary_key, changes)
+      .then((number_of_updates) => {
+        this.logger.info(`Updated ${number_of_updates} record(s) with key '${primary_key}' in store '${store_name}'`, changes);
         return number_of_updates;
       })
-      .catch(error => {
-        this.logger.error(
-          `Failed to update '${primary_key}' in store '${store_name}'`,
-          error,
-        );
+      .catch((error) => {
+        this.logger.error(`Failed to update '${primary_key}' in store '${store_name}'`, error);
         throw error;
       });
   }

@@ -24,14 +24,11 @@ window.z.team = z.team || {};
 
 z.team.TeamMapper = class TeamMapper {
   constructor() {
-    this.logger = new z.util.Logger(
-      'z.team.TeamMapper',
-      z.config.LOGGER.OPTIONS,
-    );
+    this.logger = new z.util.Logger('z.team.TeamMapper', z.config.LOGGER.OPTIONS);
   }
 
   map_teams_from_array(team_data) {
-    return team_data.map(data => this.update_team_from_object(data));
+    return team_data.map((data) => this.update_team_from_object(data));
   }
 
   map_team_from_object(data) {
@@ -67,7 +64,7 @@ z.team.TeamMapper = class TeamMapper {
   }
 
   map_member_from_array(members_data) {
-    return members_data.map(data => this.update_member_from_object(data));
+    return members_data.map((data) => this.update_member_from_object(data));
   }
 
   map_member_from_object(data) {

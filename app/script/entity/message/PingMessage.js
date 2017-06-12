@@ -27,20 +27,12 @@ z.entity.PingMessage = class PingMessage extends z.entity.Message {
     super();
     this.super_type = z.message.SuperType.PING;
 
-    this.caption = ko.pureComputed(
-      () => {
-        return z.l10n.text(
-          this.user().is_me
-            ? z.string.conversation_ping_you
-            : z.string.conversation_ping,
-        );
-      },
-      this,
-      {deferEvaluation: true},
-    );
+    this.caption = ko.pureComputed(() => {
+      return z.l10n.text(this.user().is_me ? z.string.conversation_ping_you : z.string.conversation_ping);
+    }, this, {deferEvaluation: true});
 
     this.get_icon_classes = ko.pureComputed(() => {
-      const show_ping_animation = Date.now() - this.timestamp() < 2000;
+      const show_ping_animation = (Date.now() - this.timestamp()) < 2000;
       let css_classes = this.accent_color();
       if (show_ping_animation) {
         css_classes += ' ping-animation ping-animation-soft';

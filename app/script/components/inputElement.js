@@ -28,14 +28,12 @@ z.components.InputElement = class InputElement {
     this.value = params.value;
 
     this.change = (data, event) => {
-      const new_name = z.util.StringUtil.remove_line_breaks(
-        event.target.value.trim(),
-      );
+      const new_name = z.util.StringUtil.remove_line_breaks(event.target.value.trim());
       const old_name = this.value().trim();
       event.target.value = old_name;
       this.editing(false);
 
-      if (new_name !== old_name && typeof params.change === 'function') {
+      if (new_name !== old_name && (typeof params.change === 'function')) {
         params.change(new_name);
       }
     };
@@ -43,13 +41,15 @@ z.components.InputElement = class InputElement {
     this.edit = () => this.editing(true);
 
     this.editing = ko.observable(false);
-    this.editing_subscription = this.editing.subscribe(value => {
+    this.editing_subscription = this.editing.subscribe((value) => {
       if (value) {
-        $(component_info.element).find('textarea').one('keydown', event => {
-          if (event.keyCode === z.util.KEYCODE.ESC) {
-            this.editing(false);
-          }
-        });
+        $(component_info.element)
+          .find('textarea')
+          .one('keydown', (event) => {
+            if (event.keyCode === z.util.KEYCODE.ESC) {
+              this.editing(false);
+            }
+          });
       } else {
         $(component_info.element)
           .find('textarea')

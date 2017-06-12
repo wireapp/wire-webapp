@@ -21,7 +21,7 @@
 
 (function() {
   const custom_renderer = new marked.Renderer();
-  custom_renderer.paragraph = text => `${text.replace(/\n$/, '')}\n`;
+  custom_renderer.paragraph = (text) => `${text.replace(/\n$/, '')}\n`;
 
   window.marked.setOptions({
     highlight(code) {

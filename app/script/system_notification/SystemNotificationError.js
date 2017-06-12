@@ -27,7 +27,7 @@ z.system_notification.SystemNotificationError = class SystemNotificationError ex
     super();
 
     this.name = this.constructor.name;
-    this.stack = new Error().stack;
+    this.stack = (new Error()).stack;
     this.type = type || z.cryptography.CryptographyError.TYPE.UNKNOWN;
 
     switch (this.type) {
@@ -41,8 +41,7 @@ z.system_notification.SystemNotificationError = class SystemNotificationError ex
 
   static get TYPE() {
     return {
-      HIDE_NOTIFICATION:
-        'z.system_notification.SystemNotificationError.TYPE.HIDE_NOTIFICATION',
+      HIDE_NOTIFICATION: 'z.system_notification.SystemNotificationError.TYPE.HIDE_NOTIFICATION',
       UNKNOWN: 'z.system_notification.SystemNotificationError.TYPE.UNKNOWN',
     };
   }

@@ -53,7 +53,7 @@ z.util.ArrayUtil = {
     const next_index = current_index + 1;
 
     // item is last item in the array
-    if (next_index === array.length && current_index > 0) {
+    if ((next_index === array.length) && (current_index > 0)) {
       return array[current_index - 1];
     }
 
@@ -63,7 +63,7 @@ z.util.ArrayUtil = {
 
     for (let index = next_index; index <= array.length; index++) {
       const next_item = array[index];
-      if (typeof filter !== 'function' || !!filter(next_item)) {
+      if ((typeof filter !== 'function') || !!filter(next_item)) {
         return next_item;
       }
     }
@@ -87,13 +87,13 @@ z.util.ArrayUtil = {
       const before = Math.floor(original_index).toFixed();
       const after = Math.ceil(original_index).toFixed();
       const point = original_index - before;
-      new_array[index] = array[before] + (array[after] - array[before]) * point; // linear interpolation
+      new_array[index] = array[before] + ((array[after] - array[before]) * point); // linear interpolation
     }
 
     return new_array;
   },
   is_last_item(array, item) {
-    return array.indexOf(item) === array.length - 1;
+    return array.indexOf(item) === (array.length - 1);
   },
   iterate_index(array, current_index, reverse = false) {
     if (_.isArray(array) && array.length && _.isNumber(current_index)) {
@@ -117,9 +117,7 @@ z.util.ArrayUtil = {
         return;
       }
 
-      return array[
-        z.util.ArrayUtil.iterate_index(array, current_index, reverse)
-      ];
+      return array[z.util.ArrayUtil.iterate_index(array, current_index, reverse)];
     }
   },
   /**

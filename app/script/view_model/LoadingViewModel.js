@@ -32,10 +32,7 @@ z.ViewModel.LoadingViewModel = class LoadingViewModel {
       return `${this.loading_progress()}%`;
     });
 
-    amplify.subscribe(
-      z.event.WebApp.APP.UPDATE_PROGRESS,
-      this.update_progress.bind(this),
-    );
+    amplify.subscribe(z.event.WebApp.APP.UPDATE_PROGRESS, this.update_progress.bind(this));
 
     ko.applyBindings(this, document.getElementById(element_id));
   }
@@ -44,7 +41,7 @@ z.ViewModel.LoadingViewModel = class LoadingViewModel {
     if (progress > this.loading_progress()) {
       this.loading_progress(progress);
     } else {
-      this.loading_progress(this.loading_progress() + 0.01);
+      this.loading_progress(this.loading_progress() + .01);
     }
 
     if (message_locator && !z.util.Environment.frontend.is_production()) {
@@ -52,24 +49,17 @@ z.ViewModel.LoadingViewModel = class LoadingViewModel {
 
       switch (message_locator) {
         case z.string.init_received_self_user: {
-          updated_loading_message = z.localization.Localizer.get_text({
-            id: message_locator,
-            replace: {
-              content: this.user_repository.self().first_name(),
-              placeholder: '%name',
-            },
-          });
+          updated_loading_message = z.l10n.text(message_locator, this.user_repository.self().first_name());
           break;
         }
 
         case z.string.init_events_progress: {
-          updated_loading_message = z.localization.Localizer.get_text({
-            id: message_locator,
-            replace: [
-              {content: replace_content[0], placeholder: '%progress'},
-              {content: replace_content[1], placeholder: '%total'},
-            ],
-          });
+          const substitutes = {
+            number1: replace_content[0],
+            number2: replace_content[1],
+          };
+
+          updated_loading_message = z.l10n.text(message_locator, substitutes);
           break;
         }
 

@@ -23,7 +23,10 @@ window.z = window.z || {};
 window.z.audio = z.audio || {};
 
 z.audio.AudioPlayingType = {
-  MUTED: [z.audio.AudioType.CALL_DROP, z.audio.AudioType.NETWORK_INTERRUPTION],
+  MUTED: [
+    z.audio.AudioType.CALL_DROP,
+    z.audio.AudioType.NETWORK_INTERRUPTION,
+  ],
   NONE: [
     z.audio.AudioType.CALL_DROP,
     z.audio.AudioType.NETWORK_INTERRUPTION,

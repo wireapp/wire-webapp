@@ -27,15 +27,14 @@ z.conversation.ConversationError = class ConversationError extends Error {
     super();
 
     this.name = this.constructor.name;
-    this.stack = new Error().stack;
+    this.stack = (new Error()).stack;
     this.type = type || z.client.ConversationError.TYPE.UNKNOWN;
 
     switch (this.type) {
       case z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND:
         this.message = 'Conversation not found';
         break;
-      case z.conversation.ConversationError.TYPE
-        .DEGRADED_CONVERSATION_CANCELLATION:
+      case z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION:
         this.message = 'Sending to degraded conversation was canceled by user';
         break;
       case z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND:
@@ -63,15 +62,11 @@ z.conversation.ConversationError = class ConversationError extends Error {
 
   static get TYPE() {
     return {
-      CONVERSATION_NOT_FOUND:
-        'z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND',
-      DEGRADED_CONVERSATION_CANCELLATION:
-        'z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION',
-      MESSAGE_NOT_FOUND:
-        'z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND',
+      CONVERSATION_NOT_FOUND: 'z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND',
+      DEGRADED_CONVERSATION_CANCELLATION: 'z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION',
+      MESSAGE_NOT_FOUND: 'z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND',
       NO_CHANGES: 'z.conversation.ConversationError.TYPE.NO_CHANGES',
-      NO_CONVERSATION_ID:
-        'z.conversation.ConversationError.TYPE.NO_CONVERSATION_ID',
+      NO_CONVERSATION_ID: 'z.conversation.ConversationError.TYPE.NO_CONVERSATION_ID',
       NOT_FOUND: 'z.conversation.ConversationError.TYPE.NOT_FOUND',
       REQUEST_FAILURE: 'z.conversation.ConversationError.TYPE.REQUEST_FAILURE',
       UNKNOWN: 'z.conversation.ConversationError.TYPE.UNKNOWN',

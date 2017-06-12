@@ -27,7 +27,7 @@ z.service.BackendClientError = class BackendClientError extends Error {
     super();
 
     this.name = this.constructor.name;
-    this.stack = new Error().stack;
+    this.stack = (new Error()).stack;
 
     if (_.isObject(params)) {
       this.code = params.code;

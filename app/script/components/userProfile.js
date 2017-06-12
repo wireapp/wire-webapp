@@ -35,10 +35,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
     this.dispose = this.dispose.bind(this);
     this.click_on_device = this.click_on_device.bind(this);
 
-    this.logger = new z.util.Logger(
-      'z.components.UserProfileViewModel',
-      z.config.LOGGER.OPTIONS,
-    );
+    this.logger = new z.util.Logger('z.components.UserProfileViewModel', z.config.LOGGER.OPTIONS);
 
     this.user = params.user;
     this.conversation = params.conversation;
@@ -104,7 +101,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
     this.confirm_dialog = undefined;
 
     // tabs
-    this.click_on_tab = index => this.tab_index(index);
+    this.click_on_tab = (index) => this.tab_index(index);
     this.tab_index = ko.observable(0);
     this.tab_index.subscribe(this.on_tab_index_changed.bind(this));
 
@@ -130,71 +127,35 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
 
     this.show_back_button = ko.pureComputed(() => {
       if (typeof this.conversation === 'function') {
-        return (
-          this.conversation().is_group() || this.conversation().is_team_group()
-        );
+        return this.conversation().is_group() || this.conversation().is_team_group();
       }
     });
 
     this.selected_device_subscription = this.selected_device.subscribe(() => {
       if (this.selected_device()) {
-        this.fingerprint_local(
-          this.cryptography_repository.get_local_fingerprint(),
-        );
+        this.fingerprint_local(this.cryptography_repository.get_local_fingerprint());
         this.fingerprint_remote('');
-        this.cryptography_repository
-          .get_remote_fingerprint(this.user().id, this.selected_device().id)
-          .then(fingerprint => this.fingerprint_remote(fingerprint));
+        this.cryptography_repository.get_remote_fingerprint(this.user().id, this.selected_device().id)
+          .then((fingerprint) => this.fingerprint_remote(fingerprint));
       }
     });
 
-    this.add_people_tooltip = z.localization.Localizer.get_text({
-      id: z.string.tooltip_people_add,
-      replace: {
-        content: z.ui.Shortcut.get_shortcut_tooltip(
-          z.ui.ShortcutType.ADD_PEOPLE,
-        ),
-        placeholder: '%shortcut',
-      },
-    });
+    const shortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.ADD_PEOPLE);
+    this.add_people_tooltip = z.l10n.text(z.string.tooltip_people_add, shortcut);
 
     this.device_headline = ko.pureComputed(() => {
-      return z.localization.Localizer.get_text({
-        id: z.string.people_tabs_devices_headline,
-        replace: {
-          content: this.user().first_name(),
-          placeholder: '%@.name',
-        },
-      });
+      return z.l10n.text(z.string.people_tabs_devices_headline, this.user().first_name());
     });
 
     this.no_device_headline = ko.pureComputed(() => {
-      return z.localization.Localizer.get_text({
-        id: z.string.people_tabs_no_devices_headline,
-        replace: {
-          content: this.user().first_name(),
-          placeholder: '%@.name',
-        },
-      });
+      return z.l10n.text(z.string.people_tabs_no_devices_headline, this.user().first_name());
     });
 
     this.detail_message = ko.pureComputed(() => {
-      return z.localization.Localizer.get_text({
-        id: z.string.people_tabs_device_detail_headline,
-        replace: [
-          {
-            content: "<span class='user-profile-device-detail-highlight'>",
-            placeholder: '%bold',
-          },
-          {
-            content: z.util.escape_html(this.user().first_name()),
-            placeholder: '%@.name',
-          },
-          {
-            content: '</span>',
-            placeholder: '%end',
-          },
-        ],
+      return z.l10n.text(z.string.people_tabs_device_detail_headline, {
+        html1: "<span class='user-profile-device-detail-highlight'>",
+        html2: '</span>',
+        user: z.util.escape_html(this.user().first_name()),
       });
     });
 
@@ -203,32 +164,20 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
 
       this.confirm_dialog = this.element.confirm({
         confirm: () => {
-          const should_block = this.element
-            .find('.checkbox input')
-            .is(':checked');
+          const should_block = this.element.find('.checkbox input').is(':checked');
           if (should_block) {
             this.user_repository.block_user(this.user());
           } else {
             this.user_repository.cancel_connection_request(this.user());
           }
 
-          this.conversation_repository
-            .get_1to1_conversation(this.user())
-            .then(conversation_et => {
-              if (
-                this.conversation_repository.is_active_conversation(
-                  conversation_et,
-                )
-              ) {
+          this.conversation_repository.get_1to1_conversation(this.user())
+            .then((conversation_et) => {
+              if (this.conversation_repository.is_active_conversation(conversation_et)) {
                 amplify.publish(z.event.WebApp.CONVERSATION.PEOPLE.HIDE);
-                const next_conversation_et = this.conversation_repository.get_next_conversation(
-                  conversation_et,
-                );
+                const next_conversation_et = this.conversation_repository.get_next_conversation(conversation_et);
                 window.setTimeout(function() {
-                  amplify.publish(
-                    z.event.WebApp.CONVERSATION.SHOW,
-                    next_conversation_et,
-                  );
+                  amplify.publish(z.event.WebApp.CONVERSATION.SHOW, next_conversation_et);
                 }, SHOW_CONVERSATION_DELAY);
               }
             });
@@ -247,13 +196,10 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
     this.on_open = () => {
       amplify.publish(z.event.WebApp.CONVERSATION.PEOPLE.HIDE);
 
-      this.conversation_repository
-        .get_1to1_conversation(this.user())
-        .then(conversation_et => {
+      this.conversation_repository.get_1to1_conversation(this.user())
+        .then((conversation_et) => {
           if (conversation_et.is_archived()) {
-            this.conversation_repository.unarchive_conversation(
-              conversation_et,
-            );
+            this.conversation_repository.unarchive_conversation(conversation_et);
           }
 
           window.setTimeout(() => {
@@ -266,8 +212,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
     };
 
     this.on_connect = () => {
-      this.user_repository
-        .create_connection(this.user(), true)
+      this.user_repository.create_connection(this.user(), true)
         .then(function() {
           amplify.publish(z.event.WebApp.CONVERSATION.PEOPLE.HIDE);
         });
@@ -287,50 +232,35 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
       }
     };
 
-    this.accent_color = ko.pureComputed(
-      () => {
-        if (this.user()) {
-          return `accent-color-${this.user().accent_id()}`;
-        }
-      },
-      this,
-      {deferEvaluation: true},
-    );
+    this.accent_color = ko.pureComputed(() => {
+      if (this.user()) {
+        return `accent-color-${this.user().accent_id()}`;
+      }
+    }
+    , this, {deferEvaluation: true});
 
-    this.show_gray_image = ko.pureComputed(
-      () => {
-        if (!this.user()) {
-          return false;
-        }
+    this.show_gray_image = ko.pureComputed(() => {
+      if (!this.user()) {
+        return false;
+      }
 
-        return !this.user().is_me && !this.user.is_connected();
-      },
-      this,
-      {deferEvaluation: true},
-    );
+      return (!this.user().is_me && (!this.user.is_connected()));
+    }, this, {deferEvaluation: true});
 
-    this.connection_is_not_established = ko.pureComputed(
-      () => {
-        if (this.user()) {
-          return this.user().is_request() || this.user().is_ignored();
-        }
-      },
-      this,
-      {deferEvaluation: true},
-    );
+    this.connection_is_not_established = ko.pureComputed(() => {
+      if (this.user()) {
+        return this.user().is_request() || this.user().is_ignored();
+      }
+    }, this, {deferEvaluation: true});
 
-    this.user_is_removed_from_conversation = ko.pureComputed(
-      () => {
-        if (!this.user() || !this.conversation()) {
-          return true;
-        }
+    this.user_is_removed_from_conversation = ko.pureComputed(() => {
+      if (!this.user() || !this.conversation()) {
+        return true;
+      }
 
-        const participating_user_ets = this.conversation().participating_user_ets();
-        return !participating_user_ets.includes(this.user());
-      },
-      this,
-      {deferEvaluation: true},
-    );
+      const participating_user_ets = this.conversation().participating_user_ets();
+      return !participating_user_ets.includes(this.user());
+    }, this, {deferEvaluation: true});
 
     this.render_avatar = ko.observable(false);
     this.render_avatar_computed = ko.computed(() => {
@@ -369,15 +299,14 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
           if (user_et.is_outgoing_request()) {
             return 'user-profile-footer-pending';
           }
+
         } else if (conversation_et.is_group()) {
           if (user_et.is_me) {
             return 'user-profile-footer-profile-leave';
           }
 
           if (user_et.is_unknown()) {
-            return conversation_et.team_id
-              ? 'user-profile-footer-message-remove'
-              : 'user-profile-footer-connect-remove';
+            return conversation_et.team_id ? 'user-profile-footer-message-remove' : 'user-profile-footer-connect-remove';
           }
           if (user_et.is_ignored() || user_et.is_request()) {
             return 'user-profile-footer-pending-remove';
@@ -391,7 +320,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
             return 'user-profile-footer-unblock-remove';
           }
         }
-        // When used in Search!
+      // When used in Search!
       } else {
         if (user_et.is_blocked()) {
           return 'user-profile-footer-unblock';
@@ -443,12 +372,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
     };
 
     this.is_resetting_session(true);
-    this.conversation_repository
-      .reset_session(
-        this.user().id,
-        this.selected_device().id,
-        this.conversation().id,
-      )
+    this.conversation_repository.reset_session(this.user().id, this.selected_device().id, this.conversation().id)
       .then(() => reset_progress())
       .catch(() => reset_progress());
   }
@@ -456,25 +380,19 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
   click_on_verify_client() {
     const toggle_verified = !this.selected_device().meta.is_verified();
 
-    this.client_repository
-      .verify_client(this.user().id, this.selected_device(), toggle_verified)
-      .catch(error =>
-        this.logger.warn(`Client cannot be updated: ${error.message}`),
-      );
+    this.client_repository.verify_client(this.user().id, this.selected_device(), toggle_verified)
+      .catch((error) => this.logger.warn(`Client cannot be updated: ${error.message}`));
   }
 
   on_tab_index_changed(index) {
     if (index === 1) {
       const user_id = this.user().id;
-      this.client_repository
-        .get_clients_by_user_id(user_id)
-        .then(client_ets => {
+      this.client_repository.get_clients_by_user_id(user_id)
+        .then((client_ets) => {
           this.devices_found(client_ets.length > 0);
         })
-        .catch(error => {
-          this.logger.error(
-            `Unable to retrieve clients data for user '${user_id}': ${error}`,
-          );
+        .catch((error) => {
+          this.logger.error(`Unable to retrieve clients data for user '${user_id}': ${error}`);
         });
     }
   }

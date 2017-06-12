@@ -23,6 +23,7 @@ window.z = window.z || {};
 window.z.links = z.links || {};
 
 z.links.LinkPreviewProtoBuilder = {
+
   /*
   Create Protocol Buffers message for link previews.
   Open Graph data can be validated through: https://developers.facebook.com/tools/debug/
@@ -41,19 +42,8 @@ z.links.LinkPreviewProtoBuilder = {
     data.url = data.url || url;
 
     if (data.title && data.url) {
-      const article = new z.proto.Article(
-        data.url,
-        data.title,
-        data.description,
-      ); // deprecated format
-      const preview = new z.proto.LinkPreview(
-        url,
-        offset,
-        article,
-        data.url,
-        data.title,
-        data.description,
-      );
+      const article = new z.proto.Article(data.url, data.title, data.description); // deprecated format
+      const preview = new z.proto.LinkPreview(url, offset, article, data.url, data.title, data.description);
 
       if (data.site_name === 'Twitter') {
         const author = data.title.replace('on Twitter', '').trim();
@@ -66,4 +56,5 @@ z.links.LinkPreviewProtoBuilder = {
       return preview;
     }
   },
+
 };

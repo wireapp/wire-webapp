@@ -29,10 +29,7 @@ window.z.user = z.user || {};
 z.user.UserConnectionMapper = class UserConnectionMapper {
   // Construct a new user mapper.
   constructor() {
-    this.logger = new z.util.Logger(
-      'z.user.UserConnectionMapper',
-      z.config.LOGGER.OPTIONS,
-    );
+    this.logger = new z.util.Logger('z.user.UserConnectionMapper', z.config.LOGGER.OPTIONS);
 
     /**
      * Converts JSON connection into connection entity.
@@ -51,8 +48,8 @@ z.user.UserConnectionMapper = class UserConnectionMapper {
      */
     this.map_user_connections_from_json = function(data) {
       return data
-        .filter(connection => connection !== undefined)
-        .map(connection => this.map_user_connection_from_json(connection));
+        .filter((connection) => connection !== undefined)
+        .map((connection) => this.map_user_connection_from_json(connection));
     };
 
     /**

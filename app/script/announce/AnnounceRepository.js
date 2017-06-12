@@ -32,10 +32,7 @@ z.announce.AnnounceRepository = class AnnounceRepository {
   }
 
   constructor(announce_service) {
-    this.logger = new z.util.Logger(
-      'z.announce.AnnounceRepository',
-      z.config.LOGGER.OPTIONS,
-    );
+    this.logger = new z.util.Logger('z.announce.AnnounceRepository', z.config.LOGGER.OPTIONS);
     this.announce_service = announce_service;
   }
 
@@ -48,29 +45,23 @@ z.announce.AnnounceRepository = class AnnounceRepository {
 
   check_announcements() {
     if (navigator.onLine) {
-      return this.announce_service.get_announcements().then(() => {
-        this.process_announce_list();
-      });
+      return this.announce_service.get_announcements()
+        .then(() => {
+          this.process_announce_list();
+        });
     }
   }
 
   check_version() {
     if (navigator.onLine) {
-      return this.announce_service.get_version().then(server_version => {
-        this.logger.info(
-          `Checking current webapp version. Server '${server_version}' vs. local '${z.util.Environment.version(
-            false,
-            true,
-          )}'`,
-        );
+      return this.announce_service.get_version()
+        .then((server_version) => {
+          this.logger.info(`Checking current webapp version. Server '${server_version}' vs. local '${z.util.Environment.version(false, true)}'`);
 
-        if (server_version > z.util.Environment.version(false, true)) {
-          amplify.publish(
-            z.event.WebApp.LIFECYCLE.UPDATE,
-            z.announce.UPDATE_SOURCE.WEBAPP,
-          );
-        }
-      });
+          if (server_version > z.util.Environment.version(false, true)) {
+            amplify.publish(z.event.WebApp.LIFECYCLE.UPDATE, z.announce.UPDATE_SOURCE.WEBAPP);
+          }
+        });
     }
   }
 
@@ -88,66 +79,42 @@ z.announce.AnnounceRepository = class AnnounceRepository {
     if (announcements_list) {
       for (const announcement of announcements_list) {
         if (!z.util.Environment.frontend.is_localhost()) {
-          if (
-            announcement.version_max &&
-            z.util.Environment.version(false) > announcement.version_max
-          ) {
+          if (announcement.version_max && (z.util.Environment.version(false) > announcement.version_max)) {
             continue;
           }
-          if (
-            announcement.version_min &&
-            z.util.Environment.version(false) < announcement.version_min
-          ) {
+          if (announcement.version_min && (z.util.Environment.version(false) < announcement.version_min)) {
             continue;
           }
         }
 
-        const key = `${z.storage.StorageKey.ANNOUNCE
-          .ANNOUNCE_KEY}@${announcement.key}`;
+        const key = `${z.storage.StorageKey.ANNOUNCE.ANNOUNCE_KEY}@${announcement.key}`;
         if (!z.util.StorageUtil.get_value(key)) {
           z.util.StorageUtil.set_value(key, 'read');
           if (!z.util.Environment.browser.supports.notifications) {
             return;
           }
 
-          if (
-            window.Notification.permission ===
-            z.system_notification.PermissionStatusState.DENIED
-          ) {
+          if (window.Notification.permission === z.system_notification.PermissionStatusState.DENIED) {
             return;
           }
 
           if (z.localization.Localizer.locale !== 'en') {
-            announcement.title =
-              announcement[`title_${z.localization.Localizer.locale}`] ||
-              announcement.title;
-            announcement.message =
-              announcement[`message_${z.localization.Localizer.locale}`] ||
-              announcement.message;
+            announcement.title = announcement[`title_${z.localization.Localizer.locale}`] || announcement.title;
+            announcement.message = announcement[`message_${z.localization.Localizer.locale}`] || announcement.message;
           }
 
           const notification = new window.Notification(announcement.title, {
             body: announcement.message,
-            icon: z.util.Environment.electron && z.util.Environment.os.mac
-              ? ''
-              : '/image/logo/notification.png',
+            icon: z.util.Environment.electron && z.util.Environment.os.mac ? '' : '/image/logo/notification.png',
             requireInteraction: true,
             sticky: true,
           });
 
-          amplify.publish(
-            z.event.WebApp.ANALYTICS.EVENT,
-            z.tracking.EventName.ANNOUNCE.SENT,
-            {campaign: announcement.campaign},
-          );
+          amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ANNOUNCE.SENT, {campaign: announcement.campaign});
           this.logger.info(`Announcement '${announcement.title}' shown`);
 
           notification.onclick = () => {
-            amplify.publish(
-              z.event.WebApp.ANALYTICS.EVENT,
-              z.tracking.EventName.ANNOUNCE.CLICKED,
-              {campaign: announcement.campaign},
-            );
+            amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ANNOUNCE.CLICKED, {campaign: announcement.campaign});
             this.logger.info(`Announcement '${announcement.title}' clicked`);
 
             if (announcement.link) {

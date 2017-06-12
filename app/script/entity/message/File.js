@@ -59,20 +59,17 @@ z.entity.File = class File extends z.entity.Asset {
     this.upload_failed_reason = ko.observable();
     this.upload_cancel = undefined;
     this.pending_upload = ko.pureComputed(() => {
-      return (
-        this.status() === z.assets.AssetTransferState.UPLOADING &&
-        this.uploaded_on_this_client()
-      );
+      return this.status() === z.assets.AssetTransferState.UPLOADING && this.uploaded_on_this_client();
     });
 
     // update progress
-    this.upload_id.subscribe(upload_id => {
+    this.upload_id.subscribe((upload_id) => {
       if (upload_id) {
         return amplify.subscribe(`upload${upload_id}`, this.on_progress);
       }
     });
 
-    this.status.subscribe(status => {
+    this.status.subscribe((status) => {
       if (status === z.assets.AssetTransferState.UPLOADED) {
         return amplify.unsubscribe(`upload${this.upload_id}`, this.on_progress);
       }
@@ -100,13 +97,12 @@ z.entity.File = class File extends z.entity.Asset {
   load() {
     this.status(z.assets.AssetTransferState.DOWNLOADING);
 
-    return this.original_resource()
-      .load()
-      .then(blob => {
+    return this.original_resource().load()
+      .then((blob) => {
         this.status(z.assets.AssetTransferState.UPLOADED);
         return blob;
       })
-      .catch(error => {
+      .catch((error) => {
         this.status(z.assets.AssetTransferState.UPLOADED);
         throw error;
       });
@@ -125,43 +121,25 @@ z.entity.File = class File extends z.entity.Asset {
     const download_started = Date.now();
     const tracking_data = {
       size_bytes: this.file_size,
-      size_mb: z.util.bucket_values(this.file_size / 1024 / 1024, [
-        0,
-        5,
-        10,
-        15,
-        20,
-        25,
-      ]),
+      size_mb: z.util.bucket_values((this.file_size / 1024 / 1024), [0, 5, 10, 15, 20, 25]),
       type: z.util.get_file_extension(this.file_name),
     };
 
-    amplify.publish(
-      z.event.WebApp.ANALYTICS.EVENT,
-      z.tracking.EventName.FILE.DOWNLOAD_INITIATED,
-      tracking_data,
-    );
+    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.DOWNLOAD_INITIATED, tracking_data);
 
     return this.load()
-      .then(blob => {
+      .then((blob) => {
         return z.util.download_blob(blob, this.file_name);
       })
       .then(() => {
         const download_duration = (Date.now() - download_started) / 1000;
         this.logger.info(`Downloaded asset in ${download_duration} seconds`);
-        return amplify.publish(
-          z.event.WebApp.ANALYTICS.EVENT,
-          z.tracking.EventName.FILE.DOWNLOAD_SUCCESSFUL,
-          $.extend(tracking_data, {time: download_duration}),
-        );
+        return amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.DOWNLOAD_SUCCESSFUL,
+          $.extend(tracking_data, {time: download_duration}));
       })
-      .catch(error => {
+      .catch((error) => {
         this.logger.error('Failed to download asset', error);
-        return amplify.publish(
-          z.event.WebApp.ANALYTICS.EVENT,
-          z.tracking.EventName.FILE.DOWNLOAD_FAILED,
-          tracking_data,
-        );
+        return amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.DOWNLOAD_FAILED, tracking_data);
       });
   }
 
@@ -175,22 +153,11 @@ z.entity.File = class File extends z.entity.Asset {
       this.upload_cancel();
     }
     amplify.publish(z.event.WebApp.CONVERSATION.ASSET.CANCEL, message_et);
-    amplify.publish(
-      z.event.WebApp.ANALYTICS.EVENT,
-      z.tracking.EventName.FILE.UPLOAD_CANCELLED,
-      {
-        size_bytes: this.file_size,
-        size_mb: z.util.bucket_values(this.file_size / 1024 / 1024, [
-          0,
-          5,
-          10,
-          15,
-          20,
-          25,
-        ]),
-        type: z.util.get_file_extension(this.file_name),
-      },
-    );
+    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_CANCELLED, {
+      size_bytes: this.file_size,
+      size_mb: z.util.bucket_values((this.file_size / 1024 / 1024), [0, 5, 10, 15, 20, 25]),
+      type: z.util.get_file_extension(this.file_name),
+    });
   }
 
   reload() {

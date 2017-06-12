@@ -79,6 +79,9 @@ window.z.util = z.util || {};
       }
       return this.is_chrome() || this.is_firefox() || this.is_opera();
     },
+    supports_indexed_db: function() {
+      return !!window.indexedDB;
+    },
     supports_media_devices: function() {
       return navigator.mediaDevices && navigator.mediaDevices.getUserMedia;
     },
@@ -110,14 +113,14 @@ window.z.util = z.util || {};
 
   // add body information
   const os_css_class = os.is_mac() ? 'os-mac' : 'os-pc';
-  const platform_css_class = _check.is_electron()
-    ? 'platform-electron'
-    : 'platform-web';
+  const platform_css_class = _check.is_electron() ? 'platform-electron' : 'platform-web';
   $(document.body).addClass(`${os_css_class} ${platform_css_class}`);
 
   const app_version = function() {
     if ($("[property='wire:version']").attr('version')) {
-      return $("[property='wire:version']").attr('version').trim();
+      return $("[property='wire:version']")
+        .attr('version')
+        .trim();
     }
     return '';
   };
@@ -130,20 +133,14 @@ window.z.util = z.util || {};
   z.util.Environment = {
     backend: {
       account_url: function() {
-        if (
-          z.util.Environment.backend.current ===
-          z.service.BackendEnvironment.PRODUCTION
-        ) {
+        if (z.util.Environment.backend.current === z.service.BackendEnvironment.PRODUCTION) {
           return z.config.ACCOUNT_PRODUCTION_URL;
         }
         return z.config.ACCOUNT_STAGING_URL;
       },
       current: undefined,
       website_url: function() {
-        if (
-          z.util.Environment.backend.current ===
-          z.service.BackendEnvironment.PRODUCTION
-        ) {
+        if (z.util.Environment.backend.current === z.service.BackendEnvironment.PRODUCTION) {
           return z.config.WEBSITE_PRODUCTION_URL;
         }
         return z.config.WEBSITE_STAGING_URL;
@@ -158,6 +155,7 @@ window.z.util = z.util || {};
       supports: {
         audio_output_selection: _check.supports_audio_output_selection(),
         calling: _check.supports_calling(),
+        indexed_db: _check.supports_indexed_db(),
         media_devices: _check.supports_media_devices(),
         notifications: _check.supports_notifications(),
         screen_sharing: _check.supports_screen_sharing(),
@@ -167,14 +165,10 @@ window.z.util = z.util || {};
     electron: _check.is_electron(),
     frontend: {
       is_localhost() {
-        return [APP_ENV.LOCALHOST, APP_ENV.VIRTUAL_HOST].includes(
-          window.location.hostname,
-        );
+        return [APP_ENV.LOCALHOST, APP_ENV.VIRTUAL_HOST].includes(window.location.hostname);
       },
       is_production() {
-        return [APP_ENV.PRODUCTION, APP_ENV.PROD_NEXT].includes(
-          window.location.hostname,
-        );
+        return [APP_ENV.PRODUCTION, APP_ENV.PROD_NEXT].includes(window.location.hostname);
       },
     },
     os: {

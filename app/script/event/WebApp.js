@@ -50,8 +50,7 @@ z.event.WebApp = {
     SIGNALING: {
       DELETE_FLOW: 'wire.webapp.call.signaling.delete_flow',
       POST_FLOWS: 'wire.webapp.call.signaling.post_flows',
-      SEND_ICE_CANDIDATE_INFO:
-        'wire.webapp.call.signaling.send_ice_candidate_info',
+      SEND_ICE_CANDIDATE_INFO: 'wire.webapp.call.signaling.send_ice_candidate_info',
       SEND_LOCAL_SDP_INFO: 'wire.webapp.call.signaling.send_local_sdp_info',
     },
     STATE: {
@@ -93,8 +92,7 @@ z.event.WebApp = {
     DETAIL_VIEW: {
       SHOW: 'wire.webapp.conversation.detail_view.show',
     },
-    EPHEMERAL_MESSAGE_TIMEOUT:
-      'wire.webapp.conversation.ephemeral_message_timeout',
+    EPHEMERAL_MESSAGE_TIMEOUT: 'wire.webapp.conversation.ephemeral_message_timeout',
     EVENT_FROM_BACKEND: 'wire.webapp.conversation.event_from_backend',
     IMAGE: {
       SEND: 'wire.webapp.conversation.image.send',
@@ -171,9 +169,14 @@ z.event.WebApp = {
   PROPERTIES: {
     UPDATE: {
       CONTACTS: 'wire.webapp.properties.update.contacts',
-      HAS_CREATED_CONVERSATION:
-        'wire.webapp.properties.update.has_created_conversation',
+      EMOJI: {
+        REPLACE_INLINE: 'wire.webapp.properties.update.emoji.replace_inline',
+      },
+      HAS_CREATED_CONVERSATION: 'wire.webapp.properties.update.has_created_conversation',
       NOTIFICATIONS: 'wire.webapp.properties.update.notifications',
+      PREVIEWS: {
+        SEND: 'wire.webapp.properties.update.previews.send',
+      },
       PRIVACY: 'wire.webapp.properties.update.privacy',
       SOUND_ALERTS: 'wire.webapp.properties.update.sound_alerts',
     },

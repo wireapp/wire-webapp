@@ -167,15 +167,17 @@
             data-bind="css: {'conversation-list-cell-active': content_state() === z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS}">
           <div class="conversation-list-cell-left">
             <!-- ko if: connect_requests().length > 1 -->
-              <group-avatar params="users: connect_requests()"></group-avatar>
+              <group-avatar data-bind="css: {'group-avatar-active': content_state() === z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS}" params="users: connect_requests()"></group-avatar>
             <!-- /ko -->
             <!-- ko if: connect_requests().length === 1 -->
-              <user-avatar class="user-avatar-xs" params="user: connect_requests()[0]"></user-avatar>
+            <div class="user-avatar-halo" data-bind="css: {'user-avatar-halo-active': content_state() === z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS}">
+              <user-avatar class="user-avatar-s" params="user: connect_requests()[0]"></user-avatar>
+            </div>
             <!-- /ko -->
           </div>
           <div class="conversation-list-cell-center">
             <span class="conversation-list-cell-name"
-                  data-bind="click: click_on_connect_requests, text: connect_requests_text"
+                  data-bind="click: click_on_connect_requests, text: connect_requests_text, css: {'text-theme': content_state() === z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS}"
                   data-uie-name="item-pending-requests"></span>
           </div>
           <div class="conversation-list-cell-right">

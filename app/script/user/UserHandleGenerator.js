@@ -25,243 +25,11 @@ window.z.user = z.user || {};
 (function() {
   const MAX_HANDLE_LENGTH = 21;
 
-  const RANDOM_WORDS_1 = [
-    'acid',
-    'agate',
-    'agile',
-    'amber',
-    'aqua',
-    'arid',
-    'avid',
-    'azure',
-    'baby',
-    'basic',
-    'beige',
-    'best',
-    'black',
-    'blond',
-    'blue',
-    'brass',
-    'brave',
-    'brown',
-    'busy',
-    'chief',
-    'chill',
-    'clear',
-    'cold',
-    'cool',
-    'coral',
-    'cosy',
-    'cozy',
-    'cream',
-    'curly',
-    'cyan',
-    'dear',
-    'dry',
-    'early',
-    'even',
-    'fancy',
-    'fast',
-    'fit',
-    'folk',
-    'gold',
-    'green',
-    'grey',
-    'happy',
-    'hazy',
-    'icy',
-    'iron',
-    'kind',
-    'large',
-    'lazy',
-    'lemon',
-    'light',
-    'lilac',
-    'lime',
-    'lord',
-    'lucid',
-    'mauve',
-    'melt',
-    'merry',
-    'mint',
-    'nice',
-    'noir',
-    'ochre',
-    'odd',
-    'olive',
-    'opal',
-    'peach',
-    'pearl',
-    'pink',
-    'plain',
-    'purple',
-    'quiet',
-    'rapid',
-    'red',
-    'rock',
-    'rose',
-    'ruby',
-    'rust',
-    'sand',
-    'sassy',
-    'shiny',
-    'shy',
-    'silly',
-    'slow',
-    'small',
-    'stone',
-    'sweet',
-    'swift',
-    'talc',
-    'tame',
-    'tiny',
-    'topaz',
-    'torn',
-    'total',
-    'vinyl',
-    'violet',
-    'warm',
-    'white',
-    'wise',
-    'witty',
-    'yellow',
-    'young',
-    'zinc',
-  ];
-  const RANDOM_WORDS_2 = [
-    'alligator',
-    'alpaca',
-    'ant',
-    'antelope',
-    'asp',
-    'badger',
-    'bat',
-    'bear',
-    'bee',
-    'beetle',
-    'bird',
-    'bison',
-    'bobcat',
-    'buffalo',
-    'buzzard',
-    'camel',
-    'caribou',
-    'carp',
-    'cat',
-    'catfish',
-    'cheetah',
-    'clam',
-    'cobra',
-    'cod',
-    'condor',
-    'cow',
-    'coyote',
-    'crane',
-    'crayfish',
-    'cricket',
-    'crow',
-    'deer',
-    'dog',
-    'dolphin',
-    'donkey',
-    'dove',
-    'duck',
-    'eagle',
-    'eel',
-    'elk',
-    'falcon',
-    'ferret',
-    'finch',
-    'fly',
-    'fox',
-    'frog',
-    'gazelle',
-    'giraffe',
-    'gnu',
-    'goat',
-    'goose',
-    'gopher',
-    'grouse',
-    'gull',
-    'halibut',
-    'hamster',
-    'hare',
-    'hawk',
-    'heron',
-    'herring',
-    'horse',
-    'husky',
-    'impala',
-    'jackal',
-    'jaguar',
-    'kangaroo',
-    'koala',
-    'lemur',
-    'lion',
-    'lizard',
-    'llama',
-    'lobster',
-    'mackerel',
-    'mole',
-    'moose',
-    'moth',
-    'mouse',
-    'mule',
-    'mussel',
-    'newt',
-    'octopus',
-    'orca',
-    'ostrich',
-    'otter',
-    'owl',
-    'ox',
-    'oyster',
-    'panda',
-    'panther',
-    'parrot',
-    'pelican',
-    'penguin',
-    'pigeon',
-    'pike',
-    'pony',
-    'quail',
-    'rabbit',
-    'racoon',
-    'ram',
-    'raven',
-    'salmon',
-    'sardine',
-    'seal',
-    'shark',
-    'sheep',
-    'sloth',
-    'snail',
-    'snake',
-    'squid',
-    'sturgeon',
-    'swan',
-    'tiger',
-    'tilapia',
-    'toad',
-    'trout',
-    'tuna',
-    'turkey',
-    'turtle',
-    'walrus',
-    'wapiti',
-    'wasp',
-    'weasel',
-    'whale',
-    'wolf',
-    'wombat',
-    'yak',
-    'zebra',
-  ];
+  const RANDOM_WORDS_1 = ['acid', 'agate', 'agile', 'amber', 'aqua', 'arid', 'avid', 'azure', 'baby', 'basic', 'beige', 'best', 'black', 'blond', 'blue', 'brass', 'brave', 'brown', 'busy', 'chief', 'chill', 'clear', 'cold', 'cool', 'coral', 'cosy', 'cozy', 'cream', 'curly', 'cyan', 'dear', 'dry', 'early', 'even', 'fancy', 'fast', 'fit', 'folk', 'gold', 'green', 'grey', 'happy', 'hazy', 'icy', 'iron', 'kind', 'large', 'lazy', 'lemon', 'light', 'lilac', 'lime', 'lord', 'lucid', 'mauve', 'melt', 'merry', 'mint', 'nice', 'noir', 'ochre', 'odd', 'olive', 'opal', 'peach', 'pearl', 'pink', 'plain', 'purple', 'quiet', 'rapid', 'red', 'rock', 'rose', 'ruby', 'rust', 'sand', 'sassy', 'shiny', 'shy', 'silly', 'slow', 'small', 'stone', 'sweet', 'swift', 'talc', 'tame', 'tiny', 'topaz', 'torn', 'total', 'vinyl', 'violet', 'warm', 'white', 'wise', 'witty', 'yellow', 'young', 'zinc'];
+  const RANDOM_WORDS_2 = ['alligator', 'alpaca', 'ant', 'antelope', 'asp', 'badger', 'bat', 'bear', 'bee', 'beetle', 'bird', 'bison', 'bobcat', 'buffalo', 'buzzard', 'camel', 'caribou', 'carp', 'cat', 'catfish', 'cheetah', 'clam', 'cobra', 'cod', 'condor', 'cow', 'coyote', 'crane', 'crayfish', 'cricket', 'crow', 'deer', 'dog', 'dolphin', 'donkey', 'dove', 'duck', 'eagle', 'eel', 'elk', 'falcon', 'ferret', 'finch', 'fly', 'fox', 'frog', 'gazelle', 'giraffe', 'gnu', 'goat', 'goose', 'gopher', 'grouse', 'gull', 'halibut', 'hamster', 'hare', 'hawk', 'heron', 'herring', 'horse', 'husky', 'impala', 'jackal', 'jaguar', 'kangaroo', 'koala', 'lemur', 'lion', 'lizard', 'llama', 'lobster', 'mackerel', 'mole', 'moose', 'moth', 'mouse', 'mule', 'mussel', 'newt', 'octopus', 'orca', 'ostrich', 'otter', 'owl', 'ox', 'oyster', 'panda', 'panther', 'parrot', 'pelican', 'penguin', 'pigeon', 'pike', 'pony', 'quail', 'rabbit', 'racoon', 'ram', 'raven', 'salmon', 'sardine', 'seal', 'shark', 'sheep', 'sloth', 'snail', 'snake', 'squid', 'sturgeon', 'swan', 'tiger', 'tilapia', 'toad', 'trout', 'tuna', 'turkey', 'turtle', 'walrus', 'wapiti', 'wasp', 'weasel', 'whale', 'wolf', 'wombat', 'yak', 'zebra'];
 
   function get_random_word_combination() {
-    return `${z.util.ArrayUtil.random_element(
-      RANDOM_WORDS_1,
-    )}${z.util.ArrayUtil.random_element(RANDOM_WORDS_2)}`;
+    return `${z.util.ArrayUtil.random_element(RANDOM_WORDS_1)}${z.util.ArrayUtil.random_element(RANDOM_WORDS_2)}`;
   }
 
   /**
@@ -272,10 +40,7 @@ window.z.user = z.user || {};
    */
   function generate_handle_variations(handle, number_of_variations = 5) {
     return _.range(1, number_of_variations + 1).map(function(value) {
-      return append_random_digits(
-        handle.slice(0, MAX_HANDLE_LENGTH - value),
-        value,
-      );
+      return append_random_digits(handle.slice(0, MAX_HANDLE_LENGTH - value), value);
     });
   }
 
@@ -286,9 +51,7 @@ window.z.user = z.user || {};
    * @returns {string} String appended with random digits.
    */
   function append_random_digits(handle, additional_numbers) {
-    const random_digits = _.range(additional_numbers).map(() =>
-      z.util.get_random_int(1, 9),
-    );
+    const random_digits = _.range(additional_numbers).map(() => z.util.get_random_int(1, 9));
     return `${handle}${random_digits.join('')}`;
   }
 
@@ -298,8 +61,7 @@ window.z.user = z.user || {};
    * @returns {string} User handle
    */
   function normalize_name(name) {
-    return window
-      .getSlug(name)
+    return window.getSlug(name)
       .toLowerCase()
       .replace(new RegExp(/[^a-z0-9_]/, 'g'), '')
       .substring(0, MAX_HANDLE_LENGTH);
@@ -312,7 +74,7 @@ window.z.user = z.user || {};
    */
   function validate_character(character) {
     const isAlphaNumeric = /[a-z0-9_]/.test(character);
-    const isString = _.isString(character) && character.length === 1;
+    const isString = _.isString(character) && (character.length === 1);
     return isAlphaNumeric && isString;
   }
 
@@ -328,9 +90,7 @@ window.z.user = z.user || {};
 
     if (normalized_name) {
       suggestions.push(normalized_name);
-      const normalized_name_variations = generate_handle_variations(
-        normalized_name,
-      );
+      const normalized_name_variations = generate_handle_variations(normalized_name);
       suggestions = suggestions.concat(normalized_name_variations);
     }
 
