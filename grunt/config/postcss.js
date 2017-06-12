@@ -22,10 +22,10 @@
 const processors = [
   require('autoprefixer')({
     browsers: [
-      'Chrome >= 52',
+      'Chrome >= 51',
       'Edge >= 14',
-      'Firefox >= 45',
-      'Opera >= 41',
+      'Firefox >= 52',
+      'Opera >= 40',
     ],
   }),
 ];

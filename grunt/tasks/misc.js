@@ -25,13 +25,9 @@ module.exports = (grunt) => {
     grunt.log.writeln(`Deployed: ${pkg.name} (v${pkg.version})`);
   });
 
-  grunt.registerTask('set_version', (target) => {
-    if (target) {
-      grunt.option('target', target);
-      grunt.log.ok(`Version target set to ${grunt.option('target')}`);
-    } else {
-      target = grunt.config('gitinfo.local.branch.current.name');
-    }
+  grunt.registerTask('set_version', (target = grunt.config('gitinfo.local.branch.current.name')) => {
+    grunt.option('target', target);
+    grunt.log.ok(`Version target set to ${grunt.option('target')}`);
 
     let user = grunt.config('gitinfo.local.branch.current.currentUser');
     if (user) {
