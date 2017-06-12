@@ -76,7 +76,7 @@
             <label class="preferences-options-checkbox-label" for="replace-inline-emoji-checkbox" data-bind="l10n_text: z.string.preferences_options_emoji_replace_checkbox"></label>
           </div>
         </div>
-        <div class="preferences-detail" data-bind="l10n_text: z.string.preferences_options_emoji_replace_detail"></div>
+        <div class="preferences-detail" data-bind="l10n_html: emoji_replace_text"></div>
         <!-- ko if: z.util.Environment.electron -->
           <div class="preferences-option preferences-options-multiple">
             <div class="preferences-option-icon checkbox text-theme">
