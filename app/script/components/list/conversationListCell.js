@@ -43,7 +43,7 @@ z.components.ConversationListCell = class ConversationListCell {
 
 ko.components.register('conversation-list-cell', {
   template: `
-    <div class="conversation-list-cell" data-bind="attr: {'data-uie-uid': conversation.id, 'data-uie-value': conversation.display_name}">
+    <div class="conversation-list-cell" data-bind="attr: {'data-uie-uid': conversation.id, 'data-uie-value': conversation.display_name}, css: {'conversation-list-cell-active': is_selected(conversation)}">
       <div class="conversation-list-cell-left" data-bind="css: {'conversation-list-cell-left-opaque': conversation.removed_from_conversation() || conversation.participating_user_ids().length === 0}">
         <!-- ko if: conversation.is_group() || conversation.is_team_group()  -->
           <group-avatar class="conversation-list-cell-avatar-arrow" data-bind="css: {'group-avatar-active': is_selected(conversation)}" params="users: users(), conversation: conversation"></group-avatar>
