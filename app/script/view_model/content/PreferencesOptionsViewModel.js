@@ -28,8 +28,6 @@ z.ViewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
     this.properties_repository = properties_repository;
     this.logger = new z.util.Logger('z.ViewModel.content.PreferencesOptionsViewModel', z.config.LOGGER.OPTIONS);
 
-    this.emoji_replace_text = z.l10n.text(z.string.preferences_options_emoji_replace_detail, '<div class="icon icon-emoji preferences-options-detail-icon"></div>');
-
     this.option_audio = ko.observable();
     this.option_audio.subscribe((audio_preference) => {
       const tracking_value = (() => {

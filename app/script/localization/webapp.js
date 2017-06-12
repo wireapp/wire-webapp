@@ -341,7 +341,7 @@ z.string.invite_meta_key_pc = 'Ctrl';
 z.string.invite_hint_selected = 'Press {{meta_key}} + C to copy';
 z.string.invite_hint_unselected = 'Select and Press {{meta_key}} + C';
 z.string.invite_headline = 'Invite people to Wire';
-z.string.invite_message = 'I’m on Wire, search for {{user}} or visit get.wire.com.';
+z.string.invite_message = 'I’m on Wire, search for {{username}} or visit get.wire.com.';
 z.string.invite_message_no_email = 'I’m on Wire. Visit get.wire.com to connect with me.';
 
 // Extensions
@@ -455,7 +455,7 @@ z.string.preferences_av_permission_detail = 'Enable from your browser Preference
 z.string.preferences_av_speakers = 'Speakers';
 
 z.string.preferences_devices_activated_in = 'in {{location}}';
-z.string.preferences_devices_activated_on = 'Activated on {{time}}';
+z.string.preferences_devices_activated_on = 'Activated on {{date}}';
 z.string.preferences_devices_active = 'Active';
 z.string.preferences_devices_active_detail = 'If you don’t recognize a device above, remove it and reset your password.';
 z.string.preferences_devices_current = 'Current';
