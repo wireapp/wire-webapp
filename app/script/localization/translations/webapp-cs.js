@@ -411,7 +411,6 @@ z.string.cs.warning_tell_me_how = 'Jak na to';
 z.string.cs.warning_connectivity_connection_lost = 'Pokoušíme se o připojení. Wire nemusí být schopen doručit zprávy.';
 z.string.cs.warning_connectivity_no_internet = 'Chybí připojení k internetu. Nebudete moci odesílat ani přijímat zprávy.';
 
-
 z.string.cs.system_notification_asset_add = 'Sdílel(a) obrázek';
 z.string.cs.system_notification_connection_accepted = 'Přijal(a) váš požadavek na připojení';
 z.string.cs.system_notification_connection_request = 'Žádá o připojení';

@@ -228,7 +228,6 @@ z.string.fi.collection_section_links = 'Linkit';
 z.string.fi.collection_section_images = 'Kuvat';
 z.string.fi.collection_section_files = 'Tiedostot';
 
-
 z.string.fi.archive_header = 'Arkistoi';
 
 z.string.fi.conversations_all_archived = 'Kaikki arkistoitu';
@@ -451,7 +450,6 @@ z.string.fi.warning_tell_me_how = 'Kerro miten';
 
 z.string.fi.warning_connectivity_connection_lost = 'Yritetään yhdistää. Wire ei mahdollisesti pysty toimitttamaan viestejä perille.';
 z.string.fi.warning_connectivity_no_internet = 'Ei Internetiä. Et pysty lähettämään tai vastaanottamaan viestejä.';
-
 
 z.string.fi.system_notification_asset_add = 'Jakoi kuvan';
 z.string.fi.system_notification_connection_accepted = 'Hyväksyi yhteyspyyntösi';

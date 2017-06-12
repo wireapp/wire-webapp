@@ -440,7 +440,6 @@ z.string.hr.warning_tell_me_how = 'Recite mi kako';
 z.string.hr.warning_connectivity_connection_lost = 'Povezivanje u tijeku. Postoji mogućnost da Wire neće moći isporučiti poruke.';
 z.string.hr.warning_connectivity_no_internet = 'Nema Interneta. Nećete moći slati ili primati poruke.';
 
-
 z.string.hr.system_notification_asset_add = 'Podijelila/o sliku';
 z.string.hr.system_notification_connection_accepted = 'Prihvatila/o zahtjev za vezu';
 z.string.hr.system_notification_connection_request = 'Želi se povezati';
