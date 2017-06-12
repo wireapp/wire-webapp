@@ -222,7 +222,6 @@ z.string.cs.conversation_edit_timestamp = 'Upraveno v {{date}}';
 z.string.cs.conversation_likes_caption = '{{number}} lidí';
 
 
-
 z.string.cs.archive_header = 'Archivovat';
 
 z.string.cs.conversations_all_archived = 'Vše archivováno';
