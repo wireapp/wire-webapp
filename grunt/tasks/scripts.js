@@ -1,33 +1,33 @@
-//
-// Wire
-// Copyright (C) 2016 Wire Swiss GmbH
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program. If not, see http://www.gnu.org/licenses/.
-//
+/*
+ * Wire
+ * Copyright (C) 2017 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
 
-//##############################################################################
-// Extract script sources
-//##############################################################################
+'use strict';
+
 module.exports = (grunt) => {
 
-  let extract_sources = (source_file, target) => {
-    let scripts = grunt.file.read(source_file);
-    let script_files = [];
+  function extract_sources(source_file, target) {
+    const scripts = grunt.file.read(source_file);
+    const script_files = [];
 
     // parse app scripts
     const lines = scripts.split('\n');
-    for (let line of Array.from(lines)) {
+    for (const line of lines) {
       const has_source = line.match(/src="(.*?)"/);
       const is_comment = line.match(/<!--[\s\S]*?-->/);
 
@@ -52,16 +52,16 @@ module.exports = (grunt) => {
     grunt.log.ok(`Processed files from '${source_file}'.`);
 
     return script_files;
-  };
+  }
 
-  grunt.registerTask('scripts', function() {
+  grunt.registerTask('scripts', () => {
     const dist_path = grunt.config('dir.app.template_dist');
 
     const directories = {
       app: [],
       auth: [],
       component: [],
-      vendor: []
+      vendor: [],
     };
 
     grunt.config('scripts', directories);
