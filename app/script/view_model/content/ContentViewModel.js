@@ -273,12 +273,17 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
     const {is_guest, team_id} = conversation_et;
 
     if (this.team_repository.active_team().id !== team_id) {
+      const is_team = team_id && !is_guest();
       let team_et;
-      if (team_id && !is_guest()) {
-        [team_et] = this.teams().filter((_team_et) => _team_et.id === team_id);
-      } else {
+
+      if (is_team) {
+        team_et = this.teams().find((_team_et) => _team_et.id === team_id);
+      }
+
+      if (!team_et) {
         team_et = this.team_repository.personal_space;
       }
+
       this.team_repository.active_team(team_et);
     }
   }
