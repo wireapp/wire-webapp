@@ -222,25 +222,9 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       const meta_key = z.util.Environment.os.mac ? z.l10n.text(z.string.invite_meta_key_mac) : z.l10n.text(z.string.invite_meta_key_pc);
 
       if (this.invite_message_selected()) {
-        return z.localization.Localizer.get_text({
-          id: z.string.invite_hint_selected,
-          replace: [
-            {
-              content: meta_key,
-              placeholder: '%meta_key',
-            },
-          ],
-        });
+        return z.l10n.text(z.string.invite_hint_selected, meta_key);
       }
-      return z.localization.Localizer.get_text({
-        id: z.string.invite_hint_unselected,
-        replace: [
-          {
-            content: meta_key,
-            placeholder: '%meta_key',
-          },
-        ],
-      });
+      return z.l10n.text(z.string.invite_hint_unselected, meta_key);
     });
 
     this.invite_button_text = ko.pureComputed(() => {
@@ -562,15 +546,8 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
       const self = this.user_repository.self();
 
-      if (self.email()) {
-        this.invite_message(z.localization.Localizer.get_text({
-          id: z.string.invite_message,
-          replace: [
-            {
-              content: `@${self.username()}`,
-              placeholder: '%username',
-            },
-          ]}));
+      if (self.username()) {
+        this.invite_message(z.l10n.text(z.string.invite_message, `@${self.username()}`));
       } else {
         this.invite_message(z.l10n.text(z.string.invite_message_no_email));
       }

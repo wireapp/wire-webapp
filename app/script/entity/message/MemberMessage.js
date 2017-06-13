@@ -62,16 +62,6 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
       return z.l10n.text(z.string.conversation_connection_accepted);
     };
 
-    this._get_caption_with_names = (key, declension) => {
-      return z.localization.Localizer.get_text({
-        id: key,
-        replace: {
-          content: this._generate_name_string(declension),
-          placeholder: '%@names',
-        },
-      });
-    };
-
     this.show_large_avatar = () => {
       const large_avatar_types = [
         z.message.SystemMessageType.CONNECTION_ACCEPTED,
@@ -99,11 +89,11 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
           return this._get_caption_connection(this.other_user());
         case z.message.SystemMessageType.CONVERSATION_CREATE:
           if (this.user().is_me) {
-            return this._get_caption_with_names(z.string.conversation_create_you);
+            return z.l10n.text(z.string.conversation_create_you, this._generate_name_string());
           }
-          return this._get_caption_with_names(z.string.conversation_create, z.string.Declension.DATIVE);
+          return z.l10n.text(z.string.conversation_create, this._generate_name_string(z.string.Declension.DATIVE));
         case z.message.SystemMessageType.CONVERSATION_RESUME:
-          return this._get_caption_with_names(z.string.conversation_resume, z.string.Declension.DATIVE);
+          return z.l10n.text(z.string.conversation_resume, this._generate_name_string(z.string.Declension.DATIVE));
         default:
           break;
       }
@@ -117,14 +107,14 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
             return z.l10n.text(z.string.conversation_member_leave_left);
           }
           if (this.user().is_me) {
-            return this._get_caption_with_names(z.string.conversation_member_leave_removed_you);
+            return z.l10n.text(z.string.conversation_member_leave_removed_you, this._generate_name_string());
           }
-          return this._get_caption_with_names(z.string.conversation_member_leave_removed);
+          return z.l10n.text(z.string.conversation_member_leave_removed, this._generate_name_string());
         case z.event.Backend.CONVERSATION.MEMBER_JOIN:
           if (this.user().is_me) {
-            return this._get_caption_with_names(z.string.conversation_member_join_you);
+            return z.l10n.text(z.string.conversation_member_join_you, this._generate_name_string());
           }
-          return this._get_caption_with_names(z.string.conversation_member_join);
+          return z.l10n.text(z.string.conversation_member_join, this._generate_name_string());
         case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE:
           return z.l10n.text(z.string.conversation_team_leave);
         default:

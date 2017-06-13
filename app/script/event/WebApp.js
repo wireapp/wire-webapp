@@ -169,8 +169,14 @@ z.event.WebApp = {
   PROPERTIES: {
     UPDATE: {
       CONTACTS: 'wire.webapp.properties.update.contacts',
+      EMOJI: {
+        REPLACE_INLINE: 'wire.webapp.properties.update.emoji.replace_inline',
+      },
       HAS_CREATED_CONVERSATION: 'wire.webapp.properties.update.has_created_conversation',
       NOTIFICATIONS: 'wire.webapp.properties.update.notifications',
+      PREVIEWS: {
+        SEND: 'wire.webapp.properties.update.previews.send',
+      },
       PRIVACY: 'wire.webapp.properties.update.privacy',
       SOUND_ALERTS: 'wire.webapp.properties.update.sound_alerts',
     },

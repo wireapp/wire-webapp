@@ -152,13 +152,8 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
         });
     });
 
-    this.add_people_tooltip = z.localization.Localizer.get_text({
-      id: z.string.tooltip_people_add,
-      replace: {
-        content: z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.ADD_PEOPLE),
-        placeholder: '%shortcut',
-      },
-    });
+    const shortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.ADD_PEOPLE);
+    this.add_people_tooltip = z.l10n.text(z.string.tooltip_people_add, shortcut);
 
     amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, this.switch_content.bind(this));
     amplify.subscribe(z.event.WebApp.PEOPLE.SHOW, this.show_participant);

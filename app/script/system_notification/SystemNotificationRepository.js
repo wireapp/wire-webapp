@@ -125,6 +125,22 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
   }
 
   /**
+   * Close all notifications.
+   * @returns {undefined} No return value
+   */
+  clear_notifications() {
+    this.notifications.forEach((notification) => {
+      const {close, data: notification_data} = notification;
+
+      close();
+      if (notification_data) {
+        const {notification_conversation_id, notification_message_id} = notification_data;
+        this.logger.info(`Notification for '${notification_message_id}' in '${notification_conversation_id}' closed on unload.`);
+      }
+    });
+  }
+
+  /**
    * Display browser notification and play sound notification.
    * @param {z.entity.Conversation} conversation_et - Conversation entity
    * @param {z.entity.Message} message_et - Message entity
@@ -236,18 +252,9 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    * @returns {string} Notification message body
    */
   _create_body_conversation_rename(message_et) {
-    return z.localization.Localizer.get_text({
-      id: z.string.system_notification_conversation_rename,
-      replace: [
-        {
-          content: message_et.user().first_name(),
-          placeholder: '%s.first_name',
-        },
-        {
-          content: message_et.name,
-          placeholder: '%name',
-        },
-      ],
+    return z.l10n.text(z.string.system_notification_conversation_rename, {
+      name: message_et.name,
+      user: message_et.user().first_name(),
     });
   }
 
@@ -260,33 +267,16 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    */
   _create_body_member_join(message_et) {
     if (message_et.user_ets().length === 1) {
-      return z.localization.Localizer.get_text({
-        id: z.string.system_notification_member_join_one,
-        replace: [
-          {
-            content: message_et.user().first_name(),
-            placeholder: '%s.first_name',
-          },
-          {
-            content: z.util.get_first_name(message_et.user_ets()[0], z.string.Declension.ACCUSATIVE),
-            placeholder: '%@.first_name',
-          },
-        ],
+      const user2_name = z.util.get_first_name(message_et.user_ets()[0], z.string.Declension.ACCUSATIVE);
+      return z.l10n.text(z.string.system_notification_member_join_one, {
+        user1: message_et.user().first_name(),
+        user2: user2_name,
       });
     }
 
-    return z.localization.Localizer.get_text({
-      id: z.string.system_notification_member_join_many,
-      replace: [
-        {
-          content: message_et.user().first_name(),
-          placeholder: '%s.first_name',
-        },
-        {
-          content: message_et.user_ids().length,
-          placeholder: '%no',
-        },
-      ],
+    return z.l10n.text(z.string.system_notification_member_join_many, {
+      number: message_et.user_ids().length,
+      user: message_et.user().first_name(),
     });
   }
 
@@ -332,13 +322,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
       case z.message.SystemMessageType.CONNECTION_REQUEST:
         return z.l10n.text(z.string.system_notification_connection_request);
       case z.message.SystemMessageType.CONVERSATION_CREATE:
-        return z.localization.Localizer.get_text({
-          id: z.string.system_notification_conversation_create,
-          replace: {
-            content: message_et.user().first_name(),
-            placeholder: '%s.first_name',
-          },
-        });
+        return z.l10n.text(z.string.system_notification_conversation_create, message_et.user().first_name());
       default:
         this.logger.log(this.logger.levels.OFF, `Notification for '${message_et.id} in '${conversation_et.id}' does not show notification.`);
     }
@@ -369,13 +353,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    * @returns {string} Notification message body
    */
   _create_body_reaction(message_et) {
-    return z.localization.Localizer.get_text({
-      id: z.string.system_notification_reaction,
-      replace: {
-        content: message_et.reaction,
-        placeholder: '%reaction',
-      },
-    });
+    return z.l10n.text(z.string.system_notification_reaction, message_et.reaction);
   }
 
   /**
@@ -735,15 +713,5 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
 
     this.notifications.push(notification);
     this.logger.info(`Added notification for '${message_id}' in '${conversation_id}' to queue.`);
-
-    window.onunload = () => {
-      this.notifications.forEach((browser_notification) => {
-        browser_notification.close();
-        if (browser_notification.data) {
-          const {notification_conversation_id, notification_message_id} = browser_notification.data;
-          this.logger.info(`Notification for '${notification_message_id}' in '${notification_conversation_id}' closed by redirect.`);
-        }
-      });
-    };
   }
 };

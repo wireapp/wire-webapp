@@ -185,44 +185,20 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     this.can_verify_password = ko.pureComputed(() => !this.disabled_by_animation() && this.password().length);
 
     this.account_retry_text = ko.pureComputed(() => {
-      return z.localization.Localizer.get_text({
-        id: z.string.auth_posted_retry,
-        replace: {
-          content: this.username(),
-          placeholder: '%email',
-        },
-      });
+      return z.l10n.text(z.string.auth_posted_retry, this.username());
     });
 
     this.account_resend_text = ko.pureComputed(() => {
-      return z.localization.Localizer.get_text({
-        id: z.string.auth_posted_resend,
-        replace: {
-          content: this.username(),
-          placeholder: '%email',
-        },
-      });
+      return z.l10n.text(z.string.auth_posted_resend, this.username());
     });
 
     this.verify_code_text = ko.pureComputed(() => {
       const phone_number = PhoneFormat.formatNumberForMobileDialing('', this.phone_number_e164()) || this.phone_number_e164();
-      return z.localization.Localizer.get_text({
-        id: z.string.auth_verify_code_description,
-        replace: {
-          content: phone_number,
-          placeholder: '%@number',
-        },
-      });
+      return z.l10n.text(z.string.auth_verify_code_description, phone_number);
     });
 
     this.verify_code_timer_text = ko.pureComputed(() => {
-      return z.localization.Localizer.get_text({
-        id: z.string.auth_verify_code_resend_timer,
-        replace: {
-          content: this.code_expiration_in(),
-          placeholder: '%expiration',
-        },
-      });
+      return z.l10n.text(z.string.auth_verify_code_resend_timer, this.code_expiration_in());
     });
 
     this.visible_section = ko.observable(undefined);
@@ -238,6 +214,10 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       ];
       return login_modes.includes(this.account_mode());
     });
+
+    this.blocked_mode = ko.observable(undefined);
+    this.blocked_mode_database = ko.pureComputed(() => this.blocked_mode() === z.auth.AuthView.MODE.BLOCKED_DATABASE);
+    this.blocked_mode_tabs = ko.pureComputed(() => this.blocked_mode() === z.auth.AuthView.MODE.BLOCKED_TABS);
 
     this.posted_mode = ko.observable(undefined);
     this.posted_mode_offline = ko.pureComputed(() => this.posted_mode() === z.auth.AuthView.MODE.POSTED_OFFLINE);
@@ -258,6 +238,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     ko.applyBindings(this, document.getElementById(element_id));
 
     this.show_initial_animation = false;
+    this.tabs_check_interval_id = undefined;
+    this.tabs_check_hash = undefined;
 
     this._init_base();
     this._track_app_launch();
@@ -265,13 +247,12 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
   }
 
   _init_base() {
-    this._init_url_parameter();
-    this._init_url_hash();
-
     $(window)
       .on('dragover drop', () => false)
       .on('hashchange', this._on_hash_change.bind(this))
       .on('keydown', this.keydown_auth.bind(this));
+
+    this._init_page();
 
     // Select country based on location of user IP
     this.country_code((z.util.CountryCodes.get_country_code($('[name=geoip]').attr('country')) || 1).toString());
@@ -280,10 +261,25 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     this.audio_repository.init();
   }
 
+  _init_page() {
+    this._check_database()
+      .then(() => this._check_single_instance())
+      .then(() => {
+        this._init_url_parameter();
+        this._init_url_hash();
+      })
+      .catch((error) => {
+        if (!(error instanceof z.auth.AuthError)) {
+          throw error;
+        }
+      });
+  }
+
   _init_url_hash() {
     const modes_to_block = [
       z.auth.AuthView.MODE.HISTORY,
       z.auth.AuthView.MODE.LIMIT,
+      z.auth.AuthView.MODE.BLOCKED_TABS,
       z.auth.AuthView.MODE.POSTED,
       z.auth.AuthView.MODE.POSTED_PENDING,
       z.auth.AuthView.MODE.POSTED_RETRY,
@@ -321,6 +317,108 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     if (is_expired) {
       this.session_expired(true);
     }
+  }
+
+
+  //##############################################################################
+  // Private mode and & multiple tabs check
+  //##############################################################################
+
+  /**
+   * Check that we are not in unsupported private mode browser.
+   * @returns {Promise} Resolves when the database check has passed
+   */
+  _check_database() {
+    const current_hash = this._get_hash();
+
+    return z.util.check_indexed_db()
+      .then(() => {
+        if (current_hash === z.auth.AuthView.MODE.BLOCKED_DATABASE) {
+          this._set_hash();
+        }
+      })
+      .catch((error) => {
+        if (current_hash !== z.auth.AuthView.MODE.BLOCKED_DATABASE) {
+          this._set_hash(z.auth.AuthView.MODE.BLOCKED_DATABASE);
+          throw error;
+        }
+      });
+  }
+
+  /**
+   * Check that this is the single instance tab of the app.
+   * @param {boolean} [set_check_interval=true] - Set check interval
+   * @returns {Promise} Resolves when page is the first tab
+   */
+  _check_single_instance(set_check_interval = true) {
+    if (Cookies.get(z.main.App.CONFIG.COOKIE_NAME)) {
+      this._handle_blocked_tabs(set_check_interval);
+      return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.MULTIPLE_TABS));
+    }
+
+    if (set_check_interval) {
+      this._set_tabs_check_interval();
+    }
+    return Promise.resolve();
+  }
+
+  _clear_tabs_check_interval() {
+    window.clearInterval(this.tabs_check_interval_id);
+    this.tabs_check_interval_id = undefined;
+  }
+
+  _handle_blocked_tabs(set_check_interval) {
+    const current_hash = this._get_hash();
+    const is_blocked_tabs_hash = current_hash === z.auth.AuthView.MODE.BLOCKED_TABS;
+
+    if (!is_blocked_tabs_hash) {
+      if (!this.tabs_check_hash) {
+        this.tabs_check_hash = current_hash;
+        this._set_hash(z.auth.AuthView.MODE.BLOCKED_TABS);
+      }
+
+      if (set_check_interval) {
+        this._set_tabs_recheck_interval();
+      }
+    }
+  }
+
+  _set_tabs_check_interval() {
+    this._clear_tabs_check_interval();
+
+    this.tabs_check_interval_id = window.setInterval(() => {
+      this._check_single_instance()
+        .catch((error) => {
+          if (error.type !== z.auth.AuthError.TYPE.MULTIPLE_TABS) {
+            throw error;
+          }
+          this._handle_blocked_tabs();
+        });
+    }, 500);
+  }
+
+  _set_tabs_recheck_interval() {
+    this._clear_tabs_check_interval();
+
+    this.tabs_check_interval_id = window.setInterval(() => {
+      this._check_single_instance(false)
+        .then(() => {
+          this._set_tabs_check_interval();
+          this._init_url_parameter();
+
+          if (this.tabs_check_hash) {
+            this._set_hash(this.tabs_check_hash);
+            return this.tabs_check_hash = undefined;
+          }
+
+          this._init_url_hash();
+        })
+        .catch((error) => {
+          if (error.type !== z.auth.AuthError.TYPE.MULTIPLE_TABS) {
+            throw error;
+          }
+        });
+    }, 500);
   }
 
 
@@ -714,6 +812,12 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
         this._remove_error(event.currentTarget.classList[1]);
       }
     }
+  }
+  clicked_on_blocked_learn_more() {
+    if (this.blocked_mode === z.auth.AuthView.MODE.BLOCKED_TABS) {
+      return z.util.safe_window_open(z.string.url_support_multiple_tabs);
+    }
+    z.util.safe_window_open(z.string.url_support_private_mode);
   }
 
   clicked_on_change_email() {
@@ -1121,6 +1225,24 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.REGISTRATION.OPENED_EMAIL_SIGN_UP, {context: this.registration_context});
   }
 
+  _show_blocked_database() {
+    const switch_params = {
+      mode: z.auth.AuthView.MODE.BLOCKED_DATABASE,
+      section: z.auth.AuthView.SECTION.BLOCKED,
+    };
+
+    this.switch_ui(switch_params);
+  }
+
+  _show_blocked_tabs() {
+    const switch_params = {
+      mode: z.auth.AuthView.MODE.BLOCKED_TABS,
+      section: z.auth.AuthView.SECTION.BLOCKED,
+    };
+
+    this.switch_ui(switch_params);
+  }
+
   _show_history() {
     const switch_params = {
       mode: z.auth.AuthView.MODE.HISTORY,
@@ -1257,6 +1379,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
     if (switch_params.section === z.auth.AuthView.SECTION.ACCOUNT) {
       this.account_mode(switch_params.mode);
+    } else if (switch_params.section === z.auth.AuthView.SECTION.BLOCKED) {
+      this.blocked_mode(switch_params.mode);
     } else if (switch_params.section === z.auth.AuthView.SECTION.POSTED) {
       this.posted_mode(switch_params.mode);
     }
@@ -1457,6 +1581,14 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
       case z.auth.AuthView.MODE.ACCOUNT_PHONE:
         this._show_account_phone();
+        break;
+
+      case z.auth.AuthView.MODE.BLOCKED_DATABASE:
+        this._show_blocked_database();
+        break;
+
+      case z.auth.AuthView.MODE.BLOCKED_TABS:
+        this._show_blocked_tabs();
         break;
 
       case z.auth.AuthView.MODE.HISTORY:

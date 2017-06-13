@@ -53,7 +53,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.conversations = ko.observableArray([]);
 
     this.active_team = this.team_repository.active_team;
-    this.team_repository.teams.subscribe(() => this.map_guest_status());
+    this.team_repository.known_team_ids.subscribe(() => this.map_guest_status());
 
     this.block_event_handling = true;
     this.fetching_conversations = {};
@@ -814,7 +814,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   _map_guest_status(conversation_et) {
     const team_id = conversation_et.team_id;
-    const is_guest = !!(team_id && !this.team_repository.known_team_ids().includes(team_id));
+    const is_guest = team_id && !this.team_repository.known_team_ids().includes(team_id);
     conversation_et.is_guest(is_guest);
   }
 
@@ -1119,17 +1119,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
       tag = z.l10n.text(z.string.extensions_giphy_random);
     }
 
-    const message = z.localization.Localizer.get_text({
-      id: z.string.extensions_giphy_message,
-      replace: {
-        content: tag,
-        placeholder: '%tag',
-      },
-    });
-
     return z.util.load_url_blob(url)
       .then((blob) => {
-        this.send_text(message, conversation_et);
+        this.send_text(z.l10n.text(z.string.extensions_giphy_message, tag), conversation_et);
         return this.upload_images(conversation_et, [blob]);
       });
   }
@@ -1599,7 +1591,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this._send_and_inject_generic_message(conversation_et, generic_message, false)
       .then(() => {
         this._track_edit_message(conversation_et, original_message_et);
-        return this.send_link_preview(message, conversation_et, generic_message);
+        if (z.util.Environment.electron) {
+          return this.send_link_preview(message, conversation_et, generic_message);
+        }
       })
       .catch((error) => {
         if (error.type !== z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
@@ -1702,7 +1696,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
   send_text_with_link_preview(message, conversation_et) {
     return this.send_text(message, conversation_et)
       .then((generic_message) => {
-        return this.send_link_preview(message, conversation_et, generic_message);
+        if (z.util.Environment.electron) {
+          return this.send_link_preview(message, conversation_et, generic_message);
+        }
       })
       .catch((error) => {
         if (error.type !== z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
