@@ -605,13 +605,18 @@ z.event.EventRepository = class EventRepository {
    * @returns {boolean} Returns true if event is handled within is lifetime, otherwise throws error
    */
   _validate_call_event_lifetime(event) {
-    if (this.notification_handling_state() === z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET) return true;
-    if (event.content.type === z.calling.enum.CALL_MESSAGE_TYPE.CANCEL) return true;
+    const {content, conversation: conversation_id, time, type} = event;
+
+    const web_socket_state = this.notification_handling_state() === z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
+    const is_cancel = content.type === z.calling.enum.CALL_MESSAGE_TYPE.CANCEL;
+    if (web_socket_state || is_cancel) {
+      return true;
+    }
 
     const corrected_timestamp = Date.now() - this.clock_drift;
-    const event_timestamp = new Date(event.time).getTime();
+    const event_timestamp = new Date(time).getTime();
     if (corrected_timestamp > (event_timestamp + EventRepository.CONFIG.E_CALL_EVENT_LIFETIME)) {
-      this.logger.info(`Ignored outdated '${event.type}' event in conversation '${event.conversation}' - Event: '${event_timestamp}', Local: '${corrected_timestamp}'`, {event_json: JSON.stringify(event), event_object: event});
+      this.logger.info(`Ignored outdated '${type}' event in conversation '${conversation_id}' - Event: '${event_timestamp}', Local: '${corrected_timestamp}'`, {event_json: JSON.stringify(event), event_object: event});
       throw new z.event.EventError(z.event.EventError.TYPE.OUTDATED_E_CALL_EVENT);
     }
     return true;
