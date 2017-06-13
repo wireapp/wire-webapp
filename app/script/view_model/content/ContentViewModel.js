@@ -167,19 +167,8 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
           return;
         }
 
+        this._update_active_team(conversation_et);
         this._release_content(this.content_state(), conversation_et);
-
-        const team_id = conversation_et.team_id;
-        if (this.team_repository.active_team().id !== team_id) {
-          let team_promise;
-          if (team_id && !conversation_et.is_guest()) {
-            team_promise = this.team_repository.get_team_by_id(team_id);
-          } else {
-            team_promise = Promise.resolve(this.team_repository.personal_space);
-          }
-
-          team_promise.then((team_et) => this.team_repository.active_team(team_et));
-        }
 
         this.content_state(z.ViewModel.content.CONTENT_STATE.CONVERSATION);
         this.conversation_repository.active_conversation(conversation_et);
@@ -278,5 +267,19 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
   _show_content(new_content_state) {
     this.content_state(new_content_state);
     return this._shift_content(this._get_element_of_content(new_content_state));
+  }
+
+  _update_active_team(conversation_et) {
+    const {is_guest, team_id} = conversation_et;
+
+    if (this.team_repository.active_team().id !== team_id) {
+      let team_et;
+      if (team_id && !is_guest()) {
+        [team_et] = this.teams().filter((_team_et) => _team_et.id === team_id);
+      } else {
+        team_et = this.team_repository.personal_space;
+      }
+      this.team_repository.active_team(team_et);
+    }
   }
 };
