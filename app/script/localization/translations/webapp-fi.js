@@ -284,6 +284,7 @@ z.string.fi.people_invite_headline = 'Kutsu kavereitasi';
 z.string.fi.people_tabs_details = 'Lisätietoja';
 z.string.fi.people_tabs_devices = 'Laitteet';
 z.string.fi.people_tabs_devices_headline = 'Wire antaa jokaiselle laitteelle yksilöllisen sormenjäljen. Vertaa niitä {{user}} kanssa ja vahvista keskustelusi.';
+z.string.fi.people_tabs_devices_learn_more = 'Lue lisää';
 z.string.fi.people_tabs_devices_why_verify = 'Miksi vahvistaa keskustelu?';
 z.string.fi.people_tabs_no_devices_headline = '{{user}} käyttää vanhaa Wire-versiota. Laitteita ei näytetä täällä.';
 z.string.fi.people_tabs_device_detail_all_my_devices = 'Näytä kaikki laitteeni';

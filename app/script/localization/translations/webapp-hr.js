@@ -275,6 +275,7 @@ z.string.hr.people_invite_headline = 'Pozovi prijatelje';
 z.string.hr.people_tabs_details = 'Detalji';
 z.string.hr.people_tabs_devices = 'Uređaji';
 z.string.hr.people_tabs_devices_headline = 'Wire daje svakom uređaju jedinstveni otisak. Usporedite otiske s {{user}} da bi verificirali razgovor.';
+z.string.hr.people_tabs_devices_learn_more = 'Saznaj više';
 z.string.hr.people_tabs_devices_why_verify = 'Zašto verifikacija razgovora?';
 z.string.hr.people_tabs_no_devices_headline = '{{user}} koristi staru verziju Wire. Nema novih uređaja.';
 z.string.hr.people_tabs_device_detail_all_my_devices = 'Pokaži sve uređaje';

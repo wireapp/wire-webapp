@@ -323,6 +323,7 @@ z.string.ru.people_invite_headline = 'Приведите друзей';
 z.string.ru.people_tabs_details = 'Подробнее';
 z.string.ru.people_tabs_devices = 'Устройства';
 z.string.ru.people_tabs_devices_headline = 'Wire даёт каждому устройству уникальный отпечаток. Сравните их с {{user}}, чтобы верифицировать разговор.';
+z.string.ru.people_tabs_devices_learn_more = 'Подробнее';
 z.string.ru.people_tabs_devices_why_verify = 'Зачем верифицировать разговоры?';
 z.string.ru.people_tabs_no_devices_headline = '{{user}} использует устаревшую версию Wire. Устройства не отображаются.';
 z.string.ru.people_tabs_device_detail_all_my_devices = 'Показать все мои устройства';
@@ -535,7 +536,6 @@ z.string.ru.tooltip_conversations_archived = 'Показать архив ({{num
 z.string.ru.tooltip_conversations_more = 'Больше';
 z.string.ru.tooltip_conversations_notify = 'Включить звук ({{shortcut}})';
 z.string.ru.tooltip_conversations_silence = 'Выключить звук ({{shortcut}})';
-z.string.ru.tooltip_conversations_start = 'Начать разговор ({{shortcut}})';
 
 z.string.ru.tooltip_people_add = 'Добавить людей в разговор ({{shortcut}})';
 z.string.ru.tooltip_people_back = 'Назад';

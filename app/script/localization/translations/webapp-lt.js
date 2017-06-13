@@ -316,6 +316,7 @@ z.string.lt.people_invite_headline = 'Pasikvieskite savo draugus';
 z.string.lt.people_tabs_details = 'Išsamiau';
 z.string.lt.people_tabs_devices = 'Įrenginiai';
 z.string.lt.people_tabs_devices_headline = 'Wire kiekvienam įrenginiui suteikia unikalų kontrolinį kodą. Palyginkite juos su {{user}} ir patvirtinkite savo pokalbį.';
+z.string.lt.people_tabs_devices_learn_more = 'Sužinoti daugiau';
 z.string.lt.people_tabs_devices_why_verify = 'Kam patvirtinti pokalbį?';
 z.string.lt.people_tabs_no_devices_headline = '{{user}} naudoja seną Wire versiją. Čia nerodomi jokie įrenginiai.';
 z.string.lt.people_tabs_device_detail_all_my_devices = 'Rodyti visus mano įrenginius';

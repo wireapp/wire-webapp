@@ -313,6 +313,7 @@ z.string.da.people_invite_headline = 'Få dine venner med';
 z.string.da.people_tabs_details = 'Detaljer';
 z.string.da.people_tabs_devices = 'Enheder';
 z.string.da.people_tabs_devices_headline = 'Wire giver hver enhed et unikt fingeraftryk. Sammenlign dem med {{user}} og bekræft din samtale.';
+z.string.da.people_tabs_devices_learn_more = 'Lær mere';
 z.string.da.people_tabs_devices_why_verify = 'Hvorfor bekræfte samtale?';
 z.string.da.people_tabs_no_devices_headline = '{{user}} bruger en gammel version af Wire. Ingen enheder er vist her.';
 z.string.da.people_tabs_device_detail_all_my_devices = 'Vis alle mine enheder';

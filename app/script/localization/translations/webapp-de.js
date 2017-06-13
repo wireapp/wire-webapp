@@ -329,6 +329,7 @@ z.string.de.people_invite_headline = 'Hole deine Freunde';
 z.string.de.people_tabs_details = 'Details';
 z.string.de.people_tabs_devices = 'Geräte';
 z.string.de.people_tabs_devices_headline = 'Wire gibt jedem Gerät einen einzigartigen Fingerabdruck. Vergleiche diese mit {{user}} und überprüfe deine Unterhaltung.';
+z.string.de.people_tabs_devices_learn_more = 'Erfahre mehr';
 z.string.de.people_tabs_devices_why_verify = 'Warum sollte ich meine Unterhaltungen verifizieren?';
 z.string.de.people_tabs_no_devices_headline = '{{user}} benutzt eine ältere Version von Wire. Es werden keine Geräte angezeigt.';
 z.string.de.people_tabs_device_detail_all_my_devices = 'Alle meine Geräte anzeigen';
@@ -545,6 +546,7 @@ z.string.de.tooltip_conversations_archive = 'Archivieren ({{shortcut}})';
 z.string.de.tooltip_conversations_archived = 'Archiv anzeigen ({{number}})';
 z.string.de.tooltip_conversations_more = 'Mehr';
 z.string.de.tooltip_conversations_notify = 'Benachrichtigen ({{shortcut}})';
+z.string.de.tooltip_conversations_preferences = 'Einstellungen öffnen';
 z.string.de.tooltip_conversations_silence = 'Stummschalten ({{shortcut}})';
 z.string.de.tooltip_conversations_start = 'Unterhaltung beginnen ({{shortcut}})';
 
