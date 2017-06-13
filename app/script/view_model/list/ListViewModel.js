@@ -285,7 +285,6 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
           this.conversation_repository.clear_conversation(conversation_et, next_conversation, leave);
         },
         conversation: conversation_et,
-        data: conversation_et.display_name(),
       });
     }
   }
