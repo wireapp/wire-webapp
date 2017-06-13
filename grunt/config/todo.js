@@ -61,8 +61,8 @@ module.exports = {
   },
 
   src: [
-    '<%= dir.app_ %>/**/*.coffee',
+    '<%= dir.app_ %>/**/*.js',
     '<%= dir.app.style %>/**/*.less',
-    '<%= dir.test.unit_tests %>/**/*.coffee',
+    '<%= dir.test_ %>/**/*.js',
   ],
 };

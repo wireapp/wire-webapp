@@ -71,8 +71,6 @@ module.exports = (grunt) => {
     aws_s3: require('./grunt/config/aws_s3'),
     bower: require('./grunt/config/bower'),
     clean: require('./grunt/config/clean'),
-    coffee: require('./grunt/config/coffee'),
-    coffeelint: require('./grunt/config/coffeelint'),
     compress: require('./grunt/config/compress'),
     concat: require('./grunt/config/concat'),
     connect: require('./grunt/config/connect'),
@@ -138,7 +136,6 @@ module.exports = (grunt) => {
     grunt.config('karma.options.reporters', ['progress']);
     grunt.task.run([
       'scripts',
-      'newer:coffee:dist',
       'newer:copy:dist_js',
       `test_prepare:${test_name}`,
       'karma:test',
