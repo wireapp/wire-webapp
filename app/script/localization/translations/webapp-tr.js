@@ -324,6 +324,7 @@ z.string.tr.people_invite_headline = 'Arkadaşlarınızı getirin';
 z.string.tr.people_tabs_details = 'Detaylar';
 z.string.tr.people_tabs_devices = 'Cihazlar';
 z.string.tr.people_tabs_devices_headline = 'Wire her cihaza eşsiz bir parmak izi verir. {{user}} ile karşılaştırın ve konuşmayı doğrulayın.';
+z.string.tr.people_tabs_devices_learn_more = 'Daha fazla bilgi';
 z.string.tr.people_tabs_devices_why_verify = 'Neden konuşmayı doğrulamalıyız?';
 z.string.tr.people_tabs_no_devices_headline = '{{user}}, Wire’ın eski bir versiyonunu kullanıyor. Hiçbir cihaz burada gösterilmiyor.';
 z.string.tr.people_tabs_device_detail_all_my_devices = 'Tüm cihazlarımı göster';

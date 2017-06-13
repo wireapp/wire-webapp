@@ -318,6 +318,7 @@ z.string.pt.people_invite_headline = 'Traga os seus amigos';
 z.string.pt.people_tabs_details = 'Detalhes';
 z.string.pt.people_tabs_devices = 'Dispositivos';
 z.string.pt.people_tabs_devices_headline = 'O Wire fornece a cada dispositivo uma impressão digital única. Compare-as com {{user}} e verifique a sua conversa.';
+z.string.pt.people_tabs_devices_learn_more = 'Mais informação';
 z.string.pt.people_tabs_devices_why_verify = 'Por que verificar conversas?';
 z.string.pt.people_tabs_no_devices_headline = '{{user}} está usando uma versão antiga do Wire. Nenhum dispositivo será mostrado aqui.';
 z.string.pt.people_tabs_device_detail_all_my_devices = 'Mostrar todos os meus dispositivos';

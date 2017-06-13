@@ -255,7 +255,7 @@ z.string.conversation_verified = 'Verified';
 z.string.conversation_voice_channel_deactivate = ' called';
 z.string.conversation_voice_channel_deactivate_you = ' called';
 z.string.conversation_yesterday = 'Yesterday';
-z.string.conversation_unable_to_decrypt_1 = 'a message from {{user}}was not received.';
+z.string.conversation_unable_to_decrypt_1 = 'a message from {{user}} was not received.';
 z.string.conversation_unable_to_decrypt_2 = '{{user}}´s device identity changed. Undelivered message.';
 z.string.conversation_unable_to_decrypt_link = 'Why?';
 z.string.conversation_unable_to_decrypt_error_message = 'Error';
@@ -350,7 +350,7 @@ z.string.extensions_bubble_button_gif = 'Gif';
 // Extensions Giphy
 z.string.extensions_giphy_button_ok = 'Send';
 z.string.extensions_giphy_button_more = 'Try Another';
-z.string.extensions_giphy_message = '{{tag}}} • via giphy.com';
+z.string.extensions_giphy_message = '{{tag}} • via giphy.com';
 z.string.extensions_giphy_no_gifs = 'Oops, no gifs';
 z.string.extensions_giphy_random = 'Random';
 
@@ -372,6 +372,7 @@ z.string.people_invite_headline = 'Bring your friends';
 z.string.people_tabs_details = 'Details';
 z.string.people_tabs_devices = 'Devices';
 z.string.people_tabs_devices_headline = 'Wire gives every device a unique fingerprint. Compare them with {{user}} and verify your conversation.';
+z.string.people_tabs_devices_learn_more = 'Learn more';
 z.string.people_tabs_devices_why_verify = 'Why verify conversation?';
 z.string.people_tabs_no_devices_headline = '{{user}} is using an old version of Wire. No devices are shown here.';
 z.string.people_tabs_device_detail_all_my_devices = 'Show all my devices';

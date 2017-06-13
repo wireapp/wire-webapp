@@ -325,6 +325,7 @@ z.string.hu.people_invite_headline = 'Hozza magával barátait';
 z.string.hu.people_tabs_details = 'Részletek';
 z.string.hu.people_tabs_devices = 'Eszközök';
 z.string.hu.people_tabs_devices_headline = 'A Wire minden eszköznek egyedi ujjlenyomatot ad. Hasonlítsa össze vele: {{user}} majd ellenőrizze a beszélgetést.';
+z.string.hu.people_tabs_devices_learn_more = 'További információk';
 z.string.hu.people_tabs_devices_why_verify = 'Mért ellenőrizze a beszélgetést?';
 z.string.hu.people_tabs_no_devices_headline = '{{user}} a Wire régi verzióját használja. Eszközei itt nem jeleníthetőek meg.';
 z.string.hu.people_tabs_device_detail_all_my_devices = 'Eszközei megjelenítése';

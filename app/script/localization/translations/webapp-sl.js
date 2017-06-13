@@ -325,6 +325,7 @@ z.string.sl.people_invite_headline = 'Pripeljite vaše prijatelje';
 z.string.sl.people_tabs_details = 'Podrobnosti';
 z.string.sl.people_tabs_devices = 'Naprave';
 z.string.sl.people_tabs_devices_headline = 'Wire dodeli vsaki napravi edinstven prstni odtis. Primerjajte jih z {{user}} in preverite vaš pogovor.';
+z.string.sl.people_tabs_devices_learn_more = 'Nauči se več';
 z.string.sl.people_tabs_devices_why_verify = 'Zakaj preveriti pogovor?';
 z.string.sl.people_tabs_no_devices_headline = '{{user}} uporablja starejšo različico Wire. Nobenih naprav tukaj ni prikazano.';
 z.string.sl.people_tabs_device_detail_all_my_devices = 'Prikaži vse moje naprave';

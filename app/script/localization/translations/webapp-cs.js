@@ -270,6 +270,7 @@ z.string.cs.people_invite_headline = 'Přiveďte své přátele';
 z.string.cs.people_tabs_details = 'Podrobnosti';
 z.string.cs.people_tabs_devices = 'Přístroje';
 z.string.cs.people_tabs_devices_headline = 'Wire přiřazuje každému přístroji jedinečný identifikátor. Porovnejte je s {{user}} a ověřte svou konverzaci.';
+z.string.cs.people_tabs_devices_learn_more = 'Dozvědět se více';
 z.string.cs.people_tabs_devices_why_verify = 'Proč mám ověřovat konverzaci?';
 z.string.cs.people_tabs_no_devices_headline = '{{user}} používá starší verzi aplikace Wire. Nejsou zde zobrazeny žádné přístroje.';
 z.string.cs.people_tabs_device_detail_all_my_devices = 'Zobrazit všechny mé přístroje';
