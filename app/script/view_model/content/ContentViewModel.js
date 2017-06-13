@@ -277,7 +277,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
       let team_et;
 
       if (is_team) {
-        team_et = this.teams().find((_team_et) => _team_et.id === team_id);
+        team_et = this.team_repository.teams().find((_team_et) => _team_et.id === team_id);
       }
 
       if (!team_et) {
