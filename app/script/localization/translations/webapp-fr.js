@@ -316,6 +316,7 @@ z.string.fr.people_invite_headline = 'Invitez vos amis';
 z.string.fr.people_tabs_details = 'Détails';
 z.string.fr.people_tabs_devices = 'Appareils';
 z.string.fr.people_tabs_devices_headline = 'Wire donne à chaque appareil une empreinte unique. Comparez-les avec {{user}} et vérifiez votre conversation.';
+z.string.fr.people_tabs_devices_learn_more = 'En savoir plus ';
 z.string.fr.people_tabs_devices_why_verify = 'Pourquoi vérifier une conversation ?';
 z.string.fr.people_tabs_no_devices_headline = '{{user}} utilise une ancienne version de Wire. Aucun appareil n’est indiqué ici.';
 z.string.fr.people_tabs_device_detail_all_my_devices = 'Afficher tous mes appareils';

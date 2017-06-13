@@ -324,6 +324,7 @@ z.string.uk.people_invite_headline = 'Приведіть друзів';
 z.string.uk.people_tabs_details = 'Подробиці';
 z.string.uk.people_tabs_devices = 'Пристрої';
 z.string.uk.people_tabs_devices_headline = 'Wire присвоює кожному пристроєві унікальний ідентифікатор. Порівняйте його з ідентифікатором на пристрої контакту {{user}} та верифікуйте вашу розмову.';
+z.string.uk.people_tabs_devices_learn_more = 'Дізнатися більше';
 z.string.uk.people_tabs_devices_why_verify = 'Навіщо верифікувати розмови?';
 z.string.uk.people_tabs_no_devices_headline = '{{user}} використовує стару версію Wire, тому не показується жоден пристрій.';
 z.string.uk.people_tabs_device_detail_all_my_devices = 'Показати всі мої пристрої';

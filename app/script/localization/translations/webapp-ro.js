@@ -317,6 +317,7 @@ z.string.ro.people_invite_headline = 'Invită prietenii';
 z.string.ro.people_tabs_details = 'Detalii';
 z.string.ro.people_tabs_devices = 'Dispozitive';
 z.string.ro.people_tabs_devices_headline = 'Wire oferă fiecărui dispozitiv o amprentă unică. Compară amprentele cu {{user}} și verifică conversația.';
+z.string.ro.people_tabs_devices_learn_more = 'Află mai multe';
 z.string.ro.people_tabs_devices_why_verify = 'De ce să verific această conversație?';
 z.string.ro.people_tabs_no_devices_headline = '{{user}} folosește o versiune veche de Wire. Nu sunt afișate dispozitive.';
 z.string.ro.people_tabs_device_detail_all_my_devices = 'Arată toate dispozitivele mele';

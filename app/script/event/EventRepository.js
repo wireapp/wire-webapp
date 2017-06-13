@@ -518,11 +518,13 @@ z.event.EventRepository = class EventRepository {
    * @returns {undefined} No return value
    */
   inject_event(event, can_create_notification = true) {
-    if (event.conversation !== this.user_repository.self().id) {
-      this.logger.info(
-        `Injected event ID '${event.id}' of type '${event.type}'`,
-        event
-      );
+    const {
+      conversation: conversation_id,
+      id = 'ID not specified',
+      type,
+    } = event;
+    if (conversation_id !== this.user_repository.self().id) {
+      this.logger.info(`Injected event ID '${id}' of type '${type}'`, event);
       const source = can_create_notification
         ? EventRepository.NOTIFICATION_SOURCE.INJECTED
         : EventRepository.NOTIFICATION_SOURCE.STREAM;

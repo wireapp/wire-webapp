@@ -89,7 +89,7 @@ z.string.sk.auth_placeholder_email = 'E-mail';
 z.string.sk.auth_placeholder_name = 'Meno';
 z.string.sk.auth_placeholder_password_put = 'Heslo';
 z.string.sk.auth_placeholder_password_set = 'Heslo (minimálne 8 znakov)';
-z.string.sk.auth_placeholder_phone = 'Telefóne číslo';
+z.string.sk.auth_placeholder_phone = 'Telefónne číslo';
 
 z.string.sk.auth_error_code = 'Neplatný kód';
 z.string.sk.auth_error_country_code_invalid = 'Neplatný kód krajiny';
@@ -329,6 +329,7 @@ z.string.sk.people_invite_headline = 'Pozvať priateľov';
 z.string.sk.people_tabs_details = 'Detaily';
 z.string.sk.people_tabs_devices = 'Zariadenia';
 z.string.sk.people_tabs_devices_headline = 'Wire dáva každému zariadeniu jedinečný identifikátor. Porovnajte ich s {{user}} a overte Vaše rozhovory.';
+z.string.sk.people_tabs_devices_learn_more = 'Zistiť viac';
 z.string.sk.people_tabs_devices_why_verify = 'Prečo overiť rozhovor?';
 z.string.sk.people_tabs_no_devices_headline = '{{user}} používa staršiu verziu Wire. Žiadne zariadenia sa tu nezobrazujú.';
 z.string.sk.people_tabs_device_detail_all_my_devices = 'Zobraziť všetky moje zariadenia';

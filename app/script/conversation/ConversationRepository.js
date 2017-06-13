@@ -68,7 +68,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.conversations = ko.observableArray([]);
 
     this.active_team = this.team_repository.active_team;
-    this.team_repository.teams.subscribe(() => this.map_guest_status());
+    this.team_repository.known_team_ids.subscribe(() =>
+      this.map_guest_status()
+    );
 
     this.block_event_handling = true;
     this.fetching_conversations = {};
@@ -1061,9 +1063,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   _map_guest_status(conversation_et) {
     const team_id = conversation_et.team_id;
-    const is_guest = !!(
-      team_id && !this.team_repository.known_team_ids().includes(team_id)
-    );
+    const is_guest =
+      team_id && !this.team_repository.known_team_ids().includes(team_id);
     conversation_et.is_guest(is_guest);
   }
 

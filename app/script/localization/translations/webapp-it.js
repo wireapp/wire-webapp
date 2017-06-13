@@ -318,6 +318,7 @@ z.string.it.people_invite_headline = 'Invita i tuoi amici';
 z.string.it.people_tabs_details = 'Dettagli';
 z.string.it.people_tabs_devices = 'Dispositivi';
 z.string.it.people_tabs_devices_headline = 'Wire dà un’impronta unica a ogni dispositivo. Confrontale con {{user}} e verifica la tua conversazione.';
+z.string.it.people_tabs_devices_learn_more = 'Ulteriori informazioni';
 z.string.it.people_tabs_devices_why_verify = 'Perché verificare la conversazione?';
 z.string.it.people_tabs_no_devices_headline = '{{user}} sta utilizzando una vecchia versione di Wire. Nessun dispositivo da visualizzare qui.';
 z.string.it.people_tabs_device_detail_all_my_devices = 'Mostra tutti i miei dispositivi';

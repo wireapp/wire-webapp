@@ -302,6 +302,7 @@ z.string.es.people_invite_headline = 'Tráete a tus amigos';
 z.string.es.people_tabs_details = 'Detalles';
 z.string.es.people_tabs_devices = 'Dispositivos';
 z.string.es.people_tabs_devices_headline = 'Wire proporciona a cada dispositivo una huella digital única. Comparala con {{user}} y verifica tu conversación.';
+z.string.es.people_tabs_devices_learn_more = 'Aprender más';
 z.string.es.people_tabs_devices_why_verify = '¿Por qué verificar la conversación?';
 z.string.es.people_tabs_no_devices_headline = '{{user}} está utilizando una versión antigua de Wire. No se muestran dispositivos aquí.';
 z.string.es.people_tabs_device_detail_all_my_devices = 'Mostrar todos mis dispositivos';
