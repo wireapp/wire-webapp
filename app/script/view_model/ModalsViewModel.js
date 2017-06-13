@@ -209,7 +209,7 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
     }
 
     const title_element = $(type).find('.modal-title');
-    title_element.text(z.l10n.text(z.string.modal_clear_conversation_headline, options.data));
+    title_element.text(z.l10n.text(z.string.modal_clear_conversation_headline));
 
     return type;
   }

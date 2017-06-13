@@ -154,7 +154,7 @@ z.string.modal_call_second_outgoing_headline = 'Hang up current call?';
 z.string.modal_call_second_outgoing_message = 'You can only be in one call at a time.';
 z.string.modal_call_second_outgoing_action = 'Hang Up';
 // Clear a conversation
-z.string.modal_clear_conversation_headline = 'Delete "{{user}}" content?';
+z.string.modal_clear_conversation_headline = 'Delete content?';
 z.string.modal_clear_conversation_message = 'This will clear the conversation history and remove it from your list.';
 z.string.modal_clear_conversation_option = 'Also leave the conversation';
 z.string.modal_clear_conversation_button = 'Delete';
