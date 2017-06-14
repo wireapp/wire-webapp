@@ -29,6 +29,9 @@
             <user-avatar class="image user-avatar-lg cursor-default" params="user: user" data-uie-name="status-profile-picture"></user-avatar>
           <!-- /ko -->
         </div>
+        <div class="user-profile-footer">
+          <!-- ko template: {name: get_footer_template} --><!-- /ko -->
+        </div>
       <!-- /ko -->
 
       <!-- ko if: tab_index() === 1 -->
@@ -58,10 +61,6 @@
           <!-- /ko -->
         </div>
       <!-- /ko -->
-
-      <div class="user-profile-footer">
-        <!-- ko template: {name: get_footer_template} --><!-- /ko -->
-      </div>
     </div>
 
     <div class="user-profile-device-detail">
