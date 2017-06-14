@@ -41,13 +41,7 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
     });
 
     this.display_edited_timestamp = () => {
-      return z.localization.Localizer.get_text({
-        id: z.string.conversation_edit_timestamp,
-        replace: {
-          content: moment(this.edited_timestamp).format('HH:mm'),
-          placeholder: '%@timestamp',
-        },
-      });
+      return z.l10n.text(z.string.conversation_edit_timestamp, moment(this.edited_timestamp).format('HH:mm'));
     };
 
     this.is_liked_provisional = ko.observable();
@@ -76,13 +70,7 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
           .map((user_et) => user_et.first_name())
           .join(', ');
       }
-      return z.localization.Localizer.get_text({
-        id: z.string.conversation_likes_caption,
-        replace: {
-          content: this.reactions_user_ets().length,
-          placeholder: '%@number',
-        },
-      });
+      return z.l10n.text(z.string.conversation_likes_caption, this.reactions_user_ets().length);
     });
   }
 

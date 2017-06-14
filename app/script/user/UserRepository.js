@@ -59,8 +59,6 @@ z.user.UserRepository = class UserRepository {
     this.users = ko.observableArray([]);
     this.connections = ko.observableArray([]);
 
-    this.fetching_users = {};
-
     this.connect_requests = ko.pureComputed(() => {
       return this.users()
         .filter((user_et) => user_et.is_incoming_request());
@@ -175,9 +173,9 @@ z.user.UserRepository = class UserRepository {
   /**
    * Create a new conversation.
    * @note Initially called by Wire for Web's app start to retrieve user entities and their connections.
-   * @param {number} limit=500 - Query limit for user connections
-   * @param {string} user_id - User ID of the latest connection
-   * @param {Array<z.entity.Connection>} connection_ets - Unordered array of user connections
+   * @param {number} [limit=500] - Query limit for user connections
+   * @param {string} [user_id] - User ID of the latest connection
+   * @param {Array<z.entity.Connection>} [connection_ets=[]] - Unordered array of user connections
    * @returns {Promise} Promise that resolves when all connections have been retrieved and mapped
    */
   get_connections(limit = 500, user_id, connection_ets = []) {
@@ -494,9 +492,9 @@ z.user.UserRepository = class UserRepository {
    */
   fetch_user_by_id(user_id) {
     return this.fetch_users_by_id([user_id])
-      .then((user_ets) => {
-        if (user_ets) {
-          return user_ets[0];
+      .then(([user_et]) => {
+        if (user_et) {
+          return user_et;
         }
       });
   }
@@ -512,20 +510,6 @@ z.user.UserRepository = class UserRepository {
     if (!user_ids.length) {
       return Promise.resolve([]);
     }
-
-    const user_ids_ongoing = [];
-    const user_ids_to_fetch = [];
-
-    const get_user_promises = user_ids
-      .map((user_id) => {
-        if (this.fetching_users.hasOwnProperty(user_id)) {
-          user_ids_ongoing.push(user_id);
-          return new Promise((resolve, reject) => this.fetching_users[user_id].push({reject_fn: reject, resolve_fn: resolve}));
-        }
-
-        user_ids_to_fetch.push(user_id);
-      })
-      .filter((get_promise) => get_promise);
 
     const _get_users = (user_id_chunk) => {
       return this.user_service.get_users(user_id_chunk)
@@ -543,23 +527,11 @@ z.user.UserRepository = class UserRepository {
         });
     };
 
-    let fetch_user_promises = [];
-    if (user_ids_to_fetch.length) {
-      const user_id_chunks = z.util.ArrayUtil.chunk(user_ids_to_fetch, z.config.MAXIMUM_USERS_PER_REQUEST);
-      fetch_user_promises = user_id_chunks.map((user_id_chunk) => _get_users(user_id_chunk));
-    }
-
-    return Promise.all(fetch_user_promises)
+    const user_id_chunks = z.util.ArrayUtil.chunk(user_ids, z.config.MAXIMUM_USERS_PER_REQUEST);
+    return Promise.all(user_id_chunks.map((user_id_chunk) => _get_users(user_id_chunk)))
       .then((resolve_array) => {
         const new_user_ets = _.flatten(resolve_array);
-
-        new_user_ets.forEach((user_et) => {
-          if (this.fetching_users.hasOwnProperty(user_et.id)) {
-            this.fetching_users[user_et.id].forEach(({resolve_fn}) => resolve_fn(user_et));
-          }
-        });
-
-        return Promise.all(get_user_promises.concat(this.save_users(new_user_ets)));
+        return this.save_users(new_user_ets);
       })
       .then((resolve_array) => {
         let fetched_user_ets = _.flatten(resolve_array);
@@ -638,7 +610,7 @@ z.user.UserRepository = class UserRepository {
 
     const _find_user = (user_id) => {
       return this.find_user_by_id(user_id)
-        .catch(function(error) {
+        .catch((error) => {
           if (error.type !== z.user.UserError.TYPE.USER_NOT_FOUND) {
             throw error;
           }
@@ -655,7 +627,8 @@ z.user.UserRepository = class UserRepository {
         return known_user_ets;
       }
 
-      return this.fetch_users_by_id(unknown_user_ids).then((user_ets) => known_user_ets.concat(user_ets));
+      return this.fetch_users_by_id(unknown_user_ids)
+        .then((user_ets) => known_user_ets.concat(user_ets));
     });
   }
 

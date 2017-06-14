@@ -34,8 +34,8 @@ z.util.PromiseQueue = class PromiseQueue {
    *
    * @param {Object} [options={}] - Initialization options
    * @param {string} options.name - Name for Promise queue
-   * @param {boolean} options.paused - Initial paused state
-   * @param {number} options.timeout - Timeout in ms
+   * @param {boolean} [options.paused=false] - Initial paused state
+   * @param {number} [options.timeout=PromiseQueue.CONFIG.UNBLOCK_INTERVAL] - Timeout in ms
    * @returns {PromiseQueue} Process Promises sequentially
    */
   constructor(options = {}) {

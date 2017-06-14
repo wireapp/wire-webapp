@@ -59,7 +59,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
     this.collection =                 new z.ViewModel.content.CollectionViewModel('collection', this.conversation_repository, this.collection_details);
     this.connect_requests =           new z.ViewModel.content.ConnectRequestsViewModel('connect-requests', this.user_repository);
     this.conversation_titlebar =      new z.ViewModel.ConversationTitlebarViewModel('conversation-titlebar', this.calling_repository, this.conversation_repository, this.multitasking);
-    this.conversation_input =         new z.ViewModel.ConversationInputViewModel('conversation-input', this.conversation_repository, this.user_repository);
+    this.conversation_input =         new z.ViewModel.ConversationInputViewModel('conversation-input', this.conversation_repository, this.user_repository, this.properties_repository);
     this.message_list =               new z.ViewModel.MessageListViewModel('message-list', this.conversation_repository, this.user_repository);
     this.participants =               new z.ViewModel.ParticipantsViewModel('participants', this.user_repository, this.conversation_repository, this.search_repository, this.team_repository);
     this.giphy =                      new z.ViewModel.GiphyViewModel('giphy-modal', this.conversation_repository, this.giphy_repository);
@@ -167,19 +167,8 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
           return;
         }
 
+        this._update_active_team(conversation_et);
         this._release_content(this.content_state(), conversation_et);
-
-        const team_id = conversation_et.team_id;
-        if (this.team_repository.active_team().id !== team_id) {
-          let team_promise;
-          if (team_id && !conversation_et.is_guest()) {
-            team_promise = this.team_repository.get_team_by_id(team_id);
-          } else {
-            team_promise = Promise.resolve(this.team_repository.personal_space);
-          }
-
-          team_promise.then((team_et) => this.team_repository.active_team(team_et));
-        }
 
         this.content_state(z.ViewModel.content.CONTENT_STATE.CONVERSATION);
         this.conversation_repository.active_conversation(conversation_et);
@@ -278,5 +267,24 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
   _show_content(new_content_state) {
     this.content_state(new_content_state);
     return this._shift_content(this._get_element_of_content(new_content_state));
+  }
+
+  _update_active_team(conversation_et) {
+    const {is_guest, team_id} = conversation_et;
+
+    if (this.team_repository.active_team().id !== team_id) {
+      const is_team = team_id && !is_guest();
+      let team_et;
+
+      if (is_team) {
+        team_et = this.team_repository.teams().find((_team_et) => _team_et.id === team_id);
+      }
+
+      if (!team_et) {
+        team_et = this.team_repository.personal_space;
+      }
+
+      this.team_repository.active_team(team_et);
+    }
   }
 };

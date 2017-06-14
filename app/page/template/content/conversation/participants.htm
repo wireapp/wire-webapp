@@ -11,7 +11,7 @@
               <textarea data-bind="visible: editing, value: conversation().display_name(), enter: rename_conversation, hasFocus: editing, resize" data-uie-name="enter-name" maxlength="64" dir="auto"></textarea>
             </div>
             <span class="edit icon-edit" data-bind="visible: editable() && !editing(), click: edit"></span>
-            <div class="people popover-meta text-uppercase" data-bind="l10n_text: {'id': z.string.people_people, 'replace': {'placeholder': '%no', 'content': participants().length}}"></div>
+            <div class="people popover-meta text-uppercase" data-bind="l10n_text: {'id': z.string.people_people, 'substitute': participants().length}"></div>
           </div>
           <div class="participants-group-list">
             <!-- ko if: render_participants -->

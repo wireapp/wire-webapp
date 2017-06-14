@@ -81,7 +81,7 @@ z.team.TeamRepository = class TeamRepository {
   }
 
   get_team_by_id(team_id) {
-    const [team_local] = this.teams().filter((team_et) => team_et.id === team_id);
+    const team_local = this.teams().find((team_et) => team_et.id === team_id);
     if (team_local) {
       return Promise.resolve(team_local);
     }

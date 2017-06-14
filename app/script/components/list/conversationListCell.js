@@ -49,11 +49,13 @@ ko.components.register('conversation-list-cell', {
           <group-avatar class="conversation-list-cell-avatar-arrow" params="users: users(), conversation: conversation"></group-avatar>
         <!-- /ko -->
         <!-- ko if: !conversation.is_group() && !conversation.is_team_group() && users().length === 1 -->
-          <user-avatar class="user-avatar-s" params="user: users()[0]"></user-avatar>
+          <div class="user-avatar-halo">
+            <user-avatar class="user-avatar-s" params="user: users()[0]"></user-avatar>
+          </div>
         <!-- /ko -->
       </div>
       <div class="conversation-list-cell-center">
-        <span class="conversation-list-cell-name" data-bind="text: conversation.display_name()"></span>
+        <span class="conversation-list-cell-name" data-bind="text: conversation.display_name(), css: {'text-theme': is_selected(conversation)}"></span>
         <span class="conversation-list-cell-description" data-bind="text: cell_state().description" data-uie-name="secondary-line"></span>
       </div>
       <div class="conversation-list-cell-right">
