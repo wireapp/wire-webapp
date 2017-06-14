@@ -32,9 +32,6 @@ z.util.emoji = {
     const remove_emojies = string => string.replace(emoji_regex, '');
     const remove_whitespace = string => string.replace(/\s/g, '');
 
-    return (
-      is_valid_string(text) &&
-      remove_emojies(remove_whitespace(text)).length === 0
-    );
+    return is_valid_string(text) && remove_emojies(remove_whitespace(text)).length === 0;
   },
 };

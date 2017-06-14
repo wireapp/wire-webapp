@@ -27,10 +27,7 @@ z.util.StringUtil = {
     return `${string.charAt(0).toUpperCase()}${string.substring(1)}`;
   },
   compare_transliteration: function(name_a, name_b) {
-    return z.util.StringUtil.includes(
-      window.getSlug(name_a),
-      window.getSlug(name_b)
-    );
+    return z.util.StringUtil.includes(window.getSlug(name_a), window.getSlug(name_b));
   },
   format: function() {
     let string = arguments[0];
@@ -139,10 +136,7 @@ z.util.StringUtil = {
   truncate: function(string, output_length, word_boundary = true) {
     if (string.length > output_length) {
       let trunc_index = output_length - 1;
-      if (
-        word_boundary &&
-        string.lastIndexOf(' ', output_length - 1) > output_length - 25
-      ) {
+      if (word_boundary && string.lastIndexOf(' ', output_length - 1) > output_length - 25) {
         trunc_index = string.lastIndexOf(' ', output_length - 1);
       }
       string = `${string.substr(0, trunc_index)}…`;

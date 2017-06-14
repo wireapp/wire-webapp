@@ -51,18 +51,9 @@ z.calling.entities.Call = class Call {
     this.calling_repository = calling_repository;
 
     const {id: conversation_id, is_group} = conversation_et;
-    const {
-      media_stream_handler,
-      media_repository,
-      self_state,
-      telemetry,
-      user_repository,
-    } = this.calling_repository;
+    const {media_stream_handler, media_repository, self_state, telemetry, user_repository} = this.calling_repository;
 
-    this.logger = new z.util.Logger(
-      `z.calling.entities.Call (${conversation_id})`,
-      z.config.LOGGER.OPTIONS
-    );
+    this.logger = new z.util.Logger(`z.calling.entities.Call (${conversation_id})`, z.config.LOGGER.OPTIONS);
 
     // IDs and references
     this.id = conversation_id;
@@ -102,19 +93,11 @@ z.calling.entities.Call = class Call {
     this._reset_timer();
 
     // Computed values
-    this.is_declined = ko.pureComputed(
-      () => this.state() === z.calling.enum.CALL_STATE.REJECTED
-    );
+    this.is_declined = ko.pureComputed(() => this.state() === z.calling.enum.CALL_STATE.REJECTED);
 
-    this.is_ongoing_on_another_client = ko.pureComputed(
-      () => this.self_user_joined() && !this.self_client_joined()
-    );
-    this.is_remote_screen_send = ko.pureComputed(
-      () => this.remote_media_type() === z.media.MediaType.SCREEN
-    );
-    this.is_remote_video_send = ko.pureComputed(
-      () => this.remote_media_type() === z.media.MediaType.VIDEO
-    );
+    this.is_ongoing_on_another_client = ko.pureComputed(() => this.self_user_joined() && !this.self_client_joined());
+    this.is_remote_screen_send = ko.pureComputed(() => this.remote_media_type() === z.media.MediaType.SCREEN);
+    this.is_remote_video_send = ko.pureComputed(() => this.remote_media_type() === z.media.MediaType.VIDEO);
 
     this.network_interruption = ko.pureComputed(() => {
       if (this.is_connected() && !this.is_group) {
@@ -124,9 +107,7 @@ z.calling.entities.Call = class Call {
       return false;
     });
 
-    this.participants_count = ko.pureComputed(() =>
-      this.get_number_of_participants(this.self_user_joined())
-    );
+    this.participants_count = ko.pureComputed(() => this.get_number_of_participants(this.self_user_joined()));
 
     // Observable subscriptions
     this.is_connected.subscribe(is_connected => {
@@ -136,17 +117,11 @@ z.calling.entities.Call = class Call {
         }
 
         const attributes = {direction: this.direction};
-        this.telemetry.track_event(
-          z.tracking.EventName.CALLING.ESTABLISHED_CALL,
-          this,
-          attributes
-        );
+        this.telemetry.track_event(z.tracking.EventName.CALLING.ESTABLISHED_CALL, this, attributes);
         this.timer_start = Date.now() - Call.CONFIG.TIMER_UPDATE_START;
 
         this.call_timer_interval = window.setInterval(() => {
-          const duration_in_seconds = Math.floor(
-            (Date.now() - this.timer_start) / 1000
-          );
+          const duration_in_seconds = Math.floor((Date.now() - this.timer_start) / 1000);
 
           this.duration_time(duration_in_seconds);
         }, Call.CONFIG.TIMER_UPDATE_INTERVAL);
@@ -161,22 +136,13 @@ z.calling.entities.Call = class Call {
 
     this.network_interruption.subscribe(is_interrupted => {
       if (is_interrupted) {
-        return amplify.publish(
-          z.event.WebApp.AUDIO.PLAY_IN_LOOP,
-          z.audio.AudioType.NETWORK_INTERRUPTION
-        );
+        return amplify.publish(z.event.WebApp.AUDIO.PLAY_IN_LOOP, z.audio.AudioType.NETWORK_INTERRUPTION);
       }
-      amplify.publish(
-        z.event.WebApp.AUDIO.STOP,
-        z.audio.AudioType.NETWORK_INTERRUPTION
-      );
+      amplify.publish(z.event.WebApp.AUDIO.STOP, z.audio.AudioType.NETWORK_INTERRUPTION);
     });
 
     this.participants_count.subscribe(users_in_call => {
-      this.max_number_of_participants = Math.max(
-        users_in_call,
-        this.max_number_of_participants
-      );
+      this.max_number_of_participants = Math.max(users_in_call, this.max_number_of_participants);
     });
 
     this.self_client_joined.subscribe(is_joined => {
@@ -184,10 +150,7 @@ z.calling.entities.Call = class Call {
         this.is_connected(false);
 
         if (z.calling.enum.CALL_STATE_GROUP.IS_ENDING.includes(this.state())) {
-          amplify.publish(
-            z.event.WebApp.AUDIO.PLAY,
-            z.audio.AudioType.TALK_LATER
-          );
+          amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.TALK_LATER);
         }
 
         if (this.termination_reason) {
@@ -207,18 +170,12 @@ z.calling.entities.Call = class Call {
       if (z.calling.enum.CALL_STATE_GROUP.STOP_RINGING.includes(state)) {
         this._on_state_stop_ringing();
       } else if (z.calling.enum.CALL_STATE_GROUP.IS_RINGING.includes(state)) {
-        this._on_state_start_ringing(
-          state === z.calling.enum.CALL_STATE.INCOMING
-        );
+        this._on_state_start_ringing(state === z.calling.enum.CALL_STATE.INCOMING);
       }
 
       if (state === z.calling.enum.CALL_STATE.CONNECTING) {
         const attributes = {direction: this.direction};
-        this.telemetry.track_event(
-          z.tracking.EventName.CALLING.JOINED_CALL,
-          this,
-          attributes
-        );
+        this.telemetry.track_event(z.tracking.EventName.CALLING.JOINED_CALL, this, attributes);
       }
 
       this.previous_state = state;
@@ -242,23 +199,12 @@ z.calling.entities.Call = class Call {
    * @param {z.calling.enum.TERMINATION_REASON} [termination_reason=z.calling.enum.TERMINATION_REASON.SELF_USER] - Call termination reason
    * @returns {undefined} No return value
    */
-  deactivate_call(
-    call_message_et,
-    termination_reason = z.calling.enum.TERMINATION_REASON.SELF_USER
-  ) {
-    const was_missed = z.calling.enum.CALL_STATE_GROUP.WAS_MISSED.includes(
-      this.state()
-    );
-    const reason = was_missed
-      ? z.calling.enum.TERMINATION_REASON.MISSED
-      : z.calling.enum.TERMINATION_REASON.COMPLETED;
+  deactivate_call(call_message_et, termination_reason = z.calling.enum.TERMINATION_REASON.SELF_USER) {
+    const was_missed = z.calling.enum.CALL_STATE_GROUP.WAS_MISSED.includes(this.state());
+    const reason = was_missed ? z.calling.enum.TERMINATION_REASON.MISSED : z.calling.enum.TERMINATION_REASON.COMPLETED;
 
     this.termination_reason = termination_reason;
-    this.calling_repository.inject_deactivate_event(
-      call_message_et,
-      this.creating_user,
-      reason
-    );
+    this.calling_repository.inject_deactivate_event(call_message_et, this.creating_user, reason);
 
     if (this.participants().length <= 1) {
       this.calling_repository.delete_call(this.id);
@@ -289,10 +235,7 @@ z.calling.entities.Call = class Call {
 
     if (this.is_group) {
       const response = this.state() !== z.calling.enum.CALL_STATE.OUTGOING;
-      const additional_payload = z.calling.CallMessageBuilder.create_payload(
-        this.id,
-        this.self_user.id
-      );
+      const additional_payload = z.calling.CallMessageBuilder.create_payload(this.id, this.self_user.id);
       const prop_sync_payload = z.calling.CallMessageBuilder.create_payload_prop_sync(
         this.self_state,
         z.media.MediaType.AUDIO,
@@ -301,11 +244,7 @@ z.calling.entities.Call = class Call {
       );
 
       this.send_call_message(
-        z.calling.CallMessageBuilder.build_group_start(
-          response,
-          this.session_id,
-          prop_sync_payload
-        )
+        z.calling.CallMessageBuilder.build_group_start(response, this.session_id, prop_sync_payload)
       );
     } else {
       const [user_id] = this.conversation_et.participating_user_ids();
@@ -330,49 +269,25 @@ z.calling.entities.Call = class Call {
 
     let call_message_et = undefined;
     if (this.is_connected()) {
-      call_message_et = z.calling.CallMessageBuilder.build_hangup(
-        false,
-        this.session_id
-      );
+      call_message_et = z.calling.CallMessageBuilder.build_hangup(false, this.session_id);
     } else {
-      call_message_et = z.calling.CallMessageBuilder.build_cancel(
-        false,
-        this.session_id
-      );
+      call_message_et = z.calling.CallMessageBuilder.build_cancel(false, this.session_id);
     }
 
-    const event_promises = this.get_flows().map(
-      ({remote_client_id, remote_user_id}) => {
-        call_message_et.add_properties(
-          z.calling.CallMessageBuilder.create_payload(
-            this.id,
-            this.self_user.id,
-            remote_user_id,
-            remote_client_id
-          )
-        );
-        return this.send_call_message(call_message_et);
-      }
-    );
+    const event_promises = this.get_flows().map(({remote_client_id, remote_user_id}) => {
+      call_message_et.add_properties(
+        z.calling.CallMessageBuilder.create_payload(this.id, this.self_user.id, remote_user_id, remote_client_id)
+      );
+      return this.send_call_message(call_message_et);
+    });
 
     Promise.all(event_promises)
-      .then(() =>
-        Promise.all(
-          this.participants().map(({id}) => this.reset_participant(id))
-        )
-      )
+      .then(() => Promise.all(this.participants().map(({id}) => this.reset_participant(id))))
       .then(() => {
-        const additional_payload = z.calling.CallMessageBuilder.create_payload(
-          this.id,
-          this.self_user.id
-        );
+        const additional_payload = z.calling.CallMessageBuilder.create_payload(this.id, this.self_user.id);
 
         if (this.is_group) {
-          call_message_et = z.calling.CallMessageBuilder.build_group_leave(
-            false,
-            this.session_id,
-            additional_payload
-          );
+          call_message_et = z.calling.CallMessageBuilder.build_group_leave(false, this.session_id, additional_payload);
           this.send_call_message(call_message_et);
         } else {
           call_message_et.add_properties(additional_payload);
@@ -404,10 +319,7 @@ z.calling.entities.Call = class Call {
    * @returns {undefined} No return value
    */
   reject_call() {
-    const additional_payload = z.calling.CallMessageBuilder.create_payload(
-      this.id,
-      this.self_user.id
-    );
+    const additional_payload = z.calling.CallMessageBuilder.create_payload(this.id, this.self_user.id);
 
     this.state(z.calling.enum.CALL_STATE.REJECTED);
 
@@ -415,13 +327,7 @@ z.calling.entities.Call = class Call {
       this.calling_repository.media_stream_handler.reset_media_stream();
     }
 
-    this.send_call_message(
-      z.calling.CallMessageBuilder.build_reject(
-        false,
-        this.session_id,
-        additional_payload
-      )
-    );
+    this.send_call_message(z.calling.CallMessageBuilder.build_reject(false, this.session_id, additional_payload));
   }
 
   /**
@@ -458,30 +364,24 @@ z.calling.entities.Call = class Call {
    * @returns {Promise} Resolves when state has been toggled
    */
   toggle_media(media_type) {
-    const call_event_promises = this.get_flows().map(
-      ({remote_client_id, remote_user_id}) => {
-        const additional_payload = z.calling.CallMessageBuilder.create_payload(
-          this.id,
-          this.self_user.id,
-          remote_user_id,
-          remote_client_id
-        );
-        const prop_sync_payload = z.calling.CallMessageBuilder.create_payload_prop_sync(
-          this.self_state,
-          media_type,
-          true,
-          additional_payload
-        );
+    const call_event_promises = this.get_flows().map(({remote_client_id, remote_user_id}) => {
+      const additional_payload = z.calling.CallMessageBuilder.create_payload(
+        this.id,
+        this.self_user.id,
+        remote_user_id,
+        remote_client_id
+      );
+      const prop_sync_payload = z.calling.CallMessageBuilder.create_payload_prop_sync(
+        this.self_state,
+        media_type,
+        true,
+        additional_payload
+      );
 
-        return this.send_call_message(
-          z.calling.CallMessageBuilder.build_prop_sync(
-            false,
-            this.session_id,
-            prop_sync_payload
-          )
-        );
-      }
-    );
+      return this.send_call_message(
+        z.calling.CallMessageBuilder.build_prop_sync(false, this.session_id, prop_sync_payload)
+      );
+    });
 
     return Promise.all(call_event_promises);
   }
@@ -517,30 +417,16 @@ z.calling.entities.Call = class Call {
   _set_send_group_check_timeout() {
     const maximum_timeout = Call.CONFIG.GROUP_CHECK_MAXIMUM_TIMEOUT;
     const minimum_timeout = Call.CONFIG.GROUP_CHECK_MINIMUM_TIMEOUT;
-    const timeout_in_seconds = z.util.NumberUtil.get_random_number(
-      minimum_timeout,
-      maximum_timeout
-    );
+    const timeout_in_seconds = z.util.NumberUtil.get_random_number(minimum_timeout, maximum_timeout);
 
-    this.logger.debug(
-      `Set sending group check after random timeout of '${timeout_in_seconds}s'`
-    );
+    this.logger.debug(`Set sending group check after random timeout of '${timeout_in_seconds}s'`);
     this.group_check_timeout = window.setTimeout(() => {
       if (this.participants().length) {
-        this.logger.debug(
-          `Sending group check after random timeout of '${timeout_in_seconds}s'`
-        );
-        const additional_payload = z.calling.CallMessageBuilder.create_payload(
-          this.id,
-          this.self_user.id
-        );
+        this.logger.debug(`Sending group check after random timeout of '${timeout_in_seconds}s'`);
+        const additional_payload = z.calling.CallMessageBuilder.create_payload(this.id, this.self_user.id);
 
         this.send_call_message(
-          z.calling.CallMessageBuilder.build_group_check(
-            true,
-            this.session_id,
-            additional_payload
-          )
+          z.calling.CallMessageBuilder.build_group_check(true, this.session_id, additional_payload)
         );
         this.schedule_group_check();
       } else {
@@ -557,9 +443,7 @@ z.calling.entities.Call = class Call {
   _set_verify_group_check_timeout() {
     const timeout_in_seconds = Call.CONFIG.GROUP_CHECK_ACTIVITY_TIMEOUT;
 
-    this.logger.debug(
-      `Set verifying group check after '${timeout_in_seconds}s'`
-    );
+    this.logger.debug(`Set verifying group check after '${timeout_in_seconds}s'`);
     this.group_check_timeout = window.setTimeout(() => {
       this.logger.debug('Removing on group check timeout');
       const additional_payload = z.calling.CallMessageBuilder.create_payload(
@@ -573,10 +457,7 @@ z.calling.entities.Call = class Call {
         additional_payload
       );
 
-      this.deactivate_call(
-        call_message_et,
-        z.calling.enum.TERMINATION_REASON.MISSED
-      );
+      this.deactivate_call(call_message_et, z.calling.enum.TERMINATION_REASON.MISSED);
     }, timeout_in_seconds * 1000);
   }
 
@@ -602,11 +483,7 @@ z.calling.entities.Call = class Call {
 
     switch (type) {
       case z.calling.enum.CALL_MESSAGE_TYPE.HANGUP: {
-        call_message_et = z.calling.CallMessageBuilder.build_hangup(
-          true,
-          this.session_id,
-          additional_payload
-        );
+        call_message_et = z.calling.CallMessageBuilder.build_hangup(true, this.session_id, additional_payload);
         break;
       }
 
@@ -618,19 +495,12 @@ z.calling.entities.Call = class Call {
           additional_payload
         );
 
-        call_message_et = z.calling.CallMessageBuilder.build_prop_sync(
-          true,
-          this.session_id,
-          prop_sync_payload
-        );
+        call_message_et = z.calling.CallMessageBuilder.build_prop_sync(true, this.session_id, prop_sync_payload);
         break;
       }
 
       default: {
-        this.logger.error(
-          `Tried to confirm call event of wrong type '${type}'`,
-          call_message_et
-        );
+        this.logger.error(`Tried to confirm call event of wrong type '${type}'`, call_message_et);
         return Promise.resolve();
       }
     }
@@ -644,10 +514,7 @@ z.calling.entities.Call = class Call {
    * @returns {Promise} Resolves when the event has been send
    */
   send_call_message(call_message_et) {
-    return this.calling_repository.send_call_message(
-      this.conversation_et,
-      call_message_et
-    );
+    return this.calling_repository.send_call_message(this.conversation_et, call_message_et);
   }
 
   /**
@@ -659,9 +526,7 @@ z.calling.entities.Call = class Call {
     const {sdp: rtc_sdp} = call_message_et;
 
     if (rtc_sdp) {
-      this.telemetry.set_remote_version(
-        z.calling.SDPMapper.get_tool_version(rtc_sdp)
-      );
+      this.telemetry.set_remote_version(z.calling.SDPMapper.get_tool_version(rtc_sdp));
     }
   }
 
@@ -695,12 +560,8 @@ z.calling.entities.Call = class Call {
    * @returns {undefined} No return value
    */
   _on_state_stop_ringing() {
-    if (
-      z.calling.enum.CALL_STATE_GROUP.IS_RINGING.includes(this.previous_state)
-    ) {
-      this._stop_ring_tone(
-        this.previous_state === z.calling.enum.CALL_STATE.INCOMING
-      );
+    if (z.calling.enum.CALL_STATE_GROUP.IS_RINGING.includes(this.previous_state)) {
+      this._stop_ring_tone(this.previous_state === z.calling.enum.CALL_STATE.INCOMING);
     }
   }
 
@@ -712,9 +573,7 @@ z.calling.entities.Call = class Call {
    * @returns {undefined} No return value
    */
   _play_ring_tone(is_incoming) {
-    const audio_id = is_incoming
-      ? z.audio.AudioType.INCOMING_CALL
-      : z.audio.AudioType.OUTGOING_CALL;
+    const audio_id = is_incoming ? z.audio.AudioType.INCOMING_CALL : z.audio.AudioType.OUTGOING_CALL;
 
     amplify.publish(z.event.WebApp.AUDIO.PLAY_IN_LOOP, audio_id);
   }
@@ -738,11 +597,7 @@ z.calling.entities.Call = class Call {
         return amplify.publish(z.event.WebApp.CALL.STATE.DELETE, this.id);
       }
 
-      return amplify.publish(
-        z.event.WebApp.CALL.STATE.LEAVE,
-        this.id,
-        z.calling.enum.TERMINATION_REASON.TIMEOUT
-      );
+      return amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, this.id, z.calling.enum.TERMINATION_REASON.TIMEOUT);
     }, Call.CONFIG.STATE_TIMEOUT);
   }
 
@@ -754,9 +609,7 @@ z.calling.entities.Call = class Call {
    * @returns {undefined} No return value
    */
   _stop_ring_tone(is_incoming) {
-    const audio_id = is_incoming
-      ? z.audio.AudioType.INCOMING_CALL
-      : z.audio.AudioType.OUTGOING_CALL;
+    const audio_id = is_incoming ? z.audio.AudioType.INCOMING_CALL : z.audio.AudioType.OUTGOING_CALL;
 
     amplify.publish(z.event.WebApp.AUDIO.STOP, audio_id);
   }
@@ -824,17 +677,9 @@ z.calling.entities.Call = class Call {
           throw error;
         }
 
-        const participant_et = new z.calling.entities.Participant(
-          this,
-          user_et,
-          this.timings,
-          call_message_et
-        );
+        const participant_et = new z.calling.entities.Participant(this, user_et, this.timings, call_message_et);
 
-        this.logger.info(
-          `Adding call participant '${user_et.name()}'`,
-          participant_et
-        );
+        this.logger.info(`Adding call participant '${user_et.name()}'`, participant_et);
         this.participants.push(participant_et);
 
         return participant_et
@@ -870,26 +715,18 @@ z.calling.entities.Call = class Call {
         this.participants.remove(participant_et);
 
         this._update_remote_state();
-        this.calling_repository.media_element_handler.remove_media_element(
-          user_id
-        );
+        this.calling_repository.media_element_handler.remove_media_element(user_id);
 
         if (this.self_client_joined()) {
           switch (termination_reason) {
             case z.calling.enum.TERMINATION_REASON.OTHER_USER: {
-              amplify.publish(
-                z.event.WebApp.AUDIO.PLAY,
-                z.audio.AudioType.TALK_LATER
-              );
+              amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.TALK_LATER);
               break;
             }
 
             case z.calling.enum.TERMINATION_REASON.CONNECTION_DROP:
             case z.calling.enum.TERMINATION_REASON.MEMBER_LEAVE: {
-              amplify.publish(
-                z.event.WebApp.AUDIO.PLAY,
-                z.audio.AudioType.CALL_DROP
-              );
+              amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.CALL_DROP);
               break;
             }
 
@@ -899,9 +736,7 @@ z.calling.entities.Call = class Call {
           }
         }
 
-        this.logger.info(
-          `Removed call participant '${participant_et.user.name()}'`
-        );
+        this.logger.info(`Removed call participant '${participant_et.user.name()}'`);
         return this;
       })
       .catch(error => {
@@ -939,10 +774,7 @@ z.calling.entities.Call = class Call {
     }
 
     return Promise.reject(
-      new z.calling.CallError(
-        z.calling.CallError.TYPE.NOT_FOUND,
-        'No participant for given user ID found'
-      )
+      new z.calling.CallError(z.calling.CallError.TYPE.NOT_FOUND, 'No participant for given user ID found')
     );
   }
 
@@ -957,9 +789,7 @@ z.calling.entities.Call = class Call {
       this.interrupted_participants.remove(participant_et);
 
       this._update_remote_state();
-      this.calling_repository.media_element_handler.remove_media_element(
-        user_id
-      );
+      this.calling_repository.media_element_handler.remove_media_element(user_id);
     });
   }
 
@@ -981,10 +811,7 @@ z.calling.entities.Call = class Call {
             participant_et.verify_client_id(client_id);
           }
 
-          this.logger.info(
-            `Updating call participant '${participant_et.user.name()}'`,
-            call_message_et
-          );
+          this.logger.info(`Updating call participant '${participant_et.user.name()}'`, call_message_et);
           return participant_et.update_state(call_message_et);
         }
 
@@ -1019,17 +846,12 @@ z.calling.entities.Call = class Call {
       return Promise.resolve(this);
     }
 
-    return this.get_participant_by_id(
-      user_id
-    ).then(({session_id: participant_session_id}) => {
+    return this.get_participant_by_id(user_id).then(({session_id: participant_session_id}) => {
       if (session_id === participant_session_id) {
         return this;
       }
 
-      throw new z.calling.CallError(
-        z.calling.CallError.TYPE.WRONG_SENDER,
-        'Session IDs not matching'
-      );
+      throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_SENDER, 'Session IDs not matching');
     });
   }
 
@@ -1096,25 +918,15 @@ z.calling.entities.Call = class Call {
   _sort_participants_by_panning() {
     if (this.participants().length >= 2) {
       this.participants
-        .sort(
-          (participant_a, participant_b) =>
-            participant_a.user.joaat_hash - participant_b.user.joaat_hash
-        )
+        .sort((participant_a, participant_b) => participant_a.user.joaat_hash - participant_b.user.joaat_hash)
         .forEach((participant_et, index) => {
-          const panning = this._calculate_panning(
-            index,
-            this.participants().length
-          );
+          const panning = this._calculate_panning(index, this.participants().length);
 
-          this.logger.debug(
-            `Panning for '${participant_et.user.name()}' recalculated to '${panning}'`
-          );
+          this.logger.debug(`Panning for '${participant_et.user.name()}' recalculated to '${panning}'`);
           participant_et.panning(panning);
         });
 
-      const panning_order = this.participants()
-        .map(({user}) => user.name())
-        .join(', ');
+      const panning_order = this.participants().map(({user}) => user.name()).join(', ');
 
       this.logger.info(`New panning order: ${panning_order}`);
     }
@@ -1134,10 +946,7 @@ z.calling.entities.Call = class Call {
     this.is_connected(false);
     this.session_id = undefined;
     this.termination_reason = undefined;
-    amplify.publish(
-      z.event.WebApp.AUDIO.STOP,
-      z.audio.AudioType.NETWORK_INTERRUPTION
-    );
+    amplify.publish(z.event.WebApp.AUDIO.STOP, z.audio.AudioType.NETWORK_INTERRUPTION);
   }
 
   /**

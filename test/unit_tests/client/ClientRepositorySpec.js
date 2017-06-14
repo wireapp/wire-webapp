@@ -37,23 +37,13 @@ describe('z.client.ClientRepository', function() {
   });
 
   beforeEach(function(done) {
-    TestFactory.storage_repository
-      .clear_all_stores()
-      .then(done)
-      .catch(done.fail);
+    TestFactory.storage_repository.clear_all_stores().then(done).catch(done.fail);
   });
 
   describe('get_clients_by_user_id', () =>
-    it('maps client entities from client payloads by the backend', function(
-      done
-    ) {
-      TestFactory.client_repository.current_client(
-        new z.client.Client({id: client_id})
-      );
-      spyOn(
-        TestFactory.client_service,
-        'get_clients_by_user_id'
-      ).and.returnValue(
+    it('maps client entities from client payloads by the backend', function(done) {
+      TestFactory.client_repository.current_client(new z.client.Client({id: client_id}));
+      spyOn(TestFactory.client_service, 'get_clients_by_user_id').and.returnValue(
         Promise.resolve([
           {class: 'desktop', id: '706f64373b1bcf79'},
           {class: 'phone', id: '809fd276d6709474'},
@@ -76,8 +66,7 @@ describe('z.client.ClientRepository', function() {
   describe('get_valid_local_client', function() {
     let server = undefined;
 
-    const client_url = `${test_factory.settings.connection
-      .rest_url}/clients/${client_id}`;
+    const client_url = `${test_factory.settings.connection.rest_url}/clients/${client_id}`;
     const client_payload_server = {
       address: '62.96.148.44',
       class: 'desktop',
@@ -133,51 +122,39 @@ describe('z.client.ClientRepository', function() {
         Promise.resolve(z.client.ClientRepository.PRIMARY_KEY_CURRENT_CLIENT)
       );
 
-      TestFactory.client_repository
-        .get_valid_local_client()
-        .then(done.fail)
-        .catch(function(error) {
-          expect(error).toEqual(jasmine.any(z.client.ClientError));
-          expect(error.type).toBe(z.client.ClientError.TYPE.NO_LOCAL_CLIENT);
-          done();
-        });
+      TestFactory.client_repository.get_valid_local_client().then(done.fail).catch(function(error) {
+        expect(error).toEqual(jasmine.any(z.client.ClientError));
+        expect(error.type).toBe(z.client.ClientError.TYPE.NO_LOCAL_CLIENT);
+        done();
+      });
     });
 
     it('rejects with an error if client removed on backend', function(done) {
       spyOn(TestFactory.client_service, 'load_client_from_db').and.returnValue(
         Promise.resolve(client_payload_database)
       );
-      spyOn(TestFactory.storage_service, 'delete_everything').and.returnValue(
-        Promise.resolve(true)
-      );
+      spyOn(TestFactory.storage_service, 'delete_everything').and.returnValue(Promise.resolve(true));
 
-      TestFactory.client_repository
-        .get_valid_local_client()
-        .then(done.fail)
-        .catch(function(error) {
-          expect(error).toEqual(jasmine.any(z.client.ClientError));
-          expect(error.type).toBe(z.client.ClientError.TYPE.MISSING_ON_BACKEND);
-          done();
-        });
+      TestFactory.client_repository.get_valid_local_client().then(done.fail).catch(function(error) {
+        expect(error).toEqual(jasmine.any(z.client.ClientError));
+        expect(error.type).toBe(z.client.ClientError.TYPE.MISSING_ON_BACKEND);
+        done();
+      });
     });
 
     it('rejects with an error if database deletion fails', function(done) {
       spyOn(TestFactory.client_service, 'load_client_from_db').and.returnValue(
         Promise.resolve(client_payload_database)
       );
-      spyOn(
-        TestFactory.storage_repository,
-        'delete_cryptography'
-      ).and.returnValue(Promise.reject(new Error('Expected unit test error')));
+      spyOn(TestFactory.storage_repository, 'delete_cryptography').and.returnValue(
+        Promise.reject(new Error('Expected unit test error'))
+      );
 
-      TestFactory.client_repository
-        .get_valid_local_client()
-        .then(done.fail)
-        .catch(function(error) {
-          expect(error).toEqual(jasmine.any(z.client.ClientError));
-          expect(error.type).toBe(z.client.ClientError.TYPE.DATABASE_FAILURE);
-          done();
-        });
+      TestFactory.client_repository.get_valid_local_client().then(done.fail).catch(function(error) {
+        expect(error).toEqual(jasmine.any(z.client.ClientError));
+        expect(error.type).toBe(z.client.ClientError.TYPE.DATABASE_FAILURE);
+        done();
+      });
     });
 
     it('rejects with an error if something else fails', function(done) {
@@ -185,49 +162,29 @@ describe('z.client.ClientRepository', function() {
         Promise.reject(new Error('Expected unit test error'))
       );
 
-      TestFactory.client_repository
-        .get_valid_local_client()
-        .then(done.fail)
-        .catch(function(error) {
-          expect(error).toEqual(jasmine.any(Error));
-          expect(error.type).toBe(z.client.ClientError.TYPE.DATABASE_FAILURE);
-          done();
-        });
+      TestFactory.client_repository.get_valid_local_client().then(done.fail).catch(function(error) {
+        expect(error).toEqual(jasmine.any(Error));
+        expect(error.type).toBe(z.client.ClientError.TYPE.DATABASE_FAILURE);
+        done();
+      });
     });
   });
 
   describe('_construct_primary_key', function() {
     it('returns a proper primary key for a client', function() {
-      const actual_primary_key = TestFactory.client_repository._construct_primary_key(
-        user_id,
-        client_id
-      );
+      const actual_primary_key = TestFactory.client_repository._construct_primary_key(user_id, client_id);
       const expected_primary_key = `${user_id}@${client_id}`;
       return expect(actual_primary_key).toEqual(expected_primary_key);
     });
 
     it('throws an error if missing user ID', function() {
-      const function_call = () =>
-        TestFactory.client_repository._construct_primary_key(
-          undefined,
-          client_id
-        );
-      return expect(function_call).toThrowError(
-        z.client.ClientError,
-        'User ID is not defined'
-      );
+      const function_call = () => TestFactory.client_repository._construct_primary_key(undefined, client_id);
+      return expect(function_call).toThrowError(z.client.ClientError, 'User ID is not defined');
     });
 
     return it('throws and error if missing client ID', function() {
-      const function_call = () =>
-        TestFactory.client_repository._construct_primary_key(
-          user_id,
-          undefined
-        );
-      return expect(function_call).toThrowError(
-        z.client.ClientError,
-        'Client ID is not defined'
-      );
+      const function_call = () => TestFactory.client_repository._construct_primary_key(user_id, undefined);
+      return expect(function_call).toThrowError(z.client.ClientError, 'Client ID is not defined');
     });
   });
 
@@ -238,18 +195,14 @@ describe('z.client.ClientRepository', function() {
     });
 
     it('returns true on Electron', function() {
-      TestFactory.client_repository.current_client(
-        new z.client.Client({type: z.client.ClientType.PERMANENT})
-      );
+      TestFactory.client_repository.current_client(new z.client.Client({type: z.client.ClientType.PERMANENT}));
       z.util.Environment.electron = true;
       const is_permanent = TestFactory.client_repository.is_current_client_permanent();
       expect(is_permanent).toBeTruthy();
     });
 
     it('returns true on Electron even if client is temporary', function() {
-      TestFactory.client_repository.current_client(
-        new z.client.Client({type: z.client.ClientType.TEMPORARY})
-      );
+      TestFactory.client_repository.current_client(new z.client.Client({type: z.client.ClientType.TEMPORARY}));
       z.util.Environment.electron = true;
       const is_permanent = TestFactory.client_repository.is_current_client_permanent();
       expect(is_permanent).toBeTruthy();
@@ -257,37 +210,25 @@ describe('z.client.ClientRepository', function() {
 
     it('throws an error on Electron if no current client', function() {
       z.util.Environment.electron = true;
-      const function_call = () =>
-        TestFactory.client_repository.is_current_client_permanent();
-      expect(function_call).toThrowError(
-        z.client.ClientError,
-        'Local client is not yet set'
-      );
+      const function_call = () => TestFactory.client_repository.is_current_client_permanent();
+      expect(function_call).toThrowError(z.client.ClientError, 'Local client is not yet set');
     });
 
     it('returns true if current client is permanent', function() {
-      TestFactory.client_repository.current_client(
-        new z.client.Client({type: z.client.ClientType.PERMANENT})
-      );
+      TestFactory.client_repository.current_client(new z.client.Client({type: z.client.ClientType.PERMANENT}));
       const is_permanent = TestFactory.client_repository.is_current_client_permanent();
       expect(is_permanent).toBeTruthy();
     });
 
     it('returns false if current client is temporary', function() {
-      TestFactory.client_repository.current_client(
-        new z.client.Client({type: z.client.ClientType.TEMPORARY})
-      );
+      TestFactory.client_repository.current_client(new z.client.Client({type: z.client.ClientType.TEMPORARY}));
       const is_permanent = TestFactory.client_repository.is_current_client_permanent();
       expect(is_permanent).toBeFalsy();
     });
 
     it('throws an error if no current client', function() {
-      const function_call = () =>
-        TestFactory.client_repository.is_current_client_permanent();
-      expect(function_call).toThrowError(
-        z.client.ClientError,
-        'Local client is not yet set'
-      );
+      const function_call = () => TestFactory.client_repository.is_current_client_permanent();
+      expect(function_call).toThrowError(z.client.ClientError, 'Local client is not yet set');
     });
   });
 
@@ -297,66 +238,39 @@ describe('z.client.ClientRepository', function() {
     });
 
     it('returns true if user ID and client ID match', function() {
-      TestFactory.client_repository.current_client(
-        new z.client.Client({id: client_id})
-      );
+      TestFactory.client_repository.current_client(new z.client.Client({id: client_id}));
       TestFactory.client_repository.self_user(new z.entity.User(user_id));
-      const result = TestFactory.client_repository._is_current_client(
-        user_id,
-        client_id
-      );
+      const result = TestFactory.client_repository._is_current_client(user_id, client_id);
       expect(result).toBeTruthy();
     });
 
     it('returns false if only the user ID matches', function() {
-      TestFactory.client_repository.current_client(
-        new z.client.Client({id: client_id})
-      );
-      const result = TestFactory.client_repository._is_current_client(
-        user_id,
-        'ABCDE'
-      );
+      TestFactory.client_repository.current_client(new z.client.Client({id: client_id}));
+      const result = TestFactory.client_repository._is_current_client(user_id, 'ABCDE');
       expect(result).toBeFalsy();
     });
 
     it('returns false if only the client ID matches', function() {
-      TestFactory.client_repository.current_client(
-        new z.client.Client({id: client_id})
-      );
-      const result = TestFactory.client_repository._is_current_client(
-        'ABCDE',
-        client_id
-      );
+      TestFactory.client_repository.current_client(new z.client.Client({id: client_id}));
+      const result = TestFactory.client_repository._is_current_client('ABCDE', client_id);
       expect(result).toBeFalsy();
     });
 
     it('throws an error if current client is not set', function() {
-      const function_call = () =>
-        TestFactory.client_repository._is_current_client(user_id, client_id);
-      expect(function_call).toThrowError(
-        z.client.ClientError,
-        'Local client is not yet set'
-      );
+      const function_call = () => TestFactory.client_repository._is_current_client(user_id, client_id);
+      expect(function_call).toThrowError(z.client.ClientError, 'Local client is not yet set');
     });
 
     it('throws an error if client ID is not specified', function() {
       TestFactory.client_repository.current_client(new z.client.Client());
-      const function_call = () =>
-        TestFactory.client_repository._is_current_client(user_id);
-      expect(function_call).toThrowError(
-        z.client.ClientError,
-        'Client ID is not defined'
-      );
+      const function_call = () => TestFactory.client_repository._is_current_client(user_id);
+      expect(function_call).toThrowError(z.client.ClientError, 'Client ID is not defined');
     });
 
     it('throws an error if user ID is not specified', function() {
       TestFactory.client_repository.current_client(new z.client.Client());
-      const function_call = () =>
-        TestFactory.client_repository._is_current_client(undefined, client_id);
-      expect(function_call).toThrowError(
-        z.client.ClientError,
-        'User ID is not defined'
-      );
+      const function_call = () => TestFactory.client_repository._is_current_client(undefined, client_id);
+      expect(function_call).toThrowError(z.client.ClientError, 'User ID is not defined');
     });
   });
 });

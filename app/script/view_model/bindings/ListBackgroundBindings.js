@@ -39,9 +39,7 @@ ko.bindingHandlers.switch_background = (function() {
             });
           })
           .then(function() {
-            background_next
-              .css({opacity: '1'})
-              .one(z.util.alias.animationend, background_last.remove);
+            background_next.css({opacity: '1'}).one(z.util.alias.animationend, background_last.remove);
           });
       }
     },

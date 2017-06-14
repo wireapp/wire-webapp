@@ -70,7 +70,7 @@ rules:
   prefer-template: 2
   prettier/prettier: [2, {
       bracketSpacing: false,
-      printWidth: 80,
+      printWidth: 120,
       singleQuote: true,
       trailingComma: es5,
     }

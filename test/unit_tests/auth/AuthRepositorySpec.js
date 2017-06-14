@@ -57,9 +57,7 @@ describe('z.auth.AuthRepository', function() {
     it('renews the access token at the scheduled time', function() {
       const expiration_timestamp = Date.now() + 60500;
       TestFactory.auth_repository._schedule_token_refresh(expiration_timestamp);
-      expect(
-        TestFactory.auth_repository.renew_access_token
-      ).not.toHaveBeenCalled();
+      expect(TestFactory.auth_repository.renew_access_token).not.toHaveBeenCalled();
       jasmine.clock().tick(1000);
       expect(TestFactory.auth_repository.renew_access_token).toHaveBeenCalled();
     });
@@ -70,17 +68,11 @@ describe('z.auth.AuthRepository', function() {
       const second_timestamp = Date.now() + 61000;
 
       TestFactory.auth_repository._schedule_token_refresh(first_timestamp);
-      expect(
-        TestFactory.auth_repository.renew_access_token
-      ).not.toHaveBeenCalled();
+      expect(TestFactory.auth_repository.renew_access_token).not.toHaveBeenCalled();
       jasmine.clock().tick(250);
-      expect(
-        TestFactory.auth_repository.renew_access_token
-      ).not.toHaveBeenCalled();
+      expect(TestFactory.auth_repository.renew_access_token).not.toHaveBeenCalled();
       TestFactory.auth_repository._schedule_token_refresh(second_timestamp);
-      expect(
-        TestFactory.auth_repository.renew_access_token
-      ).not.toHaveBeenCalled();
+      expect(TestFactory.auth_repository.renew_access_token).not.toHaveBeenCalled();
       expect(window.clearTimeout).toHaveBeenCalled();
       jasmine.clock().tick(1000);
       expect(TestFactory.auth_repository.renew_access_token).toHaveBeenCalled();

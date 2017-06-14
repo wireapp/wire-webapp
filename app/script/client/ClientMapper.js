@@ -36,9 +36,7 @@ z.client.ClientMapper = class ClientMapper {
     if (client_payload.meta) {
       client_et.meta.is_verified(client_payload.meta.is_verified);
       client_et.meta.primary_key = client_payload.meta.primary_key;
-      client_et.meta.user_id = z.client.Client.dismantle_user_client_id(
-        client_payload.meta.primary_key
-      ).user_id;
+      client_et.meta.user_id = z.client.Client.dismantle_user_client_id(client_payload.meta.primary_key).user_id;
     }
 
     return client_et;
@@ -50,9 +48,7 @@ z.client.ClientMapper = class ClientMapper {
    * @returns {Array<z.client.Client>} - Mapped client entities
    */
   map_clients(clients_payload) {
-    return clients_payload.map(client_payload =>
-      this.map_client(client_payload)
-    );
+    return clients_payload.map(client_payload => this.map_client(client_payload));
   }
 
   /**
@@ -66,10 +62,7 @@ z.client.ClientMapper = class ClientMapper {
     let contains_update = false;
 
     for (const member in update_payload) {
-      if (
-        JSON.stringify(client[member]) !==
-        JSON.stringify(update_payload[member])
-      ) {
+      if (JSON.stringify(client[member]) !== JSON.stringify(update_payload[member])) {
         contains_update = true;
         client[member] = update_payload[member];
       }

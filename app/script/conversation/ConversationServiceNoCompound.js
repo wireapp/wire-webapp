@@ -24,8 +24,8 @@ window.z.conversation = z.conversation || {};
 
 // TODO: This function can be removed once Microsoft Edge's IndexedDB supports compound indices:
 // - https://developer.microsoft.com/en-us/microsoft-edge/platform/status/indexeddbarraysandmultientrysupport/
-z.conversation.ConversationServiceNoCompound = class ConversationServiceNoCompound extends z
-  .conversation.ConversationService {
+z.conversation.ConversationServiceNoCompound = class ConversationServiceNoCompound extends z.conversation
+  .ConversationService {
   constructor(client, storage_service) {
     super(client, storage_service);
   }
@@ -56,12 +56,7 @@ z.conversation.ConversationServiceNoCompound = class ConversationServiceNoCompou
    * @param {number} limit - Amount of events to load
    * @returns {Promise} Resolves with the retrieved records
    */
-  load_preceding_events_from_db(
-    conversation_id,
-    lower_bound = new Date(0),
-    upper_bound = new Date(),
-    limit
-  ) {
+  load_preceding_events_from_db(conversation_id, lower_bound = new Date(0), upper_bound = new Date(), limit) {
     if (!_.isDate(lower_bound) || !_.isDate(upper_bound)) {
       throw new Error(
         `Lower bound (${typeof lower_bound}) and upper bound (${typeof upper_bound}) must be of type 'Date'.`

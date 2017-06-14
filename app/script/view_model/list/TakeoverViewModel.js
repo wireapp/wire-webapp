@@ -34,10 +34,7 @@ z.ViewModel.list.TakeoverViewModel = class TakeoverViewModel {
   constructor(element_id, conversation_repository, user_repository) {
     this.conversation_repository = conversation_repository;
     this.user_repository = user_repository;
-    this.logger = new z.util.Logger(
-      'z.ViewModel.list.TakeoverViewModel',
-      z.config.LOGGER.OPTIONS
-    );
+    this.logger = new z.util.Logger('z.ViewModel.list.TakeoverViewModel', z.config.LOGGER.OPTIONS);
 
     this.self_user = this.user_repository.self;
 
@@ -62,56 +59,34 @@ z.ViewModel.list.TakeoverViewModel = class TakeoverViewModel {
         if (conversation_et) {
           amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversation_et);
         } else if (this.user_repository.connect_requests().length) {
-          amplify.publish(
-            z.event.WebApp.CONTENT.SWITCH,
-            z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS
-          );
+          amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS);
         }
 
-        amplify.publish(
-          z.event.WebApp.ANALYTICS.EVENT,
-          z.tracking.EventName.ONBOARDING.KEPT_GENERATED_USERNAME,
-          {
-            outcome: 'success',
-          }
-        );
+        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.KEPT_GENERATED_USERNAME, {
+          outcome: 'success',
+        });
       })
       .catch(function() {
         amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT);
-        amplify.publish(
-          z.event.WebApp.ANALYTICS.EVENT,
-          z.tracking.EventName.ONBOARDING.KEPT_GENERATED_USERNAME,
-          {
-            outcome: 'fail',
-          }
-        );
+        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.KEPT_GENERATED_USERNAME, {
+          outcome: 'fail',
+        });
       })
       .then(() => amplify.publish(z.event.WebApp.TAKEOVER.DISMISS));
   }
 
   choose_username() {
-    amplify.publish(
-      z.event.WebApp.ANALYTICS.EVENT,
-      z.tracking.EventName.ONBOARDING.OPENED_USERNAME_SETTINGS
-    );
+    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.OPENED_USERNAME_SETTINGS);
     amplify.publish(z.event.WebApp.TAKEOVER.DISMISS);
-    window.requestAnimationFrame(() =>
-      amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT)
-    );
+    window.requestAnimationFrame(() => amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT));
   }
 
   on_added_to_view() {
-    amplify.publish(
-      z.event.WebApp.ANALYTICS.EVENT,
-      z.tracking.EventName.ONBOARDING.SEEN_USERNAME_SCREEN
-    );
+    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.SEEN_USERNAME_SCREEN);
   }
 
   on_link_click() {
-    amplify.publish(
-      z.event.WebApp.ANALYTICS.EVENT,
-      z.tracking.EventName.ONBOARDING.OPENED_USERNAME_FAQ
-    );
+    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.OPENED_USERNAME_FAQ);
     return true;
   }
 };

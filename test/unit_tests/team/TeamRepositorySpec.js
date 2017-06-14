@@ -70,24 +70,23 @@ describe('z.team.TeamRepository', () => {
     server = sinon.fakeServer.create();
     server.autoRespond = true;
 
-    server.respondWith(
-      'GET',
-      `${test_factory.settings.connection.rest_url}/teams?size=100`,
-      [200, {'Content-Type': 'application/json'}, JSON.stringify(teams_data)]
-    );
+    server.respondWith('GET', `${test_factory.settings.connection.rest_url}/teams?size=100`, [
+      200,
+      {'Content-Type': 'application/json'},
+      JSON.stringify(teams_data),
+    ]);
 
-    server.respondWith(
-      'GET',
-      `${test_factory.settings.connection.rest_url}/teams/${team_metadata.id}`,
-      [200, {'Content-Type': 'application/json'}, JSON.stringify(team_metadata)]
-    );
+    server.respondWith('GET', `${test_factory.settings.connection.rest_url}/teams/${team_metadata.id}`, [
+      200,
+      {'Content-Type': 'application/json'},
+      JSON.stringify(team_metadata),
+    ]);
 
-    server.respondWith(
-      'GET',
-      `${test_factory.settings.connection
-        .rest_url}/teams/${team_metadata.id}/members`,
-      [200, {'Content-Type': 'application/json'}, JSON.stringify(team_members)]
-    );
+    server.respondWith('GET', `${test_factory.settings.connection.rest_url}/teams/${team_metadata.id}/members`, [
+      200,
+      {'Content-Type': 'application/json'},
+      JSON.stringify(team_members),
+    ]);
   });
 
   afterEach(function() {
@@ -129,9 +128,7 @@ describe('z.team.TeamRepository', () => {
         .then(entities => {
           expect(entities.length).toEqual(team_members.members.length);
           expect(entities[0].user).toEqual(team_members.members[0].user);
-          expect(entities[0].permissions).toEqual(
-            team_members.members[0].permissions
-          );
+          expect(entities[0].permissions).toEqual(team_members.members[0].permissions);
           done();
         })
         .catch(done.fail);

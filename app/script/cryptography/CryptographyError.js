@@ -67,10 +67,8 @@ z.cryptography.CryptographyError = class CryptographyError extends Error {
       IGNORED_ASSET: 'z.cryptography.CryptographyError.TYPE.IGNORED_ASSET',
       IGNORED_PREVIEW: 'z.cryptography.CryptographyError.TYPE.IGNORED_PREVIEW',
       NO_DATA_CONTENT: 'z.cryptography.CryptographyError.TYPE.NO_DATA_CONTENT',
-      NO_GENERIC_MESSAGE:
-        'z.cryptography.CryptographyError.TYPE.NO_GENERIC_MESSAGE',
-      PREVIOUSLY_STORED:
-        'z.cryptography.CryptographyError.TYPE.PREVIOUSLY_STORED',
+      NO_GENERIC_MESSAGE: 'z.cryptography.CryptographyError.TYPE.NO_GENERIC_MESSAGE',
+      PREVIOUSLY_STORED: 'z.cryptography.CryptographyError.TYPE.PREVIOUSLY_STORED',
       UNHANDLED_TYPE: 'z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE',
       UNKNOWN: 'z.cryptography.CryptographyError.TYPE.UNKNOWN',
     };

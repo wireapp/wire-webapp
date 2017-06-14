@@ -25,21 +25,14 @@ window.z.telemetry.app_init = z.telemetry.app_init || {};
 
 z.telemetry.app_init.AppInitStatistics = class AppInitStatistics {
   constructor() {
-    this.logger = new z.util.Logger(
-      'z.telemetry.app_init.AppInitStatistics',
-      z.config.LOGGER.OPTIONS
-    );
+    this.logger = new z.util.Logger('z.telemetry.app_init.AppInitStatistics', z.config.LOGGER.OPTIONS);
 
-    amplify.subscribe(
-      z.event.WebApp.TELEMETRY.BACKEND_REQUESTS,
-      this.update_backend_requests.bind(this)
-    );
+    amplify.subscribe(z.event.WebApp.TELEMETRY.BACKEND_REQUESTS, this.update_backend_requests.bind(this));
   }
 
   add(statistic, value, bucket_size) {
     if (bucket_size && _.isNumber(value)) {
-      const buckets =
-        Math.floor(value / bucket_size) + (value % bucket_size ? 1 : 0);
+      const buckets = Math.floor(value / bucket_size) + (value % bucket_size ? 1 : 0);
 
       return (this[statistic] = value === 0 ? 0 : bucket_size * buckets);
     }
@@ -70,24 +63,16 @@ z.telemetry.app_init.AppInitStatistics = class AppInitStatistics {
       if (this.hasOwnProperty(key)) {
         const value = this[key];
         if (_.isNumber(value) || _.isString(value)) {
-          const placeholder_key = Array.from(Math.max(17 - key.length, 1)).join(
-            ' '
-          );
-          const placeholder_value = Array.from(
-            Math.max(11 - value.toString().length, 1)
-          ).join(' ');
+          const placeholder_key = Array.from(Math.max(17 - key.length, 1)).join(' ');
+          const placeholder_value = Array.from(Math.max(11 - value.toString().length, 1)).join(' ');
 
-          this.logger.info(
-            `${placeholder_key}'${key}':${placeholder_value}${value}`
-          );
+          this.logger.info(`${placeholder_key}'${key}':${placeholder_value}${value}`);
         }
       }
     }
   }
 
   update_backend_requests(number_of_requests) {
-    this[
-      z.telemetry.app_init.AppInitStatisticsValue.BACKEND_REQUESTS
-    ] = number_of_requests;
+    this[z.telemetry.app_init.AppInitStatisticsValue.BACKEND_REQUESTS] = number_of_requests;
   }
 };

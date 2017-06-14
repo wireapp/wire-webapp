@@ -34,12 +34,8 @@ window.z.connect = z.connect || {};
 z.connect.ConnectGoogleService = class ConnectGoogleService {
   constructor(client) {
     this.client = client;
-    this.logger = new z.util.Logger(
-      'z.connect.ConnectGoogleService',
-      z.config.LOGGER.OPTIONS
-    );
-    this.client_id =
-      '481053726221-71f8tbhghg4ug5put5v3j5pluv0di2fc.apps.googleusercontent.com';
+    this.logger = new z.util.Logger('z.connect.ConnectGoogleService', z.config.LOGGER.OPTIONS);
+    this.client_id = '481053726221-71f8tbhghg4ug5put5v3j5pluv0di2fc.apps.googleusercontent.com';
     this.scopes = 'https://www.googleapis.com/auth/contacts.readonly';
     this.url = 'https://www.google.com/m8/feeds/contacts/default/full';
   }
@@ -53,10 +49,7 @@ z.connect.ConnectGoogleService = class ConnectGoogleService {
       .then(() => this._get_access_token())
       .then(access_token => this._get_contacts(access_token))
       .catch(error => {
-        this.logger.error(
-          `Failed to import contacts from Google: ${error.message}`,
-          error
-        );
+        this.logger.error(`Failed to import contacts from Google: ${error.message}`, error);
       });
   }
 
@@ -79,10 +72,7 @@ z.connect.ConnectGoogleService = class ConnectGoogleService {
         return reject(response !== null ? response.error : undefined);
       };
 
-      return window.gapi.auth.authorize(
-        {client_id: this.client_id, immediate: false, scope: this.scopes},
-        on_response
-      );
+      return window.gapi.auth.authorize({client_id: this.client_id, immediate: false, scope: this.scopes}, on_response);
     });
   }
 
@@ -95,19 +85,14 @@ z.connect.ConnectGoogleService = class ConnectGoogleService {
       if (window.gapi.auth) {
         const auth_token = window.gapi.auth.getToken();
         if (auth_token) {
-          this.logger.info(
-            'Using cached access token to access Google contacts',
-            auth_token
-          );
+          this.logger.info('Using cached access token to access Google contacts', auth_token);
           return resolve(auth_token.access_token);
         }
         return this._authenticate().then(resolve).catch(reject);
       }
 
       this.logger.warn('Google Auth Client for JavaScript not loaded');
-      const error = new z.connect.ConnectError(
-        z.connect.ConnectError.TYPE.GOOGLE_CLIENT
-      );
+      const error = new z.connect.ConnectError(z.connect.ConnectError.TYPE.GOOGLE_CLIENT);
       Raygun.send(error);
       return reject(error);
     });
@@ -120,10 +105,7 @@ z.connect.ConnectGoogleService = class ConnectGoogleService {
    * @returns {Promise} Resolves with the user's contacts
    */
   _get_contacts(access_token) {
-    return fetch(
-      `${this
-        .url}?access_token=${access_token}&alt=json&max-results=15000&v=3.0`
-    )
+    return fetch(`${this.url}?access_token=${access_token}&alt=json&max-results=15000&v=3.0`)
       .then(response => response.json())
       .then(({feed}) => {
         this.logger.info('Received address book from Google', feed);
@@ -151,10 +133,7 @@ z.connect.ConnectGoogleService = class ConnectGoogleService {
       const script_node = document.createElement('script');
       script_node.src = 'https://apis.google.com/js/auth.js?onload=gapi_loaded';
       const script_element = document.getElementsByTagName('script')[0];
-      return script_element.parentNode.insertBefore(
-        script_node,
-        script_element
-      );
+      return script_element.parentNode.insertBefore(script_node, script_element);
     });
   }
 };

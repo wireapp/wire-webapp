@@ -144,12 +144,8 @@ z.entity.User = class User {
     this.is_canceled = ko.pureComputed(() => this.connection().is_canceled());
     this.is_connected = ko.pureComputed(() => this.connection().is_connected());
     this.is_ignored = ko.pureComputed(() => this.connection().is_ignored());
-    this.is_incoming_request = ko.pureComputed(() =>
-      this.connection().is_incoming_request()
-    );
-    this.is_outgoing_request = ko.pureComputed(() =>
-      this.connection().is_outgoing_request()
-    );
+    this.is_incoming_request = ko.pureComputed(() => this.connection().is_incoming_request());
+    this.is_outgoing_request = ko.pureComputed(() => this.connection().is_outgoing_request());
     this.is_unknown = ko.pureComputed(() => this.connection().is_unknown());
 
     this.is_request = ko.pureComputed(() => this.connection().is_request());
@@ -174,10 +170,7 @@ z.entity.User = class User {
     this.devices.push(new_client_et);
 
     if (this.is_me) {
-      this.devices.sort(
-        (client_a, client_b) =>
-          new Date(client_b.time) - new Date(client_a.time)
-      );
+      this.devices.sort((client_a, client_b) => new Date(client_b.time) - new Date(client_a.time));
     }
 
     return true;
@@ -197,9 +190,6 @@ z.entity.User = class User {
     if (is_username) {
       return z.util.StringUtil.starts_with(this.username(), query);
     }
-    return (
-      z.util.StringUtil.compare_transliteration(this.name(), query) ||
-      this.username() === query
-    );
+    return z.util.StringUtil.compare_transliteration(this.name(), query) || this.username() === query;
   }
 };

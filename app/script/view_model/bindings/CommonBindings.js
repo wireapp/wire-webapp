@@ -152,10 +152,7 @@ ko.bindingHandlers.resize = (function() {
         resize_callback(current_height, last_height);
       }
       last_height = current_height;
-      const max_height = window.parseInt(
-        getComputedStyle(element).maxHeight,
-        10
-      );
+      const max_height = window.parseInt(getComputedStyle(element).maxHeight, 10);
 
       if (current_height === max_height) {
         return (element.style.overflowY = 'scroll');
@@ -203,11 +200,7 @@ ko.bindingHandlers.resize = (function() {
 ko.bindingHandlers.enter = {
   init(element, valueAccessor, allBindings, data, context) {
     const wrapper = function(_data, event) {
-      if (
-        event.keyCode === z.util.KEYCODE.ENTER &&
-        !event.shiftKey &&
-        !event.altKey
-      ) {
+      if (event.keyCode === z.util.KEYCODE.ENTER && !event.shiftKey && !event.altKey) {
         const callback = valueAccessor();
         if (typeof callback === 'function') {
           callback.call(this, data, event);
@@ -288,8 +281,7 @@ ko.bindingHandlers.load_image_on_hover = {
         .on('mouseover', function() {
           const item = $(this);
           image = new Image();
-          image.onload = () =>
-            item.css({backgroundImage: `url(${animated_gif})`});
+          image.onload = () => item.css({backgroundImage: `url(${animated_gif})`});
           image.src = animated_gif;
         })
         .on('mouseout', function() {
@@ -425,11 +417,7 @@ ko.bindingHandlers.relative_timestamp = (function() {
     }
 
     if (current_day === yesterday) {
-      return $(element).text(
-        `${z.l10n.text(z.string.conversation_yesterday)} ${date
-          .local()
-          .format('HH:mm')}`
-      );
+      return $(element).text(`${z.l10n.text(z.string.conversation_yesterday)} ${date.local().format('HH:mm')}`);
     }
 
     if (moment().diff(date, 'days') < 7) {

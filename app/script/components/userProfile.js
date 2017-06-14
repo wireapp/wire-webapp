@@ -35,10 +35,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
     this.dispose = this.dispose.bind(this);
     this.click_on_device = this.click_on_device.bind(this);
 
-    this.logger = new z.util.Logger(
-      'z.components.UserProfileViewModel',
-      z.config.LOGGER.OPTIONS
-    );
+    this.logger = new z.util.Logger('z.components.UserProfileViewModel', z.config.LOGGER.OPTIONS);
 
     this.user = params.user;
     this.conversation = params.conversation;
@@ -130,17 +127,13 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
 
     this.show_back_button = ko.pureComputed(() => {
       if (typeof this.conversation === 'function') {
-        return (
-          this.conversation().is_group() || this.conversation().is_team_group()
-        );
+        return this.conversation().is_group() || this.conversation().is_team_group();
       }
     });
 
     this.selected_device_subscription = this.selected_device.subscribe(() => {
       if (this.selected_device()) {
-        this.fingerprint_local(
-          this.cryptography_repository.get_local_fingerprint()
-        );
+        this.fingerprint_local(this.cryptography_repository.get_local_fingerprint());
         this.fingerprint_remote('');
         this.cryptography_repository
           .get_remote_fingerprint(this.user().id, this.selected_device().id)
@@ -148,26 +141,15 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
       }
     });
 
-    const shortcut = z.ui.Shortcut.get_shortcut_tooltip(
-      z.ui.ShortcutType.ADD_PEOPLE
-    );
-    this.add_people_tooltip = z.l10n.text(
-      z.string.tooltip_people_add,
-      shortcut
-    );
+    const shortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.ADD_PEOPLE);
+    this.add_people_tooltip = z.l10n.text(z.string.tooltip_people_add, shortcut);
 
     this.device_headline = ko.pureComputed(() => {
-      return z.l10n.text(
-        z.string.people_tabs_devices_headline,
-        this.user().first_name()
-      );
+      return z.l10n.text(z.string.people_tabs_devices_headline, this.user().first_name());
     });
 
     this.no_device_headline = ko.pureComputed(() => {
-      return z.l10n.text(
-        z.string.people_tabs_no_devices_headline,
-        this.user().first_name()
-      );
+      return z.l10n.text(z.string.people_tabs_no_devices_headline, this.user().first_name());
     });
 
     this.detail_message = ko.pureComputed(() => {
@@ -183,35 +165,22 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
 
       this.confirm_dialog = this.element.confirm({
         confirm: () => {
-          const should_block = this.element
-            .find('.checkbox input')
-            .is(':checked');
+          const should_block = this.element.find('.checkbox input').is(':checked');
           if (should_block) {
             this.user_repository.block_user(this.user());
           } else {
             this.user_repository.cancel_connection_request(this.user());
           }
 
-          this.conversation_repository
-            .get_1to1_conversation(this.user())
-            .then(conversation_et => {
-              if (
-                this.conversation_repository.is_active_conversation(
-                  conversation_et
-                )
-              ) {
-                amplify.publish(z.event.WebApp.CONVERSATION.PEOPLE.HIDE);
-                const next_conversation_et = this.conversation_repository.get_next_conversation(
-                  conversation_et
-                );
-                window.setTimeout(function() {
-                  amplify.publish(
-                    z.event.WebApp.CONVERSATION.SHOW,
-                    next_conversation_et
-                  );
-                }, SHOW_CONVERSATION_DELAY);
-              }
-            });
+          this.conversation_repository.get_1to1_conversation(this.user()).then(conversation_et => {
+            if (this.conversation_repository.is_active_conversation(conversation_et)) {
+              amplify.publish(z.event.WebApp.CONVERSATION.PEOPLE.HIDE);
+              const next_conversation_et = this.conversation_repository.get_next_conversation(conversation_et);
+              window.setTimeout(function() {
+                amplify.publish(z.event.WebApp.CONVERSATION.SHOW, next_conversation_et);
+              }, SHOW_CONVERSATION_DELAY);
+            }
+          });
 
           if (typeof params.cancel_request === 'function') {
             params.cancel_request(this.user());
@@ -227,30 +196,24 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
     this.on_open = () => {
       amplify.publish(z.event.WebApp.CONVERSATION.PEOPLE.HIDE);
 
-      this.conversation_repository
-        .get_1to1_conversation(this.user())
-        .then(conversation_et => {
-          if (conversation_et.is_archived()) {
-            this.conversation_repository.unarchive_conversation(
-              conversation_et
-            );
-          }
+      this.conversation_repository.get_1to1_conversation(this.user()).then(conversation_et => {
+        if (conversation_et.is_archived()) {
+          this.conversation_repository.unarchive_conversation(conversation_et);
+        }
 
-          window.setTimeout(() => {
-            amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversation_et);
-            if (typeof params.open === 'function') {
-              params.open(this.user());
-            }
-          }, SHOW_CONVERSATION_DELAY);
-        });
+        window.setTimeout(() => {
+          amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversation_et);
+          if (typeof params.open === 'function') {
+            params.open(this.user());
+          }
+        }, SHOW_CONVERSATION_DELAY);
+      });
     };
 
     this.on_connect = () => {
-      this.user_repository
-        .create_connection(this.user(), true)
-        .then(function() {
-          amplify.publish(z.event.WebApp.CONVERSATION.PEOPLE.HIDE);
-        });
+      this.user_repository.create_connection(this.user(), true).then(function() {
+        amplify.publish(z.event.WebApp.CONVERSATION.PEOPLE.HIDE);
+      });
 
       if (typeof params.connect === 'function') {
         params.connect(this.user());
@@ -424,11 +387,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
 
     this.is_resetting_session(true);
     this.conversation_repository
-      .reset_session(
-        this.user().id,
-        this.selected_device().id,
-        this.conversation().id
-      )
+      .reset_session(this.user().id, this.selected_device().id, this.conversation().id)
       .then(() => reset_progress())
       .catch(() => reset_progress());
   }
@@ -438,9 +397,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
 
     this.client_repository
       .verify_client(this.user().id, this.selected_device(), toggle_verified)
-      .catch(error =>
-        this.logger.warn(`Client cannot be updated: ${error.message}`)
-      );
+      .catch(error => this.logger.warn(`Client cannot be updated: ${error.message}`));
   }
 
   on_tab_index_changed(index) {
@@ -452,9 +409,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
           this.devices_found(client_ets.length > 0);
         })
         .catch(error => {
-          this.logger.error(
-            `Unable to retrieve clients data for user '${user_id}': ${error}`
-          );
+          this.logger.error(`Unable to retrieve clients data for user '${user_id}': ${error}`);
         });
     }
   }

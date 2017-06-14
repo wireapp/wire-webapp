@@ -36,9 +36,7 @@ z.media.MediaStreamInfo = class MediaStreamInfo {
   }
 
   update_stream_type() {
-    this.stream = z.media.MediaStreamHandler.detect_media_stream_type(
-      this.stream
-    );
+    this.stream = z.media.MediaStreamHandler.detect_media_stream_type(this.stream);
     return (this.type = this.stream.type);
   }
 };

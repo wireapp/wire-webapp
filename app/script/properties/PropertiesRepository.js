@@ -35,18 +35,12 @@ z.properties.PropertiesRepository = class PropertiesRepository {
    */
   constructor(properties_service) {
     this.properties_service = properties_service;
-    this.logger = new z.util.Logger(
-      'z.properties.PropertiesRepository',
-      z.config.LOGGER.OPTIONS
-    );
+    this.logger = new z.util.Logger('z.properties.PropertiesRepository', z.config.LOGGER.OPTIONS);
 
     this.properties = new z.properties.Properties();
     this.self = ko.observable();
 
-    amplify.subscribe(
-      z.event.WebApp.PROPERTIES.UPDATED,
-      this.properties_updated.bind(this)
-    );
+    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.properties_updated.bind(this));
   }
 
   /**
@@ -102,10 +96,7 @@ z.properties.PropertiesRepository = class PropertiesRepository {
    */
   properties_updated(properties) {
     if (properties[z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING]) {
-      amplify.publish(
-        z.util.Logger.prototype.LOG_ON_DEBUG,
-        properties[z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING]
-      );
+      amplify.publish(z.util.Logger.prototype.LOG_ON_DEBUG, properties[z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING]);
     }
     return true;
   }
@@ -133,66 +124,38 @@ z.properties.PropertiesRepository = class PropertiesRepository {
       this.set_preference(properties_type, updated_preference);
 
       this.properties_service
-        .put_properties_by_key(
-          PropertiesRepository.CONFIG.PROPERTIES_KEY,
-          this.properties
-        )
+        .put_properties_by_key(PropertiesRepository.CONFIG.PROPERTIES_KEY, this.properties)
         .then(() => {
-          this.logger.info(
-            `Saved updated preference: '${properties_type}' - '${updated_preference}'`
-          );
+          this.logger.info(`Saved updated preference: '${properties_type}' - '${updated_preference}'`);
 
           switch (properties_type) {
             case z.properties.PROPERTIES_TYPE.CONTACT_IMPORT.GOOGLE:
             case z.properties.PROPERTIES_TYPE.CONTACT_IMPORT.MACOS:
-              amplify.publish(
-                z.event.WebApp.PROPERTIES.UPDATE.CONTACTS,
-                updated_preference
-              );
+              amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.CONTACTS, updated_preference);
               break;
             case z.properties.PROPERTIES_TYPE.EMOJI.REPLACE_INLINE:
-              amplify.publish(
-                z.event.WebApp.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE,
-                updated_preference
-              );
+              amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE, updated_preference);
               break;
             case z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING:
-              amplify.publish(
-                z.util.Logger.prototype.LOG_ON_DEBUG,
-                updated_preference
-              );
+              amplify.publish(z.util.Logger.prototype.LOG_ON_DEBUG, updated_preference);
               break;
             case z.properties.PROPERTIES_TYPE.HAS_CREATED_CONVERSATION:
-              amplify.publish(
-                z.event.WebApp.PROPERTIES.UPDATE.HAS_CREATED_CONVERSATION,
-                updated_preference
-              );
+              amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.HAS_CREATED_CONVERSATION, updated_preference);
               break;
             case z.properties.PROPERTIES_TYPE.NOTIFICATIONS:
-              amplify.publish(
-                z.event.WebApp.PROPERTIES.UPDATE.NOTIFICATIONS,
-                updated_preference
-              );
+              amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.NOTIFICATIONS, updated_preference);
               break;
             case z.properties.PROPERTIES_TYPE.PREVIEWS.SEND:
               amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.PREVIEWS.SEND);
               break;
             case z.properties.PROPERTIES_TYPE.PRIVACY:
-              amplify.publish(
-                z.event.WebApp.PROPERTIES.UPDATE.PRIVACY,
-                updated_preference
-              );
+              amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.PRIVACY, updated_preference);
               break;
             case z.properties.PROPERTIES_TYPE.SOUND_ALERTS:
-              amplify.publish(
-                z.event.WebApp.PROPERTIES.UPDATE.SOUND_ALERTS,
-                updated_preference
-              );
+              amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.SOUND_ALERTS, updated_preference);
               break;
             default:
-              throw new Error(
-                `Failed to update preference of unhandled type '${properties_type}'`
-              );
+              throw new Error(`Failed to update preference of unhandled type '${properties_type}'`);
           }
         });
     }
@@ -214,9 +177,7 @@ z.properties.PropertiesRepository = class PropertiesRepository {
         this.properties[type_parts[0]][type_parts[1]] = changed_preference;
         break;
       case 3:
-        this.properties[type_parts[0]][type_parts[1]][
-          type_parts[2]
-        ] = changed_preference;
+        this.properties[type_parts[0]][type_parts[1]][type_parts[2]] = changed_preference;
         break;
       default:
         throw new Error(`Failed to set preference of type ${properties_type}`);

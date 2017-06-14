@@ -38,12 +38,8 @@ describe('contains_only_link', function() {
   });
 
   it('should ignore leading and trailing whitespaces', function() {
-    expect(
-      z.links.LinkPreviewHelpers.contains_only_link(' http://wire.com')
-    ).toBeTruthy();
-    expect(
-      z.links.LinkPreviewHelpers.contains_only_link('http://wire.com ')
-    ).toBeTruthy();
+    expect(z.links.LinkPreviewHelpers.contains_only_link(' http://wire.com')).toBeTruthy();
+    expect(z.links.LinkPreviewHelpers.contains_only_link('http://wire.com ')).toBeTruthy();
   });
 
   it('should return false for multiple domains', function() {
@@ -60,31 +56,23 @@ describe('contains_only_link', function() {
 describe('get_first_link_with_offset', function() {
   it('should return undefined for simple text', function() {
     const text = 'foo bar baz';
-    expect(
-      z.links.LinkPreviewHelpers.get_first_link_with_offset(text)
-    ).not.toBeDefined();
+    expect(z.links.LinkPreviewHelpers.get_first_link_with_offset(text)).not.toBeDefined();
   });
 
   it('should return correct link and offset for single link without text)', function() {
-    const link_preview = z.links.LinkPreviewHelpers.get_first_link_with_offset(
-      'wire.com'
-    );
+    const link_preview = z.links.LinkPreviewHelpers.get_first_link_with_offset('wire.com');
     expect(link_preview.offset).toEqual(0);
     expect(link_preview.url).toEqual('wire.com');
   });
 
   it('should return correct link and offset for single link with text in front)', function() {
-    const link_preview = z.links.LinkPreviewHelpers.get_first_link_with_offset(
-      'Hey check wire.com'
-    );
+    const link_preview = z.links.LinkPreviewHelpers.get_first_link_with_offset('Hey check wire.com');
     expect(link_preview.offset).toEqual(10);
     expect(link_preview.url).toEqual('wire.com');
   });
 
   it('should return correct link and offset for single link surrounded by text )', function() {
-    const link_preview = z.links.LinkPreviewHelpers.get_first_link_with_offset(
-      'Hey check wire.com PLEASE!'
-    );
+    const link_preview = z.links.LinkPreviewHelpers.get_first_link_with_offset('Hey check wire.com PLEASE!');
     expect(link_preview.offset).toEqual(10);
     expect(link_preview.url).toEqual('wire.com');
   });

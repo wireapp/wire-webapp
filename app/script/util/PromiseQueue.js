@@ -39,11 +39,7 @@ z.util.PromiseQueue = class PromiseQueue {
    * @returns {PromiseQueue} Process Promises sequentially
    */
   constructor(options = {}) {
-    const {
-      name,
-      paused = false,
-      timeout = PromiseQueue.CONFIG.UNBLOCK_INTERVAL,
-    } = options;
+    const {name, paused = false, timeout = PromiseQueue.CONFIG.UNBLOCK_INTERVAL} = options;
 
     this.logger = new z.util.Logger(
       name ? `z.util.PromiseQueue (${name})` : 'z.util.PromiseQueue',
@@ -72,10 +68,7 @@ z.util.PromiseQueue = class PromiseQueue {
         if (!this._paused) {
           this._blocked = false;
           window.clearInterval(this._interval);
-          this.logger.error(
-            'Promise queue failed, unblocking queue',
-            this._queue
-          );
+          this.logger.error('Promise queue failed, unblocking queue', this._queue);
           this.execute();
         }
       }, this._timeout);

@@ -25,10 +25,7 @@ window.z.ViewModel = z.ViewModel || {};
 z.ViewModel.MainViewModel = class MainViewModel {
   constructor(element_id, user_repository) {
     this.user_repository = user_repository;
-    this.logger = new z.util.Logger(
-      'z.ViewModel.MainViewModel',
-      z.config.LOGGER.OPTIONS
-    );
+    this.logger = new z.util.Logger('z.ViewModel.MainViewModel', z.config.LOGGER.OPTIONS);
 
     this.user = this.user_repository.self;
 

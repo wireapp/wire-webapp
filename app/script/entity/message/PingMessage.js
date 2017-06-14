@@ -29,11 +29,7 @@ z.entity.PingMessage = class PingMessage extends z.entity.Message {
 
     this.caption = ko.pureComputed(
       () => {
-        return z.l10n.text(
-          this.user().is_me
-            ? z.string.conversation_ping_you
-            : z.string.conversation_ping
-        );
+        return z.l10n.text(this.user().is_me ? z.string.conversation_ping_you : z.string.conversation_ping);
       },
       this,
       {deferEvaluation: true}

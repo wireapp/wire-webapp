@@ -31,10 +31,7 @@ z.ViewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
     this.removed_from_view = this.removed_from_view.bind(this);
     this.set_conversation = this.set_conversation.bind(this);
 
-    this.logger = new z.util.Logger(
-      'z.ViewModel.CollectionDetailsViewModel',
-      z.config.LOGGER.OPTIONS
-    );
+    this.logger = new z.util.Logger('z.ViewModel.CollectionDetailsViewModel', z.config.LOGGER.OPTIONS);
 
     this.template = ko.observable();
     this.conversation_et = ko.observable();
@@ -45,14 +42,8 @@ z.ViewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
   }
 
   set_conversation(conversation_et, category, items) {
-    amplify.subscribe(
-      z.event.WebApp.CONVERSATION.MESSAGE.ADDED,
-      this.item_added
-    );
-    amplify.subscribe(
-      z.event.WebApp.CONVERSATION.MESSAGE.REMOVED,
-      this.item_removed
-    );
+    amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, this.item_added);
+    amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.item_removed);
     this.template(category);
     this.conversation_et(conversation_et);
     z.util.ko_push_deferred(this.items, items);
@@ -93,33 +84,19 @@ z.ViewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
   }
 
   removed_from_view() {
-    amplify.unsubscribe(
-      z.event.WebApp.CONVERSATION.MESSAGE.ADDED,
-      this.item_added
-    );
-    amplify.unsubscribe(
-      z.event.WebApp.CONVERSATION.MESSAGE.REMOVED,
-      this.item_removed
-    );
+    amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, this.item_added);
+    amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.item_removed);
     this.last_message_timestamp = undefined;
     this.conversation_et(null);
     this.items.removeAll();
   }
 
   click_on_back_button() {
-    amplify.publish(
-      z.event.WebApp.CONTENT.SWITCH,
-      z.ViewModel.content.CONTENT_STATE.COLLECTION
-    );
+    amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.COLLECTION);
   }
 
   click_on_image(message_et) {
-    amplify.publish(
-      z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW,
-      message_et,
-      this.items(),
-      'collection'
-    );
+    amplify.publish(z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, message_et, this.items(), 'collection');
   }
 
   should_show_header(message_et) {
@@ -130,9 +107,7 @@ z.ViewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
 
     // We passed today
     if (
-      !moment(message_et.timestamp()).is_same_day(
-        this.last_message_timestamp
-      ) &&
+      !moment(message_et.timestamp()).is_same_day(this.last_message_timestamp) &&
       moment(this.last_message_timestamp).is_today()
     ) {
       this.last_message_timestamp = message_et.timestamp();
@@ -140,9 +115,7 @@ z.ViewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
     }
 
     // We passed the month
-    if (
-      !moment(message_et.timestamp()).is_same_month(this.last_message_timestamp)
-    ) {
+    if (!moment(message_et.timestamp()).is_same_month(this.last_message_timestamp)) {
       this.last_message_timestamp = message_et.timestamp();
       return true;
     }

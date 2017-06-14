@@ -59,33 +59,19 @@ z.event.EventRepository = class EventRepository {
     this.cryptography_repository = cryptography_repository;
     this.user_repository = user_repository;
     this.conversation_service = conversation_service;
-    this.logger = new z.util.Logger(
-      'z.event.EventRepository',
-      z.config.LOGGER.OPTIONS
-    );
+    this.logger = new z.util.Logger('z.event.EventRepository', z.config.LOGGER.OPTIONS);
 
     this.current_client = undefined;
     this.clock_drift = 0;
 
-    this.notification_handling_state = ko.observable(
-      z.event.NOTIFICATION_HANDLING_STATE.STREAM
-    );
+    this.notification_handling_state = ko.observable(z.event.NOTIFICATION_HANDLING_STATE.STREAM);
     this.notification_handling_state.subscribe(handling_state => {
-      amplify.publish(
-        z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE,
-        handling_state
-      );
+      amplify.publish(z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, handling_state);
 
       if (handling_state === z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET) {
         this._handle_buffered_notifications();
-        if (
-          this.previous_handling_state ===
-          z.event.NOTIFICATION_HANDLING_STATE.RECOVERY
-        ) {
-          amplify.publish(
-            z.event.WebApp.WARNING.DISMISS,
-            z.ViewModel.WarningType.CONNECTIVITY_RECOVERY
-          );
+        if (this.previous_handling_state === z.event.NOTIFICATION_HANDLING_STATE.RECOVERY) {
+          amplify.publish(z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.CONNECTIVITY_RECOVERY);
         }
       }
       this.previous_handling_state = handling_state;
@@ -119,30 +105,20 @@ z.event.EventRepository = class EventRepository {
               this.notifications_handled++;
 
               if (this.notifications_handled % 5 === 0) {
-                const progress =
-                  this.notifications_handled / this.notifications_total * 70 +
-                  25;
-                amplify.publish(
-                  z.event.WebApp.APP.UPDATE_PROGRESS,
-                  progress,
-                  z.string.init_events_progress,
-                  [this.notifications_handled, this.notifications_total]
-                );
+                const progress = this.notifications_handled / this.notifications_total * 70 + 25;
+                amplify.publish(z.event.WebApp.APP.UPDATE_PROGRESS, progress, z.string.init_events_progress, [
+                  this.notifications_handled,
+                  this.notifications_total,
+                ]);
               }
             });
         }
       } else if (
         this.notifications_loaded() &&
-        this.notification_handling_state() !==
-          z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET
+        this.notification_handling_state() !== z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET
       ) {
-        this.logger.info(
-          `Done handling '${this
-            .notifications_total}' notifications from the stream`
-        );
-        this.notification_handling_state(
-          z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET
-        );
+        this.logger.info(`Done handling '${this.notifications_total}' notifications from the stream`);
+        this.notification_handling_state(z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
         this.notifications_loaded(false);
         this.notifications_promises[0](this.last_notification_id());
       }
@@ -152,14 +128,8 @@ z.event.EventRepository = class EventRepository {
 
     this.last_notification_id = ko.observable(undefined);
 
-    amplify.subscribe(
-      z.event.WebApp.CONNECTION.ONLINE,
-      this.recover_from_notification_stream.bind(this)
-    );
-    amplify.subscribe(
-      z.event.WebApp.EVENT.INJECT,
-      this.inject_event.bind(this)
-    );
+    amplify.subscribe(z.event.WebApp.CONNECTION.ONLINE, this.recover_from_notification_stream.bind(this));
+    amplify.subscribe(z.event.WebApp.EVENT.INJECT, this.inject_event.bind(this));
   }
 
   //##############################################################################
@@ -177,10 +147,7 @@ z.event.EventRepository = class EventRepository {
 
     this.web_socket_service.client_id = this.current_client().id;
     this.web_socket_service.connect(notification => {
-      if (
-        this.notification_handling_state() ===
-        z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET
-      ) {
+      if (this.notification_handling_state() === z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET) {
         return this.notifications_queue.push(notification);
       }
       this._buffer_web_socket_notification(notification);
@@ -202,9 +169,7 @@ z.event.EventRepository = class EventRepository {
    * @returns {undefined} No return value
    */
   reconnect_web_socket(trigger) {
-    this.notification_handling_state(
-      z.event.NOTIFICATION_HANDLING_STATE.RECOVERY
-    );
+    this.notification_handling_state(z.event.NOTIFICATION_HANDLING_STATE.RECOVERY);
     this.web_socket_service.reconnect(trigger);
   }
 
@@ -222,15 +187,9 @@ z.event.EventRepository = class EventRepository {
    * @returns {undefined} No return value
    */
   _handle_buffered_notifications() {
-    this.logger.info(
-      `Received '${this.web_socket_buffer
-        .length}' notifications via WebSocket while handling stream`
-    );
+    this.logger.info(`Received '${this.web_socket_buffer.length}' notifications via WebSocket while handling stream`);
     if (this.web_socket_buffer.length) {
-      z.util.ko_array_push_all(
-        this.notifications_queue,
-        this.web_socket_buffer
-      );
+      z.util.ko_array_push_all(this.notifications_queue, this.web_socket_buffer);
       this.web_socket_buffer.length = 0;
     }
   }
@@ -256,9 +215,7 @@ z.event.EventRepository = class EventRepository {
         if (notifications.length > 0) {
           notification_id = notifications[notifications.length - 1].id;
 
-          this.logger.info(
-            `Added '${notifications.length}' notifications to the queue`
-          );
+          this.logger.info(`Added '${notifications.length}' notifications to the queue`);
           z.util.ko_array_push_all(this.notifications_queue, notifications);
 
           if (!this.notifications_promises) {
@@ -272,16 +229,11 @@ z.event.EventRepository = class EventRepository {
           }
 
           this.notifications_loaded(true);
-          this.logger.info(
-            `Fetched '${this
-              .notifications_total}' notifications from the backend`
-          );
+          this.logger.info(`Fetched '${this.notifications_total}' notifications from the backend`);
           return notification_id;
         }
         this.logger.info(`No notifications found since '${notification_id}'`);
-        return reject(
-          new z.event.EventError(z.event.EventError.TYPE.NO_NOTIFICATIONS)
-        );
+        return reject(new z.event.EventError(z.event.EventError.TYPE.NO_NOTIFICATIONS));
       };
 
       return this.notification_service
@@ -295,26 +247,13 @@ z.event.EventRepository = class EventRepository {
             return _got_notifications(error_response);
           }
 
-          if (
-            error_response.code ===
-            z.service.BackendClientError.STATUS_CODE.NOT_FOUND
-          ) {
-            this.logger.info(
-              `No notifications found since '${notification_id}'`,
-              error_response
-            );
-            return reject(
-              new z.event.EventError(z.event.EventError.TYPE.NO_NOTIFICATIONS)
-            );
+          if (error_response.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
+            this.logger.info(`No notifications found since '${notification_id}'`, error_response);
+            return reject(new z.event.EventError(z.event.EventError.TYPE.NO_NOTIFICATIONS));
           }
 
-          this.logger.error(
-            `Failed to get notifications: ${error_response.message}`,
-            error_response
-          );
-          return reject(
-            new z.event.EventError(z.event.EventError.TYPE.REQUEST_FAILURE)
-          );
+          this.logger.error(`Failed to get notifications: ${error_response.message}`, error_response);
+          return reject(new z.event.EventError(z.event.EventError.TYPE.REQUEST_FAILURE));
         });
     });
   }
@@ -335,19 +274,15 @@ z.event.EventRepository = class EventRepository {
           throw error;
         }
 
-        this.logger.warn(
-          'Last notification ID not found in database. Resetting...'
-        );
-        return this.notification_service
-          .get_notifications_last()
-          .then(({id: notification_id}) => {
-            if (notification_id) {
-              this._update_last_notification_id(notification_id);
-              amplify.publish(z.event.WebApp.CONVERSATION.MISSED_EVENTS);
-              return this.last_notification_id();
-            }
-            throw error;
-          });
+        this.logger.warn('Last notification ID not found in database. Resetting...');
+        return this.notification_service.get_notifications_last().then(({id: notification_id}) => {
+          if (notification_id) {
+            this._update_last_notification_id(notification_id);
+            amplify.publish(z.event.WebApp.CONVERSATION.MISSED_EVENTS);
+            return this.last_notification_id();
+          }
+          throw error;
+        });
       });
   }
 
@@ -357,14 +292,10 @@ z.event.EventRepository = class EventRepository {
    * @returns {Promise} Resolves with the last known notification ID matching the local client
    */
   initialize_last_notification_id(client_id) {
-    return this.notification_service
-      .get_notifications_last(client_id)
-      .then(response => {
-        this._update_last_notification_id(response.id);
-        this.logger.info(
-          `Set starting point on notification stream to '${this.last_notification_id()}'`
-        );
-      });
+    return this.notification_service.get_notifications_last(client_id).then(response => {
+      this._update_last_notification_id(response.id);
+      this.logger.info(`Set starting point on notification stream to '${this.last_notification_id()}'`);
+    });
   }
 
   /**
@@ -377,9 +308,7 @@ z.event.EventRepository = class EventRepository {
         return this._update_from_notification_stream(last_notification_id);
       })
       .catch(error => {
-        this.notification_handling_state(
-          z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET
-        );
+        this.notification_handling_state(z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
         if (error.type === z.event.EventError.TYPE.NO_LAST_ID) {
           this.logger.info('No notifications found for this user', error);
           return 0;
@@ -393,36 +322,19 @@ z.event.EventRepository = class EventRepository {
    * @returns {Promise} Resolves when all missed notifications have been handled
    */
   recover_from_notification_stream() {
-    this.notification_handling_state(
-      z.event.NOTIFICATION_HANDLING_STATE.RECOVERY
-    );
-    amplify.publish(
-      z.event.WebApp.WARNING.SHOW,
-      z.ViewModel.WarningType.CONNECTIVITY_RECOVERY
-    );
+    this.notification_handling_state(z.event.NOTIFICATION_HANDLING_STATE.RECOVERY);
+    amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECOVERY);
 
-    return this._update_from_notification_stream(
-      this._get_last_known_notification_id()
-    )
+    return this._update_from_notification_stream(this._get_last_known_notification_id())
       .then(number_of_notifications => {
-        this.logger.info(
-          `Retrieved '${number_of_notifications}' notifications from stream after connectivity loss`
-        );
+        this.logger.info(`Retrieved '${number_of_notifications}' notifications from stream after connectivity loss`);
       })
       .catch(error => {
         if (error.type !== z.event.EventError.TYPE.NO_NOTIFICATIONS) {
-          this.logger.error(
-            `Failed to recover from notification stream: ${error.message}`,
-            error
-          );
-          this.notification_handling_state(
-            z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET
-          );
+          this.logger.error(`Failed to recover from notification stream: ${error.message}`, error);
+          this.notification_handling_state(z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
           // @todo What do we do in this case?
-          amplify.publish(
-            z.event.WebApp.WARNING.SHOW,
-            z.ViewModel.WarningType.CONNECTIVITY_RECONNECT
-          );
+          amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECONNECT);
         }
       });
   }
@@ -436,8 +348,7 @@ z.event.EventRepository = class EventRepository {
    */
   _get_last_known_notification_id() {
     if (this.notifications_queue().length) {
-      return this.notifications_queue()[this.notifications_queue().length - 1]
-        .id;
+      return this.notifications_queue()[this.notifications_queue().length - 1].id;
     }
     return this.last_notification_id();
   }
@@ -455,24 +366,17 @@ z.event.EventRepository = class EventRepository {
     return this.get_notifications(last_notification_id, 500)
       .then(updated_last_notification_id => {
         if (updated_last_notification_id) {
-          this.logger.info(
-            `ID of last notification fetched from stream is '${updated_last_notification_id}'`
-          );
+          this.logger.info(`ID of last notification fetched from stream is '${updated_last_notification_id}'`);
         }
         return this.notifications_total;
       })
       .catch(error => {
-        this.notification_handling_state(
-          z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET
-        );
+        this.notification_handling_state(z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
         if (error.type === z.event.EventError.TYPE.NO_NOTIFICATIONS) {
           this.logger.info('No notifications found for this user', error);
           return 0;
         }
-        this.logger.error(
-          `Failed to handle notification stream: ${error.message}`,
-          error
-        );
+        this.logger.error(`Failed to handle notification stream: ${error.message}`, error);
         throw error;
       });
   }
@@ -499,9 +403,7 @@ z.event.EventRepository = class EventRepository {
   _update_last_notification_id(last_notification_id) {
     if (last_notification_id) {
       this.last_notification_id(last_notification_id);
-      this.notification_service.save_last_notification_id_to_db(
-        last_notification_id
-      );
+      this.notification_service.save_last_notification_id_to_db(last_notification_id);
     }
   }
 
@@ -518,11 +420,7 @@ z.event.EventRepository = class EventRepository {
    * @returns {undefined} No return value
    */
   inject_event(event, can_create_notification = true) {
-    const {
-      conversation: conversation_id,
-      id = 'ID not specified',
-      type,
-    } = event;
+    const {conversation: conversation_id, id = 'ID not specified', type} = event;
     if (conversation_id !== this.user_repository.self().id) {
       this.logger.info(`Injected event ID '${id}' of type '${type}'`, event);
       const source = can_create_notification
@@ -542,10 +440,7 @@ z.event.EventRepository = class EventRepository {
    */
   _distribute_event(event, source) {
     if (event.conversation) {
-      this.logger.info(
-        `Distributed '${event.type}' event for conversation '${event.conversation}'`,
-        event
-      );
+      this.logger.info(`Distributed '${event.type}' event for conversation '${event.conversation}'`, event);
     } else {
       this.logger.info(`Distributed '${event.type}' event`, event);
     }
@@ -555,11 +450,7 @@ z.event.EventRepository = class EventRepository {
         amplify.publish(z.event.WebApp.CALL.EVENT_FROM_BACKEND, event, source);
         break;
       case 'conversation':
-        amplify.publish(
-          z.event.WebApp.CONVERSATION.EVENT_FROM_BACKEND,
-          event,
-          source
-        );
+        amplify.publish(z.event.WebApp.CONVERSATION.EVENT_FROM_BACKEND, event, source);
         break;
       case 'team':
         amplify.publish(z.event.WebApp.TEAM.EVENT_FROM_BACKEND, event, source);
@@ -594,53 +485,36 @@ z.event.EventRepository = class EventRepository {
             .decrypt_event(event)
             .catch(decryption_error => {
               // Get error information
-              const error_code =
-                decryption_error.code ||
-                EventRepository.CONFIG.UNKNOWN_DECRYPTION_ERROR_CODE;
+              const error_code = decryption_error.code || EventRepository.CONFIG.UNKNOWN_DECRYPTION_ERROR_CODE;
               const {data: event_data, from: remote_user_id} = event;
               const remote_client_id = event_data.sender;
-              const session_id = this.cryptography_repository._construct_session_id(
-                remote_user_id,
-                remote_client_id
-              );
+              const session_id = this.cryptography_repository._construct_session_id(remote_user_id, remote_client_id);
 
               // Handle error
               if (
-                decryption_error instanceof
-                  Proteus.errors.DecryptError.DuplicateMessage ||
-                decryption_error instanceof
-                  Proteus.errors.DecryptError.OutdatedMessage
+                decryption_error instanceof Proteus.errors.DecryptError.DuplicateMessage ||
+                decryption_error instanceof Proteus.errors.DecryptError.OutdatedMessage
               ) {
                 // We don't need to show duplicate message errors to the user
-                throw new z.cryptography.CryptographyError(
-                  z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE
-                );
+                throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE);
               }
               if (
                 decryption_error instanceof z.cryptography.CryptographyError &&
-                decryption_error.type ===
-                  z.cryptography.CryptographyError.TYPE.PREVIOUSLY_STORED
+                decryption_error.type === z.cryptography.CryptographyError.TYPE.PREVIOUSLY_STORED
               ) {
-                throw new z.cryptography.CryptographyError(
-                  z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE
-                );
+                throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE);
               }
 
               if (
-                decryption_error instanceof
-                  Proteus.errors.DecryptError.InvalidMessage ||
-                decryption_error instanceof
-                  Proteus.errors.DecryptError.InvalidSignature
+                decryption_error instanceof Proteus.errors.DecryptError.InvalidMessage ||
+                decryption_error instanceof Proteus.errors.DecryptError.InvalidSignature
               ) {
                 // Session is broken, let's see what's really causing it...
                 this.logger.error(
                   `Session '${session_id}' with user '${remote_user_id}' (client '${remote_client_id}') is broken or out of sync. Reset the session and decryption is likely to work again. Error: ${decryption_error.message}`,
                   decryption_error
                 );
-              } else if (
-                decryption_error instanceof
-                Proteus.errors.DecryptError.RemoteIdentityChanged
-              ) {
+              } else if (decryption_error instanceof Proteus.errors.DecryptError.RemoteIdentityChanged) {
                 // Remote identity changed
                 this.logger.error(
                   `Remote identity of client '${remote_client_id}' from user '${remote_user_id}' changed: ${decryption_error.message}`,
@@ -654,18 +528,11 @@ z.event.EventRepository = class EventRepository {
               );
               this._report_decrypt_error(decryption_error, event);
 
-              return z.conversation.EventBuilder.build_unable_to_decrypt(
-                event,
-                decryption_error,
-                error_code
-              );
+              return z.conversation.EventBuilder.build_unable_to_decrypt(event, decryption_error, error_code);
             })
             .then(message => {
               if (message instanceof z.proto.GenericMessage) {
-                return this.cryptography_repository.cryptography_mapper.map_generic_message(
-                  message,
-                  event
-                );
+                return this.cryptography_repository.cryptography_mapper.map_generic_message(message, event);
               }
               return message;
             });
@@ -715,10 +582,7 @@ z.event.EventRepository = class EventRepository {
       : EventRepository.NOTIFICATION_SOURCE.STREAM;
     const is_transient_event = transient === true;
 
-    this.logger.info(
-      `Handling notification '${id}' from '${source}' containing '${events.length}' events`,
-      events
-    );
+    this.logger.info(`Handling notification '${id}' from '${source}' containing '${events.length}' events`, events);
 
     if (!events.length) {
       this.logger.warn('Notification payload does not contain any events');
@@ -736,10 +600,7 @@ z.event.EventRepository = class EventRepository {
         return id;
       })
       .catch(error => {
-        this.logger.error(
-          `Failed to handle notification '${id}' from '${source}': ${error.message}`,
-          error
-        );
+        this.logger.error(`Failed to handle notification '${id}' from '${source}': ${error.message}`, error);
         throw error;
       });
   }
@@ -754,22 +615,12 @@ z.event.EventRepository = class EventRepository {
    * @param {string} event_type - Event type
    * @returns {undefined} No return value
    */
-  _report_decrypt_error(
-    decryption_error,
-    {data: event_data, from: user_id, type: event_type}
-  ) {
-    const session_id = this.cryptography_repository._construct_session_id(
-      user_id,
-      event_data.sender
-    );
+  _report_decrypt_error(decryption_error, {data: event_data, from: user_id, type: event_type}) {
+    const session_id = this.cryptography_repository._construct_session_id(user_id, event_data.sender);
 
-    amplify.publish(
-      z.event.WebApp.ANALYTICS.EVENT,
-      z.tracking.EventName.E2EE.CANNOT_DECRYPT_MESSAGE,
-      {
-        cause: decryption_error.code || decryption_error.message,
-      }
-    );
+    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.E2EE.CANNOT_DECRYPT_MESSAGE, {
+      cause: decryption_error.code || decryption_error.message,
+    });
 
     const custom_data = {
       client_local_class: this.current_client().class,
@@ -780,9 +631,7 @@ z.event.EventRepository = class EventRepository {
       session_id: session_id,
     };
 
-    const raygun_error = new Error(
-      `Decryption failed: ${decryption_error.code || decryption_error.message}`
-    );
+    const raygun_error = new Error(`Decryption failed: ${decryption_error.code || decryption_error.message}`);
     raygun_error.stack = decryption_error.stack;
     Raygun.send(raygun_error, custom_data);
   }
@@ -795,27 +644,17 @@ z.event.EventRepository = class EventRepository {
    * @returns {boolean} Returns true if event is handled within is lifetime, otherwise throws error
    */
   _validate_call_event_lifetime(event) {
-    if (
-      this.notification_handling_state() ===
-      z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET
-    )
-      return true;
-    if (event.content.type === z.calling.enum.CALL_MESSAGE_TYPE.CANCEL)
-      return true;
+    if (this.notification_handling_state() === z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET) return true;
+    if (event.content.type === z.calling.enum.CALL_MESSAGE_TYPE.CANCEL) return true;
 
     const corrected_timestamp = Date.now() - this.clock_drift;
     const event_timestamp = new Date(event.time).getTime();
-    if (
-      corrected_timestamp >
-      event_timestamp + EventRepository.CONFIG.E_CALL_EVENT_LIFETIME
-    ) {
+    if (corrected_timestamp > event_timestamp + EventRepository.CONFIG.E_CALL_EVENT_LIFETIME) {
       this.logger.info(
         `Ignored outdated '${event.type}' event in conversation '${event.conversation}' - Event: '${event_timestamp}', Local: '${corrected_timestamp}'`,
         {event_json: JSON.stringify(event), event_object: event}
       );
-      throw new z.event.EventError(
-        z.event.EventError.TYPE.OUTDATED_E_CALL_EVENT
-      );
+      throw new z.event.EventError(z.event.EventError.TYPE.OUTDATED_E_CALL_EVENT);
     }
     return true;
   }

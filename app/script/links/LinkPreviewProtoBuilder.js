@@ -41,19 +41,8 @@ z.links.LinkPreviewProtoBuilder = {
     data.url = data.url || url;
 
     if (data.title && data.url) {
-      const article = new z.proto.Article(
-        data.url,
-        data.title,
-        data.description
-      ); // deprecated format
-      const preview = new z.proto.LinkPreview(
-        url,
-        offset,
-        article,
-        data.url,
-        data.title,
-        data.description
-      );
+      const article = new z.proto.Article(data.url, data.title, data.description); // deprecated format
+      const preview = new z.proto.LinkPreview(url, offset, article, data.url, data.title, data.description);
 
       if (data.site_name === 'Twitter') {
         const author = data.title.replace('on Twitter', '').trim();
