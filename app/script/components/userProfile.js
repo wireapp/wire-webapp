@@ -305,15 +305,16 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
             return 'user-profile-footer-profile-leave';
           }
 
-          if (user_et.is_unknown()) {
-            return conversation_et.is_guest() ? 'user-profile-footer-connect-remove' : 'user-profile-footer-message-remove';
-          }
-          if (user_et.is_ignored() || user_et.is_request()) {
-            return 'user-profile-footer-pending-remove';
+          if (user_et.is_connected() || user_et.is_team_member()) {
+            return 'user-profile-footer-message-remove';
           }
 
-          if (user_et.is_connected()) {
-            return 'user-profile-footer-message-remove';
+          if (user_et.is_unknown()) {
+            return 'user-profile-footer-connect-remove';
+          }
+
+          if (user_et.is_ignored() || user_et.is_request()) {
+            return 'user-profile-footer-pending-remove';
           }
 
           if (user_et.is_blocked()) {
