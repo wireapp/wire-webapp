@@ -67,13 +67,9 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: [process.env.TRAVIS ? 'ChromeTravisCI' : 'ChromeHeadless'],
+    browsers: ['ChromeHeadless'],
 
     customLaunchers: {
-      ChromeTravisCI: {
-        base: 'Chrome',
-        flags: ['--no-sandbox'],
-      },
       ChromeHeadless: {
         base: 'Chrome',
         flags: [
