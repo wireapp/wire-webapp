@@ -570,7 +570,7 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
 
   /**
    * Log the flow to the browser console.
-   * @param {Participant|EParticipant} participant_et - Call participant
+   * @param {Participant} participant_et - Call participant
    * @returns {undefined} No return value
    */
   log_status(participant_et) {

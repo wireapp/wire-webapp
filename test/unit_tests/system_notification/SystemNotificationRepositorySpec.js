@@ -188,7 +188,7 @@ describe('z.system_notification.SystemNotificationRepository', function() {
     it('if the browser tab has focus and conversation is active', function(done) {
       TestFactory.conversation_repository.active_conversation(conversation_et);
       document.hasFocus = () => true;
-      TestFactory.v2_call_center.joined_call = () => true;
+      TestFactory.calling_repository.joined_call = () => true;
 
       TestFactory.system_notification_repository.notify(conversation_et, message_et)
         .then(function() {
@@ -501,9 +501,12 @@ describe('z.system_notification.SystemNotificationRepository', function() {
       it('with one user being removed from the conversation', function(done) {
         message_et.user_ets([other_user_et]);
 
-        const first_name_removed = `${entities.user.jane_roe.name.split(' ')[0]}`;
-        const expected_body = `${first_name} removed ${first_name_removed} from the conversation`;
-        verify_notification_system(done, conversation_et, message_et, expected_body);
+        TestFactory.system_notification_repository.notify(conversation_et, message_et)
+          .then(function() {
+            expect(TestFactory.system_notification_repository._show_notification).not.toHaveBeenCalled();
+            done();
+          })
+          .catch(done.fail);
       });
 
       it('with you being removed from the conversation', function(done) {
@@ -518,15 +521,23 @@ describe('z.system_notification.SystemNotificationRepository', function() {
         const user_ets = TestFactory.user_repository.user_mapper.map_users_from_object(payload.users.get.many);
         message_et.user_ets(user_ets);
 
-        const expected_body = `${first_name} removed 2 people from the conversation`;
-        verify_notification_system(done, conversation_et, message_et, expected_body);
+        TestFactory.system_notification_repository.notify(conversation_et, message_et)
+          .then(function() {
+            expect(TestFactory.system_notification_repository._show_notification).not.toHaveBeenCalled();
+            done();
+          })
+          .catch(done.fail);
       });
 
       it('with someone leaving the conversation by himself', function(done) {
         message_et.user_ets([message_et.user()]);
 
-        const expected_body = `${first_name} left the conversation`;
-        verify_notification_system(done, conversation_et, message_et, expected_body);
+        TestFactory.system_notification_repository.notify(conversation_et, message_et)
+          .then(function() {
+            expect(TestFactory.system_notification_repository._show_notification).not.toHaveBeenCalled();
+            done();
+          })
+          .catch(done.fail);
       });
     });
   });

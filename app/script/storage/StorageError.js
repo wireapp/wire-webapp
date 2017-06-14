@@ -43,6 +43,9 @@ z.storage.StorageError = class StorageError extends Error {
       case z.storage.StorageError.TYPE.NO_CONVERSATION_ID:
         this.message = 'Missing conversation ID';
         break;
+      case z.storage.StorageError.TYPE.NO_DATA:
+        this.message = 'Storage value is undefined or null';
+        break;
       case z.storage.StorageError.TYPE.NO_SENDER_ID:
         this.message = 'Missing sender ID';
         break;
@@ -73,6 +76,7 @@ z.storage.StorageError = class StorageError extends Error {
       INVALID_TIME: 'z.storage.StorageError.TYPE.INVALID_TIME',
       INVALID_TIMESTAMP: 'z.storage.StorageError.TYPE.INVALID_TIMESTAMP',
       NO_CONVERSATION_ID: 'z.storage.StorageError.TYPE.NO_CONVERSATION_ID',
+      NO_DATA: 'z.storage.StorageError.TYPE.NO_DATA',
       NO_SENDER_ID: 'z.storage.StorageError.TYPE.NO_SENDER_ID',
       NO_TIME: 'z.storage.StorageError.TYPE.NO_TIME',
       NON_SEQUENTIAL_UPDATE: 'z.storage.StorageError.TYPE.NON_SEQUENTIAL_UPDATE',

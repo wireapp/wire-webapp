@@ -8,6 +8,7 @@
     "generic-message-proto": "https://github.com/wireapp/generic-message-proto.git#1.18.0",
     "highlightjs": "https://github.com/components/highlightjs.git#9.10.0",
     "jquery": "https://github.com/jquery/jquery.git#2.1.4",
+    "js-cookie": "https://github.com/js-cookie/js-cookie.git#2.1.4",
     "keyboardjs": "https://github.com/RobertWHurst/KeyboardJS.git#2.3.3",
     "knockout": "https://github.com/knockout/knockout.git#3.4.1",
     "linkifyjs": "https://github.com/nfrasser/linkify-shim.git#2.1.4",
@@ -69,6 +70,9 @@
     "jquery-mousewheel": {
       "js": "jquery.mousewheel.js"
     },
+    "js-cookie": {
+      "js": "src/js.cookie.js"
+    },
     "keyboardjs": {
       "js": "dist/keyboard.js"
     },
@@ -94,6 +98,8 @@
         "locale/hu.js",
         "locale/it.js",
         "locale/lt.js",
+        "locale/nl.js",
+        "locale/pl.js",
         "locale/pt.js",
         "locale/ro.js",
         "locale/ru.js",

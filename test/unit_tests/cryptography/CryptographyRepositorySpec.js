@@ -96,18 +96,18 @@ describe('z.cryptography.CryptographyRepository', function() {
     });
   });
 
-  describe('decrypt_event', function() {
+  describe('handle_encrypted_event', function() {
     it('detects a session reset request', function(done) {
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const event = {"conversation": "f1d2d451-0fcb-4313-b0ba-313b971ab758", "time": "2017-03-22T11:06:29.232Z", "data": {"text": "💣", "sender": "e35e4ee5b80a1a9d", "recipient": "7481c47f2f7336d8"}, "from": "e3ff8dab-1407-4890-b9d3-e1aab49233e8", "type": "conversation.otr-message-add"};
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
-      TestFactory.cryptography_repository.decrypt_event(event)
-        .catch(function(error) {
-          expect(error).toEqual(jasmine.any(Proteus.errors.DecryptError.InvalidMessage));
+      TestFactory.cryptography_repository.handle_encrypted_event(event)
+        .then((mapped_event) => {
+          expect(mapped_event.type).toBe(z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT);
           done();
         })
-        .then(done.fail);
+        .catch(done.fail);
     });
   });
 });

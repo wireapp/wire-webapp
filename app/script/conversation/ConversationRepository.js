@@ -53,6 +53,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.conversations = ko.observableArray([]);
 
     this.active_team = this.team_repository.active_team;
+    this.active_team.subscribe((team_et) => this.map_team_member_status_user(team_et));
+
+    this.known_team_ids = this.team_repository.known_team_ids;
+    this.known_team_ids.subscribe(() => this.map_guest_status_self());
 
     this.block_event_handling = true;
     this.fetching_conversations = {};
@@ -92,45 +96,70 @@ z.conversation.ConversationRepository = class ConversationRepository {
       this.sending_queue.pause(request_queue_blocked || this.block_event_handling);
     });
 
-    this.conversations_archived = ko.observableArray([]);
-    this.conversations_call = ko.observableArray([]);
-    this.conversations_cleared = ko.observableArray([]);
-    this.conversations_unarchived = ko.observableArray([]);
+    this.conversations_archived = ko.pureComputed(() => this.active_team().conversations_archived());
+    this.conversations_calls = ko.pureComputed(() => this.active_team().conversations_calls());
+    this.conversations_cleared = ko.pureComputed(() => this.active_team().conversations_cleared());
+    this.conversations_unarchived = ko.pureComputed(() => this.active_team().conversations_unarchived());
+
+    this.all_unarchived_conversations = ko.pureComputed(() => {
+      const conversations = this.team_repository.teams()
+        .concat(this.team_repository.personal_space)
+        .map((team_et) => team_et.conversations_unarchived());
+
+      return _.flatten(conversations);
+    });
 
     this._init_subscriptions();
   }
 
   _init_state_updates() {
     ko.computed(() => {
-      const archived = [];
-      const calls = [];
-      const cleared = [];
-      const unarchived = [];
-      const active_team_id = this.active_team().id;
+      const team_conversations = {
+        personal_space: {
+          archived: [],
+          calls: [],
+          cleared: [],
+          unarchived: [],
+        },
+      };
 
       this.sorted_conversations().forEach((conversation_et) => {
-        const {team_id} = conversation_et;
+        let {team_id} = conversation_et;
 
-        const is_team_conversation = team_id === active_team_id;
-        const is_guest_conversation = !active_team_id && team_id && conversation_et.is_guest;
+        if (!this.team_repository.known_team_ids().includes(team_id)) {
+          team_id = 'personal_space';
+        }
 
-        if (is_team_conversation || is_guest_conversation) {
-          if (conversation_et.has_active_call()) {
-            calls.push(conversation_et);
-          } else if (conversation_et.is_cleared()) {
-            cleared.push(conversation_et);
-          } else if (conversation_et.is_archived()) {
-            archived.push(conversation_et);
-          } else {
-            unarchived.push(conversation_et);
-          }
+        team_conversations[team_id] = team_conversations[team_id] || {archived: [], calls: [], cleared: [], unarchived: []};
+
+        if (conversation_et.has_active_call()) {
+          team_conversations[team_id].calls.push(conversation_et);
+        } else if (conversation_et.is_cleared()) {
+          team_conversations[team_id].cleared.push(conversation_et);
+        } else if (conversation_et.is_archived()) {
+          team_conversations[team_id].archived.push(conversation_et);
+        } else {
+          team_conversations[team_id].unarchived.push(conversation_et);
         }
       });
 
-      this.conversations_archived(archived);
-      this.conversations_call(calls);
-      this.conversations_cleared(cleared);
-      this.conversations_unarchived(unarchived);
+      for (const team_id in team_conversations) {
+        if (team_conversations.hasOwnProperty(team_id)) {
+          let team_et;
+          const conversations = team_conversations[team_id];
+
+          if (team_id !== 'personal_space') {
+            [team_et] = this.team_repository.teams().filter((team) => team.id === team_id);
+          } else {
+            team_et = this.team_repository.personal_space;
+          }
+
+          team_et.conversations_archived(conversations.archived);
+          team_et.conversations_calls(conversations.calls);
+          team_et.conversations_cleared(conversations.cleared);
+          team_et.conversations_unarchived(conversations.unarchived);
+        }
+      }
     });
   }
 
@@ -168,8 +197,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
     if (team_et) {
       if (team_et.id !== this.active_team().id) {
         this.active_team(team_et);
-        this.update_conversations(this.conversations_unarchived());
-        amplify.publish(z.event.WebApp.CONVERSATION.SHOW, this.get_most_recent_conversation());
       }
     } else {
       throw new TypeError('Missing team entity');
@@ -419,33 +446,49 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   unblocked_user(user_et) {
-    this.get_one_to_one_conversation(user_et)
-      .then((conversation_et) => conversation_et.status(z.conversation.ConversationStatus.PAST_MEMBER));
+    this.get_1to1_conversation(user_et)
+      .then((conversation_et) => conversation_et.status(z.conversation.ConversationStatus.CURRENT_MEMBER));
+  }
+
+  /**
+   * Update users and events for archived conversations currently visible.
+   * @returns {undefined} No return value
+   */
+  update_conversations_archived() {
+    this._update_conversations(this.conversations_archived());
+  }
+
+  /**
+   * Map users to all conversations without any backend requests.
+   * @returns {undefined} No return value
+   */
+  update_conversations_offline() {
+    this.sorted_conversations().map((conversation_et) => this.update_participating_user_ets(conversation_et, true));
+  }
+
+  /**
+   * Update users and events for all unarchived conversations.
+   * @returns {undefined} No return value
+   */
+  update_conversations_unarchived() {
+    this._update_conversations(this.all_unarchived_conversations());
   }
 
   /**
    * Get users and events for conversations.
    *
    * @note To reduce the number of backend calls we merge the user IDs of all conversations first.
+   * @private
    * @param {Array<Conversation>} conversation_ets - Array of conversation entities to be updated
    * @returns {undefined} No return value
    */
-  update_conversations(conversation_ets) {
+  _update_conversations(conversation_ets) {
     const user_ids = _.flatten(conversation_ets.map((conversation_et) => conversation_et.participating_user_ids()));
 
     this.user_repository.get_users_by_id(user_ids)
       .then(() => {
         conversation_ets.forEach((conversation_et) => this._fetch_users_and_events(conversation_et));
       });
-  }
-
-  /**
-   * Map users to conversations without any backend requests.
-   * @param {Array<Conversation>} conversation_ets - Array of conversation entities to be updated
-   * @returns {undefined} No return value
-   */
-  update_conversations_offline(conversation_ets) {
-    conversation_ets.map((conversation_et) => this.update_participating_user_ets(conversation_et, true));
   }
 
 
@@ -602,9 +645,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Conversation} Most recent conversation
    */
   get_most_recent_conversation() {
-    if (this.conversations_unarchived()) {
-      return this.conversations_unarchived()[0];
-    }
+    const [conversation_et] = this.conversations_unarchived();
+    return conversation_et;
   }
 
   /**
@@ -626,7 +668,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {string} [team_id] - Team ID in which the conversation should be searched
    * @returns {Promise} Resolves with the conversation with requested user
    */
-  get_one_to_one_conversation(user_et, team_id = this.active_team().id) {
+  get_1to1_conversation(user_et, team_id = this.active_team().id) {
     for (const conversation_et of this.conversations()) {
       const with_expected_user = user_et.id === conversation_et.participating_user_ids()[0];
 
@@ -697,7 +739,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(() => {
         this.logger.info('Updating group participants offline');
         this._init_state_updates();
-        this.update_conversations_offline(this.sorted_conversations());
+        this.update_conversations_offline();
       });
   }
 
@@ -758,20 +800,34 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   map_conversations(payload) {
-    const is_guest_mapping = (conversation_et) => {
-      const team_id = conversation_et.team_id;
-      conversation_et.is_guest = !!(team_id && !this.team_repository.known_team_ids().includes(team_id));
-    };
-
     if (payload.length) {
       const conversation_ets = this.conversation_mapper.map_conversations(payload);
-      conversation_ets.forEach(is_guest_mapping);
+      conversation_ets.forEach((conversation_et) => this._map_guest_status_self(conversation_et));
       return conversation_ets;
     }
 
     const conversation_et = this.conversation_mapper.map_conversation(payload);
-    is_guest_mapping(conversation_et);
+    this._map_guest_status_self(conversation_et);
     return conversation_et;
+  }
+
+  map_team_member_status_user(team_et) {
+    const has_team_id = team_et.id;
+
+    this.user_repository.users().forEach((user_et) => {
+      const is_team_member = has_team_id && team_et.members().find((member) => member.id === user_et.id);
+      user_et.is_team_member(is_team_member);
+    });
+  }
+
+  map_guest_status_self() {
+    this.filtered_conversations().forEach((conversation_et) => this._map_guest_status_self(conversation_et));
+  }
+
+  _map_guest_status_self(conversation_et) {
+    const team_id = conversation_et.team_id;
+    const is_guest = team_id && !this.known_team_ids().includes(team_id);
+    conversation_et.is_guest(is_guest);
   }
 
   /**
@@ -1075,17 +1131,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
       tag = z.l10n.text(z.string.extensions_giphy_random);
     }
 
-    const message = z.localization.Localizer.get_text({
-      id: z.string.extensions_giphy_message,
-      replace: {
-        content: tag,
-        placeholder: '%tag',
-      },
-    });
-
     return z.util.load_url_blob(url)
       .then((blob) => {
-        this.send_text(message, conversation_et);
+        this.send_text(z.l10n.text(z.string.extensions_giphy_message, tag), conversation_et);
         return this.upload_images(conversation_et, [blob]);
       });
   }
@@ -1106,6 +1154,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
             amplify.publish(z.event.WebApp.EVENT.INJECT, member_leave_event, false);
           }
         } else {
+          conversation_et.status(z.conversation.ConversationStatus.PAST_MEMBER);
           this._delete_conversation(conversation_et);
         }
       });
@@ -1411,29 +1460,29 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
-   * Send e-call message in specified conversation.
+   * Send call message in specified conversation.
    *
-   * @param {Conversation} conversation_et - Conversation to send e-call message to
-   * @param {ECallMessage} e_call_message_et - E-call message
+   * @param {Conversation} conversation_et - Conversation to send call message to
+   * @param {CallMessage} call_message_et - Content for call message
    * @param {Object} user_client_map - Contains the intended recipient users and clients
    * @param {Array<string>|boolean} precondition_option - Optional level that backend checks for missing clients
    * @returns {Promise} Resolves when the confirmation was sent
    */
-  send_e_call(conversation_et, e_call_message_et, user_client_map, precondition_option) {
+  send_e_call(conversation_et, call_message_et, user_client_map, precondition_option) {
     const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
-    generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.CALLING, new z.proto.Calling(e_call_message_et.to_content_string()));
+    generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.CALLING, new z.proto.Calling(call_message_et.to_content_string()));
 
     return this.sending_queue.push(() => {
       return this._send_generic_message(conversation_et.id, generic_message, user_client_map, precondition_option);
     })
     .then(() => {
       const initiating_call_message = [
-        z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_START,
-        z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP,
+        z.calling.enum.CALL_MESSAGE_TYPE.GROUP_START,
+        z.calling.enum.CALL_MESSAGE_TYPE.SETUP,
       ];
 
-      if (initiating_call_message.includes(e_call_message_et.type)) {
-        return this._track_completed_media_action(conversation_et, generic_message, e_call_message_et);
+      if (initiating_call_message.includes(call_message_et.type)) {
+        return this._track_completed_media_action(conversation_et, generic_message, call_message_et);
       }
     });
   }
@@ -1554,7 +1603,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this._send_and_inject_generic_message(conversation_et, generic_message, false)
       .then(() => {
         this._track_edit_message(conversation_et, original_message_et);
-        return this.send_link_preview(message, conversation_et, generic_message);
+        if (z.util.Environment.electron) {
+          return this.send_link_preview(message, conversation_et, generic_message);
+        }
       })
       .catch((error) => {
         if (error.type !== z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
@@ -1657,7 +1708,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
   send_text_with_link_preview(message, conversation_et) {
     return this.send_text(message, conversation_et)
       .then((generic_message) => {
-        return this.send_link_preview(message, conversation_et, generic_message);
+        if (z.util.Environment.electron) {
+          return this.send_link_preview(message, conversation_et, generic_message);
+        }
       })
       .catch((error) => {
         if (error.type !== z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
@@ -3286,10 +3339,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @private
    * @param {Conversation} conversation_et - Conversation entity
    * @param {z.protobuf.GenericMessage} generic_message - Protobuf message
-   * @param {ECallMessage} e_call_message_et - Optional e-call message
+   * @param {CallMessage} call_message_et - Optional call message
    * @returns {undefined} No return value
    */
-  _track_completed_media_action(conversation_et, generic_message, e_call_message_et) {
+  _track_completed_media_action(conversation_et, generic_message, call_message_et) {
     let ephemeral_time, is_ephemeral, message, message_content_type;
 
     if (generic_message.content === z.cryptography.GENERIC_MESSAGE_TYPE.EPHEMERAL) {
@@ -3313,7 +3366,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       }
 
       case 'calling': {
-        const {props: properties} = e_call_message_et;
+        const {props: properties} = call_message_et;
         action_type = properties.videosend === z.calling.enum.PROPERTY_STATE.TRUE ? 'video_call' : 'audio_call';
         break;
       }

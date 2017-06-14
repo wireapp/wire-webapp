@@ -34,6 +34,8 @@ z.auth.AuthView = {
     ACCOUNT_PASSWORD: 'password',
     ACCOUNT_PHONE: 'phone',
     ACCOUNT_REGISTER: 'register',
+    BLOCKED_DATABASE: 'database',
+    BLOCKED_TABS: 'tabs',
     HISTORY: 'history',
     LIMIT: 'limit',
     POSTED: 'posted',
@@ -53,6 +55,7 @@ z.auth.AuthView = {
   },
   SECTION: {
     ACCOUNT: 'account',
+    BLOCKED: 'blocked',
     HISTORY: 'history',
     LIMIT: 'limit',
     POSTED: 'posted',

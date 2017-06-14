@@ -375,14 +375,10 @@ window.TestFactory.prototype.exposeCallingActors = function() {
     .then(() => {
       this.logger.info('✓ exposedConversationActors');
 
-      TestFactory.call_service = new z.calling.v2.CallService(this.client);
-      TestFactory.call_service.logger.level = this.settings.logging_level;
-
       TestFactory.calling_service = new z.calling.CallingService(this.client);
       TestFactory.calling_service.logger.level = this.settings.logging_level;
 
       TestFactory.calling_repository = new z.calling.CallingRepository(
-        TestFactory.call_service,
         TestFactory.calling_service,
         TestFactory.client_repository,
         TestFactory.conversation_repository,
@@ -390,14 +386,6 @@ window.TestFactory.prototype.exposeCallingActors = function() {
         TestFactory.user_repository
       );
       TestFactory.calling_repository.logger.level = this.settings.logging_level;
-
-      TestFactory.v2_call_center = TestFactory.calling_repository.v2_call_center;
-      TestFactory.v2_call_center.logger.level = this.settings.logging_level;
-      TestFactory.v2_call_center.state_handler.logger.level = this.settings.logging_level;
-      TestFactory.v2_call_center.signaling_handler.logger.level = this.settings.logging_level;
-
-      TestFactory.v3_call_center = TestFactory.calling_repository.v3_call_center;
-      TestFactory.v3_call_center.logger.level = this.settings.logging_level;
 
       return TestFactory.calling_repository;
     });
@@ -420,7 +408,7 @@ window.TestFactory.prototype.exposeSystemNotificationActors = function() {
     .then(() => {
       this.logger.info('✓ exposedCallingActors');
 
-      TestFactory.system_notification_repository = new z.system_notification.SystemNotificationRepository(TestFactory.v2_call_center, TestFactory.conversation_repository);
+      TestFactory.system_notification_repository = new z.system_notification.SystemNotificationRepository(TestFactory.calling_repository, TestFactory.conversation_repository);
       TestFactory.system_notification_repository.logger.level = this.settings.logging_level;
 
       return TestFactory.system_notification_repository;

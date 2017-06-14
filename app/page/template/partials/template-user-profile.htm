@@ -6,7 +6,7 @@
       <div class="user-profile-header">
         <div class="name popover-title ellipsis" data-bind="text: user().name(), attr: {'data-uie-uid': user().id, 'data-uie-value': user().name()}" data-uie-name="status-user"></div>
         <div class="username popover-meta label-username" data-bind="text: user().username(), attr: {'data-uie-value': user().name()}" data-uie-name="status-username"></div>
-        <!-- ko if: conversation && conversation().is_group() -->
+        <!-- ko if: show_back_button() && $parent.group_mode()-->
           <div class="user-profile-back-button button-icon icon-back" data-bind="click: on_close, l10n_tooltip: z.string.tooltip_people_back" data-uie-name="do-back"></div>
         <!-- /ko -->
         <!-- ko if: user().is_verified() -->
@@ -28,6 +28,9 @@
           <!-- ko if: render_avatar -->
             <user-avatar class="image user-avatar-lg cursor-default" params="user: user" data-uie-name="status-profile-picture"></user-avatar>
           <!-- /ko -->
+        </div>
+        <div class="user-profile-footer">
+          <!-- ko template: {name: get_footer_template} --><!-- /ko -->
         </div>
       <!-- /ko -->
 
@@ -58,10 +61,6 @@
           <!-- /ko -->
         </div>
       <!-- /ko -->
-
-      <div class="user-profile-footer">
-        <!-- ko template: {name: get_footer_template} --><!-- /ko -->
-      </div>
     </div>
 
     <div class="user-profile-device-detail">
@@ -140,7 +139,7 @@
     <div class="button-icon icon-plus"></div>
     <span data-bind="l10n_text: z.string.people_button_connect"></span>
   </div>
-  <!-- ko ifnot: conversation().removed_from_conversation() || user_is_removed_from_conversation() -->
+  <!-- ko if: !(conversation().removed_from_conversation() || user_is_removed_from_conversation()) && !conversation().is_guest() -->
     <div class="button-icon icon-minus pull-right" data-bind="click: on_remove, l10n_tooltip: z.string.tooltip_people_remove" data-uie-name="do-remove"></div>
   <!-- /ko -->
 </script>
@@ -150,7 +149,7 @@
     <div class="button-icon icon-chat"></div>
     <span data-bind="l10n_text: z.string.people_button_pending"></span>
   </div>
-  <!-- ko ifnot: conversation().removed_from_conversation() || user_is_removed_from_conversation() -->
+  <!-- ko if: !(conversation().removed_from_conversation() || user_is_removed_from_conversation()) && !conversation().is_guest() -->
     <div class="button-icon icon-minus pull-right" data-bind="click: on_remove, l10n_tooltip: z.string.tooltip_people_remove" data-uie-name="do-remove"></div>
   <!-- /ko -->
 </script>
@@ -160,7 +159,7 @@
     <div class="button-icon icon-chat"></div>
     <span data-bind="l10n_text: z.string.people_button_open"></span>
   </div>
-  <!-- ko ifnot: conversation().removed_from_conversation() || user_is_removed_from_conversation() || conversation().is_guest -->
+  <!-- ko if: !(conversation().removed_from_conversation() || user_is_removed_from_conversation()) && !conversation().is_guest() -->
     <div class="button-icon icon-minus pull-right" data-bind="click: on_remove, l10n_tooltip: z.string.tooltip_people_remove" data-uie-name="do-remove"></div>
   <!-- /ko -->
 </script>
@@ -177,7 +176,7 @@
     <div class="button-icon icon-block"></div>
     <span data-bind="l10n_text: z.string.people_button_unblock"></span>
   </div>
-  <!-- ko ifnot: conversation().removed_from_conversation() || user_is_removed_from_conversation() -->
+  <!-- ko if: !(conversation().removed_from_conversation() || user_is_removed_from_conversation()) && !conversation().is_guest() -->
     <div class="button-icon icon-minus pull-right" data-bind="click: on_remove, l10n_tooltip: z.string.tooltip_people_remove" data-uie-name="do-remove"></div>
   <!-- /ko -->
 </script>

@@ -24,7 +24,7 @@ window.z.ViewModel = z.ViewModel || {};
 
 // Parent: z.ViewModel.ContentViewModel
 z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
-  constructor(element_id, conversation_repository, user_repository) {
+  constructor(element_id, conversation_repository, user_repository, properties_repository) {
     this.added_to_view = this.added_to_view.bind(this);
     this.on_drop_files = this.on_drop_files.bind(this);
     this.on_paste_files = this.on_paste_files.bind(this);
@@ -54,13 +54,8 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
           this.pasted_file_preview_url(URL.createObjectURL(blob));
         }
 
-        this.pasted_file_name(z.localization.Localizer.get_text({
-          id: z.string.conversation_send_pasted_file,
-          replace: {
-            content: moment(blob.lastModifiedDate).format('MMMM Do YYYY, h:mm:ss a'),
-            placeholder: '%date',
-          },
-        }));
+        const date = moment(blob.lastModifiedDate).format('MMMM Do YYYY, h:mm:ss a');
+        this.pasted_file_name(z.l10n.text(z.string.conversation_send_pasted_file, date));
       } else {
         this.pasted_file_preview_url(null);
         this.pasted_file_name(null);
@@ -124,15 +119,6 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
       },
     });
 
-    this.ping_tooltip = z.localization.Localizer.get_text({
-      id: z.string.tooltip_conversation_ping,
-      replace: {
-        content: z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.PING),
-        placeholder: '%shortcut',
-      },
-    });
-
-    this.picture_tooltip = z.l10n.text(z.string.tooltip_conversation_picture);
     this.file_tooltip = z.l10n.text(z.string.tooltip_conversation_file);
     this.input_tooltip = ko.pureComputed(() => {
       if (this.conversation_et().ephemeral_timer()) {
@@ -140,13 +126,15 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
       }
       return z.l10n.text(z.string.tooltip_conversation_input_placeholder);
     });
+    this.ping_tooltip = z.l10n.text(z.string.tooltip_conversation_ping, z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.PING));
+    this.picture_tooltip = z.l10n.text(z.string.tooltip_conversation_picture);
     this.ping_disabled = ko.observable(false);
 
     $(window)
       .blur(() => this.browser_has_focus(false))
       .focus(() => this.browser_has_focus(true));
 
-    this.conversation_input_emoji = new z.ViewModel.ConversationInputEmojiViewModel();
+    this.conversation_input_emoji = new z.ViewModel.ConversationInputEmojiViewModel(properties_repository);
 
     this._init_subscriptions();
   }
@@ -285,13 +273,8 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
   }
 
   _show_upload_warning(image) {
-    const warning = z.localization.Localizer.get_text({
-      id: image.type === 'image/gif' ? z.string.alert_gif_too_large : z.string.alert_upload_too_large,
-      replace: {
-        content: z.config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024,
-        placeholder: '%no',
-      },
-    });
+    const string_id = image.type === 'image/gif' ? z.string.alert_gif_too_large : z.string.alert_upload_too_large;
+    const warning_text = z.l10n.text(string_id, z.config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024);
 
     const attributes = {
       reason: 'too large',
@@ -301,7 +284,7 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
 
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.IMAGE_SENT_ERROR, attributes);
     amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
-    window.setTimeout(() => window.alert(warning), 200);
+    window.setTimeout(() => window.alert(warning_text), 200);
   }
 
   _is_hitting_upload_limit(files) {

@@ -26,7 +26,6 @@ z.components.UserListMode = {
   COMPACT: 'compact',
   DEFAULT: 'default',
   INFO: 'info',
-  TEAM_MEMBERS: 'team_members',
 };
 
 z.components.UserListViewModel = class UserListViewModel {
@@ -133,7 +132,7 @@ ko.components.register('user-list', {
         <!-- /ko -->
         <!-- ko ifnot: $parent.mode === z.components.UserListMode.COMPACT -->
           <div class="search-list-item-image">
-            <user-avatar class="user-avatar-sm" params="user: $data, selected: $parent.is_selected($data), is_team_member: $parent.mode === z.components.UserListMode.TEAM_MEMBERS"></user-avatar>
+            <user-avatar class="user-avatar-sm" params="user: $data, selected: $parent.is_selected($data)"></user-avatar>
             <div class="search-list-item-image-overlay">
               <div class="background"></div>
               <div class="checkmark icon-check"></div>

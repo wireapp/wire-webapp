@@ -125,6 +125,12 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
       this.is_resetting_session(false);
     });
 
+    this.show_back_button = ko.pureComputed(() => {
+      if (typeof this.conversation === 'function') {
+        return this.conversation().is_group() || this.conversation().is_team_group();
+      }
+    });
+
     this.selected_device_subscription = this.selected_device.subscribe(() => {
       if (this.selected_device()) {
         this.fingerprint_local(this.cryptography_repository.get_local_fingerprint());
@@ -134,49 +140,22 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
       }
     });
 
-    this.add_people_tooltip = z.localization.Localizer.get_text({
-      id: z.string.tooltip_people_add,
-      replace: {
-        content: z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.ADD_PEOPLE),
-        placeholder: '%shortcut',
-      },
-    });
+    const shortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.ADD_PEOPLE);
+    this.add_people_tooltip = z.l10n.text(z.string.tooltip_people_add, shortcut);
 
     this.device_headline = ko.pureComputed(() => {
-      return z.localization.Localizer.get_text({
-        id: z.string.people_tabs_devices_headline,
-        replace: {
-          content: this.user().first_name(),
-          placeholder: '%@.name',
-        },
-      });
+      return z.l10n.text(z.string.people_tabs_devices_headline, this.user().first_name());
     });
 
     this.no_device_headline = ko.pureComputed(() => {
-      return z.localization.Localizer.get_text({
-        id: z.string.people_tabs_no_devices_headline,
-        replace: {
-          content: this.user().first_name(),
-          placeholder: '%@.name',
-        },
-      });
+      return z.l10n.text(z.string.people_tabs_no_devices_headline, this.user().first_name());
     });
 
     this.detail_message = ko.pureComputed(() => {
-      return z.localization.Localizer.get_text({
-        id: z.string.people_tabs_device_detail_headline,
-        replace: [{
-          content: "<span class='user-profile-device-detail-highlight'>",
-          placeholder: '%bold',
-        },
-        {
-          content: z.util.escape_html(this.user().first_name()),
-          placeholder: '%@.name',
-        },
-        {
-          content: '</span>',
-          placeholder: '%end',
-        }],
+      return z.l10n.text(z.string.people_tabs_device_detail_headline, {
+        html1: "<span class='user-profile-device-detail-highlight'>",
+        html2: '</span>',
+        user: z.util.escape_html(this.user().first_name()),
       });
     });
 
@@ -192,7 +171,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
             this.user_repository.cancel_connection_request(this.user());
           }
 
-          this.conversation_repository.get_one_to_one_conversation(this.user())
+          this.conversation_repository.get_1to1_conversation(this.user())
             .then((conversation_et) => {
               if (this.conversation_repository.is_active_conversation(conversation_et)) {
                 amplify.publish(z.event.WebApp.CONVERSATION.PEOPLE.HIDE);
@@ -217,7 +196,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
     this.on_open = () => {
       amplify.publish(z.event.WebApp.CONVERSATION.PEOPLE.HIDE);
 
-      this.conversation_repository.get_one_to_one_conversation(this.user())
+      this.conversation_repository.get_1to1_conversation(this.user())
         .then((conversation_et) => {
           if (conversation_et.is_archived()) {
             this.conversation_repository.unarchive_conversation(conversation_et);
@@ -299,10 +278,10 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
 
     // footer
     this.get_footer_template = ko.pureComputed(() => {
-      if (!this.user()) {
+      const user_et = this.user();
+      if (!user_et || this.tab_index() === 1) {
         return 'user-profile-footer-empty';
       }
-      const user_et = this.user();
 
       // When used in conversation!
       if (typeof this.conversation === 'function') {
@@ -326,15 +305,16 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
             return 'user-profile-footer-profile-leave';
           }
 
-          if (user_et.is_unknown()) {
-            return conversation_et.team_id ? 'user-profile-footer-message-remove' : 'user-profile-footer-connect-remove';
-          }
-          if (user_et.is_ignored() || user_et.is_request()) {
-            return 'user-profile-footer-pending-remove';
+          if (user_et.is_connected() || user_et.is_team_member()) {
+            return 'user-profile-footer-message-remove';
           }
 
-          if (user_et.is_connected()) {
-            return 'user-profile-footer-message-remove';
+          if (user_et.is_unknown()) {
+            return 'user-profile-footer-connect-remove';
+          }
+
+          if (user_et.is_ignored() || user_et.is_request()) {
+            return 'user-profile-footer-pending-remove';
           }
 
           if (user_et.is_blocked()) {

@@ -98,7 +98,7 @@ describe('ConversationRepository', function() {
     jQuery.ajax.restore();
   });
 
-  describe('get_one_to_one_conversation', function() {
+  describe('get_1to1_conversation', function() {
     beforeEach(function() {
       TestFactory.conversation_repository.conversations([]);
     });
@@ -117,7 +117,7 @@ describe('ConversationRepository', function() {
       const team_member_id = team_1to1_conversation.members.others[0].id;
       const user_et = new z.entity.User(team_member_id);
 
-      TestFactory.conversation_repository.get_one_to_one_conversation(user_et, team_id)
+      TestFactory.conversation_repository.get_1to1_conversation(user_et, team_id)
         .then(function(found_conversation_et) {
           expect(found_conversation_et).toBe(new_conversation_et);
           done();

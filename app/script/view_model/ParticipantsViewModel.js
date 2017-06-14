@@ -34,6 +34,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.add_people = this.add_people.bind(this);
     this.block = this.block.bind(this);
     this.close = this.close.bind(this);
+    this.click_on_participant = this.click_on_participant.bind(this);
     this.connect = this.connect.bind(this);
     this.leave_conversation = this.leave_conversation.bind(this);
     this.on_search_close = this.on_search_close.bind(this);
@@ -57,6 +58,8 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.active_team = this.team_repository.active_team;
 
     this.render_participants = ko.observable(false);
+
+    this.group_mode = ko.observable(false);
 
     this.participants = ko.observableArray();
     this.participants_verified = ko.observableArray();
@@ -149,23 +152,22 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
         });
     });
 
-    this.add_people_tooltip = z.localization.Localizer.get_text({
-      id: z.string.tooltip_people_add,
-      replace: {
-        content: z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.ADD_PEOPLE),
-        placeholder: '%shortcut',
-      },
-    });
+    const shortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.ADD_PEOPLE);
+    this.add_people_tooltip = z.l10n.text(z.string.tooltip_people_add, shortcut);
 
     amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, this.switch_content.bind(this));
     amplify.subscribe(z.event.WebApp.PEOPLE.SHOW, this.show_participant);
     amplify.subscribe(z.event.WebApp.PEOPLE.TOGGLE, this.toggle_participants_bubble.bind(this));
   }
 
-  show_participant(user_et) {
+  click_on_participant(user_et) {
+    this.show_participant(user_et, true);
+  }
+
+  show_participant(user_et, group_mode = false) {
     if (user_et) {
       this.user_profile(user_et);
-      $(`#${this.element_id}`).addClass('single-user-mode');
+      this.group_mode(group_mode);
     }
   }
 
@@ -188,7 +190,6 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
         }
 
         this.render_participants(true);
-        $(`#${this.element_id}`).removeClass('single-user-mode');
       }
 
       if (add_people) {
@@ -230,7 +231,6 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
       this.confirm_dialog.destroy();
     }
     this.user_profile(this.placeholder_participant);
-    $(`#${this.element_id}`).removeClass('single-user-mode');
   }
 
   add_people() {
@@ -329,7 +329,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
         this.user_repository.unblock_user(user_et)
           .then(() => {
             this.participants_bubble.hide();
-            return this.conversation_repository.get_one_to_one_conversation(user_et);
+            return this.conversation_repository.get_1to1_conversation(user_et);
           })
           .then((conversation_et) => {
             this.conversation_repository.update_participating_user_ets(conversation_et);
