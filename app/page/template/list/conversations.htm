@@ -167,10 +167,10 @@
             data-bind="css: {'conversation-list-cell-active': content_state() === z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS}">
           <div class="conversation-list-cell-left">
             <!-- ko if: connect_requests().length > 1 -->
-              <group-avatar data-bind="css: {'group-avatar-active': content_state() === z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS}" params="users: connect_requests()"></group-avatar>
+              <group-avatar params="users: connect_requests()"></group-avatar>
             <!-- /ko -->
             <!-- ko if: connect_requests().length === 1 -->
-            <div class="user-avatar-halo" data-bind="css: {'user-avatar-halo-active': content_state() === z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS}">
+            <div class="user-avatar-halo">
               <user-avatar class="user-avatar-s" params="user: connect_requests()[0]"></user-avatar>
             </div>
             <!-- /ko -->
