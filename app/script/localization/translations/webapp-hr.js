@@ -127,7 +127,6 @@ z.string.hr.modal_call_second_ongoing_action = 'Poklopi';
 z.string.hr.modal_call_second_outgoing_headline = 'Prekinuti trenutni poziv?';
 z.string.hr.modal_call_second_outgoing_message = 'Možete biti u samo jednom pozivu u isto vrijeme.';
 z.string.hr.modal_call_second_outgoing_action = 'Poklopi';
-z.string.hr.modal_clear_conversation_headline = 'Izbriši sadržaj?';
 z.string.hr.modal_clear_conversation_message = 'Ovo će izbrisati povijest razgovora i ukloniti ga s Vašeg popisa.';
 z.string.hr.modal_clear_conversation_option = 'Također napusti razgovor';
 z.string.hr.modal_clear_conversation_button = 'Obriši';
@@ -200,7 +199,6 @@ z.string.hr.conversation_verified = 'Verificirano';
 z.string.hr.conversation_voice_channel_deactivate = ' zvao';
 z.string.hr.conversation_voice_channel_deactivate_you = ' zvao';
 z.string.hr.conversation_yesterday = 'Jučer';
-z.string.hr.conversation_unable_to_decrypt_1 = 'poruka od {{user}} nije primljena.';
 z.string.hr.conversation_unable_to_decrypt_2 = '{{user}} identitet uređaja promijenjen. Neisporučena poruka.';
 z.string.hr.conversation_unable_to_decrypt_link = 'Zašto?';
 z.string.hr.conversation_unable_to_decrypt_error_message = 'Pogreška';
@@ -255,7 +253,6 @@ z.string.hr.extensions_bubble_button_gif = 'Gif';
 
 z.string.hr.extensions_giphy_button_ok = 'Pošalji';
 z.string.hr.extensions_giphy_button_more = 'Probaj nešto drugo';
-z.string.hr.extensions_giphy_message = '• {{tag}} s giphy.com';
 z.string.hr.extensions_giphy_no_gifs = 'Ups, nema Gif-ova';
 z.string.hr.extensions_giphy_random = 'Nasumično';
 
@@ -474,7 +471,6 @@ z.string.hr.tooltip_conversations_archived = 'Pokaži arhivu ({{number}})';
 z.string.hr.tooltip_conversations_more = 'Više';
 z.string.hr.tooltip_conversations_notify = 'Uključi zvukove ({{shortcut}})';
 z.string.hr.tooltip_conversations_silence = 'Isključi zvukove ({{shortcut}})';
-z.string.hr.tooltip_conversations_start = 'Početak razgovora ({{shortcut}})';
 
 z.string.hr.tooltip_people_add = 'Dodaj ljude u razgovor ({{shortcut}})';
 z.string.hr.tooltip_people_back = 'Natrag';

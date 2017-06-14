@@ -132,7 +132,6 @@ z.string.ro.modal_call_second_ongoing_action = 'Închide';
 z.string.ro.modal_call_second_outgoing_headline = 'Închide apelul curent?';
 z.string.ro.modal_call_second_outgoing_message = 'Nu poți fi decât într-un singur apel la un moment dat.';
 z.string.ro.modal_call_second_outgoing_action = 'Închide';
-z.string.ro.modal_clear_conversation_headline = 'Șterge conversația?';
 z.string.ro.modal_clear_conversation_message = 'Aceasta va elimina istoricul conversațiilor și le va scoate din lista ta.';
 z.string.ro.modal_clear_conversation_option = 'Părăsește conversația';
 z.string.ro.modal_clear_conversation_button = 'Șterge';
@@ -219,7 +218,6 @@ z.string.ro.conversation_verified = 'Verificat';
 z.string.ro.conversation_voice_channel_deactivate = ' sunat';
 z.string.ro.conversation_voice_channel_deactivate_you = ' sunat';
 z.string.ro.conversation_yesterday = 'ieri';
-z.string.ro.conversation_unable_to_decrypt_1 = 'ai primit un mesaj de la {{user}}.';
 z.string.ro.conversation_unable_to_decrypt_2 = 'identitatea dispozitivului lui {{user}} s-a schimbat. Mesajul nu a fost livrat.';
 z.string.ro.conversation_unable_to_decrypt_link = 'De ce?';
 z.string.ro.conversation_unable_to_decrypt_error_message = 'Eroare';
@@ -296,7 +294,6 @@ z.string.ro.extensions_bubble_button_gif = 'Gif';
 
 z.string.ro.extensions_giphy_button_ok = 'Trimite';
 z.string.ro.extensions_giphy_button_more = 'Încearcă altul';
-z.string.ro.extensions_giphy_message = '{{tag}} • via giphy.com';
 z.string.ro.extensions_giphy_no_gifs = 'Ups, nu sunt gif-uri';
 z.string.ro.extensions_giphy_random = 'La întâmplare';
 
@@ -529,7 +526,6 @@ z.string.ro.tooltip_conversations_archived = 'Arată arhiva ({{number}})';
 z.string.ro.tooltip_conversations_more = 'Mai multe';
 z.string.ro.tooltip_conversations_notify = 'Demutizează ({{shortcut}})';
 z.string.ro.tooltip_conversations_silence = 'Mutizează ({{shortcut}})';
-z.string.ro.tooltip_conversations_start = 'Începe conversația ({{shortcut}})';
 
 z.string.ro.tooltip_people_add = 'Adaugă persoane la conversație ({{shortcut}})';
 z.string.ro.tooltip_people_back = 'Înapoi';

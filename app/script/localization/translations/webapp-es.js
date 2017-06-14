@@ -130,7 +130,6 @@ z.string.es.modal_call_second_ongoing_action = 'Colgar';
 z.string.es.modal_call_second_outgoing_headline = '¿Colgar llamada actual?';
 z.string.es.modal_call_second_outgoing_message = 'Solo puedes estar en una llamada a la vez.';
 z.string.es.modal_call_second_outgoing_action = 'Colgar';
-z.string.es.modal_clear_conversation_headline = '¿Borrar contenido?';
 z.string.es.modal_clear_conversation_message = 'Se borrará el historial de la conversación y la eliminará de la lista.';
 z.string.es.modal_clear_conversation_option = 'También abandonar la conversación';
 z.string.es.modal_clear_conversation_button = 'Eliminar';
@@ -216,7 +215,6 @@ z.string.es.conversation_verified = 'Verificado';
 z.string.es.conversation_voice_channel_deactivate = ' llamó';
 z.string.es.conversation_voice_channel_deactivate_you = ' llamó';
 z.string.es.conversation_yesterday = 'Ayer';
-z.string.es.conversation_unable_to_decrypt_1 = 'un mensaje de {{user}} no se recibió';
 z.string.es.conversation_unable_to_decrypt_2 = '{{user}}´s identidad de dispositivo cambiada. Mensaje no entregado.';
 z.string.es.conversation_unable_to_decrypt_link = '¿Por qué?';
 z.string.es.conversation_unable_to_decrypt_error_message = 'Error';
@@ -281,7 +279,6 @@ z.string.es.extensions_bubble_button_gif = 'Gif';
 
 z.string.es.extensions_giphy_button_ok = 'Enviar';
 z.string.es.extensions_giphy_button_more = 'Buscar otro';
-z.string.es.extensions_giphy_message = '{{tag}} · vía giphy.com';
 z.string.es.extensions_giphy_no_gifs = 'Uups, no hay gifs';
 z.string.es.extensions_giphy_random = 'Aleatorio';
 
@@ -510,7 +507,6 @@ z.string.es.tooltip_conversations_archived = 'Mostrar archivo ({{number}})';
 z.string.es.tooltip_conversations_more = 'Más';
 z.string.es.tooltip_conversations_notify = 'Activar sónido ({{shortcut}})';
 z.string.es.tooltip_conversations_silence = 'Silenciar ({{shortcut}})';
-z.string.es.tooltip_conversations_start = 'Empezar una conversación ({{shortcut}})';
 
 z.string.es.tooltip_people_add = 'Añadir personas a la conversación ({{shortcut}})';
 z.string.es.tooltip_people_back = 'Atrás';

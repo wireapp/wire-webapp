@@ -131,7 +131,6 @@ z.string.uk.modal_call_second_ongoing_action = 'Завершити';
 z.string.uk.modal_call_second_outgoing_headline = 'Завершити поточний дзвінок?';
 z.string.uk.modal_call_second_outgoing_message = 'Ви можете здійснювати тільки один дзвінок за один раз.';
 z.string.uk.modal_call_second_outgoing_action = 'Завершити';
-z.string.uk.modal_clear_conversation_headline = 'Видалити історію розмов"?';
 z.string.uk.modal_clear_conversation_message = 'Це зітре історію розмови і видалить її зі списку.';
 z.string.uk.modal_clear_conversation_option = 'Також вийти з розмови';
 z.string.uk.modal_clear_conversation_button = 'Видалити';
@@ -218,7 +217,6 @@ z.string.uk.conversation_verified = 'Верифікований';
 z.string.uk.conversation_voice_channel_deactivate = ' дзвонив(-ла)';
 z.string.uk.conversation_voice_channel_deactivate_you = ' дзвонив(-ла)';
 z.string.uk.conversation_yesterday = 'Вчора';
-z.string.uk.conversation_unable_to_decrypt_1 = 'Повідомлення від {{user}} не було отримане.';
 z.string.uk.conversation_unable_to_decrypt_2 = 'Ідентифікатор пристрою {{user}} змінився. Повідомлення не доставлено.';
 z.string.uk.conversation_unable_to_decrypt_link = 'Чому?';
 z.string.uk.conversation_unable_to_decrypt_error_message = 'Помилка';
@@ -303,7 +301,6 @@ z.string.uk.extensions_bubble_button_gif = 'Gif';
 
 z.string.uk.extensions_giphy_button_ok = 'Надіслати';
 z.string.uk.extensions_giphy_button_more = 'Спробувати іншу';
-z.string.uk.extensions_giphy_message = '{{tag}} • через giphy.com';
 z.string.uk.extensions_giphy_no_gifs = 'Упс, анімацій не знайдено';
 z.string.uk.extensions_giphy_random = 'Випадкова';
 
@@ -537,7 +534,6 @@ z.string.uk.tooltip_conversations_archived = 'Показати архів ({{num
 z.string.uk.tooltip_conversations_more = 'Більше';
 z.string.uk.tooltip_conversations_notify = 'Увімкнути звук ({{shortcut}})';
 z.string.uk.tooltip_conversations_silence = 'Вимкнути звук ({{shortcut}})';
-z.string.uk.tooltip_conversations_start = 'Почати розмову ({{shortcut}})';
 
 z.string.uk.tooltip_people_add = 'Додати людей до розмови ({{shortcut}})';
 z.string.uk.tooltip_people_back = 'Назад';
