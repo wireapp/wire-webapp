@@ -44,6 +44,8 @@ z.string.ru.auth_account_sign_in_phone = 'Телефон';
 z.string.ru.auth_account_terms_of_use = 'Условия использования';
 z.string.ru.auth_account_terms_of_use_detail = 'Я принимаю';
 
+z.string.ru.auth_blocked_database = 'Для отображения сообщений Wire необходим доступ к локальному хранилищу. Локальное хранилище недоступно в приватном режиме.';
+
 z.string.ru.auth_verify_account_add = 'Добавить';
 z.string.ru.auth_verify_account_detail = 'Это позволит использовать Wire на нескольких устройствах.';
 z.string.ru.auth_verify_account_headline = 'Добавить email и пароль.';
@@ -132,7 +134,7 @@ z.string.ru.modal_call_second_ongoing_action = 'Завершить вызов';
 z.string.ru.modal_call_second_outgoing_headline = 'Завершить текущий звонок?';
 z.string.ru.modal_call_second_outgoing_message = 'Вы можете одновременно участвовать только в одном звонке.';
 z.string.ru.modal_call_second_outgoing_action = 'Завершить вызов';
-z.string.ru.modal_clear_conversation_headline = 'Удалить историю разговоров?';
+z.string.ru.modal_clear_conversation_headline = 'Удалить содержимое?';
 z.string.ru.modal_clear_conversation_message = 'Это действие очистит историю разговора и удалит его из списка.';
 z.string.ru.modal_clear_conversation_option = 'Также покинуть разговор';
 z.string.ru.modal_clear_conversation_button = 'Удалить';
@@ -281,7 +283,9 @@ z.string.ru.conversations_secondary_line_person_removed = '{{user}} был уд�
 z.string.ru.conversations_secondary_line_people_added = '{{user}} человек были добавлены';
 z.string.ru.conversations_secondary_line_person_added = '{{user}} был добавлен';
 z.string.ru.conversations_secondary_line_person_added_you = '{{user}} добавил вас';
+z.string.ru.conversations_secondary_line_renamed = '{{user}} переименовал беседу';
 z.string.ru.conversations_secondary_line_timed_message = 'Временное сообщение';
+z.string.ru.conversations_secondary_line_you_left = 'Вы покинули беседу';
 z.string.ru.conversations_secondary_line_you_were_removed = 'Вы были удалены';
 
 z.string.ru.takeover_headline = 'Имена пользователей уже здесь.';
@@ -429,6 +433,8 @@ z.string.ru.preferences_options_contacts_detail = 'Мы используем в�
 z.string.ru.preferences_options_data = 'Отчеты о сбоях и использовании';
 z.string.ru.preferences_options_data_checkbox = 'Отчеты о сбоях и использовании';
 z.string.ru.preferences_options_data_detail = 'Сделайте Wire лучше, отправляя анонимную информацию.';
+z.string.ru.preferences_options_popular = 'По многочисленным просьбам';
+z.string.ru.preferences_options_previews_send_checkbox = 'Показывать предпросмотр ссылок, отправляемых вами';
 z.string.ru.preferences_options_notifications = 'Уведомления';
 z.string.ru.preferences_options_notifications_none = 'Выключен';
 z.string.ru.preferences_options_notifications_obfuscate = 'Скрывать содержание сообщения';
@@ -535,7 +541,9 @@ z.string.ru.tooltip_conversations_archive = 'Архивировать ({{shortcu
 z.string.ru.tooltip_conversations_archived = 'Показать архив ({{number}})';
 z.string.ru.tooltip_conversations_more = 'Больше';
 z.string.ru.tooltip_conversations_notify = 'Включить звук ({{shortcut}})';
+z.string.ru.tooltip_conversations_preferences = 'Открыть настройки';
 z.string.ru.tooltip_conversations_silence = 'Выключить звук ({{shortcut}})';
+z.string.ru.tooltip_conversations_start = 'Начать разговор ({{shortcut}})';
 
 z.string.ru.tooltip_people_add = 'Добавить людей в разговор ({{shortcut}})';
 z.string.ru.tooltip_people_back = 'Назад';
