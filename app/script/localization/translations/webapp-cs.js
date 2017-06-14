@@ -127,6 +127,7 @@ z.string.cs.modal_call_second_ongoing_action = 'Zavěsit';
 z.string.cs.modal_call_second_outgoing_headline = 'Zavěsit aktuální hovor?';
 z.string.cs.modal_call_second_outgoing_message = 'V jednom okamžiku může být pouze v jednom hovoru.';
 z.string.cs.modal_call_second_outgoing_action = 'Zavěsit';
+z.string.cs.modal_clear_conversation_headline = 'Vymazat obsah?';
 z.string.cs.modal_clear_conversation_message = 'Toto vyčistí historii konverzací a odstraní to z vašeho seznamu.';
 z.string.cs.modal_clear_conversation_option = 'Také opustit konverzaci';
 z.string.cs.modal_clear_conversation_button = 'Smazat';
@@ -199,6 +200,7 @@ z.string.cs.conversation_verified = 'Ověreno';
 z.string.cs.conversation_voice_channel_deactivate = ' volal(a)';
 z.string.cs.conversation_voice_channel_deactivate_you = ' volal(a)';
 z.string.cs.conversation_yesterday = 'Včera';
+z.string.cs.conversation_unable_to_decrypt_1 = 'zpráva od uživatele {{user}} nebyla přijata.';
 z.string.cs.conversation_unable_to_decrypt_2 = 'Identita uživatele {{user}} se změnila. Zpráva nedoručena.';
 z.string.cs.conversation_unable_to_decrypt_link = 'Proč?';
 z.string.cs.conversation_unable_to_decrypt_error_message = 'Chyba';
@@ -248,6 +250,7 @@ z.string.cs.extensions_bubble_button_gif = 'Gif';
 
 z.string.cs.extensions_giphy_button_ok = 'Odeslat';
 z.string.cs.extensions_giphy_button_more = 'Zkusit jiný';
+z.string.cs.extensions_giphy_message = '{{tag}} • přes giphy.com';
 z.string.cs.extensions_giphy_no_gifs = 'Uups, žádné gify';
 z.string.cs.extensions_giphy_random = 'Náhodně';
 
@@ -442,6 +445,7 @@ z.string.cs.tooltip_conversations_archived = 'Zobrazit archiv ({{number}})';
 z.string.cs.tooltip_conversations_more = 'Další';
 z.string.cs.tooltip_conversations_notify = 'Zapnout zvuk ({{shortcut}})';
 z.string.cs.tooltip_conversations_silence = 'Ztlumit ({{shortcut}})';
+z.string.cs.tooltip_conversations_start = 'Spustit konverzaci ({{shortcut}})';
 
 z.string.cs.tooltip_people_add = 'Přidat kontakty ke konverzaci ({{shortcut}})';
 z.string.cs.tooltip_people_back = 'Zpět';

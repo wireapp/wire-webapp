@@ -127,6 +127,7 @@ z.string.fi.modal_call_second_ongoing_action = 'Katkaise puhelu';
 z.string.fi.modal_call_second_outgoing_headline = 'Katkaise nykyinen puhelu?';
 z.string.fi.modal_call_second_outgoing_message = 'Voit olla vain yhdessä puhelussa kerrallaan.';
 z.string.fi.modal_call_second_outgoing_action = 'Katkaise puhelu';
+z.string.fi.modal_clear_conversation_headline = 'Poista sisältö?';
 z.string.fi.modal_clear_conversation_message = 'Tämä tyhjentää keskusteluhistorian ja poistaa sen luettelostasi.';
 z.string.fi.modal_clear_conversation_option = 'Poistu myös keskustelusta';
 z.string.fi.modal_clear_conversation_button = 'Poista';
@@ -201,6 +202,7 @@ z.string.fi.conversation_verified = 'Vahvistettu';
 z.string.fi.conversation_voice_channel_deactivate = ' soitti';
 z.string.fi.conversation_voice_channel_deactivate_you = ' soitti';
 z.string.fi.conversation_yesterday = 'Eilen';
+z.string.fi.conversation_unable_to_decrypt_1 = '{{user}} n viesti ei tullut perille.';
 z.string.fi.conversation_unable_to_decrypt_2 = '{{user}} n laitteen identiteetti muuttui. Perilletoimittamaton viesti.';
 z.string.fi.conversation_unable_to_decrypt_link = 'Miksi?';
 z.string.fi.conversation_unable_to_decrypt_error_message = 'Virhe';
@@ -261,6 +263,7 @@ z.string.fi.extensions_bubble_button_gif = 'Gif';
 
 z.string.fi.extensions_giphy_button_ok = 'Lähetä';
 z.string.fi.extensions_giphy_button_more = 'Kokeile toista';
+z.string.fi.extensions_giphy_message = '{{tag}} • giphy.com:in kautta';
 z.string.fi.extensions_giphy_no_gifs = 'Upsista, ei giffejä';
 z.string.fi.extensions_giphy_random = 'Satunnainen';
 
@@ -482,6 +485,7 @@ z.string.fi.tooltip_conversations_archived = 'Näytä arkisto ({{number}})';
 z.string.fi.tooltip_conversations_more = 'Lisää';
 z.string.fi.tooltip_conversations_notify = 'Poist mykistys ({{shortcut}})';
 z.string.fi.tooltip_conversations_silence = 'Mykistä ({{shortcut}})';
+z.string.fi.tooltip_conversations_start = 'Aloita keskustelu ({{shortcut}})';
 
 z.string.fi.tooltip_people_add = 'Lisää ihmisiä keskusteluun ({{shortcut}})';
 z.string.fi.tooltip_people_back = 'Takaisin';

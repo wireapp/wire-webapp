@@ -131,6 +131,7 @@ z.string.da.modal_call_second_ongoing_action = 'Læg På';
 z.string.da.modal_call_second_outgoing_headline = 'Læg nuværende opkald på?';
 z.string.da.modal_call_second_outgoing_message = 'Du kan kun være i et opkald af gangen.';
 z.string.da.modal_call_second_outgoing_action = 'Læg På';
+z.string.da.modal_clear_conversation_headline = 'Slet indhold?';
 z.string.da.modal_clear_conversation_message = 'Dette vil fjerne samtale historikken og fjerne den fra din liste.';
 z.string.da.modal_clear_conversation_option = 'Forlad også samtalen';
 z.string.da.modal_clear_conversation_button = 'Slet';
@@ -216,6 +217,7 @@ z.string.da.conversation_verified = 'Bekræftet';
 z.string.da.conversation_voice_channel_deactivate = ' ringede';
 z.string.da.conversation_voice_channel_deactivate_you = ' ringede';
 z.string.da.conversation_yesterday = 'I går';
+z.string.da.conversation_unable_to_decrypt_1 = 'en besked fra {{user}} blev ikke modtaget.';
 z.string.da.conversation_unable_to_decrypt_2 = '{{user}}’s enheds identitet er ændret. Uleveret besked.';
 z.string.da.conversation_unable_to_decrypt_link = 'Hvorfor?';
 z.string.da.conversation_unable_to_decrypt_error_message = 'Fejl';
@@ -290,6 +292,7 @@ z.string.da.extensions_bubble_button_gif = 'Gif';
 
 z.string.da.extensions_giphy_button_ok = 'Send';
 z.string.da.extensions_giphy_button_more = 'Prøv en anden';
+z.string.da.extensions_giphy_message = '{{tag}} • via giphy.com';
 z.string.da.extensions_giphy_no_gifs = 'Ups, ingen gifs';
 z.string.da.extensions_giphy_random = 'Tilfældig';
 
@@ -512,6 +515,7 @@ z.string.da.tooltip_conversations_archived = 'Vis arkiv ({{number}})';
 z.string.da.tooltip_conversations_more = 'Mere';
 z.string.da.tooltip_conversations_notify = 'Unmute ({{shortcut}})';
 z.string.da.tooltip_conversations_silence = 'Mute ({{shortcut}})';
+z.string.da.tooltip_conversations_start = 'Start samtale ({{shortcut}})';
 
 z.string.da.tooltip_people_add = 'Tilføj personer til samtalen ({{shortcut}})';
 z.string.da.tooltip_people_back = 'Tilbage';

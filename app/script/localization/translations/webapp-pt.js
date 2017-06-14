@@ -131,6 +131,7 @@ z.string.pt.modal_call_second_ongoing_action = 'Desligar';
 z.string.pt.modal_call_second_outgoing_headline = 'Desligar a chamada atual?';
 z.string.pt.modal_call_second_outgoing_message = 'Você só pode estar em uma chamada de cada vez.';
 z.string.pt.modal_call_second_outgoing_action = 'Desligar';
+z.string.pt.modal_clear_conversation_headline = 'Excluir conteúdo?';
 z.string.pt.modal_clear_conversation_message = 'Isto irá limpar o histórico de conversa e removê-la de sua lista.';
 z.string.pt.modal_clear_conversation_option = 'Também sair da conversa';
 z.string.pt.modal_clear_conversation_button = 'Apagar';
@@ -217,6 +218,7 @@ z.string.pt.conversation_verified = 'Verificado';
 z.string.pt.conversation_voice_channel_deactivate = ' ligou';
 z.string.pt.conversation_voice_channel_deactivate_you = ' ligou';
 z.string.pt.conversation_yesterday = 'Ontem';
+z.string.pt.conversation_unable_to_decrypt_1 = 'uma mensagem de {{user}} não foi recebida.';
 z.string.pt.conversation_unable_to_decrypt_2 = '{{user}} identidade do dispositivo foi alterada. Mensagem não entregue.';
 z.string.pt.conversation_unable_to_decrypt_link = 'Por que?';
 z.string.pt.conversation_unable_to_decrypt_error_message = 'Erro';
@@ -295,6 +297,7 @@ z.string.pt.extensions_bubble_button_gif = 'Gif';
 
 z.string.pt.extensions_giphy_button_ok = 'Enviar';
 z.string.pt.extensions_giphy_button_more = 'Tente outro';
+z.string.pt.extensions_giphy_message = '{{tag}} • via giphy.com';
 z.string.pt.extensions_giphy_no_gifs = 'Opa, sem gifs';
 z.string.pt.extensions_giphy_random = 'Aleatório';
 
@@ -527,6 +530,7 @@ z.string.pt.tooltip_conversations_archived = 'Mostrar arquivo ({{number}})';
 z.string.pt.tooltip_conversations_more = 'Ver mais';
 z.string.pt.tooltip_conversations_notify = 'Tirar do silencioso ({{shortcut}})';
 z.string.pt.tooltip_conversations_silence = 'Silenciar ({{shortcut}})';
+z.string.pt.tooltip_conversations_start = 'Iniciar conversa ({{shortcut}})';
 
 z.string.pt.tooltip_people_add = 'Adicionar pessoas à conversa ({{shortcut}})';
 z.string.pt.tooltip_people_back = 'Voltar';

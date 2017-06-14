@@ -222,6 +222,7 @@ z.string.hu.conversation_verified = 'Megerősítve';
 z.string.hu.conversation_voice_channel_deactivate = ' hívta';
 z.string.hu.conversation_voice_channel_deactivate_you = ' hívta';
 z.string.hu.conversation_yesterday = 'Tegnap';
+z.string.hu.conversation_unable_to_decrypt_1 = 'egy üzenetet tőle: {{user}} nem kapott meg.';
 z.string.hu.conversation_unable_to_decrypt_2 = '{{user}} eszköz azonosítója megváltozott. Kézbesítetlen üzenet.';
 z.string.hu.conversation_unable_to_decrypt_link = 'Miért?';
 z.string.hu.conversation_unable_to_decrypt_error_message = 'Hiba';
@@ -539,6 +540,7 @@ z.string.hu.tooltip_conversations_more = 'Továbbiak';
 z.string.hu.tooltip_conversations_notify = 'Némítás feloldása ({{shortcut}})';
 z.string.hu.tooltip_conversations_preferences = 'Beállítások megnyitása';
 z.string.hu.tooltip_conversations_silence = 'Némítás ({{shortcut}})';
+z.string.hu.tooltip_conversations_start = 'Beszélgetés megkezdése ({{shortcut}})';
 
 z.string.hu.tooltip_people_add = 'Partner hozzáadása a beszélgetéshez ({{shortcut}})';
 z.string.hu.tooltip_people_back = 'Vissza';

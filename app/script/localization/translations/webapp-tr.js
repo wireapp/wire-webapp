@@ -131,6 +131,7 @@ z.string.tr.modal_call_second_ongoing_action = 'Kapat';
 z.string.tr.modal_call_second_outgoing_headline = 'Mevcut konuşmayı sonlandır?';
 z.string.tr.modal_call_second_outgoing_message = 'Aynı anda tek bir aramada bulunabilirsiniz.';
 z.string.tr.modal_call_second_outgoing_action = 'Kapat';
+z.string.tr.modal_clear_conversation_headline = 'İçerik silinsin?';
 z.string.tr.modal_clear_conversation_message = 'Bu işlem konuşma geçmişini temizleyecek ve konuşmayı listenizden silecektir.';
 z.string.tr.modal_clear_conversation_option = 'Ayrıca konuşmadan da ayrıl';
 z.string.tr.modal_clear_conversation_button = 'Sil';
@@ -217,7 +218,8 @@ z.string.tr.conversation_verified = 'Doğrulanmış';
 z.string.tr.conversation_voice_channel_deactivate = ' aradı';
 z.string.tr.conversation_voice_channel_deactivate_you = ' aradı';
 z.string.tr.conversation_yesterday = 'Dün';
-z.string.tr.conversation_unable_to_decrypt_2 = '{{users}}’nin cihaz kimliği değişti. Teslim edilmemiş mesaj.';
+z.string.tr.conversation_unable_to_decrypt_1 = '{{user}}’den gelen bir mesaj alınamadı.';
+z.string.tr.conversation_unable_to_decrypt_2 = '{{user}}’nin cihaz kimliği değişti. Teslim edilmemiş mesaj.';
 z.string.tr.conversation_unable_to_decrypt_link = 'Neden?';
 z.string.tr.conversation_unable_to_decrypt_error_message = 'Hata';
 z.string.tr.conversation_unable_to_decrypt_reset_session = 'Oturumu Sıfırla';
@@ -301,6 +303,7 @@ z.string.tr.extensions_bubble_button_gif = 'Gif';
 
 z.string.tr.extensions_giphy_button_ok = 'Gönder';
 z.string.tr.extensions_giphy_button_more = 'Başkasını Dene';
+z.string.tr.extensions_giphy_message = '{{tag}} • giphy.com aracılığıyla';
 z.string.tr.extensions_giphy_no_gifs = 'Olamaz, hiç Gif yok';
 z.string.tr.extensions_giphy_random = 'Rastgele';
 
@@ -534,6 +537,7 @@ z.string.tr.tooltip_conversations_archived = 'Arşivi göster ({{number}})';
 z.string.tr.tooltip_conversations_more = 'Daha';
 z.string.tr.tooltip_conversations_notify = 'Sesi aç ({{shortcut}})';
 z.string.tr.tooltip_conversations_silence = 'Sessize al ({{shortcut}})';
+z.string.tr.tooltip_conversations_start = 'Konuşma başlat ({{shortcut}})';
 
 z.string.tr.tooltip_people_add = 'Konuşmaya birilerini ekle ({{shortcut}})';
 z.string.tr.tooltip_people_back = 'Geri';

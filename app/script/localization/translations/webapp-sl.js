@@ -132,6 +132,7 @@ z.string.sl.modal_call_second_ongoing_action = 'Odloži';
 z.string.sl.modal_call_second_outgoing_headline = 'Odloži trenutni klic?';
 z.string.sl.modal_call_second_outgoing_message = 'Naenkrat ste lahko samo v enem klicu.';
 z.string.sl.modal_call_second_outgoing_action = 'Odloži';
+z.string.sl.modal_clear_conversation_headline = 'Izbriši vsebino?';
 z.string.sl.modal_clear_conversation_message = 'To bo izbrisalo zgodovino pogovora in ga odstranilo iz vašega seznama.';
 z.string.sl.modal_clear_conversation_option = 'Tudi zapusti pogovor';
 z.string.sl.modal_clear_conversation_button = 'Izbriši';
@@ -218,6 +219,7 @@ z.string.sl.conversation_verified = 'Preverjena';
 z.string.sl.conversation_voice_channel_deactivate = ' je klical(-a)';
 z.string.sl.conversation_voice_channel_deactivate_you = ' je klical(-a)';
 z.string.sl.conversation_yesterday = 'Včeraj';
+z.string.sl.conversation_unable_to_decrypt_1 = 'sporočilo od {{user}} ni bilo prejeto.';
 z.string.sl.conversation_unable_to_decrypt_2 = 'Identita naprave od {{user}} je bila spremenjena. Sporočilo ni dostavljeno.';
 z.string.sl.conversation_unable_to_decrypt_link = 'Zakaj?';
 z.string.sl.conversation_unable_to_decrypt_error_message = 'Napaka';
@@ -302,6 +304,7 @@ z.string.sl.extensions_bubble_button_gif = 'Gif';
 
 z.string.sl.extensions_giphy_button_ok = 'Pošlji';
 z.string.sl.extensions_giphy_button_more = 'Poizkusi drugega';
+z.string.sl.extensions_giphy_message = '{{tag}} • preko giphy.com';
 z.string.sl.extensions_giphy_no_gifs = 'Ups, ni najdenih gifov';
 z.string.sl.extensions_giphy_random = 'Naključno';
 
@@ -535,6 +538,7 @@ z.string.sl.tooltip_conversations_archived = 'Prikaži arhiv ({{number}})';
 z.string.sl.tooltip_conversations_more = 'Več';
 z.string.sl.tooltip_conversations_notify = 'Povrni zvok ({{shortcut}})';
 z.string.sl.tooltip_conversations_silence = 'Utišaj ({{shortcut}})';
+z.string.sl.tooltip_conversations_start = 'Začni pogovor ({{shortcut}})';
 
 z.string.sl.tooltip_people_add = 'Dodaj osebe v pogovor ({{shortcut}})';
 z.string.sl.tooltip_people_back = 'Nazaj';

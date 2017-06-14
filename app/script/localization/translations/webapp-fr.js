@@ -132,6 +132,7 @@ z.string.fr.modal_call_second_ongoing_action = 'Raccrocher';
 z.string.fr.modal_call_second_outgoing_headline = 'Raccrocher l’appel en cours ?';
 z.string.fr.modal_call_second_outgoing_message = 'Vous ne pouvez être que dans un appel à la fois.';
 z.string.fr.modal_call_second_outgoing_action = 'Raccrocher';
+z.string.fr.modal_clear_conversation_headline = 'Effacer le contenu?';
 z.string.fr.modal_clear_conversation_message = 'Cela videra l’historique de la conversation et la supprimera de votre liste.';
 z.string.fr.modal_clear_conversation_option = 'Et quitter la conversation';
 z.string.fr.modal_clear_conversation_button = 'Supprimer';
@@ -217,6 +218,7 @@ z.string.fr.conversation_verified = 'Vérifié';
 z.string.fr.conversation_voice_channel_deactivate = ' a tenté d’appeler';
 z.string.fr.conversation_voice_channel_deactivate_you = ' a tenté d’appeler';
 z.string.fr.conversation_yesterday = 'Hier';
+z.string.fr.conversation_unable_to_decrypt_1 = 'un message de {{user}} n’a pas été reçu.';
 z.string.fr.conversation_unable_to_decrypt_2 = 'L’identité de l’appareil de {{user}} a changé. Message non délivré.';
 z.string.fr.conversation_unable_to_decrypt_link = 'Pourquoi ?';
 z.string.fr.conversation_unable_to_decrypt_error_message = 'Erreur';
@@ -293,6 +295,7 @@ z.string.fr.extensions_bubble_button_gif = 'Gif';
 
 z.string.fr.extensions_giphy_button_ok = 'Envoyer';
 z.string.fr.extensions_giphy_button_more = 'Autre Gif';
+z.string.fr.extensions_giphy_message = '{{tag}} • via giphy.com';
 z.string.fr.extensions_giphy_no_gifs = 'Oups, pas de gifs';
 z.string.fr.extensions_giphy_random = 'Au hasard';
 
@@ -525,6 +528,7 @@ z.string.fr.tooltip_conversations_archived = 'Voir les archives ({{number}})';
 z.string.fr.tooltip_conversations_more = 'Plus';
 z.string.fr.tooltip_conversations_notify = 'Activer les notifications ({{shortcut}})';
 z.string.fr.tooltip_conversations_silence = 'Désactiver les notifications ({{shortcut}})';
+z.string.fr.tooltip_conversations_start = 'Démarrer une conversation ({{shortcut}})';
 
 z.string.fr.tooltip_people_add = 'Ajouter des personnes à la conversation ({{shortcut}})';
 z.string.fr.tooltip_people_back = 'Précédent';
