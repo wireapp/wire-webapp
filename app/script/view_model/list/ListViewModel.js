@@ -230,7 +230,7 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     if (!conversation_et.is_group()) {
       const [user_et] = conversation_et.participating_user_ets();
 
-      if (user_et.is_connected() || user_et.is_request()) {
+      if (user_et && (user_et.is_connected() || user_et.is_request())) {
         entries.push({
           click: () => this.click_on_block_action(conversation_et),
           label: z.l10n.text(z.string.conversations_popover_block),
@@ -285,7 +285,6 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
           this.conversation_repository.clear_conversation(conversation_et, next_conversation, leave);
         },
         conversation: conversation_et,
-        data: conversation_et.display_name(),
       });
     }
   }

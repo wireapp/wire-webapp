@@ -35,7 +35,6 @@ z.properties.Properties = class Properties {
       },
       privacy: {
         improve_wire: true,
-        report_errors: true,
       },
       sound: {
         alerts: z.audio.AudioPreference.ALL,

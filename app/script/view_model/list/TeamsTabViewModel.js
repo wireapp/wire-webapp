@@ -42,6 +42,8 @@ z.ViewModel.list.TeamsTabViewModel = class TeamsTabViewModel {
       }
     });
 
+    this.known_team_ids = this.team_repository.known_team_ids;
+
     this.accent_color = ko.pureComputed(() => {
       const self_user_et = this.user_repository.self();
       if (self_user_et) {
@@ -85,7 +87,11 @@ z.ViewModel.list.TeamsTabViewModel = class TeamsTabViewModel {
     const start_ui_state = this.list_view_model.list_state() === z.ViewModel.list.LIST_STATE.START_UI;
     if (!start_ui_state) {
       const last_conversation = team_et.last_active_conversation;
-      const conversation_et = last_conversation ? last_conversation : this.conversation_repository.get_most_recent_conversation();
+      const team_conversation = last_conversation && last_conversation.team_id;
+      const known_team_conversation = team_conversation && this.known_team_ids().includes(last_conversation.team_id);
+      const valid_conversation = last_conversation && !(known_team_conversation && !this.active_team_id());
+
+      const conversation_et = valid_conversation ? last_conversation : this.conversation_repository.get_most_recent_conversation();
       amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversation_et);
     }
   }

@@ -53,7 +53,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.conversations = ko.observableArray([]);
 
     this.active_team = this.team_repository.active_team;
-    this.team_repository.known_team_ids.subscribe(() => this.map_guest_status());
+    this.active_team.subscribe((team_et) => this.map_team_member_status_user(team_et));
+
+    this.known_team_ids = this.team_repository.known_team_ids;
+    this.known_team_ids.subscribe(() => this.map_guest_status_self());
 
     this.block_event_handling = true;
     this.fetching_conversations = {};
@@ -799,22 +802,31 @@ z.conversation.ConversationRepository = class ConversationRepository {
   map_conversations(payload) {
     if (payload.length) {
       const conversation_ets = this.conversation_mapper.map_conversations(payload);
-      conversation_ets.forEach((conversation_et) => this._map_guest_status(conversation_et));
+      conversation_ets.forEach((conversation_et) => this._map_guest_status_self(conversation_et));
       return conversation_ets;
     }
 
     const conversation_et = this.conversation_mapper.map_conversation(payload);
-    this._map_guest_status(conversation_et);
+    this._map_guest_status_self(conversation_et);
     return conversation_et;
   }
 
-  map_guest_status() {
-    this.filtered_conversations().forEach((conversation_et) => this._map_guest_status(conversation_et));
+  map_team_member_status_user(team_et) {
+    const has_team_id = team_et.id;
+
+    this.user_repository.users().forEach((user_et) => {
+      const is_team_member = has_team_id && team_et.members().find((member) => member.id === user_et.id);
+      user_et.is_team_member(is_team_member);
+    });
   }
 
-  _map_guest_status(conversation_et) {
+  map_guest_status_self() {
+    this.filtered_conversations().forEach((conversation_et) => this._map_guest_status_self(conversation_et));
+  }
+
+  _map_guest_status_self(conversation_et) {
     const team_id = conversation_et.team_id;
-    const is_guest = team_id && !this.team_repository.known_team_ids().includes(team_id);
+    const is_guest = team_id && !this.known_team_ids().includes(team_id);
     conversation_et.is_guest(is_guest);
   }
 
@@ -3201,9 +3213,17 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   update_message_as_upload_failed(message_et) {
     if (message_et) {
-      const asset_et = message_et.get_first_asset();
+      if (!message_et.is_content()) {
+        throw new Error(`Tried to update wrong message type as upload failed '${message_et.super_type}'`);
+      }
 
+      const asset_et = message_et.get_first_asset();
       if (asset_et) {
+        const is_proper_asset = asset_et.is_audio() || asset_et.is_file() || asset_et.is_video();
+        if (!is_proper_asset) {
+          throw new Error(`Tried to update message with wrong asset type as upload failed '${asset_et.type}'`);
+        }
+
         asset_et.status(z.assets.AssetTransferState.UPLOAD_FAILED);
         asset_et.upload_failed_reason(z.assets.AssetUploadFailedReason.FAILED);
       }

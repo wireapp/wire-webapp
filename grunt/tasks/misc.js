@@ -54,7 +54,6 @@ module.exports = (grunt) => {
 
   grunt.registerTask('prepare_dist', [
     'clean:dist',
-    'coffee:dist',
     'less:dist',
     'postcss:distribution',
     'copy:dist',
@@ -74,8 +73,6 @@ module.exports = (grunt) => {
 
   grunt.registerTask('prepare_staging', [
     'clean:deploy',
-    'coffeelint:deploy',
-    'coffee:deploy',
     'less:deploy',
     'postcss:deploy',
     'copy:deploy',
@@ -92,7 +89,6 @@ module.exports = (grunt) => {
 
   grunt.registerTask('prepare_prod', [
     'clean:deploy',
-    'coffee:deploy',
     'less:deploy',
     'postcss:deploy',
     'copy:deploy',
@@ -113,11 +109,10 @@ module.exports = (grunt) => {
 
     if (file !== undefined) {
       const files = [file];
-      grunt.config('coffeelint.deploy.files.src', files);
       grunt.config('todo.src', files);
     }
 
-    grunt.task.run(['coffeelint:deploy', 'todo']);
+    grunt.task.run(['todo']);
   });
 
   return grunt.registerTask('host', function(port, open = true) {

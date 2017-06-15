@@ -157,7 +157,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
 
   /**
    * Remove all subscriptions and reset states.
-   * @param {z.entity.Conversation} conversation_et - Conversation entity to change to
+   * @param {z.entity.Conversation} [conversation_et] - Conversation entity to change to
    * @returns {undefined} No return value
    */
   release_conversation(conversation_et) {

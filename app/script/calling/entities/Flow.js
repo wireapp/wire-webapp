@@ -927,18 +927,19 @@ z.calling.entities.Flow = class Flow {
    */
   _set_local_sdp() {
     this.sdp_state_changing(true);
-    this.logger.debug(`Setting local '${this.local_sdp().type}' SDP`, this.local_sdp());
+    const local_sdp = this.local_sdp();
+    this.logger.debug(`Setting local '${local_sdp.type}' SDP`, local_sdp);
 
-    this.peer_connection.setLocalDescription(this.local_sdp())
+    this.peer_connection.setLocalDescription(local_sdp)
       .then(() => {
-        this.logger.info(`Setting local '${this.local_sdp().type}' SDP successful`, this.peer_connection.localDescription);
+        this.logger.info(`Setting local '${local_sdp.type}' SDP successful`, this.peer_connection.localDescription);
         this.telemetry.time_step(z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SET);
 
         this.should_set_local_sdp(false);
         this.sdp_state_changing(false);
         this._set_send_sdp_timeout();
       })
-      .catch((error) => this._set_sdp_failure(error, z.calling.enum.SDP_SOURCE.LOCAL, this.local_sdp().type));
+      .catch((error) => this._set_sdp_failure(error, z.calling.enum.SDP_SOURCE.LOCAL, local_sdp.type));
   }
 
   /**
@@ -948,17 +949,18 @@ z.calling.entities.Flow = class Flow {
    */
   _set_remote_sdp() {
     this.sdp_state_changing(false);
-    this.logger.debug(`Setting remote '${this.remote_sdp().type}' SDP\n${this.remote_sdp().sdp}`, this.remote_sdp());
+    const remote_sdp = this.remote_sdp();
+    this.logger.debug(`Setting remote '${remote_sdp.type}' SDP\n${remote_sdp.sdp}`, remote_sdp);
 
-    this.peer_connection.setRemoteDescription(this.remote_sdp())
+    this.peer_connection.setRemoteDescription(remote_sdp)
       .then(() => {
-        this.logger.info(`Setting remote '${this.remote_sdp().type}' SDP successful`, this.peer_connection.remoteDescription);
+        this.logger.info(`Setting remote '${remote_sdp.type}' SDP successful`, this.peer_connection.remoteDescription);
         this.telemetry.time_step(z.telemetry.calling.CallSetupSteps.REMOTE_SDP_SET);
 
         this.should_set_remote_sdp(false);
         this.sdp_state_changing(false);
       })
-      .catch((error) => this._set_sdp_failure(error, z.calling.enum.SDP_SOURCE.REMOTE, this.remote_sdp().type));
+      .catch((error) => this._set_sdp_failure(error, z.calling.enum.SDP_SOURCE.REMOTE, remote_sdp.type));
   }
 
   /**

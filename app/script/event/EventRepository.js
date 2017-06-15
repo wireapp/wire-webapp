@@ -26,7 +26,13 @@ z.event.EventRepository = class EventRepository {
   static get CONFIG() {
     return {
       E_CALL_EVENT_LIFETIME: 30 * 1000, // 30 seconds
-      UNKNOWN_DECRYPTION_ERROR_CODE: 999,
+      IGNORED_ERRORS: [
+        z.cryptography.CryptographyError.TYPE.IGNORED_ASSET,
+        z.cryptography.CryptographyError.TYPE.IGNORED_PREVIEW,
+        z.cryptography.CryptographyError.TYPE.PREVIOUSLY_STORED,
+        z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE,
+        z.event.EventError.TYPE.OUTDATED_E_CALL_EVENT,
+      ],
     };
   }
 
@@ -463,73 +469,30 @@ z.event.EventRepository = class EventRepository {
     }
 
     return Promise.resolve()
-    .then(() => {
-      if (z.event.EventTypeHandling.DECRYPT.includes(event_type)) {
-        return this.cryptography_repository.decrypt_event(event)
-        .catch((decryption_error) => {
-          // Get error information
-          const error_code = decryption_error.code || EventRepository.CONFIG.UNKNOWN_DECRYPTION_ERROR_CODE;
-          const {data: event_data, from: remote_user_id} = event;
-          const remote_client_id = event_data.sender;
-          const session_id = this.cryptography_repository._construct_session_id(remote_user_id, remote_client_id);
-
-          // Handle error
-          if (decryption_error instanceof Proteus.errors.DecryptError.DuplicateMessage || decryption_error instanceof Proteus.errors.DecryptError.OutdatedMessage) {
-            // We don't need to show duplicate message errors to the user
-            throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE);
-          }
-          if (decryption_error instanceof z.cryptography.CryptographyError && decryption_error.type === z.cryptography.CryptographyError.TYPE.PREVIOUSLY_STORED) {
-            throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE);
-          }
-
-          if (decryption_error instanceof Proteus.errors.DecryptError.InvalidMessage || decryption_error instanceof Proteus.errors.DecryptError.InvalidSignature) {
-            // Session is broken, let's see what's really causing it...
-            this.logger.error(`Session '${session_id}' with user '${remote_user_id}' (client '${remote_client_id}') is broken or out of sync. Reset the session and decryption is likely to work again. Error: ${decryption_error.message}`, decryption_error);
-          } else if (decryption_error instanceof Proteus.errors.DecryptError.RemoteIdentityChanged) {
-            // Remote identity changed
-            this.logger.error(`Remote identity of client '${remote_client_id}' from user '${remote_user_id}' changed: ${decryption_error.message}`, decryption_error);
-          }
-
-          this.logger.warn(`Could not decrypt an event from client ID '${remote_client_id}' of user ID '${remote_user_id}' in session ID '${session_id}'.\nError Code: '${error_code}'\nError Message: ${decryption_error.message}`, decryption_error);
-          this._report_decrypt_error(decryption_error, event);
-
-          return z.conversation.EventBuilder.build_unable_to_decrypt(event, decryption_error, error_code);
-        })
-        .then((message) => {
-          if (message instanceof z.proto.GenericMessage) {
-            return this.cryptography_repository.cryptography_mapper.map_generic_message(message, event);
-          }
-          return message;
-        });
-      }
-      return event;
-    })
-    .then((mapped_event) => {
-      if (z.event.EventTypeHandling.STORE.includes(mapped_event.type)) {
-        return this.conversation_service.save_event(mapped_event);
-      }
-      return mapped_event;
-    })
-    .then((saved_event) => {
-      if (event_type === z.event.Client.CALL.E_CALL) {
-        this._validate_call_event_lifetime(event);
-      }
-      this._distribute_event(saved_event, source);
-      return saved_event;
-    })
-    .catch(function(error) {
-      const ignored_errors = [
-        z.cryptography.CryptographyError.TYPE.IGNORED_ASSET,
-        z.cryptography.CryptographyError.TYPE.IGNORED_PREVIEW,
-        z.cryptography.CryptographyError.TYPE.PREVIOUSLY_STORED,
-        z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE,
-        z.event.EventError.TYPE.OUTDATED_E_CALL_EVENT,
-      ];
-
-      if (!ignored_errors.includes(error.type)) {
-        throw error;
-      }
-    });
+      .then(() => {
+        if (z.event.EventTypeHandling.DECRYPT.includes(event_type)) {
+          return this.cryptography_repository.handle_encrypted_event(event);
+        }
+        return event;
+      })
+      .then((mapped_event) => {
+        if (z.event.EventTypeHandling.STORE.includes(mapped_event.type)) {
+          return this.conversation_service.save_event(mapped_event);
+        }
+        return mapped_event;
+      })
+      .then((saved_event) => {
+        if (event_type === z.event.Client.CALL.E_CALL) {
+          this._validate_call_event_lifetime(event);
+        }
+        this._distribute_event(saved_event, source);
+        return saved_event;
+      })
+      .catch((error) => {
+        if (!EventRepository.CONFIG.IGNORED_ERRORS.includes(error.type)) {
+          throw error;
+        }
+      });
   }
 
   /**
@@ -569,35 +532,6 @@ z.event.EventRepository = class EventRepository {
   }
 
   /**
-   * Report decryption error to Localytics and stack traces to Raygun.
-   *
-   * @private
-   * @param {Error} decryption_error - Error from event decryption
-   * @param {Object} event_data - Event data
-   * @param {string} user_id - Remote user ID
-   * @param {string} event_type - Event type
-   * @returns {undefined} No return value
-   */
-  _report_decrypt_error(decryption_error, {data: event_data, from: user_id, type: event_type}) {
-    const session_id = this.cryptography_repository._construct_session_id(user_id, event_data.sender);
-
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.E2EE.CANNOT_DECRYPT_MESSAGE, {cause: decryption_error.code || decryption_error.message});
-
-    const custom_data = {
-      client_local_class: this.current_client().class,
-      client_local_type: this.current_client().type,
-      cryptobox_version: cryptobox.version,
-      error_code: decryption_error.code,
-      event_type: event_type,
-      session_id: session_id,
-    };
-
-    const raygun_error = new Error(`Decryption failed: ${decryption_error.code || decryption_error.message}`);
-    raygun_error.stack = decryption_error.stack;
-    Raygun.send(raygun_error, custom_data);
-  }
-
-  /**
    * Check if call event is handled within its valid lifespan.
    *
    * @private
@@ -605,15 +539,24 @@ z.event.EventRepository = class EventRepository {
    * @returns {boolean} Returns true if event is handled within is lifetime, otherwise throws error
    */
   _validate_call_event_lifetime(event) {
-    if (this.notification_handling_state() === z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET) return true;
-    if (event.content.type === z.calling.enum.CALL_MESSAGE_TYPE.CANCEL) return true;
+    const {content, conversation: conversation_id, time, type} = event;
+    const forced_event_types = [
+      z.calling.enum.CALL_MESSAGE_TYPE.CANCEL,
+      z.calling.enum.CALL_MESSAGE_TYPE.GROUP_LEAVE,
+    ];
 
     const corrected_timestamp = Date.now() - this.clock_drift;
-    const event_timestamp = new Date(event.time).getTime();
-    if (corrected_timestamp > (event_timestamp + EventRepository.CONFIG.E_CALL_EVENT_LIFETIME)) {
-      this.logger.info(`Ignored outdated '${event.type}' event in conversation '${event.conversation}' - Event: '${event_timestamp}', Local: '${corrected_timestamp}'`, {event_json: JSON.stringify(event), event_object: event});
-      throw new z.event.EventError(z.event.EventError.TYPE.OUTDATED_E_CALL_EVENT);
+    const threshold_timestamp = new Date(time).getTime() + EventRepository.CONFIG.E_CALL_EVENT_LIFETIME;
+
+    const is_forced_event_type = forced_event_types.includes(content.type);
+    const is_valid_event = corrected_timestamp < threshold_timestamp;
+    const web_socket_state = this.notification_handling_state() === z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
+
+    if (is_forced_event_type || is_valid_event || web_socket_state) {
+      return true;
     }
-    return true;
+
+    this.logger.info(`Ignored outdated '${type}' event in conversation '${conversation_id}' - Event: '${threshold_timestamp}', Local: '${corrected_timestamp}'`, {event_json: JSON.stringify(event), event_object: event});
+    throw new z.event.EventError(z.event.EventError.TYPE.OUTDATED_E_CALL_EVENT);
   }
 };
