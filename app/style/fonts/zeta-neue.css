@@ -252,9 +252,6 @@
 .icon-send:before {
   content: "\e235";
 }
-.icon-emoji:before {
-  content: "\e237";
-}
 .icon-hourglass:before {
   content: "\e239";
 }
