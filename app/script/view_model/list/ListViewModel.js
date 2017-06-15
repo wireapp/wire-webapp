@@ -185,8 +185,9 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     const entries = [];
 
     if (!conversation_et.is_request() && !conversation_et.removed_from_conversation()) {
-      const notify_tooltip = z.l10n.text(z.string.tooltip_conversations_notify);
-      const silence_tooltip = z.l10n.text(z.string.tooltip_conversations_silence);
+      const silence_shortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.SILENCE);
+      const notify_tooltip = z.l10n.text(z.string.tooltip_conversations_notify, silence_shortcut);
+      const silence_tooltip = z.l10n.text(z.string.tooltip_conversations_silence, silence_shortcut);
 
       label = conversation_et.is_muted() ? z.string.conversations_popover_notify : z.string.conversations_popover_silence;
       title = conversation_et.is_muted() ? notify_tooltip : silence_tooltip;
