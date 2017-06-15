@@ -95,6 +95,14 @@ z.service.BackendClient = class BackendClient {
 
     this.number_of_requests = ko.observable(0);
     this.number_of_requests.subscribe((new_value) => amplify.publish(z.event.WebApp.TELEMETRY.BACKEND_REQUESTS, new_value));
+    
+    // Only allow JSON response by default
+    $.ajaxSetup({
+      contents: {
+        javascript: false,
+      },
+      dataType: 'json',
+    });
 
     // http://stackoverflow.com/a/18996758/451634
     $.ajaxPrefilter((options, originalOptions, jqXHR) => {
@@ -117,7 +125,7 @@ z.service.BackendClient = class BackendClient {
 
   /**
    * Request backend status.
-   * @returns {$.Promise} jquery AJAX promise
+   * @returns {$.Promise} jQuery AJAX promise
    */
   status() {
     return $.ajax({
@@ -261,14 +269,36 @@ z.service.BackendClient = class BackendClient {
         timeout: config.timeout,
         type: config.type,
         url: config.url,
-        xhrFields: config.xhrFields})
-      .done((data, textStatus, {wire: wire_request}) => {
+        xhrFields: config.xhrFields,
+      })
+      .always((data, textStatus, {wire: wire_request}) => {
+
+        // Prevent empty valid response from being rejected
+        if (textStatus === 'parsererror') {
+          if (data.readyState === 4 &&
+              data.status === 200 &&
+              data.responseText === '') {
+
+            data = {};
+          } else {
+            return;
+          }
+        } else if (textStatus !== 'success') {
+          return;
+        }
+
         if (wire_request) {
           this.logger.debug(this.logger.levels.OFF, `Server Response '${wire_request.request_id}' from '${config.url}':`, data);
         }
         resolve(data);
       })
       .fail(({responseJSON: response, status: status_code}) => {
+
+        // Prevent successful requests from failing
+        if (status_code === 200 && response === '') {
+          return;
+        }
+
         switch (status_code) {
           case z.service.BackendClientError.STATUS_CODE.CONNECTIVITY_PROBLEM: {
             this.request_queue.pause();
