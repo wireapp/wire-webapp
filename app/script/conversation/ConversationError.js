@@ -31,28 +31,28 @@ z.conversation.ConversationError = class ConversationError extends Error {
     this.type = type || z.client.ConversationError.TYPE.UNKNOWN;
 
     switch (this.type) {
-      case z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND:
+      case ConversationError.TYPE.CONVERSATION_NOT_FOUND:
         this.message = 'Conversation not found';
         break;
-      case z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION:
+      case ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION:
         this.message = 'Sending to degraded conversation was canceled by user';
         break;
-      case z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND:
+      case ConversationError.TYPE.MESSAGE_NOT_FOUND:
         this.message = 'Message not found';
         break;
-      case z.conversation.ConversationError.TYPE.NO_CHANGES:
+      case ConversationError.TYPE.NO_CHANGES:
         this.message = 'Missing changes to message';
         break;
-      case z.conversation.ConversationError.TYPE.NO_CONVERSATION_ID:
+      case ConversationError.TYPE.NO_CONVERSATION_ID:
         this.message = 'Conversation ID is not defined';
         break;
-      case z.conversation.ConversationError.TYPE.NOT_FOUND:
+      case ConversationError.TYPE.NOT_FOUND:
         this.message = 'Conversation not found';
         break;
-      case z.conversation.ConversationError.TYPE.REQUEST_FAILED:
+      case ConversationError.TYPE.REQUEST_FAILED:
         this.message = 'Conversation related backend request failed';
         break;
-      case z.conversation.ConversationError.TYPE.WRONG_USER:
+      case ConversationError.TYPE.WRONG_USER:
         this.message = 'Wrong user tried to change or delete a message';
         break;
       default:

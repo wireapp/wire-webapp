@@ -3213,9 +3213,17 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   update_message_as_upload_failed(message_et) {
     if (message_et) {
-      const asset_et = message_et.get_first_asset();
+      if (!message_et.is_content()) {
+        throw new Error(`Tried to update wrong message type as upload failed '${message_et.super_type}'`);
+      }
 
+      const asset_et = message_et.get_first_asset();
       if (asset_et) {
+        const is_proper_asset = asset_et.is_audio() || asset_et.is_file() || asset_et.is_video();
+        if (!is_proper_asset) {
+          throw new Error(`Tried to update message with wrong asset type as upload failed '${asset_et.type}'`);
+        }
+
         asset_et.status(z.assets.AssetTransferState.UPLOAD_FAILED);
         asset_et.upload_failed_reason(z.assets.AssetUploadFailedReason.FAILED);
       }
