@@ -540,19 +540,23 @@ z.event.EventRepository = class EventRepository {
    */
   _validate_call_event_lifetime(event) {
     const {content, conversation: conversation_id, time, type} = event;
+    const forced_event_types = [
+      z.calling.enum.CALL_MESSAGE_TYPE.CANCEL,
+      z.calling.enum.CALL_MESSAGE_TYPE.GROUP_LEAVE,
+    ];
 
+    const corrected_timestamp = Date.now() - this.clock_drift;
+    const threshold_timestamp = new Date(time).getTime() + EventRepository.CONFIG.E_CALL_EVENT_LIFETIME;
+
+    const is_forced_event_type = forced_event_types.includes(content.type);
+    const is_valid_event = corrected_timestamp < threshold_timestamp;
     const web_socket_state = this.notification_handling_state() === z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
-    const is_cancel = content.type === z.calling.enum.CALL_MESSAGE_TYPE.CANCEL;
-    if (web_socket_state || is_cancel) {
+
+    if (is_forced_event_type || is_valid_event || web_socket_state) {
       return true;
     }
 
-    const corrected_timestamp = Date.now() - this.clock_drift;
-    const event_timestamp = new Date(time).getTime();
-    if (corrected_timestamp > (event_timestamp + EventRepository.CONFIG.E_CALL_EVENT_LIFETIME)) {
-      this.logger.info(`Ignored outdated '${type}' event in conversation '${conversation_id}' - Event: '${event_timestamp}', Local: '${corrected_timestamp}'`, {event_json: JSON.stringify(event), event_object: event});
-      throw new z.event.EventError(z.event.EventError.TYPE.OUTDATED_E_CALL_EVENT);
-    }
-    return true;
+    this.logger.info(`Ignored outdated '${type}' event in conversation '${conversation_id}' - Event: '${threshold_timestamp}', Local: '${corrected_timestamp}'`, {event_json: JSON.stringify(event), event_object: event});
+    throw new z.event.EventError(z.event.EventError.TYPE.OUTDATED_E_CALL_EVENT);
   }
 };
