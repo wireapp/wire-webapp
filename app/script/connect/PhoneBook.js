@@ -25,10 +25,9 @@ window.z.connect = z.connect || {};
 z.connect.PhoneBook = class PhoneBook {
   /**
    * Construct a new Phone book.
-   * @param {z.entity.User} self_user - Self user
    */
-  constructor(self_user) {
-    this.self = [self_user.email()];
+  constructor() {
+    this.self = [];
     this.cards = [];
   }
 };
