@@ -66,6 +66,10 @@ z.calling.SDPMapper = {
    * @returns {Object} Object containing rewritten Session Description Protocol and number of ICE candidates
    */
   rewrite_sdp(rtc_sdp, sdp_source = z.calling.enum.SDP_SOURCE.REMOTE, flow_et) {
+    if (!rtc_sdp) {
+      throw new z.calling.CallError(z.calling.CallError.TYPE.NOT_FOUND, 'Cannot rewrite undefined SDP');
+    }
+
     if (sdp_source === z.calling.enum.SDP_SOURCE.LOCAL) {
       rtc_sdp.sdp = rtc_sdp.sdp.replace('UDP/TLS/', '');
     }
