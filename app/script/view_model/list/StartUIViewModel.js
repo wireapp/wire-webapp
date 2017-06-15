@@ -303,20 +303,20 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
   _show_on_boarding_results(response) {
     return this.search_repository.show_on_boarding(response)
-      .then(({connections, suggestions}) => {
-        this.suggestions(suggestions.length ? suggestions : connections);
-        return this.get_top_people();
-      })
-      .then((user_ets) => {
-        this.top_users(user_ets);
+      .then((connected_user_ets = []) => {
         this.selected_people.removeAll();
-
+        this.suggestions(connected_user_ets);
         if (!this.suggestions().length) {
-          if (this.top_users().length) {
-            return this.suggestions(this.top_users());
-          }
+          return this.get_top_people()
+            .then((user_ets) => {
+              this.top_users(user_ets);
 
-          return this.show_no_contacts_on_wire(true);
+              if (!this.suggestions().length && this.top_users().length) {
+                return this.suggestions(this.top_users());
+              }
+
+              return this.show_no_contacts_on_wire(true);
+            });
         }
       })
       .catch((error) => {
@@ -483,7 +483,6 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.active_team(this.team_repository.personal_space);
 
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.SENT_CONNECT_REQUEST, {
-      common_users_count: user_et.mutual_friends_total(),
       context: 'startui',
     });
   }
