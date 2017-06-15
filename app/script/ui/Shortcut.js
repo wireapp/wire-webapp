@@ -143,6 +143,21 @@ window.z.ui = z.ui || {};
     },
   };
 
+  shortcut_map[z.ui.ShortcutType.SILENCE] = {
+    event: z.event.WebApp.SHORTCUT.SILENCE,
+    shortcut: {
+      electron: {
+        macos: 'command + alt + m',
+        menu: true,
+        pc: 'ctrl + alt + m',
+      },
+      webapp: {
+        macos: 'command + alt + m',
+        pc: 'ctrl + alt + m',
+      },
+    },
+  };
+
   shortcut_map[z.ui.ShortcutType.START] = {
     event: z.event.WebApp.SHORTCUT.START,
     shortcut: {
