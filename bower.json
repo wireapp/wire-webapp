@@ -184,5 +184,8 @@
     "wire-webapp-proteus": {
       "js/": "dist/window/*.js"
     }
+  },
+  "resolutions": {
+    "jquery": "3.2.1"
   }
 }
