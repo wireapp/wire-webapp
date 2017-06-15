@@ -45,7 +45,7 @@ z.connect.ConnectRepository = class ConnectRepository {
         return this._parse_google_contacts(response);
       })
       .then((phone_book) => {
-        if (phone_book.cards.length === 0) {
+        if (!phone_book.cards.length) {
           this.logger.warn('No contacts found for upload');
           throw new z.connect.ConnectError(z.connect.ConnectError.TYPE.NO_CONTACTS);
         }
@@ -81,7 +81,7 @@ z.connect.ConnectRepository = class ConnectRepository {
   get_macos_contacts() {
     return this._parse_macos_contacts()
       .then((phone_book) => {
-        if (phone_book.cards.length === 0) {
+        if (!phone_book.cards.length) {
           this.logger.warn('No contacts found for upload');
           throw new z.connect.ConnectError(z.connect.ConnectError.TYPE.NO_CONTACTS);
         }
@@ -165,10 +165,11 @@ z.connect.ConnectRepository = class ConnectRepository {
             card.contact.push(z.util.phone_number_to_e164(number, navigator.language));
           });
 
-          if (card.contact.length > 0) {
+          if (card.contact.length) {
             phone_book.cards.push(card);
           }
         });
+
         return resolve(this._encode_phone_book(phone_book));
       });
     });
@@ -203,12 +204,13 @@ z.connect.ConnectRepository = class ConnectRepository {
             });
           }
 
-          if (card.contact.length > 0) {
+          if (card.contact.length) {
             phone_book.cards.push(card);
           }
         }
       });
     }
+
     return this._encode_phone_book(phone_book);
   }
 };

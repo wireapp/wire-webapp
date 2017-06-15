@@ -78,25 +78,15 @@ z.search.SearchRepository = class SearchRepository {
   /**
    * Show on-boarding results.
    * @param {Object} response - On-boarding server response
-   * @returns {Promise} Resolves with the connections and suggestions found through on-boarding
+   * @returns {Promise} Resolves with the connections found through on-boarding
    */
   show_on_boarding(response) {
-    return this.search_result_mapper.map_results(response.results, z.search.SEARCH_MODE.ON_BOARDING)
-    .then(({results, mode}) => {
-      return this._prepare_search_result(results, mode);
-    })
-    .then((suggested_user_ets) => {
-      let connections_promise;
-      if (response['auto-connects'] && response['auto-connects'].length) {
-        connections_promise = this.user_repository.get_user_by_id(response['auto-connects'].map((result) => result.id));
-      } else {
-        connections_promise = Promise.resolve([]);
-      }
-      return connections_promise
-      .then(function(connected_user_ets) {
-        return {connections: connected_user_ets, suggestions: suggested_user_ets};
+    return this.search_result_mapper.map_results(response['auto-connects'], z.search.SEARCH_MODE.ON_BOARDING)
+      .then((results) => {
+        if (results.length) {
+          return this.user_repository.get_user_by_id(results.map((result) => result.id));
+        }
       });
-    });
   }
 
   /**
@@ -110,29 +100,25 @@ z.search.SearchRepository = class SearchRepository {
    */
   _prepare_search_result(search_ets, search_mode) {
     return this.user_repository.get_users_by_id(search_ets.map((result) => result.id))
-    .then(function(user_ets) {
-      return user_ets.map(function(user_et) {
-        const search_et = ko.utils.arrayFirst(search_ets, (user) => user.id === user_et.id);
-        user_et.mutual_friends_total(search_et.mutual_friends_total);
+      .then((user_ets) => {
+        return user_ets.map((user_et) => {
+          /*
+           Skipping some results to adjust for slow backend updates.
 
-        /*
-         Skipping some results to adjust for slow backend updates.
-
-         Only show connected people among your top people.
-         Do not show already connected people when uploading address book.
-         */
-        switch (search_mode) {
-          case z.search.SEARCH_MODE.CONTACTS:
-          case z.search.SEARCH_MODE.ON_BOARDING:
-            if (!user_et.is_connected()) {
+           Only show connected people among your top people.
+           Do not show already connected people when uploading address book.
+           */
+          switch (search_mode) {
+            case z.search.SEARCH_MODE.CONTACTS:
+              if (!user_et.is_connected()) {
+                return user_et;
+              }
+              break;
+            default:
               return user_et;
-            }
-            break;
-          default:
-            return user_et;
-        }
-      })
-      .filter((user_et) => user_et != null);
-    });
+          }
+        })
+        .filter((user_et) => user_et);
+      });
   }
 };
