@@ -222,7 +222,7 @@ describe('z.util.get_file_extension', function() {
     expect(z.util.get_file_extension('path/to/image.jpg')).toEqual('jpg');
   });
 
-  it('does not return .tar.gz when it is not the file extension', function() {
+  it('does not returns .tar.gz when it is not the file extension', function() {
     expect(z.util.get_file_extension('path/to/image.tar.gz.jpg')).toEqual('jpg');
   });
 });
