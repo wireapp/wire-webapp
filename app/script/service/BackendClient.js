@@ -95,7 +95,7 @@ z.service.BackendClient = class BackendClient {
 
     this.number_of_requests = ko.observable(0);
     this.number_of_requests.subscribe((new_value) => amplify.publish(z.event.WebApp.TELEMETRY.BACKEND_REQUESTS, new_value));
-    
+
     // Only allow JSON response by default
     $.ajaxSetup({
       contents: {
@@ -272,24 +272,21 @@ z.service.BackendClient = class BackendClient {
         xhrFields: config.xhrFields,
       })
       .always((data, textStatus, {wire: wire_request}) => {
-
         // Prevent empty valid response from being rejected
         if (textStatus === 'parsererror') {
-          if (data.readyState === 4 &&
-              data.status === 200 &&
-              data.responseText === '') {
-
+          if (data.readyState === 4 && data.status === 200 && data.responseText === '') {
             data = {};
           } else {
             return;
           }
-        } else if (textStatus !== 'success') {
+        } else if (textStatus !== 'success' && textStatus !== 'nocontent') {
           return;
         }
 
         if (wire_request) {
           this.logger.debug(this.logger.levels.OFF, `Server Response '${wire_request.request_id}' from '${config.url}':`, data);
         }
+
         resolve(data);
       })
       .fail(({responseJSON: response, status: status_code}) => {
