@@ -126,8 +126,6 @@ z.entity.User = class User {
 
     this.username = ko.observable();
 
-    this.mutual_friends_total = ko.observable(0);
-
     this.preview_picture_resource = ko.observable();
     this.medium_picture_resource = ko.observable();
 
