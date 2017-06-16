@@ -98,9 +98,7 @@ z.service.BackendClient = class BackendClient {
 
     // Only allow JSON response by default
     $.ajaxSetup({
-      contents: {
-        javascript: false,
-      },
+      contents: {javascript: false},
       dataType: 'json',
     });
 
