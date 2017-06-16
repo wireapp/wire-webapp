@@ -269,34 +269,17 @@ z.service.BackendClient = class BackendClient {
         url: config.url,
         xhrFields: config.xhrFields,
       })
-      .always((data_or_jqXHR, textStatus, jqXHR_or_error) => {
-        const wire_request = jqXHR_or_error.wire || data_or_jqXHR.wire;
+      .done((data, textStatus, {wire: wire_request}) => {
         if (wire_request) {
-          this.logger.debug(this.logger.levels.OFF, `Server Response '${wire_request.request_id}' from '${config.url}':`, data_or_jqXHR);
+          this.logger.debug(this.logger.levels.OFF, `Server Response '${wire_request.request_id}' from '${config.url}':`, data);
         }
 
-        // Prevent empty valid response from being rejected
-        const is_parse_error = textStatus === 'parsererror';
-        if (is_parse_error) {
-          const is_empty_response = data_or_jqXHR.responseText === '';
-          const is_ready_state_done = data_or_jqXHR.readyState === 4;
-          const is_status_success = data_or_jqXHR.status === 200;
-
-          if (is_empty_response && is_ready_state_done && is_status_success) {
-            return resolve({});
-          }
-        }
-
-        const is_no_content = textStatus === 'nocontent';
-        const is_success = textStatus === 'success';
-        if (is_no_content || is_success) {
-          resolve(data_or_jqXHR);
-        }
+        resolve(data);
       })
       .fail(({responseJSON: response, status: status_code}) => {
-        // Prevent successful requests from failing
+        // Prevent empty valid response from being rejected
         if (status_code === 200 && response === '') {
-          return;
+          return resolve({});
         }
 
         switch (status_code) {
