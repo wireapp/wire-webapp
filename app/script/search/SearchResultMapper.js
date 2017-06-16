@@ -39,16 +39,15 @@ z.search.SearchResultMapper = class SearchResultMapper {
    */
   map_results(search_results = [], search_mode) {
     return Promise.resolve()
-    .then(function() {
+      .then(() => {
 
-      const search_ets = search_results.map((search_result) => {
-        return {
-          id: search_result.id,
-          mutual_friends_total: search_result.total_mutual_friends,
-        };
+        const search_ets = search_results.map((search_result) => {
+          return {
+            id: search_result.id,
+          };
+        });
+
+        return {mode: search_mode, results: search_ets};
       });
-
-      return {mode: search_mode, results: search_ets};
-    });
   }
 };

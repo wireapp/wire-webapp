@@ -143,7 +143,7 @@ z.properties.PropertiesRepository = class PropertiesRepository {
             amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.NOTIFICATIONS, updated_preference);
             break;
           case z.properties.PROPERTIES_TYPE.PREVIEWS.SEND:
-            amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.PREVIEWS.SEND);
+            amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.PREVIEWS.SEND, updated_preference);
             break;
           case z.properties.PROPERTIES_TYPE.PRIVACY:
             amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.PRIVACY, updated_preference);
