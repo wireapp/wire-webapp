@@ -77,7 +77,7 @@ window.z.config = {
 
   // Maximum characters per received message
   // Encryption is approx. +40% of the original payload so let's round it at +50%
-  MAXIMUM_MESSAGE_LENGTH_RECEIVING: 8000 * 1.5,
+  MAXIMUM_MESSAGE_LENGTH_RECEIVING: 12000 * 1.5,
 
   // bigger requests will be split in chunks with a maximum size as defined
   MAXIMUM_USERS_PER_REQUEST: 200,
