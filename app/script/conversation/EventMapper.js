@@ -123,6 +123,7 @@ z.conversation.EventMapper = class EventMapper {
         message_et = this._map_event_verification(event);
         break;
       case z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT:
+      case z.event.Client.CONVERSATION.MESSAGE_TOO_BIG:
         message_et = this._map_event_unable_to_decrypt(event);
         break;
       default:
@@ -368,12 +369,17 @@ z.conversation.EventMapper = class EventMapper {
    * @param {Object} error_code - Error data received as JSON
    * @returns {DecryptErrorMessage} Decrypt error message entity
    */
-  _map_event_unable_to_decrypt({error_code}) {
+  _map_event_unable_to_decrypt(error) {
+    const {code: error_code, type: error_type} = error;
     const message_et = new z.entity.DecryptErrorMessage();
 
     if (error_code) {
       message_et.error_code = error_code.split(' ')[0];
       message_et.client_id = error_code.substring(message_et.error_code.length + 1).replace(/[()]/g, '');
+    }
+
+    if (error_type === z.event.Client.CONVERSATION.MESSAGE_TOO_BIG) {
+      console.log('BIG MESSAGE (todo)');
     }
 
     return message_et;

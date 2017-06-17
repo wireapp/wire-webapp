@@ -36,6 +36,7 @@ z.event.Client = {
     LOCATION: 'conversation.location',
     MESSAGE_DELETE: 'conversation.message-delete',
     MESSAGE_HIDDEN: 'conversation.message-hidden',
+    MESSAGE_TOO_BIG: 'conversation.message-too-big',
     MISSED_MESSAGES: 'conversation.missed-messages',
     REACTION: 'conversation.reaction',
     TEAM_MEMBER_LEAVE: 'conversation.team-member-leave',

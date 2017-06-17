@@ -115,6 +115,20 @@ z.conversation.EventBuilder = (function() {
     };
   };
 
+  const _build_message_too_big = (event, message_error, error_code) => {
+    const {conversation: conversation_id, data: event_data, from, time} = event;
+
+    return {
+      conversation: conversation_id,
+      error: `${message_error.message} (${event_data.sender})`,
+      error_code: `${error_code} (${event_data.sender})`,
+      from: from,
+      id: z.util.create_random_uuid(),
+      time: time,
+      type: z.event.Client.CONVERSATION.MESSAGE_TOO_BIG,
+    };
+  };
+
   const _build_voice_channel_activate = (call_message_et) => {
     const {conversation_id, user_id, time} = call_message_et;
 
@@ -149,6 +163,7 @@ z.conversation.EventBuilder = (function() {
     build_calling: _build_calling,
     build_degraded: _build_degraded,
     build_delete: _build_delete,
+    build_message_too_big: _build_message_too_big,
     build_missed: _build_missed,
     build_team_member_leave: _build_team_member_leave,
     build_unable_to_decrypt: _build_unable_to_decrypt,
