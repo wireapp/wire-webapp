@@ -110,6 +110,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     });
 
     this.registration_context = z.auth.AuthView.REGISTRATION_CONTEXT.EMAIL;
+    this.invite_code = undefined;
     this.invite_info = undefined;
 
     this.code_digits = ko.observableArray([
@@ -307,10 +308,11 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       return this.registration_context = z.auth.AuthView.REGISTRATION_CONTEXT.GENERIC_INVITE;
     }
 
-    const invite = z.util.get_url_parameter(z.auth.URLParameter.INVITE);
-    if (invite) {
+    const invite_code = z.util.get_url_parameter(z.auth.URLParameter.INVITE);
+    if (invite_code) {
       this.get_wire(true);
-      return this.register_from_invite(invite);
+      this.invite_code = invite_code;
+      return this.register_from_invite(invite_code);
     }
 
     const is_expired = z.util.get_url_parameter(z.auth.URLParameter.EXPIRED);
@@ -426,19 +428,19 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
   // Invitation Stuff
   //##############################################################################
 
-  register_from_invite(invite) {
-    this.auth.repository.retrieve_invite(invite)
+  register_from_invite(invite_code) {
+    this.auth.repository.retrieve_invite(invite_code)
       .then((invite_info) => {
         this.registration_context = z.auth.AuthView.REGISTRATION_CONTEXT.PERSONAL_INVITE;
         this.name(invite_info.name);
         if (invite_info.email) {
-          this.username(invite_info.email);
           this.invite_info = invite_info;
+          this.username(invite_info.email);
         }
       })
       .catch(function(error) {
         if (error.label !== z.service.BackendClientError.LABEL.INVALID_INVITATION_CODE) {
-          return Raygun.send(new Error('Invitation not found'), {error: error, invite_code: invite});
+          Raygun.send(new Error('Invitation not found'), {error: error, invite_code: invite_code});
         }
       })
       .then(() => {
@@ -726,7 +728,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
         };
 
         if (mode === z.auth.AuthView.MODE.ACCOUNT_INVITE) {
-          payload.invitation_code = this.invite_info.id;
+          payload.invitation_code = this.invite_code;
         }
 
         break;
