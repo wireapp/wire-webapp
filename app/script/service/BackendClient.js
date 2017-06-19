@@ -277,11 +277,6 @@ z.service.BackendClient = class BackendClient {
         resolve(data);
       })
       .fail(({responseJSON: response, status: status_code}) => {
-        // Prevent empty valid response from being rejected
-        if (status_code === 200 && response === '') {
-          return resolve({});
-        }
-
         switch (status_code) {
           case z.service.BackendClientError.STATUS_CODE.CONNECTIVITY_PROBLEM: {
             this.request_queue.pause();
@@ -298,13 +293,6 @@ z.service.BackendClient = class BackendClient {
               });
           }
 
-          case z.service.BackendClientError.STATUS_CODE.UNAUTHORIZED: {
-            this._push_to_request_queue(config, z.service.RequestQueueBlockedState.ACCESS_TOKEN_REFRESH)
-              .then(resolve)
-              .catch(reject);
-            return amplify.publish(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, z.auth.AuthRepository.ACCESS_TOKEN_TRIGGER.UNAUTHORIZED_REQUEST);
-          }
-
           case z.service.BackendClientError.STATUS_CODE.FORBIDDEN: {
             if (response) {
               if (BackendClient.IGNORED_BACKEND_LABELS.includes(response.label)) {
@@ -316,12 +304,28 @@ z.service.BackendClient = class BackendClient {
             break;
           }
 
+          case z.service.BackendClientError.STATUS_CODE.OK: {
+            // Prevent empty valid response from being rejected
+            if (!response) {
+              return resolve({});
+            }
+            break;
+          }
+
+          case z.service.BackendClientError.STATUS_CODE.UNAUTHORIZED: {
+            this._push_to_request_queue(config, z.service.RequestQueueBlockedState.ACCESS_TOKEN_REFRESH)
+              .then(resolve)
+              .catch(reject);
+            return amplify.publish(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, z.auth.AuthRepository.ACCESS_TOKEN_TRIGGER.UNAUTHORIZED_REQUEST);
+          }
+
           default: {
             if (!BackendClient.IGNORED_BACKEND_ERRORS.includes(status_code)) {
               Raygun.send(new Error(`Server request failed: ${status_code}`));
             }
           }
         }
+
         return reject(response || new z.service.BackendClientError(status_code));
       });
     });
