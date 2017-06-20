@@ -915,7 +915,7 @@ z.calling.entities.Flow = class Flow {
    */
   _create_additional_payload() {
     const payload = z.calling.CallMessageBuilder.create_payload(this.id, this.self_user_id, this.remote_user_id, this.remote_client_id);
-    const additional_payload = $.extend({remote_user: this.remote_user, sdp: this.local_sdp().sdp}, payload);
+    const additional_payload = Object.assign({remote_user: this.remote_user, sdp: this.local_sdp().sdp}, payload);
 
     return z.calling.CallMessageBuilder.create_payload_prop_sync(this.call_et.self_state, this.call_et.self_state.video_send(), false, additional_payload);
   }
