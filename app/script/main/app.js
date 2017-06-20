@@ -332,6 +332,7 @@ z.main.App = class App {
     }
     this.logger.info(log_message, {error});
 
+    const {message, type} = error;
     const is_auth_error = error instanceof z.auth.AuthError;
     if (is_auth_error) {
       if (type === z.auth.AuthError.TYPE.MULTIPLE_TABS) {
@@ -341,8 +342,6 @@ z.main.App = class App {
     }
 
     this.logger.debug(`App reload: '${is_reload}', Document referrer: '${document.referrer}', Location: '${window.location.href}'`);
-
-    const {message, type} = error;
     if (is_reload) {
       const is_session_expired = [
         z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN,
