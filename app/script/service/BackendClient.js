@@ -310,6 +310,9 @@ z.service.BackendClient = class BackendClient {
             break;
           }
 
+          case z.service.BackendClientError.STATUS_CODE.ACCEPTED:
+          case z.service.BackendClientError.STATUS_CODE.CREATED:
+          case z.service.BackendClientError.STATUS_CODE.NO_CONTENT:
           case z.service.BackendClientError.STATUS_CODE.OK: {
             // Prevent empty valid response from being rejected
             if (!response) {

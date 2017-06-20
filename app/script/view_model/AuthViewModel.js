@@ -584,7 +584,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
       this.user_service.change_own_password(this.password())
         .catch((error) => {
-          this.logger.warn('Could not change user password', error);
+          this.logger.warn(`Could not change user password: ${error.message}`, error);
           if (error.code !== z.service.BackendClientError.STATUS_CODE.FORBIDDEN) {
             throw error;
           }
@@ -596,6 +596,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
           this._set_hash(z.auth.AuthView.MODE.POSTED_VERIFY);
         })
         .catch((error) => {
+          this.logger.warn(`Could not verify account: ${error.message}`, error);
+
           this.pending_server_request(false);
           if (error) {
             switch (error.label) {
