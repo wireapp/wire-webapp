@@ -539,16 +539,19 @@ z.conversation.ConversationService = class ConversationService {
   update_asset_as_uploaded_in_db(primary_key, asset_data) {
     return this.storage_service.load(z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key)
       .then((record) => {
-        record.data.id = asset_data.id;
-        record.data.otr_key = asset_data.otr_key;
-        record.data.sha256 = asset_data.sha256;
-        record.data.key = asset_data.key;
-        record.data.token = asset_data.token;
-        record.data.status = z.assets.AssetTransferState.UPLOADED;
-        return this.storage_service.update(z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key, record);
-      })
-      .then(() => {
-        this.logger.info('Updated asset message_et (uploaded)', primary_key);
+        if (record) {
+          record.data.id = asset_data.id;
+          record.data.key = asset_data.key;
+          record.data.otr_key = asset_data.otr_key;
+          record.data.sha256 = asset_data.sha256;
+          record.data.status = z.assets.AssetTransferState.UPLOADED;
+          record.data.token = asset_data.token;
+
+          return this.storage_service.update(z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key, record)
+            .then(() => this.logger.info('Updated asset message_et (uploaded)', primary_key));
+        }
+
+        this.logger.warn('Did not find message to update asset (uploaded)', primary_key);
       });
   }
 
@@ -562,15 +565,18 @@ z.conversation.ConversationService = class ConversationService {
   update_asset_preview_in_db(primary_key, asset_data) {
     return this.storage_service.load(z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key)
       .then((record) => {
-        record.data.preview_id = asset_data.id;
-        record.data.preview_otr_key = asset_data.otr_key;
-        record.data.preview_sha256 = asset_data.sha256;
-        record.data.preview_key = asset_data.key;
-        record.data.preview_token = asset_data.token;
-        return this.storage_service.update(z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key, record);
-      })
-      .then(() => {
-        this.logger.info('Updated asset message_et (preview)', primary_key);
+        if (record) {
+          record.data.preview_id = asset_data.id;
+          record.data.preview_key = asset_data.key;
+          record.data.preview_otr_key = asset_data.otr_key;
+          record.data.preview_sha256 = asset_data.sha256;
+          record.data.preview_token = asset_data.token;
+
+          return this.storage_service.update(z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key, record)
+            .then(() => this.logger.info('Updated asset message_et (preview)', primary_key));
+        }
+
+        this.logger.warn('Did not find message to update asset (preview)', primary_key);
       });
   }
 
@@ -584,12 +590,15 @@ z.conversation.ConversationService = class ConversationService {
   update_asset_as_failed_in_db(primary_key, reason) {
     return this.storage_service.load(z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key)
       .then((record) => {
-        record.data.status = z.assets.AssetTransferState.UPLOAD_FAILED;
-        record.data.reason = reason;
-        return this.storage_service.update(z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key, record);
-      })
-      .then(() => {
-        this.logger.info('Updated asset message_et (failed)', primary_key);
+        if (record) {
+          record.data.reason = reason;
+          record.data.status = z.assets.AssetTransferState.UPLOAD_FAILED;
+
+          return this.storage_service.update(z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key, record)
+            .then(() => this.logger.info('Updated asset message_et (failed)', primary_key));
+        }
+
+        this.logger.warn('Did not find message to update asset (failed)', primary_key);
       });
   }
 
