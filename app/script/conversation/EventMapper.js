@@ -379,7 +379,7 @@ z.conversation.EventMapper = class EventMapper {
     }
 
     if (error_type === z.event.Client.CONVERSATION.MESSAGE_TOO_BIG) {
-      console.log('BIG MESSAGE (todo)');
+      message_et.error_code = 300;
     }
 
     return message_et;
