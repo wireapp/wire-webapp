@@ -109,7 +109,7 @@ z.calling.entities.FlowAudio = class FlowAudio {
       this.audio_remote = audio_context.createMediaStreamDestination();
       this._hookup_audio();
 
-      $.extend(true, media_stream, this.audio_remote.stream);
+      Object.assign(media_stream, this.audio_remote.stream);
       this.logger.debug('Wrapped audio stream from microphone', media_stream);
     }
 
@@ -135,7 +135,7 @@ z.calling.entities.FlowAudio = class FlowAudio {
         remote_source.connect(this.pan_node);
         this.pan_node.connect(audio_output_device);
 
-        $.extend(true, media_stream, audio_output_device.stream);
+        Object.assign(media_stream, audio_output_device.stream);
         this.logger.debug(`Wrapped audio stream to speaker to create stereo. Initial panning set to '${this.panning()}'.`, media_stream);
       }
     }

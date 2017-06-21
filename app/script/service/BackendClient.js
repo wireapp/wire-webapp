@@ -141,18 +141,24 @@ z.service.BackendClient = class BackendClient {
   execute_on_connectivity(source = BackendClient.CONNECTIVITY_CHECK_TRIGGER.UNKNOWN) {
     this.logger.info(`Connectivity check requested by '${source}'`);
 
+    const _reset_queue = () => {
+      if (this.connectivity_timeout) {
+        window.clearTimeout(this.connectivity_timeout);
+        this.connectivity_queue.pause(false);
+      }
+      this.connectivity_timeout = undefined;
+    };
+
     const _check_status = () => {
       return this.status()
         .done((jqXHR) => {
           this.logger.info('Connectivity verified', jqXHR);
-          this.connectivity_timeout = undefined;
-          this.connectivity_queue.pause(false);
+          _reset_queue();
         })
         .fail((jqXHR) => {
           if (jqXHR.readyState === 4) {
             this.logger.info(`Connectivity verified by server error '${jqXHR.status}'`, jqXHR);
-            this.connectivity_queue.pause(false);
-            this.connectivity_timeout = undefined;
+            _reset_queue();
           } else {
             this.logger.warn('Connectivity could not be verified... retrying');
             this.connectivity_queue.pause();
@@ -304,6 +310,9 @@ z.service.BackendClient = class BackendClient {
             break;
           }
 
+          case z.service.BackendClientError.STATUS_CODE.ACCEPTED:
+          case z.service.BackendClientError.STATUS_CODE.CREATED:
+          case z.service.BackendClientError.STATUS_CODE.NO_CONTENT:
           case z.service.BackendClientError.STATUS_CODE.OK: {
             // Prevent empty valid response from being rejected
             if (!response) {
