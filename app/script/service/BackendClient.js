@@ -48,7 +48,6 @@ z.service.BackendClient = class BackendClient {
   static get IGNORED_BACKEND_ERRORS() {
     return [
       z.service.BackendClientError.STATUS_CODE.BAD_GATEWAY,
-      z.service.BackendClientError.STATUS_CODE.BAD_REQUEST,
       z.service.BackendClientError.STATUS_CODE.CONFLICT,
       z.service.BackendClientError.STATUS_CODE.CONNECTIVITY_PROBLEM,
       z.service.BackendClientError.STATUS_CODE.INTERNAL_SERVER_ERROR,
@@ -66,6 +65,7 @@ z.service.BackendClient = class BackendClient {
       z.service.BackendClientError.LABEL.PASSWORD_EXISTS,
       z.service.BackendClientError.LABEL.TOO_MANY_CLIENTS,
       z.service.BackendClientError.LABEL.TOO_MANY_MEMBERS,
+      z.service.BackendClientError.LABEL.UNKNOWN_CLIENT,
     ];
   }
 
@@ -276,13 +276,12 @@ z.service.BackendClient = class BackendClient {
         xhrFields: config.xhrFields,
       })
       .done((data, textStatus, {wire: wire_request}) => {
-        if (wire_request) {
-          this.logger.debug(this.logger.levels.OFF, `Server Response '${wire_request.request_id}' from '${config.url}':`, data);
-        }
+        const request_id = wire_request ? wire_request.request : 'ID not set';
+        this.logger.debug(this.logger.levels.OFF, `Server response to '${config.type}' request '${config.url}' - '${request_id}':`, data);
 
         resolve(data);
       })
-      .fail(({responseJSON: response, status: status_code}) => {
+      .fail(({responseJSON: response, status: status_code, wire: wire_request}) => {
         switch (status_code) {
           case z.service.BackendClientError.STATUS_CODE.CONNECTIVITY_PROBLEM: {
             this.request_queue.pause();
@@ -301,10 +300,19 @@ z.service.BackendClient = class BackendClient {
 
           case z.service.BackendClientError.STATUS_CODE.FORBIDDEN: {
             if (response) {
-              if (BackendClient.IGNORED_BACKEND_LABELS.includes(response.label)) {
-                this.logger.warn(`Server request failed: ${response.label}`);
+              const error_label = response.label;
+              const error_message = `Server request forbidden: ${error_label}`;
+
+              if (BackendClient.IGNORED_BACKEND_LABELS.includes(error_label)) {
+                this.logger.warn(error_message);
               } else {
-                Raygun.send(new Error(`Server request failed: ${response.label}`));
+                const request_id = wire_request ? wire_request.request_id : undefined;
+                const custom_data = {
+                  endpoint: config.url,
+                  request_id: request_id,
+                };
+
+                Raygun.send(new Error(error_message), custom_data);
               }
             }
             break;
@@ -325,12 +333,20 @@ z.service.BackendClient = class BackendClient {
             this._push_to_request_queue(config, z.service.RequestQueueBlockedState.ACCESS_TOKEN_REFRESH)
               .then(resolve)
               .catch(reject);
-            return amplify.publish(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, z.auth.AuthRepository.ACCESS_TOKEN_TRIGGER.UNAUTHORIZED_REQUEST);
+
+            const trigger = z.auth.AuthRepository.ACCESS_TOKEN_TRIGGER.UNAUTHORIZED_REQUEST;
+            return amplify.publish(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, trigger);
           }
 
           default: {
             if (!BackendClient.IGNORED_BACKEND_ERRORS.includes(status_code)) {
-              Raygun.send(new Error(`Server request failed: ${status_code}`));
+              const request_id = wire_request ? wire_request.request_id : undefined;
+              const custom_data = {
+                endpoint: config.url,
+                request_id: request_id,
+              };
+
+              Raygun.send(new Error(`Server request failed: ${status_code}`), custom_data);
             }
           }
         }

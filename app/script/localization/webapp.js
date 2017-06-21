@@ -112,6 +112,7 @@ z.string.auth_error_name_short = 'Enter a name with at least 2 characters';
 z.string.auth_error_offline = 'No Internet connection';
 z.string.auth_error_password_short = 'Choose a password with at least 8 characters.';
 z.string.auth_error_password_wrong = 'Wrong password. Please try again.';
+z.string.auth_error_phone_number_budget = 'You logged in too often. Try again later.';
 z.string.auth_error_phone_number_forbidden = 'Sorry. This phone number is forbidden.';
 z.string.auth_error_phone_number_invalid = 'Invalid Phone Number';
 z.string.auth_error_phone_number_unknown = 'Unknown Phone Number';

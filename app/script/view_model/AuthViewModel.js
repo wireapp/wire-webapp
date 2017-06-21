@@ -527,6 +527,9 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
               case z.service.BackendClientError.LABEL.PENDING_LOGIN:
                 _on_code_request_success(error);
                 break;
+              case z.service.BackendClientError.LABEL.PHONE_BUDGET_EXHAUSTED:
+                this._add_error(z.string.auth_error_phone_number_budget, z.auth.AuthView.TYPE.PHONE);
+                break;
               case z.service.BackendClientError.LABEL.UNAUTHORIZED:
                 this._add_error(z.string.auth_error_phone_number_forbidden, z.auth.AuthView.TYPE.PHONE);
                 break;
