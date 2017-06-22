@@ -43,15 +43,16 @@ z.ViewModel.WindowTitleViewModel = class WindowTitleViewModel {
       if (this.update_window_title) {
         let window_title = '';
         let number_of_unread_conversations = 0;
-        const number_of_connect_requests = this.user_repository.connect_requests().length;
+        const number_of_requests = this.user_repository.connect_requests().length;
 
-        this.conversation_repository.conversations_unarchived().forEach(function(conversation_et) {
-          if (!conversation_et.is_request() && !conversation_et.is_muted() && conversation_et.unread_event_count()) {
-            number_of_unread_conversations++;
-          }
-        });
+        this.conversation_repository.all_unarchived_conversations()
+          .forEach((conversation_et) => {
+            if (!conversation_et.is_request() && !conversation_et.is_muted() && conversation_et.unread_message_count()) {
+              number_of_unread_conversations++;
+            }
+          });
 
-        const badge_count = number_of_connect_requests + number_of_unread_conversations;
+        const badge_count = number_of_requests + number_of_unread_conversations;
         if (badge_count > 0) {
           window_title = `(${badge_count}) · `;
         }
@@ -60,14 +61,8 @@ z.ViewModel.WindowTitleViewModel = class WindowTitleViewModel {
 
         switch (this.content_state()) {
           case z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS: {
-            if (number_of_connect_requests > 1) {
-              window_title += z.localization.Localizer.get_text({
-                id: z.string.conversations_connection_request_many,
-                replace: {
-                  content: number_of_connect_requests,
-                  placeholder: '%no',
-                },
-              });
+            if (number_of_requests > 1) {
+              window_title += z.l10n.text(z.string.conversations_connection_request_many, number_of_requests);
             } else {
               window_title += z.l10n.text(z.string.conversations_connection_request_one);
             }

@@ -79,6 +79,9 @@ window.z.util = z.util || {};
       }
       return this.is_chrome() || this.is_firefox() || this.is_opera();
     },
+    supports_indexed_db: function() {
+      return !!window.indexedDB;
+    },
     supports_media_devices: function() {
       return navigator.mediaDevices && navigator.mediaDevices.getUserMedia;
     },
@@ -152,6 +155,7 @@ window.z.util = z.util || {};
       supports: {
         audio_output_selection: _check.supports_audio_output_selection(),
         calling: _check.supports_calling(),
+        indexed_db: _check.supports_indexed_db(),
         media_devices: _check.supports_media_devices(),
         notifications: _check.supports_notifications(),
         screen_sharing: _check.supports_screen_sharing(),

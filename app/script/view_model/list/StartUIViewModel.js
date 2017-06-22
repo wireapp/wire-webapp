@@ -222,25 +222,9 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       const meta_key = z.util.Environment.os.mac ? z.l10n.text(z.string.invite_meta_key_mac) : z.l10n.text(z.string.invite_meta_key_pc);
 
       if (this.invite_message_selected()) {
-        return z.localization.Localizer.get_text({
-          id: z.string.invite_hint_selected,
-          replace: [
-            {
-              content: meta_key,
-              placeholder: '%meta_key',
-            },
-          ],
-        });
+        return z.l10n.text(z.string.invite_hint_selected, meta_key);
       }
-      return z.localization.Localizer.get_text({
-        id: z.string.invite_hint_unselected,
-        replace: [
-          {
-            content: meta_key,
-            placeholder: '%meta_key',
-          },
-        ],
-      });
+      return z.l10n.text(z.string.invite_hint_unselected, meta_key);
     });
 
     this.invite_button_text = ko.pureComputed(() => {
@@ -319,20 +303,20 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
   _show_on_boarding_results(response) {
     return this.search_repository.show_on_boarding(response)
-      .then(({connections, suggestions}) => {
-        this.suggestions(suggestions.length ? suggestions : connections);
-        return this.get_top_people();
-      })
-      .then((user_ets) => {
-        this.top_users(user_ets);
+      .then((connected_user_ets = []) => {
         this.selected_people.removeAll();
-
+        this.suggestions(connected_user_ets);
         if (!this.suggestions().length) {
-          if (this.top_users().length) {
-            return this.suggestions(this.top_users());
-          }
+          return this.get_top_people()
+            .then((user_ets) => {
+              this.top_users(user_ets);
 
-          return this.show_no_contacts_on_wire(true);
+              if (!this.suggestions().length && this.top_users().length) {
+                return this.suggestions(this.top_users());
+              }
+
+              return this.show_no_contacts_on_wire(true);
+            });
         }
       })
       .catch((error) => {
@@ -386,7 +370,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
   click_on_group(conversation_et) {
     const promise = conversation_et instanceof z.entity.User ? this.conversation_repository.get_1to1_conversation(conversation_et) : Promise.resolve(conversation_et);
 
-    promise
+    return promise
       .then((_conversation_et) => {
         if (_conversation_et.is_archived()) {
           this.conversation_repository.unarchive_conversation(_conversation_et);
@@ -401,6 +385,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
           conversation_type: (conversation_et.is_group() || conversation_et.is_team_group()) ? 'group' : 'one_to_one',
         });
         this._close_list();
+        return _conversation_et;
       });
   }
 
@@ -498,7 +483,6 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.active_team(this.team_repository.personal_space);
 
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.SENT_CONNECT_REQUEST, {
-      common_users_count: user_et.mutual_friends_total(),
       context: 'startui',
     });
   }
@@ -561,15 +545,8 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
       const self = this.user_repository.self();
 
-      if (self.email()) {
-        this.invite_message(z.localization.Localizer.get_text({
-          id: z.string.invite_message,
-          replace: [
-            {
-              content: `@${self.username()}`,
-              placeholder: '%username',
-            },
-          ]}));
+      if (self.username()) {
+        this.invite_message(z.l10n.text(z.string.invite_message, `@${self.username()}`));
       } else {
         this.invite_message(z.l10n.text(z.string.invite_message_no_email));
       }
@@ -635,55 +612,40 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
   // Header
   //##############################################################################
 
-  on_submit_search() {
-    if (!this.selected_people().length || this.submitted_search) {
+  on_submit_search(handle_search_input = true) {
+    if (this.submitted_search) {
       return Promise.resolve();
     }
 
-    this.submitted_search = true;
-
-    if (this.selected_people().length === 1) {
-      return this.conversation_repository.get_1to1_conversation(this.selected_people()[0])
-        .then((conversation_et) => {
-          amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.OPENED_CONVERSATION, {source: 'top_user'});
-          this.click_on_group(conversation_et);
-          this.submitted_search = false;
-          return conversation_et;
-        })
-        .catch((error) => {
-          this.submitted_search = false;
-          throw error;
-        });
+    if (handle_search_input && this.search_input().length) {
+      const match_handled = this._handle_search_input();
+      if (match_handled) {
+        return Promise.resolve();
+      }
     }
 
-    if (this.selected_people().length > 1) {
-      const user_ids = this.selected_people().map((user_et) => user_et.id);
+    switch (this.selected_people().length) {
+      case 0: {
+        return Promise.resolve();
+      }
 
-      return this.conversation_repository.create_new_conversation(user_ids, null)
-        .then(({conversation_et}) => {
-          this.properties_repository.save_preference(z.properties.PROPERTIES_TYPE.HAS_CREATED_CONVERSATION);
-          amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.CREATE_GROUP_CONVERSATION, {
-            creationContext: 'search',
-            numberOfParticipants: user_ids.length,
-          });
-          this.click_on_group(conversation_et);
-          this.submitted_search = false;
-          return conversation_et;
-        })
-        .catch((error) => {
-          this.submitted_search = false;
-          this._close_list();
-          throw new Error(`Unable to create conversation: ${error.message}`);
-        });
+      case 1: {
+        const [selected_user_et] = this.selected_people();
+        return this._open_1to1_conversation(selected_user_et);
+      }
+
+      default: {
+        const user_ids = this.selected_people().map((user_et) => user_et.id);
+        return this._open_group_conversation(user_ids);
+      }
     }
-
   }
 
   on_audio_call() {
-    this.on_submit_search()
-      .then(function(conversation_et) {
+    this.on_submit_search(false)
+      .then((conversation_et) => {
         if (conversation_et) {
-          window.setTimeout(function() {
+          window.setTimeout(() => {
             amplify.publish(z.event.WebApp.CALL.STATE.TOGGLE, false, conversation_et);
           }, 500);
         }
@@ -691,10 +653,10 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
   }
 
   on_photo(images) {
-    this.on_submit_search()
-      .then(function(conversation_et) {
+    this.on_submit_search(false)
+      .then((conversation_et) => {
         if (conversation_et) {
-          window.setTimeout(function() {
+          window.setTimeout(() => {
             amplify.publish(z.event.WebApp.CONVERSATION.IMAGE.SEND, images);
           }, 500);
         }
@@ -702,13 +664,78 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
   }
 
   on_video_call() {
-    this.on_submit_search()
-      .then(function(conversation_et) {
+    this.on_submit_search(false)
+      .then((conversation_et) => {
         if (conversation_et) {
-          window.setTimeout(function() {
+          window.setTimeout(() => {
             amplify.publish(z.event.WebApp.CALL.STATE.TOGGLE, true, conversation_et);
           }, 500);
         }
+      });
+  }
+
+  _handle_search_input() {
+    const [matching_connection] = this.search_results.contacts();
+    const [matching_group] = this.search_results.groups();
+    const [matching_team_member] = this.search_results.team_members();
+
+    if (matching_connection && this.is_personal_space()) {
+      this.selected_people.push(matching_connection);
+      return true;
+    }
+
+    if (matching_team_member && !this.is_personal_space()) {
+      this.selected_people.push(matching_team_member);
+      return true;
+    }
+
+    if (matching_group) {
+      this.click_on_group(matching_group);
+      return true;
+    }
+
+    if (matching_connection && !this.is_personal_space()) {
+      this.selected_people.push(matching_connection);
+      return true;
+    }
+
+    return false;
+  }
+
+  _open_1to1_conversation(user_et) {
+    this.submitted_search = true;
+
+    return this.conversation_repository.get_1to1_conversation(user_et)
+      .then((conversation_et) => {
+        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.OPENED_CONVERSATION);
+        this.click_on_group(conversation_et);
+        this.submitted_search = false;
+        return conversation_et;
+      })
+      .catch((error) => {
+        this.submitted_search = false;
+        throw error;
+      });
+  }
+
+  _open_group_conversation(user_ids) {
+    this.submitted_search = true;
+
+    return this.conversation_repository.create_new_conversation(user_ids, null)
+      .then(({conversation_et}) => {
+        this.properties_repository.save_preference(z.properties.PROPERTIES_TYPE.HAS_CREATED_CONVERSATION);
+        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.CREATE_GROUP_CONVERSATION, {
+          creationContext: 'search',
+          numberOfParticipants: user_ids.length,
+        });
+        this.click_on_group(conversation_et);
+        this.submitted_search = false;
+        return conversation_et;
+      })
+      .catch((error) => {
+        this.submitted_search = false;
+        this._close_list();
+        throw new Error(`Unable to create conversation: ${error.message}`);
       });
   }
 };

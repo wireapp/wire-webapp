@@ -88,7 +88,7 @@ z.ui.Context = (() => {
   }
 
   function cleanup() {
-    [...document.querySelectorAll('.ctx-menu')].forEach((menu) => menu.remove());
+    Array.from(document.querySelectorAll('.ctx-menu')).forEach((menu) => menu.remove());
     removeListeners();
   }
 

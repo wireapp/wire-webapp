@@ -140,49 +140,22 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
       }
     });
 
-    this.add_people_tooltip = z.localization.Localizer.get_text({
-      id: z.string.tooltip_people_add,
-      replace: {
-        content: z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.ADD_PEOPLE),
-        placeholder: '%shortcut',
-      },
-    });
+    const shortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.ADD_PEOPLE);
+    this.add_people_tooltip = z.l10n.text(z.string.tooltip_people_add, shortcut);
 
     this.device_headline = ko.pureComputed(() => {
-      return z.localization.Localizer.get_text({
-        id: z.string.people_tabs_devices_headline,
-        replace: {
-          content: this.user().first_name(),
-          placeholder: '%@.name',
-        },
-      });
+      return z.l10n.text(z.string.people_tabs_devices_headline, this.user().first_name());
     });
 
     this.no_device_headline = ko.pureComputed(() => {
-      return z.localization.Localizer.get_text({
-        id: z.string.people_tabs_no_devices_headline,
-        replace: {
-          content: this.user().first_name(),
-          placeholder: '%@.name',
-        },
-      });
+      return z.l10n.text(z.string.people_tabs_no_devices_headline, this.user().first_name());
     });
 
     this.detail_message = ko.pureComputed(() => {
-      return z.localization.Localizer.get_text({
-        id: z.string.people_tabs_device_detail_headline,
-        replace: [{
-          content: "<span class='user-profile-device-detail-highlight'>",
-          placeholder: '%bold',
-        },
-        {
-          content: z.util.escape_html(this.user().first_name()),
-          placeholder: '%@.name',
-        },
-        {
-          content: '</span>',
-          placeholder: '%end',
-        }],
+      return z.l10n.text(z.string.people_tabs_device_detail_headline, {
+        html1: "<span class='user-profile-device-detail-highlight'>",
+        html2: '</span>',
+        user: z.util.escape_html(this.user().first_name()),
       });
     });
 
@@ -332,15 +305,16 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
             return 'user-profile-footer-profile-leave';
           }
 
-          if (user_et.is_unknown()) {
-            return conversation_et.team_id ? 'user-profile-footer-message-remove' : 'user-profile-footer-connect-remove';
-          }
-          if (user_et.is_ignored() || user_et.is_request()) {
-            return 'user-profile-footer-pending-remove';
+          if (user_et.is_connected() || user_et.is_team_member()) {
+            return 'user-profile-footer-message-remove';
           }
 
-          if (user_et.is_connected()) {
-            return 'user-profile-footer-message-remove';
+          if (user_et.is_unknown()) {
+            return 'user-profile-footer-connect-remove';
+          }
+
+          if (user_et.is_ignored() || user_et.is_request()) {
+            return 'user-profile-footer-pending-remove';
           }
 
           if (user_et.is_blocked()) {

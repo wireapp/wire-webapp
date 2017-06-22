@@ -147,13 +147,13 @@ window.z.ui = z.ui || {};
     event: z.event.WebApp.SHORTCUT.SILENCE,
     shortcut: {
       electron: {
-        macos: 'command + alt + s',
+        macos: 'command + alt + m',
         menu: true,
-        pc: 'ctrl + alt + s',
+        pc: 'ctrl + alt + m',
       },
       webapp: {
-        macos: 'command + alt + s',
-        pc: 'ctrl + alt + s',
+        macos: 'command + alt + m',
+        pc: 'ctrl + alt + m',
       },
     },
   };
@@ -162,13 +162,13 @@ window.z.ui = z.ui || {};
     event: z.event.WebApp.SHORTCUT.START,
     shortcut: {
       electron: {
-        macos: 'command + n',
+        macos: 'command + f',
         menu: true,
-        pc: 'ctrl + n',
+        pc: 'ctrl + f',
       },
       webapp: {
-        macos: 'command + alt + graveaccent', // KeyboardJS fires this when using cmd + alt + n
-        pc: 'ctrl + alt + graveaccent',
+        macos: 'command + alt + f',
+        pc: 'ctrl + alt + f',
       },
     },
   };

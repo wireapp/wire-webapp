@@ -96,6 +96,12 @@ z.service.BackendClient = class BackendClient {
     this.number_of_requests = ko.observable(0);
     this.number_of_requests.subscribe((new_value) => amplify.publish(z.event.WebApp.TELEMETRY.BACKEND_REQUESTS, new_value));
 
+    // Only allow JSON response by default
+    $.ajaxSetup({
+      contents: {javascript: false},
+      dataType: 'json',
+    });
+
     // http://stackoverflow.com/a/18996758/451634
     $.ajaxPrefilter((options, originalOptions, jqXHR) => {
       jqXHR.wire = {
@@ -117,7 +123,7 @@ z.service.BackendClient = class BackendClient {
 
   /**
    * Request backend status.
-   * @returns {$.Promise} jquery AJAX promise
+   * @returns {$.Promise} jQuery AJAX promise
    */
   status() {
     return $.ajax({
@@ -135,18 +141,24 @@ z.service.BackendClient = class BackendClient {
   execute_on_connectivity(source = BackendClient.CONNECTIVITY_CHECK_TRIGGER.UNKNOWN) {
     this.logger.info(`Connectivity check requested by '${source}'`);
 
+    const _reset_queue = () => {
+      if (this.connectivity_timeout) {
+        window.clearTimeout(this.connectivity_timeout);
+        this.connectivity_queue.pause(false);
+      }
+      this.connectivity_timeout = undefined;
+    };
+
     const _check_status = () => {
       return this.status()
         .done((jqXHR) => {
           this.logger.info('Connectivity verified', jqXHR);
-          this.connectivity_timeout = undefined;
-          this.connectivity_queue.pause(false);
+          _reset_queue();
         })
         .fail((jqXHR) => {
           if (jqXHR.readyState === 4) {
             this.logger.info(`Connectivity verified by server error '${jqXHR.status}'`, jqXHR);
-            this.connectivity_queue.pause(false);
-            this.connectivity_timeout = undefined;
+            _reset_queue();
           } else {
             this.logger.warn('Connectivity could not be verified... retrying');
             this.connectivity_queue.pause();
@@ -261,11 +273,13 @@ z.service.BackendClient = class BackendClient {
         timeout: config.timeout,
         type: config.type,
         url: config.url,
-        xhrFields: config.xhrFields})
+        xhrFields: config.xhrFields,
+      })
       .done((data, textStatus, {wire: wire_request}) => {
         if (wire_request) {
           this.logger.debug(this.logger.levels.OFF, `Server Response '${wire_request.request_id}' from '${config.url}':`, data);
         }
+
         resolve(data);
       })
       .fail(({responseJSON: response, status: status_code}) => {
@@ -285,13 +299,6 @@ z.service.BackendClient = class BackendClient {
               });
           }
 
-          case z.service.BackendClientError.STATUS_CODE.UNAUTHORIZED: {
-            this._push_to_request_queue(config, z.service.RequestQueueBlockedState.ACCESS_TOKEN_REFRESH)
-              .then(resolve)
-              .catch(reject);
-            return amplify.publish(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, z.auth.AuthRepository.ACCESS_TOKEN_TRIGGER.UNAUTHORIZED_REQUEST);
-          }
-
           case z.service.BackendClientError.STATUS_CODE.FORBIDDEN: {
             if (response) {
               if (BackendClient.IGNORED_BACKEND_LABELS.includes(response.label)) {
@@ -303,12 +310,31 @@ z.service.BackendClient = class BackendClient {
             break;
           }
 
+          case z.service.BackendClientError.STATUS_CODE.ACCEPTED:
+          case z.service.BackendClientError.STATUS_CODE.CREATED:
+          case z.service.BackendClientError.STATUS_CODE.NO_CONTENT:
+          case z.service.BackendClientError.STATUS_CODE.OK: {
+            // Prevent empty valid response from being rejected
+            if (!response) {
+              return resolve({});
+            }
+            break;
+          }
+
+          case z.service.BackendClientError.STATUS_CODE.UNAUTHORIZED: {
+            this._push_to_request_queue(config, z.service.RequestQueueBlockedState.ACCESS_TOKEN_REFRESH)
+              .then(resolve)
+              .catch(reject);
+            return amplify.publish(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, z.auth.AuthRepository.ACCESS_TOKEN_TRIGGER.UNAUTHORIZED_REQUEST);
+          }
+
           default: {
             if (!BackendClient.IGNORED_BACKEND_ERRORS.includes(status_code)) {
               Raygun.send(new Error(`Server request failed: ${status_code}`));
             }
           }
         }
+
         return reject(response || new z.service.BackendClientError(status_code));
       });
     });

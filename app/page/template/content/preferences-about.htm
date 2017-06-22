@@ -15,7 +15,7 @@
       </section>
       <section class="preferences-section">
         <header class="preferences-header"><hr class="preferences-separator"></header>
-        <div class="preferences-detail" data-bind="l10n_text: {id: z.string.preferences_about_version, replace: {placeholder: '%version', content: '{{config.CURRENT_VERSION_DATE}}'}}"></div>
+        <div class="preferences-detail" data-bind="l10n_text: {id: z.string.preferences_about_version, substitute: '{{config.CURRENT_VERSION_DATE}}'}"></div>
         <div class="preferences-detail" data-bind="l10n_text: z.string.preferences_about_copyright"></div>
       </section>
     </div>

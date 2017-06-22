@@ -28,6 +28,47 @@ window.LOG = function() {
   }
 };
 
+z.util.check_indexed_db = function() {
+  if (!z.util.Environment.browser.supports.indexed_db) {
+    if (z.util.Environment.browser.edge) {
+      return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.PRIVATE_MODE));
+    }
+    return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.INDEXED_DB_UNSUPPORTED));
+  }
+
+  if (z.util.Environment.browser.firefox) {
+    let db;
+
+    try {
+      db = window.indexedDB.open('test');
+    } catch (error) {
+      return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.PRIVATE_MODE));
+    }
+
+    return new Promise((resolve, reject) => {
+      let current_attempt = 0;
+      const interval = 10;
+      const max_retry = 50;
+
+      const interval_id = window.setInterval(() => {
+        current_attempt = current_attempt + 1;
+
+        if (db.readyState === 'done' && !db.result) {
+          window.clearInterval(interval_id);
+          return reject(new z.auth.AuthError(z.auth.AuthError.TYPE.PRIVATE_MODE));
+        }
+
+        if (current_attempt >= max_retry) {
+          window.clearInterval(interval_id);
+          resolve();
+        }
+      }, interval);
+    });
+  }
+
+  return Promise.resolve();
+};
+
 z.util.dummy_image = function(width, height) {
   return `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${width} ${height}' width='${width}' height='${height}'></svg>`;
 };
@@ -134,7 +175,7 @@ z.util.get_file_extension = function(filename) {
     return '';
   }
 
-  if (filename.includes('tar.gz')) {
+  if (filename.endsWith('.tar.gz')) {
     return 'tar.gz';
   }
 
@@ -147,7 +188,11 @@ z.util.get_file_extension = function(filename) {
  * @returns {string} New String without extension
  */
 z.util.trim_file_extension = function(filename) {
-  filename = filename.replace('.tar.gz', '');
+
+  if (filename.endsWith('.tar.gz')) {
+    filename = filename.replace(/\.tar\.gz$/, '');
+  }
+
   return filename.replace(/\.[^/.]+$/, '');
 };
 

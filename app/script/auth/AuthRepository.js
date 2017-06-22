@@ -167,7 +167,7 @@ z.auth.AuthRepository = class AuthRepository {
         if ((error.type === z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN) || z.util.Environment.frontend.is_localhost()) {
           this.logger.warn(`Session expired on access token refresh: ${error.message}`, error);
           Raygun.send(error);
-          return amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReason.SESSION_EXPIRED, false, true);
+          return amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReason.SESSION_EXPIRED, false);
         }
 
         if (error.type !== z.auth.AccessTokenError.TYPE.REFRESH_IN_PROGRESS) {

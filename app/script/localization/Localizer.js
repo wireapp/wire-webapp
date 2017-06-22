@@ -41,45 +41,11 @@ class Localizer {
       Object.assign(z.string, z.string[this.locale]);
     }
   }
-
-  /**
-   * Pulls the localized string from the resources and replaces placeholders.
-   *
-   * @deprecated
-   * @note Takes the id of the string for look up from z.string is directly for simple use. Else pass it in as the id
-   *   parameter in conjunction with a single or multiple (it supports but does not require an array) replace rules that
-   *   consist of a placeholder and the content that it should be replace with.
-   *
-   * @param valueAccessor [Object] contains localization string ID and replace object
-   */
-
-  get_text(valueAccessor) {
-    if (valueAccessor == null) return;
-
-    let args = [];
-    let value = valueAccessor;
-    if (valueAccessor.id != null) {
-      value = valueAccessor.id;
-      if (_.isArray(valueAccessor.replace)) {
-        args = valueAccessor.replace;
-      } else {
-        args.push(valueAccessor.replace);
-      }
-    }
-    if (args.length !== 0) {
-      for (const arg of args) {
-        const reg = new RegExp(arg.placeholder, 'gm');
-        value = value.replace(reg, arg.content);
-      }
-    }
-    return value;
-  }
 }
 
 z.localization.Localizer = new Localizer();
 
 z.l10n = (() => {
-
   function replaceWithString(string, substitute) {
     return string.replace(/{{\w+}}/, substitute);
   }
@@ -122,47 +88,4 @@ z.l10n = (() => {
       return string;
     },
   };
-
 })();
-
-ko.bindingHandlers.l10n_href = {
-  update(element, valueAccessor) {
-    element.setAttribute('href', z.localization.Localizer.get_text(valueAccessor()));
-  },
-};
-
-ko.bindingHandlers.l10n_input = {
-  update(element, valueAccessor) {
-    element.setAttribute('value', z.localization.Localizer.get_text(valueAccessor()));
-  },
-};
-
-ko.bindingHandlers.l10n_placeholder = {
-  update(element, valueAccessor) {
-    element.setAttribute('placeholder', z.localization.Localizer.get_text(valueAccessor()));
-  },
-};
-
-ko.bindingHandlers.l10n_text = {
-  update(element, valueAccessor) {
-    ko.utils.setTextContent(element, z.localization.Localizer.get_text(valueAccessor()));
-  },
-};
-
-ko.bindingHandlers.l10n_html = {
-  update(element, valueAccessor) {
-    ko.utils.setHtml(element, z.localization.Localizer.get_text(valueAccessor()));
-  },
-};
-
-ko.bindingHandlers.l10n_tooltip = {
-  update(element, valueAccessor) {
-    element.setAttribute('title', z.localization.Localizer.get_text(valueAccessor()));
-  },
-};
-
-ko.bindingHandlers.l10n_aria_label = {
-  update(element, valueAccessor) {
-    element.setAttribute('aria-label', z.localization.Localizer.get_text(valueAccessor()));
-  },
-};
