@@ -1048,7 +1048,10 @@ z.calling.entities.Flow = class Flow {
    * @returns {boolean} False if we locally needed to switch sides
    */
   _solve_colliding_states(force_renegotiation = false) {
-    if (this.self_user_id < this.remote_user_id || force_renegotiation) {
+    this.logger.debug(`Solving state collision: Self user ID '${this.self_user_id}', remote user ID '${this.remote_user_id}', force_renegotiation '${force_renegotiation}'`);
+
+    const self_user_id_looses = this.self_user_id < this.remote_user_id;
+    if (self_user_id_looses || force_renegotiation) {
       this.logger.warn(`We need to switch SDP state of flow with '${this.remote_user.name()}' to answer.`);
 
       this.restart_negotiation(z.calling.enum.SDP_NEGOTIATION_MODE.STATE_COLLISION, true);
