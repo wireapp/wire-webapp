@@ -353,20 +353,25 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
    * @returns {Promise} Resolves when page is the first tab
    */
   _check_single_instance(set_check_interval = true) {
-    if (Cookies.get(z.main.App.CONFIG.COOKIE_NAME)) {
-      this._handle_blocked_tabs(set_check_interval);
-      return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.MULTIPLE_TABS));
+    if (!z.util.Environment.electron) {
+      if (Cookies.get(z.main.App.CONFIG.COOKIE_NAME)) {
+        this._handle_blocked_tabs(set_check_interval);
+        return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.MULTIPLE_TABS));
+      }
+
+      if (set_check_interval) {
+        this._set_tabs_check_interval();
+      }
     }
 
-    if (set_check_interval) {
-      this._set_tabs_check_interval();
-    }
     return Promise.resolve();
   }
 
   _clear_tabs_check_interval() {
-    window.clearInterval(this.tabs_check_interval_id);
-    this.tabs_check_interval_id = undefined;
+    if (this.tabs_check_interval_id) {
+      window.clearInterval(this.tabs_check_interval_id);
+      this.tabs_check_interval_id = undefined;
+    }
   }
 
   _handle_blocked_tabs(set_check_interval) {
@@ -397,6 +402,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
           this._handle_blocked_tabs();
         });
     }, 500);
+    $(window).on('unload', () => this._clear_tabs_check_interval());
   }
 
   _set_tabs_recheck_interval() {
