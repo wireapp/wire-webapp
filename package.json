@@ -25,7 +25,7 @@
     "grunt-postcss": "0.8.0",
     "grunt-shell": "2.1.0",
     "grunt-todo": "0.5.0",
-    "husky": "0.13.4",
+    "husky": "0.14.0",
     "jasmine-ajax": "3.2.0",
     "jasmine-core": "2.5.2",
     "karma": "1.7.0",
