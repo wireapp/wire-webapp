@@ -129,7 +129,8 @@
 
   <!-- ko if: show_invite_people() -->
     <div class="start-ui-import" data-bind="click: show_invite_bubble" >
-      <span id="invite-button" class="label-bold-xs" data-bind="text: invite_button_text" data-bubble="#invite-bubble" data-placement="top"></span>
+      <span class="icon-invite start-ui-import-icon"></span>
+      <span id="invite-button" class="label-bold-xs" data-bind="l10n_text: z.string.people_invite" data-bubble="#invite-bubble" data-placement="top"></span>
     </div>
   <!-- /ko -->
 

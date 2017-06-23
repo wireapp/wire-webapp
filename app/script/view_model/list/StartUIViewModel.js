@@ -227,10 +227,6 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       return z.l10n.text(z.string.invite_hint_unselected, meta_key);
     });
 
-    this.invite_button_text = ko.pureComputed(() => {
-      return z.l10n.text(this.show_invite_form_only() ? z.string.people_invite : z.string.people_bring_your_friends);
-    });
-
     // Last open bubble
     this.user_bubble = undefined;
     this.user_bubble_last_id = undefined;

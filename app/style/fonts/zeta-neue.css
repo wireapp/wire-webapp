@@ -19,7 +19,7 @@
 
 @font-face {
   font-family: 'Wire';
-  src: url('/font/Wire.ttf?emoji') format('truetype');
+  src: url('/font/Wire.ttf?invite') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
@@ -236,6 +236,9 @@
 }
 .icon-end-call:before {
   content: "\e222";
+}
+.icon-invite:before {
+  content: "\e223";
 }
 .icon-sysmsg-error:before {
   content: "\e225";
