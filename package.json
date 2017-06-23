@@ -27,7 +27,7 @@
     "grunt-todo": "0.5.0",
     "husky": "0.14.0",
     "jasmine-ajax": "3.2.0",
-    "jasmine-core": "2.5.2",
+    "jasmine-core": "2.6.3",
     "karma": "1.7.0",
     "karma-chrome-launcher": "2.1.1",
     "karma-coverage": "1.1.1",
