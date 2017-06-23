@@ -673,7 +673,8 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
   _handle_search_input() {
     const [matching_group] = this.search_results.groups();
 
-    let matching_connection, matching_team_member = undefined;
+    let matching_connection = undefined;
+    let matching_team_member = undefined;
 
     for (const user_et of this.search_results.contacts()) {
       if (!this.selected_people().includes(user_et)) {
