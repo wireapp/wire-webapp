@@ -76,6 +76,10 @@ user-input {
 
 }
 
+.search-inner-has-close {
+  margin-right: 20px;
+}
+
 .search-inner > input {
   appearance: none;
   border: none;
@@ -89,6 +93,7 @@ user-input {
 
   &:invalid {
     .accent-color();
+    box-shadow: none;
   }
 
   &::placeholder {
@@ -105,10 +110,6 @@ user-input {
     &::placeholder {
       color: fade(#222, 48%);
     }
-  }
-
-  &:invalid {
-    box-shadow: none;
   }
 }
 

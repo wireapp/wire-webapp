@@ -71,7 +71,7 @@ ko.components.register('user-input', {
   template: `
     <div class="search-outer">
       <div class="search-inner-wrap">
-        <div class="search-inner">
+        <div class="search-inner" data-bind="css: {'search-inner-has-close': on_close}">
           <div class="search-icon icon-search" data-bind="visible: search_icon_visible"></div>
           <!-- ko foreach: selected -->
             <span data-bind="text: first_name()"></span>

@@ -689,7 +689,6 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       }
     }
 
-    console.log('fooo');
     if (this.is_personal_space() && matching_connection) {
       this.selected_people.push(matching_connection);
       return true;
