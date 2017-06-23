@@ -63,7 +63,8 @@ z.calling.entities.Flow = class Flow {
     this.remote_client_id = undefined;
     this.remote_user = this.participant_et.user;
     this.remote_user_id = this.remote_user.id;
-    this.self_user_id = this.call_et.self_user_id;
+    this.self_user = this.call_et.self_user;
+    this.self_user_id = this.self_user.id;
 
     // Telemetry
     this.telemetry = new z.telemetry.calling.FlowTelemetry(this.id, this.remote_user_id, this.call_et, timings);
