@@ -671,16 +671,31 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
   }
 
   _handle_search_input() {
-    const [matching_connection] = this.search_results.contacts();
     const [matching_group] = this.search_results.groups();
-    const [matching_team_member] = this.search_results.team_members();
 
-    if (matching_connection && this.is_personal_space()) {
+    let matching_connection, matching_team_member = undefined;
+
+    for (const user_et of this.search_results.contacts()) {
+      if (!this.selected_people().includes(user_et)) {
+        matching_connection = user_et;
+        break;
+      }
+    }
+
+    for (const user_et of this.search_results.team_members()) {
+      if (!this.selected_people().includes(user_et)) {
+        matching_team_member = user_et;
+        break;
+      }
+    }
+
+    console.log('fooo');
+    if (this.is_personal_space() && matching_connection) {
       this.selected_people.push(matching_connection);
       return true;
     }
 
-    if (matching_team_member && !this.is_personal_space()) {
+    if (!this.is_personal_space() && matching_team_member) {
       this.selected_people.push(matching_team_member);
       return true;
     }

@@ -22,6 +22,8 @@ user-input {
   color: #fff;
   display: block;
   position: relative;
+  background: fade(#fff, 8%);
+  border-radius: 4px;
 
   &.user-list-light {
     color: #222;
@@ -29,8 +31,7 @@ user-input {
 }
 
 .search-outer {
-  padding-right: 16px;
-  padding-bottom: 12px;
+  padding: 4px 8px;
   overflow: hidden;
 }
 
@@ -83,7 +84,6 @@ user-input {
   flex: 1 1;
   height: @avatar-diameter-xs;
   line-height: @avatar-diameter-xs;
-  margin-right: 24px;
   min-width: 65px;
   outline: none;
 
@@ -93,10 +93,11 @@ user-input {
 
   &::placeholder {
     &:invalid {
-      color: fade(#fff, 48%);
+      color: fade(#fff, 40%);
     }
     .label-xs();
-    color: fade(#fff, 48%);
+    color: fade(#fff, 40%);
+    text-align: center;
     padding-left: 8px;
   }
 
@@ -111,8 +112,16 @@ user-input {
   }
 }
 
+.search-icon {
+  position: absolute;
+  height: @avatar-diameter-xs;
+  line-height: @avatar-diameter-xs;
+  top: 4px;
+  left: 8px;
+}
+
 .search-close {
   position: absolute;
-  top: 6px;
-  right: 0;
+  top: 8px;
+  right: 8px;
 }
