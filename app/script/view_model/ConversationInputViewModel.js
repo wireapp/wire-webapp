@@ -162,7 +162,7 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
   }
 
   ping() {
-    if (!this.ping_disabled()) {
+    if (this.conversation_et() && !this.ping_disabled()) {
       this.ping_disabled(true);
       this.conversation_repository.send_knock(this.conversation_et())
         .then(() => {
