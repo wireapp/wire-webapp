@@ -85,7 +85,7 @@ z.calling.SDPMapper = {
           sdp_lines.push(sdp_line);
 
           const browser_string = `${z.util.Environment.browser.name} ${z.util.Environment.browser.version}`;
-          if (z.util.Environment.electron) {
+          if (z.util.Environment.desktop) {
             outline = `a=tool:electron ${z.util.Environment.version()} ${z.util.Environment.version(false)} (${browser_string})`;
           } else {
             outline = `a=tool:webapp ${z.util.Environment.version(false)} (${browser_string})`;
