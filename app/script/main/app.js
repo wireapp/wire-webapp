@@ -418,13 +418,16 @@ z.main.App = class App {
    * @returns {Promise} Resolves when page is the first tab
    */
   _check_single_instance() {
-    const cookie_name = App.CONFIG.COOKIE_NAME;
-    if (Cookies.get(cookie_name)) {
-      return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.MULTIPLE_TABS));
+    if (!z.util.Environment.electron) {
+      const cookie_name = App.CONFIG.COOKIE_NAME;
+      if (Cookies.get(cookie_name)) {
+        return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.MULTIPLE_TABS));
+      }
+
+      Cookies.set(cookie_name, true);
+      $(window).on('unload', () => Cookies.remove(cookie_name));
     }
 
-    Cookies.set(cookie_name, true);
-    $(window).on('unload', () => Cookies.remove(cookie_name));
     return Promise.resolve();
   }
 
