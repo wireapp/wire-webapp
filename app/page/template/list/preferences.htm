@@ -23,7 +23,7 @@
           <div class="center-column" data-bind="l10n_text: z.string.preferences_av"></div>
         </li>
       <!-- /ko -->
-      <!-- ko ifnot: z.util.Environment.electron -->
+      <!-- ko ifnot: z.util.Environment.desktop -->
         <li class="left-list-item left-list-item-clickable" data-bind="click: click_on_about, css: {'text-theme': selected_about}" data-uie-name="go-about">
           <div class="left-column icon-wire"></div>
           <div class="center-column" data-bind="l10n_text: z.string.preferences_about"></div>

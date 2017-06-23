@@ -411,7 +411,9 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    * @returns {undefined} No return value
    */
   _hide_permission_request_hint(media_type) {
-    if (z.util.Environment.electron) return;
+    if (z.util.Environment.electron) {
+      return;
+    }
 
     switch (media_type) {
       case z.media.MediaType.AUDIO:
@@ -543,7 +545,9 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    * @returns {undefined} No return value
    */
   _show_permission_request_hint(media_type) {
-    if (z.util.Environment.electron) return;
+    if (z.util.Environment.electron) {
+      return;
+    }
 
     switch (media_type) {
       case z.media.MediaType.AUDIO:

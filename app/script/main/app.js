@@ -327,7 +327,7 @@ z.main.App = class App {
 
   _app_init_failure(error, is_reload) {
     let log_message = `Could not initialize app version '${z.util.Environment.version(false)}'`;
-    if (z.util.Environment.electron) {
+    if (z.util.Environment.desktop) {
       log_message = `${log_message} - Electron '${platform.os.family}' '${z.util.Environment.version()}'`;
     }
     this.logger.info(log_message, {error});
@@ -613,7 +613,7 @@ z.main.App = class App {
    * @returns {undefined} No return value
    */
   refresh() {
-    if (z.util.Environment.electron) {
+    if (z.util.Environment.desktop) {
       amplify.publish(z.event.WebApp.LIFECYCLE.RESTART, this.update_source);
     }
     if (this.update_source === z.announce.UPDATE_SOURCE.WEBAPP) {

@@ -352,7 +352,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     if (!z.util.Environment.frontend.is_localhost()) {
       Raygun.setVersion(z.util.Environment.version(false));
     }
-    if (z.util.Environment.electron) {
+    if (z.util.Environment.desktop) {
       Raygun.withCustomData({electron_version: z.util.Environment.version(true)});
     }
     Raygun.onBeforeSend(this._check_error_payload.bind(this));
