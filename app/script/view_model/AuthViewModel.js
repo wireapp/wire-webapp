@@ -354,7 +354,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
    */
   _check_single_instance(set_check_interval = true) {
     if (!z.util.Environment.electron) {
-      if (Cookies.get(z.main.App.CONFIG.COOKIE_NAME)) {
+      if (Cookies.get(z.main.App.CONFIG.TABS_CHECK.COOKIE_NAME)) {
         this._handle_blocked_tabs(set_check_interval);
         return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.MULTIPLE_TABS));
       }
