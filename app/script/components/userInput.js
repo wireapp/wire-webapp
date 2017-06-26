@@ -36,8 +36,6 @@ z.components.UserListInputViewModel = class UserListInputViewModel {
     this.input_element = $(this.element).find('.search-input');
     this.inner_element = $(this.element).find('.search-inner');
 
-    this.search_icon_visible = ko.pureComputed(() => !this.selected().length && !this.input().length);
-
     this.selected_subscription = this.selected.subscribe(() => {
       this.input('');
       this.input_element.focus();
@@ -72,12 +70,12 @@ ko.components.register('user-input', {
     <div class="search-outer">
       <div class="search-inner-wrap">
         <div class="search-inner" data-bind="css: {'search-inner-has-close': on_close}">
-          <div class="search-icon icon-search" data-bind="visible: search_icon_visible"></div>
+          <div class="search-icon icon-search"></div>
           <!-- ko foreach: selected -->
             <span data-bind="text: first_name()"></span>
           <!-- /ko -->
           <input type="text" style="display:none" /> <!-- prevent chrome from autocomplete -->
-          <input autocomplete="off" maxlength="128" required spellcheck="false" class="search-input" type="text" data-bind="textInput: input, hasFocus: true, event: {keydown: on_key_press}, enter: on_enter, attr: {placeholder: placeholder}" data-uie-name="enter-users">
+          <input autocomplete="off" maxlength="128" required spellcheck="false" class="search-input" type="text" data-bind="textInput: input, hasFocus: true, attr: {placeholder: placeholder}, css: {'search-input-show-placeholder': placeholder}, event: {keydown: on_key_press}, enter: on_enter" data-uie-name="enter-users">
           <!-- ko if: on_close -->
             <div class="search-close icon-close icon-button" data-bind="click: on_close, l10n_tooltip: z.string.tooltip_search_close" data-uie-name="do-close"></div>
           <!-- /ko -->

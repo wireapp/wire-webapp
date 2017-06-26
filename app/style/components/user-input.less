@@ -52,8 +52,6 @@ user-input {
   .label-bold-xs();
   flex: 0 0 auto;
   line-height: @line-height-lg;
-  margin-bottom: 2px;
-  margin-top: 2px;
   padding-right: 16px;
   position: relative;
 
@@ -89,6 +87,7 @@ user-input {
   height: @avatar-diameter-xs;
   line-height: @avatar-diameter-xs;
   min-width: 65px;
+  padding-left: -24px;
   outline: none;
 
   &:invalid {
@@ -103,7 +102,7 @@ user-input {
     .label-xs();
     color: fade(#fff, 40%);
     text-align: center;
-    padding-left: 8px;
+    margin-left: -24px;
   }
 
   .user-list-light & {
@@ -114,11 +113,13 @@ user-input {
 }
 
 .search-icon {
-  position: absolute;
   height: @avatar-diameter-xs;
   line-height: @avatar-diameter-xs;
-  top: 4px;
-  left: 8px;
+  margin-right: 8px;
+}
+
+.search-input-show-placeholder {
+  margin-left: -41px;
 }
 
 .search-close {
