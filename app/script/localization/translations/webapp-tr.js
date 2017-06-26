@@ -43,6 +43,9 @@ z.string.tr.auth_account_sign_in_phone = 'Telefon';
 z.string.tr.auth_account_terms_of_use = 'Kullanım Şartları';
 z.string.tr.auth_account_terms_of_use_detail = 'Kabul ediyorum';
 
+z.string.tr.auth_blocked_database = 'Wire’ın mesajları gösterebilmek için yerel diske erişmesi lazım. Gizli modda yerel disk kullanılamaz.';
+z.string.tr.auth_blocked_tabs = 'Wire zaten başka bir sekmede açık.';
+
 z.string.tr.auth_verify_account_add = 'Ekle';
 z.string.tr.auth_verify_account_detail = 'Bu sizin Wire’ı birden fazla cihazda kullanmanıza olanak sağlar.';
 z.string.tr.auth_verify_account_headline = 'Bir e-posta adresi ve şifre ekleyin.';
@@ -254,6 +257,7 @@ z.string.tr.archive_header = 'Arşivle';
 
 z.string.tr.conversations_all_archived = 'Her şey arşivlendi';
 z.string.tr.conversations_contacts = 'Kişiler';
+z.string.tr.conversations_connection_request_many = '{{number}} kişi bekliyor';
 z.string.tr.conversations_connection_request_one = 'Bir kişi bekliyor';
 z.string.tr.conversations_empty_conversation = 'Grup sohbeti';
 z.string.tr.conversations_empty_conversation_description = 'Herkes ayrıldı';
@@ -430,6 +434,10 @@ z.string.tr.preferences_options_contacts_detail = 'İletişim verilerinizi sizi 
 z.string.tr.preferences_options_data = 'Kullanım ve kilitlenme raporları';
 z.string.tr.preferences_options_data_checkbox = 'Kullanım ve kilitlenme raporları';
 z.string.tr.preferences_options_data_detail = 'Anonim bilgiler göndererek Wire’ın daha iyi olmasını sağlayabilirsiniz.';
+z.string.tr.preferences_options_popular = 'Yoğun istek üzerine';
+z.string.tr.preferences_options_emoji_replace_checkbox = 'Yazı halindeki emojileri, gerçek emojiler ile değiştir';
+z.string.tr.preferences_options_previews_send_checkbox = 'Gönderdiğin bağlantılar için ön izlemeler oluştur';
+z.string.tr.preferences_options_previews_send_detail = 'Ön izlemeler hala başkalarından gelen bağlantılar için görüntülenebilir olabilir.';
 z.string.tr.preferences_options_notifications = 'Bildirimler';
 z.string.tr.preferences_options_notifications_none = 'Yok';
 z.string.tr.preferences_options_notifications_obfuscate = 'Ayrıntıyı gizle';
@@ -536,6 +544,7 @@ z.string.tr.tooltip_conversations_archive = 'Arşivle ({{shortcut}})';
 z.string.tr.tooltip_conversations_archived = 'Arşivi göster ({{number}})';
 z.string.tr.tooltip_conversations_more = 'Daha';
 z.string.tr.tooltip_conversations_notify = 'Sesi aç ({{shortcut}})';
+z.string.tr.tooltip_conversations_preferences = 'Seçenekleri aç';
 z.string.tr.tooltip_conversations_silence = 'Sessize al ({{shortcut}})';
 z.string.tr.tooltip_conversations_start = 'Konuşma başlat ({{shortcut}})';
 

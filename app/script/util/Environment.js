@@ -36,6 +36,7 @@ window.z.util = z.util || {};
     ELECTRON: 'Electron',
     FIREFOX: 'Firefox',
     OPERA: 'Opera',
+    WIRE: 'Wire',
   };
 
   const PLATFORM_NAME = {
@@ -51,6 +52,9 @@ window.z.util = z.util || {};
     },
     is_chrome: function() {
       return platform.name === BROWSER_NAME.CHROME;
+    },
+    is_desktop: function() {
+      return this.is_electron() && navigator.userAgent.includes(BROWSER_NAME.WIRE);
     },
     is_edge: function() {
       return platform.name === BROWSER_NAME.EDGE;
@@ -162,6 +166,7 @@ window.z.util = z.util || {};
       },
       version: _check.get_version(),
     },
+    desktop: _check.is_desktop(),
     electron: _check.is_electron(),
     frontend: {
       is_localhost() {

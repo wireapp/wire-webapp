@@ -49,7 +49,7 @@ z.media.MediaEmbeds = (function() {
       options.class = 'iframe-container';
     }
 
-    if (z.util.Environment.electron) {
+    if (z.util.Environment.desktop) {
       options.allowfullscreen = '';
     }
 
