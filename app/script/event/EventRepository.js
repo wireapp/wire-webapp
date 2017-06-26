@@ -119,6 +119,7 @@ z.event.EventRepository = class EventRepository {
     this.web_socket_buffer = [];
 
     this.last_notification_id = ko.observable(undefined);
+    this.last_notification_timestamp = ko.observable();
 
     amplify.subscribe(z.event.WebApp.CONNECTION.ONLINE, this.recover_from_notification_stream.bind(this));
     amplify.subscribe(z.event.WebApp.EVENT.INJECT, this.inject_event.bind(this));
@@ -267,14 +268,10 @@ z.event.EventRepository = class EventRepository {
         }
 
         this.logger.warn('Last notification ID not found in database. Resetting...');
-        return this.notification_service.get_notifications_last()
-          .then(({id: notification_id}) => {
-            if (notification_id) {
-              this._update_last_notification_id(notification_id);
-              amplify.publish(z.event.WebApp.CONVERSATION.MISSED_EVENTS);
-              return this.last_notification_id();
-            }
-            throw error;
+        return this.initialize_last_notification_id(this.current_client().id)
+          .then(() => {
+            amplify.publish(z.event.WebApp.CONVERSATION.MISSED_EVENTS);
+            return this.last_notification_id();
           });
       });
   }
@@ -286,9 +283,12 @@ z.event.EventRepository = class EventRepository {
    */
   initialize_last_notification_id(client_id) {
     return this.notification_service.get_notifications_last(client_id)
-      .then((response) => {
-        this._update_last_notification_id(response.id);
-        this.logger.info(`Set starting point on notification stream to '${this.last_notification_id()}'`);
+      .then(({id: notification_id}) => {
+        if (notification_id) {
+          this._update_last_notification_id(notification_id);
+          this.logger.info(`Set starting point on notification stream to '${this.last_notification_id()}'`);
+          return this.last_notification_id();
+        }
       });
   }
 
@@ -391,13 +391,14 @@ z.event.EventRepository = class EventRepository {
    * Persist updated last notification ID.
    *
    * @private
-   * @param {string} last_notification_id - Updated last notification ID
+   * @param {string} notification_id - Updated last notification ID
+   * @param {number} [notification_timestamp=0] - Updated last notification timestamp
    * @returns {undefined} No return value
    */
-  _update_last_notification_id(last_notification_id) {
-    if (last_notification_id) {
-      this.last_notification_id(last_notification_id);
-      this.notification_service.save_last_notification_id_to_db(last_notification_id);
+  _update_last_notification_id(notification_id) {
+    if (notification_id) {
+      this.last_notification_id(notification_id);
+      this.notification_service.save_last_notification_id_to_db(notification_id);
     }
   }
 

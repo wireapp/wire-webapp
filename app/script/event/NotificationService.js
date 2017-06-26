@@ -25,6 +25,7 @@ window.z.event = z.event || {};
 z.event.NotificationService = class NotificationService {
   static get CONFIG() {
     return {
+      PRIMARY_KEY_LAST_EVENT: 'z.storage.StorageKey.EVENT.LAST_TIMESTAMP',
       PRIMARY_KEY_LAST_NOTIFICATION: 'z.storage.StorageKey.NOTIFICATION.LAST_ID',
       URL_NOTIFICATIONS: '/notifications',
       URL_NOTIFICATIONS_LAST: '/notifications/last',
@@ -81,7 +82,7 @@ z.event.NotificationService = class NotificationService {
   }
 
   /**
-   * Load last notifications id from storage.
+   * Load last notifications status from storage.
    * @returns {Promise} Resolves with the stored last notification ID.
    */
   get_last_notification_id_from_db() {
@@ -96,6 +97,15 @@ z.event.NotificationService = class NotificationService {
         }
         throw new z.event.EventError(z.event.EventError.TYPE.NO_LAST_ID);
       });
+  }
+
+  /**
+   * Save last notifications id from storage.
+   * @param {number} event_timestamp - Event timestamp to be stored
+   * @returns {Promise} Resolves with the stored record
+   */
+  save_last_event_timestamp_to_db(event_timestamp) {
+    return this.storage_service.save(z.storage.StorageService.OBJECT_STORE.AMPLIFY, NotificationService.CONFIG.PRIMARY_KEY_LAST_EVENT, {value: event_timestamp});
   }
 
   /**
