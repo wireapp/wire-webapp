@@ -99,11 +99,19 @@ user-input {
   &::placeholder {
     &:invalid {
       color: fade(#fff, 40%);
+
+      .user-list-light & {
+        color: fade(@graphite-dark, 40%);
+      }
     }
     .label-xs();
     color: fade(#fff, 40%);
     text-align: center;
     margin-left: -24px;
+
+    .user-list-light & {
+      color: fade(@graphite-dark, 40%);
+    }
   }
 }
 
