@@ -370,7 +370,7 @@ z.conversation.EventMapper = class EventMapper {
    * @returns {DecryptErrorMessage} Decrypt error message entity
    */
   _map_event_unable_to_decrypt(error) {
-    const {error_code: error_code, type: error_type} = error;
+    const {error_code: error_code} = error;
     const message_et = new z.entity.DecryptErrorMessage();
 
     if (error_code) {
