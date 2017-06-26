@@ -30,7 +30,6 @@ z.components.UserListInputViewModel = class UserListInputViewModel {
     this.selected = params.selected || ko.observableArray([]);
     this.placeholder = params.placeholder;
     this.on_enter = params.enter;
-    this.on_close = params.close;
 
     this.element = component_info.element;
     this.input_element = $(this.element).find('.search-input');
@@ -69,16 +68,13 @@ ko.components.register('user-input', {
   template: `
     <div class="search-outer">
       <div class="search-inner-wrap">
-        <div class="search-inner" data-bind="css: {'search-inner-has-close': on_close}">
+        <div class="search-inner"">
           <div class="search-icon icon-search"></div>
           <!-- ko foreach: selected -->
             <span data-bind="text: first_name()"></span>
           <!-- /ko -->
           <input type="text" style="display:none" /> <!-- prevent chrome from autocomplete -->
           <input autocomplete="off" maxlength="128" required spellcheck="false" class="search-input" type="text" data-bind="textInput: input, hasFocus: true, attr: {placeholder: placeholder}, css: {'search-input-show-placeholder': placeholder}, event: {keydown: on_key_press}, enter: on_enter" data-uie-name="enter-users">
-          <!-- ko if: on_close -->
-            <div class="search-close icon-close icon-button" data-bind="click: on_close, l10n_tooltip: z.string.tooltip_search_close" data-uie-name="do-close"></div>
-          <!-- /ko -->
         </div>
       </div>
     </div>

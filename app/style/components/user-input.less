@@ -26,7 +26,8 @@ user-input {
   border-radius: 4px;
 
   &.user-list-light {
-    color: #222;
+    background: fade(@w-gray, 16%);
+    color: @graphite-dark;
   }
 }
 
@@ -104,12 +105,6 @@ user-input {
     text-align: center;
     margin-left: -24px;
   }
-
-  .user-list-light & {
-    &::placeholder {
-      color: fade(#222, 48%);
-    }
-  }
 }
 
 .search-icon {
@@ -120,10 +115,4 @@ user-input {
 
 .search-input-show-placeholder {
   margin-left: -41px;
-}
-
-.search-close {
-  position: absolute;
-  top: 8px;
-  right: 8px;
 }

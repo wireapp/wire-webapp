@@ -166,7 +166,14 @@
 }
 
 .participants-search-header {
+  display: flex;
+  align-items: flex-start;
   padding: 16px 8px;
+}
+
+.participants-search-header-close {
+  height: 32px;
+  margin-left: 7px;
 }
 
 .participants-search-content {
@@ -180,8 +187,9 @@
   border-radius: 0;
   display: flex;
   flex: 0 0 auto;
-  line-height: @conversation-input-min-height;
-  height: @conversation-input-min-height;
+  line-height: 16px;
+  height: 48px;
+  padding: 16px;
 }
 
 .participants-search-icon {
