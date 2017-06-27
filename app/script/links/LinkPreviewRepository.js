@@ -46,7 +46,7 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
    * @returns {Promise} Resolves with link preview proto message
    */
   get_link_preview_from_string(string) {
-    if (this.should_send_previews && z.util.Environment.electron) {
+    if (this.should_send_previews && z.util.Environment.desktop) {
       return Promise.resolve()
         .then(() => {
           const data = z.links.LinkPreviewHelpers.get_first_link_with_offset(string);

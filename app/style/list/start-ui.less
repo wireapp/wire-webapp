@@ -31,8 +31,7 @@
 }
 
 .start-ui-header {
-  margin-left: 24px;
-  margin-right: 24px;
+  padding: 8px;
   border-bottom: 1px solid fade(#fff, 16%) !important;
 }
 
@@ -53,6 +52,7 @@
   transition-property: height;
   transition-timing-function: @ease-out-expo;
   transition-duration: @animation-timing-fast;
+  margin-top: 8px;
 
   .button {
     padding-left: 8px;
@@ -62,7 +62,7 @@
 
   &.start-ui-header-actions-visible {
     transition-duration: @animation-timing-slow;
-    height: 44px;
+    height: 28px;
   }
 }
 
@@ -129,18 +129,17 @@
 }
 
 .start-ui-import {
+  .accent-background-color();
   align-items: center;
-  border-top: 1px solid fade(#fff, 16%);
+  cursor: pointer;
   display: flex;
   flex: 0 0 auto;
-  justify-content: center;
   line-height: @conversation-input-min-height;
   height: @conversation-input-min-height;
+}
 
-  > span {
-    cursor: pointer;
-    line-height: 32px;
-  }
+.start-ui-import-icon {
+  margin: 0 16px;
 }
 
 .start-ui-user-bubble {

@@ -215,7 +215,7 @@ window.z.ui = z.ui || {};
   }
 
   function get_shortcut(shortcut_name) {
-    const platform = z.util.Environment.electron ? 'electron' : 'webapp';
+    const platform = z.util.Environment.desktop ? 'electron' : 'webapp';
     const platform_shortcuts = shortcut_map[shortcut_name].shortcut[platform];
     return z.util.Environment.os.mac ? platform_shortcuts.macos : platform_shortcuts.pc;
   }
@@ -233,7 +233,7 @@ window.z.ui = z.ui || {};
   function _init() {
     for (const shortcut in shortcut_map) {
       const data = shortcut_map[shortcut];
-      if (z.util.Environment.electron && shortcut_map[shortcut].shortcut.electron.menu) {
+      if (z.util.Environment.desktop && shortcut_map[shortcut].shortcut.electron.menu) {
         continue;
       }
       _register_event(get_shortcut(shortcut), data['event']);

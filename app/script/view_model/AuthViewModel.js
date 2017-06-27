@@ -110,6 +110,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     });
 
     this.registration_context = z.auth.AuthView.REGISTRATION_CONTEXT.EMAIL;
+    this.invite_code = undefined;
     this.invite_info = undefined;
 
     this.code_digits = ko.observableArray([
@@ -307,10 +308,11 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       return this.registration_context = z.auth.AuthView.REGISTRATION_CONTEXT.GENERIC_INVITE;
     }
 
-    const invite = z.util.get_url_parameter(z.auth.URLParameter.INVITE);
-    if (invite) {
+    const invite_code = z.util.get_url_parameter(z.auth.URLParameter.INVITE);
+    if (invite_code) {
       this.get_wire(true);
-      return this.register_from_invite(invite);
+      this.invite_code = invite_code;
+      return this.register_from_invite(invite_code);
     }
 
     const is_expired = z.util.get_url_parameter(z.auth.URLParameter.EXPIRED);
@@ -351,20 +353,25 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
    * @returns {Promise} Resolves when page is the first tab
    */
   _check_single_instance(set_check_interval = true) {
-    if (Cookies.get(z.main.App.CONFIG.COOKIE_NAME)) {
-      this._handle_blocked_tabs(set_check_interval);
-      return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.MULTIPLE_TABS));
+    if (!z.util.Environment.electron) {
+      if (Cookies.get(z.main.App.CONFIG.TABS_CHECK.COOKIE_NAME)) {
+        this._handle_blocked_tabs(set_check_interval);
+        return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.MULTIPLE_TABS));
+      }
+
+      if (set_check_interval) {
+        this._set_tabs_check_interval();
+      }
     }
 
-    if (set_check_interval) {
-      this._set_tabs_check_interval();
-    }
     return Promise.resolve();
   }
 
   _clear_tabs_check_interval() {
-    window.clearInterval(this.tabs_check_interval_id);
-    this.tabs_check_interval_id = undefined;
+    if (this.tabs_check_interval_id) {
+      window.clearInterval(this.tabs_check_interval_id);
+      this.tabs_check_interval_id = undefined;
+    }
   }
 
   _handle_blocked_tabs(set_check_interval) {
@@ -395,6 +402,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
           this._handle_blocked_tabs();
         });
     }, 500);
+    $(window).on('unload', () => this._clear_tabs_check_interval());
   }
 
   _set_tabs_recheck_interval() {
@@ -426,19 +434,19 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
   // Invitation Stuff
   //##############################################################################
 
-  register_from_invite(invite) {
-    this.auth.repository.retrieve_invite(invite)
+  register_from_invite(invite_code) {
+    this.auth.repository.retrieve_invite(invite_code)
       .then((invite_info) => {
         this.registration_context = z.auth.AuthView.REGISTRATION_CONTEXT.PERSONAL_INVITE;
         this.name(invite_info.name);
         if (invite_info.email) {
-          this.username(invite_info.email);
           this.invite_info = invite_info;
+          this.username(invite_info.email);
         }
       })
       .catch(function(error) {
         if (error.label !== z.service.BackendClientError.LABEL.INVALID_INVITATION_CODE) {
-          return Raygun.send(new Error('Invitation not found'), {error: error, invite_code: invite});
+          Raygun.send(new Error('Invitation not found'), {error: error, invite_code: invite_code});
         }
       })
       .then(() => {
@@ -525,6 +533,9 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
               case z.service.BackendClientError.LABEL.PENDING_LOGIN:
                 _on_code_request_success(error);
                 break;
+              case z.service.BackendClientError.LABEL.PHONE_BUDGET_EXHAUSTED:
+                this._add_error(z.string.auth_error_phone_number_budget, z.auth.AuthView.TYPE.PHONE);
+                break;
               case z.service.BackendClientError.LABEL.UNAUTHORIZED:
                 this._add_error(z.string.auth_error_phone_number_forbidden, z.auth.AuthView.TYPE.PHONE);
                 break;
@@ -582,7 +593,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
       this.user_service.change_own_password(this.password())
         .catch((error) => {
-          this.logger.warn('Could not change user password', error);
+          this.logger.warn(`Could not change user password: ${error.message}`, error);
           if (error.code !== z.service.BackendClientError.STATUS_CODE.FORBIDDEN) {
             throw error;
           }
@@ -594,6 +605,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
           this._set_hash(z.auth.AuthView.MODE.POSTED_VERIFY);
         })
         .catch((error) => {
+          this.logger.warn(`Could not verify account: ${error.message}`, error);
+
           this.pending_server_request(false);
           if (error) {
             switch (error.label) {
@@ -726,7 +739,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
         };
 
         if (mode === z.auth.AuthView.MODE.ACCOUNT_INVITE) {
-          payload.invitation_code = this.invite_info.id;
+          payload.invitation_code = this.invite_code;
         }
 
         break;

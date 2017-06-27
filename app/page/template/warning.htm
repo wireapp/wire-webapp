@@ -89,13 +89,13 @@
             <div class="warning-bar-message"><span data-bind="l10n_text: {'id': z.string.warning_call_unsupported_incoming, substitute: z.util.escape_html(first_name())}"></span>&nbsp;<a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="l10n_href: z.string.url_support_calling, l10n_text: z.string.warning_learn_more"></a></div>
           <!-- /ko -->
           <!-- ko if: z.util.Environment.browser.chrome -->
-            <!-- ko if: z.util.Environment.electron -->
+            <!-- ko if: z.util.Environment.desktop -->
               <div class="warning-bar-message">
                 <span data-bind="l10n_text: z.string.warning_call_issues"></span>&nbsp;
                 <a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="l10n_href: z.string.url_wire_for_web, l10n_text: z.string.wire_for_web"></a>
               </div>
             <!-- /ko -->
-            <!-- ko ifnot: z.util.Environment.electron -->
+            <!-- ko ifnot: z.util.Environment.desktop -->
               <div class="warning-bar-message"><span data-bind="l10n_text: z.string.warning_call_upgrade_browser"></span></div>
             <!-- /ko -->
           <!-- /ko -->
@@ -112,13 +112,13 @@
             </div>
           <!-- /ko -->
           <!-- ko if: z.util.Environment.browser.chrome -->
-            <!-- ko if: z.util.Environment.electron -->
+            <!-- ko if: z.util.Environment.desktop -->
               <div class="warning-bar-message">
                 <span data-bind="l10n_text: z.string.warning_call_issues"></span>&nbsp;
                 <a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="l10n_href: z.string.url_wire_for_web, l10n_text: z.string.wire_for_web"></a>
               </div>
             <!-- /ko -->
-            <!-- ko ifnot: z.util.Environment.electron -->
+            <!-- ko ifnot: z.util.Environment.desktop -->
               <div class="warning-bar-message"><span data-bind="l10n_text: z.string.warning_call_upgrade_browser"></span></div>
             <!-- /ko -->
           <!-- /ko -->

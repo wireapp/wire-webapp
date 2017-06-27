@@ -58,7 +58,7 @@
         <div class="preferences-link text-theme" data-bind="click: click_on_delete_account, l10n_text: z.string.preferences_account_delete" data-uie-name="go-delete-account"></div>
       </section>
 
-      <!-- ko ifnot: z.util.Environment.electron -->
+      <!-- ko ifnot: z.util.Environment.desktop -->
         <section class="preferences-section">
           <div class="preferences-link text-theme" data-bind="click: click_on_logout, l10n_text: z.string.preferences_account_log_out" data-uie-name="do-logout"></div>
         </section>

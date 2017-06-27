@@ -63,7 +63,8 @@ z.calling.entities.Flow = class Flow {
     this.remote_client_id = undefined;
     this.remote_user = this.participant_et.user;
     this.remote_user_id = this.remote_user.id;
-    this.self_user_id = this.call_et.self_user_id;
+    this.self_user = this.call_et.self_user;
+    this.self_user_id = this.self_user.id;
 
     // Telemetry
     this.telemetry = new z.telemetry.calling.FlowTelemetry(this.id, this.remote_user_id, this.call_et, timings);
@@ -915,7 +916,7 @@ z.calling.entities.Flow = class Flow {
    */
   _create_additional_payload() {
     const payload = z.calling.CallMessageBuilder.create_payload(this.id, this.self_user_id, this.remote_user_id, this.remote_client_id);
-    const additional_payload = $.extend({remote_user: this.remote_user, sdp: this.local_sdp().sdp}, payload);
+    const additional_payload = Object.assign({remote_user: this.remote_user, sdp: this.local_sdp().sdp}, payload);
 
     return z.calling.CallMessageBuilder.create_payload_prop_sync(this.call_et.self_state, this.call_et.self_state.video_send(), false, additional_payload);
   }
@@ -1048,7 +1049,10 @@ z.calling.entities.Flow = class Flow {
    * @returns {boolean} False if we locally needed to switch sides
    */
   _solve_colliding_states(force_renegotiation = false) {
-    if (this.self_user_id < this.remote_user_id || force_renegotiation) {
+    this.logger.debug(`Solving state collision: Self user ID '${this.self_user_id}', remote user ID '${this.remote_user_id}', force_renegotiation '${force_renegotiation}'`);
+
+    const self_user_id_looses = this.self_user_id < this.remote_user_id;
+    if (self_user_id_looses || force_renegotiation) {
       this.logger.warn(`We need to switch SDP state of flow with '${this.remote_user.name()}' to answer.`);
 
       this.restart_negotiation(z.calling.enum.SDP_NEGOTIATION_MODE.STATE_COLLISION, true);

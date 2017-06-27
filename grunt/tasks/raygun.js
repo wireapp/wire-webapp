@@ -27,7 +27,7 @@ const fs = require('fs');
 const request = require('request');
 
 module.exports = (grunt) => {
-  grunt.registerTask('raygun', (env = 'staging') => {
+  grunt.registerTask('raygun', function(env = 'staging') {
     const done = this.async();
 
     const options = {

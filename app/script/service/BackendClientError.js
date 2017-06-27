@@ -56,6 +56,7 @@ z.service.BackendClientError = class BackendClientError extends Error {
       PASSWORD_EXISTS: 'password-exists',
       PENDING_ACTIVATION: 'pending-activation',
       PENDING_LOGIN: 'pending-login',
+      PHONE_BUDGET_EXHAUSTED: 'phone-budget-exhausted',
       TOO_MANY_CLIENTS: 'too-many-clients',
       TOO_MANY_MEMBERS: 'too-many-members',
       UNAUTHORIZED: 'unauthorized',
