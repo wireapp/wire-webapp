@@ -366,11 +366,10 @@ z.conversation.EventMapper = class EventMapper {
    * Maps JSON data of local decrypt errors to message entity
    *
    * @private
-   * @param {Object} error - Error data received as JSON
+   * @param {Object} error_code - Error data received as JSON
    * @returns {DecryptErrorMessage} Decrypt error message entity
    */
-  _map_event_unable_to_decrypt(error) {
-    const {error_code: error_code} = error;
+  _map_event_unable_to_decrypt({error_code}) {
     const message_et = new z.entity.DecryptErrorMessage();
 
     if (error_code) {
