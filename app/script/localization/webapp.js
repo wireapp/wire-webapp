@@ -358,7 +358,7 @@ z.string.extensions_giphy_random = 'Random';
 // People View
 z.string.search_open = 'Open';
 z.string.search_open_group = 'Create Group';
-z.string.people_confirm_label = 'Add to conversation';
+z.string.people_confirm_label = 'Add people to group';
 z.string.people_people = '{{number}} People';
 z.string.people_search_placeholder = 'Search by name';
 z.string.people_everyone_participates = 'Everyone you’re\nconnected to is already in\nthis conversation.';
