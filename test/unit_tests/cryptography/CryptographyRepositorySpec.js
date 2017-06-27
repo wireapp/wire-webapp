@@ -119,7 +119,7 @@ describe('z.cryptography.CryptographyRepository', function() {
 
       TestFactory.cryptography_repository.handle_encrypted_event(event)
         .then((mapped_event) => {
-          expect(mapped_event.type).toBe(z.event.Client.CONVERSATION.MESSAGE_TOO_BIG);
+          expect(mapped_event.type).toBe(z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG);
           done();
         })
         .catch(done.fail);
