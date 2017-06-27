@@ -137,7 +137,7 @@ z.calling.CallingRepository = class CallingRepository {
    * Handle incoming calling events from backend.
    *
    * @param {Object} event - Event payload
-   * @param {z.event.EventRepository.NOTIFICATION_SOURCE} source - Source of event
+   * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
   on_event(event, source) {
@@ -152,7 +152,7 @@ z.calling.CallingRepository = class CallingRepository {
       if (z.calling.CallingRepository.supports_calling) {
         return this._on_event_in_supported_browsers(call_message_et, source);
       }
-      this._on_event_in_unsupported_browsers(call_message_et);
+      this._on_event_in_unsupported_browsers(call_message_et, source);
     }
   }
 
@@ -161,7 +161,7 @@ z.calling.CallingRepository = class CallingRepository {
    *
    * @private
    * @param {CallMessage} call_message_et - Mapped incoming call message entity
-   * @param {z.event.EventRepository.NOTIFICATION_SOURCE} source - Source of notification
+   * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
   _on_event_in_supported_browsers(call_message_et, source) {
@@ -173,7 +173,7 @@ z.calling.CallingRepository = class CallingRepository {
       .then(() => {
         switch (type) {
           case z.calling.enum.CALL_MESSAGE_TYPE.CANCEL:
-            this._on_cancel(call_message_et);
+            this._on_cancel(call_message_et, source);
             break;
           case z.calling.enum.CALL_MESSAGE_TYPE.GROUP_CHECK:
             this._on_group_check(call_message_et, source);
@@ -213,15 +213,16 @@ z.calling.CallingRepository = class CallingRepository {
    *
    * @private
    * @param {CallMessage} call_message_et - Mapped incoming call message entity
+   * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
-  _on_event_in_unsupported_browsers(call_message_et) {
+  _on_event_in_unsupported_browsers(call_message_et, source) {
     const {conversation_id, response, type, user_id} = call_message_et;
 
     if (!response) {
       switch (type) {
         case z.calling.enum.CALL_MESSAGE_TYPE.SETUP: {
-          this.inject_activate_event(call_message_et);
+          this.inject_activate_event(call_message_et, source);
           this.user_repository.get_user_by_id(user_id)
             .then((user_et) => {
               amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.UNSUPPORTED_INCOMING_CALL, {
@@ -249,9 +250,10 @@ z.calling.CallingRepository = class CallingRepository {
    *
    * @private
    * @param {CallMessage} call_message_et - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.CANCEL
+   * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
-  _on_cancel(call_message_et) {
+  _on_cancel(call_message_et, source) {
     const {client_id, conversation_id, response, user_id} = call_message_et;
 
     if (!response) {
@@ -261,7 +263,7 @@ z.calling.CallingRepository = class CallingRepository {
         .then((call_et) => call_et.deactivate_call(call_message_et, z.calling.enum.TERMINATION_REASON.OTHER_USER))
         .catch((error) => {
           if (error.type !== z.calling.CallError.TYPE.NOT_FOUND) {
-            this.inject_deactivate_event(call_message_et);
+            this.inject_deactivate_event(call_message_et, source);
             throw error;
           }
         });
@@ -273,7 +275,7 @@ z.calling.CallingRepository = class CallingRepository {
    *
    * @private
    * @param {CallMessage} call_message_et - call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.GROUP_CHECK
-   * @param {z.event.EventRepository.NOTIFICATION_SOURCE} source - Source of event
+   * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
   _on_group_check(call_message_et, source) {
@@ -351,7 +353,7 @@ z.calling.CallingRepository = class CallingRepository {
    *
    * @private
    * @param {CallMessage} call_message_et - call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.GROUP_START
-   * @param {z.event.EventRepository.NOTIFICATION_SOURCE} source - Source of event
+   * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
   _on_group_start(call_message_et, source) {
@@ -363,6 +365,7 @@ z.calling.CallingRepository = class CallingRepository {
 
         if (user_id === this.self_user_id()) {
           call_et.self_user_joined(true);
+          call_et.self_was_joined = true;
           return call_et.state(z.calling.enum.CALL_STATE.REJECTED);
         }
 
@@ -454,7 +457,7 @@ z.calling.CallingRepository = class CallingRepository {
    *
    * @private
    * @param {CallMessage} call_message_et - call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
-   * @param {z.event.EventRepository.NOTIFICATION_SOURCE} source - Source of event
+   * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
   _on_setup(call_message_et, source) {
@@ -1018,7 +1021,7 @@ z.calling.CallingRepository = class CallingRepository {
    *
    * @private
    * @param {CallMessage} call_message_et - call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
-   * @param {z.event.EventRepository.NOTIFICATION_SOURCE} source - Source of event
+   * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @param {boolean} [silent=false] - Start call in rejected mode
    * @returns {Promise} Resolves with the new call entity
    */
@@ -1043,8 +1046,8 @@ z.calling.CallingRepository = class CallingRepository {
             return call_et.add_participant(remote_user_et, call_message_et, false)
               .then(() => {
                 this.telemetry.track_event(z.tracking.EventName.CALLING.RECEIVED_CALL, call_et);
-                this.inject_activate_event(call_message_et);
-                if (call_et.is_remote_video_send() && source === z.event.EventRepository.NOTIFICATION_SOURCE.WEB_SOCKET) {
+                this.inject_activate_event(call_message_et, source);
+                if (call_et.is_remote_video_send() && source === z.event.EventRepository.SOURCE.WEB_SOCKET) {
                   this.media_stream_handler.initiate_media_stream(call_et.id, true);
                 }
               });
@@ -1090,23 +1093,25 @@ z.calling.CallingRepository = class CallingRepository {
   /**
    * Inject a call activate event.
    * @param {CallMessage} call_message_et - call message to create event from
+   * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
-  inject_activate_event(call_message_et) {
+  inject_activate_event(call_message_et, source) {
     const activate_event = z.conversation.EventBuilder.build_voice_channel_activate(call_message_et);
-    amplify.publish(z.event.WebApp.EVENT.INJECT, activate_event);
+    amplify.publish(z.event.WebApp.EVENT.INJECT, activate_event, source);
   }
 
   /**
    * Inject a call deactivate event.
    * @param {CallMessage} call_message_et - Call message to create event from
-   * @param {z.entity.User} creating_user_et - User that created call
-   * @param {z.calling.enum.TERMINATION_REASON} reason - Reason for call to end
+   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @param {z.entity.User} [creating_user_et] - User that created call
+   * @param {z.calling.enum.TERMINATION_REASON} [reason] - Reason for call to end
    * @returns {undefined} No return value
    */
-  inject_deactivate_event(call_message_et, creating_user_et, reason) {
+  inject_deactivate_event(call_message_et, source, creating_user_et, reason) {
     const deactivate_event = z.conversation.EventBuilder.build_voice_channel_deactivate(call_message_et, creating_user_et, reason);
-    amplify.publish(z.event.WebApp.EVENT.INJECT, deactivate_event);
+    amplify.publish(z.event.WebApp.EVENT.INJECT, deactivate_event, source);
   }
 
 

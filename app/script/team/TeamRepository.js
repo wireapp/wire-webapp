@@ -110,10 +110,10 @@ z.team.TeamRepository = class TeamRepository {
    * Listener for incoming team events.
    *
    * @param {Object} event_json - JSON data for team event
-   * @param {z.event.EventRepository.NOTIFICATION_SOURCE} source - Source of event
+   * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {Promise} Resolves when event was handled
    */
-  on_team_event(event_json, source = z.event.EventRepository.NOTIFICATION_SOURCE.STREAM) {
+  on_team_event(event_json, source = z.event.EventRepository.SOURCE.STREAM) {
     const type = event_json.type;
 
     this.logger.info(`»» Event: '${type}'`, {event_json: JSON.stringify(event_json), event_object: event_json});

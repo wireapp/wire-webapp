@@ -938,8 +938,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
   add_bot(conversation_et, provider_id, service_id) {
     return this.conversation_service.post_bots(conversation_et.id, provider_id, service_id)
       .then((response) => {
-        amplify.publish(z.event.WebApp.EVENT.INJECT, response.event);
-        this.logger.debug(`Successfully added bot to conversation '${conversation_et.display_name()}'`, response);
+        if (response && response.event) {
+          amplify.publish(z.event.WebApp.EVENT.INJECT, response.event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+          this.logger.debug(`Successfully added bot to conversation '${conversation_et.display_name()}'`, response);
+        }
       });
   }
 
@@ -952,8 +954,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   add_members(conversation_et, user_ids) {
     return this.conversation_service.post_members(conversation_et.id, user_ids)
-      .then((response) => amplify.publish(z.event.WebApp.EVENT.INJECT, response))
-      .catch(function(error_response) {
+      .then((response) => amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE))
+      .catch((error_response) => {
         if (error_response.label === z.service.BackendClientError.LABEL.TOO_MANY_MEMBERS) {
           amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.TOO_MANY_MEMBERS, {
             data: {
@@ -1024,7 +1026,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.conversation_service.delete_members(conversation_et.id, this.user_repository.self().id)
       .then((response) => {
         if (handle_response) {
-          amplify.publish(z.event.WebApp.EVENT.INJECT, response);
+          amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
           return this._on_member_leave(conversation_et, response)
             .then(() => {
               return this.archive_conversation(conversation_et, next_conversation_et);
@@ -1044,7 +1046,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.conversation_service.delete_bots(conversation_et.id, bot_user_id)
       .then(function(response) {
         if (response) {
-          amplify.publish(z.event.WebApp.EVENT.INJECT, response);
+          amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
           return response;
         }
       });
@@ -1061,7 +1063,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.conversation_service.delete_members(conversation_et.id, user_id)
       .then(function(response) {
         if (response) {
-          amplify.publish(z.event.WebApp.EVENT.INJECT, response);
+          amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
           return response;
         }
       });
@@ -1093,7 +1095,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.conversation_service.update_conversation_properties(conversation_et.id, name)
       .then((response) => {
         if (response) {
-          amplify.publish(z.event.WebApp.EVENT.INJECT, response);
+          amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
           return response;
         }
       });
@@ -1151,7 +1153,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         if (user_id) {
           if (conversation_et.participating_user_ids().includes(user_id)) {
             const member_leave_event = z.conversation.EventBuilder.build_team_member_leave(conversation_et, user_id);
-            amplify.publish(z.event.WebApp.EVENT.INJECT, member_leave_event, false);
+            amplify.publish(z.event.WebApp.EVENT.INJECT, member_leave_event);
           }
         } else {
           conversation_et.status(z.conversation.ConversationStatus.PAST_MEMBER);
@@ -1859,7 +1861,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.OUTGOING_PING);
         }
 
-        this.on_conversation_event(saved_event, z.event.EventRepository.NOTIFICATION_SOURCE.INJECTED);
+        this.on_conversation_event(saved_event, z.event.EventRepository.SOURCE.INJECTED);
 
         return this.send_generic_message_to_conversation(conversation_et.id, generic_message)
           .then((payload) => {
@@ -2389,10 +2391,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Listener for incoming events.
    *
    * @param {Object} event_json - JSON data for event
-   * @param {z.event.EventRepository.NOTIFICATION_SOURCE} source - Source of event
+   * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {Promise} Resolves when event was handled
    */
-  on_conversation_event(event_json, source = z.event.EventRepository.NOTIFICATION_SOURCE.STREAM) {
+  on_conversation_event(event_json, source = z.event.EventRepository.SOURCE.STREAM) {
     if (!event_json) {
       return Promise.reject(new Error('Conversation Repository Event Handling: Event missing'));
     }
@@ -2453,12 +2455,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
         if (_.isObject(return_value)) {
           const {conversation_et, message_et} = return_value;
 
-          const event_from_stream = source === z.event.EventRepository.NOTIFICATION_SOURCE.STREAM;
+          const event_from_stream = source === z.event.EventRepository.SOURCE.STREAM;
           if (message_et && !event_from_stream && !this.block_event_handling) {
             amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et);
           }
 
-          const event_from_web_socket = source === z.event.EventRepository.NOTIFICATION_SOURCE.WEB_SOCKET;
+          const event_from_web_socket = source === z.event.EventRepository.SOURCE.WEB_SOCKET;
           if (conversation_et && event_from_web_socket) {
             // Un-archive it also on the backend side
             if (previously_archived && !conversation_et.is_archived()) {
@@ -2477,13 +2479,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
   on_missed_events() {
     this.filtered_conversations()
       .filter((conversation_et) => !conversation_et.removed_from_conversation())
-      .forEach((conversation_et) => amplify.publish(z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_missed(conversation_et, this.user_repository.self())));
+      .forEach((conversation_et) => {
+        const missed_event = z.conversation.EventBuilder.build_missed(conversation_et, this.user_repository.self());
+        amplify.publish(z.event.WebApp.EVENT.INJECT, missed_event);
+      });
   }
 
   /**
    * Push to receiving queue.
    * @param {Object} event_json - JSON data for event
-   * @param {z.event.EventRepository.NOTIFICATION_SOURCE} source - Source of event
+   * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
   push_to_receiving_queue(event_json, source) {
@@ -3198,7 +3203,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   _add_delete_message(conversation_id, message_id, time, message_et) {
-    amplify.publish(z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_delete(conversation_id, message_id, time, message_et));
+    const delete_event = z.conversation.EventBuilder.build_delete(conversation_id, message_id, time, message_et);
+    amplify.publish(z.event.WebApp.EVENT.INJECT, delete_event);
   }
 
 

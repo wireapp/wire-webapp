@@ -28,28 +28,31 @@ z.event.EventError = class EventError extends Error {
 
     this.name = this.constructor.name;
     this.stack = (new Error()).stack;
-    this.type = type || z.event.EventError.TYPE.UNKNOWN;
+    this.type = type || EventError.TYPE.UNKNOWN;
 
     switch (this.type) {
-      case z.event.EventError.TYPE.DATABASE_FAILURE:
+      case EventError.TYPE.DATABASE_FAILURE:
         this.message = 'Event related database transaction failure';
         break;
-      case z.event.EventError.TYPE.DEPRECATED_SCHEMA:
+      case EventError.TYPE.DEPRECATED_SCHEMA:
         this.message = 'Event type is deprecated';
         break;
-      case z.event.EventError.TYPE.NO_CLIENT_ID:
+      case EventError.TYPE.NO_CLIENT_ID:
         this.message = 'Missing client id';
         break;
-      case z.event.EventError.TYPE.NO_LAST_ID:
+      case EventError.TYPE.NO_LAST_DATE:
+        this.message = 'Last event date not found in storage';
+        break;
+      case EventError.TYPE.NO_LAST_ID:
         this.message = 'Last notification ID not found in storage';
         break;
-      case z.event.EventError.TYPE.NO_NOTIFICATIONS:
+      case EventError.TYPE.NO_NOTIFICATIONS:
         this.message = 'No notifications found';
         break;
-      case z.event.EventError.TYPE.OUTDATED_E_CALL_EVENT:
+      case EventError.TYPE.OUTDATED_E_CALL_EVENT:
         this.message = 'Ignoring outdated e-call event';
         break;
-      case z.event.EventError.TYPE.REQUEST_FAILURE:
+      case EventError.TYPE.REQUEST_FAILURE:
         this.message = 'Event related backend request failure';
         break;
       default:
@@ -63,6 +66,7 @@ z.event.EventError = class EventError extends Error {
       DATABASE_FAILURE: 'z.event.EventError.TYPE.DATABASE_FAILURE',
       DEPRECATED_SCHEMA: 'z.event.EventError.TYPE.DEPRECATED_SCHEMA',
       NO_CLIENT_ID: 'z.event.EventError.TYPE.NO_CLIENT_ID',
+      NO_LAST_DATE: 'z.event.EventError.TYPE.NO_LAST_DATE',
       NO_LAST_ID: 'z.event.EventError.TYPE.NO_LAST_ID',
       NO_NOTIFICATIONS: 'z.event.EventError.TYPE.NO_NOTIFICATIONS',
       OUTDATED_E_CALL_EVENT: 'z.event.EventError.OUTDATED_E_CALL_EVENT',
