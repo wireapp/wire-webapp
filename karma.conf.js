@@ -33,7 +33,7 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      // Do not write files or patterns here. Put them in grunt/config/karma.coffee
+      // Do not write files or patterns here. Put them in grunt/config/karma.js
     ],
 
     proxies: {},
@@ -67,12 +67,17 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: [process.env.TRAVIS ? 'Chrome_travis_ci' : 'Chrome'],
+    browsers: ['ChromeHeadless'],
 
     customLaunchers: {
-      Chrome_travis_ci: {
+      ChromeHeadless: {
         base: 'Chrome',
-        flags: ['--no-sandbox'],
+        flags: [
+          '--disable-gpu',
+          '--headless',
+          '--no-sandbox',
+          '--remote-debugging-port=9222',
+        ],
       },
     },
 

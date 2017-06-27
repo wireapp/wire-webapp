@@ -32,7 +32,6 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       },
       FORWARDED_URL_PARAMETERS: [
         z.auth.URLParameter.BOT,
-        z.auth.URLParameter.CALLING_V3,
         z.auth.URLParameter.ENVIRONMENT,
         z.auth.URLParameter.LOCALYTICS,
       ],
@@ -111,7 +110,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     });
 
     this.registration_context = z.auth.AuthView.REGISTRATION_CONTEXT.EMAIL;
-    this.prefilled_email = '';
+    this.invite_code = undefined;
+    this.invite_info = undefined;
 
     this.code_digits = ko.observableArray([
       ko.observable(''),
@@ -186,44 +186,20 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     this.can_verify_password = ko.pureComputed(() => !this.disabled_by_animation() && this.password().length);
 
     this.account_retry_text = ko.pureComputed(() => {
-      return z.localization.Localizer.get_text({
-        id: z.string.auth_posted_retry,
-        replace: {
-          content: this.username(),
-          placeholder: '%email',
-        },
-      });
+      return z.l10n.text(z.string.auth_posted_retry, this.username());
     });
 
     this.account_resend_text = ko.pureComputed(() => {
-      return z.localization.Localizer.get_text({
-        id: z.string.auth_posted_resend,
-        replace: {
-          content: this.username(),
-          placeholder: '%email',
-        },
-      });
+      return z.l10n.text(z.string.auth_posted_resend, this.username());
     });
 
     this.verify_code_text = ko.pureComputed(() => {
       const phone_number = PhoneFormat.formatNumberForMobileDialing('', this.phone_number_e164()) || this.phone_number_e164();
-      return z.localization.Localizer.get_text({
-        id: z.string.auth_verify_code_description,
-        replace: {
-          content: phone_number,
-          placeholder: '%@number',
-        },
-      });
+      return z.l10n.text(z.string.auth_verify_code_description, phone_number);
     });
 
     this.verify_code_timer_text = ko.pureComputed(() => {
-      return z.localization.Localizer.get_text({
-        id: z.string.auth_verify_code_resend_timer,
-        replace: {
-          content: this.code_expiration_in(),
-          placeholder: '%expiration',
-        },
-      });
+      return z.l10n.text(z.string.auth_verify_code_resend_timer, this.code_expiration_in());
     });
 
     this.visible_section = ko.observable(undefined);
@@ -239,6 +215,10 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       ];
       return login_modes.includes(this.account_mode());
     });
+
+    this.blocked_mode = ko.observable(undefined);
+    this.blocked_mode_database = ko.pureComputed(() => this.blocked_mode() === z.auth.AuthView.MODE.BLOCKED_DATABASE);
+    this.blocked_mode_tabs = ko.pureComputed(() => this.blocked_mode() === z.auth.AuthView.MODE.BLOCKED_TABS);
 
     this.posted_mode = ko.observable(undefined);
     this.posted_mode_offline = ko.pureComputed(() => this.posted_mode() === z.auth.AuthView.MODE.POSTED_OFFLINE);
@@ -259,6 +239,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     ko.applyBindings(this, document.getElementById(element_id));
 
     this.show_initial_animation = false;
+    this.tabs_check_interval_id = undefined;
+    this.tabs_check_hash = undefined;
 
     this._init_base();
     this._track_app_launch();
@@ -266,13 +248,12 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
   }
 
   _init_base() {
-    this._init_url_parameter();
-    this._init_url_hash();
-
     $(window)
       .on('dragover drop', () => false)
       .on('hashchange', this._on_hash_change.bind(this))
       .on('keydown', this.keydown_auth.bind(this));
+
+    this._init_page();
 
     // Select country based on location of user IP
     this.country_code((z.util.CountryCodes.get_country_code($('[name=geoip]').attr('country')) || 1).toString());
@@ -281,10 +262,25 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     this.audio_repository.init();
   }
 
+  _init_page() {
+    this._check_database()
+      .then(() => this._check_single_instance())
+      .then(() => {
+        this._init_url_parameter();
+        this._init_url_hash();
+      })
+      .catch((error) => {
+        if (!(error instanceof z.auth.AuthError)) {
+          throw error;
+        }
+      });
+  }
+
   _init_url_hash() {
     const modes_to_block = [
       z.auth.AuthView.MODE.HISTORY,
       z.auth.AuthView.MODE.LIMIT,
+      z.auth.AuthView.MODE.BLOCKED_TABS,
       z.auth.AuthView.MODE.POSTED,
       z.auth.AuthView.MODE.POSTED_PENDING,
       z.auth.AuthView.MODE.POSTED_RETRY,
@@ -312,10 +308,11 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       return this.registration_context = z.auth.AuthView.REGISTRATION_CONTEXT.GENERIC_INVITE;
     }
 
-    const invite = z.util.get_url_parameter(z.auth.URLParameter.INVITE);
-    if (invite) {
+    const invite_code = z.util.get_url_parameter(z.auth.URLParameter.INVITE);
+    if (invite_code) {
       this.get_wire(true);
-      return this.register_from_invite(invite);
+      this.invite_code = invite_code;
+      return this.register_from_invite(invite_code);
     }
 
     const is_expired = z.util.get_url_parameter(z.auth.URLParameter.EXPIRED);
@@ -326,22 +323,130 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
 
   //##############################################################################
+  // Private mode and & multiple tabs check
+  //##############################################################################
+
+  /**
+   * Check that we are not in unsupported private mode browser.
+   * @returns {Promise} Resolves when the database check has passed
+   */
+  _check_database() {
+    const current_hash = this._get_hash();
+
+    return z.util.check_indexed_db()
+      .then(() => {
+        if (current_hash === z.auth.AuthView.MODE.BLOCKED_DATABASE) {
+          this._set_hash();
+        }
+      })
+      .catch((error) => {
+        if (current_hash !== z.auth.AuthView.MODE.BLOCKED_DATABASE) {
+          this._set_hash(z.auth.AuthView.MODE.BLOCKED_DATABASE);
+          throw error;
+        }
+      });
+  }
+
+  /**
+   * Check that this is the single instance tab of the app.
+   * @param {boolean} [set_check_interval=true] - Set check interval
+   * @returns {Promise} Resolves when page is the first tab
+   */
+  _check_single_instance(set_check_interval = true) {
+    if (!z.util.Environment.electron) {
+      if (Cookies.get(z.main.App.CONFIG.TABS_CHECK.COOKIE_NAME)) {
+        this._handle_blocked_tabs(set_check_interval);
+        return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.MULTIPLE_TABS));
+      }
+
+      if (set_check_interval) {
+        this._set_tabs_check_interval();
+      }
+    }
+
+    return Promise.resolve();
+  }
+
+  _clear_tabs_check_interval() {
+    if (this.tabs_check_interval_id) {
+      window.clearInterval(this.tabs_check_interval_id);
+      this.tabs_check_interval_id = undefined;
+    }
+  }
+
+  _handle_blocked_tabs(set_check_interval) {
+    const current_hash = this._get_hash();
+    const is_blocked_tabs_hash = current_hash === z.auth.AuthView.MODE.BLOCKED_TABS;
+
+    if (!is_blocked_tabs_hash) {
+      if (!this.tabs_check_hash) {
+        this.tabs_check_hash = current_hash;
+        this._set_hash(z.auth.AuthView.MODE.BLOCKED_TABS);
+      }
+
+      if (set_check_interval) {
+        this._set_tabs_recheck_interval();
+      }
+    }
+  }
+
+  _set_tabs_check_interval() {
+    this._clear_tabs_check_interval();
+
+    this.tabs_check_interval_id = window.setInterval(() => {
+      this._check_single_instance()
+        .catch((error) => {
+          if (error.type !== z.auth.AuthError.TYPE.MULTIPLE_TABS) {
+            throw error;
+          }
+          this._handle_blocked_tabs();
+        });
+    }, 500);
+    $(window).on('unload', () => this._clear_tabs_check_interval());
+  }
+
+  _set_tabs_recheck_interval() {
+    this._clear_tabs_check_interval();
+
+    this.tabs_check_interval_id = window.setInterval(() => {
+      this._check_single_instance(false)
+        .then(() => {
+          this._set_tabs_check_interval();
+          this._init_url_parameter();
+
+          if (this.tabs_check_hash) {
+            this._set_hash(this.tabs_check_hash);
+            return this.tabs_check_hash = undefined;
+          }
+
+          this._init_url_hash();
+        })
+        .catch((error) => {
+          if (error.type !== z.auth.AuthError.TYPE.MULTIPLE_TABS) {
+            throw error;
+          }
+        });
+    }, 500);
+  }
+
+
+  //##############################################################################
   // Invitation Stuff
   //##############################################################################
 
-  register_from_invite(invite) {
-    this.auth.repository.retrieve_invite(invite)
+  register_from_invite(invite_code) {
+    this.auth.repository.retrieve_invite(invite_code)
       .then((invite_info) => {
         this.registration_context = z.auth.AuthView.REGISTRATION_CONTEXT.PERSONAL_INVITE;
         this.name(invite_info.name);
         if (invite_info.email) {
+          this.invite_info = invite_info;
           this.username(invite_info.email);
-          this.prefilled_email = invite_info.email;
         }
       })
       .catch(function(error) {
         if (error.label !== z.service.BackendClientError.LABEL.INVALID_INVITATION_CODE) {
-          return Raygun.send(new Error('Invitation not found'), {error: error, invite_code: invite});
+          Raygun.send(new Error('Invitation not found'), {error: error, invite_code: invite_code});
         }
       })
       .then(() => {
@@ -428,6 +533,9 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
               case z.service.BackendClientError.LABEL.PENDING_LOGIN:
                 _on_code_request_success(error);
                 break;
+              case z.service.BackendClientError.LABEL.PHONE_BUDGET_EXHAUSTED:
+                this._add_error(z.string.auth_error_phone_number_budget, z.auth.AuthView.TYPE.PHONE);
+                break;
               case z.service.BackendClientError.LABEL.UNAUTHORIZED:
                 this._add_error(z.string.auth_error_phone_number_forbidden, z.auth.AuthView.TYPE.PHONE);
                 break;
@@ -451,7 +559,9 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     if (!this.pending_server_request() && this.can_register() && this._validate_input(z.auth.AuthView.MODE.ACCOUNT_REGISTER)) {
       this.pending_server_request(true);
       this.persist(true);
-      const payload = this._create_payload(z.auth.AuthView.MODE.ACCOUNT_REGISTER);
+      const is_from_invite = this.invite_info && this.invite_info.email === this.username();
+      const mode = is_from_invite ? z.auth.AuthView.MODE.ACCOUNT_INVITE : z.auth.AuthView.MODE.ACCOUNT_REGISTER;
+      const payload = this._create_payload(mode);
 
       this.auth.repository.register(payload)
         .then(() => {
@@ -459,7 +569,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
           amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.REGISTRATION.ENTERED_CREDENTIALS, {outcome: 'success'});
 
           // Track if the user changed the pre-filled email
-          if (this.prefilled_email === this.username()) {
+          if (is_from_invite) {
             this.auth.repository.get_access_token()
               .then(() => this._account_verified());
           } else {
@@ -483,7 +593,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
       this.user_service.change_own_password(this.password())
         .catch((error) => {
-          this.logger.warn('Could not change user password', error);
+          this.logger.warn(`Could not change user password: ${error.message}`, error);
           if (error.code !== z.service.BackendClientError.STATUS_CODE.FORBIDDEN) {
             throw error;
           }
@@ -495,6 +605,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
           this._set_hash(z.auth.AuthView.MODE.POSTED_VERIFY);
         })
         .catch((error) => {
+          this.logger.warn(`Could not verify account: ${error.message}`, error);
+
           this.pending_server_request(false);
           if (error) {
             switch (error.label) {
@@ -614,6 +726,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
         break;
       }
 
+      case z.auth.AuthView.MODE.ACCOUNT_INVITE:
       case z.auth.AuthView.MODE.ACCOUNT_REGISTER: {
         payload = {
           email: username,
@@ -624,6 +737,11 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
           name: this.name().trim(),
           password: this.password(),
         };
+
+        if (mode === z.auth.AuthView.MODE.ACCOUNT_INVITE) {
+          payload.invitation_code = this.invite_code;
+        }
+
         break;
       }
 
@@ -715,6 +833,12 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
         this._remove_error(event.currentTarget.classList[1]);
       }
     }
+  }
+  clicked_on_blocked_learn_more() {
+    if (this.blocked_mode === z.auth.AuthView.MODE.BLOCKED_TABS) {
+      return z.util.safe_window_open(z.string.url_support_multiple_tabs);
+    }
+    z.util.safe_window_open(z.string.url_support_private_mode);
   }
 
   clicked_on_change_email() {
@@ -1122,6 +1246,24 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.REGISTRATION.OPENED_EMAIL_SIGN_UP, {context: this.registration_context});
   }
 
+  _show_blocked_database() {
+    const switch_params = {
+      mode: z.auth.AuthView.MODE.BLOCKED_DATABASE,
+      section: z.auth.AuthView.SECTION.BLOCKED,
+    };
+
+    this.switch_ui(switch_params);
+  }
+
+  _show_blocked_tabs() {
+    const switch_params = {
+      mode: z.auth.AuthView.MODE.BLOCKED_TABS,
+      section: z.auth.AuthView.SECTION.BLOCKED,
+    };
+
+    this.switch_ui(switch_params);
+  }
+
   _show_history() {
     const switch_params = {
       mode: z.auth.AuthView.MODE.HISTORY,
@@ -1258,6 +1400,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
     if (switch_params.section === z.auth.AuthView.SECTION.ACCOUNT) {
       this.account_mode(switch_params.mode);
+    } else if (switch_params.section === z.auth.AuthView.SECTION.BLOCKED) {
+      this.blocked_mode(switch_params.mode);
     } else if (switch_params.section === z.auth.AuthView.SECTION.POSTED) {
       this.posted_mode(switch_params.mode);
     }
@@ -1458,6 +1602,14 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
       case z.auth.AuthView.MODE.ACCOUNT_PHONE:
         this._show_account_phone();
+        break;
+
+      case z.auth.AuthView.MODE.BLOCKED_DATABASE:
+        this._show_blocked_database();
+        break;
+
+      case z.auth.AuthView.MODE.BLOCKED_TABS:
+        this._show_blocked_tabs();
         break;
 
       case z.auth.AuthView.MODE.HISTORY:
@@ -1715,7 +1867,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
    * @returns {undefined} No return value
    */
   _validate_name() {
-    if (this.name().length < z.config.MINIMUM_USERNAME_LENGTH) {
+    if (this.name().length < z.user.UserRepository.CONFIG.MINIMUM_NAME_LENGTH) {
       return this._add_error(z.string.auth_error_name_short, z.auth.AuthView.TYPE.NAME);
     }
   }

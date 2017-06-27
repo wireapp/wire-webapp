@@ -24,6 +24,8 @@ window.z.ViewModel = z.ViewModel || {};
 
 z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
   constructor(element_id, calling_repository, conversation_repository, media_repository, user_repository, multitasking) {
+    this.clicked_on_cancel_screen = this.clicked_on_cancel_screen.bind(this);
+    this.clicked_on_choose_screen = this.clicked_on_choose_screen.bind(this);
     this.choose_shared_screen = this.choose_shared_screen.bind(this);
 
     this.calling_repository = calling_repository;
@@ -207,9 +209,9 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
     if (!this.disable_toggle_screen()) {
       if (this.self_stream_state.screen_send() || z.util.Environment.browser.firefox) {
         amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, conversation_id, z.media.MediaType.SCREEN);
-      } else if (z.util.Environment.electron) {
+      } else if (z.util.Environment.desktop) {
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CALLING.SHARED_SCREEN, {
-          conversation_type: this.joined_call().is_group() ? z.tracking.attribute.ConversationType.GROUP : z.tracking.attribute.ConversationType.ONE_TO_ONE,
+          conversation_type: this.joined_call().is_group ? z.tracking.attribute.ConversationType.GROUP : z.tracking.attribute.ConversationType.ONE_TO_ONE,
           kind_of_call_when_sharing: this.joined_call().is_remote_video_send() ? 'video' : 'audio',
         });
 

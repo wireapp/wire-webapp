@@ -28,9 +28,9 @@ z.entity.RenameMessage = class RenameMessage extends z.entity.SystemMessage {
     this.system_message_type = z.message.SystemMessageType.CONVERSATION_RENAME;
     this.caption = ko.pureComputed(() => {
       if (this.user().is_me) {
-        return z.localization.Localizer.get_text(z.string.conversation_rename_you);
+        return z.l10n.text(z.string.conversation_rename_you);
       }
-      return z.localization.Localizer.get_text(z.string.conversation_rename);
+      return z.l10n.text(z.string.conversation_rename);
     });
   }
 };

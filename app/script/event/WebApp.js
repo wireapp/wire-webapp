@@ -113,7 +113,6 @@ z.event.WebApp = {
     },
     PERSIST_STATE: 'wire.webapp.conversation.persist_state',
     SHOW: 'wire.webapp.conversation.show',
-    SWITCH: 'wire.webapp.conversation.switch',
     UNREAD: 'wire.webapp.conversation.unread',
   },
   DEBUG: {
@@ -170,8 +169,14 @@ z.event.WebApp = {
   PROPERTIES: {
     UPDATE: {
       CONTACTS: 'wire.webapp.properties.update.contacts',
+      EMOJI: {
+        REPLACE_INLINE: 'wire.webapp.properties.update.emoji.replace_inline',
+      },
       HAS_CREATED_CONVERSATION: 'wire.webapp.properties.update.has_created_conversation',
       NOTIFICATIONS: 'wire.webapp.properties.update.notifications',
+      PREVIEWS: {
+        SEND: 'wire.webapp.properties.update.previews.send',
+      },
       PRIVACY: 'wire.webapp.properties.update.privacy',
       SOUND_ALERTS: 'wire.webapp.properties.update.sound_alerts',
     },
@@ -213,6 +218,10 @@ z.event.WebApp = {
   TAKEOVER: {
     DISMISS: 'wire.webapp.takeover.dismiss',
     SHOW: 'wire.webapp.takeover.show',
+  },
+  TEAM: {
+    EVENT_FROM_BACKEND: 'wire.webapp.team.event_from_backend',
+    MEMBER_LEAVE: 'wire.webapp.team.member_leave',
   },
   TELEMETRY: {
     BACKEND_REQUESTS: 'wire.webapp.telemetry.backend_requests',

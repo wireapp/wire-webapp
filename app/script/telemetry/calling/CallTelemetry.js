@@ -29,7 +29,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
     this.logger = new z.util.Logger('z.telemetry.calling.CallTelemetry', z.config.LOGGER.OPTIONS);
 
     this.sessions = {};
-    this.protocol_version = protocol_version === z.calling.enum.PROTOCOL.VERSION_2 ? 'C2' : 'C3';
+    this.protocol_version = 'C3';
     this.remote_version = undefined;
 
     this.media_type = z.media.MediaType.AUDIO;
@@ -55,19 +55,6 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
     }
 
     return sorted_sessions;
-  }
-
-  /**
-   * Track session ID.
-   * @param {string} conversation_id - ID of conversation for call session
-   * @param {string} session_id - Session ID from backend call event
-   * @returns {undefined} No return value
-   */
-  track_session(conversation_id, {session: session_id}) {
-    this.sessions[session_id] = new z.calling.v2.CallTrackingInfo({
-      conversation_id: conversation_id,
-      session_id: session_id,
-    });
   }
 
 
@@ -124,7 +111,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
   /**
    * Reports call events for call tracking to Localytics.
    * @param {z.tracking.EventName} event_name - String for call event
-   * @param {Call|ECall} call_et - Call entity
+   * @param {Call} call_et - Call entity
    * @param {Object} [attributes={}] - Attributes for the event
    * @returns {undefined} No return value
    */
@@ -135,7 +122,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
       attributes = $.extend({
         conversation_participants: conversation_et.number_of_participants(),
         conversation_participants_in_call: max_number_of_participants,
-        conversation_type: is_group() ? z.tracking.attribute.ConversationType.GROUP : z.tracking.attribute.ConversationType.ONE_TO_ONE,
+        conversation_type: is_group ? z.tracking.attribute.ConversationType.GROUP : z.tracking.attribute.ConversationType.ONE_TO_ONE,
         remote_version: [z.tracking.EventName.CALLING.ESTABLISHED_CALL, z.tracking.EventName.CALLING.JOINED_CALL].includes(event_name) ? this.remote_version : undefined,
         version: this.protocol_version,
         with_bot: conversation_et.is_with_bot(),
@@ -152,7 +139,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
 
   /**
    * Track the call duration.
-   * @param {Call|ECall} call_et - Call entity
+   * @param {Call} call_et - Call entity
    * @returns {undefined} No return value
    */
   track_duration(call_et) {
@@ -182,7 +169,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
       const attributes = {
         conversation_participants: conversation_et.number_of_participants(),
         conversation_participants_in_call: max_number_of_participants,
-        conversation_type: is_group() ? z.tracking.attribute.ConversationType.GROUP : z.tracking.attribute.ConversationType.ONE_TO_ONE,
+        conversation_type: is_group ? z.tracking.attribute.ConversationType.GROUP : z.tracking.attribute.ConversationType.ONE_TO_ONE,
         duration: duration_bucket,
         duration_sec: duration,
         reason: termination_reason,

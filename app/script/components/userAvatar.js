@@ -28,8 +28,9 @@ z.components.UserAvatar = class UserAvatar {
 
     this.user = ko.unwrap(params.user);
     this.badge = params.badge || false;
-    this.element = $(component_info.element);
     this.delay = params.delay;
+    this.element = $(component_info.element);
+    this.is_team_member = params.is_team_member || false;
 
     this.avatar_loading_blocked = false;
     this.avatar_entered_viewport = false;
@@ -58,6 +59,10 @@ z.components.UserAvatar = class UserAvatar {
 
       if ((typeof params.selected === 'function') && params.selected()) {
         return 'selected';
+      }
+
+      if (this.user.is_team_member()) {
+        return '';
       }
 
       if (this.user.is_blocked()) {

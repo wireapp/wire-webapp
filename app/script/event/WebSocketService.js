@@ -51,6 +51,8 @@ z.event.WebSocketService = class WebSocketService {
    * @param {z.service.BackendClient} client - Client for the API calls
    */
   constructor(client) {
+    this.send_ping = this.send_ping.bind(this);
+
     this.client = client;
     this.logger = new z.util.Logger('z.event.WebSocketService', z.config.LOGGER.OPTIONS);
 
@@ -92,7 +94,7 @@ z.event.WebSocketService = class WebSocketService {
 
       this.socket.onopen = () => {
         this.logger.info(`Connected WebSocket to: ${this.client.web_socket_url}/await`);
-        this.ping_interval_id = window.setInterval(this.send_ping.bind(this), WebSocketService.CONFIG.PING_INTERVAL);
+        this.ping_interval_id = window.setInterval(this.send_ping, WebSocketService.CONFIG.PING_INTERVAL);
         resolve();
       };
 

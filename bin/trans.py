@@ -28,6 +28,7 @@ SUPPORTED_LOCALE = [
   'cs',
   'da',
   'de',
+  'el',
   'es',
   'fi',
   'fr',
@@ -35,6 +36,8 @@ SUPPORTED_LOCALE = [
   'hu',
   'it',
   'lt',
+  'nl',
+  'pl',
   'pt',
   'ro',
   'ru',
@@ -118,5 +121,6 @@ for filename in os.listdir(translations_dir):
     source = source.replace(zstrl, zstr).replace(zstr, zstrl)
     source = source.replace("='", " = '")
     source = source.replace('\:', ':')
+    source = source.replace('\n\n\n', '\n\n')
     source = '\n'.join(map(fix_apostrophe, source.splitlines()))
     f.write(source)

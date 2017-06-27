@@ -53,7 +53,9 @@ z.event.EventTypeHandling = {
     z.event.Client.CONVERSATION.DELETE_EVERYWHERE,
     z.event.Client.CONVERSATION.LOCATION,
     z.event.Client.CONVERSATION.MISSED_MESSAGES,
+    z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE,
     z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT,
+    z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG,
     z.event.Client.CONVERSATION.VERIFICATION,
   ],
 };

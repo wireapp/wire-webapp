@@ -36,6 +36,7 @@ window.z.util = z.util || {};
     ELECTRON: 'Electron',
     FIREFOX: 'Firefox',
     OPERA: 'Opera',
+    WIRE: 'Wire',
   };
 
   const PLATFORM_NAME = {
@@ -51,6 +52,9 @@ window.z.util = z.util || {};
     },
     is_chrome: function() {
       return platform.name === BROWSER_NAME.CHROME;
+    },
+    is_desktop: function() {
+      return this.is_electron() && navigator.userAgent.includes(BROWSER_NAME.WIRE);
     },
     is_edge: function() {
       return platform.name === BROWSER_NAME.EDGE;
@@ -78,6 +82,9 @@ window.z.util = z.util || {};
         return false;
       }
       return this.is_chrome() || this.is_firefox() || this.is_opera();
+    },
+    supports_indexed_db: function() {
+      return !!window.indexedDB;
     },
     supports_media_devices: function() {
       return navigator.mediaDevices && navigator.mediaDevices.getUserMedia;
@@ -152,12 +159,14 @@ window.z.util = z.util || {};
       supports: {
         audio_output_selection: _check.supports_audio_output_selection(),
         calling: _check.supports_calling(),
+        indexed_db: _check.supports_indexed_db(),
         media_devices: _check.supports_media_devices(),
         notifications: _check.supports_notifications(),
         screen_sharing: _check.supports_screen_sharing(),
       },
       version: _check.get_version(),
     },
+    desktop: _check.is_desktop(),
     electron: _check.is_electron(),
     frontend: {
       is_localhost() {

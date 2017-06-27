@@ -20,10 +20,6 @@
 .conversations {
   .left-list-container;
 
-  .os-mac.platform-electron & {
-    padding-top: 40px;
-  }
-
   &:not(.left-list-is-visible) {
     .start-ui-transition-fadeout();
   }
@@ -61,14 +57,20 @@
   top: 5px;
 }
 
-.conversation-hint-container {
-  margin-left: 20px;
-  margin-right: 24px;
-  position: absolute;
-  bottom: 0;
+.conversation-hint {
+  .full-screen();
+  .flex-center();
+  .label-xs();
+  .text-center();
+  .text-white();
+  flex-direction: column;
 }
 
-.conversation-hint-container-text {
-  font-size: @font-size-lg;
-  margin-bottom: 24px;
+.conversation-hint-header {
+  .label-bold-xs();
+  margin-bottom: 16px;
+}
+
+.conversation-hint-detail {
+  margin: 0 16px;
 }

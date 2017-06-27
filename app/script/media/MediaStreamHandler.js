@@ -280,7 +280,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
 
     return update_promise.then(([update_media_stream_info]) => {
       this._set_stream_state(update_media_stream_info);
-      this._release_media_stream(this.local_media_stream());
+      this._release_media_stream(this.local_media_stream(), media_stream_info.type);
       this.local_media_stream(update_media_stream_info.stream);
     });
   }
@@ -353,13 +353,13 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     .catch((error) => {
       this.logger.warn(`MediaStream request failed: ${error.name} ${error.message}`);
       this._clear_permission_request_hint(media_type);
-      if (z.calling.rtc.MEDIA_STREAM_ERROR_TYPES.DEVICE.includes(error.name)) {
+      if (z.media.MEDIA_STREAM_ERROR_TYPES.DEVICE.includes(error.name)) {
         throw new z.media.MediaError(z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE, media_type);
       }
-      if (z.calling.rtc.MEDIA_STREAM_ERROR_TYPES.MISC.includes(error.name)) {
+      if (z.media.MEDIA_STREAM_ERROR_TYPES.MISC.includes(error.name)) {
         throw new z.media.MediaError(z.media.MediaError.TYPE.MEDIA_STREAM_MISC, media_type);
       }
-      if (z.calling.rtc.MEDIA_STREAM_ERROR_TYPES.PERMISSION.includes(error.name)) {
+      if (z.media.MEDIA_STREAM_ERROR_TYPES.PERMISSION.includes(error.name)) {
         throw new z.media.MediaError(z.media.MediaError.TYPE.MEDIA_STREAM_PERMISSION, media_type);
       }
       throw error;
@@ -411,7 +411,9 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    * @returns {undefined} No return value
    */
   _hide_permission_request_hint(media_type) {
-    if (z.util.Environment.electron) return;
+    if (z.util.Environment.electron) {
+      return;
+    }
 
     switch (media_type) {
       case z.media.MediaType.AUDIO:
@@ -543,7 +545,9 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    * @returns {undefined} No return value
    */
   _show_permission_request_hint(media_type) {
-    if (z.util.Environment.electron) return;
+    if (z.util.Environment.electron) {
+      return;
+    }
 
     switch (media_type) {
       case z.media.MediaType.AUDIO:

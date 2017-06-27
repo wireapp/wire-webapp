@@ -66,7 +66,7 @@ z.tracking.helpers = {
    * @returns {z.tracking.attribute.PlatformType} Mapped platform type
    */
   get_platform() {
-    if (z.util.Environment.electron) {
+    if (z.util.Environment.desktop) {
       if (z.util.Environment.os.win) {
         return z.tracking.attribute.PlatformType.DESKTOP_WINDOWS;
       }

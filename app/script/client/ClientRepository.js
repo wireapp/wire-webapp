@@ -339,7 +339,7 @@ z.client.ClientRepository = class ClientRepository {
 
     let device_model = platform.name;
 
-    if (z.util.Environment.electron) {
+    if (z.util.Environment.desktop) {
       let identifier;
       if (z.util.Environment.os.mac) {
         identifier = z.string.wire_macos;
@@ -348,7 +348,7 @@ z.client.ClientRepository = class ClientRepository {
       } else {
         identifier = z.string.wire_linux;
       }
-      device_model = z.localization.Localizer.get_text(identifier);
+      device_model = z.l10n.text(identifier);
       if (!z.util.Environment.frontend.is_production()) {
         device_model = `${device_model} (Internal)`;
       }
@@ -481,15 +481,17 @@ z.client.ClientRepository = class ClientRepository {
   }
 
   logout_client() {
-    if (this.current_client().type === z.client.ClientType.PERMANENT) {
-      return amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.LOGOUT, {
-        action(clear_data) {
-          return amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReason.USER_REQUESTED, clear_data);
-        },
-      });
+    if (this.current_client()) {
+      if (this.current_client().type === z.client.ClientType.PERMANENT) {
+        return amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.LOGOUT, {
+          action(clear_data) {
+            return amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReason.USER_REQUESTED, clear_data);
+          },
+        });
+      }
+      return this.delete_temporary_client()
+        .then(() => amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReason.USER_REQUESTED, true));
     }
-    return this.delete_temporary_client()
-    .then(() => amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReason.USER_REQUESTED, true));
   }
 
   /**

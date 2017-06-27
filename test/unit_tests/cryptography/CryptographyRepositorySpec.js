@@ -96,18 +96,33 @@ describe('z.cryptography.CryptographyRepository', function() {
     });
   });
 
-  describe('decrypt_event', function() {
+  describe('handle_encrypted_event', function() {
     it('detects a session reset request', function(done) {
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const event = {"conversation": "f1d2d451-0fcb-4313-b0ba-313b971ab758", "time": "2017-03-22T11:06:29.232Z", "data": {"text": "💣", "sender": "e35e4ee5b80a1a9d", "recipient": "7481c47f2f7336d8"}, "from": "e3ff8dab-1407-4890-b9d3-e1aab49233e8", "type": "conversation.otr-message-add"};
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
-      TestFactory.cryptography_repository.decrypt_event(event)
-        .catch(function(error) {
-          expect(error).toEqual(jasmine.any(Proteus.errors.DecryptError.InvalidMessage));
+      TestFactory.cryptography_repository.handle_encrypted_event(event)
+        .then((mapped_event) => {
+          expect(mapped_event.type).toBe(z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT);
           done();
         })
-        .then(done.fail);
+        .catch(done.fail);
+    });
+
+    it('only accept reasonable sized payload', function(done) {
+      // Length of this message is 1 320 024 while the maximum is 150% of 8 000 (12 000)
+      /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
+      const text = window.btoa(`https://wir${"\u0000\u0001\u0000\u000D\u0000A".repeat(165000)}e.com/`);
+      const event = {"conversation":"7bc4558b-18ce-446b-8e62-0c442b86ba56","time":"2017-06-15T22:18:55.071Z","data":{"text":text,"sender":"ccc17722a9348793","recipient":"4d7a36b30ef8bc26"},"from":"8549aada-07cc-4272-9fd4-c2ae040c539d","type":"conversation.otr-message-add"};
+      /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
+
+      TestFactory.cryptography_repository.handle_encrypted_event(event)
+        .then((mapped_event) => {
+          expect(mapped_event.type).toBe(z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG);
+          done();
+        })
+        .catch(done.fail);
     });
   });
 });

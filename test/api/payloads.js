@@ -106,6 +106,7 @@ window.entities = {
     'type': 0,
     'last_event_time': '2015-01-13T10:41:55.032Z',
     'last_event': '1.800122000a4b6e15',
+    'team': '537992e5-3782-4b6c-8718-a5db2cc786ee',
   },
 };
 

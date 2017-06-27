@@ -210,10 +210,12 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   }
 
   _disable_localytics() {
-    this.localytics('close');
-    window.ll = undefined;
-    this.localytics = undefined;
-    this.logger.debug('Localytics reporting was disabled due to user preferences');
+    if (this.localytics) {
+      this.localytics('close');
+      window.ll = undefined;
+      this.localytics = undefined;
+      this.logger.debug('Localytics reporting was disabled due to user preferences');
+    }
   }
 
   // @see http://docs.localytics.com/#Dev/Integrate/web-options.html
@@ -350,7 +352,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     if (!z.util.Environment.frontend.is_localhost()) {
       Raygun.setVersion(z.util.Environment.version(false));
     }
-    if (z.util.Environment.electron) {
+    if (z.util.Environment.desktop) {
       Raygun.withCustomData({electron_version: z.util.Environment.version(true)});
     }
     Raygun.onBeforeSend(this._check_error_payload.bind(this));

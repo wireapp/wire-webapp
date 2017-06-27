@@ -221,6 +221,10 @@ describe('z.util.get_file_extension', function() {
   it('returns extension jpg for image.jpg', function() {
     expect(z.util.get_file_extension('path/to/image.jpg')).toEqual('jpg');
   });
+
+  it('does not return .tar.gz when it is not the file extension', function() {
+    expect(z.util.get_file_extension('path/to/image.tar.gz.jpg')).toEqual('jpg');
+  });
 });
 
 
@@ -239,6 +243,10 @@ describe('z.util.trim_file_extension', function() {
 
   it('returns the filename without extension for .tar.gz', function() {
     expect(z.util.trim_file_extension('archive.tar.gz')).toEqual('archive');
+  });
+
+  it('does not remove .tar.gz when it is not the file extension', function() {
+    expect(z.util.trim_file_extension('cool.tar.gz.jpg')).toEqual('cool.tar.gz');
   });
 });
 
@@ -455,32 +463,32 @@ describe('z.util.get_url_parameter', function() {
 describe('z.util.forward_url_parameter', function() {
   it('forwards existing URL parameters', function() {
     z.util.get_url_parameter = function(parameter_value) {
-      if (parameter_value === z.auth.URLParameter.CALLING_V3) {
+      if (parameter_value === z.auth.URLParameter.LOCALYTICS) {
         return true;
       }
     };
-    expect(z.util.forward_url_parameter('foo.com', z.auth.URLParameter.CALLING_V3)).toBe('foo.com?calling_v3=true');
+    expect(z.util.forward_url_parameter('foo.com', z.auth.URLParameter.LOCALYTICS)).toBe('foo.com?localytics=true');
 
     z.util.get_url_parameter = function(parameter_value) {
-      if (parameter_value === z.auth.URLParameter.CALLING_V3) {
+      if (parameter_value === z.auth.URLParameter.LOCALYTICS) {
         return false;
       }
     };
-    expect(z.util.forward_url_parameter('foo.com', z.auth.URLParameter.CALLING_V3)).toBe('foo.com?calling_v3=false');
+    expect(z.util.forward_url_parameter('foo.com', z.auth.URLParameter.LOCALYTICS)).toBe('foo.com?localytics=false');
 
     z.util.get_url_parameter = function(parameter_value) {
-      if (parameter_value === z.auth.URLParameter.CALLING_V3) {
+      if (parameter_value === z.auth.URLParameter.LOCALYTICS) {
         return 'bar';
       }
     };
-    expect(z.util.forward_url_parameter('foo.com', z.auth.URLParameter.CALLING_V3)).toBe('foo.com?calling_v3=bar');
+    expect(z.util.forward_url_parameter('foo.com', z.auth.URLParameter.LOCALYTICS)).toBe('foo.com?localytics=bar');
 
     z.util.get_url_parameter = function(parameter_value) {
-      if (parameter_value === z.auth.URLParameter.CALLING_V3) {
+      if (parameter_value === z.auth.URLParameter.LOCALYTICS) {
         return null;
       }
     };
-    expect(z.util.forward_url_parameter('foo.com', z.auth.URLParameter.CALLING_V3)).toBe('foo.com');
+    expect(z.util.forward_url_parameter('foo.com', z.auth.URLParameter.LOCALYTICS)).toBe('foo.com');
   });
 });
 

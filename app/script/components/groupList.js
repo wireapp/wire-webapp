@@ -41,7 +41,9 @@ ko.components.register('group-list', {
   template: `
     <div class="search-list search-list-lg" data-bind="foreach: {data: groups, as: 'group'}">
       <div class="search-list-item" data-bind="click: $parent.on_select, attr: {'data-uie-uid': group.id, 'data-uie-value': group.display_name" data-uie-name="item-group">
-        <div class="search-list-item-image"></div>
+        <div class="search-list-item-image">
+          <group-avatar params="users: group.participating_user_ets()"></group-avatar>
+        </div>
         <div class="search-list-item-header" data-bind="text: group.display_name"></div>
       </div>
     </div>

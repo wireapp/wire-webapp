@@ -72,8 +72,12 @@ window.z.config = {
   // 15 megabyte image upload limit
   MAXIMUM_IMAGE_FILE_SIZE: 15 * 1024 * 1024,
 
-  // Maximum characters per message
+  // Maximum characters per sent message
   MAXIMUM_MESSAGE_LENGTH: 8000,
+
+  // Maximum characters per received message
+  // Encryption is approx. +40% of the original payload so let's round it at +50%
+  MAXIMUM_MESSAGE_LENGTH_RECEIVING: 12000 * 1.5,
 
   // bigger requests will be split in chunks with a maximum size as defined
   MAXIMUM_USERS_PER_REQUEST: 200,
@@ -82,14 +86,6 @@ window.z.config = {
   MESSAGES_FETCH_LIMIT: 30,
 
   MINIMUM_PASSWORD_LENGTH: 8,
-
-  // self profile image size in pixel
-  MINIMUM_PROFILE_IMAGE_SIZE: {
-    HEIGHT: 320,
-    WIDTH: 320,
-  },
-
-  MINIMUM_USERNAME_LENGTH: 2,
 
   // measured in pixel
   SCROLL_TO_LAST_MESSAGE_THRESHOLD: 100,

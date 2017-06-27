@@ -45,12 +45,12 @@ z.components.AudioAssetComponent = class AudioAssetComponent {
     this.audio_is_loaded = ko.observable(false);
 
     this.show_loudness_preview = ko.pureComputed(() => {
-      if (this.asset.meta !== null && this.asset.meta.loudness !== null) {
+      if (this.asset.meta && this.asset.meta.loudness) {
         return this.asset.meta.loudness.length > 0;
       }
     });
 
-    if (this.asset.meta !== null) {
+    if (this.asset.meta) {
       this.audio_time(this.asset.meta.duration);
     }
 

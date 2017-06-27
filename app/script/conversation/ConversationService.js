@@ -54,14 +54,24 @@ z.conversation.ConversationService = class ConversationService {
    *
    * @param {Array<string>} user_ids - IDs of users (excluding the requestor) to be part of the conversation
    * @param {string} name - User defined name for the Conversation (optional)
+   * @param {string} team_id - ID of team conversation belongs to
    * @returns {Promise} Resolves when the conversation was created
    */
-  create_conversation(user_ids, name) {
+  create_conversation(user_ids, name, team_id) {
+    const payload = {
+      name: name,
+      users: user_ids,
+    };
+
+    if (team_id) {
+      payload.team = {
+        managed: false,
+        teamid: team_id,
+      };
+    }
+
     return this.client.send_json({
-      data: {
-        name: name,
-        users: user_ids,
-      },
+      data: payload,
       type: 'POST',
       url: this.client.create_url(ConversationService.CONFIG.URL_CONVERSATIONS),
     });
@@ -284,6 +294,19 @@ z.conversation.ConversationService = class ConversationService {
   //##############################################################################
   // Database interactions
   //##############################################################################
+
+  /**
+   * Deletes a conversation entity from the local database.
+   * @param {string} conversation_id - ID of conversation to be deleted
+   * @returns {Promise} Resolves when the entity was deleted
+   */
+  delete_conversation_from_in_db(conversation_id) {
+    return this.storage_service.delete(z.storage.StorageService.OBJECT_STORE.CONVERSATIONS, conversation_id)
+      .then((primary_key) => {
+        this.logger.log(this.logger.levels.INFO, `State of conversation '${primary_key}' was deleted`);
+        return primary_key;
+      });
+  }
 
   /**
    * Delete a message from a conversation. Duplicates are delete as well.
@@ -516,16 +539,19 @@ z.conversation.ConversationService = class ConversationService {
   update_asset_as_uploaded_in_db(primary_key, asset_data) {
     return this.storage_service.load(z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key)
       .then((record) => {
-        record.data.id = asset_data.id;
-        record.data.otr_key = asset_data.otr_key;
-        record.data.sha256 = asset_data.sha256;
-        record.data.key = asset_data.key;
-        record.data.token = asset_data.token;
-        record.data.status = z.assets.AssetTransferState.UPLOADED;
-        return this.storage_service.update(z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key, record);
-      })
-      .then(() => {
-        this.logger.info('Updated asset message_et (uploaded)', primary_key);
+        if (record) {
+          record.data.id = asset_data.id;
+          record.data.key = asset_data.key;
+          record.data.otr_key = asset_data.otr_key;
+          record.data.sha256 = asset_data.sha256;
+          record.data.status = z.assets.AssetTransferState.UPLOADED;
+          record.data.token = asset_data.token;
+
+          return this.storage_service.update(z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key, record)
+            .then(() => this.logger.info('Updated asset message_et (uploaded)', primary_key));
+        }
+
+        this.logger.warn('Did not find message to update asset (uploaded)', primary_key);
       });
   }
 
@@ -539,15 +565,18 @@ z.conversation.ConversationService = class ConversationService {
   update_asset_preview_in_db(primary_key, asset_data) {
     return this.storage_service.load(z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key)
       .then((record) => {
-        record.data.preview_id = asset_data.id;
-        record.data.preview_otr_key = asset_data.otr_key;
-        record.data.preview_sha256 = asset_data.sha256;
-        record.data.preview_key = asset_data.key;
-        record.data.preview_token = asset_data.token;
-        return this.storage_service.update(z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key, record);
-      })
-      .then(() => {
-        this.logger.info('Updated asset message_et (preview)', primary_key);
+        if (record) {
+          record.data.preview_id = asset_data.id;
+          record.data.preview_key = asset_data.key;
+          record.data.preview_otr_key = asset_data.otr_key;
+          record.data.preview_sha256 = asset_data.sha256;
+          record.data.preview_token = asset_data.token;
+
+          return this.storage_service.update(z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key, record)
+            .then(() => this.logger.info('Updated asset message_et (preview)', primary_key));
+        }
+
+        this.logger.warn('Did not find message to update asset (preview)', primary_key);
       });
   }
 
@@ -561,12 +590,15 @@ z.conversation.ConversationService = class ConversationService {
   update_asset_as_failed_in_db(primary_key, reason) {
     return this.storage_service.load(z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key)
       .then((record) => {
-        record.data.status = z.assets.AssetTransferState.UPLOAD_FAILED;
-        record.data.reason = reason;
-        return this.storage_service.update(z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key, record);
-      })
-      .then(() => {
-        this.logger.info('Updated asset message_et (failed)', primary_key);
+        if (record) {
+          record.data.reason = reason;
+          record.data.status = z.assets.AssetTransferState.UPLOAD_FAILED;
+
+          return this.storage_service.update(z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key, record)
+            .then(() => this.logger.info('Updated asset message_et (failed)', primary_key));
+        }
+
+        this.logger.warn('Did not find message to update asset (failed)', primary_key);
       });
   }
 
@@ -586,9 +618,22 @@ z.conversation.ConversationService = class ConversationService {
             return this.storage_service.db.transaction('rw', z.storage.StorageService.OBJECT_STORE.EVENTS, () => {
               return this.load_event_from_db(conversation_id, message_et.id)
                 .then((record) => {
-                  if (record && (changes.version === ((record.version || 1) + 1))) {
-                    return this.storage_service.update(z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key, changes);
+                  let custom_data;
+
+                  if (record) {
+                    const database_version = record.version || 1;
+
+                    if (changes.version === database_version + 1) {
+                      return this.storage_service.update(z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key, changes);
+                    }
+
+                    custom_data = {
+                      database_version: database_version,
+                      update_version: changes.version,
+                    };
                   }
+
+                  Raygun.send('Failed sequential database update', custom_data);
                   throw new z.storage.StorageError(z.storage.StorageError.TYPE.NON_SEQUENTIAL_UPDATE);
                 });
             });
