@@ -185,24 +185,12 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     const entries = [];
 
     if (!conversation_et.is_request() && !conversation_et.removed_from_conversation()) {
-      const notify_conversation_tooltip = z.localization.Localizer.get_text({
-        id: z.string.tooltip_conversations_notify,
-        replace: {
-          content: z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.SILENCE),
-          placeholder: '%shortcut',
-        },
-      });
-
-      const silence_conversation_tooltip = z.localization.Localizer.get_text({
-        id: z.string.tooltip_conversations_silence,
-        replace: {
-          content: z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.SILENCE),
-          placeholder: '%shortcut',
-        },
-      });
+      const silence_shortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.SILENCE);
+      const notify_tooltip = z.l10n.text(z.string.tooltip_conversations_notify, silence_shortcut);
+      const silence_tooltip = z.l10n.text(z.string.tooltip_conversations_silence, silence_shortcut);
 
       label = conversation_et.is_muted() ? z.string.conversations_popover_notify : z.string.conversations_popover_silence;
-      title = conversation_et.is_muted() ? notify_conversation_tooltip : silence_conversation_tooltip;
+      title = conversation_et.is_muted() ? notify_tooltip : silence_tooltip;
       entries.push({
         click: () => this.click_on_mute_action(conversation_et),
         label: z.l10n.text(label),
@@ -216,18 +204,12 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
         label: z.l10n.text(z.string.conversations_popover_unarchive),
       });
     } else {
-      const archive_conversation_tooltip = z.localization.Localizer.get_text({
-        id: z.string.tooltip_conversations_archive,
-        replace: {
-          content: z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.ARCHIVE),
-          placeholder: '%shortcut',
-        },
-      });
+      const shortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.ARCHIVE);
 
       entries.push({
         click: () => this.click_on_archive_action(conversation_et),
         label: z.l10n.text(z.string.conversations_popover_archive),
-        title: archive_conversation_tooltip,
+        title: z.l10n.text(z.string.tooltip_conversations_archive, shortcut),
       });
     }
 
@@ -248,7 +230,7 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     if (!conversation_et.is_group()) {
       const [user_et] = conversation_et.participating_user_ets();
 
-      if (user_et.is_connected() || user_et.is_request()) {
+      if (user_et && (user_et.is_connected() || user_et.is_request())) {
         entries.push({
           click: () => this.click_on_block_action(conversation_et),
           label: z.l10n.text(z.string.conversations_popover_block),
@@ -303,7 +285,6 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
           this.conversation_repository.clear_conversation(conversation_et, next_conversation, leave);
         },
         conversation: conversation_et,
-        data: conversation_et.display_name(),
       });
     }
   }

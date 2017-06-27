@@ -63,7 +63,8 @@ z.calling.entities.Flow = class Flow {
     this.remote_client_id = undefined;
     this.remote_user = this.participant_et.user;
     this.remote_user_id = this.remote_user.id;
-    this.self_user_id = this.call_et.self_user_id;
+    this.self_user = this.call_et.self_user;
+    this.self_user_id = this.self_user.id;
 
     // Telemetry
     this.telemetry = new z.telemetry.calling.FlowTelemetry(this.id, this.remote_user_id, this.call_et, timings);
@@ -915,7 +916,7 @@ z.calling.entities.Flow = class Flow {
    */
   _create_additional_payload() {
     const payload = z.calling.CallMessageBuilder.create_payload(this.id, this.self_user_id, this.remote_user_id, this.remote_client_id);
-    const additional_payload = $.extend({remote_user: this.remote_user, sdp: this.local_sdp().sdp}, payload);
+    const additional_payload = Object.assign({remote_user: this.remote_user, sdp: this.local_sdp().sdp}, payload);
 
     return z.calling.CallMessageBuilder.create_payload_prop_sync(this.call_et.self_state, this.call_et.self_state.video_send(), false, additional_payload);
   }
@@ -927,18 +928,19 @@ z.calling.entities.Flow = class Flow {
    */
   _set_local_sdp() {
     this.sdp_state_changing(true);
-    this.logger.debug(`Setting local '${this.local_sdp().type}' SDP`, this.local_sdp());
+    const local_sdp = this.local_sdp();
+    this.logger.debug(`Setting local '${local_sdp.type}' SDP`, local_sdp);
 
-    this.peer_connection.setLocalDescription(this.local_sdp())
+    this.peer_connection.setLocalDescription(local_sdp)
       .then(() => {
-        this.logger.info(`Setting local '${this.local_sdp().type}' SDP successful`, this.peer_connection.localDescription);
+        this.logger.info(`Setting local '${local_sdp.type}' SDP successful`, this.peer_connection.localDescription);
         this.telemetry.time_step(z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SET);
 
         this.should_set_local_sdp(false);
         this.sdp_state_changing(false);
         this._set_send_sdp_timeout();
       })
-      .catch((error) => this._set_sdp_failure(error, z.calling.enum.SDP_SOURCE.LOCAL, this.local_sdp().type));
+      .catch((error) => this._set_sdp_failure(error, z.calling.enum.SDP_SOURCE.LOCAL, local_sdp.type));
   }
 
   /**
@@ -948,17 +950,18 @@ z.calling.entities.Flow = class Flow {
    */
   _set_remote_sdp() {
     this.sdp_state_changing(false);
-    this.logger.debug(`Setting remote '${this.remote_sdp().type}' SDP\n${this.remote_sdp().sdp}`, this.remote_sdp());
+    const remote_sdp = this.remote_sdp();
+    this.logger.debug(`Setting remote '${remote_sdp.type}' SDP\n${remote_sdp.sdp}`, remote_sdp);
 
-    this.peer_connection.setRemoteDescription(this.remote_sdp())
+    this.peer_connection.setRemoteDescription(remote_sdp)
       .then(() => {
-        this.logger.info(`Setting remote '${this.remote_sdp().type}' SDP successful`, this.peer_connection.remoteDescription);
+        this.logger.info(`Setting remote '${remote_sdp.type}' SDP successful`, this.peer_connection.remoteDescription);
         this.telemetry.time_step(z.telemetry.calling.CallSetupSteps.REMOTE_SDP_SET);
 
         this.should_set_remote_sdp(false);
         this.sdp_state_changing(false);
       })
-      .catch((error) => this._set_sdp_failure(error, z.calling.enum.SDP_SOURCE.REMOTE, this.remote_sdp().type));
+      .catch((error) => this._set_sdp_failure(error, z.calling.enum.SDP_SOURCE.REMOTE, remote_sdp.type));
   }
 
   /**
@@ -1046,7 +1049,10 @@ z.calling.entities.Flow = class Flow {
    * @returns {boolean} False if we locally needed to switch sides
    */
   _solve_colliding_states(force_renegotiation = false) {
-    if (this.self_user_id < this.remote_user_id || force_renegotiation) {
+    this.logger.debug(`Solving state collision: Self user ID '${this.self_user_id}', remote user ID '${this.remote_user_id}', force_renegotiation '${force_renegotiation}'`);
+
+    const self_user_id_looses = this.self_user_id < this.remote_user_id;
+    if (self_user_id_looses || force_renegotiation) {
       this.logger.warn(`We need to switch SDP state of flow with '${this.remote_user.name()}' to answer.`);
 
       this.restart_negotiation(z.calling.enum.SDP_NEGOTIATION_MODE.STATE_COLLISION, true);

@@ -77,13 +77,7 @@ z.ViewModel.ConversationTitlebarViewModel = class ConversationTitlebarViewModel 
       return !this.has_call() && is_supported_conversation && is_active_conversation;
     });
 
-    this.people_tooltip = z.localization.Localizer.get_text({
-      id: z.string.tooltip_conversation_people,
-      replace: {
-        content: z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.PEOPLE),
-        placeholder: '%shortcut',
-      },
-    });
+    this.people_tooltip = z.l10n.text(z.string.tooltip_conversation_people, z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.PEOPLE));
   }
 
   added_to_view() {

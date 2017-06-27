@@ -1,7 +1,7 @@
 <div id="archive" class="left-list left-list-archive" data-bind="with: $root.archive">
   <div class="left-list-header">
     <span class="label-bold-xs" data-bind="l10n_text: z.string.archive_header"></span>
-    <span class="left-list-header-close-button button-icon-large icon-close" data-uie-name="do-close-archive" data-bind="click: click_on_close_archive"></span>
+    <span class="left-list-header-close-button button-icon-large icon-close" data-bind="click: click_on_close_archive, l10n_tooltip: z.string.tooltip_search_close" data-uie-name="do-close-archive"></span>
   </div>
   <div class="left-list-center">
     <ul class="left-list-items" data-bind="antiscroll: should_update_scrollbar, bordered_list: conversations_archived">

@@ -175,7 +175,7 @@ z.util.get_file_extension = function(filename) {
     return '';
   }
 
-  if (filename.includes('tar.gz')) {
+  if (filename.endsWith('.tar.gz')) {
     return 'tar.gz';
   }
 
@@ -188,7 +188,11 @@ z.util.get_file_extension = function(filename) {
  * @returns {string} New String without extension
  */
 z.util.trim_file_extension = function(filename) {
-  filename = filename.replace('.tar.gz', '');
+
+  if (filename.endsWith('.tar.gz')) {
+    filename = filename.replace(/\.tar\.gz$/, '');
+  }
+
   return filename.replace(/\.[^/.]+$/, '');
 };
 

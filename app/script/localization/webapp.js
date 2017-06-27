@@ -29,8 +29,8 @@ z.string.and = 'and';
 // Alert view when trying to set a profile image that's too small
 z.string.alert_upload_file_format = 'Can’t use this picture.\nPlease choose a PNG or JPEG file.';
 z.string.alert_upload_too_small = 'Can’t use this picture.\nPlease choose a picture that’s at least 320 x 320 px.';
-z.string.alert_upload_too_large = 'This picture is too large.\nYou can upload files up to %no MB.';
-z.string.alert_gif_too_large = 'Animation is too large.\nMaximum size is %no MB.';
+z.string.alert_upload_too_large = 'This picture is too large.\nYou can upload files up to {{number}} MB.';
+z.string.alert_gif_too_large = 'Animation is too large.\nMaximum size is {{number}} MB.';
 
 // Auth
 // Authentication: ACCOUNT section
@@ -56,10 +56,10 @@ z.string.auth_verify_account_add = 'Add';
 z.string.auth_verify_account_detail = 'This lets you use Wire on multiple devices.';
 z.string.auth_verify_account_headline = 'Add email address and password.';
 z.string.auth_verify_account_logout = 'Log out';
-z.string.auth_verify_code_description = 'Enter the verification code\nwe sent to %@number.';
+z.string.auth_verify_code_description = 'Enter the verification code\nwe sent to {{number}}.';
 z.string.auth_verify_code_resend = 'No code showing up?';
 z.string.auth_verify_code_resend_detail = 'Resend';
-z.string.auth_verify_code_resend_timer = 'You can request a new code %expiration.';
+z.string.auth_verify_code_resend_timer = 'You can request a new code {{expiration}}.';
 z.string.auth_verify_code_change_phone = 'Change phone number';
 z.string.auth_verify_password_headline = 'Enter your password';
 
@@ -83,11 +83,11 @@ z.string.auth_posted_offline_detail = 'Check your Internet connection and try ag
 z.string.auth_posted_offline_headline = 'Wire is nicer online.';
 z.string.auth_posted_pending_detail = 'Check your email inbox or resend activation.';
 z.string.auth_posted_pending_headline = 'Account already pending';
-z.string.auth_posted_resend = 'Resend to %email';
+z.string.auth_posted_resend = 'Resend to {{email}}';
 z.string.auth_posted_resend_action = 'No email showing up?';
 z.string.auth_posted_resend_detail = 'Check your email inbox and follow the instructions.';
 z.string.auth_posted_resend_headline = 'You’ve got mail.';
-z.string.auth_posted_retry = 'Re-try and send mail to %email';
+z.string.auth_posted_retry = 'Re-try and send mail to {{email}}';
 z.string.auth_posted_retry_action = 'Try again?';
 z.string.auth_posted_retry_detail = 'Please try again.';
 z.string.auth_posted_retry_headline = 'Something went wrong';
@@ -112,6 +112,7 @@ z.string.auth_error_name_short = 'Enter a name with at least 2 characters';
 z.string.auth_error_offline = 'No Internet connection';
 z.string.auth_error_password_short = 'Choose a password with at least 8 characters.';
 z.string.auth_error_password_wrong = 'Wrong password. Please try again.';
+z.string.auth_error_phone_number_budget = 'You logged in too often. Try again later.';
 z.string.auth_error_phone_number_forbidden = 'Sorry. This phone number is forbidden.';
 z.string.auth_error_phone_number_invalid = 'Invalid Phone Number';
 z.string.auth_error_phone_number_unknown = 'Unknown Phone Number';
@@ -132,8 +133,8 @@ z.string.modal_button_ok = 'Ok';
 z.string.modal_button_send = 'Send';
 
 // Block a user
-z.string.modal_block_conversation_headline = 'Block %@.name?';
-z.string.modal_block_conversation_message = '%@.name won’t be able to contact you or add you to group conversations.';
+z.string.modal_block_conversation_headline = 'Block {{user}}?';
+z.string.modal_block_conversation_message = '{{user}} won’t be able to contact you or add you to group conversations.';
 z.string.modal_block_conversation_button = 'Block';
 // Cannot create the call because there is nobody to call (conversation_empty)
 z.string.modal_call_conversation_empty_headline = 'No one to call';
@@ -154,7 +155,7 @@ z.string.modal_call_second_outgoing_headline = 'Hang up current call?';
 z.string.modal_call_second_outgoing_message = 'You can only be in one call at a time.';
 z.string.modal_call_second_outgoing_action = 'Hang Up';
 // Clear a conversation
-z.string.modal_clear_conversation_headline = 'Delete "%@.name" content?';
+z.string.modal_clear_conversation_headline = 'Delete content?';
 z.string.modal_clear_conversation_message = 'This will clear the conversation history and remove it from your list.';
 z.string.modal_clear_conversation_option = 'Also leave the conversation';
 z.string.modal_clear_conversation_button = 'Delete';
@@ -177,9 +178,9 @@ z.string.modal_delete_everyone_headline = 'Delete for everyone?';
 z.string.modal_delete_everyone_message = 'This cannot be undone.';
 // Too long message
 z.string.modal_too_long_headline = 'Message too long';
-z.string.modal_too_long_message = 'You can send messages up to %no characters long.';
+z.string.modal_too_long_message = 'You can send messages up to {{number}} characters long.';
 // Leave a conversation
-z.string.modal_leave_conversation_headline = 'Leave "%@.name" conversation?';
+z.string.modal_leave_conversation_headline = 'Leave "{{name}}" conversation?';
 z.string.modal_leave_conversation_message = 'The participants will be notified and the conversation removed from your list.';
 z.string.modal_leave_conversation_button = 'Leave';
 // Logout
@@ -187,9 +188,9 @@ z.string.modal_logout_headline = 'Clear Data?';
 z.string.modal_logout_message = 'Delete all your personal information and conversations on this device.';
 z.string.modal_logout_button = 'Log out';
 // New device
-z.string.modal_new_device_headline = '%@.name started using a new device';
-z.string.modal_new_device_headline_many = '%@.names started using new devices';
-z.string.modal_new_device_headline_you = '%@.name started using a new device';
+z.string.modal_new_device_headline = '{{user}} started using a new device';
+z.string.modal_new_device_headline_many = '{{users}} started using new devices';
+z.string.modal_new_device_headline_you = '{{user}} started using a new device';
 z.string.modal_new_device_message = 'Do you still want to send your messages?';
 z.string.modal_new_device_call_accept = 'Accept call';
 z.string.modal_new_device_call_anyway = 'Call anyway';
@@ -199,7 +200,7 @@ z.string.modal_new_device_show_device = 'show device';
 z.string.modal_new_device_send_anyway = 'send anyway';
 // Remove device
 z.string.modal_remove_device_button = 'Remove device';
-z.string.modal_remove_device_headline = 'Remove "%device_name"';
+z.string.modal_remove_device_headline = 'Remove "{{device}}"';
 z.string.modal_remove_device_message = 'Your password is required to remove the device.';
 // Session Reset
 z.string.modal_session_reset_headline = 'The session has been reset';
@@ -208,9 +209,9 @@ z.string.modal_session_reset_message_link = 'contact';
 z.string.modal_session_reset_message_2 = 'us.';
 // Too many members in conversation
 z.string.modal_too_many_members_headline = 'Full house';
-z.string.modal_too_many_members_message = 'Up to %max people can join a conversation. There is room for %no more people in here.';
+z.string.modal_too_many_members_message = 'Up to {{number1}} people can join a conversation. There is room for {{number2}} more people in here.';
 // Parallel uploads
-z.string.modal_uploads_parallel = 'You can send up to %no files at once.';
+z.string.modal_uploads_parallel = 'You can send up to {{number}} files at once.';
 
 // Connection requests
 z.string.connection_request_connect = 'Connect';
@@ -224,29 +225,29 @@ z.string.conversation_you_accusative = 'you';
 z.string.conversation_connection_accepted = 'Connected';
 z.string.conversation_connection_blocked = 'Blocked';
 z.string.conversation_connection_cancel_request = 'Cancel connection request';
-z.string.conversation_create = ' started a conversation with %@names';
-z.string.conversation_create_you = ' started a conversation with %@names';
+z.string.conversation_create = ' started a conversation with {{users}}';
+z.string.conversation_create_you = ' started a conversation with {{users}}';
 z.string.conversation_device_started_using_one = ' started using';
 z.string.conversation_device_started_using_many = ' started using';
 z.string.conversation_device_unverified = ' unverified one of';
 z.string.conversation_device_your_devices = ' your devices';
-z.string.conversation_device_user_devices = ' %@name´s devices';
+z.string.conversation_device_user_devices = ' {{user}}´s devices';
 z.string.conversation_device_new_device_one = ' a new device';
 z.string.conversation_device_new_device_many = ' new devices';
 z.string.conversation_device_new_people_joined = 'new people joined.';
 z.string.conversation_device_new_people_joined_verify = ' verify devices';
 z.string.conversation_just_now = 'Just now';
 z.string.conversation_location_link = 'Open Map';
-z.string.conversation_member_join = ' added %@names';
-z.string.conversation_member_join_you = ' added %@names';
+z.string.conversation_member_join = ' added {{users}}';
+z.string.conversation_member_join_you = ' added {{users}}';
 z.string.conversation_member_leave_left = ' left';
 z.string.conversation_member_leave_left_you = ' left';
-z.string.conversation_member_leave_removed = ' removed %@names';
-z.string.conversation_member_leave_removed_you = ' removed %@names';
+z.string.conversation_member_leave_removed = ' removed {{users}}';
+z.string.conversation_member_leave_removed_you = ' removed {{users}}';
 z.string.conversation_message_delivered = 'Delivered';
 z.string.conversation_rename = ' renamed the conversation';
 z.string.conversation_rename_you = ' renamed the conversation';
-z.string.conversation_resume = 'Start a conversation with %@names';
+z.string.conversation_resume = 'Start a conversation with {{users}}';
 z.string.conversation_team_leave = ' was removed from the team';
 z.string.conversation_ping = ' pinged';
 z.string.conversation_ping_you = ' pinged';
@@ -255,8 +256,8 @@ z.string.conversation_verified = 'Verified';
 z.string.conversation_voice_channel_deactivate = ' called';
 z.string.conversation_voice_channel_deactivate_you = ' called';
 z.string.conversation_yesterday = 'Yesterday';
-z.string.conversation_unable_to_decrypt_1 = 'a message from %@name was not received.';
-z.string.conversation_unable_to_decrypt_2 = '%@name´s device identity changed. Undelivered message.';
+z.string.conversation_unable_to_decrypt_1 = 'a message from {{user}} was not received.';
+z.string.conversation_unable_to_decrypt_2 = '{{user}}´s device identity changed. Undelivered message.';
 z.string.conversation_unable_to_decrypt_link = 'Why?';
 z.string.conversation_unable_to_decrypt_error_message = 'Error';
 z.string.conversation_unable_to_decrypt_reset_session = 'Reset session';
@@ -264,7 +265,7 @@ z.string.conversation_missed_messages = 'You haven’t used this device for a wh
 z.string.conversation_asset_uploading = 'Uploading…';
 z.string.conversation_asset_downloading = 'Downloading…';
 z.string.conversation_asset_upload_failed = 'Upload Failed';
-z.string.conversation_asset_upload_too_large = 'You can send files up to %no';
+z.string.conversation_asset_upload_too_large = 'You can send files up to {{number}}';
 z.string.conversation_playback_error = 'Unable to play';
 z.string.conversation_context_menu_edit = 'Edit';
 z.string.conversation_context_menu_delete = 'Delete for Me';
@@ -272,14 +273,14 @@ z.string.conversation_context_menu_delete_everyone = 'Delete for Everyone';
 z.string.conversation_context_menu_download = 'Download';
 z.string.conversation_context_menu_like = 'Like';
 z.string.conversation_context_menu_unlike = 'Unlike';
-z.string.conversation_delete_timestamp = 'Deleted on %@timestamp';
-z.string.conversation_edit_timestamp = 'Edited on %@timestamp';
-z.string.conversation_likes_caption = '%@number people';
-z.string.conversation_send_pasted_file = 'Pasted image at %date';
+z.string.conversation_delete_timestamp = 'Deleted on {{date}}';
+z.string.conversation_edit_timestamp = 'Edited on {{date}}';
+z.string.conversation_likes_caption = '{{number}} people';
+z.string.conversation_send_pasted_file = 'Pasted image at {{date}}';
 z.string.conversation_tweet_author = ' on Twitter';
 
 // Collection
-z.string.collection_show_all = 'Show all %no';
+z.string.collection_show_all = 'Show all {{number}}';
 z.string.collection_section_links = 'Links';
 z.string.collection_section_images = 'Pictures';
 z.string.collection_section_files = 'Files';
@@ -338,10 +339,10 @@ z.string.takeover_button_keep = 'Keep this one';
 // Invites
 z.string.invite_meta_key_mac = 'Cmd';
 z.string.invite_meta_key_pc = 'Ctrl';
-z.string.invite_hint_selected = 'Press %meta_key + C to copy';
-z.string.invite_hint_unselected = 'Select and Press %meta_key + C';
+z.string.invite_hint_selected = 'Press {{meta_key}} + C to copy';
+z.string.invite_hint_unselected = 'Select and Press {{meta_key}} + C';
 z.string.invite_headline = 'Invite people to Wire';
-z.string.invite_message = 'I’m on Wire, search for %username or visit get.wire.com.';
+z.string.invite_message = 'I’m on Wire, search for {{username}} or visit get.wire.com.';
 z.string.invite_message_no_email = 'I’m on Wire. Visit get.wire.com to connect with me.';
 
 // Extensions
@@ -350,33 +351,33 @@ z.string.extensions_bubble_button_gif = 'Gif';
 // Extensions Giphy
 z.string.extensions_giphy_button_ok = 'Send';
 z.string.extensions_giphy_button_more = 'Try Another';
-z.string.extensions_giphy_message = '%tag • via giphy.com';
+z.string.extensions_giphy_message = '{{tag}} • via giphy.com';
 z.string.extensions_giphy_no_gifs = 'Oops, no gifs';
 z.string.extensions_giphy_random = 'Random';
 
 // People View
 z.string.search_open = 'Open';
 z.string.search_open_group = 'Create Group';
-z.string.people_confirm_label = 'Add to conversation';
-z.string.people_people = '%no People';
+z.string.people_confirm_label = 'Add people to group';
+z.string.people_people = '{{number}} People';
 z.string.people_search_placeholder = 'Search by name';
 z.string.people_everyone_participates = 'Everyone you’re\nconnected to is already in\nthis conversation.';
 z.string.people_no_matches = 'No matching results.\nTry entering a different name.';
-z.string.people_invite = 'Invite people';
-z.string.people_share = 'Share Contacts';
-z.string.people_bring_your_friends = 'Bring your Friends to Wire';
+z.string.people_invite = 'Invite people to join Wire';
 z.string.people_invite_detail = 'Sharing your contacts helps you connect with others. We anonymize all the information and do not share it with anyone else.';
 z.string.people_invite_button_contacts = 'From Contacts';
 z.string.people_invite_button_gmail = 'From Gmail';
 z.string.people_invite_headline = 'Bring your friends';
+z.string.people_share = 'Share Contacts';
 z.string.people_tabs_details = 'Details';
 z.string.people_tabs_devices = 'Devices';
-z.string.people_tabs_devices_headline = 'Wire gives every device a unique fingerprint. Compare them with %@.name and verify your conversation.';
+z.string.people_tabs_devices_headline = 'Wire gives every device a unique fingerprint. Compare them with {{user}} and verify your conversation.';
+z.string.people_tabs_devices_learn_more = 'Learn more';
 z.string.people_tabs_devices_why_verify = 'Why verify conversation?';
-z.string.people_tabs_no_devices_headline = '%@.name is using an old version of Wire. No devices are shown here.';
+z.string.people_tabs_no_devices_headline = '{{user}} is using an old version of Wire. No devices are shown here.';
 z.string.people_tabs_device_detail_all_my_devices = 'Show all my devices';
 z.string.people_tabs_device_detail_device_fingerprint = 'Device fingerprint';
-z.string.people_tabs_device_detail_headline = 'Verify that this matches the fingerprint shown on %bold%@.name’s device%end.';
+z.string.people_tabs_device_detail_headline = 'Verify that this matches the fingerprint shown on {{html1}}{{user}}’s device{{html2}}.';
 z.string.people_tabs_device_detail_how_to = 'How do I do that?';
 z.string.people_tabs_device_detail_reset_session = 'Reset session';
 z.string.people_tabs_device_detail_show_my_device = 'Show my device fingerprint';
@@ -385,15 +386,15 @@ z.string.people_verified = 'Verified';
 
 // Block user
 z.string.people_block_headline = 'Block?';
-z.string.people_block_message = '%@.first_name won’t be able to contact you or add you to group conversations.';
+z.string.people_block_message = '{{user}} won’t be able to contact you or add you to group conversations.';
 
 // Accept a pending connection dialogue
 z.string.people_connect_headline = 'Accept?';
-z.string.people_connect_message = 'This will connect you and open the conversation with %@.first_name.';
+z.string.people_connect_message = 'This will connect you and open the conversation with {{user}}.';
 
 // Cancel a pending request
 z.string.people_cancel_request_headline = 'Cancel Request?';
-z.string.people_cancel_request_message = 'Remove connection request to %@.first_name.';
+z.string.people_cancel_request_message = 'Remove connection request to {{user}}.';
 
 // Leave the conversation dialogue
 z.string.people_leave_headline = 'Leave the conversation?';
@@ -401,11 +402,11 @@ z.string.people_leave_message = 'You won’t be able to send or receive messages
 
 // Remove from conversation dialogue
 z.string.people_remove_headline = 'Remove?';
-z.string.people_remove_message = '%@.first_name won’t be able to send or receive messages in this conversation.';
+z.string.people_remove_message = '{{user}} won’t be able to send or receive messages in this conversation.';
 
 // Unblock user
 z.string.people_unblock_headline = 'Unblock?';
-z.string.people_unblock_message = '%@.first_name will be able to contact you and add you to group conversations again.';
+z.string.people_unblock_message = '{{user}} will be able to contact you and add you to group conversations again.';
 
 // Button labels for the actions
 z.string.people_button_add = 'Add people';
@@ -438,7 +439,7 @@ z.string.preferences_about_support = 'Support';
 z.string.preferences_about_support_website = 'Support website';
 z.string.preferences_about_support_contact = 'Contact Support';
 z.string.preferences_about_terms_of_use = 'Terms of use';
-z.string.preferences_about_version = 'Version %version';
+z.string.preferences_about_version = 'Version {{version}}';
 z.string.preferences_about_website = 'Wire website';
 
 z.string.preferences_account_reset_password = 'Reset password';
@@ -454,8 +455,8 @@ z.string.preferences_av_microphone = 'Microphone';
 z.string.preferences_av_permission_detail = 'Enable from your browser Preferences';
 z.string.preferences_av_speakers = 'Speakers';
 
-z.string.preferences_devices_activated_in = 'in %location';
-z.string.preferences_devices_activated_on = 'Activated on %time';
+z.string.preferences_devices_activated_in = 'in {{location}}';
+z.string.preferences_devices_activated_on = 'Activated on {{date}}';
 z.string.preferences_devices_active = 'Active';
 z.string.preferences_devices_active_detail = 'If you don’t recognize a device above, remove it and reset your password.';
 z.string.preferences_devices_current = 'Current';
@@ -485,9 +486,11 @@ z.string.preferences_options_contacts_detail = 'We use your contact data to conn
 z.string.preferences_options_data = 'Usage and crash reports';
 z.string.preferences_options_data_checkbox = 'Send anonymous data';
 z.string.preferences_options_data_detail = 'Make Wire better by sending anonymous information.';
-z.string.preferences_options_emoji = 'Emoji';
-z.string.preferences_options_replace_inline_emoji_checkbox = 'Inline replacement';
-z.string.preferences_options_replace_inline_emoji_detail = 'Replace ASCII emoticons with emojis while typing, e.g. :-) → 🙂';
+z.string.preferences_options_popular = 'By popular demand';
+z.string.preferences_options_emoji_replace_checkbox = 'Replace type emoticons with emojis';
+z.string.preferences_options_emoji_replace_detail = ':-) → {{icon}}';
+z.string.preferences_options_previews_send_checkbox = 'Create previews for links you send';
+z.string.preferences_options_previews_send_detail = 'Previews may still be shown for links from other people.';
 z.string.preferences_options_notifications = 'Notifications';
 z.string.preferences_options_notifications_none = 'Off';
 z.string.preferences_options_notifications_obfuscate = 'Hide details';
@@ -541,7 +544,7 @@ z.string.url_decrypt_error_2 = 'https://wire.com/privacy/error-2';
 // Warnings: Permission requests & permission callbacks
 z.string.warning_call_detail = 'Your browser needs access to the microphone to make calls.';
 z.string.warning_call_headline = 'Can’t call without microphone';
-z.string.warning_call_unsupported_incoming = '%s.first_name is calling. Your browser doesn’t support calls.';
+z.string.warning_call_unsupported_incoming = '{{user}} is calling. Your browser doesn’t support calls.';
 z.string.warning_call_unsupported_outgoing = 'You cannot call because your browser doesn’t support calls.';
 z.string.warning_call_issues = 'This version of Wire can not participate in the call. Please use';
 z.string.warning_call_upgrade_browser = 'To call, please update Google Chrome.';
@@ -551,10 +554,10 @@ z.string.warning_not_found_microphone = 'You cannot call because your computer d
 z.string.warning_permission_denied_camera = 'You cannot call because your browser does not have access to the camera.';
 z.string.warning_permission_denied_microphone = 'You cannot call because your browser does not have access to the microphone.';
 z.string.warning_permission_denied_screen = 'Your browser needs permission to share your screen.';
-z.string.warning_permission_request_camera = '%icon Allow access to camera';
-z.string.warning_permission_request_microphone = '%icon Allow access to microphone';
-z.string.warning_permission_request_notification = '%icon Allow notifications';
-z.string.warning_permission_request_screen = '%icon Allow access to screen';
+z.string.warning_permission_request_camera = '{{icon}} Allow access to camera';
+z.string.warning_permission_request_microphone = '{{icon}} Allow access to microphone';
+z.string.warning_permission_request_notification = '{{icon}} Allow notifications';
+z.string.warning_permission_request_screen = '{{icon}} Allow access to screen';
 z.string.warning_tell_me_how = 'Tell me how';
 
 // Warnings: Connectivity
@@ -571,15 +574,15 @@ z.string.system_notification_asset_add = 'Shared a picture';
 z.string.system_notification_connection_accepted = 'Accepted your connection request';
 z.string.system_notification_connection_connected = 'You are now connected';
 z.string.system_notification_connection_request = 'Wants to connect';
-z.string.system_notification_conversation_create = '%s.first_name started a conversation';
-z.string.system_notification_conversation_rename = '%s.first_name renamed the conversation to %name';
-z.string.system_notification_member_join_many = '%s.first_name added %no people to the conversation';
-z.string.system_notification_member_join_one = '%s.first_name added %@.first_name to the conversation';
+z.string.system_notification_conversation_create = '{{user}} started a conversation';
+z.string.system_notification_conversation_rename = '{{user}} renamed the conversation to {{name}}';
+z.string.system_notification_member_join_many = '{{user}} added {{number}} people to the conversation';
+z.string.system_notification_member_join_one = '{{user1}} added {{user2}} to the conversation';
 z.string.system_notification_member_leave_removed_you = '{{user}} removed you from the conversation';
 z.string.system_notification_obfuscated = 'Sent you a message';
 z.string.system_notification_obfuscated_title = 'Someone';
 z.string.system_notification_ping = 'Pinged';
-z.string.system_notification_reaction = '%reaction your message';
+z.string.system_notification_reaction = '{{reaction}} your message';
 z.string.system_notification_shared_audio = 'Shared an audio message';
 z.string.system_notification_shared_file = 'Shared a file';
 z.string.system_notification_shared_location = 'Shared a location';
@@ -593,19 +596,20 @@ z.string.tooltip_conversation_call = 'Call';
 z.string.tooltip_conversation_ephemeral = 'Timed message';
 z.string.tooltip_conversation_file = 'Add file';
 z.string.tooltip_conversation_input_placeholder = 'Type a message';
-z.string.tooltip_conversation_people = 'People (%shortcut)';
+z.string.tooltip_conversation_people = 'People ({{shortcut}})';
 z.string.tooltip_conversation_picture = 'Add picture';
-z.string.tooltip_conversation_ping = 'Ping (%shortcut)';
+z.string.tooltip_conversation_ping = 'Ping ({{shortcut}})';
 z.string.tooltip_conversation_video_call = 'Video Call';
 
-z.string.tooltip_conversations_archive = 'Archive (%shortcut)';
-z.string.tooltip_conversations_archived = 'Show archive (%no)';
+z.string.tooltip_conversations_archive = 'Archive ({{shortcut}})';
+z.string.tooltip_conversations_archived = 'Show archive ({{number}})';
 z.string.tooltip_conversations_more = 'More';
-z.string.tooltip_conversations_notify = 'Unmute (%shortcut)';
-z.string.tooltip_conversations_silence = 'Mute (%shortcut)';
-z.string.tooltip_conversations_tooltip_start = 'Start conversation (%shortcut)';
+z.string.tooltip_conversations_notify = 'Unmute ({{shortcut}})';
+z.string.tooltip_conversations_preferences = 'Open preferences';
+z.string.tooltip_conversations_silence = 'Mute ({{shortcut}})';
+z.string.tooltip_conversations_start = 'Start conversation ({{shortcut}})';
 
-z.string.tooltip_people_add = 'Add people to conversation (%shortcut)';
+z.string.tooltip_people_add = 'Add people to conversation ({{shortcut}})';
 z.string.tooltip_people_back = 'Back';
 z.string.tooltip_people_block = 'Block';
 z.string.tooltip_people_connect = 'Connect';
@@ -626,10 +630,10 @@ z.string.tooltip_search_close = 'Close (Esc)';
 
 // App loading
 z.string.init_received_access_token = 'Signed in';
-z.string.init_received_self_user = 'Hello, %name.';
+z.string.init_received_self_user = 'Hello, {{user}}.';
 z.string.init_validated_client = 'Fetching your connections and conversations';
 z.string.init_received_user_data = 'Checking for new messages';
-z.string.init_events_progress = 'Loading messages - %progress of %total';
+z.string.init_events_progress = 'Loading messages - {{number1}} of {{number2}}';
 z.string.init_updated_from_notifications = 'Enjoy Wire';
 
 z.string.ephememal_units_none = 'Off';

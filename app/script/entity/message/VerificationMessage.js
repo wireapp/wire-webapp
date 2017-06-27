@@ -58,13 +58,7 @@ z.entity.VerificationMessage = class VerificationMessage extends z.entity.Messag
       if (this.is_self_device()) {
         return z.l10n.text(z.string.conversation_device_your_devices);
       }
-      return z.localization.Localizer.get_text({
-        id: z.string.conversation_device_user_devices,
-        replace: {
-          content: this.user_ets()[0].first_name(),
-          placeholder: '%@name',
-        },
-      });
+      return z.l10n.text(z.string.conversation_device_user_devices, this.user_ets()[0].first_name());
     });
   }
 

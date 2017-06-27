@@ -114,7 +114,7 @@ z.entity.User = class User {
 
     this.initials = ko.pureComputed(() => {
       let initials = '';
-      if ((this.first_name() != null) && (this.last_name() != null)) {
+      if (this.first_name() && this.last_name()) {
         const first = z.util.StringUtil.get_first_character(this.first_name());
         const last = z.util.StringUtil.get_first_character(this.last_name());
         initials = `${first}${last}`;
@@ -125,8 +125,6 @@ z.entity.User = class User {
     });
 
     this.username = ko.observable();
-
-    this.mutual_friends_total = ko.observable(0);
 
     this.preview_picture_resource = ko.observable();
     this.medium_picture_resource = ko.observable();
@@ -140,6 +138,8 @@ z.entity.User = class User {
     this.is_incoming_request = ko.pureComputed(() => this.connection().is_incoming_request());
     this.is_outgoing_request = ko.pureComputed(() => this.connection().is_outgoing_request());
     this.is_unknown = ko.pureComputed(() => this.connection().is_unknown());
+
+    this.is_team_member = ko.observable(false);
 
     this.is_request = ko.pureComputed(() => this.connection().is_request());
 

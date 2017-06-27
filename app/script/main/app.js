@@ -25,7 +25,11 @@ window.z.main = z.main || {};
 z.main.App = class App {
   static get CONFIG() {
     return {
-      COOKIE_NAME: 'app_opened',
+      TABS_CHECK: {
+        COOKIE_NAME: 'app_opened',
+        COOKIE_TIMEOUT: 5 * 60 * 1000,
+        RENEWAL_THRESHOLD: 15 * 1000,
+      },
     };
   }
 
@@ -81,7 +85,7 @@ z.main.App = class App {
     repositories.search              = new z.search.SearchRepository(this.service.search, repositories.user);
     repositories.properties          = new z.properties.PropertiesRepository(this.service.properties);
     repositories.connect             = new z.connect.ConnectRepository(this.service.connect, this.service.connect_google, repositories.properties);
-    repositories.links               = new z.links.LinkPreviewRepository(this.service.asset);
+    repositories.links               = new z.links.LinkPreviewRepository(this.service.asset, repositories.properties);
     repositories.team                = new z.team.TeamRepository(this.service.team, repositories.user);
 
     repositories.conversation        = new z.conversation.ConversationRepository(
@@ -199,7 +203,7 @@ z.main.App = class App {
   init_app(is_reload = this._is_reload()) {
     z.util.check_indexed_db()
     .then(() => this._check_single_instance())
-    .then(() => this._load_access_token(is_reload))
+    .then(() => this._load_access_token())
     .then(() => {
       this.view.loading.update_progress(2.5, z.string.init_received_access_token);
       this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
@@ -233,7 +237,6 @@ z.main.App = class App {
       return Promise.all([
         this.repository.conversation.get_conversations(),
         this.repository.user.get_connections(),
-        this.repository.team.get_teams(),
       ]);
     })
     .then(([conversation_ets, connection_ets]) => {
@@ -245,9 +248,13 @@ z.main.App = class App {
 
       this.repository.conversation.initialize_connections(this.repository.user.connections());
       this._subscribe_to_unload_events();
-      return this.repository.event.initialize_from_notification_stream();
+
+      return Promise.all([
+        this.repository.event.initialize_from_notification_stream(),
+        this.repository.team.get_teams(),
+      ]);
     })
-    .then((notifications_count) => {
+    .then(([notifications_count, team_ets]) => {
       this.view.loading.update_progress(95, z.string.init_updated_from_notifications);
 
       this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
@@ -282,37 +289,7 @@ z.main.App = class App {
       this.repository.conversation.cleanup_conversations();
       this.logger.info('App fully loaded');
     })
-    .catch((error) => {
-      let error_message = `Error during initialization of app version '${z.util.Environment.version(false)}'`;
-      if (z.util.Environment.electron) {
-        error_message = `${error_message} - Electron '${platform.os.family}' '${z.util.Environment.version()}'`;
-      }
-
-      this.logger.info(error_message, {error});
-      if (error instanceof z.auth.AuthError) {
-        if (error.type === z.auth.AuthError.TYPE.MULTIPLE_TABS) {
-          return this._redirect_to_login(z.auth.SignOutReason.MULTIPLE_TABS);
-        }
-        return this._redirect_to_login(z.auth.SignOutReason.INDEXED_DB);
-      }
-
-      this.logger.debug(`App reload: '${is_reload}', Document referrer: '${document.referrer}', Location: '${window.location.href}'`);
-
-      if (is_reload && ![z.client.ClientError.TYPE.MISSING_ON_BACKEND, z.client.ClientError.TYPE.NO_LOCAL_CLIENT].includes(error.type)) {
-        return this.auth.client.execute_on_connectivity(z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.APP_INIT_RELOAD).then(() => window.location.reload(false));
-      }
-
-      if (navigator.onLine) {
-        this.logger.error(`Caused by: ${(error ? error.message : undefined) || error}`, error);
-        if (error instanceof z.storage.StorageError) {
-          Raygun.send(error);
-        }
-        return this.logout(z.auth.SignOutReason.APP_INIT);
-      }
-
-      this.logger.warn('No connectivity. Trigger reload on regained connectivity.', error);
-      this._watch_online_status();
-    });
+    .catch((error) => this._app_init_failure(error, is_reload));
   }
 
   /**
@@ -352,23 +329,78 @@ z.main.App = class App {
     amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.NO_INTERNET);
   }
 
-  /**
-   * Get the self user from the backend.
-   * @returns {Promise<z.entity.User>} Resolves with the self user entity
-   */
-  _get_user_self() {
-    return this.repository.user.get_me()
-    .then((user_et) => {
-      this.logger.info(`Loaded self user with ID '${user_et.id}'`);
-      if (!user_et.email() && !user_et.phone()) {
-        throw new Error('User does not have a verified identity');
+  _app_init_failure(error, is_reload) {
+    let log_message = `Could not initialize app version '${z.util.Environment.version(false)}'`;
+    if (z.util.Environment.desktop) {
+      log_message = `${log_message} - Electron '${platform.os.family}' '${z.util.Environment.version()}'`;
+    }
+    this.logger.info(log_message, {error});
+
+    const {message, type} = error;
+    const is_auth_error = error instanceof z.auth.AuthError;
+    if (is_auth_error) {
+      if (type === z.auth.AuthError.TYPE.MULTIPLE_TABS) {
+        return this._redirect_to_login(z.auth.SignOutReason.MULTIPLE_TABS);
       }
-      return this.service.storage.init(user_et.id)
-      .then(() => {
-        this._check_user_information(user_et);
-        return user_et;
-      });
-    });
+      return this._redirect_to_login(z.auth.SignOutReason.INDEXED_DB);
+    }
+
+    this.logger.debug(`App reload: '${is_reload}', Document referrer: '${document.referrer}', Location: '${window.location.href}'`);
+    if (is_reload) {
+      const is_session_expired = [
+        z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN,
+        z.auth.AccessTokenError.TYPE.NOT_FOUND_IN_CACHE,
+      ];
+
+      if (is_session_expired.includes(type)) {
+        this.logger.error(`Session expired on page reload: ${message}`, error);
+        Raygun.send(new Error(('Session expired on page reload'), error));
+        return this._redirect_to_login(z.auth.SignOutReason.SESSION_EXPIRED);
+      }
+
+      const is_access_token_error = error instanceof z.auth.AccessTokenError;
+      const is_invalid_client = [
+        z.client.ClientError.TYPE.MISSING_ON_BACKEND,
+        z.client.ClientError.TYPE.NO_LOCAL_CLIENT,
+      ];
+
+      if (is_access_token_error || !is_invalid_client.includes(type)) {
+        this.logger.warn('Connectivity issues. Trigger reload on regained connectivity.', error);
+        const trigger_source = is_access_token_error
+          ? z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_RETRIEVAL
+          : z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.APP_INIT_RELOAD;
+        return this.auth.client.execute_on_connectivity(trigger_source)
+          .then(() => window.location.reload(false));
+      }
+    }
+
+    if (navigator.onLine) {
+      switch (type) {
+        case z.auth.AccessTokenError.TYPE.NOT_FOUND_IN_CACHE:
+        case z.auth.AccessTokenError.TYPE.RETRIES_EXCEEDED:
+        case z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN: {
+          this.logger.warn(`Redirecting to login: ${error.message}`, error);
+          return this._redirect_to_login(z.auth.SignOutReason.NOT_SIGNED_IN);
+        }
+
+        default: {
+          this.logger.error(`Caused by: ${(error ? error.message : undefined) || error}`, error);
+          const is_storage_error = error instanceof z.storage.StorageError;
+          if (is_storage_error) {
+            Raygun.send(error);
+          }
+
+          const is_access_token_error = error instanceof z.auth.AccessTokenError;
+          if (is_access_token_error) {
+            this.logger.error(`Could not get access token: ${error.message}. Logging out user.`, error);
+          }
+          return this.logout(z.auth.SignOutReason.APP_INIT);
+        }
+      }
+    }
+
+    this.logger.warn('No connectivity. Trigger reload on regained connectivity.', error);
+    this._watch_online_status();
   }
 
   /**
@@ -390,14 +422,36 @@ z.main.App = class App {
    * @returns {Promise} Resolves when page is the first tab
    */
   _check_single_instance() {
-    const cookie_name = App.CONFIG.COOKIE_NAME;
-    if (Cookies.get(cookie_name)) {
-      return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.MULTIPLE_TABS));
+    if (!z.util.Environment.electron) {
+      const cookie_name = App.CONFIG.TABS_CHECK.COOKIE_NAME;
+      if (Cookies.get(cookie_name)) {
+        return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.MULTIPLE_TABS));
+      }
+
+      this._set_single_instance_cookie();
+      $(window).on('beforeunload', () => Cookies.remove(cookie_name));
     }
 
-    Cookies.set(cookie_name, true);
-    $(window).on('unload', () => Cookies.remove(cookie_name));
     return Promise.resolve();
+  }
+
+  /**
+   * Get the self user from the backend.
+   * @returns {Promise<z.entity.User>} Resolves with the self user entity
+   */
+  _get_user_self() {
+    return this.repository.user.get_me()
+    .then((user_et) => {
+      this.logger.info(`Loaded self user with ID '${user_et.id}'`);
+      if (!user_et.email() && !user_et.phone()) {
+        throw new Error('User does not have a verified identity');
+      }
+      return this.service.storage.init(user_et.id)
+      .then(() => {
+        this._check_user_information(user_et);
+        return user_et;
+      });
+    });
   }
 
   /**
@@ -428,51 +482,28 @@ z.main.App = class App {
 
   /**
    * Load the access token from cache or get one from the backend.
-   * @param {boolean} is_reload - Is initialization a page reload
    * @returns {Promise} Resolves with the access token
    */
-  _load_access_token(is_reload) {
-    return new Promise((resolve) => {
-      let token_promise;
-      if (z.util.Environment.frontend.is_localhost() || document.referrer.toLowerCase().includes('/auth')) {
-        token_promise = this.auth.repository.get_cached_access_token().then(resolve);
-      } else {
-        token_promise = this.auth.repository.get_access_token().then(resolve);
-      }
+  _load_access_token() {
+    const is_localhost = z.util.Environment.frontend.is_localhost();
+    const is_redirect_from_auth = document.referrer.toLowerCase().includes('/auth');
+    const get_cached_token = is_localhost || is_redirect_from_auth;
 
-      return token_promise.catch((error) => {
-        if (is_reload) {
-          if ([z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN, z.auth.AccessTokenError.TYPE.NOT_FOUND_IN_CACHE].includes(error.type)) {
-            this.logger.error(`Session expired on page reload: ${error.message}`, error);
-            Raygun.send(new Error(('Session expired on page reload'), error));
-            return this._redirect_to_login(z.auth.SignOutReason.SESSION_EXPIRED);
-          }
-          this.logger.warn('Connectivity issues. Trigger reload on regained connectivity.', error);
-          return this.auth.client.execute_on_connectivity(z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_RETRIEVAL)
-          .then(function() {
-            window.location.reload(false);
-          });
-        }
-
-        if (navigator.onLine) {
-          switch (error.type) {
-            case z.auth.AccessTokenError.TYPE.NOT_FOUND_IN_CACHE:
-            case z.auth.AccessTokenError.TYPE.RETRIES_EXCEEDED:
-            case z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN:
-              this.logger.warn(`Redirecting to login: ${error.message}`, error);
-              return this._redirect_to_login(z.auth.SignOutReason.NOT_SIGNED_IN);
-            default:
-              this.logger.error(`Could not get access token: ${error.message}. Logging out user.`, error);
-              return this.logout(z.auth.SignOutReason.APP_INIT);
-          }
-        }
-
-        this.logger.warn('No connectivity. Trigger reload on regained connectivity.', error);
-        this._watch_online_status();
-      });
-    });
+    const token_promise = get_cached_token ? this.auth.repository.get_cached_access_token() : this.auth.repository.get_access_token();
+    return token_promise;
   }
 
+  /**
+   * Set the cookie to verify we are running a single instace tab.
+   * @returns {undefined} No return value
+   */
+  _set_single_instance_cookie() {
+    const cookie_timeout = new Date(Date.now() + App.CONFIG.TABS_CHECK.COOKIE_TIMEOUT);
+    Cookies.set(App.CONFIG.TABS_CHECK.COOKIE_NAME, true, {expires: cookie_timeout});
+
+    const renewal_timeout = App.CONFIG.TABS_CHECK.COOKIE_TIMEOUT - App.CONFIG.TABS_CHECK.RENEWAL_THRESHOLD;
+    window.setTimeout(() => this._set_single_instance_cookie(), renewal_timeout);
+  }
 
   /**
    * Hide the loading spinner and show the application UI.
@@ -569,12 +600,8 @@ z.main.App = class App {
       // Clear IndexedDB
       if (clear_data) {
         this.repository.storage.delete_everything()
-        .catch((error) => {
-          return this.logger.error('Failed to delete database before logout', error);
-        })
-        .then(() => {
-          this._redirect_to_login(sign_out_reason);
-        });
+          .catch((error) => this.logger.error('Failed to delete database before logout', error))
+          .then(() => this._redirect_to_login(sign_out_reason));
       } else {
         this._redirect_to_login(sign_out_reason);
       }
@@ -583,8 +610,8 @@ z.main.App = class App {
     const _logout_on_backend = () => {
       this.logger.info(`Logout triggered by '${sign_out_reason}': Disconnecting user from the backend.`);
       this.auth.repository.logout()
-      .then(() => _logout())
-      .catch(() => this._redirect_to_login(sign_out_reason));
+        .then(() => _logout())
+        .catch(() => this._redirect_to_login(sign_out_reason));
     };
 
     if (sign_out_reason === z.auth.SignOutReason.SESSION_EXPIRED) {
@@ -604,7 +631,7 @@ z.main.App = class App {
    * @returns {undefined} No return value
    */
   refresh() {
-    if (z.util.Environment.electron) {
+    if (z.util.Environment.desktop) {
       amplify.publish(z.event.WebApp.LIFECYCLE.RESTART, this.update_source);
     }
     if (this.update_source === z.announce.UPDATE_SOURCE.WEBAPP) {
@@ -631,15 +658,15 @@ z.main.App = class App {
   _redirect_to_login(sign_out_reason) {
     this.logger.info(`Redirecting to login after connectivity verification. Reason: ${sign_out_reason}`);
     this.auth.client.execute_on_connectivity(z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.LOGIN_REDIRECT)
-    .then(() => {
-      let url = `/auth/${location.search}`;
+      .then(() => {
+        let url = `/auth/${location.search}`;
 
-      if (sign_out_reason === z.auth.SignOutReason.SESSION_EXPIRED) {
-        url = z.util.append_url_parameter(url, z.auth.URLParameter.EXPIRED);
-      }
+        if (sign_out_reason === z.auth.SignOutReason.SESSION_EXPIRED) {
+          url = z.util.append_url_parameter(url, z.auth.URLParameter.EXPIRED);
+        }
 
-      window.location.replace(url);
-    });
+        window.location.replace(url);
+      });
   }
 
 
@@ -701,6 +728,7 @@ z.main.App = class App {
 //##############################################################################
 // Setting up the App
 //##############################################################################
+
 $(function() {
   if ($('#wire-main-app').length !== 0) {
     wire.app = new z.main.App(wire.auth);

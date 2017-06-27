@@ -222,29 +222,9 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       const meta_key = z.util.Environment.os.mac ? z.l10n.text(z.string.invite_meta_key_mac) : z.l10n.text(z.string.invite_meta_key_pc);
 
       if (this.invite_message_selected()) {
-        return z.localization.Localizer.get_text({
-          id: z.string.invite_hint_selected,
-          replace: [
-            {
-              content: meta_key,
-              placeholder: '%meta_key',
-            },
-          ],
-        });
+        return z.l10n.text(z.string.invite_hint_selected, meta_key);
       }
-      return z.localization.Localizer.get_text({
-        id: z.string.invite_hint_unselected,
-        replace: [
-          {
-            content: meta_key,
-            placeholder: '%meta_key',
-          },
-        ],
-      });
-    });
-
-    this.invite_button_text = ko.pureComputed(() => {
-      return z.l10n.text(this.show_invite_form_only() ? z.string.people_invite : z.string.people_bring_your_friends);
+      return z.l10n.text(z.string.invite_hint_unselected, meta_key);
     });
 
     // Last open bubble
@@ -319,20 +299,20 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
   _show_on_boarding_results(response) {
     return this.search_repository.show_on_boarding(response)
-      .then(({connections, suggestions}) => {
-        this.suggestions(suggestions.length ? suggestions : connections);
-        return this.get_top_people();
-      })
-      .then((user_ets) => {
-        this.top_users(user_ets);
+      .then((connected_user_ets = []) => {
         this.selected_people.removeAll();
-
+        this.suggestions(connected_user_ets);
         if (!this.suggestions().length) {
-          if (this.top_users().length) {
-            return this.suggestions(this.top_users());
-          }
+          return this.get_top_people()
+            .then((user_ets) => {
+              this.top_users(user_ets);
 
-          return this.show_no_contacts_on_wire(true);
+              if (!this.suggestions().length && this.top_users().length) {
+                return this.suggestions(this.top_users());
+              }
+
+              return this.show_no_contacts_on_wire(true);
+            });
         }
       })
       .catch((error) => {
@@ -499,7 +479,6 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.active_team(this.team_repository.personal_space);
 
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.SENT_CONNECT_REQUEST, {
-      common_users_count: user_et.mutual_friends_total(),
       context: 'startui',
     });
   }
@@ -562,15 +541,8 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
       const self = this.user_repository.self();
 
-      if (self.email()) {
-        this.invite_message(z.localization.Localizer.get_text({
-          id: z.string.invite_message,
-          replace: [
-            {
-              content: `@${self.username()}`,
-              placeholder: '%username',
-            },
-          ]}));
+      if (self.username()) {
+        this.invite_message(z.l10n.text(z.string.invite_message, `@${self.username()}`));
       } else {
         this.invite_message(z.l10n.text(z.string.invite_message_no_email));
       }
@@ -699,16 +671,31 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
   }
 
   _handle_search_input() {
-    const [matching_connection] = this.search_results.contacts();
     const [matching_group] = this.search_results.groups();
-    const [matching_team_member] = this.search_results.team_members();
 
-    if (matching_connection && this.is_personal_space()) {
+    let matching_connection = undefined;
+    let matching_team_member = undefined;
+
+    for (const user_et of this.search_results.contacts()) {
+      if (!this.selected_people().includes(user_et)) {
+        matching_connection = user_et;
+        break;
+      }
+    }
+
+    for (const user_et of this.search_results.team_members()) {
+      if (!this.selected_people().includes(user_et)) {
+        matching_team_member = user_et;
+        break;
+      }
+    }
+
+    if (this.is_personal_space() && matching_connection) {
       this.selected_people.push(matching_connection);
       return true;
     }
 
-    if (matching_team_member && !this.is_personal_space()) {
+    if (!this.is_personal_space() && matching_team_member) {
       this.selected_people.push(matching_team_member);
       return true;
     }

@@ -30,6 +30,7 @@ z.auth.AuthView = {
     VERTICAL_TOP: 'vertical-top',
   },
   MODE: {
+    ACCOUNT_INVITE: 'invite',
     ACCOUNT_LOGIN: 'login',
     ACCOUNT_PASSWORD: 'password',
     ACCOUNT_PHONE: 'phone',

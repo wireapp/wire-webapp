@@ -180,21 +180,8 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
   }
 
   _show_modal_block(content, title_element, message_element) {
-    title_element.text(z.localization.Localizer.get_text({
-      id: z.string.modal_block_conversation_headline,
-      replace: {
-        content: content,
-        placeholder: '%@.name',
-      },
-    }));
-
-    message_element.text(z.localization.Localizer.get_text({
-      id: z.string.modal_block_conversation_message,
-      replace: {
-        content: content,
-        placeholder: '%@.name',
-      },
-    }));
+    title_element.text(z.l10n.text(z.string.modal_block_conversation_headline, content));
+    message_element.text(z.l10n.text(z.string.modal_block_conversation_message, content));
   }
 
   /**
@@ -222,13 +209,7 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
     }
 
     const title_element = $(type).find('.modal-title');
-    title_element.text(z.localization.Localizer.get_text({
-      id: z.string.modal_clear_conversation_headline,
-      replace: {
-        content: options.data,
-        placeholder: '%@.name',
-      },
-    }));
+    title_element.text(z.l10n.text(z.string.modal_clear_conversation_headline));
 
     return type;
   }
@@ -250,33 +231,20 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
   }
 
   _show_modal_leave(content, title_element) {
-    title_element.text(z.localization.Localizer.get_text({
-      id: z.string.modal_leave_conversation_headline,
-      replace: {
-        content: content,
-        placeholder: '%@.name',
-      },
-    }));
+    title_element.text(z.l10n.text(z.string.modal_leave_conversation_headline, content));
   }
 
   _show_modal_new_device(content, title_element, message_element, action_element) {
     let action_id, message_id;
     const joined_names = z.util.StringUtil.capitalize_first_char(z.util.LocalizerUtil.join_names(content.user_ets, z.string.Declension.NOMINATIVE));
 
-    let string_id;
-    if (content.user_ets.length === 1) {
-      string_id = content.user_ets[0].is_me ? z.string.modal_new_device_headline_you : z.string.modal_new_device_headline;
+    if (content.user_ets.length > 1) {
+      title_element.text(z.l10n.text(z.string.modal_new_device_headline_many, joined_names));
+    } else if (content.user_ets[0].is_me) {
+      title_element.text(z.l10n.text(z.string.modal_new_device_headline_you, joined_names));
     } else {
-      string_id = z.string.modal_new_device_headline_many;
+      title_element.text(z.l10n.text(z.string.modal_new_device_headline, joined_names));
     }
-
-    title_element.text(z.localization.Localizer.get_text({
-      id: string_id,
-      replace: {
-        content: joined_names,
-        placeholder: content.user_ets.length === 1 ? '%@.name' : '%@.names',
-      },
-    }));
 
     switch (content.consent_type) {
       case z.ViewModel.MODAL_CONSENT_TYPE.INCOMING_CALL:
@@ -297,56 +265,25 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
   }
 
   _show_modal_remove_device(content, title_element) {
-    title_element.text(z.localization.Localizer.get_text({
-      id: z.string.modal_remove_device_headline,
-      replace: {
-        content: content,
-        placeholder: '%device_name',
-      },
-    }));
+    title_element.text(z.l10n.text(z.string.modal_remove_device_headline, content));
   }
 
   _show_modal_too_many_members(content, message_element) {
-    message_element.text(z.localization.Localizer.get_text({
-      id: z.string.modal_too_many_members_message,
-      replace: [{
-        content: content.open_spots,
-        placeholder: '%no',
-      },
-      {
-        content: content.max,
-        placeholder: '%max',
-      }],
+    message_element.text(z.l10n.text(z.string.modal_too_many_members_message, {
+      number1: content.max,
+      number2: content.open_spots,
     }));
   }
 
   _show_modal_upload_parallel(content, title_element) {
-    title_element.text(z.localization.Localizer.get_text({
-      id: z.string.modal_uploads_parallel,
-      replace: {
-        content: content,
-        placeholder: '%no',
-      },
-    }));
+    title_element.text(z.l10n.text(z.string.modal_uploads_parallel, content));
   }
 
   _show_modal_upload_too_large(content, title_element) {
-    title_element.text(z.localization.Localizer.get_text({
-      id: z.string.conversation_asset_upload_too_large,
-      replace: {
-        content: content,
-        placeholder: '%no',
-      },
-    }));
+    title_element.text(z.l10n.text(z.string.conversation_asset_upload_too_large, content));
   }
 
   _show_modal_message_too_long(content, message_element) {
-    message_element.text(z.localization.Localizer.get_text({
-      id: z.string.modal_too_long_message,
-      replace: {
-        content: content,
-        placeholder: '%no',
-      },
-    }));
+    message_element.text(z.l10n.text(z.string.modal_too_long_message, content));
   }
 };

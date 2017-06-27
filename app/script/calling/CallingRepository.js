@@ -124,7 +124,7 @@ z.calling.CallingRepository = class CallingRepository {
     amplify.subscribe(z.event.WebApp.CALL.STATE.PARTICIPANT_LEFT, this.participant_left.bind(this));
     amplify.subscribe(z.event.WebApp.CALL.STATE.TOGGLE, this.toggle_state.bind(this));
     amplify.subscribe(z.event.WebApp.DEBUG.UPDATE_LAST_CALL_STATUS, this.store_flow_status.bind(this));
-    amplify.subscribe(z.event.WebApp.LOADED, this.get_config);
+    amplify.subscribe(z.event.WebApp.LIFECYCLE.LOADED, this.get_config);
     amplify.subscribe(z.util.Logger.prototype.LOG_ON_DEBUG, this.set_logging.bind(this));
   }
 
