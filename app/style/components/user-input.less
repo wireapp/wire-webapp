@@ -26,7 +26,8 @@ user-input {
   border-radius: 4px;
 
   &.user-list-light {
-    color: #222;
+    background: fade(@w-gray, 16%);
+    color: @graphite-dark;
   }
 }
 
@@ -52,8 +53,6 @@ user-input {
   .label-bold-xs();
   flex: 0 0 auto;
   line-height: @line-height-lg;
-  margin-bottom: 2px;
-  margin-top: 2px;
   padding-right: 16px;
   position: relative;
 
@@ -76,10 +75,6 @@ user-input {
 
 }
 
-.search-inner-has-close {
-  margin-right: 20px;
-}
-
 .search-inner > input {
   appearance: none;
   border: none;
@@ -89,6 +84,7 @@ user-input {
   height: @avatar-diameter-xs;
   line-height: @avatar-diameter-xs;
   min-width: 65px;
+  padding-left: -24px;
   outline: none;
 
   &:invalid {
@@ -103,26 +99,22 @@ user-input {
     .label-xs();
     color: fade(#fff, 40%);
     text-align: center;
-    padding-left: 8px;
+    margin-left: -24px;
   }
 
   .user-list-light & {
     &::placeholder {
-      color: fade(#222, 48%);
+      color: fade(@graphite-dark, 40%);
     }
   }
 }
 
 .search-icon {
-  position: absolute;
   height: @avatar-diameter-xs;
   line-height: @avatar-diameter-xs;
-  top: 4px;
-  left: 8px;
+  margin-right: 8px;
 }
 
-.search-close {
-  position: absolute;
-  top: 8px;
-  right: 8px;
+.search-input-show-placeholder {
+  margin-right: 41px;
 }
