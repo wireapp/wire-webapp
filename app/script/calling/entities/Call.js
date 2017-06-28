@@ -145,21 +145,24 @@ z.calling.entities.Call = class Call {
       this.max_number_of_participants = Math.max(users_in_call, this.max_number_of_participants);
     });
 
+    this.self_was_joined = false;
     this.self_client_joined.subscribe((is_joined) => {
-      if (!is_joined) {
-        this.is_connected(false);
-
-        if (z.calling.enum.CALL_STATE_GROUP.IS_ENDING.includes(this.state())) {
-          amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.TALK_LATER);
-        }
-
-        if (this.termination_reason) {
-          this.telemetry.track_duration(this);
-        }
-
-        this._reset_timer();
-        this._reset_flows();
+      if (is_joined) {
+        return this.self_was_joined = true;
       }
+
+      this.is_connected(false);
+
+      if (z.calling.enum.CALL_STATE_GROUP.IS_ENDING.includes(this.state())) {
+        amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.TALK_LATER);
+      }
+
+      if (this.termination_reason) {
+        this.telemetry.track_duration(this);
+      }
+
+      this._reset_timer();
+      this._reset_flows();
     });
 
     this.state.subscribe((state) => {
@@ -201,17 +204,15 @@ z.calling.entities.Call = class Call {
    * @returns {undefined} No return value
    */
   deactivate_call(call_message_et, termination_reason = z.calling.enum.TERMINATION_REASON.SELF_USER) {
-    const was_missed = z.calling.enum.CALL_STATE_GROUP.WAS_MISSED.includes(this.state());
-    const reason = was_missed ? z.calling.enum.TERMINATION_REASON.MISSED : z.calling.enum.TERMINATION_REASON.COMPLETED;
+    const reason = !this.self_was_joined ? z.calling.enum.TERMINATION_REASON.MISSED : z.calling.enum.TERMINATION_REASON.COMPLETED;
 
     this.termination_reason = termination_reason;
-    this.calling_repository.inject_deactivate_event(call_message_et, this.creating_user, reason);
+    this.calling_repository.inject_deactivate_event(call_message_et, z.event.EventRepository.SOURCE.WEB_SOCKET, this.creating_user, reason);
 
     if (this.participants().length <= 1) {
-      this.calling_repository.delete_call(this.id);
-    } else {
-      this.calling_repository.media_stream_handler.reset_media_stream();
+      return this.calling_repository.delete_call(this.id);
     }
+    this.calling_repository.media_stream_handler.reset_media_stream();
   }
 
   /**
@@ -407,10 +408,10 @@ z.calling.entities.Call = class Call {
         const additional_payload = z.calling.CallMessageBuilder.create_payload(this.id, this.self_user.id);
 
         this.send_call_message(z.calling.CallMessageBuilder.build_group_check(true, this.session_id, additional_payload));
-        this.schedule_group_check();
-      } else {
-        this.leave_call(z.calling.enum.TERMINATION_REASON.OTHER_USER);
+        return this.schedule_group_check();
       }
+
+      this.leave_call(z.calling.enum.TERMINATION_REASON.OTHER_USER);
     }, timeout_in_seconds * 1000);
   }
 

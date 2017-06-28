@@ -250,7 +250,7 @@ z.main.App = class App {
       this._subscribe_to_unload_events();
 
       return Promise.all([
-        this.repository.event.initialize_from_notification_stream(),
+        this.repository.event.initialize_from_stream(),
         this.repository.team.get_teams(),
       ]);
     })
