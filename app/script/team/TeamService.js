@@ -39,20 +39,6 @@ z.team.TeamService = class TeamService {
     this.logger = new z.util.Logger('z.team.TeamService', z.config.LOGGER.OPTIONS);
   }
 
-  delete_member(team_id, user_id) {
-    return this.client.send_json({
-      type: 'DELETE',
-      url: this.client.create_url(`${TeamService.URL.TEAMS}/${team_id}/members/${user_id}`),
-    });
-  }
-
-  delete_team() {
-    return this.client.send_json({
-      type: 'DELETE',
-      url: this.client.create_url(TeamService.URL.TEAMS),
-    });
-  }
-
   get_team_members(team_id) {
     return this.client.send_request({
       type: 'GET',
@@ -68,48 +54,6 @@ z.team.TeamService = class TeamService {
       },
       type: 'GET',
       url: this.client.create_url(TeamService.URL.TEAMS),
-    });
-  }
-
-  get_team_metadata(team_id) {
-    return this.client.send_request({
-      type: 'GET',
-      url: this.client.create_url(`${TeamService.URL.TEAMS}/${team_id}`),
-    });
-  }
-
-  post_members(team_id, members) {
-    return this.client.send_json({
-      data: {
-        members: members,
-      },
-      type: 'POST',
-      url: this.client.create_url(`${TeamService.URL.TEAMS}/${team_id}/members`),
-    });
-  }
-
-  post_team(name, members, icon, icon_key = null) {
-    return this.client.send_json({
-      data: {
-        icon: icon,
-        icon_key: icon_key,
-        members: members,
-        name: name,
-      },
-      type: 'POST',
-      url: this.client.create_url(TeamService.URL.TEAMS),
-    });
-  }
-
-  put_team(team_id, name, icon, icon_key = null) {
-    return this.client.send_json({
-      data: {
-        icon: icon,
-        icon_key: icon_key,
-        name: name,
-      },
-      type: 'PUT',
-      url: this.client.create_url(`${TeamService.URL.TEAMS}/${team_id}`),
     });
   }
 };

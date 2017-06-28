@@ -251,10 +251,10 @@ z.main.App = class App {
 
       return Promise.all([
         this.repository.event.initialize_from_stream(),
-        this.repository.team.get_teams(),
+        this.repository.team.get_team(),
       ]);
     })
-    .then(([notifications_count, team_ets]) => {
+    .then(([notifications_count, team_et]) => {
       this.view.loading.update_progress(95, z.string.init_updated_from_notifications);
 
       this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);

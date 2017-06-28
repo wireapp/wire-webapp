@@ -1,6 +1,6 @@
 <div id="start-ui" data-bind="with: $root.start_ui">
   <div class="left-list-header">
-    <span class="label-bold-xs" data-bind="text: active_team_name" data-uie-name="status-team-name-search"></span>
+    <span class="label-bold-xs" data-bind="text: team_name" data-uie-name="status-team-name-search"></span>
     <span class="left-list-header-close-button button-icon-large icon-close" data-bind="click: click_on_close, l10n_tooltip: z.string.tooltip_search_close" data-uie-name="do-close"></span>
   </div>
   <div id="start-ui-header" class="start-ui-header border-theme">
@@ -29,7 +29,7 @@
   </div>
 
   <div class="left-list-center start-ui-list-wrapper">
-    <div class="start-ui-list" data-bind="antiscroll: should_update_scrollbar, bordered_list: active_team">
+    <div class="start-ui-list" data-bind="antiscroll: should_update_scrollbar, bordered_list: team">
       <!-- ko ifnot: show_spinner() -->
 
         <!-- ko ifnot: show_search_results() -->
@@ -61,7 +61,7 @@
 
         <!-- ko if: show_search_results() -->
           <div class="start-ui-list-search-results">
-            <!-- ko ifnot: is_personal_space() -->
+            <!-- ko if: is_team -->
               <div class="team_members" data-bind="visible: search_results.team_members().length > 0">
                 <span class="start-ui-list-header" data-bind="l10n_text: z.string.search_team_members"></span>
                 <user-list class="search-list-theme-black" params="user: search_results.team_members, selected: selected_people, mode: z.components.UserListMode.INFO"></user-list>
@@ -75,7 +75,7 @@
               <span class="start-ui-list-header" data-bind="l10n_text: z.string.search_connections"></span>
               <user-list class="search-list-theme-black" params="user: search_results.contacts, selected: selected_people, mode: z.components.UserListMode.INFO"></user-list>
             </div>
-            <!-- ko if: is_personal_space() -->
+            <!-- ko ifnot: is_team -->
               <div class="start-ui-groups" data-bind="visible: search_results.groups().length > 0">
                 <span class="start-ui-list-header" data-bind="l10n_text: z.string.search_groups"></span>
                 <group-list params="groups: search_results.groups, click: click_on_group"></group-list>

@@ -55,7 +55,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.conversation = ko.observable(new z.entity.Conversation());
     this.conversation.subscribe(() => this.render_participants(false));
 
-    this.active_team = this.team_repository.active_team;
+    this.team = this.team_repository.team;
 
     this.render_participants = ko.observable(false);
 
@@ -135,7 +135,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
             }
           }
 
-          if (this.active_team().id) {
+          if (this.team().id) {
             for (const team_member of this.team_members()) {
               if (user_et.id === team_member.id) {
                 return false;
@@ -148,7 +148,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
         .sort((user_a, user_b) => z.util.StringUtil.sort_by_priority(user_a.first_name(), user_b.first_name()));
     }, this, {deferEvaluation: true});
     this.team_members = ko.pureComputed(() => {
-      return this.active_team().members()
+      return this.team().members()
         .filter((user_et) => {
           for (const conversation_participant of this.participants()) {
             if (user_et.id === conversation_participant.id) {
@@ -368,7 +368,6 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
   connect(user_et) {
     this.participants_bubble.hide();
-    this.active_team(this.team_repository.personal_space);
 
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.SENT_CONNECT_REQUEST, {
       context: 'participants',

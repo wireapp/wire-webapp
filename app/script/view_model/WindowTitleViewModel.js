@@ -45,7 +45,7 @@ z.ViewModel.WindowTitleViewModel = class WindowTitleViewModel {
         let number_of_unread_conversations = 0;
         const number_of_requests = this.user_repository.connect_requests().length;
 
-        this.conversation_repository.all_unarchived_conversations()
+        this.conversation_repository.conversations_unarchived()
           .forEach((conversation_et) => {
             if (!conversation_et.is_request() && !conversation_et.is_muted() && conversation_et.unread_message_count()) {
               number_of_unread_conversations++;

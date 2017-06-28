@@ -32,9 +32,10 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
    * @param {z.ViewModel.ContentViewModel} content_view_model - Content view model
    * @param {z.calling.CallingRepository} calling_repository - Calling repository
    * @param {z.conversation.ConversationRepository} conversation_repository - Conversation repository
+   * @param {z.team.TeamRepository} team_repository - Team repository
    * @param {z.user.UserRepository} user_repository - User repository
   */
-  constructor(element_id, list_view_model, content_view_model, calling_repository, conversation_repository, user_repository) {
+  constructor(element_id, list_view_model, content_view_model, calling_repository, conversation_repository, team_repository, user_repository) {
     this.click_on_conversation = this.click_on_conversation.bind(this);
     this.is_selected_conversation = this.is_selected_conversation.bind(this);
 
@@ -42,6 +43,7 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
     this.content_view_model = content_view_model;
     this.calling_repository = calling_repository;
     this.conversation_repository = conversation_repository;
+    this.team_repository = team_repository;
     this.user_repository = user_repository;
     this.logger = new z.util.Logger('z.ViewModel.list.ConversationListViewModel', z.config.LOGGER.OPTIONS);
 
@@ -72,13 +74,8 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
       return this.webapp_is_loaded() || this.conversations_unarchived().length || this.connect_requests().length || this.conversations_calls().length;
     }).extend({notify: 'always', rateLimit: 500});
 
-    this.active_team_name = ko.pureComputed(() => {
-      const team_et = this.conversation_repository.active_team();
-      if (team_et && team_et.name()) {
-        return team_et.name();
-      }
-      return this.user_repository.self().name();
-    });
+    this.team_name = this.team_repository.team_name;
+    this.is_team = this.team_repository.is_team;
 
     this.active_conversation_id = ko.pureComputed(() => {
       if (this.conversation_repository.active_conversation()) {
@@ -92,12 +89,7 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
 
     this.start_tooltip = z.l10n.text(z.string.tooltip_conversations_start, z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.START));
 
-    this.show_connect_requests = ko.pureComputed(() => {
-      const team_et = this.conversation_repository.active_team();
-      const is_personal_team = team_et && !team_et.name();
-
-      return is_personal_team && this.connect_requests().length;
-    });
+    this.show_connect_requests = ko.pureComputed(() => this.connect_requests().length);
 
     this.self_stream_state = this.calling_repository.self_stream_state;
 

@@ -78,6 +78,9 @@ z.user.UserRepository = class UserRepository {
       amplify.publish(z.event.WebApp.ANALYTICS.CUSTOM_DIMENSION, z.tracking.CustomDimension.CONTACTS, number_of_connected_users);
     });
 
+    this.team = undefined;
+    this.is_team = false;
+
     amplify.subscribe(z.event.Backend.USER.CONNECTION, this.user_connection.bind(this));
     amplify.subscribe(z.event.Backend.USER.UPDATE, this.user_update.bind(this));
     amplify.subscribe(z.event.WebApp.CLIENT.ADD, this.add_client_to_user.bind(this));
@@ -531,6 +534,11 @@ z.user.UserRepository = class UserRepository {
     return Promise.all(user_id_chunks.map((user_id_chunk) => _get_users(user_id_chunk)))
       .then((resolve_array) => {
         const new_user_ets = _.flatten(resolve_array);
+
+        if (this.is_team) {
+          this.map_guest_status(new_user_ets);
+        }
+
         return this.save_users(new_user_ets);
       })
       .then((resolve_array) => {
@@ -743,12 +751,7 @@ z.user.UserRepository = class UserRepository {
    */
   _add_suspended_users(user_ids, user_ets) {
     for (const user_id of user_ids) {
-      const matching_user_ids = user_ets.find(function(user_et) {
-        if (user_et.id === user_id) {
-          return true;
-        }
-        return false;
-      });
+      const matching_user_ids = user_ets.find((user_et) => user_et.id === user_id);
 
       if (!matching_user_ids) {
         const user_et = new z.entity.User(user_id);
@@ -922,5 +925,15 @@ z.user.UserRepository = class UserRepository {
           source: 'unsplash',
         });
       });
+  }
+
+  map_guest_status(user_ets = this.users()) {
+    const team_members = this.team().members();
+
+    user_ets.forEach((user_et) => {
+      const is_team_member = team_members.find((member) => member.id === user_et.id);
+      user_et.is_guest(!is_team_member);
+      user_et.is_team_member(is_team_member);
+    });
   }
 };

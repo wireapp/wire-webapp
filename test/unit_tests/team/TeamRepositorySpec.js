@@ -52,12 +52,6 @@ describe('z.team.TeamRepository', () => {
       JSON.stringify(teams_data),
     ]);
 
-    server.respondWith('GET', `${test_factory.settings.connection.rest_url}/teams/${team_metadata.id}`, [
-      200,
-      {'Content-Type': 'application/json'},
-      JSON.stringify(team_metadata),
-    ]);
-
     server.respondWith('GET', `${test_factory.settings.connection.rest_url}/teams/${team_metadata.id}/members`, [
       200,
       {'Content-Type': 'application/json'},
@@ -76,19 +70,6 @@ describe('z.team.TeamRepository', () => {
           expect(entities.length).toEqual(teams_data.teams.length);
           expect(entities[0].creator).toEqual(teams_data.teams[0].creator);
           expect(entities[1].creator).toEqual(teams_data.teams[1].creator);
-          done();
-        })
-        .catch(done.fail);
-    });
-  });
-
-  describe('get_team_metadata()', () => {
-    it('returns team metadata entities', (done) => {
-      team_repository.get_team_from_backend(team_metadata.id)
-        .then((entity) => {
-          expect(entity.creator).toEqual(team_metadata.creator);
-          expect(entity.id).toEqual(team_metadata.id);
-          expect(entity.name()).toEqual(team_metadata.name);
           done();
         })
         .catch(done.fail);
