@@ -167,7 +167,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
           return;
         }
 
-        this._release_content(this.content_state(), conversation_et);
+        this._release_content(this.content_state());
 
         this.content_state(z.ViewModel.content.CONTENT_STATE.CONVERSATION);
         this.conversation_repository.active_conversation(conversation_et);
@@ -237,7 +237,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
     }
   }
 
-  _release_content(new_content_state, conversation_et) {
+  _release_content(new_content_state) {
     this.previous_state = this.content_state();
 
     const conversation_state = this.previous_state === z.ViewModel.content.CONTENT_STATE.CONVERSATION;
