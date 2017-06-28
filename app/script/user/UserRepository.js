@@ -79,7 +79,7 @@ z.user.UserRepository = class UserRepository {
     });
 
     this.team = undefined;
-    this.is_team = false;
+    this.is_team = ko.observable();
 
     amplify.subscribe(z.event.Backend.USER.CONNECTION, this.user_connection.bind(this));
     amplify.subscribe(z.event.Backend.USER.UPDATE, this.user_update.bind(this));
@@ -535,7 +535,7 @@ z.user.UserRepository = class UserRepository {
       .then((resolve_array) => {
         const new_user_ets = _.flatten(resolve_array);
 
-        if (this.is_team) {
+        if (this.is_team()) {
           this.map_guest_status(new_user_ets);
         }
 

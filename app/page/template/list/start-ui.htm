@@ -61,7 +61,7 @@
 
         <!-- ko if: show_search_results() -->
           <div class="start-ui-list-search-results">
-            <!-- ko if: is_team -->
+            <!-- ko if: is_team() -->
               <div class="team_members" data-bind="visible: search_results.team_members().length > 0">
                 <span class="start-ui-list-header" data-bind="l10n_text: z.string.search_team_members"></span>
                 <user-list class="search-list-theme-black" params="user: search_results.team_members, selected: selected_people, mode: z.components.UserListMode.INFO"></user-list>
@@ -75,7 +75,7 @@
               <span class="start-ui-list-header" data-bind="l10n_text: z.string.search_connections"></span>
               <user-list class="search-list-theme-black" params="user: search_results.contacts, selected: selected_people, mode: z.components.UserListMode.INFO"></user-list>
             </div>
-            <!-- ko ifnot: is_team -->
+            <!-- ko ifnot: is_team() -->
               <div class="start-ui-groups" data-bind="visible: search_results.groups().length > 0">
                 <span class="start-ui-list-header" data-bind="l10n_text: z.string.search_groups"></span>
                 <group-list params="groups: search_results.groups, click: click_on_group"></group-list>

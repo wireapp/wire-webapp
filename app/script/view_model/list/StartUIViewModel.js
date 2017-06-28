@@ -71,7 +71,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
         this.search_repository.search_by_name(normalized_query, is_username)
           .then((user_ets) => {
             if (normalized_query === z.search.SearchRepository.normalize_query(this.search_input())) {
-              if (this.is_team) {
+              if (this.is_team()) {
                 const non_member_others = user_ets.filter((user_et) => !this.search_results.team_members().includes(user_et));
                 this.search_results.others(non_member_others);
               } else {
@@ -158,7 +158,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       return this.search_results.groups().length || this.search_results.contacts().length || this.search_results.others().length;
     });
 
-    this.show_connections = ko.pureComputed(() => !this.is_team && !this.show_suggestions());
+    this.show_connections = ko.pureComputed(() => !this.is_team() && !this.show_suggestions());
 
     this.show_invite = ko.pureComputed(() => {
       const no_connections_and_suggestions = !this.show_search_results() && !this.connections().length && !this.show_suggestions();
@@ -167,7 +167,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       return no_connections_and_suggestions || no_search_results;
     });
 
-    this.show_invite_people = ko.pureComputed(() => !this.is_team);
+    this.show_invite_people = ko.pureComputed(() => !this.is_team());
 
     this.show_suggestions = ko.pureComputed(() => !!this.suggestions().length);
 
@@ -179,8 +179,8 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       return this.has_results() || this.search_input().length;
     });
 
-    this.show_team_member = ko.pureComputed(() => this.is_team && this.team_members().length);
-    this.show_top_people = ko.pureComputed(() => !this.is_team && this.top_users().length);
+    this.show_team_member = ko.pureComputed(() => this.is_team() && this.team_members().length);
+    this.show_top_people = ko.pureComputed(() => !this.is_team() && this.top_users().length);
 
     // Invite bubble states
     this.show_invite_form = ko.observable(true);
@@ -651,7 +651,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
   }
 
   _handle_search_input() {
-    if (this.is_team) {
+    if (this.is_team()) {
       for (const user_et of this.search_results.team_members()) {
         if (!this.selected_people().includes(user_et)) {
           this.selected_people.push(user_et);
@@ -660,7 +660,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       }
     }
 
-    if (!this.is_team) {
+    if (!this.is_team()) {
       for (const user_et of this.search_results.contacts()) {
         if (!this.selected_people().includes(user_et)) {
           this.selected_people.push(user_et);

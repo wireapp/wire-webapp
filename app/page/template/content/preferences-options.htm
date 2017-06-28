@@ -2,26 +2,28 @@
   <div class="preferences-titlebar" data-bind="l10n_text: z.string.preferences_options"></div>
   <div class="preferences-content-wrapper">
     <div class="preferences-content" data-bind="antiscroll">
-      <section class="preferences-section">
-        <header class="preferences-header" data-bind="l10n_text: z.string.preferences_options_contacts"></header>
-        <div class="preferences-option" data-uie-name="do-share-contacts">
-          <div class="preferences-option-icon preferences-option-pointer" data-bind="click: connect_google_contacts, l10n_tooltip: z.string.tooltip_preferences_contacts_gmail">
-            <svg>
-              <use xlink:href="#icon-gmail"></use>
-            </svg>
-          </div>
-          <label class="preferences-option-label" data-bind="click: connect_google_contacts, l10n_text: z.string.preferences_options_contacts_gmail, l10n_tooltip: z.string.tooltip_preferences_contacts_gmail"></label>
-        </div>
-        <!-- ko if: window.wAddressBook || window.zAddressBook -->
-          <div class="preferences-option" data-uie-name="do-share-osx-contacts">
-            <div class="preferences-option-icon preferences-option-pointer" data-bind="click: connect_macos_contacts, l10n_tooltip: z.string.tooltip_preferences_contacts_macos">
-              <div class="icon-contacts"></div>
+      <!-- ko ifnot: is_team()-->
+        <section class="preferences-section">
+          <header class="preferences-header" data-bind="l10n_text: z.string.preferences_options_contacts"></header>
+          <div class="preferences-option" data-uie-name="do-share-contacts">
+            <div class="preferences-option-icon preferences-option-pointer" data-bind="click: connect_google_contacts, l10n_tooltip: z.string.tooltip_preferences_contacts_gmail">
+              <svg>
+                <use xlink:href="#icon-gmail"></use>
+              </svg>
             </div>
-            <label class="preferences-option-label" data-bind="click: connect_macos_contacts, l10n_text: z.string.preferences_options_contacts_macos, l10n_tooltip: z.string.tooltip_preferences_contacts_macos"></label>
+            <label class="preferences-option-label" data-bind="click: connect_google_contacts, l10n_text: z.string.preferences_options_contacts_gmail, l10n_tooltip: z.string.tooltip_preferences_contacts_gmail"></label>
           </div>
-        <!-- /ko -->
-        <div class="preferences-detail" data-bind="l10n_text: z.string.preferences_options_contacts_detail"></div>
-      </section>
+          <!-- ko if: window.wAddressBook || window.zAddressBook -->
+            <div class="preferences-option" data-uie-name="do-share-osx-contacts">
+              <div class="preferences-option-icon preferences-option-pointer" data-bind="click: connect_macos_contacts, l10n_tooltip: z.string.tooltip_preferences_contacts_macos">
+                <div class="icon-contacts"></div>
+              </div>
+              <label class="preferences-option-label" data-bind="click: connect_macos_contacts, l10n_text: z.string.preferences_options_contacts_macos, l10n_tooltip: z.string.tooltip_preferences_contacts_macos"></label>
+            </div>
+          <!-- /ko -->
+          <div class="preferences-detail" data-bind="l10n_text: z.string.preferences_options_contacts_detail"></div>
+        </section>
+      <!-- /ko -->
 
       <section class="preferences-section">
         <header class="preferences-header" data-bind="l10n_text: z.string.preferences_options_audio"></header>

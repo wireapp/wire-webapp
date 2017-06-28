@@ -39,7 +39,7 @@ z.team.TeamRepository = class TeamRepository {
       return this.user_repository.self().name();
     });
 
-    this.is_team = false;
+    this.is_team = ko.observable(false);
 
     this.user_repository.team = this.team;
     amplify.subscribe(z.event.WebApp.TEAM.EVENT_FROM_BACKEND, this.on_team_event.bind(this));
@@ -181,9 +181,8 @@ z.team.TeamRepository = class TeamRepository {
 
   _set_team(team_et) {
     this.update_team_members(team_et);
-    this.is_team = true;
+    this.is_team(true);
     this.team(team_et);
-    this.user_repository.is_team = true;
     this.user_repository.map_guest_status();
   }
 };
