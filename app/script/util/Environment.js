@@ -181,6 +181,14 @@ window.z.util = z.util || {};
       mac: os.is_mac(),
       win: os.is_windows(),
     },
+    _electron_version: function(user_agent) {
+      const result = /(Wire|WireInternal)\/(\S+)/.exec(user_agent);
+      if (result) {
+        const [match, app, version] = result;
+        return version;
+      }
+      return undefined;
+    },
     version: function(show_wrapper_version = true, do_not_format = false) {
       if (z.util.Environment.frontend.is_localhost()) {
         return 'dev';
@@ -190,8 +198,9 @@ window.z.util = z.util || {};
         return app_version();
       }
 
-      if (window.electron_version && show_wrapper_version) {
-        return window.electron_version;
+      const electron_version = this._electron_version(navigator.userAgent);
+      if (electron_version && show_wrapper_version) {
+        return electron_version;
       }
 
       return formatted_app_version();
