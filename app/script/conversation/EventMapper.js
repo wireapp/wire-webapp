@@ -123,6 +123,7 @@ z.conversation.EventMapper = class EventMapper {
         message_et = this._map_event_verification(event);
         break;
       case z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT:
+      case z.event.Client.CONVERSATION.MESSAGE_TOO_BIG:
         message_et = this._map_event_unable_to_decrypt(event);
         break;
       default:

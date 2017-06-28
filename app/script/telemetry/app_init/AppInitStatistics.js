@@ -24,6 +24,13 @@ window.z.telemetry = z.telemetry || {};
 window.z.telemetry.app_init = z.telemetry.app_init || {};
 
 z.telemetry.app_init.AppInitStatistics = class AppInitStatistics {
+  static get CONFIG() {
+    return {
+      LOG_LENGTH_KEY: 17,
+      LOG_LENGTH_VALUE: 11,
+    };
+  }
+
   constructor() {
     this.logger = new z.util.Logger('z.telemetry.app_init.AppInitStatistics', z.config.LOGGER.OPTIONS);
 
@@ -63,8 +70,10 @@ z.telemetry.app_init.AppInitStatistics = class AppInitStatistics {
       if (this.hasOwnProperty(key)) {
         const value = this[key];
         if (_.isNumber(value) || _.isString(value)) {
-          const placeholder_key = Array.from(Math.max(17 - key.length, 1)).join(' ');
-          const placeholder_value = Array.from(Math.max(11 - value.toString().length, 1)).join(' ');
+          const placeholder_key_length = Math.max(AppInitStatistics.CONFIG.LOG_LENGTH_KEY - key.length, 1);
+          const placeholder_key = new Array(placeholder_key_length).join(' ');
+          const placeholder_value_length = Math.max(AppInitStatistics.CONFIG.LOG_LENGTH_VALUE - value.toString().length, 1);
+          const placeholder_value = new Array(placeholder_value_length).join(' ');
 
           this.logger.info(`${placeholder_key}'${key}':${placeholder_value}${value}`);
         }

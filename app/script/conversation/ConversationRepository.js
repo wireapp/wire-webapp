@@ -1297,8 +1297,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
         })
         .catch((error) => {
           this.logger.error(`Error (${error.label}): ${error.message}`);
-          error = new Error('Failed to update last read timestamp');
-          Raygun.send(error, {label: error.label, message: error.message});
+          const raygun_error = new Error('Failed to update last read timestamp');
+          Raygun.send(raygun_error, {label: error.label, message: error.message});
         });
     }
   }
@@ -1603,7 +1603,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this._send_and_inject_generic_message(conversation_et, generic_message, false)
       .then(() => {
         this._track_edit_message(conversation_et, original_message_et);
-        if (z.util.Environment.electron) {
+        if (z.util.Environment.desktop) {
           return this.send_link_preview(message, conversation_et, generic_message);
         }
       })
@@ -1708,7 +1708,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   send_text_with_link_preview(message, conversation_et) {
     return this.send_text(message, conversation_et)
       .then((generic_message) => {
-        if (z.util.Environment.electron) {
+        if (z.util.Environment.desktop) {
           return this.send_link_preview(message, conversation_et, generic_message);
         }
       })

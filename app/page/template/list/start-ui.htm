@@ -1,11 +1,12 @@
 <div id="start-ui" data-bind="with: $root.start_ui">
   <div class="left-list-header">
     <span class="label-bold-xs" data-bind="text: active_team_name" data-uie-name="status-team-name-search"></span>
+    <span class="left-list-header-close-button button-icon-large icon-close" data-bind="click: click_on_close, l10n_tooltip: z.string.tooltip_search_close" data-uie-name="do-close"></span>
   </div>
   <div id="start-ui-header" class="start-ui-header border-theme">
     <user-input data-bind="input_hint: {text: group_hint_text, trigger: show_hint}"
                 class="start-ui-header-user-input"
-                params="input: search_input, placeholder: z.string.search_placeholder, selected: selected_people, enter: on_submit_search, close: click_on_close"
+                params="input: search_input, placeholder: z.string.search_placeholder, selected: selected_people, enter: on_submit_search"
                 data-uie-name="enter-search">
     </user-input>
     <div class="start-ui-header-actions clear" data-bind="css: {'start-ui-header-actions-visible': selected_people().length > 0}">
@@ -27,8 +28,8 @@
       </div>
   </div>
 
-  <div class="start-ui-list-wrapper">
-    <div class="start-ui-list" data-bind="antiscroll: should_update_scrollbar">
+  <div class="left-list-center start-ui-list-wrapper">
+    <div class="start-ui-list" data-bind="antiscroll: should_update_scrollbar, bordered_list: active_team">
       <!-- ko ifnot: show_spinner() -->
 
         <!-- ko ifnot: show_search_results() -->
@@ -129,7 +130,8 @@
 
   <!-- ko if: show_invite_people() -->
     <div class="start-ui-import" data-bind="click: show_invite_bubble" >
-      <span id="invite-button" class="label-bold-xs" data-bind="text: invite_button_text" data-bubble="#invite-bubble" data-placement="top"></span>
+      <span class="icon-invite start-ui-import-icon"></span>
+      <span id="invite-button" data-bind="l10n_text: z.string.people_invite" data-bubble="#invite-bubble" data-placement="top"></span>
     </div>
   <!-- /ko -->
 
