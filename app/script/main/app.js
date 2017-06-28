@@ -25,7 +25,11 @@ window.z.main = z.main || {};
 z.main.App = class App {
   static get CONFIG() {
     return {
-      COOKIE_NAME: 'app_opened',
+      TABS_CHECK: {
+        COOKIE_NAME: 'app_opened',
+        COOKIE_TIMEOUT: 5 * 60 * 1000,
+        RENEWAL_THRESHOLD: 15 * 1000,
+      },
     };
   }
 
@@ -199,7 +203,7 @@ z.main.App = class App {
   init_app(is_reload = this._is_reload()) {
     z.util.check_indexed_db()
     .then(() => this._check_single_instance())
-    .then(() => this._load_access_token(is_reload))
+    .then(() => this._load_access_token())
     .then(() => {
       this.view.loading.update_progress(2.5, z.string.init_received_access_token);
       this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
@@ -327,7 +331,7 @@ z.main.App = class App {
 
   _app_init_failure(error, is_reload) {
     let log_message = `Could not initialize app version '${z.util.Environment.version(false)}'`;
-    if (z.util.Environment.electron) {
+    if (z.util.Environment.desktop) {
       log_message = `${log_message} - Electron '${platform.os.family}' '${z.util.Environment.version()}'`;
     }
     this.logger.info(log_message, {error});
@@ -418,13 +422,16 @@ z.main.App = class App {
    * @returns {Promise} Resolves when page is the first tab
    */
   _check_single_instance() {
-    const cookie_name = App.CONFIG.COOKIE_NAME;
-    if (Cookies.get(cookie_name)) {
-      return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.MULTIPLE_TABS));
+    if (!z.util.Environment.electron) {
+      const cookie_name = App.CONFIG.TABS_CHECK.COOKIE_NAME;
+      if (Cookies.get(cookie_name)) {
+        return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.MULTIPLE_TABS));
+      }
+
+      this._set_single_instance_cookie();
+      $(window).on('beforeunload', () => Cookies.remove(cookie_name));
     }
 
-    Cookies.set(cookie_name, true);
-    $(window).on('unload', () => Cookies.remove(cookie_name));
     return Promise.resolve();
   }
 
@@ -486,6 +493,17 @@ z.main.App = class App {
     return token_promise;
   }
 
+  /**
+   * Set the cookie to verify we are running a single instace tab.
+   * @returns {undefined} No return value
+   */
+  _set_single_instance_cookie() {
+    const cookie_timeout = new Date(Date.now() + App.CONFIG.TABS_CHECK.COOKIE_TIMEOUT);
+    Cookies.set(App.CONFIG.TABS_CHECK.COOKIE_NAME, true, {expires: cookie_timeout});
+
+    const renewal_timeout = App.CONFIG.TABS_CHECK.COOKIE_TIMEOUT - App.CONFIG.TABS_CHECK.RENEWAL_THRESHOLD;
+    window.setTimeout(() => this._set_single_instance_cookie(), renewal_timeout);
+  }
 
   /**
    * Hide the loading spinner and show the application UI.
@@ -613,7 +631,7 @@ z.main.App = class App {
    * @returns {undefined} No return value
    */
   refresh() {
-    if (z.util.Environment.electron) {
+    if (z.util.Environment.desktop) {
       amplify.publish(z.event.WebApp.LIFECYCLE.RESTART, this.update_source);
     }
     if (this.update_source === z.announce.UPDATE_SOURCE.WEBAPP) {

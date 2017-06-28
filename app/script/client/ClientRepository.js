@@ -339,7 +339,7 @@ z.client.ClientRepository = class ClientRepository {
 
     let device_model = platform.name;
 
-    if (z.util.Environment.electron) {
+    if (z.util.Environment.desktop) {
       let identifier;
       if (z.util.Environment.os.mac) {
         identifier = z.string.wire_macos;

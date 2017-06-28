@@ -248,6 +248,12 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
       return Promise.reject(new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.NO_DATA_CONTENT));
     }
 
+    // Check the length of the message
+    if (typeof event_data.text === 'string' && (event_data.text.length > z.config.MAXIMUM_MESSAGE_LENGTH_RECEIVING)) {
+      const decryption_error = new Proteus.errors.DecryptError.InvalidMessage('The received message was too big.', 300);
+      return Promise.resolve(z.conversation.EventBuilder.build_incoming_message_too_big(event, decryption_error, decryption_error.code));
+    }
+
     if (event_data.text === CryptographyRepository.REMOTE_ENCRYPTION_FAILURE) {
       const decryption_error = new Proteus.errors.DecryptError.InvalidMessage('The sending client couldn\'t encrypt a message for our client.');
       return Promise.resolve(this._handle_decryption_failure(decryption_error, event));

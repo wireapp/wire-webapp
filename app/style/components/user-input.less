@@ -22,15 +22,17 @@ user-input {
   color: #fff;
   display: block;
   position: relative;
+  background: fade(#fff, 8%);
+  border-radius: 4px;
 
   &.user-list-light {
-    color: #222;
+    background: fade(@w-gray, 16%);
+    color: @graphite-dark;
   }
 }
 
 .search-outer {
-  padding-right: 16px;
-  padding-bottom: 12px;
+  padding: 4px 8px;
   overflow: hidden;
 }
 
@@ -51,8 +53,6 @@ user-input {
   .label-bold-xs();
   flex: 0 0 auto;
   line-height: @line-height-lg;
-  margin-bottom: 2px;
-  margin-top: 2px;
   padding-right: 16px;
   position: relative;
 
@@ -83,36 +83,38 @@ user-input {
   flex: 1 1;
   height: @avatar-diameter-xs;
   line-height: @avatar-diameter-xs;
-  margin-right: 24px;
   min-width: 65px;
+  padding-left: -24px;
   outline: none;
 
   &:invalid {
     .accent-color();
+    box-shadow: none;
   }
 
   &::placeholder {
     &:invalid {
-      color: fade(#fff, 48%);
+      color: fade(#fff, 40%);
     }
     .label-xs();
-    color: fade(#fff, 48%);
-    padding-left: 8px;
+    color: fade(#fff, 40%);
+    text-align: center;
+    margin-left: -24px;
   }
 
   .user-list-light & {
     &::placeholder {
-      color: fade(#222, 48%);
+      color: fade(@graphite-dark, 40%);
     }
-  }
-
-  &:invalid {
-    box-shadow: none;
   }
 }
 
-.search-close {
-  position: absolute;
-  top: 6px;
-  right: 0;
+.search-icon {
+  height: @avatar-diameter-xs;
+  line-height: @avatar-diameter-xs;
+  margin-right: 8px;
+}
+
+.search-input-show-placeholder {
+  margin-right: 41px;
 }
