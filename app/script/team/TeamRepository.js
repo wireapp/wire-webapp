@@ -41,11 +41,13 @@ z.team.TeamRepository = class TeamRepository {
 
     this.is_team = ko.observable(false);
 
+    this.self_user = this.user_repository.self;
+
     this.user_repository.team = this.team;
     amplify.subscribe(z.event.WebApp.TEAM.EVENT_FROM_BACKEND, this.on_team_event.bind(this));
   }
 
-  get_team(limit = 100, team_ets = []) {
+  get_team() {
     return this.team_service.get_teams()
       .then(({teams}) => {
         if (teams.length) {
@@ -60,6 +62,10 @@ z.team.TeamRepository = class TeamRepository {
         }
 
         return this.team(new z.team.TeamEntity());
+      })
+      .then((team_et) => {
+        amplify.publish(z.event.WebApp.TEAM.INFO, this._create_team_info());
+        return team_et;
       });
   }
 
@@ -137,6 +143,16 @@ z.team.TeamRepository = class TeamRepository {
     }
   }
 
+  _create_team_info() {
+    return {
+      accentID: this.self_user().accent_id(),
+      name: this.team_name(),
+      picture: '',
+      teamID: this.team().id,
+      userID: this.self_user().id,
+    };
+  }
+
   _on_delete(event_json) {
     const team_id = event_json.team;
     amplify.publish(z.event.WebApp.TEAM.MEMBER_LEAVE, team_id);
@@ -176,6 +192,7 @@ z.team.TeamRepository = class TeamRepository {
 
     if (this.team().id === team_id) {
       this.team_mapper.update_team_from_object(team_data, this.team());
+      amplify.publish(z.event.WebApp.TEAM.INFO, this._create_team_info());
     }
   }
 
