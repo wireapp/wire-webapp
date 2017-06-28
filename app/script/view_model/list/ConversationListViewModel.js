@@ -105,6 +105,8 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
       }
     });
 
+    this.show_badge = ko.observable(false);
+
     this._init_subscriptions();
   }
 
@@ -133,6 +135,8 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
     amplify.subscribe(z.event.WebApp.SHORTCUT.NEXT, this._go_to_next_conversation.bind(this));
     amplify.subscribe(z.event.WebApp.SHORTCUT.PREV, this._go_to_prev_conversation.bind(this));
     amplify.subscribe(z.event.WebApp.SHORTCUT.START, this.click_on_people_button.bind(this));
+    amplify.subscribe(z.event.WebApp.SEARCH.BADGE.SHOW, () => this.show_badge(true));
+    amplify.subscribe(z.event.WebApp.SEARCH.BADGE.HIDE, () => this.show_badge(false));
   }
 
   _go_to_next_conversation() {
@@ -210,6 +214,10 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
 
   click_on_archived_button() {
     this.list_view_model.switch_list(z.ViewModel.list.LIST_STATE.ARCHIVE);
+  }
+
+  click_on_preferences_button() {
+    amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT);
   }
 
   click_on_people_button() {
