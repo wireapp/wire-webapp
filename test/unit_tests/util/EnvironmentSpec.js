@@ -21,13 +21,7 @@
 
 'use strict';
 
-xdescribe('EnvironmentSpec', function() {
-  window.navigator.userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.10240';
-  describe('z.util.Environment.browser', function() {
-    it('detects Microsoft Edge', function() {
-      expect(z.util.Environment.browser.edge).toBe(true);
-    });
-  });
+describe('EnvironmentSpec', function() {
 
   describe('z.util.Environment._electron_version', function() {
     it('detects wrapper version for internal', function() {

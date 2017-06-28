@@ -135,6 +135,14 @@ window.z.util = z.util || {};
   };
 
   z.util.Environment = {
+    _electron_version: function(user_agent) {
+      const result = /(Wire|WireInternal)\/(\S+)/.exec(user_agent);
+      if (result) {
+        const [, , version] = result;
+        return version;
+      }
+      return undefined;
+    },
     backend: {
       account_url: function() {
         if (z.util.Environment.backend.current === z.service.BackendEnvironment.PRODUCTION) {
@@ -180,14 +188,6 @@ window.z.util = z.util || {};
       linux: !os.is_mac() && !os.is_windows(),
       mac: os.is_mac(),
       win: os.is_windows(),
-    },
-    _electron_version: function(user_agent) {
-      const result = /(Wire|WireInternal)\/(\S+)/.exec(user_agent);
-      if (result) {
-        const [match, app, version] = result;
-        return version;
-      }
-      return undefined;
     },
     version: function(show_wrapper_version = true, do_not_format = false) {
       if (z.util.Environment.frontend.is_localhost()) {
