@@ -238,7 +238,7 @@ z.event.EventRepository = class EventRepository {
           // When asking for notifications with a since set to a notification ID that does not belong to our client ID,
           //   we will get a 404 AND notifications
           if (error_response.notifications) {
-            amplify.publish(z.event.WebApp.CONVERSATION.MISSED_EVENTS);
+            this._missed_events_from_stream();
             return _got_notifications(error_response);
           }
 
@@ -267,7 +267,7 @@ z.event.EventRepository = class EventRepository {
         this.logger.warn('Last notification ID not found in database. Resetting...');
         return this._get_last_notification_id(this.current_client().id)
           .then(() => {
-            amplify.publish(z.event.WebApp.CONVERSATION.MISSED_EVENTS);
+            this._missed_events_from_stream();
             return this.last_notification_id();
           });
       })
@@ -369,6 +369,16 @@ z.event.EventRepository = class EventRepository {
           this._update_last_notification_id(notification_id);
           this.logger.info(`Set starting point on notification stream to '${this.last_notification_id()}'`);
           return this.last_notification_id();
+        }
+      });
+  }
+
+  _missed_events_from_stream() {
+    this.notification_service.get_missed_id_from_db()
+      .then((notification_id) => {
+        if (this.last_notification_id() !== notification_id) {
+          amplify.publish(z.event.WebApp.CONVERSATION.MISSED_EVENTS);
+          this.notification_service.save_missed_id_to_db(this.last_notification_id());
         }
       });
   }
