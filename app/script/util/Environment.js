@@ -138,8 +138,7 @@ window.z.util = z.util || {};
     _electron_version: function(user_agent) {
       const result = /(Wire|WireInternal)\/(\S+)/.exec(user_agent);
       if (result) {
-        const [, , version] = result;
-        return version;
+        return result[2]; // [match, app, version]
       }
       return undefined;
     },
