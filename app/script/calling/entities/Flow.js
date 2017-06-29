@@ -965,7 +965,7 @@ z.calling.entities.Flow = class Flow {
     const attributes = {cause: name, location: sdp_source, step: 'set_sdp', type: sdp_type};
     this.call_et.telemetry.track_event(z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes);
 
-    amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, this.call_et.id, z.calling.enum.TERMINATION_REASON.SDP_FAILED);
+    this._remove_participant(z.calling.enum.TERMINATION_REASON.SDP_FAILED);
   }
 
   /**
