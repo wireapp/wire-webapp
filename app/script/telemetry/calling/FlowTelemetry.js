@@ -26,7 +26,7 @@ window.z.telemetry.calling = z.telemetry.calling || {};
 z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
   static get CONFIG() {
     return {
-      MEDIA_CHECK_TIMEOUT: 5000,
+      MEDIA_CHECK_TIMEOUT: 10000,
       STATS_CHECK_INTERVAL: 2000,
       STATS_CHECK_TIMEOUT: 50,
     };
@@ -133,11 +133,15 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
       const stats = this.statistics[media_type];
 
       const seconds = (attempt * FlowTelemetry.CONFIG.MEDIA_CHECK_TIMEOUT) / 1000;
-      if (stats.bytes_received === 0 && stats.bytes_sent === 0) {
+
+      const no_bytes_received = stats.bytes_received === 0;
+      const no_bytes_sent = stats.bytes_sent === 0;
+
+      if (no_bytes_received && no_bytes_sent) {
         return this.logger.warn(`No '${media_type}' flowing in either direction on stream after ${seconds} seconds`);
       }
 
-      if (stats.bytes_received === 0) {
+      if (no_bytes_received) {
         return this.logger.warn(`No incoming '${media_type}' received on stream after ${seconds} seconds`);
       }
 
@@ -146,18 +150,6 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
       }
 
       return this.logger.debug(`Stream has '${media_type}' flowing properly both ways`);
-    }
-
-    if (this.is_answer) {
-      this.logger.info(`Check '${media_type}' statistics on stream delayed as we created this flow`);
-
-      const stream_check_timeout = window.setTimeout(() => {
-        this.check_stream(media_type, attempt++);
-      },
-      FlowTelemetry.CONFIG.MEDIA_CHECK_TIMEOUT);
-
-      this.stream_check_timeouts.push(stream_check_timeout);
-      return;
     }
 
     this.logger.error(`Failed to check '${media_type}' statistics on stream`);
