@@ -87,7 +87,7 @@ z.calling.entities.Flow = class Flow {
     this.connection_state.subscribe((ice_connection_state) => {
       switch (ice_connection_state) {
         case z.calling.rtc.ICE_CONNECTION_STATE.CHECKING: {
-          this.telemetry.schedule_check(this.call_et.telemetry.media_type);
+          this.telemetry.schedule_check(this.call_et.telemetry.media_type, this.is_answer());
           break;
         }
 

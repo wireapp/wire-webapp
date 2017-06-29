@@ -26,7 +26,7 @@ window.z.telemetry.calling = z.telemetry.calling || {};
 z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
   static get CONFIG() {
     return {
-      MEDIA_CHECK_TIMEOUT: 10000,
+      MEDIA_CHECK_TIMEOUT: 5000,
       STATS_CHECK_INTERVAL: 2000,
       STATS_CHECK_TIMEOUT: 50,
     };
@@ -158,16 +158,17 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
   /**
    * Schedule check of stream activity.
    * @param {z.media.MediaType} media_type - Type of checks to schedule
+   * @param {boolean} is_answer - Type of flow
    * @returns {undefined} No return value
    */
-  schedule_check(media_type) {
+  schedule_check(media_type, is_answer) {
+    const timeout = is_answer ? FlowTelemetry.CONFIG.MEDIA_CHECK_TIMEOUT * 2 : FlowTelemetry.CONFIG.MEDIA_CHECK_TIMEOUT;
     const stream_check_timeout = window.setTimeout(() => {
       this.check_stream(z.media.MediaType.AUDIO);
       if (media_type === z.media.MediaType.VIDEO) {
         this.check_stream(z.media.MediaType.VIDEO);
       }
-    },
-    FlowTelemetry.CONFIG.MEDIA_CHECK_TIMEOUT);
+    }, timeout);
 
     this.stream_check_timeouts.push(stream_check_timeout);
   }
