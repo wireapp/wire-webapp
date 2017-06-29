@@ -110,8 +110,10 @@ z.calling.entities.Call = class Call {
     this.participants_count = ko.pureComputed(() => this.get_number_of_participants(this.self_user_joined()));
 
     // Observable subscriptions
+    this.was_connected = false;
     this.is_connected.subscribe((is_connected) => {
       if (is_connected) {
+        this.was_connected = true;
         if (this.is_group) {
           this.schedule_group_check();
         }
@@ -145,24 +147,21 @@ z.calling.entities.Call = class Call {
       this.max_number_of_participants = Math.max(users_in_call, this.max_number_of_participants);
     });
 
-    this.self_was_joined = false;
     this.self_client_joined.subscribe((is_joined) => {
-      if (is_joined) {
-        return this.self_was_joined = true;
+      if (!is_joined) {
+        this.is_connected(false);
+
+        if (z.calling.enum.CALL_STATE_GROUP.IS_ENDING.includes(this.state())) {
+          amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.TALK_LATER);
+        }
+
+        if (this.termination_reason) {
+          this.telemetry.track_duration(this);
+        }
+
+        this._reset_timer();
+        this._reset_flows();
       }
-
-      this.is_connected(false);
-
-      if (z.calling.enum.CALL_STATE_GROUP.IS_ENDING.includes(this.state())) {
-        amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.TALK_LATER);
-      }
-
-      if (this.termination_reason) {
-        this.telemetry.track_duration(this);
-      }
-
-      this._reset_timer();
-      this._reset_flows();
     });
 
     this.state.subscribe((state) => {
@@ -204,7 +203,7 @@ z.calling.entities.Call = class Call {
    * @returns {undefined} No return value
    */
   deactivate_call(call_message_et, termination_reason = z.calling.enum.TERMINATION_REASON.SELF_USER) {
-    const reason = !this.self_was_joined ? z.calling.enum.TERMINATION_REASON.MISSED : z.calling.enum.TERMINATION_REASON.COMPLETED;
+    const reason = !this.was_connected ? z.calling.enum.TERMINATION_REASON.MISSED : z.calling.enum.TERMINATION_REASON.COMPLETED;
 
     this.termination_reason = termination_reason;
     this.calling_repository.inject_deactivate_event(call_message_et, z.event.EventRepository.SOURCE.WEB_SOCKET, this.creating_user, reason);
