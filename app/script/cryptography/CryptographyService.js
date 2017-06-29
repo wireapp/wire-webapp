@@ -43,12 +43,12 @@ z.cryptography.CryptographyService = class CryptographyService {
    * Gets a pre-key for each client of a user client map.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getMultiPrekeyBundles
    *
-   * @param {Object} user_client_map - User client map to request pre-keys for
+   * @param {Object} recipients - User client map to request pre-keys for
    * @returns {Promise} Resolves with a pre-key for each client of the given map
    */
-  get_users_pre_keys(user_client_map) {
+  get_users_pre_keys(recipients) {
     return this.client.send_json({
-      data: user_client_map,
+      data: recipients,
       type: 'POST',
       url: this.client.create_url(`${CryptographyService.CONFIG.URL_USERS}/prekeys`),
     });

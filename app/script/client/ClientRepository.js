@@ -72,16 +72,16 @@ z.client.ClientRepository = class ClientRepository {
   get_all_clients_from_db() {
     return this.client_service.load_all_clients_from_db()
     .then((clients) => {
-      const user_client_map = {};
+      const recipients = {};
       for (const client of clients) {
         const ids = z.client.Client.dismantle_user_client_id(client.meta.primary_key);
         if (!ids.user_id || [this.self_user().id, z.client.ClientRepository.PRIMARY_KEY_CURRENT_CLIENT].includes(ids.user_id)) {
           continue;
         }
-        user_client_map[ids.user_id] = user_client_map[ids.user_id] || [];
-        user_client_map[ids.user_id].push(this.client_mapper.map_client(client));
+        recipients[ids.user_id] = recipients[ids.user_id] || [];
+        recipients[ids.user_id].push(this.client_mapper.map_client(client));
       }
-      return user_client_map;
+      return recipients;
     });
   }
 

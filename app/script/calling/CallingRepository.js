@@ -627,12 +627,12 @@ z.calling.CallingRepository = class CallingRepository {
         this.logger.info(`Sending call '${type}' message (response: ${response}) to conversation '${conversation_id}'`, call_message_et.to_JSON());
 
         return this._limit_message_recipients(call_message_et)
-          .then(({precondition_option, user_client_map}) => {
+          .then(({precondition_option, recipients}) => {
             if (type === z.calling.enum.CALL_MESSAGE_TYPE.HANGUP) {
               call_message_et.type = z.calling.enum.CALL_MESSAGE_TYPE.CANCEL;
             }
 
-            return this.conversation_repository.send_e_call(conversation_et, call_message_et, user_client_map, precondition_option);
+            return this.conversation_repository.send_e_call(conversation_et, call_message_et, recipients, precondition_option);
           });
       });
   }
@@ -676,20 +676,20 @@ z.calling.CallingRepository = class CallingRepository {
 
     return recipients_promise
       .then(({remote_user_et, self_user_et}) => {
-        let precondition_option, user_client_map;
+        let precondition_option, recipients;
 
         switch (type) {
           case z.calling.enum.CALL_MESSAGE_TYPE.CANCEL: {
             if (response === true) {
               // Send to remote client that initiated call
               precondition_option = true;
-              user_client_map = {
+              recipients = {
                 [remote_user_et.id]: [`${remote_client_id}`],
               };
             } else {
               // Send to all clients of remote user
               precondition_option = [remote_user_et.id];
-              user_client_map = {
+              recipients = {
                 [remote_user_et.id]: remote_user_et.devices().map((device) => device.id),
               };
             }
@@ -703,7 +703,7 @@ z.calling.CallingRepository = class CallingRepository {
             // Send to remote client that call is connected with
             if (remote_client_id) {
               precondition_option = true;
-              user_client_map = {
+              recipients = {
                 [remote_user_et.id]: [`${remote_client_id}`],
               };
             }
@@ -713,7 +713,7 @@ z.calling.CallingRepository = class CallingRepository {
           case z.calling.enum.CALL_MESSAGE_TYPE.REJECT: {
             // Send to all clients of self user
             precondition_option = [self_user_et.id];
-            user_client_map = {
+            recipients = {
               [self_user_et.id]: self_user_et.devices().map((device) => device.id),
             };
             break;
@@ -723,14 +723,14 @@ z.calling.CallingRepository = class CallingRepository {
             if (response === true) {
               // Send to remote client that initiated call and all clients of self user
               precondition_option = [self_user_et.id];
-              user_client_map = {
+              recipients = {
                 [remote_user_et.id]: [`${remote_client_id}`],
                 [self_user_et.id]: self_user_et.devices().map((device) => device.id),
               };
             } else {
               // Send to all clients of remote user
               precondition_option = [remote_user_et.id];
-              user_client_map = {
+              recipients = {
                 [remote_user_et.id]: remote_user_et.devices().map((device) => device.id),
               };
             }
@@ -742,7 +742,7 @@ z.calling.CallingRepository = class CallingRepository {
           }
         }
 
-        return {precondition_option: precondition_option, user_client_map: user_client_map};
+        return {precondition_option: precondition_option, recipients: recipients};
       });
   }
 
