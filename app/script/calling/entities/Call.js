@@ -644,9 +644,9 @@ z.calling.entities.Call = class Call {
   //##############################################################################
 
   /**
-   * Add an participant to the call.
+   * Add or update a participant of the call.
    *
-   * @param {string} user_id - ID of user to be removed from the call
+   * @param {string} user_id - User ID of the call participant
    * @param {boolean} negotiate - Should negotiation be started immediately
    * @param {CallMessage} [call_message_et] - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
    * @returns {Promise} Resolves with added participant
