@@ -35,7 +35,7 @@
     "lint-staged": "4.0.0",
     "load-grunt-tasks": "3.5.2",
     "request": "2.81.0",
-    "sinon": "2.3.5",
+    "sinon": "2.3.6",
     "stylelint": "7.12.0"
   },
   "lint-staged": {
