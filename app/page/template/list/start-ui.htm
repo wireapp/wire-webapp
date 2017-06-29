@@ -33,16 +33,21 @@
       <!-- ko ifnot: show_spinner() -->
 
         <!-- ko ifnot: show_search_results() -->
-          <!-- ko if: show_team_member() && team_members().length -->
-            <div class="start-ui-list-team-member">
-              <span class="start-ui-list-header start-ui-list-header-team-member" data-uie-name="status-team-members" data-bind="l10n_text: z.string.search_team_members"></span>
-              <user-list class="search-list-theme-black" params="user: team_members, mode: z.components.UserListMode.INFO, selected: selected_people"></user-list>
-            </div>
-          <!-- /ko  -->
           <!-- ko if: show_top_people() && top_users().length -->
             <div class="start-ui-list-top-conversations">
               <span class="start-ui-list-header start-ui-list-header-top-people" data-uie-name="status-top-people" data-bind="l10n_text: z.string.search_top_people"></span>
               <top-people class="search-list-theme-black" params="user: top_users, selected: selected_people"></top-people>
+            </div>
+          <!-- /ko  -->
+          <!-- ko if: show_contacts() && contacts().length -->
+            <div class="start-ui-list-contacts">
+              <!-- ko if: is_team() -->
+                <span class="start-ui-list-header start-ui-list-header-team-member" data-uie-name="status-team-members" data-bind="l10n_text: z.string.search_team_members"></span>
+              <!-- /ko  -->
+              <!-- ko ifnot: is_team() -->
+                <span class="start-ui-list-header" data-uie-name="status-connect" data-bind="l10n_text: z.string.search_connections"></span>
+              <!-- /ko  -->
+              <user-list class="search-list-theme-black" params="user: contacts, mode: z.components.UserListMode.INFO, selected: selected_people"></user-list>
             </div>
           <!-- /ko  -->
           <!-- ko if: show_suggestions() && suggestions().length -->
@@ -51,36 +56,28 @@
               <user-list class="search-list-theme-black" params="user: suggestions, click: click_on_other, mode: z.components.UserListMode.INFO"></user-list>
             </div>
           <!-- /ko  -->
-          <!-- ko if: show_connections() && connections().length -->
-            <div class="start-ui-list-connections">
-              <span class="start-ui-list-header" data-uie-name="status-connect" data-bind="l10n_text: z.string.search_connections"></span>
-              <user-list class="search-list-theme-black" params="user: connections, mode: z.components.UserListMode.INFO, selected: selected_people"></user-list>
-            </div>
-          <!-- /ko  -->
         <!-- /ko  -->
 
         <!-- ko if: show_search_results() -->
           <div class="start-ui-list-search-results">
-            <!-- ko if: is_team() -->
-              <div class="team_members" data-bind="visible: search_results.team_members().length > 0">
-                <span class="start-ui-list-header" data-bind="l10n_text: z.string.search_team_members"></span>
-                <user-list class="search-list-theme-black" params="user: search_results.team_members, selected: selected_people, mode: z.components.UserListMode.INFO"></user-list>
-              </div>
-              <div class="start-ui-team-groups" data-bind="visible: search_results.groups().length > 0">
-                <span class="start-ui-list-header" data-bind="l10n_text: z.string.search_team_groups"></span>
-                <group-list params="groups: search_results.groups, click: click_on_group"></group-list>
-              </div>
-            <!-- /ko  -->
             <div class="contacts" data-bind="visible: search_results.contacts().length > 0">
-              <span class="start-ui-list-header" data-bind="l10n_text: z.string.search_connections"></span>
+              <!-- ko if: is_team() -->
+                <span class="start-ui-list-header" data-bind="l10n_text: z.string.search_team_members"></span>
+              <!-- /ko  -->
+              <!-- ko ifnot: is_team() -->
+                <span class="start-ui-list-header" data-bind="l10n_text: z.string.search_connections"></span>
+              <!-- /ko  -->
               <user-list class="search-list-theme-black" params="user: search_results.contacts, selected: selected_people, mode: z.components.UserListMode.INFO"></user-list>
             </div>
-            <!-- ko ifnot: is_team() -->
-              <div class="start-ui-groups" data-bind="visible: search_results.groups().length > 0">
+            <div class="start-ui-groups" data-bind="visible: search_results.groups().length > 0">
+              <!-- ko if: is_team() -->
+                <span class="start-ui-list-header" data-bind="l10n_text: z.string.search_team_groups"></span>
+              <!-- /ko  -->
+              <!-- ko ifnot: is_team() -->
                 <span class="start-ui-list-header" data-bind="l10n_text: z.string.search_groups"></span>
-                <group-list params="groups: search_results.groups, click: click_on_group"></group-list>
-              </div>
-            <!-- /ko  -->
+              <!-- /ko  -->
+              <group-list params="groups: search_results.groups, click: click_on_group"></group-list>
+            </div>
             <div class="others" data-bind="visible: search_results.others().length > 0">
               <span class="start-ui-list-header" data-bind="l10n_text: z.string.search_others"></span>
               <user-list class="search-list-theme-black" params="user: search_results.others, click: click_on_other, mode: z.components.UserListMode.INFO"></user-list>

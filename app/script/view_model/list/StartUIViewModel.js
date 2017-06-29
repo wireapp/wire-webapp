@@ -68,28 +68,27 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
         // Contacts, groups and others
         const is_username = query.trim().startsWith('@');
 
-        this.search_repository.search_by_name(normalized_query, is_username)
-          .then((user_ets) => {
-            if (normalized_query === z.search.SearchRepository.normalize_query(this.search_input())) {
-              if (this.is_team()) {
-                const non_member_others = user_ets.filter((user_et) => !this.search_results.team_members().includes(user_et));
-                this.search_results.others(non_member_others);
-              } else {
-                this.search_results.others(user_ets);
+        if (this.is_team()) {
+          this.search_results.contacts(this.search_for_member(normalized_query, is_username));
+        } else {
+          this.search_repository.search_by_name(normalized_query, is_username)
+            .then((user_ets) => {
+              if (normalized_query === z.search.SearchRepository.normalize_query(this.search_input())) {
+                if (this.is_team()) {
+                  const non_member_others = user_ets.filter((user_et) => !this.search_results.contacts().includes(user_et));
+                  this.search_results.others(non_member_others);
+                } else {
+                  this.search_results.others(user_ets);
+                }
               }
-            }
-          })
-          .catch((error) => {
-            this.logger.error(`Error searching for contacts: ${error.message}`, error);
-          });
+            })
+            .catch((error) => {
+              this.logger.error(`Error searching for contacts: ${error.message}`, error);
+            });
+        }
+
         this.search_results.contacts(this.user_repository.search_for_connected_users(normalized_query, is_username));
         this.search_results.groups(this.conversation_repository.get_groups_by_name(normalized_query, is_username));
-
-        if (this.team) {
-          this.search_results.team_members(this.search_for_member(normalized_query, is_username));
-          const non_member_contacts = this.search_results.contacts().filter((user_et) => !this.search_results.team_members().includes(user_et));
-          this.search_results.contacts(non_member_contacts);
-        }
 
         this.searched_for_user(query);
       }
@@ -120,27 +119,21 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.top_users = ko.observableArray([]);
     this.suggestions = ko.observableArray([]);
 
-    this.connections = ko.pureComputed(() => {
-      return this.user_repository.users()
-        .filter((user_et) => user_et.is_connected())
-        .sort((user_a, user_b) => z.util.StringUtil.sort_by_priority(user_a.first_name(), user_b.first_name()));
-    });
-
-    this.team_members = ko.pureComputed(() => {
-      const team_et = this.team();
-
-      if (team_et && team_et.id) {
+    this.contacts = ko.pureComputed(() => {
+      if (this.is_team()) {
+        const team_et = this.team();
         return team_et.members().sort((user_a, user_b) => z.util.StringUtil.sort_by_priority(user_a.first_name(), user_b.first_name()));
       }
 
-      return [];
+      return this.user_repository.users()
+        .filter((user_et) => user_et.is_connected())
+        .sort((user_a, user_b) => z.util.StringUtil.sort_by_priority(user_a.first_name(), user_b.first_name()));
     });
 
     this.search_results = {
       contacts: ko.observableArray([]),
       groups: ko.observableArray([]),
       others: ko.observableArray([]),
-      team_members: ko.observableArray([]),
     };
 
     // view states
@@ -158,10 +151,10 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       return this.search_results.groups().length || this.search_results.contacts().length || this.search_results.others().length;
     });
 
-    this.show_connections = ko.pureComputed(() => !this.is_team() && !this.show_suggestions());
+    this.show_contacts = ko.pureComputed(() => !this.show_suggestions());
 
     this.show_invite = ko.pureComputed(() => {
-      const no_connections_and_suggestions = !this.show_search_results() && !this.connections().length && !this.show_suggestions();
+      const no_connections_and_suggestions = !this.show_search_results() && !this.contacts().length && !this.show_suggestions();
       const no_search_results = this.show_search_results() && !this.has_results() && !this.is_searching();
 
       return no_connections_and_suggestions || no_search_results;
@@ -179,7 +172,6 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       return this.has_results() || this.search_input().length;
     });
 
-    this.show_team_member = ko.pureComputed(() => this.is_team() && this.team_members().length);
     this.show_top_people = ko.pureComputed(() => !this.is_team() && this.top_users().length);
 
     // Invite bubble states
@@ -302,7 +294,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
   }
 
   search_for_member(query, is_username) {
-    return this.team_members()
+    return this.contacts()
       .filter((user_et) => user_et.matches(query, is_username))
       .sort(function(user_a, user_b) {
         if (is_username) {
@@ -651,21 +643,10 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
   }
 
   _handle_search_input() {
-    if (this.is_team()) {
-      for (const user_et of this.search_results.team_members()) {
-        if (!this.selected_people().includes(user_et)) {
-          this.selected_people.push(user_et);
-          return true;
-        }
-      }
-    }
-
-    if (!this.is_team()) {
-      for (const user_et of this.search_results.contacts()) {
-        if (!this.selected_people().includes(user_et)) {
-          this.selected_people.push(user_et);
-          return true;
-        }
+    for (const user_et of this.search_results.contacts()) {
+      if (!this.selected_people().includes(user_et)) {
+        this.selected_people.push(user_et);
+        return true;
       }
     }
 
