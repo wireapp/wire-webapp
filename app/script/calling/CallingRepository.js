@@ -365,7 +365,7 @@ z.calling.CallingRepository = class CallingRepository {
 
         if (user_id === this.self_user_id()) {
           call_et.self_user_joined(true);
-          call_et.self_was_joined = true;
+          call_et.was_connected = true;
           return call_et.state(z.calling.enum.CALL_STATE.REJECTED);
         }
 
