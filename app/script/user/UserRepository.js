@@ -263,17 +263,17 @@ z.user.UserRepository = class UserRepository {
    */
   _assign_all_clients() {
     return this.client_repository.get_all_clients_from_db()
-      .then((user_client_map) => {
-        this.logger.info(`Found locally stored clients for '${Object.keys(user_client_map).length}' users`, user_client_map);
-        const user_ids = Object.keys(user_client_map);
+      .then((recipients) => {
+        this.logger.info(`Found locally stored clients for '${Object.keys(recipients).length}' users`, recipients);
+        const user_ids = Object.keys(recipients);
 
         return this.get_users_by_id(user_ids)
           .then((user_ets) => {
             for (const user_et of user_ets) {
-              if (user_client_map[user_et.id].length > 8) {
-                this.logger.warn(`Found '${user_client_map[user_et.id].length}' clients for '${user_et.name()}'`, user_client_map[user_et.id]);
+              if (recipients[user_et.id].length > 8) {
+                this.logger.warn(`Found '${recipients[user_et.id].length}' clients for '${user_et.name()}'`, recipients[user_et.id]);
               }
-              user_et.devices(user_client_map[user_et.id]);
+              user_et.devices(recipients[user_et.id]);
             }
 
             return user_ets;
