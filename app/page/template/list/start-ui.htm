@@ -4,7 +4,7 @@
     <span class="left-list-header-close-button button-icon-large icon-close" data-bind="click: click_on_close, l10n_tooltip: z.string.tooltip_search_close" data-uie-name="do-close"></span>
   </div>
   <div id="start-ui-header" class="start-ui-header border-theme">
-    <user-input data-bind="input_hint: {text: group_hint_text, trigger: show_hint}"
+    <user-input data-bind="input_hint: {text: z.l10n.text(z.string.search_group_hint), trigger: show_hint}"
                 class="start-ui-header-user-input"
                 params="input: search_input, placeholder: z.string.search_placeholder, selected: selected_people, enter: on_submit_search"
                 data-uie-name="enter-search">
@@ -85,11 +85,11 @@
           </div>
         <!-- /ko  -->
 
-        <!-- ko if: show_invite() && show_no_contacts_on_wire() -->
+        <!-- ko if: show_action() && show_no_contacts_on_wire() -->
           <div class="start-ui-no-top-people" data-bind="l10n_text: z.string.search_no_contacts_on_wire"></div>
         <!-- /ko  -->
 
-        <!-- ko if: show_invite() && !show_no_contacts_on_wire() && search_input()-->
+        <!-- ko if: show_action() && !show_no_contacts_on_wire() && search_input()-->
           <div class="start-ui-no-top-people" data-bind="l10n_text: z.string.search_try_search"></div>
         <!-- /ko  -->
 
@@ -104,7 +104,7 @@
     </div>
   </div>
 
-  <!-- ko if: show_invite() && !show_no_contacts_on_wire() && !search_input() -->
+  <!-- ko if: show_action() && !show_no_contacts_on_wire() && !search_input() -->
     <div class="start-ui-import-container">
       <div>
         <h1 class="start-ui-import-headline" data-bind="l10n_text: z.string.people_invite_headline"></h1>
