@@ -343,7 +343,7 @@ z.calling.CallingRepository = class CallingRepository {
 
         this._validate_message_destination(call_et, call_message_et);
         call_et.set_remote_version(call_message_et);
-        call_et.update_participant(user_id, call_message_et, response !== true);
+        call_et.add_or_update_participant(user_id, response !== true, call_message_et);
       })
       .catch(this._throw_message_error);
   }
@@ -374,8 +374,7 @@ z.calling.CallingRepository = class CallingRepository {
         }
 
         // Add the correct participant, start negotiating
-        this.user_repository.get_user_by_id(user_id)
-          .then((remote_user_et) => call_et.add_participant(remote_user_et, call_message_et, call_et.self_client_joined()));
+        call_et.add_or_update_participant(user_id, call_et.self_client_joined(), call_message_et);
       })
       .catch((error) => {
         this._throw_message_error(error);
@@ -425,7 +424,7 @@ z.calling.CallingRepository = class CallingRepository {
     this.get_call_by_id(conversation_id)
       .then((call_et) => call_et.verify_session_id(call_message_et))
       .then((call_et) => this._confirm_call_message(call_et, call_message_et))
-      .then((call_et) => call_et.update_participant(user_id, call_message_et))
+      .then((call_et) => call_et.add_or_update_participant(user_id, false, call_message_et))
       .catch(this._throw_message_error);
   }
 
@@ -467,18 +466,17 @@ z.calling.CallingRepository = class CallingRepository {
       .then((call_et) => {
         call_et.set_remote_version(call_message_et);
 
-        if (response) {
-          if (user_id === this.self_user_id()) {
-            this.logger.info(`Incoming call in conversation '${call_et.conversation_et.display_name()}' accepted on other device`);
-            return this.delete_call(conversation_id);
-          }
-
-          return call_et.update_participant(user_id, call_message_et)
-            .then(() => call_et.state(z.calling.enum.CALL_STATE.CONNECTING));
+        if (response && user_id === this.self_user_id()) {
+          this.logger.info(`Incoming call in conversation '${call_et.conversation_et.display_name()}' accepted on other device`);
+          return this.delete_call(conversation_id);
         }
 
-        this.user_repository.get_user_by_id(user_id)
-          .then((remote_user_et) => call_et.add_participant(remote_user_et, call_message_et, true));
+        return call_et.add_or_update_participant(user_id, response !== true, call_message_et)
+          .then(() => {
+            if (response) {
+              call_et.state(z.calling.enum.CALL_STATE.CONNECTING);
+            }
+          });
       })
       .catch((error) => {
         this._throw_message_error(error);
@@ -505,7 +503,7 @@ z.calling.CallingRepository = class CallingRepository {
         this._validate_message_destination(call_et, call_message_et);
         return call_et.verify_session_id(call_message_et);
       })
-      .then((call_et) => call_et.update_participant(user_id, call_message_et))
+      .then((call_et) => call_et.add_or_update_participant(user_id, true, call_message_et))
       .catch(this._throw_message_error);
   }
 
@@ -1043,7 +1041,7 @@ z.calling.CallingRepository = class CallingRepository {
 
             call_et.direction = z.calling.enum.CALL_STATE.INCOMING;
             call_et.set_remote_version(call_message_et);
-            return call_et.add_participant(remote_user_et, call_message_et, false)
+            return call_et.add_or_update_participant(user_id, false, call_message_et)
               .then(() => {
                 this.telemetry.track_event(z.tracking.EventName.CALLING.RECEIVED_CALL, call_et);
                 this.inject_activate_event(call_message_et, source);

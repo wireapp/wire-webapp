@@ -41,9 +41,8 @@ z.calling.entities.Flow = class Flow {
    * @param {Call} call_et - Call entity that the flow belongs to
    * @param {Participant} participant_et - Participant entity that the flow belongs to
    * @param {CallSetupTimings} timings - Timing statistics of call setup steps
-   * @param {CallMessage} call_message_et - Optional call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
    */
-  constructor(call_et, participant_et, timings, call_message_et) {
+  constructor(call_et, participant_et, timings) {
     this.calling_repository = call_et.calling_repository;
 
     this.call_et = call_et;
@@ -54,7 +53,7 @@ z.calling.entities.Flow = class Flow {
     this.conversation_id = this.call_et.id;
 
     // States
-    this.is_answer = ko.observable(undefined);
+    this.is_answer = ko.observable(false);
 
     // Audio
     this.audio = new z.calling.entities.FlowAudio(this, this.calling_repository.media_repository);
@@ -88,7 +87,7 @@ z.calling.entities.Flow = class Flow {
     this.connection_state.subscribe((ice_connection_state) => {
       switch (ice_connection_state) {
         case z.calling.rtc.ICE_CONNECTION_STATE.CHECKING: {
-          this.telemetry.schedule_check(this.call_et.telemetry.media_type);
+          this.telemetry.schedule_check(this.call_et.telemetry.media_type, this.is_answer());
           break;
         }
 
@@ -277,29 +276,6 @@ z.calling.entities.Flow = class Flow {
         this._create_sdp_offer();
       }
     });
-
-    this.initialize_flow(call_message_et);
-  }
-
-  /**
-   * Initialize the flow.
-   *
-   * @note Magic here is that if an call_message is present, the remote user is the creator of the flow
-   * @param {CallMessage} call_message_et - Optional call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
-   * @returns {undefined} No return value
-   */
-  initialize_flow(call_message_et) {
-    if (call_message_et) {
-      const {client_id, sdp: rtc_sdp} = call_message_et;
-
-      this.set_remote_client_id(client_id);
-
-      if (rtc_sdp) {
-        return this.save_remote_sdp(call_message_et);
-      }
-    }
-
-    this.is_answer(false);
   }
 
   /**
@@ -313,10 +289,9 @@ z.calling.entities.Flow = class Flow {
   restart_negotiation(negotiation_mode, is_answer, media_stream) {
     this.logger.info(`Negotiation restart triggered by '${negotiation_mode}'`);
 
+    this.clear_timeouts();
     this._close_peer_connection();
     this._close_data_channel();
-    this._clear_negotiation_timeout();
-    this._clear_send_sdp_timeout();
     this._reset_signaling_states();
     this.is_answer(is_answer);
     this._reset_sdp();
@@ -717,7 +692,8 @@ z.calling.entities.Flow = class Flow {
       .then(({sdp: remote_sdp}) => {
         const {type} = call_message_et;
 
-        if (remote_sdp.type === z.calling.rtc.SDP_TYPE.OFFER) {
+        const is_remote_offer = remote_sdp.type === z.calling.rtc.SDP_TYPE.OFFER;
+        if (is_remote_offer) {
           switch (this.signaling_state()) {
             case z.calling.rtc.SIGNALING_STATE.LOCAL_OFFER: {
               if (this._solve_colliding_states()) {
@@ -728,7 +704,6 @@ z.calling.entities.Flow = class Flow {
 
             case z.calling.rtc.SIGNALING_STATE.NEW:
             case z.calling.rtc.SIGNALING_STATE.STABLE: {
-
               this.is_answer(true);
               break;
             }
@@ -738,7 +713,8 @@ z.calling.entities.Flow = class Flow {
             }
           }
 
-          if (type === z.calling.enum.CALL_MESSAGE_TYPE.UPDATE) {
+          const is_update = type === z.calling.enum.CALL_MESSAGE_TYPE.UPDATE;
+          if (is_update) {
             this.restart_negotiation(z.calling.enum.SDP_NEGOTIATION_MODE.STREAM_CHANGE, true);
           }
         }
@@ -989,7 +965,7 @@ z.calling.entities.Flow = class Flow {
     const attributes = {cause: name, location: sdp_source, step: 'set_sdp', type: sdp_type};
     this.call_et.telemetry.track_event(z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes);
 
-    amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, this.call_et.id, z.calling.enum.TERMINATION_REASON.SDP_FAILED);
+    this._remove_participant(z.calling.enum.TERMINATION_REASON.SDP_FAILED);
   }
 
   /**
