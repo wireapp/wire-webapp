@@ -64,7 +64,7 @@ z.team.TeamRepository = class TeamRepository {
         return this.team(new z.team.TeamEntity());
       })
       .then((team_et) => {
-        amplify.publish(z.event.WebApp.TEAM.INFO, this._create_team_info());
+        this._send_account_info();
         return team_et;
       });
   }
@@ -143,14 +143,24 @@ z.team.TeamRepository = class TeamRepository {
     }
   }
 
-  _create_team_info() {
-    return {
-      accentID: this.self_user().accent_id(),
-      name: this.team_name(),
-      picture: '',
-      teamID: this.team().id,
-      userID: this.self_user().id,
-    };
+  _send_account_info() {
+    const image_resource = this.is_team() ? this.self_user().preview_picture_resource() : this.self_user().preview_picture_resource();
+
+    image_resource.load()
+      .then((image_blob) => z.util.load_data_url(image_blob))
+      .then((image_data_url) => {
+        const account_info = {
+          accentID: this.self_user().accent_id(),
+          name: this.team_name(),
+          picture: image_data_url,
+          teamID: this.team().id,
+          userID: this.self_user().id,
+        };
+
+        this.logger.info('Publishing account info', account_info);
+        amplify.publish(z.event.WebApp.TEAM.INFO, account_info);
+      });
+
   }
 
   _on_delete(event_json) {
@@ -192,7 +202,7 @@ z.team.TeamRepository = class TeamRepository {
 
     if (this.team().id === team_id) {
       this.team_mapper.update_team_from_object(team_data, this.team());
-      amplify.publish(z.event.WebApp.TEAM.INFO, this._create_team_info());
+      this._send_account_info();
     }
   }
 
