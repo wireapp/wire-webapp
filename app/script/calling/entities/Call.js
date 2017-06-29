@@ -60,7 +60,8 @@ z.calling.entities.Call = class Call {
     this.timings = undefined;
 
     this.media_repository = media_repository;
-    this.self_user = user_repository.self();
+    this.user_repository = user_repository;
+    this.self_user = this.user_repository.self();
     this.self_state = self_state;
     this.telemetry = telemetry;
 
@@ -211,6 +212,8 @@ z.calling.entities.Call = class Call {
     if (this.participants().length <= 1) {
       return this.calling_repository.delete_call(this.id);
     }
+
+    this._clear_timeouts();
     this.calling_repository.media_stream_handler.reset_media_stream();
   }
 
@@ -241,10 +244,9 @@ z.calling.entities.Call = class Call {
 
       this.send_call_message(z.calling.CallMessageBuilder.build_group_start(response, this.session_id, prop_sync_payload));
     } else {
-      const [user_id] = this.conversation_et.participating_user_ids();
+      const [remote_user_id] = this.conversation_et.participating_user_ids();
 
-      this.calling_repository.user_repository.get_user_by_id(user_id)
-        .then((remote_user_et) => this.add_participant(remote_user_et));
+      this.add_or_update_participant(remote_user_id, true);
     }
   }
 
@@ -254,8 +256,6 @@ z.calling.entities.Call = class Call {
    * @returns {undefined} No return value
    */
   leave_call(termination_reason) {
-    this._clear_timeouts();
-
     if (this.state() === z.calling.enum.CALL_STATE.ONGOING && !this.is_group) {
       this.state(z.calling.enum.CALL_STATE.DISCONNECTING);
     }
@@ -626,35 +626,20 @@ z.calling.entities.Call = class Call {
   /**
    * Add an participant to the call.
    *
-   * @param {z.entities.User} user_et - User entity to be added to the call
-   * @param {CallMessage} call_message_et - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
-   * @param {boolean} [negotiate=true] - Should negotiation be started immediately
+   * @param {string} user_id - ID of user to be removed from the call
+   * @param {boolean} negotiate - Should negotiation be started immediately
+   * @param {CallMessage} [call_message_et] - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
    * @returns {Promise} Resolves with added participant
    */
-  add_participant(user_et, call_message_et, negotiate = true) {
-    const {id: user_id} = user_et;
-
+  add_or_update_participant(user_id, negotiate, call_message_et) {
     return this.get_participant_by_id(user_id)
-      .then(() => this.update_participant(user_id, call_message_et, negotiate))
+      .then(() => this._update_participant(user_id, negotiate, call_message_et))
       .catch((error) => {
-        if (error.type !== z.calling.CallError.TYPE.NOT_FOUND) {
-          throw error;
+        if (error.type === z.calling.CallError.TYPE.NOT_FOUND) {
+          return this._add_participant(user_id, negotiate, call_message_et);
         }
 
-        const participant_et = new z.calling.entities.Participant(this, user_et, this.timings, call_message_et);
-
-        this.logger.info(`Adding call participant '${user_et.name()}'`, participant_et);
-        this.participants.push(participant_et);
-
-        return participant_et.update_state(call_message_et)
-          .catch((_error) => {
-            if (_error.type !== z.calling.CallError.TYPE.SDP_STATE_COLLISION) {
-              throw error;
-            }
-
-            negotiate = false;
-          })
-          .then(() => this._update_state(participant_et, negotiate));
+        throw error;
       });
   }
 
@@ -756,45 +741,6 @@ z.calling.entities.Call = class Call {
   }
 
   /**
-   * Update call participant with call message.
-   *
-   * @param {string} user_id - ID of participant to update
-   * @param {CallMessage} call_message_et - Call message to update user with
-   * @param {boolean} [negotiate=false] - Should negotiation be started
-   * @returns {Promise} Resolves when participant was updated
-   */
-  update_participant(user_id, call_message_et, negotiate = false) {
-    return this.get_participant_by_id(user_id)
-      .then((participant_et) => {
-        if (call_message_et) {
-          const {client_id} = call_message_et;
-
-          if (client_id) {
-            participant_et.verify_client_id(client_id);
-          }
-
-          this.logger.info(`Updating call participant '${participant_et.user.name()}'`, call_message_et);
-          return participant_et.update_state(call_message_et);
-        }
-
-        return participant_et;
-      })
-      .catch((error) => {
-        if (error.type !== z.calling.CallError.TYPE.SDP_STATE_COLLISION) {
-          throw error;
-        }
-
-        negotiate = false;
-      })
-      .then((participant_et) => this._update_state(participant_et, negotiate))
-      .catch((error) => {
-        if (error.type !== z.calling.CallError.TYPE.NOT_FOUND) {
-          throw error;
-        }
-      });
-  }
-
-  /**
    * Verify call message belongs to call by session id.
    *
    * @private
@@ -816,6 +762,69 @@ z.calling.entities.Call = class Call {
 
         throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_SENDER, 'Session IDs not matching');
       });
+  }
+
+  /**
+   * Add an participant to the call.
+   *
+   * @param {string} user_id - User ID to be added to the call
+   * @param {boolean} negotiate - Should negotiation be started immediately
+   * @param {CallMessage} [call_message_et] - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
+   * @returns {Promise} Resolves with added participant
+   */
+  _add_participant(user_id, negotiate, call_message_et) {
+    return this.get_participant_by_id(user_id)
+      .catch((error) => {
+        if (error.type !== z.calling.CallError.TYPE.NOT_FOUND) {
+          throw error;
+        }
+
+        return this.user_repository.get_user_by_id(user_id)
+          .then((user_et) => {
+            const participant_et = new z.calling.entities.Participant(this, user_et, this.timings);
+
+            this.participants.push(participant_et);
+
+            this.logger.info(`Adding call participant '${user_et.name()}'`, participant_et);
+            return this._update_participant_state(participant_et, call_message_et, negotiate);
+          });
+      });
+  }
+
+  /**
+   * Update call participant with call message.
+   *
+   * @param {string} user_id - User ID to be added to the call
+   * @param {boolean} negotiate - Should negotiation be started
+   * @param {CallMessage} call_message_et - Call message to update user with
+   * @returns {Promise} Resolves when participant was updated
+   */
+  _update_participant(user_id, negotiate, call_message_et) {
+    return this.get_participant_by_id(user_id)
+      .then((participant_et) => {
+        if (call_message_et) {
+          const {client_id} = call_message_et;
+
+          if (client_id) {
+            participant_et.verify_client_id(client_id);
+          }
+        }
+
+        this.logger.info(`Updating call participant '${participant_et.user.name()}'`, call_message_et);
+        return this._update_participant_state(participant_et, call_message_et, negotiate);
+      });
+  }
+
+  _update_participant_state(participant_et, call_message_et, negotiate) {
+    return participant_et.update_state(call_message_et)
+      .catch((error) => {
+        if (error.type !== z.calling.CallError.TYPE.SDP_STATE_COLLISION) {
+          throw error;
+        }
+
+        negotiate = false;
+      })
+      .then(() => this._update_state(participant_et, negotiate));
   }
 
 
