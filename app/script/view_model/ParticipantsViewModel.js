@@ -55,6 +55,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.conversation = ko.observable(new z.entity.Conversation());
     this.conversation.subscribe(() => this.render_participants(false));
 
+    this.is_team = this.team_repository.is_team;
     this.team = this.team_repository.team;
 
     this.render_participants = ko.observable(false);
@@ -126,38 +127,21 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
     this.user_input = ko.observable('');
     this.user_selected = ko.observableArray([]);
+
     this.connected_users = ko.pureComputed(() => {
-      return this.user_repository.connected_users()
+      const user_ets = this.is_team() ? this.team().members() : this.user_repository.connected_users();
+
+      return user_ets
         .filter((user_et) => {
           for (const conversation_participant of this.participants()) {
             if (user_et.id === conversation_participant.id) {
               return false;
             }
           }
-
-          if (this.team().id) {
-            for (const team_member of this.team_members()) {
-              if (user_et.id === team_member.id) {
-                return false;
-              }
-            }
-          }
-
           return true;
         })
         .sort((user_a, user_b) => z.util.StringUtil.sort_by_priority(user_a.first_name(), user_b.first_name()));
     }, this, {deferEvaluation: true});
-    this.team_members = ko.pureComputed(() => {
-      return this.team().members()
-        .filter((user_et) => {
-          for (const conversation_participant of this.participants()) {
-            if (user_et.id === conversation_participant.id) {
-              return false;
-            }
-          }
-          return true;
-        });
-    });
 
     const shortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.ADD_PEOPLE);
     this.add_people_tooltip = z.l10n.text(z.string.tooltip_people_add, shortcut);
