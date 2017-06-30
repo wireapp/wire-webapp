@@ -57,6 +57,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
     this.is_team = this.team_repository.is_team;
     this.team = this.team_repository.team;
+    this.team_users = this.team_repository.team_users;
 
     this.render_participants = ko.observable(false);
 
@@ -129,7 +130,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.user_selected = ko.observableArray([]);
 
     this.connected_users = ko.pureComputed(() => {
-      const user_ets = this.is_team() ? this.team().members() : this.user_repository.connected_users();
+      const user_ets = this.is_team() ? this.team_users() : this.user_repository.connected_users();
 
       return user_ets
         .filter((user_et) => {

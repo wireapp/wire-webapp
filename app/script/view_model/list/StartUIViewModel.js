@@ -62,7 +62,6 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.user = this.user_repository.self;
 
     this.is_team = this.team_repository.is_team;
-    this.team = this.team_repository.team;
     this.team_name = this.team_repository.team_name;
 
     this.submitted_search = false;
@@ -114,13 +113,9 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
     // User lists
     this.contacts = ko.pureComputed(() => {
-      if (this.is_team()) {
-        const team_et = this.team();
-        return team_et.members().sort((user_a, user_b) => z.util.StringUtil.sort_by_priority(user_a.first_name(), user_b.first_name()));
-      }
+      const user_ets = this.is_team() ? this.team_repository.team_users() : this.user_repository.connected_users();
 
-      return this.user_repository.users()
-        .filter((user_et) => user_et.is_connected())
+      return user_ets
         .sort((user_a, user_b) => z.util.StringUtil.sort_by_priority(user_a.first_name(), user_b.first_name()));
     });
 

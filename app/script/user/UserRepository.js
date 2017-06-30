@@ -78,8 +78,8 @@ z.user.UserRepository = class UserRepository {
       amplify.publish(z.event.WebApp.ANALYTICS.CUSTOM_DIMENSION, z.tracking.CustomDimension.CONTACTS, number_of_connected_users);
     });
 
-    this.team = undefined;
     this.is_team = ko.observable();
+    this.team = undefined;
 
     amplify.subscribe(z.event.Backend.USER.CONNECTION, this.user_connection.bind(this));
     amplify.subscribe(z.event.Backend.USER.UPDATE, this.user_update.bind(this));

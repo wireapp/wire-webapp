@@ -74,8 +74,8 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
       return this.webapp_is_loaded() || this.conversations_unarchived().length || this.connect_requests().length || this.conversations_calls().length;
     }).extend({notify: 'always', rateLimit: 500});
 
-    this.team_name = this.team_repository.team_name;
     this.is_team = this.team_repository.is_team;
+    this.team_name = this.team_repository.team_name;
 
     this.active_conversation_id = ko.pureComputed(() => {
       if (this.conversation_repository.active_conversation()) {

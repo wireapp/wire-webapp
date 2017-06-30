@@ -30,20 +30,28 @@ z.team.TeamRepository = class TeamRepository {
     this.team_service = team_service;
     this.user_repository = user_repository;
 
+    this.is_team = ko.observable(false);
+
     this.team = ko.observable();
     this.team_name = ko.pureComputed(() => {
-      if (this.team() && this.team().name()) {
+      if (this.is_team()) {
         return this.team().name();
       }
 
       return this.user_repository.self().name();
     });
-
-    this.is_team = ko.observable(false);
+    this.team_users = ko.pureComputed(() => {
+      if (this.is_team()) {
+        const team_members = this.team().team_members();
+        return team_members.join(this.user_repository.connected_users());
+      }
+    });
 
     this.self_user = this.user_repository.self;
 
     this.user_repository.team = this.team;
+    this.user_repository.team_users = this.team_users;
+
     amplify.subscribe(z.event.WebApp.TEAM.EVENT_FROM_BACKEND, this.on_team_event.bind(this));
   }
 
