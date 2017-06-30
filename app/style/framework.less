@@ -19,28 +19,24 @@
 
 .app {
   .font-antialiasing;
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  width: 100%;
+  .full-screen;
+  display: flex;
   min-width: @screen-md-min;
   background-color: @app-bg;
 
   .left {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
+    position: relative;
+    flex: 0 0 auto;
     color: @left-color;
-    width: @left-width + @teams-width;
+    width: @left-width;
+
+    .team-mode & {
+      width: @left-width + @teams-width;
+    }
   }
 
   .right {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: @left-width + @teams-width;
+    position: relative;
+    flex: 1 1 auto;
   }
 }
