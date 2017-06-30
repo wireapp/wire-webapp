@@ -694,14 +694,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when connection was mapped return value
    */
   map_connection(connection_et, show_conversation = false) {
-    return this.find_conversation_by_id(connection_et.conversation_id)
+    const {conversation_id} = connection_et;
+
+    return this.find_conversation_by_id(conversation_id)
       .catch((error) => {
         if (error.type !== z.conversation.ConversationError.TYPE.NOT_FOUND) {
           throw error;
         }
 
         if (connection_et.is_connected() || connection_et.is_outgoing_request()) {
-          return this.fetch_conversation_by_id(connection_et.conversation_id);
+          return this.fetch_conversation_by_id(conversation_id);
         }
 
         throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.NOT_FOUND);
