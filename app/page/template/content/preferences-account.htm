@@ -36,7 +36,7 @@
                    data-bind="l10n_text: z.string.preferences_account_username_error_taken, css: {'text-red': submitted_username() === entered_username()}"></div>
             <!-- /ko -->
           </div>
-          <!-- ko ifnot: is_team() -->
+          <!-- ko if: is_team() -->
             <div class="preferences-account-team" data-bind="text: team_name()" data-uie-name="status-team"></div>
           <!-- /ko -->
           <div class="preferences-account-mail" data-bind="text: self_user().email()" data-uie-name="enter-email"></div>
