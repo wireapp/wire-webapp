@@ -219,9 +219,7 @@ z.user.UserRepository = class UserRepository {
    */
   create_connection(user_et, show_conversation = false) {
     return this.user_service.create_connection(user_et.id, user_et.name())
-      .then((response) => {
-        return this.user_connection(response, z.event.EventRepository.SOURCE.INJECTED, show_conversation);
-      })
+      .then((response) => this.user_connection(response, z.event.EventRepository.SOURCE.INJECTED, show_conversation))
       .catch((error) => {
         this.logger.error(`Failed to send connection request to user '${user_et.id}': ${error.message}`, error);
       });
@@ -367,7 +365,7 @@ z.user.UserRepository = class UserRepository {
   /**
    * Assign connections to the users.
    * @param {z.entity.User} user_et - User to which a connection will be assigned to.
-   * @returns {Promise} Promise that resolves with the connection entity which has been found for the given user entity.
+   * @returns {z.entity.Connection} Connection entity which has been found for the given user entity.
    * @private
    */
   _assign_connection(user_et) {
@@ -398,9 +396,7 @@ z.user.UserRepository = class UserRepository {
     }
 
     return this.user_service.update_connection_status(user_et.id, status)
-      .then((response) => {
-        return this.user_connection(response, z.event.EventRepository.SOURCE.INJECTED, show_conversation);
-      })
+      .then((response) => this.user_connection(response, z.event.EventRepository.SOURCE.INJECTED, show_conversation))
       .catch((error) => {
         this.logger.error(`Connection status change to '${status}' for user '${user_et.id}' failed: ${error.message}`, error);
 
@@ -428,7 +424,7 @@ z.user.UserRepository = class UserRepository {
 
     if (is_web_socket_event && !self_user_accepted) {
       this.get_user_by_id(connection_et.to)
-        .then(function(user_et) {
+        .then((user_et) => {
           const message_et = new z.entity.MemberMessage();
           message_et.user(user_et);
 
@@ -470,7 +466,7 @@ z.user.UserRepository = class UserRepository {
         }
 
         return this.client_repository.save_client_in_db(user_id, client_et.to_json())
-          .then(function() {
+          .then(() => {
             amplify.publish(z.event.WebApp.USER.CLIENT_ADDED, user_id, client_et);
             if (user_et.is_me) {
               amplify.publish(z.event.WebApp.CLIENT.ADD_OWN_CLIENT, user_id, client_et);
@@ -487,10 +483,8 @@ z.user.UserRepository = class UserRepository {
    */
   remove_client_from_user(user_id, client_id) {
     return this.client_repository.remove_client(user_id, client_id)
-      .then(() => {
-        return this.get_user_by_id(user_id);
-      })
-      .then(function(user_et) {
+      .then(() => this.get_user_by_id(user_id))
+      .then((user_et) => {
         user_et.remove_client(client_id);
         amplify.publish(z.event.WebApp.USER.CLIENT_REMOVED, user_id, client_id);
       });
@@ -503,8 +497,8 @@ z.user.UserRepository = class UserRepository {
    * @returns {undefined} No return value
    */
   update_clients_from_user(user_id, client_ets) {
-    return this.get_user_by_id(user_id)
-      .then(function(user_et) {
+    this.get_user_by_id(user_id)
+      .then((user_et) => {
         user_et.devices(client_ets);
         amplify.publish(z.event.WebApp.USER.CLIENTS_UPDATED, user_id, client_ets);
       });
@@ -568,13 +562,8 @@ z.user.UserRepository = class UserRepository {
 
     const user_id_chunks = z.util.ArrayUtil.chunk(user_ids, z.config.MAXIMUM_USERS_PER_REQUEST);
     return Promise.all(user_id_chunks.map((user_id_chunk) => _get_users(user_id_chunk)))
-      .then((resolve_array) => {
-        const new_user_ets = _.flatten(resolve_array);
-        return this.save_users(new_user_ets);
-      })
-      .then((resolve_array) => {
-        let fetched_user_ets = _.flatten(resolve_array);
-
+      .then((resolve_array) => this.save_users(_.flatten(resolve_array)))
+      .then((fetched_user_ets) => {
         // If there is a difference then we most likely have a case with a suspended user
         if (user_ids.length !== fetched_user_ets.length) {
           fetched_user_ets = this._add_suspended_users(user_ids, fetched_user_ets);
@@ -658,17 +647,19 @@ z.user.UserRepository = class UserRepository {
     };
 
     const find_users = user_ids.map((user_id) => _find_user(user_id));
-    return Promise.all(find_users).then((resolve_array) => {
-      const known_user_ets = resolve_array.filter((array_item) => array_item instanceof z.entity.User);
-      const unknown_user_ids = resolve_array.filter((array_item) => _.isString(array_item));
 
-      if (offline || !unknown_user_ids.length) {
-        return known_user_ets;
-      }
+    return Promise.all(find_users)
+      .then((resolve_array) => {
+        const known_user_ets = resolve_array.filter((array_item) => array_item instanceof z.entity.User);
+        const unknown_user_ids = resolve_array.filter((array_item) => _.isString(array_item));
 
-      return this.fetch_users_by_id(unknown_user_ids)
-        .then((user_ets) => known_user_ets.concat(user_ets));
-    });
+        if (offline || !unknown_user_ids.length) {
+          return known_user_ets;
+        }
+
+        return this.fetch_users_by_id(unknown_user_ids)
+          .then((user_ets) => known_user_ets.concat(user_ets));
+      });
   }
 
   /**
@@ -679,13 +670,13 @@ z.user.UserRepository = class UserRepository {
    */
   search_for_connected_users(query, is_username) {
     return this.users()
-      .filter(function(user_et) {
+      .filter((user_et) => {
         if (!user_et.is_connected()) {
           return false;
         }
         return user_et.matches(query, is_username);
       })
-      .sort(function(user_a, user_b) {
+      .sort((user_a, user_b) => {
         if (is_username) {
           return z.util.StringUtil.sort_by_priority(user_a.username(), user_b.username(), query);
         }
@@ -709,7 +700,7 @@ z.user.UserRepository = class UserRepository {
    * Is the user the logged in user.
    * @param {z.entity.User|string} user_et - User entity or user ID
    * @param {boolean} is_me - True, if self user
-   * @returns {boolean} Is the user the logged in user
+   * @returns {Promise} Resolves with the user entity
    */
   save_user(user_et, is_me = false) {
     return this.find_user_by_id(user_et.id)
@@ -733,10 +724,10 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise} Resolves with users passed as parameter
    */
   save_users(user_ets) {
-    const _user_exists = (user_et) => {
+    const _find_users = (user_et) => {
       return this.find_user_by_id(user_et.id)
         .then(() => undefined)
-        .catch(function(error) {
+        .catch((error) => {
           if (error.type !== z.user.UserError.TYPE.USER_NOT_FOUND) {
             throw error;
           }
@@ -744,11 +735,11 @@ z.user.UserRepository = class UserRepository {
         });
     };
 
-    const existing_users = user_ets.map((user_et) => _user_exists(user_et));
-    return Promise.all(existing_users)
-      .then((existing_user_ets) => {
-        const new_user_ets = existing_user_ets.filter((user_et) => user_et);
-        z.util.ko_array_push_all(this.users, new_user_ets);
+    const find_users = user_ets.map((user_et) => _find_users(user_et));
+
+    return Promise.all(find_users)
+      .then((resolve_array) => {
+        z.util.ko_array_push_all(this.users, resolve_array.filter((user_et) => user_et));
         return user_ets;
       });
   }
@@ -760,7 +751,7 @@ z.user.UserRepository = class UserRepository {
    */
   update_user_by_id(user_id) {
     return this.find_user_by_id(user_id)
-      .catch(function(error) {
+      .catch((error) => {
         if (error.type !== z.user.UserError.TYPE.USER_NOT_FOUND) {
           throw error;
         }
@@ -782,12 +773,7 @@ z.user.UserRepository = class UserRepository {
    */
   _add_suspended_users(user_ids, user_ets) {
     for (const user_id of user_ids) {
-      const matching_user_ids = user_ets.find(function(user_et) {
-        if (user_et.id === user_id) {
-          return true;
-        }
-        return false;
-      });
+      const matching_user_ids = user_ets.find((user_et) => user_et.id === user_id);
 
       if (!matching_user_ids) {
         const user_et = new z.entity.User(user_id);
@@ -880,8 +866,8 @@ z.user.UserRepository = class UserRepository {
           this.should_set_username = false;
           return this.self().username(username);
         })
-        .catch(function(error) {
-          if ([z.service.BackendClientError.STATUS_CODE.CONFLICT, z.service.BackendClientError.STATUS_CODE.BAD_REQUEST].includes(error.code)) {
+        .catch(({code: error_code}) => {
+          if ([z.service.BackendClientError.STATUS_CODE.CONFLICT, z.service.BackendClientError.STATUS_CODE.BAD_REQUEST].includes(error_code)) {
             throw new z.user.UserError(z.user.UserError.TYPE.USERNAME_TAKEN);
           }
           throw new z.user.UserError(z.user.UserError.TYPE.REQUEST_FAILURE);
@@ -907,16 +893,16 @@ z.user.UserRepository = class UserRepository {
    */
   verify_username(username) {
     return this.user_service.check_username(username)
-      .catch(function(error) {
-        if (error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
+      .catch(({code: error_code}) => {
+        if (error_code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
           return username;
         }
-        if (error.code === z.service.BackendClientError.STATUS_CODE.BAD_REQUEST) {
+        if (error_code === z.service.BackendClientError.STATUS_CODE.BAD_REQUEST) {
           throw new z.user.UserError(z.user.UserError.TYPE.USERNAME_TAKEN);
         }
         throw new z.user.UserError(z.user.UserError.TYPE.REQUEST_FAILURE);
       })
-      .then(function(verified_username) {
+      .then((verified_username) => {
         if (verified_username) {
           return verified_username;
         }
@@ -941,7 +927,7 @@ z.user.UserRepository = class UserRepository {
             return this.user_update({user: {assets: assets, id: this.self().id}});
           });
       })
-      .catch(function(error) {
+      .catch((error) => {
         throw new Error(`Error during profile image upload: ${error.message}`);
       });
   }
