@@ -254,7 +254,7 @@ describe('MediaEmbeds', function() {
         const link = 'https://www.youtube-nocookie.com/watch?v=oHg5SJYRHA0&autoplay=1';
 
         const message = build_message_with_anchor(link);
-        const iframe = '<a href="https://www.youtube-nocookie.com/watch?v=oHg5SJYRHA0&autoplay=1" target="_blank" rel="nofollow">https://www.youtube-nocookie.com/watch?v=oHg5SJYRHA0&autoplay=1</a><div class="iframe-container iframe-container-video"><iframe class="youtube" width="100%" height="100%" src="https://www.youtube-nocookie.com/embed/oHg5SJYRHA0?html5=1" frameborder="0" allowfullscreen></iframe></div>';
+        const iframe = '<a href="https://www.youtube-nocookie.com/watch?v=oHg5SJYRHA0&autoplay=1" target="_blank" rel="nofollow">https://www.youtube-nocookie.com/watch?v=oHg5SJYRHA0&autoplay=1</a><div class="iframe-container iframe-container-video"><iframe class="youtube" width="100%" height="100%" src="https://www.youtube-nocookie.com/embed/oHg5SJYRHA0?html5=1&enablejsapi=0&modestbranding=1&rel=0" frameborder="0" allowfullscreen></iframe></div>';
 
         expect(z.media.MediaParser.render_media_embeds(message)).toBe(iframe);
       });
@@ -263,7 +263,7 @@ describe('MediaEmbeds', function() {
         const link = 'https://www.youtube-nocookie.com/watch?autoplay=1&v=oHg5SJYRHA0';
 
         const message = build_message_with_anchor(link);
-        const iframe = '<a href="https://www.youtube-nocookie.com/watch?autoplay=1&v=oHg5SJYRHA0" target="_blank" rel="nofollow">https://www.youtube-nocookie.com/watch?autoplay=1&v=oHg5SJYRHA0</a><div class="iframe-container iframe-container-video"><iframe class="youtube" width="100%" height="100%" src="https://www.youtube-nocookie.com/embed/oHg5SJYRHA0?html5=1" frameborder="0" allowfullscreen></iframe></div>';
+        const iframe = '<a href="https://www.youtube-nocookie.com/watch?autoplay=1&v=oHg5SJYRHA0" target="_blank" rel="nofollow">https://www.youtube-nocookie.com/watch?autoplay=1&v=oHg5SJYRHA0</a><div class="iframe-container iframe-container-video"><iframe class="youtube" width="100%" height="100%" src="https://www.youtube-nocookie.com/embed/oHg5SJYRHA0?html5=1&enablejsapi=0&modestbranding=1&rel=0" frameborder="0" allowfullscreen></iframe></div>';
 
         expect(z.media.MediaParser.render_media_embeds(message)).toBe(iframe);
       });
