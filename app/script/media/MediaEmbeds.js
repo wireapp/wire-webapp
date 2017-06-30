@@ -116,9 +116,9 @@ z.media.MediaEmbeds = (function() {
 
       // Append HTML5 parameter to YouTube src to force HTML5 mode
       // This fixes the issue that FF displays black box in some cases
-      searchParams.set('html5', '1');
+      searchParams.set('html5', 1);
 
-      searchParams.set('enablejsapi', '0');
+      searchParams.set('enablejsapi', 0);
       searchParams.set('modestbranding', 1);
 
       // Do not get related videos at the end
