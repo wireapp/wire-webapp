@@ -1174,9 +1174,10 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
     this.web_socket_service.connect((notification) => {
       const [event] = notification.payload;
+      const {type: event_type} = event;
 
-      this.logger.info(`»» Event: '${event.type}'`, {event_json: JSON.stringify(event), event_object: event});
-      if (event.type === z.event.Backend.USER.ACTIVATE) {
+      this.logger.info(`»» Event: '${event_type}'`, {event_json: JSON.stringify(event), event_object: event});
+      if (event_type === z.event.Backend.USER.ACTIVATE) {
         this._account_verified();
       }
     });
@@ -1187,9 +1188,11 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
     this.web_socket_service.connect((notification) => {
       const [event] = notification.payload;
+      const {type: event_type, user} = event;
+      const is_user_update = event_type === z.event.Backend.USER.UPDATE;
 
-      this.logger.info(`»» Event: '${event.type}'`, {event_json: JSON.stringify(event), event_object: event});
-      if ((event.type === z.event.Backend.USER.UPDATE) && event.user.email) {
+      this.logger.info(`»» Event: '${event_type}'`, {event_json: JSON.stringify(event), event_object: event});
+      if (is_user_update && user.email) {
         this._account_verified(false);
       }
     });

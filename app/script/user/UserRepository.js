@@ -78,11 +78,92 @@ z.user.UserRepository = class UserRepository {
       amplify.publish(z.event.WebApp.ANALYTICS.CUSTOM_DIMENSION, z.tracking.CustomDimension.CONTACTS, number_of_connected_users);
     });
 
-    amplify.subscribe(z.event.Backend.USER.CONNECTION, this.user_connection.bind(this));
-    amplify.subscribe(z.event.Backend.USER.UPDATE, this.user_update.bind(this));
     amplify.subscribe(z.event.WebApp.CLIENT.ADD, this.add_client_to_user.bind(this));
     amplify.subscribe(z.event.WebApp.CLIENT.REMOVE, this.remove_client_from_user.bind(this));
     amplify.subscribe(z.event.WebApp.CLIENT.UPDATE, this.update_clients_from_user.bind(this));
+    amplify.subscribe(z.event.WebApp.USER.EVENT_FROM_BACKEND, this.on_user_event.bind(this));
+  }
+
+  /**
+   * Listener for incoming user events.
+   *
+   * @param {Object} event_json - JSON data for event
+   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @returns {undefined} No return value
+   */
+  on_user_event(event_json, source) {
+    const {type} = event_json;
+
+    switch (type) {
+      case z.event.Backend.USER.CONNECTION:
+        this.user_connection(event_json, source);
+        break;
+      case z.event.Backend.USER.DELETE:
+        this.user_delete(event_json);
+        break;
+      case z.event.Backend.USER.UPDATE:
+        this.user_update(event_json);
+        break;
+      default:
+        return;
+    }
+  }
+
+  /**
+   * Convert a JSON event into an entity and get the matching conversation.
+   * @param {Object} event_json - JSON data of 'user.connection' event
+   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @param {boolean} [show_conversation] - Should the new conversation be opened?
+   * @returns {undefined} No return value
+   */
+  user_connection(event_json, source, show_conversation) {
+    if (!event_json) {
+      return;
+    }
+    event_json = event_json.connection || event_json;
+
+    let connection_et = this.get_connection_by_user_id(event_json.to);
+    let previous_status = null;
+
+    if (connection_et) {
+      previous_status = connection_et.status();
+      this.connection_mapper.update_user_connection_from_json(connection_et, event_json);
+    } else {
+      connection_et = this.connection_mapper.map_user_connection_from_json(event_json);
+    }
+
+    this.update_user_connections([connection_et])
+      .then(() => {
+        if ((previous_status === z.user.ConnectionStatus.SENT) && connection_et.is_connected()) {
+          this.update_user_by_id(connection_et.to);
+        }
+        this._send_user_connection_notification(connection_et, source, previous_status);
+        amplify.publish(z.event.WebApp.CONVERSATION.MAP_CONNECTION, connection_et, show_conversation);
+      });
+  }
+
+  /**
+   * Event to delete the matching user.
+   * @param {string} id - User ID of deleted user
+   * @returns {undefined} No return value
+   */
+  user_delete({id}) {
+    // @todo Add user deletion cases for other users
+    const is_self_user = id === this.self().id;
+    if (is_self_user) {
+      amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReason.SESSION_EXPIRED, true);
+    }
+  }
+
+  /**
+   * Event to update the matching user.
+   * @param {Object} user - Update user info
+   * @returns {z.entity.User} Updated user entity
+   */
+  user_update({user}) {
+    const is_self_user = user.id === this.self().id;
+    return is_self_user ? Promise.resolve(this.self()) : this.get_user_by_id(user.id)
+      .then((user_et) => this.user_mapper.update_user_from_object(user_et, user));
   }
 
   /**
@@ -329,50 +410,6 @@ z.user.UserRepository = class UserRepository {
 
         Raygun.send(new Error('Connection status change failed'), custom_data);
       });
-  }
-
-  /**
-   * Convert a JSON event into an entity and get the matching conversation.
-   * @param {Object} event_json - JSON data of 'user.connection' event
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
-   * @param {boolean} show_conversation - Should the new conversation be opened?
-   * @returns {undefined} No return value
-   */
-  user_connection(event_json, source, show_conversation) {
-    if (event_json == null) {
-      return;
-    }
-    event_json = event_json.connection || event_json;
-
-    let connection_et = this.get_connection_by_user_id(event_json.to);
-    let previous_status = null;
-
-    if (connection_et != null) {
-      previous_status = connection_et.status();
-      this.connection_mapper.update_user_connection_from_json(connection_et, event_json);
-    } else {
-      connection_et = this.connection_mapper.map_user_connection_from_json(event_json);
-    }
-
-    this.update_user_connections([connection_et])
-      .then(() => {
-        if ((previous_status === z.user.ConnectionStatus.SENT) && connection_et.is_connected()) {
-          this.update_user_by_id(connection_et.to);
-        }
-        this._send_user_connection_notification(connection_et, source, previous_status);
-        amplify.publish(z.event.WebApp.CONVERSATION.MAP_CONNECTION, connection_et, show_conversation);
-      });
-  }
-
-  /**
-   * Use a JSON event to update the matching user.
-   * @param {Object} event_json - JSON data
-   * @returns {z.entity.User} Updated user entity.
-   */
-  user_update({user}) {
-    return Promise.resolve()
-      .then(() => user.id === this.self().id ? this.self() : this.get_user_by_id(user.id))
-      .then((user_et) => this.user_mapper.update_user_from_object(user_et, user));
   }
 
   /**

@@ -481,13 +481,16 @@ z.event.EventRepository = class EventRepository {
    * @returns {undefined} No return value
    */
   _distribute_event(event, source) {
-    if (event.conversation) {
-      this.logger.info(`Distributed '${event.type}' event for conversation '${event.conversation}'`, event);
+    const {conversation: conversation_id, type} = event;
+
+    if (conversation_id) {
+      this.logger.info(`Distributed '${type}' event for conversation '${conversation_id}'`, event);
     } else {
-      this.logger.info(`Distributed '${event.type}' event`, event);
+      this.logger.info(`Distributed '${type}' event`, event);
     }
 
-    switch (event.type.split('.')[0]) {
+    const [category] = type.split('.');
+    switch (category) {
       case 'call':
         amplify.publish(z.event.WebApp.CALL.EVENT_FROM_BACKEND, event, source);
         break;
@@ -497,8 +500,11 @@ z.event.EventRepository = class EventRepository {
       case 'team':
         amplify.publish(z.event.WebApp.TEAM.EVENT_FROM_BACKEND, event, source);
         break;
+      case 'user':
+        amplify.publish(z.event.WebApp.USER.EVENT_FROM_BACKEND, event, source);
+        break;
       default:
-        amplify.publish(event.type, event, source);
+        amplify.publish(type, event, source);
     }
   }
 
