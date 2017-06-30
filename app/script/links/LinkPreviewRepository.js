@@ -143,19 +143,12 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
         if (error) {
           resolve(undefined);
         }
-        const _first_item_of_array = (property) => {
-          const property_value = data[property];
 
-          if (_.isArray(property_value)) {
-            data[property] = property_value[0];
-          }
-        };
-
-        _first_item_of_array('description');
-        _first_item_of_array('image');
-        _first_item_of_array('title');
-        _first_item_of_array('type');
-        _first_item_of_array('url');
+        data = Object.keys(data).reduce((filtered_data, key) => {
+          const value = data[key];
+          filtered_data[key] = Array.isArray(value) ? value[0] : value;
+          return filtered_data;
+        }, {});
 
         resolve(data);
       });
