@@ -82,7 +82,7 @@ z.media.MediaEmbeds = (function() {
   };
 
   /**
-   * Find parameters in a string
+   * Find search parameters in a string
    *
    * @private
    * @param {string} params - String where we should find the parameters
