@@ -354,7 +354,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
    */
   _check_single_instance(set_check_interval = true) {
     if (!z.util.Environment.electron) {
-      if (Cookies.get(z.main.App.CONFIG.COOKIE_NAME)) {
+      if (Cookies.get(z.main.App.CONFIG.TABS_CHECK.COOKIE_NAME)) {
         this._handle_blocked_tabs(set_check_interval);
         return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.MULTIPLE_TABS));
       }
@@ -2062,7 +2062,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     return this.client_repository.register_client(this.password())
       .then((client_observable) => {
         this.event_repository.current_client = client_observable;
-        return this.event_repository.initialize_last_notification_id(client_observable().id);
+        return this.event_repository.initialize_stream_state(client_observable().id);
       })
       .catch((error) => {
         if (error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {

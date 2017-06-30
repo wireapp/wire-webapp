@@ -54,10 +54,4 @@ z.calling.enum.CALL_STATE_GROUP = {
     z.calling.enum.CALL_STATE.ONGOING,
     z.calling.enum.CALL_STATE.REJECTED,
   ],
-  WAS_MISSED: [
-    z.calling.enum.CALL_STATE.CONNECTING,
-    z.calling.enum.CALL_STATE.INCOMING,
-    z.calling.enum.CALL_STATE.REJECTED,
-    z.calling.enum.CALL_STATE.OUTGOING,
-  ],
 };

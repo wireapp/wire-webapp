@@ -938,8 +938,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
   add_bot(conversation_et, provider_id, service_id) {
     return this.conversation_service.post_bots(conversation_et.id, provider_id, service_id)
       .then((response) => {
-        amplify.publish(z.event.WebApp.EVENT.INJECT, response.event);
-        this.logger.debug(`Successfully added bot to conversation '${conversation_et.display_name()}'`, response);
+        if (response && response.event) {
+          amplify.publish(z.event.WebApp.EVENT.INJECT, response.event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+          this.logger.debug(`Successfully added bot to conversation '${conversation_et.display_name()}'`, response);
+        }
       });
   }
 
@@ -952,8 +954,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   add_members(conversation_et, user_ids) {
     return this.conversation_service.post_members(conversation_et.id, user_ids)
-      .then((response) => amplify.publish(z.event.WebApp.EVENT.INJECT, response))
-      .catch(function(error_response) {
+      .then((response) => amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE))
+      .catch((error_response) => {
         if (error_response.label === z.service.BackendClientError.LABEL.TOO_MANY_MEMBERS) {
           amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.TOO_MANY_MEMBERS, {
             data: {
@@ -1024,7 +1026,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.conversation_service.delete_members(conversation_et.id, this.user_repository.self().id)
       .then((response) => {
         if (handle_response) {
-          amplify.publish(z.event.WebApp.EVENT.INJECT, response);
+          amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
           return this._on_member_leave(conversation_et, response)
             .then(() => {
               return this.archive_conversation(conversation_et, next_conversation_et);
@@ -1044,7 +1046,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.conversation_service.delete_bots(conversation_et.id, bot_user_id)
       .then(function(response) {
         if (response) {
-          amplify.publish(z.event.WebApp.EVENT.INJECT, response);
+          amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
           return response;
         }
       });
@@ -1061,7 +1063,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.conversation_service.delete_members(conversation_et.id, user_id)
       .then(function(response) {
         if (response) {
-          amplify.publish(z.event.WebApp.EVENT.INJECT, response);
+          amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
           return response;
         }
       });
@@ -1093,7 +1095,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.conversation_service.update_conversation_properties(conversation_et.id, name)
       .then((response) => {
         if (response) {
-          amplify.publish(z.event.WebApp.EVENT.INJECT, response);
+          amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
           return response;
         }
       });
@@ -1151,7 +1153,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         if (user_id) {
           if (conversation_et.participating_user_ids().includes(user_id)) {
             const member_leave_event = z.conversation.EventBuilder.build_team_member_leave(conversation_et, user_id);
-            amplify.publish(z.event.WebApp.EVENT.INJECT, member_leave_event, false);
+            amplify.publish(z.event.WebApp.EVENT.INJECT, member_leave_event);
           }
         } else {
           conversation_et.status(z.conversation.ConversationStatus.PAST_MEMBER);
@@ -1451,9 +1453,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.CONFIRMATION, new z.proto.Confirmation(message_et.id, z.proto.Confirmation.Type.DELIVERED));
 
       this.sending_queue.push(() => {
-        return this.create_user_client_map(conversation_et.id, true, [message_et.user().id])
-          .then((user_client_map) => {
-            return this._send_generic_message(conversation_et.id, generic_message, user_client_map, [message_et.user().id], false);
+        return this.create_recipients(conversation_et.id, true, [message_et.user().id])
+          .then((recipients) => {
+            return this._send_generic_message(conversation_et.id, generic_message, recipients, [message_et.user().id], false);
           });
       });
     }
@@ -1464,16 +1466,20 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {Conversation} conversation_et - Conversation to send call message to
    * @param {CallMessage} call_message_et - Content for call message
-   * @param {Object} user_client_map - Contains the intended recipient users and clients
+   * @param {Object} recipients - Contains the intended receiving users and clients
    * @param {Array<string>|boolean} precondition_option - Optional level that backend checks for missing clients
    * @returns {Promise} Resolves when the confirmation was sent
    */
-  send_e_call(conversation_et, call_message_et, user_client_map, precondition_option) {
+  send_e_call(conversation_et, call_message_et, recipients, precondition_option) {
     const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
     generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.CALLING, new z.proto.Calling(call_message_et.to_content_string()));
 
     return this.sending_queue.push(() => {
-      return this._send_generic_message(conversation_et.id, generic_message, user_client_map, precondition_option);
+      const recipients_promise = recipients ? Promise.resolve(recipients) : this.create_recipients(conversation_et.id, false);
+
+      return recipients_promise.then((_recipients) => {
+        return this._send_generic_message(conversation_et.id, generic_message, _recipients, precondition_option);
+      });
     })
     .then(() => {
       const initiating_call_message = [
@@ -1665,10 +1671,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
     generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.CLIENT_ACTION, z.proto.ClientAction.RESET_SESSION);
 
-    const user_client_map = {};
-    user_client_map[user_id] = [client_id];
+    const recipients = {};
+    recipients[user_id] = [client_id];
 
-    return this._send_generic_message(conversation_id, generic_message, user_client_map, true)
+    return this._send_generic_message(conversation_id, generic_message, recipients, true)
       .then((response) => {
         this.logger.info(`Sent info about session reset to client '${client_id}' of user '${user_id}'`);
         return response;
@@ -1740,21 +1746,21 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
-   * Map a user client maps.
+   * Map a function to recipients.
    *
    * @private
-   * @param {Object} user_client_map - User client map
+   * @param {Object} recipients - User client map
    * @param {Function} client_fn - Function to be executed on clients first
    * @param {Function} user_fn - Function to be executed on users at the end
    * @returns {Array} Function array
    */
-  _map_user_client_map(user_client_map, client_fn, user_fn) {
+  _map_recipients(recipients, client_fn, user_fn) {
     const result = [];
-    const user_ids = Object.keys(user_client_map);
+    const user_ids = Object.keys(recipients);
 
     user_ids.forEach(function(user_id) {
-      if (user_client_map.hasOwnProperty(user_id)) {
-        const client_ids = user_client_map[user_id];
+      if (recipients.hasOwnProperty(user_id)) {
+        const client_ids = recipients[user_id];
 
         if (_.isFunction(client_fn)) {
           client_ids.forEach((function(client_id) {
@@ -1801,10 +1807,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {Array<string>} user_ids - Optionally the intended recipient users
    * @returns {Promise} Resolves with a user client map
    */
-  create_user_client_map(conversation_id, skip_own_clients = false, user_ids) {
+  create_recipients(conversation_id, skip_own_clients = false, user_ids) {
     return this.get_all_users_in_conversation(conversation_id)
-      .then(function(user_ets) {
-        const user_client_map = {};
+      .then((user_ets) => {
+        const recipients = {};
 
         for (const user_et of user_ets) {
           if (!(skip_own_clients && user_et.is_me)) {
@@ -1812,11 +1818,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
               continue;
             }
 
-            user_client_map[user_et.id] = user_et.devices().map((client_et) => client_et.id);
+            recipients[user_et.id] = user_et.devices().map((client_et) => client_et.id);
           }
         }
 
-        return user_client_map;
+        return recipients;
       });
   }
 
@@ -1824,15 +1830,15 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.sending_queue.push(() => {
       const skip_own_clients = generic_message.content === z.cryptography.GENERIC_MESSAGE_TYPE.EPHEMERAL;
 
-      return this.create_user_client_map(conversation_id, skip_own_clients)
-      .then((user_client_map) => {
+      return this.create_recipients(conversation_id, skip_own_clients)
+      .then((recipients) => {
         let precondition_option;
 
         if (skip_own_clients) {
-          precondition_option = Object.keys(user_client_map);
+          precondition_option = Object.keys(recipients);
         }
 
-        return this._send_generic_message(conversation_id, generic_message, user_client_map, precondition_option);
+        return this._send_generic_message(conversation_id, generic_message, recipients, precondition_option);
       });
     });
   }
@@ -1859,7 +1865,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.OUTGOING_PING);
         }
 
-        this.on_conversation_event(saved_event, z.event.EventRepository.NOTIFICATION_SOURCE.INJECTED);
+        this.on_conversation_event(saved_event, z.event.EventRepository.SOURCE.INJECTED);
 
         return this.send_generic_message_to_conversation(conversation_et.id, generic_message)
           .then((payload) => {
@@ -1904,12 +1910,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {string} conversation_id - Conversation ID
    * @param {z.protobuf.GenericMessage} generic_message - Generic message to be sent as external message
-   * @param {Object} user_client_map - Optional object containing recipient users and their clients
+   * @param {Object} recipients - Optional object containing recipient users and their clients
    * @param {Array<string>|boolean} precondition_option - Optional level that backend checks for missing clients
    * @param {boolean} [native_push=true] - Optional if message should enforce native push
    * @returns {Promise} Resolves after sending the external message
    */
-  _send_external_generic_message(conversation_id, generic_message, user_client_map, precondition_option, native_push = true) {
+  _send_external_generic_message(conversation_id, generic_message, recipients, precondition_option, native_push = true) {
     this.logger.info(`Sending external message of type '${generic_message.content}'`, generic_message);
 
     return z.assets.AssetCrypto.encrypt_aes_asset(generic_message.toArrayBuffer())
@@ -1917,7 +1923,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const generic_message_external = new z.proto.GenericMessage(z.util.create_random_uuid());
         generic_message_external.set('external', new z.proto.External(new Uint8Array(key_bytes), new Uint8Array(sha256)));
 
-        return this.cryptography_repository.encrypt_generic_message(user_client_map, generic_message_external)
+        return this.cryptography_repository.encrypt_generic_message(recipients, generic_message_external)
           .then((payload) => {
             payload.data = z.util.array_to_base64(cipher_text);
             payload.native_push = native_push;
@@ -1936,19 +1942,19 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @private
    * @param {string} conversation_id - Conversation ID
    * @param {z.protobuf.GenericMessage} generic_message - Protobuf message to be encrypted and send
-   * @param {Object} user_client_map - Optional object containing recipient users and their clients
+   * @param {Object} recipients - Optional object containing recipient users and their clients
    * @param {Array<string>|boolean} precondition_option - Optional level that backend checks for missing clients
    * @param {boolean} [native_push=true] - Optional if message should enforce native push
    * @returns {Promise} Resolves when the message was sent
    */
-  _send_generic_message(conversation_id, generic_message, user_client_map, precondition_option, native_push = true) {
+  _send_generic_message(conversation_id, generic_message, recipients, precondition_option, native_push = true) {
     return this._should_send_as_external(conversation_id, generic_message)
       .then((send_as_external) => {
         if (send_as_external) {
-          return this._send_external_generic_message(conversation_id, generic_message, user_client_map, precondition_option, native_push);
+          return this._send_external_generic_message(conversation_id, generic_message, recipients, precondition_option, native_push);
         }
 
-        return this.cryptography_repository.encrypt_generic_message(user_client_map, generic_message)
+        return this.cryptography_repository.encrypt_generic_message(recipients, generic_message)
           .then((payload) => {
             payload.native_push = native_push;
             return this._send_encrypted_message(conversation_id, generic_message, payload, precondition_option);
@@ -1956,7 +1962,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       })
       .catch((error) => {
         if (error.code === z.service.BackendClientError.STATUS_CODE.REQUEST_TOO_LARGE) {
-          return this._send_external_generic_message(conversation_id, generic_message, user_client_map, precondition_option, native_push);
+          return this._send_external_generic_message(conversation_id, generic_message, recipients, precondition_option, native_push);
         }
 
         throw error;
@@ -2174,9 +2180,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
         generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.DELETED, new z.proto.MessageDelete(message_et.id));
 
         return this.sending_queue.push(() => {
-          return this.create_user_client_map(conversation_et.id, false, precondition_option)
-            .then((user_client_map) => {
-              return this._send_generic_message(conversation_et.id, generic_message, user_client_map, precondition_option);
+          return this.create_recipients(conversation_et.id, false, precondition_option)
+            .then((recipients) => {
+              return this._send_generic_message(conversation_et.id, generic_message, recipients, precondition_option);
             });
         });
       })
@@ -2389,10 +2395,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Listener for incoming events.
    *
    * @param {Object} event_json - JSON data for event
-   * @param {z.event.EventRepository.NOTIFICATION_SOURCE} source - Source of event
+   * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {Promise} Resolves when event was handled
    */
-  on_conversation_event(event_json, source = z.event.EventRepository.NOTIFICATION_SOURCE.STREAM) {
+  on_conversation_event(event_json, source = z.event.EventRepository.SOURCE.STREAM) {
     if (!event_json) {
       return Promise.reject(new Error('Conversation Repository Event Handling: Event missing'));
     }
@@ -2453,12 +2459,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
         if (_.isObject(return_value)) {
           const {conversation_et, message_et} = return_value;
 
-          const event_from_stream = source === z.event.EventRepository.NOTIFICATION_SOURCE.STREAM;
+          const event_from_stream = source === z.event.EventRepository.SOURCE.STREAM;
           if (message_et && !event_from_stream && !this.block_event_handling) {
             amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et);
           }
 
-          const event_from_web_socket = source === z.event.EventRepository.NOTIFICATION_SOURCE.WEB_SOCKET;
+          const event_from_web_socket = source === z.event.EventRepository.SOURCE.WEB_SOCKET;
           if (conversation_et && event_from_web_socket) {
             // Un-archive it also on the backend side
             if (previously_archived && !conversation_et.is_archived()) {
@@ -2477,13 +2483,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
   on_missed_events() {
     this.filtered_conversations()
       .filter((conversation_et) => !conversation_et.removed_from_conversation())
-      .forEach((conversation_et) => amplify.publish(z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_missed(conversation_et, this.user_repository.self())));
+      .forEach((conversation_et) => {
+        const missed_event = z.conversation.EventBuilder.build_missed(conversation_et, this.user_repository.self());
+        amplify.publish(z.event.WebApp.EVENT.INJECT, missed_event);
+      });
   }
 
   /**
    * Push to receiving queue.
    * @param {Object} event_json - JSON data for event
-   * @param {z.event.EventRepository.NOTIFICATION_SOURCE} source - Source of event
+   * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
   push_to_receiving_queue(event_json, source) {
@@ -3035,15 +3044,15 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @note Contains clients of which the backend is sure that they should not be recipient of a message and verified they no longer exist.
    * @private
    *
-   * @param {Object} user_client_map - User client map containing redundant clients
+   * @param {Object} recipients - User client map containing redundant clients
    * @param {Object} payload - Optional payload of the failed request
    * @returns {Promise} Resolves with the updated payload
    */
-  _handle_client_mismatch_deleted(user_client_map, payload) {
-    if (_.isEmpty(user_client_map)) {
+  _handle_client_mismatch_deleted(recipients, payload) {
+    if (_.isEmpty(recipients)) {
       return Promise.resolve(payload);
     }
-    this.logger.debug(`Message contains deleted clients of '${Object.keys(user_client_map).length}' users`, user_client_map);
+    this.logger.debug(`Message contains deleted clients of '${Object.keys(recipients).length}' users`, recipients);
 
     const _remove_deleted_client = (user_id, client_id) => {
       if (payload) {
@@ -3058,9 +3067,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
       }
     };
 
-    return Promise.all(this._map_user_client_map(user_client_map, _remove_deleted_client, _remove_deleted_user))
+    return Promise.all(this._map_recipients(recipients, _remove_deleted_client, _remove_deleted_user))
       .then(() => {
-        this.verification_state_handler.on_client_removed(Object.keys(user_client_map));
+        this.verification_state_handler.on_client_removed(Object.keys(recipients));
         return payload;
       });
   }
@@ -3069,18 +3078,18 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Handle the missing client mismatch.
    *
    * @private
-   * @param {Object} user_client_map - User client map containing redundant clients
+   * @param {Object} recipients - User client map containing redundant clients
    * @param {Object} payload - Optional payload of the failed request
    * @param {z.proto.GenericMessage} generic_message - Protobuffer message to be sent
    * @returns {Promise} Resolves with the updated payload
    */
-  _handle_client_mismatch_missing(user_client_map, payload, generic_message) {
-    if (!payload || _.isEmpty(user_client_map)) {
+  _handle_client_mismatch_missing(recipients, payload, generic_message) {
+    if (!payload || _.isEmpty(recipients)) {
       return Promise.resolve(payload);
     }
-    this.logger.debug(`Message is missing clients of '${Object.keys(user_client_map).length}' users`, user_client_map);
+    this.logger.debug(`Message is missing clients of '${Object.keys(recipients).length}' users`, recipients);
 
-    return this.cryptography_repository.encrypt_generic_message(user_client_map, generic_message, payload)
+    return this.cryptography_repository.encrypt_generic_message(recipients, generic_message, payload)
       .then((updated_payload) => {
         payload = updated_payload;
 
@@ -3088,10 +3097,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
           return this.user_repository.add_client_to_user(user_id, new z.client.Client({id: client_id}));
         };
 
-        return Promise.all(this._map_user_client_map(user_client_map, _add_missing_client));
+        return Promise.all(this._map_recipients(recipients, _add_missing_client));
       })
       .then(() => {
-        this.verification_state_handler.on_client_add(Object.keys(user_client_map));
+        this.verification_state_handler.on_client_add(Object.keys(recipients));
         return payload;
       });
   }
@@ -3104,16 +3113,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *   Sometimes clients of the self user are listed. Thus we cannot remove the payload for all the clients of a user without checking.
    * @private
    *
-   * @param {Object} user_client_map - User client map containing redundant clients
+   * @param {Object} recipients - User client map containing redundant clients
    * @param {Object} payload - Optional payload of the failed request
    * @param {string} conversation_id - ID of conversation the message was sent in
    * @returns {Promise} Resolves with the updated payload
   */
-  _handle_client_mismatch_redundant(user_client_map, payload, conversation_id) {
-    if (_.isEmpty(user_client_map)) {
+  _handle_client_mismatch_redundant(recipients, payload, conversation_id) {
+    if (_.isEmpty(recipients)) {
       return Promise.resolve(payload);
     }
-    this.logger.debug(`Message contains redundant clients of '${Object.keys(user_client_map).length}' users`, user_client_map);
+    this.logger.debug(`Message contains redundant clients of '${Object.keys(recipients).length}' users`, recipients);
 
     return this.get_conversation_by_id_async(conversation_id)
       .catch(function(error) {
@@ -3138,7 +3147,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           }
         };
 
-        return Promise.all(this._map_user_client_map(user_client_map, _remove_redundant_client, _remove_redundant_user))
+        return Promise.all(this._map_recipients(recipients, _remove_redundant_client, _remove_redundant_user))
           .then(() => {
             if (conversation_et) {
               this.update_participating_user_ets(conversation_et);
@@ -3198,7 +3207,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   _add_delete_message(conversation_id, message_id, time, message_et) {
-    amplify.publish(z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_delete(conversation_id, message_id, time, message_et));
+    const delete_event = z.conversation.EventBuilder.build_delete(conversation_id, message_id, time, message_et);
+    amplify.publish(z.event.WebApp.EVENT.INJECT, delete_event);
   }
 
 

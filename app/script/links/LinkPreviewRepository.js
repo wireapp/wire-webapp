@@ -139,7 +139,19 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
    */
   _fetch_open_graph_data(link) {
     return new Promise((resolve) => {
-      return window.openGraph(link, (error, data) => resolve(error ? null : data));
+      return window.openGraph(link, (error, data) => {
+        if (error) {
+          resolve(undefined);
+        }
+
+        data = Object.keys(data).reduce((filtered_data, key) => {
+          const value = data[key];
+          filtered_data[key] = Array.isArray(value) ? value[0] : value;
+          return filtered_data;
+        }, {});
+
+        resolve(data);
+      });
     });
   }
 

@@ -25,7 +25,11 @@ window.z.main = z.main || {};
 z.main.App = class App {
   static get CONFIG() {
     return {
-      COOKIE_NAME: 'app_opened',
+      TABS_CHECK: {
+        COOKIE_NAME: 'app_opened',
+        COOKIE_TIMEOUT: 5 * 60 * 1000,
+        RENEWAL_THRESHOLD: 15 * 1000,
+      },
     };
   }
 
@@ -199,7 +203,7 @@ z.main.App = class App {
   init_app(is_reload = this._is_reload()) {
     z.util.check_indexed_db()
     .then(() => this._check_single_instance())
-    .then(() => this._load_access_token(is_reload))
+    .then(() => this._load_access_token())
     .then(() => {
       this.view.loading.update_progress(2.5, z.string.init_received_access_token);
       this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
@@ -246,7 +250,7 @@ z.main.App = class App {
       this._subscribe_to_unload_events();
 
       return Promise.all([
-        this.repository.event.initialize_from_notification_stream(),
+        this.repository.event.initialize_from_stream(),
         this.repository.team.get_teams(),
       ]);
     })
@@ -419,13 +423,13 @@ z.main.App = class App {
    */
   _check_single_instance() {
     if (!z.util.Environment.electron) {
-      const cookie_name = App.CONFIG.COOKIE_NAME;
+      const cookie_name = App.CONFIG.TABS_CHECK.COOKIE_NAME;
       if (Cookies.get(cookie_name)) {
         return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.MULTIPLE_TABS));
       }
 
-      Cookies.set(cookie_name, true);
-      $(window).on('unload', () => Cookies.remove(cookie_name));
+      this._set_single_instance_cookie();
+      $(window).on('beforeunload', () => Cookies.remove(cookie_name));
     }
 
     return Promise.resolve();
@@ -489,6 +493,17 @@ z.main.App = class App {
     return token_promise;
   }
 
+  /**
+   * Set the cookie to verify we are running a single instace tab.
+   * @returns {undefined} No return value
+   */
+  _set_single_instance_cookie() {
+    const cookie_timeout = new Date(Date.now() + App.CONFIG.TABS_CHECK.COOKIE_TIMEOUT);
+    Cookies.set(App.CONFIG.TABS_CHECK.COOKIE_NAME, true, {expires: cookie_timeout});
+
+    const renewal_timeout = App.CONFIG.TABS_CHECK.COOKIE_TIMEOUT - App.CONFIG.TABS_CHECK.RENEWAL_THRESHOLD;
+    window.setTimeout(() => this._set_single_instance_cookie(), renewal_timeout);
+  }
 
   /**
    * Hide the loading spinner and show the application UI.

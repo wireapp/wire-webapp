@@ -117,6 +117,13 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     });
 
     // @todo create a viewmodel search?
+    this.search_action = ko.pureComputed(() => {
+      if (this.conversation()) {
+        const is_group = this.conversation().is_group() || this.conversation().is_team_group();
+        return is_group ? z.string.people_confirm_label : z.string.search_open_group;
+      }
+    });
+
     this.user_input = ko.observable('');
     this.user_selected = ko.observableArray([]);
     this.connected_users = ko.pureComputed(() => {

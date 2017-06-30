@@ -62,7 +62,8 @@
     <!-- ko if: state() == 'search' -->
       <div class="participants-search">
         <div class="participants-search-header">
-          <user-input class="user-list-light" params="input: user_input, selected: user_selected, placeholder: z.string.people_search_placeholder, close: on_search_close" spellcheck="false"></user-input>
+          <user-input class="participants-search-header-list user-list-light" params="input: user_input, selected: user_selected, placeholder: z.string.people_search_placeholder" spellcheck="false"></user-input>
+          <div class="participants-search-header-close icon-close icon-button" data-bind="click: on_search_close, l10n_tooltip: z.string.tooltip_search_close" data-uie-name="do-close"></div>
         </div >
         <div class="participants-search-content">
           <div class="participants-search-list" data-bind="antiscroll: user_selected">
@@ -75,8 +76,8 @@
           </div>
         </div>
         <button class="participants-search-footer button button-full" data-bind="enable: user_selected().length > 0, click: on_search_add" data-uie-name="do-create">
-          <span class="icon-invite participants-search-icon"></span>
-          <span data-bind="l10n_text: z.string.people_confirm_label"></span>
+          <span class="icon-people-add participants-search-icon"></span>
+          <span data-bind="l10n_text: search_action"></span>
         </button>
       </div>
     <!-- /ko -->

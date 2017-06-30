@@ -36,8 +36,9 @@ z.event.EventRepository = class EventRepository {
     };
   }
 
-  static get NOTIFICATION_SOURCE() {
+  static get SOURCE() {
     return {
+      BACKEND_RESPONSE: 'backend_response',
       INJECTED: 'injected',
       STREAM: 'Notification Stream',
       WEB_SOCKET: 'WebSocket',
@@ -119,8 +120,9 @@ z.event.EventRepository = class EventRepository {
     this.web_socket_buffer = [];
 
     this.last_notification_id = ko.observable(undefined);
+    this.last_event_date = ko.observable();
 
-    amplify.subscribe(z.event.WebApp.CONNECTION.ONLINE, this.recover_from_notification_stream.bind(this));
+    amplify.subscribe(z.event.WebApp.CONNECTION.ONLINE, this.recover_from_stream.bind(this));
     amplify.subscribe(z.event.WebApp.EVENT.INJECT, this.inject_event.bind(this));
   }
 
@@ -231,23 +233,23 @@ z.event.EventRepository = class EventRepository {
       };
 
       return this.notification_service.get_notifications(this.current_client().id, notification_id, limit)
-      .then(_got_notifications)
-      .catch((error_response) => {
-        // When asking for notifications with a since set to a notification ID that does not belong to our client ID,
-        //   we will get a 404 AND notifications
-        if (error_response.notifications) {
-          amplify.publish(z.event.WebApp.CONVERSATION.MISSED_EVENTS);
-          return _got_notifications(error_response);
-        }
+        .then(_got_notifications)
+        .catch((error_response) => {
+          // When asking for notifications with a since set to a notification ID that does not belong to our client ID,
+          //   we will get a 404 AND notifications
+          if (error_response.notifications) {
+            this._missed_events_from_stream();
+            return _got_notifications(error_response);
+          }
 
-        if (error_response.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
-          this.logger.info(`No notifications found since '${notification_id}'`, error_response);
-          return reject(new z.event.EventError(z.event.EventError.TYPE.NO_NOTIFICATIONS));
-        }
+          if (error_response.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
+            this.logger.info(`No notifications found since '${notification_id}'`, error_response);
+            return reject(new z.event.EventError(z.event.EventError.TYPE.NO_NOTIFICATIONS));
+          }
 
-        this.logger.error(`Failed to get notifications: ${error_response.message}`, error_response);
-        return reject(new z.event.EventError(z.event.EventError.TYPE.REQUEST_FAILURE));
-      });
+          this.logger.error(`Failed to get notifications: ${error_response.message}`, error_response);
+          return reject(new z.event.EventError(z.event.EventError.TYPE.REQUEST_FAILURE));
+        });
     });
   }
 
@@ -255,40 +257,38 @@ z.event.EventRepository = class EventRepository {
    * Get the last notification.
    * @returns {Promise} Resolves with the last handled notification ID
    */
-  get_last_notification_id() {
+  get_stream_state() {
     return this.notification_service.get_last_notification_id_from_db()
-      .then((last_notification_id) => {
-        this.last_notification_id(last_notification_id);
-        return this.last_notification_id();
-      })
       .catch((error) => {
         if (error.type !== z.event.EventError.TYPE.NO_LAST_ID) {
           throw error;
         }
 
         this.logger.warn('Last notification ID not found in database. Resetting...');
-        return this.notification_service.get_notifications_last()
-          .then(({id: notification_id}) => {
-            if (notification_id) {
-              this._update_last_notification_id(notification_id);
-              amplify.publish(z.event.WebApp.CONVERSATION.MISSED_EVENTS);
-              return this.last_notification_id();
-            }
-            throw error;
+        return this._get_last_notification_id(this.current_client().id)
+          .then(() => {
+            this._missed_events_from_stream();
+            return this.last_notification_id();
           });
-      });
-  }
+      })
+      .then((notification_id) => {
+        this.last_notification_id(notification_id);
+        return this.notification_service.get_last_event_date_from_db();
+      })
+      .catch((error) => {
+        if (error.type !== z.event.EventError.TYPE.NO_LAST_DATE) {
+          throw error;
+        }
 
-  /**
-   * Get the last notification ID for a given client.
-   * @param {string} client_id - Client ID to retrieve last notification ID for
-   * @returns {Promise} Resolves with the last known notification ID matching the local client
-   */
-  initialize_last_notification_id(client_id) {
-    return this.notification_service.get_notifications_last(client_id)
-      .then((response) => {
-        this._update_last_notification_id(response.id);
-        this.logger.info(`Set starting point on notification stream to '${this.last_notification_id()}'`);
+        this.logger.warn('Last event date not found in database. Resetting...');
+        return this._update_last_notification_id(new Date(0).toISOString());
+      })
+      .then((event_date) => {
+        this.last_event_date(event_date);
+        return {
+          event_date: this.last_event_date(),
+          notification_id: this.last_notification_id(),
+        };
       });
   }
 
@@ -296,10 +296,10 @@ z.event.EventRepository = class EventRepository {
    * Initialize from notification stream.
    * @returns {Promise} Resolves when all notifications have been handled
    */
-  initialize_from_notification_stream() {
-    return this.get_last_notification_id()
-      .then((last_notification_id) => {
-        return this._update_from_notification_stream(last_notification_id);
+  initialize_from_stream() {
+    return this.get_stream_state()
+      .then(({notification_id}) => {
+        return this._update_from_stream(notification_id);
       })
       .catch((error) => {
         this.notification_handling_state(z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
@@ -312,14 +312,24 @@ z.event.EventRepository = class EventRepository {
   }
 
   /**
+   * Get the last notification ID and set event date for a given client.
+   * @param {string} client_id - Client ID to retrieve last notification ID for
+   * @returns {Promise} Resolves with the last known notification ID matching the given client ID
+   */
+  initialize_stream_state(client_id) {
+    this._update_last_event_date(new Date(0).toISOString());
+    return this._get_last_notification_id(client_id);
+  }
+
+  /**
    * Retrieve missed notifications from the stream after a connectivity loss.
    * @returns {Promise} Resolves when all missed notifications have been handled
    */
-  recover_from_notification_stream() {
+  recover_from_stream() {
     this.notification_handling_state(z.event.NOTIFICATION_HANDLING_STATE.RECOVERY);
     amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECOVERY);
 
-    return this._update_from_notification_stream(this._get_last_known_notification_id())
+    return this._update_from_stream(this._get_last_known_notification_id())
       .then((number_of_notifications) => {
         this.logger.info(`Retrieved '${number_of_notifications}' notifications from stream after connectivity loss`);
       })
@@ -348,13 +358,39 @@ z.event.EventRepository = class EventRepository {
   }
 
   /**
+   * Get the last notification ID for a given client.
+   * @param {string} client_id - Client ID to retrieve last notification ID for
+   * @returns {Promise} Resolves with the last known notification ID matching the local client
+   */
+  _get_last_notification_id(client_id) {
+    return this.notification_service.get_notifications_last(client_id)
+      .then(({id: notification_id}) => {
+        if (notification_id) {
+          this._update_last_notification_id(notification_id);
+          this.logger.info(`Set starting point on notification stream to '${this.last_notification_id()}'`);
+          return this.last_notification_id();
+        }
+      });
+  }
+
+  _missed_events_from_stream() {
+    this.notification_service.get_missed_id_from_db()
+      .then((notification_id) => {
+        if (this.last_notification_id() !== notification_id) {
+          amplify.publish(z.event.WebApp.CONVERSATION.MISSED_EVENTS);
+          this.notification_service.save_missed_id_to_db(this.last_notification_id());
+        }
+      });
+  }
+
+  /**
    * Fetch all missed events from the notification stream since the given last notification ID.
    *
    * @private
    * @param {string} last_notification_id - Last known notification ID to start update from
    * @returns {Promise} Resolves with the total number of notifications
    */
-  _update_from_notification_stream(last_notification_id) {
+  _update_from_stream(last_notification_id) {
     this.notifications_total = 0;
 
     return this.get_notifications(last_notification_id, 500)
@@ -388,16 +424,30 @@ z.event.EventRepository = class EventRepository {
   }
 
   /**
+   * Persist updated last event timestamp.
+   *
+   * @private
+   * @param {string} event_date - Updated last event date
+   * @returns {undefined} No return value
+   */
+  _update_last_event_date(event_date) {
+    if (event_date) {
+      this.last_event_date(event_date);
+      this.notification_service.save_last_event_date_to_db(event_date);
+    }
+  }
+
+  /**
    * Persist updated last notification ID.
    *
    * @private
-   * @param {string} last_notification_id - Updated last notification ID
+   * @param {string} notification_id - Updated last notification ID
    * @returns {undefined} No return value
    */
-  _update_last_notification_id(last_notification_id) {
-    if (last_notification_id) {
-      this.last_notification_id(last_notification_id);
-      this.notification_service.save_last_notification_id_to_db(last_notification_id);
+  _update_last_notification_id(notification_id) {
+    if (notification_id) {
+      this.last_notification_id(notification_id);
+      this.notification_service.save_last_notification_id_to_db(notification_id);
     }
   }
 
@@ -411,14 +461,13 @@ z.event.EventRepository = class EventRepository {
    * @note Don't add unable to decrypt to self conversation
    *
    * @param {Object} event - Event payload to be injected
-   * @param {boolean} [can_create_notification=true] - Can message generate a notification
+   * @param {z.event.EventRepository.SOURCE} [source=EventRepository.SOURCE.INJECTED] - Source of injection
    * @returns {undefined} No return value
    */
-  inject_event(event, can_create_notification = true) {
+  inject_event(event, source = EventRepository.SOURCE.INJECTED) {
     const {conversation: conversation_id, id = 'ID not specified', type} = event;
     if (conversation_id !== this.user_repository.self().id) {
       this.logger.info(`Injected event ID '${id}' of type '${type}'`, event);
-      const source = can_create_notification ? EventRepository.NOTIFICATION_SOURCE.INJECTED : EventRepository.NOTIFICATION_SOURCE.STREAM;
       this._handle_event(event, source);
     }
   }
@@ -428,7 +477,7 @@ z.event.EventRepository = class EventRepository {
    *
    * @private
    * @param {Object} event - Mapped event to be distributed
-   * @param {z.event.EventRepository.NOTIFICATION_SOURCE} source - Source of notification
+   * @param {z.event.EventRepository.SOURCE} source - Source of notification
    * @returns {undefined} No return value
    */
   _distribute_event(event, source) {
@@ -458,13 +507,20 @@ z.event.EventRepository = class EventRepository {
    *
    * @private
    * @param {JSON} event - Backend event extracted from notification stream
-   * @param {z.event.EventRepository.NOTIFICATION_SOURCE} source - Source of event
+   * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {Promise} Resolves with the saved record or boolean true if the event was skipped
    */
   _handle_event(event, source) {
-    const {type: event_type} = event;
+    const {time: event_date, type: event_type} = event;
     if (z.event.EventTypeHandling.IGNORE.includes(event_type)) {
       this.logger.info(`Event ignored: '${event_type}'`, {event_json: JSON.stringify(event), event_object: event});
+      return Promise.resolve(true);
+    }
+
+    const event_from_stream = source === z.event.EventRepository.SOURCE.STREAM;
+    const outdated_event = this.last_event_date() >= event_date;
+    if (event_from_stream && outdated_event) {
+      this.logger.info(`Event from stream skipped as outdated: '${event_type}'`, {event_json: JSON.stringify(event), event_object: event});
       return Promise.resolve(true);
     }
 
@@ -482,9 +538,15 @@ z.event.EventRepository = class EventRepository {
         return mapped_event;
       })
       .then((saved_event) => {
+        const event_not_injected = source !== EventRepository.SOURCE.INJECTED;
+        if (event_not_injected) {
+          this._update_last_event_date(event_date);
+        }
+
         if (event_type === z.event.Client.CALL.E_CALL) {
           this._validate_call_event_lifetime(event);
         }
+
         this._distribute_event(saved_event, source);
         return saved_event;
       })
@@ -505,7 +567,7 @@ z.event.EventRepository = class EventRepository {
    * @returns {Promise} Resolves with the ID of the handled notification
    */
   _handle_notification({payload: events, id, transient}) {
-    const source = transient !== undefined ? EventRepository.NOTIFICATION_SOURCE.WEB_SOCKET : EventRepository.NOTIFICATION_SOURCE.STREAM;
+    const source = transient !== undefined ? EventRepository.SOURCE.WEB_SOCKET : EventRepository.SOURCE.STREAM;
     const is_transient_event = transient === true;
 
     this.logger.info(`Handling notification '${id}' from '${source}' containing '${events.length}' events`, events);

@@ -50,7 +50,7 @@ describe('Event Repository', function() {
       .catch(done.fail);
   });
 
-  describe('update_from_notification_stream', function() {
+  describe('update_from_stream', function() {
     beforeEach(function() {
       spyOn(TestFactory.event_repository, '_handle_notification').and.callThrough();
       spyOn(TestFactory.event_repository, '_buffer_web_socket_notification').and.callThrough();
@@ -94,7 +94,7 @@ describe('Event Repository', function() {
       amplify.subscribe(z.event.WebApp.CONVERSATION.MISSED_EVENTS, missed_events_spy);
 
       TestFactory.event_repository.connect_web_socket();
-      TestFactory.event_repository.initialize_from_notification_stream()
+      TestFactory.event_repository.initialize_from_stream()
         .then(function() {
           expect(TestFactory.notification_service.get_last_notification_id_from_db).toHaveBeenCalled();
           expect(TestFactory.notification_service.get_notifications_last).toHaveBeenCalled();
@@ -123,7 +123,7 @@ describe('Event Repository', function() {
       websocket_service_mock.publish({id: z.util.create_random_uuid(), payload: []});
 
       websocket_service_mock.publish({id: last_published_notification_id, payload: []});
-      TestFactory.event_repository.initialize_from_notification_stream()
+      TestFactory.event_repository.initialize_from_stream()
         .then(function() {
           expect(TestFactory.event_repository._handle_buffered_notifications).toHaveBeenCalled();
           expect(TestFactory.event_repository.web_socket_buffer.length).toBe(0);
