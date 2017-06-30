@@ -42,8 +42,8 @@ z.team.TeamRepository = class TeamRepository {
     });
     this.team_users = ko.pureComputed(() => {
       if (this.is_team()) {
-        const team_members = this.team().team_members();
-        return team_members.join(this.user_repository.connected_users());
+        const team_members = this.team().members();
+        return team_members.concat(this.user_repository.connected_users());
       }
     });
 
@@ -153,9 +153,9 @@ z.team.TeamRepository = class TeamRepository {
 
   _send_account_info() {
     const image_resource = this.is_team() ? this.self_user().preview_picture_resource() : this.self_user().preview_picture_resource();
+    const image_promise = image_resource ? image_resource.load() : Promise.resolve();
 
-    image_resource.load()
-      .then((image_blob) => z.util.load_data_url(image_blob))
+    image_promise
       .then((image_data_url) => {
         const account_info = {
           accentID: this.self_user().accent_id(),

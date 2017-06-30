@@ -24,12 +24,16 @@
   position: absolute;
   right: 0;
   top: 0;
-  left: @teams-width;
+  left: 0;
   width: @left-width;
 }
 
 .left-list {
   .left-list-container;
+
+  .team-mode & {
+    left: @teams-width;
+  }
 
   &:not(.left-list-is-visible) {
     .start-ui-transition-fadeout();
