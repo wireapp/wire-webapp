@@ -37,11 +37,10 @@ z.client.ClientRepository = class ClientRepository {
     this.clients = ko.pureComputed(() => this.self_user() ? this.self_user().devices() : []);
     this.current_client = ko.observable();
 
-    amplify.subscribe(z.event.Backend.USER.CLIENT_ADD, this.map_self_client.bind(this));
-    amplify.subscribe(z.event.Backend.USER.CLIENT_REMOVE, this.on_client_remove.bind(this));
     amplify.subscribe(z.event.WebApp.LIFECYCLE.ASK_TO_CLEAR_DATA, this.logout_client.bind(this));
     // todo: deprecated - remove when user base of wrappers version >= 2.12 is large enough
     amplify.subscribe(z.event.WebApp.LOGOUT.ASK_TO_CLEAR_DATA, this.logout_client.bind(this));
+    amplify.subscribe(z.event.WebApp.USER.EVENT_FROM_BACKEND, this.on_user_event.bind(this));
   }
 
   init(self_user) {
@@ -650,7 +649,7 @@ z.client.ClientRepository = class ClientRepository {
         // Locally unknown client new on backend
         this.logger.info(`New client '${client_id}' of user '${user_id}' will be stored locally`);
         if (this.self_user().id === user_id) {
-          this.map_self_client({client: client_payload});
+          this.on_client_add({client: client_payload});
         }
         promises.push(this._update_client_schema_in_db(user_id, client_payload));
       }
@@ -692,12 +691,32 @@ z.client.ClientRepository = class ClientRepository {
   // Conversation Events
   //##############################################################################
 
+
+  /**
+   * Listener for incoming user events.
+   *
+   * @param {Object} event_json - JSON data for event
+   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @returns {undefined} No return value
+   */
+  on_user_event(event_json, source) {
+    const {type} = event_json;
+
+    if (type === z.event.Backend.USER.CLIENT_ADD) {
+      return this.on_client_add(event_json);
+    }
+
+    if (type === z.event.Backend.USER.CLIENT_REMOVE) {
+      this.on_client_remove(event_json);
+    }
+  }
+
   /**
    * A client was added by the self user.
    * @param {Object} event_json - JSON data of 'user.client-add' event
    * @returns {undefined} No return value
    */
-  map_self_client(event_json) {
+  on_client_add(event_json) {
     this.logger.info('Client of self user added', event_json);
     const client_et = this.client_mapper.map_client(event_json.client);
     amplify.publish(z.event.WebApp.CLIENT.ADD, this.self_user().id, client_et);
@@ -711,11 +730,13 @@ z.client.ClientRepository = class ClientRepository {
   on_client_remove(event_json = {}) {
     const client_id = event_json.client !== null ? event_json.client.id : undefined;
     if (client_id) {
-      if (client_id === this.current_client().id) {
-        return this.cryptography_repository.storage_repository.delete_cryptography()
-        .then(() => {
-          amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReason.CLIENT_REMOVED, this.current_client().is_temporary());
-        });
+      const is_current_client = client_id === this.current_client().id;
+      if (is_current_client) {
+        this.cryptography_repository.storage_repository.delete_cryptography()
+          .then(() => {
+            const is_temporary_client = this.current_client().is_temporary();
+            amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReason.CLIENT_REMOVED, is_temporary_client);
+          });
       }
       amplify.publish(z.event.WebApp.CLIENT.REMOVE, this.self_user().id, client_id);
     }
