@@ -357,7 +357,7 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {undefined} No return value
    */
   _on_group_start(call_message_et, source) {
-    const {conversation_id, user_id} = call_message_et;
+    const {conversation_id, response, user_id} = call_message_et;
 
     this.get_call_by_id(conversation_id)
       .then((call_et) => {
@@ -379,7 +379,8 @@ z.calling.CallingRepository = class CallingRepository {
       .catch((error) => {
         this._throw_message_error(error);
 
-        if (user_id !== this.self_user_id()) {
+        const is_self_user = user_id === this.self_user_id();
+        if (!response && !is_self_user) {
           this.conversation_repository.grant_message(conversation_id, z.ViewModel.MODAL_CONSENT_TYPE.INCOMING_CALL, [user_id])
             .then(() => this._create_incoming_call(call_message_et, source));
         }
