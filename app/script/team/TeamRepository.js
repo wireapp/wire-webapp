@@ -156,6 +156,7 @@ z.team.TeamRepository = class TeamRepository {
     const image_promise = image_resource ? image_resource.load() : Promise.resolve();
 
     image_promise
+      .then((image_blob) => z.util.load_data_url(image_blob))
       .then((image_data_url) => {
         const account_info = {
           accentID: this.self_user().accent_id(),
