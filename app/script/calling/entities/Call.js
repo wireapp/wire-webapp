@@ -620,24 +620,6 @@ z.calling.entities.Call = class Call {
     }
   }
 
-  /**
-   * Update the state on participant change.
-   *
-   * @private
-   * @param {Participant} participant_et - Updated participant
-   * @param {boolean} negotiate - Should negotiation be started immediately
-   * @returns {Participant} Changed participant
-   */
-  _update_state(participant_et, negotiate) {
-    this._update_remote_state();
-
-    if (negotiate) {
-      participant_et.start_negotiation();
-    }
-
-    return participant_et;
-  }
-
 
   //##############################################################################
   // Participants
@@ -648,8 +630,8 @@ z.calling.entities.Call = class Call {
    *
    * @param {string} user_id - User ID of the call participant
    * @param {boolean} negotiate - Should negotiation be started immediately
-   * @param {CallMessage} [call_message_et] - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
-   * @returns {Promise} Resolves with added participant
+   * @param {CallMessage} [call_message_et] - Call message for participant change
+   * @returns {Promise} Resolves with participant entity
    */
   add_or_update_participant(user_id, negotiate, call_message_et) {
     return this.get_participant_by_id(user_id)
@@ -789,8 +771,8 @@ z.calling.entities.Call = class Call {
    *
    * @param {string} user_id - User ID to be added to the call
    * @param {boolean} negotiate - Should negotiation be started immediately
-   * @param {CallMessage} [call_message_et] - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
-   * @returns {Promise} Resolves with added participant
+   * @param {CallMessage} [call_message_et] - Call message entity for participant change
+   * @returns {Promise} Resolves with the added participant
    */
   _add_participant(user_id, negotiate, call_message_et) {
     return this.get_participant_by_id(user_id)
@@ -806,7 +788,7 @@ z.calling.entities.Call = class Call {
             this.participants.push(participant_et);
 
             this.logger.info(`Adding call participant '${user_et.name()}'`, participant_et);
-            return this._update_participant_state(participant_et, call_message_et, negotiate);
+            return this._update_participant_state(participant_et, negotiate, call_message_et);
           });
       });
   }
@@ -814,10 +796,10 @@ z.calling.entities.Call = class Call {
   /**
    * Update call participant with call message.
    *
-   * @param {string} user_id - User ID to be added to the call
+   * @param {string} user_id - User ID to be updated in the call
    * @param {boolean} negotiate - Should negotiation be started
    * @param {CallMessage} call_message_et - Call message to update user with
-   * @returns {Promise} Resolves when participant was updated
+   * @returns {Promise} Resolves with the updated participant
    */
   _update_participant(user_id, negotiate, call_message_et) {
     return this.get_participant_by_id(user_id)
@@ -831,11 +813,19 @@ z.calling.entities.Call = class Call {
         }
 
         this.logger.info(`Updating call participant '${participant_et.user.name()}'`, call_message_et);
-        return this._update_participant_state(participant_et, call_message_et, negotiate);
+        return this._update_participant_state(participant_et, negotiate, call_message_et);
       });
   }
 
-  _update_participant_state(participant_et, call_message_et, negotiate) {
+  /**
+   * Update call participant state.
+   *
+   * @param {z.calling.entities.Participant} participant_et - User ID to be added to the call
+   * @param {boolean} negotiate - Should negotiation be started
+   * @param {CallMessage} call_message_et - Call message to update user with
+   * @returns {Promise} Resolves with the updated participant
+   */
+  _update_participant_state(participant_et, negotiate, call_message_et) {
     return participant_et.update_state(call_message_et)
       .catch((error) => {
         if (error.type !== z.calling.CallError.TYPE.SDP_STATE_COLLISION) {
@@ -844,7 +834,11 @@ z.calling.entities.Call = class Call {
 
         negotiate = false;
       })
-      .then(() => this._update_state(participant_et, negotiate));
+      .then(() => {
+        this._update_remote_state();
+        participant_et.handle_negotiation(negotiate, call_message_et);
+        return participant_et;
+      });
   }
 
 
