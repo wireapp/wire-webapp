@@ -23,6 +23,13 @@ window.z = window.z || {};
 window.z.team = z.team || {};
 
 z.team.TeamRepository = class TeamRepository {
+  /**
+   * Construct a new Team Repository.
+   * @class z.team.TeamRepository
+   *
+   * @param {z.team.TeamService} team_service - Backend REST API team service implementation
+   * @param {z.user.UserRepository} user_repository - epository for all user and connection interactions
+   */
   constructor(team_service, user_repository) {
     this.logger = new z.util.Logger('z.team.TeamRepository', z.config.LOGGER.OPTIONS);
 
