@@ -174,7 +174,8 @@ z.team.TeamRepository = class TeamRepository {
 
   _on_delete(event_json) {
     const team_id = event_json.team;
-    amplify.publish(z.event.WebApp.TEAM.MEMBER_LEAVE, team_id);
+    amplify.publish(z.event.WebApp.TEAM.DELETE, team_id);
+    amplify.publish(z.event.WebApp.TEAM.MEMBER_LEAVE, team_id); // deprecated
   }
 
   _on_member_join(event_json) {
