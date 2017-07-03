@@ -151,7 +151,9 @@ z.user.UserRepository = class UserRepository {
     // @todo Add user deletion cases for other users
     const is_self_user = id === this.self().id;
     if (is_self_user) {
-      amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReason.SESSION_EXPIRED, true);
+      window.setTimeout(() => {
+        amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReason.SESSION_EXPIRED, true);
+      }, 50);
     }
   }
 
