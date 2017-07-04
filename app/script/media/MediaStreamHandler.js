@@ -159,10 +159,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
         },
       };
 
-      return Promise.resolve({
-        media_stream_constraints: constraints,
-        media_type: z.media.MediaType.SCREEN,
-      });
+      return Promise.resolve({media_stream_constraints: constraints, media_type: z.media.MediaType.SCREEN});
     }
 
     if (z.util.Environment.browser.firefox) {
@@ -175,10 +172,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
         },
       };
 
-      return Promise.resolve({
-        media_stream_constraints: constraints,
-        media_type: z.media.MediaType.SCREEN,
-      });
+      return Promise.resolve({media_stream_constraints: constraints, media_type: z.media.MediaType.SCREEN});
     }
 
     return Promise.reject(new z.media.MediaError(z.media.MediaError.TYPE.SCREEN_NOT_SUPPORTED));
@@ -208,7 +202,9 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     };
 
     if (_.isString(media_device_id)) {
-      media_stream_constraints.deviceId = {exact: media_device_id};
+      media_stream_constraints.deviceId = {
+        exact: media_device_id,
+      };
     }
 
     return media_stream_constraints;
@@ -423,7 +419,9 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    * @returns {undefined} No return value
    */
   _hide_permission_request_hint(media_type) {
-    if (z.util.Environment.electron) return;
+    if (z.util.Environment.electron) {
+      return;
+    }
 
     switch (media_type) {
       case z.media.MediaType.AUDIO:
@@ -561,7 +559,9 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    * @returns {undefined} No return value
    */
   _show_permission_request_hint(media_type) {
-    if (z.util.Environment.electron) return;
+    if (z.util.Environment.electron) {
+      return;
+    }
 
     switch (media_type) {
       case z.media.MediaType.AUDIO:

@@ -22,13 +22,6 @@
 // https://github.com/gruntjs/grunt-contrib-watch
 
 module.exports = {
-  coffee: {
-    files: ['<%= dir.app_ %>/**/*.coffee', 'sw.js'],
-    options: {
-      spawn: false,
-    },
-    tasks: ['coffee:dist'],
-  },
   js: {
     files: '<%= dir.app_ %>/**/*.js',
     tasks: ['newer:copy:dist_js'],

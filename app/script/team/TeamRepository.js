@@ -80,7 +80,7 @@ z.team.TeamRepository = class TeamRepository {
   }
 
   get_team_by_id(team_id) {
-    const [team_local] = this.teams().filter(team_et => team_et.id === team_id);
+    const team_local = this.teams().find(team_et => team_et.id === team_id);
     if (team_local) {
       return Promise.resolve(team_local);
     }
@@ -107,16 +107,13 @@ z.team.TeamRepository = class TeamRepository {
    * Listener for incoming team events.
    *
    * @param {Object} event_json - JSON data for team event
-   * @param {z.event.EventRepository.NOTIFICATION_SOURCE} source - Source of event
+   * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {Promise} Resolves when event was handled
    */
-  on_team_event(event_json, source = z.event.EventRepository.NOTIFICATION_SOURCE.STREAM) {
+  on_team_event(event_json, source = z.event.EventRepository.SOURCE.STREAM) {
     const type = event_json.type;
 
-    this.logger.info(`»» Event: '${type}'`, {
-      event_json: JSON.stringify(event_json),
-      event_object: event_json,
-    });
+    this.logger.info(`»» Event: '${type}'`, {event_json: JSON.stringify(event_json), event_object: event_json});
 
     switch (type) {
       case z.event.Backend.TEAM.CONVERSATION_CREATE:

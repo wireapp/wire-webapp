@@ -1,7 +1,7 @@
 <div id="preferences" class="left-list left-list-preferences" data-bind="with: $root.preferences">
   <div class="left-list-header">
     <span class="label-bold-xs" data-bind="l10n_text: z.string.preferences_headline"></span>
-    <span class="left-list-header-close-button button-icon-large icon-close" data-uie-name="do-close-preferences" data-bind="click: click_on_close_preferences"></span>
+    <span class="left-list-header-close-button button-icon-large icon-close" data-bind="click: click_on_close_preferences, l10n_tooltip: z.string.tooltip_search_close" data-uie-name="do-close-preferences"></span>
   </div>
   <div class="left-list-center">
     <ul class="left-list-items preferences-list-items">
@@ -23,7 +23,7 @@
           <div class="center-column" data-bind="l10n_text: z.string.preferences_av"></div>
         </li>
       <!-- /ko -->
-      <!-- ko ifnot: z.util.Environment.electron -->
+      <!-- ko ifnot: z.util.Environment.desktop -->
         <li class="left-list-item left-list-item-clickable" data-bind="click: click_on_about, css: {'text-theme': selected_about}" data-uie-name="go-about">
           <div class="left-column icon-wire"></div>
           <div class="center-column" data-bind="l10n_text: z.string.preferences_about"></div>

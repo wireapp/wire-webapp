@@ -222,9 +222,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   click_on_reset_password() {
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PASSWORD_RESET, {
-      value: 'fromProfile',
-    });
+    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PASSWORD_RESET, {value: 'fromProfile'});
     return z.util.safe_window_open(
       `${z.util.Environment.backend.website_url()}${z.l10n.text(z.string.url_password_reset)}`
     );

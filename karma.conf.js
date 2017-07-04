@@ -23,7 +23,6 @@
 
 module.exports = function(config) {
   config.set({
-
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: 'dist',
 
@@ -33,7 +32,7 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      // Do not write files or patterns here. Put them in grunt/config/karma.coffee
+      // Do not write files or patterns here. Put them in grunt/config/karma.js
     ],
 
     proxies: {},
@@ -67,21 +66,12 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: [process.env.TRAVIS ? 'ChromeTravisCI' : 'ChromeHeadless'],
+    browsers: ['ChromeHeadless'],
 
     customLaunchers: {
-      ChromeTravisCI: {
-        base: 'Chrome',
-        flags: ['--no-sandbox'],
-      },
       ChromeHeadless: {
         base: 'Chrome',
-        flags: [
-          '--disable-gpu',
-          '--headless',
-          '--no-sandbox',
-          '--remote-debugging-port=9222',
-        ],
+        flags: ['--disable-gpu', '--headless', '--no-sandbox', '--remote-debugging-port=9222'],
       },
     },
 

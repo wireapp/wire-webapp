@@ -117,6 +117,13 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     });
 
     // @todo create a viewmodel search?
+    this.search_action = ko.pureComputed(() => {
+      if (this.conversation()) {
+        const is_group = this.conversation().is_group() || this.conversation().is_team_group();
+        return is_group ? z.string.people_confirm_label : z.string.search_open_group;
+      }
+    });
+
     this.user_input = ko.observable('');
     this.user_selected = ko.observableArray([]);
     this.connected_users = ko.pureComputed(
@@ -273,7 +280,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     let user_ids = this.user_selected().map(user_et => user_et.id);
     this.participants_bubble.hide();
 
-    if (this.conversation().is_group()) {
+    if (this.conversation().is_group() || this.conversation().is_team_group()) {
       this.conversation_repository.add_members(this.conversation(), user_ids).then(() => {
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.ADD_TO_GROUP_CONVERSATION, {
           numberOfGroupParticipants: this.conversation().number_of_participants(),
@@ -367,7 +374,6 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.active_team(this.team_repository.personal_space);
 
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.SENT_CONNECT_REQUEST, {
-      common_users_count: user_et.mutual_friends_total(),
       context: 'participants',
     });
   }

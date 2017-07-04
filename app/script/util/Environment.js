@@ -36,6 +36,7 @@ window.z.util = z.util || {};
     ELECTRON: 'Electron',
     FIREFOX: 'Firefox',
     OPERA: 'Opera',
+    WIRE: 'Wire',
   };
 
   const PLATFORM_NAME = {
@@ -51,6 +52,9 @@ window.z.util = z.util || {};
     },
     is_chrome: function() {
       return platform.name === BROWSER_NAME.CHROME;
+    },
+    is_desktop: function() {
+      return this.is_electron() && navigator.userAgent.includes(BROWSER_NAME.WIRE);
     },
     is_edge: function() {
       return platform.name === BROWSER_NAME.EDGE;
@@ -129,6 +133,13 @@ window.z.util = z.util || {};
   };
 
   z.util.Environment = {
+    _electron_version: function(user_agent) {
+      const result = /(Wire|WireInternal)\/(\S+)/.exec(user_agent);
+      if (result) {
+        return result[2]; // [match, app, version]
+      }
+      return undefined;
+    },
     backend: {
       account_url: function() {
         if (z.util.Environment.backend.current === z.service.BackendEnvironment.PRODUCTION) {
@@ -160,6 +171,7 @@ window.z.util = z.util || {};
       },
       version: _check.get_version(),
     },
+    desktop: _check.is_desktop(),
     electron: _check.is_electron(),
     frontend: {
       is_localhost() {
@@ -183,8 +195,9 @@ window.z.util = z.util || {};
         return app_version();
       }
 
-      if (window.electron_version && show_wrapper_version) {
-        return window.electron_version;
+      const electron_version = this._electron_version(navigator.userAgent);
+      if (electron_version && show_wrapper_version) {
+        return electron_version;
       }
 
       return formatted_app_version();

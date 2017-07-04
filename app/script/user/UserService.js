@@ -96,7 +96,7 @@ z.user.UserService = class UserService {
         status: status,
       },
       type: 'PUT',
-      url: this.client.create_url(`/connections/${user_id}`),
+      url: this.client.create_url(`${UserService.URL.CONNECTIONS}/${user_id}`),
     });
   }
 
@@ -159,7 +159,7 @@ z.user.UserService = class UserService {
         email: email,
       },
       type: 'PUT',
-      url: this.client.create_url('/self/email'),
+      url: this.client.create_url(`${UserService.URL.SELF}/email`),
     });
   }
 
@@ -174,7 +174,7 @@ z.user.UserService = class UserService {
         handle: username,
       },
       type: 'PUT',
-      url: this.client.create_url('/self/handle'),
+      url: this.client.create_url(`${UserService.URL.SELF}/handle`),
     });
   }
 
@@ -182,7 +182,7 @@ z.user.UserService = class UserService {
    * Change own user password.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/changePassword
    * @param {string} new_password - New user password
-   * @param {string} old_password - Old password of the user (optional)
+   * @param {string} [old_password] - Old password of the user
    * @returns {Promise} Promise that resolves when password has been changed on backend
    */
   change_own_password(new_password, old_password) {
@@ -192,7 +192,7 @@ z.user.UserService = class UserService {
         old_password: old_password,
       },
       type: 'PUT',
-      url: this.client.create_url('/self/password'),
+      url: this.client.create_url(`${UserService.URL.SELF}/password`),
     });
   }
 
@@ -208,7 +208,7 @@ z.user.UserService = class UserService {
         phone: phone_number,
       },
       type: 'PUT',
-      url: this.client.create_url('/self/phone'),
+      url: this.client.create_url(`${UserService.URL.SELF}/phone`),
     });
   }
 
@@ -254,7 +254,7 @@ z.user.UserService = class UserService {
         return: amount,
       },
       type: 'POST',
-      url: this.client.create_url('/users/handles'),
+      url: this.client.create_url(`${UserService.URL.USERS}/handles`),
     });
   }
 

@@ -31,134 +31,15 @@ z.connect.ConnectRepository = class ConnectRepository {
   }
 
   /**
-   * Retrieve a user's Google Contacts.
-   * @returns {Promise} Resolves with the user's Google contacts that match on Wire
+   * Get user's contacts for matching.
+   * @param {z.connect.ConnectSource} source - Source for phone book retrieval
+   * @returns {Promise} Resolves with the matched user IDs
    */
-  get_google_contacts() {
-    return this.connect_google_service
-      .get_contacts()
-      .catch(error => {
-        this.logger.info('Google Contacts SDK error', error);
-        throw new z.connect.ConnectError(z.connect.ConnectError.TYPE.GOOGLE_DOWNLOAD);
-      })
-      .then(response => {
-        amplify.publish(z.event.WebApp.SEARCH.SHOW);
-        return this._parse_google_contacts(response);
-      })
-      .then(phone_book => {
-        if (phone_book.cards.length === 0) {
-          this.logger.warn('No contacts found for upload');
-          throw new z.connect.ConnectError(z.connect.ConnectError.TYPE.NO_CONTACTS);
-        }
-        this.logger.info(`Uploading hashes of '${phone_book.cards.length}' contacts for matching`, phone_book);
-        return this.connect_service.post_onboarding(phone_book);
-      })
-      .then(response => {
-        this.logger.info(
-          `Gmail contacts upload successful: ${response.results.length} matches, ${response['auto-connects']
-            .length} auto connects`,
-          response
-        );
-        this.properties_repository.save_preference(z.properties.PROPERTIES_TYPE.CONTACT_IMPORT.GOOGLE);
-        return response;
-      })
-      .catch(error => {
-        switch (error.type) {
-          case z.connect.ConnectError.TYPE.GOOGLE_DOWNLOAD:
-            throw error;
-          case z.connect.ConnectError.TYPE.NO_CONTACTS:
-            return {};
-          default:
-            if (error.code === z.service.BackendClientError.STATUS_CODE.TOO_MANY_REQUESTS) {
-              this.logger.error('Backend refused Gmail contacts upload: Endpoint used too frequent', error);
-            } else {
-              this.logger.error('Gmail contacts upload failed', error);
-            }
-            throw new z.connect.ConnectError(z.connect.ConnectError.TYPE.UPLOAD);
-        }
-      });
-  }
+  get_contacts(source) {
+    const import_from_icloud = source === z.connect.ConnectSource.ICLOUD;
 
-  /**
-   * Retrieve a user's macOS address book contacts.
-   * @returns {Promise} Resolves with the user's address book contacts that match on Wire
-   */
-  get_macos_contacts() {
-    // TODO: Delete this block after uptake of wrapper builds including new address book implementation
-    if (window.zAddressBook) {
-      return Promise.resolve()
-        .then(() => {
-          const phone_book = this._parse_old_macos_contacts();
-
-          if (phone_book.cards.length === 0) {
-            this.logger.warn('No contacts found for upload');
-            throw new z.connect.ConnectError(z.connect.ConnectError.TYPE.NO_CONTACTS);
-          }
-
-          amplify.publish(z.event.WebApp.SEARCH.SHOW);
-          this.logger.info(`Uploading hashes of '${phone_book.cards.length}' contacts for matching`, phone_book);
-          return this.connect_service.post_onboarding(phone_book);
-        })
-        .then(response => {
-          this.logger.info(
-            `macOS contacts upload successful: ${response.results.length} matches, ${response['auto-connects']
-              .length} auto connects`,
-            response
-          );
-          this.properties_repository.save_preference(z.properties.PROPERTIES_TYPE.CONTACT_IMPORT.MACOS);
-          return response;
-        })
-        .catch(error => {
-          switch (error.type) {
-            case z.connect.ConnectError.TYPE.GOOGLE_DOWNLOAD:
-              throw error;
-            case z.connect.ConnectError.TYPE.NO_CONTACTS:
-              return {};
-            default:
-              if (error.code === z.service.BackendClientError.STATUS_CODE.TOO_MANY_REQUESTS) {
-                this.logger.error('Backend refused macOS contacts upload: Endpoint used too frequent', error);
-              } else {
-                this.logger.error('macOS contacts upload failed', error);
-              }
-              throw new z.connect.ConnectError(z.connect.ConnectError.TYPE.UPLOAD);
-          }
-        });
-    }
-
-    return this._parse_macos_contacts()
-      .then(phone_book => {
-        if (phone_book.cards.length === 0) {
-          this.logger.warn('No contacts found for upload');
-          throw new z.connect.ConnectError(z.connect.ConnectError.TYPE.NO_CONTACTS);
-        }
-        amplify.publish(z.event.WebApp.SEARCH.SHOW);
-        this.logger.info(`Uploading hashes of '${phone_book.cards.length}' contacts for matching`, phone_book);
-        return this.connect_service.post_onboarding(phone_book);
-      })
-      .then(response => {
-        this.logger.info(
-          `macOS contacts upload successful: ${response.results.length} matches, ${response['auto-connects']
-            .length} auto connects`,
-          response
-        );
-        this.properties_repository.save_preference(z.properties.PROPERTIES_TYPE.CONTACT_IMPORT.MACOS);
-        return response;
-      })
-      .catch(error => {
-        switch (error.type) {
-          case z.connect.ConnectError.TYPE.GOOGLE_DOWNLOAD:
-            throw error;
-          case z.connect.ConnectError.TYPE.NO_CONTACTS:
-            return {};
-          default:
-            if (error.code === z.service.BackendClientError.STATUS_CODE.TOO_MANY_REQUESTS) {
-              this.logger.error('Backend refused macOS contacts upload: Endpoint used too frequent');
-            } else {
-              this.logger.error('macOS contacts upload failed', error);
-            }
-            throw new z.connect.ConnectError(z.connect.ConnectError.TYPE.UPLOAD);
-        }
-      });
+    const import_promise = import_from_icloud ? this._get_macos_contacts() : this._get_google_contacts();
+    return import_promise.then(phone_book => this._upload_contacts(phone_book, source));
   }
 
   /**
@@ -180,13 +61,41 @@ z.connect.ConnectRepository = class ConnectRepository {
       });
       cards[card_index] = card;
     });
+
     return phone_book;
+  }
+
+  /**
+   * Retrieve a user's Google Contacts.
+   * @private
+   * @returns {Promise} Resolves with the user's Google contacts that match on Wire
+   */
+  _get_google_contacts() {
+    return this.connect_google_service
+      .get_contacts()
+      .catch(error => {
+        this.logger.info('Google Contacts SDK error', error);
+        throw new z.connect.ConnectError(z.connect.ConnectError.TYPE.GOOGLE_DOWNLOAD);
+      })
+      .then(response => {
+        amplify.publish(z.event.WebApp.SEARCH.SHOW);
+        return this._parse_google_contacts(response);
+      });
+  }
+
+  /**
+   * Retrieve a user's macOS address book contacts.
+   * @private
+   * @returns {Promise} Resolves with the user's address book contacts that match on Wire
+   */
+  _get_macos_contacts() {
+    return this._parse_macos_contacts();
   }
 
   /**
    * Parse a user's macOS address book Contacts.
    * @private
-   * @returns {z.connect.PhoneBook} Encoded phone book data
+   * @returns {Promise} Resolves with encoded phone book data
    */
   _parse_macos_contacts() {
     return new Promise(resolve => {
@@ -194,115 +103,56 @@ z.connect.ConnectRepository = class ConnectRepository {
         return resolve(undefined);
       }
       const address_book = window.wAddressBook;
-      const phone_book = new z.connect.PhoneBook(this.properties_repository.self());
+      const phone_book = new z.connect.PhoneBook();
 
-      const {emails: self_emails, numbers: self_numbers} = address_book.getMe();
-      self_emails.forEach(email => {
-        phone_book.self.push(email);
-      });
+      const {numbers: self_numbers} = address_book.getMe();
       self_numbers.forEach(number => {
         phone_book.self.push(number);
       });
 
-      return address_book.getContacts(
+      address_book.getContacts(
         percentage => {
           this.logger.info('Importing Contacts', percentage);
         },
         contacts => {
-          contacts.forEach(({emails, firstName: first_name, lastName: last_name, numbers}) => {
+          contacts.forEach(({firstName: first_name, lastName: last_name, numbers}) => {
             const card = {
               card_id: CryptoJS.MD5(`${first_name}${last_name}`).toString(),
               contact: [],
             };
-            emails.forEach(email => {
-              card.contact.push(email.toLowerCase().trim());
-            });
             numbers.forEach(number => {
               card.contact.push(z.util.phone_number_to_e164(number, navigator.language));
             });
 
-            if (card.contact.length > 0) {
+            if (card.contact.length) {
               phone_book.cards.push(card);
             }
           });
+
           return resolve(this._encode_phone_book(phone_book));
         }
       );
     });
   }
 
-  // TODO: Delete this block after uptake of wrapper builds including new address book implementation
-  _parse_old_macos_contacts() {
-    if (!window.zAddressBook) {
-      return;
-    }
-
-    const address_book = window.zAddressBook();
-    const phone_book = new z.connect.PhoneBook(this.properties_repository.self());
-
-    const {emails: self_emails, numbers: self_numbers} = address_book.getMe();
-    self_emails.forEach(email => {
-      phone_book.self.push(email);
-    });
-    self_numbers.forEach(number => {
-      phone_book.self.push(number);
-    });
-
-    let index = 0;
-    while (index < address_book.contactCount()) {
-      const {emails, firstName: first_name, lastName: last_name, numbers} = address_book.getContact(index);
-      const card = {
-        card_id: CryptoJS.MD5(`${first_name}${last_name}`).toString(),
-        contact: [],
-      };
-      emails.forEach(email => {
-        card.contact.push(email.toLowerCase().trim());
-      });
-      numbers.forEach(number => {
-        card.contact.push(z.util.phone_number_to_e164(number, navigator.language));
-      });
-
-      if (card.contact.length > 0) {
-        phone_book.cards.push(card);
-      }
-      index++;
-    }
-    return this._encode_phone_book(phone_book);
-  }
-
   /**
    * Parse a user's Google Contacts.
    *
    * @private
-   * @param {Array} self - Self response from Google API
    * @param {Array} users - Contacts response from Google API
    * @returns {z.connect.PhoneBook} Encoded phone book data
    */
-  _parse_google_contacts({author: self, entry: users}) {
-    const phone_book = new z.connect.PhoneBook(this.properties_repository.self());
-
-    // Add self info from Google
-    if (self) {
-      const google_email = self[0].email.$t.toLowerCase().trim();
-      if (!this.properties_repository.self().email() === google_email) {
-        phone_book.self.push(google_email);
-      }
-    }
+  _parse_google_contacts({entry: users}) {
+    const phone_book = new z.connect.PhoneBook();
 
     // Add Google contacts
     if (users) {
       users.forEach(user => {
-        if (user.gd$email || user.gd$phoneNumber) {
+        if (user.gd$phoneNumber) {
           const card = {
             card_id: user.gd$etag,
             contact: [],
           };
-
-          if (user.gd$email) {
-            user.gd$email.forEach(email => {
-              card.contact.push(email.address.toLowerCase().trim());
-            });
-          }
 
           if (user.gd$phoneNumber) {
             user.gd$phoneNumber.forEach(number => {
@@ -314,12 +164,54 @@ z.connect.ConnectRepository = class ConnectRepository {
             });
           }
 
-          if (card.contact.length > 0) {
+          if (card.contact.length) {
             phone_book.cards.push(card);
           }
         }
       });
     }
+
     return this._encode_phone_book(phone_book);
+  }
+
+  /**
+   * Upload hashed phone booked to backend for matching.
+   *
+   * @private
+   * @param {z.connect.PhoneBook} phone_book - Encoded phone book data
+   * @param {z.connect.ConnectSource} source - Source of phone book data
+   * @returns {Promise} Resolves when phone book was uploaded
+   */
+  _upload_contacts(phone_book, source = z.connect.ConnectSource.GMAIL) {
+    const {cards} = phone_book;
+
+    if (!cards.length) {
+      this.logger.warn('No contacts found for upload');
+      throw new z.connect.ConnectError(z.connect.ConnectError.TYPE.NO_CONTACTS);
+    }
+
+    this.logger.info(`Uploading hashes of '${cards.length}' contacts for matching`, phone_book);
+    return this.connect_service
+      .post_onboarding(phone_book)
+      .then(({results}) => {
+        this.logger.info(`Upload of '${source}' contacts upload successful: ${results.length} matches`, results);
+        this.properties_repository.save_preference(z.properties.PROPERTIES_TYPE.CONTACT_IMPORT.GOOGLE);
+        return results.map(result => result.id);
+      })
+      .catch(error => {
+        switch (error.type) {
+          case z.connect.ConnectError.TYPE.GOOGLE_DOWNLOAD:
+            throw error;
+          case z.connect.ConnectError.TYPE.NO_CONTACTS:
+            return {};
+          default:
+            if (error.code === z.service.BackendClientError.STATUS_CODE.TOO_MANY_REQUESTS) {
+              this.logger.error(`Backend refused upload of '${source}' contacts: Endpoint used too frequent`, error);
+            } else {
+              this.logger.error(`Upload of '${source}' contacts failed`, error);
+            }
+            throw new z.connect.ConnectError(z.connect.ConnectError.TYPE.UPLOAD);
+        }
+      });
   }
 };

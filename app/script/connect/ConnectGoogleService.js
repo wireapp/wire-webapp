@@ -63,7 +63,7 @@ z.connect.ConnectGoogleService = class ConnectGoogleService {
       this.logger.info('Authenticating with Google for contacts access');
 
       const on_response = response => {
-        if (!(response !== null ? response.error : undefined)) {
+        if (response && !response.error) {
           this.logger.info('Received access token from Google', response);
           return resolve(response.access_token);
         }

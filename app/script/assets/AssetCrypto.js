@@ -76,11 +76,7 @@ z.assets.AssetCrypto = (() => {
 
         return window.crypto.subtle.exportKey('raw', key);
       })
-      .then(key_bytes => ({
-        cipher_text: iv_ciphertext.buffer,
-        key_bytes: key_bytes,
-        sha256: computed_sha256,
-      }));
+      .then(key_bytes => ({cipher_text: iv_ciphertext.buffer, key_bytes: key_bytes, sha256: computed_sha256}));
   }
 
   function _equal_hashes(buffer_a, buffer_b) {

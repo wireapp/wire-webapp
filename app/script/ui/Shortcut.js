@@ -147,13 +147,13 @@ window.z.ui = z.ui || {};
     event: z.event.WebApp.SHORTCUT.SILENCE,
     shortcut: {
       electron: {
-        macos: 'command + alt + s',
+        macos: 'command + alt + m',
         menu: true,
-        pc: 'ctrl + alt + s',
+        pc: 'ctrl + alt + m',
       },
       webapp: {
-        macos: 'command + alt + s',
-        pc: 'ctrl + alt + s',
+        macos: 'command + alt + m',
+        pc: 'ctrl + alt + m',
       },
     },
   };
@@ -162,13 +162,13 @@ window.z.ui = z.ui || {};
     event: z.event.WebApp.SHORTCUT.START,
     shortcut: {
       electron: {
-        macos: 'command + n',
+        macos: 'command + f',
         menu: true,
-        pc: 'ctrl + n',
+        pc: 'ctrl + f',
       },
       webapp: {
-        macos: 'command + alt + graveaccent', // KeyboardJS fires this when using cmd + alt + n
-        pc: 'ctrl + alt + graveaccent',
+        macos: 'command + alt + f',
+        pc: 'ctrl + alt + f',
       },
     },
   };
@@ -215,7 +215,7 @@ window.z.ui = z.ui || {};
   }
 
   function get_shortcut(shortcut_name) {
-    const platform = z.util.Environment.electron ? 'electron' : 'webapp';
+    const platform = z.util.Environment.desktop ? 'electron' : 'webapp';
     const platform_shortcuts = shortcut_map[shortcut_name].shortcut[platform];
     return z.util.Environment.os.mac ? platform_shortcuts.macos : platform_shortcuts.pc;
   }
@@ -233,7 +233,7 @@ window.z.ui = z.ui || {};
   function _init() {
     for (const shortcut in shortcut_map) {
       const data = shortcut_map[shortcut];
-      if (z.util.Environment.electron && shortcut_map[shortcut].shortcut.electron.menu) {
+      if (z.util.Environment.desktop && shortcut_map[shortcut].shortcut.electron.menu) {
         continue;
       }
       _register_event(get_shortcut(shortcut), data['event']);

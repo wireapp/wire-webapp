@@ -245,7 +245,7 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
     if (!this.disable_toggle_screen()) {
       if (this.self_stream_state.screen_send() || z.util.Environment.browser.firefox) {
         amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, conversation_id, z.media.MediaType.SCREEN);
-      } else if (z.util.Environment.electron) {
+      } else if (z.util.Environment.desktop) {
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CALLING.SHARED_SCREEN, {
           conversation_type: this.joined_call().is_group
             ? z.tracking.attribute.ConversationType.GROUP

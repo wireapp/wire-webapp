@@ -46,9 +46,7 @@ z.bot.BotRepository = class BotRepository {
         if (create_conversation) {
           return this.conversation_repository.create_new_conversation([], bot_result.name || bot_name);
         }
-        return {
-          conversation_et: this.conversation_repository.active_conversation(),
-        };
+        return {conversation_et: this.conversation_repository.active_conversation()};
       })
       .then(({conversation_et}) => {
         this.conversation_repository.add_bot(conversation_et, bot_result.provider, bot_result.service);

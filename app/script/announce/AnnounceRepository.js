@@ -45,8 +45,8 @@ z.announce.AnnounceRepository = class AnnounceRepository {
 
   check_announcements() {
     if (navigator.onLine) {
-      return this.announce_service.get_announcements().then(() => {
-        this.process_announce_list();
+      return this.announce_service.get_announcements().then(announcements_list => {
+        this.process_announce_list(announcements_list);
       });
     }
   }

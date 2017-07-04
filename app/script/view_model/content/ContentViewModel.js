@@ -198,7 +198,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
    * @note If the conversation_et is not defined, it will open the incoming connection requests instead
    *  Conversation_et can also just be the conversation ID
    *
-   * @param {z.entity.Conversation|string} conversation - Conversation entity or conversation ID
+   * @param {Conversation|string} conversation - Conversation entity or conversation ID
    * @param {z.entity.Message} [message_et] - Message to scroll to
    * @returns {undefined} No return value
    */
@@ -215,26 +215,17 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
     }
 
     conversation_promise.then(conversation_et => {
-      const is_active_conversation = conversation_et === this.conversation_repository.active_conversation();
+      const is_active_conversation =
+        conversation_et && conversation_et === this.conversation_repository.active_conversation();
       const is_conversation_state = this.content_state() === z.ViewModel.content.CONTENT_STATE.CONVERSATION;
 
       if (is_active_conversation && is_conversation_state) {
+        this.team_repository.active_team().last_active_conversation = conversation_et;
         return;
       }
 
+      this._update_active_team(conversation_et);
       this._release_content(this.content_state(), conversation_et);
-
-      const team_id = conversation_et.team_id;
-      if (this.team_repository.active_team().id !== team_id) {
-        let team_promise;
-        if (team_id && !conversation_et.is_guest()) {
-          team_promise = this.team_repository.get_team_by_id(team_id);
-        } else {
-          team_promise = Promise.resolve(this.team_repository.personal_space);
-        }
-
-        team_promise.then(team_et => this.team_repository.active_team(team_et));
-      }
 
       this.content_state(z.ViewModel.content.CONTENT_STATE.CONVERSATION);
       this.conversation_repository.active_conversation(conversation_et);
@@ -332,5 +323,24 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
   _show_content(new_content_state) {
     this.content_state(new_content_state);
     return this._shift_content(this._get_element_of_content(new_content_state));
+  }
+
+  _update_active_team(conversation_et) {
+    const {is_guest, team_id} = conversation_et;
+
+    if (this.team_repository.active_team().id !== team_id) {
+      const is_team = team_id && !is_guest();
+      let team_et;
+
+      if (is_team) {
+        team_et = this.team_repository.teams().find(_team_et => _team_et.id === team_id);
+      }
+
+      if (!team_et) {
+        team_et = this.team_repository.personal_space;
+      }
+
+      this.team_repository.active_team(team_et);
+    }
   }
 };

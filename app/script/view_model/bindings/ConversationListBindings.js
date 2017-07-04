@@ -24,13 +24,13 @@ ko.bindingHandlers.bordered_list = (function() {
   const calculate_borders = _.throttle(function($element) {
     if ($element) {
       window.requestAnimationFrame(function() {
-        const archive_column = $($element).parent();
+        const list_column = $($element).parent();
         if ($element.height() <= 0 || !$element.is_scrollable()) {
-          return archive_column.removeClass('left-list-center-border-bottom conversations-center-border-top');
+          return list_column.removeClass('left-list-center-border-bottom conversations-center-border-top');
         }
 
-        archive_column.toggleClass('left-list-center-border-top', !$element.is_scrolled_top());
-        archive_column.toggleClass('left-list-center-border-bottom', !$element.is_scrolled_bottom());
+        list_column.toggleClass('left-list-center-border-top', !$element.is_scrolled_top());
+        list_column.toggleClass('left-list-center-border-bottom', !$element.is_scrolled_bottom());
       });
     }
   }, 100);

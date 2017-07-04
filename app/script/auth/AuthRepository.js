@@ -204,9 +204,7 @@ z.auth.AuthRepository = class AuthRepository {
       const access_token_type = z.util.StorageUtil.get_value(z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE);
 
       if (access_token) {
-        this.logger.info('Cached access token found in Local Storage', {
-          access_token,
-        });
+        this.logger.info('Cached access token found in Local Storage', {access_token});
         this.auth_service.save_access_token_in_client(access_token_type, access_token);
         this._schedule_token_refresh(z.util.StorageUtil.get_value(z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION));
         return resolve();

@@ -90,9 +90,7 @@ z.storage.StorageRepository = class StorageRepository {
    * @returns {Promise} Resolves with the primary key
   */
   save_value(primary_key, value) {
-    return this.storage_service.save(z.storage.StorageService.OBJECT_STORE.AMPLIFY, primary_key, {
-      value: value,
-    });
+    return this.storage_service.save(z.storage.StorageService.OBJECT_STORE.AMPLIFY, primary_key, {value: value});
   }
 
   /**

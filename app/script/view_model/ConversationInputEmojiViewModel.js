@@ -130,12 +130,12 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
         const details = json[code];
 
         // Ignore 'tone' emojis for now, they clutter suggestions too much.
-        if (details['alpha code'].match(/_tone\d/)) {
+        if (details['alpha_code'].match(/_tone\d/)) {
           continue;
         }
 
-        const icon = String.fromCodePoint.apply(null, code.split('-').map(char => `0x${char}`));
-        const alpha_codes = [details['alpha code'], ...details['aliases'].split('|')];
+        const icon = String.fromCodePoint.apply(null, details['output'].split('-').map(char => `0x${char}`));
+        const alpha_codes = [details['alpha_code'], ...details['aliases'].split('|')];
         alpha_codes.forEach(alpha_code => {
           if (alpha_code) {
             const name = alpha_code.slice(1, -1).replace(/_/g, ' ').toLowerCase();

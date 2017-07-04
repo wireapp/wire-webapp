@@ -1,11 +1,12 @@
 <div id="start-ui" data-bind="with: $root.start_ui">
   <div class="left-list-header">
     <span class="label-bold-xs" data-bind="text: active_team_name" data-uie-name="status-team-name-search"></span>
+    <span class="left-list-header-close-button button-icon-large icon-close" data-bind="click: click_on_close, l10n_tooltip: z.string.tooltip_search_close" data-uie-name="do-close"></span>
   </div>
   <div id="start-ui-header" class="start-ui-header border-theme">
     <user-input data-bind="input_hint: {text: group_hint_text, trigger: show_hint}"
                 class="start-ui-header-user-input"
-                params="input: search_input, placeholder: z.string.search_placeholder, selected: selected_people, enter: on_submit_search, close: click_on_close"
+                params="input: search_input, placeholder: z.string.search_placeholder, selected: selected_people, enter: on_submit_search"
                 data-uie-name="enter-search">
     </user-input>
     <div class="start-ui-header-actions clear" data-bind="css: {'start-ui-header-actions-visible': selected_people().length > 0}">
@@ -27,30 +28,29 @@
       </div>
   </div>
 
-  <div class="start-ui-list-wrapper">
-    <div class="start-ui-list" data-bind="antiscroll: should_update_scrollbar">
-      <!-- ko ifnot: show_spinner() -->
+  <div class="left-list-center start-ui-list-wrapper">
+    <div class="start-ui-list" data-bind="antiscroll: should_update_scrollbar, bordered_list: active_team">
+      <!-- ko if: show_spinner() -->
+        <div class="start-ui-list-spinner">
+          <span class="icon-spinner spin"></span>
+        </div>
+      <!-- /ko  -->
 
+      <!-- ko ifnot: show_spinner() -->
         <!-- ko ifnot: show_search_results() -->
-          <!-- ko if: show_team_member() && team_members().length -->
+          <!-- ko if: show_team_member() -->
             <div class="start-ui-list-team-member">
               <span class="start-ui-list-header start-ui-list-header-team-member" data-uie-name="status-team-members" data-bind="l10n_text: z.string.search_team_members"></span>
-              <user-list class="search-list-theme-black" params="user: team_members, mode: z.components.UserListMode.TEAM_MEMBERS, selected: selected_people"></user-list>
+              <user-list class="search-list-theme-black" params="user: team_members, mode: z.components.UserListMode.INFO, selected: selected_people"></user-list>
             </div>
           <!-- /ko  -->
-          <!-- ko if: show_top_people() && top_users().length -->
+          <!-- ko if: show_top_people() -->
             <div class="start-ui-list-top-conversations">
               <span class="start-ui-list-header start-ui-list-header-top-people" data-uie-name="status-top-people" data-bind="l10n_text: z.string.search_top_people"></span>
               <top-people class="search-list-theme-black" params="user: top_users, selected: selected_people"></top-people>
             </div>
           <!-- /ko  -->
-          <!-- ko if: show_suggestions() && suggestions().length -->
-            <div class="start-ui-list-suggestions">
-              <span class="start-ui-list-header" data-uie-name="status-connect" data-bind="l10n_text: z.string.search_connect"></span>
-              <user-list class="search-list-theme-black" params="user: suggestions, click: click_on_other, mode: z.components.UserListMode.INFO"></user-list>
-            </div>
-          <!-- /ko  -->
-          <!-- ko if: show_connections() && connections().length -->
+          <!-- ko if: show_connections() -->
             <div class="start-ui-list-connections">
               <span class="start-ui-list-header" data-uie-name="status-connect" data-bind="l10n_text: z.string.search_connections"></span>
               <user-list class="search-list-theme-black" params="user: connections, mode: z.components.UserListMode.INFO, selected: selected_people"></user-list>
@@ -63,7 +63,7 @@
             <!-- ko ifnot: is_personal_space() -->
               <div class="team_members" data-bind="visible: search_results.team_members().length > 0">
                 <span class="start-ui-list-header" data-bind="l10n_text: z.string.search_team_members"></span>
-                <user-list class="search-list-theme-black" params="user: search_results.team_members, selected: selected_people, mode: z.components.UserListMode.TEAM_MEMBERS"></user-list>
+                <user-list class="search-list-theme-black" params="user: search_results.team_members, selected: selected_people, mode: z.components.UserListMode.INFO"></user-list>
               </div>
               <div class="start-ui-team-groups" data-bind="visible: search_results.groups().length > 0">
                 <span class="start-ui-list-header" data-bind="l10n_text: z.string.search_team_groups"></span>
@@ -86,27 +86,19 @@
             </div>
           </div>
         <!-- /ko  -->
-
-        <!-- ko if: show_invite() && show_no_contacts_on_wire() -->
-          <div class="start-ui-no-top-people" data-bind="l10n_text: z.string.search_no_contacts_on_wire"></div>
-        <!-- /ko  -->
-
-        <!-- ko if: show_invite() && !show_no_contacts_on_wire() && search_input()-->
-          <div class="start-ui-no-top-people" data-bind="l10n_text: z.string.search_try_search"></div>
-        <!-- /ko  -->
-
       <!-- /ko  -->
 
-      <!-- ko if: show_spinner() -->
-        <div class="start-ui-list-spinner">
-          <span class="icon-spinner spin"></span>
-        </div>
+      <!-- ko if: show_no_matches() -->
+        <div class="start-ui-no-contacts" data-bind="l10n_text: z.string.search_no_contacts_on_wire"></div>
       <!-- /ko  -->
 
+      <!-- ko if: show_no_search_results() -->
+        <div class="start-ui-no-search-results" data-bind="l10n_text: z.string.search_try_search"></div>
+      <!-- /ko  -->
     </div>
   </div>
 
-  <!-- ko if: show_invite() && !show_no_contacts_on_wire() && !search_input() -->
+  <!-- ko if: show_no_contacts() -->
     <div class="start-ui-import-container">
       <div>
         <h1 class="start-ui-import-headline" data-bind="l10n_text: z.string.people_invite_headline"></h1>
@@ -127,9 +119,10 @@
     </div>
   <!-- /ko  -->
 
-  <!-- ko if: show_invite_people() -->
+  <!-- ko if: show_invite() -->
     <div class="start-ui-import" data-bind="click: show_invite_bubble" >
-      <span id="invite-button" class="label-bold-xs" data-bind="text: invite_button_text" data-bubble="#invite-bubble" data-placement="top"></span>
+      <span class="icon-invite start-ui-import-icon"></span>
+      <span id="invite-button" data-bind="l10n_text: z.string.people_invite" data-bubble="#invite-bubble" data-placement="top"></span>
     </div>
   <!-- /ko -->
 

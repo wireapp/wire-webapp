@@ -41,9 +41,8 @@ z.calling.entities.Flow = class Flow {
    * @param {Call} call_et - Call entity that the flow belongs to
    * @param {Participant} participant_et - Participant entity that the flow belongs to
    * @param {CallSetupTimings} timings - Timing statistics of call setup steps
-   * @param {CallMessage} call_message_et - Optional call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
    */
-  constructor(call_et, participant_et, timings, call_message_et) {
+  constructor(call_et, participant_et, timings) {
     this.calling_repository = call_et.calling_repository;
 
     this.call_et = call_et;
@@ -54,7 +53,7 @@ z.calling.entities.Flow = class Flow {
     this.conversation_id = this.call_et.id;
 
     // States
-    this.is_answer = ko.observable(undefined);
+    this.is_answer = ko.observable(false);
 
     // Audio
     this.audio = new z.calling.entities.FlowAudio(this, this.calling_repository.media_repository);
@@ -63,7 +62,8 @@ z.calling.entities.Flow = class Flow {
     this.remote_client_id = undefined;
     this.remote_user = this.participant_et.user;
     this.remote_user_id = this.remote_user.id;
-    this.self_user_id = this.call_et.self_user_id;
+    this.self_user = this.call_et.self_user;
+    this.self_user_id = this.self_user.id;
 
     // Telemetry
     this.telemetry = new z.telemetry.calling.FlowTelemetry(this.id, this.remote_user_id, this.call_et, timings);
@@ -86,7 +86,7 @@ z.calling.entities.Flow = class Flow {
     this.connection_state.subscribe(ice_connection_state => {
       switch (ice_connection_state) {
         case z.calling.rtc.ICE_CONNECTION_STATE.CHECKING: {
-          this.telemetry.schedule_check(this.call_et.telemetry.media_type);
+          this.telemetry.schedule_check(this.call_et.telemetry.media_type, this.is_answer());
           break;
         }
 
@@ -287,29 +287,6 @@ z.calling.entities.Flow = class Flow {
         this._create_sdp_offer();
       }
     });
-
-    this.initialize_flow(call_message_et);
-  }
-
-  /**
-   * Initialize the flow.
-   *
-   * @note Magic here is that if an call_message is present, the remote user is the creator of the flow
-   * @param {CallMessage} call_message_et - Optional call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
-   * @returns {undefined} No return value
-   */
-  initialize_flow(call_message_et) {
-    if (call_message_et) {
-      const {client_id, sdp: rtc_sdp} = call_message_et;
-
-      this.set_remote_client_id(client_id);
-
-      if (rtc_sdp) {
-        return this.save_remote_sdp(call_message_et);
-      }
-    }
-
-    this.is_answer(false);
   }
 
   /**
@@ -323,10 +300,9 @@ z.calling.entities.Flow = class Flow {
   restart_negotiation(negotiation_mode, is_answer, media_stream) {
     this.logger.info(`Negotiation restart triggered by '${negotiation_mode}'`);
 
+    this.clear_timeouts();
     this._close_peer_connection();
     this._close_data_channel();
-    this._clear_negotiation_timeout();
-    this._clear_send_sdp_timeout();
     this._reset_signaling_states();
     this.is_answer(is_answer);
     this._reset_sdp();
@@ -640,11 +616,7 @@ z.calling.entities.Flow = class Flow {
    */
   _initialize_data_channel() {
     if (this.peer_connection.createDataChannel && !this.data_channel) {
-      this._setup_data_channel(
-        this.peer_connection.createDataChannel(Flow.CONFIG.DATA_CHANNEL_LABEL, {
-          ordered: true,
-        })
-      );
+      this._setup_data_channel(this.peer_connection.createDataChannel(Flow.CONFIG.DATA_CHANNEL_LABEL, {ordered: true}));
     }
   }
 
@@ -725,11 +697,7 @@ z.calling.entities.Flow = class Flow {
       this.remote_user_id,
       this.remote_client_id
     );
-    amplify.publish(
-      z.event.WebApp.CALL.EVENT_FROM_BACKEND,
-      call_event,
-      z.event.EventRepository.NOTIFICATION_SOURCE.WEB_SOCKET
-    );
+    amplify.publish(z.event.WebApp.CALL.EVENT_FROM_BACKEND, call_event, z.event.EventRepository.SOURCE.WEB_SOCKET);
   }
 
   /**
@@ -758,9 +726,8 @@ z.calling.entities.Flow = class Flow {
       .map_call_message_to_object(call_message_et)
       .then(rtc_sdp => z.calling.SDPMapper.rewrite_sdp(rtc_sdp, z.calling.enum.SDP_SOURCE.REMOTE, this))
       .then(({sdp: remote_sdp}) => {
-        const {type} = call_message_et;
-
-        if (remote_sdp.type === z.calling.rtc.SDP_TYPE.OFFER) {
+        const is_remote_offer = remote_sdp.type === z.calling.rtc.SDP_TYPE.OFFER;
+        if (is_remote_offer) {
           switch (this.signaling_state()) {
             case z.calling.rtc.SIGNALING_STATE.LOCAL_OFFER: {
               if (this._solve_colliding_states()) {
@@ -778,10 +745,6 @@ z.calling.entities.Flow = class Flow {
             default: {
               break;
             }
-          }
-
-          if (type === z.calling.enum.CALL_MESSAGE_TYPE.UPDATE) {
-            this.restart_negotiation(z.calling.enum.SDP_NEGOTIATION_MODE.STREAM_CHANGE, true);
           }
         }
 
@@ -983,7 +946,7 @@ z.calling.entities.Flow = class Flow {
       this.remote_user_id,
       this.remote_client_id
     );
-    const additional_payload = $.extend({remote_user: this.remote_user, sdp: this.local_sdp().sdp}, payload);
+    const additional_payload = Object.assign({remote_user: this.remote_user, sdp: this.local_sdp().sdp}, payload);
 
     return z.calling.CallMessageBuilder.create_payload_prop_sync(
       this.call_et.self_state,
@@ -1000,22 +963,20 @@ z.calling.entities.Flow = class Flow {
    */
   _set_local_sdp() {
     this.sdp_state_changing(true);
-    this.logger.debug(`Setting local '${this.local_sdp().type}' SDP`, this.local_sdp());
+    const local_sdp = this.local_sdp();
+    this.logger.debug(`Setting local '${local_sdp.type}' SDP`, local_sdp);
 
     this.peer_connection
-      .setLocalDescription(this.local_sdp())
+      .setLocalDescription(local_sdp)
       .then(() => {
-        this.logger.info(
-          `Setting local '${this.local_sdp().type}' SDP successful`,
-          this.peer_connection.localDescription
-        );
+        this.logger.info(`Setting local '${local_sdp.type}' SDP successful`, this.peer_connection.localDescription);
         this.telemetry.time_step(z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SET);
 
         this.should_set_local_sdp(false);
         this.sdp_state_changing(false);
         this._set_send_sdp_timeout();
       })
-      .catch(error => this._set_sdp_failure(error, z.calling.enum.SDP_SOURCE.LOCAL, this.local_sdp().type));
+      .catch(error => this._set_sdp_failure(error, z.calling.enum.SDP_SOURCE.LOCAL, local_sdp.type));
   }
 
   /**
@@ -1025,21 +986,19 @@ z.calling.entities.Flow = class Flow {
    */
   _set_remote_sdp() {
     this.sdp_state_changing(false);
-    this.logger.debug(`Setting remote '${this.remote_sdp().type}' SDP\n${this.remote_sdp().sdp}`, this.remote_sdp());
+    const remote_sdp = this.remote_sdp();
+    this.logger.debug(`Setting remote '${remote_sdp.type}' SDP\n${remote_sdp.sdp}`, remote_sdp);
 
     this.peer_connection
-      .setRemoteDescription(this.remote_sdp())
+      .setRemoteDescription(remote_sdp)
       .then(() => {
-        this.logger.info(
-          `Setting remote '${this.remote_sdp().type}' SDP successful`,
-          this.peer_connection.remoteDescription
-        );
+        this.logger.info(`Setting remote '${remote_sdp.type}' SDP successful`, this.peer_connection.remoteDescription);
         this.telemetry.time_step(z.telemetry.calling.CallSetupSteps.REMOTE_SDP_SET);
 
         this.should_set_remote_sdp(false);
         this.sdp_state_changing(false);
       })
-      .catch(error => this._set_sdp_failure(error, z.calling.enum.SDP_SOURCE.REMOTE, this.remote_sdp().type));
+      .catch(error => this._set_sdp_failure(error, z.calling.enum.SDP_SOURCE.REMOTE, remote_sdp.type));
   }
 
   /**
@@ -1064,15 +1023,10 @@ z.calling.entities.Flow = class Flow {
 
     this.logger.error(`Setting ${sdp_source} '${sdp_type}' SDP failed: ${name} - ${message}`, error);
 
-    const attributes = {
-      cause: name,
-      location: sdp_source,
-      step: 'set_sdp',
-      type: sdp_type,
-    };
+    const attributes = {cause: name, location: sdp_source, step: 'set_sdp', type: sdp_type};
     this.call_et.telemetry.track_event(z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes);
 
-    amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, this.call_et.id, z.calling.enum.TERMINATION_REASON.SDP_FAILED);
+    this._remove_participant(z.calling.enum.TERMINATION_REASON.SDP_FAILED);
   }
 
   /**
@@ -1130,7 +1084,13 @@ z.calling.entities.Flow = class Flow {
    * @returns {boolean} False if we locally needed to switch sides
    */
   _solve_colliding_states(force_renegotiation = false) {
-    if (this.self_user_id < this.remote_user_id || force_renegotiation) {
+    this.logger.debug(
+      `Solving state collision: Self user ID '${this.self_user_id}', remote user ID '${this
+        .remote_user_id}', force_renegotiation '${force_renegotiation}'`
+    );
+
+    const self_user_id_looses = this.self_user_id < this.remote_user_id;
+    if (self_user_id_looses || force_renegotiation) {
       this.logger.warn(`We need to switch SDP state of flow with '${this.remote_user.name()}' to answer.`);
 
       this.restart_negotiation(z.calling.enum.SDP_NEGOTIATION_MODE.STATE_COLLISION, true);

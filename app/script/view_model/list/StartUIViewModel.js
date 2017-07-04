@@ -74,6 +74,8 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
       const normalized_query = z.search.SearchRepository.normalize_query(query);
       if (normalized_query) {
+        this.show_matches(false);
+
         // Contacts, groups and others
         const is_username = query.trim().startsWith('@');
 
@@ -141,12 +143,15 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
     // Results
     this.top_users = ko.observableArray([]);
-    this.suggestions = ko.observableArray([]);
 
+    this.matched_users = ko.observableArray([]);
     this.connections = ko.pureComputed(() => {
+      if (this.show_matches()) {
+        return this.matched_users();
+      }
+
       return this.user_repository
-        .users()
-        .filter(user_et => user_et.is_connected())
+        .connected_users()
         .sort((user_a, user_b) => z.util.StringUtil.sort_by_priority(user_a.first_name(), user_b.first_name()));
     });
 
@@ -169,9 +174,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       team_members: ko.observableArray([]),
     };
 
-    // view states
-    this.show_no_contacts_on_wire = ko.observable(false);
-    this.is_searching = ko.observable(false);
+    // View states
     this.show_spinner = ko.observable(false);
 
     this.should_update_scrollbar = ko
@@ -182,7 +185,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
     this.has_uploaded_contacts = ko.observable(false);
 
-    this.has_results = ko.pureComputed(() => {
+    this.has_search_results = ko.pureComputed(() => {
       return (
         this.search_results.groups().length ||
         this.search_results.contacts().length ||
@@ -190,26 +193,29 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       );
     });
 
-    this.show_connections = ko.pureComputed(() => this.is_personal_space() && !this.show_suggestions());
+    this.show_connections = ko.pureComputed(() => this.is_personal_space() && this.connections().length);
 
-    this.show_invite = ko.pureComputed(() => {
-      const no_connections_and_suggestions =
-        !this.show_search_results() && !this.connections().length && !this.show_suggestions();
-      const no_search_results = this.show_search_results() && !this.has_results() && !this.is_searching();
+    this.show_no_contacts = ko.pureComputed(
+      () => !this.show_search_results() && !this.connections().length && !this.show_matches()
+    );
 
-      return no_connections_and_suggestions || no_search_results;
+    this.show_no_matches = ko.pureComputed(() => this.show_matches() && !this.connections().length);
+
+    this.show_no_search_results = ko.pureComputed(() => {
+      return (
+        !this.show_matches() && this.show_search_results() && !this.has_search_results() && this.search_input().length
+      );
     });
 
-    this.show_invite_people = ko.pureComputed(() => this.is_personal_space());
+    this.show_invite = ko.pureComputed(() => this.is_personal_space());
 
-    this.show_suggestions = ko.pureComputed(() => !!this.suggestions().length);
-
+    this.show_matches = ko.observable(false);
     this.show_search_results = ko.pureComputed(() => {
       if (!this.selected_people().length && !this.search_input().length) {
         this.clear_search_results();
         return false;
       }
-      return this.has_results() || this.search_input().length;
+      return this.has_search_results() || this.search_input().length;
     });
 
     this.is_personal_space = ko.pureComputed(() => {
@@ -221,7 +227,9 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     });
 
     this.show_team_member = ko.pureComputed(() => !this.is_personal_space() && this.team_members().length);
-    this.show_top_people = ko.pureComputed(() => this.is_personal_space() && this.top_users().length);
+    this.show_top_people = ko.pureComputed(
+      () => this.is_personal_space() && this.top_users().length && !this.show_matches()
+    );
 
     // Invite bubble states
     this.show_invite_form = ko.observable(true);
@@ -230,7 +238,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
         return true;
       }
 
-      return !this.has_uploaded_contacts() && !this.show_top_people() && !this.show_suggestions();
+      return !this.has_uploaded_contacts() && !this.show_top_people();
     });
 
     // Selected user
@@ -250,10 +258,6 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
         return z.l10n.text(z.string.invite_hint_selected, meta_key);
       }
       return z.l10n.text(z.string.invite_hint_unselected, meta_key);
-    });
-
-    this.invite_button_text = ko.pureComputed(() => {
-      return z.l10n.text(this.show_invite_form_only() ? z.string.people_invite : z.string.people_bring_your_friends);
     });
 
     // Last open bubble
@@ -276,8 +280,6 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.search_results.groups.removeAll();
     this.search_results.contacts.removeAll();
     this.search_results.others.removeAll();
-    this.is_searching(false);
-    this.show_no_contacts_on_wire(false);
   }
 
   click_on_close() {
@@ -297,19 +299,18 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
    * @returns {undefined} No return value
    */
   import_contacts(source) {
-    let import_promise;
     this.show_spinner(true);
 
-    if (source === z.connect.ConnectSource.GMAIL) {
-      import_promise = this.connect_repository.get_google_contacts();
-    } else if (source === z.connect.ConnectSource.ICLOUD) {
-      import_promise = this.connect_repository.get_macos_contacts();
-    }
-
-    import_promise
-      .then(response => {
+    this.connect_repository
+      .get_contacts(source)
+      .then((user_ids = []) => {
         this.active_team(this.team_repository.personal_space);
-        return this._show_on_boarding_results(response);
+        return this.user_repository.get_users_by_id(user_ids);
+      })
+      .then(user_ets => {
+        this.selected_people.removeAll();
+        this.matched_users(user_ets);
+        this.show_matches(true);
       })
       .catch(error => {
         if (error.type !== z.connect.ConnectError.TYPE.NO_CONTACTS) {
@@ -323,30 +324,6 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       .then(error => {
         this.show_spinner(false);
         this._track_import(source, error);
-      });
-  }
-
-  _show_on_boarding_results(response) {
-    return this.search_repository
-      .show_on_boarding(response)
-      .then(({connections, suggestions}) => {
-        this.suggestions(suggestions.length ? suggestions : connections);
-        return this.get_top_people();
-      })
-      .then(user_ets => {
-        this.top_users(user_ets);
-        this.selected_people.removeAll();
-
-        if (!this.suggestions().length) {
-          if (this.top_users().length) {
-            return this.suggestions(this.top_users());
-          }
-
-          return this.show_no_contacts_on_wire(true);
-        }
-      })
-      .catch(error => {
-        this.logger.error(`Could not show the on-boarding results: ${error.message}`, error);
       });
   }
 
@@ -365,7 +342,6 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.show_spinner(false);
 
     // Clean up
-    this.suggestions.removeAll();
     this.selected_people.removeAll();
     this.clear_search_results();
     this.user_profile(null);
@@ -381,6 +357,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       this.invite_bubble.hide();
     }
 
+    this.show_matches(false);
     this.show_spinner(false);
 
     this.selected_people.removeAll();
@@ -507,7 +484,6 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.active_team(this.team_repository.personal_space);
 
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.SENT_CONNECT_REQUEST, {
-      common_users_count: user_et.mutual_friends_total(),
       context: 'startui',
     });
   }
@@ -692,16 +668,31 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
   }
 
   _handle_search_input() {
-    const [matching_connection] = this.search_results.contacts();
     const [matching_group] = this.search_results.groups();
-    const [matching_team_member] = this.search_results.team_members();
 
-    if (matching_connection && this.is_personal_space()) {
+    let matching_connection = undefined;
+    let matching_team_member = undefined;
+
+    for (const user_et of this.search_results.contacts()) {
+      if (!this.selected_people().includes(user_et)) {
+        matching_connection = user_et;
+        break;
+      }
+    }
+
+    for (const user_et of this.search_results.team_members()) {
+      if (!this.selected_people().includes(user_et)) {
+        matching_team_member = user_et;
+        break;
+      }
+    }
+
+    if (this.is_personal_space() && matching_connection) {
       this.selected_people.push(matching_connection);
       return true;
     }
 
-    if (matching_team_member && !this.is_personal_space()) {
+    if (!this.is_personal_space() && matching_team_member) {
       this.selected_people.push(matching_team_member);
       return true;
     }

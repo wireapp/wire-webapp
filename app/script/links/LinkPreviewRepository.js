@@ -46,7 +46,7 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
    * @returns {Promise} Resolves with link preview proto message
    */
   get_link_preview_from_string(string) {
-    if (this.should_send_previews && z.util.Environment.electron) {
+    if (this.should_send_previews && z.util.Environment.desktop) {
       return Promise.resolve().then(() => {
         const data = z.links.LinkPreviewHelpers.get_first_link_with_offset(string);
 
@@ -137,7 +137,19 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
    */
   _fetch_open_graph_data(link) {
     return new Promise(resolve => {
-      return window.openGraph(link, (error, data) => resolve(error ? null : data));
+      return window.openGraph(link, (error, data) => {
+        if (error) {
+          resolve(undefined);
+        }
+
+        data = Object.keys(data).reduce((filtered_data, key) => {
+          const value = data[key];
+          filtered_data[key] = Array.isArray(value) ? value[0] : value;
+          return filtered_data;
+        }, {});
+
+        resolve(data);
+      });
     });
   }
 

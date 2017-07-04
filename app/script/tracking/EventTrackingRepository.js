@@ -324,9 +324,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   _disable_error_reporting() {
     this.logger.debug('Disabling Raygun error reporting');
     Raygun.detach();
-    Raygun.init(EventTrackingRepository.CONFIG.RAYGUN.API_KEY, {
-      disableErrorTracking: true,
-    });
+    Raygun.init(EventTrackingRepository.CONFIG.RAYGUN.API_KEY, {disableErrorTracking: true});
     this._detach_promise_rejection_handler();
   }
 
@@ -352,10 +350,8 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     if (!z.util.Environment.frontend.is_localhost()) {
       Raygun.setVersion(z.util.Environment.version(false));
     }
-    if (z.util.Environment.electron) {
-      Raygun.withCustomData({
-        electron_version: z.util.Environment.version(true),
-      });
+    if (z.util.Environment.desktop) {
+      Raygun.withCustomData({electron_version: z.util.Environment.version(true)});
     }
     Raygun.onBeforeSend(this._check_error_payload.bind(this));
     this._attach_promise_rejection_handler();

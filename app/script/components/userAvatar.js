@@ -61,7 +61,7 @@ z.components.UserAvatar = class UserAvatar {
         return 'selected';
       }
 
-      if (this.is_team_member) {
+      if (this.user.is_team_member()) {
         return '';
       }
 

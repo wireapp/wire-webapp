@@ -183,19 +183,13 @@ z.storage.StorageService = class StorageService {
       this.db.version(6).stores(version_4).upgrade(transaction => {
         this.logger.warn('Database upgrade to version 6', transaction);
         transaction[StorageService.OBJECT_STORE.CONVERSATIONS].toCollection().eachKey(key => {
-          this.db[StorageService.OBJECT_STORE.CONVERSATIONS].update(key, {
-            id: key,
-          });
+          this.db[StorageService.OBJECT_STORE.CONVERSATIONS].update(key, {id: key});
         });
         transaction[StorageService.OBJECT_STORE.SESSIONS].toCollection().eachKey(key => {
-          this.db[StorageService.OBJECT_STORE.SESSIONS].update(key, {
-            id: key,
-          });
+          this.db[StorageService.OBJECT_STORE.SESSIONS].update(key, {id: key});
         });
         transaction[StorageService.OBJECT_STORE.PRE_KEYS].toCollection().eachKey(key => {
-          this.db[StorageService.OBJECT_STORE.PRE_KEYS].update(key, {
-            id: key,
-          });
+          this.db[StorageService.OBJECT_STORE.PRE_KEYS].update(key, {id: key});
         });
       });
       this.db.version(7).stores(version_5).upgrade(transaction => {

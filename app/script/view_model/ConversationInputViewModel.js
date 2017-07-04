@@ -167,7 +167,7 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
   }
 
   ping() {
-    if (!this.ping_disabled()) {
+    if (this.conversation_et() && !this.ping_disabled()) {
       this.ping_disabled(true);
       this.conversation_repository.send_knock(this.conversation_et()).then(() => {
         window.setTimeout(() => {
@@ -215,9 +215,14 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
     );
   }
 
+  /**
+   * Post images to a conversation.
+   * @param {Array|FileList} images - Images
+   * @returns {undefined} No return value
+   */
   upload_images(images) {
     if (!this._is_hitting_upload_limit(images)) {
-      for (const image of images) {
+      for (const image of [...images]) {
         if (image.size > z.config.MAXIMUM_IMAGE_FILE_SIZE) {
           return this._show_upload_warning(image);
         }
@@ -227,9 +232,14 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
     }
   }
 
+  /**
+   * Post files to a conversation.
+   * @param {Array|FileList} files - Images
+   * @returns {undefined} No return value
+   */
   upload_files(files) {
     if (!this._is_hitting_upload_limit(files)) {
-      for (const file of files) {
+      for (const file of [...files]) {
         if (file.size > z.config.MAXIMUM_ASSET_FILE_SIZE) {
           amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_TOO_BIG, {
             size: file.size,

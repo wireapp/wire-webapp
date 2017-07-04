@@ -27,22 +27,22 @@ z.auth.AccessTokenError = class AccessTokenError extends Error {
     super();
     this.name = this.constructor.name;
     this.stack = new Error().stack;
-    this.type = type || z.audio.AccessTokenError.TYPE.UNKNOWN;
+    this.type = type || AccessTokenError.TYPE.UNKNOWN;
 
     switch (this.type) {
-      case z.auth.AccessTokenError.TYPE.NOT_FOUND_IN_CACHE:
+      case AccessTokenError.TYPE.NOT_FOUND_IN_CACHE:
         this.message = 'No cached access token found in Local Storage';
         break;
-      case z.auth.AccessTokenError.TYPE.REFRESH_IN_PROGRESS:
+      case AccessTokenError.TYPE.REFRESH_IN_PROGRESS:
         this.message = 'Access Token request already in progress';
         break;
-      case z.auth.AccessTokenError.TYPE.RETRIES_EXCEEDED:
+      case AccessTokenError.TYPE.RETRIES_EXCEEDED:
         this.message = 'No. of retries to get Access Token exceeded';
         break;
-      case z.auth.AccessTokenError.TYPE.REQUEST_FAILED:
+      case AccessTokenError.TYPE.REQUEST_FAILED:
         this.message = 'Request to POST for access token failed';
         break;
-      case z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN:
+      case AccessTokenError.TYPE.REQUEST_FORBIDDEN:
         this.message = 'Request to POST for access token forbidden';
         break;
       default:

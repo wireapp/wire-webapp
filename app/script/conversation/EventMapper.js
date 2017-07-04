@@ -62,10 +62,7 @@ z.conversation.EventMapper = class EventMapper {
     try {
       return this._map_json_event(event, conversation_et, should_create_dummy_image);
     } catch (error) {
-      this.logger.error(`Failed to map event: ${error.message}`, {
-        error,
-        event,
-      });
+      this.logger.error(`Failed to map event: ${error.message}`, {error, event});
       return undefined;
     }
   }
@@ -126,6 +123,7 @@ z.conversation.EventMapper = class EventMapper {
         message_et = this._map_event_verification(event);
         break;
       case z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT:
+      case z.event.Client.CONVERSATION.MESSAGE_TOO_BIG:
         message_et = this._map_event_unable_to_decrypt(event);
         break;
       default:

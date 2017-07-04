@@ -29,6 +29,9 @@
             <user-avatar class="image user-avatar-lg cursor-default" params="user: user" data-uie-name="status-profile-picture"></user-avatar>
           <!-- /ko -->
         </div>
+        <div class="user-profile-footer">
+          <!-- ko template: {name: get_footer_template} --><!-- /ko -->
+        </div>
       <!-- /ko -->
 
       <!-- ko if: tab_index() === 1 -->
@@ -58,10 +61,6 @@
           <!-- /ko -->
         </div>
       <!-- /ko -->
-
-      <div class="user-profile-footer">
-        <!-- ko template: {name: get_footer_template} --><!-- /ko -->
-      </div>
     </div>
 
     <div class="user-profile-device-detail">
@@ -140,7 +139,7 @@
     <div class="button-icon icon-plus"></div>
     <span data-bind="l10n_text: z.string.people_button_connect"></span>
   </div>
-  <!-- ko ifnot: conversation().removed_from_conversation() || user_is_removed_from_conversation() -->
+  <!-- ko if: !(conversation().removed_from_conversation() || user_is_removed_from_conversation()) && !conversation().is_guest() -->
     <div class="button-icon icon-minus pull-right" data-bind="click: on_remove, l10n_tooltip: z.string.tooltip_people_remove" data-uie-name="do-remove"></div>
   <!-- /ko -->
 </script>
@@ -150,7 +149,7 @@
     <div class="button-icon icon-chat"></div>
     <span data-bind="l10n_text: z.string.people_button_pending"></span>
   </div>
-  <!-- ko ifnot: conversation().removed_from_conversation() || user_is_removed_from_conversation() -->
+  <!-- ko if: !(conversation().removed_from_conversation() || user_is_removed_from_conversation()) && !conversation().is_guest() -->
     <div class="button-icon icon-minus pull-right" data-bind="click: on_remove, l10n_tooltip: z.string.tooltip_people_remove" data-uie-name="do-remove"></div>
   <!-- /ko -->
 </script>
@@ -160,7 +159,7 @@
     <div class="button-icon icon-chat"></div>
     <span data-bind="l10n_text: z.string.people_button_open"></span>
   </div>
-  <!-- ko ifnot: conversation().removed_from_conversation() || user_is_removed_from_conversation() || conversation().is_guest -->
+  <!-- ko if: !(conversation().removed_from_conversation() || user_is_removed_from_conversation()) && !conversation().is_guest() -->
     <div class="button-icon icon-minus pull-right" data-bind="click: on_remove, l10n_tooltip: z.string.tooltip_people_remove" data-uie-name="do-remove"></div>
   <!-- /ko -->
 </script>
@@ -177,7 +176,7 @@
     <div class="button-icon icon-block"></div>
     <span data-bind="l10n_text: z.string.people_button_unblock"></span>
   </div>
-  <!-- ko ifnot: conversation().removed_from_conversation() || user_is_removed_from_conversation() -->
+  <!-- ko if: !(conversation().removed_from_conversation() || user_is_removed_from_conversation()) && !conversation().is_guest() -->
     <div class="button-icon icon-minus pull-right" data-bind="click: on_remove, l10n_tooltip: z.string.tooltip_people_remove" data-uie-name="do-remove"></div>
   <!-- /ko -->
 </script>
