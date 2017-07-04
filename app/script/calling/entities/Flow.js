@@ -1143,13 +1143,16 @@ z.calling.entities.Flow = class Flow {
    * @returns {Promise} Resolves when MediaStream has been replaced
    */
   _replace_media_stream(media_stream_info) {
+    const media_type = media_stream_info.type;
+
     return Promise.resolve()
       .then(() => this._remove_media_stream(this.media_stream()))
       .then(() => this._upgrade_media_stream(media_stream_info))
       .then((upgraded_media_stream_info) => {
-        const {stream: media_stream, type: media_type} = upgraded_media_stream_info;
+        const {stream: media_stream} = upgraded_media_stream_info;
+        upgraded_media_stream_info.replaced = true;
 
-        this.logger.info(`Upgraded the MediaStream to update '${media_type}' successfully`, media_stream);
+        this.logger.info(`Upgraded the MediaStream to update '${media_type}'`, media_stream);
         this.restart_negotiation(z.calling.enum.SDP_NEGOTIATION_MODE.STREAM_CHANGE, false, media_stream);
         return upgraded_media_stream_info;
       })

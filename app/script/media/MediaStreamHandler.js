@@ -77,7 +77,11 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     this.calls = () => [];
     this.joined_call = () => undefined;
 
-    this.current_device_id = this.media_repository.devices_handler.current_device_id;
+    this.constraints_handler = this.media_repository.constraints_handler;
+    this.devices_handler = this.media_repository.devices_handler;
+    this.element_handler = this.media_repository.element_handler;
+
+    this.current_device_id = this.devices_handler.current_device_id;
 
     this.local_media_stream = ko.observable();
     this.local_media_type = ko.observable(z.media.MediaType.AUDIO);
@@ -99,119 +103,6 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
 
 
   //##############################################################################
-  // MediaStream constraints
-  //##############################################################################
-
-  /**
-   * Get the MediaStreamConstraints to be used for MediaStream creation.
-   *
-   * @private
-   * @param {boolean} [request_audio=false] - Request audio in the constraints
-   * @param {boolean} [request_video=false] - Request video in the constraints
-   * @returns {Promise} Resolves with MediaStreamConstraints and their type
-   */
-  get_media_stream_constraints(request_audio = false, request_video = false) {
-    return Promise.resolve()
-      .then(() => {
-        const constraints = {
-          audio: request_audio ? this._get_audio_stream_constraints(this.current_device_id.audio_input()) : undefined,
-          video: request_video ? this._get_video_stream_constraints(this.current_device_id.video_input()) : undefined,
-        };
-        console.log('supported', navigator.mediaDevices.getSupportedConstraints());
-        console.log('media_stream_constraints', constraints);
-        const media_type = request_video ? z.media.MediaType.VIDEO : z.media.MediaType.AUDIO;
-        return {media_stream_constraints: constraints, media_type: media_type};
-      });
-  }
-
-  /**
-   * Get the video constraints to be used for MediaStream creation.
-   * @private
-   * @param {string} media_device_id - Optional ID of MediaDevice to be used
-   * @returns {Object} Video stream constraints
-   */
-  _get_audio_stream_constraints(media_device_id) {
-    if (_.isString(media_device_id)) {
-      return {
-        deviceId: media_device_id,
-      };
-    }
-    return true;
-  }
-
-  /**
-   * Get the MediaStreamConstraints to be used for screen sharing.
-   * @returns {Promise} Resolves with MediaStreamConstraints and their type
-   */
-  get_screen_stream_constraints() {
-    if (window.desktopCapturer) {
-      this.logger.info('Enabling screen sharing from Electron');
-
-      const constraints = {
-        audio: false,
-        video: {
-          mandatory: {
-            chromeMediaSource: 'desktop',
-            chromeMediaSourceId: this.current_device_id.screen_input(),
-            maxHeight: 720,
-            maxWidth: 1280,
-            minHeight: 720,
-            minWidth: 1280,
-          },
-        },
-      };
-
-      return Promise.resolve({media_stream_constraints: constraints, media_type: z.media.MediaType.SCREEN});
-    }
-
-    if (z.util.Environment.browser.firefox) {
-      this.logger.info('Enabling screen sharing from Firefox');
-
-      const constraints = {
-        audio: false,
-        video: {
-          mediaSource: 'screen',
-        },
-      };
-
-      return Promise.resolve({media_stream_constraints: constraints, media_type: z.media.MediaType.SCREEN});
-    }
-
-    return Promise.reject(new z.media.MediaError(z.media.MediaError.TYPE.SCREEN_NOT_SUPPORTED));
-  }
-
-  /**
-   * Get the video constraints to be used for MediaStream creation.
-   *
-   * @private
-   * @param {string} media_device_id - Optional ID of MediaDevice to be used
-   * @returns {Object} Video stream constraints
-   */
-  _get_video_stream_constraints(media_device_id) {
-    const media_stream_constraints = {
-      facingMode: 'user',
-      frameRate: 30,
-      height: {
-        ideal: 360,
-        max: 720,
-        min: 360,
-      },
-      width: {
-        ideal: 640,
-        max: 1280,
-        min: 640,
-      },
-    };
-
-    if (_.isString(media_device_id)) {
-      media_stream_constraints.deviceId = media_device_id;
-    }
-
-    return media_stream_constraints;
-  }
-
-
-  //##############################################################################
   // Local MediaStream handling
   //##############################################################################
 
@@ -223,8 +114,8 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    * @returns {Promise} Resolves when the MediaStream has been initiated
    */
   initiate_media_stream(conversation_id, video_send = false) {
-    return this.media_repository.devices_handler.update_current_devices(video_send)
-      .then(() => this.get_media_stream_constraints(true, video_send))
+    return this.devices_handler.update_current_devices(video_send)
+      .then(() => this.constraints_handler.get_media_stream_constraints(true, video_send))
       .then(({media_type, media_stream_constraints}) => this.request_media_stream(media_type, media_stream_constraints))
       .then((media_stream_info) => {
         this.self_stream_state.video_send(video_send);
@@ -258,9 +149,13 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    * @returns {Promise} Resolves when the MediaStream has been replaced
    */
   replace_media_stream(media_stream_info) {
-    const {stream: media_stream} = media_stream_info;
+    const {stream: media_stream, type} = media_stream_info;
     this.logger.debug(`Received new MediaStream with '${media_stream.getTracks().length}' MediaStreamTrack(s)`,
-      {audio_tracks: media_stream.getAudioTracks(), stream: media_stream, video_tracks: media_stream.getVideoTracks()});
+      {
+        audio_tracks: media_stream.getAudioTracks(),
+        stream: media_stream,
+        video_tracks: media_stream.getVideoTracks(),
+      });
 
     let update_promise;
     if (this.joined_call()) {
@@ -275,8 +170,10 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
 
     return update_promise
       .then(([update_media_stream_info]) => {
+        const media_type = !update_media_stream_info.replaced ? type : undefined;
+
         this._set_stream_state(update_media_stream_info);
-        this._release_media_stream(this.local_media_stream(), media_stream_info.type);
+        this._release_media_stream(this.local_media_stream(), media_type);
         this.local_media_stream(update_media_stream_info.stream);
       });
   }
@@ -292,13 +189,13 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     let constraints_promise;
     switch (input_media_type) {
       case z.media.MediaType.AUDIO:
-        constraints_promise = this.get_media_stream_constraints(true, is_preference_change);
+        constraints_promise = this.constraints_handler.get_media_stream_constraints(true, is_preference_change);
         break;
       case z.media.MediaType.SCREEN:
-        constraints_promise = this.get_screen_stream_constraints();
+        constraints_promise = this.constraints_handler.get_screen_stream_constraints();
         break;
       case z.media.MediaType.VIDEO:
-        constraints_promise = this.get_media_stream_constraints(is_preference_change, true);
+        constraints_promise = this.constraints_handler.get_media_stream_constraints(is_preference_change, true);
         break;
       default:
         throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
@@ -329,10 +226,10 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    * @returns {Promise} Resolves with the stream and its type
    */
   request_media_stream(media_type, media_stream_constraints) {
-    if (!this.media_repository.devices_handler.has_microphone()) {
+    if (!this.devices_handler.has_microphone()) {
       return Promise.reject(new z.media.MediaError(z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE, z.media.MediaType.VIDEO));
     }
-    if (!this.media_repository.devices_handler.has_camera() && (media_type === z.media.MediaType.VIDEO)) {
+    if (!this.devices_handler.has_camera() && (media_type === z.media.MediaType.VIDEO)) {
       return Promise.reject(new z.media.MediaError(z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE, z.media.MediaType.VIDEO));
     }
 
@@ -441,7 +338,11 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
       const {stream: media_stream} = media_stream_info;
 
       this.logger.debug(`Received initial MediaStream with '${media_stream.getTracks().length}' MediaStreamTrack(s)`,
-        {audio_tracks: media_stream.getAudioTracks(), stream: media_stream, video_tracks: media_stream.getVideoTracks()});
+        {
+          audio_tracks: media_stream.getAudioTracks(),
+          stream: media_stream,
+          video_tracks: media_stream.getVideoTracks(),
+        });
       this._set_stream_state(media_stream_info);
       this.local_media_stream(media_stream);
     }
@@ -591,7 +492,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
         throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
     }
 
-    this.media_repository.element_handler.add_media_element(media_stream_info);
+    this.element_handler.add_media_element(media_stream_info);
   }
 
 
