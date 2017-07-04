@@ -146,7 +146,7 @@ z.main.App = class App {
    */
   _setup_utils() {
     return {
-      debug: z.util.Environment.frontend.is_production() ? undefined : new z.util.DebugUtil(this.repository.user, this.repository.conversation),
+      debug: z.util.Environment.frontend.is_production() ? undefined : new z.util.DebugUtil(this.repository.calling, this.repository.conversation, this.repository.user),
     };
   }
 
@@ -700,14 +700,6 @@ z.main.App = class App {
     if (z.util.Environment.frontend.is_localhost()) {
       this._attach_live_reload();
     }
-  }
-
-  /**
-   * Print call log to console.
-   * @returns {undefined} No return value
-   */
-  print_call_log() {
-    this.repository.calling.print_log();
   }
 
   /**
