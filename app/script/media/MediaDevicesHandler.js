@@ -290,7 +290,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
           const {current_device: media_device} = this._get_current_device(media_devices, device_id_observable());
 
           if (!media_device) {
-            const updated_device = this.available_devices[`${device_type}`]()[0];
+            const [updated_device] = this.available_devices[`${device_type}`]();
 
             if (updated_device) {
               this.logger.warn(`Selected '${media_type}' device '${device_id_observable()}' not found and replaced by '${updated_device.label || updated_device.deviceId}'`, media_devices);

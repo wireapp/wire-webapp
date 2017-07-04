@@ -131,12 +131,12 @@ z.media.MediaElementHandler = class MediaElementHandler {
   _set_media_element_output(media_element, sink_id) {
     if (media_element.setSinkId) {
       media_element.setSinkId(sink_id)
-      .then(() => {
-        this.logger.info(`Audio output device '${sink_id}' attached to flow '${media_element.dataset['flow_id']}`, media_element);
-      })
-      .catch((error) => {
-        this.logger.warn(`Failed to attach audio output device '${sink_id}' to flow '${media_element.dataset['flow_id']}': ${error.message}`, error);
-      });
+        .then(() => {
+          this.logger.info(`Audio output device '${sink_id}' attached to flow '${media_element.dataset['flow_id']}`, media_element);
+        })
+        .catch((error) => {
+          this.logger.warn(`Failed to attach audio output device '${sink_id}' to flow '${media_element.dataset['flow_id']}': ${error.message}`, error);
+        });
     }
   }
 };
