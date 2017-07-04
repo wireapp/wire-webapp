@@ -655,9 +655,9 @@ z.calling.entities.Flow = class Flow {
     const {conversation_et} = this.call_et;
 
     if (response === true) {
-      this.logger.debug(`Received confirmation for call '${type}' message via data channel`, call_message);
+      this.logger.debug(`Received confirmation for '${type}' message via data channel`, call_message);
     } else {
-      this.logger.debug(`Received call '${type}' (response: ${response}) message via data channel`, call_message);
+      this.logger.debug(`Received '${type}' (response: ${response}) message via data channel`, call_message);
     }
 
     const call_event = z.conversation.EventBuilder.build_calling(conversation_et, call_message, this.remote_user_id, this.remote_client_id);
@@ -884,7 +884,7 @@ z.calling.entities.Flow = class Flow {
    * @returns {Object} Additional payload
    */
   _create_additional_payload() {
-    const payload = z.calling.CallMessageBuilder.create_payload(this.id, this.self_user_id, this.remote_user_id, this.remote_client_id);
+    const payload = z.calling.CallMessageBuilder.create_payload(this.conversation_id, this.self_user_id, this.remote_user_id, this.remote_client_id);
     const additional_payload = Object.assign({remote_user: this.remote_user, sdp: this.local_sdp().sdp}, payload);
 
     return z.calling.CallMessageBuilder.create_payload_prop_sync(this.call_et.self_state, this.call_et.self_state.video_send(), false, additional_payload);
@@ -1143,13 +1143,16 @@ z.calling.entities.Flow = class Flow {
    * @returns {Promise} Resolves when MediaStream has been replaced
    */
   _replace_media_stream(media_stream_info) {
+    const media_type = media_stream_info.type;
+
     return Promise.resolve()
       .then(() => this._remove_media_stream(this.media_stream()))
       .then(() => this._upgrade_media_stream(media_stream_info))
       .then((upgraded_media_stream_info) => {
-        const {stream: media_stream, type: media_type} = upgraded_media_stream_info;
+        const {stream: media_stream} = upgraded_media_stream_info;
+        upgraded_media_stream_info.replaced = true;
 
-        this.logger.info(`Upgraded the MediaStream to update '${media_type}' successfully`, media_stream);
+        this.logger.info(`Upgraded the MediaStream to update '${media_type}'`, media_stream);
         this.restart_negotiation(z.calling.enum.SDP_NEGOTIATION_MODE.STREAM_CHANGE, false, media_stream);
         return upgraded_media_stream_info;
       })

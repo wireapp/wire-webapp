@@ -221,13 +221,15 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
           height: 176,
           width: 312,
         },
-        types: ['screen'],
+        types: [z.media.MediaConstraintsHandler.CONFIG.SCREEN_CONSTRAINTS.SOURCE_TYPE],
       };
 
       return window.desktopCapturer.getSources(options, (error, screen_sources) => {
-        if (error) return reject(error);
+        if (error) {
+          return reject(error);
+        }
 
-        this.logger.info(`Found '${screen_sources.length}' possible sources for screen sharing on Electron`, screen_sources);
+        this.logger.info(`Detected '${screen_sources.length}' sources for screen sharing from Electron`, screen_sources);
         this.available_devices.screen_input(screen_sources);
         if (screen_sources.length === 1) {
           const [first_screen_source] = screen_sources;
@@ -290,7 +292,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
           const {current_device: media_device} = this._get_current_device(media_devices, device_id_observable());
 
           if (!media_device) {
-            const updated_device = this.available_devices[`${device_type}`]()[0];
+            const [updated_device] = this.available_devices[`${device_type}`]();
 
             if (updated_device) {
               this.logger.warn(`Selected '${media_type}' device '${device_id_observable()}' not found and replaced by '${updated_device.label || updated_device.deviceId}'`, media_devices);
