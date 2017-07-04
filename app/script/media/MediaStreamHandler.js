@@ -117,6 +117,8 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
         audio: request_audio ? this._get_audio_stream_constraints(this.current_device_id.audio_input()) : undefined,
         video: request_video ? this._get_video_stream_constraints(this.current_device_id.video_input()) : undefined,
       };
+      console.log('supported', navigator.mediaDevices.getSupportedConstraints());
+      console.log('media_stream_constraints', constraints);
       const media_type = request_video ? z.media.MediaType.VIDEO : z.media.MediaType.AUDIO;
       return {media_stream_constraints: constraints, media_type: media_type};
     });
@@ -131,9 +133,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
   _get_audio_stream_constraints(media_device_id) {
     if (_.isString(media_device_id)) {
       return {
-        deviceId: {
-          exact: media_device_id,
-        },
+        deviceId: media_device_id,
       };
     }
     return true;
@@ -204,9 +204,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     };
 
     if (_.isString(media_device_id)) {
-      media_stream_constraints.deviceId = {
-        exact: media_device_id,
-      };
+      media_stream_constraints.deviceId = media_device_id;
     }
 
     return media_stream_constraints;
@@ -276,7 +274,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
         .map((flow_et) => flow_et.update_media_stream(media_stream_info))
       );
     } else {
-      update_promise = Promise.resolve(media_stream_info);
+      update_promise = Promise.resolve([media_stream_info]);
     }
 
     return update_promise.then(([update_media_stream_info]) => {
@@ -292,16 +290,18 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    * @returns {Promise} Resolves when the input source has been replaced
    */
   replace_input_source(input_media_type) {
+    const is_preference_change = !this.needs_media_stream();
+
     let constraints_promise;
     switch (input_media_type) {
       case z.media.MediaType.AUDIO:
-        constraints_promise = this.get_media_stream_constraints(true, false);
+        constraints_promise = this.get_media_stream_constraints(true, is_preference_change);
         break;
       case z.media.MediaType.SCREEN:
         constraints_promise = this.get_screen_stream_constraints();
         break;
       case z.media.MediaType.VIDEO:
-        constraints_promise = this.get_media_stream_constraints(false, true);
+        constraints_promise = this.get_media_stream_constraints(is_preference_change, true);
         break;
       default:
         throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
@@ -315,11 +315,11 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
       });
     })
     .catch((error) => {
-      if (error.media_type === z.media.MediaType.SCREEN) {
+      if (input_media_type === z.media.MediaType.SCREEN) {
         return this.logger.error(`Failed to enable screen sharing: ${error.message}`, error);
       }
 
-      this.logger.error(`Failed to replace '${error.media_type}' input source: ${error.message}`, error);
+      this.logger.error(`Failed to replace '${input_media_type}' input source: ${error.message}`, error);
     });
   }
 
