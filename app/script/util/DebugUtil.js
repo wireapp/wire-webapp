@@ -23,10 +23,11 @@ window.z = window.z || {};
 window.z.util = z.util || {};
 
 z.util.DebugUtil = class DebugUtil {
-  constructor(user_repository, conversation_repository) {
+  constructor(calling_repository, conversation_repository, user_repository) {
+    this.calling_repository = calling_repository;
     this.conversation_repository = conversation_repository;
-    this.logger = new z.util.Logger('z.util.DebugUtil', z.config.LOGGER.OPTIONS);
     this.user_repository = user_repository;
+    this.logger = new z.util.Logger('z.util.DebugUtil', z.config.LOGGER.OPTIONS);
   }
 
   block_all_connections() {
@@ -188,6 +189,14 @@ z.util.DebugUtil = class DebugUtil {
         session: resolve_array[2],
       });
     });
+  }
+
+  /**
+   * Print call log to console.
+   * @returns {undefined} No return value
+   */
+  log_call_messages() {
+    this.calling_repository.print_log();
   }
 
   log_connection_status() {

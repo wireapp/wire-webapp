@@ -70,7 +70,7 @@ z.calling.entities.Call = class Call {
     this.timer_start = undefined;
     this.direction = undefined;
     this.duration_time = ko.observable(0);
-    this.group_check_timeout = undefined;
+    this.group_check_timeout_id = undefined;
     this.termination_reason = undefined;
 
     this.is_connected = ko.observable(false);
@@ -209,11 +209,15 @@ z.calling.entities.Call = class Call {
     this.termination_reason = termination_reason;
     this.calling_repository.inject_deactivate_event(call_message_et, z.event.EventRepository.SOURCE.WEB_SOCKET, this.creating_user, reason);
 
+    this._clear_timeouts();
     if (this.participants().length <= 1) {
       return this.calling_repository.delete_call(this.id);
     }
 
-    this._clear_timeouts();
+    if (this.is_group) {
+      this.schedule_group_check();
+    }
+
     this.calling_repository.media_stream_handler.reset_media_stream();
   }
 
@@ -373,9 +377,10 @@ z.calling.entities.Call = class Call {
    * @returns {undefined} No return value
    */
   _clear_group_check_timeout() {
-    if (this.group_check_timeout) {
-      window.clearTimeout(this.group_check_timeout);
-      this.group_check_timeout = undefined;
+    if (this.group_check_timeout_id) {
+      this.logger.debug(`Clear group check timeout with ID '${this.group_check_timeout_id}'`);
+      window.clearTimeout(this.group_check_timeout_id);
+      this.group_check_timeout_id = undefined;
     }
   }
 
@@ -399,7 +404,7 @@ z.calling.entities.Call = class Call {
    */
   _on_send_group_check_timeout(timeout_in_seconds) {
     if (this.participants().length) {
-      this.logger.info(`Sending group check after random timeout of '${timeout_in_seconds}s' (ID: ${this.group_check_timeout})`);
+      this.logger.info(`Sending group check after random timeout of '${timeout_in_seconds}s' (ID: ${this.group_check_timeout_id})`);
       const additional_payload = z.calling.CallMessageBuilder.create_payload(this.id, this.self_user.id);
 
       this.send_call_message(z.calling.CallMessageBuilder.build_group_check(true, this.session_id, additional_payload));
@@ -415,7 +420,7 @@ z.calling.entities.Call = class Call {
    * @returns {undefined} No return value
    */
   _on_verify_group_check_timeout() {
-    this.logger.info(`Removing on group check timeout (ID: ${this.group_check_timeout})`);
+    this.logger.info(`Removing on group check timeout (ID: ${this.group_check_timeout_id})`);
     const additional_payload = z.calling.CallMessageBuilder.create_payload(this.id, this.self_user.id, this.creating_user.id);
     const call_message_et = z.calling.CallMessageBuilder.build_group_leave(false, this.session_id, additional_payload);
 
@@ -432,10 +437,10 @@ z.calling.entities.Call = class Call {
     const minimum_timeout = Call.CONFIG.GROUP_CHECK_MINIMUM_TIMEOUT;
     const timeout_in_seconds = z.util.NumberUtil.get_random_number(minimum_timeout, maximum_timeout);
 
-    this.group_check_timeout = window.setTimeout(() => {
+    this.group_check_timeout_id = window.setTimeout(() => {
       this._on_send_group_check_timeout(timeout_in_seconds);
     }, timeout_in_seconds * 1000);
-    this.logger.debug(`Set sending group check after random timeout of '${timeout_in_seconds}s' (ID: ${this.group_check_timeout})`);
+    this.logger.debug(`Set sending group check after random timeout of '${timeout_in_seconds}s' (ID: ${this.group_check_timeout_id})`);
   }
 
   /**
@@ -446,10 +451,10 @@ z.calling.entities.Call = class Call {
   _set_verify_group_check_timeout() {
     const timeout_in_seconds = Call.CONFIG.GROUP_CHECK_ACTIVITY_TIMEOUT;
 
-    this.group_check_timeout = window.setTimeout(() => {
+    this.group_check_timeout_id = window.setTimeout(() => {
       this._on_verify_group_check_timeout();
     }, timeout_in_seconds * 1000);
-    this.logger.debug(`Set verifying group check after '${timeout_in_seconds}s' (ID: ${this.group_check_timeout})`);
+    this.logger.debug(`Set verifying group check after '${timeout_in_seconds}s' (ID: ${this.group_check_timeout_id})`);
   }
 
 
