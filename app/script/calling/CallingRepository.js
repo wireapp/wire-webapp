@@ -25,7 +25,12 @@ window.z.calling = z.calling || {};
 z.calling.CallingRepository = class CallingRepository {
   static get CONFIG() {
     return {
+      DATA_CHANNEL_MESSAGE_TYPES: [
+        z.calling.enum.CALL_MESSAGE_TYPE.HANGUP,
+        z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC,
+      ],
       DEFAULT_UPDATE_INTERVAL: 30 * 60, // 30 minutes in seconds
+      MESSAGE_LOG_LENGTH: 250,
       PROTOCOL_VERSION: '3.0',
     };
   }
@@ -76,6 +81,7 @@ z.calling.CallingRepository = class CallingRepository {
 
     // Telemetry
     this.telemetry = new z.telemetry.calling.CallTelemetry();
+    this.message_log = [];
 
     // Media Handler
     this.media_devices_handler = this.media_repository.devices_handler;
@@ -141,14 +147,18 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {undefined} No return value
    */
   on_event(event, source) {
-    const {type: event_type, content: event_content} = event;
+    const {content: event_content, time: event_date, type: event_type} = event;
+    const is_call = event_type === z.event.Client.CALL.E_CALL;
 
-    if (event_type === z.event.Client.CALL.E_CALL) {
-      if (event_content.version !== z.calling.entities.CallMessage.CONFIG.VERSION) {
+    if (is_call) {
+      const is_supported_version = event_content.version === z.calling.entities.CallMessage.CONFIG.VERSION;
+
+      if (!is_supported_version) {
         throw new z.calling.CallError(z.calling.CallError.TYPE.UNSUPPORTED_VERSION);
       }
       const call_message_et = z.calling.CallMessageMapper.map_event(event);
 
+      this._log_message(false, call_message_et, event_date);
       if (z.calling.CallingRepository.supports_calling) {
         return this._on_event_in_supported_browsers(call_message_et, source);
       }
@@ -165,13 +175,11 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {undefined} No return value
    */
   _on_event_in_supported_browsers(call_message_et, source) {
-    const {conversation_id, response, type, user_id} = call_message_et;
-
-    this.logger.info(`Received '${type}' message (response: ${response}) from user '${user_id}' in conversation '${conversation_id}'`, call_message_et);
+    const {type: message_type} = call_message_et;
 
     this._validate_message_type(call_message_et)
       .then(() => {
-        switch (type) {
+        switch (message_type) {
           case z.calling.enum.CALL_MESSAGE_TYPE.CANCEL:
             this._on_cancel(call_message_et, source);
             break;
@@ -203,7 +211,7 @@ z.calling.CallingRepository = class CallingRepository {
             this._on_update(call_message_et);
             break;
           default:
-            this.logger.warn(`call event of unknown type '${type}' was ignored`, call_message_et);
+            this.logger.warn(`Call event of unknown type '${message_type}' was ignored`, call_message_et);
         }
       });
   }
@@ -595,24 +603,17 @@ z.calling.CallingRepository = class CallingRepository {
       throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_PAYLOAD_FORMAT);
     }
 
-    const {conversation_id, remote_user_id, response, type} = call_message_et;
+    const {conversation_id, remote_user_id, type} = call_message_et;
 
     return this.get_call_by_id(conversation_id || conversation_et.id)
       .then((call_et) => {
-        const data_channel_message_types = [
-          z.calling.enum.CALL_MESSAGE_TYPE.HANGUP,
-          z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC,
-        ];
-
-        if (data_channel_message_types.includes(type)) {
-          return call_et.get_participant_by_id(remote_user_id)
-            .then((participant_et) => {
-              const {flow_et} = participant_et;
-              flow_et.send_message(call_message_et);
-            });
+        if (!CallingRepository.CONFIG.DATA_CHANNEL_MESSAGE_TYPES.includes(type)) {
+          throw new z.calling.CallError(z.calling.CallError.TYPE.NO_DATA_CHANNEL);
         }
-        throw new z.calling.CallError(z.calling.CallError.TYPE.NO_DATA_CHANNEL);
+
+        return call_et.get_participant_by_id(remote_user_id);
       })
+      .then(({flow_et}) => flow_et.send_message(call_message_et))
       .catch((error) => {
         const expected_error_types = [
           z.calling.CallError.TYPE.NO_DATA_CHANNEL,
@@ -623,8 +624,6 @@ z.calling.CallingRepository = class CallingRepository {
           throw error;
         }
 
-        this.logger.info(`Sending '${type}' message (response: ${response}) to conversation '${conversation_id}'`, call_message_et.to_JSON());
-
         return this._limit_message_recipients(call_message_et)
           .then(({precondition_option, recipients}) => {
             if (type === z.calling.enum.CALL_MESSAGE_TYPE.HANGUP) {
@@ -633,7 +632,8 @@ z.calling.CallingRepository = class CallingRepository {
 
             return this.conversation_repository.send_e_call(conversation_et, call_message_et, recipients, precondition_option);
           });
-      });
+      })
+      .then(() => this._log_message(true, call_message_et));
   }
 
   /**
@@ -1251,26 +1251,14 @@ z.calling.CallingRepository = class CallingRepository {
   //##############################################################################
 
   /**
-   * Set logging on adapter.js.
-   * @param {boolean} is_logging_enabled - New logging state
+   * Print the call message log.
    * @returns {undefined} No return value
    */
-  set_logging(is_logging_enabled) {
-    if (adapter) {
-      this.logger.debug(`Set logging for WebRTC Adapter: ${is_logging_enabled}`);
-      adapter.disableLog = !is_logging_enabled;
-    }
-  }
-
-  /**
-   * Store last flow status.
-   * @param {Object} flow_status - Status to store
-   * @returns {undefined} No return value
-   */
-  store_flow_status(flow_status) {
-    if (flow_status) {
-      this.flow_status = flow_status;
-    }
+  print_log() {
+    this.logger.force_log(`Call message log contains '${this.message_log.length}' events`, this.message_log);
+    this.message_log.forEach(({date, log, message}) => {
+      this.logger.force_log(`${date} - ${log}`, message);
+    });
   }
 
   /**
@@ -1298,6 +1286,66 @@ z.calling.CallingRepository = class CallingRepository {
 
         this.logger.warn('Could not find flows to report for call analysis');
       });
+  }
+
+  /**
+   * Set logging on adapter.js.
+   * @param {boolean} is_logging_enabled - New logging state
+   * @returns {undefined} No return value
+   */
+  set_logging(is_logging_enabled) {
+    if (adapter) {
+      this.logger.debug(`Set logging for WebRTC Adapter: ${is_logging_enabled}`);
+      adapter.disableLog = !is_logging_enabled;
+    }
+  }
+
+  /**
+   * Store last flow status.
+   * @param {Object} flow_status - Status to store
+   * @returns {undefined} No return value
+   */
+  store_flow_status(flow_status) {
+    if (flow_status) {
+      this.flow_status = flow_status;
+    }
+  }
+
+  /**
+   * Log call messages for debugging.
+   *
+   * @private
+   * @param {boolean} is_outgoing - Is message outgoing
+   * @param {CallMessage} call_message_et - Call message to be logged in the sequence
+   * @param {string} [date] - Date of message as ISO string
+   * @returns {undefined} No return value
+   */
+  _log_message(is_outgoing, call_message_et, date = new Date().toISOString()) {
+    while (this.message_log.length >= CallingRepository.CONFIG.MESSAGE_LOG_LENGTH) {
+      this.message_log.shift();
+    }
+
+    const {conversation_id, remote_user_id, response, type, user_id} = call_message_et;
+
+    let log_message;
+    if (is_outgoing) {
+      if (remote_user_id) {
+        log_message = `Sending '${type}' message (response: ${response}) to user '${remote_user_id}' in conversation '${conversation_id}'`;
+      } else {
+        log_message = `Sending '${type}' message (response: ${response}) to conversation '${conversation_id}'`;
+      }
+    } else {
+      log_message = `Received '${type}' message (response: ${response}) from user '${user_id}' in conversation '${conversation_id}'`;
+    }
+
+    const log_entry = {
+      date: date,
+      log: log_message,
+      message: call_message_et,
+    };
+
+    this.message_log.push(log_entry);
+    this.logger.info(log_message, call_message_et);
   }
 
   /**

@@ -703,6 +703,14 @@ z.main.App = class App {
   }
 
   /**
+   * Print call log to console.
+   * @returns {undefined} No return value
+   */
+  print_call_log() {
+    this.repository.calling.print_log();
+  }
+
+  /**
    * Report call telemetry to Raygun for analysis.
    * @returns {undefined} No return value
    */
