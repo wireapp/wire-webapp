@@ -655,9 +655,9 @@ z.calling.entities.Flow = class Flow {
     const {conversation_et} = this.call_et;
 
     if (response === true) {
-      this.logger.debug(`Received confirmation for call '${type}' message via data channel`, call_message);
+      this.logger.debug(`Received confirmation for '${type}' message via data channel`, call_message);
     } else {
-      this.logger.debug(`Received call '${type}' (response: ${response}) message via data channel`, call_message);
+      this.logger.debug(`Received '${type}' (response: ${response}) message via data channel`, call_message);
     }
 
     const call_event = z.conversation.EventBuilder.build_calling(conversation_et, call_message, this.remote_user_id, this.remote_client_id);
@@ -884,7 +884,7 @@ z.calling.entities.Flow = class Flow {
    * @returns {Object} Additional payload
    */
   _create_additional_payload() {
-    const payload = z.calling.CallMessageBuilder.create_payload(this.id, this.self_user_id, this.remote_user_id, this.remote_client_id);
+    const payload = z.calling.CallMessageBuilder.create_payload(this.conversation_id, this.self_user_id, this.remote_user_id, this.remote_client_id);
     const additional_payload = Object.assign({remote_user: this.remote_user, sdp: this.local_sdp().sdp}, payload);
 
     return z.calling.CallMessageBuilder.create_payload_prop_sync(this.call_et.self_state, this.call_et.self_state.video_send(), false, additional_payload);

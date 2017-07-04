@@ -167,7 +167,7 @@ z.calling.CallingRepository = class CallingRepository {
   _on_event_in_supported_browsers(call_message_et, source) {
     const {conversation_id, response, type, user_id} = call_message_et;
 
-    this.logger.info(`Received call '${type}' message (response: ${response}) from user '${user_id}' in conversation '${conversation_id}'`, call_message_et);
+    this.logger.info(`Received '${type}' message (response: ${response}) from user '${user_id}' in conversation '${conversation_id}'`, call_message_et);
 
     this._validate_message_type(call_message_et)
       .then(() => {
@@ -623,7 +623,7 @@ z.calling.CallingRepository = class CallingRepository {
           throw error;
         }
 
-        this.logger.info(`Sending call '${type}' message (response: ${response}) to conversation '${conversation_id}'`, call_message_et.to_JSON());
+        this.logger.info(`Sending '${type}' message (response: ${response}) to conversation '${conversation_id}'`, call_message_et.to_JSON());
 
         return this._limit_message_recipients(call_message_et)
           .then(({precondition_option, recipients}) => {
