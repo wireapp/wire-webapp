@@ -204,8 +204,9 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     };
 
     if (_.isString(media_device_id)) {
-      media_stream_constraints.deviceId =
-        {exact: media_device_id};
+      media_stream_constraints.deviceId = {
+        exact: media_device_id,
+      };
     }
 
     return media_stream_constraints;

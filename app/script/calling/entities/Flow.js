@@ -690,8 +690,6 @@ z.calling.entities.Flow = class Flow {
     return z.calling.SDPMapper.map_call_message_to_object(call_message_et)
       .then((rtc_sdp) => z.calling.SDPMapper.rewrite_sdp(rtc_sdp, z.calling.enum.SDP_SOURCE.REMOTE, this))
       .then(({sdp: remote_sdp}) => {
-        const {type} = call_message_et;
-
         const is_remote_offer = remote_sdp.type === z.calling.rtc.SDP_TYPE.OFFER;
         if (is_remote_offer) {
           switch (this.signaling_state()) {
@@ -711,11 +709,6 @@ z.calling.entities.Flow = class Flow {
             default: {
               break;
             }
-          }
-
-          const is_update = type === z.calling.enum.CALL_MESSAGE_TYPE.UPDATE;
-          if (is_update) {
-            this.restart_negotiation(z.calling.enum.SDP_NEGOTIATION_MODE.STREAM_CHANGE, true);
           }
         }
 
