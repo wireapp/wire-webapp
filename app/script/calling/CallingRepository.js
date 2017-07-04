@@ -1325,7 +1325,7 @@ z.calling.CallingRepository = class CallingRepository {
       this.message_log.shift();
     }
 
-    const {conversation_id, remote_user_id, response, type, user_id} = call_message_et;
+    const {conversation_id, dest_user_id, remote_user_id, response, type, user_id} = call_message_et;
 
     let log_message;
     if (is_outgoing) {
@@ -1335,6 +1335,10 @@ z.calling.CallingRepository = class CallingRepository {
         log_message = `Sending '${type}' message (response: ${response}) to conversation '${conversation_id}'`;
       }
     } else {
+      if (dest_user_id && dest_user_id !== this.self_user_id()) {
+        return;
+      }
+
       log_message = `Received '${type}' message (response: ${response}) from user '${user_id}' in conversation '${conversation_id}'`;
     }
 
