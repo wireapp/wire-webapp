@@ -160,12 +160,12 @@ z.user.UserRepository = class UserRepository {
   /**
    * Event to update the matching user.
    * @param {Object} user - Update user info
-   * @returns {z.entity.User} Updated user entity
+   * @returns {Promise} Resolves wit the updated user entity
    */
   user_update({user}) {
     const is_self_user = user.id === this.self().id;
-    return is_self_user ? Promise.resolve(this.self()) : this.get_user_by_id(user.id)
-      .then((user_et) => this.user_mapper.update_user_from_object(user_et, user));
+    const user_promise = is_self_user ? Promise.resolve(this.self()) : this.get_user_by_id(user.id);
+    return user_promise.then((user_et) => this.user_mapper.update_user_from_object(user_et, user));
   }
 
   /**
@@ -923,9 +923,7 @@ z.user.UserRepository = class UserRepository {
           {key: medium_key, size: 'complete', type: 'image'},
         ];
         return this.user_service.update_own_user_profile({assets})
-          .then(() => {
-            return this.user_update({user: {assets: assets, id: this.self().id}});
-          });
+          .then(() => this.user_update({user: {assets: assets, id: this.self().id}}));
       })
       .catch((error) => {
         throw new Error(`Error during profile image upload: ${error.message}`);
