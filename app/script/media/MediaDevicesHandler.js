@@ -230,9 +230,10 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
         this.logger.info(`Found '${screen_sources.length}' possible sources for screen sharing on Electron`, screen_sources);
         this.available_devices.screen_input(screen_sources);
         if (screen_sources.length === 1) {
+          const [first_screen_source] = screen_sources;
           this.current_device_id.screen_input('');
-          this.logger.info(`Selected '${screen_sources[0].name}' for screen sharing`, screen_sources[0]);
-          this.current_device_id.screen_input(screen_sources[0].id);
+          this.logger.info(`Selected '${first_screen_source.name}' for screen sharing`, first_screen_source);
+          this.current_device_id.screen_input(first_screen_source.id);
         }
         return resolve(screen_sources);
       });
@@ -251,7 +252,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
 
         this.current_device_id.video_input(next_device.deviceId);
 
-        const current_device_name = current_device ? (current_device.name || current_device.id) : undefined;
+        const current_device_name = current_device ? (current_device.label || current_device.deviceId) : undefined;
         this.logger.info(`Switching the active camera from '${current_device_name}' to '${next_device.label || next_device.deviceId}'`);
       });
   }

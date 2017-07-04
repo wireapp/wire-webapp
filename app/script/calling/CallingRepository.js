@@ -504,7 +504,7 @@ z.calling.CallingRepository = class CallingRepository {
         this._validate_message_destination(call_et, call_message_et);
         return call_et.verify_session_id(call_message_et);
       })
-      .then((call_et) => call_et.add_or_update_participant(user_id, true, call_message_et))
+      .then((call_et) => call_et.add_or_update_participant(user_id, false, call_message_et))
       .catch(this._throw_message_error);
   }
 
