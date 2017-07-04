@@ -40,7 +40,7 @@ z.ViewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
 
     this.is_visible = false;
 
-    this.media_stream.subscribe((media_stream) => {
+    this.media_stream.subscribe(media_stream => {
       if (this.audio_interval) {
         this._release_audio_meter();
       }
@@ -64,12 +64,11 @@ z.ViewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
   initiate_devices() {
     this.is_visible = true;
 
-    this._get_media_stream()
-      .then((media_stream) => {
-        if (media_stream && !this.audio_interval) {
-          this._initiate_audio_meter(media_stream);
-        }
-      });
+    this._get_media_stream().then(media_stream => {
+      if (media_stream && !this.audio_interval) {
+        this._initiate_audio_meter(media_stream);
+      }
+    });
   }
 
   /**
@@ -88,15 +87,19 @@ z.ViewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
    * @returns {Promise} Resolves with a MediaStream
    */
   _get_media_stream() {
-    if (this.media_stream() && (this.media_stream_handler.local_media_type() === z.media.MediaType.VIDEO)) {
+    if (this.media_stream() && this.media_stream_handler.local_media_type() === z.media.MediaType.VIDEO) {
       return Promise.resolve(this.media_stream());
     }
 
-    return this.media_stream_handler.get_media_stream_constraints(this.available_devices.audio_input().length, this.available_devices.video_input().length)
+    return this.media_stream_handler
+      .get_media_stream_constraints(
+        this.available_devices.audio_input().length,
+        this.available_devices.video_input().length
+      )
       .then(({media_stream_constraints, media_type}) => {
         return this.media_stream_handler.request_media_stream(media_type, media_stream_constraints);
       })
-      .then((media_stream_info) => {
+      .then(media_stream_info => {
         if (this.available_devices.video_input().length) {
           this.media_stream_handler.local_media_type(z.media.MediaType.VIDEO);
         }
@@ -104,9 +107,13 @@ z.ViewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
         this.media_stream_handler.local_media_stream(media_stream_info.stream);
         return this.media_stream_handler.local_media_stream();
       })
-      .catch((error) => {
+      .catch(error => {
         this.logger.error(`Requesting MediaStream failed: ${error.message}`, error);
-        if ([z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE, z.media.MediaError.TYPE.MEDIA_STREAM_PERMISSION].includes(error.type)) {
+        if (
+          [z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE, z.media.MediaError.TYPE.MEDIA_STREAM_PERMISSION].includes(
+            error.type
+          )
+        ) {
           this.permission_denied(true);
           return false;
         }

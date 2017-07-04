@@ -45,9 +45,9 @@ z.conversation.EventMapper = class EventMapper {
   map_json_events(events, conversation_et, should_create_dummy_image) {
     return events
       .reverse()
-      .filter((event) => event)
-      .map((event) => this.map_json_event(event, conversation_et, should_create_dummy_image))
-      .filter((message_et) => message_et);
+      .filter(event => event)
+      .map(event => this.map_json_event(event, conversation_et, should_create_dummy_image))
+      .filter(message_et => message_et);
   }
 
   /**
@@ -159,11 +159,9 @@ z.conversation.EventMapper = class EventMapper {
     return message_et;
   }
 
-
   //##############################################################################
   // Event mappers
   //##############################################################################
-
 
   /**
    * Maps JSON data of conversation.asset_add message into message entity
@@ -235,7 +233,6 @@ z.conversation.EventMapper = class EventMapper {
     const message_et = new z.entity.ContentMessage();
     const asset_et = new z.entity.Location();
 
-
     asset_et.longitude = location.longitude;
     asset_et.latitude = location.latitude;
     asset_et.name = location.name;
@@ -259,8 +256,12 @@ z.conversation.EventMapper = class EventMapper {
     const {data: event_data, from} = event;
     const message_et = new z.entity.MemberMessage();
 
-    if ([z.conversation.ConversationType.CONNECT, z.conversation.ConversationType.ONE2ONE].includes(conversation_et.type())) {
-      if ((from === conversation_et.creator) && (event_data.user_ids.length === 1)) {
+    if (
+      [z.conversation.ConversationType.CONNECT, z.conversation.ConversationType.ONE2ONE].includes(
+        conversation_et.type()
+      )
+    ) {
+      if (from === conversation_et.creator && event_data.user_ids.length === 1) {
         message_et.member_message_type = z.message.SystemMessageType.CONNECTION_ACCEPTED;
         event_data.user_ids = conversation_et.participating_user_ids();
       } else {
@@ -269,7 +270,7 @@ z.conversation.EventMapper = class EventMapper {
     } else {
       const creator_index = event_data.user_ids.indexOf(event.from);
 
-      if ((from === conversation_et.creator) && (creator_index !== -1)) {
+      if (from === conversation_et.creator && creator_index !== -1) {
         event_data.user_ids.splice(creator_index, 1);
         message_et.member_message_type = z.message.SystemMessageType.CONVERSATION_CREATE;
       }
@@ -347,7 +348,6 @@ z.conversation.EventMapper = class EventMapper {
     message_et.nonce = event_data.nonce;
     return message_et;
   }
-
 
   /**
    * Maps JSON data of conversation.rename message into message entity
@@ -452,7 +452,6 @@ z.conversation.EventMapper = class EventMapper {
     asset_et.file_name = info.name;
     asset_et.meta = meta;
 
-
     // remote data - full
     const {key, otr_key, sha256, token} = event_data;
     if (key) {
@@ -465,9 +464,13 @@ z.conversation.EventMapper = class EventMapper {
     const {preview_id, preview_key, preview_otr_key, preview_sha256, preview_token} = event_data;
     if (preview_otr_key) {
       if (preview_key) {
-        asset_et.preview_resource(z.assets.AssetRemoteData.v3(preview_key, preview_otr_key, preview_sha256, preview_token, true));
+        asset_et.preview_resource(
+          z.assets.AssetRemoteData.v3(preview_key, preview_otr_key, preview_sha256, preview_token, true)
+        );
       } else {
-        asset_et.preview_resource(z.assets.AssetRemoteData.v2(conversation_id, preview_id, preview_otr_key, preview_sha256, true));
+        asset_et.preview_resource(
+          z.assets.AssetRemoteData.v2(conversation_id, preview_id, preview_otr_key, preview_sha256, true)
+        );
       }
     }
 
@@ -487,7 +490,13 @@ z.conversation.EventMapper = class EventMapper {
     if (link_preview) {
       const link_preview_et = new z.entity.LinkPreview();
       const {image, permanent_url, summary, title, url, url_offset, meta_data} = link_preview;
-      const {image: article_image, title: article_title, summary: article_summary, permanent_url: article_permanent_url} = link_preview.article || {};
+      const {
+        image: article_image,
+        title: article_title,
+        summary: article_summary,
+        permanent_url: article_permanent_url,
+      } =
+        link_preview.article || {};
 
       link_preview_et.title = title || article_title;
       link_preview_et.summary = summary || article_summary;
@@ -510,7 +519,6 @@ z.conversation.EventMapper = class EventMapper {
       }
 
       return link_preview_et;
-
     }
   }
 
@@ -523,9 +531,9 @@ z.conversation.EventMapper = class EventMapper {
    */
   _map_asset_link_previews(link_previews = []) {
     return link_previews
-      .map((encoded_link_preview) => z.proto.LinkPreview.decode64(encoded_link_preview))
-      .map((link_preview) => this._map_asset_link_preview(link_preview))
-      .filter((link_preview_et) => link_preview_et);
+      .map(encoded_link_preview => z.proto.LinkPreview.decode64(encoded_link_preview))
+      .map(link_preview => this._map_asset_link_preview(link_preview))
+      .filter(link_preview_et => link_preview_et);
   }
 
   /**
@@ -537,7 +545,7 @@ z.conversation.EventMapper = class EventMapper {
    */
   _map_asset_text(event_data) {
     const {id, content, message, nonce, previews} = event_data;
-    const asset_et = new z.entity.Text(id, (content || message));
+    const asset_et = new z.entity.Text(id, content || message);
 
     asset_et.nonce = nonce;
     asset_et.previews(this._map_asset_link_previews(previews));

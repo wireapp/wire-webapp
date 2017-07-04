@@ -75,14 +75,13 @@ z.components.AudioAssetComponent = class AudioAssetComponent {
     Promise.resolve()
       .then(() => {
         if (!this.audio_src()) {
-          return this.asset.load()
-            .then((blob) => this.audio_src(window.URL.createObjectURL(blob)));
+          return this.asset.load().then(blob => this.audio_src(window.URL.createObjectURL(blob)));
         }
       })
       .then(() => {
         this.audio_element.play();
       })
-      .catch((error) => {
+      .catch(error => {
         this.logger.error('Failed to load audio asset ', error);
       });
   }

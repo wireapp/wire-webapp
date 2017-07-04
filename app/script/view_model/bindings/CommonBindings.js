@@ -50,14 +50,17 @@ ko.bindingHandlers.drop_file = {
       }
     };
 
-    ko.applyBindingsToNode(element, {
-      event: {
-        dragleave: fileDragLeave,
-        dragover: fileDragOver,
-        drop: fileSelectHandler,
+    ko.applyBindingsToNode(
+      element,
+      {
+        event: {
+          dragleave: fileDragLeave,
+          dragover: fileDragOver,
+          drop: fileSelectHandler,
+        },
       },
-    },
-    context);
+      context
+    );
   },
 };
 
@@ -66,15 +69,14 @@ ko.bindingHandlers.drop_file = {
  */
 ko.bindingHandlers.paste_file = {
   init(element, valueAccessor, allBindings, data, context) {
-
     const on_paste = function(_data, event) {
       const clipboard_data = event.originalEvent.clipboardData;
       const items = [].slice.call(clipboard_data.items || clipboard_data.files);
 
       const files = items
-        .filter((item) => item.kind === 'file')
-        .map((item) => new File([item.getAsFile()], null, {type: item.type}))
-        .filter((item) => item && item.size !== 4); // Pasted files result in 4 byte blob (OSX)
+        .filter(item => item.kind === 'file')
+        .map(item => new File([item.getAsFile()], null, {type: item.type}))
+        .filter(item => item && item.size !== 4); // Pasted files result in 4 byte blob (OSX)
 
       if (files.length > 0) {
         valueAccessor()(files);
@@ -83,12 +85,15 @@ ko.bindingHandlers.paste_file = {
       return true;
     };
 
-    return ko.applyBindingsToNode(window, {
-      event: {
-        paste: on_paste,
+    return ko.applyBindingsToNode(
+      window,
+      {
+        event: {
+          paste: on_paste,
+        },
       },
-    },
-    context);
+      context
+    );
   },
 };
 
@@ -98,20 +103,22 @@ ko.bindingHandlers.paste_file = {
  */
 ko.bindingHandlers.ignore_drop_file = {
   init(element, valueAccessor, allBindings, data, context) {
-    return ko.applyBindingsToNode(element, {
-      event: {
-        dragover(_data, event) {
-          event.preventDefault();
-        },
-        drop(_data, event) {
-          event.preventDefault();
+    return ko.applyBindingsToNode(
+      element,
+      {
+        event: {
+          dragover(_data, event) {
+            event.preventDefault();
+          },
+          drop(_data, event) {
+            event.preventDefault();
+          },
         },
       },
-    },
-    context);
+      context
+    );
   },
 };
-
 
 /**
  * Indicate that the current binding loop should not try to bind this element’s children.
@@ -148,13 +155,12 @@ ko.bindingHandlers.resize = (function() {
       const max_height = window.parseInt(getComputedStyle(element).maxHeight, 10);
 
       if (current_height === max_height) {
-        return element.style.overflowY = 'scroll';
+        return (element.style.overflowY = 'scroll');
       }
 
       element.style.overflowY = 'hidden';
     }
-  },
-  100);
+  }, 100);
 
   return {
     init(element, valueAccessor, allBindings, data, context) {
@@ -163,17 +169,20 @@ ko.bindingHandlers.resize = (function() {
       resize_callback = allBindings.get('resize_callback');
 
       if (!resize_observable) {
-        return ko.applyBindingsToNode(element, {
-          event: {
-            focus() {
-              resize_textarea(element);
-            },
-            input() {
-              resize_textarea(element);
+        return ko.applyBindingsToNode(
+          element,
+          {
+            event: {
+              focus() {
+                resize_textarea(element);
+              },
+              input() {
+                resize_textarea(element);
+              },
             },
           },
-        },
-        context);
+          context
+        );
       }
     },
 
@@ -191,7 +200,7 @@ ko.bindingHandlers.resize = (function() {
 ko.bindingHandlers.enter = {
   init(element, valueAccessor, allBindings, data, context) {
     const wrapper = function(_data, event) {
-      if ((event.keyCode === z.util.KEYCODE.ENTER) && !event.shiftKey && !event.altKey) {
+      if (event.keyCode === z.util.KEYCODE.ENTER && !event.shiftKey && !event.altKey) {
         const callback = valueAccessor();
         if (typeof callback === 'function') {
           callback.call(this, data, event);
@@ -201,12 +210,15 @@ ko.bindingHandlers.enter = {
       return true;
     };
 
-    return ko.applyBindingsToNode(element, {
-      event: {
-        keypress: wrapper,
+    return ko.applyBindingsToNode(
+      element,
+      {
+        event: {
+          keypress: wrapper,
+        },
       },
-    },
-    context);
+      context
+    );
   },
 };
 
@@ -227,15 +239,18 @@ ko.bindingHandlers.file_select = {
       }
     };
 
-    return ko.applyBindingsToNode(element, {
-      event: {
-        change: wrapper,
-        focus(_data, event) {
-          return $(event.target).blur();
+    return ko.applyBindingsToNode(
+      element,
+      {
+        event: {
+          change: wrapper,
+          focus(_data, event) {
+            return $(event.target).blur();
+          },
         },
       },
-    }
-    , context);
+      context
+    );
   },
 };
 
@@ -246,7 +261,7 @@ ko.bindingHandlers.load_image = {
   init(element, valueAccessor) {
     const image_src = z.util.strip_url_wrapper(ko.unwrap(valueAccessor()));
     const image = new Image();
-    image.onload = () => element.style.backgroundImage = `url(${image_src})`;
+    image.onload = () => (element.style.backgroundImage = `url(${image_src})`);
     image.src = image_src;
   },
 };
@@ -302,12 +317,14 @@ ko.subscribable.fn.trimmed = function() {
  * @returns {undefined} No return value
  */
 ko.subscribable.fn.subscribe_once = function(handler, owner, event_name) {
-  const subscription = this.subscribe(function(new_value) {
-    subscription.dispose();
-    handler(new_value);
-  },
-  owner,
-  event_name);
+  const subscription = this.subscribe(
+    function(new_value) {
+      subscription.dispose();
+      handler(new_value);
+    },
+    owner,
+    event_name
+  );
 };
 
 /**
@@ -333,9 +350,12 @@ ko.bindingHandlers.antiscroll = {
       }
 
       const resize_event = `resize.${Date.now()}`;
-      $(window).on(resize_event, _.throttle(() => {
-        antiscroll.rebuild();
-      }, 100));
+      $(window).on(
+        resize_event,
+        _.throttle(() => {
+          antiscroll.rebuild();
+        }, 100)
+      );
 
       ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
         antiscroll.destroy();
@@ -348,7 +368,6 @@ ko.bindingHandlers.antiscroll = {
   },
 };
 
-
 ko.bindingHandlers.electron_remove = {
   init(element) {
     if (z.util.Environment.electron) {
@@ -356,7 +375,6 @@ ko.bindingHandlers.electron_remove = {
     }
   },
 };
-
 
 ko.bindingHandlers.visibility = (function() {
   const setVisibility = function(element, valueAccessor) {
@@ -369,15 +387,13 @@ ko.bindingHandlers.visibility = (function() {
   };
 })();
 
-
 ko.bindingHandlers.relative_timestamp = (function() {
   const timestamps = [];
 
   // should be fine to fire all 60 sec
   window.setInterval(function() {
-    timestamps.map((timestamp_func) => timestamp_func());
-  },
-  60 * 1000);
+    timestamps.map(timestamp_func => timestamp_func());
+  }, 60 * 1000);
 
   const calculate = function(element, timestamp) {
     timestamp = window.parseInt(timestamp);
@@ -452,8 +468,7 @@ ko.bindingHandlers.hide_controls = {
 
       hide_timeout = window.setTimeout(function() {
         element.classList.add('hide-controls');
-      },
-      timeout);
+      }, timeout);
     };
   },
 };
@@ -485,8 +500,8 @@ ko.bindingHandlers.in_viewport = (function() {
   const listeners = [];
 
   // listeners can be deleted during iteration
-  const notify_listeners = _.throttle((event) => {
-    for (let index = listeners.length; index--;) {
+  const notify_listeners = _.throttle(event => {
+    for (let index = listeners.length; index--; ) {
       listeners[index](event);
     }
   }, 300);
@@ -495,10 +510,14 @@ ko.bindingHandlers.in_viewport = (function() {
 
   return {
     init(element, valueAccessor, allBindingsAccessor) {
-
       function _in_view(dom_element) {
         const box = dom_element.getBoundingClientRect();
-        return (box.right >= 0) && (box.bottom >= 0) && (box.left <= document.documentElement.clientWidth) && (box.top <= document.documentElement.clientHeight);
+        return (
+          box.right >= 0 &&
+          box.bottom >= 0 &&
+          box.left <= document.documentElement.clientWidth &&
+          box.top <= document.documentElement.clientHeight
+        );
       }
 
       function _dispose() {
@@ -515,7 +534,6 @@ ko.bindingHandlers.in_viewport = (function() {
           if (dispose) {
             _dispose();
           }
-
         }
       }
 

@@ -48,7 +48,11 @@ describe('z.conversation.EventBuilder', function() {
 
   it('build_degraded', function() {
     const user_ids = [z.util.create_random_uuid()];
-    const event = z.conversation.EventBuilder.build_degraded(conversation_et, user_ids, z.message.VerificationMessageType.NEW_DEVICE);
+    const event = z.conversation.EventBuilder.build_degraded(
+      conversation_et,
+      user_ids,
+      z.message.VerificationMessageType.NEW_DEVICE
+    );
     const message_et = event_mapper.map_json_event(event, conversation_et);
     expect(message_et).toBeDefined();
     expect(message_et.super_type).toBe(z.message.SuperType.VERIFICATION);

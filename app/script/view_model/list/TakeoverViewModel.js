@@ -52,7 +52,8 @@ z.ViewModel.list.TakeoverViewModel = class TakeoverViewModel {
   }
 
   keep_username() {
-    this.user_repository.change_username(this.username())
+    this.user_repository
+      .change_username(this.username())
       .then(() => {
         const conversation_et = this.conversation_repository.get_most_recent_conversation();
         if (conversation_et) {
@@ -61,11 +62,15 @@ z.ViewModel.list.TakeoverViewModel = class TakeoverViewModel {
           amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS);
         }
 
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.KEPT_GENERATED_USERNAME, {outcome: 'success'});
+        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.KEPT_GENERATED_USERNAME, {
+          outcome: 'success',
+        });
       })
       .catch(function() {
         amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT);
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.KEPT_GENERATED_USERNAME, {outcome: 'fail'});
+        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.KEPT_GENERATED_USERNAME, {
+          outcome: 'fail',
+        });
       })
       .then(() => amplify.publish(z.event.WebApp.TAKEOVER.DISMISS));
   }

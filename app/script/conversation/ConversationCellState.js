@@ -24,7 +24,7 @@ window.z.conversation = z.conversation || {};
 
 z.conversation.ConversationCellState = (() => {
   function is_alert(message_et) {
-    return message_et.is_ping() || message_et.is_call() && message_et.was_missed();
+    return message_et.is_ping() || (message_et.is_call() && message_et.was_missed());
   }
 
   function generate_activity_string(activities) {
@@ -67,9 +67,9 @@ z.conversation.ConversationCellState = (() => {
   function accumulate_activity(conversation_et) {
     const unread_events = conversation_et.unread_events();
     const activities = {
-      'call': 0,
-      'message': 0,
-      'ping': 0,
+      call: 0,
+      message: 0,
+      ping: 0,
     };
 
     for (const message_et of unread_events) {
@@ -213,7 +213,9 @@ z.conversation.ConversationCellState = (() => {
     },
     match(conversation_et) {
       const last_message_et = conversation_et.get_last_message();
-      const expected_message_type = last_message_et ? (last_message_et.is_member() || last_message_et.is_system()) : false;
+      const expected_message_type = last_message_et
+        ? last_message_et.is_member() || last_message_et.is_system()
+        : false;
       return conversation_et.is_group() && conversation_et.unread_event_count() > 0 && expected_message_type;
     },
   };
@@ -280,9 +282,17 @@ z.conversation.ConversationCellState = (() => {
   };
 
   function _generate(conversation_et) {
-    const states = [empty_state, removed_state, muted_state, alert_state, group_activity_state, unread_message_state, user_name_state];
-    const icon_state = states.find((state) => state.match(conversation_et));
-    const description_state = states.find((state) => state.match(conversation_et));
+    const states = [
+      empty_state,
+      removed_state,
+      muted_state,
+      alert_state,
+      group_activity_state,
+      unread_message_state,
+      user_name_state,
+    ];
+    const icon_state = states.find(state => state.match(conversation_et));
+    const description_state = states.find(state => state.match(conversation_et));
 
     return {
       description: (description_state || default_state).description(conversation_et),

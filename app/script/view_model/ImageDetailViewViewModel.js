@@ -40,12 +40,11 @@ z.ViewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
     this.conversation_et = ko.observable();
     this.items = ko.observableArray();
     this.message_et = ko.observable();
-    this.message_et.subscribe((message_et) => {
+    this.message_et.subscribe(message_et => {
       if (message_et) {
-        this.conversation_repository.get_conversation_by_id_async(message_et.conversation_id)
-          .then((conversation_et) => {
-            this.conversation_et(conversation_et);
-          });
+        this.conversation_repository.get_conversation_by_id_async(message_et.conversation_id).then(conversation_et => {
+          this.conversation_et(conversation_et);
+        });
       }
     });
 
@@ -81,7 +80,7 @@ z.ViewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
     this.image_modal.show();
 
     this._load_image();
-    $(document).on('keydown.lightbox', (event) => {
+    $(document).on('keydown.lightbox', event => {
       switch (event.keyCode) {
         case z.util.KEYCODE.ESC:
           this.click_on_close();
@@ -107,7 +106,7 @@ z.ViewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
   }
 
   message_removed(removed_message_id) {
-    this.items.remove((message_et) => message_et.id === removed_message_id);
+    this.items.remove(message_et => message_et.id === removed_message_id);
     if (this.message_et().id === removed_message_id) {
       this.image_modal.hide();
     }
@@ -115,14 +114,10 @@ z.ViewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
 
   _load_image() {
     this.image_visible(false);
-    this.message_et()
-      .get_first_asset()
-      .resource()
-      .load()
-      .then((blob) => {
-        this.image_src(window.URL.createObjectURL(blob));
-        this.image_visible(true);
-      });
+    this.message_et().get_first_asset().resource().load().then(blob => {
+      this.image_src(window.URL.createObjectURL(blob));
+      this.image_visible(true);
+    });
   }
 
   click_on_close() {

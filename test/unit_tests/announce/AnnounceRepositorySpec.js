@@ -26,50 +26,48 @@ describe('z.announce.AnnounceRepository', function() {
   const test_factory = new TestFactory();
 
   beforeAll(function(done) {
-    test_factory.exposeAnnounceActors()
-      .then(done)
-      .catch(done.fail);
+    test_factory.exposeAnnounceActors().then(done).catch(done.fail);
   });
 
   beforeEach(function() {
     server = sinon.fakeServer.create();
     server.autoRespond = true;
     const response = {
-      'count': 2,
-      'now': '2016-05-26T10:15:43.507250',
-      'result': [
+      count: 2,
+      now: '2016-05-26T10:15:43.507250',
+      result: [
         {
-          'active': true,
-          'created': '2016-05-25T09:12:53.316350',
-          'id': 5656058538229760,
-          'key': 'ag5lfndpcmUtd2Vic2l0ZXIVCxIIQW5ub3VuY2UYgICAgPyEhgoM',
-          'link': 'https://medium.com/@wireapp/safe-harbor-and-data-privacy-at-wire-86aa7b43d435',
-          'message': 'Safe Harbor and data privacy at Wire..',
-          'modified': '2016-05-25T12:56:17.363980',
-          'production': true,
-          'refresh': false,
-          'title': 'New Blog post',
-          'version': 1464166352,
-          'version_max': 'dev',
-          'version_min': '2016.04.14.0921',
+          active: true,
+          created: '2016-05-25T09:12:53.316350',
+          id: 5656058538229760,
+          key: 'ag5lfndpcmUtd2Vic2l0ZXIVCxIIQW5ub3VuY2UYgICAgPyEhgoM',
+          link: 'https://medium.com/@wireapp/safe-harbor-and-data-privacy-at-wire-86aa7b43d435',
+          message: 'Safe Harbor and data privacy at Wire..',
+          modified: '2016-05-25T12:56:17.363980',
+          production: true,
+          refresh: false,
+          title: 'New Blog post',
+          version: 1464166352,
+          version_max: 'dev',
+          version_min: '2016.04.14.0921',
         },
         {
-          'active': true,
-          'created': '2016-05-25T09:54:38.376540',
-          'id': 5746055551385600,
-          'key': 'ag5lfndpcmUtd2Vic2l0ZXIVCxIIQW5ub3VuY2UYgICAgJ3AmgoM',
-          'link': '',
-          'message': 'You heard it man..',
-          'modified': '2016-05-25T10:05:12.742010',
-          'production': true,
-          'refresh': true,
-          'title': 'Click me to refresh..',
-          'version': 1464166352,
-          'version_max': '2016.06.14.0921',
-          'version_min': 'dev',
+          active: true,
+          created: '2016-05-25T09:54:38.376540',
+          id: 5746055551385600,
+          key: 'ag5lfndpcmUtd2Vic2l0ZXIVCxIIQW5ub3VuY2UYgICAgJ3AmgoM',
+          link: '',
+          message: 'You heard it man..',
+          modified: '2016-05-25T10:05:12.742010',
+          production: true,
+          refresh: true,
+          title: 'Click me to refresh..',
+          version: 1464166352,
+          version_max: '2016.06.14.0921',
+          version_min: 'dev',
         },
       ],
-      'status': 'success',
+      status: 'success',
     };
 
     server.respondWith('GET', 'https://staging-website.zinfra.io/api/v1/announce/?order=created&active=true', [
@@ -84,8 +82,6 @@ describe('z.announce.AnnounceRepository', function() {
   });
 
   it('can fetch an announcement', function(done) {
-    TestFactory.announce_repository.check_announcements()
-      .then(done)
-      .catch(done.fail);
+    TestFactory.announce_repository.check_announcements().then(done).catch(done.fail);
   });
 });

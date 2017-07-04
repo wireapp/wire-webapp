@@ -271,7 +271,9 @@ describe('Conversation', function() {
       conversation_et.participating_user_ets.push(other_user);
       conversation_et.participating_user_ets.push(third_user);
       conversation_et.type(z.conversation.ConversationType.REGULAR);
-      const expected_display_name = `${conversation_et.participating_user_ets()[0].first_name()}, ${conversation_et.participating_user_ets()[1].first_name()}`;
+      const expected_display_name = `${conversation_et
+        .participating_user_ets()[0]
+        .first_name()}, ${conversation_et.participating_user_ets()[1].first_name()}`;
       expect(conversation_et.display_name()).toBe(expected_display_name);
     });
 
@@ -311,8 +313,7 @@ describe('Conversation', function() {
       conversation_et.muted_state(false);
 
       expect(conversation_et._subscribe_to_states_updates.calls.count()).toEqual(1);
-    })
-  );
+    }));
 
   describe('message sorting', function() {
     const reference_timestamp = Date.now();
@@ -617,8 +618,7 @@ describe('Conversation', function() {
 
       expect(older_message_et.visible()).toBeTruthy();
       expect(newer_message_et.visible()).toBeFalsy();
-    })
-  );
+    }));
 
   describe('is_with_bot', () =>
     it('detects bot conversations by the username of the remote participant', function() {
@@ -654,8 +654,7 @@ describe('Conversation', function() {
 
       user_et.username('wire');
       expect(conversation_et.is_with_bot()).toBe(false);
-    })
-  );
+    }));
 
   describe('get_last_editable_message', function() {
     let self_user_et = undefined;
@@ -799,8 +798,7 @@ describe('Conversation', function() {
       const new_lrt_number = window.parseInt(new_lrt_string, 10);
       conversation_et.set_timestamp(new_lrt_string, z.conversation.ConversationUpdateType.LAST_READ_TIMESTAMP);
       expect(conversation_et.last_read_timestamp()).toBe(new_lrt_number);
-    })
-  );
+    }));
 
   describe('connection', function() {
     it('updates the participating user IDs with the user ID of the other party', function() {
@@ -808,8 +806,44 @@ describe('Conversation', function() {
 
       // @formatter:off
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
-      const payload_connection = {"status":"sent","conversation":"15a7f358-8eba-4b8e-bcf2-61a08eb53349","to":`${connector_user_id}`,"from":"616cbbeb-1360-4e17-b333-e000662257bd","last_update":"2017-05-10T11:34:18.396Z","message":" "};
-      const payload_conversation = {"access":["private"],"creator":"616cbbeb-1360-4e17-b333-e000662257bd","members":{"self":{"hidden_ref":null,"status":0,"last_read":"1.800122000a73cb62","muted_time":null,"service":null,"otr_muted_ref":null,"muted":null,"status_time":"2017-05-10T11:34:18.376Z","hidden":false,"status_ref":"0.0","id":"616cbbeb-1360-4e17-b333-e000662257bd","otr_archived":false,"cleared":null,"otr_muted":false,"otr_archived_ref":null,"archived":null},"others":[]},"name":"Marco","id":"15a7f358-8eba-4b8e-bcf2-61a08eb53349","type":3,"last_event_time":"2017-05-10T11:34:18.376Z","last_event":"2.800122000a73cb63"};
+      const payload_connection = {
+        status: 'sent',
+        conversation: '15a7f358-8eba-4b8e-bcf2-61a08eb53349',
+        to: `${connector_user_id}`,
+        from: '616cbbeb-1360-4e17-b333-e000662257bd',
+        last_update: '2017-05-10T11:34:18.396Z',
+        message: ' ',
+      };
+      const payload_conversation = {
+        access: ['private'],
+        creator: '616cbbeb-1360-4e17-b333-e000662257bd',
+        members: {
+          self: {
+            hidden_ref: null,
+            status: 0,
+            last_read: '1.800122000a73cb62',
+            muted_time: null,
+            service: null,
+            otr_muted_ref: null,
+            muted: null,
+            status_time: '2017-05-10T11:34:18.376Z',
+            hidden: false,
+            status_ref: '0.0',
+            id: '616cbbeb-1360-4e17-b333-e000662257bd',
+            otr_archived: false,
+            cleared: null,
+            otr_muted: false,
+            otr_archived_ref: null,
+            archived: null,
+          },
+          others: [],
+        },
+        name: 'Marco',
+        id: '15a7f358-8eba-4b8e-bcf2-61a08eb53349',
+        type: 3,
+        last_event_time: '2017-05-10T11:34:18.376Z',
+        last_event: '2.800122000a73cb63',
+      };
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
       // @formatter:on
 

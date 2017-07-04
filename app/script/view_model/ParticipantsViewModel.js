@@ -77,7 +77,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
       this.participants_verified.removeAll();
       this.participants_unverified.removeAll();
 
-      participants.map((user_et) => {
+      participants.map(user_et => {
         if (user_et.is_verified()) {
           this.participants_verified.push(user_et);
         } else {
@@ -101,7 +101,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
       }
     };
 
-    this.editing.subscribe((value) => {
+    this.editing.subscribe(value => {
       if (value === false) {
         const name = $('.group-header .name span');
         return $('.group-header textarea').css('height', `${name.height()}px`);
@@ -126,37 +126,41 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
     this.user_input = ko.observable('');
     this.user_selected = ko.observableArray([]);
-    this.connected_users = ko.pureComputed(() => {
-      return this.user_repository.connected_users()
-        .filter((user_et) => {
-          for (const conversation_participant of this.participants()) {
-            if (user_et.id === conversation_participant.id) {
-              return false;
-            }
-          }
-
-          if (this.active_team().id) {
-            for (const team_member of this.team_members()) {
-              if (user_et.id === team_member.id) {
+    this.connected_users = ko.pureComputed(
+      () => {
+        return this.user_repository
+          .connected_users()
+          .filter(user_et => {
+            for (const conversation_participant of this.participants()) {
+              if (user_et.id === conversation_participant.id) {
                 return false;
               }
             }
-          }
 
-          return true;
-        })
-        .sort((user_a, user_b) => z.util.StringUtil.sort_by_priority(user_a.first_name(), user_b.first_name()));
-    }, this, {deferEvaluation: true});
-    this.team_members = ko.pureComputed(() => {
-      return this.active_team().members()
-        .filter((user_et) => {
-          for (const conversation_participant of this.participants()) {
-            if (user_et.id === conversation_participant.id) {
-              return false;
+            if (this.active_team().id) {
+              for (const team_member of this.team_members()) {
+                if (user_et.id === team_member.id) {
+                  return false;
+                }
+              }
             }
+
+            return true;
+          })
+          .sort((user_a, user_b) => z.util.StringUtil.sort_by_priority(user_a.first_name(), user_b.first_name()));
+      },
+      this,
+      {deferEvaluation: true}
+    );
+    this.team_members = ko.pureComputed(() => {
+      return this.active_team().members().filter(user_et => {
+        for (const conversation_participant of this.participants()) {
+          if (user_et.id === conversation_participant.id) {
+            return false;
           }
-          return true;
-        });
+        }
+        return true;
+      });
     });
 
     const shortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.ADD_PEOPLE);
@@ -205,7 +209,10 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
           return this.add_people();
         }
 
-        if ((this.state() === ParticipantsViewModel.STATE.SEARCH) || (this.confirm_dialog && this.confirm_dialog.is_visible())) {
+        if (
+          this.state() === ParticipantsViewModel.STATE.SEARCH ||
+          (this.confirm_dialog && this.confirm_dialog.is_visible())
+        ) {
           return this.participants_bubble.hide();
         }
 
@@ -260,41 +267,37 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
   rename_conversation(data, event) {
     const new_name = z.util.StringUtil.remove_line_breaks(event.target.value.trim());
-    const old_name = this.conversation()
-      .display_name()
-      .trim();
+    const old_name = this.conversation().display_name().trim();
 
     event.target.value = old_name;
     this.editing(false);
-    if (new_name.length && (new_name !== old_name)) {
+    if (new_name.length && new_name !== old_name) {
       this.conversation_repository.rename_conversation(this.conversation(), new_name);
     }
   }
 
   on_search_add() {
-    let user_ids = this.user_selected().map((user_et) => user_et.id);
+    let user_ids = this.user_selected().map(user_et => user_et.id);
     this.participants_bubble.hide();
 
     if (this.conversation().is_group() || this.conversation().is_team_group()) {
-      this.conversation_repository.add_members(this.conversation(), user_ids)
-        .then(() => {
-          amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.ADD_TO_GROUP_CONVERSATION, {
-            numberOfGroupParticipants: this.conversation().number_of_participants(),
-            numberOfParticipantsAdded: user_ids.length,
-          });
+      this.conversation_repository.add_members(this.conversation(), user_ids).then(() => {
+        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.ADD_TO_GROUP_CONVERSATION, {
+          numberOfGroupParticipants: this.conversation().number_of_participants(),
+          numberOfParticipantsAdded: user_ids.length,
         });
+      });
     } else {
       user_ids = user_ids.concat(this.user_profile().id);
 
-      this.conversation_repository.create_new_conversation(user_ids, null)
-        .then(function({conversation_et}) {
-          amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.CREATE_GROUP_CONVERSATION, {
-            creationContext: 'addedToOneToOne',
-            numberOfParticipants: user_ids.length,
-          });
-
-          amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversation_et);
+      this.conversation_repository.create_new_conversation(user_ids, null).then(function({conversation_et}) {
+        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.CREATE_GROUP_CONVERSATION, {
+          creationContext: 'addedToOneToOne',
+          numberOfParticipants: user_ids.length,
         });
+
+        amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversation_et);
+      });
     }
   }
 
@@ -312,12 +315,11 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
     this.confirm_dialog = $('#participants').confirm({
       confirm: () => {
-        this.conversation_repository.remove_participant(this.conversation(), user_et)
-          .then((response) => {
-            if (response) {
-              this.reset_view();
-            }
-          });
+        this.conversation_repository.remove_participant(this.conversation(), user_et).then(response => {
+          if (response) {
+            this.reset_view();
+          }
+        });
       },
       data: {
         user: user_et,
@@ -333,12 +335,13 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   unblock(user_et) {
     this.confirm_dialog = $('#participants').confirm({
       confirm: () => {
-        this.user_repository.unblock_user(user_et)
+        this.user_repository
+          .unblock_user(user_et)
           .then(() => {
             this.participants_bubble.hide();
             return this.conversation_repository.get_1to1_conversation(user_et);
           })
-          .then((conversation_et) => {
+          .then(conversation_et => {
             this.conversation_repository.update_participating_user_ets(conversation_et);
           });
       },
@@ -380,12 +383,10 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
     this.confirm_dialog = $('#participants').confirm({
       cancel: () => {
-        this.user_repository.ignore_connection_request(user_et)
-          .then(() => on_success());
+        this.user_repository.ignore_connection_request(user_et).then(() => on_success());
       },
       confirm: () => {
-        this.user_repository.accept_connection_request(user_et, true)
-          .then(() => on_success());
+        this.user_repository.accept_connection_request(user_et, true).then(() => on_success());
       },
       data: {
         user: this.user_profile(),

@@ -122,9 +122,7 @@ window.z.util = z.util || {};
 
   const app_version = function() {
     if ($("[property='wire:version']").attr('version')) {
-      return $("[property='wire:version']")
-        .attr('version')
-        .trim();
+      return $("[property='wire:version']").attr('version').trim();
     }
     return '';
   };

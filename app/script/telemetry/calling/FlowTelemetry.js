@@ -56,7 +56,6 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
     this.stream_check_timeouts = [];
   }
 
-
   //##############################################################################
   // External misc
   //##############################################################################
@@ -132,7 +131,7 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
     if (this.statistics.hasOwnProperty(media_type)) {
       const stats = this.statistics[media_type];
 
-      const seconds = (attempt * FlowTelemetry.CONFIG.MEDIA_CHECK_TIMEOUT) / 1000;
+      const seconds = attempt * FlowTelemetry.CONFIG.MEDIA_CHECK_TIMEOUT / 1000;
 
       const no_bytes_received = stats.bytes_received === 0;
       const no_bytes_sent = stats.bytes_sent === 0;
@@ -193,7 +192,6 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
     this.timings.is_answer = is_answer;
   }
 
-
   //##############################################################################
   // Statistics
   //##############################################################################
@@ -223,12 +221,11 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
       this._clear_statistics_interval();
       this._clear_stream_check_timeouts();
 
-      this._update_statistics()
-        .then(() => {
-          this.logger.info('Network stats updated for the last time', this.statistics);
-          amplify.publish(z.event.WebApp.DEBUG.UPDATE_LAST_CALL_STATUS, this.create_report());
-          this.statistics = {};
-        });
+      this._update_statistics().then(() => {
+        this.logger.info('Network stats updated for the last time', this.statistics);
+        amplify.publish(z.event.WebApp.DEBUG.UPDATE_LAST_CALL_STATUS, this.create_report());
+        this.statistics = {};
+      });
     }
   }
 
@@ -249,21 +246,18 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
           .then(() => {
             this.logger.info('Network stats updated for the first time', this.statistics);
           })
-          .catch((error) => {
+          .catch(error => {
             this.logger.warn(`Failed to update flow networks stats: ${error.message}`);
           });
-      },
-      FlowTelemetry.CONFIG.STATS_CHECK_TIMEOUT);
+      }, FlowTelemetry.CONFIG.STATS_CHECK_TIMEOUT);
 
       this.stream_check_timeouts.push(stream_check_timeout);
 
       this.statistics_interval = window.setInterval(() => {
-        this._update_statistics()
-          .catch((error) => {
-            this.logger.warn(`Networks stats not updated: ${error.message}`);
-          });
-      },
-      FlowTelemetry.CONFIG.STATS_CHECK_INTERVAL);
+        this._update_statistics().catch(error => {
+          this.logger.warn(`Networks stats not updated: ${error.message}`);
+        });
+      }, FlowTelemetry.CONFIG.STATS_CHECK_INTERVAL);
     }
   }
 
@@ -300,11 +294,12 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
    * @returns {Promise} Resolves when stats are returned
    */
   _update_statistics() {
-    return this.peer_connection.getStats(null)
-      .then((rtc_stats_report) => {
+    return this.peer_connection
+      .getStats(null)
+      .then(rtc_stats_report => {
         let connection_stats = new z.telemetry.calling.ConnectionStats();
 
-        rtc_stats_report.forEach((report) => {
+        rtc_stats_report.forEach(report => {
           switch (report.type) {
             case z.calling.rtc.STATS_TYPE.CANDIDATE_PAIR: {
               connection_stats = this._update_from_candidate_pair(report, rtc_stats_report, connection_stats);
@@ -340,9 +335,9 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
         });
 
         const _calc_rate = (key, timestamp, type) => {
-          const bytes = (connection_stats[key][type] - this.statistics[key][type]);
-          const time_span = (connection_stats.timestamp - timestamp);
-          return window.parseInt((1000.0 * bytes) / time_span, 10);
+          const bytes = connection_stats[key][type] - this.statistics[key][type];
+          const time_span = connection_stats.timestamp - timestamp;
+          return window.parseInt(1000.0 * bytes / time_span, 10);
         };
 
         // Calculate bit rate since last update
@@ -350,9 +345,17 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
           if (connection_stats.hasOwnProperty(key)) {
             const value = connection_stats[key];
             if (_.isObject(value)) {
-              connection_stats[key].bit_rate_mean_received = _calc_rate(key, this.statistics.connected, 'bytes_received');
+              connection_stats[key].bit_rate_mean_received = _calc_rate(
+                key,
+                this.statistics.connected,
+                'bytes_received'
+              );
               connection_stats[key].bit_rate_mean_sent = _calc_rate(key, this.statistics.connected, 'bytes_sent');
-              connection_stats[key].bit_rate_current_received = _calc_rate(key, this.statistics.timestamp, 'bytes_received');
+              connection_stats[key].bit_rate_current_received = _calc_rate(
+                key,
+                this.statistics.timestamp,
+                'bytes_received'
+              );
               connection_stats[key].bit_rate_current_sent = _calc_rate(key, this.statistics.timestamp, 'bytes_sent');
             }
           }
@@ -360,7 +363,7 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
 
         return $.extend(this.statistics, connection_stats);
       })
-      .catch((error) => {
+      .catch(error => {
         this.logger.warn('Update of network stats for flow failed', error);
       });
   }
@@ -375,8 +378,12 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
    */
   _update_from_candidate_pair(report, rtc_stats_report, connection_stats) {
     if (report.selected) {
-      connection_stats.peer_connection.local_candidate_type = rtc_stats_report.get(report.localCandidateId).candidateType;
-      connection_stats.peer_connection.remote_candidate_type = rtc_stats_report.get(report.remoteCandidateId).candidateType;
+      connection_stats.peer_connection.local_candidate_type = rtc_stats_report.get(
+        report.localCandidateId
+      ).candidateType;
+      connection_stats.peer_connection.remote_candidate_type = rtc_stats_report.get(
+        report.remoteCandidateId
+      ).candidateType;
     }
 
     return connection_stats;
@@ -393,8 +400,12 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
   _update_from_google_candidate_pair(report, rtc_stats_report, connection_stats) {
     if (report.googActiveConnection === 'true') {
       connection_stats.peer_connection.round_trip_time = window.parseInt(report.googRtt, 10);
-      connection_stats.peer_connection.local_candidate_type = rtc_stats_report.get(report.localCandidateId).candidateType;
-      connection_stats.peer_connection.remote_candidate_type = rtc_stats_report.get(report.remoteCandidateId).candidateType;
+      connection_stats.peer_connection.local_candidate_type = rtc_stats_report.get(
+        report.localCandidateId
+      ).candidateType;
+      connection_stats.peer_connection.remote_candidate_type = rtc_stats_report.get(
+        report.remoteCandidateId
+      ).candidateType;
     }
 
     return connection_stats;
@@ -524,7 +535,6 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
     return connection_stats;
   }
 
-
   //##############################################################################
   // Timings
   //##############################################################################
@@ -545,7 +555,6 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
   time_step(step) {
     this.timings.time_step(step);
   }
-
 
   //##############################################################################
   // Reporting & Logging

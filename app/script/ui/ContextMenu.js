@@ -23,7 +23,6 @@ window.z = window.z || {};
 window.z.ui = z.ui || {};
 
 z.ui.Context = (() => {
-
   function addListeners() {
     window.addEventListener('wheel', onWheel);
     window.addEventListener('keydown', onKeyDown);
@@ -75,7 +74,7 @@ z.ui.Context = (() => {
     }
 
     const direction = keyCode === z.util.KEYCODE.ARROW_UP ? -1 : 1;
-    const nextEntry = entries[((entries.indexOf(entry) + direction) + entries.length) % entries.length];
+    const nextEntry = entries[(entries.indexOf(entry) + direction + entries.length) % entries.length];
     nextEntry.classList.add('selected');
     entry.classList.remove('selected');
   }
@@ -88,7 +87,7 @@ z.ui.Context = (() => {
   }
 
   function cleanup() {
-    Array.from(document.querySelectorAll('.ctx-menu')).forEach((menu) => menu.remove());
+    Array.from(document.querySelectorAll('.ctx-menu')).forEach(menu => menu.remove());
     removeListeners();
   }
 
@@ -145,8 +144,8 @@ z.ui.Context = (() => {
     const menuWidth = menu.offsetWidth;
     const menuHeight = menu.offsetHeight;
 
-    menu.style.left = `${(((windowWidth - click_x) < menuWidth) ? click_x - menuWidth : click_x)}px`;
-    menu.style.top = `${(((windowHeight - click_y) < menuHeight) ? click_y - menuHeight : click_y)}px`;
+    menu.style.left = `${windowWidth - click_x < menuWidth ? click_x - menuWidth : click_x}px`;
+    menu.style.top = `${windowHeight - click_y < menuHeight ? click_y - menuHeight : click_y}px`;
     menu.style.visibility = '';
 
     addListeners();
@@ -155,5 +154,4 @@ z.ui.Context = (() => {
   return {
     from,
   };
-
 })();

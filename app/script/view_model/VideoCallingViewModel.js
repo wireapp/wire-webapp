@@ -23,7 +23,14 @@ window.z = window.z || {};
 window.z.ViewModel = z.ViewModel || {};
 
 z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
-  constructor(element_id, calling_repository, conversation_repository, media_repository, user_repository, multitasking) {
+  constructor(
+    element_id,
+    calling_repository,
+    conversation_repository,
+    media_repository,
+    user_repository,
+    multitasking
+  ) {
     this.clicked_on_cancel_screen = this.clicked_on_cancel_screen.bind(this);
     this.clicked_on_choose_screen = this.clicked_on_choose_screen.bind(this);
     this.choose_shared_screen = this.choose_shared_screen.bind(this);
@@ -61,8 +68,11 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
     this.videod_call = ko.pureComputed(() => {
       for (const call_et of this.calls()) {
         const is_active = z.calling.enum.CALL_STATE_GROUP.IS_ACTIVE.includes(call_et.state());
-        const self_video_send = (call_et.self_client_joined() && this.self_stream_state.screen_send()) || this.self_stream_state.video_send();
-        const remote_video_send = (call_et.is_remote_screen_send() || call_et.is_remote_video_send()) && !call_et.is_ongoing_on_another_client();
+        const self_video_send =
+          (call_et.self_client_joined() && this.self_stream_state.screen_send()) || this.self_stream_state.video_send();
+        const remote_video_send =
+          (call_et.is_remote_screen_send() || call_et.is_remote_video_send()) &&
+          !call_et.is_ongoing_on_another_client();
         if (is_active && (self_video_send || remote_video_send || this.is_choosing_screen())) {
           return call_et;
         }
@@ -98,11 +108,18 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
     });
 
     this.show_local = ko.pureComputed(() => {
-      return (this.show_local_video() || this.overlay_icon_class()) && !this.multitasking.is_minimized() && !this.is_choosing_screen();
+      return (
+        (this.show_local_video() || this.overlay_icon_class()) &&
+        !this.multitasking.is_minimized() &&
+        !this.is_choosing_screen()
+      );
     });
     this.show_local_video = ko.pureComputed(() => {
       if (this.videod_call()) {
-        const is_visible = this.self_stream_state.screen_send() || this.self_stream_state.video_send() || this.videod_call().state() !== z.calling.enum.CALL_STATE.ONGOING;
+        const is_visible =
+          this.self_stream_state.screen_send() ||
+          this.self_stream_state.video_send() ||
+          this.videod_call().state() !== z.calling.enum.CALL_STATE.ONGOING;
         return is_visible && this.local_video_stream();
       }
     });
@@ -116,22 +133,31 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
     });
     this.show_remote_video = ko.pureComputed(() => {
       if (this.joined_call()) {
-        const is_visible = (this.joined_call().is_remote_screen_send() || this.joined_call().is_remote_video_send()) && this.remote_video_stream();
+        const is_visible =
+          (this.joined_call().is_remote_screen_send() || this.joined_call().is_remote_video_send()) &&
+          this.remote_video_stream();
         return this.is_ongoing() && is_visible;
       }
     });
 
     this.show_switch_camera = ko.pureComputed(() => {
-      const is_visible = this.local_video_stream() && (this.available_devices.video_input().length > 1) && this.self_stream_state.video_send();
+      const is_visible =
+        this.local_video_stream() &&
+        this.available_devices.video_input().length > 1 &&
+        this.self_stream_state.video_send();
       return this.is_ongoing() && is_visible;
     });
     this.show_switch_screen = ko.pureComputed(() => {
-      const is_visible = this.local_video_stream() && (this.available_devices.screen_input().length > 1) && this.self_stream_state.screen_send();
+      const is_visible =
+        this.local_video_stream() &&
+        this.available_devices.screen_input().length > 1 &&
+        this.self_stream_state.screen_send();
       return this.is_ongoing() && is_visible;
     });
 
     this.show_controls = ko.pureComputed(() => {
-      const is_visible = this.show_remote_video() || (this.show_remote_participant() && !this.multitasking.is_minimized());
+      const is_visible =
+        this.show_remote_video() || (this.show_remote_participant() && !this.multitasking.is_minimized());
       return this.is_ongoing() && is_visible;
     });
     this.show_toggle_video = ko.pureComputed(() => {
@@ -147,7 +173,7 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
     });
 
     this.visible_call_id = undefined;
-    this.joined_call.subscribe((joined_call) => {
+    this.joined_call.subscribe(joined_call => {
       if (joined_call) {
         if (this.visible_call_id !== joined_call.id) {
           this.visible_call_id = joined_call.id;
@@ -167,35 +193,45 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
       }
     });
 
-    this.available_devices.screen_input.subscribe((media_devices) => {
+    this.available_devices.screen_input.subscribe(media_devices => {
       if (_.isArray(media_devices)) {
         this.number_of_screen_devices(media_devices.length);
       } else {
         this.number_of_screen_devices(0);
       }
     });
-    this.available_devices.video_input.subscribe((media_devices) => {
+    this.available_devices.video_input.subscribe(media_devices => {
       if (_.isArray(media_devices)) {
         this.number_of_video_devices(media_devices.length);
       } else {
         this.number_of_video_devices(0);
       }
     });
-    this.show_remote_participant.subscribe((show_remote_participant) => {
+    this.show_remote_participant.subscribe(show_remote_participant => {
       if (this.minimize_timeout) {
         window.clearTimeout(this.minimize_timeout);
         this.minimize_timeout = undefined;
       }
 
-      if (show_remote_participant && this.multitasking.auto_minimize() && this.videod_call() && !this.is_choosing_screen()) {
+      if (
+        show_remote_participant &&
+        this.multitasking.auto_minimize() &&
+        this.videod_call() &&
+        !this.is_choosing_screen()
+      ) {
         const remote_user_name = this.remote_user() ? this.remote_user().name() : undefined;
 
-        this.logger.info(`Scheduled minimizing call '${this.videod_call().id}' on timeout as remote user '${remote_user_name}' is not videod`);
+        this.logger.info(
+          `Scheduled minimizing call '${this.videod_call()
+            .id}' on timeout as remote user '${remote_user_name}' is not videod`
+        );
         this.minimize_timeout = window.setTimeout(() => {
           if (!this.is_choosing_screen()) {
             this.multitasking.is_minimized(true);
           }
-          this.logger.info(`Minimizing call '${this.videod_call().id}' on timeout as remote user '${remote_user_name}' is not videod`);
+          this.logger.info(
+            `Minimizing call '${this.videod_call().id}' on timeout as remote user '${remote_user_name}' is not videod`
+          );
         }, 4000);
       }
     });
@@ -211,12 +247,15 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
         amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, conversation_id, z.media.MediaType.SCREEN);
       } else if (z.util.Environment.desktop) {
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CALLING.SHARED_SCREEN, {
-          conversation_type: this.joined_call().is_group ? z.tracking.attribute.ConversationType.GROUP : z.tracking.attribute.ConversationType.ONE_TO_ONE,
+          conversation_type: this.joined_call().is_group
+            ? z.tracking.attribute.ConversationType.GROUP
+            : z.tracking.attribute.ConversationType.ONE_TO_ONE,
           kind_of_call_when_sharing: this.joined_call().is_remote_video_send() ? 'video' : 'audio',
         });
 
-        this.media_repository.devices_handler.get_screen_sources()
-          .then((screen_sources) => {
+        this.media_repository.devices_handler
+          .get_screen_sources()
+          .then(screen_sources => {
             if (screen_sources.length > 1) {
               this.is_choosing_screen(true);
               if (this.multitasking.is_minimized()) {
@@ -227,7 +266,7 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
               amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, conversation_id, z.media.MediaType.SCREEN);
             }
           })
-          .catch((error) => {
+          .catch(error => {
             this.logger.error('Unable to get screens sources for sharing', error);
           });
       }
@@ -240,7 +279,11 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
 
   clicked_on_leave_call() {
     if (this.joined_call()) {
-      amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, this.joined_call().id, z.calling.enum.TERMINATION_REASON.SELF_USER);
+      amplify.publish(
+        z.event.WebApp.CALL.STATE.LEAVE,
+        this.joined_call().id,
+        z.calling.enum.TERMINATION_REASON.SELF_USER
+      );
     }
   }
 
@@ -321,7 +364,6 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
   }
 };
 
-
 // http://stackoverflow.com/questions/28762211/unable-to-mute-html5-video-tag-in-firefox
 ko.bindingHandlers.mute_media_element = {
   update(element, valueAccessor) {
@@ -330,7 +372,6 @@ ko.bindingHandlers.mute_media_element = {
     }
   },
 };
-
 
 ko.bindingHandlers.source_stream = {
   update(element, valueAccessor) {

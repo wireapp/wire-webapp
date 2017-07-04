@@ -19,8 +19,7 @@
 
 'use strict';
 
-module.exports = (grunt) => {
-
+module.exports = grunt => {
   function extract_sources(source_file, target) {
     const scripts = grunt.file.read(source_file);
     const script_files = [];
@@ -36,7 +35,7 @@ module.exports = (grunt) => {
         const source = has_source[1];
 
         // sodium hotfix until this issue gets resolved: https://github.com/jedisct1/libsodium.js/issues/90
-        if ((!source.endsWith('sodium.min.js')) && (source.endsWith('.min.js'))) {
+        if (!source.endsWith('sodium.min.js') && source.endsWith('.min.js')) {
           current_files = grunt.config('scripts_minified');
           current_files[target].push(`deploy${source}`);
           grunt.config('scripts_minified', current_files);
@@ -67,7 +66,7 @@ module.exports = (grunt) => {
     grunt.config('scripts', directories);
     grunt.config('scripts_minified', directories);
 
-    Object.keys(directories).forEach((directory_name) => {
+    Object.keys(directories).forEach(directory_name => {
       extract_sources(`${dist_path}/${directory_name}.htm`, directory_name);
     });
   });

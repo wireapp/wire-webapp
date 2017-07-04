@@ -23,7 +23,6 @@
 
 module.exports = function(config) {
   config.set({
-
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: 'dist',
 
@@ -72,12 +71,7 @@ module.exports = function(config) {
     customLaunchers: {
       ChromeHeadless: {
         base: 'Chrome',
-        flags: [
-          '--disable-gpu',
-          '--headless',
-          '--no-sandbox',
-          '--remote-debugging-port=9222',
-        ],
+        flags: ['--disable-gpu', '--headless', '--no-sandbox', '--remote-debugging-port=9222'],
       },
     },
 

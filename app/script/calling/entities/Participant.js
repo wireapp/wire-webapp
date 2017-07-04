@@ -52,7 +52,7 @@ z.calling.entities.Participant = class Participant {
 
     this.flow_et = new z.calling.entities.Flow(this.call_et, this, timings);
 
-    this.is_connected.subscribe((is_connected) => {
+    this.is_connected.subscribe(is_connected => {
       if (is_connected && !this.was_connected) {
         amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.READY_TO_TALK);
         this.was_connected = true;
@@ -122,8 +122,7 @@ z.calling.entities.Participant = class Participant {
    * @returns {Promise} Resolves when the properties have been updated
    */
   update_properties(properties) {
-    return Promise.resolve()
-    .then(() => {
+    return Promise.resolve().then(() => {
       if (properties) {
         const {audiosend: audio_send, screensend: screen_send, videosend: video_send} = properties;
 
@@ -152,7 +151,10 @@ z.calling.entities.Participant = class Participant {
       const connected_client_id = this.flow_et.remote_client_id;
 
       if (connected_client_id && client_id !== connected_client_id) {
-        this.logger.warn(`State change requested from '${client_id}' while we are connected to '${connected_client_id}'`, this);
+        this.logger.warn(
+          `State change requested from '${client_id}' while we are connected to '${connected_client_id}'`,
+          this
+        );
         throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_SENDER);
       }
       this.flow_et.remote_client_id = client_id;

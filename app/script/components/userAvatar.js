@@ -40,7 +40,7 @@ z.components.UserAvatar = class UserAvatar {
     }
 
     this.element.attr({
-      'id': z.util.create_random_uuid(),
+      id: z.util.create_random_uuid(),
       'user-id': this.user.id,
     });
 
@@ -57,7 +57,7 @@ z.components.UserAvatar = class UserAvatar {
         return 'self';
       }
 
-      if ((typeof params.selected === 'function') && params.selected()) {
+      if (typeof params.selected === 'function' && params.selected()) {
         return 'selected';
       }
 
@@ -108,17 +108,13 @@ z.components.UserAvatar = class UserAvatar {
       if (!this.avatar_loading_blocked) {
         this.avatar_loading_blocked = true;
         if (this.user.preview_picture_resource()) {
-          this.user.preview_picture_resource().get_object_url()
-            .then((url) => {
-              const image = new Image();
-              image.src = url;
-              this.element
-                .find('.user-avatar-image')
-                .empty()
-                .append(image);
-              this.element.addClass('user-avatar-image-loaded user-avatar-loading-transition');
-              this.avatar_loading_blocked = false;
-            });
+          this.user.preview_picture_resource().get_object_url().then(url => {
+            const image = new Image();
+            image.src = url;
+            this.element.find('.user-avatar-image').empty().append(image);
+            this.element.addClass('user-avatar-image-loaded user-avatar-loading-transition');
+            this.avatar_loading_blocked = false;
+          });
         }
       }
     };

@@ -46,13 +46,11 @@ z.ViewModel.ModalType = {
   UPLOAD_TOO_LARGE: '.modal-asset-upload-too-large',
 };
 
-
 z.ViewModel.MODAL_CONSENT_TYPE = {
   INCOMING_CALL: 'incoming_call',
   MESSAGE: 'message',
   OUTGOING_CALL: 'outgoing_call',
 };
-
 
 z.ViewModel.ModalsViewModel = class ModalsViewModel {
   constructor(element_id) {
@@ -121,17 +119,11 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
     }
 
     const modal = new zeta.webapp.module.Modal(type, null, function() {
-      $(type)
-        .find('.modal-close')
-        .off('click');
+      $(type).find('.modal-close').off('click');
 
-      $(type)
-        .find('.modal-action')
-        .off('click');
+      $(type).find('.modal-action').off('click');
 
-      $(type)
-        .find('.modal-secondary')
-        .off('click');
+      $(type).find('.modal-secondary').off('click');
 
       modal.destroy();
 
@@ -140,38 +132,32 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
       }
     });
 
-    $(type)
-      .find('.modal-close')
-      .click(() => modal.hide());
+    $(type).find('.modal-close').click(() => modal.hide());
 
-    $(type)
-      .find('.modal-secondary')
-      .click(() => {
-        modal.hide(() => {
-          if (typeof options.secondary === 'function') {
-            options.secondary();
-          }
-        });
-      });
-
-    $(type)
-      .find('.modal-action')
-      .click(function() {
-        const checkbox = $(type).find('.modal-checkbox');
-        const input = $(type).find('.modal-input');
-
-        if (checkbox.length) {
-          options.action(checkbox.is(':checked'));
-          checkbox.prop('checked', false);
-        } else if (input.length) {
-          options.action(input.val());
-          input.val('');
-        } else if (typeof options.action === 'function') {
-          options.action();
+    $(type).find('.modal-secondary').click(() => {
+      modal.hide(() => {
+        if (typeof options.secondary === 'function') {
+          options.secondary();
         }
-
-        modal.hide();
       });
+    });
+
+    $(type).find('.modal-action').click(function() {
+      const checkbox = $(type).find('.modal-checkbox');
+      const input = $(type).find('.modal-input');
+
+      if (checkbox.length) {
+        options.action(checkbox.is(':checked'));
+        checkbox.prop('checked', false);
+      } else if (input.length) {
+        options.action(input.val());
+        input.val('');
+      } else if (typeof options.action === 'function') {
+        options.action();
+      }
+
+      modal.hide();
+    });
 
     if (!modal.is_shown()) {
       this.logger.info(`Show modal of type '${type}'`);
@@ -219,14 +205,10 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
 
     devices_element.empty();
 
-    devices.map((device) => {
-      $('<div>')
-        .text(`${moment(device.time).format('MMMM Do YYYY, HH:mm')} - UTC`)
-        .appendTo(devices_element);
+    devices.map(device => {
+      $('<div>').text(`${moment(device.time).format('MMMM Do YYYY, HH:mm')} - UTC`).appendTo(devices_element);
 
-      $('<div>')
-        .text(`${z.l10n.text(z.string.modal_connected_device_from)} ${device.model}`)
-        .appendTo(devices_element);
+      $('<div>').text(`${z.l10n.text(z.string.modal_connected_device_from)} ${device.model}`).appendTo(devices_element);
     });
   }
 
@@ -236,7 +218,9 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
 
   _show_modal_new_device(content, title_element, message_element, action_element) {
     let action_id, message_id;
-    const joined_names = z.util.StringUtil.capitalize_first_char(z.util.LocalizerUtil.join_names(content.user_ets, z.string.Declension.NOMINATIVE));
+    const joined_names = z.util.StringUtil.capitalize_first_char(
+      z.util.LocalizerUtil.join_names(content.user_ets, z.string.Declension.NOMINATIVE)
+    );
 
     if (content.user_ets.length > 1) {
       title_element.text(z.l10n.text(z.string.modal_new_device_headline_many, joined_names));
@@ -269,10 +253,12 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
   }
 
   _show_modal_too_many_members(content, message_element) {
-    message_element.text(z.l10n.text(z.string.modal_too_many_members_message, {
-      number1: content.max,
-      number2: content.open_spots,
-    }));
+    message_element.text(
+      z.l10n.text(z.string.modal_too_many_members_message, {
+        number1: content.max,
+        number2: content.open_spots,
+      })
+    );
   }
 
   _show_modal_upload_parallel(content, title_element) {

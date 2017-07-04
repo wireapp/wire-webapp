@@ -21,13 +21,12 @@
 
 // https://github.com/gruntjs/grunt-contrib-clean
 
-
 /* eslint sort-keys: "off"*/
 
 module.exports = {
-//##############################################################################
-// Local/Test deployment related
-//##############################################################################
+  //##############################################################################
+  // Local/Test deployment related
+  //##############################################################################
   dist: '<%= dir.dist %>',
   dist_app: '<%= dir.dist %>/app',
   docs: '<%= dir.docs %>',
@@ -35,15 +34,12 @@ module.exports = {
   ext: '<%= dir.app.ext %>/*',
   temp: '<%= dir.temp %>',
 
-//##############################################################################
-// Production/Staging/Edge deployment related
-//##############################################################################
+  //##############################################################################
+  // Production/Staging/Edge deployment related
+  //##############################################################################
   deploy: '<%= dir.deploy %>',
   deploy_app: '<%= dir.deploy %>/app',
-  deploy_script: [
-    '<%= dir.deploy %>/ext/js',
-    '<%= dir.deploy %>/script',
-  ],
+  deploy_script: ['<%= dir.deploy %>/ext/js', '<%= dir.deploy %>/script'],
   prod: [
     '<%= dir.deploy %>/audio/buzzer',
     '<%= dir.deploy %>/audio/digits',
@@ -51,9 +47,9 @@ module.exports = {
     '<%= dir.deploy %>/min/*.map',
   ],
 
-//##############################################################################
-// Amazon Web Services related
-//##############################################################################
+  //##############################################################################
+  // Amazon Web Services related
+  //##############################################################################
   aws: '<%= dir.aws.static %>',
   aws_app: '<%= dir.aws.templates %>/app',
   aws_s3: '<%= dir.aws.s3 %>',

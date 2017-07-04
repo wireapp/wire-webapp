@@ -19,18 +19,28 @@
 
 'use strict';
 
+// https://github.com/gruntjs/grunt-contrib-coffee
+
 module.exports = {
-  aws: {
-    command: 'python aws/application.py',
-    options: {
-      stdout: true,
-    },
+  //##############################################################################
+  // Production/Staging/Edge deployment related
+  //##############################################################################
+  deploy: {
+    cwd: '<%= dir.app_ %>',
+    dest: '<%= dir.deploy %>',
+    expand: true,
+    ext: '.js',
+    src: '**/*.coffee',
   },
-  aws_deploy: {
-    command:
-      'aws elasticbeanstalk create-application-version --application-name Webapp --version-label <%= grunt.config("aws.deploy.options.version") %> --source-bundle S3Bucket="wire-webapp",S3Key="<%= grunt.config("aws.deploy.options.version") %>.zip" --auto-create-application',
-    options: {
-      stdout: true,
-    },
+
+  //##############################################################################
+  // Local/Test deployment related
+  //##############################################################################
+  dist: {
+    cwd: '<%= dir.app_ %>',
+    dest: '<%= dir.dist %>',
+    expand: true,
+    ext: '.js',
+    src: '**/*.coffee',
   },
 };

@@ -25,16 +25,40 @@ describe('z.team.TeamRepository', () => {
   const test_factory = new TestFactory();
 
   /* eslint sort-keys: "off" */
-  const teams_data = {teams: [{creator: '9ca1bf41-42cd-4ee4-b54e-99e8dcc9d375', icon_key: null, icon: '', id: 'e6d3adc5-9140-477a-abc1-8279d210ceab', name: 'Wire GmbH'}, {creator: 'e82019bc-5ee1-4835-8057-cfbe2229582b', icon_key: null, icon: '', id: 'f9310b63-0c04-4f13-a051-c19d24b78ed5', name: 'My Awesome Company'}], 'has_more': false};
+  const teams_data = {
+    teams: [
+      {
+        creator: '9ca1bf41-42cd-4ee4-b54e-99e8dcc9d375',
+        icon_key: null,
+        icon: '',
+        id: 'e6d3adc5-9140-477a-abc1-8279d210ceab',
+        name: 'Wire GmbH',
+      },
+      {
+        creator: 'e82019bc-5ee1-4835-8057-cfbe2229582b',
+        icon_key: null,
+        icon: '',
+        id: 'f9310b63-0c04-4f13-a051-c19d24b78ed5',
+        name: 'My Awesome Company',
+      },
+    ],
+    has_more: false,
+  };
   const team_metadata = teams_data.teams[0];
-  const team_members = {members: [{user: 'bac6597b-5396-4a6a-8de9-d5aa75c998bf', permissions: 4}, {user: '74fa64dc-8318-4426-9935-82590ff8aa3e', permissions: 8}]};
+  const team_members = {
+    members: [
+      {user: 'bac6597b-5396-4a6a-8de9-d5aa75c998bf', permissions: 4},
+      {user: '74fa64dc-8318-4426-9935-82590ff8aa3e', permissions: 8},
+    ],
+  };
   /* eslint sort-keys: "off" */
 
   let server = undefined;
   let team_repository = undefined;
 
-  beforeAll((done) => {
-    test_factory.exposeTeamActors()
+  beforeAll(done => {
+    test_factory
+      .exposeTeamActors()
       .then(function(repository) {
         team_repository = repository;
         done();
@@ -70,9 +94,10 @@ describe('z.team.TeamRepository', () => {
   });
 
   describe('get_teams()', () => {
-    it('returns team entities', (done) => {
-      team_repository.get_teams(100)
-        .then((entities) => {
+    it('returns team entities', done => {
+      team_repository
+        .get_teams(100)
+        .then(entities => {
           expect(entities.length).toEqual(teams_data.teams.length);
           expect(entities[0].creator).toEqual(teams_data.teams[0].creator);
           expect(entities[1].creator).toEqual(teams_data.teams[1].creator);
@@ -83,9 +108,10 @@ describe('z.team.TeamRepository', () => {
   });
 
   describe('get_team_metadata()', () => {
-    it('returns team metadata entities', (done) => {
-      team_repository.get_team_from_backend(team_metadata.id)
-        .then((entity) => {
+    it('returns team metadata entities', done => {
+      team_repository
+        .get_team_from_backend(team_metadata.id)
+        .then(entity => {
           expect(entity.creator).toEqual(team_metadata.creator);
           expect(entity.id).toEqual(team_metadata.id);
           expect(entity.name()).toEqual(team_metadata.name);
@@ -96,9 +122,10 @@ describe('z.team.TeamRepository', () => {
   });
 
   xdescribe('get_team_members()', () => {
-    it('returns team member entities', (done) => {
-      team_repository.get_team_members(team_metadata.id)
-        .then((entities) => {
+    it('returns team member entities', done => {
+      team_repository
+        .get_team_members(team_metadata.id)
+        .then(entities => {
           expect(entities.length).toEqual(team_members.members.length);
           expect(entities[0].user).toEqual(team_members.members[0].user);
           expect(entities[0].permissions).toEqual(team_members.members[0].permissions);

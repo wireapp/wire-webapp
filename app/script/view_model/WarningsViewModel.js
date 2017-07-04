@@ -43,7 +43,6 @@ z.ViewModel.WarningType = {
   UNSUPPORTED_OUTGOING_CALL: 'unsupported_outgoing_call',
 };
 
-
 z.ViewModel.WarningsViewModel = class WarningsViewModel {
   static get CONFIG() {
     return {
@@ -66,9 +65,13 @@ z.ViewModel.WarningsViewModel = class WarningsViewModel {
 
     // Array of warning banners
     this.warnings = ko.observableArray();
-    this.top_warning = ko.pureComputed(() => {
-      return this.warnings()[this.warnings().length - 1];
-    }, this, {deferEvaluation: true});
+    this.top_warning = ko.pureComputed(
+      () => {
+        return this.warnings()[this.warnings().length - 1];
+      },
+      this,
+      {deferEvaluation: true}
+    );
 
     this.warnings.subscribe(function(warnings) {
       let top_margin;
@@ -90,14 +93,20 @@ z.ViewModel.WarningsViewModel = class WarningsViewModel {
     this.first_name = ko.observable();
     this.call_id = undefined;
 
-    this.warning_dimmed = ko.pureComputed(() => {
-      for (const warning of this.warnings()) {
-        if (WarningsViewModel.CONFIG.DIMMED_MODES.includes(warning)) {
-          return true;
-        }
-      }
-      return false;
-    }, this, {deferEvaluation: true}).extend({rateLimit: 200});
+    this.warning_dimmed = ko
+      .pureComputed(
+        () => {
+          for (const warning of this.warnings()) {
+            if (WarningsViewModel.CONFIG.DIMMED_MODES.includes(warning)) {
+              return true;
+            }
+          }
+          return false;
+        },
+        this,
+        {deferEvaluation: true}
+      )
+      .extend({rateLimit: 200});
 
     amplify.subscribe(z.event.WebApp.WARNING.SHOW, this.show_warning.bind(this));
     amplify.subscribe(z.event.WebApp.WARNING.DISMISS, this.dismiss_warning.bind(this));
@@ -124,7 +133,10 @@ z.ViewModel.WarningsViewModel = class WarningsViewModel {
         break;
       case z.ViewModel.WarningType.REQUEST_NOTIFICATION:
         // We block subsequent permission requests for notifications when the user ignores the request.
-        amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.PERMISSION_STATE, z.system_notification.PermissionStatusState.IGNORED);
+        amplify.publish(
+          z.event.WebApp.SYSTEM_NOTIFICATION.PERMISSION_STATE,
+          z.system_notification.PermissionStatusState.IGNORED
+        );
         break;
       default:
         break;
@@ -139,7 +151,10 @@ z.ViewModel.WarningsViewModel = class WarningsViewModel {
   }
 
   show_warning(type, info) {
-    const is_connectivity_warning = [z.ViewModel.WarningType.CONNECTIVITY_RECONNECT, z.ViewModel.WarningType.NO_INTERNET].includes(type);
+    const is_connectivity_warning = [
+      z.ViewModel.WarningType.CONNECTIVITY_RECONNECT,
+      z.ViewModel.WarningType.NO_INTERNET,
+    ].includes(type);
     const top_warning_is_not_lifecycle_update = this.top_warning() !== z.ViewModel.WarningType.LIFECYCLE_UPDATE;
     if (is_connectivity_warning && top_warning_is_not_lifecycle_update) {
       this.dismiss_warning(this.top_warning());

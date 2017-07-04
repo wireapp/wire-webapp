@@ -29,7 +29,7 @@ z.components.Image = class Image {
     this.asset_is_loading = ko.observable(false);
 
     this.on_click = () => {
-      if (!this.asset_is_loading() && (typeof params.click === 'function')) {
+      if (!this.asset_is_loading() && typeof params.click === 'function') {
         params.click(this.asset);
       }
     };
@@ -41,11 +41,10 @@ z.components.Image = class Image {
 
     this.load_image_asset = () => {
       this.asset_is_loading(true);
-      this.asset.load()
-        .then((blob) => {
-          this.asset_is_loading(false);
-          this.asset_src(window.URL.createObjectURL(blob));
-        });
+      this.asset.load().then(blob => {
+        this.asset_is_loading(false);
+        this.asset_src(window.URL.createObjectURL(blob));
+      });
     };
   }
 

@@ -23,7 +23,6 @@ window.z = window.z || {};
 window.z.links = z.links || {};
 
 z.links.LinkPreviewHelpers = {
-
   /**
    * Check if the text contains only one link
    * @param {string} text - Text to parse
@@ -32,7 +31,7 @@ z.links.LinkPreviewHelpers = {
   contains_only_link(text) {
     text = text.trim();
     const urls = linkify.find(text, 'url');
-    return (urls.length === 1) && (urls[0].value === text);
+    return urls.length === 1 && urls[0].value === text;
   },
 
   /**
@@ -52,5 +51,4 @@ z.links.LinkPreviewHelpers = {
       };
     }
   },
-
 };

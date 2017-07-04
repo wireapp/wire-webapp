@@ -34,7 +34,14 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
    * @param {z.conversation.ConversationRepository} conversation_repository - Conversation repository
    * @param {z.user.UserRepository} user_repository - User repository
   */
-  constructor(element_id, list_view_model, content_view_model, calling_repository, conversation_repository, user_repository) {
+  constructor(
+    element_id,
+    list_view_model,
+    content_view_model,
+    calling_repository,
+    conversation_repository,
+    user_repository
+  ) {
     this.click_on_conversation = this.click_on_conversation.bind(this);
     this.is_selected_conversation = this.is_selected_conversation.bind(this);
 
@@ -68,9 +75,16 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
 
     this.webapp_is_loaded = ko.observable(false);
 
-    this.should_update_scrollbar = ko.computed(() => {
-      return this.webapp_is_loaded() || this.conversations_unarchived().length || this.connect_requests().length || this.conversations_calls().length;
-    }).extend({notify: 'always', rateLimit: 500});
+    this.should_update_scrollbar = ko
+      .computed(() => {
+        return (
+          this.webapp_is_loaded() ||
+          this.conversations_unarchived().length ||
+          this.connect_requests().length ||
+          this.conversations_calls().length
+        );
+      })
+      .extend({notify: 'always', rateLimit: 500});
 
     this.active_team_name = ko.pureComputed(() => {
       const team_et = this.conversation_repository.active_team();
@@ -90,7 +104,10 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
       return z.l10n.text(z.string.tooltip_conversations_archived, this.conversations_archived().length);
     });
 
-    this.start_tooltip = z.l10n.text(z.string.tooltip_conversations_start, z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.START));
+    this.start_tooltip = z.l10n.text(
+      z.string.tooltip_conversations_start,
+      z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.START)
+    );
 
     this.show_connect_requests = ko.pureComputed(() => {
       const team_et = this.conversation_repository.active_team();
@@ -178,7 +195,6 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
     this.webapp_is_loaded(true);
   }
 
-
   //##############################################################################
   // Call stuff
   //##############################################################################
@@ -211,7 +227,6 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
     amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, conversation_et.id, z.media.MediaType.VIDEO);
   }
 
-
   //##############################################################################
   // Footer actions
   //##############################################################################
@@ -223,7 +238,6 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
   click_on_people_button() {
     this.list_view_model.switch_list(z.ViewModel.list.LIST_STATE.START_UI);
   }
-
 
   //##############################################################################
   // Legacy

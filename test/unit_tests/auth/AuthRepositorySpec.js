@@ -25,9 +25,7 @@ describe('z.auth.AuthRepository', function() {
   const test_factory = new TestFactory();
 
   beforeAll(function(done) {
-    test_factory.exposeAuthActors()
-      .then(done)
-      .catch(done.fail);
+    test_factory.exposeAuthActors().then(done).catch(done.fail);
   });
 
   describe('_schedule_token_refresh', function() {

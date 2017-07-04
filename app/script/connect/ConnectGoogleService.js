@@ -46,11 +46,11 @@ z.connect.ConnectGoogleService = class ConnectGoogleService {
    */
   get_contacts() {
     return this._init_library()
-    .then(() => this._get_access_token())
-    .then((access_token) => this._get_contacts(access_token))
-    .catch((error) => {
-      this.logger.error(`Failed to import contacts from Google: ${error.message}`, error);
-    });
+      .then(() => this._get_access_token())
+      .then(access_token => this._get_contacts(access_token))
+      .catch(error => {
+        this.logger.error(`Failed to import contacts from Google: ${error.message}`, error);
+      });
   }
 
   /**
@@ -62,7 +62,7 @@ z.connect.ConnectGoogleService = class ConnectGoogleService {
     return new Promise((resolve, reject) => {
       this.logger.info('Authenticating with Google for contacts access');
 
-      const on_response = (response) => {
+      const on_response = response => {
         if (response && !response.error) {
           this.logger.info('Received access token from Google', response);
           return resolve(response.access_token);
@@ -88,9 +88,7 @@ z.connect.ConnectGoogleService = class ConnectGoogleService {
           this.logger.info('Using cached access token to access Google contacts', auth_token);
           return resolve(auth_token.access_token);
         }
-        return this._authenticate()
-          .then(resolve)
-          .catch(reject);
+        return this._authenticate().then(resolve).catch(reject);
       }
 
       this.logger.warn('Google Auth Client for JavaScript not loaded');
@@ -108,11 +106,11 @@ z.connect.ConnectGoogleService = class ConnectGoogleService {
    */
   _get_contacts(access_token) {
     return fetch(`${this.url}?access_token=${access_token}&alt=json&max-results=15000&v=3.0`)
-    .then((response) => response.json())
-    .then(({feed}) => {
-      this.logger.info('Received address book from Google', feed);
-      return feed;
-    });
+      .then(response => response.json())
+      .then(({feed}) => {
+        this.logger.info('Received address book from Google', feed);
+        return feed;
+      });
   }
 
   /**
@@ -128,7 +126,7 @@ z.connect.ConnectGoogleService = class ConnectGoogleService {
    * @returns {Promise} Resolves when the authentication library is loaded
    */
   _load_library() {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       window.gapi_loaded = resolve;
 
       this.logger.info('Lazy loading Google Auth API');

@@ -23,7 +23,6 @@ window.z = window.z || {};
 window.z.calling = z.calling || {};
 
 z.calling.CallMessageBuilder = (function() {
-
   const _build_call_message = function(type, response, session_id, additional_payload) {
     const call_message_et = new z.calling.entities.CallMessage(type, response, session_id);
 
@@ -112,7 +111,9 @@ z.calling.CallMessageBuilder = (function() {
         },
       };
     } else {
-      let audio_send_state, screen_send_state, video_send_state = undefined;
+      let audio_send_state,
+        screen_send_state,
+        video_send_state = undefined;
 
       switch (payload_type) {
         case z.media.MediaType.AUDIO: {
@@ -122,7 +123,8 @@ z.calling.CallMessageBuilder = (function() {
 
           payload = {
             props: {
-              audiosend: `${audio_send_state}`},
+              audiosend: `${audio_send_state}`,
+            },
           };
           break;
         }

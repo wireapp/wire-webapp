@@ -33,7 +33,7 @@ z.components.InputElement = class InputElement {
       event.target.value = old_name;
       this.editing(false);
 
-      if (new_name !== old_name && (typeof params.change === 'function')) {
+      if (new_name !== old_name && typeof params.change === 'function') {
         params.change(new_name);
       }
     };
@@ -41,19 +41,15 @@ z.components.InputElement = class InputElement {
     this.edit = () => this.editing(true);
 
     this.editing = ko.observable(false);
-    this.editing_subscription = this.editing.subscribe((value) => {
+    this.editing_subscription = this.editing.subscribe(value => {
       if (value) {
-        $(component_info.element)
-          .find('textarea')
-          .one('keydown', (event) => {
-            if (event.keyCode === z.util.KEYCODE.ESC) {
-              this.editing(false);
-            }
-          });
+        $(component_info.element).find('textarea').one('keydown', event => {
+          if (event.keyCode === z.util.KEYCODE.ESC) {
+            this.editing(false);
+          }
+        });
       } else {
-        $(component_info.element)
-          .find('textarea')
-          .off('keydown', 'esc', this.abort);
+        $(component_info.element).find('textarea').off('keydown', 'esc', this.abort);
       }
     });
 

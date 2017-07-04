@@ -47,12 +47,14 @@ z.auth.AuthService = class AuthService {
    * @returns {Promise} Promise that resolves with an array of cookies.
    */
   get_cookies() {
-    return this.client.send_request({
-      type: 'GET',
-      url: this.client.create_url(AuthService.CONFIG.URL_COOKIES),
-    }).then((data) => {
-      return data.cookies;
-    });
+    return this.client
+      .send_request({
+        type: 'GET',
+        url: this.client.create_url(AuthService.CONFIG.URL_COOKIES),
+      })
+      .then(data => {
+        return data.cookies;
+      });
   }
 
   /**
@@ -95,7 +97,7 @@ z.auth.AuthService = class AuthService {
         };
       }
 
-      config.success = (data) => {
+      config.success = data => {
         this.client.request_queue_blocked_state(z.service.RequestQueueBlockedState.NONE);
         this.save_access_token_in_client(data.token_type, data.access_token);
         resolve(data);
@@ -110,13 +112,12 @@ z.auth.AuthService = class AuthService {
         if (retry_attempt <= AuthService.CONFIG.POST_ACCESS_RETRY_LIMIT) {
           retry_attempt++;
 
-          const _retry = () => this.post_access(retry_attempt)
-            .then(resolve)
-            .catch(reject);
+          const _retry = () => this.post_access(retry_attempt).then(resolve).catch(reject);
 
           if (jqXHR.status === z.service.BackendClientError.STATUS_CODE.CONNECTIVITY_PROBLEM) {
             this.logger.warn('Access token refresh delayed due to suspected connectivity issue');
-            return this.client.execute_on_connectivity(z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_REFRESH)
+            return this.client
+              .execute_on_connectivity(z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_REFRESH)
               .then(() => {
                 this.logger.info('Continuing access token refresh after verifying connectivity');
                 return _retry();
@@ -205,7 +206,7 @@ z.auth.AuthService = class AuthService {
       };
 
       $.ajax(config)
-        .done((data) => {
+        .done(data => {
           resolve(data);
         })
         .fail((jqXHR, textStatus, errorThrown) => {
@@ -281,7 +282,7 @@ z.auth.AuthService = class AuthService {
       };
 
       $.ajax(config)
-        .done((data) => {
+        .done(data => {
           resolve(data);
         })
         .fail((jqXHR, textStatus, errorThrown) => {

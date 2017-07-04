@@ -31,16 +31,18 @@ z.entity.DecryptErrorMessage = class DecryptErrorMessage extends z.entity.Messag
     this.client_id = '';
 
     this.caption = ko.pureComputed(() => {
-      const content = `<span class='label-bold-xs'>${ z.util.escape_html(this.user().first_name())}</span>`;
+      const content = `<span class='label-bold-xs'>${z.util.escape_html(this.user().first_name())}</span>`;
       const string_id = this.error_code === Proteus.errors.DecodeError.CODE.CASE_204
-        ? z.string.conversation_unable_to_decrypt_2 : z.string.conversation_unable_to_decrypt_1;
+        ? z.string.conversation_unable_to_decrypt_2
+        : z.string.conversation_unable_to_decrypt_1;
 
       return z.l10n.text(string_id, content);
     });
 
     this.link = ko.pureComputed(() => {
       const string_id = this.error_code === Proteus.errors.DecodeError.CODE.CASE_204
-        ? z.string.url_decrypt_error_2 : z.string.url_decrypt_error_1;
+        ? z.string.url_decrypt_error_2
+        : z.string.url_decrypt_error_1;
       return z.l10n.text(string_id);
     });
 

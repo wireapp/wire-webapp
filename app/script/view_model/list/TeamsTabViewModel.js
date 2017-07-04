@@ -33,7 +33,9 @@ z.ViewModel.list.TeamsTabViewModel = class TeamsTabViewModel {
 
     this.personal_space = this.team_repository.personal_space;
     this.self = this.user_repository.self;
-    this.teams = ko.pureComputed(() => this.team_repository.teams().sort((team_a, team_b) => team_a.name() > team_b.name()));
+    this.teams = ko.pureComputed(() =>
+      this.team_repository.teams().sort((team_a, team_b) => team_a.name() > team_b.name())
+    );
 
     this.active_team = this.team_repository.active_team;
     this.active_team_id = ko.pureComputed(() => {
@@ -91,7 +93,9 @@ z.ViewModel.list.TeamsTabViewModel = class TeamsTabViewModel {
       const known_team_conversation = team_conversation && this.known_team_ids().includes(last_conversation.team_id);
       const valid_conversation = last_conversation && !(known_team_conversation && !this.active_team_id());
 
-      const conversation_et = valid_conversation ? last_conversation : this.conversation_repository.get_most_recent_conversation();
+      const conversation_et = valid_conversation
+        ? last_conversation
+        : this.conversation_repository.get_most_recent_conversation();
       amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversation_et);
     }
   }

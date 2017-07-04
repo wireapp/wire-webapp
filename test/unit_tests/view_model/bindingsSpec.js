@@ -58,7 +58,6 @@ describe('ko.bindingHandlers', function() {
     });
   });
 
-
   describe('ko.subscribable.fn.subscribe_once', function() {
     let observable = null;
     let handler = null;
@@ -83,7 +82,6 @@ describe('ko.bindingHandlers', function() {
       expect(handler.callback).toHaveBeenCalledWith(true);
     });
   });
-
 
   describe('ko.subscribable.fn.trimmed', function() {
     let observable = null;

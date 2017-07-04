@@ -74,14 +74,17 @@ z.extension.GiphyService = class GiphyService {
    * @returns {Promise} Resolves with matches
    */
   get_search(options) {
-    options = $.extend({
-      limit: 25,
-      offset: 0,
-      sorting: 'relevant',
-    }
-    , options);
+    options = $.extend(
+      {
+        limit: 25,
+        offset: 0,
+        sorting: 'relevant',
+      },
+      options
+    );
 
-    const url = `${GiphyService.CONFIG.ENDPOINT_BASE}/search` +
+    const url =
+      `${GiphyService.CONFIG.ENDPOINT_BASE}/search` +
       `?q=${encodeURIComponent(options.query)}` +
       `&offset=${options.offset}` +
       `&limit=${options.limit}` +

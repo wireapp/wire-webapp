@@ -44,7 +44,7 @@ z.components.UserListInputViewModel = class UserListInputViewModel {
     });
 
     this.placeholder = ko.pureComputed(() => {
-      if ((this.input() === '') && (this.selected().length === 0)) {
+      if (this.input() === '' && this.selected().length === 0) {
         return z.l10n.text(params.placeholder);
       }
 
@@ -53,7 +53,7 @@ z.components.UserListInputViewModel = class UserListInputViewModel {
   }
 
   on_key_press(data, event) {
-    if ((event.keyCode === z.util.KEYCODE.DELETE) && (this.input() === '')) {
+    if (event.keyCode === z.util.KEYCODE.DELETE && this.input() === '') {
       this.selected.pop();
     }
     return true;

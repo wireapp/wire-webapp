@@ -24,17 +24,18 @@ window.z.tracking = z.tracking || {};
 
 z.tracking.EventTrackingRepository = class EventTrackingRepository {
   static get CONFIG() {
-    const RAYGUN_API_KEY = z.util.Environment.frontend.is_production() ? 'lAkLCPLx3ysnsXktajeHmw==' : '5hvAMmz8wTXaHBYqu2TFUQ==';
-    const LOCALYTICS_APP_KEY = z.util.Environment.frontend.is_production() ? 'f19c50ccf7bff11992798f0-59fac3b8-ad88-11e6-ff9e-00ae30fe7875' : '905792736c9f17c3464fd4e-60d90c82-d14a-11e4-af66-009c5fda0a25';
+    const RAYGUN_API_KEY = z.util.Environment.frontend.is_production()
+      ? 'lAkLCPLx3ysnsXktajeHmw=='
+      : '5hvAMmz8wTXaHBYqu2TFUQ==';
+    const LOCALYTICS_APP_KEY = z.util.Environment.frontend.is_production()
+      ? 'f19c50ccf7bff11992798f0-59fac3b8-ad88-11e6-ff9e-00ae30fe7875'
+      : '905792736c9f17c3464fd4e-60d90c82-d14a-11e4-af66-009c5fda0a25';
 
     return {
       ERROR_REPORTING_THRESHOLD: 60 * 1000, // in milliseconds
       LOCALYTICS: {
         APP_KEY: LOCALYTICS_APP_KEY,
-        DISABLED_DOMAINS: [
-          'localhost',
-          'zinfra.io',
-        ],
+        DISABLED_DOMAINS: ['localhost', 'zinfra.io'],
         SESSION_INTERVAL: 60 * 1000, // milliseconds
         SESSION_TIMEOUT: 3 * 60 * 1000,
       },
@@ -152,7 +153,6 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     amplify.unsubscribeAll(z.event.WebApp.ANALYTICS.START_SESSION);
   }
 
-
   //##############################################################################
   // Localytics
   //##############################################################################
@@ -187,7 +187,10 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
       this.logger.info('Starting new Localytics session');
       this.localytics('open');
       this.localytics('upload');
-      this.session_interval = window.setInterval(this.upload_session, EventTrackingRepository.CONFIG.LOCALYTICS.SESSION_INTERVAL);
+      this.session_interval = window.setInterval(
+        this.upload_session,
+        EventTrackingRepository.CONFIG.LOCALYTICS.SESSION_INTERVAL
+      );
     }
   }
 
@@ -260,7 +263,6 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     return false;
   }
 
-
   //##############################################################################
   // Raygun
   //##############################################################################
@@ -282,11 +284,10 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
         if (rejected_promise) {
           window.setTimeout(() => {
-            rejected_promise.catch((promise_error) => {
+            rejected_promise.catch(promise_error => {
               this.logger.log(this.logger.levels.OFF, 'Handled uncaught Promise in error reporting', promise_error);
             });
-          },
-          0);
+          }, 0);
         }
       }
     };
@@ -331,10 +332,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     this.logger.debug('Enabling Raygun error reporting');
     const options = {
       disableErrorTracking: false,
-      excludedHostnames: [
-        'localhost',
-        'wire.ms',
-      ],
+      excludedHostnames: ['localhost', 'wire.ms'],
       ignore3rdPartyErrors: true,
       ignoreAjaxAbort: true,
       ignoreAjaxError: true,

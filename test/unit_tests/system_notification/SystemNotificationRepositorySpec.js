@@ -29,19 +29,28 @@ describe('z.system_notification.SystemNotificationRepository', function() {
   let conversation_et = null;
   let message_et = null;
   let user_et = null;
-  let verify_notification, verify_notification_ephemeral, verify_notification_obfuscated, verify_notification_system = undefined;
+  let verify_notification,
+    verify_notification_ephemeral,
+    verify_notification_obfuscated,
+    verify_notification_system = undefined;
 
   const first_name = `${entities.user.john_doe.name.split(' ')[0]}`;
   let notification_content = null;
 
-  beforeEach((done) => {
-    test_factory.exposeSystemNotificationActors()
+  beforeEach(done => {
+    test_factory
+      .exposeSystemNotificationActors()
       .then(function() {
-        amplify.publish(z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
+        amplify.publish(
+          z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE,
+          z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET
+        );
 
         // Create entities
         user_et = TestFactory.user_repository.user_mapper.map_user_from_object(payload.users.get.one[0]);
-        conversation_et = TestFactory.conversation_repository.conversation_mapper.map_conversation(entities.conversation);
+        conversation_et = TestFactory.conversation_repository.conversation_mapper.map_conversation(
+          entities.conversation
+        );
         conversation_et.team_id = undefined;
 
         // Notification
@@ -57,12 +66,17 @@ describe('z.system_notification.SystemNotificationRepository', function() {
             tag: conversation_et.id,
           },
           timeout: z.system_notification.SystemNotificationRepository.CONFIG.TIMEOUT,
-          title: z.util.StringUtil.truncate(conversation_et.display_name(), z.system_notification.SystemNotificationRepository.CONFIG.TITLE_LENGTH, false),
+          title: z.util.StringUtil.truncate(
+            conversation_et.display_name(),
+            z.system_notification.SystemNotificationRepository.CONFIG.TITLE_LENGTH,
+            false
+          ),
         };
 
         // Mocks
         document.hasFocus = () => false;
-        TestFactory.system_notification_repository.permission_state = z.system_notification.PermissionStatusState.GRANTED;
+        TestFactory.system_notification_repository.permission_state =
+          z.system_notification.PermissionStatusState.GRANTED;
         z.util.Environment.browser.supports.notifications = true;
         window.wire.app = {
           service: {
@@ -88,19 +102,28 @@ describe('z.system_notification.SystemNotificationRepository', function() {
         spyOn(TestFactory.system_notification_repository, '_notify_sound');
 
         verify_notification = function(_done, _conversation, _message, _expected_body) {
-          TestFactory.system_notification_repository.notify(_conversation, _message)
+          TestFactory.system_notification_repository
+            .notify(_conversation, _message)
             .then(function() {
               notification_content.options.body = _expected_body;
               if (_conversation.is_group()) {
                 const title = `${_message.user().first_name()} in ${_conversation.display_name()}`;
-                notification_content.title = z.util.StringUtil.truncate(title, z.system_notification.SystemNotificationRepository.CONFIG.TITLE_LENGTH, false);
+                notification_content.title = z.util.StringUtil.truncate(
+                  title,
+                  z.system_notification.SystemNotificationRepository.CONFIG.TITLE_LENGTH,
+                  false
+                );
               } else {
                 notification_content.title = '…';
               }
-              notification_content.trigger = TestFactory.system_notification_repository._create_trigger(conversation_et, message_et);
+              notification_content.trigger = TestFactory.system_notification_repository._create_trigger(
+                conversation_et,
+                message_et
+              );
 
-
-              const result = JSON.stringify(TestFactory.system_notification_repository._show_notification.calls.first().args[0]);
+              const result = JSON.stringify(
+                TestFactory.system_notification_repository._show_notification.calls.first().args[0]
+              );
               expect(result).toEqual(JSON.stringify(notification_content));
               expect(TestFactory.system_notification_repository._show_notification).toHaveBeenCalledTimes(1);
               _done();
@@ -109,13 +132,19 @@ describe('z.system_notification.SystemNotificationRepository', function() {
         };
 
         verify_notification_ephemeral = function(_done, _conversation, _message) {
-          TestFactory.system_notification_repository.notify(_conversation, _message)
+          TestFactory.system_notification_repository
+            .notify(_conversation, _message)
             .then(function() {
               notification_content.options.body = z.string.system_notification_obfuscated;
               notification_content.title = z.string.system_notification_obfuscated_title;
-              notification_content.trigger = TestFactory.system_notification_repository._create_trigger(conversation_et, message_et);
+              notification_content.trigger = TestFactory.system_notification_repository._create_trigger(
+                conversation_et,
+                message_et
+              );
 
-              const result = JSON.stringify(TestFactory.system_notification_repository._show_notification.calls.first().args[0]);
+              const result = JSON.stringify(
+                TestFactory.system_notification_repository._show_notification.calls.first().args[0]
+              );
               expect(result).toEqual(JSON.stringify(notification_content));
               expect(TestFactory.system_notification_repository._show_notification).toHaveBeenCalledTimes(1);
               _done();
@@ -124,19 +153,29 @@ describe('z.system_notification.SystemNotificationRepository', function() {
         };
 
         verify_notification_obfuscated = function(_done, _conversation, _message, _setting) {
-          TestFactory.system_notification_repository.notify(_conversation, _message)
+          TestFactory.system_notification_repository
+            .notify(_conversation, _message)
             .then(function() {
               if (_setting === z.system_notification.SystemNotificationPreference.OBFUSCATE_MESSAGE) {
                 const title = `${message_et.user().first_name()} in ${conversation_et.display_name()}`;
                 notification_content.options.body = z.string.system_notification_obfuscated;
-                notification_content.title = z.util.StringUtil.truncate(title, z.system_notification.SystemNotificationRepository.CONFIG.TITLE_LENGTH, false);
+                notification_content.title = z.util.StringUtil.truncate(
+                  title,
+                  z.system_notification.SystemNotificationRepository.CONFIG.TITLE_LENGTH,
+                  false
+                );
               } else {
                 notification_content.options.body = z.string.system_notification_obfuscated;
                 notification_content.title = z.string.system_notification_obfuscated_title;
               }
-              notification_content.trigger = TestFactory.system_notification_repository._create_trigger(conversation_et, message_et);
+              notification_content.trigger = TestFactory.system_notification_repository._create_trigger(
+                conversation_et,
+                message_et
+              );
 
-              const result = JSON.stringify(TestFactory.system_notification_repository._show_notification.calls.first().args[0]);
+              const result = JSON.stringify(
+                TestFactory.system_notification_repository._show_notification.calls.first().args[0]
+              );
               expect(result).toEqual(JSON.stringify(notification_content));
               expect(TestFactory.system_notification_repository._show_notification).toHaveBeenCalledTimes(1);
               _done();
@@ -145,7 +184,8 @@ describe('z.system_notification.SystemNotificationRepository', function() {
         };
 
         verify_notification_system = function(_done, _conversation, _message, _expected_body, _expected_title) {
-          TestFactory.system_notification_repository.notify(_conversation, _message)
+          TestFactory.system_notification_repository
+            .notify(_conversation, _message)
             .then(function() {
               notification_content.options.body = _expected_body;
               if (_expected_title) {
@@ -153,9 +193,14 @@ describe('z.system_notification.SystemNotificationRepository', function() {
                 notification_content.options.tag = _conversation.id;
                 notification_content.title = _expected_title;
               }
-              notification_content.trigger = TestFactory.system_notification_repository._create_trigger(conversation_et, message_et);
+              notification_content.trigger = TestFactory.system_notification_repository._create_trigger(
+                conversation_et,
+                message_et
+              );
 
-              const result = JSON.stringify(TestFactory.system_notification_repository._show_notification.calls.first().args[0]);
+              const result = JSON.stringify(
+                TestFactory.system_notification_repository._show_notification.calls.first().args[0]
+              );
               expect(result).toEqual(JSON.stringify(notification_content));
               expect(TestFactory.system_notification_repository._show_notification).toHaveBeenCalledTimes(1);
               _done();
@@ -177,7 +222,8 @@ describe('z.system_notification.SystemNotificationRepository', function() {
     it('if the browser does not support them', function(done) {
       z.util.Environment.browser.supports.notifications = false;
 
-      TestFactory.system_notification_repository.notify(conversation_et, message_et)
+      TestFactory.system_notification_repository
+        .notify(conversation_et, message_et)
         .then(function() {
           expect(TestFactory.system_notification_repository._show_notification).not.toHaveBeenCalled();
           done();
@@ -190,17 +236,17 @@ describe('z.system_notification.SystemNotificationRepository', function() {
       document.hasFocus = () => true;
       TestFactory.calling_repository.joined_call = () => true;
 
-      TestFactory.system_notification_repository.notify(conversation_et, message_et)
+      TestFactory.system_notification_repository
+        .notify(conversation_et, message_et)
         .then(function() {
           expect(TestFactory.system_notification_repository._show_notification).not.toHaveBeenCalled();
 
           window.wire.app.view.content.multitasking.is_minimized = () => false;
 
-          TestFactory.system_notification_repository.notify(conversation_et, message_et)
-            .then(function() {
-              expect(TestFactory.system_notification_repository._show_notification).toHaveBeenCalledTimes(1);
-              done();
-            });
+          TestFactory.system_notification_repository.notify(conversation_et, message_et).then(function() {
+            expect(TestFactory.system_notification_repository._show_notification).toHaveBeenCalledTimes(1);
+            done();
+          });
         })
         .catch(done.fail);
     });
@@ -208,7 +254,8 @@ describe('z.system_notification.SystemNotificationRepository', function() {
     it('if the event was triggered by the user', function(done) {
       message_et.user().is_me = true;
 
-      TestFactory.system_notification_repository.notify(conversation_et, message_et)
+      TestFactory.system_notification_repository
+        .notify(conversation_et, message_et)
         .then(function() {
           expect(TestFactory.system_notification_repository._show_notification).not.toHaveBeenCalled();
           done();
@@ -219,7 +266,8 @@ describe('z.system_notification.SystemNotificationRepository', function() {
     it('if the conversation is muted', function(done) {
       conversation_et.muted_state(true);
 
-      TestFactory.system_notification_repository.notify(conversation_et, message_et)
+      TestFactory.system_notification_repository
+        .notify(conversation_et, message_et)
         .then(function() {
           expect(TestFactory.system_notification_repository._show_notification).not.toHaveBeenCalled();
           done();
@@ -232,7 +280,8 @@ describe('z.system_notification.SystemNotificationRepository', function() {
       message_et.call_message_type = z.message.CALL_MESSAGE_TYPE.DEACTIVATED;
       message_et.finished_reason = z.calling.enum.TERMINATION_REASON.COMPLETED;
 
-      TestFactory.system_notification_repository.notify(conversation_et, message_et)
+      TestFactory.system_notification_repository
+        .notify(conversation_et, message_et)
         .then(function() {
           expect(TestFactory.system_notification_repository._show_notification).not.toHaveBeenCalled();
           done();
@@ -241,9 +290,12 @@ describe('z.system_notification.SystemNotificationRepository', function() {
     });
 
     it('if preference is set to none', function(done) {
-      TestFactory.system_notification_repository.notifications_preference(z.system_notification.SystemNotificationPreference.NONE);
+      TestFactory.system_notification_repository.notifications_preference(
+        z.system_notification.SystemNotificationPreference.NONE
+      );
 
-      TestFactory.system_notification_repository.notify(conversation_et, message_et)
+      TestFactory.system_notification_repository
+        .notify(conversation_et, message_et)
         .then(function() {
           expect(TestFactory.system_notification_repository._show_notification).not.toHaveBeenCalled();
           done();
@@ -254,7 +306,8 @@ describe('z.system_notification.SystemNotificationRepository', function() {
     it('if the user permission was denied', function(done) {
       TestFactory.system_notification_repository.permission_state = z.system_notification.PermissionStatusState.DENIED;
 
-      TestFactory.system_notification_repository.notify(conversation_et, message_et)
+      TestFactory.system_notification_repository
+        .notify(conversation_et, message_et)
         .then(function() {
           expect(TestFactory.system_notification_repository._show_notification).not.toHaveBeenCalled();
           done();
@@ -262,7 +315,6 @@ describe('z.system_notification.SystemNotificationRepository', function() {
         .catch(done.fail);
     });
   });
-
 
   describe('shows a well-formed call notification', function() {
     describe('for an incoming call', function() {
@@ -304,7 +356,6 @@ describe('z.system_notification.SystemNotificationRepository', function() {
       });
     });
   });
-
 
   describe('shows a well-formed content notification', function() {
     let expected_body = undefined;
@@ -421,11 +472,14 @@ describe('z.system_notification.SystemNotificationRepository', function() {
     });
   });
 
-
   describe('shows a well-formed group notification', function() {
     beforeEach(function() {
       const title = `${message_et.user().first_name()} in ${conversation_et.display_name()}`;
-      notification_content.title = z.util.StringUtil.truncate(title, z.system_notification.SystemNotificationRepository.CONFIG.TITLE_LENGTH, false);
+      notification_content.title = z.util.StringUtil.truncate(
+        title,
+        z.system_notification.SystemNotificationRepository.CONFIG.TITLE_LENGTH,
+        false
+      );
     });
 
     it('if a group is created', function(done) {
@@ -448,7 +502,6 @@ describe('z.system_notification.SystemNotificationRepository', function() {
     });
   });
 
-
   describe('shows a well-formed member notification', function() {
     let other_user_et = undefined;
 
@@ -463,7 +516,11 @@ describe('z.system_notification.SystemNotificationRepository', function() {
       beforeEach(function() {
         message_et.type = z.event.Backend.CONVERSATION.MEMBER_JOIN;
         const title = `${message_et.user().first_name()} in ${conversation_et.display_name()}`;
-        notification_content.title = z.util.StringUtil.truncate(title, z.system_notification.SystemNotificationRepository.CONFIG.TITLE_LENGTH, false);
+        notification_content.title = z.util.StringUtil.truncate(
+          title,
+          z.system_notification.SystemNotificationRepository.CONFIG.TITLE_LENGTH,
+          false
+        );
       });
 
       it('with one user being added to the conversation', function(done) {
@@ -495,13 +552,18 @@ describe('z.system_notification.SystemNotificationRepository', function() {
       beforeEach(function() {
         message_et.type = z.event.Backend.CONVERSATION.MEMBER_LEAVE;
         const title = `${message_et.user().first_name()} in ${conversation_et.display_name()}`;
-        notification_content.title = z.util.StringUtil.truncate(title, z.system_notification.SystemNotificationRepository.CONFIG.TITLE_LENGTH, false);
+        notification_content.title = z.util.StringUtil.truncate(
+          title,
+          z.system_notification.SystemNotificationRepository.CONFIG.TITLE_LENGTH,
+          false
+        );
       });
 
       it('with one user being removed from the conversation', function(done) {
         message_et.user_ets([other_user_et]);
 
-        TestFactory.system_notification_repository.notify(conversation_et, message_et)
+        TestFactory.system_notification_repository
+          .notify(conversation_et, message_et)
           .then(function() {
             expect(TestFactory.system_notification_repository._show_notification).not.toHaveBeenCalled();
             done();
@@ -521,7 +583,8 @@ describe('z.system_notification.SystemNotificationRepository', function() {
         const user_ets = TestFactory.user_repository.user_mapper.map_users_from_object(payload.users.get.many);
         message_et.user_ets(user_ets);
 
-        TestFactory.system_notification_repository.notify(conversation_et, message_et)
+        TestFactory.system_notification_repository
+          .notify(conversation_et, message_et)
           .then(function() {
             expect(TestFactory.system_notification_repository._show_notification).not.toHaveBeenCalled();
             done();
@@ -532,7 +595,8 @@ describe('z.system_notification.SystemNotificationRepository', function() {
       it('with someone leaving the conversation by himself', function(done) {
         message_et.user_ets([message_et.user()]);
 
-        TestFactory.system_notification_repository.notify(conversation_et, message_et)
+        TestFactory.system_notification_repository
+          .notify(conversation_et, message_et)
           .then(function() {
             expect(TestFactory.system_notification_repository._show_notification).not.toHaveBeenCalled();
             done();

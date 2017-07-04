@@ -34,13 +34,10 @@ z.bot.BotService = class BotService {
    * @returns {Promise} Resolves with information about bot
    */
   fetch_bot(bot_name) {
-    return fetch(`${this.url}${bot_name}/`)
-    .then((response) => response.json())
-    .then(({result}) => result);
+    return fetch(`${this.url}${bot_name}/`).then(response => response.json()).then(({result}) => result);
   }
 
   static get URL() {
     return 'api/v1/bot/';
   }
-
 };

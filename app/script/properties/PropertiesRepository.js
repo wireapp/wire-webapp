@@ -68,23 +68,25 @@ z.properties.PropertiesRepository = class PropertiesRepository {
    * @returns {undefined} No return value
    */
   init(self_user_et) {
-    this.properties_service.get_properties()
-    .then((keys) => {
-      this.self(self_user_et);
-      if (keys.includes(PropertiesRepository.CONFIG.PROPERTIES_KEY)) {
-        return this.properties_service.get_properties_by_key(PropertiesRepository.CONFIG.PROPERTIES_KEY)
-        .then((properties) => {
-          $.extend(true, this.properties, properties);
-          this.logger.info('Loaded user properties', this.properties);
-        });
-      }
+    this.properties_service
+      .get_properties()
+      .then(keys => {
+        this.self(self_user_et);
+        if (keys.includes(PropertiesRepository.CONFIG.PROPERTIES_KEY)) {
+          return this.properties_service
+            .get_properties_by_key(PropertiesRepository.CONFIG.PROPERTIES_KEY)
+            .then(properties => {
+              $.extend(true, this.properties, properties);
+              this.logger.info('Loaded user properties', this.properties);
+            });
+        }
 
-      this.logger.info('User has no saved properties, using defaults');
-    })
-    .then(() => {
-      amplify.publish(z.event.WebApp.PROPERTIES.UPDATED, this.properties);
-      amplify.publish(z.event.WebApp.ANALYTICS.INIT, this.properties);
-    });
+        this.logger.info('User has no saved properties, using defaults');
+      })
+      .then(() => {
+        amplify.publish(z.event.WebApp.PROPERTIES.UPDATED, this.properties);
+        amplify.publish(z.event.WebApp.ANALYTICS.INIT, this.properties);
+      });
   }
 
   /**
@@ -121,40 +123,41 @@ z.properties.PropertiesRepository = class PropertiesRepository {
     if (updated_preference !== this.get_preference(properties_type)) {
       this.set_preference(properties_type, updated_preference);
 
-      this.properties_service.put_properties_by_key(PropertiesRepository.CONFIG.PROPERTIES_KEY, this.properties)
-      .then(() => {
-        this.logger.info(`Saved updated preference: '${properties_type}' - '${updated_preference}'`);
+      this.properties_service
+        .put_properties_by_key(PropertiesRepository.CONFIG.PROPERTIES_KEY, this.properties)
+        .then(() => {
+          this.logger.info(`Saved updated preference: '${properties_type}' - '${updated_preference}'`);
 
-        switch (properties_type) {
-          case z.properties.PROPERTIES_TYPE.CONTACT_IMPORT.GOOGLE:
-          case z.properties.PROPERTIES_TYPE.CONTACT_IMPORT.MACOS:
-            amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.CONTACTS, updated_preference);
-            break;
-          case z.properties.PROPERTIES_TYPE.EMOJI.REPLACE_INLINE:
-            amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE, updated_preference);
-            break;
-          case z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING:
-            amplify.publish(z.util.Logger.prototype.LOG_ON_DEBUG, updated_preference);
-            break;
-          case z.properties.PROPERTIES_TYPE.HAS_CREATED_CONVERSATION:
-            amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.HAS_CREATED_CONVERSATION, updated_preference);
-            break;
-          case z.properties.PROPERTIES_TYPE.NOTIFICATIONS:
-            amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.NOTIFICATIONS, updated_preference);
-            break;
-          case z.properties.PROPERTIES_TYPE.PREVIEWS.SEND:
-            amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.PREVIEWS.SEND, updated_preference);
-            break;
-          case z.properties.PROPERTIES_TYPE.PRIVACY:
-            amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.PRIVACY, updated_preference);
-            break;
-          case z.properties.PROPERTIES_TYPE.SOUND_ALERTS:
-            amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.SOUND_ALERTS, updated_preference);
-            break;
-          default:
-            throw new Error(`Failed to update preference of unhandled type '${properties_type}'`);
-        }
-      });
+          switch (properties_type) {
+            case z.properties.PROPERTIES_TYPE.CONTACT_IMPORT.GOOGLE:
+            case z.properties.PROPERTIES_TYPE.CONTACT_IMPORT.MACOS:
+              amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.CONTACTS, updated_preference);
+              break;
+            case z.properties.PROPERTIES_TYPE.EMOJI.REPLACE_INLINE:
+              amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE, updated_preference);
+              break;
+            case z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING:
+              amplify.publish(z.util.Logger.prototype.LOG_ON_DEBUG, updated_preference);
+              break;
+            case z.properties.PROPERTIES_TYPE.HAS_CREATED_CONVERSATION:
+              amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.HAS_CREATED_CONVERSATION, updated_preference);
+              break;
+            case z.properties.PROPERTIES_TYPE.NOTIFICATIONS:
+              amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.NOTIFICATIONS, updated_preference);
+              break;
+            case z.properties.PROPERTIES_TYPE.PREVIEWS.SEND:
+              amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.PREVIEWS.SEND, updated_preference);
+              break;
+            case z.properties.PROPERTIES_TYPE.PRIVACY:
+              amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.PRIVACY, updated_preference);
+              break;
+            case z.properties.PROPERTIES_TYPE.SOUND_ALERTS:
+              amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.SOUND_ALERTS, updated_preference);
+              break;
+            default:
+              throw new Error(`Failed to update preference of unhandled type '${properties_type}'`);
+          }
+        });
     }
   }
 

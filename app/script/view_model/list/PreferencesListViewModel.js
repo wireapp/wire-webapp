@@ -37,15 +37,30 @@ z.ViewModel.list.PreferencesListViewModel = class PreferencesListViewModel {
     this.logger = new z.util.Logger('z.ViewModel.list.PreferencesListViewModel', z.config.LOGGER.OPTIONS);
 
     this.preferences_state = this.content_view_model.content_state;
-    this.should_update_scrollbar = ko.computed(() => {
-      return this.list_view_model.last_update();
-    }).extend({notify: 'always', rateLimit: 500});
+    this.should_update_scrollbar = ko
+      .computed(() => {
+        return this.list_view_model.last_update();
+      })
+      .extend({notify: 'always', rateLimit: 500});
 
-    this.selected_about = ko.pureComputed(() => this.preferences_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_ABOUT);
-    this.selected_account = ko.pureComputed(() => this.preferences_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT);
-    this.selected_av = ko.pureComputed(() => this.preferences_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_AV);
-    this.selected_devices = ko.pureComputed(() => [z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS, z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES].includes(this.preferences_state()));
-    this.selected_options = ko.pureComputed(() => this.preferences_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS);
+    this.selected_about = ko.pureComputed(
+      () => this.preferences_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_ABOUT
+    );
+    this.selected_account = ko.pureComputed(
+      () => this.preferences_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT
+    );
+    this.selected_av = ko.pureComputed(
+      () => this.preferences_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_AV
+    );
+    this.selected_devices = ko.pureComputed(() =>
+      [
+        z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS,
+        z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES,
+      ].includes(this.preferences_state())
+    );
+    this.selected_options = ko.pureComputed(
+      () => this.preferences_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS
+    );
   }
 
   click_on_close_preferences() {

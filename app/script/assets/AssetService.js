@@ -24,7 +24,6 @@ window.z.assets = z.assets || {};
 
 // AssetService for all asset handling and the calls to the backend REST API.
 z.assets.AssetService = class AssetService {
-
   /**
    * Construct a new Asset Service.
    * @param {z.service.BackendClient} client - Client for the API calls
@@ -40,10 +39,7 @@ z.assets.AssetService = class AssetService {
    * @returns {Promise} Resolves when profile image has been uploaded
    */
   upload_profile_image(image) {
-    return Promise.all([
-      this._compress_profile_image(image),
-      this._compress_image(image),
-    ])
+    return Promise.all([this._compress_profile_image(image), this._compress_image(image)])
       .then(([small, medium]) => {
         const [, small_image_bytes] = small;
         const [, medium_image_bytes] = medium;
@@ -70,11 +66,14 @@ z.assets.AssetService = class AssetService {
    * @returns {Promise} Resolves when asset has been uploaded
    */
   _upload_asset(bytes, options, xhr_accessor_function) {
-    return z.assets.AssetCrypto.encrypt_aes_asset(bytes)
-      .then(({cipher_text, key_bytes, sha256}) => {
-        return this.post_asset(new Uint8Array(cipher_text), options, xhr_accessor_function)
-          .then(({key, token}) => ({key, key_bytes, sha256, token}));
-      });
+    return z.assets.AssetCrypto.encrypt_aes_asset(bytes).then(({cipher_text, key_bytes, sha256}) => {
+      return this.post_asset(new Uint8Array(cipher_text), options, xhr_accessor_function).then(({key, token}) => ({
+        key,
+        key_bytes,
+        sha256,
+        token,
+      }));
+    });
   }
 
   /**
@@ -89,8 +88,9 @@ z.assets.AssetService = class AssetService {
    * @returns {Promise} Resolves when asset has been uploaded
    */
   upload_asset(file, options, xhr_accessor_function) {
-    return z.util.load_file_buffer(file)
-      .then((buffer) => {
+    return z.util
+      .load_file_buffer(file)
+      .then(buffer => {
         return this._upload_asset(buffer, options, xhr_accessor_function);
       })
       .then(function({key, key_bytes, sha256, token}) {
@@ -111,17 +111,15 @@ z.assets.AssetService = class AssetService {
    * @returns {Promise} Resolves when asset has been uploaded
    */
   upload_image_asset(image, options) {
-    return this._compress_image(image)
-      .then(([compressed_image, compressed_bytes]) => {
-        return this._upload_asset(compressed_bytes, options)
-          .then(function({key, key_bytes, sha256, token}) {
-            const image_meta_data = new z.proto.Asset.ImageMetaData(compressed_image.width, compressed_image.height);
-            const asset = new z.proto.Asset();
-            asset.set('original', new z.proto.Asset.Original(image.type, compressed_bytes.length, null, image_meta_data));
-            asset.set('uploaded', new z.proto.Asset.RemoteData(key_bytes, sha256, key, token));
-            return asset;
-          });
+    return this._compress_image(image).then(([compressed_image, compressed_bytes]) => {
+      return this._upload_asset(compressed_bytes, options).then(function({key, key_bytes, sha256, token}) {
+        const image_meta_data = new z.proto.Asset.ImageMetaData(compressed_image.width, compressed_image.height);
+        const asset = new z.proto.Asset();
+        asset.set('original', new z.proto.Asset.Original(image.type, compressed_bytes.length, null, image_meta_data));
+        asset.set('uploaded', new z.proto.Asset.RemoteData(key_bytes, sha256, key, token));
+        return asset;
       });
+    });
   }
 
   /**
@@ -194,10 +192,13 @@ z.assets.AssetService = class AssetService {
     return new Promise((resolve, reject) => {
       const BOUNDARY = 'frontier';
 
-      metadata = Object.assign({
-        public: false,
-        retention: z.assets.AssetRetentionPolicy.PERSISTENT,
-      }, metadata);
+      metadata = Object.assign(
+        {
+          public: false,
+          retention: z.assets.AssetRetentionPolicy.PERSISTENT,
+        },
+        metadata
+      );
 
       metadata = JSON.stringify(metadata);
 
@@ -260,18 +261,16 @@ z.assets.AssetService = class AssetService {
    * @returns {Promise} Resolves with the compressed image
    */
   _compress_image_with_worker(worker, image, filter) {
-    return z.util.load_file_buffer(image)
-      .then((buffer) => {
+    return z.util
+      .load_file_buffer(image)
+      .then(buffer => {
         if (typeof filter === 'function' ? filter() : undefined) {
           return new Uint8Array(buffer);
         }
         return new z.util.Worker(worker).post(buffer);
       })
-      .then((compressed_bytes) => {
-        return Promise.all([
-          z.util.load_image(new Blob([compressed_bytes], {'type': image.type})),
-          compressed_bytes,
-        ]);
+      .then(compressed_bytes => {
+        return Promise.all([z.util.load_image(new Blob([compressed_bytes], {type: image.type})), compressed_bytes]);
       });
   }
 };

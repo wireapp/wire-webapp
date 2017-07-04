@@ -19,7 +19,7 @@
 
 'use strict';
 
-module.exports = (grunt) => {
+module.exports = grunt => {
   require('load-grunt-tasks')(grunt);
 
   const config = {
@@ -98,7 +98,7 @@ module.exports = (grunt) => {
   grunt.registerTask('app_deploy_staging', ['gitinfo', 'set_version:staging', 'aws_deploy']);
   grunt.registerTask('app_deploy_prod', ['gitinfo', 'set_version:prod', 'aws_deploy']);
 
-  grunt.registerTask('app_deploy_travis', (target) => {
+  grunt.registerTask('app_deploy_travis', target => {
     if (target === 'prod' || target === 'staging') {
       grunt.task.run(`set_version:${target}`, 'init', `prepare_${target}`, 'aws_prepare');
     } else if (target === 'dev') {
@@ -109,14 +109,16 @@ module.exports = (grunt) => {
   });
 
   // Test Related
-  grunt.registerTask('test', () => grunt.task.run(['clean:docs_coverage', 'scripts', 'test_init', 'test_prepare', 'karma:test']));
+  grunt.registerTask('test', () =>
+    grunt.task.run(['clean:docs_coverage', 'scripts', 'test_init', 'test_prepare', 'karma:test'])
+  );
 
-  grunt.registerTask('test_prepare', (test_name) => {
+  grunt.registerTask('test_prepare', test_name => {
     const scripts = grunt.config('scripts');
     const scripts_minified = grunt.config('scripts_minified');
 
-    const prepare_file_names = (file_name_array) => {
-      return file_name_array.map((file_name) => file_name.replace('deploy/', ''));
+    const prepare_file_names = file_name_array => {
+      return file_name_array.map(file_name => file_name.replace('deploy/', ''));
     };
 
     const helper_files = grunt.config.get('karma.options.files');
@@ -132,13 +134,8 @@ module.exports = (grunt) => {
 
   grunt.registerTask('test_init', ['prepare_dist']);
 
-  grunt.registerTask('test_run', (test_name) => {
+  grunt.registerTask('test_run', test_name => {
     grunt.config('karma.options.reporters', ['progress']);
-    grunt.task.run([
-      'scripts',
-      'newer:copy:dist_js',
-      `test_prepare:${test_name}`,
-      'karma:test',
-    ]);
+    grunt.task.run(['scripts', 'newer:copy:dist_js', `test_prepare:${test_name}`, 'karma:test']);
   });
 };

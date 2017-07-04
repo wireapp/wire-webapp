@@ -21,7 +21,6 @@
 
 'use strict';
 
-
 describe('l10n', function() {
   it('can get localized strings', function() {
     const text = z.l10n.text(z.string.wire);
@@ -44,12 +43,18 @@ describe('l10n', function() {
   });
 
   it('can replace placeholders in localized strings using a more complex object', function() {
-    const text = z.l10n.text('{{greeting}} {{name}}', {greeting: 'Hey', name: 'Tod'});
+    const text = z.l10n.text('{{greeting}} {{name}}', {
+      greeting: 'Hey',
+      name: 'Tod',
+    });
     expect(text).toBe('Hey Tod');
   });
 
   it('can replace duplicate placeholders in localized strings using a more complex object', function() {
-    const text = z.l10n.text('{{greeting}} {{greeting}} {{name}}', {greeting: 'Hey', name: 'Tod'});
+    const text = z.l10n.text('{{greeting}} {{greeting}} {{name}}', {
+      greeting: 'Hey',
+      name: 'Tod',
+    });
     expect(text).toBe('Hey Hey Tod');
   });
 });

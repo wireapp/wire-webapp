@@ -55,7 +55,9 @@ z.telemetry.app_init.AppInitTimings = class AppInitTimings {
 
   get_app_load() {
     const app_loaded_in_seconds = this[z.telemetry.app_init.AppInitTimingsStep.APP_LOADED] / 1000;
-    return (Math.floor(app_loaded_in_seconds / AppInitTimings.CONFIG.BUCKET_SIZE) + 1) * AppInitTimings.CONFIG.BUCKET_SIZE;
+    return (
+      (Math.floor(app_loaded_in_seconds / AppInitTimings.CONFIG.BUCKET_SIZE) + 1) * AppInitTimings.CONFIG.BUCKET_SIZE
+    );
   }
 
   log() {
@@ -68,7 +70,10 @@ z.telemetry.app_init.AppInitTimings = class AppInitTimings {
         if (key.toString() !== 'init' && _.isNumber(value)) {
           const placeholder_key_length = Math.max(AppInitTimings.CONFIG.LOG_LENGTH_KEY - key.length, 1);
           const placeholder_key = new Array(placeholder_key_length).join(' ');
-          const placeholder_value_length = Math.max(AppInitTimings.CONFIG.LOG_LENGTH_VALUE - value.toString().length, 1);
+          const placeholder_value_length = Math.max(
+            AppInitTimings.CONFIG.LOG_LENGTH_VALUE - value.toString().length,
+            1
+          );
           const placeholder_value = new Array(placeholder_value_length).join(' ');
 
           this.logger.info(`${placeholder_key}'${key}':${placeholder_value}${value}ms`);
@@ -79,7 +84,7 @@ z.telemetry.app_init.AppInitTimings = class AppInitTimings {
 
   time_step(step) {
     if (!this[step]) {
-      return this[step] = window.parseInt(window.performance.now() - this.init);
+      return (this[step] = window.parseInt(window.performance.now() - this.init));
     }
   }
 };

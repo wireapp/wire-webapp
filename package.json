@@ -4,7 +4,9 @@
   "devDependencies": {
     "autoprefixer": "7.1.1",
     "eslint": "3.19.0",
+    "eslint-config-prettier": "2.1.1",
     "eslint-plugin-jsdoc": "3.1.1",
+    "eslint-plugin-prettier": "2.1.1",
     "grunt": "1.0.1",
     "grunt-aws-s3": "1.0.0",
     "grunt-bower-task": "0.4.0",
@@ -34,6 +36,7 @@
     "karma-jasmine": "1.1.0",
     "lint-staged": "4.0.0",
     "load-grunt-tasks": "3.5.2",
+    "prettier": "1.4.2",
     "request": "2.81.0",
     "sinon": "2.3.6",
     "stylelint": "7.12.0"
@@ -48,7 +51,7 @@
     "deploy-travis-staging": "grunt app_deploy_travis:staging",
     "lint": "yarn lint-scripts && yarn lint-styles",
     "lint-fix": "npm run lint-scripts -- --fix",
-    "lint-scripts": "eslint -c .eslintrc.yaml --ignore-path .gitignore --quiet app/script/ test/ bin/ grunt/ Gruntfile.js",
+    "lint-scripts": "eslint -c .eslintrc.yaml --ignore-path .gitignore --ignore-path .eslintignore --quiet app/script/ test/ bin/ grunt/ Gruntfile.js karma.conf.js",
     "lint-styles": "stylelint app/style/**/*.less --syntax less",
     "postinstall": "grunt init",
     "precommit": "lint-staged",

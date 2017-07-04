@@ -34,9 +34,7 @@ describe('LinkPreviewProtoBuilder', function() {
   };
 
   beforeAll(function(done) {
-    z.util.protobuf.load_protos('ext/proto/generic-message-proto/messages.proto')
-      .then(done)
-      .catch(done.fail);
+    z.util.protobuf.load_protos('ext/proto/generic-message-proto/messages.proto').then(done).catch(done.fail);
   });
 
   it('returns undefined if no data is given', function() {

@@ -40,9 +40,7 @@ describe('z.cryptography.CryptographyMapper', function() {
 
   describe('map_generic_message', function() {
     beforeAll(function(done) {
-      z.util.protobuf.load_protos('ext/proto/generic-message-proto/messages.proto')
-        .then(done)
-        .catch(done.fail);
+      z.util.protobuf.load_protos('ext/proto/generic-message-proto/messages.proto').then(done).catch(done.fail);
     });
 
     it('resolves with a mapped original asset message', function(done) {
@@ -58,7 +56,8 @@ describe('z.cryptography.CryptographyMapper', function() {
       const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
 
-      mapper.map_generic_message(generic_message, event)
+      mapper
+        .map_generic_message(generic_message, event)
         .then(function(event_json) {
           expect(_.isObject(event_json)).toBeTruthy();
           expect(event_json.type).toBe(z.event.Client.CONVERSATION.ASSET_META);
@@ -83,7 +82,8 @@ describe('z.cryptography.CryptographyMapper', function() {
       const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
 
-      mapper.map_generic_message(generic_message, event)
+      mapper
+        .map_generic_message(generic_message, event)
         .then(function(event_json) {
           expect(_.isObject(event_json)).toBeTruthy();
           expect(event_json.type).toBe(z.event.Client.CONVERSATION.ASSET_META);
@@ -96,7 +96,9 @@ describe('z.cryptography.CryptographyMapper', function() {
           expect(event_json.data.info.name).toEqual(original_asset.name);
           expect(event_json.data.info.nonce).toBe(generic_message.message_id);
           expect(event_json.data.meta.duration).toEqual(original_asset.audio.duration_in_millis / 1000);
-          expect(event_json.data.meta.loudness).toEqual(new Uint8Array(original_asset.audio.normalized_loudness.toArrayBuffer()));
+          expect(event_json.data.meta.loudness).toEqual(
+            new Uint8Array(original_asset.audio.normalized_loudness.toArrayBuffer())
+          );
           done();
         })
         .catch(done.fail);
@@ -110,14 +112,20 @@ describe('z.cryptography.CryptographyMapper', function() {
         token: z.util.create_random_uuid(),
       };
 
-      const uploaded_asset = new z.proto.Asset.RemoteData(uploaded.otr_key, uploaded.sha256, uploaded.key, uploaded.token);
+      const uploaded_asset = new z.proto.Asset.RemoteData(
+        uploaded.otr_key,
+        uploaded.sha256,
+        uploaded.key,
+        uploaded.token
+      );
       const asset = new z.proto.Asset();
       asset.set('uploaded', uploaded_asset);
 
       const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
 
-      mapper.map_generic_message(generic_message, event)
+      mapper
+        .map_generic_message(generic_message, event)
         .then(function(event_json) {
           expect(_.isObject(event_json)).toBeTruthy();
           expect(event_json.type).toBe(z.event.Client.CONVERSATION.ASSET_UPLOAD_COMPLETE);
@@ -140,7 +148,8 @@ describe('z.cryptography.CryptographyMapper', function() {
       const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
 
-      mapper.map_generic_message(generic_message, event)
+      mapper
+        .map_generic_message(generic_message, event)
         .then(function(event_json) {
           expect(_.isObject(event_json)).toBeTruthy();
           expect(event_json.type).toBe(z.event.Client.CONVERSATION.ASSET_UPLOAD_FAILED);
@@ -161,7 +170,8 @@ describe('z.cryptography.CryptographyMapper', function() {
       const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
 
-      mapper.map_generic_message(generic_message, event)
+      mapper
+        .map_generic_message(generic_message, event)
         .then(function(event_json) {
           expect(_.isObject(event_json)).toBeTruthy();
           expect(event_json.type).toBe(z.event.Client.CONVERSATION.ASSET_UPLOAD_FAILED);
@@ -194,7 +204,8 @@ describe('z.cryptography.CryptographyMapper', function() {
       const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
 
-      mapper.map_generic_message(generic_message, event)
+      mapper
+        .map_generic_message(generic_message, event)
         .then(function(event_json) {
           expect(_.isObject(event_json)).toBeTruthy();
           expect(event_json.type).toBe(z.event.Client.CONVERSATION.ASSET_PREVIEW);
@@ -216,7 +227,8 @@ describe('z.cryptography.CryptographyMapper', function() {
       const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.CLEARED, new z.proto.Cleared(conversation_id, date));
 
-      mapper.map_generic_message(generic_message, event)
+      mapper
+        .map_generic_message(generic_message, event)
         .then(function(event_json) {
           expect(_.isObject(event_json)).toBeTruthy();
           expect(event_json.type).toBe(z.event.Backend.CONVERSATION.MEMBER_UPDATE);
@@ -234,9 +246,13 @@ describe('z.cryptography.CryptographyMapper', function() {
       const conversation_id = z.util.create_random_uuid();
       const message_id = z.util.create_random_uuid();
       const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
-      generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.HIDDEN, new z.proto.MessageHide(conversation_id, message_id));
+      generic_message.set(
+        z.cryptography.GENERIC_MESSAGE_TYPE.HIDDEN,
+        new z.proto.MessageHide(conversation_id, message_id)
+      );
 
-      mapper.map_generic_message(generic_message, event)
+      mapper
+        .map_generic_message(generic_message, event)
         .then(function(event_json) {
           expect(_.isObject(event_json)).toBeTruthy();
           expect(event_json.type).toBe(z.event.Client.CONVERSATION.MESSAGE_HIDDEN);
@@ -256,7 +272,8 @@ describe('z.cryptography.CryptographyMapper', function() {
       const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.DELETED, new z.proto.MessageDelete(message_id));
 
-      mapper.map_generic_message(generic_message, event)
+      mapper
+        .map_generic_message(generic_message, event)
         .then(function(event_json) {
           expect(_.isObject(event_json)).toBeTruthy();
           expect(event_json.type).toBe(z.event.Client.CONVERSATION.MESSAGE_DELETE);
@@ -283,10 +300,19 @@ describe('z.cryptography.CryptographyMapper', function() {
       };
 
       const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
-      const image_asset = new z.proto.ImageAsset(image.tag, image.width, image.height, image.original_width, image.original_height, image.mime_type, image.size);
+      const image_asset = new z.proto.ImageAsset(
+        image.tag,
+        image.width,
+        image.height,
+        image.original_width,
+        image.original_height,
+        image.mime_type,
+        image.size
+      );
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.IMAGE, image_asset);
 
-      mapper.map_generic_message(generic_message, event)
+      mapper
+        .map_generic_message(generic_message, event)
         .then(function(event_json) {
           expect(_.isObject(event_json)).toBeTruthy();
           expect(event_json.type).toBe(z.event.Backend.CONVERSATION.ASSET_ADD);
@@ -324,7 +350,8 @@ describe('z.cryptography.CryptographyMapper', function() {
       asset.set('uploaded', remote_data);
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
 
-      mapper.map_generic_message(generic_message, event)
+      mapper
+        .map_generic_message(generic_message, event)
         .then(function(event_json) {
           expect(_.isObject(event_json)).toBeTruthy();
           expect(event_json.type).toBe(z.event.Backend.CONVERSATION.ASSET_ADD);
@@ -357,12 +384,21 @@ describe('z.cryptography.CryptographyMapper', function() {
       };
 
       const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
-      const image_asset = new z.proto.ImageAsset(image.tag, image.width, image.height, image.original_width, image.original_height, image.mime_type, image.size);
+      const image_asset = new z.proto.ImageAsset(
+        image.tag,
+        image.width,
+        image.height,
+        image.original_width,
+        image.original_height,
+        image.mime_type,
+        image.size
+      );
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.IMAGE, image_asset);
 
       delete event.data.id;
 
-      mapper.map_generic_message(generic_message, event)
+      mapper
+        .map_generic_message(generic_message, event)
         .then(function(event_json) {
           expect(_.isObject(event_json)).toBeTruthy();
           expect(event_json.type).toBe(z.event.Backend.CONVERSATION.ASSET_ADD);
@@ -387,20 +423,19 @@ describe('z.cryptography.CryptographyMapper', function() {
       const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.IMAGE, new z.proto.ImageAsset('preview'));
 
-      mapper.map_generic_message(generic_message, event)
-        .then(done.fail)
-        .catch(function(error) {
-          expect(error instanceof z.cryptography.CryptographyError).toBeTruthy();
-          expect(error.type).toBe(z.cryptography.CryptographyError.TYPE.IGNORED_PREVIEW);
-          done();
-        });
+      mapper.map_generic_message(generic_message, event).then(done.fail).catch(function(error) {
+        expect(error instanceof z.cryptography.CryptographyError).toBeTruthy();
+        expect(error.type).toBe(z.cryptography.CryptographyError.TYPE.IGNORED_PREVIEW);
+        done();
+      });
     });
 
     it('resolves with a mapped knock message', function(done) {
       const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.KNOCK, new z.proto.Knock(false));
 
-      mapper.map_generic_message(generic_message, event)
+      mapper
+        .map_generic_message(generic_message, event)
         .then(function(event_json) {
           expect(_.isObject(event_json)).toBeTruthy();
           expect(event_json.type).toBe(z.event.Backend.CONVERSATION.KNOCK);
@@ -420,7 +455,8 @@ describe('z.cryptography.CryptographyMapper', function() {
       const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.LAST_READ, new z.proto.LastRead(conversation_id, date));
 
-      mapper.map_generic_message(generic_message, event)
+      mapper
+        .map_generic_message(generic_message, event)
         .then(function(event_json) {
           expect(_.isObject(event_json)).toBeTruthy();
           expect(event_json.type).toBe(z.event.Backend.CONVERSATION.MEMBER_UPDATE);
@@ -436,9 +472,13 @@ describe('z.cryptography.CryptographyMapper', function() {
 
     it('resolves with a mapped reaction message', function(done) {
       const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
-      generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.REACTION, new z.proto.Reaction(z.message.ReactionType.LIKE, generic_message.message_id));
+      generic_message.set(
+        z.cryptography.GENERIC_MESSAGE_TYPE.REACTION,
+        new z.proto.Reaction(z.message.ReactionType.LIKE, generic_message.message_id)
+      );
 
-      mapper.map_generic_message(generic_message, event)
+      mapper
+        .map_generic_message(generic_message, event)
         .then(function(event_json) {
           expect(_.isObject(event_json)).toBeTruthy();
           expect(event_json.type).toBe(z.event.Client.CONVERSATION.REACTION);
@@ -457,7 +497,8 @@ describe('z.cryptography.CryptographyMapper', function() {
       const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, new z.proto.Text('Unit test'));
 
-      mapper.map_generic_message(generic_message, event)
+      mapper
+        .map_generic_message(generic_message, event)
         .then(function(event_json) {
           expect(_.isObject(event_json)).toBeTruthy();
           expect(event_json.type).toBe(z.event.Backend.CONVERSATION.MESSAGE_ADD);
@@ -473,13 +514,11 @@ describe('z.cryptography.CryptographyMapper', function() {
     });
 
     it('rejects with an error if no generic message is provided', function(done) {
-      mapper.map_generic_message(undefined, {id: 'ABC'})
-        .then(done.fail)
-        .catch(function(error) {
-          expect(error instanceof z.cryptography.CryptographyError).toBeTruthy();
-          expect(error.type).toBe(z.cryptography.CryptographyError.TYPE.NO_GENERIC_MESSAGE);
-          done();
-        });
+      mapper.map_generic_message(undefined, {id: 'ABC'}).then(done.fail).catch(function(error) {
+        expect(error instanceof z.cryptography.CryptographyError).toBeTruthy();
+        expect(error.type).toBe(z.cryptography.CryptographyError.TYPE.NO_GENERIC_MESSAGE);
+        done();
+      });
     });
 
     it('can map a text wrapped inside an external message', function(done) {
@@ -488,7 +527,8 @@ describe('z.cryptography.CryptographyMapper', function() {
       const generic_message = new z.proto.GenericMessage(generic_message_id);
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, new z.proto.Text(plaintext));
 
-      z.assets.AssetCrypto.encrypt_aes_asset(generic_message.toArrayBuffer())
+      z.assets.AssetCrypto
+        .encrypt_aes_asset(generic_message.toArrayBuffer())
         .then(function({cipher_text, key_bytes, sha256}) {
           key_bytes = new Uint8Array(key_bytes);
           sha256 = new Uint8Array(sha256);
@@ -514,7 +554,8 @@ describe('z.cryptography.CryptographyMapper', function() {
       const ping = new z.proto.GenericMessage(generic_message_id);
       ping.set('knock', new z.proto.Knock(false));
 
-      z.assets.AssetCrypto.encrypt_aes_asset(ping.toArrayBuffer())
+      z.assets.AssetCrypto
+        .encrypt_aes_asset(ping.toArrayBuffer())
         .then(function({cipher_text, key_bytes, sha256}) {
           key_bytes = new Uint8Array(key_bytes);
           sha256 = new Uint8Array(sha256);
@@ -539,9 +580,13 @@ describe('z.cryptography.CryptographyMapper', function() {
 
     it('resolves with a mapped location message', function(done) {
       const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
-      generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.LOCATION, new z.proto.Location(52.520645, 13.409779, 'Berlin', 1));
+      generic_message.set(
+        z.cryptography.GENERIC_MESSAGE_TYPE.LOCATION,
+        new z.proto.Location(52.520645, 13.409779, 'Berlin', 1)
+      );
 
-      mapper.map_generic_message(generic_message, event)
+      mapper
+        .map_generic_message(generic_message, event)
         .then(function(event_json) {
           expect(_.isObject(event_json)).toBeTruthy();
           expect(event_json.type).toBe(z.event.Client.CONVERSATION.LOCATION);
@@ -563,7 +608,8 @@ describe('z.cryptography.CryptographyMapper', function() {
       const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
       generic_message.set('reaction', new z.proto.Reaction(z.message.ReactionType.LIKE, generic_message.message_id));
 
-      mapper.map_generic_message(generic_message, event)
+      mapper
+        .map_generic_message(generic_message, event)
         .then(function(event_json) {
           expect(_.isObject(event_json)).toBeTruthy();
           expect(event_json.type).toBe(z.event.Client.CONVERSATION.REACTION);
@@ -587,9 +633,13 @@ describe('z.cryptography.CryptographyMapper', function() {
       };
 
       const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
-      generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.CALLING, new z.proto.Calling(JSON.stringify(content_message)));
+      generic_message.set(
+        z.cryptography.GENERIC_MESSAGE_TYPE.CALLING,
+        new z.proto.Calling(JSON.stringify(content_message))
+      );
 
-      mapper.map_generic_message(generic_message, event)
+      mapper
+        .map_generic_message(generic_message, event)
         .then(function(event_json) {
           expect(_.isObject(event_json)).toBeTruthy();
           expect(event_json.type).toBe(z.event.Client.CALL.E_CALL);

@@ -33,7 +33,7 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
     this.should_send_previews = properties_repository.get_preference(z.properties.PROPERTIES_TYPE.PREVIEWS.SEND);
 
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.PREVIEWS.SEND, this.updated_send_preference);
-    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, (properties) => {
+    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, properties => {
       this.updated_send_preference(properties.settings.previews.send);
     });
   }
@@ -47,19 +47,17 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
    */
   get_link_preview_from_string(string) {
     if (this.should_send_previews && z.util.Environment.desktop) {
-      return Promise.resolve()
-        .then(() => {
-          const data = z.links.LinkPreviewHelpers.get_first_link_with_offset(string);
+      return Promise.resolve().then(() => {
+        const data = z.links.LinkPreviewHelpers.get_first_link_with_offset(string);
 
-          if (data) {
-            return this.get_link_preview(data.url, data.offset)
-              .catch(function(error) {
-                if (!(error instanceof z.links.LinkPreviewError)) {
-                  throw error;
-                }
-              });
-          }
-        });
+        if (data) {
+          return this.get_link_preview(data.url, data.offset).catch(function(error) {
+            if (!(error instanceof z.links.LinkPreviewError)) {
+              throw error;
+            }
+          });
+        }
+      });
     }
     return Promise.resolve();
   }
@@ -85,14 +83,14 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
         }
         throw new z.links.LinkPreviewError(z.links.LinkPreviewError.TYPE.NOT_SUPPORTED);
       })
-      .then((data) => {
+      .then(data => {
         open_graph_data = data;
         if (open_graph_data) {
           return z.links.LinkPreviewProtoBuilder.build_from_open_graph_data(open_graph_data, url, offset);
         }
         throw new z.links.LinkPreviewError(z.links.LinkPreviewError.TYPE.NO_DATA_AVAILABLE);
       })
-      .then((link_preview) => {
+      .then(link_preview => {
         if (link_preview) {
           return this._fetch_preview_image(link_preview, open_graph_data.image);
         }
@@ -120,7 +118,7 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
   _fetch_preview_image(link_preview, open_graph_image = {}) {
     if (open_graph_image.data) {
       return this._upload_preview_image(open_graph_image.data)
-        .then((asset) => {
+        .then(asset => {
           link_preview.article.set('image', asset); // deprecated
           link_preview.image.set('image', asset);
           return link_preview;
@@ -138,7 +136,7 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
    * @returns {Promise} Resolves with the retrieved open graph data
    */
   _fetch_open_graph_data(link) {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       return window.openGraph(link, (error, data) => {
         if (error) {
           resolve(undefined);
@@ -163,7 +161,8 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
    * @returns {Promise} Resolves with the uploaded asset
    */
   _upload_preview_image(data_URI) {
-    return Promise.resolve(z.util.base64_to_blob(data_URI))
-      .then((blob) => this.asset_service.upload_image_asset(blob, {public: true}));
+    return Promise.resolve(z.util.base64_to_blob(data_URI)).then(blob =>
+      this.asset_service.upload_image_asset(blob, {public: true})
+    );
   }
 };

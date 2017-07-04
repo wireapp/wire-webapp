@@ -54,7 +54,7 @@ z.ViewModel.ConversationTitlebarViewModel = class ConversationTitlebarViewModel 
         return false;
       }
 
-      return this.has_call() && (this.joined_call().state() === z.calling.enum.CALL_STATE.ONGOING);
+      return this.has_call() && this.joined_call().state() === z.calling.enum.CALL_STATE.ONGOING;
     });
 
     this.show_maximize_control = ko.pureComputed(() => {
@@ -63,7 +63,9 @@ z.ViewModel.ConversationTitlebarViewModel = class ConversationTitlebarViewModel 
       }
 
       const has_local_video = this.self_stream_state.video_send() || this.self_stream_state.screen_send();
-      const has_remote_video = (this.joined_call().is_remote_screen_send() || this.joined_call().is_remote_video_send()) && this.remote_media_streams.video();
+      const has_remote_video =
+        (this.joined_call().is_remote_screen_send() || this.joined_call().is_remote_video_send()) &&
+        this.remote_media_streams.video();
       return this.has_ongoing_call() && this.multitasking.is_minimized() && has_local_video && !has_remote_video;
     });
 
@@ -73,11 +75,15 @@ z.ViewModel.ConversationTitlebarViewModel = class ConversationTitlebarViewModel 
       }
 
       const is_supported_conversation = this.conversation_et().is_group() || this.conversation_et().is_one2one();
-      const is_active_conversation = this.conversation_et().participating_user_ids().length && !this.conversation_et().removed_from_conversation();
+      const is_active_conversation =
+        this.conversation_et().participating_user_ids().length && !this.conversation_et().removed_from_conversation();
       return !this.has_call() && is_supported_conversation && is_active_conversation;
     });
 
-    this.people_tooltip = z.l10n.text(z.string.tooltip_conversation_people, z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.PEOPLE));
+    this.people_tooltip = z.l10n.text(
+      z.string.tooltip_conversation_people,
+      z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.PEOPLE)
+    );
   }
 
   added_to_view() {

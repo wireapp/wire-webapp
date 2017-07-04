@@ -42,9 +42,11 @@ z.ViewModel.list.ArchiveViewModel = class ArchiveViewModel {
 
     this.conversations_archived = this.conversation_repository.conversations_archived;
 
-    this.should_update_scrollbar = ko.computed(() => {
-      return this.list_view_model.last_update();
-    }).extend({notify: 'always', rateLimit: 500});
+    this.should_update_scrollbar = ko
+      .computed(() => {
+        return this.list_view_model.last_update();
+      })
+      .extend({notify: 'always', rateLimit: 500});
   }
 
   click_on_archived_conversation(conversation_et) {

@@ -28,7 +28,7 @@ window.z.audio.AudioRepository = class AudioRepository {
     this.audio_elements = {};
     this.currently_looping = {};
     this.audio_preference = ko.observable(z.audio.AudioPreference.ALL);
-    this.audio_preference.subscribe((audio_preference) => {
+    this.audio_preference.subscribe(audio_preference => {
       if (audio_preference === z.audio.AudioPreference.NONE) {
         this._stop_all();
       }
@@ -45,11 +45,17 @@ window.z.audio.AudioRepository = class AudioRepository {
    */
   _check_sound_setting(audio_id) {
     return new Promise((resolve, reject) => {
-      if (this.muted === true && !(z.audio.AudioPlayingType.MUTED.includes(audio_id))) {
+      if (this.muted === true && !z.audio.AudioPlayingType.MUTED.includes(audio_id)) {
         reject(new z.audio.AudioError(z.audio.AudioError.TYPE.IGNORED_SOUND));
-      } else if (this.audio_preference() === z.audio.AudioPreference.NONE && !(z.audio.AudioPlayingType.NONE.includes(audio_id))) {
+      } else if (
+        this.audio_preference() === z.audio.AudioPreference.NONE &&
+        !z.audio.AudioPlayingType.NONE.includes(audio_id)
+      ) {
         reject(new z.audio.AudioError(z.audio.AudioError.TYPE.IGNORED_SOUND));
-      } else if (this.audio_preference() === z.audio.AudioPreference.SOME && !(z.audio.AudioPlayingType.SOME.includes(audio_id))) {
+      } else if (
+        this.audio_preference() === z.audio.AudioPreference.SOME &&
+        !z.audio.AudioPlayingType.SOME.includes(audio_id)
+      ) {
         reject(new z.audio.AudioError(z.audio.AudioError.TYPE.IGNORED_SOUND));
       } else {
         resolve();
@@ -186,7 +192,7 @@ window.z.audio.AudioRepository = class AudioRepository {
    * @returns {undefined}
    */
   _subscribe_to_events() {
-    amplify.subscribe(z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, this, (handling_notifications) => {
+    amplify.subscribe(z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, this, handling_notifications => {
       const updated_muted_state_muted_state = handling_notifications !== z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
       if (this.muted !== updated_muted_state_muted_state) {
@@ -195,11 +201,11 @@ window.z.audio.AudioRepository = class AudioRepository {
       }
     });
 
-    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this, (properties) => {
+    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this, properties => {
       this.audio_preference(properties.settings.sound.alerts);
     });
 
-    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.SOUND_ALERTS, this, (audio_preference) => {
+    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.SOUND_ALERTS, this, audio_preference => {
       this.audio_preference(audio_preference);
     });
   }
@@ -235,21 +241,21 @@ window.z.audio.AudioRepository = class AudioRepository {
    */
   play(audio_id, play_in_loop = false) {
     return this._check_sound_setting(audio_id)
-    .then(() => {
-      return this._get_sound_by_id(audio_id);
-    })
-    .then((audio_element) => {
-      return this._play(audio_id, audio_element, play_in_loop);
-    })
-    .then((audio_element) => {
-      this.logger.info(`Playing sound '${audio_id}' (loop: '${play_in_loop}')`, audio_element);
-    })
-    .catch((error) => {
-      if (!(error instanceof z.audio.AudioError)) {
-        this.logger.error(`Failed playing sound '${audio_id}': ${error.message}`);
-        throw error;
-      }
-    });
+      .then(() => {
+        return this._get_sound_by_id(audio_id);
+      })
+      .then(audio_element => {
+        return this._play(audio_id, audio_element, play_in_loop);
+      })
+      .then(audio_element => {
+        this.logger.info(`Playing sound '${audio_id}' (loop: '${play_in_loop}')`, audio_element);
+      })
+      .catch(error => {
+        if (!(error instanceof z.audio.AudioError)) {
+          this.logger.error(`Failed playing sound '${audio_id}': ${error.message}`);
+          throw error;
+        }
+      });
   }
 
   /**
@@ -259,19 +265,19 @@ window.z.audio.AudioRepository = class AudioRepository {
    */
   stop(audio_id) {
     return this._get_sound_by_id(audio_id)
-    .then((audio_element) => {
-      if (!audio_element.paused) {
-        this.logger.info(`Stopping sound '${audio_id}'`, audio_element);
-        audio_element.pause();
-      }
+      .then(audio_element => {
+        if (!audio_element.paused) {
+          this.logger.info(`Stopping sound '${audio_id}'`, audio_element);
+          audio_element.pause();
+        }
 
-      if (this.currently_looping[audio_id]) {
-        delete this.currently_looping[audio_id];
-      }
-    })
-    .catch((error) => {
-      this.logger.error(`Failed stopping sound '${audio_id}': ${error.message}`);
-      throw error;
-    });
+        if (this.currently_looping[audio_id]) {
+          delete this.currently_looping[audio_id];
+        }
+      })
+      .catch(error => {
+        this.logger.error(`Failed stopping sound '${audio_id}': ${error.message}`);
+        throw error;
+      });
   }
 };

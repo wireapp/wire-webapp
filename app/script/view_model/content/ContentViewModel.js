@@ -24,7 +24,16 @@ window.z.ViewModel = z.ViewModel || {};
 window.z.ViewModel.content = z.ViewModel.content || {};
 
 z.ViewModel.content.ContentViewModel = class ContentViewModel {
-  constructor(element_id, calling_repository, client_repository, conversation_repository, media_repository, properties_repository, search_repository, team_repository) {
+  constructor(
+    element_id,
+    calling_repository,
+    client_repository,
+    conversation_repository,
+    media_repository,
+    properties_repository,
+    search_repository,
+    team_repository
+  ) {
     this.show_conversation = this.show_conversation.bind(this);
     this.switch_content = this.switch_content.bind(this);
     this.switch_previous_content = this.switch_previous_content.bind(this);
@@ -53,28 +62,77 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
 
     // Nested view models
     /* eslint-disable no-multi-spaces */
-    this.call_shortcuts =             new z.ViewModel.CallShortcutsViewModel(this.calling_repository);
-    this.video_calling =              new z.ViewModel.VideoCallingViewModel('video-calling', this.calling_repository, this.conversation_repository, this.media_repository, this.user_repository, this.multitasking);
-    this.collection_details =         new z.ViewModel.content.CollectionDetailsViewModel('collection-details');
-    this.collection =                 new z.ViewModel.content.CollectionViewModel('collection', this.conversation_repository, this.collection_details);
-    this.connect_requests =           new z.ViewModel.content.ConnectRequestsViewModel('connect-requests', this.user_repository);
-    this.conversation_titlebar =      new z.ViewModel.ConversationTitlebarViewModel('conversation-titlebar', this.calling_repository, this.conversation_repository, this.multitasking);
-    this.conversation_input =         new z.ViewModel.ConversationInputViewModel('conversation-input', this.conversation_repository, this.user_repository, this.properties_repository);
-    this.message_list =               new z.ViewModel.MessageListViewModel('message-list', this.conversation_repository, this.user_repository);
-    this.participants =               new z.ViewModel.ParticipantsViewModel('participants', this.user_repository, this.conversation_repository, this.search_repository, this.team_repository);
-    this.giphy =                      new z.ViewModel.GiphyViewModel('giphy-modal', this.conversation_repository, this.giphy_repository);
+    this.call_shortcuts = new z.ViewModel.CallShortcutsViewModel(this.calling_repository);
+    this.video_calling = new z.ViewModel.VideoCallingViewModel(
+      'video-calling',
+      this.calling_repository,
+      this.conversation_repository,
+      this.media_repository,
+      this.user_repository,
+      this.multitasking
+    );
+    this.collection_details = new z.ViewModel.content.CollectionDetailsViewModel('collection-details');
+    this.collection = new z.ViewModel.content.CollectionViewModel(
+      'collection',
+      this.conversation_repository,
+      this.collection_details
+    );
+    this.connect_requests = new z.ViewModel.content.ConnectRequestsViewModel('connect-requests', this.user_repository);
+    this.conversation_titlebar = new z.ViewModel.ConversationTitlebarViewModel(
+      'conversation-titlebar',
+      this.calling_repository,
+      this.conversation_repository,
+      this.multitasking
+    );
+    this.conversation_input = new z.ViewModel.ConversationInputViewModel(
+      'conversation-input',
+      this.conversation_repository,
+      this.user_repository,
+      this.properties_repository
+    );
+    this.message_list = new z.ViewModel.MessageListViewModel(
+      'message-list',
+      this.conversation_repository,
+      this.user_repository
+    );
+    this.participants = new z.ViewModel.ParticipantsViewModel(
+      'participants',
+      this.user_repository,
+      this.conversation_repository,
+      this.search_repository,
+      this.team_repository
+    );
+    this.giphy = new z.ViewModel.GiphyViewModel('giphy-modal', this.conversation_repository, this.giphy_repository);
 
-    this.preferences_account =        new z.ViewModel.content.PreferencesAccountViewModel('preferences-account', this.client_repository, this.user_repository);
-    this.preferences_av =             new z.ViewModel.content.PreferencesAVViewModel('preferences-av', this.media_repository);
-    this.preferences_device_details = new z.ViewModel.content.PreferencesDeviceDetailsViewModel('preferences-devices', this.client_repository, this.conversation_repository, this.cryptography_repository);
-    this.preferences_devices =        new z.ViewModel.content.PreferencesDevicesViewModel('preferences-devices', this.preferences_device_details, this.client_repository, this.conversation_repository, this.cryptography_repository);
-    this.preferences_options =        new z.ViewModel.content.PreferencesOptionsViewModel('preferences-options', this.properties_repository);
+    this.preferences_account = new z.ViewModel.content.PreferencesAccountViewModel(
+      'preferences-account',
+      this.client_repository,
+      this.user_repository
+    );
+    this.preferences_av = new z.ViewModel.content.PreferencesAVViewModel('preferences-av', this.media_repository);
+    this.preferences_device_details = new z.ViewModel.content.PreferencesDeviceDetailsViewModel(
+      'preferences-devices',
+      this.client_repository,
+      this.conversation_repository,
+      this.cryptography_repository
+    );
+    this.preferences_devices = new z.ViewModel.content.PreferencesDevicesViewModel(
+      'preferences-devices',
+      this.preferences_device_details,
+      this.client_repository,
+      this.conversation_repository,
+      this.cryptography_repository
+    );
+    this.preferences_options = new z.ViewModel.content.PreferencesOptionsViewModel(
+      'preferences-options',
+      this.properties_repository
+    );
     /* eslint-enable no-multi-spaces */
 
     this.previous_state = undefined;
     this.previous_conversation = undefined;
 
-    this.content_state.subscribe((content_state) => {
+    this.content_state.subscribe(content_state => {
       switch (content_state) {
         case z.ViewModel.content.CONTENT_STATE.CONVERSATION:
           this.conversation_input.added_to_view();
@@ -98,7 +156,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
       }
     });
 
-    this.user_repository.connect_requests.subscribe((requests) => {
+    this.user_repository.connect_requests.subscribe(requests => {
       const requests_state = this.content_state() === z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS;
       if (requests_state && !requests.length) {
         this.show_conversation(this.conversation_repository.get_most_recent_conversation());
@@ -130,9 +188,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
       .off(z.util.alias.animationend)
       .addClass(incoming_css_class)
       .one(z.util.alias.animationend, function() {
-        $(this)
-          .removeClass(incoming_css_class)
-          .off(z.util.alias.animationend);
+        $(this).removeClass(incoming_css_class).off(z.util.alias.animationend);
       });
   }
 
@@ -158,28 +214,27 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
       conversation_promise = this.conversation_repository.get_conversation_by_id_async(conversation);
     }
 
-    conversation_promise
-      .then((conversation_et) => {
-        const is_active_conversation = conversation_et && conversation_et === this.conversation_repository.active_conversation();
-        const is_conversation_state = this.content_state() === z.ViewModel.content.CONTENT_STATE.CONVERSATION;
+    conversation_promise.then(conversation_et => {
+      const is_active_conversation =
+        conversation_et && conversation_et === this.conversation_repository.active_conversation();
+      const is_conversation_state = this.content_state() === z.ViewModel.content.CONTENT_STATE.CONVERSATION;
 
-        if (is_active_conversation && is_conversation_state) {
-          this.team_repository.active_team().last_active_conversation = conversation_et;
-          return;
-        }
+      if (is_active_conversation && is_conversation_state) {
+        this.team_repository.active_team().last_active_conversation = conversation_et;
+        return;
+      }
 
-        this._update_active_team(conversation_et);
-        this._release_content(this.content_state(), conversation_et);
+      this._update_active_team(conversation_et);
+      this._release_content(this.content_state(), conversation_et);
 
-        this.content_state(z.ViewModel.content.CONTENT_STATE.CONVERSATION);
-        this.conversation_repository.active_conversation(conversation_et);
-        this.message_list.change_conversation(conversation_et, message_et)
-          .then(() => {
-            this._show_content(z.ViewModel.content.CONTENT_STATE.CONVERSATION);
-            this.participants.change_conversation(conversation_et);
-            this.previous_conversation = this.conversation_repository.active_conversation();
-          });
+      this.content_state(z.ViewModel.content.CONTENT_STATE.CONVERSATION);
+      this.conversation_repository.active_conversation(conversation_et);
+      this.message_list.change_conversation(conversation_et, message_et).then(() => {
+        this._show_content(z.ViewModel.content.CONTENT_STATE.CONVERSATION);
+        this.participants.change_conversation(conversation_et);
+        this.previous_conversation = this.conversation_repository.active_conversation();
       });
+    });
   }
 
   switch_content(new_content_state) {
@@ -278,7 +333,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
       let team_et;
 
       if (is_team) {
-        team_et = this.team_repository.teams().find((_team_et) => _team_et.id === team_id);
+        team_et = this.team_repository.teams().find(_team_et => _team_et.id === team_id);
       }
 
       if (!team_et) {

@@ -57,7 +57,6 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
     return sorted_sessions;
   }
 
-
   //##############################################################################
   // Error reporting
   //##############################################################################
@@ -73,14 +72,12 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
     const raygun_error = new Error(description);
 
     if (passed_error) {
-      custom_data =
-        {error: passed_error};
+      custom_data = {error: passed_error};
       raygun_error.stack = passed_error.stack;
     }
 
     Raygun.send(raygun_error, custom_data);
   }
-
 
   //##############################################################################
   // Analytics
@@ -119,15 +116,24 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
     if (call_et) {
       const {conversation_et, is_group, max_number_of_participants} = call_et;
 
-      attributes = $.extend({
-        conversation_participants: conversation_et.number_of_participants(),
-        conversation_participants_in_call: max_number_of_participants,
-        conversation_type: is_group ? z.tracking.attribute.ConversationType.GROUP : z.tracking.attribute.ConversationType.ONE_TO_ONE,
-        remote_version: [z.tracking.EventName.CALLING.ESTABLISHED_CALL, z.tracking.EventName.CALLING.JOINED_CALL].includes(event_name) ? this.remote_version : undefined,
-        version: this.protocol_version,
-        with_bot: conversation_et.is_with_bot(),
-      },
-      attributes);
+      attributes = $.extend(
+        {
+          conversation_participants: conversation_et.number_of_participants(),
+          conversation_participants_in_call: max_number_of_participants,
+          conversation_type: is_group
+            ? z.tracking.attribute.ConversationType.GROUP
+            : z.tracking.attribute.ConversationType.ONE_TO_ONE,
+          remote_version: [
+            z.tracking.EventName.CALLING.ESTABLISHED_CALL,
+            z.tracking.EventName.CALLING.JOINED_CALL,
+          ].includes(event_name)
+            ? this.remote_version
+            : undefined,
+          version: this.protocol_version,
+          with_bot: conversation_et.is_with_bot(),
+        },
+        attributes
+      );
 
       if (this.media_type === z.media.MediaType.VIDEO) {
         event_name = event_name.replace('_call', '_video_call');
@@ -143,7 +149,14 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
    * @returns {undefined} No return value
    */
   track_duration(call_et) {
-    const {conversation_et, duration_time, is_group, termination_reason, timer_start, max_number_of_participants} = call_et;
+    const {
+      conversation_et,
+      duration_time,
+      is_group,
+      termination_reason,
+      timer_start,
+      max_number_of_participants,
+    } = call_et;
     const duration = Math.floor((Date.now() - timer_start) / 1000);
 
     if (!window.isNaN(duration)) {
@@ -156,11 +169,11 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
         duration_bucket = '16s-30s';
       } else if (duration <= 60) {
         duration_bucket = '31s-60s';
-      } else if (duration <= (3 * 60)) {
+      } else if (duration <= 3 * 60) {
         duration_bucket = '61s-3min';
-      } else if (duration <= (10 * 60)) {
+      } else if (duration <= 10 * 60) {
         duration_bucket = '3min-10min';
-      } else if (duration <= (60 * 60)) {
+      } else if (duration <= 60 * 60) {
         duration_bucket = '10min-1h';
       } else {
         duration_bucket = '1h-infinite';
@@ -169,7 +182,9 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
       const attributes = {
         conversation_participants: conversation_et.number_of_participants(),
         conversation_participants_in_call: max_number_of_participants,
-        conversation_type: is_group ? z.tracking.attribute.ConversationType.GROUP : z.tracking.attribute.ConversationType.ONE_TO_ONE,
+        conversation_type: is_group
+          ? z.tracking.attribute.ConversationType.GROUP
+          : z.tracking.attribute.ConversationType.ONE_TO_ONE,
         duration: duration_bucket,
         duration_sec: duration,
         reason: termination_reason,

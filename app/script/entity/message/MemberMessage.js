@@ -34,16 +34,12 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
 
     // Users joined the conversation without sender
     this.joined_user_ets = ko.pureComputed(() => {
-      return this.user_ets()
-        .filter((user_et) => user_et.id !== this.user().id)
-        .map((user_et) => user_et);
+      return this.user_ets().filter(user_et => user_et.id !== this.user().id).map(user_et => user_et);
     });
 
     // Users joined the conversation without self
     this.remote_user_ets = ko.pureComputed(() => {
-      return this.user_ets()
-        .filter((user_et) => !user_et.is_me)
-        .map((user_et) => user_et);
+      return this.user_ets().filter(user_et => !user_et.is_me).map(user_et => user_et);
     });
 
     this._generate_name_string = (declension = z.string.Declension.ACCUSATIVE) => {
@@ -75,59 +71,61 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
         return this.user_ets()[0];
       }
       return new z.entity.User();
-
     });
 
-    this.caption = ko.pureComputed(() => {
-      if (this.user_ets().length === 0) {
-        return '';
-      }
+    this.caption = ko.pureComputed(
+      () => {
+        if (this.user_ets().length === 0) {
+          return '';
+        }
 
-      switch (this.member_message_type) {
-        case z.message.SystemMessageType.CONNECTION_ACCEPTED:
-        case z.message.SystemMessageType.CONNECTION_REQUEST:
-          return this._get_caption_connection(this.other_user());
-        case z.message.SystemMessageType.CONVERSATION_CREATE:
-          if (this.user().is_me) {
-            return z.l10n.text(z.string.conversation_create_you, this._generate_name_string());
-          }
-          return z.l10n.text(z.string.conversation_create, this._generate_name_string(z.string.Declension.DATIVE));
-        case z.message.SystemMessageType.CONVERSATION_RESUME:
-          return z.l10n.text(z.string.conversation_resume, this._generate_name_string(z.string.Declension.DATIVE));
-        default:
-          break;
-      }
-
-      switch (this.type) {
-        case z.event.Backend.CONVERSATION.MEMBER_LEAVE:
-          if (this.other_user().id === this.user().id) {
+        switch (this.member_message_type) {
+          case z.message.SystemMessageType.CONNECTION_ACCEPTED:
+          case z.message.SystemMessageType.CONNECTION_REQUEST:
+            return this._get_caption_connection(this.other_user());
+          case z.message.SystemMessageType.CONVERSATION_CREATE:
             if (this.user().is_me) {
-              return z.l10n.text(z.string.conversation_member_leave_left_you);
+              return z.l10n.text(z.string.conversation_create_you, this._generate_name_string());
             }
-            return z.l10n.text(z.string.conversation_member_leave_left);
-          }
-          if (this.user().is_me) {
-            return z.l10n.text(z.string.conversation_member_leave_removed_you, this._generate_name_string());
-          }
-          return z.l10n.text(z.string.conversation_member_leave_removed, this._generate_name_string());
-        case z.event.Backend.CONVERSATION.MEMBER_JOIN:
-          if (this.user().is_me) {
-            return z.l10n.text(z.string.conversation_member_join_you, this._generate_name_string());
-          }
-          return z.l10n.text(z.string.conversation_member_join, this._generate_name_string());
-        case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE:
-          return z.l10n.text(z.string.conversation_team_leave);
-        default:
-          break;
-      }
-    }, this, {deferEvaluation: true});
+            return z.l10n.text(z.string.conversation_create, this._generate_name_string(z.string.Declension.DATIVE));
+          case z.message.SystemMessageType.CONVERSATION_RESUME:
+            return z.l10n.text(z.string.conversation_resume, this._generate_name_string(z.string.Declension.DATIVE));
+          default:
+            break;
+        }
+
+        switch (this.type) {
+          case z.event.Backend.CONVERSATION.MEMBER_LEAVE:
+            if (this.other_user().id === this.user().id) {
+              if (this.user().is_me) {
+                return z.l10n.text(z.string.conversation_member_leave_left_you);
+              }
+              return z.l10n.text(z.string.conversation_member_leave_left);
+            }
+            if (this.user().is_me) {
+              return z.l10n.text(z.string.conversation_member_leave_removed_you, this._generate_name_string());
+            }
+            return z.l10n.text(z.string.conversation_member_leave_removed, this._generate_name_string());
+          case z.event.Backend.CONVERSATION.MEMBER_JOIN:
+            if (this.user().is_me) {
+              return z.l10n.text(z.string.conversation_member_join_you, this._generate_name_string());
+            }
+            return z.l10n.text(z.string.conversation_member_join, this._generate_name_string());
+          case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE:
+            return z.l10n.text(z.string.conversation_team_leave);
+          default:
+            break;
+        }
+      },
+      this,
+      {deferEvaluation: true}
+    );
   }
 
   is_connection() {
-    return [
-      z.message.SystemMessageType.CONNECTION_ACCEPTED,
-      z.message.SystemMessageType.CONNECTION_REQUEST,
-    ].includes(this.member_message_type);
+    return [z.message.SystemMessageType.CONNECTION_ACCEPTED, z.message.SystemMessageType.CONNECTION_REQUEST].includes(
+      this.member_message_type
+    );
   }
 
   is_creation() {

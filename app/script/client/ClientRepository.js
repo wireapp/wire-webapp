@@ -34,7 +34,7 @@ z.client.ClientRepository = class ClientRepository {
     this.logger = new z.util.Logger('z.client.ClientRepository', z.config.LOGGER.OPTIONS);
 
     this.client_mapper = new z.client.ClientMapper();
-    this.clients = ko.pureComputed(() => this.self_user() ? this.self_user().devices() : []);
+    this.clients = ko.pureComputed(() => (this.self_user() ? this.self_user().devices() : []));
     this.current_client = ko.observable();
 
     amplify.subscribe(z.event.WebApp.LIFECYCLE.ASK_TO_CLEAR_DATA, this.logout_client.bind(this));
@@ -69,12 +69,14 @@ z.client.ClientRepository = class ClientRepository {
    * @returns {Promise} Resolves with all the clients found in the local database
    */
   get_all_clients_from_db() {
-    return this.client_service.load_all_clients_from_db()
-    .then((clients) => {
+    return this.client_service.load_all_clients_from_db().then(clients => {
       const recipients = {};
       for (const client of clients) {
         const ids = z.client.Client.dismantle_user_client_id(client.meta.primary_key);
-        if (!ids.user_id || [this.self_user().id, z.client.ClientRepository.PRIMARY_KEY_CURRENT_CLIENT].includes(ids.user_id)) {
+        if (
+          !ids.user_id ||
+          [this.self_user().id, z.client.ClientRepository.PRIMARY_KEY_CURRENT_CLIENT].includes(ids.user_id)
+        ) {
           continue;
         }
         recipients[ids.user_id] = recipients[ids.user_id] || [];
@@ -98,20 +100,28 @@ z.client.ClientRepository = class ClientRepository {
    * @returns {Promise<z.client.Client>} Resolves with the local client
    */
   get_current_client_from_db() {
-    return this.client_service.load_client_from_db(z.client.ClientRepository.PRIMARY_KEY_CURRENT_CLIENT)
-    .catch(() => {
-      throw new z.client.ClientError(z.client.ClientError.TYPE.DATABASE_FAILURE);
-    })
-    .then((client_payload) => {
-      if (_.isString(client_payload)) {
-        this.logger.info(`No current local client connected to '${z.client.ClientRepository.PRIMARY_KEY_CURRENT_CLIENT}' found in database`);
-        throw new z.client.ClientError(z.client.ClientError.TYPE.NO_LOCAL_CLIENT);
-      }
-      const client_et = this.client_mapper.map_client(client_payload);
-      this.current_client(client_et);
-      this.logger.info(`Loaded local client '${client_et.id}' connected to '${z.client.ClientRepository.PRIMARY_KEY_CURRENT_CLIENT}'`, this.current_client());
-      return this.current_client();
-    });
+    return this.client_service
+      .load_client_from_db(z.client.ClientRepository.PRIMARY_KEY_CURRENT_CLIENT)
+      .catch(() => {
+        throw new z.client.ClientError(z.client.ClientError.TYPE.DATABASE_FAILURE);
+      })
+      .then(client_payload => {
+        if (_.isString(client_payload)) {
+          this.logger.info(
+            `No current local client connected to '${z.client.ClientRepository
+              .PRIMARY_KEY_CURRENT_CLIENT}' found in database`
+          );
+          throw new z.client.ClientError(z.client.ClientError.TYPE.NO_LOCAL_CLIENT);
+        }
+        const client_et = this.client_mapper.map_client(client_payload);
+        this.current_client(client_et);
+        this.logger.info(
+          `Loaded local client '${client_et.id}' connected to '${z.client.ClientRepository
+            .PRIMARY_KEY_CURRENT_CLIENT}'`,
+          this.current_client()
+        );
+        return this.current_client();
+      });
   }
 
   /**
@@ -170,8 +180,7 @@ z.client.ClientRepository = class ClientRepository {
    * @returns {Promise} Resolves when the verification state has been updated
    */
   verify_client(user_id, client_et, is_verified) {
-    return this.update_client_in_db(user_id, client_et.id, {meta: {is_verified}})
-    .then(() => {
+    return this.update_client_in_db(user_id, client_et.id, {meta: {is_verified}}).then(() => {
       client_et.meta.is_verified(is_verified);
       return amplify.publish(z.event.WebApp.CLIENT.VERIFICATION_STATE_CHANGED, user_id, client_et, is_verified);
     });
@@ -237,39 +246,42 @@ z.client.ClientRepository = class ClientRepository {
    */
   get_valid_local_client() {
     return this.get_current_client_from_db()
-    .then((client_et) => this.get_client_by_id_from_backend(client_et.id))
-    .then((client) => {
-      this.logger.info(`Client with ID '${client.id}' (${client.type}) validated on backend`);
-      return this.current_client;
-    })
-    .catch((error) => {
-      const client_et = this.current_client();
-      this.current_client(undefined);
+      .then(client_et => this.get_client_by_id_from_backend(client_et.id))
+      .then(client => {
+        this.logger.info(`Client with ID '${client.id}' (${client.type}) validated on backend`);
+        return this.current_client;
+      })
+      .catch(error => {
+        const client_et = this.current_client();
+        this.current_client(undefined);
 
-      if (error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
-        this.logger.warn(`Local client '${client_et.id}' (${client_et.type}) no longer exists on the backend`, error);
-        return Promise.resolve()
-        .then(() => {
-          if (client_et.is_temporary()) {
-            return this.cryptography_repository.storage_repository.delete_everything();
-          }
-          return this.cryptography_repository.storage_repository.delete_cryptography();
-        })
-        .catch((database_error) => {
-          this.logger.error(`Deleting crypto database after failed client validation unsuccessful: ${database_error.message}`, database_error);
-          throw new z.client.ClientError(z.client.ClientError.TYPE.DATABASE_FAILURE);
-        })
-        .then(() => {
-          throw new z.client.ClientError(z.client.ClientError.TYPE.MISSING_ON_BACKEND);
-        });
-      } else if (error.type === z.client.ClientError.TYPE.NO_LOCAL_CLIENT) {
-        this.cryptography_repository.storage_repository.delete_cryptography();
-        throw error;
-      } else {
-        this.logger.error(`Getting valid local client failed: ${error.code || error.message}`, error);
-        throw error;
-      }
-    });
+        if (error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
+          this.logger.warn(`Local client '${client_et.id}' (${client_et.type}) no longer exists on the backend`, error);
+          return Promise.resolve()
+            .then(() => {
+              if (client_et.is_temporary()) {
+                return this.cryptography_repository.storage_repository.delete_everything();
+              }
+              return this.cryptography_repository.storage_repository.delete_cryptography();
+            })
+            .catch(database_error => {
+              this.logger.error(
+                `Deleting crypto database after failed client validation unsuccessful: ${database_error.message}`,
+                database_error
+              );
+              throw new z.client.ClientError(z.client.ClientError.TYPE.DATABASE_FAILURE);
+            })
+            .then(() => {
+              throw new z.client.ClientError(z.client.ClientError.TYPE.MISSING_ON_BACKEND);
+            });
+        } else if (error.type === z.client.ClientError.TYPE.NO_LOCAL_CLIENT) {
+          this.cryptography_repository.storage_repository.delete_cryptography();
+          throw error;
+        } else {
+          this.logger.error(`Getting valid local client failed: ${error.code || error.message}`, error);
+          throw error;
+        }
+      });
   }
 
   /**
@@ -283,39 +295,45 @@ z.client.ClientRepository = class ClientRepository {
   register_client(password) {
     const client_type = this._load_current_client_type();
 
-    return this.cryptography_repository.generate_client_keys()
-    .then((keys) => {
-      return this.client_service.post_clients(this._create_registration_payload(client_type, password, keys));
-    })
-    .catch((error) => {
-      if (error.label === z.service.BackendClientError.LABEL.TOO_MANY_CLIENTS) {
-        throw new z.client.ClientError(z.client.ClientError.TYPE.TOO_MANY_CLIENTS);
-      }
-      this.logger.error(`Client registration request failed: ${error.message}`, error);
-      throw new z.client.ClientError(z.client.ClientError.TYPE.REQUEST_FAILURE);
-    })
-    .then((response) => {
-      this.logger.info(`Registered '${response.type}' client '${response.id}' with cookie label '${response.cookie}'`, response);
-      this.current_client(this.client_mapper.map_client(response));
-      return this._save_current_client_in_db(response);
-    })
-    .catch((error) => {
-      if ([z.client.ClientError.TYPE.REQUEST_FAILURE, z.client.ClientError.TYPE.TOO_MANY_CLIENTS].includes(error.type)) {
+    return this.cryptography_repository
+      .generate_client_keys()
+      .then(keys => {
+        return this.client_service.post_clients(this._create_registration_payload(client_type, password, keys));
+      })
+      .catch(error => {
+        if (error.label === z.service.BackendClientError.LABEL.TOO_MANY_CLIENTS) {
+          throw new z.client.ClientError(z.client.ClientError.TYPE.TOO_MANY_CLIENTS);
+        }
+        this.logger.error(`Client registration request failed: ${error.message}`, error);
+        throw new z.client.ClientError(z.client.ClientError.TYPE.REQUEST_FAILURE);
+      })
+      .then(response => {
+        this.logger.info(
+          `Registered '${response.type}' client '${response.id}' with cookie label '${response.cookie}'`,
+          response
+        );
+        this.current_client(this.client_mapper.map_client(response));
+        return this._save_current_client_in_db(response);
+      })
+      .catch(error => {
+        if (
+          [z.client.ClientError.TYPE.REQUEST_FAILURE, z.client.ClientError.TYPE.TOO_MANY_CLIENTS].includes(error.type)
+        ) {
+          throw error;
+        }
+        this.logger.error(`Failed to save client: ${error.message}`, error);
+        throw new z.client.ClientError(z.client.ClientError.TYPE.DATABASE_FAILURE);
+      })
+      .then(client_payload => {
+        return this._transfer_cookie_label(client_type, client_payload.cookie);
+      })
+      .then(() => {
+        return this.current_client;
+      })
+      .catch(error => {
+        this.logger.error(`Client registration failed: ${error.message}`, error);
         throw error;
-      }
-      this.logger.error(`Failed to save client: ${error.message}`, error);
-      throw new z.client.ClientError(z.client.ClientError.TYPE.DATABASE_FAILURE);
-    })
-    .then((client_payload) => {
-      return this._transfer_cookie_label(client_type, client_payload.cookie);
-    })
-    .then(() => {
-      return this.current_client;
-    })
-    .catch((error) => {
-      this.logger.error(`Client registration failed: ${error.message}`, error);
-      throw error;
-    });
+      });
   }
 
   /**
@@ -388,7 +406,10 @@ z.client.ClientRepository = class ClientRepository {
    */
   _transfer_cookie_label(client_type, cookie_label) {
     const indexed_db_key = z.storage.StorageKey.AUTH.COOKIE_LABEL;
-    const local_storage_key = this.construct_cookie_label_key(this.self_user().email() || this.self_user().phone(), client_type);
+    const local_storage_key = this.construct_cookie_label_key(
+      this.self_user().email() || this.self_user().phone(),
+      client_type
+    );
 
     if (cookie_label === undefined) {
       cookie_label = this.construct_cookie_label(this.self_user().email() || this.self_user().phone(), client_type);
@@ -417,7 +438,6 @@ z.client.ClientRepository = class ClientRepository {
     const type = is_permanent ? z.client.ClientType.PERMANENT : z.client.ClientType.TEMPORARY;
     return z.util.Environment.electron ? z.client.ClientType.PERMANENT : type;
   }
-
 
   //##############################################################################
   // Client handling
@@ -456,27 +476,32 @@ z.client.ClientRepository = class ClientRepository {
       return Promise.reject(new z.client.ClientError(z.client.ClientError.TYPE.REQUEST_FORBIDDEN));
     }
 
-    return this.client_service.delete_client(client_id, password)
-    .then(() => {
-      return this.delete_client_from_db(this.self_user().id, client_id);
-    })
-    .then(() => {
-      this.self_user().remove_client(client_id);
-      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.REMOVED_DEVICE, {outcome: 'success'});
-      amplify.publish(z.event.WebApp.USER.CLIENT_REMOVED, this.self_user().id, client_id);
-      return this.clients();
-    })
-    .catch((error) => {
-      this.logger.error(`Unable to delete client '${client_id}': ${error.message}`, error);
-      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.REMOVED_DEVICE, {outcome: 'fail'});
+    return this.client_service
+      .delete_client(client_id, password)
+      .then(() => {
+        return this.delete_client_from_db(this.self_user().id, client_id);
+      })
+      .then(() => {
+        this.self_user().remove_client(client_id);
+        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.REMOVED_DEVICE, {
+          outcome: 'success',
+        });
+        amplify.publish(z.event.WebApp.USER.CLIENT_REMOVED, this.self_user().id, client_id);
+        return this.clients();
+      })
+      .catch(error => {
+        this.logger.error(`Unable to delete client '${client_id}': ${error.message}`, error);
+        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.REMOVED_DEVICE, {
+          outcome: 'fail',
+        });
 
-      if (error.code === z.service.BackendClientError.STATUS_CODE.FORBIDDEN) {
-        error = new z.client.ClientError(z.client.ClientError.TYPE.REQUEST_FORBIDDEN);
-      } else {
-        error = new z.client.ClientError(z.client.ClientError.TYPE.REQUEST_FAILURE);
-      }
-      throw error;
-    });
+        if (error.code === z.service.BackendClientError.STATUS_CODE.FORBIDDEN) {
+          error = new z.client.ClientError(z.client.ClientError.TYPE.REQUEST_FORBIDDEN);
+        } else {
+          error = new z.client.ClientError(z.client.ClientError.TYPE.REQUEST_FAILURE);
+        }
+        throw error;
+      });
   }
 
   logout_client() {
@@ -488,8 +513,9 @@ z.client.ClientRepository = class ClientRepository {
           },
         });
       }
-      return this.delete_temporary_client()
-        .then(() => amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReason.USER_REQUESTED, true));
+      return this.delete_temporary_client().then(() =>
+        amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReason.USER_REQUESTED, true)
+      );
     }
   }
 
@@ -501,8 +527,9 @@ z.client.ClientRepository = class ClientRepository {
    * @returns {Promise} Resolves when a client and its session have been deleted
    */
   remove_client(user_id, client_id) {
-    return this.cryptography_repository.delete_session(user_id, client_id)
-    .then(() => this.delete_client_from_db(user_id, client_id));
+    return this.cryptography_repository
+      .delete_session(user_id, client_id)
+      .then(() => this.delete_client_from_db(user_id, client_id));
   }
 
   /**
@@ -513,19 +540,19 @@ z.client.ClientRepository = class ClientRepository {
    * @returns {Promise} Resolves with an array of client entities
    */
   get_clients_by_user_id(user_id) {
-    return this.client_service.get_clients_by_user_id(user_id)
-    .then((clients) => this._update_clients_for_user(user_id, clients))
-    .then((client_ets) => {
-      amplify.publish(z.event.WebApp.CLIENT.UPDATE, user_id, client_ets);
-      return client_ets;
-    });
+    return this.client_service
+      .get_clients_by_user_id(user_id)
+      .then(clients => this._update_clients_for_user(user_id, clients))
+      .then(client_ets => {
+        amplify.publish(z.event.WebApp.CLIENT.UPDATE, user_id, client_ets);
+        return client_ets;
+      });
   }
 
   get_client_by_user_id_from_db(user_id) {
-    return this.client_service.load_all_clients_from_db()
-    .then((clients) => {
-      return clients.filter((client) => {
-        return (z.client.Client.dismantle_user_client_id(client.meta.primary_key)).user_id === user_id;
+    return this.client_service.load_all_clients_from_db().then(clients => {
+      return clients.filter(client => {
+        return z.client.Client.dismantle_user_client_id(client.meta.primary_key).user_id === user_id;
       });
     });
   }
@@ -536,14 +563,15 @@ z.client.ClientRepository = class ClientRepository {
    */
   get_clients_for_self() {
     this.logger.info(`Retrieving all clients for the self user '${this.self_user().id}'`);
-    return this.client_service.get_clients()
-    .then((response) => this._update_clients_for_user(this.self_user().id, response))
-    .then((client_ets) => {
-      for (const client_et of client_ets) {
-        this.self_user().add_client(client_et);
-      }
-      return this.self_user().devices();
-    });
+    return this.client_service
+      .get_clients()
+      .then(response => this._update_clients_for_user(this.self_user().id, response))
+      .then(client_ets => {
+        for (const client_et of client_ets) {
+          this.self_user().add_client(client_et);
+        }
+        return this.self_user().devices();
+      });
   }
 
   /**
@@ -566,12 +594,14 @@ z.client.ClientRepository = class ClientRepository {
    * @returns {Promise} Resolves when obsolete clients have been removed
    */
   _remove_obsolete_client_for_user_by_id(user_id, client_ids) {
-    return this.get_clients_by_user_id(user_id)
-    .then((client_ets) => {
-      this.logger.info(`For user '${user_id}' backend found '${client_ets.length}' active clients. Locally there are sessions for '${client_ids.length}' clients`, {
-        clients: client_ets,
-        sessions: client_ids,
-      });
+    return this.get_clients_by_user_id(user_id).then(client_ets => {
+      this.logger.info(
+        `For user '${user_id}' backend found '${client_ets.length}' active clients. Locally there are sessions for '${client_ids.length}' clients`,
+        {
+          clients: client_ets,
+          sessions: client_ids,
+        }
+      );
       for (const client_id of client_ids) {
         let deleted_client = true;
         for (const client_et of client_ets) {
@@ -608,61 +638,61 @@ z.client.ClientRepository = class ClientRepository {
 
     // Find clients in database
     return this.get_client_by_user_id_from_db(user_id)
-    .then((results) => {
-      const promises = [];
+      .then(results => {
+        const promises = [];
 
-      for (const result of results) {
-        if (clients_from_backend[result.id]) {
-          const {client, was_updated} = this.client_mapper.update_client(result, clients_from_backend[result.id]);
+        for (const result of results) {
+          if (clients_from_backend[result.id]) {
+            const {client, was_updated} = this.client_mapper.update_client(result, clients_from_backend[result.id]);
 
-          delete clients_from_backend[result.id];
+            delete clients_from_backend[result.id];
 
-          if (this.current_client() && this._is_current_client(user_id, result.id)) {
-            this.logger.warn(`Removing duplicate self client '${result.id}' locally`);
-            this.remove_client(user_id, result.id);
-          }
+            if (this.current_client() && this._is_current_client(user_id, result.id)) {
+              this.logger.warn(`Removing duplicate self client '${result.id}' locally`);
+              this.remove_client(user_id, result.id);
+            }
 
-          // Locally known client changed on backend
-          if (was_updated) {
-            this.logger.info(`Updating client '${result.id}' of user '${user_id}' locally`);
-            promises.push(this.save_client_in_db(user_id, client));
+            // Locally known client changed on backend
+            if (was_updated) {
+              this.logger.info(`Updating client '${result.id}' of user '${user_id}' locally`);
+              promises.push(this.save_client_in_db(user_id, client));
+              continue;
+            }
+
+            // Locally known client unchanged on backend
+            clients_stored_in_db.push(client);
             continue;
           }
 
-          // Locally known client unchanged on backend
-          clients_stored_in_db.push(client);
-          continue;
+          // Locally known client deleted on backend
+          this.logger.warn(`Removing client '${result.id}' of user '${user_id}' locally`);
+          this.remove_client(user_id, result.id);
         }
 
-        // Locally known client deleted on backend
-        this.logger.warn(`Removing client '${result.id}' of user '${user_id}' locally`);
-        this.remove_client(user_id, result.id);
-      }
+        for (const client_id in clients_from_backend) {
+          const client_payload = clients_from_backend[client_id];
 
-      for (const client_id in clients_from_backend) {
-        const client_payload = clients_from_backend[client_id];
+          if (this.current_client() && this._is_current_client(user_id, client_id)) {
+            continue;
+          }
 
-        if (this.current_client() && this._is_current_client(user_id, client_id)) {
-          continue;
+          // Locally unknown client new on backend
+          this.logger.info(`New client '${client_id}' of user '${user_id}' will be stored locally`);
+          if (this.self_user().id === user_id) {
+            this.on_client_add({client: client_payload});
+          }
+          promises.push(this._update_client_schema_in_db(user_id, client_payload));
         }
 
-        // Locally unknown client new on backend
-        this.logger.info(`New client '${client_id}' of user '${user_id}' will be stored locally`);
-        if (this.self_user().id === user_id) {
-          this.on_client_add({client: client_payload});
-        }
-        promises.push(this._update_client_schema_in_db(user_id, client_payload));
-      }
-
-      return Promise.all(promises);
-    })
-    .then((new_records) => {
-      return this.client_mapper.map_clients(clients_stored_in_db.concat(new_records));
-    })
-    .catch((error) => {
-      this.logger.error(`Unable to retrieve clients for user '${user_id}': ${error.message}`, error);
-      throw error;
-    });
+        return Promise.all(promises);
+      })
+      .then(new_records => {
+        return this.client_mapper.map_clients(clients_stored_in_db.concat(new_records));
+      })
+      .catch(error => {
+        this.logger.error(`Unable to retrieve clients for user '${user_id}': ${error.message}`, error);
+        throw error;
+      });
   }
 
   /**
@@ -683,14 +713,12 @@ z.client.ClientRepository = class ClientRepository {
     if (!client_id) {
       throw new z.client.ClientError(z.client.ClientError.TYPE.NO_CLIENT_ID);
     }
-    return (user_id === this.self_user().id) && (client_id === this.current_client().id);
+    return user_id === this.self_user().id && client_id === this.current_client().id;
   }
-
 
   //##############################################################################
   // Conversation Events
   //##############################################################################
-
 
   /**
    * Listener for incoming user events.
@@ -732,11 +760,10 @@ z.client.ClientRepository = class ClientRepository {
     if (client_id) {
       const is_current_client = client_id === this.current_client().id;
       if (is_current_client) {
-        this.cryptography_repository.storage_repository.delete_cryptography()
-          .then(() => {
-            const is_temporary_client = this.current_client().is_temporary();
-            amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReason.CLIENT_REMOVED, is_temporary_client);
-          });
+        this.cryptography_repository.storage_repository.delete_cryptography().then(() => {
+          const is_temporary_client = this.current_client().is_temporary();
+          amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReason.CLIENT_REMOVED, is_temporary_client);
+        });
       }
       amplify.publish(z.event.WebApp.CLIENT.REMOVE, this.self_user().id, client_id);
     }

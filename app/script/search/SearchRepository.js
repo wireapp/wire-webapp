@@ -56,13 +56,14 @@ z.search.SearchRepository = class SearchRepository {
    * @returns {Promise} Resolves with the search results
    */
   search_by_name(name, is_username, max_results = 10) {
-    return this.search_service.get_contacts(name, 30)
-      .then(({documents}) => documents.map((match) => match.id))
-      .then((user_ids) => this.user_repository.get_users_by_id(user_ids))
-      .then((user_ets) => user_ets.filter((user_et) => !user_et.is_connected()))
-      .then((user_ets) => {
+    return this.search_service
+      .get_contacts(name, 30)
+      .then(({documents}) => documents.map(match => match.id))
+      .then(user_ids => this.user_repository.get_users_by_id(user_ids))
+      .then(user_ets => user_ets.filter(user_et => !user_et.is_connected()))
+      .then(user_ets => {
         if (is_username) {
-          user_ets = user_ets.filter((user_et) => z.util.StringUtil.starts_with(user_et.username(), name));
+          user_ets = user_ets.filter(user_et => z.util.StringUtil.starts_with(user_et.username(), name));
         }
 
         return user_ets

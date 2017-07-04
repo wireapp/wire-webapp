@@ -40,7 +40,7 @@ z.announce.AnnounceService = class AnnounceService {
   get_announcements() {
     return new Promise((resolve, reject) => {
       $.get(this.url)
-        .done((data) => {
+        .done(data => {
           resolve(data['result']);
         })
         .fail((jqXHR, textStatus, errorThrown) => {
@@ -52,7 +52,7 @@ z.announce.AnnounceService = class AnnounceService {
   get_version() {
     return new Promise((resolve, reject) => {
       $.get('version/')
-        .done((data) => {
+        .done(data => {
           resolve(data['version']);
         })
         .fail((jqXHR, textStatus, errorThrown) => {

@@ -60,19 +60,20 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
         this.logger.info(`Initializing Cryptobox with database '${db.name}'...`);
         this.cryptobox = new cryptobox.Cryptobox(new cryptobox.store.IndexedDB(db), 10);
 
-        this.cryptobox.on(cryptobox.Cryptobox.TOPIC.NEW_PREKEYS, (pre_keys) => {
-          const serialized_pre_keys = pre_keys.map((pre_key) => {
+        this.cryptobox.on(cryptobox.Cryptobox.TOPIC.NEW_PREKEYS, pre_keys => {
+          const serialized_pre_keys = pre_keys.map(pre_key => {
             return this.cryptobox.serialize_prekey(pre_key);
           });
 
           this.logger.log(`Received '${pre_keys.length}' new PreKeys.`, serialized_pre_keys);
-          return this.cryptography_service.put_client_prekeys(this.current_client().id, serialized_pre_keys)
+          return this.cryptography_service
+            .put_client_prekeys(this.current_client().id, serialized_pre_keys)
             .then(() => {
               this.logger.log(`Successfully uploaded '${serialized_pre_keys.length}' PreKeys.`);
             });
         });
 
-        this.cryptobox.on(cryptobox.Cryptobox.TOPIC.NEW_SESSION, (session_id) => {
+        this.cryptobox.on(cryptobox.Cryptobox.TOPIC.NEW_SESSION, session_id => {
           const {user_id, client_id} = z.client.Client.dismantle_user_client_id(session_id);
           amplify.publish(z.event.WebApp.CLIENT.ADD, user_id, new z.client.Client({id: client_id}));
         });
@@ -93,10 +94,9 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
       this.cryptobox.get_serialized_last_resort_prekey(),
       this.cryptobox.get_serialized_standard_prekeys(),
       this._generate_signaling_keys(),
-    ])
-      .catch(function(error) {
-        throw new Error(`Failed to generate client keys: ${error.message}`);
-      });
+    ]).catch(function(error) {
+      throw new Error(`Failed to generate client keys: ${error.message}`);
+    });
   }
 
   /**
@@ -114,8 +114,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
    * @returns {Promise} Resolves with the remote fingerprint
    */
   get_remote_fingerprint(user_id, client_id) {
-    return this._load_session(user_id, client_id)
-      .then((cryptobox_session) => cryptobox_session.fingerprint_remote());
+    return this._load_session(user_id, client_id).then(cryptobox_session => cryptobox_session.fingerprint_remote());
   }
 
   /**
@@ -124,24 +123,21 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
    * @returns {Promise} Resolves with a map of pre-keys for the requested clients
    */
   get_users_pre_keys(recipients) {
-    return this.cryptography_service.get_users_pre_keys(recipients)
-      .catch((error) => {
-        if (error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
-          throw new z.user.UserError(z.user.UserError.prototype.TYPE.PRE_KEY_NOT_FOUND);
-        }
-        this.logger.error(`Failed to get pre-key from backend: ${error.message}`);
-        throw new z.user.UserError(z.user.UserError.prototype.TYPE.REQUEST_FAILURE);
-      });
+    return this.cryptography_service.get_users_pre_keys(recipients).catch(error => {
+      if (error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
+        throw new z.user.UserError(z.user.UserError.prototype.TYPE.PRE_KEY_NOT_FOUND);
+      }
+      this.logger.error(`Failed to get pre-key from backend: ${error.message}`);
+      throw new z.user.UserError(z.user.UserError.prototype.TYPE.REQUEST_FAILURE);
+    });
   }
 
   _load_session(user_id, client_id) {
-    return this.cryptobox.session_load(this._construct_session_id(user_id, client_id))
-      .catch(() => {
-        return this.get_users_pre_keys({[user_id]: [client_id]})
-          .then((user_pre_key_map) => {
-            return this._session_from_encoded_prekey_payload(user_pre_key_map[user_id][client_id], user_id, client_id);
-          });
+    return this.cryptobox.session_load(this._construct_session_id(user_id, client_id)).catch(() => {
+      return this.get_users_pre_keys({[user_id]: [client_id]}).then(user_pre_key_map => {
+        return this._session_from_encoded_prekey_payload(user_pre_key_map[user_id][client_id], user_id, client_id);
       });
+    });
   }
 
   /**
@@ -203,21 +199,26 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     for (const user_id in recipients) {
       const client_ids = recipients[user_id];
       payload.recipients[user_id] = payload.recipients[user_id] || {};
-      client_ids.forEach((client_id) => {
-        cipher_payload_promises.push(this._encrypt_payload_for_session(this._construct_session_id(user_id, client_id), generic_message));
+      client_ids.forEach(client_id => {
+        cipher_payload_promises.push(
+          this._encrypt_payload_for_session(this._construct_session_id(user_id, client_id), generic_message)
+        );
       });
     }
 
-    this.logger.log(`Encrypting message of type '${generic_message.content}' for '${Object.keys(payload.recipients).length}' users.`, payload.recipients);
+    this.logger.log(
+      `Encrypting message of type '${generic_message.content}' for '${Object.keys(payload.recipients).length}' users.`,
+      payload.recipients
+    );
 
     return Promise.all(cipher_payload_promises)
-      .then((cipher_payloads) => {
+      .then(cipher_payloads => {
         const recipients_for_missing_sessions = {};
 
         cipher_payloads.forEach(({cipher_text, session_id}) => {
           const {user_id, client_id} = z.client.Client.dismantle_user_client_id(session_id);
           if (cipher_text) {
-            return payload.recipients[user_id][client_id] = cipher_text;
+            return (payload.recipients[user_id][client_id] = cipher_text);
           }
           recipients_for_missing_sessions[user_id] = recipients_for_missing_sessions[user_id] || [];
           recipients_for_missing_sessions[user_id].push(client_id);
@@ -225,7 +226,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
 
         return this._encrypt_generic_message_for_new_sessions(recipients_for_missing_sessions, generic_message);
       })
-      .then((additional_cipher_payloads) => {
+      .then(additional_cipher_payloads => {
         additional_cipher_payloads.forEach(({cipher_text, session_id}) => {
           const {user_id, client_id} = z.client.Client.dismantle_user_client_id(session_id);
           payload.recipients[user_id] = payload.recipients[user_id] || {};
@@ -244,38 +245,57 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     const {data: event_data, from, id} = event;
 
     if (!event_data) {
-      this.logger.error(`Encrypted event with ID '${id}' from user ''${from} does not contain it's data payload`, event);
-      return Promise.reject(new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.NO_DATA_CONTENT));
+      this.logger.error(
+        `Encrypted event with ID '${id}' from user ''${from} does not contain it's data payload`,
+        event
+      );
+      return Promise.reject(
+        new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.NO_DATA_CONTENT)
+      );
     }
 
     // Check the length of the message
-    if (typeof event_data.text === 'string' && (event_data.text.length > z.config.MAXIMUM_MESSAGE_LENGTH_RECEIVING)) {
+    if (typeof event_data.text === 'string' && event_data.text.length > z.config.MAXIMUM_MESSAGE_LENGTH_RECEIVING) {
       const decryption_error = new Proteus.errors.DecryptError.InvalidMessage('The received message was too big.', 300);
-      return Promise.resolve(z.conversation.EventBuilder.build_incoming_message_too_big(event, decryption_error, decryption_error.code));
+      return Promise.resolve(
+        z.conversation.EventBuilder.build_incoming_message_too_big(event, decryption_error, decryption_error.code)
+      );
     }
 
     if (event_data.text === CryptographyRepository.REMOTE_ENCRYPTION_FAILURE) {
-      const decryption_error = new Proteus.errors.DecryptError.InvalidMessage('The sending client couldn\'t encrypt a message for our client.');
+      const decryption_error = new Proteus.errors.DecryptError.InvalidMessage(
+        "The sending client couldn't encrypt a message for our client."
+      );
       return Promise.resolve(this._handle_decryption_failure(decryption_error, event));
     }
 
     return this._decrypt_event(event)
-      .then((generic_message) => this.cryptography_mapper.map_generic_message(generic_message, event))
-      .catch((error) => this._handle_decryption_failure(error, event));
+      .then(generic_message => this.cryptography_mapper.map_generic_message(generic_message, event))
+      .catch(error => this._handle_decryption_failure(error, event));
   }
 
   _session_from_encoded_prekey_payload(remote_pre_key, user_id, client_id) {
     return Promise.resolve()
       .then(() => {
         if (remote_pre_key) {
-          this.logger.log(`Initializing session with Client ID '${client_id}' from User ID '${user_id}' with remote PreKey ID '${remote_pre_key.id}'.`);
-          return this.cryptobox.session_from_prekey(this._construct_session_id(user_id, client_id), z.util.base64_to_array(remote_pre_key.key).buffer);
+          this.logger.log(
+            `Initializing session with Client ID '${client_id}' from User ID '${user_id}' with remote PreKey ID '${remote_pre_key.id}'.`
+          );
+          return this.cryptobox.session_from_prekey(
+            this._construct_session_id(user_id, client_id),
+            z.util.base64_to_array(remote_pre_key.key).buffer
+          );
         }
-        this.logger.warn(`No remote PreKey for User ID '${user_id}' with Client ID '${client_id}' found. The owner probably deleted the client already.`);
+        this.logger.warn(
+          `No remote PreKey for User ID '${user_id}' with Client ID '${client_id}' found. The owner probably deleted the client already.`
+        );
         return undefined;
       })
-      .catch((error) => {
-        this.logger.warn(`Invalid remote PreKey for User ID '${user_id}' with Client ID '${client_id}' found. Skipping encryption. Reason: ${error.message}`, error);
+      .catch(error => {
+        this.logger.warn(
+          `Invalid remote PreKey for User ID '${user_id}' with Client ID '${client_id}' found. Skipping encryption. Reason: ${error.message}`,
+          error
+        );
         return undefined;
       });
   }
@@ -283,7 +303,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
   _encrypt_generic_message_for_new_sessions(recipients_for_missing_sessions, generic_message) {
     if (Object.keys(recipients_for_missing_sessions).length) {
       return this.get_users_pre_keys(recipients_for_missing_sessions)
-        .then((user_pre_key_map) => {
+        .then(user_pre_key_map => {
           this.logger.info(`Fetched pre-keys for '${Object.keys(user_pre_key_map).length}' users.`, user_pre_key_map);
 
           const new_session_promises = [];
@@ -298,10 +318,10 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
 
           return Promise.all(new_session_promises);
         })
-        .then((cryptobox_sessions) => {
+        .then(cryptobox_sessions => {
           const cipher_payload_promises = [];
 
-          cryptobox_sessions.forEach((cryptobox_session) => {
+          cryptobox_sessions.forEach(cryptobox_session => {
             if (cryptobox_session) {
               cipher_payload_promises.push(this._encrypt_payload_for_session(cryptobox_session.id, generic_message));
             }
@@ -340,8 +360,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     const cipher_text = z.util.base64_to_array(event_data.text || event_data.key).buffer;
     const session_id = this._construct_session_id(from, event_data.sender);
 
-    return this.cryptobox.decrypt(session_id, cipher_text)
-      .then((plaintext) => z.proto.GenericMessage.decode(plaintext));
+    return this.cryptobox.decrypt(session_id, cipher_text).then(plaintext => z.proto.GenericMessage.decode(plaintext));
   }
 
   /**
@@ -354,16 +373,20 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
    * @returns {Object} Contains session ID and encrypted message as BASE64 encoded string
    */
   _encrypt_payload_for_session(session_id, generic_message) {
-    return this.cryptobox.encrypt(session_id, generic_message.toArrayBuffer())
-      .then((cipher_text) => {
+    return this.cryptobox
+      .encrypt(session_id, generic_message.toArrayBuffer())
+      .then(cipher_text => {
         return {cipher_text: z.util.array_to_base64(cipher_text), session_id: session_id};
       })
-      .catch((error) => {
+      .catch(error => {
         if (error instanceof cryptobox.store.RecordNotFoundError) {
           this.logger.log(`Session '${session_id}' needs to get initialized...`);
           return {session_id: session_id};
         }
-        this.logger.warn(`Failed encrypting '${generic_message.content}' message for session '${session_id}': ${error.message}`, error);
+        this.logger.warn(
+          `Failed encrypting '${generic_message.content}' message for session '${session_id}': ${error.message}`,
+          error
+        );
         return {cipher_text: CryptographyRepository.REMOTE_ENCRYPTION_FAILURE, session_id: session_id};
       });
   }
@@ -393,13 +416,22 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     const is_remote_identity_changed = error instanceof Proteus.errors.DecryptError.RemoteIdentityChanged;
     if (is_invalid_message || is_invalid_signature) {
       // Session is broken, let's see what's really causing it...
-      this.logger.error(`Session '${session_id}' with user '${remote_user_id}' (client '${remote_client_id}') is broken or out of sync. Reset the session and decryption is likely to work again. Error: ${error.message}`, error);
+      this.logger.error(
+        `Session '${session_id}' with user '${remote_user_id}' (client '${remote_client_id}') is broken or out of sync. Reset the session and decryption is likely to work again. Error: ${error.message}`,
+        error
+      );
     } else if (is_remote_identity_changed) {
       // Remote identity changed
-      this.logger.error(`Remote identity of client '${remote_client_id}' from user '${remote_user_id}' changed: ${error.message}`, error);
+      this.logger.error(
+        `Remote identity of client '${remote_client_id}' from user '${remote_user_id}' changed: ${error.message}`,
+        error
+      );
     }
 
-    this.logger.warn(`Could not decrypt an event from client ID '${remote_client_id}' of user ID '${remote_user_id}' in session ID '${session_id}'.\nError Code: '${error_code}'\nError Message: ${error.message}`, error);
+    this.logger.warn(
+      `Could not decrypt an event from client ID '${remote_client_id}' of user ID '${remote_user_id}' in session ID '${session_id}'.\nError Code: '${error_code}'\nError Message: ${error.message}`,
+      error
+    );
     this._report_decryption_failure(error, event);
 
     return z.conversation.EventBuilder.build_unable_to_decrypt(event, error, error_code);
@@ -418,7 +450,9 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
   _report_decryption_failure(error, {data: event_data, from: user_id, type: event_type}) {
     const session_id = this._construct_session_id(user_id, event_data.sender);
 
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.E2EE.CANNOT_DECRYPT_MESSAGE, {cause: error.code || error.message});
+    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.E2EE.CANNOT_DECRYPT_MESSAGE, {
+      cause: error.code || error.message,
+    });
 
     const custom_data = {
       client_local_class: this.current_client().class,

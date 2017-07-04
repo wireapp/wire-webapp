@@ -28,12 +28,14 @@ z.components.EphemeralTimer = class EphemeralTimer {
 
     this.message_et = params.message;
 
-    this.ephemeral_duration = ko.computed(() => this.message_et.ephemeral_expires() - this.message_et.ephemeral_started());
+    this.ephemeral_duration = ko.computed(
+      () => this.message_et.ephemeral_expires() - this.message_et.ephemeral_started()
+    );
 
     this.progress = ko.observable(0);
     this.remaining_time = ko.observable(0);
 
-    this.remaining_subscription = this.message_et.ephemeral_remaining.subscribe((remaining_time) => {
+    this.remaining_subscription = this.message_et.ephemeral_remaining.subscribe(remaining_time => {
       if (Date.now() >= this.message_et.ephemeral_expires()) {
         return this.progress(1);
       }
@@ -45,7 +47,7 @@ z.components.EphemeralTimer = class EphemeralTimer {
   }
 
   is_bullet_active(index) {
-    const passed_index = this.progress() > ((index + 1) / this.bullet_count.length);
+    const passed_index = this.progress() > (index + 1) / this.bullet_count.length;
     if (passed_index) {
       return 'ephemeral-timer-bullet-inactive';
     }

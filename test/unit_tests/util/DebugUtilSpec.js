@@ -26,7 +26,8 @@ describe('z.util.DebugUtil', function() {
   const test_factory = new TestFactory();
 
   beforeAll(function(done) {
-    test_factory.exposeConversationActors()
+    test_factory
+      .exposeConversationActors()
       .then(function(conversation_repository) {
         debug_util = new z.util.DebugUtil(TestFactory.user_repository, conversation_repository);
         done();
@@ -63,6 +64,5 @@ describe('z.util.DebugUtil', function() {
 
       const amount = debug_util.get_number_of_clients_in_conversation();
       expect(amount).toBe(4);
-    })
-  );
+    }));
 });

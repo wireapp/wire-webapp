@@ -39,85 +39,90 @@ z.ViewModel.WindowTitleViewModel = class WindowTitleViewModel {
     this.logger.info('Starting to update window title');
     this.update_window_title = true;
 
-    ko.computed(() => {
-      if (this.update_window_title) {
-        let window_title = '';
-        let number_of_unread_conversations = 0;
-        const number_of_requests = this.user_repository.connect_requests().length;
+    ko
+      .computed(() => {
+        if (this.update_window_title) {
+          let window_title = '';
+          let number_of_unread_conversations = 0;
+          const number_of_requests = this.user_repository.connect_requests().length;
 
-        this.conversation_repository.all_unarchived_conversations()
-          .forEach((conversation_et) => {
-            if (!conversation_et.is_request() && !conversation_et.is_muted() && conversation_et.unread_message_count()) {
+          this.conversation_repository.all_unarchived_conversations().forEach(conversation_et => {
+            if (
+              !conversation_et.is_request() &&
+              !conversation_et.is_muted() &&
+              conversation_et.unread_message_count()
+            ) {
               number_of_unread_conversations++;
             }
           });
 
-        const badge_count = number_of_requests + number_of_unread_conversations;
-        if (badge_count > 0) {
-          window_title = `(${badge_count}) · `;
-        }
+          const badge_count = number_of_requests + number_of_unread_conversations;
+          if (badge_count > 0) {
+            window_title = `(${badge_count}) · `;
+          }
 
-        amplify.publish(z.event.WebApp.CONVERSATION.UNREAD, badge_count);
+          amplify.publish(z.event.WebApp.CONVERSATION.UNREAD, badge_count);
 
-        switch (this.content_state()) {
-          case z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS: {
-            if (number_of_requests > 1) {
-              window_title += z.l10n.text(z.string.conversations_connection_request_many, number_of_requests);
-            } else {
-              window_title += z.l10n.text(z.string.conversations_connection_request_one);
+          switch (this.content_state()) {
+            case z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS: {
+              if (number_of_requests > 1) {
+                window_title += z.l10n.text(z.string.conversations_connection_request_many, number_of_requests);
+              } else {
+                window_title += z.l10n.text(z.string.conversations_connection_request_one);
+              }
+              break;
             }
-            break;
-          }
 
-          case z.ViewModel.content.CONTENT_STATE.CONVERSATION: {
-            if (this.conversation_repository.active_conversation()) {
-              window_title += this.conversation_repository.active_conversation().display_name();
+            case z.ViewModel.content.CONTENT_STATE.CONVERSATION: {
+              if (this.conversation_repository.active_conversation()) {
+                window_title += this.conversation_repository.active_conversation().display_name();
+              }
+              break;
             }
-            break;
+
+            case z.ViewModel.content.CONTENT_STATE.PREFERENCES_ABOUT: {
+              window_title += z.l10n.text(z.string.preferences_about);
+              break;
+            }
+
+            case z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT: {
+              window_title += z.l10n.text(z.string.preferences_account);
+              break;
+            }
+
+            case z.ViewModel.content.CONTENT_STATE.PREFERENCES_AV: {
+              window_title += z.l10n.text(z.string.preferences_av);
+              break;
+            }
+
+            case z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS: {
+              window_title += z.l10n.text(z.string.preferences_device_details);
+              break;
+            }
+
+            case z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES: {
+              window_title += z.l10n.text(z.string.preferences_devices);
+              break;
+            }
+
+            case z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS: {
+              window_title += z.l10n.text(z.string.preferences_options);
+              break;
+            }
+
+            default:
+              break;
           }
 
-          case z.ViewModel.content.CONTENT_STATE.PREFERENCES_ABOUT: {
-            window_title += z.l10n.text(z.string.preferences_about);
-            break;
+          if (window_title !== '' && !window_title.endsWith(' ')) {
+            window_title += ' · ';
           }
+          window_title += z.l10n.text(z.string.wire);
 
-          case z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT: {
-            window_title += z.l10n.text(z.string.preferences_account);
-            break;
-          }
-
-          case z.ViewModel.content.CONTENT_STATE.PREFERENCES_AV: {
-            window_title += z.l10n.text(z.string.preferences_av);
-            break;
-          }
-
-          case z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS: {
-            window_title += z.l10n.text(z.string.preferences_device_details);
-            break;
-          }
-
-          case z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES: {
-            window_title += z.l10n.text(z.string.preferences_devices);
-            break;
-          }
-
-          case z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS: {
-            window_title += z.l10n.text(z.string.preferences_options);
-            break;
-          }
-
-          default:
-            break;
+          window.document.title = window_title;
         }
-
-        if ((window_title !== '') && !window_title.endsWith(' ')) {
-          window_title += ' · ';
-        }
-        window_title += z.l10n.text(z.string.wire);
-
-        window.document.title = window_title;
-      }
-    }).extend({rateLimit: 250});
+      })
+      .extend({rateLimit: 250});
   }
 
   set_update_state(handling_notifications) {

@@ -25,7 +25,12 @@ module.exports = {
   options: {
     configFile: 'karma.conf.js',
     files: [
-      {included: false, nocache: true, pattern: 'ext/proto/generic-message-proto/messages.proto', served: true},
+      {
+        included: false,
+        nocache: true,
+        pattern: 'ext/proto/generic-message-proto/messages.proto',
+        served: true,
+      },
       {included: false, nocache: false, pattern: 'audio/*.mp3', served: true},
       {included: false, nocache: true, pattern: 'worker/*.js', served: true},
       // helper files

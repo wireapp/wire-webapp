@@ -36,7 +36,16 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
    * @param {z.team.TeamRepository} team_repository - Team repoitory
    * @param {z.user.UserRepository} user_repository - User repository
   */
-  constructor(element_id, list_view_model, connect_repository, conversation_repository, properties_repository, search_repository, team_repository, user_repository) {
+  constructor(
+    element_id,
+    list_view_model,
+    connect_repository,
+    conversation_repository,
+    properties_repository,
+    search_repository,
+    team_repository,
+    user_repository
+  ) {
     this.click_on_close = this.click_on_close.bind(this);
     this.click_on_group = this.click_on_group.bind(this);
     this.click_on_other = this.click_on_other.bind(this);
@@ -60,7 +69,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
     this.submitted_search = false;
 
-    this.search = _.debounce((query) => {
+    this.search = _.debounce(query => {
       this.clear_search_results();
 
       const normalized_query = z.search.SearchRepository.normalize_query(query);
@@ -70,18 +79,21 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
         // Contacts, groups and others
         const is_username = query.trim().startsWith('@');
 
-        this.search_repository.search_by_name(normalized_query, is_username)
-          .then((user_ets) => {
+        this.search_repository
+          .search_by_name(normalized_query, is_username)
+          .then(user_ets => {
             if (normalized_query === z.search.SearchRepository.normalize_query(this.search_input())) {
               if (this.is_personal_space()) {
                 this.search_results.others(user_ets);
               } else {
-                const non_member_others = user_ets.filter((user_et) => !this.search_results.team_members().includes(user_et));
+                const non_member_others = user_ets.filter(
+                  user_et => !this.search_results.team_members().includes(user_et)
+                );
                 this.search_results.others(non_member_others);
               }
             }
           })
-          .catch((error) => {
+          .catch(error => {
             this.logger.error(`Error searching for contacts: ${error.message}`, error);
           });
         this.search_results.contacts(this.user_repository.search_for_connected_users(normalized_query, is_username));
@@ -89,7 +101,9 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
         if (!this.is_personal_space()) {
           this.search_results.team_members(this.search_for_member(normalized_query, is_username));
-          const non_member_contacts = this.search_results.contacts().filter((user_et) => !this.search_results.team_members().includes(user_et));
+          const non_member_contacts = this.search_results
+            .contacts()
+            .filter(user_et => !this.search_results.team_members().includes(user_et));
           this.search_results.contacts(non_member_contacts);
         }
 
@@ -106,7 +120,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
     this.user = this.user_repository.self;
     this.active_team = this.team_repository.active_team;
-    this.active_team.subscribe((active_team) => this.search(this.search_input()));
+    this.active_team.subscribe(active_team => this.search(this.search_input()));
 
     this.active_team_name = ko.pureComputed(() => {
       const team_et = this.active_team();
@@ -123,7 +137,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.selected_people = ko.observableArray([]);
 
     this.has_created_conversation = ko.observable(false);
-    this.show_hint = ko.pureComputed(() => (this.selected_people().length === 1) && !this.has_created_conversation());
+    this.show_hint = ko.pureComputed(() => this.selected_people().length === 1 && !this.has_created_conversation());
 
     this.group_hint_text = z.l10n.text(z.string.search_group_hint);
 
@@ -136,7 +150,8 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
         return this.matched_users();
       }
 
-      return this.user_repository.connected_users()
+      return this.user_repository
+        .connected_users()
         .sort((user_a, user_b) => z.util.StringUtil.sort_by_priority(user_a.first_name(), user_b.first_name()));
     });
 
@@ -144,12 +159,13 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       const active_team = this.active_team();
 
       if (active_team && active_team.id) {
-        return active_team.members().sort((user_a, user_b) => z.util.StringUtil.sort_by_priority(user_a.first_name(), user_b.first_name()));
+        return active_team
+          .members()
+          .sort((user_a, user_b) => z.util.StringUtil.sort_by_priority(user_a.first_name(), user_b.first_name()));
       }
 
       return [];
     });
-
 
     this.search_results = {
       contacts: ko.observableArray([]),
@@ -161,24 +177,34 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     // View states
     this.show_spinner = ko.observable(false);
 
-    this.should_update_scrollbar = ko.computed(() => {
-      return this.list_view_model.last_update();
-    }).extend({notify: 'always', rateLimit: 500});
+    this.should_update_scrollbar = ko
+      .computed(() => {
+        return this.list_view_model.last_update();
+      })
+      .extend({notify: 'always', rateLimit: 500});
 
     this.has_uploaded_contacts = ko.observable(false);
 
     this.has_search_results = ko.pureComputed(() => {
-      return this.search_results.groups().length || this.search_results.contacts().length || this.search_results.others().length;
+      return (
+        this.search_results.groups().length ||
+        this.search_results.contacts().length ||
+        this.search_results.others().length
+      );
     });
 
     this.show_connections = ko.pureComputed(() => this.is_personal_space() && this.connections().length);
 
-    this.show_no_contacts = ko.pureComputed(() => !this.show_search_results() && !this.connections().length && !this.show_matches());
+    this.show_no_contacts = ko.pureComputed(
+      () => !this.show_search_results() && !this.connections().length && !this.show_matches()
+    );
 
     this.show_no_matches = ko.pureComputed(() => this.show_matches() && !this.connections().length);
 
     this.show_no_search_results = ko.pureComputed(() => {
-      return !this.show_matches() && this.show_search_results() && !this.has_search_results() && this.search_input().length;
+      return (
+        !this.show_matches() && this.show_search_results() && !this.has_search_results() && this.search_input().length
+      );
     });
 
     this.show_invite = ko.pureComputed(() => this.is_personal_space());
@@ -201,7 +227,9 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     });
 
     this.show_team_member = ko.pureComputed(() => !this.is_personal_space() && this.team_members().length);
-    this.show_top_people = ko.pureComputed(() => this.is_personal_space() && this.top_users().length && !this.show_matches());
+    this.show_top_people = ko.pureComputed(
+      () => this.is_personal_space() && this.top_users().length && !this.show_matches()
+    );
 
     // Invite bubble states
     this.show_invite_form = ko.observable(true);
@@ -222,7 +250,9 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.invite_message = ko.observable('');
     this.invite_message_selected = ko.observable(true);
     this.invite_hints = ko.pureComputed(() => {
-      const meta_key = z.util.Environment.os.mac ? z.l10n.text(z.string.invite_meta_key_mac) : z.l10n.text(z.string.invite_meta_key_pc);
+      const meta_key = z.util.Environment.os.mac
+        ? z.l10n.text(z.string.invite_meta_key_mac)
+        : z.l10n.text(z.string.invite_meta_key_pc);
 
       if (this.invite_message_selected()) {
         return z.l10n.text(z.string.invite_hint_selected, meta_key);
@@ -271,17 +301,18 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
   import_contacts(source) {
     this.show_spinner(true);
 
-    this.connect_repository.get_contacts(source)
+    this.connect_repository
+      .get_contacts(source)
       .then((user_ids = []) => {
         this.active_team(this.team_repository.personal_space);
         return this.user_repository.get_users_by_id(user_ids);
       })
-      .then((user_ets) => {
+      .then(user_ets => {
         this.selected_people.removeAll();
         this.matched_users(user_ets);
         this.show_matches(true);
       })
-      .catch((error) => {
+      .catch(error => {
         if (error.type !== z.connect.ConnectError.TYPE.NO_CONTACTS) {
           this.logger.error(`Importing contacts from '${source}' failed: ${error.message}`, error);
 
@@ -290,25 +321,23 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
           });
         }
       })
-      .then((error) => {
+      .then(error => {
         this.show_spinner(false);
         this._track_import(source, error);
       });
   }
 
   search_for_member(query, is_username) {
-    return this.team_members()
-      .filter((user_et) => user_et.matches(query, is_username))
-      .sort(function(user_a, user_b) {
-        if (is_username) {
-          return z.util.StringUtil.sort_by_priority(user_a.username(), user_b.username(), query);
-        }
-        return z.util.StringUtil.sort_by_priority(user_a.name(), user_b.name(), query);
-      });
+    return this.team_members().filter(user_et => user_et.matches(query, is_username)).sort(function(user_a, user_b) {
+      if (is_username) {
+        return z.util.StringUtil.sort_by_priority(user_a.username(), user_b.username(), query);
+      }
+      return z.util.StringUtil.sort_by_priority(user_a.name(), user_b.name(), query);
+    });
   }
 
   update_list() {
-    this.get_top_people().then((user_ets) => this.top_users(user_ets));
+    this.get_top_people().then(user_ets => this.top_users(user_ets));
 
     this.show_spinner(false);
 
@@ -340,25 +369,26 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
   }
 
   click_on_group(conversation_et) {
-    const promise = conversation_et instanceof z.entity.User ? this.conversation_repository.get_1to1_conversation(conversation_et) : Promise.resolve(conversation_et);
+    const promise = conversation_et instanceof z.entity.User
+      ? this.conversation_repository.get_1to1_conversation(conversation_et)
+      : Promise.resolve(conversation_et);
 
-    return promise
-      .then((_conversation_et) => {
-        if (_conversation_et.is_archived()) {
-          this.conversation_repository.unarchive_conversation(_conversation_et);
-        }
+    return promise.then(_conversation_et => {
+      if (_conversation_et.is_archived()) {
+        this.conversation_repository.unarchive_conversation(_conversation_et);
+      }
 
-        if (_conversation_et.is_cleared()) {
-          _conversation_et.cleared_timestamp(0);
-        }
+      if (_conversation_et.is_cleared()) {
+        _conversation_et.cleared_timestamp(0);
+      }
 
-        amplify.publish(z.event.WebApp.CONVERSATION.SHOW, _conversation_et);
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.OPENED_CONVERSATION, {
-          conversation_type: (conversation_et.is_group() || conversation_et.is_team_group()) ? 'group' : 'one_to_one',
-        });
-        this._close_list();
-        return _conversation_et;
+      amplify.publish(z.event.WebApp.CONVERSATION.SHOW, _conversation_et);
+      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.OPENED_CONVERSATION, {
+        conversation_type: conversation_et.is_group() || conversation_et.is_team_group() ? 'group' : 'one_to_one',
       });
+      this._close_list();
+      return _conversation_et;
+    });
   }
 
   click_on_other(user_et, event) {
@@ -380,14 +410,14 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       context: 'startui',
     });
 
-    const create_bubble = (element_id) => {
+    const create_bubble = element_id => {
       this.user_profile(user_et);
       this.user_bubble_last_id = element_id;
       this.user_bubble = new zeta.webapp.module.Bubble({
         host_selector: `#${element.attr('id')}`,
         on_hide: () => {
           this.user_bubble = undefined;
-          return this.user_bubble_last_id = undefined;
+          return (this.user_bubble_last_id = undefined);
         },
         on_show() {
           return $('.start-ui-user-bubble .user-profile-connect-message').focus();
@@ -399,17 +429,16 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     };
 
     // We clicked on the same bubble
-    if (this.user_bubble && (this.user_bubble_last_id === event.currentTarget.id)) {
+    if (this.user_bubble && this.user_bubble_last_id === event.currentTarget.id) {
       this.user_bubble.toggle();
       return;
     }
 
-    const element = $(event.currentTarget)
-      .attr({
-        'data-bubble': '#start-ui-user-bubble',
-        'data-placement': 'right-flex',
-        'id': Date.now(),
-      });
+    const element = $(event.currentTarget).attr({
+      'data-bubble': '#start-ui-user-bubble',
+      'data-placement': 'right-flex',
+      id: Date.now(),
+    });
 
     // Dismiss old bubble and wait with creating the new one when another bubble is open
     if (this.user_bubble) {
@@ -427,19 +456,19 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
   //##############################################################################
 
   get_top_people() {
-    return this.conversation_repository.get_most_active_conversations()
+    return this.conversation_repository
+      .get_most_active_conversations()
       .then(function(conversation_ets) {
         return conversation_ets
-          .filter((conversation_et) => conversation_et.is_one2one())
+          .filter(conversation_et => conversation_et.is_one2one())
           .slice(0, 9)
-          .map((conversation_et) => conversation_et.participating_user_ids()[0]);
+          .map(conversation_et => conversation_et.participating_user_ids()[0]);
       })
-      .then((user_ids) => {
+      .then(user_ids => {
         return this.user_repository.get_users_by_id(user_ids);
       })
-      .then((user_ets) => user_ets.filter((user_et) => !user_et.is_blocked()));
+      .then(user_ets => user_ets.filter(user_et => !user_et.is_blocked()));
   }
-
 
   //##############################################################################
   // User bubble
@@ -460,12 +489,11 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
   }
 
   on_user_ignore(user_et) {
-    this.user_repository.ignore_connection_request(user_et)
-      .then(() => {
-        if (this.user_bubble) {
-          this.user_bubble.hide();
-        }
-      });
+    this.user_repository.ignore_connection_request(user_et).then(() => {
+      if (this.user_bubble) {
+        this.user_bubble.hide();
+      }
+    });
   }
 
   on_user_open() {
@@ -482,7 +510,6 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       this.user_bubble.hide();
     }
   }
-
 
   //##############################################################################
   // Invite bubble
@@ -513,7 +540,9 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
   show_invite_bubble() {
     if (!this.invite_bubble) {
-      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.OPENED_GENERIC_INVITE_MENU, {context: 'banner'});
+      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.OPENED_GENERIC_INVITE_MENU, {
+        context: 'banner',
+      });
 
       const self = this.user_repository.self();
 
@@ -545,26 +574,21 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
   _focus_invite_form() {
     $('.invite-link-box .message')
-      .on('copy', (event) => {
-        $(event.currentTarget)
-          .parent()
-          .find('.bg')
-          .addClass('bg-animation')
-          .on(z.util.alias.animationend, (_event) => {
-            if (_event.originalEvent.animationName === 'message-bg-fadeout') {
-              $(this).off(z.util.alias.animationend);
-              this.invite_bubble.hide();
-            }
-          });
+      .on('copy', event => {
+        $(event.currentTarget).parent().find('.bg').addClass('bg-animation').on(z.util.alias.animationend, _event => {
+          if (_event.originalEvent.animationName === 'message-bg-fadeout') {
+            $(this).off(z.util.alias.animationend);
+            this.invite_bubble.hide();
+          }
+        });
       })
       .on('blur', () => this.invite_message_selected(false))
-      .on('click', (event) => {
+      .on('click', event => {
         this.invite_message_selected(true);
         $(event.target).select();
       })
       .trigger('click');
   }
-
 
   //##############################################################################
   // User Properties
@@ -574,11 +598,11 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     const properties = this.properties_repository.properties;
     this.has_created_conversation(properties.has_created_conversation);
 
-    const has_uploaded_contacts = properties.contact_import.google !== undefined || properties.contact_import.macos !== undefined;
+    const has_uploaded_contacts =
+      properties.contact_import.google !== undefined || properties.contact_import.macos !== undefined;
     this.has_uploaded_contacts(has_uploaded_contacts);
     return true;
   }
-
 
   //##############################################################################
   // Header
@@ -607,43 +631,40 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       }
 
       default: {
-        const user_ids = this.selected_people().map((user_et) => user_et.id);
+        const user_ids = this.selected_people().map(user_et => user_et.id);
         return this._open_group_conversation(user_ids);
       }
     }
   }
 
   on_audio_call() {
-    this.on_submit_search(false)
-      .then((conversation_et) => {
-        if (conversation_et) {
-          window.setTimeout(() => {
-            amplify.publish(z.event.WebApp.CALL.STATE.TOGGLE, false, conversation_et);
-          }, 500);
-        }
-      });
+    this.on_submit_search(false).then(conversation_et => {
+      if (conversation_et) {
+        window.setTimeout(() => {
+          amplify.publish(z.event.WebApp.CALL.STATE.TOGGLE, false, conversation_et);
+        }, 500);
+      }
+    });
   }
 
   on_photo(images) {
-    this.on_submit_search(false)
-      .then((conversation_et) => {
-        if (conversation_et) {
-          window.setTimeout(() => {
-            amplify.publish(z.event.WebApp.CONVERSATION.IMAGE.SEND, images);
-          }, 500);
-        }
-      });
+    this.on_submit_search(false).then(conversation_et => {
+      if (conversation_et) {
+        window.setTimeout(() => {
+          amplify.publish(z.event.WebApp.CONVERSATION.IMAGE.SEND, images);
+        }, 500);
+      }
+    });
   }
 
   on_video_call() {
-    this.on_submit_search(false)
-      .then((conversation_et) => {
-        if (conversation_et) {
-          window.setTimeout(() => {
-            amplify.publish(z.event.WebApp.CALL.STATE.TOGGLE, true, conversation_et);
-          }, 500);
-        }
-      });
+    this.on_submit_search(false).then(conversation_et => {
+      if (conversation_et) {
+        window.setTimeout(() => {
+          amplify.publish(z.event.WebApp.CALL.STATE.TOGGLE, true, conversation_et);
+        }, 500);
+      }
+    });
   }
 
   _handle_search_input() {
@@ -692,14 +713,15 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
   _open_1to1_conversation(user_et) {
     this.submitted_search = true;
 
-    return this.conversation_repository.get_1to1_conversation(user_et)
-      .then((conversation_et) => {
+    return this.conversation_repository
+      .get_1to1_conversation(user_et)
+      .then(conversation_et => {
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.OPENED_CONVERSATION);
         this.click_on_group(conversation_et);
         this.submitted_search = false;
         return conversation_et;
       })
-      .catch((error) => {
+      .catch(error => {
         this.submitted_search = false;
         throw error;
       });
@@ -708,7 +730,8 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
   _open_group_conversation(user_ids) {
     this.submitted_search = true;
 
-    return this.conversation_repository.create_new_conversation(user_ids, null)
+    return this.conversation_repository
+      .create_new_conversation(user_ids, null)
       .then(({conversation_et}) => {
         this.properties_repository.save_preference(z.properties.PROPERTIES_TYPE.HAS_CREATED_CONVERSATION);
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.CREATE_GROUP_CONVERSATION, {
@@ -719,7 +742,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
         this.submitted_search = false;
         return conversation_et;
       })
-      .catch((error) => {
+      .catch(error => {
         this.submitted_search = false;
         this._close_list();
         throw new Error(`Unable to create conversation: ${error.message}`);
