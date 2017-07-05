@@ -281,6 +281,7 @@ z.string.fi.people_invite_detail = 'Yhteystietojesi jakaminen auttaa sinua löyt
 z.string.fi.people_invite_button_contacts = 'Kontakteista';
 z.string.fi.people_invite_button_gmail = 'Gmailista';
 z.string.fi.people_invite_headline = 'Kutsu kavereitasi';
+z.string.fi.people_share = 'Jaa yhteystietoja';
 z.string.fi.people_tabs_details = 'Lisätietoja';
 z.string.fi.people_tabs_devices = 'Laitteet';
 z.string.fi.people_tabs_devices_headline = 'Wire antaa jokaiselle laitteelle yksilöllisen sormenjäljen. Vertaa niitä {{user}} kanssa ja vahvista keskustelusi.';

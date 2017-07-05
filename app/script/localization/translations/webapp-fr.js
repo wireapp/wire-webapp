@@ -313,6 +313,7 @@ z.string.fr.people_invite_detail = 'Partager vos contacts vous permet de trouvez
 z.string.fr.people_invite_button_contacts = 'Depuis vos Contacts';
 z.string.fr.people_invite_button_gmail = 'Depuis Gmail';
 z.string.fr.people_invite_headline = 'Invitez vos amis';
+z.string.fr.people_share = 'Partagez vos contacts';
 z.string.fr.people_tabs_details = 'Détails';
 z.string.fr.people_tabs_devices = 'Appareils';
 z.string.fr.people_tabs_devices_headline = 'Wire donne à chaque appareil une empreinte unique. Comparez-les avec {{user}} et vérifiez votre conversation.';

@@ -325,6 +325,7 @@ z.string.tr.people_invite_detail = 'Kişileriniz paylaşmak, başkalarıyla bağ
 z.string.tr.people_invite_button_contacts = 'Kişilerden';
 z.string.tr.people_invite_button_gmail = 'Gmail’den';
 z.string.tr.people_invite_headline = 'Arkadaşlarınızı getirin';
+z.string.tr.people_share = 'Kişileri Paylaş';
 z.string.tr.people_tabs_details = 'Detaylar';
 z.string.tr.people_tabs_devices = 'Cihazlar';
 z.string.tr.people_tabs_devices_headline = 'Wire her cihaza eşsiz bir parmak izi verir. {{user}} ile karşılaştırın ve konuşmayı doğrulayın.';

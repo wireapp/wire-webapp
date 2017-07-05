@@ -325,6 +325,7 @@ z.string.pt.people_invite_detail = 'Compartilhar seus contatos ajuda a se conect
 z.string.pt.people_invite_button_contacts = 'Dos contatos';
 z.string.pt.people_invite_button_gmail = 'Do Gmail';
 z.string.pt.people_invite_headline = 'Traga os seus amigos';
+z.string.pt.people_share = 'Compartilhar Contatos';
 z.string.pt.people_tabs_details = 'Detalhes';
 z.string.pt.people_tabs_devices = 'Dispositivos';
 z.string.pt.people_tabs_devices_headline = 'O Wire fornece a cada dispositivo uma impressão digital única. Compare-as com {{user}} e verifique a sua conversa.';
