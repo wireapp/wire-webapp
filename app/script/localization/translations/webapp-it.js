@@ -325,6 +325,7 @@ z.string.it.people_invite_detail = 'Condividere i contatti dalla rubrica ti aiut
 z.string.it.people_invite_button_contacts = 'Dalla rubrica';
 z.string.it.people_invite_button_gmail = 'Da Gmail';
 z.string.it.people_invite_headline = 'Invita i tuoi amici';
+z.string.it.people_share = 'Condividi contatti';
 z.string.it.people_tabs_details = 'Dettagli';
 z.string.it.people_tabs_devices = 'Dispositivi';
 z.string.it.people_tabs_devices_headline = 'Wire dà un’impronta unica a ogni dispositivo. Confrontale con {{user}} e verifica la tua conversazione.';

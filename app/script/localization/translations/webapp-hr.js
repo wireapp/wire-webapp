@@ -272,6 +272,7 @@ z.string.hr.people_bring_your_friends = 'Pozovi prijatelje na Wire';
 z.string.hr.people_invite_button_contacts = 'Iz kontakata';
 z.string.hr.people_invite_button_gmail = 'Iz Gmaila';
 z.string.hr.people_invite_headline = 'Pozovi prijatelje';
+z.string.hr.people_share = 'Podijeli kontakte';
 z.string.hr.people_tabs_details = 'Detalji';
 z.string.hr.people_tabs_devices = 'Uređaji';
 z.string.hr.people_tabs_devices_headline = 'Wire daje svakom uređaju jedinstveni otisak. Usporedite otiske s {{user}} da bi verificirali razgovor.';

@@ -281,7 +281,7 @@ z.event.EventRepository = class EventRepository {
         }
 
         this.logger.warn('Last event date not found in database. Resetting...');
-        return this._update_last_notification_id(new Date(0).toISOString());
+        return this._update_last_event_date(new Date(0).toISOString());
       })
       .then((event_date) => {
         this.last_event_date(event_date);

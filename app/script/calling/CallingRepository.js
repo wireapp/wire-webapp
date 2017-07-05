@@ -103,6 +103,7 @@ z.calling.CallingRepository = class CallingRepository {
 
 
     this.flow_status = undefined;
+    this.debug_enabled = false;
 
     this.share_call_states();
     this.subscribe_to_events();
@@ -131,7 +132,7 @@ z.calling.CallingRepository = class CallingRepository {
     amplify.subscribe(z.event.WebApp.CALL.STATE.TOGGLE, this.toggle_state.bind(this));
     amplify.subscribe(z.event.WebApp.DEBUG.UPDATE_LAST_CALL_STATUS, this.store_flow_status.bind(this));
     amplify.subscribe(z.event.WebApp.LIFECYCLE.LOADED, this.get_config);
-    amplify.subscribe(z.util.Logger.prototype.LOG_ON_DEBUG, this.set_logging.bind(this));
+    amplify.subscribe(z.util.Logger.prototype.LOG_ON_DEBUG, this.set_debug_state.bind(this));
   }
 
 
@@ -1290,13 +1291,21 @@ z.calling.CallingRepository = class CallingRepository {
 
   /**
    * Set logging on adapter.js.
-   * @param {boolean} is_logging_enabled - New logging state
+   * @param {boolean} is_debugging_enabled - Updated debug state
    * @returns {undefined} No return value
    */
-  set_logging(is_logging_enabled) {
+  set_debug_state(is_debugging_enabled) {
+    if (this.debug_enabled !== is_debugging_enabled) {
+      this.debug_enabled = is_debugging_enabled;
+      this.logger.debug(`Debugging enabled state set to '${is_debugging_enabled}'`);
+      if (!is_debugging_enabled) {
+        this.message_log.length = 0;
+      }
+    }
+
     if (adapter) {
-      this.logger.debug(`Set logging for WebRTC Adapter: ${is_logging_enabled}`);
-      adapter.disableLog = !is_logging_enabled;
+      this.logger.debug(`Set logging for WebRTC Adapter: ${is_debugging_enabled}`);
+      adapter.disableLog = !is_debugging_enabled;
     }
   }
 
@@ -1342,14 +1351,17 @@ z.calling.CallingRepository = class CallingRepository {
       log_message = `Received '${type}' message (response: ${response}) from user '${user_id}' in conversation '${conversation_id}'`;
     }
 
-    const log_entry = {
-      date: date,
-      log: log_message,
-      message: call_message_et,
-    };
-
-    this.message_log.push(log_entry);
     this.logger.info(log_message, call_message_et);
+
+    if (this.debug_enabled) {
+      const log_entry = {
+        date: date,
+        log: log_message,
+        message: call_message_et,
+      };
+
+      this.message_log.push(log_entry);
+    }
   }
 
   /**

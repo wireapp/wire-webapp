@@ -299,6 +299,7 @@ z.string.es.people_invite_detail = 'Compartir tus contactos te ayuda a conectar 
 z.string.es.people_invite_button_contacts = 'Desde los contactos';
 z.string.es.people_invite_button_gmail = 'Desde Gmail';
 z.string.es.people_invite_headline = 'Tráete a tus amigos';
+z.string.es.people_share = 'Compartir contactos';
 z.string.es.people_tabs_details = 'Detalles';
 z.string.es.people_tabs_devices = 'Dispositivos';
 z.string.es.people_tabs_devices_headline = 'Wire proporciona a cada dispositivo una huella digital única. Comparala con {{user}} y verifica tu conversación.';
