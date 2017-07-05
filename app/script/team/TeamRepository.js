@@ -159,24 +159,29 @@ z.team.TeamRepository = class TeamRepository {
   }
 
   _send_account_info() {
-    const image_resource = this.is_team() ? this.self_user().preview_picture_resource() : this.self_user().preview_picture_resource();
-    const image_promise = image_resource ? image_resource.load() : Promise.resolve();
+    if (z.util.Environment.desktop) {
+      const image_resource = this.is_team() ? this.self_user().preview_picture_resource() : this.self_user().preview_picture_resource();
+      const image_promise = image_resource ? image_resource.load() : Promise.resolve();
 
-    image_promise
-      .then((image_blob) => z.util.load_data_url(image_blob))
-      .then((image_data_url) => {
-        const account_info = {
-          accentID: this.self_user().accent_id(),
-          name: this.team_name(),
-          picture: image_data_url,
-          teamID: this.team().id,
-          userID: this.self_user().id,
-        };
+      image_promise
+        .then((image_blob) => {
+          if (image_blob) {
+            z.util.load_data_url(image_blob);
+          }
+        })
+        .then((image_data_url) => {
+          const account_info = {
+            accentID: this.self_user().accent_id(),
+            name: this.team_name(),
+            picture: image_data_url,
+            teamID: this.team().id,
+            userID: this.self_user().id,
+          };
 
-        this.logger.info('Publishing account info', account_info);
-        amplify.publish(z.event.WebApp.TEAM.INFO, account_info);
-      });
-
+          this.logger.info('Publishing account info', account_info);
+          amplify.publish(z.event.WebApp.TEAM.INFO, account_info);
+        });
+    }
   }
 
   _on_delete(event_json) {
