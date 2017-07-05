@@ -267,6 +267,7 @@ z.string.cs.people_bring_your_friends = 'Přiveďte své přátele do aplikace W
 z.string.cs.people_invite_button_contacts = 'Z kontaktů';
 z.string.cs.people_invite_button_gmail = 'Z Gmailu';
 z.string.cs.people_invite_headline = 'Přiveďte své přátele';
+z.string.cs.people_share = 'Sdílet kontakty';
 z.string.cs.people_tabs_details = 'Podrobnosti';
 z.string.cs.people_tabs_devices = 'Přístroje';
 z.string.cs.people_tabs_devices_headline = 'Wire přiřazuje každému přístroji jedinečný identifikátor. Porovnejte je s {{user}} a ověřte svou konverzaci.';

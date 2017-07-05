@@ -326,6 +326,7 @@ z.string.nl.people_invite_detail = 'Het delen van je contacten helpt je om met a
 z.string.nl.people_invite_button_contacts = 'Van contacten';
 z.string.nl.people_invite_button_gmail = 'Van Gmail';
 z.string.nl.people_invite_headline = 'Nodig je vrienden uit';
+z.string.nl.people_share = 'Contacten delen';
 z.string.nl.people_tabs_details = 'Beschrijving';
 z.string.nl.people_tabs_devices = 'Apparaten';
 z.string.nl.people_tabs_devices_headline = 'Wire geeft elk apparaat een unieke vingerafdruk. Vergelijk deze met {{user}} en verifieer het gesprek.';

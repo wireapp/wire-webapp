@@ -44,6 +44,9 @@ z.string.sl.auth_account_sign_in_phone = 'Telefon';
 z.string.sl.auth_account_terms_of_use = 'Pogoji uporabe';
 z.string.sl.auth_account_terms_of_use_detail = 'Sprejmem';
 
+z.string.sl.auth_blocked_database = 'Wire potrebuje dostop do lokalnega pomnilnika za prikaz sporočil. Lokalni pomnilnik ni na voljo v privatnem načinu.';
+z.string.sl.auth_blocked_tabs = 'Wire je že odprt v drugem oknu.';
+
 z.string.sl.auth_verify_account_add = 'Dodaj';
 z.string.sl.auth_verify_account_detail = 'To vam omogoča uporabo Wire na večih napravah.';
 z.string.sl.auth_verify_account_headline = 'Dodajte e-poštni naslov in geslo.';
@@ -255,6 +258,7 @@ z.string.sl.archive_header = 'Arhiviraj';
 
 z.string.sl.conversations_all_archived = 'Vse je arhivirano';
 z.string.sl.conversations_contacts = 'Stiki';
+z.string.sl.conversations_connection_request_many = '{{number}} ljudi, ki čakajo';
 z.string.sl.conversations_connection_request_one = '1 oseba čaka';
 z.string.sl.conversations_empty_conversation = 'Skupinski pogovor';
 z.string.sl.conversations_empty_conversation_description = 'Vsi so zapustili pogovor';
@@ -322,6 +326,7 @@ z.string.sl.people_invite_detail = 'Deljenje vaših stikov pomaga pri povezovanj
 z.string.sl.people_invite_button_contacts = 'Iz imenika stikov';
 z.string.sl.people_invite_button_gmail = 'Iz Gmail';
 z.string.sl.people_invite_headline = 'Pripeljite vaše prijatelje';
+z.string.sl.people_share = 'Deli Stike';
 z.string.sl.people_tabs_details = 'Podrobnosti';
 z.string.sl.people_tabs_devices = 'Naprave';
 z.string.sl.people_tabs_devices_headline = 'Wire dodeli vsaki napravi edinstven prstni odtis. Primerjajte jih z {{user}} in preverite vaš pogovor.';
@@ -431,6 +436,10 @@ z.string.sl.preferences_options_contacts_detail = 'Uporabljamo vaše podatke sti
 z.string.sl.preferences_options_data = 'Podatki o uporabi in poročila o prisilnih ustavitvah';
 z.string.sl.preferences_options_data_checkbox = 'Podatki o uporabi in poročila o prisilnih ustavitvah';
 z.string.sl.preferences_options_data_detail = 'Izboljšajte Wire s pošiljanjem anonimnih informacij.';
+z.string.sl.preferences_options_popular = 'Po priljubljenosti';
+z.string.sl.preferences_options_emoji_replace_checkbox = 'Zamenjaj čustvene simbole z emojiji';
+z.string.sl.preferences_options_previews_send_checkbox = 'Ustvari predogled za povezave, ki jih pošiljate';
+z.string.sl.preferences_options_previews_send_detail = 'Predogledi se še vedno lahko prikazujejo za povezave drugih ljudi.';
 z.string.sl.preferences_options_notifications = 'Obvestila';
 z.string.sl.preferences_options_notifications_none = 'Izklopljeno';
 z.string.sl.preferences_options_notifications_obfuscate = 'Skrij podrobnosti';
@@ -537,6 +546,7 @@ z.string.sl.tooltip_conversations_archive = 'Arhiviraj ({{shortcut}})';
 z.string.sl.tooltip_conversations_archived = 'Prikaži arhiv ({{number}})';
 z.string.sl.tooltip_conversations_more = 'Več';
 z.string.sl.tooltip_conversations_notify = 'Povrni zvok ({{shortcut}})';
+z.string.sl.tooltip_conversations_preferences = 'Odpri nastavitve';
 z.string.sl.tooltip_conversations_silence = 'Utišaj ({{shortcut}})';
 z.string.sl.tooltip_conversations_start = 'Začni pogovor ({{shortcut}})';
 
