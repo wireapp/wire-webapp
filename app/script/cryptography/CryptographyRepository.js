@@ -263,7 +263,13 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
 
     return this._decrypt_event(event)
       .then((generic_message) => this.cryptography_mapper.map_generic_message(generic_message, event))
-      .catch((error) => this._handle_decryption_failure(error, event));
+      .catch((error) => {
+        if (error.type === z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE) {
+          throw error;
+        }
+
+        return this._handle_decryption_failure(error, event);
+      });
   }
 
   _session_from_encoded_prekey_payload(remote_pre_key, user_id, client_id) {
