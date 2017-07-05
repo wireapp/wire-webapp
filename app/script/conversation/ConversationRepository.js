@@ -218,9 +218,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   create_new_conversation(user_ids, name) {
     return this.conversation_service.create_conversation(user_ids, name, this.active_team().id)
-      .then((response) => {
-        return this._on_create({conversation: response.id, data: response});
-      });
+      .then((response) => this._on_create({conversation: response.id, data: response}));
   }
 
   /**
