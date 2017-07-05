@@ -20,10 +20,10 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.search = z.search || {};
+window.z.media = z.media || {};
 
-// Enum of different search modes.
-z.search.SEARCH_MODE = {
-  CONTACTS: 'contacts',
-  ON_BOARDING: 'onboarding',
+z.media.VIDEO_QUALITY_MODE = {
+  FULL_HD: 'z.media.VIDEO_QUALITY_MODE.FULL_HD',
+  HD: 'z.media.VIDEO_QUALITY_MODE.MOBILE.HD',
+  MOBILE: 'z.media.VIDEO_QUALITY_MODE.MOBILE',
 };

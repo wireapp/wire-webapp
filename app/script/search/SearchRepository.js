@@ -44,12 +44,12 @@ z.search.SearchRepository = class SearchRepository {
     this.search_service = search_service;
     this.user_repository = user_repository;
     this.logger = new z.util.Logger('z.search.SearchRepository', z.config.LOGGER.OPTIONS);
-
-    this.search_result_mapper = new z.search.SearchResultMapper(this.user_repository);
   }
 
   /**
    * Search for users on the backend by name.
+   * @note We skip a few results as connection changes need a while to reflect on the backend.
+   *
    * @param {string} name - Search query
    * @param {boolean} is_username - Is query a username
    * @param {number} [max_results=10] - Maximum number of results
@@ -57,8 +57,9 @@ z.search.SearchRepository = class SearchRepository {
    */
   search_by_name(name, is_username, max_results = 10) {
     return this.search_service.get_contacts(name, 30)
-      .then(({documents: matches}) => this.search_result_mapper.map_results(matches, z.search.SEARCH_MODE.CONTACTS))
-      .then(({results, mode}) => this._prepare_search_result(results, mode))
+      .then(({documents}) => documents.map((match) => match.id))
+      .then((user_ids) => this.user_repository.get_users_by_id(user_ids))
+      .then((user_ets) => user_ets.filter((user_et) => !user_et.is_connected()))
       .then((user_ets) => {
         if (is_username) {
           user_ets = user_ets.filter((user_et) => z.util.StringUtil.starts_with(user_et.username(), name));
@@ -72,53 +73,6 @@ z.search.SearchRepository = class SearchRepository {
             return z.util.StringUtil.sort_by_priority(user_a.name(), user_b.name(), name);
           })
           .slice(0, max_results);
-      });
-  }
-
-  /**
-   * Show on-boarding results.
-   * @param {Object} response - On-boarding server response
-   * @returns {Promise} Resolves with the connections found through on-boarding
-   */
-  show_on_boarding(response) {
-    return this.search_result_mapper.map_results(response['auto-connects'], z.search.SEARCH_MODE.ON_BOARDING)
-      .then((results) => {
-        if (results.length) {
-          return this.user_repository.get_user_by_id(results.map((result) => result.id));
-        }
-      });
-  }
-
-  /**
-   * Preparing the search results for display.
-   * @note We skip a few results as connection changes need a while to reflect on the backend.
-   *
-   * @private
-   * @param {Array<Object>} search_ets - An array of mapped search result entities
-   * @param {z.search.SEARCH_MODE} search_mode - Search mode
-   * @returns {Promise} Resolves with search results
-   */
-  _prepare_search_result(search_ets, search_mode) {
-    return this.user_repository.get_users_by_id(search_ets.map((result) => result.id))
-      .then((user_ets) => {
-        return user_ets.map((user_et) => {
-          /*
-           Skipping some results to adjust for slow backend updates.
-
-           Only show connected people among your top people.
-           Do not show already connected people when uploading address book.
-           */
-          switch (search_mode) {
-            case z.search.SEARCH_MODE.CONTACTS:
-              if (!user_et.is_connected()) {
-                return user_et;
-              }
-              break;
-            default:
-              return user_et;
-          }
-        })
-        .filter((user_et) => user_et);
       });
   }
 };

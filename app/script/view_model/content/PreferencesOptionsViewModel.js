@@ -81,7 +81,7 @@ z.ViewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
   update_properties(properties) {
     this.option_audio(properties.settings.sound.alerts);
     this.option_emoji_replace_inline(properties.settings.emoji.replace_inline);
-    this.option_previews_send(properties.settings.emoji.replace_inline);
+    this.option_previews_send(properties.settings.previews.send);
     this.option_privacy(properties.settings.privacy.improve_wire);
     this.option_notifications(properties.settings.notifications);
   }

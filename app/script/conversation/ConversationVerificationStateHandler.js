@@ -41,9 +41,11 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
   on_client_verification_changed(user_id) {
     this._get_active_conversations().forEach((conversation_et) => {
       if (this._will_change_to_degraded(conversation_et)) {
-        amplify.publish(z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_degraded(conversation_et, [user_id], z.message.VerificationMessageType.UNVERIFIED));
+        const degraded_event = z.conversation.EventBuilder.build_degraded(conversation_et, [user_id], z.message.VerificationMessageType.UNVERIFIED);
+        amplify.publish(z.event.WebApp.EVENT.INJECT, degraded_event);
       } else if (this._will_change_to_verified(conversation_et)) {
-        amplify.publish(z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_all_verified(conversation_et));
+        const all_verified_event = z.conversation.EventBuilder.build_all_verified(conversation_et);
+        amplify.publish(z.event.WebApp.EVENT.INJECT, all_verified_event);
       }
     });
   }
@@ -63,7 +65,8 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
         const user_ids_in_conversation = _.intersection(user_ids, conversation_et.participating_user_ids().concat(conversation_et.self.id));
 
         if (user_ids_in_conversation.length) {
-          return amplify.publish(z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_degraded(conversation_et, user_ids, z.message.VerificationMessageType.NEW_DEVICE));
+          const degraded_event = z.conversation.EventBuilder.build_degraded(conversation_et, user_ids, z.message.VerificationMessageType.NEW_DEVICE);
+          return amplify.publish(z.event.WebApp.EVENT.INJECT, degraded_event);
         }
       }
     });
@@ -76,7 +79,8 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
   on_client_removed() {
     this._get_active_conversations().forEach((conversation_et) => {
       if (this._will_change_to_verified(conversation_et)) {
-        amplify.publish(z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_all_verified(conversation_et));
+        const all_verified_event = z.conversation.EventBuilder.build_all_verified(conversation_et);
+        amplify.publish(z.event.WebApp.EVENT.INJECT, all_verified_event);
       }
     });
   }
@@ -89,9 +93,11 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
   on_clients_updated(user_id) {
     this._get_active_conversations().forEach((conversation_et) => {
       if (this._will_change_to_degraded(conversation_et)) {
-        amplify.publish(z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_degraded(conversation_et, [user_id], z.message.VerificationMessageType.NEW_DEVICE));
+        const degraded_event = z.conversation.EventBuilder.build_degraded(conversation_et, [user_id], z.message.VerificationMessageType.NEW_DEVICE);
+        amplify.publish(z.event.WebApp.EVENT.INJECT, degraded_event);
       } else if (this._will_change_to_verified(conversation_et)) {
-        amplify.publish(z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_all_verified(conversation_et));
+        const all_verified_event = z.conversation.EventBuilder.build_all_verified(conversation_et);
+        amplify.publish(z.event.WebApp.EVENT.INJECT, all_verified_event);
       }
     });
   }
@@ -108,7 +114,8 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
     }
 
     if (this._will_change_to_degraded(conversation_et)) {
-      amplify.publish(z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_degraded(conversation_et, user_ids, z.message.VerificationMessageType.NEW_MEMBER));
+      const degraded_event = z.conversation.EventBuilder.build_degraded(conversation_et, user_ids, z.message.VerificationMessageType.NEW_MEMBER);
+      amplify.publish(z.event.WebApp.EVENT.INJECT, degraded_event);
     }
   }
 
@@ -119,7 +126,8 @@ z.conversation.ConversationVerificationStateHandler = class ConversationVerifica
    */
   on_member_left(conversation_et) {
     if (this._will_change_to_verified(conversation_et)) {
-      amplify.publish(z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_all_verified(conversation_et));
+      const all_verified_event = z.conversation.EventBuilder.build_all_verified(conversation_et);
+      amplify.publish(z.event.WebApp.EVENT.INJECT, all_verified_event);
     }
   }
 

@@ -82,6 +82,19 @@ z.media.MediaEmbeds = (function() {
   };
 
   /**
+   * Find search parameters in a string
+   *
+   * @private
+   * @param {string} params - String where we should find the parameters
+   * @returns {string} Parameters
+   */
+  const _get_parameters = (params) => {
+    return params
+      .substr(params.indexOf('?'), params.length)
+      .replace(/^\?/, '');
+  };
+
+  /**
    * Generate embed URL to use as src in iframes
    *
    * @private
@@ -96,18 +109,34 @@ z.media.MediaEmbeds = (function() {
         return;
       }
 
-      // W have to remove the v param and convert the timestamp
-      // into an embed friendly format (start=seconds)
-      const query = url
-        .substr(url.indexOf('?'), url.length)
-        .replace(/^[?]/, '&')
-        .replace(/[&]v=[a-zA-Z0-9_-]{11}/, '')
-        .replace(/[&#]t=([a-z0-9]+)/, (temp, timestamp) => `&start=${_convert_youtube_timestamp_to_seconds(timestamp)}`)
-        .replace(/[&]?autoplay=1/, ''); // remove autoplay param
+      // Extract params from the URL
+      const parser = document.createElement('a');
+      parser.href = url;
+      const searchParams = new URLSearchParams([_get_parameters(parser.search), _get_parameters(parser.hash)].join('&'));
 
-      // append html5 parameter to youtube src to force html5 mode
-      // this fixes the issue that FF displays black box in some cases
-      return `https://www.youtube-nocookie.com/embed/${video_id[1]}?html5=1${query}`;
+      // Append HTML5 parameter to YouTube src to force HTML5 mode
+      // This fixes the issue that FF displays black box in some cases
+      searchParams.set('html5', 1);
+
+      searchParams.set('enablejsapi', 0);
+      searchParams.set('modestbranding', 1);
+
+      // Do not get related videos at the end
+      searchParams.set('rel', 0);
+
+      // Convert the timestamp into an embed friendly format (start=seconds)
+      if (searchParams.has('t')) {
+        searchParams.set('start', _convert_youtube_timestamp_to_seconds(searchParams.get('t')));
+        searchParams.delete('t');
+      }
+      
+      // Remove some parameters
+      searchParams.delete('autoplay');
+      searchParams.delete('v');
+      searchParams.delete('widget_referrer');
+      searchParams.delete('showinfo');
+
+      return `https://www.youtube-nocookie.com/embed/${video_id[1]}?${searchParams.toString()}`;
     }
   };
 

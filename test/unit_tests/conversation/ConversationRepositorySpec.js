@@ -757,11 +757,11 @@ describe('ConversationRepository', function() {
       const [, dudes] = TestFactory.conversation_repository.conversations();
       const user_ets = dudes.participating_user_ets();
 
-      TestFactory.conversation_repository.create_user_client_map(dudes.id)
-        .then(function(user_client_map) {
-          expect(Object.keys(user_client_map).length).toBe(2);
-          expect(user_client_map[bob.id].length).toBe(2);
-          expect(user_client_map[john.id].length).toBe(1);
+      TestFactory.conversation_repository.create_recipients(dudes.id)
+        .then(function(recipients) {
+          expect(Object.keys(recipients).length).toBe(2);
+          expect(recipients[bob.id].length).toBe(2);
+          expect(recipients[john.id].length).toBe(1);
           expect(user_ets.length).toBe(2);
           done();
         })
@@ -806,14 +806,14 @@ describe('ConversationRepository', function() {
       it('should add missing clients to the payload', function(done) {
         spyOn(TestFactory.user_repository, 'add_client_to_user').and.returnValue(Promise.resolve());
         // TODO: Make this fake method available as a utility function for testing
-        spyOn(TestFactory.cryptography_repository.cryptography_service, 'get_users_pre_keys').and.callFake(function(user_client_map) {
+        spyOn(TestFactory.cryptography_repository.cryptography_service, 'get_users_pre_keys').and.callFake(function(recipients) {
           return Promise.resolve()
             .then(function() {
               const pre_key_map = {};
 
-              for (const user_id in user_client_map) {
-                if (user_client_map.hasOwnProperty(user_id)) {
-                  const client_ids = user_client_map[user_id];
+              for (const user_id in recipients) {
+                if (recipients.hasOwnProperty(user_id)) {
+                  const client_ids = recipients[user_id];
                   pre_key_map[user_id] = pre_key_map[user_id] || {};
 
                   client_ids.forEach(function(client_id) {

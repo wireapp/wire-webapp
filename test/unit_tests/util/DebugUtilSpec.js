@@ -26,9 +26,9 @@ describe('z.util.DebugUtil', function() {
   const test_factory = new TestFactory();
 
   beforeAll(function(done) {
-    test_factory.exposeConversationActors()
-      .then(function(conversation_repository) {
-        debug_util = new z.util.DebugUtil(TestFactory.user_repository, conversation_repository);
+    test_factory.exposeCallingActors()
+      .then(function(calling_repository) {
+        debug_util = new z.util.DebugUtil(calling_repository, TestFactory.conversation_repository, TestFactory.user_repository);
         done();
       })
       .catch(done.fail);

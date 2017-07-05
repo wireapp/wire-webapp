@@ -326,6 +326,7 @@ z.string.de.people_invite_detail = 'Wir verwenden deine Kontaktdaten, um Kontakt
 z.string.de.people_invite_button_contacts = 'Aus Kontakte';
 z.string.de.people_invite_button_gmail = 'Aus Gmail';
 z.string.de.people_invite_headline = 'Hole deine Freunde';
+z.string.de.people_share = 'Teile deine Kontakte';
 z.string.de.people_tabs_details = 'Details';
 z.string.de.people_tabs_devices = 'Geräte';
 z.string.de.people_tabs_devices_headline = 'Wire gibt jedem Gerät einen einzigartigen Fingerabdruck. Vergleiche diese mit {{user}} und überprüfe deine Unterhaltung.';
