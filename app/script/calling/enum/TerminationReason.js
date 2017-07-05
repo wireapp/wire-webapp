@@ -28,6 +28,7 @@ z.calling.enum.TERMINATION_REASON = {
   CONCURRENT_CALL: 'concurrent',
   CONNECTION_DROP: 'drop',
   CONNECTION_FAILED: 'failed_ice',
+  GROUP_CHECK: 'group_check',
   MEMBER_LEAVE: 'member_leave',
   MISSED: 'missed',
   OTHER_USER: 'other',
