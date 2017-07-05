@@ -30,7 +30,6 @@ z.components.UserAvatar = class UserAvatar {
     this.badge = params.badge || false;
     this.delay = params.delay;
     this.element = $(component_info.element);
-    this.is_team_member = params.is_team_member || false;
 
     this.avatar_loading_blocked = false;
     this.avatar_entered_viewport = false;

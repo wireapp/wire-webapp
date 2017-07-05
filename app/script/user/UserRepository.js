@@ -79,7 +79,7 @@ z.user.UserRepository = class UserRepository {
     });
 
     this.is_team = ko.observable();
-    this.team = undefined;
+    this.team_members = undefined;
 
     amplify.subscribe(z.event.WebApp.CLIENT.ADD, this.add_client_to_user.bind(this));
     amplify.subscribe(z.event.WebApp.CLIENT.REMOVE, this.remove_client_from_user.bind(this));
@@ -959,10 +959,13 @@ z.user.UserRepository = class UserRepository {
   }
 
   map_guest_status(user_ets = this.users()) {
-    const team_members = this.team().members();
+    const team_members = this.team_members();
 
+    console.log('user_ets', user_ets);
     user_ets.forEach((user_et) => {
-      const is_team_member = team_members.find((member) => member.id === user_et.id);
+      console.log('user_et', user_et);
+      const is_team_member = !!team_members.find((member) => member.id === user_et.id);
+      console.log('is_team_member', is_team_member);
       user_et.is_guest(!is_team_member);
       user_et.is_team_member(is_team_member);
     });

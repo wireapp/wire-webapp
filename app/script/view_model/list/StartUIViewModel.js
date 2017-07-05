@@ -126,6 +126,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     });
 
     this.matched_users = ko.observableArray([]);
+    this.team_members = this.team_repository.team_members;
     this.top_users = ko.observableArray([]);
 
     this.search_results = {

@@ -37,27 +37,19 @@ z.team.TeamRepository = class TeamRepository {
     this.team_service = team_service;
     this.user_repository = user_repository;
 
-    this.is_team = ko.observable(false);
-
-    this.team = ko.observable();
-    this.team_name = ko.pureComputed(() => {
-      if (this.is_team()) {
-        return this.team().name();
-      }
-
-      return this.user_repository.self().name();
-    });
-    this.team_users = ko.pureComputed(() => {
-      if (this.is_team()) {
-        const team_members = this.team().members();
-        return team_members.concat(this.user_repository.connected_users());
-      }
-    });
-
     this.self_user = this.user_repository.self;
 
-    this.user_repository.team = this.team;
-    this.user_repository.team_users = this.team_users;
+    this.team = ko.observable();
+
+    this.is_team = ko.pureComputed(() => this.team() ? !!this.team().id : false);
+
+    this.team_members = ko.pureComputed(() => this.is_team() ? this.team().members() : []);
+    this.team_name = ko.pureComputed(() => this.is_team() ? this.team().name() : this.user_repository.self().name());
+    this.team_users = ko.pureComputed(() => this.team_members().concat(this.user_repository.connected_users()));
+
+    this.team_members.subscribe(() => this.user_repository.map_guest_status());
+
+    this.user_repository.team_members = this.team_members;
 
     amplify.subscribe(z.event.WebApp.TEAM.EVENT_FROM_BACKEND, this.on_team_event.bind(this));
   }
@@ -230,7 +222,6 @@ z.team.TeamRepository = class TeamRepository {
 
   _set_team(team_et) {
     this.update_team_members(team_et);
-    this.is_team(true);
     this.team(team_et);
     this.user_repository.map_guest_status();
   }
