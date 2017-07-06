@@ -678,6 +678,8 @@ z.calling.entities.Flow = class Flow {
 
   /**
    * Save the remote SDP received via an call message within the flow.
+   *
+   * @note The resolving value indicates whether negotiation should be skipped for the current state.
    * @param {CallMessage} call_message_et - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
    * @returns {Promise} Resolves when the remote SDP was saved
    */
