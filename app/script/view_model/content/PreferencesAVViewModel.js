@@ -35,6 +35,7 @@ z.ViewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
     this.available_devices = this.media_devices_handler.available_devices;
     this.current_device_id = this.media_devices_handler.current_device_id;
 
+    this.constraints_handler = this.media_repository.constraints_handler;
     this.media_stream_handler = this.media_repository.stream_handler;
     this.media_stream = this.media_stream_handler.local_media_stream;
 
@@ -92,7 +93,7 @@ z.ViewModel.content.PreferencesAVViewModel = class PreferencesAVViewModel {
       return Promise.resolve(this.media_stream());
     }
 
-    return this.media_stream_handler.get_media_stream_constraints(this.available_devices.audio_input().length, this.available_devices.video_input().length)
+    return this.constraints_handler.get_media_stream_constraints(this.available_devices.audio_input().length, this.available_devices.video_input().length)
       .then(({media_stream_constraints, media_type}) => {
         return this.media_stream_handler.request_media_stream(media_type, media_stream_constraints);
       })
