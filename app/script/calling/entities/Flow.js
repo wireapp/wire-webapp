@@ -141,11 +141,6 @@ z.calling.entities.Flow = class Flow {
           break;
         }
 
-        case z.calling.rtc.SIGNALING_STATE.REMOTE_OFFER: {
-          this.negotiation_needed(true);
-          break;
-        }
-
         case z.calling.rtc.SIGNALING_STATE.STABLE: {
           this._clear_negotiation_timeout();
           break;
@@ -550,7 +545,7 @@ z.calling.entities.Flow = class Flow {
     if (this.data_channel && this.data_channel_opened) {
       try {
         this.data_channel.send(call_message_et.to_content_string());
-        this.logger.info(`Send call '${type}' message to conversation '${conversation_id}' via data channel`, call_message_et.to_JSON());
+        this.logger.info(`Sending '${type}' message to conversation '${conversation_id}' via data channel`, call_message_et.to_JSON());
         return;
       } catch (error) {
         if (!response) {
@@ -684,9 +679,11 @@ z.calling.entities.Flow = class Flow {
   /**
    * Save the remote SDP received via an call message within the flow.
    * @param {CallMessage} call_message_et - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
-   * @returns {Promise} Resolves when remote SDP was saved
+   * @returns {Promise} Resolves when the remote SDP was saved
    */
   save_remote_sdp(call_message_et) {
+    let skip_negotiation = false;
+
     return z.calling.SDPMapper.map_call_message_to_object(call_message_et)
       .then((rtc_sdp) => z.calling.SDPMapper.rewrite_sdp(rtc_sdp, z.calling.enum.SDP_SOURCE.REMOTE, this))
       .then(({sdp: remote_sdp}) => {
@@ -695,13 +692,20 @@ z.calling.entities.Flow = class Flow {
           switch (this.signaling_state()) {
             case z.calling.rtc.SIGNALING_STATE.LOCAL_OFFER: {
               if (this._solve_colliding_states()) {
-                throw new z.calling.CallError(z.calling.CallError.TYPE.SDP_STATE_COLLISION);
+                return true;
               }
               break;
             }
 
             case z.calling.rtc.SIGNALING_STATE.NEW:
             case z.calling.rtc.SIGNALING_STATE.STABLE: {
+              const is_update = call_message_et.type === z.calling.enum.CALL_MESSAGE_TYPE.UPDATE;
+
+              if (is_update) {
+                this.restart_negotiation(z.calling.enum.SDP_NEGOTIATION_MODE.STREAM_CHANGE, true);
+                skip_negotiation = true;
+              }
+
               this.is_answer(true);
               break;
             }
@@ -714,6 +718,7 @@ z.calling.entities.Flow = class Flow {
 
         this.remote_sdp(remote_sdp);
         this.logger.debug(`Saved remote '${remote_sdp.type}' SDP`, this.remote_sdp());
+        return skip_negotiation;
       });
   }
 

@@ -58,9 +58,6 @@ z.calling.CallError = class CallError extends Error {
         case CallError.TYPE.RTP_SENDER_NOT_SUPPORTED:
           this.message = 'PeerConnection does not support RtcRtpSender extension';
           break;
-        case CallError.TYPE.SDP_STATE_COLLISION:
-          this.message = 'Unresolved SDP states collision of participants';
-          break;
         case CallError.TYPE.UNSUPPORTED_VERSION:
           this.message = 'Unsupported version of the call protocol';
           break;
@@ -89,7 +86,6 @@ z.calling.CallError = class CallError extends Error {
       NOT_FOUND: 'z.calling.CallError.TYPE.NOT_FOUND',
       NOT_SUPPORTED: 'z.calling.CallError.TYPE.NOT_SUPPORTED',
       RTP_SENDER_NOT_SUPPORTED: 'z.calling.CallError.TYPE.RTP_SENDER_NOT_SUPPORTED',
-      SDP_STATE_COLLISION: 'z.calling.CallError.TYPE.SDP_STATE_COLLISION',
       UNKNOWN: 'z.calling.CallError.TYPE.UNKNOWN',
       UNSUPPORTED_VERSION: 'z.calling.CallError.TYPE.UNSUPPORTED_VERSION',
       WRONG_CONVERSATION_TYPE: 'z.calling.CallError.TYPE.WRONG_CONVERSATION_TYPE',
