@@ -60,7 +60,8 @@ z.calling.entities.Call = class Call {
     this.timings = undefined;
 
     this.media_repository = media_repository;
-    this.self_user = user_repository.self();
+    this.user_repository = user_repository;
+    this.self_user = this.user_repository.self();
     this.self_state = self_state;
     this.telemetry = telemetry;
 
@@ -69,7 +70,7 @@ z.calling.entities.Call = class Call {
     this.timer_start = undefined;
     this.direction = undefined;
     this.duration_time = ko.observable(0);
-    this.group_check_timeout = undefined;
+    this.group_check_timeout_id = undefined;
     this.termination_reason = undefined;
 
     this.is_connected = ko.observable(false);
@@ -110,8 +111,10 @@ z.calling.entities.Call = class Call {
     this.participants_count = ko.pureComputed(() => this.get_number_of_participants(this.self_user_joined()));
 
     // Observable subscriptions
+    this.was_connected = false;
     this.is_connected.subscribe((is_connected) => {
       if (is_connected) {
+        this.was_connected = true;
         if (this.is_group) {
           this.schedule_group_check();
         }
@@ -201,17 +204,30 @@ z.calling.entities.Call = class Call {
    * @returns {undefined} No return value
    */
   deactivate_call(call_message_et, termination_reason = z.calling.enum.TERMINATION_REASON.SELF_USER) {
-    const was_missed = z.calling.enum.CALL_STATE_GROUP.WAS_MISSED.includes(this.state());
-    const reason = was_missed ? z.calling.enum.TERMINATION_REASON.MISSED : z.calling.enum.TERMINATION_REASON.COMPLETED;
+    const everyone_left = this.participants().length <= 1;
+    const on_group_check = termination_reason === z.calling.enum.TERMINATION_REASON.GROUP_CHECK;
 
-    this.termination_reason = termination_reason;
-    this.calling_repository.inject_deactivate_event(call_message_et, this.creating_user, reason);
+    this._clear_timeouts();
 
-    if (this.participants().length <= 1) {
-      this.calling_repository.delete_call(this.id);
-    } else {
-      this.calling_repository.media_stream_handler.reset_media_stream();
+    if (everyone_left || on_group_check) {
+      const reason = !this.was_connected ? z.calling.enum.TERMINATION_REASON.MISSED : z.calling.enum.TERMINATION_REASON.COMPLETED;
+
+      if (on_group_check && !everyone_left) {
+        const user_ids = this.participants().map((participant_et) => participant_et.id);
+        this.logger.warn(`Deactivation on group check with remaining users '${user_ids.join(', ')}' on group check`);
+      }
+
+      this.termination_reason = termination_reason;
+      this.calling_repository.inject_deactivate_event(call_message_et, z.event.EventRepository.SOURCE.WEB_SOCKET, this.creating_user, reason);
+
+      return this.calling_repository.delete_call(this.id);
     }
+
+    if (this.is_group) {
+      this.schedule_group_check();
+    }
+
+    this.calling_repository.media_stream_handler.reset_media_stream();
   }
 
   /**
@@ -241,10 +257,9 @@ z.calling.entities.Call = class Call {
 
       this.send_call_message(z.calling.CallMessageBuilder.build_group_start(response, this.session_id, prop_sync_payload));
     } else {
-      const [user_id] = this.conversation_et.participating_user_ids();
+      const [remote_user_id] = this.conversation_et.participating_user_ids();
 
-      this.calling_repository.user_repository.get_user_by_id(user_id)
-        .then((remote_user_et) => this.add_participant(remote_user_et));
+      this.add_or_update_participant(remote_user_id, true);
     }
   }
 
@@ -254,8 +269,6 @@ z.calling.entities.Call = class Call {
    * @returns {undefined} No return value
    */
   leave_call(termination_reason) {
-    this._clear_timeouts();
-
     if (this.state() === z.calling.enum.CALL_STATE.ONGOING && !this.is_group) {
       this.state(z.calling.enum.CALL_STATE.DISCONNECTING);
     }
@@ -373,9 +386,10 @@ z.calling.entities.Call = class Call {
    * @returns {undefined} No return value
    */
   _clear_group_check_timeout() {
-    if (this.group_check_timeout) {
-      window.clearTimeout(this.group_check_timeout);
-      this.group_check_timeout = undefined;
+    if (this.group_check_timeout_id) {
+      this.logger.debug(`Clear group check timeout with ID '${this.group_check_timeout_id}'`);
+      window.clearTimeout(this.group_check_timeout_id);
+      this.group_check_timeout_id = undefined;
     }
   }
 
@@ -391,6 +405,38 @@ z.calling.entities.Call = class Call {
   }
 
   /**
+   * Leave group call or schedule sending new group check after timeout.
+   *
+   * @private
+   * @param {number} timeout_in_seconds - Random timeout in seconds
+   * @returns {undefined} No return value
+   */
+  _on_send_group_check_timeout(timeout_in_seconds) {
+    if (this.participants().length) {
+      this.logger.info(`Sending group check after random timeout of '${timeout_in_seconds}s' (ID: ${this.group_check_timeout_id})`);
+      const additional_payload = z.calling.CallMessageBuilder.create_payload(this.id, this.self_user.id);
+
+      this.send_call_message(z.calling.CallMessageBuilder.build_group_check(true, this.session_id, additional_payload));
+      return this.schedule_group_check();
+    }
+
+    this.leave_call(z.calling.enum.TERMINATION_REASON.OTHER_USER);
+  }
+
+  /**
+   * Remove group call after timeout.
+   * @private
+   * @returns {undefined} No return value
+   */
+  _on_verify_group_check_timeout() {
+    this.logger.info(`Removing on group check timeout (ID: ${this.group_check_timeout_id})`);
+    const additional_payload = z.calling.CallMessageBuilder.create_payload(this.id, this.self_user.id, this.creating_user.id);
+    const call_message_et = z.calling.CallMessageBuilder.build_group_leave(false, this.session_id, additional_payload);
+
+    this.deactivate_call(call_message_et, z.calling.enum.TERMINATION_REASON.GROUP_CHECK);
+  }
+
+  /**
    * Set the outgoing group check timeout.
    * @private
    * @returns {undefined} No return value
@@ -400,18 +446,10 @@ z.calling.entities.Call = class Call {
     const minimum_timeout = Call.CONFIG.GROUP_CHECK_MINIMUM_TIMEOUT;
     const timeout_in_seconds = z.util.NumberUtil.get_random_number(minimum_timeout, maximum_timeout);
 
-    this.logger.debug(`Set sending group check after random timeout of '${timeout_in_seconds}s'`);
-    this.group_check_timeout = window.setTimeout(() => {
-      if (this.participants().length) {
-        this.logger.debug(`Sending group check after random timeout of '${timeout_in_seconds}s'`);
-        const additional_payload = z.calling.CallMessageBuilder.create_payload(this.id, this.self_user.id);
-
-        this.send_call_message(z.calling.CallMessageBuilder.build_group_check(true, this.session_id, additional_payload));
-        this.schedule_group_check();
-      } else {
-        this.leave_call(z.calling.enum.TERMINATION_REASON.OTHER_USER);
-      }
+    this.group_check_timeout_id = window.setTimeout(() => {
+      this._on_send_group_check_timeout(timeout_in_seconds);
     }, timeout_in_seconds * 1000);
+    this.logger.debug(`Set sending group check after random timeout of '${timeout_in_seconds}s' (ID: ${this.group_check_timeout_id})`);
   }
 
   /**
@@ -422,14 +460,10 @@ z.calling.entities.Call = class Call {
   _set_verify_group_check_timeout() {
     const timeout_in_seconds = Call.CONFIG.GROUP_CHECK_ACTIVITY_TIMEOUT;
 
-    this.logger.debug(`Set verifying group check after '${timeout_in_seconds}s'`);
-    this.group_check_timeout = window.setTimeout(() => {
-      this.logger.debug('Removing on group check timeout');
-      const additional_payload = z.calling.CallMessageBuilder.create_payload(this.id, this.self_user.id, this.creating_user.id);
-      const call_message_et = z.calling.CallMessageBuilder.build_group_leave(false, this.session_id, additional_payload);
-
-      this.deactivate_call(call_message_et, z.calling.enum.TERMINATION_REASON.MISSED);
+    this.group_check_timeout_id = window.setTimeout(() => {
+      this._on_verify_group_check_timeout();
     }, timeout_in_seconds * 1000);
+    this.logger.debug(`Set verifying group check after '${timeout_in_seconds}s' (ID: ${this.group_check_timeout_id})`);
   }
 
 
@@ -600,61 +634,28 @@ z.calling.entities.Call = class Call {
     }
   }
 
-  /**
-   * Update the state on participant change.
-   *
-   * @private
-   * @param {Participant} participant_et - Updated participant
-   * @param {boolean} negotiate - Should negotiation be started immediately
-   * @returns {Participant} Changed participant
-   */
-  _update_state(participant_et, negotiate) {
-    this._update_remote_state();
-
-    if (negotiate) {
-      participant_et.start_negotiation();
-    }
-
-    return participant_et;
-  }
-
 
   //##############################################################################
   // Participants
   //##############################################################################
 
   /**
-   * Add an participant to the call.
+   * Add or update a participant of the call.
    *
-   * @param {z.entities.User} user_et - User entity to be added to the call
-   * @param {CallMessage} call_message_et - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
-   * @param {boolean} [negotiate=true] - Should negotiation be started immediately
-   * @returns {Promise} Resolves with added participant
+   * @param {string} user_id - User ID of the call participant
+   * @param {boolean} negotiate - Should negotiation be started immediately
+   * @param {CallMessage} [call_message_et] - Call message for participant change
+   * @returns {Promise} Resolves with participant entity
    */
-  add_participant(user_et, call_message_et, negotiate = true) {
-    const {id: user_id} = user_et;
-
+  add_or_update_participant(user_id, negotiate, call_message_et) {
     return this.get_participant_by_id(user_id)
-      .then(() => this.update_participant(user_id, call_message_et, negotiate))
+      .then(() => this._update_participant(user_id, negotiate, call_message_et))
       .catch((error) => {
-        if (error.type !== z.calling.CallError.TYPE.NOT_FOUND) {
-          throw error;
+        if (error.type === z.calling.CallError.TYPE.NOT_FOUND) {
+          return this._add_participant(user_id, negotiate, call_message_et);
         }
 
-        const participant_et = new z.calling.entities.Participant(this, user_et, this.timings, call_message_et);
-
-        this.logger.info(`Adding call participant '${user_et.name()}'`, participant_et);
-        this.participants.push(participant_et);
-
-        return participant_et.update_state(call_message_et)
-          .catch((_error) => {
-            if (_error.type !== z.calling.CallError.TYPE.SDP_STATE_COLLISION) {
-              throw error;
-            }
-
-            negotiate = false;
-          })
-          .then(() => this._update_state(participant_et, negotiate));
+        throw error;
       });
   }
 
@@ -756,45 +757,6 @@ z.calling.entities.Call = class Call {
   }
 
   /**
-   * Update call participant with call message.
-   *
-   * @param {string} user_id - ID of participant to update
-   * @param {CallMessage} call_message_et - Call message to update user with
-   * @param {boolean} [negotiate=false] - Should negotiation be started
-   * @returns {Promise} Resolves when participant was updated
-   */
-  update_participant(user_id, call_message_et, negotiate = false) {
-    return this.get_participant_by_id(user_id)
-      .then((participant_et) => {
-        if (call_message_et) {
-          const {client_id} = call_message_et;
-
-          if (client_id) {
-            participant_et.verify_client_id(client_id);
-          }
-
-          this.logger.info(`Updating call participant '${participant_et.user.name()}'`, call_message_et);
-          return participant_et.update_state(call_message_et);
-        }
-
-        return participant_et;
-      })
-      .catch((error) => {
-        if (error.type !== z.calling.CallError.TYPE.SDP_STATE_COLLISION) {
-          throw error;
-        }
-
-        negotiate = false;
-      })
-      .then((participant_et) => this._update_state(participant_et, negotiate))
-      .catch((error) => {
-        if (error.type !== z.calling.CallError.TYPE.NOT_FOUND) {
-          throw error;
-        }
-      });
-  }
-
-  /**
    * Verify call message belongs to call by session id.
    *
    * @private
@@ -815,6 +777,84 @@ z.calling.entities.Call = class Call {
         }
 
         throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_SENDER, 'Session IDs not matching');
+      });
+  }
+
+  /**
+   * Add an participant to the call.
+   *
+   * @param {string} user_id - User ID to be added to the call
+   * @param {boolean} negotiate - Should negotiation be started immediately
+   * @param {CallMessage} [call_message_et] - Call message entity for participant change
+   * @returns {Promise} Resolves with the added participant
+   */
+  _add_participant(user_id, negotiate, call_message_et) {
+    return this.get_participant_by_id(user_id)
+      .catch((error) => {
+        if (error.type !== z.calling.CallError.TYPE.NOT_FOUND) {
+          throw error;
+        }
+
+        return this.user_repository.get_user_by_id(user_id)
+          .then((user_et) => {
+            const participant_et = new z.calling.entities.Participant(this, user_et, this.timings);
+
+            this.participants.push(participant_et);
+
+            this.logger.info(`Adding call participant '${user_et.name()}'`, participant_et);
+            return this._update_participant_state(participant_et, negotiate, call_message_et);
+          });
+      });
+  }
+
+  /**
+   * Update call participant with call message.
+   *
+   * @param {string} user_id - User ID to be updated in the call
+   * @param {boolean} negotiate - Should negotiation be started
+   * @param {CallMessage} call_message_et - Call message to update user with
+   * @returns {Promise} Resolves with the updated participant
+   */
+  _update_participant(user_id, negotiate, call_message_et) {
+    return this.get_participant_by_id(user_id)
+      .then((participant_et) => {
+        if (call_message_et) {
+          const {client_id} = call_message_et;
+
+          if (client_id) {
+            participant_et.verify_client_id(client_id);
+          }
+        }
+
+        this.logger.info(`Updating call participant '${participant_et.user.name()}'`, call_message_et);
+        return this._update_participant_state(participant_et, negotiate, call_message_et);
+      });
+  }
+
+  /**
+   * Update call participant state.
+   *
+   * @param {z.calling.entities.Participant} participant_et - User ID to be added to the call
+   * @param {boolean} negotiate - Should negotiation be started
+   * @param {CallMessage} [call_message_et] - Call message to update user with
+   * @returns {Promise} Resolves with the updated participant
+   */
+  _update_participant_state(participant_et, negotiate, call_message_et) {
+    const update_promise = call_message_et ? participant_et.update_state(call_message_et) : Promise.resolve(false);
+
+    return update_promise
+      .then((skip_negotiation) => {
+        if (skip_negotiation) {
+          negotiate = false;
+        }
+
+        this._update_remote_state();
+
+        if (negotiate) {
+          participant_et.start_negotiation();
+        }
+
+        return participant_et;
       });
   }
 
@@ -881,7 +921,7 @@ z.calling.entities.Call = class Call {
    */
   _sort_participants_by_panning() {
     if (this.participants().length >= 2) {
-      this.participants
+      this.participants()
         .sort((participant_a, participant_b) => participant_a.user.joaat_hash - participant_b.user.joaat_hash)
         .forEach((participant_et, index) => {
           const panning = this._calculate_panning(index, this.participants().length);

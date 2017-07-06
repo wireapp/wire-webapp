@@ -310,6 +310,7 @@ z.string.da.people_invite_detail = 'At dele dine kontakter hjælper med at forbi
 z.string.da.people_invite_button_contacts = 'Fra Kontakter';
 z.string.da.people_invite_button_gmail = 'Fra Gmail';
 z.string.da.people_invite_headline = 'Få dine venner med';
+z.string.da.people_share = 'Del Kontakter';
 z.string.da.people_tabs_details = 'Detaljer';
 z.string.da.people_tabs_devices = 'Enheder';
 z.string.da.people_tabs_devices_headline = 'Wire giver hver enhed et unikt fingeraftryk. Sammenlign dem med {{user}} og bekræft din samtale.';

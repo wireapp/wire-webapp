@@ -53,13 +53,13 @@ describe('z.cryptography.CryptographyRepository', function() {
     });
 
     it('encrypts a generic message', function(done) {
-      spyOn(TestFactory.cryptography_service, 'get_users_pre_keys').and.callFake((user_client_map) =>
+      spyOn(TestFactory.cryptography_service, 'get_users_pre_keys').and.callFake((recipients) =>
         Promise.resolve().then(function() {
           const prekey_map = {};
 
-          for (const user_id in user_client_map) {
-            if (user_client_map.hasOwnProperty(user_id)) {
-              const client_ids = user_client_map[user_id];
+          for (const user_id in recipients) {
+            if (recipients.hasOwnProperty(user_id)) {
+              const client_ids = recipients[user_id];
 
               prekey_map[user_id] = prekey_map[user_id] || {};
 
@@ -79,11 +79,11 @@ describe('z.cryptography.CryptographyRepository', function() {
       const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, new z.proto.Text('Unit test'));
 
-      const user_client_map = {};
-      user_client_map[john_doe.id] = [john_doe.clients.phone_id, john_doe.clients.desktop_id];
-      user_client_map[jane_roe.id] = [jane_roe.clients.phone_id];
+      const recipients = {};
+      recipients[john_doe.id] = [john_doe.clients.phone_id, john_doe.clients.desktop_id];
+      recipients[jane_roe.id] = [jane_roe.clients.phone_id];
 
-      TestFactory.cryptography_repository.encrypt_generic_message(user_client_map, generic_message)
+      TestFactory.cryptography_repository.encrypt_generic_message(recipients, generic_message)
         .then(function(payload) {
           expect(payload.recipients).toBeTruthy();
           expect(Object.keys(payload.recipients).length).toBe(2);
@@ -110,11 +110,26 @@ describe('z.cryptography.CryptographyRepository', function() {
         .catch(done.fail);
     });
 
-    it('only accept reasonable sized payload', function(done) {
-      // Length of this message is 1 320 024 while the maximum is 150% of 8 000 (12 000)
+    it('only accept reasonable sized payload (text key)', function(done) {
+      // Length of this message is 1 320 024 while the maximum is 150% of 12 000 (18 000)
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const text = window.btoa(`https://wir${"\u0000\u0001\u0000\u000D\u0000A".repeat(165000)}e.com/`);
       const event = {"conversation":"7bc4558b-18ce-446b-8e62-0c442b86ba56","time":"2017-06-15T22:18:55.071Z","data":{"text":text,"sender":"ccc17722a9348793","recipient":"4d7a36b30ef8bc26"},"from":"8549aada-07cc-4272-9fd4-c2ae040c539d","type":"conversation.otr-message-add"};
+      /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
+
+      TestFactory.cryptography_repository.handle_encrypted_event(event)
+        .then((mapped_event) => {
+          expect(mapped_event.type).toBe(z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG);
+          done();
+        })
+        .catch(done.fail);
+    });
+
+    it('only accept reasonable sized payload (data key)', function(done) {
+      // Length of this message is 1 320 024 while the maximum is 150% of 12 000 (18 000)
+      /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
+      const data = window.btoa(`https://wir${"\u0000\u0001\u0000\u000D\u0000A".repeat(165000)}e.com/`);
+      const event = {"conversation":"7bc4558b-18ce-446b-8e62-0c442b86ba56","time":"2017-06-15T22:18:55.071Z","data":{"text":"💣","data":data,"sender":"ccc17722a9348793","recipient":"4d7a36b30ef8bc26"},"from":"8549aada-07cc-4272-9fd4-c2ae040c539d","type":"conversation.otr-message-add"};
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
       TestFactory.cryptography_repository.handle_encrypted_event(event)

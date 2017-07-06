@@ -143,7 +143,16 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
    * @returns {undefined} No return value
    */
   track_duration(call_et) {
-    const {conversation_et, duration_time, is_group, termination_reason, timer_start, max_number_of_participants} = call_et;
+    const {
+      conversation_et,
+      direction,
+      duration_time,
+      is_group,
+      termination_reason,
+      timer_start,
+      max_number_of_participants,
+    } = call_et;
+
     const duration = Math.floor((Date.now() - timer_start) / 1000);
 
     if (!window.isNaN(duration)) {
@@ -170,6 +179,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
         conversation_participants: conversation_et.number_of_participants(),
         conversation_participants_in_call: max_number_of_participants,
         conversation_type: is_group ? z.tracking.attribute.ConversationType.GROUP : z.tracking.attribute.ConversationType.ONE_TO_ONE,
+        direction: direction,
         duration: duration_bucket,
         duration_sec: duration,
         reason: termination_reason,

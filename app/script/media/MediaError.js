@@ -29,28 +29,28 @@ z.media.MediaError = class MediaError extends Error {
     this.name = this.constructor.name;
     this.media_type = media_type;
     this.stack = (new Error()).stack;
-    this.type = type || z.media.MediaError.TYPE.UNKNOWN;
+    this.type = type || MediaError.TYPE.UNKNOWN;
 
     switch (this.type) {
-      case z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE:
+      case MediaError.TYPE.MEDIA_STREAM_DEVICE:
         this.message = 'Device related failure when getting MediaStream';
         break;
-      case z.media.MediaError.TYPE.MEDIA_STREAM_MISC:
+      case MediaError.TYPE.MEDIA_STREAM_MISC:
         this.message = 'Other failure when getting MediaStream';
         break;
-      case z.media.MediaError.TYPE.MEDIA_STREAM_PERMISSION:
+      case MediaError.TYPE.MEDIA_STREAM_PERMISSION:
         this.message = 'Permission related failure when getting MediaStream';
         break;
-      case z.media.MediaError.TYPE.NO_AUDIO_STREAM_FOUND:
+      case MediaError.TYPE.NO_AUDIO_STREAM_FOUND:
         this.message = 'No audio stream found to toggle mute state';
         break;
-      case z.media.MediaError.TYPE.NO_MEDIA_DEVICES_FOUND:
+      case MediaError.TYPE.NO_MEDIA_DEVICES_FOUND:
         this.message = 'No MediaDevices found';
         break;
-      case z.media.MediaError.TYPE.SCREEN_NOT_SUPPORTED:
+      case MediaError.TYPE.SCREEN_NOT_SUPPORTED:
         this.message = 'Screen sharing is not yet supported by this browser';
         break;
-      case z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE:
+      case MediaError.TYPE.UNHANDLED_MEDIA_TYPE:
         this.message = 'Media type unknown';
         break;
       default:

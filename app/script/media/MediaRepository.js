@@ -46,6 +46,7 @@ z.media.MediaRepository = class MediaRepository {
   constructor() {
     this.logger = new z.util.Logger('z.media.MediaRepository', z.config.LOGGER.OPTIONS);
 
+    this.constraints_handler = new z.media.MediaConstraintsHandler(this);
     this.devices_handler = new z.media.MediaDevicesHandler(this);
     this.element_handler = new z.media.MediaElementHandler(this);
     this.stream_handler = new z.media.MediaStreamHandler(this);

@@ -31,9 +31,8 @@ z.calling.entities.Participant = class Participant {
    * @param {Call} call_et - Call entity
    * @param {z.entity.User} user - User entity to base the participant on
    * @param {CallSetupTimings} timings - Timing statistics of call setup steps
-   * @param {CallMessage} call_message_et - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
    */
-  constructor(call_et, user, timings, call_message_et) {
+  constructor(call_et, user, timings) {
     this.call_et = call_et;
     this.user = user;
     this.id = this.user.id;
@@ -51,7 +50,7 @@ z.calling.entities.Participant = class Participant {
       video_send: ko.observable(false),
     };
 
-    this.flow_et = new z.calling.entities.Flow(this.call_et, this, timings, call_message_et);
+    this.flow_et = new z.calling.entities.Flow(this.call_et, this, timings);
 
     this.is_connected.subscribe((is_connected) => {
       if (is_connected && !this.was_connected) {
@@ -82,13 +81,9 @@ z.calling.entities.Participant = class Participant {
   /**
    * Update the participant state.
    * @param {CallMessage} call_message_et - Call message to update state from.
-   * @returns {Promise} Resolves with the participant when the state was updated
+   * @returns {Promise} Resolves when the state was updated
    */
   update_state(call_message_et) {
-    if (!call_message_et) {
-      return Promise.resolve(this);
-    }
-
     const {client_id, props, sdp: rtc_sdp, session_id} = call_message_et;
 
     return this.update_properties(props)
@@ -99,8 +94,9 @@ z.calling.entities.Participant = class Participant {
         if (rtc_sdp) {
           return this.flow_et.save_remote_sdp(call_message_et);
         }
-      })
-      .then(() => this);
+
+        return false;
+      });
   }
 
   /**

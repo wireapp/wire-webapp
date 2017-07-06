@@ -41,9 +41,8 @@ z.calling.entities.Flow = class Flow {
    * @param {Call} call_et - Call entity that the flow belongs to
    * @param {Participant} participant_et - Participant entity that the flow belongs to
    * @param {CallSetupTimings} timings - Timing statistics of call setup steps
-   * @param {CallMessage} call_message_et - Optional call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
    */
-  constructor(call_et, participant_et, timings, call_message_et) {
+  constructor(call_et, participant_et, timings) {
     this.calling_repository = call_et.calling_repository;
 
     this.call_et = call_et;
@@ -54,7 +53,7 @@ z.calling.entities.Flow = class Flow {
     this.conversation_id = this.call_et.id;
 
     // States
-    this.is_answer = ko.observable(undefined);
+    this.is_answer = ko.observable(false);
 
     // Audio
     this.audio = new z.calling.entities.FlowAudio(this, this.calling_repository.media_repository);
@@ -88,7 +87,7 @@ z.calling.entities.Flow = class Flow {
     this.connection_state.subscribe((ice_connection_state) => {
       switch (ice_connection_state) {
         case z.calling.rtc.ICE_CONNECTION_STATE.CHECKING: {
-          this.telemetry.schedule_check(this.call_et.telemetry.media_type);
+          this.telemetry.schedule_check(this.call_et.telemetry.media_type, this.is_answer());
           break;
         }
 
@@ -139,11 +138,6 @@ z.calling.entities.Flow = class Flow {
         case z.calling.rtc.SIGNALING_STATE.CLOSED: {
           this.logger.info(`PeerConnection with '${this.remote_user.name()}' was closed`);
           this.call_et.delete_participant(this.participant_et.id, this.remote_client_id);
-          break;
-        }
-
-        case z.calling.rtc.SIGNALING_STATE.REMOTE_OFFER: {
-          this.negotiation_needed(true);
           break;
         }
 
@@ -277,29 +271,6 @@ z.calling.entities.Flow = class Flow {
         this._create_sdp_offer();
       }
     });
-
-    this.initialize_flow(call_message_et);
-  }
-
-  /**
-   * Initialize the flow.
-   *
-   * @note Magic here is that if an call_message is present, the remote user is the creator of the flow
-   * @param {CallMessage} call_message_et - Optional call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
-   * @returns {undefined} No return value
-   */
-  initialize_flow(call_message_et) {
-    if (call_message_et) {
-      const {client_id, sdp: rtc_sdp} = call_message_et;
-
-      this.set_remote_client_id(client_id);
-
-      if (rtc_sdp) {
-        return this.save_remote_sdp(call_message_et);
-      }
-    }
-
-    this.is_answer(false);
   }
 
   /**
@@ -313,10 +284,9 @@ z.calling.entities.Flow = class Flow {
   restart_negotiation(negotiation_mode, is_answer, media_stream) {
     this.logger.info(`Negotiation restart triggered by '${negotiation_mode}'`);
 
+    this.clear_timeouts();
     this._close_peer_connection();
     this._close_data_channel();
-    this._clear_negotiation_timeout();
-    this._clear_send_sdp_timeout();
     this._reset_signaling_states();
     this.is_answer(is_answer);
     this._reset_sdp();
@@ -575,7 +545,7 @@ z.calling.entities.Flow = class Flow {
     if (this.data_channel && this.data_channel_opened) {
       try {
         this.data_channel.send(call_message_et.to_content_string());
-        this.logger.info(`Send call '${type}' message to conversation '${conversation_id}' via data channel`, call_message_et.to_JSON());
+        this.logger.info(`Sending '${type}' message to conversation '${conversation_id}' via data channel`, call_message_et.to_JSON());
         return;
       } catch (error) {
         if (!response) {
@@ -680,13 +650,13 @@ z.calling.entities.Flow = class Flow {
     const {conversation_et} = this.call_et;
 
     if (response === true) {
-      this.logger.debug(`Received confirmation for call '${type}' message via data channel`, call_message);
+      this.logger.debug(`Received confirmation for '${type}' message via data channel`, call_message);
     } else {
-      this.logger.debug(`Received call '${type}' (response: ${response}) message via data channel`, call_message);
+      this.logger.debug(`Received '${type}' (response: ${response}) message via data channel`, call_message);
     }
 
     const call_event = z.conversation.EventBuilder.build_calling(conversation_et, call_message, this.remote_user_id, this.remote_client_id);
-    amplify.publish(z.event.WebApp.CALL.EVENT_FROM_BACKEND, call_event, z.event.EventRepository.NOTIFICATION_SOURCE.WEB_SOCKET);
+    amplify.publish(z.event.WebApp.CALL.EVENT_FROM_BACKEND, call_event, z.event.EventRepository.SOURCE.WEB_SOCKET);
   }
 
   /**
@@ -708,26 +678,35 @@ z.calling.entities.Flow = class Flow {
 
   /**
    * Save the remote SDP received via an call message within the flow.
+   *
+   * @note The resolving value indicates whether negotiation should be skipped for the current state.
    * @param {CallMessage} call_message_et - Call message entity of type z.calling.enum.CALL_MESSAGE_TYPE.SETUP
-   * @returns {Promise} Resolves when remote SDP was saved
+   * @returns {Promise} Resolves when the remote SDP was saved
    */
   save_remote_sdp(call_message_et) {
+    let skip_negotiation = false;
+
     return z.calling.SDPMapper.map_call_message_to_object(call_message_et)
       .then((rtc_sdp) => z.calling.SDPMapper.rewrite_sdp(rtc_sdp, z.calling.enum.SDP_SOURCE.REMOTE, this))
       .then(({sdp: remote_sdp}) => {
-        const {type} = call_message_et;
-
-        if (remote_sdp.type === z.calling.rtc.SDP_TYPE.OFFER) {
+        const is_remote_offer = remote_sdp.type === z.calling.rtc.SDP_TYPE.OFFER;
+        if (is_remote_offer) {
           switch (this.signaling_state()) {
             case z.calling.rtc.SIGNALING_STATE.LOCAL_OFFER: {
               if (this._solve_colliding_states()) {
-                throw new z.calling.CallError(z.calling.CallError.TYPE.SDP_STATE_COLLISION);
+                return true;
               }
               break;
             }
 
             case z.calling.rtc.SIGNALING_STATE.NEW:
             case z.calling.rtc.SIGNALING_STATE.STABLE: {
+              const is_update = call_message_et.type === z.calling.enum.CALL_MESSAGE_TYPE.UPDATE;
+
+              if (is_update) {
+                this.restart_negotiation(z.calling.enum.SDP_NEGOTIATION_MODE.STREAM_CHANGE, true);
+                skip_negotiation = true;
+              }
 
               this.is_answer(true);
               break;
@@ -737,14 +716,11 @@ z.calling.entities.Flow = class Flow {
               break;
             }
           }
-
-          if (type === z.calling.enum.CALL_MESSAGE_TYPE.UPDATE) {
-            this.restart_negotiation(z.calling.enum.SDP_NEGOTIATION_MODE.STREAM_CHANGE, true);
-          }
         }
 
         this.remote_sdp(remote_sdp);
         this.logger.debug(`Saved remote '${remote_sdp.type}' SDP`, this.remote_sdp());
+        return skip_negotiation;
       });
   }
 
@@ -915,7 +891,7 @@ z.calling.entities.Flow = class Flow {
    * @returns {Object} Additional payload
    */
   _create_additional_payload() {
-    const payload = z.calling.CallMessageBuilder.create_payload(this.id, this.self_user_id, this.remote_user_id, this.remote_client_id);
+    const payload = z.calling.CallMessageBuilder.create_payload(this.conversation_id, this.self_user_id, this.remote_user_id, this.remote_client_id);
     const additional_payload = Object.assign({remote_user: this.remote_user, sdp: this.local_sdp().sdp}, payload);
 
     return z.calling.CallMessageBuilder.create_payload_prop_sync(this.call_et.self_state, this.call_et.self_state.video_send(), false, additional_payload);
@@ -989,7 +965,7 @@ z.calling.entities.Flow = class Flow {
     const attributes = {cause: name, location: sdp_source, step: 'set_sdp', type: sdp_type};
     this.call_et.telemetry.track_event(z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes);
 
-    amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, this.call_et.id, z.calling.enum.TERMINATION_REASON.SDP_FAILED);
+    this._remove_participant(z.calling.enum.TERMINATION_REASON.SDP_FAILED);
   }
 
   /**
@@ -1174,13 +1150,16 @@ z.calling.entities.Flow = class Flow {
    * @returns {Promise} Resolves when MediaStream has been replaced
    */
   _replace_media_stream(media_stream_info) {
+    const media_type = media_stream_info.type;
+
     return Promise.resolve()
       .then(() => this._remove_media_stream(this.media_stream()))
       .then(() => this._upgrade_media_stream(media_stream_info))
       .then((upgraded_media_stream_info) => {
-        const {stream: media_stream, type: media_type} = upgraded_media_stream_info;
+        const {stream: media_stream} = upgraded_media_stream_info;
+        upgraded_media_stream_info.replaced = true;
 
-        this.logger.info(`Upgraded the MediaStream to update '${media_type}' successfully`, media_stream);
+        this.logger.info(`Upgraded the MediaStream to update '${media_type}'`, media_stream);
         this.restart_negotiation(z.calling.enum.SDP_NEGOTIATION_MODE.STREAM_CHANGE, false, media_stream);
         return upgraded_media_stream_info;
       })

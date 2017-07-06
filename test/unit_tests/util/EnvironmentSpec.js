@@ -21,11 +21,23 @@
 
 'use strict';
 
-xdescribe('EnvironmentSpec', function() {
-  window.navigator.userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.10240';
-  describe('z.util.Environment.browser', function() {
-    it('detects Microsoft Edge', function() {
-      expect(z.util.Environment.browser.edge).toBe(true);
+describe('EnvironmentSpec', function() {
+
+  describe('z.util.Environment._electron_version', function() {
+    it('detects wrapper version for internal', function() {
+      const user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Electron/1.7.3 WireInternal/2.14.2744 Safari/537.36';
+      expect(z.util.Environment._electron_version(user_agent)).toBe('2.14.2744');
+    });
+
+    it('detects wrapper version for public', function() {
+      const user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Wire/2.13.2734 Chrome/56.0.2924.87 Electron/1.6.4 Safari/537.36';
+      expect(z.util.Environment._electron_version(user_agent)).toBe('2.13.2734');
+    });
+
+    it('return undefined if no version is present', function() {
+      const user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110';
+      expect(z.util.Environment._electron_version(user_agent)).not.toBeDefined();
     });
   });
+
 });

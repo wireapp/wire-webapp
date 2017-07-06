@@ -280,12 +280,12 @@ describe('z.user.UserRepository', function() {
             const permanent_client = TestFactory.client_repository.client_mapper.map_client(entities.clients.john_doe.permanent);
             const plain_client = TestFactory.client_repository.client_mapper.map_client(entities.clients.jane_roe.plain);
             const temporary_client = TestFactory.client_repository.client_mapper.map_client(entities.clients.john_doe.temporary);
-            const user_client_map = {
+            const recipients = {
               [entities.user.john_doe.id]: [permanent_client, temporary_client],
               [entities.user.jane_roe.id]: [plain_client],
             };
 
-            spyOn(TestFactory.client_repository, 'get_all_clients_from_db').and.returnValue(Promise.resolve(user_client_map));
+            spyOn(TestFactory.client_repository, 'get_all_clients_from_db').and.returnValue(Promise.resolve(recipients));
             done();
           })
           .catch(done.fail);

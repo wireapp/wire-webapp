@@ -120,11 +120,11 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
 
   /**
    * Get a pre-key for client of in the user client map.
-   * @param {Object} user_client_map - User client map to request pre-keys for
+   * @param {Object} recipients - User client map to request pre-keys for
    * @returns {Promise} Resolves with a map of pre-keys for the requested clients
    */
-  get_users_pre_keys(user_client_map) {
-    return this.cryptography_service.get_users_pre_keys(user_client_map)
+  get_users_pre_keys(recipients) {
+    return this.cryptography_service.get_users_pre_keys(recipients)
       .catch((error) => {
         if (error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
           throw new z.user.UserError(z.user.UserError.prototype.TYPE.PRE_KEY_NOT_FOUND);
@@ -192,16 +192,16 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
   /**
    * Bundles and encrypts the generic message for all given clients.
    *
-   * @param {Object} user_client_map - Contains all users and their known clients
+   * @param {Object} recipients - Contains all users and their known clients
    * @param {z.proto.GenericMessage} generic_message - Proto buffer message to be encrypted
    * @param {Object} [payload={sender: string, recipients: {}, native_push: true}] - Object to contain encrypted message payload
    * @returns {Promise} Resolves with the encrypted payload
    */
-  encrypt_generic_message(user_client_map, generic_message, payload = this._construct_payload(this.current_client().id)) {
+  encrypt_generic_message(recipients, generic_message, payload = this._construct_payload(this.current_client().id)) {
     const cipher_payload_promises = [];
 
-    for (const user_id in user_client_map) {
-      const client_ids = user_client_map[user_id];
+    for (const user_id in recipients) {
+      const client_ids = recipients[user_id];
       payload.recipients[user_id] = payload.recipients[user_id] || {};
       client_ids.forEach((client_id) => {
         cipher_payload_promises.push(this._encrypt_payload_for_session(this._construct_session_id(user_id, client_id), generic_message));
@@ -212,18 +212,18 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
 
     return Promise.all(cipher_payload_promises)
       .then((cipher_payloads) => {
-        const user_client_map_for_missing_sessions = {};
+        const recipients_for_missing_sessions = {};
 
         cipher_payloads.forEach(({cipher_text, session_id}) => {
           const {user_id, client_id} = z.client.Client.dismantle_user_client_id(session_id);
           if (cipher_text) {
             return payload.recipients[user_id][client_id] = cipher_text;
           }
-          user_client_map_for_missing_sessions[user_id] = user_client_map_for_missing_sessions[user_id] || [];
-          user_client_map_for_missing_sessions[user_id].push(client_id);
+          recipients_for_missing_sessions[user_id] = recipients_for_missing_sessions[user_id] || [];
+          recipients_for_missing_sessions[user_id].push(client_id);
         });
 
-        return this._encrypt_generic_message_for_new_sessions(user_client_map_for_missing_sessions, generic_message);
+        return this._encrypt_generic_message_for_new_sessions(recipients_for_missing_sessions, generic_message);
       })
       .then((additional_cipher_payloads) => {
         additional_cipher_payloads.forEach(({cipher_text, session_id}) => {
@@ -249,7 +249,9 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     }
 
     // Check the length of the message
-    if (typeof event_data.text === 'string' && (event_data.text.length > z.config.MAXIMUM_MESSAGE_LENGTH_RECEIVING)) {
+    const generic_message_is_too_big = event_data.text.length > z.config.MAXIMUM_MESSAGE_LENGTH_RECEIVING;
+    const external_message_is_too_big = typeof event_data.data === 'string' && event_data.data.length > z.config.MAXIMUM_MESSAGE_LENGTH_RECEIVING;
+    if (generic_message_is_too_big || external_message_is_too_big) {
       const decryption_error = new Proteus.errors.DecryptError.InvalidMessage('The received message was too big.', 300);
       return Promise.resolve(z.conversation.EventBuilder.build_incoming_message_too_big(event, decryption_error, decryption_error.code));
     }
@@ -261,7 +263,13 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
 
     return this._decrypt_event(event)
       .then((generic_message) => this.cryptography_mapper.map_generic_message(generic_message, event))
-      .catch((error) => this._handle_decryption_failure(error, event));
+      .catch((error) => {
+        if (error.type === z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE) {
+          throw error;
+        }
+
+        return this._handle_decryption_failure(error, event);
+      });
   }
 
   _session_from_encoded_prekey_payload(remote_pre_key, user_id, client_id) {
@@ -280,9 +288,9 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
       });
   }
 
-  _encrypt_generic_message_for_new_sessions(user_client_map_for_missing_sessions, generic_message) {
-    if (Object.keys(user_client_map_for_missing_sessions).length) {
-      return this.get_users_pre_keys(user_client_map_for_missing_sessions)
+  _encrypt_generic_message_for_new_sessions(recipients_for_missing_sessions, generic_message) {
+    if (Object.keys(recipients_for_missing_sessions).length) {
+      return this.get_users_pre_keys(recipients_for_missing_sessions)
         .then((user_pre_key_map) => {
           this.logger.info(`Fetched pre-keys for '${Object.keys(user_pre_key_map).length}' users.`, user_pre_key_map);
 

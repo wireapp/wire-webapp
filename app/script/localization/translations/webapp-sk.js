@@ -326,6 +326,7 @@ z.string.sk.people_invite_detail = 'Zdieľanie kontaktov Vám pomôže spojiť s
 z.string.sk.people_invite_button_contacts = 'Z kontaktov';
 z.string.sk.people_invite_button_gmail = 'Z Gmailu';
 z.string.sk.people_invite_headline = 'Pozvať priateľov';
+z.string.sk.people_share = 'Zdieľať kontakty';
 z.string.sk.people_tabs_details = 'Detaily';
 z.string.sk.people_tabs_devices = 'Zariadenia';
 z.string.sk.people_tabs_devices_headline = 'Wire dáva každému zariadeniu jedinečný identifikátor. Porovnajte ich s {{user}} a overte Vaše rozhovory.';

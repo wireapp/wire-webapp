@@ -146,7 +146,7 @@ z.main.App = class App {
    */
   _setup_utils() {
     return {
-      debug: z.util.Environment.frontend.is_production() ? undefined : new z.util.DebugUtil(this.repository.user, this.repository.conversation),
+      debug: z.util.Environment.frontend.is_production() ? undefined : new z.util.DebugUtil(this.repository.calling, this.repository.conversation, this.repository.user),
     };
   }
 
@@ -250,7 +250,7 @@ z.main.App = class App {
       this._subscribe_to_unload_events();
 
       return Promise.all([
-        this.repository.event.initialize_from_notification_stream(),
+        this.repository.event.initialize_from_stream(),
         this.repository.team.get_teams(),
       ]);
     })
