@@ -72,36 +72,18 @@ z.calling.entities.Participant = class Participant {
 
   /**
    * Start negotiating the peer connection.
-   *
-   * @param {boolean} negotiate - Should negotiation be started
-   * @param {CallMessage} [call_message_et] - Call message to check negotiation state from.
    * @returns {undefined} No return value
    */
-  handle_negotiation(negotiate, call_message_et) {
-    if (call_message_et && call_message_et.type === z.calling.enum.CALL_MESSAGE_TYPE.UPDATE) {
-      const {sdp: remote_sdp} = call_message_et;
-      const is_remote_offer = remote_sdp.type === z.calling.rtc.SDP_TYPE.OFFER;
-
-      if (is_remote_offer) {
-        return this.flow_et.restart_negotiation(z.calling.enum.SDP_NEGOTIATION_MODE.STREAM_CHANGE, true);
-      }
-    }
-
-    if (negotiate) {
-      this.flow_et.start_negotiation();
-    }
+  start_negotiation() {
+    this.flow_et.start_negotiation();
   }
 
   /**
    * Update the participant state.
    * @param {CallMessage} call_message_et - Call message to update state from.
-   * @returns {Promise} Resolves with the participant when the state was updated
+   * @returns {Promise} Resolves when the state was updated
    */
   update_state(call_message_et) {
-    if (!call_message_et) {
-      return Promise.resolve(this);
-    }
-
     const {client_id, props, sdp: rtc_sdp, session_id} = call_message_et;
 
     return this.update_properties(props)
@@ -112,8 +94,9 @@ z.calling.entities.Participant = class Participant {
         if (rtc_sdp) {
           return this.flow_et.save_remote_sdp(call_message_et);
         }
-      })
-      .then(() => this);
+
+        return false;
+      });
   }
 
   /**

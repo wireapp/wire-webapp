@@ -204,13 +204,22 @@ z.calling.entities.Call = class Call {
    * @returns {undefined} No return value
    */
   deactivate_call(call_message_et, termination_reason = z.calling.enum.TERMINATION_REASON.SELF_USER) {
-    const reason = !this.was_connected ? z.calling.enum.TERMINATION_REASON.MISSED : z.calling.enum.TERMINATION_REASON.COMPLETED;
-
-    this.termination_reason = termination_reason;
-    this.calling_repository.inject_deactivate_event(call_message_et, z.event.EventRepository.SOURCE.WEB_SOCKET, this.creating_user, reason);
+    const everyone_left = this.participants().length <= 1;
+    const on_group_check = termination_reason === z.calling.enum.TERMINATION_REASON.GROUP_CHECK;
 
     this._clear_timeouts();
-    if (this.participants().length <= 1) {
+
+    if (everyone_left || on_group_check) {
+      const reason = !this.was_connected ? z.calling.enum.TERMINATION_REASON.MISSED : z.calling.enum.TERMINATION_REASON.COMPLETED;
+
+      if (on_group_check && !everyone_left) {
+        const user_ids = this.participants().map((participant_et) => participant_et.id);
+        this.logger.warn(`Deactivation on group check with remaining users '${user_ids.join(', ')}' on group check`);
+      }
+
+      this.termination_reason = termination_reason;
+      this.calling_repository.inject_deactivate_event(call_message_et, z.event.EventRepository.SOURCE.WEB_SOCKET, this.creating_user, reason);
+
       return this.calling_repository.delete_call(this.id);
     }
 
@@ -424,7 +433,7 @@ z.calling.entities.Call = class Call {
     const additional_payload = z.calling.CallMessageBuilder.create_payload(this.id, this.self_user.id, this.creating_user.id);
     const call_message_et = z.calling.CallMessageBuilder.build_group_leave(false, this.session_id, additional_payload);
 
-    this.deactivate_call(call_message_et, z.calling.enum.TERMINATION_REASON.MISSED);
+    this.deactivate_call(call_message_et, z.calling.enum.TERMINATION_REASON.GROUP_CHECK);
   }
 
   /**
@@ -827,21 +836,24 @@ z.calling.entities.Call = class Call {
    *
    * @param {z.calling.entities.Participant} participant_et - User ID to be added to the call
    * @param {boolean} negotiate - Should negotiation be started
-   * @param {CallMessage} call_message_et - Call message to update user with
+   * @param {CallMessage} [call_message_et] - Call message to update user with
    * @returns {Promise} Resolves with the updated participant
    */
   _update_participant_state(participant_et, negotiate, call_message_et) {
-    return participant_et.update_state(call_message_et)
-      .catch((error) => {
-        if (error.type !== z.calling.CallError.TYPE.SDP_STATE_COLLISION) {
-          throw error;
+    const update_promise = call_message_et ? participant_et.update_state(call_message_et) : Promise.resolve(false);
+
+    return update_promise
+      .then((skip_negotiation) => {
+        if (skip_negotiation) {
+          negotiate = false;
         }
 
-        negotiate = false;
-      })
-      .then(() => {
         this._update_remote_state();
-        participant_et.handle_negotiation(negotiate, call_message_et);
+
+        if (negotiate) {
+          participant_et.start_negotiation();
+        }
+
         return participant_et;
       });
   }
@@ -909,7 +921,7 @@ z.calling.entities.Call = class Call {
    */
   _sort_participants_by_panning() {
     if (this.participants().length >= 2) {
-      this.participants
+      this.participants()
         .sort((participant_a, participant_b) => participant_a.user.joaat_hash - participant_b.user.joaat_hash)
         .forEach((participant_et, index) => {
           const panning = this._calculate_panning(index, this.participants().length);

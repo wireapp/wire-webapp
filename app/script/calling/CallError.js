@@ -30,48 +30,49 @@ z.calling.CallError = class CallError extends Error {
     this.stack = (new Error()).stack;
     this.type = type || CallError.TYPE.UNKNOWN;
 
-    switch (this.type) {
-      case CallError.TYPE.MISTARGETED_MESSAGE:
-        this.message = 'Message targeted at another client';
-        break;
-      case CallError.TYPE.NO_CONVERSATION_ID:
-        this.message = 'No conversation ID given';
-        break;
-      case CallError.TYPE.NO_DATA_CHANNEL:
-        this.message = 'No established data channel for call';
-        break;
-      case CallError.TYPE.NO_REPLACEABLE_TRACK:
-        this.message = 'No replaceable MediaStreamTrack found';
-        break;
-      case CallError.TYPE.NO_USER_ID:
-        this.message = 'User ID to target message not given';
-        break;
-      case CallError.TYPE.NOT_FOUND:
-        this.message = 'No call for conversation ID found';
-        break;
-      case CallError.TYPE.NOT_SUPPORTED:
-        this.message = 'Calling is not supported';
-        break;
-      case CallError.TYPE.RTP_SENDER_NOT_SUPPORTED:
-        this.message = 'PeerConnection does not support RtcRtpSender extension';
-        break;
-      case CallError.TYPE.SDP_STATE_COLLISION:
-        this.message = 'Unresolved SDP states collision of participants';
-        break;
-      case CallError.TYPE.UNSUPPORTED_VERSION:
-        this.message = 'Unsupported version of the call protocol';
-        break;
-      case CallError.TYPE.WRONG_CONVERSATION_TYPE:
-        this.message = 'Wrong conversation type for call message';
-        break;
-      case CallError.TYPE.WRONG_PAYLOAD_FORMAT:
-        this.message = 'Payload for an call message is in wrong format';
-        break;
-      case CallError.TYPE.WRONG_SENDER:
-        this.message = 'Call change from wrong sender';
-        break;
-      default:
-        this.message = 'Unknown CallError';
+    if (message) {
+      this.message = message;
+    } else {
+      switch (this.type) {
+        case CallError.TYPE.MISTARGETED_MESSAGE:
+          this.message = 'Message targeted at another client';
+          break;
+        case CallError.TYPE.NO_CONVERSATION_ID:
+          this.message = 'No conversation ID given';
+          break;
+        case CallError.TYPE.NO_DATA_CHANNEL:
+          this.message = 'No established data channel for call';
+          break;
+        case CallError.TYPE.NO_REPLACEABLE_TRACK:
+          this.message = 'No replaceable MediaStreamTrack found';
+          break;
+        case CallError.TYPE.NO_USER_ID:
+          this.message = 'User ID to target message not given';
+          break;
+        case CallError.TYPE.NOT_FOUND:
+          this.message = 'No call for conversation ID found';
+          break;
+        case CallError.TYPE.NOT_SUPPORTED:
+          this.message = 'Calling is not supported';
+          break;
+        case CallError.TYPE.RTP_SENDER_NOT_SUPPORTED:
+          this.message = 'PeerConnection does not support RtcRtpSender extension';
+          break;
+        case CallError.TYPE.UNSUPPORTED_VERSION:
+          this.message = 'Unsupported version of the call protocol';
+          break;
+        case CallError.TYPE.WRONG_CONVERSATION_TYPE:
+          this.message = 'Wrong conversation type for call message';
+          break;
+        case CallError.TYPE.WRONG_PAYLOAD_FORMAT:
+          this.message = 'Payload for an call message is in wrong format';
+          break;
+        case CallError.TYPE.WRONG_SENDER:
+          this.message = 'Call change from wrong sender';
+          break;
+        default:
+          this.message = 'Unknown CallError';
+      }
     }
   }
 
@@ -85,7 +86,6 @@ z.calling.CallError = class CallError extends Error {
       NOT_FOUND: 'z.calling.CallError.TYPE.NOT_FOUND',
       NOT_SUPPORTED: 'z.calling.CallError.TYPE.NOT_SUPPORTED',
       RTP_SENDER_NOT_SUPPORTED: 'z.calling.CallError.TYPE.RTP_SENDER_NOT_SUPPORTED',
-      SDP_STATE_COLLISION: 'z.calling.CallError.TYPE.SDP_STATE_COLLISION',
       UNKNOWN: 'z.calling.CallError.TYPE.UNKNOWN',
       UNSUPPORTED_VERSION: 'z.calling.CallError.TYPE.UNSUPPORTED_VERSION',
       WRONG_CONVERSATION_TYPE: 'z.calling.CallError.TYPE.WRONG_CONVERSATION_TYPE',

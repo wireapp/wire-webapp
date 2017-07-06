@@ -321,11 +321,13 @@ z.calling.CallingRepository = class CallingRepository {
 
     this.get_call_by_id(conversation_id)
       .then((call_et) => {
-        if (call_et.state() === z.calling.enum.CALL_STATE.OUTGOING) {
-          throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_SENDER);
+        const is_outgoing = call_et.state() === z.calling.enum.CALL_STATE.OUTGOING;
+        if (is_outgoing) {
+          throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_SENDER, 'Remote user tried to leave outgoing call');
         }
 
-        if (user_id === this.self_user_id()) {
+        const is_self_user = user_id === this.self_user_id();
+        if (is_self_user) {
           call_et.self_user_joined(false);
           return call_et;
         }
@@ -372,7 +374,8 @@ z.calling.CallingRepository = class CallingRepository {
       .then((call_et) => {
         // @todo Grant message for ongoing call
 
-        if (user_id === this.self_user_id()) {
+        const is_self_user = user_id === this.self_user_id();
+        if (is_self_user && !call_et.self_client_joined()) {
           call_et.self_user_joined(true);
           call_et.was_connected = true;
           return call_et.state(z.calling.enum.CALL_STATE.REJECTED);
@@ -450,13 +453,16 @@ z.calling.CallingRepository = class CallingRepository {
 
     this.get_call_by_id(conversation_id)
       .then((call_et) => {
-        if (user_id !== this.self_user_id()) {
+        const is_self_user = user_id !== this.self_user_id();
+        if (!is_self_user) {
           throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_SENDER, 'Call rejected by wrong user');
         }
 
-        this.logger.info(`Rejecting call in conversation '${conversation_id}'`, call_et);
-        call_et.state(z.calling.enum.CALL_STATE.REJECTED);
-        this.media_stream_handler.reset_media_stream();
+        if (!call_et.self_client_joined()) {
+          this.logger.info(`Rejecting call in conversation '${conversation_id}'`, call_et);
+          call_et.state(z.calling.enum.CALL_STATE.REJECTED);
+          this.media_stream_handler.reset_media_stream();
+        }
       })
       .catch(this._throw_message_error);
   }
