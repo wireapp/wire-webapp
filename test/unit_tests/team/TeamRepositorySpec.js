@@ -25,7 +25,7 @@ describe('z.team.TeamRepository', () => {
   const test_factory = new TestFactory();
 
   /* eslint sort-keys: "off" */
-  const teams_data = {teams: [{creator: '9ca1bf41-42cd-4ee4-b54e-99e8dcc9d375', icon_key: null, icon: '', id: 'e6d3adc5-9140-477a-abc1-8279d210ceab', name: 'Wire GmbH'}, {creator: 'e82019bc-5ee1-4835-8057-cfbe2229582b', icon_key: null, icon: '', id: 'f9310b63-0c04-4f13-a051-c19d24b78ed5', name: 'My Awesome Company'}], 'has_more': false};
+  const teams_data = {teams: [{binding: true, creator: '9ca1bf41-42cd-4ee4-b54e-99e8dcc9d375', icon_key: null, icon: '', id: 'e6d3adc5-9140-477a-abc1-8279d210ceab', name: 'Wire GmbH'}, {creator: 'e82019bc-5ee1-4835-8057-cfbe2229582b', icon_key: null, icon: '', id: 'f9310b63-0c04-4f13-a051-c19d24b78ed5', name: 'My Awesome Company'}], 'has_more': false};
   const team_metadata = teams_data.teams[0];
   const team_members = {members: [{user: 'bac6597b-5396-4a6a-8de9-d5aa75c998bf', permissions: 4}, {user: '74fa64dc-8318-4426-9935-82590ff8aa3e', permissions: 8}]};
   /* eslint sort-keys: "off" */
@@ -63,13 +63,14 @@ describe('z.team.TeamRepository', () => {
     server.restore();
   });
 
-  describe('get_teams()', () => {
-    it('returns team entities', (done) => {
-      team_repository.get_teams(100)
-        .then((entities) => {
-          expect(entities.length).toEqual(teams_data.teams.length);
-          expect(entities[0].creator).toEqual(teams_data.teams[0].creator);
-          expect(entities[1].creator).toEqual(teams_data.teams[1].creator);
+  describe('get_team()', () => {
+    it('returns the binding team entity', (done) => {
+      team_repository.get_team()
+        .then((team_et) => {
+          const [team_data] = teams_data.teams;
+
+          expect(team_et.creator).toEqual(team_data.creator);
+          expect(team_et.id).toEqual(team_data.id);
           done();
         })
         .catch(done.fail);

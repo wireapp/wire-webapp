@@ -23,10 +23,10 @@ window.z = window.z || {};
 window.z.ViewModel = z.ViewModel || {};
 
 z.ViewModel.WindowTitleViewModel = class WindowTitleViewModel {
-  constructor(content_state, user_repository, conversation_repository) {
+  constructor(content_state, conversation_repository, user_repository) {
     this.content_state = content_state;
-    this.user_repository = user_repository;
     this.conversation_repository = conversation_repository;
+    this.user_repository = user_repository;
     this.logger = new z.util.Logger('z.ViewModel.WindowTitleViewModel', z.config.LOGGER.OPTIONS);
 
     this.update_window_title = false;
