@@ -24,9 +24,13 @@ window.z.ViewModel = z.ViewModel || {};
 window.z.ViewModel.content = z.ViewModel.content || {};
 
 z.ViewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewModel {
-  constructor(element_id, properties_repository) {
-    this.properties_repository = properties_repository;
+  constructor(element_id, properties_repository, team_repository) {
     this.logger = new z.util.Logger('z.ViewModel.content.PreferencesOptionsViewModel', z.config.LOGGER.OPTIONS);
+
+    this.properties_repository = properties_repository;
+    this.team_repository = team_repository;
+
+    this.is_team = this.team_repository.is_team;
 
     this.option_audio = ko.observable();
     this.option_audio.subscribe((audio_preference) => {

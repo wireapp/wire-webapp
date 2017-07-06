@@ -160,7 +160,7 @@ z.main.App = class App {
     view_models.main              = new z.ViewModel.MainViewModel('wire-main', this.repository.user);
     view_models.content           = new z.ViewModel.content.ContentViewModel('right', this.repository.calling, this.repository.client, this.repository.conversation, this.repository.media, this.repository.properties, this.repository.search, this.repository.team);
     view_models.list              = new z.ViewModel.list.ListViewModel('left', view_models.content, this.repository.calling, this.repository.connect, this.repository.conversation, this.repository.search, this.repository.properties, this.repository.team);
-    view_models.title             = new z.ViewModel.WindowTitleViewModel(view_models.content.content_state, this.repository.user, this.repository.conversation);
+    view_models.title             = new z.ViewModel.WindowTitleViewModel(view_models.content.content_state, this.repository.conversation, this.repository.user);
     view_models.lightbox          = new z.ViewModel.ImageDetailViewViewModel('detail-view', this.repository.conversation);
     view_models.warnings          = new z.ViewModel.WarningsViewModel('warnings');
     view_models.modals            = new z.ViewModel.ModalsViewModel('modals');
@@ -251,10 +251,10 @@ z.main.App = class App {
 
       return Promise.all([
         this.repository.event.initialize_from_stream(),
-        this.repository.team.get_teams(),
+        this.repository.team.get_team(),
       ]);
     })
-    .then(([notifications_count, team_ets]) => {
+    .then(([notifications_count, team_et]) => {
       this.view.loading.update_progress(95, z.string.init_updated_from_notifications);
 
       this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);

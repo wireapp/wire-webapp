@@ -442,9 +442,10 @@ z.string.preferences_about_terms_of_use = 'Terms of use';
 z.string.preferences_about_version = 'Version {{version}}';
 z.string.preferences_about_website = 'Wire website';
 
-z.string.preferences_account_reset_password = 'Reset password';
 z.string.preferences_account_delete = 'Delete account';
 z.string.preferences_account_log_out = 'Log out';
+z.string.preferences_account_reset_password = 'Reset password';
+z.string.preferences_account_team = 'in {{name}}';
 z.string.preferences_account_username_placeholder = 'Your full name';
 z.string.preferences_account_username_hint = 'At least 2 characters. a—z, 0—9 and _ only.';
 z.string.preferences_account_username_available = 'Available';

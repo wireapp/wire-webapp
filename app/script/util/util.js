@@ -90,6 +90,17 @@ z.util.load_image = function(blob) {
   });
 };
 
+z.util.load_data_url = function(file) {
+  return new Promise(function(resolve, reject) {
+    const reader = new FileReader();
+    reader.onload = function() {
+      return resolve(this.result);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+};
+
 z.util.load_file_buffer = function(file) {
   return new Promise(function(resolve, reject) {
     const reader = new FileReader();

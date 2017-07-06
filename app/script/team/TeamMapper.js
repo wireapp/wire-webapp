@@ -27,10 +27,6 @@ z.team.TeamMapper = class TeamMapper {
     this.logger = new z.util.Logger('z.team.TeamMapper', z.config.LOGGER.OPTIONS);
   }
 
-  map_teams_from_array(team_data) {
-    return team_data.map((data) => this.update_team_from_object(data));
-  }
-
   map_team_from_object(data) {
     return this.update_team_from_object(data);
   }

@@ -23,6 +23,13 @@ window.z = window.z || {};
 window.z.team = z.team || {};
 
 z.team.TeamRepository = class TeamRepository {
+  /**
+   * Construct a new Team Repository.
+   * @class z.team.TeamRepository
+   *
+   * @param {z.team.TeamService} team_service - Backend REST API team service implementation
+   * @param {z.user.UserRepository} user_repository - epository for all user and connection interactions
+   */
   constructor(team_service, user_repository) {
     this.logger = new z.util.Logger('z.team.TeamRepository', z.config.LOGGER.OPTIONS);
 
@@ -30,70 +37,42 @@ z.team.TeamRepository = class TeamRepository {
     this.team_service = team_service;
     this.user_repository = user_repository;
 
-    this.personal_space = new z.team.TeamEntity();
-    this.teams = ko.observableArray([]);
+    this.self_user = this.user_repository.self;
 
-    this.active_team = ko.observable(this.personal_space);
+    this.team = ko.observable();
 
-    this.known_team_ids = ko.pureComputed(() => this.teams().map((team_et) => team_et.id));
+    this.is_team = ko.pureComputed(() => this.team() ? !!this.team().id : false);
+
+    this.team_members = ko.pureComputed(() => this.is_team() ? this.team().members() : []);
+    this.team_name = ko.pureComputed(() => this.is_team() ? this.team().name() : this.user_repository.self().name());
+    this.team_users = ko.pureComputed(() => this.team_members().concat(this.user_repository.connected_users()));
+
+    this.team_members.subscribe(() => this.user_repository.map_guest_status());
+
+    this.user_repository.team_members = this.team_members;
 
     amplify.subscribe(z.event.WebApp.TEAM.EVENT_FROM_BACKEND, this.on_team_event.bind(this));
   }
 
-  add_members() {
-    return this.team_service.post_members();
-  }
-
-  create_team() {
-    return this.team_service.post_team();
-  }
-
-  delete_member() {
-    return this.team_service.delete_member();
-  }
-
-  delete_team() {
-    return this.team_service.delete_team();
-  }
-
-  get_members() {
-    return this.team_service.get_members();
-  }
-
-  get_teams(limit = 100, team_ets = []) {
+  get_team() {
     return this.team_service.get_teams()
-      .then(({teams, has_more}) => {
+      .then(({teams}) => {
         if (teams.length) {
-          const new_team_ets = this.team_mapper.map_teams_from_array(teams);
-          team_ets = team_ets.concat(new_team_ets);
+          const [team] = teams;
+
+          if (team.binding) {
+            const team_et = this.team_mapper.map_team_from_object(team);
+            this._set_team(team_et);
+
+            return this.team();
+          }
         }
 
-        if (has_more) {
-          const last_team_et = team_ets[team_ets.length - 1];
-          return this.get_teams(limit, last_team_et.id, team_ets);
-        }
-
-        z.util.ko_array_push_all(this.teams, team_ets);
-
-        team_ets.forEach((team_et) => this.update_team_members(team_et));
-        return this.teams();
-      });
-  }
-
-  get_team_by_id(team_id) {
-    const team_local = this.teams().find((team_et) => team_et.id === team_id);
-    if (team_local) {
-      return Promise.resolve(team_local);
-    }
-    return this.get_team_from_backend(team_id);
-  }
-
-  get_team_from_backend(team_id) {
-    return this.team_service.get_team_metadata(team_id)
-      .then((team_metadata) => {
-        if (team_metadata) {
-          return this.team_mapper.map_team_from_object(team_metadata);
-        }
+        return this.team(new z.team.TeamEntity());
+      })
+      .then((team_et) => {
+        this._send_account_info();
+        return team_et;
       });
   }
 
@@ -113,7 +92,7 @@ z.team.TeamRepository = class TeamRepository {
    * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {Promise} Resolves when event was handled
    */
-  on_team_event(event_json, source = z.event.EventRepository.SOURCE.STREAM) {
+  on_team_event(event_json, source) {
     const type = event_json.type;
 
     this.logger.info(`»» Event: '${type}'`, {event_json: JSON.stringify(event_json), event_object: event_json});
@@ -123,10 +102,6 @@ z.team.TeamRepository = class TeamRepository {
       case z.event.Backend.TEAM.CONVERSATION_DELETE:
       case z.event.Backend.TEAM.MEMBER_UPDATE: {
         this._on_unhandled(event_json);
-        break;
-      }
-      case z.event.Backend.TEAM.CREATE: {
-        this._on_create(event_json);
         break;
       }
       case z.event.Backend.TEAM.DELETE: {
@@ -151,10 +126,6 @@ z.team.TeamRepository = class TeamRepository {
     }
   }
 
-  update_team() {
-    return this.team_service.put_team();
-  }
-
   update_team_members(team_et) {
     return this.get_team_members(team_et.id)
       .then((team_members) => {
@@ -171,61 +142,68 @@ z.team.TeamRepository = class TeamRepository {
       .then((user_ets) => team_et.members(user_ets));
   }
 
-  _add_team(team_et) {
-    if (!this.teams().filter((team) => team.id === team_et.id).length) {
-      this.teams.push(team_et);
-    }
-  }
-
-  _add_user_to_team(user_et, team_et) {
-    const members = team_et.members;
+  _add_user_to_team(user_et) {
+    const members = this.team().members;
 
     if (!members().filter((member) => member.id === user_et.id).length) {
       members.push(user_et);
     }
   }
 
-  _on_create(event_json) {
-    const team_data = event_json.data;
+  _send_account_info() {
+    if (z.util.Environment.desktop) {
+      const image_resource = this.is_team() ? this.self_user().preview_picture_resource() : this.self_user().preview_picture_resource();
+      const image_promise = image_resource ? image_resource.load() : Promise.resolve();
 
-    const team_et = this.team_mapper.map_team_from_object(team_data);
-    this._add_team(team_et);
+      image_promise
+        .then((image_blob) => {
+          if (image_blob) {
+            z.util.load_data_url(image_blob);
+          }
+        })
+        .then((image_data_url) => {
+          const account_info = {
+            accentID: this.self_user().accent_id(),
+            name: this.team_name(),
+            picture: image_data_url,
+            teamID: this.team().id,
+            userID: this.self_user().id,
+          };
+
+          this.logger.info('Publishing account info', account_info);
+          amplify.publish(z.event.WebApp.TEAM.INFO, account_info);
+        });
+    }
   }
 
   _on_delete(event_json) {
     const team_id = event_json.team;
-
-    this.teams.remove((team) => team.id === team_id);
-    if (this.active_team().id === team_id) {
-      this.active_team(this.personal_space);
-    }
-    amplify.publish(z.event.WebApp.TEAM.MEMBER_LEAVE, team_id);
+    amplify.publish(z.event.WebApp.TEAM.DELETE, team_id);
+    amplify.publish(z.event.WebApp.TEAM.MEMBER_LEAVE, team_id); // deprecated
   }
 
   _on_member_join(event_json) {
     const {data: {user: user_id}, team: team_id} = event_json;
+    const is_local_team = this.team().id === team_id;
+    const is_other_user = this.user_repository.self().id !== user_id;
 
-    return this.get_team_by_id(team_id)
-      .then((team_et) => {
-        if (this.user_repository.self().id !== user_id) {
-          this.user_repository.get_users_by_id([user_id])
-            .then(([user_et]) => this._add_user_to_team(user_et, team_et));
-        } else {
-          this.update_team_members(team_et);
-          this._add_team(team_et);
-        }
-      });
+    if (is_local_team && is_other_user) {
+      this.user_repository.get_user_by_id(user_id)
+        .then((user_et) => this._add_user_to_team(user_et));
+    }
   }
 
   _on_member_leave(event_json) {
     const {data: {user: user_id}, team: team_id} = event_json;
-    const [team_of_user] = this.teams().filter((team) => team.id === team_id);
+    const is_local_team = this.team().id === team_id;
 
-    if (this.user_repository.self().id !== user_id) {
-      team_of_user.members.remove((member) => member.id === user_id);
+    if (is_local_team) {
+      if (this.user_repository.self().id === user_id) {
+        return this._on_delete({team: team_id});
+      }
+
+      this.team().members.remove((member) => member.id === user_id);
       amplify.publish(z.event.WebApp.TEAM.MEMBER_LEAVE, team_id, user_id);
-    } else {
-      this._on_delete({team: team_id});
     }
   }
 
@@ -236,15 +214,15 @@ z.team.TeamRepository = class TeamRepository {
   _on_update(event_json) {
     const {data: team_data, team: team_id} = event_json;
 
-    return this.get_team_by_id(team_id)
-      .then((team_et) => {
-        this.team_mapper.update_team_from_object(team_data, team_et);
-      });
+    if (this.team().id === team_id) {
+      this.team_mapper.update_team_from_object(team_data, this.team());
+      this._send_account_info();
+    }
   }
 
-  _update_teams(team_ets) {
-    return Promise.resolve()
-      .then(() => z.util.ko_array_push_all(this.teams, team_ets))
-      .then(() => team_ets);
+  _set_team(team_et) {
+    this.update_team_members(team_et);
+    this.team(team_et);
+    this.user_repository.map_guest_status();
   }
 };

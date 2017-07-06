@@ -78,6 +78,9 @@ z.user.UserRepository = class UserRepository {
       amplify.publish(z.event.WebApp.ANALYTICS.CUSTOM_DIMENSION, z.tracking.CustomDimension.CONTACTS, number_of_connected_users);
     });
 
+    this.is_team = ko.observable();
+    this.team_members = undefined;
+
     amplify.subscribe(z.event.WebApp.CLIENT.ADD, this.add_client_to_user.bind(this));
     amplify.subscribe(z.event.WebApp.CLIENT.REMOVE, this.remove_client_from_user.bind(this));
     amplify.subscribe(z.event.WebApp.CLIENT.UPDATE, this.update_clients_from_user.bind(this));
@@ -562,7 +565,15 @@ z.user.UserRepository = class UserRepository {
 
     const user_id_chunks = z.util.ArrayUtil.chunk(user_ids, z.config.MAXIMUM_USERS_PER_REQUEST);
     return Promise.all(user_id_chunks.map((user_id_chunk) => _get_users(user_id_chunk)))
-      .then((resolve_array) => this.save_users(_.flatten(resolve_array)))
+      .then((resolve_array) => {
+        const new_user_ets = _.flatten(resolve_array);
+
+        if (this.is_team()) {
+          this.map_guest_status(new_user_ets);
+        }
+
+        return this.save_users(new_user_ets);
+      })
       .then((fetched_user_ets) => {
         // If there is a difference then we most likely have a case with a suspended user
         if (user_ids.length !== fetched_user_ets.length) {
@@ -945,5 +956,15 @@ z.user.UserRepository = class UserRepository {
           source: 'unsplash',
         });
       });
+  }
+
+  map_guest_status(user_ets = this.users()) {
+    const team_members = this.team_members();
+
+    user_ets.forEach((user_et) => {
+      const is_team_member = !!team_members.find((member) => member.id === user_et.id);
+      user_et.is_guest(!is_team_member);
+      user_et.is_team_member(is_team_member);
+    });
   }
 };

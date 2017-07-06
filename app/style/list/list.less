@@ -24,8 +24,12 @@
   position: absolute;
   right: 0;
   top: 0;
-  left: @teams-width;
+  left: 0;
   width: @left-width;
+
+  .team-mode & {
+    left: @teams-width;
+  }
 }
 
 .left-list {
