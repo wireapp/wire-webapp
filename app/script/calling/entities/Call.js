@@ -836,21 +836,24 @@ z.calling.entities.Call = class Call {
    *
    * @param {z.calling.entities.Participant} participant_et - User ID to be added to the call
    * @param {boolean} negotiate - Should negotiation be started
-   * @param {CallMessage} call_message_et - Call message to update user with
+   * @param {CallMessage} [call_message_et] - Call message to update user with
    * @returns {Promise} Resolves with the updated participant
    */
   _update_participant_state(participant_et, negotiate, call_message_et) {
-    return participant_et.update_state(call_message_et)
-      .catch((error) => {
-        if (error.type !== z.calling.CallError.TYPE.SDP_STATE_COLLISION) {
-          throw error;
+    const update_promise = call_message_et ? participant_et.update_state(call_message_et) : Promise.resolve(false);
+
+    return update_promise
+      .then((skip_negotiation) => {
+        if (skip_negotiation) {
+          negotiate = false;
         }
 
-        negotiate = false;
-      })
-      .then(() => {
         this._update_remote_state();
-        participant_et.handle_negotiation(negotiate, call_message_et);
+
+        if (negotiate) {
+          participant_et.start_negotiation();
+        }
+
         return participant_et;
       });
   }
