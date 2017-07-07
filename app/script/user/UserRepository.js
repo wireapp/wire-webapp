@@ -172,7 +172,6 @@ z.user.UserRepository = class UserRepository {
       this.user_mapper.update_user_from_object(user_et, user);
 
       if (is_self_user) {
-        console.log('update');
         amplify.publish(z.event.WebApp.TEAM.UPDATE_INFO);
       }
 
