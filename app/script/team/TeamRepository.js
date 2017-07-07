@@ -125,6 +125,22 @@ z.team.TeamRepository = class TeamRepository {
       }
     }
   }
+  /**
+   * Search for user.
+   * @param {string} query - Find user using name or username
+   * @param {boolean} is_username - Query string is username
+   * @returns {Array<z.entity.User>} Matching users
+   */
+  search_for_team_members(query, is_username) {
+    return this.team_members()
+      .filter((user_et) => user_et.matches(query, is_username))
+      .sort((user_a, user_b) => {
+        if (is_username) {
+          return z.util.StringUtil.sort_by_priority(user_a.username(), user_b.username(), query);
+        }
+        return z.util.StringUtil.sort_by_priority(user_a.name(), user_b.name(), query);
+      });
+  }
 
   update_team_members(team_et) {
     return this.get_team_members(team_et.id)

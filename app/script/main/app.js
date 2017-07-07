@@ -82,12 +82,12 @@ z.main.App = class App {
     repositories.client              = new z.client.ClientRepository(this.service.client, repositories.cryptography);
     repositories.user                = new z.user.UserRepository(this.service.user, this.service.asset, this.service.search, repositories.client, repositories.cryptography);
     repositories.event               = new z.event.EventRepository(this.service.web_socket, this.service.notification, repositories.cryptography, repositories.user, this.service.conversation);
-    repositories.search              = new z.search.SearchRepository(this.service.search, repositories.user);
     repositories.properties          = new z.properties.PropertiesRepository(this.service.properties);
     repositories.connect             = new z.connect.ConnectRepository(this.service.connect, this.service.connect_google, repositories.properties);
     repositories.links               = new z.links.LinkPreviewRepository(this.service.asset, repositories.properties);
     repositories.team                = new z.team.TeamRepository(this.service.team, repositories.user);
 
+    repositories.search              = new z.search.SearchRepository(this.service.search, repositories.team, repositories.user);
     repositories.conversation        = new z.conversation.ConversationRepository(
       this.service.conversation,
       this.service.asset,
