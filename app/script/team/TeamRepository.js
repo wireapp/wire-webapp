@@ -52,6 +52,7 @@ z.team.TeamRepository = class TeamRepository {
     this.user_repository.team_members = this.team_members;
 
     amplify.subscribe(z.event.WebApp.TEAM.EVENT_FROM_BACKEND, this.on_team_event.bind(this));
+    amplify.subscribe(z.event.WebApp.TEAM.UPDATE_INFO, this.send_account_info.bind(this));
   }
 
   get_team() {
@@ -71,7 +72,7 @@ z.team.TeamRepository = class TeamRepository {
         return this.team(new z.team.TeamEntity());
       })
       .then((team_et) => {
-        this._send_account_info();
+        this.send_account_info();
         return team_et;
       });
   }
@@ -142,31 +143,7 @@ z.team.TeamRepository = class TeamRepository {
       });
   }
 
-  update_team_members(team_et) {
-    return this.get_team_members(team_et.id)
-      .then((team_members) => {
-        const member_ids = team_members
-          .map((team_member) => {
-            if (team_member.user_id !== this.user_repository.self().id) {
-              return team_member.user_id;
-            }
-          })
-          .filter((member_id) => member_id);
-
-        return this.user_repository.get_users_by_id(member_ids);
-      })
-      .then((user_ets) => team_et.members(user_ets));
-  }
-
-  _add_user_to_team(user_et) {
-    const members = this.team().members;
-
-    if (!members().filter((member) => member.id === user_et.id).length) {
-      members.push(user_et);
-    }
-  }
-
-  _send_account_info() {
+  send_account_info() {
     if (z.util.Environment.desktop) {
       const image_resource = this.is_team() ? this.self_user().preview_picture_resource() : this.self_user().preview_picture_resource();
       const image_promise = image_resource ? image_resource.load() : Promise.resolve();
@@ -189,6 +166,30 @@ z.team.TeamRepository = class TeamRepository {
           this.logger.info('Publishing account info', account_info);
           amplify.publish(z.event.WebApp.TEAM.INFO, account_info);
         });
+    }
+  }
+
+  update_team_members(team_et) {
+    return this.get_team_members(team_et.id)
+      .then((team_members) => {
+        const member_ids = team_members
+          .map((team_member) => {
+            if (team_member.user_id !== this.user_repository.self().id) {
+              return team_member.user_id;
+            }
+          })
+          .filter((member_id) => member_id);
+
+        return this.user_repository.get_users_by_id(member_ids);
+      })
+      .then((user_ets) => team_et.members(user_ets));
+  }
+
+  _add_user_to_team(user_et) {
+    const members = this.team().members;
+
+    if (!members().filter((member) => member.id === user_et.id).length) {
+      members.push(user_et);
     }
   }
 
@@ -232,7 +233,7 @@ z.team.TeamRepository = class TeamRepository {
 
     if (this.team().id === team_id) {
       this.team_mapper.update_team_from_object(team_data, this.team());
-      this._send_account_info();
+      this.send_account_info();
     }
   }
 
