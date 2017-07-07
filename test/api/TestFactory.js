@@ -260,29 +260,6 @@ window.TestFactory.prototype.exposeConnectActors = function() {
     });
 };
 
-/**
- *
- * @returns {Promise<z.search.SearchRepository>} The search repository.
- */
-window.TestFactory.prototype.exposeSearchActors = function() {
-  this.logger.info('- exposeSearchActors');
-  return Promise.resolve()
-    .then(() => {
-      return this.exposeUserActors();
-    })
-    .then(() => {
-      this.logger.info('✓ exposedUserActors');
-
-      TestFactory.search_service = new z.search.SearchService(this.client);
-      TestFactory.search_service.logger.level = this.settings.logging_level;
-
-      TestFactory.search_repository = new z.search.SearchRepository(TestFactory.search_service, TestFactory.user_repository);
-      TestFactory.search_repository.logger.level = this.settings.logging_level;
-
-      return TestFactory.search_repository;
-    });
-};
-
 window.TestFactory.prototype.exposeTeamActors = function() {
   this.logger.info('- exposeTeamActors');
   return Promise.resolve()
@@ -300,6 +277,29 @@ window.TestFactory.prototype.exposeTeamActors = function() {
       TestFactory.team_repository = new z.team.TeamRepository(TestFactory.team_service, TestFactory.user_repository);
       TestFactory.team_repository.logger.level = this.settings.logging_level;
       return TestFactory.team_repository;
+    });
+};
+
+/**
+ *
+ * @returns {Promise<z.search.SearchRepository>} The search repository.
+ */
+window.TestFactory.prototype.exposeSearchActors = function() {
+  this.logger.info('- exposeSearchActors');
+  return Promise.resolve()
+    .then(() => {
+      return this.exposeTeamActors();
+    })
+    .then(() => {
+      this.logger.info('✓ exposedTeamActors');
+
+      TestFactory.search_service = new z.search.SearchService(this.client);
+      TestFactory.search_service.logger.level = this.settings.logging_level;
+
+      TestFactory.search_repository = new z.search.SearchRepository(TestFactory.search_service, TestFactory.team_repository, TestFactory.user_repository);
+      TestFactory.search_repository.logger.level = this.settings.logging_level;
+
+      return TestFactory.search_repository;
     });
 };
 

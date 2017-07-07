@@ -38,12 +38,17 @@ z.search.SearchRepository = class SearchRepository {
   /**
    * Construct a new Conversation Repository.
    * @param {z.search.SearchService} search_service - Backend REST API search service implementation
+   * @param {z.team.TeamRepository} team_repository - Repository for all team interactions
    * @param {z.user.UserRepository} user_repository - Repository for all user and connection interactions
   */
-  constructor(search_service, user_repository) {
+  constructor(search_service, team_repository, user_repository) {
     this.search_service = search_service;
+    this.team_repository = team_repository;
     this.user_repository = user_repository;
     this.logger = new z.util.Logger('z.search.SearchRepository', z.config.LOGGER.OPTIONS);
+
+    this.is_team = this.team_repository.is_team;
+    this.team_members = this.team_repository.team_members;
   }
 
   /**
@@ -59,7 +64,15 @@ z.search.SearchRepository = class SearchRepository {
     return this.search_service.get_contacts(name, 30)
       .then(({documents}) => documents.map((match) => match.id))
       .then((user_ids) => this.user_repository.get_users_by_id(user_ids))
-      .then((user_ets) => user_ets.filter((user_et) => !user_et.is_connected()))
+      .then((user_ets) => {
+        return user_ets.filter((user_et) => {
+          if (this.is_team() && this.team_members().includes(user_et)) {
+            return false;
+          }
+
+          return !user_et.is_connected();
+        });
+      })
       .then((user_ets) => {
         if (is_username) {
           user_ets = user_ets.filter((user_et) => z.util.StringUtil.starts_with(user_et.username(), name));

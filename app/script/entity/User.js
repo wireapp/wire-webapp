@@ -139,6 +139,7 @@ z.entity.User = class User {
     this.is_outgoing_request = ko.pureComputed(() => this.connection().is_outgoing_request());
     this.is_unknown = ko.pureComputed(() => this.connection().is_unknown());
 
+    this.is_guest = ko.observable(false);
     this.is_team_member = ko.observable(false);
 
     this.is_request = ko.pureComputed(() => this.connection().is_request());

@@ -64,11 +64,11 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
     this.participants =               new z.ViewModel.ParticipantsViewModel('participants', this.user_repository, this.conversation_repository, this.search_repository, this.team_repository);
     this.giphy =                      new z.ViewModel.GiphyViewModel('giphy-modal', this.conversation_repository, this.giphy_repository);
 
-    this.preferences_account =        new z.ViewModel.content.PreferencesAccountViewModel('preferences-account', this.client_repository, this.user_repository);
+    this.preferences_account =        new z.ViewModel.content.PreferencesAccountViewModel('preferences-account', this.client_repository, this.team_repository, this.user_repository);
     this.preferences_av =             new z.ViewModel.content.PreferencesAVViewModel('preferences-av', this.media_repository);
     this.preferences_device_details = new z.ViewModel.content.PreferencesDeviceDetailsViewModel('preferences-devices', this.client_repository, this.conversation_repository, this.cryptography_repository);
     this.preferences_devices =        new z.ViewModel.content.PreferencesDevicesViewModel('preferences-devices', this.preferences_device_details, this.client_repository, this.conversation_repository, this.cryptography_repository);
-    this.preferences_options =        new z.ViewModel.content.PreferencesOptionsViewModel('preferences-options', this.properties_repository);
+    this.preferences_options =        new z.ViewModel.content.PreferencesOptionsViewModel('preferences-options', this.properties_repository, this.team_repository);
     /* eslint-enable no-multi-spaces */
 
     this.previous_state = undefined;
@@ -164,12 +164,10 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
         const is_conversation_state = this.content_state() === z.ViewModel.content.CONTENT_STATE.CONVERSATION;
 
         if (is_active_conversation && is_conversation_state) {
-          this.team_repository.active_team().last_active_conversation = conversation_et;
           return;
         }
 
-        this._update_active_team(conversation_et);
-        this._release_content(this.content_state(), conversation_et);
+        this._release_content(this.content_state());
 
         this.content_state(z.ViewModel.content.CONTENT_STATE.CONVERSATION);
         this.conversation_repository.active_conversation(conversation_et);
@@ -205,7 +203,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
 
   _check_content_availability(content_state) {
     if (content_state === z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS) {
-      if (this.team_repository.active_team().id || !this.user_repository.connect_requests().length) {
+      if (!this.user_repository.connect_requests().length) {
         return z.ViewModel.content.CONTENT_STATE.WATERMARK;
       }
     }
@@ -239,15 +237,11 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
     }
   }
 
-  _release_content(new_content_state, conversation_et) {
+  _release_content(new_content_state) {
     this.previous_state = this.content_state();
 
     const conversation_state = this.previous_state === z.ViewModel.content.CONTENT_STATE.CONVERSATION;
     if (conversation_state) {
-      if (conversation_et) {
-        this.team_repository.active_team().last_active_conversation = conversation_et;
-      }
-
       const collection_states = [
         z.ViewModel.content.CONTENT_STATE.COLLECTION,
         z.ViewModel.content.CONTENT_STATE.COLLECTION_DETAILS,
@@ -268,24 +262,5 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
   _show_content(new_content_state) {
     this.content_state(new_content_state);
     return this._shift_content(this._get_element_of_content(new_content_state));
-  }
-
-  _update_active_team(conversation_et) {
-    const {is_guest, team_id} = conversation_et;
-
-    if (this.team_repository.active_team().id !== team_id) {
-      const is_team = team_id && !is_guest();
-      let team_et;
-
-      if (is_team) {
-        team_et = this.team_repository.teams().find((_team_et) => _team_et.id === team_id);
-      }
-
-      if (!team_et) {
-        team_et = this.team_repository.personal_space;
-      }
-
-      this.team_repository.active_team(team_et);
-    }
   }
 };

@@ -82,12 +82,12 @@ z.main.App = class App {
     repositories.client              = new z.client.ClientRepository(this.service.client, repositories.cryptography);
     repositories.user                = new z.user.UserRepository(this.service.user, this.service.asset, this.service.search, repositories.client, repositories.cryptography);
     repositories.event               = new z.event.EventRepository(this.service.web_socket, this.service.notification, repositories.cryptography, repositories.user, this.service.conversation);
-    repositories.search              = new z.search.SearchRepository(this.service.search, repositories.user);
     repositories.properties          = new z.properties.PropertiesRepository(this.service.properties);
     repositories.connect             = new z.connect.ConnectRepository(this.service.connect, this.service.connect_google, repositories.properties);
     repositories.links               = new z.links.LinkPreviewRepository(this.service.asset, repositories.properties);
     repositories.team                = new z.team.TeamRepository(this.service.team, repositories.user);
 
+    repositories.search              = new z.search.SearchRepository(this.service.search, repositories.team, repositories.user);
     repositories.conversation        = new z.conversation.ConversationRepository(
       this.service.conversation,
       this.service.asset,
@@ -160,7 +160,7 @@ z.main.App = class App {
     view_models.main              = new z.ViewModel.MainViewModel('wire-main', this.repository.user);
     view_models.content           = new z.ViewModel.content.ContentViewModel('right', this.repository.calling, this.repository.client, this.repository.conversation, this.repository.media, this.repository.properties, this.repository.search, this.repository.team);
     view_models.list              = new z.ViewModel.list.ListViewModel('left', view_models.content, this.repository.calling, this.repository.connect, this.repository.conversation, this.repository.search, this.repository.properties, this.repository.team);
-    view_models.title             = new z.ViewModel.WindowTitleViewModel(view_models.content.content_state, this.repository.user, this.repository.conversation);
+    view_models.title             = new z.ViewModel.WindowTitleViewModel(view_models.content.content_state, this.repository.conversation, this.repository.user);
     view_models.lightbox          = new z.ViewModel.ImageDetailViewViewModel('detail-view', this.repository.conversation);
     view_models.warnings          = new z.ViewModel.WarningsViewModel('warnings');
     view_models.modals            = new z.ViewModel.ModalsViewModel('modals');
@@ -251,10 +251,10 @@ z.main.App = class App {
 
       return Promise.all([
         this.repository.event.initialize_from_stream(),
-        this.repository.team.get_teams(),
+        this.repository.team.get_team(),
       ]);
     })
-    .then(([notifications_count, team_ets]) => {
+    .then(([notifications_count, team_et]) => {
       this.view.loading.update_progress(95, z.string.init_updated_from_notifications);
 
       this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
