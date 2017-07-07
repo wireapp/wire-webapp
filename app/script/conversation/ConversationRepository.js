@@ -104,9 +104,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.sending_queue = new z.util.PromiseQueue({name: 'ConversationRepository.Sending', paused: true});
 
     // @note Only use the client request queue as to unblock if not blocked by event handling or the cryptographic order of messages will be ruined and sessions might be deleted
-    this.conversation_service.client.request_queue_blocked_state.subscribe((state) => {
-      const request_queue_blocked = state !== z.service.RequestQueueBlockedState.NONE;
-      this.sending_queue.pause(request_queue_blocked || this.block_event_handling());
+    this.conversation_service.client.queue_state.subscribe((queue_state) => {
+      const queue_ready = queue_state === z.service.QUEUE_STATE.READY;
+      this.sending_queue.pause(!queue_ready || this.block_event_handling());
     });
 
     this.conversations_archived = ko.observableArray([]);

@@ -88,7 +88,7 @@ z.service.BackendClient = class BackendClient {
     this.connectivity_queue = new z.util.PromiseQueue({name: 'BackendClient.Connectivity'});
 
     this.request_queue = new z.util.PromiseQueue({name: 'BackendClient.Request'});
-    this.request_queue_blocked_state = ko.observable(z.service.RequestQueueBlockedState.NONE);
+    this.queue_state = ko.observable(z.service.QUEUE_STATE.READY);
 
     this.access_token = '';
     this.access_token_type = '';
@@ -182,9 +182,10 @@ z.service.BackendClient = class BackendClient {
    * @returns {undefined} No return value
    */
   execute_request_queue() {
+    this.queue_state(z.service.QUEUE_STATE.READY);
     if (this.access_token && this.request_queue.get_length()) {
       this.logger.info(`Executing '${this.request_queue.get_length()}' queued requests`);
-      this.request_queue.pause(false);
+      this.request_queue.resume();
     }
   }
 
@@ -226,8 +227,8 @@ z.service.BackendClient = class BackendClient {
    * @returns {Promise} Resolves when the request has been executed
    */
   send_request(config) {
-    if (this.request_queue_blocked_state() !== z.service.RequestQueueBlockedState.NONE) {
-      return this._push_to_request_queue(config, this.request_queue_blocked_state());
+    if (this.queue_state() !== z.service.QUEUE_STATE.READY) {
+      return this._push_to_request_queue(config, this.queue_state());
     }
 
     return this._send_request(config);
@@ -241,7 +242,7 @@ z.service.BackendClient = class BackendClient {
    * @param {string} reason - Reason for delayed execution of request
    * @returns {Promise} Resolved when the request has been executed
    */
-  _push_to_request_queue(config, reason) {
+  _push_to_request_queue(config, reason = this.queue_state()) {
     this.logger.info(`Adding '${config.type}' request to '${config.url}' to queue due to '${reason}'`, config);
     return this.request_queue.push(() => this._send_request(config));
   }
@@ -286,17 +287,10 @@ z.service.BackendClient = class BackendClient {
           switch (status_code) {
             case z.service.BackendClientError.STATUS_CODE.CONNECTIVITY_PROBLEM: {
               this.request_queue.pause();
-              this.request_queue_blocked_state(z.service.RequestQueueBlockedState.CONNECTIVITY_PROBLEM);
-
-              this._push_to_request_queue(config, this.request_queue_blocked_state())
-                .then(resolve)
-                .catch(reject);
+              this.queue_state(z.service.QUEUE_STATE.CONNECTIVITY_PROBLEM);
 
               return this.execute_on_connectivity()
-                .then(() => {
-                  this.request_queue_blocked_state(z.service.RequestQueueBlockedState.NONE);
-                  this.execute_request_queue();
-                });
+                .then(() => this.execute_request_queue());
             }
 
             case z.service.BackendClientError.STATUS_CODE.FORBIDDEN: {
@@ -331,12 +325,9 @@ z.service.BackendClient = class BackendClient {
             }
 
             case z.service.BackendClientError.STATUS_CODE.UNAUTHORIZED: {
-              this._push_to_request_queue(config, z.service.RequestQueueBlockedState.ACCESS_TOKEN_REFRESH)
-                .then(resolve)
-                .catch(reject);
-
               const trigger = z.auth.AuthRepository.ACCESS_TOKEN_TRIGGER.UNAUTHORIZED_REQUEST;
-              return amplify.publish(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, trigger);
+              amplify.publish(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, trigger);
+              return;
             }
 
             default: {
@@ -352,7 +343,7 @@ z.service.BackendClient = class BackendClient {
             }
           }
 
-          return reject(response || new z.service.BackendClientError(status_code));
+          reject(response || new z.service.BackendClientError(status_code));
         });
     });
   }

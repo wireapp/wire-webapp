@@ -61,15 +61,14 @@ z.util.PromiseQueue = class PromiseQueue {
     const queue_entry = this._queue[0];
     if (queue_entry) {
       this._blocked = true;
+      this._clear_interval();
+
       this._interval = window.setInterval(() => {
         if (!this._paused) {
-          this._blocked = false;
-          window.clearInterval(this._interval);
           this.logger.error('Promise queue failed, unblocking queue', this._queue);
-          this.execute();
+          this.resume();
         }
-      },
-      this._timeout);
+      }, this._timeout);
 
       queue_entry.fn()
         .catch((error) => {
@@ -80,13 +79,12 @@ z.util.PromiseQueue = class PromiseQueue {
           if (queue_entry.resolve_fn) {
             queue_entry.resolve_fn(response);
           }
-          window.clearInterval(this._interval);
+
+          this._clear_interval();
           this._blocked = false;
+
           this._queue.shift();
-          window.setTimeout(() => {
-            return this.execute();
-          },
-          0);
+          window.setTimeout(() => this.execute(), 0);
         });
     }
   }
@@ -127,5 +125,22 @@ z.util.PromiseQueue = class PromiseQueue {
       this._queue.push(queue_entry);
       this.execute();
     });
+  }
+
+  /**
+   * Resume execution of queue.
+   * @returns {undefined} No return value
+   */
+  resume() {
+    this._clear_interval();
+    this._blocked = false;
+    this.pause(false);
+  }
+
+  _clear_interval() {
+    if (this._interval) {
+      window.clearInterval(this._interval);
+      this._interval = undefined;
+    }
   }
 };
