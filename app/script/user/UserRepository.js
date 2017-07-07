@@ -168,7 +168,15 @@ z.user.UserRepository = class UserRepository {
   user_update({user}) {
     const is_self_user = user.id === this.self().id;
     const user_promise = is_self_user ? Promise.resolve(this.self()) : this.get_user_by_id(user.id);
-    return user_promise.then((user_et) => this.user_mapper.update_user_from_object(user_et, user));
+    return user_promise.then((user_et) => {
+      this.user_mapper.update_user_from_object(user_et, user);
+
+      if (is_self_user) {
+        amplify.publish(z.event.WebApp.TEAM.UPDATE_INFO);
+      }
+
+      return user_et;
+    });
   }
 
   /**
@@ -803,7 +811,7 @@ z.user.UserRepository = class UserRepository {
    */
   change_accent_color(accent_id) {
     return this.user_service.update_own_user_profile({accent_id})
-      .then(() => this.self().accent_id(accent_id));
+      .then(() => this.user_update({user: {accent_id: accent_id, id: this.self().id}}));
   }
 
   /**
@@ -814,7 +822,7 @@ z.user.UserRepository = class UserRepository {
   change_name(name) {
     if (name.length >= UserRepository.CONFIG.MINIMUM_NAME_LENGTH) {
       return this.user_service.update_own_user_profile({name})
-        .then(() => this.self().name(name));
+        .then(() => this.user_update({user: {id: this.self().id, name: name}}));
     }
 
     return Promise.reject(new z.user.UserError(z.userUserError.TYPE.INVALID_UPDATE));
@@ -876,7 +884,7 @@ z.user.UserRepository = class UserRepository {
       return this.user_service.change_own_username(username)
         .then(() => {
           this.should_set_username = false;
-          return this.self().username(username);
+          return this.user_update({user: {handle: username, id: this.self().id}});
         })
         .catch(({code: error_code}) => {
           if ([z.service.BackendClientError.STATUS_CODE.CONFLICT, z.service.BackendClientError.STATUS_CODE.BAD_REQUEST].includes(error_code)) {
@@ -948,9 +956,7 @@ z.user.UserRepository = class UserRepository {
    */
   set_default_picture() {
     return z.util.load_url_blob(z.config.UNSPLASH_URL)
-      .then((blob) => {
-        return this.change_picture(blob);
-      })
+      .then((blob) => this.change_picture(blob))
       .then(() => {
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.ADDED_PHOTO, {
           outcome: 'success',
