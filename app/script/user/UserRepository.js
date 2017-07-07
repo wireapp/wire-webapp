@@ -66,7 +66,8 @@ z.user.UserRepository = class UserRepository {
 
     this.connected_users = ko.pureComputed(() => {
       return this.users()
-        .filter((user_et) => user_et.is_connected());
+        .filter((user_et) => user_et.is_connected())
+        .sort((user_a, user_b) => z.util.StringUtil.sort_by_priority(user_a.first_name(), user_b.first_name()));
     }).extend({rateLimit: 1000});
 
     this.number_of_connected_users = ko.pureComputed(() => {

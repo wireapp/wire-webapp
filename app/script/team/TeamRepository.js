@@ -43,7 +43,14 @@ z.team.TeamRepository = class TeamRepository {
 
     this.is_team = ko.pureComputed(() => this.team() ? !!this.team().id : false);
 
-    this.team_members = ko.pureComputed(() => this.is_team() ? this.team().members() : []);
+    this.team_members = ko.pureComputed(() => {
+      if (this.is_team()) {
+        return this.team().members()
+          .sort((user_a, user_b) => z.util.StringUtil.sort_by_priority(user_a.first_name(), user_b.first_name()));
+      }
+
+      return [];
+    });
     this.team_name = ko.pureComputed(() => this.is_team() ? this.team().name() : this.user_repository.self().name());
     this.team_users = ko.pureComputed(() => this.team_members().concat(this.user_repository.connected_users()));
 
