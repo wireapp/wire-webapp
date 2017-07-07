@@ -39,20 +39,20 @@
       <!-- ko ifnot: show_spinner() -->
         <!-- ko ifnot: show_search_results() -->
           <!-- ko if: show_top_people() -->
-            <div class="start-ui-list-top-people">
-              <span class="start-ui-list-header start-ui-list-header-top-people" data-uie-name="status-top-people" data-bind="l10n_text: z.string.search_top_people"></span>
+            <div class="start-ui-list-top-people" data-uie-name="status-top-people">
+              <span class="start-ui-list-header start-ui-list-header-top-people" data-bind="l10n_text: z.string.search_top_people"></span>
               <top-people class="search-list-theme-black" params="user: top_users, selected: selected_people"></top-people>
             </div>
           <!-- /ko  -->
           <!-- ko if: show_team_members() -->
-            <div class="start-ui-list-team-members">
-              <span class="start-ui-list-header start-ui-list-header-team-member" data-uie-name="status-team-members" data-bind="l10n_text: z.string.search_team_members"></span>
+            <div class="start-ui-list-team-members" data-uie-name="status-team-members">
+              <span class="start-ui-list-header start-ui-list-header-team-member" data-bind="l10n_text: z.string.search_team_members"></span>
               <user-list class="search-list-theme-black" params="user: team_members, mode: z.components.UserListMode.INFO, selected: selected_people"></user-list>
             </div>
           <!-- /ko  -->
           <!-- ko if: show_contacts() -->
-            <div class="start-ui-list-contacts">
-              <span class="start-ui-list-header" data-uie-name="status-connect" data-bind="l10n_text: z.string.search_connections"></span>
+            <div class="start-ui-list-contacts" data-uie-name="status-contacts">
+              <span class="start-ui-list-header" data-bind="l10n_text: z.string.search_connections"></span>
               <user-list class="search-list-theme-black" params="user: contacts, mode: z.components.UserListMode.INFO, selected: selected_people"></user-list>
             </div>
           <!-- /ko  -->
