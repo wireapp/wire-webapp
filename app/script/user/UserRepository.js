@@ -680,11 +680,12 @@ z.user.UserRepository = class UserRepository {
    * @returns {Array<z.entity.User>} Matching users
    */
   search_for_connected_users(query, is_username) {
-    return this.users()
+    return this.connected_users()
       .filter((user_et) => {
-        if (!user_et.is_connected()) {
+        if (this.is_team() && this.team_members().includes(user_et)) {
           return false;
         }
+
         return user_et.matches(query, is_username);
       })
       .sort((user_a, user_b) => {
