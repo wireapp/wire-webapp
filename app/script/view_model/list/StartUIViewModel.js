@@ -80,7 +80,6 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
           .then((user_ets) => {
             const is_current_query = normalized_query === z.search.SearchRepository.normalize_query(this.search_input());
             if (is_current_query) {
-              console.log('users', user_ets);
               this.search_results.others(user_ets);
             }
           })
