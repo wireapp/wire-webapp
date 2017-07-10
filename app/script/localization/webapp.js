@@ -217,6 +217,9 @@ z.string.modal_uploads_parallel = 'You can send up to {{number}} files at once.'
 z.string.connection_request_connect = 'Connect';
 z.string.connection_request_ignore = 'Ignore';
 
+// Guests
+z.string.conversation_guest_indicator = 'Guest';
+
 // Conversation
 z.string.conversation_you_nominative = 'you';
 z.string.conversation_you_dative = 'you';

@@ -250,7 +250,7 @@ z.main.App = class App {
       this.telemetry.add_statistic(z.telemetry.app_init.AppInitStatisticsValue.CONVERSATIONS, conversation_ets.length, 50);
       this.telemetry.add_statistic(z.telemetry.app_init.AppInitStatisticsValue.CONNECTIONS, connection_ets.length, 50);
 
-      this.repository.conversation.initialize_connections(this.repository.user.connections());
+      this.repository.conversation.map_connections(this.repository.user.connections());
       this._subscribe_to_unload_events();
 
       return Promise.all([
@@ -259,6 +259,7 @@ z.main.App = class App {
       ]);
     })
     .then(([notifications_count, team_et]) => {
+      this.repository.conversation.initialize_conversations();
       this.view.loading.update_progress(95, z.string.init_updated_from_notifications);
 
       this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);

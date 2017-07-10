@@ -70,17 +70,16 @@ z.team.TeamRepository = class TeamRepository {
 
           if (team.binding) {
             const team_et = this.team_mapper.map_team_from_object(team);
-            this._set_team(team_et);
-
-            return this.team();
+            this.team(team_et);
+            return this.update_team_members(team_et);
           }
         }
 
         return this.team(new z.team.TeamEntity());
       })
-      .then((team_et) => {
+      .then(() => {
         this.send_account_info();
-        return team_et;
+        return this.team();
       });
   }
 
@@ -180,12 +179,8 @@ z.team.TeamRepository = class TeamRepository {
     return this.get_team_members(team_et.id)
       .then((team_members) => {
         const member_ids = team_members
-          .map((team_member) => {
-            if (team_member.user_id !== this.user_repository.self().id) {
-              return team_member.user_id;
-            }
-          })
-          .filter((member_id) => member_id);
+          .filter((team_member) => team_member.user_id !== this.user_repository.self().id)
+          .map((team_member) => team_member.user_id);
 
         return this.user_repository.get_users_by_id(member_ids);
       })
@@ -195,7 +190,7 @@ z.team.TeamRepository = class TeamRepository {
   _add_user_to_team(user_et) {
     const members = this.team().members;
 
-    if (!members().filter((member) => member.id === user_et.id).length) {
+    if (!members().find((member) => member.id === user_et.id)) {
       members.push(user_et);
     }
   }
@@ -246,11 +241,5 @@ z.team.TeamRepository = class TeamRepository {
       this.team_mapper.update_team_from_object(team_data, this.team());
       this.send_account_info();
     }
-  }
-
-  _set_team(team_et) {
-    this.update_team_members(team_et);
-    this.team(team_et);
-    this.user_repository.map_guest_status();
   }
 };
