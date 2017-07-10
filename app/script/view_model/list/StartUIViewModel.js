@@ -110,8 +110,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
         return this.matched_users();
       }
 
-      return this.user_repository.connected_users()
-        .sort((user_a, user_b) => z.util.StringUtil.sort_by_priority(user_a.first_name(), user_b.first_name()));
+      return this.user_repository.connected_users();
     });
 
     this.matched_users = ko.observableArray([]);
