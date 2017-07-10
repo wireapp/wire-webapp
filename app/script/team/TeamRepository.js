@@ -198,7 +198,10 @@ z.team.TeamRepository = class TeamRepository {
   _on_delete(event_json) {
     const team_id = event_json.team;
     amplify.publish(z.event.WebApp.TEAM.DELETE, team_id);
-    amplify.publish(z.event.WebApp.TEAM.MEMBER_LEAVE, team_id); // deprecated
+    
+    return window.setTimeout(() => {
+      amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.ACCOUNT_DELETED, true);
+    }, 50);
   }
 
   _on_member_join(event_json) {
@@ -219,7 +222,7 @@ z.team.TeamRepository = class TeamRepository {
     if (is_local_team) {
       const is_self_user = user_id === this.user_repository.self().id;
       if (is_self_user) {
-        return this._on_delete({team: team_id});
+        return this._on_delete(event_json);
       }
 
       this.team().members.remove((member) => member.id === user_id);
