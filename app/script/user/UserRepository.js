@@ -156,7 +156,7 @@ z.user.UserRepository = class UserRepository {
     const is_self_user = id === this.self().id;
     if (is_self_user) {
       window.setTimeout(() => {
-        amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReason.SESSION_EXPIRED, true);
+        amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.ACCOUNT_DELETED, true);
       }, 50);
     }
   }

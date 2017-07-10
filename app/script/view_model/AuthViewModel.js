@@ -315,8 +315,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       return this.register_from_invite(invite_code);
     }
 
-    const is_expired = z.util.get_url_parameter(z.auth.URLParameter.EXPIRED);
-    if (is_expired) {
+    const reason = z.util.get_url_parameter(z.auth.URLParameter.REASON);
+    if (reason && reason === z.auth.SIGN_OUT_REASON.SESSION_EXPIRED) {
       this.session_expired(true);
     }
   }
