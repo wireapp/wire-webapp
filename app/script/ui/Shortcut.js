@@ -162,13 +162,13 @@ window.z.ui = z.ui || {};
     event: z.event.WebApp.SHORTCUT.START,
     shortcut: {
       electron: {
-        macos: 'command + f',
+        macos: 'command + n',
         menu: true,
-        pc: 'ctrl + f',
+        pc: 'ctrl + n',
       },
       webapp: {
-        macos: 'command + alt + f',
-        pc: 'ctrl + alt + f',
+        macos: 'command + alt + graveaccent', // KeyboardJS fires this when using cmd + alt + n
+        pc: 'ctrl + alt + graveaccent',
       },
     },
   };
