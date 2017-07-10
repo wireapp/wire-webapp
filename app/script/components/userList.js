@@ -146,8 +146,8 @@ ko.components.register('user-list', {
               <!-- /ko -->
             </div>
           </div>
-          <div class="search-list-item-connect" data-bind="visible: $parent.show_buttons()">
-            <span class="icon-add icon-button" data-bind="click: $parent.on_connect"></span>
+          <div class="search-list-item-guest-indicator" data-bind="visible: $data.is_guest()">
+            <div class="search-list-item-guest-indicator-badge cell-badge-light" data-bind="l10n_text: z.string.conversation_guest_indicator"></div>
           </div>
         <!-- /ko -->
       </div>
