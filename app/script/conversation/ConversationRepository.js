@@ -410,6 +410,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   update_conversations_offline() {
+    this.logger.info('Updating group participants offline');
     this.sorted_conversations().map((conversation_et) => this.update_participating_user_ets(conversation_et, true));
   }
 
@@ -674,13 +675,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
       });
   }
 
-  initialize_connections(connections_ets) {
-    this.map_connections(connections_ets)
-      .then(() => {
-        this.logger.info('Updating group participants offline');
-        this._init_state_updates();
-        this.update_conversations_offline();
-      });
+  initialize_conversations() {
+    this.update_conversations_offline();
+    this._init_state_updates();
   }
 
   /**
