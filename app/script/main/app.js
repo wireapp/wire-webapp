@@ -26,8 +26,8 @@ z.main.App = class App {
   static get CONFIG() {
     return {
       IMMEDIATE_SIGN_OUT_REASONS: [
-        z.auth.SIGN_OUT.ACCOUNT_DELETED,
-        z.auth.SIGN_OUT.SESSION_EXPIRED,
+        z.auth.SIGN_OUT_REASON.ACCOUNT_DELETED,
+        z.auth.SIGN_OUT_REASON.SESSION_EXPIRED,
       ],
       TABS_CHECK: {
         COOKIE_NAME: 'app_opened',
