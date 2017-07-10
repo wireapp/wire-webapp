@@ -218,7 +218,7 @@ z.string.connection_request_connect = 'Connect';
 z.string.connection_request_ignore = 'Ignore';
 
 // Guests
-z.string.conversation_guest_indicator = 'Guest'
+z.string.conversation_guest_indicator = 'Guest';
 
 // Conversation
 z.string.conversation_you_nominative = 'you';
