@@ -129,6 +129,7 @@ z.team.TeamRepository = class TeamRepository {
       }
     }
   }
+
   /**
    * Search for user.
    * @param {string} query - Find user using name or username
@@ -192,13 +193,12 @@ z.team.TeamRepository = class TeamRepository {
     }
   }
 
-  _on_delete(event_json) {
-    const team_id = event_json.team;
-    amplify.publish(z.event.WebApp.TEAM.DELETE, team_id);
-
-    return window.setTimeout(() => {
-      amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.ACCOUNT_DELETED, true);
-    }, 50);
+  _on_delete({team: team_id}) {
+    if (this.is_team() && this.team().id === team_id) {
+      window.setTimeout(() => {
+        amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.ACCOUNT_DELETED, true);
+      }, 50);
+    }
   }
 
   _on_member_join(event_json) {
