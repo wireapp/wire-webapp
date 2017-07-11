@@ -16,7 +16,7 @@
         <!-- /ko -->
       </div>
 
-      <!-- ko if: user().is_connected() -->
+      <!-- ko if: user().is_connected() || user().is_team_member() -->
         <div class="user-profile-tabs" data-bind="attr: {'data-tab-index': tab_index}">
           <span data-uie-name="go-profile-details" class="user-profile-tab" data-bind="click: function() { click_on_tab(0) }, l10n_text: z.string.people_tabs_details"></span>
           <span data-uie-name="go-profile-devices" class="user-profile-tab" data-bind="click: function() { click_on_tab(1) }, l10n_text: z.string.people_tabs_devices"></span>
