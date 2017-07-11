@@ -129,7 +129,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.user_input = ko.observable('');
     this.user_selected = ko.observableArray([]);
 
-    this.connected_users = ko.pureComputed(() => {
+    this.users = ko.pureComputed(() => {
       const user_ets = this.is_team() ? this.team_users() : this.user_repository.connected_users();
 
       return user_ets

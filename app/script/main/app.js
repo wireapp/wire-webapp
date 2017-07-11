@@ -89,9 +89,9 @@ z.main.App = class App {
     repositories.properties          = new z.properties.PropertiesRepository(this.service.properties);
     repositories.connect             = new z.connect.ConnectRepository(this.service.connect, this.service.connect_google, repositories.properties);
     repositories.links               = new z.links.LinkPreviewRepository(this.service.asset, repositories.properties);
+    repositories.search              = new z.search.SearchRepository(this.service.search, repositories.user);
     repositories.team                = new z.team.TeamRepository(this.service.team, repositories.user);
 
-    repositories.search              = new z.search.SearchRepository(this.service.search, repositories.team, repositories.user);
     repositories.conversation        = new z.conversation.ConversationRepository(
       this.service.conversation,
       this.service.asset,

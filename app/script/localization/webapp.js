@@ -505,6 +505,7 @@ z.string.preferences_options_notifications_on = 'Show sender and message';
 z.string.search_group_hint = 'Keep typing or pick more people to create a group';
 z.string.search_connect = 'Connect';
 z.string.search_connections = 'Connections';
+z.string.search_contacts = 'Contacts';
 z.string.search_groups = 'Groups';
 z.string.search_placeholder = 'Search by name or username';
 z.string.search_team_groups = 'Team conversations';
