@@ -56,8 +56,23 @@ z.search.SearchRepository = class SearchRepository {
    * @returns {Promise} Resolves with the search results
    */
   search_by_name(name, is_username, max_results = 10) {
-    return this.search_service.get_contacts(name, 30)
-      .then(({documents}) => documents.map((match) => match.id))
+    const directory_search = this.search_service.get_contacts(name, 30)
+      .then(({documents}) => documents.map((match) => match.id));
+
+    const search_promises = [directory_search];
+
+    if (is_username) {
+      search_promises.push(this.user_repository.get_user_id_by_username(name));
+    }
+
+    return Promise.all(search_promises)
+      .then(([directory_results, username_result]) => {
+        if (username_result && !directory_results.includes(username_result)) {
+          directory_results.push(username_result);
+        }
+
+        return directory_results;
+      })
       .then((user_ids) => this.user_repository.get_users_by_id(user_ids))
       .then((user_ets) => user_ets.filter((user_et) => !user_et.is_connected() && !user_et.is_team_member()))
       .then((user_ets) => {
