@@ -43,16 +43,13 @@ z.team.TeamRepository = class TeamRepository {
 
     this.is_team = ko.pureComputed(() => this.team() ? !!this.team().id : false);
 
-    this.team_members = ko.pureComputed(() => {
-      if (this.is_team()) {
-        return this.team().members()
-          .sort((user_a, user_b) => z.util.StringUtil.sort_by_priority(user_a.first_name(), user_b.first_name()));
-      }
-
-      return [];
-    });
+    this.team_members = ko.pureComputed(() => this.is_team() ? this.team().members() : []);
     this.team_name = ko.pureComputed(() => this.is_team() ? this.team().name() : this.user_repository.self().name());
-    this.team_users = ko.pureComputed(() => this.team_members().concat(this.user_repository.connected_users()));
+    this.team_users = ko.pureComputed(() => {
+      return this.team_members()
+        .concat(this.user_repository.connected_users())
+        .sort((user_a, user_b) => z.util.StringUtil.sort_by_priority(user_a.first_name(), user_b.first_name()));
+    });
 
     this.team_members.subscribe(() => this.user_repository.map_guest_status());
 
@@ -138,8 +135,8 @@ z.team.TeamRepository = class TeamRepository {
    * @param {boolean} is_username - Query string is username
    * @returns {Array<z.entity.User>} Matching users
    */
-  search_for_team_members(query, is_username) {
-    return this.team_members()
+  search_for_team_users(query, is_username) {
+    return this.team_users()
       .filter((user_et) => user_et.matches(query, is_username))
       .sort((user_a, user_b) => {
         if (is_username) {
@@ -198,7 +195,7 @@ z.team.TeamRepository = class TeamRepository {
   _on_delete(event_json) {
     const team_id = event_json.team;
     amplify.publish(z.event.WebApp.TEAM.DELETE, team_id);
-    
+
     return window.setTimeout(() => {
       amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.ACCOUNT_DELETED, true);
     }, 50);

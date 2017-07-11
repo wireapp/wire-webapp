@@ -85,10 +85,13 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
           })
           .catch((error) => this.logger.error(`Error searching for contacts: ${error.message}`, error));
 
-        this.search_results.contacts(this.user_repository.search_for_connected_users(normalized_query, is_username));
-        this.search_results.groups(this.conversation_repository.get_groups_by_name(normalized_query, is_username));
-        this.search_results.team_members(this.team_repository.search_for_team_members(normalized_query, is_username));
+        if (this.is_team()) {
+          this.search_results.contacts(this.team_repository.search_for_team_users(normalized_query, is_username));
+        } else {
+          this.search_results.contacts(this.user_repository.search_for_connected_users(normalized_query, is_username));
+        }
 
+        this.search_results.groups(this.conversation_repository.get_groups_by_name(normalized_query, is_username));
         this.searched_for_user(query);
       }
     }, 300);
@@ -110,18 +113,20 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
         return this.matched_users();
       }
 
+      if (this.is_team()) {
+        return this.team_repository.team_users();
+      }
+
       return this.user_repository.connected_users();
     });
 
     this.matched_users = ko.observableArray([]);
-    this.team_members = this.team_repository.team_members;
     this.top_users = ko.observableArray([]);
 
     this.search_results = {
       contacts: ko.observableArray([]),
       groups: ko.observableArray([]),
       others: ko.observableArray([]),
-      team_members: ko.observableArray([]),
     };
 
     // User properties
@@ -138,7 +143,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.show_invite = ko.pureComputed(() => !this.is_team());
     this.show_matches = ko.observable(false);
 
-    this.show_no_contacts = ko.pureComputed(() => !this.show_matches() && !this.show_search_results() && !this.contacts().length && !this.team_members());
+    this.show_no_contacts = ko.pureComputed(() => !this.show_matches() && !this.show_search_results() && !this.contacts().length);
     this.show_no_matches = ko.pureComputed(() => this.show_matches() && !this.contacts().length);
     this.show_no_search_results = ko.pureComputed(() => {
       return !this.show_matches() && this.show_search_results() && !this.has_search_results() && this.search_input().length;
@@ -154,7 +159,6 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       return this.has_search_results() || this.search_input().length;
     });
 
-    this.show_team_members = ko.pureComputed(() => this.is_team() && this.team_members().length && !this.show_matches());
     this.show_top_people = ko.pureComputed(() => !this.is_team() && this.top_users().length && !this.show_matches());
 
     // Invite bubble states

@@ -690,13 +690,7 @@ z.user.UserRepository = class UserRepository {
    */
   search_for_connected_users(query, is_username) {
     return this.connected_users()
-      .filter((user_et) => {
-        if (this.is_team() && this.team_members().includes(user_et)) {
-          return false;
-        }
-
-        return user_et.matches(query, is_username);
-      })
+      .filter((user_et) => user_et.matches(query, is_username))
       .sort((user_a, user_b) => {
         if (is_username) {
           return z.util.StringUtil.sort_by_priority(user_a.username(), user_b.username(), query);
