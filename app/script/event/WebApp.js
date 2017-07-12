@@ -139,6 +139,7 @@ z.event.WebApp = {
     REFRESH: 'wire.webapp.lifecycle.refresh',
     RESTART: 'wire.webapp.lifecycle.restart',
     SIGN_OUT: 'wire.webapp.lifecycle.sign_out',
+    SIGNED_OUT: 'wire.webapp.lifecycle.signed_out',
     UPDATE: 'wire.webapp.lifecycle.update',
   },
   LIST: {
