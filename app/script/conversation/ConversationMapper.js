@@ -197,7 +197,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
    * @returns {Array} Merged conversation data
    */
   merge_conversations(local, remote) {
-    return remote.map(function(remote_conversation, index) {
+    return remote.map((remote_conversation, index) => {
       const {id, creator, members, name, team, type} = remote_conversation;
       let local_conversation = local
         .filter((conversation) => conversation)
