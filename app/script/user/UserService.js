@@ -239,6 +239,13 @@ z.user.UserService = class UserService {
     });
   }
 
+  get_username(username) {
+    return this.client.send_request({
+      type: 'GET',
+      url: this.client.create_url(`${UserService.URL.USERS}/handles/${username}`),
+    });
+  }
+
   /**
    * Get a set of users for the given usernames
    * @example ['0bb84213-8cc2-4bb1-9e0b-b8dd522396d5', '15ede065-72b3-433a-9917-252f076ed031']
