@@ -47,6 +47,8 @@
 .search-list-item-image {
 
   .search-list-sm & {
+    .square(@avatar-diameter-md);
+    position: relative;
     margin-bottom: 3px;
   }
 
@@ -55,6 +57,14 @@
     height: @avatar-diameter-sm;
     position: relative;
   }
+}
+
+.search-list-item-image-guest-indicator-badge {
+  .guest-badge;
+  bottom: 0;
+  left: 50%;
+  position: absolute;
+  transform: translateX(-50%);
 }
 
 .search-list-item-image-overlay {
@@ -130,9 +140,7 @@
 }
 
 .search-list-item-guest-indicator-badge {
-  .cell-badge-light();
-  padding-right: 8px;
-  padding-left: 8px;
+  .guest-badge;
 
   .user-list-light & {
     .cell-badge-dark();
