@@ -606,8 +606,12 @@ z.main.App = class App {
       if (clear_data) {
         this.repository.storage.delete_everything()
           .catch((error) => this.logger.error('Failed to delete database before logout', error))
-          .then(() => this._redirect_to_login(sign_out_reason));
+          .then(() => {
+            amplify.publish(z.event.WebApp.LIFECYCLE.SIGNED_OUT);
+            this._redirect_to_login(sign_out_reason);
+          });
       } else {
+        amplify.publish(z.event.WebApp.LIFECYCLE.SIGNED_OUT);
         this._redirect_to_login(sign_out_reason);
       }
     };
@@ -616,7 +620,10 @@ z.main.App = class App {
       this.logger.info(`Logout triggered by '${sign_out_reason}': Disconnecting user from the backend.`);
       this.auth.repository.logout()
         .then(() => _logout())
-        .catch(() => this._redirect_to_login(sign_out_reason));
+        .catch(() => {
+          amplify.publish(z.event.WebApp.LIFECYCLE.SIGNED_OUT);
+          this._redirect_to_login(sign_out_reason);
+        });
     };
 
     if (App.CONFIG.IMMEDIATE_SIGN_OUT_REASONS.includes(sign_out_reason)) {
