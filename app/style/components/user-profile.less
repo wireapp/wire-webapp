@@ -117,6 +117,20 @@ user-profile {
   flex: 1 1;
   flex-direction: column;
   justify-content: center;
+  position: relative;
+}
+
+.user-profile-details-avatar {
+  .square(@avatar-diameter-lg);
+  position: relative;
+}
+
+.user-profile-details-guest-badge {
+  .guest-badge;
+  bottom: -10px;
+  left: 50%;
+  position: absolute;
+  transform: translateX(-50%);
 }
 
 .user-profile-devices {

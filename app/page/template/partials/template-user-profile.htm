@@ -26,7 +26,10 @@
       <!-- ko if: tab_index() === 0 -->
         <div class="user-profile-details">
           <!-- ko if: render_avatar -->
-            <user-avatar class="image user-avatar-lg cursor-default" params="user: user" data-uie-name="status-profile-picture"></user-avatar>
+            <div class="user-profile-details-avatar">
+              <user-avatar class="user-avatar-lg cursor-default" params="user: user" data-uie-name="status-profile-picture"></user-avatar>
+              <span class="user-profile-details-guest-badge" data-bind="visible: user().is_guest(), l10n_text: z.string.conversation_guest_indicator"></span>
+            </div>
           <!-- /ko -->
         </div>
         <div class="user-profile-footer">
