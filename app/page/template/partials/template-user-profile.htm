@@ -16,7 +16,7 @@
         <!-- /ko -->
       </div>
 
-      <!-- ko if: user().is_connected() -->
+      <!-- ko if: user().is_connected() || user().is_team_member() -->
         <div class="user-profile-tabs" data-bind="attr: {'data-tab-index': tab_index}">
           <span data-uie-name="go-profile-details" class="user-profile-tab" data-bind="click: function() { click_on_tab(0) }, l10n_text: z.string.people_tabs_details"></span>
           <span data-uie-name="go-profile-devices" class="user-profile-tab" data-bind="click: function() { click_on_tab(1) }, l10n_text: z.string.people_tabs_devices"></span>
@@ -26,7 +26,10 @@
       <!-- ko if: tab_index() === 0 -->
         <div class="user-profile-details">
           <!-- ko if: render_avatar -->
-            <user-avatar class="image user-avatar-lg cursor-default" params="user: user" data-uie-name="status-profile-picture"></user-avatar>
+            <div class="user-profile-details-avatar">
+              <user-avatar class="user-avatar-lg cursor-default" params="user: user" data-uie-name="status-profile-picture"></user-avatar>
+              <span class="user-profile-details-guest-badge" data-bind="visible: user().is_guest(), l10n_text: z.string.conversation_guest_indicator"></span>
+            </div>
           <!-- /ko -->
         </div>
         <div class="user-profile-footer">

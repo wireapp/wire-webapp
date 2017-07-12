@@ -23,6 +23,13 @@ window.z = window.z || {};
 window.z.search = z.search || {};
 
 z.search.SearchRepository = class SearchRepository {
+  static get CONFIG() {
+    return {
+      MAX_DIRECTORY_RESULTS: 30,
+      MAX_SEARCH_RESULTS: 10,
+    };
+  }
+
   /**
    * Trim and remove @.
    * @param {string} query - Search string
@@ -38,17 +45,12 @@ z.search.SearchRepository = class SearchRepository {
   /**
    * Construct a new Conversation Repository.
    * @param {z.search.SearchService} search_service - Backend REST API search service implementation
-   * @param {z.team.TeamRepository} team_repository - Repository for all team interactions
    * @param {z.user.UserRepository} user_repository - Repository for all user and connection interactions
   */
-  constructor(search_service, team_repository, user_repository) {
+  constructor(search_service, user_repository) {
     this.search_service = search_service;
-    this.team_repository = team_repository;
     this.user_repository = user_repository;
     this.logger = new z.util.Logger('z.search.SearchRepository', z.config.LOGGER.OPTIONS);
-
-    this.is_team = this.team_repository.is_team;
-    this.team_members = this.team_repository.team_members;
   }
 
   /**
@@ -57,22 +59,29 @@ z.search.SearchRepository = class SearchRepository {
    *
    * @param {string} name - Search query
    * @param {boolean} is_username - Is query a username
-   * @param {number} [max_results=10] - Maximum number of results
+   * @param {number} [max_results=SearchRepository.CONFIG.MAX_SEARCH_RESULTS] - Maximum number of results
    * @returns {Promise} Resolves with the search results
    */
-  search_by_name(name, is_username, max_results = 10) {
-    return this.search_service.get_contacts(name, 30)
-      .then(({documents}) => documents.map((match) => match.id))
-      .then((user_ids) => this.user_repository.get_users_by_id(user_ids))
-      .then((user_ets) => {
-        return user_ets.filter((user_et) => {
-          if (this.is_team() && this.team_members().includes(user_et)) {
-            return false;
-          }
+  search_by_name(name, is_username, max_results = SearchRepository.CONFIG.MAX_SEARCH_RESULTS) {
+    const directory_search = this.search_service.get_contacts(name, SearchRepository.CONFIG.MAX_DIRECTORY_RESULTS)
+      .then(({documents}) => documents.map((match) => match.id));
 
-          return !user_et.is_connected();
-        });
+    const search_promises = [directory_search];
+
+    if (is_username) {
+      search_promises.push(this.user_repository.get_user_id_by_username(name));
+    }
+
+    return Promise.all(search_promises)
+      .then(([directory_results, username_result]) => {
+        if (username_result && !directory_results.includes(username_result)) {
+          directory_results.push(username_result);
+        }
+
+        return directory_results;
       })
+      .then((user_ids) => this.user_repository.get_users_by_id(user_ids))
+      .then((user_ets) => user_ets.filter((user_et) => !user_et.is_connected() && !user_et.is_team_member()))
       .then((user_ets) => {
         if (is_username) {
           user_ets = user_ets.filter((user_et) => z.util.StringUtil.starts_with(user_et.username(), name));

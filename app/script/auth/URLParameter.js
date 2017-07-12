@@ -26,8 +26,8 @@ z.auth.URLParameter = {
   BOT: 'bot',
   CONNECT: 'connect',
   ENVIRONMENT: 'env',
-  EXPIRED: 'expired',
   INVITE: 'invite',
   LOCALE: 'hl',
   LOCALYTICS: 'localytics',
+  REASON: 'reason',
 };

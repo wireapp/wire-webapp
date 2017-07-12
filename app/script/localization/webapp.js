@@ -217,6 +217,9 @@ z.string.modal_uploads_parallel = 'You can send up to {{number}} files at once.'
 z.string.connection_request_connect = 'Connect';
 z.string.connection_request_ignore = 'Ignore';
 
+// Guests
+z.string.conversation_guest_indicator = 'Guest';
+
 // Conversation
 z.string.conversation_you_nominative = 'you';
 z.string.conversation_you_dative = 'you';
@@ -301,7 +304,7 @@ z.string.conversations_connection_request_one = '1 person waiting';
 z.string.conversations_empty_conversation = 'Group conversation';
 z.string.conversations_empty_conversation_description = 'Everyone left';
 z.string.conversations_no_conversations = 'No conversations yet';
-z.string.conversations_no_conversations_detail = 'Start a conversation, create a group or invite people to join.';
+z.string.conversations_no_conversations_detail = 'Start a conversation or create a group.';
 z.string.conversations_popover_archive = 'Archive';
 z.string.conversations_popover_block = 'Block';
 z.string.conversations_popover_cancel = 'Cancel request';
@@ -502,6 +505,7 @@ z.string.preferences_options_notifications_on = 'Show sender and message';
 z.string.search_group_hint = 'Keep typing or pick more people to create a group';
 z.string.search_connect = 'Connect';
 z.string.search_connections = 'Connections';
+z.string.search_contacts = 'Contacts';
 z.string.search_groups = 'Groups';
 z.string.search_placeholder = 'Search by name or username';
 z.string.search_team_groups = 'Team conversations';

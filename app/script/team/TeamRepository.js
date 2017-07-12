@@ -45,7 +45,11 @@ z.team.TeamRepository = class TeamRepository {
 
     this.team_members = ko.pureComputed(() => this.is_team() ? this.team().members() : []);
     this.team_name = ko.pureComputed(() => this.is_team() ? this.team().name() : this.user_repository.self().name());
-    this.team_users = ko.pureComputed(() => this.team_members().concat(this.user_repository.connected_users()));
+    this.team_users = ko.pureComputed(() => {
+      return this.team_members()
+        .concat(this.user_repository.connected_users())
+        .sort((user_a, user_b) => z.util.StringUtil.sort_by_priority(user_a.first_name(), user_b.first_name()));
+    });
 
     this.team_members.subscribe(() => this.user_repository.map_guest_status());
 
@@ -63,17 +67,16 @@ z.team.TeamRepository = class TeamRepository {
 
           if (team.binding) {
             const team_et = this.team_mapper.map_team_from_object(team);
-            this._set_team(team_et);
-
-            return this.team();
+            this.team(team_et);
+            return this.update_team_members(team_et);
           }
         }
 
         return this.team(new z.team.TeamEntity());
       })
-      .then((team_et) => {
+      .then(() => {
         this.send_account_info();
-        return team_et;
+        return this.team();
       });
   }
 
@@ -126,14 +129,15 @@ z.team.TeamRepository = class TeamRepository {
       }
     }
   }
+
   /**
    * Search for user.
    * @param {string} query - Find user using name or username
    * @param {boolean} is_username - Query string is username
    * @returns {Array<z.entity.User>} Matching users
    */
-  search_for_team_members(query, is_username) {
-    return this.team_members()
+  search_for_team_users(query, is_username) {
+    return this.team_users()
       .filter((user_et) => user_et.matches(query, is_username))
       .sort((user_a, user_b) => {
         if (is_username) {
@@ -173,12 +177,8 @@ z.team.TeamRepository = class TeamRepository {
     return this.get_team_members(team_et.id)
       .then((team_members) => {
         const member_ids = team_members
-          .map((team_member) => {
-            if (team_member.user_id !== this.user_repository.self().id) {
-              return team_member.user_id;
-            }
-          })
-          .filter((member_id) => member_id);
+          .filter((team_member) => team_member.user_id !== this.user_repository.self().id)
+          .map((team_member) => team_member.user_id);
 
         return this.user_repository.get_users_by_id(member_ids);
       })
@@ -188,15 +188,17 @@ z.team.TeamRepository = class TeamRepository {
   _add_user_to_team(user_et) {
     const members = this.team().members;
 
-    if (!members().filter((member) => member.id === user_et.id).length) {
+    if (!members().find((member) => member.id === user_et.id)) {
       members.push(user_et);
     }
   }
 
-  _on_delete(event_json) {
-    const team_id = event_json.team;
-    amplify.publish(z.event.WebApp.TEAM.DELETE, team_id);
-    amplify.publish(z.event.WebApp.TEAM.MEMBER_LEAVE, team_id); // deprecated
+  _on_delete({team: team_id}) {
+    if (this.is_team() && this.team().id === team_id) {
+      window.setTimeout(() => {
+        amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.ACCOUNT_DELETED, true);
+      }, 50);
+    }
   }
 
   _on_member_join(event_json) {
@@ -215,8 +217,9 @@ z.team.TeamRepository = class TeamRepository {
     const is_local_team = this.team().id === team_id;
 
     if (is_local_team) {
-      if (this.user_repository.self().id === user_id) {
-        return this._on_delete({team: team_id});
+      const is_self_user = user_id === this.user_repository.self().id;
+      if (is_self_user) {
+        return this._on_delete(event_json);
       }
 
       this.team().members.remove((member) => member.id === user_id);
@@ -235,11 +238,5 @@ z.team.TeamRepository = class TeamRepository {
       this.team_mapper.update_team_from_object(team_data, this.team());
       this.send_account_info();
     }
-  }
-
-  _set_team(team_et) {
-    this.update_team_members(team_et);
-    this.team(team_et);
-    this.user_repository.map_guest_status();
   }
 };

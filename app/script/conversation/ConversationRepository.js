@@ -410,6 +410,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   update_conversations_offline() {
+    this.logger.info('Updating group participants offline');
     this.sorted_conversations().map((conversation_et) => this.update_participating_user_ets(conversation_et, true));
   }
 
@@ -674,13 +675,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
       });
   }
 
-  initialize_connections(connections_ets) {
-    this.map_connections(connections_ets)
-      .then(() => {
-        this.logger.info('Updating group participants offline');
-        this._init_state_updates();
-        this.update_conversations_offline();
-      });
+  initialize_conversations() {
+    this.update_conversations_offline();
+    this._init_state_updates();
   }
 
   /**
@@ -1077,22 +1074,17 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   /**
    * Team member was removed.
-   * @param {string} team_id - ID of team member left
-   * @param {string} [user_id] - Optional ID of user to leave
+   * @param {string} team_id - ID of team that member was removed from
+   * @param {string} user_id - ID of leaving user
    * @returns {undefined} No return value
    */
   team_member_leave(team_id, user_id) {
     this.conversations()
       .filter((conversation_et) => conversation_et.team_id === team_id && !conversation_et.removed_from_conversation())
       .forEach((conversation_et) => {
-        if (user_id) {
-          if (conversation_et.participating_user_ids().includes(user_id)) {
-            const member_leave_event = z.conversation.EventBuilder.build_team_member_leave(conversation_et, user_id);
-            amplify.publish(z.event.WebApp.EVENT.INJECT, member_leave_event);
-          }
-        } else {
-          conversation_et.status(z.conversation.ConversationStatus.PAST_MEMBER);
-          this._delete_conversation(conversation_et);
+        if (conversation_et.participating_user_ids().includes(user_id)) {
+          const member_leave_event = z.conversation.EventBuilder.build_team_member_leave(conversation_et, user_id);
+          amplify.publish(z.event.WebApp.EVENT.INJECT, member_leave_event);
         }
       });
   }

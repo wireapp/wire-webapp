@@ -66,7 +66,8 @@ z.user.UserRepository = class UserRepository {
 
     this.connected_users = ko.pureComputed(() => {
       return this.users()
-        .filter((user_et) => user_et.is_connected());
+        .filter((user_et) => user_et.is_connected())
+        .sort((user_a, user_b) => z.util.StringUtil.sort_by_priority(user_a.first_name(), user_b.first_name()));
     }).extend({rateLimit: 1000});
 
     this.number_of_connected_users = ko.pureComputed(() => {
@@ -155,7 +156,7 @@ z.user.UserRepository = class UserRepository {
     const is_self_user = id === this.self().id;
     if (is_self_user) {
       window.setTimeout(() => {
-        amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReason.SESSION_EXPIRED, true);
+        amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.ACCOUNT_DELETED, true);
       }, 50);
     }
   }
@@ -644,6 +645,16 @@ z.user.UserRepository = class UserRepository {
       });
   }
 
+  get_user_id_by_username(username) {
+    return this.user_service.get_username(username)
+      .then(({user: user_id}) => user_id)
+      .catch((error) => {
+        if (error.code !== z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
+          throw error;
+        }
+      });
+  }
+
   /**
    * Check for users locally and fetch them from the server otherwise.
    * @param {Array<string>} user_ids - User IDs
@@ -689,13 +700,7 @@ z.user.UserRepository = class UserRepository {
    */
   search_for_connected_users(query, is_username) {
     return this.connected_users()
-      .filter((user_et) => {
-        if (this.is_team() && this.team_members().includes(user_et)) {
-          return false;
-        }
-
-        return user_et.matches(query, is_username);
-      })
+      .filter((user_et) => user_et.matches(query, is_username))
       .sort((user_a, user_b) => {
         if (is_username) {
           return z.util.StringUtil.sort_by_priority(user_a.username(), user_b.username(), query);
