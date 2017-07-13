@@ -607,11 +607,11 @@ z.main.App = class App {
         this.repository.storage.delete_everything()
           .catch((error) => this.logger.error('Failed to delete database before logout', error))
           .then(() => {
-            amplify.publish(z.event.WebApp.LIFECYCLE.SIGNED_OUT);
+            amplify.publish(z.event.WebApp.LIFECYCLE.SIGNED_OUT, clear_data);
             this._redirect_to_login(sign_out_reason);
           });
       } else {
-        amplify.publish(z.event.WebApp.LIFECYCLE.SIGNED_OUT);
+        amplify.publish(z.event.WebApp.LIFECYCLE.SIGNED_OUT, clear_data);
         this._redirect_to_login(sign_out_reason);
       }
     };
@@ -621,7 +621,7 @@ z.main.App = class App {
       this.auth.repository.logout()
         .then(() => _logout())
         .catch(() => {
-          amplify.publish(z.event.WebApp.LIFECYCLE.SIGNED_OUT);
+          amplify.publish(z.event.WebApp.LIFECYCLE.SIGNED_OUT, clear_data);
           this._redirect_to_login(sign_out_reason);
         });
     };
