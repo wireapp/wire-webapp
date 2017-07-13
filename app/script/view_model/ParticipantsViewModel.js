@@ -121,7 +121,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     // @todo create a viewmodel search?
     this.search_action = ko.pureComputed(() => {
       if (this.conversation()) {
-        const is_group = this.conversation().is_group() || this.conversation().is_team_group();
+        const is_group = this.conversation().is_group();
         return is_group ? z.string.people_confirm_label : z.string.search_open_group;
       }
     });
@@ -175,7 +175,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
         this.reset_view();
 
         const [user_et] = this.participants();
-        if (user_et && !this.conversation().is_group() && !this.conversation().is_team_group()) {
+        if (user_et && !this.conversation().is_group()) {
           this.user_profile(user_et);
         } else {
           this.user_profile(this.placeholder_participant);
@@ -260,7 +260,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     let user_ids = this.user_selected().map((user_et) => user_et.id);
     this.participants_bubble.hide();
 
-    if (this.conversation().is_group() || this.conversation().is_team_group()) {
+    if (this.conversation().is_group()) {
       this.conversation_repository.add_members(this.conversation(), user_ids)
         .then(() => {
           amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.ADD_TO_GROUP_CONVERSATION, {
