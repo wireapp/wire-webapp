@@ -167,19 +167,13 @@ window.z.ui = z.ui || {};
         pc: 'ctrl + n',
       },
       webapp: {
-        macos: 'command + alt + graveaccent', // KeyboardJS fires this when using cmd + alt + n
-        pc: 'ctrl + alt + graveaccent',
+        macos: 'command + alt + ,',
+        pc: 'ctrl + alt + ,',
       },
     },
   };
 
   function _register_event(platform_specific_shortcut, event) {
-    // bind also 'command + alt + n' for start shortcut
-    if (z.util.StringUtil.includes(platform_specific_shortcut, 'graveaccent')) {
-      const replaced_shortcut = platform_specific_shortcut.replace('graveaccent', 'n');
-      _register_event(replaced_shortcut, event);
-    }
-
     return keyboardJS.on(platform_specific_shortcut, function(inputEvent) {
       keyboardJS.releaseKey(inputEvent.keyCode);
 
