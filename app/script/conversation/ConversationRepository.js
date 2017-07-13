@@ -615,7 +615,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
       if (with_expected_user) {
         if (team_id) {
-          const active_1to1_conversation = conversation_et.is_one2one() && !conversation_et.is_team_group() && !conversation_et.removed_from_conversation();
+          const active_1to1_conversation = conversation_et.is_one2one() && !conversation_et.removed_from_conversation();
           const in_team = team_id === conversation_et.team_id;
 
           if (active_1to1_conversation && in_team) {

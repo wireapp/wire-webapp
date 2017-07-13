@@ -51,21 +51,24 @@ z.entity.Conversation = class Conversation {
 
     this.is_group = ko.pureComputed(() => {
       const group_type = this.type() === z.conversation.ConversationType.REGULAR;
-      const group_conversation = group_type && !this.team_id;
-      const team_group_conversation = group_type && this.team_id && this.participating_user_ids().length !== 1;
+      const group_conversation = group_type;
 
-      return group_conversation || team_group_conversation;
+      const has_one_participant = this.participating_user_ids().length === 1;
+      const team_one2one_conversation = group_type && has_one_participant && this.team_id && !this.name();
+
+      return group_conversation && !team_one2one_conversation;
     });
     this.is_one2one = ko.pureComputed(() => {
-      const group_type = this.type() === z.conversation.ConversationType.REGULAR;
       const one2one_conversation = this.type() === z.conversation.ConversationType.ONE2ONE;
-      const team_one2one_conversation = group_type && this.team_id && this.participating_user_ids().length === 1;
+
+      const group_type = this.type() === z.conversation.ConversationType.REGULAR;
+      const has_one_participant = this.participating_user_ids().length === 1;
+      const team_one2one_conversation = group_type && has_one_participant && this.team_id && !this.name();
 
       return one2one_conversation || team_one2one_conversation;
     });
     this.is_request = ko.pureComputed(() => this.type() === z.conversation.ConversationType.CONNECT);
     this.is_self = ko.pureComputed(() => this.type() === z.conversation.ConversationType.SELF);
-    this.is_team_group = ko.pureComputed(() => this.is_one2one() && this.team_id && this.name());
 
     // in case this is a one2one conversation this is the connection to that user
     this.connection = ko.observable(new z.entity.Connection());
