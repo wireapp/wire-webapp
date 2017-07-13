@@ -130,12 +130,10 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    */
   clear_notifications() {
     this.notifications.forEach((notification) => {
-      const {close, data: notification_data} = notification;
-
-      close();
-      if (notification_data) {
-        const {notification_conversation_id, notification_message_id} = notification_data;
-        this.logger.info(`Notification for '${notification_message_id}' in '${notification_conversation_id}' closed on unload.`);
+      notification.close();
+      if (notification.data) {
+        const {conversation_id, message_id} = notification.data;
+        this.logger.info(`Notification for '${message_id}' in '${conversation_id}' closed on unload.`, notification);
       }
     });
   }
