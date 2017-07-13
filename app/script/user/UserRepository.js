@@ -974,9 +974,11 @@ z.user.UserRepository = class UserRepository {
     const team_members = this.team_members();
 
     user_ets.forEach((user_et) => {
-      const is_team_member = !!team_members.find((member) => member.id === user_et.id);
-      user_et.is_guest(!is_team_member);
-      user_et.is_team_member(is_team_member);
+      if (!user_et.is_me) {
+        const is_team_member = !!team_members.find((member) => member.id === user_et.id);
+        user_et.is_guest(!is_team_member);
+        user_et.is_team_member(is_team_member);
+      }
     });
   }
 };

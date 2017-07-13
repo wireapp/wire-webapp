@@ -28,7 +28,9 @@
           <!-- ko if: render_avatar -->
             <div class="user-profile-details-avatar">
               <user-avatar class="user-avatar-lg cursor-default" params="user: user" data-uie-name="status-profile-picture"></user-avatar>
-              <span class="user-profile-details-guest-badge" data-bind="visible: user().is_guest(), l10n_text: z.string.conversation_guest_indicator"></span>
+              <!-- ko if: user().is_guest() -->
+                <span class="user-profile-details-guest-badge" data-bind="l10n_text: z.string.conversation_guest_indicator" data-uie-name="status-guest"></span>
+              <!-- /ko -->
             </div>
           <!-- /ko -->
         </div>

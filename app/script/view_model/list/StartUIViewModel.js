@@ -224,7 +224,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
         amplify.publish(z.event.WebApp.CONVERSATION.SHOW, _conversation_et);
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.OPENED_CONVERSATION, {
-          conversation_type: (conversation_et.is_group() || conversation_et.is_team_group()) ? 'group' : 'one_to_one',
+          conversation_type: conversation_et.is_group() ? 'group' : 'one_to_one',
         });
         this._close_list();
         return _conversation_et;

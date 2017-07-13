@@ -25,6 +25,7 @@ window.z.media = z.media || {};
 z.media.MediaConstraintsHandler = class MediaConstraintsHandler {
   static get CONFIG() {
     return {
+      DEFAULT_DEVICE_ID: 'default',
       SCREEN_CONSTRAINTS: {
         MEDIA_SOURCE: 'desktop',
         SOURCE_TYPE: 'screen',
@@ -89,11 +90,11 @@ z.media.MediaConstraintsHandler = class MediaConstraintsHandler {
   /**
    * Get the video constraints to be used for MediaStream creation.
    * @private
-   * @param {string} media_device_id - Optional ID of MediaDevice to be used
+   * @param {string} [media_device_id=''] - ID of MediaDevice to be used
    * @returns {Object} Video stream constraints
    */
-  _get_audio_stream_constraints(media_device_id) {
-    if (_.isString(media_device_id)) {
+  _get_audio_stream_constraints(media_device_id = '') {
+    if (media_device_id && media_device_id !== MediaConstraintsHandler.CONFIG.DEFAULT_DEVICE_ID) {
       return {
         deviceId: {
           exact: media_device_id,
