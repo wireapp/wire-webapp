@@ -24,6 +24,12 @@ window.z.conversation = z.conversation || {};
 
 // Conversation repository for all conversation interactions with the conversation service
 z.conversation.ConversationRepository = class ConversationRepository {
+  static get CONFIG() {
+    return {
+      CONFIRMATION_THRESHOLD: 7 * 24 * 60 * 60 * 1000,
+    };
+  }
+
   /**
    * Construct a new Conversation Repository.
    *
@@ -1375,7 +1381,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   send_confirmation_status(conversation_et, message_et) {
-    if (!message_et.user().is_me && conversation_et.is_one2one() && z.event.EventTypeHandling.CONFIRM.includes(message_et.type)) {
+    const other_user_in_one2one = !message_et.user().is_me && conversation_et.is_one2one();
+    const within_threshold = message_et.timestamp() >= Date.now() - ConversationRepository.CONFIG.CONFIRMATION_THRESHOLD;
+
+    if (other_user_in_one2one && within_threshold && z.event.EventTypeHandling.CONFIRM.includes(message_et.type)) {
       const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.CONFIRMATION, new z.proto.Confirmation(message_et.id, z.proto.Confirmation.Type.DELIVERED));
 
