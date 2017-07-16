@@ -36,7 +36,7 @@
     "load-grunt-tasks": "3.5.2",
     "request": "2.81.0",
     "sinon": "2.3.8",
-    "stylelint": "7.13.0"
+    "stylelint": "8.0.0"
   },
   "lint-staged": {
     "*.js": ["yarn lint-scripts", "git add"],
