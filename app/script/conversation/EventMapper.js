@@ -461,7 +461,6 @@ z.conversation.EventMapper = class EventMapper {
 
     asset_et.status(status || z.assets.AssetTransferState.UPLOADING);
 
-    debugger
     return asset_et;
   }
 

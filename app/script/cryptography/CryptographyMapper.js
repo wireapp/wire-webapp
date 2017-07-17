@@ -149,15 +149,15 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
         key: uploaded.asset_id,
         otr_key: new Uint8Array(uploaded.otr_key.toArrayBuffer()),
         sha256: new Uint8Array(uploaded.sha256.toArrayBuffer()),
+        status: z.assets.AssetTransferState.UPLOADED,
         token: uploaded.asset_token,
-        status: z.assets.AssetTransferState.UPLOADED
       });
     }
 
     if (not_uploaded) {
       data = Object.assign(data, {
         reason: not_uploaded,
-        status: z.assets.AssetTransferState.UPLOAD_FAILED
+        status: z.assets.AssetTransferState.UPLOAD_FAILED,
       });
     }
 

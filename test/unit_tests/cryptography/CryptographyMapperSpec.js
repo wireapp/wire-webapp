@@ -120,7 +120,7 @@ describe('z.cryptography.CryptographyMapper', function() {
       mapper.map_generic_message(generic_message, event)
         .then(function(event_json) {
           expect(_.isObject(event_json)).toBeTruthy();
-          expect(event_json.type).toBe(z.event.Client.CONVERSATION.ASSET_UPLOAD_COMPLETE);
+          expect(event_json.type).toBe(z.event.Backend.CONVERSATION.ASSET_ADD);
           expect(event_json.conversation).toBe(event.conversation);
           expect(event_json.from).toBe(event.from);
           expect(event_json.time).toBe(event.time);
@@ -164,7 +164,7 @@ describe('z.cryptography.CryptographyMapper', function() {
       mapper.map_generic_message(generic_message, event)
         .then(function(event_json) {
           expect(_.isObject(event_json)).toBeTruthy();
-          expect(event_json.type).toBe(z.event.Client.CONVERSATION.ASSET_UPLOAD_FAILED);
+          expect(event_json.type).toBe(z.event.Backend.CONVERSATION.ASSET_ADD);
           expect(event_json.conversation).toBe(event.conversation);
           expect(event_json.from).toBe(event.from);
           expect(event_json.time).toBe(event.time);
@@ -197,7 +197,7 @@ describe('z.cryptography.CryptographyMapper', function() {
       mapper.map_generic_message(generic_message, event)
         .then(function(event_json) {
           expect(_.isObject(event_json)).toBeTruthy();
-          expect(event_json.type).toBe(z.event.Client.CONVERSATION.ASSET_PREVIEW);
+          expect(event_json.type).toBe(z.event.Backend.CONVERSATION.ASSET_ADD);
           expect(event_json.conversation).toBe(event.conversation);
           expect(event_json.from).toBe(event.from);
           expect(event_json.time).toBe(event.time);

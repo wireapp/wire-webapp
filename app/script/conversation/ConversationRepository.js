@@ -2695,7 +2695,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           if (JSON.stringify((event) !== JSON.stringify((event_json)))) {
             return this._delete_message_by_id(conversation_et, event_json) // TODO: remove delete and update UI
               .then(() => $.extend(true, event, event_json))
-              .then((event) => this.conversation_service.update_event(event));
+              .then((extended_event) => this.conversation_service.update_event(extended_event));
           }
           return event_json;
         }
