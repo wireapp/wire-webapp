@@ -38,7 +38,7 @@ describe('z.cryptography.CryptographyMapper', function() {
     };
   });
 
-  describe('map_generic_message', function() {
+  describe('"map_generic_message"', function() {
     beforeAll(function(done) {
       z.util.protobuf.load_protos('ext/proto/generic-message-proto/messages.proto')
         .then(done)
@@ -61,7 +61,7 @@ describe('z.cryptography.CryptographyMapper', function() {
       mapper.map_generic_message(generic_message, event)
         .then(function(event_json) {
           expect(_.isObject(event_json)).toBeTruthy();
-          expect(event_json.type).toBe(z.event.Client.CONVERSATION.ASSET_META);
+          expect(event_json.type).toBe(z.event.Backend.CONVERSATION.ASSET_ADD);
           expect(event_json.conversation).toBe(event.conversation);
           expect(event_json.from).toBe(event.from);
           expect(event_json.time).toBe(event.time);
@@ -86,7 +86,7 @@ describe('z.cryptography.CryptographyMapper', function() {
       mapper.map_generic_message(generic_message, event)
         .then(function(event_json) {
           expect(_.isObject(event_json)).toBeTruthy();
-          expect(event_json.type).toBe(z.event.Client.CONVERSATION.ASSET_META);
+          expect(event_json.type).toBe(z.event.Backend.CONVERSATION.ASSET_ADD);
           expect(event_json.conversation).toBe(event.conversation);
           expect(event_json.from).toBe(event.from);
           expect(event_json.time).toBe(event.time);
@@ -143,7 +143,7 @@ describe('z.cryptography.CryptographyMapper', function() {
       mapper.map_generic_message(generic_message, event)
         .then(function(event_json) {
           expect(_.isObject(event_json)).toBeTruthy();
-          expect(event_json.type).toBe(z.event.Client.CONVERSATION.ASSET_UPLOAD_FAILED);
+          expect(event_json.type).toBe(z.event.Backend.CONVERSATION.ASSET_ADD);
           expect(event_json.conversation).toBe(event.conversation);
           expect(event_json.from).toBe(event.from);
           expect(event_json.time).toBe(event.time);
@@ -175,7 +175,7 @@ describe('z.cryptography.CryptographyMapper', function() {
         .catch(done.fail);
     });
 
-    it('resolves with a mapped uploaded asset message', function(done) {
+    it('resolves with a mapped uploaded preview asset message', function(done) {
       const data = {
         otr_key: new Uint8Array([1, 2]),
         sha256: new Uint8Array([3, 4]),

@@ -117,8 +117,8 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
         content_length: original.size.toNumber(),
         content_type: original.mime_type,
         info: {
-          nonce: event_nonce,
           name: original.name,
+          nonce: event_nonce,
         },
       };
 
@@ -127,7 +127,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
         data.info.width = original.image.width;
         data.info.tag = 'medium';
       } else {
-        data.meta = this._map_asset_meta_data(original)
+        data.meta = this._map_asset_meta_data(original);
       }
     }
 
