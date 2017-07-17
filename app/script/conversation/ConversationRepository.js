@@ -2371,6 +2371,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
             return this._on_member_update(conversation_et, event_json);
           case z.event.Backend.CONVERSATION.MESSAGE_ADD:
             return this._on_message_add(conversation_et, event_json);
+          case z.event.Backend.CONVERSATION.ASSET_ADD:
+            return this._on_asset_add(conversation_et, event_json);
           case z.event.Backend.CONVERSATION.RENAME:
             return this._on_rename(conversation_et, event_json);
           case z.event.Client.CONVERSATION.ASSET_UPLOAD_COMPLETE:
@@ -2683,6 +2685,21 @@ z.conversation.ConversationRepository = class ConversationRepository {
         if (error.type !== z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
           throw error;
         }
+      });
+  }
+
+  _on_asset_add(conversation_et, event_json) {
+    return this.conversation_service.load_event_from_db(conversation_et.id, event_json.id)
+      .then((event) => {
+        if (event) {
+          // update existing event?
+          // delete current event?
+          return event_json;
+        }
+        return this.conversation_service.save_event(event_json);
+      })
+      .then((event) => {
+        return this._on_add_event(conversation_et, event);
       });
   }
 

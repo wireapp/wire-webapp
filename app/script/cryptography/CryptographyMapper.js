@@ -106,8 +106,6 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     };
   }
 
-  // ASSET
-
   _map_asset(asset, event_nonce, event_id) {
     let data = null;
 
