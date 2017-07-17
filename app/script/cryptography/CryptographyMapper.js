@@ -98,27 +98,6 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     }
   }
 
-  _map_asset(asset, event_nonce, event_id) {
-    if (asset.uploaded !== null) {
-      if (asset.uploaded.asset_id && asset.original !== null && asset.original.image) {
-        return this._map_image_asset_v3(asset, event_nonce);
-      }
-      return this._map_asset_uploaded(asset.uploaded, event_id);
-    }
-    if (asset.not_uploaded !== null) {
-      return this._map_asset_not_uploaded(asset.not_uploaded);
-    }
-    if (asset.preview !== null) {
-      return this._map_asset_preview(asset.preview, event_id);
-    }
-    if (asset.original !== null) {
-      return this._map_asset_original(asset.original, event_nonce);
-    }
-    const error = new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.IGNORED_ASSET);
-    this.logger.info(`Skipped event '${event_id}': ${error.message}`);
-    throw error;
-  }
-
   _map_calling(calling, event_data) {
     return {
       content: JSON.parse(calling.content),
@@ -127,22 +106,60 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     };
   }
 
-  _map_image_asset_v3(asset, event_nonce) {
-    return {
-      data: {
-        content_length: asset.original.size.toNumber(),
-        content_type: asset.original.mime_type,
+  // ASSET
+
+  _map_asset(asset, event_nonce, event_id) {
+    let data = null;
+
+    if (asset.original) {
+      const {original} = asset;
+      data = {
+        content_length: original.size.toNumber(),
+        content_type: original.mime_type,
         info: {
-          height: asset.original.image.height,
           nonce: event_nonce,
-          tag: 'medium',
-          width: asset.original.image.width,
+          name: original.name,
         },
-        key: asset.uploaded.asset_id,
-        otr_key: new Uint8Array(asset.uploaded.otr_key.toArrayBuffer()),
-        sha256: new Uint8Array(asset.uploaded.sha256.toArrayBuffer()),
-        token: asset.uploaded.asset_token,
-      },
+      };
+
+      if (original.image) {
+        data.info.height = original.image.height;
+        data.info.width = original.image.width;
+        data.info.tag = 'medium';
+      } else {
+        data.meta = this._map_asset_meta_data(original)
+      }
+    }
+
+    if (asset.preview) {
+      const {preview: {remote}} = asset;
+      data = Object.assign(data, {
+        preview_id: event_id,
+        preview_key: remote.asset_id,
+        preview_otr_key: new Uint8Array(remote.otr_key.toArrayBuffer()),
+        preview_sha256: new Uint8Array(remote.sha256.toArrayBuffer()),
+        preview_token: remote.asset_token,
+      });
+    }
+
+    if (asset.uploaded) {
+      const {uploaded} = asset;
+      data = Object.assign(data, {
+        key: uploaded.asset_id,
+        otr_key: new Uint8Array(uploaded.otr_key.toArrayBuffer()),
+        sha256: new Uint8Array(uploaded.sha256.toArrayBuffer()),
+        token: uploaded.asset_token,
+      });
+    }
+
+    if (asset.not_uploaded) {
+      data = Object.assign(data, {
+        reason: asset.not_uploaded,
+      });
+    }
+
+    return {
+      data,
       type: z.event.Backend.CONVERSATION.ASSET_ADD,
     };
   }
@@ -154,56 +171,6 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
         loudness: new Uint8Array(original.audio.normalized_loudness !== null ? original.audio.normalized_loudness.toArrayBuffer() : []),
       };
     }
-  }
-
-  _map_asset_not_uploaded(not_uploaded) {
-    return {
-      data: {
-        reason: not_uploaded,
-      },
-      type: z.event.Client.CONVERSATION.ASSET_UPLOAD_FAILED,
-    };
-  }
-
-  _map_asset_original(original, event_nonce) {
-    return {
-      data: {
-        content_length: original.size.toNumber(),
-        content_type: original.mime_type,
-        info: {
-          name: original.name,
-          nonce: event_nonce,
-        },
-        meta: this._map_asset_meta_data(original),
-      },
-      type: z.event.Client.CONVERSATION.ASSET_META,
-    };
-  }
-
-  _map_asset_preview(preview, event_id) {
-    return {
-      data: {
-        id: event_id,
-        key: preview.remote.asset_id,
-        otr_key: new Uint8Array(preview.remote.otr_key !== null ? preview.remote.otr_key.toArrayBuffer() : []),
-        sha256: new Uint8Array(preview.remote.sha256 !== null ? preview.remote.sha256.toArrayBuffer() : []),
-        token: preview.remote.asset_token,
-      },
-      type: z.event.Client.CONVERSATION.ASSET_PREVIEW,
-    };
-  }
-
-  _map_asset_uploaded(uploaded, event_id) {
-    return {
-      data: {
-        id: event_id,
-        key: uploaded.asset_id,
-        otr_key: new Uint8Array(uploaded.otr_key !== null ? uploaded.otr_key.toArrayBuffer() : []),
-        sha256: new Uint8Array(uploaded.sha256 !== null ? uploaded.sha256.toArrayBuffer() : []),
-        token: uploaded.asset_token,
-      },
-      type: z.event.Client.CONVERSATION.ASSET_UPLOAD_COMPLETE,
-    };
   }
 
   _map_cleared(cleared) {
