@@ -2692,15 +2692,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.conversation_service.load_event_from_db(conversation_et.id, event_json.id)
       .then((event) => {
         if (event) {
-          // update existing event?
-          // delete current event?
+          if (JSON.stringify((event) !== JSON.stringify((event_json)))) {
+            return this._delete_message_by_id(conversation_et, event_json) // TODO: remove delete and update UI
+              .then(() => $.extend(true, event, event_json))
+              .then((event) => this.conversation_service.update_event(event));
+          }
           return event_json;
         }
         return this.conversation_service.save_event(event_json);
       })
-      .then((event) => {
-        return this._on_add_event(conversation_et, event);
-      });
+      .then((event) => this._on_add_event(conversation_et, event));
   }
 
   /**

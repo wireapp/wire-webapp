@@ -107,7 +107,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
   }
 
   _map_asset(asset, event_nonce, event_id) {
-    let data = null;
+    let data = {};
 
     if (asset.original) {
       const {original} = asset;
@@ -123,7 +123,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
       if (original.image) {
         data.info.height = original.image.height;
         data.info.width = original.image.width;
-        data.info.tag = 'medium';
+        data.info.tag = original.image.tag;
       } else {
         data.meta = this._map_asset_meta_data(original)
       }
@@ -147,12 +147,14 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
         otr_key: new Uint8Array(uploaded.otr_key.toArrayBuffer()),
         sha256: new Uint8Array(uploaded.sha256.toArrayBuffer()),
         token: uploaded.asset_token,
+        status: z.assets.AssetTransferState.UPLOADED
       });
     }
 
     if (asset.not_uploaded) {
       data = Object.assign(data, {
         reason: asset.not_uploaded,
+        status: z.assets.AssetTransferState.UPLOAD_FAILED
       });
     }
 

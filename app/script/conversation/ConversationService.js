@@ -488,6 +488,15 @@ z.conversation.ConversationService = class ConversationService {
   }
 
   /**
+   * Update an unencrypted conversation event.
+   * @param {Object} event - JSON event to be stored
+   * @returns {Promise} Resolves with the updated record
+   */
+  update_event(event) {
+    return this.storage_service.update(z.storage.StorageService.OBJECT_STORE.EVENTS, event.primary_key, event).then(() => event);
+  }
+
+  /**
    * Saves a list of conversation records in the local database.
    * @param {Array<Conversation>} conversations - Conversation entity
    * @returns {Promise<Array>} Resolves with a list of conversation records
