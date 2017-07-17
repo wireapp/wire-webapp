@@ -425,7 +425,6 @@ z.conversation.EventMapper = class EventMapper {
    * @returns {File} File asset entity
    */
   _map_asset_file(event) {
-    console.log('_map_asset_file ', event);
     const {conversation: conversation_id, data: event_data} = event;
     const {content_length, content_type, id, info, meta, status} = event_data;
 
