@@ -107,10 +107,10 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
   }
 
   _map_asset(asset, event_nonce, event_id) {
+    const {original, preview, uploaded, not_uploaded} = asset;
     let data = {};
 
-    if (asset.original) {
-      const {original} = asset;
+    if (original) {
       data = {
         content_length: original.size.toNumber(),
         content_type: original.mime_type,
@@ -123,14 +123,13 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
       if (original.image) {
         data.info.height = original.image.height;
         data.info.width = original.image.width;
-        data.info.tag = original.image.tag;
       } else {
         data.meta = this._map_asset_meta_data(original);
       }
     }
 
-    if (asset.preview) {
-      const {preview: {remote}} = asset;
+    if (preview) {
+      const {remote} = preview;
       data = Object.assign(data, {
         preview_id: event_id,
         preview_key: remote.asset_id,
@@ -140,8 +139,12 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
       });
     }
 
-    if (asset.uploaded) {
-      const {uploaded} = asset;
+    const is_image = uploaded && uploaded.asset_id && original && original.image;
+    if (is_image) {
+      data.info.tag = 'medium';
+    }
+
+    if (uploaded) {
       data = Object.assign(data, {
         key: uploaded.asset_id,
         otr_key: new Uint8Array(uploaded.otr_key.toArrayBuffer()),
@@ -151,9 +154,9 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
       });
     }
 
-    if (asset.not_uploaded) {
+    if (not_uploaded) {
       data = Object.assign(data, {
-        reason: asset.not_uploaded,
+        reason: not_uploaded,
         status: z.assets.AssetTransferState.UPLOAD_FAILED
       });
     }

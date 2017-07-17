@@ -177,7 +177,7 @@ z.conversation.EventMapper = class EventMapper {
     const event_data = event.data;
     const message_et = new z.entity.ContentMessage();
 
-    if (event_data.info && event_data.info.tag === 'medium') {
+    if (event_data.info.tag === 'medium') {
       message_et.assets.push(this._map_asset_image(event, should_create_dummy_image));
     } else {
       message_et.assets.push(this._map_asset_file(event));
