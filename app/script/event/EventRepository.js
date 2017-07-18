@@ -607,7 +607,7 @@ z.event.EventRepository = class EventRepository {
    * @returns {boolean} Returns true if event is handled within is lifetime, otherwise throws error
    */
   _validate_call_event_lifetime(event) {
-    const {content, conversation: conversation_id, time, type} = event;
+    const {content = {}, conversation: conversation_id, time, type} = event;
     const forced_event_types = [
       z.calling.enum.CALL_MESSAGE_TYPE.CANCEL,
       z.calling.enum.CALL_MESSAGE_TYPE.GROUP_LEAVE,
