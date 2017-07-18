@@ -30,7 +30,7 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
     test_factory.exposeConversationActors()
       .then(function(conversation_repository) {
         const content_state = ko.observable(z.ViewModel.content.CONTENT_STATE.CONVERSATION);
-        title_view_model = new z.ViewModel.WindowTitleViewModel(content_state, TestFactory.user_repository, conversation_repository);
+        title_view_model = new z.ViewModel.WindowTitleViewModel(content_state, conversation_repository, TestFactory.user_repository);
         done();
       })
       .catch(done.fail);
@@ -64,8 +64,7 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
       conversation.name('Birthday Bash');
       conversation.type(z.conversation.ConversationType.REGULAR);
 
-      const team_repository = title_view_model.conversation_repository.team_repository;
-      team_repository.personal_space.conversations_unarchived.push(conversation);
+      title_view_model.conversation_repository.conversations_unarchived.push(conversation);
       title_view_model.conversation_repository.active_conversation(conversation);
       title_view_model.initiate_title_updates();
 
@@ -87,9 +86,8 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
       // Add conversations to conversation repository
       expect(title_view_model.conversation_repository.conversations_unarchived().length).toBe(0);
 
-      const team_repository = title_view_model.conversation_repository.team_repository;
-      team_repository.personal_space.conversations_unarchived.push(selected_conversation);
-      team_repository.personal_space.conversations_unarchived.push(muted_conversation);
+      title_view_model.conversation_repository.conversations_unarchived.push(selected_conversation);
+      title_view_model.conversation_repository.conversations_unarchived.push(muted_conversation);
       expect(title_view_model.conversation_repository.conversations_unarchived().length).toBe(2);
 
       // Check title when there are no messages
@@ -214,8 +212,7 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
       conversation.name('Birthday Bash');
       conversation.type(z.conversation.ConversationType.REGULAR);
 
-      const team_repository = title_view_model.conversation_repository.team_repository;
-      team_repository.personal_space.conversations_unarchived.push(conversation);
+      title_view_model.conversation_repository.conversations_unarchived.push(conversation);
       title_view_model.conversation_repository.active_conversation(conversation);
 
       amplify.subscribe(z.event.WebApp.CONVERSATION.UNREAD, function(badge_count) {

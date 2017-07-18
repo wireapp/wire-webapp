@@ -127,7 +127,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
 
     this.show_back_button = ko.pureComputed(() => {
       if (typeof this.conversation === 'function') {
-        return this.conversation().is_group() || this.conversation().is_team_group();
+        return this.conversation().is_group();
       }
     });
 

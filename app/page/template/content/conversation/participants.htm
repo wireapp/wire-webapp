@@ -67,12 +67,7 @@
         </div >
         <div class="participants-search-content">
           <div class="participants-search-list" data-bind="antiscroll: user_selected">
-            <!-- ko if: conversation().team_id -->
-              <div class="participant-search-list-header" data-bind="l10n_text: z.string.search_team_members"></div>
-              <user-list params="user: team_members, filter: user_input, selected: user_selected, mode: z.components.UserListMode.INFO"></user-list>
-              <div class="participant-search-list-header" data-bind="l10n_text: z.string.search_connections"></div>
-            <!-- /ko -->
-            <user-list params="user: connected_users, filter: user_input, selected: user_selected, mode: z.components.UserListMode.INFO"></user-list>
+            <user-list class="user-list-light" params="user: users, filter: user_input, selected: user_selected, mode: z.components.UserListMode.INFO"></user-list>
           </div>
         </div>
         <button class="participants-search-footer button button-full" data-bind="enable: user_selected().length > 0, click: on_search_add" data-uie-name="do-create">

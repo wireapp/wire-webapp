@@ -47,6 +47,8 @@
 .search-list-item-image {
 
   .search-list-sm & {
+    .square(@avatar-diameter-md);
+    position: relative;
     margin-bottom: 3px;
   }
 
@@ -55,6 +57,14 @@
     height: @avatar-diameter-sm;
     position: relative;
   }
+}
+
+.search-list-item-image-guest-indicator-badge {
+  .guest-badge;
+  bottom: 0;
+  left: 50%;
+  position: absolute;
+  transform: translateX(-50%);
 }
 
 .search-list-item-image-overlay {
@@ -120,4 +130,19 @@
 .search-list-theme-black .image.state-badge:before {
   background-color: #000;
   color: #fff;
+}
+
+.search-list-item-guest-indicator {
+  font-size: @font-size-xs;
+  height: @avatar-diameter-sm;
+  display: flex;
+  align-items: center;
+}
+
+.search-list-item-guest-indicator-badge {
+  .guest-badge;
+
+  .user-list-light & {
+    .cell-badge-dark();
+  }
 }

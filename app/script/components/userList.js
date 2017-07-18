@@ -125,7 +125,12 @@ ko.components.register('user-list', {
     <div class="search-list" data-bind="css: css_classes(), foreach: {data: filtered_user_ets}">
       <div class="search-list-item" data-bind="click: $parent.on_select, css: {'search-list-item-selected': $parent.is_selected($data)}, attr: {'data-uie-uid': $data.id, 'data-uie-value': $data.name(), 'data-uie-status': $data.connection().status()}" data-uie-name="item-user">
         <!-- ko if: $parent.mode === z.components.UserListMode.COMPACT -->
-          <user-avatar class="search-list-item-image user-avatar-md" params="user: $data, selected: $parent.is_selected($data)"></user-avatar>
+          <div class="search-list-item-image">
+            <user-avatar class="user-avatar-md" params="user: $data, selected: $parent.is_selected($data)"></user-avatar>
+            <!-- ko if: $data.is_guest() -->
+              <div class="search-list-item-image-guest-indicator-badge" data-bind="l10n_text: z.string.conversation_guest_indicator" data-uie-name="status-guest"></div>
+            <!-- /ko -->
+          </div>
           <div class="search-list-item-content">
             <div class="search-list-item-content-name" data-bind="text: first_name"></div>
           </div>
@@ -146,9 +151,11 @@ ko.components.register('user-list', {
               <!-- /ko -->
             </div>
           </div>
-          <div class="search-list-item-connect" data-bind="visible: $parent.show_buttons()">
-            <span class="icon-add icon-button" data-bind="click: $parent.on_connect"></span>
-          </div>
+          <!-- ko if: $data.is_guest() -->
+            <div class="search-list-item-guest-indicator" data-uie-name="status-guest">
+              <div class="search-list-item-guest-indicator-badge" data-bind="l10n_text: z.string.conversation_guest_indicator"></div>
+            </div>
+          <!-- /ko -->
         <!-- /ko -->
       </div>
     </div>

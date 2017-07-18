@@ -25,6 +25,10 @@ window.z.main = z.main || {};
 z.main.App = class App {
   static get CONFIG() {
     return {
+      IMMEDIATE_SIGN_OUT_REASONS: [
+        z.auth.SIGN_OUT_REASON.ACCOUNT_DELETED,
+        z.auth.SIGN_OUT_REASON.SESSION_EXPIRED,
+      ],
       TABS_CHECK: {
         COOKIE_NAME: 'app_opened',
         COOKIE_TIMEOUT: 5 * 60 * 1000,
@@ -82,10 +86,10 @@ z.main.App = class App {
     repositories.client              = new z.client.ClientRepository(this.service.client, repositories.cryptography);
     repositories.user                = new z.user.UserRepository(this.service.user, this.service.asset, this.service.search, repositories.client, repositories.cryptography);
     repositories.event               = new z.event.EventRepository(this.service.web_socket, this.service.notification, repositories.cryptography, repositories.user, this.service.conversation);
-    repositories.search              = new z.search.SearchRepository(this.service.search, repositories.user);
     repositories.properties          = new z.properties.PropertiesRepository(this.service.properties);
     repositories.connect             = new z.connect.ConnectRepository(this.service.connect, this.service.connect_google, repositories.properties);
     repositories.links               = new z.links.LinkPreviewRepository(this.service.asset, repositories.properties);
+    repositories.search              = new z.search.SearchRepository(this.service.search, repositories.user);
     repositories.team                = new z.team.TeamRepository(this.service.team, repositories.user);
 
     repositories.conversation        = new z.conversation.ConversationRepository(
@@ -160,7 +164,7 @@ z.main.App = class App {
     view_models.main              = new z.ViewModel.MainViewModel('wire-main', this.repository.user);
     view_models.content           = new z.ViewModel.content.ContentViewModel('right', this.repository.calling, this.repository.client, this.repository.conversation, this.repository.media, this.repository.properties, this.repository.search, this.repository.team);
     view_models.list              = new z.ViewModel.list.ListViewModel('left', view_models.content, this.repository.calling, this.repository.connect, this.repository.conversation, this.repository.search, this.repository.properties, this.repository.team);
-    view_models.title             = new z.ViewModel.WindowTitleViewModel(view_models.content.content_state, this.repository.user, this.repository.conversation);
+    view_models.title             = new z.ViewModel.WindowTitleViewModel(view_models.content.content_state, this.repository.conversation, this.repository.user);
     view_models.lightbox          = new z.ViewModel.ImageDetailViewViewModel('detail-view', this.repository.conversation);
     view_models.warnings          = new z.ViewModel.WarningsViewModel('warnings');
     view_models.modals            = new z.ViewModel.ModalsViewModel('modals');
@@ -246,15 +250,16 @@ z.main.App = class App {
       this.telemetry.add_statistic(z.telemetry.app_init.AppInitStatisticsValue.CONVERSATIONS, conversation_ets.length, 50);
       this.telemetry.add_statistic(z.telemetry.app_init.AppInitStatisticsValue.CONNECTIONS, connection_ets.length, 50);
 
-      this.repository.conversation.initialize_connections(this.repository.user.connections());
+      this.repository.conversation.map_connections(this.repository.user.connections());
       this._subscribe_to_unload_events();
 
       return Promise.all([
         this.repository.event.initialize_from_stream(),
-        this.repository.team.get_teams(),
+        this.repository.team.get_team(),
       ]);
     })
-    .then(([notifications_count, team_ets]) => {
+    .then(([notifications_count, team_et]) => {
+      this.repository.conversation.initialize_conversations();
       this.view.loading.update_progress(95, z.string.init_updated_from_notifications);
 
       this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
@@ -340,9 +345,9 @@ z.main.App = class App {
     const is_auth_error = error instanceof z.auth.AuthError;
     if (is_auth_error) {
       if (type === z.auth.AuthError.TYPE.MULTIPLE_TABS) {
-        return this._redirect_to_login(z.auth.SignOutReason.MULTIPLE_TABS);
+        return this._redirect_to_login(z.auth.SIGN_OUT_REASON.MULTIPLE_TABS);
       }
-      return this._redirect_to_login(z.auth.SignOutReason.INDEXED_DB);
+      return this._redirect_to_login(z.auth.SIGN_OUT_REASON.INDEXED_DB);
     }
 
     this.logger.debug(`App reload: '${is_reload}', Document referrer: '${document.referrer}', Location: '${window.location.href}'`);
@@ -355,7 +360,7 @@ z.main.App = class App {
       if (is_session_expired.includes(type)) {
         this.logger.error(`Session expired on page reload: ${message}`, error);
         Raygun.send(new Error(('Session expired on page reload'), error));
-        return this._redirect_to_login(z.auth.SignOutReason.SESSION_EXPIRED);
+        return this._redirect_to_login(z.auth.SIGN_OUT_REASON.SESSION_EXPIRED);
       }
 
       const is_access_token_error = error instanceof z.auth.AccessTokenError;
@@ -380,7 +385,7 @@ z.main.App = class App {
         case z.auth.AccessTokenError.TYPE.RETRIES_EXCEEDED:
         case z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN: {
           this.logger.warn(`Redirecting to login: ${error.message}`, error);
-          return this._redirect_to_login(z.auth.SignOutReason.NOT_SIGNED_IN);
+          return this._redirect_to_login(z.auth.SIGN_OUT_REASON.NOT_SIGNED_IN);
         }
 
         default: {
@@ -394,7 +399,7 @@ z.main.App = class App {
           if (is_access_token_error) {
             this.logger.error(`Could not get access token: ${error.message}. Logging out user.`, error);
           }
-          return this.logout(z.auth.SignOutReason.APP_INIT);
+          return this.logout(z.auth.SIGN_OUT_REASON.APP_INIT);
         }
       }
     }
@@ -565,7 +570,7 @@ z.main.App = class App {
   /**
    * Logs the user out on the backend and deletes cached data.
    *
-   * @param {z.auth.SignOutReason} sign_out_reason - Cause for logout
+   * @param {z.auth.SIGN_OUT_REASON} sign_out_reason - Cause for logout
    * @param {boolean} clear_data - Keep data in database
    * @returns {undefined} No return value
    */
@@ -593,16 +598,20 @@ z.main.App = class App {
           }
         });
 
-        const session_expired = sign_out_reason === z.auth.SignOutReason.SESSION_EXPIRED;
-        this.repository.cache.clear_cache(session_expired, do_not_delete);
+        const keep_conversation_input = sign_out_reason === z.auth.SIGN_OUT_REASON.SESSION_EXPIRED;
+        this.repository.cache.clear_cache(keep_conversation_input, do_not_delete);
       }
 
       // Clear IndexedDB
       if (clear_data) {
         this.repository.storage.delete_everything()
           .catch((error) => this.logger.error('Failed to delete database before logout', error))
-          .then(() => this._redirect_to_login(sign_out_reason));
+          .then(() => {
+            amplify.publish(z.event.WebApp.LIFECYCLE.SIGNED_OUT, clear_data);
+            this._redirect_to_login(sign_out_reason);
+          });
       } else {
+        amplify.publish(z.event.WebApp.LIFECYCLE.SIGNED_OUT, clear_data);
         this._redirect_to_login(sign_out_reason);
       }
     };
@@ -611,10 +620,13 @@ z.main.App = class App {
       this.logger.info(`Logout triggered by '${sign_out_reason}': Disconnecting user from the backend.`);
       this.auth.repository.logout()
         .then(() => _logout())
-        .catch(() => this._redirect_to_login(sign_out_reason));
+        .catch(() => {
+          amplify.publish(z.event.WebApp.LIFECYCLE.SIGNED_OUT, clear_data);
+          this._redirect_to_login(sign_out_reason);
+        });
     };
 
-    if (sign_out_reason === z.auth.SignOutReason.SESSION_EXPIRED) {
+    if (App.CONFIG.IMMEDIATE_SIGN_OUT_REASONS.includes(sign_out_reason)) {
       return _logout();
     }
 
@@ -652,7 +664,7 @@ z.main.App = class App {
 
   /**
    * Redirect to the login page after internet connectivity has been verified.
-   * @param {z.auth.SignOutReason} sign_out_reason - Redirect triggered by session expiration
+   * @param {z.auth.SIGN_OUT_REASON} sign_out_reason - Redirect triggered by session expiration
    * @returns {undefined} No return value
    */
   _redirect_to_login(sign_out_reason) {
@@ -661,8 +673,8 @@ z.main.App = class App {
       .then(() => {
         let url = `/auth/${location.search}`;
 
-        if (sign_out_reason === z.auth.SignOutReason.SESSION_EXPIRED) {
-          url = z.util.append_url_parameter(url, z.auth.URLParameter.EXPIRED);
+        if (App.CONFIG.IMMEDIATE_SIGN_OUT_REASONS.includes(sign_out_reason)) {
+          url = z.util.append_url_parameter(url, `${z.auth.URLParameter.REASON}=${sign_out_reason}`);
         }
 
         window.location.replace(url);

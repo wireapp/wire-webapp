@@ -104,9 +104,7 @@ window.TestFactory.prototype.exposeStorageActors = function() {
 window.TestFactory.prototype.exposeCryptographyActors = function() {
   this.logger.info('- exposeCryptographyActors');
   return Promise.resolve()
-    .then(() => {
-      return this.exposeStorageActors();
-    })
+    .then(() => this.exposeStorageActors())
     .then(() => {
       this.logger.info('✓ exposedStorageActors');
 
@@ -120,9 +118,7 @@ window.TestFactory.prototype.exposeCryptographyActors = function() {
 
       return TestFactory.cryptography_repository.init(TestFactory.storage_service.db);
     })
-    .then(function() {
-      return TestFactory.cryptography_repository;
-    });
+    .then(() => TestFactory.cryptography_repository);
 };
 
 /**
@@ -132,9 +128,7 @@ window.TestFactory.prototype.exposeCryptographyActors = function() {
 window.TestFactory.prototype.exposeClientActors = function() {
   this.logger.info('- exposeClientActors');
   return Promise.resolve()
-    .then(() => {
-      return this.exposeCryptographyActors();
-    })
+    .then(() => this.exposeCryptographyActors())
     .then(() => {
       this.logger.info('✓ exposedCryptographyActors');
 
@@ -169,9 +163,7 @@ window.TestFactory.prototype.exposeClientActors = function() {
 window.TestFactory.prototype.exposeEventActors = function() {
   this.logger.info('- exposeEventActors');
   return Promise.resolve()
-    .then(() => {
-      return this.exposeCryptographyActors();
-    })
+    .then(() => this.exposeCryptographyActors())
     .then(() => {
       this.logger.info('✓ exposedCryptographyActors');
 
@@ -205,9 +197,7 @@ window.TestFactory.prototype.exposeEventActors = function() {
 window.TestFactory.prototype.exposeUserActors = function() {
   this.logger.info('- exposeUserActors');
   return Promise.resolve()
-    .then(() => {
-      return this.exposeClientActors();
-    })
+    .then(() => this.exposeClientActors())
     .then(() => {
       this.logger.info('✓ exposedClientActors');
 
@@ -241,9 +231,7 @@ window.TestFactory.prototype.exposeUserActors = function() {
 window.TestFactory.prototype.exposeConnectActors = function() {
   this.logger.info('- exposeConnectActors');
   return Promise.resolve()
-    .then(() => {
-      return this.exposeUserActors();
-    })
+    .then(() => this.exposeUserActors())
     .then(() => {
       this.logger.info('✓ exposedUserActors');
 
@@ -267,11 +255,9 @@ window.TestFactory.prototype.exposeConnectActors = function() {
 window.TestFactory.prototype.exposeSearchActors = function() {
   this.logger.info('- exposeSearchActors');
   return Promise.resolve()
+    .then(() => this.exposeUserActors())
     .then(() => {
-      return this.exposeUserActors();
-    })
-    .then(() => {
-      this.logger.info('✓ exposedUserActors');
+      this.logger.info('✓ exposedTeamActors');
 
       TestFactory.search_service = new z.search.SearchService(this.client);
       TestFactory.search_service.logger.level = this.settings.logging_level;
@@ -286,9 +272,7 @@ window.TestFactory.prototype.exposeSearchActors = function() {
 window.TestFactory.prototype.exposeTeamActors = function() {
   this.logger.info('- exposeTeamActors');
   return Promise.resolve()
-    .then(() => {
-      return this.exposeUserActors();
-    })
+    .then(() => this.exposeUserActors())
     .then(() => {
       this.logger.info('✓ exposedUserActors');
 
@@ -310,9 +294,7 @@ window.TestFactory.prototype.exposeTeamActors = function() {
 window.TestFactory.prototype.exposeConversationActors = function() {
   this.logger.info('- exposeConversationActors');
   return Promise.resolve()
-    .then(() => {
-      return this.exposeTeamActors();
-    })
+    .then(() => this.exposeTeamActors())
     .then(() => {
       this.logger.info('✓ exposedTeamActors');
 
@@ -341,9 +323,7 @@ window.TestFactory.prototype.exposeConversationActors = function() {
 window.TestFactory.prototype.exposeMediaActors = function() {
   this.logger.info('- exposeMediaActors');
   return Promise.resolve()
-    .then(() => {
-      return this.exposeAudioActors();
-    })
+    .then(() => this.exposeAudioActors())
     .then(() => {
       this.logger.info('✓ exposedAudioActors');
 
@@ -365,9 +345,7 @@ window.TestFactory.prototype.exposeMediaActors = function() {
 window.TestFactory.prototype.exposeCallingActors = function() {
   this.logger.info('- exposeCallingActors');
   return Promise.resolve()
-    .then(() => {
-      return this.exposeMediaActors();
-    })
+    .then(() => this.exposeMediaActors())
     .then(() => {
       this.logger.info('✓ exposedMediaActors');
       return this.exposeConversationActors();
@@ -398,9 +376,7 @@ window.TestFactory.prototype.exposeCallingActors = function() {
 window.TestFactory.prototype.exposeSystemNotificationActors = function() {
   this.logger.info('- exposeSystemNotificationActors');
   return Promise.resolve()
-    .then(() => {
-      return this.exposeConversationActors();
-    })
+    .then(() => this.exposeConversationActors())
     .then(() => {
       this.logger.info('✓ exposedConversationActors');
       return this.exposeCallingActors();
@@ -422,9 +398,7 @@ window.TestFactory.prototype.exposeSystemNotificationActors = function() {
 window.TestFactory.prototype.exposeTrackingActors = function() {
   this.logger.info('- exposeTrackingActors');
   return Promise.resolve()
-    .then(() => {
-      return this.exposeConversationActors();
-    })
+    .then(() => this.exposeConversationActors())
     .then(() => {
       this.logger.info('✓ exposedConversationActors');
 

@@ -484,12 +484,12 @@ z.client.ClientRepository = class ClientRepository {
       if (this.current_client().type === z.client.ClientType.PERMANENT) {
         return amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.LOGOUT, {
           action(clear_data) {
-            return amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReason.USER_REQUESTED, clear_data);
+            return amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.USER_REQUESTED, clear_data);
           },
         });
       }
       return this.delete_temporary_client()
-        .then(() => amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReason.USER_REQUESTED, true));
+        .then(() => amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.USER_REQUESTED, true));
     }
   }
 
@@ -735,7 +735,7 @@ z.client.ClientRepository = class ClientRepository {
         this.cryptography_repository.storage_repository.delete_cryptography()
           .then(() => {
             const is_temporary_client = this.current_client().is_temporary();
-            amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReason.CLIENT_REMOVED, is_temporary_client);
+            amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.CLIENT_REMOVED, is_temporary_client);
           });
       }
       amplify.publish(z.event.WebApp.CLIENT.REMOVE, this.self_user().id, client_id);

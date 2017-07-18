@@ -210,13 +210,14 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
       if (this.self_stream_state.screen_send() || z.util.Environment.browser.firefox) {
         amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, conversation_id, z.media.MediaType.SCREEN);
       } else if (z.util.Environment.desktop) {
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CALLING.SHARED_SCREEN, {
-          conversation_type: this.joined_call().is_group ? z.tracking.attribute.ConversationType.GROUP : z.tracking.attribute.ConversationType.ONE_TO_ONE,
-          kind_of_call_when_sharing: this.joined_call().is_remote_video_send() ? 'video' : 'audio',
-        });
-
         this.media_repository.devices_handler.get_screen_sources()
           .then((screen_sources) => {
+            amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CALLING.SHARED_SCREEN, {
+              conversation_type: this.joined_call().is_group ? z.tracking.attribute.ConversationType.GROUP : z.tracking.attribute.ConversationType.ONE_TO_ONE,
+              kind_of_call_when_sharing: this.joined_call().is_remote_video_send() ? 'video' : 'audio',
+              num_screens: screen_sources.length,
+            });
+
             if (screen_sources.length > 1) {
               this.is_choosing_screen(true);
               if (this.multitasking.is_minimized()) {

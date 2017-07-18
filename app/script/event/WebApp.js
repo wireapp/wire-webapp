@@ -139,6 +139,7 @@ z.event.WebApp = {
     REFRESH: 'wire.webapp.lifecycle.refresh',
     RESTART: 'wire.webapp.lifecycle.restart',
     SIGN_OUT: 'wire.webapp.lifecycle.sign_out',
+    SIGNED_OUT: 'wire.webapp.lifecycle.signed_out',
     UPDATE: 'wire.webapp.lifecycle.update',
   },
   LIST: {
@@ -221,7 +222,9 @@ z.event.WebApp = {
   },
   TEAM: {
     EVENT_FROM_BACKEND: 'wire.webapp.team.event_from_backend',
+    INFO: 'wire.webapp.team.info',
     MEMBER_LEAVE: 'wire.webapp.team.member_leave',
+    UPDATE_INFO: 'wire.webapp.team.update_info',
   },
   TELEMETRY: {
     BACKEND_REQUESTS: 'wire.webapp.telemetry.backend_requests',

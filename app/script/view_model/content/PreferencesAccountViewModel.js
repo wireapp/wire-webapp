@@ -28,14 +28,16 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     return 750 * 2;
   }
 
-  constructor(element_id, client_repository, user_repository) {
+  constructor(element_id, client_repository, team_repository, user_repository) {
     this.change_accent_color = this.change_accent_color.bind(this);
     this.check_new_clients = this.check_new_clients.bind(this);
     this.removed_from_view = this.removed_from_view.bind(this);
 
-    this.client_repository = client_repository;
-    this.user_repository = user_repository;
     this.logger = new z.util.Logger('z.ViewModel.content.PreferencesAccountViewModel', z.config.LOGGER.OPTIONS);
+
+    this.client_repository = client_repository;
+    this.team_repository = team_repository;
+    this.user_repository = user_repository;
 
     this.self_user = this.user_repository.self;
     this.new_clients = ko.observableArray([]);
@@ -45,6 +47,10 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.entered_username = ko.observable();
     this.submitted_username = ko.observable();
     this.username_error = ko.observable();
+
+    this.is_team = this.team_repository.is_team;
+    this.team = this.team_repository.team;
+    this.team_name = ko.pureComputed(() => z.l10n.text(z.string.preferences_account_team, this.team_repository.team_name()));
 
     this.name_saved = ko.observable();
     this.username_saved = ko.observable();

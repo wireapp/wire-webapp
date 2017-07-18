@@ -23,10 +23,10 @@ window.z = window.z || {};
 window.z.ViewModel = z.ViewModel || {};
 
 z.ViewModel.WindowTitleViewModel = class WindowTitleViewModel {
-  constructor(content_state, user_repository, conversation_repository) {
+  constructor(content_state, conversation_repository, user_repository) {
     this.content_state = content_state;
-    this.user_repository = user_repository;
     this.conversation_repository = conversation_repository;
+    this.user_repository = user_repository;
     this.logger = new z.util.Logger('z.ViewModel.WindowTitleViewModel', z.config.LOGGER.OPTIONS);
 
     this.update_window_title = false;
@@ -45,7 +45,7 @@ z.ViewModel.WindowTitleViewModel = class WindowTitleViewModel {
         let number_of_unread_conversations = 0;
         const number_of_requests = this.user_repository.connect_requests().length;
 
-        this.conversation_repository.all_unarchived_conversations()
+        this.conversation_repository.conversations_unarchived()
           .forEach((conversation_et) => {
             if (!conversation_et.is_request() && !conversation_et.is_muted() && conversation_et.unread_message_count()) {
               number_of_unread_conversations++;

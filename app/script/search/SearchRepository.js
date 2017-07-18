@@ -23,6 +23,13 @@ window.z = window.z || {};
 window.z.search = z.search || {};
 
 z.search.SearchRepository = class SearchRepository {
+  static get CONFIG() {
+    return {
+      MAX_DIRECTORY_RESULTS: 30,
+      MAX_SEARCH_RESULTS: 10,
+    };
+  }
+
   /**
    * Trim and remove @.
    * @param {string} query - Search string
@@ -52,14 +59,29 @@ z.search.SearchRepository = class SearchRepository {
    *
    * @param {string} name - Search query
    * @param {boolean} is_username - Is query a username
-   * @param {number} [max_results=10] - Maximum number of results
+   * @param {number} [max_results=SearchRepository.CONFIG.MAX_SEARCH_RESULTS] - Maximum number of results
    * @returns {Promise} Resolves with the search results
    */
-  search_by_name(name, is_username, max_results = 10) {
-    return this.search_service.get_contacts(name, 30)
-      .then(({documents}) => documents.map((match) => match.id))
+  search_by_name(name, is_username, max_results = SearchRepository.CONFIG.MAX_SEARCH_RESULTS) {
+    const directory_search = this.search_service.get_contacts(name, SearchRepository.CONFIG.MAX_DIRECTORY_RESULTS)
+      .then(({documents}) => documents.map((match) => match.id));
+
+    const search_promises = [directory_search];
+
+    if (is_username) {
+      search_promises.push(this.user_repository.get_user_id_by_username(name));
+    }
+
+    return Promise.all(search_promises)
+      .then(([directory_results, username_result]) => {
+        if (username_result && !directory_results.includes(username_result)) {
+          directory_results.push(username_result);
+        }
+
+        return directory_results;
+      })
       .then((user_ids) => this.user_repository.get_users_by_id(user_ids))
-      .then((user_ets) => user_ets.filter((user_et) => !user_et.is_connected()))
+      .then((user_ets) => user_ets.filter((user_et) => !user_et.is_connected() && !user_et.is_team_member()))
       .then((user_ets) => {
         if (is_username) {
           user_ets = user_ets.filter((user_et) => z.util.StringUtil.starts_with(user_et.username(), name));
