@@ -201,10 +201,10 @@ describe('z.cryptography.CryptographyMapper', function() {
           expect(event_json.conversation).toBe(event.conversation);
           expect(event_json.from).toBe(event.from);
           expect(event_json.time).toBe(event.time);
-          expect(event_json.id).toBe(generic_message.message_id);
-          expect(event_json.data.id).toBe(event.data.id);
-          expect(event_json.data.otr_key.length).toBe(2);
-          expect(event_json.data.sha256.length).toBe(2);
+          expect(event_json.preview_id).toBe(generic_message.message_id);
+          expect(event_json.preview_data.id).toBe(event.data.id);
+          expect(event_json.preview_data.otr_key.length).toBe(2);
+          expect(event_json.preview_data.sha256.length).toBe(2);
           done();
         })
         .catch(done.fail);
