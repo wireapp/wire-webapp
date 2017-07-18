@@ -2689,19 +2689,35 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   _on_asset_add(conversation_et, event_json) {
+    let should_delete_in_view = false;
+
     return this.conversation_service.load_event_from_db(conversation_et.id, event_json.id)
-      .then((event) => {
-        if (event) {
-          if (JSON.stringify((event) !== JSON.stringify((event_json)))) {
-            return this._delete_message_by_id(conversation_et, event_json) // TODO: remove delete and update UI
-              .then(() => $.extend(true, event, event_json))
-              .then((extended_event) => this.conversation_service.update_event(extended_event));
-          }
-          return event_json;
+      .then((stored_event) => {
+        if (stored_event == null) {
+          return this.conversation_service.save_event(event_json);
         }
-        return this.conversation_service.save_event(event_json);
+
+        if (_.isEqual(stored_event, event_json)) {
+          return; // ignore redundant event
+        }
+
+        // defer deletion to avoid flashing UI
+        should_delete_in_view = true;
+
+        // TODO: replace jquery extend
+        const updated_event = $.extend(true, stored_event, event_json);
+
+        return this.conversation_service.update_event(updated_event);
       })
-      .then((event) => this._on_add_event(conversation_et, event));
+      .then((event) => {
+        if (event === undefined) {
+          return;
+        }
+        if (should_delete_in_view) {
+          conversation_et.remove_message_by_id(event_json.id);
+        }
+        return this._on_add_event(conversation_et, event);
+      });
   }
 
   /**
