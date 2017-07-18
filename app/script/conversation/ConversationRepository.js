@@ -2714,7 +2714,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
         should_delete_in_view = true;
 
         // TODO: replace jquery extend
-        const updated_event = $.extend(true, stored_event, event_json);
+        // only event data is relevant for updating
+        const updated_event = $.extend(true, stored_event, {
+          data: event_json.data,
+        });
 
         return this.conversation_service.update_event(updated_event);
       })
