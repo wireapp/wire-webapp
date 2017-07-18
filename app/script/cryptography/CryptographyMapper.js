@@ -65,7 +65,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
   _map_generic_message(generic_message, event) {
     switch (generic_message.content) {
       case z.cryptography.GENERIC_MESSAGE_TYPE.ASSET:
-        return this._map_asset(generic_message.asset, generic_message.message_id, event.data !== null ? event.data.id : undefined);
+        return this._map_asset(generic_message.asset, generic_message.message_id);
       case z.cryptography.GENERIC_MESSAGE_TYPE.CALLING:
         return this._map_calling(generic_message.calling, event.data);
       case z.cryptography.GENERIC_MESSAGE_TYPE.CLEARED:
@@ -106,7 +106,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     };
   }
 
-  _map_asset(asset, event_nonce, event_id) {
+  _map_asset(asset, event_nonce) {
     const {original, preview, uploaded, not_uploaded} = asset;
     let data = {};
 
@@ -131,7 +131,6 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     if (preview != null) {
       const {remote} = preview;
       data = Object.assign(data, {
-        preview_id: event_id,
         preview_key: remote.asset_id,
         preview_otr_key: new Uint8Array(remote.otr_key.toArrayBuffer()),
         preview_sha256: new Uint8Array(remote.sha256.toArrayBuffer()),

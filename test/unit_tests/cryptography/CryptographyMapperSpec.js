@@ -125,9 +125,10 @@ describe('z.cryptography.CryptographyMapper', function() {
           expect(event_json.from).toBe(event.from);
           expect(event_json.time).toBe(event.time);
           expect(event_json.id).toBe(generic_message.message_id);
-          expect(event_json.data.id).toBe(event.data.id);
           expect(event_json.data.key).toBe(uploaded.key);
           expect(event_json.data.token).toBe(uploaded.token);
+          expect(event_json.data.otr_key.length).toBe(2);
+          expect(event_json.data.sha256.length).toBe(2);
           done();
         })
         .catch(done.fail);
@@ -202,7 +203,6 @@ describe('z.cryptography.CryptographyMapper', function() {
           expect(event_json.from).toBe(event.from);
           expect(event_json.time).toBe(event.time);
           expect(event_json.id).toBe(generic_message.message_id);
-          expect(event_json.data.preview_id).toBe(event.data.id);
           expect(event_json.data.preview_otr_key.length).toBe(2);
           expect(event_json.data.preview_sha256.length).toBe(2);
           done();
