@@ -23,15 +23,6 @@ window.z = window.z || {};
 window.z.event = z.event || {};
 
 z.event.Backend = {
-  CALL: {
-    FLOW_ACTIVE: 'call.flow-active',
-    FLOW_ADD: 'call.flow-add',
-    FLOW_DELETE: 'call.flow-delete',
-    REMOTE_CANDIDATES_ADD: 'call.remote-candidates-add',
-    REMOTE_CANDIDATES_UPDATE: 'call.remote-candidates-update',
-    REMOTE_SDP: 'call.remote-sdp',
-    STATE: 'call.state',
-  },
   CONVERSATION: {
     ASSET_ADD: 'conversation.asset-add',
     CONNECT_REQUEST: 'conversation.connect-request',
