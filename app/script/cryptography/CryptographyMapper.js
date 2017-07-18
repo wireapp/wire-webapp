@@ -110,7 +110,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     const {original, preview, uploaded, not_uploaded} = asset;
     let data = {};
 
-    if (original) {
+    if (original != null) {
       data = {
         content_length: original.size.toNumber(),
         content_type: original.mime_type,
@@ -128,7 +128,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
       }
     }
 
-    if (preview) {
+    if (preview != null) {
       const {remote} = preview;
       data = Object.assign(data, {
         preview_id: event_id,
@@ -144,7 +144,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
       data.info.tag = 'medium';
     }
 
-    if (uploaded) {
+    if (uploaded != null) {
       data = Object.assign(data, {
         key: uploaded.asset_id,
         otr_key: new Uint8Array(uploaded.otr_key.toArrayBuffer()),
@@ -154,7 +154,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
       });
     }
 
-    if (not_uploaded) {
+    if (not_uploaded != null) {
       data = Object.assign(data, {
         reason: not_uploaded,
         status: z.assets.AssetTransferState.UPLOAD_FAILED,

@@ -439,7 +439,6 @@ z.conversation.EventMapper = class EventMapper {
     asset_et.file_name = info.name;
     asset_et.meta = meta;
 
-
     // remote data - full
     const {key, otr_key, sha256, token} = event_data;
     if (key) {

@@ -2688,6 +2688,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
       });
   }
 
+  /**
+   * An asset received in a conversation.
+   *
+   * @private
+   * @param {Conversation} conversation_et - Conversation to add the event to
+   * @param {Object} event_json - JSON data of 'conversation.message-add'
+   * @returns {Promise} Resolves when the event was handled
+   */
   _on_asset_add(conversation_et, event_json) {
     let should_delete_in_view = false;
 
@@ -2697,8 +2705,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
           return this.conversation_service.save_event(event_json);
         }
 
+        // ignore redundant event
         if (_.isEqual(stored_event, event_json)) {
-          return; // ignore redundant event
+          return;
         }
 
         // defer deletion to avoid flashing UI
