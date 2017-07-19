@@ -74,7 +74,8 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
         this.show_matches(false);
 
         // Contacts, groups and others
-        const is_username = query.trim().startsWith('@');
+        const trimmed_query = query.trim();
+        const is_username = trimmed_query.startsWith('@') && z.user.UserHandleGenerator.validate_handle(normalized_query);
 
         this.search_repository.search_by_name(normalized_query, is_username)
           .then((user_ets) => {

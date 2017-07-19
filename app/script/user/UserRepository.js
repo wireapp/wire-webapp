@@ -646,7 +646,7 @@ z.user.UserRepository = class UserRepository {
   }
 
   get_user_id_by_username(username) {
-    return this.user_service.get_username(username)
+    return this.user_service.get_username(username.toLowerCase())
       .then(({user: user_id}) => user_id)
       .catch((error) => {
         if (error.code !== z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {

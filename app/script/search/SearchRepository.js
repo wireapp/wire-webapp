@@ -39,7 +39,10 @@ z.search.SearchRepository = class SearchRepository {
     if (!_.isString(query)) {
       return '';
     }
-    return query.trim().replace(/^[@]/, '');
+    return query
+      .trim()
+      .replace(/^[@]/, '')
+      .toLowerCase();
   }
 
   /**
