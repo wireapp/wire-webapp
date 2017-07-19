@@ -2710,6 +2710,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
           return;
         }
 
+        if (event_json.data.status === z.assets.AssetTransferState.UPLOAD_FAILED) {
+          return this._delete_message_by_id(conversation_et, event_json.id).then(() => undefined);
+        }
+
         // defer deletion to avoid flashing UI
         should_delete_in_view = true;
 
