@@ -36,8 +36,12 @@ z.message.MessageCategorization = (function() {
     }
   };
 
-  const _check_image = function(event) {
+  const _check_asset = function(event) {
     if (event.type === z.event.Backend.CONVERSATION.ASSET_ADD) {
+      if (event.data.info.tag === undefined) {
+        return z.message.MessageCategory.FILE;
+      }
+
       let category = z.message.MessageCategory.IMAGE;
 
       if (event.data.content_type === 'image/gif') {
@@ -45,12 +49,6 @@ z.message.MessageCategorization = (function() {
       }
 
       return category;
-    }
-  };
-
-  const _check_file = function(event) {
-    if (event.type === z.event.Client.CONVERSATION.ASSET_META) {
-      return z.message.MessageCategory.FILE;
     }
   };
 
@@ -74,7 +72,7 @@ z.message.MessageCategorization = (function() {
         return z.message.MessageCategory.NONE;
       }
 
-      for (const check of [_check_text, _check_image, _check_file, _check_ping, _check_location]) {
+      for (const check of [_check_text, _check_asset, _check_ping, _check_location]) {
         const temp_category = check(event);
         if (temp_category) {
           category = temp_category;
