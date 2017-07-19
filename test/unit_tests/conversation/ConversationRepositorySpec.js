@@ -637,50 +637,6 @@ describe('ConversationRepository', function() {
         .catch(done.fail);
     });
 
-    it('should update original asset when asset upload failed', function(done) {
-      // mocked event response
-      const event = {
-        conversation: conversation_et.id,
-        data: {
-          reason: z.assets.AssetUploadFailedReason.FAILED,
-        },
-        from: z.util.create_random_uuid(),
-        id: message_et.id,
-        time: Date.now(),
-        type: z.event.Client.CONVERSATION.ASSET_UPLOAD_FAILED,
-      };
-
-      TestFactory.conversation_repository._on_asset_upload_failed(conversation_et, event)
-        .then(function() {
-          expect(TestFactory.conversation_service.update_asset_as_failed_in_db).toHaveBeenCalled();
-          expect(message_et.assets()[0].status()).toBe(z.assets.AssetTransferState.UPLOAD_FAILED);
-          expect(message_et.assets()[0].upload_failed_reason()).toBe(z.assets.AssetUploadFailedReason.FAILED);
-          done();
-        })
-        .catch(done.fail);
-    });
-
-    it('should remove original asset message when asset upload was cancelled', function(done) {
-      // mocked event response
-      const event = {
-        conversation: conversation_et.id,
-        data: {
-          reason: z.assets.AssetUploadFailedReason.CANCELLED,
-        },
-        from: z.util.create_random_uuid(),
-        id: message_et.id,
-        time: Date.now(),
-        type: z.event.Client.CONVERSATION.ASSET_UPLOAD_FAILED,
-      };
-
-      TestFactory.conversation_repository._on_asset_upload_failed(conversation_et, event)
-        .then(function() {
-          expect(TestFactory.conversation_service.delete_message_from_db).toHaveBeenCalledWith(conversation_et.id, message_et.id);
-          expect(conversation_et.get_message_by_id(message_et.id)).toBeUndefined();
-          done();
-        })
-        .catch(done.fail);
-    });
   });
 
   describe('Encryption', function() {
