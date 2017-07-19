@@ -2375,6 +2375,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
             return this._on_asset_add(conversation_et, event_json);
           case z.event.Backend.CONVERSATION.RENAME:
             return this._on_rename(conversation_et, event_json);
+          case z.event.Client.CONVERSATION.ASSET_UPLOAD_COMPLETE:
+            return this._on_asset_upload_complete(conversation_et, event_json);
+          case z.event.Client.CONVERSATION.ASSET_UPLOAD_FAILED:
+            return this._on_asset_upload_failed(conversation_et, event_json);
+          case z.event.Client.CONVERSATION.ASSET_PREVIEW:
+            return this._on_asset_preview(conversation_et, event_json);
           case z.event.Client.CONVERSATION.CONFIRMATION:
             return this._on_confirmation(conversation_et, event_json);
           case z.event.Client.CONVERSATION.MESSAGE_DELETE:
@@ -2488,6 +2494,31 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
 
         return this.logger.error(`Upload complete: Could not find message with id '${event_json.id}'`, event_json);
+      });
+  }
+
+  /**
+   * An asset failed.
+   * @private
+   * @param {Conversation} conversation_et - Conversation to add the event to
+   * @param {Object} event_json - JSON data of 'conversation.asset-upload-failed' event
+   * @returns {Promise} Resolves when the event was handled
+   */
+  _on_asset_upload_failed(conversation_et, event_json) {
+    return this.get_message_in_conversation_by_id(conversation_et, event_json.id)
+      .then((message_et) => {
+        if (event_json.data.reason === z.assets.AssetUploadFailedReason.CANCELLED) {
+          return this._delete_message_by_id(conversation_et, message_et.id);
+        }
+
+        return this.update_message_as_upload_failed(message_et);
+      })
+      .catch((error) => {
+        if (error.type !== z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
+          throw error;
+        }
+
+        return this.logger.error(`Upload failed: Could not find message with id '${event_json.id}'`, event_json);
       });
   }
 
