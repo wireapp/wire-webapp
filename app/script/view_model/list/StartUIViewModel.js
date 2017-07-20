@@ -74,9 +74,10 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
         this.show_matches(false);
 
         // Contacts, groups and others
-        const is_username = query.trim().startsWith('@');
+        const trimmed_query = query.trim();
+        const is_handle = trimmed_query.startsWith('@') && z.user.UserHandleGenerator.validate_handle(normalized_query);
 
-        this.search_repository.search_by_name(normalized_query, is_username)
+        this.search_repository.search_by_name(normalized_query, is_handle)
           .then((user_ets) => {
             const is_current_query = normalized_query === z.search.SearchRepository.normalize_query(this.search_input());
             if (is_current_query) {
@@ -86,12 +87,12 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
           .catch((error) => this.logger.error(`Error searching for contacts: ${error.message}`, error));
 
         if (this.is_team()) {
-          this.search_results.contacts(this.team_repository.search_for_team_users(normalized_query, is_username));
+          this.search_results.contacts(this.team_repository.search_for_team_users(normalized_query, is_handle));
         } else {
-          this.search_results.contacts(this.user_repository.search_for_connected_users(normalized_query, is_username));
+          this.search_results.contacts(this.user_repository.search_for_connected_users(normalized_query, is_handle));
         }
 
-        this.search_results.groups(this.conversation_repository.get_groups_by_name(normalized_query, is_username));
+        this.search_results.groups(this.conversation_repository.get_groups_by_name(normalized_query, is_handle));
         this.searched_for_user(query);
       }
     }, 300);

@@ -539,17 +539,17 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Get group conversations by name.
    *
    * @param {string} query - Query to be searched in group conversation names
-   * @param {boolean} is_username - Query string is username
+   * @param {boolean} is_handle - Query string is handle
    * @returns {Array<Conversation>} Matching group conversations
    */
-  get_groups_by_name(query, is_username) {
+  get_groups_by_name(query, is_handle) {
     return this.sorted_conversations()
       .filter((conversation_et) => {
         if (!conversation_et.is_group()) {
           return false;
         }
 
-        if (is_username) {
+        if (is_handle) {
           if (z.util.StringUtil.compare_transliteration(conversation_et.display_name(), `@${query}`)) {
             return true;
           }
@@ -620,7 +620,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       const with_expected_user = user_et.id === conversation_et.participating_user_ids()[0];
 
       if (with_expected_user) {
-        if (team_id) {
+        if (team_id && user_et.is_team_member()) {
           const active_1to1_conversation = conversation_et.is_one2one() && !conversation_et.removed_from_conversation();
           const in_team = team_id === conversation_et.team_id;
 
@@ -2370,7 +2370,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           case z.event.Backend.CONVERSATION.MEMBER_UPDATE:
             return this._on_member_update(conversation_et, event_json);
           case z.event.Backend.CONVERSATION.MESSAGE_ADD:
-            return this._on_message_add(conversation_et, event_json);
+            return this._on_message_add(conversation_et, event_json, source);
           case z.event.Backend.CONVERSATION.RENAME:
             return this._on_rename(conversation_et, event_json);
           case z.event.Client.CONVERSATION.ASSET_UPLOAD_COMPLETE:
@@ -2661,9 +2661,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @private
    * @param {Conversation} conversation_et - Conversation to add the event to
    * @param {Object} event_json - JSON data of 'conversation.message-add'
+   * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {Promise} Resolves when the event was handled
    */
-  _on_message_add(conversation_et, event_json) {
+  _on_message_add(conversation_et, event_json, source) {
     return Promise.resolve()
       .then(() => {
         if (event_json.data.previews.length) {
@@ -2674,10 +2675,20 @@ z.conversation.ConversationRepository = class ConversationRepository {
           return this._update_edited_message(conversation_et, event_json);
         }
 
+        const remote_sources = [
+          z.event.EventRepository.SOURCE.STREAM,
+          z.event.EventRepository.SOURCE.WEB_SOCKET,
+        ];
+        if (remote_sources.includes(remote_sources)) {
+          return this._check_message_duplicate(conversation_et, event_json);
+        }
+
         return event_json;
       })
       .then((updated_event_json) => {
-        return this._on_add_event(conversation_et, updated_event_json);
+        if (updated_event_json) {
+          return this._on_add_event(conversation_et, updated_event_json);
+        }
       })
       .catch(function(error) {
         if (error.type !== z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
@@ -3230,6 +3241,22 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     asset_et.preview_resource(resource);
     return this.conversation_service.update_asset_preview_in_db(message_et.primary_key, asset_data);
+  }
+
+  _check_message_duplicate(conversation_et, event_json) {
+    return this.get_message_in_conversation_by_id(conversation_et, event_json.id)
+      .then((original_message_et) => {
+        const from_same_user = event_json.from === original_message_et.from;
+        if (!from_same_user) {
+          return event_json;
+        }
+        return event_json;
+      })
+      .catch((error) => {
+        if (error.type !== z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
+          throw error;
+        }
+      });
   }
 
   /**
