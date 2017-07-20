@@ -539,7 +539,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Get group conversations by name.
    *
    * @param {string} query - Query to be searched in group conversation names
-   * @param {boolean} is_handle - Query string is username
+   * @param {boolean} is_handle - Query string is handle
    * @returns {Array<Conversation>} Matching group conversations
    */
   get_groups_by_name(query, is_handle) {

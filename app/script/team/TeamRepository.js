@@ -132,8 +132,8 @@ z.team.TeamRepository = class TeamRepository {
 
   /**
    * Search for user.
-   * @param {string} query - Find user using name or username
-   * @param {boolean} is_handle - Query string is username
+   * @param {string} query - Find user by name or handle
+   * @param {boolean} is_handle - Query string is handle
    * @returns {Array<z.entity.User>} Matching users
    */
   search_for_team_users(query, is_handle) {

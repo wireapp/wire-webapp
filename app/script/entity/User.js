@@ -175,9 +175,9 @@ z.entity.User = class User {
   }
 
   /**
-   * Check whether username or name matches the given query
+   * Check whether handle or name matches the given query
    * @param {string} query - Query
-   * @param {boolean} is_handle - Query string is username
+   * @param {boolean} is_handle - Query string is handle
    * @returns {undefined} No return value
    */
   matches(query, is_handle) {
