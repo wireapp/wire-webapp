@@ -2674,10 +2674,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
           return this._update_edited_message(conversation_et, event_json);
         }
 
-        return event_json;
+        return this._check_message_duplicate(conversation_et, event_json);
       })
       .then((updated_event_json) => {
-        return this._on_add_event(conversation_et, updated_event_json);
+        if (updated_event_json) {
+          return this._on_add_event(conversation_et, updated_event_json);
+        }
       })
       .catch(function(error) {
         if (error.type !== z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
@@ -3230,6 +3232,21 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     asset_et.preview_resource(resource);
     return this.conversation_service.update_asset_preview_in_db(message_et.primary_key, asset_data);
+  }
+
+  _check_message_duplicate(conversation_et, event_json) {
+    return this.get_message_in_conversation_by_id(conversation_et, event_json.id)
+      .then((original_message_et) => {
+        const from_same_user = event_json.from === original_message_et.from;
+        if (!from_same_user) {
+          return event_json;
+        }
+      })
+      .catch((error) => {
+        if (error.type !== z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
+          throw error;
+        }
+      });
   }
 
   /**
