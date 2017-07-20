@@ -132,15 +132,15 @@ z.team.TeamRepository = class TeamRepository {
 
   /**
    * Search for user.
-   * @param {string} query - Find user using name or username
-   * @param {boolean} is_username - Query string is username
+   * @param {string} query - Find user by name or handle
+   * @param {boolean} is_handle - Query string is handle
    * @returns {Array<z.entity.User>} Matching users
    */
-  search_for_team_users(query, is_username) {
+  search_for_team_users(query, is_handle) {
     return this.team_users()
-      .filter((user_et) => user_et.matches(query, is_username))
+      .filter((user_et) => user_et.matches(query, is_handle))
       .sort((user_a, user_b) => {
-        if (is_username) {
+        if (is_handle) {
           return z.util.StringUtil.sort_by_priority(user_a.username(), user_b.username(), query);
         }
         return z.util.StringUtil.sort_by_priority(user_a.name(), user_b.name(), query);
