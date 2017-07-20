@@ -645,8 +645,8 @@ z.user.UserRepository = class UserRepository {
       });
   }
 
-  get_user_id_by_username(username) {
-    return this.user_service.get_username(username.toLowerCase())
+  get_user_id_by_handle(handle) {
+    return this.user_service.get_username(handle.toLowerCase())
       .then(({user: user_id}) => user_id)
       .catch((error) => {
         if (error.code !== z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
@@ -695,14 +695,14 @@ z.user.UserRepository = class UserRepository {
   /**
    * Search for user.
    * @param {string} query - Find user using name or username
-   * @param {boolean} is_username - Query string is username
+   * @param {boolean} is_handle - Query string is username
    * @returns {Array<z.entity.User>} Matching users
    */
-  search_for_connected_users(query, is_username) {
+  search_for_connected_users(query, is_handle) {
     return this.connected_users()
-      .filter((user_et) => user_et.matches(query, is_username))
+      .filter((user_et) => user_et.matches(query, is_handle))
       .sort((user_a, user_b) => {
-        if (is_username) {
+        if (is_handle) {
           return z.util.StringUtil.sort_by_priority(user_a.username(), user_b.username(), query);
         }
         return z.util.StringUtil.sort_by_priority(user_a.name(), user_b.name(), query);

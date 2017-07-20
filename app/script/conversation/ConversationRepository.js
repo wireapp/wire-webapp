@@ -539,17 +539,17 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Get group conversations by name.
    *
    * @param {string} query - Query to be searched in group conversation names
-   * @param {boolean} is_username - Query string is username
+   * @param {boolean} is_handle - Query string is username
    * @returns {Array<Conversation>} Matching group conversations
    */
-  get_groups_by_name(query, is_username) {
+  get_groups_by_name(query, is_handle) {
     return this.sorted_conversations()
       .filter((conversation_et) => {
         if (!conversation_et.is_group()) {
           return false;
         }
 
-        if (is_username) {
+        if (is_handle) {
           if (z.util.StringUtil.compare_transliteration(conversation_et.display_name(), `@${query}`)) {
             return true;
           }

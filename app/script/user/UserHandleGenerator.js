@@ -105,8 +105,8 @@ window.z.user = z.user || {};
    * @param {string} handle - Character candidate
    * @returns {boolean} True, if handle is valid.
    */
-  function validate_handle(handle) {
-    if (handle.length < MIN_HANDLE_LENGTH || handle.length > MAX_HANDLE_LENGTH) {
+  function validate_handle(handle = '') {
+    if (!handle.length || handle.length < MIN_HANDLE_LENGTH || handle.length > MAX_HANDLE_LENGTH) {
       return false;
     }
 
