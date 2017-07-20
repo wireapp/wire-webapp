@@ -132,7 +132,7 @@ z.string.fr.modal_call_second_ongoing_action = 'Raccrocher';
 z.string.fr.modal_call_second_outgoing_headline = 'Raccrocher l’appel en cours ?';
 z.string.fr.modal_call_second_outgoing_message = 'Vous ne pouvez être que dans un appel à la fois.';
 z.string.fr.modal_call_second_outgoing_action = 'Raccrocher';
-z.string.fr.modal_clear_conversation_headline = 'Effacer le contenu?';
+z.string.fr.modal_clear_conversation_headline = 'Effacer le contenu ?';
 z.string.fr.modal_clear_conversation_message = 'Cela videra l’historique de la conversation et la supprimera de votre liste.';
 z.string.fr.modal_clear_conversation_option = 'Et quitter la conversation';
 z.string.fr.modal_clear_conversation_button = 'Supprimer';
@@ -336,7 +336,7 @@ z.string.fr.people_connect_headline = 'Accepter ?';
 z.string.fr.people_connect_message = 'Cela vous connectera et ouvrira la conversation avec {{user}}.';
 
 z.string.fr.people_cancel_request_headline = 'Annuler la demande ?';
-z.string.fr.people_cancel_request_message = 'Annuler la demande de connexion à{{user}}.';
+z.string.fr.people_cancel_request_message = 'Annuler la demande de connexion avec {{user}}.';
 
 z.string.fr.people_leave_headline = 'Quitter la conversation ?';
 z.string.fr.people_leave_message = 'Vous ne pourrez plus envoyer ou recevoir de messages dans cette conversation.';
@@ -390,7 +390,7 @@ z.string.fr.preferences_account_username_error_taken = 'Déjà pris';
 z.string.fr.preferences_av_camera = 'Webcam';
 z.string.fr.preferences_av_microphone = 'Microphone';
 z.string.fr.preferences_av_permission_detail = 'Activer à partir des préférences de votre navigateur';
-z.string.fr.preferences_av_speakers = 'Haut-parleurs';
+z.string.fr.preferences_av_speakers = 'Hauts-parleurs';
 
 z.string.fr.preferences_devices_activated_in = 'à {{location}}';
 z.string.fr.preferences_devices_activated_on = 'Activé le {{date}}';
