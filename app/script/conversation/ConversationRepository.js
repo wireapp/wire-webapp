@@ -2370,7 +2370,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           case z.event.Backend.CONVERSATION.MEMBER_UPDATE:
             return this._on_member_update(conversation_et, event_json);
           case z.event.Backend.CONVERSATION.MESSAGE_ADD:
-            return this._on_message_add(conversation_et, event_json);
+            return this._on_message_add(conversation_et, event_json, source);
           case z.event.Backend.CONVERSATION.RENAME:
             return this._on_rename(conversation_et, event_json);
           case z.event.Client.CONVERSATION.ASSET_UPLOAD_COMPLETE:
@@ -2661,9 +2661,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @private
    * @param {Conversation} conversation_et - Conversation to add the event to
    * @param {Object} event_json - JSON data of 'conversation.message-add'
+   * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {Promise} Resolves when the event was handled
    */
-  _on_message_add(conversation_et, event_json) {
+  _on_message_add(conversation_et, event_json, source) {
     return Promise.resolve()
       .then(() => {
         if (event_json.data.previews.length) {
@@ -2674,7 +2675,15 @@ z.conversation.ConversationRepository = class ConversationRepository {
           return this._update_edited_message(conversation_et, event_json);
         }
 
-        return this._check_message_duplicate(conversation_et, event_json);
+        const remote_sources = [
+          z.event.EventRepository.SOURCE.STREAM,
+          z.event.EventRepository.SOURCE.WEB_SOCKET,
+        ];
+        if (remote_sources.includes(remote_sources)) {
+          return this._check_message_duplicate(conversation_et, event_json);
+        }
+
+        return event_json;
       })
       .then((updated_event_json) => {
         if (updated_event_json) {
@@ -3241,6 +3250,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         if (!from_same_user) {
           return event_json;
         }
+        return event_json;
       })
       .catch((error) => {
         if (error.type !== z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
