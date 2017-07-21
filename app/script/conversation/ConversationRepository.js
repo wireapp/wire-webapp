@@ -3246,7 +3246,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
         if (!from_same_user) {
           return event_json;
         }
-        return event_json;
       })
       .catch((error) => {
         if (error.type !== z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
