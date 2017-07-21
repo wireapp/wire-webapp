@@ -966,9 +966,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         if (handle_response) {
           amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
           return this._on_member_leave(conversation_et, response)
-            .then(() => {
-              return this.archive_conversation(conversation_et, next_conversation_et);
-            });
+            .then(() => this.archive_conversation(conversation_et, next_conversation_et));
         }
       });
   }
@@ -2589,7 +2587,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @private
    * @param {Conversation} conversation_et - Conversation entity that will be updated
    * @param {Object} event_json - JSON data of 'conversation.member-update' event
-   * @param {Conversation} [next_conversation_et] - Optional next conversation in list
+   * @param {Conversation|false} [next_conversation_et] - Optional next conversation in list
    * @returns {Promise} Resolves when the event was handled
    */
   _on_member_update(conversation_et, event_json, next_conversation_et) {
@@ -2599,7 +2597,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     if (previously_archived && !conversation_et.is_archived()) {
       return this._fetch_users_and_events(conversation_et);
-    } else if (conversation_et.is_archived() && next_conversation_et) {
+    } else if (conversation_et.is_archived() && next_conversation_et != null) {
       amplify.publish(z.event.WebApp.CONVERSATION.SHOW, next_conversation_et);
     }
   }
