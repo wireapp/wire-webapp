@@ -87,6 +87,7 @@ z.entity.Conversation = class Conversation {
     this.cleared_timestamp = ko.observable(0);
     this.last_event_timestamp = ko.observable(0);
     this.last_read_timestamp = ko.observable(0);
+    this.last_server_timestamp = ko.observable(0);
     this.muted_timestamp = ko.observable(0);
 
     // Conversation states for view
@@ -116,7 +117,6 @@ z.entity.Conversation = class Conversation {
     this.messages = ko.pureComputed(() => this.messages_unordered().sort((message_a, message_b) => {
       return message_a.timestamp() - message_b.timestamp();
     }));
-    this.messages.subscribe(() => this.update_latest_from_message(this.get_last_message()));
 
     this.creation_message = undefined;
 
@@ -244,6 +244,7 @@ z.entity.Conversation = class Conversation {
       this.is_guest,
       this.last_event_timestamp,
       this.last_read_timestamp,
+      this.last_server_timestamp,
       this.muted_state,
       this.name,
       this.participating_user_ids,
@@ -291,6 +292,9 @@ z.entity.Conversation = class Conversation {
       case z.conversation.TIMESTAMP_TYPE.LAST_READ:
         entity_timestamp = this.last_read_timestamp;
         break;
+      case z.conversation.TIMESTAMP_TYPE.LAST_SERVER:
+        entity_timestamp = this.last_server_timestamp;
+        break;
       case z.conversation.TIMESTAMP_TYPE.MUTED:
         entity_timestamp = this.muted_timestamp;
         break;
@@ -325,11 +329,11 @@ z.entity.Conversation = class Conversation {
    * @returns {undefined} No return value
    */
   add_message(message_et) {
-    amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, message_et);
-    this._update_last_read_from_message(message_et);
     message_et = this._check_for_duplicate(message_et);
     if (message_et) {
+      this._update_timestamps(message_et);
       this.messages_unordered.push(message_et);
+      amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, message_et);
     }
   }
 
@@ -348,7 +352,7 @@ z.entity.Conversation = class Conversation {
     for (let counter = message_ets.length - 1; counter >= 0; counter--) {
       const message_et = message_ets[counter];
       if (message_et.user() && message_et.user().is_me) {
-        this._update_last_read_from_message(message_et);
+        this._update_timestamps(message_et);
         break;
       }
     }
@@ -471,31 +475,32 @@ z.entity.Conversation = class Conversation {
     return message_et;
   }
 
+  update_server_timestamp(time) {
+    const timestamp = new Date(time).getTime();
+
+    if (!_.isNaN(timestamp)) {
+      this.set_timestamp(timestamp, z.conversation.TIMESTAMP_TYPE.LAST_SERVER);
+    }
+  }
+
   /**
-   * Update information about last activity from single message.
+   * Update information about conversation activity from single message.
+   *
+   * @private
    * @param {z.entity.Message} message_et - Message to be added to conversation
    * @returns {undefined} No return value
    */
-  update_latest_from_message(message_et) {
-    if (message_et && message_et.visible() && message_et.should_effect_conversation_timestamp) {
+  _update_timestamps(message_et) {
+    if (message_et && message_et.timestamp() && message_et.visible() && message_et.affect_conversation_order) {
       this.set_timestamp(message_et.timestamp(), z.conversation.TIMESTAMP_TYPE.LAST_EVENT);
+
+      const from_self = message_et.user() && message_et.user().is_me;
+      if (from_self) {
+        this.set_timestamp(message_et.timestamp(), z.conversation.TIMESTAMP_TYPE.LAST_READ);
+      }
     }
   }
 
-  /**
-   * Update last read if message sender is self
-   * @private
-   * @param {z.entity.Message} message_et - Message entity
-   * @returns {undefined} No return value
-   */
-  _update_last_read_from_message(message_et) {
-    const is_me = message_et.user() && message_et.user().is_me;
-    const has_timestamp = message_et.timestamp();
-
-    if (is_me && has_timestamp && message_et.should_effect_conversation_timestamp) {
-      this.set_timestamp(message_et.timestamp(), z.conversation.TIMESTAMP_TYPE.LAST_READ);
-    }
-  }
 
   /**
    * Get all messages.
@@ -630,6 +635,7 @@ z.entity.Conversation = class Conversation {
       is_managed: this.is_managed,
       last_event_timestamp: this.last_event_timestamp(),
       last_read_timestamp: this.last_read_timestamp(),
+      last_server_timestamp: this.last_server_timestamp(),
       muted_state: this.muted_state(),
       muted_timestamp: this.muted_timestamp(),
       name: this.name(),

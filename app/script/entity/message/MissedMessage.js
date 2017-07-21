@@ -26,6 +26,6 @@ z.entity.MissedMessage = class MissedMessage extends z.entity.Message {
   constructor() {
     super();
     this.super_type = z.message.SuperType.MISSED;
-    this.should_effect_conversation_timestamp = false;
+    this.affect_conversation_order = false;
   }
 };
