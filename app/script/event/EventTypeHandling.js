@@ -41,7 +41,6 @@ z.event.EventTypeHandling = {
     z.event.Backend.CONVERSATION.TYPING,
   ],
   STORE: [
-    z.event.Backend.CONVERSATION.ASSET_ADD,
     z.event.Backend.CONVERSATION.KNOCK,
     z.event.Backend.CONVERSATION.MEMBER_JOIN,
     z.event.Backend.CONVERSATION.MEMBER_LEAVE,

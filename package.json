@@ -39,8 +39,14 @@
     "stylelint": "7.13.0"
   },
   "lint-staged": {
-    "*.js": ["yarn lint-scripts", "git add"],
-    "*.less": ["yarn lint-styles", "git add"]
+    "*.js": [
+      "yarn lint-scripts",
+      "git add"
+    ],
+    "*.less": [
+      "yarn lint-styles",
+      "git add"
+    ]
   },
   "scripts": {
     "deploy-travis-dev": "grunt app_deploy_travis:dev",
