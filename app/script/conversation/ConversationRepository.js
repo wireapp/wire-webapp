@@ -2371,14 +2371,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
             return this._on_member_update(conversation_et, event_json);
           case z.event.Backend.CONVERSATION.MESSAGE_ADD:
             return this._on_message_add(conversation_et, event_json, source);
+          case z.event.Backend.CONVERSATION.ASSET_ADD:
+            return this._on_asset_add(conversation_et, event_json);
           case z.event.Backend.CONVERSATION.RENAME:
             return this._on_rename(conversation_et, event_json);
-          case z.event.Client.CONVERSATION.ASSET_UPLOAD_COMPLETE:
-            return this._on_asset_upload_complete(conversation_et, event_json);
-          case z.event.Client.CONVERSATION.ASSET_UPLOAD_FAILED:
-            return this._on_asset_upload_failed(conversation_et, event_json);
-          case z.event.Client.CONVERSATION.ASSET_PREVIEW:
-            return this._on_asset_preview(conversation_et, event_json);
           case z.event.Client.CONVERSATION.CONFIRMATION:
             return this._on_confirmation(conversation_et, event_json);
           case z.event.Client.CONVERSATION.MESSAGE_DELETE:
@@ -2452,28 +2448,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
-   * An asset preview was send.
-   *
-   * @private
-   * @param {Conversation} conversation_et - Conversation to add the event to
-   * @param {Object} event_json - JSON data of 'conversation.asset-upload-failed' event
-   * @returns {Promise} Resolves when the event was handled
-   */
-  _on_asset_preview(conversation_et, event_json) {
-    return this.get_message_in_conversation_by_id(conversation_et, event_json.id)
-      .then((message_et) => {
-        return this.update_message_with_asset_preview(conversation_et, message_et, event_json.data);
-      })
-      .catch((error) => {
-        if (error.type !== z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
-          throw error;
-        }
-
-        this.logger.error(`Asset preview: Could not find message with id '${event_json.id}'`, event_json);
-      });
-  }
-
-  /**
    * An asset was uploaded.
    *
    * @private
@@ -2492,31 +2466,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
 
         return this.logger.error(`Upload complete: Could not find message with id '${event_json.id}'`, event_json);
-      });
-  }
-
-  /**
-   * An asset failed.
-   * @private
-   * @param {Conversation} conversation_et - Conversation to add the event to
-   * @param {Object} event_json - JSON data of 'conversation.asset-upload-failed' event
-   * @returns {Promise} Resolves when the event was handled
-   */
-  _on_asset_upload_failed(conversation_et, event_json) {
-    return this.get_message_in_conversation_by_id(conversation_et, event_json.id)
-      .then((message_et) => {
-        if (event_json.data.reason === z.assets.AssetUploadFailedReason.CANCELLED) {
-          return this._delete_message_by_id(conversation_et, message_et.id);
-        }
-
-        return this.update_message_as_upload_failed(message_et);
-      })
-      .catch((error) => {
-        if (error.type !== z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
-          throw error;
-        }
-
-        return this.logger.error(`Upload failed: Could not find message with id '${event_json.id}'`, event_json);
       });
   }
 
@@ -2694,6 +2643,53 @@ z.conversation.ConversationRepository = class ConversationRepository {
         if (error.type !== z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
           throw error;
         }
+      });
+  }
+
+  /**
+   * An asset received in a conversation.
+   *
+   * @private
+   * @param {Conversation} conversation_et - Conversation to add the event to
+   * @param {Object} event_json - JSON data of 'conversation.message-add'
+   * @returns {Promise} Resolves when the event was handled
+   */
+  _on_asset_add(conversation_et, event_json) {
+    let should_delete_in_view = false;
+
+    return this.conversation_service.load_event_from_db(conversation_et.id, event_json.id)
+      .then((stored_event) => {
+        if (stored_event == null) {
+          return this.conversation_service.save_event(event_json);
+        }
+
+        // ignore redundant event
+        if (_.isEqual(stored_event, event_json)) {
+          return;
+        }
+
+        if (event_json.data.status === z.assets.AssetTransferState.UPLOAD_FAILED) {
+          return this._delete_message_by_id(conversation_et, event_json.id).then(() => undefined);
+        }
+
+        // defer deletion to avoid flashing UI
+        should_delete_in_view = true;
+
+        // only event data is relevant for updating
+        const updated_event = $.extend(true, stored_event, {
+          data: event_json.data,
+        });
+
+        return this.conversation_service.update_event(updated_event);
+      })
+      .then((event) => {
+        if (event === undefined) {
+          return;
+        }
+        if (should_delete_in_view) {
+          conversation_et.remove_message_by_id(event_json.id);
+        }
+        return this._on_add_event(conversation_et, event);
       });
   }
 
@@ -3250,7 +3246,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
         if (!from_same_user) {
           return event_json;
         }
-        return event_json;
       })
       .catch((error) => {
         if (error.type !== z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
