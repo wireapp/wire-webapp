@@ -2399,8 +2399,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
             // Un-archive it also on the backend side
             if (previously_archived && !conversation_et.is_archived()) {
               this.logger.info(`Un-archiving conversation '${conversation_et.id}' with new event`);
-              return this.unarchive_conversation(conversation_et);
+              this.unarchive_conversation(conversation_et);
             }
+          }
+
+          if (event_from_stream && event_from_web_socket && conversation_et && message_et) {
+            this.send_confirmation_status(conversation_et, message_et);
           }
         }
       });
@@ -2439,10 +2443,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   _on_add_event(conversation_et, event_json) {
     return this._add_event_to_conversation(event_json, conversation_et)
-      .then((message_et) => {
-        this.send_confirmation_status(conversation_et, message_et);
-        return {conversation_et: conversation_et, message_et: message_et};
-      });
+      .then((message_et) => ({conversation_et: conversation_et, message_et: message_et}));
   }
 
   /**
@@ -2688,6 +2689,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
           conversation_et.remove_message_by_id(event_json.id);
         }
         return this._on_add_event(conversation_et, event);
+      })
+      .then(({message_et}) => {
+        const first_asset = message_et.get_first_asset();
+        if (first_asset.status() === z.assets.AssetTransferState.UPLOADED) {
+          return {conversation_et: conversation_et, message_et: message_et};
+        }
       });
   }
 
