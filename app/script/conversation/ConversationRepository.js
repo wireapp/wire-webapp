@@ -213,22 +213,20 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   get_conversations() {
-    const remote_conversations_promise = this.conversation_service.get_all_conversations()
-      .catch((error) => {
-        this.logger.error(`Failed to get all conversations from backend: ${error.message}`);
-      });
+    return this.conversation_service.load_conversation_states_from_db()
+      .then((local_conversations) => {
+        return this.conversation_service.get_all_conversations()
+          .catch((error) => {
+            return this.logger.error(`Failed to get all conversations from backend: ${error.message}`);
+          })
+          .then((remote_conversations = []) => {
+            if (remote_conversations.length) {
+              return Promise.resolve(this.conversation_mapper.merge_conversations(local_conversations, remote_conversations))
+                .then((merged_conversations) => this.conversation_service.save_conversations_in_db(merged_conversations));
+            }
 
-    return Promise.all([
-      this.conversation_service.load_conversation_states_from_db(),
-      remote_conversations_promise,
-    ])
-      .then(([local_conversations, remote_conversations = []]) => {
-        if (remote_conversations.length) {
-          const conversations = this.conversation_mapper.merge_conversations(local_conversations, remote_conversations);
-          return this.conversation_service.save_conversations_in_db(conversations);
-        }
-
-        return local_conversations;
+            return local_conversations;
+          });
       })
       .then((conversations) => {
         this.save_conversations(this.map_conversations(conversations));
