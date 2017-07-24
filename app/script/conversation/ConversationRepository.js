@@ -2692,7 +2692,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       })
       .then(({message_et}) => {
         const first_asset = message_et.get_first_asset();
-        if (first_asset.status() === z.assets.AssetTransferState.UPLOADED) {
+        if (first_asset.is_image() || first_asset.status() === z.assets.AssetTransferState.UPLOADED) {
           return {conversation_et: conversation_et, message_et: message_et};
         }
       });
