@@ -37,10 +37,11 @@
             <!-- /ko -->
           </div>
           <!-- ko if: is_team() -->
-            <div class="preferences-account-team" data-bind="text: team_name()" data-uie-name="status-team"></div>
+            <div class="preferences-account-team preferences-section-account-space-after" data-bind="text: team_name()" data-uie-name="status-team"></div>
           <!-- /ko -->
           <div class="preferences-account-mail" data-bind="text: self_user().email()" data-uie-name="enter-email"></div>
           <div class="preferences-account-phone" data-bind="text: self_user().phone()" data-uie-name="enter-phone"></div>
+          <accent-color-picker class="preferences-account-accent-color preferences-section-account-space-before" params="user: self_user(), selected: change_accent_color" data-uie-name="enter-accent-color"></accent-color-picker>
         </div>
 
         <label class="preferences-account-picture-button" for="self-upload-file-input" data-bind="l10n_tooltip: z.string.tooltip_preferences_picture">
@@ -50,9 +51,15 @@
                  data-bind="file_select: click_on_change_picture"
                  data-uie-name="do-select-picture"/>
           <span class="icon-camera"></span>
+          <!-- ko if: is_team() -->
+            <div class="preferences-account-team-icon">
+                <svg width="56" height="64" viewBox="0 0 56 64" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M24.678.81c1.835-1.086 4.827-1.075 6.644 0l21.356 12.645c1.835 1.086 3.322 3.75 3.322 5.9v25.29c0 2.172-1.505 4.824-3.322 5.9L31.322 63.19c-1.835 1.086-4.827 1.075-6.644 0L3.322 50.544C1.487 49.46 0 46.795 0 44.645v-25.29c0-2.172 1.505-4.824 3.322-5.9L24.678.81z" fill-rule="nonzero" />
+                </svg>
+              <span class="preferences-account-team-initial" data-bind="text: team_initial"></span>
+            </div>
+          <!-- /ko -->
         </label>
-
-        <accent-color-picker class="preferences-account-accent-color" params="user: self_user(), selected: change_accent_color" data-uie-name="enter-accent-color"></accent-color-picker>
       </section>
 
       <section class="preferences-section preferences-section-account-security">
