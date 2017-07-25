@@ -17,10 +17,36 @@
  *
  */
 
-.calling-cell-button {
+.conversation-list-calling-cell:after {
+  display: none;
+}
+
+.conversation-list-calling-cell-controls {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-bottom: 16px;
+}
+
+.conversation-list-calling-cell-participants {
+  display: flex;
+  align-items: center;
+  padding-right: 16px;
+  padding-bottom: 16px;
+}
+
+.conversation-list-calling-cell-controls-on-call {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+.conversation-list-calling-cell-controls-button {
   .cell-badge;
-  color: #fff;
   font-size: 12px;
+  padding-left: 8px;
+  padding-right: 8px;
 
   & + & {
     margin-left: 8px;

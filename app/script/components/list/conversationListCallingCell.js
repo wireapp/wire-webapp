@@ -35,7 +35,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
 
 ko.components.register('conversation-list-calling-cell', {
   template: `
-    <div class="conversation-list-cell" data-bind="attr: {'data-uie-uid': conversation.id, 'data-uie-value': conversation.display_name}, css: {'conversation-list-cell-active': is_selected(conversation)}">
+    <div class="conversation-list-calling-cell conversation-list-cell" data-bind="attr: {'data-uie-uid': conversation.id, 'data-uie-value': conversation.display_name}, css: {'conversation-list-cell-active': is_selected(conversation)}">
       <div class="conversation-list-cell-left">
         <!-- ko if: conversation.is_group() -->
           <group-avatar class="conversation-list-cell-avatar-arrow" params="users: users(), conversation: conversation"></group-avatar>
@@ -51,9 +51,20 @@ ko.components.register('conversation-list-calling-cell', {
         <span class="conversation-list-cell-description" data-bind="text: description" data-uie-name="secondary-line"></span>
       </div>
       <div class="conversation-list-cell-right">
-        <div class="calling-cell-button fill-red icon-end-call" data-uie-name="do-call-controls-call-decline"></div>
-        <div class="calling-cell-button fill-green icon-call" data-uie-name="do-call-controls-call-accept"></div>
+        <div class="conversation-list-calling-cell-controls-button fill-red icon-end-call" data-uie-name="do-call-controls-call-decline"></div>
+        <div class="conversation-list-calling-cell-controls-button fill-green icon-call" data-uie-name="do-call-controls-call-accept"></div>
       </div>
+    </div>
+    <div class="conversation-list-calling-cell-controls">
+      <div class="conversation-list-calling-cell-controls-button conversation-list-calling-cell-controls-on-call cell-badge-dark">3 on call</div>
+      <div class="conversation-list-calling-cell-controls-button cell-badge-light icon-microphone"></div>
+      <div class="conversation-list-calling-cell-controls-button cell-badge-light icon-video"></div>
+      <div class="conversation-list-calling-cell-controls-button cell-badge-light icon-screensharing"></div>
+    </div>
+    <div class="conversation-list-calling-cell-participants">
+      <!-- ko foreach: users() -->
+        <user-avatar class="user-avatar-xs" params="user: users()[0]"></user-avatar>
+      <!-- /ko -->
     </div>
   `,
   viewModel: z.components.ConversationListCallingCell,
