@@ -51,6 +51,8 @@ ko.components.register('conversation-list-calling-cell', {
         <span class="conversation-list-cell-description" data-bind="text: description" data-uie-name="secondary-line"></span>
       </div>
       <div class="conversation-list-cell-right">
+        <div class="calling-cell-button fill-red icon-end-call" data-uie-name="do-call-controls-call-decline"></div>
+        <div class="calling-cell-button fill-green icon-call" data-uie-name="do-call-controls-call-accept"></div>
       </div>
     </div>
   `,
