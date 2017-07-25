@@ -23,14 +23,36 @@ window.z = window.z || {};
 window.z.components = z.components || {};
 
 z.components.ConversationListCallingCell = class ConversationListCallingCell {
-  constructor() {
+  constructor(params) {
+    this.conversation = params.conversation;
+    this.is_selected = params.is_selected;
 
+    this.users = ko.pureComputed(() => this.conversation.participating_user_ets());
+
+    this.description = ko.observable('');
   }
 };
 
 ko.components.register('conversation-list-calling-cell', {
   template: `
-    CALL
+    <div class="conversation-list-cell" data-bind="attr: {'data-uie-uid': conversation.id, 'data-uie-value': conversation.display_name}, css: {'conversation-list-cell-active': is_selected(conversation)}">
+      <div class="conversation-list-cell-left">
+        <!-- ko if: conversation.is_group() -->
+          <group-avatar class="conversation-list-cell-avatar-arrow" params="users: users(), conversation: conversation"></group-avatar>
+        <!-- /ko -->
+        <!-- ko if: !conversation.is_group() && users().length -->
+          <div class="user-avatar-halo">
+            <user-avatar class="user-avatar-s" params="user: users()[0]"></user-avatar>
+          </div>
+        <!-- /ko -->
+      </div>
+      <div class="conversation-list-cell-center">
+        <span class="conversation-list-cell-name" data-bind="text: conversation.display_name(), css: {'text-theme': is_selected(conversation)}"></span>
+        <span class="conversation-list-cell-description" data-bind="text: description" data-uie-name="secondary-line"></span>
+      </div>
+      <div class="conversation-list-cell-right">
+      </div>
+    </div>
   `,
   viewModel: z.components.ConversationListCallingCell,
 });

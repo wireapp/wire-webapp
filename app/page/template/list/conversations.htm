@@ -3,7 +3,7 @@
     <span class="label-bold-xs" data-bind="text: team_name" data-uie-name="status-team-name"></span>
   </div>
   <!-- ko foreach: conversations_calls -->
-    <conversation-list-calling-cell params="conversation: $data"></conversation-list-calling-cell>
+    <conversation-list-calling-cell params="conversation: $data, is_selected: $parent.is_selected_conversation"></conversation-list-calling-cell>
   <!-- /ko -->
   <div class="left-list-center">
     <!-- ko if: conversations_unarchived().length > 0 || connect_requests().length > 0 -->
