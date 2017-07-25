@@ -2688,13 +2688,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
         if (should_delete_in_view) {
           conversation_et.remove_message_by_id(event_json.id);
         }
-        return this._on_add_event(conversation_et, event);
-      })
-      .then(({message_et}) => {
-        const first_asset = message_et.get_first_asset();
-        if (first_asset.is_image() || first_asset.status() === z.assets.AssetTransferState.UPLOADED) {
-          return {conversation_et: conversation_et, message_et: message_et};
-        }
+        return this._on_add_event(conversation_et, event)
+          .then(({message_et}) => {
+            const first_asset = message_et.get_first_asset();
+            if (first_asset.is_image() || first_asset.status() === z.assets.AssetTransferState.UPLOADED) {
+              return {conversation_et: conversation_et, message_et: message_et};
+            }
+          });
       });
   }
 
