@@ -765,7 +765,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   _map_guest_status_self(conversation_et) {
     if (this.team()) {
       const team_id = conversation_et.team_id;
-      const is_guest = team_id && this.team().id !== team_id;
+      const is_guest = !!(team_id && this.team().id !== team_id);
       conversation_et.is_guest(is_guest);
     }
   }
