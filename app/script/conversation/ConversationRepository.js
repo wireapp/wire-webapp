@@ -104,6 +104,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.conversations_cleared = ko.observableArray([]);
     this.conversations_unarchived = ko.observableArray([]);
 
+    this.init_handled = 0;
+    this.init_promise = undefined;
+    this.init_total = 0;
+
     this._init_subscriptions();
   }
 
@@ -686,6 +690,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
   initialize_conversations() {
     this.update_conversations_offline();
     this._init_state_updates();
+    this.init_total = this.receiving_queue.get_length();
+
+    if (this.init_total > 5) {
+      this.logger.log(`Handling '${this.init_total}' additional messages on app start`);
+      return new Promise((resolve, reject) => this.init_promise = {reject_fn: reject, resolve_fn: resolve});
+    }
   }
 
   /**
@@ -2433,7 +2443,32 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   push_to_receiving_queue(event_json, source) {
-    this.receiving_queue.push(() => this.on_conversation_event(event_json, source));
+    this.receiving_queue.push(() => this.on_conversation_event(event_json, source))
+      .then(() => {
+        if (this.init_promise) {
+          const event_from_stream = source === z.event.EventRepository.SOURCE.STREAM;
+          if (event_from_stream) {
+            this.init_handled = this.init_handled + 1;
+            if ((this.init_handled % 5) === 0 || this.init_handled < 5) {
+              const progress = this.init_handled / this.init_total * 20 + 75;
+              amplify.publish(z.event.WebApp.APP.UPDATE_PROGRESS, progress, z.string.init_events_progress, [this.init_handled, this.init_total]);
+            }
+          }
+
+          if (!this.receiving_queue.get_length() || !event_from_stream) {
+            this.init_promise.resolve_fn();
+            this.init_promise = undefined;
+          }
+        }
+      })
+      .catch((error) => {
+        if (this.init_promise) {
+          this.init_promise.reject_fn(error);
+          this.init_promise = undefined;
+        } else {
+          throw error;
+        }
+      });
   }
 
   /**
