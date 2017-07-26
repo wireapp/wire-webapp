@@ -542,19 +542,23 @@ z.conversation.ConversationService = class ConversationService {
    * Update asset as uploaded in database.
    *
    * @param {string} primary_key - Primary key used to find an event in the database
-   * @param {Object} asset_data - Updated asset data
+   * @param {Object} event_json - Updated event asset data
    * @returns {Promise} Resolves when the message was updated in database
    */
-  update_asset_as_uploaded_in_db(primary_key, asset_data) {
+  update_asset_as_uploaded_in_db(primary_key, event_json) {
     return this.storage_service.load(z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key)
       .then((record) => {
         if (record) {
+          const {data: asset_data, time} = event_json;
+
           record.data.id = asset_data.id;
           record.data.key = asset_data.key;
           record.data.otr_key = asset_data.otr_key;
           record.data.sha256 = asset_data.sha256;
           record.data.status = z.assets.AssetTransferState.UPLOADED;
           record.data.token = asset_data.token;
+          record.status = z.message.StatusType.SENT;
+          record.time = time;
 
           return this.storage_service.update(z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key, record)
             .then(() => this.logger.info('Updated asset message_et (uploaded)', primary_key));

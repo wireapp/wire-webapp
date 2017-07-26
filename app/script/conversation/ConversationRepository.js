@@ -1253,10 +1253,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
   // Send encrypted events
   //##############################################################################
 
-  send_asset_remotedata(conversation_et, file, nonce) {
+  send_asset_remotedata(conversation_et, file, message_id) {
     let generic_message;
 
-    return this.get_message_in_conversation_by_id(conversation_et, nonce)
+    return this.get_message_in_conversation_by_id(conversation_et, message_id)
       .then((message_et) => {
         const asset_et = message_et.get_first_asset();
 
@@ -1267,7 +1267,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         });
       })
       .then((asset) => {
-        generic_message = new z.proto.GenericMessage(nonce);
+        generic_message = new z.proto.GenericMessage(message_id);
         generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
 
         if (conversation_et.ephemeral_timer()) {
@@ -1276,7 +1276,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         return this.send_generic_message_to_conversation(conversation_et.id, generic_message);
       })
-      .then(() => {
+      .then((payload) => {
         const asset_data = conversation_et.ephemeral_timer() ? generic_message.ephemeral.asset : generic_message.asset;
         const event = this._construct_otr_event(conversation_et.id, z.event.Backend.CONVERSATION.ASSET_ADD);
 
@@ -1284,7 +1284,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
         event.data.sha256 = asset_data.uploaded.sha256;
         event.data.key = asset_data.uploaded.asset_id;
         event.data.token = asset_data.uploaded.asset_token;
-        event.id = nonce;
+        event.id = message_id;
+        event.time = payload.time;
 
         return this._on_asset_upload_complete(conversation_et, event);
       });
@@ -1457,9 +1458,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
 
         return this._send_and_inject_generic_message(conversation_et, generic_message)
-        .then(() => {
-          this._track_completed_media_action(conversation_et, generic_message);
-        });
+          .then(() => this._track_completed_media_action(conversation_et, generic_message));
       })
       .catch((error) => {
         this.logger.error(`Failed to upload otr asset for conversation ${conversation_et.id}: ${error.message}`, error);
@@ -2082,9 +2081,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         message_id = id;
         return this.send_asset_preview(conversation_et, file, message_id);
       })
-      .then(() => {
-        return this.send_asset_remotedata(conversation_et, file, message_id);
-      })
+      .then(() => this.send_asset_remotedata(conversation_et, file, message_id))
       .then(() => {
         const upload_duration = (Date.now() - upload_started) / 1000;
 
@@ -2112,7 +2109,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {Conversation} conversation_et - Conversation to delete message from
    * @param {Message} message_et - Message to delete
-   * @param {Array<string>|boolean} precondition_option - Optional level that backend checks for missing clients
+   * @param {Array<string>|boolean} [precondition_option] - Optional level that backend checks for missing clients
    * @returns {Promise} Resolves when message was deleted
    */
   delete_message_everyone(conversation_et, message_et, precondition_option) {
@@ -2127,14 +2124,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         return this.sending_queue.push(() => {
           return this.create_recipients(conversation_et.id, false, precondition_option)
-            .then((recipients) => {
-              return this._send_generic_message(conversation_et.id, generic_message, recipients, precondition_option);
-            });
+            .then((recipients) => this._send_generic_message(conversation_et.id, generic_message, recipients, precondition_option));
         });
       })
-      .then(() => {
-        return this._track_delete_message(conversation_et, message_et, z.tracking.attribute.DeleteType.EVERYWHERE);
-      })
+      .then(() => this._track_delete_message(conversation_et, message_et, z.tracking.attribute.DeleteType.EVERYWHERE))
       .then(() => {
         amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, message_et.id);
         return this._delete_message_by_id(conversation_et, message_et.id);
@@ -2160,9 +2153,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         return this.send_generic_message_to_conversation(this.self_conversation().id, generic_message);
       })
-      .then(() => {
-        return this._track_delete_message(conversation_et, message_et, z.tracking.attribute.DeleteType.LOCAL);
-      })
+      .then(() => this._track_delete_message(conversation_et, message_et, z.tracking.attribute.DeleteType.LOCAL))
       .then(() => {
         amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, message_et.id);
         return this._delete_message_by_id(conversation_et, message_et.id);
@@ -2494,15 +2485,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   _on_asset_upload_complete(conversation_et, event_json) {
     return this.get_message_in_conversation_by_id(conversation_et, event_json.id)
-      .then((message_et) => {
-        return this.update_message_as_upload_complete(conversation_et, message_et, event_json.data);
-      })
+      .then((message_et) => this.update_message_as_upload_complete(conversation_et, message_et, event_json))
       .catch((error) => {
         if (error.type !== z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
           throw error;
         }
 
-        return this.logger.error(`Upload complete: Could not find message with id '${event_json.id}'`, event_json);
+        this.logger.error(`Upload complete: Could not find message with id '${event_json.id}'`, event_json);
       });
   }
 
@@ -3233,14 +3222,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {Conversation} conversation_et - Conversation that contains the message
    * @param {Message} message_et - Message to update
-   * @param {Object} asset_data - Uploaded asset information
-   * @param {number} asset_data.id - ID of asset
-   * @param {Uint8Array} asset_data.otr_key - AES key
-   * @param {Uint8Array} asset_data.sha256 - Hash of the encrypted asset
+   * @param {Object} event_json - Uploaded asset event information
    * @returns {Promise} Resolve when message was updated
    */
-  update_message_as_upload_complete(conversation_et, message_et, asset_data) {
-    const {id, key, otr_key, sha256, token} = asset_data;
+  update_message_as_upload_complete(conversation_et, message_et, event_json) {
+    const {id, key, otr_key, sha256, token} = event_json.data;
     const asset_et = message_et.get_first_asset();
 
     let resource;
@@ -3252,8 +3238,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     asset_et.original_resource(resource);
     asset_et.status(z.assets.AssetTransferState.UPLOADED);
+    message_et.status(z.message.StatusType.SENT);
 
-    return this.conversation_service.update_asset_as_uploaded_in_db(message_et.primary_key, asset_data);
+    return this.conversation_service.update_asset_as_uploaded_in_db(message_et.primary_key, event_json);
   }
 
   /**
