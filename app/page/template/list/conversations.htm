@@ -2,11 +2,13 @@
   <div class="left-list-header">
     <span class="label-bold-xs" data-bind="text: team_name" data-uie-name="status-team-name"></span>
   </div>
-  <!-- ko foreach: conversations_calls -->
-    <conversation-list-calling-cell
-      data-bind="click: $parent.click_on_conversation, event: {'contextmenu': $parent.list_view_model.on_context_menu}"
-      params="conversation: $data, is_selected: $parent.is_selected_conversation">
-    </conversation-list-calling-cell>
+  <!-- ko if: show_calls() -->
+    <!-- ko foreach: conversations_calls -->
+      <conversation-list-calling-cell
+        data-bind="click: $parent.click_on_conversation, event: {'contextmenu': $parent.list_view_model.on_context_menu}"
+        params="conversation: $data, is_selected: $parent.is_selected_conversation, calling_repository: $parent.calling_repository">
+      </conversation-list-calling-cell>
+    <!-- /ko -->
   <!-- /ko -->
   <div class="left-list-center">
     <!-- ko if: conversations_unarchived().length > 0 || connect_requests().length > 0 -->

@@ -37,6 +37,12 @@
   height: @badge-height;
   min-width: 32px;
   text-align: center;
+
+  &.disabled {
+    cursor: default;
+    opacity: .32;
+    pointer-events: none;
+  }
 }
 
 .cell-badge-light {
