@@ -2405,7 +2405,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
             }
           }
 
-          if (event_from_stream && event_from_web_socket && conversation_et && message_et) {
+          const is_remote_event = event_from_stream || event_from_web_socket;
+          if (conversation_et && message_et && is_remote_event) {
             this.send_confirmation_status(conversation_et, message_et);
           }
         }
