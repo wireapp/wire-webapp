@@ -67,8 +67,9 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     this.call_participants_displayed = ko.observableArray();
     this.call_participants_rest = ko.observable(0);
     this.call_participants.subscribe((user_ets) => {
-      this.call_participants_displayed(user_ets.slice(0, MAX_DISPLAYED_PARTICIPANTS));
-      this.call_participants_rest(user_ets.length - MAX_DISPLAYED_PARTICIPANTS);
+      const displayed_user_ets = user_ets.slice(0, MAX_DISPLAYED_PARTICIPANTS);
+      this.call_participants_displayed(displayed_user_ets);
+      this.call_participants_rest(user_ets.length - displayed_user_ets.length);
     });
 
     this.joined_call = this.calling_repository.joined_call;
@@ -200,7 +201,7 @@ ko.components.register('conversation-list-calling-cell', {
         <!-- ko foreach: call_participants_displayed() -->
           <user-avatar class="conversation-list-calling-cell-participant user-avatar-xxs" params="user: $data"></user-avatar>
         <!-- /ko -->
-        <!-- if: call_participants_rest() > 0 -->
+        <!-- ko if: call_participants_rest() > 0 -->
           <div class="conversation-list-calling-cell-participants-rest" data-bind="text: call_participants_rest()"></div>
         <!-- /ko -->
       </div>
