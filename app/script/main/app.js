@@ -259,17 +259,19 @@ z.main.App = class App {
       ]);
     })
     .then(([notifications_count, team_et]) => {
-      this.repository.conversation.initialize_conversations();
-      this.view.loading.update_progress(95, z.string.init_updated_from_notifications);
-
       this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
       this.telemetry.add_statistic(z.telemetry.app_init.AppInitStatisticsValue.NOTIFICATIONS, notifications_count, 100);
+
+      return this.repository.conversation.initialize_conversations();
+    })
+    .then(() => {
+      this.view.loading.update_progress(97.5, z.string.init_updated_from_notifications);
 
       this._watch_online_status();
       return this.repository.client.get_clients_for_self();
     })
     .then((client_ets) => {
-      this.view.loading.update_progress(97.5);
+      this.view.loading.update_progress(99);
 
       this.telemetry.add_statistic(z.telemetry.app_init.AppInitStatisticsValue.CLIENTS, client_ets.length);
       this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.APP_PRE_LOADED);
