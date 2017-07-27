@@ -60,8 +60,15 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     this.call = ko.pureComputed(() => this.conversation.call());
     this.call_participants = ko.pureComputed(() => {
       return this.call().participants()
-        .map((participant_et) => participant_et.user)
-        .filter((user_et) => !user_et.is_me);
+        .map((participant_et) => participant_et.user);
+    });
+
+    const MAX_DISPLAYED_PARTICIPANTS = 9;
+    this.call_participants_displayed = ko.observableArray();
+    this.call_participants_rest = ko.observable(0);
+    this.call_participants.subscribe((user_ets) => {
+      this.call_participants_displayed(user_ets.slice(0, MAX_DISPLAYED_PARTICIPANTS));
+      this.call_participants_rest(user_ets.length - MAX_DISPLAYED_PARTICIPANTS);
     });
 
     this.joined_call = this.calling_repository.joined_call;
@@ -114,8 +121,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     };
 
     this.participants_button_label = ko.pureComputed(() => {
-      const number = this.call_participants().length;
-      return z.l10n.text(z.string.call_participants, number);
+      return z.l10n.text(z.string.call_participants, this.call_participants().length);
     });
 
     this.show_participants_button = ko.pureComputed(() => {
@@ -191,8 +197,11 @@ ko.components.register('conversation-list-calling-cell', {
     <!-- /ko -->
     <!-- ko if: show_participants -->
       <div class="conversation-list-calling-cell-participants">
-        <!-- ko foreach: call_participants() -->
+        <!-- ko foreach: call_participants_displayed() -->
           <user-avatar class="conversation-list-calling-cell-participant user-avatar-xxs" params="user: $data"></user-avatar>
+        <!-- /ko -->
+        <!-- if: call_participants_rest() > 0 -->
+          <div class="conversation-list-calling-cell-participants-rest" data-bind="text: call_participants_rest()"></div>
         <!-- /ko -->
       </div>
     <!-- /ko -->
