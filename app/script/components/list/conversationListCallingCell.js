@@ -68,6 +68,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     this.call_participants_rest = ko.observable(0);
     this.call_participants.subscribe((user_ets) => {
       const displayed_user_ets = user_ets.slice(0, MAX_DISPLAYED_PARTICIPANTS);
+      console.log(displayed_user_ets, user_ets, MAX_DISPLAYED_PARTICIPANTS);
       this.call_participants_displayed(displayed_user_ets);
       this.call_participants_rest(user_ets.length - displayed_user_ets.length);
     });
@@ -107,6 +108,10 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
 
     this.show_accept_video_button = ko.pureComputed(() => {
       return this.call_is_anwserable() && this.call().is_remote_video_send();
+    });
+
+    this.show_call_timer = ko.pureComputed(() => {
+      return this.call_is_ongoing() && this.call().self_user_joined();
     });
 
     this.show_join_button = ko.pureComputed(() => {
@@ -152,7 +157,7 @@ ko.components.register('conversation-list-calling-cell', {
         <!-- ko if: call_is_incoming -->
           <span class="conversation-list-cell-description" data-bind="l10n_text: z.string.call_state_incoming" data-uie-name="call-label-incoming"></span>
         <!-- /ko -->
-        <!-- ko if: call_is_ongoing && call_participants().length -->
+        <!-- ko if: show_call_timer -->
           <span class="conversation-list-cell-description" data-bind="text: z.util.format_seconds(call().duration_time())" data-uie-name="call-duration"></span>
         <!-- /ko -->
       </div>
@@ -164,7 +169,7 @@ ko.components.register('conversation-list-calling-cell', {
            <div class="conversation-list-calling-cell-controls-button fill-red icon-end-call" data-bind="click: on_reject_call" data-uie-name="do-call-controls-call-decline"></div>
         <!-- /ko -->
         <!-- ko if: show_join_button -->
-          <div class="conversation-list-calling-cell-controls-button fill-green" data-bind="click: on_accept_call" data-uie-name="do-call-controls-call-join"></div>
+          <div class="conversation-list-calling-cell-controls-button fill-green" data-bind="click: on_accept_call, l10n_text: z.string.call_join" data-uie-name="do-call-controls-call-join"></div>
         <!-- /ko -->
         <!-- ko if: show_accept_button -->
           <div class="conversation-list-calling-cell-controls-button fill-green icon-call" data-bind="click: on_accept_call" data-uie-name="do-call-controls-call-accept"></div>
