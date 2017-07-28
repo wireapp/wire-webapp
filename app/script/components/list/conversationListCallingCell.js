@@ -164,7 +164,7 @@ ko.components.register('conversation-list-calling-cell', {
            <div class="conversation-list-calling-cell-controls-button fill-red icon-end-call" data-bind="click: on_reject_call" data-uie-name="do-call-controls-call-decline"></div>
         <!-- /ko -->
         <!-- ko if: show_join_button -->
-          <div class="conversation-list-calling-cell-controls-button fill-green icon-call" data-bind="click: on_accept_call" data-uie-name="do-call-controls-call-join"></div>
+          <div class="conversation-list-calling-cell-controls-button fill-green" data-bind="click: on_accept_call" data-uie-name="do-call-controls-call-join"></div>
         <!-- /ko -->
         <!-- ko if: show_accept_button -->
           <div class="conversation-list-calling-cell-controls-button fill-green icon-call" data-bind="click: on_accept_call" data-uie-name="do-call-controls-call-accept"></div>
@@ -177,7 +177,7 @@ ko.components.register('conversation-list-calling-cell', {
     <!-- ko if: show_call_controls -->
     <div class="conversation-list-calling-cell-controls">
       <!-- ko if: show_participants_button -->
-        <div class="conversation-list-calling-cell-controls-button cursor-pointer font-weight-light conversation-list-calling-cell-controls-on-call" data-bind="click: on_participants_button_click, text: participants_button_label, css: show_participants() ? 'cell-badge-light' : 'cell-badge-dark'"></div>
+        <div class="conversation-list-calling-cell-controls-button cursor-pointer conversation-list-calling-cell-controls-on-call" data-bind="click: on_participants_button_click, text: participants_button_label, css: show_participants() ? 'cell-badge-light' : 'cell-badge-dark'"></div>
       <!-- /ko -->
       <div class="conversation-list-calling-cell-controls-button icon-mute cursor-pointer" data-bind="click: on_toggle_audio, css: self_stream_state.audio_send() ? 'cell-badge-dark' : 'cell-badge-light'"></div>
       <!-- ko if: call_is_ongoing -->
