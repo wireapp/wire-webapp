@@ -88,11 +88,11 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
 
   /**
    * Set the media type of the call.
-   * @param {boolean} [video_send=false] - Call contains video
+   * @param {z.media.MediaType} [media_type=z.media.MediaType.AUDIO] - Media type for this call
    * @returns {undefined} No return value
    */
-  set_media_type(video_send = false) {
-    this.media_type = video_send ? z.media.MediaType.VIDEO : z.media.MediaType.AUDIO;
+  set_media_type(media_type = z.media.MediaType.AUDIO) {
+    this.media_type = media_type;
     this.logger.info(`Set media type to '${this.media_type}'`);
   }
 
@@ -129,7 +129,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
       },
       attributes);
 
-      if (this.media_type === z.media.MediaType.VIDEO) {
+      if (this.media_type === z.media.MediaType.AUDIO_VIDEO) {
         event_name = event_name.replace('_call', '_video_call');
       }
     }
@@ -189,7 +189,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
       };
 
       let event_name = z.tracking.EventName.CALLING.ENDED_CALL;
-      if (this.media_type === z.media.MediaType.VIDEO) {
+      if (this.media_type === z.media.MediaType.AUDIO_VIDEO) {
         event_name = event_name.replace('_call', '_video_call');
       }
 

@@ -93,7 +93,7 @@ z.ViewModel.ConversationTitlebarViewModel = class ConversationTitlebarViewModel 
   }
 
   click_on_call_button() {
-    amplify.publish(z.event.WebApp.CALL.STATE.TOGGLE, false);
+    amplify.publish(z.event.WebApp.CALL.STATE.TOGGLE, z.media.MediaType.AUDIO);
   }
 
   click_on_maximize() {
@@ -107,7 +107,7 @@ z.ViewModel.ConversationTitlebarViewModel = class ConversationTitlebarViewModel 
   }
 
   click_on_video_button() {
-    amplify.publish(z.event.WebApp.CALL.STATE.TOGGLE, true);
+    amplify.publish(z.event.WebApp.CALL.STATE.TOGGLE, z.media.MediaType.AUDIO_VIDEO);
   }
 
   click_on_collection_button() {

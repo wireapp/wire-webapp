@@ -782,10 +782,10 @@ z.calling.CallingRepository = class CallingRepository {
    * Join a call.
    *
    * @param {string} conversation_id - ID of conversation to join call in
-   * @param {boolean} [video_send=false] - Send video for this call
+   * @param {z.media.MediaType} media_type - Media type for this call
    * @returns {undefined} No return value
    */
-  join_call(conversation_id, video_send = false) {
+  join_call(conversation_id, media_type) {
     this.get_call_by_id(conversation_id)
       .then((call_et) => ({call_et: call_et, call_state: call_et.state()}))
       .catch((error) => {
@@ -803,6 +803,7 @@ z.calling.CallingRepository = class CallingRepository {
               return call_et;
             }
 
+            const video_send = media_type === z.media.MediaType.AUDIO_VIDEO;
             const prop_sync_payload = z.calling.CallMessageBuilder.create_payload_prop_sync(this.self_state, video_send, false, {conversation_id: conversation_id});
             return this._create_outgoing_call(z.calling.CallMessageBuilder.build_prop_sync(false, undefined, prop_sync_payload));
           });
@@ -810,12 +811,12 @@ z.calling.CallingRepository = class CallingRepository {
       .then((call_et) => {
         this.logger.info(`Joining call in conversation '${conversation_id}'`, call_et);
 
-        call_et.initiate_telemetry(video_send);
+        call_et.initiate_telemetry(media_type);
         if (this.media_stream_handler.local_media_stream()) {
           return call_et;
         }
 
-        return this.media_stream_handler.initiate_media_stream(conversation_id, video_send)
+        return this.media_stream_handler.initiate_media_stream(conversation_id, media_type)
           .then(() => call_et);
       })
       .then((call_et) => {
@@ -923,19 +924,19 @@ z.calling.CallingRepository = class CallingRepository {
   /**
    * User action to toggle the call state.
    *
-   * @param {boolean} [video_send=false] - Is this a video call
+   * @param {boolean} media_type - Media type of call
    * @param {Conversation} [conversation_et=this.conversation_repository.active_conversation()] - Conversation for which state will be toggled
    * @returns {undefined} No return value
    */
-  toggle_state(video_send, conversation_et = this.conversation_repository.active_conversation()) {
+  toggle_state(media_type, conversation_et = this.conversation_repository.active_conversation()) {
     if (conversation_et) {
-      if (video_send && conversation_et.is_group()) {
+      if (conversation_et.is_group() && media_type === z.media.MediaType.AUDIO_VIDEO) {
         amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALL_NO_VIDEO_IN_GROUP);
       } else {
         if (conversation_et.id === this._self_client_on_a_call()) {
           return this.leave_call(conversation_et.id);
         }
-        this.join_call(conversation_et.id, video_send);
+        this.join_call(conversation_et.id, media_type);
       }
     }
   }

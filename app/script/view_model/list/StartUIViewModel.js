@@ -565,7 +565,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       .then((conversation_et) => {
         if (conversation_et) {
           window.setTimeout(() => {
-            amplify.publish(z.event.WebApp.CALL.STATE.TOGGLE, false, conversation_et);
+            amplify.publish(z.event.WebApp.CALL.STATE.TOGGLE, z.media.MediaType.AUDIO, conversation_et);
           }, 500);
         }
       });
@@ -587,7 +587,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       .then((conversation_et) => {
         if (conversation_et) {
           window.setTimeout(() => {
-            amplify.publish(z.event.WebApp.CALL.STATE.TOGGLE, true, conversation_et);
+            amplify.publish(z.event.WebApp.CALL.STATE.TOGGLE, z.media.MediaType.AUDIO_VIDEO, conversation_et);
           }, 500);
         }
       });

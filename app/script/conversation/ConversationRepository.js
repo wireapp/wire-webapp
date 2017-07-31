@@ -1996,6 +1996,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
                     conversation_et.verification_state(z.conversation.ConversationVerificationState.UNVERIFIED);
 
                     if (consent_type === z.ViewModel.MODAL_CONSENT_TYPE.INCOMING_CALL) {
+                      // todo Select proper media type
                       amplify.publish(z.event.WebApp.CALL.STATE.JOIN, conversation_et.id);
                     }
 
