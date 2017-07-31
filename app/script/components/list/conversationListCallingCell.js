@@ -68,7 +68,6 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     this.call_participants_rest = ko.observable(0);
     this.call_participants.subscribe((user_ets) => {
       const displayed_user_ets = user_ets.slice(0, MAX_DISPLAYED_PARTICIPANTS);
-      console.log(displayed_user_ets, user_ets, MAX_DISPLAYED_PARTICIPANTS);
       this.call_participants_displayed(displayed_user_ets);
       this.call_participants_rest(user_ets.length - displayed_user_ets.length);
     });
