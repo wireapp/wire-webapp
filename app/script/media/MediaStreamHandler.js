@@ -227,7 +227,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    */
   request_media_stream(media_type, media_stream_constraints) {
     if (!this.devices_handler.has_microphone()) {
-      return Promise.reject(new z.media.MediaError(z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE, z.media.MediaType.VIDEO));
+      return Promise.reject(new z.media.MediaError(z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE, z.media.MediaType.AUDIO));
     }
     if (!this.devices_handler.has_camera() && (media_type === z.media.MediaType.VIDEO)) {
       return Promise.reject(new z.media.MediaError(z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE, z.media.MediaType.VIDEO));
@@ -247,17 +247,22 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
         return new z.media.MediaStreamInfo(z.media.MediaStreamSource.LOCAL, 'self', media_stream);
       })
       .catch((error) => {
-        this.logger.warn(`MediaStream request failed: ${error.name} ${error.message}`);
+        const {message, name} = error;
+        this.logger.warn(`MediaStream request for '${media_type}' failed: ${name} ${message}`);
         this._clear_permission_request_hint(media_type);
-        if (z.media.MEDIA_STREAM_ERROR_TYPES.DEVICE.includes(error.name)) {
+
+        if (z.media.MEDIA_STREAM_ERROR_TYPES.DEVICE.includes(name)) {
           throw new z.media.MediaError(z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE, media_type);
         }
-        if (z.media.MEDIA_STREAM_ERROR_TYPES.MISC.includes(error.name)) {
+
+        if (z.media.MEDIA_STREAM_ERROR_TYPES.MISC.includes(name)) {
           throw new z.media.MediaError(z.media.MediaError.TYPE.MEDIA_STREAM_MISC, media_type);
         }
-        if (z.media.MEDIA_STREAM_ERROR_TYPES.PERMISSION.includes(error.name)) {
+
+        if (z.media.MEDIA_STREAM_ERROR_TYPES.PERMISSION.includes(name)) {
           throw new z.media.MediaError(z.media.MediaError.TYPE.MEDIA_STREAM_PERMISSION, media_type);
         }
+
         throw error;
       });
   }

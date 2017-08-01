@@ -29,7 +29,7 @@ z.ViewModel.WindowTitleViewModel = class WindowTitleViewModel {
     this.user_repository = user_repository;
     this.logger = new z.util.Logger('z.ViewModel.WindowTitleViewModel', z.config.LOGGER.OPTIONS);
 
-    this.update_window_title = false;
+    this.update_window_title = ko.observable(false);
 
     amplify.subscribe(z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, this.set_update_state.bind(this));
     amplify.subscribe(z.event.WebApp.LIFECYCLE.LOADED, this.initiate_title_updates.bind(this));
@@ -37,10 +37,10 @@ z.ViewModel.WindowTitleViewModel = class WindowTitleViewModel {
 
   initiate_title_updates() {
     this.logger.info('Starting to update window title');
-    this.update_window_title = true;
+    this.update_window_title(true);
 
     ko.computed(() => {
-      if (this.update_window_title) {
+      if (this.update_window_title()) {
         let window_title = '';
         let number_of_unread_conversations = 0;
         const number_of_requests = this.user_repository.connect_requests().length;
@@ -123,9 +123,9 @@ z.ViewModel.WindowTitleViewModel = class WindowTitleViewModel {
   set_update_state(handling_notifications) {
     const update_window_title = handling_notifications === z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
-    if (this.update_window_title !== update_window_title) {
-      this.update_window_title = update_window_title;
-      this.logger.debug(`Set window title update state to '${this.update_window_title}'`);
+    if (this.update_window_title() !== update_window_title) {
+      this.update_window_title(update_window_title);
+      this.logger.debug(`Set window title update state to '${this.update_window_title()}'`);
     }
   }
 };

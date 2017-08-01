@@ -103,9 +103,9 @@ z.event.EventRepository = class EventRepository {
               this.notifications_queue.shift();
               this.notifications_handled++;
 
-              if ((this.notifications_handled % 5) === 0) {
-                const progress = this.notifications_handled / this.notifications_total * 70 + 25;
-                amplify.publish(z.event.WebApp.APP.UPDATE_PROGRESS, progress, z.string.init_events_progress, [this.notifications_handled, this.notifications_total]);
+              if ((this.notifications_handled % 5) === 0 || this.notifications_handled < 5) {
+                const progress = this.notifications_handled / this.notifications_total * 50 + 25;
+                amplify.publish(z.event.WebApp.APP.UPDATE_PROGRESS, progress, z.string.init_decryption_progress, [this.notifications_handled, this.notifications_total]);
               }
             });
         }
@@ -607,7 +607,7 @@ z.event.EventRepository = class EventRepository {
    * @returns {boolean} Returns true if event is handled within is lifetime, otherwise throws error
    */
   _validate_call_event_lifetime(event) {
-    const {content, conversation: conversation_id, time, type} = event;
+    const {content = {}, conversation: conversation_id, time, type} = event;
     const forced_event_types = [
       z.calling.enum.CALL_MESSAGE_TYPE.CANCEL,
       z.calling.enum.CALL_MESSAGE_TYPE.GROUP_LEAVE,
