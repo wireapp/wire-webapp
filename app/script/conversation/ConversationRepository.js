@@ -61,8 +61,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.team = this.team_repository.team;
     this.team.subscribe(() => this.map_guest_status_self());
 
-    this.block_event_handling = true;
+    this.block_event_handling = ko.observable(true);
     this.fetching_conversations = {};
+    this.conversations_with_new_events = {};
+    this.block_event_handling.subscribe((event_handling_state) => {
+      if (event_handling_state) {
+        this._check_changed_conversations();
+      }
+    });
 
     this.self_conversation = ko.pureComputed(() => {
       if (this.user_repository.self()) {
@@ -96,7 +102,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     // @note Only use the client request queue as to unblock if not blocked by event handling or the cryptographic order of messages will be ruined and sessions might be deleted
     this.conversation_service.client.request_queue_blocked_state.subscribe((state) => {
       const request_queue_blocked = state !== z.service.RequestQueueBlockedState.NONE;
-      this.sending_queue.pause(request_queue_blocked || this.block_event_handling);
+      this.sending_queue.pause(request_queue_blocked || this.block_event_handling());
     });
 
     this.conversations_archived = ko.observableArray([]);
@@ -282,7 +288,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         return this._add_events_to_conversation(events, conversation_et);
       })
-      .then(function(mapped_messages) {
+      .then((mapped_messages) => {
         conversation_et.is_pending(false);
         return mapped_messages;
       });
@@ -308,7 +314,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     .then(([older_events, newer_events]) => {
       return this._add_events_to_conversation(older_events.concat(newer_events), conversation_et);
     })
-    .then(function(mapped_messages) {
+    .then((mapped_messages) => {
       conversation_et.is_pending(false);
       return mapped_messages;
     });
@@ -327,10 +333,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
     conversation_et.is_pending(true);
 
     return this.conversation_service.load_subsequent_events_from_db(conversation_et.id, message_date, z.config.MESSAGES_FETCH_LIMIT, include_message)
-      .then((events) => {
-        return this._add_events_to_conversation(events, conversation_et);
-      })
-      .then(function(mapped_messages) {
+      .then((events) => this._add_events_to_conversation(events, conversation_et))
+      .then((mapped_messages) => {
         conversation_et.is_pending(false);
         return mapped_messages;
       });
@@ -446,9 +450,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const user_ids = _.flatten(conversation_ets.map((conversation_et) => conversation_et.participating_user_ids()));
 
     this.user_repository.get_users_by_id(user_ids)
-      .then(() => {
-        conversation_ets.forEach((conversation_et) => this._fetch_users_and_events(conversation_et));
-      });
+      .then(() => conversation_ets.forEach((conversation_et) => this._fetch_users_and_events(conversation_et)));
   }
 
 
@@ -501,9 +503,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   get_all_users_in_conversation(conversation_id) {
     return this.get_conversation_by_id_async(conversation_id)
-      .then((conversation_et) => {
-        return [this.user_repository.self()].concat(conversation_et.participating_user_ets());
-      });
+      .then((conversation_et) => [this.user_repository.self()].concat(conversation_et.participating_user_ets()));
   }
 
   /**
@@ -786,11 +786,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   mark_as_read(conversation_et) {
-    if (this.block_event_handling || conversation_et === undefined) {
-      return;
-    }
-
-    if (conversation_et.unread_event_count() === 0) {
+    if (this.block_event_handling() || !conversation_et || conversation_et.unread_event_count() === 0) {
       return;
     }
 
@@ -849,10 +845,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
   set_notification_handling_state(handling_state) {
     const updated_handling_state = handling_state !== z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
-    if (this.block_event_handling !== updated_handling_state) {
-      this.block_event_handling = updated_handling_state;
-      this.sending_queue.pause(this.block_event_handling);
-      this.logger.info(`Block handling of conversation events: ${this.block_event_handling}`);
+    if (this.block_event_handling() !== updated_handling_state) {
+      this.block_event_handling(updated_handling_state);
+      this.sending_queue.pause(this.block_event_handling());
+      this.logger.info(`Block handling of conversation events: ${this.block_event_handling()}`);
     }
   }
 
@@ -871,7 +867,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return conversation_et;
       });
   }
-
 
   //##############################################################################
   // Send events
@@ -1201,7 +1196,18 @@ z.conversation.ConversationRepository = class ConversationRepository {
         this._on_member_update(conversation_et, {data: payload});
         this.logger.info(`Unarchived conversation '${conversation_et.id}' on '${payload.otr_archived_ref}'`);
       });
+  }
 
+  _check_changed_conversations() {
+    Object
+      .entries(this.conversations_with_new_events)
+      .forEach(([conversation_id, conversation_et]) => {
+        if (conversation_et.should_unarchive()) {
+          this.unarchive_conversation(conversation_et);
+        }
+      });
+
+    this.conversations_with_new_events = {};
   }
 
   /**
@@ -2387,27 +2393,34 @@ z.conversation.ConversationRepository = class ConversationRepository {
             return this._on_add_event(conversation_et, event_json);
         }
       })
-      .then((return_value) => {
-        if (_.isObject(return_value)) {
-          const {conversation_et, message_et} = return_value;
+      .then((return_value = {}) => {
+        const {conversation_et, message_et} = return_value;
 
-          const event_from_stream = source === z.event.EventRepository.SOURCE.STREAM;
-          if (message_et && !event_from_stream && !this.block_event_handling) {
-            amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et);
-          }
-
+        if (conversation_et) {
           const event_from_web_socket = source === z.event.EventRepository.SOURCE.WEB_SOCKET;
-          if (conversation_et && event_from_web_socket) {
-            // Un-archive it also on the backend side
-            if (previously_archived && !conversation_et.is_archived()) {
-              this.logger.info(`Un-archiving conversation '${conversation_et.id}' with new event`);
-              this.unarchive_conversation(conversation_et);
+          const event_from_stream = source === z.event.EventRepository.SOURCE.STREAM;
+
+          if (message_et) {
+            const is_remote_event = event_from_stream || event_from_web_socket;
+
+            if (is_remote_event) {
+              this.send_confirmation_status(conversation_et, message_et);
+            }
+
+            if (!event_from_stream) {
+              amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et);
             }
           }
 
-          const is_remote_event = event_from_stream || event_from_web_socket;
-          if (conversation_et && message_et && is_remote_event) {
-            this.send_confirmation_status(conversation_et, message_et);
+          // Check if event needs to be un-archived
+          if (previously_archived) {
+            // Add to check for unarchive at the end of stream handling
+            if (event_from_stream) {
+              this.conversations_with_new_events[conversation_et.id] = conversation_et;
+            } else if (event_from_web_socket && conversation_et.should_unarchive()) {
+              this.logger.info(`Un-archiving conversation '${conversation_et.id}' with new event`);
+              return this.unarchive_conversation(conversation_et);
+            }
           }
         }
       });
