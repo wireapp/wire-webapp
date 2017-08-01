@@ -1430,9 +1430,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.sending_queue.push(() => {
       const recipients_promise = recipients ? Promise.resolve(recipients) : this.create_recipients(conversation_et.id, false);
 
-      return recipients_promise.then((_recipients) => {
-        return this._send_generic_message(conversation_et.id, generic_message, _recipients, precondition_option);
-      });
+      return recipients_promise
+        .then((_recipients) => this._send_generic_message(conversation_et.id, generic_message, _recipients, precondition_option));
     })
     .then(() => {
       const initiating_call_message = [
@@ -1443,6 +1442,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
       if (initiating_call_message.includes(call_message_et.type)) {
         return this._track_completed_media_action(conversation_et, generic_message, call_message_et);
       }
+    })
+    .catch((error) => {
+      if (error.type !== z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
+        throw error;
+      }
+
+      amplify.publish(z.event.WebApp.CALL.STATE.DELETE, conversation_et.id);
     });
   }
 
@@ -1978,47 +1984,42 @@ z.conversation.ConversationRepository = class ConversationRepository {
   grant_message(conversation_id, consent_type, user_ids) {
     return this.get_conversation_by_id_async(conversation_id)
       .then((conversation_et) => {
-        if (conversation_et.verification_state() === z.conversation.ConversationVerificationState.DEGRADED) {
-          return new Promise((resolve, reject) => {
-            let send_anyway = false;
+        const conversation_degraded = conversation_et.verification_state() === z.conversation.ConversationVerificationState.DEGRADED;
 
-            if (!user_ids) {
-              user_ids = conversation_et
-                .get_users_with_unverified_clients()
-                .map((user_et) => user_et.id);
-            }
-
-            return this.user_repository.get_users_by_id(user_ids)
-              .then(function(user_ets) {
-                amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.NEW_DEVICE, {
-                  action() {
-                    send_anyway = true;
-                    conversation_et.verification_state(z.conversation.ConversationVerificationState.UNVERIFIED);
-
-                    if (consent_type === z.ViewModel.MODAL_CONSENT_TYPE.INCOMING_CALL) {
-                      // todo Select proper media type
-                      amplify.publish(z.event.WebApp.CALL.STATE.JOIN, conversation_et.id);
-                    }
-
-                    resolve();
-                  },
-                  close() {
-                    if (!send_anyway) {
-                      if (consent_type === z.ViewModel.MODAL_CONSENT_TYPE.OUTGOING_CALL) {
-                        amplify.publish(z.event.WebApp.CALL.STATE.DELETE, conversation_et.id);
-                      }
-
-                      reject(new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION));
-                    }
-                  },
-                  data: {
-                    consent_type: consent_type,
-                    user_ets: user_ets,
-                  },
-                });
-              });
-          });
+        if (!conversation_degraded) {
+          return false;
         }
+
+        return new Promise((resolve, reject) => {
+          let send_anyway = false;
+
+          if (!user_ids) {
+            user_ids = conversation_et
+              .get_users_with_unverified_clients()
+              .map((user_et) => user_et.id);
+          }
+
+          return this.user_repository.get_users_by_id(user_ids)
+            .then((user_ets) => {
+              amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.NEW_DEVICE, {
+                action() {
+                  send_anyway = true;
+                  conversation_et.verification_state(z.conversation.ConversationVerificationState.UNVERIFIED);
+
+                  resolve(true);
+                },
+                close() {
+                  if (!send_anyway) {
+                    reject(new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION));
+                  }
+                },
+                data: {
+                  consent_type: consent_type,
+                  user_ets: user_ets,
+                },
+              });
+            });
+        });
       });
   }
 

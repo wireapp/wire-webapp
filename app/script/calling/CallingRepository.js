@@ -122,7 +122,7 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {undefined} No return value
    */
   subscribe_to_events() {
-    amplify.subscribe(z.event.WebApp.CALL.EVENT_FROM_BACKEND, this.on_event.bind(this));
+    amplify.subscribe(z.event.WebApp.CALL.EVENT_FROM_BACKEND, this.on_call_event.bind(this));
     amplify.subscribe(z.event.WebApp.CALL.MEDIA.TOGGLE, this.toggle_media.bind(this));
     amplify.subscribe(z.event.WebApp.CALL.STATE.DELETE, this.delete_call.bind(this));
     amplify.subscribe(z.event.WebApp.CALL.STATE.JOIN, this.join_call.bind(this));
@@ -147,7 +147,7 @@ z.calling.CallingRepository = class CallingRepository {
    * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
-  on_event(event, source) {
+  on_call_event(event, source) {
     const {content: event_content, time: event_date, type: event_type} = event;
     const is_call = event_type === z.event.Client.CALL.E_CALL;
 
@@ -161,9 +161,9 @@ z.calling.CallingRepository = class CallingRepository {
 
       this._log_message(false, call_message_et, event_date);
       if (z.calling.CallingRepository.supports_calling) {
-        return this._on_event_in_supported_browsers(call_message_et, source);
+        return this._on_call_event_in_supported_browsers(call_message_et, source);
       }
-      this._on_event_in_unsupported_browsers(call_message_et, source);
+      this._on_call_event_in_unsupported_browsers(call_message_et, source);
     }
   }
 
@@ -175,7 +175,7 @@ z.calling.CallingRepository = class CallingRepository {
    * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
-  _on_event_in_supported_browsers(call_message_et, source) {
+  _on_call_event_in_supported_browsers(call_message_et, source) {
     const {type: message_type} = call_message_et;
 
     this._validate_message_type(call_message_et)
@@ -225,7 +225,7 @@ z.calling.CallingRepository = class CallingRepository {
    * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
-  _on_event_in_unsupported_browsers(call_message_et, source) {
+  _on_call_event_in_unsupported_browsers(call_message_et, source) {
     const {conversation_id, response, type, user_id} = call_message_et;
 
     if (!response) {
@@ -288,24 +288,9 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {undefined} No return value
    */
   _on_group_check(call_message_et, source) {
-    const {conversation_id, user_id} = call_message_et;
-
-    this.get_call_by_id(conversation_id)
-      .then((call_et) => {
-        // @todo Grant message for ongoing call
-
-        call_et.schedule_group_check();
-      })
-      .catch((error) => {
-        this._throw_message_error(error);
-
-        if (user_id !== this.self_user_id()) {
-          this.conversation_repository.grant_message(conversation_id, z.ViewModel.MODAL_CONSENT_TYPE.INCOMING_CALL, [user_id])
-            .then(() => {
-              this._create_incoming_call(call_message_et, source, true);
-            });
-        }
-      });
+    this.get_call_by_id(call_message_et.conversation_id)
+      .then((call_et) => call_et.schedule_group_check())
+      .catch((error) => this._validate_incoming_call(call_message_et, source, error));
   }
 
   /**
@@ -368,7 +353,7 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {undefined} No return value
    */
   _on_group_start(call_message_et, source) {
-    const {conversation_id, response, user_id} = call_message_et;
+    const {conversation_id, user_id} = call_message_et;
 
     this.get_call_by_id(conversation_id)
       .then((call_et) => {
@@ -388,15 +373,7 @@ z.calling.CallingRepository = class CallingRepository {
         // Add the correct participant, start negotiating
         call_et.add_or_update_participant(user_id, call_et.self_client_joined(), call_message_et);
       })
-      .catch((error) => {
-        this._throw_message_error(error);
-
-        const is_self_user = user_id === this.self_user_id();
-        if (!response && !is_self_user) {
-          this.conversation_repository.grant_message(conversation_id, z.ViewModel.MODAL_CONSENT_TYPE.INCOMING_CALL, [user_id])
-            .then(() => this._create_incoming_call(call_message_et, source));
-        }
-      });
+      .catch((error) => this._validate_incoming_call(call_message_et, source, error));
   }
 
   /**
@@ -494,14 +471,7 @@ z.calling.CallingRepository = class CallingRepository {
             }
           });
       })
-      .catch((error) => {
-        this._throw_message_error(error);
-
-        if (!response && user_id !== this.self_user_id()) {
-          this.conversation_repository.grant_message(conversation_id, z.ViewModel.MODAL_CONSENT_TYPE.INCOMING_CALL, [user_id])
-            .then(() => this._create_incoming_call(call_message_et, source));
-        }
-      });
+      .catch((error) => this._validate_incoming_call(call_message_et, source, error));
   }
 
   /**
@@ -538,6 +508,47 @@ z.calling.CallingRepository = class CallingRepository {
 
     if (!expected_error_types.includes(error.type)) {
       throw error;
+    }
+  }
+
+  /**
+   * Verify validity of incoming call.
+   *
+   * @param {CallMessage} call_message_et - call message to validate
+   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @param {z.calling.CallError|Error} error - Error thrown during call message handling
+   * @returns {undefined} No return value
+   */
+  _validate_incoming_call(call_message_et, source, error) {
+    this._throw_message_error(error);
+
+    const {conversation_id, response, type, user_id} = call_message_et;
+
+    const is_group_check = type === z.calling.enum.CALL_MESSAGE_TYPE.GROUP_CHECK;
+    const is_self_user = user_id === this.self_user_id();
+    const valid_message = response !== is_group_check;
+
+    if (!is_self_user && valid_message) {
+      const event_from_stream = source === z.event.EventRepository.SOURCE.STREAM;
+      const silent_call = is_group_check || event_from_stream;
+      const promises = [this._create_incoming_call(call_message_et, source, silent_call)];
+
+      if (!event_from_stream) {
+        promises.push(this.conversation_repository.grant_message(conversation_id, z.ViewModel.MODAL_CONSENT_TYPE.INCOMING_CALL, [user_id]));
+      }
+
+      Promise.all(promises)
+        .then(([call_et, granted_call]) => {
+          if (granted_call) {
+            const media_type = call_et.is_remote_video_send() ? z.media.MediaType.AUDIO_VIDEO : z.media.MediaType.AUDIO;
+            this.join_call(conversation_id, media_type);
+          }
+        })
+        .catch((_error) => {
+          if (_error.type !== z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
+            throw _error;
+          }
+        });
     }
   }
 
@@ -1036,28 +1047,25 @@ z.calling.CallingRepository = class CallingRepository {
     const {conversation_id, props, user_id} = call_message_et;
 
     return this.user_repository.get_user_by_id(user_id)
-      .then((remote_user_et) => {
-        return this._create_call(call_message_et, remote_user_et)
-          .then((call_et) => {
-            this.logger.info(`Incoming '${this._get_media_type_from_properties(props)}' call in conversation '${call_et.conversation_et.display_name()}'`, call_et);
+      .then((remote_user_et) => this._create_call(call_message_et, remote_user_et))
+      .then((call_et) => {
+        this.logger.info(`Incoming '${this._get_media_type_from_properties(props)}' call in conversation '${call_et.conversation_et.display_name()}'`, call_et);
 
-            if (silent) {
-              call_et.state(z.calling.enum.CALL_STATE.REJECTED);
+        call_et.direction = z.calling.enum.CALL_STATE.INCOMING;
+        call_et.set_remote_version(call_message_et);
+        call_et.state(silent ? z.calling.enum.CALL_STATE.REJECTED : z.calling.enum.CALL_STATE.INCOMING);
 
-            } else {
-              call_et.state(z.calling.enum.CALL_STATE.INCOMING);
+        return call_et.add_or_update_participant(user_id, false, call_message_et)
+          .then(() => {
+            this.telemetry.track_event(z.tracking.EventName.CALLING.RECEIVED_CALL, call_et);
+            this.inject_activate_event(call_message_et, source);
+
+            const event_from_web_socket = source === z.event.EventRepository.SOURCE.WEB_SOCKET;
+            if (event_from_web_socket && call_et.is_remote_video_send()) {
+              this.media_stream_handler.initiate_media_stream(call_et.id, true);
             }
 
-            call_et.direction = z.calling.enum.CALL_STATE.INCOMING;
-            call_et.set_remote_version(call_message_et);
-            return call_et.add_or_update_participant(user_id, false, call_message_et)
-              .then(() => {
-                this.telemetry.track_event(z.tracking.EventName.CALLING.RECEIVED_CALL, call_et);
-                this.inject_activate_event(call_message_et, source);
-                if (call_et.is_remote_video_send() && source === z.event.EventRepository.SOURCE.WEB_SOCKET) {
-                  this.media_stream_handler.initiate_media_stream(call_et.id, true);
-                }
-              });
+            return call_et;
           });
       })
       .catch((error) => {
@@ -1084,9 +1092,10 @@ z.calling.CallingRepository = class CallingRepository {
         const media_type = this._get_media_type_from_properties(props);
         this.logger.info(`Outgoing '${media_type}' call in conversation '${call_et.conversation_et.display_name()}'`, call_et);
 
-        call_et.state(z.calling.enum.CALL_STATE.OUTGOING);
         call_et.direction = z.calling.enum.CALL_STATE.OUTGOING;
-        this.telemetry.set_media_type(media_type === z.media.MediaType.VIDEO);
+        call_et.state(z.calling.enum.CALL_STATE.OUTGOING);
+
+        this.telemetry.set_media_type(media_type);
         this.telemetry.track_event(z.tracking.EventName.CALLING.INITIATED_CALL, call_et);
         return call_et;
       });
