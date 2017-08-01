@@ -1457,8 +1457,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           generic_message = this._wrap_in_ephemeral_message(generic_message, conversation_et.ephemeral_timer());
         }
 
-        return this._send_and_inject_generic_message(conversation_et, generic_message)
-          .then(() => this._track_completed_media_action(conversation_et, generic_message));
+        return this._send_and_inject_generic_message(conversation_et, generic_message);
       })
       .catch((error) => {
         this.logger.error(`Failed to upload otr asset for conversation ${conversation_et.id}: ${error.message}`, error);
@@ -1798,30 +1797,28 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const optimistic_event = this._construct_otr_event(conversation_et.id, z.event.Backend.CONVERSATION.MESSAGE_ADD);
         return this.cryptography_repository.cryptography_mapper.map_generic_message(generic_message, optimistic_event);
       })
-      .then((mapped_event) => {
-        if (z.event.EventTypeHandling.STORE.includes(mapped_event.type)) {
-          return this.conversation_service.save_event(mapped_event);
+      .then((message_mapped) => {
+        if (z.event.EventTypeHandling.STORE.includes(message_mapped.type)) {
+          return this.conversation_service.save_event(message_mapped);
         }
 
-        return mapped_event;
+        return message_mapped;
       })
-      .then((saved_event) => {
+      .then((message_stored) => {
         if (generic_message.content === z.cryptography.GENERIC_MESSAGE_TYPE.KNOCK) {
           amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.OUTGOING_PING);
         }
 
-        this.on_conversation_event(saved_event, z.event.EventRepository.SOURCE.INJECTED);
+        this.on_conversation_event(message_stored, z.event.EventRepository.SOURCE.INJECTED);
 
         return this.send_generic_message_to_conversation(conversation_et.id, generic_message)
           .then((payload) => {
-            if (z.event.EventTypeHandling.STORE.includes(saved_event.type)) {
-              const backend_timestamp = sync_timestamp ? payload.time : undefined;
-              this._update_message_sent_status(conversation_et, saved_event.id, backend_timestamp);
-            }
+            this._track_completed_media_action(conversation_et, generic_message);
 
-            return this._track_completed_media_action(conversation_et, generic_message);
+            const backend_timestamp = sync_timestamp ? payload.time : undefined;
+            return this._update_message_as_sent(conversation_et, message_stored, backend_timestamp);
           })
-          .then(() => saved_event);
+          .then(() => message_stored);
       });
   }
 
@@ -1829,12 +1826,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Update message as sent in db and view.
    *
    * @param {Conversation} conversation_et - Conversation entity
-   * @param {string} message_id - ID of message
+   * @param {z.entity.Message} message - Message
    * @param {number} event_time - If defined it will update event timestamp
    * @returns {Promise} Resolves when sent status was updated
    */
-  _update_message_sent_status(conversation_et, message_id, event_time) {
-    return this.get_message_in_conversation_by_id(conversation_et, message_id)
+  _update_message_as_sent(conversation_et, message, event_time) {
+    return this.get_message_in_conversation_by_id(conversation_et, message.id)
       .then((message_et) => {
         const changes = {
           status: z.message.StatusType.SENT,
@@ -1846,7 +1843,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
           changes.time = event_time;
         }
 
-        return this.conversation_service.update_message_in_db(message_et, changes);
+        if (z.event.EventTypeHandling.STORE.includes(message_et.type) || message_et.has_asset_image()) {
+          return this.conversation_service.update_message_in_db(message_et, changes);
+        }
       });
   }
 
