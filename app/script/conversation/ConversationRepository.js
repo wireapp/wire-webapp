@@ -3292,7 +3292,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     return this.get_message_in_conversation_by_id(conversation_et, event_data.replacing_message_id)
       .then((original_message_et) => {
-        if (from !== original_message_et.from) {
+        const from_original_user = from === original_message_et.from;
+        if (!from_original_user) {
           throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_USER);
         }
 
@@ -3318,12 +3319,18 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves with the updated event_json
    */
   _update_link_preview(conversation_et, event_json) {
-    return this.get_message_in_conversation_by_id(conversation_et, event_json.id)
-      .then((original_message_et) => {
-        const first_asset = original_message_et.get_first_asset();
+    const {from, id} = event_json;
 
+    return this.get_message_in_conversation_by_id(conversation_et, id)
+      .then((original_message_et) => {
+        const from_original_user = from === original_message_et.from;
+        if (!from_original_user) {
+          throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_USER);
+        }
+
+        const first_asset = original_message_et.get_first_asset();
         if (first_asset.previews().length) {
-          this.logger.warn(`Ignored link preview for message with ID '${event_json}' already it previously contained preview`);
+          this.logger.warn(`Ignored link preview for message with ID '${id}' already it previously contained preview`, event_json);
           this._delete_message(conversation_et, event_json);
           throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND);
         }
