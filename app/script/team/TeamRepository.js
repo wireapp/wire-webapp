@@ -48,6 +48,7 @@ z.team.TeamRepository = class TeamRepository {
     this.team_users = ko.pureComputed(() => {
       return this.team_members()
         .concat(this.user_repository.connected_users())
+        .filter((item, index, array) => array.indexOf(item) === index)
         .sort((user_a, user_b) => z.util.StringUtil.sort_by_priority(user_a.first_name(), user_b.first_name()));
     });
 
