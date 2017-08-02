@@ -2659,11 +2659,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
   _on_message_add(conversation_et, event_json, source) {
     return Promise.resolve()
       .then(() => {
-        if (event_json.data.previews.length) {
+        const event_data = event_json.data;
+
+        if (event_data.previews.length) {
           return this._update_link_preview(conversation_et, event_json);
         }
 
-        if (event_json.data.replacing_message_id) {
+        if (event_data.replacing_message_id) {
           return this._update_edited_message(conversation_et, event_json);
         }
 

@@ -541,11 +541,19 @@ z.event.EventRepository = class EventRepository {
         if (z.event.EventTypeHandling.STORE.includes(mapped_event.type)) {
           return this.conversation_service.load_event_from_db(conversation_id, mapped_event.id)
             .then((stored_event) => {
-              if (stored_event && stored_event.from !== mapped_event.from) {
-                this.logger.warn(`Ignored event from user '${mapped_event.from}' with ID '${mapped_event.id}' previously used by '${stored_event.from}'`, event);
-                throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.PREVIOUSLY_STORED);
-              }
+              if (stored_event) {
+                const {data: event_data, from, type} = mapped_event;
+                const from_same_user = stored_event.from === from;
+                const is_message_add = type === z.event.Backend.CONVERSATION.MESSAGE_ADD;
 
+                if (!from_same_user) {
+                  this.logger.warn(`Ignored event from user '${mapped_event.from}' with ID '${mapped_event.id}' previously used by '${stored_event.from}'`, mapped_event);
+                  throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.PREVIOUSLY_STORED);
+                } else if (is_message_add && !event_data.previews.length) {
+                  this.logger.warn(`Ignored event from user '${mapped_event.from}' with previously used ID '${mapped_event.id}'`, mapped_event);
+                  throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.PREVIOUSLY_STORED);
+                }
+              }
               return this.conversation_service.save_event(mapped_event);
             });
         }
