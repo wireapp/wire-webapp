@@ -1821,8 +1821,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
           .then((payload) => {
             this._track_completed_media_action(conversation_et, generic_message);
 
-            const backend_timestamp = sync_timestamp ? payload.time : undefined;
-            return this._update_message_as_sent(conversation_et, message_stored, backend_timestamp);
+            if (z.event.EventTypeHandling.STORE.includes(message_et.type) || message_et.has_asset_image()) {
+              const backend_timestamp = sync_timestamp ? payload.time : undefined;
+              return this._update_message_as_sent(conversation_et, message_stored, backend_timestamp);
+            }
           })
           .then(() => message_stored);
       });
@@ -1849,9 +1851,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           changes.time = event_time;
         }
 
-        if (z.event.EventTypeHandling.STORE.includes(message_et.type) || message_et.has_asset_image()) {
-          return this.conversation_service.update_message_in_db(message_et, changes);
-        }
+        return this.conversation_service.update_message_in_db(message_et, changes);
       });
   }
 
