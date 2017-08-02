@@ -1837,7 +1837,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when sent status was updated
    */
   _update_message_as_sent(conversation_et, message, event_time) {
-    if (z.event.EventTypeHandling.STORE.includes(message_et.type) || message_et.has_asset_image()) {
+    if (z.event.EventTypeHandling.STORE.includes(message.type) || message.has_asset_image()) {
       return this.get_message_in_conversation_by_id(conversation_et, message.id)
         .then((message_et) => {
           const changes = {
