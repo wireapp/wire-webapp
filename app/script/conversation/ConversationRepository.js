@@ -1832,27 +1832,32 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Update message as sent in db and view.
    *
    * @param {Conversation} conversation_et - Conversation entity
-   * @param {z.entity.Message} message - Message
+   * @param {Object} event_json - Event object
    * @param {number} event_time - If defined it will update event timestamp
    * @returns {Promise} Resolves when sent status was updated
    */
-  _update_message_as_sent(conversation_et, message, event_time) {
-    if (z.event.EventTypeHandling.STORE.includes(message.type) || message.has_asset_image()) {
-      return this.get_message_in_conversation_by_id(conversation_et, message.id)
-        .then((message_et) => {
-          const changes = {
-            status: z.message.StatusType.SENT,
-          };
-          message_et.status(z.message.StatusType.SENT);
+  _update_message_as_sent(conversation_et, event_json, event_time) {
+    return this.get_message_in_conversation_by_id(conversation_et, event_json.id)
+      .then((message_et) => {
+        const changes = {
+          status: z.message.StatusType.SENT,
+        };
+        message_et.status(z.message.StatusType.SENT);
 
-          if (event_time) {
-            message_et.timestamp(new Date(event_time).getTime());
-            changes.time = event_time;
-          }
+        if (event_time) {
+          message_et.timestamp(new Date(event_time).getTime());
+          changes.time = event_time;
+        }
 
+        if (z.event.EventTypeHandling.STORE.includes(message_et.type) || message_et.has_asset_image()) {
           return this.conversation_service.update_message_in_db(message_et, changes);
-        });
-    }
+        }
+      })
+      .catch((error) => {
+        if (error.type !== z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
+          throw error;
+        }
+      });
   }
 
   /**
