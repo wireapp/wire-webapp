@@ -1821,10 +1821,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
           .then((payload) => {
             this._track_completed_media_action(conversation_et, generic_message);
 
-            if (z.event.EventTypeHandling.STORE.includes(message_et.type) || message_et.has_asset_image()) {
-              const backend_timestamp = sync_timestamp ? payload.time : undefined;
-              return this._update_message_as_sent(conversation_et, message_stored, backend_timestamp);
-            }
+            const backend_timestamp = sync_timestamp ? payload.time : undefined;
+            return this._update_message_as_sent(conversation_et, message_stored, backend_timestamp);
           })
           .then(() => message_stored);
       });
@@ -1839,20 +1837,22 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when sent status was updated
    */
   _update_message_as_sent(conversation_et, message, event_time) {
-    return this.get_message_in_conversation_by_id(conversation_et, message.id)
-      .then((message_et) => {
-        const changes = {
-          status: z.message.StatusType.SENT,
-        };
-        message_et.status(z.message.StatusType.SENT);
+    if (z.event.EventTypeHandling.STORE.includes(message_et.type) || message_et.has_asset_image()) {
+      return this.get_message_in_conversation_by_id(conversation_et, message.id)
+        .then((message_et) => {
+          const changes = {
+            status: z.message.StatusType.SENT,
+          };
+          message_et.status(z.message.StatusType.SENT);
 
-        if (event_time) {
-          message_et.timestamp(new Date(event_time).getTime());
-          changes.time = event_time;
-        }
+          if (event_time) {
+            message_et.timestamp(new Date(event_time).getTime());
+            changes.time = event_time;
+          }
 
-        return this.conversation_service.update_message_in_db(message_et, changes);
-      });
+          return this.conversation_service.update_message_in_db(message_et, changes);
+        });
+    }
   }
 
   /**
