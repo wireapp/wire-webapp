@@ -941,12 +941,14 @@ z.calling.CallingRepository = class CallingRepository {
    */
   toggle_state(media_type, conversation_et = this.conversation_repository.active_conversation()) {
     if (conversation_et) {
-      if (conversation_et.is_group() && media_type === z.media.MediaType.AUDIO_VIDEO) {
+      if (conversation_et.id === this._self_client_on_a_call()) {
+        return this.leave_call(conversation_et.id);
+      }
+
+      const is_video_call = media_type === z.media.MediaType.AUDIO_VIDEO;
+      if (conversation_et.is_group() && is_video_call) {
         amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALL_NO_VIDEO_IN_GROUP);
       } else {
-        if (conversation_et.id === this._self_client_on_a_call()) {
-          return this.leave_call(conversation_et.id);
-        }
         this.join_call(conversation_et.id, media_type);
       }
     }
