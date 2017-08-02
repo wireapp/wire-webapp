@@ -17,7 +17,7 @@
     "normalize-css": "https://github.com/necolas/normalize.css.git#3.0.3",
     "pako": "https://github.com/nodeca/pako.git#1.0.5",
     "phone-format": "https://github.com/albeebe/phoneformat.js.git#1.0.5",
-    "platform.js": "https://github.com/bestiejs/platform.js.git#1.3.3",
+    "platform.js": "https://github.com/bestiejs/platform.js.git#1.3.4",
     "poster-image": "https://github.com/herrmannplatz/poster-image.git#1.1.1",
     "protobuf": "https://github.com/gregor/protobuf.js.git#32ada41d3c963bd5f43d7cdadced2d6d2ccd082a",
     "raygun4js": "https://github.com/MindscapeHQ/raygun4js.git#2.5.3",
