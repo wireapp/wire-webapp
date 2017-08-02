@@ -517,7 +517,7 @@ z.event.EventRepository = class EventRepository {
    * @returns {Promise} Resolves with the saved record or boolean true if the event was skipped
    */
   _handle_event(event, source) {
-    const {time: event_date, type: event_type} = event;
+    const {conversation: conversation_id, time: event_date, type: event_type} = event;
     if (z.event.EventTypeHandling.IGNORE.includes(event_type)) {
       this.logger.info(`Event ignored: '${event_type}'`, {event_json: JSON.stringify(event), event_object: event});
       return Promise.resolve(true);
@@ -539,8 +539,17 @@ z.event.EventRepository = class EventRepository {
       })
       .then((mapped_event) => {
         if (z.event.EventTypeHandling.STORE.includes(mapped_event.type)) {
-          return this.conversation_service.save_event(mapped_event);
+          return this.conversation_service.load_event_from_db(conversation_id, mapped_event.id)
+            .then((stored_event) => {
+              if (stored_event && stored_event.from !== mapped_event.from) {
+                this.logger.warn(`Ignored event from user '${mapped_event.from}' with ID '${mapped_event.id}' previously used by '${stored_event.from}'`, event);
+                throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.PREVIOUSLY_STORED);
+              }
+
+              return this.conversation_service.save_event(mapped_event);
+            });
         }
+
         return mapped_event;
       })
       .then((saved_event) => {
