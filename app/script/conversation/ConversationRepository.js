@@ -2381,7 +2381,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           case z.event.Backend.CONVERSATION.MEMBER_UPDATE:
             return this._on_member_update(conversation_et, event_json);
           case z.event.Backend.CONVERSATION.MESSAGE_ADD:
-            return this._on_message_add(conversation_et, event_json, source);
+            return this._on_message_add(conversation_et, event_json);
           case z.event.Backend.CONVERSATION.ASSET_ADD:
             return this._on_asset_add(conversation_et, event_json);
           case z.event.Backend.CONVERSATION.RENAME:
@@ -2653,20 +2653,19 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @private
    * @param {Conversation} conversation_et - Conversation to add the event to
    * @param {Object} event_json - JSON data of 'conversation.message-add'
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {Promise} Resolves when the event was handled
    */
-  _on_message_add(conversation_et, event_json, source) {
+  _on_message_add(conversation_et, event_json) {
     return Promise.resolve()
       .then(() => {
         const event_data = event_json.data;
 
-        if (event_data.previews.length) {
-          return this._update_link_preview(conversation_et, event_json);
-        }
-
         if (event_data.replacing_message_id) {
           return this._update_edited_message(conversation_et, event_json);
+        }
+
+        if (event_data.previews.length) {
+          return this._update_link_preview(conversation_et, event_json);
         }
 
         return event_json;
@@ -3323,11 +3322,15 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then((original_message_et) => {
         const first_asset = original_message_et.get_first_asset();
 
-        if (!first_asset.previews().length) {
-          return this._delete_message(conversation_et, original_message_et);
+        if (first_asset.previews().length) {
+          this.logger.warn(`Ignored link preview for message with ID '${event_json}' already it previously contained preview`);
+          this._delete_message(conversation_et, event_json);
+          throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND);
         }
-      })
-      .then(() => event_json);
+
+        this._delete_message(conversation_et, original_message_et);
+        return event_json;
+      });
   }
 
 
