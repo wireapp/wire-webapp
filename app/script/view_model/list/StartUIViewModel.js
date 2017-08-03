@@ -207,7 +207,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     return promise
       .then((_conversation_et) => {
         if (_conversation_et.is_archived()) {
-          this.conversation_repository.unarchive_conversation(_conversation_et);
+          this.conversation_repository.unarchive_conversation(_conversation_et, 'opened conversation from search');
         }
 
         if (_conversation_et.is_cleared()) {
