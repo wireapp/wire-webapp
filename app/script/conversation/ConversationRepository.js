@@ -2383,7 +2383,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           case z.event.Backend.CONVERSATION.MEMBER_UPDATE:
             return this._on_member_update(conversation_et, event_json);
           case z.event.Backend.CONVERSATION.MESSAGE_ADD:
-            return this._on_message_add(conversation_et, event_json, source);
+            return this._on_message_add(conversation_et, event_json);
           case z.event.Backend.CONVERSATION.ASSET_ADD:
             return this._on_asset_add(conversation_et, event_json);
           case z.event.Backend.CONVERSATION.RENAME:
@@ -2655,26 +2655,19 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @private
    * @param {Conversation} conversation_et - Conversation to add the event to
    * @param {Object} event_json - JSON data of 'conversation.message-add'
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {Promise} Resolves when the event was handled
    */
-  _on_message_add(conversation_et, event_json, source) {
+  _on_message_add(conversation_et, event_json) {
     return Promise.resolve()
       .then(() => {
-        if (event_json.data.previews.length) {
-          return this._update_link_preview(conversation_et, event_json);
-        }
+        const event_data = event_json.data;
 
-        if (event_json.data.replacing_message_id) {
+        if (event_data.replacing_message_id) {
           return this._update_edited_message(conversation_et, event_json);
         }
 
-        const remote_sources = [
-          z.event.EventRepository.SOURCE.STREAM,
-          z.event.EventRepository.SOURCE.WEB_SOCKET,
-        ];
-        if (remote_sources.includes(remote_sources)) {
-          return this._check_message_duplicate(conversation_et, event_json);
+        if (event_data.previews.length) {
+          return this._update_link_preview(conversation_et, event_json);
         }
 
         return event_json;
@@ -3288,21 +3281,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.conversation_service.update_asset_preview_in_db(message_et.primary_key, asset_data);
   }
 
-  _check_message_duplicate(conversation_et, event_json) {
-    return this.get_message_in_conversation_by_id(conversation_et, event_json.id)
-      .then((original_message_et) => {
-        const from_same_user = event_json.from === original_message_et.from;
-        if (!from_same_user) {
-          return event_json;
-        }
-      })
-      .catch((error) => {
-        if (error.type !== z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
-          throw error;
-        }
-      });
-  }
-
   /**
    * Update edited message with timestamp from the original message and delete original.
    *
@@ -3316,7 +3294,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     return this.get_message_in_conversation_by_id(conversation_et, event_data.replacing_message_id)
       .then((original_message_et) => {
-        if (from !== original_message_et.from) {
+        const from_original_user = from === original_message_et.from;
+        if (!from_original_user) {
           throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_USER);
         }
 
@@ -3342,15 +3321,25 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves with the updated event_json
    */
   _update_link_preview(conversation_et, event_json) {
-    return this.get_message_in_conversation_by_id(conversation_et, event_json.id)
-      .then((original_message_et) => {
-        const first_asset = original_message_et.get_first_asset();
+    const {from, id} = event_json;
 
-        if (!first_asset.previews().length) {
-          return this._delete_message(conversation_et, original_message_et);
+    return this.get_message_in_conversation_by_id(conversation_et, id)
+      .then((original_message_et) => {
+        const from_original_user = from === original_message_et.from;
+        if (!from_original_user) {
+          throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_USER);
         }
-      })
-      .then(() => event_json);
+
+        const first_asset = original_message_et.get_first_asset();
+        if (first_asset.previews().length) {
+          this.logger.warn(`Ignored link preview for message with ID '${id}' already it previously contained preview`, event_json);
+          this._delete_message(conversation_et, event_json);
+          throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND);
+        }
+
+        this._delete_message(conversation_et, original_message_et);
+        return event_json;
+      });
   }
 
 

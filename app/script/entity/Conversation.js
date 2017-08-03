@@ -327,7 +327,7 @@ z.entity.Conversation = class Conversation {
   add_message(message_et) {
     amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, message_et);
     this._update_last_read_from_message(message_et);
-    message_et = this._check_for_duplicate(message_et, this.get_last_message());
+    message_et = this._check_for_duplicate(message_et);
     if (message_et) {
       this.messages_unordered.push(message_et);
     }
@@ -340,10 +340,7 @@ z.entity.Conversation = class Conversation {
    */
   add_messages(message_ets) {
     message_ets = message_ets
-      .map((message_et, index) => {
-        const previous_message = message_ets[index - 1] || this.get_last_message();
-        return this._check_for_duplicate(message_et, previous_message);
-      })
+      .map((message_et) => this._check_for_duplicate(message_et))
       .filter((message_et) => message_et);
 
     // in order to avoid multiple db writes check the messages from the end and stop once
@@ -365,11 +362,8 @@ z.entity.Conversation = class Conversation {
    * @returns {undefined} No return value
    */
   prepend_messages(message_ets) {
-    const last_message_et = message_ets[message_ets.length - 1];
-    message_ets[message_ets.length - 1] = this._check_for_duplicate(last_message_et, this.get_first_message());
-
     message_ets = message_ets
-      .map((message_et, index) => this._check_for_duplicate(message_et, message_ets[index - 1]))
+      .map((message_et) => this._check_for_duplicate(message_et))
       .filter((message_et) => message_et);
 
     z.util.ko_array_unshift_all(this.messages_unordered, message_ets);
@@ -421,46 +415,14 @@ z.entity.Conversation = class Conversation {
    *
    * @private
    * @param {z.entity.Message} message_et - Message entity to be added to the conversation
-   * @param {z.entity.Message} other_message_et - Other message entity to compare with
    * @returns {z.entity.Message|undefined} Message if it is not a duplicate
    */
-  _check_for_duplicate(message_et, other_message_et) {
+  _check_for_duplicate(message_et) {
     if (message_et) {
       for (const existing_message_et of this.messages_unordered()) {
         if (message_et.id && existing_message_et.id === message_et.id && existing_message_et.from === message_et.from) {
           return undefined;
         }
-      }
-
-      const messages_have_nonces = other_message_et && message_et.has_nonce() && other_message_et.has_nonce();
-      if (messages_have_nonces) {
-        message_et = this._check_for_duplicate_nonce(message_et, other_message_et);
-      }
-    }
-
-    return message_et;
-  }
-  /**
-   * Checks for message duplicates by nonce.
-   *
-   * @private
-   * @param {z.entity.Message} message_et - Message entity to be added to the conversation
-   * @param {z.entity.Message} other_message_et - Other message entity to compare with
-   * @returns {z.entity.Message} Message to be added
-   */
-  _check_for_duplicate_nonce(message_et, other_message_et) {
-    if (message_et.nonce === other_message_et.nonce) {
-      const [older_message_et, newer_message_et] = z.entity.Message.sort_by_timestamp([message_et, other_message_et]);
-
-      const message_is_asset_meta = message_et.type === z.event.Client.CONVERSATION.ASSET_META;
-      const other_message_is_asset_meta = other_message_et.type === z.event.Client.CONVERSATION.ASSET_META;
-      if (message_is_asset_meta && other_message_is_asset_meta) {
-        // android sends to meta messages with the same content. we would store both and but only update the first one
-        // whenever we reload the conversation the nonce check would hide the older one and we would show the non updated message
-        // to fix that we hide the newer one
-        newer_message_et.visible(false); // hide newer
-      } else {
-        older_message_et.visible(false); // hide older
       }
     }
 
