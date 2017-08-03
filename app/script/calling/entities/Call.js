@@ -883,11 +883,11 @@ z.calling.entities.Call = class Call {
 
   /**
    * Initiate the call telemetry.
-   * @param {boolean} [video_send=false] - Call with video
+   * @param {z.media.MediaType} [media_type=z.media.MediaType.AUDIO] - Media type for this call
    * @returns {undefined} No return value
    */
-  initiate_telemetry(video_send = false) {
-    this.telemetry.set_media_type(video_send);
+  initiate_telemetry(media_type = z.media.MediaType.AUDIO) {
+    this.telemetry.set_media_type(media_type);
     this.timings = new z.telemetry.calling.CallSetupTimings(this.id);
   }
 

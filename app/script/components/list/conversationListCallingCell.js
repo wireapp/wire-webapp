@@ -29,11 +29,11 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     this.is_selected = params.is_selected;
 
     this.on_accept_call = () => {
-      amplify.publish(z.event.WebApp.CALL.STATE.JOIN, this.conversation.id, false);
+      amplify.publish(z.event.WebApp.CALL.STATE.JOIN, this.conversation.id, z.media.MediaType.AUDIO);
     };
 
     this.on_accept_video = () => {
-      amplify.publish(z.event.WebApp.CALL.STATE.JOIN, this.conversation.id, true);
+      amplify.publish(z.event.WebApp.CALL.STATE.JOIN, this.conversation.id, z.media.MediaType.AUDIO_VIDEO);
     };
 
     this.on_leave_call = () => {
