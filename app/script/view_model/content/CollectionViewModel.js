@@ -99,12 +99,8 @@ z.ViewModel.content.CollectionViewModel = class CollectionViewModel {
       this.conversation_et(conversation_et);
 
       this.conversation_repository.get_events_for_category(conversation_et, z.message.MessageCategory.LINK_PREVIEW)
-        .then((message_ets) => {
-          return this._populate_items(message_ets);
-        })
-        .then(() => {
-          this._track_opened_collection(conversation_et, this.no_items_found());
-        });
+        .then((message_ets) => this._populate_items(message_ets))
+        .then(() => this._track_opened_collection(conversation_et, this.no_items_found()));
     }
   }
 

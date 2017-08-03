@@ -47,7 +47,6 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
     this.user_repository = user_repository;
     this.logger = new z.util.Logger('z.ViewModel.list.ConversationListViewModel', z.config.LOGGER.OPTIONS);
 
-    this.joined_call = this.calling_repository.joined_call;
     this.show_calls = ko.observable(false);
 
     this.content_state = this.content_view_model.content_state;
@@ -90,20 +89,6 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
     this.start_tooltip = z.l10n.text(z.string.tooltip_conversations_start, z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.START));
 
     this.show_connect_requests = ko.pureComputed(() => this.connect_requests().length);
-
-    this.self_stream_state = this.calling_repository.self_stream_state;
-
-    this.show_toggle_screen = ko.pureComputed(() => z.calling.CallingRepository.supports_screen_sharing);
-    this.show_toggle_video = ko.pureComputed(() => {
-      if (this.joined_call()) {
-        return this.joined_call().conversation_et.is_one2one();
-      }
-    });
-    this.disable_toggle_screen = ko.pureComputed(() => {
-      if (this.joined_call()) {
-        return this.joined_call().is_remote_screen_send();
-      }
-    });
 
     this.show_badge = ko.observable(false);
 
@@ -173,40 +158,6 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
   on_webapp_loaded() {
     this.webapp_is_loaded(true);
   }
-
-
-  //##############################################################################
-  // Call stuff
-  //##############################################################################
-
-  on_accept_call(conversation_et) {
-    amplify.publish(z.event.WebApp.CALL.STATE.JOIN, conversation_et.id, false);
-  }
-
-  on_accept_video(conversation_et) {
-    amplify.publish(z.event.WebApp.CALL.STATE.JOIN, conversation_et.id, true);
-  }
-
-  on_leave_call(conversation_et) {
-    amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, conversation_et.id, z.calling.enum.TERMINATION_REASON.SELF_USER);
-  }
-
-  on_reject_call(conversation_et) {
-    amplify.publish(z.event.WebApp.CALL.STATE.REJECT, conversation_et.id);
-  }
-
-  on_toggle_audio(conversation_et) {
-    amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, conversation_et.id, z.media.MediaType.AUDIO);
-  }
-
-  on_toggle_screen(conversation_et) {
-    amplify.publish(z.event.WebApp.CALL.MEDIA.CHOOSE_SCREEN, conversation_et.id);
-  }
-
-  on_toggle_video(conversation_et) {
-    amplify.publish(z.event.WebApp.CALL.MEDIA.TOGGLE, conversation_et.id, z.media.MediaType.VIDEO);
-  }
-
 
   //##############################################################################
   // Footer actions
