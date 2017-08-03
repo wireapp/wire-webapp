@@ -126,6 +126,7 @@ z.string.call_decline = 'Decline';
 z.string.call_accept = 'Accept';
 z.string.call_join = 'Join';
 z.string.call_choose_shared_screen = 'Choose a screen to share';
+z.string.call_participants = '{{number}} on call';
 
 // Warnings
 z.string.modal_button_cancel = 'Cancel';
