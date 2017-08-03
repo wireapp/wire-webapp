@@ -65,7 +65,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.fetching_conversations = {};
     this.conversations_with_new_events = {};
     this.block_event_handling.subscribe((event_handling_state) => {
-      if (event_handling_state) {
+      if (!event_handling_state) {
         this._check_changed_conversations();
       }
     });
@@ -1172,10 +1172,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   /**
    * Un-archive a conversation.
+   *
    * @param {Conversation} conversation_et - Conversation to unarchive
+   * @param {string} trigger - Trigger for unarchive
    * @returns {Promise} Resolves when the conversation was unarchived
    */
-  unarchive_conversation(conversation_et) {
+  unarchive_conversation(conversation_et, trigger) {
     if (!conversation_et) {
       return Promise.reject(new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND));
     }
@@ -1185,6 +1187,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       otr_archived_ref: new Date(conversation_et.last_event_timestamp()).toISOString(),
     };
 
+    this.logger.info(`Unarchiving conversation '${conversation_et.id}' triggered by '${trigger}'`);
     return this.conversation_service.update_member_properties(conversation_et.id, payload)
       .catch((error) => {
         this.logger.error(`Conversation '${conversation_et.id}' could not be unarchived: ${error.code}`);
@@ -1203,7 +1206,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .entries(this.conversations_with_new_events)
       .forEach(([conversation_id, conversation_et]) => {
         if (conversation_et.should_unarchive()) {
-          this.unarchive_conversation(conversation_et);
+          this.unarchive_conversation(conversation_et, 'event from notification stream');
         }
       });
 
@@ -2421,10 +2424,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
           if (previously_archived) {
             // Add to check for unarchive at the end of stream handling
             if (event_from_stream) {
-              this.conversations_with_new_events[conversation_et.id] = conversation_et;
-            } else if (event_from_web_socket && conversation_et.should_unarchive()) {
-              this.logger.info(`Un-archiving conversation '${conversation_et.id}' with new event`);
-              return this.unarchive_conversation(conversation_et);
+              return this.conversations_with_new_events[conversation_et.id] = conversation_et;
+            }
+
+            if (event_from_web_socket && conversation_et.should_unarchive()) {
+              return this.unarchive_conversation(conversation_et, 'event from WebSocket');
             }
           }
         }
