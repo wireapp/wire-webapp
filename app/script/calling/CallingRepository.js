@@ -935,7 +935,7 @@ z.calling.CallingRepository = class CallingRepository {
   /**
    * User action to toggle the call state.
    *
-   * @param {boolean} media_type - Media type of call
+   * @param {z.media.MediaType} media_type - Media type of call
    * @param {Conversation} [conversation_et=this.conversation_repository.active_conversation()] - Conversation for which state will be toggled
    * @returns {undefined} No return value
    */
