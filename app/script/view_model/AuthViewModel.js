@@ -77,7 +77,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     this.disabled_by_animation = ko.observable(false);
 
     this.get_wire = ko.observable(false);
-    this.session_expired = ko.observable(false);
+    this.reason_info = ko.observable('');
+    this.reason_visible = ko.pureComputed(() => this.reason_info().length);
     this.device_reused = ko.observable(false);
 
     this.country_code = ko.observable('');
@@ -163,44 +164,28 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     this.accepted_terms_of_use = ko.observable(false);
     this.accepted_terms_of_use.subscribe(() => this.clear_error(z.auth.AuthView.TYPE.TERMS));
 
-    this.can_login_password = ko.pureComputed(() => {
-      return !this.disabled_by_animation();
-    });
-
+    this.can_login_password = ko.pureComputed(() => !this.disabled_by_animation());
     this.can_login_phone = ko.pureComputed(() => {
       return !this.disabled_by_animation() && (this.country_code().length > 1) && this.phone_number().length;
     });
-
     this.can_register = ko.pureComputed(() => {
       return !this.disabled_by_animation() && this.username().length && this.name().length && this.password().length && this.accepted_terms_of_use();
     });
-
     this.can_resend_code = ko.pureComputed(() => {
       return !this.disabled_by_animation() && (this.code_expiration_timestamp() < z.util.get_unix_timestamp());
     });
-
     this.can_resend_registration = ko.pureComputed(() => !this.disabled_by_animation() && this.username().length);
-
     this.can_resend_verification = ko.pureComputed(() => !this.disabled_by_animation() && this.username().length);
-
     this.can_verify_password = ko.pureComputed(() => !this.disabled_by_animation() && this.password().length);
 
-    this.account_retry_text = ko.pureComputed(() => {
-      return z.l10n.text(z.string.auth_posted_retry, this.username());
-    });
-
-    this.account_resend_text = ko.pureComputed(() => {
-      return z.l10n.text(z.string.auth_posted_resend, this.username());
-    });
-
+    this.account_retry_text = ko.pureComputed(() => z.l10n.text(z.string.auth_posted_retry, this.username()));
+    this.account_resend_text = ko.pureComputed(() => z.l10n.text(z.string.auth_posted_resend, this.username()));
     this.verify_code_text = ko.pureComputed(() => {
       const phone_number = PhoneFormat.formatNumberForMobileDialing('', this.phone_number_e164()) || this.phone_number_e164();
       return z.l10n.text(z.string.auth_verify_code_description, phone_number);
     });
 
-    this.verify_code_timer_text = ko.pureComputed(() => {
-      return z.l10n.text(z.string.auth_verify_code_resend_timer, this.code_expiration_in());
-    });
+    this.verify_code_timer_text = ko.pureComputed(() => z.l10n.text(z.string.auth_verify_code_resend_timer, this.code_expiration_in()));
 
     this.visible_section = ko.observable(undefined);
     this.visible_mode = ko.observable(undefined);
@@ -312,12 +297,21 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     if (invite_code) {
       this.get_wire(true);
       this.invite_code = invite_code;
-      return this.register_from_invite(invite_code);
+      return this._register_from_invite(invite_code);
     }
 
     const reason = z.util.get_url_parameter(z.auth.URLParameter.REASON);
-    if (reason && reason === z.auth.SIGN_OUT_REASON.SESSION_EXPIRED) {
-      this.session_expired(true);
+    switch (reason) {
+      case z.auth.SIGN_OUT_REASON.ACCOUNT_DELETED:
+        this.reason_info(z.l10n.text(z.string.auth_account_deletion));
+        break;
+      case z.auth.SIGN_OUT_REASON.ACCOUNT_REGISTRATION:
+        return this._login_from_teams();
+      case z.auth.SIGN_OUT_REASON.SESSION_EXPIRED:
+        this.reason_info(z.l10n.text(z.string.auth_account_expiration));
+        break;
+      default:
+        break;
     }
   }
 
@@ -434,7 +428,12 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
   // Invitation Stuff
   //##############################################################################
 
-  register_from_invite(invite_code) {
+  _login_from_teams() {
+    this.auth.repository.get_access_token()
+      .then(() => this._authentication_successful(true));
+  }
+
+  _register_from_invite(invite_code) {
     this.auth.repository.retrieve_invite(invite_code)
       .then((invite_info) => {
         this.registration_context = z.auth.AuthView.REGISTRATION_CONTEXT.PERSONAL_INVITE;
@@ -449,9 +448,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
           Raygun.send(new Error('Invitation not found'), {error: error, invite_code: invite_code});
         }
       })
-      .then(() => {
-        this._set_hash(z.auth.AuthView.MODE.ACCOUNT_REGISTER);
-      });
+      .then(() => this._set_hash(z.auth.AuthView.MODE.ACCOUNT_REGISTER));
   }
 
 
@@ -1074,12 +1071,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
   click_on_remove_device_submit(password, device) {
     this.client_repository.delete_client(device.id, password)
-      .then(() => {
-        return this._register_client();
-      })
-      .then(() => {
-        this.device_modal.toggle();
-      })
+      .then(() => this._register_client())
+      .then(() => this.device_modal.toggle())
       .catch((error) => {
         this.remove_form_error(true);
         this.logger.error(`Unable to replace device: ${error.message}`, error);
@@ -1973,15 +1966,14 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
    *
    * @note Gets the client and forwards the user to the login.
    * @private
+   * @param {boolean} [from_registration=false] - Redirected from team registration
    * @returns {undefined} No return value
    */
-  _authentication_successful() {
+  _authentication_successful(from_registration = false) {
     this.logger.info('Logging in');
 
     this._get_self_user()
-      .then(() => {
-        return this.client_repository.get_valid_local_client();
-      })
+      .then(() => this.client_repository.get_valid_local_client())
       .catch((error) => {
         if (error.type === z.user.UserError.TYPE.USER_MISSING_EMAIL) {
           throw error;
@@ -1993,9 +1985,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
           return this.storage_service.init(this.self_user().id);
         }
       })
-      .then(() => {
-        return this.cryptography_repository.init(this.storage_service.db);
-      })
+      .then(() => this.cryptography_repository.init(this.storage_service.db))
       .then(() => {
         if (this.client_repository.current_client()) {
           this.logger.info('Active client found. Redirecting to app...');
@@ -2003,7 +1993,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
         }
 
         this.logger.info('No active client found. We need to register one...');
-        this._register_client();
+        this._register_client(from_registration);
       })
       .catch((error) => {
         if (error.type !== z.user.UserError.TYPE.USER_MISSING_EMAIL) {
@@ -2061,7 +2051,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     window.location.replace(url);
   }
 
-  _register_client() {
+  _register_client(from_registration) {
     return this.client_repository.register_client(this.password())
       .then((client_observable) => {
         this.event_repository.current_client = client_observable;
@@ -2073,9 +2063,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
         }
         throw error;
       })
-      .then(() => {
-        return this.client_repository.get_clients_for_self();
-      })
+      .then(() => this.client_repository.get_clients_for_self())
       .then((client_ets) => {
         const number_of_clients = client_ets ? client_ets.length : 0;
         this.logger.info(`User has '${number_of_clients}' registered clients`, client_ets);
@@ -2103,6 +2091,10 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
           return window.location.hash = z.auth.AuthView.MODE.LIMIT;
         }
         this.logger.error(`Failed to register a new client: ${error.message}`, error);
+
+        if (from_registration) {
+          window.location.hash = z.auth.AuthView.MODE.ACCOUNT_LOGIN;
+        }
       });
   }
 

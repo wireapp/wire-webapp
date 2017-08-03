@@ -361,7 +361,7 @@ z.client.ClientRepository = class ClientRepository {
       label: device_label,
       lastkey: last_resort_key,
       model: device_model,
-      password,
+      password: password,
       prekeys: pre_keys,
       sigkeys: signaling_keys,
       type: client_type,

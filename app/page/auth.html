@@ -66,8 +66,8 @@
                   <li class="error" data-bind="text: message"></li>
                 <!-- /ko -->
               </ul>
-              <div class="expired-info" data-bind="visible: session_expired">
-                <div data-bind="l10n_text: z.string.auth_account_expiration" data-uie-name="status-expired"></div>
+              <div class="reason-info" data-bind="visible: reason_visible">
+                <div data-bind="l10n_text: reason_info" data-uie-name="status-expired"></div>
               </div>
               <div id="wire-login-password-remember" data-bind="electron_remove">
                 <div class="checkbox checkbox-remember">
