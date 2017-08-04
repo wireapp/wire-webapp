@@ -277,7 +277,7 @@ z.client.ClientRepository = class ClientRepository {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/registerClient
    *
    * @note Password is needed for the registration of a client once 1st client has been registered.
-   * @param {string} password - User password for verification
+   * @param {string|undefined} password - User password for verification
    * @returns {Promise<z.client.Client>} Resolve with the newly registered client
    */
   register_client(password) {
@@ -306,12 +306,8 @@ z.client.ClientRepository = class ClientRepository {
       this.logger.error(`Failed to save client: ${error.message}`, error);
       throw new z.client.ClientError(z.client.ClientError.TYPE.DATABASE_FAILURE);
     })
-    .then((client_payload) => {
-      return this._transfer_cookie_label(client_type, client_payload.cookie);
-    })
-    .then(() => {
-      return this.current_client;
-    })
+    .then((client_payload) => this._transfer_cookie_label(client_type, client_payload.cookie))
+    .then(() => this.current_client)
     .catch((error) => {
       this.logger.error(`Client registration failed: ${error.message}`, error);
       throw error;

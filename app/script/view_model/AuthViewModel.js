@@ -429,8 +429,17 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
   //##############################################################################
 
   _login_from_teams() {
+    this.pending_server_request(true);
+
+    z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.PERSIST, true);
+    z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.SHOW_LOGIN, true);
+
     this.auth.repository.get_access_token()
-      .then(() => this._authentication_successful(true));
+      .then(() => this._authentication_successful(true))
+      .catch((error) => {
+        this.pending_server_request(false);
+        throw error;
+      });
   }
 
   _register_from_invite(invite_code) {
@@ -1966,10 +1975,10 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
    *
    * @note Gets the client and forwards the user to the login.
    * @private
-   * @param {boolean} [from_registration=false] - Redirected from team registration
+   * @param {boolean} [team_registration=false] - Redirected from team registration
    * @returns {undefined} No return value
    */
-  _authentication_successful(from_registration = false) {
+  _authentication_successful(team_registration = false) {
     this.logger.info('Logging in');
 
     this._get_self_user()
@@ -1993,7 +2002,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
         }
 
         this.logger.info('No active client found. We need to register one...');
-        this._register_client(from_registration);
+        this._register_client(team_registration);
       })
       .catch((error) => {
         if (error.type !== z.user.UserError.TYPE.USER_MISSING_EMAIL) {
@@ -2051,8 +2060,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     window.location.replace(url);
   }
 
-  _register_client(from_registration) {
-    return this.client_repository.register_client(this.password())
+  _register_client(team_registration) {
+    return this.client_repository.register_client(team_registration ? undefined : this.password())
       .then((client_observable) => {
         this.event_repository.current_client = client_observable;
         return this.event_repository.initialize_stream_state(client_observable().id);
@@ -2092,7 +2101,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
         }
         this.logger.error(`Failed to register a new client: ${error.message}`, error);
 
-        if (from_registration) {
+        if (team_registration) {
           window.location.hash = z.auth.AuthView.MODE.ACCOUNT_LOGIN;
         }
       });
