@@ -90,22 +90,14 @@ z.entity.Conversation = class Conversation {
     this.muted_timestamp = ko.observable(0);
 
     // Conversation states for view
-    this.is_muted = ko.pureComputed(() => this.muted_state());
-
-    this.is_archived = ko.pureComputed(() => {
-      const archived = this.last_event_timestamp() <= this.archived_timestamp();
-      if (archived) {
-        return this.archived_state();
-      }
-      return this.archived_state() && this.muted_state();
-
-    });
-
+    this.is_archived = this.archived_state;
     this.is_cleared = ko.pureComputed(() => this.last_event_timestamp() <= this.cleared_timestamp());
-
+    this.is_muted = this.muted_state;
     this.is_verified = ko.pureComputed(() => {
-      const all_users = [this.self].concat(this.participating_user_ets());
-      return all_users.every((user_et) => user_et ? user_et.is_verified() : undefined);
+      if (this.self) {
+        const all_users = [this.self].concat(this.participating_user_ets());
+        return all_users.every((user_et) => user_et.is_verified());
+      }
     });
 
     this.status = ko.observable(z.conversation.ConversationStatus.CURRENT_MEMBER);
@@ -415,6 +407,15 @@ z.entity.Conversation = class Conversation {
     this.messages_unordered.removeAll();
   }
 
+  should_unarchive() {
+    if (this.archived_state()) {
+      const has_new_event = this.last_event_timestamp() > this.archived_timestamp();
+
+      return has_new_event && !this.is_muted();
+    }
+    return false;
+  }
+
   /**
    * Checks for message duplicates.
    *
@@ -426,7 +427,7 @@ z.entity.Conversation = class Conversation {
   _check_for_duplicate(message_et, other_message_et) {
     if (message_et) {
       for (const existing_message_et of this.messages_unordered()) {
-        if (message_et.id && existing_message_et.id === message_et.id) {
+        if (message_et.id && existing_message_et.id === message_et.id && existing_message_et.from === message_et.from) {
           return undefined;
         }
       }

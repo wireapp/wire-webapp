@@ -168,7 +168,7 @@ window.z.ui = z.ui || {};
       },
       webapp: {
         macos: 'command + alt + graveaccent', // KeyboardJS fires this when using cmd + alt + n
-        pc: 'ctrl + alt + graveaccent',
+        pc: 'ctrl + alt + ,',
       },
     },
   };

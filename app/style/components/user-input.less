@@ -84,7 +84,6 @@ user-input {
   height: @avatar-diameter-xs;
   line-height: @avatar-diameter-xs;
   min-width: 65px;
-  padding-left: -24px;
   outline: none;
 
   &:invalid {
@@ -100,6 +99,11 @@ user-input {
     color: fade(#fff, 40%);
     text-align: center;
     margin-left: -24px;
+  }
+
+  // hack for chrome to fix line height issue
+  &::-webkit-input-placeholder {
+    transform: translateY(-2px);
   }
 
   .user-list-light & {
