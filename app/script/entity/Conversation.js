@@ -36,7 +36,7 @@ z.entity.Conversation = class Conversation {
     this.type = ko.observable();
 
     this.input = ko.observable(z.util.StorageUtil.get_value(`${z.storage.StorageKey.CONVERSATION.INPUT}|${this.id}`) || '');
-    this.input.subscribe((text) => z.util.StorageUtil.set_value(`${z.storage.StorageKey.CONVERSATION.INPUT}|${this.id}`, text));
+    this.input.subscribe((text) => z.util.StorageUtil.set_value(`${z.storage.StorageKey.CONVERSATION.INPUT}|${this.id}`, text.trim()));
 
     this.is_loaded = ko.observable(false);
     this.is_pending = ko.observable(false);
