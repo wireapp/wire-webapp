@@ -48,7 +48,7 @@ z.ViewModel.list.ArchiveViewModel = class ArchiveViewModel {
   }
 
   click_on_archived_conversation(conversation_et) {
-    this.conversation_repository.unarchive_conversation(conversation_et);
+    this.conversation_repository.unarchive_conversation(conversation_et, 'opened conversation from archive');
     this.list_view_model.switch_list(z.ViewModel.list.LIST_STATE.CONVERSATIONS);
     amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversation_et);
   }
