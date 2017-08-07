@@ -526,7 +526,7 @@ z.calling.CallingRepository = class CallingRepository {
 
     const is_group_check = type === z.calling.enum.CALL_MESSAGE_TYPE.GROUP_CHECK;
     const is_self_user = user_id === this.self_user_id();
-    const valid_message = response !== is_group_check;
+    const valid_message = response === is_group_check;
 
     if (!is_self_user && valid_message) {
       const event_from_stream = source === z.event.EventRepository.SOURCE.STREAM;
