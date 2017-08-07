@@ -2812,12 +2812,21 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when the event was handled
    */
   _on_reaction(conversation_et, event_json) {
-    return this.get_message_in_conversation_by_id(conversation_et, event_json.data.message_id)
-      .then((message_et) => {
-        const changes = message_et.update_reactions(event_json);
+    const event_data = event_json.data;
 
+    return this.get_message_in_conversation_by_id(conversation_et, event_data.message_id)
+      .then((message_et) => {
+        if (!message_et || !message_et.is_content()) {
+          const type = message_et ? message_et.type : 'unknown';
+
+          this.logger.error(`Message '${event_data.message_id}' in conversation '${conversation_et.id}' is of reactable type '${type}'`, message_et);
+          throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_TYPE);
+        }
+
+        const changes = message_et.update_reactions(event_json);
         if (changes) {
-          this.logger.debug(`Updating reactions to message '${event_json.data.message_id}' in conversation '${conversation_et.id}'`, event_json);
+          this.logger.debug(`Updating reactions to message '${event_data.message_id}' in conversation '${conversation_et.id}'`, event_json);
+
           return this._update_user_ets(message_et)
             .then((updated_message_et) => {
               this.conversation_service.update_message_in_db(updated_message_et, changes, conversation_et.id);
@@ -2827,7 +2836,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       })
       .catch((error) => {
         if (error.type !== z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
-          this.logger.error(`Failed to handle reaction to message '${event_json.data.message_id}' in conversation '${conversation_et.id}'`, {error, event: event_json});
+          this.logger.error(`Failed to handle reaction to message '${event_data.message_id}' in conversation '${conversation_et.id}'`, {error, event: event_json});
           throw error;
         }
       });
