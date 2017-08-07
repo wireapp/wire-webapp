@@ -139,7 +139,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
 
 ko.components.register('conversation-list-calling-cell', {
   template: `
-    <div class="conversation-list-calling-cell conversation-list-cell" data-bind="attr: {'data-uie-uid': conversation.id, 'data-uie-value': conversation.display_name}, css: {'conversation-list-cell-active': is_selected(conversation)}">
+    <div data-uie-name="item-call" class="conversation-list-calling-cell conversation-list-cell" data-bind="attr: {'data-uie-uid': conversation.id, 'data-uie-value': conversation.display_name}, css: {'conversation-list-cell-active': is_selected(conversation)}">
       <div class="conversation-list-cell-left">
         <!-- ko if: conversation.is_group() -->
           <group-avatar class="conversation-list-cell-avatar-arrow" params="users: users(), conversation: conversation"></group-avatar>
