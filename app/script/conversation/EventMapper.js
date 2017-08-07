@@ -531,6 +531,15 @@ z.conversation.EventMapper = class EventMapper {
     return asset_et;
   }
 
+  _validate_asset_v3_keys(key, token) {
+    const key_match = key.match(new RegExp(/^[a-zA-Z0-9-]+$/));
+    const sanitized_token = token.replace(new RegExp(/[^A-Za-z0-9=]/, 'ig'), '');
+
+    // Consider throwing a "new Proteus.errors.DecryptError.InvalidMessage"
+    if (!(key_match && key_match[0] === key)) throw new Error('Invalid asset key');
+    if (token.length !== 24 || sanitized_token !== token) throw new Error('Invalid asset token');
+  }
+
   /**
    * Maps JSON data of medium image asset into asset entity
    *
@@ -551,7 +560,9 @@ z.conversation.EventMapper = class EventMapper {
     asset_et.ratio = asset_et.height / asset_et.width;
 
     const {key, otr_key, sha256, token} = event_data;
+
     if (key) {
+      this._validate_asset_v3_keys(key, token);
       asset_et.resource(z.assets.AssetRemoteData.v3(key, otr_key, sha256, token, true));
     } else {
       asset_et.resource(z.assets.AssetRemoteData.v2(conversation_id, asset_id, otr_key, sha256, true));
