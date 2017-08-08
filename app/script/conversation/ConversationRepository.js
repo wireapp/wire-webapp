@@ -1203,10 +1203,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   _check_changed_conversations() {
     Object
-      .entries(this.conversations_with_new_events)
-      .forEach(([conversation_id, conversation_et]) => {
-        if (conversation_et.should_unarchive()) {
-          this.unarchive_conversation(conversation_et, 'event from notification stream');
+      .keys(this.conversations_with_new_events)
+      .forEach((conversation_id) => {
+        if (this.conversations_with_new_events.hasOwnProperty(conversation_id)) {
+          const conversation_et = this.conversations_with_new_events[conversation_id];
+          if (conversation_et.should_unarchive()) {
+            this.unarchive_conversation(conversation_et, 'event from notification stream');
+          }
         }
       });
 
