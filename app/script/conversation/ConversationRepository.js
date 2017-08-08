@@ -2588,14 +2588,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
     });
 
     // Self user joins again
-    if (event_json.data.user_ids.includes(this.user_repository.self().id)) {
+    const self_user_rejoins = event_json.data.user_ids.includes(this.user_repository.self().id);
+    if (self_user_rejoins) {
       conversation_et.status(z.conversation.ConversationStatus.CURRENT_MEMBER);
     }
 
     return this.update_participating_user_ets(conversation_et)
-      .then(() => {
-        return this._add_event_to_conversation(event_json, conversation_et);
-      })
+      .then(() => this._add_event_to_conversation(event_json, conversation_et))
       .then((message_et) => {
         this.verification_state_handler.on_member_joined(conversation_et, event_json.data.user_ids);
         return {conversation_et: conversation_et, message_et: message_et};
