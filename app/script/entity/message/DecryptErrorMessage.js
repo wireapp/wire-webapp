@@ -23,6 +23,10 @@ window.z = window.z || {};
 window.z.entity = z.entity || {};
 
 z.entity.DecryptErrorMessage = class DecryptErrorMessage extends z.entity.Message {
+  static get REMOTE_IDENTITY_CHANGED_ERROR() {
+    return Proteus.errors.DecodeError.CODE.CASE_204.toString();
+  }
+
   constructor() {
     super();
     this.super_type = z.message.SuperType.UNABLE_TO_DECRYPT;
@@ -32,22 +36,20 @@ z.entity.DecryptErrorMessage = class DecryptErrorMessage extends z.entity.Messag
 
     this.caption = ko.pureComputed(() => {
       const content = `<span class='label-bold-xs'>${ z.util.escape_html(this.user().first_name())}</span>`;
-      const string_id = this.error_code === Proteus.errors.DecodeError.CODE.CASE_204
-        ? z.string.conversation_unable_to_decrypt_2 : z.string.conversation_unable_to_decrypt_1;
+      const string_id = this.is_remote_identity_changed() ? z.string.conversation_unable_to_decrypt_2 : z.string.conversation_unable_to_decrypt_1;
 
       return z.l10n.text(string_id, content);
     });
 
     this.link = ko.pureComputed(() => {
-      const string_id = this.error_code === Proteus.errors.DecodeError.CODE.CASE_204
-        ? z.string.url_decrypt_error_2 : z.string.url_decrypt_error_1;
+      const string_id = this.is_remote_identity_changed() ? z.string.url_decrypt_error_2 : z.string.url_decrypt_error_1;
+
       return z.l10n.text(string_id);
     });
 
-    this.is_recoverable = ko.pureComputed(() => {
-      return this.error_code.toString().startsWith('2');
-    });
 
+    this.is_recoverable = ko.pureComputed(() => this.error_code.toString().startsWith('2') && !this.is_remote_identity_changed());
+    this.is_remote_identity_changed = ko.pureComputed(() => this.error_code.toString() === DecryptErrorMessage.REMOTE_IDENTITY_CHANGED_ERROR);
     this.is_resetting_session = ko.observable(false);
 
     this.error_message = ko.pureComputed(() => {
