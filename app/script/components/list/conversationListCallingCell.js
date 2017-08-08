@@ -181,7 +181,7 @@ ko.components.register('conversation-list-calling-cell', {
     <!-- ko if: show_call_controls -->
     <div class="conversation-list-calling-cell-controls">
       <!-- ko if: show_participants_button -->
-        <div class="conversation-list-calling-cell-controls-button cursor-pointer conversation-list-calling-cell-controls-on-call" data-bind="click: on_participants_button_click, text: participants_button_label, css: show_participants() ? 'cell-badge-light' : 'cell-badge-dark'"></div>
+        <div data-uie-name="do-toggle-participants" class="conversation-list-calling-cell-controls-button cursor-pointer conversation-list-calling-cell-controls-on-call" data-bind="click: on_participants_button_click, text: participants_button_label, css: show_participants() ? 'cell-badge-light' : 'cell-badge-dark'"></div>
       <!-- /ko -->
       <div data-uie-name="do-toggle-mute" class="conversation-list-calling-cell-controls-button icon-mute-small cursor-pointer" data-bind="click: on_toggle_audio, css: self_stream_state.audio_send() ? 'cell-badge-dark' : 'cell-badge-light'"></div>
       <!-- ko if: call_is_ongoing -->
@@ -189,7 +189,7 @@ ko.components.register('conversation-list-calling-cell', {
           <div data-uie-name="do-toggle-video" class="conversation-list-calling-cell-controls-button icon-video cursor-pointer" data-bind="click: on_toggle_video, css: self_stream_state.video_send() ? 'cell-badge-light' : 'cell-badge-dark'"></div>
         <!-- /ko -->
         <!-- ko if: show_screensharing_button() -->
-          <div class="conversation-list-calling-cell-controls-button icon-screensharing-small cursor-pointer"
+          <div data-uie-name="do-toggle-screenshare" class="conversation-list-calling-cell-controls-button icon-screensharing-small cursor-pointer"
                data-bind="click: on_toggle_screen, css: {
                 'disabled': disable_toggle_screen(),
                 'cell-badge-light': self_stream_state.screen_send(),
