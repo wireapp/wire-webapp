@@ -548,6 +548,8 @@ z.calling.CallingRepository = class CallingRepository {
           if (_error.type !== z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
             throw _error;
           }
+
+          this.reject_call(conversation_id);
         });
     }
   }
