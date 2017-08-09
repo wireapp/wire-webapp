@@ -24,7 +24,7 @@ window.z.entity = z.entity || {};
 
 z.entity.DecryptErrorMessage = class DecryptErrorMessage extends z.entity.Message {
   static get REMOTE_IDENTITY_CHANGED_ERROR() {
-    return Proteus.errors.DecodeError.CODE.CASE_204.toString();
+    return Proteus.errors.DecryptError.CODE.CASE_204.toString();
   }
 
   constructor() {
