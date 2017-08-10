@@ -873,8 +873,6 @@ z.calling.entities.Flow = class Flow {
 
     const offer_options = {
       iceRestart: restart,
-      offerToReceiveAudio: true,
-      offerToReceiveVideo: true,
       voiceActivityDetection: true,
     };
 
