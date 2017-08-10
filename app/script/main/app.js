@@ -95,12 +95,13 @@ z.main.App = class App {
     repositories.conversation        = new z.conversation.ConversationRepository(
       this.service.conversation,
       this.service.asset,
-      repositories.user,
-      repositories.giphy,
+      repositories.client,
       repositories.cryptography,
+      repositories.giphy,
       repositories.links,
-      repositories.team
-    );
+      repositories.team,
+      repositories.user
+  );
 
     repositories.bot                 = new z.bot.BotRepository(this.service.bot, repositories.conversation);
     repositories.calling             = new z.calling.CallingRepository(this.service.calling, repositories.client, repositories.conversation, repositories.media, repositories.user);
