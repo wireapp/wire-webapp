@@ -96,6 +96,24 @@ user-avatar {
     }
   }
 
+  &.user-avatar-xxs {
+    .square(@avatar-diameter-xxs);
+
+    .user-avatar-initials {
+      font-size: @avatar-initials-xxs;
+      line-height: @avatar-diameter-xxs;
+    }
+
+    .user-avatar-image {
+      .no-transition();
+    }
+
+    .user-avatar-badge {
+      display: none;
+    }
+  }
+
+
   &.user-avatar-no-border {
     .user-avatar-border {
       border: 0;

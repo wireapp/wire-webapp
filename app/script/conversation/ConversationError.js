@@ -52,6 +52,9 @@ z.conversation.ConversationError = class ConversationError extends Error {
       case ConversationError.TYPE.REQUEST_FAILED:
         this.message = 'Conversation related backend request failed';
         break;
+      case ConversationError.TYPE.WRONG_TYPE:
+        this.message = 'Wrong message to for action';
+        break;
       case ConversationError.TYPE.WRONG_USER:
         this.message = 'Wrong user tried to change or delete a message';
         break;
@@ -70,6 +73,7 @@ z.conversation.ConversationError = class ConversationError extends Error {
       NOT_FOUND: 'z.conversation.ConversationError.TYPE.NOT_FOUND',
       REQUEST_FAILURE: 'z.conversation.ConversationError.TYPE.REQUEST_FAILURE',
       UNKNOWN: 'z.conversation.ConversationError.TYPE.UNKNOWN',
+      WRONG_TYPE: 'z.conversation.ConversatiionError.TYPE.WRONG_TYPE',
       WRONG_USER: 'z.conversation.ConversationError.TYPE.WRONG_USER',
     };
   }

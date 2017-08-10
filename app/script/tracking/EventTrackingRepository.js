@@ -63,7 +63,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
     this.last_report = undefined;
     this.localytics = undefined;
-    this.properties = undefined;
+    this.privacy_preference = false;
     this.session_interval = undefined;
 
     if (!this.conversation_repository && !this.user_repository) {
@@ -75,14 +75,16 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
   /**
    * Init the repository.
-   * @param {z.properties.Properties} properties - User properties
+   * @param {boolean} privacy_preference - Privacy preference
    * @returns {undefined} No return value
    */
-  init(properties) {
-    this.properties = properties;
-    this.logger.info('Initialize tracking and error reporting');
+  init(privacy_preference) {
+    this.privacy_preference = privacy_preference;
+    this.logger.info('Initialize tracking and error reporting', this.privacy_preference);
 
-    if (!this._localytics_disabled() && this._has_permission()) {
+    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.PRIVACY, this.updated_privacy.bind(this));
+
+    if (!this._localytics_disabled() && this.privacy_preference) {
       this._enable_error_reporting();
       if (!this.localytics) {
         this._init_localytics();
@@ -90,8 +92,6 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
       this.set_custom_dimension(z.tracking.CustomDimension.CONTACTS, this.user_repository.connected_users().length);
       this._subscribe_to_events();
     }
-
-    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.PRIVACY, this.updated_privacy.bind(this));
   }
 
   /**
@@ -112,30 +112,27 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   }
 
   updated_privacy(privacy_preference) {
-    if (privacy_preference) {
-      this._enable_error_reporting();
-      if (!this._localytics_disabled()) {
-        this.start_session();
-        this.set_custom_dimension(z.tracking.CustomDimension.CONTACTS, this.user_repository.connected_users().length);
-        this._subscribe_to_events();
-        this.tag_event(z.tracking.EventName.TRACKING.OPT_IN);
-      }
-    } else {
-      if (!this._localytics_disabled()) {
-        amplify.unsubscribeAll(z.event.WebApp.ANALYTICS.CUSTOM_DIMENSION);
-        amplify.unsubscribeAll(z.event.WebApp.ANALYTICS.EVENT);
-        this.tag_event(z.tracking.EventName.TRACKING.OPT_OUT);
-        this._disable_localytics();
-      }
-      this._disable_error_reporting();
-    }
-  }
+    if (privacy_preference !== this.privacy_preference) {
+      this.privacy_preference = privacy_preference;
 
-  _has_permission() {
-    if (this.properties) {
-      return this.properties.settings.privacy.improve_wire;
+      if (privacy_preference) {
+        this._enable_error_reporting();
+        if (!this._localytics_disabled()) {
+          this.start_session();
+          this.set_custom_dimension(z.tracking.CustomDimension.CONTACTS, this.user_repository.connected_users().length);
+          this._subscribe_to_events();
+          this.tag_event(z.tracking.EventName.TRACKING.OPT_IN);
+        }
+      } else {
+        if (!this._localytics_disabled()) {
+          amplify.unsubscribeAll(z.event.WebApp.ANALYTICS.CUSTOM_DIMENSION);
+          amplify.unsubscribeAll(z.event.WebApp.ANALYTICS.EVENT);
+          this.tag_event(z.tracking.EventName.TRACKING.OPT_OUT);
+          this._disable_localytics();
+        }
+        this._disable_error_reporting();
+      }
     }
-    return false;
   }
 
   _subscribe_to_events() {
@@ -158,7 +155,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   //##############################################################################
 
   close_session() {
-    if (this.localytics && this._has_permission()) {
+    if (this.localytics && this.privacy_preference) {
       this.logger.info('Closing Localytics session');
 
       if (this.session_interval) {
@@ -179,7 +176,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   }
 
   start_session() {
-    if (this._has_permission() && !this.session_interval) {
+    if (this.privacy_preference && !this.session_interval) {
       if (!this.localytics) {
         this._init_localytics();
       }
