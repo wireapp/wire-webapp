@@ -51,7 +51,7 @@ window.z.util = z.util || {};
       }
     },
     is_chrome: function() {
-      return platform.name === BROWSER_NAME.CHROME;
+      return platform.name === BROWSER_NAME.CHROME || this.is_electron();
     },
     is_desktop: function() {
       return this.is_electron() && navigator.userAgent.includes(BROWSER_NAME.WIRE);
@@ -60,7 +60,7 @@ window.z.util = z.util || {};
       return platform.name === BROWSER_NAME.EDGE;
     },
     is_electron: function() {
-      return navigator.userAgent.includes(BROWSER_NAME.ELECTRON);
+      return platform.name === BROWSER_NAME.ELECTRON;
     },
     is_firefox: function() {
       return platform.name === BROWSER_NAME.FIREFOX;
