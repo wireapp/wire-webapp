@@ -35,20 +35,22 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {ConversationService} conversation_service - Backend REST API conversation service implementation
    * @param {AssetService} asset_service - Backend REST API asset service implementation
-   * @param {UserRepository} user_repository - Repository for all user and connection interactions
-   * @param {GiphyRepository} giphy_repository - Repository for Giphy GIFs
+   * @param {ClientRepository} client_repository - Repository for client interactions
    * @param {CryptographyRepository} cryptography_repository - Repository for all cryptography interactions
+   * @param {GiphyRepository} giphy_repository - Repository for Giphy GIFs
    * @param {LinkPreviewRepository} link_repository - Repository for link previews
    * @param {TeamRepository} team_repository - Repository for teams
+   * @param {UserRepository} user_repository - Repository for all user and connection interactions
    */
-  constructor(conversation_service, asset_service, user_repository, giphy_repository, cryptography_repository, link_repository, team_repository) {
+  constructor(conversation_service, asset_service, client_repository, cryptography_repository, giphy_repository, link_repository, team_repository, user_repository) {
     this.conversation_service = conversation_service;
     this.asset_service = asset_service;
-    this.user_repository = user_repository;
-    this.giphy_repository = giphy_repository;
+    this.client_repository = client_repository;
     this.cryptography_repository = cryptography_repository;
+    this.giphy_repository = giphy_repository;
     this.link_repository = link_repository;
     this.team_repository = team_repository;
+    this.user_repository = user_repository;
     this.logger = new z.util.Logger('z.conversation.ConversationRepository', z.config.LOGGER.OPTIONS);
 
     this.conversation_mapper = new z.conversation.ConversationMapper();
@@ -1953,14 +1955,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.logger.info(`Sending encrypted '${generic_message.content}' message to conversation '${conversation_id}'`, payload);
 
     return this._grant_outgoing_message(conversation_id, generic_message)
-      .then(() => {
-        return this.conversation_service.post_encrypted_message(conversation_id, payload, precondition_option);
-      })
+      .then(() => this.conversation_service.post_encrypted_message(conversation_id, payload, precondition_option))
       .then((response) => {
         this._handle_client_mismatch(conversation_id, response);
         return response;
       })
       .catch((error) => {
+        if (error.label === z.service.BackendClientError.LABEL.UNKNOWN_CLIENT) {
+          this.client_repository.remove_local_client();
+        }
+
         if (!error.missing) {
           throw error;
         }
@@ -3023,8 +3027,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @note As part of 412 or general response when sending encrypted message
    * @param {string} conversation_id - ID of conversation message was sent int
    * @param {Object} client_mismatch - Client mismatch object containing client user maps for deleted, missing and obsolete clients
-   * @param {z.proto.GenericMessage} generic_message - Optionally the GenericMessage that was sent
-   * @param {Object} payload - Optionally the initial payload that was sent resulting in a 412
+   * @param {z.proto.GenericMessage} [generic_message] - GenericMessage that was sent
+   * @param {Object} [payload] - Initial payload resulting in a 412
    * @returns {Promise} Resolve when mistmatch was handled
    */
   _handle_client_mismatch(conversation_id, client_mismatch, generic_message, payload) {
