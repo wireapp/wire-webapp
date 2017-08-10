@@ -32,7 +32,7 @@ z.util.ValidationUtil = {
     retentionPolicy: (str) => {
       // Ensure the given asset is either eternal, persistent or volatile
       // https://github.com/wireapp/wire-server/blob/e97f7c882cad37e4ddd922d2e48fe0d71751fc5a/libs/cargohold-types/src/CargoHold/Types/V3.hs#L151
-      return (str > 0 && str < (Object.keys(z.assets.AssetRetentionPolicy).length + 1));
+      return str > 0 && str < (Object.keys(z.assets.AssetRetentionPolicy).length + 1);
     },
     v2: () => {
       // ToDo: Validate asset v2
@@ -41,12 +41,17 @@ z.util.ValidationUtil = {
       const SEPERATOR = '-';
       const [version, type, ...uuid] = asset_key.split(SEPERATOR);
 
-      if (version !== '3') throw new Error('Invalid asset key (version)');
-      if (!z.util.ValidationUtil.asset.retentionPolicy(type)) throw new Error('Invalid asset key (type)');
-      if (!z.util.ValidationUtil.isUUID(uuid.join(SEPERATOR))) throw new Error('Invalid asset key (UUID)');
-
-      if (asset_token) {
-        if (!z.util.ValidationUtil.isBase64(asset_token)) throw new Error('Invalid asset token (malformed base64)');
+      if (version !== '3') {
+        throw new Error('Invalid asset key (version)');
+      }
+      if (!z.util.ValidationUtil.asset.retentionPolicy(type)) {
+        throw new Error('Invalid asset key (type)');
+      }
+      if (!z.util.ValidationUtil.isUUID(uuid.join(SEPERATOR))) {
+        throw new Error('Invalid asset key (UUID)');
+      }
+      if (asset_token && !z.util.ValidationUtil.isBase64(asset_token)) {
+        throw new Error('Invalid asset token (malformed base64)');
       }
     },
   },
