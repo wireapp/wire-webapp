@@ -87,7 +87,7 @@ window.z.util = z.util || {};
       return !!window.indexedDB;
     },
     supports_media_devices: function() {
-      return navigator.mediaDevices && navigator.mediaDevices.getUserMedia;
+      return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
     },
     supports_notifications: function() {
       if (window.Notification === undefined) {
