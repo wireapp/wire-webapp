@@ -28,9 +28,6 @@ z.util.ValidationUtil = {
   // ToDo: Move z.util.is_iso_string here
   // ToDo: Move z.util.is_valid_email here
   // ToDo: Move z.util.is_same_location here
-  UUID: (str) => {
-    return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(str);
-  },
   asset: {
     retentionPolicy: (str) => {
       // Ensure the given asset is either eternal, persistent or volatile
@@ -41,20 +38,19 @@ z.util.ValidationUtil = {
       // ToDo: Validate asset v2
     },
     v3: (asset_key, asset_token) => {
-      const [version, type, ...uuid] = asset_key.split('-');
+      const SEPERATOR = '-';
+      const [version, type, ...uuid] = asset_key.split(SEPERATOR);
 
       if (version !== '3') throw new Error('Invalid asset key (version)');
       if (!z.util.ValidationUtil.asset.retentionPolicy(type)) throw new Error('Invalid asset key (type)');
-      if (!z.util.ValidationUtil.UUID(uuid.join('-'))) throw new Error('Invalid asset key (uuid)');
+      if (!z.util.ValidationUtil.isUUID(uuid.join(SEPERATOR))) throw new Error('Invalid asset key (UUID)');
 
       if (asset_token) {
-        // const [token, tokenBase64] = asset_token.split('-');
-        // if (!/^[a-zA-Z0-9]+$/i.test(token)) throw new Error('Invalid asset token');
-        if (!z.util.ValidationUtil.base64(asset_token)) throw new Error('Invalid asset token (malformed base64 string)');
+        if (!z.util.ValidationUtil.isBase64(asset_token)) throw new Error('Invalid asset token (malformed base64)');
       }
     },
   },
-  base64: (str) => {
+  isBase64: (str) => {
     try {
       // Will raise a DOM exception if base64 string is invalid
       window.atob(str);
@@ -62,5 +58,8 @@ z.util.ValidationUtil = {
       return false;
     }
     return true;
+  },
+  isUUID: (str) => {
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(str);
   },
 };
