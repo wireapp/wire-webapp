@@ -64,12 +64,11 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     });
 
     const MAX_DISPLAYED_PARTICIPANTS = 9;
-    this.call_participants_displayed = ko.observableArray();
     this.call_participants_rest = ko.observable(0);
-    this.call_participants.subscribe((user_ets) => {
-      const displayed_user_ets = user_ets.slice(0, MAX_DISPLAYED_PARTICIPANTS);
-      this.call_participants_displayed(displayed_user_ets);
-      this.call_participants_rest(user_ets.length - displayed_user_ets.length);
+    this.call_participants_displayed = ko.pureComputed(() => {
+      const displayed_user_ets = this.call_participants().slice(0, MAX_DISPLAYED_PARTICIPANTS);
+      this.call_participants_rest(this.call_participants().length - displayed_user_ets.length);
+      return displayed_user_ets;
     });
 
     this.joined_call = this.calling_repository.joined_call;
