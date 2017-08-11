@@ -49,13 +49,7 @@ z.cache.CacheRepository = class CacheRepository {
     }
 
     for (const stored_key in amplify.store()) {
-      let should_be_deleted = true;
-
-      for (const pattern in protected_key_patterns) {
-        if (stored_key.startsWith(protected_key_patterns[pattern])) {
-          should_be_deleted = false;
-        }
-      }
+      const should_be_deleted = !protected_key_patterns.some((pattern) => stored_key.startsWith(pattern));
 
       if (should_be_deleted) {
         z.util.StorageUtil.reset_value(stored_key);

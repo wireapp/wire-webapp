@@ -236,8 +236,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
       if (this.user()) {
         return `accent-color-${this.user().accent_id()}`;
       }
-    }
-    , this, {deferEvaluation: true});
+    }, this, {deferEvaluation: true});
 
     this.show_gray_image = ko.pureComputed(() => {
       if (!this.user()) {

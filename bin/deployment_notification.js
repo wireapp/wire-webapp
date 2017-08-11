@@ -68,16 +68,10 @@ const store = new cryptobox.store.FileStore(storagePath);
 const box = new cryptobox.Cryptobox(store, 1);
 
 new wire.User(login, box).login(false)
-.then(function(service) {
-  return service.conversation.sendTextMessage(content.conversationId, content.message);
-})
-.then(function(service) {
-  return service.user.logout();
-})
-.then(function() {
-  return process.exit(0);
-})
-.catch(function(error) {
-  console.log(error.message);
-  return process.exit(1);
-});
+  .then((service) => service.conversation.sendTextMessage(content.conversationId, content.message))
+  .then((service) => service.user.logout())
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.log(error.message);
+    return process.exit(1);
+  });

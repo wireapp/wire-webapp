@@ -469,15 +469,17 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
     const entries = [{
       click: () => this.set_ephemeral_timer(0),
       label: z.l10n.text(z.string.ephememal_units_none),
-    }].concat(z.ephemeral.timings.get_values()
-        .map((milliseconds) => {
-          const [number, unit] = z.util.format_milliseconds_short(milliseconds);
-          const unit_locale = this._get_localized_unit_string(number, unit);
-          return {
-            click: () => this.set_ephemeral_timer(milliseconds),
-            label: `${number} ${unit_locale}`,
-          };
-        })
+    }]
+      .concat(
+        z.ephemeral.timings.get_values()
+          .map((milliseconds) => {
+            const [number, unit] = z.util.format_milliseconds_short(milliseconds);
+            const unit_locale = this._get_localized_unit_string(number, unit);
+            return {
+              click: () => this.set_ephemeral_timer(milliseconds),
+              label: `${number} ${unit_locale}`,
+            };
+          })
       );
 
     z.ui.Context.from(event, entries, 'ephemeral-options-menu');

@@ -51,14 +51,10 @@ z.connect.ConnectRepository = class ConnectRepository {
    */
   _encode_phone_book(phone_book) {
     const {cards, self} = phone_book;
-    self.forEach((contact, contact_index) => {
-      self[contact_index] = z.util.encode_sha256_base64(contact);
-    });
+    self.forEach((contact, contact_index) => self[contact_index] = z.util.encode_sha256_base64(contact));
 
     cards.forEach((card, card_index) => {
-      card.contact.forEach((contact, contact_index) => {
-        card.contact[contact_index] = z.util.encode_sha256_base64(contact);
-      });
+      card.contact.forEach((contact, contact_index) => card.contact[contact_index] = z.util.encode_sha256_base64(contact));
       cards[card_index] = card;
     });
 
@@ -105,9 +101,7 @@ z.connect.ConnectRepository = class ConnectRepository {
       const phone_book = new z.connect.PhoneBook();
 
       const {numbers: self_numbers} = address_book.getMe();
-      self_numbers.forEach((number) => {
-        phone_book.self.push(number);
-      });
+      self_numbers.forEach((number) => phone_book.self.push(number));
 
       address_book.getContacts((percentage) => {
         this.logger.info('Importing Contacts', percentage);
@@ -118,9 +112,8 @@ z.connect.ConnectRepository = class ConnectRepository {
             card_id: CryptoJS.MD5(`${first_name}${last_name}`).toString(),
             contact: [],
           };
-          numbers.forEach((number) => {
-            card.contact.push(z.util.phone_number_to_e164(number, navigator.language));
-          });
+
+          numbers.forEach((number) => card.contact.push(z.util.phone_number_to_e164(number, navigator.language)));
 
           if (card.contact.length) {
             phone_book.cards.push(card);
@@ -210,4 +203,4 @@ z.connect.ConnectRepository = class ConnectRepository {
         }
       });
   }
- };
+};

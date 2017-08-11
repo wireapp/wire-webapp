@@ -895,8 +895,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
         const payload = this._create_payload(z.auth.AuthView.MODE.POSTED_RESEND);
 
         this.auth.repository.resend_activation(payload)
-        .then((response) => this._on_resend_success(response))
-        .catch((error) => this._on_resend_error(error));
+          .then((response) => this._on_resend_success(response))
+          .catch((error) => this._on_resend_error(error));
       }
     }
   }
