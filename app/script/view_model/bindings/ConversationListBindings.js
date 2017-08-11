@@ -33,8 +33,8 @@ ko.bindingHandlers.bordered_list = (function() {
         list_column.toggleClass('left-list-center-border-bottom', !$element.is_scrolled_bottom());
       });
     }
-  }
-  , 100);
+  },
+  100);
 
   return {
     init(element) {

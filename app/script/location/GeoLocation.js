@@ -58,13 +58,13 @@ z.location = (() => {
       $.ajax({
         url: `${GOOGLE_GEOCODING_BASE_URL}?latlng=${latitude},${longitude}&key=${API_KEY}`,
       })
-      .done((response) => {
-        if (response.status === 'OK') {
-          return resolve(_parse_results(response.results));
-        }
-        return resolve();
-      })
-      .fail((jqXHR, textStatus, errorThrown) => reject(new Error(errorThrown)));
+        .done((response) => {
+          if (response.status === 'OK') {
+            return resolve(_parse_results(response.results));
+          }
+          return resolve();
+        })
+        .fail((jqXHR, textStatus, errorThrown) => reject(new Error(errorThrown)));
     });
   };
 

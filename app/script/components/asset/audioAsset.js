@@ -79,12 +79,8 @@ z.components.AudioAssetComponent = class AudioAssetComponent {
             .then((blob) => this.audio_src(window.URL.createObjectURL(blob)));
         }
       })
-      .then(() => {
-        this.audio_element.play();
-      })
-      .catch((error) => {
-        this.logger.error('Failed to load audio asset ', error);
-      });
+      .then(() => this.audio_element.play())
+      .catch((error) => this.logger.error('Failed to load audio asset ', error));
   }
 
   on_pause_button_clicked() {

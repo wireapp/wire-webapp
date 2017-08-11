@@ -234,8 +234,8 @@ ko.bindingHandlers.file_select = {
           return $(event.target).blur();
         },
       },
-    }
-    , context);
+    },
+    context);
   },
 };
 

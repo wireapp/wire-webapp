@@ -148,11 +148,11 @@ z.event.WebSocketService = class WebSocketService {
     const reconnect = () => {
       this.logger.info(`Trying to re-establish WebSocket connection. Try #${this.reconnect_count}`);
       return this.connect(this.on_notification)
-      .then(() => {
-        this.reconnect_count = 0;
-        this.logger.info(`Reconnect to WebSocket triggered by '${trigger}'`);
-        return this.reconnected();
-      });
+        .then(() => {
+          this.reconnect_count = 0;
+          this.logger.info(`Reconnect to WebSocket triggered by '${trigger}'`);
+          return this.reconnected();
+        });
     };
 
     if (this.reconnect_count === 1) {

@@ -101,19 +101,19 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
 
     if (navigator.permissions) {
       return navigator.permissions.query({name: 'notifications'})
-      .then((permission_status) => {
-        this.permission_status = permission_status;
-        this.permission_status.onchange = () => {
-          return this.set_permission_state(this.permission_status.state);
-        };
+        .then((permission_status) => {
+          this.permission_status = permission_status;
+          this.permission_status.onchange = () => {
+            return this.set_permission_state(this.permission_status.state);
+          };
 
-        switch (permission_status.state) {
-          case z.system_notification.PermissionStatusState.PROMPT:
-            return this._request_permission();
-          default:
-            return this.set_permission_state(permission_status.state);
-        }
-      });
+          switch (permission_status.state) {
+            case z.system_notification.PermissionStatusState.PROMPT:
+              return this._request_permission();
+            default:
+              return this.set_permission_state(permission_status.state);
+          }
+        });
     }
     switch (window.Notification.permission) {
       case z.system_notification.PermissionStatusState.DEFAULT:
@@ -546,7 +546,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
             }
           });
       })
-      .catch(function(error) {
+      .catch((error) => {
         if (error.type !== z.system_notification.SystemNotificationError.TYPE.HIDE_NOTIFICATION) {
           throw error;
         }
@@ -705,8 +705,8 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
       timeout_trigger_id = window.setTimeout(() => {
         this.logger.info(`Notification for '${message_id}' in '${conversation_id}' closed by timeout.`);
         notification.close();
-      }
-      , notification_content.timeout);
+      },
+      notification_content.timeout);
     };
 
     this.notifications.push(notification);

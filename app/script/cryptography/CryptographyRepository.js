@@ -79,9 +79,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
 
         return this.cryptobox.init();
       })
-      .then(() => {
-        return this;
-      });
+      .then(() => this);
   }
 
   /**
@@ -138,9 +136,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     return this.cryptobox.session_load(this._construct_session_id(user_id, client_id))
       .catch(() => {
         return this.get_users_pre_keys({[user_id]: [client_id]})
-          .then((user_pre_key_map) => {
-            return this._session_from_encoded_prekey_payload(user_pre_key_map[user_id][client_id], user_id, client_id);
-          });
+          .then((user_pre_key_map) => this._session_from_encoded_prekey_payload(user_pre_key_map[user_id][client_id], user_id, client_id));
       });
   }
 
@@ -363,9 +359,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
    */
   _encrypt_payload_for_session(session_id, generic_message) {
     return this.cryptobox.encrypt(session_id, generic_message.toArrayBuffer())
-      .then((cipher_text) => {
-        return {cipher_text: z.util.array_to_base64(cipher_text), session_id: session_id};
-      })
+      .then((cipher_text) => ({cipher_text: z.util.array_to_base64(cipher_text), session_id: session_id}))
       .catch((error) => {
         if (error instanceof cryptobox.store.RecordNotFoundError) {
           this.logger.log(`Session '${session_id}' needs to get initialized...`);

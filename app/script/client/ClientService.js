@@ -158,17 +158,17 @@ z.client.ClientService = class ClientService {
    */
   load_client_from_db(primary_key) {
     return this.storage_service.db[z.storage.StorageService.OBJECT_STORE.CLIENTS]
-    .where('meta.primary_key')
-    .equals(primary_key)
-    .first()
-    .then((client_record) => {
-      if (client_record === undefined) {
-        this.logger.info(`Client with primary key '${primary_key}' not found in database`);
-        return primary_key;
-      }
-      this.logger.info(`Loaded client record from database '${primary_key}'`, client_record);
-      return client_record;
-    });
+      .where('meta.primary_key')
+      .equals(primary_key)
+      .first()
+      .then((client_record) => {
+        if (client_record === undefined) {
+          this.logger.info(`Client with primary key '${primary_key}' not found in database`);
+          return primary_key;
+        }
+        this.logger.info(`Loaded client record from database '${primary_key}'`, client_record);
+        return client_record;
+      });
   }
 
   /**
@@ -186,10 +186,10 @@ z.client.ClientService = class ClientService {
     client_payload.meta.primary_key = primary_key;
 
     return this.storage_service.save(z.storage.StorageService.OBJECT_STORE.CLIENTS, primary_key, client_payload)
-    .then(() => {
-      this.logger.info(`Client '${client_payload.id}' stored with primary key '${primary_key}'`, client_payload);
-      return client_payload;
-    });
+      .then(() => {
+        this.logger.info(`Client '${client_payload.id}' stored with primary key '${primary_key}'`, client_payload);
+        return client_payload;
+      });
   }
 
   /**

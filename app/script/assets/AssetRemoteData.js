@@ -96,14 +96,14 @@ z.assets.AssetRemoteData = class AssetRemoteData {
     let mime_type;
 
     return this._load_buffer()
-    .then(([buffer, type]) => {
-      mime_type = type;
-      if ((this.otr_key != null) && (this.sha256 != null)) {
-        return z.assets.AssetCrypto.decrypt_aes_asset(buffer, this.otr_key.buffer, this.sha256.buffer);
-      }
-      return buffer;
-    })
-    .then((plaintext) => new Blob([new Uint8Array(plaintext)], {mime_type}));
+      .then(([buffer, type]) => {
+        mime_type = type;
+        if ((this.otr_key != null) && (this.sha256 != null)) {
+          return z.assets.AssetCrypto.decrypt_aes_asset(buffer, this.otr_key.buffer, this.sha256.buffer);
+        }
+        return buffer;
+      })
+      .then((plaintext) => new Blob([new Uint8Array(plaintext)], {mime_type}));
   }
 
   /**
