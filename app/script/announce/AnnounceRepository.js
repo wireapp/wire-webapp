@@ -45,14 +45,14 @@ z.announce.AnnounceRepository = class AnnounceRepository {
 
   check_announcements() {
     if (navigator.onLine) {
-      this.announce_service.get_announcements()
+      return this.announce_service.get_announcements()
         .then((announcements_list) => this.process_announce_list(announcements_list));
     }
   }
 
   check_version() {
     if (navigator.onLine) {
-      this.announce_service.get_version()
+      return this.announce_service.get_version()
         .then((server_version) => {
           this.logger.info(`Checking current webapp version. Server '${server_version}' vs. local '${z.util.Environment.version(false, true)}'`);
 
