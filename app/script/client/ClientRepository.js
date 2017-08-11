@@ -475,6 +475,14 @@ z.client.ClientRepository = class ClientRepository {
     });
   }
 
+  remove_local_client() {
+    this.cryptography_repository.storage_repository.delete_cryptography()
+      .then(() => {
+        const is_temporary_client = this.current_client().is_temporary();
+        amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.CLIENT_REMOVED, is_temporary_client);
+      });
+  }
+
   logout_client() {
     if (this.current_client()) {
       if (this.current_client().type === z.client.ClientType.PERMANENT) {
@@ -724,16 +732,13 @@ z.client.ClientRepository = class ClientRepository {
    * @returns {Promise} Resolves when the event has been handled
    */
   on_client_remove(event_json = {}) {
-    const client_id = event_json.client !== null ? event_json.client.id : undefined;
+    const client_id = event_json.client ? event_json.client.id : undefined;
     if (client_id) {
       const is_current_client = client_id === this.current_client().id;
       if (is_current_client) {
-        this.cryptography_repository.storage_repository.delete_cryptography()
-          .then(() => {
-            const is_temporary_client = this.current_client().is_temporary();
-            amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.CLIENT_REMOVED, is_temporary_client);
-          });
+        return this.remove_local_client();
       }
+
       amplify.publish(z.event.WebApp.CLIENT.REMOVE, this.self_user().id, client_id);
     }
   }

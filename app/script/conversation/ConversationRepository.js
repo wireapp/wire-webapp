@@ -35,20 +35,22 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {ConversationService} conversation_service - Backend REST API conversation service implementation
    * @param {AssetService} asset_service - Backend REST API asset service implementation
-   * @param {UserRepository} user_repository - Repository for all user and connection interactions
-   * @param {GiphyRepository} giphy_repository - Repository for Giphy GIFs
+   * @param {ClientRepository} client_repository - Repository for client interactions
    * @param {CryptographyRepository} cryptography_repository - Repository for all cryptography interactions
+   * @param {GiphyRepository} giphy_repository - Repository for Giphy GIFs
    * @param {LinkPreviewRepository} link_repository - Repository for link previews
    * @param {TeamRepository} team_repository - Repository for teams
+   * @param {UserRepository} user_repository - Repository for all user and connection interactions
    */
-  constructor(conversation_service, asset_service, user_repository, giphy_repository, cryptography_repository, link_repository, team_repository) {
+  constructor(conversation_service, asset_service, client_repository, cryptography_repository, giphy_repository, link_repository, team_repository, user_repository) {
     this.conversation_service = conversation_service;
     this.asset_service = asset_service;
-    this.user_repository = user_repository;
-    this.giphy_repository = giphy_repository;
+    this.client_repository = client_repository;
     this.cryptography_repository = cryptography_repository;
+    this.giphy_repository = giphy_repository;
     this.link_repository = link_repository;
     this.team_repository = team_repository;
+    this.user_repository = user_repository;
     this.logger = new z.util.Logger('z.conversation.ConversationRepository', z.config.LOGGER.OPTIONS);
 
     this.conversation_mapper = new z.conversation.ConversationMapper();
@@ -1203,10 +1205,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   _check_changed_conversations() {
     Object
-      .entries(this.conversations_with_new_events)
-      .forEach(([conversation_id, conversation_et]) => {
-        if (conversation_et.should_unarchive()) {
-          this.unarchive_conversation(conversation_et, 'event from notification stream');
+      .keys(this.conversations_with_new_events)
+      .forEach((conversation_id) => {
+        if (this.conversations_with_new_events.hasOwnProperty(conversation_id)) {
+          const conversation_et = this.conversations_with_new_events[conversation_id];
+          if (conversation_et.should_unarchive()) {
+            this.unarchive_conversation(conversation_et, 'event from notification stream');
+          }
         }
       });
 
@@ -1950,14 +1955,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.logger.info(`Sending encrypted '${generic_message.content}' message to conversation '${conversation_id}'`, payload);
 
     return this._grant_outgoing_message(conversation_id, generic_message)
-      .then(() => {
-        return this.conversation_service.post_encrypted_message(conversation_id, payload, precondition_option);
-      })
+      .then(() => this.conversation_service.post_encrypted_message(conversation_id, payload, precondition_option))
       .then((response) => {
         this._handle_client_mismatch(conversation_id, response);
         return response;
       })
       .catch((error) => {
+        if (error.label === z.service.BackendClientError.LABEL.UNKNOWN_CLIENT) {
+          this.client_repository.remove_local_client();
+        }
+
         if (!error.missing) {
           throw error;
         }
@@ -2585,14 +2592,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
     });
 
     // Self user joins again
-    if (event_json.data.user_ids.includes(this.user_repository.self().id)) {
+    const self_user_rejoins = event_json.data.user_ids.includes(this.user_repository.self().id);
+    if (self_user_rejoins) {
       conversation_et.status(z.conversation.ConversationStatus.CURRENT_MEMBER);
     }
 
     return this.update_participating_user_ets(conversation_et)
-      .then(() => {
-        return this._add_event_to_conversation(event_json, conversation_et);
-      })
+      .then(() => this._add_event_to_conversation(event_json, conversation_et))
       .then((message_et) => {
         this.verification_state_handler.on_member_joined(conversation_et, event_json.data.user_ids);
         return {conversation_et: conversation_et, message_et: message_et};
@@ -2809,12 +2815,21 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when the event was handled
    */
   _on_reaction(conversation_et, event_json) {
-    return this.get_message_in_conversation_by_id(conversation_et, event_json.data.message_id)
-      .then((message_et) => {
-        const changes = message_et.update_reactions(event_json);
+    const event_data = event_json.data;
 
+    return this.get_message_in_conversation_by_id(conversation_et, event_data.message_id)
+      .then((message_et) => {
+        if (!message_et || !message_et.is_content()) {
+          const type = message_et ? message_et.type : 'unknown';
+
+          this.logger.error(`Message '${event_data.message_id}' in conversation '${conversation_et.id}' is of reactable type '${type}'`, message_et);
+          throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_TYPE);
+        }
+
+        const changes = message_et.update_reactions(event_json);
         if (changes) {
-          this.logger.debug(`Updating reactions to message '${event_json.data.message_id}' in conversation '${conversation_et.id}'`, event_json);
+          this.logger.debug(`Updating reactions to message '${event_data.message_id}' in conversation '${conversation_et.id}'`, event_json);
+
           return this._update_user_ets(message_et)
             .then((updated_message_et) => {
               this.conversation_service.update_message_in_db(updated_message_et, changes, conversation_et.id);
@@ -2824,7 +2839,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       })
       .catch((error) => {
         if (error.type !== z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
-          this.logger.error(`Failed to handle reaction to message '${event_json.data.message_id}' in conversation '${conversation_et.id}'`, {error, event: event_json});
+          this.logger.error(`Failed to handle reaction to message '${event_data.message_id}' in conversation '${conversation_et.id}'`, {error, event: event_json});
           throw error;
         }
       });
@@ -3012,8 +3027,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @note As part of 412 or general response when sending encrypted message
    * @param {string} conversation_id - ID of conversation message was sent int
    * @param {Object} client_mismatch - Client mismatch object containing client user maps for deleted, missing and obsolete clients
-   * @param {z.proto.GenericMessage} generic_message - Optionally the GenericMessage that was sent
-   * @param {Object} payload - Optionally the initial payload that was sent resulting in a 412
+   * @param {z.proto.GenericMessage} [generic_message] - GenericMessage that was sent
+   * @param {Object} [payload] - Initial payload resulting in a 412
    * @returns {Promise} Resolve when mistmatch was handled
    */
   _handle_client_mismatch(conversation_id, client_mismatch, generic_message, payload) {
