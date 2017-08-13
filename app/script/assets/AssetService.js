@@ -137,7 +137,7 @@ z.assets.AssetService = class AssetService {
     z.util.ValidationUtil.asset.legacy(asset_id, conversation_id);
     const url = this.client.create_url(`/assets/${asset_id}`);
     let asset_url = `${url}?access_token=${this.client.access_token}&conv_id=${encodeURIComponent(conversation_id)}`;
-    if (force_caching) {
+    if (force_caching === true) {
       asset_url = `${asset_url}&forceCaching=true`;
     }
     return asset_url;
@@ -156,7 +156,7 @@ z.assets.AssetService = class AssetService {
     z.util.ValidationUtil.asset.legacy(asset_id, conversation_id);
     const url = this.client.create_url(`/conversations/${conversation_id}/otr/assets/${asset_id}`);
     let asset_url = `${url}?access_token=${this.client.access_token}`;
-    if (force_caching) {
+    if (force_caching === true) {
       asset_url = `${asset_url}&forceCaching=true`;
     }
     return asset_url;
@@ -176,7 +176,7 @@ z.assets.AssetService = class AssetService {
     if (asset_token) {
       asset_url = `${asset_url}&asset_token=${encodeURIComponent(asset_token)}`;
     }
-    if (force_caching) {
+    if (force_caching === true) {
       asset_url = `${asset_url}&forceCaching=true`;
     }
     return asset_url;
