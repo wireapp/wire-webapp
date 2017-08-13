@@ -22,6 +22,18 @@
 window.z = window.z || {};
 window.z.util = z.util || {};
 
+class ValidationUtilError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = this.constructor.name;
+    if (typeof Error.captureStackTrace === 'function') {
+      Error.captureStackTrace(this, this.constructor);
+    } else {
+      this.stack = (new Error(message)).stack;
+    }
+  }
+}
+
 z.util.ValidationUtil = {
   // ToDo: Move z.util.is_valid_username here
   // ToDo: Move z.util.is_valid_phone_number here
@@ -29,29 +41,32 @@ z.util.ValidationUtil = {
   // ToDo: Move z.util.is_valid_email here
   // ToDo: Move z.util.is_same_location here
   asset: {
+    legacy: (asset_id, conversation_id) => {
+      if (!z.util.ValidationUtil.isUUID(asset_id) ||
+          !z.util.ValidationUtil.isUUID(conversation_id)) {
+        throw new ValidationUtilError('Invalid asset_id / conversation_id');
+      }
+    },
     retentionPolicy: (str) => {
       // Ensure the given asset is either eternal, persistent or volatile
       // https://github.com/wireapp/wire-server/blob/e97f7c882cad37e4ddd922d2e48fe0d71751fc5a/libs/cargohold-types/src/CargoHold/Types/V3.hs#L151
       return str > 0 && str < (Object.keys(z.assets.AssetRetentionPolicy).length + 1);
-    },
-    v2: () => {
-      // ToDo: Validate asset v2
     },
     v3: (asset_key, asset_token) => {
       const SEPERATOR = '-';
       const [version, type, ...uuid] = asset_key.split(SEPERATOR);
 
       if (version !== '3') {
-        throw new Error('Invalid asset key (version)');
+        throw new ValidationUtilError('Invalid asset key (version)');
       }
       if (!z.util.ValidationUtil.asset.retentionPolicy(type)) {
-        throw new Error('Invalid asset key (type)');
+        throw new ValidationUtilError('Invalid asset key (type)');
       }
       if (!z.util.ValidationUtil.isUUID(uuid.join(SEPERATOR))) {
-        throw new Error('Invalid asset key (UUID)');
+        throw new ValidationUtilError('Invalid asset key (UUID)');
       }
       if (asset_token && !z.util.ValidationUtil.isBase64(asset_token)) {
-        throw new Error('Invalid asset token (malformed base64)');
+        throw new ValidationUtilError('Invalid asset token (malformed base64)');
       }
     },
   },
