@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2016 Wire Swiss GmbH
+ * Copyright (C) 2017 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,19 +22,19 @@
   background: @accent_colors-1;
   position: relative;
 
-  &:before,
-  &:after {
+  &::before,
+  &::after {
     content: '';
     position: absolute;
     border-radius: 50%;
   }
 
-  &:before {
+  &::before {
     background:
-    linear-gradient(0deg,   hsla(0,0,100%,1)  50%, hsla(0,0,100%,.9) 100%)    0    0,
-    linear-gradient(90deg,  hsla(0,0,100%,.9)   0, hsla(0,0,100%,.6) 100%) 100%    0,
-    linear-gradient(180deg, hsla(0,0,100%,.6)   0, hsla(0,0,100%,.3) 100%) 100% 100%,
-    linear-gradient(360deg, hsla(0,0,100%,.3)   0, hsla(0,0,100%,0)  100%)    0 100%;
+      linear-gradient(0deg, hsla(0, 0, 100%, 1)  50%, hsla(0, 0, 100%, .9) 100%) 0 0,
+      linear-gradient(90deg, hsla(0, 0, 100%, .9)   0, hsla(0, 0, 100%, .6) 100%) 100% 0,
+      linear-gradient(180deg, hsla(0, 0, 100%, .6)   0, hsla(0, 0, 100%, .3) 100%) 100% 100%,
+      linear-gradient(360deg, hsla(0, 0, 100%, .3)   0, hsla(0, 0, 100%, 0)  100%) 0 100%;
     background-repeat: no-repeat;
     background-size: 50% 50%;
     top: -1px;
@@ -43,7 +43,7 @@
     right: -1px;
   }
 
-  &:after {
+  &::after {
     background: #fff;
     top: 3px;
     bottom: 3px;

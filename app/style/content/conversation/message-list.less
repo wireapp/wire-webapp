@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2016 Wire Swiss GmbH
+ * Copyright (C) 2017 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,9 +40,9 @@
   position: relative;
   margin-bottom: 16px;
 
-  & a {text-decoration: none;}
-  & * {.accent-selection-color;}
-  &:last-child {margin-bottom: 24px;}
+  & a { text-decoration: none; }
+  & * { .accent-selection-color; }
+  &:last-child { margin-bottom: 24px; }
 
   &.hover .time,
   &:hover .time,
@@ -61,7 +61,7 @@
   }
 }
 
-@keyframes marked-animation {to { background-color: inherit}}
+@keyframes marked-animation { to { background-color: inherit; } }
 
 .message-marked {
   .text {
@@ -98,13 +98,13 @@
 
 .message-header-label-sender {
   .label-nocase-bold-xs;
-  &.accent-color-1 {color: fade(@accent_colors-1, 80%);}
-  &.accent-color-2 {color: fade(@accent_colors-2, 72%);}
-  &.accent-color-3 {color: @accent_colors-3;}
-  &.accent-color-4 {color: fade(@accent_colors-4, 72%);}
-  &.accent-color-5 {color: fade(@accent_colors-5, 80%);}
-  &.accent-color-6 {color: fade(@accent_colors-6, 80%);}
-  &.accent-color-7 {color: fade(@accent_colors-7, 64%);}
+  &.accent-color-1 { color: fade(@accent_colors-1, 80%); }
+  &.accent-color-2 { color: fade(@accent_colors-2, 72%); }
+  &.accent-color-3 { color: @accent_colors-3; }
+  &.accent-color-4 { color: fade(@accent_colors-4, 72%); }
+  &.accent-color-5 { color: fade(@accent_colors-5, 80%); }
+  &.accent-color-6 { color: fade(@accent_colors-6, 80%); }
+  &.accent-color-7 { color: fade(@accent_colors-7, 64%); }
 }
 
 .message-header-label-icon {
@@ -142,18 +142,19 @@
   &:not(.message-timestamp-day) {
     margin-right: @conversation-message-timestamp-width;
     border: 0;
+
     .message-header-label {
       border-bottom: 1px dotted @seperator-color;
     }
   }
 
-  time[data-timestamp-type='normal'] {display: block;}
-  time[data-timestamp-type='day'] {display: none;}
+  time[data-timestamp-type='normal'] { display: block; }
+  time[data-timestamp-type='day'] { display: none; }
 }
 
 .message-timestamp-day {
-  time[data-timestamp-type='normal'] {display: none;}
-  time[data-timestamp-type='day'] {display: block;}
+  time[data-timestamp-type='normal'] { display: none; }
+  time[data-timestamp-type='day'] { display: block; }
 }
 
 // MESSAGE - BODY
@@ -187,7 +188,9 @@
     padding-bottom: 75%;
     position: relative;
 
-    iframe, embed, object {
+    embed,
+    iframe,
+    object {
       position: absolute;
       left: 0;
       max-width: 100%;
@@ -214,8 +217,8 @@
   }
 
   .image-loading {
-    .image-element          {cursor: default}
-    .image-placeholder-icon {display: flex}
+    .image-element { cursor: default; }
+    .image-placeholder-icon { display: flex; }
   }
 
   .image-element {
@@ -388,8 +391,15 @@
 }
 
 // PING MESSAGE
-@keyframes ping-scale-animation {0%{ transform: scale(1); } 100%{ transform: scale(1.8);}}
-@keyframes ping-opacity-animation {0%{ opacity: 1; } 100%{ opacity: 0;}}
+@keyframes ping-scale-animation {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.8); }
+}
+
+@keyframes ping-opacity-animation {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
 
 .ping-animation {
   animation-name: ping-scale-animation, ping-opacity-animation;
@@ -398,7 +408,7 @@
   animation-duration: .7s, .7s;
 }
 
-.ping-animation-soft {animation-iteration-count: 3, 3}
+.ping-animation-soft { animation-iteration-count: 3, 3; }
 
 .message-icon-ping {
   margin-left: 8px;
@@ -410,13 +420,13 @@
   top: 8px;
   left: 16px;
 
-  &.accent-color-1 { path {fill: @accent_colors-1;}}
-  &.accent-color-2 { path {fill: @accent_colors-2;}}
-  &.accent-color-3 { path {fill: @accent_colors-3;}}
-  &.accent-color-4 { path {fill: @accent_colors-4;}}
-  &.accent-color-5 { path {fill: @accent_colors-5;}}
-  &.accent-color-6 { path {fill: @accent_colors-6;}}
-  &.accent-color-7 { path {fill: @accent_colors-7;}}
+  &.accent-color-1 { path { fill: @accent_colors-1; } }
+  &.accent-color-2 { path { fill: @accent_colors-2; } }
+  &.accent-color-3 { path { fill: @accent_colors-3; } }
+  &.accent-color-4 { path { fill: @accent_colors-4; } }
+  &.accent-color-5 { path { fill: @accent_colors-5; } }
+  &.accent-color-6 { path { fill: @accent_colors-6; } }
+  &.accent-color-7 { path { fill: @accent_colors-7; } }
 }
 
 // DECRYPT MESSAGE
@@ -459,7 +469,7 @@
 }
 
 .message-call,
-.message-ping  {
+.message-ping {
   padding-top: 16px;
   margin-bottom: 24px;
 }

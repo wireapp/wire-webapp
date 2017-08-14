@@ -37,7 +37,7 @@
     "request": "2.81.0",
     "sinon": "3.2.0",
     "stylelint": "8.0.0",
-    "stylelint-config-recommended": "1.0.0"
+    "stylelint-config-standard": "17.0.0"
   },
   "lint-staged": {
     "*.js": [

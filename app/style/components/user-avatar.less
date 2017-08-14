@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2016 Wire Swiss GmbH
+ * Copyright (C) 2017 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -113,7 +113,6 @@ user-avatar {
     }
   }
 
-
   &.user-avatar-no-border {
     .user-avatar-border {
       border: 0;
@@ -160,25 +159,25 @@ user-avatar {
   }
 
   &.selected {
-    .user-avatar-badge:before {
+    .user-avatar-badge::before {
       .icon-mixin('\e102', @icon-size-sm); // icon-check
     }
   }
 
   &.pending {
-    .user-avatar-badge:before {
+    .user-avatar-badge::before {
       .icon-mixin('\e165', @icon-size-sm); // icon-pending
     }
   }
 
   &.blocked {
-    .user-avatar-badge:before {
+    .user-avatar-badge::before {
       .icon-mixin('\e104', @icon-size-sm); // icon-block
     }
   }
 
   &.camera {
-    .user-avatar-badge:before {
+    .user-avatar-badge::before {
       .icon-mixin('\e143', @icon-size-lg); // icon-camera
     }
   }
@@ -242,7 +241,6 @@ user-avatar {
 }
 
 .user-avatar-loading-transition {
-
   .user-avatar-image {
     transition: all @animation-timing-slow @ease-out-quart @animation-timing-faster;
   }
@@ -252,7 +250,6 @@ user-avatar {
     transition-timing-function: @ease-in-quart;
     transition-duration: @animation-timing-faster;
   }
-
 }
 
 .user-avatar-halo {

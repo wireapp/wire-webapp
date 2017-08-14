@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2016 Wire Swiss GmbH
+ * Copyright (C) 2017 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,20 +45,15 @@ input-element {
     }
   }
 
-
   > span {
     .ellipsis;
     display: block;
     max-width: 100%;
 
-    &.hover:after,
-    &:hover:after {
+    &.hover::after,
+    &:hover::after {
       .icon-mixin('\e177', @icon-size-sm); // icon-edit
       margin-left: 8px;
     }
   }
 }
-
-
-
-

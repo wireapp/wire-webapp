@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2016 Wire Swiss GmbH
+ * Copyright (C) 2017 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@
 }
 
 .text-capitalize {
-  text-transform: capitalize
+  text-transform: capitalize;
 }
 
 .text-underline {
@@ -100,7 +100,7 @@
 // Animations
 // ----------------------------------------------------------------------------
 
-@keyframes spin {to {transform: rotate(1turn);}}
+@keyframes spin { to { transform: rotate(1turn); } }
 
 .spin {
   animation: spin 1s infinite linear;
@@ -128,7 +128,7 @@
   border-radius: 50%;
 }
 
-.arrow-down:before {
+.arrow-down::before {
   .icon-mixin('\e111');
   display: inline-block;
   transform: rotate(90deg);
@@ -170,7 +170,7 @@
 // ----------------------------------------------------------------------------
 
 .clear {
-  &:after {
+  &::after {
     content: '';
     display: table;
     clear: both;
@@ -268,12 +268,11 @@
   height: @bubble-height;
 }
 
-
 // ----------------------------------------------------------------------------
 // ICON MIXINS
 // ----------------------------------------------------------------------------
 
-.icon-mixin (@code, @icon-size: 16px){
+.icon-mixin (@code, @icon-size: 16px) {
   content: @code;
   font-family: Wire;
   speak: none;
@@ -331,9 +330,10 @@
 }
 
 .hide-scrollbar() {
-  &::-webkit-scrollbar {
-    display: none !important
-  }
   -ms-overflow-style: none;
   overflow: -moz-scrollbars-none;
+
+  &::-webkit-scrollbar {
+    display: none !important;
+  }
 }
