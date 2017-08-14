@@ -213,9 +213,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
 
     this.on_connect = () => {
       this.user_repository.create_connection(this.user(), true)
-        .then(function() {
-          amplify.publish(z.event.WebApp.CONVERSATION.PEOPLE.HIDE);
-        });
+        .then(() => amplify.publish(z.event.WebApp.CONVERSATION.PEOPLE.HIDE));
 
       if (typeof params.connect === 'function') {
         params.connect(this.user());
@@ -236,8 +234,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
       if (this.user()) {
         return `accent-color-${this.user().accent_id()}`;
       }
-    }
-    , this, {deferEvaluation: true});
+    }, this, {deferEvaluation: true});
 
     this.show_gray_image = ko.pureComputed(() => {
       if (!this.user()) {
@@ -389,12 +386,8 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
     if (index === 1) {
       const user_id = this.user().id;
       this.client_repository.get_clients_by_user_id(user_id)
-        .then((client_ets) => {
-          this.devices_found(client_ets.length > 0);
-        })
-        .catch((error) => {
-          this.logger.error(`Unable to retrieve clients data for user '${user_id}': ${error}`);
-        });
+        .then((client_ets) => this.devices_found(client_ets.length > 0))
+        .catch((error) => this.logger.error(`Unable to retrieve clients data for user '${user_id}': ${error}`));
     }
   }
 

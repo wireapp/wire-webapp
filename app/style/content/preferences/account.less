@@ -25,19 +25,28 @@
 }
 
 .preferences-section-account-security {
-  margin-top: 72px;
-  margin-bottom: 48px;
+  margin-top: 32px;
+  margin-bottom: 32px;
 
   .preferences-separator {
     margin-bottom: 24px;
   }
 }
 
+.preferences-section-account-space-before {
+  margin-top: @line-height-lg;
+}
+
+.preferences-section-account-space-after {
+  margin-bottom: @line-height-lg;
+}
+
+.preferences-account-user-data {
+  line-height: @line-height-xl;
+}
+
 .preferences-account-accent-color {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 256px;
+  width: 100%;
 }
 
 .preferences-account-mail,
@@ -46,6 +55,7 @@
 }
 
 .preferences-account-picture-button {
+  .square(@avatar-diameter-lg);
   position: relative;
   display: inline-block;
   cursor: pointer;
@@ -72,14 +82,25 @@
   }
 }
 
-.preferences-account-user-data {
-  line-height: @line-height-lg;
+.preferences-account-team-icon {
+  .accent-fill;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
+
+.preferences-account-team-initial {
+  .absolute-center;
+  color: #fff;
+  font-size: 28px;
+  font-weight: @font-weight-light;
+  line-height: 28px;
+  text-transform: uppercase;
 }
 
 .preferences-account-name-wrapper {
   position: relative;
   width: 256px;
-
 }
 
 .preferences-account-username-wrapper {

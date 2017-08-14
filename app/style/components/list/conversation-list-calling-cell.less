@@ -1,0 +1,104 @@
+/*
+ * Wire
+ * Copyright (C) 2016 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+conversation-list-calling-cell {
+  position: relative;
+
+  &:before {
+    content: '';
+    background-color: fade(#000, 24%);
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -40px;
+    bottom: 0;
+    z-index: -1;
+  }
+}
+
+.conversation-list-calling-cell:after {
+  display: none;
+}
+
+.conversation-list-calling-cell-controls {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-bottom: 16px;
+}
+
+.conversation-list-calling-cell-participants {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding-right: 16px;
+  padding-left: 16px;
+  height: 44px;
+
+  &:before {
+    content: '';
+    background-color: @seperator-color;
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    top: 0;
+    height: 1px;
+  }
+}
+
+.conversation-list-calling-cell-participant {
+  cursor: default;
+
+  & + & {
+    margin-left: 8px;
+  }
+}
+
+.conversation-list-calling-cell-controls-on-call {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+.conversation-list-calling-cell-controls-button {
+  .cell-badge;
+  font-size: 12px;
+  padding-left: 8px;
+  padding-right: 8px;
+  user-select: none;
+
+  & + & {
+    margin-left: 8px;
+  }
+}
+
+.conversation-list-calling-cell-controls-join-button {
+  .fill-green;
+  .label-bold;
+}
+
+.conversation-list-calling-cell-participants-rest {
+  font-size: 12px;
+  margin-left: 8px;
+
+  &:before {
+    content: '+';
+  }
+}

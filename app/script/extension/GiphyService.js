@@ -78,8 +78,7 @@ z.extension.GiphyService = class GiphyService {
       limit: 25,
       offset: 0,
       sorting: 'relevant',
-    }
-    , options);
+    }, options);
 
     const url = `${GiphyService.CONFIG.ENDPOINT_BASE}/search` +
       `?q=${encodeURIComponent(options.query)}` +

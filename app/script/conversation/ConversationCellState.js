@@ -231,12 +231,14 @@ z.conversation.ConversationCellState = (() => {
           message_text = message_et.get_first_asset().text;
         } else if (message_et.has_asset()) {
           const asset_et = message_et.get_first_asset();
-          if (asset_et.is_audio()) {
-            message_text = z.l10n.text(z.string.system_notification_shared_audio);
-          } else if (asset_et.is_video()) {
-            message_text = z.l10n.text(z.string.system_notification_shared_video);
-          } else {
-            message_text = z.l10n.text(z.string.system_notification_shared_file);
+          if (asset_et.status() === z.assets.AssetTransferState.UPLOADED) {
+            if (asset_et.is_audio()) {
+              message_text = z.l10n.text(z.string.system_notification_shared_audio);
+            } else if (asset_et.is_video()) {
+              message_text = z.l10n.text(z.string.system_notification_shared_video);
+            } else {
+              message_text = z.l10n.text(z.string.system_notification_shared_file);
+            }
           }
         } else if (message_et.has_asset_location()) {
           message_text = z.l10n.text(z.string.system_notification_shared_location);

@@ -37,7 +37,7 @@ describe('UserHandleGenerator', function() {
       expect(z.user.UserHandleGenerator.normalize_name('Maria LaRochelle')).toBe('marialarochelle');
       expect(z.user.UserHandleGenerator.normalize_name("Mêrié \"LaRöche'lle\"")).toBe('merielaroechelle');
       expect(z.user.UserHandleGenerator.normalize_name('Maria I ❤️🍕')).toBe('mariai');
-      expect(z.user.UserHandleGenerator.normalize_name('.-/Maria\-.')).toBe('maria');
+      expect(z.user.UserHandleGenerator.normalize_name('.-/Maria-.')).toBe('maria');
       // expect(z.user.UserHandleGenerator.normalize_name('苹果')).toBe 'pingguo'
       // expect(z.user.UserHandleGenerator.normalize_name('תפוח ')).toBe 'tpwh'
       // expect(z.user.UserHandleGenerator.normalize_name('सेवफलम्')).toBe 'sevaphalam'
@@ -94,6 +94,29 @@ describe('UserHandleGenerator', function() {
       expect(suggestions.length).toBe(12);
       expect(suggestions.shift()).toBe(username);
       suggestions.forEach((suggestion) => expect(suggestion).not.toBe(username));
+    });
+  });
+
+  describe('validate_handle', function() {
+    it('returns true for valid handles', function() {
+      expect(z.user.UserHandleGenerator.validate_handle('valid1')).toBeTruthy();
+      expect(z.user.UserHandleGenerator.validate_handle('1valid')).toBeTruthy();
+      expect(z.user.UserHandleGenerator.validate_handle('val1d')).toBeTruthy();
+      expect(z.user.UserHandleGenerator.validate_handle('still_valid')).toBeTruthy();
+    });
+
+    it('returns false for invalid handles', function() {
+      expect(z.user.UserHandleGenerator.validate_handle()).toBeFalsy();
+      expect(z.user.UserHandleGenerator.validate_handle('')).toBeFalsy();
+      expect(z.user.UserHandleGenerator.validate_handle(1)).toBeFalsy();
+      expect(z.user.UserHandleGenerator.validate_handle('Invalid')).toBeFalsy();
+      expect(z.user.UserHandleGenerator.validate_handle('invaliD')).toBeFalsy();
+      expect(z.user.UserHandleGenerator.validate_handle('invAlid')).toBeFalsy();
+      expect(z.user.UserHandleGenerator.validate_handle('!invalid')).toBeFalsy();
+      expect(z.user.UserHandleGenerator.validate_handle('invalid!')).toBeFalsy();
+      expect(z.user.UserHandleGenerator.validate_handle('inva!lid')).toBeFalsy();
+      expect(z.user.UserHandleGenerator.validate_handle('inva!lid')).toBeFalsy();
+      expect(z.user.UserHandleGenerator.validate_handle('thisisaverylongandthusinvalidhandle')).toBeFalsy();
     });
   });
 });

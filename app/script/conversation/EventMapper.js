@@ -177,26 +177,13 @@ z.conversation.EventMapper = class EventMapper {
     const event_data = event.data;
     const message_et = new z.entity.ContentMessage();
 
-    message_et.assets.push(this._map_asset_image(event, should_create_dummy_image));
+    if (event_data.info.tag === 'medium') {
+      message_et.assets.push(this._map_asset_image(event, should_create_dummy_image));
+    } else {
+      message_et.assets.push(this._map_asset_file(event));
+    }
+
     message_et.nonce = event_data.info.nonce;
-
-    return message_et;
-  }
-
-  /**
-   * Maps JSON data of conversation.asset_add message into message entity
-   *
-   * @private
-   * @param {Object} event - Message data
-   * @returns {ContentMessage} Content message entity
-   */
-  _map_event_asset_meta(event) {
-    const event_data = event.data;
-    const message_et = new z.entity.ContentMessage();
-
-    message_et.assets.push(this._map_asset_file(event));
-    message_et.nonce = event_data.info.nonce;
-
     return message_et;
   }
 
@@ -451,7 +438,6 @@ z.conversation.EventMapper = class EventMapper {
     asset_et.file_type = content_type;
     asset_et.file_name = info.name;
     asset_et.meta = meta;
-
 
     // remote data - full
     const {key, otr_key, sha256, token} = event_data;

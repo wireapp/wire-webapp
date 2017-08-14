@@ -133,51 +133,10 @@ describe('Conversation', function() {
     const first_date = new Date('2014-12-15T09:21:14.225Z').getTime();
     const second_date = new Date('2014-12-15T09:22:14.225Z').getTime();
 
-    it('should update with newer timestamp', function() {
+    it('should only update with newer timestamp', function() {
       expect(conversation_et._increment_time_only(first_date, second_date)).toBe(second_date);
-    });
-
-    it('should not update with older timestamp', function() {
       expect(conversation_et._increment_time_only(second_date, first_date)).toBeFalsy();
-    });
-
-    // TODO: Flaky test
-    xit('should not update with same timestamp', function() {
       expect(conversation_et._increment_time_only(first_date, first_date)).toBeFalsy();
-    });
-  });
-
-  describe('is_archived', function() {
-    const first_date = new Date('2014-12-15T09:21:14.225Z').getTime();
-    const second_date = new Date('2014-12-15T09:22:14.225Z').getTime();
-
-    it('is not archived when nothing is set', function() {
-      expect(conversation_et.is_archived()).toBeFalsy();
-    });
-
-    it('is archived when archived event is last event', function() {
-      conversation_et.archived_state(true);
-      conversation_et.archived_timestamp(first_date);
-      conversation_et.last_event_timestamp(first_date);
-      expect(conversation_et.is_archived()).toBeTruthy();
-    });
-
-    it('is not archived when archived event is older then last event', function() {
-      conversation_et.archived_state(true);
-      conversation_et.archived_timestamp(first_date);
-      conversation_et.last_event_timestamp(second_date);
-      expect(conversation_et.is_archived()).toBeFalsy();
-    });
-
-    // TODO: test is flaky
-    xit('is archived when archived event is older then last event but its muted', function() {
-      conversation_et.archived_state(true);
-      conversation_et.archived_timestamp(first_date);
-      conversation_et.last_event_timestamp(second_date);
-      conversation_et.muted_timestamp(first_date);
-      conversation_et.muted_state(true);
-      expect(conversation_et.is_muted()).toBeTruthy();
-      expect(conversation_et.is_archived()).toBeTruthy();
     });
   });
 
@@ -351,22 +310,6 @@ describe('Conversation', function() {
       conversation_et.add_messages(message_ets);
 
       expect(conversation_et.messages_unordered().length).toBe(2);
-    });
-
-    it('detects duplicate messages', function() {
-      const content = z.message.SuperType.CONTENT;
-      const asset_meta = z.event.Client.CONVERSATION.ASSET_META;
-
-      message1.super_type = content;
-      message1.type = asset_meta;
-
-      message2.super_type = content;
-      message2.type = asset_meta;
-      const message_ets = [message1, message2];
-      conversation_et.add_messages(message_ets);
-
-      expect(message2.visible()).toBe(false);
-      expect(message1.visible()).toBe(true);
     });
   });
 
@@ -591,35 +534,6 @@ describe('Conversation', function() {
     });
   });
 
-  describe('_check_for_duplicate_nonce', () =>
-    it('should hide newer duplicated audio asset', function() {
-      const older_timestamp = new Date('December 24, 2000 18:00:00').getTime();
-      const newer_timestamp = new Date('December 24, 2000 18:01:00').getTime();
-
-      const asset_et = new z.entity.File(z.util.create_random_uuid());
-      asset_et.file_size = 'audio/mp4';
-
-      const older_message_et = new z.entity.ContentMessage();
-      older_message_et.timestamp(older_timestamp);
-      older_message_et.id = z.util.create_random_uuid();
-      older_message_et.nonce = z.util.create_random_uuid();
-      older_message_et.type = z.event.Client.CONVERSATION.ASSET_META;
-      older_message_et.add_asset(asset_et);
-
-      const newer_message_et = new z.entity.ContentMessage();
-      newer_message_et.timestamp(newer_timestamp);
-      newer_message_et.id = older_message_et.id;
-      newer_message_et.nonce = older_message_et.nonce;
-      newer_message_et.type = z.event.Client.CONVERSATION.ASSET_META;
-      newer_message_et.add_asset(asset_et);
-
-      conversation_et._check_for_duplicate_nonce(older_message_et, newer_message_et);
-
-      expect(older_message_et.visible()).toBeTruthy();
-      expect(newer_message_et.visible()).toBeFalsy();
-    })
-  );
-
   describe('is_with_bot', () =>
     it('detects bot conversations by the username of the remote participant', function() {
       const user_et = new z.entity.User(z.util.create_random_uuid());
@@ -822,6 +736,48 @@ describe('Conversation', function() {
 
       expect(new_conversation.participating_user_ids().length).toBe(1);
       expect(new_conversation.participating_user_ids()[0]).toBe(connector_user_id);
+    });
+  });
+
+  describe('should_unarchive', () => {
+    let time = undefined;
+
+    beforeEach(() => {
+      time = Date.now();
+      conversation_et.archived_timestamp(time);
+      conversation_et.archived_state(true);
+      conversation_et.muted_state(true);
+    });
+
+    it('returns expected bool whether a conversation should be unarchived', () => {
+      conversation_et.last_event_timestamp(time - 100);
+      expect(conversation_et.should_unarchive()).toBeFalsy();
+
+      conversation_et.last_event_timestamp(time);
+      expect(conversation_et.should_unarchive()).toBeFalsy();
+
+      conversation_et.last_event_timestamp(time + 100);
+      expect(conversation_et.should_unarchive()).toBeFalsy();
+
+      conversation_et.muted_state(false);
+      conversation_et.last_event_timestamp(time - 100);
+      expect(conversation_et.should_unarchive()).toBeFalsy();
+
+      conversation_et.last_event_timestamp(time);
+      expect(conversation_et.should_unarchive()).toBeFalsy();
+
+      conversation_et.last_event_timestamp(time + 100);
+      expect(conversation_et.should_unarchive()).toBeTruthy();
+
+      conversation_et.archived_state(false);
+      conversation_et.last_event_timestamp(time - 100);
+      expect(conversation_et.should_unarchive()).toBeFalsy();
+
+      conversation_et.last_event_timestamp(time);
+      expect(conversation_et.should_unarchive()).toBeFalsy();
+
+      conversation_et.last_event_timestamp(time + 100);
+      expect(conversation_et.should_unarchive()).toBeFalsy();
     });
   });
 });

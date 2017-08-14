@@ -172,14 +172,6 @@ z.entity.Message = class Message {
   }
 
   /**
-   * Check if message contains a nonce.
-   * @returns {boolean} Message contains a nonce
-   */
-  has_nonce() {
-    return this.super_type === z.message.SuperType.CONTENT;
-  }
-
-  /**
    * Check if message is a call message.
    * @returns {boolean} Is message of type call
    */

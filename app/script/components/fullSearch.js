@@ -59,8 +59,7 @@ z.components.FullSearchViewModel = class FullSearchViewModel {
             this.message_ets_rendered(this.message_ets.splice(0, this.number_of_message_to_render));
           }
         });
-    }
-    , 100)
+    }, 100)
     );
 
     this.transform_text = (message_et) => {

@@ -53,6 +53,7 @@ z.ViewModel.LoadingViewModel = class LoadingViewModel {
           break;
         }
 
+        case z.string.init_decryption_progress:
         case z.string.init_events_progress: {
           const substitutes = {
             number1: replace_content[0],

@@ -19,7 +19,7 @@
 
 @font-face {
   font-family: 'Wire';
-  src: url('/font/Wire.ttf?invite') format('truetype');
+  src: url('/font/Wire.ttf?call') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
@@ -156,6 +156,9 @@
 .icon-mute:before {
   content: "\e159";
 }
+.icon-mute-small:before {
+  content: "\e1590";
+}
 .icon-notification:before {
   content: "\e161";
 }
@@ -248,6 +251,9 @@
 }
 .icon-screensharing:before {
   content: "\e227";
+}
+.icon-screensharing-small:before {
+  content: "\e2270";
 }
 .icon-video-off:before {
   content: "\e231";

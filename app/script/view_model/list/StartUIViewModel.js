@@ -74,9 +74,10 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
         this.show_matches(false);
 
         // Contacts, groups and others
-        const is_username = query.trim().startsWith('@');
+        const trimmed_query = query.trim();
+        const is_handle = trimmed_query.startsWith('@') && z.user.UserHandleGenerator.validate_handle(normalized_query);
 
-        this.search_repository.search_by_name(normalized_query, is_username)
+        this.search_repository.search_by_name(normalized_query, is_handle)
           .then((user_ets) => {
             const is_current_query = normalized_query === z.search.SearchRepository.normalize_query(this.search_input());
             if (is_current_query) {
@@ -86,12 +87,12 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
           .catch((error) => this.logger.error(`Error searching for contacts: ${error.message}`, error));
 
         if (this.is_team()) {
-          this.search_results.contacts(this.team_repository.search_for_team_users(normalized_query, is_username));
+          this.search_results.contacts(this.team_repository.search_for_team_users(normalized_query, is_handle));
         } else {
-          this.search_results.contacts(this.user_repository.search_for_connected_users(normalized_query, is_username));
+          this.search_results.contacts(this.user_repository.search_for_connected_users(normalized_query, is_handle));
         }
 
-        this.search_results.groups(this.conversation_repository.get_groups_by_name(normalized_query, is_username));
+        this.search_results.groups(this.conversation_repository.get_groups_by_name(normalized_query, is_handle));
         this.searched_for_user(query);
       }
     }, 300);
@@ -131,7 +132,6 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
     // User properties
     this.has_created_conversation = ko.observable(false);
-    this.has_uploaded_contacts = ko.observable(false);
 
     // View states
     this.has_search_results = ko.pureComputed(() => {
@@ -163,13 +163,6 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
     // Invite bubble states
     this.show_invite_form = ko.observable(true);
-    this.show_invite_form_only = ko.pureComputed(() => {
-      if (this.has_uploaded_contacts()) {
-        return true;
-      }
-
-      return !this.has_uploaded_contacts() && !this.show_top_people();
-    });
 
     // Invite bubble
     this.invite_bubble = null;
@@ -200,7 +193,6 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.update_properties = this.update_properties.bind(this);
 
     amplify.subscribe(z.event.WebApp.CONNECT.IMPORT_CONTACTS, this.import_contacts.bind(this));
-    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.CONTACTS, this.update_properties);
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.HAS_CREATED_CONVERSATION, this.update_properties);
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.update_properties);
   }
@@ -215,7 +207,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     return promise
       .then((_conversation_et) => {
         if (_conversation_et.is_archived()) {
-          this.conversation_repository.unarchive_conversation(_conversation_et);
+          this.conversation_repository.unarchive_conversation(_conversation_et, 'opened conversation from search');
         }
 
         if (_conversation_et.is_cleared()) {
@@ -514,8 +506,6 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     const properties = this.properties_repository.properties;
     this.has_created_conversation(properties.has_created_conversation);
 
-    const has_uploaded_contacts = properties.contact_import.google !== undefined || properties.contact_import.macos !== undefined;
-    this.has_uploaded_contacts(has_uploaded_contacts);
     return true;
   }
 
@@ -564,7 +554,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       .then((conversation_et) => {
         if (conversation_et) {
           window.setTimeout(() => {
-            amplify.publish(z.event.WebApp.CALL.STATE.TOGGLE, false, conversation_et);
+            amplify.publish(z.event.WebApp.CALL.STATE.TOGGLE, z.media.MediaType.AUDIO, conversation_et);
           }, 500);
         }
       });
@@ -586,7 +576,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       .then((conversation_et) => {
         if (conversation_et) {
           window.setTimeout(() => {
-            amplify.publish(z.event.WebApp.CALL.STATE.TOGGLE, true, conversation_et);
+            amplify.publish(z.event.WebApp.CALL.STATE.TOGGLE, z.media.MediaType.AUDIO_VIDEO, conversation_et);
           }, 500);
         }
       });

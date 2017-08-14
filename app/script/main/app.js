@@ -95,11 +95,12 @@ z.main.App = class App {
     repositories.conversation        = new z.conversation.ConversationRepository(
       this.service.conversation,
       this.service.asset,
-      repositories.user,
-      repositories.giphy,
+      repositories.client,
       repositories.cryptography,
+      repositories.giphy,
       repositories.links,
-      repositories.team
+      repositories.team,
+      repositories.user
     );
 
     repositories.bot                 = new z.bot.BotRepository(this.service.bot, repositories.conversation);
@@ -206,95 +207,97 @@ z.main.App = class App {
    */
   init_app(is_reload = this._is_reload()) {
     z.util.check_indexed_db()
-    .then(() => this._check_single_instance())
-    .then(() => this._load_access_token())
-    .then(() => {
-      this.view.loading.update_progress(2.5, z.string.init_received_access_token);
-      this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
-      return Promise.all([
-        this._get_user_self(),
-        z.util.protobuf.load_protos(`ext/proto/generic-message-proto/messages.proto?${z.util.Environment.version(false)}`),
-      ]);
-    })
-    .then(([self_user_et]) => {
-      this.view.loading.update_progress(5, z.string.init_received_self_user);
-      this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_SELF_USER);
-      this.repository.client.init(self_user_et);
-      this.repository.properties.init(self_user_et);
-      return this.repository.cryptography.init(this.service.storage.db);
-    })
-    .then(() => {
-      this.view.loading.update_progress(7.5);
-      this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
-      return this.repository.client.get_valid_local_client();
-    })
-    .then((client_observable) => {
-      this.view.loading.update_progress(10, z.string.init_validated_client);
+      .then(() => this._check_single_instance())
+      .then(() => this._load_access_token())
+      .then(() => {
+        this.view.loading.update_progress(2.5, z.string.init_received_access_token);
+        this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
+        return Promise.all([
+          this._get_user_self(),
+          z.util.protobuf.load_protos(`ext/proto/generic-message-proto/messages.proto?${z.util.Environment.version(false)}`),
+        ]);
+      })
+      .then(([self_user_et]) => {
+        this.view.loading.update_progress(5, z.string.init_received_self_user);
+        this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_SELF_USER);
+        this.repository.client.init(self_user_et);
+        this.repository.properties.init(self_user_et);
+        return this.repository.cryptography.init(this.service.storage.db);
+      })
+      .then(() => {
+        this.view.loading.update_progress(7.5);
+        this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
+        return this.repository.client.get_valid_local_client();
+      })
+      .then((client_observable) => {
+        this.view.loading.update_progress(10, z.string.init_validated_client);
 
-      this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.VALIDATED_CLIENT);
-      this.telemetry.add_statistic(z.telemetry.app_init.AppInitStatisticsValue.CLIENT_TYPE, client_observable().type);
+        this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.VALIDATED_CLIENT);
+        this.telemetry.add_statistic(z.telemetry.app_init.AppInitStatisticsValue.CLIENT_TYPE, client_observable().type);
 
-      this.repository.cryptography.current_client = client_observable;
-      this.repository.event.current_client = client_observable;
-      this.repository.event.connect_web_socket();
+        this.repository.cryptography.current_client = client_observable;
+        this.repository.event.current_client = client_observable;
+        this.repository.event.connect_web_socket();
 
-      return Promise.all([
-        this.repository.conversation.get_conversations(),
-        this.repository.user.get_connections(),
-      ]);
-    })
-    .then(([conversation_ets, connection_ets]) => {
-      this.view.loading.update_progress(25, z.string.init_received_user_data);
+        return Promise.all([
+          this.repository.conversation.get_conversations(),
+          this.repository.user.get_connections(),
+        ]);
+      })
+      .then(([conversation_ets, connection_ets]) => {
+        this.view.loading.update_progress(25, z.string.init_received_user_data);
 
-      this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_USER_DATA);
-      this.telemetry.add_statistic(z.telemetry.app_init.AppInitStatisticsValue.CONVERSATIONS, conversation_ets.length, 50);
-      this.telemetry.add_statistic(z.telemetry.app_init.AppInitStatisticsValue.CONNECTIONS, connection_ets.length, 50);
+        this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_USER_DATA);
+        this.telemetry.add_statistic(z.telemetry.app_init.AppInitStatisticsValue.CONVERSATIONS, conversation_ets.length, 50);
+        this.telemetry.add_statistic(z.telemetry.app_init.AppInitStatisticsValue.CONNECTIONS, connection_ets.length, 50);
 
-      this.repository.conversation.map_connections(this.repository.user.connections());
-      this._subscribe_to_unload_events();
+        this.repository.conversation.map_connections(this.repository.user.connections());
+        this._subscribe_to_unload_events();
 
-      return Promise.all([
-        this.repository.event.initialize_from_stream(),
-        this.repository.team.get_team(),
-      ]);
-    })
-    .then(([notifications_count, team_et]) => {
-      this.repository.conversation.initialize_conversations();
-      this.view.loading.update_progress(95, z.string.init_updated_from_notifications);
+        return Promise.all([
+          this.repository.event.initialize_from_stream(),
+          this.repository.team.get_team(),
+        ]);
+      })
+      .then(([notifications_count, team_et]) => {
+        this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
+        this.telemetry.add_statistic(z.telemetry.app_init.AppInitStatisticsValue.NOTIFICATIONS, notifications_count, 100);
 
-      this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
-      this.telemetry.add_statistic(z.telemetry.app_init.AppInitStatisticsValue.NOTIFICATIONS, notifications_count, 100);
+        return this.repository.conversation.initialize_conversations();
+      })
+      .then(() => {
+        this.view.loading.update_progress(97.5, z.string.init_updated_from_notifications);
 
-      this._watch_online_status();
-      return this.repository.client.get_clients_for_self();
-    })
-    .then((client_ets) => {
-      this.view.loading.update_progress(97.5);
+        this._watch_online_status();
+        return this.repository.client.get_clients_for_self();
+      })
+      .then((client_ets) => {
+        this.view.loading.update_progress(99);
 
-      this.telemetry.add_statistic(z.telemetry.app_init.AppInitStatisticsValue.CLIENTS, client_ets.length);
-      this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.APP_PRE_LOADED);
+        this.telemetry.add_statistic(z.telemetry.app_init.AppInitStatisticsValue.CLIENTS, client_ets.length);
+        this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.APP_PRE_LOADED);
 
-      this.repository.user.self().devices(client_ets);
-      this.logger.info('App pre-loading completed');
-      return this._handle_url_params();
-    })
-    .then(() => {
-      this._show_ui();
-      this.telemetry.report();
-      amplify.publish(z.event.WebApp.LIFECYCLE.LOADED);
-      amplify.publish(z.event.WebApp.LOADED); // todo: deprecated - remove when user base of wrappers version >= 2.12 is large enough
-      this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.APP_LOADED);
-      return this.repository.conversation.update_conversations_unarchived();
-    })
-    .then(() => {
-      this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.UPDATED_CONVERSATIONS);
-      this.repository.announce.init();
-      this.repository.audio.init(true);
-      this.repository.client.cleanup_clients_and_sessions(true);
-      this.repository.conversation.cleanup_conversations();
-      this.logger.info('App fully loaded');
-    })
-    .catch((error) => this._app_init_failure(error, is_reload));
+        this.repository.user.self().devices(client_ets);
+        this.logger.info('App pre-loading completed');
+        return this._handle_url_params();
+      })
+      .then(() => {
+        this._show_ui();
+        this.telemetry.report();
+        amplify.publish(z.event.WebApp.LIFECYCLE.LOADED);
+        amplify.publish(z.event.WebApp.LOADED); // todo: deprecated - remove when user base of wrappers version >= 2.12 is large enough
+        this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.APP_LOADED);
+        return this.repository.conversation.update_conversations_unarchived();
+      })
+      .then(() => {
+        this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.UPDATED_CONVERSATIONS);
+        this.repository.announce.init();
+        this.repository.audio.init(true);
+        this.repository.client.cleanup_clients_and_sessions(true);
+        this.repository.conversation.cleanup_conversations();
+        this.logger.info('App fully loaded');
+      })
+      .catch((error) => this._app_init_failure(error, is_reload));
   }
 
   /**
@@ -304,9 +307,7 @@ z.main.App = class App {
   init_service_worker() {
     if (navigator.serviceWorker) {
       navigator.serviceWorker.register('/sw.js')
-      .then((registration) => {
-        this.logger.info(`ServiceWorker registration successful with scope: ${registration.scope}`);
-      });
+        .then(({scope}) => this.logger.info(`ServiceWorker registration successful with scope: ${scope}`));
     }
   }
 
@@ -446,17 +447,17 @@ z.main.App = class App {
    */
   _get_user_self() {
     return this.repository.user.get_me()
-    .then((user_et) => {
-      this.logger.info(`Loaded self user with ID '${user_et.id}'`);
-      if (!user_et.email() && !user_et.phone()) {
-        throw new Error('User does not have a verified identity');
-      }
-      return this.service.storage.init(user_et.id)
-      .then(() => {
-        this._check_user_information(user_et);
-        return user_et;
+      .then((user_et) => {
+        this.logger.info(`Loaded self user with ID '${user_et.id}'`);
+        if (!user_et.email() && !user_et.phone()) {
+          throw new Error('User does not have a verified identity');
+        }
+        return this.service.storage.init(user_et.id)
+          .then(() => {
+            this._check_user_information(user_et);
+            return user_et;
+          });
       });
-    });
   }
 
   /**
@@ -527,8 +528,7 @@ z.main.App = class App {
 
     window.setTimeout(() => {
       return this.repository.system_notification.check_permission();
-    }
-    , 10000);
+    }, 10000);
 
     $('#loading-screen').remove();
     $('#wire-main').attr('data-uie-value', 'is-loaded');

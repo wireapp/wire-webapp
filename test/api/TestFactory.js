@@ -304,11 +304,12 @@ window.TestFactory.prototype.exposeConversationActors = function() {
       TestFactory.conversation_repository = new z.conversation.ConversationRepository(
         TestFactory.conversation_service,
         TestFactory.asset_service,
-        TestFactory.user_repository,
-        undefined,
+        TestFactory.client_repository,
         TestFactory.cryptography_repository,
         undefined,
-        TestFactory.team_repository
+        undefined,
+        TestFactory.team_repository,
+        TestFactory.user_repository
       );
       TestFactory.conversation_repository.logger.level = this.settings.logging_level;
 

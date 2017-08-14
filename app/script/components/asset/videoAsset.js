@@ -94,9 +94,7 @@ z.components.VideoAssetComponent = class VideoAssetComponent {
           }
           this.show_bottom_controls(true);
         })
-        .catch((error) => {
-          this.logger.error('Failed to load video asset ', error);
-        });
+        .catch((error) => this.logger.error('Failed to load video asset ', error));
     }
   }
 

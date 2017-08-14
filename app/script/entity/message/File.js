@@ -128,9 +128,7 @@ z.entity.File = class File extends z.entity.Asset {
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.DOWNLOAD_INITIATED, tracking_data);
 
     return this.load()
-      .then((blob) => {
-        return z.util.download_blob(blob, this.file_name);
-      })
+      .then((blob) => z.util.download_blob(blob, this.file_name))
       .then(() => {
         const download_duration = (Date.now() - download_started) / 1000;
         this.logger.info(`Downloaded asset in ${download_duration} seconds`);

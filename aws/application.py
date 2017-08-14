@@ -40,10 +40,9 @@ sslify = flask_sslify.SSLify(application, skips=['test'])
 ###############################################################################
 # Controllers
 ###############################################################################
-@application.route('/<path>/')
 @application.route('/')
 @main.latest_browser_required
-def index(path=None):
+def index():
   return flask.make_response(flask.render_template('index.html'))
 
 
@@ -152,16 +151,17 @@ def error_handler(e):
     e.code = 500
     e.name = 'Internal Server Error'
 
-  handler = logging.StreamHandler()
-  application.logger.addHandler(handler)
-  application.logger.error('IP: %s (agent: %s)' % (
-    flask.request.remote_addr,
-    flask.request.headers['User-Agent'],
-  ))
-  application.logger.exception(e)
-
   if e.code == 406:
     return flask.redirect('https://wire.com/unsupported/')
+  elif e.code >= 500:
+    handler = logging.StreamHandler()
+    application.logger.addHandler(handler)
+    application.logger.error('Error - %s IP: %s (agent: %s)' % (
+      e.code,
+      flask.request.remote_addr,
+      flask.request.headers['User-Agent'],
+    ))
+    application.logger.exception(e)
 
   return flask.render_template(
       'aws/error.html',

@@ -3,8 +3,8 @@
   "license": "LicenseRef-LICENSE",
   "devDependencies": {
     "autoprefixer": "7.1.2",
-    "eslint": "3.19.0",
-    "eslint-plugin-jsdoc": "3.1.1",
+    "eslint": "4.4.1",
+    "eslint-plugin-jsdoc": "3.1.2",
     "grunt": "1.0.1",
     "grunt-aws-s3": "1.0.0",
     "grunt-bower-task": "0.4.0",
@@ -27,20 +27,26 @@
     "grunt-todo": "0.5.0",
     "husky": "0.14.3",
     "jasmine-ajax": "3.2.0",
-    "jasmine-core": "2.6.4",
+    "jasmine-core": "2.7.0",
     "karma": "1.7.0",
     "karma-chrome-launcher": "2.2.0",
     "karma-coverage": "1.1.1",
     "karma-jasmine": "1.1.0",
-    "lint-staged": "4.0.1",
+    "lint-staged": "4.0.3",
     "load-grunt-tasks": "3.5.2",
     "request": "2.81.0",
-    "sinon": "2.3.8",
+    "sinon": "3.2.0",
     "stylelint": "8.0.0"
   },
   "lint-staged": {
-    "*.js": ["yarn lint-scripts", "git add"],
-    "*.less": ["yarn lint-styles", "git add"]
+    "*.js": [
+      "yarn lint-scripts",
+      "git add"
+    ],
+    "*.less": [
+      "yarn lint-styles",
+      "git add"
+    ]
   },
   "scripts": {
     "deploy-travis-dev": "grunt app_deploy_travis:dev",

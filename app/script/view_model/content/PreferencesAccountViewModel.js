@@ -51,6 +51,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.is_team = this.team_repository.is_team;
     this.team = this.team_repository.team;
     this.team_name = ko.pureComputed(() => z.l10n.text(z.string.preferences_account_team, this.team_repository.team_name()));
+    this.team_initial = ko.pureComputed(() => z.util.StringUtil.get_first_character(this.team_repository.team_name()));
 
     this.name_saved = ko.observable();
     this.username_saved = ko.observable();

@@ -37,6 +37,7 @@ z.string.alert_gif_too_large = 'Animation is too large.\nMaximum size is {{numbe
 z.string.auth_account_country_code = 'Country Code';
 z.string.auth_account_create = 'Create';
 z.string.auth_account_create_account = 'Create an account';
+z.string.auth_account_deletion = 'You were signed out because your account was deleted.';
 z.string.auth_account_expiration = 'You were signed out because your session expired. Please log in again.';
 z.string.auth_account_get_wire = 'Simple, private & secure messenger for chat, calls, sharing pics, music, videos, GIFs and more.';
 z.string.auth_account_password_forgot = 'Forgot password';
@@ -126,6 +127,7 @@ z.string.call_decline = 'Decline';
 z.string.call_accept = 'Accept';
 z.string.call_join = 'Join';
 z.string.call_choose_shared_screen = 'Choose a screen to share';
+z.string.call_participants = '{{number}} on call';
 
 // Warnings
 z.string.modal_button_cancel = 'Cancel';
@@ -638,8 +640,9 @@ z.string.init_received_access_token = 'Signed in';
 z.string.init_received_self_user = 'Hello, {{user}}.';
 z.string.init_validated_client = 'Fetching your connections and conversations';
 z.string.init_received_user_data = 'Checking for new messages';
+z.string.init_decryption_progress = 'Decrypting messages - {{number1}} of {{number2}}';
 z.string.init_events_progress = 'Loading messages - {{number1}} of {{number2}}';
-z.string.init_updated_from_notifications = 'Enjoy Wire';
+z.string.init_updated_from_notifications = 'Almost done - Enjoy Wire';
 
 z.string.ephememal_units_none = 'Off';
 z.string.ephememal_units_second = 'second';

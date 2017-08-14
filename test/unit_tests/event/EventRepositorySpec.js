@@ -192,7 +192,7 @@ describe('Event Repository', function() {
     });
 
     it('should not save but distribute call events', function(done) {
-      TestFactory.event_repository._handle_event({type: z.event.Backend.CALL.FLOW_ACTIVE})
+      TestFactory.event_repository._handle_event({type: z.event.Client.CALL.E_CALL})
         .then(function() {
           expect(TestFactory.event_repository.conversation_service.save_event).not.toHaveBeenCalled();
           expect(TestFactory.event_repository._distribute_event).toHaveBeenCalled();

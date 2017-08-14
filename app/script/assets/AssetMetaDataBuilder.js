@@ -26,14 +26,15 @@ window.z.assets = z.assets || {};
 z.assets.AssetMetaDataBuilder = {
   _build_audio_metdadata(audiofile) {
     return z.util.load_file_buffer(audiofile)
-    .then((buffer) => {
-      const audioContext = new AudioContext();
-      audioContext.close();
-      return audioContext.decodeAudioData(buffer);
-    })
-    .then((audio_buffer) => {
-      return new z.proto.Asset.AudioMetaData(audio_buffer.duration * 1000, z.assets.AssetMetaDataBuilder._normalise_loudness(audio_buffer));
-    });
+      .then((buffer) => {
+        const audioContext = new AudioContext();
+        audioContext.close();
+        return audioContext.decodeAudioData(buffer);
+      })
+      .then((audio_buffer) => {
+        const normalized_loudness = z.assets.AssetMetaDataBuilder._normalise_loudness(audio_buffer);
+        return new z.proto.Asset.AudioMetaData(audio_buffer.duration * 1000, normalized_loudness);
+      });
   },
 
   _build_image_metdadata(imagefile) {
@@ -94,9 +95,11 @@ z.assets.AssetMetaDataBuilder = {
 
     if (this.is_video(file)) {
       return this._build_video_metdadata(file);
-    } else if (this.is_audio(file)) {
+    }
+    if (this.is_audio(file)) {
       return this._build_audio_metdadata(file);
-    } else if (this.is_image(file)) {
+    }
+    if (this.is_image(file)) {
       return this._build_image_metdadata(file);
     }
     return Promise.resolve();

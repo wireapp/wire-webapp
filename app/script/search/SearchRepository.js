@@ -39,7 +39,10 @@ z.search.SearchRepository = class SearchRepository {
     if (!_.isString(query)) {
       return '';
     }
-    return query.trim().replace(/^[@]/, '');
+    return query
+      .trim()
+      .replace(/^[@]/, '')
+      .toLowerCase();
   }
 
   /**
@@ -58,18 +61,18 @@ z.search.SearchRepository = class SearchRepository {
    * @note We skip a few results as connection changes need a while to reflect on the backend.
    *
    * @param {string} name - Search query
-   * @param {boolean} is_username - Is query a username
+   * @param {boolean} is_handle - Is query a user handle
    * @param {number} [max_results=SearchRepository.CONFIG.MAX_SEARCH_RESULTS] - Maximum number of results
    * @returns {Promise} Resolves with the search results
    */
-  search_by_name(name, is_username, max_results = SearchRepository.CONFIG.MAX_SEARCH_RESULTS) {
+  search_by_name(name, is_handle, max_results = SearchRepository.CONFIG.MAX_SEARCH_RESULTS) {
     const directory_search = this.search_service.get_contacts(name, SearchRepository.CONFIG.MAX_DIRECTORY_RESULTS)
       .then(({documents}) => documents.map((match) => match.id));
 
     const search_promises = [directory_search];
 
-    if (is_username) {
-      search_promises.push(this.user_repository.get_user_id_by_username(name));
+    if (is_handle) {
+      search_promises.push(this.user_repository.get_user_id_by_handle(name));
     }
 
     return Promise.all(search_promises)
@@ -83,13 +86,13 @@ z.search.SearchRepository = class SearchRepository {
       .then((user_ids) => this.user_repository.get_users_by_id(user_ids))
       .then((user_ets) => user_ets.filter((user_et) => !user_et.is_connected() && !user_et.is_team_member()))
       .then((user_ets) => {
-        if (is_username) {
+        if (is_handle) {
           user_ets = user_ets.filter((user_et) => z.util.StringUtil.starts_with(user_et.username(), name));
         }
 
         return user_ets
           .sort((user_a, user_b) => {
-            if (is_username) {
+            if (is_handle) {
               return z.util.StringUtil.sort_by_priority(user_a.username(), user_b.username(), name);
             }
             return z.util.StringUtil.sort_by_priority(user_a.name(), user_b.name(), name);

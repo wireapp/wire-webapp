@@ -73,7 +73,7 @@ describe('z.message.MessageCategorization', function() {
     });
 
     it('file message should have category of type FILE', function() {
-      const event = '{"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c0","id":"95377495-d203-4071-a02a-5221b75644fa","from":"9b47476f-974d-481c-af64-13f82ed98a5f","time":"2017-01-09T13:46:14.855Z","status":2,"data":{"content_length":199580,"content_type":"image/jpeg","info":{"name":"6642.jpg","nonce":"95377495-d203-4071-a02a-5221b75644fa"},"id":"aed78bfd-7c98-475b-badd-2c11fd150a63","otr_key":{},"sha256":{},"status":"uploaded"},"type":"conversation.asset-meta"}';
+      const event = '{"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c0","id":"95377495-d203-4071-a02a-5221b75644fa","from":"9b47476f-974d-481c-af64-13f82ed98a5f","time":"2017-01-09T13:46:14.855Z","status":2,"data":{"content_length":199580,"content_type":"image/jpeg","info":{"name":"6642.jpg","nonce":"95377495-d203-4071-a02a-5221b75644fa"},"id":"aed78bfd-7c98-475b-badd-2c11fd150a63","otr_key":{},"sha256":{},"status":"uploaded"},"type":"conversation.asset-add"}';
       const category = z.message.MessageCategorization.category_from_event(JSON.parse(event));
       expect(category).toBe(z.message.MessageCategory.FILE);
     });

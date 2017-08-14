@@ -27,10 +27,6 @@ z.event.Client = {
     E_CALL: 'call.e-call',
   },
   CONVERSATION: {
-    ASSET_META: 'conversation.asset-meta',
-    ASSET_PREVIEW: 'conversation.asset-preview',
-    ASSET_UPLOAD_COMPLETE: 'conversation.asset-upload-complete',
-    ASSET_UPLOAD_FAILED: 'conversation.asset-upload-failed',
     CONFIRMATION: 'conversation.confirmation',
     DELETE_EVERYWHERE: 'conversation.delete-everywhere',
     INCOMING_MESSAGE_TOO_BIG: 'conversation.incoming-message-too-big',

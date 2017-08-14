@@ -42,30 +42,28 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
       return Promise.reject(new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.NO_GENERIC_MESSAGE));
     }
     return Promise.resolve()
-    .then(() => {
-      return generic_message.external ? this._unwrap_external(generic_message.external, event) : generic_message;
-    })
-    .then((unwrapped_generic_message) => {
-      return Promise.all([
-        this._map_generic_message(unwrapped_generic_message, event),
-        unwrapped_generic_message,
-      ]);
-    })
-    .then(([specific_content, unwrapped_generic_message]) => {
-      return Object.assign({
-        conversation: event.conversation,
-        from: event.from,
-        id: unwrapped_generic_message.message_id,
-        status: event.status,
-        time: event.time,
-      }, specific_content);
-    });
+      .then(() => generic_message.external ? this._unwrap_external(generic_message.external, event) : generic_message)
+      .then((unwrapped_generic_message) => {
+        return Promise.all([
+          this._map_generic_message(unwrapped_generic_message, event),
+          unwrapped_generic_message,
+        ]);
+      })
+      .then(([specific_content, unwrapped_generic_message]) => {
+        return Object.assign({
+          conversation: event.conversation,
+          from: event.from,
+          id: unwrapped_generic_message.message_id,
+          status: event.status,
+          time: event.time,
+        }, specific_content);
+      });
   }
 
   _map_generic_message(generic_message, event) {
     switch (generic_message.content) {
       case z.cryptography.GENERIC_MESSAGE_TYPE.ASSET:
-        return this._map_asset(generic_message.asset, generic_message.message_id, event.data !== null ? event.data.id : undefined);
+        return this._map_asset(generic_message.asset, generic_message.message_id);
       case z.cryptography.GENERIC_MESSAGE_TYPE.CALLING:
         return this._map_calling(generic_message.calling, event.data);
       case z.cryptography.GENERIC_MESSAGE_TYPE.CLEARED:
@@ -98,27 +96,6 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     }
   }
 
-  _map_asset(asset, event_nonce, event_id) {
-    if (asset.uploaded !== null) {
-      if (asset.uploaded.asset_id && asset.original !== null && asset.original.image) {
-        return this._map_image_asset_v3(asset, event_nonce);
-      }
-      return this._map_asset_uploaded(asset.uploaded, event_id);
-    }
-    if (asset.not_uploaded !== null) {
-      return this._map_asset_not_uploaded(asset.not_uploaded);
-    }
-    if (asset.preview !== null) {
-      return this._map_asset_preview(asset.preview, event_id);
-    }
-    if (asset.original !== null) {
-      return this._map_asset_original(asset.original, event_nonce);
-    }
-    const error = new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.IGNORED_ASSET);
-    this.logger.info(`Skipped event '${event_id}': ${error.message}`);
-    throw error;
-  }
-
   _map_calling(calling, event_data) {
     return {
       content: JSON.parse(calling.content),
@@ -127,22 +104,62 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     };
   }
 
-  _map_image_asset_v3(asset, event_nonce) {
-    return {
-      data: {
-        content_length: asset.original.size.toNumber(),
-        content_type: asset.original.mime_type,
+  _map_asset(asset, event_nonce) {
+    const {original, preview, uploaded, not_uploaded} = asset;
+    let data = {};
+
+    if (original != null) {
+      data = {
+        content_length: original.size.toNumber(),
+        content_type: original.mime_type,
         info: {
-          height: asset.original.image.height,
+          name: original.name,
           nonce: event_nonce,
-          tag: 'medium',
-          width: asset.original.image.width,
         },
-        key: asset.uploaded.asset_id,
-        otr_key: new Uint8Array(asset.uploaded.otr_key.toArrayBuffer()),
-        sha256: new Uint8Array(asset.uploaded.sha256.toArrayBuffer()),
-        token: asset.uploaded.asset_token,
-      },
+      };
+
+      if (original.image) {
+        data.info.height = original.image.height;
+        data.info.width = original.image.width;
+      } else {
+        data.meta = this._map_asset_meta_data(original);
+      }
+    }
+
+    if (preview != null) {
+      const {remote} = preview;
+      data = Object.assign(data, {
+        preview_key: remote.asset_id,
+        preview_otr_key: new Uint8Array(remote.otr_key.toArrayBuffer()),
+        preview_sha256: new Uint8Array(remote.sha256.toArrayBuffer()),
+        preview_token: remote.asset_token,
+      });
+    }
+
+    const is_image = uploaded && uploaded.asset_id && original && original.image;
+    if (is_image) {
+      data.info.tag = 'medium';
+    }
+
+    if (uploaded != null) {
+      data = Object.assign(data, {
+        key: uploaded.asset_id,
+        otr_key: new Uint8Array(uploaded.otr_key.toArrayBuffer()),
+        sha256: new Uint8Array(uploaded.sha256.toArrayBuffer()),
+        status: z.assets.AssetTransferState.UPLOADED,
+        token: uploaded.asset_token,
+      });
+    }
+
+    if (not_uploaded != null) {
+      data = Object.assign(data, {
+        reason: not_uploaded,
+        status: z.assets.AssetTransferState.UPLOAD_FAILED,
+      });
+    }
+
+    return {
+      data,
       type: z.event.Backend.CONVERSATION.ASSET_ADD,
     };
   }
@@ -154,56 +171,6 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
         loudness: new Uint8Array(original.audio.normalized_loudness !== null ? original.audio.normalized_loudness.toArrayBuffer() : []),
       };
     }
-  }
-
-  _map_asset_not_uploaded(not_uploaded) {
-    return {
-      data: {
-        reason: not_uploaded,
-      },
-      type: z.event.Client.CONVERSATION.ASSET_UPLOAD_FAILED,
-    };
-  }
-
-  _map_asset_original(original, event_nonce) {
-    return {
-      data: {
-        content_length: original.size.toNumber(),
-        content_type: original.mime_type,
-        info: {
-          name: original.name,
-          nonce: event_nonce,
-        },
-        meta: this._map_asset_meta_data(original),
-      },
-      type: z.event.Client.CONVERSATION.ASSET_META,
-    };
-  }
-
-  _map_asset_preview(preview, event_id) {
-    return {
-      data: {
-        id: event_id,
-        key: preview.remote.asset_id,
-        otr_key: new Uint8Array(preview.remote.otr_key !== null ? preview.remote.otr_key.toArrayBuffer() : []),
-        sha256: new Uint8Array(preview.remote.sha256 !== null ? preview.remote.sha256.toArrayBuffer() : []),
-        token: preview.remote.asset_token,
-      },
-      type: z.event.Client.CONVERSATION.ASSET_PREVIEW,
-    };
-  }
-
-  _map_asset_uploaded(uploaded, event_id) {
-    return {
-      data: {
-        id: event_id,
-        key: uploaded.asset_id,
-        otr_key: new Uint8Array(uploaded.otr_key !== null ? uploaded.otr_key.toArrayBuffer() : []),
-        sha256: new Uint8Array(uploaded.sha256 !== null ? uploaded.sha256.toArrayBuffer() : []),
-        token: uploaded.asset_token,
-      },
-      type: z.event.Client.CONVERSATION.ASSET_UPLOAD_COMPLETE,
-    };
   }
 
   _map_cleared(cleared) {
@@ -274,11 +241,11 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     };
 
     return z.assets.AssetCrypto.decrypt_aes_asset(data.text.buffer, data.otr_key.buffer, data.sha256.buffer)
-    .then((external_message_buffer) => z.proto.GenericMessage.decode(external_message_buffer))
-    .catch((error) => {
-      this.logger.error(`Failed to map external message: ${error.message}`, error);
-      throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.BROKEN_EXTERNAL);
-    });
+      .then((external_message_buffer) => z.proto.GenericMessage.decode(external_message_buffer))
+      .catch((error) => {
+        this.logger.error(`Failed to map external message: ${error.message}`, error);
+        throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.BROKEN_EXTERNAL);
+      });
   }
 
   _map_hidden(hidden) {
