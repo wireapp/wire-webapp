@@ -244,10 +244,7 @@ user-avatar {
 .user-avatar-loading-transition {
 
   .user-avatar-image {
-    transition-property: all;
-    transition-timing-function: @ease-out-quart;
-    transition-duration: @animation-timing-slow;
-    transition-delay: @animation-timing-faster;
+    transition: all @animation-timing-slow @ease-out-quart @animation-timing-faster;
   }
 
   .user-avatar-initials {

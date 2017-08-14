@@ -1,3 +1,4 @@
+extends: stylelint-config-recommended
 rules:
   color-hex-case: lower
   color-hex-length: short
@@ -5,4 +6,5 @@ rules:
   function-url-quotes: never
   number-leading-zero: never
   selector-attribute-quotes: always
+  selector-type-no-unknown: null
   string-quotes: single
