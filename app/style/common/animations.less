@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2016 Wire Swiss GmbH
+ * Copyright (C) 2017 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,10 +18,7 @@
  */
 
 .start-ui-transition-fadein {
-  transition-delay: @animation-timing-fast;
-  transition-duration: @animation-timing-slow;
-  transition-property: all;
-  transition-timing-function: @ease-out-expo;
+  transition: all @animation-timing-slow @ease-out-expo @animation-timing-fast;
   transform: translateY(0);
   opacity: 1;
   pointer-events: auto;
