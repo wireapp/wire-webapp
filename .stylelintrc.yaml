@@ -1,4 +1,6 @@
 rules:
+  color-hex-case: lower
+  color-hex-length: short
   font-family-name-quotes: always-where-required
   function-url-quotes: never
   number-leading-zero: never
