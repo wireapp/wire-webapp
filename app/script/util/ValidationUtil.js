@@ -65,8 +65,8 @@ z.util.ValidationUtil = {
       if (!z.util.ValidationUtil.isUUID(uuid.join(SEPERATOR))) {
         throw new ValidationUtilError('Invalid asset key (UUID)');
       }
-      if (asset_token && !z.util.ValidationUtil.isBase64(asset_token)) {
-        throw new ValidationUtilError('Invalid asset token (malformed base64)');
+      if (asset_token && !z.util.ValidationUtil.isBearerToken(asset_token)) {
+        throw new ValidationUtilError('Invalid asset token');
       }
     },
   },
@@ -78,6 +78,12 @@ z.util.ValidationUtil = {
       return false;
     }
     return true;
+  },
+  isBearerToken: (str) => {
+    // Since some special chars are allowed,
+    // remember to always encode Bearer tokens
+    // using encodeURIComponents afterwards!
+    return /^[a-zA-Z0-9\-\._~\+\/]+[=]{0,2}$/.test(str);
   },
   isUUID: (str) => {
     return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(str);
