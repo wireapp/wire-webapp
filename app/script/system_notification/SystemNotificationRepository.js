@@ -456,7 +456,15 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
   */
   _create_options_icon(should_obfuscate_sender, user_et) {
     if (user_et.preview_picture_resource() && !should_obfuscate_sender) {
-      return user_et.preview_picture_resource().generate_url();
+      try {
+        return user_et.preview_picture_resource().generate_url();
+      } catch (error) {
+        if (error.name === 'ValidationUtilError') {
+          this.logger.error(`Failed to validate an asset URL (notification icon). Error: ${error.message}`);
+        } else {
+          throw error;
+        }
+      }
     }
     if (z.util.Environment.electron && z.util.Environment.os.mac) {
       return '';
