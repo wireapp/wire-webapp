@@ -131,12 +131,20 @@ z.user.UserMapper = class UserMapper {
   }
 
   _map_profile_pictures(user_et, picture) {
-    if (picture[0]) {
-      user_et.preview_picture_resource(z.assets.AssetRemoteData.v1(user_et.id, picture[0].id, true));
-    }
+    try {
+      if (picture[0]) {
+        user_et.preview_picture_resource(z.assets.AssetRemoteData.v1(user_et.id, picture[0].id, true));
+      }
 
-    if (picture[1]) {
-      return user_et.medium_picture_resource(z.assets.AssetRemoteData.v1(user_et.id, picture[1].id, true));
+      if (picture[1]) {
+        return user_et.medium_picture_resource(z.assets.AssetRemoteData.v1(user_et.id, picture[1].id, true));
+      }
+    } catch (error) {
+      if (error.name === 'ValidationUtilError') {
+        this.logger.error(`Failed to validate an asset. Error: ${error.message}`);
+        return false;
+      }
+      throw error;
     }
   }
 
@@ -144,15 +152,23 @@ z.user.UserMapper = class UserMapper {
     return assets
       .filter((asset) => asset.type === 'image')
       .map((asset) => {
-        switch (asset.size) {
-          case 'preview':
-            user_et.preview_picture_resource(z.assets.AssetRemoteData.v3(asset.key, true));
-            break;
-          case 'complete':
-            user_et.medium_picture_resource(z.assets.AssetRemoteData.v3(asset.key, true));
-            break;
-          default:
-            break;
+        try {
+          switch (asset.size) {
+            case 'preview':
+              user_et.preview_picture_resource(z.assets.AssetRemoteData.v3(asset.key, true));
+              break;
+            case 'complete':
+              user_et.medium_picture_resource(z.assets.AssetRemoteData.v3(asset.key, true));
+              break;
+            default:
+              break;
+          }
+        } catch (error) {
+          if (error.name === 'ValidationUtilError') {
+            this.logger.error(`Failed to validate an asset. Error: ${error.message}`);
+          } else {
+            throw error;
+          }
         }
       });
   }

@@ -439,22 +439,30 @@ z.conversation.EventMapper = class EventMapper {
     asset_et.file_name = info.name;
     asset_et.meta = meta;
 
-    // remote data - full
-    const {key, otr_key, sha256, token} = event_data;
-    if (key) {
-      asset_et.original_resource(z.assets.AssetRemoteData.v3(key, otr_key, sha256, token));
-    } else {
-      asset_et.original_resource(z.assets.AssetRemoteData.v2(conversation_id, id, otr_key, sha256));
-    }
-
-    // remote data - preview
-    const {preview_id, preview_key, preview_otr_key, preview_sha256, preview_token} = event_data;
-    if (preview_otr_key) {
-      if (preview_key) {
-        asset_et.preview_resource(z.assets.AssetRemoteData.v3(preview_key, preview_otr_key, preview_sha256, preview_token, true));
+    try {
+      // remote data - full
+      const {key, otr_key, sha256, token} = event_data;
+      if (key) {
+        asset_et.original_resource(z.assets.AssetRemoteData.v3(key, otr_key, sha256, token));
       } else {
-        asset_et.preview_resource(z.assets.AssetRemoteData.v2(conversation_id, preview_id, preview_otr_key, preview_sha256, true));
+        asset_et.original_resource(z.assets.AssetRemoteData.v2(conversation_id, id, otr_key, sha256));
       }
+
+      // remote data - preview
+      const {preview_id, preview_key, preview_otr_key, preview_sha256, preview_token} = event_data;
+      if (preview_otr_key) {
+        if (preview_key) {
+          asset_et.preview_resource(z.assets.AssetRemoteData.v3(preview_key, preview_otr_key, preview_sha256, preview_token, true));
+        } else {
+          asset_et.preview_resource(z.assets.AssetRemoteData.v2(conversation_id, preview_id, preview_otr_key, preview_sha256, true));
+        }
+      }
+    } catch (error) {
+      if (error.name === 'ValidationUtilError') {
+        this.logger.error(`Failed to validate an asset. Error: ${error.message}`);
+        return asset_et;
+      }
+      throw error;
     }
 
     asset_et.status(status || z.assets.AssetTransferState.UPLOADING);
@@ -492,11 +500,18 @@ z.conversation.EventMapper = class EventMapper {
         otr_key = new Uint8Array(otr_key.toArrayBuffer());
         sha256 = new Uint8Array(sha256.toArrayBuffer());
 
-        link_preview_et.image_resource(z.assets.AssetRemoteData.v3(asset_id, otr_key, sha256, asset_token, true));
+        try {
+          link_preview_et.image_resource(z.assets.AssetRemoteData.v3(asset_id, otr_key, sha256, asset_token, true));
+        } catch (error) {
+          if (error.name === 'ValidationUtilError') {
+            this.logger.error(`Failed to validate an asset. Error: ${error.message}`);
+          } else {
+            throw error;
+          }
+        }
       }
 
       return link_preview_et;
-
     }
   }
 
@@ -552,14 +567,22 @@ z.conversation.EventMapper = class EventMapper {
 
     const {key, otr_key, sha256, token} = event_data;
 
-    if (key) {
-      asset_et.resource(z.assets.AssetRemoteData.v3(key, otr_key, sha256, token, true));
-    } else {
-      asset_et.resource(z.assets.AssetRemoteData.v2(conversation_id, asset_id, otr_key, sha256, true));
-    }
-
     if (should_create_dummy_image) {
       asset_et.dummy_url = z.util.dummy_image(asset_et.width, asset_et.height);
+    }
+
+    try {
+      if (key) {
+        asset_et.resource(z.assets.AssetRemoteData.v3(key, otr_key, sha256, token, true));
+      } else {
+        asset_et.resource(z.assets.AssetRemoteData.v2(conversation_id, asset_id, otr_key, sha256, true));
+      }
+    } catch (error) {
+      if (error.name === 'ValidationUtilError') {
+        this.logger.error(`Failed to validate an asset. Error: ${error.message}`);
+        return asset_et;
+      }
+      throw error;
     }
 
     return asset_et;
