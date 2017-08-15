@@ -3246,18 +3246,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const asset_et = message_et.get_first_asset();
 
     let resource;
-    try {
-      if (key) {
-        resource = z.assets.AssetRemoteData.v3(key, otr_key, sha256, token);
-      } else {
-        resource = z.assets.AssetRemoteData.v2(conversation_et.id, id, otr_key, sha256);
-      }
-    } catch (error) {
-      if (error.name === 'ValidationUtilError') {
-        this.logger.error(`Failed to validate an asset. Error: ${error.message}`);
-        return false;
-      }
-      throw error;
+    if (key) {
+      resource = z.assets.AssetRemoteData.v3(key, otr_key, sha256, token);
+    } else {
+      resource = z.assets.AssetRemoteData.v2(conversation_et.id, id, otr_key, sha256);
     }
 
     asset_et.original_resource(resource);
@@ -3283,18 +3275,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const asset_et = message_et.get_first_asset();
 
     let resource;
-    try {
-      if (key) {
-        resource = z.assets.AssetRemoteData.v3(key, otr_key, sha256, token, true);
-      } else {
-        resource = z.assets.AssetRemoteData.v2(conversation_et.id, id, otr_key, sha256, true);
-      }
-    } catch (error) {
-      if (error.name === 'ValidationUtilError') {
-        this.logger.error(`Failed to validate an asset. Error: ${error.message}`);
-        return false;
-      }
-      throw error;
+    if (key) {
+      resource = z.assets.AssetRemoteData.v3(key, otr_key, sha256, token, true);
+    } else {
+      resource = z.assets.AssetRemoteData.v2(conversation_et.id, id, otr_key, sha256, true);
     }
 
     asset_et.preview_resource(resource);
