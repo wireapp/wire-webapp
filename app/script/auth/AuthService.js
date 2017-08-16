@@ -63,8 +63,11 @@ z.auth.AuthService = class AuthService {
    */
   get_invitations_info(code) {
     return this.client.send_request({
+      data: {
+        code,
+      },
       type: 'GET',
-      url: this.client.create_url(`${AuthService.CONFIG.URL_INVITATIONS}/info?code=${code}`),
+      url: this.client.create_url(`${AuthService.CONFIG.URL_INVITATIONS}/info`),
     });
   }
 
@@ -189,7 +192,7 @@ z.auth.AuthService = class AuthService {
    */
   post_login(login, persist) {
     return new Promise((resolve, reject) => {
-      const config = {
+      $.ajax({
         contentType: 'application/json; charset=utf-8',
         crossDomain: true,
         data: pako.gzip(JSON.stringify(login)),
@@ -198,13 +201,11 @@ z.auth.AuthService = class AuthService {
         },
         processData: false,
         type: 'POST',
-        url: `${this.client.create_url(`${AuthService.CONFIG.URL_LOGIN}?persist=${persist}`)}`,
+        url: `${this.client.create_url(AuthService.CONFIG.URL_LOGIN)}?persist=${(persist === true ? 'true' : 'false')}`,
         xhrFields: {
           withCredentials: true,
         },
-      };
-
-      $.ajax(config)
+      })
         .done((data) => {
           resolve(data);
         })
@@ -244,7 +245,7 @@ z.auth.AuthService = class AuthService {
    * @returns {jQuery.jqXHR} A superset of the XMLHTTPRequest object.
    */
   post_logout() {
-    return this.client.send_json({
+    return this.client.send_request({
       type: 'POST',
       url: this.client.create_url(`${AuthService.CONFIG.URL_ACCESS}/logout`),
       withCredentials: true,
@@ -274,7 +275,7 @@ z.auth.AuthService = class AuthService {
         },
         processData: false,
         type: 'POST',
-        url: `${this.client.create_url(`${AuthService.CONFIG.URL_REGISTER}?challenge_cookie=true`)}`,
+        url: `${this.client.create_url(AuthService.CONFIG.URL_REGISTER)}?challenge_cookie=true`,
         xhrFields: {
           withCredentials: true,
         },

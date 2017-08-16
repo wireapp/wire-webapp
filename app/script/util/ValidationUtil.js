@@ -70,6 +70,11 @@ z.util.ValidationUtil = {
       }
     },
   },
+  isAPICompliantPath: (str) => {
+    if (!/^\/[a-zA-Z0-9\-_\/\,]+$/.test(str)) {
+      throw new ValidationUtilError(`Non-compliant path creation attempt. Details: ${str}`);
+    }
+  },
   isBase64: (str) => {
     try {
       // Will raise a DOM exception if base64 string is invalid

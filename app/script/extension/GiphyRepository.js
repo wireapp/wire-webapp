@@ -97,8 +97,7 @@ z.extension.GiphyRepository = class GiphyRepository {
       number: 6,
       random: true,
       sorting: 'relevant',
-    }
-    , options);
+    }, options);
 
     if (!options.query) {
       const error = new Error('No query specified');
@@ -123,8 +122,9 @@ z.extension.GiphyRepository = class GiphyRepository {
     return this.giphy_service.get_search({
       limit: 100,
       offset: offset,
-      query: options.query,
-      sorting: options.sorting,
+      // eslint-disable-next-line id-length
+      q: options.query,
+      sort: options.sorting,
     })
     .then(({data: gifs, pagination}) => {
       const result = [];

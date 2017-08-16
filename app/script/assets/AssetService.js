@@ -172,7 +172,7 @@ z.assets.AssetService = class AssetService {
    */
   generate_asset_url_v3(asset_key, asset_token, force_caching) {
     z.util.ValidationUtil.asset.v3(asset_key, asset_token);
-    let asset_url = `${this.client.create_url(`/assets/v3/${asset_key}/`)}?access_token=${this.client.access_token}`;
+    let asset_url = `${this.client.create_url(`/assets/v3/${asset_key}`)}?access_token=${this.client.access_token}`;
     if (asset_token) {
       asset_url = `${asset_url}&asset_token=${encodeURIComponent(asset_token)}`;
     }
