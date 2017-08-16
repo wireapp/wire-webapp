@@ -33,7 +33,7 @@
     "webrtc-adapter": "https://github.com/webrtc/adapter.git#4.2.1",
     "wire-audio-files": "https://github.com/wireapp/wire-audio-files.git#1.1.0",
     "wire-theme": "https://github.com/wireapp/wire-theme.git#1.0.0",
-    "wire-webapp-cryptobox": "https://github.com/wireapp/wire-webapp-cryptobox.git#5.1.0"
+    "wire-webapp-cryptobox": "https://github.com/wireapp/wire-webapp-cryptobox.git#6.0.0"
   },
   "exportsOverride": {
     "amplify": {
