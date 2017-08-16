@@ -50,15 +50,49 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
   }
 
   /**
-   * Initialize the repository.
-   * @param {Object} db - Database object
-   * @returns {Promise} Resolves with the repository after initialization
+   * Initializes the repository by loading an existing cryptobox.
+   * @param {Object} database - Database object
+   * @returns {Promise} Resolves after initialization
    */
-  init(db) {
+  create_cryptobox(database) {
+    return this._init(database)
+      .then(() => this.cryptobox.create());
+  }
+
+  /**
+   * Initializes the repository by creating a new cryptobox.
+   * @param {Object} database - Database object
+   * @returns {Promise} Resolves after initialization
+   */
+  load_cryptobox(database) {
+    return this._init(database)
+      .then(() => this.cryptobox.load());
+  }
+
+  reset_cryptobox(client_et) {
+    const delete_everything = client_et ? client_et.is_temporary() : false;
+    const delete_promise = delete_everything ? this.storage_repository.delete_everything() : this.storage_repository.delete_cryptography();
+
+    return delete_promise
+      .catch((database_error) => {
+        this.logger.error(`Deleting crypto database after failed client validation unsuccessful: ${database_error.message}`, database_error);
+        throw new z.client.ClientError(z.client.ClientError.TYPE.DATABASE_FAILURE);
+      })
+      .then(() => delete_everything);
+  }
+
+  /**
+   * Initialize the repository.
+   *
+   * @private
+   * @param {Object} database - Database object
+   * @returns {Promise} Resolves after initialization
+   */
+  _init(database) {
     return Promise.resolve()
       .then(() => {
-        this.logger.info(`Initializing Cryptobox with database '${db.name}'...`);
-        this.cryptobox = new cryptobox.Cryptobox(new cryptobox.store.IndexedDB(db), 10);
+        this.logger.info(`Initializing Cryptobox with database '${database.name}'...`);
+        this.cryptobox = new cryptobox.Cryptobox(new cryptobox.store.IndexedDB(database), 10);
 
         this.cryptobox.on(cryptobox.Cryptobox.TOPIC.NEW_PREKEYS, (pre_keys) => {
           const serialized_pre_keys = pre_keys.map((pre_key) => {
@@ -76,10 +110,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
           const {user_id, client_id} = z.client.Client.dismantle_user_client_id(session_id);
           amplify.publish(z.event.WebApp.CLIENT.ADD, user_id, new z.client.Client({id: client_id}));
         });
-
-        return this.cryptobox.init();
-      })
-      .then(() => this);
+      });
   }
 
   /**
@@ -361,7 +392,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     return this.cryptobox.encrypt(session_id, generic_message.toArrayBuffer())
       .then((cipher_text) => ({cipher_text: z.util.array_to_base64(cipher_text), session_id: session_id}))
       .catch((error) => {
-        if (error instanceof cryptobox.store.RecordNotFoundError) {
+        if (error instanceof cryptobox.store.error.RecordNotFoundError) {
           this.logger.log(`Session '${session_id}' needs to get initialized...`);
           return {session_id: session_id};
         }

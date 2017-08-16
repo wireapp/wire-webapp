@@ -116,7 +116,7 @@ window.TestFactory.prototype.exposeCryptographyActors = function() {
       TestFactory.cryptography_repository.current_client = ko.observable(current_client);
       TestFactory.cryptography_repository.logger.level = this.settings.logging_level;
 
-      return TestFactory.cryptography_repository.init(TestFactory.storage_service.db);
+      return TestFactory.cryptography_repository.create_cryptobox(TestFactory.storage_service.db);
     })
     .then(() => TestFactory.cryptography_repository);
 };

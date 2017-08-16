@@ -222,21 +222,21 @@ z.main.App = class App {
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_SELF_USER);
         this.repository.client.init(self_user_et);
         this.repository.properties.init(self_user_et);
-        return this.repository.cryptography.init(this.service.storage.db);
-      })
-      .then(() => {
-        this.view.loading.update_progress(7.5);
-        this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
         return this.repository.client.get_valid_local_client();
       })
       .then((client_observable) => {
-        this.view.loading.update_progress(10, z.string.init_validated_client);
+        this.view.loading.update_progress(7.5, z.string.init_validated_client);
 
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.VALIDATED_CLIENT);
         this.telemetry.add_statistic(z.telemetry.app_init.AppInitStatisticsValue.CLIENT_TYPE, client_observable().type);
 
         this.repository.cryptography.current_client = client_observable;
         this.repository.event.current_client = client_observable;
+        return this.repository.cryptography.load_cryptobox(this.service.storage.db);
+      })
+      .then(() => {
+        this.view.loading.update_progress(10);
+        this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
         this.repository.event.connect_web_socket();
 
         return Promise.all([
@@ -365,12 +365,9 @@ z.main.App = class App {
       }
 
       const is_access_token_error = error instanceof z.auth.AccessTokenError;
-      const is_invalid_client = [
-        z.client.ClientError.TYPE.MISSING_ON_BACKEND,
-        z.client.ClientError.TYPE.NO_LOCAL_CLIENT,
-      ];
+      const is_invalid_client = type === z.client.ClientError.TYPE.NO_VALID_CLIENT;
 
-      if (is_access_token_error || !is_invalid_client.includes(type)) {
+      if (is_access_token_error || is_invalid_client) {
         this.logger.warn('Connectivity issues. Trigger reload on regained connectivity.', error);
         const trigger_source = is_access_token_error
           ? z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_RETRIEVAL

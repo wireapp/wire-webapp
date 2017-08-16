@@ -94,7 +94,15 @@ z.client.ClientRepository = class ClientRepository {
    * @returns {Promise} Resolves with the retrieved client information
    */
   get_client_by_id_from_backend(client_id) {
-    return this.client_service.get_client_by_id(client_id);
+    return this.client_service.get_client_by_id(client_id)
+      .catch((error) => {
+        const client_not_found_backend = error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND;
+        if (client_not_found_backend) {
+          this.logger.warn(`Local client '${client_id}' no longer exists on the backend`, error);
+          throw new z.client.ClientError(z.client.ClientError.TYPE.NO_VALID_CLIENT);
+        }
+        throw error;
+      });
   }
 
   /**
@@ -108,8 +116,8 @@ z.client.ClientRepository = class ClientRepository {
       })
       .then((client_payload) => {
         if (_.isString(client_payload)) {
-          this.logger.info(`No current local client connected to '${z.client.ClientRepository.PRIMARY_KEY_CURRENT_CLIENT}' found in database`);
-          throw new z.client.ClientError(z.client.ClientError.TYPE.NO_LOCAL_CLIENT);
+          this.logger.info('No local client found in database');
+          throw new z.client.ClientError(z.client.ClientError.TYPE.NO_VALID_CLIENT);
         }
         const client_et = this.client_mapper.map_client(client_payload);
         this.current_client(client_et);
@@ -242,35 +250,14 @@ z.client.ClientRepository = class ClientRepository {
   get_valid_local_client() {
     return this.get_current_client_from_db()
       .then((client_et) => this.get_client_by_id_from_backend(client_et.id))
-      .then((client) => {
-        this.logger.info(`Client with ID '${client.id}' (${client.type}) validated on backend`);
+      .then((client_et) => {
+        this.logger.info(`Client with ID '${client_et.id}' (${client_et.type}) validated on backend`);
         return this.current_client;
       })
       .catch((error) => {
-        const client_et = this.current_client();
-        this.current_client(undefined);
-
-        if (error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
-          this.logger.warn(`Local client '${client_et.id}' (${client_et.type}) no longer exists on the backend`, error);
-          return Promise.resolve()
-            .then(() => {
-              if (client_et.is_temporary()) {
-                return this.cryptography_repository.storage_repository.delete_everything();
-              }
-              return this.cryptography_repository.storage_repository.delete_cryptography();
-            })
-            .catch((database_error) => {
-              this.logger.error(`Deleting crypto database after failed client validation unsuccessful: ${database_error.message}`, database_error);
-              throw new z.client.ClientError(z.client.ClientError.TYPE.DATABASE_FAILURE);
-            })
-            .then(() => {
-              throw new z.client.ClientError(z.client.ClientError.TYPE.MISSING_ON_BACKEND);
-            });
-        }
-
-        if (error.type === z.client.ClientError.TYPE.NO_LOCAL_CLIENT) {
-          this.cryptography_repository.storage_repository.delete_cryptography();
-          throw error;
+        const client_not_validated = error.type === z.client.ClientError.TYPE.NO_VALID_CLIENT;
+        if (client_not_validated) {
+          throw new z.client.ClientError(z.client.ClientError.TYPE.NO_VALID_CLIENT);
         }
 
         this.logger.error(`Getting valid local client failed: ${error.code || error.message}`, error);
