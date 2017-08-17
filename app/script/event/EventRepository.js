@@ -549,7 +549,9 @@ z.event.EventRepository = class EventRepository {
                 if (!from_same_user) {
                   this.logger.warn(`Ignored event from user '${mapped_event.from}' with ID '${mapped_event.id}' previously used by '${stored_event.from}'`, mapped_event);
                   throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.PREVIOUSLY_STORED);
-                } else if (is_message_add && !event_data.previews.length) {
+                }
+
+                if (is_message_add && !event_data.previews.length) {
                   this.logger.warn(`Ignored event from user '${mapped_event.from}' with previously used ID '${mapped_event.id}'`, mapped_event);
                   throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.PREVIOUSLY_STORED);
                 }
