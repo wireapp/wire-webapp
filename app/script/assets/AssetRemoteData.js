@@ -131,7 +131,7 @@ z.assets.AssetRemoteData = class AssetRemoteData {
     try {
       generated_url = this.generate_url();
     } catch (error) {
-      if (error.name === 'ValidationUtilError') {
+      if (error instanceof z.util.ValidationUtilError) {
         this.logger.error(`Failed to validate an asset URL (_load_buffer). Error: ${error.message}`);
         return false;
       }
