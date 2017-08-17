@@ -392,7 +392,7 @@ z.conversation.ConversationService = class ConversationService {
     return this.storage_service.db[z.storage.StorageService.OBJECT_STORE.EVENTS]
       .where('conversation')
       .equals(conversation_id)
-      .filter((record) => record.id === message_id)
+      .filter((record) => message_id && record.id === message_id)
       .first()
       .catch((error) => {
         this.logger.error(`Failed to get event for conversation '${conversation_id}': ${error.message}`, error);
