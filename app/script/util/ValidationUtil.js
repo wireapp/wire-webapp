@@ -22,18 +22,6 @@
 window.z = window.z || {};
 window.z.util = z.util || {};
 
-class ValidationUtilError extends Error {
-  constructor(message) {
-    super(message);
-    this.name = this.constructor.name;
-    if (typeof Error.captureStackTrace === 'function') {
-      Error.captureStackTrace(this, this.constructor);
-    } else {
-      this.stack = (new Error(message)).stack;
-    }
-  }
-}
-
 z.util.ValidationUtil = {
   // ToDo: Move z.util.is_valid_username here
   // ToDo: Move z.util.is_valid_phone_number here
@@ -44,7 +32,7 @@ z.util.ValidationUtil = {
     legacy: (asset_id, conversation_id) => {
       if (!z.util.ValidationUtil.isUUID(asset_id) ||
           !z.util.ValidationUtil.isUUID(conversation_id)) {
-        throw new ValidationUtilError('Invalid asset_id / conversation_id');
+        throw new z.util.ValidationUtilError('Invalid asset_id / conversation_id');
       }
     },
     retentionPolicy: (str) => {
@@ -57,22 +45,22 @@ z.util.ValidationUtil = {
       const [version, type, ...uuid] = asset_key.split(SEPERATOR);
 
       if (version !== '3') {
-        throw new ValidationUtilError('Invalid asset key (version)');
+        throw new z.util.ValidationUtilError('Invalid asset key (version)');
       }
       if (!z.util.ValidationUtil.asset.retentionPolicy(type)) {
-        throw new ValidationUtilError('Invalid asset key (type)');
+        throw new z.util.ValidationUtilError('Invalid asset key (type)');
       }
       if (!z.util.ValidationUtil.isUUID(uuid.join(SEPERATOR))) {
-        throw new ValidationUtilError('Invalid asset key (UUID)');
+        throw new z.util.ValidationUtilError('Invalid asset key (UUID)');
       }
       if (asset_token && !z.util.ValidationUtil.isBearerToken(asset_token)) {
-        throw new ValidationUtilError('Invalid asset token');
+        throw new z.util.ValidationUtilError('Invalid asset token');
       }
     },
   },
   isAPICompliantPath: (str) => {
     if (!/^\/[a-zA-Z0-9\-_\/\,]+$/.test(str)) {
-      throw new ValidationUtilError(`Non-compliant path creation attempt. Details: ${str}`);
+      throw new z.util.ValidationUtilError(`Non-compliant path creation attempt. Details: ${str}`);
     }
   },
   isBase64: (str) => {
