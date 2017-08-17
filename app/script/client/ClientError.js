@@ -37,17 +37,14 @@ z.client.ClientError = class ClientError extends Error {
       case z.client.ClientError.TYPE.DATABASE_FAILURE:
         this.message = 'Client related database transaction failed';
         break;
-      case z.client.ClientError.TYPE.MISSING_ON_BACKEND:
-        this.message = 'Local client does not exist on backend';
-        break;
       case z.client.ClientError.TYPE.NO_CLIENT_ID:
         this.message = 'Client ID is not defined';
         break;
-      case z.client.ClientError.TYPE.NO_LOCAL_CLIENT:
-        this.message = 'No local client found in database';
-        break;
       case z.client.ClientError.TYPE.NO_USER_ID:
         this.message = 'User ID is not defined';
+        break;
+      case z.client.ClientError.TYPE.NO_VALID_CLIENT:
+        this.message = 'No valid local client found';
         break;
       case z.client.ClientError.TYPE.REQUEST_FAILURE:
         this.message = 'Client related backend request failed';
@@ -67,10 +64,9 @@ z.client.ClientError = class ClientError extends Error {
     return {
       CLIENT_NOT_SET: 'z.client.ClientError.TYPE.CLIENT_NOT_SET',
       DATABASE_FAILURE: 'z.client.ClientError.TYPE.DATABASE_FAILURE',
-      MISSING_ON_BACKEND: 'z.client.ClientError.TYPE.MISSING_ON_BACKEND',
       NO_CLIENT_ID: 'z.client.ClientError.TYPE.NO_CLIENT_ID',
-      NO_LOCAL_CLIENT: 'z.client.ClientError.TYPE.NO_LOCAL_CLIENT',
       NO_USER_ID: 'z.client.ClientError.TYPE.NO_USER_ID',
+      NO_VALID_CLIENT: 'z.client.ClientError.TYPE.NO_VALID_CLIENT',
       REQUEST_FAILURE: 'z.client.ClientError.TYPE.REQUEST_FAILURE',
       REQUEST_FORBIDDEN: 'z.client.ClientError.TYPE.REQUEST_FORBIDDEN',
       TOO_MANY_CLIENTS: 'z.client.ClientError.TYPE.TOO_MANY_CLIENTS',
