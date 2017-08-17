@@ -44,7 +44,7 @@ z.client.ClientError = class ClientError extends Error {
         this.message = 'User ID is not defined';
         break;
       case z.client.ClientError.TYPE.NO_VALID_CLIENT:
-        this.message = 'No valid client found in locally';
+        this.message = 'No valid local client found';
         break;
       case z.client.ClientError.TYPE.REQUEST_FAILURE:
         this.message = 'Client related backend request failed';

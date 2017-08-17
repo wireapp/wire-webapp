@@ -50,7 +50,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
   }
 
   /**
-   * Initializes the repository by loading an existing cryptobox.
+   * Initializes the repository by loading an existing Cryptobox.
    * @param {Object} database - Database object
    * @returns {Promise} Resolves after initialization
    */
@@ -60,7 +60,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
   }
 
   /**
-   * Initializes the repository by creating a new cryptobox.
+   * Initializes the repository by creating a new Cryptobox.
    * @param {Object} database - Database object
    * @returns {Promise} Resolves after initialization
    */
@@ -75,7 +75,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
 
     return delete_promise
       .catch((database_error) => {
-        this.logger.error(`Deleting crypto database after failed client validation unsuccessful: ${database_error.message}`, database_error);
+        this.logger.error(`Unsuccessful deleting cryptography-relate database content after failed client validation: ${database_error.message}`, database_error);
         throw new z.client.ClientError(z.client.ClientError.TYPE.DATABASE_FAILURE);
       })
       .then(() => delete_everything);
