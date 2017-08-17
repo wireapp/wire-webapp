@@ -23,10 +23,12 @@ window.z = window.z || {};
 window.z.util = z.util || {};
 
 z.util.ValidationUtilError = class ValidationUtilError extends Error {
-  constructor(message) {
+  constructor(message = 'Unknown ValidationUtilError') {
     super();
 
+    this.message = message;
     this.name = this.constructor.name;
+
     if (typeof Error.captureStackTrace === 'function') {
       Error.captureStackTrace(this, this.constructor);
     } else {

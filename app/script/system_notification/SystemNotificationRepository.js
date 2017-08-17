@@ -459,8 +459,8 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
       try {
         return user_et.preview_picture_resource().generate_url();
       } catch (error) {
-        if (error.name === 'ValidationUtilError') {
-          this.logger.error(`Failed to validate an asset URL (notification icon). Error: ${error.message}`);
+        if (error instanceof z.util.ValidationUtilError) {
+          this.logger.error(`Failed to validate an asset URL: ${error.message}`);
         } else {
           throw error;
         }
