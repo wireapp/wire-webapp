@@ -59,7 +59,7 @@ z.extension.GiphyService = class GiphyService {
   get_random(tag) {
     return this.client.send_request({
       data: {
-        tag,
+        tag: tag,
       },
       type: 'GET',
       url: this.client.create_url(`${GiphyService.CONFIG.ENDPOINT_BASE}/random`),

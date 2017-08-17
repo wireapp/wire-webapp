@@ -234,7 +234,7 @@ z.media.MediaEmbeds = (function() {
         let embed = '';
         link_src.replace(_regex.spotify, function(match, group1) {
           const replace_slashes = group1.replace(/\//g, ':');
-          const encoded_params = encodeURIComponent(`:${replace_slashes}`);
+          const encoded_params = window.encodeURIComponent(`:${replace_slashes}`);
           return embed = iframe.replace('$1', encoded_params);
         });
 

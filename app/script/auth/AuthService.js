@@ -64,7 +64,7 @@ z.auth.AuthService = class AuthService {
   get_invitations_info(code) {
     return this.client.send_request({
       data: {
-        code,
+        code: code,
       },
       type: 'GET',
       url: this.client.create_url(`${AuthService.CONFIG.URL_INVITATIONS}/info`),
@@ -201,7 +201,7 @@ z.auth.AuthService = class AuthService {
         },
         processData: false,
         type: 'POST',
-        url: `${this.client.create_url(AuthService.CONFIG.URL_LOGIN)}?persist=${(persist === true ? 'true' : 'false')}`,
+        url: `${this.client.create_url(AuthService.CONFIG.URL_LOGIN)}?persist=${window.encodeURIComponent(persist.toString())}`,
         xhrFields: {
           withCredentials: true,
         },
