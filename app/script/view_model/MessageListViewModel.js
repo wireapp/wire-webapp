@@ -362,7 +362,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
    * @returns {undefined} No return value
    */
   _focus_message(message_et) {
-    const message_element = $(`.message[data-uie-uid=\"${message_et.id}\"]`);
+    const message_element = $(`.message[data-uie-uid="${message_et.id}"]`);
 
     if (message_element.length) {
       const message_list_element = $('.messages-wrap');

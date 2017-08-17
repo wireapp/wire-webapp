@@ -421,6 +421,6 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
   }
 
   _escape_regexp(str) {
-    return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+    return str.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
   }
 };

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2016 Wire Swiss GmbH
+ * Copyright (C) 2017 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@
   margin-left: -20px;
   position: fixed;
 
-  &:before {
+  &::before {
     border-top: 6px solid @graphite;
     border-left: 6px solid transparent;
     border-right: 6px solid transparent;
@@ -57,14 +57,14 @@
   position: relative;
 
   &:hover {
-    &:after,
-    &:before {
+    &::after,
+    &::before {
       opacity: 1;
     }
   }
 
-  &:after,
-  &:before {
+  &::after,
+  &::before {
     position: absolute;
     left: 100%;
     top: 50%;
@@ -73,14 +73,14 @@
     pointer-events: none;
   }
 
-  &:after {
+  &::after {
     .tooltip-body;
     content: attr(aria-label);
     margin-left: 6px;
     width: 160px;
   }
 
-  &:before {
+  &::before {
     border-right: 6px solid @graphite;
     border-top: 6px solid transparent;
     border-bottom: 6px solid transparent;

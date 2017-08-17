@@ -298,6 +298,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
       case z.media.MediaType.SCREEN:
         amplify.publish(z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.DENIED_SCREEN);
         break;
+      case z.media.MediaType.AUDIO_VIDEO:
       case z.media.MediaType.VIDEO:
         amplify.publish(z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.DENIED_CAMERA);
         break;
@@ -325,6 +326,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
       case z.media.MediaType.SCREEN:
         amplify.publish(z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.REQUEST_SCREEN);
         break;
+      case z.media.MediaType.AUDIO_VIDEO:
       case z.media.MediaType.VIDEO:
         amplify.publish(z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.REQUEST_CAMERA);
         break;
@@ -439,6 +441,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
       case z.media.MediaType.SCREEN:
         amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.DENIED_SCREEN);
         break;
+      case z.media.MediaType.AUDIO_VIDEO:
       case z.media.MediaType.VIDEO:
         amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.DENIED_CAMERA);
         break;
@@ -466,6 +469,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
       case z.media.MediaType.SCREEN:
         amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.REQUEST_SCREEN);
         break;
+      case z.media.MediaType.AUDIO_VIDEO:
       case z.media.MediaType.VIDEO:
         amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.REQUEST_CAMERA);
         break;

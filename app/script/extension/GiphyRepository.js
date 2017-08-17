@@ -55,24 +55,22 @@ z.extension.GiphyRepository = class GiphyRepository {
       }
 
       return this.giphy_service.get_random(options.tag)
-      .then(({data: random_gif}) => {
-        return this.giphy_service.get_by_id(random_gif.id);
-      })
-      .then(({data: {images, url}}) => {
-        const static_gif = images[z.extension.GiphyContentSizes.FIXED_WIDTH_STILL];
-        const animated_gif = images[z.extension.GiphyContentSizes.DOWNSIZED];
+        .then(({data: random_gif}) => this.giphy_service.get_by_id(random_gif.id))
+        .then(({data: {images, url}}) => {
+          const static_gif = images[z.extension.GiphyContentSizes.FIXED_WIDTH_STILL];
+          const animated_gif = images[z.extension.GiphyContentSizes.DOWNSIZED];
 
-        if (animated_gif.size > options.max_size) {
-          this.logger.info(`Gif size (${animated_gif.size}) is over maximum size (${animated_gif.size})`);
-          return _get_random_gif(retries + 1);
-        }
+          if (animated_gif.size > options.max_size) {
+            this.logger.info(`Gif size (${animated_gif.size}) is over maximum size (${animated_gif.size})`);
+            return _get_random_gif(retries + 1);
+          }
 
-        return {
-          animated: animated_gif.url,
-          static: static_gif.url,
-          url: url,
-        };
-      });
+          return {
+            animated: animated_gif.url,
+            static: static_gif.url,
+            url: url,
+          };
+        });
     };
 
     return _get_random_gif();
@@ -126,36 +124,34 @@ z.extension.GiphyRepository = class GiphyRepository {
       q: options.query,
       sort: options.sorting,
     })
-    .then(({data: gifs, pagination}) => {
-      const result = [];
+      .then(({data: gifs, pagination}) => {
+        const result = [];
 
-      if (options.random) {
-        gifs = gifs.sort(function() {
-          return .5 - Math.random();
-        });
-      }
-
-      this.gif_query_cache[options.query] = pagination.total_count;
-
-      for (const gif of gifs.slice(0, options.number)) {
-        const {images} = gif;
-        const static_gif = images[z.extension.GiphyContentSizes.FIXED_WIDTH_STILL];
-        const animation_gif = images[z.extension.GiphyContentSizes.DOWNSIZED];
-
-        if (animation_gif.size <= options.max_size) {
-          result.push({
-            animated: animation_gif.url,
-            static: static_gif.url,
-            url: gif.url,
-          });
+        if (options.random) {
+          gifs = gifs.sort(() => .5 - Math.random());
         }
-      }
 
-      return result;
-    })
-    .catch((error) => {
-      this.logger.info(`Unable to fetch gif for query: ${options.query}`, error);
-      throw error;
-    });
+        this.gif_query_cache[options.query] = pagination.total_count;
+
+        for (const gif of gifs.slice(0, options.number)) {
+          const {images} = gif;
+          const static_gif = images[z.extension.GiphyContentSizes.FIXED_WIDTH_STILL];
+          const animation_gif = images[z.extension.GiphyContentSizes.DOWNSIZED];
+
+          if (animation_gif.size <= options.max_size) {
+            result.push({
+              animated: animation_gif.url,
+              static: static_gif.url,
+              url: gif.url,
+            });
+          }
+        }
+
+        return result;
+      })
+      .catch((error) => {
+        this.logger.info(`Unable to fetch gif for query: ${options.query}`, error);
+        throw error;
+      });
   }
 };

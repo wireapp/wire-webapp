@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2016 Wire Swiss GmbH
+ * Copyright (C) 2017 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -58,13 +58,13 @@ z.location = (() => {
       $.ajax({
         url: `${GOOGLE_GEOCODING_BASE_URL}?latlng=${latitude},${longitude}&key=${API_KEY}`,
       })
-      .done((response) => {
-        if (response.status === 'OK') {
-          return resolve(_parse_results(response.results));
-        }
-        return resolve();
-      })
-      .fail((jqXHR, textStatus, errorThrown) => reject(new Error(errorThrown)));
+        .done((response) => {
+          if (response.status === 'OK') {
+            return resolve(_parse_results(response.results));
+          }
+          return resolve();
+        })
+        .fail((jqXHR, textStatus, errorThrown) => reject(new Error(errorThrown)));
     });
   };
 

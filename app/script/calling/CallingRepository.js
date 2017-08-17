@@ -526,7 +526,7 @@ z.calling.CallingRepository = class CallingRepository {
 
     const is_group_check = type === z.calling.enum.CALL_MESSAGE_TYPE.GROUP_CHECK;
     const is_self_user = user_id === this.self_user_id();
-    const valid_message = response !== is_group_check;
+    const valid_message = response === is_group_check;
 
     if (!is_self_user && valid_message) {
       const event_from_stream = source === z.event.EventRepository.SOURCE.STREAM;
@@ -548,6 +548,8 @@ z.calling.CallingRepository = class CallingRepository {
           if (_error.type !== z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
             throw _error;
           }
+
+          this.reject_call(conversation_id);
         });
     }
   }
@@ -1064,7 +1066,7 @@ z.calling.CallingRepository = class CallingRepository {
 
             const event_from_web_socket = source === z.event.EventRepository.SOURCE.WEB_SOCKET;
             if (event_from_web_socket && call_et.is_remote_video_send()) {
-              this.media_stream_handler.initiate_media_stream(call_et.id, true);
+              this.media_stream_handler.initiate_media_stream(call_et.id, z.media.MediaType.AUDIO_VIDEO);
             }
 
             return call_et;

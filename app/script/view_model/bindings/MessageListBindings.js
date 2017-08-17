@@ -47,8 +47,8 @@ ko.bindingHandlers.focus_on_keydown = {
           return true;
         },
       },
-    }
-    , context);
+    },
+    context);
   },
 };
 
@@ -90,8 +90,8 @@ ko.bindingHandlers.background_image = {
           })
           .catch(() => {});
       }
-    }
-    , 500);
+    },
+    500);
 
     const image_element = $(element).find('img');
     const asset_remote_data = valueAccessor();

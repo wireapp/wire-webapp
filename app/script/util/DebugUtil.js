@@ -167,13 +167,13 @@ z.util.DebugUtil = class DebugUtil {
       this.get_serialised_identity(),
       this.get_serialised_session(session_id.toLowerCase()),
     ])
-    .then((resolve_array) => {
-      return JSON.stringify({
-        identity: resolve_array[1],
-        notification: resolve_array[0],
-        session: resolve_array[2],
+      .then((resolve_array) => {
+        return JSON.stringify({
+          identity: resolve_array[1],
+          notification: resolve_array[0],
+          session: resolve_array[2],
+        });
       });
-    });
   }
 
   get_info_for_client_decryption_errors(remote_user_id, remote_client_id) {
@@ -182,13 +182,13 @@ z.util.DebugUtil = class DebugUtil {
       this.get_serialised_identity(),
       this.get_serialised_session(`${remote_user_id}@${remote_client_id}`),
     ])
-    .then((resolve_array) => {
-      return JSON.stringify({
-        identity: resolve_array[1],
-        notifications: resolve_array[0],
-        session: resolve_array[2],
+      .then((resolve_array) => {
+        return JSON.stringify({
+          identity: resolve_array[1],
+          notifications: resolve_array[0],
+          session: resolve_array[2],
+        });
       });
-    });
   }
 
   /**

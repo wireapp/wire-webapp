@@ -32,14 +32,14 @@ z.assets.AssetCrypto = (() => {
    */
   function decrypt_aes_asset(ciphertext, key_bytes, reference_sha256) {
     return window.crypto.subtle.digest('SHA-256', ciphertext)
-      .then(function(computed_sha256) {
+      .then((computed_sha256) => {
         if (_equal_hashes(reference_sha256, computed_sha256)) {
           return window.crypto.subtle.importKey('raw', key_bytes, 'AES-CBC', false, ['decrypt']);
         }
 
         throw new Error('Encrypted asset does not match its SHA-256 hash');
       })
-      .then(function(key) {
+      .then((key) => {
         const iv = ciphertext.slice(0, 16);
         const img_ciphertext = ciphertext.slice(16);
         return window.crypto.subtle.decrypt({iv: iv, name: 'AES-CBC'}, key, img_ciphertext);
@@ -58,24 +58,24 @@ z.assets.AssetCrypto = (() => {
     let computed_sha256 = null;
 
     return window.crypto.subtle.importKey('raw', key_bytes_raw.buffer, 'AES-CBC', true, ['encrypt'])
-    .then(function(ckey) {
-      key = ckey;
+      .then((ckey) => {
+        key = ckey;
 
-      return window.crypto.subtle.encrypt({iv: iv.buffer, name: 'AES-CBC'}, key, plaintext);
-    })
-    .then(function(ciphertext) {
-      iv_ciphertext = new Uint8Array(ciphertext.byteLength + iv.byteLength);
-      iv_ciphertext.set(iv, 0);
-      iv_ciphertext.set(new Uint8Array(ciphertext), iv.byteLength);
+        return window.crypto.subtle.encrypt({iv: iv.buffer, name: 'AES-CBC'}, key, plaintext);
+      })
+      .then((ciphertext) => {
+        iv_ciphertext = new Uint8Array(ciphertext.byteLength + iv.byteLength);
+        iv_ciphertext.set(iv, 0);
+        iv_ciphertext.set(new Uint8Array(ciphertext), iv.byteLength);
 
-      return window.crypto.subtle.digest('SHA-256', iv_ciphertext);
-    })
-    .then(function(digest) {
-      computed_sha256 = digest;
+        return window.crypto.subtle.digest('SHA-256', iv_ciphertext);
+      })
+      .then((digest) => {
+        computed_sha256 = digest;
 
-      return window.crypto.subtle.exportKey('raw', key);
-    })
-    .then((key_bytes) => ({cipher_text: iv_ciphertext.buffer, key_bytes: key_bytes, sha256: computed_sha256}));
+        return window.crypto.subtle.exportKey('raw', key);
+      })
+      .then((key_bytes) => ({cipher_text: iv_ciphertext.buffer, key_bytes: key_bytes, sha256: computed_sha256}));
   }
 
   function _equal_hashes(buffer_a, buffer_b) {
@@ -97,5 +97,4 @@ z.assets.AssetCrypto = (() => {
     decrypt_aes_asset,
     encrypt_aes_asset,
   };
-
 })();

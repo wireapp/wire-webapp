@@ -72,22 +72,22 @@ z.util.PromiseQueue = class PromiseQueue {
       this._timeout);
 
       queue_entry.fn()
-      .catch((error) => {
-        queue_entry.resolve_fn = undefined;
-        queue_entry.reject_fn(error);
-      })
-      .then((response) => {
-        if (queue_entry.resolve_fn) {
-          queue_entry.resolve_fn(response);
-        }
-        window.clearInterval(this._interval);
-        this._blocked = false;
-        this._queue.shift();
-        window.setTimeout(() => {
-          return this.execute();
-        },
-        0);
-      });
+        .catch((error) => {
+          queue_entry.resolve_fn = undefined;
+          queue_entry.reject_fn(error);
+        })
+        .then((response) => {
+          if (queue_entry.resolve_fn) {
+            queue_entry.resolve_fn(response);
+          }
+          window.clearInterval(this._interval);
+          this._blocked = false;
+          this._queue.shift();
+          window.setTimeout(() => {
+            return this.execute();
+          },
+          0);
+        });
     }
   }
 

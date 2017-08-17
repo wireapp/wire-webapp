@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2016 Wire Swiss GmbH
+ * Copyright (C) 2017 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ video-asset {
   display: block;
   position: relative;
 
-  &:after {
+  &::after {
     content: '';
     display: block;
     padding-bottom: 75%; // video ratio 4:3
@@ -82,7 +82,7 @@ video-asset {
   position: absolute;
   width: 100%;
 
-  &:before {
+  &::before {
     .full-screen;
     content: '';
     background: linear-gradient(to bottom, fade(#fff, 0), fade(#000, 40%));

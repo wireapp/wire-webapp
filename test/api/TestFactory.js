@@ -116,7 +116,7 @@ window.TestFactory.prototype.exposeCryptographyActors = function() {
       TestFactory.cryptography_repository.current_client = ko.observable(current_client);
       TestFactory.cryptography_repository.logger.level = this.settings.logging_level;
 
-      return TestFactory.cryptography_repository.init(TestFactory.storage_service.db);
+      return TestFactory.cryptography_repository.create_cryptobox(TestFactory.storage_service.db);
     })
     .then(() => TestFactory.cryptography_repository);
 };
@@ -304,11 +304,12 @@ window.TestFactory.prototype.exposeConversationActors = function() {
       TestFactory.conversation_repository = new z.conversation.ConversationRepository(
         TestFactory.conversation_service,
         TestFactory.asset_service,
-        TestFactory.user_repository,
-        undefined,
+        TestFactory.client_repository,
         TestFactory.cryptography_repository,
         undefined,
-        TestFactory.team_repository
+        undefined,
+        TestFactory.team_repository,
+        TestFactory.user_repository
       );
       TestFactory.conversation_repository.logger.level = this.settings.logging_level;
 

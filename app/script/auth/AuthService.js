@@ -50,8 +50,6 @@ z.auth.AuthService = class AuthService {
     return this.client.send_request({
       type: 'GET',
       url: this.client.create_url(AuthService.CONFIG.URL_COOKIES),
-    }).then((data) => {
-      return data.cookies;
     });
   }
 
@@ -206,19 +204,8 @@ z.auth.AuthService = class AuthService {
           withCredentials: true,
         },
       })
-        .done((data) => {
-          resolve(data);
-        })
-        .fail((jqXHR, textStatus, errorThrown) => {
-          if (jqXHR.status === z.service.BackendClientError.STATUS_CODE.TOO_MANY_REQUESTS && login.email) {
-            // Backend blocked our user account from login, so we have to reset our cookies
-            this.post_cookies_remove(login.email, login.password, undefined).then(() => {
-              reject(jqXHR.responseJSON || errorThrown);
-            });
-          } else {
-            reject(jqXHR.responseJSON || errorThrown);
-          }
-        });
+        .done(resolve)
+        .fail((jqXHR, textStatus, errorThrown) => reject(jqXHR.responseJSON || errorThrown));
     });
   }
 

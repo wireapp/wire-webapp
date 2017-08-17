@@ -17,8 +17,7 @@
  *
  */
 
- /* container */
-
+/* container */
 .conversation-list-cell {
   cursor: pointer;
   display: flex;
@@ -26,7 +25,7 @@
   height: 56px;
   position: relative;
 
-  &:after {
+  &::after {
     background-color: #fff;
     bottom: 0;
     content: '';
@@ -58,7 +57,6 @@
 }
 
 /* elements */
-
 .conversation-list-cell-name {
   .ellipsis-nowrap;
   font-size: 14px;
@@ -84,12 +82,9 @@
   .flex-center;
   .square(20px);
 
-  &:before {
+  &::before {
     content: '';
-    transition-property: opacity;
-    transition-timing-function: @ease-out-quart;
-    transition-delay: @animation-timing-faster + .05;
-    transition-duration: @animation-timing-slow;
+    transition: opacity @animation-timing-slow @ease-out-quart @animation-timing-faster + .05;
     opacity: 0;
     width: 0;
     height: 0;
