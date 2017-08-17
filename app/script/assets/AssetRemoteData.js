@@ -92,25 +92,20 @@ z.assets.AssetRemoteData = class AssetRemoteData {
 
   /**
    * Loads and decrypts stored asset
-   * @returns {Blob} Decrypted asset data
+   * @returns {Promise<Blob>} Resolves with the decrypted asset data
    */
   load() {
     let mime_type;
 
-    const loaded_buffer = this._load_buffer();
-    if (!loaded_buffer) {
-      return Promise.reject(new Error());
-    }
-
-    return loaded_buffer
-    .then(([buffer, type]) => {
-      mime_type = type;
-      if ((this.otr_key != null) && (this.sha256 != null)) {
-        return z.assets.AssetCrypto.decrypt_aes_asset(buffer, this.otr_key.buffer, this.sha256.buffer);
-      }
-      return buffer;
-    })
-    .then((plaintext) => new Blob([new Uint8Array(plaintext)], {mime_type}));
+    return this._load_buffer()
+      .then(([buffer, type]) => {
+        mime_type = type;
+        if ((this.otr_key != null) && (this.sha256 != null)) {
+          return z.assets.AssetCrypto.decrypt_aes_asset(buffer, this.otr_key.buffer, this.sha256.buffer);
+        }
+        return buffer;
+      })
+      .then((plaintext) => new Blob([new Uint8Array(plaintext)], {mime_type}));
   }
 
   /**
@@ -127,19 +122,19 @@ z.assets.AssetRemoteData = class AssetRemoteData {
   }
 
   _load_buffer() {
-    let generated_url;
-    try {
-      generated_url = this.generate_url();
-    } catch (error) {
-      if (error instanceof z.util.ValidationUtilError) {
-        this.logger.error(`Failed to validate an asset URL: ${error.message}`);
-        return false;
-      }
-      throw error;
-    }
-    return z.util.load_url_buffer(generated_url, (xhr) => {
-      xhr.onprogress = (event) => this.download_progress(Math.round((event.loaded / event.total) * 100));
-      return this.cancel_download = () => xhr.abort.call(xhr);
-    });
+    return Promise.resolve()
+      .then(() => this.generate_url())
+      .then((generated_url) => {
+        return z.util.load_url_buffer(generated_url, (xhr) => {
+          xhr.onprogress = (event) => this.download_progress(Math.round((event.loaded / event.total) * 100));
+          return this.cancel_download = () => xhr.abort.call(xhr);
+        });
+      })
+      .catch((error) => {
+        if (error instanceof z.util.ValidationUtilError) {
+          this.logger.error(`Failed to validate an asset URL (_load_buffer). Error: ${error.message}`);
+        }
+        throw error;
+      });
   }
 };
