@@ -59,7 +59,7 @@ z.util.ValidationUtil = {
     },
   },
   isAPICompliantPath: (str) => {
-    if (!/^\/[a-zA-Z0-9\-_\/\,]+$/.test(str)) {
+    if (!/^\/[a-zA-Z0-9\-_/,]+$/.test(str)) {
       throw new z.util.ValidationUtilError(`Non-compliant path creation attempt. Details: ${str}`);
     }
   },
@@ -76,7 +76,7 @@ z.util.ValidationUtil = {
     // Since some special chars are allowed,
     // remember to always encode Bearer tokens
     // using encodeURIComponents afterwards!
-    return /^[a-zA-Z0-9\-\._~\+\/]+[=]{0,2}$/.test(str);
+    return /^[a-zA-Z0-9\-._~+/]+[=]{0,2}$/.test(str);
   },
   isUUID: (str) => {
     return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(str);
