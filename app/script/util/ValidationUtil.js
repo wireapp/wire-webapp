@@ -57,6 +57,7 @@ z.util.ValidationUtil = {
       if (asset_token && !z.util.ValidationUtil.is_bearer_token(asset_token)) {
         throw new z.util.ValidationUtilError('Invalid asset token');
       }
+      return true;
     },
   },
   is_UUID: (str) => {

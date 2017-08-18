@@ -31,14 +31,58 @@ describe('z.util.ValidationUtil', () => {
       expect(actual).toBe(true);
     });
 
-    it('detects an invalid asset below v3', () => {
+    it('detects an invalid asset below v3', (done) => {
       const asset_id = z.util.create_random_uuid();
       const conversation_id = 'e13f9940-819c-477b-9391-b04234ae84af"*';
       try {
         z.util.ValidationUtil.asset.legacy(asset_id, conversation_id);
       } catch (error) {
         expect(error).toEqual(jasmine.any(z.util.ValidationUtilError));
+        return done();
       }
+      done.fail('Detection failed');
+    });
+  });
+
+  describe('"asset.v3"', () => {
+    it('detects a valid v3 asset (asset_key only)', () => {
+      const asset_key = `3-1-${z.util.create_random_uuid()}`;
+
+      const actual = z.util.ValidationUtil.asset.v3(asset_key);
+      expect(actual).toBe(true);
+    });
+
+    it('detects a valid v3 asset (asset_key & asset_token)', () => {
+      const asset_key = `3-1-${z.util.create_random_uuid()}`;
+      const asset_token = 'aV0TGxF3ugpawm3wAYPmew==';
+
+      const actual = z.util.ValidationUtil.asset.v3(asset_key, asset_token);
+      expect(actual).toBe(true);
+    });
+
+    it('detects an invalid v3 asset (asset_key)', (done) => {
+      const asset_key = `3-6-${z.util.create_random_uuid()}`;
+
+      try {
+        z.util.ValidationUtil.asset.v3(asset_key);
+      } catch (error) {
+        expect(error).toEqual(jasmine.any(z.util.ValidationUtilError));
+        return done();
+      }
+      done.fail('Detection failed');
+    });
+
+    it('detects an invalid v3 asset (asset_token)', (done) => {
+      const asset_key = `3-1-${z.util.create_random_uuid()}`;
+      const asset_token = 'a3wAY4%$@#$@%)!@-pOe==';
+
+      try {
+        z.util.ValidationUtil.asset.v3(asset_key, asset_token);
+      } catch (error) {
+        expect(error).toEqual(jasmine.any(z.util.ValidationUtilError));
+        return done();
+      }
+      done.fail('Detection failed');
     });
   });
 
@@ -63,7 +107,7 @@ describe('z.util.ValidationUtil', () => {
     });
 
     it('detects an incorrect Base64-encoded string', () => {
-      const encoded = 'Hello World!';
+      const encoded = 'SGVsbG8gV29ybGQh==';
       const actual = z.util.ValidationUtil.is_base64(encoded);
       expect(actual).toBe(false);
     });
@@ -91,7 +135,7 @@ describe('z.util.ValidationUtil', () => {
     });
 
     it('detects a incorrect UUID', () => {
-      const uuid = 'incorrect';
+      const uuid = 'i-c-o-r-r-e-c-t';
       const actual = z.util.ValidationUtil.is_UUID(uuid);
       expect(actual).toBe(false);
     });
@@ -104,13 +148,15 @@ describe('z.util.ValidationUtil', () => {
       expect(actual).toBe(true);
     });
 
-    it('detects a invalid API path', () => {
+    it('detects a invalid API path', (done) => {
       const path = '../../../search/contacts';
       try {
         z.util.ValidationUtil.is_valid_api_path(path);
       } catch (error) {
         expect(error).toEqual(jasmine.any(z.util.ValidationUtilError));
+        return done();
       }
+      done.fail('Detection failed');
     });
   });
 });
