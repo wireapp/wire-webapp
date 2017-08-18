@@ -118,7 +118,7 @@ z.service.BackendClient = class BackendClient {
    * @returns {string} REST API endpoint URL
    */
   create_url(path) {
-    z.util.ValidationUtil.isAPICompliantPath(path);
+    z.util.ValidationUtil.is_valid_api_path(path);
     return `${this.rest_url}${path}`;
   }
 

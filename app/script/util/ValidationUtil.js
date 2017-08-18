@@ -30,8 +30,8 @@ z.util.ValidationUtil = {
   // ToDo: Move z.util.is_same_location here
   asset: {
     legacy: (asset_id, conversation_id) => {
-      if (!z.util.ValidationUtil.isUUID(asset_id) ||
-          !z.util.ValidationUtil.isUUID(conversation_id)) {
+      if (!z.util.ValidationUtil.is_UUID(asset_id) ||
+          !z.util.ValidationUtil.is_UUID(conversation_id)) {
         throw new z.util.ValidationUtilError('Invalid asset_id / conversation_id');
       }
     },
@@ -50,20 +50,18 @@ z.util.ValidationUtil = {
       if (!z.util.ValidationUtil.asset.retention_policy(type)) {
         throw new z.util.ValidationUtilError('Invalid asset key (type)');
       }
-      if (!z.util.ValidationUtil.isUUID(uuid.join(SEPERATOR))) {
+      if (!z.util.ValidationUtil.is_UUID(uuid.join(SEPERATOR))) {
         throw new z.util.ValidationUtilError('Invalid asset key (UUID)');
       }
-      if (asset_token && !z.util.ValidationUtil.isBearerToken(asset_token)) {
+      if (asset_token && !z.util.ValidationUtil.is_bearer_token(asset_token)) {
         throw new z.util.ValidationUtilError('Invalid asset token');
       }
     },
   },
-  isAPICompliantPath: (str) => {
-    if (!/^\/[a-zA-Z0-9\-_/,]+$/.test(str)) {
-      throw new z.util.ValidationUtilError(`Non-compliant path creation attempt. Details: ${str}`);
-    }
+  is_UUID: (str) => {
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(str);
   },
-  isBase64: (str) => {
+  is_base64: (str) => {
     try {
       // Will raise a DOM exception if base64 string is invalid
       window.atob(str);
@@ -72,13 +70,15 @@ z.util.ValidationUtil = {
     }
     return true;
   },
-  isBearerToken: (str) => {
+  is_bearer_token: (str) => {
     // Since some special chars are allowed,
     // remember to always encode Bearer tokens
     // using encodeURIComponents afterwards!
     return /^[a-zA-Z0-9\-._~+/]+[=]{0,2}$/.test(str);
   },
-  isUUID: (str) => {
-    return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(str);
+  is_valid_api_path: (str) => {
+    if (!/^\/[a-zA-Z0-9\-_/,]+$/.test(str)) {
+      throw new z.util.ValidationUtilError(`Non-compliant path creation attempt. Details: ${str}`);
+    }
   },
 };
