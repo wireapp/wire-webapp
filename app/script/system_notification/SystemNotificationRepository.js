@@ -545,9 +545,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    */
   _notify_banner(conversation_et, message_et) {
     return this._should_show_notification(conversation_et, message_et)
-      .then(() => {
-        return this._create_notification_content(conversation_et, message_et);
-      })
+      .then(() => this._create_notification_content(conversation_et, message_et))
       .then((notification_content) => {
         return this.check_permission()
           .then((permission_state) => {
