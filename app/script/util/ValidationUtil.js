@@ -34,6 +34,7 @@ z.util.ValidationUtil = {
           !z.util.ValidationUtil.is_UUID(conversation_id)) {
         throw new z.util.ValidationUtilError('Invalid asset_id / conversation_id');
       }
+      return true;
     },
     retention_policy: (str) => {
       // Ensure the given asset is either eternal, persistent or volatile

@@ -22,6 +22,26 @@
 'use strict';
 
 describe('z.util.ValidationUtil', () => {
+  describe('"asset.legacy"', () => {
+    it('detects a valid asset below v3', () => {
+      const asset_id = z.util.create_random_uuid();
+      const conversation_id = z.util.create_random_uuid();
+
+      const actual = z.util.ValidationUtil.asset.legacy(asset_id, conversation_id);
+      expect(actual).toBe(true);
+    });
+
+    it('detects an invalid legacy asset', () => {
+      const asset_id = z.util.create_random_uuid();
+      const conversation_id = undefined;
+      try {
+        z.util.ValidationUtil.asset.legacy(asset_id, conversation_id);
+      } catch (error) {
+        expect(error).toEqual(jasmine.any(z.util.ValidationUtilError));
+      }
+    });
+  });
+
   describe('"is_base64"', () => {
     it('detects a correct Base64-encoded string', () => {
       const encoded = 'SGVsbG8gV29ybGQh';
