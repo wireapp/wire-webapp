@@ -68,9 +68,7 @@ describe('z.system_notification.SystemNotificationRepository', function() {
           service: {
             asset: {
               generate_asset_url() {
-                return new Promise((resolve) => {
-                  resolve('/image/logo/notification.png');
-                });
+                return new Promise((resolve) => resolve('/image/logo/notification.png'));
               },
             },
           },
