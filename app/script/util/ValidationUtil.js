@@ -70,15 +70,16 @@ z.util.ValidationUtil = {
     }
     return true;
   },
-  is_bearer_token: (str) => {
+  is_bearer_token: (token) => {
     // Since some special chars are allowed,
     // remember to always encode Bearer tokens
     // using encodeURIComponents afterwards!
-    return /^[a-zA-Z0-9\-._~+/]+[=]{0,2}$/.test(str);
+    return /^[a-zA-Z0-9\-._~+/]+[=]{0,2}$/.test(token);
   },
-  is_valid_api_path: (str) => {
-    if (!/^\/[a-zA-Z0-9\-_/,]+$/.test(str)) {
-      throw new z.util.ValidationUtilError(`Non-compliant path creation attempt. Details: ${str}`);
+  is_valid_api_path: (path) => {
+    if (!/^\/[a-zA-Z0-9\-_/,]+$/.test(path)) {
+      throw new z.util.ValidationUtilError(`Non-compliant path creation attempt. Details: ${path}`);
     }
+    return true;
   },
 };

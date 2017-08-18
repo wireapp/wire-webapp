@@ -22,45 +22,62 @@
 'use strict';
 
 describe('z.util.ValidationUtil', () => {
-  describe('"isBase64"', () => {
+  describe('"is_base64"', () => {
     it('detects a correct Base64-encoded string', () => {
       const encoded = 'SGVsbG8gV29ybGQh';
-      const actual = z.util.ValidationUtil.isBase64(encoded);
+      const actual = z.util.ValidationUtil.is_base64(encoded);
       expect(actual).toBe(true);
     });
 
     it('detects an incorrect Base64-encoded string', () => {
       const encoded = 'Hello World!';
-      const actual = z.util.ValidationUtil.isBase64(encoded);
+      const actual = z.util.ValidationUtil.is_base64(encoded);
       expect(actual).toBe(false);
     });
   });
 
-  describe('"isBearerToken"', () => {
+  describe('"is_bearer_token"', () => {
     it('detects a correct Bearer Token', () => {
       const token = 'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ==';
-      const actual = z.util.ValidationUtil.isBearerToken(token);
+      const actual = z.util.ValidationUtil.is_bearer_token(token);
       expect(actual).toBe(true);
     });
 
     it('detects a incorrect Bearer Token', () => {
       const token = 'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ==.v=1';
-      const actual = z.util.ValidationUtil.isBearerToken(token);
+      const actual = z.util.ValidationUtil.is_bearer_token(token);
       expect(actual).toBe(false);
     });
   });
 
-  describe('"isUUID"', () => {
+  describe('"is_UUID"', () => {
     it('detects a correct UUID', () => {
       const uuid = UUID.genV4().hexString;
-      const actual = z.util.ValidationUtil.isUUID(uuid);
+      const actual = z.util.ValidationUtil.is_UUID(uuid);
       expect(actual).toBe(true);
     });
 
     it('detects a incorrect UUID', () => {
       const uuid = 'incorrect';
-      const actual = z.util.ValidationUtil.isUUID(uuid);
+      const actual = z.util.ValidationUtil.is_UUID(uuid);
       expect(actual).toBe(false);
+    });
+  });
+
+  describe('"is_valid_api_path"', () => {
+    it('detects a valid API path', () => {
+      const path = '/search/contacts';
+      const actual = z.util.ValidationUtil.is_valid_api_path(path);
+      expect(actual).toBe(true);
+    });
+
+    it('detects a invalid API path', () => {
+      const path = '../../../search/contacts';
+      try {
+        z.util.ValidationUtil.is_valid_api_path(path);
+      } catch (error) {
+        expect(error).toEqual(jasmine.any(z.util.ValidationUtilError));
+      }
     });
   });
 });
