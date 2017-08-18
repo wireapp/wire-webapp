@@ -31,14 +31,27 @@ describe('z.util.ValidationUtil', () => {
       expect(actual).toBe(true);
     });
 
-    it('detects an invalid legacy asset', () => {
+    it('detects an invalid asset below v3', () => {
       const asset_id = z.util.create_random_uuid();
-      const conversation_id = undefined;
+      const conversation_id = 'e13f9940-819c-477b-9391-b04234ae84af"*';
       try {
         z.util.ValidationUtil.asset.legacy(asset_id, conversation_id);
       } catch (error) {
         expect(error).toEqual(jasmine.any(z.util.ValidationUtilError));
       }
+    });
+  });
+
+  describe('"asset.retention_policy"', () => {
+    it('detects retention numbers', () => {
+      expect(z.util.ValidationUtil.asset.retention_policy(1)).toBe(true);
+      expect(z.util.ValidationUtil.asset.retention_policy(2)).toBe(true);
+      expect(z.util.ValidationUtil.asset.retention_policy(3)).toBe(true);
+    });
+
+    it('detects invalid retention numbers', () => {
+      expect(z.util.ValidationUtil.asset.retention_policy(0)).toBe(false);
+      expect(z.util.ValidationUtil.asset.retention_policy(4)).toBe(false);
     });
   });
 
