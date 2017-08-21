@@ -39,6 +39,15 @@ z.components.LinkPreviewAssetComponent = class LinkPreviewAssetComponent {
     this.element = component_info.element;
     this.url = this.preview.original_url;
 
+    this.is_twitter_url = (
+      this.preview.meta_data_type === z.links.LinkPreviewMetaDataType.TWEET &&
+      z.util.ValidationUtil.twitter.is_status(this.url)
+    );
+
+    if (this.is_twitter_url) {
+      this.author = this.preview.meta_data.author;
+    }
+
     this.on_link_preview_click = this.on_link_preview_click.bind(this);
     this.element.addEventListener('click', this.on_link_preview_click);
   }
@@ -63,19 +72,19 @@ ko.components.register('link-preview-asset', {
           <image-component class="link-preview-image" data-uie-name="link-preview-image" params="asset: preview.image_resource"></image-component>
         <!-- /ko -->
       </div>
-    
+
       <div class="link-preview-info">
         <!-- ko if: header -->
           <asset-header class="link-preview-info-header" params="message: message_et"></asset-header>
         <!-- /ko -->
-        <!-- ko if: preview.meta_data_type == undefined -->
+        <!-- ko if: !is_twitter_url -->
           <div class="link-preview-info-title" data-uie-name="link-preview-title" data-bind="text: preview.title, css: header ? 'link-preview-info-title-singleline' : 'link-preview-info-title-multiline'"></div>
           <div class="link-preview-info-link text-graphite ellipsis" data-uie-name="link-preview-url" data-bind="text: z.util.naked_url(url), attr: {title: url}"></div>
         <!-- /ko -->
-        <!-- ko if: preview.meta_data_type === z.links.LinkPreviewMetaDataType.TWEET -->
+        <!-- ko if: is_twitter_url -->
           <div class="link-preview-info-title" data-uie-name="link-preview-title" data-bind="text: preview.title, css: header ? 'link-preview-info-title-singleline' : 'link-preview-info-title-multiline'"></div>
           <div class="link-preview-info-link text-graphite" data-uie-name="link-preview-tweet-author" attr: {title: url}>
-            <span class="font-weight-bold ellipsis" data-bind="text: preview.meta_data.author"></span>
+            <span class="font-weight-bold ellipsis" data-bind="text: author"></span>
             <span data-bind="l10n_text: z.string.conversation_tweet_author"></span>
           </div>
         <!-- /ko -->

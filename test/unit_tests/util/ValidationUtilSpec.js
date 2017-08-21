@@ -159,4 +159,84 @@ describe('z.util.ValidationUtil', () => {
       done.fail('Detection failed');
     });
   });
+
+  // See https://regex101.com/r/ixiPT0/7
+  fdescribe('"twitter.is_status"', () => {
+    it('detects invalid statuses', () => {
+      const urls = [
+        'http://twitter.com/',
+        'https://www.twitter.com/',
+        'https://twitter.com/pwnsdx/',
+        'https://twitter.com/pwnsdx/following',
+        'https://twitter.com/pwnsdx/status/899574902050758656lolz',
+        'http://twitter.com/pwnsdx/statusb/899574902050758656',
+        'https://help.twitter.com/pwnsdx/status/899574902050758656',
+        'https://.twitter.com/pwnsdx/status/899574902050758656',
+        'ftp://twitter.com/pwnsdx/status/899574902050758656',
+      ];
+      for (const url of urls) {
+        expect(z.util.ValidationUtil.twitter.is_status(url)).toBe(false);
+      }
+    });
+
+    it('detects a valid status with various protocols/subdomains', () => {
+      const urls = [
+        'https://twitter.com/pwnsdx/status/899574902050758656',
+        'https://www.twitter.com/pwnsdx/status/899574902050758656',
+        'http://twitter.com/pwnsdx/status/899574902050758656',
+        'http://www.twitter.com/pwnsdx/status/899574902050758656',
+      ];
+      for (const url of urls) {
+        expect(z.util.ValidationUtil.twitter.is_status(url)).toBe(true);
+      }
+    });
+    it('detects a valid status with "statues" in the url', () => {
+      const urls = [
+        'https://twitter.com/i/moments/899675330595749888',
+      ];
+      for (const url of urls) {
+        expect(z.util.ValidationUtil.twitter.is_status(url)).toBe(true);
+      }
+      expect(z.util.ValidationUtil.twitter.is_status('https://twitter.com/pwnsdx/statuses/899574902050758656')).toBe(true);
+    });
+
+    it('detects a valid status when using moments', () => {
+      const urls = [
+        'https://twitter.com/i/moments/899675330595749888',
+      ];
+      for (const url of urls) {
+        expect(z.util.ValidationUtil.twitter.is_status(url)).toBe(true);
+      }
+    });
+
+    it('detects a valid status even when search params or directory are added', () => {
+      const urls = [
+        'https://twitter.com/pwnsdx/status/899574902050758656/test',
+        'https://twitter.com/pwnsdx/status/899574902050758656/test?ref_src=twsrc%5Etfw&ref_url=https%3A%2F%2Fdiscover.twitter.com%2Ffirst-tweet',
+        'https://twitter.com/pwnsdx/status/899574902050758656?ref_src=twsrc%5Etfw&ref_url=https%3A%2F%2Fdiscover.twitter.com%2Ffirst-tweet',
+      ];
+      for (const url of urls) {
+        expect(z.util.ValidationUtil.twitter.is_status(url)).toBe(true);
+      }
+    });
+
+    it('detects a valid status with a short id', () => {
+      const urls = [
+        'https://twitter.com/Twitter/status/145344012',
+      ];
+      for (const url of urls) {
+        expect(z.util.ValidationUtil.twitter.is_status(url)).toBe(true);
+      }
+    });
+
+    it('detects a valid status with a mobile or 0 link', () => {
+      const urls = [
+        'https://mobile.twitter.com/pwnsdx/status/899574902050758656',
+        'https://0.twitter.com/pwnsdx/status/899574902050758656',
+      ];
+      for (const url of urls) {
+        expect(z.util.ValidationUtil.twitter.is_status(url)).toBe(true);
+      }
+    });
+  });
 });
