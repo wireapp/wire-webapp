@@ -130,12 +130,16 @@ z.assets.AssetService = class AssetService {
    * @returns {string} URL of v1 asset
    */
   generate_asset_url(asset_id, conversation_id, force_caching) {
-    const url = this.client.create_url(`/assets/${asset_id}`);
-    let asset_url = `${url}?access_token=${this.client.access_token}&conv_id=${conversation_id}`;
-    if (force_caching) {
-      asset_url = `${asset_url}&forceCaching=true`;
-    }
-    return asset_url;
+    return Promise.resolve()
+      .then(() => {
+        z.util.ValidationUtil.asset.legacy(asset_id, conversation_id);
+        const url = this.client.create_url(`/assets/${asset_id}`);
+        let asset_url = `${url}?access_token=${this.client.access_token}&conv_id=${window.encodeURIComponent(conversation_id)}`;
+        if (force_caching === true) {
+          asset_url = `${asset_url}&forceCaching=true`;
+        }
+        return asset_url;
+      });
   }
 
   /**
@@ -148,12 +152,16 @@ z.assets.AssetService = class AssetService {
    * @returns {string} URL of v2 asset
    */
   generate_asset_url_v2(asset_id, conversation_id, force_caching) {
-    const url = this.client.create_url(`/conversations/${conversation_id}/otr/assets/${asset_id}`);
-    let asset_url = `${url}?access_token=${this.client.access_token}`;
-    if (force_caching) {
-      asset_url = `${asset_url}&forceCaching=true`;
-    }
-    return asset_url;
+    return Promise.resolve()
+      .then(() => {
+        z.util.ValidationUtil.asset.legacy(asset_id, conversation_id);
+        const url = this.client.create_url(`/conversations/${conversation_id}/otr/assets/${asset_id}`);
+        let asset_url = `${url}?access_token=${this.client.access_token}`;
+        if (force_caching === true) {
+          asset_url = `${asset_url}&forceCaching=true`;
+        }
+        return asset_url;
+      });
   }
 
   /**
@@ -165,15 +173,18 @@ z.assets.AssetService = class AssetService {
    * @returns {string} URL of v3 asset
    */
   generate_asset_url_v3(asset_key, asset_token, force_caching) {
-    const url = this.client.create_url(`/assets/v3/${asset_key}/`);
-    let asset_url = `${url}?access_token=${this.client.access_token}`;
-    if (asset_token) {
-      asset_url = `${asset_url}&asset_token=${asset_token}`;
-    }
-    if (force_caching) {
-      asset_url = `${asset_url}&forceCaching=true`;
-    }
-    return asset_url;
+    return Promise.resolve()
+      .then(() => {
+        z.util.ValidationUtil.asset.v3(asset_key, asset_token);
+        let asset_url = `${this.client.create_url(`/assets/v3/${asset_key}`)}?access_token=${this.client.access_token}`;
+        if (asset_token) {
+          asset_url = `${asset_url}&asset_token=${window.encodeURIComponent(asset_token)}`;
+        }
+        if (force_caching === true) {
+          asset_url = `${asset_url}&forceCaching=true`;
+        }
+        return asset_url;
+      });
   }
 
   /**

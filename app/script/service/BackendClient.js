@@ -114,11 +114,12 @@ z.service.BackendClient = class BackendClient {
 
   /**
    * Create a request URL.
-   * @param {string} url - API endpoint to be prefixed with REST API environment
+   * @param {string} path - API endpoint path to be suffixed to REST API environment
    * @returns {string} REST API endpoint URL
    */
-  create_url(url) {
-    return `${this.rest_url}${url}`;
+  create_url(path) {
+    z.util.ValidationUtil.is_valid_api_path(path);
+    return `${this.rest_url}${path}`;
   }
 
   /**
