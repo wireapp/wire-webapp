@@ -161,7 +161,7 @@ describe('z.util.ValidationUtil', () => {
   });
 
   // See https://regex101.com/r/ixiPT0/7
-  fdescribe('"twitter.is_status"', () => {
+  describe('"twitter.is_status"', () => {
     it('detects invalid statuses', () => {
       const urls = [
         'http://twitter.com/',
