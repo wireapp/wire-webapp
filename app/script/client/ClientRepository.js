@@ -101,6 +101,7 @@ z.client.ClientRepository = class ClientRepository {
           this.logger.warn(`Local client '${client_id}' no longer exists on the backend`, error);
           throw new z.client.ClientError(z.client.ClientError.TYPE.NO_VALID_CLIENT);
         }
+
         throw error;
       });
   }
@@ -119,6 +120,7 @@ z.client.ClientRepository = class ClientRepository {
           this.logger.info('No local client found in database');
           throw new z.client.ClientError(z.client.ClientError.TYPE.NO_VALID_CLIENT);
         }
+
         const client_et = this.client_mapper.map_client(client_payload);
         this.current_client(client_et);
         this.logger.info(`Loaded local client '${client_et.id}' connected to '${z.client.ClientRepository.PRIMARY_KEY_CURRENT_CLIENT}'`, this.current_client());
@@ -256,11 +258,10 @@ z.client.ClientRepository = class ClientRepository {
       })
       .catch((error) => {
         const client_not_validated = error.type === z.client.ClientError.TYPE.NO_VALID_CLIENT;
-        if (client_not_validated) {
-          throw new z.client.ClientError(z.client.ClientError.TYPE.NO_VALID_CLIENT);
+        if (!client_not_validated) {
+          this.logger.error(`Getting valid local client failed: ${error.code || error.message}`, error);
         }
 
-        this.logger.error(`Getting valid local client failed: ${error.code || error.message}`, error);
         throw error;
       });
   }
