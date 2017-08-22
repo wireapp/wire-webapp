@@ -189,7 +189,7 @@ z.service.BackendClient = class BackendClient {
   }
 
   /**
-   * Send jQuery AJAX request with compressed JSON body.
+   * Deprecated: Send jQuery AJAX request with compressed JSON body.
    *
    * @note ContentType will be overwritten with 'application/json; charset=utf-8'
    * @see send_request for valid parameters
@@ -198,16 +198,7 @@ z.service.BackendClient = class BackendClient {
    * @returns {Promise} Resolves when the request has been executed
    */
   send_json(config) {
-    const json_config = {
-      contentType: 'application/json; charset=utf-8',
-      data: config.data ? pako.gzip(JSON.stringify(config.data)) : undefined,
-      headers: {
-        'Content-Encoding': 'gzip',
-      },
-      processData: false,
-    };
-
-    return this.send_request($.extend(config, json_config, true));
+    return this.send_request(config);
   }
 
   /**

@@ -193,11 +193,7 @@ z.auth.AuthService = class AuthService {
       $.ajax({
         contentType: 'application/json; charset=utf-8',
         crossDomain: true,
-        data: pako.gzip(JSON.stringify(login)),
-        headers: {
-          'Content-Encoding': 'gzip',
-        },
-        processData: false,
+        data: login,
         type: 'POST',
         url: `${this.client.create_url(AuthService.CONFIG.URL_LOGIN)}?persist=${window.encodeURIComponent(persist.toString())}`,
         xhrFields: {
@@ -256,11 +252,7 @@ z.auth.AuthService = class AuthService {
       const config = {
         contentType: 'application/json; charset=utf-8',
         crossDomain: true,
-        data: pako.gzip(JSON.stringify(new_user)),
-        headers: {
-          'Content-Encoding': 'gzip',
-        },
-        processData: false,
+        data: new_user,
         type: 'POST',
         url: `${this.client.create_url(AuthService.CONFIG.URL_REGISTER)}?challenge_cookie=true`,
         xhrFields: {
