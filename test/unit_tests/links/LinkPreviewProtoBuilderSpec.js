@@ -94,4 +94,12 @@ describe('LinkPreviewProtoBuilder', function() {
     const link_preview = z.links.LinkPreviewProtoBuilder.build_from_open_graph_data(mock, url);
     compare_article_with_mock(url, 0, link_preview, mock);
   });
+
+  it('returns a regular link preview even if site name is Twitter', function() {
+    const url = 'heise.de';
+    const mock = OpenGraphMocks.getHeiseMock();
+    mock.site_name = 'Twitter';
+    const link_preview = z.links.LinkPreviewProtoBuilder.build_from_open_graph_data(mock, url);
+    compare_article_with_mock(url, 0, link_preview, mock);
+  });
 });
