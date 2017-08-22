@@ -29,7 +29,7 @@ z.calling.CallingRepository = class CallingRepository {
         z.calling.enum.CALL_MESSAGE_TYPE.HANGUP,
         z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC,
       ],
-      DEFAULT_CONFIG_TTL: 60 * 60 * 1000, // 60 minutes in milliseconds
+      DEFAULT_CONFIG_TTL: 60 * 60, // 60 minutes in seconds
       MESSAGE_LOG_LENGTH: 250,
       PROTOCOL_VERSION: '3.0',
     };
@@ -1250,8 +1250,8 @@ z.calling.CallingRepository = class CallingRepository {
         if (calling_config) {
           this._clear_config_timeout();
 
-          const ttl = (calling_config.ttl * .9 * 1000) || CallingRepository.CONFIG.DEFAULT_CONFIG_TTL;
-          const timeout = Math.min(ttl, CallingRepository.CONFIG.DEFAULT_CONFIG_TTL);
+          const ttl = (calling_config.ttl * .9) || CallingRepository.CONFIG.DEFAULT_CONFIG_TTL;
+          const timeout = Math.min(ttl, CallingRepository.CONFIG.DEFAULT_CONFIG_TTL) * 1000;
           const expiration_date = new Date(Date.now() + timeout);
           calling_config.expiration = expiration_date;
 
