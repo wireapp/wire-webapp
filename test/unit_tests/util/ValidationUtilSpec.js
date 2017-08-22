@@ -161,7 +161,7 @@ describe('z.util.ValidationUtil', () => {
   });
 
   // See https://regex101.com/r/ixiPT0/7
-  describe('"twitter.is_status"', () => {
+  describe('"urls.is_tweet"', () => {
     it('detects invalid statuses', () => {
       const urls = [
         'http://twitter.com/',
@@ -175,7 +175,7 @@ describe('z.util.ValidationUtil', () => {
         'ftp://twitter.com/pwnsdx/status/899574902050758656',
       ];
       for (const url of urls) {
-        expect(z.util.ValidationUtil.twitter.is_status(url)).toBe(false);
+        expect(z.util.ValidationUtil.urls.is_tweet(url)).toBe(false);
       }
     });
 
@@ -187,17 +187,16 @@ describe('z.util.ValidationUtil', () => {
         'http://www.twitter.com/pwnsdx/status/899574902050758656',
       ];
       for (const url of urls) {
-        expect(z.util.ValidationUtil.twitter.is_status(url)).toBe(true);
+        expect(z.util.ValidationUtil.urls.is_tweet(url)).toBe(true);
       }
     });
     it('detects a valid status with "statues" in the url', () => {
       const urls = [
-        'https://twitter.com/i/moments/899675330595749888',
+        'https://twitter.com/pwnsdx/statuses/899574902050758656',
       ];
       for (const url of urls) {
-        expect(z.util.ValidationUtil.twitter.is_status(url)).toBe(true);
+        expect(z.util.ValidationUtil.urls.is_tweet(url)).toBe(true);
       }
-      expect(z.util.ValidationUtil.twitter.is_status('https://twitter.com/pwnsdx/statuses/899574902050758656')).toBe(true);
     });
 
     it('detects a valid status when using moments', () => {
@@ -205,7 +204,7 @@ describe('z.util.ValidationUtil', () => {
         'https://twitter.com/i/moments/899675330595749888',
       ];
       for (const url of urls) {
-        expect(z.util.ValidationUtil.twitter.is_status(url)).toBe(true);
+        expect(z.util.ValidationUtil.urls.is_tweet(url)).toBe(true);
       }
     });
 
@@ -216,7 +215,7 @@ describe('z.util.ValidationUtil', () => {
         'https://twitter.com/pwnsdx/status/899574902050758656?ref_src=twsrc%5Etfw&ref_url=https%3A%2F%2Fdiscover.twitter.com%2Ffirst-tweet',
       ];
       for (const url of urls) {
-        expect(z.util.ValidationUtil.twitter.is_status(url)).toBe(true);
+        expect(z.util.ValidationUtil.urls.is_tweet(url)).toBe(true);
       }
     });
 
@@ -225,7 +224,7 @@ describe('z.util.ValidationUtil', () => {
         'https://twitter.com/Twitter/status/145344012',
       ];
       for (const url of urls) {
-        expect(z.util.ValidationUtil.twitter.is_status(url)).toBe(true);
+        expect(z.util.ValidationUtil.urls.is_tweet(url)).toBe(true);
       }
     });
 
@@ -235,7 +234,7 @@ describe('z.util.ValidationUtil', () => {
         'https://0.twitter.com/pwnsdx/status/899574902050758656',
       ];
       for (const url of urls) {
-        expect(z.util.ValidationUtil.twitter.is_status(url)).toBe(true);
+        expect(z.util.ValidationUtil.urls.is_tweet(url)).toBe(true);
       }
     });
   });
