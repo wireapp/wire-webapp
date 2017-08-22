@@ -198,9 +198,7 @@ describe('z.service.BackendClient', function() {
     it('passes all params to send_request', function(done) {
       spyOn(backend_client, 'send_request').and.callFake(function(config) {
         expect(config.callback).toBe(original_config.callback);
-        // expect(config.contentType).toBe('application/json; charset=utf-8');
         expect(config.headers['X-TEST-HEADER']).toBe(original_config.headers['X-TEST-HEADER']);
-        // expect(config.headers['Content-Encoding']).toBe('gzip');
         expect(config.data).toBeDefined();
         expect(config.processData).toBe(original_config.processData);
         expect(config.timeout).toBe(original_config.timeout);
