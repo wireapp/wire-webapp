@@ -29,7 +29,7 @@ z.calling.CallingRepository = class CallingRepository {
         z.calling.enum.CALL_MESSAGE_TYPE.HANGUP,
         z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC,
       ],
-      DEFAULT_UPDATE_INTERVAL: 30 * 60, // 30 minutes in seconds
+      DEFAULT_CONFIG_TTL: 30 * 60, // 30 minutes in seconds
       MESSAGE_LOG_LENGTH: 250,
       PROTOCOL_VERSION: '3.0',
     };
@@ -77,7 +77,7 @@ z.calling.CallingRepository = class CallingRepository {
     });
 
     this.calling_config = undefined;
-    this.calling_config_timeouts = [];
+    this.calling_config_timeout = undefined;
 
     // Telemetry
     this.telemetry = new z.telemetry.calling.CallTelemetry();
@@ -1225,20 +1225,30 @@ z.calling.CallingRepository = class CallingRepository {
    */
   get_config() {
     if (this.calling_config) {
-      return Promise.resolve(this.calling_config);
+      const is_expired_config = this.calling_config.expiration.getTime() >= Date.now();
+
+      if (!is_expired_config) {
+        this.logger.debug('Returning local calling configuration. No update needed.', this.calling_config);
+        return Promise.resolve(this.calling_config);
+      }
+
+      this._clear_config();
     }
 
     return this._get_config_from_backend();
   }
 
-  _clear_calling_config() {
-    this.calling_config = undefined;
+  _clear_config() {
+    if (this.calling_config) {
+      this.logger.debug(`Removing calling configuration with expiration of '${this.calling_config.expiration}'`);
+      this.calling_config = undefined;
+    }
   }
 
-  _clear_calling_config_timeouts() {
-    if (this.calling_config_timeouts.length) {
-      this.calling_config_timeouts.forEach((timeout) => window.clearTimeout(timeout));
-      this.calling_config_timeouts.length = 0;
+  _clear_config_timeout() {
+    if (this.calling_config_timeout) {
+      window.clearTimeout(this.calling_config_timeout);
+      this.calling_config_timeout = undefined;
     }
   }
 
@@ -1252,15 +1262,16 @@ z.calling.CallingRepository = class CallingRepository {
     return this.calling_service.get_config()
       .then((calling_config) => {
         if (calling_config) {
-          this._clear_calling_config_timeouts();
-          const renewal_timeout_in_seconds = CallingRepository.CONFIG.DEFAULT_UPDATE_INTERVAL;
-          const clear_timeout_in_seconds = calling_config.ttl || renewal_timeout_in_seconds;
+          this._clear_config_timeout();
+          const ttl = calling_config.ttl || CallingRepository.CONFIG.DEFAULT_CONFIG_TTL;
+          const timeout = ttl * 1000;
+          const expiration_date = new Date(Date.now() + timeout);
+          calling_config.expiration = expiration_date;
 
-          this.logger.info(`Updated calling configuration - next update in ${renewal_timeout_in_seconds}s`, calling_config);
+          this.logger.info(`Updated calling configuration expires on '${expiration_date.toISOString()}'`, calling_config);
           this.calling_config = calling_config;
 
-          this.calling_config_timeouts.push = window.setTimeout(this.get_config, renewal_timeout_in_seconds * 1000);
-          this.calling_config_timeouts.push = window.setTimeout(this._clear_calling_config, clear_timeout_in_seconds * 1000);
+          this.calling_config_timeout = window.setTimeout(() => this._clear_config(), timeout);
           return this.calling_config;
         }
       });
