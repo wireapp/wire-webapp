@@ -1985,11 +1985,13 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       .then(() => this.cryptography_repository.load_cryptobox(this.storage_service.db))
       .then(() => this.client_repository.get_valid_local_client())
       .catch((error) => {
-        if (error.type === z.user.UserError.TYPE.USER_MISSING_EMAIL) {
+        const user_missing_email = error.type === z.user.UserError.TYPE.USER_MISSING_EMAIL;
+        if (user_missing_email) {
           throw error;
         }
 
-        if (error.type === z.client.ClientError.TYPE.NO_VALID_CLIENT) {
+        const client_not_validated = error.type === z.client.ClientError.TYPE.NO_VALID_CLIENT;
+        if (client_not_validated) {
           const client_et = this.client_repository.current_client();
           this.client_repository.current_client(undefined);
           return this.cryptography_repository.reset_cryptobox(client_et)
