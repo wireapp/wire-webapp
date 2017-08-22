@@ -29,7 +29,7 @@ z.calling.CallingRepository = class CallingRepository {
         z.calling.enum.CALL_MESSAGE_TYPE.HANGUP,
         z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC,
       ],
-      DEFAULT_CONFIG_TTL: 30 * 60, // 30 minutes in seconds
+      DEFAULT_CONFIG_TTL: 60 * 60 * 1000, // 60 minutes in milliseconds
       MESSAGE_LOG_LENGTH: 250,
       PROTOCOL_VERSION: '3.0',
     };
@@ -1263,15 +1263,20 @@ z.calling.CallingRepository = class CallingRepository {
       .then((calling_config) => {
         if (calling_config) {
           this._clear_config_timeout();
-          const ttl = calling_config.ttl || CallingRepository.CONFIG.DEFAULT_CONFIG_TTL;
-          const timeout = ttl * 1000;
+
+          const ttl = (calling_config.ttl * .9 * 1000) || CallingRepository.CONFIG.DEFAULT_CONFIG_TTL;
+          const timeout = Math.min(ttl, CallingRepository.CONFIG.DEFAULT_CONFIG_TTL);
           const expiration_date = new Date(Date.now() + timeout);
           calling_config.expiration = expiration_date;
 
           this.logger.info(`Updated calling configuration expires on '${expiration_date.toISOString()}'`, calling_config);
           this.calling_config = calling_config;
 
-          this.calling_config_timeout = window.setTimeout(() => this._clear_config(), timeout);
+          this.calling_config_timeout = window.setTimeout(() => {
+            this._clear_config();
+            this.get_config();
+          }, timeout);
+
           return this.calling_config;
         }
       });
