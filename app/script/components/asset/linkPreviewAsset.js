@@ -41,7 +41,7 @@ z.components.LinkPreviewAssetComponent = class LinkPreviewAssetComponent {
 
     this.is_twitter_url = (
       this.preview.meta_data_type === z.links.LinkPreviewMetaDataType.TWEET &&
-      z.util.ValidationUtil.twitter.is_status(this.url)
+      z.util.ValidationUtil.urls.is_tweet(this.url)
     );
 
     if (this.is_twitter_url) {
