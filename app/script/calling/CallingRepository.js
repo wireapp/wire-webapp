@@ -1225,7 +1225,7 @@ z.calling.CallingRepository = class CallingRepository {
    */
   get_config() {
     if (this.calling_config) {
-      const is_expired_config = this.calling_config.expiration.getTime() >= Date.now();
+      const is_expired_config = this.calling_config.expiration.getTime() < Date.now();
 
       if (!is_expired_config) {
         this.logger.debug('Returning local calling configuration. No update needed.', this.calling_config);
@@ -1240,7 +1240,7 @@ z.calling.CallingRepository = class CallingRepository {
 
   _clear_config() {
     if (this.calling_config) {
-      this.logger.debug(`Removing calling configuration with expiration of '${this.calling_config.expiration}'`);
+      this.logger.debug(`Removing calling configuration with expiration of '${this.calling_config.expiration.toISOString()}'`);
       this.calling_config = undefined;
     }
   }
