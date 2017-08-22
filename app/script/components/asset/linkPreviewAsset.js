@@ -45,7 +45,7 @@ z.components.LinkPreviewAssetComponent = class LinkPreviewAssetComponent {
     );
 
     if (this.is_twitter_url) {
-      this.author = this.preview.meta_data.author;
+      this.author = this.preview.meta_data.author.substring(0, 20);
     }
 
     this.on_link_preview_click = this.on_link_preview_click.bind(this);
@@ -84,7 +84,7 @@ ko.components.register('link-preview-asset', {
         <!-- ko if: is_twitter_url -->
           <div class="link-preview-info-title" data-uie-name="link-preview-title" data-bind="text: preview.title, css: header ? 'link-preview-info-title-singleline' : 'link-preview-info-title-multiline'"></div>
           <div class="link-preview-info-link text-graphite" data-uie-name="link-preview-tweet-author" attr: {title: url}>
-            <span class="font-weight-bold ellipsis" data-bind="text: author"></span>
+            <span class="font-weight-bold link-preview-info-title-singleline" data-bind="text: author"></span>
             <span data-bind="l10n_text: z.string.conversation_tweet_author"></span>
           </div>
         <!-- /ko -->
