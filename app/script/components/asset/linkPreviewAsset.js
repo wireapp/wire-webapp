@@ -39,12 +39,12 @@ z.components.LinkPreviewAssetComponent = class LinkPreviewAssetComponent {
     this.element = component_info.element;
     this.url = this.preview.original_url;
 
-    this.is_twitter_url = (
+    this.is_tweet = (
       this.preview.meta_data_type === z.links.LinkPreviewMetaDataType.TWEET &&
       z.util.ValidationUtil.urls.is_tweet(this.url)
     );
 
-    if (this.is_twitter_url) {
+    if (this.is_tweet) {
       this.author = this.preview.meta_data.author.substring(0, 20);
     }
 
@@ -77,11 +77,11 @@ ko.components.register('link-preview-asset', {
         <!-- ko if: header -->
           <asset-header class="link-preview-info-header" params="message: message_et"></asset-header>
         <!-- /ko -->
-        <!-- ko if: !is_twitter_url -->
+        <!-- ko ifnot: is_tweet -->
           <div class="link-preview-info-title" data-uie-name="link-preview-title" data-bind="text: preview.title, css: header ? 'link-preview-info-title-singleline' : 'link-preview-info-title-multiline'"></div>
           <div class="link-preview-info-link text-graphite ellipsis" data-uie-name="link-preview-url" data-bind="text: z.util.naked_url(url), attr: {title: url}"></div>
         <!-- /ko -->
-        <!-- ko if: is_twitter_url -->
+        <!-- ko if: is_tweet -->
           <div class="link-preview-info-title" data-uie-name="link-preview-title" data-bind="text: preview.title, css: header ? 'link-preview-info-title-singleline' : 'link-preview-info-title-multiline'"></div>
           <div class="link-preview-info-link text-graphite" data-uie-name="link-preview-tweet-author" attr: {title: url}>
             <span class="font-weight-bold link-preview-info-title-singleline" data-bind="text: author"></span>
