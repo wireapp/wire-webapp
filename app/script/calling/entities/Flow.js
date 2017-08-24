@@ -396,10 +396,10 @@ z.calling.entities.Flow = class Flow {
    */
   _create_peer_connection_configuration() {
     return this.calling_repository.get_config()
-      .then((calling_config) => {
+      .then(({ice_servers}) => {
         return {
           bundlePolicy: 'max-bundle',
-          iceServers: calling_config.ice_servers,
+          iceServers: ice_servers,
           rtcpMuxPolicy: 'require', // @deprecated Default value beginning Chrome 57
         };
       });
