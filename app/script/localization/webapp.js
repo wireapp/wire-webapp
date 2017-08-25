@@ -606,6 +606,7 @@ z.string.tooltip_conversation_input_placeholder = 'Type a message';
 z.string.tooltip_conversation_people = 'People ({{shortcut}})';
 z.string.tooltip_conversation_picture = 'Add picture';
 z.string.tooltip_conversation_ping = 'Ping ({{shortcut}})';
+z.string.tooltip_conversation_search = 'Search';
 z.string.tooltip_conversation_video_call = 'Video Call';
 
 z.string.tooltip_conversations_archive = 'Archive ({{shortcut}})';

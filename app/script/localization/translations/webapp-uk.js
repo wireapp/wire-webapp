@@ -33,6 +33,7 @@ z.string.uk.alert_gif_too_large = 'Файл анімації завеликий.
 z.string.uk.auth_account_country_code = 'Код країни';
 z.string.uk.auth_account_create = 'Створити';
 z.string.uk.auth_account_create_account = 'Створити акаунт';
+z.string.uk.auth_account_deletion = 'Ви вийшли, оскільки ваш акаунт було видалено.';
 z.string.uk.auth_account_expiration = 'Ви вийшли, оскільки термін дії вашої сесії завершився. Будь ласка, увійдіть ще раз.';
 z.string.uk.auth_account_get_wire = 'Простий, приватний та захищений месенджер для розмов, дзвінків, обміну картинками, музикою, відео, GIF-анімаціями та іншими функціями.';
 z.string.uk.auth_account_password_forgot = 'Забули пароль?';
@@ -114,6 +115,7 @@ z.string.uk.call_decline = 'Скасувати';
 z.string.uk.call_accept = 'Прийняти';
 z.string.uk.call_join = 'Приєднатись';
 z.string.uk.call_choose_shared_screen = 'Оберіть робочий стіл, скріншотами якого ви хочете поділитися';
+z.string.uk.call_participants = '{{number}} учасників';
 
 z.string.uk.modal_button_cancel = 'Скасувати';
 z.string.uk.modal_button_ok = 'ОК';
@@ -183,6 +185,8 @@ z.string.uk.modal_uploads_parallel = 'Ви можете надіслати до 
 
 z.string.uk.connection_request_connect = 'Додати до контактів';
 z.string.uk.connection_request_ignore = 'Ігнорувати';
+
+z.string.uk.conversation_guest_indicator = 'Гість';
 
 z.string.uk.conversation_you_nominative = 'ви';
 z.string.uk.conversation_you_dative = 'ви';
@@ -263,6 +267,7 @@ z.string.uk.conversations_connection_request_one = '1 людина очікує'
 z.string.uk.conversations_empty_conversation = 'Групова розмова';
 z.string.uk.conversations_empty_conversation_description = 'Всі вийшли';
 z.string.uk.conversations_no_conversations = 'Поки що розмови відсутні';
+z.string.uk.conversations_no_conversations_detail = 'Розпочніть розмову або створіть групу.';
 z.string.uk.conversations_popover_archive = 'Архівувати';
 z.string.uk.conversations_popover_block = 'Заблокувати';
 z.string.uk.conversations_popover_cancel = 'Скасувати запит';
@@ -392,6 +397,7 @@ z.string.uk.preferences_about_website = 'Веб-сайт Wire';
 z.string.uk.preferences_account_delete = 'Видалити акаунт';
 z.string.uk.preferences_account_log_out = 'Вийти';
 z.string.uk.preferences_account_reset_password = 'Виконати скидання паролю';
+z.string.uk.preferences_account_team = 'в {{name}}';
 z.string.uk.preferences_account_username_placeholder = 'Ваше повне ім’я';
 z.string.uk.preferences_account_username_hint = 'Мінімум 2 символи з множини a—z, 0—9, та _.';
 z.string.uk.preferences_account_username_available = 'Доступний';

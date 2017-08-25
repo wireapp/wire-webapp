@@ -546,6 +546,7 @@ z.string.de.tooltip_conversation_input_placeholder = 'Schreibe eine Nachricht';
 z.string.de.tooltip_conversation_people = 'Unterhaltungsübersicht ({{shortcut}})';
 z.string.de.tooltip_conversation_picture = 'Bild senden';
 z.string.de.tooltip_conversation_ping = 'Ping ({{shortcut}})';
+z.string.de.tooltip_conversation_search = 'Suche';
 z.string.de.tooltip_conversation_video_call = 'Videoanruf';
 
 z.string.de.tooltip_conversations_archive = 'Archivieren ({{shortcut}})';
