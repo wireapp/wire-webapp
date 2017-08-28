@@ -84,4 +84,9 @@ z.util.ValidationUtil = {
     }
     return true;
   },
+  urls: {
+    is_tweet: (url) => {
+      return /^http(?:s)?:\/\/(?:(?:www|mobile|0)\.)?twitter\.com\/(?:(?:\w{1,15})\/status(?:es|\/i)?|i\/moments)\/(?:\d{2,21})(?:(?:\?|\/).*)?$/.test(url);
+    },
+  },
 };
