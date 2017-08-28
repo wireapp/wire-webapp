@@ -3179,7 +3179,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
-   * Delete messages from UI an database.
+   * Delete messages from UI and database.
    *
    * @private
    * @param {Conversation} conversation_et - Conversation that contains the message
