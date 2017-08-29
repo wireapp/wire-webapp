@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2016 Wire Swiss GmbH
+ * Copyright (C) 2017 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,6 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-
 
 user-profile {
   .bubble-content();
@@ -81,7 +80,7 @@ user-profile {
   line-height: 40px;
   position: relative;
 
-  &:after {
+  &::after {
     background-color: #fff;
     border-right: 1px solid @seperator-color;
     border-top: 1px solid @seperator-color;
@@ -90,17 +89,18 @@ user-profile {
     display: block;
     height: 7px;
     position: absolute;
-    transform: rotate(-45deg) translate(-50%,25%);
+    transform: rotate(-45deg) translate(-50%, 25%);
     width: 7px;
   }
 
   &[data-tab-index='0'] {
-    &:after {left: calc(100% * .25);}
-    & .user-profile-tab:nth-child(1) {color: @graphite-dark;}
+    &::after { left: calc(100% * .25); }
+    & .user-profile-tab:nth-child(1) { color: @graphite-dark; }
   }
+
   &[data-tab-index='1'] {
-    &:after {left: calc(100% * .75);}
-    & .user-profile-tab:nth-child(2) {color: @graphite-dark;}
+    &::after { left: calc(100% * .75); }
+    & .user-profile-tab:nth-child(2) { color: @graphite-dark; }
   }
 }
 

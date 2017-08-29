@@ -895,8 +895,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
         const payload = this._create_payload(z.auth.AuthView.MODE.POSTED_RESEND);
 
         this.auth.repository.resend_activation(payload)
-        .then((response) => this._on_resend_success(response))
-        .catch((error) => this._on_resend_error(error));
+          .then((response) => this._on_resend_success(response))
+          .catch((error) => this._on_resend_error(error));
       }
     }
   }
@@ -1982,19 +1982,27 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     this.logger.info('Logging in');
 
     this._get_self_user()
+      .then(() => this.cryptography_repository.load_cryptobox(this.storage_service.db))
       .then(() => this.client_repository.get_valid_local_client())
       .catch((error) => {
-        if (error.type === z.user.UserError.TYPE.USER_MISSING_EMAIL) {
+        const user_missing_email = error.type === z.user.UserError.TYPE.USER_MISSING_EMAIL;
+        if (user_missing_email) {
           throw error;
         }
 
-        this.logger.info(`No valid local client found: ${error.message}`, error);
-        if (error.type === z.client.ClientError.TYPE.MISSING_ON_BACKEND) {
-          this.logger.info('Local client rejected as invalid by backend. Reinitializing storage.');
-          return this.storage_service.init(this.self_user().id);
+        const client_not_validated = error.type === z.client.ClientError.TYPE.NO_VALID_CLIENT;
+        if (client_not_validated) {
+          const client_et = this.client_repository.current_client();
+          this.client_repository.current_client(undefined);
+          return this.cryptography_repository.reset_cryptobox(client_et)
+            .then((deleted_everything) => {
+              if (deleted_everything) {
+                this.logger.info('Database was completely reset. Reinitializing storage...');
+                return this.storage_repository.storage_service.init(this.self_user().id);
+              }
+            });
         }
       })
-      .then(() => this.cryptography_repository.init(this.storage_service.db))
       .then(() => {
         if (this.client_repository.current_client()) {
           this.logger.info('Active client found. Redirecting to app...');
@@ -2026,16 +2034,17 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
         this.logger.info(`Retrieved self user: ${this.self_user().id}`);
         this.pending_server_request(false);
 
-        if (this.self_user().email()) {
-          return this.storage_service.init(this.self_user().id)
-            .then(() => {
-              this.client_repository.init(this.self_user());
-              return this.self_user();
-            });
+        const has_email = this.self_user().email();
+        if (!has_email) {
+          this._set_hash(z.auth.AuthView.MODE.VERIFY_ACCOUNT);
+          throw new z.user.UserError(z.user.UserError.TYPE.USER_MISSING_EMAIL);
         }
 
-        this._set_hash(z.auth.AuthView.MODE.VERIFY_ACCOUNT);
-        throw new z.user.UserError(z.user.UserError.TYPE.USER_MISSING_EMAIL);
+        return this.storage_service.init(this.self_user().id);
+      })
+      .then(() => {
+        this.client_repository.init(this.self_user());
+        return this.self_user();
       });
   }
 
@@ -2061,7 +2070,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
   }
 
   _register_client(team_registration) {
-    return this.client_repository.register_client(team_registration ? undefined : this.password())
+    return this.cryptography_repository.create_cryptobox(this.storage_service.db)
+      .then(() => this.client_repository.register_client(team_registration ? undefined : this.password()))
       .then((client_observable) => {
         this.event_repository.current_client = client_observable;
         return this.event_repository.initialize_stream_state(client_observable().id);

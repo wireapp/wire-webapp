@@ -37,7 +37,7 @@ describe('UserHandleGenerator', function() {
       expect(z.user.UserHandleGenerator.normalize_name('Maria LaRochelle')).toBe('marialarochelle');
       expect(z.user.UserHandleGenerator.normalize_name("Mêrié \"LaRöche'lle\"")).toBe('merielaroechelle');
       expect(z.user.UserHandleGenerator.normalize_name('Maria I ❤️🍕')).toBe('mariai');
-      expect(z.user.UserHandleGenerator.normalize_name('.-/Maria\-.')).toBe('maria');
+      expect(z.user.UserHandleGenerator.normalize_name('.-/Maria-.')).toBe('maria');
       // expect(z.user.UserHandleGenerator.normalize_name('苹果')).toBe 'pingguo'
       // expect(z.user.UserHandleGenerator.normalize_name('תפוח ')).toBe 'tpwh'
       // expect(z.user.UserHandleGenerator.normalize_name('सेवफलम्')).toBe 'sevaphalam'

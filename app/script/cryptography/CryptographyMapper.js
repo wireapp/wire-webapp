@@ -42,24 +42,22 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
       return Promise.reject(new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.NO_GENERIC_MESSAGE));
     }
     return Promise.resolve()
-    .then(() => {
-      return generic_message.external ? this._unwrap_external(generic_message.external, event) : generic_message;
-    })
-    .then((unwrapped_generic_message) => {
-      return Promise.all([
-        this._map_generic_message(unwrapped_generic_message, event),
-        unwrapped_generic_message,
-      ]);
-    })
-    .then(([specific_content, unwrapped_generic_message]) => {
-      return Object.assign({
-        conversation: event.conversation,
-        from: event.from,
-        id: unwrapped_generic_message.message_id,
-        status: event.status,
-        time: event.time,
-      }, specific_content);
-    });
+      .then(() => generic_message.external ? this._unwrap_external(generic_message.external, event) : generic_message)
+      .then((unwrapped_generic_message) => {
+        return Promise.all([
+          this._map_generic_message(unwrapped_generic_message, event),
+          unwrapped_generic_message,
+        ]);
+      })
+      .then(([specific_content, unwrapped_generic_message]) => {
+        return Object.assign({
+          conversation: event.conversation,
+          from: event.from,
+          id: unwrapped_generic_message.message_id,
+          status: event.status,
+          time: event.time,
+        }, specific_content);
+      });
   }
 
   _map_generic_message(generic_message, event) {
@@ -243,11 +241,11 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     };
 
     return z.assets.AssetCrypto.decrypt_aes_asset(data.text.buffer, data.otr_key.buffer, data.sha256.buffer)
-    .then((external_message_buffer) => z.proto.GenericMessage.decode(external_message_buffer))
-    .catch((error) => {
-      this.logger.error(`Failed to map external message: ${error.message}`, error);
-      throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.BROKEN_EXTERNAL);
-    });
+      .then((external_message_buffer) => z.proto.GenericMessage.decode(external_message_buffer))
+      .catch((error) => {
+        this.logger.error(`Failed to map external message: ${error.message}`, error);
+        throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.BROKEN_EXTERNAL);
+      });
   }
 
   _map_hidden(hidden) {

@@ -106,23 +106,23 @@ z.calling.entities.Participant = class Participant {
    */
   update_properties(properties) {
     return Promise.resolve()
-    .then(() => {
-      if (properties) {
-        const {audiosend: audio_send, screensend: screen_send, videosend: video_send} = properties;
+      .then(() => {
+        if (properties) {
+          const {audiosend: audio_send, screensend: screen_send, videosend: video_send} = properties;
 
-        if (audio_send !== undefined) {
-          this.state.audio_send(audio_send === z.calling.enum.PROPERTY_STATE.TRUE);
-        }
+          if (audio_send !== undefined) {
+            this.state.audio_send(audio_send === z.calling.enum.PROPERTY_STATE.TRUE);
+          }
 
-        if (screen_send !== undefined) {
-          this.state.screen_send(screen_send === z.calling.enum.PROPERTY_STATE.TRUE);
-        }
+          if (screen_send !== undefined) {
+            this.state.screen_send(screen_send === z.calling.enum.PROPERTY_STATE.TRUE);
+          }
 
-        if (video_send !== undefined) {
-          this.state.video_send(video_send === z.calling.enum.PROPERTY_STATE.TRUE);
+          if (video_send !== undefined) {
+            this.state.video_send(video_send === z.calling.enum.PROPERTY_STATE.TRUE);
+          }
         }
-      }
-    });
+      });
   }
 
   /**

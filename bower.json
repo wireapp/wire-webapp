@@ -30,10 +30,10 @@
     "webapp-module-logger": "https://github.com/wireapp/webapp-module-logger.git#1.1.0",
     "webapp-module-modal": "https://github.com/wireapp/webapp-module-modal.git#1.0.0",
     "webapp-module-namespace": "https://github.com/wireapp/webapp-module-namespace.git#1.0.0",
-    "webrtc-adapter": "https://github.com/webrtc/adapter.git#4.2.1",
+    "webrtc-adapter": "https://github.com/webrtc/adapter.git#4.2.2",
     "wire-audio-files": "https://github.com/wireapp/wire-audio-files.git#1.1.0",
     "wire-theme": "https://github.com/wireapp/wire-theme.git#1.0.0",
-    "wire-webapp-cryptobox": "https://github.com/wireapp/wire-webapp-cryptobox.git#5.1.0"
+    "wire-webapp-cryptobox": "https://github.com/wireapp/wire-webapp-cryptobox.git#6.0.1"
   },
   "exportsOverride": {
     "amplify": {
@@ -81,7 +81,7 @@
       "js": "dist/knockout.debug.js"
     },
     "libsodium.js": {
-      "js/": "dist/browsers-sumo/combined/sodium.min.js"
+      "js/": "dist/browsers-sumo/combined/sodium.js"
     },
     "marked": {
       "js": "lib/marked.js"

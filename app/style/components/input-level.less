@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2016 Wire Swiss GmbH
+ * Copyright (C) 2017 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,10 +22,10 @@
   display: flex;
   justify-content: space-between;
   list-style: none;
-  padding: 0
+  padding: 0;
 }
 
-.input-level-bullet:before {
+.input-level-bullet::before {
   .circle(@input-level-bullet-size);
   display: block;
   content: '';
@@ -35,10 +35,10 @@
   transition: all .16s;
 }
 
-.input-level-bullet-active:before {
+.input-level-bullet-active::before {
   background-color: currentColor;
 }
 
-.input-level-bullet-disabled:before {
+.input-level-bullet-disabled::before {
   background-color: @seperator-color;
 }

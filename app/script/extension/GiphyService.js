@@ -45,7 +45,7 @@ z.extension.GiphyService = class GiphyService {
   get_by_id(ids) {
     ids = _.isArray(ids) ? ids : [ids];
 
-    return this.client.send_json({
+    return this.client.send_request({
       type: 'GET',
       url: this.client.create_url(`${GiphyService.CONFIG.ENDPOINT_BASE}/${ids.join(',')}`),
     });
@@ -57,9 +57,12 @@ z.extension.GiphyService = class GiphyService {
    * @returns {Promise} Resolves with random gifs for given tag
    */
   get_random(tag) {
-    return this.client.send_json({
+    return this.client.send_request({
+      data: {
+        tag: tag,
+      },
       type: 'GET',
-      url: this.client.create_url(`${GiphyService.CONFIG.ENDPOINT_BASE}/random?tag=${encodeURIComponent(tag)}`),
+      url: this.client.create_url(`${GiphyService.CONFIG.ENDPOINT_BASE}/random`),
     });
   }
 
@@ -67,29 +70,21 @@ z.extension.GiphyService = class GiphyService {
    * Search GIFs for a word or phrase.
    *
    * @param {Object} options - Search options
-   * @param {string} options.query - Search query term or phrase
+   * @param {string} options.q - Search query term or phrase
    * @param {number} [options.limit=25] - Number of results to return (maximum 100)
    * @param {number} [options.offset=0] - Results offset
    * @param {string} [options.sorting='recent'] - Specify sorting ('relevant' or 'recent')
    * @returns {Promise} Resolves with matches
    */
   get_search(options) {
-    options = $.extend({
-      limit: 25,
-      offset: 0,
-      sorting: 'relevant',
-    }
-    , options);
-
-    const url = `${GiphyService.CONFIG.ENDPOINT_BASE}/search` +
-      `?q=${encodeURIComponent(options.query)}` +
-      `&offset=${options.offset}` +
-      `&limit=${options.limit}` +
-      `&sort=${options.sorting}`;
-
-    return this.client.send_json({
+    return this.client.send_request({
+      data: $.extend({
+        limit: 25,
+        offset: 0,
+        sort: 'relevant',
+      }, options),
       type: 'GET',
-      url: this.client.create_url(url),
+      url: this.client.create_url(`${GiphyService.CONFIG.ENDPOINT_BASE}/search`),
     });
   }
 };

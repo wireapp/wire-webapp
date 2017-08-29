@@ -366,8 +366,8 @@ z.conversation.ConversationService = class ConversationService {
           }
 
           return accumulated;
-        }
-        , {});
+        },
+        {});
 
         return Object.keys(conversations).sort((id_a, id_b) => conversations[id_b] - conversations[id_a]);
       });

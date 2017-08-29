@@ -551,6 +551,7 @@ z.conversation.EventMapper = class EventMapper {
     asset_et.ratio = asset_et.height / asset_et.width;
 
     const {key, otr_key, sha256, token} = event_data;
+
     if (key) {
       asset_et.resource(z.assets.AssetRemoteData.v3(key, otr_key, sha256, token, true));
     } else {

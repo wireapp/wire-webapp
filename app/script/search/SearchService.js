@@ -41,8 +41,13 @@ z.search.SearchService = class SearchService {
    */
   get_contacts(query, size) {
     return this.client.send_request({
+      data: {
+        // eslint-disable-next-line id-length
+        q: query,
+        size,
+      },
       type: 'GET',
-      url: this.client.create_url(`/search/contacts?q=${encodeURIComponent(query)}&size=${size}`),
+      url: this.client.create_url('/search/contacts'),
     });
   }
 };

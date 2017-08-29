@@ -120,7 +120,7 @@ describe('z.client.ClientRepository', function() {
         .then(done.fail)
         .catch(function(error) {
           expect(error).toEqual(jasmine.any(z.client.ClientError));
-          expect(error.type).toBe(z.client.ClientError.TYPE.NO_LOCAL_CLIENT);
+          expect(error.type).toBe(z.client.ClientError.TYPE.NO_VALID_CLIENT);
           done();
         });
     });
@@ -133,20 +133,7 @@ describe('z.client.ClientRepository', function() {
         .then(done.fail)
         .catch(function(error) {
           expect(error).toEqual(jasmine.any(z.client.ClientError));
-          expect(error.type).toBe(z.client.ClientError.TYPE.MISSING_ON_BACKEND);
-          done();
-        });
-    });
-
-    it('rejects with an error if database deletion fails', function(done) {
-      spyOn(TestFactory.client_service, 'load_client_from_db').and.returnValue(Promise.resolve(client_payload_database));
-      spyOn(TestFactory.storage_repository, 'delete_cryptography').and.returnValue(Promise.reject(new Error('Expected unit test error')));
-
-      TestFactory.client_repository.get_valid_local_client()
-        .then(done.fail)
-        .catch(function(error) {
-          expect(error).toEqual(jasmine.any(z.client.ClientError));
-          expect(error.type).toBe(z.client.ClientError.TYPE.DATABASE_FAILURE);
+          expect(error.type).toBe(z.client.ClientError.TYPE.NO_VALID_CLIENT);
           done();
         });
     });

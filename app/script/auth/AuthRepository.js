@@ -50,7 +50,7 @@ z.auth.AuthRepository = class AuthRepository {
    */
   list_cookies() {
     this.auth_service.get_cookies()
-      .then((cookies) => {
+      .then(({cookies}) => {
         this.logger.force_log('Backend cookies:');
         cookies.forEach((cookie, index) => {
           const expiration = z.util.format_timestamp(cookie.time, false);
@@ -58,9 +58,7 @@ z.auth.AuthRepository = class AuthRepository {
           this.logger.force_log(`Cookie No. ${index + 1} | ${log}`);
         });
       })
-      .catch((error) => {
-        this.logger.force_log('Could not list user cookies', error);
-      });
+      .catch((error) => this.logger.force_log('Could not list user cookies', error));
   }
 
   /**
@@ -76,11 +74,11 @@ z.auth.AuthRepository = class AuthRepository {
    */
   login(login, persist) {
     return this.auth_service.post_login(login, persist)
-      .then((response) => {
-        this.save_access_token(response);
+      .then((access_token_data) => {
+        this.save_access_token(access_token_data);
         z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.PERSIST, persist);
         z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.SHOW_LOGIN, true);
-        return response;
+        return access_token_data;
       });
   }
 
@@ -90,12 +88,8 @@ z.auth.AuthRepository = class AuthRepository {
    */
   logout() {
     return this.auth_service.post_logout()
-      .then(() => {
-        this.logger.info('Log out on backend successful');
-      })
-      .catch((error) => {
-        this.logger.warn(`Log out on backend failed: ${error.message}`, error);
-      });
+      .then(() => this.logger.info('Log out on backend successful'))
+      .catch((error) => this.logger.warn(`Log out on backend failed: ${error.message}`, error));
   }
 
   /**
@@ -219,10 +213,7 @@ z.auth.AuthRepository = class AuthRepository {
     }
 
     return this.auth_service.post_access()
-      .then((access_token) => {
-        this.save_access_token(access_token);
-        return access_token;
-      });
+      .then((access_token) => this.save_access_token(access_token));
   }
 
   /**
@@ -238,7 +229,7 @@ z.auth.AuthRepository = class AuthRepository {
    * @option {string} access_token_data - access_token
    * @option {string} access_token_data - expires_in
    * @option {string} access_token_data - type
-   * @returns {undefined} No return value
+   * @returns {Object} Access token data
    */
   save_access_token(access_token_data) {
     const expires_in_millis = 1000 * access_token_data.expires_in;
@@ -253,6 +244,7 @@ z.auth.AuthRepository = class AuthRepository {
 
     this._log_access_token_update(access_token_data, expiration_timestamp);
     this._schedule_token_refresh(expiration_timestamp);
+    return access_token_data;
   }
 
   /**

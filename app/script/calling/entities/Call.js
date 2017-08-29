@@ -244,11 +244,10 @@ z.calling.entities.Call = class Call {
    * @returns {undefined} No return value
    */
   join_call() {
-    this.set_self_state(true);
-
     if (z.calling.enum.CALL_STATE_GROUP.CAN_CONNECT.includes(this.state())) {
       this.state(z.calling.enum.CALL_STATE.CONNECTING);
     }
+    this.set_self_state(true);
 
     if (this.is_group) {
       const response = this.state() !== z.calling.enum.CALL_STATE.OUTGOING;
@@ -352,15 +351,15 @@ z.calling.entities.Call = class Call {
   /**
    * Set the self state.
    * @param {boolean} joined_state - Self joined state
-   * @param {z.calling.enum.TERMINATION_REASON} termination_reason - Call termination reason
+   * @param {z.calling.enum.TERMINATION_REASON} [termination_reason] - Call termination reason
    * @returns {undefined} No return value
    */
   set_self_state(joined_state, termination_reason) {
     if (termination_reason && !this.termination_reason) {
       this.termination_reason = termination_reason;
     }
-    this.self_user_joined(joined_state);
     this.self_client_joined(joined_state);
+    this.self_user_joined(joined_state);
   }
 
   /**

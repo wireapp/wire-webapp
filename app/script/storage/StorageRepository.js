@@ -74,7 +74,7 @@ z.storage.StorageRepository = class StorageRepository {
    */
   get_value(primary_key) {
     return this.storage_service.load(z.storage.StorageService.OBJECT_STORE.AMPLIFY, primary_key)
-      .then(function(record) {
+      .then((record) => {
         if (record && record.value) {
           return record.value;
         }

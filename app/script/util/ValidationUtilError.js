@@ -17,15 +17,22 @@
  *
  */
 
-.three-dots {
-  display: flex;
+'use strict';
 
-  & > span {
-    .dot-xs;
-    background-color: fade(@graphite-dark, 16%);
-  }
+window.z = window.z || {};
+window.z.util = z.util || {};
 
-  & > span + span {
-    margin-left: 4px;
+z.util.ValidationUtilError = class ValidationUtilError extends Error {
+  constructor(message = 'Unknown ValidationUtilError') {
+    super();
+
+    this.message = message;
+    this.name = this.constructor.name;
+
+    if (typeof Error.captureStackTrace === 'function') {
+      Error.captureStackTrace(this, this.constructor);
+    } else {
+      this.stack = (new Error(message)).stack;
+    }
   }
-}
+};
