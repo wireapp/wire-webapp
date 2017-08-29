@@ -877,6 +877,12 @@ z.calling.entities.Flow = class Flow {
     this.negotiation_needed(false);
     this._initialize_data_channel();
 
+    /*
+     * https://www.w3.org/TR/webrtc/#offer-answer-options
+     * https://www.w3.org/TR/webrtc/#configuration-data-extensions
+     *
+     * Set offerToReceiveVideo to true on audio calls. Else it should be undefined for Firefox compatibility reasons.
+     */
     const offer_options = {
       iceRestart: restart,
       offerToReceiveVideo: this.offer_to_receive_video() ? true : undefined,
