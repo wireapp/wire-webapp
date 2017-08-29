@@ -132,9 +132,9 @@ z.ViewModel.WarningsViewModel = class WarningsViewModel {
   }
 
   dismiss_warning(type = this.top_warning()) {
-    if (type) {
+    const dismissed_warnings = this.warnings.remove(type);
+    if (dismissed_warnings.length) {
       this.logger.info(`Dismissed warning of type '${type}'`);
-      this.warnings.remove(type);
     }
   }
 
