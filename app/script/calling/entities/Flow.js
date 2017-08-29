@@ -54,6 +54,7 @@ z.calling.entities.Flow = class Flow {
 
     // States
     this.is_answer = ko.observable(false);
+    this.self_state = this.call_et.self_state;
 
     // Audio
     this.audio = new z.calling.entities.FlowAudio(this, this.calling_repository.media_repository);
@@ -270,6 +271,11 @@ z.calling.entities.Flow = class Flow {
       if (can_create) {
         this._create_sdp_offer();
       }
+    });
+
+    this.offer_to_receive_video = ko.pureComputed(() => {
+      const is_sending_video = this.self_state.video_send() || this.self_state.screen_send();
+      return !is_sending_video;
     });
   }
 
@@ -873,6 +879,7 @@ z.calling.entities.Flow = class Flow {
 
     const offer_options = {
       iceRestart: restart,
+      offerToReceiveVideo: this.offer_to_receive_video() ? true : undefined,
       voiceActivityDetection: true,
     };
 
