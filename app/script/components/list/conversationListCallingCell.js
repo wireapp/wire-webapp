@@ -28,12 +28,9 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     this.calling_repository = params.calling_repository;
     this.is_selected = params.is_selected;
 
-    this.on_accept_call = () => {
-      amplify.publish(z.event.WebApp.CALL.STATE.JOIN, this.conversation.id, z.media.MediaType.AUDIO);
-    };
-
-    this.on_accept_video = () => {
-      amplify.publish(z.event.WebApp.CALL.STATE.JOIN, this.conversation.id, z.media.MediaType.AUDIO_VIDEO);
+    this.on_join_call = () => {
+      const media_type = this.call().is_remote_video_send() ? z.media.MediaType.AUDIO_VIDEO : z.media.MediaType.AUDIO;
+      amplify.publish(z.event.WebApp.CALL.STATE.JOIN, this.conversation.id, media_type);
     };
 
     this.on_leave_call = () => {
@@ -167,13 +164,13 @@ ko.components.register('conversation-list-calling-cell', {
            <div class="conversation-list-calling-cell-controls-button fill-red icon-end-call" data-bind="click: on_leave_call" data-uie-name="do-call-controls-call-leave"></div>
         <!-- /ko -->
         <!-- ko if: show_accept_button -->
-          <div class="conversation-list-calling-cell-controls-button fill-green icon-call" data-bind="click: on_accept_call" data-uie-name="do-call-controls-call-accept"></div>
+          <div class="conversation-list-calling-cell-controls-button fill-green icon-call" data-bind="click: on_join_call" data-uie-name="do-call-controls-call-accept"></div>
         <!-- /ko -->
         <!-- ko if: show_accept_video_button -->
-          <div class="conversation-list-calling-cell-controls-button fill-green icon-video" data-bind="click: on_accept_video" data-uie-name="do-call-controls-call-accept"></div>
+          <div class="conversation-list-calling-cell-controls-button fill-green icon-video" data-bind="click: on_join_call" data-uie-name="do-call-controls-call-accept"></div>
         <!-- /ko -->
         <!-- ko if: show_join_button -->
-          <div class="conversation-list-calling-cell-controls-button conversation-list-calling-cell-controls-join-button" data-bind="click: on_accept_call, l10n_text: z.string.call_join" data-uie-name="do-call-controls-call-join"></div>
+          <div class="conversation-list-calling-cell-controls-button conversation-list-calling-cell-controls-join-button" data-bind="click: on_join_call, l10n_text: z.string.call_join" data-uie-name="do-call-controls-call-join"></div>
         <!-- /ko -->
       </div>
     </div>
