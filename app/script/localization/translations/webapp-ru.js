@@ -34,6 +34,7 @@ z.string.ru.alert_gif_too_large = 'Анимация слишком больша�
 z.string.ru.auth_account_country_code = 'Код страны';
 z.string.ru.auth_account_create = 'Создать';
 z.string.ru.auth_account_create_account = 'Создать аккаунт';
+z.string.ru.auth_account_deletion = 'Вы вышли из системы потому что ваша учётная запись была удалена.';
 z.string.ru.auth_account_expiration = 'Вы были отключены, потому что срок действия вашей сессии истек. Пожалуйста, войдите снова.';
 z.string.ru.auth_account_get_wire = 'Простой, конфиденциальный и безопасный мессенджер для общения, звонков, обмена картинками, музыкой, видео, GIF-ками и многого другого.';
 z.string.ru.auth_account_password_forgot = 'Восстановление пароля';
@@ -115,6 +116,7 @@ z.string.ru.call_decline = 'Отменить';
 z.string.ru.call_accept = 'Принять';
 z.string.ru.call_join = 'Присоединиться';
 z.string.ru.call_choose_shared_screen = 'Выберите экран для демонстрации';
+z.string.ru.call_participants = '{{number}} участвуют(ет) в звонке';
 
 z.string.ru.modal_button_cancel = 'Отменить';
 z.string.ru.modal_button_ok = 'OK';
@@ -184,6 +186,8 @@ z.string.ru.modal_uploads_parallel = 'Вы можете отправить до 
 
 z.string.ru.connection_request_connect = 'Связаться';
 z.string.ru.connection_request_ignore = 'Игнорировать';
+
+z.string.ru.conversation_guest_indicator = 'Гость';
 
 z.string.ru.conversation_you_nominative = 'вы';
 z.string.ru.conversation_you_dative = 'вы';
@@ -264,6 +268,7 @@ z.string.ru.conversations_connection_request_one = '1 человек ожида�
 z.string.ru.conversations_empty_conversation = 'Групповой разговор';
 z.string.ru.conversations_empty_conversation_description = 'Все вышли';
 z.string.ru.conversations_no_conversations = 'Разговоров пока нет';
+z.string.ru.conversations_no_conversations_detail = 'Начните разговор или создайте группу.';
 z.string.ru.conversations_popover_archive = 'Архивировать';
 z.string.ru.conversations_popover_block = 'Заблокировать';
 z.string.ru.conversations_popover_cancel = 'Отклонить запрос';
@@ -393,6 +398,7 @@ z.string.ru.preferences_about_website = 'Веб-сайт Wire';
 z.string.ru.preferences_account_delete = 'Удалить аккаунт';
 z.string.ru.preferences_account_log_out = 'Выход';
 z.string.ru.preferences_account_reset_password = 'Сбросить пароль';
+z.string.ru.preferences_account_team = 'в {{name}}';
 z.string.ru.preferences_account_username_placeholder = 'Ваше полное имя';
 z.string.ru.preferences_account_username_hint = 'Минимум 2 символа. Только a–z, 0–9 и _';
 z.string.ru.preferences_account_username_available = 'Доступно';
@@ -539,6 +545,7 @@ z.string.ru.tooltip_conversation_input_placeholder = 'Наберите сооб�
 z.string.ru.tooltip_conversation_people = 'Люди ({{shortcut}})';
 z.string.ru.tooltip_conversation_picture = 'Добавить изображение';
 z.string.ru.tooltip_conversation_ping = 'Пинг ({{shortcut}})';
+z.string.ru.tooltip_conversation_search = 'Поиск';
 z.string.ru.tooltip_conversation_video_call = 'Видеозвонок';
 
 z.string.ru.tooltip_conversations_archive = 'Архивировать ({{shortcut}})';

@@ -34,6 +34,7 @@ z.string.fr.alert_gif_too_large = 'L’animation est trop lourde. La taille maxi
 z.string.fr.auth_account_country_code = 'Indicatif du pays';
 z.string.fr.auth_account_create = 'Créer';
 z.string.fr.auth_account_create_account = 'Créer un compte';
+z.string.fr.auth_account_deletion = 'Vous avez été déconnecté car votre compte a été supprimé.';
 z.string.fr.auth_account_expiration = 'Vous avez été déconnecté car votre session a expirée. Veuillez vous reconnecter.';
 z.string.fr.auth_account_get_wire = 'Une messagerie simple, privée et sécurisée pour échanger, appeler, partager des images, de la musique, des vidéos, des GIFs et bien plus encore.';
 z.string.fr.auth_account_password_forgot = 'Mot de passe oublié';
@@ -115,6 +116,7 @@ z.string.fr.call_decline = 'Décliner';
 z.string.fr.call_accept = 'Accepter';
 z.string.fr.call_join = 'Rejoindre';
 z.string.fr.call_choose_shared_screen = 'Choisissez un écran à partager';
+z.string.fr.call_participants = '{{number}} sur l’’appel';
 
 z.string.fr.modal_button_cancel = 'Annuler';
 z.string.fr.modal_button_ok = 'OK';
@@ -184,6 +186,8 @@ z.string.fr.modal_uploads_parallel = 'Vous pouvez envoyer jusqu’à {{number}} 
 
 z.string.fr.connection_request_connect = 'Se connecter';
 z.string.fr.connection_request_ignore = 'Ignorer';
+
+z.string.fr.conversation_guest_indicator = 'Invité';
 
 z.string.fr.conversation_you_nominative = 'vous';
 z.string.fr.conversation_you_dative = 'vous';
@@ -264,6 +268,7 @@ z.string.fr.conversations_connection_request_one = '1 personne en attente';
 z.string.fr.conversations_empty_conversation = 'Conversation de groupe';
 z.string.fr.conversations_empty_conversation_description = 'Tout le monde est parti';
 z.string.fr.conversations_no_conversations = 'Pas encore de conversation';
+z.string.fr.conversations_no_conversations_detail = 'Commencez une conversation ou créez un groupe.';
 z.string.fr.conversations_popover_archive = 'Archiver';
 z.string.fr.conversations_popover_block = 'Bloquer';
 z.string.fr.conversations_popover_cancel = 'Annuler la demande';
@@ -393,6 +398,7 @@ z.string.fr.preferences_about_website = 'Site de Wire';
 z.string.fr.preferences_account_delete = 'Supprimer le compte';
 z.string.fr.preferences_account_log_out = 'Se déconnecter';
 z.string.fr.preferences_account_reset_password = 'Réinitialiser le mot de passe';
+z.string.fr.preferences_account_team = 'dans {{name}}';
 z.string.fr.preferences_account_username_placeholder = 'Votre nom complet';
 z.string.fr.preferences_account_username_hint = 'Au moins 2 caractères. Uniquement a–z, 0–9 et _.';
 z.string.fr.preferences_account_username_available = 'Disponible';
@@ -539,6 +545,7 @@ z.string.fr.tooltip_conversation_input_placeholder = 'Écrivez un message';
 z.string.fr.tooltip_conversation_people = 'Personnes ({{shortcut}})';
 z.string.fr.tooltip_conversation_picture = 'Ajouter une image';
 z.string.fr.tooltip_conversation_ping = 'Faire un signe ({{shortcut}})';
+z.string.fr.tooltip_conversation_search = 'Recherche';
 z.string.fr.tooltip_conversation_video_call = 'Appel vidéo';
 
 z.string.fr.tooltip_conversations_archive = 'Archiver ({{shortcut}})';

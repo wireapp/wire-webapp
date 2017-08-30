@@ -33,6 +33,7 @@ z.string.pl.alert_gif_too_large = 'Animacja jest zbyt duża. Maksymalny rozmiar 
 z.string.pl.auth_account_country_code = 'Kierunkowy kraju';
 z.string.pl.auth_account_create = 'Utwórz';
 z.string.pl.auth_account_create_account = 'Utwórz konto';
+z.string.pl.auth_account_deletion = 'Zostałeś wylogowany, ponieważ Twoje konto zostało usunięte.';
 z.string.pl.auth_account_expiration = 'Zostałeś wylogowany ponieważ twoja sesja wygasła. Proszę zalogować się ponownie.';
 z.string.pl.auth_account_get_wire = 'Prosty, prywatny i bezpieczny komunikator do rozmów, połączeń głosowych, udostępniania obrazów, muzyki, wideo, animacji i innych.';
 z.string.pl.auth_account_password_forgot = 'Zapomniałem hasła';
@@ -114,6 +115,7 @@ z.string.pl.call_decline = 'Odrzuć';
 z.string.pl.call_accept = 'Odbierz';
 z.string.pl.call_join = 'Dołącz';
 z.string.pl.call_choose_shared_screen = 'Wybierz ekran do współdzielenia';
+z.string.pl.call_participants = '{{number}} uczestników';
 
 z.string.pl.modal_button_cancel = 'Anuluj';
 z.string.pl.modal_button_ok = 'OK';
@@ -183,6 +185,8 @@ z.string.pl.modal_uploads_parallel = 'Jednorazowo możesz wysłać maksymalnie {
 
 z.string.pl.connection_request_connect = 'Połącz';
 z.string.pl.connection_request_ignore = 'Ignoruj';
+
+z.string.pl.conversation_guest_indicator = 'Gość';
 
 z.string.pl.conversation_you_nominative = 'ty';
 z.string.pl.conversation_you_dative = 'ty';
@@ -263,6 +267,7 @@ z.string.pl.conversations_connection_request_one = '1 osoba czeka';
 z.string.pl.conversations_empty_conversation = 'Rozmowa grupowa';
 z.string.pl.conversations_empty_conversation_description = 'Wszyscy opuścili rozmowę';
 z.string.pl.conversations_no_conversations = 'Brak jeszcze konwersacji';
+z.string.pl.conversations_no_conversations_detail = 'Rozpocznij nową konwersację lub utwórz grupę.';
 z.string.pl.conversations_popover_archive = 'Archiwizuj';
 z.string.pl.conversations_popover_block = 'Zablokuj';
 z.string.pl.conversations_popover_cancel = 'Anuluj żądanie';
@@ -392,6 +397,7 @@ z.string.pl.preferences_about_website = 'Strona internetowa Wire';
 z.string.pl.preferences_account_delete = 'Usuń konto';
 z.string.pl.preferences_account_log_out = 'Wyloguj się';
 z.string.pl.preferences_account_reset_password = 'Zresetuj hasło';
+z.string.pl.preferences_account_team = 'w {{name}}';
 z.string.pl.preferences_account_username_placeholder = 'Twoje pełne imię i nazwisko';
 z.string.pl.preferences_account_username_hint = 'Co najmniej 2 znaki. Tylko a-z, 0-9, _.';
 z.string.pl.preferences_account_username_available = '&Dostępny(a)';
@@ -538,6 +544,7 @@ z.string.pl.tooltip_conversation_input_placeholder = 'Wpisz wiadomość';
 z.string.pl.tooltip_conversation_people = 'Użytkownicy ({{shortcut}})';
 z.string.pl.tooltip_conversation_picture = 'Dodaj zdjęcie';
 z.string.pl.tooltip_conversation_ping = 'Zaczep ({{shortcut}})';
+z.string.pl.tooltip_conversation_search = 'Wyszukaj';
 z.string.pl.tooltip_conversation_video_call = 'Połączenie video';
 
 z.string.pl.tooltip_conversations_archive = 'Archiwum ({{shortcut}})';
