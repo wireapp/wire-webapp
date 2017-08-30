@@ -138,13 +138,15 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       return this.search_results.groups().length || this.search_results.contacts().length || this.search_results.others().length;
     });
 
+    this.show_content = ko.pureComputed(() => this.show_contacts() || this.show_matches() || this.show_search_results());
+
     this.show_contacts = ko.pureComputed(() => this.contacts().length);
     this.show_hint = ko.pureComputed(() => (this.selected_people().length === 1) && !this.has_created_conversation());
     this.show_invite = ko.pureComputed(() => !this.is_team());
     this.show_matches = ko.observable(false);
 
-    this.show_no_contacts = ko.pureComputed(() => !this.show_matches() && !this.show_search_results() && !this.contacts().length);
-    this.show_no_matches = ko.pureComputed(() => this.show_matches() && !this.contacts().length);
+    this.show_no_contacts = ko.pureComputed(() => !this.is_team() && !this.show_content());
+    this.show_no_matches = ko.pureComputed(() => (this.is_team() || this.show_matches()) && !this.show_contacts() && !this.show_search_results());
     this.show_no_search_results = ko.pureComputed(() => {
       return !this.show_matches() && this.show_search_results() && !this.has_search_results() && this.search_input().length;
     });
