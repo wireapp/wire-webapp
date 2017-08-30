@@ -33,6 +33,7 @@ z.string.el.alert_gif_too_large = 'Η κινούμενη εικόνα είναι
 z.string.el.auth_account_country_code = 'Κωδικός Χώρας';
 z.string.el.auth_account_create = 'Δημιουργία';
 z.string.el.auth_account_create_account = 'Δημιουργήστε ένα λογαριασμό';
+z.string.el.auth_account_deletion = 'Αποσυνδεθήκατε, επειδή ο λογαριασμός έχει διαγραφεί.';
 z.string.el.auth_account_expiration = 'Αποσυνδεθήκατε διότι η περίοδος λειτουργίας σας έληξε. Παρακαλούμε συνδεθείτε ξανά.';
 z.string.el.auth_account_get_wire = 'Απλός, ιδιωτικός και ασφαλές messenger για συνομιλίες, κλήσεις, ανταλλαγής φωτογραφιών, βίντεο, GIF και άλλα.';
 z.string.el.auth_account_password_forgot = 'Ξέχασα τον κωδικό πρόσβασης';
@@ -114,6 +115,7 @@ z.string.el.call_decline = 'Απόρριψη';
 z.string.el.call_accept = 'Αποδοχή';
 z.string.el.call_join = 'Συμμετοχή';
 z.string.el.call_choose_shared_screen = 'Επιλέξτε μια οθόνη για κοινή χρήση';
+z.string.el.call_participants = '{{number}} στο τηλεφώνημα';
 
 z.string.el.modal_button_cancel = 'Ακύρωση';
 z.string.el.modal_button_ok = 'Εντάξει';
@@ -183,6 +185,8 @@ z.string.el.modal_uploads_parallel = 'Μπορείτε να στείλετε μ�
 
 z.string.el.connection_request_connect = 'Σύνδεση';
 z.string.el.connection_request_ignore = 'Αγνόηση';
+
+z.string.el.conversation_guest_indicator = 'Επισκέπτης';
 
 z.string.el.conversation_you_nominative = 'εσύ';
 z.string.el.conversation_you_dative = 'εσυ';
@@ -263,6 +267,7 @@ z.string.el.conversations_connection_request_one = '1 άτομο σε αναμο
 z.string.el.conversations_empty_conversation = 'Ομαδική συζήτηση';
 z.string.el.conversations_empty_conversation_description = 'Αποχώρηση όλων';
 z.string.el.conversations_no_conversations = 'Δεν υπάρχουν ακόμα συζητήσεις';
+z.string.el.conversations_no_conversations_detail = 'Ξεκινήστε μία συνομιλία ή δημιουργήστε μία ομάδα.';
 z.string.el.conversations_popover_archive = 'Αρχειοθέτηση';
 z.string.el.conversations_popover_block = 'Αποκλεισμός';
 z.string.el.conversations_popover_cancel = 'Ακύρωση αιτήματος';
@@ -391,6 +396,7 @@ z.string.el.preferences_about_website = 'Η Ιστοσελίδα του Wire';
 z.string.el.preferences_account_delete = 'Διαγραφή λογαριασμού';
 z.string.el.preferences_account_log_out = 'Αποσύνδεση';
 z.string.el.preferences_account_reset_password = 'Επαναφορά κωδικού πρόσβασης';
+z.string.el.preferences_account_team = 'στο {{name}}';
 z.string.el.preferences_account_username_placeholder = 'Ονοματεπώνυμο';
 z.string.el.preferences_account_username_hint = 'Τουλάχιστον 2 χαρακτήρες. a—z, 0—9 και _ μόνο.';
 z.string.el.preferences_account_username_available = 'Διαθέσιμο';
@@ -520,6 +526,7 @@ z.string.el.tooltip_conversation_input_placeholder = 'Πληκτρολογήση
 z.string.el.tooltip_conversation_people = 'Άτομα ({{shortcut}})';
 z.string.el.tooltip_conversation_picture = 'Προσθήκη εικόνας';
 z.string.el.tooltip_conversation_ping = 'Κουδούνισμα ({{shortcut}})';
+z.string.el.tooltip_conversation_search = 'Αναζήτηση';
 z.string.el.tooltip_conversation_video_call = 'Βιντεοκλήση';
 
 z.string.el.tooltip_conversations_archive = 'Αρχειοθέτηση ({{shortcut}})';

@@ -33,6 +33,7 @@ z.string.cs.alert_gif_too_large = 'Animace je příliš veliká.\nMaximální ve
 z.string.cs.auth_account_country_code = 'Kód země';
 z.string.cs.auth_account_create = 'Vytvořit';
 z.string.cs.auth_account_create_account = 'Vytvořit účet';
+z.string.cs.auth_account_deletion = 'Byli jste odhlášeni, protože váš účet byl smazán.';
 z.string.cs.auth_account_expiration = 'Byli jste odhlášeni, protože platnost relace vypršela. Přihlaste se znovu.';
 z.string.cs.auth_account_get_wire = 'Jednoduchá, soukromá & bezpečná aplikace pro chat, hovory, sdílení fotek, hudby, videa, GIFů a dalších.';
 z.string.cs.auth_account_password_forgot = 'Zapomenuté heslo';
@@ -114,6 +115,7 @@ z.string.cs.call_decline = 'Zamítnout';
 z.string.cs.call_accept = 'Přijmout';
 z.string.cs.call_join = 'Vstoupit';
 z.string.cs.call_choose_shared_screen = 'Vybrat obrazovku ke sdílení';
+z.string.cs.call_participants = '{{number}} se účastní hovoru';
 
 z.string.cs.modal_button_cancel = 'Zrušit';
 z.string.cs.modal_button_ok = 'Ok';
@@ -183,6 +185,8 @@ z.string.cs.modal_uploads_parallel = 'Najednou můžete poslat až {{number}} so
 
 z.string.cs.connection_request_connect = 'Připojit';
 z.string.cs.connection_request_ignore = 'Ignorovat';
+
+z.string.cs.conversation_guest_indicator = 'Host';
 
 z.string.cs.conversation_you_nominative = 'jste';
 z.string.cs.conversation_you_dative = 'jste';
@@ -263,6 +267,7 @@ z.string.cs.conversations_connection_request_one = '1 čekající osoba';
 z.string.cs.conversations_empty_conversation = 'Skupinová konverzace';
 z.string.cs.conversations_empty_conversation_description = 'Všichni opustili konverzaci';
 z.string.cs.conversations_no_conversations = 'Zatím žádné konverzace';
+z.string.cs.conversations_no_conversations_detail = 'Zahájit konverzaci nebo vytvořte skupinu.';
 z.string.cs.conversations_popover_archive = 'Archivovat';
 z.string.cs.conversations_popover_block = 'Blokovat';
 z.string.cs.conversations_popover_cancel = 'Zrušit žádost';
@@ -391,6 +396,7 @@ z.string.cs.preferences_about_website = 'Wire webové stránky';
 z.string.cs.preferences_account_delete = 'Smazat účet';
 z.string.cs.preferences_account_log_out = 'Odhlásit se';
 z.string.cs.preferences_account_reset_password = 'Resetovat heslo';
+z.string.cs.preferences_account_team = 'v {{name}}';
 z.string.cs.preferences_account_username_placeholder = 'Celé jméno';
 z.string.cs.preferences_account_username_hint = 'Alespoň 2 znaky. Pouze a—z, 0—9 a _';
 z.string.cs.preferences_account_username_available = 'Dostupný';
@@ -519,6 +525,7 @@ z.string.cs.tooltip_conversation_input_placeholder = 'Napsat zprávu';
 z.string.cs.tooltip_conversation_people = 'Kontakty ({{shortcut}})';
 z.string.cs.tooltip_conversation_picture = 'Přidat obrázek';
 z.string.cs.tooltip_conversation_ping = 'Ping ({{shortcut}})';
+z.string.cs.tooltip_conversation_search = 'Hledat';
 z.string.cs.tooltip_conversation_video_call = 'Videohovor';
 
 z.string.cs.tooltip_conversations_archive = 'Archivovat ({{shortcut}})';

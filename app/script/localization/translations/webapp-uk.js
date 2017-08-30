@@ -544,6 +544,7 @@ z.string.uk.tooltip_conversation_input_placeholder = 'Напишіть пові�
 z.string.uk.tooltip_conversation_people = 'Учасники ({{shortcut}})';
 z.string.uk.tooltip_conversation_picture = 'Додати картинку';
 z.string.uk.tooltip_conversation_ping = 'Надіслати пінг ({{shortcut}})';
+z.string.uk.tooltip_conversation_search = 'Пошук';
 z.string.uk.tooltip_conversation_video_call = 'Відеодзвінок';
 
 z.string.uk.tooltip_conversations_archive = 'Архівувати ({{shortcut}})';

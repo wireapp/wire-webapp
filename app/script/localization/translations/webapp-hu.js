@@ -185,6 +185,8 @@ z.string.hu.modal_uploads_parallel = 'Egyszerre {{number}} fájt küldhetsz.';
 z.string.hu.connection_request_connect = 'Csatlakozás';
 z.string.hu.connection_request_ignore = 'Figyelmen kívül hagyás';
 
+z.string.hu.conversation_guest_indicator = 'Vendég';
+
 z.string.hu.conversation_you_nominative = 'te';
 z.string.hu.conversation_you_dative = 'neked';
 z.string.hu.conversation_you_accusative = 'téged';
@@ -264,6 +266,7 @@ z.string.hu.conversations_connection_request_one = '1 partner várakozik';
 z.string.hu.conversations_empty_conversation = 'Csoportos beszélgetés';
 z.string.hu.conversations_empty_conversation_description = 'Mindenki elhagyta a beszélgetést';
 z.string.hu.conversations_no_conversations = 'Még nincsenek beszélgetések';
+z.string.hu.conversations_no_conversations_detail = 'Indíts egy beszélgetést vagy hozz létre egy csoportot.';
 z.string.hu.conversations_popover_archive = 'Archiválás';
 z.string.hu.conversations_popover_block = 'Tiltás';
 z.string.hu.conversations_popover_cancel = 'Kérelem visszavonása';
@@ -539,6 +542,7 @@ z.string.hu.tooltip_conversation_input_placeholder = 'Üzenet írása';
 z.string.hu.tooltip_conversation_people = 'Partnerek ({{shortcut}})';
 z.string.hu.tooltip_conversation_picture = 'Kép hozzáadása';
 z.string.hu.tooltip_conversation_ping = 'Kopogás ({{shortcut}})';
+z.string.hu.tooltip_conversation_search = 'Keresés';
 z.string.hu.tooltip_conversation_video_call = 'Videóhívás';
 
 z.string.hu.tooltip_conversations_archive = 'Archiválás ({{shortcut}})';

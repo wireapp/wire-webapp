@@ -34,6 +34,7 @@ z.string.sk.alert_gif_too_large = 'Animácia je príliš veľká. Maximálna ve�
 z.string.sk.auth_account_country_code = 'Kód krajiny';
 z.string.sk.auth_account_create = 'Vytvoriť';
 z.string.sk.auth_account_create_account = 'Vytvoriť konto';
+z.string.sk.auth_account_deletion = 'Boli ste odhlásení, pretože vaše konto bolo odstránené.';
 z.string.sk.auth_account_expiration = 'Boli ste odhlásení pretože vypršala platnosť Vášho sedenia. Prihláste sa prosím znova.';
 z.string.sk.auth_account_get_wire = 'Jednoduchý, súkromný & bezpečný messenger pre rozhovory, volania, zdieľanie fotiek, hudby, videí, obrázkov vo formáte GIF a ešte viac.';
 z.string.sk.auth_account_password_forgot = 'Zabudnuté heslo';
@@ -115,6 +116,7 @@ z.string.sk.call_decline = 'Odmietnuť';
 z.string.sk.call_accept = 'Prijať';
 z.string.sk.call_join = 'Pripojiť';
 z.string.sk.call_choose_shared_screen = 'Vybrať obrazovku pre zdieľanie';
+z.string.sk.call_participants = '{{number}} je dostupné';
 
 z.string.sk.modal_button_cancel = 'Zrušiť';
 z.string.sk.modal_button_ok = 'OK';
@@ -184,6 +186,8 @@ z.string.sk.modal_uploads_parallel = 'Súčasne môžete poslať až {{number}} 
 
 z.string.sk.connection_request_connect = 'Pripojiť';
 z.string.sk.connection_request_ignore = 'Ignorovať';
+
+z.string.sk.conversation_guest_indicator = 'Hosť';
 
 z.string.sk.conversation_you_nominative = 'Vy';
 z.string.sk.conversation_you_dative = 'Vy';
@@ -264,6 +268,7 @@ z.string.sk.conversations_connection_request_one = '1 osoba čaká';
 z.string.sk.conversations_empty_conversation = 'Skupinová konverzácia';
 z.string.sk.conversations_empty_conversation_description = 'Všetci opustili rozhovor';
 z.string.sk.conversations_no_conversations = 'Zatiaľ žiadne konverzácie';
+z.string.sk.conversations_no_conversations_detail = 'Začať konverzáciu alebo vytvoriť skupinu.';
 z.string.sk.conversations_popover_archive = 'Archív';
 z.string.sk.conversations_popover_block = 'Blokovať';
 z.string.sk.conversations_popover_cancel = 'Zrušiť požiadavku';
@@ -393,6 +398,7 @@ z.string.sk.preferences_about_website = 'Webová stránka Wire';
 z.string.sk.preferences_account_delete = 'Vymazať účet';
 z.string.sk.preferences_account_log_out = 'Odhlásenie';
 z.string.sk.preferences_account_reset_password = 'Reset hesla';
+z.string.sk.preferences_account_team = 'v {{name}}';
 z.string.sk.preferences_account_username_placeholder = 'Vaše celé meno';
 z.string.sk.preferences_account_username_hint = 'Aspoň 2 znaky. A výhradne a-z, 0-9.';
 z.string.sk.preferences_account_username_available = 'Dostupné';
@@ -539,6 +545,7 @@ z.string.sk.tooltip_conversation_input_placeholder = 'Napísať správu';
 z.string.sk.tooltip_conversation_people = 'Ľudia ({{shortcut}})';
 z.string.sk.tooltip_conversation_picture = 'Pridať obrázok';
 z.string.sk.tooltip_conversation_ping = 'Ping ({{shortcut}})';
+z.string.sk.tooltip_conversation_search = 'Hladať';
 z.string.sk.tooltip_conversation_video_call = 'Videohovor';
 
 z.string.sk.tooltip_conversations_archive = 'Archív ({{shortcut}})';
