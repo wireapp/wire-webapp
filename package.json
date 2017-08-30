@@ -15,7 +15,7 @@
     "grunt-contrib-connect": "1.0.2",
     "grunt-contrib-copy": "1.0.0",
     "grunt-contrib-less": "1.4.1",
-    "grunt-contrib-uglify": "wireapp/grunt-contrib-uglify#be6e6f0fd28aa0e20e7f22a70bf52f1176b0441b",
+    "grunt-contrib-uglify": "wireapp/grunt-contrib-uglify#harmony-v2.8.22",
     "grunt-contrib-watch": "1.0.0",
     "grunt-gitinfo": "0.1.8",
     "grunt-include-replace": "5.0.0",
