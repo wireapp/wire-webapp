@@ -462,9 +462,6 @@ z.main.App = class App {
    * @returns {undefined} Not return value
    */
   _handle_url_params() {
-    // TODO: remove in the next release
-    this.repository.conversation.use_v3_api = true;
-
     const bot_name = z.util.get_url_parameter(z.auth.URLParameter.BOT);
     if (bot_name) {
       this.logger.info(`Found bot token '${bot_name}'`);
