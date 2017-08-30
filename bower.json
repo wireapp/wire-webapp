@@ -37,14 +37,14 @@
   },
   "exportsOverride": {
     "amplify": {
-      "js": "lib/amplify.js"
+      "js/": "lib/amplify.js"
     },
     "antiscroll-2": {
       "css": "dist/antiscroll-2.css",
-      "js": "dist/antiscroll-2.js"
+      "js/": "dist/antiscroll-2.js"
     },
     "bytebuffer": {
-      "js": "dist/ByteBufferAB.js"
+      "js/": "dist/ByteBufferAB.js"
     },
     "cryptojs": {
       "js/": [
@@ -56,38 +56,41 @@
       ]
     },
     "dexie": {
-      "js": "dist/dexie.js"
+      "js/": "dist/dexie.js"
     },
     "generic-message-proto": {
       "proto": "proto/messages.proto"
     },
     "highlightjs": {
-      "js": "highlight.pack.js",
-      "css": "styles/github.css"
+      "css": "styles/github.css",
+      "js/": "highlight.pack.js"
     },
     "jquery": {
-      "js": "dist/jquery.js"
+      "js/": "dist/jquery.js"
     },
     "jquery-mousewheel": {
-      "js": "jquery.mousewheel.js"
+      "js/": "jquery.mousewheel.js"
     },
     "js-cookie": {
-      "js": "src/js.cookie.js"
+      "js/": "src/js.cookie.js"
     },
     "keyboardjs": {
-      "js": "dist/keyboard.js"
+      "js/": "dist/keyboard.js"
     },
     "knockout": {
-      "js": "dist/knockout.debug.js"
+      "js/": "dist/knockout.debug.js"
     },
     "libsodium.js": {
       "js/": "dist/browsers-sumo/combined/sodium.js"
     },
+    "long": {
+      "js/": "dist/long.js"
+    },
     "marked": {
-      "js": "lib/marked.js"
+      "js/": "lib/marked.js"
     },
     "moment": {
-      "js": [
+      "js/": [
         "moment.js",
         "locale/cs.js",
         "locale/da.js",
@@ -115,47 +118,43 @@
       "css": "normalize.css"
     },
     "pako": {
-      "js": "dist/pako_deflate.js"
+      "js/": "dist/pako_deflate.js"
     },
     "phone-format": {
-      "js": "dist/phone-format-global.js"
+      "js/": "dist/phone-format-global.js"
     },
     "platform.js": {
-      "js": "platform.js"
+      "js/": "platform.js"
+    },
+    "poster-image": {
+      "js/": "poster.js"
     },
     "protobuf": {
-      "js": "dist/protobuf.js"
+      "js/": "dist/protobuf.js"
     },
     "raygun4js": {
-      "js": "dist/raygun.vanilla.js"
+      "js/": "dist/raygun.vanilla.js"
     },
     "speakingurl": {
-      "js": "speakingurl.min.js"
+      "js/": "speakingurl.min.js"
     },
     "linkifyjs": {
       "js/": "linkify{-html,}.min.js"
     },
     "uint32": {
-      "js": "uint32.js"
+      "js/": "uint32.js"
     },
     "underscore": {
-      "js": "underscore.js"
+      "js/": "underscore.js"
     },
     "uuid": {
-      "js": "src/uuid.js"
+      "js/": "src/uuid.js"
     },
     "url-search-params-polyfill": {
       "js/": "index.js"
     },
     "wire-audio-files": {
       "audio": "webapp/*"
-    },
-    "webapp-module-external": {
-      "js/": [
-        "modules/*.js",
-        "modules/**/*.js"
-      ],
-      "css": "modules/**/*.css"
     },
     "webapp-module-namespace": {
       "js/": "js/*.js"
@@ -172,7 +171,7 @@
       "less": "app/style/webapp-module-modal.less"
     },
     "webrtc-adapter": {
-      "js": "release/adapter.js"
+      "js/": "release/adapter.js"
     },
     "wire-theme": {
       "less": "app/style/{wire-theme,variables,input}.less"
