@@ -1,7 +1,7 @@
 {
   "name": "wire-webapp",
   "dependencies": {
-    "amplify": "https://github.com/wireapp/amplify.git#1.1.4",
+    "amplify": "https://github.com/wireapp/amplify.git#1.1.5",
     "antiscroll-2": "https://github.com/wireapp/antiscroll-2.git#1.2.8",
     "cryptojs": "https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/crypto-js/CryptoJS%20v3.1.2.zip",
     "dexie": "https://github.com/dfahlander/Dexie.js.git#1.5.1",
