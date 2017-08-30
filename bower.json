@@ -115,7 +115,7 @@
       "css": "normalize.css"
     },
     "pako": {
-      "js": "dist/pako.min.js"
+      "js": "dist/pako_deflate.js"
     },
     "phone-format": {
       "js": "dist/phone-format-global.js"
