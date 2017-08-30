@@ -45,6 +45,7 @@ z.string.de.auth_account_sign_in_phone = 'Handy';
 z.string.de.auth_account_terms_of_use = 'Nutzungsbedingungen';
 z.string.de.auth_account_terms_of_use_detail = 'Ich akzeptiere die';
 
+z.string.de.auth_blocked_cookies = 'Aktiviere Cookies, um dich bei Wire einzuloggen.';
 z.string.de.auth_blocked_database = 'Wire benötigt zum Anzeigen deiner Nachrichten Zugriff auf den lokalen Speicher. In Privaten Fenstern ist dieser nicht verfügbar.';
 z.string.de.auth_blocked_tabs = 'Wire ist bereits in einem anderen Tab geöffnet.';
 

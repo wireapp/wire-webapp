@@ -49,6 +49,7 @@ z.string.auth_account_terms_of_use = 'Terms of Use';
 z.string.auth_account_terms_of_use_detail = 'I accept';
 
 // Authentication: BLOCKED section
+z.string.auth_blocked_cookies = 'Enable cookies to log in to Wire.';
 z.string.auth_blocked_database = 'Wire needs access to local storage to display your messages. Local storage is not available in private mode.';
 z.string.auth_blocked_tabs = 'Wire is already open in another tab.';
 
