@@ -185,6 +185,8 @@ z.string.nl.modal_uploads_parallel = 'Je kan tot {{number}} bestanden tegelijk v
 z.string.nl.connection_request_connect = 'Verbind';
 z.string.nl.connection_request_ignore = 'Negeer';
 
+z.string.nl.conversation_guest_indicator = 'Gast';
+
 z.string.nl.conversation_you_nominative = 'jij';
 z.string.nl.conversation_you_dative = 'jij';
 z.string.nl.conversation_you_accusative = 'jij';
@@ -264,6 +266,7 @@ z.string.nl.conversations_connection_request_one = '1 persoon wacht';
 z.string.nl.conversations_empty_conversation = 'Groepsgesprek';
 z.string.nl.conversations_empty_conversation_description = 'Verlaten door iedereen';
 z.string.nl.conversations_no_conversations = 'Nog geen gesprekken';
+z.string.nl.conversations_no_conversations_detail = 'Start een gesprek of een groep maken.';
 z.string.nl.conversations_popover_archive = 'Archiveren';
 z.string.nl.conversations_popover_block = 'Blokkeren';
 z.string.nl.conversations_popover_cancel = 'Annuleer verzoek';
@@ -539,6 +542,7 @@ z.string.nl.tooltip_conversation_input_placeholder = 'Typ een bericht';
 z.string.nl.tooltip_conversation_people = 'Mensen ({{shortcut}})';
 z.string.nl.tooltip_conversation_picture = 'Voeg foto toe';
 z.string.nl.tooltip_conversation_ping = 'Ping ({{shortcut}})';
+z.string.nl.tooltip_conversation_search = 'Zoeken';
 z.string.nl.tooltip_conversation_video_call = 'Video-oproep';
 
 z.string.nl.tooltip_conversations_archive = 'Archief ({{shortcut}})';

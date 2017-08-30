@@ -33,6 +33,7 @@ z.string.tr.alert_gif_too_large = 'Animasyon çok büyük.\nMaksimum dosya boyut
 z.string.tr.auth_account_country_code = 'Ülke Kodu';
 z.string.tr.auth_account_create = 'Oluştur';
 z.string.tr.auth_account_create_account = 'Bir hesap oluştur';
+z.string.tr.auth_account_deletion = 'Çıkış yaptınız çünkü hesabınız silinmiş.';
 z.string.tr.auth_account_expiration = 'Oturumunuzun süresi dolduğu için çıkış yapıldı. Lütfen tekrar giriş yapın.';
 z.string.tr.auth_account_get_wire = 'Konuşma, arama; fotoğraf, video, müzik ve GIF paylaşmak için basit, gizli ve güvenli mesajlaşma uygulaması.';
 z.string.tr.auth_account_password_forgot = 'Şifremi unuttum';
@@ -114,6 +115,7 @@ z.string.tr.call_decline = 'Reddet';
 z.string.tr.call_accept = 'Kabul et';
 z.string.tr.call_join = 'Katıl';
 z.string.tr.call_choose_shared_screen = 'Paylaşmak için bir ekran seçin';
+z.string.tr.call_participants = '{{number}} çağrıda';
 
 z.string.tr.modal_button_cancel = 'İptal';
 z.string.tr.modal_button_ok = 'Tamam';
@@ -183,6 +185,8 @@ z.string.tr.modal_uploads_parallel = 'Tek seferde en fazla {{number}} boyutunda 
 
 z.string.tr.connection_request_connect = 'Bağlan';
 z.string.tr.connection_request_ignore = 'Görmezden gel';
+
+z.string.tr.conversation_guest_indicator = 'Misafir';
 
 z.string.tr.conversation_you_nominative = 'sen';
 z.string.tr.conversation_you_dative = 'sen';
@@ -263,6 +267,7 @@ z.string.tr.conversations_connection_request_one = 'Bir kişi bekliyor';
 z.string.tr.conversations_empty_conversation = 'Grup sohbeti';
 z.string.tr.conversations_empty_conversation_description = 'Herkes ayrıldı';
 z.string.tr.conversations_no_conversations = 'Hiç konuşma yok';
+z.string.tr.conversations_no_conversations_detail = 'Bir konuşma başlat ya da bir grup oluştur.';
 z.string.tr.conversations_popover_archive = 'Arşivle';
 z.string.tr.conversations_popover_block = 'Engelle';
 z.string.tr.conversations_popover_cancel = 'İsteği iptal et';
@@ -392,6 +397,7 @@ z.string.tr.preferences_about_website = 'Wire İnternet Sitesi';
 z.string.tr.preferences_account_delete = 'Hesabı Sil';
 z.string.tr.preferences_account_log_out = 'Çıkış yap';
 z.string.tr.preferences_account_reset_password = 'Şifreni sıfırla';
+z.string.tr.preferences_account_team = '{{name}}’de';
 z.string.tr.preferences_account_username_placeholder = 'Tam adınız';
 z.string.tr.preferences_account_username_hint = 'En az 2 karakter. a—z, 0—9, ve yalnızca _.';
 z.string.tr.preferences_account_username_available = 'Alınabilir';
@@ -538,6 +544,7 @@ z.string.tr.tooltip_conversation_input_placeholder = 'Bir mesaj yazın';
 z.string.tr.tooltip_conversation_people = 'İnsanlar ({{shortcut}})';
 z.string.tr.tooltip_conversation_picture = 'Resim ekle';
 z.string.tr.tooltip_conversation_ping = 'Pingle ({{shortcut}})';
+z.string.tr.tooltip_conversation_search = 'Arama';
 z.string.tr.tooltip_conversation_video_call = 'Görüntülü Ara';
 
 z.string.tr.tooltip_conversations_archive = 'Arşivle ({{shortcut}})';

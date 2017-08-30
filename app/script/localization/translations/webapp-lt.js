@@ -34,6 +34,7 @@ z.string.lt.alert_gif_too_large = 'Animacija yra per didelė.\nDidžiausias dydi
 z.string.lt.auth_account_country_code = 'Šalies kodas';
 z.string.lt.auth_account_create = 'Sukurti';
 z.string.lt.auth_account_create_account = 'Sukurti paskyrą';
+z.string.lt.auth_account_deletion = 'Buvote atjungtas, nes jūsų abonementas buvo ištrintas.';
 z.string.lt.auth_account_expiration = 'Jūs buvote atjungti, kadangi baigėsi jūsų seansas. Prašome prisijungti dar kartą.';
 z.string.lt.auth_account_get_wire = 'Paprasta, privati ir saugi pokalbių programa, skirta pokalbiams, skambučiams bei paveikslų, muzikos, vaizdo įrašų, GIF ir kitų failų bendrinimui.';
 z.string.lt.auth_account_password_forgot = 'Pamiršau slaptažodį';
@@ -115,6 +116,7 @@ z.string.lt.call_decline = 'Atmesti';
 z.string.lt.call_accept = 'Priimti';
 z.string.lt.call_join = 'Prisijungti';
 z.string.lt.call_choose_shared_screen = 'Pasirinkite ekraną, kurį bendrinti';
+z.string.lt.call_participants = '{{number}} kalba';
 
 z.string.lt.modal_button_cancel = 'Atsisakyti';
 z.string.lt.modal_button_ok = 'Gerai';
@@ -184,6 +186,8 @@ z.string.lt.modal_uploads_parallel = 'Jūs vienu metu galite siųsti iki {{numbe
 
 z.string.lt.connection_request_connect = 'Užmegzti kontaktą';
 z.string.lt.connection_request_ignore = 'Nepaisyti';
+
+z.string.lt.conversation_guest_indicator = 'Svečias';
 
 z.string.lt.conversation_you_nominative = 'jūs';
 z.string.lt.conversation_you_dative = 'jūs';
@@ -264,6 +268,7 @@ z.string.lt.conversations_connection_request_one = '1 asmuo laukia';
 z.string.lt.conversations_empty_conversation = 'Grupės pokalbis';
 z.string.lt.conversations_empty_conversation_description = 'Visi išėjo';
 z.string.lt.conversations_no_conversations = 'Kol kas nėra pokalbių';
+z.string.lt.conversations_no_conversations_detail = 'Pradėkite susirašinėjimą arba sukurkite grupę.';
 z.string.lt.conversations_popover_archive = 'Archyvuoti';
 z.string.lt.conversations_popover_block = 'Užblokuoti';
 z.string.lt.conversations_popover_cancel = 'Atsisakyti užklausos';
@@ -393,6 +398,7 @@ z.string.lt.preferences_about_website = 'Wire svetainė';
 z.string.lt.preferences_account_delete = 'Ištrinti paskyrą';
 z.string.lt.preferences_account_log_out = 'Atsijungti';
 z.string.lt.preferences_account_reset_password = 'Atstatyti slaptažodį';
+z.string.lt.preferences_account_team = 'komandoje {{name}}';
 z.string.lt.preferences_account_username_placeholder = 'Jūsų visas vardas';
 z.string.lt.preferences_account_username_hint = 'Bent 2 simboliai. Tik a—z, 0—9 ir _.';
 z.string.lt.preferences_account_username_available = 'Prieinamas';
@@ -539,6 +545,7 @@ z.string.lt.tooltip_conversation_input_placeholder = 'Rašykite žinutę';
 z.string.lt.tooltip_conversation_people = 'Žmonės ({{shortcut}})';
 z.string.lt.tooltip_conversation_picture = 'Pridėti paveikslą';
 z.string.lt.tooltip_conversation_ping = 'Tikrinti ryšį ({{shortcut}})';
+z.string.lt.tooltip_conversation_search = 'Paieška';
 z.string.lt.tooltip_conversation_video_call = 'Vaizdo skambutis';
 
 z.string.lt.tooltip_conversations_archive = 'Archyvuoti ({{shortcut}})';
