@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2016 Wire Swiss GmbH
+ * Copyright (C) 2017 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,6 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-
 
 user-input {
   color: #fff;
@@ -46,7 +45,7 @@ user-input {
   flex-wrap: wrap;
   margin-right: -17px;
   max-height: 84px;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 .search-inner > span {
@@ -56,7 +55,7 @@ user-input {
   padding-right: 16px;
   position: relative;
 
-  &:before {
+  &::before {
     .dot-size(2px);
     background-color: fade(#fff, 40%);
     content: '';
@@ -72,7 +71,6 @@ user-input {
   &:last-child {
     margin-right: 8px;
   }
-
 }
 
 .search-inner > input {

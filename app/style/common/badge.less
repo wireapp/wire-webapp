@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2016 Wire Swiss GmbH
+ * Copyright (C) 2017 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,11 +32,16 @@
 .cell-badge {
   border-radius: 10px;
   font-size: 12px;
-  font-weight: @font-weight-bold;
   line-height: @badge-height;
   height: @badge-height;
   min-width: 32px;
   text-align: center;
+
+  &.disabled {
+    cursor: default;
+    opacity: .32;
+    pointer-events: none;
+  }
 }
 
 .cell-badge-light {

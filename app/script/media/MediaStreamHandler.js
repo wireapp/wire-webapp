@@ -110,13 +110,15 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    * Initiate the MediaStream.
    *
    * @param {string} conversation_id - Conversation ID of call
-   * @param {boolean} [video_send=false] - Should MediaStream contain video
+   * @param {z.media.MediaType} [media_type=z.media.MediaType.AUDIO] - Media type for this call
    * @returns {Promise} Resolves when the MediaStream has been initiated
    */
-  initiate_media_stream(conversation_id, video_send = false) {
+  initiate_media_stream(conversation_id, media_type = z.media.MediaType.AUDIO) {
+    const video_send = media_type === z.media.MediaType.AUDIO_VIDEO;
+
     return this.devices_handler.update_current_devices(video_send)
       .then(() => this.constraints_handler.get_media_stream_constraints(true, video_send))
-      .then(({media_type, media_stream_constraints}) => this.request_media_stream(media_type, media_stream_constraints))
+      .then(({media_stream_constraints}) => this.request_media_stream(media_type, media_stream_constraints))
       .then((media_stream_info) => {
         this.self_stream_state.video_send(video_send);
         if (video_send) {
@@ -296,6 +298,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
       case z.media.MediaType.SCREEN:
         amplify.publish(z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.DENIED_SCREEN);
         break;
+      case z.media.MediaType.AUDIO_VIDEO:
       case z.media.MediaType.VIDEO:
         amplify.publish(z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.DENIED_CAMERA);
         break;
@@ -323,6 +326,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
       case z.media.MediaType.SCREEN:
         amplify.publish(z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.REQUEST_SCREEN);
         break;
+      case z.media.MediaType.AUDIO_VIDEO:
       case z.media.MediaType.VIDEO:
         amplify.publish(z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.REQUEST_CAMERA);
         break;
@@ -437,6 +441,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
       case z.media.MediaType.SCREEN:
         amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.DENIED_SCREEN);
         break;
+      case z.media.MediaType.AUDIO_VIDEO:
       case z.media.MediaType.VIDEO:
         amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.DENIED_CAMERA);
         break;
@@ -464,6 +469,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
       case z.media.MediaType.SCREEN:
         amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.REQUEST_SCREEN);
         break;
+      case z.media.MediaType.AUDIO_VIDEO:
       case z.media.MediaType.VIDEO:
         amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.REQUEST_CAMERA);
         break;

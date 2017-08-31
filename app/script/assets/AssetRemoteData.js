@@ -36,6 +36,8 @@ z.assets.AssetRemoteData = class AssetRemoteData {
     this.cancel_download = undefined;
     this.generate_url = undefined;
     this.identifier = undefined;
+
+    this.logger = new z.util.Logger('z.assets.AssetRemoteData', z.config.LOGGER.OPTIONS);
   }
 
   /**
@@ -90,20 +92,20 @@ z.assets.AssetRemoteData = class AssetRemoteData {
 
   /**
    * Loads and decrypts stored asset
-   * @returns {Blob} Decrypted asset data
+   * @returns {Promise<Blob>} Resolves with the decrypted asset data
    */
   load() {
     let mime_type;
 
     return this._load_buffer()
-    .then(([buffer, type]) => {
-      mime_type = type;
-      if ((this.otr_key != null) && (this.sha256 != null)) {
-        return z.assets.AssetCrypto.decrypt_aes_asset(buffer, this.otr_key.buffer, this.sha256.buffer);
-      }
-      return buffer;
-    })
-    .then((plaintext) => new Blob([new Uint8Array(plaintext)], {mime_type}));
+      .then(([buffer, type]) => {
+        mime_type = type;
+        if ((this.otr_key != null) && (this.sha256 != null)) {
+          return z.assets.AssetCrypto.decrypt_aes_asset(buffer, this.otr_key.buffer, this.sha256.buffer);
+        }
+        return buffer;
+      })
+      .then((plaintext) => new Blob([new Uint8Array(plaintext)], {mime_type}));
   }
 
   /**
@@ -120,9 +122,18 @@ z.assets.AssetRemoteData = class AssetRemoteData {
   }
 
   _load_buffer() {
-    return z.util.load_url_buffer(this.generate_url(), (xhr) => {
-      xhr.onprogress = (event) => this.download_progress(Math.round((event.loaded / event.total) * 100));
-      return this.cancel_download = () => xhr.abort.call(xhr);
-    });
+    return this.generate_url()
+      .then((generated_url) => {
+        return z.util.load_url_buffer(generated_url, (xhr) => {
+          xhr.onprogress = (event) => this.download_progress(Math.round((event.loaded / event.total) * 100));
+          return this.cancel_download = () => xhr.abort.call(xhr);
+        });
+      })
+      .catch((error) => {
+        if (error instanceof z.util.ValidationUtilError) {
+          this.logger.error(`Failed to validate an asset URL (_load_buffer). Error: ${error.message}`);
+        }
+        throw error;
+      });
   }
 };

@@ -50,8 +50,6 @@ z.auth.AuthService = class AuthService {
     return this.client.send_request({
       type: 'GET',
       url: this.client.create_url(AuthService.CONFIG.URL_COOKIES),
-    }).then((data) => {
-      return data.cookies;
     });
   }
 
@@ -63,8 +61,11 @@ z.auth.AuthService = class AuthService {
    */
   get_invitations_info(code) {
     return this.client.send_request({
+      data: {
+        code: code,
+      },
       type: 'GET',
-      url: this.client.create_url(`${AuthService.CONFIG.URL_INVITATIONS}/info?code=${code}`),
+      url: this.client.create_url(`${AuthService.CONFIG.URL_INVITATIONS}/info`),
     });
   }
 
@@ -189,7 +190,7 @@ z.auth.AuthService = class AuthService {
    */
   post_login(login, persist) {
     return new Promise((resolve, reject) => {
-      const config = {
+      $.ajax({
         contentType: 'application/json; charset=utf-8',
         crossDomain: true,
         data: pako.gzip(JSON.stringify(login)),
@@ -198,26 +199,13 @@ z.auth.AuthService = class AuthService {
         },
         processData: false,
         type: 'POST',
-        url: `${this.client.create_url(`${AuthService.CONFIG.URL_LOGIN}?persist=${persist}`)}`,
+        url: `${this.client.create_url(AuthService.CONFIG.URL_LOGIN)}?persist=${window.encodeURIComponent(persist.toString())}`,
         xhrFields: {
           withCredentials: true,
         },
-      };
-
-      $.ajax(config)
-        .done((data) => {
-          resolve(data);
-        })
-        .fail((jqXHR, textStatus, errorThrown) => {
-          if (jqXHR.status === z.service.BackendClientError.STATUS_CODE.TOO_MANY_REQUESTS && login.email) {
-            // Backend blocked our user account from login, so we have to reset our cookies
-            this.post_cookies_remove(login.email, login.password, undefined).then(() => {
-              reject(jqXHR.responseJSON || errorThrown);
-            });
-          } else {
-            reject(jqXHR.responseJSON || errorThrown);
-          }
-        });
+      })
+        .done(resolve)
+        .fail((jqXHR, textStatus, errorThrown) => reject(jqXHR.responseJSON || errorThrown));
     });
   }
 
@@ -244,7 +232,7 @@ z.auth.AuthService = class AuthService {
    * @returns {jQuery.jqXHR} A superset of the XMLHTTPRequest object.
    */
   post_logout() {
-    return this.client.send_json({
+    return this.client.send_request({
       type: 'POST',
       url: this.client.create_url(`${AuthService.CONFIG.URL_ACCESS}/logout`),
       withCredentials: true,
@@ -274,7 +262,7 @@ z.auth.AuthService = class AuthService {
         },
         processData: false,
         type: 'POST',
-        url: `${this.client.create_url(`${AuthService.CONFIG.URL_REGISTER}?challenge_cookie=true`)}`,
+        url: `${this.client.create_url(AuthService.CONFIG.URL_REGISTER)}?challenge_cookie=true`,
         xhrFields: {
           withCredentials: true,
         },

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2016 Wire Swiss GmbH
+ * Copyright (C) 2017 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
  */
 
 @keyframes show {
-  to {transform: scaleY(1);}
+  to { transform: scaleY(1); }
 }
 
 .checkmark {
@@ -28,28 +28,26 @@
   position: relative;
   transform: rotate(45deg);
 
-  &:before,
-  &:after {
+  &::before,
+  &::after {
     content: '';
-
     position: absolute;
     left: 50%;
     right: 0;
     bottom: 0;
     top: 0;
-
     transform: scaleY(0);
     animation-name: show;
     animation-fill-mode: forwards;
   }
 
-  &:before {
+  &::before {
     border-bottom: 2px solid currentColor;
     transform-origin: 0 0;
     animation-duration: @animation-timing-faster;
   }
 
-  &:after {
+  &::after {
     border-right: 2px solid currentColor;
     transform-origin: 0 100%;
     animation-duration: @animation-timing-fast;

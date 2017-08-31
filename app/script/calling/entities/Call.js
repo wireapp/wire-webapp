@@ -244,11 +244,10 @@ z.calling.entities.Call = class Call {
    * @returns {undefined} No return value
    */
   join_call() {
-    this.set_self_state(true);
-
     if (z.calling.enum.CALL_STATE_GROUP.CAN_CONNECT.includes(this.state())) {
       this.state(z.calling.enum.CALL_STATE.CONNECTING);
     }
+    this.set_self_state(true);
 
     if (this.is_group) {
       const response = this.state() !== z.calling.enum.CALL_STATE.OUTGOING;
@@ -352,15 +351,15 @@ z.calling.entities.Call = class Call {
   /**
    * Set the self state.
    * @param {boolean} joined_state - Self joined state
-   * @param {z.calling.enum.TERMINATION_REASON} termination_reason - Call termination reason
+   * @param {z.calling.enum.TERMINATION_REASON} [termination_reason] - Call termination reason
    * @returns {undefined} No return value
    */
   set_self_state(joined_state, termination_reason) {
     if (termination_reason && !this.termination_reason) {
       this.termination_reason = termination_reason;
     }
-    this.self_user_joined(joined_state);
     this.self_client_joined(joined_state);
+    this.self_user_joined(joined_state);
   }
 
   /**
@@ -883,11 +882,11 @@ z.calling.entities.Call = class Call {
 
   /**
    * Initiate the call telemetry.
-   * @param {boolean} [video_send=false] - Call with video
+   * @param {z.media.MediaType} [media_type=z.media.MediaType.AUDIO] - Media type for this call
    * @returns {undefined} No return value
    */
-  initiate_telemetry(video_send = false) {
-    this.telemetry.set_media_type(video_send);
+  initiate_telemetry(media_type = z.media.MediaType.AUDIO) {
+    this.telemetry.set_media_type(media_type);
     this.timings = new z.telemetry.calling.CallSetupTimings(this.id);
   }
 

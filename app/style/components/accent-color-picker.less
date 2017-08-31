@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2016 Wire Swiss GmbH
+ * Copyright (C) 2017 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,24 +31,24 @@ accent-color-picker {
       width: 16px;
     }
 
-    & + label:before {
+    & + label::before {
       .square(6px);
       background-color: currentColor;
     }
 
-    & + label:after,
-    & + label:before {
+    & + label::after,
+    & + label::before {
       .absolute-center;
       content: '';
       border-radius: 50%;
       transition: all @animation-timing-faster ease-out;
     }
 
-    &:checked + label:before {
+    &:checked + label::before {
       .square(10px);
     }
 
-    &:checked + label:after {
+    &:checked + label::after {
       .square(16px);
       border: 1px solid currentColor;
     }

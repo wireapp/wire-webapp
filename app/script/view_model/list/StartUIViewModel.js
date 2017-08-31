@@ -132,20 +132,21 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
     // User properties
     this.has_created_conversation = ko.observable(false);
-    this.has_uploaded_contacts = ko.observable(false);
 
     // View states
     this.has_search_results = ko.pureComputed(() => {
       return this.search_results.groups().length || this.search_results.contacts().length || this.search_results.others().length;
     });
 
+    this.show_content = ko.pureComputed(() => this.show_contacts() || this.show_matches() || this.show_search_results());
+
     this.show_contacts = ko.pureComputed(() => this.contacts().length);
     this.show_hint = ko.pureComputed(() => (this.selected_people().length === 1) && !this.has_created_conversation());
     this.show_invite = ko.pureComputed(() => !this.is_team());
     this.show_matches = ko.observable(false);
 
-    this.show_no_contacts = ko.pureComputed(() => !this.show_matches() && !this.show_search_results() && !this.contacts().length);
-    this.show_no_matches = ko.pureComputed(() => this.show_matches() && !this.contacts().length);
+    this.show_no_contacts = ko.pureComputed(() => !this.is_team() && !this.show_content());
+    this.show_no_matches = ko.pureComputed(() => (this.is_team() || this.show_matches()) && !this.show_contacts() && !this.show_search_results());
     this.show_no_search_results = ko.pureComputed(() => {
       return !this.show_matches() && this.show_search_results() && !this.has_search_results() && this.search_input().length;
     });
@@ -164,13 +165,6 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
     // Invite bubble states
     this.show_invite_form = ko.observable(true);
-    this.show_invite_form_only = ko.pureComputed(() => {
-      if (this.has_uploaded_contacts()) {
-        return true;
-      }
-
-      return !this.has_uploaded_contacts() && !this.show_top_people();
-    });
 
     // Invite bubble
     this.invite_bubble = null;
@@ -201,7 +195,6 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.update_properties = this.update_properties.bind(this);
 
     amplify.subscribe(z.event.WebApp.CONNECT.IMPORT_CONTACTS, this.import_contacts.bind(this));
-    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.CONTACTS, this.update_properties);
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.HAS_CREATED_CONVERSATION, this.update_properties);
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.update_properties);
   }
@@ -515,8 +508,6 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     const properties = this.properties_repository.properties;
     this.has_created_conversation(properties.has_created_conversation);
 
-    const has_uploaded_contacts = properties.contact_import.google !== undefined || properties.contact_import.macos !== undefined;
-    this.has_uploaded_contacts(has_uploaded_contacts);
     return true;
   }
 
@@ -565,7 +556,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       .then((conversation_et) => {
         if (conversation_et) {
           window.setTimeout(() => {
-            amplify.publish(z.event.WebApp.CALL.STATE.TOGGLE, false, conversation_et);
+            amplify.publish(z.event.WebApp.CALL.STATE.TOGGLE, z.media.MediaType.AUDIO, conversation_et);
           }, 500);
         }
       });
@@ -587,7 +578,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       .then((conversation_et) => {
         if (conversation_et) {
           window.setTimeout(() => {
-            amplify.publish(z.event.WebApp.CALL.STATE.TOGGLE, true, conversation_et);
+            amplify.publish(z.event.WebApp.CALL.STATE.TOGGLE, z.media.MediaType.AUDIO_VIDEO, conversation_et);
           }, 500);
         }
       });

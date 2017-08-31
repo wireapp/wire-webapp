@@ -20,6 +20,7 @@
 /keys
 /nbproject
 /node_modules
+/package-lock.json
 /tags
 /temp
 /test/_SpecRunner.html

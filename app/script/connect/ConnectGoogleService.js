@@ -46,11 +46,11 @@ z.connect.ConnectGoogleService = class ConnectGoogleService {
    */
   get_contacts() {
     return this._init_library()
-    .then(() => this._get_access_token())
-    .then((access_token) => this._get_contacts(access_token))
-    .catch((error) => {
-      this.logger.error(`Failed to import contacts from Google: ${error.message}`, error);
-    });
+      .then(() => this._get_access_token())
+      .then((access_token) => this._get_contacts(access_token))
+      .catch((error) => {
+        this.logger.error(`Failed to import contacts from Google: ${error.message}`, error);
+      });
   }
 
   /**
@@ -108,11 +108,11 @@ z.connect.ConnectGoogleService = class ConnectGoogleService {
    */
   _get_contacts(access_token) {
     return fetch(`${this.url}?access_token=${access_token}&alt=json&max-results=15000&v=3.0`)
-    .then((response) => response.json())
-    .then(({feed}) => {
-      this.logger.info('Received address book from Google', feed);
-      return feed;
-    });
+      .then((response) => response.json())
+      .then(({feed}) => {
+        this.logger.info('Received address book from Google', feed);
+        return feed;
+      });
   }
 
   /**

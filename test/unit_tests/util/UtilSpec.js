@@ -35,49 +35,49 @@ describe('z.util.render_message', function() {
   it('renders complicated image links', function() {
     const link = 'http://static.err.ee/gridfs/95E91BE0D28DF7236BC00EE349284A451C05949C2D04E7857BC686E4394F1585.jpg?&crop=(0,27,848,506.0960451977401)&cropxunits=848&cropyunits=595&format=jpg&quality=90&width=752&maxheight=42';
     const link_with_entities = link.split('&').join('&amp;');
-    const expected = `<a href=\"${link_with_entities}\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">${link_with_entities}</a>`;
+    const expected = `<a href="${link_with_entities}" target="_blank" rel="nofollow noopener noreferrer">${link_with_entities}</a>`;
     expect(z.util.render_message(link)).toBe(expected);
   });
 
   it('renders URLs with underscores', function() {
     const link = 'http://en.wikipedia.org/wiki/Stormtrooper_(Star_Wars)';
-    const expected = `Stormtroopers: <a href=\"${link}\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">${link}</a> !!!`;
+    const expected = `Stormtroopers: <a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a> !!!`;
     expect(z.util.render_message(`Stormtroopers: ${link} !!!`)).toBe(expected);
   });
 
   xit('renders links with multiple underscores', function() {
     const link = 'https://www.nike.com/events-registration/event?id=6245&languageLocale=de_de&cp=EUNS_KW_DE_&s_kwcid=AL!2799!3!46005237943!b!!g!!womens%20running';
-    const expected = `<a href=\"${link}\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">${link}</a>`;
+    const expected = `<a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a>`;
     expect(z.util.render_message(link)).toBe(expected);
   });
 
   it('renders URLs without a trailing slash', function() {
     const link = 'http://www.underscore.com';
-    const expected = `e.g. <a href=\"${link}\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">${link}</a>.`;
+    const expected = `e.g. <a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a>.`;
     expect(z.util.render_message(`e.g. ${link}.`)).toBe(expected);
   });
 
   it('renders localhost links', function() {
     const link = 'http://localhost:8888/';
-    const expected = `<a href=\"${link}\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">${link}</a>`;
+    const expected = `<a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a>`;
     expect(z.util.render_message(link)).toBe(expected);
   });
 
   it('renders links with IP addresses', function() {
     const link = 'http://192.168.10.44:8080//job/webapp_atomic_test/4290/cucumber-html-reports';
-    const expected = `<a href=\"${link}\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">${link}</a>`;
+    const expected = `<a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a>`;
     expect(z.util.render_message(link)).toBe(expected);
   });
 
   it('renders URLs with @-signs correctly', function() {
     const link = 'https://www.mail-archive.com/debian-bugs-dist@lists.debian.org/msg1448956.html';
-    const expected = `<a href=\"${link}\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">${link}</a>`;
+    const expected = `<a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a>`;
     expect(z.util.render_message(link)).toBe(expected);
   });
 
   it('renders URLs with @-signs and text correctly', function() {
     const link = 'https://t.facdn.net/22382738@400-1485204208.jpg';
-    const expected = `Just click <a href=\"${link}\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">${link}</a> and download it`;
+    const expected = `Just click <a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a> and download it`;
     expect(z.util.render_message(`Just click ${link} and download it`)).toBe(expected);
   });
 
@@ -125,8 +125,10 @@ describe('z.util.render_message', function() {
   });
 
   xit('renders an emoticon of someone shrugging', function() {
+    /* eslint-disable no-useless-escape */
     expect(z.util.render_message('¯\_(ツ)_/¯')).toBe('¯\_(ツ)_/¯');
   });
+  /* eslint-enable no-useless-escape */
 });
 
 
@@ -565,7 +567,7 @@ describe('Markdown for code snippets', function() {
   });
 
   it('doesn’t render links within code blocks', function() {
-    const expected = '<pre><code class=\"lang-xml\"><span class=\"hljs-tag\">&lt;<span class=\"hljs-name\">dependency</span>&gt;</span><br />  <span class=\"hljs-tag\">&lt;<span class=\"hljs-name\">groupId</span>&gt;</span>com.ibm.icu<span class=\"hljs-tag\">&lt;/<span class=\"hljs-name\">groupId</span>&gt;</span><br />  <span class=\"hljs-tag\">&lt;<span class=\"hljs-name\">artifactId</span>&gt;</span>icu4j<span class=\"hljs-tag\">&lt;/<span class=\"hljs-name\">artifactId</span>&gt;</span><br />  <span class=\"hljs-tag\">&lt;<span class=\"hljs-name\">version</span>&gt;</span>53.1<span class=\"hljs-tag\">&lt;/<span class=\"hljs-name\">version</span>&gt;</span><br /><span class=\"hljs-tag\">&lt;/<span class=\"hljs-name\">dependency</span>&gt;</span><br /></code></pre>';
+    const expected = '<pre><code class="lang-xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br />  <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>com.ibm.icu<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br />  <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>icu4j<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br />  <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>53.1<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br /><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br /></code></pre>';
     expect(z.util.render_message('```xml\n<dependency>\n  <groupId>com.ibm.icu</groupId>\n  <artifactId>icu4j</artifactId>\n  <version>53.1</version>\n</dependency>\n```')).toEqual(expected);
   });
 
@@ -585,13 +587,13 @@ describe('Markdown for code snippets', function() {
   });
 
   it('renders escaped HTML code blocks', function() {
-    const expected = '<pre><code class=\"lang-html\">&lt;<span class=\"hljs-selector-tag\">a</span> href=<span class=\"hljs-string\">\"javascript:wire.app.logout()\"</span>&gt;This is <span class=\"hljs-selector-tag\">a</span> trick&lt;/a&gt;<br /></code></pre>';
-    expect(z.util.render_message('```html\n<a href=\"javascript:wire.app.logout()\">This is a trick</a>\n```')).toEqual(expected);
+    const expected = '<pre><code class="lang-html">&lt;<span class="hljs-selector-tag">a</span> href=<span class="hljs-string">"javascript:wire.app.logout()"</span>&gt;This is <span class="hljs-selector-tag">a</span> trick&lt;/a&gt;<br /></code></pre>';
+    expect(z.util.render_message('```html\n<a href="javascript:wire.app.logout()">This is a trick</a>\n```')).toEqual(expected);
   });
 
   it('renders escaped HTML code spans', function() {
     const expected = '<code>&lt;a href=&quot;javascript:wire.app.logout()&quot;&gt;This is a trick&lt;/a&gt;</code>';
-    expect(z.util.render_message('`<a href=\"javascript:wire.app.logout()\">This is a trick</a>`')).toEqual(expected);
+    expect(z.util.render_message('`<a href="javascript:wire.app.logout()">This is a trick</a>`')).toEqual(expected);
   });
 });
 

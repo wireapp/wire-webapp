@@ -33,14 +33,19 @@ z.string.cs.alert_gif_too_large = 'Animace je příliš veliká.\nMaximální ve
 z.string.cs.auth_account_country_code = 'Kód země';
 z.string.cs.auth_account_create = 'Vytvořit';
 z.string.cs.auth_account_create_account = 'Vytvořit účet';
+z.string.cs.auth_account_deletion = 'Byli jste odhlášeni, protože váš účet byl smazán.';
 z.string.cs.auth_account_expiration = 'Byli jste odhlášeni, protože platnost relace vypršela. Přihlaste se znovu.';
 z.string.cs.auth_account_get_wire = 'Jednoduchá, soukromá & bezpečná aplikace pro chat, hovory, sdílení fotek, hudby, videa, GIFů a dalších.';
 z.string.cs.auth_account_password_forgot = 'Zapomenuté heslo';
+z.string.cs.auth_account_public_computer = 'Toto je veřejný počítač';
 z.string.cs.auth_account_sign_in = 'Přihlásit se';
 z.string.cs.auth_account_sign_in_email = 'Email';
 z.string.cs.auth_account_sign_in_phone = 'Telefon';
 z.string.cs.auth_account_terms_of_use = 'Podmínky používání';
 z.string.cs.auth_account_terms_of_use_detail = 'Souhlasím';
+
+z.string.cs.auth_blocked_database = 'Pro zobrazení zpráv potřebuje Wire potřebuje přístup k úložišti. Úložiště není k dispozici v anonymním režimu.';
+z.string.cs.auth_blocked_tabs = 'Wire je již otevřen na jiné záložce.';
 
 z.string.cs.auth_verify_account_add = 'Přidat';
 z.string.cs.auth_verify_account_detail = 'To umožňuje používat Wire na více zařízeních.';
@@ -61,6 +66,8 @@ z.string.cs.auth_limit_devices_current = '(Aktuální)';
 
 z.string.cs.auth_history_headline = 'Toto je poprvé kdy používáte Wire na tomto přístroji.';
 z.string.cs.auth_history_description = 'Z důvodů ochrany soukromí se zde nezobrazí historie vaší konverzace.';
+z.string.cs.auth_history_reuse_headline = 'Již jste dříve použili Wire na tomto zařízení.';
+z.string.cs.auth_history_reuse_description = 'Zprávy odeslané v mezičase se zde nezobrazí.';
 z.string.cs.auth_history_button = 'OK';
 
 z.string.cs.auth_posted_change_email = 'Změnit email';
@@ -95,6 +102,7 @@ z.string.cs.auth_error_name_short = 'Zadejte jméno s alespoň 2 znaky';
 z.string.cs.auth_error_offline = 'Nejste připojeni k Internetu';
 z.string.cs.auth_error_password_short = 'Zadejte heslo obsahující alespoň 8 znaků.';
 z.string.cs.auth_error_password_wrong = 'Neplatné heslo. Zkuste to prosím znovu.';
+z.string.cs.auth_error_phone_number_budget = 'Příliš často se přihlašujete. Opakujte akci později.';
 z.string.cs.auth_error_phone_number_forbidden = 'Omlouváme se. Toto telefonní číslo bylo zakázáno.';
 z.string.cs.auth_error_phone_number_invalid = 'Neplatné telefonní číslo';
 z.string.cs.auth_error_phone_number_unknown = 'Neznámé telefonní číslo';
@@ -107,12 +115,14 @@ z.string.cs.call_decline = 'Zamítnout';
 z.string.cs.call_accept = 'Přijmout';
 z.string.cs.call_join = 'Vstoupit';
 z.string.cs.call_choose_shared_screen = 'Vybrat obrazovku ke sdílení';
+z.string.cs.call_participants = '{{number}} se účastní hovoru';
 
 z.string.cs.modal_button_cancel = 'Zrušit';
 z.string.cs.modal_button_ok = 'Ok';
 z.string.cs.modal_button_send = 'Odeslat';
 
 z.string.cs.modal_block_conversation_headline = 'Blokovat {{user}}?';
+z.string.cs.modal_block_conversation_message = '{{user}} vás nebude moci kontaktovat nebo přizvat ke skupinové konverzaci.';
 z.string.cs.modal_block_conversation_button = 'Blokovat';
 z.string.cs.modal_call_conversation_empty_headline = 'Nikdo pro volání';
 z.string.cs.modal_call_conversation_empty_message = 'Již zde nikdo jiný není.';
@@ -152,7 +162,14 @@ z.string.cs.modal_leave_conversation_button = 'Odejít';
 z.string.cs.modal_logout_headline = 'Vyčistit data?';
 z.string.cs.modal_logout_message = 'Smazat všechny osobní informace a konverzace z tohoto přístroje.';
 z.string.cs.modal_logout_button = 'Odhlásit se';
+z.string.cs.modal_new_device_headline = '{{user}} začal(a) používat nové zařízení';
+z.string.cs.modal_new_device_headline_many = '{{users}} začali používat nové zařízení';
+z.string.cs.modal_new_device_headline_you = '{{user}} začal(a) používat nové zařízení';
 z.string.cs.modal_new_device_message = 'Chcete přesto odeslat své zprávy?';
+z.string.cs.modal_new_device_call_accept = 'Přijmout volání';
+z.string.cs.modal_new_device_call_anyway = 'Přesto zavolat';
+z.string.cs.modal_new_device_call_incoming = 'Chcete přesto přijmout hovor?';
+z.string.cs.modal_new_device_call_outgoing = 'Chcete přesto volat?';
 z.string.cs.modal_new_device_show_device = 'zobrazit přístroj';
 z.string.cs.modal_new_device_send_anyway = 'přesto odeslat';
 z.string.cs.modal_remove_device_button = 'Odstranit přístroj';
@@ -169,6 +186,8 @@ z.string.cs.modal_uploads_parallel = 'Najednou můžete poslat až {{number}} so
 z.string.cs.connection_request_connect = 'Připojit';
 z.string.cs.connection_request_ignore = 'Ignorovat';
 
+z.string.cs.conversation_guest_indicator = 'Host';
+
 z.string.cs.conversation_you_nominative = 'jste';
 z.string.cs.conversation_you_dative = 'jste';
 z.string.cs.conversation_you_accusative = 'jste';
@@ -178,9 +197,15 @@ z.string.cs.conversation_connection_blocked = 'Blokováno';
 z.string.cs.conversation_connection_cancel_request = 'Zrušit žádost o připojení';
 z.string.cs.conversation_create = ' zahájil(a) rozhovor s {{users}}';
 z.string.cs.conversation_create_you = ' zahájil(a) rozhovor s {{users}}';
+z.string.cs.conversation_device_started_using_one = ' začal(a) používat';
+z.string.cs.conversation_device_started_using_many = ' začal(a) používat';
 z.string.cs.conversation_device_unverified = ' neověřen jeden ze';
 z.string.cs.conversation_device_your_devices = ' vaše přístroje';
 z.string.cs.conversation_device_user_devices = ' přístroje uživatele {{user}}';
+z.string.cs.conversation_device_new_device_one = ' nové zařízení';
+z.string.cs.conversation_device_new_device_many = ' nové zařízení';
+z.string.cs.conversation_device_new_people_joined = 'noví lidé se přípojili.';
+z.string.cs.conversation_device_new_people_joined_verify = ' ověřit zařízení';
 z.string.cs.conversation_just_now = 'Právě teď';
 z.string.cs.conversation_location_link = 'Otevřít mapu';
 z.string.cs.conversation_member_join = ' přidal(a) {{users}}';
@@ -193,6 +218,7 @@ z.string.cs.conversation_message_delivered = 'Doručeno';
 z.string.cs.conversation_rename = ' přejmenoval(a) konverzaci';
 z.string.cs.conversation_rename_you = ' přejmenoval(a) konverzaci';
 z.string.cs.conversation_resume = 'Začít konverzovat s {{users}}';
+z.string.cs.conversation_team_leave = ' byl(a) odebrán(a) z týmu';
 z.string.cs.conversation_ping = ' pingl(a)';
 z.string.cs.conversation_ping_you = ' pingl(a)';
 z.string.cs.conversation_today = 'dnes';
@@ -205,6 +231,7 @@ z.string.cs.conversation_unable_to_decrypt_2 = 'Identita uživatele {{user}} se 
 z.string.cs.conversation_unable_to_decrypt_link = 'Proč?';
 z.string.cs.conversation_unable_to_decrypt_error_message = 'Chyba';
 z.string.cs.conversation_unable_to_decrypt_reset_session = 'Resetovat sezení';
+z.string.cs.conversation_missed_messages = 'Toto zařízení jste nějakou dobu nepoužíval(a). Některé zprávy se nemusí zobrazit.';
 z.string.cs.conversation_asset_uploading = 'Nahrávání…';
 z.string.cs.conversation_asset_downloading = 'Stahování…';
 z.string.cs.conversation_asset_upload_failed = 'Nahrání selhalo';
@@ -219,7 +246,17 @@ z.string.cs.conversation_context_menu_unlike = 'Nelíbí';
 z.string.cs.conversation_delete_timestamp = 'Smazáno v {{date}}';
 z.string.cs.conversation_edit_timestamp = 'Upraveno v {{date}}';
 z.string.cs.conversation_likes_caption = '{{number}} lidí';
+z.string.cs.conversation_send_pasted_file = 'Obrázek vložen {{date}}';
+z.string.cs.conversation_tweet_author = ' na Twittru';
 
+z.string.cs.collection_show_all = 'Zobrazit všechny {{number}}';
+z.string.cs.collection_section_links = 'Odkazy';
+z.string.cs.collection_section_images = 'Obrázky';
+z.string.cs.collection_section_files = 'Soubory';
+z.string.cs.collection_section_audio = 'Zvukové zprávy';
+
+z.string.cs.fullsearch_placeholder = 'Prohledat zprávy';
+z.string.cs.fullsearch_no_results = 'Žádné výsledky.';
 
 z.string.cs.archive_header = 'Archivovat';
 
@@ -227,6 +264,10 @@ z.string.cs.conversations_all_archived = 'Vše archivováno';
 z.string.cs.conversations_contacts = 'Kontakty';
 z.string.cs.conversations_connection_request_many = '{{number}} čekajících osob';
 z.string.cs.conversations_connection_request_one = '1 čekající osoba';
+z.string.cs.conversations_empty_conversation = 'Skupinová konverzace';
+z.string.cs.conversations_empty_conversation_description = 'Všichni opustili konverzaci';
+z.string.cs.conversations_no_conversations = 'Zatím žádné konverzace';
+z.string.cs.conversations_no_conversations_detail = 'Zahájit konverzaci nebo vytvořte skupinu.';
 z.string.cs.conversations_popover_archive = 'Archivovat';
 z.string.cs.conversations_popover_block = 'Blokovat';
 z.string.cs.conversations_popover_cancel = 'Zrušit žádost';
@@ -236,15 +277,36 @@ z.string.cs.conversations_popover_notify = 'Zapnout zvuk';
 z.string.cs.conversations_popover_silence = 'Ztlumit';
 z.string.cs.conversations_popover_unarchive = 'Obnovit';
 
+z.string.cs.conversations_secondary_line_missed_call = '{{number}} zmeškaný hovor';
+z.string.cs.conversations_secondary_line_missed_calls = '{{number}} zmeškaných hovorů';
+z.string.cs.conversations_secondary_line_new_message = '{{number}} nová zpráva';
+z.string.cs.conversations_secondary_line_new_messages = '{{number}} nové zprávy';
+z.string.cs.conversations_secondary_line_ping = '{{number}} ping';
+z.string.cs.conversations_secondary_line_pings = '{{number}} x ping';
+z.string.cs.conversations_secondary_line_people_left = '{{number}} lidí opustilo konverzaci';
+z.string.cs.conversations_secondary_line_person_left = '{{user}} opustil(a) konverzaci';
+z.string.cs.conversations_secondary_line_person_removed = '{{user}} byl odebrán';
+z.string.cs.conversations_secondary_line_people_added = '{{user}} lidé byli přidáni';
+z.string.cs.conversations_secondary_line_person_added = '{{user}} byl přídán';
+z.string.cs.conversations_secondary_line_person_added_you = '{{user}} vás přidal';
+z.string.cs.conversations_secondary_line_renamed = '{{user}} přejmenoval konverzaci';
 z.string.cs.conversations_secondary_line_timed_message = 'Časované zprávy';
+z.string.cs.conversations_secondary_line_you_left = 'Opustil(a) jste konverzaci';
+z.string.cs.conversations_secondary_line_you_were_removed = 'Byl(a) jste odebrán(a)';
 
+z.string.cs.takeover_headline = 'Uživatelská jména jsou zde.';
+z.string.cs.takeover_sub = 'Vytvořte si vaše jedinečné jméno na Wire.';
 z.string.cs.takeover_link = 'Dozvědět se více';
+z.string.cs.takeover_button_choose = 'Vyberte své vlastní';
+z.string.cs.takeover_button_keep = 'Ponechat tento';
 
 z.string.cs.invite_meta_key_mac = 'Cmd';
 z.string.cs.invite_meta_key_pc = 'Ctrl';
 z.string.cs.invite_hint_selected = 'Stiskněte {{meta_key}} + C pro kopírování';
 z.string.cs.invite_hint_unselected = 'Vybrat a stisknout {{meta_key}} + C';
 z.string.cs.invite_headline = 'Pozvat lidi do aplikace Wire';
+z.string.cs.invite_message = 'Jsem na Wire, hledejte {{username}} nebo navštivte get.wire.com.';
+z.string.cs.invite_message_no_email = 'Jsem k zastižení na síti Wire. K navázání kontaktu navštivte https://get.wire.com.';
 
 z.string.cs.extensions_bubble_button_gif = 'Gif';
 
@@ -256,14 +318,13 @@ z.string.cs.extensions_giphy_random = 'Náhodně';
 
 z.string.cs.search_open = 'Otevřít';
 z.string.cs.search_open_group = 'Vytvořit skupinu';
-z.string.cs.people_confirm_label = 'Přidat ke konverzaci';
+z.string.cs.people_confirm_label = 'Přidat lidi do skupiny';
 z.string.cs.people_people = '{{number}} lidí';
 z.string.cs.people_search_placeholder = 'Hledat podle jména';
 z.string.cs.people_everyone_participates = 'Všichni, které znáte\njsou již připojeni\nk této konverzaci.';
 z.string.cs.people_no_matches = 'Žádné odpovídající výsledky.\nZkuste jiné jméno.';
-z.string.cs.people_invite = 'Pozvat další';
-z.string.cs.people_share = 'Sdílet kontakty';
-z.string.cs.people_bring_your_friends = 'Přiveďte své přátele do aplikace Wire';
+z.string.cs.people_invite = 'Pozvat lidi do aplikace Wire';
+z.string.cs.people_invite_detail = 'Sdílením svých kontaktů si zjednodušíte propojení s ostatními. Všechny informace anonymizujeme a nikdy je neposkytujeme nikomu dalšímu.';
 z.string.cs.people_invite_button_contacts = 'Z kontaktů';
 z.string.cs.people_invite_button_gmail = 'Z Gmailu';
 z.string.cs.people_invite_headline = 'Přiveďte své přátele';
@@ -284,6 +345,7 @@ z.string.cs.people_tabs_device_detail_verify = 'Ověreno';
 z.string.cs.people_verified = 'Ověreno';
 
 z.string.cs.people_block_headline = 'Blokovat?';
+z.string.cs.people_block_message = '{{user}} vás nebude moci kontaktovat nebo přizvat ke skupinové konverzaci.';
 
 z.string.cs.people_connect_headline = 'Přijmout?';
 z.string.cs.people_connect_message = 'Toto naváže spojení a otevře konverzaci s {{user}}.';
@@ -298,6 +360,7 @@ z.string.cs.people_remove_headline = 'Odstranit?';
 z.string.cs.people_remove_message = '{{user}} nebude moci odesílat nebo přijímat zprávy v této konverzaci.';
 
 z.string.cs.people_unblock_headline = 'Odblokovat?';
+z.string.cs.people_unblock_message = '{{user}} vás nebude moci kontaktovat nebo přizvat ke skupinové konverzaci.';
 
 z.string.cs.people_button_add = 'Přidat kontakty';
 z.string.cs.people_button_block = 'Blokovat';
@@ -330,10 +393,14 @@ z.string.cs.preferences_about_terms_of_use = 'Podmínky používání';
 z.string.cs.preferences_about_version = 'Verze {{version}}';
 z.string.cs.preferences_about_website = 'Wire webové stránky';
 
-z.string.cs.preferences_account_reset_password = 'Resetovat heslo';
 z.string.cs.preferences_account_delete = 'Smazat účet';
 z.string.cs.preferences_account_log_out = 'Odhlásit se';
+z.string.cs.preferences_account_reset_password = 'Resetovat heslo';
+z.string.cs.preferences_account_team = 'v {{name}}';
 z.string.cs.preferences_account_username_placeholder = 'Celé jméno';
+z.string.cs.preferences_account_username_hint = 'Alespoň 2 znaky. Pouze a—z, 0—9 a _';
+z.string.cs.preferences_account_username_available = 'Dostupný';
+z.string.cs.preferences_account_username_error_taken = 'Již uděleno';
 
 z.string.cs.preferences_av_camera = 'Kamera';
 z.string.cs.preferences_av_microphone = 'Mikrofon';
@@ -371,15 +438,27 @@ z.string.cs.preferences_options_contacts_detail = 'Vaše údaje o kontaktech pou
 z.string.cs.preferences_options_data = 'Použití a zprávy o pádech';
 z.string.cs.preferences_options_data_checkbox = 'Použití a zprávy o pádech';
 z.string.cs.preferences_options_data_detail = 'Přispějte k vylepšení aplikace Wire odesíláním anonymních informací.';
+z.string.cs.preferences_options_popular = 'Podle popularity poptávky';
+z.string.cs.preferences_options_emoji_replace_checkbox = 'Nahradit psané emotikony pomocí emojis';
+z.string.cs.preferences_options_previews_send_checkbox = 'Vytvořit náhledy pro odeslané odkazy';
+z.string.cs.preferences_options_previews_send_detail = 'Náhledy mohou být zobrazeny i pro odkazy od jiných lidí.';
 z.string.cs.preferences_options_notifications = 'Upozornění';
 z.string.cs.preferences_options_notifications_none = 'Vypnout';
+z.string.cs.preferences_options_notifications_obfuscate = 'Skrýt detaily';
+z.string.cs.preferences_options_notifications_obfuscate_message = 'Zobrazit odesílatele';
 z.string.cs.preferences_options_notifications_on = 'Zobrazit odesílatele a zprávu';
 
 z.string.cs.search_group_hint = 'Pokračujte v psaní nebo vyberte více lidí pro vytvoření skupiny';
 z.string.cs.search_connect = 'Připojit';
 z.string.cs.search_connections = 'Kontakty';
+z.string.cs.search_contacts = 'Kontakty';
 z.string.cs.search_groups = 'Skupiny';
+z.string.cs.search_placeholder = 'Hledat podle jméno nebo uživatelského jméno';
+z.string.cs.search_team_groups = 'Týmové konverzace';
+z.string.cs.search_team_members = 'Členové týmu';
 z.string.cs.search_top_people = 'Nejaktivnější kontakty';
+z.string.cs.search_try_search = 'Vyhledávání osob podle\nvlastního nebo uživatelského jména';
+z.string.cs.search_no_contacts_on_wire = 'V aplikaci Wire nemáte žádné kontakty.\nZkuste vyhledat kontakty podle jména nebo\nuživatelského jména.';
 z.string.cs.search_others = 'Připojit';
 
 z.string.cs.upload_google_headline = 'Najít kontakty\npro konverzaci.';
@@ -388,6 +467,7 @@ z.string.cs.upload_google_headline_error = 'Něco se\npokazilo.';
 z.string.cs.upload_google_message_error = 'Neobdrželi jsme vaše data. Zkuste prosím kontakty importovat znovu.';
 z.string.cs.upload_google_button_again = 'Zkusit znovu';
 
+z.string.cs.url_password_reset = 'zapomenuté/';
 z.string.cs.url_support_device_access_denied = 'https://support.wire.com/hc/en-us/articles/213512545';
 z.string.cs.url_decrypt_error_1 = 'https://wire.com/privacy/error-1';
 z.string.cs.url_decrypt_error_2 = 'https://wire.com/privacy/error-2';
@@ -413,13 +493,19 @@ z.string.cs.warning_tell_me_how = 'Jak na to';
 z.string.cs.warning_connectivity_connection_lost = 'Pokoušíme se o připojení. Wire nemusí být schopen doručit zprávy.';
 z.string.cs.warning_connectivity_no_internet = 'Chybí připojení k internetu. Nebudete moci odesílat ani přijímat zprávy.';
 
+z.string.cs.warning_lifecycle_update = 'Je dostupná nová verze aplikace Wire.';
+z.string.cs.warning_lifecycle_update_notes = 'Co je nového';
+z.string.cs.warning_lifecycle_update_link = 'Aktualizovat nyní';
+
 z.string.cs.system_notification_asset_add = 'Sdílel(a) obrázek';
 z.string.cs.system_notification_connection_accepted = 'Přijal(a) váš požadavek na připojení';
+z.string.cs.system_notification_connection_connected = 'Nyní jste připojeni';
 z.string.cs.system_notification_connection_request = 'Žádá o připojení';
 z.string.cs.system_notification_conversation_create = '{{user}} zahájil(a) rozhovor';
 z.string.cs.system_notification_conversation_rename = '{{user}} přejmenoval(a) rozhovor na {{name}}';
 z.string.cs.system_notification_member_join_many = '{{user}} přidal(a) {{number}} kontakty do konverzace';
 z.string.cs.system_notification_member_join_one = '{{user1}} přidal(a) {{user2}} do konverzace';
+z.string.cs.system_notification_member_leave_removed_you = '{{user}} tě odebral(a) z konverzace';
 z.string.cs.system_notification_obfuscated = 'Vám poslal zprávu';
 z.string.cs.system_notification_obfuscated_title = 'Někdo';
 z.string.cs.system_notification_ping = 'Pingnut';
@@ -439,12 +525,14 @@ z.string.cs.tooltip_conversation_input_placeholder = 'Napsat zprávu';
 z.string.cs.tooltip_conversation_people = 'Kontakty ({{shortcut}})';
 z.string.cs.tooltip_conversation_picture = 'Přidat obrázek';
 z.string.cs.tooltip_conversation_ping = 'Ping ({{shortcut}})';
+z.string.cs.tooltip_conversation_search = 'Hledat';
 z.string.cs.tooltip_conversation_video_call = 'Videohovor';
 
 z.string.cs.tooltip_conversations_archive = 'Archivovat ({{shortcut}})';
 z.string.cs.tooltip_conversations_archived = 'Zobrazit archiv ({{number}})';
 z.string.cs.tooltip_conversations_more = 'Další';
 z.string.cs.tooltip_conversations_notify = 'Zapnout zvuk ({{shortcut}})';
+z.string.cs.tooltip_conversations_preferences = 'Otevřít předvolby';
 z.string.cs.tooltip_conversations_silence = 'Ztlumit ({{shortcut}})';
 z.string.cs.tooltip_conversations_start = 'Spustit konverzaci ({{shortcut}})';
 
@@ -469,7 +557,7 @@ z.string.cs.tooltip_search_close = 'Zavřít (Esc)';
 
 z.string.cs.init_received_self_user = 'Ahoj, {{user}}.';
 z.string.cs.init_received_user_data = 'Kontrola nových zpráv';
-z.string.cs.init_updated_from_notifications = 'Užívejte si Wire';
+z.string.cs.init_events_progress = 'Načítání zpráv - {{number1}} z {{number2}}';
 
 z.string.cs.ephememal_units_none = 'Vypnout';
 z.string.cs.ephememal_units_second = 'sekunda';

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2016 Wire Swiss GmbH
+ * Copyright (C) 2017 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,11 +23,13 @@
 
 @import 'common/variables';
 
-
 html {
   box-sizing: border-box;
 }
-*, *:before, *:after {
+
+*,
+*::before,
+*::after {
   box-sizing: inherit;
 }
 
@@ -65,6 +67,7 @@ p {
   height: 100%;
   width: 100%;
   vertical-align: middle;
+
   .content {
     width: 100%;
     max-width: 400px;
@@ -80,6 +83,7 @@ p {
 .footer {
   margin-top: 96px;
   font-size: 14px;
+
   p {
     margin-bottom: 4px;
   }
@@ -88,9 +92,10 @@ p {
 .support {
   .btn {
     text-transform: initial;
+
     &.hover,
     &:hover {
-      color: #fff!important;
+      color: #fff !important;
     }
   }
 }

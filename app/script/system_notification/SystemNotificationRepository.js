@@ -101,19 +101,19 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
 
     if (navigator.permissions) {
       return navigator.permissions.query({name: 'notifications'})
-      .then((permission_status) => {
-        this.permission_status = permission_status;
-        this.permission_status.onchange = () => {
-          return this.set_permission_state(this.permission_status.state);
-        };
+        .then((permission_status) => {
+          this.permission_status = permission_status;
+          this.permission_status.onchange = () => {
+            return this.set_permission_state(this.permission_status.state);
+          };
 
-        switch (permission_status.state) {
-          case z.system_notification.PermissionStatusState.PROMPT:
-            return this._request_permission();
-          default:
-            return this.set_permission_state(permission_status.state);
-        }
-      });
+          switch (permission_status.state) {
+            case z.system_notification.PermissionStatusState.PROMPT:
+              return this._request_permission();
+            default:
+              return this.set_permission_state(permission_status.state);
+          }
+        });
     }
     switch (window.Notification.permission) {
       case z.system_notification.PermissionStatusState.DEFAULT:
@@ -386,18 +386,21 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
         throw new z.system_notification.SystemNotificationError(z.system_notification.SystemNotificationError.TYPE.HIDE_NOTIFICATION);
       })
       .then((should_obfuscate_sender) => {
-        return {
-          options: {
-            body: this._should_obfuscate_notification_message(message_et) ? this._create_body_obfuscated() : options_body,
-            data: this._create_options_data(conversation_et, message_et),
-            icon: this._create_options_icon(should_obfuscate_sender, message_et.user()),
-            silent: true, // @note When Firefox supports this we can remove the fix for WEBAPP-731
-            tag: this._create_options_tag(conversation_et),
-          },
-          timeout: SystemNotificationRepository.CONFIG.TIMEOUT,
-          title: should_obfuscate_sender ? this._create_title_obfuscated() : this._create_title(conversation_et, message_et),
-          trigger: this._create_trigger(conversation_et, message_et),
-        };
+        return this._create_options_icon(should_obfuscate_sender, message_et.user())
+          .then((icon_url) => {
+            return {
+              options: {
+                body: this._should_obfuscate_notification_message(message_et) ? this._create_body_obfuscated() : options_body,
+                data: this._create_options_data(conversation_et, message_et),
+                icon: icon_url,
+                silent: true, // @note When Firefox supports this we can remove the fix for WEBAPP-731
+                tag: this._create_options_tag(conversation_et),
+              },
+              timeout: SystemNotificationRepository.CONFIG.TIMEOUT,
+              title: should_obfuscate_sender ? this._create_title_obfuscated() : this._create_title(conversation_et, message_et),
+              trigger: this._create_trigger(conversation_et, message_et),
+            };
+          });
       });
   }
 
@@ -456,12 +459,19 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
   */
   _create_options_icon(should_obfuscate_sender, user_et) {
     if (user_et.preview_picture_resource() && !should_obfuscate_sender) {
-      return user_et.preview_picture_resource().generate_url();
+      return user_et.preview_picture_resource().generate_url()
+        .catch((error) => {
+          if (error instanceof z.util.ValidationUtilError) {
+            this.logger.error(`Failed to validate an asset URL: ${error.message}`);
+          }
+          return '';
+        });
     }
+
     if (z.util.Environment.electron && z.util.Environment.os.mac) {
-      return '';
+      return Promise.resolve('');
     }
-    return SystemNotificationRepository.CONFIG.ICON_URL;
+    return Promise.resolve(SystemNotificationRepository.CONFIG.ICON_URL);
   }
 
   /**
@@ -535,9 +545,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    */
   _notify_banner(conversation_et, message_et) {
     return this._should_show_notification(conversation_et, message_et)
-      .then(() => {
-        return this._create_notification_content(conversation_et, message_et);
-      })
+      .then(() => this._create_notification_content(conversation_et, message_et))
       .then((notification_content) => {
         return this.check_permission()
           .then((permission_state) => {
@@ -546,7 +554,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
             }
           });
       })
-      .catch(function(error) {
+      .catch((error) => {
         if (error.type !== z.system_notification.SystemNotificationError.TYPE.HIDE_NOTIFICATION) {
           throw error;
         }
@@ -705,8 +713,8 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
       timeout_trigger_id = window.setTimeout(() => {
         this.logger.info(`Notification for '${message_id}' in '${conversation_id}' closed by timeout.`);
         notification.close();
-      }
-      , notification_content.timeout);
+      },
+      notification_content.timeout);
     };
 
     this.notifications.push(notification);

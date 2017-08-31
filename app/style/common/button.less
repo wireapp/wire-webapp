@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2016 Wire Swiss GmbH
+ * Copyright (C) 2017 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -189,26 +189,26 @@
 .button-color() {
   border: none;
   color: #fff;
-  &.disabled  {background: transparent}
+  &.disabled { background: transparent; }
 }
 
 .button-theme {
   .accent-background-color();
   .button-color();
-  &.disabled  {.accent-color(24%);}
+  &.disabled { .accent-color(24%); }
 }
 
 .button-theme-color(@color) {
   .button-color();
   background-color: @color !important;
-  &.toggled   {color: @color !important;}
-  &.disabled  {color: fade(@color, 24%) !important;}
+  &.toggled { color: @color !important; }
+  &.disabled { color: fade(@color, 24%) !important; }
 }
 
-.button-theme-blue    {.button-theme-color(@w-blue);}
-.button-theme-green   {.button-theme-color(@w-green);}
-.button-theme-yellow  {.button-theme-color(@w-yellow);}
-.button-theme-red     {.button-theme-color(@w-red);}
-.button-theme-orange  {.button-theme-color(@w-orange);}
-.button-theme-pink    {.button-theme-color(@w-pink);}
-.button-theme-purple  {.button-theme-color(@w-purple);}
+.button-theme-blue { .button-theme-color(@w-blue); }
+.button-theme-green { .button-theme-color(@w-green); }
+.button-theme-yellow { .button-theme-color(@w-yellow); }
+.button-theme-red { .button-theme-color(@w-red); }
+.button-theme-orange { .button-theme-color(@w-orange); }
+.button-theme-pink { .button-theme-color(@w-pink); }
+.button-theme-purple { .button-theme-color(@w-purple); }

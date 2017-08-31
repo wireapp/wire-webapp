@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2016 Wire Swiss GmbH
+ * Copyright (C) 2017 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -131,7 +131,7 @@
 
 // paste modal
 @keyframes paste-fade-in {
-  to {opacity:1}
+  to { opacity: 1; }
 }
 
 .conversation-input-paste-modal {
@@ -171,7 +171,7 @@
 .conversation-input-emoji-list {
   background-color: #fff;
   border-radius: 4px;
-  box-shadow: 0 0 1px 0 rgba(0,0,0,.08), 0 8px 24px 0 rgba(0,0,0,.16);
+  box-shadow: 0 0 1px 0 rgba(0, 0, 0, .08), 0 8px 24px 0 rgba(0, 0, 0, .16);
   display: block;
   font-size: 12px;
   font-weight: @font-weight-regular;
@@ -209,7 +209,7 @@
       vertical-align: middle;
       margin-left: 40px;
 
-      &:first-letter {
+      &::first-letter {
         text-transform: capitalize;
       }
     }

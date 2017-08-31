@@ -63,7 +63,9 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
         const is_active = z.calling.enum.CALL_STATE_GROUP.IS_ACTIVE.includes(call_et.state());
         const self_video_send = (call_et.self_client_joined() && this.self_stream_state.screen_send()) || this.self_stream_state.video_send();
         const remote_video_send = (call_et.is_remote_screen_send() || call_et.is_remote_video_send()) && !call_et.is_ongoing_on_another_client();
-        if (is_active && (self_video_send || remote_video_send || this.is_choosing_screen())) {
+        const is_videod = self_video_send || remote_video_send || this.is_choosing_screen();
+
+        if (is_active && is_videod) {
           return call_et;
         }
       }
@@ -151,6 +153,7 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
       if (joined_call) {
         if (this.visible_call_id !== joined_call.id) {
           this.visible_call_id = joined_call.id;
+
           if (this.show_local_video() || this.show_remote_video()) {
             this.multitasking.is_minimized(false);
             return this.logger.info(`Maximizing video call '${joined_call.id}' to full-screen`, joined_call);
