@@ -87,11 +87,6 @@ z.calling.entities.Flow = class Flow {
 
     this.connection_state.subscribe((ice_connection_state) => {
       switch (ice_connection_state) {
-        case z.calling.rtc.ICE_CONNECTION_STATE.CHECKING: {
-          this.telemetry.schedule_check(this.call_et.telemetry.media_type, this.is_answer());
-          break;
-        }
-
         case z.calling.rtc.ICE_CONNECTION_STATE.COMPLETED:
         case z.calling.rtc.ICE_CONNECTION_STATE.CONNECTED: {
           this._clear_negotiation_timeout();
@@ -128,6 +123,7 @@ z.calling.entities.Flow = class Flow {
           break;
         }
 
+        case z.calling.rtc.ICE_CONNECTION_STATE.CHECKING:
         default: {
           break;
         }
