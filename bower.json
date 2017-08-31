@@ -47,7 +47,7 @@
       "js": "dist/ByteBufferAB.js"
     },
     "cryptojs": {
-      "js/": [
+      "js": [
         "components/core.js",
         "components/lib-typedarrays.js",
         "components/md5.js",
@@ -81,7 +81,13 @@
       "js": "dist/knockout.debug.js"
     },
     "libsodium.js": {
-      "js/": "dist/browsers-sumo/combined/sodium.js"
+      "js": "dist/browsers-sumo/combined/sodium.js"
+    },
+    "linkifyjs": {
+      "js": "linkify{-html,}.min.js"
+    },
+    "long": {
+      "js": "dist/long.js"
     },
     "marked": {
       "js": "lib/marked.js"
@@ -126,14 +132,14 @@
     "protobuf": {
       "js": "dist/protobuf.js"
     },
+    "poster-image": {
+      "js": "poster.js"
+    },
     "raygun4js": {
       "js": "dist/raygun.vanilla.js"
     },
     "speakingurl": {
       "js": "speakingurl.min.js"
-    },
-    "linkifyjs": {
-      "js/": "linkify{-html,}.min.js"
     },
     "uint32": {
       "js": "uint32.js"
@@ -141,35 +147,28 @@
     "underscore": {
       "js": "underscore.js"
     },
-    "uuid": {
-      "js": "src/uuid.js"
-    },
     "url-search-params-polyfill": {
       "js/": "index.js"
+    },
+    "uuid": {
+      "js": "src/uuid.js"
     },
     "wire-audio-files": {
       "audio": "webapp/*"
     },
-    "webapp-module-external": {
-      "js/": [
-        "modules/*.js",
-        "modules/**/*.js"
-      ],
-      "css": "modules/**/*.css"
-    },
-    "webapp-module-namespace": {
-      "js/": "js/*.js"
-    },
     "webapp-module-bubble": {
-      "js/": "dist/script/*.js",
+      "js": "dist/script/*.js",
       "less": "app/style/webapp-module-bubble.less"
     },
     "webapp-module-logger": {
-      "js/": "dist/js/Logger.js"
+      "js": "dist/js/Logger.js"
     },
     "webapp-module-modal": {
-      "js/": "dist/script/*.js",
+      "js": "dist/script/*.js",
       "less": "app/style/webapp-module-modal.less"
+    },
+    "webapp-module-namespace": {
+      "js": "js/*.js"
     },
     "webrtc-adapter": {
       "js": "release/adapter.js"
@@ -178,16 +177,16 @@
       "less": "app/style/{wire-theme,variables,input}.less"
     },
     "wire-webapp-cbor": {
-      "js/": "dist/window/*.js"
+      "js": "dist/window/*.js"
     },
     "wire-webapp-cryptobox": {
-      "js/": "dist/window/*.js"
+      "js": "dist/window/*.js"
     },
     "wire-webapp-lru-cache": {
-      "js/": "dist/window/*.js"
+      "js": "dist/window/*.js"
     },
     "wire-webapp-proteus": {
-      "js/": "dist/window/*.js"
+      "js": "dist/window/*.js"
     }
   }
 }

@@ -32,7 +32,6 @@ module.exports = {
   dist_app: '<%= dir.dist %>/app',
   docs: '<%= dir.docs %>',
   docs_coverage: '<%= dir.docs.coverage %>',
-  ext: '<%= dir.app.ext %>/*',
   temp: '<%= dir.temp %>',
 
   //##############################################################################

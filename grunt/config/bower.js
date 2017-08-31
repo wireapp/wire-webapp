@@ -21,17 +21,15 @@
 
 // https://github.com/yatskevich/grunt-bower-task
 
-const path = require('path');
-
 module.exports = {
   install: {
     options: {
-      layout(type, component) {
-        if (['js', '__untyped__'].includes(type)) {
-          return 'js';
-        }
-        return path.join(type, component);
+      bowerOptions: {
+        forceLatest: true,
       },
+      cleanTargetDir: true,
+      copy: true,
+      layout: 'byType',
       targetDir: '<%= dir.app.ext %>',
       verbose: true,
     },
