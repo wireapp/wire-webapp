@@ -31,12 +31,10 @@ module.exports = {
     },
     options: {
       banner: '/*! <%= pkg.name %> - <%= grunt.option("version") %> */',
-      output: {
-        comments: false,
-      },
-      sourceMap: {
-        includeSources: true,
-      },
+      preserveComments: false,
+      screwIE8: true,
+      sourceMap: true,
+      sourceMapIncludeSources: true,
     },
   },
 };
