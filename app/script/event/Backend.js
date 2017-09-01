@@ -24,7 +24,6 @@ window.z.event = z.event || {};
 
 z.event.Backend = {
   CONVERSATION: {
-    ASSET_ADD: 'conversation.asset-add',
     CONNECT_REQUEST: 'conversation.connect-request',
     CREATE: 'conversation.create',
     KNOCK: 'conversation.knock',

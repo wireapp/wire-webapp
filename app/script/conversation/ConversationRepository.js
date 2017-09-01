@@ -1290,7 +1290,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       })
       .then((payload) => {
         const asset_data = conversation_et.ephemeral_timer() ? generic_message.ephemeral.asset : generic_message.asset;
-        const event = this._construct_otr_event(conversation_et.id, z.event.Backend.CONVERSATION.ASSET_ADD);
+        const event = this._construct_otr_event(conversation_et.id, z.event.Client.CONVERSATION.ASSET_ADD);
 
         event.data.otr_key = asset_data.uploaded.otr_key;
         event.data.sha256 = asset_data.uploaded.sha256;
@@ -1373,7 +1373,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           });
       })
       .catch((error) => {
-        this.logger.info(`No preview for asset '${message_id}' in conversation uploaded ${conversation_et.id}`, error);
+        this.logger.info(`No preview for asset '${message_id}' in conversation '${conversation_et.id}' uploaded `, error);
       });
   }
 
@@ -2386,7 +2386,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
             return this._on_member_update(conversation_et, event_json);
           case z.event.Backend.CONVERSATION.MESSAGE_ADD:
             return this._on_message_add(conversation_et, event_json);
-          case z.event.Backend.CONVERSATION.ASSET_ADD:
+          case z.event.Client.CONVERSATION.ASSET_ADD:
             return this._on_asset_add(conversation_et, event_json);
           case z.event.Backend.CONVERSATION.RENAME:
             return this._on_rename(conversation_et, event_json);
@@ -2687,51 +2687,46 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @private
    * @param {Conversation} conversation_et - Conversation to add the event to
-   * @param {Object} event_json - JSON data of 'conversation.message-add'
+   * @param {Object} event_json - JSON data of 'conversation.asset-add'
    * @returns {Promise} Resolves when the event was handled
    */
   _on_asset_add(conversation_et, event_json) {
-    let should_delete_in_view = false;
+    const {data: event_data, id: event_id} = event_json;
 
-    return this.conversation_service.load_event_from_db(conversation_et.id, event_json.id)
+    return this.conversation_service.load_event_from_db(conversation_et.id, event_id)
       .then((stored_event) => {
-        if (stored_event == null) {
-          return this.conversation_service.save_event(event_json);
+        if (stored_event) {
+          // Ignore redundant event
+          if (_.isEqual(stored_event, event_json)) {
+            return;
+          }
+
+          if (event_data.status === z.assets.AssetTransferState.UPLOAD_FAILED) {
+            return this.conversation_service.update_asset_as_failed_in_db(stored_event.primary_key, event_data.reason);
+          }
+
+          // only event data is relevant for updating
+          const updated_event = $.extend(true, stored_event, {
+            data: event_data,
+          });
+
+          return this.conversation_service.update_event(updated_event);
         }
 
-        // ignore redundant event
-        if (_.isEqual(stored_event, event_json)) {
-          return;
-        }
-
-        if (event_json.data.status === z.assets.AssetTransferState.UPLOAD_FAILED) {
-          return this._delete_message_by_id(conversation_et, event_json.id).then(() => undefined);
-        }
-
-        // defer deletion to avoid flashing UI
-        should_delete_in_view = true;
-
-        // only event data is relevant for updating
-        const updated_event = $.extend(true, stored_event, {
-          data: event_json.data,
-        });
-
-        return this.conversation_service.update_event(updated_event);
+        return this.conversation_service.save_event(event_json);
       })
       .then((event) => {
-        if (event === undefined) {
-          return;
-        }
-        if (should_delete_in_view) {
+        if (event) {
           conversation_et.remove_message_by_id(event_json.id);
+
+          return this._on_add_event(conversation_et, event)
+            .then(({message_et}) => {
+              const first_asset = message_et.get_first_asset();
+              if (first_asset.is_image() || first_asset.status() === z.assets.AssetTransferState.UPLOADED) {
+                return {conversation_et: conversation_et, message_et: message_et};
+              }
+            });
         }
-        return this._on_add_event(conversation_et, event)
-          .then(({message_et}) => {
-            const first_asset = message_et.get_first_asset();
-            if (first_asset.is_image() || first_asset.status() === z.assets.AssetTransferState.UPLOADED) {
-              return {conversation_et: conversation_et, message_et: message_et};
-            }
-          });
       });
   }
 
@@ -3213,9 +3208,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Update asset in UI and DB as failed
    * @param {Message} message_et - Message to update
+   * @param {string} [reason=z.assets.AssetTransferState.UPLOAD_FAILED] - Failure reason
    * @returns {Promise} Resolve when message was updated
    */
-  update_message_as_upload_failed(message_et) {
+  update_message_as_upload_failed(message_et, reason = z.assets.AssetTransferState.UPLOAD_FAILED) {
     if (message_et) {
       if (!message_et.is_content()) {
         throw new Error(`Tried to update wrong message type as upload failed '${message_et.super_type}'`);
@@ -3228,11 +3224,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
           throw new Error(`Tried to update message with wrong asset type as upload failed '${asset_et.type}'`);
         }
 
-        asset_et.status(z.assets.AssetTransferState.UPLOAD_FAILED);
+        asset_et.status(reason);
         asset_et.upload_failed_reason(z.assets.AssetUploadFailedReason.FAILED);
       }
 
-      return this.conversation_service.update_asset_as_failed_in_db(message_et.primary_key);
+      return this.conversation_service.update_asset_as_failed_in_db(message_et.primary_key, reason);
     }
   }
 
@@ -3260,32 +3256,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
     message_et.status(z.message.StatusType.SENT);
 
     return this.conversation_service.update_asset_as_uploaded_in_db(message_et.primary_key, event_json);
-  }
-
-  /**
-   * Update asset in UI and DB with preview
-   *
-   * @param {Conversation} conversation_et - Conversation that contains the message
-   * @param {Message} message_et - Message to update
-   * @param {Object} asset_data - Updated asset information
-   * @param {number} asset_data.id - ID of asset
-   * @param {Uint8Array} asset_data.otr_key - AES key
-   * @param {Uint8Array} asset_data.sha256 - Hash of the encrypted asset
-   * @returns {Promise} Resolve when message was updated
-   */
-  update_message_with_asset_preview(conversation_et, message_et, asset_data) {
-    const {id, key, otr_key, sha256, token} = asset_data;
-    const asset_et = message_et.get_first_asset();
-
-    let resource;
-    if (key) {
-      resource = z.assets.AssetRemoteData.v3(key, otr_key, sha256, token, true);
-    } else {
-      resource = z.assets.AssetRemoteData.v2(conversation_et.id, id, otr_key, sha256, true);
-    }
-
-    asset_et.preview_resource(resource);
-    return this.conversation_service.update_asset_preview_in_db(message_et.primary_key, asset_data);
   }
 
   /**

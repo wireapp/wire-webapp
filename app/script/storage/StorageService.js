@@ -260,6 +260,16 @@ z.storage.StorageService = class StorageService {
               this.db[StorageService.OBJECT_STORE.EVENTS].bulkPut(items);
             });
         });
+      this.db.version(14).stores(version_12)
+        .upgrade((transaction) => {
+          this.logger.warn('Database upgrade to version 14', transaction);
+          transaction[StorageService.OBJECT_STORE.EVENTS].toCollection()
+            .modify((event) => {
+              if (event.type === 'conversation.asset-meta') {
+                event.type = z.event.Client.CONVERSATION.ASSET_ADD;
+              }
+            });
+        });
 
       this.db.open()
         .then(() => {

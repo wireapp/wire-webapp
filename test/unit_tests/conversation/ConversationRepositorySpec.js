@@ -574,7 +574,6 @@ describe('ConversationRepository', function() {
 
           spyOn(TestFactory.conversation_service, 'update_asset_as_uploaded_in_db');
           spyOn(TestFactory.conversation_service, 'update_asset_as_failed_in_db');
-          spyOn(TestFactory.conversation_service, 'update_asset_preview_in_db');
           spyOn(TestFactory.conversation_service, 'delete_message_from_db');
           done();
         })
@@ -597,7 +596,7 @@ describe('ConversationRepository', function() {
         from: z.util.create_random_uuid(),
         id: message_et.id,
         time: Date.now(),
-        type: z.event.Backend.CONVERSATION.ASSET_ADD,
+        type: z.event.Client.CONVERSATION.ASSET_ADD,
       };
 
       TestFactory.conversation_repository._on_asset_upload_complete(conversation_et, event)

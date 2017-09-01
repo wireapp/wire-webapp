@@ -79,7 +79,7 @@ z.conversation.EventMapper = class EventMapper {
     let message_et;
 
     switch (event.type) {
-      case z.event.Backend.CONVERSATION.ASSET_ADD:
+      case z.event.Client.CONVERSATION.ASSET_ADD:
         message_et = this._map_event_asset_add(event, should_create_dummy_image);
         break;
       case z.event.Backend.CONVERSATION.KNOCK:
@@ -110,9 +110,6 @@ z.conversation.EventMapper = class EventMapper {
       case z.event.Backend.CONVERSATION.VOICE_CHANNEL_DEACTIVATE:
         message_et = this._map_event_voice_channel_deactivate(event);
         break;
-      case z.event.Client.CONVERSATION.ASSET_META:
-        message_et = this._map_event_asset_meta(event);
-        break;
       case z.event.Client.CONVERSATION.DELETE_EVERYWHERE:
         message_et = this._map_event_delete_everywhere(event);
         break;
@@ -127,7 +124,8 @@ z.conversation.EventMapper = class EventMapper {
         message_et = this._map_event_unable_to_decrypt(event);
         break;
       default:
-        message_et = this._map_event_ignored();
+        this.logger.warn(`Ignored unhandled event '${event.id}' of type '${event.type}'`);
+        return message_et;
     }
 
     message_et.category = event.category;
@@ -200,16 +198,6 @@ z.conversation.EventMapper = class EventMapper {
     return message_et;
   }
 
-  /**
-   * Maps JSON data of other message types currently ignored into message entity
-   * @private
-   * @returns {SystemMessage} System message entity
-   */
-  _map_event_ignored() {
-    const message_et = new z.entity.SystemMessage();
-    message_et.visible(false);
-    return message_et;
-  }
   /**
    * Maps JSON data of conversation.location message into message entity
    *
