@@ -32,6 +32,7 @@ z.event.EventRepository = class EventRepository {
         z.cryptography.CryptographyError.TYPE.PREVIOUSLY_STORED,
         z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE,
         z.event.EventError.TYPE.OUTDATED_E_CALL_EVENT,
+        z.event.EventError.TYPE.VALIDATION_FAILED,
       ],
     };
   }
@@ -517,67 +518,122 @@ z.event.EventRepository = class EventRepository {
    * @returns {Promise} Resolves with the saved record or boolean true if the event was skipped
    */
   _handle_event(event, source) {
-    const {conversation: conversation_id, time: event_date, type: event_type} = event;
-    if (z.event.EventTypeHandling.IGNORE.includes(event_type)) {
-      this.logger.info(`Event ignored: '${event_type}'`, {event_json: JSON.stringify(event), event_object: event});
-      return Promise.resolve(true);
-    }
-
-    const event_from_stream = source === z.event.EventRepository.SOURCE.STREAM;
-    const outdated_event = this.last_event_date() >= event_date;
-    if (event_from_stream && outdated_event) {
-      this.logger.info(`Event from stream skipped as outdated: '${event_type}'`, {event_json: JSON.stringify(event), event_object: event});
-      return Promise.resolve(true);
-    }
-
-    return Promise.resolve()
-      .then(() => {
-        if (z.event.EventTypeHandling.DECRYPT.includes(event_type)) {
+    return this._handle_event_validation(event, source)
+      .then((validated_event) => {
+        if (z.event.EventTypeHandling.DECRYPT.includes(validated_event.type)) {
           return this.cryptography_repository.handle_encrypted_event(event);
         }
         return event;
       })
       .then((mapped_event) => {
         if (z.event.EventTypeHandling.STORE.includes(mapped_event.type)) {
-          return this.conversation_service.load_event_from_db(conversation_id, mapped_event.id)
-            .then((stored_event) => {
-              if (stored_event) {
-                const {data: event_data, from, type} = mapped_event;
-                const from_same_user = stored_event.from === from;
-                const is_message_add = type === z.event.Backend.CONVERSATION.MESSAGE_ADD;
-
-                if (!from_same_user) {
-                  this.logger.warn(`Ignored event from user '${mapped_event.from}' with ID '${mapped_event.id}' previously used by '${stored_event.from}'`, mapped_event);
-                  throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.PREVIOUSLY_STORED);
-                }
-
-                if (is_message_add && !event_data.previews.length) {
-                  this.logger.warn(`Ignored event from user '${mapped_event.from}' with previously used ID '${mapped_event.id}'`, mapped_event);
-                  throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.PREVIOUSLY_STORED);
-                }
-              }
-              return this.conversation_service.save_event(mapped_event);
-            });
+          return this._handle_event_saving(mapped_event, source);
         }
 
         return mapped_event;
       })
-      .then((saved_event) => {
-        const event_not_injected = source !== EventRepository.SOURCE.INJECTED;
-        if (event_not_injected) {
-          this._update_last_event_date(event_date);
-        }
-
-        if (event_type === z.event.Client.CALL.E_CALL) {
-          this._validate_call_event_lifetime(event);
-        }
-
-        this._distribute_event(saved_event, source);
-        return saved_event;
-      })
+      .then((saved_event) => this._handle_event_distribution(saved_event, source))
       .catch((error) => {
         if (!EventRepository.CONFIG.IGNORED_ERRORS.includes(error.type)) {
           throw error;
+        }
+
+        return true;
+      });
+  }
+
+  /**
+   * Handle a saved event and distribute it.
+   *
+   * @private
+   * @param {JSON} event - Backend event extracted from notification stream
+   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @returns {Promise} Resolves with the mapped event
+   */
+  _handle_event_distribution(event, source) {
+    const {time: event_date, type: event_type} = event;
+
+    const event_not_injected = source !== EventRepository.SOURCE.INJECTED;
+    if (event_not_injected) {
+      this._update_last_event_date(event_date);
+    }
+
+    if (event_type === z.event.Client.CALL.E_CALL) {
+      this._validate_call_event_lifetime(event);
+    }
+
+    this._distribute_event(event, source);
+
+    return event;
+  }
+
+  /**
+   * Handle a mapped event, check for malicious ID use and save it.
+   *
+   * @private
+   * @param {JSON} event - Backend event extracted from notification stream
+   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @returns {Promise} Resolves with the saved event
+   */
+  _handle_event_saving(event, source) {
+    const {conversation: conversation_id, id: event_id} = event;
+
+    return this.conversation_service.load_event_from_db(conversation_id, event_id)
+      .then((stored_event) => {
+        if (stored_event) {
+          const {data: mapped_data, from: mapped_from, type: mapped_type} = event;
+          const {data: stored_data, from: stored_from, type: stored_type, time: stored_time} = stored_event;
+
+          const from_different_user = stored_from !== mapped_from;
+          const is_mapped_message_add = mapped_type === z.event.Client.CONVERSATION.MESSAGE_ADD;
+          const is_stored_message_add = stored_type === z.event.Client.CONVERSATION.MESSAGE_ADD;
+
+          if (from_different_user) {
+            this.logger.warn(`Ignored '${mapped_type}' from user '${mapped_from}' with ID '${event_id}' previously used by '${stored_from}'`, event);
+            throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, 'Event validation failed: ID reused from other user');
+          }
+
+          if (!is_mapped_message_add || !is_stored_message_add || !mapped_data.previews.length) {
+            this.logger.warn(`Ignored '${mapped_type}' from user '${mapped_from}' with previously used ID '${event_id}'`, event);
+            throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, 'Event validation failed: ID reused from same user');
+          }
+
+          if (stored_data.previews.length) {
+            this.logger.warn(`Ignored '${mapped_type}'from user '${mapped_from}' with ID '${event_id} that previously contained link preview`, event);
+            throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, 'Event validation failed: ID of link preview reused');
+          }
+
+          event.time = stored_time;
+        }
+
+        return this.conversation_service.save_event(event);
+      });
+  }
+
+  /**
+   * Handle an event by validating it.
+   *
+   * @private
+   * @param {JSON} event - Backend event extracted from notification stream
+   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @returns {Promise} Resolves with the event
+   */
+  _handle_event_validation(event, source) {
+    return Promise.resolve()
+      .then(({time: event_date, type: event_type}) => {
+        if (z.event.EventTypeHandling.IGNORE.includes(event_type)) {
+          this.logger.info(`Event ignored: '${event_type}'`, {event_json: JSON.stringify(event), event_object: event});
+          throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, 'Event validation failed: Ignored based on type');
+        }
+
+        const event_from_stream = source === z.event.EventRepository.SOURCE.STREAM;
+        if (event_from_stream && event_date) {
+          const outdated_event = this.last_event_date() >= new Date(event_date).toISOString();
+
+          if (outdated_event) {
+            this.logger.info(`Event from stream skipped as outdated: '${event_type}'`, {event_json: JSON.stringify(event), event_object: event});
+            throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, 'Event validation failed: Outdated timestamp');
+          }
         }
       });
   }

@@ -338,7 +338,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
         nonce: event_id,
         previews: text.link_preview.map((preview) => preview.encode64()),
       },
-      type: z.event.Backend.CONVERSATION.MESSAGE_ADD,
+      type: z.event.Client.CONVERSATION.MESSAGE_ADD,
     };
   }
 };

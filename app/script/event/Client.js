@@ -32,6 +32,7 @@ z.event.Client = {
     DELETE_EVERYWHERE: 'conversation.delete-everywhere',
     INCOMING_MESSAGE_TOO_BIG: 'conversation.incoming-message-too-big',
     LOCATION: 'conversation.location',
+    MESSAGE_ADD: 'conversation.message-add',
     MESSAGE_DELETE: 'conversation.message-delete',
     MESSAGE_HIDDEN: 'conversation.message-hidden',
     MISSED_MESSAGES: 'conversation.missed-messages',

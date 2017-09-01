@@ -25,7 +25,7 @@ window.z.message = z.message || {};
 z.message.MessageCategorization = (function() {
 
   const _check_text = function(event) {
-    if (event.type === z.event.Backend.CONVERSATION.MESSAGE_ADD) {
+    if (event.type === z.event.Client.CONVERSATION.MESSAGE_ADD) {
       let category = z.message.MessageCategory.TEXT;
 
       if (event.data.previews && event.data.previews.length > 0) {
