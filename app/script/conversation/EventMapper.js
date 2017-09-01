@@ -79,7 +79,7 @@ z.conversation.EventMapper = class EventMapper {
     let message_et;
 
     switch (event.type) {
-      case z.event.Backend.CONVERSATION.ASSET_ADD:
+      case z.event.Client.CONVERSATION.ASSET_ADD:
         message_et = this._map_event_asset_add(event, should_create_dummy_image);
         break;
       case z.event.Backend.CONVERSATION.KNOCK:
@@ -124,7 +124,7 @@ z.conversation.EventMapper = class EventMapper {
         message_et = this._map_event_unable_to_decrypt(event);
         break;
       default:
-        this.logger.log(`Ignoring unhandled event '${event.id}' of type '${event.type}'`);
+        this.logger.warn(`Ignored unhandled event '${event.id}' of type '${event.type}'`);
         return message_et;
     }
 

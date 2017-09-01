@@ -1290,7 +1290,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       })
       .then((payload) => {
         const asset_data = conversation_et.ephemeral_timer() ? generic_message.ephemeral.asset : generic_message.asset;
-        const event = this._construct_otr_event(conversation_et.id, z.event.Backend.CONVERSATION.ASSET_ADD);
+        const event = this._construct_otr_event(conversation_et.id, z.event.Client.CONVERSATION.ASSET_ADD);
 
         event.data.otr_key = asset_data.uploaded.otr_key;
         event.data.sha256 = asset_data.uploaded.sha256;
@@ -1373,7 +1373,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           });
       })
       .catch((error) => {
-        this.logger.info(`No preview for asset '${message_id}' in conversation uploaded ${conversation_et.id}`, error);
+        this.logger.info(`No preview for asset '${message_id}' in conversation '${conversation_et.id}' uploaded `, error);
       });
   }
 
@@ -2386,7 +2386,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
             return this._on_member_update(conversation_et, event_json);
           case z.event.Backend.CONVERSATION.MESSAGE_ADD:
             return this._on_message_add(conversation_et, event_json);
-          case z.event.Backend.CONVERSATION.ASSET_ADD:
+          case z.event.Client.CONVERSATION.ASSET_ADD:
             return this._on_asset_add(conversation_et, event_json);
           case z.event.Backend.CONVERSATION.RENAME:
             return this._on_rename(conversation_et, event_json);
@@ -2687,7 +2687,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @private
    * @param {Conversation} conversation_et - Conversation to add the event to
-   * @param {Object} event_json - JSON data of 'conversation.message-add'
+   * @param {Object} event_json - JSON data of 'conversation.asset-add'
    * @returns {Promise} Resolves when the event was handled
    */
   _on_asset_add(conversation_et, event_json) {

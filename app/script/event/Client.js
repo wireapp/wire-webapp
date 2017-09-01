@@ -27,6 +27,7 @@ z.event.Client = {
     E_CALL: 'call.e-call',
   },
   CONVERSATION: {
+    ASSET_ADD: 'conversation.asset-add',
     CONFIRMATION: 'conversation.confirmation',
     DELETE_EVERYWHERE: 'conversation.delete-everywhere',
     INCOMING_MESSAGE_TOO_BIG: 'conversation.incoming-message-too-big',

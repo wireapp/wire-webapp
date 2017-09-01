@@ -160,7 +160,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
 
     return {
       data,
-      type: z.event.Backend.CONVERSATION.ASSET_ADD,
+      type: z.event.Client.CONVERSATION.ASSET_ADD,
     };
   }
 
@@ -283,7 +283,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
         otr_key: new Uint8Array(image.otr_key !== null ? image.otr_key.toArrayBuffer() : []),
         sha256: new Uint8Array(image.sha256 !== null ? image.sha256.toArrayBuffer() : []),
       },
-      type: z.event.Backend.CONVERSATION.ASSET_ADD,
+      type: z.event.Client.CONVERSATION.ASSET_ADD,
     };
   }
 

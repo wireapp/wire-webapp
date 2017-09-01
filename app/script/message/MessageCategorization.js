@@ -37,7 +37,7 @@ z.message.MessageCategorization = (function() {
   };
 
   const _check_asset = function(event) {
-    if (event.type === z.event.Backend.CONVERSATION.ASSET_ADD) {
+    if (event.type === z.event.Client.CONVERSATION.ASSET_ADD) {
       if (event.data.info.tag === undefined) {
         return z.message.MessageCategory.FILE;
       }
