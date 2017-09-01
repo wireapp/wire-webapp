@@ -486,13 +486,16 @@ z.conversation.EventMapper = class EventMapper {
       const preview_image = image || article_image;
 
       if (preview_image) {
-        const {asset_token, asset_id} = preview_image.uploaded;
-        let {otr_key, sha256} = preview_image.uploaded;
+        const {asset_token, asset_id: asset_key} = preview_image.uploaded;
 
-        otr_key = new Uint8Array(otr_key.toArrayBuffer());
-        sha256 = new Uint8Array(sha256.toArrayBuffer());
+        if (asset_key) {
+          let {otr_key, sha256} = preview_image.uploaded;
 
-        link_preview_et.image_resource(z.assets.AssetRemoteData.v3(asset_id, otr_key, sha256, asset_token, true));
+          otr_key = new Uint8Array(otr_key.toArrayBuffer());
+          sha256 = new Uint8Array(sha256.toArrayBuffer());
+
+          link_preview_et.image_resource(z.assets.AssetRemoteData.v3(asset_key, otr_key, sha256, asset_token, true));
+        }
       }
 
       return link_preview_et;
