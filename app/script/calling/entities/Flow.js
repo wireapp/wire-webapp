@@ -87,16 +87,11 @@ z.calling.entities.Flow = class Flow {
 
     this.connection_state.subscribe((ice_connection_state) => {
       switch (ice_connection_state) {
-        case z.calling.rtc.ICE_CONNECTION_STATE.CHECKING: {
-          this.telemetry.schedule_check(this.call_et.telemetry.media_type, this.is_answer());
-          break;
-        }
-
         case z.calling.rtc.ICE_CONNECTION_STATE.COMPLETED:
         case z.calling.rtc.ICE_CONNECTION_STATE.CONNECTED: {
           this._clear_negotiation_timeout();
           this.negotiation_mode(z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT);
-          this.telemetry.start_statistics();
+          this.telemetry.time_step(z.telemetry.calling.CallSetupSteps.ICE_CONNECTION_CONNECTED);
 
           this.call_et.is_connected(true);
           this.participant_et.is_connected(true);
@@ -128,6 +123,7 @@ z.calling.entities.Flow = class Flow {
           break;
         }
 
+        case z.calling.rtc.ICE_CONNECTION_STATE.CHECKING:
         default: {
           break;
         }
@@ -1327,7 +1323,7 @@ z.calling.entities.Flow = class Flow {
     */
   reset_flow() {
     this.clear_timeouts();
-    this.telemetry.reset_statistics();
+    this.telemetry.disconnected();
 
     this.logger.debug(`Resetting flow with user '${this.remote_user.id}'`);
     this.remote_client_id = undefined;
