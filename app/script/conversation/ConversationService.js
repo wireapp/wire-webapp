@@ -569,31 +569,6 @@ z.conversation.ConversationService = class ConversationService {
   }
 
   /**
-   * Update asset with preview in database.
-   *
-   * @param {string} primary_key - Primary key used to find an event in the database
-   * @param {Object} asset_data - Updated asset data
-   * @returns {Promise} Resolves when the message was updated in database
-   */
-  update_asset_preview_in_db(primary_key, asset_data) {
-    return this.storage_service.load(z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key)
-      .then((record) => {
-        if (record) {
-          record.data.preview_id = asset_data.id;
-          record.data.preview_key = asset_data.key;
-          record.data.preview_otr_key = asset_data.otr_key;
-          record.data.preview_sha256 = asset_data.sha256;
-          record.data.preview_token = asset_data.token;
-
-          return this.storage_service.update(z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key, record)
-            .then(() => this.logger.info('Updated asset message_et (preview)', primary_key));
-        }
-
-        this.logger.warn('Did not find message to update asset (preview)', primary_key);
-      });
-  }
-
-  /**
    * Update asset as failed in database.
    *
    * @param {string} primary_key - Primary key used to find an event in the database
@@ -608,7 +583,10 @@ z.conversation.ConversationService = class ConversationService {
           record.data.status = z.assets.AssetTransferState.UPLOAD_FAILED;
 
           return this.storage_service.update(z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key, record)
-            .then(() => this.logger.info('Updated asset message_et (failed)', primary_key));
+            .then(() => {
+              this.logger.info('Updated asset message_et (failed)', primary_key);
+              return record;
+            });
         }
 
         this.logger.warn('Did not find message to update asset (failed)', primary_key);
