@@ -1300,6 +1300,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   send_asset_metadata(conversation_et, file) {
     return z.assets.AssetMetaDataBuilder.build_metadata(file)
+      .catch((error) => {
+        this.logger.warn(`Couldn't render asset preview from metadata. Asset might be corrupt: ${error.message}`, error);
+        return undefined;
+      })
       .then((metadata) => {
         const asset = new z.proto.Asset();
 
@@ -1314,11 +1318,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
 
         return asset;
-      })
-      .catch((error) => {
-        this.logger.warn(`Couldn't render asset preview from metadata. Asset might be corrupt: ${error.message}`, error);
-        const asset = new z.proto.Asset();
-        return asset.set('original', new z.proto.Asset.Original(file.type, file.size, file.name));
       })
       .then((asset) => {
         let generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
