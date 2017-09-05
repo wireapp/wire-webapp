@@ -108,6 +108,7 @@ z.string.de.auth_error_phone_number_budget = 'Du hast dich zu oft eingeloggt. Ve
 z.string.de.auth_error_phone_number_forbidden = 'Diese Telefonnummer ist leider nicht nutzbar.';
 z.string.de.auth_error_phone_number_invalid = 'Ungültige Telefonnummer';
 z.string.de.auth_error_phone_number_unknown = 'Unbekannte Telefonnummer';
+z.string.de.auth_error_suspended = 'Benutzerkonto ist nicht mehr zum Login berechtigt.';
 z.string.de.auth_error_sign_in = 'Überprüfe deine Eingaben und versuche es erneut.';
 
 z.string.de.call_state_outgoing = 'Klingelt…';

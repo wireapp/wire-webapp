@@ -525,10 +525,15 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
           if (navigator.onLine) {
             if (error.label) {
-              if (error.label === z.service.BackendClientError.LABEL.PENDING_ACTIVATION) {
-                return this._set_hash(z.auth.AuthView.MODE.POSTED_PENDING);
+              switch (error.label) {
+                case z.service.BackendClientError.LABEL.PENDING_ACTIVATION:
+                  return this._set_hash(z.auth.AuthView.MODE.POSTED_PENDING);
+                case z.service.BackendClientError.LABEL.SUSPENDED:
+                  this._add_error(z.string.auth_error_suspended);
+                  break;
+                default:
+                  this._add_error(z.string.auth_error_sign_in, [z.auth.AuthView.TYPE.EMAIL, z.auth.AuthView.TYPE.PASSWORD]);
               }
-              this._add_error(z.string.auth_error_sign_in, [z.auth.AuthView.TYPE.EMAIL, z.auth.AuthView.TYPE.PASSWORD]);
             } else {
               this._add_error(z.string.auth_error_misc);
             }
@@ -580,6 +585,9 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
                 break;
               case z.service.BackendClientError.LABEL.PHONE_BUDGET_EXHAUSTED:
                 this._add_error(z.string.auth_error_phone_number_budget, z.auth.AuthView.TYPE.PHONE);
+                break;
+              case z.service.BackendClientError.LABEL.SUSPENDED:
+                this._add_error(z.string.auth_error_suspended);
                 break;
               case z.service.BackendClientError.LABEL.UNAUTHORIZED:
                 this._add_error(z.string.auth_error_phone_number_forbidden, z.auth.AuthView.TYPE.PHONE);
