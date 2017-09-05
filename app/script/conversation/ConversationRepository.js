@@ -1300,6 +1300,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   send_asset_metadata(conversation_et, file) {
     return z.assets.AssetMetaDataBuilder.build_metadata(file)
+      .catch((error) => {
+        this.logger.warn(`Couldn't render asset preview from metadata. Asset might be corrupt: ${error.message}`, error);
+        return undefined;
+      })
       .then((metadata) => {
         const asset = new z.proto.Asset();
 
@@ -1326,7 +1330,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return this._send_and_inject_generic_message(conversation_et, generic_message);
       })
       .catch((error) => {
-        this.logger.warn(`Failed to upload metadata for asset in conversation ${conversation_et.id}: ${error.message}`, error);
+        this.logger.warn(`Failed to upload metadata for asset in conversation '${conversation_et.id}': ${error.message}`, error);
 
         if (error.type === z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
           throw error;
@@ -1361,7 +1365,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           });
       })
       .catch((error) => {
-        this.logger.info(`No preview for asset '${message_id}' in conversation '${conversation_et.id}' uploaded `, error);
+        this.logger.warn(`No preview for asset '${message_id}' in conversation '${conversation_et.id}' uploaded `, error);
       });
   }
 
