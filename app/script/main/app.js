@@ -25,6 +25,9 @@ window.z.main = z.main || {};
 z.main.App = class App {
   static get CONFIG() {
     return {
+      COOKIES_CHECK: {
+        COOKIE_NAME: 'cookies_enabled',
+      },
       IMMEDIATE_SIGN_OUT_REASONS: [
         z.auth.SIGN_OUT_REASON.ACCOUNT_DELETED,
         z.auth.SIGN_OUT_REASON.SESSION_EXPIRED,
@@ -489,8 +492,7 @@ z.main.App = class App {
     const is_redirect_from_auth = document.referrer.toLowerCase().includes('/auth');
     const get_cached_token = is_localhost || is_redirect_from_auth;
 
-    const token_promise = get_cached_token ? this.auth.repository.get_cached_access_token() : this.auth.repository.get_access_token();
-    return token_promise;
+    return get_cached_token ? this.auth.repository.get_cached_access_token() : this.auth.repository.get_access_token();
   }
 
   /**
