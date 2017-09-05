@@ -1807,7 +1807,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           throw new Error('Cannot send message to conversation you are not part of');
         }
 
-        const optimistic_event = this._construct_otr_event(conversation_et.id, z.event.Backend.CONVERSATION.MESSAGE_ADD);
+        const optimistic_event = this._construct_otr_event(conversation_et.id, z.event.Client.CONVERSATION.MESSAGE_ADD);
         return this.cryptography_repository.cryptography_mapper.map_generic_message(generic_message, optimistic_event);
       })
       .then((message_mapped) => {
@@ -2384,14 +2384,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
             return this._on_member_leave(conversation_et, event_json);
           case z.event.Backend.CONVERSATION.MEMBER_UPDATE:
             return this._on_member_update(conversation_et, event_json);
-          case z.event.Backend.CONVERSATION.MESSAGE_ADD:
-            return this._on_message_add(conversation_et, event_json);
           case z.event.Client.CONVERSATION.ASSET_ADD:
             return this._on_asset_add(conversation_et, event_json);
           case z.event.Backend.CONVERSATION.RENAME:
             return this._on_rename(conversation_et, event_json);
           case z.event.Client.CONVERSATION.CONFIRMATION:
             return this._on_confirmation(conversation_et, event_json);
+          case z.event.Client.CONVERSATION.MESSAGE_ADD:
+            return this._on_message_add(conversation_et, event_json);
           case z.event.Client.CONVERSATION.MESSAGE_DELETE:
             return this._on_message_deleted(conversation_et, event_json);
           case z.event.Client.CONVERSATION.MESSAGE_HIDDEN:
@@ -3301,23 +3301,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves with the updated event_json
    */
   _update_link_preview(conversation_et, event_json) {
-    const {from, id} = event_json;
-
-    return this.get_message_in_conversation_by_id(conversation_et, id)
-      .then((original_message_et) => {
-        const from_original_user = from === original_message_et.from;
-        if (!from_original_user) {
-          throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_USER);
+    return this.conversation_service.load_event_from_db(conversation_et.id, event_json.id)
+      .then((stored_message) => {
+        if (stored_message) {
+          this._delete_message(conversation_et, stored_message);
         }
-
-        const first_asset = original_message_et.get_first_asset();
-        if (first_asset.previews().length) {
-          this.logger.warn(`Ignored link preview for message with ID '${id}' already it previously contained preview`, event_json);
-          this._delete_message(conversation_et, event_json);
-          throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND);
-        }
-
-        this._delete_message(conversation_et, original_message_et);
         return event_json;
       });
   }
