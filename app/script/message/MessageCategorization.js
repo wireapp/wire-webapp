@@ -53,7 +53,7 @@ z.message.MessageCategorization = (function() {
   };
 
   const _check_ping = function(event) {
-    if (event.type === z.event.Backend.CONVERSATION.KNOCK) {
+    if (event.type === z.event.Client.CONVERSATION.KNOCK) {
       return z.message.MessageCategory.KNOCK;
     }
   };

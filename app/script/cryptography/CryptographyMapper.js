@@ -292,7 +292,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
       data: {
         nonce: event_id,
       },
-      type: z.event.Backend.CONVERSATION.KNOCK,
+      type: z.event.Client.CONVERSATION.KNOCK,
     };
   }
 

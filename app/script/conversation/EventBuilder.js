@@ -138,7 +138,7 @@ z.conversation.EventBuilder = (function() {
       id: z.util.create_random_uuid(),
       protocol_version: z.calling.CallingRepository.CONFIG.PROTOCOL_VERSION,
       time: time,
-      type: z.event.Backend.CONVERSATION.VOICE_CHANNEL_ACTIVATE,
+      type: z.event.Client.CONVERSATION.VOICE_CHANNEL_ACTIVATE,
     };
   };
 
@@ -154,7 +154,7 @@ z.conversation.EventBuilder = (function() {
       id: z.util.create_random_uuid(),
       protocol_version: z.calling.CallingRepository.CONFIG.PROTOCOL_VERSION,
       time: time,
-      type: z.event.Backend.CONVERSATION.VOICE_CHANNEL_DEACTIVATE,
+      type: z.event.Client.CONVERSATION.VOICE_CHANNEL_DEACTIVATE,
     };
   };
 
