@@ -31,6 +31,7 @@ z.event.Client = {
     CONFIRMATION: 'conversation.confirmation',
     DELETE_EVERYWHERE: 'conversation.delete-everywhere',
     INCOMING_MESSAGE_TOO_BIG: 'conversation.incoming-message-too-big',
+    KNOCK: 'conversation.knock',
     LOCATION: 'conversation.location',
     MESSAGE_ADD: 'conversation.message-add',
     MESSAGE_DELETE: 'conversation.message-delete',
@@ -40,5 +41,7 @@ z.event.Client = {
     TEAM_MEMBER_LEAVE: 'conversation.team-member-leave',
     UNABLE_TO_DECRYPT: 'conversation.unable-to-decrypt',
     VERIFICATION: 'conversation.verification',
+    VOICE_CHANNEL_ACTIVATE: 'conversation.voice-channel-activate',
+    VOICE_CHANNEL_DEACTIVATE: 'conversation.voice-channel-deactivate',
   },
 };

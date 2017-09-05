@@ -25,10 +25,9 @@ window.z.event = z.event || {};
 z.event.EventTypeHandling = {
   CONFIRM: [
     z.event.Client.CONVERSATION.ASSET_ADD,
-    z.event.Backend.CONVERSATION.KNOCK,
-    z.event.Client.CONVERSATION.MESSAGE_ADD,
+    z.event.Client.CONVERSATION.KNOCK,
     z.event.Client.CONVERSATION.LOCATION,
-    z.event.Client.CONVERSATION.REACTION,
+    z.event.Client.CONVERSATION.MESSAGE_ADD,
   ],
   DECRYPT: [
     z.event.Backend.CONVERSATION.OTR_ASSET_ADD,
@@ -38,19 +37,19 @@ z.event.EventTypeHandling = {
     z.event.Backend.CONVERSATION.TYPING,
   ],
   STORE: [
-    z.event.Backend.CONVERSATION.KNOCK,
     z.event.Backend.CONVERSATION.MEMBER_JOIN,
     z.event.Backend.CONVERSATION.MEMBER_LEAVE,
     z.event.Backend.CONVERSATION.RENAME,
-    z.event.Backend.CONVERSATION.VOICE_CHANNEL_ACTIVATE,
-    z.event.Backend.CONVERSATION.VOICE_CHANNEL_DEACTIVATE,
     z.event.Client.CONVERSATION.DELETE_EVERYWHERE,
+    z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG,
+    z.event.Client.CONVERSATION.KNOCK,
     z.event.Client.CONVERSATION.LOCATION,
     z.event.Client.CONVERSATION.MESSAGE_ADD,
     z.event.Client.CONVERSATION.MISSED_MESSAGES,
     z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE,
     z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT,
-    z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG,
     z.event.Client.CONVERSATION.VERIFICATION,
+    z.event.Client.CONVERSATION.VOICE_CHANNEL_ACTIVATE,
+    z.event.Client.CONVERSATION.VOICE_CHANNEL_DEACTIVATE,
   ],
 };

@@ -79,15 +79,6 @@ z.conversation.EventMapper = class EventMapper {
     let message_et;
 
     switch (event.type) {
-      case z.event.Client.CONVERSATION.ASSET_ADD:
-        message_et = this._map_event_asset_add(event, should_create_dummy_image);
-        break;
-      case z.event.Backend.CONVERSATION.KNOCK:
-        message_et = this._map_event_ping(event);
-        break;
-      case z.event.Client.CONVERSATION.MESSAGE_ADD:
-        message_et = this._map_event_message_add(event);
-        break;
       case z.event.Backend.CONVERSATION.MEMBER_JOIN:
         message_et = this._map_event_member_join(event, conversation_et);
         break;
@@ -98,30 +89,39 @@ z.conversation.EventMapper = class EventMapper {
       case z.event.Backend.CONVERSATION.MEMBER_UPDATE:
         message_et = this._map_event_member_update(event);
         break;
-      case z.event.Client.CONVERSATION.MISSED_MESSAGES:
-        message_et = this._map_event_missed_messages();
-        break;
       case z.event.Backend.CONVERSATION.RENAME:
         message_et = this._map_event_rename(event);
         break;
-      case z.event.Backend.CONVERSATION.VOICE_CHANNEL_ACTIVATE:
-        message_et = this._map_event_voice_channel_activate();
-        break;
-      case z.event.Backend.CONVERSATION.VOICE_CHANNEL_DEACTIVATE:
-        message_et = this._map_event_voice_channel_deactivate(event);
+      case z.event.Client.CONVERSATION.ASSET_ADD:
+        message_et = this._map_event_asset_add(event, should_create_dummy_image);
         break;
       case z.event.Client.CONVERSATION.DELETE_EVERYWHERE:
         message_et = this._map_event_delete_everywhere(event);
         break;
+      case z.event.Client.CONVERSATION.KNOCK:
+        message_et = this._map_event_ping(event);
+        break;
       case z.event.Client.CONVERSATION.LOCATION:
         message_et = this._map_event_location(event);
         break;
-      case z.event.Client.CONVERSATION.VERIFICATION:
-        message_et = this._map_event_verification(event);
+      case z.event.Client.CONVERSATION.MESSAGE_ADD:
+        message_et = this._map_event_message_add(event);
+        break;
+      case z.event.Client.CONVERSATION.MISSED_MESSAGES:
+        message_et = this._map_event_missed_messages();
         break;
       case z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT:
       case z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG:
         message_et = this._map_event_unable_to_decrypt(event);
+        break;
+      case z.event.Client.CONVERSATION.VERIFICATION:
+        message_et = this._map_event_verification(event);
+        break;
+      case z.event.Client.CONVERSATION.VOICE_CHANNEL_ACTIVATE:
+        message_et = this._map_event_voice_channel_activate();
+        break;
+      case z.event.Client.CONVERSATION.VOICE_CHANNEL_DEACTIVATE:
+        message_et = this._map_event_voice_channel_deactivate(event);
         break;
       default:
         this.logger.warn(`Ignored unhandled event '${event.id}' of type '${event.type}'`);

@@ -2376,10 +2376,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
             return this._on_member_leave(conversation_et, event_json);
           case z.event.Backend.CONVERSATION.MEMBER_UPDATE:
             return this._on_member_update(conversation_et, event_json);
-          case z.event.Client.CONVERSATION.ASSET_ADD:
-            return this._on_asset_add(conversation_et, event_json);
           case z.event.Backend.CONVERSATION.RENAME:
             return this._on_rename(conversation_et, event_json);
+          case z.event.Client.CONVERSATION.ASSET_ADD:
+            return this._on_asset_add(conversation_et, event_json);
           case z.event.Client.CONVERSATION.CONFIRMATION:
             return this._on_confirmation(conversation_et, event_json);
           case z.event.Client.CONVERSATION.MESSAGE_ADD:
