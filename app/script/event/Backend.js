@@ -26,7 +26,6 @@ z.event.Backend = {
   CONVERSATION: {
     CONNECT_REQUEST: 'conversation.connect-request',
     CREATE: 'conversation.create',
-    KNOCK: 'conversation.knock',
     MEMBER_JOIN: 'conversation.member-join',
     MEMBER_LEAVE: 'conversation.member-leave',
     MEMBER_UPDATE: 'conversation.member-update',
@@ -34,8 +33,6 @@ z.event.Backend = {
     OTR_MESSAGE_ADD: 'conversation.otr-message-add',
     RENAME: 'conversation.rename',
     TYPING: 'conversation.typing',
-    VOICE_CHANNEL_ACTIVATE: 'conversation.voice-channel-activate',
-    VOICE_CHANNEL_DEACTIVATE: 'conversation.voice-channel-deactivate',
   },
   TEAM: {
     CONVERSATION_CREATE: 'team.conversation-create',

@@ -492,16 +492,16 @@ z.event.EventRepository = class EventRepository {
 
     const [category] = type.split('.');
     switch (category) {
-      case 'call':
+      case z.event.EVENT_TYPE.CALL:
         amplify.publish(z.event.WebApp.CALL.EVENT_FROM_BACKEND, event, source);
         break;
-      case 'conversation':
+      case z.event.EVENT_TYPE.CONVERSATION:
         amplify.publish(z.event.WebApp.CONVERSATION.EVENT_FROM_BACKEND, event, source);
         break;
-      case 'team':
+      case z.event.EVENT_TYPE.TEAM:
         amplify.publish(z.event.WebApp.TEAM.EVENT_FROM_BACKEND, event, source);
         break;
-      case 'user':
+      case z.event.EVENT_TYPE.USER:
         amplify.publish(z.event.WebApp.USER.EVENT_FROM_BACKEND, event, source);
         break;
       default:
