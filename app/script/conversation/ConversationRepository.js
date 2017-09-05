@@ -1338,7 +1338,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return this._send_and_inject_generic_message(conversation_et, generic_message);
       })
       .catch((error) => {
-        this.logger.warn(`Failed to upload metadata for asset in conversation ${conversation_et.id}: ${error.message}`, error);
+        this.logger.warn(`Failed to upload metadata for asset in conversation "${conversation_et.id}": ${error.message}`, error);
 
         if (error.type === z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
           throw error;
