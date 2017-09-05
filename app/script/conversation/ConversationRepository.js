@@ -1327,6 +1327,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         return asset;
       })
+      .catch((error) => {
+        this.logger.warn(`Couldn't render asset preview from metadata. Asset might be corrupt: ${error.message}`, error);
+        const asset = new z.proto.Asset();
+        return asset.set('original', new z.proto.Asset.Original(file.type, file.size, file.name));
+      })
       .then((asset) => {
         let generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
         generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
@@ -1373,7 +1378,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           });
       })
       .catch((error) => {
-        this.logger.info(`No preview for asset '${message_id}' in conversation '${conversation_et.id}' uploaded `, error);
+        this.logger.warn(`No preview for asset '${message_id}' in conversation '${conversation_et.id}' uploaded `, error);
       });
   }
 
