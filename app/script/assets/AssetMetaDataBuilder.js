@@ -70,9 +70,10 @@ z.assets.AssetMetaDataBuilder = {
   },
 
   /**
-   * Convert a Media Error event into a plain Error object. This needs to be done because Error events are non-standard between browser implementations.
-   * @param {Event} event - Error event
+   * Convert an error event into a plain error object.
+   * This needs to be done because error events are not standardized between browser implementations.
    * @private
+   * @param {Event} event - Error event
    * @returns {MediaError} Error object
    * @see https://developer.mozilla.org/en-US/docs/Web/API/Event/originalTarget
    */
