@@ -2702,6 +2702,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
           }
 
           if (event_data.status === z.assets.AssetTransferState.UPLOAD_FAILED) {
+            if (event_json.from === this.user_repository.self().id) {
+              return this._delete_message_by_id(conversation_et, event_json.id).then(() => undefined);
+            }
             return this.conversation_service.update_asset_as_failed_in_db(stored_event.primary_key, event_data.reason);
           }
 
