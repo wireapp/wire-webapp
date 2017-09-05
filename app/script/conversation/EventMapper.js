@@ -85,7 +85,7 @@ z.conversation.EventMapper = class EventMapper {
       case z.event.Backend.CONVERSATION.KNOCK:
         message_et = this._map_event_ping(event);
         break;
-      case z.event.Backend.CONVERSATION.MESSAGE_ADD:
+      case z.event.Client.CONVERSATION.MESSAGE_ADD:
         message_et = this._map_event_message_add(event);
         break;
       case z.event.Backend.CONVERSATION.MEMBER_JOIN:

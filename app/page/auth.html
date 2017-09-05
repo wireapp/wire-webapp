@@ -379,6 +379,9 @@
 
         <div id="section-blocked" class="section">
           <div class="form-blocked">
+            <div id="form-blocked-cookies" class="blocked-content" data-bind="visible: blocked_mode_cookies">
+              <div class="auth-headline" data-bind="l10n_text: z.string.auth_blocked_cookies"></div>
+            </div>
             <div id="form-blocked-database" class="blocked-content" data-bind="visible: blocked_mode_database">
               <div class="auth-headline" data-bind="l10n_text: z.string.auth_blocked_database"></div>
             </div>

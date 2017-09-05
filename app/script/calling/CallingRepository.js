@@ -579,7 +579,7 @@ z.calling.CallingRepository = class CallingRepository {
   _validate_message_type(call_message_et) {
     const {conversation_id, type} = call_message_et;
 
-    return this.conversation_repository.get_conversation_by_id_async(conversation_id)
+    return this.conversation_repository.get_conversation_by_id(conversation_id)
       .then((conversation_et) => {
         if (conversation_et.is_one2one()) {
           const group_message_types = [
@@ -963,7 +963,7 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {Promise} Resolves when conversation supports calling
    */
   _check_calling_support(conversation_id, call_state) {
-    return this.conversation_repository.get_conversation_by_id_async(conversation_id)
+    return this.conversation_repository.get_conversation_by_id(conversation_id)
       .then(({participating_user_ids}) => {
         if (!participating_user_ids().length) {
           amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALL_EMPTY_CONVERSATION);
@@ -1028,7 +1028,7 @@ z.calling.CallingRepository = class CallingRepository {
 
     return this.get_call_by_id(conversation_id)
       .catch(() => {
-        return this.conversation_repository.get_conversation_by_id_async(conversation_id)
+        return this.conversation_repository.get_conversation_by_id(conversation_id)
           .then((conversation_et) => {
             const call_et = new z.calling.entities.Call(conversation_et, creating_user_et, session_id, this);
 

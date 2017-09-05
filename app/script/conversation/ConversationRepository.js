@@ -502,20 +502,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   get_all_users_in_conversation(conversation_id) {
-    return this.get_conversation_by_id_async(conversation_id)
+    return this.get_conversation_by_id(conversation_id)
       .then((conversation_et) => [this.user_repository.self()].concat(conversation_et.participating_user_ets()));
-  }
-
-  /**
-   * Check for conversation locally.
-   *
-   * @deprecated
-   * @note Deprecated legacy method, remove when last dependencies in wrapper has been removed
-   * @param {string} conversation_id - ID of conversation to get
-   * @returns {Conversation} Conversation is locally available
-   */
-  get_conversation_by_id(conversation_id) {
-    return this._find_conversation_by_id(conversation_id);
   }
 
   /**
@@ -523,7 +511,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {string} conversation_id - ID of conversation to get
    * @returns {Promise} Resolves with the Conversation
    */
-  get_conversation_by_id_async(conversation_id) {
+  get_conversation_by_id(conversation_id) {
     return this.find_conversation_by_id(conversation_id)
       .catch((error) => {
         if (error.type === z.conversation.ConversationError.TYPE.NOT_FOUND) {
@@ -673,7 +661,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       return Promise.resolve(false);
     }
 
-    return this.get_conversation_by_id_async(conversation_id)
+    return this.get_conversation_by_id(conversation_id)
       .then((conversation_et) => {
         return this.get_message_in_conversation_by_id(conversation_et, message_id)
           .then((message_et) => conversation_et.last_read_timestamp() >= message_et.timestamp());
@@ -1812,7 +1800,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           throw new Error('Cannot send message to conversation you are not part of');
         }
 
-        const optimistic_event = this._construct_otr_event(conversation_et.id, z.event.Backend.CONVERSATION.MESSAGE_ADD);
+        const optimistic_event = this._construct_otr_event(conversation_et.id, z.event.Client.CONVERSATION.MESSAGE_ADD);
         return this.cryptography_repository.cryptography_mapper.map_generic_message(generic_message, optimistic_event);
       })
       .then((message_mapped) => {
@@ -1990,7 +1978,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   grant_message(conversation_id, consent_type, user_ids) {
-    return this.get_conversation_by_id_async(conversation_id)
+    return this.get_conversation_by_id(conversation_id)
       .then((conversation_et) => {
         const conversation_degraded = conversation_et.verification_state() === z.conversation.ConversationVerificationState.DEGRADED;
 
@@ -2040,7 +2028,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {boolean} Is payload likely to be too big so that we switch to type external?
    */
   _should_send_as_external(conversation_id, generic_message) {
-    return this.get_conversation_by_id_async(conversation_id)
+    return this.get_conversation_by_id(conversation_id)
       .then((conversation_et) => {
         const estimated_number_of_clients = conversation_et.number_of_participants() * 4;
         const message_in_bytes = new Uint8Array(generic_message.toArrayBuffer()).length;
@@ -2208,7 +2196,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   timeout_ephemeral_message(message_et) {
     if (!message_et.is_expired()) {
-      this.get_conversation_by_id_async(message_et.conversation_id)
+      this.get_conversation_by_id(message_et.conversation_id)
         .then((conversation_et) => {
           if (message_et.user().is_me) {
             switch (false) {
@@ -2377,7 +2365,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     // Check if conversation was archived
     let previously_archived;
-    return this.get_conversation_by_id_async(conversation_id)
+    return this.get_conversation_by_id(conversation_id)
       .then((conversation_et) => {
         previously_archived = conversation_et.is_archived();
 
@@ -2389,14 +2377,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
             return this._on_member_leave(conversation_et, event_json);
           case z.event.Backend.CONVERSATION.MEMBER_UPDATE:
             return this._on_member_update(conversation_et, event_json);
-          case z.event.Backend.CONVERSATION.MESSAGE_ADD:
-            return this._on_message_add(conversation_et, event_json);
           case z.event.Client.CONVERSATION.ASSET_ADD:
             return this._on_asset_add(conversation_et, event_json);
           case z.event.Backend.CONVERSATION.RENAME:
             return this._on_rename(conversation_et, event_json);
           case z.event.Client.CONVERSATION.CONFIRMATION:
             return this._on_confirmation(conversation_et, event_json);
+          case z.event.Client.CONVERSATION.MESSAGE_ADD:
+            return this._on_message_add(conversation_et, event_json);
           case z.event.Client.CONVERSATION.MESSAGE_DELETE:
             return this._on_message_deleted(conversation_et, event_json);
           case z.event.Client.CONVERSATION.MESSAGE_HIDDEN:
@@ -2786,7 +2774,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       return Promise.reject(new Error('Cannot hide message: Sender is not self user'));
     }
 
-    return this.get_conversation_by_id_async(event_data.conversation_id)
+    return this.get_conversation_by_id(event_data.conversation_id)
       .then((conversation_et) => {
         amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, event_data.message_id);
         return this._delete_message_by_id(conversation_et, event_data.message_id);
@@ -3121,7 +3109,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
     this.logger.debug(`Message contains redundant clients of '${Object.keys(recipients).length}' users`, recipients);
 
-    return this.get_conversation_by_id_async(conversation_id)
+    return this.get_conversation_by_id(conversation_id)
       .catch((error) => {
         if (error.type !== z.conversation.ConversationError.TYPE.NOT_FOUND) {
           throw error;
@@ -3306,23 +3294,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves with the updated event_json
    */
   _update_link_preview(conversation_et, event_json) {
-    const {from, id} = event_json;
-
-    return this.get_message_in_conversation_by_id(conversation_et, id)
-      .then((original_message_et) => {
-        const from_original_user = from === original_message_et.from;
-        if (!from_original_user) {
-          throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_USER);
+    return this.conversation_service.load_event_from_db(conversation_et.id, event_json.id)
+      .then((stored_message) => {
+        if (stored_message) {
+          this._delete_message(conversation_et, stored_message);
         }
-
-        const first_asset = original_message_et.get_first_asset();
-        if (first_asset.previews().length) {
-          this.logger.warn(`Ignored link preview for message with ID '${id}' already it previously contained preview`, event_json);
-          this._delete_message(conversation_et, event_json);
-          throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND);
-        }
-
-        this._delete_message(conversation_et, original_message_et);
         return event_json;
       });
   }

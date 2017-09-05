@@ -45,6 +45,7 @@ z.string.ru.auth_account_sign_in_phone = 'Телефон';
 z.string.ru.auth_account_terms_of_use = 'Условия использования';
 z.string.ru.auth_account_terms_of_use_detail = 'Я принимаю';
 
+z.string.ru.auth_blocked_cookies = 'Включите файлы cookie для входа в Wire.';
 z.string.ru.auth_blocked_database = 'Для отображения сообщений Wire необходим доступ к локальному хранилищу. Локальное хранилище недоступно в приватном режиме.';
 z.string.ru.auth_blocked_tabs = 'Wire уже открыто в другой вкладке.';
 
