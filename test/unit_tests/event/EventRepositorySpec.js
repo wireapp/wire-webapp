@@ -284,7 +284,7 @@ describe('Event Repository', () => {
 
   describe('_handle_event_saving', () => {
     let event = undefined;
-    let stored_event = undefined;
+    let previously_stored_event = undefined;
 
     beforeEach(() => {
       event = {
@@ -294,7 +294,7 @@ describe('Event Repository', () => {
         },
         from: z.util.create_random_uuid(),
         id: z.util.create_random_uuid(),
-        time: new Date().getTime(),
+        time: new Date().toISOString(),
         type: z.event.Client.CONVERSATION.MESSAGE_ADD,
       };
 
@@ -313,9 +313,9 @@ describe('Event Repository', () => {
     });
 
     it('ignores an event with an ID previously used by another user', (done) => {
-      stored_event = JSON.parse(JSON.stringify(event));
-      stored_event.from = z.util.create_random_uuid();
-      spyOn(TestFactory.event_repository.conversation_service, 'load_event_from_db').and.returnValue(Promise.resolve(stored_event));
+      previously_stored_event = JSON.parse(JSON.stringify(event));
+      previously_stored_event.from = z.util.create_random_uuid();
+      spyOn(TestFactory.event_repository.conversation_service, 'load_event_from_db').and.returnValue(Promise.resolve(previously_stored_event));
 
       TestFactory.event_repository._handle_event_saving(event)
         .then(done.fail)
@@ -329,8 +329,8 @@ describe('Event Repository', () => {
 
     it('ignores a non-"text message" with an ID previously used by the same user', (done) => {
       event.type = z.event.Client.CALL.E_CALL;
-      stored_event = JSON.parse(JSON.stringify(event));
-      spyOn(TestFactory.event_repository.conversation_service, 'load_event_from_db').and.returnValue(Promise.resolve(stored_event));
+      previously_stored_event = JSON.parse(JSON.stringify(event));
+      spyOn(TestFactory.event_repository.conversation_service, 'load_event_from_db').and.returnValue(Promise.resolve(previously_stored_event));
 
       TestFactory.event_repository._handle_event_saving(event)
         .then(done.fail)
@@ -343,9 +343,9 @@ describe('Event Repository', () => {
     });
 
     it('ignores a plain text message with an ID previously used by the same user for a non-"text message"', (done) => {
-      stored_event = JSON.parse(JSON.stringify(event));
-      stored_event.type = z.event.Client.CALL.E_CALL;
-      spyOn(TestFactory.event_repository.conversation_service, 'load_event_from_db').and.returnValue(Promise.resolve(stored_event));
+      previously_stored_event = JSON.parse(JSON.stringify(event));
+      previously_stored_event.type = z.event.Client.CALL.E_CALL;
+      spyOn(TestFactory.event_repository.conversation_service, 'load_event_from_db').and.returnValue(Promise.resolve(previously_stored_event));
 
       TestFactory.event_repository._handle_event_saving(event)
         .then(done.fail)
@@ -358,8 +358,8 @@ describe('Event Repository', () => {
     });
 
     it('ignores a plain text message with an ID previously used by the same user', (done) => {
-      stored_event = JSON.parse(JSON.stringify(event));
-      spyOn(TestFactory.event_repository.conversation_service, 'load_event_from_db').and.returnValue(Promise.resolve(stored_event));
+      previously_stored_event = JSON.parse(JSON.stringify(event));
+      spyOn(TestFactory.event_repository.conversation_service, 'load_event_from_db').and.returnValue(Promise.resolve(previously_stored_event));
 
       TestFactory.event_repository._handle_event_saving(event)
         .then(done.fail)
@@ -373,8 +373,8 @@ describe('Event Repository', () => {
 
     it('ignores a text message with link preview with an ID previously used by the same user for a text message with link preview', (done) => {
       event.data.previews.push(1);
-      stored_event = JSON.parse(JSON.stringify(event));
-      spyOn(TestFactory.event_repository.conversation_service, 'load_event_from_db').and.returnValue(Promise.resolve(stored_event));
+      previously_stored_event = JSON.parse(JSON.stringify(event));
+      spyOn(TestFactory.event_repository.conversation_service, 'load_event_from_db').and.returnValue(Promise.resolve(previously_stored_event));
 
       TestFactory.event_repository._handle_event_saving(event)
         .then(done.fail)
@@ -387,16 +387,18 @@ describe('Event Repository', () => {
     });
 
     it('saves a text message with link preview with an ID previously used by the same user for a plain text message', (done) => {
-      stored_event = JSON.parse(JSON.stringify(event));
+      previously_stored_event = JSON.parse(JSON.stringify(event));
 
+      const initial_time = event.time;
+      const changed_time = new Date(new Date(event.time).getTime() + 60 * 1000).toISOString();
       event.data.previews.push(1);
-      event.time = new Date(event.time + 100);
-      spyOn(TestFactory.event_repository.conversation_service, 'load_event_from_db').and.returnValue(Promise.resolve(stored_event));
+      event.time = changed_time;
+      spyOn(TestFactory.event_repository.conversation_service, 'load_event_from_db').and.returnValue(Promise.resolve(previously_stored_event));
 
-      TestFactory.event_repository._handle_event_mapped(event)
-        .then((handled_event) => {
-          expect(handled_event.time).not.toEqual(event.time);
-          expect(handled_event.time).toEqual(stored_event.time);
+      TestFactory.event_repository._handle_event_saving(event)
+        .then((saved_event) => {
+          expect(saved_event.time).toEqual(initial_time);
+          expect(saved_event.time).not.toEqual(changed_time);
           expect(TestFactory.event_repository.conversation_service.save_event).toHaveBeenCalled();
           done();
         })
@@ -419,6 +421,7 @@ describe('Event Repository', () => {
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const event = {"conversation":"9fe8b359-b9e0-4624-b63c-71747664e4fa","time":"2016-08-05T16:18:41.820Z","data":{"content":"Hello","nonce":"1cea64c5-afbe-4c9d-b7d0-c49aa3b0a53d"},"from":"532af01e-1e24-4366-aacf-33b67d4ee376","id":"74f.800122000b2d7182","type":"conversation.message-add"};
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
+      TestFactory.event_repository.last_event_date('2017-08-05T16:18:41.820Z');
 
       TestFactory.event_repository._handle_event_validation(event, z.event.EventRepository.SOURCE.STREAM)
         .then(done.fail)

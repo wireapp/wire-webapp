@@ -620,21 +620,23 @@ z.event.EventRepository = class EventRepository {
    */
   _handle_event_validation(event, source) {
     return Promise.resolve()
-      .then(({time: event_date, type: event_type}) => {
-        if (z.event.EventTypeHandling.IGNORE.includes(event_type)) {
-          this.logger.info(`Event ignored: '${event_type}'`, {event_json: JSON.stringify(event), event_object: event});
+      .then(() => {
+        if (z.event.EventTypeHandling.IGNORE.includes(event.type)) {
+          this.logger.info(`Event ignored: '${event.type}'`, {event_json: JSON.stringify(event), event_object: event});
           throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, 'Event validation failed: Ignored based on type');
         }
 
         const event_from_stream = source === z.event.EventRepository.SOURCE.STREAM;
-        if (event_from_stream && event_date) {
-          const outdated_event = this.last_event_date() >= new Date(event_date).toISOString();
+        if (event_from_stream && event.time) {
+          const outdated_event = this.last_event_date() >= new Date(event.time).toISOString();
 
           if (outdated_event) {
-            this.logger.info(`Event from stream skipped as outdated: '${event_type}'`, {event_json: JSON.stringify(event), event_object: event});
+            this.logger.info(`Event from stream skipped as outdated: '${event.type}'`, {event_json: JSON.stringify(event), event_object: event});
             throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, 'Event validation failed: Outdated timestamp');
           }
         }
+
+        return event;
       });
   }
 
