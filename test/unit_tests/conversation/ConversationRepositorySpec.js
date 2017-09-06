@@ -62,6 +62,7 @@ describe('ConversationRepository', function() {
 
   beforeEach(function(done) {
     server = sinon.fakeServer.create();
+    server.autoRespond = true;
     sinon.spy(jQuery, 'ajax');
 
     test_factory.exposeConversationActors()
@@ -126,49 +127,157 @@ describe('ConversationRepository', function() {
     });
   });
 
-  describe('on_conversation_event', function() {
-    let member_join_event = null;
+  describe('"on_conversation_event"', () => {
+    describe('"conversation.asset-add"', () => {
+      beforeEach(() => {
+        const matchUsers = new RegExp(`${test_factory.settings.connection.rest_url}/users\\?ids=([a-z0-9-,]+)`);
+        server.respondWith('GET', matchUsers, (xhr, ids) => {
+          const users = [];
+          for (const userId of ids.split(',')) {
+            users.push({"handle":`handle_${userId}`,"locale":"en","accent_id":0,"picture":[{"content_length":19190,"data":null,"content_type":"image/jpeg","id":"ab7eb2f7-7c5b-4e55-ab16-dfc206891e67","info":{"height":280,"tag":"smallProfile","original_width":620,"width":280,"correlation_id":"7dfa4adf-454e-4372-a06a-7403baa36e5c","original_height":960,"nonce":"7dfa4adf-454e-4372-a06a-7403baa36e5c","public":true}},{"content_length":82690,"data":null,"content_type":"image/jpeg","id":"87c95372-fce7-4215-861a-a3e0fe262e48","info":{"height":960,"tag":"medium","original_width":620,"width":620,"correlation_id":"7dfa4adf-454e-4372-a06a-7403baa36e5c","original_height":960,"nonce":"7dfa4adf-454e-4372-a06a-7403baa36e5c","public":true}}],"name":`name_${userId}`,"id":userId,"assets":[]});
+          }
+          xhr.respond(200, {'Content-Type': 'application/json'}, JSON.stringify(users));
+        });
 
-    beforeEach(function() {
-      spyOn(TestFactory.conversation_repository, '_on_member_join').and.callThrough();
-      spyOn(TestFactory.conversation_repository, 'update_participating_user_ets').and.callThrough();
+        const matchConversations = new RegExp(`${test_factory.settings.connection.rest_url}/conversations/([a-z0-9-]+)`);
+        server.respondWith('GET', matchConversations, (xhr, conversationId) => {
+          const conversation = {"access":["private"],"creator":"6761450e-1bd6-4027-a338-1191fe5e349f","members":{"self":{"hidden_ref":null,"status":0,"service":null,"otr_muted_ref":null,"status_time":"1970-01-01T00:00:00.000Z","hidden":false,"status_ref":"0.0","id":"8a88604a-430a-42ed-966e-19a35c3d292a","otr_archived":false,"otr_muted":false,"otr_archived_ref":null},"others":[{"status":0,"id":"6761450e-1bd6-4027-a338-1191fe5e349f"}]},"name":null,"team":null,"id":conversationId,"type":2,"last_event_time":"1970-01-01T00:00:00.000Z","last_event":"0.0"};
+          xhr.respond(200, {'Content-Type': 'application/json'}, JSON.stringify(conversation));
+        });
+      });
 
-      member_join_event = {
-        conversation: conversation_et.id,
-        data: {
-          user_ids: [],
-        },
-        from: 'd5a39ffb-6ce3-4cc8-9048-0e15d031b4c5',
-        id: '3.800122000a5dcd58',
-        time: '2015-04-27T11:42:31.475Z',
-        type: 'conversation.member-join',
-      };
+      it('removes a file upload from the messages list of the sender when the upload gets canceled', (done) => {
+        const conversation_id = z.util.create_random_uuid();
+        const message_id = z.util.create_random_uuid();
+        const sending_user_id = TestFactory.user_repository.self().id;
+
+        // @formatter:off
+        const upload_start = {"conversation":conversation_id,"from":sending_user_id,"id":message_id,"status":1,"time":"2017-09-06T09:43:32.278Z","data":{"content_length":23089240,"content_type":"application/x-msdownload","info":{"name":"AirDroid_Desktop_Client_3.4.2.0.exe","nonce":"79072f78-15ee-4d54-a63c-fd46cd5607ae"}},"type":"conversation.asset-add","category":512,"primary_key":107};
+        const upload_cancel = {"conversation":conversation_id,"from":sending_user_id,"id":message_id,"status":1,"time":"2017-09-06T09:43:36.528Z","data":{"reason":0,"status":"upload-failed"},"type":"conversation.asset-add"};
+        // @formatter:on
+
+        TestFactory.conversation_repository.fetch_conversation_by_id(conversation_id)
+          .then((fetched_conversation) => {
+            expect(fetched_conversation).toBeDefined();
+            TestFactory.conversation_repository.active_conversation(fetched_conversation);
+            return TestFactory.conversation_repository.on_conversation_event(upload_start);
+          })
+          .then(() => {
+            const number_of_messages = Object.keys(TestFactory.conversation_repository.active_conversation().messages()).length;
+            expect(number_of_messages).toBe(1);
+            return TestFactory.conversation_repository.on_conversation_event(upload_cancel);
+          })
+          .then(() => {
+            const number_of_messages = Object.keys(TestFactory.conversation_repository.active_conversation().messages()).length;
+            expect(number_of_messages).toBe(0);
+            done();
+          })
+          .catch(done.fail);
+      });
+
+      it('removes a file upload from the messages list of the receiver when the upload gets canceled', (done) => {
+        const conversation_id = z.util.create_random_uuid();
+        const message_id = z.util.create_random_uuid();
+        const sending_user_id = z.util.create_random_uuid();
+
+        // @formatter:off
+        const upload_start = {"conversation": conversation_id,"from":sending_user_id,"id":message_id,"status":1,"time":"2017-09-06T09:43:32.278Z","data":{"content_length":23089240,"content_type":"application/x-msdownload","info":{"name":"AirDroid_Desktop_Client_3.4.2.0.exe","nonce":"79072f78-15ee-4d54-a63c-fd46cd5607ae"}},"type":"conversation.asset-add","category":512,"primary_key":107};
+        const upload_cancel = {"conversation": conversation_id,"from":sending_user_id,"id":message_id,"status":1,"time":"2017-09-06T09:43:36.528Z","data":{"reason":0,"status":"upload-failed"},"type":"conversation.asset-add"};
+        // @formatter:on
+
+        TestFactory.conversation_repository.fetch_conversation_by_id(conversation_id)
+          .then((fetched_conversation) => {
+            expect(fetched_conversation).toBeDefined();
+            TestFactory.conversation_repository.active_conversation(fetched_conversation);
+            return TestFactory.conversation_repository.on_conversation_event(upload_start);
+          })
+          .then(() => {
+            const number_of_messages = Object.keys(TestFactory.conversation_repository.active_conversation().messages()).length;
+            expect(number_of_messages).toBe(1);
+            return TestFactory.conversation_repository.on_conversation_event(upload_cancel);
+          })
+          .then(() => {
+            const number_of_messages = Object.keys(TestFactory.conversation_repository.active_conversation().messages()).length;
+            expect(number_of_messages).toBe(0);
+            done();
+          })
+          .catch(done.fail);
+      });
+
+      it('shows a failed message on the sender\'s side if the upload fails', (done) => {
+        const conversation_id = z.util.create_random_uuid();
+        const message_id = z.util.create_random_uuid();
+        const sending_user_id = TestFactory.user_repository.self().id;
+
+        // @formatter:off
+        const upload_start = {"conversation":conversation_id,"from":sending_user_id,"id":message_id,"status":1,"time":"2017-09-06T09:43:32.278Z","data":{"content_length":23089240,"content_type":"application/x-msdownload","info":{"name":"AirDroid_Desktop_Client_3.4.2.0.exe","nonce":"79072f78-15ee-4d54-a63c-fd46cd5607ae"}},"type":"conversation.asset-add","category":512,"primary_key":107};
+        const upload_failed = {"conversation":conversation_id,"from":sending_user_id,"id":message_id,"status":1,"time":"2017-09-06T16:14:08.165Z","data":{"reason":1,"status":"upload-failed"},"type":"conversation.asset-add"};
+        // @formatter:on
+
+        TestFactory.conversation_repository.fetch_conversation_by_id(conversation_id)
+          .then((fetched_conversation) => {
+            expect(fetched_conversation).toBeDefined();
+            TestFactory.conversation_repository.active_conversation(fetched_conversation);
+            return TestFactory.conversation_repository.on_conversation_event(upload_start);
+          })
+          .then(() => {
+            const number_of_messages = Object.keys(TestFactory.conversation_repository.active_conversation().messages()).length;
+            expect(number_of_messages).toBe(1);
+            return TestFactory.conversation_repository.on_conversation_event(upload_failed);
+          })
+          .then(() => {
+            const number_of_messages = Object.keys(TestFactory.conversation_repository.active_conversation().messages()).length;
+            expect(number_of_messages).toBe(1);
+            done();
+          })
+          .catch(done.fail);
+      });
     });
 
-    it('should process member-join event when joining a group conversation', function(done) {
-      TestFactory.conversation_repository.on_conversation_event(member_join_event)
-        .then(function() {
-          expect(TestFactory.conversation_repository._on_member_join).toHaveBeenCalled();
-          expect(TestFactory.conversation_repository.update_participating_user_ets).toHaveBeenCalled();
-          done();
-        })
-        .catch(done.fail);
-    });
+    describe('"conversation.member-join"', () => {
+      let member_join_event = null;
 
-    it('should ignore member-join event when joining a 1to1 conversation', function(done) {
-      // conversation has a corresponding pending connection
-      const connection_et_a = new z.entity.Connection();
-      connection_et_a.conversation_id = conversation_et.id;
-      connection_et_a.status(z.user.ConnectionStatus.PENDING);
-      TestFactory.user_repository.connections.push(connection_et_a);
+      beforeEach(function() {
+        spyOn(TestFactory.conversation_repository, '_on_member_join').and.callThrough();
+        spyOn(TestFactory.conversation_repository, 'update_participating_user_ets').and.callThrough();
 
-      TestFactory.conversation_repository.on_conversation_event(member_join_event)
-        .then(function() {
-          expect(TestFactory.conversation_repository._on_member_join).toHaveBeenCalled();
-          expect(TestFactory.conversation_repository.update_participating_user_ets).not.toHaveBeenCalled();
-          done();
-        })
-        .catch(done.fail);
+        member_join_event = {
+          conversation: conversation_et.id,
+          data: {
+            user_ids: [],
+          },
+          from: 'd5a39ffb-6ce3-4cc8-9048-0e15d031b4c5',
+          id: '3.800122000a5dcd58',
+          time: '2015-04-27T11:42:31.475Z',
+          type: 'conversation.member-join',
+        };
+      });
+
+      it('should process member-join event when joining a group conversation', function(done) {
+        TestFactory.conversation_repository.on_conversation_event(member_join_event)
+          .then(function() {
+            expect(TestFactory.conversation_repository._on_member_join).toHaveBeenCalled();
+            expect(TestFactory.conversation_repository.update_participating_user_ets).toHaveBeenCalled();
+            done();
+          })
+          .catch(done.fail);
+      });
+
+      it('should ignore member-join event when joining a 1to1 conversation', function(done) {
+        // conversation has a corresponding pending connection
+        const connection_et_a = new z.entity.Connection();
+        connection_et_a.conversation_id = conversation_et.id;
+        connection_et_a.status(z.user.ConnectionStatus.PENDING);
+        TestFactory.user_repository.connections.push(connection_et_a);
+
+        TestFactory.conversation_repository.on_conversation_event(member_join_event)
+          .then(function() {
+            expect(TestFactory.conversation_repository._on_member_join).toHaveBeenCalled();
+            expect(TestFactory.conversation_repository.update_participating_user_ets).not.toHaveBeenCalled();
+            done();
+          })
+          .catch(done.fail);
+      });
     });
   });
 
