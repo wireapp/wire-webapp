@@ -269,7 +269,7 @@ z.entity.Conversation = class Conversation {
    * Set the timestamp of a given type.
    * @note This will only increment timestamps
    * @param {string} timestamp - Timestamp to be set
-   * @param {z.conversation.ConversationUpdateType} type - Type of timestamp to be updated
+   * @param {z.conversation.TIMESTAMP_TYPE} type - Type of timestamp to be updated
    * @returns {boolean|number} Timestamp value which can be 'false' (boolean) if there is no timestamp
    */
   set_timestamp(timestamp, type) {
@@ -279,19 +279,19 @@ z.entity.Conversation = class Conversation {
     }
 
     switch (type) {
-      case z.conversation.ConversationUpdateType.ARCHIVED_TIMESTAMP:
+      case z.conversation.TIMESTAMP_TYPE.ARCHIVED:
         entity_timestamp = this.archived_timestamp;
         break;
-      case z.conversation.ConversationUpdateType.CLEARED_TIMESTAMP:
+      case z.conversation.TIMESTAMP_TYPE.CLEARED:
         entity_timestamp = this.cleared_timestamp;
         break;
-      case z.conversation.ConversationUpdateType.LAST_EVENT_TIMESTAMP:
+      case z.conversation.TIMESTAMP_TYPE.LAST_EVENT:
         entity_timestamp = this.last_event_timestamp;
         break;
-      case z.conversation.ConversationUpdateType.LAST_READ_TIMESTAMP:
+      case z.conversation.TIMESTAMP_TYPE.LAST_READ:
         entity_timestamp = this.last_read_timestamp;
         break;
-      case z.conversation.ConversationUpdateType.MUTED_TIMESTAMP:
+      case z.conversation.TIMESTAMP_TYPE.MUTED:
         entity_timestamp = this.muted_timestamp;
         break;
       default:
@@ -478,7 +478,7 @@ z.entity.Conversation = class Conversation {
    */
   update_latest_from_message(message_et) {
     if (message_et && message_et.visible() && message_et.should_effect_conversation_timestamp) {
-      this.set_timestamp(message_et.timestamp(), z.conversation.ConversationUpdateType.LAST_EVENT_TIMESTAMP);
+      this.set_timestamp(message_et.timestamp(), z.conversation.TIMESTAMP_TYPE.LAST_EVENT);
     }
   }
 
@@ -493,7 +493,7 @@ z.entity.Conversation = class Conversation {
     const has_timestamp = message_et.timestamp();
 
     if (is_me && has_timestamp && message_et.should_effect_conversation_timestamp) {
-      this.set_timestamp(message_et.timestamp(), z.conversation.ConversationUpdateType.LAST_READ_TIMESTAMP);
+      this.set_timestamp(message_et.timestamp(), z.conversation.TIMESTAMP_TYPE.LAST_READ);
     }
   }
 
