@@ -111,6 +111,10 @@ z.conversation.ConversationMapper = class ConversationMapper {
         conversation_et.set_timestamp(self.last_read_timestamp, z.conversation.TIMESTAMP_TYPE.LAST_READ);
       }
 
+      if (self.last_server_timestamp) {
+        conversation_et.set_timestamp(self.last_read_timestamp, z.conversation.TIMESTAMP_TYPE.LAST_SERVER);
+      }
+
       if (self.muted_timestamp) {
         conversation_et.set_timestamp(self.muted_timestamp, z.conversation.TIMESTAMP_TYPE.MUTED);
         conversation_et.muted_state(self.muted_state);

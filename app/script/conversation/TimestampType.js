@@ -27,5 +27,6 @@ z.conversation.TIMESTAMP_TYPE = {
   CLEARED: 'z.conversation.TIMESTAMP_TYPE.CLEARED',
   LAST_EVENT: 'z.conversation.TIMESTAMP_TYPE.LAST_EVENT',
   LAST_READ: 'z.conversation.TIMESTAMP_TYPE.LAST_READ',
+  LAST_SERVER: 'z.conversation.TIMESTAMP_TYPE.LAST_SERVER',
   MUTED: 'z.conversation.TIMESTAMP_TYPE.MUTED',
 };

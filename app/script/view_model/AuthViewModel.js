@@ -2111,7 +2111,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
   /**
    * Check whether the device has a local history.
    * @private
-   * @returns {boolean} At least one conversation event stored
+   * @returns {Promise<boolean>} Resolves with whether at least one conversation event was found
    */
   _has_local_history() {
     return this.storage_service.get_all(z.storage.StorageService.OBJECT_STORE.EVENTS)

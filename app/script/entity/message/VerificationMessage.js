@@ -26,7 +26,7 @@ z.entity.VerificationMessage = class VerificationMessage extends z.entity.Messag
   constructor() {
     super();
     this.super_type = z.message.SuperType.VERIFICATION;
-    this.should_effect_conversation_timestamp = false;
+    this.affect_conversation_order = false;
     this.verification_message_type = undefined;
 
     this.user_ets = ko.observableArray();
