@@ -711,7 +711,7 @@ describe('Conversation', function() {
       expect(lrt).toBe(0);
       const new_lrt_string = '1480338525243';
       const new_lrt_number = window.parseInt(new_lrt_string, 10);
-      conversation_et.set_timestamp(new_lrt_string, z.conversation.ConversationUpdateType.LAST_READ_TIMESTAMP);
+      conversation_et.set_timestamp(new_lrt_string, z.conversation.TIMESTAMP_TYPE.LAST_READ);
       expect(conversation_et.last_read_timestamp()).toBe(new_lrt_number);
     })
   );
