@@ -2694,9 +2694,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
           }
 
           if (event_data.status === z.assets.AssetTransferState.UPLOAD_FAILED) {
-            if (event_json.from === this.user_repository.self().id) {
+            const from_self = (event_json.from === this.user_repository.self().id);
+            const was_canceled = (event_data.reason === z.assets.AssetUploadFailedReason.CANCELLED);
+
+            if (from_self || was_canceled) {
               return this._delete_message_by_id(conversation_et, event_json.id).then(() => undefined);
             }
+
             return this.conversation_service.update_asset_as_failed_in_db(stored_event.primary_key, event_data.reason);
           }
 
