@@ -148,10 +148,39 @@ describe('ConversationRepository', function() {
 
       it('removes a file upload from the messages list of the sender when the upload gets canceled', (done) => {
         const conversation_id = z.util.create_random_uuid();
+        const sending_user_id = TestFactory.user_repository.self().id;
 
         // @formatter:off
-        const upload_start = {"conversation": conversation_id,"from":TestFactory.user_repository.self().id,"id":"79072f78-15ee-4d54-a63c-fd46cd5607ae","status":1,"time":"2017-09-06T09:43:32.278Z","data":{"content_length":23089240,"content_type":"application/x-msdownload","info":{"name":"AirDroid_Desktop_Client_3.4.2.0.exe","nonce":"79072f78-15ee-4d54-a63c-fd46cd5607ae"}},"type":"conversation.asset-add","category":512,"primary_key":107};
-        const upload_cancel = {"conversation": conversation_id,"from":TestFactory.user_repository.self().id,"id":"79072f78-15ee-4d54-a63c-fd46cd5607ae","status":1,"time":"2017-09-06T09:43:36.528Z","data":{"reason":0,"status":"upload-failed"},"type":"conversation.asset-add"};
+        const upload_start = {"conversation": conversation_id,"from":sending_user_id,"id":"79072f78-15ee-4d54-a63c-fd46cd5607ae","status":1,"time":"2017-09-06T09:43:32.278Z","data":{"content_length":23089240,"content_type":"application/x-msdownload","info":{"name":"AirDroid_Desktop_Client_3.4.2.0.exe","nonce":"79072f78-15ee-4d54-a63c-fd46cd5607ae"}},"type":"conversation.asset-add","category":512,"primary_key":107};
+        const upload_cancel = {"conversation": conversation_id,"from":sending_user_id,"id":"79072f78-15ee-4d54-a63c-fd46cd5607ae","status":1,"time":"2017-09-06T09:43:36.528Z","data":{"reason":0,"status":"upload-failed"},"type":"conversation.asset-add"};
+        // @formatter:on
+
+        TestFactory.conversation_repository.fetch_conversation_by_id(conversation_id)
+          .then((fetched_conversation) => {
+            expect(fetched_conversation).toBeDefined();
+            TestFactory.conversation_repository.active_conversation(fetched_conversation);
+            return TestFactory.conversation_repository.on_conversation_event(upload_start);
+          })
+          .then(() => {
+            const number_of_messages = Object.keys(TestFactory.conversation_repository.active_conversation().messages()).length;
+            expect(number_of_messages).toBe(1);
+            return TestFactory.conversation_repository.on_conversation_event(upload_cancel);
+          })
+          .then(() => {
+            const number_of_messages = Object.keys(TestFactory.conversation_repository.active_conversation().messages()).length;
+            expect(number_of_messages).toBe(0);
+            done();
+          })
+          .catch(done.fail);
+      });
+
+      it('removes a file upload from the messages list of the receiver when the upload gets canceled', (done) => {
+        const conversation_id = z.util.create_random_uuid();
+        const sending_user_id = z.util.create_random_uuid();
+
+        // @formatter:off
+        const upload_start = {"conversation": conversation_id,"from":sending_user_id,"id":"79072f78-15ee-4d54-a63c-fd46cd5607ae","status":1,"time":"2017-09-06T09:43:32.278Z","data":{"content_length":23089240,"content_type":"application/x-msdownload","info":{"name":"AirDroid_Desktop_Client_3.4.2.0.exe","nonce":"79072f78-15ee-4d54-a63c-fd46cd5607ae"}},"type":"conversation.asset-add","category":512,"primary_key":107};
+        const upload_cancel = {"conversation": conversation_id,"from":sending_user_id,"id":"79072f78-15ee-4d54-a63c-fd46cd5607ae","status":1,"time":"2017-09-06T09:43:36.528Z","data":{"reason":0,"status":"upload-failed"},"type":"conversation.asset-add"};
         // @formatter:on
 
         TestFactory.conversation_repository.fetch_conversation_by_id(conversation_id)
