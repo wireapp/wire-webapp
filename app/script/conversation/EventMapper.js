@@ -459,20 +459,14 @@ z.conversation.EventMapper = class EventMapper {
    */
   _map_asset_link_preview(link_preview) {
     if (link_preview) {
-      const link_preview_et = new z.entity.LinkPreview();
-      const {image, permanent_url, summary, title, url, url_offset, meta_data} = link_preview;
-      const {image: article_image, title: article_title, summary: article_summary, permanent_url: article_permanent_url} = link_preview.article || {};
+      const {image, title, url, meta_data} = link_preview;
+      const {image: article_image, title: article_title} = link_preview.article || {};
 
-      link_preview_et.title = title || article_title;
-      link_preview_et.summary = summary || article_summary;
-      link_preview_et.permanent_url = permanent_url || article_permanent_url;
-      link_preview_et.original_url = url;
-      link_preview_et.url_offset = url_offset;
+      const link_preview_et = new z.entity.LinkPreview(title || article_title, url);
       link_preview_et.meta_data_type = meta_data;
       link_preview_et.meta_data = link_preview[meta_data];
 
       const preview_image = image || article_image;
-
       if (preview_image) {
         const {asset_token, asset_id: asset_key} = preview_image.uploaded;
 

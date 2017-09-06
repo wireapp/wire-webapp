@@ -90,7 +90,7 @@ describe('Event Mapper', function() {
       expect(message_et.get_first_asset().text).toBe(event.data.content);
       expect(message_et.get_first_asset().nonce).toBe(event.data.nonce);
       expect(message_et.get_first_asset().previews().length).toBe(1);
-      expect(message_et.get_first_asset().previews()[0].original_url).toBe('test.com');
+      expect(message_et.get_first_asset().previews()[0].url).toBe('test.com');
       expect(message_et).toBeDefined();
     });
 
@@ -116,8 +116,7 @@ describe('Event Mapper', function() {
       expect(message_et.get_first_asset().text).toBe(event.data.content);
       expect(message_et.get_first_asset().nonce).toBe(event.data.nonce);
       expect(message_et.get_first_asset().previews().length).toBe(1);
-      expect(message_et.get_first_asset().previews()[0].original_url).toBe(link_preview.url);
-      expect(message_et.get_first_asset().previews()[0].permanent_url).toBe(link_preview.permanent_url);
+      expect(message_et.get_first_asset().previews()[0].url).toBe(link_preview.url);
       expect(message_et).toBeDefined();
     });
 

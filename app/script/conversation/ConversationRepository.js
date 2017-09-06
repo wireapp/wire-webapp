@@ -2251,19 +2251,25 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.get_message_in_conversation_by_id(conversation_et, message_id)
       .then((message_et) => {
         const asset = message_et.get_first_asset();
-        const obfuscated = new z.entity.Text(message_et.id);
-        obfuscated.previews(asset.previews());
-        if (obfuscated.previews().length === 0) {
-          obfuscated.text = z.util.StringUtil.obfuscate(asset.text);
-        }
+        const obfuscated_asset = new z.entity.Text(message_et.id);
+        const obfuscated_previews = asset.previews()
+          .map((link_preview) => {
+            link_preview.obfuscate();
+            const article = new z.proto.Article(link_preview.url, link_preview.title); // deprecated format
+            return new z.proto.LinkPreview(link_preview.url, 0, article, link_preview.url, link_preview.title).encode64();
+          });
 
-        message_et.assets([obfuscated]);
+        obfuscated_asset.text = z.util.StringUtil.obfuscate(asset.text);
+        obfuscated_asset.previews(asset.previews());
+
+        message_et.assets([obfuscated_asset]);
         message_et.ephemeral_expires(true);
 
         return this.conversation_service.update_message_in_db(message_et, {
           data: {
-            content: obfuscated.text,
-            nonce: obfuscated.id,
+            content: obfuscated_asset.text,
+            nonce: obfuscated_asset.id,
+            previews: obfuscated_previews,
           },
           ephemeral_expires: true,
         });
