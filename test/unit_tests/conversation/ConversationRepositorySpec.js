@@ -126,46 +126,48 @@ describe('ConversationRepository', function() {
     });
   });
 
-  describe('on_conversation_event', function() {
-    let member_join_event = null;
+  describe('"on_conversation_event"', function() {
+    describe('"conversation.member-join"', () => {
+      let member_join_event = null;
 
-    beforeEach(function() {
-      spyOn(TestFactory.conversation_repository, '_on_member_join').and.callThrough();
+      beforeEach(function() {
+        spyOn(TestFactory.conversation_repository, '_on_member_join').and.callThrough();
 
-      member_join_event = {
-        conversation: conversation_et.id,
-        data: {
-          user_ids: [],
-        },
-        from: 'd5a39ffb-6ce3-4cc8-9048-0e15d031b4c5',
-        id: '3.800122000a5dcd58',
-        time: '2015-04-27T11:42:31.475Z',
-        type: 'conversation.member-join',
-      };
-    });
+        member_join_event = {
+          conversation: conversation_et.id,
+          data: {
+            user_ids: [],
+          },
+          from: 'd5a39ffb-6ce3-4cc8-9048-0e15d031b4c5',
+          id: '3.800122000a5dcd58',
+          time: '2015-04-27T11:42:31.475Z',
+          type: 'conversation.member-join',
+        };
+      });
 
-    it('should process member-join event when joining a group conversation', function(done) {
-      TestFactory.conversation_repository.on_conversation_event(member_join_event)
-        .then(function() {
-          expect(TestFactory.conversation_repository._on_member_join).toHaveBeenCalled();
-          done();
-        })
-        .catch(done.fail);
-    });
+      it('should process member-join event when joining a group conversation', function(done) {
+        TestFactory.conversation_repository.on_conversation_event(member_join_event)
+          .then(function() {
+            expect(TestFactory.conversation_repository._on_member_join).toHaveBeenCalled();
+            done();
+          })
+          .catch(done.fail);
+      });
 
-    it('should ignore member-join event when joining a 1to1 conversation', function(done) {
-      // conversation has a corresponding pending connection
-      const connection_et_a = new z.entity.Connection();
-      connection_et_a.conversation_id = conversation_et.id;
-      connection_et_a.status(z.user.ConnectionStatus.PENDING);
-      TestFactory.user_repository.connections.push(connection_et_a);
+      it('should ignore member-join event when joining a 1to1 conversation', function(done) {
+        // conversation has a corresponding pending connection
+        const connection_et_a = new z.entity.Connection();
+        connection_et_a.conversation_id = conversation_et.id;
+        connection_et_a.status(z.user.ConnectionStatus.PENDING);
+        TestFactory.user_repository.connections.push(connection_et_a);
 
-      TestFactory.conversation_repository.on_conversation_event(member_join_event)
-        .then(function() {
-          expect(TestFactory.conversation_repository._on_member_join).not.toHaveBeenCalled();
-          done();
-        })
-        .catch(done.fail);
+        TestFactory.conversation_repository.on_conversation_event(member_join_event)
+          .then(function() {
+            expect(TestFactory.conversation_repository._on_member_join).not.toHaveBeenCalled();
+            done();
+          })
+          .catch(done.fail);
+      });
     });
   });
 
