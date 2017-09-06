@@ -589,17 +589,17 @@ z.event.EventRepository = class EventRepository {
           const is_stored_message_add = stored_type === z.event.Client.CONVERSATION.MESSAGE_ADD;
 
           if (from_different_user) {
-            this.logger.warn(`Ignored '${mapped_type}' from user '${mapped_from}' with ID '${event_id}' previously used by '${stored_from}'`, event);
+            this.logger.warn(`Ignored '${mapped_type}' in conversation '${conversation_id}' from user '${mapped_from}' with ID '${event_id}' previously used by user '${stored_from}'`, event);
             throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, 'Event validation failed: ID reused from other user');
           }
 
           if (!is_mapped_message_add || !is_stored_message_add || !mapped_data.previews.length) {
-            this.logger.warn(`Ignored '${mapped_type}' from user '${mapped_from}' with previously used ID '${event_id}'`, event);
+            this.logger.warn(`Ignored '${mapped_type}' in conversation '${conversation_id}' from user '${mapped_from}' with previously used ID '${event_id}'`, event);
             throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, 'Event validation failed: ID reused from same user');
           }
 
           if (stored_data.previews.length) {
-            this.logger.warn(`Ignored '${mapped_type}'from user '${mapped_from}' with ID '${event_id} that previously contained link preview`, event);
+            this.logger.warn(`Ignored '${mapped_type}' in conversation '${conversation_id}' from user '${mapped_from}' with ID '${event_id} that previously contained link preview`, event);
             throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, 'Event validation failed: ID of link preview reused');
           }
 
