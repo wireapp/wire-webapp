@@ -164,7 +164,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   cleanup_conversations() {
     this.conversations().forEach((conversation_et) => {
       if (conversation_et.is_group() && conversation_et.is_cleared() && conversation_et.removed_from_conversation()) {
-        this.conversation_service.delete_conversation_from_in_db(conversation_et.id);
+        this.conversation_service.delete_conversation_from_db(conversation_et.id);
         this.delete_conversation(conversation_et.id);
       }
     });
@@ -1196,7 +1196,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this._update_cleared_timestamp(conversation_et);
     this._delete_messages(conversation_et);
     if (conversation_et.removed_from_conversation()) {
-      this.conversation_service.delete_conversation_from_in_db(conversation_et.id);
+      this.conversation_service.delete_conversation_from_db(conversation_et.id);
       this.delete_conversation(conversation_et.id);
     }
   }
