@@ -300,7 +300,7 @@ z.conversation.ConversationService = class ConversationService {
    * @param {string} conversation_id - ID of conversation to be deleted
    * @returns {Promise} Resolves when the entity was deleted
    */
-  delete_conversation_from_in_db(conversation_id) {
+  delete_conversation_from_db(conversation_id) {
     return this.storage_service.delete(z.storage.StorageService.OBJECT_STORE.CONVERSATIONS, conversation_id)
       .then((primary_key) => {
         this.logger.log(this.logger.levels.INFO, `State of conversation '${primary_key}' was deleted`);

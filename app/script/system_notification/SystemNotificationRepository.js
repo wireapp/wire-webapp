@@ -280,6 +280,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
 
   /**
    * Creates the notification body for people being removed from or leaving a group conversation.
+   * @note Only show a notification if self user was removed
    *
    * @private
    * @param {z.entity.MemberMessage} message_et - Member message entity

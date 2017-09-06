@@ -21,17 +21,17 @@
 
 'use strict';
 
-describe('z.announce.AnnounceRepository', function() {
+describe('z.announce.AnnounceRepository', () => {
   let server = undefined;
   const test_factory = new TestFactory();
 
-  beforeAll(function(done) {
+  beforeAll((done) => {
     test_factory.exposeAnnounceActors()
       .then(done)
       .catch(done.fail);
   });
 
-  beforeEach(function() {
+  beforeEach(() => {
     server = sinon.fakeServer.create();
     server.autoRespond = true;
     const response = {
@@ -79,11 +79,11 @@ describe('z.announce.AnnounceRepository', function() {
     ]);
   });
 
-  afterEach(function() {
+  afterEach(() => {
     server.restore();
   });
 
-  it('can fetch an announcement', function(done) {
+  it('can fetch announcements', (done) => {
     TestFactory.announce_repository.check_announcements()
       .then(done)
       .catch(done.fail);

@@ -25,39 +25,38 @@ window.z.announce = z.announce || {};
 z.announce.AnnounceService = class AnnounceService {
   static get CONFIG() {
     return {
-      URL: 'api/v1/announce/',
+      URL: {
+        ANNOUNCE: 'api/v1/announce/',
+        VERSION: 'version/',
+      },
     };
   }
 
   constructor() {
     this.logger = new z.util.Logger('z.announce.AnnounceService', z.config.LOGGER.OPTIONS);
-    this.url = `${z.util.Environment.backend.website_url()}${AnnounceService.CONFIG.URL}?order=created&active=true`;
+    this.announce_url = `${z.util.Environment.backend.website_url()}${AnnounceService.CONFIG.URL.ANNOUNCE}?order=created&active=true`;
     if (z.util.Environment.frontend.is_production()) {
-      this.url += '&production=true';
+      this.announce_url += '&production=true';
     }
   }
 
   get_announcements() {
-    return new Promise((resolve, reject) => {
-      $.get(this.url)
-        .done((data) => {
-          resolve(data['result']);
-        })
-        .fail((jqXHR, textStatus, errorThrown) => {
-          reject(new Error(errorThrown));
-        });
-    });
+    return this._fetch_data(this.announce_url)
+      .then(({result}) => result);
   }
 
   get_version() {
-    return new Promise((resolve, reject) => {
-      $.get('version/')
-        .done((data) => {
-          resolve(data['version']);
-        })
-        .fail((jqXHR, textStatus, errorThrown) => {
-          reject(new Error(errorThrown));
-        });
-    });
+    return this._fetch_data(AnnounceService.CONFIG.URL.VERSION)
+      .then(({version}) => version);
+  }
+
+  _fetch_data(url) {
+    return fetch(url)
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw new Error(`Failed to fetch '${url}': ${response.statusText}`);
+      });
   }
 };

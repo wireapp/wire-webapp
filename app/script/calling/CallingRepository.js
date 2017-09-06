@@ -153,17 +153,26 @@ z.calling.CallingRepository = class CallingRepository {
 
     if (is_call) {
       const is_supported_version = event_content.version === z.calling.entities.CallMessage.CONFIG.VERSION;
-
       if (!is_supported_version) {
         throw new z.calling.CallError(z.calling.CallError.TYPE.UNSUPPORTED_VERSION);
       }
-      const call_message_et = z.calling.CallMessageMapper.map_event(event);
 
+      const call_message_et = z.calling.CallMessageMapper.map_event(event);
       this._log_message(false, call_message_et, event_date);
-      if (z.calling.CallingRepository.supports_calling) {
-        return this._on_call_event_in_supported_browsers(call_message_et, source);
-      }
-      this._on_call_event_in_unsupported_browsers(call_message_et, source);
+
+      this._validate_message_type(call_message_et)
+        .then((conversation_et) => {
+          const injected_event = source === z.event.EventRepository.SOURCE.INJECTED;
+          if (!injected_event) {
+            conversation_et.update_server_timestamp(call_message_et.time);
+          }
+        })
+        .then(() => {
+          if (z.calling.CallingRepository.supports_calling) {
+            return this._on_call_event_in_supported_browsers(call_message_et, source);
+          }
+          this._on_call_event_in_unsupported_browsers(call_message_et, source);
+        });
     }
   }
 
@@ -176,45 +185,42 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {undefined} No return value
    */
   _on_call_event_in_supported_browsers(call_message_et, source) {
-    const {type: message_type} = call_message_et;
+    const message_type = call_message_et.type;
 
-    this._validate_message_type(call_message_et)
-      .then(() => {
-        switch (message_type) {
-          case z.calling.enum.CALL_MESSAGE_TYPE.CANCEL:
-            this._on_cancel(call_message_et, source);
-            break;
-          case z.calling.enum.CALL_MESSAGE_TYPE.GROUP_CHECK:
-            this._on_group_check(call_message_et, source);
-            break;
-          case z.calling.enum.CALL_MESSAGE_TYPE.GROUP_LEAVE:
-            this._on_group_leave(call_message_et);
-            break;
-          case z.calling.enum.CALL_MESSAGE_TYPE.GROUP_SETUP:
-            this._on_group_setup(call_message_et);
-            break;
-          case z.calling.enum.CALL_MESSAGE_TYPE.GROUP_START:
-            this._on_group_start(call_message_et, source);
-            break;
-          case z.calling.enum.CALL_MESSAGE_TYPE.HANGUP:
-            this._on_hangup(call_message_et);
-            break;
-          case z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC:
-            this._on_prop_sync(call_message_et);
-            break;
-          case z.calling.enum.CALL_MESSAGE_TYPE.REJECT:
-            this._on_reject(call_message_et);
-            break;
-          case z.calling.enum.CALL_MESSAGE_TYPE.SETUP:
-            this._on_setup(call_message_et, source);
-            break;
-          case z.calling.enum.CALL_MESSAGE_TYPE.UPDATE:
-            this._on_update(call_message_et);
-            break;
-          default:
-            this.logger.warn(`Call event of unknown type '${message_type}' was ignored`, call_message_et);
-        }
-      });
+    switch (message_type) {
+      case z.calling.enum.CALL_MESSAGE_TYPE.CANCEL:
+        this._on_cancel(call_message_et, source);
+        break;
+      case z.calling.enum.CALL_MESSAGE_TYPE.GROUP_CHECK:
+        this._on_group_check(call_message_et, source);
+        break;
+      case z.calling.enum.CALL_MESSAGE_TYPE.GROUP_LEAVE:
+        this._on_group_leave(call_message_et);
+        break;
+      case z.calling.enum.CALL_MESSAGE_TYPE.GROUP_SETUP:
+        this._on_group_setup(call_message_et);
+        break;
+      case z.calling.enum.CALL_MESSAGE_TYPE.GROUP_START:
+        this._on_group_start(call_message_et, source);
+        break;
+      case z.calling.enum.CALL_MESSAGE_TYPE.HANGUP:
+        this._on_hangup(call_message_et);
+        break;
+      case z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC:
+        this._on_prop_sync(call_message_et);
+        break;
+      case z.calling.enum.CALL_MESSAGE_TYPE.REJECT:
+        this._on_reject(call_message_et);
+        break;
+      case z.calling.enum.CALL_MESSAGE_TYPE.SETUP:
+        this._on_setup(call_message_et, source);
+        break;
+      case z.calling.enum.CALL_MESSAGE_TYPE.UPDATE:
+        this._on_update(call_message_et);
+        break;
+      default:
+        this.logger.warn(`Call event of unknown type '${message_type}' was ignored`, call_message_et);
+    }
   }
 
   /**
@@ -603,6 +609,8 @@ z.calling.CallingRepository = class CallingRepository {
         } else {
           throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_CONVERSATION_TYPE);
         }
+
+        return conversation_et;
       });
   }
 

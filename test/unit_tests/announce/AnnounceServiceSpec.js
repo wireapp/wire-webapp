@@ -21,21 +21,40 @@
 
 'use strict';
 
-describe('z.announce.AnnounceService', function() {
-  let server = undefined;
+describe('z.announce.AnnounceService', () => {
+  let mock_response = undefined;
   const test_factory = new window.TestFactory();
 
-  beforeAll(function(done) {
+  beforeAll((done) => {
     test_factory.exposeAnnounceActors()
       .then(done)
       .catch(done.fail);
+
+    mock_response = (body, status_code = 200, status_text) => {
+      const response = new window.Response(JSON.stringify(body), {
+        headers: {
+          'Content-type': 'application/json',
+        },
+        status: status_code,
+        statusText: status_text,
+      });
+
+      return Promise.resolve(response);
+    };
+
+    beforeEach(() => {
+      sinon.stub(window, 'fetch');
+    });
+
+    afterEach(() => {
+      window.fetch.restore();
+    });
+
   });
 
-  describe('Successful calls', function() {
-    beforeEach(function() {
-      server = sinon.fakeServer.create();
-      server.autoRespond = true;
-      const response = {
+  describe('get_announcements', () => {
+    it('should fetch announcements', (done) => {
+      const response_body = {
         'count': 2,
         'now': '2016-05-26T10:15:43.507250',
         'result': [
@@ -72,72 +91,37 @@ describe('z.announce.AnnounceService', function() {
         ],
         'status': 'success',
       };
+      window.fetch.returns(mock_response(response_body, 200));
 
-      server.respondWith('GET', 'https://staging-website.zinfra.io/api/v1/announce/?order=created&active=true', [
-        200,
-        {'Content-Type': 'application/json'},
-        JSON.stringify(response),
-      ]);
-    });
-
-    afterEach(function() {
-      server.restore();
-    });
-
-    it('can fetch an announcement', function(done) {
       TestFactory.announce_service.get_announcements()
-        .then(function(result) {
+        .then((result) => {
+          console.log(JSON.stringify(result));
           expect(result.length).toBe(2);
           done();
         })
         .catch(done.fail);
     });
-  });
 
-  describe('Failed calls', function() {
-    beforeEach(function() {
-      server = sinon.fakeServer.create();
-      server.autoRespond = true;
-      server.respondWith('GET', 'https://staging-website.zinfra.io/api/v1/announce/?order=created&active=true', [404, {}, '']);
-    });
+    it('handles a server error', (done) => {
+      window.fetch.returns(mock_response({}, 404, 'Not Found'));
 
-    afterEach(function() {
-      server.restore();
-    });
-
-    it('cannot fetch an announcement', function(done) {
       TestFactory.announce_service.get_announcements()
         .then(done.fail)
-        .catch(function(error) {
-          expect(error.message).toBe('Not Found');
+        .catch((error) => {
+          expect(error.message).toBe('Failed to fetch \'https://staging-website.zinfra.io/api/v1/announce/?order=created&active=true\': Not Found');
           done();
         });
     });
   });
 
-  describe('get_version', function() {
-    const response = {
-      version: '2017-03-14-15-05-prod',
-    };
+  describe('get_version', () => {
+    it('fetches the webapp release version', (done) => {
+      const response_body = {version: '2017-03-14-15-05-prod'};
+      window.fetch.returns(mock_response(response_body, 200));
 
-    beforeEach(function() {
-      server = sinon.fakeServer.create();
-      server.autoRespond = true;
-      server.respondWith('GET', 'version/', [
-        200,
-        {'Content-Type': 'application/json'},
-        JSON.stringify(response),
-      ]);
-    });
-
-    afterEach(function() {
-      server.restore();
-    });
-
-    it('fetches the webapp release version', function(done) {
       TestFactory.announce_service.get_version()
-        .then(function(version) {
-          expect(version).toBe(response.version);
+        .then((version) => {
+          expect(version).toBe(response_body.version);
           done();
         })
         .catch(done.fail);

@@ -73,7 +73,7 @@ z.entity.Message = class Message {
     this.version = 1;
 
     this.timestamp = ko.observable(Date.now());
-    this.should_effect_conversation_timestamp = true;
+    this.affect_conversation_order = true;
 
     // z.message.MessageCategory
     this.category = undefined;
