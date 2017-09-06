@@ -129,11 +129,13 @@ describe('ConversationRepository', function() {
 
   describe('"on_conversation_event"', () => {
     describe('"conversation.asset-add"', () => {
-      fit('', (done) => {
+      it('', (done) => {
         // @formatter:off
         const upload_start = {"conversation": conversation_et.id,"from":"8a88604a-430a-42ed-966e-19a35c3d292a","id":"79072f78-15ee-4d54-a63c-fd46cd5607ae","status":1,"time":"2017-09-06T09:43:32.278Z","data":{"content_length":23089240,"content_type":"application/x-msdownload","info":{"name":"AirDroid_Desktop_Client_3.4.2.0.exe","nonce":"79072f78-15ee-4d54-a63c-fd46cd5607ae"}},"type":"conversation.asset-add","category":512,"primary_key":107};
         const upload_cancel = {"conversation": conversation_et.id,"from":"8a88604a-430a-42ed-966e-19a35c3d292a","id":"79072f78-15ee-4d54-a63c-fd46cd5607ae","status":1,"time":"2017-09-06T09:43:36.528Z","data":{"reason":0,"status":"upload-failed"},"type":"conversation.asset-add"};
         // @formatter:on
+
+        spyOn(TestFactory.conversation_repository, '_on_asset_add').and.callThrough();
 
         const matchUsers = new RegExp(`${test_factory.settings.connection.rest_url}/users\\?ids=([a-z0-9-,]+)`);
         server.respondWith('GET', matchUsers, (xhr, ids) => {
