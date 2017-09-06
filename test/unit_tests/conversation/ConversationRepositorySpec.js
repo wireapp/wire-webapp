@@ -62,6 +62,7 @@ describe('ConversationRepository', function() {
 
   beforeEach(function(done) {
     server = sinon.fakeServer.create();
+    server.autoRespond = true;
     sinon.spy(jQuery, 'ajax');
 
     test_factory.exposeConversationActors()
@@ -126,7 +127,36 @@ describe('ConversationRepository', function() {
     });
   });
 
-  describe('"on_conversation_event"', function() {
+  describe('"on_conversation_event"', () => {
+    describe('"conversation.asset-add"', () => {
+      fit('', (done) => {
+        // @formatter:off
+        const upload_start = {"conversation": conversation_et.id,"from":"8a88604a-430a-42ed-966e-19a35c3d292a","id":"79072f78-15ee-4d54-a63c-fd46cd5607ae","status":1,"time":"2017-09-06T09:43:32.278Z","data":{"content_length":23089240,"content_type":"application/x-msdownload","info":{"name":"AirDroid_Desktop_Client_3.4.2.0.exe","nonce":"79072f78-15ee-4d54-a63c-fd46cd5607ae"}},"type":"conversation.asset-add","category":512,"primary_key":107};
+        const upload_cancel = {"conversation": conversation_et.id,"from":"8a88604a-430a-42ed-966e-19a35c3d292a","id":"79072f78-15ee-4d54-a63c-fd46cd5607ae","status":1,"time":"2017-09-06T09:43:36.528Z","data":{"reason":0,"status":"upload-failed"},"type":"conversation.asset-add"};
+        // @formatter:on
+
+        const matchUsers = new RegExp(`${test_factory.settings.connection.rest_url}/users\\?ids=([a-z0-9-,]+)`);
+        server.respondWith('GET', matchUsers, (xhr, ids) => {
+          const users = [];
+          for (const userId of ids.split(',')) {
+            users.push({"handle":`handle_${userId}`,"locale":"en","accent_id":0,"picture":[{"content_length":19190,"data":null,"content_type":"image/jpeg","id":"ab7eb2f7-7c5b-4e55-ab16-dfc206891e67","info":{"height":280,"tag":"smallProfile","original_width":620,"width":280,"correlation_id":"7dfa4adf-454e-4372-a06a-7403baa36e5c","original_height":960,"nonce":"7dfa4adf-454e-4372-a06a-7403baa36e5c","public":true}},{"content_length":82690,"data":null,"content_type":"image/jpeg","id":"87c95372-fce7-4215-861a-a3e0fe262e48","info":{"height":960,"tag":"medium","original_width":620,"width":620,"correlation_id":"7dfa4adf-454e-4372-a06a-7403baa36e5c","original_height":960,"nonce":"7dfa4adf-454e-4372-a06a-7403baa36e5c","public":true}}],"name":`name_${userId}`,"id":userId,"assets":[]});
+          }
+          xhr.respond(200, {'Content-Type': 'application/json'}, JSON.stringify(users));
+        });
+
+        TestFactory.conversation_repository.on_conversation_event(upload_start)
+          .then(() => {
+            expect(TestFactory.conversation_repository._on_asset_add).toHaveBeenCalled();
+            return TestFactory.conversation_repository.on_conversation_event(upload_cancel);
+          })
+          .then(() => {
+            expect(TestFactory.conversation_repository._on_asset_add).toHaveBeenCalled();
+            done();
+          })
+          .catch(done.fail);
+      });
+    });
+
     describe('"conversation.member-join"', () => {
       let member_join_event = null;
 
