@@ -482,10 +482,10 @@ z.event.EventRepository = class EventRepository {
    * @returns {undefined} No return value
    */
   _distribute_event(event, source) {
-    const {conversation: conversation_id, type} = event;
+    const {conversation: conversation_id, from: user_id, type} = event;
 
-    if (conversation_id) {
-      this.logger.info(`Distributed '${type}' event for conversation '${conversation_id}'`, event);
+    if (conversation_id && user_id) {
+      this.logger.info(`Distributed '${type}' event for conversation '${conversation_id}' from user '${user_id}'`, event);
     } else {
       this.logger.info(`Distributed '${type}' event`, event);
     }
