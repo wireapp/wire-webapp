@@ -239,6 +239,7 @@ describe('ConversationRepository', function() {
 
       beforeEach(function() {
         spyOn(TestFactory.conversation_repository, '_on_member_join').and.callThrough();
+        spyOn(TestFactory.conversation_repository, 'update_participating_user_ets').and.callThrough();
 
         member_join_event = {
           conversation: conversation_et.id,
@@ -256,6 +257,7 @@ describe('ConversationRepository', function() {
         TestFactory.conversation_repository.on_conversation_event(member_join_event)
           .then(function() {
             expect(TestFactory.conversation_repository._on_member_join).toHaveBeenCalled();
+            expect(TestFactory.conversation_repository.update_participating_user_ets).toHaveBeenCalled();
             done();
           })
           .catch(done.fail);
@@ -270,7 +272,8 @@ describe('ConversationRepository', function() {
 
         TestFactory.conversation_repository.on_conversation_event(member_join_event)
           .then(function() {
-            expect(TestFactory.conversation_repository._on_member_join).not.toHaveBeenCalled();
+            expect(TestFactory.conversation_repository._on_member_join).toHaveBeenCalled();
+            expect(TestFactory.conversation_repository.update_participating_user_ets).not.toHaveBeenCalled();
             done();
           })
           .catch(done.fail);
