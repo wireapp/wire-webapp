@@ -775,18 +775,23 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise} Resolves when user was updated
    */
   update_user_by_id(user_id) {
-    return this.find_user_by_id(user_id)
+    const get_current_user = () => this.find_user_by_id(user_id)
       .catch((error) => {
         if (error.type !== z.user.UserError.TYPE.USER_NOT_FOUND) {
           throw error;
         }
         return new z.entity.User();
-      })
-      .then((old_user_et) => {
-        return this.user_service.get_user_by_id(user_id)
-          .then((new_user_data) => {
-            return this.user_mapper.update_user_from_object(old_user_et, new_user_data);
-          });
+      });
+
+    return Promise.all([
+      get_current_user(user_id),
+      this.user_service.get_user_by_id(user_id),
+    ])
+      .then(([current_user_et, updated_user_data]) => this.user_mapper.update_user_from_object(current_user_et, updated_user_data))
+      .then((updated_user_et) => {
+        if (this.is_team()) {
+          this.map_guest_status([updated_user_et]);
+        }
       });
   }
 

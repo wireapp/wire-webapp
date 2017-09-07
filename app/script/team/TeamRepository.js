@@ -54,6 +54,7 @@ z.team.TeamRepository = class TeamRepository {
 
     this.team_members.subscribe(() => this.user_repository.map_guest_status());
 
+    this.user_repository.is_team = this.is_team;
     this.user_repository.team_members = this.team_members;
 
     amplify.subscribe(z.event.WebApp.TEAM.EVENT_FROM_BACKEND, this.on_team_event.bind(this));
