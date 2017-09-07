@@ -933,17 +933,15 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   _update_cleared_timestamp(conversation_et) {
-    const cleared_timestamp = conversation_et.last_server_timestamp();
+    const timestamp = conversation_et.get_last_timestamp();
 
-    if (conversation_et.set_timestamp(cleared_timestamp, z.conversation.TIMESTAMP_TYPE.CLEARED)) {
-      const message_content = new z.proto.Cleared(conversation_et.id, cleared_timestamp);
+    if (timestamp && conversation_et.set_timestamp(timestamp, z.conversation.TIMESTAMP_TYPE.CLEARED)) {
+      const message_content = new z.proto.Cleared(conversation_et.id, timestamp);
       const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.CLEARED, message_content);
 
       this.send_generic_message_to_conversation(this.self_conversation().id, generic_message)
-        .then(() => {
-          this.logger.info(`Cleared conversation '${conversation_et.id}' on '${new Date(cleared_timestamp).toISOString()}'`);
-        });
+        .then(() => this.logger.info(`Cleared conversation '${conversation_et.id}' on '${new Date(timestamp).toISOString()}'`));
     }
   }
 
@@ -1153,7 +1151,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     const payload = {
       otr_archived: new_archive_state,
-      otr_archived_ref: new Date(conversation_et.last_server_timestamp()).toISOString(),
+      otr_archived_ref: new Date(conversation_et.get_last_timestamp()).toISOString(),
     };
 
     this.logger.info(`Conversation '${conversation_et.id}' archive state change triggered by '${trigger}'`);
@@ -1209,7 +1207,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   _update_last_read_timestamp(conversation_et) {
-    const timestamp = conversation_et.last_server_timestamp();
+    const timestamp = conversation_et.get_last_timestamp();
 
     if (timestamp && conversation_et.set_timestamp(timestamp, z.conversation.TIMESTAMP_TYPE.LAST_READ)) {
       const message_content = new z.proto.LastRead(conversation_et.id, conversation_et.last_read_timestamp());
