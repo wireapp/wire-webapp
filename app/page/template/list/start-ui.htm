@@ -52,7 +52,7 @@
               <!-- ko ifnot: is_team() -->
                 <span class="start-ui-list-header" data-bind="l10n_text: z.string.search_connections"></span>
               <!-- /ko  -->
-              <user-list class="search-list-theme-black" params="user: contacts, mode: z.components.UserListMode.INFO, selected: selected_people"></user-list>
+              <user-list class="search-list-theme-black" params="user: contacts, selected: selected_people"></user-list>
             </div>
           <!-- /ko  -->
         <!-- /ko  -->
@@ -66,7 +66,7 @@
               <!-- ko ifnot: is_team() -->
                 <span class="start-ui-list-header start-ui-list-header-connections" data-bind="l10n_text: z.string.search_connections"></span>
               <!-- /ko  -->
-              <user-list class="search-list-theme-black" params="user: search_results.contacts, selected: selected_people, mode: z.components.UserListMode.INFO"></user-list>
+              <user-list class="search-list-theme-black" params="user: search_results.contacts, selected: selected_people"></user-list>
             </div>
             <div class="start-ui-groups" data-bind="visible: search_results.groups().length > 0">
               <!-- ko if: is_team() -->
@@ -79,7 +79,7 @@
             </div>
             <div class="others" data-bind="visible: search_results.others().length > 0">
               <span class="start-ui-list-header" data-bind="l10n_text: z.string.search_others"></span>
-              <user-list class="search-list-theme-black" params="user: search_results.others, click: click_on_other, mode: z.components.UserListMode.INFO"></user-list>
+              <user-list class="search-list-theme-black" params="user: search_results.others, click: click_on_other, mode: z.components.UserListMode.OTHERS"></user-list>
             </div>
           </div>
         <!-- /ko  -->
