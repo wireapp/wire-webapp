@@ -401,10 +401,14 @@ z.entity.Conversation = class Conversation {
   }
 
   /**
-   * Removes all messages from the conversation.
+   * Removes messages from the conversation.
+   * @param {number} [timestamp] - Optional timestamp which messages should be removed
    * @returns {undefined} No return value
    */
-  remove_messages() {
+  remove_messages(timestamp) {
+    if (timestamp) {
+      return this.messages_unordered.remove((message_et) => timestamp >= message_et.timestamp());
+    }
     this.messages_unordered.removeAll();
   }
 

@@ -909,16 +909,18 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {Conversation} conversation_et - Conversation to clear
    * @param {Conversation} [next_conversation_et] - Optional next conversation to be shown
    * @param {boolean} [leave=false] - Should we leave the conversation before clearing the content?
-   * @returns {Promise} No return value
+   * @returns {undefined} No return value
    */
   clear_conversation(conversation_et, next_conversation_et, leave = false) {
     const promise = leave ? this.leave_conversation(conversation_et, next_conversation_et, false) : Promise.resolve();
-    return promise
+    promise
       .then(() => {
         if (leave) {
           conversation_et.status(z.conversation.ConversationStatus.PAST_MEMBER);
         }
-        this._delete_conversation(conversation_et);
+        this._update_cleared_timestamp(conversation_et);
+        this._clear_conversation(conversation_et);
+
         if (next_conversation_et) {
           amplify.publish(z.event.WebApp.CONVERSATION.SHOW, next_conversation_et);
         }
@@ -1122,11 +1124,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Archive a conversation.
    *
    * @param {Conversation} conversation_et - Conversation to rename
-   * @param {Conversation} [next_conversation_et] - Next conversation to potentially switch to
    * @returns {Promise} Resolves when the conversation was archived
    */
-  archive_conversation(conversation_et, next_conversation_et) {
-    return this._toggle_archive_conversation(conversation_et, true, 'archiving', next_conversation_et);
+  archive_conversation(conversation_et) {
+    return this._toggle_archive_conversation(conversation_et, true, 'archiving');
   }
 
   /**
@@ -1140,7 +1141,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this._toggle_archive_conversation(conversation_et, false, trigger);
   }
 
-  _toggle_archive_conversation(conversation_et, new_archive_state, trigger, next_conversation_et) {
+  _toggle_archive_conversation(conversation_et, new_archive_state, trigger) {
     if (!conversation_et) {
       return Promise.reject(new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND));
     }
@@ -1163,7 +1164,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
       })
       .then(() => {
-        this._on_member_update(conversation_et, {data: payload}, next_conversation_et);
+        this._on_member_update(conversation_et, {data: payload});
         this.logger.info(`Update conversation '${conversation_et.id}' archive state to '${new_archive_state}' on '${payload.otr_archived_ref}'`);
       });
   }
@@ -1184,15 +1185,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
-   * Deletes a conversation from the local storage.
+   * Clears conversation conversation content from view and the database.
    *
    * @private
    * @param {Conversation} conversation_et - Conversation entity to delete
+   * @param {number} [timestamp] - Optional timestamps for which messages to remove
    * @returns {undefined} No return value
    */
-  _delete_conversation(conversation_et) {
-    this._update_cleared_timestamp(conversation_et);
-    this._delete_messages(conversation_et);
+  _clear_conversation(conversation_et, timestamp) {
+    this._delete_messages(conversation_et, timestamp);
+
     if (conversation_et.removed_from_conversation()) {
       this.conversation_service.delete_conversation_from_db(conversation_et.id);
       this.delete_conversation(conversation_et.id);
@@ -2619,7 +2621,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {Conversation|false} [next_conversation_et] - Optional next conversation in list
    * @returns {Promise} Resolves when the event was handled
    */
-  _on_member_update(conversation_et, event_json, next_conversation_et) {
+  _on_member_update(conversation_et, event_json) {
+    const is_active_conversation = this.is_active_conversation(conversation_et);
+    const next_conversation_et = is_active_conversation ? this.get_next_conversation(conversation_et) : undefined;
     const previously_archived = conversation_et.is_archived();
 
     this.conversation_mapper.update_self_status(conversation_et, event_json.data);
@@ -2628,7 +2632,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
       return this._fetch_users_and_events(conversation_et);
     }
 
-    if (conversation_et.is_archived() && next_conversation_et) {
+    if (conversation_et.is_cleared()) {
+      this._clear_conversation(conversation_et, conversation_et.cleared_timestamp());
+    }
+
+    if (next_conversation_et && (conversation_et.is_archived() || conversation_et.is_cleared())) {
       amplify.publish(z.event.WebApp.CONVERSATION.SHOW, next_conversation_et);
     }
   }
@@ -3171,11 +3179,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @private
    * @param {Conversation} conversation_et - Conversation that contains the message
+   * @param {number} [timestamp] - Optional timestamps for which messages to remove
    * @returns {undefined} No return value
    */
-  _delete_messages(conversation_et) {
-    conversation_et.remove_messages();
-    this.conversation_service.delete_messages_from_db(conversation_et.id);
+  _delete_messages(conversation_et, timestamp) {
+    conversation_et.remove_messages(timestamp);
+    this.conversation_service.delete_messages_from_db(conversation_et.id, new Date(timestamp).toISOString());
   }
 
   /**
