@@ -420,8 +420,13 @@ z.event.EventRepository = class EventRepository {
    * @returns {undefined} No return value
    */
   _update_baseline_clock(backend_time) {
-    this.clock_drift = new Date() - new Date(backend_time);
-    this.logger.info(`Clock drift set to '${this.clock_drift}' ms`);
+    const updated_clock_drift = new Date() - new Date(backend_time);
+
+    if (_.isNumber(updated_clock_drift)) {
+      this.clock_drift = updated_clock_drift;
+      amplify.publish(z.event.WebApp.EVENT.UPDATE_CLOCK_DRIFT, this.clock_drift);
+      this.logger.info(`Clock drift set to '${this.clock_drift}' ms`);
+    }
   }
 
   /**

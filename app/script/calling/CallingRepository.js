@@ -76,6 +76,8 @@ z.calling.CallingRepository = class CallingRepository {
       }
     });
 
+    this.clock_drift = 0;
+
     this.calling_config = undefined;
     this.calling_config_timeout = undefined;
 
@@ -131,6 +133,7 @@ z.calling.CallingRepository = class CallingRepository {
     amplify.subscribe(z.event.WebApp.CALL.STATE.PARTICIPANT_LEFT, this.participant_left.bind(this));
     amplify.subscribe(z.event.WebApp.CALL.STATE.TOGGLE, this.toggle_state.bind(this));
     amplify.subscribe(z.event.WebApp.DEBUG.UPDATE_LAST_CALL_STATUS, this.store_flow_status.bind(this));
+    amplify.subscribe(z.event.WebApp.EVENT.UPDATE_CLOCK_DRIFT, this.update_clock_drift.bind(this));
     amplify.subscribe(z.event.WebApp.LIFECYCLE.LOADED, this.get_config);
     amplify.subscribe(z.util.Logger.prototype.LOG_ON_DEBUG, this.set_debug_state.bind(this));
   }
@@ -162,10 +165,8 @@ z.calling.CallingRepository = class CallingRepository {
 
       this._validate_message_type(call_message_et)
         .then((conversation_et) => {
-          const injected_event = source === z.event.EventRepository.SOURCE.INJECTED;
-          if (!injected_event) {
-            conversation_et.update_server_timestamp(call_message_et.time);
-          }
+          const is_backend_timestamp = source !== z.event.EventRepository.SOURCE.INJECTED;
+          conversation_et.update_timestamp_server(call_message_et.time, is_backend_timestamp);
         })
         .then(() => {
           if (z.calling.CallingRepository.supports_calling) {
@@ -1133,13 +1134,21 @@ z.calling.CallingRepository = class CallingRepository {
    * Inject a call deactivate event.
    * @param {CallMessage} call_message_et - Call message to create event from
    * @param {z.event.EventRepository.SOURCE} source - Source of event
-   * @param {z.entity.User} [creating_user_et] - User that created call
    * @param {z.calling.enum.TERMINATION_REASON} [reason] - Reason for call to end
    * @returns {undefined} No return value
    */
-  inject_deactivate_event(call_message_et, source, creating_user_et, reason) {
-    const deactivate_event = z.conversation.EventBuilder.build_voice_channel_deactivate(call_message_et, creating_user_et, reason);
+  inject_deactivate_event(call_message_et, source, reason) {
+    const deactivate_event = z.conversation.EventBuilder.build_voice_channel_deactivate(call_message_et, reason, this.clock_drift);
     amplify.publish(z.event.WebApp.EVENT.INJECT, deactivate_event, source);
+  }
+
+  /**
+   * Update clock drift.
+   * @param {number} clock_drift - Approximate time different to backend in milliseconds
+   * @returns {undefined} No return value
+   */
+  update_clock_drift(clock_drift) {
+    this.clock_drift = clock_drift;
   }
 
 

@@ -121,6 +121,7 @@ z.event.WebApp = {
   EVENT: {
     INJECT: 'wire.webapp.event.inject',
     NOTIFICATION_HANDLING_STATE: 'wire.webapp.event.notification_handling',
+    UPDATE_CLOCK_DRIFT: 'wire.webapp.event.update_clock_drift',
   },
   EXTENSIONS: {
     GIPHY: {

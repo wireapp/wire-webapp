@@ -24,7 +24,7 @@ window.z.conversation = z.conversation || {};
 
 z.conversation.EventBuilder = (function() {
 
-  const _build_all_verified = (conversation_et) => {
+  const _build_all_verified = (conversation_et, clock_drift) => {
     const {self, id} = conversation_et;
 
     return {
@@ -34,8 +34,21 @@ z.conversation.EventBuilder = (function() {
       },
       from: self.id,
       id: z.util.create_random_uuid(),
-      time: new Date().toISOString(),
+      time: conversation_et.get_next_iso_date(clock_drift),
       type: z.event.Client.CONVERSATION.VERIFICATION,
+    };
+  };
+
+  const _build_asset_add = (conversation_et, data, clock_drift) => {
+    const {self, id} = conversation_et;
+
+    return {
+      conversation: id,
+      data: data,
+      from: self.id,
+      status: z.message.StatusType.SENDING,
+      time: conversation_et.get_next_iso_date(clock_drift),
+      type: z.event.Client.CONVERSATION.ASSET_ADD,
     };
   };
 
@@ -49,7 +62,7 @@ z.conversation.EventBuilder = (function() {
     };
   };
 
-  const _build_degraded = (conversation_et, user_ids, type) => {
+  const _build_degraded = (conversation_et, user_ids, type, clock_drift) => {
     const {self, id} = conversation_et;
 
     return {
@@ -60,35 +73,64 @@ z.conversation.EventBuilder = (function() {
       },
       from: self.id,
       id: z.util.create_random_uuid(),
-      time: new Date().toISOString(),
+      time: conversation_et.get_next_iso_date(clock_drift),
       type: z.event.Client.CONVERSATION.VERIFICATION,
     };
   };
 
-  const _build_delete = (conversation_id, message_id, time, message_to_delete_et) => {
+  const _build_delete = (conversation_id, message_id, time, deleted_message_et) => {
     return {
       conversation: conversation_id,
       data: {
         deleted_time: time,
       },
-      from: message_to_delete_et.from,
+      from: deleted_message_et.from,
       id: message_id,
-      time: new Date(message_to_delete_et.timestamp()).toISOString(),
+      time: new Date(deleted_message_et.timestamp()).toISOString(),
       type: z.event.Client.CONVERSATION.DELETE_EVERYWHERE,
     };
   };
 
-  const _build_missed = (conversation_et, self_user_et) => {
+  const _build_incoming_message_too_big = (event, message_error, error_code) => {
+    const {conversation: conversation_id, data: event_data, from, time} = event;
+
     return {
-      conversation: conversation_et.id,
-      from: self_user_et.id,
+      conversation: conversation_id,
+      error: `${message_error.message} (${event_data.sender})`,
+      error_code: `${error_code} (${event_data.sender})`,
+      from: from,
       id: z.util.create_random_uuid(),
-      time: new Date().toISOString(),
+      time: time,
+      type: z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG,
+    };
+  };
+
+  const _build_message_add = (conversation_et, clock_drift) => {
+    const {self, id} = conversation_et;
+
+    return {
+      conversation: id,
+      data: {},
+      from: self.id,
+      status: z.message.StatusType.SENDING,
+      time: conversation_et.get_next_iso_date(clock_drift),
+      type: z.event.Client.CONVERSATION.MESSAGE_ADD,
+    };
+  };
+
+  const _build_missed = (conversation_et, clock_drift) => {
+    const {id, self} = conversation_et;
+
+    return {
+      conversation: id,
+      from: self.id,
+      id: z.util.create_random_uuid(),
+      time: conversation_et.get_next_iso_date(clock_drift),
       type: z.event.Client.CONVERSATION.MISSED_MESSAGES,
     };
   };
 
-  const _build_team_member_leave = (conversation_et, user_id) => {
+  const _build_team_member_leave = (conversation_et, user_id, clock_drift) => {
     return {
       conversation: conversation_et.id,
       data: {
@@ -96,7 +138,7 @@ z.conversation.EventBuilder = (function() {
       },
       from: user_id,
       id: z.util.create_random_uuid(),
-      time: new Date().toISOString(),
+      time: conversation_et.get_next_iso_date(clock_drift),
       type: z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE,
     };
   };
@@ -115,20 +157,6 @@ z.conversation.EventBuilder = (function() {
     };
   };
 
-  const _build_incoming_message_too_big = (event, message_error, error_code) => {
-    const {conversation: conversation_id, data: event_data, from, time} = event;
-
-    return {
-      conversation: conversation_id,
-      error: `${message_error.message} (${event_data.sender})`,
-      error_code: `${error_code} (${event_data.sender})`,
-      from: from,
-      id: z.util.create_random_uuid(),
-      time: time,
-      type: z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG,
-    };
-  };
-
   const _build_voice_channel_activate = (call_message_et) => {
     const {conversation_id, user_id, time} = call_message_et;
 
@@ -142,15 +170,15 @@ z.conversation.EventBuilder = (function() {
     };
   };
 
-  const _build_voice_channel_deactivate = (call_message_et, creating_user_et, reason = z.calling.enum.TERMINATION_REASON.COMPLETED) => {
-    const {conversation_id, user_id, time = new Date().toISOString()} = call_message_et;
+  const _build_voice_channel_deactivate = (call_message_et, reason = z.calling.enum.TERMINATION_REASON.COMPLETED, clock_drift = 0) => {
+    const {conversation_id, user_id, time = new Date(Date.now() - clock_drift).toISOString()} = call_message_et;
 
     return {
       conversation: conversation_id,
       data: {
         reason: reason,
       },
-      from: creating_user_et ? creating_user_et.id : user_id,
+      from: user_id,
       id: z.util.create_random_uuid(),
       protocol_version: z.calling.CallingRepository.CONFIG.PROTOCOL_VERSION,
       time: time,
@@ -160,10 +188,12 @@ z.conversation.EventBuilder = (function() {
 
   return {
     build_all_verified: _build_all_verified,
+    build_asset_add: _build_asset_add,
     build_calling: _build_calling,
     build_degraded: _build_degraded,
     build_delete: _build_delete,
     build_incoming_message_too_big: _build_incoming_message_too_big,
+    build_message_add: _build_message_add,
     build_missed: _build_missed,
     build_team_member_leave: _build_team_member_leave,
     build_unable_to_decrypt: _build_unable_to_decrypt,
