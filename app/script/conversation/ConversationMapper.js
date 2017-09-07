@@ -228,6 +228,10 @@ z.conversation.ConversationMapper = class ConversationMapper {
         local_conversation.last_event_timestamp = index + 1;
       }
 
+      if (!local_conversation.last_server_timestamp) {
+        local_conversation.last_server_timestamp = local_conversation.last_event_timestamp;
+      }
+
       // Some archived timestamp were not properly stored in the database.
       // To fix this we check if the remote one is newer and update our local timestamp.
       const {archived_state: local_archived_state, archived_timestamp: local_archived_timestamp} = local_conversation;
