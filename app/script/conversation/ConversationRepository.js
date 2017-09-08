@@ -3333,17 +3333,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   _track_completed_media_action(conversation_et, generic_message, call_message_et) {
-    let ephemeral_time, is_ephemeral, message, message_content_type;
+    let ephemeral_time, message, message_content_type;
 
-    if (generic_message.content === z.cryptography.GENERIC_MESSAGE_TYPE.EPHEMERAL) {
+    const is_ephemeral = generic_message.content === z.cryptography.GENERIC_MESSAGE_TYPE.EPHEMERAL;
+    if (is_ephemeral) {
       message = generic_message.ephemeral;
       message_content_type = generic_message.ephemeral.content;
-      is_ephemeral = true;
       ephemeral_time = generic_message.ephemeral.expire_after_millis / 1000;
     } else {
       message = generic_message;
       message_content_type = generic_message.content;
-      is_ephemeral = false;
     }
 
     let action_type;
