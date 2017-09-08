@@ -2368,7 +2368,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           case z.event.Client.CONVERSATION.CONFIRMATION:
             return this._on_confirmation(conversation_et, event_json);
           case z.event.Client.CONVERSATION.MESSAGE_ADD:
-            return this._on_message_add(conversation_et, event_json);
+            return this._on_message_add(conversation_et, event_json, source);
           case z.event.Client.CONVERSATION.MESSAGE_DELETE:
             return this._on_message_deleted(conversation_et, event_json);
           case z.event.Client.CONVERSATION.MESSAGE_HIDDEN:
@@ -2646,9 +2646,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @private
    * @param {Conversation} conversation_et - Conversation to add the event to
    * @param {Object} event_json - JSON data of 'conversation.message-add'
+   * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {Promise} Resolves when the event was handled
    */
-  _on_message_add(conversation_et, event_json) {
+  _on_message_add(conversation_et, event_json, source) {
     return Promise.resolve()
       .then(() => {
         const event_data = event_json.data;
@@ -2658,7 +2659,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
 
         if (event_data.previews.length) {
-          return this._update_link_preview(conversation_et, event_json);
+          return this._update_link_preview(conversation_et, event_json, source);
         }
 
         return event_json;
@@ -3298,15 +3299,22 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @private
    * @param {Conversation} conversation_et - Conversation of updated message
    * @param {JSON} event_json - Link preview message event
+   * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {Promise} Resolves with the updated event_json
    */
-  _update_link_preview(conversation_et, event_json) {
+  _update_link_preview(conversation_et, event_json, source) {
     return this.conversation_service.load_event_from_db(conversation_et.id, event_json.id)
       .then((stored_message) => {
+        const is_injected_event = source === z.event.EventRepository.SOURCE.INJECTED;
         if (stored_message) {
           this._delete_message(conversation_et, stored_message);
+        } else if (is_injected_event) {
+          this._delete_message(conversation_et, event_json);
         }
-        return event_json;
+
+        if (stored_message || !is_injected_event) {
+          return event_json;
+        }
       });
   }
 
