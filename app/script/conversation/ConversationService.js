@@ -336,12 +336,19 @@ z.conversation.ConversationService = class ConversationService {
   /**
    * Delete all message of a conversation.
    * @param {string} conversation_id - Delete messages for this conversation
+   * @param {string} [iso_date] - Date in ISO string format as upper bound which messages should be removed
    * @returns {Promise} Resolves when the message was deleted
    */
-  delete_messages_from_db(conversation_id) {
+  delete_messages_from_db(conversation_id, iso_date) {
     return this.storage_service.db[z.storage.StorageService.OBJECT_STORE.EVENTS]
       .where('conversation')
       .equals(conversation_id)
+      .filter((record) => {
+        if (iso_date) {
+          return iso_date >= record.time;
+        }
+        return true;
+      })
       .delete();
   }
 

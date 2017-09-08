@@ -218,7 +218,8 @@ z.calling.entities.Call = class Call {
       }
 
       this.termination_reason = termination_reason;
-      this.calling_repository.inject_deactivate_event(call_message_et, z.event.EventRepository.SOURCE.WEB_SOCKET, this.creating_user, reason);
+      call_message_et.user_id = this.creating_user.id;
+      this.calling_repository.inject_deactivate_event(call_message_et, z.event.EventRepository.SOURCE.WEB_SOCKET, reason);
 
       return this.calling_repository.delete_call(this.id);
     }

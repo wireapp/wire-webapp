@@ -311,9 +311,9 @@ z.entity.Conversation = class Conversation {
 
   /**
    * Increment only on timestamp update
-   * @param {z.entity.Conversation} current_timestamp - Current timestamp
-   * @param {string} updated_timestamp - Timestamp from update
-   * @returns {string|boolean} Updated timestamp or false if not increased
+   * @param {number} current_timestamp - Current timestamp
+   * @param {number} updated_timestamp - Timestamp from update
+   * @returns {number|boolean} Updated timestamp or false if not increased
    */
   _increment_time_only(current_timestamp, updated_timestamp) {
     if (updated_timestamp > current_timestamp) {
@@ -330,7 +330,7 @@ z.entity.Conversation = class Conversation {
   add_message(message_et) {
     message_et = this._check_for_duplicate(message_et);
     if (message_et) {
-      this._update_timestamps(message_et);
+      this.update_timestamps(message_et);
       this.messages_unordered.push(message_et);
       amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, message_et);
     }
@@ -351,7 +351,7 @@ z.entity.Conversation = class Conversation {
     for (let counter = message_ets.length - 1; counter >= 0; counter--) {
       const message_et = message_ets[counter];
       if (message_et.user() && message_et.user().is_me) {
-        this._update_timestamps(message_et);
+        this.update_timestamps(message_et);
         break;
       }
     }
@@ -361,6 +361,12 @@ z.entity.Conversation = class Conversation {
 
   get_last_timestamp() {
     return this.last_server_timestamp() || Date.now();
+  }
+
+  get_next_iso_date(clock_drift) {
+    clock_drift = _.isNumber(clock_drift) ? clock_drift : 0;
+    const timestamp = Math.max(this.last_server_timestamp() + 1, Date.now() - clock_drift);
+    return new Date(timestamp).toISOString();
   }
 
   /**
@@ -382,29 +388,18 @@ z.entity.Conversation = class Conversation {
    * @returns {undefined} No return value
    */
   remove_message_by_id(message_id) {
-    const messages = this.messages_unordered();
-    for (let index = messages.length - 1; index >= 0; index--) {
-      const message_et = messages[index];
-      if (message_et.id === message_id) {
-        this.messages_unordered.remove(message_et);
-      }
+    this.messages_unordered.remove((message_et) => message_id && message_id === message_et.id);
+  }
+
+  /**
+   * Removes messages from the conversation.
+   * @param {number} [timestamp] - Optional timestamp which messages should be removed
+   * @returns {undefined} No return value
+   */
+  remove_messages(timestamp) {
+    if (timestamp && _.isNumber(timestamp)) {
+      return this.messages_unordered.remove((message_et) => timestamp >= message_et.timestamp());
     }
-  }
-
-  /**
-   * Removes a single message from the conversation.
-   * @param {z.entity.Message} message_et - Message entity to be removed from the conversation
-   * @returns {undefined} No return value
-   */
-  remove_message(message_et) {
-    this.messages_unordered.remove(message_et);
-  }
-
-  /**
-   * Removes all messages from the conversation.
-   * @returns {undefined} No return value
-   */
-  remove_messages() {
     this.messages_unordered.removeAll();
   }
 
@@ -478,11 +473,12 @@ z.entity.Conversation = class Conversation {
     return message_et;
   }
 
-  update_server_timestamp(time) {
-    const timestamp = new Date(time).getTime();
-
-    if (!_.isNaN(timestamp)) {
-      this.set_timestamp(timestamp, z.conversation.TIMESTAMP_TYPE.LAST_SERVER);
+  update_timestamp_server(time, is_backend_timestamp = false) {
+    if (is_backend_timestamp) {
+      const timestamp = new Date(time).getTime();
+      if (!_.isNaN(timestamp)) {
+        this.set_timestamp(timestamp, z.conversation.TIMESTAMP_TYPE.LAST_SERVER);
+      }
     }
   }
 
@@ -493,13 +489,19 @@ z.entity.Conversation = class Conversation {
    * @param {z.entity.Message} message_et - Message to be added to conversation
    * @returns {undefined} No return value
    */
-  _update_timestamps(message_et) {
-    if (message_et && message_et.timestamp() && message_et.visible() && message_et.affect_conversation_order) {
-      this.set_timestamp(message_et.timestamp(), z.conversation.TIMESTAMP_TYPE.LAST_EVENT);
+  update_timestamps(message_et) {
+    if (message_et) {
+      const timestamp = message_et.timestamp();
 
-      const from_self = message_et.user() && message_et.user().is_me;
-      if (from_self) {
-        this.set_timestamp(message_et.timestamp(), z.conversation.TIMESTAMP_TYPE.LAST_READ);
+      if (timestamp <= this.last_server_timestamp()) {
+        if (message_et.timestamp_affects_order()) {
+          this.set_timestamp(timestamp, z.conversation.TIMESTAMP_TYPE.LAST_EVENT);
+
+          const from_self = message_et.user() && message_et.user().is_me;
+          if (from_self) {
+            this.set_timestamp(timestamp, z.conversation.TIMESTAMP_TYPE.LAST_READ);
+          }
+        }
       }
     }
   }

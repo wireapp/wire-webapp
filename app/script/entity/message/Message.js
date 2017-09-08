@@ -72,8 +72,9 @@ z.entity.Message = class Message {
     this.visible = ko.observable(true);
     this.version = 1;
 
+    this.affect_order = ko.observable(true);
     this.timestamp = ko.observable(Date.now());
-    this.affect_conversation_order = true;
+    this.timestamp_affects_order = ko.pureComputed(() => this.visible() && this.affect_order());
 
     // z.message.MessageCategory
     this.category = undefined;
