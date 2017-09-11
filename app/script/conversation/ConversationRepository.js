@@ -1530,8 +1530,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
       })
       .then((message_et) => {
         if (message_et) {
-          const first_asset = message_et.get_first_asset();
-          if (first_asset.text === message) {
+          const asset_et = message_et.get_first_asset();
+          if (asset_et.text === message) {
             this.logger.debug(`Sending link preview for message '${message_id}' in conversation '${conversation_et.id}'`);
             return this._send_and_inject_generic_message(conversation_et, generic_message);
           }
@@ -2800,7 +2800,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   _on_message_hidden(event_json) {
     const {data: event_data, from} = event_json;
-    if (from !== this.user_repository.self().id) {
+
+    const is_from_self = from === this.user_repository.self().id;
+    if (!is_from_self) {
       return Promise.reject(new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_USER));
     }
 
