@@ -2503,9 +2503,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when the event was handled
    */
   _on_confirmation(conversation_et, event_json) {
-    return this.get_message_in_conversation_by_id(conversation_et, event_json.data.message_id)
+    const event_data = event_json.data;
+
+    return this.get_message_in_conversation_by_id(conversation_et, event_data.message_id)
       .then((message_et) => {
-        const was_updated = message_et.update_status(event_json.data.status);
+        const was_updated = message_et.update_status(event_data.status);
 
         if (was_updated) {
           return this.conversation_service.update_message_in_db(message_et, {status: message_et.status()});
@@ -2739,23 +2741,27 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when the event was handled
    */
   _on_message_deleted(conversation_et, event_json) {
-    return this.get_message_in_conversation_by_id(conversation_et, event_json.data.message_id)
+    const {data: event_data, from, id: event_id, time} = event_json;
+
+    return this.get_message_in_conversation_by_id(conversation_et, event_data.message_id)
       .then((message_to_delete_et) => {
         if (message_to_delete_et.ephemeral_expires()) {
           return;
         }
 
-        if (event_json.from !== message_to_delete_et.from) {
+        const is_same_sender = from === message_to_delete_et.from;
+        if (!is_same_sender) {
           throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_USER);
         }
 
-        if (event_json.from !== this.user_repository.self().id) {
-          return this._add_delete_message(conversation_et.id, event_json.id, event_json.time, message_to_delete_et);
+        const is_from_self = from === this.user_repository.self().id;
+        if (!is_from_self) {
+          return this._add_delete_message(conversation_et.id, event_id, time, message_to_delete_et);
         }
       })
       .then(() => {
-        amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, event_json.data.message_id);
-        return this._delete_message_by_id(conversation_et, event_json.data.message_id);
+        amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, event_data.message_id);
+        return this._delete_message_by_id(conversation_et, event_data.message_id);
       })
       .catch((error) => {
         if (error.type !== z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
