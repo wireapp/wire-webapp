@@ -1500,10 +1500,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {string} message - Plain text message that possibly contains link
    * @param {Conversation} conversation_et - Conversation that should receive the message
-   * @param {z.protobuf.GenericMessage} generic_message - GenericMessage of containing text or edited message
+   * @param {z.proto.GenericMessage} generic_message - GenericMessage of containing text or edited message
    * @returns {Promise} Resolves after sending the message
    */
   send_link_preview(message, conversation_et, generic_message) {
+    const message_id = generic_message.message_id;
+
     return this.link_repository.get_link_preview_from_string(message)
       .then((link_preview) => {
         if (link_preview) {
@@ -1519,10 +1521,28 @@ z.conversation.ConversationRepository = class ConversationRepository {
               break;
             default:
               break;
+
           }
 
-          return this._send_and_inject_generic_message(conversation_et, generic_message);
+          return this.get_message_in_conversation_by_id(conversation_et, message_id);
         }
+        this.logger.debug(`No link in or preview for message '${message_id}' in conversation '${conversation_et.id}' found`);
+      })
+      .then((message_et) => {
+        if (message_et) {
+          const first_asset = message_et.get_first_asset();
+          if (first_asset.text === message) {
+            this.logger.debug(`Sending link preview for message '${message_id}' in conversation '${conversation_et.id}'`);
+            return this._send_and_inject_generic_message(conversation_et, generic_message);
+          }
+          this.logger.debug(`Skipped sending link preview for changed message '${message_id}' in conversation '${conversation_et.id}'`);
+        }
+      })
+      .catch((error) => {
+        if (error.type !== z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
+          throw error;
+        }
+        this.logger.debug(`Skipped sending link preview for changed message '${message_id}' in conversation '${conversation_et.id}'`);
       });
   }
 
@@ -1847,7 +1867,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Send encrypted external message
    *
    * @param {string} conversation_id - Conversation ID
-   * @param {z.protobuf.GenericMessage} generic_message - Generic message to be sent as external message
+   * @param {z.proto.GenericMessage} generic_message - Generic message to be sent as external message
    * @param {Object} recipients - Optional object containing recipient users and their clients
    * @param {Array<string>|boolean} precondition_option - Optional level that backend checks for missing clients
    * @param {boolean} [native_push=true] - Optional if message should enforce native push
@@ -1879,7 +1899,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @private
    * @param {string} conversation_id - Conversation ID
-   * @param {z.protobuf.GenericMessage} generic_message - Protobuf message to be encrypted and send
+   * @param {z.proto.GenericMessage} generic_message - Protobuf message to be encrypted and send
    * @param {Object} recipients - Optional object containing recipient users and their clients
    * @param {Array<string>|boolean} precondition_option - Optional level that backend checks for missing clients
    * @param {boolean} [native_push=true] - Optional if message should enforce native push
@@ -1915,7 +1935,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *   'false' - all clients, 'Array<String>' - only clients of listed users, 'true' - force sending
    *
    * @param {string} conversation_id - Conversation ID
-   * @param {z.protobuf.GenericMessage} generic_message - Protobuf message to be encrypted and send
+   * @param {z.proto.GenericMessage} generic_message - Protobuf message to be encrypted and send
    * @param {Object} payload - Payload
    * @param {Array<string>|boolean} precondition_option - Level that backend checks for missing clients
    * @returns {Promise} Promise that resolves after sending the encrypted message
@@ -2007,7 +2027,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @private
    * @param {string} conversation_id - Conversation ID
-   * @param {z.protobuf.GenericMessage} generic_message - Generic message that will be send
+   * @param {z.proto.GenericMessage} generic_message - Generic message that will be send
    * @returns {boolean} Is payload likely to be too big so that we switch to type external?
    */
   _should_send_as_external(conversation_id, generic_message) {
@@ -2503,9 +2523,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when the event was handled
    */
   _on_confirmation(conversation_et, event_json) {
-    return this.get_message_in_conversation_by_id(conversation_et, event_json.data.message_id)
+    const event_data = event_json.data;
+
+    return this.get_message_in_conversation_by_id(conversation_et, event_data.message_id)
       .then((message_et) => {
-        const was_updated = message_et.update_status(event_json.data.status);
+        const was_updated = message_et.update_status(event_data.status);
 
         if (was_updated) {
           return this.conversation_service.update_message_in_db(message_et, {status: message_et.status()});
@@ -2739,23 +2761,27 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when the event was handled
    */
   _on_message_deleted(conversation_et, event_json) {
-    return this.get_message_in_conversation_by_id(conversation_et, event_json.data.message_id)
+    const {data: event_data, from, id: event_id, time} = event_json;
+
+    return this.get_message_in_conversation_by_id(conversation_et, event_data.message_id)
       .then((message_to_delete_et) => {
         if (message_to_delete_et.ephemeral_expires()) {
           return;
         }
 
-        if (event_json.from !== message_to_delete_et.from) {
+        const is_same_sender = from === message_to_delete_et.from;
+        if (!is_same_sender) {
           throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_USER);
         }
 
-        if (event_json.from !== this.user_repository.self().id) {
-          return this._add_delete_message(conversation_et.id, event_json.id, event_json.time, message_to_delete_et);
+        const is_from_self = from === this.user_repository.self().id;
+        if (!is_from_self) {
+          return this._add_delete_message(conversation_et.id, event_id, time, message_to_delete_et);
         }
       })
       .then(() => {
-        amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, event_json.data.message_id);
-        return this._delete_message_by_id(conversation_et, event_json.data.message_id);
+        amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, event_data.message_id);
+        return this._delete_message_by_id(conversation_et, event_data.message_id);
       })
       .catch((error) => {
         if (error.type !== z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
@@ -3320,7 +3346,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @private
    * @param {Conversation} conversation_et - Conversation entity
-   * @param {z.protobuf.GenericMessage} generic_message - Protobuf message
+   * @param {z.proto.GenericMessage} generic_message - Protobuf message
    * @param {CallMessage} call_message_et - Optional call message
    * @returns {undefined} No return value
    */
