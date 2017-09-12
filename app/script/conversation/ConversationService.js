@@ -300,7 +300,7 @@ z.conversation.ConversationService = class ConversationService {
    * @param {string} conversation_id - ID of conversation to be deleted
    * @returns {Promise} Resolves when the entity was deleted
    */
-  delete_conversation_from_in_db(conversation_id) {
+  delete_conversation_from_db(conversation_id) {
     return this.storage_service.delete(z.storage.StorageService.OBJECT_STORE.CONVERSATIONS, conversation_id)
       .then((primary_key) => {
         this.logger.log(this.logger.levels.INFO, `State of conversation '${primary_key}' was deleted`);
@@ -336,12 +336,19 @@ z.conversation.ConversationService = class ConversationService {
   /**
    * Delete all message of a conversation.
    * @param {string} conversation_id - Delete messages for this conversation
+   * @param {string} [iso_date] - Date in ISO string format as upper bound which messages should be removed
    * @returns {Promise} Resolves when the message was deleted
    */
-  delete_messages_from_db(conversation_id) {
+  delete_messages_from_db(conversation_id, iso_date) {
     return this.storage_service.db[z.storage.StorageService.OBJECT_STORE.EVENTS]
       .where('conversation')
       .equals(conversation_id)
+      .filter((record) => {
+        if (iso_date) {
+          return iso_date >= record.time;
+        }
+        return true;
+      })
       .delete();
   }
 
@@ -569,31 +576,6 @@ z.conversation.ConversationService = class ConversationService {
   }
 
   /**
-   * Update asset with preview in database.
-   *
-   * @param {string} primary_key - Primary key used to find an event in the database
-   * @param {Object} asset_data - Updated asset data
-   * @returns {Promise} Resolves when the message was updated in database
-   */
-  update_asset_preview_in_db(primary_key, asset_data) {
-    return this.storage_service.load(z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key)
-      .then((record) => {
-        if (record) {
-          record.data.preview_id = asset_data.id;
-          record.data.preview_key = asset_data.key;
-          record.data.preview_otr_key = asset_data.otr_key;
-          record.data.preview_sha256 = asset_data.sha256;
-          record.data.preview_token = asset_data.token;
-
-          return this.storage_service.update(z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key, record)
-            .then(() => this.logger.info('Updated asset message_et (preview)', primary_key));
-        }
-
-        this.logger.warn('Did not find message to update asset (preview)', primary_key);
-      });
-  }
-
-  /**
    * Update asset as failed in database.
    *
    * @param {string} primary_key - Primary key used to find an event in the database
@@ -608,7 +590,10 @@ z.conversation.ConversationService = class ConversationService {
           record.data.status = z.assets.AssetTransferState.UPLOAD_FAILED;
 
           return this.storage_service.update(z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key, record)
-            .then(() => this.logger.info('Updated asset message_et (failed)', primary_key));
+            .then(() => {
+              this.logger.info('Updated asset message_et (failed)', primary_key);
+              return record;
+            });
         }
 
         this.logger.warn('Did not find message to update asset (failed)', primary_key);

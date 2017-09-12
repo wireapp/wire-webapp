@@ -49,6 +49,7 @@ z.string.auth_account_terms_of_use = 'Terms of Use';
 z.string.auth_account_terms_of_use_detail = 'I accept';
 
 // Authentication: BLOCKED section
+z.string.auth_blocked_cookies = 'Enable cookies to log in to Wire.';
 z.string.auth_blocked_database = 'Wire needs access to local storage to display your messages. Local storage is not available in private mode.';
 z.string.auth_blocked_tabs = 'Wire is already open in another tab.';
 
@@ -117,6 +118,7 @@ z.string.auth_error_phone_number_budget = 'You logged in too often. Try again la
 z.string.auth_error_phone_number_forbidden = 'Sorry. This phone number is forbidden.';
 z.string.auth_error_phone_number_invalid = 'Invalid Phone Number';
 z.string.auth_error_phone_number_unknown = 'Unknown Phone Number';
+z.string.auth_error_suspended = 'This account is no longer authorized to log in.';
 z.string.auth_error_sign_in = 'Please verify your details and try again.';
 
 // Call stuff

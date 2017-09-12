@@ -1322,21 +1322,22 @@ z.calling.entities.Flow = class Flow {
    * @returns {undefined} No return value
     */
   reset_flow() {
-    this.clear_timeouts();
-    this.telemetry.disconnected();
-
-    this.logger.debug(`Resetting flow with user '${this.remote_user.id}'`);
-    this.remote_client_id = undefined;
-
     if (this.media_stream()) {
       this._remove_media_stream(this.media_stream());
     }
 
-    this._close_data_channel();
-    this._close_peer_connection();
-    this._reset_signaling_states();
-    this._reset_sdp();
-    this.pc_initialized(false);
+    if (this.pc_initialized()) {
+      this.logger.debug(`Resetting flow with user '${this.remote_user.id}'`);
+      this.remote_client_id = undefined;
+      this.telemetry.disconnected();
+
+      this.clear_timeouts();
+      this._close_data_channel();
+      this._close_peer_connection();
+      this._reset_signaling_states();
+      this._reset_sdp();
+      this.pc_initialized(false);
+    }
   }
 
   /**

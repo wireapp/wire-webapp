@@ -249,8 +249,7 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
 
   click_on_archive_action(conversation_et = this.conversation_repository.active_conversation()) {
     if (conversation_et) {
-      const next_conversation_et = this._get_next_conversation(conversation_et) || false;
-      this.conversation_repository.archive_conversation(conversation_et, next_conversation_et);
+      this.conversation_repository.archive_conversation(conversation_et);
     }
   }
 

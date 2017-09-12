@@ -34,6 +34,7 @@ z.string.hu.alert_gif_too_large = 'Az Animáció mérete túl nagy.\nA maximáli
 z.string.hu.auth_account_country_code = 'Országhívó-kód';
 z.string.hu.auth_account_create = 'Létrehozás';
 z.string.hu.auth_account_create_account = 'Fiók létrehozása';
+z.string.hu.auth_account_deletion = 'Ki lettél jelentkeztetve, mert a felhasználói fiókodat törölték.';
 z.string.hu.auth_account_expiration = 'A munkamenet lejárt, ezért ki lettél jelentkeztetve. Kérjük, jelentkezz be újra.';
 z.string.hu.auth_account_get_wire = 'Egyszerű, privát és biztonságos beszélgetések, hívások, képmegosztás, zene, videók, GIF és még sok más.';
 z.string.hu.auth_account_password_forgot = 'Elfelejtett jelszó';
@@ -44,6 +45,7 @@ z.string.hu.auth_account_sign_in_phone = 'Telefon';
 z.string.hu.auth_account_terms_of_use = 'Felhasználási feltételek';
 z.string.hu.auth_account_terms_of_use_detail = 'Elfogadom';
 
+z.string.hu.auth_blocked_cookies = 'A bejelentkezéshez engedélyezni kell a böngésző-sütiket.';
 z.string.hu.auth_blocked_database = 'Az üzenetek megjelenítéséhez a Wire-nek el kell érnie a helyi tárhelyet. A böngésző privát módú használatakor a helyi tárhely nem áll rendelkezésre.';
 z.string.hu.auth_blocked_tabs = 'A Wire már nyitva van egy másik böngészőlapon.';
 
@@ -115,6 +117,7 @@ z.string.hu.call_decline = 'Elutasítás';
 z.string.hu.call_accept = 'Elfogadás';
 z.string.hu.call_join = 'Csatlakozás';
 z.string.hu.call_choose_shared_screen = 'Válaszd ki a megosztandó képernyőt';
+z.string.hu.call_participants = '{{number}} partner a vonalban';
 
 z.string.hu.modal_button_cancel = 'Mégsem';
 z.string.hu.modal_button_ok = 'Ok';
@@ -396,6 +399,7 @@ z.string.hu.preferences_about_website = 'Wire weboldala';
 z.string.hu.preferences_account_delete = 'Fiók törlése';
 z.string.hu.preferences_account_log_out = 'Kijelentkezés';
 z.string.hu.preferences_account_reset_password = 'Jelszó visszaállítása';
+z.string.hu.preferences_account_team = 'innen: {{name}}';
 z.string.hu.preferences_account_username_placeholder = 'Teljes neved';
 z.string.hu.preferences_account_username_hint = 'Legalább 2 karakter, és kizárólag a—z, 0—9 és _ karakterek.';
 z.string.hu.preferences_account_username_available = 'Elérhető';

@@ -21,12 +21,12 @@
 
 'use strict';
 
-describe('z.conversation.EventBuilder', function() {
+describe('z.conversation.EventBuilder', () => {
   let event_mapper = undefined;
   let conversation_et = undefined;
   let self_user_et = undefined;
 
-  beforeEach(function() {
+  beforeEach(() => {
     self_user_et = new z.entity.User(z.util.create_random_uuid());
     self_user_et.is_me = true;
 
@@ -36,7 +36,7 @@ describe('z.conversation.EventBuilder', function() {
     event_mapper = new z.conversation.EventMapper();
   });
 
-  it('build_all_verified', function() {
+  it('build_all_verified', () => {
     const event = z.conversation.EventBuilder.build_all_verified(conversation_et);
     const message_et = event_mapper.map_json_event(event, conversation_et);
     expect(message_et).toBeDefined();
@@ -46,7 +46,7 @@ describe('z.conversation.EventBuilder', function() {
     expect(message_et.conversation_id).toBe(conversation_et.id);
   });
 
-  it('build_degraded', function() {
+  it('build_degraded', () => {
     const user_ids = [z.util.create_random_uuid()];
     const event = z.conversation.EventBuilder.build_degraded(conversation_et, user_ids, z.message.VerificationMessageType.NEW_DEVICE);
     const message_et = event_mapper.map_json_event(event, conversation_et);
@@ -58,8 +58,8 @@ describe('z.conversation.EventBuilder', function() {
     expect(message_et.user_ids()).toEqual(user_ids);
   });
 
-  it('build_missed', function() {
-    const event = z.conversation.EventBuilder.build_missed(conversation_et, self_user_et);
+  it('build_missed', () => {
+    const event = z.conversation.EventBuilder.build_missed(conversation_et);
     const message_et = event_mapper.map_json_event(event, conversation_et);
     expect(message_et).toBeDefined();
     expect(message_et.super_type).toBe(z.message.SuperType.MISSED);

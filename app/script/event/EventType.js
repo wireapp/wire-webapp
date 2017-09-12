@@ -20,24 +20,11 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.entity = z.entity || {};
+window.z.event = z.event || {};
 
-z.entity.LinkPreview = class LinkPreview {
-  constructor(title, url) {
-    this.title = title || '';
-    this.url = url || '';
-
-    this.image_resource = ko.observable();
-    this.meta_data = undefined;
-    this.meta_data_type = undefined;
-  }
-
-  obfuscate() {
-    this.title = z.util.StringUtil.obfuscate(this.title);
-    this.url = z.util.StringUtil.obfuscate(this.url);
-
-    this.image_resource(undefined);
-    this.meta_data = undefined;
-    this.meta_data_type = undefined;
-  }
+z.event.EVENT_TYPE = {
+  CALL: 'call',
+  CONVERSATION: 'conversation',
+  TEAM: 'team',
+  USER: 'user',
 };

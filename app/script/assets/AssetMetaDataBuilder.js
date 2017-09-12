@@ -53,20 +53,44 @@ z.assets.AssetMetaDataBuilder = {
     });
   },
 
-  _build_video_metdadata(videofile) {
+  _build_video_metdadata(video_file) {
     return new Promise((resolve, reject) => {
-      const url = window.URL.createObjectURL(videofile);
+      const url = window.URL.createObjectURL(video_file);
       const video = document.createElement('video');
       video.onloadedmetadata = () => {
         resolve(new z.proto.Asset.VideoMetaData(video.videoWidth, video.videoHeight, video.duration));
         window.URL.revokeObjectURL(url);
       };
-      video.onerror = (error) => {
-        reject(error);
+      video.addEventListener('error', (error) => {
+        reject(this._convert_event_into_error(error));
         window.URL.revokeObjectURL(url);
-      };
+      }, true);
       video.src = url;
     });
+  },
+
+  /**
+   * Convert an error event into a plain error object.
+   * This needs to be done because error events are not standardized between browser implementations.
+   * @private
+   * @param {Event} event - Error event
+   * @returns {MediaError} Error object
+   * @see https://developer.mozilla.org/en-US/docs/Web/API/Event/originalTarget
+   */
+  _convert_event_into_error(event) {
+    let error = event;
+
+    // Chrome v60
+    if (event.path && event.path[0]) {
+      error = event.path[0].error;
+    }
+
+    // Firefox v55
+    if (event.originalTarget) {
+      error = error.originalTarget.error;
+    }
+
+    return error;
   },
 
   _normalise_loudness(audio_buffer) {

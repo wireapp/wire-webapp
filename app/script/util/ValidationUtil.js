@@ -36,12 +36,16 @@ z.util.ValidationUtil = {
       }
       return true;
     },
-    retention_policy: (str) => {
+    retention_policy: (string) => {
       // Ensure the given asset is either eternal, persistent or volatile
       // https://github.com/wireapp/wire-server/blob/e97f7c882cad37e4ddd922d2e48fe0d71751fc5a/libs/cargohold-types/src/CargoHold/Types/V3.hs#L151
-      return str > 0 && str < (Object.keys(z.assets.AssetRetentionPolicy).length + 1);
+      return string > 0 && string < (Object.keys(z.assets.AssetRetentionPolicy).length + 1);
     },
     v3: (asset_key, asset_token) => {
+      if (!asset_key) {
+        throw new z.util.ValidationUtilError('Asset key not defined');
+      }
+
       const SEPERATOR = '-';
       const [version, type, ...uuid] = asset_key.split(SEPERATOR);
 
@@ -60,13 +64,13 @@ z.util.ValidationUtil = {
       return true;
     },
   },
-  is_UUID: (str) => {
-    return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(str);
+  is_UUID: (string) => {
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(string);
   },
-  is_base64: (str) => {
+  is_base64: (string) => {
     try {
       // Will raise a DOM exception if base64 string is invalid
-      window.atob(str);
+      window.atob(string);
     } catch (error) {
       return false;
     }

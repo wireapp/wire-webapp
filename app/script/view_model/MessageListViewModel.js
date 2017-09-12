@@ -290,7 +290,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
 
     if (last_message) {
       // Message was prepended
-      if (last_message.timestamp() !== this.conversation().last_event_timestamp()) {
+      if (last_message.timestamp() < this.conversation().last_event_timestamp()) {
         return;
       }
 

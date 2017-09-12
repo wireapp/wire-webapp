@@ -45,6 +45,7 @@ z.string.de.auth_account_sign_in_phone = 'Handy';
 z.string.de.auth_account_terms_of_use = 'Nutzungsbedingungen';
 z.string.de.auth_account_terms_of_use_detail = 'Ich akzeptiere die';
 
+z.string.de.auth_blocked_cookies = 'Aktiviere Cookies, um dich bei Wire einzuloggen.';
 z.string.de.auth_blocked_database = 'Wire benötigt zum Anzeigen deiner Nachrichten Zugriff auf den lokalen Speicher. In Privaten Fenstern ist dieser nicht verfügbar.';
 z.string.de.auth_blocked_tabs = 'Wire ist bereits in einem anderen Tab geöffnet.';
 
@@ -107,6 +108,7 @@ z.string.de.auth_error_phone_number_budget = 'Du hast dich zu oft eingeloggt. Ve
 z.string.de.auth_error_phone_number_forbidden = 'Diese Telefonnummer ist leider nicht nutzbar.';
 z.string.de.auth_error_phone_number_invalid = 'Ungültige Telefonnummer';
 z.string.de.auth_error_phone_number_unknown = 'Unbekannte Telefonnummer';
+z.string.de.auth_error_suspended = 'Benutzerkonto ist nicht mehr zum Login berechtigt.';
 z.string.de.auth_error_sign_in = 'Überprüfe deine Eingaben und versuche es erneut.';
 
 z.string.de.call_state_outgoing = 'Klingelt…';

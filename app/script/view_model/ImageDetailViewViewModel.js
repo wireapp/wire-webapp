@@ -42,10 +42,8 @@ z.ViewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
     this.message_et = ko.observable();
     this.message_et.subscribe((message_et) => {
       if (message_et) {
-        this.conversation_repository.get_conversation_by_id_async(message_et.conversation_id)
-          .then((conversation_et) => {
-            this.conversation_et(conversation_et);
-          });
+        this.conversation_repository.get_conversation_by_id(message_et.conversation_id)
+          .then((conversation_et) => this.conversation_et(conversation_et));
       }
     });
 

@@ -22,10 +22,11 @@
 window.z = window.z || {};
 window.z.conversation = z.conversation || {};
 
-z.conversation.ConversationUpdateType = {
-  ARCHIVED_TIMESTAMP: 'archived_timestamp',
-  CLEARED_TIMESTAMP: 'cleared_timestamp',
-  LAST_EVENT_TIMESTAMP: 'last_event_timestamp',
-  LAST_READ_TIMESTAMP: 'last_read_timestamp',
-  MUTED_TIMESTAMP: 'muted_timestamp',
+z.conversation.TIMESTAMP_TYPE = {
+  ARCHIVED: 'z.conversation.TIMESTAMP_TYPE.ARCHIVED',
+  CLEARED: 'z.conversation.TIMESTAMP_TYPE.CLEARED',
+  LAST_EVENT: 'z.conversation.TIMESTAMP_TYPE.LAST_EVENT',
+  LAST_READ: 'z.conversation.TIMESTAMP_TYPE.LAST_READ',
+  LAST_SERVER: 'z.conversation.TIMESTAMP_TYPE.LAST_SERVER',
+  MUTED: 'z.conversation.TIMESTAMP_TYPE.MUTED',
 };
