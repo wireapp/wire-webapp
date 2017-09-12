@@ -359,8 +359,8 @@ z.entity.Conversation = class Conversation {
     z.util.ko_array_push_all(this.messages_unordered, message_ets);
   }
 
-  get_last_timestamp() {
-    return this.last_server_timestamp() || Date.now();
+  get_latest_timestamp() {
+    return this.last_server_timestamp() || this.last_event_timestamp() || Date.now();
   }
 
   get_next_iso_date(clock_drift) {
