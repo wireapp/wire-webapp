@@ -973,8 +973,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then((response) => {
         if (handle_response) {
           amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
-          return this._on_member_leave(conversation_et, response)
-            .then(() => this.archive_conversation(conversation_et, next_conversation_et));
+          return this._on_member_leave(conversation_et, response);
         }
       });
   }
@@ -2629,6 +2628,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return this.update_participating_user_ets(conversation_et)
           .then(() => {
             this.verification_state_handler.on_member_left(conversation_et, message_et.user_ids());
+
+            const is_from_self = event_json.from === this.user_repository.self().id;
+            if (is_from_self && conversation_et.removed_from_conversation()) {
+              this.archive_conversation(conversation_et);
+            }
+
             return {conversation_et: conversation_et, message_et: message_et};
           });
       });
