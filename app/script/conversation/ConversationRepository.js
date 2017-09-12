@@ -914,24 +914,27 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * It will be unarchived once it is opened through search. We use the archive flag to distinguish states.
    *
    * @param {Conversation} conversation_et - Conversation to clear
-   * @param {Conversation} [next_conversation_et] - Optional next conversation to be shown
-   * @param {boolean} [leave=false] - Should we leave the conversation before clearing the content?
+   * @param {boolean} [leave_conversation=false] - Should we leave the conversation before clearing the content?
    * @returns {undefined} No return value
    */
-  clear_conversation(conversation_et, next_conversation_et, leave = false) {
-    const promise = leave ? this.leave_conversation(conversation_et, next_conversation_et, false) : Promise.resolve();
-    promise
-      .then(() => {
-        if (leave) {
-          conversation_et.status(z.conversation.ConversationStatus.PAST_MEMBER);
-        }
-        this._update_cleared_timestamp(conversation_et);
-        this._clear_conversation(conversation_et);
+  clear_conversation(conversation_et, leave_conversation = false) {
+    const is_active_conversation = this.is_active_conversation(conversation_et);
+    const next_conversation_et = this.get_next_conversation(conversation_et);
 
-        if (next_conversation_et) {
-          amplify.publish(z.event.WebApp.CONVERSATION.SHOW, next_conversation_et);
-        }
-      });
+    if (leave_conversation) {
+      conversation_et.status(z.conversation.ConversationStatus.PAST_MEMBER);
+    }
+
+    this._update_cleared_timestamp(conversation_et);
+    this._clear_conversation(conversation_et);
+
+    if (leave_conversation) {
+      this.remove_member(conversation_et, this.user_repository.self().id);
+    }
+
+    if (is_active_conversation) {
+      amplify.publish(z.event.WebApp.CONVERSATION.SHOW, next_conversation_et);
+    }
   }
 
   /**
@@ -952,24 +955,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
       this.send_generic_message_to_conversation(this.self_conversation().id, generic_message)
         .then(() => this.logger.info(`Cleared conversation '${conversation_et.id}' on '${new Date(timestamp).toISOString()}'`));
     }
-  }
-
-  /**
-   * Leave conversation.
-   *
-   * @param {Conversation} conversation_et - Conversation to leave
-   * @param {Conversation} [next_conversation_et] - Optional next conversation in list
-   * @param {boolean} handle_response - Set to false if conversation is deleted
-   * @returns {Promise} Resolves when the conversation was left
-   */
-  leave_conversation(conversation_et, next_conversation_et, handle_response = true) {
-    return this.conversation_service.delete_members(conversation_et.id, this.user_repository.self().id)
-      .then((response) => {
-        if (handle_response) {
-          amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
-          return this._on_member_leave(conversation_et, response);
-        }
-      });
   }
 
   /**
@@ -2603,34 +2588,46 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when the event was handled
    */
   _on_member_leave(conversation_et, event_json) {
-    return this._add_event_to_conversation(event_json, conversation_et)
-      .then((message_et) => {
-        message_et.user_ets().forEach((user_et) => {
-          if (user_et.is_me) {
-            conversation_et.status(z.conversation.ConversationStatus.PAST_MEMBER);
-            if (conversation_et.call()) {
-              amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, conversation_et.id, z.calling.enum.TERMINATION_REASON.MEMBER_LEAVE);
-            }
-          } else {
-            conversation_et.participating_user_ids.remove(user_et.id);
-            if (conversation_et.call()) {
-              amplify.publish(z.event.WebApp.CALL.STATE.PARTICIPANT_LEFT, conversation_et.id, user_et.id);
-            }
+    const self_user_id = this.user_repository.self().id;
+    const {data: event_data, from} = event_json;
+
+    const is_from_self = from === self_user_id;
+    const removes_self = event_data.user_ids.includes(self_user_id);
+    const self_leaving_cleared_conversation = is_from_self && removes_self && conversation_et.is_cleared();
+
+    if (removes_self) {
+      conversation_et.status(z.conversation.ConversationStatus.PAST_MEMBER);
+
+      if (conversation_et.call()) {
+        amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, conversation_et.id, z.calling.enum.TERMINATION_REASON.MEMBER_LEAVE);
+      }
+    }
+
+    if (!self_leaving_cleared_conversation) {
+      return this._add_event_to_conversation(event_json, conversation_et)
+        .then((message_et) => {
+          message_et.user_ets()
+            .filter((user_et) => !user_et.is_me)
+            .forEach((user_et) => {
+              conversation_et.participating_user_ids.remove(user_et.id);
+
+              if (conversation_et.call()) {
+                amplify.publish(z.event.WebApp.CALL.STATE.PARTICIPANT_LEFT, conversation_et.id, user_et.id);
+              }
+            });
+
+          return this.update_participating_user_ets(conversation_et).then(() => message_et);
+        })
+        .then((message_et) => {
+          this.verification_state_handler.on_member_left(conversation_et);
+
+          if (is_from_self && conversation_et.removed_from_conversation()) {
+            this.archive_conversation(conversation_et);
           }
+
+          return {conversation_et: conversation_et, message_et: message_et};
         });
-
-        return this.update_participating_user_ets(conversation_et)
-          .then(() => {
-            this.verification_state_handler.on_member_left(conversation_et, message_et.user_ids());
-
-            const is_from_self = event_json.from === this.user_repository.self().id;
-            if (is_from_self && conversation_et.removed_from_conversation()) {
-              this.archive_conversation(conversation_et);
-            }
-
-            return {conversation_et: conversation_et, message_et: message_et};
-          });
-      });
+    }
   }
 
   /**
