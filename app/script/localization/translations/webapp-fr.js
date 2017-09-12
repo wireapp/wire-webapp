@@ -45,6 +45,7 @@ z.string.fr.auth_account_sign_in_phone = 'Téléphone';
 z.string.fr.auth_account_terms_of_use = 'Conditions d’utilisation';
 z.string.fr.auth_account_terms_of_use_detail = 'J’accepte';
 
+z.string.fr.auth_blocked_cookies = 'Autorisez les cookies pour vous connecter à Wire.';
 z.string.fr.auth_blocked_database = 'Wire a besoin d’accéder à votre espace de stockage pour afficher les messages. Il n’est pas disponible en navigation privée.';
 z.string.fr.auth_blocked_tabs = 'Wire est déjà ouvert dans un autre onglet.';
 
@@ -107,6 +108,7 @@ z.string.fr.auth_error_phone_number_budget = 'Vous vous êtes connecté trop sou
 z.string.fr.auth_error_phone_number_forbidden = 'Désolé. Ce numéro de téléphone est banni.';
 z.string.fr.auth_error_phone_number_invalid = 'Numéro de téléphone non valide';
 z.string.fr.auth_error_phone_number_unknown = 'Numéro de téléphone inconnu';
+z.string.fr.auth_error_suspended = 'Ce compte n’est plus autorisé à se connecter.';
 z.string.fr.auth_error_sign_in = 'Veuillez vérifier vos informations et réessayez.';
 
 z.string.fr.call_state_outgoing = 'Sonnerie…';

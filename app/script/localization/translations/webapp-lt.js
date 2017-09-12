@@ -34,7 +34,7 @@ z.string.lt.alert_gif_too_large = 'Animacija yra per didelė.\nDidžiausias dydi
 z.string.lt.auth_account_country_code = 'Šalies kodas';
 z.string.lt.auth_account_create = 'Sukurti';
 z.string.lt.auth_account_create_account = 'Sukurti paskyrą';
-z.string.lt.auth_account_deletion = 'Buvote atjungtas, nes jūsų abonementas buvo ištrintas.';
+z.string.lt.auth_account_deletion = 'Buvote atjungti, nes jūsų paskyra buvo ištrinta.';
 z.string.lt.auth_account_expiration = 'Jūs buvote atjungti, kadangi baigėsi jūsų seansas. Prašome prisijungti dar kartą.';
 z.string.lt.auth_account_get_wire = 'Paprasta, privati ir saugi pokalbių programa, skirta pokalbiams, skambučiams bei paveikslų, muzikos, vaizdo įrašų, GIF ir kitų failų bendrinimui.';
 z.string.lt.auth_account_password_forgot = 'Pamiršau slaptažodį';
@@ -45,6 +45,7 @@ z.string.lt.auth_account_sign_in_phone = 'Telefonas';
 z.string.lt.auth_account_terms_of_use = 'Naudojimosi sąlygos';
 z.string.lt.auth_account_terms_of_use_detail = 'Aš sutinku su';
 
+z.string.lt.auth_blocked_cookies = 'Norėdami prisijungti prie Wire, įjunkite slapukus.';
 z.string.lt.auth_blocked_database = 'Norint rodyti žinutes, Wire reikia prieigos prie jūsų vietinės saugyklos. Vietinė saugykla nėra prieinama privačioje veiksenoje.';
 z.string.lt.auth_blocked_tabs = 'Wire jau yra atverta kitoje kortelėje.';
 
@@ -107,6 +108,7 @@ z.string.lt.auth_error_phone_number_budget = 'Jūs prisijungėte pernelyg dažna
 z.string.lt.auth_error_phone_number_forbidden = 'Atleiskite. Šis telefono numeris yra uždraustas.';
 z.string.lt.auth_error_phone_number_invalid = 'Neteisingas telefono numeris';
 z.string.lt.auth_error_phone_number_unknown = 'Nežinomas telefono numeris';
+z.string.lt.auth_error_suspended = 'Ši paskyra daugiau nebeturi įgaliojimų prisijungti.';
 z.string.lt.auth_error_sign_in = 'Patvirtinkite savo duomenis ir bandykite dar kartą.';
 
 z.string.lt.call_state_outgoing = 'Kviečiama…';

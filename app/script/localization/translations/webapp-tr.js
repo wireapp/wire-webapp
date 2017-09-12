@@ -44,6 +44,7 @@ z.string.tr.auth_account_sign_in_phone = 'Telefon';
 z.string.tr.auth_account_terms_of_use = 'Kullanım Şartları';
 z.string.tr.auth_account_terms_of_use_detail = 'Kabul ediyorum';
 
+z.string.tr.auth_blocked_cookies = 'Wire’a giriş yapabilmek için çerezleri etkinleştirin.';
 z.string.tr.auth_blocked_database = 'Wire’ın mesajları gösterebilmek için yerel diske erişmesi lazım. Gizli modda yerel disk kullanılamaz.';
 z.string.tr.auth_blocked_tabs = 'Wire zaten başka bir sekmede açık.';
 
@@ -106,6 +107,7 @@ z.string.tr.auth_error_phone_number_budget = 'Çok sık giriş yaptınız. Tekra
 z.string.tr.auth_error_phone_number_forbidden = 'Üzgünüz. Bu telefon numarası yasaklı.';
 z.string.tr.auth_error_phone_number_invalid = 'Geçersiz Telefon Numarası';
 z.string.tr.auth_error_phone_number_unknown = 'Bilinmeyen Telefon Numarası';
+z.string.tr.auth_error_suspended = 'Bu hesap artık giriş yapmak için yeterli yetkiye sahip değil.';
 z.string.tr.auth_error_sign_in = 'Lütfen bilgilerinizi doğrulayıp öyle tekrar deneyiniz.';
 
 z.string.tr.call_state_outgoing = 'Çalıyor…';
