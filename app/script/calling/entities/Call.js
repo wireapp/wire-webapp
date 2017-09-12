@@ -209,7 +209,6 @@ z.calling.entities.Call = class Call {
 
     this._clear_timeouts();
 
-    console.log('participants', this.participants());
     if (everyone_left || on_group_check) {
       const reason = !this.was_connected ? z.calling.enum.TERMINATION_REASON.MISSED : z.calling.enum.TERMINATION_REASON.COMPLETED;
 
