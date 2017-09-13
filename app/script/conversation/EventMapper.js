@@ -86,9 +86,6 @@ z.conversation.EventMapper = class EventMapper {
       case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE:
         message_et = this._map_event_member_leave(event);
         break;
-      case z.event.Backend.CONVERSATION.MEMBER_UPDATE:
-        message_et = this._map_event_member_update(event);
-        break;
       case z.event.Backend.CONVERSATION.RENAME:
         message_et = this._map_event_rename(event);
         break;

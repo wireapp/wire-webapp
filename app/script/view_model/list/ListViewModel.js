@@ -276,11 +276,9 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
 
   click_on_clear_action(conversation_et = this.conversation_repository.active_conversation()) {
     if (conversation_et) {
-      const next_conversation = this._get_next_conversation(conversation_et);
-
       amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CLEAR, {
-        action: (leave = false) => {
-          this.conversation_repository.clear_conversation(conversation_et, next_conversation, leave);
+        action: (leave_conversation = false) => {
+          this.conversation_repository.clear_conversation(conversation_et, leave_conversation);
         },
         conversation: conversation_et,
       });
@@ -288,10 +286,8 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
   }
 
   click_on_leave_action(conversation_et) {
-    const next_conversation_et = this._get_next_conversation(conversation_et);
-
     amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.LEAVE, {
-      action: () => this.conversation_repository.leave_conversation(conversation_et, next_conversation_et),
+      action: () => this.conversation_repository.leave_conversation(conversation_et),
       data: conversation_et.display_name(),
     }
     );
