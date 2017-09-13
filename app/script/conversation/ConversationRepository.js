@@ -1137,13 +1137,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
       return Promise.reject(new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND));
     }
 
-    if (conversation_et.is_archived() === new_archive_state) {
+    const archive_timestamp = conversation_et.get_latest_timestamp();
+    const no_state_change = conversation_et.is_archived() === new_archive_state;
+    const no_timestamp_change = conversation_et.archived_timestamp() === archive_timestamp;
+    if (no_state_change && no_timestamp_change) {
       return Promise.reject(new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.NO_CHANGES));
     }
 
     const payload = {
       otr_archived: new_archive_state,
-      otr_archived_ref: new Date(conversation_et.get_latest_timestamp()).toISOString(),
+      otr_archived_ref: new Date(archive_timestamp).toISOString(),
     };
 
     this.logger.info(`Conversation '${conversation_et.id}' archive state change triggered by '${trigger}'`);
