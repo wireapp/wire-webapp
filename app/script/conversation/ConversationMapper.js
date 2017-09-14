@@ -223,12 +223,13 @@ z.conversation.ConversationMapper = class ConversationMapper {
         .filter((other) => other.status === z.conversation.ConversationStatus.CURRENT_MEMBER)
         .map((other) => other.id);
 
+      // This should ensure a proper order
       if (!local_conversation.last_event_timestamp) {
-        // This should ensure a proper order
-        local_conversation.last_event_timestamp = index + 1;
+        local_conversation.last_event_timestamp = index;
       }
 
-      if (!local_conversation.last_server_timestamp) {
+      // Set initially or correct server timestamp
+      if (!local_conversation.last_server_timestamp || (local_conversation.last_server_timestamp < local_conversation.last_event_timestamp)) {
         local_conversation.last_server_timestamp = local_conversation.last_event_timestamp;
       }
 
