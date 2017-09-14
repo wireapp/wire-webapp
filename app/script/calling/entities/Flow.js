@@ -268,11 +268,6 @@ z.calling.entities.Flow = class Flow {
         this._create_sdp_offer();
       }
     });
-
-    this.offer_to_receive_video = ko.pureComputed(() => {
-      const is_sending_video = this.self_state.video_send() || this.self_state.screen_send();
-      return !is_sending_video;
-    });
   }
 
   /**
@@ -881,7 +876,6 @@ z.calling.entities.Flow = class Flow {
      */
     const offer_options = {
       iceRestart: restart,
-      offerToReceiveVideo: this.offer_to_receive_video() ? true : undefined,
       voiceActivityDetection: true,
     };
 

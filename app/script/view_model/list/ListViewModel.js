@@ -41,16 +41,16 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     this.on_context_menu = this.on_context_menu.bind(this);
 
     this.content_view_model = content_view_model;
+
+    // Repositories
     this.calling_repository = calling_repository;
     this.connect_repository = connect_repository;
     this.conversation_repository = conversation_repository;
     this.search_repository = search_repository;
     this.properties_repository = properties_repository;
     this.team_repository = team_repository;
-    this.logger = new z.util.Logger('z.ViewModel.list.ListViewModel', z.config.LOGGER.OPTIONS);
-
-    // Repositories
     this.user_repository = this.conversation_repository.user_repository;
+    this.logger = new z.util.Logger('z.ViewModel.list.ListViewModel', z.config.LOGGER.OPTIONS);
 
     // State
     this.list_state = ko.observable(z.ViewModel.list.LIST_STATE.CONVERSATIONS);
@@ -276,11 +276,9 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
 
   click_on_clear_action(conversation_et = this.conversation_repository.active_conversation()) {
     if (conversation_et) {
-      const next_conversation = this._get_next_conversation(conversation_et);
-
       amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CLEAR, {
-        action: (leave = false) => {
-          this.conversation_repository.clear_conversation(conversation_et, next_conversation, leave);
+        action: (leave_conversation = false) => {
+          this.conversation_repository.clear_conversation(conversation_et, leave_conversation);
         },
         conversation: conversation_et,
       });
@@ -288,10 +286,8 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
   }
 
   click_on_leave_action(conversation_et) {
-    const next_conversation_et = this._get_next_conversation(conversation_et);
-
     amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.LEAVE, {
-      action: () => this.conversation_repository.leave_conversation(conversation_et, next_conversation_et),
+      action: () => this.conversation_repository.remove_member(conversation_et, this.user_repository.self().id),
       data: conversation_et.display_name(),
     }
     );

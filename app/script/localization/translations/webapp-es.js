@@ -44,6 +44,7 @@ z.string.es.auth_account_sign_in_phone = 'Teléfono';
 z.string.es.auth_account_terms_of_use = 'Términos de Uso';
 z.string.es.auth_account_terms_of_use_detail = 'Acepto';
 
+z.string.es.auth_blocked_cookies = 'Habilita las cookies para iniciar sesión.';
 z.string.es.auth_blocked_database = 'Wire necesita acceso al almacenamiento local para mostrar los mensajes. No está disponible en modo privado.';
 z.string.es.auth_blocked_tabs = 'Wire ya está abierto en otra pestaña.';
 
@@ -106,6 +107,7 @@ z.string.es.auth_error_phone_number_budget = 'Has entrado muchas veces. Prueba m
 z.string.es.auth_error_phone_number_forbidden = 'Lo sentimos. Este número de teléfono está prohibido.';
 z.string.es.auth_error_phone_number_invalid = 'Número de teléfono no válido';
 z.string.es.auth_error_phone_number_unknown = 'Número de Teléfono Desconocido';
+z.string.es.auth_error_suspended = 'Esta cuenta ya no está autorizada a iniciar sesión.';
 z.string.es.auth_error_sign_in = 'Por favor, verifica tus datos y vuelve a intentarlo.';
 
 z.string.es.call_state_outgoing = 'Sonando…';

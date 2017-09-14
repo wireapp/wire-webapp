@@ -359,13 +359,14 @@ z.entity.Conversation = class Conversation {
     z.util.ko_array_push_all(this.messages_unordered, message_ets);
   }
 
-  get_last_timestamp() {
-    return this.last_server_timestamp() || Date.now();
+  get_latest_timestamp(clock_drift) {
+    const current_timestamp = z.util.TimeUtil.adjust_current_timestamp(clock_drift);
+    return Math.max(this.last_server_timestamp(), this.last_event_timestamp()) || current_timestamp;
   }
 
   get_next_iso_date(clock_drift) {
-    clock_drift = _.isNumber(clock_drift) ? clock_drift : 0;
-    const timestamp = Math.max(this.last_server_timestamp() + 1, Date.now() - clock_drift);
+    const current_timestamp = z.util.TimeUtil.adjust_current_timestamp(clock_drift);
+    const timestamp = Math.max(this.last_server_timestamp() + 1, current_timestamp);
     return new Date(timestamp).toISOString();
   }
 

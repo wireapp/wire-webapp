@@ -235,9 +235,8 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
     this.confirm_dialog = $('#participants').confirm({
       confirm: () => {
-        const next_conversation_et = this.conversation_repository.get_next_conversation(this.conversation());
         this.participants_bubble.hide();
-        this.conversation_repository.leave_conversation(this.conversation(), next_conversation_et);
+        this.conversation_repository.remove_member(this.conversation(), this.user_repository.self().id);
       },
       template: '#template-confirm-leave',
     });

@@ -45,6 +45,7 @@ z.string.sk.auth_account_sign_in_phone = 'Telefón';
 z.string.sk.auth_account_terms_of_use = 'Podmienky používania';
 z.string.sk.auth_account_terms_of_use_detail = 'Súhlasím';
 
+z.string.sk.auth_blocked_cookies = 'Povoľte cookies na prihlásenie k Wire.';
 z.string.sk.auth_blocked_database = 'Pre zobrazenie Vašich správ potrebuje Wire prístup k lokálnemu úložisku. Lokálne úložisko nie je dostupné v privátnom režime.';
 z.string.sk.auth_blocked_tabs = 'Wire je už otvorený na inej karte.';
 
@@ -107,6 +108,7 @@ z.string.sk.auth_error_phone_number_budget = 'Prihlasujete sa príliš často. S
 z.string.sk.auth_error_phone_number_forbidden = 'Prepáčte. Toto telefónne číslo je zakázané.';
 z.string.sk.auth_error_phone_number_invalid = 'Neplatné telefónne číslo';
 z.string.sk.auth_error_phone_number_unknown = 'Neznáme telefónne číslo';
+z.string.sk.auth_error_suspended = 'Toto konto už nemá povolené prihlásenie.';
 z.string.sk.auth_error_sign_in = 'Prosím, skontrolujte svoje údaje a skúste to znova.';
 
 z.string.sk.call_state_outgoing = 'Zvoní…';
