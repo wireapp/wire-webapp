@@ -608,6 +608,12 @@ z.event.EventRepository = class EventRepository {
             throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, 'Event validation failed: ID of link preview reused');
           }
 
+          if (mapped_data.content !== stored_data.content) {
+            this.logger.warn(`Ignored '${mapped_type}' in conversation '${conversation_id}' from user '${mapped_from}' with ID '${event_id} not matching link preview content`, event);
+            throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, 'Event validation failed: ID of link preview reused');
+          }
+
+          // Only valid case for a duplicate message ID is the first event with a link preview replacing the previous matching text
           event.time = stored_time;
         }
 
