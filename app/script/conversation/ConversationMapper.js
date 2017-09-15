@@ -225,7 +225,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
 
       // This should ensure a proper order
       if (!local_conversation.last_event_timestamp) {
-        local_conversation.last_event_timestamp = index;
+        local_conversation.last_event_timestamp = index + 1;
       }
 
       // Set initially or correct server timestamp

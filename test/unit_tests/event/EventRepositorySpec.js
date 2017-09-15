@@ -290,6 +290,7 @@ describe('Event Repository', () => {
       event = {
         conversation: z.util.create_random_uuid(),
         data: {
+          content: 'Lorem Ipsum',
           previews: [],
         },
         from: z.util.create_random_uuid(),
@@ -386,14 +387,31 @@ describe('Event Repository', () => {
         });
     });
 
+    it('ignores a text message with link preview with an ID previously used by the same user for a text message different content', (done) => {
+      previously_stored_event = JSON.parse(JSON.stringify(event));
+      spyOn(TestFactory.event_repository.conversation_service, 'load_event_from_db').and.returnValue(Promise.resolve(previously_stored_event));
+
+      event.data.previews.push(1);
+      event.data.content = 'Ipsum loren';
+
+      TestFactory.event_repository._handle_event_saving(event)
+        .then(done.fail)
+        .catch((error) => {
+          expect(error).toEqual(jasmine.any(z.event.EventError));
+          expect(error.type).toBe(z.event.EventError.TYPE.VALIDATION_FAILED);
+          expect(TestFactory.event_repository.conversation_service.save_event).not.toHaveBeenCalled();
+          done();
+        });
+    });
+
     it('saves a text message with link preview with an ID previously used by the same user for a plain text message', (done) => {
       previously_stored_event = JSON.parse(JSON.stringify(event));
+      spyOn(TestFactory.event_repository.conversation_service, 'load_event_from_db').and.returnValue(Promise.resolve(previously_stored_event));
 
       const initial_time = event.time;
       const changed_time = new Date(new Date(event.time).getTime() + 60 * 1000).toISOString();
       event.data.previews.push(1);
       event.time = changed_time;
-      spyOn(TestFactory.event_repository.conversation_service, 'load_event_from_db').and.returnValue(Promise.resolve(previously_stored_event));
 
       TestFactory.event_repository._handle_event_saving(event)
         .then((saved_event) => {

@@ -604,10 +604,16 @@ z.event.EventRepository = class EventRepository {
           }
 
           if (stored_data.previews.length) {
-            this.logger.warn(`Ignored '${mapped_type}' in conversation '${conversation_id}' from user '${mapped_from}' with ID '${event_id} that previously contained link preview`, event);
+            this.logger.warn(`Ignored '${mapped_type}' in conversation '${conversation_id}' from user '${mapped_from}' with ID '${event_id}' that previously contained link preview`, event);
             throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, 'Event validation failed: ID of link preview reused');
           }
 
+          if (mapped_data.content !== stored_data.content) {
+            this.logger.warn(`Ignored '${mapped_type}' in conversation '${conversation_id}' from user '${mapped_from}' with ID '${event_id}' not matching text content`, event);
+            throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, 'Event validation failed: ID of link preview reused');
+          }
+
+          // Only valid case for a duplicate message ID: First update to a text message matching the previous text content with a link preview
           event.time = stored_time;
         }
 
