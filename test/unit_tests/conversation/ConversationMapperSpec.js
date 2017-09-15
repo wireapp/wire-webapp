@@ -273,9 +273,8 @@ describe('Conversation Mapper', () => {
       expect(merged_conversation.muted_state).toBe(remote_data.members.self.otr_muted);
       expect(merged_conversation.muted_timestamp).toBe(new Date(remote_data.members.self.otr_muted_ref).getTime());
 
-
-      expect(merged_conversation_2.last_event_timestamp).toBe(1);
-      expect(merged_conversation_2.last_server_timestamp).toBe(1);
+      expect(merged_conversation_2.last_event_timestamp).toBe(2);
+      expect(merged_conversation_2.last_server_timestamp).toBe(2);
     });
 
     it('updates local archive and muted timestamps if time of remote data is newer', () => {
