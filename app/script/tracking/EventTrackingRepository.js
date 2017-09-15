@@ -17,6 +17,7 @@
  *
  */
 
+/* eslint-disable no-undef */
 'use strict';
 
 window.z = window.z || {};
@@ -24,22 +25,22 @@ window.z.tracking = z.tracking || {};
 
 z.tracking.EventTrackingRepository = class EventTrackingRepository {
   static get CONFIG() {
+    const MIXPANEL_KEY = z.util.Environment.frontend.is_production() ? 'c7dcb15893f14932b1c31b5fb33ff669' : '537da3b3bc07df1e420d07e2921a6f6f';
     const RAYGUN_API_KEY = z.util.Environment.frontend.is_production() ? 'lAkLCPLx3ysnsXktajeHmw==' : '5hvAMmz8wTXaHBYqu2TFUQ==';
-    const LOCALYTICS_APP_KEY = z.util.Environment.frontend.is_production() ? 'f19c50ccf7bff11992798f0-59fac3b8-ad88-11e6-ff9e-00ae30fe7875' : '905792736c9f17c3464fd4e-60d90c82-d14a-11e4-af66-009c5fda0a25';
 
     return {
-      ERROR_REPORTING_THRESHOLD: 60 * 1000, // in milliseconds
-      LOCALYTICS: {
-        APP_KEY: LOCALYTICS_APP_KEY,
+      RAYGUN: {
+        API_KEY: RAYGUN_API_KEY,
+        ERROR_REPORTING_THRESHOLD: 60 * 1000, // in milliseconds
+      },
+      TRACKING: {
         DISABLED_DOMAINS: [
-          'localhost',
+          // 'localhost',
           'zinfra.io',
         ],
         SESSION_INTERVAL: 60 * 1000, // milliseconds
         SESSION_TIMEOUT: 3 * 60 * 1000,
-      },
-      RAYGUN: {
-        API_KEY: RAYGUN_API_KEY,
+        TOKEN: MIXPANEL_KEY,
       },
     };
   }
@@ -84,10 +85,10 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.PRIVACY, this.updated_privacy.bind(this));
 
-    if (!this._localytics_disabled() && this.privacy_preference) {
+    if (!this._tracking_disabled() && this.privacy_preference) {
       this._enable_error_reporting();
       if (!this.localytics) {
-        this._init_localytics();
+        this._init_tracking();
       }
       this.set_custom_dimension(z.tracking.CustomDimension.CONTACTS, this.user_repository.connected_users().length);
       this._subscribe_to_events();
@@ -102,9 +103,9 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   init_without_user_tracking() {
     this._enable_error_reporting();
 
-    if (!this._localytics_disabled()) {
+    if (!this._tracking_disabled()) {
       if (!this.localytics) {
-        this._init_localytics();
+        this._init_tracking();
       }
       this.set_custom_dimension(z.tracking.CustomDimension.CONTACTS, -1);
       amplify.subscribe(z.event.WebApp.ANALYTICS.EVENT, this.tag_event.bind(this));
@@ -117,18 +118,18 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
       if (privacy_preference) {
         this._enable_error_reporting();
-        if (!this._localytics_disabled()) {
+        if (!this._tracking_disabled()) {
           this.start_session();
           this.set_custom_dimension(z.tracking.CustomDimension.CONTACTS, this.user_repository.connected_users().length);
           this._subscribe_to_events();
           this.tag_event(z.tracking.EventName.TRACKING.OPT_IN);
         }
       } else {
-        if (!this._localytics_disabled()) {
+        if (!this._tracking_disabled()) {
           amplify.unsubscribeAll(z.event.WebApp.ANALYTICS.CUSTOM_DIMENSION);
           amplify.unsubscribeAll(z.event.WebApp.ANALYTICS.EVENT);
           this.tag_event(z.tracking.EventName.TRACKING.OPT_OUT);
-          this._disable_localytics();
+          this._disable_tracking();
         }
         this._disable_error_reporting();
       }
@@ -163,92 +164,85 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
         this.session_interval = undefined;
       }
 
-      this.localytics('upload');
-      this.localytics('close');
+      // this.localytics('upload');
+      // this.localytics('close');
     }
   }
 
   set_custom_dimension(custom_dimension, value) {
     if (this.localytics) {
-      this.logger.info(`Set Localytics custom dimension '${custom_dimension}' to value '${value}'`);
-      this.localytics('setCustomDimension', custom_dimension, value);
+      this.logger.info(`Set super property '${custom_dimension}' to value '${value}'`);
+
+      const super_properties = {};
+      super_properties[custom_dimension] = value;
+      mixpanel.register(super_properties);
+      // this.localytics('setCustomDimension', custom_dimension, value);
     }
   }
 
   start_session() {
     if (this.privacy_preference && !this.session_interval) {
       if (!this.localytics) {
-        this._init_localytics();
+        this._init_tracking();
       }
 
       this.logger.info('Starting new Localytics session');
-      this.localytics('open');
-      this.localytics('upload');
-      this.session_interval = window.setInterval(this.upload_session, EventTrackingRepository.CONFIG.LOCALYTICS.SESSION_INTERVAL);
+      // this.localytics('open');
+      // this.localytics('upload');
+      this.session_interval = window.setInterval(this.upload_session, EventTrackingRepository.CONFIG.TRACKING.SESSION_INTERVAL);
     }
   }
 
   tag_event(event_name, attributes) {
     if (this.localytics) {
       if (attributes) {
-        this.logger.info(`Localytics event '${event_name}' with attributes: ${JSON.stringify(attributes)}`);
+        this.logger.info(`Tracking event '${event_name}' with attributes: ${JSON.stringify(attributes)}`);
       } else {
-        this.logger.info(`Localytics event '${event_name}' without attributes`);
+        this.logger.info(`Tracking event '${event_name}' without attributes`);
       }
 
-      this.localytics('tagEvent', event_name, attributes);
+      // During the transition phase (Localytics -> Mixpanel), we only want to log certain events.
+      const allowed_events = [
+        z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION,
+        z.tracking.EventName.TRACKING.OPT_IN,
+        z.tracking.EventName.TRACKING.OPT_OUT,
+      ];
+
+      if (allowed_events.includes(event_name)) {
+        mixpanel.track(event_name, attributes);
+      }
     }
   }
 
   upload_session() {
     if (this.localytics) {
-      this.localytics('upload');
+      // this.localytics('upload');
     }
   }
 
-  _disable_localytics() {
+  _disable_tracking() {
     if (this.localytics) {
-      this.localytics('close');
+      // this.localytics('close');
       window.ll = undefined;
       this.localytics = undefined;
       this.logger.debug('Localytics reporting was disabled due to user preferences');
     }
   }
 
-  // @see http://docs.localytics.com/#Dev/Integrate/web-options.html
-  _init_localytics() {
-    let element_node;
-    const options = {
-      appVersion: z.util.Environment.version(),
-      customDimensions: [z.tracking.helpers.get_platform()],
-    };
+  _init_tracking() {
+    mixpanel.init(EventTrackingRepository.CONFIG.TRACKING.TOKEN, {
+      debug: !z.util.Environment.frontend.is_production(),
+    });
 
-    this.localytics = function() {
-      /* eslint-disable id-length */
-      this.localytics.t = new Date();
-      this.localytics.q = this.localytics.q || [];
-      this.localytics.q.push(arguments);
-      /* eslint-enable id-length */
-    };
-
-    window.ll = this.localytics;
-    window.LocalyticsGlobal = 'll';
-
-    const script_element = document.createElement('script');
-    script_element.src = 'https://web.localytics.com/v3/localytics.min.js';
-
-    (element_node = document.getElementsByTagName('script')[0]).parentNode.insertBefore(script_element, element_node);
-
-    this.localytics('init', EventTrackingRepository.CONFIG.LOCALYTICS.APP_KEY, options);
-    this.logger.debug('Localytics reporting is enabled');
+    this.localytics = mixpanel;
+    this.logger.debug('Tracking is enabled');
   }
 
-  _localytics_disabled() {
+  _tracking_disabled() {
     if (!z.util.get_url_parameter(z.auth.URLParameter.LOCALYTICS)) {
-      for (const domain of EventTrackingRepository.CONFIG.LOCALYTICS.DISABLED_DOMAINS) {
+      for (const domain of EventTrackingRepository.CONFIG.TRACKING.DISABLED_DOMAINS) {
         if (z.util.StringUtil.includes(window.location.hostname, domain)) {
-          this.logger.debug('Localytics reporting is disabled due to domain');
-
+          this.logger.debug('Tracking is not enabled for this domain.');
           return true;
         }
       }
@@ -304,7 +298,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     }
 
     const time_since_last_report = Date.now() - this.last_report;
-    if (time_since_last_report > EventTrackingRepository.CONFIG.ERROR_REPORTING_THRESHOLD) {
+    if (time_since_last_report > EventTrackingRepository.CONFIG.RAYGUN.ERROR_REPORTING_THRESHOLD) {
       this.last_report = Date.now();
 
       return raygun_payload;
