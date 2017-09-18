@@ -20,33 +20,23 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.announce = z.announce || {};
+window.z.lifecycle = z.lifecycle || {};
 
-z.announce.AnnounceService = class AnnounceService {
+z.lifecycle.LifecycleService = class LifecycleService {
   static get CONFIG() {
     return {
       URL: {
-        ANNOUNCE: 'api/v1/announce/',
         VERSION: 'version/',
       },
     };
   }
 
   constructor() {
-    this.logger = new z.util.Logger('z.announce.AnnounceService', z.config.LOGGER.OPTIONS);
-    this.announce_url = `${z.util.Environment.backend.website_url()}${AnnounceService.CONFIG.URL.ANNOUNCE}?order=created&active=true`;
-    if (z.util.Environment.frontend.is_production()) {
-      this.announce_url += '&production=true';
-    }
-  }
-
-  get_announcements() {
-    return this._fetch_data(this.announce_url)
-      .then(({result}) => result);
+    this.logger = new z.util.Logger('z.lifecycle.LifecycleService', z.config.LOGGER.OPTIONS);
   }
 
   get_version() {
-    return this._fetch_data(AnnounceService.CONFIG.URL.VERSION)
+    return this._fetch_data(LifecycleService.CONFIG.URL.VERSION)
       .then(({version}) => version);
   }
 
