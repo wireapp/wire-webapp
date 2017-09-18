@@ -749,12 +749,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   map_conversations(payload) {
     if (payload.length) {
-      const conversation_ets = this.conversation_mapper.map_conversations(payload);
+      const conversation_ets = this.conversation_mapper.map_conversations(payload, this.clock_drift);
       conversation_ets.forEach((conversation_et) => this._map_guest_status_self(conversation_et));
       return conversation_ets;
     }
 
-    const conversation_et = this.conversation_mapper.map_conversation(payload);
+    const conversation_et = this.conversation_mapper.map_conversation(payload, this.clock_drift);
     this._map_guest_status_self(conversation_et);
     return conversation_et;
   }
@@ -2536,13 +2536,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
           throw error;
         }
 
-        return this.update_participating_user_ets(this.map_conversations(event_json))
-          .then((conversation_et) => {
-            conversation_et.update_timestamp_server(event_json.time, true);
-            return this.save_conversation(conversation_et);
-          })
-          .then((conversation_et) => this._prepare_conversation_create_notification(conversation_et));
-      });
+        return this.map_conversations(event_json);
+      })
+      .then((conversation_et) => this.update_participating_user_ets(conversation_et))
+      .then((conversation_et) => {
+        conversation_et.update_timestamp_server(event_json.time, true);
+        return this.save_conversation(conversation_et);
+      })
+      .then((conversation_et) => this._prepare_conversation_create_notification(conversation_et));
   }
 
   /**

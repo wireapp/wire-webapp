@@ -31,22 +31,26 @@ z.conversation.ConversationMapper = class ConversationMapper {
 
   /**
    * Convert a JSON conversation into a conversation entity.
+   *
    * @param {Object} json - Conversation data
+   * @param {number} clock_drift - Approximate time different to backend in milliseconds
    * @returns {Conversation} Mapped conversation entity
    */
-  map_conversation(json) {
+  map_conversation(json, clock_drift) {
     const json_data_array = json ? (json.data ? [json.data] : [json]) : [json];
-    const [conversation_et] = this.map_conversations(json_data_array);
+    const [conversation_et] = this.map_conversations(json_data_array, clock_drift);
     return conversation_et;
   }
 
   /**
    * Convert multiple JSON conversations into a conversation entities.
+   *
    * @param {Object} json - Conversation data
+   * @param {number} clock_drift - Approximate time different to backend in milliseconds
    * @returns {Array<Conversation>} Mapped conversation entities
    */
-  map_conversations(json) {
-    return json.map((conversation) => this._create_conversation_et(conversation));
+  map_conversations(json, clock_drift) {
+    return json.map((conversation) => this._create_conversation_et(conversation, clock_drift));
   }
 
   /**
@@ -146,9 +150,10 @@ z.conversation.ConversationMapper = class ConversationMapper {
    *
    * @private
    * @param {Object} conversation_data - Either locally stored or backend data
+   * @param {number} [clock_drift=0] - Approximate time different to backend in milliseconds
    * @returns {Conversation} Mapped conversation entity
    */
-  _create_conversation_et(conversation_data) {
+  _create_conversation_et(conversation_data, clock_drift = 0) {
     if (conversation_data === undefined) {
       throw new Error('Cannot create conversation entity without data');
     }
@@ -164,7 +169,9 @@ z.conversation.ConversationMapper = class ConversationMapper {
     conversation_et = this.update_self_status(conversation_et, self_state);
 
     if (!conversation_et.last_event_timestamp()) {
-      conversation_et.last_event_timestamp(Date.now());
+      const current_timestamp = Date.now() - clock_drift;
+      conversation_et.last_event_timestamp(current_timestamp);
+      conversation_et.last_server_timestamp(current_timestamp);
     }
 
     // All users that are still active
