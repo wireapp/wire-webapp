@@ -285,10 +285,10 @@ describe('Conversation Mapper', () => {
       // @formatter:on
 
       const self_update = {
-        otr_archived_ref: "2017-02-16T10:06:41.118Z",
-        otr_archived:true,
-        otr_muted_ref: "2017-02-16T10:06:41.118Z",
+        otr_archived: true,
+        otr_archived_ref: '2017-02-16T10:06:41.118Z',
         otr_muted: true,
+        otr_muted_ref: '2017-02-16T10:06:41.118Z',
       };
 
       remote_data.members.self = Object.assign(remote_data.members.self, self_update);
