@@ -425,7 +425,7 @@ z.event.EventRepository = class EventRepository {
     if (_.isNumber(updated_clock_drift)) {
       this.clock_drift = updated_clock_drift;
       amplify.publish(z.event.WebApp.EVENT.UPDATE_CLOCK_DRIFT, this.clock_drift);
-      this.logger.info(`Clock drift set to '${this.clock_drift}' ms`);
+      this.logger.info(`Backend reported current time as '${backend_time}'. Clock drift set to '${this.clock_drift}' ms`);
     }
   }
 
