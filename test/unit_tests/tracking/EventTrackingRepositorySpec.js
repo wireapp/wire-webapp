@@ -27,7 +27,7 @@ describe('z.tracking.EventTrackingRepository', function() {
   beforeEach(function(done) {
     test_factory.exposeTrackingActors()
       .then(function() {
-        TestFactory.tracking_repository._tracking_disabled = () => false;
+        TestFactory.tracking_repository._is_domain_allowed_for_tracking = () => false;
         TestFactory.tracking_repository._has_permission = () => true;
         done();
       })

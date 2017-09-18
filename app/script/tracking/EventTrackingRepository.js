@@ -84,11 +84,9 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
     return Promise.resolve()
       .then(() => {
-        if (!this._tracking_disabled() && this.privacy_preference) {
+        if (!this._is_domain_allowed_for_tracking() && this.privacy_preference) {
           this._enable_error_reporting();
-          if (!this.mixpanel) {
-            return this._init_tracking();
-          }
+          return this._init_tracking();
         }
         return undefined;
       })
@@ -117,18 +115,14 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
       if (privacy_preference) {
         this._enable_error_reporting();
-        if (!this._tracking_disabled()) {
-          this._subscribe_to_tracking_events();
-          this.tag_event(z.tracking.EventName.TRACKING.OPT_IN);
-          this._set_super_property(z.tracking.CustomDimension.CONTACTS, this.user_repository.connected_users().length);
+        if (!this._is_domain_allowed_for_tracking()) {
+          this._re_enable_tracking();
         }
       } else {
-        if (!this._tracking_disabled()) {
-          this._unsubscribe_from_tracking_events();
-          this.tag_event(z.tracking.EventName.TRACKING.OPT_OUT);
+        this._disable_error_reporting();
+        if (!this._is_domain_allowed_for_tracking()) {
           this._disable_tracking();
         }
-        this._disable_error_reporting();
       }
     }
   }
@@ -175,25 +169,39 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   }
 
   _disable_tracking() {
+    this._unsubscribe_from_tracking_events();
+    this.tag_event(z.tracking.EventName.TRACKING.OPT_OUT);
+
     if (this.mixpanel) {
-      // this.mixpanel('close');
-      window.ll = undefined;
-      this.mixpanel = undefined;
-      this.logger.debug('Localytics reporting was disabled due to user preferences');
+      this.mixpanel.register({
+        '$ignore': true,
+      });
+      this.logger.debug('Tracking was disabled due to user preferences');
     }
+  }
+
+  _re_enable_tracking() {
+    this.mixpanel.unregister('$ignore');
+    this._subscribe_to_tracking_events();
+    this.tag_event(z.tracking.EventName.TRACKING.OPT_IN);
+    this._set_super_property(z.tracking.CustomDimension.CONTACTS, this.user_repository.connected_users().length);
   }
 
   _init_tracking() {
     return new Promise((resolve) => {
-      mixpanel.init(EventTrackingRepository.CONFIG.TRACKING.TOKEN, {
-        autotrack: false,
-        debug: !z.util.Environment.frontend.is_production(),
-        loaded: resolve,
-      }, 'Wire');
+      if (!this.mixpanel) {
+        mixpanel.init(EventTrackingRepository.CONFIG.TRACKING.TOKEN, {
+          autotrack: false,
+          debug: !z.util.Environment.frontend.is_production(),
+          loaded: resolve,
+        }, 'Wire');
+      } else {
+        resolve(this.mixpanel);
+      }
     });
   }
 
-  _tracking_disabled() {
+  _is_domain_allowed_for_tracking() {
     if (!z.util.get_url_parameter(z.auth.URLParameter.LOCALYTICS)) {
       for (const domain of EventTrackingRepository.CONFIG.TRACKING.DISABLED_DOMAINS) {
         if (z.util.StringUtil.includes(window.location.hostname, domain)) {

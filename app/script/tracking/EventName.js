@@ -125,8 +125,8 @@ z.tracking.EventName = {
     APP_INITIALIZATION: 'telemetry.app_initialization',
   },
   TRACKING: {
-    OPT_IN: 'settings.opted_out_tracking',
-    OPT_OUT: 'settings.opted_in_tracking',
+    OPT_IN: 'settings.opted_in_tracking',
+    OPT_OUT: 'settings.opted_out_tracking',
   },
   UPLOADED_CONTACTS: 'uploadedContacts', // "source": "Gmail"
 };
