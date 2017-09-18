@@ -160,11 +160,8 @@ z.conversation.ConversationMapper = class ConversationMapper {
     conversation_et.type(type);
     conversation_et.name(name ? name : '');
 
-    if (members) {
-      conversation_et = this.update_self_status(conversation_et, members.self);
-    } else {
-      conversation_et = this.update_self_status(conversation_et, conversation_data);
-    }
+    const self_state = members ? members.self : conversation_data;
+    conversation_et = this.update_self_status(conversation_et, self_state);
 
     if (!conversation_et.last_event_timestamp()) {
       conversation_et.last_event_timestamp(Date.now());
@@ -181,10 +178,10 @@ z.conversation.ConversationMapper = class ConversationMapper {
       conversation_et.participating_user_ids(participating_user_ids);
     }
 
-    if (conversation_data.team_id) {
-      conversation_et.team_id = conversation_data.team_id; // data from IndexedDB
-    } else if (conversation_data.team) {
-      conversation_et.team_id = conversation_data.team; // data from backend
+    // Data from IndexedDB or backend
+    const team_id = conversation_data.team_id ? conversation_data.team_id : conversation_data.team;
+    if (team_id) {
+      conversation_et.team_id = team_id;
     }
 
     if (conversation_data.is_guest) {
