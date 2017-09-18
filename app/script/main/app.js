@@ -574,7 +574,6 @@ z.main.App = class App {
     const _logout = () => {
       // Disconnect from our backend, end tracking and clear cached data
       this.repository.event.disconnect_web_socket(z.event.WebSocketService.CHANGE_TRIGGER.LOGOUT);
-      amplify.publish(z.event.WebApp.ANALYTICS.CLOSE_SESSION);
 
       // Clear Local Storage (but don't delete the cookie label if you were logged in with a permanent client)
       const do_not_delete = [z.storage.StorageKey.AUTH.SHOW_LOGIN];

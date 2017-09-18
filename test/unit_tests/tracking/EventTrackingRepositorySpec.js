@@ -34,7 +34,21 @@ describe('z.tracking.EventTrackingRepository', function() {
       .catch(done.fail);
   });
 
-  describe('Initialization', function() {
+  describe('init', function() {
+    fit('enables error reporting, user tracking and subscribes to events', function() {
+      spyOn(TestFactory.tracking_repository, '_enable_error_reporting').and.callThrough();
+      spyOn(TestFactory.tracking_repository, '_init_tracking').and.callThrough();
+      spyOn(TestFactory.tracking_repository, '_subscribe_to_tracking_events').and.callThrough();
+
+      const send_usage_data = true;
+      TestFactory.tracking_repository.init(send_usage_data)
+        .then(() => {
+          expect(TestFactory.tracking_repository._enable_error_reporting).toHaveBeenCalled();
+          expect(TestFactory.tracking_repository._init_tracking).toHaveBeenCalled();
+          expect(TestFactory.tracking_repository._subscribe_to_tracking_events).toHaveBeenCalled();
+        });
+    });
+
     it('initializes error reporting on an init event', function() {
       spyOn(TestFactory.tracking_repository, 'init').and.callThrough();
       spyOn(TestFactory.tracking_repository, '_enable_error_reporting').and.callThrough();

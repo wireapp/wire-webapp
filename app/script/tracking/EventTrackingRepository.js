@@ -63,9 +63,8 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     this.user_repository = user_repository;
 
     this.last_report = undefined;
-    this.localytics = undefined;
+    this.mixpanel = undefined;
     this.privacy_preference = false;
-    this.session_interval = undefined;
 
     if (!this.conversation_repository && !this.user_repository) {
       this.init_without_user_tracking();
@@ -81,35 +80,35 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
    */
   init(privacy_preference) {
     this.privacy_preference = privacy_preference;
-    this.logger.info('Initialize tracking and error reporting', this.privacy_preference);
+    this.logger.info(`Initialize tracking and error reporting: ${this.privacy_preference}`);
 
-    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.PRIVACY, this.updated_privacy.bind(this));
-
-    if (!this._tracking_disabled() && this.privacy_preference) {
-      this._enable_error_reporting();
-      if (!this.localytics) {
-        this._init_tracking();
-      }
-      this.set_custom_dimension(z.tracking.CustomDimension.CONTACTS, this.user_repository.connected_users().length);
-      this._subscribe_to_events();
-    }
+    return Promise.resolve()
+      .then(() => {
+        if (!this._tracking_disabled() && this.privacy_preference) {
+          this._enable_error_reporting();
+          if (!this.mixpanel) {
+            return this._init_tracking();
+          }
+        }
+        return undefined;
+      })
+      .then((tracking_library) => {
+        if (tracking_library) {
+          this.mixpanel = tracking_library;
+          this._subscribe_to_tracking_events();
+          this.logger.debug('Tracking is enabled', tracking_library);
+        }
+        amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.PRIVACY, this.updated_privacy.bind(this));
+      });
   }
 
   /**
-   * Init the repository without user.
+   * Initialize the repository without user tracking but with error reporting (used for "auth" page).
    * @note Mode for auth page
    * @returns {undefined} No return value
    */
   init_without_user_tracking() {
     this._enable_error_reporting();
-
-    if (!this._tracking_disabled()) {
-      if (!this.localytics) {
-        this._init_tracking();
-      }
-      this.set_custom_dimension(z.tracking.CustomDimension.CONTACTS, -1);
-      amplify.subscribe(z.event.WebApp.ANALYTICS.EVENT, this.tag_event.bind(this));
-    }
   }
 
   updated_privacy(privacy_preference) {
@@ -119,15 +118,13 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
       if (privacy_preference) {
         this._enable_error_reporting();
         if (!this._tracking_disabled()) {
-          this.start_session();
-          this.set_custom_dimension(z.tracking.CustomDimension.CONTACTS, this.user_repository.connected_users().length);
-          this._subscribe_to_events();
+          this._subscribe_to_tracking_events();
           this.tag_event(z.tracking.EventName.TRACKING.OPT_IN);
+          this._set_super_property(z.tracking.CustomDimension.CONTACTS, this.user_repository.connected_users().length);
         }
       } else {
         if (!this._tracking_disabled()) {
-          amplify.unsubscribeAll(z.event.WebApp.ANALYTICS.CUSTOM_DIMENSION);
-          amplify.unsubscribeAll(z.event.WebApp.ANALYTICS.EVENT);
+          this._unsubscribe_from_tracking_events();
           this.tag_event(z.tracking.EventName.TRACKING.OPT_OUT);
           this._disable_tracking();
         }
@@ -136,65 +133,28 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     }
   }
 
-  _subscribe_to_events() {
-    amplify.subscribe(z.event.WebApp.ANALYTICS.CLOSE_SESSION, this.close_session.bind(this));
-    amplify.subscribe(z.event.WebApp.ANALYTICS.CUSTOM_DIMENSION, this.set_custom_dimension.bind(this));
+  _subscribe_to_tracking_events() {
+    amplify.subscribe(z.event.WebApp.ANALYTICS.CUSTOM_DIMENSION, this._set_super_property.bind(this));
     amplify.subscribe(z.event.WebApp.ANALYTICS.EVENT, this.tag_event.bind(this));
-    amplify.subscribe(z.event.WebApp.ANALYTICS.START_SESSION, this.start_session.bind(this));
   }
 
-  _unsubscribe_from_events() {
-    amplify.unsubscribeAll(z.event.WebApp.ANALYTICS.CLOSE_SESSION);
+  _unsubscribe_from_tracking_events() {
     amplify.unsubscribeAll(z.event.WebApp.ANALYTICS.CUSTOM_DIMENSION);
     amplify.unsubscribeAll(z.event.WebApp.ANALYTICS.EVENT);
-    amplify.unsubscribeAll(z.event.WebApp.ANALYTICS.START_SESSION);
   }
 
-
-  //##############################################################################
-  // Localytics
-  //##############################################################################
-
-  close_session() {
-    if (this.localytics && this.privacy_preference) {
-      this.logger.info('Closing Localytics session');
-
-      if (this.session_interval) {
-        window.clearInterval(this.session_interval);
-        this.session_interval = undefined;
-      }
-
-      // this.localytics('upload');
-      // this.localytics('close');
-    }
-  }
-
-  set_custom_dimension(custom_dimension, value) {
-    if (this.localytics) {
-      this.logger.info(`Set super property '${custom_dimension}' to value '${value}'`);
-
+  // @see https://mixpanel.com/help/reference/javascript-full-api-reference#mixpanel.register
+  _set_super_property(super_property, value) {
+    if (this.mixpanel) {
+      this.logger.info(`Set super property '${super_property}' to value '${value}'`);
       const super_properties = {};
-      super_properties[custom_dimension] = value;
-      mixpanel.register(super_properties);
-      // this.localytics('setCustomDimension', custom_dimension, value);
-    }
-  }
-
-  start_session() {
-    if (this.privacy_preference && !this.session_interval) {
-      if (!this.localytics) {
-        this._init_tracking();
-      }
-
-      this.logger.info('Starting new Localytics session');
-      // this.localytics('open');
-      // this.localytics('upload');
-      this.session_interval = window.setInterval(this.upload_session, EventTrackingRepository.CONFIG.TRACKING.SESSION_INTERVAL);
+      super_properties[super_property] = value;
+      this.mixpanel.register(super_properties);
     }
   }
 
   tag_event(event_name, attributes) {
-    if (this.localytics) {
+    if (this.mixpanel) {
       if (attributes) {
         this.logger.info(`Tracking event '${event_name}' with attributes: ${JSON.stringify(attributes)}`);
       } else {
@@ -214,28 +174,23 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     }
   }
 
-  upload_session() {
-    if (this.localytics) {
-      // this.localytics('upload');
-    }
-  }
-
   _disable_tracking() {
-    if (this.localytics) {
-      // this.localytics('close');
+    if (this.mixpanel) {
+      // this.mixpanel('close');
       window.ll = undefined;
-      this.localytics = undefined;
+      this.mixpanel = undefined;
       this.logger.debug('Localytics reporting was disabled due to user preferences');
     }
   }
 
   _init_tracking() {
-    mixpanel.init(EventTrackingRepository.CONFIG.TRACKING.TOKEN, {
-      debug: !z.util.Environment.frontend.is_production(),
+    return new Promise((resolve) => {
+      mixpanel.init(EventTrackingRepository.CONFIG.TRACKING.TOKEN, {
+        autotrack: false,
+        debug: !z.util.Environment.frontend.is_production(),
+        loaded: resolve,
+      }, 'Wire');
     });
-
-    this.localytics = mixpanel;
-    this.logger.debug('Tracking is enabled');
   }
 
   _tracking_disabled() {
