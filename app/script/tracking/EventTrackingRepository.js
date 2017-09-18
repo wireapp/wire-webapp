@@ -84,7 +84,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
     return Promise.resolve()
       .then(() => {
-        if (!this._is_domain_allowed_for_tracking() && this.privacy_preference) {
+        if (this._is_domain_allowed_for_tracking() && this.privacy_preference) {
           this._enable_error_reporting();
           return this._init_tracking();
         }
@@ -115,12 +115,12 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
       if (privacy_preference) {
         this._enable_error_reporting();
-        if (!this._is_domain_allowed_for_tracking()) {
+        if (this._is_domain_allowed_for_tracking()) {
           this._re_enable_tracking();
         }
       } else {
         this._disable_error_reporting();
-        if (!this._is_domain_allowed_for_tracking()) {
+        if (this._is_domain_allowed_for_tracking()) {
           this._disable_tracking();
         }
       }
@@ -129,7 +129,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
   _subscribe_to_tracking_events() {
     amplify.subscribe(z.event.WebApp.ANALYTICS.CUSTOM_DIMENSION, this._set_super_property.bind(this));
-    amplify.subscribe(z.event.WebApp.ANALYTICS.EVENT, this.tag_event.bind(this));
+    amplify.subscribe(z.event.WebApp.ANALYTICS.EVENT, this._track_event.bind(this));
   }
 
   _unsubscribe_from_tracking_events() {
@@ -147,7 +147,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     }
   }
 
-  tag_event(event_name, attributes) {
+  _track_event(event_name, attributes) {
     if (this.mixpanel) {
       if (attributes) {
         this.logger.info(`Tracking event '${event_name}' with attributes: ${JSON.stringify(attributes)}`);
@@ -170,7 +170,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
   _disable_tracking() {
     this._unsubscribe_from_tracking_events();
-    this.tag_event(z.tracking.EventName.TRACKING.OPT_OUT);
+    this._track_event(z.tracking.EventName.TRACKING.OPT_OUT);
 
     if (this.mixpanel) {
       this.mixpanel.register({
@@ -183,7 +183,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   _re_enable_tracking() {
     this.mixpanel.unregister('$ignore');
     this._subscribe_to_tracking_events();
-    this.tag_event(z.tracking.EventName.TRACKING.OPT_IN);
+    this._track_event(z.tracking.EventName.TRACKING.OPT_IN);
     this._set_super_property(z.tracking.CustomDimension.CONTACTS, this.user_repository.connected_users().length);
   }
 
@@ -206,12 +206,12 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
       for (const domain of EventTrackingRepository.CONFIG.TRACKING.DISABLED_DOMAINS) {
         if (z.util.StringUtil.includes(window.location.hostname, domain)) {
           this.logger.debug('Tracking is not enabled for this domain.');
-          return true;
+          return false;
         }
       }
     }
 
-    return false;
+    return true;
   }
 
 

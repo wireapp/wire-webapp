@@ -24,37 +24,30 @@
 describe('z.tracking.EventTrackingRepository', function() {
   const test_factory = new TestFactory();
 
-  beforeEach(function(done) {
+  beforeEach((done) => {
     test_factory.exposeTrackingActors()
-      .then(function() {
-        TestFactory.tracking_repository._is_domain_allowed_for_tracking = () => false;
-        TestFactory.tracking_repository._has_permission = () => true;
+      .then(() => {
+        TestFactory.tracking_repository._is_domain_allowed_for_tracking = () => true;
         done();
       })
       .catch(done.fail);
   });
 
-  describe('init', function() {
-    fit('enables error reporting, user tracking and subscribes to events', function() {
+  describe('init', () => {
+    it('enables error reporting, user tracking and subscribes to tracking events', () => {
+      expect(TestFactory.tracking_repository.mixpanel).toBeUndefined();
       spyOn(TestFactory.tracking_repository, '_enable_error_reporting').and.callThrough();
       spyOn(TestFactory.tracking_repository, '_init_tracking').and.callThrough();
       spyOn(TestFactory.tracking_repository, '_subscribe_to_tracking_events').and.callThrough();
 
-      const send_usage_data = true;
-      TestFactory.tracking_repository.init(send_usage_data)
+      const properties = new z.properties.Properties();
+      TestFactory.tracking_repository.init(properties.settings.privacy.improve_wire)
         .then(() => {
+          expect(TestFactory.tracking_repository.mixpanel).toBeDefined();
           expect(TestFactory.tracking_repository._enable_error_reporting).toHaveBeenCalled();
           expect(TestFactory.tracking_repository._init_tracking).toHaveBeenCalled();
           expect(TestFactory.tracking_repository._subscribe_to_tracking_events).toHaveBeenCalled();
         });
-    });
-
-    it('initializes error reporting on an init event', function() {
-      spyOn(TestFactory.tracking_repository, 'init').and.callThrough();
-      spyOn(TestFactory.tracking_repository, '_enable_error_reporting').and.callThrough();
-
-      amplify.publish(z.event.WebApp.ANALYTICS.INIT, new z.properties.Properties());
-      expect(TestFactory.tracking_repository._enable_error_reporting).toHaveBeenCalled();
     });
   });
 
@@ -62,8 +55,8 @@ describe('z.tracking.EventTrackingRepository', function() {
     let event_name = undefined;
 
     beforeEach(function() {
-      TestFactory.tracking_repository.tag_event = jasmine.createSpy();
-      amplify.subscribe(z.event.WebApp.ANALYTICS.EVENT, TestFactory.tracking_repository.tag_event);
+      TestFactory.tracking_repository._track_event = jasmine.createSpy();
+      amplify.subscribe(z.event.WebApp.ANALYTICS.EVENT, TestFactory.tracking_repository._track_event);
     });
 
     afterEach(function() {
@@ -72,30 +65,28 @@ describe('z.tracking.EventTrackingRepository', function() {
 
     it('immediately reports events', function() {
       amplify.publish(z.event.WebApp.ANALYTICS.EVENT, 'i_am_an_event');
-      expect(TestFactory.tracking_repository.tag_event).toHaveBeenCalled();
-      expect(TestFactory.tracking_repository.tag_event).toHaveBeenCalledTimes(1);
+      expect(TestFactory.tracking_repository._track_event).toHaveBeenCalled();
+      expect(TestFactory.tracking_repository._track_event).toHaveBeenCalledTimes(1);
     });
 
     it('allows additional parameters for events', function() {
-      event_name = 'ArticleView';
+      event_name = 'Article View';
       const attributes = {
-        'Page Name': 'Baseball-Headlines',
+        'Page Name': 'Baseball Headlines',
         'Section': 'Sports',
       };
 
       amplify.publish(z.event.WebApp.ANALYTICS.EVENT, event_name, attributes);
-      expect(TestFactory.tracking_repository.tag_event).toHaveBeenCalledWith(event_name, attributes);
+      expect(TestFactory.tracking_repository._track_event).toHaveBeenCalledWith(event_name, attributes);
     });
   });
 
-  describe('Error Reporting', function() {
-    beforeAll(function() {
-      TestFactory.tracking_repository.init(new z.properties.Properties(), TestFactory.user_repository.self());
+  fdescribe('Error Reporting', function() {
+    beforeAll(function(done) {
+      TestFactory.tracking_repository.init(true).then(() => done);
     });
 
-    beforeEach(function() {
-      jasmine.clock().install();
-    });
+    beforeEach(() => jasmine.clock().install());
 
     afterEach(function() {
       jasmine.clock().uninstall();
