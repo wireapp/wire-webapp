@@ -98,14 +98,14 @@ def update_headers(response):
 
   csp_values = ';'.join([
     "default-src 'self'",
-    "connect-src 'self' blob: https://*.giphy.com https://apis.google.com https://www.google.com https://maps.googleapis.com https://api.raygun.io https://*.unsplash.com https://wire.com https://*.wire.com wss://prod-nginz-ssl.wire.com https://*.zinfra.io wss://*.zinfra.io",
+    "connect-src 'self' blob: https://*.giphy.com https://apis.google.com https://www.google.com https://maps.googleapis.com https://*.mxpnl.com https://api.raygun.io https://*.unsplash.com https://wire.com https://*.wire.com wss://prod-nginz-ssl.wire.com https://*.zinfra.io wss://*.zinfra.io",
     "font-src 'self' data:",
     "frame-src 'self' https://accounts.google.com https://*.soundcloud.com https://*.spotify.com https://*.vimeo.com https://*.youtube-nocookie.com",
-    "img-src 'self' blob: data: https://*.giphy.com https://1-ps.googleusercontent.com https://*.wire.com https://*.cloudfront.net https://*.zinfra.io https://csi.gstatic.com",
+    "img-src 'self' blob: data: https://*.giphy.com https://1-ps.googleusercontent.com https://*.mxpnl.com https://*.wire.com https://*.cloudfront.net https://*.zinfra.io https://csi.gstatic.com",
     # Note: The "blob:" attribute needs to be explicitly set for Chrome 47+: https://code.google.com/p/chromium/issues/detail?id=473904
     "media-src blob: data: *",
     "object-src 'self' https://*.youtube-nocookie.com https://1-ps.googleusercontent.com",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://api.raygun.io https://*.wire.com https://*.zinfra.io",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://*.mxpnl.com https://api.raygun.io https://*.wire.com https://*.zinfra.io",
     "style-src 'self' 'unsafe-inline' https://*.wire.com https://*.googleusercontent.com"
   ])
   response.headers['Content-Security-Policy'] = csp_values
