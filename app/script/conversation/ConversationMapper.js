@@ -46,10 +46,10 @@ z.conversation.ConversationMapper = class ConversationMapper {
    * Convert multiple JSON conversations into a conversation entities.
    *
    * @param {Object} json - Conversation data
-   * @param {number} [initial_timestamp=0] - Initial timestamp for conversation
+   * @param {number} [initial_timestamp=1] - Initial timestamp for conversation
    * @returns {Array<Conversation>} Mapped conversation entities
    */
-  map_conversations(json, initial_timestamp = 0) {
+  map_conversations(json, initial_timestamp = 1) {
     return json.map((conversation, index) => this._create_conversation_et(conversation, initial_timestamp + index));
   }
 
