@@ -259,14 +259,12 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   _check_error_payload(raygun_payload) {
     if (!this.last_report) {
       this.last_report = Date.now();
-
       return raygun_payload;
     }
 
     const time_since_last_report = Date.now() - this.last_report;
     if (time_since_last_report > EventTrackingRepository.CONFIG.RAYGUN.ERROR_REPORTING_THRESHOLD) {
       this.last_report = Date.now();
-
       return raygun_payload;
     }
 
