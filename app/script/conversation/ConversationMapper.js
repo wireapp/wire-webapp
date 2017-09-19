@@ -33,12 +33,12 @@ z.conversation.ConversationMapper = class ConversationMapper {
    * Convert a JSON conversation into a conversation entity.
    *
    * @param {Object} json - Conversation data
-   * @param {number} time_offset - Approximate time different to backend in milliseconds
+   * @param {number} [initial_timestamp] - Initial timestamp for conversation
    * @returns {Conversation} Mapped conversation entity
    */
-  map_conversation(json, time_offset) {
+  map_conversation(json, initial_timestamp) {
     const json_data_array = json ? (json.data ? [json.data] : [json]) : [json];
-    const [conversation_et] = this.map_conversations(json_data_array, time_offset);
+    const [conversation_et] = this.map_conversations(json_data_array, initial_timestamp);
     return conversation_et;
   }
 
@@ -46,11 +46,11 @@ z.conversation.ConversationMapper = class ConversationMapper {
    * Convert multiple JSON conversations into a conversation entities.
    *
    * @param {Object} json - Conversation data
-   * @param {number} time_offset - Approximate time different to backend in milliseconds
+   * @param {number} [initial_timestamp=0] - Initial timestamp for conversation
    * @returns {Array<Conversation>} Mapped conversation entities
    */
-  map_conversations(json, time_offset) {
-    return json.map((conversation, index) => this._create_conversation_et(conversation, time_offset));
+  map_conversations(json, initial_timestamp = 0) {
+    return json.map((conversation, index) => this._create_conversation_et(conversation, initial_timestamp + index));
   }
 
   /**
@@ -165,10 +165,10 @@ z.conversation.ConversationMapper = class ConversationMapper {
    *
    * @private
    * @param {Object} conversation_data - Either locally stored or backend data
-   * @param {number} [time_offset=0] - Approximate time different to backend in milliseconds
+   * @param {number} [initial_timestamp] - Initial timestamp for conversation in milliseconds
    * @returns {Conversation} Mapped conversation entity
    */
-  _create_conversation_et(conversation_data, time_offset = 0) {
+  _create_conversation_et(conversation_data, initial_timestamp) {
     if (conversation_data === undefined) {
       throw new Error('Cannot create conversation entity without data');
     }
@@ -183,10 +183,9 @@ z.conversation.ConversationMapper = class ConversationMapper {
     const self_state = members ? members.self : conversation_data;
     conversation_et = this.update_self_status(conversation_et, self_state);
 
-    if (!conversation_et.last_event_timestamp()) {
-      const current_timestamp = Date.now() - time_offset;
-      conversation_et.last_event_timestamp(current_timestamp);
-      conversation_et.last_server_timestamp(current_timestamp);
+    if (!conversation_et.last_event_timestamp() && initial_timestamp) {
+      conversation_et.last_event_timestamp(initial_timestamp);
+      conversation_et.last_server_timestamp(initial_timestamp);
     }
 
     // All users that are still active

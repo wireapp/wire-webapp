@@ -188,7 +188,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   create_new_conversation(user_ids, name) {
     return this.conversation_service.create_conversation(user_ids, name, this.team().id)
-      .then((response) => this._on_create({conversation: response.id, data: response}));
+      .then((response) => this._on_create({conversation: response.id, data: response, time: this.get_latest_event_timestamp()}));
   }
 
   /**
@@ -575,6 +575,19 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
+   * Get the most recent event timestamp from any conversation.
+   * @returns {number} Timestamp value
+   */
+  get_latest_event_timestamp() {
+    const [most_recent_conversation] = this.sorted_conversations();
+    if (most_recent_conversation) {
+      return most_recent_conversation.last_event_timestamp();
+    }
+
+    return 0;
+  }
+
+  /**
    * Get the next unarchived conversation.
    *
    * @param {Conversation} conversation_et - Conversation to start from
@@ -747,14 +760,21 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return Promise.all(connection_ets.map((connection_et) => this.map_connection(connection_et)));
   }
 
-  map_conversations(payload) {
+  /**
+   * Map conversation payload.
+   *
+   * @param {JSON} payload - Payload to map
+   * @param {number} [initial_timestamp=this.get_latest_event_timestamp()] - Initial server and event timestamp
+   * @returns {z.entity.Conversation|Array<z.entity.Conversation>} Mapped conversation/s
+   */
+  map_conversations(payload, initial_timestamp = this.get_latest_event_timestamp()) {
     if (payload.length) {
-      const conversation_ets = this.conversation_mapper.map_conversations(payload, this.time_offset);
+      const conversation_ets = this.conversation_mapper.map_conversations(payload, initial_timestamp);
       conversation_ets.forEach((conversation_et) => this._map_guest_status_self(conversation_et));
       return conversation_ets;
     }
 
-    const conversation_et = this.conversation_mapper.map_conversation(payload, this.time_offset);
+    const conversation_et = this.conversation_mapper.map_conversation(payload, initial_timestamp);
     this._map_guest_status_self(conversation_et);
     return conversation_et;
   }
@@ -2536,13 +2556,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
           throw error;
         }
 
-        return this.map_conversations(event_json);
+        return this.map_conversations(event_json, event_json.time);
       })
       .then((conversation_et) => this.update_participating_user_ets(conversation_et))
-      .then((conversation_et) => {
-        conversation_et.update_timestamp_server(event_json.time, true);
-        return this.save_conversation(conversation_et);
-      })
+      .then((conversation_et) => this.save_conversation(conversation_et))
       .then((conversation_et) => this._prepare_conversation_create_notification(conversation_et));
   }
 
