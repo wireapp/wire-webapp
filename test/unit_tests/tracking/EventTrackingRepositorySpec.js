@@ -34,7 +34,7 @@ describe('z.tracking.EventTrackingRepository', () => {
         .catch(done.fail);
     });
 
-    it('enables error reporting, user tracking and subscribes to tracking events', (done) => {
+    it('enables error reporting, user tracking and subscribes to tracking events by default', (done) => {
       expect(TestFactory.tracking_repository.mixpanel).toBeUndefined();
       spyOn(TestFactory.tracking_repository, '_enable_error_reporting').and.callThrough();
       spyOn(TestFactory.tracking_repository, '_init_tracking').and.callThrough();
@@ -47,6 +47,32 @@ describe('z.tracking.EventTrackingRepository', () => {
           expect(TestFactory.tracking_repository._enable_error_reporting).toHaveBeenCalled();
           expect(TestFactory.tracking_repository._init_tracking).toHaveBeenCalled();
           expect(TestFactory.tracking_repository._subscribe_to_tracking_events).toHaveBeenCalled();
+          done();
+        });
+    });
+
+    it('enables error reporting and user tracking', (done) => {
+      TestFactory.tracking_repository._track_event = jasmine.createSpy('_track_event');
+
+      expect(TestFactory.tracking_repository.is_error_tracking_activated).toBe(false);
+      expect(TestFactory.tracking_repository.is_user_tracking_activated).toBe(false);
+
+      TestFactory.tracking_repository.init(true)
+        .then(() => {
+          expect(TestFactory.tracking_repository.is_error_tracking_activated).toBe(true);
+          expect(TestFactory.tracking_repository.is_user_tracking_activated).toBe(true);
+
+          amplify.publish(z.event.WebApp.ANALYTICS.EVENT, 'i_am_an_event');
+          expect(TestFactory.tracking_repository._track_event).toHaveBeenCalledTimes(1);
+
+          amplify.publish(z.event.WebApp.ANALYTICS.EVENT, 'i_am_another_event');
+          expect(TestFactory.tracking_repository._track_event).toHaveBeenCalledTimes(2);
+
+          amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.PRIVACY, false);
+          expect(TestFactory.tracking_repository._track_event).toHaveBeenCalledTimes(3);
+
+          amplify.publish(z.event.WebApp.ANALYTICS.EVENT, 'i_am_not_tracking');
+          expect(TestFactory.tracking_repository._track_event).toHaveBeenCalledTimes(3);
           done();
         });
     });

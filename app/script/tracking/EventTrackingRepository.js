@@ -66,6 +66,9 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     this.mixpanel = undefined;
     this.privacy_preference = false;
 
+    this.is_error_tracking_activated = false;
+    this.is_user_tracking_activated = false;
+
     if (!this.conversation_repository && !this.user_repository) {
       this.init_without_user_tracking();
     } else {
@@ -90,12 +93,12 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
         }
         return undefined;
       })
-      .then((tracking_library) => {
-        if (tracking_library) {
-          this.mixpanel = tracking_library;
+      .then((mixpanel_instance) => {
+        if (mixpanel_instance) {
+          this.mixpanel = mixpanel_instance;
           this._subscribe_to_tracking_events();
         }
-        amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.PRIVACY, this.updated_privacy.bind(this));
+        amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.PRIVACY, this._update_privacy_preference.bind(this));
       });
   }
 
@@ -108,7 +111,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     this._enable_error_reporting();
   }
 
-  updated_privacy(privacy_preference) {
+  _update_privacy_preference(privacy_preference) {
     if (privacy_preference !== this.privacy_preference) {
       this.privacy_preference = privacy_preference;
 
@@ -119,16 +122,23 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
         }
       } else {
         this._disable_error_reporting();
-        if (this._is_domain_allowed_for_tracking()) {
-          this._disable_tracking();
-        }
+        this._disable_tracking();
       }
     }
   }
 
   _subscribe_to_tracking_events() {
-    amplify.subscribe(z.event.WebApp.ANALYTICS.CUSTOM_DIMENSION, this._set_super_property.bind(this));
-    amplify.subscribe(z.event.WebApp.ANALYTICS.EVENT, this._track_event.bind(this));
+    amplify.subscribe(z.event.WebApp.ANALYTICS.CUSTOM_DIMENSION, this, (...args) => {
+      if (this.is_user_tracking_activated) {
+        this._set_super_property(...args);
+      }
+    });
+
+    amplify.subscribe(z.event.WebApp.ANALYTICS.EVENT, this, (...args) => {
+      if (this.is_user_tracking_activated) {
+        this._track_event(...args);
+      }
+    });
   }
 
   _unsubscribe_from_tracking_events() {
@@ -138,40 +148,35 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
   // @see https://mixpanel.com/help/reference/javascript-full-api-reference#mixpanel.register
   _set_super_property(super_property, value) {
-    if (this.mixpanel) {
-      this.logger.info(`Set super property '${super_property}' to value '${value}'`);
-      const super_properties = {};
-      super_properties[super_property] = value;
-      this.mixpanel.register(super_properties);
-    } else {
-      this.logger.warn(`Cannot set super property '${super_property}' to value '${value}' because Mixpanel is not initialized`);
-    }
+    this.logger.info(`Set super property '${super_property}' to value '${value}'`);
+    const super_properties = {};
+    super_properties[super_property] = value;
+    this.mixpanel.register(super_properties);
   }
 
   _track_event(event_name, attributes) {
-    if (this.mixpanel) {
-      if (attributes) {
-        this.logger.info(`Tracking event '${event_name}' with attributes: ${JSON.stringify(attributes)}`);
-      } else {
-        this.logger.info(`Tracking event '${event_name}' without attributes`);
-      }
-
-      // During the transition phase (Localytics -> Mixpanel), we only want to log certain events.
-      const allowed_events = [
-        z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION,
-        z.tracking.EventName.TRACKING.OPT_IN,
-        z.tracking.EventName.TRACKING.OPT_OUT,
-      ];
-
-      if (allowed_events.includes(event_name)) {
-        this.mixpanel.track(event_name, attributes);
-      }
+    if (attributes) {
+      this.logger.info(`Tracking event '${event_name}' with attributes: ${JSON.stringify(attributes)}`);
     } else {
-      this.logger.warn(`Cannot track event '${super_property}' with attributes '${JSON.stringify(attributes)}' because Mixpanel is not initialized`);
+      this.logger.info(`Tracking event '${event_name}' without attributes`);
+    }
+
+    // During the transition phase (Localytics -> Mixpanel), we only want to log certain events.
+    const allowed_events = [
+      z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION,
+      z.tracking.EventName.TRACKING.OPT_IN,
+      z.tracking.EventName.TRACKING.OPT_OUT,
+    ];
+
+    if (allowed_events.includes(event_name)) {
+      this.mixpanel.track(event_name, attributes);
     }
   }
 
   _disable_tracking() {
+    this.logger.debug('Tracking was disabled due to user preferences');
+    this.is_user_tracking_activated = false;
+
     this._unsubscribe_from_tracking_events();
     this._track_event(z.tracking.EventName.TRACKING.OPT_OUT);
 
@@ -179,11 +184,11 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
       this.mixpanel.register({
         '$ignore': true,
       });
-      this.logger.debug('Tracking was disabled due to user preferences');
     }
   }
 
   _re_enable_tracking() {
+    this.is_user_tracking_activated = true;
     this.mixpanel.unregister('$ignore');
     this._subscribe_to_tracking_events();
     this._track_event(z.tracking.EventName.TRACKING.OPT_IN);
@@ -191,13 +196,15 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   }
 
   _init_tracking() {
+    this.is_user_tracking_activated = true;
+
     return new Promise((resolve) => {
       if (!this.mixpanel) {
         mixpanel.init(EventTrackingRepository.CONFIG.TRACKING.TOKEN, {
           autotrack: false,
           debug: !z.util.Environment.frontend.is_production(),
           loaded: resolve,
-        }, 'Wire');
+        }, Date.now());
       } else {
         resolve(this.mixpanel);
       }
@@ -277,6 +284,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
   _disable_error_reporting() {
     this.logger.debug('Disabling Raygun error reporting');
+    this.is_error_tracking_activated = false;
     Raygun.detach();
     Raygun.init(EventTrackingRepository.CONFIG.RAYGUN.API_KEY, {disableErrorTracking: true});
     this._detach_promise_rejection_handler();
@@ -284,6 +292,8 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
   _enable_error_reporting() {
     this.logger.debug('Enabling Raygun error reporting');
+    this.is_error_tracking_activated = true;
+
     const options = {
       disableErrorTracking: false,
       excludedHostnames: [
