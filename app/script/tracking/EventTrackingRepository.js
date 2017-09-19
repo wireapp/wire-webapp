@@ -25,7 +25,7 @@ window.z.tracking = z.tracking || {};
 
 z.tracking.EventTrackingRepository = class EventTrackingRepository {
   static get CONFIG() {
-    const MIXPANEL_KEY = z.util.Environment.frontend.is_production() ? 'c7dcb15893f14932b1c31b5fb33ff669' : '537da3b3bc07df1e420d07e2921a6f6f';
+    const MIXPANEL_API_TOKEN = z.util.Environment.frontend.is_production() ? 'c7dcb15893f14932b1c31b5fb33ff669' : '537da3b3bc07df1e420d07e2921a6f6f';
     const RAYGUN_API_KEY = z.util.Environment.frontend.is_production() ? 'lAkLCPLx3ysnsXktajeHmw==' : '5hvAMmz8wTXaHBYqu2TFUQ==';
 
     return {
@@ -40,7 +40,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
         ],
         SESSION_INTERVAL: 60 * 1000, // milliseconds
         SESSION_TIMEOUT: 3 * 60 * 1000,
-        TOKEN: MIXPANEL_KEY,
+        TOKEN: MIXPANEL_API_TOKEN,
       },
     };
   }
@@ -146,7 +146,6 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     amplify.unsubscribeAll(z.event.WebApp.ANALYTICS.EVENT);
   }
 
-  // @see https://mixpanel.com/help/reference/javascript-full-api-reference#mixpanel.register
   _set_super_property(super_property, value) {
     this.logger.info(`Set super property '${super_property}' to value '${value}'`);
     const super_properties = {};
@@ -161,7 +160,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
       this.logger.info(`Tracking event '${event_name}' without attributes`);
     }
 
-    // During the transition phase (Localytics -> Mixpanel), we only want to log certain events.
+    // During the transition phase (Localytics -> Mixpanel), we only want to log certain events:
     const allowed_events = [
       z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION,
       z.tracking.EventName.TRACKING.OPT_IN,
@@ -215,7 +214,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     if (!z.util.get_url_parameter(z.auth.URLParameter.TRACKING)) {
       for (const domain of EventTrackingRepository.CONFIG.TRACKING.DISABLED_DOMAINS) {
         if (z.util.StringUtil.includes(window.location.hostname, domain)) {
-          this.logger.debug('Tracking is not enabled for this domain.');
+          this.logger.debug(`Tracking is disabled for domain '${window.location.hostname}'`);
           return false;
         }
       }
