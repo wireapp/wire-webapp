@@ -44,7 +44,7 @@ describe('Giphy Repository', function() {
     spyOn(giphy_service, 'get_random').and.callThrough();
     spyOn(giphy_service, 'get_by_id').and.callThrough();
 
-    const random_foo_gif = `${urls.rest_url}/giphy/v1/gifs/random?tag=foo`;
+    const random_foo_gif = `${urls.rest_url}/proxy/giphy/v1/gifs/random?tag=foo`;
     /* eslint-disable comma-spacing, key-spacing, no-useless-escape, sort-keys, quotes */
     server.respondWith('GET', random_foo_gif, [
       200,
