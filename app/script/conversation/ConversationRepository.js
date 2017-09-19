@@ -584,7 +584,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       return most_recent_conversation.last_event_timestamp();
     }
 
-    return 0;
+    return 1;
   }
 
   /**
