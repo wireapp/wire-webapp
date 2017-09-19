@@ -34,7 +34,7 @@ describe('z.tracking.EventTrackingRepository', function() {
   });
 
   describe('init', () => {
-    it('enables error reporting, user tracking and subscribes to tracking events', () => {
+    it('enables error reporting, user tracking and subscribes to tracking events', (done) => {
       expect(TestFactory.tracking_repository.mixpanel).toBeUndefined();
       spyOn(TestFactory.tracking_repository, '_enable_error_reporting').and.callThrough();
       spyOn(TestFactory.tracking_repository, '_init_tracking').and.callThrough();
@@ -47,6 +47,7 @@ describe('z.tracking.EventTrackingRepository', function() {
           expect(TestFactory.tracking_repository._enable_error_reporting).toHaveBeenCalled();
           expect(TestFactory.tracking_repository._init_tracking).toHaveBeenCalled();
           expect(TestFactory.tracking_repository._subscribe_to_tracking_events).toHaveBeenCalled();
+          done();
         });
     });
   });
@@ -81,7 +82,7 @@ describe('z.tracking.EventTrackingRepository', function() {
     });
   });
 
-  fdescribe('Error Reporting', function() {
+  describe('Error Reporting', function() {
     beforeAll(function(done) {
       TestFactory.tracking_repository.init(true).then(() => done);
     });
