@@ -25,9 +25,9 @@ window.z.event = z.event || {};
 // Enum of different webapp events.
 z.event.WebApp = {
   ANALYTICS: {
-    CUSTOM_DIMENSION: 'wire.webapp.analytics.custom_dimension',
     EVENT: 'wire.webapp.analytics.event',
     INIT: 'wire.webapp.analytics.init',
+    SUPER_PROPERTY: 'wire.webapp.analytics.super_property',
   },
   APP: {
     UPDATE_PROGRESS: 'wire.webapp.app.update_progress',

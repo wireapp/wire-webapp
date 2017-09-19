@@ -76,7 +76,7 @@ z.user.UserRepository = class UserRepository {
         .length;
     });
     this.number_of_connected_users.subscribe((number_of_connected_users) => {
-      amplify.publish(z.event.WebApp.ANALYTICS.CUSTOM_DIMENSION, z.tracking.CustomDimension.CONTACTS, number_of_connected_users);
+      amplify.publish(z.event.WebApp.ANALYTICS.SUPER_PROPERTY, z.tracking.SuperProperty.CONTACTS, number_of_connected_users);
     });
 
     this.is_team = ko.observable();

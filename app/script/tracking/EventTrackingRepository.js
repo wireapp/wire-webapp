@@ -122,7 +122,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   }
 
   _subscribe_to_tracking_events() {
-    amplify.subscribe(z.event.WebApp.ANALYTICS.CUSTOM_DIMENSION, this, (...args) => {
+    amplify.subscribe(z.event.WebApp.ANALYTICS.SUPER_PROPERTY, this, (...args) => {
       if (this.is_user_tracking_activated) {
         this._set_super_property(...args);
       }
@@ -136,7 +136,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   }
 
   _unsubscribe_from_tracking_events() {
-    amplify.unsubscribeAll(z.event.WebApp.ANALYTICS.CUSTOM_DIMENSION);
+    amplify.unsubscribeAll(z.event.WebApp.ANALYTICS.SUPER_PROPERTY);
     amplify.unsubscribeAll(z.event.WebApp.ANALYTICS.EVENT);
   }
 
@@ -185,7 +185,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     this.mixpanel.unregister('$ignore');
     this._subscribe_to_tracking_events();
     this._track_event(z.tracking.EventName.TRACKING.OPT_IN);
-    this._set_super_property(z.tracking.CustomDimension.CONTACTS, this.user_repository.connected_users().length);
+    this._set_super_property(z.tracking.SuperProperty.CONTACTS, this.user_repository.connected_users().length);
   }
 
   _init_tracking() {
