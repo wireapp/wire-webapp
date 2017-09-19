@@ -309,7 +309,7 @@ z.main.App = class App {
    */
   init_service_worker() {
     if (navigator.serviceWorker) {
-      navigator.serviceWorker.register('/sw.js')
+      navigator.serviceWorker.register(`/sw.js?${z.util.Environment.version(false)}`)
         .then(({scope}) => this.logger.info(`ServiceWorker registration successful with scope: ${scope}`));
     }
   }

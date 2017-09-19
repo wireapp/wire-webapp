@@ -35,7 +35,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
       },
       TRACKING: {
         DISABLED_DOMAINS: [
-          // 'localhost',
+          'localhost',
           'zinfra.io',
         ],
         SESSION_INTERVAL: 60 * 1000, // milliseconds
@@ -205,7 +205,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   }
 
   _is_domain_allowed_for_tracking() {
-    if (!z.util.get_url_parameter(z.auth.URLParameter.LOCALYTICS)) {
+    if (!z.util.get_url_parameter(z.auth.URLParameter.TRACKING)) {
       for (const domain of EventTrackingRepository.CONFIG.TRACKING.DISABLED_DOMAINS) {
         if (z.util.StringUtil.includes(window.location.hostname, domain)) {
           this.logger.debug('Tracking is not enabled for this domain.');
