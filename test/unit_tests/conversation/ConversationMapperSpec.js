@@ -58,20 +58,19 @@ describe('Conversation Mapper', () => {
 
     it('maps conversations', () => {
       const {conversations} = payload.conversations.get;
-      const initial_timestamp = Date.now();
-      const conversation_ets = conversation_mapper.map_conversations(conversations, initial_timestamp);
+      const conversation_ets = conversation_mapper.map_conversations(conversations);
 
       expect(conversation_ets.length).toBe(conversations.length);
 
       const [first_conversation_et, second_conversation_et] = conversation_ets;
       expect(first_conversation_et.id).toBe(conversations[0].id);
-      expect(first_conversation_et.last_event_timestamp()).toBe(initial_timestamp);
-      expect(first_conversation_et.last_server_timestamp()).toBe(initial_timestamp);
+      expect(first_conversation_et.last_event_timestamp()).toBe(1);
+      expect(first_conversation_et.last_server_timestamp()).toBe(1);
       expect(first_conversation_et.name()).toBe(conversations[0].name);
 
       expect(second_conversation_et.id).toBe(conversations[1].id);
-      expect(second_conversation_et.last_event_timestamp()).toBe(initial_timestamp + 1);
-      expect(second_conversation_et.last_server_timestamp()).toBe(initial_timestamp + 1);
+      expect(second_conversation_et.last_event_timestamp()).toBe(2);
+      expect(second_conversation_et.last_server_timestamp()).toBe(2);
       expect(second_conversation_et.name()).toBe(conversations[1].name);
     });
 
