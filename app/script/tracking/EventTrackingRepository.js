@@ -144,6 +144,8 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
       const super_properties = {};
       super_properties[super_property] = value;
       this.mixpanel.register(super_properties);
+    } else {
+      this.logger.warn(`Cannot set super property '${super_property}' to value '${value}' because Mixpanel is not initialized`);
     }
   }
 
@@ -165,6 +167,8 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
       if (allowed_events.includes(event_name)) {
         mixpanel.track(event_name, attributes);
       }
+    } else {
+      this.logger.warn(`Cannot track event '${super_property}' with attributes '${JSON.stringify(attributes)}' because Mixpanel is not initialized`);
     }
   }
 
