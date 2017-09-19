@@ -94,7 +94,6 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
         if (tracking_library) {
           this.mixpanel = tracking_library;
           this._subscribe_to_tracking_events();
-          this.logger.debug('Tracking is enabled', tracking_library);
         }
         amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.PRIVACY, this.updated_privacy.bind(this));
       });
@@ -165,7 +164,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
       ];
 
       if (allowed_events.includes(event_name)) {
-        mixpanel.track(event_name, attributes);
+        this.mixpanel.track(event_name, attributes);
       }
     } else {
       this.logger.warn(`Cannot track event '${super_property}' with attributes '${JSON.stringify(attributes)}' because Mixpanel is not initialized`);
