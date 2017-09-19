@@ -64,7 +64,7 @@ z.event.EventRepository = class EventRepository {
     this.logger = new z.util.Logger('z.event.EventRepository', z.config.LOGGER.OPTIONS);
 
     this.current_client = undefined;
-    this.clock_drift = 0;
+    this.time_offset = 0;
 
     this.notification_handling_state = ko.observable(z.event.NOTIFICATION_HANDLING_STATE.STREAM);
     this.notification_handling_state.subscribe((handling_state) => {
@@ -413,19 +413,19 @@ z.event.EventRepository = class EventRepository {
   }
 
   /**
-   * Update local clock drift.
+   * Update local time offset.
    *
    * @private
    * @param {string} backend_time - Time as reported by backend
    * @returns {undefined} No return value
    */
   _update_baseline_clock(backend_time) {
-    const updated_clock_drift = new Date() - new Date(backend_time);
+    const updated_time_offset = new Date() - new Date(backend_time);
 
-    if (_.isNumber(updated_clock_drift)) {
-      this.clock_drift = updated_clock_drift;
-      amplify.publish(z.event.WebApp.EVENT.UPDATE_CLOCK_DRIFT, this.clock_drift);
-      this.logger.info(`Backend reported current time as '${backend_time}'. Clock drift set to '${this.clock_drift}' ms`);
+    if (_.isNumber(updated_time_offset)) {
+      this.time_offset = updated_time_offset;
+      amplify.publish(z.event.WebApp.EVENT.UPDATE_TIME_OFFSET, this.time_offset);
+      this.logger.info(`Backend reported current time as '${backend_time}'. Time offset updated to '${this.time_offset}' ms`);
     }
   }
 
@@ -701,7 +701,7 @@ z.event.EventRepository = class EventRepository {
       z.calling.enum.CALL_MESSAGE_TYPE.GROUP_LEAVE,
     ];
 
-    const corrected_timestamp = Date.now() - this.clock_drift;
+    const corrected_timestamp = Date.now() - this.time_offset;
     const threshold_timestamp = new Date(time).getTime() + EventRepository.CONFIG.E_CALL_EVENT_LIFETIME;
 
     const is_forced_event_type = forced_event_types.includes(content.type);

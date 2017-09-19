@@ -23,8 +23,8 @@ window.z = window.z || {};
 window.z.util = z.util || {};
 
 z.util.TimeUtil = {
-  adjust_current_timestamp: function(clock_drift) {
-    clock_drift = _.isNumber(clock_drift) ? clock_drift : 0;
-    return Date.now() - clock_drift;
+  adjust_current_timestamp: function(time_offset) {
+    time_offset = _.isNumber(time_offset) ? time_offset : 0;
+    return Date.now() - time_offset;
   },
 };
