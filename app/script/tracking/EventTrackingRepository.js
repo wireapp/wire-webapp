@@ -196,7 +196,18 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
         mixpanel.init(EventTrackingRepository.CONFIG.USER_TRACKING.API_KEY, {
           autotrack: false,
           debug: !z.util.Environment.frontend.is_production(),
-          loaded: resolve,
+          loaded: (mixpanel) => {
+            mixpanel.register({
+              '$city': null,
+              '$initial_referrer': null,
+              '$initial_referring_domain': null,
+              '$referrer': null,
+              '$referring_domain': null,
+              '$region': null,
+              'mp_country_code': null,
+            });
+            resolve(mixpanel);
+          },
         }, Date.now());
       } else {
         resolve(this.mixpanel);
