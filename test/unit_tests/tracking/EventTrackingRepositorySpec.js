@@ -130,7 +130,7 @@ describe('z.tracking.EventTrackingRepository', () => {
       expect(error_payload).toBe(false);
 
       jasmine.clock().mockDate(Date.now());
-      jasmine.clock().tick(z.tracking.EventTrackingRepository.CONFIG.RAYGUN.ERROR_REPORTING_THRESHOLD * 2);
+      jasmine.clock().tick(z.tracking.EventTrackingRepository.CONFIG.ERROR_TRACKING.REPORTING_THRESHOLD * 2);
 
       error_payload = TestFactory.tracking_repository._check_error_payload(raygun_payload);
       expect(error_payload).toBe(raygun_payload);

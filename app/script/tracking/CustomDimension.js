@@ -27,7 +27,6 @@ window.z.tracking = z.tracking || {};
  *
  * @note Custom Dimensions for Localytics have to be created server side and are
  *   identified by the index found in the settings of Desktop and Desktop staging projects
- * @see https://dashboard.localytics.com/settings/apps?org_id=1145
  *
  * @returns {z.tracking.CustomDimension} Enum of custom dimensions
  */

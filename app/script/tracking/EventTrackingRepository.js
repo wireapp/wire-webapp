@@ -25,32 +25,26 @@ window.z.tracking = z.tracking || {};
 
 z.tracking.EventTrackingRepository = class EventTrackingRepository {
   static get CONFIG() {
-    const MIXPANEL_API_TOKEN = z.util.Environment.frontend.is_production() ? 'c7dcb15893f14932b1c31b5fb33ff669' : '537da3b3bc07df1e420d07e2921a6f6f';
+    const MIXPANEL_TOKEN = z.util.Environment.frontend.is_production() ? 'c7dcb15893f14932b1c31b5fb33ff669' : '537da3b3bc07df1e420d07e2921a6f6f';
     const RAYGUN_API_KEY = z.util.Environment.frontend.is_production() ? 'lAkLCPLx3ysnsXktajeHmw==' : '5hvAMmz8wTXaHBYqu2TFUQ==';
 
     return {
-      RAYGUN: {
+      ERROR_TRACKING: {
         API_KEY: RAYGUN_API_KEY,
-        ERROR_REPORTING_THRESHOLD: 60 * 1000, // in milliseconds
+        REPORTING_THRESHOLD: 60 * 1000, // milliseconds
       },
-      TRACKING: {
+      USER_TRACKING: {
+        API_KEY: MIXPANEL_TOKEN,
         DISABLED_DOMAINS: [
           'localhost',
           'zinfra.io',
         ],
-        SESSION_INTERVAL: 60 * 1000, // milliseconds
-        SESSION_TIMEOUT: 3 * 60 * 1000,
-        TOKEN: MIXPANEL_API_TOKEN,
       },
     };
   }
 
   /**
    * Construct a new repository for user actions and errors reporting.
-   *
-   * @note Uses Localytics and Raygun.
-   * @see https://support.localytics.com/Javascript
-   * @see http://docs.localytics.com/#Dev/Instrument/js-tag-events.html
    *
    * @param {z.conversation.ConversationRepository} conversation_repository - Repository that handles conversations
    * @param {z.user.UserRepository} user_repository - Repository that handles users
@@ -199,7 +193,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
     return new Promise((resolve) => {
       if (!this.mixpanel) {
-        mixpanel.init(EventTrackingRepository.CONFIG.TRACKING.TOKEN, {
+        mixpanel.init(EventTrackingRepository.CONFIG.USER_TRACKING.API_KEY, {
           autotrack: false,
           debug: !z.util.Environment.frontend.is_production(),
           loaded: resolve,
@@ -212,7 +206,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
   _is_domain_allowed_for_tracking() {
     if (!z.util.get_url_parameter(z.auth.URLParameter.TRACKING)) {
-      for (const domain of EventTrackingRepository.CONFIG.TRACKING.DISABLED_DOMAINS) {
+      for (const domain of EventTrackingRepository.CONFIG.USER_TRACKING.DISABLED_DOMAINS) {
         if (z.util.StringUtil.includes(window.location.hostname, domain)) {
           this.logger.debug(`Tracking is disabled for domain '${window.location.hostname}'`);
           return false;
@@ -269,7 +263,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     }
 
     const time_since_last_report = Date.now() - this.last_report;
-    if (time_since_last_report > EventTrackingRepository.CONFIG.RAYGUN.ERROR_REPORTING_THRESHOLD) {
+    if (time_since_last_report > EventTrackingRepository.CONFIG.ERROR_TRACKING.REPORTING_THRESHOLD) {
       this.last_report = Date.now();
       return raygun_payload;
     }
@@ -285,7 +279,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     this.logger.debug('Disabling Raygun error reporting');
     this.is_error_tracking_activated = false;
     Raygun.detach();
-    Raygun.init(EventTrackingRepository.CONFIG.RAYGUN.API_KEY, {disableErrorTracking: true});
+    Raygun.init(EventTrackingRepository.CONFIG.ERROR_TRACKING.API_KEY, {disableErrorTracking: true});
     this._detach_promise_rejection_handler();
   }
 
@@ -306,7 +300,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
     options.debugMode = !z.util.Environment.frontend.is_production();
 
-    Raygun.init(EventTrackingRepository.CONFIG.RAYGUN.API_KEY, options).attach();
+    Raygun.init(EventTrackingRepository.CONFIG.ERROR_TRACKING.API_KEY, options).attach();
 
     /*
     Adding a version to the Raygun reports to identify which version of the Wire ran into the issue.
