@@ -39,6 +39,11 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
           'localhost',
           'zinfra.io',
         ],
+        SUPPORTED_EVENTS: [
+          z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION,
+          z.tracking.EventName.TRACKING.OPT_IN,
+          z.tracking.EventName.TRACKING.OPT_OUT,
+        ],
       },
     };
   }
@@ -154,14 +159,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
       this.logger.info(`Tracking event '${event_name}' without attributes`);
     }
 
-    // During the transition phase (Localytics -> Mixpanel), we only want to log certain events:
-    const allowed_events = [
-      z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION,
-      z.tracking.EventName.TRACKING.OPT_IN,
-      z.tracking.EventName.TRACKING.OPT_OUT,
-    ];
-
-    if (allowed_events.includes(event_name)) {
+    if (EventTrackingRepository.CONFIG.USER_TRACKING.SUPPORTED_EVENTS.includes(event_name)) {
       this.mixpanel.track(event_name, attributes);
     }
   }
