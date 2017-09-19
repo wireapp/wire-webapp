@@ -76,7 +76,7 @@ z.calling.CallingRepository = class CallingRepository {
       }
     });
 
-    this.clock_drift = 0;
+    this.time_offset = 0;
 
     this.calling_config = undefined;
     this.calling_config_timeout = undefined;
@@ -133,7 +133,7 @@ z.calling.CallingRepository = class CallingRepository {
     amplify.subscribe(z.event.WebApp.CALL.STATE.PARTICIPANT_LEFT, this.participant_left.bind(this));
     amplify.subscribe(z.event.WebApp.CALL.STATE.TOGGLE, this.toggle_state.bind(this));
     amplify.subscribe(z.event.WebApp.DEBUG.UPDATE_LAST_CALL_STATUS, this.store_flow_status.bind(this));
-    amplify.subscribe(z.event.WebApp.EVENT.UPDATE_CLOCK_DRIFT, this.update_clock_drift.bind(this));
+    amplify.subscribe(z.event.WebApp.EVENT.UPDATE_TIME_OFFSET, this.update_time_offset.bind(this));
     amplify.subscribe(z.event.WebApp.LIFECYCLE.LOADED, this.get_config);
     amplify.subscribe(z.util.Logger.prototype.LOG_ON_DEBUG, this.set_debug_state.bind(this));
   }
@@ -1138,17 +1138,17 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {undefined} No return value
    */
   inject_deactivate_event(call_message_et, source, reason) {
-    const deactivate_event = z.conversation.EventBuilder.build_voice_channel_deactivate(call_message_et, reason, this.clock_drift);
+    const deactivate_event = z.conversation.EventBuilder.build_voice_channel_deactivate(call_message_et, reason, this.time_offset);
     amplify.publish(z.event.WebApp.EVENT.INJECT, deactivate_event, source);
   }
 
   /**
-   * Update clock drift.
-   * @param {number} clock_drift - Approximate time different to backend in milliseconds
+   * Update time offset.
+   * @param {number} time_offset - Approximate time different to backend in milliseconds
    * @returns {undefined} No return value
    */
-  update_clock_drift(clock_drift) {
-    this.clock_drift = clock_drift;
+  update_time_offset(time_offset) {
+    this.time_offset = time_offset;
   }
 
 

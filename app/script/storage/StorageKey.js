@@ -23,9 +23,6 @@ window.z = window.z || {};
 window.z.storage = z.storage || {};
 
 z.storage.StorageKey = {
-  ANNOUNCE: {
-    ANNOUNCE_KEY: 'z.storage.StorageKey.ANNOUNCE.ANNOUNCE_KEY',
-  },
   AUTH: {
     ACCESS_TOKEN: {
       EXPIRATION: 'z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION',

@@ -78,10 +78,10 @@ z.main.App = class App {
   _setup_repositories() {
     const repositories = {};
 
-    repositories.announce            = new z.announce.AnnounceRepository(this.service.announce);
     repositories.audio               = this.auth.audio;
     repositories.cache               = new z.cache.CacheRepository();
     repositories.giphy               = new z.extension.GiphyRepository(this.service.giphy);
+    repositories.lifecycle            = new z.lifecycle.LifecycleRepository(this.service.lifecycle);
     repositories.media               = new z.media.MediaRepository();
     repositories.storage             = new z.storage.StorageRepository(this.service.storage);
 
@@ -128,6 +128,7 @@ z.main.App = class App {
     services.connect_google = new z.connect.ConnectGoogleService(this.auth.client);
     services.cryptography   = new z.cryptography.CryptographyService(this.auth.client);
     services.giphy          = new z.extension.GiphyService(this.auth.client);
+    services.lifecycle       = new z.lifecycle.LifecycleService();
     services.search         = new z.search.SearchService(this.auth.client);
     services.storage        = new z.storage.StorageService();
     services.team           = new z.team.TeamService(this.auth.client);
@@ -137,7 +138,6 @@ z.main.App = class App {
 
     services.client         = new z.client.ClientService(this.auth.client, services.storage);
     services.notification   = new z.event.NotificationService(this.auth.client, services.storage);
-    services.announce       = new z.announce.AnnounceService();
 
     if (z.util.Environment.browser.edge) {
       services.conversation = new z.conversation.ConversationServiceNoCompound(this.auth.client, services.storage);
@@ -294,7 +294,7 @@ z.main.App = class App {
       })
       .then(() => {
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.UPDATED_CONVERSATIONS);
-        this.repository.announce.init();
+        this.repository.lifecycle.init();
         this.repository.audio.init(true);
         this.repository.client.cleanup_clients_and_sessions(true);
         this.repository.conversation.cleanup_conversations();
@@ -641,7 +641,7 @@ z.main.App = class App {
     if (z.util.Environment.desktop) {
       amplify.publish(z.event.WebApp.LIFECYCLE.RESTART, this.update_source);
     }
-    if (this.update_source === z.announce.UPDATE_SOURCE.WEBAPP) {
+    if (this.update_source === z.lifecycle.UPDATE_SOURCE.WEBAPP) {
       window.location.reload(true);
       window.focus();
     }
@@ -649,7 +649,7 @@ z.main.App = class App {
 
   /**
    * Notify about found update
-   * @param {z.announce.UPDATE_SOURCE} update_source - Update source
+   * @param {z.lifecycle.UPDATE_SOURCE} update_source - Update source
    * @returns {undefined} No return value
    */
   update(update_source) {
