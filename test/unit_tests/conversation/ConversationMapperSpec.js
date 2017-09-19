@@ -33,7 +33,8 @@ describe('Conversation Mapper', () => {
 
     it('maps a conversation', () => {
       const {conversation} = entities;
-      const conversation_et = conversation_mapper.map_conversation(conversation);
+      const initial_timestamp = Date.now();
+      const conversation_et = conversation_mapper.map_conversation(conversation, initial_timestamp);
 
       const expected_participant_ids = [
         conversation.members.others[0].id,
@@ -44,22 +45,34 @@ describe('Conversation Mapper', () => {
 
       expect(conversation_et.participating_user_ids()).toEqual(expected_participant_ids);
       expect(conversation_et.id).toBe(conversation.id);
-      expect(conversation_et.name()).toBe(conversation.name);
-      expect(conversation_et.type()).toBe(z.conversation.ConversationType.REGULAR);
       expect(conversation_et.is_group()).toBeTruthy();
-      expect(conversation_et.number_of_participants()).toBe(conversation.members.others.length);
       expect(conversation_et.is_muted()).toBe(conversation.members.self.otr_muted);
+      expect(conversation_et.last_event_timestamp()).toBe(initial_timestamp);
+      expect(conversation_et.last_server_timestamp()).toBe(initial_timestamp);
       expect(conversation_et.muted_timestamp()).toEqual(new Date(conversation.members.self.otr_muted_ref).getTime());
+      expect(conversation_et.name()).toBe(conversation.name);
+      expect(conversation_et.number_of_participants()).toBe(conversation.members.others.length);
       expect(conversation_et.team_id).toEqual(conversation.team);
+      expect(conversation_et.type()).toBe(z.conversation.ConversationType.REGULAR);
     });
 
     it('maps conversations', () => {
       const {conversations} = payload.conversations.get;
-      const conversation_ets = conversation_mapper.map_conversations(conversations);
+      const initial_timestamp = Date.now();
+      const conversation_ets = conversation_mapper.map_conversations(conversations, initial_timestamp);
 
       expect(conversation_ets.length).toBe(conversations.length);
-      expect(conversation_ets[0].id).toBe(conversations[0].id);
-      expect(conversation_ets[1].name()).toBe(conversations[1].name);
+
+      const [first_conversation_et, second_conversation_et] = conversation_ets;
+      expect(first_conversation_et.id).toBe(conversations[0].id);
+      expect(first_conversation_et.last_event_timestamp()).toBe(initial_timestamp);
+      expect(first_conversation_et.last_server_timestamp()).toBe(initial_timestamp);
+      expect(first_conversation_et.name()).toBe(conversations[0].name);
+
+      expect(second_conversation_et.id).toBe(conversations[1].id);
+      expect(second_conversation_et.last_event_timestamp()).toBe(initial_timestamp + 1);
+      expect(second_conversation_et.last_server_timestamp()).toBe(initial_timestamp + 1);
+      expect(second_conversation_et.name()).toBe(conversations[1].name);
     });
 
     it('maps a team conversation', () => {
