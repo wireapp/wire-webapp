@@ -541,6 +541,47 @@ describe('ConversationRepository', () => {
       });
     });
 
+    describe('"conversation.create"', () => {
+      let conversation_id = null;
+      let create_event = null;
+
+      beforeEach(() => {
+        spyOn(TestFactory.conversation_repository, '_on_create').and.callThrough();
+        spyOn(TestFactory.conversation_repository, 'map_conversations').and.returnValue(true);
+        spyOn(TestFactory.conversation_repository, 'update_participating_user_ets').and.returnValue(true);
+        spyOn(TestFactory.conversation_repository, 'save_conversation').and.returnValue(true);
+        spyOn(TestFactory.conversation_repository, '_prepare_conversation_create_notification').and.returnValue(true);
+
+        conversation_id = z.util.create_random_uuid();
+        create_event = {conversation: conversation_id, data: {}, type: z.event.Backend.CONVERSATION.CREATE};
+      });
+
+      it('should process create event for a new conversation created locally', (done) => {
+        TestFactory.conversation_repository.on_conversation_event(create_event)
+          .then(() => {
+            expect(TestFactory.conversation_repository._on_create).toHaveBeenCalled();
+            expect(TestFactory.conversation_repository.map_conversations).toHaveBeenCalledWith(create_event, 1);
+            expect(TestFactory.conversation_repository._prepare_conversation_create_notification).toHaveBeenCalled();
+            done();
+          })
+          .catch(done.fail);
+      });
+
+      it('should process create event for a new conversation created remotely', (done) => {
+        const time = new Date();
+        create_event.time = time.toISOString();
+
+        TestFactory.conversation_repository.on_conversation_event(create_event)
+          .then(() => {
+            expect(TestFactory.conversation_repository._on_create).toHaveBeenCalled();
+            expect(TestFactory.conversation_repository.map_conversations).toHaveBeenCalledWith(create_event, time.getTime());
+            expect(TestFactory.conversation_repository._prepare_conversation_create_notification).toHaveBeenCalled();
+            done();
+          })
+          .catch(done.fail);
+      });
+    });
+
     describe('"conversation.member-join"', () => {
       let member_join_event = null;
 
