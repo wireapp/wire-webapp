@@ -32,10 +32,6 @@ z.tracking.EventName = {
     LOGGED_IN: 'account.logged_in',
     OPENED_LOGIN: 'account.opened_login',
   },
-  ANNOUNCE: {
-    CLICKED: 'announce.clicked',
-    SENT: 'announce.sent',
-  },
   APP_LAUNCH: 'appLaunch',
   CALLING: {
     ENDED_CALL: 'calling.ended_call',

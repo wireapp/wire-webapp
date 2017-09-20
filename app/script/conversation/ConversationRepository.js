@@ -60,7 +60,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.active_conversation = ko.observable();
     this.conversations = ko.observableArray([]);
 
-    this.clock_drift = 0;
+    this.time_offset = 0;
 
     this.team = this.team_repository.team;
     this.team.subscribe(() => this.map_guest_status_self());
@@ -155,7 +155,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     amplify.subscribe(z.event.WebApp.CONVERSATION.MISSED_EVENTS, this.on_missed_events.bind(this));
     amplify.subscribe(z.event.WebApp.CONVERSATION.PERSIST_STATE, this.save_conversation_state_in_db.bind(this));
     amplify.subscribe(z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, this.set_notification_handling_state.bind(this));
-    amplify.subscribe(z.event.WebApp.EVENT.UPDATE_CLOCK_DRIFT, this.update_clock_drift.bind(this));
+    amplify.subscribe(z.event.WebApp.EVENT.UPDATE_TIME_OFFSET, this.update_time_offset.bind(this));
     amplify.subscribe(z.event.WebApp.TEAM.MEMBER_LEAVE, this.team_member_leave.bind(this));
     amplify.subscribe(z.event.WebApp.USER.UNBLOCKED, this.unblocked_user.bind(this));
   }
@@ -188,7 +188,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   create_new_conversation(user_ids, name) {
     return this.conversation_service.create_conversation(user_ids, name, this.team().id)
-      .then((response) => this._on_create({conversation: response.id, data: response}));
+      .then((response) => this._on_create({conversation: response.id, data: response, time: this.get_latest_event_timestamp()}));
   }
 
   /**
@@ -575,6 +575,19 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
+   * Get the most recent event timestamp from any conversation.
+   * @returns {number} Timestamp value
+   */
+  get_latest_event_timestamp() {
+    const [most_recent_conversation] = this.sorted_conversations();
+    if (most_recent_conversation) {
+      return most_recent_conversation.last_event_timestamp();
+    }
+
+    return 1;
+  }
+
+  /**
    * Get the next unarchived conversation.
    *
    * @param {Conversation} conversation_et - Conversation to start from
@@ -747,14 +760,21 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return Promise.all(connection_ets.map((connection_et) => this.map_connection(connection_et)));
   }
 
-  map_conversations(payload) {
+  /**
+   * Map conversation payload.
+   *
+   * @param {JSON} payload - Payload to map
+   * @param {number} [initial_timestamp=this.get_latest_event_timestamp()] - Initial server and event timestamp
+   * @returns {z.entity.Conversation|Array<z.entity.Conversation>} Mapped conversation/s
+   */
+  map_conversations(payload, initial_timestamp = this.get_latest_event_timestamp()) {
     if (payload.length) {
-      const conversation_ets = this.conversation_mapper.map_conversations(payload);
+      const conversation_ets = this.conversation_mapper.map_conversations(payload, initial_timestamp);
       conversation_ets.forEach((conversation_et) => this._map_guest_status_self(conversation_et));
       return conversation_ets;
     }
 
-    const conversation_et = this.conversation_mapper.map_conversation(payload);
+    const conversation_et = this.conversation_mapper.map_conversation(payload, initial_timestamp);
     this._map_guest_status_self(conversation_et);
     return conversation_et;
   }
@@ -838,12 +858,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
-   * Update clock drift.
-   * @param {number} clock_drift - Approximate time different to backend in milliseconds
+   * Update time offset.
+   * @param {number} time_offset - Approximate time different to backend in milliseconds
    * @returns {undefined} No return value
    */
-  update_clock_drift(clock_drift) {
-    this.clock_drift = clock_drift;
+  update_time_offset(time_offset) {
+    this.time_offset = time_offset;
   }
 
   /**
@@ -945,7 +965,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   _update_cleared_timestamp(conversation_et) {
-    const timestamp = conversation_et.get_latest_timestamp(this.clock_drift);
+    const timestamp = conversation_et.get_latest_timestamp(this.time_offset);
 
     if (timestamp && conversation_et.set_timestamp(timestamp, z.conversation.TIMESTAMP_TYPE.CLEARED)) {
       const message_content = new z.proto.Cleared(conversation_et.id, timestamp);
@@ -1073,7 +1093,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .filter((conversation_et) => conversation_et.team_id === team_id && !conversation_et.removed_from_conversation())
       .forEach((conversation_et) => {
         if (conversation_et.participating_user_ids().includes(user_id)) {
-          const member_leave_event = z.conversation.EventBuilder.build_team_member_leave(conversation_et, user_id, this.clock_drift);
+          const member_leave_event = z.conversation.EventBuilder.build_team_member_leave(conversation_et, user_id, this.time_offset);
           amplify.publish(z.event.WebApp.EVENT.INJECT, member_leave_event);
         }
       });
@@ -1091,7 +1111,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     const payload = {
       otr_muted: !conversation_et.is_muted(),
-      otr_muted_ref: new Date(conversation_et.get_latest_timestamp(this.clock_drift)).toISOString(),
+      otr_muted_ref: new Date(conversation_et.get_latest_timestamp(this.time_offset)).toISOString(),
     };
 
     return this.conversation_service.update_member_properties(conversation_et.id, payload)
@@ -1137,7 +1157,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       return Promise.reject(new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND));
     }
 
-    const archive_timestamp = conversation_et.get_latest_timestamp(this.clock_drift);
+    const archive_timestamp = conversation_et.get_latest_timestamp(this.time_offset);
     const no_state_change = conversation_et.is_archived() === new_archive_state;
     const no_timestamp_change = conversation_et.archived_timestamp() === archive_timestamp;
     if (no_state_change && no_timestamp_change) {
@@ -1203,7 +1223,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   _update_last_read_timestamp(conversation_et) {
-    const timestamp = conversation_et.get_latest_timestamp(this.clock_drift);
+    const timestamp = conversation_et.get_latest_timestamp(this.time_offset);
 
     if (timestamp && conversation_et.set_timestamp(timestamp, z.conversation.TIMESTAMP_TYPE.LAST_READ)) {
       const message_content = new z.proto.LastRead(conversation_et.id, conversation_et.last_read_timestamp());
@@ -1260,7 +1280,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           token: asset_data.asset_token,
         };
 
-        const asset_add_event = z.conversation.EventBuilder.build_asset_add(conversation_et, data, this.clock_drift);
+        const asset_add_event = z.conversation.EventBuilder.build_asset_add(conversation_et, data, this.time_offset);
 
         asset_add_event.id = message_id;
         asset_add_event.time = payload.time;
@@ -1778,7 +1798,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           throw new Error('Cannot send message to conversation you are not part of');
         }
 
-        const optimistic_event = z.conversation.EventBuilder.build_message_add(conversation_et, this.clock_drift);
+        const optimistic_event = z.conversation.EventBuilder.build_message_add(conversation_et, this.time_offset);
         return this.cryptography_repository.cryptography_mapper.map_generic_message(generic_message, optimistic_event);
       })
       .then((message_mapped) => {
@@ -2422,7 +2442,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.filtered_conversations()
       .filter((conversation_et) => !conversation_et.removed_from_conversation())
       .forEach((conversation_et) => {
-        const missed_event = z.conversation.EventBuilder.build_missed(conversation_et, this.clock_drift);
+        const missed_event = z.conversation.EventBuilder.build_missed(conversation_et, this.time_offset);
         amplify.publish(z.event.WebApp.EVENT.INJECT, missed_event);
       });
   }
@@ -2536,13 +2556,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
           throw error;
         }
 
-        return this.update_participating_user_ets(this.map_conversations(event_json))
-          .then((conversation_et) => {
-            conversation_et.update_timestamp_server(event_json.time, true);
-            return this.save_conversation(conversation_et);
-          })
-          .then((conversation_et) => this._prepare_conversation_create_notification(conversation_et));
-      });
+        return this.map_conversations(event_json, event_json.time);
+      })
+      .then((conversation_et) => this.update_participating_user_ets(conversation_et))
+      .then((conversation_et) => this.save_conversation(conversation_et))
+      .then((conversation_et) => this._prepare_conversation_create_notification(conversation_et));
   }
 
   /**
