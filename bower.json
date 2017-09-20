@@ -13,6 +13,7 @@
     "knockout": "https://github.com/knockout/knockout.git#3.4.1",
     "linkifyjs": "https://github.com/nfrasser/linkify-shim.git#2.1.4",
     "marked": "https://github.com/wireapp/marked.git#18f7f85194ec0f619397f49f7dfdaa5e5b09db09",
+    "mixpanel": "https://github.com/mixpanel/mixpanel-js.git#2.13.0",
     "moment": "https://github.com/moment/moment.git#2.18.1",
     "normalize-css": "https://github.com/necolas/normalize.css.git#3.0.3",
     "pako": "https://github.com/nodeca/pako.git#1.0.6",
@@ -91,6 +92,12 @@
     },
     "marked": {
       "js": "lib/marked.js"
+    },
+    "mixpanel": {
+      "js": [
+        "mixpanel-jslib-snippet.js",
+        "mixpanel.min.js"
+      ]
     },
     "moment": {
       "js": [
