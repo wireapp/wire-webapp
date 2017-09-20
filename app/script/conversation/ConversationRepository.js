@@ -781,6 +781,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   map_guest_status_self() {
     this.filtered_conversations().forEach((conversation_et) => this._map_guest_status_self(conversation_et));
+
+    if (this.team()) {
+      this.user_repository.self().is_team_member(true);
+    }
   }
 
   _map_guest_status_self(conversation_et) {
