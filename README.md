@@ -23,13 +23,13 @@ No license is granted to the Wire trademark and its associated logos, all of whi
 ### Installation
 
 1. Install [Node.js](https://nodejs.org/)
-2. Install [Yarn](https://yarnpkg.com): `npm install -g yarn`
+2. Install [Yarn](https://yarnpkg.com/en/docs/install)
 3. Run `yarn`
 
 ### Execution
 
 Run `yarn start` and Wire's web app will be available at: http://localhost:8888/auth/#login
- 
+
 To login with your existing Wire account use: http://localhost:8888/auth/?env=prod#login
 
 ### Status
