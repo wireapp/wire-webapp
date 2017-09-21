@@ -58,11 +58,9 @@ rules:
   no-else-return: 2
   no-lonely-if: 2
   no-shadow: 2
-  no-trailing-spaces: [2, {ignoreComments: true, skipBlankLines: false}]
   no-unused-expressions: 2
   no-unused-vars: [2, {args: none}]
   no-var: 2
-  no-whitespace-before-property: 2
   prefer-const: 2
   prefer-promise-reject-errors: 2
   prefer-spread: 2
