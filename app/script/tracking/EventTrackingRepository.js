@@ -183,8 +183,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     this.mixpanel.unregister('$ignore');
     this._subscribe_to_tracking_events();
 
-    const contacts = this.user_repository.is_team() ? this.user_repository.team_users() : this.user_repository.connected_users();
-    this._set_super_property(z.tracking.SuperProperty.CONTACTS, contacts.length);
+    this._set_super_property(z.tracking.SuperProperty.CONTACTS, this.user_repository.number_of_contacts());
     this._track_event(z.tracking.EventName.TRACKING.OPT_IN);
   }
 
