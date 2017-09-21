@@ -56,7 +56,7 @@
     "deploy-travis-staging": "grunt app_deploy_travis:staging",
     "lint": "yarn lint-scripts && yarn lint-styles",
     "lint-fix": "npm run lint-scripts -- --fix",
-    "lint-scripts": "eslint -c .eslintrc.yaml --ignore-path .gitignore --ignore-path .eslintignore --quiet app/script/ test/ bin/ grunt/ Gruntfile.js",
+    "lint-scripts": "eslint -c .eslintrc.yaml --ignore-path .gitignore --ignore-path .eslintignore --quiet app/script/ test/ bin/ grunt/ Gruntfile.js karma.conf.js",
     "lint-styles": "prettier --single-quote --print-width=120 --write 'app/style/**/*.less'",
     "postinstall": "grunt init",
     "precommit": "lint-staged",
