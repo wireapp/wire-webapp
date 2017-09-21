@@ -70,18 +70,19 @@ z.user.UserRepository = class UserRepository {
         .sort((user_a, user_b) => z.util.StringUtil.sort_by_priority(user_a.first_name(), user_b.first_name()));
     }).extend({rateLimit: 1000});
 
-    this.number_of_connected_users = ko.pureComputed(() => {
-      return this.connected_users()
-        .filter((user_et) => !user_et.is_bot)
-        .length;
-    });
-    this.number_of_connected_users.subscribe((number_of_connected_users) => {
-      amplify.publish(z.event.WebApp.ANALYTICS.SUPER_PROPERTY, z.tracking.SuperProperty.CONTACTS, number_of_connected_users);
-    });
-
     this.is_team = ko.observable();
     this.team_members = undefined;
     this.team_users = undefined;
+
+    this.number_of_contacts = ko.pureComputed(() => {
+      const contacts = this.is_team() ? this.team_users() : this.connected_users();
+      return contacts
+        .filter((user_et) => !user_et.is_bot)
+        .length;
+    });
+    this.number_of_contacts.subscribe((number_of_contacts) => {
+      amplify.publish(z.event.WebApp.ANALYTICS.SUPER_PROPERTY, z.tracking.SuperProperty.CONTACTS, number_of_contacts);
+    });
 
     amplify.subscribe(z.event.WebApp.CLIENT.ADD, this.add_client_to_user.bind(this));
     amplify.subscribe(z.event.WebApp.CLIENT.REMOVE, this.remove_client_from_user.bind(this));
