@@ -81,6 +81,7 @@ z.user.UserRepository = class UserRepository {
 
     this.is_team = ko.observable();
     this.team_members = undefined;
+    this.team_users = undefined;
 
     amplify.subscribe(z.event.WebApp.CLIENT.ADD, this.add_client_to_user.bind(this));
     amplify.subscribe(z.event.WebApp.CLIENT.REMOVE, this.remove_client_from_user.bind(this));
