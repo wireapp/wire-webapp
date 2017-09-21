@@ -40,10 +40,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
       USER_TRACKING: {
         API_KEY: MIXPANEL_TOKEN,
         CLIENT_TYPE: 'desktop',
-        DISABLED_DOMAINS: [
-          'localhost',
-          'zinfra.io',
-        ],
+        DISABLED_DOMAINS: ['localhost', 'zinfra.io'],
         SUPPORTED_EVENTS: [
           z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION,
           z.tracking.EventName.TRACKING.OPT_IN,
