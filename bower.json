@@ -195,5 +195,9 @@
     "wire-webapp-proteus": {
       "js": "dist/window/*.js"
     }
+  },
+  "resolutions": {
+    "libsodium.js": "0.5.4",
+    "wire-webapp-proteus": "5.2.0"
   }
 }
