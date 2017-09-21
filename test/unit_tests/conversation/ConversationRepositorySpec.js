@@ -560,7 +560,7 @@ describe('ConversationRepository', () => {
         TestFactory.conversation_repository.on_conversation_event(create_event)
           .then(() => {
             expect(TestFactory.conversation_repository._on_create).toHaveBeenCalled();
-            expect(TestFactory.conversation_repository.map_conversations).toHaveBeenCalledWith(create_event, 1);
+            expect(TestFactory.conversation_repository.map_conversations).toHaveBeenCalledWith(create_event, true, 1);
             expect(TestFactory.conversation_repository._prepare_conversation_create_notification).toHaveBeenCalled();
             done();
           })
@@ -574,7 +574,7 @@ describe('ConversationRepository', () => {
         TestFactory.conversation_repository.on_conversation_event(create_event)
           .then(() => {
             expect(TestFactory.conversation_repository._on_create).toHaveBeenCalled();
-            expect(TestFactory.conversation_repository.map_conversations).toHaveBeenCalledWith(create_event, time.getTime());
+            expect(TestFactory.conversation_repository.map_conversations).toHaveBeenCalledWith(create_event, true, time.getTime());
             expect(TestFactory.conversation_repository._prepare_conversation_create_notification).toHaveBeenCalled();
             done();
           })

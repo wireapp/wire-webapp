@@ -207,7 +207,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     return this.conversation_service.get_conversation_by_id(conversation_id)
       .then((response) => {
-        const conversation_et = this.map_conversations(response);
+        const conversation_et = this.map_conversations(response, true);
 
         this.logger.info(`Fetched conversation '${conversation_id}' from backend`);
         this.save_conversation(conversation_et);
@@ -245,8 +245,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         return local_conversations;
       })
-      .then((conversations) => {
-        this.save_conversations(this.map_conversations(conversations));
+      .then((conversations) => this.map_conversations(conversations, false))
+      .then((conversation_ets) => {
+        this.save_conversations(conversation_ets);
         amplify.publish(z.event.WebApp.CONVERSATION.LOADED_STATES);
         return this.conversations();
       });
@@ -764,19 +765,25 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Map conversation payload.
    *
    * @param {JSON} payload - Payload to map
+   * @param {boolean} [subscribe_states=true] - Immediately subscribe to state updates
    * @param {number} [initial_timestamp=this.get_latest_event_timestamp()] - Initial server and event timestamp
    * @returns {z.entity.Conversation|Array<z.entity.Conversation>} Mapped conversation/s
    */
-  map_conversations(payload, initial_timestamp = this.get_latest_event_timestamp()) {
-    if (payload.length) {
-      const conversation_ets = this.conversation_mapper.map_conversations(payload, initial_timestamp);
-      conversation_ets.forEach((conversation_et) => this._map_guest_status_self(conversation_et));
-      return conversation_ets;
-    }
+  map_conversations(payload, subscribe_states = true, initial_timestamp = this.get_latest_event_timestamp()) {
+    const conversation_data = payload.length ? payload : [payload];
 
-    const conversation_et = this.conversation_mapper.map_conversation(payload, initial_timestamp);
+    const conversation_ets = this.conversation_mapper.map_conversations(conversation_data, initial_timestamp);
+    conversation_ets.forEach((conversation_et) => this._handle_mapped_conversation(conversation_et, subscribe_states));
+
+    return payload.length ? conversation_ets : conversation_ets[0];
+  }
+
+  _handle_mapped_conversation(conversation_et, subscribe_states) {
     this._map_guest_status_self(conversation_et);
-    return conversation_et;
+
+    if (subscribe_states) {
+      conversation_et.subscribe_to_state_updates();
+    }
   }
 
   map_guest_status_self() {
@@ -2362,7 +2369,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
 
     const {conversation: conversation_id, type} = event_json;
-    this.logger.info(`»» Event: '${type}'`, {event_json: JSON.stringify(event_json), event_object: event_json});
+    this.logger.info(`»» Conversation Event: '${type}' (Source: ${source})`, {event_json: JSON.stringify(event_json), event_object: event_json});
 
     // Handle conversation create event separately
     if (type === z.event.Backend.CONVERSATION.CREATE) {
@@ -2560,8 +2567,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
           throw error;
         }
 
-        const event_timestamp = new Date(event_json.time).getTime();
-        return this.map_conversations(event_json, _.isNaN(event_timestamp) ? this.get_latest_event_timestamp() : event_timestamp);
+        const {data: event_data, time} = event_json;
+        const event_timestamp = new Date(time).getTime();
+        const initial_timestamp = _.isNaN(event_timestamp) ? this.get_latest_event_timestamp() : event_timestamp;
+        return this.map_conversations(event_data, true, initial_timestamp);
       })
       .then((conversation_et) => this.update_participating_user_ets(conversation_et))
       .then((conversation_et) => this.save_conversation(conversation_et))
