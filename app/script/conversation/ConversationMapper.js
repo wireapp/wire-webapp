@@ -32,12 +32,12 @@ z.conversation.ConversationMapper = class ConversationMapper {
   /**
    * Converts JSON conversations into conversation entities.
    *
-   * @param {Object} json - Conversation data
+   * @param {Array} [conversation_data=[undefined]] - Conversation data
    * @param {number} [initial_timestamp=1] - Initial timestamp for conversation
    * @returns {Array<Conversation>} Mapped conversation entities
    */
-  map_conversations(json, initial_timestamp = 1) {
-    return json.map((conversation, index) => this._create_conversation_et(conversation, initial_timestamp + index));
+  map_conversations(conversation_data = [undefined], initial_timestamp = 1) {
+    return conversation_data.map((conversation, index) => this._create_conversation_et(conversation, initial_timestamp + index));
   }
 
   /**
@@ -156,7 +156,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
    * @returns {Conversation} Mapped conversation entity
    */
   _create_conversation_et(conversation_data, initial_timestamp) {
-    if (conversation_data === undefined) {
+    if (conversation_data === undefined || !Object.keys(conversation_data).length) {
       throw new Error('Cannot create conversation entity without data');
     }
 

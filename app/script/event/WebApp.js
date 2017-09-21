@@ -98,7 +98,6 @@ z.event.WebApp = {
     INPUT: {
       CLICK: 'wire.webapp.conversation.input.click',
     },
-    LOADED_STATES: 'wire.webapp.conversation.loaded_states',
     MAP_CONNECTION: 'wire.webapp.conversation.map_connection',
     MESSAGE: {
       ADDED: 'wire.webapp.conversation.message.added',

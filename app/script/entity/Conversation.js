@@ -29,8 +29,6 @@ z.entity.Conversation = class Conversation {
    * @param {string} conversation_id - Conversation ID
    */
   constructor(conversation_id = '') {
-    this.subscribe_to_state_updates = this.subscribe_to_state_updates.bind(this);
-
     this.creator = undefined;
     this.id = conversation_id;
     this.name = ko.observable();
@@ -234,8 +232,6 @@ z.entity.Conversation = class Conversation {
     this.persist_state = _.debounce(() => {
       amplify.publish(z.event.WebApp.CONVERSATION.PERSIST_STATE, this);
     }, 100);
-
-    amplify.subscribe(z.event.WebApp.CONVERSATION.LOADED_STATES, this.subscribe_to_state_updates);
   }
 
   subscribe_to_state_updates() {
@@ -256,8 +252,6 @@ z.entity.Conversation = class Conversation {
       this.type,
       this.verification_state,
     ].forEach((property) => property.subscribe(this.persist_state));
-
-    amplify.unsubscribe(z.event.WebApp.CONVERSATION.LOADED_STATES, this.subscribe_to_state_updates);
   }
 
   /**
