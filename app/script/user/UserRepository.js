@@ -100,6 +100,8 @@ z.user.UserRepository = class UserRepository {
   on_user_event(event_json, source) {
     const {type} = event_json;
 
+    this.logger.info(`»» User Event: '${type}' (Source: ${source})`, {event_json: JSON.stringify(event_json), event_object: event_json});
+
     switch (type) {
       case z.event.Backend.USER.CONNECTION:
         this.user_connection(event_json, source);
