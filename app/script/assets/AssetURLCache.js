@@ -42,7 +42,7 @@ z.assets.AssetURLCache = (function() {
     return url;
   };
 
-  const get_url = (identifier) => lru_cache.get(identifier);
+  const get_url = identifier => lru_cache.get(identifier);
 
   return {
     get_url,

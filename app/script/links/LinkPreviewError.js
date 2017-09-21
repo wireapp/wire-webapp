@@ -26,7 +26,7 @@ z.links.LinkPreviewError = class LinkPreviewError extends Error {
   constructor(type) {
     super();
     this.name = this.constructor.name;
-    this.stack = (new Error()).stack;
+    this.stack = new Error().stack;
     this.type = type || z.links.LinkPreviewError.TYPE.UNKNOWN;
 
     switch (this.type) {

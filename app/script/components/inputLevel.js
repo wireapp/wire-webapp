@@ -27,9 +27,11 @@ z.components.InputLevel = class InputLevel {
     this.input_level = params.level;
     this.disabled = params.disabled;
 
-    this.level_in_view = ko.pureComputed(() => {
-      return this.input_level();
-    }).extend({rateLimit: 100});
+    this.level_in_view = ko
+      .pureComputed(() => {
+        return this.input_level();
+      })
+      .extend({rateLimit: 100});
 
     this.bullet_count = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
   }
@@ -38,7 +40,7 @@ z.components.InputLevel = class InputLevel {
     if (this.disabled()) {
       return 'input-level-bullet-disabled';
     }
-    const threshold_passed = this.level_in_view() > ((index + 1) / this.bullet_count.length);
+    const threshold_passed = this.level_in_view() > (index + 1) / this.bullet_count.length;
     if (threshold_passed) {
       return 'input-level-bullet-active';
     }

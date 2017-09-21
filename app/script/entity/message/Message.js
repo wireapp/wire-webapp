@@ -84,9 +84,13 @@ z.entity.Message = class Message {
       return date.local().format('HH:mm');
     };
 
-    this.sender_name = ko.pureComputed(() => {
-      return z.util.get_first_name(this.user());
-    }, this, {deferEvaluation: true});
+    this.sender_name = ko.pureComputed(
+      () => {
+        return z.util.get_first_name(this.user());
+      },
+      this,
+      {deferEvaluation: true}
+    );
 
     this.accent_color = ko.pureComputed(() => {
       return `accent-color-${this.user().accent_id()}`;
@@ -196,8 +200,9 @@ z.entity.Message = class Message {
     if (this.is_ping() || !this.has_asset()) {
       return true;
     }
-    return ![z.assets.AssetTransferState.DOWNLOADING,
-      z.assets.AssetTransferState.UPLOADING].includes(this.get_first_asset().status());
+    return ![z.assets.AssetTransferState.DOWNLOADING, z.assets.AssetTransferState.UPLOADING].includes(
+      this.get_first_asset().status()
+    );
   }
 
   /**
@@ -207,7 +212,7 @@ z.entity.Message = class Message {
   is_downloadable() {
     if (typeof this.get_first_asset === 'function') {
       const asset_et = this.get_first_asset();
-      if (asset_et && (typeof asset_et.download === 'function')) {
+      if (asset_et && typeof asset_et.download === 'function') {
         return true;
       }
     }
@@ -301,12 +306,8 @@ z.entity.Message = class Message {
     }
 
     if (this.ephemeral_status() === z.message.EphemeralStatusType.INACTIVE) {
-      this.ephemeral_expires(new Date(Date.now() + this.ephemeral_expires())
-        .getTime()
-        .toString());
-      this.ephemeral_started(new Date(Date.now())
-        .getTime()
-        .toString());
+      this.ephemeral_expires(new Date(Date.now() + this.ephemeral_expires()).getTime().toString());
+      this.ephemeral_started(new Date(Date.now()).getTime().toString());
     }
 
     this.ephemeral_remaining(this.ephemeral_expires() - Date.now());
@@ -316,10 +317,10 @@ z.entity.Message = class Message {
       return this.ephemeral_caption(z.util.format_time_remaining(this.ephemeral_remaining()));
     }, 250);
 
-    return this.ephemeral_timeout_id = window.setTimeout(() => {
+    return (this.ephemeral_timeout_id = window.setTimeout(() => {
       amplify.publish(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this);
       return window.clearInterval(this.ephemeral_interval_id);
-    }, this.ephemeral_remaining());
+    }, this.ephemeral_remaining()));
   }
 
   /**

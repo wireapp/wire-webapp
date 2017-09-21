@@ -33,7 +33,8 @@ describe('z.assets.AssetRemoteData', function() {
     });
 
     it('should load and decrypt asset', function(done) {
-      remote_data.load()
+      remote_data
+        .load()
         .then(function(blob) {
           expect(new Blob([video_bytes], {type: video_type})).toEqual(blob);
           done();
@@ -43,17 +44,22 @@ describe('z.assets.AssetRemoteData', function() {
   });
 
   describe('load encrypted asset', function() {
-
     let remote_data = null;
     const video_bytes = new Uint8Array([1, 2, 3, 4]);
     const video_type = 'video/mp4';
 
     beforeEach(function(done) {
-      z.assets.AssetCrypto.encrypt_aes_asset(video_bytes)
+      z.assets.AssetCrypto
+        .encrypt_aes_asset(video_bytes)
         .then(function({cipher_text, key_bytes, sha256}) {
           const conversation_id = z.util.create_random_uuid();
           const asset_id = z.util.create_random_uuid();
-          remote_data = z.assets.AssetRemoteData.v2(conversation_id, asset_id, new Uint8Array(key_bytes), new Uint8Array(sha256));
+          remote_data = z.assets.AssetRemoteData.v2(
+            conversation_id,
+            asset_id,
+            new Uint8Array(key_bytes),
+            new Uint8Array(sha256)
+          );
           spyOn(remote_data, '_load_buffer').and.returnValue(Promise.resolve([cipher_text, video_type]));
           done();
         })
@@ -61,7 +67,8 @@ describe('z.assets.AssetRemoteData', function() {
     });
 
     it('should load and decrypt asset', function(done) {
-      remote_data.load()
+      remote_data
+        .load()
         .then(function(blob) {
           expect(new Blob([video_bytes], {type: video_type})).toEqual(blob);
           done();

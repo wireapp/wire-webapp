@@ -68,12 +68,14 @@ z.properties.PropertiesRepository = class PropertiesRepository {
    * @returns {undefined} No return value
    */
   init(self_user_et) {
-    this.properties_service.get_properties()
-      .then((keys) => {
+    this.properties_service
+      .get_properties()
+      .then(keys => {
         this.self(self_user_et);
         if (keys.includes(PropertiesRepository.CONFIG.PROPERTIES_KEY)) {
-          return this.properties_service.get_properties_by_key(PropertiesRepository.CONFIG.PROPERTIES_KEY)
-            .then((properties) => {
+          return this.properties_service
+            .get_properties_by_key(PropertiesRepository.CONFIG.PROPERTIES_KEY)
+            .then(properties => {
               $.extend(true, this.properties, properties);
               this.logger.info('Loaded user properties', this.properties);
             });
@@ -121,7 +123,8 @@ z.properties.PropertiesRepository = class PropertiesRepository {
     if (updated_preference !== this.get_preference(properties_type)) {
       this.set_preference(properties_type, updated_preference);
 
-      this.properties_service.put_properties_by_key(PropertiesRepository.CONFIG.PROPERTIES_KEY, this.properties)
+      this.properties_service
+        .put_properties_by_key(PropertiesRepository.CONFIG.PROPERTIES_KEY, this.properties)
         .then(() => {
           this.logger.info(`Saved updated preference: '${properties_type}' - '${updated_preference}'`);
 

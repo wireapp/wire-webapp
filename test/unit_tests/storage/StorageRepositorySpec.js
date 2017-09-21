@@ -25,7 +25,8 @@ describe('z.storage.StorageRepository', function() {
   const test_factory = new TestFactory();
 
   beforeAll(function(done) {
-    test_factory.exposeStorageActors()
+    test_factory
+      .exposeStorageActors()
       .then(done)
       .catch(done.fail);
   });
@@ -39,7 +40,8 @@ describe('z.storage.StorageRepository', function() {
       const primary_key = 'test_key';
       const primitive_value = 'test_value';
 
-      TestFactory.storage_repository.save_value(primary_key, primitive_value)
+      TestFactory.storage_repository
+        .save_value(primary_key, primitive_value)
         .then(function(storage_key) {
           expect(storage_key).toBe(primary_key);
           return done();

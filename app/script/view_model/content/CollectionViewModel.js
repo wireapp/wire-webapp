@@ -41,21 +41,21 @@ z.ViewModel.content.CollectionViewModel = class CollectionViewModel {
 
     this.conversation_et = ko.observable();
 
-    this.audio = ko.observableArray().extend({'rateLimit': 1});
-    this.files = ko.observableArray().extend({'rateLimit': 1});
-    this.images = ko.observableArray().extend({'rateLimit': 1});
-    this.links = ko.observableArray().extend({'rateLimit': 1});
+    this.audio = ko.observableArray().extend({rateLimit: 1});
+    this.files = ko.observableArray().extend({rateLimit: 1});
+    this.images = ko.observableArray().extend({rateLimit: 1});
+    this.links = ko.observableArray().extend({rateLimit: 1});
 
     this.search_input = ko.observable('');
     this.no_items_found = ko.pureComputed(() => {
-      return (this.images().length + this.files().length + this.links().length + this.audio().length) === 0;
+      return this.images().length + this.files().length + this.links().length + this.audio().length === 0;
     });
   }
 
   added_to_view() {
     amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, this.item_added);
     amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.item_removed);
-    $(document).on('keydown.collection', (event) => {
+    $(document).on('keydown.collection', event => {
       if (event.keyCode === z.util.KEYCODE.ESC) {
         amplify.publish(z.event.WebApp.CONVERSATION.SHOW, this.conversation_et());
       }
@@ -81,8 +81,8 @@ z.ViewModel.content.CollectionViewModel = class CollectionViewModel {
   }
 
   item_removed(removed_message_id) {
-    const _remove_item = (message_et) => message_et.id === removed_message_id;
-    [this.audio, this.files, this.images, this.links].forEach((array) => array.remove(_remove_item));
+    const _remove_item = message_et => message_et.id === removed_message_id;
+    [this.audio, this.files, this.images, this.links].forEach(array => array.remove(_remove_item));
   }
 
   removed_from_view() {
@@ -91,24 +91,27 @@ z.ViewModel.content.CollectionViewModel = class CollectionViewModel {
     $(document).off('keydown.collection');
     this.conversation_et(null);
     this.search_input('');
-    [this.images, this.files, this.links, this.audio].forEach((array) => array.removeAll());
+    [this.images, this.files, this.links, this.audio].forEach(array => array.removeAll());
   }
 
   set_conversation(conversation_et = this.conversation_repository.active_conversation()) {
     if (conversation_et) {
       this.conversation_et(conversation_et);
 
-      this.conversation_repository.get_events_for_category(conversation_et, z.message.MessageCategory.LINK_PREVIEW)
-        .then((message_ets) => this._populate_items(message_ets))
+      this.conversation_repository
+        .get_events_for_category(conversation_et, z.message.MessageCategory.LINK_PREVIEW)
+        .then(message_ets => this._populate_items(message_ets))
         .then(() => this._track_opened_collection(conversation_et, this.no_items_found()));
     }
   }
 
   _populate_items(message_ets) {
-    message_ets.map((message_et) => {
-
+    message_ets.map(message_et => {
       // TODO: create binary map helper
-      if ((message_et.category & z.message.MessageCategory.IMAGE) && !(message_et.category & z.message.MessageCategory.GIF)) {
+      if (
+        message_et.category & z.message.MessageCategory.IMAGE &&
+        !(message_et.category & z.message.MessageCategory.GIF)
+      ) {
         this.images.push(message_et);
       } else if (message_et.category & z.message.MessageCategory.FILE) {
         if (message_et.get_first_asset().is_audio()) {

@@ -23,7 +23,6 @@ window.z = window.z || {};
 window.z.assets = z.assets || {};
 
 z.assets.AssetCrypto = (() => {
-
   /**
    * @param {ArrayBuffer} ciphertext - Encrypted plaintext
    * @param {ArrayBuffer} key_bytes - AES key used for encryption
@@ -31,15 +30,16 @@ z.assets.AssetCrypto = (() => {
    * @returns {Promise} Resolves with the decrypted asset
    */
   function decrypt_aes_asset(ciphertext, key_bytes, reference_sha256) {
-    return window.crypto.subtle.digest('SHA-256', ciphertext)
-      .then((computed_sha256) => {
+    return window.crypto.subtle
+      .digest('SHA-256', ciphertext)
+      .then(computed_sha256 => {
         if (_equal_hashes(reference_sha256, computed_sha256)) {
           return window.crypto.subtle.importKey('raw', key_bytes, 'AES-CBC', false, ['decrypt']);
         }
 
         throw new Error('Encrypted asset does not match its SHA-256 hash');
       })
-      .then((key) => {
+      .then(key => {
         const iv = ciphertext.slice(0, 16);
         const img_ciphertext = ciphertext.slice(16);
         return window.crypto.subtle.decrypt({iv: iv, name: 'AES-CBC'}, key, img_ciphertext);
@@ -57,25 +57,26 @@ z.assets.AssetCrypto = (() => {
     let iv_ciphertext = null;
     let computed_sha256 = null;
 
-    return window.crypto.subtle.importKey('raw', key_bytes_raw.buffer, 'AES-CBC', true, ['encrypt'])
-      .then((ckey) => {
+    return window.crypto.subtle
+      .importKey('raw', key_bytes_raw.buffer, 'AES-CBC', true, ['encrypt'])
+      .then(ckey => {
         key = ckey;
 
         return window.crypto.subtle.encrypt({iv: iv.buffer, name: 'AES-CBC'}, key, plaintext);
       })
-      .then((ciphertext) => {
+      .then(ciphertext => {
         iv_ciphertext = new Uint8Array(ciphertext.byteLength + iv.byteLength);
         iv_ciphertext.set(iv, 0);
         iv_ciphertext.set(new Uint8Array(ciphertext), iv.byteLength);
 
         return window.crypto.subtle.digest('SHA-256', iv_ciphertext);
       })
-      .then((digest) => {
+      .then(digest => {
         computed_sha256 = digest;
 
         return window.crypto.subtle.exportKey('raw', key);
       })
-      .then((key_bytes) => ({cipher_text: iv_ciphertext.buffer, key_bytes: key_bytes, sha256: computed_sha256}));
+      .then(key_bytes => ({cipher_text: iv_ciphertext.buffer, key_bytes: key_bytes, sha256: computed_sha256}));
   }
 
   function _equal_hashes(buffer_a, buffer_b) {
@@ -87,7 +88,7 @@ z.assets.AssetCrypto = (() => {
   function _generate_random_bytes(length) {
     const randomValues = new Uint32Array(length / 4).map(() => libsodium.getRandomValue());
     const ramdonBytes = new Uint8Array(randomValues.buffer);
-    if ((ramdonBytes.length > 0) && !ramdonBytes.every((byte) => byte === 0)) {
+    if (ramdonBytes.length > 0 && !ramdonBytes.every(byte => byte === 0)) {
       return ramdonBytes;
     }
     throw Error('Failed to initialize iv with random values');

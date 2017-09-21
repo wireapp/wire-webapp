@@ -41,10 +41,10 @@ z.team.TeamRepository = class TeamRepository {
 
     this.team = ko.observable();
 
-    this.is_team = ko.pureComputed(() => this.team() ? !!this.team().id : false);
+    this.is_team = ko.pureComputed(() => (this.team() ? !!this.team().id : false));
 
-    this.team_members = ko.pureComputed(() => this.is_team() ? this.team().members() : []);
-    this.team_name = ko.pureComputed(() => this.is_team() ? this.team().name() : this.user_repository.self().name());
+    this.team_members = ko.pureComputed(() => (this.is_team() ? this.team().members() : []));
+    this.team_name = ko.pureComputed(() => (this.is_team() ? this.team().name() : this.user_repository.self().name()));
     this.team_users = ko.pureComputed(() => {
       return this.team_members()
         .concat(this.user_repository.connected_users())
@@ -63,7 +63,8 @@ z.team.TeamRepository = class TeamRepository {
   }
 
   get_team() {
-    return this.team_service.get_teams()
+    return this.team_service
+      .get_teams()
       .then(({teams}) => {
         if (teams.length) {
           const [team] = teams;
@@ -84,12 +85,11 @@ z.team.TeamRepository = class TeamRepository {
   }
 
   get_team_members(team_id) {
-    return this.team_service.get_team_members(team_id)
-      .then(({members}) => {
-        if (members.length) {
-          return this.team_mapper.map_member_from_array(members);
-        }
-      });
+    return this.team_service.get_team_members(team_id).then(({members}) => {
+      if (members.length) {
+        return this.team_mapper.map_member_from_array(members);
+      }
+    });
   }
 
   /**
@@ -141,7 +141,7 @@ z.team.TeamRepository = class TeamRepository {
    */
   search_for_team_users(query, is_handle) {
     return this.team_users()
-      .filter((user_et) => user_et.matches(query, is_handle))
+      .filter(user_et => user_et.matches(query, is_handle))
       .sort((user_a, user_b) => {
         if (is_handle) {
           return z.util.StringUtil.sort_by_priority(user_a.username(), user_b.username(), query);
@@ -152,16 +152,18 @@ z.team.TeamRepository = class TeamRepository {
 
   send_account_info() {
     if (z.util.Environment.desktop) {
-      const image_resource = this.is_team() ? this.self_user().preview_picture_resource() : this.self_user().preview_picture_resource();
+      const image_resource = this.is_team()
+        ? this.self_user().preview_picture_resource()
+        : this.self_user().preview_picture_resource();
       const image_promise = image_resource ? image_resource.load() : Promise.resolve();
 
       image_promise
-        .then((image_blob) => {
+        .then(image_blob => {
           if (image_blob) {
             return z.util.load_data_url(image_blob);
           }
         })
-        .then((image_data_url) => {
+        .then(image_data_url => {
           const account_info = {
             accentID: this.self_user().accent_id(),
             name: this.team_name(),
@@ -178,20 +180,20 @@ z.team.TeamRepository = class TeamRepository {
 
   update_team_members(team_et) {
     return this.get_team_members(team_et.id)
-      .then((team_members) => {
+      .then(team_members => {
         const member_ids = team_members
-          .filter((team_member) => team_member.user_id !== this.user_repository.self().id)
-          .map((team_member) => team_member.user_id);
+          .filter(team_member => team_member.user_id !== this.user_repository.self().id)
+          .map(team_member => team_member.user_id);
 
         return this.user_repository.get_users_by_id(member_ids);
       })
-      .then((user_ets) => team_et.members(user_ets));
+      .then(user_ets => team_et.members(user_ets));
   }
 
   _add_user_to_team(user_et) {
     const members = this.team().members;
 
-    if (!members().find((member) => member.id === user_et.id)) {
+    if (!members().find(member => member.id === user_et.id)) {
       members.push(user_et);
     }
   }
@@ -210,8 +212,7 @@ z.team.TeamRepository = class TeamRepository {
     const is_other_user = this.user_repository.self().id !== user_id;
 
     if (is_local_team && is_other_user) {
-      this.user_repository.get_user_by_id(user_id)
-        .then((user_et) => this._add_user_to_team(user_et));
+      this.user_repository.get_user_by_id(user_id).then(user_et => this._add_user_to_team(user_et));
     }
   }
 
@@ -225,7 +226,7 @@ z.team.TeamRepository = class TeamRepository {
         return this._on_delete(event_json);
       }
 
-      this.team().members.remove((member) => member.id === user_id);
+      this.team().members.remove(member => member.id === user_id);
       amplify.publish(z.event.WebApp.TEAM.MEMBER_LEAVE, team_id, user_id);
     }
   }

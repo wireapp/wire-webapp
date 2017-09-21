@@ -25,8 +25,12 @@ window.z.tracking = z.tracking || {};
 
 z.tracking.EventTrackingRepository = class EventTrackingRepository {
   static get CONFIG() {
-    const MIXPANEL_TOKEN = z.util.Environment.frontend.is_production() ? 'c7dcb15893f14932b1c31b5fb33ff669' : '537da3b3bc07df1e420d07e2921a6f6f';
-    const RAYGUN_API_KEY = z.util.Environment.frontend.is_production() ? 'lAkLCPLx3ysnsXktajeHmw==' : '5hvAMmz8wTXaHBYqu2TFUQ==';
+    const MIXPANEL_TOKEN = z.util.Environment.frontend.is_production()
+      ? 'c7dcb15893f14932b1c31b5fb33ff669'
+      : '537da3b3bc07df1e420d07e2921a6f6f';
+    const RAYGUN_API_KEY = z.util.Environment.frontend.is_production()
+      ? 'lAkLCPLx3ysnsXktajeHmw=='
+      : '5hvAMmz8wTXaHBYqu2TFUQ==';
 
     return {
       ERROR_TRACKING: {
@@ -35,10 +39,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
       },
       USER_TRACKING: {
         API_KEY: MIXPANEL_TOKEN,
-        DISABLED_DOMAINS: [
-          'localhost',
-          'zinfra.io',
-        ],
+        DISABLED_DOMAINS: ['localhost', 'zinfra.io'],
         SUPPORTED_EVENTS: [
           z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION,
           z.tracking.EventName.TRACKING.OPT_IN,
@@ -92,7 +93,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
         }
         return undefined;
       })
-      .then((mixpanel_instance) => {
+      .then(mixpanel_instance => {
         if (mixpanel_instance) {
           this.mixpanel = mixpanel_instance;
           this._subscribe_to_tracking_events();
@@ -173,7 +174,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
     if (this.mixpanel) {
       this.mixpanel.register({
-        '$ignore': true,
+        $ignore: true,
       });
     }
   }
@@ -190,24 +191,28 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   _init_tracking() {
     this.is_user_tracking_activated = true;
 
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       if (!this.mixpanel) {
-        mixpanel.init(EventTrackingRepository.CONFIG.USER_TRACKING.API_KEY, {
-          autotrack: false,
-          debug: !z.util.Environment.frontend.is_production(),
-          loaded: (mixpanel) => {
-            mixpanel.register({
-              '$city': null,
-              '$initial_referrer': null,
-              '$initial_referring_domain': null,
-              '$referrer': null,
-              '$referring_domain': null,
-              '$region': null,
-              'mp_country_code': null,
-            });
-            resolve(mixpanel);
+        mixpanel.init(
+          EventTrackingRepository.CONFIG.USER_TRACKING.API_KEY,
+          {
+            autotrack: false,
+            debug: !z.util.Environment.frontend.is_production(),
+            loaded: mixpanel => {
+              mixpanel.register({
+                $city: null,
+                $initial_referrer: null,
+                $initial_referring_domain: null,
+                $referrer: null,
+                $referring_domain: null,
+                $region: null,
+                mp_country_code: null,
+              });
+              resolve(mixpanel);
+            },
           },
-        }, Date.now());
+          Date.now()
+        );
       } else {
         resolve(this.mixpanel);
       }
@@ -226,7 +231,6 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
     return true;
   }
-
 
   //##############################################################################
   // Raygun
@@ -249,11 +253,10 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
         if (rejected_promise) {
           window.setTimeout(() => {
-            rejected_promise.catch((promise_error) => {
+            rejected_promise.catch(promise_error => {
               this.logger.log(this.logger.levels.OFF, 'Handled uncaught Promise in error reporting', promise_error);
             });
-          },
-          0);
+          }, 0);
         }
       }
     };
@@ -299,10 +302,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
     const options = {
       disableErrorTracking: false,
-      excludedHostnames: [
-        'localhost',
-        'wire.ms',
-      ],
+      excludedHostnames: ['localhost', 'wire.ms'],
       ignore3rdPartyErrors: true,
       ignoreAjaxAbort: true,
       ignoreAjaxError: true,

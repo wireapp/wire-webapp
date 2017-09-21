@@ -39,24 +39,26 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
    */
   map_generic_message(generic_message, event) {
     if (generic_message === undefined) {
-      return Promise.reject(new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.NO_GENERIC_MESSAGE));
+      return Promise.reject(
+        new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.NO_GENERIC_MESSAGE)
+      );
     }
     return Promise.resolve()
-      .then(() => generic_message.external ? this._unwrap_external(generic_message.external, event) : generic_message)
-      .then((unwrapped_generic_message) => {
-        return Promise.all([
-          this._map_generic_message(unwrapped_generic_message, event),
-          unwrapped_generic_message,
-        ]);
+      .then(() => (generic_message.external ? this._unwrap_external(generic_message.external, event) : generic_message))
+      .then(unwrapped_generic_message => {
+        return Promise.all([this._map_generic_message(unwrapped_generic_message, event), unwrapped_generic_message]);
       })
       .then(([specific_content, unwrapped_generic_message]) => {
-        return Object.assign({
-          conversation: event.conversation,
-          from: event.from,
-          id: unwrapped_generic_message.message_id,
-          status: event.status,
-          time: event.time,
-        }, specific_content);
+        return Object.assign(
+          {
+            conversation: event.conversation,
+            from: event.from,
+            id: unwrapped_generic_message.message_id,
+            status: event.status,
+            time: event.time,
+          },
+          specific_content
+        );
       });
   }
 
@@ -91,7 +93,10 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
       case z.cryptography.GENERIC_MESSAGE_TYPE.TEXT:
         return this._map_text(generic_message.text, generic_message.message_id);
       default:
-        this.logger.debug(`Skipped event '${generic_message.message_id}' of unhandled type '${generic_message.content}'`, {event, generic_message});
+        this.logger.debug(
+          `Skipped event '${generic_message.message_id}' of unhandled type '${generic_message.content}'`,
+          {event, generic_message}
+        );
         throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE);
     }
   }
@@ -168,7 +173,9 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     if (original.audio) {
       return {
         duration: original.audio.duration_in_millis.toNumber() / 1000,
-        loudness: new Uint8Array(original.audio.normalized_loudness !== null ? original.audio.normalized_loudness.toArrayBuffer() : []),
+        loudness: new Uint8Array(
+          original.audio.normalized_loudness !== null ? original.audio.normalized_loudness.toArrayBuffer() : []
+        ),
       };
     }
   }
@@ -194,7 +201,10 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
             case z.proto.Confirmation.Type.READ:
               return z.message.StatusType.SEEN;
             default:
-              throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE, 'Unhandled confirmation type');
+              throw new z.cryptography.CryptographyError(
+                z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE,
+                'Unhandled confirmation type'
+              );
           }
         })(),
       },
@@ -240,9 +250,10 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
       text: z.util.base64_to_array(event.data.data),
     };
 
-    return z.assets.AssetCrypto.decrypt_aes_asset(data.text.buffer, data.otr_key.buffer, data.sha256.buffer)
-      .then((external_message_buffer) => z.proto.GenericMessage.decode(external_message_buffer))
-      .catch((error) => {
+    return z.assets.AssetCrypto
+      .decrypt_aes_asset(data.text.buffer, data.otr_key.buffer, data.sha256.buffer)
+      .then(external_message_buffer => z.proto.GenericMessage.decode(external_message_buffer))
+      .catch(error => {
         this.logger.error(`Failed to map external message: ${error.message}`, error);
         throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.BROKEN_EXTERNAL);
       });
@@ -336,7 +347,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
       data: {
         content: `${text.content}`,
         nonce: event_id,
-        previews: text.link_preview.map((preview) => preview.encode64()),
+        previews: text.link_preview.map(preview => preview.encode64()),
       },
       type: z.event.Client.CONVERSATION.MESSAGE_ADD,
     };

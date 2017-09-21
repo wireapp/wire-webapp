@@ -37,7 +37,7 @@ describe('Conversation', () => {
   });
 
   describe('type checks', () => {
-    beforeEach(() => conversation_et = new z.entity.Conversation());
+    beforeEach(() => (conversation_et = new z.entity.Conversation()));
 
     it('should return the expected value for personal conversations', () => {
       conversation_et.type(z.conversation.ConversationType.CONNECT);
@@ -387,7 +387,9 @@ describe('Conversation', () => {
 
       expect(conversation_et.get_next_iso_date()).toBeGreaterThan(reference_iso_date);
       expect(conversation_et.get_next_iso_date(1000)).toBeLessThan(reference_iso_date);
-      expect(conversation_et.get_next_iso_date(-1000)).toBeGreaterThan(new Date(reference_date.getTime() + 1000).toISOString());
+      expect(conversation_et.get_next_iso_date(-1000)).toBeGreaterThan(
+        new Date(reference_date.getTime() + 1000).toISOString()
+      );
       expect(conversation_et.get_next_iso_date('foo')).toBeGreaterThan(reference_iso_date);
 
       const last_server_timestamp = Date.now() + 10000;
@@ -427,7 +429,9 @@ describe('Conversation', () => {
       conversation_et.participating_user_ets.push(other_user);
       conversation_et.participating_user_ets.push(third_user);
       conversation_et.type(z.conversation.ConversationType.REGULAR);
-      const expected_display_name = `${conversation_et.participating_user_ets()[0].first_name()}, ${conversation_et.participating_user_ets()[1].first_name()}`;
+      const expected_display_name = `${conversation_et
+        .participating_user_ets()[0]
+        .first_name()}, ${conversation_et.participating_user_ets()[1].first_name()}`;
       expect(conversation_et.display_name()).toBe(expected_display_name);
     });
 
@@ -553,8 +557,7 @@ describe('Conversation', () => {
 
       user_et.username('wire');
       expect(conversation_et.is_with_bot()).toBe(false);
-    })
-  );
+    }));
 
   describe('messages_visible', () => {
     it('should return no messages if conversation ID is empty', () => {
@@ -719,8 +722,7 @@ describe('Conversation', () => {
       const new_lrt_number = window.parseInt(new_lrt_string, 10);
       conversation_et.set_timestamp(new_lrt_string, z.conversation.TIMESTAMP_TYPE.LAST_READ);
       expect(conversation_et.last_read_timestamp()).toBe(new_lrt_number);
-    })
-  );
+    }));
 
   describe('should_unarchive', () => {
     let time = undefined;
@@ -839,8 +841,7 @@ describe('Conversation', () => {
       conversation_et.muted_state(false);
 
       expect(conversation_et._subscribe_to_states_updates.calls.count()).toEqual(1);
-    })
-  );
+    }));
 
   describe('connection', () => {
     it('updates the participating user IDs with the user ID of the other party', () => {
@@ -848,8 +849,44 @@ describe('Conversation', () => {
 
       // @formatter:off
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
-      const payload_connection = {"status":"sent","conversation":"15a7f358-8eba-4b8e-bcf2-61a08eb53349","to":`${connector_user_id}`,"from":"616cbbeb-1360-4e17-b333-e000662257bd","last_update":"2017-05-10T11:34:18.396Z","message":" "};
-      const payload_conversation = {"access":["private"],"creator":"616cbbeb-1360-4e17-b333-e000662257bd","members":{"self":{"hidden_ref":null,"status":0,"last_read":"1.800122000a73cb62","muted_time":null,"service":null,"otr_muted_ref":null,"muted":null,"status_time":"2017-05-10T11:34:18.376Z","hidden":false,"status_ref":"0.0","id":"616cbbeb-1360-4e17-b333-e000662257bd","otr_archived":false,"cleared":null,"otr_muted":false,"otr_archived_ref":null,"archived":null},"others":[]},"name":"Marco","id":"15a7f358-8eba-4b8e-bcf2-61a08eb53349","type":3,"last_event_time":"2017-05-10T11:34:18.376Z","last_event":"2.800122000a73cb63"};
+      const payload_connection = {
+        status: 'sent',
+        conversation: '15a7f358-8eba-4b8e-bcf2-61a08eb53349',
+        to: `${connector_user_id}`,
+        from: '616cbbeb-1360-4e17-b333-e000662257bd',
+        last_update: '2017-05-10T11:34:18.396Z',
+        message: ' ',
+      };
+      const payload_conversation = {
+        access: ['private'],
+        creator: '616cbbeb-1360-4e17-b333-e000662257bd',
+        members: {
+          self: {
+            hidden_ref: null,
+            status: 0,
+            last_read: '1.800122000a73cb62',
+            muted_time: null,
+            service: null,
+            otr_muted_ref: null,
+            muted: null,
+            status_time: '2017-05-10T11:34:18.376Z',
+            hidden: false,
+            status_ref: '0.0',
+            id: '616cbbeb-1360-4e17-b333-e000662257bd',
+            otr_archived: false,
+            cleared: null,
+            otr_muted: false,
+            otr_archived_ref: null,
+            archived: null,
+          },
+          others: [],
+        },
+        name: 'Marco',
+        id: '15a7f358-8eba-4b8e-bcf2-61a08eb53349',
+        type: 3,
+        last_event_time: '2017-05-10T11:34:18.376Z',
+        last_event: '2.800122000a73cb63',
+      };
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
       // @formatter:on
 

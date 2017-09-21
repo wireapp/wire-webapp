@@ -41,7 +41,7 @@ z.ViewModel.LoadingViewModel = class LoadingViewModel {
     if (progress > this.loading_progress()) {
       this.loading_progress(progress);
     } else {
-      this.loading_progress(this.loading_progress() + .01);
+      this.loading_progress(this.loading_progress() + 0.01);
     }
 
     if (message_locator && !z.util.Environment.frontend.is_production()) {

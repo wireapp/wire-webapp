@@ -41,7 +41,7 @@ window.z.config = {
         'app.wire.com': function() {
           return 0;
         },
-        'localhost': function() {
+        localhost: function() {
           return 300;
         },
         'wire.ms': function() {
@@ -90,22 +90,9 @@ window.z.config = {
   // measured in pixel
   SCROLL_TO_LAST_MESSAGE_THRESHOLD: 100,
 
-  SUPPORTED_CONVERSATION_IMAGE_TYPES: [
-    '.jpg-large',
-    'image/jpg',
-    'image/jpeg',
-    'image/png',
-    'image/bmp',
-    'image/gif',
-  ],
+  SUPPORTED_CONVERSATION_IMAGE_TYPES: ['.jpg-large', 'image/jpg', 'image/jpeg', 'image/png', 'image/bmp', 'image/gif'],
 
-  SUPPORTED_PROFILE_IMAGE_TYPES: [
-    '.jpg-large',
-    'image/jpg',
-    'image/jpeg',
-    'image/png',
-    'image/bmp',
-  ],
+  SUPPORTED_PROFILE_IMAGE_TYPES: ['.jpg-large', 'image/jpg', 'image/jpeg', 'image/png', 'image/bmp'],
 
   UNSPLASH_URL: 'https://source.unsplash.com/1200x1200/?landscape',
 

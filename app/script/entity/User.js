@@ -24,7 +24,6 @@ window.z.entity = z.entity || {};
 
 // Please note: The own user has a "locale"
 z.entity.User = class User {
-
   static get ACCENT_COLOR() {
     return {
       BLUE: '#2391d3',
@@ -57,47 +56,55 @@ z.entity.User = class User {
     this.joaat_hash = -1;
 
     this.accent_id = ko.observable(z.config.ACCENT_ID.BLUE);
-    this.accent_theme = ko.pureComputed(() => {
-      switch (this.accent_id()) {
-        case z.config.ACCENT_ID.BLUE:
-          return z.entity.User.THEME.BLUE;
-        case z.config.ACCENT_ID.GREEN:
-          return z.entity.User.THEME.GREEN;
-        case z.config.ACCENT_ID.ORANGE:
-          return z.entity.User.THEME.ORANGE;
-        case z.config.ACCENT_ID.PINK:
-          return z.entity.User.THEME.PINK;
-        case z.config.ACCENT_ID.PURPLE:
-          return z.entity.User.THEME.PURPLE;
-        case z.config.ACCENT_ID.RED:
-          return z.entity.User.THEME.RED;
-        case z.config.ACCENT_ID.YELLOW:
-          return z.entity.User.THEME.YELLOW;
-        default:
-          return z.entity.User.THEME.BLUE;
-      }
-    }, this, {deferEvaluation: true});
+    this.accent_theme = ko.pureComputed(
+      () => {
+        switch (this.accent_id()) {
+          case z.config.ACCENT_ID.BLUE:
+            return z.entity.User.THEME.BLUE;
+          case z.config.ACCENT_ID.GREEN:
+            return z.entity.User.THEME.GREEN;
+          case z.config.ACCENT_ID.ORANGE:
+            return z.entity.User.THEME.ORANGE;
+          case z.config.ACCENT_ID.PINK:
+            return z.entity.User.THEME.PINK;
+          case z.config.ACCENT_ID.PURPLE:
+            return z.entity.User.THEME.PURPLE;
+          case z.config.ACCENT_ID.RED:
+            return z.entity.User.THEME.RED;
+          case z.config.ACCENT_ID.YELLOW:
+            return z.entity.User.THEME.YELLOW;
+          default:
+            return z.entity.User.THEME.BLUE;
+        }
+      },
+      this,
+      {deferEvaluation: true}
+    );
 
-    this.accent_color = ko.pureComputed(() => {
-      switch (this.accent_id()) {
-        case z.config.ACCENT_ID.BLUE:
-          return z.entity.User.ACCENT_COLOR.BLUE;
-        case z.config.ACCENT_ID.GREEN:
-          return z.entity.User.ACCENT_COLOR.GREEN;
-        case z.config.ACCENT_ID.ORANGE:
-          return z.entity.User.ACCENT_COLOR.ORANGE;
-        case z.config.ACCENT_ID.PINK:
-          return z.entity.User.ACCENT_COLOR.PINK;
-        case z.config.ACCENT_ID.PURPLE:
-          return z.entity.User.ACCENT_COLOR.PURPLE;
-        case z.config.ACCENT_ID.RED:
-          return z.entity.User.ACCENT_COLOR.RED;
-        case z.config.ACCENT_ID.YELLOW:
-          return z.entity.User.ACCENT_COLOR.YELLOW;
-        default:
-          return z.entity.User.ACCENT_COLOR.BLUE;
-      }
-    }, this, {deferEvaluation: true});
+    this.accent_color = ko.pureComputed(
+      () => {
+        switch (this.accent_id()) {
+          case z.config.ACCENT_ID.BLUE:
+            return z.entity.User.ACCENT_COLOR.BLUE;
+          case z.config.ACCENT_ID.GREEN:
+            return z.entity.User.ACCENT_COLOR.GREEN;
+          case z.config.ACCENT_ID.ORANGE:
+            return z.entity.User.ACCENT_COLOR.ORANGE;
+          case z.config.ACCENT_ID.PINK:
+            return z.entity.User.ACCENT_COLOR.PINK;
+          case z.config.ACCENT_ID.PURPLE:
+            return z.entity.User.ACCENT_COLOR.PURPLE;
+          case z.config.ACCENT_ID.RED:
+            return z.entity.User.ACCENT_COLOR.RED;
+          case z.config.ACCENT_ID.YELLOW:
+            return z.entity.User.ACCENT_COLOR.YELLOW;
+          default:
+            return z.entity.User.ACCENT_COLOR.BLUE;
+        }
+      },
+      this,
+      {deferEvaluation: true}
+    );
 
     this.email = ko.observable();
     this.phone = ko.observable();
@@ -147,10 +154,10 @@ z.entity.User = class User {
     // e2ee
     this.devices = ko.observableArray();
     this.is_verified = ko.pureComputed(() => {
-      if ((this.devices().length === 0) && !this.is_me) {
+      if (this.devices().length === 0 && !this.is_me) {
         return false;
       }
-      return this.devices().every((client_et) => client_et.meta.is_verified());
+      return this.devices().every(client_et => client_et.meta.is_verified());
     });
   }
 
@@ -171,7 +178,7 @@ z.entity.User = class User {
   }
 
   remove_client(client_id) {
-    return this.devices.remove((client_et) => client_et.id === client_id);
+    return this.devices.remove(client_et => client_et.id === client_id);
   }
 
   /**
@@ -184,6 +191,6 @@ z.entity.User = class User {
     if (is_handle) {
       return z.util.StringUtil.starts_with(this.username(), query);
     }
-    return z.util.StringUtil.compare_transliteration(this.name(), query) || (this.username() === query);
+    return z.util.StringUtil.compare_transliteration(this.name(), query) || this.username() === query;
   }
 };

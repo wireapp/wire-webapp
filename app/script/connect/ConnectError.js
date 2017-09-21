@@ -27,7 +27,7 @@ z.connect.ConnectError = class ConnectError extends Error {
     super();
 
     this.name = this.constructor.name;
-    this.stack = (new Error()).stack;
+    this.stack = new Error().stack;
     this.type = type || z.connect.ConnectError.TYPE.UNKNOWN;
 
     switch (this.type) {

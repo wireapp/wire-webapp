@@ -50,7 +50,9 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
     this.is_team = this.team_repository.is_team;
     this.team = this.team_repository.team;
-    this.team_name = ko.pureComputed(() => z.l10n.text(z.string.preferences_account_team, this.team_repository.team_name()));
+    this.team_name = ko.pureComputed(() =>
+      z.l10n.text(z.string.preferences_account_team, this.team_repository.team_name())
+    );
     this.team_initial = ko.pureComputed(() => z.util.StringUtil.get_first_character(this.team_repository.team_name()));
 
     this.name_saved = ko.observable();
@@ -80,14 +82,13 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     }
 
     if (new_name.length > z.user.UserRepository.CONFIG.MINIMUM_NAME_LENGTH) {
-      this.user_repository.change_name(new_name)
-        .then(() => {
-          this.name_saved(true);
-          event.target.blur();
-          window.setTimeout(() => {
-            this.name_saved(false);
-          }, PreferencesAccountViewModel.SAVED_ANIMATION_TIMEOUT);
-        });
+      this.user_repository.change_name(new_name).then(() => {
+        this.name_saved(true);
+        event.target.blur();
+        window.setTimeout(() => {
+          this.name_saved(false);
+        }, PreferencesAccountViewModel.SAVED_ANIMATION_TIMEOUT);
+      });
     }
   }
 
@@ -134,13 +135,16 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     }
 
     this.submitted_username(entered_username);
-    this.user_repository.change_username(entered_username)
+    this.user_repository
+      .change_username(entered_username)
       .then(() => {
         if (this.entered_username() === this.submitted_username()) {
           this.username_error(null);
           this.username_saved(true);
 
-          amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.SET_USERNAME, {length: entered_username.length});
+          amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.SET_USERNAME, {
+            length: entered_username.length,
+          });
 
           event.target.blur();
           window.setTimeout(() => {
@@ -148,8 +152,11 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
           }, PreferencesAccountViewModel.SAVED_ANIMATION_TIMEOUT);
         }
       })
-      .catch((error) => {
-        if (error.type === z.user.UserError.TYPE.USERNAME_TAKEN && this.entered_username() === this.submitted_username()) {
+      .catch(error => {
+        if (
+          error.type === z.user.UserError.TYPE.USERNAME_TAKEN &&
+          this.entered_username() === this.submitted_username()
+        ) {
           return this.username_error('taken');
         }
       });
@@ -158,20 +165,24 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   verify_username(username, event) {
     const entered_username = event.target.value;
 
-    if ((entered_username.length < 2) || (entered_username === this.self_user().username())) {
+    if (entered_username.length < 2 || entered_username === this.self_user().username()) {
       this.username_error(null);
       return;
     }
 
     this.entered_username(entered_username);
-    this.user_repository.verify_username(entered_username)
+    this.user_repository
+      .verify_username(entered_username)
       .then(() => {
         if (this.entered_username() === entered_username) {
           this.username_error('available');
         }
       })
-      .catch((error) => {
-        if (error.type === z.user.UserError.TYPE.USERNAME_TAKEN && this.entered_username() === this.submitted_username()) {
+      .catch(error => {
+        if (
+          error.type === z.user.UserError.TYPE.USERNAME_TAKEN &&
+          this.entered_username() === this.submitted_username()
+        ) {
           return this.username_error('taken');
         }
       });
@@ -195,9 +206,11 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
     this.set_picture(new_user_picture)
       .then(() => {
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PROFILE_PICTURE_CHANGED, {source: 'fromPhotoLibrary'});
+        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PROFILE_PICTURE_CHANGED, {
+          source: 'fromPhotoLibrary',
+        });
       })
-      .catch((error) => {
+      .catch(error => {
         if (error.type !== z.user.UserError.TYPE.INVALID_UPDATE) {
           throw error;
         }
@@ -219,7 +232,9 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
   click_on_reset_password() {
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PASSWORD_RESET, {value: 'fromProfile'});
-    return z.util.safe_window_open(`${z.util.Environment.backend.website_url()}${z.l10n.text(z.string.url_password_reset)}`);
+    return z.util.safe_window_open(
+      `${z.util.Environment.backend.website_url()}${z.l10n.text(z.string.url_password_reset)}`
+    );
   }
 
   set_picture(new_user_picture) {
@@ -235,14 +250,13 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     const min_height = z.user.UserRepository.CONFIG.MINIMUM_PICTURE_SIZE.HEIGHT;
     const min_width = z.user.UserRepository.CONFIG.MINIMUM_PICTURE_SIZE.WIDTH;
 
-    return z.util.valid_profile_image_size(new_user_picture, min_width, min_height)
-      .then((valid) => {
-        if (valid) {
-          return this.user_repository.change_picture(new_user_picture);
-        }
+    return z.util.valid_profile_image_size(new_user_picture, min_width, min_height).then(valid => {
+      if (valid) {
+        return this.user_repository.change_picture(new_user_picture);
+      }
 
-        return this._show_upload_warning(z.l10n.text(z.string.alert_upload_too_small));
-      });
+      return this._show_upload_warning(z.l10n.text(z.string.alert_upload_too_small));
+    });
   }
 
   _show_upload_warning(warning) {
@@ -260,7 +274,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
   on_client_remove(user_id, client_id) {
     if (user_id === this.self_user().id) {
-      this.new_clients().forEach((client_et) => {
+      this.new_clients().forEach(client_et => {
         if (client_et.id === client_id && client_et.is_permanent()) {
           this.new_clients.remove(client_et);
         }

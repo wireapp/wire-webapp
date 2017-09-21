@@ -38,8 +38,9 @@ z.bot.BotRepository = class BotRepository {
   add_bot(bot_name, create_conversation = true) {
     let bot_result;
 
-    return this.bot_service.fetch_bot(bot_name)
-      .then((result) => {
+    return this.bot_service
+      .fetch_bot(bot_name)
+      .then(result => {
         bot_result = result;
         this.logger.info(`Info for bot '${bot_name}' retrieved`, bot_result);
         if (create_conversation) {

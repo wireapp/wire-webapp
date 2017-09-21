@@ -36,7 +36,16 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
    * @param {z.properties.PropertiesRepository} properties_repository - Properties repository
    * @param {z.team.TeamRepository} team_repository - Team repository
   */
-  constructor(element_id, content_view_model, calling_repository, connect_repository, conversation_repository, search_repository, properties_repository, team_repository) {
+  constructor(
+    element_id,
+    content_view_model,
+    calling_repository,
+    connect_repository,
+    conversation_repository,
+    search_repository,
+    properties_repository,
+    team_repository
+  ) {
     this.switch_list = this.switch_list.bind(this);
     this.on_context_menu = this.on_context_menu.bind(this);
 
@@ -60,11 +69,32 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
 
     // Nested view models
     /* eslint-disable no-multi-spaces */
-    this.archive       = new z.ViewModel.list.ArchiveViewModel('archive', this, this.conversation_repository);
-    this.conversations = new z.ViewModel.list.ConversationListViewModel('conversations', this, this.content_view_model, this.calling_repository, this.conversation_repository, this.team_repository, this.user_repository);
-    this.preferences   = new z.ViewModel.list.PreferencesListViewModel('preferences', this, this.content_view_model);
-    this.start_ui      = new z.ViewModel.list.StartUIViewModel('start-ui', this, this.connect_repository, this.conversation_repository, this.properties_repository, this.search_repository, this.team_repository, this.user_repository);
-    this.takeover      = new z.ViewModel.list.TakeoverViewModel('takeover', this.conversation_repository, this.user_repository);
+    this.archive = new z.ViewModel.list.ArchiveViewModel('archive', this, this.conversation_repository);
+    this.conversations = new z.ViewModel.list.ConversationListViewModel(
+      'conversations',
+      this,
+      this.content_view_model,
+      this.calling_repository,
+      this.conversation_repository,
+      this.team_repository,
+      this.user_repository
+    );
+    this.preferences = new z.ViewModel.list.PreferencesListViewModel('preferences', this, this.content_view_model);
+    this.start_ui = new z.ViewModel.list.StartUIViewModel(
+      'start-ui',
+      this,
+      this.connect_repository,
+      this.conversation_repository,
+      this.properties_repository,
+      this.search_repository,
+      this.team_repository,
+      this.user_repository
+    );
+    this.takeover = new z.ViewModel.list.TakeoverViewModel(
+      'takeover',
+      this.conversation_repository,
+      this.user_repository
+    );
     /* eslint-enable no-multi-spaces */
 
     this.self_user_picture = ko.pureComputed(() => {
@@ -79,7 +109,9 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
   }
 
   _init_subscriptions() {
-    amplify.subscribe(z.event.WebApp.CONVERSATION.SHOW, () => this.switch_list(z.ViewModel.list.LIST_STATE.CONVERSATIONS, false));
+    amplify.subscribe(z.event.WebApp.CONVERSATION.SHOW, () =>
+      this.switch_list(z.ViewModel.list.LIST_STATE.CONVERSATIONS, false)
+    );
     amplify.subscribe(z.event.WebApp.LIFECYCLE.LOADED, () => this.webapp_loaded(true));
     amplify.subscribe(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT, this.open_preferences_account.bind(this));
     amplify.subscribe(z.event.WebApp.PREFERENCES.MANAGE_DEVICES, this.open_preferences_devices.bind(this));
@@ -128,7 +160,7 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     $(`#${this._get_element_id_of_list(new_list_state)}`).addClass('left-list-is-visible');
     this.list_state(new_list_state);
     this.last_update(Date.now());
-    $(document).on('keydown.list_view', (event) => {
+    $(document).on('keydown.list_view', event => {
       if (event.keyCode === z.util.KEYCODE.ESC) {
         this.switch_list(z.ViewModel.list.LIST_STATE.CONVERSATIONS);
       }
@@ -174,7 +206,6 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     this.list_modal(undefined);
   }
 
-
   //##############################################################################
   // Context menu
   //##############################################################################
@@ -188,7 +219,9 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
       const notify_tooltip = z.l10n.text(z.string.tooltip_conversations_notify, silence_shortcut);
       const silence_tooltip = z.l10n.text(z.string.tooltip_conversations_silence, silence_shortcut);
 
-      label = conversation_et.is_muted() ? z.string.conversations_popover_notify : z.string.conversations_popover_silence;
+      label = conversation_et.is_muted()
+        ? z.string.conversations_popover_notify
+        : z.string.conversations_popover_silence;
       title = conversation_et.is_muted() ? notify_tooltip : silence_tooltip;
       entries.push({
         click: () => this.click_on_mute_action(conversation_et),
@@ -289,8 +322,7 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.LEAVE, {
       action: () => this.conversation_repository.remove_member(conversation_et, this.user_repository.self().id),
       data: conversation_et.display_name(),
-    }
-    );
+    });
   }
 
   click_on_mute_action(conversation_et = this.conversation_repository.active_conversation()) {
@@ -300,12 +332,11 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
   }
 
   click_on_unarchive_action(conversation_et) {
-    this.conversation_repository.unarchive_conversation(conversation_et, 'manual un-archive')
-      .then(() => {
-        if (!this.conversation_repository.conversations_archived().length) {
-          this.switch_list(z.ViewModel.list.LIST_STATE.CONVERSATIONS);
-        }
-      });
+    this.conversation_repository.unarchive_conversation(conversation_et, 'manual un-archive').then(() => {
+      if (!this.conversation_repository.conversations_archived().length) {
+        this.switch_list(z.ViewModel.list.LIST_STATE.CONVERSATIONS);
+      }
+    });
   }
 
   _get_next_conversation(conversation_et) {

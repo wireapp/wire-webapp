@@ -23,7 +23,6 @@ window.z = window.z || {};
 window.z.links = z.links || {};
 
 z.links.LinkPreviewProtoBuilder = {
-
   /*
   Create Protocol Buffers message for link previews.
   Open Graph data can be validated through: https://developers.facebook.com/tools/debug/
@@ -56,5 +55,4 @@ z.links.LinkPreviewProtoBuilder = {
       return preview;
     }
   },
-
 };

@@ -58,20 +58,21 @@ switch (commit.branch) {
 }
 
 content.message =
-  `**Travis build '${build.number}' deployed on '${commit.branch}' environment.** ᕦ(￣ ³￣)ᕤ`
-  + `\r\n- Link: ${build.url}`
-  + `\r\n- Last commit from: ${commit.author}`
-  + `\r\n- Last commit message: ${commit.message}`;
+  `**Travis build '${build.number}' deployed on '${commit.branch}' environment.** ᕦ(￣ ³￣)ᕤ` +
+  `\r\n- Link: ${build.url}` +
+  `\r\n- Last commit from: ${commit.author}` +
+  `\r\n- Last commit message: ${commit.message}`;
 
 const storagePath = `${process.env.HOME}/cryptobox`;
 const store = new cryptobox.store.FileStore(storagePath);
 const box = new cryptobox.Cryptobox(store, 1);
 
-new wire.User(login, box).login(false)
-  .then((service) => service.conversation.sendTextMessage(content.conversationId, content.message))
-  .then((service) => service.user.logout())
+new wire.User(login, box)
+  .login(false)
+  .then(service => service.conversation.sendTextMessage(content.conversationId, content.message))
+  .then(service => service.user.logout())
   .then(() => process.exit(0))
-  .catch((error) => {
+  .catch(error => {
     console.log(error.message);
     return process.exit(1);
   });

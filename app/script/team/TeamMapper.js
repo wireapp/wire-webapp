@@ -60,7 +60,7 @@ z.team.TeamMapper = class TeamMapper {
   }
 
   map_member_from_array(members_data) {
-    return members_data.map((data) => this.update_member_from_object(data));
+    return members_data.map(data => this.update_member_from_object(data));
   }
 
   map_member_from_object(data) {

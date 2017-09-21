@@ -21,7 +21,7 @@
 
 const path = require('path');
 
-module.exports = (grunt) => {
+module.exports = grunt => {
   grunt.registerTask('aws_deploy', () => {
     grunt.task.run('init');
 
@@ -36,12 +36,23 @@ module.exports = (grunt) => {
     const version = grunt.option('version');
 
     grunt.config('aws.deploy.options.version', version);
-    grunt.config('aws.deploy.options.application_versions', 'https://eu-west-1.console.aws.amazon.com/elasticbeanstalk/home?region=eu-west-1#/application/versions?applicationName=Webapp');
+    grunt.config(
+      'aws.deploy.options.application_versions',
+      'https://eu-west-1.console.aws.amazon.com/elasticbeanstalk/home?region=eu-west-1#/application/versions?applicationName=Webapp'
+    );
     grunt.task.run('aws_prepare', 'aws_s3:default', 'shell:aws_deploy', 'open:ebs');
   });
 
   grunt.registerTask('aws_version_file', () => grunt.file.write(path.join('aws', 'version'), grunt.option('version')));
 
-  grunt.registerTask('aws_prepare', ['aws_version_file', 'clean:aws', 'copy:aws', 'copy:aws_templates', 'clean:aws_app', 'clean:aws_s3', 'compress:aws']);
+  grunt.registerTask('aws_prepare', [
+    'aws_version_file',
+    'clean:aws',
+    'copy:aws',
+    'copy:aws_templates',
+    'clean:aws_app',
+    'clean:aws_s3',
+    'compress:aws',
+  ]);
   grunt.registerTask('aws_run', ['init', 'prepare_prod', 'aws_prepare', 'open:aws', 'shell:aws']);
 };

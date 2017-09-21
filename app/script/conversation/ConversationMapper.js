@@ -193,8 +193,8 @@ z.conversation.ConversationMapper = class ConversationMapper {
       conversation_et.participating_user_ids(others);
     } else {
       const participating_user_ids = members.others
-        .filter((other) => other.status === z.conversation.ConversationStatus.CURRENT_MEMBER)
-        .map((other) => other.id);
+        .filter(other => other.status === z.conversation.ConversationStatus.CURRENT_MEMBER)
+        .map(other => other.id);
 
       conversation_et.participating_user_ids(participating_user_ids);
     }
@@ -221,9 +221,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
   merge_conversations(local, remote) {
     return remote.map((remote_conversation, index) => {
       const {id, creator, members, name, team, type} = remote_conversation;
-      let local_conversation = local
-        .filter((conversation) => conversation)
-        .find((conversation) => conversation.id === id);
+      let local_conversation = local.filter(conversation => conversation).find(conversation => conversation.id === id);
 
       if (!local_conversation) {
         local_conversation = {
@@ -238,8 +236,8 @@ z.conversation.ConversationMapper = class ConversationMapper {
       local_conversation.type = type;
 
       local_conversation.others = members.others
-        .filter((other) => other.status === z.conversation.ConversationStatus.CURRENT_MEMBER)
-        .map((other) => other.id);
+        .filter(other => other.status === z.conversation.ConversationStatus.CURRENT_MEMBER)
+        .map(other => other.id);
 
       // This should ensure a proper order
       if (!local_conversation.last_event_timestamp) {
@@ -247,7 +245,10 @@ z.conversation.ConversationMapper = class ConversationMapper {
       }
 
       // Set initially or correct server timestamp
-      if (!local_conversation.last_server_timestamp || (local_conversation.last_server_timestamp < local_conversation.last_event_timestamp)) {
+      if (
+        !local_conversation.last_server_timestamp ||
+        local_conversation.last_server_timestamp < local_conversation.last_event_timestamp
+      ) {
         local_conversation.last_server_timestamp = local_conversation.last_event_timestamp;
       }
 
@@ -255,16 +256,18 @@ z.conversation.ConversationMapper = class ConversationMapper {
       // To fix this we check if the remote one is newer and update our local timestamp.
       const {archived_state: local_archived_state, archived_timestamp: local_archived_timestamp} = local_conversation;
       const remote_archived_timestamp = new Date(members.self.otr_archived_ref).getTime();
-      const is_remote_archived_timestamp_newer = (local_archived_timestamp !== undefined) && (remote_archived_timestamp > local_archived_timestamp);
+      const is_remote_archived_timestamp_newer =
+        local_archived_timestamp !== undefined && remote_archived_timestamp > local_archived_timestamp;
 
-      if (is_remote_archived_timestamp_newer || (local_archived_state === undefined)) {
+      if (is_remote_archived_timestamp_newer || local_archived_state === undefined) {
         local_conversation.archived_state = members.self.otr_archived;
         local_conversation.archived_timestamp = remote_archived_timestamp;
       }
 
       const {muted_state: local_muted_state, muted_timestamp: local_muted_timestamp} = local_conversation;
       const remote_muted_timestamp = new Date(members.self.otr_muted_ref).getTime();
-      const is_remote_muted_timestamp_newer = (local_muted_timestamp !== undefined) && (remote_muted_timestamp > local_muted_timestamp);
+      const is_remote_muted_timestamp_newer =
+        local_muted_timestamp !== undefined && remote_muted_timestamp > local_muted_timestamp;
 
       if (is_remote_muted_timestamp_newer || local_muted_state === undefined) {
         local_conversation.muted_state = members.self.otr_muted;

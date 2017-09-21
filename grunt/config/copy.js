@@ -113,5 +113,4 @@ module.exports = {
     expand: true,
     src: 'script/**/*.js',
   },
-
 };

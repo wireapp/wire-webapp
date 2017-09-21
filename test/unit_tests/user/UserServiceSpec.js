@@ -50,7 +50,8 @@ describe('User Service', function() {
       JSON.stringify(payload.connections.get),
     ]);
 
-    user_service.get_own_connections()
+    user_service
+      .get_own_connections()
       .then(function(response) {
         expect(response.has_more).toBeFalsy();
         expect(response.connections.length).toBe(2);
@@ -72,7 +73,8 @@ describe('User Service', function() {
         JSON.stringify(payload.users.get.one),
       ]);
 
-      user_service.get_users(['7025598b-ffac-4993-8a81-af3f35b7147f'])
+      user_service
+        .get_users(['7025598b-ffac-4993-8a81-af3f35b7147f'])
         .then(function(response) {
           expect(response.length).toBe(1);
           expect(response[0].id).toBe('d5a39ffb-6ce3-4cc8-9048-0e15d031b4c5');
@@ -85,13 +87,10 @@ describe('User Service', function() {
 
     it('cannot get a single fake user from the server', function(done) {
       const request_url = `${urls.rest_url}/users?ids=7025598b-ffac-4993-8a81-af3f35b71414`;
-      server.respondWith('GET', request_url, [
-        404,
-        {'Content-Type': 'application/json'},
-        '',
-      ]);
+      server.respondWith('GET', request_url, [404, {'Content-Type': 'application/json'}, '']);
 
-      user_service.get_users(['7025598b-ffac-4993-8a81-af3f35b71414'])
+      user_service
+        .get_users(['7025598b-ffac-4993-8a81-af3f35b71414'])
         .then(done.fail)
         .catch(function(error) {
           expect(error.code).toBe(z.service.BackendClientError.STATUS_CODE.NOT_FOUND);
@@ -109,7 +108,8 @@ describe('User Service', function() {
         JSON.stringify(payload.users.get.many),
       ]);
 
-      user_service.get_users(['7025598b-ffac-4993-8a81-af3f35b7147f', '7025598b-ffac-4993-8a81-af3f35b71414'])
+      user_service
+        .get_users(['7025598b-ffac-4993-8a81-af3f35b7147f', '7025598b-ffac-4993-8a81-af3f35b71414'])
         .then(function(response) {
           expect(response.length).toBe(2);
           expect(response[0].id).toBe('d5a39ffb-6ce3-4cc8-9048-0e15d031b4c5');
@@ -122,13 +122,10 @@ describe('User Service', function() {
 
     it('cannot fetch multiple fake users from the server', function(done) {
       const request_url = `${urls.rest_url}/users?ids=7025598b-ffac-4993-8a81-af3f35b71488%2C7025598b-ffac-4993-8a81-af3f35b71414`;
-      server.respondWith('GET', request_url, [
-        404,
-        {'Content-Type': 'application/json'},
-        '',
-      ]);
+      server.respondWith('GET', request_url, [404, {'Content-Type': 'application/json'}, '']);
 
-      user_service.get_users(['7025598b-ffac-4993-8a81-af3f35b71488', '7025598b-ffac-4993-8a81-af3f35b71414'])
+      user_service
+        .get_users(['7025598b-ffac-4993-8a81-af3f35b71488', '7025598b-ffac-4993-8a81-af3f35b71414'])
         .then(done.fail)
         .catch(function(error) {
           expect(error.code).toBe(z.service.BackendClientError.STATUS_CODE.NOT_FOUND);
@@ -146,7 +143,8 @@ describe('User Service', function() {
         JSON.stringify(payload.users.get.one),
       ]);
 
-      user_service.get_users(['d5a39ffb-6ce3-4cc8-9048-0e15d031b4c5', '7025598b-ffac-4993-8a81-af3f35b71425'])
+      user_service
+        .get_users(['d5a39ffb-6ce3-4cc8-9048-0e15d031b4c5', '7025598b-ffac-4993-8a81-af3f35b71425'])
         .then(function(response) {
           expect(response.length).toBe(1);
           expect(response[0].id).toBe('d5a39ffb-6ce3-4cc8-9048-0e15d031b4c5');

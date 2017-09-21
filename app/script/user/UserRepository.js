@@ -59,16 +59,19 @@ z.user.UserRepository = class UserRepository {
     this.users = ko.observableArray([]);
     this.connections = ko.observableArray([]);
 
-    this.connect_requests = ko.pureComputed(() => {
-      return this.users()
-        .filter((user_et) => user_et.is_incoming_request());
-    }).extend({rateLimit: 50});
+    this.connect_requests = ko
+      .pureComputed(() => {
+        return this.users().filter(user_et => user_et.is_incoming_request());
+      })
+      .extend({rateLimit: 50});
 
-    this.connected_users = ko.pureComputed(() => {
-      return this.users()
-        .filter((user_et) => user_et.is_connected())
-        .sort((user_a, user_b) => z.util.StringUtil.sort_by_priority(user_a.first_name(), user_b.first_name()));
-    }).extend({rateLimit: 1000});
+    this.connected_users = ko
+      .pureComputed(() => {
+        return this.users()
+          .filter(user_et => user_et.is_connected())
+          .sort((user_a, user_b) => z.util.StringUtil.sort_by_priority(user_a.first_name(), user_b.first_name()));
+      })
+      .extend({rateLimit: 1000});
 
     this.is_team = ko.observable();
     this.team_members = undefined;
@@ -76,11 +79,9 @@ z.user.UserRepository = class UserRepository {
 
     this.number_of_contacts = ko.pureComputed(() => {
       const contacts = this.is_team() ? this.team_users() : this.connected_users();
-      return contacts
-        .filter((user_et) => !user_et.is_bot)
-        .length;
+      return contacts.filter(user_et => !user_et.is_bot).length;
     });
-    this.number_of_contacts.subscribe((number_of_contacts) => {
+    this.number_of_contacts.subscribe(number_of_contacts => {
       amplify.publish(z.event.WebApp.ANALYTICS.SUPER_PROPERTY, z.tracking.SuperProperty.CONTACTS, number_of_contacts);
     });
 
@@ -138,14 +139,13 @@ z.user.UserRepository = class UserRepository {
       connection_et = this.connection_mapper.map_user_connection_from_json(event_json);
     }
 
-    this.update_user_connections([connection_et])
-      .then(() => {
-        if ((previous_status === z.user.ConnectionStatus.SENT) && connection_et.is_connected()) {
-          this.update_user_by_id(connection_et.to);
-        }
-        this._send_user_connection_notification(connection_et, source, previous_status);
-        amplify.publish(z.event.WebApp.CONVERSATION.MAP_CONNECTION, connection_et, show_conversation);
-      });
+    this.update_user_connections([connection_et]).then(() => {
+      if (previous_status === z.user.ConnectionStatus.SENT && connection_et.is_connected()) {
+        this.update_user_by_id(connection_et.to);
+      }
+      this._send_user_connection_notification(connection_et, source, previous_status);
+      amplify.publish(z.event.WebApp.CONVERSATION.MAP_CONNECTION, connection_et, show_conversation);
+    });
   }
 
   /**
@@ -171,7 +171,7 @@ z.user.UserRepository = class UserRepository {
   user_update({user}) {
     const is_self_user = user.id === this.self().id;
     const user_promise = is_self_user ? Promise.resolve(this.self()) : this.get_user_by_id(user.id);
-    return user_promise.then((user_et) => {
+    return user_promise.then(user_et => {
       this.user_mapper.update_user_from_object(user_et, user);
 
       if (is_self_user) {
@@ -200,12 +200,11 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise} Promise that resolves when the user was blocked
    */
   block_user(user_et, next_conversation_et) {
-    return this._update_connection_status(user_et, z.user.ConnectionStatus.BLOCKED)
-      .then(() => {
-        if (next_conversation_et) {
-          amplify.publish(z.event.WebApp.CONVERSATION.SHOW, next_conversation_et);
-        }
-      });
+    return this._update_connection_status(user_et, z.user.ConnectionStatus.BLOCKED).then(() => {
+      if (next_conversation_et) {
+        amplify.publish(z.event.WebApp.CONVERSATION.SHOW, next_conversation_et);
+      }
+    });
   }
 
   /**
@@ -216,12 +215,11 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise} Promise that resolves when an outgoing connection request was cancelled
    */
   cancel_connection_request(user_et, next_conversation_et) {
-    return this._update_connection_status(user_et, z.user.ConnectionStatus.CANCELLED)
-      .then(() => {
-        if (next_conversation_et) {
-          amplify.publish(z.event.WebApp.CONVERSATION.SHOW, next_conversation_et);
-        }
-      });
+    return this._update_connection_status(user_et, z.user.ConnectionStatus.CANCELLED).then(() => {
+      if (next_conversation_et) {
+        amplify.publish(z.event.WebApp.CONVERSATION.SHOW, next_conversation_et);
+      }
+    });
   }
 
   /**
@@ -232,9 +230,10 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise} Promise that resolves when the connection request was successfully created
    */
   create_connection(user_et, show_conversation = false) {
-    return this.user_service.create_connection(user_et.id, user_et.name())
-      .then((response) => this.user_connection(response, z.event.EventRepository.SOURCE.INJECTED, show_conversation))
-      .catch((error) => {
+    return this.user_service
+      .create_connection(user_et.id, user_et.name())
+      .then(response => this.user_connection(response, z.event.EventRepository.SOURCE.INJECTED, show_conversation))
+      .catch(error => {
         this.logger.error(`Failed to send connection request to user '${user_et.id}': ${error.message}`, error);
       });
   }
@@ -274,7 +273,8 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise} Promise that resolves when all connections have been retrieved and mapped
    */
   get_connections(limit = 500, user_id, connection_ets = []) {
-    return this.user_service.get_own_connections(limit, user_id)
+    return this.user_service
+      .get_own_connections(limit, user_id)
       .then(({connections, has_more}) => {
         if (connections.length) {
           const new_connection_ets = this.connection_mapper.map_user_connections_from_json(connections);
@@ -287,15 +287,14 @@ z.user.UserRepository = class UserRepository {
         }
 
         if (connection_ets.length) {
-          return this.update_user_connections(connection_ets, true)
-            .then(() => {
-              return this.connections();
-            });
+          return this.update_user_connections(connection_ets, true).then(() => {
+            return this.connections();
+          });
         }
 
         return this.connections();
       })
-      .catch((error) => {
+      .catch(error => {
         this.logger.error(`Failed to retrieve connections from backend: ${error.message}`, error);
         throw error;
       });
@@ -330,21 +329,20 @@ z.user.UserRepository = class UserRepository {
     return Promise.resolve()
       .then(() => {
         z.util.ko_array_push_all(this.connections, connection_ets);
-        const user_ids = connection_ets.map((connection_et) => connection_et.to);
+        const user_ids = connection_ets.map(connection_et => connection_et.to);
 
         if (user_ids.length === 0) {
           return;
         }
 
-        return this.get_users_by_id(user_ids)
-          .then((user_ets) => {
-            for (const user_et of user_ets) {
-              this._assign_connection(user_et);
-            }
-            if (assign_clients) {
-              return this._assign_all_clients();
-            }
-          });
+        return this.get_users_by_id(user_ids).then(user_ets => {
+          for (const user_et of user_ets) {
+            this._assign_connection(user_et);
+          }
+          if (assign_clients) {
+            return this._assign_all_clients();
+          }
+        });
       })
       .then(() => {
         return connection_ets;
@@ -357,23 +355,24 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise} Promise that resolves with all user entities where client entities have been assigned to.
    */
   _assign_all_clients() {
-    return this.client_repository.get_all_clients_from_db()
-      .then((recipients) => {
-        this.logger.info(`Found locally stored clients for '${Object.keys(recipients).length}' users`, recipients);
-        const user_ids = Object.keys(recipients);
+    return this.client_repository.get_all_clients_from_db().then(recipients => {
+      this.logger.info(`Found locally stored clients for '${Object.keys(recipients).length}' users`, recipients);
+      const user_ids = Object.keys(recipients);
 
-        return this.get_users_by_id(user_ids)
-          .then((user_ets) => {
-            for (const user_et of user_ets) {
-              if (recipients[user_et.id].length > 8) {
-                this.logger.warn(`Found '${recipients[user_et.id].length}' clients for '${user_et.name()}'`, recipients[user_et.id]);
-              }
-              user_et.devices(recipients[user_et.id]);
-            }
+      return this.get_users_by_id(user_ids).then(user_ets => {
+        for (const user_et of user_ets) {
+          if (recipients[user_et.id].length > 8) {
+            this.logger.warn(
+              `Found '${recipients[user_et.id].length}' clients for '${user_et.name()}'`,
+              recipients[user_et.id]
+            );
+          }
+          user_et.devices(recipients[user_et.id]);
+        }
 
-            return user_ets;
-          });
+        return user_ets;
       });
+    });
   }
 
   /**
@@ -409,10 +408,14 @@ z.user.UserRepository = class UserRepository {
       return Promise.resolve();
     }
 
-    return this.user_service.update_connection_status(user_et.id, status)
-      .then((response) => this.user_connection(response, z.event.EventRepository.SOURCE.INJECTED, show_conversation))
-      .catch((error) => {
-        this.logger.error(`Connection status change to '${status}' for user '${user_et.id}' failed: ${error.message}`, error);
+    return this.user_service
+      .update_connection_status(user_et.id, status)
+      .then(response => this.user_connection(response, z.event.EventRepository.SOURCE.INJECTED, show_conversation))
+      .catch(error => {
+        this.logger.error(
+          `Connection status change to '${status}' for user '${user_et.id}' failed: ${error.message}`,
+          error
+        );
 
         const custom_data = {
           current_status: user_et.connection().status(),
@@ -433,36 +436,37 @@ z.user.UserRepository = class UserRepository {
    */
   _send_user_connection_notification(connection_et, source, previous_status) {
     // We accepted the connection request or unblocked the user
-    const self_user_accepted = connection_et.is_connected() && [z.user.ConnectionStatus.BLOCKED, z.user.ConnectionStatus.PENDING].includes(previous_status);
+    const self_user_accepted =
+      connection_et.is_connected() &&
+      [z.user.ConnectionStatus.BLOCKED, z.user.ConnectionStatus.PENDING].includes(previous_status);
     const is_web_socket_event = source === z.event.EventRepository.SOURCE.WEB_SOCKET;
 
     if (is_web_socket_event && !self_user_accepted) {
-      this.get_user_by_id(connection_et.to)
-        .then((user_et) => {
-          const message_et = new z.entity.MemberMessage();
-          message_et.user(user_et);
+      this.get_user_by_id(connection_et.to).then(user_et => {
+        const message_et = new z.entity.MemberMessage();
+        message_et.user(user_et);
 
-          switch (connection_et.status()) {
-            case z.user.ConnectionStatus.PENDING: {
-              message_et.member_message_type = z.message.SystemMessageType.CONNECTION_REQUEST;
-              break;
-            }
-
-            case z.user.ConnectionStatus.ACCEPTED: {
-              if (previous_status === z.user.ConnectionStatus.SENT) {
-                message_et.member_message_type = z.message.SystemMessageType.CONNECTION_ACCEPTED;
-              } else {
-                message_et.member_message_type = z.message.SystemMessageType.CONNECTION_CONNECTED;
-              }
-              break;
-            }
-
-            default:
-              break;
+        switch (connection_et.status()) {
+          case z.user.ConnectionStatus.PENDING: {
+            message_et.member_message_type = z.message.SystemMessageType.CONNECTION_REQUEST;
+            break;
           }
 
-          amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, connection_et, message_et);
-        });
+          case z.user.ConnectionStatus.ACCEPTED: {
+            if (previous_status === z.user.ConnectionStatus.SENT) {
+              message_et.member_message_type = z.message.SystemMessageType.CONNECTION_ACCEPTED;
+            } else {
+              message_et.member_message_type = z.message.SystemMessageType.CONNECTION_CONNECTED;
+            }
+            break;
+          }
+
+          default:
+            break;
+        }
+
+        amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, connection_et, message_et);
+      });
     }
   }
 
@@ -473,20 +477,18 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise} Promise that resolves when a client and its session have been deleted
    */
   add_client_to_user(user_id, client_et) {
-    return this.get_user_by_id(user_id)
-      .then((user_et) => {
-        if (!user_et.add_client(client_et)) {
-          return;
-        }
+    return this.get_user_by_id(user_id).then(user_et => {
+      if (!user_et.add_client(client_et)) {
+        return;
+      }
 
-        return this.client_repository.save_client_in_db(user_id, client_et.to_json())
-          .then(() => {
-            amplify.publish(z.event.WebApp.USER.CLIENT_ADDED, user_id, client_et);
-            if (user_et.is_me) {
-              amplify.publish(z.event.WebApp.CLIENT.ADD_OWN_CLIENT, user_id, client_et);
-            }
-          });
+      return this.client_repository.save_client_in_db(user_id, client_et.to_json()).then(() => {
+        amplify.publish(z.event.WebApp.USER.CLIENT_ADDED, user_id, client_et);
+        if (user_et.is_me) {
+          amplify.publish(z.event.WebApp.CLIENT.ADD_OWN_CLIENT, user_id, client_et);
+        }
       });
+    });
   }
 
   /**
@@ -496,9 +498,10 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise} Promise that resolves when a client and its session have been deleted
    */
   remove_client_from_user(user_id, client_id) {
-    return this.client_repository.remove_client(user_id, client_id)
+    return this.client_repository
+      .remove_client(user_id, client_id)
       .then(() => this.get_user_by_id(user_id))
-      .then((user_et) => {
+      .then(user_et => {
         user_et.remove_client(client_id);
         amplify.publish(z.event.WebApp.USER.CLIENT_REMOVED, user_id, client_id);
       });
@@ -511,11 +514,10 @@ z.user.UserRepository = class UserRepository {
    * @returns {undefined} No return value
    */
   update_clients_from_user(user_id, client_ets) {
-    this.get_user_by_id(user_id)
-      .then((user_et) => {
-        user_et.devices(client_ets);
-        amplify.publish(z.event.WebApp.USER.CLIENTS_UPDATED, user_id, client_ets);
-      });
+    this.get_user_by_id(user_id).then(user_et => {
+      user_et.devices(client_ets);
+      amplify.publish(z.event.WebApp.USER.CLIENTS_UPDATED, user_id, client_ets);
+    });
   }
 
   /**
@@ -523,11 +525,12 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise} Promise that resolves when account deletion process has been initiated
    */
   delete_me() {
-    return this.user_service.delete_self()
+    return this.user_service
+      .delete_self()
       .then(() => {
         this.logger.info('Account deletion initiated');
       })
-      .catch((error) => {
+      .catch(error => {
         this.logger.error(`Unable to delete self: ${error}`);
       });
   }
@@ -538,12 +541,11 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise<z.entity.User>} Promise that resolves with the user entity
    */
   fetch_user_by_id(user_id) {
-    return this.fetch_users_by_id([user_id])
-      .then(([user_et]) => {
-        if (user_et) {
-          return user_et;
-        }
-      });
+    return this.fetch_users_by_id([user_id]).then(([user_et]) => {
+      if (user_et) {
+        return user_et;
+      }
+    });
   }
 
   /**
@@ -552,21 +554,22 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise<Array<z.entity.User>>} Promise that resolves with an array of user entities
    */
   fetch_users_by_id(user_ids = []) {
-    user_ids = user_ids.filter((user_id) => user_id);
+    user_ids = user_ids.filter(user_id => user_id);
 
     if (!user_ids.length) {
       return Promise.resolve([]);
     }
 
-    const _get_users = (user_id_chunk) => {
-      return this.user_service.get_users(user_id_chunk)
-        .then((response) => {
+    const _get_users = user_id_chunk => {
+      return this.user_service
+        .get_users(user_id_chunk)
+        .then(response => {
           if (response) {
             return this.user_mapper.map_users_from_object(response);
           }
           return [];
         })
-        .catch((error) => {
+        .catch(error => {
           if (error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
             return [];
           }
@@ -575,8 +578,8 @@ z.user.UserRepository = class UserRepository {
     };
 
     const user_id_chunks = z.util.ArrayUtil.chunk(user_ids, z.config.MAXIMUM_USERS_PER_REQUEST);
-    return Promise.all(user_id_chunks.map((user_id_chunk) => _get_users(user_id_chunk)))
-      .then((resolve_array) => {
+    return Promise.all(user_id_chunks.map(user_id_chunk => _get_users(user_id_chunk)))
+      .then(resolve_array => {
         const new_user_ets = _.flatten(resolve_array);
 
         if (this.is_team()) {
@@ -585,7 +588,7 @@ z.user.UserRepository = class UserRepository {
 
         return this.save_users(new_user_ets);
       })
-      .then((fetched_user_ets) => {
+      .then(fetched_user_ets => {
         // If there is a difference then we most likely have a case with a suspended user
         if (user_ids.length !== fetched_user_ets.length) {
           fetched_user_ets = this._add_suspended_users(user_ids, fetched_user_ets);
@@ -615,12 +618,13 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise} Promise that will resolve with the self user entity
    */
   get_me() {
-    return this.user_service.get_own_user()
-      .then((response) => {
+    return this.user_service
+      .get_own_user()
+      .then(response => {
         const user_et = this.user_mapper.map_self_user_from_object(response);
         return this.save_user(user_et, true);
       })
-      .catch((error) => {
+      .catch(error => {
         this.logger.error(`Unable to load self user: ${error}`);
         throw error;
       });
@@ -633,13 +637,13 @@ z.user.UserRepository = class UserRepository {
    */
   get_user_by_id(user_id) {
     return this.find_user_by_id(user_id)
-      .catch((error) => {
+      .catch(error => {
         if (error.type === z.user.UserError.TYPE.USER_NOT_FOUND) {
           return this.fetch_user_by_id(user_id);
         }
         throw error;
       })
-      .catch((error) => {
+      .catch(error => {
         if (error.type !== z.user.UserError.TYPE.USER_NOT_FOUND) {
           this.logger.log(this.logger.levels.ERROR, `Failed to get user '${user_id}': ${error.message}`, error);
         }
@@ -648,9 +652,10 @@ z.user.UserRepository = class UserRepository {
   }
 
   get_user_id_by_handle(handle) {
-    return this.user_service.get_username(handle.toLowerCase())
+    return this.user_service
+      .get_username(handle.toLowerCase())
       .then(({user: user_id}) => user_id)
-      .catch((error) => {
+      .catch(error => {
         if (error.code !== z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
           throw error;
         }
@@ -668,30 +673,27 @@ z.user.UserRepository = class UserRepository {
       return Promise.resolve([]);
     }
 
-    const _find_user = (user_id) => {
-      return this.find_user_by_id(user_id)
-        .catch((error) => {
-          if (error.type !== z.user.UserError.TYPE.USER_NOT_FOUND) {
-            throw error;
-          }
-          return user_id;
-        });
+    const _find_user = user_id => {
+      return this.find_user_by_id(user_id).catch(error => {
+        if (error.type !== z.user.UserError.TYPE.USER_NOT_FOUND) {
+          throw error;
+        }
+        return user_id;
+      });
     };
 
-    const find_users = user_ids.map((user_id) => _find_user(user_id));
+    const find_users = user_ids.map(user_id => _find_user(user_id));
 
-    return Promise.all(find_users)
-      .then((resolve_array) => {
-        const known_user_ets = resolve_array.filter((array_item) => array_item instanceof z.entity.User);
-        const unknown_user_ids = resolve_array.filter((array_item) => _.isString(array_item));
+    return Promise.all(find_users).then(resolve_array => {
+      const known_user_ets = resolve_array.filter(array_item => array_item instanceof z.entity.User);
+      const unknown_user_ids = resolve_array.filter(array_item => _.isString(array_item));
 
-        if (offline || !unknown_user_ids.length) {
-          return known_user_ets;
-        }
+      if (offline || !unknown_user_ids.length) {
+        return known_user_ets;
+      }
 
-        return this.fetch_users_by_id(unknown_user_ids)
-          .then((user_ets) => known_user_ets.concat(user_ets));
-      });
+      return this.fetch_users_by_id(unknown_user_ids).then(user_ets => known_user_ets.concat(user_ets));
+    });
   }
 
   /**
@@ -702,7 +704,7 @@ z.user.UserRepository = class UserRepository {
    */
   search_for_connected_users(query, is_handle) {
     return this.connected_users()
-      .filter((user_et) => user_et.matches(query, is_handle))
+      .filter(user_et => user_et.matches(query, is_handle))
       .sort((user_a, user_b) => {
         if (is_handle) {
           return z.util.StringUtil.sort_by_priority(user_a.username(), user_b.username(), query);
@@ -730,19 +732,18 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise} Resolves with the user entity
    */
   save_user(user_et, is_me = false) {
-    return this.find_user_by_id(user_et.id)
-      .catch((error) => {
-        if (error.type !== z.user.UserError.TYPE.USER_NOT_FOUND) {
-          throw error;
-        }
+    return this.find_user_by_id(user_et.id).catch(error => {
+      if (error.type !== z.user.UserError.TYPE.USER_NOT_FOUND) {
+        throw error;
+      }
 
-        if (is_me) {
-          user_et.is_me = true;
-          this.self(user_et);
-        }
-        this.users.push(user_et);
-        return user_et;
-      });
+      if (is_me) {
+        user_et.is_me = true;
+        this.self(user_et);
+      }
+      this.users.push(user_et);
+      return user_et;
+    });
   }
 
   /**
@@ -751,10 +752,10 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise} Resolves with users passed as parameter
    */
   save_users(user_ets) {
-    const _find_users = (user_et) => {
+    const _find_users = user_et => {
       return this.find_user_by_id(user_et.id)
         .then(() => undefined)
-        .catch((error) => {
+        .catch(error => {
           if (error.type !== z.user.UserError.TYPE.USER_NOT_FOUND) {
             throw error;
           }
@@ -762,13 +763,12 @@ z.user.UserRepository = class UserRepository {
         });
     };
 
-    const find_users = user_ets.map((user_et) => _find_users(user_et));
+    const find_users = user_ets.map(user_et => _find_users(user_et));
 
-    return Promise.all(find_users)
-      .then((resolve_array) => {
-        z.util.ko_array_push_all(this.users, resolve_array.filter((user_et) => user_et));
-        return user_ets;
-      });
+    return Promise.all(find_users).then(resolve_array => {
+      z.util.ko_array_push_all(this.users, resolve_array.filter(user_et => user_et));
+      return user_ets;
+    });
   }
 
   /**
@@ -777,20 +777,19 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise} Resolves when user was updated
    */
   update_user_by_id(user_id) {
-    const get_current_user = () => this.find_user_by_id(user_id)
-      .catch((error) => {
+    const get_current_user = () =>
+      this.find_user_by_id(user_id).catch(error => {
         if (error.type !== z.user.UserError.TYPE.USER_NOT_FOUND) {
           throw error;
         }
         return new z.entity.User();
       });
 
-    return Promise.all([
-      get_current_user(user_id),
-      this.user_service.get_user_by_id(user_id),
-    ])
-      .then(([current_user_et, updated_user_data]) => this.user_mapper.update_user_from_object(current_user_et, updated_user_data))
-      .then((updated_user_et) => {
+    return Promise.all([get_current_user(user_id), this.user_service.get_user_by_id(user_id)])
+      .then(([current_user_et, updated_user_data]) =>
+        this.user_mapper.update_user_from_object(current_user_et, updated_user_data)
+      )
+      .then(updated_user_et => {
         if (this.is_team()) {
           this.map_guest_status([updated_user_et]);
         }
@@ -805,7 +804,7 @@ z.user.UserRepository = class UserRepository {
    */
   _add_suspended_users(user_ids, user_ets) {
     for (const user_id of user_ids) {
-      const matching_user_ids = user_ets.find((user_et) => user_et.id === user_id);
+      const matching_user_ids = user_ets.find(user_et => user_et.id === user_id);
 
       if (!matching_user_ids) {
         const user_et = new z.entity.User(user_id);
@@ -822,7 +821,8 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise} Resolves when accent color was changed
    */
   change_accent_color(accent_id) {
-    return this.user_service.update_own_user_profile({accent_id})
+    return this.user_service
+      .update_own_user_profile({accent_id})
       .then(() => this.user_update({user: {accent_id: accent_id, id: this.self().id}}));
   }
 
@@ -833,7 +833,8 @@ z.user.UserRepository = class UserRepository {
    */
   change_name(name) {
     if (name.length >= UserRepository.CONFIG.MINIMUM_NAME_LENGTH) {
-      return this.user_service.update_own_user_profile({name})
+      return this.user_service
+        .update_own_user_profile({name})
         .then(() => this.user_update({user: {id: this.self().id, name: name}}));
     }
 
@@ -860,27 +861,24 @@ z.user.UserRepository = class UserRepository {
         suggestions = z.user.UserHandleGenerator.create_suggestions(this.self().name());
         return this.verify_usernames(suggestions);
       })
-      .then((valid_suggestions) => {
+      .then(valid_suggestions => {
         this.should_set_username = true;
         this.self().username(valid_suggestions[0]);
 
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT,
-          z.tracking.EventName.ONBOARDING.GENERATED_USERNAME, {
-            num_of_attempts: 1,
-            outcome: 'success',
-          });
+        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.GENERATED_USERNAME, {
+          num_of_attempts: 1,
+          outcome: 'success',
+        });
       })
-      .catch((error) => {
+      .catch(error => {
         if (error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
           this.should_set_username = false;
         }
 
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT,
-          z.tracking.EventName.ONBOARDING.GENERATED_USERNAME, {
-            num_of_attempts: 1,
-            outcome: 'fail',
-          }
-        );
+        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.GENERATED_USERNAME, {
+          num_of_attempts: 1,
+          outcome: 'fail',
+        });
 
         throw error;
       });
@@ -893,13 +891,19 @@ z.user.UserRepository = class UserRepository {
    */
   change_username(username) {
     if (username.length >= UserRepository.CONFIG.MINIMUM_USERNAME_LENGTH) {
-      return this.user_service.change_own_username(username)
+      return this.user_service
+        .change_own_username(username)
         .then(() => {
           this.should_set_username = false;
           return this.user_update({user: {handle: username, id: this.self().id}});
         })
         .catch(({code: error_code}) => {
-          if ([z.service.BackendClientError.STATUS_CODE.CONFLICT, z.service.BackendClientError.STATUS_CODE.BAD_REQUEST].includes(error_code)) {
+          if (
+            [
+              z.service.BackendClientError.STATUS_CODE.CONFLICT,
+              z.service.BackendClientError.STATUS_CODE.BAD_REQUEST,
+            ].includes(error_code)
+          ) {
             throw new z.user.UserError(z.user.UserError.TYPE.USERNAME_TAKEN);
           }
           throw new z.user.UserError(z.user.UserError.TYPE.REQUEST_FAILURE);
@@ -924,7 +928,8 @@ z.user.UserRepository = class UserRepository {
    * @returns {string} Username which is not taken.
    */
   verify_username(username) {
-    return this.user_service.check_username(username)
+    return this.user_service
+      .check_username(username)
       .catch(({code: error_code}) => {
         if (error_code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
           return username;
@@ -934,7 +939,7 @@ z.user.UserRepository = class UserRepository {
         }
         throw new z.user.UserError(z.user.UserError.TYPE.REQUEST_FAILURE);
       })
-      .then((verified_username) => {
+      .then(verified_username => {
         if (verified_username) {
           return verified_username;
         }
@@ -948,16 +953,18 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise} Resolves when the picture was updated
    */
   change_picture(picture) {
-    return this.asset_service.upload_profile_image(picture)
+    return this.asset_service
+      .upload_profile_image(picture)
       .then(([small_key, medium_key]) => {
         const assets = [
           {key: small_key, size: 'preview', type: 'image'},
           {key: medium_key, size: 'complete', type: 'image'},
         ];
-        return this.user_service.update_own_user_profile({assets})
+        return this.user_service
+          .update_own_user_profile({assets})
           .then(() => this.user_update({user: {assets: assets, id: this.self().id}}));
       })
-      .catch((error) => {
+      .catch(error => {
         throw new Error(`Error during profile image upload: ${error.message}`);
       });
   }
@@ -967,8 +974,9 @@ z.user.UserRepository = class UserRepository {
    * @returns {undefined} No return value
    */
   set_default_picture() {
-    return z.util.load_url_blob(z.config.UNSPLASH_URL)
-      .then((blob) => this.change_picture(blob))
+    return z.util
+      .load_url_blob(z.config.UNSPLASH_URL)
+      .then(blob => this.change_picture(blob))
       .then(() => {
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.ADDED_PHOTO, {
           outcome: 'success',
@@ -980,9 +988,9 @@ z.user.UserRepository = class UserRepository {
   map_guest_status(user_ets = this.users()) {
     const team_members = this.team_members();
 
-    user_ets.forEach((user_et) => {
+    user_ets.forEach(user_et => {
       if (!user_et.is_me) {
-        const is_team_member = !!team_members.find((member) => member.id === user_et.id);
+        const is_team_member = !!team_members.find(member => member.id === user_et.id);
         user_et.is_guest(!is_team_member);
         user_et.is_team_member(is_team_member);
       }

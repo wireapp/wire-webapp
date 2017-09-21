@@ -25,7 +25,7 @@ ko.bindingHandlers.bordered_list = (function() {
     if ($element) {
       window.requestAnimationFrame(function() {
         const list_column = $($element).parent();
-        if (($element.height() <= 0) || !$element.is_scrollable()) {
+        if ($element.height() <= 0 || !$element.is_scrollable()) {
           return list_column.removeClass('left-list-center-border-bottom conversations-center-border-top');
         }
 
@@ -33,8 +33,7 @@ ko.bindingHandlers.bordered_list = (function() {
         list_column.toggleClass('left-list-center-border-bottom', !$element.is_scrolled_bottom());
       });
     }
-  },
-  100);
+  }, 100);
 
   return {
     init(element) {

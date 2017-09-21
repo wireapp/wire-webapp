@@ -42,7 +42,7 @@ z.calling.entities.FlowAudio = class FlowAudio {
 
     // Panning
     this.panning = this.flow_et.participant_et.panning;
-    this.panning.subscribe((updated_panning_value) => {
+    this.panning.subscribe(updated_panning_value => {
       this.logger.debug(`Panning of ${this.flow_et.remote_user.name()} changed to '${updated_panning_value}'`);
       this.set_pan(updated_panning_value);
     });
@@ -138,7 +138,10 @@ z.calling.entities.FlowAudio = class FlowAudio {
         this.pan_node.connect(audio_output_device);
 
         Object.assign(media_stream, audio_output_device.stream);
-        this.logger.debug(`Wrapped audio stream to speaker to create stereo. Initial panning set to '${this.panning()}'.`, media_stream);
+        this.logger.debug(
+          `Wrapped audio stream to speaker to create stereo. Initial panning set to '${this.panning()}'.`,
+          media_stream
+        );
       }
     }
 

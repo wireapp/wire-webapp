@@ -19,7 +19,7 @@
 
 'use strict';
 
-module.exports = (grunt) => {
+module.exports = grunt => {
   grunt.registerTask('log', () => {
     const pkg = grunt.file.readJSON('package.json');
     grunt.log.writeln(`Deployed: ${pkg.name} (v${pkg.version})`);
@@ -35,10 +35,10 @@ module.exports = (grunt) => {
     }
 
     const date = new Date();
-    const month = (`0${date.getMonth() + 1}`).slice(-2);
-    const day = (`0${date.getDate()}`).slice(-2);
-    const hour = (`0${date.getHours()}`).slice(-2);
-    const minute = (`0${date.getMinutes()}`).slice(-2);
+    const month = `0${date.getMonth() + 1}`.slice(-2);
+    const day = `0${date.getDate()}`.slice(-2);
+    const hour = `0${date.getHours()}`.slice(-2);
+    const minute = `0${date.getMinutes()}`.slice(-2);
 
     let version = `${date.getFullYear()}-${month}-${day}-${hour}-${minute}`;
     if (user) {
@@ -104,7 +104,7 @@ module.exports = (grunt) => {
     'clean:prod',
   ]);
 
-  grunt.registerTask('check', (file) => {
+  grunt.registerTask('check', file => {
     grunt.log.writeln(`=== ${grunt.task.current.name.toUpperCase()} ===`);
 
     if (file !== undefined) {

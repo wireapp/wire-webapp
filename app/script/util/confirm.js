@@ -44,7 +44,6 @@ window.z.util = z.util || {};
  */
 
 $.fn.confirm = function(config) {
-
   const template_html = $(config.template).html();
   const parent = $(this);
   parent.append(template_html);
@@ -62,9 +61,7 @@ $.fn.confirm = function(config) {
 
   if (config.data && config.data.user) {
     const stripped_user_name = config.data.user.first_name();
-    parent
-      .find('.user')
-      .html(z.util.escape_html(stripped_user_name));
+    parent.find('.user').html(z.util.escape_html(stripped_user_name));
   }
 
   window.requestAnimationFrame(() => confirm.addClass('confirm-is-visible'));
@@ -83,7 +80,6 @@ $.fn.confirm = function(config) {
   this.is_visible = () => is_visible;
 
   $('[data-action="cancel"]', confirm).click(() => {
-
     if (typeof config.cancel === 'function') {
       config.cancel(config.data);
     }
@@ -92,7 +88,6 @@ $.fn.confirm = function(config) {
   });
 
   $('[data-action="confirm"]', confirm).click(() => {
-
     if (typeof config.confirm === 'function') {
       config.confirm(config.data);
     }

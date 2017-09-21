@@ -25,13 +25,14 @@ window.z.assets = z.assets || {};
 // Builder for creating all kinds of asset metadata
 z.assets.AssetMetaDataBuilder = {
   _build_audio_metdadata(audiofile) {
-    return z.util.load_file_buffer(audiofile)
-      .then((buffer) => {
+    return z.util
+      .load_file_buffer(audiofile)
+      .then(buffer => {
         const audioContext = new AudioContext();
         audioContext.close();
         return audioContext.decodeAudioData(buffer);
       })
-      .then((audio_buffer) => {
+      .then(audio_buffer => {
         const normalized_loudness = z.assets.AssetMetaDataBuilder._normalise_loudness(audio_buffer);
         return new z.proto.Asset.AudioMetaData(audio_buffer.duration * 1000, normalized_loudness);
       });
@@ -45,7 +46,7 @@ z.assets.AssetMetaDataBuilder = {
         resolve(new z.proto.Asset.ImageMetaData(img.width, img.height));
         window.URL.revokeObjectURL(url);
       };
-      img.onerror = (error) => {
+      img.onerror = error => {
         reject(error);
         window.URL.revokeObjectURL(url);
       };
@@ -61,10 +62,14 @@ z.assets.AssetMetaDataBuilder = {
         resolve(new z.proto.Asset.VideoMetaData(video.videoWidth, video.videoHeight, video.duration));
         window.URL.revokeObjectURL(url);
       };
-      video.addEventListener('error', (error) => {
-        reject(this._convert_event_into_error(error));
-        window.URL.revokeObjectURL(url);
-      }, true);
+      video.addEventListener(
+        'error',
+        error => {
+          reject(this._convert_event_into_error(error));
+          window.URL.revokeObjectURL(url);
+        },
+        true
+      );
       video.src = url;
     });
   },
@@ -100,7 +105,7 @@ z.assets.AssetMetaDataBuilder = {
     const bucket_size = parseInt(channel.length / MAX_SAMPLES);
     const buckets = z.util.ArrayUtil.chunk(channel, bucket_size);
 
-    const preview = buckets.map((bucket) => {
+    const preview = buckets.map(bucket => {
       return z.util.NumberUtil.cap_to_byte(AMPLIFIER * z.util.NumberUtil.root_mean_square(bucket));
     });
 
@@ -128,7 +133,6 @@ z.assets.AssetMetaDataBuilder = {
     }
     return Promise.resolve();
   },
-
 
   is_audio(file) {
     return file && file.type.startsWith('audio');
