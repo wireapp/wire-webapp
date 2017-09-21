@@ -188,7 +188,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   create_new_conversation(user_ids, name) {
     return this.conversation_service.create_conversation(user_ids, name, this.team().id)
-      .then((response) => this._on_create({conversation: response.id, data: response, time: this.get_latest_event_timestamp()}));
+      .then((response) => this._on_create({conversation: response.id, data: response}));
   }
 
   /**
@@ -781,6 +781,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   map_guest_status_self() {
     this.filtered_conversations().forEach((conversation_et) => this._map_guest_status_self(conversation_et));
+
+    if (this.team()) {
+      this.user_repository.self().is_team_member(true);
+    }
   }
 
   _map_guest_status_self(conversation_et) {
@@ -2556,7 +2560,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
           throw error;
         }
 
-        return this.map_conversations(event_json, event_json.time);
+        const event_timestamp = new Date(event_json.time).getTime();
+        return this.map_conversations(event_json, _.isNaN(event_timestamp) ? this.get_latest_event_timestamp() : event_timestamp);
       })
       .then((conversation_et) => this.update_participating_user_ets(conversation_et))
       .then((conversation_et) => this.save_conversation(conversation_et))

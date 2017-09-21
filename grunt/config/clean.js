@@ -40,7 +40,6 @@ module.exports = {
   deploy: '<%= dir.deploy %>',
   deploy_app: '<%= dir.deploy %>/app',
   deploy_script: [
-    '<%= dir.deploy %>/ext/js',
     '<%= dir.deploy %>/script',
   ],
   prod: [

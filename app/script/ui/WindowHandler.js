@@ -32,8 +32,6 @@ z.ui.WindowHandler = class WindowHandler {
     this.width = 0;
 
     this.is_visible = true;
-    this.lost_focus_interval = undefined;
-    this.lost_focus_on = undefined;
 
     return this;
   }
@@ -47,18 +45,9 @@ z.ui.WindowHandler = class WindowHandler {
       if (document.visibilityState === 'visible') {
         this.logger.info('Webapp is visible');
         this.is_visible = true;
-        window.clearInterval(this.lost_focus_interval);
-        this.lost_focus_interval = undefined;
-        this.lost_focus_on = undefined;
-        amplify.publish(z.event.WebApp.ANALYTICS.START_SESSION);
       } else {
         this.logger.info('Webapp is hidden');
         this.is_visible = false;
-        if (this.lost_focus_interval === undefined) {
-          this.lost_focus_on = Date.now();
-          this.lost_focus_interval = window.setInterval((() => this._check_for_timeout()),
-            z.tracking.EventTrackingRepository.CONFIG.LOCALYTICS.SESSION_INTERVAL);
-        }
       }
     });
     return this;
@@ -92,12 +81,5 @@ z.ui.WindowHandler = class WindowHandler {
         return false;
       }
     });
-  }
-
-  _check_for_timeout() {
-    const in_background_since = Date.now() - this.lost_focus_on;
-    if (in_background_since >= z.tracking.EventTrackingRepository.CONFIG.LOCALYTICS.SESSION_TIMEOUT) {
-      return amplify.publish(z.event.WebApp.ANALYTICS.CLOSE_SESSION);
-    }
   }
 };

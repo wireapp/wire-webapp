@@ -23,15 +23,10 @@ window.z = window.z || {};
 window.z.tracking = z.tracking || {};
 
 /**
- * Enum of custom dimensions for Localytics
- *
- * @note Custom Dimensions for Localytics have to be created server side and are
- *   identified by the index found in the settings of Desktop and Desktop staging projects
- * @see https://dashboard.localytics.com/settings/apps?org_id=1145
- *
- * @returns {z.tracking.CustomDimension} Enum of custom dimensions
+ * Enumeration of properties that should get send with every user tracking call.
+ * @returns {z.tracking.SuperProperty} Super property identifier
  */
-z.tracking.CustomDimension = {
+z.tracking.SuperProperty = {
   APP: 0,
-  CONTACTS: 1,
+  CONTACTS: 'contacts',
 };
