@@ -63,8 +63,12 @@
   flex: 1 1 auto;
   position: relative;
 
-  &.left-list-center-border-bottom { border-bottom: 1px solid fade(#fff, 16%); }
-  &.left-list-center-border-top { border-top: 1px solid fade(#fff, 16%); }
+  &.left-list-center-border-bottom {
+    border-bottom: 1px solid fade(#fff, 16%);
+  }
+  &.left-list-center-border-top {
+    border-top: 1px solid fade(#fff, 16%);
+  }
 }
 
 .left-list-items {
@@ -138,7 +142,7 @@
   &.hover,
   &:hover {
     .right-column > .icon-more {
-      transition-delay: @animation-timing-faster + .05;
+      transition-delay: @animation-timing-faster + 0.05;
       transition-duration: @animation-timing-slow;
       opacity: 1;
     }
