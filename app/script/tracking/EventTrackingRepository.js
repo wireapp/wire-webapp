@@ -39,7 +39,11 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
       },
       USER_TRACKING: {
         API_KEY: MIXPANEL_TOKEN,
-        DISABLED_DOMAINS: ['localhost', 'zinfra.io'],
+        CLIENT_TYPE: 'desktop',
+        DISABLED_DOMAINS: [
+          'localhost',
+          'zinfra.io',
+        ],
         SUPPORTED_EVENTS: [
           z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION,
           z.tracking.EventName.TRACKING.OPT_IN,
@@ -97,6 +101,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
         if (mixpanel_instance) {
           this.mixpanel = mixpanel_instance;
           this._subscribe_to_tracking_events();
+          this._set_super_properties();
         }
         amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.PRIVACY, this._update_privacy_preference.bind(this));
       });
@@ -146,6 +151,12 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     amplify.unsubscribeAll(z.event.WebApp.ANALYTICS.EVENT);
   }
 
+  _set_super_properties() {
+    this._set_super_property(z.tracking.SuperProperty.APP, EventTrackingRepository.CONFIG.USER_TRACKING.CLIENT_TYPE);
+    this._set_super_property(z.tracking.SuperProperty.CONTACTS, this.user_repository.number_of_contacts());
+    this._set_super_property(z.tracking.SuperProperty.DESKTOP_APP, z.tracking.helpers.get_platform());
+  }
+
   _set_super_property(super_property, value) {
     this.logger.info(`Set super property '${super_property}' to value '${value}'`);
     const super_properties = {};
@@ -184,7 +195,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     this.mixpanel.unregister('$ignore');
     this._subscribe_to_tracking_events();
 
-    this._set_super_property(z.tracking.SuperProperty.CONTACTS, this.user_repository.number_of_contacts());
+    this._set_super_properties();
     this._track_event(z.tracking.EventName.TRACKING.OPT_IN);
   }
 
