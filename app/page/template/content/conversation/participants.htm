@@ -1,7 +1,7 @@
 <div id="participants-bubble" class="bubble">
   <div id="participants" class="participants" data-bind="with: $root.participants, css: {'show-user': $root.participants.user_profile().id !== ''}">
 
-    <!-- ko if: state() == 'participants' -->
+    <!-- ko if: state() === z.ViewModel.ParticipantsViewModel.STATE.PARTICIPANTS -->
       <div class="participants-transition">
 
         <div class="participants-group">
@@ -59,7 +59,7 @@
       </div>
     <!-- /ko -->
 
-    <!-- ko if: state() == 'search' -->
+    <!-- ko if: state() === z.ViewModel.ParticipantsViewModel.STATE.ADD_PEOPLE -->
       <div class="participants-search">
         <div class="participants-search-header">
           <user-input class="participants-search-header-list user-list-light" params="input: user_input, selected: user_selected, placeholder: z.string.people_search_placeholder" spellcheck="false"></user-input>
