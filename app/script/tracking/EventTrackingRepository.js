@@ -141,7 +141,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
       }
     });
 
-    amplify.subscribe(z.event.WebApp.LIFECYCLE.SIGN_OUT, this._reset_super_properties.bind(this));
+    amplify.subscribe(z.event.WebApp.LIFECYCLE.SIGNED_OUT, this._reset_super_properties.bind(this));
   }
 
   /**
