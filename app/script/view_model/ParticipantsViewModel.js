@@ -251,9 +251,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   }
 
   on_search_add() {
-    let user_ids = this.user_selected().map((user_et) => user_et.id);
-    this.participants_bubble.hide();
-
+    const user_ids = this.user_selected().map((user_et) => user_et.id);
     if (this.conversation().is_group()) {
       this.conversation_repository.add_members(this.conversation(), user_ids)
         .then(() => {
@@ -263,9 +261,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
           });
         });
     } else {
-      user_ids = user_ids.concat(this.user_profile().id);
-
-      this.conversation_repository.create_new_conversation(user_ids, null)
+      this.conversation_repository.create_new_conversation(user_ids.concat(this.user_profile().id), null)
         .then(function({conversation_et}) {
           amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.CREATE_GROUP_CONVERSATION, {
             creationContext: 'addedToOneToOne',
@@ -275,6 +271,8 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
           amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversation_et);
         });
     }
+
+    this.participants_bubble.hide();
   }
 
   on_search_close() {
@@ -282,7 +280,6 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   }
 
   close() {
-    this.user_profile(this.placeholder_participant);
     this.reset_view();
   }
 
