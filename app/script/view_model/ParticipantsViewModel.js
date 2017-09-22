@@ -25,8 +25,8 @@ window.z.ViewModel = z.ViewModel || {};
 z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   static get STATE() {
     return {
+      ADD_PEOPLE: 'add_people',
       PARTICIPANTS: 'participants',
-      SEARCH: 'search',
     };
   }
 
@@ -133,16 +133,9 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
       const user_ets = this.is_team() ? this.team_users() : this.user_repository.connected_users();
 
       return user_ets
-        .filter((user_et) => {
-          for (const conversation_participant of this.participants()) {
-            if (user_et.id === conversation_participant.id) {
-              return false;
-            }
-          }
-          return true;
-        })
+        .filter((user_et) => !this.participants().find((participant) => user_et.id === participant.id))
         .sort((user_a, user_b) => z.util.StringUtil.sort_by_priority(user_a.first_name(), user_b.first_name()));
-    }, this, {deferEvaluation: true});
+    });
 
     const shortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.ADD_PEOPLE);
     this.add_people_tooltip = z.l10n.text(z.string.tooltip_people_add, shortcut);
@@ -186,11 +179,13 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
       if (add_people) {
         if (!this.participants_bubble.is_visible()) {
-          this.participants_bubble.show();
-          return this.add_people();
+          return this.participants_bubble.show()
+            .then(() => this.add_people());
         }
 
-        if ((this.state() === ParticipantsViewModel.STATE.SEARCH) || (this.confirm_dialog && this.confirm_dialog.is_visible())) {
+        const is_adding_people = this.state() === ParticipantsViewModel.STATE.ADD_PEOPLE;
+        const is_confirming = this.confirm_dialog && this.confirm_dialog.is_visible();
+        if (is_adding_people || is_confirming) {
           return this.participants_bubble.hide();
         }
 
@@ -226,7 +221,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   }
 
   add_people() {
-    this.state(ParticipantsViewModel.STATE.SEARCH);
+    this.state(ParticipantsViewModel.STATE.ADD_PEOPLE);
     $('.participants-search').addClass('participants-search-show');
   }
 
