@@ -177,7 +177,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
         this.render_participants(true);
       }
 
-      if (add_people) {
+      if (add_people && !this.conversation().is_guest()) {
         if (!this.participants_bubble.is_visible()) {
           return this.participants_bubble.show()
             .then(() => this.add_people());
