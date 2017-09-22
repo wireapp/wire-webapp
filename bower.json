@@ -27,7 +27,7 @@
     "underscore": "https://github.com/jashkenas/underscore.git#1.8.3",
     "uuid": "https://github.com/LiosK/UUID.js.git#3.5.3",
     "url-search-params-polyfill": "https://github.com/jerrybendy/url-search-params-polyfill.git#2.0.1",
-    "webapp-module-bubble": "https://github.com/wireapp/webapp-module-bubble.git#promises",
+    "webapp-module-bubble": "https://github.com/wireapp/webapp-module-bubble.git#1.1.0",
     "webapp-module-logger": "https://github.com/wireapp/webapp-module-logger.git#1.1.0",
     "webapp-module-modal": "https://github.com/wireapp/webapp-module-modal.git#1.0.0",
     "webapp-module-namespace": "https://github.com/wireapp/webapp-module-namespace.git#1.0.0",
