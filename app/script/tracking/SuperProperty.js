@@ -27,6 +27,7 @@ window.z.tracking = z.tracking || {};
  * @returns {z.tracking.SuperProperty} Super property identifier
  */
 z.tracking.SuperProperty = {
-  APP: 0,
+  APP: 'app',
   CONTACTS: 'contacts',
+  DESKTOP_APP: 'desktop_app',
 };

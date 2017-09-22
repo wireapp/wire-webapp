@@ -56,6 +56,7 @@ z.team.TeamRepository = class TeamRepository {
 
     this.user_repository.is_team = this.is_team;
     this.user_repository.team_members = this.team_members;
+    this.user_repository.team_users = this.team_users;
 
     amplify.subscribe(z.event.WebApp.TEAM.EVENT_FROM_BACKEND, this.on_team_event.bind(this));
     amplify.subscribe(z.event.WebApp.TEAM.UPDATE_INFO, this.send_account_info.bind(this));
@@ -101,7 +102,7 @@ z.team.TeamRepository = class TeamRepository {
   on_team_event(event_json, source) {
     const type = event_json.type;
 
-    this.logger.info(`»» Event: '${type}'`, {event_json: JSON.stringify(event_json), event_object: event_json});
+    this.logger.info(`»» Team Event: '${type}' (Source: ${source})`, {event_json: JSON.stringify(event_json), event_object: event_json});
 
     switch (type) {
       case z.event.Backend.TEAM.CONVERSATION_CREATE:

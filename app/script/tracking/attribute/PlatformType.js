@@ -27,5 +27,5 @@ z.tracking.attribute.PlatformType = {
   BROWSER_APP: 'web',
   DESKTOP_LINUX: 'linux',
   DESKTOP_MACOS: 'mac',
-  DESKTOP_WINDOWS: 'win',
+  DESKTOP_WINDOWS: 'windows',
 };
