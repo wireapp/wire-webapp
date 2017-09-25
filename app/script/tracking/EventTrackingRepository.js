@@ -224,7 +224,6 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
               '$referrer': null,
               '$referring_domain': null,
               '$region': null,
-              'mp_country_code': null,
             });
             resolve(mixpanel);
           },
