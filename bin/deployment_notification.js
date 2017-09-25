@@ -17,13 +17,10 @@
  *
  */
 
-'use strict';
-
-const cryptobox = require('wire-webapp-cryptobox');
-const wire = require('wire-webapp-core');
+const {shout} = require('@wireapp/core');
 
 const login = {
-  email: process.env.WIRE_WEBAPP_BOT_EMAIL,
+  handle: 'webappbot',
   password: process.env.WIRE_WEBAPP_BOT_PASSWORD,
 };
 
@@ -63,13 +60,7 @@ content.message =
   + `\r\n- Last commit from: ${commit.author}`
   + `\r\n- Last commit message: ${commit.message}`;
 
-const storagePath = `${process.env.HOME}/cryptobox`;
-const store = new cryptobox.store.FileStore(storagePath);
-const box = new cryptobox.Cryptobox(store, 1);
-
-new wire.User(login, box).login(false)
-  .then((service) => service.conversation.sendTextMessage(content.conversationId, content.message))
-  .then((service) => service.user.logout())
+shout(login.handle, login.password, content.conversationId, content.message)
   .then(() => process.exit(0))
   .catch((error) => {
     console.log(error.message);
