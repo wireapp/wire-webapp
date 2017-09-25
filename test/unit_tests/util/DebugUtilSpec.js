@@ -59,7 +59,7 @@ describe('z.util.DebugUtil', function() {
       const second_user_et = new z.entity.User();
       second_user_et.devices.push(third_client);
 
-      const conversation_et = conversation_repository.conversation_mapper.map_conversation(entities.conversation);
+      const [conversation_et] = conversation_repository.conversation_mapper.map_conversations([entities.conversation]);
       conversation_et.participating_user_ets.push(user_et);
       conversation_et.participating_user_ets.push(second_user_et);
 

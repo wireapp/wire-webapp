@@ -246,13 +246,12 @@ z.entity.Conversation = class Conversation {
     this.persist_state = _.debounce(() => {
       amplify.publish(z.event.WebApp.CONVERSATION.PERSIST_STATE, this);
     }, 100);
-
-    amplify.subscribe(z.event.WebApp.CONVERSATION.LOADED_STATES, this._subscribe_to_states_updates.bind(this));
   }
 
-  _subscribe_to_states_updates() {
-    return [
+  subscribe_to_state_updates() {
+    [
       this.archived_state,
+      this.archived_timestamp,
       this.cleared_timestamp,
       this.ephemeral_timer,
       this.is_guest,
@@ -260,6 +259,7 @@ z.entity.Conversation = class Conversation {
       this.last_read_timestamp,
       this.last_server_timestamp,
       this.muted_state,
+      this.muted_timestamp,
       this.name,
       this.participating_user_ids,
       this.status,
@@ -490,6 +490,7 @@ z.entity.Conversation = class Conversation {
   update_timestamp_server(time, is_backend_timestamp = false) {
     if (is_backend_timestamp) {
       const timestamp = new Date(time).getTime();
+
       if (!_.isNaN(timestamp)) {
         this.set_timestamp(timestamp, z.conversation.TIMESTAMP_TYPE.LAST_SERVER);
       }

@@ -343,12 +343,7 @@ z.conversation.ConversationService = class ConversationService {
     return this.storage_service.db[z.storage.StorageService.OBJECT_STORE.EVENTS]
       .where('conversation')
       .equals(conversation_id)
-      .filter(record => {
-        if (iso_date) {
-          return iso_date >= record.time;
-        }
-        return true;
-      })
+      .filter(record => !iso_date || iso_date >= record.time)
       .delete();
   }
 

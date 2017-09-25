@@ -141,6 +141,19 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
         this._track_event(...args);
       }
     });
+
+    amplify.subscribe(z.event.WebApp.LIFECYCLE.SIGNED_OUT, this._reset_super_properties.bind(this));
+  }
+
+  /**
+   * Calling the reset method will clear the Distinct Id and all super properties.
+   * @see https://mixpanel.com/blog/2015/09/21/community-tip-maintaining-user-identity/
+   * @returns {undefined}
+   */
+  _reset_super_properties() {
+    if (this.mixpanel) {
+      this.mixpanel.reset();
+    }
   }
 
   _unsubscribe_from_tracking_events() {
@@ -214,7 +227,6 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
                 $referrer: null,
                 $referring_domain: null,
                 $region: null,
-                mp_country_code: null,
               });
               resolve(mixpanel);
             },

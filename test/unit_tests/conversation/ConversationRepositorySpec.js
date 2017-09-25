@@ -314,9 +314,9 @@ describe('ConversationRepository', () => {
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       // @formatter:on
 
-      const new_conversation_et = TestFactory.conversation_repository.conversation_mapper.map_conversation(
-        team_1to1_conversation
-      );
+      const [new_conversation_et] = TestFactory.conversation_repository.conversation_mapper.map_conversations([
+        team_1to1_conversation,
+      ]);
       TestFactory.conversation_repository.conversations.push(new_conversation_et);
 
       const team_id = team_1to1_conversation.team;
@@ -810,7 +810,7 @@ describe('ConversationRepository', () => {
           .on_conversation_event(create_event)
           .then(() => {
             expect(TestFactory.conversation_repository._on_create).toHaveBeenCalled();
-            expect(TestFactory.conversation_repository.map_conversations).toHaveBeenCalledWith(create_event, 1);
+            expect(TestFactory.conversation_repository.map_conversations).toHaveBeenCalledWith(create_event.data, 1);
             expect(TestFactory.conversation_repository._prepare_conversation_create_notification).toHaveBeenCalled();
             done();
           })
@@ -826,7 +826,7 @@ describe('ConversationRepository', () => {
           .then(() => {
             expect(TestFactory.conversation_repository._on_create).toHaveBeenCalled();
             expect(TestFactory.conversation_repository.map_conversations).toHaveBeenCalledWith(
-              create_event,
+              create_event.data,
               time.getTime()
             );
             expect(TestFactory.conversation_repository._prepare_conversation_create_notification).toHaveBeenCalled();

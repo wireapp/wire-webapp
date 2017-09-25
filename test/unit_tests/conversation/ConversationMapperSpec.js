@@ -26,17 +26,17 @@ describe('Conversation Mapper', () => {
 
   beforeEach(() => (conversation_mapper = new z.conversation.ConversationMapper()));
 
-  describe('map_conversation', () => {
+  describe('map_conversations', () => {
     it('throws an error if conversation data is missing', () => {
-      expect(() => conversation_mapper.map_conversation()).toThrow(
+      expect(() => conversation_mapper.map_conversations()).toThrow(
         new Error('Cannot create conversation entity without data')
       );
     });
 
-    it('maps a conversation', () => {
+    it('maps a single conversation', () => {
       const {conversation} = entities;
       const initial_timestamp = Date.now();
-      const conversation_et = conversation_mapper.map_conversation(conversation, initial_timestamp);
+      const [conversation_et] = conversation_mapper.map_conversations([conversation], initial_timestamp);
 
       const expected_participant_ids = [
         conversation.members.others[0].id,
@@ -58,7 +58,7 @@ describe('Conversation Mapper', () => {
       expect(conversation_et.type()).toBe(z.conversation.ConversationType.REGULAR);
     });
 
-    it('maps conversations', () => {
+    it('maps multiple conversations', () => {
       const {conversations} = payload.conversations.get;
       const conversation_ets = conversation_mapper.map_conversations(conversations);
 
@@ -80,43 +80,37 @@ describe('Conversation Mapper', () => {
       // @formatter:off
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const payload = {
-        conversation: 'f2520615-f860-4c72-8b90-9ace3b5f6c37',
-        time: '2017-05-26T08:10:27.040Z',
-        data: {
-          access: ['invite'],
-          creator: 'f52eed1b-aa64-447f-ad4a-96529f72105f',
-          members: {
-            self: {
-              hidden_ref: null,
-              status: 0,
-              service: null,
-              otr_muted_ref: null,
-              status_time: '1970-01-01T00:00:00.000Z',
-              hidden: false,
-              status_ref: '0.0',
-              id: '39b7f597-dfd1-4dff-86f5-fe1b79cb70a0',
-              otr_archived: false,
-              otr_muted: false,
-              otr_archived_ref: null,
-            },
-            others: [{status: 0, id: 'f52eed1b-aa64-447f-ad4a-96529f72105f'}],
+        access: ['invite'],
+        creator: 'f52eed1b-aa64-447f-ad4a-96529f72105f',
+        members: {
+          self: {
+            hidden_ref: null,
+            status: 0,
+            service: null,
+            otr_muted_ref: null,
+            status_time: '1970-01-01T00:00:00.000Z',
+            hidden: false,
+            status_ref: '0.0',
+            id: '39b7f597-dfd1-4dff-86f5-fe1b79cb70a0',
+            otr_archived: false,
+            otr_muted: false,
+            otr_archived_ref: null,
           },
-          name: 'BennyTest',
-          team: '5316fe03-24ee-4b19-b789-6d026bd3ce5f',
-          id: 'f2520615-f860-4c72-8b90-9ace3b5f6c37',
-          type: 0,
-          last_event_time: '1970-01-01T00:00:00.000Z',
-          last_event: '0.0',
+          others: [{status: 0, id: 'f52eed1b-aa64-447f-ad4a-96529f72105f'}],
         },
-        from: 'f52eed1b-aa64-447f-ad4a-96529f72105f',
-        type: 'conversation.create',
+        name: 'BennyTest',
+        team: '5316fe03-24ee-4b19-b789-6d026bd3ce5f',
+        id: 'f2520615-f860-4c72-8b90-9ace3b5f6c37',
+        type: 0,
+        last_event_time: '1970-01-01T00:00:00.000Z',
+        last_event: '0.0',
       };
       // @formatter:on
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
 
-      const conversation_et = conversation_mapper.map_conversation(payload);
-      expect(conversation_et.name()).toBe(payload.data.name);
-      expect(conversation_et.team_id).toBe(payload.data.team);
+      const [conversation_et] = conversation_mapper.map_conversations([payload]);
+      expect(conversation_et.name()).toBe(payload.name);
+      expect(conversation_et.team_id).toBe(payload.team);
     });
   });
 

@@ -42,9 +42,7 @@ z.conversation.ConversationServiceNoCompound = class ConversationServiceNoCompou
       .where('conversation')
       .equals(conversation_id)
       .sortBy('time')
-      .then(records => {
-        return records.filter(record => record.category >= category);
-      });
+      .then(records => records.filter(record => record.category >= category));
   }
 
   /**

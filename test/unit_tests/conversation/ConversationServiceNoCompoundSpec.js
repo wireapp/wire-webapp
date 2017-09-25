@@ -282,7 +282,7 @@ describe('ConversationServiceNoCompound', function() {
       };
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
       // @formatter:on
-      const conversation_et = conversation_mapper.map_conversation(conversation_payload);
+      const [conversation_et] = conversation_mapper.map_conversations([conversation_payload]);
 
       conversation_service
         .save_conversation_state_in_db(conversation_et)

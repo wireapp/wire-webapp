@@ -829,18 +829,17 @@ describe('Conversation', () => {
     });
   });
 
-  describe('_subscribe_to_states_updates', () =>
+  describe('subscribe_to_state_updates', () =>
     it('creates subscribers to state updates', () => {
-      spyOn(conversation_et, '_subscribe_to_states_updates').and.callThrough();
-
-      conversation_et._subscribe_to_states_updates();
+      conversation_et.subscribe_to_state_updates();
       conversation_et.archived_state(false);
       conversation_et.cleared_timestamp(0);
       conversation_et.last_event_timestamp(1467650148305);
       conversation_et.last_read_timestamp(1467650148305);
       conversation_et.muted_state(false);
 
-      expect(conversation_et._subscribe_to_states_updates.calls.count()).toEqual(1);
+      expect(conversation_et.last_event_timestamp.getSubscriptionsCount()).toEqual(1);
+      expect(conversation_et.last_read_timestamp.getSubscriptionsCount()).toEqual(1);
     }));
 
   describe('connection', () => {
