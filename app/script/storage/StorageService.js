@@ -308,20 +308,19 @@ z.storage.StorageService = class StorageService {
    * @returns {Promise} Resolves when the object is deleted
    */
   delete(store_name, primary_key) {
-    return new Promise((resolve, reject) => {
-      if (this.db[store_name]) {
-        return this.db[store_name].delete(primary_key)
-          .then(() => {
-            this.logger.info(`Deleted '${primary_key}' from object store '${store_name}'`);
-            resolve(primary_key);
-          })
-          .catch((error) => {
-            this.logger.error(`Failed to delete '${primary_key}' from store '${store_name}'`, error);
-            reject(error);
-          });
-      }
-      return reject(new z.storage.StorageError(z.storage.StorageError.TYPE.DATA_STORE_NOT_FOUND));
-    });
+    if (this.db[store_name]) {
+      return this.db[store_name].delete(primary_key)
+        .then(() => {
+          this.logger.info(`Deleted '${primary_key}' from object store '${store_name}'`);
+          return primary_key;
+        })
+        .catch((error) => {
+          this.logger.error(`Failed to delete '${primary_key}' from store '${store_name}'`, error);
+          throw error;
+        });
+    }
+
+    return Promise.reject(new z.storage.StorageError(z.storage.StorageError.TYPE.DATA_STORE_NOT_FOUND));
   }
 
   /**
@@ -329,21 +328,19 @@ z.storage.StorageService = class StorageService {
    * @returns {Promise} Resolves if a database is found and cleared
    */
   delete_everything() {
-    return new Promise((resolve, reject) => {
-      if (this.db) {
-        return this.db.delete()
-          .then(() => {
-            this.logger.info(`Clearing IndexedDB '${this.db_name}' successful`);
-            resolve(true);
-          })
-          .catch((error) => {
-            this.logger.error(`Clearing IndexedDB '${this.db_name}' failed`);
-            reject(error);
-          });
-      }
-      this.logger.error(`IndexedDB '${this.db_name}' not found`);
-      resolve(true);
-    });
+    if (this.db) {
+      return this.db.delete()
+        .then(() => {
+          this.logger.info(`Clearing IndexedDB '${this.db_name}' successful`);
+          return true;
+        })
+        .catch((error) => {
+          this.logger.error(`Clearing IndexedDB '${this.db_name}' failed`);
+          throw error;
+        });
+    }
+    this.logger.error(`IndexedDB '${this.db_name}' not found`);
+    return Promise.resolve(true);
   }
 
   /**
