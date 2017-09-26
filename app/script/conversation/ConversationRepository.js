@@ -794,6 +794,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   _handle_mapped_conversation(conversation_et) {
     this._map_guest_status_self(conversation_et);
+    conversation_et.self = this.user_repository.self();
     conversation_et.subscribe_to_state_updates();
   }
 
@@ -896,7 +897,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   update_participating_user_ets(conversation_et, offline = false) {
     return this.user_repository.get_users_by_id(conversation_et.participating_user_ids(), offline).then(user_ets => {
-      conversation_et.self = this.user_repository.self();
       conversation_et.participating_user_ets(user_ets);
       return conversation_et;
     });
