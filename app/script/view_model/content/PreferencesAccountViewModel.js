@@ -108,13 +108,12 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     return this.user_repository.should_set_username;
   }
 
-  check_username_input(username, event) {
-    // FF sends charCode 0 when pressing backspace
-    if (event.charCode !== 0) {
-      // Automation is missing key prop
-      return z.user.UserHandleGenerator.validate_character(event.key.toLowerCase());
+  check_username_input(username, keyboard_event) {
+    if (z.util.KeyboardUtil.is_key(keyboard_event, z.util.KeyboardUtil.KEY.BACKSPACE)) {
+      return true;
     }
-    return true;
+    // Automation is missing key prop
+    return z.user.UserHandleGenerator.validate_character(keyboard_event.key.toLowerCase());
   }
 
   click_on_username() {
@@ -123,24 +122,28 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
   change_username(username, event) {
     const entered_username = event.target.value;
+    const normalized_username = entered_username.toLowerCase().replace(/[^a-z0-9_]/g, '');
 
-    if (entered_username.length < z.user.UserRepository.CONFIG.MINIMUM_USERNAME_LENGTH) {
-      this.username_error(null);
-      return;
+    if (entered_username !== normalized_username) {
+      event.target.value = normalized_username;
     }
 
-    if (entered_username === this.self_user().username()) {
+    if (normalized_username.length < z.user.UserRepository.CONFIG.MINIMUM_USERNAME_LENGTH) {
+      return this.username_error(null);
+    }
+
+    if (normalized_username === this.self_user().username()) {
       event.target.blur();
     }
 
-    this.submitted_username(entered_username);
-    this.user_repository.change_username(entered_username)
+    this.submitted_username(normalized_username);
+    this.user_repository.change_username(normalized_username)
       .then(() => {
         if (this.entered_username() === this.submitted_username()) {
           this.username_error(null);
           this.username_saved(true);
 
-          amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.SET_USERNAME, {length: entered_username.length});
+          amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.SET_USERNAME, {length: normalized_username.length});
 
           event.target.blur();
           window.setTimeout(() => {
@@ -156,9 +159,11 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   verify_username(username, event) {
-    const entered_username = event.target.value;
+    const entered_username = event.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '');
 
-    if ((entered_username.length < 2) || (entered_username === this.self_user().username())) {
+    const username_too_short = entered_username.length < z.user.UserRepository.CONFIG.MINIMUM_USERNAME_LENGTH;
+    const username_unchanged = entered_username === this.self_user().username();
+    if (username_too_short || username_unchanged) {
       this.username_error(null);
       return;
     }

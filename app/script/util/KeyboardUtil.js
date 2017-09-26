@@ -24,7 +24,7 @@ window.z.util = z.util || {};
 
 z.util.KeyboardUtil = (() => {
 
-  const KEYBOARD_KEY = {
+  const KEY_DEFAULT = {
     ARROW_DOWN: 'ArrowDown',
     ARROW_LEFT: 'ArrowLeft',
     ARROW_RIGHT: 'ArrowRight',
@@ -37,6 +37,15 @@ z.util.KeyboardUtil = (() => {
     SPACE: '',
     TAB: 'Tab',
   };
+
+  const KEY_EDGE = {
+    ARROW_DOWN: 'Down',
+    ARROW_LEFT: 'Left',
+    ARROW_RIGHT: 'Right',
+    ARROW_UP: 'Up',
+  };
+
+  const KEYBOARD_KEY = z.util.Environment.browser.edge ? Object.assign(KEY_DEFAULT, KEY_EDGE) : KEY_DEFAULT;
 
   const _insert_at_caret = (areaId, text) => {
     // http://stackoverflow.com/a/1064139

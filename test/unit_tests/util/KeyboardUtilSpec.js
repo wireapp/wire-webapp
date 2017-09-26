@@ -24,38 +24,38 @@
 describe('z.util.KeyboardUtil.KEY', () => {
   describe('is_arrow_key', () => {
     it('returns whether an arrow key has been pressed', () => {
-      expect(z.util.KeyboardUtil.is_arrow_key({key: z.util.KeyboardUtil.KEY.ARROW_DOWN})).toBeThruthy();
-      expect(z.util.KeyboardUtil.is_arrow_key({key: z.util.KeyboardUtil.KEY.ARROW_LEFT})).toBeThruthy();
-      expect(z.util.KeyboardUtil.is_arrow_key({key: z.util.KeyboardUtil.KEY.ARROW_RIGHT})).toBeThruthy();
-      expect(z.util.KeyboardUtil.is_arrow_key({key: z.util.KeyboardUtil.KEY.ARROW_UP})).toBeThruthy();
+      expect(z.util.KeyboardUtil.is_arrow_key({key: z.util.KeyboardUtil.KEY.ARROW_DOWN})).toBeTruthy();
+      expect(z.util.KeyboardUtil.is_arrow_key({key: z.util.KeyboardUtil.KEY.ARROW_LEFT})).toBeTruthy();
+      expect(z.util.KeyboardUtil.is_arrow_key({key: z.util.KeyboardUtil.KEY.ARROW_RIGHT})).toBeTruthy();
+      expect(z.util.KeyboardUtil.is_arrow_key({key: z.util.KeyboardUtil.KEY.ARROW_UP})).toBeTruthy();
       expect(z.util.KeyboardUtil.is_arrow_key({key: z.util.KeyboardUtil.KEY.ESC})).toBeFalsy();
     });
   });
 
   describe('is_delete_key', () => {
     it('returns whether the delete key has been pressed', () => {
-      expect(z.util.KeyboardUtil.is_delete_key({key: z.util.KeyboardUtil.KEY.DELETE})).toBeThruthy();
+      expect(z.util.KeyboardUtil.is_delete_key({key: z.util.KeyboardUtil.KEY.DELETE})).toBeTruthy();
       expect(z.util.KeyboardUtil.is_delete_key({key: z.util.KeyboardUtil.KEY.ESC})).toBeFalsy();
     });
   });
 
   describe('is_enter_key', () => {
     it('returns whether the enter key has been pressed', () => {
-      expect(z.util.KeyboardUtil.is_enter_key({key: z.util.KeyboardUtil.KEY.ENTER})).toBeThruthy();
+      expect(z.util.KeyboardUtil.is_enter_key({key: z.util.KeyboardUtil.KEY.ENTER})).toBeTruthy();
       expect(z.util.KeyboardUtil.is_enter_key({key: z.util.KeyboardUtil.KEY.ESC})).toBeFalsy();
     });
   });
 
   describe('is_escape_key', () => {
     it('returns whether the escape key has been pressed', () => {
-      expect(z.util.KeyboardUtil.is_escape_key({key: z.util.KeyboardUtil.KEY.ESC})).toBeThruthy();
+      expect(z.util.KeyboardUtil.is_escape_key({key: z.util.KeyboardUtil.KEY.ESC})).toBeTruthy();
       expect(z.util.KeyboardUtil.is_escape_key({key: z.util.KeyboardUtil.KEY.ENTER})).toBeFalsy();
     });
   });
 
   describe('is_key', () => {
     it('returns whether the expected key has been pressed', () => {
-      expect(z.util.KeyboardUtil.is_key({key: z.util.KeyboardUtil.KEY.KEY_V}, z.util.KeyboardUtil.KEY.KEY_V)).toBeThruthy();
+      expect(z.util.KeyboardUtil.is_key({key: z.util.KeyboardUtil.KEY.KEY_V}, z.util.KeyboardUtil.KEY.KEY_V)).toBeTruthy();
       expect(z.util.KeyboardUtil.is_key({key: z.util.KeyboardUtil.KEY.KEY_V})).toBeFalsy();
       expect(z.util.KeyboardUtil.is_key({key: z.util.KeyboardUtil.KEY.KEY_V}, '')).toBeFalsy();
       expect(z.util.KeyboardUtil.is_key({key: z.util.KeyboardUtil.KEY.KEY_V}, z.util.KeyboardUtil.KEY.ARROW_RIGHT)).toBeFalsy();
@@ -64,14 +64,14 @@ describe('z.util.KeyboardUtil.KEY', () => {
 
   describe('is_one_of_keys', () => {
     it('returns whether one the expected key has been pressed', () => {
-      expect(z.util.KeyboardUtil.is_key({key: z.util.KeyboardUtil.KEY.KEY_V}, [z.util.KeyboardUtil.KEY.KEY_V])).toBeThruthy();
-      expect(z.util.KeyboardUtil.is_key({key: z.util.KeyboardUtil.KEY.KEY_V}, [z.util.KeyboardUtil.KEY.KEY_V, z.util.KeyboardUtil.KEY.ARROW_RIGHT])).toBeThruthy();
-      expect(z.util.KeyboardUtil.is_key({key: z.util.KeyboardUtil.KEY.KEY_V}, [z.util.KeyboardUtil.KEY.ARROW_RIGHT, z.util.KeyboardUtil.KEY.KEY_V])).toBeThruthy();
-      expect(z.util.KeyboardUtil.is_key({key: z.util.KeyboardUtil.KEY.KEY_V})).toBeFalsy();
-      expect(z.util.KeyboardUtil.is_key({key: z.util.KeyboardUtil.KEY.KEY_V}, [])).toBeFalsy();
-      expect(z.util.KeyboardUtil.is_key({key: z.util.KeyboardUtil.KEY.KEY_V}, [''])).toBeFalsy();
-      expect(z.util.KeyboardUtil.is_key({key: z.util.KeyboardUtil.KEY.KEY_V}, [z.util.ARROW_LEFT])).toBeFalsy();
-      expect(z.util.KeyboardUtil.is_key({key: z.util.KeyboardUtil.KEY.KEY_V}, [z.util.ARROW_LEFT, z.util.KeyboardUtil.KEY.ARROW_RIGHT])).toBeFalsy();
+      expect(z.util.KeyboardUtil.is_one_of_keys({key: z.util.KeyboardUtil.KEY.KEY_V}, [z.util.KeyboardUtil.KEY.KEY_V])).toBeTruthy();
+      expect(z.util.KeyboardUtil.is_one_of_keys({key: z.util.KeyboardUtil.KEY.KEY_V}, [z.util.KeyboardUtil.KEY.KEY_V, z.util.KeyboardUtil.KEY.ARROW_RIGHT])).toBeTruthy();
+      expect(z.util.KeyboardUtil.is_one_of_keys({key: z.util.KeyboardUtil.KEY.KEY_V}, [z.util.KeyboardUtil.KEY.ARROW_RIGHT, z.util.KeyboardUtil.KEY.KEY_V])).toBeTruthy();
+      expect(z.util.KeyboardUtil.is_one_of_keys({key: z.util.KeyboardUtil.KEY.KEY_V})).toBeFalsy();
+      expect(z.util.KeyboardUtil.is_one_of_keys({key: z.util.KeyboardUtil.KEY.KEY_V}, [])).toBeFalsy();
+      expect(z.util.KeyboardUtil.is_one_of_keys({key: z.util.KeyboardUtil.KEY.KEY_V}, [''])).toBeFalsy();
+      expect(z.util.KeyboardUtil.is_one_of_keys({key: z.util.KeyboardUtil.KEY.KEY_V}, [z.util.KeyboardUtil.KEY.ARROW_LEFT])).toBeFalsy();
+      expect(z.util.KeyboardUtil.is_one_of_keys({key: z.util.KeyboardUtil.KEY.KEY_V}, [z.util.KeyboardUtil.KEY.ARROW_LEFT, z.util.KeyboardUtil.KEY.ARROW_RIGHT])).toBeFalsy();
     });
   });
 });

@@ -74,11 +74,11 @@ z.ui.Context = (() => {
     }
 
     if (entry === null) {
-      const index = key === z.util.KeyboardUtil.KEYEY.ARROW_UP ? entries.length - 1 : 0;
+      const index = key === z.util.KeyboardUtil.KEY.ARROW_UP ? entries.length - 1 : 0;
       return entries[index].classList.add('selected');
     }
 
-    const direction = key === z.util.KeyboardUtil.KEYEY.ARROW_UP ? -1 : 1;
+    const direction = key === z.util.KeyboardUtil.KEY.ARROW_UP ? -1 : 1;
     const nextEntry = entries[((entries.indexOf(entry) + direction) + entries.length) % entries.length];
     nextEntry.classList.add('selected');
     entry.classList.remove('selected');
