@@ -33,7 +33,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       FORWARDED_URL_PARAMETERS: [
         z.auth.URLParameter.BOT,
         z.auth.URLParameter.ENVIRONMENT,
-        z.auth.URLParameter.LOCALYTICS,
+        z.auth.URLParameter.TRACKING,
       ],
     };
   }
@@ -202,6 +202,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     });
 
     this.blocked_mode = ko.observable(undefined);
+    this.blocked_mode_cookies = ko.pureComputed(() => this.blocked_mode() === z.auth.AuthView.MODE.BLOCKED_COOKIES);
     this.blocked_mode_database = ko.pureComputed(() => this.blocked_mode() === z.auth.AuthView.MODE.BLOCKED_DATABASE);
     this.blocked_mode_tabs = ko.pureComputed(() => this.blocked_mode() === z.auth.AuthView.MODE.BLOCKED_TABS);
 
@@ -248,7 +249,9 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
   }
 
   _init_page() {
-    this._check_database()
+    Promise.resolve(this._get_hash())
+      .then((current_hash) => this._check_cookies(current_hash))
+      .then((current_hash) => this._check_database(current_hash))
       .then(() => this._check_single_instance())
       .then(() => {
         this._init_url_parameter();
@@ -317,16 +320,52 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
 
   //##############################################################################
-  // Private mode and & multiple tabs check
+  // Cookies support, private mode and & multiple tabs check
   //##############################################################################
 
   /**
+   * Check cookies are enabled.
+   * @param {string} current_hash - Current page hash
+   * @returns {Promise} Resolves when cookies are enabled
+   */
+  _check_cookies(current_hash) {
+    const cookie_name = z.main.App.CONFIG.COOKIES_CHECK.COOKIE_NAME;
+
+    const cookies_enabled = () => {
+      if (current_hash === z.auth.AuthView.MODE.BLOCKED_COOKIES) {
+        this._set_hash();
+      }
+      return Promise.resolve(current_hash);
+    };
+
+    const cookies_disabled = () => {
+      if (current_hash !== z.auth.AuthView.MODE.BLOCKED_COOKIES) {
+        this._set_hash(z.auth.AuthView.MODE.BLOCKED_COOKIES);
+        throw new z.auth.AuthError(z.auth.AuthError.TYPE.COOKIES_DISABLED);
+      }
+    };
+
+    switch (navigator.cookieEnabled) {
+      case true:
+        return cookies_enabled();
+      case false:
+        return cookies_disabled();
+      default:
+        Cookies.set(cookie_name, 'yes');
+        if (Cookies.get(cookie_name)) {
+          Cookies.remove(cookie_name);
+          return cookies_enabled();
+        }
+        return cookies_disabled();
+    }
+  }
+
+  /**
    * Check that we are not in unsupported private mode browser.
+   * @param {string} current_hash - Current page hash
    * @returns {Promise} Resolves when the database check has passed
    */
-  _check_database() {
-    const current_hash = this._get_hash();
-
+  _check_database(current_hash) {
     return z.util.check_indexed_db()
       .then(() => {
         if (current_hash === z.auth.AuthView.MODE.BLOCKED_DATABASE) {
@@ -486,10 +525,15 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
           if (navigator.onLine) {
             if (error.label) {
-              if (error.label === z.service.BackendClientError.LABEL.PENDING_ACTIVATION) {
-                return this._set_hash(z.auth.AuthView.MODE.POSTED_PENDING);
+              switch (error.label) {
+                case z.service.BackendClientError.LABEL.PENDING_ACTIVATION:
+                  return this._set_hash(z.auth.AuthView.MODE.POSTED_PENDING);
+                case z.service.BackendClientError.LABEL.SUSPENDED:
+                  this._add_error(z.string.auth_error_suspended);
+                  break;
+                default:
+                  this._add_error(z.string.auth_error_sign_in, [z.auth.AuthView.TYPE.EMAIL, z.auth.AuthView.TYPE.PASSWORD]);
               }
-              this._add_error(z.string.auth_error_sign_in, [z.auth.AuthView.TYPE.EMAIL, z.auth.AuthView.TYPE.PASSWORD]);
             } else {
               this._add_error(z.string.auth_error_misc);
             }
@@ -541,6 +585,9 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
                 break;
               case z.service.BackendClientError.LABEL.PHONE_BUDGET_EXHAUSTED:
                 this._add_error(z.string.auth_error_phone_number_budget, z.auth.AuthView.TYPE.PHONE);
+                break;
+              case z.service.BackendClientError.LABEL.SUSPENDED:
+                this._add_error(z.string.auth_error_suspended);
                 break;
               case z.service.BackendClientError.LABEL.UNAUTHORIZED:
                 this._add_error(z.string.auth_error_phone_number_forbidden, z.auth.AuthView.TYPE.PHONE);
@@ -1251,6 +1298,15 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.REGISTRATION.OPENED_EMAIL_SIGN_UP, {context: this.registration_context});
   }
 
+  _show_blocked_cookies() {
+    const switch_params = {
+      mode: z.auth.AuthView.MODE.BLOCKED_COOKIES,
+      section: z.auth.AuthView.SECTION.BLOCKED,
+    };
+
+    this.switch_ui(switch_params);
+  }
+
   _show_blocked_database() {
     const switch_params = {
       mode: z.auth.AuthView.MODE.BLOCKED_DATABASE,
@@ -1607,6 +1663,10 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
       case z.auth.AuthView.MODE.ACCOUNT_PHONE:
         this._show_account_phone();
+        break;
+
+      case z.auth.AuthView.MODE.BLOCKED_COOKIES:
+        this._show_blocked_cookies();
         break;
 
       case z.auth.AuthView.MODE.BLOCKED_DATABASE:
@@ -2051,7 +2111,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
   /**
    * Check whether the device has a local history.
    * @private
-   * @returns {boolean} At least one conversation event stored
+   * @returns {Promise<boolean>} Resolves with whether at least one conversation event was found
    */
   _has_local_history() {
     return this.storage_service.get_all(z.storage.StorageService.OBJECT_STORE.EVENTS)

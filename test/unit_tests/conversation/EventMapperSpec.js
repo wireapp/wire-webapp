@@ -58,7 +58,7 @@ describe('Event Mapper', function() {
         from: z.util.create_random_uuid,
         id: event_id,
         time: new Date().toISOString(),
-        type: z.event.Backend.CONVERSATION.MESSAGE_ADD,
+        type: z.event.Client.CONVERSATION.MESSAGE_ADD,
       };
 
       const message_et = event_mapper.map_json_event(event, conversation_et);
@@ -83,14 +83,14 @@ describe('Event Mapper', function() {
         from: z.util.create_random_uuid,
         id: event_id,
         time: new Date().toISOString(),
-        type: z.event.Backend.CONVERSATION.MESSAGE_ADD,
+        type: z.event.Client.CONVERSATION.MESSAGE_ADD,
       };
 
       const message_et = event_mapper.map_json_event(event, conversation_et);
       expect(message_et.get_first_asset().text).toBe(event.data.content);
       expect(message_et.get_first_asset().nonce).toBe(event.data.nonce);
       expect(message_et.get_first_asset().previews().length).toBe(1);
-      expect(message_et.get_first_asset().previews()[0].original_url).toBe('test.com');
+      expect(message_et.get_first_asset().previews()[0].url).toBe('test.com');
       expect(message_et).toBeDefined();
     });
 
@@ -109,15 +109,14 @@ describe('Event Mapper', function() {
         from: z.util.create_random_uuid,
         id: event_id,
         time: new Date().toISOString(),
-        type: z.event.Backend.CONVERSATION.MESSAGE_ADD,
+        type: z.event.Client.CONVERSATION.MESSAGE_ADD,
       };
 
       const message_et = event_mapper.map_json_event(event, conversation_et);
       expect(message_et.get_first_asset().text).toBe(event.data.content);
       expect(message_et.get_first_asset().nonce).toBe(event.data.nonce);
       expect(message_et.get_first_asset().previews().length).toBe(1);
-      expect(message_et.get_first_asset().previews()[0].original_url).toBe(link_preview.url);
-      expect(message_et.get_first_asset().previews()[0].permanent_url).toBe(link_preview.permanent_url);
+      expect(message_et.get_first_asset().previews()[0].url).toBe(link_preview.url);
       expect(message_et).toBeDefined();
     });
 

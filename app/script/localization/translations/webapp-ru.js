@@ -45,6 +45,7 @@ z.string.ru.auth_account_sign_in_phone = 'Телефон';
 z.string.ru.auth_account_terms_of_use = 'Условия использования';
 z.string.ru.auth_account_terms_of_use_detail = 'Я принимаю';
 
+z.string.ru.auth_blocked_cookies = 'Включите файлы cookie для входа в Wire.';
 z.string.ru.auth_blocked_database = 'Для отображения сообщений Wire необходим доступ к локальному хранилищу. Локальное хранилище недоступно в приватном режиме.';
 z.string.ru.auth_blocked_tabs = 'Wire уже открыто в другой вкладке.';
 
@@ -107,6 +108,7 @@ z.string.ru.auth_error_phone_number_budget = 'Вы делаете попытки
 z.string.ru.auth_error_phone_number_forbidden = 'Извините, этот номер телефона запрещён.';
 z.string.ru.auth_error_phone_number_invalid = 'Неправильный номер телефона';
 z.string.ru.auth_error_phone_number_unknown = 'Неизвестный номер телефона';
+z.string.ru.auth_error_suspended = 'У этой учетной записи истек срок действия авторизации.';
 z.string.ru.auth_error_sign_in = 'Пожалуйста, проверьте ваши данные\nи попробуйте еще раз.';
 
 z.string.ru.call_state_outgoing = 'Звонит…';
@@ -511,7 +513,7 @@ z.string.ru.warning_permission_request_screen = '{{icon}} Разрешить д�
 z.string.ru.warning_tell_me_how = 'Скажите мне, как';
 
 z.string.ru.warning_connectivity_connection_lost = 'Пытаемся подключиться. У Wire может не получиться доставить сообщения.';
-z.string.ru.warning_connectivity_no_internet = 'Отсутсвует подключение к интернету. Вы не сможете отправлять и получать сообщения.';
+z.string.ru.warning_connectivity_no_internet = 'Отсутствует подключение к интернету. Вы не сможете отправлять и получать сообщения.';
 
 z.string.ru.warning_lifecycle_update = 'Доступна новая версия Wire.';
 z.string.ru.warning_lifecycle_update_notes = 'Что нового';

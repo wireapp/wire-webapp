@@ -24,17 +24,12 @@ window.z.tracking = z.tracking || {};
 
 /**
  * Definition of events used for user-tracking with Localytics.
- * @note Event names should be descriptive (!) like "Item Purchased" instead of being programmatic like "itemPurchased".
- * @returns {z.tracking.EventName} Localytics event names
+ * @returns {z.tracking.EventName} Localytics event names (defined by Business Intelligence Team)
  */
 z.tracking.EventName = {
   ACCOUNT: {
     LOGGED_IN: 'account.logged_in',
     OPENED_LOGIN: 'account.opened_login',
-  },
-  ANNOUNCE: {
-    CLICKED: 'announce.clicked',
-    SENT: 'announce.sent',
   },
   APP_LAUNCH: 'appLaunch',
   CALLING: {
@@ -88,7 +83,7 @@ z.tracking.EventName = {
   },
   IMAGE_SENT_ERROR: 'Image Sent Error',
   MEDIA: {
-    COMPLETED_MEDIA_ACTION: 'media.completed_media_action',
+    COMPLETED_MEDIA_ACTION: 'contributed',
     PLAYED_AUDIO_MESSAGE: 'media.played_audio_message',
     PLAYED_VIDEO_MESSAGE: 'media.played_video_message',
   },
@@ -126,8 +121,8 @@ z.tracking.EventName = {
     APP_INITIALIZATION: 'telemetry.app_initialization',
   },
   TRACKING: {
-    OPT_IN: 'Opt-in',
-    OPT_OUT: 'Opt-out',
+    OPT_IN: 'settings.opted_in_tracking',
+    OPT_OUT: 'settings.opted_out_tracking',
   },
   UPLOADED_CONTACTS: 'uploadedContacts', // "source": "Gmail"
 };

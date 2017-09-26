@@ -20,9 +20,14 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.announce = z.announce || {};
+window.z.tracking = z.tracking || {};
 
-window.z.announce.UPDATE_SOURCE = {
-  DESKTOP: 'desktop',
-  WEBAPP: 'webapp',
+/**
+ * Enumeration of properties that should get send with every user tracking call.
+ * @returns {z.tracking.SuperProperty} Super property identifier
+ */
+z.tracking.SuperProperty = {
+  APP: 'app',
+  CONTACTS: 'contacts',
+  DESKTOP_APP: 'desktop_app',
 };

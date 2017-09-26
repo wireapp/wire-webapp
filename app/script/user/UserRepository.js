@@ -70,17 +70,19 @@ z.user.UserRepository = class UserRepository {
         .sort((user_a, user_b) => z.util.StringUtil.sort_by_priority(user_a.first_name(), user_b.first_name()));
     }).extend({rateLimit: 1000});
 
-    this.number_of_connected_users = ko.pureComputed(() => {
-      return this.connected_users()
+    this.is_team = ko.observable();
+    this.team_members = undefined;
+    this.team_users = undefined;
+
+    this.number_of_contacts = ko.pureComputed(() => {
+      const contacts = this.is_team() ? this.team_users() : this.connected_users();
+      return contacts
         .filter((user_et) => !user_et.is_bot)
         .length;
     });
-    this.number_of_connected_users.subscribe((number_of_connected_users) => {
-      amplify.publish(z.event.WebApp.ANALYTICS.CUSTOM_DIMENSION, z.tracking.CustomDimension.CONTACTS, number_of_connected_users);
+    this.number_of_contacts.subscribe((number_of_contacts) => {
+      amplify.publish(z.event.WebApp.ANALYTICS.SUPER_PROPERTY, z.tracking.SuperProperty.CONTACTS, number_of_contacts);
     });
-
-    this.is_team = ko.observable();
-    this.team_members = undefined;
 
     amplify.subscribe(z.event.WebApp.CLIENT.ADD, this.add_client_to_user.bind(this));
     amplify.subscribe(z.event.WebApp.CLIENT.REMOVE, this.remove_client_from_user.bind(this));
@@ -97,6 +99,8 @@ z.user.UserRepository = class UserRepository {
    */
   on_user_event(event_json, source) {
     const {type} = event_json;
+
+    this.logger.info(`»» User Event: '${type}' (Source: ${source})`, {event_json: JSON.stringify(event_json), event_object: event_json});
 
     switch (type) {
       case z.event.Backend.USER.CONNECTION:
@@ -775,18 +779,23 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise} Resolves when user was updated
    */
   update_user_by_id(user_id) {
-    return this.find_user_by_id(user_id)
+    const get_current_user = () => this.find_user_by_id(user_id)
       .catch((error) => {
         if (error.type !== z.user.UserError.TYPE.USER_NOT_FOUND) {
           throw error;
         }
         return new z.entity.User();
-      })
-      .then((old_user_et) => {
-        return this.user_service.get_user_by_id(user_id)
-          .then((new_user_data) => {
-            return this.user_mapper.update_user_from_object(old_user_et, new_user_data);
-          });
+      });
+
+    return Promise.all([
+      get_current_user(user_id),
+      this.user_service.get_user_by_id(user_id),
+    ])
+      .then(([current_user_et, updated_user_data]) => this.user_mapper.update_user_from_object(current_user_et, updated_user_data))
+      .then((updated_user_et) => {
+        if (this.is_team()) {
+          this.map_guest_status([updated_user_et]);
+        }
       });
   }
 

@@ -34,6 +34,7 @@ z.string.ro.alert_gif_too_large = 'Animația este prea mare.\nMărimea maximă e
 z.string.ro.auth_account_country_code = 'Codul țării';
 z.string.ro.auth_account_create = 'Creează';
 z.string.ro.auth_account_create_account = 'Creează un cont';
+z.string.ro.auth_account_deletion = 'Ai fost deconectat deoarece contul tău a fost șters.';
 z.string.ro.auth_account_expiration = 'Ai fost scos din sesiune pentru că sesiunea ta a expirat. Te rugăm să te autentifici din nou.';
 z.string.ro.auth_account_get_wire = 'Program de mesagerie simplu, privat și sigur pentru chat, apeluri, partajarea de imagini, muzică, videouri, GIF-uri și altele.';
 z.string.ro.auth_account_password_forgot = 'Am uitat parola';
@@ -44,6 +45,7 @@ z.string.ro.auth_account_sign_in_phone = 'Telefon';
 z.string.ro.auth_account_terms_of_use = 'Termeni de folosire';
 z.string.ro.auth_account_terms_of_use_detail = 'Sunt de acord';
 
+z.string.ro.auth_blocked_cookies = 'Activează cookie-urile pentru intra în Wire.';
 z.string.ro.auth_blocked_database = 'Wire are nevoie de acces la stocarea locală pentru a afișa mesaje. Stocarea locală nu este disponibilă în modul privat.';
 z.string.ro.auth_blocked_tabs = 'Wire este deja deschis în altă filă.';
 
@@ -115,6 +117,7 @@ z.string.ro.call_decline = 'Refuză';
 z.string.ro.call_accept = 'Acceptă';
 z.string.ro.call_join = 'Alătură-te';
 z.string.ro.call_choose_shared_screen = 'Alege un ecran pentru a partaja';
+z.string.ro.call_participants = '{{number}} în apel';
 
 z.string.ro.modal_button_cancel = 'Renunță';
 z.string.ro.modal_button_ok = 'Ok';
@@ -184,6 +187,8 @@ z.string.ro.modal_uploads_parallel = 'Poți trimite maxim {{number}} fișiere si
 
 z.string.ro.connection_request_connect = 'Conectare';
 z.string.ro.connection_request_ignore = 'Ignoră';
+
+z.string.ro.conversation_guest_indicator = 'Vizitator';
 
 z.string.ro.conversation_you_nominative = 'tu';
 z.string.ro.conversation_you_dative = 'tu';
@@ -264,6 +269,7 @@ z.string.ro.conversations_connection_request_one = '1 persoană așteaptă';
 z.string.ro.conversations_empty_conversation = 'Conversație de grup';
 z.string.ro.conversations_empty_conversation_description = 'Toată lumea a plecat';
 z.string.ro.conversations_no_conversations = 'Nu sunt încă conversații';
+z.string.ro.conversations_no_conversations_detail = 'Începe o conversație sau creează un grup.';
 z.string.ro.conversations_popover_archive = 'Arhivă';
 z.string.ro.conversations_popover_block = 'Blochează';
 z.string.ro.conversations_popover_cancel = 'Anulează cererea';
@@ -393,6 +399,7 @@ z.string.ro.preferences_about_website = 'Site web Wire';
 z.string.ro.preferences_account_delete = 'Șterge contul';
 z.string.ro.preferences_account_log_out = 'Deconectare';
 z.string.ro.preferences_account_reset_password = 'Resetează parola';
+z.string.ro.preferences_account_team = 'în {{name}}';
 z.string.ro.preferences_account_username_placeholder = 'Numele tău complet';
 z.string.ro.preferences_account_username_hint = 'Cel puțin două caractere. Doar a—z, 0—9 și _ sunt permise.';
 z.string.ro.preferences_account_username_available = 'Disponibil';
@@ -539,6 +546,7 @@ z.string.ro.tooltip_conversation_input_placeholder = 'Scrie un mesaj';
 z.string.ro.tooltip_conversation_people = 'Persoane ({{shortcut}})';
 z.string.ro.tooltip_conversation_picture = 'Adaugă poză';
 z.string.ro.tooltip_conversation_ping = 'Ping ({{shortcut}})';
+z.string.ro.tooltip_conversation_search = 'Caută';
 z.string.ro.tooltip_conversation_video_call = 'Apel video';
 
 z.string.ro.tooltip_conversations_archive = 'Arhivează ({{shortcut}})';

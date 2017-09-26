@@ -53,8 +53,6 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
       }
     });
 
-    this.conversation_is_changing = false;
-
     // Message that should be focused
     this.marked_message = ko.observable(undefined);
 
@@ -180,8 +178,6 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
    * @returns {Promise} Resolves when conversation was changed
    */
   change_conversation(conversation_et, message_et) {
-    this.conversation_is_changing = true;
-
     // Clean up old conversation
     if (this.conversation()) {
       this.release_conversation(this.conversation());
@@ -227,27 +223,23 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
     // Hide conversation until everything is processed
     $('.conversation').css({opacity: 0});
 
-    this.conversation_is_changing = false;
-
     const messages_container = $('.messages-wrap');
     messages_container.on('mousewheel', this.on_mouse_wheel);
 
+    const is_current_conversation = conversation_et === this.conversation();
+    if (!is_current_conversation) {
+      this.logger.info(`Skipped re-loading current conversation '${conversation_et.display_name()}'`);
+      return Promise.resolve();
+    }
+
     return new Promise((resolve) => {
       window.setTimeout(() => {
-        const is_current_conversation = conversation_et === this.conversation();
-        if (!is_current_conversation) {
-          this.logger.info(`Skipped re-loading current conversation '${conversation_et.display_name()}'`);
-          return resolve();
-        }
-
         // Reset scroll position
         messages_container.scrollTop(0);
 
         this.capture_scrolling_event = true;
 
-        if (!messages_container.is_scrollable()) {
-          this.conversation_repository.mark_as_read(conversation_et);
-        } else {
+        if (messages_container.is_scrollable()) {
           const unread_message = $('.message-timestamp-unread');
 
           if (this.marked_message()) {
@@ -262,6 +254,8 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
           } else {
             messages_container.scroll_to_bottom();
           }
+        } else {
+          this.conversation_repository.mark_as_read(conversation_et);
         }
 
         $('.conversation').css({opacity: 1});
@@ -290,7 +284,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
 
     if (last_message) {
       // Message was prepended
-      if (last_message.timestamp() !== this.conversation().last_event_timestamp()) {
+      if (last_message.timestamp() < this.conversation().last_event_timestamp()) {
         return;
       }
 

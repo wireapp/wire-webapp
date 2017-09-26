@@ -21,24 +21,25 @@
 
 'use strict';
 
-describe('Conversation', function() {
+describe('Conversation', () => {
   let conversation_et = null;
   let other_user = null;
 
   const self_user = new z.entity.User(entities.user.john_doe.id);
   self_user.is_me = true;
 
-  beforeEach(function() {
+  const first_timestamp = new Date('2017-09-26T09:21:14.225Z').getTime();
+  const second_timestamp = new Date('2017-09-26T10:27:18.837Z').getTime();
+
+  beforeEach(() => {
     conversation_et = new z.entity.Conversation();
     other_user = new z.entity.User(entities.user.jane_roe.id);
   });
 
-  describe('Conversation type checks', function() {
-    beforeEach(function() {
-      conversation_et = new z.entity.Conversation();
-    });
+  describe('type checks', () => {
+    beforeEach(() => conversation_et = new z.entity.Conversation());
 
-    it('should return the expected value for personal conversations', function() {
+    it('should return the expected value for personal conversations', () => {
       conversation_et.type(z.conversation.ConversationType.CONNECT);
       expect(conversation_et.is_group()).toBeFalsy();
       expect(conversation_et.is_one2one()).toBeFalsy();
@@ -64,7 +65,7 @@ describe('Conversation', function() {
       expect(conversation_et.is_self()).toBeFalsy();
     });
 
-    it('should return the expected value for team conversations', function() {
+    it('should return the expected value for team conversations', () => {
       conversation_et.team_id = z.util.create_random_uuid();
 
       conversation_et.type(z.conversation.ConversationType.CONNECT);
@@ -107,45 +108,359 @@ describe('Conversation', function() {
     });
   });
 
-  describe('timestamp', function() {
-    it('adding a message should update the conversation timestamp', function() {
-      const message_et = new z.entity.Message();
-      message_et.timestamp(new Date('2014-12-15T09:21:14.225Z').getTime());
-      conversation_et.last_event_timestamp(new Date('2014-12-14T09:21:14.225Z').getTime());
-      conversation_et.add_message(message_et);
-      expect(conversation_et.last_event_timestamp()).toBe(message_et.timestamp());
+  describe('add message', () => {
+    let initial_message_et = undefined;
+
+    beforeEach(() => {
+      initial_message_et = new z.entity.Message(z.util.create_random_uuid());
+      initial_message_et.timestamp(first_timestamp);
+      conversation_et.add_message(initial_message_et);
     });
 
-    it('adding a message should not update the conversation timestamp if should_effect_conversation_timestamp is false', function() {
-      const message_et = new z.entity.Message();
-      message_et.timestamp(new Date('2014-12-15T09:21:14.225Z').getTime());
+    afterEach(() => conversation_et.remove_messages());
+
+    it('should not add message with an exisiting id', () => {
+      conversation_et.add_message(initial_message_et);
+      expect(conversation_et.messages().length).toBe(1);
+    });
+
+    it('should add message with a newer timestamp', () => {
+      const message_et = new z.entity.Message(z.util.create_random_uuid());
+      message_et.timestamp(second_timestamp);
+
       conversation_et.add_message(message_et);
 
-      const message_two_et = new z.entity.Message();
-      message_two_et.timestamp(new Date('2014-12-16T09:21:14.225Z').getTime());
-      message_two_et.should_effect_conversation_timestamp = false;
-      conversation_et.add_message(message_two_et);
-      expect(conversation_et.last_event_timestamp()).toBe(message_et.timestamp());
+      expect(conversation_et.messages().length).toBe(2);
+      const last_message_et = conversation_et.get_last_message();
+      expect(last_message_et.id).toBe(message_et.id);
+      expect(last_message_et.timestamp()).toBe(second_timestamp);
+    });
+
+    it('should add message with an older timestamp', () => {
+      const older_timestamp = first_timestamp - 100;
+      const message_et = new z.entity.Message(z.util.create_random_uuid());
+      message_et.timestamp(older_timestamp);
+
+      conversation_et.add_message(message_et);
+
+      expect(conversation_et.messages().length).toBe(2);
+      const last_message_et = conversation_et.get_first_message();
+      expect(last_message_et.id).toBe(message_et.id);
+      expect(last_message_et.timestamp()).toBe(older_timestamp);
+    });
+
+    describe('affects last_event_timestamp', () => {
+      it('and adding a message should update it', () => {
+        const message_et = new z.entity.Message(z.util.create_random_uuid());
+        message_et.timestamp(second_timestamp);
+
+        conversation_et.last_event_timestamp(first_timestamp);
+        conversation_et.last_server_timestamp(second_timestamp);
+
+        conversation_et.add_message(message_et);
+
+        expect(conversation_et.last_event_timestamp()).toBe(second_timestamp);
+      });
+
+      it('and adding a message should not update it if affect_order is false', () => {
+        const message_et = new z.entity.Message(z.util.create_random_uuid());
+        message_et.timestamp(second_timestamp);
+        message_et.affect_order(false);
+
+        conversation_et.last_event_timestamp(first_timestamp);
+        conversation_et.last_server_timestamp(second_timestamp);
+
+        conversation_et.add_message(message_et);
+
+        expect(conversation_et.last_event_timestamp()).toBe(first_timestamp);
+      });
+
+      it('and adding a message should not update it if timestamp is greater than the last server timestamp', () => {
+        const message_et = new z.entity.Message(z.util.create_random_uuid());
+        message_et.timestamp(second_timestamp);
+
+        conversation_et.last_event_timestamp(first_timestamp);
+        conversation_et.last_server_timestamp(first_timestamp);
+
+        conversation_et.add_message(message_et);
+
+        expect(conversation_et.last_event_timestamp()).toBe(first_timestamp);
+      });
+    });
+
+    describe('affects last_read_timestamp', () => {
+      it('and adding a message should update it if sent by self user', () => {
+        const message_et = new z.entity.Message(z.util.create_random_uuid());
+        message_et.timestamp(second_timestamp);
+        message_et.user(self_user);
+
+        conversation_et.last_read_timestamp(first_timestamp);
+        conversation_et.last_server_timestamp(second_timestamp);
+
+        conversation_et.add_message(message_et);
+
+        expect(conversation_et.last_read_timestamp()).toBe(second_timestamp);
+      });
+
+      it('should not update last read if last message was not send from self user', () => {
+        const message_et = new z.entity.Message(z.util.create_random_uuid());
+        message_et.timestamp(second_timestamp);
+
+        conversation_et.last_read_timestamp(first_timestamp);
+        conversation_et.last_server_timestamp(second_timestamp);
+
+        conversation_et.add_message(message_et);
+
+        expect(conversation_et.last_read_timestamp()).toBe(first_timestamp);
+      });
+
+      it('should not update last read if timestamp is greater than the last server timestamp', () => {
+        const message_et = new z.entity.Message(z.util.create_random_uuid());
+        message_et.timestamp(second_timestamp);
+
+        conversation_et.last_read_timestamp(first_timestamp);
+        conversation_et.last_server_timestamp(first_timestamp);
+
+        conversation_et.add_message(message_et);
+
+        expect(conversation_et.last_read_timestamp()).toBe(first_timestamp);
+      });
     });
   });
 
-  describe('_increment_time_only', function() {
-    const first_date = new Date('2014-12-15T09:21:14.225Z').getTime();
-    const second_date = new Date('2014-12-15T09:22:14.225Z').getTime();
+  describe('add_messages', () => {
+    const reference_timestamp = Date.now();
 
-    it('should only update with newer timestamp', function() {
-      expect(conversation_et._increment_time_only(first_date, second_date)).toBe(second_date);
-      expect(conversation_et._increment_time_only(second_date, first_date)).toBeFalsy();
-      expect(conversation_et._increment_time_only(first_date, first_date)).toBeFalsy();
+    const message1 = new z.entity.Message();
+    message1.id = z.util.create_random_uuid();
+    message1.timestamp(reference_timestamp - 10000);
+    message1.user(self_user);
+
+    const message2 = new z.entity.Message();
+    message2.id = z.util.create_random_uuid();
+    message2.timestamp(reference_timestamp - 5000);
+
+    it('adds multiple messages', () => {
+      const message_ets = [message1, message2];
+      conversation_et.add_messages(message_ets);
+
+      expect(conversation_et.messages_unordered().length).toBe(2);
     });
   });
 
-  describe('is_verified', function() {
-    it('is not verified when nothing is set', function() {
+  describe('get_last_delivered_message', () => {
+    it('returns undefined if conversation has no messages', () => {
+      expect(conversation_et.get_last_delivered_message()).not.toBeDefined();
+    });
+
+    it('returns last delivered message', () => {
+      const sent_message_et = new z.entity.ContentMessage();
+      sent_message_et.id = z.util.create_random_uuid();
+      sent_message_et.status(z.message.StatusType.SENT);
+      conversation_et.add_message(sent_message_et);
+      expect(conversation_et.get_last_delivered_message()).not.toBeDefined();
+
+      const delivered_message_et = new z.entity.ContentMessage();
+      delivered_message_et.id = z.util.create_random_uuid();
+      delivered_message_et.status(z.message.StatusType.DELIVERED);
+      conversation_et.add_message(delivered_message_et);
+      expect(conversation_et.get_last_delivered_message()).toBe(delivered_message_et);
+
+      const next_sent_message_et = new z.entity.ContentMessage();
+      next_sent_message_et.id = z.util.create_random_uuid();
+      next_sent_message_et.status(z.message.StatusType.SENT);
+      conversation_et.add_message(next_sent_message_et);
+      expect(conversation_et.get_last_delivered_message()).toBe(delivered_message_et);
+
+      const next_delivered_message_et = new z.entity.ContentMessage();
+      next_delivered_message_et.id = z.util.create_random_uuid();
+      next_delivered_message_et.status(z.message.StatusType.DELIVERED);
+      conversation_et.add_message(next_delivered_message_et);
+      expect(conversation_et.get_last_delivered_message()).toBe(next_delivered_message_et);
+    });
+  });
+
+  describe('get_last_editable_message', () => {
+    let self_user_et = undefined;
+
+    beforeEach(function() {
+      self_user_et = new z.entity.User();
+      self_user_et.is_me = true;
+    });
+
+    afterEach(() => conversation_et.remove_messages());
+
+    it('returns undefined if conversation has no messages', () => {
+      expect(conversation_et.get_last_editable_message()).not.toBeDefined();
+    });
+
+    it('returns undefined if last message is not text and not added by self user', () => {
+      const message_et = new z.entity.PingMessage();
+      message_et.id = z.util.create_random_uuid();
+      message_et.user(new z.entity.User());
+      conversation_et.add_message(message_et);
+      expect(conversation_et.get_last_editable_message()).not.toBeDefined();
+    });
+
+    it('returns undefined if last message is not text and not added by self user', () => {
+      const message_et = new z.entity.PingMessage();
+      message_et.id = z.util.create_random_uuid();
+      message_et.user(new z.entity.User());
+      conversation_et.add_message(message_et);
+      expect(conversation_et.get_last_editable_message()).not.toBeDefined();
+    });
+
+    it('returns undefined if last message is text and not send by self user', () => {
+      const message_et = new z.entity.ContentMessage();
+      message_et.add_asset(new z.entity.Text());
+      message_et.id = z.util.create_random_uuid();
+      message_et.user(new z.entity.User());
+      conversation_et.add_message(message_et);
+      expect(conversation_et.get_last_editable_message()).not.toBeDefined();
+    });
+
+    it('returns message if last message is text and send by self user', () => {
+      const message_et = new z.entity.ContentMessage();
+      message_et.add_asset(new z.entity.Text());
+      message_et.id = z.util.create_random_uuid();
+      message_et.user(self_user_et);
+      conversation_et.add_message(message_et);
+      expect(conversation_et.get_last_editable_message()).toBeDefined();
+    });
+
+    it('returns message if last message is text and send by self user', () => {
+      const message_et = new z.entity.ContentMessage();
+      message_et.add_asset(new z.entity.Text());
+      message_et.id = z.util.create_random_uuid();
+      message_et.user(self_user_et);
+      conversation_et.add_message(message_et);
+
+      const ping_message_et = new z.entity.PingMessage();
+      ping_message_et.id = z.util.create_random_uuid();
+      ping_message_et.user(new z.entity.User());
+      conversation_et.add_message(ping_message_et);
+
+      expect(conversation_et.get_last_editable_message()).toBeDefined();
+      expect(conversation_et.get_last_editable_message().id).toBe(message_et.id);
+    });
+
+    it('returns message if last message is text and send by self user', () => {
+      const message_et = new z.entity.ContentMessage();
+      message_et.add_asset(new z.entity.Text());
+      message_et.id = z.util.create_random_uuid();
+      message_et.user(self_user_et);
+      conversation_et.add_message(message_et);
+
+      const next_message_et = new z.entity.ContentMessage();
+      next_message_et.add_asset(new z.entity.Text());
+      next_message_et.id = z.util.create_random_uuid();
+      next_message_et.user(self_user_et);
+      conversation_et.add_message(next_message_et);
+
+      expect(conversation_et.get_last_editable_message()).toBeDefined();
+      expect(conversation_et.get_last_editable_message().id).toBe(next_message_et.id);
+    });
+
+    it('returns message if last message is text and ephemeral', () => {
+      const message_et = new z.entity.ContentMessage();
+      message_et.add_asset(new z.entity.Text());
+      message_et.id = z.util.create_random_uuid();
+      message_et.user(self_user_et);
+      conversation_et.add_message(message_et);
+
+      const ephemeral_message_et = new z.entity.ContentMessage();
+      ephemeral_message_et.add_asset(new z.entity.Text());
+      ephemeral_message_et.id = z.util.create_random_uuid();
+      ephemeral_message_et.user(self_user_et);
+      ephemeral_message_et.ephemeral_expires(true);
+      conversation_et.add_message(ephemeral_message_et);
+
+      expect(conversation_et.get_last_editable_message()).toBeDefined();
+      expect(conversation_et.get_last_editable_message().id).toBe(message_et.id);
+    });
+  });
+
+  describe('get_next_iso_date', () => {
+    it('should return an expected ISO string', () => {
+      const reference_date = new Date(Date.now() - 1);
+      const reference_iso_date = reference_date.toISOString();
+
+      expect(conversation_et.get_next_iso_date()).toBeGreaterThan(reference_iso_date);
+      expect(conversation_et.get_next_iso_date(1000)).toBeLessThan(reference_iso_date);
+      expect(conversation_et.get_next_iso_date(-1000)).toBeGreaterThan(new Date(reference_date.getTime() + 1000).toISOString());
+      expect(conversation_et.get_next_iso_date('foo')).toBeGreaterThan(reference_iso_date);
+
+      const last_server_timestamp = Date.now() + 10000;
+      conversation_et.last_server_timestamp(last_server_timestamp);
+      const expected_iso_date = new Date(last_server_timestamp + 1).toISOString();
+
+      expect(conversation_et.get_next_iso_date()).toEqual(expected_iso_date);
+      expect(conversation_et.get_next_iso_date(1000)).toEqual(expected_iso_date);
+      expect(conversation_et.get_next_iso_date(-1000)).toEqual(expected_iso_date);
+      expect(conversation_et.get_next_iso_date('foo')).toEqual(expected_iso_date);
+    });
+  });
+
+  describe('display_name', () => {
+    it('displays a name if the conversation is a 1:1 conversation or a connection request', () => {
+      other_user.name(entities.user.jane_roe.name);
+      conversation_et.participating_user_ets.push(other_user);
+      conversation_et.type(z.conversation.ConversationType.ONE2ONE);
+      expect(conversation_et.display_name()).toBe(conversation_et.participating_user_ets()[0].name());
+
+      conversation_et.type(z.conversation.ConversationType.CONNECT);
+      expect(conversation_et.display_name()).toBe(conversation_et.participating_user_ets()[0].name());
+    });
+
+    it('displays a fallback if no user name has been set', () => {
+      conversation_et.type(z.conversation.ConversationType.ONE2ONE);
+      expect(conversation_et.display_name()).toBe('…');
+
+      conversation_et.type(z.conversation.ConversationType.CONNECT);
+      expect(conversation_et.display_name()).toBe('…');
+    });
+
+    it('displays a group conversation name with names from the participants', () => {
+      const third_user = new z.entity.User(z.util.create_random_uuid());
+      third_user.name('Brad Delson');
+      other_user.name(entities.user.jane_roe.name);
+      conversation_et.participating_user_ets.push(other_user);
+      conversation_et.participating_user_ets.push(third_user);
+      conversation_et.type(z.conversation.ConversationType.REGULAR);
+      const expected_display_name = `${conversation_et.participating_user_ets()[0].first_name()}, ${conversation_et.participating_user_ets()[1].first_name()}`;
+      expect(conversation_et.display_name()).toBe(expected_display_name);
+    });
+
+    it('displays "Empty Conversation" if no other participants are in the conversation', () => {
+      conversation_et.type(z.conversation.ConversationType.REGULAR);
+      expect(conversation_et.display_name()).toBe(z.string.conversations_empty_conversation);
+    });
+
+    it('displays a fallback if no user name has been set for a group conversation', () => {
+      const user = new z.entity.User(z.util.create_random_uuid());
+      conversation_et.type(z.conversation.ConversationType.REGULAR);
+      conversation_et.participating_user_ids.push(other_user.id);
+      conversation_et.participating_user_ids.push(user.id);
+
+      expect(conversation_et.display_name()).toBe('…');
+    });
+
+    it('displays the conversation name for a self conversation', () => {
+      conversation_et.type(z.conversation.ConversationType.SELF);
+      expect(conversation_et.display_name()).toBe('…');
+
+      const conversation_name = 'My favorite music band';
+      conversation_et.name(conversation_name);
+      expect(conversation_et.display_name()).toBe(conversation_name);
+    });
+  });
+
+  describe('is_verified', () => {
+    it('is not verified when nothing is set', () => {
       expect(conversation_et.is_verified()).toBeFalsy();
     });
 
-    it('is verified when self user has no remote clients', function() {
+    it('is verified when self user has no remote clients', () => {
       const verified_client_et = new z.client.Client();
       verified_client_et.meta.is_verified(true);
 
@@ -160,7 +475,7 @@ describe('Conversation', function() {
       expect(conversation_et.is_verified()).toBeTruthy();
     });
 
-    it('is not verified when participant has unverified device', function() {
+    it('is not verified when participant has unverified device', () => {
       const unverified_client_et = new z.client.Client();
       const verified_client_et = new z.client.Client();
       verified_client_et.meta.is_verified(true);
@@ -182,7 +497,7 @@ describe('Conversation', function() {
       expect(conversation_et.is_verified()).toBeFalsy();
     });
 
-    it('is verified when all users are verified', function() {
+    it('is verified when all users are verified', () => {
       const verified_client_et = new z.client.Client();
       verified_client_et.meta.is_verified(true);
 
@@ -204,338 +519,8 @@ describe('Conversation', function() {
     });
   });
 
-  describe('display_name', function() {
-    it('displays a name if the conversation is a 1:1 conversation or a connection request', function() {
-      other_user.name(entities.user.jane_roe.name);
-      conversation_et.participating_user_ets.push(other_user);
-      conversation_et.type(z.conversation.ConversationType.ONE2ONE);
-      expect(conversation_et.display_name()).toBe(conversation_et.participating_user_ets()[0].name());
-
-      conversation_et.type(z.conversation.ConversationType.CONNECT);
-      expect(conversation_et.display_name()).toBe(conversation_et.participating_user_ets()[0].name());
-    });
-
-    it('displays a fallback if no user name has been set', function() {
-      conversation_et.type(z.conversation.ConversationType.ONE2ONE);
-      expect(conversation_et.display_name()).toBe('…');
-
-      conversation_et.type(z.conversation.ConversationType.CONNECT);
-      expect(conversation_et.display_name()).toBe('…');
-    });
-
-    it('displays a group conversation name with names from the participants', function() {
-      const third_user = new z.entity.User(z.util.create_random_uuid());
-      third_user.name('Brad Delson');
-      other_user.name(entities.user.jane_roe.name);
-      conversation_et.participating_user_ets.push(other_user);
-      conversation_et.participating_user_ets.push(third_user);
-      conversation_et.type(z.conversation.ConversationType.REGULAR);
-      const expected_display_name = `${conversation_et.participating_user_ets()[0].first_name()}, ${conversation_et.participating_user_ets()[1].first_name()}`;
-      expect(conversation_et.display_name()).toBe(expected_display_name);
-    });
-
-    it('displays "Empty Conversation" if no other participants are in the conversation', function() {
-      conversation_et.type(z.conversation.ConversationType.REGULAR);
-      expect(conversation_et.display_name()).toBe(z.string.conversations_empty_conversation);
-    });
-
-    it('displays a fallback if no user name has been set for a group conversation', function() {
-      const user = new z.entity.User(z.util.create_random_uuid());
-      conversation_et.type(z.conversation.ConversationType.REGULAR);
-      conversation_et.participating_user_ids.push(other_user.id);
-      conversation_et.participating_user_ids.push(user.id);
-
-      expect(conversation_et.display_name()).toBe('…');
-    });
-
-    it('displays the conversation name for a self conversation', function() {
-      conversation_et.type(z.conversation.ConversationType.SELF);
-      expect(conversation_et.display_name()).toBe('…');
-
-      const conversation_name = 'My favorite music band';
-      conversation_et.name(conversation_name);
-      expect(conversation_et.display_name()).toBe(conversation_name);
-    });
-  });
-
-  describe('_subscribe_to_states_updates', () =>
-    it('creates subscribers to state updates', function() {
-      spyOn(conversation_et, '_subscribe_to_states_updates').and.callThrough();
-
-      conversation_et._subscribe_to_states_updates();
-      conversation_et.archived_state(false);
-      conversation_et.cleared_timestamp(0);
-      conversation_et.last_event_timestamp(1467650148305);
-      conversation_et.last_read_timestamp(1467650148305);
-      conversation_et.muted_state(false);
-
-      expect(conversation_et._subscribe_to_states_updates.calls.count()).toEqual(1);
-    })
-  );
-
-  describe('message sorting', function() {
-    const reference_timestamp = Date.now();
-
-    beforeEach(function() {
-      const message = new z.entity.Message();
-      message.timestamp(reference_timestamp);
-      conversation_et.add_message(message);
-    });
-
-    it('can add message with a newer timestamp', function() {
-      const message_id = z.util.create_random_uuid();
-      const message = new z.entity.Message();
-      message.id = message_id;
-      message.timestamp(Date.now());
-      conversation_et.add_message(message);
-      expect(conversation_et.messages().length).toBe(2);
-      expect(conversation_et.get_last_message().id).toBe(message_id);
-    });
-  });
-
-  describe('add_messages', function() {
-    const reference_timestamp = Date.now();
-
-    const message1 = new z.entity.Message();
-    message1.id = z.util.create_random_uuid();
-    message1.timestamp(reference_timestamp - 10000);
-    message1.user(self_user);
-
-    const message2 = new z.entity.Message();
-    message2.id = z.util.create_random_uuid();
-    message2.timestamp(reference_timestamp - 5000);
-
-    it('adds many messages', function() {
-      const message_ets = [message1, message2];
-      conversation_et.add_messages(message_ets);
-
-      expect(conversation_et.messages_unordered().length).toBe(2);
-    });
-  });
-
-  describe('message deletion', function() {
-    let message_et = null;
-
-    beforeEach(function() {
-      message_et = new z.entity.Message();
-      message_et.id = z.util.create_random_uuid();
-      conversation_et.add_message(message_et);
-    });
-
-    afterEach(function() {
-      conversation_et.remove_messages();
-    });
-
-    it('should remove message by id', function() {
-      expect(conversation_et.messages().length).toBe(1);
-      conversation_et.remove_message_by_id(message_et.id);
-      expect(conversation_et.messages().length).toBe(0);
-    });
-
-    it('should remove all message with the same id', function() {
-      const duplicated_message_et = new z.entity.Message();
-      duplicated_message_et.id = message_et.id;
-
-      expect(conversation_et.messages().length).toBe(1);
-      conversation_et.add_message(duplicated_message_et);
-      expect(conversation_et.messages().length).toBe(1);
-      conversation_et.messages_unordered.push(duplicated_message_et);
-      expect(conversation_et.messages().length).toBe(2);
-      conversation_et.remove_message_by_id(message_et.id);
-      expect(conversation_et.messages().length).toBe(0);
-    });
-
-    it('should remove message by message entity', function() {
-      expect(conversation_et.messages().length).toBe(1);
-      conversation_et.remove_message(message_et);
-      expect(conversation_et.messages().length).toBe(0);
-    });
-
-    it('should remove all messages', function() {
-      expect(conversation_et.messages().length).toBe(1);
-      conversation_et.remove_messages();
-      expect(conversation_et.messages().length).toBe(0);
-    });
-  });
-
-  describe('_creation_message', function() {
-    beforeEach(function() {
-      conversation_et.self = self_user;
-      conversation_et.participating_user_ets.push(other_user);
-    });
-
-    it('can create a message for an outgoing connection request', function() {
-      conversation_et.type(z.conversation.ConversationType.CONNECT);
-      other_user.connection().status(z.user.ConnectionStatus.SENT);
-      const creation_message = conversation_et._creation_message();
-      expect(creation_message).toBeDefined();
-      expect(creation_message.member_message_type).toBe(z.message.SystemMessageType.CONNECTION_REQUEST);
-    });
-
-    it('can create a message for an accepted connection request', function() {
-      conversation_et.type(z.conversation.ConversationType.ONE2ONE);
-      const creation_message = conversation_et._creation_message();
-      expect(creation_message).toBeDefined();
-      expect(creation_message.member_message_type).toBe(z.message.SystemMessageType.CONNECTION_ACCEPTED);
-    });
-
-    it('can create a message for a group the user started', function() {
-      conversation_et.type(z.conversation.ConversationType.REGULAR);
-      conversation_et.creator = self_user.id;
-      const creation_message = conversation_et._creation_message();
-      expect(creation_message).toBeDefined();
-      expect(creation_message.member_message_type).toBe(z.message.SystemMessageType.CONVERSATION_CREATE);
-      expect(creation_message.user().id).toBe(self_user.id);
-    });
-
-    it('can create a message for a group another user started', function() {
-      conversation_et.type(z.conversation.ConversationType.REGULAR);
-      conversation_et.creator = other_user.id;
-      const creation_message = conversation_et._creation_message();
-      expect(creation_message).toBeDefined();
-      expect(creation_message.member_message_type).toBe(z.message.SystemMessageType.CONVERSATION_CREATE);
-      expect(creation_message.user().id).toBe(other_user.id);
-    });
-
-    it('can create a message for a group a user started that is no longer part of the group', function() {
-      conversation_et.type(z.conversation.ConversationType.REGULAR);
-      conversation_et.creator = z.util.create_random_uuid;
-      const creation_message = conversation_et._creation_message();
-      expect(creation_message).toBeDefined();
-      expect(creation_message.member_message_type).toBe(z.message.SystemMessageType.CONVERSATION_RESUME);
-      expect(creation_message.user().id).toBe('');
-    });
-
-    it('returns undefined if there are no participating users', function() {
-      conversation_et.participating_user_ets([]);
-      const creation_message = conversation_et._creation_message();
-      expect(creation_message).toBeUndefined();
-    });
-  });
-
-  describe('messages_visible', function() {
-    it('returns no messages if conversation ID is empty', function() {
-      expect(conversation_et.id).toBe('');
-      expect(conversation_et.messages_visible().length).toBe(0);
-    });
-
-    it('creates a creation message and returns visible messages', function() {
-      conversation_et.self = self_user;
-      conversation_et.participating_user_ets.push(other_user);
-      conversation_et.id = z.util.create_random_uuid();
-      conversation_et.has_further_messages(false);
-
-      expect(conversation_et.messages_visible().length).toBe(1);
-      expect(conversation_et.messages_visible()[0].super_type).toBe(z.message.SuperType.MEMBER);
-
-      const member_message = new z.entity.MemberMessage();
-      member_message.super_type = z.message.SuperType.MEMBER;
-
-      conversation_et.add_message(member_message);
-
-      expect(conversation_et.messages_visible().length).toBe(2);
-      expect(conversation_et.messages_visible()[0].super_type).toBe(z.message.SuperType.MEMBER);
-    });
-
-    it('returns visible unmerged pings', function() {
-      const timestamp = Date.now();
-      conversation_et.id = z.util.create_random_uuid();
-
-      const ping_message_1 = new z.entity.PingMessage();
-      ping_message_1.timestamp(timestamp - 4000);
-      ping_message_1.id = z.util.create_random_uuid();
-
-      const ping_message_2 = new z.entity.PingMessage();
-      ping_message_2.timestamp(timestamp - 2000);
-      ping_message_2.id = z.util.create_random_uuid();
-
-      const ping_message_3 = new z.entity.PingMessage();
-      ping_message_3.timestamp(timestamp);
-      ping_message_3.id = z.util.create_random_uuid();
-
-      conversation_et.add_message(ping_message_1);
-      conversation_et.add_message(ping_message_2);
-      conversation_et.add_message(ping_message_3);
-
-      expect(conversation_et.messages_unordered().length).toBe(3);
-      expect(conversation_et.messages().length).toBe(3);
-      expect(conversation_et.messages_visible().length).toBe(3);
-    });
-  });
-
-  describe('last read', function() {
-    it('should update last read if last message was send from self user', function() {
-      const last_read_timestamp = new Date('December 24, 2000 18:00:00').getTime();
-      const last_message_timestamp = new Date('December 24, 2000 18:01:00').getTime();
-
-      conversation_et.last_read_timestamp(last_read_timestamp);
-
-      const message_et = new z.entity.Message();
-      message_et.user(self_user);
-      message_et.timestamp(last_message_timestamp);
-      message_et.id = z.util.create_random_uuid();
-
-      expect(conversation_et.last_read_timestamp()).toBe(last_read_timestamp);
-      conversation_et.add_message(message_et);
-      expect(conversation_et.last_read_timestamp()).toBe(last_message_timestamp);
-    });
-
-    it('should not update last read if last message was not send from self user', function() {
-      const last_read_timestamp = new Date('December 24, 2000 18:00:00').getTime();
-      const last_message_timestamp = new Date('December 24, 2000 18:01:00').getTime();
-
-      conversation_et.last_read_timestamp(last_read_timestamp);
-
-      const message_et = new z.entity.Message();
-      message_et.timestamp(last_message_timestamp);
-      message_et.id = z.util.create_random_uuid();
-
-      expect(conversation_et.last_read_timestamp()).toBe(last_read_timestamp);
-      conversation_et.add_message(message_et);
-      expect(conversation_et.last_read_timestamp()).toBe(last_read_timestamp);
-    });
-  });
-
-  describe('release', function() {
-    it('should not release messages if conversation has unread messages', function() {
-      const last_read_timestamp = new Date('December 24, 2000 18:00:00').getTime();
-      const last_message_timestamp = new Date('December 24, 2000 18:01:00').getTime();
-
-      conversation_et.last_read_timestamp(last_read_timestamp);
-
-      const message_et = new z.entity.PingMessage();
-      message_et.timestamp(last_message_timestamp);
-      message_et.id = z.util.create_random_uuid();
-      conversation_et.add_message(message_et);
-
-      expect(conversation_et.messages().length).toBe(1);
-      expect(conversation_et.unread_event_count()).toBe(1);
-      conversation_et.release();
-      expect(conversation_et.messages().length).toBe(1);
-      expect(conversation_et.unread_event_count()).toBe(1);
-    });
-
-    it('should release messages if conversation has no unread messages', function() {
-      const last_message_timestamp = new Date('December 24, 2000 18:01:00').getTime();
-
-      const message_et = new z.entity.Message();
-      message_et.timestamp(last_message_timestamp);
-      message_et.id = z.util.create_random_uuid();
-      conversation_et.add_message(message_et);
-
-      conversation_et.last_read_timestamp(last_message_timestamp);
-
-      expect(conversation_et.unread_event_count()).toBe(0);
-      expect(conversation_et.messages().length).toBe(1);
-      conversation_et.release();
-      expect(conversation_et.messages().length).toBe(0);
-      expect(conversation_et.is_loaded()).toBeFalsy();
-      expect(conversation_et.has_further_messages()).toBeTruthy();
-    });
-  });
-
   describe('is_with_bot', () =>
-    it('detects bot conversations by the username of the remote participant', function() {
+    it('detects bot conversations by the username of the remote participant', () => {
       const user_et = new z.entity.User(z.util.create_random_uuid());
 
       conversation_et = new z.entity.Conversation(z.util.create_random_uuid());
@@ -571,173 +556,171 @@ describe('Conversation', function() {
     })
   );
 
-  describe('get_last_editable_message', function() {
-    let self_user_et = undefined;
-
-    beforeEach(function() {
-      self_user_et = new z.entity.User();
-      self_user_et.is_me = true;
+  describe('messages_visible', () => {
+    it('should return no messages if conversation ID is empty', () => {
+      expect(conversation_et.id).toBe('');
+      expect(conversation_et.messages_visible().length).toBe(0);
     });
 
-    afterEach(function() {
-      conversation_et.remove_messages();
+    it('creates a creation message and returns visible messages', () => {
+      conversation_et.self = self_user;
+      conversation_et.participating_user_ets.push(other_user);
+      conversation_et.id = z.util.create_random_uuid();
+      conversation_et.has_further_messages(false);
+
+      expect(conversation_et.messages_visible().length).toBe(1);
+      expect(conversation_et.messages_visible()[0].super_type).toBe(z.message.SuperType.MEMBER);
+
+      const member_message = new z.entity.MemberMessage();
+      member_message.super_type = z.message.SuperType.MEMBER;
+
+      conversation_et.add_message(member_message);
+
+      expect(conversation_et.messages_visible().length).toBe(2);
+      expect(conversation_et.messages_visible()[0].super_type).toBe(z.message.SuperType.MEMBER);
     });
 
-    it('returns undefined if conversation has no messages', function() {
-      expect(conversation_et.get_last_editable_message()).not.toBeDefined();
-    });
+    it('returns visible unmerged pings', () => {
+      const timestamp = Date.now();
+      conversation_et.id = z.util.create_random_uuid();
 
-    it('returns undefined if last message is not text and not added by self user', function() {
-      const message_et = new z.entity.PingMessage();
-      message_et.id = z.util.create_random_uuid();
-      message_et.user(new z.entity.User());
-      conversation_et.add_message(message_et);
-      expect(conversation_et.get_last_editable_message()).not.toBeDefined();
-    });
+      const ping_message_1 = new z.entity.PingMessage();
+      ping_message_1.timestamp(timestamp - 4000);
+      ping_message_1.id = z.util.create_random_uuid();
 
-    it('returns undefined if last message is not text and not added by self user', function() {
-      const message_et = new z.entity.PingMessage();
-      message_et.id = z.util.create_random_uuid();
-      message_et.user(new z.entity.User());
-      conversation_et.add_message(message_et);
-      expect(conversation_et.get_last_editable_message()).not.toBeDefined();
-    });
+      const ping_message_2 = new z.entity.PingMessage();
+      ping_message_2.timestamp(timestamp - 2000);
+      ping_message_2.id = z.util.create_random_uuid();
 
-    it('returns undefined if last message is text and not send by self user', function() {
-      const message_et = new z.entity.ContentMessage();
-      message_et.add_asset(new z.entity.Text());
-      message_et.id = z.util.create_random_uuid();
-      message_et.user(new z.entity.User());
-      conversation_et.add_message(message_et);
-      expect(conversation_et.get_last_editable_message()).not.toBeDefined();
-    });
+      const ping_message_3 = new z.entity.PingMessage();
+      ping_message_3.timestamp(timestamp);
+      ping_message_3.id = z.util.create_random_uuid();
 
-    it('returns message if last message is text and send by self user', function() {
-      const message_et = new z.entity.ContentMessage();
-      message_et.add_asset(new z.entity.Text());
-      message_et.id = z.util.create_random_uuid();
-      message_et.user(self_user_et);
-      conversation_et.add_message(message_et);
-      expect(conversation_et.get_last_editable_message()).toBeDefined();
-    });
+      conversation_et.add_message(ping_message_1);
+      conversation_et.add_message(ping_message_2);
+      conversation_et.add_message(ping_message_3);
 
-    it('returns message if last message is text and send by self user', function() {
-      const message_et = new z.entity.ContentMessage();
-      message_et.add_asset(new z.entity.Text());
-      message_et.id = z.util.create_random_uuid();
-      message_et.user(self_user_et);
-      conversation_et.add_message(message_et);
-
-      const ping_message_et = new z.entity.PingMessage();
-      ping_message_et.id = z.util.create_random_uuid();
-      ping_message_et.user(new z.entity.User());
-      conversation_et.add_message(ping_message_et);
-
-      expect(conversation_et.get_last_editable_message()).toBeDefined();
-      expect(conversation_et.get_last_editable_message().id).toBe(message_et.id);
-    });
-
-    it('returns message if last message is text and send by self user', function() {
-      const message_et = new z.entity.ContentMessage();
-      message_et.add_asset(new z.entity.Text());
-      message_et.id = z.util.create_random_uuid();
-      message_et.user(self_user_et);
-      conversation_et.add_message(message_et);
-
-      const next_message_et = new z.entity.ContentMessage();
-      next_message_et.add_asset(new z.entity.Text());
-      next_message_et.id = z.util.create_random_uuid();
-      next_message_et.user(self_user_et);
-      conversation_et.add_message(next_message_et);
-
-      expect(conversation_et.get_last_editable_message()).toBeDefined();
-      expect(conversation_et.get_last_editable_message().id).toBe(next_message_et.id);
-    });
-
-    it('returns message if last message is text and ephemeral', function() {
-      const message_et = new z.entity.ContentMessage();
-      message_et.add_asset(new z.entity.Text());
-      message_et.id = z.util.create_random_uuid();
-      message_et.user(self_user_et);
-      conversation_et.add_message(message_et);
-
-      const ephemeral_message_et = new z.entity.ContentMessage();
-      ephemeral_message_et.add_asset(new z.entity.Text());
-      ephemeral_message_et.id = z.util.create_random_uuid();
-      ephemeral_message_et.user(self_user_et);
-      ephemeral_message_et.ephemeral_expires(true);
-      conversation_et.add_message(ephemeral_message_et);
-
-      expect(conversation_et.get_last_editable_message()).toBeDefined();
-      expect(conversation_et.get_last_editable_message().id).toBe(message_et.id);
+      expect(conversation_et.messages_unordered().length).toBe(3);
+      expect(conversation_et.messages().length).toBe(3);
+      expect(conversation_et.messages_visible().length).toBe(3);
     });
   });
 
-  describe('get_last_delivered_message', function() {
-    it('returns undefined if conversation has no messages', function() {
-      expect(conversation_et.get_last_delivered_message()).not.toBeDefined();
+  describe('release', () => {
+    it('should not release messages if conversation has unread messages', () => {
+      const message_et = new z.entity.Message(z.util.create_random_uuid());
+      message_et.timestamp(second_timestamp);
+      conversation_et.add_message(message_et);
+      conversation_et.last_read_timestamp(first_timestamp);
+
+      expect(conversation_et.messages().length).toBe(1);
+      expect(conversation_et.unread_event_count()).toBe(1);
+
+      conversation_et.release();
+
+      expect(conversation_et.messages().length).toBe(1);
+      expect(conversation_et.unread_event_count()).toBe(1);
     });
 
-    it('returns last delivered message', function() {
-      const sent_message_et = new z.entity.ContentMessage();
-      sent_message_et.id = z.util.create_random_uuid();
-      sent_message_et.status(z.message.StatusType.SENT);
-      conversation_et.add_message(sent_message_et);
-      expect(conversation_et.get_last_delivered_message()).not.toBeDefined();
+    it('should release messages if conversation has no unread messages', () => {
+      const message_et = new z.entity.Message(z.util.create_random_uuid());
+      message_et.timestamp(first_timestamp);
+      conversation_et.add_message(message_et);
+      conversation_et.last_read_timestamp(first_timestamp);
 
-      const delivered_message_et = new z.entity.ContentMessage();
-      delivered_message_et.id = z.util.create_random_uuid();
-      delivered_message_et.status(z.message.StatusType.DELIVERED);
-      conversation_et.add_message(delivered_message_et);
-      expect(conversation_et.get_last_delivered_message()).toBe(delivered_message_et);
+      expect(conversation_et.messages().length).toBe(1);
+      expect(conversation_et.unread_event_count()).toBe(0);
 
-      const next_sent_message_et = new z.entity.ContentMessage();
-      next_sent_message_et.id = z.util.create_random_uuid();
-      next_sent_message_et.status(z.message.StatusType.SENT);
-      conversation_et.add_message(next_sent_message_et);
-      expect(conversation_et.get_last_delivered_message()).toBe(delivered_message_et);
+      conversation_et.release();
 
-      const next_delivered_message_et = new z.entity.ContentMessage();
-      next_delivered_message_et.id = z.util.create_random_uuid();
-      next_delivered_message_et.status(z.message.StatusType.DELIVERED);
-      conversation_et.add_message(next_delivered_message_et);
-      expect(conversation_et.get_last_delivered_message()).toBe(next_delivered_message_et);
+      expect(conversation_et.has_further_messages()).toBeTruthy();
+      expect(conversation_et.is_loaded()).toBeFalsy();
+      expect(conversation_et.messages().length).toBe(0);
+      expect(conversation_et.unread_event_count()).toBe(0);
+    });
+  });
+
+  describe('remove_message_by_id', () => {
+    let message_id = undefined;
+
+    beforeEach(() => {
+      const message_et = new z.entity.Message(z.util.create_random_uuid());
+      conversation_et.add_message(message_et);
+      message_id = message_et.id;
+    });
+
+    afterEach(() => conversation_et.remove_messages());
+
+    it('should remove message by id', () => {
+      expect(conversation_et.messages().length).toBe(1);
+      conversation_et.remove_message_by_id(message_id);
+      expect(conversation_et.messages().length).toBe(0);
+    });
+
+    it('should remove all message with the same id', () => {
+      const duplicated_message_et = new z.entity.Message(message_id);
+
+      expect(conversation_et.messages().length).toBe(1);
+      conversation_et.add_message(duplicated_message_et);
+      expect(conversation_et.messages().length).toBe(1);
+      conversation_et.messages_unordered.push(duplicated_message_et);
+      expect(conversation_et.messages().length).toBe(2);
+
+      conversation_et.remove_message_by_id(message_id);
+      expect(conversation_et.messages().length).toBe(0);
+    });
+  });
+
+  describe('remove_messages', () => {
+    let message_et = undefined;
+
+    beforeEach(() => {
+      const first_message_et = new z.entity.Message(z.util.create_random_uuid());
+      first_message_et.timestamp(first_timestamp);
+      conversation_et.add_message(first_message_et);
+
+      message_et = new z.entity.Message(z.util.create_random_uuid());
+      message_et.timestamp(second_timestamp);
+      conversation_et.add_message(message_et);
+    });
+
+    afterEach(() => conversation_et.remove_messages());
+
+    it('should remove all messages', () => {
+      expect(conversation_et.messages().length).toBe(2);
+      conversation_et.remove_messages();
+      expect(conversation_et.messages().length).toBe(0);
+    });
+
+    it('should remove all messages for invalid input timestamp', () => {
+      expect(conversation_et.messages().length).toBe(2);
+      conversation_et.remove_messages('foo');
+      expect(conversation_et.messages().length).toBe(0);
+    });
+
+    it('should remove expected messages for timestamp greater than message', () => {
+      expect(conversation_et.messages().length).toBe(2);
+      conversation_et.remove_messages(first_timestamp + 1);
+      expect(conversation_et.messages().length).toBe(1);
+    });
+
+    it('should remove expected messages for timestamp equal to message', () => {
+      expect(conversation_et.messages().length).toBe(2);
+      conversation_et.remove_messages(first_timestamp);
+      expect(conversation_et.messages().length).toBe(1);
     });
   });
 
   describe('set_timestamp', () =>
-    it('turns strings into numbers', function() {
+    it('turns strings into numbers', () => {
       const lrt = conversation_et.last_read_timestamp();
       expect(lrt).toBe(0);
       const new_lrt_string = '1480338525243';
       const new_lrt_number = window.parseInt(new_lrt_string, 10);
-      conversation_et.set_timestamp(new_lrt_string, z.conversation.ConversationUpdateType.LAST_READ_TIMESTAMP);
+      conversation_et.set_timestamp(new_lrt_string, z.conversation.TIMESTAMP_TYPE.LAST_READ);
       expect(conversation_et.last_read_timestamp()).toBe(new_lrt_number);
     })
   );
-
-  describe('connection', function() {
-    it('updates the participating user IDs with the user ID of the other party', function() {
-      const connector_user_id = 'b43b376d-7b5a-4d77-89be-81a02892db8c';
-
-      // @formatter:off
-      /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
-      const payload_connection = {"status":"sent","conversation":"15a7f358-8eba-4b8e-bcf2-61a08eb53349","to":`${connector_user_id}`,"from":"616cbbeb-1360-4e17-b333-e000662257bd","last_update":"2017-05-10T11:34:18.396Z","message":" "};
-      const payload_conversation = {"access":["private"],"creator":"616cbbeb-1360-4e17-b333-e000662257bd","members":{"self":{"hidden_ref":null,"status":0,"last_read":"1.800122000a73cb62","muted_time":null,"service":null,"otr_muted_ref":null,"muted":null,"status_time":"2017-05-10T11:34:18.376Z","hidden":false,"status_ref":"0.0","id":"616cbbeb-1360-4e17-b333-e000662257bd","otr_archived":false,"cleared":null,"otr_muted":false,"otr_archived_ref":null,"archived":null},"others":[]},"name":"Marco","id":"15a7f358-8eba-4b8e-bcf2-61a08eb53349","type":3,"last_event_time":"2017-05-10T11:34:18.376Z","last_event":"2.800122000a73cb63"};
-      /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
-      // @formatter:on
-
-      const user_connection_mapper = new z.user.UserConnectionMapper();
-      const connection_et = user_connection_mapper.map_user_connection_from_json(payload_connection);
-
-      const conversation_mapper = new z.conversation.ConversationMapper();
-      const new_conversation = conversation_mapper._create_conversation_et(payload_conversation);
-      new_conversation.connection(connection_et);
-
-      expect(new_conversation.participating_user_ids().length).toBe(1);
-      expect(new_conversation.participating_user_ids()[0]).toBe(connector_user_id);
-    });
-  });
 
   describe('should_unarchive', () => {
     let time = undefined;
@@ -778,6 +761,106 @@ describe('Conversation', function() {
 
       conversation_et.last_event_timestamp(time + 100);
       expect(conversation_et.should_unarchive()).toBeFalsy();
+    });
+  });
+
+  describe('_creation_message', () => {
+    beforeEach(() => {
+      conversation_et.self = self_user;
+      conversation_et.participating_user_ets.push(other_user);
+    });
+
+    it('can create a message for an outgoing connection request', () => {
+      conversation_et.type(z.conversation.ConversationType.CONNECT);
+      other_user.connection().status(z.user.ConnectionStatus.SENT);
+      const creation_message = conversation_et._creation_message();
+      expect(creation_message).toBeDefined();
+      expect(creation_message.member_message_type).toBe(z.message.SystemMessageType.CONNECTION_REQUEST);
+    });
+
+    it('can create a message for an accepted connection request', () => {
+      conversation_et.type(z.conversation.ConversationType.ONE2ONE);
+      const creation_message = conversation_et._creation_message();
+      expect(creation_message).toBeDefined();
+      expect(creation_message.member_message_type).toBe(z.message.SystemMessageType.CONNECTION_ACCEPTED);
+    });
+
+    it('can create a message for a group the user started', () => {
+      conversation_et.type(z.conversation.ConversationType.REGULAR);
+      conversation_et.creator = self_user.id;
+      const creation_message = conversation_et._creation_message();
+      expect(creation_message).toBeDefined();
+      expect(creation_message.member_message_type).toBe(z.message.SystemMessageType.CONVERSATION_CREATE);
+      expect(creation_message.user().id).toBe(self_user.id);
+    });
+
+    it('can create a message for a group another user started', () => {
+      conversation_et.type(z.conversation.ConversationType.REGULAR);
+      conversation_et.creator = other_user.id;
+      const creation_message = conversation_et._creation_message();
+      expect(creation_message).toBeDefined();
+      expect(creation_message.member_message_type).toBe(z.message.SystemMessageType.CONVERSATION_CREATE);
+      expect(creation_message.user().id).toBe(other_user.id);
+    });
+
+    it('can create a message for a group a user started that is no longer part of the group', () => {
+      conversation_et.type(z.conversation.ConversationType.REGULAR);
+      conversation_et.creator = z.util.create_random_uuid;
+      const creation_message = conversation_et._creation_message();
+      expect(creation_message).toBeDefined();
+      expect(creation_message.member_message_type).toBe(z.message.SystemMessageType.CONVERSATION_RESUME);
+      expect(creation_message.user().id).toBe('');
+    });
+
+    it('returns undefined if there are no participating users', () => {
+      conversation_et.participating_user_ets([]);
+      const creation_message = conversation_et._creation_message();
+      expect(creation_message).toBeUndefined();
+    });
+  });
+
+  describe('_increment_time_only', () => {
+    it('should update only to newer timestamps', () => {
+      expect(conversation_et._increment_time_only(first_timestamp, second_timestamp)).toBe(second_timestamp);
+      expect(conversation_et._increment_time_only(second_timestamp, first_timestamp)).toBeFalsy();
+      expect(conversation_et._increment_time_only(first_timestamp, first_timestamp)).toBeFalsy();
+    });
+  });
+
+  describe('subscribe_to_state_updates', () =>
+    it('creates subscribers to state updates', () => {
+      conversation_et.subscribe_to_state_updates();
+      conversation_et.archived_state(false);
+      conversation_et.cleared_timestamp(0);
+      conversation_et.last_event_timestamp(1467650148305);
+      conversation_et.last_read_timestamp(1467650148305);
+      conversation_et.muted_state(false);
+
+      expect(conversation_et.last_event_timestamp.getSubscriptionsCount()).toEqual(1);
+      expect(conversation_et.last_read_timestamp.getSubscriptionsCount()).toEqual(1);
+    })
+  );
+
+  describe('connection', () => {
+    it('updates the participating user IDs with the user ID of the other party', () => {
+      const connector_user_id = 'b43b376d-7b5a-4d77-89be-81a02892db8c';
+
+      // @formatter:off
+      /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
+      const payload_connection = {"status":"sent","conversation":"15a7f358-8eba-4b8e-bcf2-61a08eb53349","to":`${connector_user_id}`,"from":"616cbbeb-1360-4e17-b333-e000662257bd","last_update":"2017-05-10T11:34:18.396Z","message":" "};
+      const payload_conversation = {"access":["private"],"creator":"616cbbeb-1360-4e17-b333-e000662257bd","members":{"self":{"hidden_ref":null,"status":0,"last_read":"1.800122000a73cb62","muted_time":null,"service":null,"otr_muted_ref":null,"muted":null,"status_time":"2017-05-10T11:34:18.376Z","hidden":false,"status_ref":"0.0","id":"616cbbeb-1360-4e17-b333-e000662257bd","otr_archived":false,"cleared":null,"otr_muted":false,"otr_archived_ref":null,"archived":null},"others":[]},"name":"Marco","id":"15a7f358-8eba-4b8e-bcf2-61a08eb53349","type":3,"last_event_time":"2017-05-10T11:34:18.376Z","last_event":"2.800122000a73cb63"};
+      /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
+      // @formatter:on
+
+      const user_connection_mapper = new z.user.UserConnectionMapper();
+      const connection_et = user_connection_mapper.map_user_connection_from_json(payload_connection);
+
+      const conversation_mapper = new z.conversation.ConversationMapper();
+      const new_conversation = conversation_mapper._create_conversation_et(payload_conversation);
+      new_conversation.connection(connection_et);
+
+      expect(new_conversation.participating_user_ids().length).toBe(1);
+      expect(new_conversation.participating_user_ids()[0]).toBe(connector_user_id);
     });
   });
 });

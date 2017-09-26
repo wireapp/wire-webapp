@@ -25,7 +25,7 @@ window.z.message = z.message || {};
 z.message.MessageCategorization = (function() {
 
   const _check_text = function(event) {
-    if (event.type === z.event.Backend.CONVERSATION.MESSAGE_ADD) {
+    if (event.type === z.event.Client.CONVERSATION.MESSAGE_ADD) {
       let category = z.message.MessageCategory.TEXT;
 
       if (event.data.previews && event.data.previews.length > 0) {
@@ -37,7 +37,7 @@ z.message.MessageCategorization = (function() {
   };
 
   const _check_asset = function(event) {
-    if (event.type === z.event.Backend.CONVERSATION.ASSET_ADD) {
+    if (event.type === z.event.Client.CONVERSATION.ASSET_ADD) {
       if (event.data.info.tag === undefined) {
         return z.message.MessageCategory.FILE;
       }
@@ -53,7 +53,7 @@ z.message.MessageCategorization = (function() {
   };
 
   const _check_ping = function(event) {
-    if (event.type === z.event.Backend.CONVERSATION.KNOCK) {
+    if (event.type === z.event.Client.CONVERSATION.KNOCK) {
       return z.message.MessageCategory.KNOCK;
     }
   };

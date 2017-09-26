@@ -73,7 +73,7 @@ z.util.DebugUtil = class DebugUtil {
     const debug_information = {event};
 
     return this.conversation_repository
-      .get_conversation_by_id_async(event.conversation)
+      .get_conversation_by_id(event.conversation)
       .then((conversation_et) => {
         debug_information.conversation = conversation_et;
         return this.user_repository.get_user_by_id(event.from);

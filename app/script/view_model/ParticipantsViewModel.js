@@ -25,8 +25,8 @@ window.z.ViewModel = z.ViewModel || {};
 z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   static get STATE() {
     return {
+      ADD_PEOPLE: 'add_people',
       PARTICIPANTS: 'participants',
-      SEARCH: 'search',
     };
   }
 
@@ -133,16 +133,9 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
       const user_ets = this.is_team() ? this.team_users() : this.user_repository.connected_users();
 
       return user_ets
-        .filter((user_et) => {
-          for (const conversation_participant of this.participants()) {
-            if (user_et.id === conversation_participant.id) {
-              return false;
-            }
-          }
-          return true;
-        })
+        .filter((user_et) => !this.participants().find((participant) => user_et.id === participant.id))
         .sort((user_a, user_b) => z.util.StringUtil.sort_by_priority(user_a.first_name(), user_b.first_name()));
-    }, this, {deferEvaluation: true});
+    });
 
     const shortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.ADD_PEOPLE);
     this.add_people_tooltip = z.l10n.text(z.string.tooltip_people_add, shortcut);
@@ -184,13 +177,15 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
         this.render_participants(true);
       }
 
-      if (add_people) {
+      if (add_people && !this.conversation().is_guest()) {
         if (!this.participants_bubble.is_visible()) {
-          this.participants_bubble.show();
-          return this.add_people();
+          return this.participants_bubble.show()
+            .then(() => this.add_people());
         }
 
-        if ((this.state() === ParticipantsViewModel.STATE.SEARCH) || (this.confirm_dialog && this.confirm_dialog.is_visible())) {
+        const is_adding_people = this.state() === ParticipantsViewModel.STATE.ADD_PEOPLE;
+        const is_confirming = this.confirm_dialog && this.confirm_dialog.is_visible();
+        if (is_adding_people || is_confirming) {
           return this.participants_bubble.hide();
         }
 
@@ -226,7 +221,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   }
 
   add_people() {
-    this.state(ParticipantsViewModel.STATE.SEARCH);
+    this.state(ParticipantsViewModel.STATE.ADD_PEOPLE);
     $('.participants-search').addClass('participants-search-show');
   }
 
@@ -235,9 +230,8 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
     this.confirm_dialog = $('#participants').confirm({
       confirm: () => {
-        const next_conversation_et = this.conversation_repository.get_next_conversation(this.conversation());
         this.participants_bubble.hide();
-        this.conversation_repository.leave_conversation(this.conversation(), next_conversation_et);
+        this.conversation_repository.remove_member(this.conversation(), this.user_repository.self().id);
       },
       template: '#template-confirm-leave',
     });
@@ -257,9 +251,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   }
 
   on_search_add() {
-    let user_ids = this.user_selected().map((user_et) => user_et.id);
-    this.participants_bubble.hide();
-
+    const user_ids = this.user_selected().map((user_et) => user_et.id);
     if (this.conversation().is_group()) {
       this.conversation_repository.add_members(this.conversation(), user_ids)
         .then(() => {
@@ -269,9 +261,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
           });
         });
     } else {
-      user_ids = user_ids.concat(this.user_profile().id);
-
-      this.conversation_repository.create_new_conversation(user_ids, null)
+      this.conversation_repository.create_new_conversation(user_ids.concat(this.user_profile().id), null)
         .then(function({conversation_et}) {
           amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.CREATE_GROUP_CONVERSATION, {
             creationContext: 'addedToOneToOne',
@@ -281,6 +271,8 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
           amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversation_et);
         });
     }
+
+    this.participants_bubble.hide();
   }
 
   on_search_close() {
@@ -288,7 +280,6 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   }
 
   close() {
-    this.user_profile(this.placeholder_participant);
     this.reset_view();
   }
 

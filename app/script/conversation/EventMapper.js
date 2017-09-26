@@ -79,15 +79,6 @@ z.conversation.EventMapper = class EventMapper {
     let message_et;
 
     switch (event.type) {
-      case z.event.Backend.CONVERSATION.ASSET_ADD:
-        message_et = this._map_event_asset_add(event, should_create_dummy_image);
-        break;
-      case z.event.Backend.CONVERSATION.KNOCK:
-        message_et = this._map_event_ping(event);
-        break;
-      case z.event.Backend.CONVERSATION.MESSAGE_ADD:
-        message_et = this._map_event_message_add(event);
-        break;
       case z.event.Backend.CONVERSATION.MEMBER_JOIN:
         message_et = this._map_event_member_join(event, conversation_et);
         break;
@@ -95,39 +86,43 @@ z.conversation.EventMapper = class EventMapper {
       case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE:
         message_et = this._map_event_member_leave(event);
         break;
-      case z.event.Backend.CONVERSATION.MEMBER_UPDATE:
-        message_et = this._map_event_member_update(event);
-        break;
-      case z.event.Client.CONVERSATION.MISSED_MESSAGES:
-        message_et = this._map_event_missed_messages();
-        break;
       case z.event.Backend.CONVERSATION.RENAME:
         message_et = this._map_event_rename(event);
         break;
-      case z.event.Backend.CONVERSATION.VOICE_CHANNEL_ACTIVATE:
-        message_et = this._map_event_voice_channel_activate();
-        break;
-      case z.event.Backend.CONVERSATION.VOICE_CHANNEL_DEACTIVATE:
-        message_et = this._map_event_voice_channel_deactivate(event);
-        break;
-      case z.event.Client.CONVERSATION.ASSET_META:
-        message_et = this._map_event_asset_meta(event);
+      case z.event.Client.CONVERSATION.ASSET_ADD:
+        message_et = this._map_event_asset_add(event, should_create_dummy_image);
         break;
       case z.event.Client.CONVERSATION.DELETE_EVERYWHERE:
         message_et = this._map_event_delete_everywhere(event);
         break;
+      case z.event.Client.CONVERSATION.KNOCK:
+        message_et = this._map_event_ping(event);
+        break;
       case z.event.Client.CONVERSATION.LOCATION:
         message_et = this._map_event_location(event);
         break;
-      case z.event.Client.CONVERSATION.VERIFICATION:
-        message_et = this._map_event_verification(event);
+      case z.event.Client.CONVERSATION.MESSAGE_ADD:
+        message_et = this._map_event_message_add(event);
+        break;
+      case z.event.Client.CONVERSATION.MISSED_MESSAGES:
+        message_et = this._map_event_missed_messages();
         break;
       case z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT:
       case z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG:
         message_et = this._map_event_unable_to_decrypt(event);
         break;
+      case z.event.Client.CONVERSATION.VERIFICATION:
+        message_et = this._map_event_verification(event);
+        break;
+      case z.event.Client.CONVERSATION.VOICE_CHANNEL_ACTIVATE:
+        message_et = this._map_event_voice_channel_activate();
+        break;
+      case z.event.Client.CONVERSATION.VOICE_CHANNEL_DEACTIVATE:
+        message_et = this._map_event_voice_channel_deactivate(event);
+        break;
       default:
-        message_et = this._map_event_ignored();
+        this.logger.warn(`Ignored unhandled event '${event.id}' of type '${event.type}'`);
+        return message_et;
     }
 
     message_et.category = event.category;
@@ -200,16 +195,6 @@ z.conversation.EventMapper = class EventMapper {
     return message_et;
   }
 
-  /**
-   * Maps JSON data of other message types currently ignored into message entity
-   * @private
-   * @returns {SystemMessage} System message entity
-   */
-  _map_event_ignored() {
-    const message_et = new z.entity.SystemMessage();
-    message_et.visible(false);
-    return message_et;
-  }
   /**
    * Maps JSON data of conversation.location message into message entity
    *
@@ -471,28 +456,25 @@ z.conversation.EventMapper = class EventMapper {
    */
   _map_asset_link_preview(link_preview) {
     if (link_preview) {
-      const link_preview_et = new z.entity.LinkPreview();
-      const {image, permanent_url, summary, title, url, url_offset, meta_data} = link_preview;
-      const {image: article_image, title: article_title, summary: article_summary, permanent_url: article_permanent_url} = link_preview.article || {};
+      const {image, title, url, meta_data} = link_preview;
+      const {image: article_image, title: article_title} = link_preview.article || {};
 
-      link_preview_et.title = title || article_title;
-      link_preview_et.summary = summary || article_summary;
-      link_preview_et.permanent_url = permanent_url || article_permanent_url;
-      link_preview_et.original_url = url;
-      link_preview_et.url_offset = url_offset;
+      const link_preview_et = new z.entity.LinkPreview(title || article_title, url);
       link_preview_et.meta_data_type = meta_data;
       link_preview_et.meta_data = link_preview[meta_data];
 
       const preview_image = image || article_image;
-
       if (preview_image) {
-        const {asset_token, asset_id} = preview_image.uploaded;
-        let {otr_key, sha256} = preview_image.uploaded;
+        const {asset_token, asset_id: asset_key} = preview_image.uploaded;
 
-        otr_key = new Uint8Array(otr_key.toArrayBuffer());
-        sha256 = new Uint8Array(sha256.toArrayBuffer());
+        if (asset_key) {
+          let {otr_key, sha256} = preview_image.uploaded;
 
-        link_preview_et.image_resource(z.assets.AssetRemoteData.v3(asset_id, otr_key, sha256, asset_token, true));
+          otr_key = new Uint8Array(otr_key.toArrayBuffer());
+          sha256 = new Uint8Array(sha256.toArrayBuffer());
+
+          link_preview_et.image_resource(z.assets.AssetRemoteData.v3(asset_key, otr_key, sha256, asset_token, true));
+        }
       }
 
       return link_preview_et;

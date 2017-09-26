@@ -23,41 +23,47 @@ window.z = window.z || {};
 window.z.event = z.event || {};
 
 z.event.EventError = class EventError extends Error {
-  constructor(type) {
+  constructor(type, message) {
     super();
 
     this.name = this.constructor.name;
     this.stack = (new Error()).stack;
     this.type = type || EventError.TYPE.UNKNOWN;
 
-    switch (this.type) {
-      case EventError.TYPE.DATABASE_FAILURE:
-        this.message = 'Event related database transaction failure';
-        break;
-      case EventError.TYPE.DEPRECATED_SCHEMA:
-        this.message = 'Event type is deprecated';
-        break;
-      case EventError.TYPE.NO_CLIENT_ID:
-        this.message = 'Missing client id';
-        break;
-      case EventError.TYPE.NO_LAST_DATE:
-        this.message = 'Last event date not found in storage';
-        break;
-      case EventError.TYPE.NO_LAST_ID:
-        this.message = 'Last notification ID not found in storage';
-        break;
-      case EventError.TYPE.NO_NOTIFICATIONS:
-        this.message = 'No notifications found';
-        break;
-      case EventError.TYPE.OUTDATED_E_CALL_EVENT:
-        this.message = 'Ignoring outdated e-call event';
-        break;
-      case EventError.TYPE.REQUEST_FAILURE:
-        this.message = 'Event related backend request failure';
-        break;
-      default:
-        this.message = 'Unknown EventError';
-
+    if (message) {
+      this.message = message;
+    } else {
+      switch (this.type) {
+        case EventError.TYPE.DATABASE_FAILURE:
+          this.message = 'Event related database transaction failure';
+          break;
+        case EventError.TYPE.DEPRECATED_SCHEMA:
+          this.message = 'Event type is deprecated';
+          break;
+        case EventError.TYPE.NO_CLIENT_ID:
+          this.message = 'Missing client id';
+          break;
+        case EventError.TYPE.NO_LAST_DATE:
+          this.message = 'Last event date not found in storage';
+          break;
+        case EventError.TYPE.NO_LAST_ID:
+          this.message = 'Last notification ID not found in storage';
+          break;
+        case EventError.TYPE.NO_NOTIFICATIONS:
+          this.message = 'No notifications found';
+          break;
+        case EventError.TYPE.OUTDATED_E_CALL_EVENT:
+          this.message = 'Ignoring outdated e-call event';
+          break;
+        case EventError.TYPE.REQUEST_FAILURE:
+          this.message = 'Event related backend request failure';
+          break;
+        case EventError.TYPE.VALIDATION_FAILED:
+          this.message = 'Event failed validation';
+          break;
+        default:
+          this.message = 'Unknown EventError';
+      }
     }
   }
 
@@ -71,6 +77,7 @@ z.event.EventError = class EventError extends Error {
       NO_NOTIFICATIONS: 'z.event.EventError.TYPE.NO_NOTIFICATIONS',
       OUTDATED_E_CALL_EVENT: 'z.event.EventError.OUTDATED_E_CALL_EVENT',
       REQUEST_FAILURE: 'z.event.EventError.TYPE.REQUEST_FAILURE',
+      VALIDATION_FAILED: 'z.event.EventError.TYPE.VALIDATION_FAILED',
     };
   }
 };

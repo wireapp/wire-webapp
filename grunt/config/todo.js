@@ -61,7 +61,7 @@ module.exports = {
   },
 
   src: [
-    '<%= dir.app_ %>/**/*.js',
+    '<%= dir.app.script %>/**/*.js',
     '<%= dir.app.style %>/**/*.less',
     '<%= dir.test_ %>/**/*.js',
   ],

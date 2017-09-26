@@ -25,7 +25,7 @@ window.z.components = z.components || {};
 z.components.UserListMode = {
   COMPACT: 'compact',
   DEFAULT: 'default',
-  INFO: 'info',
+  OTHERS: 'others',
 };
 
 z.components.UserListViewModel = class UserListViewModel {
@@ -151,7 +151,7 @@ ko.components.register('user-list', {
               <!-- /ko -->
             </div>
           </div>
-          <!-- ko if: $data.is_guest() -->
+          <!-- ko if: $parent.mode !== z.components.UserListMode.OTHERS && $data.is_guest() -->
             <div class="search-list-item-guest-indicator" data-uie-name="status-guest">
               <div class="search-list-item-guest-indicator-badge" data-bind="l10n_text: z.string.conversation_guest_indicator"></div>
             </div>

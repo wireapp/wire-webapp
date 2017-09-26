@@ -17,6 +17,7 @@
  *
  */
 
+/* eslint-disable no-undef */
 'use strict';
 
 window.z = window.z || {};
@@ -24,32 +25,32 @@ window.z.tracking = z.tracking || {};
 
 z.tracking.EventTrackingRepository = class EventTrackingRepository {
   static get CONFIG() {
+    const MIXPANEL_TOKEN = z.util.Environment.frontend.is_production() ? 'c7dcb15893f14932b1c31b5fb33ff669' : '537da3b3bc07df1e420d07e2921a6f6f';
     const RAYGUN_API_KEY = z.util.Environment.frontend.is_production() ? 'lAkLCPLx3ysnsXktajeHmw==' : '5hvAMmz8wTXaHBYqu2TFUQ==';
-    const LOCALYTICS_APP_KEY = z.util.Environment.frontend.is_production() ? 'f19c50ccf7bff11992798f0-59fac3b8-ad88-11e6-ff9e-00ae30fe7875' : '905792736c9f17c3464fd4e-60d90c82-d14a-11e4-af66-009c5fda0a25';
 
     return {
-      ERROR_REPORTING_THRESHOLD: 60 * 1000, // in milliseconds
-      LOCALYTICS: {
-        APP_KEY: LOCALYTICS_APP_KEY,
+      ERROR_TRACKING: {
+        API_KEY: RAYGUN_API_KEY,
+        REPORTING_THRESHOLD: 60 * 1000, // milliseconds
+      },
+      USER_TRACKING: {
+        API_KEY: MIXPANEL_TOKEN,
+        CLIENT_TYPE: 'desktop',
         DISABLED_DOMAINS: [
           'localhost',
           'zinfra.io',
         ],
-        SESSION_INTERVAL: 60 * 1000, // milliseconds
-        SESSION_TIMEOUT: 3 * 60 * 1000,
-      },
-      RAYGUN: {
-        API_KEY: RAYGUN_API_KEY,
+        SUPPORTED_EVENTS: [
+          z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION,
+          z.tracking.EventName.TRACKING.OPT_IN,
+          z.tracking.EventName.TRACKING.OPT_OUT,
+        ],
       },
     };
   }
 
   /**
    * Construct a new repository for user actions and errors reporting.
-   *
-   * @note Uses Localytics and Raygun.
-   * @see https://support.localytics.com/Javascript
-   * @see http://docs.localytics.com/#Dev/Instrument/js-tag-events.html
    *
    * @param {z.conversation.ConversationRepository} conversation_repository - Repository that handles conversations
    * @param {z.user.UserRepository} user_repository - Repository that handles users
@@ -62,9 +63,11 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     this.user_repository = user_repository;
 
     this.last_report = undefined;
-    this.localytics = undefined;
+    this.mixpanel = undefined;
     this.privacy_preference = false;
-    this.session_interval = undefined;
+
+    this.is_error_tracking_activated = false;
+    this.is_user_tracking_activated = false;
 
     if (!this.conversation_repository && !this.user_repository) {
       this.init_without_user_tracking();
@@ -80,181 +83,168 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
    */
   init(privacy_preference) {
     this.privacy_preference = privacy_preference;
-    this.logger.info('Initialize tracking and error reporting', this.privacy_preference);
+    this.logger.info(`Initialize tracking and error reporting: ${this.privacy_preference}`);
 
-    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.PRIVACY, this.updated_privacy.bind(this));
-
-    if (!this._localytics_disabled() && this.privacy_preference) {
-      this._enable_error_reporting();
-      if (!this.localytics) {
-        this._init_localytics();
-      }
-      this.set_custom_dimension(z.tracking.CustomDimension.CONTACTS, this.user_repository.connected_users().length);
-      this._subscribe_to_events();
-    }
+    return Promise.resolve()
+      .then(() => {
+        if (this._is_domain_allowed_for_tracking() && this.privacy_preference) {
+          this._enable_error_reporting();
+          return this._init_tracking();
+        }
+        return undefined;
+      })
+      .then((mixpanel_instance) => {
+        if (mixpanel_instance) {
+          this.mixpanel = mixpanel_instance;
+          this._subscribe_to_tracking_events();
+          this._set_super_properties();
+        }
+        amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.PRIVACY, this._update_privacy_preference.bind(this));
+      });
   }
 
   /**
-   * Init the repository without user.
+   * Initialize the repository without user tracking but with error reporting (used for "auth" page).
    * @note Mode for auth page
    * @returns {undefined} No return value
    */
   init_without_user_tracking() {
     this._enable_error_reporting();
-
-    if (!this._localytics_disabled()) {
-      if (!this.localytics) {
-        this._init_localytics();
-      }
-      this.set_custom_dimension(z.tracking.CustomDimension.CONTACTS, -1);
-      amplify.subscribe(z.event.WebApp.ANALYTICS.EVENT, this.tag_event.bind(this));
-    }
   }
 
-  updated_privacy(privacy_preference) {
+  _update_privacy_preference(privacy_preference) {
     if (privacy_preference !== this.privacy_preference) {
       this.privacy_preference = privacy_preference;
 
       if (privacy_preference) {
         this._enable_error_reporting();
-        if (!this._localytics_disabled()) {
-          this.start_session();
-          this.set_custom_dimension(z.tracking.CustomDimension.CONTACTS, this.user_repository.connected_users().length);
-          this._subscribe_to_events();
-          this.tag_event(z.tracking.EventName.TRACKING.OPT_IN);
+        if (this._is_domain_allowed_for_tracking()) {
+          this._re_enable_tracking();
         }
       } else {
-        if (!this._localytics_disabled()) {
-          amplify.unsubscribeAll(z.event.WebApp.ANALYTICS.CUSTOM_DIMENSION);
-          amplify.unsubscribeAll(z.event.WebApp.ANALYTICS.EVENT);
-          this.tag_event(z.tracking.EventName.TRACKING.OPT_OUT);
-          this._disable_localytics();
-        }
         this._disable_error_reporting();
+        this._disable_tracking();
       }
     }
   }
 
-  _subscribe_to_events() {
-    amplify.subscribe(z.event.WebApp.ANALYTICS.CLOSE_SESSION, this.close_session.bind(this));
-    amplify.subscribe(z.event.WebApp.ANALYTICS.CUSTOM_DIMENSION, this.set_custom_dimension.bind(this));
-    amplify.subscribe(z.event.WebApp.ANALYTICS.EVENT, this.tag_event.bind(this));
-    amplify.subscribe(z.event.WebApp.ANALYTICS.START_SESSION, this.start_session.bind(this));
+  _subscribe_to_tracking_events() {
+    amplify.subscribe(z.event.WebApp.ANALYTICS.SUPER_PROPERTY, this, (...args) => {
+      if (this.is_user_tracking_activated) {
+        this._set_super_property(...args);
+      }
+    });
+
+    amplify.subscribe(z.event.WebApp.ANALYTICS.EVENT, this, (...args) => {
+      if (this.is_user_tracking_activated) {
+        this._track_event(...args);
+      }
+    });
+
+    amplify.subscribe(z.event.WebApp.LIFECYCLE.SIGNED_OUT, this._reset_super_properties.bind(this));
   }
 
-  _unsubscribe_from_events() {
-    amplify.unsubscribeAll(z.event.WebApp.ANALYTICS.CLOSE_SESSION);
-    amplify.unsubscribeAll(z.event.WebApp.ANALYTICS.CUSTOM_DIMENSION);
+  /**
+   * Calling the reset method will clear the Distinct Id and all super properties.
+   * @see https://mixpanel.com/blog/2015/09/21/community-tip-maintaining-user-identity/
+   * @returns {undefined}
+   */
+  _reset_super_properties() {
+    if (this.mixpanel) {
+      this.mixpanel.reset();
+    }
+  }
+
+  _unsubscribe_from_tracking_events() {
+    amplify.unsubscribeAll(z.event.WebApp.ANALYTICS.SUPER_PROPERTY);
     amplify.unsubscribeAll(z.event.WebApp.ANALYTICS.EVENT);
-    amplify.unsubscribeAll(z.event.WebApp.ANALYTICS.START_SESSION);
   }
 
+  _set_super_properties() {
+    this._set_super_property(z.tracking.SuperProperty.APP, EventTrackingRepository.CONFIG.USER_TRACKING.CLIENT_TYPE);
+    this._set_super_property(z.tracking.SuperProperty.CONTACTS, this.user_repository.number_of_contacts());
+    this._set_super_property(z.tracking.SuperProperty.DESKTOP_APP, z.tracking.helpers.get_platform());
+  }
 
-  //##############################################################################
-  // Localytics
-  //##############################################################################
+  _set_super_property(super_property, value) {
+    this.logger.info(`Set super property '${super_property}' to value '${value}'`);
+    const super_properties = {};
+    super_properties[super_property] = value;
+    this.mixpanel.register(super_properties);
+  }
 
-  close_session() {
-    if (this.localytics && this.privacy_preference) {
-      this.logger.info('Closing Localytics session');
+  _track_event(event_name, attributes) {
+    if (attributes) {
+      this.logger.info(`Tracking event '${event_name}' with attributes: ${JSON.stringify(attributes)}`);
+    } else {
+      this.logger.info(`Tracking event '${event_name}' without attributes`);
+    }
 
-      if (this.session_interval) {
-        window.clearInterval(this.session_interval);
-        this.session_interval = undefined;
-      }
-
-      this.localytics('upload');
-      this.localytics('close');
+    if (EventTrackingRepository.CONFIG.USER_TRACKING.SUPPORTED_EVENTS.includes(event_name)) {
+      this.mixpanel.track(event_name, attributes);
     }
   }
 
-  set_custom_dimension(custom_dimension, value) {
-    if (this.localytics) {
-      this.logger.info(`Set Localytics custom dimension '${custom_dimension}' to value '${value}'`);
-      this.localytics('setCustomDimension', custom_dimension, value);
+  _disable_tracking() {
+    this.logger.debug('Tracking was disabled due to user preferences');
+    this.is_user_tracking_activated = false;
+
+    this._unsubscribe_from_tracking_events();
+    this._track_event(z.tracking.EventName.TRACKING.OPT_OUT);
+
+    if (this.mixpanel) {
+      this.mixpanel.register({
+        '$ignore': true,
+      });
     }
   }
 
-  start_session() {
-    if (this.privacy_preference && !this.session_interval) {
-      if (!this.localytics) {
-        this._init_localytics();
-      }
+  _re_enable_tracking() {
+    this.is_user_tracking_activated = true;
+    this.mixpanel.unregister('$ignore');
+    this._subscribe_to_tracking_events();
 
-      this.logger.info('Starting new Localytics session');
-      this.localytics('open');
-      this.localytics('upload');
-      this.session_interval = window.setInterval(this.upload_session, EventTrackingRepository.CONFIG.LOCALYTICS.SESSION_INTERVAL);
-    }
+    this._set_super_properties();
+    this._track_event(z.tracking.EventName.TRACKING.OPT_IN);
   }
 
-  tag_event(event_name, attributes) {
-    if (this.localytics) {
-      if (attributes) {
-        this.logger.info(`Localytics event '${event_name}' with attributes: ${JSON.stringify(attributes)}`);
+  _init_tracking() {
+    this.is_user_tracking_activated = true;
+
+    return new Promise((resolve) => {
+      if (!this.mixpanel) {
+        mixpanel.init(EventTrackingRepository.CONFIG.USER_TRACKING.API_KEY, {
+          autotrack: false,
+          debug: !z.util.Environment.frontend.is_production(),
+          loaded: (mixpanel) => {
+            mixpanel.register({
+              '$city': null,
+              '$initial_referrer': null,
+              '$initial_referring_domain': null,
+              '$referrer': null,
+              '$referring_domain': null,
+              '$region': null,
+            });
+            resolve(mixpanel);
+          },
+        }, Date.now());
       } else {
-        this.logger.info(`Localytics event '${event_name}' without attributes`);
+        resolve(this.mixpanel);
       }
-
-      this.localytics('tagEvent', event_name, attributes);
-    }
+    });
   }
 
-  upload_session() {
-    if (this.localytics) {
-      this.localytics('upload');
-    }
-  }
-
-  _disable_localytics() {
-    if (this.localytics) {
-      this.localytics('close');
-      window.ll = undefined;
-      this.localytics = undefined;
-      this.logger.debug('Localytics reporting was disabled due to user preferences');
-    }
-  }
-
-  // @see http://docs.localytics.com/#Dev/Integrate/web-options.html
-  _init_localytics() {
-    let element_node;
-    const options = {
-      appVersion: z.util.Environment.version(),
-      customDimensions: [z.tracking.helpers.get_platform()],
-    };
-
-    this.localytics = function() {
-      /* eslint-disable id-length */
-      this.localytics.t = new Date();
-      this.localytics.q = this.localytics.q || [];
-      this.localytics.q.push(arguments);
-      /* eslint-enable id-length */
-    };
-
-    window.ll = this.localytics;
-    window.LocalyticsGlobal = 'll';
-
-    const script_element = document.createElement('script');
-    script_element.src = 'https://web.localytics.com/v3/localytics.min.js';
-
-    (element_node = document.getElementsByTagName('script')[0]).parentNode.insertBefore(script_element, element_node);
-
-    this.localytics('init', EventTrackingRepository.CONFIG.LOCALYTICS.APP_KEY, options);
-    this.logger.debug('Localytics reporting is enabled');
-  }
-
-  _localytics_disabled() {
-    if (!z.util.get_url_parameter(z.auth.URLParameter.LOCALYTICS)) {
-      for (const domain of EventTrackingRepository.CONFIG.LOCALYTICS.DISABLED_DOMAINS) {
+  _is_domain_allowed_for_tracking() {
+    if (!z.util.get_url_parameter(z.auth.URLParameter.TRACKING)) {
+      for (const domain of EventTrackingRepository.CONFIG.USER_TRACKING.DISABLED_DOMAINS) {
         if (z.util.StringUtil.includes(window.location.hostname, domain)) {
-          this.logger.debug('Localytics reporting is disabled due to domain');
-
-          return true;
+          this.logger.debug(`Tracking is disabled for domain '${window.location.hostname}'`);
+          return false;
         }
       }
     }
 
-    return false;
+    return true;
   }
 
 
@@ -299,14 +289,12 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   _check_error_payload(raygun_payload) {
     if (!this.last_report) {
       this.last_report = Date.now();
-
       return raygun_payload;
     }
 
     const time_since_last_report = Date.now() - this.last_report;
-    if (time_since_last_report > EventTrackingRepository.CONFIG.ERROR_REPORTING_THRESHOLD) {
+    if (time_since_last_report > EventTrackingRepository.CONFIG.ERROR_TRACKING.REPORTING_THRESHOLD) {
       this.last_report = Date.now();
-
       return raygun_payload;
     }
 
@@ -319,13 +307,16 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
   _disable_error_reporting() {
     this.logger.debug('Disabling Raygun error reporting');
+    this.is_error_tracking_activated = false;
     Raygun.detach();
-    Raygun.init(EventTrackingRepository.CONFIG.RAYGUN.API_KEY, {disableErrorTracking: true});
+    Raygun.init(EventTrackingRepository.CONFIG.ERROR_TRACKING.API_KEY, {disableErrorTracking: true});
     this._detach_promise_rejection_handler();
   }
 
   _enable_error_reporting() {
     this.logger.debug('Enabling Raygun error reporting');
+    this.is_error_tracking_activated = true;
+
     const options = {
       disableErrorTracking: false,
       excludedHostnames: [
@@ -339,7 +330,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
     options.debugMode = !z.util.Environment.frontend.is_production();
 
-    Raygun.init(EventTrackingRepository.CONFIG.RAYGUN.API_KEY, options).attach();
+    Raygun.init(EventTrackingRepository.CONFIG.ERROR_TRACKING.API_KEY, options).attach();
 
     /*
     Adding a version to the Raygun reports to identify which version of the Wire ran into the issue.

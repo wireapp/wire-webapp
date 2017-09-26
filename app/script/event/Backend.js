@@ -24,20 +24,15 @@ window.z.event = z.event || {};
 
 z.event.Backend = {
   CONVERSATION: {
-    ASSET_ADD: 'conversation.asset-add',
     CONNECT_REQUEST: 'conversation.connect-request',
     CREATE: 'conversation.create',
-    KNOCK: 'conversation.knock',
     MEMBER_JOIN: 'conversation.member-join',
     MEMBER_LEAVE: 'conversation.member-leave',
     MEMBER_UPDATE: 'conversation.member-update',
-    MESSAGE_ADD: 'conversation.message-add',
     OTR_ASSET_ADD: 'conversation.otr-asset-add',
     OTR_MESSAGE_ADD: 'conversation.otr-message-add',
     RENAME: 'conversation.rename',
     TYPING: 'conversation.typing',
-    VOICE_CHANNEL_ACTIVATE: 'conversation.voice-channel-activate',
-    VOICE_CHANNEL_DEACTIVATE: 'conversation.voice-channel-deactivate',
   },
   TEAM: {
     CONVERSATION_CREATE: 'team.conversation-create',

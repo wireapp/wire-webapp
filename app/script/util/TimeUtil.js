@@ -20,23 +20,11 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.telemetry = z.telemetry || {};
-window.z.telemetry.calling = z.telemetry.calling || {};
+window.z.util = z.util || {};
 
-z.telemetry.calling.VideoStreamStats = class VideoStreamStats extends z.telemetry.calling.MediaStreamStats {
-  /**
-   * Construct a new VideoStream stats report.
-   * @param {Date} timestamp - Creation date
-   * @returns {VideoStreamStats} The new VideoStream stats entity
-   */
-  constructor(timestamp) {
-    super(timestamp);
-    this.media_type = z.media.MediaType.VIDEO;
-    this.frame_height_received = 0;
-    this.frame_height_sent = 0;
-    this.frame_rate_received = 0;
-    this.frame_rate_sent = 0;
-    this.frame_width_received = 0;
-    this.frame_width_sent = 0;
-  }
+z.util.TimeUtil = {
+  adjust_current_timestamp: function(time_offset) {
+    time_offset = _.isNumber(time_offset) ? time_offset : 0;
+    return Date.now() - time_offset;
+  },
 };

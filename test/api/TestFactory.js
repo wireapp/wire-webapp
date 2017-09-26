@@ -412,17 +412,17 @@ window.TestFactory.prototype.exposeTrackingActors = function() {
 
 /**
  *
- * @returns {Promise<z.announce.AnnounceRepository>} The repository for announcements.
+ * @returns {Promise<z.lifecycle.LifecycleRepository>} The lifecycle repository.
  */
-window.TestFactory.prototype.exposeAnnounceActors = function() {
-  this.logger.info('- exposeAnnounceActors');
+window.TestFactory.prototype.exposeLifecycleActors = function() {
+  this.logger.info('- exposeLifecycleActors');
   return Promise.resolve()
     .then(() => {
-      TestFactory.announce_service = new z.announce.AnnounceService();
-      TestFactory.announce_service.logger.level = this.settings.logging_level;
+      TestFactory.lifecycle_service = new z.lifecycle.LifecycleService();
+      TestFactory.lifecycle_service.logger.level = this.settings.logging_level;
 
-      TestFactory.announce_repository = new z.announce.AnnounceRepository(TestFactory.announce_service);
-      TestFactory.announce_repository.logger.level = this.settings.logging_level;
-      return TestFactory.announce_repository;
+      TestFactory.lifecycle_repository = new z.lifecycle.LifecycleRepository(TestFactory.lifecycle_service);
+      TestFactory.lifecycle_repository.logger.level = this.settings.logging_level;
+      return TestFactory.lifecycle_repository;
     });
 };

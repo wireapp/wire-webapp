@@ -87,16 +87,11 @@ z.calling.entities.Flow = class Flow {
 
     this.connection_state.subscribe((ice_connection_state) => {
       switch (ice_connection_state) {
-        case z.calling.rtc.ICE_CONNECTION_STATE.CHECKING: {
-          this.telemetry.schedule_check(this.call_et.telemetry.media_type, this.is_answer());
-          break;
-        }
-
         case z.calling.rtc.ICE_CONNECTION_STATE.COMPLETED:
         case z.calling.rtc.ICE_CONNECTION_STATE.CONNECTED: {
           this._clear_negotiation_timeout();
           this.negotiation_mode(z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT);
-          this.telemetry.start_statistics();
+          this.telemetry.time_step(z.telemetry.calling.CallSetupSteps.ICE_CONNECTION_CONNECTED);
 
           this.call_et.is_connected(true);
           this.participant_et.is_connected(true);
@@ -128,6 +123,7 @@ z.calling.entities.Flow = class Flow {
           break;
         }
 
+        case z.calling.rtc.ICE_CONNECTION_STATE.CHECKING:
         default: {
           break;
         }
@@ -271,11 +267,6 @@ z.calling.entities.Flow = class Flow {
       if (can_create) {
         this._create_sdp_offer();
       }
-    });
-
-    this.offer_to_receive_video = ko.pureComputed(() => {
-      const is_sending_video = this.self_state.video_send() || this.self_state.screen_send();
-      return !is_sending_video;
     });
   }
 
@@ -885,7 +876,6 @@ z.calling.entities.Flow = class Flow {
      */
     const offer_options = {
       iceRestart: restart,
-      offerToReceiveVideo: this.offer_to_receive_video() ? true : undefined,
       voiceActivityDetection: true,
     };
 
@@ -1326,21 +1316,22 @@ z.calling.entities.Flow = class Flow {
    * @returns {undefined} No return value
     */
   reset_flow() {
-    this.clear_timeouts();
-    this.telemetry.reset_statistics();
-
-    this.logger.debug(`Resetting flow with user '${this.remote_user.id}'`);
-    this.remote_client_id = undefined;
-
     if (this.media_stream()) {
       this._remove_media_stream(this.media_stream());
     }
 
-    this._close_data_channel();
-    this._close_peer_connection();
-    this._reset_signaling_states();
-    this._reset_sdp();
-    this.pc_initialized(false);
+    if (this.pc_initialized()) {
+      this.logger.debug(`Resetting flow with user '${this.remote_user.id}'`);
+      this.remote_client_id = undefined;
+      this.telemetry.disconnected();
+
+      this.clear_timeouts();
+      this._close_data_channel();
+      this._close_peer_connection();
+      this._reset_signaling_states();
+      this._reset_sdp();
+      this.pc_initialized(false);
+    }
   }
 
   /**

@@ -151,13 +151,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
       return this.switch_content(z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS);
     }
 
-    let conversation_promise;
-    if (conversation.id) {
-      conversation_promise = Promise.resolve(conversation);
-    } else {
-      conversation_promise = this.conversation_repository.get_conversation_by_id_async(conversation);
-    }
-
+    const conversation_promise = conversation.id ? Promise.resolve(conversation) : this.conversation_repository.get_conversation_by_id(conversation);
     conversation_promise
       .then((conversation_et) => {
         const is_active_conversation = conversation_et && conversation_et === this.conversation_repository.active_conversation();

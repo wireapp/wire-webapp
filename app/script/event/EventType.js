@@ -20,12 +20,11 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.conversation = z.conversation || {};
+window.z.event = z.event || {};
 
-z.conversation.ConversationUpdateType = {
-  ARCHIVED_TIMESTAMP: 'archived_timestamp',
-  CLEARED_TIMESTAMP: 'cleared_timestamp',
-  LAST_EVENT_TIMESTAMP: 'last_event_timestamp',
-  LAST_READ_TIMESTAMP: 'last_read_timestamp',
-  MUTED_TIMESTAMP: 'muted_timestamp',
+z.event.EVENT_TYPE = {
+  CALL: 'call',
+  CONVERSATION: 'conversation',
+  TEAM: 'team',
+  USER: 'user',
 };

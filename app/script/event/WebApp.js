@@ -25,11 +25,9 @@ window.z.event = z.event || {};
 // Enum of different webapp events.
 z.event.WebApp = {
   ANALYTICS: {
-    CLOSE_SESSION: 'wire.webapp.analytics.close_session',
-    CUSTOM_DIMENSION: 'wire.webapp.analytics.custom_dimension',
     EVENT: 'wire.webapp.analytics.event',
     INIT: 'wire.webapp.analytics.init',
-    START_SESSION: 'wire.webapp.analytics.start_session',
+    SUPER_PROPERTY: 'wire.webapp.analytics.super_property',
   },
   APP: {
     UPDATE_PROGRESS: 'wire.webapp.app.update_progress',
@@ -100,7 +98,6 @@ z.event.WebApp = {
     INPUT: {
       CLICK: 'wire.webapp.conversation.input.click',
     },
-    LOADED_STATES: 'wire.webapp.conversation.loaded_states',
     MAP_CONNECTION: 'wire.webapp.conversation.map_connection',
     MESSAGE: {
       ADDED: 'wire.webapp.conversation.message.added',
@@ -121,6 +118,7 @@ z.event.WebApp = {
   EVENT: {
     INJECT: 'wire.webapp.event.inject',
     NOTIFICATION_HANDLING_STATE: 'wire.webapp.event.notification_handling',
+    UPDATE_TIME_OFFSET: 'wire.webapp.event.update_time_offset',
   },
   EXTENSIONS: {
     GIPHY: {

@@ -37,18 +37,22 @@ z.components.LinkPreviewAssetComponent = class LinkPreviewAssetComponent {
 
     this.preview = this.message_et.get_first_asset().previews()[0];
     this.element = component_info.element;
-    this.url = this.preview.original_url;
 
     const is_type_tweet = this.preview.meta_data_type === z.links.LinkPreviewMetaDataType.TWEET;
-    this.is_tweet = is_type_tweet && z.util.ValidationUtil.urls.is_tweet(this.url);
+    this.is_tweet = is_type_tweet && z.util.ValidationUtil.urls.is_tweet(this.preview.url);
     this.author = this.is_tweet ? this.preview.meta_data.author.substring(0, 20) : '';
 
     this.on_link_preview_click = this.on_link_preview_click.bind(this);
-    this.element.addEventListener('click', this.on_link_preview_click);
+
+    if (!this.message_et.is_expired()) {
+      this.element.addEventListener('click', this.on_link_preview_click);
+    }
   }
 
   on_link_preview_click() {
-    z.util.safe_window_open(this.url);
+    if (!this.message_et.is_expired()) {
+      z.util.safe_window_open(this.preview.url);
+    }
   }
 
   dispose() {
@@ -74,14 +78,14 @@ ko.components.register('link-preview-asset', {
         <!-- /ko -->
         <!-- ko if: is_tweet -->
           <div class="link-preview-info-title" data-uie-name="link-preview-title" data-bind="text: preview.title, css: header ? 'link-preview-info-title-singleline' : 'link-preview-info-title-multiline'"></div>
-          <div class="link-preview-info-link text-graphite" data-uie-name="link-preview-tweet-author" data-bind="attr: {title: url}">
+          <div class="link-preview-info-link text-graphite" data-uie-name="link-preview-tweet-author" data-bind="attr: {title: preview.url}">
             <span class="font-weight-bold link-preview-info-title-singleline" data-bind="text: author"></span>
             <span data-bind="l10n_text: z.string.conversation_tweet_author"></span>
           </div>
         <!-- /ko -->
         <!-- ko ifnot: is_tweet -->
           <div class="link-preview-info-title" data-uie-name="link-preview-title" data-bind="text: preview.title, css: header ? 'link-preview-info-title-singleline' : 'link-preview-info-title-multiline'"></div>
-          <div class="link-preview-info-link text-graphite ellipsis" data-uie-name="link-preview-url" data-bind="text: z.util.naked_url(url), attr: {title: url}"></div>
+          <div class="link-preview-info-link text-graphite ellipsis" data-uie-name="link-preview-url" data-bind="text: z.util.naked_url(preview.url), attr: {title: preview.url}"></div>
         <!-- /ko -->
       </div>
     <!-- /ko -->
@@ -90,8 +94,8 @@ ko.components.register('link-preview-asset', {
         <div class="link-preview-image-placeholder icon-link bg-color-ephemeral text-white"></div>
       </div>
       <div class="link-preview-info">
-        <div class="link-preview-info-title ephemeral-message-obfuscated" data-bind="text: z.util.StringUtil.obfuscate(preview.title), css: header ? 'link-preview-info-title-singleline' : 'link-preview-info-title-multiline'"></div>
-        <div class="link-preview-info-link ephemeral-message-obfuscated ellipsis" data-bind="text: z.util.StringUtil.obfuscate(url)"></div>
+        <div class="link-preview-info-title ephemeral-message-obfuscated" data-bind="text: preview.title, css: header ? 'link-preview-info-title-singleline' : 'link-preview-info-title-multiline'"></div>
+        <div class="link-preview-info-link ephemeral-message-obfuscated ellipsis" data-bind="text: preview.url"></div>
       </div>
     <!-- /ko -->
   `,

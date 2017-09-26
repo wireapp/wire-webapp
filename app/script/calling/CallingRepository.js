@@ -76,6 +76,8 @@ z.calling.CallingRepository = class CallingRepository {
       }
     });
 
+    this.time_offset = 0;
+
     this.calling_config = undefined;
     this.calling_config_timeout = undefined;
 
@@ -131,6 +133,7 @@ z.calling.CallingRepository = class CallingRepository {
     amplify.subscribe(z.event.WebApp.CALL.STATE.PARTICIPANT_LEFT, this.participant_left.bind(this));
     amplify.subscribe(z.event.WebApp.CALL.STATE.TOGGLE, this.toggle_state.bind(this));
     amplify.subscribe(z.event.WebApp.DEBUG.UPDATE_LAST_CALL_STATUS, this.store_flow_status.bind(this));
+    amplify.subscribe(z.event.WebApp.EVENT.UPDATE_TIME_OFFSET, this.update_time_offset.bind(this));
     amplify.subscribe(z.event.WebApp.LIFECYCLE.LOADED, this.get_config);
     amplify.subscribe(z.util.Logger.prototype.LOG_ON_DEBUG, this.set_debug_state.bind(this));
   }
@@ -151,19 +154,28 @@ z.calling.CallingRepository = class CallingRepository {
     const {content: event_content, time: event_date, type: event_type} = event;
     const is_call = event_type === z.event.Client.CALL.E_CALL;
 
+    this.logger.info(`»» Call Event: '${event_type}' (Source: ${source})`, {event_json: JSON.stringify(event), event_object: event});
+
     if (is_call) {
       const is_supported_version = event_content.version === z.calling.entities.CallMessage.CONFIG.VERSION;
-
       if (!is_supported_version) {
         throw new z.calling.CallError(z.calling.CallError.TYPE.UNSUPPORTED_VERSION);
       }
-      const call_message_et = z.calling.CallMessageMapper.map_event(event);
 
+      const call_message_et = z.calling.CallMessageMapper.map_event(event);
       this._log_message(false, call_message_et, event_date);
-      if (z.calling.CallingRepository.supports_calling) {
-        return this._on_call_event_in_supported_browsers(call_message_et, source);
-      }
-      this._on_call_event_in_unsupported_browsers(call_message_et, source);
+
+      this._validate_message_type(call_message_et)
+        .then((conversation_et) => {
+          const is_backend_timestamp = source !== z.event.EventRepository.SOURCE.INJECTED;
+          conversation_et.update_timestamp_server(call_message_et.time, is_backend_timestamp);
+        })
+        .then(() => {
+          if (z.calling.CallingRepository.supports_calling) {
+            return this._on_call_event_in_supported_browsers(call_message_et, source);
+          }
+          this._on_call_event_in_unsupported_browsers(call_message_et, source);
+        });
     }
   }
 
@@ -176,45 +188,42 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {undefined} No return value
    */
   _on_call_event_in_supported_browsers(call_message_et, source) {
-    const {type: message_type} = call_message_et;
+    const message_type = call_message_et.type;
 
-    this._validate_message_type(call_message_et)
-      .then(() => {
-        switch (message_type) {
-          case z.calling.enum.CALL_MESSAGE_TYPE.CANCEL:
-            this._on_cancel(call_message_et, source);
-            break;
-          case z.calling.enum.CALL_MESSAGE_TYPE.GROUP_CHECK:
-            this._on_group_check(call_message_et, source);
-            break;
-          case z.calling.enum.CALL_MESSAGE_TYPE.GROUP_LEAVE:
-            this._on_group_leave(call_message_et);
-            break;
-          case z.calling.enum.CALL_MESSAGE_TYPE.GROUP_SETUP:
-            this._on_group_setup(call_message_et);
-            break;
-          case z.calling.enum.CALL_MESSAGE_TYPE.GROUP_START:
-            this._on_group_start(call_message_et, source);
-            break;
-          case z.calling.enum.CALL_MESSAGE_TYPE.HANGUP:
-            this._on_hangup(call_message_et);
-            break;
-          case z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC:
-            this._on_prop_sync(call_message_et);
-            break;
-          case z.calling.enum.CALL_MESSAGE_TYPE.REJECT:
-            this._on_reject(call_message_et);
-            break;
-          case z.calling.enum.CALL_MESSAGE_TYPE.SETUP:
-            this._on_setup(call_message_et, source);
-            break;
-          case z.calling.enum.CALL_MESSAGE_TYPE.UPDATE:
-            this._on_update(call_message_et);
-            break;
-          default:
-            this.logger.warn(`Call event of unknown type '${message_type}' was ignored`, call_message_et);
-        }
-      });
+    switch (message_type) {
+      case z.calling.enum.CALL_MESSAGE_TYPE.CANCEL:
+        this._on_cancel(call_message_et, source);
+        break;
+      case z.calling.enum.CALL_MESSAGE_TYPE.GROUP_CHECK:
+        this._on_group_check(call_message_et, source);
+        break;
+      case z.calling.enum.CALL_MESSAGE_TYPE.GROUP_LEAVE:
+        this._on_group_leave(call_message_et);
+        break;
+      case z.calling.enum.CALL_MESSAGE_TYPE.GROUP_SETUP:
+        this._on_group_setup(call_message_et);
+        break;
+      case z.calling.enum.CALL_MESSAGE_TYPE.GROUP_START:
+        this._on_group_start(call_message_et, source);
+        break;
+      case z.calling.enum.CALL_MESSAGE_TYPE.HANGUP:
+        this._on_hangup(call_message_et);
+        break;
+      case z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC:
+        this._on_prop_sync(call_message_et);
+        break;
+      case z.calling.enum.CALL_MESSAGE_TYPE.REJECT:
+        this._on_reject(call_message_et);
+        break;
+      case z.calling.enum.CALL_MESSAGE_TYPE.SETUP:
+        this._on_setup(call_message_et, source);
+        break;
+      case z.calling.enum.CALL_MESSAGE_TYPE.UPDATE:
+        this._on_update(call_message_et);
+        break;
+      default:
+        this.logger.warn(`Call event of unknown type '${message_type}' was ignored`, call_message_et);
+    }
   }
 
   /**
@@ -579,7 +588,7 @@ z.calling.CallingRepository = class CallingRepository {
   _validate_message_type(call_message_et) {
     const {conversation_id, type} = call_message_et;
 
-    return this.conversation_repository.get_conversation_by_id_async(conversation_id)
+    return this.conversation_repository.get_conversation_by_id(conversation_id)
       .then((conversation_et) => {
         if (conversation_et.is_one2one()) {
           const group_message_types = [
@@ -603,6 +612,8 @@ z.calling.CallingRepository = class CallingRepository {
         } else {
           throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_CONVERSATION_TYPE);
         }
+
+        return conversation_et;
       });
   }
 
@@ -963,7 +974,7 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {Promise} Resolves when conversation supports calling
    */
   _check_calling_support(conversation_id, call_state) {
-    return this.conversation_repository.get_conversation_by_id_async(conversation_id)
+    return this.conversation_repository.get_conversation_by_id(conversation_id)
       .then(({participating_user_ids}) => {
         if (!participating_user_ids().length) {
           amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALL_EMPTY_CONVERSATION);
@@ -1028,7 +1039,7 @@ z.calling.CallingRepository = class CallingRepository {
 
     return this.get_call_by_id(conversation_id)
       .catch(() => {
-        return this.conversation_repository.get_conversation_by_id_async(conversation_id)
+        return this.conversation_repository.get_conversation_by_id(conversation_id)
           .then((conversation_et) => {
             const call_et = new z.calling.entities.Call(conversation_et, creating_user_et, session_id, this);
 
@@ -1125,13 +1136,21 @@ z.calling.CallingRepository = class CallingRepository {
    * Inject a call deactivate event.
    * @param {CallMessage} call_message_et - Call message to create event from
    * @param {z.event.EventRepository.SOURCE} source - Source of event
-   * @param {z.entity.User} [creating_user_et] - User that created call
    * @param {z.calling.enum.TERMINATION_REASON} [reason] - Reason for call to end
    * @returns {undefined} No return value
    */
-  inject_deactivate_event(call_message_et, source, creating_user_et, reason) {
-    const deactivate_event = z.conversation.EventBuilder.build_voice_channel_deactivate(call_message_et, creating_user_et, reason);
+  inject_deactivate_event(call_message_et, source, reason) {
+    const deactivate_event = z.conversation.EventBuilder.build_voice_channel_deactivate(call_message_et, reason, this.time_offset);
     amplify.publish(z.event.WebApp.EVENT.INJECT, deactivate_event, source);
+  }
+
+  /**
+   * Update time offset.
+   * @param {number} time_offset - Approximate time different to backend in milliseconds
+   * @returns {undefined} No return value
+   */
+  update_time_offset(time_offset) {
+    this.time_offset = time_offset;
   }
 
 

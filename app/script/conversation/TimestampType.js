@@ -20,19 +20,13 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.telemetry = z.telemetry || {};
-window.z.telemetry.calling = z.telemetry.calling || {};
+window.z.conversation = z.conversation || {};
 
-z.telemetry.calling.AudioStreamStats = class AudioStreamStats extends z.telemetry.calling.MediaStreamStats {
-  /**
-   * Construct a new AudioStream stats report.
-   * @param {Date} timestamp - Creation date
-   * @returns {AudioStreamStats} The new AudioStream stats entity
-   */
-  constructor(timestamp) {
-    super(timestamp);
-    this.media_type = z.media.MediaType.AUDIO;
-    this.volume_received = 0;
-    this.volume_sent = 0;
-  }
+z.conversation.TIMESTAMP_TYPE = {
+  ARCHIVED: 'z.conversation.TIMESTAMP_TYPE.ARCHIVED',
+  CLEARED: 'z.conversation.TIMESTAMP_TYPE.CLEARED',
+  LAST_EVENT: 'z.conversation.TIMESTAMP_TYPE.LAST_EVENT',
+  LAST_READ: 'z.conversation.TIMESTAMP_TYPE.LAST_READ',
+  LAST_SERVER: 'z.conversation.TIMESTAMP_TYPE.LAST_SERVER',
+  MUTED: 'z.conversation.TIMESTAMP_TYPE.MUTED',
 };

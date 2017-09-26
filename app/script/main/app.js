@@ -25,6 +25,9 @@ window.z.main = z.main || {};
 z.main.App = class App {
   static get CONFIG() {
     return {
+      COOKIES_CHECK: {
+        COOKIE_NAME: 'cookies_enabled',
+      },
       IMMEDIATE_SIGN_OUT_REASONS: [
         z.auth.SIGN_OUT_REASON.ACCOUNT_DELETED,
         z.auth.SIGN_OUT_REASON.SESSION_EXPIRED,
@@ -75,10 +78,10 @@ z.main.App = class App {
   _setup_repositories() {
     const repositories = {};
 
-    repositories.announce            = new z.announce.AnnounceRepository(this.service.announce);
     repositories.audio               = this.auth.audio;
     repositories.cache               = new z.cache.CacheRepository();
     repositories.giphy               = new z.extension.GiphyRepository(this.service.giphy);
+    repositories.lifecycle            = new z.lifecycle.LifecycleRepository(this.service.lifecycle);
     repositories.media               = new z.media.MediaRepository();
     repositories.storage             = new z.storage.StorageRepository(this.service.storage);
 
@@ -125,6 +128,7 @@ z.main.App = class App {
     services.connect_google = new z.connect.ConnectGoogleService(this.auth.client);
     services.cryptography   = new z.cryptography.CryptographyService(this.auth.client);
     services.giphy          = new z.extension.GiphyService(this.auth.client);
+    services.lifecycle       = new z.lifecycle.LifecycleService();
     services.search         = new z.search.SearchService(this.auth.client);
     services.storage        = new z.storage.StorageService();
     services.team           = new z.team.TeamService(this.auth.client);
@@ -134,7 +138,6 @@ z.main.App = class App {
 
     services.client         = new z.client.ClientService(this.auth.client, services.storage);
     services.notification   = new z.event.NotificationService(this.auth.client, services.storage);
-    services.announce       = new z.announce.AnnounceService();
 
     if (z.util.Environment.browser.edge) {
       services.conversation = new z.conversation.ConversationServiceNoCompound(this.auth.client, services.storage);
@@ -291,7 +294,7 @@ z.main.App = class App {
       })
       .then(() => {
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.UPDATED_CONVERSATIONS);
-        this.repository.announce.init();
+        this.repository.lifecycle.init();
         this.repository.audio.init(true);
         this.repository.client.cleanup_clients_and_sessions(true);
         this.repository.conversation.cleanup_conversations();
@@ -306,7 +309,7 @@ z.main.App = class App {
    */
   init_service_worker() {
     if (navigator.serviceWorker) {
-      navigator.serviceWorker.register('/sw.js')
+      navigator.serviceWorker.register(`/sw.js?${z.util.Environment.version(false)}`)
         .then(({scope}) => this.logger.info(`ServiceWorker registration successful with scope: ${scope}`));
     }
   }
@@ -462,9 +465,6 @@ z.main.App = class App {
    * @returns {undefined} Not return value
    */
   _handle_url_params() {
-    // TODO: remove in the next release
-    this.repository.conversation.use_v3_api = true;
-
     const bot_name = z.util.get_url_parameter(z.auth.URLParameter.BOT);
     if (bot_name) {
       this.logger.info(`Found bot token '${bot_name}'`);
@@ -492,8 +492,7 @@ z.main.App = class App {
     const is_redirect_from_auth = document.referrer.toLowerCase().includes('/auth');
     const get_cached_token = is_localhost || is_redirect_from_auth;
 
-    const token_promise = get_cached_token ? this.auth.repository.get_cached_access_token() : this.auth.repository.get_access_token();
-    return token_promise;
+    return get_cached_token ? this.auth.repository.get_cached_access_token() : this.auth.repository.get_access_token();
   }
 
   /**
@@ -575,7 +574,6 @@ z.main.App = class App {
     const _logout = () => {
       // Disconnect from our backend, end tracking and clear cached data
       this.repository.event.disconnect_web_socket(z.event.WebSocketService.CHANGE_TRIGGER.LOGOUT);
-      amplify.publish(z.event.WebApp.ANALYTICS.CLOSE_SESSION);
 
       // Clear Local Storage (but don't delete the cookie label if you were logged in with a permanent client)
       const do_not_delete = [z.storage.StorageKey.AUTH.SHOW_LOGIN];
@@ -643,7 +641,7 @@ z.main.App = class App {
     if (z.util.Environment.desktop) {
       amplify.publish(z.event.WebApp.LIFECYCLE.RESTART, this.update_source);
     }
-    if (this.update_source === z.announce.UPDATE_SOURCE.WEBAPP) {
+    if (this.update_source === z.lifecycle.UPDATE_SOURCE.WEBAPP) {
       window.location.reload(true);
       window.focus();
     }
@@ -651,7 +649,7 @@ z.main.App = class App {
 
   /**
    * Notify about found update
-   * @param {z.announce.UPDATE_SOURCE} update_source - Update source
+   * @param {z.lifecycle.UPDATE_SOURCE} update_source - Update source
    * @returns {undefined} No return value
    */
   update(update_source) {

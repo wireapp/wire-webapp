@@ -28,6 +28,6 @@ z.auth.URLParameter = {
   ENVIRONMENT: 'env',
   INVITE: 'invite',
   LOCALE: 'hl',
-  LOCALYTICS: 'localytics',
   REASON: 'reason',
+  TRACKING: 'tracking',
 };

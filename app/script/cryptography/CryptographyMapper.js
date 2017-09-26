@@ -160,7 +160,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
 
     return {
       data,
-      type: z.event.Backend.CONVERSATION.ASSET_ADD,
+      type: z.event.Client.CONVERSATION.ASSET_ADD,
     };
   }
 
@@ -283,7 +283,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
         otr_key: new Uint8Array(image.otr_key !== null ? image.otr_key.toArrayBuffer() : []),
         sha256: new Uint8Array(image.sha256 !== null ? image.sha256.toArrayBuffer() : []),
       },
-      type: z.event.Backend.CONVERSATION.ASSET_ADD,
+      type: z.event.Client.CONVERSATION.ASSET_ADD,
     };
   }
 
@@ -292,7 +292,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
       data: {
         nonce: event_id,
       },
-      type: z.event.Backend.CONVERSATION.KNOCK,
+      type: z.event.Client.CONVERSATION.KNOCK,
     };
   }
 
@@ -338,7 +338,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
         nonce: event_id,
         previews: text.link_preview.map((preview) => preview.encode64()),
       },
-      type: z.event.Backend.CONVERSATION.MESSAGE_ADD,
+      type: z.event.Client.CONVERSATION.MESSAGE_ADD,
     };
   }
 };

@@ -23,17 +23,20 @@ window.z = window.z || {};
 window.z.entity = z.entity || {};
 
 z.entity.LinkPreview = class LinkPreview {
-  constructor() {
+  constructor(title, url) {
+    this.title = title || '';
+    this.url = url || '';
 
-    this.original_url = '';
-    this.permanent_url = '';
-    this.summary = '';
-    this.title = '';
-    this.url_offset = 0;
-
-    // z.assets.AssetRemoteData
     this.image_resource = ko.observable();
+    this.meta_data = undefined;
+    this.meta_data_type = undefined;
+  }
 
+  obfuscate() {
+    this.title = z.util.StringUtil.obfuscate(this.title);
+    this.url = z.util.StringUtil.obfuscate(this.url);
+
+    this.image_resource(undefined);
     this.meta_data = undefined;
     this.meta_data_type = undefined;
   }

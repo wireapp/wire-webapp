@@ -20,18 +20,33 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.telemetry = z.telemetry || {};
-window.z.telemetry.calling = z.telemetry.calling || {};
+window.z.lifecycle = z.lifecycle || {};
 
-z.telemetry.calling.StreamStats = class StreamStats extends z.telemetry.calling.Stats {
-  /**
-   * Construct a new stream stats report.
-   * @param {Date} timestamp - Creation date
-   * @returns {StreamStats} The new stream stats entity
-   */
-  constructor(timestamp) {
-    super(timestamp);
-    this.local_candidate_type = '';
-    this.remote_candidate_type = '';
+z.lifecycle.LifecycleService = class LifecycleService {
+  static get CONFIG() {
+    return {
+      URL: {
+        VERSION: 'version/',
+      },
+    };
+  }
+
+  constructor() {
+    this.logger = new z.util.Logger('z.lifecycle.LifecycleService', z.config.LOGGER.OPTIONS);
+  }
+
+  get_version() {
+    return this._fetch_data(LifecycleService.CONFIG.URL.VERSION)
+      .then(({version}) => version);
+  }
+
+  _fetch_data(url) {
+    return fetch(url)
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw new Error(`Failed to fetch '${url}': ${response.statusText}`);
+      });
   }
 };

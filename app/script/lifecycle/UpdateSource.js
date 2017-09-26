@@ -20,21 +20,13 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.telemetry = z.telemetry || {};
-window.z.telemetry.calling = z.telemetry.calling || {};
+window.z.lifecycle = z.lifecycle || {};
 
-z.telemetry.calling.ConnectionStats = class ConnectionStats {
-  /**
-   * Construct a new connection stats report.
-   * @returns {ConnectionStats} The new Connection stats entity
-   */
-  constructor() {
-    this.timestamp = Date.now();
-    this.connected = undefined;
-
-    this.audio = new z.telemetry.calling.AudioStreamStats(this.timestamp);
-    this.peer_connection = new z.telemetry.calling.StreamStats(this.timestamp);
-    this.video = new z.telemetry.calling.VideoStreamStats(this.timestamp);
-    return this;
-  }
+z.lifecycle.UPDATE_SOURCE = {
+  DESKTOP: 'desktop',
+  WEBAPP: 'webapp',
 };
+
+// Add backward compatibility until update of wrapper >3.1
+window.z.announce = z.announce || {};
+z.announce.UPDATE_SOURCE = z.lifecycle.UPDATE_SOURCE;
