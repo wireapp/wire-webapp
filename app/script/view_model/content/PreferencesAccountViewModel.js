@@ -164,17 +164,20 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     }
 
     this.entered_username(entered_username);
-    this.user_repository.verify_username(entered_username)
-      .then(() => {
-        if (this.entered_username() === entered_username) {
-          this.username_error('available');
-        }
-      })
-      .catch((error) => {
-        if (error.type === z.user.UserError.TYPE.USERNAME_TAKEN && this.entered_username() === this.submitted_username()) {
-          return this.username_error('taken');
-        }
-      });
+
+    if (z.user.UserHandleGenerator.validate_handle(entered_username)) {
+      this.user_repository.verify_username(entered_username)
+        .then(() => {
+          if (this.entered_username() === entered_username) {
+            this.username_error('available');
+          }
+        })
+        .catch((error) => {
+          if (error.type === z.user.UserError.TYPE.USERNAME_TAKEN && this.entered_username() === entered_username) {
+            return this.username_error('taken');
+          }
+        });
+    }
   }
 
   check_new_clients() {
