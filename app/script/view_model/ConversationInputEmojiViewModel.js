@@ -152,19 +152,19 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
     this._init_subscriptions();
   }
 
-  on_input_key_down(data, event) {
-    const input = event.target;
+  on_input_key_down(data, keyboard_event) {
+    const input = keyboard_event.target;
 
     // Handling just entered inline emoji
-    switch (event.keyCode) {
-      case z.util.KEYCODE.SPACE:
+    switch (keyboard_event.key) {
+      case z.util.KeyboardUtil.KEY.SPACE:
         if (this._try_replace_inline_emoji(input)) {
           return false;
         }
         break;
-      case z.util.KEYCODE.TAB:
+      case z.util.KeyboardUtil.KEY.TAB:
         if (this._try_replace_inline_emoji(input)) {
-          event.preventDefault();
+          keyboard_event.preventDefault();
           return true;
         }
         break;
@@ -174,24 +174,24 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
 
     // Handling emoji popup
     if (this.emoji_div.is(':visible')) {
-      switch (event.keyCode) {
-        case z.util.KEYCODE.ESC:
+      switch (keyboard_event.key) {
+        case z.util.KeyboardUtil.KEY.ESC:
           this.remove_emoji_popup();
-          event.preventDefault();
+          keyboard_event.preventDefault();
           return true;
-        case z.util.KEYCODE.ARROW_UP:
-        case z.util.KEYCODE.ARROW_DOWN:
-          this._rotate_emoji_popup(event.keyCode === z.util.KEYCODE.ARROW_UP);
+        case z.util.KeyboardUtil.KEY.ARROW_UP:
+        case z.util.KeyboardUtil.KEY.ARROW_DOWN:
+          this._rotate_emoji_popup(z.util.KeyboardUtil.is_key(keyboard_event, z.util.KeyboardUtil.KEY.ARROW_UP));
           this.suppress_key_up = true;
-          event.preventDefault();
+          keyboard_event.preventDefault();
           return true;
-        case z.util.KEYCODE.ENTER:
-        case z.util.KEYCODE.TAB:
-          if (event.shiftKey && event.keyCode === z.util.KEYCODE.ENTER) {
+        case z.util.KeyboardUtil.KEY.ENTER:
+        case z.util.KeyboardUtil.KEY.TAB:
+          if (keyboard_event.shiftKey && z.util.KeyboardUtil.is_enter_key(keyboard_event)) {
             break;
           }
           this._enter_emoji_popup_line(input, this.emoji_div.find('.emoji.selected'));
-          event.preventDefault();
+          keyboard_event.preventDefault();
           return true;
         default:
           break;
@@ -199,20 +199,20 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
     }
 
     // Handling inline emoji in the whole text
-    if (event.keyCode === z.util.KEYCODE.ENTER) {
+    if (z.util.KeyboardUtil.is_enter_key(keyboard_event)) {
       this._replace_all_inline_emoji(input);
     }
 
     return false;
   }
 
-  on_input_key_up(data, event) {
+  on_input_key_up(data, keyboard_event) {
     if (this.suppress_key_up) {
       this.suppress_key_up = false;
       return true;
     }
 
-    const input = event.target;
+    const input = keyboard_event.target;
     const text = input.value || '';
     if (text[input.selectionStart - 1] === ':') {
       this.emoji_start_pos = input.selectionStart;
