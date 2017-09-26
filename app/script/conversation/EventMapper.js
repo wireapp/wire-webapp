@@ -62,7 +62,7 @@ z.conversation.EventMapper = class EventMapper {
     try {
       return this._map_json_event(event, conversation_et, should_create_dummy_image);
     } catch (error) {
-      this.logger.error(`Failed to map event: ${error.message}`, {error, event});
+      this.logger.error(`Failed to map event of type '${event.type}': ${error.message}`, {error, event});
       return undefined;
     }
   }

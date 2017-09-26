@@ -74,7 +74,6 @@ rules:
   ]
   sort-keys: [2, asc, {caseSensitive: true, natural: true}]
   sort-vars: 2
-  strict: [2, global]
   valid-jsdoc:
     - error
     -

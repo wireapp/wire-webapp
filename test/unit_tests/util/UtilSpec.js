@@ -262,6 +262,14 @@ describe('z.util.trim_file_extension', function() {
   it('does not remove .tar.gz when it is not the file extension', function() {
     expect(z.util.trim_file_extension('cool.tar.gz.jpg')).toEqual('cool.tar.gz');
   });
+
+  it('returns an empty string for undefined', function() {
+    expect(z.util.trim_file_extension(undefined)).toEqual('');
+  });
+
+  it('returns an empty string for an object', function() {
+    expect(z.util.trim_file_extension({})).toEqual('');
+  });
 });
 
 describe('z.util.ko_array_push_all', function() {
