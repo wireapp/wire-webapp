@@ -2912,9 +2912,15 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Promise that resolves with the message entity for the event
    */
   _add_event_to_conversation(json, conversation_et) {
-    return this._update_user_ets(this.event_mapper.map_json_event(json, conversation_et, true))
+    return Promise.resolve()
+      .then(() => this.event_mapper.map_json_event(json, conversation_et, true))
       .then((message_et) => {
-        if (conversation_et) {
+        if (message_et) {
+          return this._update_user_ets(message_et);
+        }
+      })
+      .then((message_et) => {
+        if (conversation_et && message_et) {
           conversation_et.add_message(message_et);
         }
 
