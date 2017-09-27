@@ -48,7 +48,7 @@ z.user.UserConnectionMapper = class UserConnectionMapper {
      */
     this.map_user_connections_from_json = function(data) {
       return data
-        .filter((connection) => connection !== undefined)
+        .filter((connection) => connection)
         .map((connection) => this.map_user_connection_from_json(connection));
     };
 
