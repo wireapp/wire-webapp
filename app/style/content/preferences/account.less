@@ -66,9 +66,16 @@
     color: #fff;
     font-size: @font-size-xl;
     pointer-events: none;
+    opacity: 0;
 
     &::before {
       text-shadow: 0 0 40px fade(#000, 80%);
+    }
+  }
+
+  &:hover {
+    > span {
+      opacity: 1;
     }
   }
 
