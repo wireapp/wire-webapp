@@ -34,7 +34,7 @@ z.util.KeyboardUtil = (() => {
     ENTER: 'Enter',
     ESC: 'Escape',
     KEY_V: 'v',
-    SPACE: '',
+    SPACE: ' ',
     TAB: 'Tab',
   };
 
