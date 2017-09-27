@@ -55,8 +55,8 @@ z.ViewModel.content.CollectionViewModel = class CollectionViewModel {
   added_to_view() {
     amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, this.item_added);
     amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.item_removed);
-    $(document).on('keydown.collection', (event) => {
-      if (event.keyCode === z.util.KEYCODE.ESC) {
+    $(document).on('keydown.collection', (keyboard_event) => {
+      if (z.util.KeyboardUtil.is_escape_key(keyboard_event)) {
         amplify.publish(z.event.WebApp.CONVERSATION.SHOW, this.conversation_et());
       }
     });
