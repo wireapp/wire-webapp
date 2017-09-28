@@ -874,17 +874,15 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     }
   }
 
-  clear_error(mode, event) {
-    const error_mode = event ? event.currentTarget.classList[1] : undefined || mode;
+  clear_error(mode, input_event) {
+    const error_mode = input_event ? input_event.currentTarget.classList[1] : undefined || mode;
     this._remove_error(error_mode);
   }
 
-  clear_error_password(view_model, keyboard_event) {
-    if (!z.util.KeyboardUtil.is_enter_key(keyboard_event)) {
-      this.failed_validation_password(false);
-      if (!keyboard_event.currentTarget.value.length || (keyboard_event.currentTarget.value.length >= 8)) {
-        this._remove_error(keyboard_event.currentTarget.classList[1]);
-      }
+  clear_error_password(view_model, input_event) {
+    this.failed_validation_password(false);
+    if (!input_event.currentTarget.value.length || (input_event.currentTarget.value.length >= 8)) {
+      this._remove_error(input_event.currentTarget.classList[1]);
     }
   }
   clicked_on_blocked_learn_more() {

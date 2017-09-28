@@ -108,8 +108,9 @@ z.util.KeyboardUtil = (() => {
     return keyboard_event.altKey || keyboard_event.ctrlKey || keyboard_event.metaKey || keyboard_event.shiftKey;
   };
 
-  const _is_key = (keyboard_event, expected_key = '') => {
-    return keyboard_event.key.toLowerCase() === expected_key.toLowerCase();
+  const _is_key = (keyboard_event = {}, expected_key = '') => {
+    const key = keyboard_event.key ? keyboard_event.key : '';
+    return key.toLowerCase() === expected_key.toLowerCase();
   };
 
   const _is_meta_key = (keyboard_event) => keyboard_event.metaKey || keyboard_event.ctrlKey;
