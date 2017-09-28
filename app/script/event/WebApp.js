@@ -26,7 +26,6 @@ window.z.event = z.event || {};
 z.event.WebApp = {
   ANALYTICS: {
     EVENT: 'wire.webapp.analytics.event',
-    INIT: 'wire.webapp.analytics.init',
     SUPER_PROPERTY: 'wire.webapp.analytics.super_property',
   },
   APP: {
