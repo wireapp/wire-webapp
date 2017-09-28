@@ -290,14 +290,14 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
   }
 
   _update_emoji_popup(input) {
-    const text = input.value;
+    const {selectionStart: selection, value: text} = input;
     if (!text) {
       return;
     }
 
-    const query = text.substr(this.emoji_start_pos, input.selectionStart - this.emoji_start_pos);
+    const query = text.substr(this.emoji_start_pos, selection - this.emoji_start_pos);
     if (!query.length) {
-      return this.emoji_div.remove();
+      return this._close_emoji_popup();
     }
 
     if (!this.emoji_list.length || query.startsWith(' ') || /\s{2,}/.test(query)) {
