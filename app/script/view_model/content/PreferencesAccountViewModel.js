@@ -112,8 +112,9 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     if (z.util.KeyboardUtil.is_key(keyboard_event, z.util.KeyboardUtil.KEY.BACKSPACE)) {
       return true;
     }
-    // Automation is missing key prop
-    return z.user.UserHandleGenerator.validate_character(keyboard_event.key.toLowerCase());
+    // Automation: KeyboardEvent triggered during tests is missing key property
+    const input_char = keyboard_event.key || String.fromCharCode(event.charCode);
+    return z.user.UserHandleGenerator.validate_character(input_char.toLowerCase());
   }
 
   click_on_username() {
