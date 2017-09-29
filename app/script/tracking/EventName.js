@@ -75,7 +75,7 @@ z.tracking.EventName = {
     SELECTED_MESSAGE: 'conversation.selected_message',
   },
   E2EE: {
-    CANNOT_DECRYPT_MESSAGE: 'e2ee.cannot_decrypt_message',
+    FAILED_MESSAGE_DECRYPTION: 'e2ee.failed_message_decryption',
   },
   FILE: {
     DOWNLOAD_FAILED: 'file.failed_file_download',
