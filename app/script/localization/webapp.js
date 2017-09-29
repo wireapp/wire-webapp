@@ -140,6 +140,9 @@ z.string.modal_button_send = 'Send';
 z.string.modal_block_conversation_headline = 'Block {{user}}?';
 z.string.modal_block_conversation_message = '{{user}} won’t be able to contact you or add you to group conversations.';
 z.string.modal_block_conversation_button = 'Block';
+// Bots unavailable
+z.string.modal_bots_unavailable_headline = 'Bots currently unavailable';
+z.string.modal_bots_unavailable_message = 'Thank you for your interest in bots. The service is currently suspended while we work on the next version. Stay tuned.';
 // Cannot create the call because there is nobody to call (conversation_empty)
 z.string.modal_call_conversation_empty_headline = 'No one to call';
 z.string.modal_call_conversation_empty_message = 'There is no one left here.';
