@@ -2008,7 +2008,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
   _account_verified(registration = true) {
     this.logger.info('User account verified. User can now login.');
     if (registration) {
-      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.REGISTRATION.SUCCEEDED, {content: this.registration_context});
+      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.REGISTRATION.SUCCEEDED, {context: this.registration_context});
     }
     this._authentication_successful();
   }
