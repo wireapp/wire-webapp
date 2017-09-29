@@ -60,7 +60,7 @@ z.util.PromiseQueue = class PromiseQueue {
   execute() {
     if (this._paused || this._blocked) return;
 
-    const queue_entry = this._queue[0];
+    const queue_entry = this._queue.shift();
     if (queue_entry) {
       this._clear_interval();
 
@@ -93,7 +93,6 @@ z.util.PromiseQueue = class PromiseQueue {
             this._blocked = false;
           }
 
-          this._queue.shift();
           window.setTimeout(() => this.execute(), 0);
         });
     }
@@ -110,13 +109,15 @@ z.util.PromiseQueue = class PromiseQueue {
   /**
    * Pause or resume the execution.
    * @param {boolean} [should_pause=true] - Pause queue
-   * @returns {undefined} No return value
+   * @returns {z.util.PromiseQueue} PromiseQueue
    */
   pause(should_pause = true) {
     this._paused = should_pause;
     if (this._paused === false) {
       this.execute();
     }
+
+    return this;
   }
 
   /**
@@ -145,6 +146,24 @@ z.util.PromiseQueue = class PromiseQueue {
     this._clear_interval();
     this._blocked = false;
     this.pause(false);
+  }
+
+  /**
+   * Queued function is executed.
+   * @param {Function} fn - Function to be executed in queue order
+   * @returns {Promise} Resolves when function was executed
+   */
+  unshift(fn) {
+    return new Promise((resolve, reject) => {
+      const queue_entry = {
+        fn: fn,
+        reject_fn: reject,
+        resolve_fn: resolve,
+      };
+
+      this._queue.unshift(queue_entry);
+      this.execute();
+    });
   }
 
   _clear_interval() {

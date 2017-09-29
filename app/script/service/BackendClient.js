@@ -234,6 +234,16 @@ z.service.BackendClient = class BackendClient {
     return this.request_queue.push(() => this._send_request(config));
   }
 
+  _prepend_request_queue(config, resolve_fn, reject_fn) {
+    this.request_queue
+      .pause()
+      .unshift(() => {
+        return this._send_request(config)
+          .then(resolve_fn)
+          .catch(reject_fn);
+      });
+  }
+
   /**
    * Send jQuery AJAX request.
    *
@@ -273,8 +283,8 @@ z.service.BackendClient = class BackendClient {
         .fail(({responseJSON: response, status: status_code, wire: wire_request}) => {
           switch (status_code) {
             case z.service.BackendClientError.STATUS_CODE.CONNECTIVITY_PROBLEM: {
-              this.request_queue.pause();
               this.queue_state(z.service.QUEUE_STATE.CONNECTIVITY_PROBLEM);
+              this._prepend_request_queue(config, resolve, reject);
 
               return this.execute_on_connectivity()
                 .then(() => this.execute_request_queue());
@@ -312,9 +322,10 @@ z.service.BackendClient = class BackendClient {
             }
 
             case z.service.BackendClientError.STATUS_CODE.UNAUTHORIZED: {
+              this._prepend_request_queue(config, resolve, reject);
+
               const trigger = z.auth.AuthRepository.ACCESS_TOKEN_TRIGGER.UNAUTHORIZED_REQUEST;
-              amplify.publish(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, trigger);
-              return;
+              return amplify.publish(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, trigger);
             }
 
             default: {
