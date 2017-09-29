@@ -41,6 +41,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
           'zinfra.io',
         ],
         SUPPORTED_EVENTS: [
+          z.tracking.EventName.ACCOUNT.LOGGED_IN,
           z.tracking.EventName.CALLING.ENDED_CALL,
           z.tracking.EventName.CALLING.ENDED_VIDEO_CALL,
           z.tracking.EventName.CALLING.ESTABLISHED_CALL,
