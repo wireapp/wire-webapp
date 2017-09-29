@@ -87,7 +87,7 @@ z.service.BackendClient = class BackendClient {
     this.connectivity_timeout = undefined;
     this.connectivity_queue = new z.util.PromiseQueue({name: 'BackendClient.Connectivity'});
 
-    this.request_queue = new z.util.PromiseQueue({name: 'BackendClient.Request'});
+    this.request_queue = new z.util.PromiseQueue({concurrent: 4, name: 'BackendClient.Request'});
     this.queue_state = ko.observable(z.service.QUEUE_STATE.READY);
 
     this.access_token = '';
@@ -212,7 +212,7 @@ z.service.BackendClient = class BackendClient {
   }
 
   /**
-   * Send or queue jQuery AJAX request.
+   * Queue jQuery AJAX request.
    * @see http://api.jquery.com/jquery.ajax/#jQuery-ajax-settings
    *
    * @param {Object} config - AJAX request configuration
@@ -228,22 +228,9 @@ z.service.BackendClient = class BackendClient {
    */
   send_request(config) {
     if (this.queue_state() !== z.service.QUEUE_STATE.READY) {
-      return this._push_to_request_queue(config, this.queue_state());
+      this.logger.info(`Adding '${config.type}' request to '${config.url}' to queue due to '${this.queue_state()}'`, config);
     }
 
-    return this._send_request(config);
-  }
-
-  /**
-   * Push a request to the queue
-   *
-   * @private
-   * @param {Object} config - Configuration for the AJAX request
-   * @param {string} reason - Reason for delayed execution of request
-   * @returns {Promise} Resolved when the request has been executed
-   */
-  _push_to_request_queue(config, reason = this.queue_state()) {
-    this.logger.info(`Adding '${config.type}' request to '${config.url}' to queue due to '${reason}'`, config);
     return this.request_queue.push(() => this._send_request(config));
   }
 

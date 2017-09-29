@@ -33,22 +33,24 @@ z.util.PromiseQueue = class PromiseQueue {
    * Construct a new Promise Queue.
    *
    * @param {Object} [options={}] - Initialization options
+   * @param {boolean} [options.concurrent=1] - Concurrent promise execution
    * @param {string} options.name - Name for Promise queue
    * @param {boolean} [options.paused=false] - Initial paused state
    * @param {number} [options.timeout=PromiseQueue.CONFIG.UNBLOCK_INTERVAL] - Timeout in ms
    * @returns {PromiseQueue} Process Promises sequentially
    */
   constructor(options = {}) {
-    const {name, paused = false, timeout = PromiseQueue.CONFIG.UNBLOCK_INTERVAL} = options;
+    const {concurrent = 1, name, paused = false, timeout = PromiseQueue.CONFIG.UNBLOCK_INTERVAL} = options;
 
     this.logger = new z.util.Logger((name ? `z.util.PromiseQueue (${name})` : 'z.util.PromiseQueue'), z.config.LOGGER.OPTIONS);
 
     this._blocked = false;
+    this._concurrent = concurrent;
+    this._current = 0;
     this._interval = undefined;
     this._paused = paused;
     this._queue = [];
     this._timeout = timeout;
-    return this;
   }
 
   /**
@@ -60,8 +62,12 @@ z.util.PromiseQueue = class PromiseQueue {
 
     const queue_entry = this._queue[0];
     if (queue_entry) {
-      this._blocked = true;
       this._clear_interval();
+
+      this._current = this._current + 1;
+      if (this._current >= this._concurrent) {
+        this._blocked = true;
+      }
 
       this._interval = window.setInterval(() => {
         if (!this._paused) {
@@ -81,7 +87,11 @@ z.util.PromiseQueue = class PromiseQueue {
           }
 
           this._clear_interval();
-          this._blocked = false;
+
+          this._current = this._current - 1;
+          if (this._current < this._concurrent) {
+            this._blocked = false;
+          }
 
           this._queue.shift();
           window.setTimeout(() => this.execute(), 0);
