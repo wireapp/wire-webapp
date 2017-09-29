@@ -54,13 +54,13 @@ describe('z.tracking.EventTrackingRepository', () => {
     it('allows changing initial tracking properties', (done) => {
       TestFactory.tracking_repository._track_event = jasmine.createSpy('_track_event');
 
-      expect(TestFactory.tracking_repository.is_error_tracking_activated).toBe(false);
-      expect(TestFactory.tracking_repository.is_user_tracking_activated).toBe(false);
+      expect(TestFactory.tracking_repository.is_error_reporting_activated).toBe(false);
+      expect(TestFactory.tracking_repository.is_user_analytics_activated).toBe(false);
 
       TestFactory.tracking_repository.init(true)
         .then(() => {
-          expect(TestFactory.tracking_repository.is_error_tracking_activated).toBe(true);
-          expect(TestFactory.tracking_repository.is_user_tracking_activated).toBe(true);
+          expect(TestFactory.tracking_repository.is_error_reporting_activated).toBe(true);
+          expect(TestFactory.tracking_repository.is_user_analytics_activated).toBe(true);
 
           amplify.publish(z.event.WebApp.ANALYTICS.EVENT, 'i_am_an_event');
           expect(TestFactory.tracking_repository._track_event).toHaveBeenCalledTimes(1);
@@ -130,7 +130,7 @@ describe('z.tracking.EventTrackingRepository', () => {
       expect(error_payload).toBe(false);
 
       jasmine.clock().mockDate(Date.now());
-      jasmine.clock().tick(z.tracking.EventTrackingRepository.CONFIG.ERROR_TRACKING.REPORTING_THRESHOLD * 2);
+      jasmine.clock().tick(z.tracking.EventTrackingRepository.CONFIG.ERROR_REPORTING.REPORTING_THRESHOLD * 2);
 
       error_payload = TestFactory.tracking_repository._check_error_payload(raygun_payload);
       expect(error_payload).toBe(raygun_payload);

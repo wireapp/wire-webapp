@@ -23,8 +23,8 @@ window.z = window.z || {};
 window.z.tracking = z.tracking || {};
 
 /**
- * Definition of events used for user-tracking with Localytics.
- * @returns {z.tracking.EventName} Localytics event names (defined by Business Intelligence Team)
+ * Definition of events used for user analytics.
+ * @returns {z.tracking.EventName} Event names (defined by Business Intelligence Team)
  */
 z.tracking.EventName = {
   ACCOUNT: {
@@ -59,6 +59,7 @@ z.tracking.EventName = {
   CONTACTS: {
     ENTERED_SEARCH: 'contacts.entered_search',
   },
+  CONTRIBUTED: 'contributed',
   CONVERSATION: {
     ADD_TO_GROUP_CONVERSATION: 'addContactToGroupConversation',
     CHARACTER_LIMIT_REACHED: 'conversation.character_limit_reached',
@@ -83,7 +84,6 @@ z.tracking.EventName = {
   },
   IMAGE_SENT_ERROR: 'Image Sent Error',
   MEDIA: {
-    COMPLETED_MEDIA_ACTION: 'contributed',
     PLAYED_AUDIO_MESSAGE: 'media.played_audio_message',
     PLAYED_VIDEO_MESSAGE: 'media.played_video_message',
   },
@@ -112,6 +112,8 @@ z.tracking.EventName = {
   },
   SETTINGS: {
     EDITED_USERNAME: 'settings.edited_username',
+    OPTED_IN_TRACKING: 'settings.opted_in_tracking',
+    OPTED_OUT_TRACKING: 'settings.opted_out_tracking',
     REMOVED_DEVICE: 'settings.removed_device',
     SET_USERNAME: 'settings.set_username',
     VIEWED_DEVICE: 'settings.viewed_device',
