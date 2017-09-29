@@ -50,6 +50,10 @@ z.bot.BotRepository = class BotRepository {
       .then(({conversation_et}) => {
         this.conversation_repository.add_bot(conversation_et, bot_result.provider, bot_result.service);
         amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversation_et);
+      })
+      .catch((error) => {
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.BOTS_UNAVAILABLE);
+        throw error;
       });
   }
 };
