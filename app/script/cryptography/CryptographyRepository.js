@@ -451,7 +451,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
   _report_decryption_failure(error, {data: event_data, from: user_id, type: event_type}) {
     const session_id = this._construct_session_id(user_id, event_data.sender);
 
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.E2EE.CANNOT_DECRYPT_MESSAGE, {cause: error.code || error.message});
+    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.E2EE.FAILED_MESSAGE_DECRYPTION, {cause: error.code || error.message});
 
     const custom_data = {
       client_local_class: this.current_client().class,

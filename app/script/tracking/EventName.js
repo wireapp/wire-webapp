@@ -34,13 +34,18 @@ z.tracking.EventName = {
   APP_LAUNCH: 'appLaunch',
   CALLING: {
     ENDED_CALL: 'calling.ended_call',
-    ESTABLISHED_CALL: 'calling.established_successful_call',
+    ENDED_VIDEO_CALL: 'calling.ended_video_call',
+    ESTABLISHED_CALL: 'calling.established_call',
+    ESTABLISHED_VIDEO_CALL: 'calling.established_video_call',
     FAILED_REQUEST: 'calling.failed_request',
     FAILED_REQUESTING_MEDIA: 'calling.failed_requesting_media',
     FAILED_RTC: 'calling.failed_rtc',
     INITIATED_CALL: 'calling.initiated_call',
+    INITIATED_VIDEO_CALL: 'calling.initiated_video_call',
     JOINED_CALL: 'calling.joined_call',
+    JOINED_VIDEO_CALL: 'calling.joined_video_call',
     RECEIVED_CALL: 'calling.received_call',
+    RECEIVED_VIDEO_CALL: 'calling.received_video_call',
     SHARED_SCREEN: 'calling.shared_screen',
   },
   COLLECTION: {
@@ -70,7 +75,7 @@ z.tracking.EventName = {
     SELECTED_MESSAGE: 'conversation.selected_message',
   },
   E2EE: {
-    CANNOT_DECRYPT_MESSAGE: 'e2ee.cannot_decrypt_message',
+    FAILED_MESSAGE_DECRYPTION: 'e2ee.failed_message_decryption',
   },
   FILE: {
     DOWNLOAD_FAILED: 'file.failed_file_download',
