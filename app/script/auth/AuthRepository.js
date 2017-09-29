@@ -41,6 +41,10 @@ z.auth.AuthRepository = class AuthRepository {
     this.access_token_refresh = undefined;
     this.auth_service = auth_service;
     this.logger = new z.util.Logger('z.auth.AuthRepository', z.config.LOGGER.OPTIONS);
+
+    this.pending_web_socket_trigger = undefined;
+    this.queue_state = this.auth_service.client.queue_state;
+
     amplify.subscribe(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, this.renew_access_token.bind(this));
   }
 
@@ -148,28 +152,42 @@ z.auth.AuthRepository = class AuthRepository {
 
   /**
    * Renew access-token provided a valid cookie.
-   * @param {AuthRepository.ACCESS_TOKEN_TRIGGER} trigger - Trigger for access token renewal
+   * @param {AuthRepository.ACCESS_TOKEN_TRIGGER} renewal_trigger - Trigger for access token renewal
+   * @param {z.event.WebSocketService.CHANGE_TRIGGER} [web_socket_trigger] - Trigger for WebSocket reset
    * @returns {undefined} No return value
    */
-  renew_access_token(trigger) {
-    this.logger.info(`Access token renewal started. Source: ${trigger}`);
-    this.get_access_token()
-      .then(() => {
-        this.auth_service.client.execute_request_queue();
-        amplify.publish(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEWED);
-      })
-      .catch((error) => {
-        if ((error.type === z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN) || z.util.Environment.frontend.is_localhost()) {
-          this.logger.warn(`Session expired on access token refresh: ${error.message}`, error);
-          Raygun.send(error);
-          return amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.SESSION_EXPIRED, false);
-        }
+  renew_access_token(renewal_trigger, web_socket_trigger) {
+    const is_refreshing_token = this.queue_state() === z.service.QUEUE_STATE.ACCESS_TOKEN_REFRESH;
 
-        if (error.type !== z.auth.AccessTokenError.TYPE.REFRESH_IN_PROGRESS) {
-          this.logger.error(`Refreshing access token failed: '${error.type}'`, error);
+    if (web_socket_trigger) {
+      this.pending_web_socket_trigger = web_socket_trigger;
+    }
+
+    if (!is_refreshing_token) {
+      this.queue_state(z.service.QUEUE_STATE.ACCESS_TOKEN_REFRESH);
+      this.logger.info(`Access token renewal started. Source: ${renewal_trigger}`);
+
+      this.get_access_token()
+        .then(() => {
+          this.auth_service.client.execute_request_queue();
+
+          amplify.publish(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEWED, this.pending_web_socket_trigger);
+          this.pending_web_socket_trigger = undefined;
+        })
+        .catch((error) => {
+          const {message, type} = error;
+          const is_request_forbidden = type === z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN;
+          if (is_request_forbidden || z.util.Environment.frontend.is_localhost()) {
+            this.logger.warn(`Session expired on access token refresh: ${message}`, error);
+            Raygun.send(error);
+            return amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.SESSION_EXPIRED, false);
+          }
+
+          this.queue_state(z.service.QUEUE_STATE.READY);
+          this.logger.error(`Refreshing access token failed: '${type}'`, error);
           amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECONNECT);
-        }
-      });
+        });
+    }
   }
 
   /**
@@ -208,10 +226,6 @@ z.auth.AuthRepository = class AuthRepository {
    * @returns {Promise} Resolves with the access token data
    */
   get_access_token() {
-    if (this.auth_service.client.request_queue_blocked_state() === z.service.RequestQueueBlockedState.ACCESS_TOKEN_REFRESH) {
-      return Promise.reject(new z.auth.AccessTokenError(z.auth.AccessTokenError.TYPE.REFRESH_IN_PROGRESS));
-    }
-
     return this.auth_service.post_access()
       .then((access_token) => this.save_access_token(access_token));
   }

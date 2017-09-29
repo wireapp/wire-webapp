@@ -87,8 +87,8 @@ z.service.BackendClient = class BackendClient {
     this.connectivity_timeout = undefined;
     this.connectivity_queue = new z.util.PromiseQueue({name: 'BackendClient.Connectivity'});
 
-    this.request_queue = new z.util.PromiseQueue({name: 'BackendClient.Request'});
-    this.request_queue_blocked_state = ko.observable(z.service.RequestQueueBlockedState.NONE);
+    this.request_queue = new z.util.PromiseQueue({concurrent: 4, name: 'BackendClient.Request'});
+    this.queue_state = ko.observable(z.service.QUEUE_STATE.READY);
 
     this.access_token = '';
     this.access_token_type = '';
@@ -182,9 +182,10 @@ z.service.BackendClient = class BackendClient {
    * @returns {undefined} No return value
    */
   execute_request_queue() {
+    this.queue_state(z.service.QUEUE_STATE.READY);
     if (this.access_token && this.request_queue.get_length()) {
       this.logger.info(`Executing '${this.request_queue.get_length()}' queued requests`);
-      this.request_queue.pause(false);
+      this.request_queue.resume();
     }
   }
 
@@ -211,7 +212,7 @@ z.service.BackendClient = class BackendClient {
   }
 
   /**
-   * Send or queue jQuery AJAX request.
+   * Queue jQuery AJAX request.
    * @see http://api.jquery.com/jquery.ajax/#jQuery-ajax-settings
    *
    * @param {Object} config - AJAX request configuration
@@ -226,24 +227,21 @@ z.service.BackendClient = class BackendClient {
    * @returns {Promise} Resolves when the request has been executed
    */
   send_request(config) {
-    if (this.request_queue_blocked_state() !== z.service.RequestQueueBlockedState.NONE) {
-      return this._push_to_request_queue(config, this.request_queue_blocked_state());
+    if (this.queue_state() !== z.service.QUEUE_STATE.READY) {
+      this.logger.info(`Adding '${config.type}' request to '${config.url}' to queue due to '${this.queue_state()}'`, config);
     }
 
-    return this._send_request(config);
+    return this.request_queue.push(() => this._send_request(config));
   }
 
-  /**
-   * Push a request to the queue
-   *
-   * @private
-   * @param {Object} config - Configuration for the AJAX request
-   * @param {string} reason - Reason for delayed execution of request
-   * @returns {Promise} Resolved when the request has been executed
-   */
-  _push_to_request_queue(config, reason) {
-    this.logger.info(`Adding '${config.type}' request to '${config.url}' to queue due to '${reason}'`, config);
-    return this.request_queue.push(() => this._send_request(config));
+  _prepend_request_queue(config, resolve_fn, reject_fn) {
+    this.request_queue
+      .pause()
+      .unshift(() => {
+        return this._send_request(config)
+          .then(resolve_fn)
+          .catch(reject_fn);
+      });
   }
 
   /**
@@ -285,18 +283,11 @@ z.service.BackendClient = class BackendClient {
         .fail(({responseJSON: response, status: status_code, wire: wire_request}) => {
           switch (status_code) {
             case z.service.BackendClientError.STATUS_CODE.CONNECTIVITY_PROBLEM: {
-              this.request_queue.pause();
-              this.request_queue_blocked_state(z.service.RequestQueueBlockedState.CONNECTIVITY_PROBLEM);
-
-              this._push_to_request_queue(config, this.request_queue_blocked_state())
-                .then(resolve)
-                .catch(reject);
+              this.queue_state(z.service.QUEUE_STATE.CONNECTIVITY_PROBLEM);
+              this._prepend_request_queue(config, resolve, reject);
 
               return this.execute_on_connectivity()
-                .then(() => {
-                  this.request_queue_blocked_state(z.service.RequestQueueBlockedState.NONE);
-                  this.execute_request_queue();
-                });
+                .then(() => this.execute_request_queue());
             }
 
             case z.service.BackendClientError.STATUS_CODE.FORBIDDEN: {
@@ -331,9 +322,7 @@ z.service.BackendClient = class BackendClient {
             }
 
             case z.service.BackendClientError.STATUS_CODE.UNAUTHORIZED: {
-              this._push_to_request_queue(config, z.service.RequestQueueBlockedState.ACCESS_TOKEN_REFRESH)
-                .then(resolve)
-                .catch(reject);
+              this._prepend_request_queue(config, resolve, reject);
 
               const trigger = z.auth.AuthRepository.ACCESS_TOKEN_TRIGGER.UNAUTHORIZED_REQUEST;
               return amplify.publish(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, trigger);
@@ -352,7 +341,7 @@ z.service.BackendClient = class BackendClient {
             }
           }
 
-          return reject(response || new z.service.BackendClientError(status_code));
+          reject(response || new z.service.BackendClientError(status_code));
         });
     });
   }
