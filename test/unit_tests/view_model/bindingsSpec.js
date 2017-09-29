@@ -21,13 +21,13 @@
 
 'use strict';
 
-describe('ko.bindingHandlers', function() {
-  describe('ko.bindingHandlers.enter', function() {
+describe('ko.bindingHandlers', () => {
+  describe('ko.bindingHandlers.enter', () => {
     const binding = ko.bindingHandlers.enter;
     let element = null;
     let handler = null;
 
-    beforeEach(function() {
+    beforeEach(() => {
       element = document.createElement('div');
 
       handler = {
@@ -42,28 +42,28 @@ describe('ko.bindingHandlers', function() {
       binding.init(element, handler.on_enter);
     });
 
-    it('can execute callback when enter is pressed', function() {
-      $(element).trigger($.Event('keypress', {keyCode: 13}));
+    it('can execute callback when enter is pressed', () => {
+      $(element).trigger($.Event('keypress', {key: 'Enter'}));
       expect(handler.on_enter).toHaveBeenCalled();
     });
 
-    it('can not execute callback when another key is pressed', function() {
-      $(element).trigger($.Event('keypress', {keyCode: 123}));
+    it('can not execute callback when another key is pressed', () => {
+      $(element).trigger($.Event('keypress', {key: 'Esc'}));
       expect(handler.on_enter).not.toHaveBeenCalled();
     });
 
-    it('can not execute callback when another event is triggered', function() {
-      $(element).trigger($.Event('keyup', {keyCode: 123}));
+    it('can not execute callback when another event is triggered', () => {
+      $(element).trigger($.Event('keyup', {key: 'Enter'}));
       expect(handler.on_enter).not.toHaveBeenCalled();
     });
   });
 
 
-  describe('ko.subscribable.fn.subscribe_once', function() {
+  describe('ko.subscribable.fn.subscribe_once', () => {
     let observable = null;
     let handler = null;
 
-    beforeEach(function() {
+    beforeEach(() => {
       observable = ko.observable(false);
       handler = {
         callback() {
@@ -74,7 +74,7 @@ describe('ko.bindingHandlers', function() {
       spyOn(handler, 'callback');
     });
 
-    it('handler is only called once', function() {
+    it('handler is only called once', () => {
       observable.subscribe_once(handler.callback);
       observable(true);
       observable(false);
@@ -85,14 +85,14 @@ describe('ko.bindingHandlers', function() {
   });
 
 
-  describe('ko.subscribable.fn.trimmed', function() {
+  describe('ko.subscribable.fn.trimmed', () => {
     let observable = null;
 
-    beforeEach(function() {
+    beforeEach(() => {
       observable = ko.observable('').trimmed();
     });
 
-    it('trims spaces', function() {
+    it('trims spaces', () => {
       observable(' foo');
       expect(observable()).toBe('foo');
       observable('foo ');

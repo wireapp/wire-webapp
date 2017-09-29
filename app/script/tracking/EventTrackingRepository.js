@@ -53,13 +53,15 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
    * Construct a new repository for user actions and errors reporting.
    *
    * @param {z.conversation.ConversationRepository} conversation_repository - Repository that handles conversations
+   * @param {z.team.TeamRepository} team_repository - Repository that handles teams
    * @param {z.user.UserRepository} user_repository - Repository that handles users
    * @returns {EventTrackingRepository} The new repository for user actions
    */
-  constructor(conversation_repository, user_repository) {
+  constructor(conversation_repository, team_repository, user_repository) {
     this.logger = new z.util.Logger('z.tracking.EventTrackingRepository', z.config.LOGGER.OPTIONS);
 
     this.conversation_repository = conversation_repository;
+    this.team_repository = team_repository;
     this.user_repository = user_repository;
 
     this.last_report = undefined;
@@ -69,10 +71,8 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     this.is_error_tracking_activated = false;
     this.is_user_tracking_activated = false;
 
-    if (!this.conversation_repository && !this.user_repository) {
+    if (!this.conversation_repository || !this.team_repository || !this.user_repository) {
       this.init_without_user_tracking();
-    } else {
-      amplify.subscribe(z.event.WebApp.ANALYTICS.INIT, this.init.bind(this));
     }
   }
 
@@ -164,6 +164,9 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     this._set_super_property(z.tracking.SuperProperty.APP, EventTrackingRepository.CONFIG.USER_TRACKING.CLIENT_TYPE);
     this._set_super_property(z.tracking.SuperProperty.CONTACTS, this.user_repository.number_of_contacts());
     this._set_super_property(z.tracking.SuperProperty.DESKTOP_APP, z.tracking.helpers.get_platform());
+
+    this._set_super_property(z.tracking.SuperProperty.TEAM.IN_TEAM, this.team_repository.is_team());
+    this._set_super_property(z.tracking.SuperProperty.TEAM.SIZE, this.team_repository.team_size());
   }
 
   _set_super_property(super_property, value) {

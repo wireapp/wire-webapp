@@ -108,7 +108,7 @@ z.main.App = class App {
 
     repositories.bot                 = new z.bot.BotRepository(this.service.bot, repositories.conversation);
     repositories.calling             = new z.calling.CallingRepository(this.service.calling, repositories.client, repositories.conversation, repositories.media, repositories.user);
-    repositories.event_tracker       = new z.tracking.EventTrackingRepository(repositories.conversation, repositories.user);
+    repositories.event_tracker       = new z.tracking.EventTrackingRepository(repositories.conversation, repositories.team, repositories.user);
     repositories.system_notification = new z.system_notification.SystemNotificationRepository(repositories.calling, repositories.conversation);
 
     return repositories;
@@ -266,6 +266,7 @@ z.main.App = class App {
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
         this.telemetry.add_statistic(z.telemetry.app_init.AppInitStatisticsValue.NOTIFICATIONS, notifications_count, 100);
 
+        this.repository.event_tracker.init(this.repository.properties.properties.settings.privacy.improve_wire);
         return this.repository.conversation.initialize_conversations();
       })
       .then(() => {

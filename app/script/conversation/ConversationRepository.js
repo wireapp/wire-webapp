@@ -778,6 +778,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   _handle_mapped_conversation(conversation_et) {
     this._map_guest_status_self(conversation_et);
+    conversation_et.self = this.user_repository.self();
     conversation_et.subscribe_to_state_updates();
   }
 
@@ -882,7 +883,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
   update_participating_user_ets(conversation_et, offline = false) {
     return this.user_repository.get_users_by_id(conversation_et.participating_user_ids(), offline)
       .then((user_ets) => {
-        conversation_et.self = this.user_repository.self();
         conversation_et.participating_user_ets(user_ets);
         return conversation_et;
       });
@@ -2912,9 +2912,15 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Promise that resolves with the message entity for the event
    */
   _add_event_to_conversation(json, conversation_et) {
-    return this._update_user_ets(this.event_mapper.map_json_event(json, conversation_et, true))
+    return Promise.resolve()
+      .then(() => this.event_mapper.map_json_event(json, conversation_et, true))
       .then((message_et) => {
-        if (conversation_et) {
+        if (message_et) {
+          return this._update_user_ets(message_et);
+        }
+      })
+      .then((message_et) => {
+        if (conversation_et && message_et) {
           conversation_et.add_message(message_et);
         }
 
