@@ -32,6 +32,6 @@ z.tracking.SuperProperty = {
   DESKTOP_APP: 'desktop_app',
   TEAM: {
     IN_TEAM: 'team.in_team',
-    SIZE: 'size',
+    SIZE: 'team.size',
   },
 };
