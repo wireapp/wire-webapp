@@ -42,7 +42,6 @@ z.auth.AuthRepository = class AuthRepository {
     this.auth_service = auth_service;
     this.logger = new z.util.Logger('z.auth.AuthRepository', z.config.LOGGER.OPTIONS);
 
-    this.pending_web_socket_trigger = undefined;
     this.queue_state = this.auth_service.client.queue_state;
 
     amplify.subscribe(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, this.renew_access_token.bind(this));
@@ -153,15 +152,10 @@ z.auth.AuthRepository = class AuthRepository {
   /**
    * Renew access-token provided a valid cookie.
    * @param {AuthRepository.ACCESS_TOKEN_TRIGGER} renewal_trigger - Trigger for access token renewal
-   * @param {z.event.WebSocketService.CHANGE_TRIGGER} [web_socket_trigger] - Trigger for WebSocket reset
    * @returns {undefined} No return value
    */
-  renew_access_token(renewal_trigger, web_socket_trigger) {
+  renew_access_token(renewal_trigger) {
     const is_refreshing_token = this.queue_state() === z.service.QUEUE_STATE.ACCESS_TOKEN_REFRESH;
-
-    if (web_socket_trigger) {
-      this.pending_web_socket_trigger = web_socket_trigger;
-    }
 
     if (!is_refreshing_token) {
       this.queue_state(z.service.QUEUE_STATE.ACCESS_TOKEN_REFRESH);
@@ -170,9 +164,7 @@ z.auth.AuthRepository = class AuthRepository {
       this.get_access_token()
         .then(() => {
           this.auth_service.client.execute_request_queue();
-
-          amplify.publish(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEWED, this.pending_web_socket_trigger);
-          this.pending_web_socket_trigger = undefined;
+          amplify.publish(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEWED);
         })
         .catch((error) => {
           const {message, type} = error;
