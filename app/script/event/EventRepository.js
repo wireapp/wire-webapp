@@ -586,7 +586,7 @@ z.event.EventRepository = class EventRepository {
     return this.conversation_service.load_event_from_db(conversation_id, event_id)
       .then((stored_event) => {
         if (stored_event) {
-          const {data: mapped_data, from: mapped_from, type: mapped_type} = event;
+          const {data: mapped_data, from: mapped_from, type: mapped_type, time: mapped_time} = event;
           const {data: stored_data, from: stored_from, type: stored_type, time: stored_time} = stored_event;
 
           const from_different_user = stored_from !== mapped_from;
@@ -614,6 +614,7 @@ z.event.EventRepository = class EventRepository {
           }
 
           // Only valid case for a duplicate message ID: First update to a text message matching the previous text content with a link preview
+          event.server_time = mapped_time;
           event.time = stored_time;
         }
 
