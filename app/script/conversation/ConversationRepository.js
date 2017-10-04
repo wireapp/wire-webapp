@@ -1528,7 +1528,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
               break;
             default:
               break;
-
           }
 
           return this.get_message_in_conversation_by_id(conversation_et, message_id);
