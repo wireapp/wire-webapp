@@ -85,9 +85,9 @@ def user_agent():
   wire_version = ''.join(re.findall(r'Wire/(.*)\ ', user_agent)).strip()
   if wire_version:
     agent['wire'] = {
-        'name': 'Wire',
-        'version': wire_version,
-      }
+      'name': 'Wire',
+      'version': wire_version,
+    }
 
   is_franz = bool(re.search(r'Franz/(.*)\ ', user_agent))
 
