@@ -360,8 +360,8 @@ z.entity.Conversation = class Conversation {
   }
 
   get_latest_timestamp(time_offset) {
-    const current_timestamp = z.util.TimeUtil.adjust_current_timestamp(time_offset);
-    return Math.max(this.last_server_timestamp(), this.last_event_timestamp()) || current_timestamp;
+    const last_known_timestamp = Math.max(this.last_server_timestamp(), this.last_event_timestamp());
+    return last_known_timestamp || z.util.TimeUtil.adjust_current_timestamp(time_offset);
   }
 
   get_next_iso_date(time_offset) {
