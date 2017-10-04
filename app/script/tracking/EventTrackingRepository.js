@@ -112,7 +112,6 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
       })
       .then((mixpanel_instance) => {
         if (mixpanel_instance) {
-          this.mixpanel = mixpanel_instance;
           this._subscribe_to_tracking_events();
           this._set_super_properties();
         }
@@ -126,7 +125,19 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
    * @returns {undefined} No return value
    */
   init_without_user_analytics() {
-    this._enable_error_reporting();
+    return Promise.resolve()
+      .then(() => {
+        if (this._is_domain_allowed_for_tracking()) {
+          this._enable_error_reporting();
+          return this._init_tracking();
+        }
+        return undefined;
+      })
+      .then((mixpanel_instance) => {
+        if (mixpanel_instance) {
+          this._subscribe_to_tracking_events();
+        }
+      });
   }
 
   _update_privacy_preference(privacy_preference) {
@@ -231,26 +242,27 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   _init_tracking() {
     this.is_user_analytics_activated = true;
 
+    if (this.mixpanel) {
+      return Promise.resolve(this.mixpanel);
+    }
+
     return new Promise((resolve) => {
-      if (!this.mixpanel) {
-        mixpanel.init(EventTrackingRepository.CONFIG.USER_ANALYTICS.API_KEY, {
-          autotrack: false,
-          debug: !z.util.Environment.frontend.is_production(),
-          loaded: (mixpanel) => {
-            mixpanel.register({
-              '$city': null,
-              '$initial_referrer': null,
-              '$initial_referring_domain': null,
-              '$referrer': null,
-              '$referring_domain': null,
-              '$region': null,
-            });
-            resolve(mixpanel);
-          },
-        }, Date.now());
-      } else {
-        resolve(this.mixpanel);
-      }
+      mixpanel.init(EventTrackingRepository.CONFIG.USER_ANALYTICS.API_KEY, {
+        autotrack: false,
+        debug: !z.util.Environment.frontend.is_production(),
+        loaded: (mixpanel) => {
+          mixpanel.register({
+            '$city': null,
+            '$initial_referrer': null,
+            '$initial_referring_domain': null,
+            '$referrer': null,
+            '$referring_domain': null,
+            '$region': null,
+          });
+          this.mixpanel = mixpanel;
+          resolve(mixpanel);
+        },
+      }, Date.now());
     });
   }
 
