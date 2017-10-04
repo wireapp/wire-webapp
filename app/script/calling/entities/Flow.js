@@ -646,7 +646,7 @@ z.calling.entities.Flow = class Flow {
     const {resp: response, type} = call_message;
     const {conversation_et} = this.call_et;
 
-    if (response === true) {
+    if (response) {
       this.logger.debug(`Received confirmation for '${type}' message via data channel`, call_message);
     } else {
       this.logger.debug(`Received '${type}' (response: ${response}) message via data channel`, call_message);

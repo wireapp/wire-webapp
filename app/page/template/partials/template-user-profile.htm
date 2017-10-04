@@ -41,7 +41,7 @@
 
       <!-- ko if: tab_index() === 1 -->
         <div class="user-profile-devices">
-          <!-- ko if: devices_found() === true -->
+          <!-- ko if: devices_found() -->
             <div class="user-profile-device-message">
               <div data-bind="text: device_headline"></div>
               <a data-bind="l10n_text: z.string.people_tabs_devices_why_verify, l10n_href: z.string.url_privacy_why" rel="nofollow noopener noreferrer" target="_blank" class="text-theme"></a>
@@ -60,7 +60,7 @@
               </div>
             </div>
           <!-- /ko -->
-          <!-- ko if: devices_found() === false -->
+          <!-- ko ifnot: devices_found() -->
             <div data-bind="text: no_device_headline"></div>
             <a data-bind="l10n_text: z.string.people_tabs_devices_learn_more, l10n_href: z.string.url_privacy" rel="nofollow noopener noreferrer" target="_blank" class="text-theme"></a>
           <!-- /ko -->

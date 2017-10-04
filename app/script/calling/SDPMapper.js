@@ -51,7 +51,7 @@ z.calling.SDPMapper = {
     const {response, sdp: sdp_string} = call_message_et;
     const sdp = {
       sdp: sdp_string,
-      type: response === true ? z.calling.rtc.SDP_TYPE.ANSWER : z.calling.rtc.SDP_TYPE.OFFER,
+      type: response ? z.calling.rtc.SDP_TYPE.ANSWER : z.calling.rtc.SDP_TYPE.OFFER,
     };
 
     return Promise.resolve(new window.RTCSessionDescription(sdp));
