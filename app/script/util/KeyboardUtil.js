@@ -98,6 +98,8 @@ z.util.KeyboardUtil = (() => {
     ]);
   };
 
+  const _is_backspace_key = (keyboard_event) => _is_key(keyboard_event, KEYBOARD_KEY.BACKSPACE);
+
   const _is_delete_key = (keyboard_event) => _is_key(keyboard_event, KEYBOARD_KEY.DELETE);
 
   const _is_enter_key = (keyboard_event) => _is_key(keyboard_event, KEYBOARD_KEY.ENTER);
@@ -126,10 +128,15 @@ z.util.KeyboardUtil = (() => {
     return _is_meta_key(keyboard_event) && _is_key(keyboard_event, KEYBOARD_KEY.KEY_V);
   };
 
+  const _is_removal_action = (keyboard_event) => {
+    return _is_one_of_keys(keyboard_event, [KEYBOARD_KEY.BACKSPACE, KEYBOARD_KEY.DELETE]);
+  };
+
   return {
     KEY: KEYBOARD_KEY,
     insert_at_caret: _insert_at_caret,
     is_arrow_key: _is_arrow_key,
+    is_backspace_key: _is_backspace_key,
     is_delete_key: _is_delete_key,
     is_enter_key: _is_enter_key,
     is_escape_key: _is_escape_key,
@@ -138,5 +145,6 @@ z.util.KeyboardUtil = (() => {
     is_meta_key: _is_meta_key,
     is_one_of_keys: _is_one_of_keys,
     is_paste_action: _is_paste_action,
+    is_removal_action: _is_removal_action,
   };
 })();
