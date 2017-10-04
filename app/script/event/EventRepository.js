@@ -662,7 +662,7 @@ z.event.EventRepository = class EventRepository {
    */
   _handle_notification({payload: events, id, transient}) {
     const source = transient !== undefined ? EventRepository.SOURCE.WEB_SOCKET : EventRepository.SOURCE.STREAM;
-    const is_transient_event = transient === true;
+    const is_transient_event = !!transient;
 
     this.logger.info(`Handling notification '${id}' from '${source}' containing '${events.length}' events`, events);
 

@@ -104,7 +104,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     };
 
     this.editing.subscribe((value) => {
-      if (value === false) {
+      if (!value) {
         const name = $('.group-header .name span');
         return $('.group-header textarea').css('height', `${name.height()}px`);
       }
