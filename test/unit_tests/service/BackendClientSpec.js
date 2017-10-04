@@ -124,7 +124,7 @@ describe('z.service.BackendClient', function() {
     });
   });
 
-  describe('send_request', function() {
+  describe('_send_request', function() {
     let config = undefined;
     const url = 'http://localhost/user';
 
@@ -149,7 +149,7 @@ describe('z.service.BackendClient', function() {
 
     it('should resolve with the request payload', function(done) {
       backend_client
-        .send_request(config)
+        ._send_request(config)
         .then(done)
         .catch(done.fail);
       server.requests[0].respond(200);
@@ -160,7 +160,7 @@ describe('z.service.BackendClient', function() {
       amplify.subscribe(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, token_refresh);
 
       backend_client
-        .send_request(config)
+        ._send_request(config)
         .then(response => done.fail(response))
         .catch(done.fail);
       server.requests[0].respond(401);
@@ -175,7 +175,7 @@ describe('z.service.BackendClient', function() {
       spyOn(backend_client, 'execute_on_connectivity').and.returnValue(Promise.resolve());
 
       backend_client
-        .send_request(config)
+        ._send_request(config)
         .then(response => done.fail(response))
         .catch(done.fail);
 

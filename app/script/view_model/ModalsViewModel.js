@@ -24,6 +24,7 @@ window.z.ViewModel = z.ViewModel || {};
 
 z.ViewModel.ModalType = {
   BLOCK: '.modal-block',
+  BOTS_UNAVAILABLE: '.modal-bots-unavailable',
   CALL_EMPTY_CONVERSATION: '.modal-call-conversation-empty',
   CALL_NO_VIDEO_IN_GROUP: '.modal-call-no-video-in-group',
   CALL_START_ANOTHER: '.modal-call-second',
@@ -80,9 +81,6 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
     switch (type) {
       case z.ViewModel.ModalType.BLOCK:
         this._show_modal_block(options.data, title_element, message_element);
-        break;
-      case z.ViewModel.ModalType.CALL_FULL_CONVERSATION:
-        this._show_modal_call_full_conversation(options.data, message_element);
         break;
       case z.ViewModel.ModalType.CALL_START_ANOTHER:
         this._show_modal_call_start_another(options.data, title_element, message_element);

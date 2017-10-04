@@ -129,7 +129,11 @@ z.main.App = class App {
       repositories.media,
       repositories.user
     );
-    repositories.event_tracker = new z.tracking.EventTrackingRepository(repositories.conversation, repositories.user);
+    repositories.event_tracker = new z.tracking.EventTrackingRepository(
+      repositories.conversation,
+      repositories.team,
+      repositories.user
+    );
     repositories.system_notification = new z.system_notification.SystemNotificationRepository(
       repositories.calling,
       repositories.conversation
@@ -322,6 +326,7 @@ z.main.App = class App {
           100
         );
 
+        this.repository.event_tracker.init(this.repository.properties.properties.settings.privacy.improve_wire);
         return this.repository.conversation.initialize_conversations();
       })
       .then(() => {

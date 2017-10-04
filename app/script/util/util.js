@@ -202,8 +202,10 @@ z.util.trim_file_extension = function(filename) {
     if (filename.endsWith('.tar.gz')) {
       filename = filename.replace(/\.tar\.gz$/, '');
     }
+
     return filename.replace(/\.[^/.]+$/, '');
   }
+
   return '';
 };
 

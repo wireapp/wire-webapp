@@ -27,6 +27,7 @@
 /Web.config
 aws-keys.json
 npm-debug.log
+yarn-error.log
 
 # Automatically created files
 /doc

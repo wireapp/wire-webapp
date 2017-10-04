@@ -33,9 +33,6 @@ z.auth.AccessTokenError = class AccessTokenError extends Error {
       case AccessTokenError.TYPE.NOT_FOUND_IN_CACHE:
         this.message = 'No cached access token found in Local Storage';
         break;
-      case AccessTokenError.TYPE.REFRESH_IN_PROGRESS:
-        this.message = 'Access Token request already in progress';
-        break;
       case AccessTokenError.TYPE.RETRIES_EXCEEDED:
         this.message = 'No. of retries to get Access Token exceeded';
         break;
@@ -53,7 +50,6 @@ z.auth.AccessTokenError = class AccessTokenError extends Error {
   static get TYPE() {
     return {
       NOT_FOUND_IN_CACHE: 'z.auth.AccessTokenError.TYPE.NOT_FOUND_IN_CACHE',
-      REFRESH_IN_PROGRESS: 'z.auth.AccessTokenError.TYPE.REFRESH_IN_PROGRESS',
       REQUEST_FAILED: 'z.auth.AccessTokenError.TYPE.REQUEST_FAILED',
       REQUEST_FORBIDDEN: 'z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN',
       RETRIES_EXCEEDED: 'z.auth.AccessTokenError.TYPE.RETRIES_EXCEEDED',

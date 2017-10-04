@@ -21,9 +21,9 @@
 
 'use strict';
 
-describe('UserHandleGenerator', function() {
-  describe('generate_handle_variations', function() {
-    it('generates handle variations', function() {
+describe('UserHandleGenerator', () => {
+  describe('generate_handle_variations', () => {
+    it('generates handle variations', () => {
       const handle = 'superman';
       const number_of_variations = 10;
       const variations = z.user.UserHandleGenerator.generate_handle_variations(handle, number_of_variations);
@@ -32,8 +32,8 @@ describe('UserHandleGenerator', function() {
     });
   });
 
-  describe('normalize_name', function() {
-    it('should normalize user names', function() {
+  describe('normalize_name', () => {
+    it('should normalize user names', () => {
       expect(z.user.UserHandleGenerator.normalize_name('Maria LaRochelle')).toBe('marialarochelle');
       expect(z.user.UserHandleGenerator.normalize_name('Mêrié "LaRöche\'lle"')).toBe('merielaroechelle');
       expect(z.user.UserHandleGenerator.normalize_name('Maria I ❤️🍕')).toBe('mariai');
@@ -56,8 +56,8 @@ describe('UserHandleGenerator', function() {
     });
   });
 
-  describe('validate_character', function() {
-    it('returns true character is valid', function() {
+  describe('validate_character', () => {
+    it('returns true character is valid', () => {
       const latin_alphabet = [
         'a',
         'b',
@@ -87,29 +87,30 @@ describe('UserHandleGenerator', function() {
         'z',
       ];
       const numbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
-      const allow_characters = ['_'];
+      const allowed_symbols = ['_'];
 
       latin_alphabet
-        .concat(numbers, allow_characters)
+        .concat(numbers, allowed_symbols)
         .forEach(character => expect(z.user.UserHandleGenerator.validate_character(character)).toBeTruthy());
     });
 
-    it('returns false if character is not a string', function() {
+    it('returns false if character is not a string', () => {
       expect(z.user.UserHandleGenerator.validate_character()).toBeFalsy();
       expect(z.user.UserHandleGenerator.validate_character(null)).toBeFalsy();
       expect(z.user.UserHandleGenerator.validate_character({})).toBeFalsy();
       expect(z.user.UserHandleGenerator.validate_character(1)).toBeFalsy();
     });
 
-    it('returns false if character contains other than alphanumeric characters and underscores', function() {
+    it('returns false if character contains other than alphanumeric characters and underscores', () => {
+      expect(z.user.UserHandleGenerator.validate_character('A')).toBeFalsy();
       expect(z.user.UserHandleGenerator.validate_character('太')).toBeFalsy();
       expect(z.user.UserHandleGenerator.validate_character('شمس')).toBeFalsy();
       expect(z.user.UserHandleGenerator.validate_character('!')).toBeFalsy();
     });
   });
 
-  describe('append_random_digits', function() {
-    it('appends random digits to the end of the string', function() {
+  describe('append_random_digits', () => {
+    it('appends random digits to the end of the string', () => {
       const handle = 'foo';
       const additional_numbers = 5;
       const string_with_digits = z.user.UserHandleGenerator.append_random_digits('foo', additional_numbers);
@@ -118,8 +119,8 @@ describe('UserHandleGenerator', function() {
     });
   });
 
-  describe('create_suggestions', function() {
-    it('appends random digits to the end of the string', function() {
+  describe('create_suggestions', () => {
+    it('appends random digits to the end of the string', () => {
       const username = 'memphis';
       const suggestions = z.user.UserHandleGenerator.create_suggestions(username);
       expect(suggestions.length).toBe(12);
@@ -128,15 +129,15 @@ describe('UserHandleGenerator', function() {
     });
   });
 
-  describe('validate_handle', function() {
-    it('returns true for valid handles', function() {
+  describe('validate_handle', () => {
+    it('returns true for valid handles', () => {
       expect(z.user.UserHandleGenerator.validate_handle('valid1')).toBeTruthy();
       expect(z.user.UserHandleGenerator.validate_handle('1valid')).toBeTruthy();
       expect(z.user.UserHandleGenerator.validate_handle('val1d')).toBeTruthy();
       expect(z.user.UserHandleGenerator.validate_handle('still_valid')).toBeTruthy();
     });
 
-    it('returns false for invalid handles', function() {
+    it('returns false for invalid handles', () => {
       expect(z.user.UserHandleGenerator.validate_handle()).toBeFalsy();
       expect(z.user.UserHandleGenerator.validate_handle('')).toBeFalsy();
       expect(z.user.UserHandleGenerator.validate_handle(1)).toBeFalsy();

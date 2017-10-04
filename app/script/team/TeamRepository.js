@@ -45,6 +45,7 @@ z.team.TeamRepository = class TeamRepository {
 
     this.team_members = ko.pureComputed(() => (this.is_team() ? this.team().members() : []));
     this.team_name = ko.pureComputed(() => (this.is_team() ? this.team().name() : this.user_repository.self().name()));
+    this.team_size = ko.pureComputed(() => (this.is_team() ? this.team_members().length + 1 : 0));
     this.team_users = ko.pureComputed(() => {
       return this.team_members()
         .concat(this.user_repository.connected_users())
@@ -53,6 +54,9 @@ z.team.TeamRepository = class TeamRepository {
     });
 
     this.team_members.subscribe(() => this.user_repository.map_guest_status());
+    this.team_size.subscribe(team_size => {
+      amplify.publish(z.event.WebApp.ANALYTICS.SUPER_PROPERTY, z.tracking.SuperProperty.TEAM.SIZE, team_size);
+    });
 
     this.user_repository.is_team = this.is_team;
     this.user_repository.team_members = this.team_members;

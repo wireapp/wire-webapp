@@ -22,8 +22,8 @@
 window.z = window.z || {};
 window.z.service = z.service || {};
 
-z.service.RequestQueueBlockedState = {
-  ACCESS_TOKEN_REFRESH: 'z.service.RequestQueueBlockedState.ACCESS_TOKEN_REFRESH',
-  CONNECTIVITY_PROBLEM: 'z.service.RequestQueueBlockedState.CONNECTIVITY_PROBLEM',
-  NONE: 'z.service.RequestQueueBlockedState.NONE',
+z.service.QUEUE_STATE = {
+  ACCESS_TOKEN_REFRESH: 'z.service.QUEUE_STATE.ACCESS_TOKEN_REFRESH',
+  CONNECTIVITY_PROBLEM: 'z.service.QUEUE_STATE.CONNECTIVITY_PROBLEM',
+  READY: 'z.service.QUEUE_STATE.READY',
 };

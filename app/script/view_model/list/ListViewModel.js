@@ -160,8 +160,8 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     $(`#${this._get_element_id_of_list(new_list_state)}`).addClass('left-list-is-visible');
     this.list_state(new_list_state);
     this.last_update(Date.now());
-    $(document).on('keydown.list_view', event => {
-      if (event.keyCode === z.util.KEYCODE.ESC) {
+    $(document).on('keydown.list_view', keyboard_event => {
+      if (z.util.KeyboardUtil.is_escape_key(keyboard_event)) {
         this.switch_list(z.ViewModel.list.LIST_STATE.CONVERSATIONS);
       }
     });

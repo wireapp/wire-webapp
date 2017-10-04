@@ -85,7 +85,6 @@ z.properties.PropertiesRepository = class PropertiesRepository {
       })
       .then(() => {
         amplify.publish(z.event.WebApp.PROPERTIES.UPDATED, this.properties);
-        amplify.publish(z.event.WebApp.ANALYTICS.INIT, this.properties.settings.privacy.improve_wire);
       });
   }
 

@@ -23,8 +23,8 @@ window.z = window.z || {};
 window.z.tracking = z.tracking || {};
 
 /**
- * Definition of events used for user-tracking with Localytics.
- * @returns {z.tracking.EventName} Localytics event names (defined by Business Intelligence Team)
+ * Definition of events used for user analytics.
+ * @returns {z.tracking.EventName} Event names (defined by Business Intelligence Team)
  */
 z.tracking.EventName = {
   ACCOUNT: {
@@ -34,13 +34,18 @@ z.tracking.EventName = {
   APP_LAUNCH: 'appLaunch',
   CALLING: {
     ENDED_CALL: 'calling.ended_call',
-    ESTABLISHED_CALL: 'calling.established_successful_call',
+    ENDED_VIDEO_CALL: 'calling.ended_video_call',
+    ESTABLISHED_CALL: 'calling.established_call',
+    ESTABLISHED_VIDEO_CALL: 'calling.established_video_call',
     FAILED_REQUEST: 'calling.failed_request',
     FAILED_REQUESTING_MEDIA: 'calling.failed_requesting_media',
     FAILED_RTC: 'calling.failed_rtc',
     INITIATED_CALL: 'calling.initiated_call',
+    INITIATED_VIDEO_CALL: 'calling.initiated_video_call',
     JOINED_CALL: 'calling.joined_call',
+    JOINED_VIDEO_CALL: 'calling.joined_video_call',
     RECEIVED_CALL: 'calling.received_call',
+    RECEIVED_VIDEO_CALL: 'calling.received_video_call',
     SHARED_SCREEN: 'calling.shared_screen',
   },
   COLLECTION: {
@@ -59,6 +64,7 @@ z.tracking.EventName = {
   CONTACTS: {
     ENTERED_SEARCH: 'contacts.entered_search',
   },
+  CONTRIBUTED: 'contributed',
   CONVERSATION: {
     ADD_TO_GROUP_CONVERSATION: 'addContactToGroupConversation',
     CHARACTER_LIMIT_REACHED: 'conversation.character_limit_reached',
@@ -69,7 +75,7 @@ z.tracking.EventName = {
     SELECTED_MESSAGE: 'conversation.selected_message',
   },
   E2EE: {
-    CANNOT_DECRYPT_MESSAGE: 'e2ee.cannot_decrypt_message',
+    FAILED_MESSAGE_DECRYPTION: 'e2ee.failed_message_decryption',
   },
   FILE: {
     DOWNLOAD_FAILED: 'file.failed_file_download',
@@ -83,7 +89,6 @@ z.tracking.EventName = {
   },
   IMAGE_SENT_ERROR: 'Image Sent Error',
   MEDIA: {
-    COMPLETED_MEDIA_ACTION: 'contributed',
     PLAYED_AUDIO_MESSAGE: 'media.played_audio_message',
     PLAYED_VIDEO_MESSAGE: 'media.played_video_message',
   },
@@ -112,6 +117,8 @@ z.tracking.EventName = {
   },
   SETTINGS: {
     EDITED_USERNAME: 'settings.edited_username',
+    OPTED_IN_TRACKING: 'settings.opted_in_tracking',
+    OPTED_OUT_TRACKING: 'settings.opted_out_tracking',
     REMOVED_DEVICE: 'settings.removed_device',
     SET_USERNAME: 'settings.set_username',
     VIEWED_DEVICE: 'settings.viewed_device',

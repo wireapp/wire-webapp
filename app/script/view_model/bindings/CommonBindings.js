@@ -199,11 +199,11 @@ ko.bindingHandlers.resize = (function() {
  */
 ko.bindingHandlers.enter = {
   init(element, valueAccessor, allBindings, data, context) {
-    const wrapper = function(_data, event) {
-      if (event.keyCode === z.util.KEYCODE.ENTER && !event.shiftKey && !event.altKey) {
+    const wrapper = function(_data, keyboard_event) {
+      if (z.util.KeyboardUtil.is_enter_key(keyboard_event) && !keyboard_event.shiftKey && !keyboard_event.altKey) {
         const callback = valueAccessor();
         if (typeof callback === 'function') {
-          callback.call(this, data, event);
+          callback.call(this, data, keyboard_event);
           return false;
         }
       }

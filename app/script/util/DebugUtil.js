@@ -31,9 +31,7 @@ z.util.DebugUtil = class DebugUtil {
   }
 
   block_all_connections() {
-    const block_users = wire.app.repository.user.users().map(user_et => {
-      return this.user_repository.block_user(user_et);
-    });
+    const block_users = wire.app.repository.user.users().map(user_et => this.user_repository.block_user(user_et));
     return Promise.all(block_users);
   }
 
@@ -41,7 +39,7 @@ z.util.DebugUtil = class DebugUtil {
     const session_id = `${user_id}@${client_id}`;
     return wire.app.repository.cryptography.cryptobox
       .session_load(session_id)
-      .then(function(cryptobox_session) {
+      .then(cryptobox_session => {
         cryptobox_session.session.session_states = {};
 
         const record = {
@@ -57,9 +55,7 @@ z.util.DebugUtil = class DebugUtil {
           record
         );
       })
-      .then(() => {
-        this.logger.log(`Corrupted Session ID '${session_id}'`);
-      });
+      .then(() => this.logger.log(`Corrupted Session ID '${session_id}'`));
   }
 
   get_number_of_clients_in_conversation() {
@@ -94,17 +90,15 @@ z.util.DebugUtil = class DebugUtil {
   }
 
   get_serialised_session(session_id) {
-    return wire.app.repository.storage.storage_service.load('sessions', session_id).then(function(record) {
-      const base64_encoded_payload = z.util.array_to_base64(record.serialised);
-      record.serialised = base64_encoded_payload;
+    return wire.app.repository.storage.storage_service.load('sessions', session_id).then(record => {
+      record.serialised = z.util.array_to_base64(record.serialised);
       return record;
     });
   }
 
   get_serialised_identity() {
-    return wire.app.repository.storage.storage_service.load('keys', 'local_identity').then(function(record) {
-      const base64_encoded_payload = z.util.array_to_base64(record.serialised);
-      record.serialised = base64_encoded_payload;
+    return wire.app.repository.storage.storage_service.load('keys', 'local_identity').then(record => {
+      record.serialised = z.util.array_to_base64(record.serialised);
       return record;
     });
   }
@@ -130,28 +124,28 @@ z.util.DebugUtil = class DebugUtil {
       .then(_got_notifications);
   }
 
-  get_notifications_from_stream(remote_user_id, remote_client_id, matching_notifications, notification_id_since) {
-    if (matching_notifications == null) {
-      matching_notifications = [];
-    }
+  get_notifications_from_stream(remote_user_id, remote_client_id, matching_notifications = [], notification_id_since) {
     const local_client_id = wire.app.repository.client.current_client().id;
     const local_user_id = wire.app.repository.user.self().id;
 
     const _got_notifications = ({has_more, notifications}) => {
-      const additional_notifications = notifications.filter(function(notification) {
-        const {payload} = notification;
-        for (const {data, from} of payload) {
-          if (data && [local_user_id, remote_user_id].includes(from)) {
-            const {sender, recipient} = data;
-            const incoming_event = sender === remote_client_id && recipient === local_client_id;
-            const outgoing_event = sender === local_client_id && recipient === remote_client_id;
-            return incoming_event || outgoing_event;
-          }
-        }
-        return false;
-      });
+      const additional_notifications = !remote_user_id
+        ? notifications
+        : notifications.filter(notification => {
+            const {payload} = notification;
+            for (const {data, from} of payload) {
+              if (data && [local_user_id, remote_user_id].includes(from)) {
+                const {sender, recipient} = data;
+                const incoming_event = sender === remote_client_id && recipient === local_client_id;
+                const outgoing_event = sender === local_client_id && recipient === remote_client_id;
+                return incoming_event || outgoing_event;
+              }
+            }
+            return false;
+          });
 
       matching_notifications = matching_notifications.concat(additional_notifications);
+
       if (has_more) {
         const last_notification = notifications[notifications.length - 1];
         return this.get_notifications_from_stream(
@@ -161,10 +155,15 @@ z.util.DebugUtil = class DebugUtil {
           last_notification.id
         );
       }
-      this.logger.log(
-        `Found '${matching_notifications.length}' notification between '${local_client_id}' and '${remote_client_id}'`,
-        matching_notifications
-      );
+
+      if (remote_user_id) {
+        this.logger.log(
+          `Found '${matching_notifications.length}' notifications between '${local_client_id}' and '${remote_client_id}'`,
+          matching_notifications
+        );
+      } else {
+        this.logger.log(`Found '${matching_notifications.length}' notifications`, matching_notifications);
+      }
       return matching_notifications;
     };
 

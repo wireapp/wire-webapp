@@ -30,14 +30,23 @@ z.ui.Context = (() => {
     window.addEventListener('resize', cleanup);
   }
 
-  function onKeyDown(event) {
-    event.preventDefault();
+  function onKeyDown(keyboard_event) {
+    keyboard_event.preventDefault();
 
-    if (event.keyCode === z.util.KEYCODE.ESC) {
-      cleanup();
-    } else if (event.keyCode === z.util.KEYCODE.ARROW_UP || event.keyCode === z.util.KEYCODE.ARROW_DOWN) {
-      rotateItem(event.keyCode);
-    } else if (event.keyCode === z.util.KEYCODE.ENTER) {
+    if (z.util.KeyboardUtil.is_escape_key(keyboard_event)) {
+      return cleanup();
+    }
+
+    if (
+      z.util.KeyboardUtil.is_one_of_keys(keyboard_event, [
+        z.util.KeyboardUtil.KEY.ARROW_UP,
+        z.util.KeyboardUtil.KEY.ARROW_DOWN,
+      ])
+    ) {
+      return rotateItem(keyboard_event.key);
+    }
+
+    if (z.util.KeyboardUtil.is_enter_key(z.util.KeyboardUtil.KEY.ENTER)) {
       triggerItem();
     }
   }
@@ -60,7 +69,7 @@ z.ui.Context = (() => {
     }
   }
 
-  function rotateItem(keyCode) {
+  function rotateItem(key) {
     const entries = Array.from(document.querySelectorAll('.ctx-menu-item'));
     const entry = document.querySelector('.ctx-menu-item.selected');
 
@@ -69,11 +78,11 @@ z.ui.Context = (() => {
     }
 
     if (entry === null) {
-      const index = keyCode === z.util.KEYCODE.ARROW_UP ? entries.length - 1 : 0;
+      const index = key === z.util.KeyboardUtil.KEY.ARROW_UP ? entries.length - 1 : 0;
       return entries[index].classList.add('selected');
     }
 
-    const direction = keyCode === z.util.KEYCODE.ARROW_UP ? -1 : 1;
+    const direction = key === z.util.KeyboardUtil.KEY.ARROW_UP ? -1 : 1;
     const nextEntry = entries[(entries.indexOf(entry) + direction + entries.length) % entries.length];
     nextEntry.classList.add('selected');
     entry.classList.remove('selected');

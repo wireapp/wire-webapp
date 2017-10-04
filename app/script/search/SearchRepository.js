@@ -72,7 +72,7 @@ z.search.SearchRepository = class SearchRepository {
 
     const search_promises = [directory_search];
 
-    if (is_handle) {
+    if (z.user.UserHandleGenerator.validate_handle(name)) {
       search_promises.push(this.user_repository.get_user_id_by_handle(name));
     }
 

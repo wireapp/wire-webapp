@@ -926,17 +926,15 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     }
   }
 
-  clear_error(mode, event) {
-    const error_mode = event ? event.currentTarget.classList[1] : undefined || mode;
+  clear_error(mode, input_event) {
+    const error_mode = input_event ? input_event.currentTarget.classList[1] : undefined || mode;
     this._remove_error(error_mode);
   }
 
-  clear_error_password(view_model, event) {
-    if (event.keyCode !== z.util.KEYCODE.ENTER) {
-      this.failed_validation_password(false);
-      if (!event.currentTarget.value.length || event.currentTarget.value.length >= 8) {
-        this._remove_error(event.currentTarget.classList[1]);
-      }
+  clear_error_password(view_model, input_event) {
+    this.failed_validation_password(false);
+    if (!input_event.currentTarget.value.length || input_event.currentTarget.value.length >= 8) {
+      this._remove_error(input_event.currentTarget.classList[1]);
     }
   }
   clicked_on_blocked_learn_more() {
@@ -1053,8 +1051,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     z.util.safe_window_open(z.l10n.text(z.string.url_wire));
   }
 
-  keydown_auth(event) {
-    if (event.keyCode === z.util.KEYCODE.ENTER) {
+  keydown_auth(keyboard_event) {
+    if (z.util.KeyboardUtil.is_enter_key(keyboard_event)) {
       switch (this.visible_mode()) {
         case z.auth.AuthView.MODE.ACCOUNT_LOGIN: {
           if (this.visible_method() === z.auth.AuthView.MODE.ACCOUNT_PHONE) {
@@ -1100,36 +1098,35 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     }
   }
 
-  keydown_phone_code(view_model, event) {
-    const combo_key = z.util.Environment.os.win ? event.ctrlKey : event.metaKey;
-    if (combo_key && event.keyCode === z.util.KEYCODE.KEY_V) {
+  keydown_phone_code(view_model, keyboard_event) {
+    if (z.util.KeyboardUtil.is_paste_action(keyboard_event)) {
       return true;
     }
 
-    if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) {
+    if (z.util.KeyboardUtil.is_function_key(keyboard_event)) {
       return false;
     }
 
-    const target_id = event.currentTarget.id;
+    const target_id = keyboard_event.currentTarget.id;
     const target_digit = window.parseInt(target_id.substr(target_id.length - 1));
 
     let focus_digit;
-    switch (event.keyCode) {
-      case z.util.KEYCODE.ARROW_LEFT:
-      case z.util.KEYCODE.ARROW_UP:
+    switch (keyboard_event.key) {
+      case z.util.KeyboardUtil.KEY.ARROW_LEFT:
+      case z.util.KeyboardUtil.KEY.ARROW_UP:
         focus_digit = target_digit - 1;
         $(`#wire-verify-code-digit-${Math.max(1, focus_digit)}`).focus();
         break;
 
-      case z.util.KEYCODE.ARROW_DOWN:
-      case z.util.KEYCODE.ARROW_RIGHT:
+      case z.util.KeyboardUtil.KEY.ARROW_DOWN:
+      case z.util.KeyboardUtil.KEY.ARROW_RIGHT:
         focus_digit = target_digit + 1;
         $(`#wire-verify-code-digit-${Math.min(6, focus_digit)}`).focus();
         break;
 
-      case z.util.KEYCODE.BACKSPACE:
-      case z.util.KEYCODE.DELETE:
-        if (event.currentTarget.value === '') {
+      case z.util.KeyboardUtil.KEY.BACKSPACE:
+      case z.util.KeyboardUtil.KEY.DELETE:
+        if (keyboard_event.currentTarget.value === '') {
           focus_digit = target_digit - 1;
           $(`#wire-verify-code-digit-${Math.max(1, focus_digit)}`).focus();
         }
@@ -1137,7 +1134,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
       default: {
         const char =
-          String.fromCharCode(event.keyCode).match(/\d+/g) || String.fromCharCode(event.keyCode - 48).match(/\d+/g);
+          String.fromCharCode(keyboard_event.keyCode).match(/\d+/g) ||
+          String.fromCharCode(keyboard_event.keyCode - 48).match(/\d+/g);
 
         if (char) {
           this.code_digits()[target_digit - 1](char);
@@ -2075,7 +2073,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     this.logger.info('User account verified. User can now login.');
     if (registration) {
       amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.REGISTRATION.SUCCEEDED, {
-        content: this.registration_context,
+        context: this.registration_context,
       });
     }
     this._authentication_successful();
