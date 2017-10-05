@@ -258,7 +258,7 @@ z.auth.AuthService = class AuthService {
         },
         processData: false,
         type: 'POST',
-        url: `${this.client.create_url(AuthService.CONFIG.URL_REGISTER)}?challenge_cookie=true`,
+        url: `${this.client.create_url(AuthService.CONFIG.URL_REGISTER)}`,
         xhrFields: {
           withCredentials: true,
         },
