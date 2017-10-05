@@ -398,7 +398,7 @@ z.string.es.preferences_about_website = 'Página web de Wire';
 
 z.string.es.preferences_account_delete = 'Eliminar cuenta';
 z.string.es.preferences_account_log_out = 'Cerrar sesión';
-z.string.es.preferences_account_reset_password = 'Restablecer constraseña';
+z.string.es.preferences_account_reset_password = 'Restablecer contraseña';
 z.string.es.preferences_account_team = 'en {{name}}';
 z.string.es.preferences_account_username_placeholder = 'Tu nombre completo';
 z.string.es.preferences_account_username_hint = 'Al menos 2 caracteres. Sólo a–z, 0–9 y _.';
