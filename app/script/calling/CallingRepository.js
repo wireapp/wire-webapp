@@ -1064,7 +1064,8 @@ z.calling.CallingRepository = class CallingRepository {
     return this.user_repository.get_user_by_id(user_id)
       .then((remote_user_et) => this._create_call(call_message_et, remote_user_et))
       .then((call_et) => {
-        this.logger.info(`Incoming '${this._get_media_type_from_properties(props)}' call in conversation '${call_et.conversation_et.display_name()}'`, call_et);
+        const media_type = this._get_media_type_from_properties(props);
+        this.logger.info(`Incoming '${media_type}' call in conversation '${call_et.conversation_et.display_name()}'`, call_et);
 
         call_et.direction = z.calling.enum.CALL_STATE.INCOMING;
         call_et.set_remote_version(call_message_et);
@@ -1072,6 +1073,7 @@ z.calling.CallingRepository = class CallingRepository {
 
         return call_et.add_or_update_participant(user_id, false, call_message_et)
           .then(() => {
+            this.telemetry.set_media_type(media_type);
             this.telemetry.track_event(z.tracking.EventName.CALLING.RECEIVED_CALL, call_et);
             this.inject_activate_event(call_message_et, source);
 
