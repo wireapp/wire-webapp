@@ -710,7 +710,7 @@ z.calling.CallingRepository = class CallingRepository {
 
         switch (type) {
           case z.calling.enum.CALL_MESSAGE_TYPE.CANCEL: {
-            if (response === true) {
+            if (response) {
               // Send to remote client that initiated call
               precondition_option = true;
               recipients = {
@@ -750,7 +750,7 @@ z.calling.CallingRepository = class CallingRepository {
           }
 
           case z.calling.enum.CALL_MESSAGE_TYPE.SETUP: {
-            if (response === true) {
+            if (response) {
               // Send to remote client that initiated call and all clients of self user
               precondition_option = [self_user_et.id];
               recipients = {

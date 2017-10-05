@@ -113,7 +113,7 @@ z.util.PromiseQueue = class PromiseQueue {
    */
   pause(should_pause = true) {
     this._paused = should_pause;
-    if (this._paused === false) {
+    if (!this._paused) {
       this.execute();
     }
 
