@@ -677,7 +677,7 @@ z.calling.CallingRepository = class CallingRepository {
   _confirm_call_message(call_et, incoming_call_message_et) {
     const {response} = incoming_call_message_et;
 
-    if (response) {
+    if (response || !call_et.self_client_joined()) {
       return Promise.resolve(call_et);
     }
 
