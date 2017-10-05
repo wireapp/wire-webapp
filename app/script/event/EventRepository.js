@@ -600,7 +600,7 @@ z.event.EventRepository = class EventRepository {
 
     return this.conversation_service.load_event_from_db(conversation_id, event_id).then(stored_event => {
       if (stored_event) {
-        const {data: mapped_data, from: mapped_from, type: mapped_type} = event;
+        const {data: mapped_data, from: mapped_from, type: mapped_type, time: mapped_time} = event;
         const {data: stored_data, from: stored_from, type: stored_type, time: stored_time} = stored_event;
 
         const from_different_user = stored_from !== mapped_from;
@@ -652,6 +652,7 @@ z.event.EventRepository = class EventRepository {
         }
 
         // Only valid case for a duplicate message ID: First update to a text message matching the previous text content with a link preview
+        event.server_time = mapped_time;
         event.time = stored_time;
       }
 
@@ -708,7 +709,7 @@ z.event.EventRepository = class EventRepository {
    */
   _handle_notification({payload: events, id, transient}) {
     const source = transient !== undefined ? EventRepository.SOURCE.WEB_SOCKET : EventRepository.SOURCE.STREAM;
-    const is_transient_event = transient === true;
+    const is_transient_event = !!transient;
 
     this.logger.info(`Handling notification '${id}' from '${source}' containing '${events.length}' events`, events);
 

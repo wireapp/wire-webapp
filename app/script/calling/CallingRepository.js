@@ -678,7 +678,7 @@ z.calling.CallingRepository = class CallingRepository {
   _confirm_call_message(call_et, incoming_call_message_et) {
     const {response} = incoming_call_message_et;
 
-    if (response) {
+    if (response || !call_et.self_client_joined()) {
       return Promise.resolve(call_et);
     }
 
@@ -711,7 +711,7 @@ z.calling.CallingRepository = class CallingRepository {
 
       switch (type) {
         case z.calling.enum.CALL_MESSAGE_TYPE.CANCEL: {
-          if (response === true) {
+          if (response) {
             // Send to remote client that initiated call
             precondition_option = true;
             recipients = {
@@ -751,7 +751,7 @@ z.calling.CallingRepository = class CallingRepository {
         }
 
         case z.calling.enum.CALL_MESSAGE_TYPE.SETUP: {
-          if (response === true) {
+          if (response) {
             // Send to remote client that initiated call and all clients of self user
             precondition_option = [self_user_et.id];
             recipients = {

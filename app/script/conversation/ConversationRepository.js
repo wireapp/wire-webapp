@@ -2505,7 +2505,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         previously_archived = conversation_et.is_archived();
 
         const is_backend_timestamp = source !== z.event.EventRepository.SOURCE.INJECTED;
-        conversation_et.update_timestamp_server(event_json.time, is_backend_timestamp);
+        conversation_et.update_timestamp_server(event_json.server_time || event_json.time, is_backend_timestamp);
 
         switch (type) {
           case z.event.Backend.CONVERSATION.MEMBER_JOIN:

@@ -248,7 +248,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
         this.switch_content(z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS);
       }
 
-      if (this.previous_conversation && this.previous_conversation.is_archived() === false) {
+      if (this.previous_conversation && !this.previous_conversation.is_archived()) {
         return this.show_conversation(this.previous_conversation);
       }
 

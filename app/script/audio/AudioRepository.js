@@ -44,7 +44,7 @@ window.z.audio.AudioRepository = class AudioRepository {
    * @returns {Promise} Resolves if the sound should be played.
    */
   _check_sound_setting(audio_id) {
-    if (this.muted === true && !z.audio.AudioPlayingType.MUTED.includes(audio_id)) {
+    if (this.muted && !z.audio.AudioPlayingType.MUTED.includes(audio_id)) {
       return Promise.reject(new z.audio.AudioError(z.audio.AudioError.TYPE.IGNORED_SOUND));
     }
     if (this.audio_preference() === z.audio.AudioPreference.NONE && !z.audio.AudioPlayingType.NONE.includes(audio_id)) {

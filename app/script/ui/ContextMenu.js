@@ -57,7 +57,7 @@ z.ui.Context = (() => {
 
   function onMouseDown(event) {
     const entry = document.querySelector('.ctx-menu');
-    if (entry && entry.contains(event.target) === false) {
+    if (entry && !entry.contains(event.target)) {
       cleanup();
     }
   }

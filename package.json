@@ -41,19 +41,19 @@
     "sinon": "4.0.1"
   },
   "lint-staged": {
-    "*.js": ["yarn lint-scripts", "git add"],
-    "*.json": ["yarn lint-json", "git add"],
-    "*.less": ["yarn lint-styles", "git add"]
+    "*.js": ["yarn lint:scripts", "git add"],
+    "*.json": ["yarn lint:json", "git add"],
+    "*.less": ["yarn lint:styles", "git add"]
   },
   "scripts": {
     "deploy-travis-dev": "grunt app_deploy_travis:dev",
     "deploy-travis-prod": "grunt app_deploy_travis:prod",
     "deploy-travis-staging": "grunt app_deploy_travis:staging",
-    "lint": "yarn lint-scripts && yarn lint-styles",
-    "lint-fix": "npm run lint-scripts -- --fix",
-    "lint-json": "prettier --print-width=200 --write 'app/**/*.json' bower.json package.json",
-    "lint-scripts": "eslint -c .eslintrc.yaml --ignore-path .gitignore --ignore-path .eslintignore --quiet app/script/ test/ bin/ grunt/ Gruntfile.js karma.conf.js",
-    "lint-styles": "prettier --single-quote --print-width=120 --write 'app/style/**/*.less'",
+    "lint": "yarn lint:scripts && yarn lint:styles",
+    "lint:fix": "npm run lint:scripts -- --fix",
+    "lint:json": "prettier --print-width=200 --write 'app/**/*.json' bower.json package.json",
+    "lint:scripts": "eslint -c .eslintrc.yaml --ignore-path .gitignore --ignore-path .eslintignore --quiet app/script/ test/ bin/ grunt/ Gruntfile.js karma.conf.js",
+    "lint:styles": "prettier --single-quote --print-width=120 --write 'app/style/**/*.less'",
     "postinstall": "grunt init",
     "precommit": "lint-staged",
     "start": "grunt",

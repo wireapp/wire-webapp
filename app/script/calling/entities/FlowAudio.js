@@ -61,7 +61,7 @@ z.calling.entities.FlowAudio = class FlowAudio {
    * @returns {undefined} No return value
    */
   hookup(is_active) {
-    if (is_active === true) {
+    if (is_active) {
       return this._hookup_audio();
     }
 
