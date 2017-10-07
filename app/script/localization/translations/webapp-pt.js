@@ -44,6 +44,7 @@ z.string.pt.auth_account_sign_in_phone = 'Telefone';
 z.string.pt.auth_account_terms_of_use = 'Condições de Utilização';
 z.string.pt.auth_account_terms_of_use_detail = 'Aceito';
 
+z.string.pt.auth_blocked_cookies = 'Ative os cookies para iniciar sessão no Wire.';
 z.string.pt.auth_blocked_database = 'O Wire necessita de acesso ao armazenamento local para mostrar as suas mensagens. O armazenamento local não está disponível no modo privado.';
 z.string.pt.auth_blocked_tabs = 'O Wire já está aberto noutro separador.';
 
@@ -85,7 +86,7 @@ z.string.pt.auth_posted_retry_detail = 'Por favor, tente de novo.';
 z.string.pt.auth_posted_retry_headline = 'Algo correu mal';
 z.string.pt.auth_posted_verify_later = 'Verificar mais tarde';
 
-z.string.pt.auth_placeholder_email = 'E-mail';
+z.string.pt.auth_placeholder_email = 'Email';
 z.string.pt.auth_placeholder_name = 'Nome';
 z.string.pt.auth_placeholder_password_put = 'Palavra-passe';
 z.string.pt.auth_placeholder_password_set = 'Palavra-passe (pelo menos 8 caracteres)';
@@ -106,6 +107,7 @@ z.string.pt.auth_error_phone_number_budget = 'Iniciou sessão demasiadas vezes. 
 z.string.pt.auth_error_phone_number_forbidden = 'Este numero de telefone não é permitido.';
 z.string.pt.auth_error_phone_number_invalid = 'Número de telefone inválido';
 z.string.pt.auth_error_phone_number_unknown = 'Número de telefone desconhecido';
+z.string.pt.auth_error_suspended = 'Esta conta já não está autorizada a iniciar sessão.';
 z.string.pt.auth_error_sign_in = 'Por favor verifique os seus detalhes e tente de novo.';
 
 z.string.pt.call_state_outgoing = 'A tocar…';

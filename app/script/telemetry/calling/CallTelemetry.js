@@ -133,7 +133,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
         attributes
       );
 
-      if (this.media_type === z.media.MediaType.AUDIO_VIDEO) {
+      if ([z.media.MediaType.AUDIO_VIDEO, z.media.MediaType.VIDEO].includes(this.media_type)) {
         event_name = event_name.replace('_call', '_video_call');
       }
     }
