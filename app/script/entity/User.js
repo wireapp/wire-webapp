@@ -141,6 +141,7 @@ z.entity.User = class User {
 
     this.is_guest = ko.observable(false);
     this.is_team_member = ko.observable(false);
+    this.team_role = ko.observable(z.team.TEAM_ROLE.NONE);
 
     this.is_request = ko.pureComputed(() => this.connection().is_request());
 
