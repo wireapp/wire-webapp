@@ -66,11 +66,14 @@ z.team.TeamPermission = (() => {
     return result;
   };
 
-  const _has_permission = (member_permissions, role) => {
+  const _has_permission_for_role = (member_permissions, role) => {
     const role_permissions = _permissions_for_role(role);
-    console.log('Expected', role_permissions, 'Found', member_permissions);
+    return _has_permission(member_permissions, role_permissions);
+  };
+
+  const _has_permission = (member_permissions, expected_permissions) => {
     if (Number.isSafeInteger(member_permissions) && member_permissions > 0) {
-      return (member_permissions & role_permissions) === role_permissions;
+      return (member_permissions & expected_permissions) === expected_permissions;
     }
     return false;
   };
@@ -99,5 +102,6 @@ z.team.TeamPermission = (() => {
   return {
     PERMISSION: PERMISSION,
     has_permission: _has_permission,
+    has_permission_for_role: _has_permission_for_role,
   };
 })();

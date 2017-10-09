@@ -33,15 +33,15 @@ z.team.TeamRole = (() => {
   };
 
   const _check_role = (permissions) => {
-    if (z.team.TeamPermission.has_permission(permissions.self, ROLE.OWNER)) {
+    if (z.team.TeamPermission.has_permission_for_role(permissions.self, ROLE.OWNER)) {
       return ROLE.OWNER;
     }
 
-    if (z.team.TeamPermission.has_permission(permissions.self, ROLE.ADMIN)) {
+    if (z.team.TeamPermission.has_permission_for_role(permissions.self, ROLE.ADMIN)) {
       return ROLE.ADMIN;
     }
 
-    if (z.team.TeamPermission.has_permission(permissions.self, ROLE.MEMBER)) {
+    if (z.team.TeamPermission.has_permission_for_role(permissions.self, ROLE.MEMBER)) {
       return ROLE.MEMBER;
     }
 
