@@ -82,17 +82,19 @@ def user_agent():
 
   # Electron
   electron_version = ''.join(re.findall(r'Electron/(.*)\ ', user_agent)).strip()
-  if electron_version:
-    agent['wrapper'] = {
-        'name': 'Electron',
-        'version': electron_version,
-      }
+  wire_version = ''.join(re.findall(r'Wire/(.*)\ ', user_agent)).strip()
+  if wire_version:
+    agent['wire'] = {
+      'name': 'Wire',
+      'version': wire_version,
+    }
+
   is_franz = bool(re.search(r'Franz/(.*)\ ', user_agent))
 
   is_media = {}
   is_media['electron'] = bool(electron_version)
   is_media['franz'] = is_franz
-  is_media['wrapper'] = is_media['electron']
+  is_media['wire'] = bool(wire_version)
 
   # Google Related
   is_media['android'] = value_exists(agent, 'platform/name', 'android')
@@ -149,7 +151,7 @@ def value_exists(obj, path, value):
 def check_browser(agent):
   if agent['is']['franz']:
     return False
-  elif agent['is']['electron'] or agent['is']['crawler']:
+  elif agent['is']['crawler'] or agent['is']['wire']:
     return True
   try:
     browser = agent['browser']

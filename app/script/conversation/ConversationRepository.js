@@ -104,9 +104,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.sending_queue = new z.util.PromiseQueue({name: 'ConversationRepository.Sending', paused: true});
 
     // @note Only use the client request queue as to unblock if not blocked by event handling or the cryptographic order of messages will be ruined and sessions might be deleted
-    this.conversation_service.client.request_queue_blocked_state.subscribe((state) => {
-      const request_queue_blocked = state !== z.service.RequestQueueBlockedState.NONE;
-      this.sending_queue.pause(request_queue_blocked || this.block_event_handling());
+    this.conversation_service.client.queue_state.subscribe((queue_state) => {
+      const queue_ready = queue_state === z.service.QUEUE_STATE.READY;
+      this.sending_queue.pause(!queue_ready || this.block_event_handling());
     });
 
     this.conversations_archived = ko.observableArray([]);
@@ -778,6 +778,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   _handle_mapped_conversation(conversation_et) {
     this._map_guest_status_self(conversation_et);
+    conversation_et.self = this.user_repository.self();
     conversation_et.subscribe_to_state_updates();
   }
 
@@ -882,7 +883,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
   update_participating_user_ets(conversation_et, offline = false) {
     return this.user_repository.get_users_by_id(conversation_et.participating_user_ids(), offline)
       .then((user_ets) => {
-        conversation_et.self = this.user_repository.self();
         conversation_et.participating_user_ets(user_ets);
         return conversation_et;
       });
@@ -1528,7 +1528,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
               break;
             default:
               break;
-
           }
 
           return this.get_message_in_conversation_by_id(conversation_et, message_id);
@@ -2378,7 +2377,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         previously_archived = conversation_et.is_archived();
 
         const is_backend_timestamp = source !== z.event.EventRepository.SOURCE.INJECTED;
-        conversation_et.update_timestamp_server(event_json.time, is_backend_timestamp);
+        conversation_et.update_timestamp_server(event_json.server_time || event_json.time, is_backend_timestamp);
 
         switch (type) {
           case z.event.Backend.CONVERSATION.MEMBER_JOIN:
@@ -2912,9 +2911,15 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Promise that resolves with the message entity for the event
    */
   _add_event_to_conversation(json, conversation_et) {
-    return this._update_user_ets(this.event_mapper.map_json_event(json, conversation_et, true))
+    return Promise.resolve()
+      .then(() => this.event_mapper.map_json_event(json, conversation_et, true))
       .then((message_et) => {
-        if (conversation_et) {
+        if (message_et) {
+          return this._update_user_ets(message_et);
+        }
+      })
+      .then((message_et) => {
+        if (conversation_et && message_et) {
           conversation_et.add_message(message_et);
         }
 
@@ -3428,7 +3433,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
 
     if (action_type) {
-      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION, {
+      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONTRIBUTED, {
         action: action_type,
         conversation_type: z.tracking.helpers.get_conversation_type(conversation_et),
         ephemeral_time: is_ephemeral ? ephemeral_time : undefined,

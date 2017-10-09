@@ -79,18 +79,18 @@ z.ViewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
     this.image_modal.show();
 
     this._load_image();
-    $(document).on('keydown.lightbox', (event) => {
-      switch (event.keyCode) {
-        case z.util.KEYCODE.ESC:
+    $(document).on('keydown.lightbox', (keyboard_event) => {
+      switch (keyboard_event.key) {
+        case z.util.KeyboardUtil.KEY.ESC:
           this.click_on_close();
           break;
-        case z.util.KEYCODE.ARROW_DOWN:
-        case z.util.KEYCODE.ARROW_RIGHT:
-          this.click_on_show_next(this, event);
+        case z.util.KeyboardUtil.KEY.ARROW_DOWN:
+        case z.util.KeyboardUtil.KEY.ARROW_RIGHT:
+          this.click_on_show_next(this, keyboard_event);
           break;
-        case z.util.KEYCODE.ARROW_LEFT:
-        case z.util.KEYCODE.ARROW_UP:
-          this.click_on_show_previous(this, event);
+        case z.util.KeyboardUtil.KEY.ARROW_LEFT:
+        case z.util.KeyboardUtil.KEY.ARROW_UP:
+          this.click_on_show_previous(this, keyboard_event);
           break;
         default:
           break;

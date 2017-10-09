@@ -922,7 +922,7 @@ z.user.UserRepository = class UserRepository {
 
   /**
    * Verify a username against the backend.
-   * @param {Array} username - New user name
+   * @param {string} username - New user name
    * @returns {string} Username which is not taken.
    */
   verify_username(username) {

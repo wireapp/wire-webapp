@@ -156,10 +156,10 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     return this.cryptography_service.get_users_pre_keys(recipients)
       .catch((error) => {
         if (error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
-          throw new z.user.UserError(z.user.UserError.prototype.TYPE.PRE_KEY_NOT_FOUND);
+          throw new z.user.UserError(z.user.UserError.TYPE.PRE_KEY_NOT_FOUND);
         }
         this.logger.error(`Failed to get pre-key from backend: ${error.message}`);
-        throw new z.user.UserError(z.user.UserError.prototype.TYPE.REQUEST_FAILURE);
+        throw new z.user.UserError(z.user.UserError.TYPE.REQUEST_FAILURE);
       });
   }
 
@@ -451,7 +451,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
   _report_decryption_failure(error, {data: event_data, from: user_id, type: event_type}) {
     const session_id = this._construct_session_id(user_id, event_data.sender);
 
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.E2EE.CANNOT_DECRYPT_MESSAGE, {cause: error.code || error.message});
+    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.E2EE.FAILED_MESSAGE_DECRYPTION, {cause: error.code || error.message});
 
     const custom_data = {
       client_local_class: this.current_client().class,

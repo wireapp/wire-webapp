@@ -364,21 +364,21 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
     $(event.target).focus();
   }
 
-  on_input_key_up(data, event) {
-    this.conversation_input_emoji.on_input_key_up(data, event);
+  on_input_key_up(data, keyboard_event) {
+    this.conversation_input_emoji.on_input_key_up(data, keyboard_event);
   }
 
-  on_input_key_down(data, event) {
-    if (!this.conversation_input_emoji.on_input_key_down(data, event)) {
-      switch (event.keyCode) {
-        case z.util.KEYCODE.ARROW_UP: {
+  on_input_key_down(data, keyboard_event) {
+    if (!this.conversation_input_emoji.on_input_key_down(data, keyboard_event)) {
+      switch (keyboard_event.key) {
+        case z.util.KeyboardUtil.KEY.ARROW_UP: {
           if (!this.input().length) {
-            this.edit_message(this.conversation_et().get_last_editable_message(), event.target);
+            this.edit_message(this.conversation_et().get_last_editable_message(), keyboard_event.target);
           }
           break;
         }
 
-        case z.util.KEYCODE.ESC: {
+        case z.util.KeyboardUtil.KEY.ESC: {
           if (this.pasted_file()) {
             this.pasted_file(null);
           } else {
@@ -387,11 +387,11 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
           break;
         }
 
-        case z.util.KEYCODE.ENTER: {
-          if (event.altKey || event.metaKey) {
-            z.util.KeyUtil.insert_at_caret(event.target, '\n');
-            $(event.target).change();
-            event.preventDefault();
+        case z.util.KeyboardUtil.KEY.ENTER: {
+          if (keyboard_event.altKey || keyboard_event.metaKey) {
+            z.util.KeyboardUtil.insert_at_caret(keyboard_event.target, '\n');
+            $(keyboard_event.target).change();
+            keyboard_event.preventDefault();
           }
           break;
         }

@@ -66,9 +66,16 @@
     color: #fff;
     font-size: @font-size-xl;
     pointer-events: none;
+    opacity: 0;
 
     &::before {
       text-shadow: 0 0 40px fade(#000, 80%);
+    }
+  }
+
+  &:hover {
+    > span {
+      opacity: 1;
     }
   }
 
@@ -80,22 +87,6 @@
     position: absolute;
     left: -9999px;
   }
-}
-
-.preferences-account-team-icon {
-  .accent-fill;
-  position: absolute;
-  right: 0;
-  bottom: 0;
-}
-
-.preferences-account-team-initial {
-  .absolute-center;
-  color: #fff;
-  font-size: 28px;
-  font-weight: @font-weight-light;
-  line-height: 28px;
-  text-transform: uppercase;
 }
 
 .preferences-account-name-wrapper {

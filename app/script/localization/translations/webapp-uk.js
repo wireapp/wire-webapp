@@ -44,6 +44,7 @@ z.string.uk.auth_account_sign_in_phone = 'Номер телефону';
 z.string.uk.auth_account_terms_of_use = 'Умови використання';
 z.string.uk.auth_account_terms_of_use_detail = 'Я приймаю';
 
+z.string.uk.auth_blocked_cookies = 'Увімкніть файли cookie, щоб увійти в Wire.';
 z.string.uk.auth_blocked_database = 'Wire потребує доступу до локальної бази даних для відображення повідомлень. Локальна база даних недоступна в приватному режимі.';
 z.string.uk.auth_blocked_tabs = 'Wire уже відкрито в іншій вкладці браузера.';
 
@@ -106,6 +107,7 @@ z.string.uk.auth_error_phone_number_budget = 'Ви входите в систе�
 z.string.uk.auth_error_phone_number_forbidden = 'Вибачте. Використання цього номеру телефону заборонено.';
 z.string.uk.auth_error_phone_number_invalid = 'Невірний номер телефону';
 z.string.uk.auth_error_phone_number_unknown = 'Невідомий номер телефону';
+z.string.uk.auth_error_suspended = 'Даний акаунт був заблокований.';
 z.string.uk.auth_error_sign_in = 'Будь ласка, перевірте ваші дані та повторіть спробу.';
 
 z.string.uk.call_state_outgoing = 'Дзвінок…';

@@ -67,6 +67,10 @@ z.event.WebSocketService = class WebSocketService {
 
     this.reconnect_timeout_id = undefined;
     this.reconnect_count = 0;
+
+    this.pending_reconnect_trigger = undefined;
+
+    amplify.subscribe(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEWED, this.pending_reconnect.bind(this));
   }
 
   /**
@@ -122,13 +126,14 @@ z.event.WebSocketService = class WebSocketService {
 
   /**
    * Reconnect WebSocket after access token has been refreshed.
-   * @param {WebSocketService.CHANGE_TRIGGER} trigger - Trigger of the reconnect
    * @returns {undefined} No return value
    */
-  pending_reconnect(trigger) {
-    amplify.unsubscribeAll(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEWED);
-    this.logger.info(`Executing pending WebSocket reconnect triggered by '${trigger}' after access token refresh`);
-    this.reconnect(trigger);
+  pending_reconnect() {
+    if (this.pending_reconnect_trigger) {
+      this.logger.info(`Executing pending WebSocket reconnect triggered by '${this.pending_reconnect_trigger}' after access token refresh`);
+      this.reconnect(this.pending_reconnect_trigger);
+      this.pending_reconnect_trigger = undefined;
+    }
   }
 
   /**
@@ -139,8 +144,7 @@ z.event.WebSocketService = class WebSocketService {
   reconnect(trigger) {
     if (!z.util.StorageUtil.get_value(z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION)) {
       this.logger.info(`Access token has to be refreshed before reconnecting the WebSocket triggered by '${trigger}'`);
-      amplify.unsubscribeAll(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEWED);
-      amplify.subscribe(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEWED, () => this.pending_reconnect(trigger));
+      this.pending_reconnect_trigger = trigger;
       return amplify.publish(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, z.auth.AuthRepository.ACCESS_TOKEN_TRIGGER.WEB_SOCKET);
     }
 

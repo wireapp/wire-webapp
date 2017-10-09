@@ -403,7 +403,7 @@ window.TestFactory.prototype.exposeTrackingActors = function() {
     .then(() => {
       this.logger.info('✓ exposedConversationActors');
 
-      TestFactory.tracking_repository = new z.tracking.EventTrackingRepository(TestFactory.conversation_repository, TestFactory.user_repository);
+      TestFactory.tracking_repository = new z.tracking.EventTrackingRepository(TestFactory.conversation_repository, TestFactory.team_repository, TestFactory.user_repository);
       TestFactory.tracking_repository.logger.level = this.settings.logging_level;
 
       return TestFactory.tracking_repository;
