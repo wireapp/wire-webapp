@@ -25,12 +25,12 @@ window.z.entity = z.entity || {};
 z.entity.RenameMessage = class RenameMessage extends z.entity.SystemMessage {
   constructor() {
     super();
+
     this.system_message_type = z.message.SystemMessageType.CONVERSATION_RENAME;
+
     this.caption = ko.pureComputed(() => {
-      if (this.user().is_me) {
-        return z.l10n.text(z.string.conversation_rename_you);
-      }
-      return z.l10n.text(z.string.conversation_rename);
+      const identifier = this.user().is_me ? z.string.conversation_rename_you : z.string.conversation_rename;
+      return z.l10n.text(identifier);
     });
   }
 };

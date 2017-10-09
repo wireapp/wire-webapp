@@ -287,6 +287,7 @@ z.string.conversation_delete_timestamp = 'Deleted on {{date}}';
 z.string.conversation_edit_timestamp = 'Edited on {{date}}';
 z.string.conversation_likes_caption = '{{number}} people';
 z.string.conversation_send_pasted_file = 'Pasted image at {{date}}';
+z.string.conversation_someone = 'Someone';
 z.string.conversation_tweet_author = ' on Twitter';
 
 // Collection
