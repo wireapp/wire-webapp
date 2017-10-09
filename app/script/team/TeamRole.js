@@ -22,10 +22,34 @@
 window.z = window.z || {};
 window.z.team = z.team || {};
 
-z.team.TEAM_ROLE = {
-  ADMIN: 'z.team.TEAM_ROLE.ADMIN',
-  INVALID: 'z.team.TEAM_ROLE.INVALID',
-  MEMBER: 'z.team.TEAM_ROLE.MEMBER',
-  NONE: 'z.team.TEAM_ROLE.NONE',
-  OWNER: 'z.team.TEAM_ROLE.OWNER',
-};
+z.team.TeamRole = (() => {
+
+  const ROLE = {
+    ADMIN: 'z.team.TeamRole.ROLE.ADMIN',
+    INVALID: 'z.team.TeamRole.ROLE.INVALID',
+    MEMBER: 'z.team.TeamRole.ROLE.MEMBER',
+    NONE: 'z.team.TeamRole.ROLE.NONE',
+    OWNER: 'z.team.TeamRole.ROLE.OWNER',
+  };
+
+  const _check_role = (permissions) => {
+    if (z.team.TeamPermission.has_permission(permissions.self, ROLE.OWNER)) {
+      return ROLE.OWNER;
+    }
+
+    if (z.team.TeamPermission.has_permission(permissions.self, ROLE.ADMIN)) {
+      return ROLE.ADMIN;
+    }
+
+    if (z.team.TeamPermission.has_permission(permissions.self, ROLE.MEMBER)) {
+      return ROLE.MEMBER;
+    }
+
+    return ROLE.INVALID;
+  };
+
+  return {
+    ROLE: ROLE,
+    check_role: _check_role,
+  };
+})();

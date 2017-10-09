@@ -68,7 +68,8 @@ z.team.TeamMapper = class TeamMapper {
   }
 
   map_role(user_et, member_et) {
-    const team_role = z.team.TEAM_ROLE.ADMIN;
+    const team_role = z.team.TeamRole.check_role(member_et.permissions);
+    this.logger.info(`Identified user '${user_et.id}' as '${team_role}'`, member_et);
     user_et.team_role(team_role);
   }
 
