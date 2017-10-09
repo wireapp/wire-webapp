@@ -81,10 +81,8 @@ z.team.TeamRepository = class TeamRepository {
 
         return this.team(new z.team.TeamEntity());
       })
-      .then(() => {
-        this.send_account_info();
-        return this.team();
-      });
+      .then(() => this.send_account_info())
+      .then(() => this.team());
   }
 
   get_team_members(team_id) {
@@ -171,6 +169,7 @@ z.team.TeamRepository = class TeamRepository {
             name: this.team_name(),
             picture: image_data_url,
             teamID: this.team().id,
+            teamRole: this.self_user().team_role(),
             userID: this.self_user().id,
           };
 
