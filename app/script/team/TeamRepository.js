@@ -184,7 +184,15 @@ z.team.TeamRepository = class TeamRepository {
     return this.get_team_members(team_et.id)
       .then((team_members) => {
         const member_ids = team_members
-          .filter((team_member) => team_member.user_id !== this.user_repository.self().id)
+          .filter((team_member) => {
+            const is_self_user = team_member.user_id === this.user_repository.self().id;
+
+            if (is_self_user) {
+              this.team_mapper.map_role(this.user_repository.self(), team_member);
+            }
+
+            return !is_self_user;
+          })
           .map((team_member) => team_member.user_id);
 
         return this.user_repository.get_users_by_id(member_ids);

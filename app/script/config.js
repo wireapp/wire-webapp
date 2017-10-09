@@ -32,8 +32,11 @@ window.z.config = {
     YELLOW: 3,
   },
 
-  ACCOUNT_PRODUCTION_URL: 'https://account-wire.com/',
+  ACCOUNT_PRODUCTION_URL: 'https://account.wire.com/',
   ACCOUNT_STAGING_URL: 'https://wire-account-staging.zinfra.io/',
+
+  ADMIN_PRODUCTION_URL: 'https://teams.wire.com/',
+  ADMIN_STAGING_URL: 'https://wire-admin-staging.zinfra.io/',
 
   LOGGER: {
     OPTIONS: {

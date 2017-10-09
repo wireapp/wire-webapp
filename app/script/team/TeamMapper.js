@@ -67,6 +67,11 @@ z.team.TeamMapper = class TeamMapper {
     return this.update_member_from_object(data);
   }
 
+  map_role(user_et, member_et) {
+    const team_role = z.team.TEAM_ROLE.ADMIN;
+    user_et.team_role(team_role);
+  }
+
   update_member_from_object(data, member_et = new z.team.TeamMemberEntity()) {
     if (!data) {
       return;
