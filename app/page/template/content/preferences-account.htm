@@ -64,6 +64,13 @@
 
       <!-- ko ifnot: z.util.Environment.desktop -->
         <section class="preferences-section">
+          <!-- ko if: is_team_manager() -->
+            <div class="preferences-link text-theme" data-bind="click: click_on_manage, l10n_text: z.string.preferences_account_manage_team" data-uie-name="do-manage-team"></div>
+          <!-- /ko -->
+          <div class="preferences-link text-theme" data-bind="click: click_on_create, l10n_text: z.string.preferences_account_create_team" data-uie-name="do-create-team"></div>
+        </section>
+
+        <section class="preferences-section">
           <div class="preferences-link text-theme" data-bind="click: click_on_logout, l10n_text: z.string.preferences_account_log_out" data-uie-name="do-logout"></div>
         </section>
       <!-- /ko -->

@@ -143,18 +143,18 @@ window.z.util = z.util || {};
       return undefined;
     },
     backend: {
-      account_url: function() {
-        if (z.util.Environment.backend.current === z.service.BackendEnvironment.PRODUCTION) {
-          return z.config.ACCOUNT_PRODUCTION_URL;
-        }
-        return z.config.ACCOUNT_STAGING_URL;
+      account_url() {
+        const is_production = z.util.Environment.backend.current === z.service.BackendEnvironment.PRODUCTION;
+        return is_production ? z.config.ACCOUNT_PRODUCTION_URL : z.config.ACCOUNT_STAGING_URL;
+      },
+      admin_url() {
+        const is_production = z.util.Environment.backend.current === z.service.BackendEnvironment.PRODUCTION;
+        return is_production ? z.config.ADMIN_PRODUCTION_URL : z.config.ADMIN_STAGING_URL;
       },
       current: undefined,
-      website_url: function() {
-        if (z.util.Environment.backend.current === z.service.BackendEnvironment.PRODUCTION) {
-          return z.config.WEBSITE_PRODUCTION_URL;
-        }
-        return z.config.WEBSITE_STAGING_URL;
+      website_url() {
+        const is_production = z.util.Environment.backend.current === z.service.BackendEnvironment.PRODUCTION;
+        return is_production ? z.config.WEBSITE_PRODUCTION_URL : z.config.WEBSITE_STAGING_URL;
       },
     },
     browser: {
