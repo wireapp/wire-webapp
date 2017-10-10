@@ -83,7 +83,6 @@ z.conversation.EventMapper = class EventMapper {
         message_et = this._map_event_member_join(event, conversation_et);
         break;
       case z.event.Backend.CONVERSATION.MEMBER_LEAVE:
-      case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE:
         message_et = this._map_event_member_leave(event);
         break;
       case z.event.Backend.CONVERSATION.RENAME:
@@ -106,6 +105,9 @@ z.conversation.EventMapper = class EventMapper {
         break;
       case z.event.Client.CONVERSATION.MISSED_MESSAGES:
         message_et = this._map_event_missed_messages();
+        break;
+      case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE:
+        message_et = this._map_event_team_member_leave(event);
         break;
       case z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT:
       case z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG:
@@ -254,7 +256,7 @@ z.conversation.EventMapper = class EventMapper {
   }
 
   /**
-   * Maps JSON data of conversation.member_leave or conversation.team_leave message into message entity
+   * Maps JSON data of conversation.member_leave message into message entity
    *
    * @private
    * @param {Object} event_data - Message data
@@ -331,6 +333,20 @@ z.conversation.EventMapper = class EventMapper {
   _map_event_rename({data: event_data}) {
     const message_et = new z.entity.RenameMessage();
     message_et.name = event_data.name;
+    return message_et;
+  }
+
+  /**
+   * Maps JSON data of conversation.team_leave message into message entity
+   *
+   * @private
+   * @param {Object} event - Message data
+   * @returns {MemberMessage} Member message entity
+   */
+  _map_event_team_member_leave(event) {
+    const message_et = this._map_event_member_leave(event);
+    const event_data = event.data;
+    message_et.name(event_data.name || z.l10n.text(z.string.conversation_someone));
     return message_et;
   }
 

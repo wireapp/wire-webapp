@@ -235,9 +235,9 @@
         <hr class="message-header-line" />
       </div>
       <!-- ko if: message.is_member_change() -->
-      <div class="message-body-actions">
-        <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}"></time>
-      </div>
+        <div class="message-body-actions">
+          <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}"></time>
+        </div>
       <!-- /ko -->
     </div>
     <div class="message-body">
@@ -248,9 +248,9 @@
                        data-placement="vertical"
                        params="user: $data, click: $parents[1].on_message_user_click"></user-avatar>
         <!-- /ko -->
-        <!-- ko if: message.is_member_change() -->
+        <!-- ko if: message.is_member_join() || message.is_member_leave() -->
           <user-avatar class="user-avatar-xs"
-                       data-bind="css: {'translucent': message.is_member_removal()}"
+                       data-bind="css: {'translucent': message.is_member_leave()}"
                        data-bubble="#participants-bubble"
                        data-placement="vertical"
                        params="user: $data, click: $parents[1].on_message_user_click"></user-avatar>

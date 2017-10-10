@@ -287,6 +287,7 @@ z.string.conversation_delete_timestamp = 'Deleted on {{date}}';
 z.string.conversation_edit_timestamp = 'Edited on {{date}}';
 z.string.conversation_likes_caption = '{{number}} people';
 z.string.conversation_send_pasted_file = 'Pasted image at {{date}}';
+z.string.conversation_someone = 'Someone';
 z.string.conversation_tweet_author = ' on Twitter';
 
 // Collection
@@ -452,8 +453,10 @@ z.string.preferences_about_terms_of_use = 'Terms of use';
 z.string.preferences_about_version = 'Version {{version}}';
 z.string.preferences_about_website = 'Wire website';
 
+z.string.preferences_account_create_team = 'Create a team';
 z.string.preferences_account_delete = 'Delete account';
 z.string.preferences_account_log_out = 'Log out';
+z.string.preferences_account_manage_team = 'Manage team';
 z.string.preferences_account_reset_password = 'Reset password';
 z.string.preferences_account_team = 'in {{name}}';
 z.string.preferences_account_username_placeholder = 'Your full name';
@@ -530,6 +533,7 @@ z.string.upload_google_message_error = 'We did not receive your information. Ple
 z.string.upload_google_button_again = 'Try again';
 
 // URLs
+z.string.url_team_create = 'create-team/';
 z.string.url_password_reset = 'forgot/';
 z.string.url_legal = 'https://wire.com/legal/';
 z.string.url_privacy = 'https://wire.com/privacy/';

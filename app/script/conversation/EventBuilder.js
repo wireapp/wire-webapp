@@ -129,13 +129,14 @@ z.conversation.EventBuilder = (function() {
     };
   };
 
-  const _build_team_member_leave = (conversation_et, user_id, time_offset) => {
+  const _build_team_member_leave = (conversation_et, user_et, time_offset) => {
     return {
       conversation: conversation_et.id,
       data: {
-        user_ids: [user_id],
+        name: user_et.name(),
+        user_ids: [user_et.id],
       },
-      from: user_id,
+      from: user_et.id,
       id: z.util.create_random_uuid(),
       time: conversation_et.get_next_iso_date(time_offset),
       type: z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE,

@@ -49,11 +49,11 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.username_error = ko.observable();
 
     this.is_team = this.team_repository.is_team;
+    this.is_team_manager = ko.pureComputed(() => this.is_team() && this.self_user().is_team_manager());
     this.team = this.team_repository.team;
     this.team_name = ko.pureComputed(() =>
       z.l10n.text(z.string.preferences_account_team, this.team_repository.team_name())
     );
-    this.team_initial = ko.pureComputed(() => z.util.StringUtil.get_first_character(this.team_repository.team_name()));
 
     this.name_saved = ko.observable();
     this.username_saved = ko.observable();
@@ -225,22 +225,26 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
   click_on_delete_account() {
     amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.DELETE_ACCOUNT, {
-      action: () => {
-        return this.user_repository.delete_me();
-      },
+      action: () => this.user_repository.delete_me(),
       data: this.self_user().email(),
     });
   }
 
+  click_on_create() {
+    z.util.safe_window_open(`${z.util.Environment.backend.website_url()}${z.l10n.text(z.string.url_team_create)}`);
+  }
+
   click_on_logout() {
-    return this.client_repository.logout_client();
+    this.client_repository.logout_client();
+  }
+
+  click_on_manage() {
+    z.util.safe_window_open(`${z.util.Environment.backend.admin_url()}`);
   }
 
   click_on_reset_password() {
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PASSWORD_RESET, {value: 'fromProfile'});
-    return z.util.safe_window_open(
-      `${z.util.Environment.backend.website_url()}${z.l10n.text(z.string.url_password_reset)}`
-    );
+    z.util.safe_window_open(`${z.util.Environment.backend.website_url()}${z.l10n.text(z.string.url_password_reset)}`);
   }
 
   set_picture(new_user_picture) {

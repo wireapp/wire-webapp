@@ -1114,18 +1114,20 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   team_member_leave(team_id, user_id) {
-    this.conversations()
-      .filter(conversation_et => conversation_et.team_id === team_id && !conversation_et.removed_from_conversation())
-      .forEach(conversation_et => {
-        if (conversation_et.participating_user_ids().includes(user_id)) {
-          const member_leave_event = z.conversation.EventBuilder.build_team_member_leave(
-            conversation_et,
-            user_id,
-            this.time_offset
-          );
-          amplify.publish(z.event.WebApp.EVENT.INJECT, member_leave_event);
-        }
-      });
+    this.user_repository.get_user_by_id(user_id).then(user_et => {
+      this.conversations()
+        .filter(conversation_et => conversation_et.team_id === team_id && !conversation_et.removed_from_conversation())
+        .forEach(conversation_et => {
+          if (conversation_et.participating_user_ids().includes(user_id)) {
+            const member_leave_event = z.conversation.EventBuilder.build_team_member_leave(
+              conversation_et,
+              user_et,
+              this.time_offset
+            );
+            amplify.publish(z.event.WebApp.EVENT.INJECT, member_leave_event);
+          }
+        });
+    });
   }
 
   /**

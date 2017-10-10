@@ -14,7 +14,7 @@
     "linkifyjs": "https://github.com/nfrasser/linkify-shim.git#2.1.5",
     "marked": "https://github.com/wireapp/marked.git#18f7f85194ec0f619397f49f7dfdaa5e5b09db09",
     "mixpanel": "https://github.com/mixpanel/mixpanel-js.git#2.13.0",
-    "moment": "https://github.com/moment/moment.git#2.18.1",
+    "moment": "https://github.com/moment/moment.git#2.19.0",
     "normalize-css": "https://github.com/necolas/normalize.css.git#3.0.3",
     "pako": "https://github.com/nodeca/pako.git#1.0.6",
     "phone-format": "https://github.com/albeebe/phoneformat.js.git#1.0.5",

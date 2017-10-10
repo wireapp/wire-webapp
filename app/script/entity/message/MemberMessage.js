@@ -31,6 +31,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
 
     this.user_ets = ko.observableArray();
     this.user_ids = ko.observableArray();
+    this.name = ko.observable('');
 
     // Users joined the conversation without sender
     this.joined_user_ets = ko.pureComputed(() => {
@@ -45,6 +46,15 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
         .filter(user_et => !user_et.is_me)
         .map(user_et => user_et);
     });
+
+    this.sender_name = ko.pureComputed(
+      () => {
+        const is_team_member_leave = this.type === z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE;
+        return is_team_member_leave ? this.name() : z.util.get_first_name(this.user());
+      },
+      this,
+      {deferEvaluation: true}
+    );
 
     this._generate_name_string = (declension = z.string.Declension.ACCUSATIVE) => {
       return z.util.LocalizerUtil.join_names(this.joined_user_ets(), declension);
