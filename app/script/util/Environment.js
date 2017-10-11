@@ -50,14 +50,20 @@ window.z.util = z.util || {};
         return window.parseInt(platform.version.split('.')[0], 10);
       }
     },
-    is_chrome: () => platform.name === BROWSER_NAME.CHROME || this.is_electron(),
-    is_desktop: () => this.is_electron() && navigator.userAgent.includes(BROWSER_NAME.WIRE),
+    is_chrome() {
+      return platform.name === BROWSER_NAME.CHROME || this.is_electron();
+    },
+    is_desktop() {
+      return this.is_electron() && navigator.userAgent.includes(BROWSER_NAME.WIRE);
+    },
     is_edge: () => platform.name === BROWSER_NAME.EDGE,
     is_electron: () => platform.name === BROWSER_NAME.ELECTRON,
     is_firefox: () => platform.name === BROWSER_NAME.FIREFOX,
     is_opera: () => platform.name === BROWSER_NAME.OPERA,
-    supports_audio_output_selection: () => this.is_chrome(),
-    supports_calling: () => {
+    supports_audio_output_selection() {
+      return this.is_chrome();
+    },
+    supports_calling() {
       if (!this.supports_media_devices()) {
         return false;
       }
@@ -80,7 +86,7 @@ window.z.util = z.util || {};
       }
       return document.visibilityState !== undefined;
     },
-    supports_screen_sharing: () => {
+    supports_screen_sharing() {
       if (window.desktopCapturer) {
         return true;
       }
@@ -148,7 +154,7 @@ window.z.util = z.util || {};
       mac: os.is_mac(),
       win: os.is_windows(),
     },
-    version: (show_wrapper_version = true, do_not_format = false) => {
+    version(show_wrapper_version = true, do_not_format = false) {
       if (z.util.Environment.frontend.is_localhost()) {
         return 'dev';
       }
