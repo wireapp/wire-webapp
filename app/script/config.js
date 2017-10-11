@@ -35,21 +35,11 @@ window.z.config = {
   LOGGER: {
     OPTIONS: {
       domains: {
-        'app.wire.com': function() {
-          return 0;
-        },
-        'localhost': function() {
-          return 300;
-        },
-        'wire.ms': function() {
-          return 300;
-        },
-        'wire-webapp-staging.wire.com': function() {
-          return 300;
-        },
-        'zinfra.io': function() {
-          return 300;
-        },
+        'app.wire.com': () => 0,
+        'localhost': () => 300,
+        'wire.ms': () => 300,
+        'wire-webapp-staging.wire.com': () => 300,
+        'zinfra.io': () => 300,
       },
       name_length: 65,
     },
