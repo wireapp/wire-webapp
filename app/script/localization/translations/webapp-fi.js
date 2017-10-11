@@ -222,6 +222,7 @@ z.string.fi.conversation_delete_timestamp = 'Poistettu {{date}}';
 z.string.fi.conversation_edit_timestamp = 'Muokattu {{date}}';
 z.string.fi.conversation_likes_caption = '{{number}} henkeä';
 z.string.fi.conversation_send_pasted_file = 'Liitti kuvan {{date}}';
+z.string.fi.conversation_someone = 'Joku';
 
 z.string.fi.collection_show_all = 'Näytä kaikki {{number}}';
 z.string.fi.collection_section_links = 'Linkit';
@@ -408,33 +409,14 @@ z.string.fi.upload_google_headline_error = 'Jotain meni pieleen.';
 z.string.fi.upload_google_message_error = 'Emme vastaanottaneet tietojasi. Ole hyvä ja yritä tuoda kontaktisi uudelleen.';
 z.string.fi.upload_google_button_again = 'Yritä uudelleen';
 
-z.string.fi.url_legal = 'https://wire.com/legal/';
-z.string.fi.url_privacy = 'https://wire.com/privacy/';
-z.string.fi.url_privacy_why = 'https://wire.com/privacy/why/';
-z.string.fi.url_support = 'https://support.wire.com';
-z.string.fi.url_terms_of_use = 'https://wire.com/legal/terms/';
-z.string.fi.url_wire = 'https://wire.com';
-z.string.fi.url_wire_for_web = 'https://app.wire.com';
-z.string.fi.url_support_calling = 'https://support.wire.com/hc/en-us/articles/202969412';
-z.string.fi.url_support_camera_access_denied = 'https://support.wire.com/hc/en-us/articles/202935412';
-z.string.fi.url_support_device_access_denied = 'https://support.wire.com/hc/en-us/articles/213512545';
-z.string.fi.url_support_contact = 'https://support.wire.com/hc/en-us/requests/new';
-z.string.fi.url_support_contact_bug = 'https://support.wire.com/hc/en-us/requests/new?ticket_form_id=101615';
-z.string.fi.url_support_history = 'https://support.wire.com/hc/en-us/articles/207834645';
-z.string.fi.url_support_mic_access_denied = 'https://support.wire.com/hc/en-us/articles/202590081';
-z.string.fi.url_support_mic_not_found = 'https://support.wire.com/hc/en-us/articles/202970662';
-z.string.fi.url_support_screen_access_denied = 'https://support.wire.com/hc/en-us/articles/202935412';
-z.string.fi.url_support_screen_whitelist = 'https://support.wire.com/hc/en-us/articles/209423889';
-z.string.fi.url_support_usernames = 'https://wire.com/support/username';
-z.string.fi.url_decrypt_error_1 = 'https://wire.com/privacy/error-1';
-z.string.fi.url_decrypt_error_2 = 'https://wire.com/privacy/error-2';
-
 z.string.fi.warning_call_detail = 'Selaimellasi täytyy olla käyttöoikeus mikrofoniisi voidaksesi käydä puhelinkeskusteluja.';
 z.string.fi.warning_call_headline = 'Et voi käydä puhelinkeskusteluja ilman mikrofonia';
 z.string.fi.warning_call_unsupported_incoming = '{{user}} soittaa. Selaimesi ei tue puheluja.';
 z.string.fi.warning_call_unsupported_outgoing = 'Et voi soittaa puhelua koska selaimesi ei tue puheluja.';
 z.string.fi.warning_call_issues = 'Tämä versio Wirestä ei pysty osallistumaan puheluun. Käytä';
 z.string.fi.warning_call_upgrade_browser = 'Soittaaksesi puhelun, päivitä Google Chrome.';
+z.string.fi.warning_connectivity_connection_lost = 'Yritetään yhdistää. Wire ei mahdollisesti pysty toimitttamaan viestejä perille.';
+z.string.fi.warning_connectivity_no_internet = 'Ei Internetiä. Et pysty lähettämään tai vastaanottamaan viestejä.';
 z.string.fi.warning_learn_more = 'Lue lisää';
 z.string.fi.warning_not_found_camera = 'Et voi soittaa puhelua koska tietokoneessasi ei ole kameraa.';
 z.string.fi.warning_not_found_microphone = 'Et voi soittaa puhelua koska tietokoneessasi ei ole mikrofonia.';
@@ -446,9 +428,6 @@ z.string.fi.warning_permission_request_microphone = '{{icon}} Anna käyttöoikeu
 z.string.fi.warning_permission_request_notification = '{{icon}} Salli ilmoitukset';
 z.string.fi.warning_permission_request_screen = '{{icon}} Salli näytön käyttö';
 z.string.fi.warning_tell_me_how = 'Kerro miten';
-
-z.string.fi.warning_connectivity_connection_lost = 'Yritetään yhdistää. Wire ei mahdollisesti pysty toimitttamaan viestejä perille.';
-z.string.fi.warning_connectivity_no_internet = 'Ei Internetiä. Et pysty lähettämään tai vastaanottamaan viestejä.';
 
 z.string.fi.system_notification_asset_add = 'Jakoi kuvan';
 z.string.fi.system_notification_connection_accepted = 'Hyväksyi yhteyspyyntösi';

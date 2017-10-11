@@ -249,6 +249,7 @@ z.string.es.conversation_delete_timestamp = 'Eliminados en {{date}}';
 z.string.es.conversation_edit_timestamp = 'Editado {{date}}';
 z.string.es.conversation_likes_caption = '{{number}}o de personas';
 z.string.es.conversation_send_pasted_file = 'Imagen añadida el {{date}}';
+z.string.es.conversation_someone = 'Alguien';
 z.string.es.conversation_tweet_author = ' en Twitter';
 
 z.string.es.collection_show_all = 'Mostrar los {{number}}';
@@ -470,35 +471,18 @@ z.string.es.upload_google_headline_error = 'Algo salió mal.';
 z.string.es.upload_google_message_error = 'No recibimos tu información. Por favor, intenta importar tus contactos otra vez.';
 z.string.es.upload_google_button_again = 'Vuelve a intentarlo';
 
-z.string.es.url_password_reset = 'forgot/?hl=es';
-z.string.es.url_legal = 'https://wire.com/legal/';
-z.string.es.url_privacy = 'https://wire.com/privacy/';
-z.string.es.url_privacy_why = 'https://wire.com/privacy/why/';
-z.string.es.url_support = 'https://support.wire.com';
-z.string.es.url_terms_of_use = 'https://wire.com/legal/terms/';
-z.string.es.url_wire = 'https://wire.com';
-z.string.es.url_wire_for_web = 'https://app.wire.com';
-z.string.es.url_support_calling = 'https://support.wire.com/hc/en-us/articles/202969412';
-z.string.es.url_support_camera_access_denied = 'https://support.wire.com/hc/en-us/articles/202935412';
-z.string.es.url_support_device_access_denied = 'https://support.wire.com/hc/en-us/articles/213512545';
-z.string.es.url_support_contact = 'https://support.wire.com/hc/en-us/requests/new';
-z.string.es.url_support_contact_bug = 'https://support.wire.com/hc/en-us/requests/new?ticket_form_id=101615';
-z.string.es.url_support_history = 'https://support.wire.com/hc/en-us/articles/207834645';
-z.string.es.url_support_mic_access_denied = 'https://support.wire.com/hc/en-us/articles/202590081';
-z.string.es.url_support_mic_not_found = 'https://support.wire.com/hc/en-us/articles/202970662';
-z.string.es.url_support_screen_access_denied = 'https://support.wire.com/hc/en-us/articles/202935412';
-z.string.es.url_support_screen_whitelist = 'https://support.wire.com/hc/en-us/articles/209423889';
-z.string.es.url_support_usernames = 'https://wire.com/support/username';
-z.string.es.url_decrypt_error_1 = 'https://wire.com/privacy/error-1';
-z.string.es.url_decrypt_error_2 = 'https://wire.com/privacy/error-2';
-
 z.string.es.warning_call_detail = 'Para hablar, tu navegador necesita permiso de usar el micrófono.';
 z.string.es.warning_call_headline = 'No se puede llamar sin micrófono';
 z.string.es.warning_call_unsupported_incoming = '{{user}} está llamando. Tu navegador no está configurada para llamadas.';
 z.string.es.warning_call_unsupported_outgoing = 'No puedes llamar porque tu navegador no está configurada para llamadas.';
 z.string.es.warning_call_issues = 'Esta versión de Wire no puede participar en la llamada. Por favor, usa';
 z.string.es.warning_call_upgrade_browser = 'Para llamar se necesita una versión reciente de Google Chrome.';
+z.string.es.warning_connectivity_connection_lost = 'Intentando conectar. Es posible que Wire no podrá entregar mensajes.';
+z.string.es.warning_connectivity_no_internet = 'No hay Internet. No podrás enviar o recibir mensajes.';
 z.string.es.warning_learn_more = 'Aprender más';
+z.string.es.warning_lifecycle_update = 'Hay una nueva versión de Wire disponible.';
+z.string.es.warning_lifecycle_update_notes = 'Novedades';
+z.string.es.warning_lifecycle_update_link = 'Actualiza ahora';
 z.string.es.warning_not_found_camera = 'No puedes llamar porque tu máquina no tiene cámera.';
 z.string.es.warning_not_found_microphone = 'No puedes llamar porque tu máquina no tiene micrófono.';
 z.string.es.warning_permission_denied_camera = 'No puedes llamar porque tu máquina no tiene accesso a la cámera.';
@@ -509,13 +493,6 @@ z.string.es.warning_permission_request_microphone = '{{icon}} Permitir acceso al
 z.string.es.warning_permission_request_notification = '{{icon}} Permitir notificaciones';
 z.string.es.warning_permission_request_screen = '{{icon}} Permitir acceso a la pantalla';
 z.string.es.warning_tell_me_how = 'Explíqueme cómo';
-
-z.string.es.warning_connectivity_connection_lost = 'Intentando conectar. Es posible que Wire no podrá entregar mensajes.';
-z.string.es.warning_connectivity_no_internet = 'No hay Internet. No podrás enviar o recibir mensajes.';
-
-z.string.es.warning_lifecycle_update = 'Hay una nueva versión de Wire disponible.';
-z.string.es.warning_lifecycle_update_notes = 'Novedades';
-z.string.es.warning_lifecycle_update_link = 'Actualiza ahora';
 
 z.string.es.system_notification_asset_add = 'Compartió una foto';
 z.string.es.system_notification_connection_accepted = 'Aceptó tu solicitud de conexión';

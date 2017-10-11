@@ -13,7 +13,7 @@
         <div class="warning-bar warning-bar-feature bg-theme">
           <div class="warning-bar-message">
             <span data-bind="l10n_text: z.string.warning_permission_denied_camera"></span>&nbsp;
-            <a class="warning-bar-link" data-bind="l10n_href: z.string.url_support_camera_access_denied, l10n_text: z.string.warning_learn_more" rel="nofollow noopener noreferrer" target="_blank"></a>
+            <a class="warning-bar-link" data-bind="l10n_href: {support: z.config.SUPPORT.ID.CAMERA_ACCESS_DENIED}, l10n_text: z.string.warning_learn_more" rel="nofollow noopener noreferrer" target="_blank"></a>
           </div>
           <span class="warning-bar-close icon-close button-round button-round-dark" data-bind="click: close_warning"></span>
         </div>
@@ -47,7 +47,7 @@
         <div class="warning-bar warning-bar-feature bg-theme">
           <div class="warning-bar-message">
             <span data-bind="l10n_text: z.string.warning_permission_denied_screen"></span>&nbsp;
-            <a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="l10n_href: z.string.url_support_screen_access_denied, l10n_text: z.string.warning_learn_more"></a>
+            <a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="l10n_href: {support: z.config.SUPPORT.ID.SCREEN_ACCESS_DENIED}, l10n_text: z.string.warning_learn_more"></a>
           </div>
           <span class="warning-bar-close icon-close button-round button-round-dark" data-bind="click: close_warning"></span>
         </div>
@@ -57,7 +57,7 @@
       <div class="warning-bar warning-bar-feature bg-theme">
         <div class="warning-bar-message">
           <span data-bind="l10n_text: z.string.warning_not_found_camera"></span>&nbsp;
-          <a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="l10n_href: z.string.url_support_mic_not_found, l10n_text: z.string.warning_learn_more"></a>
+          <a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="l10n_href: {support: z.config.SUPPORT.ID.DEVICE_NOT_FOUND}, l10n_text: z.string.warning_learn_more"></a>
         </div>
         <span class="warning-bar-close icon-close button-round button-round-dark" data-bind="click: close_warning"></span>
       </div>
@@ -67,7 +67,7 @@
         <div class="warning-bar warning-bar-feature bg-theme">
           <div class="warning-bar-message">
             <span data-bind="l10n_text: z.string.warning_not_found_microphone"></span>&nbsp;
-            <a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="l10n_href: z.string.url_support_mic_not_found, l10n_text: z.string.warning_learn_more"></a>
+            <a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="l10n_href: {support: z.config.SUPPORT.ID.DEVICE_NOT_FOUND}, l10n_text: z.string.warning_learn_more"></a>
           </div>
           <span class="warning-bar-close icon-close button-round button-round-dark" data-bind="click: close_warning"></span>
         </div>
@@ -86,13 +86,13 @@
       <!-- ko if: top_warning() === z.ViewModel.WarningType.UNSUPPORTED_INCOMING_CALL -->
         <div class="warning-bar warning-bar-feature bg-theme">
           <!-- ko ifnot: z.util.Environment.browser.chrome -->
-            <div class="warning-bar-message"><span data-bind="l10n_text: {'id': z.string.warning_call_unsupported_incoming, substitute: z.util.escape_html(first_name())}"></span>&nbsp;<a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="l10n_href: z.string.url_support_calling, l10n_text: z.string.warning_learn_more"></a></div>
+            <div class="warning-bar-message"><span data-bind="l10n_text: {'id': z.string.warning_call_unsupported_incoming, substitute: z.util.escape_html(first_name())}"></span>&nbsp;<a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="l10n_href: {support: z.config.SUPPORT.ID.CALLING}, l10n_text: z.string.warning_learn_more"></a></div>
           <!-- /ko -->
           <!-- ko if: z.util.Environment.browser.chrome -->
             <!-- ko if: z.util.Environment.desktop -->
               <div class="warning-bar-message">
                 <span data-bind="l10n_text: z.string.warning_call_issues"></span>&nbsp;
-                <a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="l10n_href: z.string.url_wire_for_web, l10n_text: z.string.wire_for_web"></a>
+                <a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="l10n_href: {type: z.util.URLUtil.TYPE.WEBAPP, path: z.string.url_webapp_root}, l10n_text: z.string.wire_for_web"></a>
               </div>
             <!-- /ko -->
             <!-- ko ifnot: z.util.Environment.desktop -->
@@ -108,14 +108,14 @@
           <!-- ko ifnot: z.util.Environment.browser.chrome -->
             <div class="warning-bar-message">
               <span data-bind="l10n_text: z.string.warning_call_unsupported_outgoing"></span>&nbsp;
-              <a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="l10n_href: z.string.url_support_calling, l10n_text: z.string.warning_learn_more"></a>
+              <a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="l10n_href: {support: z.config.SUPPORT.ID.CALLING}, l10n_text: z.string.warning_learn_more"></a>
             </div>
           <!-- /ko -->
           <!-- ko if: z.util.Environment.browser.chrome -->
             <!-- ko if: z.util.Environment.desktop -->
               <div class="warning-bar-message">
                 <span data-bind="l10n_text: z.string.warning_call_issues"></span>&nbsp;
-                <a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="l10n_href: z.string.url_wire_for_web, l10n_text: z.string.wire_for_web"></a>
+                <a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="l10n_href: {type: z.util.URLUtil.TYPE.WEBAPP, path: z.string.url_webapp_root}, l10n_text: z.string.wire_for_web"></a>
               </div>
             <!-- /ko -->
             <!-- ko ifnot: z.util.Environment.desktop -->
