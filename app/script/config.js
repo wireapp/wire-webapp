@@ -77,6 +77,22 @@ window.z.config = {
   // measured in pixel
   SCROLL_TO_LAST_MESSAGE_THRESHOLD: 100,
 
+  SUPPORT: {
+    FORM: {
+      BUG: 'new?ticket_form_id=101615',
+      CONTACT: 'new',
+    },
+    ID: {
+      CALLING: 202969412,
+      CAMERA_ACCESS_DENIED: 202935412,
+      DEVICE_ACCESS_DENIED: 213512545,
+      DEVICE_NOT_FOUND: 202970662,
+      HISTORY: 207834645,
+      MICROPHONE_ACCESS_DENIED: 202590081,
+      SCREEN_ACCESS_DENIED: 202935412,
+    },
+  },
+
   SUPPORTED_CONVERSATION_IMAGE_TYPES: [
     '.jpg-large',
     'image/jpg',

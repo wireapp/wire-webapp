@@ -118,8 +118,7 @@ z.ViewModel.WarningsViewModel = class WarningsViewModel {
       case z.ViewModel.WarningType.REQUEST_MICROPHONE:
         amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALLING, {
           action() {
-            const path = z.l10n.text(z.string.url_support_mic_access_denied);
-            z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.SUPPORT, path));
+            z.util.safe_window_open(z.util.URLUtil.build_support_url(z.config.SUPPORT.ID.MICROPHONE_ACCESS_DENIED));
           },
         });
         break;
