@@ -8,7 +8,7 @@
           <header class="preferences-header preferences-av-header" data-bind="l10n_text: z.string.preferences_av_microphone"></header>
           <!-- ko if: permission_denied() -->
             <div class="preferences-av-detail">
-              <a rel="nofollow noopener noreferrer" target="_blank" data-bind="l10n_text: z.string.preferences_av_permission_detail, l10n_href: z.string.url_support_device_access_denied"></a>
+              <a rel="nofollow noopener noreferrer" target="_blank" data-bind="l10n_text: z.string.preferences_av_permission_detail, l10n_href: {type: z.util.URLUtil.TYPE.SUPPORT, path: z.string.url_support_device_access_denied}"></a>
             </div>
           <!-- /ko -->
           <div class="preferences-option" data-bind="css: {'preferences-av-select-disabled': permission_denied}">
@@ -59,7 +59,7 @@
           <header class="preferences-header preferences-av-header" data-bind="l10n_text: z.string.preferences_av_camera"></header>
           <!-- ko if: permission_denied() -->
             <div class="preferences-av-detail">
-              <a rel="nofollow noopener noreferrer" target="_blank" data-bind="l10n_text: z.string.preferences_av_permission_detail, l10n_href: z.string.url_support_device_access_denied"></a>
+              <a rel="nofollow noopener noreferrer" target="_blank" data-bind="l10n_text: z.string.preferences_av_permission_detail, l10n_href: {type: z.util.URLUtil.TYPE.SUPPORT, path: z.string.url_support_device_access_denied}"></a>
             </div>
           <!-- /ko -->
           <div class="preferences-option" data-bind="css: {'preferences-av-select-disabled': permission_denied}">

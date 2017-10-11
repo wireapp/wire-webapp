@@ -22,8 +22,8 @@
 
 ko.bindingHandlers.l10n_href = {
   update(element, valueAccessor = z.util.noop) {
-    const {id = valueAccessor(), substitute} = valueAccessor();
-    element.setAttribute('href', z.l10n.text(id, substitute));
+    const {type, path} = valueAccessor();
+    element.setAttribute('href', z.util.URLUtil.build_url(type, z.l10n.text(path)));
   },
 };
 

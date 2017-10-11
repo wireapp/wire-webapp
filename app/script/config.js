@@ -32,12 +32,6 @@ window.z.config = {
     YELLOW: 3,
   },
 
-  ACCOUNT_PRODUCTION_URL: 'https://account.wire.com/',
-  ACCOUNT_STAGING_URL: 'https://wire-account-staging.zinfra.io/',
-
-  ADMIN_PRODUCTION_URL: 'https://teams.wire.com/',
-  ADMIN_STAGING_URL: 'https://wire-admin-staging.zinfra.io/',
-
   LOGGER: {
     OPTIONS: {
       domains: {
@@ -112,6 +106,35 @@ window.z.config = {
 
   UNSPLASH_URL: 'https://source.unsplash.com/1200x1200/?landscape',
 
-  WEBSITE_PRODUCTION_URL: 'https://wire.com/',
-  WEBSITE_STAGING_URL: 'https://staging-website.zinfra.io/',
+  URL: {
+    ACCOUNT: {
+      PRODUCTION: 'https://account.wire.com',
+      STAGING: 'https://wire-account-staging.zinfra.io',
+    },
+    SUPPORT: 'https://support.wire.com',
+    TEAM_SETTINGS: {
+      PRODUCTION: 'https://teams.wire.com',
+      STAGING: 'https://wire-admin-staging.zinfra.io',
+    },
+    WEBAPP: {
+      PRODUCTION: 'https://app.wire.com',
+      STAGING: 'https://wire-webapp-staging.zinfra.io',
+    },
+    WEBSITE: {
+      PRODUCTION: 'https://wire.com',
+      STAGING: 'https://staging-website.zinfra.io',
+    },
+  },
+
+  URL_PATH: {
+    CREATE_TEAM: '/create-team/',
+    DECRYPT_ERROR_1: '/privacy/error-1',
+    DECRYPT_ERROR_2: '/privacy/error-2',
+    MANAGE_TEAM: '/login/',
+    PASSWORD_RESET: '/forgot/',
+    PRIVACY_HOW: '/privacy/how/',
+    PRIVACY_WHY: '/privacy/why/',
+    SUPPORT_USERNAME: '/support/username',
+    TERMS_OF_USE: '/legal/terms/',
+  },
 };

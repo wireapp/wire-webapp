@@ -281,7 +281,7 @@
       </div>
       <div class="modal-text">
         <span data-bind="l10n_text: z.string.modal_session_reset_message_1"></span>
-        <a data-bind="l10n_href: z.string.url_support_contact_bug, l10n_text: z.string.modal_session_reset_message_link" rel="nofollow noopener noreferrer" target="_blank"></a>
+        <a data-bind="l10n_href: {type: z.util.URLUtil.TYPE.SUPPORT, path: z.string.url_support_contact_bug}, l10n_text: z.string.modal_session_reset_message_link" rel="nofollow noopener noreferrer" target="_blank"></a>
         <span data-bind="l10n_text: z.string.modal_session_reset_message_2"></span>
       </div>
       <div class="modal-close button button-medium button-fluid" data-bind="l10n_text: z.string.modal_button_ok" data-uie-name="do-close"></div>
