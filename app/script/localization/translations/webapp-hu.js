@@ -108,6 +108,7 @@ z.string.hu.auth_error_phone_number_budget = 'Túl gyakran jelentkeztél be. Pr�
 z.string.hu.auth_error_phone_number_forbidden = 'Sajnáljuk. Ez a telefonszám nem megengedett.';
 z.string.hu.auth_error_phone_number_invalid = 'Érvénytelen telefonszám';
 z.string.hu.auth_error_phone_number_unknown = 'Ismeretlen telefonszám';
+z.string.hu.auth_error_suspended = 'Ezzel az azonosítóval már nem lehet bejelentkezni.';
 z.string.hu.auth_error_sign_in = 'Kérjük, ellenőrizd az adataid, majd próbáld meg újra.';
 
 z.string.hu.call_state_outgoing = 'Kicsengés…';
@@ -126,6 +127,8 @@ z.string.hu.modal_button_send = 'Küldés';
 z.string.hu.modal_block_conversation_headline = '{{user}} tiltása?';
 z.string.hu.modal_block_conversation_message = '{{user}} nem tud majd kapcsolatba lépni veled, sem meghívni téged csoportos beszélgetésekbe.';
 z.string.hu.modal_block_conversation_button = 'Tiltás';
+z.string.hu.modal_bots_unavailable_headline = 'A botok jelenleg nem elérhetőek';
+z.string.hu.modal_bots_unavailable_message = 'Köszönjük, hogy érdeklődsz a botokkal kapcsolatban. A szolgáltatást jelenleg felfüggesztettük, amíg a következő verzión dolgozunk. Hamarosan jelentkezünk.';
 z.string.hu.modal_call_conversation_empty_headline = 'Senki sem hívható';
 z.string.hu.modal_call_conversation_empty_message = 'Senki sem maradt itt.';
 z.string.hu.modal_call_no_video_in_group_headline = 'A csoportokban a videóhívás nem elérhető';
@@ -249,6 +252,7 @@ z.string.hu.conversation_delete_timestamp = 'Törölve ({{date}})';
 z.string.hu.conversation_edit_timestamp = 'Szerkesztve ({{date}})';
 z.string.hu.conversation_likes_caption = '{{number}} partner';
 z.string.hu.conversation_send_pasted_file = 'Kép beillesztve ({{date}})';
+z.string.hu.conversation_someone = 'Valaki';
 z.string.hu.conversation_tweet_author = ' Twitteren';
 
 z.string.hu.collection_show_all = 'Mind a(z) {{number}} mutatása';
@@ -470,36 +474,18 @@ z.string.hu.upload_google_headline_error = 'Valami nem stimmel.';
 z.string.hu.upload_google_message_error = 'Nem kaptuk meg az adataidat. Kérjük, próbáld meg újra a névjegyek importálását.';
 z.string.hu.upload_google_button_again = 'Újra próbálás';
 
-z.string.hu.url_password_reset = 'forgot/';
-z.string.hu.url_legal = 'https://wire.com/legal/';
-z.string.hu.url_privacy = 'https://wire.com/privacy/';
-z.string.hu.url_privacy_how = 'https://wire.com/privacy/how/';
-z.string.hu.url_privacy_why = 'https://wire.com/privacy/why/';
-z.string.hu.url_support = 'https://support.wire.com';
-z.string.hu.url_terms_of_use = 'https://wire.com/legal/terms/';
-z.string.hu.url_wire = 'https://wire.com';
-z.string.hu.url_wire_for_web = 'https://app.wire.com';
-z.string.hu.url_support_calling = 'https://support.wire.com/hc/en-us/articles/202969412';
-z.string.hu.url_support_camera_access_denied = 'https://support.wire.com/hc/en-us/articles/202935412';
-z.string.hu.url_support_device_access_denied = 'https://support.wire.com/hc/en-us/articles/213512545';
-z.string.hu.url_support_contact = 'https://support.wire.com/hc/en-us/requests/new';
-z.string.hu.url_support_contact_bug = 'https://support.wire.com/hc/en-us/requests/new?ticket_form_id=101615';
-z.string.hu.url_support_history = 'https://support.wire.com/hc/en-us/articles/207834645';
-z.string.hu.url_support_mic_access_denied = 'https://support.wire.com/hc/en-us/articles/202590081';
-z.string.hu.url_support_mic_not_found = 'https://support.wire.com/hc/en-us/articles/202970662';
-z.string.hu.url_support_screen_access_denied = 'https://support.wire.com/hc/en-us/articles/202935412';
-z.string.hu.url_support_screen_whitelist = 'https://support.wire.com/hc/en-us/articles/209423889';
-z.string.hu.url_support_usernames = 'https://wire.com/support/username';
-z.string.hu.url_decrypt_error_1 = 'https://wire.com/privacy/error-1';
-z.string.hu.url_decrypt_error_2 = 'https://wire.com/privacy/error-2';
-
 z.string.hu.warning_call_detail = 'A hívásokhoz a böngésződnek hozzá kell férnie a mikrofonodhoz.';
 z.string.hu.warning_call_headline = 'Nem kezdeményezhetsz hívást mikrofon nélkül';
 z.string.hu.warning_call_unsupported_incoming = '{{user}} hív. Böngésződ nem támogatja a hanghívásokat.';
 z.string.hu.warning_call_unsupported_outgoing = 'Nem kezdeményezhetsz hívást, mert böngésződ nem támogatja a hanghívásokat.';
 z.string.hu.warning_call_issues = 'Ezzel a Wire verzióval nem tudsz részt venni a hívásban. Kérjük, használd ezt:';
 z.string.hu.warning_call_upgrade_browser = 'Kérjük, hogy hanghívásokhoz frissítsd a Google Chrome-ot.';
+z.string.hu.warning_connectivity_connection_lost = 'Kapcsolódási kísérlet folyamatban. A Wire most nem tud üzeneteket kézbesíteni.';
+z.string.hu.warning_connectivity_no_internet = 'Nincs internet. Üzenetek küldése és fogadása most nem lehetséges.';
 z.string.hu.warning_learn_more = 'További információ';
+z.string.hu.warning_lifecycle_update = 'Elérhető a Wire új verziója.';
+z.string.hu.warning_lifecycle_update_notes = 'Újdonságok';
+z.string.hu.warning_lifecycle_update_link = 'Frissítés most';
 z.string.hu.warning_not_found_camera = 'Nem kezdeményezhetsz hívást, mert nincs kamerád.';
 z.string.hu.warning_not_found_microphone = 'Nem kezdeményezhetsz hívást, mert nincs mikrofonod.';
 z.string.hu.warning_permission_denied_camera = 'Nem kezdeményezhetsz hívást, mert böngésződ nem férhet hozzá a kamerádhoz.';
@@ -510,13 +496,6 @@ z.string.hu.warning_permission_request_microphone = '{{icon}} Mikrofon hozzáfé
 z.string.hu.warning_permission_request_notification = '{{icon}} Értesítések engedélyezése';
 z.string.hu.warning_permission_request_screen = '{{icon}} Képernyőmegosztás engedélyezése';
 z.string.hu.warning_tell_me_how = 'Mit kell tennem';
-
-z.string.hu.warning_connectivity_connection_lost = 'Kapcsolódási kísérlet folyamatban. A Wire most nem tud üzeneteket kézbesíteni.';
-z.string.hu.warning_connectivity_no_internet = 'Nincs internet. Üzenetek küldése és fogadása most nem lehetséges.';
-
-z.string.hu.warning_lifecycle_update = 'Elérhető a Wire új verziója.';
-z.string.hu.warning_lifecycle_update_notes = 'Újdonságok';
-z.string.hu.warning_lifecycle_update_link = 'Frissítés most';
 
 z.string.hu.system_notification_asset_add = 'Megosztott egy képet';
 z.string.hu.system_notification_connection_accepted = 'Elfogadta a csatlakozási kérelmedet';
