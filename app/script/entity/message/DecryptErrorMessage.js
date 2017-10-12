@@ -44,7 +44,9 @@ z.entity.DecryptErrorMessage = class DecryptErrorMessage extends z.entity.Messag
     });
 
     this.link = ko.pureComputed(() => {
-      const path = this.is_remote_identity_changed() ? z.config.URL_PATH.DECRYPT_ERROR_2 : z.config.URL_PATH.DECRYPT_ERROR_1;
+      const path = this.is_remote_identity_changed()
+        ? z.config.URL_PATH.DECRYPT_ERROR_2
+        : z.config.URL_PATH.DECRYPT_ERROR_1;
       return z.util.URLUtil.build_url(z.util.URLUtil.TYPE.WEBSITE, path);
     });
 

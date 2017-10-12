@@ -23,7 +23,6 @@ window.z = window.z || {};
 window.z.util = z.util || {};
 
 z.util.URLUtil = (() => {
-
   const TYPE = {
     ACCOUNT: 'TYPE.ACCOUNT',
     SUPPORT: 'TYPE.SUPPORT',
@@ -32,7 +31,7 @@ z.util.URLUtil = (() => {
     WEBSITE: 'TYPE.WEBSITE',
   };
 
-  const _get_domain = (url_type) => {
+  const _get_domain = url_type => {
     const is_production = _is_production_backend();
 
     switch (url_type) {
@@ -53,7 +52,7 @@ z.util.URLUtil = (() => {
 
   const _is_production_backend = () => z.util.Environment.backend.current === z.service.BackendEnvironment.PRODUCTION;
 
-  const _build_support_url = (support_id) => {
+  const _build_support_url = support_id => {
     const url_path = _.isNumber(support_id) ? z.string.url_support_articles : z.string.url_support_requests;
     return `${_get_domain(TYPE.SUPPORT)}${z.l10n.text(url_path)}${support_id}`;
   };
