@@ -400,8 +400,10 @@ z.string.ru.preferences_about_terms_of_use = 'Условия использов�
 z.string.ru.preferences_about_version = 'Версия {{version}}';
 z.string.ru.preferences_about_website = 'Веб-сайт Wire';
 
+z.string.ru.preferences_account_create_team = 'Создать команду';
 z.string.ru.preferences_account_delete = 'Удалить аккаунт';
 z.string.ru.preferences_account_log_out = 'Выход';
+z.string.ru.preferences_account_manage_team = 'Управлять командой';
 z.string.ru.preferences_account_reset_password = 'Сбросить пароль';
 z.string.ru.preferences_account_team = 'в {{name}}';
 z.string.ru.preferences_account_username_placeholder = 'Ваше полное имя';

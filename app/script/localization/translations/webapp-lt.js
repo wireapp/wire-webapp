@@ -46,7 +46,7 @@ z.string.lt.auth_account_terms_of_use = 'Naudojimosi sąlygos';
 z.string.lt.auth_account_terms_of_use_detail = 'Aš sutinku su';
 
 z.string.lt.auth_blocked_cookies = 'Aktyvuokite slapukus, kad galėtumėte prisijungti prie „Wire“.';
-z.string.lt.auth_blocked_database = 'Norint rodyti žinutes, „Wire“ būtina prieiga prie jūsų vietinės saugyklos. Vietinė saugykla galima privačioje veiksenoje.';
+z.string.lt.auth_blocked_database = 'Norint rodyti žinutes, „Wire“ būtina prieiga prie jūsų vietinės saugyklos. Vietinė saugykla negalima privačioje veiksenoje.';
 z.string.lt.auth_blocked_tabs = '„Wire“ jau veikia kitame skirtuke.';
 
 z.string.lt.auth_verify_account_add = 'Pridėti';
@@ -400,8 +400,10 @@ z.string.lt.preferences_about_terms_of_use = 'Naudojimosi sąlygos';
 z.string.lt.preferences_about_version = 'Versija {{version}}';
 z.string.lt.preferences_about_website = 'Wire svetainė';
 
+z.string.lt.preferences_account_create_team = 'Sukurti komandą';
 z.string.lt.preferences_account_delete = 'Ištrinti paskyrą';
 z.string.lt.preferences_account_log_out = 'Atsijungti';
+z.string.lt.preferences_account_manage_team = 'Tvarkyti komandą';
 z.string.lt.preferences_account_reset_password = 'Atstatyti slaptažodį';
 z.string.lt.preferences_account_team = 'komandoje {{name}}';
 z.string.lt.preferences_account_username_placeholder = 'Jūsų vardas ir pavardė';

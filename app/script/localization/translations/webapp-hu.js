@@ -400,8 +400,10 @@ z.string.hu.preferences_about_terms_of_use = 'Felhasználási feltételek';
 z.string.hu.preferences_about_version = 'Verzió {{version}}';
 z.string.hu.preferences_about_website = 'Wire weboldala';
 
+z.string.hu.preferences_account_create_team = 'Csapat létrehozása';
 z.string.hu.preferences_account_delete = 'Fiók törlése';
 z.string.hu.preferences_account_log_out = 'Kijelentkezés';
+z.string.hu.preferences_account_manage_team = 'Csapat kezelése';
 z.string.hu.preferences_account_reset_password = 'Jelszó visszaállítása';
 z.string.hu.preferences_account_team = 'innen: {{name}}';
 z.string.hu.preferences_account_username_placeholder = 'Teljes neved';
@@ -474,6 +476,12 @@ z.string.hu.upload_google_headline_error = 'Valami nem stimmel.';
 z.string.hu.upload_google_message_error = 'Nem kaptuk meg az adataidat. Kérjük, próbáld meg újra a névjegyek importálását.';
 z.string.hu.upload_google_button_again = 'Újra próbálás';
 
+z.string.hu.url_support_root = '/';
+z.string.hu.url_support_articles = '/hc/en-us/articles/';
+z.string.hu.url_support_requests = '/hc/en-us/requests/';
+z.string.hu.url_webapp_root = '/';
+z.string.hu.url_website_root = '/';
+z.string.hu.url_website_create_team = '/create-team';
 z.string.hu.warning_call_detail = 'A hívásokhoz a böngésződnek hozzá kell férnie a mikrofonodhoz.';
 z.string.hu.warning_call_headline = 'Nem kezdeményezhetsz hívást mikrofon nélkül';
 z.string.hu.warning_call_unsupported_incoming = '{{user}} hív. Böngésződ nem támogatja a hanghívásokat.';
