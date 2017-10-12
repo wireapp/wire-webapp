@@ -62,7 +62,7 @@
           <!-- /ko -->
           <!-- ko ifnot: devices_found() -->
             <div data-bind="text: no_device_headline"></div>
-            <a data-bind="l10n_text: z.string.people_tabs_devices_learn_more, l10n_href: z.string.url_privacy" rel="nofollow noopener noreferrer" target="_blank" class="text-theme"></a>
+            <a data-bind="l10n_text: z.string.people_tabs_devices_learn_more, l10n_href: {type: z.util.URLUtil.TYPE.WEBSITE, path: z.string.url_website_privacy}" rel="nofollow noopener noreferrer" target="_blank" class="text-theme"></a>
           <!-- /ko -->
         </div>
       <!-- /ko -->
