@@ -222,7 +222,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
   click_on_create() {
     const path = z.l10n.text(z.string.url_website_create_team);
-    z.util.safe_window_open(z.util.URLUtil(z.url.URLUtil.TYPE.WEBSITE, path));
+    z.util.safe_window_open(z.util.URLUtil(z.util.URLUtil.TYPE.WEBSITE, path));
   }
 
   click_on_logout() {
@@ -230,12 +230,12 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   click_on_manage() {
-    z.util.safe_window_open(z.util.URLUtil(z.url.URLUtil.TYPE.TEAM_SETTINGS, z.config.URL_PATH.MANAGE_TEAM));
+    z.util.safe_window_open(z.util.URLUtil(z.util.URLUtil.TYPE.TEAM_SETTINGS, z.config.URL_PATH.MANAGE_TEAM));
   }
 
   click_on_reset_password() {
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PASSWORD_RESET, {value: 'fromProfile'});
-    z.util.safe_window_open(z.util.URLUtil(z.url.URLUtil.TYPE.WEBSITE, z.config.URL_PATH.PASSWORD_RESET));
+    z.util.safe_window_open(z.util.URLUtil(z.util.URLUtil.TYPE.WEBSITE, z.config.URL_PATH.PASSWORD_RESET));
   }
 
   set_picture(new_user_picture) {
