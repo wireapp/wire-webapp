@@ -400,8 +400,10 @@ z.string.fr.preferences_about_terms_of_use = 'Conditions d’utilisation';
 z.string.fr.preferences_about_version = 'Version {{version}}';
 z.string.fr.preferences_about_website = 'Site de Wire';
 
+z.string.fr.preferences_account_create_team = 'Créer une équipe';
 z.string.fr.preferences_account_delete = 'Supprimer le compte';
 z.string.fr.preferences_account_log_out = 'Se déconnecter';
+z.string.fr.preferences_account_manage_team = 'Gérer l’équipe';
 z.string.fr.preferences_account_reset_password = 'Réinitialiser le mot de passe';
 z.string.fr.preferences_account_team = 'dans {{name}}';
 z.string.fr.preferences_account_username_placeholder = 'Votre nom complet';
