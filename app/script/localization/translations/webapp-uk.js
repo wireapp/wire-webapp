@@ -297,7 +297,6 @@ z.string.uk.conversations_secondary_line_timed_message = 'Тимчасове п�
 z.string.uk.conversations_secondary_line_you_left = 'Ви вийшли';
 z.string.uk.conversations_secondary_line_you_were_removed = 'Вас видалили';
 
-z.string.uk.takeover_headline = 'Ніки вже тут.';
 z.string.uk.takeover_sub = 'Зарезервуйте свій унікальний нік в Wire.';
 z.string.uk.takeover_link = 'Дізнатися більше';
 z.string.uk.takeover_button_choose = 'Вибрати власний';

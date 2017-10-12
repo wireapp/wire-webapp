@@ -341,7 +341,6 @@ z.string.conversations_secondary_line_you_left = 'You left';
 z.string.conversations_secondary_line_you_were_removed = 'You were removed';
 
 // Takeover
-z.string.takeover_headline = 'Usernames are here.';
 z.string.takeover_sub = 'Claim your unique name on Wire.';
 z.string.takeover_link = 'Learn more';
 z.string.takeover_button_choose = 'Choose your own';

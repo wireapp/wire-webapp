@@ -300,7 +300,6 @@ z.string.nl.conversations_secondary_line_timed_message = 'Tijdelijk bericht';
 z.string.nl.conversations_secondary_line_you_left = 'Je hebt het gesprek verlaten';
 z.string.nl.conversations_secondary_line_you_were_removed = 'Je bent verwijderd';
 
-z.string.nl.takeover_headline = 'Nieuw gebruikersnamen.';
 z.string.nl.takeover_sub = 'Claim je unieke gebruikers naam op Wire.';
 z.string.nl.takeover_link = 'Leer meer';
 z.string.nl.takeover_button_choose = 'Kies je eigen';

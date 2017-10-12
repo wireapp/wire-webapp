@@ -297,7 +297,6 @@ z.string.es.conversations_secondary_line_timed_message = 'Mensaje temporizado';
 z.string.es.conversations_secondary_line_you_left = 'Te fuiste';
 z.string.es.conversations_secondary_line_you_were_removed = 'Te han eliminado';
 
-z.string.es.takeover_headline = 'Ya llegaron los nombres de usuario.';
 z.string.es.takeover_sub = 'Reclama tu nombre único en Wire.';
 z.string.es.takeover_link = 'Aprender más';
 z.string.es.takeover_button_choose = 'Elegir tu propio nombre';

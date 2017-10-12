@@ -240,7 +240,6 @@ z.string.hr.conversations_popover_unarchive = 'Dearhiviraj';
 
 z.string.hr.conversations_secondary_line_timed_message = 'Odgođeno slanje';
 
-z.string.hr.takeover_headline = 'Korisnička imena su ovdje.';
 z.string.hr.takeover_sub = 'Zatražite svoje jedinstveno ime na Wire.';
 z.string.hr.takeover_link = 'Saznaj više';
 z.string.hr.takeover_button_choose = 'Odaberite vlastitu';

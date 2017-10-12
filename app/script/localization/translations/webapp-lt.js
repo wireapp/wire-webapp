@@ -46,8 +46,8 @@ z.string.lt.auth_account_terms_of_use = 'Naudojimosi sąlygos';
 z.string.lt.auth_account_terms_of_use_detail = 'Aš sutinku su';
 
 z.string.lt.auth_blocked_cookies = 'Aktyvuokite slapukus, kad galėtumėte prisijungti prie „Wire“.';
-z.string.lt.auth_blocked_database = 'Norint rodyti žinutes, „Wire“ būtina prieiga prie jūsų vietinės saugyklos. Vietinė saugykla negalima privačioje veiksenoje.';
-z.string.lt.auth_blocked_tabs = '„Wire“ jau veikia kitame skirtuke.';
+z.string.lt.auth_blocked_database = 'Norint rodyti žinutes, Wire reikia prieigos prie jūsų vietinės saugyklos. Vietinė saugykla nėra prieinama privačioje veiksenoje.';
+z.string.lt.auth_blocked_tabs = 'Wire jau yra atverta kitoje kortelėje.';
 
 z.string.lt.auth_verify_account_add = 'Pridėti';
 z.string.lt.auth_verify_account_detail = 'Tai leidžia jums naudoti „Wire“ keliuose įrenginiuose.';
@@ -97,7 +97,7 @@ z.string.lt.auth_error_code = 'Neteisingas kodas';
 z.string.lt.auth_error_country_code_invalid = 'Neteisingas šalies kodas';
 z.string.lt.auth_error_email_exists = 'El. pašto adresas jau užimtas';
 z.string.lt.auth_error_email_forbidden = 'Atleiskite. Šis el. pašto adresas yra uždraustas.';
-z.string.lt.auth_error_email_malformed = 'Įrašykite teisingą el. pašto adresą.';
+z.string.lt.auth_error_email_malformed = 'Įveskite taisyklingą el. pašto adresą.';
 z.string.lt.auth_error_email_missing = 'Įrašykite el. pašto adresą.';
 z.string.lt.auth_error_misc = 'Problemos su ryšiu. Banbykite dar kartą.';
 z.string.lt.auth_error_name_short = 'Įveskite bent 2 simbolių vardą';
@@ -300,7 +300,6 @@ z.string.lt.conversations_secondary_line_timed_message = 'Laikina žinutė';
 z.string.lt.conversations_secondary_line_you_left = 'Jūs išėjote';
 z.string.lt.conversations_secondary_line_you_were_removed = 'Jūs buvote pašalinti';
 
-z.string.lt.takeover_headline = 'Naudotojo vardai jau čia.';
 z.string.lt.takeover_sub = 'Užsirezervuokite savo unikalų Wire vardą.';
 z.string.lt.takeover_link = 'Sužinoti daugiau';
 z.string.lt.takeover_button_choose = 'Pasirinkti savo asmeninį';
