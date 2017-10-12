@@ -297,7 +297,6 @@ z.string.tr.conversations_secondary_line_timed_message = 'Süreli Mesaj';
 z.string.tr.conversations_secondary_line_you_left = 'Ayrıldın';
 z.string.tr.conversations_secondary_line_you_were_removed = 'Çıkartıldınız';
 
-z.string.tr.takeover_headline = 'Kullanıcı adları burada.';
 z.string.tr.takeover_sub = 'Wire üzerinden size özel isminizi hemen alın.';
 z.string.tr.takeover_link = 'Daha fazla bilgi';
 z.string.tr.takeover_button_choose = 'Kendininkini seç';

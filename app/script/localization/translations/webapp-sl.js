@@ -291,7 +291,6 @@ z.string.sl.conversations_secondary_line_timed_message = 'Časovno sporočilo';
 z.string.sl.conversations_secondary_line_you_left = 'Si zapustil(-a)';
 z.string.sl.conversations_secondary_line_you_were_removed = 'Bil(-a) si odstranjen(-a)';
 
-z.string.sl.takeover_headline = 'Uporabniška imena so tukaj.';
 z.string.sl.takeover_sub = 'Zavzemite vaše unikatno ime na Wire.';
 z.string.sl.takeover_link = 'Nauči se več';
 z.string.sl.takeover_button_choose = 'Izberi svojo';

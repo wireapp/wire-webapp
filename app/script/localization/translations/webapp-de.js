@@ -300,7 +300,6 @@ z.string.de.conversations_secondary_line_timed_message = 'Temporäre Nachricht';
 z.string.de.conversations_secondary_line_you_left = 'Du hast die Unterhaltung verlassen';
 z.string.de.conversations_secondary_line_you_were_removed = 'Du wurdest entfent';
 
-z.string.de.takeover_headline = 'Benutzernamen sind da.';
 z.string.de.takeover_sub = 'Sichere dir deinen persönlichen Benutzernamen auf Wire.';
 z.string.de.takeover_link = 'Erfahre mehr';
 z.string.de.takeover_button_choose = 'Wähle deinen eigenen';

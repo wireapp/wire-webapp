@@ -299,7 +299,6 @@ z.string.pt.conversations_secondary_line_timed_message = 'Mensagem agendada';
 z.string.pt.conversations_secondary_line_you_left = 'Você deixou';
 z.string.pt.conversations_secondary_line_you_were_removed = 'Você foram removido';
 
-z.string.pt.takeover_headline = 'Os nomes de utilizador estão aqui.';
 z.string.pt.takeover_sub = 'Reivindicar seu nome exclusivo no Wire.';
 z.string.pt.takeover_link = 'Saber mais';
 z.string.pt.takeover_button_choose = 'Escolha a sua';

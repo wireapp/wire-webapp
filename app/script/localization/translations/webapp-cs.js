@@ -295,7 +295,6 @@ z.string.cs.conversations_secondary_line_timed_message = 'Časované zprávy';
 z.string.cs.conversations_secondary_line_you_left = 'Opustil(a) jste konverzaci';
 z.string.cs.conversations_secondary_line_you_were_removed = 'Byl(a) jste odebrán(a)';
 
-z.string.cs.takeover_headline = 'Uživatelská jména jsou zde.';
 z.string.cs.takeover_sub = 'Vytvořte si vaše jedinečné jméno na Wire.';
 z.string.cs.takeover_link = 'Dozvědět se více';
 z.string.cs.takeover_button_choose = 'Vyberte své vlastní';

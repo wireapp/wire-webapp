@@ -300,7 +300,6 @@ z.string.ru.conversations_secondary_line_timed_message = 'Временное с�
 z.string.ru.conversations_secondary_line_you_left = 'Вы покинули разговор';
 z.string.ru.conversations_secondary_line_you_were_removed = 'Вы были удалены';
 
-z.string.ru.takeover_headline = 'Имена пользователей уже здесь.';
 z.string.ru.takeover_sub = 'Зарегистрируйте своё уникальное имя в Wire.';
 z.string.ru.takeover_link = 'Подробнее';
 z.string.ru.takeover_button_choose = 'Выбрать своё';

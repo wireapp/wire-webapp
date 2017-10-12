@@ -297,7 +297,6 @@ z.string.ro.conversations_secondary_line_timed_message = 'Mesaj temporizat';
 z.string.ro.conversations_secondary_line_you_left = 'Ai ieșit';
 z.string.ro.conversations_secondary_line_you_were_removed = 'Ai fost scos din conversație';
 
-z.string.ro.takeover_headline = 'Numele de utilizator sunt aici.';
 z.string.ro.takeover_sub = 'Obține numele tău unic pe Wire.';
 z.string.ro.takeover_link = 'Află mai multe';
 z.string.ro.takeover_button_choose = 'Alege propriul nume';

@@ -300,7 +300,6 @@ z.string.sk.conversations_secondary_line_timed_message = 'Časovaná správa';
 z.string.sk.conversations_secondary_line_you_left = 'Odišli ste';
 z.string.sk.conversations_secondary_line_you_were_removed = 'Boli ste odstránený';
 
-z.string.sk.takeover_headline = 'Užívateľské mená sú obsadené.';
 z.string.sk.takeover_sub = 'Potvrďte Vaše jednoznačné meno pre Wire.';
 z.string.sk.takeover_link = 'Zistiť viac';
 z.string.sk.takeover_button_choose = 'Vybrať vlastné';

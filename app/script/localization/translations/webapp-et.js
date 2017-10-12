@@ -300,7 +300,6 @@ z.string.et.conversations_secondary_line_timed_message = 'Kustuv sõnum';
 z.string.et.conversations_secondary_line_you_left = 'Sa lahkusid';
 z.string.et.conversations_secondary_line_you_were_removed = 'Sind eemaldati vestlusest';
 
-z.string.et.takeover_headline = 'Kasutajanimed on siin.';
 z.string.et.takeover_sub = 'Haara oma unikaalne nimi Wire’is.';
 z.string.et.takeover_link = 'Loe lähemalt';
 z.string.et.takeover_button_choose = 'Vali enda oma';

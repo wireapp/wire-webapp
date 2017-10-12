@@ -300,7 +300,6 @@ z.string.hu.conversations_secondary_line_timed_message = 'Időzített üzenet';
 z.string.hu.conversations_secondary_line_you_left = 'Kiléptél';
 z.string.hu.conversations_secondary_line_you_were_removed = 'El lettél távolítva';
 
-z.string.hu.takeover_headline = 'Itt vannak a felhasználónevek.';
 z.string.hu.takeover_sub = 'Foglald le egyedi Wire felhasználóneved.';
 z.string.hu.takeover_link = 'További információ';
 z.string.hu.takeover_button_choose = 'Válaszd ki a sajátod';

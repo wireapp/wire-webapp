@@ -246,7 +246,6 @@ z.string.fi.conversations_popover_unarchive = 'Palauta arkistosta';
 
 z.string.fi.conversations_secondary_line_timed_message = 'Ajoitettu viesti';
 
-z.string.fi.takeover_headline = 'Käyttäjänimet ovat täällä.';
 z.string.fi.takeover_sub = 'Valtaa yksilöllinen nimesi Wiressä.';
 z.string.fi.takeover_link = 'Lue lisää';
 z.string.fi.takeover_button_choose = 'Valitse omasi';

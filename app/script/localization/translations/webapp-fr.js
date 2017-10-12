@@ -300,7 +300,6 @@ z.string.fr.conversations_secondary_line_timed_message = 'Message éphémère';
 z.string.fr.conversations_secondary_line_you_left = 'Vous êtes parti';
 z.string.fr.conversations_secondary_line_you_were_removed = 'Vous avez été exclu';
 
-z.string.fr.takeover_headline = 'Les identifiants sont arrivés.';
 z.string.fr.takeover_sub = 'Choisissez votre nom d’utilisateur unique sur Wire.';
 z.string.fr.takeover_link = 'En savoir plus';
 z.string.fr.takeover_button_choose = 'Choisissez le vôtre';
