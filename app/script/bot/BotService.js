@@ -25,7 +25,7 @@ window.z.bot = z.bot || {};
 z.bot.BotService = class BotService {
   constructor() {
     this.logger = new z.util.Logger('z.bot.BotService', z.config.LOGGER.OPTIONS);
-    this.url = `${z.util.Environment.backend.website_url()}${BotService.URL}`;
+    this.url = z.util.URLUtil.build_url(z.util.URLUtil.TYPE.WEBSITE, BotService.URL);
   }
 
   /**
@@ -40,6 +40,6 @@ z.bot.BotService = class BotService {
   }
 
   static get URL() {
-    return 'api/v1/bot/';
+    return '/api/v1/bot/';
   }
 };

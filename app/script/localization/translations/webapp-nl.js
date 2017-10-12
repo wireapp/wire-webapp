@@ -34,6 +34,7 @@ z.string.nl.alert_gif_too_large = 'Animatie is te groot.\nMaximale grootte is {{
 z.string.nl.auth_account_country_code = 'Landcode';
 z.string.nl.auth_account_create = 'Aanmaken';
 z.string.nl.auth_account_create_account = 'Een account aanmaken';
+z.string.nl.auth_account_deletion = 'Je bent uitgelogt omdat je account is verwijdert.';
 z.string.nl.auth_account_expiration = 'Je bent afgemeld omdat de sessie verlopen is. Log opnieuw in.';
 z.string.nl.auth_account_get_wire = 'Eenvoudige, privé & veilige messenger voor chat, bellen, het delen van foto’s, muziek, video’s, GIFs en meer.';
 z.string.nl.auth_account_password_forgot = 'Wachtwoord vergeten';
@@ -44,6 +45,7 @@ z.string.nl.auth_account_sign_in_phone = 'Telefoonnummer';
 z.string.nl.auth_account_terms_of_use = 'Gebruikersvoorwaarden';
 z.string.nl.auth_account_terms_of_use_detail = 'Ik ga akkoord';
 
+z.string.nl.auth_blocked_cookies = 'Zet je cookies aan om in te loggen in Wire.';
 z.string.nl.auth_blocked_database = 'Wire heeft toegang nodig tot lokale opslag om je berichten te kunnen laten zien, maar dit is niet mogelijk in privémodus.';
 z.string.nl.auth_blocked_tabs = 'Wire is al open in een ander tabblad.';
 
@@ -106,6 +108,7 @@ z.string.nl.auth_error_phone_number_budget = 'Je vaak ingelogd. Probeer het late
 z.string.nl.auth_error_phone_number_forbidden = 'Sorry. Dit telefoon nummer is verboden.';
 z.string.nl.auth_error_phone_number_invalid = 'Ongeldig Telefoonnummer';
 z.string.nl.auth_error_phone_number_unknown = 'Onbekend Telefoon Nummer';
+z.string.nl.auth_error_suspended = 'Dit account is niet langer geautoriseerd om in te loggen.';
 z.string.nl.auth_error_sign_in = 'Controleer je gegevens en probeer het nog eens.';
 
 z.string.nl.call_state_outgoing = 'Bellen…';
@@ -115,6 +118,7 @@ z.string.nl.call_decline = 'Leg op';
 z.string.nl.call_accept = 'Neem op';
 z.string.nl.call_join = 'Deelnemen';
 z.string.nl.call_choose_shared_screen = 'Kies een scherm om te delen';
+z.string.nl.call_participants = '{{number}} bellen';
 
 z.string.nl.modal_button_cancel = 'Annuleer';
 z.string.nl.modal_button_ok = 'Ok';
@@ -123,6 +127,8 @@ z.string.nl.modal_button_send = 'Stuur';
 z.string.nl.modal_block_conversation_headline = '{{user}} blokkeren?';
 z.string.nl.modal_block_conversation_message = '{{user}} zal niet in staat zijn je te contacteren of toe te voegen aan een groepsgesprek.';
 z.string.nl.modal_block_conversation_button = 'Blokkeren';
+z.string.nl.modal_bots_unavailable_headline = 'Bots zijn nu niet beschikbaar';
+z.string.nl.modal_bots_unavailable_message = 'Dank je voor je intress voor bots. De service is nu gestopt, terwijl we nu werken aan een volgende versie.';
 z.string.nl.modal_call_conversation_empty_headline = 'Niemand om te bellen';
 z.string.nl.modal_call_conversation_empty_message = 'Er is hier niemand meer.';
 z.string.nl.modal_call_no_video_in_group_headline = 'Geen video bellen in groepen';
@@ -246,6 +252,7 @@ z.string.nl.conversation_delete_timestamp = 'Verwijderd op {{date}}';
 z.string.nl.conversation_edit_timestamp = 'Bewerkt op {{date}}';
 z.string.nl.conversation_likes_caption = '{{number}} mensen';
 z.string.nl.conversation_send_pasted_file = 'Afbeelding geplakt op {{date}}';
+z.string.nl.conversation_someone = 'Iemand';
 z.string.nl.conversation_tweet_author = ' op Twitter';
 
 z.string.nl.collection_show_all = 'Toon alle {{number}}';
@@ -396,6 +403,7 @@ z.string.nl.preferences_about_website = 'Wire Website';
 z.string.nl.preferences_account_delete = 'Verwijder account';
 z.string.nl.preferences_account_log_out = 'Uitloggen';
 z.string.nl.preferences_account_reset_password = 'Reset wachtwoord';
+z.string.nl.preferences_account_team = 'in {{name}}';
 z.string.nl.preferences_account_username_placeholder = 'Je volledige naam';
 z.string.nl.preferences_account_username_hint = 'Ten minste 2 tekens. a—z, 0—9, en _ alleen.';
 z.string.nl.preferences_account_username_available = 'Beschikbaar';
@@ -466,36 +474,18 @@ z.string.nl.upload_google_headline_error = 'Er is iets \nfout gegaan.';
 z.string.nl.upload_google_message_error = 'We hebben geen informatie ontvangen. Probeer opnieuw je contacten te importeren.';
 z.string.nl.upload_google_button_again = 'Probeer opnieuw';
 
-z.string.nl.url_password_reset = 'forgot/';
-z.string.nl.url_legal = 'https://wire.com/legal/';
-z.string.nl.url_privacy = 'https://wire.com/privacy/';
-z.string.nl.url_privacy_how = 'https://wire.com/privacy/how/';
-z.string.nl.url_privacy_why = 'https://wire.com/privacy/why/';
-z.string.nl.url_support = 'https://support.wire.com';
-z.string.nl.url_terms_of_use = 'https://wire.com/legal/terms/';
-z.string.nl.url_wire = 'https://wire.com';
-z.string.nl.url_wire_for_web = 'https://app.wire.com';
-z.string.nl.url_support_calling = 'https://support.wire.com/hc/en-us/articles/202969412';
-z.string.nl.url_support_camera_access_denied = 'https://support.wire.com/hc/en-us/articles/202935412';
-z.string.nl.url_support_device_access_denied = 'https://support.wire.com/hc/en-us/articles/213512545';
-z.string.nl.url_support_contact = 'https://support.wire.com/hc/en-us/requests/new';
-z.string.nl.url_support_contact_bug = 'https://support.wire.com/hc/en-us/requests/new?ticket_form_id=101615';
-z.string.nl.url_support_history = 'https://support.wire.com/hc/en-us/articles/207834645';
-z.string.nl.url_support_mic_access_denied = 'https://support.wire.com/hc/en-us/articles/202590081';
-z.string.nl.url_support_mic_not_found = 'https://support.wire.com/hc/en-us/articles/202970662';
-z.string.nl.url_support_screen_access_denied = 'https://support.wire.com/hc/en-us/articles/202935412';
-z.string.nl.url_support_screen_whitelist = 'https://support.wire.com/hc/en-us/articles/209423889';
-z.string.nl.url_support_usernames = 'https://wire.com/support/username';
-z.string.nl.url_decrypt_error_1 = 'https://wire.com/privacy/error-1';
-z.string.nl.url_decrypt_error_2 = 'https://wire.com/privacy/error-2';
-
 z.string.nl.warning_call_detail = 'Uw browser heeft toegang nodig tot de microfoon om te bellen.';
 z.string.nl.warning_call_headline = 'Je kan niet bellen zonder microfoon';
 z.string.nl.warning_call_unsupported_incoming = '{{user}} belt, maar je browser ondersteund geen gesprekken.';
 z.string.nl.warning_call_unsupported_outgoing = 'Je kan niet bellen omdat jou browser dit niet ondersteund.';
 z.string.nl.warning_call_issues = 'Deze versie kan niet deelnemen met het bellen. Gebruik alsjeblieft';
 z.string.nl.warning_call_upgrade_browser = 'Update Google Chrome om te kunnen bellen.';
+z.string.nl.warning_connectivity_connection_lost = 'Wire kan misschien geen berichten versturen. ';
+z.string.nl.warning_connectivity_no_internet = 'Geen internet. Je kan nu geen berichten versturen of ontvangen.';
 z.string.nl.warning_learn_more = 'Leer meer';
+z.string.nl.warning_lifecycle_update = 'Er is een nieuwe versie van Wire beschikbaar.';
+z.string.nl.warning_lifecycle_update_notes = 'Wat is er nieuw';
+z.string.nl.warning_lifecycle_update_link = 'Nu bijwerken';
 z.string.nl.warning_not_found_camera = 'Je kan niet bellen omdat je computer geen toegang heeft tot je camera.';
 z.string.nl.warning_not_found_microphone = 'Je kan niet bellen omdat je computer geen toegang heeft tot je microfoon.';
 z.string.nl.warning_permission_denied_camera = 'Je kan niet bellen omdat je browser geen toegang heeft tot de camera.';
@@ -506,13 +496,6 @@ z.string.nl.warning_permission_request_microphone = '{{icon}} Toegang tot de mic
 z.string.nl.warning_permission_request_notification = '{{icon}} Meldingen toestaan';
 z.string.nl.warning_permission_request_screen = '{{icon}} Toegang tot scherm toestaan';
 z.string.nl.warning_tell_me_how = 'Vertel me meer';
-
-z.string.nl.warning_connectivity_connection_lost = 'Wire kan misschien geen berichten versturen. ';
-z.string.nl.warning_connectivity_no_internet = 'Geen internet. Je kan nu geen berichten versturen of ontvangen.';
-
-z.string.nl.warning_lifecycle_update = 'Er is een nieuwe versie van Wire beschikbaar.';
-z.string.nl.warning_lifecycle_update_notes = 'Wat is er nieuw';
-z.string.nl.warning_lifecycle_update_link = 'Nu bijwerken';
 
 z.string.nl.system_notification_asset_add = 'Deelde een foto';
 z.string.nl.system_notification_connection_accepted = 'Accepteer connectie aanvraag';

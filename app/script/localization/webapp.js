@@ -532,39 +532,26 @@ z.string.upload_google_headline_error = 'Something\nwent wrong.';
 z.string.upload_google_message_error = 'We did not receive your information. Please try importing your contacts again.';
 z.string.upload_google_button_again = 'Try again';
 
-// URLs
-z.string.url_team_create = 'create-team/';
-z.string.url_password_reset = 'forgot/';
-z.string.url_legal = 'https://wire.com/legal/';
-z.string.url_privacy = 'https://wire.com/privacy/';
-z.string.url_privacy_how = 'https://wire.com/privacy/how/';
-z.string.url_privacy_why = 'https://wire.com/privacy/why/';
-z.string.url_support = 'https://support.wire.com';
-z.string.url_terms_of_use = 'https://wire.com/legal/terms/';
-z.string.url_wire = 'https://wire.com';
-z.string.url_wire_for_web = 'https://app.wire.com';
-z.string.url_support_calling = 'https://support.wire.com/hc/en-us/articles/202969412';
-z.string.url_support_camera_access_denied = 'https://support.wire.com/hc/en-us/articles/202935412';
-z.string.url_support_device_access_denied = 'https://support.wire.com/hc/en-us/articles/213512545';
-z.string.url_support_contact = 'https://support.wire.com/hc/en-us/requests/new';
-z.string.url_support_contact_bug = 'https://support.wire.com/hc/en-us/requests/new?ticket_form_id=101615';
-z.string.url_support_history = 'https://support.wire.com/hc/en-us/articles/207834645';
-z.string.url_support_mic_access_denied = 'https://support.wire.com/hc/en-us/articles/202590081';
-z.string.url_support_mic_not_found = 'https://support.wire.com/hc/en-us/articles/202970662';
-z.string.url_support_screen_access_denied = 'https://support.wire.com/hc/en-us/articles/202935412';
-z.string.url_support_screen_whitelist = 'https://support.wire.com/hc/en-us/articles/209423889';
-z.string.url_support_usernames = 'https://wire.com/support/username';
-z.string.url_decrypt_error_1 = 'https://wire.com/privacy/error-1';
-z.string.url_decrypt_error_2 = 'https://wire.com/privacy/error-2';
-
-// Warnings: Permission requests & permission callbacks
+// URLs & Warnings: Permission requests & permission callbacks
+z.string.url_support_root = '/';
+z.string.url_support_articles = '/hc/en-us/articles/';
+z.string.url_support_requests = '/hc/en-us/requests/';
+z.string.url_webapp_root = '/';
+z.string.url_website_root = '/';
+z.string.url_website_create_team = '/create-team';
+z.string.url_website_privacy = '/privacy';
 z.string.warning_call_detail = 'Your browser needs access to the microphone to make calls.';
 z.string.warning_call_headline = 'Can’t call without microphone';
 z.string.warning_call_unsupported_incoming = '{{user}} is calling. Your browser doesn’t support calls.';
 z.string.warning_call_unsupported_outgoing = 'You cannot call because your browser doesn’t support calls.';
 z.string.warning_call_issues = 'This version of Wire can not participate in the call. Please use';
 z.string.warning_call_upgrade_browser = 'To call, please update Google Chrome.';
+z.string.warning_connectivity_connection_lost = 'Trying to connect. Wire may not be able to deliver messages.';
+z.string.warning_connectivity_no_internet = 'No Internet. You won’t be able to send or receive messages.';
 z.string.warning_learn_more = 'Learn more';
+z.string.warning_lifecycle_update = 'A new version of Wire is available.';
+z.string.warning_lifecycle_update_notes = 'What’s new';
+z.string.warning_lifecycle_update_link = 'Update now';
 z.string.warning_not_found_camera = 'You cannot call because your computer does not have a camera.';
 z.string.warning_not_found_microphone = 'You cannot call because your computer does not have a microphone.';
 z.string.warning_permission_denied_camera = 'You cannot call because your browser does not have access to the camera.';
@@ -575,15 +562,6 @@ z.string.warning_permission_request_microphone = '{{icon}} Allow access to micro
 z.string.warning_permission_request_notification = '{{icon}} Allow notifications';
 z.string.warning_permission_request_screen = '{{icon}} Allow access to screen';
 z.string.warning_tell_me_how = 'Tell me how';
-
-// Warnings: Connectivity
-z.string.warning_connectivity_connection_lost = 'Trying to connect. Wire may not be able to deliver messages.';
-z.string.warning_connectivity_no_internet = 'No Internet. You won’t be able to send or receive messages.';
-
-// Warnings: Desktop Update
-z.string.warning_lifecycle_update = 'A new version of Wire is available.';
-z.string.warning_lifecycle_update_notes = 'What’s new';
-z.string.warning_lifecycle_update_link = 'Update now';
 
 // Browser notifications
 z.string.system_notification_asset_add = 'Shared a picture';

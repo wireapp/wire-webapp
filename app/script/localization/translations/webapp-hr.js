@@ -220,6 +220,7 @@ z.string.hr.conversation_delete_timestamp = 'Izbrisano na {{date}}';
 z.string.hr.conversation_edit_timestamp = 'Promijenjeno na {{date}}';
 z.string.hr.conversation_likes_caption = '{{number}} ljudi';
 z.string.hr.conversation_send_pasted_file = 'Slika zaljepljena na {{date}}';
+z.string.hr.conversation_someone = 'Netko';
 
 
 z.string.hr.archive_header = 'Arhiviraj';
@@ -397,33 +398,14 @@ z.string.hr.upload_google_headline_error = 'Nešto je pogrešno.';
 z.string.hr.upload_google_message_error = 'Nismo dobili podatke. Pokušajte ponovno uvesti svoje kontakte.';
 z.string.hr.upload_google_button_again = 'Pokušaj ponovno';
 
-z.string.hr.url_legal = 'https://Wire.com/legal/';
-z.string.hr.url_privacy = 'https://Wire.com/privacy/';
-z.string.hr.url_privacy_why = 'https://Wire.com/privacy/Why/';
-z.string.hr.url_support = 'https://support.Wire.com';
-z.string.hr.url_terms_of_use = 'https://Wire.com/legal/Terms/';
-z.string.hr.url_wire = 'https://Wire.com';
-z.string.hr.url_wire_for_web = 'https://app.Wire.com';
-z.string.hr.url_support_calling = 'https://support.wire.com/hc/en-us/articles/202969412';
-z.string.hr.url_support_camera_access_denied = 'https://support.wire.com/hc/en-us/articles/202969412';
-z.string.hr.url_support_device_access_denied = 'https://support.wire.com/hc/en-us/articles/213512545';
-z.string.hr.url_support_contact = 'https://support.wire.com/hc/en-us/requests/new';
-z.string.hr.url_support_contact_bug = 'https://support.wire.com/hc/en-us/requests/new?ticket_form_id=101615';
-z.string.hr.url_support_history = 'https://support.wire.com/hc/en-us/articles/207834645';
-z.string.hr.url_support_mic_access_denied = 'https://support.wire.com/hc/en-us/articles/202590081';
-z.string.hr.url_support_mic_not_found = 'https://support.wire.com/hc/en-us/articles/202970662';
-z.string.hr.url_support_screen_access_denied = 'https://support.wire.com/hc/en-us/articles/202969412';
-z.string.hr.url_support_screen_whitelist = 'https://support.wire.com/hc/en-us/articles/209423889';
-z.string.hr.url_support_usernames = 'https://wire.com/support/username';
-z.string.hr.url_decrypt_error_1 = 'https://wire.com/privacy/error-1';
-z.string.hr.url_decrypt_error_2 = 'https://wire.com/privacy/error-2';
-
 z.string.hr.warning_call_detail = 'Your browser needs access to the microphone to make calls.';
 z.string.hr.warning_call_headline = 'Poziv nije moguć bez mikrofona';
 z.string.hr.warning_call_unsupported_incoming = '{{user}} zove. Vaš preglednik ne podržava pozive.';
 z.string.hr.warning_call_unsupported_outgoing = 'Poziv nije moguć jer vaš preglednik ne podržava pozive.';
 z.string.hr.warning_call_issues = 'Ova verzija Wire nema pozive. Molimo vas da koristite';
 z.string.hr.warning_call_upgrade_browser = 'Da bi imali pozive, molimo ažurirajte Google Chrome.';
+z.string.hr.warning_connectivity_connection_lost = 'Povezivanje u tijeku. Postoji mogućnost da Wire neće moći isporučiti poruke.';
+z.string.hr.warning_connectivity_no_internet = 'Nema Interneta. Nećete moći slati ili primati poruke.';
 z.string.hr.warning_learn_more = 'Saznaj više';
 z.string.hr.warning_not_found_camera = 'Poziv nije moguć jer računalo nema kameru.';
 z.string.hr.warning_not_found_microphone = 'Poziv nije moguć jer računalo nema mikrofon.';
@@ -435,9 +417,6 @@ z.string.hr.warning_permission_request_microphone = '{{icon}} dopusti pristup mi
 z.string.hr.warning_permission_request_notification = '{{icon}} Dopusti notifikacije';
 z.string.hr.warning_permission_request_screen = '{{icon}} dopusti pristup zaslonu';
 z.string.hr.warning_tell_me_how = 'Recite mi kako';
-
-z.string.hr.warning_connectivity_connection_lost = 'Povezivanje u tijeku. Postoji mogućnost da Wire neće moći isporučiti poruke.';
-z.string.hr.warning_connectivity_no_internet = 'Nema Interneta. Nećete moći slati ili primati poruke.';
 
 z.string.hr.system_notification_asset_add = 'Podijelila/o sliku';
 z.string.hr.system_notification_connection_accepted = 'Prihvatila/o zahtjev za vezu';

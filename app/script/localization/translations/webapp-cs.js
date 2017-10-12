@@ -247,6 +247,7 @@ z.string.cs.conversation_delete_timestamp = 'Smazáno v {{date}}';
 z.string.cs.conversation_edit_timestamp = 'Upraveno v {{date}}';
 z.string.cs.conversation_likes_caption = '{{number}} lidí';
 z.string.cs.conversation_send_pasted_file = 'Obrázek vložen {{date}}';
+z.string.cs.conversation_someone = 'Někdo';
 z.string.cs.conversation_tweet_author = ' na Twittru';
 
 z.string.cs.collection_show_all = 'Zobrazit všechny {{number}}';
@@ -467,18 +468,18 @@ z.string.cs.upload_google_headline_error = 'Něco se\npokazilo.';
 z.string.cs.upload_google_message_error = 'Neobdrželi jsme vaše data. Zkuste prosím kontakty importovat znovu.';
 z.string.cs.upload_google_button_again = 'Zkusit znovu';
 
-z.string.cs.url_password_reset = 'zapomenuté/';
-z.string.cs.url_support_device_access_denied = 'https://support.wire.com/hc/en-us/articles/213512545';
-z.string.cs.url_decrypt_error_1 = 'https://wire.com/privacy/error-1';
-z.string.cs.url_decrypt_error_2 = 'https://wire.com/privacy/error-2';
-
 z.string.cs.warning_call_detail = 'Pro volání potřebuje prohlížeč přístup k mikrofonu.';
 z.string.cs.warning_call_headline = 'Nelze volat bez mikrofonu';
 z.string.cs.warning_call_unsupported_incoming = 'Volá {{user}}. Tento prohlížeč nepodporuje volání.';
 z.string.cs.warning_call_unsupported_outgoing = 'Nemůžete volat, protože prohlížeč nepodporuje volání.';
 z.string.cs.warning_call_issues = 'Tato verze aplikace Wire se nemůže účastnit volání. Použijte prosím';
 z.string.cs.warning_call_upgrade_browser = 'Pro volání prosím aktualizujte Google Chrome.';
+z.string.cs.warning_connectivity_connection_lost = 'Pokoušíme se o připojení. Wire nemusí být schopen doručit zprávy.';
+z.string.cs.warning_connectivity_no_internet = 'Chybí připojení k internetu. Nebudete moci odesílat ani přijímat zprávy.';
 z.string.cs.warning_learn_more = 'Dozvědět se více';
+z.string.cs.warning_lifecycle_update = 'Je dostupná nová verze aplikace Wire.';
+z.string.cs.warning_lifecycle_update_notes = 'Co je nového';
+z.string.cs.warning_lifecycle_update_link = 'Aktualizovat nyní';
 z.string.cs.warning_not_found_camera = 'Nelze volat, protože tento počítač nemá kameru.';
 z.string.cs.warning_not_found_microphone = 'Nelze volat, protože tento počítač nemá mikrofon.';
 z.string.cs.warning_permission_denied_camera = 'Nelze volat, protože prohlížeč nemá přístup ke kameře.';
@@ -489,13 +490,6 @@ z.string.cs.warning_permission_request_microphone = '{{icon}} Povolit přístup 
 z.string.cs.warning_permission_request_notification = '{{icon}} Povolit upozornění';
 z.string.cs.warning_permission_request_screen = '{{icon}} Povolit přístup k obrazovce';
 z.string.cs.warning_tell_me_how = 'Jak na to';
-
-z.string.cs.warning_connectivity_connection_lost = 'Pokoušíme se o připojení. Wire nemusí být schopen doručit zprávy.';
-z.string.cs.warning_connectivity_no_internet = 'Chybí připojení k internetu. Nebudete moci odesílat ani přijímat zprávy.';
-
-z.string.cs.warning_lifecycle_update = 'Je dostupná nová verze aplikace Wire.';
-z.string.cs.warning_lifecycle_update_notes = 'Co je nového';
-z.string.cs.warning_lifecycle_update_link = 'Aktualizovat nyní';
 
 z.string.cs.system_notification_asset_add = 'Sdílel(a) obrázek';
 z.string.cs.system_notification_connection_accepted = 'Přijal(a) váš požadavek na připojení';

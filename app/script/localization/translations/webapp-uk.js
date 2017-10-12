@@ -249,6 +249,7 @@ z.string.uk.conversation_delete_timestamp = 'Видалене: {{date}}';
 z.string.uk.conversation_edit_timestamp = 'Відредаговане: {{date}}';
 z.string.uk.conversation_likes_caption = '{{number}} учасників';
 z.string.uk.conversation_send_pasted_file = 'Надіслав(-ла) зображення {{date}}';
+z.string.uk.conversation_someone = 'Хтось';
 z.string.uk.conversation_tweet_author = ' в Twitter';
 
 z.string.uk.collection_show_all = 'Показати всі {{number}}';
@@ -470,36 +471,18 @@ z.string.uk.upload_google_headline_error = 'Щось пішло\nне так.';
 z.string.uk.upload_google_message_error = 'Ми не отримали вашу інформацію. Будь ласка, повторіть імпорт контактів.';
 z.string.uk.upload_google_button_again = 'Спробувати ще раз';
 
-z.string.uk.url_password_reset = 'forgot/';
-z.string.uk.url_legal = 'https://wire.com/legal/';
-z.string.uk.url_privacy = 'https://wire.com/privacy/';
-z.string.uk.url_privacy_how = 'https://wire.com/privacy/how/';
-z.string.uk.url_privacy_why = 'https://wire.com/privacy/why/';
-z.string.uk.url_support = 'https://support.wire.com';
-z.string.uk.url_terms_of_use = 'https://wire.com/legal/terms/';
-z.string.uk.url_wire = 'https://wire.com';
-z.string.uk.url_wire_for_web = 'https://app.wire.com';
-z.string.uk.url_support_calling = 'https://support.wire.com/hc/en-us/articles/202969412';
-z.string.uk.url_support_camera_access_denied = 'https://support.wire.com/hc/en-us/articles/202935412';
-z.string.uk.url_support_device_access_denied = 'https://support.wire.com/hc/en-us/articles/213512545';
-z.string.uk.url_support_contact = 'https://support.wire.com/hc/en-us/requests/new';
-z.string.uk.url_support_contact_bug = 'https://support.wire.com/hc/en-us/requests/new?ticket_form_id=101615';
-z.string.uk.url_support_history = 'https://support.wire.com/hc/en-us/articles/207834645';
-z.string.uk.url_support_mic_access_denied = 'https://support.wire.com/hc/en-us/articles/202590081';
-z.string.uk.url_support_mic_not_found = 'https://support.wire.com/hc/en-us/articles/202970662';
-z.string.uk.url_support_screen_access_denied = 'https://support.wire.com/hc/en-us/articles/202935412';
-z.string.uk.url_support_screen_whitelist = 'https://support.wire.com/hc/en-us/articles/209423889';
-z.string.uk.url_support_usernames = 'https://wire.com/support/username';
-z.string.uk.url_decrypt_error_1 = 'https://wire.com/privacy/error-1';
-z.string.uk.url_decrypt_error_2 = 'https://wire.com/privacy/error-2';
-
 z.string.uk.warning_call_detail = 'Надайте вашому браузеру доступ до мікрофону, щоб робити дзвінки.';
 z.string.uk.warning_call_headline = 'Неможливо здійснити дзвінок без доступу до мікрофону';
 z.string.uk.warning_call_unsupported_incoming = '{{user}} дзвонить. Ваш браузер не підтримує дзвінки.';
 z.string.uk.warning_call_unsupported_outgoing = 'Ви не можете подзвонити, тому що ваш браузер не підтримує дзвінків.';
 z.string.uk.warning_call_issues = 'Ця версія Wire не може брати участь у дзвінку. Будь ласка, використовуйте';
 z.string.uk.warning_call_upgrade_browser = 'Щоб подзвонити, будь ласка, оновіть Google Chrome.';
+z.string.uk.warning_connectivity_connection_lost = 'Намагаюся підключитись. Wire, можливо, не зможе доставляти повідомлення.';
+z.string.uk.warning_connectivity_no_internet = 'Відсутнє підключення до Internet. Ви не зможете надсилати чи отримувати повідомлення.';
 z.string.uk.warning_learn_more = 'Дізнатися більше';
+z.string.uk.warning_lifecycle_update = 'Доступна нова версія Wire.';
+z.string.uk.warning_lifecycle_update_notes = 'Що нового';
+z.string.uk.warning_lifecycle_update_link = 'Оновити зараз';
 z.string.uk.warning_not_found_camera = 'Ви не можете подзвонити, тому що камера не підключена до вашого комп’ютера.';
 z.string.uk.warning_not_found_microphone = 'Ви не можете подзвонити, тому що мікрофон не підключений до вашого комп’ютера.';
 z.string.uk.warning_permission_denied_camera = 'Ви не можете подзвонити, тому що ви не надали доступу до камери для вашого браузера.';
@@ -510,13 +493,6 @@ z.string.uk.warning_permission_request_microphone = '{{icon}} Дозволити
 z.string.uk.warning_permission_request_notification = '{{icon}} Дозволити сповіщення';
 z.string.uk.warning_permission_request_screen = '{{icon}} Дозволити доступ до обміну скріншотами робочого столу';
 z.string.uk.warning_tell_me_how = 'Скажіть мені як';
-
-z.string.uk.warning_connectivity_connection_lost = 'Намагаюся підключитись. Wire, можливо, не зможе доставляти повідомлення.';
-z.string.uk.warning_connectivity_no_internet = 'Відсутнє підключення до Internet. Ви не зможете надсилати чи отримувати повідомлення.';
-
-z.string.uk.warning_lifecycle_update = 'Доступна нова версія Wire.';
-z.string.uk.warning_lifecycle_update_notes = 'Що нового';
-z.string.uk.warning_lifecycle_update_link = 'Оновити зараз';
 
 z.string.uk.system_notification_asset_add = 'Поділився(-лась) картинкою';
 z.string.uk.system_notification_connection_accepted = 'Прийняв(-ла) ваш запит на додавання до контактів';
