@@ -26,6 +26,7 @@ z.string.cs = z.string.cs || {};
 z.string.de = z.string.de || {};
 z.string.el = z.string.el || {};
 z.string.es = z.string.es || {};
+z.string.et = z.string.et || {};
 z.string.fi = z.string.fi || {};
 z.string.fr = z.string.fr || {};
 z.string.hr = z.string.hr || {};
