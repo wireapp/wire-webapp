@@ -115,11 +115,11 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
   }
 
   go_to_next() {
-    this._iterate_active_item(false);
+    this._iterate_active_item(true);
   }
 
   go_to_previous() {
-    this._iterate_active_item(true);
+    this._iterate_active_item(false);
   }
 
   _iterate_active_item(reverse = false) {
