@@ -26,6 +26,7 @@ z.user.UserService = class UserService {
   static get URL() {
     return {
       CONNECTIONS: '/connections',
+      PASSWORD_RESET: '/password-reset',
       PROPERTIES: '/properties',
       SELF: '/self',
       USERS: '/users',
@@ -107,14 +108,36 @@ z.user.UserService = class UserService {
    * @param {string} phone_number - E.164 formatted phone number
    * @returns {Promise} Promise that resolves when password reset process has been triggered
    */
-  initiate_password_reset(email, phone_number) {
+  post_password_reset(email, phone_number) {
     return this.client.send_json({
       data: {
         email: email,
         phone: phone_number,
       },
       type: 'POST',
-      url: this.client.create_url('/password-reset'),
+      url: this.client.create_url(UserService.URL.PASSWORD_RESET),
+    });
+  }
+
+  /**
+   * Complete a password reset.
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/completePasswordReset
+   * @param {string} code - Password reset code
+   * @param {string} new_password - New password to be set
+   * @param {string} email - Email address
+   * @param {string} phone_number - E.164 formatted phone number
+   * @returns {Promise} Promise that resolves when password reset process has been triggered
+   */
+  post_password_reset_complete(code, new_password, email, phone_number) {
+    return this.client.send_json({
+      data: {
+        code: code,
+        email: email,
+        password: new_password,
+        phone: phone_number,
+      },
+      type: 'POST',
+      url: this.client.create_url(`${UserService.URL.PASSWORD_RESET}/complete`),
     });
   }
 
