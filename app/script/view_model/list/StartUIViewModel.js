@@ -622,6 +622,8 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
     return this.conversation_repository.create_new_conversation(user_ids, null)
       .then((response) => {
+        this.submitted_search = false;
+
         if (response && response.conversation_et) {
           this.properties_repository.save_preference(z.properties.PROPERTIES_TYPE.HAS_CREATED_CONVERSATION);
           amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.CREATE_GROUP_CONVERSATION, {
@@ -629,7 +631,6 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
             numberOfParticipants: user_ids.length,
           });
           this.click_on_group(response.conversation_et);
-          this.submitted_search = false;
           return response.conversation_et;
         }
       })
