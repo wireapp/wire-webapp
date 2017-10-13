@@ -43,7 +43,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
     this.giphy_repository = this.conversation_repository.giphy_repository;
     this.user_repository = this.conversation_repository.user_repository;
 
-    // Dtate
+    // State
     this.content_state = ko.observable(z.ViewModel.content.CONTENT_STATE.WATERMARK);
     this.multitasking = {
       auto_minimize: ko.observable(true),
