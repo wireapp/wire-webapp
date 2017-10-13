@@ -117,31 +117,9 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
   _init_subscriptions() {
     amplify.subscribe(z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, this.set_show_calls_state.bind(this));
     amplify.subscribe(z.event.WebApp.LIFECYCLE.LOADED, this.on_webapp_loaded.bind(this));
-    amplify.subscribe(z.event.WebApp.SHORTCUT.NEXT, this._go_to_next_conversation.bind(this));
-    amplify.subscribe(z.event.WebApp.SHORTCUT.PREV, this._go_to_prev_conversation.bind(this));
     amplify.subscribe(z.event.WebApp.SHORTCUT.START, this.click_on_people_button.bind(this));
     amplify.subscribe(z.event.WebApp.SEARCH.BADGE.SHOW, () => this.show_badge(true));
     amplify.subscribe(z.event.WebApp.SEARCH.BADGE.HIDE, () => this.show_badge(false));
-  }
-
-  _go_to_next_conversation() {
-    const conversations = this.conversation_repository.conversations_unarchived();
-    const next_index = conversations.indexOf(this.conversation_repository.active_conversation()) - 1;
-    const next_conversation_et = conversations[next_index];
-
-    if (next_conversation_et) {
-      amplify.publish(z.event.WebApp.CONVERSATION.SHOW, next_conversation_et);
-    }
-  }
-
-  _go_to_prev_conversation() {
-    const conversations = this.conversation_repository.conversations_unarchived();
-    const prev_index = conversations.indexOf(this.conversation_repository.active_conversation()) + 1;
-    const prev_conversation_et = conversations[prev_index];
-
-    if (prev_conversation_et) {
-      amplify.publish(z.event.WebApp.CONVERSATION.SHOW, prev_conversation_et);
-    }
   }
 
   is_selected_conversation(conversation_et) {
