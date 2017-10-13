@@ -188,7 +188,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   create_new_conversation(user_ids, name) {
     return this.conversation_service.create_conversation(user_ids, name, this.team().id)
-      .then((response) => this._on_create({conversation: response.id, data: response}));
+      .then((response) => this._on_create({conversation: response.id, data: response}))
+      .catch((error) => {
+        if (error.label === z.service.BackendClientError.LABEL.NOT_CONNECTED) {
+          return this._handle_users_not_connected(user_ids);
+        }
+
+        throw error;
+      });
   }
 
   /**
@@ -921,15 +928,21 @@ z.conversation.ConversationRepository = class ConversationRepository {
   add_members(conversation_et, user_ids) {
     return this.conversation_service.post_members(conversation_et.id, user_ids)
       .then((response) => amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE))
-      .catch((error_response) => {
-        if (error_response.label === z.service.BackendClientError.LABEL.TOO_MANY_MEMBERS) {
-          amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.TOO_MANY_MEMBERS, {
+      .catch((error) => {
+        if (error.label === z.service.BackendClientError.LABEL.TOO_MANY_MEMBERS) {
+          return amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.TOO_MANY_MEMBERS, {
             data: {
               max: z.config.MAXIMUM_CONVERSATION_SIZE,
               open_spots: Math.max(0, z.config.MAXIMUM_CONVERSATION_SIZE - (conversation_et.number_of_participants() + 1)),
             },
           });
         }
+
+        if (error.label === z.service.BackendClientError.LABEL.NOT_CONNECTED) {
+          return this._handle_users_not_connected(user_ids);
+        }
+
+        throw error;
       });
   }
 
@@ -1222,6 +1235,17 @@ z.conversation.ConversationRepository = class ConversationRepository {
       this.conversation_service.delete_conversation_from_db(conversation_et.id);
       this.delete_conversation(conversation_et.id);
     }
+  }
+
+  _handle_users_not_connected(user_ids) {
+    const user_promise = user_ids.length === 1 ? this.user_repository.get_user_by_id(user_ids[0]) : Promise.resolve();
+
+    user_promise.then((user_et) => {
+      const username = user_et ? user_et.first_name() : undefined;
+      amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.NOT_CONNECTED, {
+        data: username,
+      });
+    });
   }
 
   /**

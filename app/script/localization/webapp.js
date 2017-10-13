@@ -205,6 +205,10 @@ z.string.modal_new_device_call_incoming = 'Do you still want to accept the call?
 z.string.modal_new_device_call_outgoing = 'Do you still want to place the call?';
 z.string.modal_new_device_show_device = 'show device';
 z.string.modal_new_device_send_anyway = 'send anyway';
+// Not connected
+z.string.modal_not_connected_headline = 'No one added to conversation';
+z.string.modal_not_connected_message_one = '{{name}} does not want to be added to conversations.';
+z.string.modal_not_connected_message_many = 'One of the people you selected does not want to be added to conversations.';
 // Remove device
 z.string.modal_remove_device_button = 'Remove device';
 z.string.modal_remove_device_headline = 'Remove "{{device}}"';
