@@ -247,6 +247,7 @@ z.string.it.conversation_delete_timestamp = 'Cancellato il {{date}}';
 z.string.it.conversation_edit_timestamp = 'Modificato il {{date}}';
 z.string.it.conversation_likes_caption = '{{number}} persone';
 z.string.it.conversation_send_pasted_file = 'Immagine incollata alle {{date}}';
+z.string.it.conversation_someone = 'Qualcuno';
 z.string.it.conversation_tweet_author = ' su Twitter';
 
 z.string.it.collection_show_all = 'Mostra tutti i {{number}}';
@@ -294,7 +295,6 @@ z.string.it.conversations_secondary_line_timed_message = 'Messaggio a tempo';
 z.string.it.conversations_secondary_line_you_left = 'Hai abbandonato';
 z.string.it.conversations_secondary_line_you_were_removed = 'Sei stato rimosso';
 
-z.string.it.takeover_headline = 'Usernames sono qui.';
 z.string.it.takeover_sub = 'Rivendica il tuo username su Wire.';
 z.string.it.takeover_link = 'Ulteriori informazioni';
 z.string.it.takeover_button_choose = 'Scegli il tuo';
@@ -467,28 +467,18 @@ z.string.it.upload_google_headline_error = 'Qualcosa è andato storto.';
 z.string.it.upload_google_message_error = 'Non abbiamo ricevuto i tuoi dati. Per favore riprova ad importare i tuoi contatti.';
 z.string.it.upload_google_button_again = 'Riprova';
 
-z.string.it.url_password_reset = 'forgot/';
-z.string.it.url_terms_of_use = 'https://wire.com/legal/terms/';
-z.string.it.url_support_calling = 'https://support.wire.com/hc/en-us/articles/202969412';
-z.string.it.url_support_camera_access_denied = 'https://support.wire.com/hc/en-us/articles/202935412';
-z.string.it.url_support_device_access_denied = 'https://support.wire.com/hc/en-us/articles/213512545';
-z.string.it.url_support_contact_bug = 'https://support.wire.com/hc/en-us/requests/new?ticket_form_id=101615';
-z.string.it.url_support_history = 'https://support.wire.com/hc/en-us/articles/207834645';
-z.string.it.url_support_mic_access_denied = 'https://support.wire.com/hc/en-us/articles/202590081';
-z.string.it.url_support_mic_not_found = 'https://support.wire.com/hc/en-us/articles/202970662';
-z.string.it.url_support_screen_access_denied = 'https://support.wire.com/hc/en-us/articles/202935412';
-z.string.it.url_support_screen_whitelist = 'https://support.wire.com/hc/en-us/articles/209423889';
-z.string.it.url_support_usernames = 'https://wire.com/support/username';
-z.string.it.url_decrypt_error_1 = 'https://wire.com/privacy/error-1';
-z.string.it.url_decrypt_error_2 = 'https://wire.com/privacy/error-2';
-
 z.string.it.warning_call_detail = 'Il browser ha bisogno di accedere al microfono per effettuare le chiamate.';
 z.string.it.warning_call_headline = 'Impossibile chiamare senza microfono';
 z.string.it.warning_call_unsupported_incoming = '{{user}} sta chiamando. Il tuo browser non supporta le chiamate.';
 z.string.it.warning_call_unsupported_outgoing = 'Non puoi chiamare perchè il tuo browser non supporta le chiamate.';
 z.string.it.warning_call_issues = 'Questa versione di Wire non può partecipare alla chiamata. Per favore usa';
 z.string.it.warning_call_upgrade_browser = 'Per chiamare, per favore aggiorna Google Chrome.';
+z.string.it.warning_connectivity_connection_lost = 'Tentativo di connessione. Wire non è in grado di consegnare i messaggi.';
+z.string.it.warning_connectivity_no_internet = 'Nessuna connessione. Non sarai in grado di inviare o ricevere messaggi.';
 z.string.it.warning_learn_more = 'Ulteriori informazioni';
+z.string.it.warning_lifecycle_update = 'Una nuova versione di Wire è disponibile.';
+z.string.it.warning_lifecycle_update_notes = 'Novità';
+z.string.it.warning_lifecycle_update_link = 'Aggiorna Ora';
 z.string.it.warning_not_found_camera = 'Non puoi chiamare perchè il tuo computer non ha una webcam.';
 z.string.it.warning_not_found_microphone = 'Non puoi chiamare perchè il tuo computer non ha un microfono.';
 z.string.it.warning_permission_denied_camera = 'Non puoi chiamare perchè il tuo browser non ha accesso alla webcam.';
@@ -499,13 +489,6 @@ z.string.it.warning_permission_request_microphone = '{{icon}} Consenti accesso a
 z.string.it.warning_permission_request_notification = '{{icon}} Consenti notifiche';
 z.string.it.warning_permission_request_screen = '{{icon}} Consenti accesso allo schermo';
 z.string.it.warning_tell_me_how = 'Dimmi come';
-
-z.string.it.warning_connectivity_connection_lost = 'Tentativo di connessione. Wire non è in grado di consegnare i messaggi.';
-z.string.it.warning_connectivity_no_internet = 'Nessuna connessione. Non sarai in grado di inviare o ricevere messaggi.';
-
-z.string.it.warning_lifecycle_update = 'Una nuova versione di Wire è disponibile.';
-z.string.it.warning_lifecycle_update_notes = 'Novità';
-z.string.it.warning_lifecycle_update_link = 'Aggiorna Ora';
 
 z.string.it.system_notification_asset_add = 'Ha condiviso un’immagine';
 z.string.it.system_notification_connection_accepted = 'Ha accettato la tua richiesta di connessione';

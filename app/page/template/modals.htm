@@ -242,6 +242,17 @@
     </div>
   </div>
 
+  <div class="modal modal-not-connected" data-uie-name="modal-not-connected">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-close icon-close icon-button pull-right"></div>
+        <div class="modal-title" data-bind="l10n_text: z.string.modal_not_connected_headline"></div>
+      </div>
+      <div class="modal-text" data-bind="l10n_text: z.string.modal_not_connected_message_many"></div>
+      <div class="modal-close button button-medium button-fluid" data-bind="l10n_text: z.string.modal_button_ok" data-uie-name="do-close"></div>
+    </div>
+  </div>
+
   <div class="modal modal-remove-device" data-uie-name="modal-remove-device">
     <div class="modal-content">
       <div class="modal-header">
@@ -281,7 +292,7 @@
       </div>
       <div class="modal-text">
         <span data-bind="l10n_text: z.string.modal_session_reset_message_1"></span>
-        <a data-bind="l10n_href: z.string.url_support_contact_bug, l10n_text: z.string.modal_session_reset_message_link" rel="nofollow noopener noreferrer" target="_blank"></a>
+        <a data-bind="l10n_href: {support: z.config.SUPPORT.FORM.BUG}, l10n_text: z.string.modal_session_reset_message_link" rel="nofollow noopener noreferrer" target="_blank"></a>
         <span data-bind="l10n_text: z.string.modal_session_reset_message_2"></span>
       </div>
       <div class="modal-close button button-medium button-fluid" data-bind="l10n_text: z.string.modal_button_ok" data-uie-name="do-close"></div>

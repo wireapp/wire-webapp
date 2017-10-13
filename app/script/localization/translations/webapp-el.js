@@ -248,6 +248,7 @@ z.string.el.conversation_delete_timestamp = 'Διεγράφη στις {{date}}'
 z.string.el.conversation_edit_timestamp = 'Επεξεργάστηκε στις {{date}}';
 z.string.el.conversation_likes_caption = '{{number}} άτομα';
 z.string.el.conversation_send_pasted_file = 'Επικολλημένη εικόνα στις {{date}}';
+z.string.el.conversation_someone = 'Κάποιος';
 z.string.el.conversation_tweet_author = ' στο Twitter';
 
 z.string.el.collection_show_all = 'Προβολή όλων {{number}}';
@@ -295,7 +296,6 @@ z.string.el.conversations_secondary_line_timed_message = 'Προσωρινό μ�
 z.string.el.conversations_secondary_line_you_left = 'Αποχωρήσατε';
 z.string.el.conversations_secondary_line_you_were_removed = 'Σας αφαίρεσαν';
 
-z.string.el.takeover_headline = 'Τα ονόματα χρηστών βρίσκονται εδώ.';
 z.string.el.takeover_sub = 'Ζητήστε το μοναδικό σας όνομα στο Wire.';
 z.string.el.takeover_link = 'Μάθετε περισσότερα';
 z.string.el.takeover_button_choose = 'Επιλέξτε το δικό σας';
@@ -468,19 +468,18 @@ z.string.el.upload_google_headline_error = 'Κάτι πήγε στραβά.';
 z.string.el.upload_google_message_error = 'Δεν λάβαμε πληροφορίες σας. Παρακαλούμε προσπαθήστε ξανά να εισάγετε τις επαφές σας.';
 z.string.el.upload_google_button_again = 'Προσπαθήστε ξανά';
 
-z.string.el.url_password_reset = 'ξέχασα/';
-z.string.el.url_support_device_access_denied = 'https://support.wire.com/hc/en-us/articles/213512545';
-z.string.el.url_support_usernames = 'https://wire.com/support/username';
-z.string.el.url_decrypt_error_1 = 'https://wire.com/privacy/error-1';
-z.string.el.url_decrypt_error_2 = 'https://wire.com/privacy/error-2';
-
 z.string.el.warning_call_detail = 'Το πρόγραμμα περιήγησής σας χρειάζεται πρόσβαση στο μικρόφωνο για να κάνετε κλήσεις.';
 z.string.el.warning_call_headline = 'Αδύνατη η κλήση χωρίς μικρόφωνο';
 z.string.el.warning_call_unsupported_incoming = '{{user}} καλεί. Το πρόγραμμα περιήγησής σας δεν υποστηρίζει κλήσεις.';
 z.string.el.warning_call_unsupported_outgoing = 'Δεν μπορείτε να καλέσετε, επειδή το πρόγραμμα περιήγησής σας δεν υποστηρίζει κλήσεις.';
 z.string.el.warning_call_issues = 'Αυτή η έκδοση του Wire δεν μπορεί να μετέχει στην κλήση. Παρακαλούμε χρησιμοποιήστε';
 z.string.el.warning_call_upgrade_browser = 'Για να καλέσετε, παρακαλούμε ενημερώστε το Google Chrome.';
+z.string.el.warning_connectivity_connection_lost = 'Προσπαθείτε να συνδεθείτε. Το Wire μπορεί να μην είναι σε θέση να παραδώσει μηνύματα.';
+z.string.el.warning_connectivity_no_internet = 'Χωρίς σύνδεση. Δεν θα μπορείτε να στείλετε ή να λάβετε μηνύματα.';
 z.string.el.warning_learn_more = 'Μάθετε περισσότερα';
+z.string.el.warning_lifecycle_update = 'Διατίθεται μια νέα έκδοση του Wire.';
+z.string.el.warning_lifecycle_update_notes = 'Τι νέο υπάρχει';
+z.string.el.warning_lifecycle_update_link = 'Ενημέρωση τώρα';
 z.string.el.warning_not_found_camera = 'Δεν μπορείτε να πραγματοποιήσετε κλήση επειδή ο υπολογιστής σας δεν διαθέτει κάμερα.';
 z.string.el.warning_not_found_microphone = 'Δεν μπορείτε να καλέσετε, επειδή ο υπολογιστής σας δεν διαθέτει μικρόφωνο.';
 z.string.el.warning_permission_denied_camera = 'Δεν μπορείτε να καλέσετε, επειδή το πρόγραμμα περιήγησής σας δεν έχει πρόσβαση σε κάμερα.';
@@ -491,13 +490,6 @@ z.string.el.warning_permission_request_microphone = '{{icon}} Να επιτρέ�
 z.string.el.warning_permission_request_notification = '{{icon}} Να επιτρέπονται οι ειδοποιήσεις';
 z.string.el.warning_permission_request_screen = '{{icon}} Να επιτρέπεται η πρόσβαση στην οθόνη';
 z.string.el.warning_tell_me_how = 'Πείτε μας πως';
-
-z.string.el.warning_connectivity_connection_lost = 'Προσπαθείτε να συνδεθείτε. Το Wire μπορεί να μην είναι σε θέση να παραδώσει μηνύματα.';
-z.string.el.warning_connectivity_no_internet = 'Χωρίς σύνδεση. Δεν θα μπορείτε να στείλετε ή να λάβετε μηνύματα.';
-
-z.string.el.warning_lifecycle_update = 'Διατίθεται μια νέα έκδοση του Wire.';
-z.string.el.warning_lifecycle_update_notes = 'Τι νέο υπάρχει';
-z.string.el.warning_lifecycle_update_link = 'Ενημέρωση τώρα';
 
 z.string.el.system_notification_asset_add = 'Κοινοποίηση εικόνας';
 z.string.el.system_notification_connection_accepted = 'Η αίτηση σύνδεσης σας έγινε αποδεκτή';

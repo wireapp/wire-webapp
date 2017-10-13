@@ -44,7 +44,7 @@
           <!-- ko if: devices_found() -->
             <div class="user-profile-device-message">
               <div data-bind="text: device_headline"></div>
-              <a data-bind="l10n_text: z.string.people_tabs_devices_why_verify, l10n_href: z.string.url_privacy_why" rel="nofollow noopener noreferrer" target="_blank" class="text-theme"></a>
+              <a data-bind="attr: {href: z.util.URLUtil.build_url(z.util.URLUtil.TYPE.WEBSITE, z.config.URL_PATH.PRIVACY_WHY)}, l10n_text: z.string.people_tabs_devices_why_verify" rel="nofollow noopener noreferrer" target="_blank" class="text-theme"></a>
             </div>
             <div data-bind="foreach: user().devices">
               <div class="user-profile-device" data-bind="click: $parent.click_on_device">
@@ -62,7 +62,7 @@
           <!-- /ko -->
           <!-- ko ifnot: devices_found() -->
             <div data-bind="text: no_device_headline"></div>
-            <a data-bind="l10n_text: z.string.people_tabs_devices_learn_more, l10n_href: z.string.url_privacy" rel="nofollow noopener noreferrer" target="_blank" class="text-theme"></a>
+            <a data-bind="l10n_text: z.string.people_tabs_devices_learn_more, l10n_href: {type: z.util.URLUtil.TYPE.WEBSITE, path: z.string.url_website_privacy}" rel="nofollow noopener noreferrer" target="_blank" class="text-theme"></a>
           <!-- /ko -->
         </div>
       <!-- /ko -->
@@ -74,7 +74,7 @@
         <span class="user-profile-my-device-button user-profile-top-right-button button-label text-theme" data-bind="click: click_on_my_fingerprint_button, l10n_text: z.string.people_tabs_device_detail_show_my_device"></span>
         <div class="user-profile-device-detail-message">
           <div data-bind="html: detail_message"></div>
-          <a data-bind="l10n_text: z.string.people_tabs_device_detail_how_to, l10n_href: z.string.url_privacy_how" rel="nofollow noopener noreferrer" target="_blank" class="text-theme"></a>
+          <a data-bind="attr: {href: z.util.URLUtil.build_url(z.util.URLUtil.TYPE.WEBSITE, z.config.URL_PATH.PRIVACY_HOW)}, l10n_text: z.string.people_tabs_device_detail_how_to" rel="nofollow noopener noreferrer" target="_blank" class="text-theme"></a>
         </div>
         <device-card class="user-profile-device-detail-card" params="device: selected_device()"></device-card>
         <div class="user-profile-device-detail-fingerprint" data-bind="html: z.util.print_devices_id(fingerprint_remote())"></div>

@@ -885,12 +885,6 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       this._remove_error(input_event.currentTarget.classList[1]);
     }
   }
-  clicked_on_blocked_learn_more() {
-    if (this.blocked_mode === z.auth.AuthView.MODE.BLOCKED_TABS) {
-      return z.util.safe_window_open(z.string.url_support_multiple_tabs);
-    }
-    z.util.safe_window_open(z.string.url_support_private_mode);
-  }
 
   clicked_on_change_email() {
     this._set_hash(z.auth.AuthView.MODE.ACCOUNT_REGISTER);
@@ -917,7 +911,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
   clicked_on_password() {
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PASSWORD_RESET, {value: 'fromSignIn'});
-    z.util.safe_window_open(`${z.util.Environment.backend.website_url()}${z.l10n.text(z.string.url_password_reset)}`);
+    z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.WEBSITE, z.config.URL_PATH.PASSWORD_RESET));
   }
 
   clicked_on_register() {
@@ -984,7 +978,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
   clicked_on_terms() {
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.NAVIGATION.OPENED_TERMS);
-    z.util.safe_window_open(z.l10n.text(z.string.url_terms_of_use));
+    z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.WEBSITE, z.config.URL_PATH.TERMS_OF_USE));
   }
 
   clicked_on_verify_later() {
@@ -993,7 +987,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
   clicked_on_wire_link() {
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.NAVIGATION.OPENED_WIRE_WEBSITE);
-    z.util.safe_window_open(z.l10n.text(z.string.url_wire));
+    const path = z.l10n.text(z.string.url_website_root);
+    z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.WEBSITE, path));
   }
 
   keydown_auth(keyboard_event) {
