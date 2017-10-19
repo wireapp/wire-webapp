@@ -39,6 +39,7 @@ z.ViewModel.ModalType = {
   LEAVE: '.modal-leave',
   LOGOUT: '.modal-logout',
   NEW_DEVICE: '.modal-new-device',
+  NOT_CONNECTED: '.modal-not-connected',
   REMOVE_DEVICE: '.modal-remove-device',
   SESSION_RESET: '.modal-session-reset',
   TOO_LONG_MESSAGE: '.modal-too-long-message',
@@ -96,6 +97,9 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
         break;
       case z.ViewModel.ModalType.NEW_DEVICE:
         this._show_modal_new_device(options.data, title_element, message_element, action_element);
+        break;
+      case z.ViewModel.ModalType.NOT_CONNECTED:
+        this._show_modal_not_connected(options.data, message_element);
         break;
       case z.ViewModel.ModalType.REMOVE_DEVICE:
         this._show_modal_remove_device(options.data, title_element);
@@ -260,6 +264,14 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
 
     message_element.text(z.l10n.text(message_id));
     action_element.text(z.l10n.text(action_id));
+  }
+
+  _show_modal_not_connected(content, message_element) {
+    if (content) {
+      message_element.text(z.l10n.text(z.string.modal_not_connected_message_one, content));
+    } else {
+      message_element.text(z.l10n.text(z.string.modal_not_connected_message_many));
+    }
   }
 
   _show_modal_remove_device(content, title_element) {

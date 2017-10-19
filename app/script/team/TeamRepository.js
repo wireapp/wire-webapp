@@ -86,6 +86,12 @@ z.team.TeamRepository = class TeamRepository {
       .then(() => this.team());
   }
 
+  get_team_member(team_id, user_id) {
+    return this.team_service
+      .get_team_member(team_id, user_id)
+      .then(member_reponse => this.team_mapper.map_member_from_object(member_reponse));
+  }
+
   get_team_members(team_id) {
     return this.team_service.get_team_members(team_id).then(({members}) => {
       if (members.length) {
@@ -111,8 +117,7 @@ z.team.TeamRepository = class TeamRepository {
 
     switch (type) {
       case z.event.Backend.TEAM.CONVERSATION_CREATE:
-      case z.event.Backend.TEAM.CONVERSATION_DELETE:
-      case z.event.Backend.TEAM.MEMBER_UPDATE: {
+      case z.event.Backend.TEAM.CONVERSATION_DELETE: {
         this._on_unhandled(event_json);
         break;
       }
@@ -126,6 +131,10 @@ z.team.TeamRepository = class TeamRepository {
       }
       case z.event.Backend.TEAM.MEMBER_LEAVE: {
         this._on_member_leave(event_json);
+        break;
+      }
+      case z.event.Backend.TEAM.MEMBER_UPDATE: {
+        this._on_member_update(event_json);
         break;
       }
       case z.event.Backend.TEAM.UPDATE: {
@@ -188,16 +197,16 @@ z.team.TeamRepository = class TeamRepository {
     return this.get_team_members(team_et.id)
       .then(team_members => {
         const member_ids = team_members
-          .filter(team_member => {
-            const is_self_user = team_member.user_id === this.user_repository.self().id;
+          .filter(member_et => {
+            const is_self_user = member_et.user_id === this.user_repository.self().id;
 
             if (is_self_user) {
-              this.team_mapper.map_role(this.user_repository.self(), team_member);
+              this.team_mapper.map_role(this.user_repository.self(), member_et);
             }
 
             return !is_self_user;
           })
-          .map(team_member => team_member.user_id);
+          .map(member_et => member_et.user_id);
 
         return this.user_repository.get_users_by_id(member_ids);
       })
@@ -235,13 +244,25 @@ z.team.TeamRepository = class TeamRepository {
     const is_local_team = this.team().id === team_id;
 
     if (is_local_team) {
-      const is_self_user = user_id === this.user_repository.self().id;
+      const is_self_user = this.user_repository.self().id === user_id;
       if (is_self_user) {
         return this._on_delete(event_json);
       }
 
       this.team().members.remove(member => member.id === user_id);
       amplify.publish(z.event.WebApp.TEAM.MEMBER_LEAVE, team_id, user_id);
+    }
+  }
+
+  _on_member_update(event_json) {
+    const {data: {user: user_id}, team: team_id} = event_json;
+    const is_local_team = this.team().id === team_id;
+    const is_self_user = this.user_repository.self().id === user_id;
+
+    if (is_local_team && is_self_user) {
+      this.get_team_member(team_id, user_id)
+        .then(member_et => this.team_mapper.map_role(this.user_repository.self(), member_et))
+        .then(() => this.send_account_info());
     }
   }
 

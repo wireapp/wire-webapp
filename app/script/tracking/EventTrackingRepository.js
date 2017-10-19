@@ -76,6 +76,8 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
    * @returns {EventTrackingRepository} The new repository for user actions
    */
   constructor(conversation_repository, team_repository, user_repository) {
+    this.update_privacy_preference = this.update_privacy_preference.bind(this);
+
     this.logger = new z.util.Logger('z.tracking.EventTrackingRepository', z.config.LOGGER.OPTIONS);
 
     this.conversation_repository = conversation_repository;
@@ -97,7 +99,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   /**
    * Init the repository.
    * @param {boolean} privacy_preference - Privacy preference
-   * @returns {undefined} No return value
+   * @returns {Promise} Resolves after initialization
    */
   init(privacy_preference) {
     this.privacy_preference = privacy_preference;
@@ -111,19 +113,14 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
         }
         return undefined;
       })
-      .then(mixpanel_instance => {
-        if (mixpanel_instance) {
-          this._subscribe_to_tracking_events();
-          this._set_super_properties();
-        }
-        amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.PRIVACY, this._update_privacy_preference.bind(this));
-      });
+      .then(mixpanel_instance => this._init_mixpanel(mixpanel_instance))
+      .then(() => amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.PRIVACY, this.update_privacy_preference));
   }
 
   /**
    * Initialize the repository without user analytics but with error reporting (used for "auth" page).
    * @note Mode for auth page
-   * @returns {undefined} No return value
+   * @returns {Promise} Resolves after initialization
    */
   init_without_user_analytics() {
     return Promise.resolve()
@@ -134,14 +131,10 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
         }
         return undefined;
       })
-      .then(mixpanel_instance => {
-        if (mixpanel_instance) {
-          this._subscribe_to_tracking_events();
-        }
-      });
+      .then(mixpanel_instance => this._init_mixpanel(mixpanel_instance));
   }
 
-  _update_privacy_preference(privacy_preference) {
+  update_privacy_preference(privacy_preference) {
     if (privacy_preference !== this.privacy_preference) {
       this.privacy_preference = privacy_preference;
 
@@ -154,6 +147,13 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
         this._disable_error_reporting();
         this._disable_tracking();
       }
+    }
+  }
+
+  _init_mixpanel(mixpanel_instance) {
+    if (mixpanel_instance) {
+      this._subscribe_to_tracking_events();
+      this._set_super_properties();
     }
   }
 
@@ -191,11 +191,13 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
   _set_super_properties() {
     this._set_super_property(z.tracking.SuperProperty.APP, EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE);
-    this._set_super_property(z.tracking.SuperProperty.CONTACTS, this.user_repository.number_of_contacts());
     this._set_super_property(z.tracking.SuperProperty.DESKTOP_APP, z.tracking.helpers.get_platform());
 
-    this._set_super_property(z.tracking.SuperProperty.TEAM.IN_TEAM, this.team_repository.is_team());
-    this._set_super_property(z.tracking.SuperProperty.TEAM.SIZE, this.team_repository.team_size());
+    if (this.user_repository) {
+      this._set_super_property(z.tracking.SuperProperty.CONTACTS, this.user_repository.number_of_contacts());
+      this._set_super_property(z.tracking.SuperProperty.TEAM.IN_TEAM, this.team_repository.is_team());
+      this._set_super_property(z.tracking.SuperProperty.TEAM.SIZE, this.team_repository.team_size());
+    }
   }
 
   _set_super_property(super_property, value) {

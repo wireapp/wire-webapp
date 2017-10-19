@@ -296,7 +296,6 @@ z.string.el.conversations_secondary_line_timed_message = 'Προσωρινό μ�
 z.string.el.conversations_secondary_line_you_left = 'Αποχωρήσατε';
 z.string.el.conversations_secondary_line_you_were_removed = 'Σας αφαίρεσαν';
 
-z.string.el.takeover_headline = 'Τα ονόματα χρηστών βρίσκονται εδώ.';
 z.string.el.takeover_sub = 'Ζητήστε το μοναδικό σας όνομα στο Wire.';
 z.string.el.takeover_link = 'Μάθετε περισσότερα';
 z.string.el.takeover_button_choose = 'Επιλέξτε το δικό σας';

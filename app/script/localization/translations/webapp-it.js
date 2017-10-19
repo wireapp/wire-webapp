@@ -295,7 +295,6 @@ z.string.it.conversations_secondary_line_timed_message = 'Messaggio a tempo';
 z.string.it.conversations_secondary_line_you_left = 'Hai abbandonato';
 z.string.it.conversations_secondary_line_you_were_removed = 'Sei stato rimosso';
 
-z.string.it.takeover_headline = 'Usernames sono qui.';
 z.string.it.takeover_sub = 'Rivendica il tuo username su Wire.';
 z.string.it.takeover_link = 'Ulteriori informazioni';
 z.string.it.takeover_button_choose = 'Scegli il tuo';

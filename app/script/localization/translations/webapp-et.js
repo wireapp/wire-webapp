@@ -177,6 +177,9 @@ z.string.et.modal_new_device_call_incoming = 'Kas sa soovid siiski kõne vastu v
 z.string.et.modal_new_device_call_outgoing = 'Kas sa soovid siiski kõne teha?';
 z.string.et.modal_new_device_show_device = 'kuva seadet';
 z.string.et.modal_new_device_send_anyway = 'saada siiski';
+z.string.et.modal_not_connected_headline = 'Kedagi pole vestlusse lisatud';
+z.string.et.modal_not_connected_message_one = '{{name}} ei soovi vestlustega liituda.';
+z.string.et.modal_not_connected_message_many = 'Üks valitud inimestest ei soovi vestlustega liituda.';
 z.string.et.modal_remove_device_button = 'Eemalda seade';
 z.string.et.modal_remove_device_headline = 'Eemalda "{{device}}"';
 z.string.et.modal_remove_device_message = 'Seadme eemaldamiseks pead sisestama parooli.';
@@ -300,7 +303,6 @@ z.string.et.conversations_secondary_line_timed_message = 'Kustuv sõnum';
 z.string.et.conversations_secondary_line_you_left = 'Sa lahkusid';
 z.string.et.conversations_secondary_line_you_were_removed = 'Sind eemaldati vestlusest';
 
-z.string.et.takeover_headline = 'Kasutajanimed on siin.';
 z.string.et.takeover_sub = 'Haara oma unikaalne nimi Wire’is.';
 z.string.et.takeover_link = 'Loe lähemalt';
 z.string.et.takeover_button_choose = 'Vali enda oma';

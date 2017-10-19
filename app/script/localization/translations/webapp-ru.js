@@ -177,6 +177,7 @@ z.string.ru.modal_new_device_call_incoming = 'Вы действительно х
 z.string.ru.modal_new_device_call_outgoing = 'Вы действительно хотите позвонить?';
 z.string.ru.modal_new_device_show_device = 'показать устройство';
 z.string.ru.modal_new_device_send_anyway = 'отправить всё равно';
+z.string.ru.modal_not_connected_message_many = 'Один из выбранных контактов не хочет быть добавлен в разговор.';
 z.string.ru.modal_remove_device_button = 'Удалить устройство';
 z.string.ru.modal_remove_device_headline = 'Удалить "{{device}}"';
 z.string.ru.modal_remove_device_message = 'Для удаления устройства требуется пароль.';
@@ -300,7 +301,6 @@ z.string.ru.conversations_secondary_line_timed_message = 'Временное с�
 z.string.ru.conversations_secondary_line_you_left = 'Вы покинули разговор';
 z.string.ru.conversations_secondary_line_you_were_removed = 'Вы были удалены';
 
-z.string.ru.takeover_headline = 'Имена пользователей уже здесь.';
 z.string.ru.takeover_sub = 'Зарегистрируйте своё уникальное имя в Wire.';
 z.string.ru.takeover_link = 'Подробнее';
 z.string.ru.takeover_button_choose = 'Выбрать своё';
@@ -400,8 +400,10 @@ z.string.ru.preferences_about_terms_of_use = 'Условия использов�
 z.string.ru.preferences_about_version = 'Версия {{version}}';
 z.string.ru.preferences_about_website = 'Веб-сайт Wire';
 
+z.string.ru.preferences_account_create_team = 'Создать команду';
 z.string.ru.preferences_account_delete = 'Удалить аккаунт';
 z.string.ru.preferences_account_log_out = 'Выход';
+z.string.ru.preferences_account_manage_team = 'Управлять командой';
 z.string.ru.preferences_account_reset_password = 'Сбросить пароль';
 z.string.ru.preferences_account_team = 'в {{name}}';
 z.string.ru.preferences_account_username_placeholder = 'Ваше полное имя';

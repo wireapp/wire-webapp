@@ -177,6 +177,9 @@ z.string.de.modal_new_device_call_incoming = 'Möchtest du den Anruf dennoch ann
 z.string.de.modal_new_device_call_outgoing = 'Möchtest du wirklich anrufen?';
 z.string.de.modal_new_device_show_device = 'Gerät anzeigen';
 z.string.de.modal_new_device_send_anyway = 'Dennoch senden';
+z.string.de.modal_not_connected_headline = 'Niemand wurde zur Unterhaltung hinzugefügt';
+z.string.de.modal_not_connected_message_one = '{{name}} will nicht zur Unterhaltung hinzugefügt werden.';
+z.string.de.modal_not_connected_message_many = 'Eine der ausgewählten Personen will nicht zur Unterhaltung hinzugefügt werden.';
 z.string.de.modal_remove_device_button = 'Gerät entfernen';
 z.string.de.modal_remove_device_headline = 'Entferne "{{device}}"';
 z.string.de.modal_remove_device_message = 'Dein Passwort wird zum Entfernen des Gerätes benötigt.';
@@ -300,7 +303,6 @@ z.string.de.conversations_secondary_line_timed_message = 'Temporäre Nachricht';
 z.string.de.conversations_secondary_line_you_left = 'Du hast die Unterhaltung verlassen';
 z.string.de.conversations_secondary_line_you_were_removed = 'Du wurdest entfent';
 
-z.string.de.takeover_headline = 'Benutzernamen sind da.';
 z.string.de.takeover_sub = 'Sichere dir deinen persönlichen Benutzernamen auf Wire.';
 z.string.de.takeover_link = 'Erfahre mehr';
 z.string.de.takeover_button_choose = 'Wähle deinen eigenen';

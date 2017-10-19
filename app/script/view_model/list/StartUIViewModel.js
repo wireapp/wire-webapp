@@ -643,19 +643,21 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
     return this.conversation_repository
       .create_new_conversation(user_ids, null)
-      .then(({conversation_et}) => {
-        this.properties_repository.save_preference(z.properties.PROPERTIES_TYPE.HAS_CREATED_CONVERSATION);
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.CREATE_GROUP_CONVERSATION, {
-          creationContext: 'search',
-          numberOfParticipants: user_ids.length,
-        });
-        this.click_on_group(conversation_et);
+      .then(response => {
         this.submitted_search = false;
-        return conversation_et;
+
+        if (response && response.conversation_et) {
+          this.properties_repository.save_preference(z.properties.PROPERTIES_TYPE.HAS_CREATED_CONVERSATION);
+          amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.CREATE_GROUP_CONVERSATION, {
+            creationContext: 'search',
+            numberOfParticipants: user_ids.length,
+          });
+          this.click_on_group(response.conversation_et);
+          return response.conversation_et;
+        }
       })
       .catch(error => {
         this.submitted_search = false;
-        this._close_list();
         throw new Error(`Unable to create conversation: ${error.message}`);
       });
   }

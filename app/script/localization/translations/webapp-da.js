@@ -275,7 +275,6 @@ z.string.da.conversations_secondary_line_ping = '{{number}} ping';
 z.string.da.conversations_secondary_line_pings = '{{number}} pings';
 z.string.da.conversations_secondary_line_timed_message = 'Tidsbestemt besked';
 
-z.string.da.takeover_headline = 'Brugernavne er her.';
 z.string.da.takeover_sub = 'Vælg dit unikke navn på Wire.';
 z.string.da.takeover_link = 'Lær mere';
 z.string.da.takeover_button_choose = 'Vælg dit eget';

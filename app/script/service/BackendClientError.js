@@ -52,6 +52,7 @@ z.service.BackendClientError = class BackendClientError extends Error {
       KEY_EXISTS: 'key-exists',
       MISSING_AUTH: 'missing-auth',
       MISSING_IDENTITY: 'missing-identity',
+      NOT_CONNECTED: 'not-connected',
       NOT_FOUND: 'not-found',
       PASSWORD_EXISTS: 'password-exists',
       PENDING_ACTIVATION: 'pending-activation',

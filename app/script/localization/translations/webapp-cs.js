@@ -44,6 +44,7 @@ z.string.cs.auth_account_sign_in_phone = 'Telefon';
 z.string.cs.auth_account_terms_of_use = 'Podmínky používání';
 z.string.cs.auth_account_terms_of_use_detail = 'Souhlasím';
 
+z.string.cs.auth_blocked_cookies = 'Pro přihlášení k Wire povolte soubory cookie.';
 z.string.cs.auth_blocked_database = 'Pro zobrazení zpráv potřebuje Wire potřebuje přístup k úložišti. Úložiště není k dispozici v anonymním režimu.';
 z.string.cs.auth_blocked_tabs = 'Wire je již otevřen na jiné záložce.';
 
@@ -106,6 +107,7 @@ z.string.cs.auth_error_phone_number_budget = 'Příliš často se přihlašujete
 z.string.cs.auth_error_phone_number_forbidden = 'Omlouváme se. Toto telefonní číslo bylo zakázáno.';
 z.string.cs.auth_error_phone_number_invalid = 'Neplatné telefonní číslo';
 z.string.cs.auth_error_phone_number_unknown = 'Neznámé telefonní číslo';
+z.string.cs.auth_error_suspended = 'Pro tento účet již není povoleno se přihlásit.';
 z.string.cs.auth_error_sign_in = 'Zkontrolujte své údaje a zkuste znovu.';
 
 z.string.cs.call_state_outgoing = 'Zvoní…';
@@ -124,6 +126,8 @@ z.string.cs.modal_button_send = 'Odeslat';
 z.string.cs.modal_block_conversation_headline = 'Blokovat {{user}}?';
 z.string.cs.modal_block_conversation_message = '{{user}} vás nebude moci kontaktovat nebo přizvat ke skupinové konverzaci.';
 z.string.cs.modal_block_conversation_button = 'Blokovat';
+z.string.cs.modal_bots_unavailable_headline = 'Roboti jsou momentálně nedostupní';
+z.string.cs.modal_bots_unavailable_message = 'Děkujeme vám za váš zájem o roboty. Služba je pozastavena, zatímco pracujeme na další verzi.';
 z.string.cs.modal_call_conversation_empty_headline = 'Nikdo pro volání';
 z.string.cs.modal_call_conversation_empty_message = 'Již zde nikdo jiný není.';
 z.string.cs.modal_call_no_video_in_group_headline = 'Žádné videohovory ve skupinách';
@@ -172,6 +176,9 @@ z.string.cs.modal_new_device_call_incoming = 'Chcete přesto přijmout hovor?';
 z.string.cs.modal_new_device_call_outgoing = 'Chcete přesto volat?';
 z.string.cs.modal_new_device_show_device = 'zobrazit přístroj';
 z.string.cs.modal_new_device_send_anyway = 'přesto odeslat';
+z.string.cs.modal_not_connected_headline = 'Do konverzace nebyl nikdo přidán';
+z.string.cs.modal_not_connected_message_one = '{{name}} nemá zájem být přidán(a) do konverzace.';
+z.string.cs.modal_not_connected_message_many = 'Jeden z lidí které jste vybrali nechce být přidán do konverzace.';
 z.string.cs.modal_remove_device_button = 'Odstranit přístroj';
 z.string.cs.modal_remove_device_headline = 'Odstranit "{{device}}"';
 z.string.cs.modal_remove_device_message = 'Pro odstranění přístroje je vyžadováno heslo.';
@@ -295,7 +302,6 @@ z.string.cs.conversations_secondary_line_timed_message = 'Časované zprávy';
 z.string.cs.conversations_secondary_line_you_left = 'Opustil(a) jste konverzaci';
 z.string.cs.conversations_secondary_line_you_were_removed = 'Byl(a) jste odebrán(a)';
 
-z.string.cs.takeover_headline = 'Uživatelská jména jsou zde.';
 z.string.cs.takeover_sub = 'Vytvořte si vaše jedinečné jméno na Wire.';
 z.string.cs.takeover_link = 'Dozvědět se více';
 z.string.cs.takeover_button_choose = 'Vyberte své vlastní';
@@ -394,8 +400,10 @@ z.string.cs.preferences_about_terms_of_use = 'Podmínky používání';
 z.string.cs.preferences_about_version = 'Verze {{version}}';
 z.string.cs.preferences_about_website = 'Wire webové stránky';
 
+z.string.cs.preferences_account_create_team = 'Vytvořit tým';
 z.string.cs.preferences_account_delete = 'Smazat účet';
 z.string.cs.preferences_account_log_out = 'Odhlásit se';
+z.string.cs.preferences_account_manage_team = 'Spravovat tým';
 z.string.cs.preferences_account_reset_password = 'Resetovat heslo';
 z.string.cs.preferences_account_team = 'v {{name}}';
 z.string.cs.preferences_account_username_placeholder = 'Celé jméno';

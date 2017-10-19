@@ -103,6 +103,29 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
       }
     });
 
+    this.visible_list_items = ko.pureComputed(() => {
+      if (this.list_state() === z.ViewModel.list.LIST_STATE.PREFERENCES) {
+        const preference_items = [
+          z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT,
+          z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES,
+          z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS,
+          z.ViewModel.content.CONTENT_STATE.PREFERENCES_AV,
+        ];
+
+        if (!z.util.Environment.desktop) {
+          preference_items.push(z.ViewModel.content.CONTENT_STATE.PREFERENCES_ABOUT);
+        }
+
+        return preference_items;
+      }
+
+      const has_connect_requests = this.user_repository.connect_requests().length;
+      const connect_requests = has_connect_requests ? z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS : [];
+      return this.conversation_repository
+        .conversations_calls()
+        .concat(connect_requests, this.conversation_repository.conversations_unarchived());
+    });
+
     this._init_subscriptions();
 
     ko.applyBindings(this, document.getElementById(element_id));
@@ -116,11 +139,62 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     amplify.subscribe(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT, this.open_preferences_account.bind(this));
     amplify.subscribe(z.event.WebApp.PREFERENCES.MANAGE_DEVICES, this.open_preferences_devices.bind(this));
     amplify.subscribe(z.event.WebApp.SEARCH.SHOW, this.open_start_ui.bind(this));
+    amplify.subscribe(z.event.WebApp.SHORTCUT.NEXT, this.go_to_next.bind(this));
+    amplify.subscribe(z.event.WebApp.SHORTCUT.PREV, this.go_to_previous.bind(this));
     amplify.subscribe(z.event.WebApp.TAKEOVER.SHOW, this.show_takeover.bind(this));
     amplify.subscribe(z.event.WebApp.TAKEOVER.DISMISS, this.dismiss_takeover.bind(this));
     amplify.subscribe(z.event.WebApp.SHORTCUT.ARCHIVE, this.click_on_archive_action.bind(this));
     amplify.subscribe(z.event.WebApp.SHORTCUT.DELETE, this.click_on_clear_action.bind(this));
     amplify.subscribe(z.event.WebApp.SHORTCUT.SILENCE, this.click_on_mute_action.bind(this));
+  }
+
+  go_to_next() {
+    this._iterate_active_item(true);
+  }
+
+  go_to_previous() {
+    this._iterate_active_item(false);
+  }
+
+  _iterate_active_item(reverse = false) {
+    if (this.list_state() === z.ViewModel.list.LIST_STATE.PREFERENCES) {
+      return this._iterate_active_preference(reverse);
+    }
+
+    this._iterate_active_conversation(reverse);
+  }
+
+  _iterate_active_conversation(reverse) {
+    const is_connection_request_state =
+      this.content_view_model.content_state() === z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS;
+    const active_conversation_item = is_connection_request_state
+      ? z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS
+      : this.conversation_repository.active_conversation();
+    const next_conversation_item = z.util.ArrayUtil.iterate_item(
+      this.visible_list_items(),
+      active_conversation_item,
+      reverse
+    );
+
+    if (next_conversation_item === z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS) {
+      this.content_view_model.switch_content(z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS);
+    } else if (next_conversation_item) {
+      amplify.publish(z.event.WebApp.CONVERSATION.SHOW, next_conversation_item);
+    }
+  }
+
+  _iterate_active_preference(reverse) {
+    let active_preference = this.content_view_model.content_state();
+
+    if (active_preference === z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS) {
+      active_preference = z.ViewModel.content.CONTENT_STATE.DEVICES;
+    }
+
+    const next_preference = z.util.ArrayUtil.iterate_item(this.visible_list_items(), active_preference, reverse);
+
+    if (next_preference) {
+      this.content_view_model.switch_content(next_preference);
+    }
   }
 
   open_preferences_account() {
