@@ -30,7 +30,7 @@
         <div class="warning-bar warning-bar-feature bg-theme">
           <div class="warning-bar-message">
             <span data-bind="l10n_text: z.string.warning_permission_denied_microphone"></span>&nbsp;
-            <a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="l10n_href: z.string.warning_permission_denied_microphone, l10n_text: z.string.warning_learn_more"></a>
+            <a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="l10n_href: {support: z.config.SUPPORT.ID.MICROPHONE_ACCESS_DENIED}, l10n_text: z.string.warning_learn_more"></a>
           </div>
           <span class="warning-bar-close icon-close button-round button-round-dark" data-bind="click: close_warning"></span>
         </div>
