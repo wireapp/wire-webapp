@@ -22,7 +22,7 @@
 window.z = window.z || {};
 window.z.util = z.util || {};
 
-(function() {
+(() => {
   const APP_ENV = {
     LOCALHOST: 'localhost',
     PROD_NEXT: 'wire-webapp-prod-next.wire.com',
@@ -45,33 +45,25 @@ window.z.util = z.util || {};
   };
 
   const _check = {
-    get_version: function() {
+    get_version: () => {
       if (platform.version) {
         return window.parseInt(platform.version.split('.')[0], 10);
       }
     },
-    is_chrome: function() {
+    is_chrome() {
       return platform.name === BROWSER_NAME.CHROME || this.is_electron();
     },
-    is_desktop: function() {
+    is_desktop() {
       return this.is_electron() && navigator.userAgent.includes(BROWSER_NAME.WIRE);
     },
-    is_edge: function() {
-      return platform.name === BROWSER_NAME.EDGE;
-    },
-    is_electron: function() {
-      return platform.name === BROWSER_NAME.ELECTRON;
-    },
-    is_firefox: function() {
-      return platform.name === BROWSER_NAME.FIREFOX;
-    },
-    is_opera: function() {
-      return platform.name === BROWSER_NAME.OPERA;
-    },
-    supports_audio_output_selection: function() {
+    is_edge: () => platform.name === BROWSER_NAME.EDGE,
+    is_electron: () => platform.name === BROWSER_NAME.ELECTRON,
+    is_firefox: () => platform.name === BROWSER_NAME.FIREFOX,
+    is_opera: () => platform.name === BROWSER_NAME.OPERA,
+    supports_audio_output_selection() {
       return this.is_chrome();
     },
-    supports_calling: function() {
+    supports_calling() {
       if (!this.supports_media_devices()) {
         return false;
       }
@@ -83,13 +75,9 @@ window.z.util = z.util || {};
       }
       return this.is_chrome() || this.is_firefox() || this.is_opera();
     },
-    supports_indexed_db: function() {
-      return !!window.indexedDB;
-    },
-    supports_media_devices: function() {
-      return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
-    },
-    supports_notifications: function() {
+    supports_indexed_db: () => !!window.indexedDB,
+    supports_media_devices: () => !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia),
+    supports_notifications: () => {
       if (window.Notification === undefined) {
         return false;
       }
@@ -98,7 +86,7 @@ window.z.util = z.util || {};
       }
       return document.visibilityState !== undefined;
     },
-    supports_screen_sharing: function() {
+    supports_screen_sharing() {
       if (window.desktopCapturer) {
         return true;
       }
@@ -107,12 +95,8 @@ window.z.util = z.util || {};
   };
 
   const os = {
-    is_mac() {
-      return navigator.platform.includes(PLATFORM_NAME.MACINTOSH);
-    },
-    is_windows() {
-      return navigator.platform.includes(PLATFORM_NAME.WINDOWS);
-    },
+    is_mac: () => navigator.platform.includes(PLATFORM_NAME.MACINTOSH),
+    is_windows: () => navigator.platform.includes(PLATFORM_NAME.WINDOWS),
   };
 
   // add body information
@@ -120,7 +104,7 @@ window.z.util = z.util || {};
   const platform_css_class = _check.is_electron() ? 'platform-electron' : 'platform-web';
   $(document.body).addClass(`${os_css_class} ${platform_css_class}`);
 
-  const app_version = function() {
+  const app_version = () => {
     if ($("[property='wire:version']").attr('version')) {
       return $("[property='wire:version']")
         .attr('version')
@@ -129,33 +113,19 @@ window.z.util = z.util || {};
     return '';
   };
 
-  const formatted_app_version = function() {
+  const formatted_app_version = () => {
     const version = app_version().split('-');
     return `${version[0]}.${version[1]}.${version[2]}.${version[3]}${version[4]}`;
   };
 
   z.util.Environment = {
-    _electron_version: function(user_agent) {
+    _electron_version: (user_agent) => {
       const result = /(Wire|WireInternal)\/(\S+)/.exec(user_agent);
-      if (result) {
-        return result[2]; // [match, app, version]
-      }
-      return undefined;
+      // [match, app, version]
+      return result ? result[2] : undefined;
     },
     backend: {
-      account_url: function() {
-        if (z.util.Environment.backend.current === z.service.BackendEnvironment.PRODUCTION) {
-          return z.config.ACCOUNT_PRODUCTION_URL;
-        }
-        return z.config.ACCOUNT_STAGING_URL;
-      },
       current: undefined,
-      website_url: function() {
-        if (z.util.Environment.backend.current === z.service.BackendEnvironment.PRODUCTION) {
-          return z.config.WEBSITE_PRODUCTION_URL;
-        }
-        return z.config.WEBSITE_STAGING_URL;
-      },
     },
     browser: {
       chrome: _check.is_chrome(),
@@ -176,19 +146,15 @@ window.z.util = z.util || {};
     desktop: _check.is_desktop(),
     electron: _check.is_electron(),
     frontend: {
-      is_localhost() {
-        return [APP_ENV.LOCALHOST, APP_ENV.VIRTUAL_HOST].includes(window.location.hostname);
-      },
-      is_production() {
-        return [APP_ENV.PRODUCTION, APP_ENV.PROD_NEXT].includes(window.location.hostname);
-      },
+      is_localhost: () => [APP_ENV.LOCALHOST, APP_ENV.VIRTUAL_HOST].includes(window.location.hostname),
+      is_production: () => [APP_ENV.PRODUCTION, APP_ENV.PROD_NEXT].includes(window.location.hostname),
     },
     os: {
       linux: !os.is_mac() && !os.is_windows(),
       mac: os.is_mac(),
       win: os.is_windows(),
     },
-    version: function(show_wrapper_version = true, do_not_format = false) {
+    version(show_wrapper_version = true, do_not_format = false) {
       if (z.util.Environment.frontend.is_localhost()) {
         return 'dev';
       }

@@ -112,7 +112,7 @@ def update_headers(response):
   response.headers['X-Content-Security-Policy'] = csp_values
 
   # Custom headers
-  response.headers['X-Wire'] = 'Great Conversations.'
+  response.headers['X-Wire'] = 'Wire - Secure messenger.'
   response.headers['X-Wire-Version'] = config.CURRENT_VERSION_ID
 
   if response.mimetype in config.EXPIRES_MIMETYPES:

@@ -126,6 +126,8 @@ z.string.pt.modal_button_send = 'Enviar';
 z.string.pt.modal_block_conversation_headline = 'Bloquear {{user}}?';
 z.string.pt.modal_block_conversation_message = '{{user}} não será capaz de o contactar ou adicioná-lo para conversas em grupo.';
 z.string.pt.modal_block_conversation_button = 'Bloquear';
+z.string.pt.modal_bots_unavailable_headline = 'Atualmente os "bots" não estão disponíveis';
+z.string.pt.modal_bots_unavailable_message = 'Obrigado pelo seu interesse nos "bots". Atualmente o serviço está suspenso enquanto preparamos a nova versão. Fique atento.';
 z.string.pt.modal_call_conversation_empty_headline = 'Ninguém para ligar';
 z.string.pt.modal_call_conversation_empty_message = 'Não há mais ninguém aqui.';
 z.string.pt.modal_call_no_video_in_group_headline = 'Não há chamadas de vídeo em grupos';
@@ -249,6 +251,7 @@ z.string.pt.conversation_delete_timestamp = 'Eliminado em {{date}}';
 z.string.pt.conversation_edit_timestamp = 'Editado em {{date}}';
 z.string.pt.conversation_likes_caption = '{{number}} pessoas';
 z.string.pt.conversation_send_pasted_file = 'Imagem colada em {{date}}';
+z.string.pt.conversation_someone = 'Alguém';
 z.string.pt.conversation_tweet_author = ' no Twitter';
 
 z.string.pt.collection_show_all = 'Mostrar todos os {{number}}';
@@ -296,7 +299,6 @@ z.string.pt.conversations_secondary_line_timed_message = 'Mensagem agendada';
 z.string.pt.conversations_secondary_line_you_left = 'Você deixou';
 z.string.pt.conversations_secondary_line_you_were_removed = 'Você foram removido';
 
-z.string.pt.takeover_headline = 'Os nomes de utilizador estão aqui.';
 z.string.pt.takeover_sub = 'Reivindicar seu nome exclusivo no Wire.';
 z.string.pt.takeover_link = 'Saber mais';
 z.string.pt.takeover_button_choose = 'Escolha a sua';
@@ -475,7 +477,12 @@ z.string.pt.warning_call_unsupported_incoming = '{{user}} está a chamar. O seu 
 z.string.pt.warning_call_unsupported_outgoing = 'Não pode telefonar porque o seu navegador não suporta chamadas.';
 z.string.pt.warning_call_issues = 'Esta versão do Wire não pode participar na chamada. Por favor, use';
 z.string.pt.warning_call_upgrade_browser = 'Para telefonar, atualize o Google Chrome.';
+z.string.pt.warning_connectivity_connection_lost = 'A tentar ligar. O Wire pode não ser capaz de entregar mensagens.';
+z.string.pt.warning_connectivity_no_internet = 'Sem Internet. Não será capaz de enviar ou receber mensagens.';
 z.string.pt.warning_learn_more = 'Saber mais';
+z.string.pt.warning_lifecycle_update = 'Está disponível uma versão nova do Wire.';
+z.string.pt.warning_lifecycle_update_notes = 'O que há de novo';
+z.string.pt.warning_lifecycle_update_link = 'Actualizar agora';
 z.string.pt.warning_not_found_camera = 'Não pode telefonar porque o seu computador não tem uma câmara.';
 z.string.pt.warning_not_found_microphone = 'Não pode telefonar porque o seu computador não tem um microfone.';
 z.string.pt.warning_permission_denied_camera = 'Não pode telefonar porque o seu navegador não tem acesso à câmara.';
@@ -486,13 +493,6 @@ z.string.pt.warning_permission_request_microphone = '{{icon}} Permitir o acesso 
 z.string.pt.warning_permission_request_notification = '{{icon}} Permitir notificações';
 z.string.pt.warning_permission_request_screen = '{{icon}} Permitir o acesso ao ecrã';
 z.string.pt.warning_tell_me_how = 'Diga-me agora';
-
-z.string.pt.warning_connectivity_connection_lost = 'A tentar ligar. O Wire pode não ser capaz de entregar mensagens.';
-z.string.pt.warning_connectivity_no_internet = 'Sem Internet. Não será capaz de enviar ou receber mensagens.';
-
-z.string.pt.warning_lifecycle_update = 'Está disponível uma versão nova do Wire.';
-z.string.pt.warning_lifecycle_update_notes = 'O que há de novo';
-z.string.pt.warning_lifecycle_update_link = 'Actualizar agora';
 
 z.string.pt.system_notification_asset_add = 'Partilhou uma foto';
 z.string.pt.system_notification_connection_accepted = 'Aceitou o seu pedido de ligação';

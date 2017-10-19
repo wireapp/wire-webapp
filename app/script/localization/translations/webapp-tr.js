@@ -249,6 +249,7 @@ z.string.tr.conversation_delete_timestamp = '{{date}} ’da silinmiş';
 z.string.tr.conversation_edit_timestamp = '{{date}} ’da düzenlenmiş';
 z.string.tr.conversation_likes_caption = '{{number}} kişi';
 z.string.tr.conversation_send_pasted_file = 'Yapıştırılmış resim, {{date}} ’de';
+z.string.tr.conversation_someone = 'Birisi';
 z.string.tr.conversation_tweet_author = ' Twitter’da';
 
 z.string.tr.collection_show_all = '{{number}}’nun tümünü göster';
@@ -296,7 +297,6 @@ z.string.tr.conversations_secondary_line_timed_message = 'Süreli Mesaj';
 z.string.tr.conversations_secondary_line_you_left = 'Ayrıldın';
 z.string.tr.conversations_secondary_line_you_were_removed = 'Çıkartıldınız';
 
-z.string.tr.takeover_headline = 'Kullanıcı adları burada.';
 z.string.tr.takeover_sub = 'Wire üzerinden size özel isminizi hemen alın.';
 z.string.tr.takeover_link = 'Daha fazla bilgi';
 z.string.tr.takeover_button_choose = 'Kendininkini seç';
@@ -470,36 +470,18 @@ z.string.tr.upload_google_headline_error = 'Bir şeyler \nyanlış gitti.';
 z.string.tr.upload_google_message_error = 'Bilgilerinzi alamadık. Lütfen kişileriniz yeniden içe aktarmayı deneyin.';
 z.string.tr.upload_google_button_again = 'Tekrar deneyin';
 
-z.string.tr.url_password_reset = 'forgot/';
-z.string.tr.url_legal = 'https://wire.com/legal/';
-z.string.tr.url_privacy = 'https://wire.com/privacy/';
-z.string.tr.url_privacy_how = 'https://wire.com/privacy/how/';
-z.string.tr.url_privacy_why = 'https://wire.com/privacy/why/';
-z.string.tr.url_support = 'https://support.wire.com';
-z.string.tr.url_terms_of_use = 'https://wire.com/legal/terms/';
-z.string.tr.url_wire = 'https://wire.com';
-z.string.tr.url_wire_for_web = 'https://app.wire.com';
-z.string.tr.url_support_calling = 'https://support.wire.com/hc/en-us/articles/202969412';
-z.string.tr.url_support_camera_access_denied = 'https://support.wire.com/hc/en-us/articles/202935412';
-z.string.tr.url_support_device_access_denied = 'https://support.wire.com/hc/en-us/articles/213512545';
-z.string.tr.url_support_contact = 'https://support.wire.com/hc/en-us/requests/new';
-z.string.tr.url_support_contact_bug = 'https://support.wire.com/hc/en-us/requests/new?ticket_form_id=101615';
-z.string.tr.url_support_history = 'https://support.wire.com/hc/en-us/articles/207834645';
-z.string.tr.url_support_mic_access_denied = 'https://support.wire.com/hc/en-us/articles/202590081';
-z.string.tr.url_support_mic_not_found = 'https://support.wire.com/hc/en-us/articles/202970662';
-z.string.tr.url_support_screen_access_denied = 'https://support.wire.com/hc/en-us/articles/202935412';
-z.string.tr.url_support_screen_whitelist = 'https://support.wire.com/hc/en-us/articles/209423889';
-z.string.tr.url_support_usernames = 'https://wire.com/support/username';
-z.string.tr.url_decrypt_error_1 = 'https://wire.com/privacy/error-1';
-z.string.tr.url_decrypt_error_2 = 'https://wire.com/privacy/error-2';
-
 z.string.tr.warning_call_detail = 'Sesli aramalar yapmak için tarayıcınızın mikrofona erişim izni alması gerekir.';
 z.string.tr.warning_call_headline = 'Mikrofon olmadan arama yapılamaz';
 z.string.tr.warning_call_unsupported_incoming = '{{user}} arıyor. Ancak tarayıcınız sesli aramaları desteklemiyor.';
 z.string.tr.warning_call_unsupported_outgoing = 'Arama yapamazsınız çünkü tarayıcınız sesli aramaları desteklemiyor.';
 z.string.tr.warning_call_issues = 'Wire’ın bu versiyonu aramalara katılamaz. Lütfen kullanın';
 z.string.tr.warning_call_upgrade_browser = 'Arama yapmak için, Google Chrome’u güncelleyin.';
+z.string.tr.warning_connectivity_connection_lost = 'Bağlanmaya çalışılıyor. Wire mesajlarınızı teslim etmekte sorun yaşayabilir.';
+z.string.tr.warning_connectivity_no_internet = 'İnternet bağlantısı yok. Mesaj gönderemez veya mesaj alamazsınız.';
 z.string.tr.warning_learn_more = 'Daha fazla bilgi';
+z.string.tr.warning_lifecycle_update = 'Wire’ın yeni bir versiyonu mevcut.';
+z.string.tr.warning_lifecycle_update_notes = 'Neler yeni';
+z.string.tr.warning_lifecycle_update_link = 'Şimdi güncelle';
 z.string.tr.warning_not_found_camera = 'Arama yapamıyorsunuz çünkü bilgisayarınızda bir kamera bulunmamaktadır.';
 z.string.tr.warning_not_found_microphone = 'Arama yapamıyorsunuz çünkü bilgisayarınızda bir mikrofon bulunmamaktadır.';
 z.string.tr.warning_permission_denied_camera = 'Arama yapamıyorsunuz çünkü tarayıcınızın kameraya erişim izni bulunmamaktadır.';
@@ -510,13 +492,6 @@ z.string.tr.warning_permission_request_microphone = '{{icon}} Mikrofona erişime
 z.string.tr.warning_permission_request_notification = '{{icon}} Bildirimlere izin ver';
 z.string.tr.warning_permission_request_screen = '{{icon}} Ekrana erişime izin ver';
 z.string.tr.warning_tell_me_how = 'Anlat bana';
-
-z.string.tr.warning_connectivity_connection_lost = 'Bağlanmaya çalışılıyor. Wire mesajlarınızı teslim etmekte sorun yaşayabilir.';
-z.string.tr.warning_connectivity_no_internet = 'İnternet bağlantısı yok. Mesaj gönderemez veya mesaj alamazsınız.';
-
-z.string.tr.warning_lifecycle_update = 'Wire’ın yeni bir versiyonu mevcut.';
-z.string.tr.warning_lifecycle_update_notes = 'Neler yeni';
-z.string.tr.warning_lifecycle_update_link = 'Şimdi güncelle';
 
 z.string.tr.system_notification_asset_add = 'Bir resim paylaştı';
 z.string.tr.system_notification_connection_accepted = 'Bağlantı isteğinizi kabul etti';

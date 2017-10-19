@@ -32,27 +32,14 @@ window.z.config = {
     YELLOW: 3,
   },
 
-  ACCOUNT_PRODUCTION_URL: 'https://account-wire.com/',
-  ACCOUNT_STAGING_URL: 'https://wire-account-staging.zinfra.io/',
-
   LOGGER: {
     OPTIONS: {
       domains: {
-        'app.wire.com': function() {
-          return 0;
-        },
-        'localhost': function() {
-          return 300;
-        },
-        'wire.ms': function() {
-          return 300;
-        },
-        'wire-webapp-staging.wire.com': function() {
-          return 300;
-        },
-        'zinfra.io': function() {
-          return 300;
-        },
+        'app.wire.com': () => 0,
+        'localhost': () => 300,
+        'wire.ms': () => 300,
+        'wire-webapp-staging.wire.com': () => 300,
+        'zinfra.io': () => 300,
       },
       name_length: 65,
     },
@@ -90,6 +77,22 @@ window.z.config = {
   // measured in pixel
   SCROLL_TO_LAST_MESSAGE_THRESHOLD: 100,
 
+  SUPPORT: {
+    FORM: {
+      BUG: 'new?ticket_form_id=101615',
+      CONTACT: 'new',
+    },
+    ID: {
+      CALLING: 202969412,
+      CAMERA_ACCESS_DENIED: 202935412,
+      DEVICE_ACCESS_DENIED: 213512545,
+      DEVICE_NOT_FOUND: 202970662,
+      HISTORY: 207834645,
+      MICROPHONE_ACCESS_DENIED: 202590081,
+      SCREEN_ACCESS_DENIED: 202935412,
+    },
+  },
+
   SUPPORTED_CONVERSATION_IMAGE_TYPES: [
     '.jpg-large',
     'image/jpg',
@@ -109,6 +112,35 @@ window.z.config = {
 
   UNSPLASH_URL: 'https://source.unsplash.com/1200x1200/?landscape',
 
-  WEBSITE_PRODUCTION_URL: 'https://wire.com/',
-  WEBSITE_STAGING_URL: 'https://staging-website.zinfra.io/',
+  URL: {
+    ACCOUNT: {
+      PRODUCTION: 'https://account.wire.com',
+      STAGING: 'https://wire-account-staging.zinfra.io',
+    },
+    SUPPORT: 'https://support.wire.com',
+    TEAM_SETTINGS: {
+      PRODUCTION: 'https://teams.wire.com',
+      STAGING: 'https://wire-admin-staging.zinfra.io',
+    },
+    WEBAPP: {
+      PRODUCTION: 'https://app.wire.com',
+      STAGING: 'https://wire-webapp-staging.zinfra.io',
+    },
+    WEBSITE: {
+      PRODUCTION: 'https://wire.com',
+      STAGING: 'https://staging-website.zinfra.io',
+    },
+  },
+
+  URL_PATH: {
+    CREATE_TEAM: '/create-team/',
+    DECRYPT_ERROR_1: '/privacy/error-1/',
+    DECRYPT_ERROR_2: '/privacy/error-2/',
+    MANAGE_TEAM: '/login/',
+    PASSWORD_RESET: '/forgot/',
+    PRIVACY_HOW: '/privacy/how/',
+    PRIVACY_WHY: '/privacy/why/',
+    SUPPORT_USERNAME: '/support/username/',
+    TERMS_OF_USE: '/legal/terms/',
+  },
 };

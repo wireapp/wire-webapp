@@ -4,14 +4,14 @@
     <div class="preferences-content" data-bind="antiscroll">
       <section class="preferences-section">
         <header class="preferences-header" data-bind="l10n_text: z.string.preferences_about_support"></header>
-        <a class="preferences-link" data-bind="l10n_href: z.string.url_support, l10n_text: z.string.preferences_about_support_website" data-uie-name="go-support" rel="nofollow noopener noreferrer" target="_blank"></a>
-        <a class="preferences-link" data-bind="l10n_href: z.string.url_support_contact, l10n_text: z.string.preferences_about_support_contact" data-uie-name="go-contact-support" rel="nofollow noopener noreferrer" target="_blank"></a>
+        <a class="preferences-link" data-bind="l10n_href: {type: z.util.URLUtil.TYPE.SUPPORT, path: z.string.url_support_root}, l10n_text: z.string.preferences_about_support_website" data-uie-name="go-support" rel="nofollow noopener noreferrer" target="_blank"></a>
+        <a class="preferences-link" data-bind="l10n_href: {support: z.config.SUPPORT.FORM.CONTACT}, l10n_text: z.string.preferences_about_support_contact" data-uie-name="go-contact-support" rel="nofollow noopener noreferrer" target="_blank"></a>
       </section>
       <section class="preferences-section">
         <header class="preferences-header" data-bind="l10n_text: z.string.wire"></header>
-        <a class="preferences-link" data-bind="l10n_href: z.string.url_terms_of_use, l10n_text: z.string.preferences_about_terms_of_use" data-uie-name="go-legal" rel="nofollow noopener noreferrer" target="_blank"></a>
-        <a class="preferences-link" data-bind="l10n_href: z.string.url_privacy, l10n_text: z.string.preferences_about_privacy_policy" data-uie-name="go-privacy" rel="nofollow noopener noreferrer" target="_blank"></a>
-        <a class="preferences-link" data-bind="l10n_href: z.string.url_wire, l10n_text: z.string.preferences_about_website" data-uie-name="go-wire-dot-com" rel="nofollow noopener noreferrer" target="_blank"></a>
+        <a class="preferences-link" data-bind="attr: {href: z.util.URLUtil.build_url(z.util.URLUtil.TYPE.WEBSITE, z.config.URL_PATH.terms_of_use)}, l10n_text: z.string.preferences_about_terms_of_use" data-uie-name="go-legal" rel="nofollow noopener noreferrer" target="_blank"></a>
+        <a class="preferences-link" data-bind="l10n_href: {type: z.util.URLUtil.TYPE.WEBSITE, path: z.string.url_website_privacy}, l10n_text: z.string.preferences_about_privacy_policy" data-uie-name="go-privacy" rel="nofollow noopener noreferrer" target="_blank"></a>
+        <a class="preferences-link" data-bind="l10n_href: {type: z.util.URLUtil.TYPE.WEBSITE, path: z.string.url_website_root}, l10n_text: z.string.preferences_about_website" data-uie-name="go-wire-dot-com" rel="nofollow noopener noreferrer" target="_blank"></a>
       </section>
       <section class="preferences-section">
         <header class="preferences-header"><hr class="preferences-separator"></header>

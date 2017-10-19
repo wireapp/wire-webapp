@@ -127,6 +127,8 @@ z.string.de.modal_button_send = 'Senden';
 z.string.de.modal_block_conversation_headline = '{{user}} blockieren?';
 z.string.de.modal_block_conversation_message = '{{user}} wird dich nicht länger kontaktieren oder zu Gruppen hinzufügen können.';
 z.string.de.modal_block_conversation_button = 'Blockieren';
+z.string.de.modal_bots_unavailable_headline = 'Bots momentan nicht verfügbar';
+z.string.de.modal_bots_unavailable_message = 'Vielen Dank für dein Interesse an Bots. Der Dienst ist derzeit ausgesetzt, während wir an der nächsten Generation arbeiten. Bleib gespannt.';
 z.string.de.modal_call_conversation_empty_headline = 'Niemand um anzurufen';
 z.string.de.modal_call_conversation_empty_message = 'Es ist niemand mehr in der Unterhaltung.';
 z.string.de.modal_call_no_video_in_group_headline = 'Keine Videoanrufe in Gruppen';
@@ -175,6 +177,9 @@ z.string.de.modal_new_device_call_incoming = 'Möchtest du den Anruf dennoch ann
 z.string.de.modal_new_device_call_outgoing = 'Möchtest du wirklich anrufen?';
 z.string.de.modal_new_device_show_device = 'Gerät anzeigen';
 z.string.de.modal_new_device_send_anyway = 'Dennoch senden';
+z.string.de.modal_not_connected_headline = 'Niemand wurde zur Unterhaltung hinzugefügt';
+z.string.de.modal_not_connected_message_one = '{{name}} will nicht zur Unterhaltung hinzugefügt werden.';
+z.string.de.modal_not_connected_message_many = 'Eine der ausgewählten Personen will nicht zur Unterhaltung hinzugefügt werden.';
 z.string.de.modal_remove_device_button = 'Gerät entfernen';
 z.string.de.modal_remove_device_headline = 'Entferne "{{device}}"';
 z.string.de.modal_remove_device_message = 'Dein Passwort wird zum Entfernen des Gerätes benötigt.';
@@ -250,6 +255,7 @@ z.string.de.conversation_delete_timestamp = 'Gelöscht um {{date}}';
 z.string.de.conversation_edit_timestamp = 'Editiert um {{date}}';
 z.string.de.conversation_likes_caption = '{{number}} Personen';
 z.string.de.conversation_send_pasted_file = 'Bild eingefügt am {{date}}';
+z.string.de.conversation_someone = 'Jemand';
 z.string.de.conversation_tweet_author = ' auf Twitter';
 
 z.string.de.collection_show_all = 'Zeige alle {{number}}';
@@ -289,7 +295,7 @@ z.string.de.conversations_secondary_line_pings = '{{number}} Ping';
 z.string.de.conversations_secondary_line_people_left = '{{number}} Personen entfernt';
 z.string.de.conversations_secondary_line_person_left = '{{user}} hat die Unterhaltung verlassen';
 z.string.de.conversations_secondary_line_person_removed = '{{user}} wurde entfernt';
-z.string.de.conversations_secondary_line_people_added = '{{user}} Kontakte wurden hinzugefügt';
+z.string.de.conversations_secondary_line_people_added = '{{user}} Personen wurden hinzugefügt';
 z.string.de.conversations_secondary_line_person_added = '{{user}} wurde hinzugefügt';
 z.string.de.conversations_secondary_line_person_added_you = '{{user}} hat dich hinzugefügt';
 z.string.de.conversations_secondary_line_renamed = '{{user}} hat die Unterhaltung umbenannt';
@@ -297,7 +303,6 @@ z.string.de.conversations_secondary_line_timed_message = 'Temporäre Nachricht';
 z.string.de.conversations_secondary_line_you_left = 'Du hast die Unterhaltung verlassen';
 z.string.de.conversations_secondary_line_you_were_removed = 'Du wurdest entfent';
 
-z.string.de.takeover_headline = 'Benutzernamen sind da.';
 z.string.de.takeover_sub = 'Sichere dir deinen persönlichen Benutzernamen auf Wire.';
 z.string.de.takeover_link = 'Erfahre mehr';
 z.string.de.takeover_button_choose = 'Wähle deinen eigenen';
@@ -365,7 +370,7 @@ z.string.de.people_remove_message = '{{user}} wird in dieser Unterhaltung keine 
 z.string.de.people_unblock_headline = 'Freigeben?';
 z.string.de.people_unblock_message = '{{user}} wird dich wieder kontaktieren und zu Gruppen hinzufügen können.';
 
-z.string.de.people_button_add = 'Kontakte hinzufügen';
+z.string.de.people_button_add = 'Personen hinzufügen';
 z.string.de.people_button_block = 'Blockieren';
 z.string.de.people_button_cancel = 'Abbrechen';
 z.string.de.people_button_connect = 'Hinzufügen';
@@ -397,8 +402,10 @@ z.string.de.preferences_about_terms_of_use = 'Nutzungsbedingungen';
 z.string.de.preferences_about_version = 'Version {{version}}';
 z.string.de.preferences_about_website = 'Wire-Webseite';
 
+z.string.de.preferences_account_create_team = 'Team erstellen';
 z.string.de.preferences_account_delete = 'Benutzerkonto löschen';
 z.string.de.preferences_account_log_out = 'Abmelden';
+z.string.de.preferences_account_manage_team = 'Team verwalten';
 z.string.de.preferences_account_reset_password = 'Passwort zurücksetzen';
 z.string.de.preferences_account_team = 'in {{name}}';
 z.string.de.preferences_account_username_placeholder = 'Dein vollständiger Name';
@@ -472,36 +479,25 @@ z.string.de.upload_google_headline_error = 'Ein Fehler ist aufgetreten.';
 z.string.de.upload_google_message_error = 'Wir haben die Informationen nicht erhalten. Bitte importiere deine Kontakte erneut.';
 z.string.de.upload_google_button_again = 'Erneut versuchen';
 
-z.string.de.url_password_reset = 'forgot/?hl=de';
-z.string.de.url_legal = 'https://wire.com/legal/?hl=de';
-z.string.de.url_privacy = 'https://wire.com/privacy/?hl=de';
-z.string.de.url_privacy_how = 'https://wire.com/privacy/how/';
-z.string.de.url_privacy_why = 'https://wire.com/privacy/why/';
-z.string.de.url_support = 'https://support.wire.com/hc/de';
-z.string.de.url_terms_of_use = 'https://wire.com/legal/terms/';
-z.string.de.url_wire = 'https://wire.com/?hl=de';
-z.string.de.url_wire_for_web = 'https://app.wire.com';
-z.string.de.url_support_calling = 'https://support.wire.com/hc/de/articles/202969412';
-z.string.de.url_support_camera_access_denied = 'https://support.wire.com/hc/de/articles/202935412';
-z.string.de.url_support_device_access_denied = 'https://support.wire.com/hc/de/articles/213512545';
-z.string.de.url_support_contact = 'https://support.wire.com/hc/de/requests/new';
-z.string.de.url_support_contact_bug = 'https://support.wire.com/hc/de/requests/new?ticket_form_id=101615';
-z.string.de.url_support_history = 'https://support.wire.com/hc/de/articles/207834645';
-z.string.de.url_support_mic_access_denied = 'https://support.wire.com/hc/de/articles/202590081';
-z.string.de.url_support_mic_not_found = 'https://support.wire.com/hc/de/articles/202970662';
-z.string.de.url_support_screen_access_denied = 'https://support.wire.com/hc/de/articles/202935412';
-z.string.de.url_support_screen_whitelist = 'https://support.wire.com/hc/de/articles/209423889';
-z.string.de.url_support_usernames = 'https://wire.com/support/username';
-z.string.de.url_decrypt_error_1 = 'https://wire.com/privacy/error-1/?hl=de';
-z.string.de.url_decrypt_error_2 = 'https://wire.com/privacy/error-2/?hl=de';
-
+z.string.de.url_support_root = '/hc/de';
+z.string.de.url_support_articles = '/hc/de/articles/';
+z.string.de.url_support_requests = '/hc/de/requests/';
+z.string.de.url_webapp_root = '/?hl=de';
+z.string.de.url_website_root = '/de/';
+z.string.de.url_website_create_team = '/de/create-team';
+z.string.de.url_website_privacy = '/de/privacy';
 z.string.de.warning_call_detail = 'Dein Browser benötigt für Anrufe Zugriff auf das Mikrofon.';
 z.string.de.warning_call_headline = 'Anrufe sind ohne Mikrofon nicht möglich';
 z.string.de.warning_call_unsupported_incoming = '{{user}} ruft an. Dein Browser unterstützt keine Anrufe.';
 z.string.de.warning_call_unsupported_outgoing = 'Du kannst nicht anrufen, da dein Browser keine Anfrufe unterstützt.';
 z.string.de.warning_call_issues = 'Diese Version von Wire kann nicht an Anrufen teilnehmen. Nutze';
 z.string.de.warning_call_upgrade_browser = 'Für Anrufe aktualisiere Google Chrome.';
+z.string.de.warning_connectivity_connection_lost = 'Verbindung wird wiederhergestellt. Wire kann Nachrichten möglicherweise nicht empfangen.';
+z.string.de.warning_connectivity_no_internet = 'Keine Internetverbindung. Du kannst keine Nachrichten senden und empfangen.';
 z.string.de.warning_learn_more = 'Erfahre mehr';
+z.string.de.warning_lifecycle_update = 'Eine neue Version von Wire ist verfügbar.';
+z.string.de.warning_lifecycle_update_notes = 'Was ist neu';
+z.string.de.warning_lifecycle_update_link = 'Jetzt aktualisieren';
 z.string.de.warning_not_found_camera = 'Du kannst nicht anrufen, da dein Computer keine Kamera hat.';
 z.string.de.warning_not_found_microphone = 'Du kannst nicht anrufen, da dein Computer kein Mikrofon hat.';
 z.string.de.warning_permission_denied_camera = 'Du kannst nicht anrufen, da dein Browser keinen Zugriff auf die Kamera hat.';
@@ -512,13 +508,6 @@ z.string.de.warning_permission_request_microphone = '{{icon}} Zugriff auf Mikrof
 z.string.de.warning_permission_request_notification = '{{icon}} Benachrichtigungen zulassen';
 z.string.de.warning_permission_request_screen = '{{icon}} Zugriff auf Bildschirm gewähren';
 z.string.de.warning_tell_me_how = 'Zeig mir wie';
-
-z.string.de.warning_connectivity_connection_lost = 'Verbindung wird wiederhergestellt. Wire kann Nachrichten möglicherweise nicht empfangen.';
-z.string.de.warning_connectivity_no_internet = 'Keine Internetverbindung. Du kannst keine Nachrichten senden und empfangen.';
-
-z.string.de.warning_lifecycle_update = 'Eine neue Version von Wire ist verfügbar.';
-z.string.de.warning_lifecycle_update_notes = 'Was ist neu';
-z.string.de.warning_lifecycle_update_link = 'Jetzt aktualisieren';
 
 z.string.de.system_notification_asset_add = 'Hat ein Bild geteilt';
 z.string.de.system_notification_connection_accepted = 'Hat deine Kontaktanfrage akzeptiert';

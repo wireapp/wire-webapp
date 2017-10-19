@@ -238,6 +238,7 @@ z.string.da.conversation_delete_timestamp = 'Slettet på {{date}}';
 z.string.da.conversation_edit_timestamp = 'Redigeret på {{date}}';
 z.string.da.conversation_likes_caption = '{{number}} personer';
 z.string.da.conversation_send_pasted_file = 'Indsatte billede d. {{date}}';
+z.string.da.conversation_someone = 'Nogen';
 z.string.da.conversation_tweet_author = ' på Twitter';
 
 z.string.da.collection_show_all = 'Vis alle {{number}}';
@@ -274,7 +275,6 @@ z.string.da.conversations_secondary_line_ping = '{{number}} ping';
 z.string.da.conversations_secondary_line_pings = '{{number}} pings';
 z.string.da.conversations_secondary_line_timed_message = 'Tidsbestemt besked';
 
-z.string.da.takeover_headline = 'Brugernavne er her.';
 z.string.da.takeover_sub = 'Vælg dit unikke navn på Wire.';
 z.string.da.takeover_link = 'Lær mere';
 z.string.da.takeover_button_choose = 'Vælg dit eget';
@@ -439,28 +439,18 @@ z.string.da.upload_google_headline_error = 'Noget \ngik galt.';
 z.string.da.upload_google_message_error = 'Vi har ikke modtaget dine oplysninger. Venligst prøv at importere dine kontakter igen.';
 z.string.da.upload_google_button_again = 'Prøv igen';
 
-z.string.da.url_password_reset = 'glemt/';
-z.string.da.url_legal = 'https://wire.com/legal/';
-z.string.da.url_privacy = 'https://wire.com/privacy/';
-z.string.da.url_privacy_how = 'https://wire.com/privacy/how/';
-z.string.da.url_privacy_why = 'https://wire.com/privacy/why/';
-z.string.da.url_support = 'https://support.wire.com';
-z.string.da.url_terms_of_use = 'https://wire.com/legal/terms/';
-z.string.da.url_wire = 'https://wire.com';
-z.string.da.url_wire_for_web = 'https://app.wire.com';
-z.string.da.url_support_calling = 'https://support.wire.com/hc/en-us/articles/202969412';
-z.string.da.url_support_device_access_denied = 'https://support.wire.com/hc/en-us/articles/213512545';
-z.string.da.url_support_usernames = 'https://wire.com/support/username';
-z.string.da.url_decrypt_error_1 = 'https://wire.com/privacy/error-1';
-z.string.da.url_decrypt_error_2 = 'https://wire.com/privacy/error-2';
-
 z.string.da.warning_call_detail = 'Din browser skal have adgang til mikrofonen for at foretage opkald.';
 z.string.da.warning_call_headline = 'Kan ikke ringe uden mikrofon';
 z.string.da.warning_call_unsupported_incoming = '{{user}} ringer. Din browser understøtter ikke opkald.';
 z.string.da.warning_call_unsupported_outgoing = 'Du kan ikke ringe, fordi din browser ikke understøtter opkald.';
 z.string.da.warning_call_issues = 'Denne version af Wire kan ikke deltage i opkaldet. Brug venligst';
 z.string.da.warning_call_upgrade_browser = 'Venligst opdater Google Chrome for at ringe.';
+z.string.da.warning_connectivity_connection_lost = 'Forsøger at forbinde. Wire kan muligvis ikke levere beskeder.';
+z.string.da.warning_connectivity_no_internet = 'Ingen Internet. Du vil ikke kunne sende eller modtage beskeder.';
 z.string.da.warning_learn_more = 'Lær mere';
+z.string.da.warning_lifecycle_update = 'En ny version af Wire er tilgængelig.';
+z.string.da.warning_lifecycle_update_notes = 'Hvad er nyt';
+z.string.da.warning_lifecycle_update_link = 'Opdatér nu';
 z.string.da.warning_not_found_camera = 'Du kan ikke ringe, fordi din computer har ikke et kamera.';
 z.string.da.warning_not_found_microphone = 'Du kan ikke ringe, fordi din computer har ikke en mikrofon.';
 z.string.da.warning_permission_denied_camera = 'Du kan ikke ringe, fordi din browser ikke har adgang til kameraet.';
@@ -471,13 +461,6 @@ z.string.da.warning_permission_request_microphone = '{{icon}} Tillad adgang til 
 z.string.da.warning_permission_request_notification = '{{icon}} Tillad meddelelser';
 z.string.da.warning_permission_request_screen = '{{icon}} Tillad adgang til skærm';
 z.string.da.warning_tell_me_how = 'Fortæl mig hvordan';
-
-z.string.da.warning_connectivity_connection_lost = 'Forsøger at forbinde. Wire kan muligvis ikke levere beskeder.';
-z.string.da.warning_connectivity_no_internet = 'Ingen Internet. Du vil ikke kunne sende eller modtage beskeder.';
-
-z.string.da.warning_lifecycle_update = 'En ny version af Wire er tilgængelig.';
-z.string.da.warning_lifecycle_update_notes = 'Hvad er nyt';
-z.string.da.warning_lifecycle_update_link = 'Opdatér nu';
 
 z.string.da.system_notification_asset_add = 'Delte et billede';
 z.string.da.system_notification_connection_accepted = 'Accepterede din anmodning om forbindelse';

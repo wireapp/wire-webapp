@@ -406,8 +406,6 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     const error_code = error.code || CryptographyRepository.CONFIG.UNKNOWN_DECRYPTION_ERROR_CODE;
 
     const {data: event_data, from: remote_user_id} = event;
-    const remote_client_id = event_data.sender;
-    const session_id = this._construct_session_id(remote_user_id, remote_client_id);
 
     const is_duplicate_message = error instanceof Proteus.errors.DecryptError.DuplicateMessage;
     const is_outdated_message = error instanceof Proteus.errors.DecryptError.OutdatedMessage;
@@ -424,15 +422,16 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     const is_invalid_message = error instanceof Proteus.errors.DecryptError.InvalidMessage;
     const is_invalid_signature = error instanceof Proteus.errors.DecryptError.InvalidSignature;
     const is_remote_identity_changed = error instanceof Proteus.errors.DecryptError.RemoteIdentityChanged;
+    const remote_client_id = event_data.sender;
     if (is_invalid_message || is_invalid_signature) {
       // Session is broken, let's see what's really causing it...
-      this.logger.error(`Session '${session_id}' with user '${remote_user_id}' (client '${remote_client_id}') is broken or out of sync. Reset the session and decryption is likely to work again. Error: ${error.message}`, error);
+      this.logger.error(`Session with client '${remote_client_id}' of user '${remote_user_id}' is broken or out of sync.\nReset the session and decryption is likely to work again.`);
     } else if (is_remote_identity_changed) {
       // Remote identity changed
-      this.logger.error(`Remote identity of client '${remote_client_id}' from user '${remote_user_id}' changed: ${error.message}`, error);
+      this.logger.error(`Remote identity of client '${remote_client_id}' from user '${remote_user_id}' changed`);
     }
 
-    this.logger.warn(`Could not decrypt an event from client ID '${remote_client_id}' of user ID '${remote_user_id}' in session ID '${session_id}'.\nError Code: '${error_code}'\nError Message: ${error.message}`, error);
+    this.logger.warn(`Failed to decrypt event from client '${remote_client_id}' of user '${remote_user_id}'.\nError Code: '${error_code}'\nError Message: ${error.message}`, error);
     this._report_decryption_failure(error, event);
 
     return z.conversation.EventBuilder.build_unable_to_decrypt(event, error, error_code);

@@ -229,21 +229,27 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
    * Unpacks a specific generic message which is wrapped inside an external generic message.
    *
    * @note Wrapped messages get the 'message_id' of their wrappers (external message)
-   * @param {z.proto.GenericMessage} external - Generic message of type 'external'
+   * @param {z.proto.External} external - Generic message of type 'external'
    * @param {JSON} event - Backend event of type 'conversation.otr-message-add'
    * @returns {Promise} Resolves with generic message
    */
   _unwrap_external(external, event) {
-    const data = {
-      otr_key: new Uint8Array(external.otr_key.toArrayBuffer()),
-      sha256: new Uint8Array(external.sha256.toArrayBuffer()),
-      text: z.util.base64_to_array(event.data.data),
-    };
+    return Promise.resolve(external)
+      .then(({otr_key, sha256}) => {
+        const event_data = event.data;
+        if (!event_data.data || !otr_key || !sha256) {
+          throw new Error('Not all expected properties defined');
+        }
 
-    return z.assets.AssetCrypto.decrypt_aes_asset(data.text.buffer, data.otr_key.buffer, data.sha256.buffer)
+        const cipher_text = z.util.base64_to_array(event_data.data).buffer;
+        const key_bytes = new Uint8Array(otr_key.toArrayBuffer()).buffer;
+        const reference_sha256 = new Uint8Array(external.sha256.toArrayBuffer()).buffer;
+
+        return z.assets.AssetCrypto.decrypt_aes_asset(cipher_text, key_bytes, reference_sha256);
+      })
       .then((external_message_buffer) => z.proto.GenericMessage.decode(external_message_buffer))
       .catch((error) => {
-        this.logger.error(`Failed to map external message: ${error.message}`, error);
+        this.logger.error(`Failed to unwrap external message: ${error.message}`, error);
         throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.BROKEN_EXTERNAL);
       });
   }
