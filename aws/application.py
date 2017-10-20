@@ -73,6 +73,13 @@ def sitemap_xml():
   return response
 
 
+@application.route('/apple-app-site-association')
+def apple_app_site_association():
+  response = flask.make_response(flask.render_template('apple-app-site-association.json'))
+  response.headers['Content-Type'] = 'application/json'
+  return response
+
+
 @application.route('/browser/')
 @main.latest_browser_required
 def browser_test():
