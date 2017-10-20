@@ -447,7 +447,10 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
           .on(z.util.alias.animationend, (_event) => {
             if (_event.originalEvent.animationName === 'message-bg-fadeout') {
               $(this).off(z.util.alias.animationend);
-              this.invite_bubble.hide();
+
+              if (this.invite_bubble) {
+                this.invite_bubble.hide();
+              }
             }
           });
       })

@@ -182,7 +182,7 @@ z.util.get_url_parameter = function(name) {
  * @returns {string} File extension
  */
 z.util.get_file_extension = function(filename) {
-  if (!filename.includes('.')) {
+  if (!_.isString(filename) || !filename.includes('.')) {
     return '';
   }
 
