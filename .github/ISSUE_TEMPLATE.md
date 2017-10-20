@@ -1,16 +1,17 @@
 <!--- 
 PLEASE NOTE:
-If you have a feature request, then file it on: https://github.com/wireapp/wire/issues
+Please remember that this is a bug tracker in a source repository and not a discussion board. All developers get notified of each comment and will take the time for reading and commenting isses. We want to keep this as a place to easily track bugs in our code.
+If you have a feature request that affects Wire in general, was kindly ask you to file it at https://github.com/wireapp/wire/issues. Please direct feature requests specifically targeted at wire-desktop to our regular customer support at https://support.wire.com and social media channels.
 --->
 
-## Wire for Web Version
-<!--- Can be found in the 3rd line of the source code of the page. -->
+## Wire for web Version
+<!--- Check the the 3rd line of the source code on https://app.wire.com. -->
 
 ## Browser Version
-<!--- Can be found on: http://whatsmyuseragent.org/ -->
+<!--- Can be checked at http://whatsmyuseragent.org.-->
 
 ## Installed Browser Addons
-<!--- This helps us to find out if there are compatibility issues with addons -->
+<!--- Helps investigating possible compatibility issues with addons. -->
 
 ## Operating System
 
