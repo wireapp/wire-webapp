@@ -1798,7 +1798,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         for (const user_et of user_ets) {
           if (!(skip_own_clients && user_et.is_me)) {
-            if (user_ids && user_ids.includes(user_et.id)) {
+            if (user_ids && !user_ids.includes(user_et.id)) {
               continue;
             }
 
