@@ -51,7 +51,7 @@
     "deploy-travis-staging": "grunt app_deploy_travis:staging",
     "fix": "yarn fix:script && yarn fix:json && yarn fix:style",
     "fix:json": "prettier --print-width=200 --ignore-path .gitignore --write '**/*.json'",
-    "fix:style": "prettier --write 'app/style/**/*.less'",
+    "fix:style": "prettier --ignore-path .gitignore --write '**/*.less'",
     "fix:script": "npm run test:script -- --fix",
     "postinstall": "grunt init",
     "precommit": "lint-staged",
