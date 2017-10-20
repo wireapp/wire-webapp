@@ -22,7 +22,6 @@
 window.z = window.z || {};
 window.z.ViewModel = z.ViewModel || {};
 
-// @formatter:off
 z.ViewModel.AuthViewModel = class AuthViewModel {
   static get CONFIG() {
     return {

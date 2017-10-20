@@ -283,36 +283,10 @@ describe('ConversationRepository', () => {
     beforeEach(() => TestFactory.conversation_repository.conversations([]));
 
     it('finds an existing 1:1 conversation within a team', done => {
-      // @formatter:off
+      // prettier-ignore
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
-      const team_1to1_conversation = {
-        access: ['invite'],
-        creator: '109da9ca-a495-47a8-ac70-9ffbe924b2d0',
-        members: {
-          self: {
-            hidden_ref: null,
-            status: 0,
-            service: null,
-            otr_muted_ref: null,
-            status_time: '1970-01-01T00:00:00.000Z',
-            hidden: false,
-            status_ref: '0.0',
-            id: '109da9ca-a495-47a8-ac70-9ffbe924b2d0',
-            otr_archived: false,
-            otr_muted: false,
-            otr_archived_ref: null,
-          },
-          others: [{status: 0, id: 'f718410c-3833-479d-bd80-a5df03f38414'}],
-        },
-        name: null,
-        team: 'cf162e22-20b8-4533-a5ab-d3f5dde39d2c',
-        id: '04ab891e-ccf1-4dba-9d74-bacec64b5b1e',
-        type: 0,
-        last_event_time: '1970-01-01T00:00:00.000Z',
-        last_event: '0.0',
-      };
+      const team_1to1_conversation = {"access":["invite"],"creator":"109da9ca-a495-47a8-ac70-9ffbe924b2d0","members":{"self":{"hidden_ref":null,"status":0,"service":null,"otr_muted_ref":null,"status_time":"1970-01-01T00:00:00.000Z","hidden":false,"status_ref":"0.0","id":"109da9ca-a495-47a8-ac70-9ffbe924b2d0","otr_archived":false,"otr_muted":false,"otr_archived_ref":null},"others":[{"status":0,"id":"f718410c-3833-479d-bd80-a5df03f38414"}]},"name":null,"team":"cf162e22-20b8-4533-a5ab-d3f5dde39d2c","id":"04ab891e-ccf1-4dba-9d74-bacec64b5b1e","type":0,"last_event_time":"1970-01-01T00:00:00.000Z","last_event":"0.0"};
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
-      // @formatter:on
 
       const [new_conversation_et] = TestFactory.conversation_repository.conversation_mapper.map_conversations([
         team_1to1_conversation,
@@ -423,25 +397,12 @@ describe('ConversationRepository', () => {
       spyOn(TestFactory.user_repository, 'get_user_by_id').and.returnValue(Promise.resolve(new z.entity.User()));
 
       conversation_et = new z.entity.Conversation(z.util.create_random_uuid());
-      // @formatter:off
+      // prettier-ignore
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
-      const bad_message = {
-        conversation: `${conversation_et.id}`,
-        id: 'aeac8355-739b-4dfc-a119-891a52c6a8dc',
-        from: '532af01e-1e24-4366-aacf-33b67d4ee376',
-        data: {content: 'Hello World :)', nonce: 'aeac8355-739b-4dfc-a119-891a52c6a8dc'},
-        type: 'conversation.message-add',
-      };
-      const good_message = {
-        conversation: `${conversation_et.id}`,
-        id: '5a8cd79a-82bb-49ca-a59e-9a8e76df77fb',
-        from: '8b497692-7a38-4a5d-8287-e3d1006577d6',
-        time: '2016-08-04T13:28:33.389Z',
-        data: {content: 'Fifth message', nonce: '5a8cd79a-82bb-49ca-a59e-9a8e76df77fb', previews: []},
-        type: 'conversation.message-add',
-      };
+      const bad_message = {"conversation":`${conversation_et.id}`,"id":"aeac8355-739b-4dfc-a119-891a52c6a8dc","from":"532af01e-1e24-4366-aacf-33b67d4ee376","data":{"content":"Hello World :)","nonce":"aeac8355-739b-4dfc-a119-891a52c6a8dc"},"type":"conversation.message-add"};
+      // prettier-ignore
+      const good_message = {"conversation":`${conversation_et.id}`,"id":"5a8cd79a-82bb-49ca-a59e-9a8e76df77fb","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:28:33.389Z","data":{"content":"Fifth message","nonce":"5a8cd79a-82bb-49ca-a59e-9a8e76df77fb","previews":[]},"type":"conversation.message-add"};
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
-      // @formatter:on
 
       const bad_message_key = `${conversation_et.id}@${bad_message.from}@NaN`;
 
@@ -464,31 +425,10 @@ describe('ConversationRepository', () => {
       connection_et = new z.entity.Connection();
       connection_et.conversation_id = conversation_et.id;
 
-      // @formatter:off
+      // prettier-ignore
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
-      const conversation_payload = {
-        creator: conversation_et.id,
-        members: {
-          self: {
-            status: 0,
-            last_read: '1.800122000a54449c',
-            muted_time: null,
-            muted: null,
-            status_time: '2015-01-28T12:53:41.847Z',
-            status_ref: '0.0',
-            id: conversation_et.id,
-            archived: null,
-          },
-          others: [],
-        },
-        name: null,
-        id: conversation_et.id,
-        type: 0,
-        last_event_time: '2015-03-20T13:41:12.580Z',
-        last_event: '25.800122000a0b0bc9',
-      };
+      const conversation_payload = {"creator": conversation_et.id, "members": {"self": {"status": 0, "last_read": "1.800122000a54449c", "muted_time": null, "muted": null, "status_time": "2015-01-28T12:53:41.847Z", "status_ref": "0.0", "id": conversation_et.id, "archived": null}, "others": []}, "name": null, "id": conversation_et.id, "type": 0, "last_event_time": "2015-03-20T13:41:12.580Z", "last_event": "25.800122000a0b0bc9"};
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
-      // @formatter:on
 
       spyOn(TestFactory.conversation_repository, 'fetch_conversation_by_id').and.callThrough();
       spyOn(TestFactory.conversation_service, 'get_conversation_by_id').and.returnValue(
@@ -632,32 +572,10 @@ describe('ConversationRepository', () => {
         const message_id = z.util.create_random_uuid();
         const sending_user_id = TestFactory.user_repository.self().id;
 
-        // @formatter:off
-        const upload_start = {
-          conversation: conversation_id,
-          from: sending_user_id,
-          id: message_id,
-          status: 1,
-          time: '2017-09-06T09:43:32.278Z',
-          data: {
-            content_length: 23089240,
-            content_type: 'application/x-msdownload',
-            info: {name: 'AirDroid_Desktop_Client_3.4.2.0.exe', nonce: '79072f78-15ee-4d54-a63c-fd46cd5607ae'},
-          },
-          type: 'conversation.asset-add',
-          category: 512,
-          primary_key: 107,
-        };
-        const upload_cancel = {
-          conversation: conversation_id,
-          from: sending_user_id,
-          id: message_id,
-          status: 1,
-          time: '2017-09-06T09:43:36.528Z',
-          data: {reason: 0, status: 'upload-failed'},
-          type: 'conversation.asset-add',
-        };
-        // @formatter:on
+        // prettier-ignore
+        const upload_start = {"conversation":conversation_id,"from":sending_user_id,"id":message_id,"status":1,"time":"2017-09-06T09:43:32.278Z","data":{"content_length":23089240,"content_type":"application/x-msdownload","info":{"name":"AirDroid_Desktop_Client_3.4.2.0.exe","nonce":"79072f78-15ee-4d54-a63c-fd46cd5607ae"}},"type":"conversation.asset-add","category":512,"primary_key":107};
+        // prettier-ignore
+        const upload_cancel = {"conversation":conversation_id,"from":sending_user_id,"id":message_id,"status":1,"time":"2017-09-06T09:43:36.528Z","data":{"reason":0,"status":"upload-failed"},"type":"conversation.asset-add"};
 
         TestFactory.conversation_repository
           .fetch_conversation_by_id(conversation_id)
@@ -686,32 +604,10 @@ describe('ConversationRepository', () => {
         const message_id = z.util.create_random_uuid();
         const sending_user_id = z.util.create_random_uuid();
 
-        // @formatter:off
-        const upload_start = {
-          conversation: conversation_id,
-          from: sending_user_id,
-          id: message_id,
-          status: 1,
-          time: '2017-09-06T09:43:32.278Z',
-          data: {
-            content_length: 23089240,
-            content_type: 'application/x-msdownload',
-            info: {name: 'AirDroid_Desktop_Client_3.4.2.0.exe', nonce: '79072f78-15ee-4d54-a63c-fd46cd5607ae'},
-          },
-          type: 'conversation.asset-add',
-          category: 512,
-          primary_key: 107,
-        };
-        const upload_cancel = {
-          conversation: conversation_id,
-          from: sending_user_id,
-          id: message_id,
-          status: 1,
-          time: '2017-09-06T09:43:36.528Z',
-          data: {reason: 0, status: 'upload-failed'},
-          type: 'conversation.asset-add',
-        };
-        // @formatter:on
+        // prettier-ignore
+        const upload_start = {"conversation": conversation_id,"from":sending_user_id,"id":message_id,"status":1,"time":"2017-09-06T09:43:32.278Z","data":{"content_length":23089240,"content_type":"application/x-msdownload","info":{"name":"AirDroid_Desktop_Client_3.4.2.0.exe","nonce":"79072f78-15ee-4d54-a63c-fd46cd5607ae"}},"type":"conversation.asset-add","category":512,"primary_key":107};
+        // prettier-ignore
+        const upload_cancel = {"conversation": conversation_id,"from":sending_user_id,"id":message_id,"status":1,"time":"2017-09-06T09:43:36.528Z","data":{"reason":0,"status":"upload-failed"},"type":"conversation.asset-add"};
 
         TestFactory.conversation_repository
           .fetch_conversation_by_id(conversation_id)
@@ -740,32 +636,10 @@ describe('ConversationRepository', () => {
         const message_id = z.util.create_random_uuid();
         const sending_user_id = TestFactory.user_repository.self().id;
 
-        // @formatter:off
-        const upload_start = {
-          conversation: conversation_id,
-          from: sending_user_id,
-          id: message_id,
-          status: 1,
-          time: '2017-09-06T09:43:32.278Z',
-          data: {
-            content_length: 23089240,
-            content_type: 'application/x-msdownload',
-            info: {name: 'AirDroid_Desktop_Client_3.4.2.0.exe', nonce: '79072f78-15ee-4d54-a63c-fd46cd5607ae'},
-          },
-          type: 'conversation.asset-add',
-          category: 512,
-          primary_key: 107,
-        };
-        const upload_failed = {
-          conversation: conversation_id,
-          from: sending_user_id,
-          id: message_id,
-          status: 1,
-          time: '2017-09-06T16:14:08.165Z',
-          data: {reason: 1, status: 'upload-failed'},
-          type: 'conversation.asset-add',
-        };
-        // @formatter:on
+        // prettier-ignore
+        const upload_start = {"conversation":conversation_id,"from":sending_user_id,"id":message_id,"status":1,"time":"2017-09-06T09:43:32.278Z","data":{"content_length":23089240,"content_type":"application/x-msdownload","info":{"name":"AirDroid_Desktop_Client_3.4.2.0.exe","nonce":"79072f78-15ee-4d54-a63c-fd46cd5607ae"}},"type":"conversation.asset-add","category":512,"primary_key":107};
+        // prettier-ignore
+        const upload_failed = {"conversation":conversation_id,"from":sending_user_id,"id":message_id,"status":1,"time":"2017-09-06T16:14:08.165Z","data":{"reason":1,"status":"upload-failed"},"type":"conversation.asset-add"};
 
         TestFactory.conversation_repository
           .fetch_conversation_by_id(conversation_id)

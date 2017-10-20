@@ -35,7 +35,7 @@
     "karma-coverage": "1.1.1",
     "karma-jasmine": "1.1.0",
     "prettier": "1.7.4",
-    "lint-staged": "4.2.3",
+    "lint-staged": "4.3.0",
     "load-grunt-tasks": "3.5.2",
     "request": "2.83.0",
     "sinon": "4.0.1"

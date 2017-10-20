@@ -54,28 +54,13 @@ describe('ConversationServiceNoCompound', function() {
   describe('load_preceding_events_from_db', function() {
     const conversation_id = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a';
 
-    // @formatter:off
+    // prettier-ignore
     /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
     const messages = [
-      {
-        conversation: '35a9a89d-70dc-4d9e-88a2-4d8758458a6a',
-        id: '68a28ab1-d7f8-4014-8b52-5e99a05ea3b1',
-        from: '8b497692-7a38-4a5d-8287-e3d1006577d6',
-        time: '2016-08-04T13:27:55.182Z',
-        data: {content: 'First message', nonce: '68a28ab1-d7f8-4014-8b52-5e99a05ea3b1', previews: []},
-        type: 'conversation.message-add',
-      },
-      {
-        conversation: '35a9a89d-70dc-4d9e-88a2-4d8758458a6a',
-        id: '4af67f76-09f9-4831-b3a4-9df877b8c29a',
-        from: '8b497692-7a38-4a5d-8287-e3d1006577d6',
-        time: '2016-08-04T13:27:58.993Z',
-        data: {content: 'Second message', nonce: '4af67f76-09f9-4831-b3a4-9df877b8c29a', previews: []},
-        type: 'conversation.message-add',
-      },
+      {"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"68a28ab1-d7f8-4014-8b52-5e99a05ea3b1","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:55.182Z","data":{"content":"First message","nonce":"68a28ab1-d7f8-4014-8b52-5e99a05ea3b1","previews":[]},"type":"conversation.message-add"},
+      {"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"4af67f76-09f9-4831-b3a4-9df877b8c29a","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:58.993Z","data":{"content":"Second message","nonce":"4af67f76-09f9-4831-b3a4-9df877b8c29a","previews":[]},"type":"conversation.message-add"},
     ];
     /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
-    // @formatter:on
 
     beforeEach(function(done) {
       Promise.all(
@@ -107,18 +92,10 @@ describe('ConversationServiceNoCompound', function() {
   });
 
   describe('update_message_in_db', function() {
-    // @formatter:off
+    // prettier-ignore
     /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
-    const event = {
-      conversation: '35a9a89d-70dc-4d9e-88a2-4d8758458a6a',
-      id: '4af67f76-09f9-4831-b3a4-9df877b8c29a',
-      from: '8b497692-7a38-4a5d-8287-e3d1006577d6',
-      time: '2016-08-04T13:27:58.993Z',
-      data: {content: 'Second message', nonce: '4af67f76-09f9-4831-b3a4-9df877b8c29a', previews: []},
-      type: 'conversation.message-add',
-    };
+    const event = {"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"4af67f76-09f9-4831-b3a4-9df877b8c29a","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:58.993Z","data":{"content":"Second message","nonce":"4af67f76-09f9-4831-b3a4-9df877b8c29a","previews":[]},"type":"conversation.message-add"};
     /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
-    // @formatter:on
 
     it('updated event in the database', function(done) {
       event.time = new Date().toISOString();
@@ -249,39 +226,10 @@ describe('ConversationServiceNoCompound', function() {
 
   describe('save_conversation_in_db', function() {
     it('saves a conversation', function(done) {
-      // @formatter:off
+      // prettier-ignore
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
-      const conversation_payload = {
-        access: ['private'],
-        creator: '0410795a-58dc-40d8-b216-cbc2360be21a',
-        members: {
-          self: {
-            hidden_ref: null,
-            status: 0,
-            last_read: '24fe.800122000b16c279',
-            muted_time: null,
-            otr_muted_ref: null,
-            muted: false,
-            status_time: '2014-12-03T18:39:12.319Z',
-            hidden: false,
-            status_ref: '0.0',
-            id: '532af01e-1e24-4366-aacf-33b67d4ee376',
-            otr_archived: false,
-            cleared: null,
-            otr_muted: false,
-            otr_archived_ref: '2016-07-25T11:30:07.883Z',
-            archived: null,
-          },
-          others: [{status: 0, id: '0410795a-58dc-40d8-b216-cbc2360be21a'}],
-        },
-        name: 'Michael',
-        id: '573b6978-7700-443e-9ce5-ff78b35ac590',
-        type: 2,
-        last_event_time: '2016-06-21T22:53:41.778Z',
-        last_event: '24fe.800122000b16c279',
-      };
+      const conversation_payload = {"access":["private"],"creator":"0410795a-58dc-40d8-b216-cbc2360be21a","members":{"self":{"hidden_ref":null,"status":0,"last_read":"24fe.800122000b16c279","muted_time":null,"otr_muted_ref":null,"muted":false,"status_time":"2014-12-03T18:39:12.319Z","hidden":false,"status_ref":"0.0","id":"532af01e-1e24-4366-aacf-33b67d4ee376","otr_archived":false,"cleared":null,"otr_muted":false,"otr_archived_ref":"2016-07-25T11:30:07.883Z","archived":null},"others":[{"status":0,"id":"0410795a-58dc-40d8-b216-cbc2360be21a"}]},"name":"Michael","id":"573b6978-7700-443e-9ce5-ff78b35ac590","type":2,"last_event_time":"2016-06-21T22:53:41.778Z","last_event":"24fe.800122000b16c279"};
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
-      // @formatter:on
       const [conversation_et] = conversation_mapper.map_conversations([conversation_payload]);
 
       conversation_service
@@ -298,36 +246,14 @@ describe('ConversationServiceNoCompound', function() {
     const conversation_id = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a';
     let primary_keys = undefined;
 
-    // @formatter:off
+    // prettier-ignore
     /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
     const messages = [
-      {
-        conversation: '35a9a89d-70dc-4d9e-88a2-4d8758458a6a',
-        id: '68a28ab1-d7f8-4014-8b52-5e99a05ea3b1',
-        from: '8b497692-7a38-4a5d-8287-e3d1006577d6',
-        time: '2016-08-04T13:27:55.182Z',
-        data: {content: 'First message', nonce: '68a28ab1-d7f8-4014-8b52-5e99a05ea3b1', previews: []},
-        type: 'conversation.message-add',
-      },
-      {
-        conversation: '35a9a89d-70dc-4d9e-88a2-4d8758458a6a',
-        id: '4af67f76-09f9-4831-b3a4-9df877b8c29a',
-        from: '8b497692-7a38-4a5d-8287-e3d1006577d6',
-        time: '2016-08-04T13:27:58.993Z',
-        data: {content: 'Second message', nonce: '4af67f76-09f9-4831-b3a4-9df877b8c29a', previews: []},
-        type: 'conversation.message-add',
-      },
-      {
-        conversation: '35a9a89d-70dc-4d9e-88a2-4d8758458a6a',
-        id: '4af67f76-09f9-4831-b3a4-9df877b8c29a',
-        from: '8b497692-7a38-4a5d-8287-e3d1006577d6',
-        time: '2016-08-04T13:27:58.993Z',
-        data: {content: 'Second message (Duplicate)', nonce: '4af67f76-09f9-4831-b3a4-9df877b8c29a', previews: []},
-        type: 'conversation.message-add',
-      },
+      {"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"68a28ab1-d7f8-4014-8b52-5e99a05ea3b1","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:55.182Z","data":{"content":"First message","nonce":"68a28ab1-d7f8-4014-8b52-5e99a05ea3b1","previews":[]},"type":"conversation.message-add"},
+      {"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"4af67f76-09f9-4831-b3a4-9df877b8c29a","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:58.993Z","data":{"content":"Second message","nonce":"4af67f76-09f9-4831-b3a4-9df877b8c29a","previews":[]},"type":"conversation.message-add"},
+      {"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"4af67f76-09f9-4831-b3a4-9df877b8c29a","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:58.993Z","data":{"content":"Second message (Duplicate)","nonce":"4af67f76-09f9-4831-b3a4-9df877b8c29a","previews":[]},"type":"conversation.message-add"},
     ];
     /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
-    // @formatter:on
 
     beforeEach(function(done) {
       Promise.all(
@@ -368,56 +294,14 @@ describe('ConversationServiceNoCompound', function() {
     let events = undefined;
 
     beforeEach(function() {
-      // @formatter:off
+      // prettier-ignore
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       events = [
-        {
-          conversation: '34e7f58e-b834-4d84-b628-b89b295d46c0',
-          id: 'b6498d81-92e8-4da7-afd2-054239595da7',
-          from: '9b47476f-974d-481c-af64-13f82ed98a5f',
-          time: '2017-01-09T13:11:15.632Z',
-          status: 2,
-          data: {content: 'test', nonce: 'b6498d81-92e8-4da7-afd2-054239595da7', previews: []},
-          type: 'conversation.message-add',
-          category: 16,
-        },
-        {
-          conversation: '34e7f58e-b834-4d84-b628-b89b295d46c0',
-          id: 'da7930dd-4c30-4378-846d-b29e1452bdfb',
-          from: '9b47476f-974d-481c-af64-13f82ed98a5f',
-          time: '2017-01-09T13:37:31.941Z',
-          status: 1,
-          data: {
-            content_length: 47527,
-            content_type: 'image/jpeg',
-            id: 'b77e8639-a32d-4ba7-88b9-7a0ae461e90d',
-            info: {tag: 'medium', width: 1448, height: 905, nonce: 'b77e8639-a32d-4ba7-88b9-7a0ae461e90d'},
-            otr_key: {},
-            sha256: {},
-          },
-          type: 'conversation.asset-add',
-          category: 128,
-        },
-        {
-          conversation: '34e7f58e-b834-4d84-b628-b89b295d46c0',
-          id: 'da7930dd-4c30-4378-846d-b29e1452bdfa',
-          from: '9b47476f-974d-481c-af64-13f82ed98a5f',
-          time: '2017-01-09T13:47:31.941Z',
-          status: 1,
-          data: {
-            content_length: 47527,
-            content_type: 'image/jpeg',
-            id: 'b77e8639-a32d-4ba7-88b9-7a0ae461e90d',
-            info: {tag: 'medium', width: 1448, height: 905, nonce: 'b77e8639-a32d-4ba7-88b9-7a0ae461e90d'},
-            otr_key: {},
-            sha256: {},
-          },
-          type: 'conversation.asset-add',
-          category: 128,
-        },
+        {"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c0","id":"b6498d81-92e8-4da7-afd2-054239595da7","from":"9b47476f-974d-481c-af64-13f82ed98a5f","time":"2017-01-09T13:11:15.632Z","status":2,"data":{"content":"test","nonce":"b6498d81-92e8-4da7-afd2-054239595da7","previews":[]},"type":"conversation.message-add","category": 16},
+        {"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c0","id":"da7930dd-4c30-4378-846d-b29e1452bdfb","from":"9b47476f-974d-481c-af64-13f82ed98a5f","time":"2017-01-09T13:37:31.941Z","status":1,"data":{"content_length":47527,"content_type":"image/jpeg","id":"b77e8639-a32d-4ba7-88b9-7a0ae461e90d","info":{"tag":"medium","width":1448,"height":905,"nonce":"b77e8639-a32d-4ba7-88b9-7a0ae461e90d"},"otr_key":{},"sha256":{}},"type":"conversation.asset-add","category": 128},
+        {"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c0","id":"da7930dd-4c30-4378-846d-b29e1452bdfa","from":"9b47476f-974d-481c-af64-13f82ed98a5f","time":"2017-01-09T13:47:31.941Z","status":1,"data":{"content_length":47527,"content_type":"image/jpeg","id":"b77e8639-a32d-4ba7-88b9-7a0ae461e90d","info":{"tag":"medium","width":1448,"height":905,"nonce":"b77e8639-a32d-4ba7-88b9-7a0ae461e90d"},"otr_key":{},"sha256":{}},"type":"conversation.asset-add","category": 128},
       ];
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
-      // @formatter:on
     });
 
     it('should return no entry matches the given category', function(done) {

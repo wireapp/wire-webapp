@@ -21,7 +21,6 @@
 
 'use strict';
 
-// @formatter:off
 describe('z.conversation.ConversationVerificationStateHandler', function() {
   const test_factory = new TestFactory();
   let state_handler = undefined;
