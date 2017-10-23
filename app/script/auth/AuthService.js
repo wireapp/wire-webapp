@@ -95,12 +95,14 @@ z.auth.AuthService = class AuthService {
       }
 
       config.success = (data) => {
+        this.client.clear_queue_unblock();
         this.save_access_token_in_client(data.token_type, data.access_token);
         resolve(data);
       };
 
       config.error = (jqXHR, textStatus, errorThrown) => {
-        if (jqXHR.status === z.service.BackendClientError.STATUS_CODE.FORBIDDEN) {
+        const request_forbidden = jqXHR.status === z.service.BackendClientError.STATUS_CODE.FORBIDDEN;
+        if (request_forbidden) {
           this.logger.error(`Requesting access token failed after ${retry_attempt} attempt(s): ${errorThrown}`, jqXHR);
           reject(new z.auth.AccessTokenError(z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN));
         }
@@ -112,11 +114,16 @@ z.auth.AuthService = class AuthService {
             .then(resolve)
             .catch(reject);
 
-          if (jqXHR.status === z.service.BackendClientError.STATUS_CODE.CONNECTIVITY_PROBLEM) {
+          const connectivity_problem = jqXHR.status === z.service.BackendClientError.STATUS_CODE.CONNECTIVITY_PROBLEM;
+          if (connectivity_problem) {
             this.logger.warn('Access token refresh delayed due to suspected connectivity issue');
+            this.client.clear_queue_unblock();
+
             return this.client.execute_on_connectivity(z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_REFRESH)
               .then(() => {
                 this.logger.info('Continuing access token refresh after verifying connectivity');
+                this.client.queue_state(z.service.QUEUE_STATE.ACCESS_TOKEN_REFRESH);
+                this.client.schedule_queue_unblock();
                 return _retry();
               });
           }
