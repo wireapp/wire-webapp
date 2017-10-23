@@ -255,6 +255,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then((conversations) => this.map_conversations(conversations))
       .then((conversation_ets) => {
         this.save_conversations(conversation_ets);
+        this.update_conversations_offline();
         return this.conversations();
       });
   }
@@ -699,7 +700,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   initialize_conversations() {
-    this.update_conversations_offline();
     this._init_state_updates();
     this.init_total = this.receiving_queue.get_length();
 
@@ -760,11 +760,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Maps user connections to the corresponding conversations.
    * @param {Array<Connection>} connection_ets - Connections entities
-   * @returns {Promise} Resolves when connections have been mapped
+   * @returns {undefined} No return value
    */
   map_connections(connection_ets) {
     this.logger.info(`Mapping '${connection_ets.length}' user connection(s) to conversations`, connection_ets);
-    return Promise.all(connection_ets.map((connection_et) => this.map_connection(connection_et)));
+    connection_ets.map((connection_et) => this.map_connection(connection_et));
   }
 
   /**
