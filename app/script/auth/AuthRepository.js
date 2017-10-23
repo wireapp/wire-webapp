@@ -159,6 +159,7 @@ z.auth.AuthRepository = class AuthRepository {
 
     if (!is_refreshing_token) {
       this.queue_state(z.service.QUEUE_STATE.ACCESS_TOKEN_REFRESH);
+      this.auth_service.client.schedule_queue_unblock();
       this.logger.info(`Access token renewal started. Source: ${renewal_trigger}`);
 
       this.get_access_token()
