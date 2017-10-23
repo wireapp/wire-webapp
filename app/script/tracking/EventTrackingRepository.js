@@ -190,7 +190,11 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
   _set_super_properties() {
     this._set_super_property(z.tracking.SuperProperty.APP, EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE);
+    this._set_super_property(z.tracking.SuperProperty.APP_VERSION, z.util.Environment.version(false));
     this._set_super_property(z.tracking.SuperProperty.DESKTOP_APP, z.tracking.helpers.get_platform());
+    if (z.util.Environment.desktop) {
+      this._set_super_property(z.tracking.SuperProperty.WRAPPER_VERSION, z.util.Environment.version(true));
+    }
 
     if (this.user_repository) {
       this._set_super_property(z.tracking.SuperProperty.CONTACTS, this.user_repository.number_of_contacts());
