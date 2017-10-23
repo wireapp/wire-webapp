@@ -474,7 +474,10 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.SHOW_LOGIN, true);
 
     this.auth.repository.get_access_token()
-      .then(() => this._authentication_successful(true))
+      .then(() => {
+        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ACCOUNT.LOGGED_IN, {context: 'auto', remember_me: this.persist()});
+        this._authentication_successful(true);
+      })
       .catch((error) => {
         this.pending_server_request(false);
         throw error;
@@ -2027,10 +2030,10 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
    *
    * @note Gets the client and forwards the user to the login.
    * @private
-   * @param {boolean} [team_registration=false] - Redirected from team registration
+   * @param {boolean} [auto_login=false] - Redirected with auto login parameter
    * @returns {undefined} No return value
    */
-  _authentication_successful(team_registration = false) {
+  _authentication_successful(auto_login = false) {
     this.logger.info('Logging in');
 
     this._get_self_user()
@@ -2062,7 +2065,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
         }
 
         this.logger.info('No active client found. We need to register one...');
-        this._register_client(team_registration);
+        this._register_client(auto_login);
       })
       .catch((error) => {
         if (error.type !== z.user.UserError.TYPE.USER_MISSING_EMAIL) {
@@ -2116,14 +2119,13 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
    * @returns {undefined} No return value
    */
   _redirect_to_app() {
-    let url = '/';
-    url = this._append_existing_parameters(url);
-    window.location.replace(url);
+    const redirect_url = this._append_existing_parameters('/');
+    window.location.replace(redirect_url);
   }
 
-  _register_client(team_registration) {
+  _register_client(auto_login) {
     return this.cryptography_repository.create_cryptobox(this.storage_service.db)
-      .then(() => this.client_repository.register_client(team_registration ? undefined : this.password()))
+      .then(() => this.client_repository.register_client(auto_login ? undefined : this.password()))
       .then((client_observable) => {
         this.event_repository.current_client = client_observable;
         return this.event_repository.initialize_stream_state(client_observable().id);
@@ -2163,7 +2165,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
         }
         this.logger.error(`Failed to register a new client: ${error.message}`, error);
 
-        if (team_registration) {
+        if (auto_login) {
           window.location.hash = z.auth.AuthView.MODE.ACCOUNT_LOGIN;
         }
       });
