@@ -981,7 +981,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
   clicked_on_terms() {
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.NAVIGATION.OPENED_TERMS);
-    z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.WEBSITE, z.config.URL_PATH.TERMS_OF_USE));
+    z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.WEBSITE, z.config.URL_PATH.TERMS_OF_USE));
   }
 
   clicked_on_verify_later() {
