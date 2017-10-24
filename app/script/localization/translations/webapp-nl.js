@@ -177,6 +177,7 @@ z.string.nl.modal_new_device_call_incoming = 'Wil je het gesprek nog steeds acce
 z.string.nl.modal_new_device_call_outgoing = 'Wil je het gesprek nog steeds voeren?';
 z.string.nl.modal_new_device_show_device = 'toon apparaat';
 z.string.nl.modal_new_device_send_anyway = 'toch verzenden';
+z.string.nl.modal_not_connected_headline = 'Niemand toegevoegd tot conversatie';
 z.string.nl.modal_remove_device_button = 'Verwijder apparaat';
 z.string.nl.modal_remove_device_headline = 'Verwijder "{{device}}"';
 z.string.nl.modal_remove_device_message = 'Je wachtwoord is nodig om dit apparaat te verwijderen.';
