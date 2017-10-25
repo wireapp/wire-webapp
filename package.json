@@ -38,7 +38,7 @@
     "lint-staged": "4.3.0",
     "load-grunt-tasks": "3.5.2",
     "request": "2.83.0",
-    "sinon": "4.0.1"
+    "sinon": "4.0.2"
   },
   "lint-staged": {
     "*.js": ["eslint -c .eslintrc.yaml --fix", "git add"],
