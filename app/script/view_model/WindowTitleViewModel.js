@@ -47,7 +47,15 @@ z.ViewModel.WindowTitleViewModel = class WindowTitleViewModel {
 
         this.conversation_repository.conversations_unarchived()
           .forEach((conversation_et) => {
-            if (!conversation_et.is_request() && !conversation_et.is_muted() && conversation_et.unread_message_count()) {
+            const is_ignored = conversation_et.is_request() || conversation_et.is_muted();
+            if (conversation_et.unread_message_count() && !is_ignored) {
+              number_of_unread_conversations++;
+            }
+          });
+
+        this.conversation_repository.conversations_calls()
+          .forEach((conversation_et) => {
+            if (conversation_et.has_joinable_call()) {
               number_of_unread_conversations++;
             }
           });
