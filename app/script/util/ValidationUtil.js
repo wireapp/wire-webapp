@@ -30,16 +30,15 @@ z.util.ValidationUtil = {
   // ToDo: Move z.util.is_same_location here
   asset: {
     legacy: (asset_id, conversation_id) => {
-      if (!z.util.ValidationUtil.is_UUID(asset_id) ||
-          !z.util.ValidationUtil.is_UUID(conversation_id)) {
+      if (!z.util.ValidationUtil.is_UUID(asset_id) || !z.util.ValidationUtil.is_UUID(conversation_id)) {
         throw new z.util.ValidationUtilError('Invalid asset_id / conversation_id');
       }
       return true;
     },
-    retention_policy: (string) => {
+    retention_policy: string => {
       // Ensure the given asset is either eternal, persistent or volatile
       // https://github.com/wireapp/wire-server/blob/e97f7c882cad37e4ddd922d2e48fe0d71751fc5a/libs/cargohold-types/src/CargoHold/Types/V3.hs#L151
-      return string > 0 && string < (Object.keys(z.assets.AssetRetentionPolicy).length + 1);
+      return string > 0 && string < Object.keys(z.assets.AssetRetentionPolicy).length + 1;
     },
     v3: (asset_key, asset_token) => {
       if (!asset_key) {
@@ -64,10 +63,10 @@ z.util.ValidationUtil = {
       return true;
     },
   },
-  is_UUID: (string) => {
+  is_UUID: string => {
     return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(string);
   },
-  is_base64: (string) => {
+  is_base64: string => {
     try {
       // Will raise a DOM exception if base64 string is invalid
       window.atob(string);
@@ -76,21 +75,23 @@ z.util.ValidationUtil = {
     }
     return true;
   },
-  is_bearer_token: (token) => {
+  is_bearer_token: token => {
     // Since some special chars are allowed,
     // remember to always encode Bearer tokens
     // using encodeURIComponents afterwards!
     return /^[a-zA-Z0-9\-._~+/]+[=]{0,2}$/.test(token);
   },
-  is_valid_api_path: (path) => {
+  is_valid_api_path: path => {
     if (!/^\/[a-zA-Z0-9\-_/,]+$/.test(path)) {
       throw new z.util.ValidationUtilError(`Non-compliant path creation attempt. Details: ${path}`);
     }
     return true;
   },
   urls: {
-    is_tweet: (url) => {
-      return /^http(?:s)?:\/\/(?:(?:www|mobile|0)\.)?twitter\.com\/(?:(?:\w{1,15})\/status(?:es|\/i)?|i\/moments)\/(?:\d{2,21})(?:(?:\?|\/).*)?$/.test(url);
+    is_tweet: url => {
+      return /^http(?:s)?:\/\/(?:(?:www|mobile|0)\.)?twitter\.com\/(?:(?:\w{1,15})\/status(?:es|\/i)?|i\/moments)\/(?:\d{2,21})(?:(?:\?|\/).*)?$/.test(
+        url
+      );
     },
   },
 };

@@ -21,7 +21,6 @@
 
 'use strict';
 
-// @formatter:off
 describe('z.conversation.ConversationVerificationStateHandler', function() {
   const test_factory = new TestFactory();
   let state_handler = undefined;
@@ -39,7 +38,8 @@ describe('z.conversation.ConversationVerificationStateHandler', function() {
   let client_b = undefined;
 
   beforeEach(function(done) {
-    test_factory.exposeConversationActors()
+    test_factory
+      .exposeConversationActors()
       .then(function(_conversation_repository) {
         conversation_repository = _conversation_repository;
         state_handler = new z.conversation.ConversationVerificationStateHandler(conversation_repository);

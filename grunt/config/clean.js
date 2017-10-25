@@ -21,7 +21,6 @@
 
 // https://github.com/gruntjs/grunt-contrib-clean
 
-
 /* eslint sort-keys: "off"*/
 
 module.exports = {
@@ -39,9 +38,7 @@ module.exports = {
   //##############################################################################
   deploy: '<%= dir.deploy %>',
   deploy_app: '<%= dir.deploy %>/app',
-  deploy_script: [
-    '<%= dir.deploy %>/script',
-  ],
+  deploy_script: ['<%= dir.deploy %>/script'],
   prod: [
     '<%= dir.deploy %>/audio/buzzer',
     '<%= dir.deploy %>/audio/digits',

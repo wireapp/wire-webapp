@@ -25,7 +25,8 @@ describe('z.auth.AuthRepository', function() {
   const test_factory = new TestFactory();
 
   beforeAll(function(done) {
-    test_factory.exposeAuthActors()
+    test_factory
+      .exposeAuthActors()
       .then(done)
       .catch(done.fail);
   });

@@ -23,7 +23,6 @@ window.z = window.z || {};
 window.z.message = z.message || {};
 
 z.message.MessageCategorization = (function() {
-
   const _check_text = function(event) {
     if (event.type === z.event.Client.CONVERSATION.MESSAGE_ADD) {
       let category = z.message.MessageCategory.TEXT;
@@ -68,7 +67,8 @@ z.message.MessageCategorization = (function() {
     try {
       let category = z.message.MessageCategory.NONE;
 
-      if (event.ephemeral_expires) { // String, Number, true
+      if (event.ephemeral_expires) {
+        // String, Number, true
         return z.message.MessageCategory.NONE;
       }
 
@@ -80,12 +80,11 @@ z.message.MessageCategorization = (function() {
         }
       }
 
-      if (_.isObject(event.reactions) && (Object.keys(event.reactions).length > 0)) {
+      if (_.isObject(event.reactions) && Object.keys(event.reactions).length > 0) {
         category = category | z.message.MessageCategory.LIKED;
       }
 
       return category;
-
     } catch (error) {
       return z.message.MessageCategory.UNDEFINED;
     }

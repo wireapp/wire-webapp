@@ -42,7 +42,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {TeamRepository} team_repository - Repository for teams
    * @param {UserRepository} user_repository - Repository for all user and connection interactions
    */
-  constructor(conversation_service, asset_service, client_repository, cryptography_repository, giphy_repository, link_repository, team_repository, user_repository) {
+  constructor(
+    conversation_service,
+    asset_service,
+    client_repository,
+    cryptography_repository,
+    giphy_repository,
+    link_repository,
+    team_repository,
+    user_repository
+  ) {
     this.conversation_service = conversation_service;
     this.asset_service = asset_service;
     this.client_repository = client_repository;
@@ -68,7 +77,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.block_event_handling = ko.observable(true);
     this.fetching_conversations = {};
     this.conversations_with_new_events = {};
-    this.block_event_handling.subscribe((event_handling_state) => {
+    this.block_event_handling.subscribe(event_handling_state => {
       if (!event_handling_state) {
         this._check_changed_conversations();
       }
@@ -81,7 +90,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     });
 
     this.filtered_conversations = ko.pureComputed(() => {
-      return this.conversations().filter((conversation_et) => {
+      return this.conversations().filter(conversation_et => {
         const states_to_filter = [
           z.user.ConnectionStatus.BLOCKED,
           z.user.ConnectionStatus.CANCELLED,
@@ -104,7 +113,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.sending_queue = new z.util.PromiseQueue({name: 'ConversationRepository.Sending', paused: true});
 
     // @note Only use the client request queue as to unblock if not blocked by event handling or the cryptographic order of messages will be ruined and sessions might be deleted
-    this.conversation_service.client.queue_state.subscribe((queue_state) => {
+    this.conversation_service.client.queue_state.subscribe(queue_state => {
       const queue_ready = queue_state === z.service.QUEUE_STATE.READY;
       this.sending_queue.pause(!queue_ready || this.block_event_handling());
     });
@@ -128,7 +137,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       const conversations_cleared = [];
       const conversations_unarchived = [];
 
-      this.sorted_conversations().forEach((conversation_et) => {
+      this.sorted_conversations().forEach(conversation_et => {
         if (conversation_et.has_active_call()) {
           conversations_calls.push(conversation_et);
         } else if (conversation_et.is_cleared()) {
@@ -154,7 +163,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
     amplify.subscribe(z.event.WebApp.CONVERSATION.MAP_CONNECTION, this.map_connection.bind(this));
     amplify.subscribe(z.event.WebApp.CONVERSATION.MISSED_EVENTS, this.on_missed_events.bind(this));
     amplify.subscribe(z.event.WebApp.CONVERSATION.PERSIST_STATE, this.save_conversation_state_in_db.bind(this));
-    amplify.subscribe(z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, this.set_notification_handling_state.bind(this));
+    amplify.subscribe(
+      z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE,
+      this.set_notification_handling_state.bind(this)
+    );
     amplify.subscribe(z.event.WebApp.EVENT.UPDATE_TIME_OFFSET, this.update_time_offset.bind(this));
     amplify.subscribe(z.event.WebApp.TEAM.MEMBER_LEAVE, this.team_member_leave.bind(this));
     amplify.subscribe(z.event.WebApp.USER.UNBLOCKED, this.unblocked_user.bind(this));
@@ -165,14 +177,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   cleanup_conversations() {
-    this.conversations().forEach((conversation_et) => {
+    this.conversations().forEach(conversation_et => {
       if (conversation_et.is_group() && conversation_et.is_cleared() && conversation_et.removed_from_conversation()) {
         this.conversation_service.delete_conversation_from_db(conversation_et.id);
         this.delete_conversation(conversation_et.id);
       }
     });
   }
-
 
   //##############################################################################
   // Conversation service interactions
@@ -187,9 +198,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when the conversation was created
    */
   create_new_conversation(user_ids, name) {
-    return this.conversation_service.create_conversation(user_ids, name, this.team().id)
-      .then((response) => this._on_create({conversation: response.id, data: response}))
-      .catch((error) => {
+    return this.conversation_service
+      .create_conversation(user_ids, name, this.team().id)
+      .then(response => this._on_create({conversation: response.id, data: response}))
+      .catch(error => {
         if (error.label === z.service.BackendClientError.LABEL.NOT_CONNECTED) {
           return this._handle_users_not_connected(user_ids);
         }
@@ -212,8 +224,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     this.fetching_conversations[conversation_id] = [];
 
-    return this.conversation_service.get_conversation_by_id(conversation_id)
-      .then((response) => {
+    return this.conversation_service
+      .get_conversation_by_id(conversation_id)
+      .then(response => {
         const conversation_et = this.map_conversations(response);
 
         this.logger.info(`Fetched conversation '${conversation_id}' from backend`);
@@ -235,15 +248,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   get_conversations() {
-    const remote_conversations_promise = this.conversation_service.get_all_conversations()
-      .catch((error) => {
-        this.logger.error(`Failed to get all conversations from backend: ${error.message}`);
-      });
+    const remote_conversations_promise = this.conversation_service.get_all_conversations().catch(error => {
+      this.logger.error(`Failed to get all conversations from backend: ${error.message}`);
+    });
 
-    return Promise.all([
-      this.conversation_service.load_conversation_states_from_db(),
-      remote_conversations_promise,
-    ])
+    return Promise.all([this.conversation_service.load_conversation_states_from_db(), remote_conversations_promise])
       .then(([local_conversations, remote_conversations = []]) => {
         if (remote_conversations.length) {
           const conversations = this.conversation_mapper.merge_conversations(local_conversations, remote_conversations);
@@ -252,8 +261,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         return local_conversations;
       })
-      .then((conversations) => this.map_conversations(conversations))
-      .then((conversation_ets) => {
+      .then(conversations => this.map_conversations(conversations))
+      .then(conversation_ets => {
         this.save_conversations(conversation_ets);
         this.update_conversations_offline();
         return this.conversations();
@@ -273,13 +282,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
       return Promise.resolve(message_et);
     }
 
-    return this.conversation_service.load_event_from_db(conversation_et.id, message_id)
-      .then((event) => {
-        if (event) {
-          return this.event_mapper.map_json_event(event, conversation_et);
-        }
-        throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND);
-      });
+    return this.conversation_service.load_event_from_db(conversation_et.id, message_id).then(event => {
+      if (event) {
+        return this.event_mapper.map_json_event(event, conversation_et);
+      }
+      throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND);
+    });
   }
 
   /**
@@ -293,15 +301,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const first_message = conversation_et.get_first_message();
     const upper_bound = first_message ? new Date(first_message.timestamp()) : new Date();
 
-    return this.conversation_service.load_preceding_events_from_db(conversation_et.id, new Date(0), upper_bound, z.config.MESSAGES_FETCH_LIMIT)
-      .then((events) => {
+    return this.conversation_service
+      .load_preceding_events_from_db(conversation_et.id, new Date(0), upper_bound, z.config.MESSAGES_FETCH_LIMIT)
+      .then(events => {
         if (events.length < z.config.MESSAGES_FETCH_LIMIT) {
           conversation_et.has_further_messages(false);
         }
 
         return this._add_events_to_conversation(events, conversation_et);
       })
-      .then((mapped_messages) => {
+      .then(mapped_messages => {
         conversation_et.is_pending(false);
         return mapped_messages;
       });
@@ -324,8 +333,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
       this.conversation_service.load_preceding_events_from_db(conversation_et.id, new Date(0), message_date, padding),
       this.conversation_service.load_subsequent_events_from_db(conversation_et.id, message_date, padding, true),
     ])
-      .then(([older_events, newer_events]) => this._add_events_to_conversation(older_events.concat(newer_events), conversation_et))
-      .then((mapped_messages) => {
+      .then(([older_events, newer_events]) =>
+        this._add_events_to_conversation(older_events.concat(newer_events), conversation_et)
+      )
+      .then(mapped_messages => {
         conversation_et.is_pending(false);
         return mapped_messages;
       });
@@ -343,9 +354,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const message_date = new Date(message_et.timestamp());
     conversation_et.is_pending(true);
 
-    return this.conversation_service.load_subsequent_events_from_db(conversation_et.id, message_date, z.config.MESSAGES_FETCH_LIMIT, include_message)
-      .then((events) => this._add_events_to_conversation(events, conversation_et))
-      .then((mapped_messages) => {
+    return this.conversation_service
+      .load_subsequent_events_from_db(conversation_et.id, message_date, z.config.MESSAGES_FETCH_LIMIT, include_message)
+      .then(events => this._add_events_to_conversation(events, conversation_et))
+      .then(mapped_messages => {
         conversation_et.is_pending(false);
         return mapped_messages;
       });
@@ -359,11 +371,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Array of message entities
    */
   get_events_for_category(conversation_et, category = z.message.MessageCategory.NONE) {
-    return this.conversation_service.load_events_with_category_from_db(conversation_et.id, category)
-      .then((events) => {
-        const message_ets = this.event_mapper.map_json_events(events, conversation_et);
-        return Promise.all(message_ets.map((message_et) => this._update_user_ets(message_et)));
-      });
+    return this.conversation_service.load_events_with_category_from_db(conversation_et.id, category).then(events => {
+      const message_ets = this.event_mapper.map_json_events(events, conversation_et);
+      return Promise.all(message_ets.map(message_et => this._update_user_ets(message_et)));
+    });
   }
 
   /**
@@ -378,12 +389,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
       return Promise.resolve([]);
     }
 
-    return this.conversation_service.search_in_conversation(conversation_et.id, query)
-      .then((events) => {
+    return this.conversation_service
+      .search_in_conversation(conversation_et.id, query)
+      .then(events => {
         const message_ets = this.event_mapper.map_json_events(events, conversation_et);
-        return Promise.all(message_ets.map((message_et) => this._update_user_ets(message_et)));
+        return Promise.all(message_ets.map(message_et => this._update_user_ets(message_et)));
       })
-      .then((message_ets) => [message_ets, query]);
+      .then(message_ets => [message_ets, query]);
   }
 
   /**
@@ -401,14 +413,15 @@ z.conversation.ConversationRepository = class ConversationRepository {
     if (lower_bound < upper_bound) {
       conversation_et.is_pending(true);
 
-      return this.conversation_service.load_preceding_events_from_db(conversation_et.id, lower_bound, upper_bound)
-        .then((events) => {
+      return this.conversation_service
+        .load_preceding_events_from_db(conversation_et.id, lower_bound, upper_bound)
+        .then(events => {
           if (events.length) {
             this._add_events_to_conversation(events, conversation_et);
           }
           conversation_et.is_pending(false);
         })
-        .catch((error) => {
+        .catch(error => {
           this.logger.info(`Could not load unread events for conversation: ${conversation_et.id}`, error);
         });
     }
@@ -420,8 +433,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   unblocked_user(user_et) {
-    this.get_1to1_conversation(user_et)
-      .then((conversation_et) => conversation_et.status(z.conversation.ConversationStatus.CURRENT_MEMBER));
+    this.get_1to1_conversation(user_et).then(conversation_et =>
+      conversation_et.status(z.conversation.ConversationStatus.CURRENT_MEMBER)
+    );
   }
 
   /**
@@ -438,7 +452,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   update_conversations_offline() {
     this.logger.info('Updating group participants offline');
-    this.sorted_conversations().map((conversation_et) => this.update_participating_user_ets(conversation_et, true));
+    this.sorted_conversations().map(conversation_et => this.update_participating_user_ets(conversation_et, true));
   }
 
   /**
@@ -458,12 +472,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   _update_conversations(conversation_ets) {
-    const user_ids = _.flatten(conversation_ets.map((conversation_et) => conversation_et.participating_user_ids()));
+    const user_ids = _.flatten(conversation_ets.map(conversation_et => conversation_et.participating_user_ids()));
 
-    this.user_repository.get_users_by_id(user_ids)
-      .then(() => conversation_ets.forEach((conversation_et) => this._fetch_users_and_events(conversation_et)));
+    this.user_repository
+      .get_users_by_id(user_ids)
+      .then(() => conversation_ets.forEach(conversation_et => this._fetch_users_and_events(conversation_et)));
   }
-
 
   //##############################################################################
   // Repository interactions
@@ -475,7 +489,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   delete_conversation(conversation_id) {
-    this.conversations.remove((conversation_et) => conversation_et.id === conversation_id);
+    this.conversations.remove(conversation_et => conversation_et.id === conversation_id);
   }
 
   /**
@@ -484,19 +498,18 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves with the conversation entity
    */
   find_conversation_by_id(conversation_id) {
-    return Promise.resolve()
-      .then(() => {
-        if (!conversation_id) {
-          throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.NO_CONVERSATION_ID);
-        }
+    return Promise.resolve().then(() => {
+      if (!conversation_id) {
+        throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.NO_CONVERSATION_ID);
+      }
 
-        const conversation_et = this._find_conversation_by_id(conversation_id);
-        if (conversation_et) {
-          return conversation_et;
-        }
+      const conversation_et = this._find_conversation_by_id(conversation_id);
+      if (conversation_et) {
+        return conversation_et;
+      }
 
-        throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.NOT_FOUND);
-      });
+      throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.NOT_FOUND);
+    });
   }
 
   /**
@@ -513,8 +526,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   get_all_users_in_conversation(conversation_id) {
-    return this.get_conversation_by_id(conversation_id)
-      .then((conversation_et) => [this.user_repository.self()].concat(conversation_et.participating_user_ets()));
+    return this.get_conversation_by_id(conversation_id).then(conversation_et =>
+      [this.user_repository.self()].concat(conversation_et.participating_user_ets())
+    );
   }
 
   /**
@@ -524,16 +538,20 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   get_conversation_by_id(conversation_id) {
     return this.find_conversation_by_id(conversation_id)
-      .catch((error) => {
+      .catch(error => {
         if (error.type === z.conversation.ConversationError.TYPE.NOT_FOUND) {
           return this.fetch_conversation_by_id(conversation_id);
         }
 
         throw error;
       })
-      .catch((error) => {
+      .catch(error => {
         if (error.type !== z.conversation.ConversationError.TYPE.NOT_FOUND) {
-          this.logger.log(this.logger.levels.ERROR, `Failed to get conversation '${conversation_id}': ${error.message}`, error);
+          this.logger.log(
+            this.logger.levels.ERROR,
+            `Failed to get conversation '${conversation_id}': ${error.message}`,
+            error
+          );
         }
 
         throw error;
@@ -549,7 +567,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   get_groups_by_name(query, is_handle) {
     return this.sorted_conversations()
-      .filter((conversation_et) => {
+      .filter(conversation_et => {
         if (!conversation_et.is_group()) {
           return false;
         }
@@ -619,12 +637,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolve with the most active conversations
    */
   get_most_active_conversations() {
-    return this.conversation_service.get_active_conversations_from_db()
-      .then((conversation_ids) => {
-        return conversation_ids
-          .map((conversation_id) => this._find_conversation_by_id(conversation_id))
-          .filter((conversation_et) => conversation_et);
-      });
+    return this.conversation_service.get_active_conversations_from_db().then(conversation_ids => {
+      return conversation_ids
+        .map(conversation_id => this._find_conversation_by_id(conversation_id))
+        .filter(conversation_et => conversation_et);
+    });
   }
 
   /**
@@ -655,11 +672,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
       return this.create_new_conversation([user_et.id], undefined).then(({conversation_et}) => conversation_et);
     }
 
-    return this.fetch_conversation_by_id(user_et.connection().conversation_id)
-      .then((conversation_et) => {
-        conversation_et.connection(user_et.connection());
-        return this.update_participating_user_ets(conversation_et);
-      });
+    return this.fetch_conversation_by_id(user_et.connection().conversation_id).then(conversation_et => {
+      conversation_et.connection(user_et.connection());
+      return this.update_participating_user_ets(conversation_et);
+    });
   }
 
   /**
@@ -686,11 +702,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
 
     return this.get_conversation_by_id(conversation_id)
-      .then((conversation_et) => {
-        return this.get_message_in_conversation_by_id(conversation_et, message_id)
-          .then((message_et) => conversation_et.last_read_timestamp() >= message_et.timestamp());
+      .then(conversation_et => {
+        return this.get_message_in_conversation_by_id(conversation_et, message_id).then(
+          message_et => conversation_et.last_read_timestamp() >= message_et.timestamp()
+        );
       })
-      .catch((error) => {
+      .catch(error => {
         if (error.type === z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
           return true;
         }
@@ -705,7 +722,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     if (this.init_total > 5) {
       this.logger.log(`Handling '${this.init_total}' additional messages on app start`);
-      return new Promise((resolve, reject) => this.init_promise = {reject_fn: reject, resolve_fn: resolve});
+      return new Promise((resolve, reject) => (this.init_promise = {reject_fn: reject, resolve_fn: resolve}));
     }
   }
 
@@ -721,7 +738,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const {conversation_id} = connection_et;
 
     return this.find_conversation_by_id(conversation_id)
-      .catch((error) => {
+      .catch(error => {
         if (error.type !== z.conversation.ConversationError.TYPE.NOT_FOUND) {
           throw error;
         }
@@ -732,25 +749,24 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.NOT_FOUND);
       })
-      .then((conversation_et) => {
+      .then(conversation_et => {
         conversation_et.connection(connection_et);
 
         if (connection_et.is_connected()) {
           conversation_et.type(z.conversation.ConversationType.ONE2ONE);
         }
 
-        this.update_participating_user_ets(conversation_et)
-          .then((updated_conversation_et) => {
-            if (show_conversation) {
-              amplify.publish(z.event.WebApp.CONVERSATION.SHOW, updated_conversation_et);
-            }
+        this.update_participating_user_ets(conversation_et).then(updated_conversation_et => {
+          if (show_conversation) {
+            amplify.publish(z.event.WebApp.CONVERSATION.SHOW, updated_conversation_et);
+          }
 
-            this.conversations.notifySubscribers();
-          });
+          this.conversations.notifySubscribers();
+        });
 
         return conversation_et;
       })
-      .catch((error) => {
+      .catch(error => {
         if (error.type !== z.conversation.ConversationError.TYPE.NOT_FOUND) {
           throw error;
         }
@@ -764,7 +780,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   map_connections(connection_ets) {
     this.logger.info(`Mapping '${connection_ets.length}' user connection(s) to conversations`, connection_ets);
-    connection_ets.map((connection_et) => this.map_connection(connection_et));
+    connection_ets.map(connection_et => this.map_connection(connection_et));
   }
 
   /**
@@ -778,7 +794,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const conversation_data = payload.length ? payload : [payload];
 
     const conversation_ets = this.conversation_mapper.map_conversations(conversation_data, initial_timestamp);
-    conversation_ets.forEach((conversation_et) => this._handle_mapped_conversation(conversation_et));
+    conversation_ets.forEach(conversation_et => this._handle_mapped_conversation(conversation_et));
 
     return payload.length ? conversation_ets : conversation_ets[0];
   }
@@ -790,7 +806,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   map_guest_status_self() {
-    this.filtered_conversations().forEach((conversation_et) => this._map_guest_status_self(conversation_et));
+    this.filtered_conversations().forEach(conversation_et => this._map_guest_status_self(conversation_et));
 
     if (this.team()) {
       this.user_repository.self().is_team_member(true);
@@ -825,15 +841,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when conversation was saved
    */
   save_conversation(conversation_et) {
-    return this.find_conversation_by_id(conversation_et.id)
-      .catch((error) => {
-        if (error.type !== z.conversation.ConversationError.TYPE.NOT_FOUND) {
-          throw error;
-        }
+    return this.find_conversation_by_id(conversation_et.id).catch(error => {
+      if (error.type !== z.conversation.ConversationError.TYPE.NOT_FOUND) {
+        throw error;
+      }
 
-        this.conversations.push(conversation_et);
-        return this.save_conversation_state_in_db(conversation_et);
-      });
+      this.conversations.push(conversation_et);
+      return this.save_conversation_state_in_db(conversation_et);
+    });
   }
 
   /**
@@ -888,13 +903,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when users have been updated
    */
   update_participating_user_ets(conversation_et, offline = false) {
-    return this.user_repository.get_users_by_id(conversation_et.participating_user_ids(), offline)
-      .then((user_ets) => {
-        conversation_et.participating_user_ets(user_ets);
-        return conversation_et;
-      });
+    return this.user_repository.get_users_by_id(conversation_et.participating_user_ids(), offline).then(user_ets => {
+      conversation_et.participating_user_ets(user_ets);
+      return conversation_et;
+    });
   }
-
 
   //##############################################################################
   // Send events
@@ -909,13 +922,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when bot was added
    */
   add_bot(conversation_et, provider_id, service_id) {
-    return this.conversation_service.post_bots(conversation_et.id, provider_id, service_id)
-      .then((response) => {
-        if (response && response.event) {
-          amplify.publish(z.event.WebApp.EVENT.INJECT, response.event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
-          this.logger.debug(`Successfully added bot to conversation '${conversation_et.display_name()}'`, response);
-        }
-      });
+    return this.conversation_service.post_bots(conversation_et.id, provider_id, service_id).then(response => {
+      if (response && response.event) {
+        amplify.publish(z.event.WebApp.EVENT.INJECT, response.event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+        this.logger.debug(`Successfully added bot to conversation '${conversation_et.display_name()}'`, response);
+      }
+    });
   }
 
   /**
@@ -926,14 +938,20 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when members were added
    */
   add_members(conversation_et, user_ids) {
-    return this.conversation_service.post_members(conversation_et.id, user_ids)
-      .then((response) => amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE))
-      .catch((error) => {
+    return this.conversation_service
+      .post_members(conversation_et.id, user_ids)
+      .then(response =>
+        amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE)
+      )
+      .catch(error => {
         if (error.label === z.service.BackendClientError.LABEL.TOO_MANY_MEMBERS) {
           return amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.TOO_MANY_MEMBERS, {
             data: {
               max: z.config.MAXIMUM_CONVERSATION_SIZE,
-              open_spots: Math.max(0, z.config.MAXIMUM_CONVERSATION_SIZE - (conversation_et.number_of_participants() + 1)),
+              open_spots: Math.max(
+                0,
+                z.config.MAXIMUM_CONVERSATION_SIZE - (conversation_et.number_of_participants() + 1)
+              ),
             },
           });
         }
@@ -991,8 +1009,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
       const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.CLEARED, message_content);
 
-      this.send_generic_message_to_conversation(this.self_conversation().id, generic_message)
-        .then(() => this.logger.info(`Cleared conversation '${conversation_et.id}' on '${new Date(timestamp).toISOString()}'`));
+      this.send_generic_message_to_conversation(this.self_conversation().id, generic_message).then(() =>
+        this.logger.info(`Cleared conversation '${conversation_et.id}' on '${new Date(timestamp).toISOString()}'`)
+      );
     }
   }
 
@@ -1004,13 +1023,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when bot was removed from the conversation
    */
   remove_bot(conversation_et, bot_user_id) {
-    return this.conversation_service.delete_bots(conversation_et.id, bot_user_id)
-      .then((response) => {
-        if (response) {
-          amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
-          return response;
-        }
-      });
+    return this.conversation_service.delete_bots(conversation_et.id, bot_user_id).then(response => {
+      if (response) {
+        amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+        return response;
+      }
+    });
   }
 
   /**
@@ -1021,13 +1039,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when member was removed from the conversation
    */
   remove_member(conversation_et, user_id) {
-    return this.conversation_service.delete_members(conversation_et.id, user_id)
-      .then((response) => {
-        if (response) {
-          amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
-          return response;
-        }
-      });
+    return this.conversation_service.delete_members(conversation_et.id, user_id).then(response => {
+      if (response) {
+        amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+        return response;
+      }
+    });
   }
 
   /**
@@ -1053,20 +1070,20 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when conversation was renamed
    */
   rename_conversation(conversation_et, name) {
-    return this.conversation_service.update_conversation_properties(conversation_et.id, name)
-      .then((response) => {
-        if (response) {
-          amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
-          return response;
-        }
-      });
+    return this.conversation_service.update_conversation_properties(conversation_et.id, name).then(response => {
+      if (response) {
+        amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+        return response;
+      }
+    });
   }
 
   reset_session(user_id, client_id, conversation_id) {
     this.logger.info(`Resetting session with client '${client_id}' of user '${user_id}'.`);
 
-    return this.cryptography_repository.delete_session(user_id, client_id)
-      .then((session_id) => {
+    return this.cryptography_repository
+      .delete_session(user_id, client_id)
+      .then(session_id => {
         if (session_id) {
           this.logger.info(`Deleted session with client '${client_id}' of user '${user_id}'.`);
         } else {
@@ -1075,8 +1092,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         return this.send_session_reset(user_id, client_id, conversation_id);
       })
-      .catch((error) => {
-        this.logger.warn(`Failed to reset session for client '${client_id}' of user '${user_id}': ${error.message}`, error);
+      .catch(error => {
+        this.logger.warn(
+          `Failed to reset session for client '${client_id}' of user '${user_id}': ${error.message}`,
+          error
+        );
         throw error;
       });
   }
@@ -1094,11 +1114,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
       tag = z.l10n.text(z.string.extensions_giphy_random);
     }
 
-    return z.util.load_url_blob(url)
-      .then((blob) => {
-        this.send_text(z.l10n.text(z.string.extensions_giphy_message, tag), conversation_et);
-        return this.upload_images(conversation_et, [blob]);
-      });
+    return z.util.load_url_blob(url).then(blob => {
+      this.send_text(z.l10n.text(z.string.extensions_giphy_message, tag), conversation_et);
+      return this.upload_images(conversation_et, [blob]);
+    });
   }
 
   /**
@@ -1108,17 +1127,20 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   team_member_leave(team_id, user_id) {
-    this.user_repository.get_user_by_id(user_id)
-      .then((user_et) => {
-        this.conversations()
-          .filter((conversation_et) => conversation_et.team_id === team_id && !conversation_et.removed_from_conversation())
-          .forEach((conversation_et) => {
-            if (conversation_et.participating_user_ids().includes(user_id)) {
-              const member_leave_event = z.conversation.EventBuilder.build_team_member_leave(conversation_et, user_et, this.time_offset);
-              amplify.publish(z.event.WebApp.EVENT.INJECT, member_leave_event);
-            }
-          });
-      });
+    this.user_repository.get_user_by_id(user_id).then(user_et => {
+      this.conversations()
+        .filter(conversation_et => conversation_et.team_id === team_id && !conversation_et.removed_from_conversation())
+        .forEach(conversation_et => {
+          if (conversation_et.participating_user_ids().includes(user_id)) {
+            const member_leave_event = z.conversation.EventBuilder.build_team_member_leave(
+              conversation_et,
+              user_et,
+              this.time_offset
+            );
+            amplify.publish(z.event.WebApp.EVENT.INJECT, member_leave_event);
+          }
+        });
+    });
   }
 
   /**
@@ -1128,7 +1150,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   toggle_silence_conversation(conversation_et) {
     if (!conversation_et) {
-      return Promise.reject(new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND));
+      return Promise.reject(
+        new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND)
+      );
     }
 
     const payload = {
@@ -1136,17 +1160,20 @@ z.conversation.ConversationRepository = class ConversationRepository {
       otr_muted_ref: new Date(conversation_et.get_latest_timestamp(this.time_offset)).toISOString(),
     };
 
-    return this.conversation_service.update_member_properties(conversation_et.id, payload)
+    return this.conversation_service
+      .update_member_properties(conversation_et.id, payload)
       .then(() => {
         const response = {
           data: payload,
         };
 
         this._on_member_update(conversation_et, response);
-        this.logger.info(`Toggle silence to '${payload.otr_muted}' for conversation '${conversation_et.id}' on '${payload.otr_muted_ref}'`);
+        this.logger.info(
+          `Toggle silence to '${payload.otr_muted}' for conversation '${conversation_et.id}' on '${payload.otr_muted_ref}'`
+        );
         return response;
       })
-      .catch((error) => {
+      .catch(error => {
         const reject_error = new Error(`Conversation '${conversation_et.id}' could not be muted: ${error.code}`);
         this.logger.warn(reject_error.message, error);
         throw reject_error;
@@ -1176,7 +1203,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   _toggle_archive_conversation(conversation_et, new_archive_state, trigger) {
     if (!conversation_et) {
-      return Promise.reject(new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND));
+      return Promise.reject(
+        new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND)
+      );
     }
 
     const archive_timestamp = conversation_et.get_latest_timestamp(this.time_offset);
@@ -1192,30 +1221,33 @@ z.conversation.ConversationRepository = class ConversationRepository {
     };
 
     this.logger.info(`Conversation '${conversation_et.id}' archive state change triggered by '${trigger}'`);
-    return this.conversation_service.update_member_properties(conversation_et.id, payload)
-      .catch((error) => {
-        this.logger.error(`Failed to change conversation '${conversation_et.id}' archived state to '${new_archive_state}': ${error.code}`);
+    return this.conversation_service
+      .update_member_properties(conversation_et.id, payload)
+      .catch(error => {
+        this.logger.error(
+          `Failed to change conversation '${conversation_et.id}' archived state to '${new_archive_state}': ${error.code}`
+        );
         if (error.code !== z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
           throw error;
         }
       })
       .then(() => {
         this._on_member_update(conversation_et, {data: payload});
-        this.logger.info(`Update conversation '${conversation_et.id}' archive state to '${new_archive_state}' on '${payload.otr_archived_ref}'`);
+        this.logger.info(
+          `Update conversation '${conversation_et.id}' archive state to '${new_archive_state}' on '${payload.otr_archived_ref}'`
+        );
       });
   }
 
   _check_changed_conversations() {
-    Object
-      .keys(this.conversations_with_new_events)
-      .forEach((conversation_id) => {
-        if (this.conversations_with_new_events.hasOwnProperty(conversation_id)) {
-          const conversation_et = this.conversations_with_new_events[conversation_id];
-          if (conversation_et.should_unarchive()) {
-            this.unarchive_conversation(conversation_et, 'event from notification stream');
-          }
+    Object.keys(this.conversations_with_new_events).forEach(conversation_id => {
+      if (this.conversations_with_new_events.hasOwnProperty(conversation_id)) {
+        const conversation_et = this.conversations_with_new_events[conversation_id];
+        if (conversation_et.should_unarchive()) {
+          this.unarchive_conversation(conversation_et, 'event from notification stream');
         }
-      });
+      }
+    });
 
     this.conversations_with_new_events = {};
   }
@@ -1240,7 +1272,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   _handle_users_not_connected(user_ids) {
     const user_promise = user_ids.length === 1 ? this.user_repository.get_user_by_id(user_ids[0]) : Promise.resolve();
 
-    user_promise.then((user_et) => {
+    user_promise.then(user_et => {
       const username = user_et ? user_et.first_name() : undefined;
       amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.NOT_CONNECTED, {
         data: username,
@@ -1265,16 +1297,17 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
       this.send_generic_message_to_conversation(this.self_conversation().id, generic_message)
         .then(() => {
-          this.logger.info(`Marked conversation '${conversation_et.id}' as read on '${new Date(timestamp).toISOString()}'`);
+          this.logger.info(
+            `Marked conversation '${conversation_et.id}' as read on '${new Date(timestamp).toISOString()}'`
+          );
         })
-        .catch((error) => {
+        .catch(error => {
           this.logger.error(`Error (${error.label}): ${error.message}`);
           const raygun_error = new Error('Failed to update last read timestamp');
           Raygun.send(raygun_error, {label: error.label, message: error.message});
         });
     }
   }
-
 
   //##############################################################################
   // Send encrypted events
@@ -1284,16 +1317,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
     let generic_message;
 
     return this.get_message_in_conversation_by_id(conversation_et, message_id)
-      .then((message_et) => {
+      .then(message_et => {
         const asset_et = message_et.get_first_asset();
 
         asset_et.uploaded_on_this_client(true);
         return this.asset_service.upload_asset(file, null, function(xhr) {
-          xhr.upload.onprogress = (event) => asset_et.upload_progress(Math.round((event.loaded / event.total) * 100));
+          xhr.upload.onprogress = event => asset_et.upload_progress(Math.round(event.loaded / event.total * 100));
           asset_et.upload_cancel = () => xhr.abort();
         });
       })
-      .then((asset) => {
+      .then(asset => {
         generic_message = new z.proto.GenericMessage(message_id);
         generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
 
@@ -1303,8 +1336,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         return this.send_generic_message_to_conversation(conversation_et.id, generic_message);
       })
-      .then((payload) => {
-        const {uploaded: asset_data} = conversation_et.ephemeral_timer() ? generic_message.ephemeral.asset : generic_message.asset;
+      .then(payload => {
+        const {uploaded: asset_data} = conversation_et.ephemeral_timer()
+          ? generic_message.ephemeral.asset
+          : generic_message.asset;
 
         const data = {
           key: asset_data.asset_id,
@@ -1330,12 +1365,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when the asset metadata was sent
    */
   send_asset_metadata(conversation_et, file) {
-    return z.assets.AssetMetaDataBuilder.build_metadata(file)
-      .catch((error) => {
-        this.logger.warn(`Couldn't render asset preview from metadata. Asset might be corrupt: ${error.message}`, error);
+    return z.assets.AssetMetaDataBuilder
+      .build_metadata(file)
+      .catch(error => {
+        this.logger.warn(
+          `Couldn't render asset preview from metadata. Asset might be corrupt: ${error.message}`,
+          error
+        );
         return undefined;
       })
-      .then((metadata) => {
+      .then(metadata => {
         const asset = new z.proto.Asset();
 
         if (z.assets.AssetMetaDataBuilder.is_audio(file)) {
@@ -1350,7 +1389,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         return asset;
       })
-      .then((asset) => {
+      .then(asset => {
         let generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
         generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
 
@@ -1360,8 +1399,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         return this._send_and_inject_generic_message(conversation_et, generic_message);
       })
-      .catch((error) => {
-        this.logger.warn(`Failed to upload metadata for asset in conversation '${conversation_et.id}': ${error.message}`, error);
+      .catch(error => {
+        this.logger.warn(
+          `Failed to upload metadata for asset in conversation '${conversation_et.id}': ${error.message}`,
+          error
+        );
 
         if (error.type === z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
           throw error;
@@ -1379,24 +1421,29 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   send_asset_preview(conversation_et, file, message_id) {
     return poster(file)
-      .then((image_blob) => {
+      .then(image_blob => {
         if (!image_blob) {
           throw Error('No image available');
         }
 
-        return this.asset_service.upload_asset(image_blob)
-          .then((uploaded_image_asset) => {
-            const asset = new z.proto.Asset();
-            asset.set('preview', new z.proto.Asset.Preview(image_blob.type, image_blob.size, uploaded_image_asset.uploaded));
+        return this.asset_service.upload_asset(image_blob).then(uploaded_image_asset => {
+          const asset = new z.proto.Asset();
+          asset.set(
+            'preview',
+            new z.proto.Asset.Preview(image_blob.type, image_blob.size, uploaded_image_asset.uploaded)
+          );
 
-            const generic_message = new z.proto.GenericMessage(message_id);
-            generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
+          const generic_message = new z.proto.GenericMessage(message_id);
+          generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
 
-            return this._send_and_inject_generic_message(conversation_et, generic_message);
-          });
+          return this._send_and_inject_generic_message(conversation_et, generic_message);
+        });
       })
-      .catch((error) => {
-        this.logger.warn(`No preview for asset '${message_id}' in conversation '${conversation_et.id}' uploaded `, error);
+      .catch(error => {
+        this.logger.warn(
+          `No preview for asset '${message_id}' in conversation '${conversation_et.id}' uploaded `,
+          error
+        );
       });
   }
 
@@ -1409,7 +1456,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when the asset failure was sent
    */
   send_asset_upload_failed(conversation_et, nonce, reason = z.assets.AssetUploadFailedReason.FAILED) {
-    const reason_proto = reason === z.assets.AssetUploadFailedReason.CANCELLED ? z.proto.Asset.NotUploaded.CANCELLED : z.proto.Asset.NotUploaded.FAILED;
+    const reason_proto =
+      reason === z.assets.AssetUploadFailedReason.CANCELLED
+        ? z.proto.Asset.NotUploaded.CANCELLED
+        : z.proto.Asset.NotUploaded.FAILED;
     const asset = new z.proto.Asset();
     asset.set('not_uploaded', reason_proto);
 
@@ -1428,17 +1478,26 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   send_confirmation_status(conversation_et, message_et) {
     const other_user_in_one2one = !message_et.user().is_me && conversation_et.is_one2one();
-    const within_threshold = message_et.timestamp() >= Date.now() - ConversationRepository.CONFIG.CONFIRMATION_THRESHOLD;
+    const within_threshold =
+      message_et.timestamp() >= Date.now() - ConversationRepository.CONFIG.CONFIRMATION_THRESHOLD;
 
     if (other_user_in_one2one && within_threshold && z.event.EventTypeHandling.CONFIRM.includes(message_et.type)) {
       const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
-      generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.CONFIRMATION, new z.proto.Confirmation(message_et.id, z.proto.Confirmation.Type.DELIVERED));
+      generic_message.set(
+        z.cryptography.GENERIC_MESSAGE_TYPE.CONFIRMATION,
+        new z.proto.Confirmation(message_et.id, z.proto.Confirmation.Type.DELIVERED)
+      );
 
       this.sending_queue.push(() => {
-        return this.create_recipients(conversation_et.id, true, [message_et.user().id])
-          .then((recipients) => {
-            return this._send_generic_message(conversation_et.id, generic_message, recipients, [message_et.user().id], false);
-          });
+        return this.create_recipients(conversation_et.id, true, [message_et.user().id]).then(recipients => {
+          return this._send_generic_message(
+            conversation_et.id,
+            generic_message,
+            recipients,
+            [message_et.user().id],
+            false
+          );
+        });
       });
     }
   }
@@ -1454,14 +1513,20 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   send_e_call(conversation_et, call_message_et, recipients, precondition_option) {
     const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
-    generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.CALLING, new z.proto.Calling(call_message_et.to_content_string()));
+    generic_message.set(
+      z.cryptography.GENERIC_MESSAGE_TYPE.CALLING,
+      new z.proto.Calling(call_message_et.to_content_string())
+    );
 
     return this.sending_queue
       .push(() => {
-        const recipients_promise = recipients ? Promise.resolve(recipients) : this.create_recipients(conversation_et.id, false);
+        const recipients_promise = recipients
+          ? Promise.resolve(recipients)
+          : this.create_recipients(conversation_et.id, false);
 
-        return recipients_promise
-          .then((_recipients) => this._send_generic_message(conversation_et.id, generic_message, _recipients, precondition_option));
+        return recipients_promise.then(_recipients =>
+          this._send_generic_message(conversation_et.id, generic_message, _recipients, precondition_option)
+        );
       })
       .then(() => {
         const initiating_call_message = [
@@ -1473,7 +1538,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           return this._track_completed_media_action(conversation_et, generic_message, call_message_et);
         }
       })
-      .catch((error) => {
+      .catch(error => {
         if (error.type !== z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
           throw error;
         }
@@ -1490,8 +1555,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when the image was sent
    */
   send_image_asset(conversation_et, image) {
-    return this.asset_service.upload_image_asset(image)
-      .then((asset) => {
+    return this.asset_service
+      .upload_image_asset(image)
+      .then(asset => {
         let generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
         generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
 
@@ -1501,7 +1567,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         return this._send_and_inject_generic_message(conversation_et, generic_message);
       })
-      .catch((error) => {
+      .catch(error => {
         this.logger.error(`Failed to upload otr asset for conversation ${conversation_et.id}: ${error.message}`, error);
         throw error;
       });
@@ -1520,13 +1586,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
       generic_message = this._wrap_in_ephemeral_message(generic_message, conversation_et.ephemeral_timer());
     }
 
-    return this._send_and_inject_generic_message(conversation_et, generic_message)
-      .catch((error) => {
-        if (error.type !== z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
-          this.logger.error(`Error while sending knock: ${error.message}`, error);
-          throw error;
-        }
-      });
+    return this._send_and_inject_generic_message(conversation_et, generic_message).catch(error => {
+      if (error.type !== z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
+        this.logger.error(`Error while sending knock: ${error.message}`, error);
+        throw error;
+      }
+    });
   }
 
   /**
@@ -1540,8 +1605,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
   send_link_preview(message, conversation_et, generic_message) {
     const message_id = generic_message.message_id;
 
-    return this.link_repository.get_link_preview_from_string(message)
-      .then((link_preview) => {
+    return this.link_repository
+      .get_link_preview_from_string(message)
+      .then(link_preview => {
         if (link_preview) {
           switch (generic_message.content) {
             case z.cryptography.GENERIC_MESSAGE_TYPE.EPHEMERAL:
@@ -1559,23 +1625,31 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
           return this.get_message_in_conversation_by_id(conversation_et, message_id);
         }
-        this.logger.debug(`No link in or preview for message '${message_id}' in conversation '${conversation_et.id}' found`);
+        this.logger.debug(
+          `No link in or preview for message '${message_id}' in conversation '${conversation_et.id}' found`
+        );
       })
-      .then((message_et) => {
+      .then(message_et => {
         if (message_et) {
           const asset_et = message_et.get_first_asset();
           if (asset_et.text === message) {
-            this.logger.debug(`Sending link preview for message '${message_id}' in conversation '${conversation_et.id}'`);
+            this.logger.debug(
+              `Sending link preview for message '${message_id}' in conversation '${conversation_et.id}'`
+            );
             return this._send_and_inject_generic_message(conversation_et, generic_message);
           }
-          this.logger.debug(`Skipped sending link preview for changed message '${message_id}' in conversation '${conversation_et.id}'`);
+          this.logger.debug(
+            `Skipped sending link preview for changed message '${message_id}' in conversation '${conversation_et.id}'`
+          );
         }
       })
-      .catch((error) => {
+      .catch(error => {
         if (error.type !== z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
           throw error;
         }
-        this.logger.debug(`Skipped sending link preview for changed message '${message_id}' in conversation '${conversation_et.id}'`);
+        this.logger.debug(
+          `Skipped sending link preview for changed message '${message_id}' in conversation '${conversation_et.id}'`
+        );
       });
   }
 
@@ -1591,7 +1665,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   send_location(conversation_et, longitude, latitude, name, zoom) {
     const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
-    generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.LOCATION, new z.proto.Location(longitude, latitude, name, zoom));
+    generic_message.set(
+      z.cryptography.GENERIC_MESSAGE_TYPE.LOCATION,
+      new z.proto.Location(longitude, latitude, name, zoom)
+    );
     return this.send_generic_message_to_conversation(conversation_et.id, generic_message);
   }
 
@@ -1609,7 +1686,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
 
     const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
-    generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.EDITED, new z.proto.MessageEdit(original_message_et.id, new z.proto.Text(message)));
+    generic_message.set(
+      z.cryptography.GENERIC_MESSAGE_TYPE.EDITED,
+      new z.proto.MessageEdit(original_message_et.id, new z.proto.Text(message))
+    );
 
     return this._send_and_inject_generic_message(conversation_et, generic_message, false)
       .then(() => {
@@ -1618,7 +1698,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           return this.send_link_preview(message, conversation_et, generic_message);
         }
       })
-      .catch((error) => {
+      .catch(error => {
         if (error.type !== z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
           this.logger.error(`Error while editing message: ${error.message}`, error);
           throw error;
@@ -1680,11 +1760,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
     recipients[user_id] = [client_id];
 
     return this._send_generic_message(conversation_id, generic_message, recipients, true)
-      .then((response) => {
+      .then(response => {
         this.logger.info(`Sent info about session reset to client '${client_id}' of user '${user_id}'`);
         return response;
       })
-      .catch((error) => {
+      .catch(error => {
         this.logger.error(`Sending conversation reset failed: ${error.message}`, error);
         throw error;
       });
@@ -1705,8 +1785,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       generic_message = this._wrap_in_ephemeral_message(generic_message, conversation_et.ephemeral_timer());
     }
 
-    return this._send_and_inject_generic_message(conversation_et, generic_message)
-      .then(() => generic_message);
+    return this._send_and_inject_generic_message(conversation_et, generic_message).then(() => generic_message);
   }
 
   /**
@@ -1718,12 +1797,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   send_text_with_link_preview(message, conversation_et) {
     return this.send_text(message, conversation_et)
-      .then((generic_message) => {
+      .then(generic_message => {
         if (z.util.Environment.desktop) {
           return this.send_link_preview(message, conversation_et, generic_message);
         }
       })
-      .catch((error) => {
+      .catch(error => {
         if (error.type !== z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
           this.logger.error(`Error while sending text message: ${error.message}`, error);
           throw error;
@@ -1744,12 +1823,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const result = [];
     const user_ids = Object.keys(recipients);
 
-    user_ids.forEach((user_id) => {
+    user_ids.forEach(user_id => {
       if (recipients.hasOwnProperty(user_id)) {
         const client_ids = recipients[user_id];
 
         if (_.isFunction(client_fn)) {
-          client_ids.forEach(((client_id) => result.push(client_fn(user_id, client_id))));
+          client_ids.forEach(client_id => result.push(client_fn(user_id, client_id)));
         }
 
         if (_.isFunction(user_fn)) {
@@ -1778,7 +1857,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return generic_message;
   }
 
-
   //##############################################################################
   // Send Generic Messages
   //##############################################################################
@@ -1792,35 +1870,32 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves with a user client map
    */
   create_recipients(conversation_id, skip_own_clients = false, user_ids) {
-    return this.get_all_users_in_conversation(conversation_id)
-      .then((user_ets) => {
-        const recipients = {};
+    return this.get_all_users_in_conversation(conversation_id).then(user_ets => {
+      const recipients = {};
 
-        for (const user_et of user_ets) {
-          if (!(skip_own_clients && user_et.is_me)) {
-            if (user_ids && !user_ids.includes(user_et.id)) {
-              continue;
-            }
-
-            recipients[user_et.id] = user_et.devices().map((client_et) => client_et.id);
+      for (const user_et of user_ets) {
+        if (!(skip_own_clients && user_et.is_me)) {
+          if (user_ids && !user_ids.includes(user_et.id)) {
+            continue;
           }
-        }
 
-        return recipients;
-      });
+          recipients[user_et.id] = user_et.devices().map(client_et => client_et.id);
+        }
+      }
+
+      return recipients;
+    });
   }
 
   send_generic_message_to_conversation(conversation_id, generic_message) {
-    return this.sending_queue
-      .push(() => {
-        const skip_own_clients = generic_message.content === z.cryptography.GENERIC_MESSAGE_TYPE.EPHEMERAL;
+    return this.sending_queue.push(() => {
+      const skip_own_clients = generic_message.content === z.cryptography.GENERIC_MESSAGE_TYPE.EPHEMERAL;
 
-        return this.create_recipients(conversation_id, skip_own_clients)
-          .then((recipients) => {
-            const precondition_option = skip_own_clients ? Object.keys(recipients) : undefined;
-            return this._send_generic_message(conversation_id, generic_message, recipients, precondition_option);
-          });
+      return this.create_recipients(conversation_id, skip_own_clients).then(recipients => {
+        const precondition_option = skip_own_clients ? Object.keys(recipients) : undefined;
+        return this._send_generic_message(conversation_id, generic_message, recipients, precondition_option);
       });
+    });
   }
 
   _send_and_inject_generic_message(conversation_et, generic_message, sync_timestamp = true) {
@@ -1833,14 +1908,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const optimistic_event = z.conversation.EventBuilder.build_message_add(conversation_et, this.time_offset);
         return this.cryptography_repository.cryptography_mapper.map_generic_message(generic_message, optimistic_event);
       })
-      .then((message_mapped) => {
+      .then(message_mapped => {
         if (z.event.EventTypeHandling.STORE.includes(message_mapped.type)) {
           return this.conversation_service.save_event(message_mapped);
         }
 
         return message_mapped;
       })
-      .then((message_stored) => {
+      .then(message_stored => {
         if (generic_message.content === z.cryptography.GENERIC_MESSAGE_TYPE.KNOCK) {
           amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.OUTGOING_PING);
         }
@@ -1848,7 +1923,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         this.on_conversation_event(message_stored, z.event.EventRepository.SOURCE.INJECTED);
 
         return this.send_generic_message_to_conversation(conversation_et.id, generic_message)
-          .then((payload) => {
+          .then(payload => {
             this._track_completed_media_action(conversation_et, generic_message);
 
             const backend_iso_date = sync_timestamp ? payload.time : '';
@@ -1868,7 +1943,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   _update_message_as_sent(conversation_et, event_json, iso_date) {
     return this.get_message_in_conversation_by_id(conversation_et, event_json.id)
-      .then((message_et) => {
+      .then(message_et => {
         const changes = {
           status: z.message.StatusType.SENT,
         };
@@ -1889,7 +1964,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           return this.conversation_service.update_message_in_db(message_et, changes);
         }
       })
-      .catch((error) => {
+      .catch(error => {
         if (error.type !== z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
           throw error;
         }
@@ -1906,22 +1981,33 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {boolean} [native_push=true] - Optional if message should enforce native push
    * @returns {Promise} Resolves after sending the external message
    */
-  _send_external_generic_message(conversation_id, generic_message, recipients, precondition_option, native_push = true) {
+  _send_external_generic_message(
+    conversation_id,
+    generic_message,
+    recipients,
+    precondition_option,
+    native_push = true
+  ) {
     this.logger.info(`Sending external message of type '${generic_message.content}'`, generic_message);
 
-    return z.assets.AssetCrypto.encrypt_aes_asset(generic_message.toArrayBuffer())
+    return z.assets.AssetCrypto
+      .encrypt_aes_asset(generic_message.toArrayBuffer())
       .then(({key_bytes, sha256, cipher_text}) => {
         const generic_message_external = new z.proto.GenericMessage(z.util.create_random_uuid());
-        generic_message_external.set('external', new z.proto.External(new Uint8Array(key_bytes), new Uint8Array(sha256)));
+        generic_message_external.set(
+          'external',
+          new z.proto.External(new Uint8Array(key_bytes), new Uint8Array(sha256))
+        );
 
-        return this.cryptography_repository.encrypt_generic_message(recipients, generic_message_external)
-          .then((payload) => {
+        return this.cryptography_repository
+          .encrypt_generic_message(recipients, generic_message_external)
+          .then(payload => {
             payload.data = z.util.array_to_base64(cipher_text);
             payload.native_push = native_push;
             return this._send_encrypted_message(conversation_id, generic_message, payload, precondition_option);
           });
       })
-      .catch((error) => {
+      .catch(error => {
         this.logger.info('Failed sending external message', error);
         throw error;
       });
@@ -1940,20 +2026,31 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   _send_generic_message(conversation_id, generic_message, recipients, precondition_option, native_push = true) {
     return this._should_send_as_external(conversation_id, generic_message)
-      .then((send_as_external) => {
+      .then(send_as_external => {
         if (send_as_external) {
-          return this._send_external_generic_message(conversation_id, generic_message, recipients, precondition_option, native_push);
+          return this._send_external_generic_message(
+            conversation_id,
+            generic_message,
+            recipients,
+            precondition_option,
+            native_push
+          );
         }
 
-        return this.cryptography_repository.encrypt_generic_message(recipients, generic_message)
-          .then((payload) => {
-            payload.native_push = native_push;
-            return this._send_encrypted_message(conversation_id, generic_message, payload, precondition_option);
-          });
+        return this.cryptography_repository.encrypt_generic_message(recipients, generic_message).then(payload => {
+          payload.native_push = native_push;
+          return this._send_encrypted_message(conversation_id, generic_message, payload, precondition_option);
+        });
       })
-      .catch((error) => {
+      .catch(error => {
         if (error.code === z.service.BackendClientError.STATUS_CODE.REQUEST_TOO_LARGE) {
-          return this._send_external_generic_message(conversation_id, generic_message, recipients, precondition_option, native_push);
+          return this._send_external_generic_message(
+            conversation_id,
+            generic_message,
+            recipients,
+            precondition_option,
+            native_push
+          );
         }
 
         throw error;
@@ -1974,15 +2071,18 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Promise that resolves after sending the encrypted message
    */
   _send_encrypted_message(conversation_id, generic_message, payload, precondition_option = false) {
-    this.logger.info(`Sending encrypted '${generic_message.content}' message to conversation '${conversation_id}'`, payload);
+    this.logger.info(
+      `Sending encrypted '${generic_message.content}' message to conversation '${conversation_id}'`,
+      payload
+    );
 
     return this._grant_outgoing_message(conversation_id, generic_message)
       .then(() => this.conversation_service.post_encrypted_message(conversation_id, payload, precondition_option))
-      .then((response) => {
+      .then(response => {
         this._handle_client_mismatch(conversation_id, response);
         return response;
       })
-      .catch((error) => {
+      .catch(error => {
         if (error.label === z.service.BackendClientError.LABEL.UNKNOWN_CLIENT) {
           this.client_repository.remove_local_client();
         }
@@ -1993,12 +2093,15 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         let updated_payload;
         return this._handle_client_mismatch(conversation_id, error, generic_message, payload)
-          .then((payload_with_missing_clients) => {
+          .then(payload_with_missing_clients => {
             updated_payload = payload_with_missing_clients;
             return this._grant_outgoing_message(conversation_id, generic_message, Object.keys(error.missing));
           })
           .then(() => {
-            this.logger.info(`Sending updated encrypted '${generic_message.content}' message to conversation '${conversation_id}'`, updated_payload);
+            this.logger.info(
+              `Sending updated encrypted '${generic_message.content}' message to conversation '${conversation_id}'`,
+              updated_payload
+            );
             return this.conversation_service.post_encrypted_message(conversation_id, updated_payload, true);
           });
       });
@@ -2009,50 +2112,54 @@ z.conversation.ConversationRepository = class ConversationRepository {
       return Promise.resolve();
     }
 
-    const consent_type = generic_message.content === z.cryptography.GENERIC_MESSAGE_TYPE.CALLING ? z.ViewModel.MODAL_CONSENT_TYPE.OUTGOING_CALL : z.ViewModel.MODAL_CONSENT_TYPE.MESSAGE;
+    const consent_type =
+      generic_message.content === z.cryptography.GENERIC_MESSAGE_TYPE.CALLING
+        ? z.ViewModel.MODAL_CONSENT_TYPE.OUTGOING_CALL
+        : z.ViewModel.MODAL_CONSENT_TYPE.MESSAGE;
     return this.grant_message(conversation_id, consent_type, user_ids);
   }
 
   grant_message(conversation_id, consent_type, user_ids) {
-    return this.get_conversation_by_id(conversation_id)
-      .then((conversation_et) => {
-        const conversation_degraded = conversation_et.verification_state() === z.conversation.ConversationVerificationState.DEGRADED;
+    return this.get_conversation_by_id(conversation_id).then(conversation_et => {
+      const conversation_degraded =
+        conversation_et.verification_state() === z.conversation.ConversationVerificationState.DEGRADED;
 
-        if (!conversation_degraded) {
-          return false;
+      if (!conversation_degraded) {
+        return false;
+      }
+
+      return new Promise((resolve, reject) => {
+        let send_anyway = false;
+
+        if (!user_ids) {
+          user_ids = conversation_et.get_users_with_unverified_clients().map(user_et => user_et.id);
         }
 
-        return new Promise((resolve, reject) => {
-          let send_anyway = false;
+        return this.user_repository.get_users_by_id(user_ids).then(user_ets => {
+          amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.NEW_DEVICE, {
+            action() {
+              send_anyway = true;
+              conversation_et.verification_state(z.conversation.ConversationVerificationState.UNVERIFIED);
 
-          if (!user_ids) {
-            user_ids = conversation_et
-              .get_users_with_unverified_clients()
-              .map((user_et) => user_et.id);
-          }
-
-          return this.user_repository.get_users_by_id(user_ids)
-            .then((user_ets) => {
-              amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.NEW_DEVICE, {
-                action() {
-                  send_anyway = true;
-                  conversation_et.verification_state(z.conversation.ConversationVerificationState.UNVERIFIED);
-
-                  resolve(true);
-                },
-                close() {
-                  if (!send_anyway) {
-                    reject(new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION));
-                  }
-                },
-                data: {
-                  consent_type: consent_type,
-                  user_ets: user_ets,
-                },
-              });
-            });
+              resolve(true);
+            },
+            close() {
+              if (!send_anyway) {
+                reject(
+                  new z.conversation.ConversationError(
+                    z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION
+                  )
+                );
+              }
+            },
+            data: {
+              consent_type: consent_type,
+              user_ets: user_ets,
+            },
+          });
         });
       });
+    });
   }
 
   /**
@@ -2064,14 +2171,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {boolean} Is payload likely to be too big so that we switch to type external?
    */
   _should_send_as_external(conversation_id, generic_message) {
-    return this.get_conversation_by_id(conversation_id)
-      .then((conversation_et) => {
-        const estimated_number_of_clients = conversation_et.number_of_participants() * 4;
-        const message_in_bytes = new Uint8Array(generic_message.toArrayBuffer()).length;
-        const estimated_payload_in_bytes = estimated_number_of_clients * message_in_bytes;
+    return this.get_conversation_by_id(conversation_id).then(conversation_et => {
+      const estimated_number_of_clients = conversation_et.number_of_participants() * 4;
+      const message_in_bytes = new Uint8Array(generic_message.toArrayBuffer()).length;
+      const estimated_payload_in_bytes = estimated_number_of_clients * message_in_bytes;
 
-        return (estimated_payload_in_bytes / 1024) > 200;
-      });
+      return estimated_payload_in_bytes / 1024 > 200;
+    });
   }
 
   /**
@@ -2083,7 +2189,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   upload_images(conversation_et, images) {
     if (this._can_upload_assets_to_conversation(conversation_et)) {
-      [...images].forEach((image) => this.send_image_asset(conversation_et, image));
+      [...images].forEach(image => this.send_image_asset(conversation_et, image));
     }
   }
 
@@ -2096,7 +2202,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   upload_files(conversation_et, files) {
     if (this._can_upload_assets_to_conversation(conversation_et)) {
-      [...files].forEach((file) => this.upload_file(conversation_et, file));
+      [...files].forEach(file => this.upload_file(conversation_et, file));
     }
   }
 
@@ -2113,12 +2219,15 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const upload_started = Date.now();
     const tracking_data = {
       size_bytes: file.size,
-      size_mb: z.util.bucket_values((file.size / 1024 / 1024), [0, 5, 10, 15, 20, 25]),
+      size_mb: z.util.bucket_values(file.size / 1024 / 1024, [0, 5, 10, 15, 20, 25]),
       type: z.util.get_file_extension(file.name),
     };
     const conversation_type = z.tracking.helpers.get_conversation_type(conversation_et);
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_INITIATED,
-      $.extend(tracking_data, {conversation_type}));
+    amplify.publish(
+      z.event.WebApp.ANALYTICS.EVENT,
+      z.tracking.EventName.FILE.UPLOAD_INITIATED,
+      $.extend(tracking_data, {conversation_type})
+    );
 
     return this.send_asset_metadata(conversation_et, file)
       .then(({id}) => {
@@ -2130,21 +2239,23 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const upload_duration = (Date.now() - upload_started) / 1000;
 
         this.logger.info(`Finished to upload asset for conversation'${conversation_et.id} in ${upload_duration}`);
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_SUCCESSFUL,
-          $.extend(tracking_data, {time: upload_duration}));
+        amplify.publish(
+          z.event.WebApp.ANALYTICS.EVENT,
+          z.tracking.EventName.FILE.UPLOAD_SUCCESSFUL,
+          $.extend(tracking_data, {time: upload_duration})
+        );
       })
-      .catch((error) => {
+      .catch(error => {
         if (error.type === z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
           throw error;
         }
 
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_FAILED, tracking_data);
         this.logger.error(`Failed to upload asset for conversation '${conversation_et.id}': ${error.message}`, error);
-        return this.get_message_in_conversation_by_id(conversation_et, message_id)
-          .then((message_et) => {
-            this.send_asset_upload_failed(conversation_et, message_et.id);
-            return this.update_message_as_upload_failed(message_et);
-          });
+        return this.get_message_in_conversation_by_id(conversation_et, message_id).then(message_et => {
+          this.send_asset_upload_failed(conversation_et, message_et.id);
+          return this.update_message_as_upload_failed(message_et);
+        });
       });
   }
 
@@ -2167,8 +2278,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
         generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.DELETED, new z.proto.MessageDelete(message_et.id));
 
         return this.sending_queue.push(() => {
-          return this.create_recipients(conversation_et.id, false, precondition_option)
-            .then((recipients) => this._send_generic_message(conversation_et.id, generic_message, recipients, precondition_option));
+          return this.create_recipients(conversation_et.id, false, precondition_option).then(recipients =>
+            this._send_generic_message(conversation_et.id, generic_message, recipients, precondition_option)
+          );
         });
       })
       .then(() => this._track_delete_message(conversation_et, message_et, z.tracking.attribute.DeleteType.EVERYWHERE))
@@ -2176,8 +2288,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
         amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, message_et.id);
         return this._delete_message_by_id(conversation_et, message_et.id);
       })
-      .catch((error) => {
-        this.logger.info(`Failed to send delete message for everyone with id '${message_et.id}' for conversation '${conversation_et.id}'`, error);
+      .catch(error => {
+        this.logger.info(
+          `Failed to send delete message for everyone with id '${message_et.id}' for conversation '${conversation_et.id}'`,
+          error
+        );
         throw error;
       });
   }
@@ -2193,7 +2308,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return Promise.resolve()
       .then(() => {
         const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
-        generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.HIDDEN, new z.proto.MessageHide(conversation_et.id, message_et.id));
+        generic_message.set(
+          z.cryptography.GENERIC_MESSAGE_TYPE.HIDDEN,
+          new z.proto.MessageHide(conversation_et.id, message_et.id)
+        );
 
         return this.send_generic_message_to_conversation(this.self_conversation().id, generic_message);
       })
@@ -2202,8 +2320,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
         amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, message_et.id);
         return this._delete_message_by_id(conversation_et, message_et.id);
       })
-      .catch((error) => {
-        this.logger.info(`Failed to send delete message with id '${message_et.id}' for conversation '${conversation_et.id}'`, error);
+      .catch(error => {
+        this.logger.info(
+          `Failed to send delete message with id '${message_et.id}' for conversation '${conversation_et.id}'`,
+          error
+        );
         throw error;
       });
   }
@@ -2223,7 +2344,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
         break;
       case z.message.EphemeralStatusType.INACTIVE:
         message_et.start_ephemeral_timer();
-        this.conversation_service.update_message_in_db(message_et, {ephemeral_expires: message_et.ephemeral_expires(), ephemeral_started: message_et.ephemeral_started()});
+        this.conversation_service.update_message_in_db(message_et, {
+          ephemeral_expires: message_et.ephemeral_expires(),
+          ephemeral_started: message_et.ephemeral_started(),
+        });
         break;
       default:
         this.logger.warn(`Ephemeral message of unsupported type: ${message_et.type}`);
@@ -2232,36 +2356,35 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   timeout_ephemeral_message(message_et) {
     if (!message_et.is_expired()) {
-      this.get_conversation_by_id(message_et.conversation_id)
-        .then((conversation_et) => {
-          if (message_et.user().is_me) {
-            switch (false) {
-              case !message_et.has_asset_text():
-                return this._obfuscate_text_message(conversation_et, message_et.id);
-              case !message_et.is_ping():
-                return this._obfuscate_ping_message(conversation_et, message_et.id);
-              case !message_et.has_asset():
-                return this._obfuscate_asset_message(conversation_et, message_et.id);
-              case !message_et.has_asset_image():
-                return this._obfuscate_image_message(conversation_et, message_et.id);
-              default:
-                return this.logger.warn(`Ephemeral message of unsupported type: ${message_et.type}`);
-            }
+      this.get_conversation_by_id(message_et.conversation_id).then(conversation_et => {
+        if (message_et.user().is_me) {
+          switch (false) {
+            case !message_et.has_asset_text():
+              return this._obfuscate_text_message(conversation_et, message_et.id);
+            case !message_et.is_ping():
+              return this._obfuscate_ping_message(conversation_et, message_et.id);
+            case !message_et.has_asset():
+              return this._obfuscate_asset_message(conversation_et, message_et.id);
+            case !message_et.has_asset_image():
+              return this._obfuscate_image_message(conversation_et, message_et.id);
+            default:
+              return this.logger.warn(`Ephemeral message of unsupported type: ${message_et.type}`);
           }
+        }
 
-          if (conversation_et.is_group()) {
-            const user_ids = _.union([this.user_repository.self().id], [message_et.from]);
-            return this.delete_message_everyone(conversation_et, message_et, user_ids);
-          }
+        if (conversation_et.is_group()) {
+          const user_ids = _.union([this.user_repository.self().id], [message_et.from]);
+          return this.delete_message_everyone(conversation_et, message_et, user_ids);
+        }
 
-          return this.delete_message_everyone(conversation_et, message_et);
-        });
+        return this.delete_message_everyone(conversation_et, message_et);
+      });
     }
   }
 
   _obfuscate_asset_message(conversation_et, message_id) {
     return this.get_message_in_conversation_by_id(conversation_et, message_id)
-      .then((message_et) => {
+      .then(message_et => {
         const asset = message_et.get_first_asset();
         message_et.ephemeral_expires(true);
 
@@ -2283,7 +2406,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   _obfuscate_image_message(conversation_et, message_id) {
     return this.get_message_in_conversation_by_id(conversation_et, message_id)
-      .then((message_et) => {
+      .then(message_et => {
         const asset = message_et.get_first_asset();
         message_et.ephemeral_expires(true);
 
@@ -2306,15 +2429,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   _obfuscate_text_message(conversation_et, message_id) {
     return this.get_message_in_conversation_by_id(conversation_et, message_id)
-      .then((message_et) => {
+      .then(message_et => {
         const asset = message_et.get_first_asset();
         const obfuscated_asset = new z.entity.Text(message_et.id);
-        const obfuscated_previews = asset.previews()
-          .map((link_preview) => {
-            link_preview.obfuscate();
-            const article = new z.proto.Article(link_preview.url, link_preview.title); // deprecated format
-            return new z.proto.LinkPreview(link_preview.url, 0, article, link_preview.url, link_preview.title).encode64();
-          });
+        const obfuscated_previews = asset.previews().map(link_preview => {
+          link_preview.obfuscate();
+          const article = new z.proto.Article(link_preview.url, link_preview.title); // deprecated format
+          return new z.proto.LinkPreview(link_preview.url, 0, article, link_preview.url, link_preview.title).encode64();
+        });
 
         obfuscated_asset.text = z.util.StringUtil.obfuscate(asset.text);
         obfuscated_asset.previews(asset.previews());
@@ -2338,7 +2460,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   _obfuscate_ping_message(conversation_et, message_id) {
     return this.get_message_in_conversation_by_id(conversation_et, message_id)
-      .then((message_et) => {
+      .then(message_et => {
         message_et.ephemeral_expires(true);
         return this.conversation_service.update_message_in_db(message_et, {ephemeral_expires: true});
       })
@@ -2369,9 +2491,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {number} Number of pending uploads
    */
   get_number_of_pending_uploads() {
-    return this.conversations().reduce((sum, conversation_et) => sum + conversation_et.get_number_of_pending_uploads(), 0);
+    return this.conversations().reduce(
+      (sum, conversation_et) => sum + conversation_et.get_number_of_pending_uploads(),
+      0
+    );
   }
-
 
   //##############################################################################
   // Event callbacks
@@ -2390,7 +2514,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
 
     const {conversation: conversation_id, type} = event_json;
-    this.logger.info(`»» Conversation Event: '${type}' (Source: ${source})`, {event_json: JSON.stringify(event_json), event_object: event_json});
+    this.logger.info(`»» Conversation Event: '${type}' (Source: ${source})`, {
+      event_json: JSON.stringify(event_json),
+      event_object: event_json,
+    });
 
     // Handle conversation create event separately
     if (type === z.event.Backend.CONVERSATION.CREATE) {
@@ -2400,7 +2527,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     // Check if conversation was archived
     let previously_archived;
     return this.get_conversation_by_id(conversation_id)
-      .then((conversation_et) => {
+      .then(conversation_et => {
         previously_archived = conversation_et.is_archived();
 
         const is_backend_timestamp = source !== z.event.EventRepository.SOURCE.INJECTED;
@@ -2455,7 +2582,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           if (previously_archived) {
             // Add to check for unarchive at the end of stream handling
             if (event_from_stream) {
-              return this.conversations_with_new_events[conversation_et.id] = conversation_et;
+              return (this.conversations_with_new_events[conversation_et.id] = conversation_et);
             }
 
             if (event_from_web_socket && conversation_et.should_unarchive()) {
@@ -2472,8 +2599,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   on_missed_events() {
     this.filtered_conversations()
-      .filter((conversation_et) => !conversation_et.removed_from_conversation())
-      .forEach((conversation_et) => {
+      .filter(conversation_et => !conversation_et.removed_from_conversation())
+      .forEach(conversation_et => {
         const missed_event = z.conversation.EventBuilder.build_missed(conversation_et, this.time_offset);
         amplify.publish(z.event.WebApp.EVENT.INJECT, missed_event);
       });
@@ -2486,15 +2613,19 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   push_to_receiving_queue(event_json, source) {
-    this.receiving_queue.push(() => this.on_conversation_event(event_json, source))
+    this.receiving_queue
+      .push(() => this.on_conversation_event(event_json, source))
       .then(() => {
         if (this.init_promise) {
           const event_from_stream = source === z.event.EventRepository.SOURCE.STREAM;
           if (event_from_stream) {
             this.init_handled = this.init_handled + 1;
-            if ((this.init_handled % 5) === 0 || this.init_handled < 5) {
+            if (this.init_handled % 5 === 0 || this.init_handled < 5) {
               const progress = this.init_handled / this.init_total * 20 + 75;
-              amplify.publish(z.event.WebApp.APP.UPDATE_PROGRESS, progress, z.string.init_events_progress, [this.init_handled, this.init_total]);
+              amplify.publish(z.event.WebApp.APP.UPDATE_PROGRESS, progress, z.string.init_events_progress, [
+                this.init_handled,
+                this.init_total,
+              ]);
             }
           }
 
@@ -2504,7 +2635,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           }
         }
       })
-      .catch((error) => {
+      .catch(error => {
         if (this.init_promise) {
           this.init_promise.reject_fn(error);
           this.init_promise = undefined;
@@ -2523,8 +2654,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when event was handled
    */
   _on_add_event(conversation_et, event_json) {
-    return this._add_event_to_conversation(event_json, conversation_et)
-      .then((message_et) => ({conversation_et: conversation_et, message_et: message_et}));
+    return this._add_event_to_conversation(event_json, conversation_et).then(message_et => ({
+      conversation_et: conversation_et,
+      message_et: message_et,
+    }));
   }
 
   /**
@@ -2537,8 +2670,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   _on_asset_upload_complete(conversation_et, event_json) {
     return this.get_message_in_conversation_by_id(conversation_et, event_json.id)
-      .then((message_et) => this.update_message_as_upload_complete(conversation_et, message_et, event_json))
-      .catch((error) => {
+      .then(message_et => this.update_message_as_upload_complete(conversation_et, message_et, event_json))
+      .catch(error => {
         if (error.type !== z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
           throw error;
         }
@@ -2559,16 +2692,19 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const event_data = event_json.data;
 
     return this.get_message_in_conversation_by_id(conversation_et, event_data.message_id)
-      .then((message_et) => {
+      .then(message_et => {
         const was_updated = message_et.update_status(event_data.status);
 
         if (was_updated) {
           return this.conversation_service.update_message_in_db(message_et, {status: message_et.status()});
         }
       })
-      .catch((error) => {
+      .catch(error => {
         if (error.type !== z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
-          this.logger.info(`Failed to handle status update of a message in conversation '${conversation_et.id}'`, error);
+          this.logger.info(
+            `Failed to handle status update of a message in conversation '${conversation_et.id}'`,
+            error
+          );
           throw error;
         }
       });
@@ -2583,7 +2719,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   _on_create(event_json) {
     return this.find_conversation_by_id(event_json.conversation)
-      .catch((error) => {
+      .catch(error => {
         if (error.type !== z.conversation.ConversationError.TYPE.NOT_FOUND) {
           throw error;
         }
@@ -2593,9 +2729,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const initial_timestamp = _.isNaN(event_timestamp) ? this.get_latest_event_timestamp() : event_timestamp;
         return this.map_conversations(event_data, initial_timestamp);
       })
-      .then((conversation_et) => this.update_participating_user_ets(conversation_et))
-      .then((conversation_et) => this.save_conversation(conversation_et))
-      .then((conversation_et) => this._prepare_conversation_create_notification(conversation_et));
+      .then(conversation_et => this.update_participating_user_ets(conversation_et))
+      .then(conversation_et => this.save_conversation(conversation_et))
+      .then(conversation_et => this._prepare_conversation_create_notification(conversation_et));
   }
 
   /**
@@ -2615,7 +2751,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     const event_data = event_json.data;
 
-    event_data.user_ids.forEach((user_id) => {
+    event_data.user_ids.forEach(user_id => {
       if (user_id !== this.user_repository.self().id && !conversation_et.participating_user_ids().includes(user_id)) {
         conversation_et.participating_user_ids.push(user_id);
       }
@@ -2629,7 +2765,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     return this.update_participating_user_ets(conversation_et)
       .then(() => this._add_event_to_conversation(event_json, conversation_et))
-      .then((message_et) => {
+      .then(message_et => {
         this.verification_state_handler.on_member_joined(conversation_et, event_data.user_ids);
         return {conversation_et: conversation_et, message_et: message_et};
       });
@@ -2655,16 +2791,21 @@ z.conversation.ConversationRepository = class ConversationRepository {
       conversation_et.status(z.conversation.ConversationStatus.PAST_MEMBER);
 
       if (conversation_et.call()) {
-        amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, conversation_et.id, z.calling.enum.TERMINATION_REASON.MEMBER_LEAVE);
+        amplify.publish(
+          z.event.WebApp.CALL.STATE.LEAVE,
+          conversation_et.id,
+          z.calling.enum.TERMINATION_REASON.MEMBER_LEAVE
+        );
       }
     }
 
     if (!self_leaving_cleared_conversation) {
       return this._add_event_to_conversation(event_json, conversation_et)
-        .then((message_et) => {
-          message_et.user_ets()
-            .filter((user_et) => !user_et.is_me)
-            .forEach((user_et) => {
+        .then(message_et => {
+          message_et
+            .user_ets()
+            .filter(user_et => !user_et.is_me)
+            .forEach(user_et => {
               conversation_et.participating_user_ids.remove(user_et.id);
 
               if (conversation_et.call()) {
@@ -2674,7 +2815,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
           return this.update_participating_user_ets(conversation_et).then(() => message_et);
         })
-        .then((message_et) => {
+        .then(message_et => {
           this.verification_state_handler.on_member_left(conversation_et);
 
           if (is_from_self && conversation_et.removed_from_conversation()) {
@@ -2737,12 +2878,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         return event_json;
       })
-      .then((updated_event_json) => {
+      .then(updated_event_json => {
         if (updated_event_json) {
           return this._on_add_event(conversation_et, updated_event_json);
         }
       })
-      .catch((error) => {
+      .catch(error => {
         if (error.type !== z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
           throw error;
         }
@@ -2760,8 +2901,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
   _on_asset_add(conversation_et, event_json) {
     const {data: event_data, id: event_id} = event_json;
 
-    return this.conversation_service.load_event_from_db(conversation_et.id, event_id)
-      .then((stored_event) => {
+    return this.conversation_service
+      .load_event_from_db(conversation_et.id, event_id)
+      .then(stored_event => {
         if (stored_event) {
           // Ignore redundant event
           if (_.isEqual(stored_event, event_json)) {
@@ -2769,11 +2911,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
           }
 
           if (event_data.status === z.assets.AssetTransferState.UPLOAD_FAILED) {
-            const from_self = (event_json.from === this.user_repository.self().id);
-            const upload_failed = (event_data.reason === z.assets.AssetUploadFailedReason.FAILED);
+            const from_self = event_json.from === this.user_repository.self().id;
+            const upload_failed = event_data.reason === z.assets.AssetUploadFailedReason.FAILED;
 
             if (from_self && upload_failed) {
-              return this.conversation_service.update_asset_as_failed_in_db(stored_event.primary_key, event_data.reason);
+              return this.conversation_service.update_asset_as_failed_in_db(
+                stored_event.primary_key,
+                event_data.reason
+              );
             }
 
             return this._delete_message_by_id(conversation_et, event_json.id).then(() => undefined);
@@ -2789,17 +2934,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         return this.conversation_service.save_event(event_json);
       })
-      .then((event) => {
+      .then(event => {
         if (event) {
           conversation_et.remove_message_by_id(event_json.id);
 
-          return this._on_add_event(conversation_et, event)
-            .then(({message_et}) => {
-              const first_asset = message_et.get_first_asset();
-              if (first_asset.is_image() || first_asset.status() === z.assets.AssetTransferState.UPLOADED) {
-                return {conversation_et: conversation_et, message_et: message_et};
-              }
-            });
+          return this._on_add_event(conversation_et, event).then(({message_et}) => {
+            const first_asset = message_et.get_first_asset();
+            if (first_asset.is_image() || first_asset.status() === z.assets.AssetTransferState.UPLOADED) {
+              return {conversation_et: conversation_et, message_et: message_et};
+            }
+          });
         }
       });
   }
@@ -2816,7 +2960,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const {data: event_data, from, id: event_id, time} = event_json;
 
     return this.get_message_in_conversation_by_id(conversation_et, event_data.message_id)
-      .then((message_to_delete_et) => {
+      .then(message_to_delete_et => {
         if (message_to_delete_et.ephemeral_expires()) {
           return;
         }
@@ -2835,7 +2979,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, event_data.message_id);
         return this._delete_message_by_id(conversation_et, event_data.message_id);
       })
-      .catch((error) => {
+      .catch(error => {
         if (error.type !== z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
           this.logger.info(`Failed to delete message for conversation '${conversation_et.id}'`, error);
           throw error;
@@ -2859,12 +3003,15 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
 
     return this.get_conversation_by_id(event_data.conversation_id)
-      .then((conversation_et) => {
+      .then(conversation_et => {
         amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, event_data.message_id);
         return this._delete_message_by_id(conversation_et, event_data.message_id);
       })
-      .catch((error) => {
-        this.logger.info(`Failed to delete message '${event_data.message_id}' for conversation '${event_data.conversation_id}'`, error);
+      .catch(error => {
+        this.logger.info(
+          `Failed to delete message '${event_data.message_id}' for conversation '${event_data.conversation_id}'`,
+          error
+        );
         throw error;
       });
   }
@@ -2881,28 +3028,36 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const event_data = event_json.data;
 
     return this.get_message_in_conversation_by_id(conversation_et, event_data.message_id)
-      .then((message_et) => {
+      .then(message_et => {
         if (!message_et || !message_et.is_content()) {
           const type = message_et ? message_et.type : 'unknown';
 
-          this.logger.error(`Message '${event_data.message_id}' in conversation '${conversation_et.id}' is of reactable type '${type}'`, message_et);
+          this.logger.error(
+            `Message '${event_data.message_id}' in conversation '${conversation_et.id}' is of reactable type '${type}'`,
+            message_et
+          );
           throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_TYPE);
         }
 
         const changes = message_et.update_reactions(event_json);
         if (changes) {
-          this.logger.debug(`Updating reactions to message '${event_data.message_id}' in conversation '${conversation_et.id}'`, event_json);
+          this.logger.debug(
+            `Updating reactions to message '${event_data.message_id}' in conversation '${conversation_et.id}'`,
+            event_json
+          );
 
-          return this._update_user_ets(message_et)
-            .then((updated_message_et) => {
-              this.conversation_service.update_message_in_db(updated_message_et, changes, conversation_et.id);
-              return this._prepare_reaction_notification(conversation_et, updated_message_et, event_json);
-            });
+          return this._update_user_ets(message_et).then(updated_message_et => {
+            this.conversation_service.update_message_in_db(updated_message_et, changes, conversation_et.id);
+            return this._prepare_reaction_notification(conversation_et, updated_message_et, event_json);
+          });
         }
       })
-      .catch((error) => {
+      .catch(error => {
         if (error.type !== z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
-          this.logger.error(`Failed to handle reaction to message '${event_data.message_id}' in conversation '${conversation_et.id}'`, {error, event: event_json});
+          this.logger.error(
+            `Failed to handle reaction to message '${event_data.message_id}' in conversation '${conversation_et.id}'`,
+            {error, event: event_json}
+          );
           throw error;
         }
       });
@@ -2917,13 +3072,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when the event was handled
    */
   _on_rename(conversation_et, event_json) {
-    return this._add_event_to_conversation(event_json, conversation_et)
-      .then((message_et) => {
-        this.conversation_mapper.update_properties(conversation_et, event_json.data);
-        return {conversation_et: conversation_et, message_et: message_et};
-      });
+    return this._add_event_to_conversation(event_json, conversation_et).then(message_et => {
+      this.conversation_mapper.update_properties(conversation_et, event_json.data);
+      return {conversation_et: conversation_et, message_et: message_et};
+    });
   }
-
 
   //##############################################################################
   // Private
@@ -2940,12 +3093,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
   _add_event_to_conversation(json, conversation_et) {
     return Promise.resolve()
       .then(() => this.event_mapper.map_json_event(json, conversation_et, true))
-      .then((message_et) => {
+      .then(message_et => {
         if (message_et) {
           return this._update_user_ets(message_et);
         }
       })
-      .then((message_et) => {
+      .then(message_et => {
         if (conversation_et && message_et) {
           conversation_et.add_message(message_et);
         }
@@ -2967,9 +3120,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return Promise.resolve()
       .then(() => {
         const message_ets = this.event_mapper.map_json_events(events, conversation_et, true);
-        return Promise.all(message_ets.map((message_et) => this._update_user_ets(message_et)));
+        return Promise.all(message_ets.map(message_et => this._update_user_ets(message_et)));
       })
-      .then((message_ets) => {
+      .then(message_ets => {
         if (prepend && conversation_et.messages().length) {
           conversation_et.prepend_messages(message_ets);
         } else {
@@ -3002,13 +3155,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when the notification was prepared
    */
   _prepare_conversation_create_notification(conversation_et) {
-    return this.user_repository.get_user_by_id(conversation_et.creator)
-      .then((user_et) => {
-        const message_et = new z.entity.MemberMessage();
-        message_et.user(user_et);
-        message_et.member_message_type = z.message.SystemMessageType.CONVERSATION_CREATE;
-        return {conversation_et: conversation_et, message_et: message_et};
-      });
+    return this.user_repository.get_user_by_id(conversation_et.creator).then(user_et => {
+      const message_et = new z.entity.MemberMessage();
+      message_et.user(user_et);
+      message_et.member_message_type = z.message.SystemMessageType.CONVERSATION_CREATE;
+      return {conversation_et: conversation_et, message_et: message_et};
+    });
   }
 
   /**
@@ -3024,13 +3176,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const {data: event_data, from} = event_json;
 
     if (event_data.reaction && message_et.from === this.user_repository.self().id) {
-      return this.user_repository.get_user_by_id(from)
-        .then((user_et) => {
-          const reaction_message_et = new z.entity.Message(message_et.id, z.message.SuperType.REACTION);
-          reaction_message_et.user(user_et);
-          reaction_message_et.reaction = event_data.reaction;
-          return {conversation_et: conversation_et, message_et: reaction_message_et};
-        });
+      return this.user_repository.get_user_by_id(from).then(user_et => {
+        const reaction_message_et = new z.entity.Message(message_et.id, z.message.SuperType.REACTION);
+        reaction_message_et.user(user_et);
+        reaction_message_et.reaction = event_data.reaction;
+        return {conversation_et: conversation_et, message_et: reaction_message_et};
+      });
     }
 
     return Promise.resolve({conversation_et: conversation_et});
@@ -3044,41 +3195,38 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when users have been update
    */
   _update_user_ets(message_et) {
-    return this.user_repository.get_user_by_id(message_et.from)
-      .then((user_et) => {
-        message_et.user(user_et);
+    return this.user_repository.get_user_by_id(message_et.from).then(user_et => {
+      message_et.user(user_et);
 
-        if (message_et.is_member() || message_et.user_ets) {
-          return this.user_repository.get_users_by_id(message_et.user_ids())
-            .then((user_ets) => {
-              message_et.user_ets(user_ets);
-              return message_et;
-            });
-        }
+      if (message_et.is_member() || message_et.user_ets) {
+        return this.user_repository.get_users_by_id(message_et.user_ids()).then(user_ets => {
+          message_et.user_ets(user_ets);
+          return message_et;
+        });
+      }
 
-        if (message_et.reactions) {
-          const user_ids = Object.keys(message_et.reactions());
+      if (message_et.reactions) {
+        const user_ids = Object.keys(message_et.reactions());
 
-          message_et.reactions_user_ets.removeAll();
-          if (user_ids.length) {
-            return this.user_repository.get_users_by_id(user_ids)
-              .then((user_ets) => {
-                message_et.reactions_user_ets(user_ets);
-                return message_et;
-              });
-          }
-        }
-
-        if (message_et.has_asset_text()) {
-          message_et.assets().forEach((asset_et) => {
-            if (asset_et.is_text()) {
-              asset_et.theme_color = message_et.user().accent_color();
-            }
+        message_et.reactions_user_ets.removeAll();
+        if (user_ids.length) {
+          return this.user_repository.get_users_by_id(user_ids).then(user_ets => {
+            message_et.reactions_user_ets(user_ets);
+            return message_et;
           });
         }
+      }
 
-        return message_et;
-      });
+      if (message_et.has_asset_text()) {
+        message_et.assets().forEach(asset_et => {
+          if (asset_et.is_text()) {
+            asset_et.theme_color = message_et.user().accent_color();
+          }
+        });
+      }
+
+      return message_et;
+    });
   }
 
   /**
@@ -3087,7 +3235,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   cancel_asset_upload(message_et) {
-    this.send_asset_upload_failed(this.active_conversation(), message_et.id, z.assets.AssetUploadFailedReason.CANCELLED);
+    this.send_asset_upload_failed(
+      this.active_conversation(),
+      message_et.id,
+      z.assets.AssetUploadFailedReason.CANCELLED
+    );
   }
 
   /**
@@ -3105,10 +3257,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(() => {
         return this._handle_client_mismatch_redundant(client_mismatch.redundant, payload, conversation_id);
       })
-      .then((updated_payload) => {
+      .then(updated_payload => {
         return this._handle_client_mismatch_deleted(client_mismatch.deleted, updated_payload);
       })
-      .then((updated_payload) => {
+      .then(updated_payload => {
         return this._handle_client_mismatch_missing(client_mismatch.missing, updated_payload, generic_message);
       });
   }
@@ -3136,17 +3288,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
       return this.user_repository.remove_client_from_user(user_id, client_id);
     };
 
-    const _remove_deleted_user = (user_id) => {
+    const _remove_deleted_user = user_id => {
       if (payload && !Object.keys(payload.recipients[user_id]).length) {
         delete payload.recipients[user_id];
       }
     };
 
-    return Promise.all(this._map_recipients(recipients, _remove_deleted_client, _remove_deleted_user))
-      .then(() => {
-        this.verification_state_handler.on_client_removed(Object.keys(recipients));
-        return payload;
-      });
+    return Promise.all(this._map_recipients(recipients, _remove_deleted_client, _remove_deleted_user)).then(() => {
+      this.verification_state_handler.on_client_removed(Object.keys(recipients));
+      return payload;
+    });
   }
 
   /**
@@ -3164,8 +3315,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
     this.logger.debug(`Message is missing clients of '${Object.keys(recipients).length}' users`, recipients);
 
-    return this.cryptography_repository.encrypt_generic_message(recipients, generic_message, payload)
-      .then((updated_payload) => {
+    return this.cryptography_repository
+      .encrypt_generic_message(recipients, generic_message, payload)
+      .then(updated_payload => {
         payload = updated_payload;
 
         const _add_missing_client = (user_id, client_id) => {
@@ -3200,12 +3352,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.logger.debug(`Message contains redundant clients of '${Object.keys(recipients).length}' users`, recipients);
 
     return this.get_conversation_by_id(conversation_id)
-      .catch((error) => {
+      .catch(error => {
         if (error.type !== z.conversation.ConversationError.TYPE.NOT_FOUND) {
           throw error;
         }
       })
-      .then((conversation_et) => {
+      .then(conversation_et => {
         const _remove_redundant_client = function(user_id, client_id) {
           if (payload) {
             delete payload.recipients[user_id][client_id];
@@ -3222,14 +3374,15 @@ z.conversation.ConversationRepository = class ConversationRepository {
           }
         };
 
-        return Promise.all(this._map_recipients(recipients, _remove_redundant_client, _remove_redundant_user))
-          .then(() => {
-            if (conversation_et) {
-              this.update_participating_user_ets(conversation_et);
-            }
+        return Promise.all(
+          this._map_recipients(recipients, _remove_redundant_client, _remove_redundant_user)
+        ).then(() => {
+          if (conversation_et) {
+            this.update_participating_user_ets(conversation_et);
+          }
 
-            return payload;
-          });
+          return payload;
+        });
       });
   }
 
@@ -3288,7 +3441,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const delete_event = z.conversation.EventBuilder.build_delete(conversation_id, message_id, time, message_et);
     amplify.publish(z.event.WebApp.EVENT.INJECT, delete_event);
   }
-
 
   //##############################################################################
   // Message updates
@@ -3358,24 +3510,26 @@ z.conversation.ConversationRepository = class ConversationRepository {
   _update_edited_message(conversation_et, event_json) {
     const {data: event_data, from, id, time} = event_json;
 
-    return this.get_message_in_conversation_by_id(conversation_et, event_data.replacing_message_id)
-      .then((original_message_et) => {
-        const from_original_user = from === original_message_et.from;
-        if (!from_original_user) {
-          throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_USER);
-        }
+    return this.get_message_in_conversation_by_id(
+      conversation_et,
+      event_data.replacing_message_id
+    ).then(original_message_et => {
+      const from_original_user = from === original_message_et.from;
+      if (!from_original_user) {
+        throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_USER);
+      }
 
-        if (!original_message_et.timestamp()) {
-          throw new TypeError('Missing timestamp');
-        }
+      if (!original_message_et.timestamp()) {
+        throw new TypeError('Missing timestamp');
+      }
 
-        event_json.edited_time = time;
-        event_json.time = new Date(original_message_et.timestamp()).toISOString();
-        this._delete_message_by_id(conversation_et, id);
-        this._delete_message_by_id(conversation_et, event_data.replacing_message_id);
-        this.conversation_service.save_event(event_json);
-        return event_json;
-      });
+      event_json.edited_time = time;
+      event_json.time = new Date(original_message_et.timestamp()).toISOString();
+      this._delete_message_by_id(conversation_et, id);
+      this._delete_message_by_id(conversation_et, event_data.replacing_message_id);
+      this.conversation_service.save_event(event_json);
+      return event_json;
+    });
   }
 
   /**
@@ -3387,15 +3541,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves with the updated event_json
    */
   _update_link_preview(conversation_et, event_json) {
-    return this.conversation_service.load_event_from_db(conversation_et.id, event_json.id)
-      .then((stored_message) => {
-        if (stored_message) {
-          this._delete_message(conversation_et, stored_message);
-        }
-        return event_json;
-      });
+    return this.conversation_service.load_event_from_db(conversation_et.id, event_json.id).then(stored_message => {
+      if (stored_message) {
+        this._delete_message(conversation_et, stored_message);
+      }
+      return event_json;
+    });
   }
-
 
   //##############################################################################
   // Tracking helpers

@@ -47,7 +47,7 @@ z.util.Statistics = {
       return deviation * deviation;
     });
 
-    return (Math.sqrt(z.util.Statistics.average(squared_deviations))).toFixed(2);
+    return Math.sqrt(z.util.Statistics.average(squared_deviations)).toFixed(2);
   },
   /**
    * Calculates the sum of all value within an array.

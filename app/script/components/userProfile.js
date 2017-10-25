@@ -101,7 +101,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
     this.confirm_dialog = undefined;
 
     // tabs
-    this.click_on_tab = (index) => this.tab_index(index);
+    this.click_on_tab = index => this.tab_index(index);
     this.tab_index = ko.observable(0);
     this.tab_index.subscribe(this.on_tab_index_changed.bind(this));
 
@@ -135,8 +135,9 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
       if (this.selected_device()) {
         this.fingerprint_local(this.cryptography_repository.get_local_fingerprint());
         this.fingerprint_remote('');
-        this.cryptography_repository.get_remote_fingerprint(this.user().id, this.selected_device().id)
-          .then((fingerprint) => this.fingerprint_remote(fingerprint));
+        this.cryptography_repository
+          .get_remote_fingerprint(this.user().id, this.selected_device().id)
+          .then(fingerprint => this.fingerprint_remote(fingerprint));
       }
     });
 
@@ -171,16 +172,15 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
             this.user_repository.cancel_connection_request(this.user());
           }
 
-          this.conversation_repository.get_1to1_conversation(this.user())
-            .then((conversation_et) => {
-              if (this.conversation_repository.is_active_conversation(conversation_et)) {
-                amplify.publish(z.event.WebApp.CONVERSATION.PEOPLE.HIDE);
-                const next_conversation_et = this.conversation_repository.get_next_conversation(conversation_et);
-                window.setTimeout(function() {
-                  amplify.publish(z.event.WebApp.CONVERSATION.SHOW, next_conversation_et);
-                }, SHOW_CONVERSATION_DELAY);
-              }
-            });
+          this.conversation_repository.get_1to1_conversation(this.user()).then(conversation_et => {
+            if (this.conversation_repository.is_active_conversation(conversation_et)) {
+              amplify.publish(z.event.WebApp.CONVERSATION.PEOPLE.HIDE);
+              const next_conversation_et = this.conversation_repository.get_next_conversation(conversation_et);
+              window.setTimeout(function() {
+                amplify.publish(z.event.WebApp.CONVERSATION.SHOW, next_conversation_et);
+              }, SHOW_CONVERSATION_DELAY);
+            }
+          });
 
           if (typeof params.cancel_request === 'function') {
             params.cancel_request(this.user());
@@ -196,23 +196,23 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
     this.on_open = () => {
       amplify.publish(z.event.WebApp.CONVERSATION.PEOPLE.HIDE);
 
-      this.conversation_repository.get_1to1_conversation(this.user())
-        .then((conversation_et) => {
-          if (conversation_et.is_archived()) {
-            this.conversation_repository.unarchive_conversation(conversation_et);
-          }
+      this.conversation_repository.get_1to1_conversation(this.user()).then(conversation_et => {
+        if (conversation_et.is_archived()) {
+          this.conversation_repository.unarchive_conversation(conversation_et);
+        }
 
-          window.setTimeout(() => {
-            amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversation_et);
-            if (typeof params.open === 'function') {
-              params.open(this.user());
-            }
-          }, SHOW_CONVERSATION_DELAY);
-        });
+        window.setTimeout(() => {
+          amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversation_et);
+          if (typeof params.open === 'function') {
+            params.open(this.user());
+          }
+        }, SHOW_CONVERSATION_DELAY);
+      });
     };
 
     this.on_connect = () => {
-      this.user_repository.create_connection(this.user(), true)
+      this.user_repository
+        .create_connection(this.user(), true)
         .then(() => amplify.publish(z.event.WebApp.CONVERSATION.PEOPLE.HIDE));
 
       if (typeof params.connect === 'function') {
@@ -230,34 +230,50 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
       }
     };
 
-    this.accent_color = ko.pureComputed(() => {
-      if (this.user()) {
-        return `accent-color-${this.user().accent_id()}`;
-      }
-    }, this, {deferEvaluation: true});
+    this.accent_color = ko.pureComputed(
+      () => {
+        if (this.user()) {
+          return `accent-color-${this.user().accent_id()}`;
+        }
+      },
+      this,
+      {deferEvaluation: true}
+    );
 
-    this.show_gray_image = ko.pureComputed(() => {
-      if (!this.user()) {
-        return false;
-      }
+    this.show_gray_image = ko.pureComputed(
+      () => {
+        if (!this.user()) {
+          return false;
+        }
 
-      return (!this.user().is_me && (!this.user.is_connected()));
-    }, this, {deferEvaluation: true});
+        return !this.user().is_me && !this.user.is_connected();
+      },
+      this,
+      {deferEvaluation: true}
+    );
 
-    this.connection_is_not_established = ko.pureComputed(() => {
-      if (this.user()) {
-        return this.user().is_request() || this.user().is_ignored();
-      }
-    }, this, {deferEvaluation: true});
+    this.connection_is_not_established = ko.pureComputed(
+      () => {
+        if (this.user()) {
+          return this.user().is_request() || this.user().is_ignored();
+        }
+      },
+      this,
+      {deferEvaluation: true}
+    );
 
-    this.user_is_removed_from_conversation = ko.pureComputed(() => {
-      if (!this.user() || !this.conversation()) {
-        return true;
-      }
+    this.user_is_removed_from_conversation = ko.pureComputed(
+      () => {
+        if (!this.user() || !this.conversation()) {
+          return true;
+        }
 
-      const participating_user_ets = this.conversation().participating_user_ets();
-      return !participating_user_ets.includes(this.user());
-    }, this, {deferEvaluation: true});
+        const participating_user_ets = this.conversation().participating_user_ets();
+        return !participating_user_ets.includes(this.user());
+      },
+      this,
+      {deferEvaluation: true}
+    );
 
     this.render_avatar = ko.observable(false);
     this.render_avatar_computed = ko.computed(() => {
@@ -296,7 +312,6 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
           if (user_et.is_outgoing_request()) {
             return 'user-profile-footer-pending';
           }
-
         } else if (conversation_et.is_group()) {
           if (user_et.is_me) {
             return 'user-profile-footer-profile-leave';
@@ -318,7 +333,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
             return 'user-profile-footer-unblock-remove';
           }
         }
-      // When used in Search!
+        // When used in Search!
       } else {
         if (user_et.is_blocked()) {
           return 'user-profile-footer-unblock';
@@ -370,7 +385,8 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
     };
 
     this.is_resetting_session(true);
-    this.conversation_repository.reset_session(this.user().id, this.selected_device().id, this.conversation().id)
+    this.conversation_repository
+      .reset_session(this.user().id, this.selected_device().id, this.conversation().id)
       .then(() => reset_progress())
       .catch(() => reset_progress());
   }
@@ -378,16 +394,18 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
   click_on_verify_client() {
     const toggle_verified = !this.selected_device().meta.is_verified();
 
-    this.client_repository.verify_client(this.user().id, this.selected_device(), toggle_verified)
-      .catch((error) => this.logger.warn(`Client cannot be updated: ${error.message}`));
+    this.client_repository
+      .verify_client(this.user().id, this.selected_device(), toggle_verified)
+      .catch(error => this.logger.warn(`Client cannot be updated: ${error.message}`));
   }
 
   on_tab_index_changed(index) {
     if (index === 1) {
       const user_id = this.user().id;
-      this.client_repository.get_clients_by_user_id(user_id)
-        .then((client_ets) => this.devices_found(client_ets.length > 0))
-        .catch((error) => this.logger.error(`Unable to retrieve clients data for user '${user_id}': ${error}`));
+      this.client_repository
+        .get_clients_by_user_id(user_id)
+        .then(client_ets => this.devices_found(client_ets.length > 0))
+        .catch(error => this.logger.error(`Unable to retrieve clients data for user '${user_id}': ${error}`));
     }
   }
 

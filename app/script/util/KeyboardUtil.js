@@ -23,7 +23,6 @@ window.z = window.z || {};
 window.z.util = z.util || {};
 
 z.util.KeyboardUtil = (() => {
-
   const KEY_DEFAULT = {
     ARROW_DOWN: 'ArrowDown',
     ARROW_LEFT: 'ArrowLeft',
@@ -56,7 +55,7 @@ z.util.KeyboardUtil = (() => {
 
     const scrollPos = textArea.scrollTop;
     let strPos = 0;
-    const br = ((textArea.selectionStart || textArea.selectionStart === '0') ? 'ff' : (document.selection ? 'ie' : false));
+    const br = textArea.selectionStart || textArea.selectionStart === '0' ? 'ff' : document.selection ? 'ie' : false;
 
     if (br === 'ie') {
       textArea.focus();
@@ -67,8 +66,8 @@ z.util.KeyboardUtil = (() => {
       strPos = textArea.selectionStart;
     }
 
-    const front = (textArea.value).substring(0, strPos);
-    const back = (textArea.value).substring(strPos, textArea.value.length);
+    const front = textArea.value.substring(0, strPos);
+    const back = textArea.value.substring(strPos, textArea.value.length);
 
     textArea.value = `${front}${text}${back}`;
     strPos = strPos + text.length;
@@ -89,7 +88,7 @@ z.util.KeyboardUtil = (() => {
     textArea.scrollTop = scrollPos;
   };
 
-  const _is_arrow_key = (keyboard_event) => {
+  const _is_arrow_key = keyboard_event => {
     return _is_one_of_keys(keyboard_event, [
       KEYBOARD_KEY.ARROW_DOWN,
       KEYBOARD_KEY.ARROW_LEFT,
@@ -98,15 +97,15 @@ z.util.KeyboardUtil = (() => {
     ]);
   };
 
-  const _is_backspace_key = (keyboard_event) => _is_key(keyboard_event, KEYBOARD_KEY.BACKSPACE);
+  const _is_backspace_key = keyboard_event => _is_key(keyboard_event, KEYBOARD_KEY.BACKSPACE);
 
-  const _is_delete_key = (keyboard_event) => _is_key(keyboard_event, KEYBOARD_KEY.DELETE);
+  const _is_delete_key = keyboard_event => _is_key(keyboard_event, KEYBOARD_KEY.DELETE);
 
-  const _is_enter_key = (keyboard_event) => _is_key(keyboard_event, KEYBOARD_KEY.ENTER);
+  const _is_enter_key = keyboard_event => _is_key(keyboard_event, KEYBOARD_KEY.ENTER);
 
-  const _is_escape_key = (keyboard_event) => _is_key(keyboard_event, KEYBOARD_KEY.ESC);
+  const _is_escape_key = keyboard_event => _is_key(keyboard_event, KEYBOARD_KEY.ESC);
 
-  const _is_function_key = (keyboard_event) => {
+  const _is_function_key = keyboard_event => {
     return keyboard_event.altKey || keyboard_event.ctrlKey || keyboard_event.metaKey || keyboard_event.shiftKey;
   };
 
@@ -115,20 +114,20 @@ z.util.KeyboardUtil = (() => {
     return key.toLowerCase() === expected_key.toLowerCase();
   };
 
-  const _is_meta_key = (keyboard_event) => keyboard_event.metaKey || keyboard_event.ctrlKey;
+  const _is_meta_key = keyboard_event => keyboard_event.metaKey || keyboard_event.ctrlKey;
 
   const _is_one_of_keys = (keyboard_event, expected_keys = []) => {
-    expected_keys = expected_keys.map((key) => key.toLowerCase());
+    expected_keys = expected_keys.map(key => key.toLowerCase());
 
     const event_key = keyboard_event.key.toLowerCase();
-    return !!expected_keys.find((key) => key === event_key);
+    return !!expected_keys.find(key => key === event_key);
   };
 
-  const _is_paste_action = (keyboard_event) => {
+  const _is_paste_action = keyboard_event => {
     return _is_meta_key(keyboard_event) && _is_key(keyboard_event, KEYBOARD_KEY.KEY_V);
   };
 
-  const _is_removal_action = (keyboard_event) => {
+  const _is_removal_action = keyboard_event => {
     return _is_one_of_keys(keyboard_event, [KEYBOARD_KEY.BACKSPACE, KEYBOARD_KEY.DELETE]);
   };
 

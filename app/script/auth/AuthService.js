@@ -94,7 +94,7 @@ z.auth.AuthService = class AuthService {
         };
       }
 
-      config.success = (data) => {
+      config.success = data => {
         this.client.clear_queue_unblock();
         this.save_access_token_in_client(data.token_type, data.access_token);
         resolve(data);
@@ -110,16 +110,18 @@ z.auth.AuthService = class AuthService {
         if (retry_attempt <= AuthService.CONFIG.POST_ACCESS_RETRY_LIMIT) {
           retry_attempt++;
 
-          const _retry = () => this.post_access(retry_attempt)
-            .then(resolve)
-            .catch(reject);
+          const _retry = () =>
+            this.post_access(retry_attempt)
+              .then(resolve)
+              .catch(reject);
 
           const connectivity_problem = jqXHR.status === z.service.BackendClientError.STATUS_CODE.CONNECTIVITY_PROBLEM;
           if (connectivity_problem) {
             this.logger.warn('Access token refresh delayed due to suspected connectivity issue');
             this.client.clear_queue_unblock();
 
-            return this.client.execute_on_connectivity(z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_REFRESH)
+            return this.client
+              .execute_on_connectivity(z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_REFRESH)
               .then(() => {
                 this.logger.info('Continuing access token refresh after verifying connectivity');
                 this.client.queue_state(z.service.QUEUE_STATE.ACCESS_TOKEN_REFRESH);
@@ -202,7 +204,9 @@ z.auth.AuthService = class AuthService {
         },
         processData: false,
         type: 'POST',
-        url: `${this.client.create_url(AuthService.CONFIG.URL_LOGIN)}?persist=${window.encodeURIComponent(persist.toString())}`,
+        url: `${this.client.create_url(AuthService.CONFIG.URL_LOGIN)}?persist=${window.encodeURIComponent(
+          persist.toString()
+        )}`,
         xhrFields: {
           withCredentials: true,
         },
@@ -272,7 +276,7 @@ z.auth.AuthService = class AuthService {
       };
 
       $.ajax(config)
-        .done((data) => {
+        .done(data => {
           resolve(data);
         })
         .fail((jqXHR, textStatus, errorThrown) => {

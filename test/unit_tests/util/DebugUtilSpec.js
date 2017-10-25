@@ -26,9 +26,14 @@ describe('z.util.DebugUtil', function() {
   const test_factory = new TestFactory();
 
   beforeAll(function(done) {
-    test_factory.exposeCallingActors()
+    test_factory
+      .exposeCallingActors()
       .then(function(calling_repository) {
-        debug_util = new z.util.DebugUtil(calling_repository, TestFactory.conversation_repository, TestFactory.user_repository);
+        debug_util = new z.util.DebugUtil(
+          calling_repository,
+          TestFactory.conversation_repository,
+          TestFactory.user_repository
+        );
         done();
       })
       .catch(done.fail);
@@ -63,6 +68,5 @@ describe('z.util.DebugUtil', function() {
 
       const amount = debug_util.get_number_of_clients_in_conversation();
       expect(amount).toBe(4);
-    })
-  );
+    }));
 });

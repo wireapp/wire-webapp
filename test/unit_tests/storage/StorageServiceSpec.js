@@ -25,7 +25,8 @@ describe('z.storage.StorageRepository', function() {
   const test_factory = new TestFactory();
 
   beforeAll(function(done) {
-    test_factory.exposeStorageActors()
+    test_factory
+      .exposeStorageActors()
       .then(done)
       .catch(done.fail);
   });
@@ -36,7 +37,8 @@ describe('z.storage.StorageRepository', function() {
 
   describe('save', function() {
     it('does not save "null" values', function(done) {
-      TestFactory.storage_service.save(z.storage.StorageService.OBJECT_STORE.AMPLIFY, 'primary_key', null)
+      TestFactory.storage_service
+        .save(z.storage.StorageService.OBJECT_STORE.AMPLIFY, 'primary_key', null)
         .then(done.fail)
         .catch(function(error) {
           expect(error.type).toEqual(z.storage.StorageError.TYPE.NO_DATA);

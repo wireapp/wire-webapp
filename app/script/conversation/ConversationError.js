@@ -27,7 +27,7 @@ z.conversation.ConversationError = class ConversationError extends Error {
     super();
 
     this.name = this.constructor.name;
-    this.stack = (new Error()).stack;
+    this.stack = new Error().stack;
     this.type = type || z.client.ConversationError.TYPE.UNKNOWN;
 
     switch (this.type) {

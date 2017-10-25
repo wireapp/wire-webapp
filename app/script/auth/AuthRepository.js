@@ -52,7 +52,8 @@ z.auth.AuthRepository = class AuthRepository {
    * @returns {undefined} No return value
    */
   list_cookies() {
-    this.auth_service.get_cookies()
+    this.auth_service
+      .get_cookies()
       .then(({cookies}) => {
         this.logger.force_log('Backend cookies:');
         cookies.forEach((cookie, index) => {
@@ -61,7 +62,7 @@ z.auth.AuthRepository = class AuthRepository {
           this.logger.force_log(`Cookie No. ${index + 1} | ${log}`);
         });
       })
-      .catch((error) => this.logger.force_log('Could not list user cookies', error));
+      .catch(error => this.logger.force_log('Could not list user cookies', error));
   }
 
   /**
@@ -76,13 +77,12 @@ z.auth.AuthRepository = class AuthRepository {
    * @returns {Promise} Promise that resolves with the received access token
    */
   login(login, persist) {
-    return this.auth_service.post_login(login, persist)
-      .then((access_token_data) => {
-        this.save_access_token(access_token_data);
-        z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.PERSIST, persist);
-        z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.SHOW_LOGIN, true);
-        return access_token_data;
-      });
+    return this.auth_service.post_login(login, persist).then(access_token_data => {
+      this.save_access_token(access_token_data);
+      z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.PERSIST, persist);
+      z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.SHOW_LOGIN, true);
+      return access_token_data;
+    });
   }
 
   /**
@@ -90,9 +90,10 @@ z.auth.AuthRepository = class AuthRepository {
    * @returns {Promise} Will always resolve
    */
   logout() {
-    return this.auth_service.post_logout()
+    return this.auth_service
+      .post_logout()
       .then(() => this.logger.info('Log out on backend successful'))
-      .catch((error) => this.logger.warn(`Log out on backend failed: ${error.message}`, error));
+      .catch(error => this.logger.warn(`Log out on backend failed: ${error.message}`, error));
   }
 
   /**
@@ -106,17 +107,19 @@ z.auth.AuthRepository = class AuthRepository {
    * @returns {Promise} Resolves on success
    */
   register(new_user) {
-    return this.auth_service.post_register(new_user)
-      .then((response) => {
-        z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.PERSIST, true);
-        z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.SHOW_LOGIN, true);
-        z.util.StorageUtil.set_value(new_user.label_key, new_user.label);
-        this.logger.info(`COOKIE::'${new_user.label}' Saved cookie label with key '${new_user.label_key}' in Local Storage`, {
+    return this.auth_service.post_register(new_user).then(response => {
+      z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.PERSIST, true);
+      z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.SHOW_LOGIN, true);
+      z.util.StorageUtil.set_value(new_user.label_key, new_user.label);
+      this.logger.info(
+        `COOKIE::'${new_user.label}' Saved cookie label with key '${new_user.label_key}' in Local Storage`,
+        {
           key: new_user.label_key,
           value: new_user.label,
-        });
-        return response;
-      });
+        }
+      );
+      return response;
+    });
   }
 
   /**
@@ -167,7 +170,7 @@ z.auth.AuthRepository = class AuthRepository {
           this.auth_service.client.execute_request_queue();
           amplify.publish(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEWED);
         })
-        .catch((error) => {
+        .catch(error => {
           const {message, type} = error;
           const is_request_forbidden = type === z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN;
           if (is_request_forbidden || z.util.Environment.frontend.is_localhost()) {
@@ -199,7 +202,7 @@ z.auth.AuthRepository = class AuthRepository {
    * @returns {Promise} Resolves when the access token was retrieved
    */
   get_cached_access_token() {
-    return new Promise(((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       const access_token = z.util.StorageUtil.get_value(z.storage.StorageKey.AUTH.ACCESS_TOKEN.VALUE);
       const access_token_type = z.util.StorageUtil.get_value(z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE);
 
@@ -211,7 +214,7 @@ z.auth.AuthRepository = class AuthRepository {
       }
 
       return reject(new z.auth.AccessTokenError(z.auth.AccessTokenError.TYPE.NOT_FOUND_IN_CACHE));
-    }));
+    });
   }
 
   /**
@@ -219,8 +222,7 @@ z.auth.AuthRepository = class AuthRepository {
    * @returns {Promise} Resolves with the access token data
    */
   get_access_token() {
-    return this.auth_service.post_access()
-      .then((access_token) => this.save_access_token(access_token));
+    return this.auth_service.post_access().then(access_token => this.save_access_token(access_token));
   }
 
   /**
@@ -242,10 +244,26 @@ z.auth.AuthRepository = class AuthRepository {
     const expires_in_millis = 1000 * access_token_data.expires_in;
     const expiration_timestamp = Date.now() + expires_in_millis;
 
-    z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.ACCESS_TOKEN.VALUE, access_token_data.access_token, access_token_data.expires_in);
-    z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION, expiration_timestamp, access_token_data.expires_in);
-    z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.ACCESS_TOKEN.TTL, expires_in_millis, access_token_data.expires_in);
-    z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE, access_token_data.token_type, access_token_data.expires_in);
+    z.util.StorageUtil.set_value(
+      z.storage.StorageKey.AUTH.ACCESS_TOKEN.VALUE,
+      access_token_data.access_token,
+      access_token_data.expires_in
+    );
+    z.util.StorageUtil.set_value(
+      z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION,
+      expiration_timestamp,
+      access_token_data.expires_in
+    );
+    z.util.StorageUtil.set_value(
+      z.storage.StorageKey.AUTH.ACCESS_TOKEN.TTL,
+      expires_in_millis,
+      access_token_data.expires_in
+    );
+    z.util.StorageUtil.set_value(
+      z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE,
+      access_token_data.token_type,
+      access_token_data.expires_in
+    );
 
     this.auth_service.save_access_token_in_client(access_token_data.token_type, access_token_data.access_token);
 
@@ -291,7 +309,7 @@ z.auth.AuthRepository = class AuthRepository {
     this.logger.info(`Scheduling next access token refresh for '${time}'`);
 
     this.access_token_refresh = window.setTimeout(() => {
-      if (callback_timestamp > (Date.now() + 15000)) {
+      if (callback_timestamp > Date.now() + 15000) {
         this.logger.info(`Access token refresh scheduled for '${time}' skipped because it was executed late`);
       }
 
@@ -300,8 +318,6 @@ z.auth.AuthRepository = class AuthRepository {
       }
 
       this.logger.info(`Access token refresh scheduled for '${time}' skipped because we are offline`);
-
     }, callback_timestamp - Date.now());
-
   }
 };

@@ -124,8 +124,7 @@ describe('z.client.ClientMapper', function() {
       expect(client_ets[0].is_temporary()).toBeTruthy();
       expect(client_ets[1].id).toBe(entities.clients.john_doe.permanent.id);
       expect(client_ets[1].is_permanent()).toBeTruthy();
-    })
-  );
+    }));
 
   describe('update_client', function() {
     it('can map changes into a client', function() {

@@ -33,7 +33,7 @@ z.components.DeviceRemove = class DeviceRemove {
     this.remove_form_visible = ko.observable(false);
 
     this.password = ko.observable('');
-    this.password_subscription = this.password.subscribe((value) => {
+    this.password_subscription = this.password.subscribe(value => {
       if (value.length > 0) {
         return this.device_remove_error(false);
       }

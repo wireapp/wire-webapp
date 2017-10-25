@@ -79,11 +79,14 @@ z.extension.GiphyService = class GiphyService {
    */
   get_search(options) {
     return this.client.send_request({
-      data: $.extend({
-        limit: 25,
-        offset: 0,
-        sort: 'relevant',
-      }, options),
+      data: $.extend(
+        {
+          limit: 25,
+          offset: 0,
+          sort: 'relevant',
+        },
+        options
+      ),
       type: 'GET',
       url: this.client.create_url(`${GiphyService.CONFIG.ENDPOINT_BASE}/search`),
     });

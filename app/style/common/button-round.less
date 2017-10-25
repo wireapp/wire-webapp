@@ -73,8 +73,12 @@
   line-height: @button-round-size;
   border: none;
   color: #fff;
-  &.toggled { background: #fff; }
-  &.disabled { background: transparent; }
+  &.toggled {
+    background: #fff;
+  }
+  &.disabled {
+    background: transparent;
+  }
 }
 
 // example:
@@ -83,8 +87,12 @@
 .button-round-theme {
   .accent-background-color();
   .button-round-color();
-  &.toggled { .accent-color(); }
-  &.disabled { .accent-color(24%); }
+  &.toggled {
+    .accent-color();
+  }
+  &.disabled {
+    .accent-color(24%);
+  }
 }
 
 // overwrite global theme
@@ -95,17 +103,35 @@
 .button-round-theme-color(@color) {
   .button-round-color();
   background-color: @color !important;
-  &.toggled { color: @color !important; }
-  &.disabled { color: fade(@color, 24%) !important; }
+  &.toggled {
+    color: @color !important;
+  }
+  &.disabled {
+    color: fade(@color, 24%) !important;
+  }
 }
 
-.button-round-theme-blue { .button-round-theme-color(@w-blue); }
-.button-round-theme-green { .button-round-theme-color(@w-green); }
-.button-round-theme-yellow { .button-round-theme-color(@w-yellow); }
-.button-round-theme-red { .button-round-theme-color(@w-red); }
-.button-round-theme-orange { .button-round-theme-color(@w-orange); }
-.button-round-theme-pink { .button-round-theme-color(@w-pink); }
-.button-round-theme-purple { .button-round-theme-color(@w-purple); }
+.button-round-theme-blue {
+  .button-round-theme-color(@w-blue);
+}
+.button-round-theme-green {
+  .button-round-theme-color(@w-green);
+}
+.button-round-theme-yellow {
+  .button-round-theme-color(@w-yellow);
+}
+.button-round-theme-red {
+  .button-round-theme-color(@w-red);
+}
+.button-round-theme-orange {
+  .button-round-theme-color(@w-orange);
+}
+.button-round-theme-pink {
+  .button-round-theme-color(@w-pink);
+}
+.button-round-theme-purple {
+  .button-round-theme-color(@w-purple);
+}
 
 // example:
 // <div class="button-round button-round-dark icon-plus"></div>

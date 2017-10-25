@@ -48,13 +48,11 @@ z.ViewModel.ModalType = {
   UPLOAD_TOO_LARGE: '.modal-asset-upload-too-large',
 };
 
-
 z.ViewModel.MODAL_CONSENT_TYPE = {
   INCOMING_CALL: 'incoming_call',
   MESSAGE: 'message',
   OUTGOING_CALL: 'outgoing_call',
 };
-
 
 z.ViewModel.ModalsViewModel = class ModalsViewModel {
   constructor(element_id) {
@@ -221,7 +219,7 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
 
     devices_element.empty();
 
-    devices.map((device) => {
+    devices.map(device => {
       $('<div>')
         .text(`${moment(device.time).format('MMMM Do YYYY, HH:mm')} - UTC`)
         .appendTo(devices_element);
@@ -238,7 +236,9 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
 
   _show_modal_new_device(content, title_element, message_element, action_element) {
     let action_id, message_id;
-    const joined_names = z.util.StringUtil.capitalize_first_char(z.util.LocalizerUtil.join_names(content.user_ets, z.string.Declension.NOMINATIVE));
+    const joined_names = z.util.StringUtil.capitalize_first_char(
+      z.util.LocalizerUtil.join_names(content.user_ets, z.string.Declension.NOMINATIVE)
+    );
 
     if (content.user_ets.length > 1) {
       title_element.text(z.l10n.text(z.string.modal_new_device_headline_many, joined_names));
@@ -279,10 +279,12 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
   }
 
   _show_modal_too_many_members(content, message_element) {
-    message_element.text(z.l10n.text(z.string.modal_too_many_members_message, {
-      number1: content.max,
-      number2: content.open_spots,
-    }));
+    message_element.text(
+      z.l10n.text(z.string.modal_too_many_members_message, {
+        number1: content.max,
+        number2: content.open_spots,
+      })
+    );
   }
 
   _show_modal_upload_parallel(content, title_element) {

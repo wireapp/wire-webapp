@@ -29,7 +29,8 @@ describe('z.media.MediaStreamHandler', function() {
   const test_factory = new TestFactory();
 
   beforeAll(function(done) {
-    test_factory.exposeMediaActors()
+    test_factory
+      .exposeMediaActors()
       .then(done)
       .catch(done.fail);
   });
@@ -42,7 +43,8 @@ describe('z.media.MediaStreamHandler', function() {
     it('toggles the audio stream if available', function(done) {
       TestFactory.media_repository.stream_handler.local_media_stream(true);
 
-      TestFactory.media_repository.stream_handler.toggle_audio_send()
+      TestFactory.media_repository.stream_handler
+        .toggle_audio_send()
         .then(function() {
           expect(TestFactory.media_repository.stream_handler._toggle_audio_send).toHaveBeenCalled();
           done();
@@ -53,7 +55,8 @@ describe('z.media.MediaStreamHandler', function() {
     it('throws an error if no audio stream is found', function(done) {
       TestFactory.media_repository.stream_handler.local_media_stream(undefined);
 
-      TestFactory.media_repository.stream_handler.toggle_audio_send()
+      TestFactory.media_repository.stream_handler
+        .toggle_audio_send()
         .then(done.fail)
         .catch(function(error) {
           expect(error).toEqual(jasmine.any(z.media.MediaError));
@@ -63,18 +66,20 @@ describe('z.media.MediaStreamHandler', function() {
     });
   });
 
-
   describe('toggle_video_send', function() {
     beforeEach(function() {
       spyOn(TestFactory.media_repository.stream_handler, '_toggle_video_send').and.returnValue(Promise.resolve());
-      return spyOn(TestFactory.media_repository.stream_handler, 'replace_input_source').and.returnValue(Promise.resolve());
+      return spyOn(TestFactory.media_repository.stream_handler, 'replace_input_source').and.returnValue(
+        Promise.resolve()
+      );
     });
 
     it('toggles the video stream if available and in video mode', function(done) {
       TestFactory.media_repository.stream_handler.local_media_stream(true);
       TestFactory.media_repository.stream_handler.local_media_type(z.media.MediaType.VIDEO);
 
-      TestFactory.media_repository.stream_handler.toggle_video_send()
+      TestFactory.media_repository.stream_handler
+        .toggle_video_send()
         .then(function() {
           expect(TestFactory.media_repository.stream_handler._toggle_video_send).toHaveBeenCalled();
           expect(TestFactory.media_repository.stream_handler.replace_input_source).not.toHaveBeenCalled();
@@ -87,10 +92,13 @@ describe('z.media.MediaStreamHandler', function() {
       TestFactory.media_repository.stream_handler.local_media_stream(undefined);
       TestFactory.media_repository.stream_handler.local_media_type(z.media.MediaType.VIDEO);
 
-      TestFactory.media_repository.stream_handler.toggle_video_send()
+      TestFactory.media_repository.stream_handler
+        .toggle_video_send()
         .then(function() {
           expect(TestFactory.media_repository.stream_handler._toggle_video_send).not.toHaveBeenCalled();
-          expect(TestFactory.media_repository.stream_handler.replace_input_source).toHaveBeenCalledWith(z.media.MediaType.VIDEO);
+          expect(TestFactory.media_repository.stream_handler.replace_input_source).toHaveBeenCalledWith(
+            z.media.MediaType.VIDEO
+          );
           done();
         })
         .catch(done.fail);
@@ -100,16 +108,18 @@ describe('z.media.MediaStreamHandler', function() {
       TestFactory.media_repository.stream_handler.local_media_stream(true);
       TestFactory.media_repository.stream_handler.local_media_type(z.media.MediaType.SCREEN);
 
-      TestFactory.media_repository.stream_handler.toggle_video_send()
+      TestFactory.media_repository.stream_handler
+        .toggle_video_send()
         .then(function() {
           expect(TestFactory.media_repository.stream_handler._toggle_video_send).not.toHaveBeenCalled();
-          expect(TestFactory.media_repository.stream_handler.replace_input_source).toHaveBeenCalledWith(z.media.MediaType.VIDEO);
+          expect(TestFactory.media_repository.stream_handler.replace_input_source).toHaveBeenCalledWith(
+            z.media.MediaType.VIDEO
+          );
           done();
         })
         .catch(done.fail);
     });
   });
-
 
   describe('toggle_screen_send', function() {
     beforeEach(function() {
@@ -121,7 +131,8 @@ describe('z.media.MediaStreamHandler', function() {
       TestFactory.media_repository.stream_handler.local_media_stream(true);
       TestFactory.media_repository.stream_handler.local_media_type(z.media.MediaType.SCREEN);
 
-      TestFactory.media_repository.stream_handler.toggle_screen_send()
+      TestFactory.media_repository.stream_handler
+        .toggle_screen_send()
         .then(function() {
           expect(TestFactory.media_repository.stream_handler._toggle_screen_send).toHaveBeenCalled();
           expect(TestFactory.media_repository.stream_handler.replace_input_source).not.toHaveBeenCalled();
@@ -134,10 +145,13 @@ describe('z.media.MediaStreamHandler', function() {
       TestFactory.media_repository.stream_handler.local_media_stream(undefined);
       TestFactory.media_repository.stream_handler.local_media_type(z.media.MediaType.SCREEN);
 
-      TestFactory.media_repository.stream_handler.toggle_screen_send()
+      TestFactory.media_repository.stream_handler
+        .toggle_screen_send()
         .then(function() {
           expect(TestFactory.media_repository.stream_handler._toggle_screen_send).not.toHaveBeenCalled();
-          expect(TestFactory.media_repository.stream_handler.replace_input_source).toHaveBeenCalledWith(z.media.MediaType.SCREEN);
+          expect(TestFactory.media_repository.stream_handler.replace_input_source).toHaveBeenCalledWith(
+            z.media.MediaType.SCREEN
+          );
           done();
         })
         .catch(done.fail);
@@ -147,10 +161,13 @@ describe('z.media.MediaStreamHandler', function() {
       TestFactory.media_repository.stream_handler.local_media_stream(true);
       TestFactory.media_repository.stream_handler.local_media_type(z.media.MediaType.VIDEO);
 
-      TestFactory.media_repository.stream_handler.toggle_screen_send()
+      TestFactory.media_repository.stream_handler
+        .toggle_screen_send()
         .then(function() {
           expect(TestFactory.media_repository.stream_handler._toggle_screen_send).not.toHaveBeenCalled();
-          expect(TestFactory.media_repository.stream_handler.replace_input_source).toHaveBeenCalledWith(z.media.MediaType.SCREEN);
+          expect(TestFactory.media_repository.stream_handler.replace_input_source).toHaveBeenCalledWith(
+            z.media.MediaType.SCREEN
+          );
           done();
         })
         .catch(done.fail);

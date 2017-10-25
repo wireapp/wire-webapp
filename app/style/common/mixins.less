@@ -100,7 +100,11 @@
 // Animations
 // ----------------------------------------------------------------------------
 
-@keyframes spin { to { transform: rotate(1turn); } }
+@keyframes spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
 
 .spin {
   animation: spin 1s infinite linear;
@@ -194,7 +198,7 @@
 }
 
 .translucent {
-  opacity: .4;
+  opacity: 0.4;
 }
 
 .element-disabled {
@@ -311,7 +315,6 @@
 
 // creates mac like scrollbar, but only in webkit browsers
 .custom-scrollbar() {
-
   @scrollbar-size: 7px;
 
   &::-webkit-scrollbar {

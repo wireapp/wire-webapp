@@ -23,7 +23,6 @@ window.z = window.z || {};
 window.z.team = z.team || {};
 
 z.team.TeamRole = (() => {
-
   const ROLE = {
     ADMIN: 'z.team.TeamRole.ROLE.ADMIN',
     INVALID: 'z.team.TeamRole.ROLE.INVALID',
@@ -32,7 +31,7 @@ z.team.TeamRole = (() => {
     OWNER: 'z.team.TeamRole.ROLE.OWNER',
   };
 
-  const _check_role = (permissions) => {
+  const _check_role = permissions => {
     if (z.team.TeamPermission.has_permission_for_role(permissions.self, ROLE.OWNER)) {
       return ROLE.OWNER;
     }

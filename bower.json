@@ -48,13 +48,7 @@
       "js": "dist/ByteBufferAB.js"
     },
     "cryptojs": {
-      "js": [
-        "components/core.js",
-        "components/lib-typedarrays.js",
-        "components/md5.js",
-        "components/enc-base64.js",
-        "components/sha256.js"
-      ]
+      "js": ["components/core.js", "components/lib-typedarrays.js", "components/md5.js", "components/enc-base64.js", "components/sha256.js"]
     },
     "dexie": {
       "js": "dist/dexie.js"
@@ -94,10 +88,7 @@
       "js": "lib/marked.js"
     },
     "mixpanel": {
-      "js": [
-        "mixpanel-jslib-snippet.js",
-        "mixpanel.min.js"
-      ]
+      "js": ["mixpanel-jslib-snippet.js", "mixpanel.min.js"]
     },
     "moment": {
       "js": [
@@ -196,5 +187,9 @@
     "wire-webapp-proteus": {
       "js": "dist/window/*.js"
     }
+  },
+  "resolutions": {
+    "libsodium.js": "0.5.4",
+    "wire-webapp-proteus": "5.2.0"
   }
 }

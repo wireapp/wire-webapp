@@ -44,20 +44,17 @@ describe('z.util.StringUtil', function() {
     });
   });
 
-
   describe('format', function() {
     it('returns string with replaced placeholder', function() {
       expect(z.util.StringUtil.format('foo={0}&bar={1}', 1, 2)).toBe('foo=1&bar=2');
     });
   });
 
-
   describe('get_random_character', function() {
     it('always returns an alphanumeric character', function() {
       _.range(1000).map(() => expect(z.util.StringUtil.get_random_character()).toMatch(/(\w|\d){1}/));
     });
   });
-
 
   describe('includes', function() {
     const string = 'Club Zeta';
@@ -73,9 +70,8 @@ describe('z.util.StringUtil', function() {
     });
   });
 
-
   describe('obfuscate', function() {
-    it('obfuscates a text preserving it\'s whitespaces', function() {
+    it("obfuscates a text preserving it's whitespaces", function() {
       const text = 'You Are The Sunshine Of My Life';
       const obfuscated = z.util.StringUtil.obfuscate(text);
       const whitespaces = obfuscated.match(/[\n\r\s]+/gi);
@@ -85,7 +81,8 @@ describe('z.util.StringUtil', function() {
     });
 
     it('obfuscates a text keeping its length', function() {
-      const text = 'Bacon ipsum dolor amet sausage landjaeger ball tip brisket filet mignon, t-bone tenderloin tri-tip beef drumstick fatback burgdoggen ground round meatball. Tri-tip spare ribs ground round bresaola ball tip tail, sirloin chicken doner boudin turkey leberkas bacon alcatra. ';
+      const text =
+        'Bacon ipsum dolor amet sausage landjaeger ball tip brisket filet mignon, t-bone tenderloin tri-tip beef drumstick fatback burgdoggen ground round meatball. Tri-tip spare ribs ground round bresaola ball tip tail, sirloin chicken doner boudin turkey leberkas bacon alcatra. ';
       const obfuscated = z.util.StringUtil.obfuscate(text);
       expect(obfuscated).not.toBe(text);
       expect(obfuscated.length).toBe(text.length);
@@ -106,13 +103,11 @@ describe('z.util.StringUtil', function() {
     });
   });
 
-
   describe('remove_line_breaks', function() {
     it('removes all the line breaks', function() {
       expect(z.util.StringUtil.remove_line_breaks('\nA\nB\nC\nD\n')).toBe('ABCD');
     });
   });
-
 
   describe('sort_by_priority', function() {
     it('can sort strings', function() {
@@ -129,7 +124,6 @@ describe('z.util.StringUtil', function() {
     });
   });
 
-
   describe('starts_with', function() {
     const string = 'To be, or not to be, that is the question.';
 
@@ -143,7 +137,6 @@ describe('z.util.StringUtil', function() {
     });
   });
 
-
   describe('z.util.trim_line_breaks', function() {
     it('removes line breaks at the beginning and/or end', function() {
       expect(z.util.StringUtil.trim_line_breaks('\n\n\n\n\nB\nC\nD')).toBe('B\nC\nD');
@@ -155,7 +148,6 @@ describe('z.util.StringUtil', function() {
       expect(z.util.StringUtil.trim_line_breaks('A\nB\nC\nD')).toBe('A\nB\nC\nD');
     });
   });
-
 
   describe('truncate', function() {
     it('returns the full string if it is shorter than the target length', function() {

@@ -35,7 +35,8 @@ describe('PromiseQueue', function() {
       const queue = new z.util.PromiseQueue();
       queue.push(promise_fn);
       queue.push(promise_fn);
-      queue.push(promise_fn)
+      queue
+        .push(promise_fn)
         .then(function() {
           expect(result).toEqual([0, 1, 2]);
           done();
@@ -64,7 +65,8 @@ describe('PromiseQueue', function() {
       queue.push(promise.fn);
 
       window.setTimeout(function() {
-        queue.push(promise.fn)
+        queue
+          .push(promise.fn)
           .then(function() {
             expect(promise.fn.calls.count()).toEqual(2);
             expect(result).toEqual([0, 1]);
@@ -75,14 +77,14 @@ describe('PromiseQueue', function() {
     });
 
     it('should process promises even when one of them rejects', function(done) {
-
       const resolving_promise = () => Promise.resolve();
 
       const rejecting_promise = () => Promise.reject(new Error('Unit test error'));
 
       const queue = new z.util.PromiseQueue();
       queue.push(rejecting_promise);
-      queue.push(resolving_promise)
+      queue
+        .push(resolving_promise)
         .then(done)
         .catch(done.fail);
     });
@@ -102,7 +104,8 @@ describe('PromiseQueue', function() {
 
       const queue = new z.util.PromiseQueue({timeout: 100});
       queue.push(timeout_promise);
-      queue.push(resolving_promise)
+      queue
+        .push(resolving_promise)
         .then(done)
         .catch(done.fail);
     });

@@ -52,7 +52,8 @@ describe('z.service.BackendClient', function() {
     });
 
     it('executes callback when backend status is ok', function(done) {
-      backend_client.execute_on_connectivity()
+      backend_client
+        .execute_on_connectivity()
         .then(function() {
           expect(backend_client.status).toHaveBeenCalled();
           expect(backend_client.status).toHaveBeenCalledTimes(1);
@@ -65,7 +66,8 @@ describe('z.service.BackendClient', function() {
     });
 
     it('executes callback when backend status return an error', function(done) {
-      backend_client.execute_on_connectivity()
+      backend_client
+        .execute_on_connectivity()
         .then(function() {
           expect(backend_client.status).toHaveBeenCalled();
           expect(backend_client.status).toHaveBeenCalledTimes(1);
@@ -78,8 +80,9 @@ describe('z.service.BackendClient', function() {
     });
 
     it('does not execute callback when request times out', function(done) {
-      backend_client.execute_on_connectivity()
-        .then((response) => done.fail(response))
+      backend_client
+        .execute_on_connectivity()
+        .then(response => done.fail(response))
         .catch(done.fail);
 
       jasmine.clock().tick(250);
@@ -91,7 +94,8 @@ describe('z.service.BackendClient', function() {
     });
 
     it('executes callback when it retries after failure', function(done) {
-      backend_client.execute_on_connectivity()
+      backend_client
+        .execute_on_connectivity()
         .then(function() {
           expect(backend_client.status).toHaveBeenCalledTimes(2);
           done();
@@ -107,8 +111,9 @@ describe('z.service.BackendClient', function() {
     });
 
     it('does not execute the callback when it retries after failure and fails again', function(done) {
-      backend_client.execute_on_connectivity()
-        .then((response) => done.fail(response))
+      backend_client
+        .execute_on_connectivity()
+        .then(response => done.fail(response))
         .catch(done.fail);
 
       jasmine.clock().tick(750);
@@ -143,7 +148,8 @@ describe('z.service.BackendClient', function() {
     });
 
     it('should resolve with the request payload', function(done) {
-      backend_client._send_request(config)
+      backend_client
+        ._send_request(config)
         .then(done)
         .catch(done.fail);
       server.requests[0].respond(200);
@@ -153,8 +159,9 @@ describe('z.service.BackendClient', function() {
       const token_refresh = jasmine.createSpy('token_refresh');
       amplify.subscribe(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, token_refresh);
 
-      backend_client._send_request(config)
-        .then((response) => done.fail(response))
+      backend_client
+        ._send_request(config)
+        .then(response => done.fail(response))
         .catch(done.fail);
       server.requests[0].respond(401);
 
@@ -167,8 +174,9 @@ describe('z.service.BackendClient', function() {
     it('should cache the request if it timed out', function(done) {
       spyOn(backend_client, 'execute_on_connectivity').and.returnValue(Promise.resolve());
 
-      backend_client._send_request(config)
-        .then((response) => done.fail(response))
+      backend_client
+        ._send_request(config)
+        .then(response => done.fail(response))
         .catch(done.fail);
 
       jasmine.clock().tick(150);

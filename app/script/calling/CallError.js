@@ -27,7 +27,7 @@ z.calling.CallError = class CallError extends Error {
     super();
 
     this.name = this.constructor.name;
-    this.stack = (new Error()).stack;
+    this.stack = new Error().stack;
     this.type = type || CallError.TYPE.UNKNOWN;
 
     if (message) {

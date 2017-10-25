@@ -44,7 +44,6 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
     this.timings = $.extend(new z.telemetry.calling.CallSetupTimings(this.id), timings ? timings.get() : {});
   }
 
-
   //##############################################################################
   // External misc
   //##############################################################################
@@ -136,7 +135,6 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
     this.timings.is_answer = is_answer;
   }
 
-
   //##############################################################################
   // Timings
   //##############################################################################
@@ -157,7 +155,6 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
   time_step(step) {
     this.timings.time_step(step);
   }
-
 
   //##############################################################################
   // Reporting & Logging

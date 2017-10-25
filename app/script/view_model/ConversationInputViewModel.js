@@ -48,7 +48,7 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
     this.pasted_file = ko.observable();
     this.pasted_file_preview_url = ko.observable();
     this.pasted_file_name = ko.observable();
-    this.pasted_file.subscribe((blob) => {
+    this.pasted_file.subscribe(blob => {
       if (blob) {
         if (z.config.SUPPORTED_CONVERSATION_IMAGE_TYPES.includes(blob.type)) {
           this.pasted_file_preview_url(URL.createObjectURL(blob));
@@ -66,7 +66,7 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
     this.edit_input = ko.observable('');
     this.is_editing = ko.pureComputed(() => this.edit_message_et() != null);
 
-    this.is_editing.subscribe((is_editing) => {
+    this.is_editing.subscribe(is_editing => {
       if (is_editing) {
         return window.addEventListener('click', this.on_window_click);
       }
@@ -82,7 +82,9 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
     this.conversation_has_focus = ko.observable(true).extend({notify: 'always'});
     this.browser_has_focus = ko.observable(true);
 
-    this.blinking_cursor = ko.pureComputed(() => this.is_editing() || this.conversation_has_focus()).extend({notify: 'always'});
+    this.blinking_cursor = ko
+      .pureComputed(() => this.is_editing() || this.conversation_has_focus())
+      .extend({notify: 'always'});
 
     this.has_text_input = ko.pureComputed(() => {
       if (this.conversation_et()) {
@@ -108,7 +110,7 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
 
         return '';
       },
-      write: (value) => {
+      write: value => {
         if (this.is_editing()) {
           return this.edit_input(value);
         }
@@ -126,7 +128,10 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
       }
       return z.l10n.text(z.string.tooltip_conversation_input_placeholder);
     });
-    this.ping_tooltip = z.l10n.text(z.string.tooltip_conversation_ping, z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.PING));
+    this.ping_tooltip = z.l10n.text(
+      z.string.tooltip_conversation_ping,
+      z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.PING)
+    );
     this.picture_tooltip = z.l10n.text(z.string.tooltip_conversation_picture);
     this.ping_disabled = ko.observable(false);
 
@@ -141,7 +146,9 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
 
   _init_subscriptions() {
     amplify.subscribe(z.event.WebApp.SEARCH.SHOW, () => this.conversation_has_focus(false));
-    amplify.subscribe(z.event.WebApp.SEARCH.HIDE, () => window.requestAnimationFrame(() => this.conversation_has_focus(true)));
+    amplify.subscribe(z.event.WebApp.SEARCH.HIDE, () =>
+      window.requestAnimationFrame(() => this.conversation_has_focus(true))
+    );
     amplify.subscribe(z.event.WebApp.EXTENSIONS.GIPHY.SEND, this.send_giphy.bind(this));
     amplify.subscribe(z.event.WebApp.CONVERSATION.IMAGE.SEND, this.upload_images.bind(this));
     amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.EDIT, this.edit_message.bind(this));
@@ -164,12 +171,11 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
   ping() {
     if (this.conversation_et() && !this.ping_disabled()) {
       this.ping_disabled(true);
-      this.conversation_repository.send_knock(this.conversation_et())
-        .then(() => {
-          window.setTimeout(() => {
-            this.ping_disabled(false);
-          }, 2000);
-        });
+      this.conversation_repository.send_knock(this.conversation_et()).then(() => {
+        window.setTimeout(() => {
+          this.ping_disabled(false);
+        }, 2000);
+      });
     }
   }
 
@@ -200,11 +206,15 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
   set_ephemeral_timer(millis) {
     if (!millis) {
       this.conversation_et().ephemeral_timer(false);
-      return this.logger.info(`Ephemeral timer for conversation '${this.conversation_et().display_name()}' turned off.`);
+      return this.logger.info(
+        `Ephemeral timer for conversation '${this.conversation_et().display_name()}' turned off.`
+      );
     }
 
     this.conversation_et().ephemeral_timer(millis);
-    this.logger.info(`Ephemeral timer for conversation '${this.conversation_et().display_name()}' is now at '${this.conversation_et().ephemeral_timer()}'.`);
+    this.logger.info(
+      `Ephemeral timer for conversation '${this.conversation_et().display_name()}' is now at '${this.conversation_et().ephemeral_timer()}'.`
+    );
   }
 
   /**
@@ -233,7 +243,10 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
     if (!this._is_hitting_upload_limit(files)) {
       for (const file of [...files]) {
         if (file.size > z.config.MAXIMUM_ASSET_FILE_SIZE) {
-          amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_TOO_BIG, {size: file.size, type: file.type});
+          amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_TOO_BIG, {
+            size: file.size,
+            type: file.type,
+          });
           amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
           window.setTimeout(function() {
             amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.UPLOAD_TOO_LARGE, {
@@ -299,10 +312,12 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
 
   _is_hitting_upload_limit(files) {
     const pending_uploads = this.conversation_repository.get_number_of_pending_uploads();
-    const is_hitting_upload_limit = (pending_uploads + files.length) > z.config.MAXIMUM_ASSET_UPLOADS;
+    const is_hitting_upload_limit = pending_uploads + files.length > z.config.MAXIMUM_ASSET_UPLOADS;
 
     if (is_hitting_upload_limit) {
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.UPLOAD_PARALLEL, {data: z.config.MAXIMUM_ASSET_UPLOADS});
+      amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.UPLOAD_PARALLEL, {
+        data: z.config.MAXIMUM_ASSET_UPLOADS,
+      });
     }
 
     return is_hitting_upload_limit;
@@ -347,7 +362,9 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
     if (message.length > z.config.MAXIMUM_MESSAGE_LENGTH) {
       amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.TOO_LONG_MESSAGE, {
         close() {
-          amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.CHARACTER_LIMIT_REACHED, {characters: message.length});
+          amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.CHARACTER_LIMIT_REACHED, {
+            characters: message.length,
+          });
         },
         data: z.config.MAXIMUM_MESSAGE_LENGTH,
       });
@@ -426,7 +443,10 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
   }
 
   _move_cursor_to_end(input_element) {
-    window.setTimeout(() => input_element.selectionStart = (input_element.selectionEnd = input_element.value.length * 2), 0);
+    window.setTimeout(
+      () => (input_element.selectionStart = input_element.selectionEnd = input_element.value.length * 2),
+      0
+    );
   }
 
   /**
@@ -466,21 +486,21 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
    * @returns {undefined} No return value
    */
   click_on_ephemeral_button(data, event) {
-    const entries = [{
-      click: () => this.set_ephemeral_timer(0),
-      label: z.l10n.text(z.string.ephememal_units_none),
-    }]
-      .concat(
-        z.ephemeral.timings.get_values()
-          .map((milliseconds) => {
-            const [number, unit] = z.util.format_milliseconds_short(milliseconds);
-            const unit_locale = this._get_localized_unit_string(number, unit);
-            return {
-              click: () => this.set_ephemeral_timer(milliseconds),
-              label: `${number} ${unit_locale}`,
-            };
-          })
-      );
+    const entries = [
+      {
+        click: () => this.set_ephemeral_timer(0),
+        label: z.l10n.text(z.string.ephememal_units_none),
+      },
+    ].concat(
+      z.ephemeral.timings.get_values().map(milliseconds => {
+        const [number, unit] = z.util.format_milliseconds_short(milliseconds);
+        const unit_locale = this._get_localized_unit_string(number, unit);
+        return {
+          click: () => this.set_ephemeral_timer(milliseconds),
+          label: `${number} ${unit_locale}`,
+        };
+      })
+    );
 
     z.ui.Context.from(event, entries, 'ephemeral-options-menu');
   }

@@ -112,7 +112,7 @@ z.calling.entities.Call = class Call {
 
     // Observable subscriptions
     this.was_connected = false;
-    this.is_connected.subscribe((is_connected) => {
+    this.is_connected.subscribe(is_connected => {
       if (is_connected) {
         this.was_connected = true;
         if (this.is_group) {
@@ -131,24 +131,24 @@ z.calling.entities.Call = class Call {
       }
     });
 
-    this.is_declined.subscribe((is_declined) => {
+    this.is_declined.subscribe(is_declined => {
       if (is_declined) {
         this._stop_ring_tone(true);
       }
     });
 
-    this.network_interruption.subscribe((is_interrupted) => {
+    this.network_interruption.subscribe(is_interrupted => {
       if (is_interrupted) {
         return amplify.publish(z.event.WebApp.AUDIO.PLAY_IN_LOOP, z.audio.AudioType.NETWORK_INTERRUPTION);
       }
       amplify.publish(z.event.WebApp.AUDIO.STOP, z.audio.AudioType.NETWORK_INTERRUPTION);
     });
 
-    this.participants_count.subscribe((users_in_call) => {
+    this.participants_count.subscribe(users_in_call => {
       this.max_number_of_participants = Math.max(users_in_call, this.max_number_of_participants);
     });
 
-    this.self_client_joined.subscribe((is_joined) => {
+    this.self_client_joined.subscribe(is_joined => {
       if (!is_joined) {
         this.is_connected(false);
 
@@ -165,7 +165,7 @@ z.calling.entities.Call = class Call {
       }
     });
 
-    this.state.subscribe((state) => {
+    this.state.subscribe(state => {
       this.logger.info(`Call state '${this.id}' changed to '${state}'`);
 
       this._clear_state_timeout();
@@ -191,7 +191,6 @@ z.calling.entities.Call = class Call {
     this.conversation_et.call(this);
   }
 
-
   //##############################################################################
   // Call states
   //##############################################################################
@@ -210,16 +209,22 @@ z.calling.entities.Call = class Call {
     this._clear_timeouts();
 
     if (everyone_left || on_group_check) {
-      const reason = !this.was_connected ? z.calling.enum.TERMINATION_REASON.MISSED : z.calling.enum.TERMINATION_REASON.COMPLETED;
+      const reason = !this.was_connected
+        ? z.calling.enum.TERMINATION_REASON.MISSED
+        : z.calling.enum.TERMINATION_REASON.COMPLETED;
 
       if (on_group_check && !everyone_left) {
-        const user_ids = this.participants().map((participant_et) => participant_et.id);
+        const user_ids = this.participants().map(participant_et => participant_et.id);
         this.logger.warn(`Deactivation on group check with remaining users '${user_ids.join(', ')}' on group check`);
       }
 
       this.termination_reason = termination_reason;
       call_message_et.user_id = this.creating_user.id;
-      this.calling_repository.inject_deactivate_event(call_message_et, z.event.EventRepository.SOURCE.WEB_SOCKET, reason);
+      this.calling_repository.inject_deactivate_event(
+        call_message_et,
+        z.event.EventRepository.SOURCE.WEB_SOCKET,
+        reason
+      );
 
       return this.calling_repository.delete_call(this.id);
     }
@@ -253,9 +258,16 @@ z.calling.entities.Call = class Call {
     if (this.is_group) {
       const response = this.state() !== z.calling.enum.CALL_STATE.OUTGOING;
       const additional_payload = z.calling.CallMessageBuilder.create_payload(this.id, this.self_user.id);
-      const prop_sync_payload = z.calling.CallMessageBuilder.create_payload_prop_sync(this.self_state, z.media.MediaType.AUDIO, false, additional_payload);
+      const prop_sync_payload = z.calling.CallMessageBuilder.create_payload_prop_sync(
+        this.self_state,
+        z.media.MediaType.AUDIO,
+        false,
+        additional_payload
+      );
 
-      this.send_call_message(z.calling.CallMessageBuilder.build_group_start(response, this.session_id, prop_sync_payload));
+      this.send_call_message(
+        z.calling.CallMessageBuilder.build_group_start(response, this.session_id, prop_sync_payload)
+      );
     } else {
       const [remote_user_id] = this.conversation_et.participating_user_ids();
 
@@ -280,11 +292,12 @@ z.calling.entities.Call = class Call {
       call_message_et = z.calling.CallMessageBuilder.build_cancel(false, this.session_id);
     }
 
-    const event_promises = this.get_flows()
-      .map(({remote_client_id, remote_user_id}) => {
-        call_message_et.add_properties(z.calling.CallMessageBuilder.create_payload(this.id, this.self_user.id, remote_user_id, remote_client_id));
-        return this.send_call_message(call_message_et);
-      });
+    const event_promises = this.get_flows().map(({remote_client_id, remote_user_id}) => {
+      call_message_et.add_properties(
+        z.calling.CallMessageBuilder.create_payload(this.id, this.self_user.id, remote_user_id, remote_client_id)
+      );
+      return this.send_call_message(call_message_et);
+    });
 
     Promise.all(event_promises)
       .then(() => Promise.all(this.participants().map(({id}) => this.reset_participant(id))))
@@ -369,13 +382,24 @@ z.calling.entities.Call = class Call {
    * @returns {Promise} Resolves when state has been toggled
    */
   toggle_media(media_type) {
-    const call_event_promises = this.get_flows()
-      .map(({remote_client_id, remote_user_id}) => {
-        const additional_payload = z.calling.CallMessageBuilder.create_payload(this.id, this.self_user.id, remote_user_id, remote_client_id);
-        const prop_sync_payload = z.calling.CallMessageBuilder.create_payload_prop_sync(this.self_state, media_type, true, additional_payload);
+    const call_event_promises = this.get_flows().map(({remote_client_id, remote_user_id}) => {
+      const additional_payload = z.calling.CallMessageBuilder.create_payload(
+        this.id,
+        this.self_user.id,
+        remote_user_id,
+        remote_client_id
+      );
+      const prop_sync_payload = z.calling.CallMessageBuilder.create_payload_prop_sync(
+        this.self_state,
+        media_type,
+        true,
+        additional_payload
+      );
 
-        return this.send_call_message(z.calling.CallMessageBuilder.build_prop_sync(false, this.session_id, prop_sync_payload));
-      });
+      return this.send_call_message(
+        z.calling.CallMessageBuilder.build_prop_sync(false, this.session_id, prop_sync_payload)
+      );
+    });
 
     return Promise.all(call_event_promises);
   }
@@ -399,7 +423,7 @@ z.calling.entities.Call = class Call {
    * @returns {undefined} No return value
    */
   _clear_timeouts() {
-    this.get_flows().map((flow_et) => flow_et.clear_timeouts());
+    this.get_flows().map(flow_et => flow_et.clear_timeouts());
     this._clear_group_check_timeout();
     this._clear_state_timeout();
   }
@@ -413,7 +437,9 @@ z.calling.entities.Call = class Call {
    */
   _on_send_group_check_timeout(timeout_in_seconds) {
     if (this.participants().length) {
-      this.logger.info(`Sending group check after random timeout of '${timeout_in_seconds}s' (ID: ${this.group_check_timeout_id})`);
+      this.logger.info(
+        `Sending group check after random timeout of '${timeout_in_seconds}s' (ID: ${this.group_check_timeout_id})`
+      );
       const additional_payload = z.calling.CallMessageBuilder.create_payload(this.id, this.self_user.id);
 
       this.send_call_message(z.calling.CallMessageBuilder.build_group_check(true, this.session_id, additional_payload));
@@ -430,7 +456,11 @@ z.calling.entities.Call = class Call {
    */
   _on_verify_group_check_timeout() {
     this.logger.info(`Removing on group check timeout (ID: ${this.group_check_timeout_id})`);
-    const additional_payload = z.calling.CallMessageBuilder.create_payload(this.id, this.self_user.id, this.creating_user.id);
+    const additional_payload = z.calling.CallMessageBuilder.create_payload(
+      this.id,
+      this.self_user.id,
+      this.creating_user.id
+    );
     const call_message_et = z.calling.CallMessageBuilder.build_group_leave(false, this.session_id, additional_payload);
 
     this.deactivate_call(call_message_et, z.calling.enum.TERMINATION_REASON.GROUP_CHECK);
@@ -449,7 +479,9 @@ z.calling.entities.Call = class Call {
     this.group_check_timeout_id = window.setTimeout(() => {
       this._on_send_group_check_timeout(timeout_in_seconds);
     }, timeout_in_seconds * 1000);
-    this.logger.debug(`Set sending group check after random timeout of '${timeout_in_seconds}s' (ID: ${this.group_check_timeout_id})`);
+    this.logger.debug(
+      `Set sending group check after random timeout of '${timeout_in_seconds}s' (ID: ${this.group_check_timeout_id})`
+    );
   }
 
   /**
@@ -466,7 +498,6 @@ z.calling.entities.Call = class Call {
     this.logger.debug(`Set verifying group check after '${timeout_in_seconds}s' (ID: ${this.group_check_timeout_id})`);
   }
 
-
   //##############################################################################
   // Call states
   //##############################################################################
@@ -479,7 +510,12 @@ z.calling.entities.Call = class Call {
   confirm_message(incoming_call_message_et) {
     const {client_id, type, user_id} = incoming_call_message_et;
 
-    const additional_payload = z.calling.CallMessageBuilder.create_payload(this.id, this.self_user.id, user_id, client_id);
+    const additional_payload = z.calling.CallMessageBuilder.create_payload(
+      this.id,
+      this.self_user.id,
+      user_id,
+      client_id
+    );
     let call_message_et;
 
     switch (type) {
@@ -489,7 +525,12 @@ z.calling.entities.Call = class Call {
       }
 
       case z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC: {
-        const prop_sync_payload = z.calling.CallMessageBuilder.create_payload_prop_sync(this.self_state, z.media.MediaType.VIDEO, false, additional_payload);
+        const prop_sync_payload = z.calling.CallMessageBuilder.create_payload_prop_sync(
+          this.self_state,
+          z.media.MediaType.VIDEO,
+          false,
+          additional_payload
+        );
 
         call_message_et = z.calling.CallMessageBuilder.build_prop_sync(true, this.session_id, prop_sync_payload);
         break;
@@ -594,8 +635,7 @@ z.calling.entities.Call = class Call {
       }
 
       return amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, this.id, z.calling.enum.TERMINATION_REASON.TIMEOUT);
-    },
-    Call.CONFIG.STATE_TIMEOUT);
+    }, Call.CONFIG.STATE_TIMEOUT);
   }
 
   /**
@@ -634,7 +674,6 @@ z.calling.entities.Call = class Call {
     }
   }
 
-
   //##############################################################################
   // Participants
   //##############################################################################
@@ -650,7 +689,7 @@ z.calling.entities.Call = class Call {
   add_or_update_participant(user_id, negotiate, call_message_et) {
     return this.get_participant_by_id(user_id)
       .then(() => this._update_participant(user_id, negotiate, call_message_et))
-      .catch((error) => {
+      .catch(error => {
         if (error.type === z.calling.CallError.TYPE.NOT_FOUND) {
           return this._add_participant(user_id, negotiate, call_message_et);
         }
@@ -669,7 +708,7 @@ z.calling.entities.Call = class Call {
    */
   delete_participant(user_id, client_id, termination_reason) {
     return this.get_participant_by_id(user_id)
-      .then((participant_et) => {
+      .then(participant_et => {
         if (client_id) {
           participant_et.verify_client_id(client_id);
         }
@@ -703,7 +742,7 @@ z.calling.entities.Call = class Call {
         this.logger.info(`Removed call participant '${participant_et.user.name()}'`);
         return this;
       })
-      .catch((error) => {
+      .catch(error => {
         if (error.type !== z.calling.CallError.TYPE.NOT_FOUND) {
           throw error;
         }
@@ -737,7 +776,9 @@ z.calling.entities.Call = class Call {
       }
     }
 
-    return Promise.reject(new z.calling.CallError(z.calling.CallError.TYPE.NOT_FOUND, 'No participant for given user ID found'));
+    return Promise.reject(
+      new z.calling.CallError(z.calling.CallError.TYPE.NOT_FOUND, 'No participant for given user ID found')
+    );
   }
 
   /**
@@ -746,14 +787,13 @@ z.calling.entities.Call = class Call {
    * @returns {Promise} Resolves with the call entity
    */
   reset_participant(user_id) {
-    return this.get_participant_by_id(user_id)
-      .then((participant_et) => {
-        participant_et.reset_participant();
-        this.interrupted_participants.remove(participant_et);
+    return this.get_participant_by_id(user_id).then(participant_et => {
+      participant_et.reset_participant();
+      this.interrupted_participants.remove(participant_et);
 
-        this._update_remote_state();
-        this.calling_repository.media_element_handler.remove_media_element(user_id);
-      });
+      this._update_remote_state();
+      this.calling_repository.media_element_handler.remove_media_element(user_id);
+    });
   }
 
   /**
@@ -770,14 +810,13 @@ z.calling.entities.Call = class Call {
       return Promise.resolve(this);
     }
 
-    return this.get_participant_by_id(user_id)
-      .then(({session_id: participant_session_id}) => {
-        if (session_id === participant_session_id) {
-          return this;
-        }
+    return this.get_participant_by_id(user_id).then(({session_id: participant_session_id}) => {
+      if (session_id === participant_session_id) {
+        return this;
+      }
 
-        throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_SENDER, 'Session IDs not matching');
-      });
+      throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_SENDER, 'Session IDs not matching');
+    });
   }
 
   /**
@@ -789,22 +828,20 @@ z.calling.entities.Call = class Call {
    * @returns {Promise} Resolves with the added participant
    */
   _add_participant(user_id, negotiate, call_message_et) {
-    return this.get_participant_by_id(user_id)
-      .catch((error) => {
-        if (error.type !== z.calling.CallError.TYPE.NOT_FOUND) {
-          throw error;
-        }
+    return this.get_participant_by_id(user_id).catch(error => {
+      if (error.type !== z.calling.CallError.TYPE.NOT_FOUND) {
+        throw error;
+      }
 
-        return this.user_repository.get_user_by_id(user_id)
-          .then((user_et) => {
-            const participant_et = new z.calling.entities.Participant(this, user_et, this.timings);
+      return this.user_repository.get_user_by_id(user_id).then(user_et => {
+        const participant_et = new z.calling.entities.Participant(this, user_et, this.timings);
 
-            this.participants.push(participant_et);
+        this.participants.push(participant_et);
 
-            this.logger.info(`Adding call participant '${user_et.name()}'`, participant_et);
-            return this._update_participant_state(participant_et, negotiate, call_message_et);
-          });
+        this.logger.info(`Adding call participant '${user_et.name()}'`, participant_et);
+        return this._update_participant_state(participant_et, negotiate, call_message_et);
       });
+    });
   }
 
   /**
@@ -816,19 +853,18 @@ z.calling.entities.Call = class Call {
    * @returns {Promise} Resolves with the updated participant
    */
   _update_participant(user_id, negotiate, call_message_et) {
-    return this.get_participant_by_id(user_id)
-      .then((participant_et) => {
-        if (call_message_et) {
-          const {client_id} = call_message_et;
+    return this.get_participant_by_id(user_id).then(participant_et => {
+      if (call_message_et) {
+        const {client_id} = call_message_et;
 
-          if (client_id) {
-            participant_et.verify_client_id(client_id);
-          }
+        if (client_id) {
+          participant_et.verify_client_id(client_id);
         }
+      }
 
-        this.logger.info(`Updating call participant '${participant_et.user.name()}'`, call_message_et);
-        return this._update_participant_state(participant_et, negotiate, call_message_et);
-      });
+      this.logger.info(`Updating call participant '${participant_et.user.name()}'`, call_message_et);
+      return this._update_participant_state(participant_et, negotiate, call_message_et);
+    });
   }
 
   /**
@@ -842,22 +878,20 @@ z.calling.entities.Call = class Call {
   _update_participant_state(participant_et, negotiate, call_message_et) {
     const update_promise = call_message_et ? participant_et.update_state(call_message_et) : Promise.resolve(false);
 
-    return update_promise
-      .then((skip_negotiation) => {
-        if (skip_negotiation) {
-          negotiate = false;
-        }
+    return update_promise.then(skip_negotiation => {
+      if (skip_negotiation) {
+        negotiate = false;
+      }
 
-        this._update_remote_state();
+      this._update_remote_state();
 
-        if (negotiate) {
-          participant_et.start_negotiation();
-        }
+      if (negotiate) {
+        participant_et.start_negotiation();
+      }
 
-        return participant_et;
-      });
+      return participant_et;
+    });
   }
-
 
   //##############################################################################
   // Misc
@@ -869,8 +903,8 @@ z.calling.entities.Call = class Call {
    */
   get_flows() {
     return this.participants()
-      .filter((participant_et) => participant_et.flow_et)
-      .map((participant_et) => participant_et.flow_et);
+      .filter(participant_et => participant_et.flow_et)
+      .map(participant_et => participant_et.flow_et);
   }
 
   /**
@@ -878,7 +912,7 @@ z.calling.entities.Call = class Call {
    * @returns {Array<Object>} Array of flow telemetry reports for calling service automation
    */
   get_flow_telemetry() {
-    return this.get_flows().map((flow_et) => flow_et.get_telemetry());
+    return this.get_flows().map(flow_et => flow_et.get_telemetry());
   }
 
   /**
@@ -905,9 +939,9 @@ z.calling.entities.Call = class Call {
     }
 
     const position = -(total - 1.0) / (total + 1.0);
-    const delta = (-2.0 * position) / (total - 1.0);
+    const delta = -2.0 * position / (total - 1.0);
 
-    return position + (delta * index);
+    return position + delta * index;
   }
 
   /**
@@ -937,7 +971,6 @@ z.calling.entities.Call = class Call {
       this.logger.info(`New panning order: ${panning_order}`);
     }
   }
-
 
   //##############################################################################
   // Reset
@@ -975,9 +1008,8 @@ z.calling.entities.Call = class Call {
    * @returns {undefined} No return value
    */
   _reset_flows() {
-    this.get_flows().forEach((flow_et) => flow_et.reset_flow());
+    this.get_flows().forEach(flow_et => flow_et.reset_flow());
   }
-
 
   //##############################################################################
   // Logging
@@ -988,7 +1020,7 @@ z.calling.entities.Call = class Call {
    * @returns {undefined} No return value
    */
   log_status() {
-    this.get_flows().forEach((flow_et) => flow_et.log_status());
+    this.get_flows().forEach(flow_et => flow_et.log_status());
   }
 
   /**
@@ -996,6 +1028,6 @@ z.calling.entities.Call = class Call {
    * @returns {undefined} No return value
    */
   log_timings() {
-    this.get_flows().forEach((flow_et) => flow_et.log_timings());
+    this.get_flows().forEach(flow_et => flow_et.log_timings());
   }
 };

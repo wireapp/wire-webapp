@@ -96,7 +96,9 @@ z.service.BackendClient = class BackendClient {
     this.access_token_type = '';
 
     this.number_of_requests = ko.observable(0);
-    this.number_of_requests.subscribe((new_value) => amplify.publish(z.event.WebApp.TELEMETRY.BACKEND_REQUESTS, new_value));
+    this.number_of_requests.subscribe(new_value =>
+      amplify.publish(z.event.WebApp.TELEMETRY.BACKEND_REQUESTS, new_value)
+    );
 
     // Only allow JSON response by default
     $.ajaxSetup({
@@ -154,18 +156,21 @@ z.service.BackendClient = class BackendClient {
 
     const _check_status = () => {
       return this.status()
-        .done((jqXHR) => {
+        .done(jqXHR => {
           this.logger.info('Connectivity verified', jqXHR);
           _reset_queue();
         })
-        .fail((jqXHR) => {
+        .fail(jqXHR => {
           if (jqXHR.readyState === 4) {
             this.logger.info(`Connectivity verified by server error '${jqXHR.status}'`, jqXHR);
             _reset_queue();
           } else {
             this.logger.warn('Connectivity could not be verified... retrying');
             this.connectivity_queue.pause();
-            this.connectivity_timeout = window.setTimeout(_check_status, BackendClient.CONFIG.CONNECTIVITY_CHECK.RECHECK_TIMEOUT);
+            this.connectivity_timeout = window.setTimeout(
+              _check_status,
+              BackendClient.CONFIG.CONNECTIVITY_CHECK.RECHECK_TIMEOUT
+            );
           }
         });
     };
@@ -173,7 +178,10 @@ z.service.BackendClient = class BackendClient {
     this.connectivity_queue.pause();
     const queued_promise = this.connectivity_queue.push(() => Promise.resolve());
     if (!this.connectivity_timeout) {
-      this.connectivity_timeout = window.setTimeout(_check_status, BackendClient.CONFIG.CONNECTIVITY_CHECK.INITIAL_TIMEOUT);
+      this.connectivity_timeout = window.setTimeout(
+        _check_status,
+        BackendClient.CONFIG.CONNECTIVITY_CHECK.INITIAL_TIMEOUT
+      );
     }
 
     return queued_promise;
@@ -248,20 +256,21 @@ z.service.BackendClient = class BackendClient {
    */
   send_request(config) {
     if (this.queue_state() !== z.service.QUEUE_STATE.READY) {
-      this.logger.info(`Adding '${config.type}' request to '${config.url}' to queue due to '${this.queue_state()}'`, config);
+      this.logger.info(
+        `Adding '${config.type}' request to '${config.url}' to queue due to '${this.queue_state()}'`,
+        config
+      );
     }
 
     return this.request_queue.push(() => this._send_request(config));
   }
 
   _prepend_request_queue(config, resolve_fn, reject_fn) {
-    this.request_queue
-      .pause()
-      .unshift(() => {
-        return this._send_request(config)
-          .then(resolve_fn)
-          .catch(reject_fn);
-      });
+    this.request_queue.pause().unshift(() => {
+      return this._send_request(config)
+        .then(resolve_fn)
+        .catch(reject_fn);
+    });
   }
 
   /**
@@ -273,7 +282,9 @@ z.service.BackendClient = class BackendClient {
    */
   _send_request(config) {
     if (this.access_token) {
-      config.headers = $.extend(config.headers || {}, {Authorization: `${this.access_token_type} ${this.access_token}`});
+      config.headers = $.extend(config.headers || {}, {
+        Authorization: `${this.access_token_type} ${this.access_token}`,
+      });
     }
 
     if (config.withCredentials) {
@@ -296,7 +307,11 @@ z.service.BackendClient = class BackendClient {
       })
         .done((data, textStatus, {wire: wire_request}) => {
           const request_id = wire_request ? wire_request.request : 'ID not set';
-          this.logger.debug(this.logger.levels.OFF, `Server response to '${config.type}' request '${config.url}' - '${request_id}':`, data);
+          this.logger.debug(
+            this.logger.levels.OFF,
+            `Server response to '${config.type}' request '${config.url}' - '${request_id}':`,
+            data
+          );
 
           resolve(data);
         })
@@ -306,8 +321,7 @@ z.service.BackendClient = class BackendClient {
               this.queue_state(z.service.QUEUE_STATE.CONNECTIVITY_PROBLEM);
               this._prepend_request_queue(config, resolve, reject);
 
-              return this.execute_on_connectivity()
-                .then(() => this.execute_request_queue());
+              return this.execute_on_connectivity().then(() => this.execute_request_queue());
             }
 
             case z.service.BackendClientError.STATUS_CODE.FORBIDDEN: {

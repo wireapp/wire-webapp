@@ -29,12 +29,13 @@ No license is granted to the Wire trademark and its associated logos, all of whi
 ### Execution
 
 Run `yarn start` and Wire's web app will be available at: http://localhost:8888/auth/#login
- 
+
 To login with your existing Wire account use: http://localhost:8888/auth/?env=prod#login
 
 ### Status
 
 [![Build Status](https://travis-ci.org/wireapp/wire-webapp.svg?branch=dev)](https://travis-ci.org/wireapp/wire-webapp)
+[![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 
 ### Translations
 
