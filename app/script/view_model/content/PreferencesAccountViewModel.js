@@ -235,7 +235,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
   click_on_reset_password() {
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PASSWORD_RESET, {value: 'fromProfile'});
-    z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.WEBSITE, z.config.URL_PATH.PASSWORD_RESET));
+    z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.ACCOUNT, z.config.URL_PATH.PASSWORD_RESET));
   }
 
   set_picture(new_user_picture) {
