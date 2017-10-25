@@ -88,7 +88,7 @@ z.assets.AssetCrypto = (() => {
   function _generate_random_bytes(length) {
     const randomValues = new Uint32Array(length / 4).map(() => libsodium.getRandomValue());
     const ramdonBytes = new Uint8Array(randomValues.buffer);
-    if (ramdonBytes.length > 0 && !ramdonBytes.every(byte => byte === 0)) {
+    if (ramdonBytes.length && !ramdonBytes.every(byte => byte === 0)) {
       return ramdonBytes;
     }
     throw Error('Failed to initialize iv with random values');

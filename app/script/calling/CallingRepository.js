@@ -469,9 +469,8 @@ z.calling.CallingRepository = class CallingRepository {
         call_et.set_remote_version(call_message_et);
 
         if (response && user_id === this.self_user_id()) {
-          this.logger.info(
-            `Incoming call in conversation '${call_et.conversation_et.display_name()}' accepted on other device`
-          );
+          const conversation_name = call_et.conversation_et.display_name();
+          this.logger.info(`Incoming call in conversation '${conversation_name}' accepted on other device`);
           return this.delete_call(conversation_id);
         }
 
@@ -576,9 +575,7 @@ z.calling.CallingRepository = class CallingRepository {
       const {dest_client_id, dest_user_id, type} = call_message_et;
 
       if (dest_user_id !== this.self_user_id() || dest_client_id !== this.client_repository.current_client().id) {
-        this.logger.log(
-          `Ignored non-targeted call '${type}' message intended for client '${dest_client_id}' of user '${dest_user_id}'`
-        );
+        this.logger.log(`Ignored '${type}' call message for client '${dest_client_id}' of user '${dest_user_id}'`);
         throw new z.calling.CallError(z.calling.CallError.TYPE.MISTARGETED_MESSAGE);
       }
     }
@@ -1079,10 +1076,8 @@ z.calling.CallingRepository = class CallingRepository {
       .then(remote_user_et => this._create_call(call_message_et, remote_user_et))
       .then(call_et => {
         const media_type = this._get_media_type_from_properties(props);
-        this.logger.info(
-          `Incoming '${media_type}' call in conversation '${call_et.conversation_et.display_name()}'`,
-          call_et
-        );
+        const conversation_name = call_et.conversation_et.display_name();
+        this.logger.info(`Incoming '${media_type}' call in conversation '${conversation_name}'`, call_et);
 
         call_et.direction = z.calling.enum.CALL_STATE.INCOMING;
         call_et.set_remote_version(call_message_et);
@@ -1122,10 +1117,8 @@ z.calling.CallingRepository = class CallingRepository {
 
     return this._create_call(call_message_et, this.user_repository.self()).then(call_et => {
       const media_type = this._get_media_type_from_properties(props);
-      this.logger.info(
-        `Outgoing '${media_type}' call in conversation '${call_et.conversation_et.display_name()}'`,
-        call_et
-      );
+      const conversation_name = call_et.conversation_et.display_name();
+      this.logger.info(`Outgoing '${media_type}' call in conversation '${conversation_name}'`, call_et);
 
       call_et.direction = z.calling.enum.CALL_STATE.OUTGOING;
       call_et.state(z.calling.enum.CALL_STATE.OUTGOING);
@@ -1280,9 +1273,8 @@ z.calling.CallingRepository = class CallingRepository {
 
   _clear_config() {
     if (this.calling_config) {
-      this.logger.debug(
-        `Removing calling configuration with expiration of '${this.calling_config.expiration.toISOString()}'`
-      );
+      const expiration_date = this.calling_config.expiration.toISOString();
+      this.logger.debug(`Removing calling configuration with expiration of '${expiration_date}'`);
       this.calling_config = undefined;
     }
   }

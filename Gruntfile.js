@@ -117,9 +117,7 @@ module.exports = grunt => {
     const scripts = grunt.config('scripts');
     const scripts_minified = grunt.config('scripts_minified');
 
-    const prepare_file_names = file_name_array => {
-      return file_name_array.map(file_name => file_name.replace('deploy/', ''));
-    };
+    const prepare_file_names = file_names => file_names.map(name => name.replace('deploy/', ''));
 
     const helper_files = grunt.config.get('karma.options.files');
     const app_files = prepare_file_names(scripts_minified.app.concat(scripts.app));
