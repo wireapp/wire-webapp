@@ -152,8 +152,8 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
   _init_mixpanel(mixpanel_instance) {
     if (mixpanel_instance) {
-      this._subscribe_to_tracking_events();
       this._set_super_properties();
+      this._subscribe_to_tracking_events();
     }
   }
 
@@ -191,7 +191,11 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
   _set_super_properties() {
     this._set_super_property(z.tracking.SuperProperty.APP, EventTrackingRepository.CONFIG.USER_ANALYTICS.CLIENT_TYPE);
+    this._set_super_property(z.tracking.SuperProperty.APP_VERSION, z.util.Environment.version(false));
     this._set_super_property(z.tracking.SuperProperty.DESKTOP_APP, z.tracking.helpers.get_platform());
+    if (z.util.Environment.desktop) {
+      this._set_super_property(z.tracking.SuperProperty.WRAPPER_VERSION, z.util.Environment.version(true));
+    }
 
     if (this.user_repository) {
       this._set_super_property(z.tracking.SuperProperty.CONTACTS, this.user_repository.number_of_contacts());
@@ -235,11 +239,18 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
   _re_enable_tracking() {
     this.is_user_analytics_activated = true;
-    this.mixpanel.unregister('$ignore');
-    this._subscribe_to_tracking_events();
 
-    this._set_super_properties();
-    this._track_event(z.tracking.EventName.SETTINGS.OPTED_IN_TRACKING);
+    Promise.resolve()
+      .then(() => {
+        if (this.mixpanel) {
+          this.mixpanel.unregister('$ignore');
+          return this.mixpanel;
+        }
+
+        return this._init_tracking();
+      })
+      .then(mixpanel_instance => this._init_mixpanel(mixpanel_instance))
+      .then(() => this._track_event(z.tracking.EventName.SETTINGS.OPTED_IN_TRACKING));
   }
 
   _init_tracking() {

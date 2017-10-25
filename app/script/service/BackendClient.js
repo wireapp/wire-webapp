@@ -30,6 +30,7 @@ z.service.BackendClient = class BackendClient {
         RECHECK_TIMEOUT: 2000,
         REQUEST_TIMEOUT: 500,
       },
+      QUEUE_CHECK_TIMEOUT: 60 * 1000,
     };
   }
 
@@ -89,6 +90,7 @@ z.service.BackendClient = class BackendClient {
 
     this.request_queue = new z.util.PromiseQueue({concurrent: 4, name: 'BackendClient.Request'});
     this.queue_state = ko.observable(z.service.QUEUE_STATE.READY);
+    this.queue_timeout = undefined;
 
     this.access_token = '';
     this.access_token_type = '';
@@ -195,6 +197,24 @@ z.service.BackendClient = class BackendClient {
       this.logger.info(`Executing '${this.request_queue.get_length()}' queued requests`);
       this.request_queue.resume();
     }
+  }
+
+  clear_queue_unblock() {
+    if (this.queue_timeout) {
+      window.clearTimeout(this.queue_timeout);
+      this.queue_timeout = undefined;
+    }
+  }
+
+  schedule_queue_unblock() {
+    this.clear_queue_unblock();
+    this.queue_timeout = window.setTimeout(() => {
+      const is_refreshing_token = this.queue_state() === z.service.QUEUE_STATE.ACCESS_TOKEN_REFRESH;
+      if (is_refreshing_token) {
+        this.logger.log(`Unblocked queue on timeout during '${this.queue_state()}'`);
+        this.queue_state(z.service.QUEUE_STATE.READY);
+      }
+    }, BackendClient.CONFIG.QUEUE_CHECK_TIMEOUT);
   }
 
   /**

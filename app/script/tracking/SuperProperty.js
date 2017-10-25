@@ -28,10 +28,12 @@ window.z.tracking = z.tracking || {};
  */
 z.tracking.SuperProperty = {
   APP: 'app',
+  APP_VERSION: 'App Version',
   CONTACTS: 'contacts',
   DESKTOP_APP: 'desktop_app',
   TEAM: {
     IN_TEAM: 'team.in_team',
     SIZE: 'team.size',
   },
+  WRAPPER_VERSION: 'wrapper_version',
 };

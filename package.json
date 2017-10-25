@@ -2,7 +2,7 @@
   "name": "wire-webapp",
   "license": "LicenseRef-LICENSE",
   "devDependencies": {
-    "autoprefixer": "7.1.5",
+    "autoprefixer": "7.1.6",
     "eslint": "4.9.0",
     "eslint-config-prettier": "2.6.0",
     "eslint-plugin-jsdoc": "3.1.3",
