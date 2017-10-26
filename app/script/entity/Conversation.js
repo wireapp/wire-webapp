@@ -431,7 +431,10 @@ z.entity.Conversation = class Conversation {
   _check_for_duplicate(message_et) {
     if (message_et) {
       for (const existing_message_et of this.messages_unordered()) {
-        if (message_et.id && existing_message_et.id === message_et.id && existing_message_et.from === message_et.from) {
+        const duplicate_message_id = message_et.id && existing_message_et.id === message_et.id;
+        const from_same_sender = existing_message_et.from === message_et.from;
+
+        if (duplicate_message_id && from_same_sender) {
           return undefined;
         }
       }

@@ -131,12 +131,13 @@ z.assets.AssetService = class AssetService {
     return Promise.resolve().then(() => {
       z.util.ValidationUtil.asset.legacy(asset_id, conversation_id);
       const url = this.client.create_url(`/assets/${asset_id}`);
-      let asset_url = `${url}?access_token=${this.client.access_token}&conv_id=${window.encodeURIComponent(
-        conversation_id
-      )}`;
+      conversation_id = window.encodeURIComponent(conversation_id);
+
+      let asset_url = `${url}?access_token=${this.client.access_token}&conv_id=${conversation_id}`;
       if (force_caching) {
         asset_url = `${asset_url}&forceCaching=true`;
       }
+
       return asset_url;
     });
   }

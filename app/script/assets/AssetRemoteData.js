@@ -102,7 +102,7 @@ z.assets.AssetRemoteData = class AssetRemoteData {
     return this._load_buffer()
       .then(([buffer, type]) => {
         mime_type = type;
-        if (this.otr_key != null && this.sha256 != null) {
+        if (this.otr_key && this.sha256) {
           return z.assets.AssetCrypto.decrypt_aes_asset(buffer, this.otr_key.buffer, this.sha256.buffer);
         }
         return buffer;
@@ -116,7 +116,7 @@ z.assets.AssetRemoteData = class AssetRemoteData {
    */
   get_object_url() {
     const object_url = z.assets.AssetURLCache.get_url(this.identifier);
-    if (object_url != null) {
+    if (object_url) {
       return Promise.resolve(object_url);
     }
 

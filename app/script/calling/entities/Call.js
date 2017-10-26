@@ -265,9 +265,8 @@ z.calling.entities.Call = class Call {
         additional_payload
       );
 
-      this.send_call_message(
-        z.calling.CallMessageBuilder.build_group_start(response, this.session_id, prop_sync_payload)
-      );
+      const message = z.calling.CallMessageBuilder.build_group_start(response, this.session_id, prop_sync_payload);
+      this.send_call_message(message);
     } else {
       const [remote_user_id] = this.conversation_et.participating_user_ids();
 
@@ -293,9 +292,13 @@ z.calling.entities.Call = class Call {
     }
 
     const event_promises = this.get_flows().map(({remote_client_id, remote_user_id}) => {
-      call_message_et.add_properties(
-        z.calling.CallMessageBuilder.create_payload(this.id, this.self_user.id, remote_user_id, remote_client_id)
+      const payload = z.calling.CallMessageBuilder.create_payload(
+        this.id,
+        this.self_user.id,
+        remote_user_id,
+        remote_client_id
       );
+      call_message_et.add_properties(payload);
       return this.send_call_message(call_message_et);
     });
 
@@ -396,9 +399,8 @@ z.calling.entities.Call = class Call {
         additional_payload
       );
 
-      return this.send_call_message(
-        z.calling.CallMessageBuilder.build_prop_sync(false, this.session_id, prop_sync_payload)
-      );
+      const message = z.calling.CallMessageBuilder.build_prop_sync(false, this.session_id, prop_sync_payload);
+      return this.send_call_message(message);
     });
 
     return Promise.all(call_event_promises);
@@ -432,14 +434,12 @@ z.calling.entities.Call = class Call {
    * Leave group call or schedule sending new group check after timeout.
    *
    * @private
-   * @param {number} timeout_in_seconds - Random timeout in seconds
+   * @param {number} timeout - Random timeout in seconds
    * @returns {undefined} No return value
    */
-  _on_send_group_check_timeout(timeout_in_seconds) {
+  _on_send_group_check_timeout(timeout) {
     if (this.participants().length) {
-      this.logger.info(
-        `Sending group check after random timeout of '${timeout_in_seconds}s' (ID: ${this.group_check_timeout_id})`
-      );
+      this.logger.info(`Sending group check after timeout of '${timeout}s' (ID: ${this.group_check_timeout_id})`);
       const additional_payload = z.calling.CallMessageBuilder.create_payload(this.id, this.self_user.id);
 
       this.send_call_message(z.calling.CallMessageBuilder.build_group_check(true, this.session_id, additional_payload));
@@ -479,9 +479,9 @@ z.calling.entities.Call = class Call {
     this.group_check_timeout_id = window.setTimeout(() => {
       this._on_send_group_check_timeout(timeout_in_seconds);
     }, timeout_in_seconds * 1000);
-    this.logger.debug(
-      `Set sending group check after random timeout of '${timeout_in_seconds}s' (ID: ${this.group_check_timeout_id})`
-    );
+
+    const timeout_id = this.group_check_timeout_id;
+    this.logger.debug(`Set sending group check after timeout of '${timeout_in_seconds}s' (ID: ${timeout_id})`);
   }
 
   /**
@@ -776,9 +776,8 @@ z.calling.entities.Call = class Call {
       }
     }
 
-    return Promise.reject(
-      new z.calling.CallError(z.calling.CallError.TYPE.NOT_FOUND, 'No participant for given user ID found')
-    );
+    const error = new z.calling.CallError(z.calling.CallError.TYPE.NOT_FOUND, 'No participant found for user ID');
+    return Promise.reject(error);
   }
 
   /**

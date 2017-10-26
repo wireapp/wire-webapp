@@ -100,7 +100,7 @@ z.components.FullSearchViewModel = class FullSearchViewModel {
 
     // binding?
     $('.collection-list').on('scroll', event => {
-      if ($(event.currentTarget).is_scrolled_bottom() && this.message_ets.length > 0) {
+      if ($(event.currentTarget).is_scrolled_bottom() && this.message_ets.length) {
         z.util.ko_array_push_all(
           this.message_ets_rendered,
           this.message_ets.splice(0, this.number_of_message_to_render)

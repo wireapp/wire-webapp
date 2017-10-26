@@ -119,11 +119,7 @@ z.client.ClientRepository = class ClientRepository {
 
         const client_et = this.client_mapper.map_client(client_payload);
         this.current_client(client_et);
-        this.logger.info(
-          `Loaded local client '${client_et.id}' connected to '${z.client.ClientRepository
-            .PRIMARY_KEY_CURRENT_CLIENT}'`,
-          this.current_client()
-        );
+        this.logger.info(`Loaded local client '${client_et.id}'`, this.current_client());
         return this.current_client();
       });
   }
@@ -287,17 +283,15 @@ z.client.ClientRepository = class ClientRepository {
         throw new z.client.ClientError(z.client.ClientError.TYPE.REQUEST_FAILURE);
       })
       .then(response => {
-        this.logger.info(
-          `Registered '${response.type}' client '${response.id}' with cookie label '${response.cookie}'`,
-          response
-        );
+        const {cookie, id, type} = response;
+        this.logger.info(`Registered '${type}' client '${id}' with cookie label '${cookie}'`, response);
         this.current_client(this.client_mapper.map_client(response));
         return this._save_current_client_in_db(response);
       })
       .catch(error => {
-        if (
-          [z.client.ClientError.TYPE.REQUEST_FAILURE, z.client.ClientError.TYPE.TOO_MANY_CLIENTS].includes(error.type)
-        ) {
+        const handled_errors = [z.client.ClientError.TYPE.REQUEST_FAILURE, z.client.ClientError.TYPE.TOO_MANY_CLIENTS];
+
+        if (handled_errors.includes(error.type)) {
           throw error;
         }
         this.logger.error(`Failed to save client: ${error.message}`, error);
@@ -381,13 +375,11 @@ z.client.ClientRepository = class ClientRepository {
    */
   _transfer_cookie_label(client_type, cookie_label) {
     const indexed_db_key = z.storage.StorageKey.AUTH.COOKIE_LABEL;
-    const local_storage_key = this.construct_cookie_label_key(
-      this.self_user().email() || this.self_user().phone(),
-      client_type
-    );
+    const user_identifier = this.self_user().email() || this.self_user().phone();
+    const local_storage_key = this.construct_cookie_label_key(user_identifier, client_type);
 
     if (cookie_label === undefined) {
-      cookie_label = this.construct_cookie_label(this.self_user().email() || this.self_user().phone(), client_type);
+      cookie_label = this.construct_cookie_label(user_identifier, client_type);
       this.logger.warn(`Cookie label is in an invalid state. We created a new one: '${cookie_label}'`);
       z.util.StorageUtil.set_value(local_storage_key, cookie_label);
     }

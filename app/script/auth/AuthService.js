@@ -194,6 +194,7 @@ z.auth.AuthService = class AuthService {
    * @returns {Promise} Promise that resolves with access token
    */
   post_login(login, persist) {
+    const persist_param = window.encodeURIComponent(persist.toString());
     return new Promise((resolve, reject) => {
       $.ajax({
         contentType: 'application/json; charset=utf-8',
@@ -204,9 +205,7 @@ z.auth.AuthService = class AuthService {
         },
         processData: false,
         type: 'POST',
-        url: `${this.client.create_url(AuthService.CONFIG.URL_LOGIN)}?persist=${window.encodeURIComponent(
-          persist.toString()
-        )}`,
+        url: `${this.client.create_url(AuthService.CONFIG.URL_LOGIN)}?persist=${persist_param}`,
         xhrFields: {
           withCredentials: true,
         },

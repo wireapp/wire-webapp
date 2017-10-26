@@ -52,7 +52,7 @@ z.client.ClientService = class ClientService {
         password,
       },
       type: 'DELETE',
-      url: this.client.create_url(`${z.client.ClientService.URL_CLIENTS}/${client_id}`),
+      url: this.client.create_url(`${ClientService.URL_CLIENTS}/${client_id}`),
     });
   }
 
@@ -65,7 +65,7 @@ z.client.ClientService = class ClientService {
     return this.client.send_json({
       data: {},
       type: 'DELETE',
-      url: this.client.create_url(`${z.client.ClientService.URL_CLIENTS}/${client_id}`),
+      url: this.client.create_url(`${ClientService.URL_CLIENTS}/${client_id}`),
     });
   }
 
@@ -79,7 +79,7 @@ z.client.ClientService = class ClientService {
   get_client_by_id(client_id) {
     return this.client.send_request({
       type: 'GET',
-      url: this.client.create_url(`${z.client.ClientService.URL_CLIENTS}/${client_id}`),
+      url: this.client.create_url(`${ClientService.URL_CLIENTS}/${client_id}`),
     });
   }
 
@@ -91,7 +91,7 @@ z.client.ClientService = class ClientService {
   get_clients() {
     return this.client.send_request({
       type: 'GET',
-      url: this.client.create_url(z.client.ClientService.URL_CLIENTS),
+      url: this.client.create_url(ClientService.URL_CLIENTS),
     });
   }
 
@@ -105,9 +105,7 @@ z.client.ClientService = class ClientService {
   get_clients_by_user_id(user_id) {
     return this.client.send_request({
       type: 'GET',
-      url: this.client.create_url(
-        `${z.client.ClientService.URL_USERS}/${user_id}${z.client.ClientService.URL_CLIENTS}`
-      ),
+      url: this.client.create_url(`${ClientService.URL_USERS}/${user_id}${ClientService.URL_CLIENTS}`),
     });
   }
 
@@ -120,7 +118,7 @@ z.client.ClientService = class ClientService {
     return this.client.send_json({
       data: payload,
       type: 'POST',
-      url: this.client.create_url(z.client.ClientService.URL_CLIENTS),
+      url: this.client.create_url(ClientService.URL_CLIENTS),
     });
   }
 
@@ -181,7 +179,7 @@ z.client.ClientService = class ClientService {
    * @returns {Promise<Object>} Resolves with the client payload stored in database
    */
   save_client_in_db(primary_key, client_payload) {
-    if (client_payload.meta == null) {
+    if (!client_payload.meta) {
       client_payload.meta = {};
     }
 
