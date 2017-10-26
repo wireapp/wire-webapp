@@ -32,9 +32,7 @@ z.components.ConversationListCell = class ConversationListCell {
 
     this.cell_state = ko.observable('');
     this.cell_state_observable = ko
-      .computed(() => {
-        this.cell_state(z.conversation.ConversationCellState.generate(this.conversation));
-      })
+      .computed(() => this.cell_state(z.conversation.ConversationCellState.generate(this.conversation)))
       .extend({rateLimit: 500});
   }
 

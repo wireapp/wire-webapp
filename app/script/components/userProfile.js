@@ -176,7 +176,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
             if (this.conversation_repository.is_active_conversation(conversation_et)) {
               amplify.publish(z.event.WebApp.CONVERSATION.PEOPLE.HIDE);
               const next_conversation_et = this.conversation_repository.get_next_conversation(conversation_et);
-              window.setTimeout(function() {
+              window.setTimeout(() => {
                 amplify.publish(z.event.WebApp.CONVERSATION.SHOW, next_conversation_et);
               }, SHOW_CONVERSATION_DELAY);
             }
@@ -230,57 +230,38 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
       }
     };
 
-    this.accent_color = ko.pureComputed(
-      () => {
-        if (this.user()) {
-          return `accent-color-${this.user().accent_id()}`;
-        }
-      },
-      this,
-      {deferEvaluation: true}
-    );
+    this.accent_color = ko.pureComputed(() => {
+      if (this.user()) {
+        return `accent-color-${this.user().accent_id()}`;
+      }
+    });
 
-    this.show_gray_image = ko.pureComputed(
-      () => {
-        if (!this.user()) {
-          return false;
-        }
+    this.show_gray_image = ko.pureComputed(() => {
+      if (!this.user()) {
+        return false;
+      }
 
-        return !this.user().is_me && !this.user.is_connected();
-      },
-      this,
-      {deferEvaluation: true}
-    );
+      return !this.user().is_me && !this.user.is_connected();
+    });
 
-    this.connection_is_not_established = ko.pureComputed(
-      () => {
-        if (this.user()) {
-          return this.user().is_request() || this.user().is_ignored();
-        }
-      },
-      this,
-      {deferEvaluation: true}
-    );
+    this.connection_is_not_established = ko.pureComputed(() => {
+      if (this.user()) {
+        return this.user().is_request() || this.user().is_ignored();
+      }
+    });
 
-    this.user_is_removed_from_conversation = ko.pureComputed(
-      () => {
-        if (!this.user() || !this.conversation()) {
-          return true;
-        }
+    this.user_is_removed_from_conversation = ko.pureComputed(() => {
+      if (!this.user() || !this.conversation()) {
+        return true;
+      }
 
-        const participating_user_ets = this.conversation().participating_user_ets();
-        return !participating_user_ets.includes(this.user());
-      },
-      this,
-      {deferEvaluation: true}
-    );
+      const participating_user_ets = this.conversation().participating_user_ets();
+      return !participating_user_ets.includes(this.user());
+    });
 
     this.render_avatar = ko.observable(false);
     this.render_avatar_computed = ko.computed(() => {
-      let has_user_id = false;
-      if (this.user()) {
-        has_user_id = true;
-      }
+      const has_user_id = !!this.user();
 
       // swap value to re-render avatar
       this.render_avatar(false);

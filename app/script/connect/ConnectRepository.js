@@ -54,9 +54,9 @@ z.connect.ConnectRepository = class ConnectRepository {
     self.forEach((contact, contact_index) => (self[contact_index] = z.util.encode_sha256_base64(contact)));
 
     cards.forEach((card, card_index) => {
-      card.contact.forEach(
-        (contact, contact_index) => (card.contact[contact_index] = z.util.encode_sha256_base64(contact))
-      );
+      card.contact.forEach((contact, contact_index) => {
+        card.contact[contact_index] = z.util.encode_sha256_base64(contact);
+      });
       cards[card_index] = card;
     });
 

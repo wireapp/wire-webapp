@@ -253,8 +253,8 @@ z.calling.entities.Flow = class Flow {
     //##############################################################################
 
     this.can_create_sdp = ko.pureComputed(() => {
-      const in_state_for_creation =
-        this.negotiation_needed() && this.signaling_state() !== z.calling.rtc.SIGNALING_STATE.CLOSED;
+      const is_connection_closed = this.signaling_state() === z.calling.rtc.SIGNALING_STATE.CLOSED;
+      const in_state_for_creation = this.negotiation_needed() && !is_connection_closed;
       return this.pc_initialized() && in_state_for_creation;
     });
 
@@ -772,10 +772,7 @@ z.calling.entities.Flow = class Flow {
 
         if (sending_on_timeout && this.negotiation_mode() === z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT) {
           if (!this._contains_relay_candidate(ice_candidates)) {
-            this.logger.warn(
-              `Local SDP does not contain any relay ICE candidates, resetting timeout\n${ice_candidates}`,
-              ice_candidates
-            );
+            this.logger.warn(`No relay ICE candidates in local SDP. Timeout reset\n${ice_candidates}`, ice_candidates);
             return this._set_send_sdp_timeout(false);
           }
         }
@@ -789,26 +786,17 @@ z.calling.entities.Flow = class Flow {
         const response = local_sdp.type === z.calling.rtc.SDP_TYPE.ANSWER;
         let call_message_et;
 
-        if (this.negotiation_mode() === z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT) {
+        const additional_payload = this._create_additional_payload();
+        const session_id = this.call_et.session_id;
+        const in_default_mode = this.negotiation_mode() === z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT;
+        if (in_default_mode) {
           if (this.call_et.is_group) {
-            call_message_et = z.calling.CallMessageBuilder.build_group_setup(
-              response,
-              this.call_et.session_id,
-              this._create_additional_payload()
-            );
+            call_message_et = z.calling.CallMessageBuilder.build_group_setup(response, session_id, additional_payload);
           } else {
-            call_message_et = z.calling.CallMessageBuilder.build_setup(
-              response,
-              this.call_et.session_id,
-              this._create_additional_payload()
-            );
+            call_message_et = z.calling.CallMessageBuilder.build_setup(response, session_id, additional_payload);
           }
         } else {
-          call_message_et = z.calling.CallMessageBuilder.build_update(
-            response,
-            this.call_et.session_id,
-            this._create_additional_payload()
-          );
+          call_message_et = z.calling.CallMessageBuilder.build_update(response, session_id, additional_payload);
         }
 
         return this.call_et.send_call_message(call_message_et).then(() => {
@@ -1264,11 +1252,12 @@ z.calling.entities.Flow = class Flow {
       .catch(error => {
         const {message, name, type} = error;
 
-        if (
-          ![z.calling.CallError.TYPE.NO_REPLACEABLE_TRACK, z.calling.CallError.TYPE.RTP_SENDER_NOT_SUPPORTED].includes(
-            type
-          )
-        ) {
+        const expected_error_types = [
+          z.calling.CallError.TYPE.NO_REPLACEABLE_TRACK,
+          z.calling.CallError.TYPE.RTP_SENDER_NOT_SUPPORTED,
+        ];
+
+        if (!expected_error_types.includes(type)) {
           this.logger.error(`Failed to replace the '${media_type}' track: ${name} - ${message}`, error);
         }
         throw error;
@@ -1349,10 +1338,8 @@ z.calling.entities.Flow = class Flow {
       z.media.MediaStreamHandler.get_media_tracks(this.media_stream(), media_type).forEach(media_stream_track => {
         this.media_stream().removeTrack(media_stream_track);
         media_stream_track.stop();
-        this.logger.debug(
-          `Stopping MediaStreamTrack of kind '${media_stream_track.kind}' successful`,
-          media_stream_track
-        );
+        const media_kind = media_stream_track.kind;
+        this.logger.debug(`Stopping MediaStreamTrack of kind '${media_kind}' successful`, media_stream_track);
       });
 
       const media_stream = this.media_stream().clone();

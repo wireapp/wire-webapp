@@ -84,12 +84,13 @@ z.calling.SDPMapper = {
           sdp_lines.push(sdp_line);
 
           const browser_string = `${z.util.Environment.browser.name} ${z.util.Environment.browser.version}`;
+          const webapp_version = z.util.Environment.version(false);
+
           if (z.util.Environment.desktop) {
-            outline = `a=tool:electron ${z.util.Environment.version()} ${z.util.Environment.version(
-              false
-            )} (${browser_string})`;
+            const desktop_version = z.util.Environment.version(true);
+            outline = `a=tool:electron ${desktop_version} ${webapp_version} (${browser_string})`;
           } else {
-            outline = `a=tool:webapp ${z.util.Environment.version(false)} (${browser_string})`;
+            outline = `a=tool:webapp ${webapp_version} (${browser_string})`;
           }
         }
       } else if (sdp_line.startsWith('a=candidate')) {
@@ -97,11 +98,10 @@ z.calling.SDPMapper = {
 
         // Remove once obsolete due to high uptake of clients based on AVS build 3.3.11 containing fix for AUDIO-1215
       } else if (sdp_line.startsWith('a=mid')) {
-        if (
-          sdp_source === z.calling.enum.SDP_SOURCE.REMOTE &&
-          z.util.Environment.browser.firefox &&
-          rtc_sdp.type === z.calling.rtc.SDP_TYPE.ANSWER
-        ) {
+        const is_remote_sdp = sdp_source === z.calling.enum.SDP_SOURCE.REMOTE;
+        const is_answer = rtc_sdp.type === z.calling.rtc.SDP_TYPE.ANSWER;
+
+        if (is_remote_sdp && is_answer && z.util.Environment.browser.firefox) {
           if (sdp_line === 'a=mid:data') {
             outline = 'a=mid:sdparta_2';
           }
@@ -109,18 +109,18 @@ z.calling.SDPMapper = {
 
         // Code to nail in bit-rate and ptime settings for improved performance and experience
       } else if (sdp_line.startsWith('m=audio')) {
-        if (
-          flow_et.negotiation_mode() === z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART ||
-          (sdp_source === z.calling.enum.SDP_SOURCE.LOCAL && flow_et.is_group)
-        ) {
+        const is_ice_restart = flow_et.negotiation_mode() === z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART;
+        const is_local_sdp = sdp_source === z.calling.enum.SDP_SOURCE.LOCAL;
+
+        if (is_ice_restart || (is_local_sdp && flow_et.is_group)) {
           sdp_lines.push(sdp_line);
           outline = `b=AS:${z.calling.SDPMapper.CONFIG.AUDIO_BITRATE}`;
         }
       } else if (sdp_line.startsWith('a=rtpmap')) {
-        if (
-          flow_et.negotiation_mode() === z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART ||
-          (sdp_source === z.calling.enum.SDP_SOURCE.LOCAL && flow_et.is_group)
-        ) {
+        const is_ice_restart = flow_et.negotiation_mode() === z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART;
+        const is_local_sdp = sdp_source === z.calling.enum.SDP_SOURCE.LOCAL;
+
+        if (is_ice_restart || (is_local_sdp && flow_et.is_group)) {
           if (z.util.StringUtil.includes(sdp_line, 'opus')) {
             sdp_lines.push(sdp_line);
             outline = `a=ptime:${z.calling.SDPMapper.CONFIG.AUDIO_PTIME}`;

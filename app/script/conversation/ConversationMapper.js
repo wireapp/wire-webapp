@@ -32,14 +32,12 @@ z.conversation.ConversationMapper = class ConversationMapper {
   /**
    * Converts JSON conversations into conversation entities.
    *
-   * @param {Array} [conversation_data=[undefined]] - Conversation data
-   * @param {number} [initial_timestamp=1] - Initial timestamp for conversation
+   * @param {Array} [conversations=[undefined]] - Conversation data
+   * @param {number} [timestamp=1] - Initial timestamp for conversation
    * @returns {Array<Conversation>} Mapped conversation entities
    */
-  map_conversations(conversation_data = [undefined], initial_timestamp = 1) {
-    return conversation_data.map((conversation, index) =>
-      this._create_conversation_et(conversation, initial_timestamp + index)
-    );
+  map_conversations(conversations = [undefined], timestamp = 1) {
+    return conversations.map((conversation, index) => this._create_conversation_et(conversation, timestamp + index));
   }
 
   /**
@@ -234,10 +232,8 @@ z.conversation.ConversationMapper = class ConversationMapper {
       }
 
       // Set initially or correct server timestamp
-      if (
-        !local_conversation.last_server_timestamp ||
-        local_conversation.last_server_timestamp < local_conversation.last_event_timestamp
-      ) {
+      const wrong_server_timestamp = local_conversation.last_server_timestamp < local_conversation.last_event_timestamp;
+      if (!local_conversation.last_server_timestamp || wrong_server_timestamp) {
         local_conversation.last_server_timestamp = local_conversation.last_event_timestamp;
       }
 
