@@ -131,14 +131,10 @@ z.assets.AssetService = class AssetService {
     return Promise.resolve().then(() => {
       z.util.ValidationUtil.asset.legacy(asset_id, conversation_id);
       const url = this.client.create_url(`/assets/${asset_id}`);
-      conversation_id = window.encodeURIComponent(conversation_id);
+      const caching_param = force_caching ? '&forceCaching=true' : '';
+      const conversation_id_param = `&conv_id=${window.encodeURIComponent(conversation_id)}`;
 
-      let asset_url = `${url}?access_token=${this.client.access_token}&conv_id=${conversation_id}`;
-      if (force_caching) {
-        asset_url = `${asset_url}&forceCaching=true`;
-      }
-
-      return asset_url;
+      return `${url}?access_token=${this.client.access_token}${conversation_id_param}${caching_param}`;
     });
   }
 
@@ -155,11 +151,9 @@ z.assets.AssetService = class AssetService {
     return Promise.resolve().then(() => {
       z.util.ValidationUtil.asset.legacy(asset_id, conversation_id);
       const url = this.client.create_url(`/conversations/${conversation_id}/otr/assets/${asset_id}`);
-      let asset_url = `${url}?access_token=${this.client.access_token}`;
-      if (force_caching) {
-        asset_url = `${asset_url}&forceCaching=true`;
-      }
-      return asset_url;
+      const caching_param = force_caching ? '&forceCaching=true' : '';
+
+      return `${url}?access_token=${this.client.access_token}${caching_param}`;
     });
   }
 
@@ -174,14 +168,11 @@ z.assets.AssetService = class AssetService {
   generate_asset_url_v3(asset_key, asset_token, force_caching) {
     return Promise.resolve().then(() => {
       z.util.ValidationUtil.asset.v3(asset_key, asset_token);
-      let asset_url = `${this.client.create_url(`/assets/v3/${asset_key}`)}?access_token=${this.client.access_token}`;
-      if (asset_token) {
-        asset_url = `${asset_url}&asset_token=${window.encodeURIComponent(asset_token)}`;
-      }
-      if (force_caching) {
-        asset_url = `${asset_url}&forceCaching=true`;
-      }
-      return asset_url;
+      const url = `${this.client.create_url(`/assets/v3/${asset_key}`)}`;
+      const asset_token_param = asset_token ? `&asset_token=${window.encodeURIComponent(asset_token)}` : '';
+      const caching_param = force_caching ? '&forceCaching=true' : '';
+
+      return `${url}?access_token=${this.client.access_token}${asset_token_param}${caching_param}`;
     });
   }
 
