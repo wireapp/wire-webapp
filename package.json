@@ -11,7 +11,7 @@
     "@bower_components/highlightjs": "components/highlightjs#9.12.0",
     "@bower_components/jquery": "jquery/jquery#2.1.4",
     "@bower_components/jquery-mousewheel": "jquery/jquery-mousewheel#3.1.13",
-    "@bower_components/js-cookie": "js-cookie/js-cookie#2.1.4",
+    "@bower_components/js-cookie": "js-cookie/js-cookie#2.2.0",
     "@bower_components/keyboardjs": "RobertWHurst/KeyboardJS#2.3.4",
     "@bower_components/knockout": "knockout/knockout#3.4.1",
     "@bower_components/libsodium.js": "jedisct1/libsodium.js#0.5.4",
@@ -52,7 +52,6 @@
     "eslint-plugin-prettier": "2.3.1",
     "grunt": "1.0.1",
     "grunt-aws-s3": "2.0.0",
-    "grunt-bower-task": "0.5.0",
     "grunt-cli": "1.2.0",
     "grunt-contrib-clean": "1.1.0",
     "grunt-contrib-compress": "1.4.3",
@@ -110,5 +109,157 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/wireapp/wire-webapp.git"
+  },
+  "exportsOverride": {
+    "@bower_components/amplify": {
+      "js": "lib/amplify.js"
+    },
+    "@bower_components/antiscroll-2": {
+      "css": "dist/antiscroll-2.css",
+      "js": "dist/antiscroll-2.js"
+    },
+    "@bower_components/bytebuffer": {
+      "js": "dist/ByteBufferAB.js"
+    },
+    "@bower_components/cryptojs": {
+      "js": ["components/core.js", "components/lib-typedarrays.js", "components/md5.js", "components/enc-base64.js", "components/sha256.js"]
+    },
+    "@bower_components/dexie": {
+      "js": "dist/dexie.js"
+    },
+    "@bower_components/generic-message-proto": {
+      "proto": "proto/messages.proto"
+    },
+    "@bower_components/highlightjs": {
+      "js": "highlight.pack.js",
+      "css": "styles/github.css"
+    },
+    "@bower_components/jquery": {
+      "js": "dist/jquery.js"
+    },
+    "@bower_components/jquery-mousewheel": {
+      "js": "jquery.mousewheel.js"
+    },
+    "@bower_components/js-cookie": {
+      "js": "src/js.cookie.js"
+    },
+    "@bower_components/keyboardjs": {
+      "js": "dist/keyboard.js"
+    },
+    "@bower_components/knockout": {
+      "js": "dist/knockout.debug.js"
+    },
+    "@bower_components/libsodium.js": {
+      "js": "dist/browsers-sumo/combined/sodium.js"
+    },
+    "@bower_components/linkifyjs": {
+      "js": "linkify{-html,}.min.js"
+    },
+    "@bower_components/long": {
+      "js": "dist/long.js"
+    },
+    "@bower_components/marked": {
+      "js": "lib/marked.js"
+    },
+    "@bower_components/mixpanel": {
+      "js": ["mixpanel-jslib-snippet.js", "mixpanel.min.js"]
+    },
+    "@bower_components/moment": {
+      "js": [
+        "moment.js",
+        "locale/cs.js",
+        "locale/da.js",
+        "locale/de.js",
+        "locale/el.js",
+        "locale/es.js",
+        "locale/et.js",
+        "locale/fi.js",
+        "locale/fr.js",
+        "locale/hr.js",
+        "locale/hu.js",
+        "locale/it.js",
+        "locale/lt.js",
+        "locale/nl.js",
+        "locale/pl.js",
+        "locale/pt.js",
+        "locale/ro.js",
+        "locale/ru.js",
+        "locale/sk.js",
+        "locale/sl.js",
+        "locale/tr.js",
+        "locale/uk.js"
+      ]
+    },
+    "@bower_components/normalize-css": {
+      "css": "normalize.css"
+    },
+    "@bower_components/pako": {
+      "js": "dist/pako_deflate.js"
+    },
+    "@bower_components/phone-format": {
+      "js": "dist/phone-format-global.js"
+    },
+    "@bower_components/platform.js": {
+      "js": "platform.js"
+    },
+    "@bower_components/protobuf": {
+      "js": "dist/protobuf.js"
+    },
+    "@bower_components/poster-image": {
+      "js": "poster.js"
+    },
+    "@bower_components/raygun4js": {
+      "js": "dist/raygun.vanilla.js"
+    },
+    "@bower_components/speakingurl": {
+      "js": "speakingurl.min.js"
+    },
+    "@bower_components/uint32": {
+      "js": "uint32.js"
+    },
+    "@bower_components/underscore": {
+      "js": "underscore.js"
+    },
+    "@bower_components/url-search-params-polyfill": {
+      "js/": "index.js"
+    },
+    "@bower_components/uuid": {
+      "js": "src/uuid.js"
+    },
+    "@bower_components/wire-audio-files": {
+      "audio": "webapp/*"
+    },
+    "@bower_components/webapp-module-bubble": {
+      "js": "dist/script/*.js",
+      "less": "app/style/webapp-module-bubble.less"
+    },
+    "@bower_components/webapp-module-logger": {
+      "js": "dist/js/Logger.js"
+    },
+    "@bower_components/webapp-module-modal": {
+      "js": "dist/script/*.js",
+      "less": "app/style/webapp-module-modal.less"
+    },
+    "@bower_components/webapp-module-namespace": {
+      "js": "js/*.js"
+    },
+    "@bower_components/webrtc-adapter": {
+      "js": "release/adapter.js"
+    },
+    "@bower_components/wire-theme": {
+      "less": "app/style/{wire-theme,variables,input}.less"
+    },
+    "@bower_components/wire-webapp-cbor": {
+      "js": "dist/window/*.js"
+    },
+    "@bower_components/wire-webapp-cryptobox": {
+      "js": "dist/window/*.js"
+    },
+    "@bower_components/wire-webapp-lru-cache": {
+      "js": "dist/window/*.js"
+    },
+    "@bower_components/wire-webapp-proteus": {
+      "js": "dist/window/*.js"
+    }
   }
 }
