@@ -1,6 +1,6 @@
 {
   "name": "wire-webapp",
-  "license": "LicenseRef-LICENSE",
+  "license": "GPL-3.0",
   "dependencies": {
     "@bower_components/amplify": "wireapp/amplify#1.1.5",
     "@bower_components/antiscroll-2": "wireapp/antiscroll-2#1.2.8",
