@@ -60,6 +60,7 @@ rules:
   no-shadow: 2
   no-unused-expressions: 2
   no-unused-vars: [2, {args: none}]
+  no-useless-return: 2
   no-var: 2
   prefer-const: 2
   prefer-promise-reject-errors: 2

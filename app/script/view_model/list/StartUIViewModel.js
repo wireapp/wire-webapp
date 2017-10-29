@@ -265,7 +265,6 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
           case z.user.ConnectionStatus.SENT:
             return 'pending_outgoing';
           default:
-            return;
         }
       })(),
       context: 'startui',

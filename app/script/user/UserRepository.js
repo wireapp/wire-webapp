@@ -117,7 +117,6 @@ z.user.UserRepository = class UserRepository {
         this.user_update(event_json);
         break;
       default:
-        return;
     }
   }
 
