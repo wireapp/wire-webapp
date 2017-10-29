@@ -141,9 +141,9 @@
   dependencies:
     bower "1.8.2"
 
-"@bower_components/webapp-module-logger@wireapp/webapp-module-logger#1.1.0":
-  version "1.1.0"
-  resolved "https://codeload.github.com/wireapp/webapp-module-logger/tar.gz/7ab4bf0fe314bb5c595b809b5504f2e1a6f16187"
+"@bower_components/webapp-module-logger@wireapp/webapp-module-logger#1.1.1":
+  version "1.1.1"
+  resolved "https://codeload.github.com/wireapp/webapp-module-logger/tar.gz/e18530c1e0530d66c553dc9b54d5e64b60713b04"
 
 "@bower_components/webapp-module-modal@wireapp/webapp-module-modal#1.0.2":
   version "1.0.2"
@@ -160,17 +160,17 @@
     rtcpeerconnection-shim "^1.0.1"
     sdp "^2.3.0"
 
-"@bower_components/wire-audio-files@wireapp/wire-audio-files#1.1.0":
-  version "0.0.0"
-  resolved "https://codeload.github.com/wireapp/wire-audio-files/tar.gz/15d8016f89aba4b7a88fb8e354b5418fcfce97c6"
+"@bower_components/wire-audio-files@wireapp/wire-audio-files#1.1.1":
+  version "1.1.1"
+  resolved "https://codeload.github.com/wireapp/wire-audio-files/tar.gz/058725ae555ac0e1bbf37c3e020b9ad825afb760"
 
-"@bower_components/wire-theme@wireapp/wire-theme#1.0.0":
-  version "1.0.0"
-  resolved "https://codeload.github.com/wireapp/wire-theme/tar.gz/9174e3b09902c8768420b34e68995b0e27c96e4c"
+"@bower_components/wire-theme@wireapp/wire-theme#1.0.6":
+  version "1.0.6"
+  resolved "https://codeload.github.com/wireapp/wire-theme/tar.gz/8fb3b63a55a0cf96be9ac4718df6225784d5577a"
 
-"@bower_components/wire-webapp-cbor@wireapp/wire-webapp-cbor#2.1.2":
-  version "2.1.2"
-  resolved "https://codeload.github.com/wireapp/wire-webapp-cbor/tar.gz/bf2f7d8dd38369fd4c7a7d98d0641f24d3b56b31"
+"@bower_components/wire-webapp-cbor@wireapp/wire-webapp-cbor#2.1.5":
+  version "2.1.5"
+  resolved "https://codeload.github.com/wireapp/wire-webapp-cbor/tar.gz/d00796b5340c087363790627f5683dcb9ce45c74"
 
 "@bower_components/wire-webapp-cryptobox@wireapp/wire-webapp-cryptobox#6.2.0":
   version "6.2.0"
@@ -2116,9 +2116,9 @@ grunt-newer@1.3.0:
     async "^1.5.2"
     rimraf "^2.5.2"
 
-grunt-npm-bower@0.0.2:
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/grunt-npm-bower/-/grunt-npm-bower-0.0.2.tgz#36616224316494951cdbf53316badde12964d8a1"
+grunt-npm-bower@0.0.3:
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/grunt-npm-bower/-/grunt-npm-bower-0.0.3.tgz#59ea345f362e8cbfa1a87a63c243f6ffbab0875c"
   dependencies:
     chalk "2.3.0"
     fs-extra "4.0.2"
