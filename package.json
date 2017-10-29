@@ -32,14 +32,14 @@
     "@bower_components/underscore": "jashkenas/underscore#1.8.3",
     "@bower_components/url-search-params-polyfill": "jerrybendy/url-search-params-polyfill#2.0.1",
     "@bower_components/uuid": "LiosK/UUID.js#3.5.3",
-    "@bower_components/webapp-module-bubble": "wireapp/webapp-module-bubble#1.1.0",
-    "@bower_components/webapp-module-logger": "wireapp/webapp-module-logger#1.1.0",
-    "@bower_components/webapp-module-modal": "wireapp/webapp-module-modal#1.0.0",
-    "@bower_components/webapp-module-namespace": "wireapp/webapp-module-namespace#1.0.0",
+    "@bower_components/webapp-module-bubble": "wireapp/webapp-module-bubble#1.1.1",
+    "@bower_components/webapp-module-logger": "wireapp/webapp-module-logger#1.1.1",
+    "@bower_components/webapp-module-modal": "wireapp/webapp-module-modal#1.0.2",
+    "@bower_components/webapp-module-namespace": "wireapp/webapp-module-namespace#1.0.2",
     "@bower_components/webrtc-adapter": "webrtc/adapter#5.0.5",
-    "@bower_components/wire-audio-files": "wireapp/wire-audio-files#1.1.0",
-    "@bower_components/wire-theme": "wireapp/wire-theme#1.0.0",
-    "@bower_components/wire-webapp-cbor": "wireapp/wire-webapp-cbor#2.1.2",
+    "@bower_components/wire-audio-files": "wireapp/wire-audio-files#1.1.1",
+    "@bower_components/wire-theme": "wireapp/wire-theme#1.0.6",
+    "@bower_components/wire-webapp-cbor": "wireapp/wire-webapp-cbor#2.1.5",
     "@bower_components/wire-webapp-cryptobox": "wireapp/wire-webapp-cryptobox#6.2.0",
     "@bower_components/wire-webapp-lru-cache": "wireapp/wire-webapp-lru-cache#2.0.0",
     "@bower_components/wire-webapp-proteus": "wireapp/proteus.js#5.2.0"
@@ -65,7 +65,7 @@
     "grunt-include-replace": "5.0.0",
     "grunt-karma": "2.0.0",
     "grunt-newer": "1.3.0",
-    "grunt-npm-bower": "0.0.2",
+    "grunt-npm-bower": "0.0.3",
     "grunt-open": "0.2.3",
     "grunt-postcss": "0.9.0",
     "grunt-shell": "2.1.0",
@@ -122,7 +122,7 @@
       "js": "dist/ByteBufferAB.js"
     },
     "@bower_components/cryptojs": {
-      "js": ["components/core.js", "components/lib-typedarrays.js", "components/md5.js", "components/enc-base64.js", "components/sha256.js"]
+      "js": ["core.js", "lib-typedarrays.js", "md5.js", "enc-base64.js", "sha256.js"]
     },
     "@bower_components/dexie": {
       "js": "dist/dexie.js"
