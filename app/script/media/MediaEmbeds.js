@@ -262,7 +262,9 @@ z.media.MediaEmbeds = (function() {
       const vimeo_color = theme_color ? theme_color.replace('#', '') : undefined;
 
       if (link_src.match(_regex.vimeo)) {
-        if (z.util.StringUtil.includes(link_src, '/user')) return message;
+        if (z.util.StringUtil.includes(link_src, '/user')) {
+          return message;
+        }
 
         const iframe = _create_iframe_container({
           src: `https://player.vimeo.com/video/$1?portrait=0&color=${vimeo_color}&badge=0`,

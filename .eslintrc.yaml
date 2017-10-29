@@ -51,6 +51,7 @@ plugins:
   - jsdoc
 
 rules:
+  curly: 2
   jsdoc/require-hyphen-before-param-description: 2
   no-console: 0
   no-const-assign: 2
