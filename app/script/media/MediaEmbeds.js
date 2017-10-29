@@ -237,7 +237,7 @@ z.media.MediaEmbeds = (function() {
 
         // convert spotify uri: album/23... -> album:23... -> album%3A23...
         let embed = '';
-        link_src.replace(_regex.spotify, function(match, group1) {
+        link_src.replace(_regex.spotify, (match, group1) => {
           const replace_slashes = group1.replace(/\//g, ':');
           const encoded_params = window.encodeURIComponent(`:${replace_slashes}`);
           return (embed = iframe.replace('$1', encoded_params));

@@ -175,7 +175,7 @@ z.storage.StorageService = class StorageService {
         .stores(version_4)
         .upgrade(transaction => {
           this.logger.warn('Database upgrade to version 4', transaction);
-          transaction[StorageService.OBJECT_STORE.CLIENTS].toCollection().modify(function(client) {
+          transaction[StorageService.OBJECT_STORE.CLIENTS].toCollection().modify(client => {
             return (client.meta = {
               is_verified: true,
               primary_key: 'local_identity',
@@ -203,7 +203,7 @@ z.storage.StorageService = class StorageService {
         .stores(version_5)
         .upgrade(transaction => {
           this.logger.warn('Database upgrade to version 7', transaction);
-          transaction[StorageService.OBJECT_STORE.CONVERSATION_EVENTS].toCollection().modify(function(event) {
+          transaction[StorageService.OBJECT_STORE.CONVERSATION_EVENTS].toCollection().modify(event => {
             const mapped_event = event.mapped || event.raw;
             delete event.mapped;
             delete event.raw;
@@ -216,7 +216,7 @@ z.storage.StorageService = class StorageService {
         .stores(version_5)
         .upgrade(transaction => {
           this.logger.warn('Database upgrade to version 8', transaction);
-          transaction[StorageService.OBJECT_STORE.CONVERSATION_EVENTS].toCollection().modify(function(event) {
+          transaction[StorageService.OBJECT_STORE.CONVERSATION_EVENTS].toCollection().modify(event => {
             if (event.type === z.event.Client.CONVERSATION.DELETE_EVERYWHERE) {
               event.time = new Date(event.time).toISOString();
             }
@@ -228,7 +228,7 @@ z.storage.StorageService = class StorageService {
         .stores(version_10)
         .upgrade(transaction => {
           this.logger.warn('Database upgrade to version 10', transaction);
-          transaction[StorageService.OBJECT_STORE.CONVERSATION_EVENTS].toCollection().modify(function(event) {
+          transaction[StorageService.OBJECT_STORE.CONVERSATION_EVENTS].toCollection().modify(event => {
             event.category = z.message.MessageCategorization.category_from_event(event);
           });
         });
@@ -250,13 +250,13 @@ z.storage.StorageService = class StorageService {
         .stores(version_11)
         .upgrade(transaction => {
           this.logger.warn('Database upgrade to version 12', transaction);
-          transaction[StorageService.OBJECT_STORE.KEYS].toCollection().modify(function(record) {
+          transaction[StorageService.OBJECT_STORE.KEYS].toCollection().modify(record => {
             return (record.serialised = z.util.base64_to_array(record.serialised).buffer);
           });
-          transaction[StorageService.OBJECT_STORE.PRE_KEYS].toCollection().modify(function(record) {
+          transaction[StorageService.OBJECT_STORE.PRE_KEYS].toCollection().modify(record => {
             return (record.serialised = z.util.base64_to_array(record.serialised).buffer);
           });
-          transaction[StorageService.OBJECT_STORE.SESSIONS].toCollection().modify(function(record) {
+          transaction[StorageService.OBJECT_STORE.SESSIONS].toCollection().modify(record => {
             return (record.serialised = z.util.base64_to_array(record.serialised).buffer);
           });
         });

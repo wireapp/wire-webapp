@@ -21,17 +21,17 @@
 
 'use strict';
 
-describe('ConversationServiceNoCompound', function() {
+describe('ConversationServiceNoCompound', () => {
   let conversation_mapper = null;
   let conversation_service = null;
   let server = null;
   let storage_service = null;
   const test_factory = new TestFactory();
 
-  beforeAll(function(done) {
+  beforeAll(done => {
     test_factory
       .exposeStorageActors()
-      .then(function(storage_repository) {
+      .then(storage_repository => {
         const {client} = test_factory;
         ({storage_service} = storage_repository);
         conversation_service = new z.conversation.ConversationServiceNoCompound(client, storage_service);
@@ -43,7 +43,7 @@ describe('ConversationServiceNoCompound', function() {
       .catch(done.fail);
   });
 
-  afterEach(function(done) {
+  afterEach(done => {
     server.restore();
     storage_service
       .clear_all_stores()
@@ -51,7 +51,7 @@ describe('ConversationServiceNoCompound', function() {
       .catch(done.fail);
   });
 
-  describe('load_preceding_events_from_db', function() {
+  describe('load_preceding_events_from_db', () => {
     const conversation_id = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a';
 
     // prettier-ignore
@@ -62,7 +62,7 @@ describe('ConversationServiceNoCompound', function() {
     ];
     /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
-    beforeEach(function(done) {
+    beforeEach(done => {
       Promise.all(
         messages.map(message => storage_service.save(z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, message))
       )
@@ -70,20 +70,20 @@ describe('ConversationServiceNoCompound', function() {
         .catch(done.fail);
     });
 
-    it('returns mapped message_et if event with id is found', function(done) {
+    it('returns mapped message_et if event with id is found', done => {
       conversation_service
         .load_event_from_db(conversation_id, '4af67f76-09f9-4831-b3a4-9df877b8c29a')
-        .then(function(message_et) {
+        .then(message_et => {
           expect(message_et).toEqual(messages[1]);
           done();
         })
         .catch(done.fail);
     });
 
-    it('returns undefined if no event with id is found', function(done) {
+    it('returns undefined if no event with id is found', done => {
       conversation_service
         .load_event_from_db(conversation_id, z.util.create_random_uuid())
-        .then(function(message_et) {
+        .then(message_et => {
           expect(message_et).not.toBeDefined();
           done();
         })
@@ -91,13 +91,13 @@ describe('ConversationServiceNoCompound', function() {
     });
   });
 
-  describe('update_message_in_db', function() {
+  describe('update_message_in_db', () => {
     // prettier-ignore
     /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
     const event = {"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"4af67f76-09f9-4831-b3a4-9df877b8c29a","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:58.993Z","data":{"content":"Second message","nonce":"4af67f76-09f9-4831-b3a4-9df877b8c29a","previews":[]},"type":"conversation.message-add"};
     /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
-    it('updated event in the database', function(done) {
+    it('updated event in the database', done => {
       event.time = new Date().toISOString();
       event.primary_key = 1337;
       conversation_service
@@ -106,11 +106,11 @@ describe('ConversationServiceNoCompound', function() {
         .catch(done.fail);
     });
 
-    it('fails if changes are not specified', function(done) {
+    it('fails if changes are not specified', done => {
       conversation_service
         .update_message_in_db(event, undefined)
         .then(done.fail)
-        .catch(function(error) {
+        .catch(error => {
           expect(error).toEqual(jasmine.any(z.conversation.ConversationError));
           expect(error.type).toBe(z.conversation.ConversationError.TYPE.NO_CHANGES);
           done();
@@ -118,13 +118,13 @@ describe('ConversationServiceNoCompound', function() {
     });
   });
 
-  describe('load_preceding_events_from_db', function() {
+  describe('load_preceding_events_from_db', () => {
     const conversation_id = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a';
     let messages = undefined;
 
-    beforeEach(function(done) {
+    beforeEach(done => {
       const timestamp = 1479903546799;
-      messages = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(function(index) {
+      messages = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(index => {
         return {
           conversation: conversation_id,
           time: new Date(timestamp + index).toISOString(),
@@ -138,20 +138,20 @@ describe('ConversationServiceNoCompound', function() {
         .catch(done.fail);
     });
 
-    it("doesn't load events for invalid conversation id", function(done) {
+    it("doesn't load events for invalid conversation id", done => {
       conversation_service
         .load_preceding_events_from_db('invalid_id', new Date(30), new Date(1479903546808))
-        .then(function(events) {
+        .then(events => {
           expect(events.length).toBe(0);
           done();
         })
         .catch(done.fail);
     });
 
-    it('loads all events', function(done) {
+    it('loads all events', done => {
       conversation_service
         .load_preceding_events_from_db(conversation_id)
-        .then(function(events) {
+        .then(events => {
           expect(events.length).toBe(10);
           expect(events[0].time).toBe('2016-11-23T12:19:06.808Z');
           expect(events[9].time).toBe('2016-11-23T12:19:06.799Z');
@@ -160,10 +160,10 @@ describe('ConversationServiceNoCompound', function() {
         .catch(done.fail);
     });
 
-    it('loads all events with limit', function(done) {
+    it('loads all events with limit', done => {
       conversation_service
         .load_preceding_events_from_db(conversation_id, undefined, undefined, 5)
-        .then(function(events) {
+        .then(events => {
           expect(events.length).toBe(5);
           expect(events[0].time).toBe('2016-11-23T12:19:06.808Z');
           expect(events[4].time).toBe('2016-11-23T12:19:06.804Z');
@@ -172,10 +172,10 @@ describe('ConversationServiceNoCompound', function() {
         .catch(done.fail);
     });
 
-    it('loads events with lower bound', function(done) {
+    it('loads events with lower bound', done => {
       conversation_service
         .load_preceding_events_from_db(conversation_id, new Date(1479903546805))
-        .then(function(events) {
+        .then(events => {
           expect(events.length).toBe(4);
           expect(events[0].time).toBe('2016-11-23T12:19:06.808Z');
           expect(events[1].time).toBe('2016-11-23T12:19:06.807Z');
@@ -186,10 +186,10 @@ describe('ConversationServiceNoCompound', function() {
         .catch(done.fail);
     });
 
-    it('loads events with upper bound', function(done) {
+    it('loads events with upper bound', done => {
       conversation_service
         .load_preceding_events_from_db(conversation_id, undefined, new Date(1479903546803))
-        .then(function(events) {
+        .then(events => {
           expect(events.length).toBe(4);
           expect(events[0].time).toBe('2016-11-23T12:19:06.802Z');
           expect(events[1].time).toBe('2016-11-23T12:19:06.801Z');
@@ -200,10 +200,10 @@ describe('ConversationServiceNoCompound', function() {
         .catch(done.fail);
     });
 
-    it('loads events with upper and lower bound', function(done) {
+    it('loads events with upper and lower bound', done => {
       conversation_service
         .load_preceding_events_from_db(conversation_id, new Date(1479903546806), new Date(1479903546807))
-        .then(function(events) {
+        .then(events => {
           expect(events.length).toBe(1);
           expect(events[0].time).toBe('2016-11-23T12:19:06.806Z');
           done();
@@ -211,10 +211,10 @@ describe('ConversationServiceNoCompound', function() {
         .catch(done.fail);
     });
 
-    it('loads events with upper and lower bound and a fetch limit', function(done) {
+    it('loads events with upper and lower bound and a fetch limit', done => {
       conversation_service
         .load_preceding_events_from_db(conversation_id, new Date(1479903546800), new Date(1479903546807), 2)
-        .then(function(events) {
+        .then(events => {
           expect(events.length).toBe(2);
           expect(events[0].time).toBe('2016-11-23T12:19:06.806Z');
           expect(events[1].time).toBe('2016-11-23T12:19:06.805Z');
@@ -224,8 +224,8 @@ describe('ConversationServiceNoCompound', function() {
     });
   });
 
-  describe('save_conversation_in_db', function() {
-    it('saves a conversation', function(done) {
+  describe('save_conversation_in_db', () => {
+    it('saves a conversation', done => {
       // prettier-ignore
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const conversation_payload = {"access":["private"],"creator":"0410795a-58dc-40d8-b216-cbc2360be21a","members":{"self":{"hidden_ref":null,"status":0,"last_read":"24fe.800122000b16c279","muted_time":null,"otr_muted_ref":null,"muted":false,"status_time":"2014-12-03T18:39:12.319Z","hidden":false,"status_ref":"0.0","id":"532af01e-1e24-4366-aacf-33b67d4ee376","otr_archived":false,"cleared":null,"otr_muted":false,"otr_archived_ref":"2016-07-25T11:30:07.883Z","archived":null},"others":[{"status":0,"id":"0410795a-58dc-40d8-b216-cbc2360be21a"}]},"name":"Michael","id":"573b6978-7700-443e-9ce5-ff78b35ac590","type":2,"last_event_time":"2016-06-21T22:53:41.778Z","last_event":"24fe.800122000b16c279"};
@@ -234,7 +234,7 @@ describe('ConversationServiceNoCompound', function() {
 
       conversation_service
         .save_conversation_state_in_db(conversation_et)
-        .then(function(conversation) {
+        .then(conversation => {
           expect(conversation.name()).toBe(conversation_payload.name);
           done();
         })
@@ -242,7 +242,7 @@ describe('ConversationServiceNoCompound', function() {
     });
   });
 
-  describe('delete_message_with_key_from_db', function() {
+  describe('delete_message_with_key_from_db', () => {
     const conversation_id = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a';
     let primary_keys = undefined;
 
@@ -255,22 +255,22 @@ describe('ConversationServiceNoCompound', function() {
     ];
     /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
 
-    beforeEach(function(done) {
+    beforeEach(done => {
       Promise.all(
         messages.map(message => storage_service.save(z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, message))
       )
-        .then(function(ids) {
+        .then(ids => {
           primary_keys = ids;
           done();
         })
         .catch(done.fail);
     });
 
-    it('deletes message with the given key', function(done) {
+    it('deletes message with the given key', done => {
       conversation_service
         .delete_message_with_key_from_db(primary_keys[1])
         .then(() => conversation_service.load_preceding_events_from_db(conversation_id))
-        .then(function(events) {
+        .then(events => {
           expect(events.length).toBe(2);
           events.forEach(event => expect(event.primary_key).not.toBe(primary_keys[1]));
           done();
@@ -278,11 +278,11 @@ describe('ConversationServiceNoCompound', function() {
         .catch(done.fail);
     });
 
-    it('does not delete the event if key is wrong', function(done) {
+    it('does not delete the event if key is wrong', done => {
       conversation_service
         .delete_message_with_key_from_db('wrongKey')
         .then(() => conversation_service.load_preceding_events_from_db(conversation_id))
-        .then(function(events) {
+        .then(events => {
           expect(events.length).toBe(3);
           done();
         })
@@ -290,10 +290,10 @@ describe('ConversationServiceNoCompound', function() {
     });
   });
 
-  describe('load_events_with_category_from_db', function() {
+  describe('load_events_with_category_from_db', () => {
     let events = undefined;
 
-    beforeEach(function() {
+    beforeEach(() => {
       // prettier-ignore
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       events = [
@@ -304,7 +304,7 @@ describe('ConversationServiceNoCompound', function() {
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
     });
 
-    it('should return no entry matches the given category', function(done) {
+    it('should return no entry matches the given category', done => {
       Promise.all(
         events
           .slice(0, 1)
@@ -316,14 +316,14 @@ describe('ConversationServiceNoCompound', function() {
             z.message.MessageCategory.IMAGE
           )
         )
-        .then(function(result) {
+        .then(result => {
           expect(result.length).toBe(0);
           done();
         })
         .catch(done.fail);
     });
 
-    it('should get images in the correct order', function(done) {
+    it('should get images in the correct order', done => {
       Promise.all(
         events.map(event => storage_service.save(z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, event))
       )
@@ -333,7 +333,7 @@ describe('ConversationServiceNoCompound', function() {
             z.message.MessageCategory.IMAGE
           )
         )
-        .then(function(result) {
+        .then(result => {
           expect(result.length).toBe(2);
           expect(result[0].id).toBe(events[1].id);
           expect(result[1].id).toBe(events[2].id);

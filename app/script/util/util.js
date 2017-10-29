@@ -78,7 +78,7 @@ z.util.is_same_location = function(past_location, current_location) {
 };
 
 z.util.load_image = function(blob) {
-  return new Promise(function(resolve, reject) {
+  return new Promise((resolve, reject) => {
     const object_url = window.URL.createObjectURL(blob);
     const img = new Image();
     img.onload = function() {
@@ -91,7 +91,7 @@ z.util.load_image = function(blob) {
 };
 
 z.util.load_data_url = function(file) {
-  return new Promise(function(resolve, reject) {
+  return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = function() {
       return resolve(this.result);
@@ -102,7 +102,7 @@ z.util.load_data_url = function(file) {
 };
 
 z.util.load_file_buffer = function(file) {
-  return new Promise(function(resolve, reject) {
+  return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = function() {
       return resolve(this.result);
@@ -113,7 +113,7 @@ z.util.load_file_buffer = function(file) {
 };
 
 z.util.load_url_buffer = function(url, xhr_accessor_function) {
-  return new Promise(function(resolve, reject) {
+  return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open('GET', url, true);
     xhr.responseType = 'arraybuffer';
@@ -132,7 +132,7 @@ z.util.load_url_buffer = function(url, xhr_accessor_function) {
 };
 
 z.util.load_url_blob = function(url) {
-  return z.util.load_url_buffer(url).then(function(value) {
+  return z.util.load_url_buffer(url).then(value => {
     const [buffer, type] = value;
     return new Blob([new Uint8Array(buffer)], {type});
   });
@@ -341,7 +341,7 @@ z.util.download_blob = function(blob, filename) {
   link.click();
 
   // Wait before removing resource and link. Needed in FF
-  return window.setTimeout(function() {
+  return window.setTimeout(() => {
     document.body.removeChild(link);
     window.URL.revokeObjectURL(url);
   }, 100);
@@ -517,7 +517,7 @@ z.util.ko_push_deferred = function(target, src, number = 100, delay = 300) {
   // push array deferred to knockout observableArray
   let interval;
 
-  return (interval = window.setInterval(function() {
+  return (interval = window.setInterval(() => {
     const chunk = src.splice(0, number);
     z.util.ko_array_push_all(target, chunk);
 

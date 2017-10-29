@@ -1321,7 +1321,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const asset_et = message_et.get_first_asset();
 
         asset_et.uploaded_on_this_client(true);
-        return this.asset_service.upload_asset(file, null, function(xhr) {
+        return this.asset_service.upload_asset(file, null, xhr => {
           xhr.upload.onprogress = event => asset_et.upload_progress(Math.round(event.loaded / event.total * 100));
           asset_et.upload_cancel = () => xhr.abort();
         });
@@ -3563,7 +3563,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   _track_completed_media_action(conversation_et, generic_message, call_message_et) {
-    let ephemeral_time, message, message_content_type;
+    let ephemeral_time;
+    let message;
+    let message_content_type;
 
     const is_ephemeral = generic_message.content === z.cryptography.GENERIC_MESSAGE_TYPE.EPHEMERAL;
     if (is_ephemeral) {

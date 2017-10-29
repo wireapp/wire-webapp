@@ -21,14 +21,14 @@
 
 'use strict';
 
-describe('z.util.DebugUtil', function() {
+describe('z.util.DebugUtil', () => {
   let debug_util = null;
   const test_factory = new TestFactory();
 
-  beforeAll(function(done) {
+  beforeAll(done => {
     test_factory
       .exposeCallingActors()
-      .then(function(calling_repository) {
+      .then(calling_repository => {
         debug_util = new z.util.DebugUtil(
           calling_repository,
           TestFactory.conversation_repository,
@@ -40,7 +40,7 @@ describe('z.util.DebugUtil', function() {
   });
 
   describe('get_number_of_clients_in_conversation', () =>
-    it('gets the amount of all clients in the current conversation (including own clients)', function() {
+    it('gets the amount of all clients in the current conversation (including own clients)', () => {
       const {conversation_repository} = debug_util;
 
       const first_client = new z.client.Client();

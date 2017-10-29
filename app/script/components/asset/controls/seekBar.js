@@ -34,7 +34,7 @@ z.components.SeekBarComponent = class SeekBarComponent {
     this.dispose = this.dispose.bind(this);
     this.media_element = params.src;
     this.dark_mode = params.dark;
-    this.disabled = ko.pureComputed(function() {
+    this.disabled = ko.pureComputed(() => {
       if (typeof params.disabled === 'function') {
         params.disabled();
       }

@@ -140,7 +140,7 @@ ko.bindingHandlers.resize = (function() {
   let resize_observable = null;
   let resize_callback = null;
 
-  const resize_textarea = _.throttle(function(element) {
+  const resize_textarea = _.throttle(element => {
     element.style.height = 0;
     element.style.height = `${element.scrollHeight}px`;
 
@@ -233,7 +233,7 @@ ko.bindingHandlers.file_select = {
 
         // http://stackoverflow.com/a/12102992/4453133
         // wait before clearing to fix autotests
-        window.setTimeout(function() {
+        window.setTimeout(() => {
           $(event.target).val(null);
         }, 1000);
       }
@@ -318,7 +318,7 @@ ko.subscribable.fn.trimmed = function() {
  */
 ko.subscribable.fn.subscribe_once = function(handler, owner, event_name) {
   const subscription = this.subscribe(
-    function(new_value) {
+    new_value => {
       subscription.dispose();
       handler(new_value);
     },
@@ -391,7 +391,7 @@ ko.bindingHandlers.relative_timestamp = (function() {
   const timestamps = [];
 
   // should be fine to fire all 60 sec
-  window.setInterval(function() {
+  window.setInterval(() => {
     timestamps.map(timestamp_func => timestamp_func());
   }, 60 * 1000);
 
@@ -433,7 +433,7 @@ ko.bindingHandlers.relative_timestamp = (function() {
       timestamp_func();
       timestamps.push(timestamp_func);
 
-      ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+      ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
         const timestamp_index = timestamps.indexOf(timestamp_func);
         timestamps.splice(timestamp_index, 1);
       });
@@ -466,7 +466,7 @@ ko.bindingHandlers.hide_controls = {
 
       element.classList.remove('hide-controls');
 
-      hide_timeout = window.setTimeout(function() {
+      hide_timeout = window.setTimeout(() => {
         element.classList.add('hide-controls');
       }, timeout);
     };

@@ -303,7 +303,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     // Dismiss old bubble and wait with creating the new one when another bubble is open
     if (this.user_bubble) {
       this.user_bubble.hide();
-      window.setTimeout(function() {
+      window.setTimeout(() => {
         create_bubble(element[0].id);
       }, 550);
     } else {

@@ -21,9 +21,9 @@
 
 'use strict';
 
-describe('PromiseQueue', function() {
-  describe('push', function() {
-    it('should process promises', function(done) {
+describe('PromiseQueue', () => {
+  describe('push', () => {
+    it('should process promises', done => {
       let counter = 0;
       const result = [];
 
@@ -37,21 +37,21 @@ describe('PromiseQueue', function() {
       queue.push(promise_fn);
       queue
         .push(promise_fn)
-        .then(function() {
+        .then(() => {
           expect(result).toEqual([0, 1, 2]);
           done();
         })
         .catch(done.fail);
     });
 
-    it('should process promises that are added during execution', function(done) {
+    it('should process promises that are added during execution', done => {
       let counter = 0;
       const result = [];
 
       const promise = {
         fn() {
-          return new Promise(function(resolve) {
-            window.setTimeout(function() {
+          return new Promise(resolve => {
+            window.setTimeout(() => {
               result.push(counter++);
               return resolve();
             }, 50);
@@ -64,10 +64,10 @@ describe('PromiseQueue', function() {
       const queue = new z.util.PromiseQueue();
       queue.push(promise.fn);
 
-      window.setTimeout(function() {
+      window.setTimeout(() => {
         queue
           .push(promise.fn)
-          .then(function() {
+          .then(() => {
             expect(promise.fn.calls.count()).toEqual(2);
             expect(result).toEqual([0, 1]);
             done();
@@ -76,7 +76,7 @@ describe('PromiseQueue', function() {
       }, 25);
     });
 
-    it('should process promises even when one of them rejects', function(done) {
+    it('should process promises even when one of them rejects', done => {
       const resolving_promise = () => Promise.resolve();
 
       const rejecting_promise = () => Promise.reject(new Error('Unit test error'));
@@ -89,13 +89,13 @@ describe('PromiseQueue', function() {
         .catch(done.fail);
     });
 
-    it('should process promises even when one of them times out (with retries)', function(done) {
+    it('should process promises even when one of them times out (with retries)', done => {
       let counter = 0;
 
       const resolving_promise = () => Promise.resolve(counter++);
 
       const timeout_promise = function() {
-        return new Promise(function(resolve) {
+        return new Promise(resolve => {
           if (counter++ === 3) {
             resolve();
           }

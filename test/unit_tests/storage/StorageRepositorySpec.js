@@ -21,28 +21,28 @@
 
 // grunt test_init && grunt test_run:storage/StorageRepository
 
-describe('z.storage.StorageRepository', function() {
+describe('z.storage.StorageRepository', () => {
   const test_factory = new TestFactory();
 
-  beforeAll(function(done) {
+  beforeAll(done => {
     test_factory
       .exposeStorageActors()
       .then(done)
       .catch(done.fail);
   });
 
-  beforeEach(function() {
+  beforeEach(() => {
     TestFactory.storage_repository.clear_all_stores();
   });
 
-  describe('save_value', function() {
-    it('persists primitive values in an object format', function(done) {
+  describe('save_value', () => {
+    it('persists primitive values in an object format', done => {
       const primary_key = 'test_key';
       const primitive_value = 'test_value';
 
       TestFactory.storage_repository
         .save_value(primary_key, primitive_value)
-        .then(function(storage_key) {
+        .then(storage_key => {
           expect(storage_key).toBe(primary_key);
           return done();
         })
