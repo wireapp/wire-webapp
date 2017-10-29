@@ -236,7 +236,7 @@ window.z.ui = z.ui || {};
       if (z.util.Environment.desktop && shortcut_map[shortcut].shortcut.electron.menu) {
         continue;
       }
-      _register_event(get_shortcut(shortcut), data['event']);
+      _register_event(get_shortcut(shortcut), data.event);
     }
   }
 
