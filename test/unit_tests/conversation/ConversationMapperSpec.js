@@ -53,7 +53,7 @@ describe('Conversation Mapper', () => {
       expect(conversation_et.last_server_timestamp()).toBe(initial_timestamp);
       expect(conversation_et.muted_timestamp()).toEqual(new Date(conversation.members.self.otr_muted_ref).getTime());
       expect(conversation_et.name()).toBe(conversation.name);
-      expect(conversation_et.number_of_participants()).toBe(conversation.members.others.length);
+      expect(conversation_et.get_number_of_participants()).toBe(conversation.members.others.length + 1);
       expect(conversation_et.team_id).toEqual(conversation.team);
       expect(conversation_et.type()).toBe(z.conversation.ConversationType.REGULAR);
     });

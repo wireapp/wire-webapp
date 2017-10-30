@@ -941,18 +941,20 @@ z.conversation.ConversationRepository = class ConversationRepository {
   add_members(conversation_et, user_ids) {
     return this.conversation_service
       .post_members(conversation_et.id, user_ids)
-      .then(response =>
-        amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE)
-      )
+      .then(response => {
+        if (response) {
+          amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+        }
+      })
       .catch(error => {
-        if (error.label === z.service.BackendClientError.LABEL.TOO_MANY_MEMBERS) {
+        const too_many_members = error.label === z.service.BackendClientError.LABEL.TOO_MANY_MEMBERS;
+        if (too_many_members) {
+          const open_spots = z.config.MAXIMUM_CONVERSATION_SIZE - conversation_et.get_number_of_participants();
+
           return amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.TOO_MANY_MEMBERS, {
             data: {
               max: z.config.MAXIMUM_CONVERSATION_SIZE,
-              open_spots: Math.max(
-                0,
-                z.config.MAXIMUM_CONVERSATION_SIZE - (conversation_et.number_of_participants() + 1)
-              ),
+              open_spots: Math.max(0, open_spots),
             },
           });
         }
@@ -2173,7 +2175,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   _should_send_as_external(conversation_id, generic_message) {
     return this.get_conversation_by_id(conversation_id).then(conversation_et => {
-      const estimated_number_of_clients = conversation_et.number_of_participants() * 4;
+      const estimated_number_of_clients = conversation_et.get_number_of_participants() * 4;
       const message_in_bytes = new Uint8Array(generic_message.toArrayBuffer()).length;
       const estimated_payload_in_bytes = estimated_number_of_clients * message_in_bytes;
 
