@@ -42,14 +42,26 @@
     "@bower_components/wire-webapp-cbor": "wireapp/wire-webapp-cbor#2.1.5",
     "@bower_components/wire-webapp-cryptobox": "wireapp/wire-webapp-cryptobox#6.2.0",
     "@bower_components/wire-webapp-lru-cache": "wireapp/wire-webapp-lru-cache#2.0.0",
-    "@bower_components/wire-webapp-proteus": "wireapp/proteus.js#5.2.0"
+    "@bower_components/wire-webapp-proteus": "wireapp/proteus.js#5.2.0",
+    "babel-polyfill": "6.26.0"
   },
   "devDependencies": {
     "autoprefixer": "7.1.6",
+    "babel-core": "6.26.0",
+    "babel-loader": "7.1.2",
+    "babel-plugin-transform-class-properties": "6.24.1",
+    "babel-plugin-transform-object-rest-spread": "6.26.0",
+    "babel-preset-env": "1.6.1",
+    "babel-preset-react": "6.24.1",
+    "css-loader": "0.28.7",
+    "cssnano": "3.10.0",
     "eslint": "4.10.0",
     "eslint-config-prettier": "2.6.0",
     "eslint-plugin-jsdoc": "3.1.3",
     "eslint-plugin-prettier": "2.3.1",
+    "extract-loader": "1.0.1",
+    "extract-text-webpack-plugin": "3.0.2",
+    "file-loader": "1.1.5",
     "grunt": "1.0.1",
     "grunt-aws-s3": "2.0.0",
     "grunt-cli": "1.2.0",
@@ -79,9 +91,20 @@
     "karma-jasmine": "1.1.0",
     "lint-staged": "4.3.0",
     "load-grunt-tasks": "3.5.2",
+    "node-sass": "4.5.3",
+    "postcss-cssnext": "3.0.2",
+    "postcss-import": "11.0.0",
+    "postcss-loader": "2.0.8",
+    "postcss-scss": "1.0.2",
     "prettier": "1.7.4",
     "request": "2.83.0",
-    "sinon": "4.0.2"
+    "sass-loader": "6.0.6",
+    "sinon": "4.0.2",
+    "style-loader": "0.19.0",
+    "uglify-js": "3.1.6",
+    "uglifyjs-webpack-plugin": "1.0.1",
+    "webpack": "3.8.1",
+    "webpack-dev-server": "2.9.3"
   },
   "engines": {
     "yarn": ">= 1.0.0"
@@ -102,8 +125,11 @@
     "postinstall": "grunt init",
     "precommit": "lint-staged",
     "start": "grunt",
+    "start:dev": "webpack-dev-server --config webpack.config.dev.js --open",
     "test:script": "eslint -c .eslintrc.yaml --ignore-path .gitignore --ignore-path .eslintignore app/script/ test/ bin/ grunt/ Gruntfile.js karma.conf.js",
-    "test": "yarn test:script && grunt check && grunt test"
+    "test": "yarn test:script && grunt check && grunt test",
+    "bundle:dev": "webpack --config webpack.config.dev.js",
+    "bundle:prod": "webpack --config webpack.config.prod.js"
   },
   "private": true,
   "repository": {
