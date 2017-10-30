@@ -1011,11 +1011,11 @@ describe('ConversationRepository', () => {
   });
 
   describe('Encryption', () => {
-    let anne,
-      bob,
-      jane,
-      john,
-      lara = undefined;
+    let anne;
+    let bob;
+    let jane;
+    let john;
+    let lara = undefined;
 
     beforeEach(done => {
       anne = new z.entity.User();

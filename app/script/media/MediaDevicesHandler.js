@@ -63,7 +63,9 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
    * @returns {undefined} No return value
    */
   initialize_media_devices() {
-    if (!z.media.MediaRepository.supports_media_devices()) return;
+    if (!z.media.MediaRepository.supports_media_devices()) {
+      return;
+    }
 
     this.get_media_devices().then(() => {
       this._set_current_devices();

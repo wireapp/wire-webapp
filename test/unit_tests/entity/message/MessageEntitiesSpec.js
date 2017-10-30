@@ -21,68 +21,68 @@
 
 // grunt test_init && grunt test_run:entity/message/MessageEntities
 
-describe('Message Entities', function() {
+describe('Message Entities', () => {
   let message_et = null;
 
-  describe('is_downloadable', function() {
-    it('message with asset text should not be downloadable', function() {
+  describe('is_downloadable', () => {
+    it('message with asset text should not be downloadable', () => {
       message_et = new z.entity.ContentMessage();
       message_et.assets.push(new z.entity.Text());
       expect(message_et.is_downloadable()).toBeFalsy();
     });
 
-    it('message with asset image should be downloadable', function() {
+    it('message with asset image should be downloadable', () => {
       message_et = new z.entity.ContentMessage();
       message_et.assets.push(new z.entity.MediumImage());
       expect(message_et.is_downloadable()).toBeTruthy();
     });
 
-    it('message with asset file should be downloadable', function() {
+    it('message with asset file should be downloadable', () => {
       message_et = new z.entity.ContentMessage();
       message_et.assets.push(new z.entity.File());
       expect(message_et.is_downloadable()).toBeTruthy();
     });
   });
 
-  describe('ContentMessage', function() {
-    beforeEach(function() {
+  describe('ContentMessage', () => {
+    beforeEach(() => {
       message_et = new z.entity.ContentMessage();
     });
 
-    describe('no asset', function() {
-      it('has_asset_medium_image return false', function() {
+    describe('no asset', () => {
+      it('has_asset_medium_image return false', () => {
         expect(message_et.has_asset_image()).toBeFalsy();
       });
 
-      it('has_asset_text return false', function() {
+      it('has_asset_text return false', () => {
         expect(message_et.has_asset_text()).toBeFalsy();
       });
     });
 
-    describe('medium asset', function() {
-      beforeEach(function() {
+    describe('medium asset', () => {
+      beforeEach(() => {
         message_et.assets.push(new z.entity.MediumImage());
       });
 
-      it('has_asset_medium_image return true', function() {
+      it('has_asset_medium_image return true', () => {
         expect(message_et.has_asset_image()).toBeTruthy();
       });
 
-      it('has_asset_text return false', function() {
+      it('has_asset_text return false', () => {
         expect(message_et.has_asset_text()).toBeFalsy();
       });
     });
 
-    describe('text asset', function() {
-      beforeEach(function() {
+    describe('text asset', () => {
+      beforeEach(() => {
         message_et.assets.push(new z.entity.Text());
       });
 
-      it('has_asset_medium_image return false', function() {
+      it('has_asset_medium_image return false', () => {
         expect(message_et.has_asset_image()).toBeFalsy();
       });
 
-      it('has_asset_text return true', function() {
+      it('has_asset_text return true', () => {
         expect(message_et.has_asset_text()).toBeTruthy();
       });
     });

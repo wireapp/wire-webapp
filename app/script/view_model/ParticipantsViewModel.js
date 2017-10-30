@@ -196,7 +196,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
     const bubble = wire.app.view.content.message_list.participant_bubble;
     if (bubble && bubble.is_visible()) {
-      window.setTimeout(function() {
+      window.setTimeout(() => {
         toggle_bubble();
       }, 550);
     } else {
@@ -261,7 +261,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     } else {
       this.conversation_repository
         .create_new_conversation(user_ids.concat(this.user_profile().id), null)
-        .then(function({conversation_et}) {
+        .then(({conversation_et}) => {
           amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.CREATE_GROUP_CONVERSATION, {
             creationContext: 'addedToOneToOne',
             numberOfParticipants: user_ids.length,

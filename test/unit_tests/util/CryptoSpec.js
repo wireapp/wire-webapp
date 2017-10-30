@@ -21,8 +21,8 @@
 
 'use strict';
 
-describe('z.util.Crypto', function() {
-  describe('Jenkins’s one-at-a-time hash', function() {
+describe('z.util.Crypto', () => {
+  describe('Jenkins’s one-at-a-time hash', () => {
     /* eslint-disable sort-keys */
     const sample = {
       '25f79335-6a5b-410e-90ea-653bd18b66da': 348398396,
@@ -38,7 +38,7 @@ describe('z.util.Crypto', function() {
     };
     /* eslint-enable sort-keys */
 
-    it('can calculate Jenkins’s one-at-a-time hash for a User ID', function() {
+    it('can calculate Jenkins’s one-at-a-time hash for a User ID', () => {
       const user_id = '532af01e-1e24-4366-aacf-33b67d4ee376';
 
       const actual = z.util.Crypto.Hashing.joaat_hash(user_id);
@@ -47,7 +47,7 @@ describe('z.util.Crypto', function() {
       expect(actual).toBe(expected);
     });
 
-    it('returns the expected hash values for some test strings', function() {
+    it('returns the expected hash values for some test strings', () => {
       let key = '25f79335-6a5b-410e-90ea-653bd18b66da';
       let actual = z.util.Crypto.Hashing.joaat_hash(key);
       expect(actual).toEqual(sample[key]);
@@ -65,11 +65,11 @@ describe('z.util.Crypto', function() {
       expect(actual).toEqual(sample[key]);
     });
 
-    it('returns zero for an empty string', function() {
+    it('returns zero for an empty string', () => {
       expect(z.util.Crypto.Hashing.joaat_hash('')).toEqual(0);
     });
 
-    it('returns the same value for upper and lowercase strings', function() {
+    it('returns the same value for upper and lowercase strings', () => {
       const key = 'E1b6e9f0-aafd-4ba9-8030-6Dd053531afd';
       expect(z.util.Crypto.Hashing.joaat_hash(key)).toEqual(sample[key.toLowerCase()]);
     });

@@ -652,7 +652,7 @@ z.main.App = class App {
           self_user.email() || self_user.phone()
         );
 
-        Object.keys(amplify.store()).forEach(function(amplify_key) {
+        Object.keys(amplify.store()).forEach(amplify_key => {
           if (
             !(amplify_key === cookie_label_key && clear_data) &&
             z.util.StringUtil.includes(amplify_key, z.storage.StorageKey.AUTH.COOKIE_LABEL)
@@ -804,7 +804,7 @@ z.main.App = class App {
 // Setting up the App
 //##############################################################################
 
-$(function() {
+$(() => {
   if ($('#wire-main-app').length !== 0) {
     wire.app = new z.main.App(wire.auth);
   }

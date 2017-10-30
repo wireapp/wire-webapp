@@ -518,7 +518,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
           this.username(invite_info.email);
         }
       })
-      .catch(function(error) {
+      .catch(error => {
         if (error.label !== z.service.BackendClientError.LABEL.INVALID_INVITATION_CODE) {
           Raygun.send(new Error('Invitation not found'), {error: error, invite_code: invite_code});
         }
@@ -1503,7 +1503,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
   //##############################################################################
 
   switch_ui(switch_params) {
-    let animation_params, direction;
+    let animation_params;
+    let direction;
 
     if (this.show_initial_animation) {
       direction = z.auth.AuthView.ANIMATION_DIRECTION.VERTICAL_TOP;
@@ -1620,7 +1621,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
         if (old_component.length) {
           animation_promises.push(
-            new Promise(function(resolve) {
+            new Promise(resolve => {
               $(old_component[0])
                 .addClass(`outgoing-${animation_params.direction}`)
                 .one(z.util.alias.animationend, function() {
@@ -1636,7 +1637,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
         if (new_component.length) {
           animation_promises.push(
-            new Promise(function(resolve) {
+            new Promise(resolve => {
               new_component
                 .addClass(`incoming-${animation_params.direction}`)
                 .one(z.util.alias.animationend, function() {
@@ -2086,7 +2087,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
    * @returns {string} Updated URL
    */
   _append_existing_parameters(url) {
-    AuthViewModel.CONFIG.FORWARDED_URL_PARAMETERS.forEach(function(parameter_name) {
+    AuthViewModel.CONFIG.FORWARDED_URL_PARAMETERS.forEach(parameter_name => {
       url = z.util.forward_url_parameter(url, parameter_name);
     });
 
@@ -2254,7 +2255,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
   }
 };
 
-$(function() {
+$(() => {
   if ($('.auth-page').length) {
     wire.auth.view = new z.ViewModel.AuthViewModel('auth-page', wire.auth);
   }

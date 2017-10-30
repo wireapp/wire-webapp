@@ -21,9 +21,9 @@
 
 // show scroll borders
 ko.bindingHandlers.bordered_list = (function() {
-  const calculate_borders = _.throttle(function($element) {
+  const calculate_borders = _.throttle($element => {
     if ($element) {
-      window.requestAnimationFrame(function() {
+      window.requestAnimationFrame(() => {
         const list_column = $($element).parent();
         if ($element.height() <= 0 || !$element.is_scrollable()) {
           return list_column.removeClass('left-list-center-border-bottom conversations-center-border-top');

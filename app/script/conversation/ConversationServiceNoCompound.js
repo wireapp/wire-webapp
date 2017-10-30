@@ -74,7 +74,7 @@ z.conversation.ConversationServiceNoCompound = class ConversationServiceNoCompou
       .reverse()
       .sortBy('time')
       .then(records => {
-        return records.filter(function(record) {
+        return records.filter(record => {
           const timestamp = new Date(record.time).getTime();
           return timestamp >= lower_bound && timestamp < upper_bound;
         });

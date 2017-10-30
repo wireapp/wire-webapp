@@ -46,7 +46,7 @@ z.main.Auth = class Auth {
 //##############################################################################
 // Setting up the Environment (DIST)
 //##############################################################################
-$(function() {
+$(() => {
   const default_env = z.util.Environment.frontend.is_production()
     ? z.service.BackendEnvironment.PRODUCTION
     : z.service.BackendEnvironment.STAGING;

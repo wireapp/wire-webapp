@@ -439,7 +439,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
         if (this.participant_bubble) {
           this.participant_bubble.hide();
         }
-        window.setTimeout(function() {
+        window.setTimeout(() => {
           create_bubble(element.id);
         }, 550);
       } else {
@@ -464,7 +464,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
    */
   on_session_reset_click(message_et) {
     const reset_progress = () =>
-      window.setTimeout(function() {
+      window.setTimeout(() => {
         message_et.is_resetting_session(false);
         amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.SESSION_RESET);
       }, 550);
@@ -556,7 +556,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
 
     this.conversation_repository
       .get_events_for_category(this.conversation(), z.message.MessageCategory.IMAGE)
-      .then(function(items) {
+      .then(items => {
         const message_ets = items.filter(
           item => item.category & z.message.MessageCategory.IMAGE && !(item.category & z.message.MessageCategory.GIF)
         );

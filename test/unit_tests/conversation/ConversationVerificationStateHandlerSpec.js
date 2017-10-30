@@ -21,7 +21,7 @@
 
 'use strict';
 
-describe('z.conversation.ConversationVerificationStateHandler', function() {
+describe('z.conversation.ConversationVerificationStateHandler', () => {
   const test_factory = new TestFactory();
   let state_handler = undefined;
   let conversation_repository = undefined;
@@ -37,10 +37,10 @@ describe('z.conversation.ConversationVerificationStateHandler', function() {
   let client_a = undefined;
   let client_b = undefined;
 
-  beforeEach(function(done) {
+  beforeEach(done => {
     test_factory
       .exposeConversationActors()
-      .then(function(_conversation_repository) {
+      .then(_conversation_repository => {
         conversation_repository = _conversation_repository;
         state_handler = new z.conversation.ConversationVerificationStateHandler(conversation_repository);
 
@@ -84,8 +84,8 @@ describe('z.conversation.ConversationVerificationStateHandler', function() {
       .catch(done.fail);
   });
 
-  describe('on_client_add', function() {
-    it('should change state to DEGRADED if new unverified client was added', function() {
+  describe('on_client_add', () => {
+    it('should change state to DEGRADED if new unverified client was added', () => {
       spyOn(z.conversation.EventBuilder, 'build_degraded');
 
       const new_client_b = new z.client.Client();
@@ -99,7 +99,7 @@ describe('z.conversation.ConversationVerificationStateHandler', function() {
       expect(z.conversation.EventBuilder.build_degraded.calls.count()).toEqual(2);
     });
 
-    it('should not change VERIFIED state if new verified client was added', function() {
+    it('should not change VERIFIED state if new verified client was added', () => {
       spyOn(z.conversation.EventBuilder, 'build_all_verified');
 
       const new_client_b = new z.client.Client();
@@ -113,8 +113,8 @@ describe('z.conversation.ConversationVerificationStateHandler', function() {
     });
   });
 
-  describe('on_client_removed', function() {
-    it('should change state from DEGRADED to VERIFIED if last unverified client was removed', function() {
+  describe('on_client_removed', () => {
+    it('should change state from DEGRADED to VERIFIED if last unverified client was removed', () => {
       spyOn(z.conversation.EventBuilder, 'build_degraded');
       spyOn(z.conversation.EventBuilder, 'build_all_verified');
 
@@ -137,8 +137,8 @@ describe('z.conversation.ConversationVerificationStateHandler', function() {
     });
   });
 
-  describe('on_clients_updated', function() {
-    it('should change state from DEGRADED to VERIFIED if last unverified client was removed by other user', function() {
+  describe('on_clients_updated', () => {
+    it('should change state from DEGRADED to VERIFIED if last unverified client was removed by other user', () => {
       spyOn(z.conversation.EventBuilder, 'build_degraded');
       spyOn(z.conversation.EventBuilder, 'build_all_verified');
 
@@ -161,8 +161,8 @@ describe('z.conversation.ConversationVerificationStateHandler', function() {
     });
   });
 
-  describe('on_member_joined', function() {
-    it('should change state to DEGRADED if new user with unverified client was added to conversation', function() {
+  describe('on_member_joined', () => {
+    it('should change state to DEGRADED if new user with unverified client was added to conversation', () => {
       spyOn(z.conversation.EventBuilder, 'build_degraded');
 
       const new_user = new z.entity.User(z.util.create_random_uuid());
@@ -180,7 +180,7 @@ describe('z.conversation.ConversationVerificationStateHandler', function() {
       expect(z.conversation.EventBuilder.build_degraded.calls.count()).toEqual(1);
     });
 
-    it('should not change state if new user with verified client was added to conversation', function() {
+    it('should not change state if new user with verified client was added to conversation', () => {
       spyOn(z.conversation.EventBuilder, 'build_degraded');
 
       const new_user = new z.entity.User(z.util.create_random_uuid());
@@ -199,8 +199,8 @@ describe('z.conversation.ConversationVerificationStateHandler', function() {
     });
   });
 
-  describe('on_client_verification_changed', function() {
-    it('should change state to DEGRADED if user unverified client', function() {
+  describe('on_client_verification_changed', () => {
+    it('should change state to DEGRADED if user unverified client', () => {
       client_a.meta.is_verified(false);
 
       state_handler.on_client_verification_changed(user_a.id, client_a.id);

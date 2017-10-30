@@ -704,7 +704,8 @@ z.calling.CallingRepository = class CallingRepository {
     }
 
     return recipients_promise.then(({remote_user_et, self_user_et}) => {
-      let precondition_option, recipients;
+      let precondition_option;
+      let recipients;
 
       switch (type) {
         case z.calling.enum.CALL_MESSAGE_TYPE.CANCEL: {

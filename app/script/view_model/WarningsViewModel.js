@@ -73,7 +73,7 @@ z.ViewModel.WarningsViewModel = class WarningsViewModel {
       {deferEvaluation: true}
     );
 
-    this.warnings.subscribe(function(warnings) {
+    this.warnings.subscribe(warnings => {
       let top_margin;
 
       const top_warning = warnings[warnings.length - 1];

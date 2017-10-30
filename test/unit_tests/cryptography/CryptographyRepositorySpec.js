@@ -21,10 +21,10 @@
 
 'use strict';
 
-describe('z.cryptography.CryptographyRepository', function() {
+describe('z.cryptography.CryptographyRepository', () => {
   const test_factory = new TestFactory();
 
-  beforeAll(function(done) {
+  beforeAll(done => {
     z.util.protobuf
       .load_protos('ext/proto/generic-message-proto/messages.proto')
       .then(() => test_factory.exposeCryptographyActors())
@@ -32,11 +32,11 @@ describe('z.cryptography.CryptographyRepository', function() {
       .catch(done.fail);
   });
 
-  describe('encrypt_generic_message', function() {
+  describe('encrypt_generic_message', () => {
     let jane_roe = undefined;
     let john_doe = undefined;
 
-    beforeAll(function() {
+    beforeAll(() => {
       john_doe = {
         clients: {
           desktop_id: 'b29034060fed476e',
@@ -53,9 +53,9 @@ describe('z.cryptography.CryptographyRepository', function() {
       });
     });
 
-    it('encrypts a generic message', function(done) {
+    it('encrypts a generic message', done => {
       spyOn(TestFactory.cryptography_service, 'get_users_pre_keys').and.callFake(recipients =>
-        Promise.resolve().then(function() {
+        Promise.resolve().then(() => {
           const prekey_map = {};
 
           for (const user_id in recipients) {
@@ -64,7 +64,7 @@ describe('z.cryptography.CryptographyRepository', function() {
 
               prekey_map[user_id] = prekey_map[user_id] || {};
 
-              client_ids.forEach(function(client_id) {
+              client_ids.forEach(client_id => {
                 prekey_map[user_id][client_id] = {
                   id: 65535,
                   key:
@@ -87,7 +87,7 @@ describe('z.cryptography.CryptographyRepository', function() {
 
       TestFactory.cryptography_repository
         .encrypt_generic_message(recipients, generic_message)
-        .then(function(payload) {
+        .then(payload => {
           expect(payload.recipients).toBeTruthy();
           expect(Object.keys(payload.recipients).length).toBe(2);
           expect(Object.keys(payload.recipients[john_doe.id]).length).toBe(2);
@@ -99,8 +99,8 @@ describe('z.cryptography.CryptographyRepository', function() {
     });
   });
 
-  describe('handle_encrypted_event', function() {
-    it('detects a session reset request', function(done) {
+  describe('handle_encrypted_event', () => {
+    it('detects a session reset request', done => {
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const event = {
         conversation: 'f1d2d451-0fcb-4313-b0ba-313b971ab758',
@@ -120,7 +120,7 @@ describe('z.cryptography.CryptographyRepository', function() {
         .catch(done.fail);
     });
 
-    it('only accept reasonable sized payload (text key)', function(done) {
+    it('only accept reasonable sized payload (text key)', done => {
       // Length of this message is 1 320 024 while the maximum is 150% of 12 000 (18 000)
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const text = window.btoa(`https://wir${'\u0000\u0001\u0000\u000D\u0000A'.repeat(165000)}e.com/`);
@@ -142,7 +142,7 @@ describe('z.cryptography.CryptographyRepository', function() {
         .catch(done.fail);
     });
 
-    it('only accept reasonable sized payload (data key)', function(done) {
+    it('only accept reasonable sized payload (data key)', done => {
       // Length of this message is 1 320 024 while the maximum is 150% of 12 000 (18 000)
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const data = window.btoa(`https://wir${'\u0000\u0001\u0000\u000D\u0000A'.repeat(165000)}e.com/`);

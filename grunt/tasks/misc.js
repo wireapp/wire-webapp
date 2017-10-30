@@ -115,7 +115,7 @@ module.exports = grunt => {
     grunt.task.run(['todo']);
   });
 
-  return grunt.registerTask('host', function(port, open = true) {
+  return grunt.registerTask('host', (port, open = true) => {
     if (port !== undefined) {
       grunt.config('connect.server.port', port);
     }

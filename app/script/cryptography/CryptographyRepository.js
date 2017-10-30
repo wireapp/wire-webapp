@@ -123,7 +123,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
       this.cryptobox.get_serialized_last_resort_prekey(),
       this.cryptobox.get_serialized_standard_prekeys(),
       this._generate_signaling_keys(),
-    ]).catch(function(error) {
+    ]).catch(error => {
       throw new Error(`Failed to generate client keys: ${error.message}`);
     });
   }

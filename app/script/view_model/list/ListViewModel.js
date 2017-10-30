@@ -285,7 +285,8 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
   //##############################################################################
 
   on_context_menu(conversation_et, event) {
-    let label, title;
+    let label;
+    let title;
     const entries = [];
 
     if (!conversation_et.is_request() && !conversation_et.removed_from_conversation()) {

@@ -60,14 +60,14 @@ describe('z.team.TeamRepository', () => {
   beforeAll(done => {
     test_factory
       .exposeTeamActors()
-      .then(function(repository) {
+      .then(repository => {
         team_repository = repository;
         done();
       })
       .catch(done.fail);
   });
 
-  beforeEach(function() {
+  beforeEach(() => {
     server = sinon.fakeServer.create();
     server.autoRespond = true;
 
@@ -84,7 +84,7 @@ describe('z.team.TeamRepository', () => {
     ]);
   });
 
-  afterEach(function() {
+  afterEach(() => {
     server.restore();
   });
 

@@ -21,61 +21,61 @@
 
 'use strict';
 
-describe('z.entity.User', function() {
-  describe('First Name', function() {
-    it('can generate first name', function() {
+describe('z.entity.User', () => {
+  describe('First Name', () => {
+    it('can generate first name', () => {
       const user_et = new z.entity.User();
       user_et.name('John Doe');
       expect(user_et.first_name()).toBe('John');
     });
   });
 
-  describe('Last Name', function() {
-    it('can generate last name', function() {
+  describe('Last Name', () => {
+    it('can generate last name', () => {
       const user_et = new z.entity.User();
       user_et.name('John Doe');
       expect(user_et.last_name()).toBe('Doe');
     });
 
-    it('can generate last name', function() {
+    it('can generate last name', () => {
       const user_et = new z.entity.User();
       user_et.name('John D. Doe');
       expect(user_et.last_name()).toBe('Doe');
     });
 
-    it('can ignore last name if user has only one name', function() {
+    it('can ignore last name if user has only one name', () => {
       const user_et = new z.entity.User();
       user_et.name('John');
       expect(user_et.last_name()).toBeUndefined();
     });
   });
 
-  describe('Initials', function() {
-    it('returns correct initials for user with first name and last name', function() {
+  describe('Initials', () => {
+    it('returns correct initials for user with first name and last name', () => {
       const user_et = new z.entity.User();
       user_et.name('John Doe');
       expect(user_et.initials()).toBe('JD');
     });
 
-    it('returns correct initials for user with just a first name', function() {
+    it('returns correct initials for user with just a first name', () => {
       const user_et = new z.entity.User();
       user_et.name('John');
       expect(user_et.initials()).toBe('JO');
     });
 
-    it('returns correct initials for user with middle name', function() {
+    it('returns correct initials for user with middle name', () => {
       const user_et = new z.entity.User();
       user_et.name('John Peter Doe');
       expect(user_et.initials()).toBe('JD');
     });
 
-    it('returns correct initials for user with one character as name', function() {
+    it('returns correct initials for user with one character as name', () => {
       const user_et = new z.entity.User();
       user_et.name('J');
       expect(user_et.initials()).toBe('J');
     });
 
-    it('returns correct initials for user with an emoji as name', function() {
+    it('returns correct initials for user with an emoji as name', () => {
       const user_et = new z.entity.User();
       user_et.name('🐒');
       expect(user_et.initials()).toBe('🐒');
@@ -83,7 +83,7 @@ describe('z.entity.User', function() {
   });
 
   describe('add_client', () =>
-    it('accepts clients which are no duplicates', function() {
+    it('accepts clients which are no duplicates', () => {
       const first_client = new z.client.Client();
       first_client.id = '5021d77752286cac';
 
@@ -99,7 +99,7 @@ describe('z.entity.User', function() {
     }));
 
   describe('accent_theme', () =>
-    it('can change the accent theme', function() {
+    it('can change the accent theme', () => {
       const user_et = new z.entity.User();
 
       user_et.accent_id(z.config.ACCENT_ID.BLUE);
@@ -128,7 +128,7 @@ describe('z.entity.User', function() {
     }));
 
   describe('accent_color', () =>
-    it('can change the accent color', function() {
+    it('can change the accent color', () => {
       const user_et = new z.entity.User();
 
       user_et.accent_id(z.config.ACCENT_ID.BLUE);

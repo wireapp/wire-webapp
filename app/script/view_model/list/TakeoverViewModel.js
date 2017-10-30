@@ -66,7 +66,7 @@ z.ViewModel.list.TakeoverViewModel = class TakeoverViewModel {
           outcome: 'success',
         });
       })
-      .catch(function() {
+      .catch(() => {
         amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT);
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.KEPT_GENERATED_USERNAME, {
           outcome: 'fail',
