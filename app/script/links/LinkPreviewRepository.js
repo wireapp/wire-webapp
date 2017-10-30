@@ -51,7 +51,7 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
         const data = z.links.LinkPreviewHelpers.get_first_link_with_offset(string);
 
         if (data) {
-          return this.get_link_preview(data.url, data.offset).catch(function(error) {
+          return this.get_link_preview(data.url, data.offset).catch(error => {
             if (!(error instanceof z.links.LinkPreviewError)) {
               throw error;
             }

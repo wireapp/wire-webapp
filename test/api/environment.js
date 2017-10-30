@@ -19,6 +19,6 @@
 
 'use strict';
 
-navigator.__defineGetter__('language', function() {
+navigator.__defineGetter__('language', () => {
   return 'en';
 });

@@ -21,7 +21,7 @@
 
 'use strict';
 
-describe('Giphy Repository', function() {
+describe('Giphy Repository', () => {
   let server = null;
   const urls = {
     rest_url: 'http://localhost',
@@ -32,7 +32,7 @@ describe('Giphy Repository', function() {
   let giphy_repository = null;
   let giphy_service = null;
 
-  beforeEach(function() {
+  beforeEach(() => {
     server = sinon.fakeServer.create();
 
     client = new z.service.BackendClient(urls);
@@ -213,15 +213,15 @@ describe('Giphy Repository', function() {
     /* eslint-enable comma-spacing, key-spacing, no-useless-escape, sort-keys, quotes */
   });
 
-  afterEach(function() {
+  afterEach(() => {
     server.restore();
   });
 
-  describe('get_random_gif', function() {
-    it('can receive a random gif', function(done) {
+  describe('get_random_gif', () => {
+    it('can receive a random gif', done => {
       giphy_repository
         .get_random_gif({tag: 'foo'})
-        .then(function() {
+        .then(() => {
           expect(giphy_service.get_random).toHaveBeenCalled();
           expect(giphy_service.get_by_id).toHaveBeenCalled();
           done();
@@ -229,7 +229,7 @@ describe('Giphy Repository', function() {
         .catch(done.fail);
 
       server.respond();
-      window.setTimeout(function() {
+      window.setTimeout(() => {
         server.respond();
       }, 10);
     });

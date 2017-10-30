@@ -34,7 +34,7 @@ z.util.ArrayUtil = {
   find_closest(array, value) {
     let closest = array[0];
 
-    array.forEach(function(current) {
+    array.forEach(current => {
       if (value >= current) {
         closest = current;
       }

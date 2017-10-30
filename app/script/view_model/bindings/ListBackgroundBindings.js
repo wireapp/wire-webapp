@@ -33,12 +33,12 @@ ko.bindingHandlers.switch_background = (function() {
 
         image_resource
           .load()
-          .then(function(blob) {
+          .then(blob => {
             background_next
               .find('.background-image')
               .css({'background-image': `url(${window.URL.createObjectURL(blob)})`});
           })
-          .then(function() {
+          .then(() => {
             background_next.css({opacity: '1'}).one(z.util.alias.animationend, background_last.remove);
           });
       }

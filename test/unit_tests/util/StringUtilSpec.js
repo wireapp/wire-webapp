@@ -21,57 +21,57 @@
 
 'use strict';
 
-describe('z.util.StringUtil', function() {
-  describe('compare_transliteration', function() {
-    it('René equals Rene', function() {
+describe('z.util.StringUtil', () => {
+  describe('compare_transliteration', () => {
+    it('René equals Rene', () => {
       expect(z.util.StringUtil.compare_transliteration('René', 'Rene')).toBeTruthy();
     });
 
-    it('Παναγιώτα equals Panagiota', function() {
+    it('Παναγιώτα equals Panagiota', () => {
       expect(z.util.StringUtil.compare_transliteration('Παναγιώτα', 'Panagiota')).toBeTruthy();
     });
 
-    it('ΠΑΝΑΓΙΩΤΑ equals PANAGIOTA', function() {
+    it('ΠΑΝΑΓΙΩΤΑ equals PANAGIOTA', () => {
       expect(z.util.StringUtil.compare_transliteration('ΠΑΝΑΓΙΩΤΑ', 'PANAGIOTA')).toBeTruthy();
     });
 
-    it('Björn equals Bjoern', function() {
+    it('Björn equals Bjoern', () => {
       expect(z.util.StringUtil.compare_transliteration('Björn', 'Bjoern')).toBeTruthy();
     });
 
-    it('Bjørn equals Bjorn', function() {
+    it('Bjørn equals Bjorn', () => {
       expect(z.util.StringUtil.compare_transliteration('Bjørn', 'Bjorn')).toBeTruthy();
     });
   });
 
-  describe('format', function() {
-    it('returns string with replaced placeholder', function() {
+  describe('format', () => {
+    it('returns string with replaced placeholder', () => {
       expect(z.util.StringUtil.format('foo={0}&bar={1}', 1, 2)).toBe('foo=1&bar=2');
     });
   });
 
-  describe('get_random_character', function() {
-    it('always returns an alphanumeric character', function() {
+  describe('get_random_character', () => {
+    it('always returns an alphanumeric character', () => {
       _.range(1000).map(() => expect(z.util.StringUtil.get_random_character()).toMatch(/(\w|\d){1}/));
     });
   });
 
-  describe('includes', function() {
+  describe('includes', () => {
     const string = 'Club Zeta';
 
-    it('returns true for positive matches', function() {
+    it('returns true for positive matches', () => {
       expect(z.util.StringUtil.includes(string, 'ub')).toBeTruthy();
       expect(z.util.StringUtil.includes(string, 'Club Z')).toBeTruthy();
       expect(z.util.StringUtil.includes(string, 'club z')).toBeTruthy();
     });
 
-    it('returns false for no matches', function() {
+    it('returns false for no matches', () => {
       expect(z.util.StringUtil.includes(string, 'wurst')).toBeFalsy();
     });
   });
 
-  describe('obfuscate', function() {
-    it("obfuscates a text preserving it's whitespaces", function() {
+  describe('obfuscate', () => {
+    it("obfuscates a text preserving it's whitespaces", () => {
       const text = 'You Are The Sunshine Of My Life';
       const obfuscated = z.util.StringUtil.obfuscate(text);
       const whitespaces = obfuscated.match(/[\n\r\s]+/gi);
@@ -80,7 +80,7 @@ describe('z.util.StringUtil', function() {
       expect(whitespaces.length).toBe(6);
     });
 
-    it('obfuscates a text keeping its length', function() {
+    it('obfuscates a text keeping its length', () => {
       const text =
         'Bacon ipsum dolor amet sausage landjaeger ball tip brisket filet mignon, t-bone tenderloin tri-tip beef drumstick fatback burgdoggen ground round meatball. Tri-tip spare ribs ground round bresaola ball tip tail, sirloin chicken doner boudin turkey leberkas bacon alcatra. ';
       const obfuscated = z.util.StringUtil.obfuscate(text);
@@ -88,14 +88,14 @@ describe('z.util.StringUtil', function() {
       expect(obfuscated.length).toBe(text.length);
     });
 
-    it('obfuscates a text keeping its length (commas)', function() {
+    it('obfuscates a text keeping its length (commas)', () => {
       const text = ',,,,,,';
       const obfuscated = z.util.StringUtil.obfuscate(text);
       expect(obfuscated).not.toBe(text);
       expect(obfuscated.length).toBe(text.length);
     });
 
-    it('obfuscates a text keeping its length (dots)', function() {
+    it('obfuscates a text keeping its length (dots)', () => {
       const text = '......';
       const obfuscated = z.util.StringUtil.obfuscate(text);
       expect(obfuscated).not.toBe(text);
@@ -103,14 +103,14 @@ describe('z.util.StringUtil', function() {
     });
   });
 
-  describe('remove_line_breaks', function() {
-    it('removes all the line breaks', function() {
+  describe('remove_line_breaks', () => {
+    it('removes all the line breaks', () => {
       expect(z.util.StringUtil.remove_line_breaks('\nA\nB\nC\nD\n')).toBe('ABCD');
     });
   });
 
-  describe('sort_by_priority', function() {
-    it('can sort strings', function() {
+  describe('sort_by_priority', () => {
+    it('can sort strings', () => {
       const string_1 = 'a b';
       const string_2 = 'c d';
 
@@ -124,51 +124,51 @@ describe('z.util.StringUtil', function() {
     });
   });
 
-  describe('starts_with', function() {
+  describe('starts_with', () => {
     const string = 'To be, or not to be, that is the question.';
 
-    it('returns true for positive matches', function() {
+    it('returns true for positive matches', () => {
       expect(z.util.StringUtil.starts_with(string, 'To be')).toBeTruthy();
       expect(z.util.StringUtil.starts_with(string, 'to be')).toBeTruthy();
     });
 
-    it('returns false for no matches', function() {
+    it('returns false for no matches', () => {
       expect(z.util.StringUtil.starts_with(string, 'not to be')).toBeFalsy();
     });
   });
 
-  describe('z.util.trim_line_breaks', function() {
-    it('removes line breaks at the beginning and/or end', function() {
+  describe('z.util.trim_line_breaks', () => {
+    it('removes line breaks at the beginning and/or end', () => {
       expect(z.util.StringUtil.trim_line_breaks('\n\n\n\n\nB\nC\nD')).toBe('B\nC\nD');
       expect(z.util.StringUtil.trim_line_breaks('B\nC\nD\n\n\n\n\n')).toBe('B\nC\nD');
       expect(z.util.StringUtil.trim_line_breaks('\n\n\n\nB\nC\n\n\n\n\n')).toBe('B\nC');
     });
 
-    it('does not remove line breaks in between', function() {
+    it('does not remove line breaks in between', () => {
       expect(z.util.StringUtil.trim_line_breaks('A\nB\nC\nD')).toBe('A\nB\nC\nD');
     });
   });
 
-  describe('truncate', function() {
-    it('returns the full string if it is shorter than the target length', function() {
+  describe('truncate', () => {
+    it('returns the full string if it is shorter than the target length', () => {
       const text = z.util.StringUtil.truncate(`${lorem_ipsum.substr(0, 80)}`, 90);
       expect(text.length).toBe(80);
       expect(text.charAt(79)).not.toBe('…');
     });
 
-    it('returns a truncated string of correct length if it is longer than the target length', function() {
+    it('returns a truncated string of correct length if it is longer than the target length', () => {
       const text = z.util.StringUtil.truncate(`${lorem_ipsum.substr(0, 80)}`, 70);
       expect(text.length).toBe(64);
       expect(text.charAt(63)).toBe('…');
     });
 
-    it('returns a truncated string of correct length if word boundary is disabled', function() {
+    it('returns a truncated string of correct length if word boundary is disabled', () => {
       const text = z.util.StringUtil.truncate(`${lorem_ipsum.substr(0, 80)}`, 70, false);
       expect(text.length).toBe(70);
       expect(text.charAt(69)).toBe('…');
     });
 
-    it('returns a truncated string of correct length if word boundary is disabled and there are no whitespaces in the string', function() {
+    it('returns a truncated string of correct length if word boundary is disabled and there are no whitespaces in the string', () => {
       const text = z.util.StringUtil.truncate(`${lorem_ipsum.replace(/\s/g, '').substr(0, 80)}`, 70);
       expect(text.length).toBe(70);
       expect(text.charAt(69)).toBe('…');

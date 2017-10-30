@@ -43,7 +43,6 @@ z.ViewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
           case z.audio.AudioPreference.NONE:
             return 'neverPlay';
           default:
-            return;
         }
       })();
 

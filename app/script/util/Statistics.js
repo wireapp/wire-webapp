@@ -42,7 +42,7 @@ z.util.Statistics = {
       average = z.util.Statistics.average(values);
     }
 
-    const squared_deviations = values.map(function(value) {
+    const squared_deviations = values.map(value => {
       const deviation = value - average;
       return deviation * deviation;
     });

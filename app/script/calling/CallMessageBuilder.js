@@ -111,9 +111,9 @@ z.calling.CallMessageBuilder = (function() {
         },
       };
     } else {
-      let audio_send_state,
-        screen_send_state,
-        video_send_state = undefined;
+      let audio_send_state;
+      let screen_send_state;
+      let video_send_state = undefined;
 
       switch (payload_type) {
         case z.media.MediaType.AUDIO: {

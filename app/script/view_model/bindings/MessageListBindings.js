@@ -90,11 +90,11 @@ ko.bindingHandlers.background_image = {
       );
     };
 
-    const _on_viewport_change = _.debounce(function() {
+    const _on_viewport_change = _.debounce(() => {
       if (_in_view(element) && asset_remote_data()) {
         asset_remote_data()
           .load()
-          .then(function(blob) {
+          .then(blob => {
             $(element).removeClass('image-loading');
             object_url = window.URL.createObjectURL(blob);
             image_element[0].src = object_url;
@@ -113,7 +113,7 @@ ko.bindingHandlers.background_image = {
 
     _on_viewport_change();
 
-    ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+    ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
       viewport_subscription.dispose();
       asset_subscription.dispose();
       if (object_url) {
@@ -189,7 +189,7 @@ ko.bindingHandlers.relative_timestamp = (function() {
   };
 
   // should be fine to update every minute
-  window.setInterval(function() {
+  window.setInterval(() => {
     timestamps.map(timestamp_func => timestamp_func());
   }, 60 * 1000);
 
@@ -213,7 +213,7 @@ ko.bindingHandlers.relative_timestamp = (function() {
       timestamp_func();
       timestamps.push(timestamp_func);
 
-      ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+      ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
         const timestamp_index = timestamps.indexOf(timestamp_func);
         timestamps.splice(timestamp_index, 1);
       });

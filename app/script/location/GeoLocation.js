@@ -27,19 +27,19 @@ z.location = (() => {
   const _parse_results = results => {
     const res = {};
     const [result] = results;
-    res['address'] = result.formatted_address;
-    res['lat'] = result.geometry.location.lat;
-    res['lng'] = result.geometry.location.lng;
+    res.address = result.formatted_address;
+    res.lat = result.geometry.location.lat;
+    res.lng = result.geometry.location.lng;
     for (const component of result.address_components) {
       const name = component.long_name || component.short_name;
       for (const type of component.types) {
         res[type] = name;
         if (type === 'country') {
-          res['country_code'] = component.short_name || '';
+          res.country_code = component.short_name || '';
         }
       }
     }
-    res['place'] =
+    res.place =
       res.locality ||
       res.natural_feature ||
       res.administrative_area_level_3 ||

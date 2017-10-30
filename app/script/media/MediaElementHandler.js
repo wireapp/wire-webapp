@@ -89,8 +89,8 @@ z.media.MediaElementHandler = class MediaElementHandler {
     try {
       const media_element = document.createElement('audio');
       media_element.srcObject = media_stream_info.stream;
-      media_element.dataset['conversation_id'] = media_stream_info.conversation_id;
-      media_element.dataset['flow_id'] = media_stream_info.flow_id;
+      media_element.dataset.conversation_id = media_stream_info.conversation_id;
+      media_element.dataset.flow_id = media_stream_info.flow_id;
       media_element.muted = false;
       media_element.setAttribute('autoplay', true);
       if (z.util.Environment.browser.supports.audio_output_selection) {
@@ -124,7 +124,7 @@ z.media.MediaElementHandler = class MediaElementHandler {
    * @returns {Array<HTMLMediaElement>} Related MediaElements
   */
   _get_media_elements(flow_id) {
-    return this.remote_media_elements().filter(media_element => media_element.dataset['flow_id'] === flow_id);
+    return this.remote_media_elements().filter(media_element => media_element.dataset.flow_id === flow_id);
   }
 
   /**
@@ -141,15 +141,14 @@ z.media.MediaElementHandler = class MediaElementHandler {
         .setSinkId(sink_id)
         .then(() => {
           this.logger.info(
-            `Audio output device '${sink_id}' attached to flow '${media_element.dataset['flow_id']}`,
+            `Audio output device '${sink_id}' attached to flow '${media_element.dataset.flow_id}`,
             media_element
           );
         })
         .catch(error => {
           this.logger.warn(
-            `Failed to attach audio output device '${sink_id}' to flow '${media_element.dataset[
-              'flow_id'
-            ]}': ${error.message}`,
+            `Failed to attach audio output device '${sink_id}' to flow '${media_element.dataset
+              .flow_id}': ${error.message}`,
             error
           );
         });
