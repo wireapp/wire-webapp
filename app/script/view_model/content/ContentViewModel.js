@@ -211,15 +211,21 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
       return this.switch_content(z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS);
     }
 
-    const conversation_promise = conversation.id
+    const is_conversation = typeof conversation === 'object' && conversation.id;
+    const is_conversation_id = typeof conversation === 'string';
+    if (!is_conversation && !is_conversation_id) {
+      throw new Error(`Wrong input for conversation: ${typeof conversation}`);
+    }
+
+    const conversation_promise = is_conversation
       ? Promise.resolve(conversation)
       : this.conversation_repository.get_conversation_by_id(conversation);
+
     conversation_promise.then(conversation_et => {
-      const is_active_conversation =
-        conversation_et && conversation_et === this.conversation_repository.active_conversation();
+      const is_active_conversation = conversation_et === this.conversation_repository.active_conversation();
       const is_conversation_state = this.content_state() === z.ViewModel.content.CONTENT_STATE.CONVERSATION;
 
-      if (is_active_conversation && is_conversation_state) {
+      if (conversation_et && is_active_conversation && is_conversation_state) {
         return;
       }
 
