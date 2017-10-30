@@ -30,7 +30,10 @@ z.bot.BotRepository = class BotRepository {
 
   /**
    * Add bot to conversation.
-   * @param {string} botName - Bot name registered on backend
+   * @param {Object} botInfo - Bot tokens
+   * @option {string} botName - Bot name registered on backend (will be used as conversation name)
+   * @option {string} botProvider - Provider UUID
+   * @option {string} botService - Service UUID
    * @param {boolean} [create_conversation=true] - A new conversation is created if true otherwise bot is added to active conversation
    * @returns {Promise} Resolves when bot was added to conversation
    */
