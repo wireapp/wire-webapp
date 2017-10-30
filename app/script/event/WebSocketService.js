@@ -102,12 +102,12 @@ z.event.WebSocketService = class WebSocketService {
         resolve();
       };
 
-      this.socket.onerror = (event) => {
+      this.socket.onerror = event => {
         this.logger.error('WebSocket connection error.', event);
         this.reset(WebSocketService.CHANGE_TRIGGER.ERROR, true);
       };
 
-      this.socket.onclose = (event) => {
+      this.socket.onclose = event => {
         this.logger.warn('Closed WebSocket connection', event);
         this.reset(WebSocketService.CHANGE_TRIGGER.CLOSE, true);
       };
@@ -130,7 +130,10 @@ z.event.WebSocketService = class WebSocketService {
    */
   pending_reconnect() {
     if (this.pending_reconnect_trigger) {
-      this.logger.info(`Executing pending WebSocket reconnect triggered by '${this.pending_reconnect_trigger}' after access token refresh`);
+      this.logger.info(
+        `Executing pending WebSocket reconnect triggered by '${this
+          .pending_reconnect_trigger}' after access token refresh`
+      );
       this.reconnect(this.pending_reconnect_trigger);
       this.pending_reconnect_trigger = undefined;
     }
@@ -145,18 +148,20 @@ z.event.WebSocketService = class WebSocketService {
     if (!z.util.StorageUtil.get_value(z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION)) {
       this.logger.info(`Access token has to be refreshed before reconnecting the WebSocket triggered by '${trigger}'`);
       this.pending_reconnect_trigger = trigger;
-      return amplify.publish(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, z.auth.AuthRepository.ACCESS_TOKEN_TRIGGER.WEB_SOCKET);
+      return amplify.publish(
+        z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW,
+        z.auth.AuthRepository.ACCESS_TOKEN_TRIGGER.WEB_SOCKET
+      );
     }
 
     this.reconnect_count++;
     const reconnect = () => {
       this.logger.info(`Trying to re-establish WebSocket connection. Try #${this.reconnect_count}`);
-      return this.connect(this.on_notification)
-        .then(() => {
-          this.reconnect_count = 0;
-          this.logger.info(`Reconnect to WebSocket triggered by '${trigger}'`);
-          return this.reconnected();
-        });
+      return this.connect(this.on_notification).then(() => {
+        this.reconnect_count = 0;
+        this.logger.info(`Reconnect to WebSocket triggered by '${trigger}'`);
+        return this.reconnected();
+      });
     };
 
     if (this.reconnect_count === 1) {
@@ -210,7 +215,10 @@ z.event.WebSocketService = class WebSocketService {
       }
       const ping_interval_diff = this.last_ping_time - current_time;
 
-      if (ping_interval_diff > (WebSocketService.CONFIG.PING_INTERVAL + WebSocketService.CONFIG.PING_INTERVAL_THRESHOLD)) {
+      if (
+        ping_interval_diff >
+        WebSocketService.CONFIG.PING_INTERVAL + WebSocketService.CONFIG.PING_INTERVAL_THRESHOLD
+      ) {
         this.logger.warn('Ping interval check failed');
         return this.reconnect(WebSocketService.CHANGE_TRIGGER.PING_INTERVAL);
       }

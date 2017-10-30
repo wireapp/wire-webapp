@@ -20,10 +20,8 @@
 window.z = window.z || {};
 window.z.team = z.team || {};
 
-
 z.team.TeamPermission = (() => {
-
-  const _permissions_for_role = (team_role) => {
+  const _permissions_for_role = team_role => {
     switch (team_role) {
       case z.team.TeamRole.ROLE.OWNER: {
         return _combine_permissions([
@@ -58,7 +56,7 @@ z.team.TeamPermission = (() => {
     }
   };
 
-  const _combine_permissions = (permissions) => {
+  const _combine_permissions = permissions => {
     let result = 0;
     for (const permission of permissions) {
       result = result | permission;

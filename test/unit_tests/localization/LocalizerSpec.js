@@ -21,7 +21,6 @@
 
 'use strict';
 
-
 describe('l10n', function() {
   it('can get localized strings', function() {
     const text = z.l10n.text(z.string.wire);

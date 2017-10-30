@@ -43,9 +43,15 @@
     border-radius: 2px;
     -webkit-appearance: none;
     background-color: fade(#000, 24%);
-    background-image: repeating-linear-gradient(-45deg, fade(#000, 32%), fade(#000, 32%) 5px, fade(#000, 8%) 4px, fade(#000, 8%) 10px);
+    background-image: repeating-linear-gradient(
+      -45deg,
+      fade(#000, 32%),
+      fade(#000, 32%) 5px,
+      fade(#000, 8%) 4px,
+      fade(#000, 8%) 10px
+    );
     background-size: 14px 14px;
-    animation: move .5s linear infinite;
+    animation: move 0.5s linear infinite;
     overflow: hidden;
 
     > div {
@@ -57,6 +63,10 @@
 }
 
 @keyframes move {
-  0% { background-position: 0 0; }
-  100% { background-position: 28px 0; }
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 28px 0;
+  }
 }

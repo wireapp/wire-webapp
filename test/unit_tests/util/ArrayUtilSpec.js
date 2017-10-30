@@ -63,7 +63,7 @@ describe('z.util.ArrayUtil', function() {
     const third_item = 'c';
     const unknown_item = 'd';
     const array = [first_item, second_item, third_item];
-    const filter = (item) => item !== second_item;
+    const filter = item => item !== second_item;
 
     it('returns the second item when first item was given', function() {
       expect(z.util.ArrayUtil.get_next_item(array, first_item)).toEqual(second_item);

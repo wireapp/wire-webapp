@@ -27,7 +27,7 @@ z.storage.StorageError = class StorageError extends Error {
     super();
 
     this.name = this.constructor.name;
-    this.stack = (new Error()).stack;
+    this.stack = new Error().stack;
     this.type = type || z.storage.StorageError.TYPE.UNKNOWN;
 
     switch (this.type) {

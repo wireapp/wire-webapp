@@ -28,7 +28,7 @@ window.z.audio.AudioRepository = class AudioRepository {
     this.audio_elements = {};
     this.currently_looping = {};
     this.audio_preference = ko.observable(z.audio.AudioPreference.ALL);
-    this.audio_preference.subscribe((audio_preference) => {
+    this.audio_preference.subscribe(audio_preference => {
       if (audio_preference === z.audio.AudioPreference.NONE) {
         this._stop_all();
       }
@@ -44,13 +44,13 @@ window.z.audio.AudioRepository = class AudioRepository {
    * @returns {Promise} Resolves if the sound should be played.
    */
   _check_sound_setting(audio_id) {
-    if (this.muted && !(z.audio.AudioPlayingType.MUTED.includes(audio_id))) {
+    if (this.muted && !z.audio.AudioPlayingType.MUTED.includes(audio_id)) {
       return Promise.reject(new z.audio.AudioError(z.audio.AudioError.TYPE.IGNORED_SOUND));
     }
-    if (this.audio_preference() === z.audio.AudioPreference.NONE && !(z.audio.AudioPlayingType.NONE.includes(audio_id))) {
+    if (this.audio_preference() === z.audio.AudioPreference.NONE && !z.audio.AudioPlayingType.NONE.includes(audio_id)) {
       return Promise.reject(new z.audio.AudioError(z.audio.AudioError.TYPE.IGNORED_SOUND));
     }
-    if (this.audio_preference() === z.audio.AudioPreference.SOME && !(z.audio.AudioPlayingType.SOME.includes(audio_id))) {
+    if (this.audio_preference() === z.audio.AudioPreference.SOME && !z.audio.AudioPlayingType.SOME.includes(audio_id)) {
       return Promise.reject(new z.audio.AudioError(z.audio.AudioError.TYPE.IGNORED_SOUND));
     }
     return Promise.resolve();
@@ -88,14 +88,12 @@ window.z.audio.AudioRepository = class AudioRepository {
    * @returns {undefined}
    */
   _init_sounds() {
-    Object
-      .keys(z.audio.AudioType)
-      .forEach((type) => {
-        if (z.audio.AudioType.hasOwnProperty(type)) {
-          const audio_id = z.audio.AudioType[type];
-          this.audio_elements[audio_id] = this._create_audio_element(`/audio/${audio_id}.mp3`);
-        }
-      });
+    Object.keys(z.audio.AudioType).forEach(type => {
+      if (z.audio.AudioType.hasOwnProperty(type)) {
+        const audio_id = z.audio.AudioType[type];
+        this.audio_elements[audio_id] = this._create_audio_element(`/audio/${audio_id}.mp3`);
+      }
+    });
 
     this.logger.info('Initialized sounds');
   }
@@ -149,15 +147,13 @@ window.z.audio.AudioRepository = class AudioRepository {
    * @returns {undefined}
    */
   _preload() {
-    Object
-      .keys(this.audio_elements)
-      .forEach((audio_id) => {
-        if (this.audio_elements.hasOwnProperty(audio_id)) {
-          const audio_element = this.audio_elements[audio_id];
-          audio_element.preload = 'auto';
-          audio_element.load();
-        }
-      });
+    Object.keys(this.audio_elements).forEach(audio_id => {
+      if (this.audio_elements.hasOwnProperty(audio_id)) {
+        const audio_element = this.audio_elements[audio_id];
+        audio_element.preload = 'auto';
+        audio_element.load();
+      }
+    });
 
     this.logger.info('Pre-loading audio files for immediate playback');
   }
@@ -168,9 +164,7 @@ window.z.audio.AudioRepository = class AudioRepository {
    * @returns {undefined}
    */
   _stop_all() {
-    Object
-      .keys(this.currently_looping)
-      .forEach((audio_id) => this.stop(audio_id));
+    Object.keys(this.currently_looping).forEach(audio_id => this.stop(audio_id));
   }
 
   /**
@@ -190,7 +184,7 @@ window.z.audio.AudioRepository = class AudioRepository {
    * @returns {undefined}
    */
   _subscribe_to_events() {
-    amplify.subscribe(z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, this, (handling_notifications) => {
+    amplify.subscribe(z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, this, handling_notifications => {
       const updated_muted_state_muted_state = handling_notifications !== z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
       if (this.muted !== updated_muted_state_muted_state) {
@@ -199,11 +193,11 @@ window.z.audio.AudioRepository = class AudioRepository {
       }
     });
 
-    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this, (properties) => {
+    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this, properties => {
       this.audio_preference(properties.settings.sound.alerts);
     });
 
-    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.SOUND_ALERTS, this, (audio_preference) => {
+    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.SOUND_ALERTS, this, audio_preference => {
       this.audio_preference(audio_preference);
     });
   }
@@ -240,9 +234,9 @@ window.z.audio.AudioRepository = class AudioRepository {
   play(audio_id, play_in_loop = false) {
     this._check_sound_setting(audio_id)
       .then(() => this._get_sound_by_id(audio_id))
-      .then((audio_element) => this._play(audio_id, audio_element, play_in_loop))
-      .then((audio_element) => this.logger.info(`Playing sound '${audio_id}' (loop: '${play_in_loop}')`, audio_element))
-      .catch((error) => {
+      .then(audio_element => this._play(audio_id, audio_element, play_in_loop))
+      .then(audio_element => this.logger.info(`Playing sound '${audio_id}' (loop: '${play_in_loop}')`, audio_element))
+      .catch(error => {
         if (!(error instanceof z.audio.AudioError)) {
           this.logger.error(`Failed playing sound '${audio_id}': ${error.message}`);
           throw error;
@@ -257,7 +251,7 @@ window.z.audio.AudioRepository = class AudioRepository {
    */
   stop(audio_id) {
     this._get_sound_by_id(audio_id)
-      .then((audio_element) => {
+      .then(audio_element => {
         if (!audio_element.paused) {
           this.logger.info(`Stopping sound '${audio_id}'`, audio_element);
           audio_element.pause();
@@ -267,7 +261,7 @@ window.z.audio.AudioRepository = class AudioRepository {
           delete this.currently_looping[audio_id];
         }
       })
-      .catch((error) => {
+      .catch(error => {
         this.logger.error(`Failed stopping sound '${audio_id}': ${error.message}`);
         throw error;
       });

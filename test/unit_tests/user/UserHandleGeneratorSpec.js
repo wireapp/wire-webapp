@@ -28,14 +28,14 @@ describe('UserHandleGenerator', () => {
       const number_of_variations = 10;
       const variations = z.user.UserHandleGenerator.generate_handle_variations(handle, number_of_variations);
       expect(variations.length).toBe(number_of_variations);
-      variations.forEach((variation) => expect(variation).not.toBe(handle));
+      variations.forEach(variation => expect(variation).not.toBe(handle));
     });
   });
 
   describe('normalize_name', () => {
     it('should normalize user names', () => {
       expect(z.user.UserHandleGenerator.normalize_name('Maria LaRochelle')).toBe('marialarochelle');
-      expect(z.user.UserHandleGenerator.normalize_name("Mêrié \"LaRöche'lle\"")).toBe('merielaroechelle');
+      expect(z.user.UserHandleGenerator.normalize_name('Mêrié "LaRöche\'lle"')).toBe('merielaroechelle');
       expect(z.user.UserHandleGenerator.normalize_name('Maria I ❤️🍕')).toBe('mariai');
       expect(z.user.UserHandleGenerator.normalize_name('.-/Maria-.')).toBe('maria');
       // expect(z.user.UserHandleGenerator.normalize_name('苹果')).toBe 'pingguo'
@@ -45,8 +45,12 @@ describe('UserHandleGenerator', () => {
       // expect(z.user.UserHandleGenerator.normalize_name('Яблоко')).toBe 'abloko'
       // expect(z.user.UserHandleGenerator.normalize_name('خطای سطح دسترسی')).toBe 'khtaysthdstrsy'
       expect(z.user.UserHandleGenerator.normalize_name('ᑭᒻᒥᓇᐅᔭᖅ')).toBe('');
-      expect(z.user.UserHandleGenerator.normalize_name('    Maria LaRochelle Von Schwerigstein ')).toBe('marialarochellevonsch');
-      expect(z.user.UserHandleGenerator.normalize_name(' \n\t Maria LaRochelle Von Schwerigstein ')).toBe('marialarochellevonsch');
+      expect(z.user.UserHandleGenerator.normalize_name('    Maria LaRochelle Von Schwerigstein ')).toBe(
+        'marialarochellevonsch'
+      );
+      expect(z.user.UserHandleGenerator.normalize_name(' \n\t Maria LaRochelle Von Schwerigstein ')).toBe(
+        'marialarochellevonsch'
+      );
       expect(z.user.UserHandleGenerator.normalize_name('🐙☀️')).toBe('');
       expect(z.user.UserHandleGenerator.normalize_name('name@mail.com')).toBe('namemailcom');
     });
@@ -54,13 +58,40 @@ describe('UserHandleGenerator', () => {
 
   describe('validate_character', () => {
     it('returns true character is valid', () => {
-      const latin_alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
+      const latin_alphabet = [
+        'a',
+        'b',
+        'c',
+        'd',
+        'e',
+        'f',
+        'g',
+        'h',
+        'i',
+        'j',
+        'k',
+        'l',
+        'm',
+        'n',
+        'o',
+        'p',
+        'q',
+        'r',
+        's',
+        't',
+        'u',
+        'v',
+        'w',
+        'x',
+        'y',
+        'z',
+      ];
       const numbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
       const allowed_symbols = ['_'];
 
       latin_alphabet
         .concat(numbers, allowed_symbols)
-        .forEach((character) => expect(z.user.UserHandleGenerator.validate_character(character)).toBeTruthy());
+        .forEach(character => expect(z.user.UserHandleGenerator.validate_character(character)).toBeTruthy());
     });
 
     it('returns false if character is not a string', () => {
@@ -94,7 +125,7 @@ describe('UserHandleGenerator', () => {
       const suggestions = z.user.UserHandleGenerator.create_suggestions(username);
       expect(suggestions.length).toBe(12);
       expect(suggestions.shift()).toBe(username);
-      suggestions.forEach((suggestion) => expect(suggestion).not.toBe(username));
+      suggestions.forEach(suggestion => expect(suggestion).not.toBe(username));
     });
   });
 

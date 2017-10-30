@@ -53,7 +53,7 @@ z.telemetry.calling.CallSetupTimings = class CallSetupTimings {
   get() {
     const timings = {};
 
-    this._steps_order().forEach((step) => {
+    this._steps_order().forEach(step => {
       timings[step] = this[step];
     });
 
@@ -69,7 +69,7 @@ z.telemetry.calling.CallSetupTimings = class CallSetupTimings {
   log() {
     this.logger.info(`Call setup duration for flow ID '${this.flow_id}' of call ID '${this.call_id}'`);
 
-    this._steps_order().forEach((step) => {
+    this._steps_order().forEach(step => {
       if (this.hasOwnProperty(step)) {
         const placeholder_key = Array.from(Math.max(26 - step.length, 1)).join(' ');
         const placeholder_value = Array.from(Math.max(6 - this[step].toString().length, 1)).join(' ');

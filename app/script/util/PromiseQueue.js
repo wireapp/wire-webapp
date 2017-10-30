@@ -42,7 +42,10 @@ z.util.PromiseQueue = class PromiseQueue {
   constructor(options = {}) {
     const {concurrent = 1, name, paused = false, timeout = PromiseQueue.CONFIG.UNBLOCK_INTERVAL} = options;
 
-    this.logger = new z.util.Logger((name ? `z.util.PromiseQueue (${name})` : 'z.util.PromiseQueue'), z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger(
+      name ? `z.util.PromiseQueue (${name})` : 'z.util.PromiseQueue',
+      z.config.LOGGER.OPTIONS
+    );
 
     this._blocked = false;
     this._concurrent = concurrent;
@@ -76,12 +79,13 @@ z.util.PromiseQueue = class PromiseQueue {
         }
       }, this._timeout);
 
-      queue_entry.fn()
-        .catch((error) => {
+      queue_entry
+        .fn()
+        .catch(error => {
           queue_entry.resolve_fn = undefined;
           queue_entry.reject_fn(error);
         })
-        .then((response) => {
+        .then(response => {
           if (queue_entry.resolve_fn) {
             queue_entry.resolve_fn(response);
           }

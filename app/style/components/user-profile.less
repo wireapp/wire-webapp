@@ -94,13 +94,21 @@ user-profile {
   }
 
   &[data-tab-index='0'] {
-    &::after { left: calc(100% * .25); }
-    & .user-profile-tab:nth-child(1) { color: @graphite-dark; }
+    &::after {
+      left: calc(100% * 0.25);
+    }
+    & .user-profile-tab:nth-child(1) {
+      color: @graphite-dark;
+    }
   }
 
   &[data-tab-index='1'] {
-    &::after { left: calc(100% * .75); }
-    & .user-profile-tab:nth-child(2) { color: @graphite-dark; }
+    &::after {
+      left: calc(100% * 0.75);
+    }
+    & .user-profile-tab:nth-child(2) {
+      color: @graphite-dark;
+    }
   }
 }
 

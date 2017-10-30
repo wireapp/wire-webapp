@@ -24,7 +24,8 @@ describe('AssetsCrypto', function() {
     const bytes = new Uint8Array(16);
     window.crypto.getRandomValues(bytes);
 
-    z.assets.AssetCrypto.encrypt_aes_asset(bytes.buffer)
+    z.assets.AssetCrypto
+      .encrypt_aes_asset(bytes.buffer)
       .then(function({cipher_text, key_bytes, sha256}) {
         return z.assets.AssetCrypto.decrypt_aes_asset(cipher_text, key_bytes, sha256);
       })
@@ -39,7 +40,8 @@ describe('AssetsCrypto', function() {
     const bytes = new Uint8Array(16);
     window.crypto.getRandomValues(bytes);
 
-    z.assets.AssetCrypto.encrypt_aes_asset(bytes.buffer)
+    z.assets.AssetCrypto
+      .encrypt_aes_asset(bytes.buffer)
       .then(function({cipher_text, key_bytes}) {
         return z.assets.AssetCrypto.decrypt_aes_asset(cipher_text, key_bytes, null);
       })
@@ -51,7 +53,8 @@ describe('AssetsCrypto', function() {
     const bytes = new Uint8Array(16);
     window.crypto.getRandomValues(bytes);
 
-    z.assets.AssetCrypto.encrypt_aes_asset(bytes.buffer)
+    z.assets.AssetCrypto
+      .encrypt_aes_asset(bytes.buffer)
       .then(function({cipher_text, key_bytes}) {
         return z.assets.AssetCrypto.decrypt_aes_asset(cipher_text, key_bytes, new Uint8Array([]));
       })

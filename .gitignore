@@ -1,11 +1,14 @@
+!/.idea/codeStyleSettings.xml
+!/.idea/modules.xml
+!/aws/templates/base_error.html
+!/aws/templates/debug.html
+!/aws/templates/error.html
 .DS_Store
 .grunt
 .Icon
 *.pyc
-!/aws/templates/base_error.html
-!/aws/templates/debug.html
-!/aws/templates/error.html
 /_SpecRunner.html
+/.idea/**/*.xml
 /app/ext
 /aws/s3
 /aws/static
@@ -14,8 +17,10 @@
 /aws/templates/sw.js
 /aws/version
 /bower_components
+/debug.log
 /deploy
 /dist
+/doc
 /docs/coverage
 /keys
 /nbproject
@@ -27,13 +32,4 @@
 /Web.config
 aws-keys.json
 npm-debug.log
-
-# Automatically created files
-/doc
-
-# IntelliJ
-# http://devnet.jetbrains.com/docs/DOC-1186
-/.idea/**/*.xml
-!/.idea/codeStyleSettings.xml
-!/.idea/modules.xml
-/debug.log
+yarn-error.log

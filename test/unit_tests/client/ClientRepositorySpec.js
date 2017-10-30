@@ -27,7 +27,8 @@ describe('z.client.ClientRepository', function() {
   let user_id = undefined;
 
   beforeAll(function(done) {
-    test_factory.exposeClientActors()
+    test_factory
+      .exposeClientActors()
       .then(function() {
         user_id = TestFactory.client_repository.self_user().id;
         done();
@@ -36,7 +37,8 @@ describe('z.client.ClientRepository', function() {
   });
 
   beforeEach(function(done) {
-    TestFactory.storage_repository.clear_all_stores()
+    TestFactory.storage_repository
+      .clear_all_stores()
       .then(done)
       .catch(done.fail);
   });
@@ -44,46 +46,48 @@ describe('z.client.ClientRepository', function() {
   describe('get_clients_by_user_id', () =>
     it('maps client entities from client payloads by the backend', function(done) {
       TestFactory.client_repository.current_client(new z.client.Client({id: client_id}));
-      spyOn(TestFactory.client_service, 'get_clients_by_user_id').and.returnValue(Promise.resolve([
-        {class: 'desktop', id: '706f64373b1bcf79'},
-        {class: 'phone', id: '809fd276d6709474'},
-        {class: 'desktop', id: '8e11e06549c8cf1a'},
-        {class: 'tablet', id: 'c411f97b139c818b'},
-        {class: 'desktop', id: 'cbf3ea49214702d8'},
-      ]));
+      spyOn(TestFactory.client_service, 'get_clients_by_user_id').and.returnValue(
+        Promise.resolve([
+          {class: 'desktop', id: '706f64373b1bcf79'},
+          {class: 'phone', id: '809fd276d6709474'},
+          {class: 'desktop', id: '8e11e06549c8cf1a'},
+          {class: 'tablet', id: 'c411f97b139c818b'},
+          {class: 'desktop', id: 'cbf3ea49214702d8'},
+        ])
+      );
 
-      TestFactory.client_repository.get_clients_by_user_id(entities.user.john_doe.id)
+      TestFactory.client_repository
+        .get_clients_by_user_id(entities.user.john_doe.id)
         .then(function(client_ets) {
           expect(client_ets[0] instanceof z.client.Client).toBeTruthy();
           expect(Object.keys(client_ets).length).toBe(5);
           done();
         })
         .catch(done.fail);
-    })
-  );
+    }));
 
   describe('get_valid_local_client', function() {
     let server = undefined;
 
     const client_url = `${test_factory.settings.connection.rest_url}/clients/${client_id}`;
     const client_payload_server = {
-      'address': '62.96.148.44',
-      'class': 'desktop',
-      'id': client_id,
-      'label': 'Windows 10',
-      'location': {
-        'lat': 52.5233,
-        'lon': 13.4138,
+      address: '62.96.148.44',
+      class: 'desktop',
+      id: client_id,
+      label: 'Windows 10',
+      location: {
+        lat: 52.5233,
+        lon: 13.4138,
       },
-      'model': 'Wire for Windows',
-      'time': '2016-05-02T11:53:49.976Z',
-      'type': 'permanent',
+      model: 'Wire for Windows',
+      time: '2016-05-02T11:53:49.976Z',
+      type: 'permanent',
     };
 
     const client_payload_database = client_payload_server;
     client_payload_database.meta = {
-      'is_verified': true,
-      'primary_key': 'local_identity',
+      is_verified: true,
+      primary_key: 'local_identity',
     };
 
     beforeEach(function() {
@@ -96,7 +100,9 @@ describe('z.client.ClientRepository', function() {
     });
 
     it('resolves with a valid client', function(done) {
-      spyOn(TestFactory.client_service, 'load_client_from_db').and.returnValue(Promise.resolve(client_payload_database));
+      spyOn(TestFactory.client_service, 'load_client_from_db').and.returnValue(
+        Promise.resolve(client_payload_database)
+      );
 
       server.respondWith('GET', client_url, [
         200,
@@ -104,7 +110,8 @@ describe('z.client.ClientRepository', function() {
         JSON.stringify(client_payload_server),
       ]);
 
-      TestFactory.client_repository.get_valid_local_client()
+      TestFactory.client_repository
+        .get_valid_local_client()
         .then(function(client_observable) {
           expect(client_observable).toBeDefined();
           expect(client_observable().id).toBe(client_id);
@@ -114,9 +121,12 @@ describe('z.client.ClientRepository', function() {
     });
 
     it('rejects with an error if no client found locally', function(done) {
-      spyOn(TestFactory.client_service, 'load_client_from_db').and.returnValue(Promise.resolve(z.client.ClientRepository.PRIMARY_KEY_CURRENT_CLIENT));
+      spyOn(TestFactory.client_service, 'load_client_from_db').and.returnValue(
+        Promise.resolve(z.client.ClientRepository.PRIMARY_KEY_CURRENT_CLIENT)
+      );
 
-      TestFactory.client_repository.get_valid_local_client()
+      TestFactory.client_repository
+        .get_valid_local_client()
         .then(done.fail)
         .catch(function(error) {
           expect(error).toEqual(jasmine.any(z.client.ClientError));
@@ -126,10 +136,13 @@ describe('z.client.ClientRepository', function() {
     });
 
     it('rejects with an error if client removed on backend', function(done) {
-      spyOn(TestFactory.client_service, 'load_client_from_db').and.returnValue(Promise.resolve(client_payload_database));
+      spyOn(TestFactory.client_service, 'load_client_from_db').and.returnValue(
+        Promise.resolve(client_payload_database)
+      );
       spyOn(TestFactory.storage_service, 'delete_everything').and.returnValue(Promise.resolve(true));
 
-      TestFactory.client_repository.get_valid_local_client()
+      TestFactory.client_repository
+        .get_valid_local_client()
         .then(done.fail)
         .catch(function(error) {
           expect(error).toEqual(jasmine.any(z.client.ClientError));
@@ -139,9 +152,12 @@ describe('z.client.ClientRepository', function() {
     });
 
     it('rejects with an error if something else fails', function(done) {
-      spyOn(TestFactory.client_service, 'load_client_from_db').and.returnValue(Promise.reject(new Error('Expected unit test error')));
+      spyOn(TestFactory.client_service, 'load_client_from_db').and.returnValue(
+        Promise.reject(new Error('Expected unit test error'))
+      );
 
-      TestFactory.client_repository.get_valid_local_client()
+      TestFactory.client_repository
+        .get_valid_local_client()
         .then(done.fail)
         .catch(function(error) {
           expect(error).toEqual(jasmine.any(Error));

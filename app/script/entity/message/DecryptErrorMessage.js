@@ -35,20 +35,27 @@ z.entity.DecryptErrorMessage = class DecryptErrorMessage extends z.entity.Messag
     this.client_id = '';
 
     this.caption = ko.pureComputed(() => {
-      const content = `<span class='label-bold-xs'>${ z.util.escape_html(this.user().first_name())}</span>`;
-      const string_id = this.is_remote_identity_changed() ? z.string.conversation_unable_to_decrypt_2 : z.string.conversation_unable_to_decrypt_1;
+      const content = `<span class='label-bold-xs'>${z.util.escape_html(this.user().first_name())}</span>`;
+      const string_id = this.is_remote_identity_changed()
+        ? z.string.conversation_unable_to_decrypt_2
+        : z.string.conversation_unable_to_decrypt_1;
 
       return z.l10n.text(string_id, content);
     });
 
     this.link = ko.pureComputed(() => {
-      const path = this.is_remote_identity_changed() ? z.config.URL_PATH.DECRYPT_ERROR_2 : z.config.URL_PATH.DECRYPT_ERROR_1;
+      const path = this.is_remote_identity_changed()
+        ? z.config.URL_PATH.DECRYPT_ERROR_2
+        : z.config.URL_PATH.DECRYPT_ERROR_1;
       return z.util.URLUtil.build_url(z.util.URLUtil.TYPE.WEBSITE, path);
     });
 
-
-    this.is_recoverable = ko.pureComputed(() => this.error_code.toString().startsWith('2') && !this.is_remote_identity_changed());
-    this.is_remote_identity_changed = ko.pureComputed(() => this.error_code.toString() === DecryptErrorMessage.REMOTE_IDENTITY_CHANGED_ERROR);
+    this.is_recoverable = ko.pureComputed(
+      () => this.error_code.toString().startsWith('2') && !this.is_remote_identity_changed()
+    );
+    this.is_remote_identity_changed = ko.pureComputed(
+      () => this.error_code.toString() === DecryptErrorMessage.REMOTE_IDENTITY_CHANGED_ERROR
+    );
     this.is_resetting_session = ko.observable(false);
 
     this.error_message = ko.pureComputed(() => {

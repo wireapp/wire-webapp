@@ -24,11 +24,13 @@
 describe('Conversation Mapper', () => {
   let conversation_mapper = null;
 
-  beforeEach(() => conversation_mapper = new z.conversation.ConversationMapper());
+  beforeEach(() => (conversation_mapper = new z.conversation.ConversationMapper()));
 
   describe('map_conversations', () => {
     it('throws an error if conversation data is missing', () => {
-      expect(() => conversation_mapper.map_conversations()).toThrow(new Error('Cannot create conversation entity without data'));
+      expect(() => conversation_mapper.map_conversations()).toThrow(
+        new Error('Cannot create conversation entity without data')
+      );
     });
 
     it('maps a single conversation', () => {
@@ -75,10 +77,9 @@ describe('Conversation Mapper', () => {
     });
 
     it('maps a team conversation', () => {
-      // @formatter:off
+      // prettier-ignore
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const payload = {"access":["invite"],"creator":"f52eed1b-aa64-447f-ad4a-96529f72105f","members":{"self":{"hidden_ref":null,"status":0,"service":null,"otr_muted_ref":null,"status_time":"1970-01-01T00:00:00.000Z","hidden":false,"status_ref":"0.0","id":"39b7f597-dfd1-4dff-86f5-fe1b79cb70a0","otr_archived":false,"otr_muted":false,"otr_archived_ref":null},"others":[{"status":0,"id":"f52eed1b-aa64-447f-ad4a-96529f72105f"}]},"name":"BennyTest","team":"5316fe03-24ee-4b19-b789-6d026bd3ce5f","id":"f2520615-f860-4c72-8b90-9ace3b5f6c37","type":0,"last_event_time":"1970-01-01T00:00:00.000Z","last_event":"0.0"};
-      // @formatter:on
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
 
       const [conversation_et] = conversation_mapper.map_conversations([payload]);
@@ -210,7 +211,7 @@ describe('Conversation Mapper', () => {
 
     it('accepts string values which must be parsed later on', () => {
       conversation_et.last_read_timestamp(0);
-      const self_status = {'last_read_timestamp': '1480339377099'};
+      const self_status = {last_read_timestamp: '1480339377099'};
       const last_read_timestamp_number = window.parseInt(self_status.last_read_timestamp, 10);
       const updated_conversation_et = conversation_mapper.update_self_status(conversation_et, self_status);
 
@@ -219,18 +220,16 @@ describe('Conversation Mapper', () => {
   });
 
   describe('merge_conversations', () => {
-    // @formatter:off
+    // prettier-ignore
     /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
     const remote_data = {"access": ["private"], "creator": "532af01e-1e24-4366-aacf-33b67d4ee376", "members": {"self": {"hidden_ref": null, "status": 0, "service": null, "otr_muted_ref": null, "status_time": "2015-01-07T16:26:51.363Z", "hidden": false, "status_ref": "0.0", "id": "8b497692-7a38-4a5d-8287-e3d1006577d6", "otr_archived": false, "otr_muted": false, "otr_archived_ref": "2017-02-16T10:06:41.118Z"}, "others": [{"status": 0, "id": "532af01e-1e24-4366-aacf-33b67d4ee376"}]}, "name": "Family Gathering", "team": "5316fe03-24ee-4b19-b789-6d026bd3ce5f", "id": "de7466b0-985c-4dc3-ad57-17877db45b4c", "type": 2, "last_event_time": "2017-02-14T17:11:10.619Z", "last_event": "4a.800122000a62e4a1"};
     /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
-    // @formatter:on
 
     it('incorporates remote data from backend into local data', () => {
-      // @formatter:off
+      // prettier-ignore
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const local_data = {"archived_state": false, "archived_timestamp": 1487239601118, "cleared_timestamp": 0, "ephemeral_timer": false, "id": "de7466b0-985c-4dc3-ad57-17877db45b4c", "last_event_timestamp": 1488387380633, "last_read_timestamp": 1488387380633, "muted_state": false, "muted_timestamp": 0, "verification_state": 0};
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
-      // @formatter:on
 
       const [merged_conversation] = conversation_mapper.merge_conversations([local_data], [remote_data]);
 
@@ -254,16 +253,18 @@ describe('Conversation Mapper', () => {
     });
 
     it('should set timestamps on local data if not present', () => {
-      // @formatter:off
+      // prettier-ignore
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const local_data = {"cleared_timestamp": 0, "ephemeral_timer": false, "id": "de7466b0-985c-4dc3-ad57-17877db45b4c", "last_event_timestamp": 1488387380633, "last_read_timestamp": 1488387380633, "verification_state": 0};
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
-      // @formatter:on
 
       const remote_data_2 = JSON.parse(JSON.stringify(remote_data));
       remote_data_2.id = z.util.create_random_uuid();
 
-      const [merged_conversation, merged_conversation_2] = conversation_mapper.merge_conversations([local_data], [remote_data, remote_data_2]);
+      const [merged_conversation, merged_conversation_2] = conversation_mapper.merge_conversations(
+        [local_data],
+        [remote_data, remote_data_2]
+      );
 
       expect(merged_conversation.creator).toBe(remote_data.creator);
       expect(merged_conversation.name).toBe(remote_data.name);
@@ -280,7 +281,9 @@ describe('Conversation Mapper', () => {
       expect(merged_conversation.verification_state).toBe(local_data.verification_state);
 
       expect(merged_conversation.archived_state).toBe(remote_data.members.self.otr_archived);
-      expect(merged_conversation.archived_timestamp).toBe(new Date(remote_data.members.self.otr_archived_ref).getTime());
+      expect(merged_conversation.archived_timestamp).toBe(
+        new Date(remote_data.members.self.otr_archived_ref).getTime()
+      );
 
       expect(merged_conversation.muted_state).toBe(remote_data.members.self.otr_muted);
       expect(merged_conversation.muted_timestamp).toBe(new Date(remote_data.members.self.otr_muted_ref).getTime());
@@ -290,11 +293,10 @@ describe('Conversation Mapper', () => {
     });
 
     it('updates local archive and muted timestamps if time of remote data is newer', () => {
-      // @formatter:off
+      // prettier-ignore
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const local_data = {"archived_state": false, "archived_timestamp": 1487066801118, "cleared_timestamp": 0, "ephemeral_timer": false, "id": "de7466b0-985c-4dc3-ad57-17877db45b4c", "last_event_timestamp": 1488387380633, "last_read_timestamp": 1488387380633, "muted_state": false, "muted_timestamp": 0, "verification_state": 0};
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
-      // @formatter:on
 
       const self_update = {
         otr_archived: true,
@@ -324,18 +326,19 @@ describe('Conversation Mapper', () => {
 
       // remote one is newer
       expect(merged_conversation.archived_state).toBe(remote_data.members.self.otr_archived);
-      expect(merged_conversation.archived_timestamp).toBe(new Date(remote_data.members.self.otr_archived_ref).getTime());
+      expect(merged_conversation.archived_timestamp).toBe(
+        new Date(remote_data.members.self.otr_archived_ref).getTime()
+      );
 
       expect(merged_conversation.muted_state).toBe(remote_data.members.self.otr_muted);
       expect(merged_conversation.muted_timestamp).toBe(new Date(remote_data.members.self.otr_muted_ref).getTime());
     });
 
     it('only maps other participants if they are still in the conversation', () => {
-      // @formatter:off
+      // prettier-ignore
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const others_update = [{"status": 1, "id": "39b7f597-dfd1-4dff-86f5-fe1b79cb70a0"}, {"status": 0, "id": "5eeba863-44be-43ff-8c47-7565a028f182"}, {"status": 1, "id": "a187fd3e-479a-4e85-a77f-5e4ab95477cf"}, {"status": 0, "id": "d270c7b4-6492-4953-b1bf-be817fe665b2"}];
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
-      // @formatter:on
 
       remote_data.members.others = remote_data.members.others.concat(others_update);
 
@@ -345,11 +348,10 @@ describe('Conversation Mapper', () => {
     });
 
     it('updates server timestamp if event timestamp is greater', () => {
-      // @formatter:off
+      // prettier-ignore
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const local_data = {"id": "de7466b0-985c-4dc3-ad57-17877db45b4c", "last_event_timestamp": 1488387380633, "last_read_timestamp": 1488387380633, "last_server_timestamp": 1377276270510,"muted_state": false, "muted_timestamp": 0, "verification_state": 0};
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
-      // @formatter:on
 
       const [merged_conversation] = conversation_mapper.merge_conversations([local_data], [remote_data]);
 

@@ -47,9 +47,7 @@ z.user.UserConnectionMapper = class UserConnectionMapper {
      * @returns {Array<z.entity.Connection>} Mapped connection entities
      */
     this.map_user_connections_from_json = function(data) {
-      return data
-        .filter((connection) => connection)
-        .map((connection) => this.map_user_connection_from_json(connection));
+      return data.filter(connection => connection).map(connection => this.map_user_connection_from_json(connection));
     };
 
     /**

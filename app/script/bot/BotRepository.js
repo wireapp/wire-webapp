@@ -38,8 +38,9 @@ z.bot.BotRepository = class BotRepository {
   add_bot(bot_name, create_conversation = true) {
     let bot_result;
 
-    return this.bot_service.fetch_bot(bot_name)
-      .then((result) => {
+    return this.bot_service
+      .fetch_bot(bot_name)
+      .then(result => {
         bot_result = result;
         this.logger.info(`Info for bot '${bot_name}' retrieved`, bot_result);
         if (create_conversation) {
@@ -51,7 +52,7 @@ z.bot.BotRepository = class BotRepository {
         this.conversation_repository.add_bot(conversation_et, bot_result.provider, bot_result.service);
         amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversation_et);
       })
-      .catch((error) => {
+      .catch(error => {
         amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.BOTS_UNAVAILABLE);
         throw error;
       });

@@ -46,8 +46,12 @@ device-remove {
   outline: 0;
   padding: 0 16px;
 
-  &::-ms-clear { display: none; }
-  &::placeholder { .device-remove-placeholder; }
+  &::-ms-clear {
+    display: none;
+  }
+  &::placeholder {
+    .device-remove-placeholder;
+  }
 
   &.device-remove-input-error {
     border: 2px solid @w-yellow;

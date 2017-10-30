@@ -26,11 +26,16 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
   const test_factory = new TestFactory();
   let title_view_model = undefined;
 
-  beforeEach((done) => {
-    test_factory.exposeConversationActors()
+  beforeEach(done => {
+    test_factory
+      .exposeConversationActors()
       .then(function(conversation_repository) {
         const content_state = ko.observable(z.ViewModel.content.CONTENT_STATE.CONVERSATION);
-        title_view_model = new z.ViewModel.WindowTitleViewModel(content_state, conversation_repository, TestFactory.user_repository);
+        title_view_model = new z.ViewModel.WindowTitleViewModel(
+          content_state,
+          conversation_repository,
+          TestFactory.user_repository
+        );
         done();
       })
       .catch(done.fail);
@@ -202,7 +207,7 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
       expect(window.document.title).toBe(expected_title);
     });
 
-    it('publishes the badge count (for Wire\'s wrapper)', function(done) {
+    it("publishes the badge count (for Wire's wrapper)", function(done) {
       const message = new z.entity.ContentMessage();
       message.id = z.util.create_random_uuid();
       message.timestamp(Date.now());

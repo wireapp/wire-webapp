@@ -19,7 +19,6 @@
 
 'use strict';
 
-
 ko.bindingHandlers.switch_background = (function() {
   return {
     update(element, valueAccessor) {
@@ -29,7 +28,7 @@ ko.bindingHandlers.switch_background = (function() {
         const background_images = $(element).find('.background');
         const background_last = background_images.last();
         const background_next = background_last.clone();
-        background_next.css({'opacity': '0'});
+        background_next.css({opacity: '0'});
         background_next.insertAfter(background_last);
 
         image_resource
@@ -40,9 +39,7 @@ ko.bindingHandlers.switch_background = (function() {
               .css({'background-image': `url(${window.URL.createObjectURL(blob)})`});
           })
           .then(function() {
-            background_next
-              .css({'opacity': '1'})
-              .one(z.util.alias.animationend, background_last.remove);
+            background_next.css({opacity: '1'}).one(z.util.alias.animationend, background_last.remove);
           });
       }
     },

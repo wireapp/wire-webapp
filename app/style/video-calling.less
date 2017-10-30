@@ -17,7 +17,11 @@
  *
  */
 
-@keyframes video-fade-in { to { opacity: 1; } }
+@keyframes video-fade-in {
+  to {
+    opacity: 1;
+  }
+}
 
 // mixins
 .video-container-small() {
@@ -27,7 +31,7 @@
   width: 160px;
   height: 120px;
   background-color: fade(#000, 8%);
-  box-shadow: 0 0 8px 0 rgba(0, 0, 0, .24);
+  box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.24);
 }
 
 .video-container-round() {
@@ -143,7 +147,7 @@
   justify-content: center;
   width: 100%;
   bottom: 54px;
-  transition: opacity .25s ease-in-out;
+  transition: opacity 0.25s ease-in-out;
 }
 
 .video-controls-button {

@@ -23,7 +23,7 @@
 
 // grunt test_init && grunt test_run:media/MediaEmbeds
 describe('MediaEmbeds', function() {
-// Will test all common link variations
+  // Will test all common link variations
   const test_link_variants = function(site, re) {
     expect(`http://${site}.com`.match(re)).toBe(null);
     expect(`https://${site}.com`.match(re)).toBe(null);
@@ -34,7 +34,7 @@ describe('MediaEmbeds', function() {
     expect(`www.${site}.com`.match(re)).toBe(null);
   };
 
-  const build_message_with_anchor = (link) => `<a href="${link}" target="_blank" rel="nofollow">${link}</a>`;
+  const build_message_with_anchor = link => `<a href="${link}" target="_blank" rel="nofollow">${link}</a>`;
 
   const build_youtube_iframe = function(link) {
     const embed_url = z.media.MediaEmbeds.generate_youtube_embed_url(link);
@@ -51,7 +51,9 @@ describe('MediaEmbeds', function() {
 
   const build_spotify_iframe = function(link, partial_link) {
     partial_link = partial_link.replace(/\//g, ':');
-    return `<a href="${link}" target="_blank" rel="nofollow">${link}</a><div class="iframe-container"><iframe class="spotify" width="100%" height="80px" src="https://embed.spotify.com/?uri=spotify%3A${window.encodeURIComponent(partial_link)}" frameborder="0"></iframe></div>`;
+    return `<a href="${link}" target="_blank" rel="nofollow">${link}</a><div class="iframe-container"><iframe class="spotify" width="100%" height="80px" src="https://embed.spotify.com/?uri=spotify%3A${window.encodeURIComponent(
+      partial_link
+    )}" frameborder="0"></iframe></div>`;
   };
 
   const build_vimeo_iframe = function(link, id) {
@@ -68,7 +70,9 @@ describe('MediaEmbeds', function() {
         expect('https://play.spotify.com/artist/7Ln80lUS6He07XvHI8qqHH'.match(re_spotify)).not.toBeNull();
         expect('https://open.spotify.com/track/26fwlVGkISUr5P91hAeTW8'.match(re_spotify)).not.toBeNull();
         expect('https://open.spotify.com/album/7iN0r7Sl624EkOUNUCOGu9'.match(re_spotify)).not.toBeNull();
-        expect('https://open.spotify.com/user/1123867741/playlist/2w63WroxrrIbNg4WIxdoBn'.match(re_spotify)).not.toBeNull();
+        expect(
+          'https://open.spotify.com/user/1123867741/playlist/2w63WroxrrIbNg4WIxdoBn'.match(re_spotify)
+        ).not.toBeNull();
       });
 
       // since this is not a link it will not render
@@ -86,7 +90,9 @@ describe('MediaEmbeds', function() {
 
       it('should match valid SoundCloud URLs', function() {
         expect('https://soundcloud.com/ago_music/ago-royal-oats-ft-waldo-prod'.match(re_soundcloud)).not.toBeNull();
-        expect('https://soundcloud.com/onedirectionmusic/sets/liams-you-i-remix-playlist'.match(re_soundcloud)).not.toBeNull();
+        expect(
+          'https://soundcloud.com/onedirectionmusic/sets/liams-you-i-remix-playlist'.match(re_soundcloud)
+        ).not.toBeNull();
         expect('https://soundcloud.com/groups/playlist-digital-sintonia'.match(re_soundcloud)).not.toBeNull();
       });
 
@@ -120,7 +126,8 @@ describe('MediaEmbeds', function() {
       });
 
       it('renders a normal link with text', function() {
-        const message = 'Check this <a href="https://www.google.com" target="_blank" rel="nofollow">https://www.google.com</a>';
+        const message =
+          'Check this <a href="https://www.google.com" target="_blank" rel="nofollow">https://www.google.com</a>';
         expect(z.media.MediaParser.render_media_embeds(message)).toBe(message);
       });
     });
@@ -245,8 +252,10 @@ describe('MediaEmbeds', function() {
       });
 
       it('doesn`t render Youtube profile link', function() {
-        const message = '<a href="https://www.youtube-nocookie.com/user/GoogleWebDesigner" target="_blank" rel="nofollow">https://www.youtube-nocookie.com/user/GoogleWebDesigner</a>';
-        const iframe = '<a href="https://www.youtube-nocookie.com/user/GoogleWebDesigner" target="_blank" rel="nofollow">https://www.youtube-nocookie.com/user/GoogleWebDesigner</a>';
+        const message =
+          '<a href="https://www.youtube-nocookie.com/user/GoogleWebDesigner" target="_blank" rel="nofollow">https://www.youtube-nocookie.com/user/GoogleWebDesigner</a>';
+        const iframe =
+          '<a href="https://www.youtube-nocookie.com/user/GoogleWebDesigner" target="_blank" rel="nofollow">https://www.youtube-nocookie.com/user/GoogleWebDesigner</a>';
         expect(z.media.MediaParser.render_media_embeds(message)).toBe(iframe);
       });
 
@@ -254,7 +263,8 @@ describe('MediaEmbeds', function() {
         const link = 'https://www.youtube-nocookie.com/watch?v=oHg5SJYRHA0&autoplay=1';
 
         const message = build_message_with_anchor(link);
-        const iframe = '<a href="https://www.youtube-nocookie.com/watch?v=oHg5SJYRHA0&autoplay=1" target="_blank" rel="nofollow">https://www.youtube-nocookie.com/watch?v=oHg5SJYRHA0&autoplay=1</a><div class="iframe-container iframe-container-video"><iframe class="youtube" width="100%" height="100%" src="https://www.youtube-nocookie.com/embed/oHg5SJYRHA0?html5=1&enablejsapi=0&modestbranding=1&rel=0" frameborder="0" allowfullscreen></iframe></div>';
+        const iframe =
+          '<a href="https://www.youtube-nocookie.com/watch?v=oHg5SJYRHA0&autoplay=1" target="_blank" rel="nofollow">https://www.youtube-nocookie.com/watch?v=oHg5SJYRHA0&autoplay=1</a><div class="iframe-container iframe-container-video"><iframe class="youtube" width="100%" height="100%" src="https://www.youtube-nocookie.com/embed/oHg5SJYRHA0?html5=1&enablejsapi=0&modestbranding=1&rel=0" frameborder="0" allowfullscreen></iframe></div>';
 
         expect(z.media.MediaParser.render_media_embeds(message)).toBe(iframe);
       });
@@ -263,7 +273,8 @@ describe('MediaEmbeds', function() {
         const link = 'https://www.youtube-nocookie.com/watch?autoplay=1&v=oHg5SJYRHA0';
 
         const message = build_message_with_anchor(link);
-        const iframe = '<a href="https://www.youtube-nocookie.com/watch?autoplay=1&v=oHg5SJYRHA0" target="_blank" rel="nofollow">https://www.youtube-nocookie.com/watch?autoplay=1&v=oHg5SJYRHA0</a><div class="iframe-container iframe-container-video"><iframe class="youtube" width="100%" height="100%" src="https://www.youtube-nocookie.com/embed/oHg5SJYRHA0?html5=1&enablejsapi=0&modestbranding=1&rel=0" frameborder="0" allowfullscreen></iframe></div>';
+        const iframe =
+          '<a href="https://www.youtube-nocookie.com/watch?autoplay=1&v=oHg5SJYRHA0" target="_blank" rel="nofollow">https://www.youtube-nocookie.com/watch?autoplay=1&v=oHg5SJYRHA0</a><div class="iframe-container iframe-container-video"><iframe class="youtube" width="100%" height="100%" src="https://www.youtube-nocookie.com/embed/oHg5SJYRHA0?html5=1&enablejsapi=0&modestbranding=1&rel=0" frameborder="0" allowfullscreen></iframe></div>';
 
         expect(z.media.MediaParser.render_media_embeds(message)).toBe(iframe);
       });
@@ -333,7 +344,6 @@ describe('MediaEmbeds', function() {
     });
 
     describe('Spotify', function() {
-
       it('renders artists (https://open.spotify.com/user/1123867741/playlist/2w63WroxrrIbNg4WIxdoBn)', function() {
         const link = 'https://open.spotify.com/user/1123867741/playlist/2w63WroxrrIbNg4WIxdoBn';
         const partial_link = 'user/1123867741/playlist/2w63WroxrrIbNg4WIxdoBn';
@@ -375,7 +385,8 @@ describe('MediaEmbeds', function() {
       });
 
       return it('renders track with params (https://play.spotify.com/track/5yEPxDjbbzUzyauGtnmVEC?play=true&utm_source=open.spotify.com&utm_medium=open)', function() {
-        const link = 'https://play.spotify.com/track/5yEPxDjbbzUzyauGtnmVEC?play=true&utm_source=open.spotify.com&utm_medium=open';
+        const link =
+          'https://play.spotify.com/track/5yEPxDjbbzUzyauGtnmVEC?play=true&utm_source=open.spotify.com&utm_medium=open';
         const partial_link = 'track/5yEPxDjbbzUzyauGtnmVEC';
 
         const message = build_message_with_anchor(link);
@@ -414,7 +425,6 @@ describe('MediaEmbeds', function() {
   });
 
   describe('convert_youtube_timestamp_to_seconds', function() {
-
     it('doesn´t convert timestamp that only contains numbers', function() {
       expect(z.media.MediaEmbeds.convert_youtube_timestamp_to_seconds('125')).toBe(125);
     });

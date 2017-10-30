@@ -44,14 +44,18 @@ z.lifecycle.LifecycleRepository = class LifecycleRepository {
 
   check_version() {
     if (navigator.onLine) {
-      return this.lifecycle_service.get_version()
-        .then((server_version) => {
-          this.logger.info(`Checking current webapp version. Server '${server_version}' vs. local '${z.util.Environment.version(false, true)}'`);
+      return this.lifecycle_service.get_version().then(server_version => {
+        this.logger.info(
+          `Checking current webapp version. Server '${server_version}' vs. local '${z.util.Environment.version(
+            false,
+            true
+          )}'`
+        );
 
-          if (server_version > z.util.Environment.version(false, true)) {
-            amplify.publish(z.event.WebApp.LIFECYCLE.UPDATE, z.lifecycle.UPDATE_SOURCE.WEBAPP);
-          }
-        });
+        if (server_version > z.util.Environment.version(false, true)) {
+          amplify.publish(z.event.WebApp.LIFECYCLE.UPDATE, z.lifecycle.UPDATE_SOURCE.WEBAPP);
+        }
+      });
     }
   }
 };

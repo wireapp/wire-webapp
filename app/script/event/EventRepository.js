@@ -55,7 +55,13 @@ z.event.EventRepository = class EventRepository {
    * @param {z.user.UserRepository} user_repository - Repository for all user and connection interactions
    * @param {z.conversation.ConversationService} conversation_service - Service to handle conversation related tasks
    */
-  constructor(web_socket_service, notification_service, cryptography_repository, user_repository, conversation_service) {
+  constructor(
+    web_socket_service,
+    notification_service,
+    cryptography_repository,
+    user_repository,
+    conversation_service
+  ) {
     this.web_socket_service = web_socket_service;
     this.notification_service = notification_service;
     this.cryptography_repository = cryptography_repository;
@@ -67,7 +73,7 @@ z.event.EventRepository = class EventRepository {
     this.time_offset = 0;
 
     this.notification_handling_state = ko.observable(z.event.NOTIFICATION_HANDLING_STATE.STREAM);
-    this.notification_handling_state.subscribe((handling_state) => {
+    this.notification_handling_state.subscribe(handling_state => {
       amplify.publish(z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, handling_state);
 
       if (handling_state === z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET) {
@@ -88,29 +94,37 @@ z.event.EventRepository = class EventRepository {
     this.notifications_queue = ko.observableArray([]);
     this.notifications_blocked = false;
 
-    this.notifications_queue.subscribe((notifications) => {
+    this.notifications_queue.subscribe(notifications => {
       if (notifications.length) {
         if (!this.notifications_blocked) {
-
           const notification = this.notifications_queue()[0];
           this.notifications_blocked = true;
 
           return this._handle_notification(notification)
-            .catch((error) => {
-              this.logger.warn(`We failed to handle a notification but will continue with queue: ${error.message}`, error);
+            .catch(error => {
+              this.logger.warn(
+                `We failed to handle a notification but will continue with queue: ${error.message}`,
+                error
+              );
             })
             .then(() => {
               this.notifications_blocked = false;
               this.notifications_queue.shift();
               this.notifications_handled++;
 
-              if ((this.notifications_handled % 5) === 0 || this.notifications_handled < 5) {
+              if (this.notifications_handled % 5 === 0 || this.notifications_handled < 5) {
                 const progress = this.notifications_handled / this.notifications_total * 50 + 25;
-                amplify.publish(z.event.WebApp.APP.UPDATE_PROGRESS, progress, z.string.init_decryption_progress, [this.notifications_handled, this.notifications_total]);
+                amplify.publish(z.event.WebApp.APP.UPDATE_PROGRESS, progress, z.string.init_decryption_progress, [
+                  this.notifications_handled,
+                  this.notifications_total,
+                ]);
               }
             });
         }
-      } else if (this.notifications_loaded() && this.notification_handling_state() !== z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET) {
+      } else if (
+        this.notifications_loaded() &&
+        this.notification_handling_state() !== z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET
+      ) {
         this.logger.info(`Done handling '${this.notifications_total}' notifications from the stream`);
         this.notification_handling_state(z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
         this.notifications_loaded(false);
@@ -127,7 +141,6 @@ z.event.EventRepository = class EventRepository {
     amplify.subscribe(z.event.WebApp.EVENT.INJECT, this.inject_event.bind(this));
   }
 
-
   //##############################################################################
   // WebSocket handling
   //##############################################################################
@@ -142,7 +155,7 @@ z.event.EventRepository = class EventRepository {
     }
 
     this.web_socket_service.client_id = this.current_client().id;
-    this.web_socket_service.connect((notification) => {
+    this.web_socket_service.connect(notification => {
       if (this.notification_handling_state() === z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET) {
         return this.notifications_queue.push(notification);
       }
@@ -190,7 +203,6 @@ z.event.EventRepository = class EventRepository {
     }
   }
 
-
   //##############################################################################
   // Notification Stream handling
   //##############################################################################
@@ -233,9 +245,10 @@ z.event.EventRepository = class EventRepository {
         return reject(new z.event.EventError(z.event.EventError.TYPE.NO_NOTIFICATIONS));
       };
 
-      return this.notification_service.get_notifications(this.current_client().id, notification_id, limit)
+      return this.notification_service
+        .get_notifications(this.current_client().id, notification_id, limit)
         .then(_got_notifications)
-        .catch((error_response) => {
+        .catch(error_response => {
           // When asking for notifications with a since set to a notification ID that does not belong to our client ID,
           //   we will get a 404 AND notifications
           if (error_response.notifications) {
@@ -259,24 +272,24 @@ z.event.EventRepository = class EventRepository {
    * @returns {Promise} Resolves with the last handled notification ID
    */
   get_stream_state() {
-    return this.notification_service.get_last_notification_id_from_db()
-      .catch((error) => {
+    return this.notification_service
+      .get_last_notification_id_from_db()
+      .catch(error => {
         if (error.type !== z.event.EventError.TYPE.NO_LAST_ID) {
           throw error;
         }
 
         this.logger.warn('Last notification ID not found in database. Resetting...');
-        return this._get_last_notification_id(this.current_client().id)
-          .then(() => {
-            this._missed_events_from_stream();
-            return this.last_notification_id();
-          });
+        return this._get_last_notification_id(this.current_client().id).then(() => {
+          this._missed_events_from_stream();
+          return this.last_notification_id();
+        });
       })
-      .then((notification_id) => {
+      .then(notification_id => {
         this.last_notification_id(notification_id);
         return this.notification_service.get_last_event_date_from_db();
       })
-      .catch((error) => {
+      .catch(error => {
         if (error.type !== z.event.EventError.TYPE.NO_LAST_DATE) {
           throw error;
         }
@@ -284,7 +297,7 @@ z.event.EventRepository = class EventRepository {
         this.logger.warn('Last event date not found in database. Resetting...');
         return this._update_last_event_date(new Date(0).toISOString());
       })
-      .then((event_date) => {
+      .then(event_date => {
         this.last_event_date(event_date);
         return {
           event_date: this.last_event_date(),
@@ -302,7 +315,7 @@ z.event.EventRepository = class EventRepository {
       .then(({notification_id}) => {
         return this._update_from_stream(notification_id);
       })
-      .catch((error) => {
+      .catch(error => {
         this.notification_handling_state(z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
         if (error.type === z.event.EventError.TYPE.NO_LAST_ID) {
           this.logger.info('No notifications found for this user', error);
@@ -331,10 +344,10 @@ z.event.EventRepository = class EventRepository {
     amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECOVERY);
 
     return this._update_from_stream(this._get_last_known_notification_id())
-      .then((number_of_notifications) => {
+      .then(number_of_notifications => {
         this.logger.info(`Retrieved '${number_of_notifications}' notifications from stream after connectivity loss`);
       })
-      .catch((error) => {
+      .catch(error => {
         if (error.type !== z.event.EventError.TYPE.NO_NOTIFICATIONS) {
           this.logger.error(`Failed to recover from notification stream: ${error.message}`, error);
           this.notification_handling_state(z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
@@ -364,24 +377,22 @@ z.event.EventRepository = class EventRepository {
    * @returns {Promise} Resolves with the last known notification ID matching the local client
    */
   _get_last_notification_id(client_id) {
-    return this.notification_service.get_notifications_last(client_id)
-      .then(({id: notification_id}) => {
-        if (notification_id) {
-          this._update_last_notification_id(notification_id);
-          this.logger.info(`Set starting point on notification stream to '${this.last_notification_id()}'`);
-          return this.last_notification_id();
-        }
-      });
+    return this.notification_service.get_notifications_last(client_id).then(({id: notification_id}) => {
+      if (notification_id) {
+        this._update_last_notification_id(notification_id);
+        this.logger.info(`Set starting point on notification stream to '${this.last_notification_id()}'`);
+        return this.last_notification_id();
+      }
+    });
   }
 
   _missed_events_from_stream() {
-    this.notification_service.get_missed_id_from_db()
-      .then((notification_id) => {
-        if (this.last_notification_id() !== notification_id) {
-          amplify.publish(z.event.WebApp.CONVERSATION.MISSED_EVENTS);
-          this.notification_service.save_missed_id_to_db(this.last_notification_id());
-        }
-      });
+    this.notification_service.get_missed_id_from_db().then(notification_id => {
+      if (this.last_notification_id() !== notification_id) {
+        amplify.publish(z.event.WebApp.CONVERSATION.MISSED_EVENTS);
+        this.notification_service.save_missed_id_to_db(this.last_notification_id());
+      }
+    });
   }
 
   /**
@@ -395,13 +406,13 @@ z.event.EventRepository = class EventRepository {
     this.notifications_total = 0;
 
     return this.get_notifications(last_notification_id, 500)
-      .then((updated_last_notification_id) => {
+      .then(updated_last_notification_id => {
         if (updated_last_notification_id) {
           this.logger.info(`ID of last notification fetched from stream is '${updated_last_notification_id}'`);
         }
         return this.notifications_total;
       })
-      .catch((error) => {
+      .catch(error => {
         this.notification_handling_state(z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
         if (error.type === z.event.EventError.TYPE.NO_NOTIFICATIONS) {
           this.logger.info('No notifications found for this user', error);
@@ -425,7 +436,9 @@ z.event.EventRepository = class EventRepository {
     if (_.isNumber(updated_time_offset)) {
       this.time_offset = updated_time_offset;
       amplify.publish(z.event.WebApp.EVENT.UPDATE_TIME_OFFSET, this.time_offset);
-      this.logger.info(`Backend reported current time as '${backend_time}'. Time offset updated to '${this.time_offset}' ms`);
+      this.logger.info(
+        `Backend reported current time as '${backend_time}'. Time offset updated to '${this.time_offset}' ms`
+      );
     }
   }
 
@@ -456,7 +469,6 @@ z.event.EventRepository = class EventRepository {
       this.notification_service.save_last_notification_id_to_db(notification_id);
     }
   }
-
 
   //##############################################################################
   // Notification/Event handling
@@ -490,7 +502,10 @@ z.event.EventRepository = class EventRepository {
     const {conversation: conversation_id, from: user_id, type} = event;
 
     if (conversation_id && user_id) {
-      this.logger.info(`Distributed '${type}' event for conversation '${conversation_id}' from user '${user_id}'`, event);
+      this.logger.info(
+        `Distributed '${type}' event for conversation '${conversation_id}' from user '${user_id}'`,
+        event
+      );
     } else {
       this.logger.info(`Distributed '${type}' event`, event);
     }
@@ -524,21 +539,21 @@ z.event.EventRepository = class EventRepository {
    */
   _handle_event(event, source) {
     return this._handle_event_validation(event, source)
-      .then((validated_event) => {
+      .then(validated_event => {
         if (z.event.EventTypeHandling.DECRYPT.includes(validated_event.type)) {
           return this.cryptography_repository.handle_encrypted_event(event);
         }
         return event;
       })
-      .then((mapped_event) => {
+      .then(mapped_event => {
         if (z.event.EventTypeHandling.STORE.includes(mapped_event.type)) {
           return this._handle_event_saving(mapped_event, source);
         }
 
         return mapped_event;
       })
-      .then((saved_event) => this._handle_event_distribution(saved_event, source))
-      .catch((error) => {
+      .then(saved_event => this._handle_event_distribution(saved_event, source))
+      .catch(error => {
         if (!EventRepository.CONFIG.IGNORED_ERRORS.includes(error.type)) {
           throw error;
         }
@@ -583,43 +598,66 @@ z.event.EventRepository = class EventRepository {
   _handle_event_saving(event, source) {
     const {conversation: conversation_id, id: event_id} = event;
 
-    return this.conversation_service.load_event_from_db(conversation_id, event_id)
-      .then((stored_event) => {
-        if (stored_event) {
-          const {data: mapped_data, from: mapped_from, type: mapped_type, time: mapped_time} = event;
-          const {data: stored_data, from: stored_from, type: stored_type, time: stored_time} = stored_event;
+    return this.conversation_service.load_event_from_db(conversation_id, event_id).then(stored_event => {
+      if (stored_event) {
+        const {data: mapped_data, from: mapped_from, type: mapped_type, time: mapped_time} = event;
+        const {data: stored_data, from: stored_from, type: stored_type, time: stored_time} = stored_event;
 
-          const from_different_user = stored_from !== mapped_from;
-          const is_mapped_message_add = mapped_type === z.event.Client.CONVERSATION.MESSAGE_ADD;
-          const is_stored_message_add = stored_type === z.event.Client.CONVERSATION.MESSAGE_ADD;
+        const from_different_user = stored_from !== mapped_from;
+        const is_mapped_message_add = mapped_type === z.event.Client.CONVERSATION.MESSAGE_ADD;
+        const is_stored_message_add = stored_type === z.event.Client.CONVERSATION.MESSAGE_ADD;
 
-          if (from_different_user) {
-            this.logger.warn(`Ignored '${mapped_type}' in conversation '${conversation_id}' from user '${mapped_from}' with ID '${event_id}' previously used by user '${stored_from}'`, event);
-            throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, 'Event validation failed: ID reused from other user');
-          }
-
-          if (!is_mapped_message_add || !is_stored_message_add || !mapped_data.previews.length) {
-            this.logger.warn(`Ignored '${mapped_type}' in conversation '${conversation_id}' from user '${mapped_from}' with previously used ID '${event_id}'`, event);
-            throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, 'Event validation failed: ID reused from same user');
-          }
-
-          if (stored_data.previews.length) {
-            this.logger.warn(`Ignored '${mapped_type}' in conversation '${conversation_id}' from user '${mapped_from}' with ID '${event_id}' that previously contained link preview`, event);
-            throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, 'Event validation failed: ID of link preview reused');
-          }
-
-          if (mapped_data.content !== stored_data.content) {
-            this.logger.warn(`Ignored '${mapped_type}' in conversation '${conversation_id}' from user '${mapped_from}' with ID '${event_id}' not matching text content`, event);
-            throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, 'Event validation failed: ID of link preview reused');
-          }
-
-          // Only valid case for a duplicate message ID: First update to a text message matching the previous text content with a link preview
-          event.server_time = mapped_time;
-          event.time = stored_time;
+        if (from_different_user) {
+          this.logger.warn(
+            `Ignored '${mapped_type}' in conversation '${conversation_id}' from user '${mapped_from}' with ID '${event_id}' previously used by user '${stored_from}'`,
+            event
+          );
+          throw new z.event.EventError(
+            z.event.EventError.TYPE.VALIDATION_FAILED,
+            'Event validation failed: ID reused from other user'
+          );
         }
 
-        return this.conversation_service.save_event(event);
-      });
+        if (!is_mapped_message_add || !is_stored_message_add || !mapped_data.previews.length) {
+          this.logger.warn(
+            `Ignored '${mapped_type}' in conversation '${conversation_id}' from user '${mapped_from}' with previously used ID '${event_id}'`,
+            event
+          );
+          throw new z.event.EventError(
+            z.event.EventError.TYPE.VALIDATION_FAILED,
+            'Event validation failed: ID reused from same user'
+          );
+        }
+
+        if (stored_data.previews.length) {
+          this.logger.warn(
+            `Ignored '${mapped_type}' in conversation '${conversation_id}' from user '${mapped_from}' with ID '${event_id}' that previously contained link preview`,
+            event
+          );
+          throw new z.event.EventError(
+            z.event.EventError.TYPE.VALIDATION_FAILED,
+            'Event validation failed: ID of link preview reused'
+          );
+        }
+
+        if (mapped_data.content !== stored_data.content) {
+          this.logger.warn(
+            `Ignored '${mapped_type}' in conversation '${conversation_id}' from user '${mapped_from}' with ID '${event_id}' not matching text content`,
+            event
+          );
+          throw new z.event.EventError(
+            z.event.EventError.TYPE.VALIDATION_FAILED,
+            'Event validation failed: ID of link preview reused'
+          );
+        }
+
+        // Only valid case for a duplicate message ID: First update to a text message matching the previous text content with a link preview
+        event.server_time = mapped_time;
+        event.time = stored_time;
+      }
+
+      return this.conversation_service.save_event(event);
+    });
   }
 
   /**
@@ -631,25 +669,33 @@ z.event.EventRepository = class EventRepository {
    * @returns {Promise} Resolves with the event
    */
   _handle_event_validation(event, source) {
-    return Promise.resolve()
-      .then(() => {
-        if (z.event.EventTypeHandling.IGNORE.includes(event.type)) {
-          this.logger.info(`Event ignored: '${event.type}'`, {event_json: JSON.stringify(event), event_object: event});
-          throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, 'Event validation failed: Ignored based on type');
+    return Promise.resolve().then(() => {
+      if (z.event.EventTypeHandling.IGNORE.includes(event.type)) {
+        this.logger.info(`Event ignored: '${event.type}'`, {event_json: JSON.stringify(event), event_object: event});
+        throw new z.event.EventError(
+          z.event.EventError.TYPE.VALIDATION_FAILED,
+          'Event validation failed: Ignored based on type'
+        );
+      }
+
+      const event_from_stream = source === z.event.EventRepository.SOURCE.STREAM;
+      if (event_from_stream && event.time) {
+        const outdated_event = this.last_event_date() >= new Date(event.time).toISOString();
+
+        if (outdated_event) {
+          this.logger.info(`Event from stream skipped as outdated: '${event.type}'`, {
+            event_json: JSON.stringify(event),
+            event_object: event,
+          });
+          throw new z.event.EventError(
+            z.event.EventError.TYPE.VALIDATION_FAILED,
+            'Event validation failed: Outdated timestamp'
+          );
         }
+      }
 
-        const event_from_stream = source === z.event.EventRepository.SOURCE.STREAM;
-        if (event_from_stream && event.time) {
-          const outdated_event = this.last_event_date() >= new Date(event.time).toISOString();
-
-          if (outdated_event) {
-            this.logger.info(`Event from stream skipped as outdated: '${event.type}'`, {event_json: JSON.stringify(event), event_object: event});
-            throw new z.event.EventError(z.event.EventError.TYPE.VALIDATION_FAILED, 'Event validation failed: Outdated timestamp');
-          }
-        }
-
-        return event;
-      });
+      return event;
+    });
   }
 
   /**
@@ -675,14 +721,14 @@ z.event.EventRepository = class EventRepository {
       return Promise.resolve(id);
     }
 
-    return Promise.all(events.map((event) => this._handle_event(event, source)))
+    return Promise.all(events.map(event => this._handle_event(event, source)))
       .then(() => {
         if (!is_transient_event) {
           this._update_last_notification_id(id);
         }
         return id;
       })
-      .catch((error) => {
+      .catch(error => {
         this.logger.error(`Failed to handle notification '${id}' from '${source}': ${error.message}`, error);
         throw error;
       });
@@ -697,10 +743,7 @@ z.event.EventRepository = class EventRepository {
    */
   _validate_call_event_lifetime(event) {
     const {content = {}, conversation: conversation_id, time, type} = event;
-    const forced_event_types = [
-      z.calling.enum.CALL_MESSAGE_TYPE.CANCEL,
-      z.calling.enum.CALL_MESSAGE_TYPE.GROUP_LEAVE,
-    ];
+    const forced_event_types = [z.calling.enum.CALL_MESSAGE_TYPE.CANCEL, z.calling.enum.CALL_MESSAGE_TYPE.GROUP_LEAVE];
 
     const corrected_timestamp = Date.now() - this.time_offset;
     const threshold_timestamp = new Date(time).getTime() + EventRepository.CONFIG.E_CALL_EVENT_LIFETIME;
@@ -713,7 +756,10 @@ z.event.EventRepository = class EventRepository {
       return true;
     }
 
-    this.logger.info(`Ignored outdated '${type}' event in conversation '${conversation_id}' - Event: '${threshold_timestamp}', Local: '${corrected_timestamp}'`, {event_json: JSON.stringify(event), event_object: event});
+    this.logger.info(
+      `Ignored outdated '${type}' event in conversation '${conversation_id}' - Event: '${threshold_timestamp}', Local: '${corrected_timestamp}'`,
+      {event_json: JSON.stringify(event), event_object: event}
+    );
     throw new z.event.EventError(z.event.EventError.TYPE.OUTDATED_E_CALL_EVENT);
   }
 };
