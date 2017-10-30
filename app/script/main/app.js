@@ -121,7 +121,7 @@ z.main.App = class App {
       repositories.user
     );
 
-    repositories.bot = new z.bot.BotRepository(this.service.bot, repositories.conversation);
+    repositories.bot = new z.bot.BotRepository(repositories.conversation);
     repositories.calling = new z.calling.CallingRepository(
       this.service.calling,
       repositories.client,
@@ -150,7 +150,6 @@ z.main.App = class App {
     const services = {};
 
     services.asset = new z.assets.AssetService(this.auth.client);
-    services.bot = new z.bot.BotService();
     services.calling = new z.calling.CallingService(this.auth.client);
     services.connect = new z.connect.ConnectService(this.auth.client);
     services.connect_google = new z.connect.ConnectGoogleService(this.auth.client);
@@ -527,10 +526,14 @@ z.main.App = class App {
    * @returns {undefined} Not return value
    */
   _handle_url_params() {
-    const bot_name = z.util.get_url_parameter(z.auth.URLParameter.BOT);
-    if (bot_name) {
-      this.logger.info(`Found bot token '${bot_name}'`);
-      this.repository.bot.add_bot(bot_name);
+    const botName = z.util.get_url_parameter(z.auth.URLParameter.BOT_NAME);
+    if (botName) {
+      const botProvider = z.util.get_url_parameter(z.auth.URLParameter.BOT_PROVIDER);
+      const botService = z.util.get_url_parameter(z.auth.URLParameter.BOT_SERVICE);
+      if (botProvider && botService) {
+        this.logger.info(`Found bot token '${botName}'`);
+        this.repository.bot.add_bot({botName, botProvider, botService});
+      }
     }
   }
 
