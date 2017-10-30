@@ -48,7 +48,6 @@ z.entity.Conversation = class Conversation {
     this.participating_user_ets = ko.observableArray([]); // Does not include self user
     this.participating_user_ids = ko.observableArray([]);
     this.self = undefined;
-    this.number_of_participants = ko.pureComputed(() => this.participating_user_ids().length);
 
     this.is_guest = ko.observable(false);
     this.is_managed = false;
@@ -378,6 +377,10 @@ z.entity.Conversation = class Conversation {
     const current_timestamp = z.util.TimeUtil.adjust_current_timestamp(time_offset);
     const timestamp = Math.max(this.last_server_timestamp() + 1, current_timestamp);
     return new Date(timestamp).toISOString();
+  }
+
+  get_number_of_participants() {
+    return this.participating_user_ids().length + (this.removed_from_conversation() ? 0 : 1);
   }
 
   /**

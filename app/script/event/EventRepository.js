@@ -483,6 +483,10 @@ z.event.EventRepository = class EventRepository {
    * @returns {undefined} No return value
    */
   inject_event(event, source = EventRepository.SOURCE.INJECTED) {
+    if (!event) {
+      throw new z.event.EventError(z.event.EventError.TYPE.NO_EVENT);
+    }
+
     const {conversation: conversation_id, id = 'ID not specified', type} = event;
     if (conversation_id !== this.user_repository.self().id) {
       this.logger.info(`Injected event ID '${id}' of type '${type}'`, event);

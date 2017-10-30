@@ -81,10 +81,9 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
       participants.map(user_et => {
         if (user_et.is_verified()) {
-          this.participants_verified.push(user_et);
-        } else {
-          this.participants_unverified.push(user_et);
+          return this.participants_verified.push(user_et);
         }
+        this.participants_unverified.push(user_et);
       });
     });
 
@@ -254,7 +253,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     if (this.conversation().is_group()) {
       this.conversation_repository.add_members(this.conversation(), user_ids).then(() => {
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.ADD_TO_GROUP_CONVERSATION, {
-          numberOfGroupParticipants: this.conversation().number_of_participants(),
+          numberOfGroupParticipants: this.conversation().get_number_of_participants(),
           numberOfParticipantsAdded: user_ids.length,
         });
       });
