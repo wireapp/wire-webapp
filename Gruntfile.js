@@ -69,7 +69,7 @@ module.exports = grunt => {
     config: config,
     dir: dir,
     aws_s3: require('./grunt/config/aws_s3'),
-    bower: require('./grunt/config/bower'),
+    npmBower: require('./grunt/config/npmBower'),
     clean: require('./grunt/config/clean'),
     compress: require('./grunt/config/compress'),
     concat: require('./grunt/config/concat'),
@@ -91,7 +91,7 @@ module.exports = grunt => {
   // Tasks
   grunt.loadTasks('grunt/tasks');
   grunt.registerTask('default', ['prepare_dist', 'host']);
-  grunt.registerTask('init', ['clean:temp', 'bower', 'scripts']);
+  grunt.registerTask('init', ['clean:temp', 'npmBower', 'scripts']);
 
   // Deploy to different environments
   grunt.registerTask('app_deploy', ['gitinfo', 'aws_deploy']);

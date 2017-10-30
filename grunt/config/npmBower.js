@@ -19,19 +19,12 @@
 
 'use strict';
 
-// https://github.com/yatskevich/grunt-bower-task
+// https://github.com/wireapp/grunt-npm-bower
 
 module.exports = {
-  install: {
-    options: {
-      bowerOptions: {
-        forceLatest: true,
-      },
-      cleanTargetDir: true,
-      copy: true,
-      layout: 'byType',
-      targetDir: '<%= dir.app.ext %>',
-      verbose: true,
-    },
+  options: {
+    cleanTargetDir: true,
+    targetDir: '<%= dir.app.ext %>',
+    verbose: true,
   },
 };
