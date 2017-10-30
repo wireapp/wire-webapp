@@ -537,6 +537,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves with the Conversation
    */
   get_conversation_by_id(conversation_id) {
+    if (!_.isString(conversation_id)) {
+      const error = new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.NO_CONVERSATION_ID);
+      return Promise.reject(error);
+    }
+
     return this.find_conversation_by_id(conversation_id)
       .catch(error => {
         if (error.type === z.conversation.ConversationError.TYPE.NOT_FOUND) {
@@ -547,11 +552,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       })
       .catch(error => {
         if (error.type !== z.conversation.ConversationError.TYPE.NOT_FOUND) {
-          this.logger.log(
-            this.logger.levels.ERROR,
-            `Failed to get conversation '${conversation_id}': ${error.message}`,
-            error
-          );
+          this.logger.error(`Failed to get conversation '${conversation_id}': ${error.message}`, error);
         }
 
         throw error;
