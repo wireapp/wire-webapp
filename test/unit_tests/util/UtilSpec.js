@@ -45,7 +45,7 @@ describe('z.util.render_message', function() {
     expect(z.util.render_message(`Stormtroopers: ${link} !!!`)).toBe(expected);
   });
 
-  xit('renders links with multiple underscores', function() {
+  it('renders links with multiple underscores', function() {
     const link = 'https://www.nike.com/events-registration/event?id=6245&languageLocale=de_de&cp=EUNS_KW_DE_&s_kwcid=AL!2799!3!46005237943!b!!g!!womens%20running';
     const expected = `<a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a>`;
     expect(z.util.render_message(link)).toBe(expected);
@@ -124,7 +124,7 @@ describe('z.util.render_message', function() {
     expect(z.util.render_message('```this.isValid("opensource@wire.com")```')).toBe('<code>this.isValid(&quot;opensource@wire.com&quot;)</code>');
   });
 
-  xit('renders an emoticon of someone shrugging', function() {
+  it('renders an emoticon of someone shrugging', function() {
     /* eslint-disable no-useless-escape */
     expect(z.util.render_message('¯\_(ツ)_/¯')).toBe('¯\_(ツ)_/¯');
   });
@@ -639,7 +639,7 @@ describe('Markdown exceptions', function() {
     expect(z.util.render_message(text)).toBe(text);
   });
 
-  xit('does not render underscores to italic when they are within a sentence', function() {
+  it('does not render underscores to italic when they are within a sentence', function() {
     const text = 'calling__voice_channel__fulltitle';
     expect(z.util.render_message(text)).toBe(text);
   });
