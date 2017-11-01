@@ -46,7 +46,7 @@ notifications:
 
 # http://docs.travis-ci.com/user/deployment/
 before_deploy:
-  - yarn global add @wireapp/core@0.0.1
+  - yarn global add @wireapp/core@0.0.3
   - if [ "$TRAVIS_BRANCH" == "dev" ]; then yarn run deploy-travis-dev; fi
   - if [ "$TRAVIS_BRANCH" == "staging" ]; then yarn run deploy-travis-staging; fi
   - if [ "$TRAVIS_BRANCH" == "prod" ]; then yarn run deploy-travis-prod || { echo 'contents of npm-debug.log:' && cat /home/travis/build/wireapp/wire-webapp/npm-debug.log && exit 1; } fi
