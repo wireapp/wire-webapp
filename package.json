@@ -45,6 +45,7 @@
     "@bower_components/wire-webapp-proteus": "wireapp/proteus.js#5.2.0"
   },
   "devDependencies": {
+    "@wireapp/core": "0.0.3",
     "autoprefixer": "7.1.6",
     "eslint": "4.10.0",
     "eslint-config-prettier": "2.6.0",
