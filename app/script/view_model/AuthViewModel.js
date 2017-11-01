@@ -32,6 +32,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       },
       FORWARDED_URL_PARAMETERS: [
         z.auth.URLParameter.BOT_NAME,
+        z.auth.URLParameter.BOT_PROVIDER,
+        z.auth.URLParameter.BOT_SERVICE,
         z.auth.URLParameter.ENVIRONMENT,
         z.auth.URLParameter.TRACKING,
       ],
