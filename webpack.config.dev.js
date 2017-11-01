@@ -21,6 +21,7 @@ const commonConfig = require('./webpack.config.common');
 const path = require('path');
 const webpack = require('webpack');
 
+const srcScript = 'app/script/auth/';
 const serve = 'app/';
 
 module.exports = Object.assign(commonConfig, {
@@ -38,6 +39,9 @@ module.exports = Object.assign(commonConfig, {
       chunks: false,
     },
   },
+  entry: Object.assign(commonConfig.entry, {
+    script: ['react-hot-loader/patch', path.resolve(__dirname, srcScript, 'main.js')],
+  }),
   output: Object.assign(commonConfig.output, {
     path: path.resolve(__dirname, serve),
   }),

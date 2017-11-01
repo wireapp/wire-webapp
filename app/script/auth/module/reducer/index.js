@@ -17,35 +17,12 @@
  *
  */
 
-import 'babel-polyfill';
-import React from 'react';
-import ReactDOM from 'react-dom';
-import Root from './page/Root';
-import {AppContainer} from 'react-hot-loader';
-import {Provider} from 'react-redux';
-import configureStore from './configureStore';
-
-const store = configureStore();
-
-const render = Component => {
-  ReactDOM.render(
-    <AppContainer>
-      <Provider store={store}>
-        <Component />
-      </Provider>
-    </AppContainer>,
-    document.getElementById('main')
-  );
+const reducers = {
+  authState: () => {
+    return {
+      name: 'bob',
+    };
+  },
 };
 
-function runApp() {
-  render(Root);
-  if (module.hot) {
-    module.hot.accept('./page/Root', () => {
-      const NextApp = require('./page/Root').default;
-      render(NextApp);
-    });
-  }
-}
-
-runApp();
+export default reducers;
