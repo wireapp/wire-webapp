@@ -303,7 +303,7 @@ z.conversation.ConversationService = class ConversationService {
     return this.storage_service
       .delete(z.storage.StorageService.OBJECT_STORE.CONVERSATIONS, conversation_id)
       .then(primary_key => {
-        this.logger.log(this.logger.levels.INFO, `State of conversation '${primary_key}' was deleted`);
+        this.logger.info(`State of conversation '${primary_key}' was deleted`);
         return primary_key;
       });
   }
@@ -541,7 +541,7 @@ z.conversation.ConversationService = class ConversationService {
     return this.storage_service
       .save(z.storage.StorageService.OBJECT_STORE.CONVERSATIONS, conversation_et.id, conversation_et.serialize())
       .then(primary_key => {
-        this.logger.log(this.logger.levels.INFO, `State of conversation '${primary_key}' was stored`);
+        this.logger.info(`State of conversation '${primary_key}' was stored`);
         return conversation_et;
       });
   }

@@ -649,7 +649,7 @@ z.user.UserRepository = class UserRepository {
       })
       .catch(error => {
         if (error.type !== z.user.UserError.TYPE.USER_NOT_FOUND) {
-          this.logger.log(this.logger.levels.ERROR, `Failed to get user '${user_id}': ${error.message}`, error);
+          this.logger.error(`Failed to get user '${user_id}': ${error.message}`, error);
         }
         throw error;
       });
