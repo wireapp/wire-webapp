@@ -203,39 +203,39 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
    *  Conversation_et can also just be the conversation ID
    *
    * @param {Conversation|string} conversation - Conversation entity or conversation ID
-   * @param {z.entity.Message} [message_et] - Message to scroll to
+   * @param {z.entity.Message} [messageEt] - Message to scroll to
    * @returns {undefined} No return value
    */
-  show_conversation(conversation, message_et) {
+  show_conversation(conversation, messageEt) {
     if (!conversation) {
       return this.switch_content(z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS);
     }
 
-    const is_conversation = typeof conversation === 'object' && conversation.id;
-    const is_conversation_id = typeof conversation === 'string';
-    if (!is_conversation && !is_conversation_id) {
+    const isConversation = typeof conversation === 'object' && conversation.id;
+    const isConversationId = typeof conversation === 'string';
+    if (!isConversation && !isConversationId) {
       throw new Error(`Wrong input for conversation: ${typeof conversation}`);
     }
 
-    const conversation_promise = is_conversation
+    const conversationPromise = isConversation
       ? Promise.resolve(conversation)
       : this.conversation_repository.get_conversation_by_id(conversation);
 
-    conversation_promise.then(conversation_et => {
-      const is_active_conversation = conversation_et === this.conversation_repository.active_conversation();
-      const is_conversation_state = this.content_state() === z.ViewModel.content.CONTENT_STATE.CONVERSATION;
+    conversationPromise.then(conversationEt => {
+      const isActiveConversation = conversationEt === this.conversation_repository.active_conversation();
+      const isConversationState = this.content_state() === z.ViewModel.content.CONTENT_STATE.CONVERSATION;
 
-      if (conversation_et && is_active_conversation && is_conversation_state) {
+      if (conversationEt && isActiveConversation && isConversationState) {
         return;
       }
 
       this._release_content(this.content_state());
 
       this.content_state(z.ViewModel.content.CONTENT_STATE.CONVERSATION);
-      this.conversation_repository.active_conversation(conversation_et);
-      this.message_list.change_conversation(conversation_et, message_et).then(() => {
+      this.conversation_repository.active_conversation(conversationEt);
+      this.message_list.change_conversation(conversationEt, messageEt).then(() => {
         this._show_content(z.ViewModel.content.CONTENT_STATE.CONVERSATION);
-        this.participants.change_conversation(conversation_et);
+        this.participants.change_conversation(conversationEt);
         this.previous_conversation = this.conversation_repository.active_conversation();
       });
     });
