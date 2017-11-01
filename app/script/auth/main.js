@@ -42,8 +42,7 @@ function runApp() {
   render(Root);
   if (module.hot) {
     module.hot.accept('./page/Root', () => {
-      const NextApp = require('./page/Root').default;
-      render(NextApp);
+      render(require('./page/Root').default);
     });
   }
 }

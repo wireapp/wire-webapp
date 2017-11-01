@@ -34,10 +34,8 @@ export const configureStore = (thunkArguments = {}) => {
 };
 
 const createMiddleware = thunkArguments => {
-  const middlewares = [];
-  middlewares.push(thunk.withExtraArgument(thunkArguments));
-  const middleware = applyMiddleware(...middlewares);
-  return middleware;
+  const middlewares = [thunk.withExtraArgument(thunkArguments)];
+  return applyMiddleware(...middlewares);
 };
 
 export default configureStore;
