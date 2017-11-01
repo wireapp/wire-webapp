@@ -17,10 +17,10 @@
  *
  */
 
-const {shout} = require('@wireapp/core');
+const {Account} = require('@wireapp/core');
 
 const login = {
-  handle: 'webappbot',
+  email: process.env.WIRE_WEBAPP_BOT_EMAIL,
   password: process.env.WIRE_WEBAPP_BOT_PASSWORD,
 };
 
@@ -60,9 +60,16 @@ content.message =
   `\r\n- Last commit from: ${commit.author}` +
   `\r\n- Last commit message: ${commit.message}`;
 
-shout(login.handle, login.password, content.conversationId, content.message)
+const bot = new Account({
+  email: login.email,
+  password: login.password,
+});
+
+bot
+  .listen()
+  .then(() => bot.sendTextMessage(content.conversationId, content.message))
   .then(() => process.exit(0))
   .catch(error => {
-    console.log(error.message);
+    console.error(error.message);
     return process.exit(1);
   });
