@@ -517,11 +517,9 @@ z.string.da.tooltip_preferences_rename = 'Ændre dit navn';
 
 z.string.da.tooltip_search_close = 'Luk (Esc)';
 
-z.string.da.init_received_access_token = 'Loggede på';
 z.string.da.init_received_self_user = 'Hej, {{user}}.';
 z.string.da.init_validated_client = 'Henter dine forbindelser og samtaler';
 z.string.da.init_received_user_data = 'Tjekker for nye beskeder';
-z.string.da.init_events_progress = 'Indlæser beskeder - {{number1}} af {{number2}}';
 
 z.string.da.ephememal_units_none = 'Slået Fra';
 z.string.da.ephememal_units_second = 'sekund';

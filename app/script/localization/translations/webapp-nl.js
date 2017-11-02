@@ -555,11 +555,9 @@ z.string.nl.tooltip_preferences_rename = 'Wijzig je naam';
 
 z.string.nl.tooltip_search_close = 'Sluiten (esc)';
 
-z.string.nl.init_received_access_token = 'Ingelogd';
 z.string.nl.init_received_self_user = 'Hallo {{user}}!';
 z.string.nl.init_validated_client = 'Je gesprekken en connecties worden opgehaald';
 z.string.nl.init_received_user_data = 'Controleer voor nieuwe berichten';
-z.string.nl.init_events_progress = 'Berichten laden - {{number1}} van {{number2}}';
 
 z.string.nl.ephememal_units_none = 'Uit';
 z.string.nl.ephememal_units_second = 'seconde';
