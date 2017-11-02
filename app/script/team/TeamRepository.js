@@ -89,7 +89,7 @@ z.team.TeamRepository = class TeamRepository {
   get_team_member(team_id, user_id) {
     return this.team_service
       .get_team_member(team_id, user_id)
-      .then(member_reponse => this.team_mapper.map_member_from_object(member_reponse));
+      .then(member_response => this.team_mapper.map_member_from_object(member_response));
   }
 
   get_team_members(team_id) {
