@@ -34,7 +34,11 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     };
 
     this.on_leave_call = () => {
-      amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, this.conversation.id, z.calling.enum.TERMINATION_REASON.SELF_USER);
+      amplify.publish(
+        z.event.WebApp.CALL.STATE.LEAVE,
+        this.conversation.id,
+        z.calling.enum.TERMINATION_REASON.SELF_USER
+      );
     };
 
     this.on_reject_call = () => {
@@ -56,8 +60,9 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     this.users = ko.pureComputed(() => this.conversation.participating_user_ets());
     this.call = ko.pureComputed(() => this.conversation.call());
     this.call_participants = ko.pureComputed(() => {
-      return this.call().participants()
-        .map((participant_et) => participant_et.user);
+      return this.call()
+        .participants()
+        .map(participant_et => participant_et.user);
     });
 
     const MAX_DISPLAYED_PARTICIPANTS = 9;

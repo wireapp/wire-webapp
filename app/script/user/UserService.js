@@ -27,7 +27,6 @@ z.user.UserService = class UserService {
     return {
       CONNECTIONS: '/connections',
       PASSWORD_RESET: '/password-reset',
-      PROPERTIES: '/properties',
       SELF: '/self',
       USERS: '/users',
     };

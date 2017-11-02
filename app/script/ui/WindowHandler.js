@@ -65,16 +65,19 @@ z.ui.WindowHandler = class WindowHandler {
       amplify.publish(z.event.WebApp.WINDOW.RESIZE.HEIGHT, change_in_height);
 
       this.width = current_width;
-      return this.height = current_height;
+      return (this.height = current_height);
     });
   }
 
   _listen_to_unhandled_promise_rejection() {
-    return $(window).on('unhandledrejection', (event) => {
+    return $(window).on('unhandledrejection', event => {
       const promise_rejection_event = event.originalEvent;
       const promise_error = promise_rejection_event.reason;
 
-      if (promise_error && promise_error.type === z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
+      if (
+        promise_error &&
+        promise_error.type === z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION
+      ) {
         this.logger.log('User has canceled sending a message to a degraded conversation.');
         promise_rejection_event.preventDefault();
         promise_rejection_event.stopPropagation();

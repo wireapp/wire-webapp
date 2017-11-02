@@ -21,7 +21,7 @@
 
 // grunt test_init && grunt test_run:user/UserMapper
 
-describe('User Mapper', function() {
+describe('User Mapper', () => {
   const asset_service = {
     generate_asset_url() {
       return 'FooBarURL';
@@ -33,12 +33,12 @@ describe('User Mapper', function() {
 
   let self_user_payload = null;
 
-  beforeEach(function() {
+  beforeEach(() => {
     self_user_payload = JSON.parse(JSON.stringify(payload.self.get));
   });
 
-  describe('map_user_from_object', function() {
-    it('can convert JSON into a single user entity', function() {
+  describe('map_user_from_object', () => {
+    it('can convert JSON into a single user entity', () => {
       const user_et = mapper.map_user_from_object(self_user_payload);
       expect(user_et.email()).toBe('jd@wire.com');
       expect(user_et.name()).toBe('John Doe');
@@ -47,26 +47,26 @@ describe('User Mapper', function() {
       expect(user_et.accent_id()).toBe(z.config.ACCENT_ID.YELLOW);
     });
 
-    it('returns undefined if input was undefined', function() {
+    it('returns undefined if input was undefined', () => {
       const user = mapper.map_user_from_object(undefined);
       expect(user).toBeUndefined();
     });
 
-    it('can convert users with profile images marked as non public', function() {
+    it('can convert users with profile images marked as non public', () => {
       self_user_payload.picture[0].info.public = false;
       self_user_payload.picture[1].info.public = false;
       const user_et = mapper.map_user_from_object(self_user_payload);
       expect(user_et.name()).toBe('John Doe');
     });
 
-    it('will return default accent color if null/undefined', function() {
+    it('will return default accent color if null/undefined', () => {
       self_user_payload.accent_id = null;
       const user_et = mapper.map_user_from_object(self_user_payload);
       expect(user_et.name()).toBe('John Doe');
       expect(user_et.accent_id()).toBe(z.config.ACCENT_ID.BLUE);
     });
 
-    it('will return default accent color if backend returns 0', function() {
+    it('will return default accent color if backend returns 0', () => {
       self_user_payload.accent_id = 0;
       const user_et = mapper.map_user_from_object(self_user_payload);
       expect(user_et.name()).toBe('John Doe');
@@ -76,7 +76,7 @@ describe('User Mapper', function() {
   });
 
   describe('map_self_user_from_object', () =>
-    it('can convert JSON into a single user entity', function() {
+    it('can convert JSON into a single user entity', () => {
       const user_et = mapper.map_self_user_from_object(self_user_payload);
       expect(user_et.email()).toBe('jd@wire.com');
       expect(user_et.name()).toBe('John Doe');
@@ -84,73 +84,72 @@ describe('User Mapper', function() {
       expect(user_et.is_me).toBeTruthy();
       expect(user_et.locale).toBe('en');
       expect(user_et.accent_id()).toBe(z.config.ACCENT_ID.YELLOW);
-    })
-  );
+    }));
 
-  describe('map_users_from_object', function() {
-    it('can convert JSON into multiple user entities', function() {
+  describe('map_users_from_object', () => {
+    it('can convert JSON into multiple user entities', () => {
       const user_ets = mapper.map_users_from_object(payload.users.get.many);
       expect(user_ets.length).toBe(2);
       expect(user_ets[0].email()).toBe('jd@wire.com');
       expect(user_ets[1].name()).toBe('Jane Roe');
     });
 
-    it('returns an empty array if input was undefined', function() {
+    it('returns an empty array if input was undefined', () => {
       const user_ets = mapper.map_users_from_object(undefined);
       expect(user_ets).toBeDefined();
       expect(user_ets.length).toBe(0);
     });
 
-    it('returns an empty array if input was an empty array', function() {
+    it('returns an empty array if input was an empty array', () => {
       const user_ets = mapper.map_users_from_object([]);
       expect(user_ets).toBeDefined();
       expect(user_ets.length).toBe(0);
     });
   });
 
-  describe('update_user_from_object', function() {
-    it('can update the accent color', function() {
+  describe('update_user_from_object', () => {
+    it('can update the accent color', () => {
       const user_et = new z.entity.User();
       user_et.id = entities.user.john_doe.id;
-      const data = {'accent_id': 1, 'id': entities.user.john_doe.id};
+      const data = {accent_id: 1, id: entities.user.john_doe.id};
       const updated_user_et = mapper.update_user_from_object(user_et, data);
       expect(updated_user_et.accent_id()).toBe(z.config.ACCENT_ID.BLUE);
     });
 
-    it('can update the user name', function() {
+    it('can update the user name', () => {
       const user_et = new z.entity.User();
       user_et.id = entities.user.john_doe.id;
-      const data = {'id': entities.user.john_doe.id, 'name': entities.user.jane_roe.name};
+      const data = {id: entities.user.john_doe.id, name: entities.user.jane_roe.name};
       const updated_user_et = mapper.update_user_from_object(user_et, data);
       expect(updated_user_et.name()).toBe(entities.user.jane_roe.name);
     });
 
-    it('can update the user handle', function() {
+    it('can update the user handle', () => {
       const user_et = new z.entity.User();
       user_et.id = entities.user.john_doe.id;
-      const data = {'handle': entities.user.jane_roe.handle, 'id': entities.user.john_doe.id};
+      const data = {handle: entities.user.jane_roe.handle, id: entities.user.john_doe.id};
       const updated_user_et = mapper.update_user_from_object(user_et, data);
       expect(updated_user_et.username()).toBe(entities.user.jane_roe.handle);
     });
 
-    it('cannot update the user name of a wrong user', function() {
+    it('cannot update the user name of a wrong user', () => {
       const user_et = new z.entity.User();
       user_et.id = entities.user.john_doe.id;
-      const data = {'id': entities.user.jane_roe.id, 'name': entities.user.jane_roe.name};
+      const data = {id: entities.user.jane_roe.id, name: entities.user.jane_roe.name};
       const func = () => mapper.update_user_from_object(user_et, data);
       expect(func).toThrow();
     });
 
-    it('can update user with v3 assets', function() {
+    it('can update user with v3 assets', () => {
       const user_et = new z.entity.User();
       user_et.id = entities.user.john_doe.id;
       const data = {
-        'assets': [
+        assets: [
           {key: z.util.create_random_uuid(), size: 'preview', type: 'image'},
           {key: z.util.create_random_uuid(), size: 'complete', type: 'image'},
         ],
-        'id': entities.user.john_doe.id,
-        'name': entities.user.jane_roe.name,
+        id: entities.user.john_doe.id,
+        name: entities.user.jane_roe.name,
       };
       const updated_user_et = mapper.update_user_from_object(user_et, data);
       expect(updated_user_et.preview_picture_resource()).toBeDefined();

@@ -60,7 +60,6 @@ z.media.MediaConstraintsHandler = class MediaConstraintsHandler {
     this.logger = new z.util.Logger('z.media.MediaConstraintsHandler', z.config.LOGGER.OPTIONS);
   }
 
-
   //##############################################################################
   // MediaStream constraints
   //##############################################################################
@@ -74,17 +73,16 @@ z.media.MediaConstraintsHandler = class MediaConstraintsHandler {
    * @returns {Promise} Resolves with MediaStreamConstraints and their type
    */
   get_media_stream_constraints(request_audio = false, request_video = false) {
-    return Promise.resolve()
-      .then(() => {
-        const current_device_id = this.media_repository.devices_handler.current_device_id;
-        const constraints = {
-          audio: request_audio ? this._get_audio_stream_constraints(current_device_id.audio_input()) : undefined,
-          video: request_video ? this._get_video_stream_constraints(current_device_id.video_input()) : undefined,
-        };
-        const media_type = request_video ? z.media.MediaType.VIDEO : z.media.MediaType.AUDIO;
+    return Promise.resolve().then(() => {
+      const current_device_id = this.media_repository.devices_handler.current_device_id;
+      const constraints = {
+        audio: request_audio ? this._get_audio_stream_constraints(current_device_id.audio_input()) : undefined,
+        video: request_video ? this._get_video_stream_constraints(current_device_id.video_input()) : undefined,
+      };
+      const media_type = request_video ? z.media.MediaType.VIDEO : z.media.MediaType.AUDIO;
 
-        return {media_stream_constraints: constraints, media_type: media_type};
-      });
+      return {media_stream_constraints: constraints, media_type: media_type};
+    });
   }
 
   /**
@@ -129,7 +127,10 @@ z.media.MediaConstraintsHandler = class MediaConstraintsHandler {
         },
       };
 
-      return Promise.resolve({media_stream_constraints: media_stream_constraints, media_type: z.media.MediaType.SCREEN});
+      return Promise.resolve({
+        media_stream_constraints: media_stream_constraints,
+        media_type: z.media.MediaType.SCREEN,
+      });
     }
 
     if (z.util.Environment.browser.firefox) {
@@ -142,7 +143,10 @@ z.media.MediaConstraintsHandler = class MediaConstraintsHandler {
         },
       };
 
-      return Promise.resolve({media_stream_constraints: media_stream_constraints, media_type: z.media.MediaType.SCREEN});
+      return Promise.resolve({
+        media_stream_constraints: media_stream_constraints,
+        media_type: z.media.MediaType.SCREEN,
+      });
     }
 
     return Promise.reject(new z.media.MediaError(z.media.MediaError.TYPE.SCREEN_NOT_SUPPORTED));

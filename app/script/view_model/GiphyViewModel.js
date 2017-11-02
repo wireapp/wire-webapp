@@ -67,7 +67,6 @@ z.ViewModel.GiphyViewModel = class GiphyViewModel {
     amplify.subscribe(z.event.WebApp.EXTENSIONS.GIPHY.SHOW, this.show_giphy.bind(this));
   }
 
-
   show_giphy() {
     this.sending_giphy_message = false;
     this.query(this.conversation_repository.active_conversation().input());
@@ -100,13 +99,12 @@ z.ViewModel.GiphyViewModel = class GiphyViewModel {
       const conversation_et = this.conversation_repository.active_conversation();
       this.sending_giphy_message = true;
 
-      this.conversation_repository.send_gif(conversation_et, this.selected_gif().animated, this.query())
-        .then(() => {
-          this.sending_giphy_message = false;
-          const event = new z.tracking.event.PictureTakenEvent('conversation', 'giphy', 'button');
-          amplify.publish(z.event.WebApp.ANALYTICS.EVENT, event.name, event.attributes);
-          amplify.publish(z.event.WebApp.EXTENSIONS.GIPHY.SEND);
-        });
+      this.conversation_repository.send_gif(conversation_et, this.selected_gif().animated, this.query()).then(() => {
+        this.sending_giphy_message = false;
+        const event = new z.tracking.event.PictureTakenEvent('conversation', 'giphy', 'button');
+        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, event.name, event.attributes);
+        amplify.publish(z.event.WebApp.EXTENSIONS.GIPHY.SEND);
+      });
 
       this.modal.hide();
     }
@@ -155,13 +153,13 @@ z.ViewModel.GiphyViewModel = class GiphyViewModel {
         .get_random_gif({
           tag: this.query(),
         })
-        .then((gif) => {
+        .then(gif => {
           this.gif(gif);
           this.gifs.push(this.gif());
           this.selected_gif(this.gif());
           this.state(GiphyViewModel.STATE.RESULTS);
         })
-        .catch((error) => {
+        .catch(error => {
           this.logger.error(`No gif found for query: ${this.query()}`, error);
           this.state(GiphyViewModel.STATE.ERROR);
         });
@@ -178,14 +176,14 @@ z.ViewModel.GiphyViewModel = class GiphyViewModel {
           number: GiphyViewModel.CONFIG.NUMBER_OF_GIFS,
           query: this.query(),
         })
-        .then((gifs) => {
+        .then(gifs => {
           this.gifs(gifs);
           if (gifs.length === 1) {
             this.selected_gif(gifs[0]);
           }
           this.state(GiphyViewModel.STATE.RESULTS);
         })
-        .catch((error) => {
+        .catch(error => {
           this.logger.error(`No gifs found for query: ${this.query()}`, error);
           this.state(GiphyViewModel.STATE.ERROR);
         });

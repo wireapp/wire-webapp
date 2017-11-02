@@ -28,7 +28,7 @@ window.z.tracking = z.tracking || {};
  */
 z.tracking.SuperProperty = {
   APP: 'app',
-  APP_VERSION: 'App version',
+  APP_VERSION: 'App Version',
   CONTACTS: 'contacts',
   DESKTOP_APP: 'desktop_app',
   TEAM: {

@@ -24,22 +24,27 @@ window.z = window.z || {};
 z.location = (() => {
   const GOOGLE_GEOCODING_BASE_URL = 'https://maps.googleapis.com/maps/api/geocode/json';
   const API_KEY = 'AIzaSyCKxxKw5JBZ5zEFtoirtgnw8omvH7gWzfo';
-  const _parse_results = (results) => {
+  const _parse_results = results => {
     const res = {};
     const [result] = results;
-    res['address'] = result.formatted_address;
-    res['lat'] = result.geometry.location.lat;
-    res['lng'] = result.geometry.location.lng;
+    res.address = result.formatted_address;
+    res.lat = result.geometry.location.lat;
+    res.lng = result.geometry.location.lng;
     for (const component of result.address_components) {
       const name = component.long_name || component.short_name;
       for (const type of component.types) {
         res[type] = name;
         if (type === 'country') {
-          res['country_code'] = component.short_name || '';
+          res.country_code = component.short_name || '';
         }
       }
     }
-    res['place'] = res.locality || res.natural_feature || res.administrative_area_level_3 || res.administrative_area_level_2 || res.administrative_area_level_1;
+    res.place =
+      res.locality ||
+      res.natural_feature ||
+      res.administrative_area_level_3 ||
+      res.administrative_area_level_2 ||
+      res.administrative_area_level_1;
     delete (res.political != null);
     return z.util.ObjectUtil.escape_properties(res);
   };
@@ -52,13 +57,13 @@ z.location = (() => {
    */
   const get_location = (latitude, longitude) => {
     return new Promise((resolve, reject) => {
-      if ((latitude == null) || (longitude == null)) {
+      if (latitude == null || longitude == null) {
         reject(new Error('You need to specify latitude and longitude in order to retrieve the location'));
       }
       $.ajax({
         url: `${GOOGLE_GEOCODING_BASE_URL}?latlng=${latitude},${longitude}&key=${API_KEY}`,
       })
-        .done((response) => {
+        .done(response => {
           if (response.status === 'OK') {
             return resolve(_parse_results(response.results));
           }

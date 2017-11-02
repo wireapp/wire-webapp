@@ -38,7 +38,7 @@ z.entity.Text = class Text extends z.entity.Asset {
     this.previews = ko.observableArray();
 
     this.should_render_text = ko.pureComputed(() => {
-      if ((this.text === null) || (this.text.length === 0)) {
+      if (this.text === null || this.text.length === 0) {
         return false;
       }
       const has_link_previews = this.previews().length > 0;

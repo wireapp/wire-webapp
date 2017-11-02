@@ -79,12 +79,11 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
       this.participants_verified.removeAll();
       this.participants_unverified.removeAll();
 
-      participants.map((user_et) => {
+      participants.map(user_et => {
         if (user_et.is_verified()) {
-          this.participants_verified.push(user_et);
-        } else {
-          this.participants_unverified.push(user_et);
+          return this.participants_verified.push(user_et);
         }
+        this.participants_unverified.push(user_et);
       });
     });
 
@@ -103,7 +102,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
       }
     };
 
-    this.editing.subscribe((value) => {
+    this.editing.subscribe(value => {
       if (!value) {
         const name = $('.group-header .name span');
         return $('.group-header textarea').css('height', `${name.height()}px`);
@@ -133,7 +132,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
       const user_ets = this.is_team() ? this.team_users() : this.user_repository.connected_users();
 
       return user_ets
-        .filter((user_et) => !this.participants().find((participant) => user_et.id === participant.id))
+        .filter(user_et => !this.participants().find(participant => user_et.id === participant.id))
         .sort((user_a, user_b) => z.util.StringUtil.sort_by_priority(user_a.first_name(), user_b.first_name()));
     });
 
@@ -179,8 +178,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
       if (add_people && !this.conversation().is_guest()) {
         if (!this.participants_bubble.is_visible()) {
-          return this.participants_bubble.show()
-            .then(() => this.add_people());
+          return this.participants_bubble.show().then(() => this.add_people());
         }
 
         const is_adding_people = this.state() === ParticipantsViewModel.STATE.ADD_PEOPLE;
@@ -197,7 +195,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
     const bubble = wire.app.view.content.message_list.participant_bubble;
     if (bubble && bubble.is_visible()) {
-      window.setTimeout(function() {
+      window.setTimeout(() => {
         toggle_bubble();
       }, 550);
     } else {
@@ -245,24 +243,24 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
     event.target.value = old_name;
     this.editing(false);
-    if (new_name.length && (new_name !== old_name)) {
+    if (new_name.length && new_name !== old_name) {
       this.conversation_repository.rename_conversation(this.conversation(), new_name);
     }
   }
 
   on_search_add() {
-    const user_ids = this.user_selected().map((user_et) => user_et.id);
+    const user_ids = this.user_selected().map(user_et => user_et.id);
     if (this.conversation().is_group()) {
-      this.conversation_repository.add_members(this.conversation(), user_ids)
-        .then(() => {
-          amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.ADD_TO_GROUP_CONVERSATION, {
-            numberOfGroupParticipants: this.conversation().number_of_participants(),
-            numberOfParticipantsAdded: user_ids.length,
-          });
+      this.conversation_repository.add_members(this.conversation(), user_ids).then(() => {
+        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.ADD_TO_GROUP_CONVERSATION, {
+          numberOfGroupParticipants: this.conversation().get_number_of_participants(),
+          numberOfParticipantsAdded: user_ids.length,
         });
+      });
     } else {
-      this.conversation_repository.create_new_conversation(user_ids.concat(this.user_profile().id), null)
-        .then(function({conversation_et}) {
+      this.conversation_repository
+        .create_new_conversation(user_ids.concat(this.user_profile().id), null)
+        .then(({conversation_et}) => {
           amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.CREATE_GROUP_CONVERSATION, {
             creationContext: 'addedToOneToOne',
             numberOfParticipants: user_ids.length,
@@ -288,12 +286,11 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
     this.confirm_dialog = $('#participants').confirm({
       confirm: () => {
-        this.conversation_repository.remove_participant(this.conversation(), user_et)
-          .then((response) => {
-            if (response) {
-              this.reset_view();
-            }
-          });
+        this.conversation_repository.remove_participant(this.conversation(), user_et).then(response => {
+          if (response) {
+            this.reset_view();
+          }
+        });
       },
       data: {
         user: user_et,
@@ -309,12 +306,13 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   unblock(user_et) {
     this.confirm_dialog = $('#participants').confirm({
       confirm: () => {
-        this.user_repository.unblock_user(user_et)
+        this.user_repository
+          .unblock_user(user_et)
           .then(() => {
             this.participants_bubble.hide();
             return this.conversation_repository.get_1to1_conversation(user_et);
           })
-          .then((conversation_et) => {
+          .then(conversation_et => {
             this.conversation_repository.update_participating_user_ets(conversation_et);
           });
       },
@@ -355,12 +353,10 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
     this.confirm_dialog = $('#participants').confirm({
       cancel: () => {
-        this.user_repository.ignore_connection_request(user_et)
-          .then(() => on_success());
+        this.user_repository.ignore_connection_request(user_et).then(() => on_success());
       },
       confirm: () => {
-        this.user_repository.accept_connection_request(user_et, true)
-          .then(() => on_success());
+        this.user_repository.accept_connection_request(user_et, true).then(() => on_success());
       },
       data: {
         user: this.user_profile(),

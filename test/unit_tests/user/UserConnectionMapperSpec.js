@@ -21,22 +21,22 @@
 
 'use strict';
 
-describe('z.user.UserConnectionMapper', function() {
+describe('z.user.UserConnectionMapper', () => {
   let mapper = undefined;
 
-  beforeAll(function() {
+  beforeAll(() => {
     mapper = new z.user.UserConnectionMapper();
   });
 
-  describe('map_user_connection_from_json', function() {
-    it('escapes all properties of an object', function() {
+  describe('map_user_connection_from_json', () => {
+    it('escapes all properties of an object', () => {
       const payload = {
-        'conversation': '4a559f61-8466-45a7-b366-9e1662f02370',
-        'from': '109da9ca-a495-47a8-ac70-9ffbe924b2d0',
-        'last_update': '2017-02-14T12:43:31.460Z',
-        'message': '',
-        'status': 'accepted',
-        'to': '39b7f597-dfd1-4dff-86f5-fe1b79cb70a0',
+        conversation: '4a559f61-8466-45a7-b366-9e1662f02370',
+        from: '109da9ca-a495-47a8-ac70-9ffbe924b2d0',
+        last_update: '2017-02-14T12:43:31.460Z',
+        message: '',
+        status: 'accepted',
+        to: '39b7f597-dfd1-4dff-86f5-fe1b79cb70a0',
       };
 
       const connection_et = mapper.map_user_connection_from_json(payload);

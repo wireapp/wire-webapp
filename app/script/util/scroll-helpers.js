@@ -60,7 +60,7 @@ $.fn.is_scrolled_bottom = function(offset) {
   const scroll_top = Math.ceil($element.scrollTop());
   const scroll_height = $element[0].scrollHeight;
   const height = $element[0].clientHeight;
-  return (scroll_top + height + offset) >= scroll_height;
+  return scroll_top + height + offset >= scroll_height;
 };
 
 $.fn.is_scrolled_top = function() {

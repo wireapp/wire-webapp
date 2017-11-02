@@ -29,28 +29,16 @@ z.calling.enum.CALL_STATE_GROUP = {
     z.calling.enum.CALL_STATE.ONGOING,
     z.calling.enum.CALL_STATE.REJECTED,
   ],
-  CAN_JOIN: [
-    z.calling.enum.CALL_STATE.INCOMING,
-    z.calling.enum.CALL_STATE.REJECTED,
-  ],
+  CAN_JOIN: [z.calling.enum.CALL_STATE.INCOMING, z.calling.enum.CALL_STATE.REJECTED],
   IS_ACTIVE: [
     z.calling.enum.CALL_STATE.CONNECTING,
     z.calling.enum.CALL_STATE.INCOMING,
     z.calling.enum.CALL_STATE.ONGOING,
     z.calling.enum.CALL_STATE.OUTGOING,
   ],
-  IS_ENDED: [
-    z.calling.enum.CALL_STATE.ENDED,
-    z.calling.enum.CALL_STATE.UNKNOWN,
-  ],
-  IS_ENDING: [
-    z.calling.enum.CALL_STATE.DISCONNECTING,
-    z.calling.enum.CALL_STATE.ONGOING,
-  ],
-  IS_RINGING: [
-    z.calling.enum.CALL_STATE.INCOMING,
-    z.calling.enum.CALL_STATE.OUTGOING,
-  ],
+  IS_ENDED: [z.calling.enum.CALL_STATE.ENDED, z.calling.enum.CALL_STATE.UNKNOWN],
+  IS_ENDING: [z.calling.enum.CALL_STATE.DISCONNECTING, z.calling.enum.CALL_STATE.ONGOING],
+  IS_RINGING: [z.calling.enum.CALL_STATE.INCOMING, z.calling.enum.CALL_STATE.OUTGOING],
   STOP_RINGING: [
     z.calling.enum.CALL_STATE.CONNECTING,
     z.calling.enum.CALL_STATE.DISCONNECTING,

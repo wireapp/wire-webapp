@@ -55,23 +55,46 @@ describe('z.util.KeyboardUtil.KEY', () => {
 
   describe('is_key', () => {
     it('returns whether the expected key has been pressed', () => {
-      expect(z.util.KeyboardUtil.is_key({key: z.util.KeyboardUtil.KEY.KEY_V}, z.util.KeyboardUtil.KEY.KEY_V)).toBeTruthy();
+      expect(
+        z.util.KeyboardUtil.is_key({key: z.util.KeyboardUtil.KEY.KEY_V}, z.util.KeyboardUtil.KEY.KEY_V)
+      ).toBeTruthy();
       expect(z.util.KeyboardUtil.is_key({key: z.util.KeyboardUtil.KEY.KEY_V})).toBeFalsy();
       expect(z.util.KeyboardUtil.is_key({key: z.util.KeyboardUtil.KEY.KEY_V}, '')).toBeFalsy();
-      expect(z.util.KeyboardUtil.is_key({key: z.util.KeyboardUtil.KEY.KEY_V}, z.util.KeyboardUtil.KEY.ARROW_RIGHT)).toBeFalsy();
+      expect(
+        z.util.KeyboardUtil.is_key({key: z.util.KeyboardUtil.KEY.KEY_V}, z.util.KeyboardUtil.KEY.ARROW_RIGHT)
+      ).toBeFalsy();
     });
   });
 
   describe('is_one_of_keys', () => {
     it('returns whether one the expected key has been pressed', () => {
-      expect(z.util.KeyboardUtil.is_one_of_keys({key: z.util.KeyboardUtil.KEY.KEY_V}, [z.util.KeyboardUtil.KEY.KEY_V])).toBeTruthy();
-      expect(z.util.KeyboardUtil.is_one_of_keys({key: z.util.KeyboardUtil.KEY.KEY_V}, [z.util.KeyboardUtil.KEY.KEY_V, z.util.KeyboardUtil.KEY.ARROW_RIGHT])).toBeTruthy();
-      expect(z.util.KeyboardUtil.is_one_of_keys({key: z.util.KeyboardUtil.KEY.KEY_V}, [z.util.KeyboardUtil.KEY.ARROW_RIGHT, z.util.KeyboardUtil.KEY.KEY_V])).toBeTruthy();
+      expect(
+        z.util.KeyboardUtil.is_one_of_keys({key: z.util.KeyboardUtil.KEY.KEY_V}, [z.util.KeyboardUtil.KEY.KEY_V])
+      ).toBeTruthy();
+      expect(
+        z.util.KeyboardUtil.is_one_of_keys({key: z.util.KeyboardUtil.KEY.KEY_V}, [
+          z.util.KeyboardUtil.KEY.KEY_V,
+          z.util.KeyboardUtil.KEY.ARROW_RIGHT,
+        ])
+      ).toBeTruthy();
+      expect(
+        z.util.KeyboardUtil.is_one_of_keys({key: z.util.KeyboardUtil.KEY.KEY_V}, [
+          z.util.KeyboardUtil.KEY.ARROW_RIGHT,
+          z.util.KeyboardUtil.KEY.KEY_V,
+        ])
+      ).toBeTruthy();
       expect(z.util.KeyboardUtil.is_one_of_keys({key: z.util.KeyboardUtil.KEY.KEY_V})).toBeFalsy();
       expect(z.util.KeyboardUtil.is_one_of_keys({key: z.util.KeyboardUtil.KEY.KEY_V}, [])).toBeFalsy();
       expect(z.util.KeyboardUtil.is_one_of_keys({key: z.util.KeyboardUtil.KEY.KEY_V}, [''])).toBeFalsy();
-      expect(z.util.KeyboardUtil.is_one_of_keys({key: z.util.KeyboardUtil.KEY.KEY_V}, [z.util.KeyboardUtil.KEY.ARROW_LEFT])).toBeFalsy();
-      expect(z.util.KeyboardUtil.is_one_of_keys({key: z.util.KeyboardUtil.KEY.KEY_V}, [z.util.KeyboardUtil.KEY.ARROW_LEFT, z.util.KeyboardUtil.KEY.ARROW_RIGHT])).toBeFalsy();
+      expect(
+        z.util.KeyboardUtil.is_one_of_keys({key: z.util.KeyboardUtil.KEY.KEY_V}, [z.util.KeyboardUtil.KEY.ARROW_LEFT])
+      ).toBeFalsy();
+      expect(
+        z.util.KeyboardUtil.is_one_of_keys({key: z.util.KeyboardUtil.KEY.KEY_V}, [
+          z.util.KeyboardUtil.KEY.ARROW_LEFT,
+          z.util.KeyboardUtil.KEY.ARROW_RIGHT,
+        ])
+      ).toBeFalsy();
     });
   });
 });

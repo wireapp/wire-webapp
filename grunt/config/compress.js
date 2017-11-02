@@ -23,14 +23,13 @@
 
 module.exports = {
   aws: {
-    files: [{
-      cwd: '<%= dir.aws_ %>',
-      expand: true,
-      src: [
-        '**',
-        '!<%= dir.aws.s3 %>',
-      ],
-    }],
+    files: [
+      {
+        cwd: '<%= dir.aws_ %>',
+        expand: true,
+        src: ['**', '!<%= dir.aws.s3 %>'],
+      },
+    ],
     options: {
       archive: '<%= dir.aws.s3 %>/ebs.zip',
     },

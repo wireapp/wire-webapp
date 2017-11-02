@@ -21,29 +21,34 @@
 
 // grunt test_init && grunt test_run:view_model/WindowTitleViewModel
 
-describe('z.ViewModel.WindowTitleViewModel', function() {
+describe('z.ViewModel.WindowTitleViewModel', () => {
   const suffix = z.l10n.text(z.string.wire);
   const test_factory = new TestFactory();
   let title_view_model = undefined;
 
-  beforeEach((done) => {
-    test_factory.exposeConversationActors()
-      .then(function(conversation_repository) {
+  beforeEach(done => {
+    test_factory
+      .exposeConversationActors()
+      .then(conversation_repository => {
         const content_state = ko.observable(z.ViewModel.content.CONTENT_STATE.CONVERSATION);
-        title_view_model = new z.ViewModel.WindowTitleViewModel(content_state, conversation_repository, TestFactory.user_repository);
+        title_view_model = new z.ViewModel.WindowTitleViewModel(
+          content_state,
+          conversation_repository,
+          TestFactory.user_repository
+        );
         done();
       })
       .catch(done.fail);
   });
 
-  describe('initiate_title_updates', function() {
-    it('sets a default title when there is an unknown state', function() {
+  describe('initiate_title_updates', () => {
+    it('sets a default title when there is an unknown state', () => {
       title_view_model.content_state('invalid or unknown');
       title_view_model.initiate_title_updates();
       expect(window.document.title).toBe(suffix);
     });
 
-    it('sets the name of the conversation (when the conversation is selected)', function() {
+    it('sets the name of the conversation (when the conversation is selected)', () => {
       const selected_conversation = new z.entity.Conversation(z.util.create_random_uuid());
       selected_conversation.name('Selected Conversation');
       selected_conversation.type(z.conversation.ConversationType.REGULAR);
@@ -54,7 +59,7 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
       expect(window.document.title).toBe(expected_title);
     });
 
-    it('sets the name of the conversation and a badge count (when the conversation is selected and when there are unread messages)', function() {
+    it('sets the name of the conversation and a badge count (when the conversation is selected and when there are unread messages)', () => {
       const message = new z.entity.ContentMessage();
       message.id = z.util.create_random_uuid();
       message.timestamp(Date.now());
@@ -72,7 +77,7 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
       expect(window.document.title).toBe(expected_title);
     });
 
-    it('does not change the title if muted conversations receive messages', function() {
+    it('does not change the title if muted conversations receive messages', () => {
       const selected_conversation = new z.entity.Conversation(z.util.create_random_uuid());
       selected_conversation.name('Selected Conversation');
       selected_conversation.type(z.conversation.ConversationType.REGULAR);
@@ -121,7 +126,7 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
       expect(window.document.title).toBe(expected_title);
     });
 
-    it('sets the name when opening the preferences about page', function() {
+    it('sets the name when opening the preferences about page', () => {
       title_view_model.content_state(z.ViewModel.content.CONTENT_STATE.PREFERENCES_ABOUT);
 
       const expected_title = `${z.string.preferences_about} · ${suffix}`;
@@ -129,7 +134,7 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
       expect(window.document.title).toBe(expected_title);
     });
 
-    it('sets the name when opening the preferences account page', function() {
+    it('sets the name when opening the preferences account page', () => {
       title_view_model.content_state(z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT);
 
       const expected_title = `${z.string.preferences_account} · ${suffix}`;
@@ -137,7 +142,7 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
       expect(window.document.title).toBe(expected_title);
     });
 
-    it('sets the name when opening the preferences av page', function() {
+    it('sets the name when opening the preferences av page', () => {
       title_view_model.content_state(z.ViewModel.content.CONTENT_STATE.PREFERENCES_AV);
 
       const expected_title = `${z.string.preferences_av} · ${suffix}`;
@@ -145,7 +150,7 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
       expect(window.document.title).toBe(expected_title);
     });
 
-    it('sets the name when opening the preferences device details page', function() {
+    it('sets the name when opening the preferences device details page', () => {
       title_view_model.content_state(z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS);
 
       const expected_title = `${z.string.preferences_device_details} · ${suffix}`;
@@ -153,7 +158,7 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
       expect(window.document.title).toBe(expected_title);
     });
 
-    it('sets the name when opening the preferences devices page', function() {
+    it('sets the name when opening the preferences devices page', () => {
       title_view_model.content_state(z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES);
 
       const expected_title = `${z.string.preferences_devices} · ${suffix}`;
@@ -161,7 +166,7 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
       expect(window.document.title).toBe(expected_title);
     });
 
-    it('sets the name when opening the preferences options page', function() {
+    it('sets the name when opening the preferences options page', () => {
       title_view_model.content_state(z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS);
 
       const expected_title = `${z.string.preferences_options} · ${suffix}`;
@@ -169,7 +174,7 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
       expect(window.document.title).toBe(expected_title);
     });
 
-    it('shows the number of connection requests when viewing the inbox', function() {
+    it('shows the number of connection requests when viewing the inbox', () => {
       title_view_model.content_state(z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS);
 
       const pending_connection = new z.entity.Connection();
@@ -202,7 +207,7 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
       expect(window.document.title).toBe(expected_title);
     });
 
-    it('publishes the badge count (for Wire\'s wrapper)', function(done) {
+    it("publishes the badge count (for Wire's wrapper)", done => {
       const message = new z.entity.ContentMessage();
       message.id = z.util.create_random_uuid();
       message.timestamp(Date.now());
@@ -215,7 +220,7 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
       title_view_model.conversation_repository.conversations_unarchived.push(conversation);
       title_view_model.conversation_repository.active_conversation(conversation);
 
-      amplify.subscribe(z.event.WebApp.CONVERSATION.UNREAD, function(badge_count) {
+      amplify.subscribe(z.event.WebApp.CONVERSATION.UNREAD, badge_count => {
         expect(badge_count).toBe(1);
         done();
       });

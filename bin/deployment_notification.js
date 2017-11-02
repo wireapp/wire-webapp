@@ -17,10 +17,10 @@
  *
  */
 
-const {shout} = require('@wireapp/core');
+const {Account} = require('@wireapp/core');
 
 const login = {
-  handle: 'webappbot',
+  email: process.env.WIRE_WEBAPP_BOT_EMAIL,
   password: process.env.WIRE_WEBAPP_BOT_PASSWORD,
 };
 
@@ -55,14 +55,21 @@ switch (commit.branch) {
 }
 
 content.message =
-  `**Travis build '${build.number}' deployed on '${commit.branch}' environment.** ᕦ(￣ ³￣)ᕤ`
-  + `\r\n- Link: ${build.url}`
-  + `\r\n- Last commit from: ${commit.author}`
-  + `\r\n- Last commit message: ${commit.message}`;
+  `**Travis build '${build.number}' deployed on '${commit.branch}' environment.** ᕦ(￣ ³￣)ᕤ` +
+  `\r\n- Link: ${build.url}` +
+  `\r\n- Last commit from: ${commit.author}` +
+  `\r\n- Last commit message: ${commit.message}`;
 
-shout(login.handle, login.password, content.conversationId, content.message)
+const bot = new Account({
+  email: login.email,
+  password: login.password,
+});
+
+bot
+  .listen()
+  .then(() => bot.sendTextMessage(content.conversationId, content.message))
   .then(() => process.exit(0))
-  .catch((error) => {
-    console.log(error.message);
+  .catch(error => {
+    console.error(error.message);
     return process.exit(1);
   });

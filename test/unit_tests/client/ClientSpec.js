@@ -21,16 +21,16 @@
 
 'use strict';
 
-describe('z.client.Client', function() {
-  describe('dismantle_user_client_id', function() {
-    it('can get the user ID and client ID from a session ID', function() {
+describe('z.client.Client', () => {
+  describe('dismantle_user_client_id', () => {
+    it('can get the user ID and client ID from a session ID', () => {
       const session_id = '034060fe-8406-476e-b29d-f0a214c0345b@4b0a0fbf418d264c';
       const ids = z.client.Client.dismantle_user_client_id(session_id);
       expect(ids.client_id).toBe('4b0a0fbf418d264c');
       expect(ids.user_id).toBe('034060fe-8406-476e-b29d-f0a214c0345b');
     });
 
-    it('can handle an undefined input', function() {
+    it('can handle an undefined input', () => {
       const ids = z.client.Client.dismantle_user_client_id(undefined);
       expect(ids.client_id).toBe(undefined);
       expect(ids.user_id).toBe(undefined);

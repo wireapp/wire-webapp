@@ -21,64 +21,66 @@
 
 // grunt test_init && grunt test_run:links/LinkPreviewHelpers
 
-describe('contains_only_link', function() {
-  it('should return true if text only contains url (naked domain)', function() {
+describe('contains_only_link', () => {
+  it('should return true if text only contains url (naked domain)', () => {
     const text = 'wire.com';
     expect(z.links.LinkPreviewHelpers.contains_only_link(text)).toBeTruthy();
   });
 
-  it('should return true if text only contains url (http domain)', function() {
+  it('should return true if text only contains url (http domain)', () => {
     const text = 'http://wire.com';
     expect(z.links.LinkPreviewHelpers.contains_only_link(text)).toBeTruthy();
   });
 
-  it('should return true if text only contains url (https domain)', function() {
+  it('should return true if text only contains url (https domain)', () => {
     const text = 'https://wire.com';
     expect(z.links.LinkPreviewHelpers.contains_only_link(text)).toBeTruthy();
   });
 
-  it('should ignore leading and trailing whitespaces', function() {
+  it('should ignore leading and trailing whitespaces', () => {
     expect(z.links.LinkPreviewHelpers.contains_only_link(' http://wire.com')).toBeTruthy();
     expect(z.links.LinkPreviewHelpers.contains_only_link('http://wire.com ')).toBeTruthy();
   });
 
-  it('should return false for multiple domains', function() {
+  it('should return false for multiple domains', () => {
     const text = 'http://wire.com http://wire.com';
     expect(z.links.LinkPreviewHelpers.contains_only_link(text)).toBeFalsy();
   });
 
-  it('should return false when text contains domain and other text', function() {
+  it('should return false when text contains domain and other text', () => {
     const text = 'see this http://wire.com';
     expect(z.links.LinkPreviewHelpers.contains_only_link(text)).toBeFalsy();
   });
 });
 
-describe('get_first_link_with_offset', function() {
-  it('should return undefined for simple text', function() {
+describe('get_first_link_with_offset', () => {
+  it('should return undefined for simple text', () => {
     const text = 'foo bar baz';
     expect(z.links.LinkPreviewHelpers.get_first_link_with_offset(text)).not.toBeDefined();
   });
 
-  it('should return correct link and offset for single link without text)', function() {
+  it('should return correct link and offset for single link without text)', () => {
     const link_preview = z.links.LinkPreviewHelpers.get_first_link_with_offset('wire.com');
     expect(link_preview.offset).toEqual(0);
     expect(link_preview.url).toEqual('wire.com');
   });
 
-  it('should return correct link and offset for single link with text in front)', function() {
+  it('should return correct link and offset for single link with text in front)', () => {
     const link_preview = z.links.LinkPreviewHelpers.get_first_link_with_offset('Hey check wire.com');
     expect(link_preview.offset).toEqual(10);
     expect(link_preview.url).toEqual('wire.com');
   });
 
-  it('should return correct link and offset for single link surrounded by text )', function() {
+  it('should return correct link and offset for single link surrounded by text )', () => {
     const link_preview = z.links.LinkPreviewHelpers.get_first_link_with_offset('Hey check wire.com PLEASE!');
     expect(link_preview.offset).toEqual(10);
     expect(link_preview.url).toEqual('wire.com');
   });
 
-  it('should return correct link and offset for single link surrounded by text )', function() {
-    const link_preview = z.links.LinkPreviewHelpers.get_first_link_with_offset('wire.com wire.com wire.com wire.com wire.com');
+  it('should return correct link and offset for single link surrounded by text )', () => {
+    const link_preview = z.links.LinkPreviewHelpers.get_first_link_with_offset(
+      'wire.com wire.com wire.com wire.com wire.com'
+    );
     expect(link_preview.offset).toEqual(0);
     expect(link_preview.url).toEqual('wire.com');
   });

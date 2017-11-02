@@ -23,7 +23,6 @@ window.z = window.z || {};
 window.z.conversation = z.conversation || {};
 
 z.conversation.EventBuilder = (function() {
-
   const _build_all_verified = (conversation_et, time_offset) => {
     const {self, id} = conversation_et;
 
@@ -158,7 +157,7 @@ z.conversation.EventBuilder = (function() {
     };
   };
 
-  const _build_voice_channel_activate = (call_message_et) => {
+  const _build_voice_channel_activate = call_message_et => {
     const {conversation_id, user_id, time} = call_message_et;
 
     return {
@@ -171,7 +170,11 @@ z.conversation.EventBuilder = (function() {
     };
   };
 
-  const _build_voice_channel_deactivate = (call_message_et, reason = z.calling.enum.TERMINATION_REASON.COMPLETED, time_offset = 0) => {
+  const _build_voice_channel_deactivate = (
+    call_message_et,
+    reason = z.calling.enum.TERMINATION_REASON.COMPLETED,
+    time_offset = 0
+  ) => {
     const {conversation_id, user_id, time = new Date(Date.now() - time_offset).toISOString()} = call_message_et;
 
     return {

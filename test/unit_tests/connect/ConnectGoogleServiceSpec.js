@@ -21,38 +21,38 @@
 
 'use strict';
 
-describe('z.connect.ConnectGoogleService', function() {
+describe('z.connect.ConnectGoogleService', () => {
   const test_factory = new TestFactory();
 
-  beforeAll(function(done) {
-    test_factory.exposeConnectActors()
+  beforeAll(done => {
+    test_factory
+      .exposeConnectActors()
       .then(done)
       .catch(done.fail);
   });
 
-  describe('get_contacts', function() {
+  describe('get_contacts', () => {
     const access_token = 'access_token';
 
-    beforeEach(function() {
+    beforeEach(() => {
       spyOn(TestFactory.connect_google_service, '_init_library').and.callThrough();
       spyOn(TestFactory.connect_google_service, '_load_library').and.returnValue(Promise.resolve());
       spyOn(TestFactory.connect_google_service, '_get_contacts').and.returnValue(Promise.resolve());
     });
 
-    it('initializes the authentication library if previously was not', function(done) {
+    it('initializes the authentication library if previously was not', done => {
       spyOn(TestFactory.connect_google_service, '_get_access_token').and.returnValue(Promise.resolve());
 
-      TestFactory.connect_google_service.get_contacts()
-        .then(function() {
-          expect(TestFactory.connect_google_service._init_library).toHaveBeenCalled();
-          expect(TestFactory.connect_google_service._load_library).toHaveBeenCalled();
-          expect(TestFactory.connect_google_service._get_access_token).toHaveBeenCalled();
-          expect(TestFactory.connect_google_service._get_contacts).toHaveBeenCalled();
-          done();
-        });
+      TestFactory.connect_google_service.get_contacts().then(() => {
+        expect(TestFactory.connect_google_service._init_library).toHaveBeenCalled();
+        expect(TestFactory.connect_google_service._load_library).toHaveBeenCalled();
+        expect(TestFactory.connect_google_service._get_access_token).toHaveBeenCalled();
+        expect(TestFactory.connect_google_service._get_contacts).toHaveBeenCalled();
+        done();
+      });
     });
 
-    it('it requests an access token if none has been set', function(done) {
+    it('it requests an access token if none has been set', done => {
       window.gapi = {
         auth: {
           getToken() {
@@ -65,19 +65,18 @@ describe('z.connect.ConnectGoogleService', function() {
       spyOn(window.gapi.auth, 'getToken').and.callThrough();
       spyOn(TestFactory.connect_google_service, '_authenticate').and.returnValue(Promise.resolve());
 
-      TestFactory.connect_google_service.get_contacts()
-        .then(function() {
-          expect(TestFactory.connect_google_service._init_library).toHaveBeenCalled();
-          expect(TestFactory.connect_google_service._load_library).not.toHaveBeenCalled();
-          expect(TestFactory.connect_google_service._get_access_token).toHaveBeenCalled();
-          expect(window.gapi.auth.getToken).toHaveBeenCalled();
-          expect(TestFactory.connect_google_service._authenticate).toHaveBeenCalled();
-          expect(TestFactory.connect_google_service._get_contacts).toHaveBeenCalled();
-          done();
-        });
+      TestFactory.connect_google_service.get_contacts().then(() => {
+        expect(TestFactory.connect_google_service._init_library).toHaveBeenCalled();
+        expect(TestFactory.connect_google_service._load_library).not.toHaveBeenCalled();
+        expect(TestFactory.connect_google_service._get_access_token).toHaveBeenCalled();
+        expect(window.gapi.auth.getToken).toHaveBeenCalled();
+        expect(TestFactory.connect_google_service._authenticate).toHaveBeenCalled();
+        expect(TestFactory.connect_google_service._get_contacts).toHaveBeenCalled();
+        done();
+      });
     });
 
-    it('it uses an available access token to request contacts', function(done) {
+    it('it uses an available access token to request contacts', done => {
       window.gapi = {
         auth: {
           getToken() {
@@ -90,16 +89,15 @@ describe('z.connect.ConnectGoogleService', function() {
       spyOn(window.gapi.auth, 'getToken').and.callThrough();
       spyOn(TestFactory.connect_google_service, '_authenticate');
 
-      TestFactory.connect_google_service.get_contacts()
-        .then(function() {
-          expect(TestFactory.connect_google_service._init_library).toHaveBeenCalled();
-          expect(TestFactory.connect_google_service._load_library).not.toHaveBeenCalled();
-          expect(TestFactory.connect_google_service._get_access_token).toHaveBeenCalled();
-          expect(window.gapi.auth.getToken).toHaveBeenCalled();
-          expect(TestFactory.connect_google_service._authenticate).not.toHaveBeenCalled();
-          expect(TestFactory.connect_google_service._get_contacts).toHaveBeenCalled();
-          done();
-        });
+      TestFactory.connect_google_service.get_contacts().then(() => {
+        expect(TestFactory.connect_google_service._init_library).toHaveBeenCalled();
+        expect(TestFactory.connect_google_service._load_library).not.toHaveBeenCalled();
+        expect(TestFactory.connect_google_service._get_access_token).toHaveBeenCalled();
+        expect(window.gapi.auth.getToken).toHaveBeenCalled();
+        expect(TestFactory.connect_google_service._authenticate).not.toHaveBeenCalled();
+        expect(TestFactory.connect_google_service._get_contacts).toHaveBeenCalled();
+        done();
+      });
     });
   });
 });

@@ -60,7 +60,6 @@ z.l10n = (() => {
   }
 
   return {
-
     /**
      * Retrieve localized string and replace placeholders
      *

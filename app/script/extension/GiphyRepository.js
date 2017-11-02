@@ -43,18 +43,21 @@ z.extension.GiphyRepository = class GiphyRepository {
    * @returns {Promise} Resolves with a random matching gif
    */
   get_random_gif(options) {
-    options = $.extend({
-      max_size: 3 * 1024 * 1024,
-      retry: 3,
-    },
-    options);
+    options = $.extend(
+      {
+        max_size: 3 * 1024 * 1024,
+        retry: 3,
+      },
+      options
+    );
 
     const _get_random_gif = (retries = 0) => {
       if (options.retry === retries) {
         throw new Error(`Unable to fetch a proper gif within ${options.retry} retries`);
       }
 
-      return this.giphy_service.get_random(options.tag)
+      return this.giphy_service
+        .get_random(options.tag)
         .then(({data: random_gif}) => this.giphy_service.get_by_id(random_gif.id))
         .then(({data: {images, url}}) => {
           const static_gif = images[z.extension.GiphyContentSizes.FIXED_WIDTH_STILL];
@@ -90,12 +93,15 @@ z.extension.GiphyRepository = class GiphyRepository {
   get_gifs(options) {
     let offset = 0;
 
-    options = $.extend({
-      max_size: 3 * 1024 * 1024,
-      number: 6,
-      random: true,
-      sorting: 'relevant',
-    }, options);
+    options = $.extend(
+      {
+        max_size: 3 * 1024 * 1024,
+        number: 6,
+        random: true,
+        sorting: 'relevant',
+      },
+      options
+    );
 
     if (!options.query) {
       const error = new Error('No query specified');
@@ -117,18 +123,19 @@ z.extension.GiphyRepository = class GiphyRepository {
       }
     }
 
-    return this.giphy_service.get_search({
-      limit: 100,
-      offset: offset,
-      // eslint-disable-next-line id-length
-      q: options.query,
-      sort: options.sorting,
-    })
+    return this.giphy_service
+      .get_search({
+        limit: 100,
+        offset: offset,
+        // eslint-disable-next-line id-length
+        q: options.query,
+        sort: options.sorting,
+      })
       .then(({data: gifs, pagination}) => {
         const result = [];
 
         if (options.random) {
-          gifs = gifs.sort(() => .5 - Math.random());
+          gifs = gifs.sort(() => 0.5 - Math.random());
         }
 
         this.gif_query_cache[options.query] = pagination.total_count;
@@ -149,7 +156,7 @@ z.extension.GiphyRepository = class GiphyRepository {
 
         return result;
       })
-      .catch((error) => {
+      .catch(error => {
         this.logger.info(`Unable to fetch gif for query: ${options.query}`, error);
         throw error;
       });

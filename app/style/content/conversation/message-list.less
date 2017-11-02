@@ -40,9 +40,15 @@
   position: relative;
   margin-bottom: 16px;
 
-  & a { text-decoration: none; }
-  & * { .accent-selection-color; }
-  &:last-child { margin-bottom: 24px; }
+  & a {
+    text-decoration: none;
+  }
+  & * {
+    .accent-selection-color;
+  }
+  &:last-child {
+    margin-bottom: 24px;
+  }
 
   &.hover .time,
   &:hover .time,
@@ -61,7 +67,11 @@
   }
 }
 
-@keyframes marked-animation { to { background-color: inherit; } }
+@keyframes marked-animation {
+  to {
+    background-color: inherit;
+  }
+}
 
 .message-marked {
   .text {
@@ -98,13 +108,27 @@
 
 .message-header-label-sender {
   .label-nocase-bold-xs;
-  &.accent-color-1 { color: fade(@accent_colors-1, 80%); }
-  &.accent-color-2 { color: fade(@accent_colors-2, 72%); }
-  &.accent-color-3 { color: @accent_colors-3; }
-  &.accent-color-4 { color: fade(@accent_colors-4, 72%); }
-  &.accent-color-5 { color: fade(@accent_colors-5, 80%); }
-  &.accent-color-6 { color: fade(@accent_colors-6, 80%); }
-  &.accent-color-7 { color: fade(@accent_colors-7, 64%); }
+  &.accent-color-1 {
+    color: fade(@accent_colors-1, 80%);
+  }
+  &.accent-color-2 {
+    color: fade(@accent_colors-2, 72%);
+  }
+  &.accent-color-3 {
+    color: @accent_colors-3;
+  }
+  &.accent-color-4 {
+    color: fade(@accent_colors-4, 72%);
+  }
+  &.accent-color-5 {
+    color: fade(@accent_colors-5, 80%);
+  }
+  &.accent-color-6 {
+    color: fade(@accent_colors-6, 80%);
+  }
+  &.accent-color-7 {
+    color: fade(@accent_colors-7, 64%);
+  }
 }
 
 .message-header-label-icon {
@@ -149,13 +173,21 @@
     }
   }
 
-  time[data-timestamp-type='normal'] { display: block; }
-  time[data-timestamp-type='day'] { display: none; }
+  time[data-timestamp-type='normal'] {
+    display: block;
+  }
+  time[data-timestamp-type='day'] {
+    display: none;
+  }
 }
 
 .message-timestamp-day {
-  time[data-timestamp-type='normal'] { display: none; }
-  time[data-timestamp-type='day'] { display: block; }
+  time[data-timestamp-type='normal'] {
+    display: none;
+  }
+  time[data-timestamp-type='day'] {
+    display: block;
+  }
 }
 
 // MESSAGE - BODY
@@ -218,8 +250,12 @@
   }
 
   .image-loading {
-    .image-element { cursor: default; }
-    .image-placeholder-icon { display: flex; }
+    .image-element {
+      cursor: default;
+    }
+    .image-placeholder-icon {
+      display: flex;
+    }
   }
 
   .image-element {
@@ -294,7 +330,7 @@
 
   .message:hover & {
     opacity: 1;
-    transition-delay: @animation-timing-faster + .05;
+    transition-delay: @animation-timing-faster + 0.05;
   }
 }
 
@@ -312,7 +348,7 @@
     line-height: 18px;
     text-decoration: none;
     z-index: 1;
-    transition: opacity, .3s;
+    transition: opacity, 0.3s;
   }
 
   // CONTEXT MENU
@@ -394,23 +430,33 @@
 
 // PING MESSAGE
 @keyframes ping-scale-animation {
-  0% { transform: scale(1); }
-  100% { transform: scale(1.8); }
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.8);
+  }
 }
 
 @keyframes ping-opacity-animation {
-  0% { opacity: 1; }
-  100% { opacity: 0; }
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 
 .ping-animation {
   animation-name: ping-scale-animation, ping-opacity-animation;
-  animation-delay: .05s, .05s;
+  animation-delay: 0.05s, 0.05s;
   animation-timing-function: @ease-out-expo, @ease-out-quart;
-  animation-duration: .7s, .7s;
+  animation-duration: 0.7s, 0.7s;
 }
 
-.ping-animation-soft { animation-iteration-count: 3, 3; }
+.ping-animation-soft {
+  animation-iteration-count: 3, 3;
+}
 
 .message-icon-ping {
   margin-left: 8px;
@@ -422,13 +468,41 @@
   top: 8px;
   left: 16px;
 
-  &.accent-color-1 { path { fill: @accent_colors-1; } }
-  &.accent-color-2 { path { fill: @accent_colors-2; } }
-  &.accent-color-3 { path { fill: @accent_colors-3; } }
-  &.accent-color-4 { path { fill: @accent_colors-4; } }
-  &.accent-color-5 { path { fill: @accent_colors-5; } }
-  &.accent-color-6 { path { fill: @accent_colors-6; } }
-  &.accent-color-7 { path { fill: @accent_colors-7; } }
+  &.accent-color-1 {
+    path {
+      fill: @accent_colors-1;
+    }
+  }
+  &.accent-color-2 {
+    path {
+      fill: @accent_colors-2;
+    }
+  }
+  &.accent-color-3 {
+    path {
+      fill: @accent_colors-3;
+    }
+  }
+  &.accent-color-4 {
+    path {
+      fill: @accent_colors-4;
+    }
+  }
+  &.accent-color-5 {
+    path {
+      fill: @accent_colors-5;
+    }
+  }
+  &.accent-color-6 {
+    path {
+      fill: @accent_colors-6;
+    }
+  }
+  &.accent-color-7 {
+    path {
+      fill: @accent_colors-7;
+    }
+  }
 }
 
 // DECRYPT MESSAGE

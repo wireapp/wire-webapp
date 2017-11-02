@@ -26,9 +26,9 @@ ko.bindingHandlers.input_hint = {
     const hint = $('<span class="hint"/>').text(options.text);
 
     if (ko.isObservable(trigger)) {
-      trigger.subscribe(function(value) {
+      trigger.subscribe(value => {
         if (value) {
-          window.requestAnimationFrame(function() {
+          window.requestAnimationFrame(() => {
             const input_field = $(element).find('input');
             const rect = input_field[0].getBoundingClientRect();
 

@@ -19,8 +19,7 @@
 
 'use strict';
 
-module.exports = (grunt) => {
-
+module.exports = grunt => {
   function extract_sources(source_file, target) {
     const scripts = grunt.file.read(source_file);
     const script_files = [];
@@ -66,7 +65,7 @@ module.exports = (grunt) => {
     grunt.config('scripts', directories);
     grunt.config('scripts_minified', directories);
 
-    Object.keys(directories).forEach((directory_name) => {
+    Object.keys(directories).forEach(directory_name => {
       extract_sources(`${dist_path}/${directory_name}.htm`, directory_name);
     });
   });

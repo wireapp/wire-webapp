@@ -28,7 +28,7 @@ z.media.MediaError = class MediaError extends Error {
 
     this.name = this.constructor.name;
     this.media_type = media_type;
-    this.stack = (new Error()).stack;
+    this.stack = new Error().stack;
     this.type = type || MediaError.TYPE.UNKNOWN;
 
     switch (this.type) {

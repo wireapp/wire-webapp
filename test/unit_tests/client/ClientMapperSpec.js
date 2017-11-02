@@ -21,11 +21,11 @@
 
 'use strict';
 
-describe('z.client.ClientMapper', function() {
+describe('z.client.ClientMapper', () => {
   const mapper = new z.client.ClientMapper();
 
-  describe('map_client', function() {
-    it('can map a permanent client payload from the backend', function() {
+  describe('map_client', () => {
+    it('can map a permanent client payload from the backend', () => {
       const client_payload = entities.clients.john_doe.permanent;
 
       const client_et = mapper.map_client(client_payload);
@@ -46,7 +46,7 @@ describe('z.client.ClientMapper', function() {
       expect(client_et.is_temporary()).toBeFalsy();
     });
 
-    it('can map a temporary client payload from the backend', function() {
+    it('can map a temporary client payload from the backend', () => {
       const client_payload = entities.clients.john_doe.temporary;
 
       const client_et = mapper.map_client(client_payload);
@@ -67,7 +67,7 @@ describe('z.client.ClientMapper', function() {
       expect(client_et.is_temporary()).toBeTruthy();
     });
 
-    it('can map a remote client payload from the backend', function() {
+    it('can map a remote client payload from the backend', () => {
       const client_payload = entities.clients.jane_roe.plain;
 
       const client_et = mapper.map_client(client_payload);
@@ -80,7 +80,7 @@ describe('z.client.ClientMapper', function() {
       expect(client_et.is_temporary()).toBeFalsy();
     });
 
-    it('can map a remote client payload from our local database', function() {
+    it('can map a remote client payload from our local database', () => {
       const client_payload = {
         class: 'desktop',
         id: '66d0515a23a0ef25',
@@ -99,7 +99,7 @@ describe('z.client.ClientMapper', function() {
       expect(client_et.is_temporary()).toBeFalsy();
     });
 
-    it('can serialize a remote client payload to store it in our local database', function() {
+    it('can serialize a remote client payload to store it in our local database', () => {
       const client_payload = {
         class: 'desktop',
         id: '66d0515a23a0ef25',
@@ -116,7 +116,7 @@ describe('z.client.ClientMapper', function() {
   });
 
   describe('map_clients', () =>
-    it('can map a multiple clients at once', function() {
+    it('can map a multiple clients at once', () => {
       const client_ets = mapper.map_clients(payload.clients.get.many);
 
       expect(client_ets.length).toBe(2);
@@ -124,11 +124,10 @@ describe('z.client.ClientMapper', function() {
       expect(client_ets[0].is_temporary()).toBeTruthy();
       expect(client_ets[1].id).toBe(entities.clients.john_doe.permanent.id);
       expect(client_ets[1].is_permanent()).toBeTruthy();
-    })
-  );
+    }));
 
-  describe('update_client', function() {
-    it('can map changes into a client', function() {
+  describe('update_client', () => {
+    it('can map changes into a client', () => {
       const initial_client_et = mapper.map_client(entities.clients.john_doe.plain);
       const client_payload = entities.clients.john_doe.permanent;
 
@@ -151,7 +150,7 @@ describe('z.client.ClientMapper', function() {
       expect(client_et.is_temporary()).toBeFalsy();
     });
 
-    it('does not change the client if there are no updates', function() {
+    it('does not change the client if there are no updates', () => {
       const client_payload = entities.clients.john_doe.permanent;
       const initial_client_et = mapper.map_client(client_payload);
 

@@ -31,7 +31,7 @@ describe('z.util.ValidationUtil', () => {
       expect(actual).toBe(true);
     });
 
-    it('detects an invalid asset below v3', (done) => {
+    it('detects an invalid asset below v3', done => {
       const asset_id = z.util.create_random_uuid();
       const conversation_id = 'e13f9940-819c-477b-9391-b04234ae84af"*';
       try {
@@ -60,7 +60,7 @@ describe('z.util.ValidationUtil', () => {
       expect(actual).toBe(true);
     });
 
-    it('detects an invalid v3 asset (asset_key)', (done) => {
+    it('detects an invalid v3 asset (asset_key)', done => {
       const asset_key = `3-6-${z.util.create_random_uuid()}`;
 
       try {
@@ -72,7 +72,7 @@ describe('z.util.ValidationUtil', () => {
       done.fail('Detection failed');
     });
 
-    it('detects an invalid v3 asset (asset_token)', (done) => {
+    it('detects an invalid v3 asset (asset_token)', done => {
       const asset_key = `3-1-${z.util.create_random_uuid()}`;
       const asset_token = 'a3wAY4%$@#$@%)!@-pOe==';
 
@@ -148,7 +148,7 @@ describe('z.util.ValidationUtil', () => {
       expect(actual).toBe(true);
     });
 
-    it('detects a invalid API path', (done) => {
+    it('detects a invalid API path', done => {
       const path = '../../../search/contacts';
       try {
         z.util.ValidationUtil.is_valid_api_path(path);
@@ -191,18 +191,14 @@ describe('z.util.ValidationUtil', () => {
       }
     });
     it('detects a valid status with "statues" in the url', () => {
-      const urls = [
-        'https://twitter.com/pwnsdx/statuses/899574902050758656',
-      ];
+      const urls = ['https://twitter.com/pwnsdx/statuses/899574902050758656'];
       for (const url of urls) {
         expect(z.util.ValidationUtil.urls.is_tweet(url)).toBe(true);
       }
     });
 
     it('detects a valid status when using moments', () => {
-      const urls = [
-        'https://twitter.com/i/moments/899675330595749888',
-      ];
+      const urls = ['https://twitter.com/i/moments/899675330595749888'];
       for (const url of urls) {
         expect(z.util.ValidationUtil.urls.is_tweet(url)).toBe(true);
       }
@@ -220,9 +216,7 @@ describe('z.util.ValidationUtil', () => {
     });
 
     it('detects a valid status with a short id', () => {
-      const urls = [
-        'https://twitter.com/Twitter/status/145344012',
-      ];
+      const urls = ['https://twitter.com/Twitter/status/145344012'];
       for (const url of urls) {
         expect(z.util.ValidationUtil.urls.is_tweet(url)).toBe(true);
       }

@@ -32,7 +32,7 @@ const EMOJI_UNICODE_RANGES = 'U+200D, U+FE0F, U+1F004, U+1F0CF, U+1F170-1F171, U
       list.push(String.fromCodePoint(`0x${codepoint}`));
     } else {
       const hex_base = 16;
-      const [start, end] = codepoint.split('-').map((code) => parseInt(code, hex_base));
+      const [start, end] = codepoint.split('-').map(code => parseInt(code, hex_base));
       for (let code = start; code <= end; code++) {
         list.push(String.fromCodePoint(`0x${code.toString(hex_base)}`));
       }
@@ -44,10 +44,10 @@ const EMOJI_UNICODE_RANGE_REGEXP = new RegExp(`[${EMOJI_UNICODE_RANGES.join('')}
 
 z.util.emoji = {
   includes_only_emojies: function(text) {
-    const is_valid_string = (string) => _.isString(string) && (string.length > 0);
-    const remove_emojies = (string) => string.replace(EMOJI_UNICODE_RANGE_REGEXP, '');
-    const remove_whitespace = (string) => string.replace(/\s+/g, '');
+    const is_valid_string = string => _.isString(string) && string.length > 0;
+    const remove_emojies = string => string.replace(EMOJI_UNICODE_RANGE_REGEXP, '');
+    const remove_whitespace = string => string.replace(/\s+/g, '');
 
-    return is_valid_string(text) && (remove_emojies(remove_whitespace(text)).length === 0);
+    return is_valid_string(text) && remove_emojies(remove_whitespace(text)).length === 0;
   },
 };

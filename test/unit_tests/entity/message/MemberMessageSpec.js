@@ -21,22 +21,22 @@
 
 // grunt test_init && grunt test_run:entity/message/MessageEntities
 
-describe('Message Entities', function() {
-  describe('generate_name_string', function() {
+describe('Message Entities', () => {
+  describe('generate_name_string', () => {
     let message_et = null;
 
-    beforeEach(function() {
+    beforeEach(() => {
       message_et = new z.entity.MemberMessage();
     });
 
-    it('can return correct string for more then one users', function() {
+    it('can return correct string for more then one users', () => {
       const user_a = new z.entity.User(z.util.create_random_uuid());
       user_a.name('John');
       message_et.user_ets.push(user_a);
       expect(message_et._generate_name_string()).toBe('John');
     });
 
-    it('can return correct string for more then one users', function() {
+    it('can return correct string for more then one users', () => {
       const user_a = new z.entity.User(z.util.create_random_uuid());
       user_a.name('John');
       const user_b = new z.entity.User(z.util.create_random_uuid());
@@ -45,7 +45,7 @@ describe('Message Entities', function() {
       expect(message_et._generate_name_string()).toBe('John and Jim');
     });
 
-    it('can return correct string for more then one users', function() {
+    it('can return correct string for more then one users', () => {
       const user_a = new z.entity.User(z.util.create_random_uuid());
       user_a.name('John');
       const user_b = new z.entity.User(z.util.create_random_uuid());
@@ -56,7 +56,7 @@ describe('Message Entities', function() {
       expect(message_et._generate_name_string()).toBe('John, Jim and Jill');
     });
 
-    it('can return correct string for more then one users without sender', function() {
+    it('can return correct string for more then one users without sender', () => {
       const user_sender = new z.entity.User(z.util.create_random_uuid());
       user_sender.name('Sender');
       message_et.user(user_sender);
@@ -72,19 +72,19 @@ describe('Message Entities', function() {
     });
   });
 
-  describe('is_deletable', function() {
+  describe('is_deletable', () => {
     let message_et = null;
 
-    beforeEach(function() {
+    beforeEach(() => {
       message_et = new z.entity.ContentMessage();
     });
 
-    it('should return true when message is not a file', function() {
+    it('should return true when message is not a file', () => {
       message_et.assets.push(new z.entity.Text());
       expect(message_et.is_deletable()).toBeTruthy();
     });
 
-    it('should return false when message is a file and uploading or downloading', function() {
+    it('should return false when message is a file and uploading or downloading', () => {
       const file_et = new z.entity.File();
       message_et.assets.push(file_et);
 
@@ -95,7 +95,7 @@ describe('Message Entities', function() {
       expect(message_et.is_deletable()).toBeFalsy();
     });
 
-    it('should return false when message is a file and uploading or downloading', function() {
+    it('should return false when message is a file and uploading or downloading', () => {
       const file_et = new z.entity.File();
       file_et.status(z.assets.AssetTransferState.UPLOADED);
       message_et.assets.push(file_et);
@@ -103,23 +103,23 @@ describe('Message Entities', function() {
     });
   });
 
-  describe('has_asset_file', function() {
+  describe('has_asset_file', () => {
     let message_et = null;
 
-    beforeEach(function() {
+    beforeEach(() => {
       message_et = new z.entity.ContentMessage();
     });
 
-    it('should return false by default', function() {
+    it('should return false by default', () => {
       expect(message_et.has_asset_file()).toBeFalsy();
     });
 
-    it('should return false for Text asset', function() {
+    it('should return false for Text asset', () => {
       message_et.assets.push(new z.entity.Text());
       expect(message_et.has_asset_file()).toBeFalsy();
     });
 
-    it('should return true for File asset', function() {
+    it('should return true for File asset', () => {
       message_et.assets.push(new z.entity.File());
       expect(message_et.has_asset_file()).toBeTruthy();
     });

@@ -36,17 +36,15 @@ z.lifecycle.LifecycleService = class LifecycleService {
   }
 
   get_version() {
-    return this._fetch_data(LifecycleService.CONFIG.URL.VERSION)
-      .then(({version}) => version);
+    return this._fetch_data(LifecycleService.CONFIG.URL.VERSION).then(({version}) => version);
   }
 
   _fetch_data(url) {
-    return fetch(url)
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        }
-        throw new Error(`Failed to fetch '${url}': ${response.statusText}`);
-      });
+    return fetch(url).then(response => {
+      if (response.ok) {
+        return response.json();
+      }
+      throw new Error(`Failed to fetch '${url}': ${response.statusText}`);
+    });
   }
 };

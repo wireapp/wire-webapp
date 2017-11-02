@@ -36,7 +36,7 @@ z.ViewModel.CallShortcutsViewModel = class CallShortcutsViewModel {
 
     this.joined_call = this.calling_repository.joined_call;
 
-    this.joined_call.subscribe((call_et) => {
+    this.joined_call.subscribe(call_et => {
       this._update_shortcut_subscription(call_et);
     });
   }

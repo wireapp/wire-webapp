@@ -60,11 +60,10 @@ z.media.MediaRepository = class MediaRepository {
    */
   close_audio_context() {
     if (this.audio_context && this.audio_context.state === MediaRepository.AUDIO_CONTEXT_STATE.RUNNING) {
-      this.audio_context.close()
-        .then(() => {
-          this.logger.info('Closed existing AudioContext', this.audio_context);
-          this.audio_context = undefined;
-        });
+      this.audio_context.close().then(() => {
+        this.logger.info('Closed existing AudioContext', this.audio_context);
+        this.audio_context = undefined;
+      });
     }
   }
 

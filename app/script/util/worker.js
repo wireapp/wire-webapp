@@ -24,11 +24,11 @@ window.z.util = z.util || {};
 
 z.util.Worker = class Worker {
   constructor(uri) {
-    this.post = (data) => {
-      return new Promise(function(resolve, reject) {
+    this.post = data => {
+      return new Promise((resolve, reject) => {
         const worker = new window.Worker(uri);
-        worker.onmessage = (event) => resolve(event.data);
-        worker.onerror = (error) => reject(error);
+        worker.onmessage = event => resolve(event.data);
+        worker.onerror = error => reject(error);
         worker.postMessage(data);
       });
     };

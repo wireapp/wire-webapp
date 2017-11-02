@@ -25,10 +25,7 @@ window.z.calling = z.calling || {};
 z.calling.CallingRepository = class CallingRepository {
   static get CONFIG() {
     return {
-      DATA_CHANNEL_MESSAGE_TYPES: [
-        z.calling.enum.CALL_MESSAGE_TYPE.HANGUP,
-        z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC,
-      ],
+      DATA_CHANNEL_MESSAGE_TYPES: [z.calling.enum.CALL_MESSAGE_TYPE.HANGUP, z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC],
       DEFAULT_CONFIG_TTL: 60 * 60, // 60 minutes in seconds
       MESSAGE_LOG_LENGTH: 250,
       PROTOCOL_VERSION: '3.0',
@@ -103,7 +100,6 @@ z.calling.CallingRepository = class CallingRepository {
       }
     });
 
-
     this.flow_status = undefined;
     this.debug_enabled = false;
 
@@ -138,7 +134,6 @@ z.calling.CallingRepository = class CallingRepository {
     amplify.subscribe(z.util.Logger.prototype.LOG_ON_DEBUG, this.set_debug_state.bind(this));
   }
 
-
   //##############################################################################
   // Inbound call events
   //##############################################################################
@@ -154,7 +149,10 @@ z.calling.CallingRepository = class CallingRepository {
     const {content: event_content, time: event_date, type: event_type} = event;
     const is_call = event_type === z.event.Client.CALL.E_CALL;
 
-    this.logger.info(`»» Call Event: '${event_type}' (Source: ${source})`, {event_json: JSON.stringify(event), event_object: event});
+    this.logger.info(`»» Call Event: '${event_type}' (Source: ${source})`, {
+      event_json: JSON.stringify(event),
+      event_object: event,
+    });
 
     if (is_call) {
       const is_supported_version = event_content.version === z.calling.entities.CallMessage.CONFIG.VERSION;
@@ -166,7 +164,7 @@ z.calling.CallingRepository = class CallingRepository {
       this._log_message(false, call_message_et, event_date);
 
       this._validate_message_type(call_message_et)
-        .then((conversation_et) => {
+        .then(conversation_et => {
           const is_backend_timestamp = source !== z.event.EventRepository.SOURCE.INJECTED;
           conversation_et.update_timestamp_server(call_message_et.time, is_backend_timestamp);
         })
@@ -241,13 +239,12 @@ z.calling.CallingRepository = class CallingRepository {
       switch (type) {
         case z.calling.enum.CALL_MESSAGE_TYPE.SETUP: {
           this.inject_activate_event(call_message_et, source);
-          this.user_repository.get_user_by_id(user_id)
-            .then((user_et) => {
-              amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.UNSUPPORTED_INCOMING_CALL, {
-                call_id: conversation_id,
-                first_name: user_et.name(),
-              });
+          this.user_repository.get_user_by_id(user_id).then(user_et => {
+            amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.UNSUPPORTED_INCOMING_CALL, {
+              call_id: conversation_id,
+              first_name: user_et.name(),
             });
+          });
           break;
         }
 
@@ -276,10 +273,10 @@ z.calling.CallingRepository = class CallingRepository {
 
     if (!response) {
       this.get_call_by_id(conversation_id)
-        .then((call_et) => call_et.verify_session_id(call_message_et))
-        .then((call_et) => call_et.delete_participant(user_id, client_id, z.calling.enum.TERMINATION_REASON.OTHER_USER))
-        .then((call_et) => call_et.deactivate_call(call_message_et, z.calling.enum.TERMINATION_REASON.OTHER_USER))
-        .catch((error) => {
+        .then(call_et => call_et.verify_session_id(call_message_et))
+        .then(call_et => call_et.delete_participant(user_id, client_id, z.calling.enum.TERMINATION_REASON.OTHER_USER))
+        .then(call_et => call_et.deactivate_call(call_message_et, z.calling.enum.TERMINATION_REASON.OTHER_USER))
+        .catch(error => {
           if (error.type !== z.calling.CallError.TYPE.NOT_FOUND) {
             this.inject_deactivate_event(call_message_et, source);
             throw error;
@@ -298,8 +295,8 @@ z.calling.CallingRepository = class CallingRepository {
    */
   _on_group_check(call_message_et, source) {
     this.get_call_by_id(call_message_et.conversation_id)
-      .then((call_et) => call_et.schedule_group_check())
-      .catch((error) => this._validate_incoming_call(call_message_et, source, error));
+      .then(call_et => call_et.schedule_group_check())
+      .catch(error => this._validate_incoming_call(call_message_et, source, error));
   }
 
   /**
@@ -314,10 +311,13 @@ z.calling.CallingRepository = class CallingRepository {
     const {conversation_id, client_id, user_id} = call_message_et;
 
     this.get_call_by_id(conversation_id)
-      .then((call_et) => {
+      .then(call_et => {
         const is_outgoing = call_et.state() === z.calling.enum.CALL_STATE.OUTGOING;
         if (is_outgoing) {
-          throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_SENDER, 'Remote user tried to leave outgoing call');
+          throw new z.calling.CallError(
+            z.calling.CallError.TYPE.WRONG_SENDER,
+            'Remote user tried to leave outgoing call'
+          );
         }
 
         const is_self_user = user_id === this.self_user_id();
@@ -328,7 +328,7 @@ z.calling.CallingRepository = class CallingRepository {
 
         return call_et.delete_participant(user_id, client_id, termination_reason);
       })
-      .then((call_et) => call_et.participant_left(call_message_et, termination_reason))
+      .then(call_et => call_et.participant_left(call_message_et, termination_reason))
       .catch(this._throw_message_error);
   }
 
@@ -343,7 +343,7 @@ z.calling.CallingRepository = class CallingRepository {
     const {conversation_id, response, user_id} = call_message_et;
 
     this.get_call_by_id(conversation_id)
-      .then((call_et) => {
+      .then(call_et => {
         // @todo Grant message for ongoing call
 
         this._validate_message_destination(call_et, call_message_et);
@@ -365,7 +365,7 @@ z.calling.CallingRepository = class CallingRepository {
     const {conversation_id, user_id} = call_message_et;
 
     this.get_call_by_id(conversation_id)
-      .then((call_et) => {
+      .then(call_et => {
         // @todo Grant message for ongoing call
 
         const is_self_user = user_id === this.self_user_id();
@@ -382,7 +382,7 @@ z.calling.CallingRepository = class CallingRepository {
         // Add the correct participant, start negotiating
         call_et.add_or_update_participant(user_id, call_et.self_client_joined(), call_message_et);
       })
-      .catch((error) => this._validate_incoming_call(call_message_et, source, error));
+      .catch(error => this._validate_incoming_call(call_message_et, source, error));
   }
 
   /**
@@ -398,10 +398,10 @@ z.calling.CallingRepository = class CallingRepository {
 
     if (!response) {
       this.get_call_by_id(conversation_id)
-        .then((call_et) => call_et.verify_session_id(call_message_et))
-        .then((call_et) => this._confirm_call_message(call_et, call_message_et))
-        .then((call_et) => call_et.delete_participant(user_id, client_id, termination_reason))
-        .then((call_et) => {
+        .then(call_et => call_et.verify_session_id(call_message_et))
+        .then(call_et => this._confirm_call_message(call_et, call_message_et))
+        .then(call_et => call_et.delete_participant(user_id, client_id, termination_reason))
+        .then(call_et => {
           if (!call_et.is_group) {
             call_et.deactivate_call(call_message_et, termination_reason);
           }
@@ -421,9 +421,9 @@ z.calling.CallingRepository = class CallingRepository {
     const {conversation_id, user_id} = call_message_et;
 
     this.get_call_by_id(conversation_id)
-      .then((call_et) => call_et.verify_session_id(call_message_et))
-      .then((call_et) => this._confirm_call_message(call_et, call_message_et))
-      .then((call_et) => call_et.add_or_update_participant(user_id, false, call_message_et))
+      .then(call_et => call_et.verify_session_id(call_message_et))
+      .then(call_et => this._confirm_call_message(call_et, call_message_et))
+      .then(call_et => call_et.add_or_update_participant(user_id, false, call_message_et))
       .catch(this._throw_message_error);
   }
 
@@ -438,7 +438,7 @@ z.calling.CallingRepository = class CallingRepository {
     const {conversation_id, user_id} = call_message_et;
 
     this.get_call_by_id(conversation_id)
-      .then((call_et) => {
+      .then(call_et => {
         const is_self_user = user_id !== this.self_user_id();
         if (!is_self_user) {
           throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_SENDER, 'Call rejected by wrong user');
@@ -465,22 +465,22 @@ z.calling.CallingRepository = class CallingRepository {
     const {conversation_id, response, user_id} = call_message_et;
 
     this.get_call_by_id(conversation_id)
-      .then((call_et) => {
+      .then(call_et => {
         call_et.set_remote_version(call_message_et);
 
         if (response && user_id === this.self_user_id()) {
-          this.logger.info(`Incoming call in conversation '${call_et.conversation_et.display_name()}' accepted on other device`);
+          const conversation_name = call_et.conversation_et.display_name();
+          this.logger.info(`Incoming call in conversation '${conversation_name}' accepted on other device`);
           return this.delete_call(conversation_id);
         }
 
-        return call_et.add_or_update_participant(user_id, response !== true, call_message_et)
-          .then(() => {
-            if (response) {
-              call_et.state(z.calling.enum.CALL_STATE.CONNECTING);
-            }
-          });
+        return call_et.add_or_update_participant(user_id, response !== true, call_message_et).then(() => {
+          if (response) {
+            call_et.state(z.calling.enum.CALL_STATE.CONNECTING);
+          }
+        });
       })
-      .catch((error) => this._validate_incoming_call(call_message_et, source, error));
+      .catch(error => this._validate_incoming_call(call_message_et, source, error));
   }
 
   /**
@@ -494,11 +494,11 @@ z.calling.CallingRepository = class CallingRepository {
     const {conversation_id, user_id} = call_message_et;
 
     this.get_call_by_id(conversation_id)
-      .then((call_et) => {
+      .then(call_et => {
         this._validate_message_destination(call_et, call_message_et);
         return call_et.verify_session_id(call_message_et);
       })
-      .then((call_et) => call_et.add_or_update_participant(user_id, false, call_message_et))
+      .then(call_et => call_et.add_or_update_participant(user_id, false, call_message_et))
       .catch(this._throw_message_error);
   }
 
@@ -510,10 +510,7 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {undefined} No return value
    */
   _throw_message_error(error) {
-    const expected_error_types = [
-      z.calling.CallError.TYPE.MISTARGETED_MESSAGE,
-      z.calling.CallError.TYPE.NOT_FOUND,
-    ];
+    const expected_error_types = [z.calling.CallError.TYPE.MISTARGETED_MESSAGE, z.calling.CallError.TYPE.NOT_FOUND];
 
     if (!expected_error_types.includes(error.type)) {
       throw error;
@@ -543,7 +540,11 @@ z.calling.CallingRepository = class CallingRepository {
       const promises = [this._create_incoming_call(call_message_et, source, silent_call)];
 
       if (!event_from_stream) {
-        promises.push(this.conversation_repository.grant_message(conversation_id, z.ViewModel.MODAL_CONSENT_TYPE.INCOMING_CALL, [user_id]));
+        promises.push(
+          this.conversation_repository.grant_message(conversation_id, z.ViewModel.MODAL_CONSENT_TYPE.INCOMING_CALL, [
+            user_id,
+          ])
+        );
       }
 
       Promise.all(promises)
@@ -553,7 +554,7 @@ z.calling.CallingRepository = class CallingRepository {
             this.join_call(conversation_id, media_type);
           }
         })
-        .catch((_error) => {
+        .catch(_error => {
           if (_error.type !== z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
             throw _error;
           }
@@ -574,7 +575,7 @@ z.calling.CallingRepository = class CallingRepository {
       const {dest_client_id, dest_user_id, type} = call_message_et;
 
       if (dest_user_id !== this.self_user_id() || dest_client_id !== this.client_repository.current_client().id) {
-        this.logger.log(`Ignored non-targeted call '${type}' message intended for client '${dest_client_id}' of user '${dest_user_id}'`);
+        this.logger.log(`Ignored '${type}' call message for client '${dest_client_id}' of user '${dest_user_id}'`);
         throw new z.calling.CallError(z.calling.CallError.TYPE.MISTARGETED_MESSAGE);
       }
     }
@@ -588,35 +589,31 @@ z.calling.CallingRepository = class CallingRepository {
   _validate_message_type(call_message_et) {
     const {conversation_id, type} = call_message_et;
 
-    return this.conversation_repository.get_conversation_by_id(conversation_id)
-      .then((conversation_et) => {
-        if (conversation_et.is_one2one()) {
-          const group_message_types = [
-            z.calling.enum.CALL_MESSAGE_TYPE.GROUP_CHECK,
-            z.calling.enum.CALL_MESSAGE_TYPE.GROUP_LEAVE,
-            z.calling.enum.CALL_MESSAGE_TYPE.GROUP_SETUP,
-            z.calling.enum.CALL_MESSAGE_TYPE.GROUP_START,
-          ];
+    return this.conversation_repository.get_conversation_by_id(conversation_id).then(conversation_et => {
+      if (conversation_et.is_one2one()) {
+        const group_message_types = [
+          z.calling.enum.CALL_MESSAGE_TYPE.GROUP_CHECK,
+          z.calling.enum.CALL_MESSAGE_TYPE.GROUP_LEAVE,
+          z.calling.enum.CALL_MESSAGE_TYPE.GROUP_SETUP,
+          z.calling.enum.CALL_MESSAGE_TYPE.GROUP_START,
+        ];
 
-          if (group_message_types.includes(type)) {
-            throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_CONVERSATION_TYPE);
-          }
-        } else if (conversation_et.is_group()) {
-          const one2one_message_types = [
-            z.calling.enum.CALL_MESSAGE_TYPE.SETUP,
-          ];
-
-          if (one2one_message_types.includes(type)) {
-            throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_CONVERSATION_TYPE);
-          }
-        } else {
+        if (group_message_types.includes(type)) {
           throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_CONVERSATION_TYPE);
         }
+      } else if (conversation_et.is_group()) {
+        const one2one_message_types = [z.calling.enum.CALL_MESSAGE_TYPE.SETUP];
 
-        return conversation_et;
-      });
+        if (one2one_message_types.includes(type)) {
+          throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_CONVERSATION_TYPE);
+        }
+      } else {
+        throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_CONVERSATION_TYPE);
+      }
+
+      return conversation_et;
+    });
   }
-
 
   //##############################################################################
   // Outbound call events
@@ -637,7 +634,7 @@ z.calling.CallingRepository = class CallingRepository {
     const {conversation_id, remote_user_id, type} = call_message_et;
 
     return this.get_call_by_id(conversation_id || conversation_et.id)
-      .then((call_et) => {
+      .then(call_et => {
         if (!CallingRepository.CONFIG.DATA_CHANNEL_MESSAGE_TYPES.includes(type)) {
           throw new z.calling.CallError(z.calling.CallError.TYPE.NO_DATA_CHANNEL);
         }
@@ -645,24 +642,25 @@ z.calling.CallingRepository = class CallingRepository {
         return call_et.get_participant_by_id(remote_user_id);
       })
       .then(({flow_et}) => flow_et.send_message(call_message_et))
-      .catch((error) => {
-        const expected_error_types = [
-          z.calling.CallError.TYPE.NO_DATA_CHANNEL,
-          z.calling.CallError.TYPE.NOT_FOUND,
-        ];
+      .catch(error => {
+        const expected_error_types = [z.calling.CallError.TYPE.NO_DATA_CHANNEL, z.calling.CallError.TYPE.NOT_FOUND];
 
         if (!expected_error_types.includes(error.type)) {
           throw error;
         }
 
-        return this._limit_message_recipients(call_message_et)
-          .then(({precondition_option, recipients}) => {
-            if (type === z.calling.enum.CALL_MESSAGE_TYPE.HANGUP) {
-              call_message_et.type = z.calling.enum.CALL_MESSAGE_TYPE.CANCEL;
-            }
+        return this._limit_message_recipients(call_message_et).then(({precondition_option, recipients}) => {
+          if (type === z.calling.enum.CALL_MESSAGE_TYPE.HANGUP) {
+            call_message_et.type = z.calling.enum.CALL_MESSAGE_TYPE.CANCEL;
+          }
 
-            return this.conversation_repository.send_e_call(conversation_et, call_message_et, recipients, precondition_option);
-          });
+          return this.conversation_repository.send_e_call(
+            conversation_et,
+            call_message_et,
+            recipients,
+            precondition_option
+          );
+        });
       })
       .then(() => this._log_message(true, call_message_et));
   }
@@ -700,82 +698,82 @@ z.calling.CallingRepository = class CallingRepository {
     } else if (remote_user) {
       recipients_promise = Promise.resolve({remote_user_et: remote_user, self_user_et: this.user_repository.self()});
     } else {
-      recipients_promise = this.user_repository.get_user_by_id(remote_user_id)
-        .then((remote_user_et) => ({remote_user_et: remote_user_et, self_user_et: this.user_repository.self()}));
+      recipients_promise = this.user_repository
+        .get_user_by_id(remote_user_id)
+        .then(remote_user_et => ({remote_user_et: remote_user_et, self_user_et: this.user_repository.self()}));
     }
 
-    return recipients_promise
-      .then(({remote_user_et, self_user_et}) => {
-        let precondition_option, recipients;
+    return recipients_promise.then(({remote_user_et, self_user_et}) => {
+      let precondition_option;
+      let recipients;
 
-        switch (type) {
-          case z.calling.enum.CALL_MESSAGE_TYPE.CANCEL: {
-            if (response) {
-              // Send to remote client that initiated call
-              precondition_option = true;
-              recipients = {
-                [remote_user_et.id]: [`${remote_client_id}`],
-              };
-            } else {
-              // Send to all clients of remote user
-              precondition_option = [remote_user_et.id];
-              recipients = {
-                [remote_user_et.id]: remote_user_et.devices().map((device) => device.id),
-              };
-            }
-            break;
-          }
-
-          case z.calling.enum.CALL_MESSAGE_TYPE.GROUP_SETUP:
-          case z.calling.enum.CALL_MESSAGE_TYPE.HANGUP:
-          case z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC:
-          case z.calling.enum.CALL_MESSAGE_TYPE.UPDATE: {
-            // Send to remote client that call is connected with
-            if (remote_client_id) {
-              precondition_option = true;
-              recipients = {
-                [remote_user_et.id]: [`${remote_client_id}`],
-              };
-            }
-            break;
-          }
-
-          case z.calling.enum.CALL_MESSAGE_TYPE.REJECT: {
-            // Send to all clients of self user
-            precondition_option = [self_user_et.id];
+      switch (type) {
+        case z.calling.enum.CALL_MESSAGE_TYPE.CANCEL: {
+          if (response) {
+            // Send to remote client that initiated call
+            precondition_option = true;
             recipients = {
-              [self_user_et.id]: self_user_et.devices().map((device) => device.id),
+              [remote_user_et.id]: [`${remote_client_id}`],
             };
-            break;
+          } else {
+            // Send to all clients of remote user
+            precondition_option = [remote_user_et.id];
+            recipients = {
+              [remote_user_et.id]: remote_user_et.devices().map(device => device.id),
+            };
           }
-
-          case z.calling.enum.CALL_MESSAGE_TYPE.SETUP: {
-            if (response) {
-              // Send to remote client that initiated call and all clients of self user
-              precondition_option = [self_user_et.id];
-              recipients = {
-                [remote_user_et.id]: [`${remote_client_id}`],
-                [self_user_et.id]: self_user_et.devices().map((device) => device.id),
-              };
-            } else {
-              // Send to all clients of remote user
-              precondition_option = [remote_user_et.id];
-              recipients = {
-                [remote_user_et.id]: remote_user_et.devices().map((device) => device.id),
-              };
-            }
-            break;
-          }
-
-          default: {
-            break;
-          }
+          break;
         }
 
-        return {precondition_option: precondition_option, recipients: recipients};
-      });
-  }
+        case z.calling.enum.CALL_MESSAGE_TYPE.GROUP_SETUP:
+        case z.calling.enum.CALL_MESSAGE_TYPE.HANGUP:
+        case z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC:
+        case z.calling.enum.CALL_MESSAGE_TYPE.UPDATE: {
+          // Send to remote client that call is connected with
+          if (remote_client_id) {
+            precondition_option = true;
+            recipients = {
+              [remote_user_et.id]: [`${remote_client_id}`],
+            };
+          }
+          break;
+        }
 
+        case z.calling.enum.CALL_MESSAGE_TYPE.REJECT: {
+          // Send to all clients of self user
+          precondition_option = [self_user_et.id];
+          recipients = {
+            [self_user_et.id]: self_user_et.devices().map(device => device.id),
+          };
+          break;
+        }
+
+        case z.calling.enum.CALL_MESSAGE_TYPE.SETUP: {
+          if (response) {
+            // Send to remote client that initiated call and all clients of self user
+            precondition_option = [self_user_et.id];
+            recipients = {
+              [remote_user_et.id]: [`${remote_client_id}`],
+              [self_user_et.id]: self_user_et.devices().map(device => device.id),
+            };
+          } else {
+            // Send to all clients of remote user
+            precondition_option = [remote_user_et.id];
+            recipients = {
+              [remote_user_et.id]: remote_user_et.devices().map(device => device.id),
+            };
+          }
+          break;
+        }
+
+        default: {
+          break;
+        }
+      }
+
+      return {precondition_option: precondition_option, recipients: recipients};
+    });
+  }
 
   //##############################################################################
   // Call actions
@@ -788,14 +786,14 @@ z.calling.CallingRepository = class CallingRepository {
    */
   delete_call(conversation_id) {
     this.get_call_by_id(conversation_id)
-      .then((call_et) => {
+      .then(call_et => {
         this.logger.info(`Deleting call in conversation '${conversation_id}'`, call_et);
 
         call_et.delete_call();
-        this.calls.remove((call) => call.id === conversation_id);
+        this.calls.remove(call => call.id === conversation_id);
         this.media_stream_handler.reset_media_stream();
       })
-      .catch((error) => {
+      .catch(error => {
         if (error.type !== z.calling.CallError.TYPE.NOT_FOUND) {
           throw error;
         }
@@ -811,8 +809,8 @@ z.calling.CallingRepository = class CallingRepository {
    */
   join_call(conversation_id, media_type) {
     this.get_call_by_id(conversation_id)
-      .then((call_et) => ({call_et: call_et, call_state: call_et.state()}))
-      .catch((error) => {
+      .then(call_et => ({call_et: call_et, call_state: call_et.state()}))
+      .catch(error => {
         if (error.type !== z.calling.CallError.TYPE.NOT_FOUND) {
           throw error;
         }
@@ -828,11 +826,18 @@ z.calling.CallingRepository = class CallingRepository {
             }
 
             const video_send = media_type === z.media.MediaType.AUDIO_VIDEO;
-            const prop_sync_payload = z.calling.CallMessageBuilder.create_payload_prop_sync(this.self_state, video_send, false, {conversation_id: conversation_id});
-            return this._create_outgoing_call(z.calling.CallMessageBuilder.build_prop_sync(false, undefined, prop_sync_payload));
+            const prop_sync_payload = z.calling.CallMessageBuilder.create_payload_prop_sync(
+              this.self_state,
+              video_send,
+              false,
+              {conversation_id: conversation_id}
+            );
+            return this._create_outgoing_call(
+              z.calling.CallMessageBuilder.build_prop_sync(false, undefined, prop_sync_payload)
+            );
           });
       })
-      .then((call_et) => {
+      .then(call_et => {
         this.logger.info(`Joining call in conversation '${conversation_id}'`, call_et);
 
         call_et.initiate_telemetry(media_type);
@@ -840,14 +845,13 @@ z.calling.CallingRepository = class CallingRepository {
           return call_et;
         }
 
-        return this.media_stream_handler.initiate_media_stream(conversation_id, media_type)
-          .then(() => call_et);
+        return this.media_stream_handler.initiate_media_stream(conversation_id, media_type).then(() => call_et);
       })
-      .then((call_et) => {
+      .then(call_et => {
         call_et.timings.time_step(z.telemetry.calling.CallSetupSteps.STREAM_RECEIVED);
         call_et.join_call();
       })
-      .catch((error) => {
+      .catch(error => {
         if (error.type !== z.calling.CallError.TYPE.NOT_SUPPORTED) {
           this.delete_call(conversation_id);
           if (!(error instanceof z.media.MediaError)) {
@@ -866,8 +870,11 @@ z.calling.CallingRepository = class CallingRepository {
    */
   leave_call(conversation_id, termination_reason) {
     this.get_call_by_id(conversation_id)
-      .then((call_et) => {
-        this.logger.info(`Leaving call in conversation '${conversation_id}' triggered by '${termination_reason}'`, call_et);
+      .then(call_et => {
+        this.logger.info(
+          `Leaving call in conversation '${conversation_id}' triggered by '${termination_reason}'`,
+          call_et
+        );
 
         if (call_et.state() !== z.calling.enum.CALL_STATE.ONGOING) {
           termination_reason = undefined;
@@ -876,7 +883,7 @@ z.calling.CallingRepository = class CallingRepository {
         this.media_stream_handler.release_media_stream();
         call_et.leave_call(termination_reason);
       })
-      .catch((error) => {
+      .catch(error => {
         if (error.type !== z.calling.CallError.TYPE.NOT_FOUND) {
           throw error;
         }
@@ -891,7 +898,11 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {undefined} No return value
    */
   participant_left(conversation_id, user_id) {
-    const additional_payload = z.calling.CallMessageBuilder.create_payload(conversation_id, this.self_user_id(), user_id);
+    const additional_payload = z.calling.CallMessageBuilder.create_payload(
+      conversation_id,
+      this.self_user_id(),
+      user_id
+    );
     const call_message_et = z.calling.CallMessageBuilder.build_group_leave(false, this.session_id, additional_payload);
 
     this._on_group_leave(call_message_et, z.calling.enum.TERMINATION_REASON.MEMBER_LEAVE);
@@ -904,12 +915,12 @@ z.calling.CallingRepository = class CallingRepository {
    */
   reject_call(conversation_id) {
     this.get_call_by_id(conversation_id)
-      .then((call_et) => {
+      .then(call_et => {
         this.logger.info(`Rejecting call in conversation '${conversation_id}'`, call_et);
 
         call_et.reject_call();
       })
-      .catch((error) => {
+      .catch(error => {
         if (error.type !== z.calling.CallError.TYPE.NOT_FOUND) {
           throw error;
         }
@@ -925,7 +936,7 @@ z.calling.CallingRepository = class CallingRepository {
    */
   toggle_media(conversation_id, media_type) {
     this.get_call_by_id(conversation_id)
-      .then((call_et) => call_et.toggle_media(media_type))
+      .then(call_et => call_et.toggle_media(media_type))
       .then(() => {
         switch (media_type) {
           case z.media.MediaType.AUDIO:
@@ -938,7 +949,7 @@ z.calling.CallingRepository = class CallingRepository {
             throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
         }
       })
-      .catch((error) => {
+      .catch(error => {
         if (error.type !== z.calling.CallError.TYPE.NOT_FOUND) {
           throw error;
         }
@@ -974,19 +985,18 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {Promise} Resolves when conversation supports calling
    */
   _check_calling_support(conversation_id, call_state) {
-    return this.conversation_repository.get_conversation_by_id(conversation_id)
-      .then(({participating_user_ids}) => {
-        if (!participating_user_ids().length) {
-          amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALL_EMPTY_CONVERSATION);
-          throw new z.calling.CallError(z.calling.CallError.TYPE.NOT_SUPPORTED);
-        }
+    return this.conversation_repository.get_conversation_by_id(conversation_id).then(({participating_user_ids}) => {
+      if (!participating_user_ids().length) {
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALL_EMPTY_CONVERSATION);
+        throw new z.calling.CallError(z.calling.CallError.TYPE.NOT_SUPPORTED);
+      }
 
-        const is_outgoing_call = call_state === z.calling.enum.CALL_STATE.OUTGOING;
-        if (is_outgoing_call && !z.calling.CallingRepository.supports_calling) {
-          amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.UNSUPPORTED_OUTGOING_CALL);
-          throw new z.calling.CallError(z.calling.CallError.TYPE.NOT_SUPPORTED);
-        }
-      });
+      const is_outgoing_call = call_state === z.calling.enum.CALL_STATE.OUTGOING;
+      if (is_outgoing_call && !z.calling.CallingRepository.supports_calling) {
+        amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.UNSUPPORTED_OUTGOING_CALL);
+        throw new z.calling.CallError(z.calling.CallError.TYPE.NOT_SUPPORTED);
+      }
+    });
   }
 
   /**
@@ -998,13 +1008,17 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {Promise} Resolves when the new call was joined
    */
   _check_concurrent_joined_call(new_call_id, call_state) {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const ongoing_call_id = this._self_participant_on_a_call();
 
       if (ongoing_call_id) {
         amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALL_START_ANOTHER, {
           action() {
-            amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, ongoing_call_id, z.calling.enum.TERMINATION_REASON.CONCURRENT_CALL);
+            amplify.publish(
+              z.event.WebApp.CALL.STATE.LEAVE,
+              ongoing_call_id,
+              z.calling.enum.TERMINATION_REASON.CONCURRENT_CALL
+            );
             window.setTimeout(resolve, 1000);
           },
           close() {
@@ -1021,7 +1035,6 @@ z.calling.CallingRepository = class CallingRepository {
     });
   }
 
-
   //##############################################################################
   // call entity creation
   //##############################################################################
@@ -1037,16 +1050,14 @@ z.calling.CallingRepository = class CallingRepository {
   _create_call(call_message_et, creating_user_et) {
     const {conversation_id, session_id} = call_message_et;
 
-    return this.get_call_by_id(conversation_id)
-      .catch(() => {
-        return this.conversation_repository.get_conversation_by_id(conversation_id)
-          .then((conversation_et) => {
-            const call_et = new z.calling.entities.Call(conversation_et, creating_user_et, session_id, this);
+    return this.get_call_by_id(conversation_id).catch(() => {
+      return this.conversation_repository.get_conversation_by_id(conversation_id).then(conversation_et => {
+        const call_et = new z.calling.entities.Call(conversation_et, creating_user_et, session_id, this);
 
-            this.calls.push(call_et);
-            return call_et;
-          });
+        this.calls.push(call_et);
+        return call_et;
       });
+    });
   }
 
   /**
@@ -1061,31 +1072,32 @@ z.calling.CallingRepository = class CallingRepository {
   _create_incoming_call(call_message_et, source, silent = false) {
     const {conversation_id, props, user_id} = call_message_et;
 
-    return this.user_repository.get_user_by_id(user_id)
-      .then((remote_user_et) => this._create_call(call_message_et, remote_user_et))
-      .then((call_et) => {
+    return this.user_repository
+      .get_user_by_id(user_id)
+      .then(remote_user_et => this._create_call(call_message_et, remote_user_et))
+      .then(call_et => {
         const media_type = this._get_media_type_from_properties(props);
-        this.logger.info(`Incoming '${media_type}' call in conversation '${call_et.conversation_et.display_name()}'`, call_et);
+        const conversation_name = call_et.conversation_et.display_name();
+        this.logger.info(`Incoming '${media_type}' call in conversation '${conversation_name}'`, call_et);
 
         call_et.direction = z.calling.enum.CALL_STATE.INCOMING;
         call_et.set_remote_version(call_message_et);
         call_et.state(silent ? z.calling.enum.CALL_STATE.REJECTED : z.calling.enum.CALL_STATE.INCOMING);
 
-        return call_et.add_or_update_participant(user_id, false, call_message_et)
-          .then(() => {
-            this.telemetry.set_media_type(media_type);
-            this.telemetry.track_event(z.tracking.EventName.CALLING.RECEIVED_CALL, call_et);
-            this.inject_activate_event(call_message_et, source);
+        return call_et.add_or_update_participant(user_id, false, call_message_et).then(() => {
+          this.telemetry.set_media_type(media_type);
+          this.telemetry.track_event(z.tracking.EventName.CALLING.RECEIVED_CALL, call_et);
+          this.inject_activate_event(call_message_et, source);
 
-            const event_from_web_socket = source === z.event.EventRepository.SOURCE.WEB_SOCKET;
-            if (event_from_web_socket && call_et.is_remote_video_send()) {
-              this.media_stream_handler.initiate_media_stream(call_et.id, z.media.MediaType.AUDIO_VIDEO);
-            }
+          const event_from_web_socket = source === z.event.EventRepository.SOURCE.WEB_SOCKET;
+          if (event_from_web_socket && call_et.is_remote_video_send()) {
+            this.media_stream_handler.initiate_media_stream(call_et.id, z.media.MediaType.AUDIO_VIDEO);
+          }
 
-            return call_et;
-          });
+          return call_et;
+        });
       })
-      .catch((error) => {
+      .catch(error => {
         this.delete_call(conversation_id);
 
         if (!(error instanceof z.media.MediaError)) {
@@ -1104,20 +1116,19 @@ z.calling.CallingRepository = class CallingRepository {
   _create_outgoing_call(call_message_et) {
     const {props} = call_message_et;
 
-    return this._create_call(call_message_et, this.user_repository.self())
-      .then((call_et) => {
-        const media_type = this._get_media_type_from_properties(props);
-        this.logger.info(`Outgoing '${media_type}' call in conversation '${call_et.conversation_et.display_name()}'`, call_et);
+    return this._create_call(call_message_et, this.user_repository.self()).then(call_et => {
+      const media_type = this._get_media_type_from_properties(props);
+      const conversation_name = call_et.conversation_et.display_name();
+      this.logger.info(`Outgoing '${media_type}' call in conversation '${conversation_name}'`, call_et);
 
-        call_et.direction = z.calling.enum.CALL_STATE.OUTGOING;
-        call_et.state(z.calling.enum.CALL_STATE.OUTGOING);
+      call_et.direction = z.calling.enum.CALL_STATE.OUTGOING;
+      call_et.state(z.calling.enum.CALL_STATE.OUTGOING);
 
-        this.telemetry.set_media_type(media_type);
-        this.telemetry.track_event(z.tracking.EventName.CALLING.INITIATED_CALL, call_et);
-        return call_et;
-      });
+      this.telemetry.set_media_type(media_type);
+      this.telemetry.track_event(z.tracking.EventName.CALLING.INITIATED_CALL, call_et);
+      return call_et;
+    });
   }
-
 
   //##############################################################################
   // Notifications
@@ -1142,7 +1153,11 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {undefined} No return value
    */
   inject_deactivate_event(call_message_et, source, reason) {
-    const deactivate_event = z.conversation.EventBuilder.build_voice_channel_deactivate(call_message_et, reason, this.time_offset);
+    const deactivate_event = z.conversation.EventBuilder.build_voice_channel_deactivate(
+      call_message_et,
+      reason,
+      this.time_offset
+    );
     amplify.publish(z.event.WebApp.EVENT.INJECT, deactivate_event, source);
   }
 
@@ -1154,7 +1169,6 @@ z.calling.CallingRepository = class CallingRepository {
   update_time_offset(time_offset) {
     this.time_offset = time_offset;
   }
-
 
   //##############################################################################
   // Helper functions
@@ -1235,7 +1249,6 @@ z.calling.CallingRepository = class CallingRepository {
     return false;
   }
 
-
   //##############################################################################
   // Calling config
   //##############################################################################
@@ -1261,7 +1274,8 @@ z.calling.CallingRepository = class CallingRepository {
 
   _clear_config() {
     if (this.calling_config) {
-      this.logger.debug(`Removing calling configuration with expiration of '${this.calling_config.expiration.toISOString()}'`);
+      const expiration_date = this.calling_config.expiration.toISOString();
+      this.logger.debug(`Removing calling configuration with expiration of '${expiration_date}'`);
       this.calling_config = undefined;
     }
   }
@@ -1280,29 +1294,27 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {Promise} Resolves with the updated calling config
    */
   _get_config_from_backend() {
-    return this.calling_service.get_config()
-      .then((calling_config) => {
-        if (calling_config) {
-          this._clear_config_timeout();
+    return this.calling_service.get_config().then(calling_config => {
+      if (calling_config) {
+        this._clear_config_timeout();
 
-          const ttl = (calling_config.ttl * .9) || CallingRepository.CONFIG.DEFAULT_CONFIG_TTL;
-          const timeout = Math.min(ttl, CallingRepository.CONFIG.DEFAULT_CONFIG_TTL) * 1000;
-          const expiration_date = new Date(Date.now() + timeout);
-          calling_config.expiration = expiration_date;
+        const ttl = calling_config.ttl * 0.9 || CallingRepository.CONFIG.DEFAULT_CONFIG_TTL;
+        const timeout = Math.min(ttl, CallingRepository.CONFIG.DEFAULT_CONFIG_TTL) * 1000;
+        const expiration_date = new Date(Date.now() + timeout);
+        calling_config.expiration = expiration_date;
 
-          this.logger.info(`Updated calling configuration expires on '${expiration_date.toISOString()}'`, calling_config);
-          this.calling_config = calling_config;
+        this.logger.info(`Updated calling configuration expires on '${expiration_date.toISOString()}'`, calling_config);
+        this.calling_config = calling_config;
 
-          this.calling_config_timeout = window.setTimeout(() => {
-            this._clear_config();
-            this.get_config();
-          }, timeout);
+        this.calling_config_timeout = window.setTimeout(() => {
+          this._clear_config();
+          this.get_config();
+        }, timeout);
 
-          return this.calling_config;
-        }
-      });
+        return this.calling_config;
+      }
+    });
   }
-
 
   //##############################################################################
   // Logging
@@ -1333,9 +1345,9 @@ z.calling.CallingRepository = class CallingRepository {
           }
         }
       })
-      .then((call_et) => {
+      .then(call_et => {
         if (call_et) {
-          return this._send_report(call_et.get_flows().map((flow_et) => flow_et.report_status()));
+          return this._send_report(call_et.get_flows().map(flow_et => flow_et.report_status()));
         }
 
         if (this.flow_status) {

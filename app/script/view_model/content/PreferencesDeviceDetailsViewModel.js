@@ -41,7 +41,7 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
     this.self_user = this.client_repository.self_user;
 
     this.device = ko.observable();
-    this.device.subscribe((device_et) => {
+    this.device.subscribe(device_et => {
       if (device_et) {
         this.session_reset_state(z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET);
         this.fingerprint('');
@@ -54,7 +54,9 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
       }
     });
 
-    this.session_reset_state = ko.observable(z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET);
+    this.session_reset_state = ko.observable(
+      z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET
+    );
     this.fingerprint = ko.observable('');
 
     this.activated_in = ko.observable(z.l10n.text(z.string.preferences_devices_activated_in));
@@ -72,19 +74,17 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
   }
 
   _update_device_location(location) {
-    z.location.get_location(location.lat, location.lon)
-      .then((retrieved_location) => {
-        if (retrieved_location) {
-          this._update_activation_location(`${retrieved_location.place}, ${retrieved_location.country_code}`);
-        }
-      });
+    z.location.get_location(location.lat, location.lon).then(retrieved_location => {
+      if (retrieved_location) {
+        this._update_activation_location(`${retrieved_location.place}, ${retrieved_location.country_code}`);
+      }
+    });
   }
 
   _update_fingerprint() {
-    this.cryptography_repository.get_remote_fingerprint(this.self_user().id, this.device().id)
-      .then((fingerprint) => {
-        this.fingerprint(fingerprint);
-      });
+    this.cryptography_repository.get_remote_fingerprint(this.self_user().id, this.device().id).then(fingerprint => {
+      this.fingerprint(fingerprint);
+    });
   }
 
   click_on_details_close() {
@@ -95,17 +95,20 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
   click_on_reset_session() {
     this.session_reset_state(z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.ONGOING);
 
-    this.conversation_repository.reset_session(this.self_user().id, this.device().id, this.conversation_repository.self_conversation().id)
+    this.conversation_repository
+      .reset_session(this.self_user().id, this.device().id, this.conversation_repository.self_conversation().id)
       .then(() => {
         window.setTimeout(() => {
-          this.session_reset_state(z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.CONFIRMATION);
+          this.session_reset_state(
+            z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.CONFIRMATION
+          );
         }, 550);
 
         window.setTimeout(() => {
           this.session_reset_state(z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET);
         }, 5000);
       })
-      .catch((error) => {
+      .catch(error => {
         this.session_reset_state(z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET);
         throw error;
       });
@@ -113,12 +116,11 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
 
   click_on_remove_device() {
     amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.REMOVE_DEVICE, {
-      action: (password) => {
+      action: password => {
         // @todo Add failure case ux WEBAPP-3570
-        this.client_repository.delete_client(this.device().id, password)
-          .then(() => {
-            this.click_on_details_close();
-          });
+        this.client_repository.delete_client(this.device().id, password).then(() => {
+          this.click_on_details_close();
+        });
       },
       data: this.device().model,
     });

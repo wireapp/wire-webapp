@@ -21,34 +21,33 @@
 
 'use strict';
 
-
-describe('l10n', function() {
-  it('can get localized strings', function() {
+describe('l10n', () => {
+  it('can get localized strings', () => {
     const text = z.l10n.text(z.string.wire);
     expect(text).toBe(z.string.wire);
   });
 
-  it('can get localized strings when value is observable', function() {
+  it('can get localized strings when value is observable', () => {
     const text = z.l10n.text(ko.observable(z.string.wire));
     expect(text).toBe(z.string.wire);
   });
 
-  it('can replace placeholders in localized strings using shorthand string version', function() {
+  it('can replace placeholders in localized strings using shorthand string version', () => {
     const text = z.l10n.text('Hey {{name}}', 'Tod');
     expect(text).toBe('Hey Tod');
   });
 
-  it('can replace placeholders in localized strings using an object', function() {
+  it('can replace placeholders in localized strings using an object', () => {
     const text = z.l10n.text('Hey {{name}}', {name: 'Tod'});
     expect(text).toBe('Hey Tod');
   });
 
-  it('can replace placeholders in localized strings using a more complex object', function() {
+  it('can replace placeholders in localized strings using a more complex object', () => {
     const text = z.l10n.text('{{greeting}} {{name}}', {greeting: 'Hey', name: 'Tod'});
     expect(text).toBe('Hey Tod');
   });
 
-  it('can replace duplicate placeholders in localized strings using a more complex object', function() {
+  it('can replace duplicate placeholders in localized strings using a more complex object', () => {
     const text = z.l10n.text('{{greeting}} {{greeting}} {{name}}', {greeting: 'Hey', name: 'Tod'});
     expect(text).toBe('Hey Hey Tod');
   });

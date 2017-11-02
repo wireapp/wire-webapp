@@ -26,7 +26,7 @@ z.auth.AccessTokenError = class AccessTokenError extends Error {
   constructor(type) {
     super();
     this.name = this.constructor.name;
-    this.stack = (new Error()).stack;
+    this.stack = new Error().stack;
     this.type = type || AccessTokenError.TYPE.UNKNOWN;
 
     switch (this.type) {

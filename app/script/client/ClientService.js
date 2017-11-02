@@ -52,7 +52,7 @@ z.client.ClientService = class ClientService {
         password,
       },
       type: 'DELETE',
-      url: this.client.create_url(`${z.client.ClientService.URL_CLIENTS}/${client_id}`),
+      url: this.client.create_url(`${ClientService.URL_CLIENTS}/${client_id}`),
     });
   }
 
@@ -65,7 +65,7 @@ z.client.ClientService = class ClientService {
     return this.client.send_json({
       data: {},
       type: 'DELETE',
-      url: this.client.create_url(`${z.client.ClientService.URL_CLIENTS}/${client_id}`),
+      url: this.client.create_url(`${ClientService.URL_CLIENTS}/${client_id}`),
     });
   }
 
@@ -79,7 +79,7 @@ z.client.ClientService = class ClientService {
   get_client_by_id(client_id) {
     return this.client.send_request({
       type: 'GET',
-      url: this.client.create_url(`${z.client.ClientService.URL_CLIENTS}/${client_id}`),
+      url: this.client.create_url(`${ClientService.URL_CLIENTS}/${client_id}`),
     });
   }
 
@@ -91,7 +91,7 @@ z.client.ClientService = class ClientService {
   get_clients() {
     return this.client.send_request({
       type: 'GET',
-      url: this.client.create_url(z.client.ClientService.URL_CLIENTS),
+      url: this.client.create_url(ClientService.URL_CLIENTS),
     });
   }
 
@@ -105,7 +105,7 @@ z.client.ClientService = class ClientService {
   get_clients_by_user_id(user_id) {
     return this.client.send_request({
       type: 'GET',
-      url: this.client.create_url(`${z.client.ClientService.URL_USERS}/${user_id}${z.client.ClientService.URL_CLIENTS}`),
+      url: this.client.create_url(`${ClientService.URL_USERS}/${user_id}${ClientService.URL_CLIENTS}`),
     });
   }
 
@@ -118,7 +118,7 @@ z.client.ClientService = class ClientService {
     return this.client.send_json({
       data: payload,
       type: 'POST',
-      url: this.client.create_url(z.client.ClientService.URL_CLIENTS),
+      url: this.client.create_url(ClientService.URL_CLIENTS),
     });
   }
 
@@ -161,7 +161,7 @@ z.client.ClientService = class ClientService {
       .where('meta.primary_key')
       .equals(primary_key)
       .first()
-      .then((client_record) => {
+      .then(client_record => {
         if (client_record === undefined) {
           this.logger.info(`Client with primary key '${primary_key}' not found in database`);
           return primary_key;
@@ -179,13 +179,14 @@ z.client.ClientService = class ClientService {
    * @returns {Promise<Object>} Resolves with the client payload stored in database
    */
   save_client_in_db(primary_key, client_payload) {
-    if (client_payload.meta == null) {
+    if (!client_payload.meta) {
       client_payload.meta = {};
     }
 
     client_payload.meta.primary_key = primary_key;
 
-    return this.storage_service.save(z.storage.StorageService.OBJECT_STORE.CLIENTS, primary_key, client_payload)
+    return this.storage_service
+      .save(z.storage.StorageService.OBJECT_STORE.CLIENTS, primary_key, client_payload)
       .then(() => {
         this.logger.info(`Client '${client_payload.id}' stored with primary key '${primary_key}'`, client_payload);
         return client_payload;
