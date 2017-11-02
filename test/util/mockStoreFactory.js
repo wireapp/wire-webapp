@@ -17,36 +17,31 @@
  *
  */
 
-import 'babel-polyfill';
-import React from 'react';
-import ReactDOM from 'react-dom';
-import Root from './page/Root';
-import {AppContainer} from 'react-hot-loader';
-import {Provider} from 'react-redux';
-import configureStore from './configureStore';
+import * as testconfig from 'test/util/testconfig';
+import configureStore from 'redux-mock-store';
+import {createLogger} from 'redux-logger';
+import thunk from 'redux-thunk';
 
-const store = configureStore();
+const mockStoreFactory = (config = testconfig) =>
+  configureStore([
+    thunk.withExtraArgument({config}),
+    createLogger({
+      actionTransformer(action) {
+        return JSON.stringify(action);
+      },
+      colors: {
+        action: false,
+        error: false,
+        nextState: false,
+        prevState: false,
+        title: false,
+      },
+      level: {
+        action: 'info',
+        nextState: false,
+        prevState: false,
+      },
+    }),
+  ]);
 
-const render = Component => {
-  ReactDOM.render(
-    <AppContainer>
-      <Provider store={store}>
-        <Component />
-      </Provider>
-    </AppContainer>,
-    document.getElementById('main')
-  );
-};
-
-function runApp() {
-  render(Root);
-  if (module.hot) {
-    module.hot.accept('./page/Root', () => {
-      render(require('./page/Root').default);
-    });
-  }
-}
-
-runApp();
-
-export default store;
+export default mockStoreFactory;

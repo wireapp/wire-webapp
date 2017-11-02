@@ -17,36 +17,11 @@
  *
  */
 
-import 'babel-polyfill';
-import React from 'react';
-import ReactDOM from 'react-dom';
-import Root from './page/Root';
-import {AppContainer} from 'react-hot-loader';
-import {Provider} from 'react-redux';
-import configureStore from './configureStore';
+import Adapter from 'enzyme-adapter-react-16';
+import {configure} from 'enzyme';
 
-const store = configureStore();
+configure({adapter: new Adapter()});
 
-const render = Component => {
-  ReactDOM.render(
-    <AppContainer>
-      <Provider store={store}>
-        <Component />
-      </Provider>
-    </AppContainer>,
-    document.getElementById('main')
-  );
-};
-
-function runApp() {
-  render(Root);
-  if (module.hot) {
-    module.hot.accept('./page/Root', () => {
-      render(require('./page/Root').default);
-    });
-  }
-}
-
-runApp();
-
-export default store;
+// traverse all testfiles for webpack dependency resolution
+const testsContext = require.context('../../app/script', true, /test\.js$/);
+testsContext.keys().forEach(testsContext);
