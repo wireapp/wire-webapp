@@ -21,6 +21,7 @@
 /deploy
 /dist
 /doc
+/docs/auth-coverage
 /docs/coverage
 /keys
 /nbproject
