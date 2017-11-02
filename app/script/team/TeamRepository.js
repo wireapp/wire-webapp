@@ -240,7 +240,7 @@ z.team.TeamRepository = class TeamRepository {
   }
 
   _on_member_leave(event_json) {
-    const {data: {user: user_id}, team: team_id} = event_json;
+    const {data: {user: user_id}, team: team_id, time} = event_json;
     const is_local_team = this.team().id === team_id;
 
     if (is_local_team) {
@@ -250,7 +250,7 @@ z.team.TeamRepository = class TeamRepository {
       }
 
       this.team().members.remove(member => member.id === user_id);
-      amplify.publish(z.event.WebApp.TEAM.MEMBER_LEAVE, team_id, user_id);
+      amplify.publish(z.event.WebApp.TEAM.MEMBER_LEAVE, team_id, user_id, new Date(time));
     }
   }
 

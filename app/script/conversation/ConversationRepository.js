@@ -1127,9 +1127,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Team member was removed.
    * @param {string} team_id - ID of team that member was removed from
    * @param {string} user_id - ID of leaving user
+   * @param {Date} date - Date of member removal
    * @returns {undefined} No return value
    */
-  team_member_leave(team_id, user_id) {
+  team_member_leave(team_id, user_id, date) {
     this.user_repository.get_user_by_id(user_id).then(user_et => {
       this.conversations()
         .filter(conversation_et => conversation_et.team_id === team_id && !conversation_et.removed_from_conversation())
@@ -1138,7 +1139,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
             const member_leave_event = z.conversation.EventBuilder.build_team_member_leave(
               conversation_et,
               user_et,
-              this.time_offset
+              date.toISOString()
             );
             amplify.publish(z.event.WebApp.EVENT.INJECT, member_leave_event);
           }
