@@ -17,11 +17,11 @@
  *
  */
 
-const dist = 'dist/script/auth/';
-const test = 'test/util/';
+const dist = 'dist/script/auth';
+const srcTest = 'test/util';
 
 const preprocessors = {};
-preprocessors[`${dist}script.js`] = ['coverage'];
+preprocessors[`${dist}/script.js`] = ['coverage'];
 preprocessors['**/*.js'] = ['sourcemap'];
 
 module.exports = function(config) {
@@ -39,7 +39,7 @@ module.exports = function(config) {
       type: 'html',
     },
     failOnEmptyTestSuite: false,
-    files: [`${test}testmain.js`, `${dist}script.js`, `${dist}test.js`],
+    files: [`${srcTest}/testmain.js`, `${dist}/script.js`, `${dist}/test.js`],
     frameworks: ['jasmine'],
     logLevel: config.LOG_INFO,
     port: 9876,
