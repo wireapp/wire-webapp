@@ -454,51 +454,6 @@ z.util.markup_links = function(message) {
 
 // Note: We are using "Underscore.js" to escape HTML in the original message
 z.util.render_message = function(message) {
-  // Parse links with linkifyjs library, ignore code tags
-  // Keep the type of the link for later
-  /*
-  const options = {
-    attributes: function(href, type) {
-      return {'data-mdtype': type};
-    },
-    ignoreTags: ['code', 'pre'],
-    validate: {
-      hashtag: function(value) {
-        return false;
-      },
-      mention: function(value) {
-        return false;
-      },
-    },
-  };
-
-  message = linkifyHtml(message, options);
-
-  console.log('linkify: ', message);
-  // rewrite all links with markdown notation,
-  // while keeping the type in the (hijacked) title attribute
-  const linkReplacements = {};
-  const messageParts = $.parseHTML(message);
-  message = messageParts
-    .map((part) => {
-      if (part.nodeName.toUpperCase() !== 'A') {
-        return part.outerHTML || part.textContent;
-      }
-      const text = part.textContent;
-      const href = part.href;
-      const type = (part.dataset && part.dataset.mdtype) || '';
-      const mdLink = `[${text}](${href} "${type}")`;
-      linkReplacements[mdLink] = text;
-      return mdLink;
-    })
-    .join('');
-
-  console.log('replaced links: ', message);
- */
-  // define our own extended version of the link renderer for marked,
-  // to handle mailto links correctly
-
-  // apply marked using our renderer with the custom renderer
   message = marked(message, {
     highlight: function(code) {
       return hljs.highlightAuto(code).value;
@@ -506,14 +461,6 @@ z.util.render_message = function(message) {
     sanitize: true,
   });
 
-  // restore markdown notated links, if they didnt get parsed
-  // (by being inside a <code> notation for example)
-  /*
-  for (const link in linkReplacements) {
-    message = message.replace(link, linkReplacements[link]);
-    message = message.replace(escape(link), escape(linkReplacements[link]));
-  }
-*/
   // Remove this when this is merged: https://github.com/SoapBox/linkifyjs/pull/189
   message = message.replace(/\n/g, '<br />');
 

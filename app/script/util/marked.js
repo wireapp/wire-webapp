@@ -992,13 +992,7 @@
 
       return;
     }
-    /*
-    // Escape input with Underscore.js
-    src = _.escape(src);
 
-    // Preserve backticks for code statements
-    src = src.replace(/&#x60;/g, '`');
-*/
     try {
       if (opt) {
         opt = merge({}, marked.defaults, opt);
