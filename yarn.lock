@@ -70,10 +70,6 @@
   version "3.2.0"
   resolved "https://codeload.github.com/dcodeIO/Long.js/tar.gz/8cdc1f74ced4f771aa844f1cbc565b1d4c4451b8"
 
-"@bower_components/marked@wireapp/marked#18f7f85194ec0f619397f49f7dfdaa5e5b09db09":
-  version "0.3.6"
-  resolved "https://codeload.github.com/wireapp/marked/tar.gz/18f7f85194ec0f619397f49f7dfdaa5e5b09db09"
-
 "@bower_components/mixpanel@mixpanel/mixpanel-js#2.13.0":
   version "2.13.0"
   resolved "https://codeload.github.com/mixpanel/mixpanel-js/tar.gz/b0249b0547bf0ee7d39cde86c6953f2af59342d1"

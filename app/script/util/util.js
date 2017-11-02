@@ -503,6 +503,7 @@ z.util.render_message = function(message) {
     highlight: function(code) {
       return hljs.highlightAuto(code).value;
     },
+    sanitize: true,
   });
 
   // restore markdown notated links, if they didnt get parsed

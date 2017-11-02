@@ -37,8 +37,7 @@ describe('z.util.render_message', () => {
   it('renders complicated image links', () => {
     const link =
       'http://static.err.ee/gridfs/95E91BE0D28DF7236BC00EE349284A451C05949C2D04E7857BC686E4394F1585.jpg?&crop=(0,27,848,506.0960451977401)&cropxunits=848&cropyunits=595&format=jpg&quality=90&width=752&maxheight=42';
-    const link_with_entities = link.split('&').join('&amp;');
-    const expected = `<a href="${link_with_entities}" target="_blank" rel="nofollow noopener noreferrer">${link_with_entities}</a>`;
+    const expected = `<a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a>`;
     expect(z.util.render_message(link)).toBe(expected);
   });
 
