@@ -89,7 +89,7 @@ z.team.TeamRepository = class TeamRepository {
   get_team_member(team_id, user_id) {
     return this.team_service
       .get_team_member(team_id, user_id)
-      .then(member_reponse => this.team_mapper.map_member_from_object(member_reponse));
+      .then(member_response => this.team_mapper.map_member_from_object(member_response));
   }
 
   get_team_members(team_id) {
@@ -240,7 +240,7 @@ z.team.TeamRepository = class TeamRepository {
   }
 
   _on_member_leave(event_json) {
-    const {data: {user: user_id}, team: team_id} = event_json;
+    const {data: {user: user_id}, team: team_id, time} = event_json;
     const is_local_team = this.team().id === team_id;
 
     if (is_local_team) {
@@ -250,7 +250,7 @@ z.team.TeamRepository = class TeamRepository {
       }
 
       this.team().members.remove(member => member.id === user_id);
-      amplify.publish(z.event.WebApp.TEAM.MEMBER_LEAVE, team_id, user_id);
+      amplify.publish(z.event.WebApp.TEAM.MEMBER_LEAVE, team_id, user_id, new Date(time));
     }
   }
 
