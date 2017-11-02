@@ -55,17 +55,17 @@ z.ViewModel.LoadingViewModel = class LoadingViewModel {
 
         case z.string.init_decryption:
         case z.string.init_events: {
-          updated_loading_message = z.l10n.text(message_locator);
-
-          if (!z.util.Environment.frontend.is_production()) {
+          if (z.util.Environment.frontend.is_production()) {
+            updated_loading_message = z.l10n.text(message_locator);
+          } else {
             const substitutes = {
               number1: replace_content.handled,
               number2: replace_content.total,
             };
 
-            updated_loading_message = `${updated_loading_message}${z.l10n.text(message_locator, substitutes)}`;
+            const handling_progress = z.l10n.text(z.string.init_progress, substitutes);
+            updated_loading_message = `${z.l10n.text(message_locator)}${handling_progress}`;
           }
-
           break;
         }
 
