@@ -378,11 +378,7 @@
     }
 
     if (this.options.gfm) {
-      if (this.options.breaks) {
-        this.rules = inline.breaks;
-      } else {
-        this.rules = inline.gfm;
-      }
+      this.rules = this.options.breaks ? inline.breaks : inline.gfm;
     } else if (this.options.pedantic) {
       this.rules = inline.pedantic;
     }
