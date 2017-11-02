@@ -44,6 +44,7 @@ module.exports = function(config) {
         flags: ['--headless', '--disable-gpu', '--remote-debugging-port=9222'],
       },
     },
+    failOnEmptyTestSuite: false,
     files: [`${test}testmain.js`, `${dist}script.js`, `${dist}test.js`],
     frameworks: ['jasmine'],
     logLevel: config.LOG_INFO,
