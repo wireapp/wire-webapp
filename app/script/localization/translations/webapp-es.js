@@ -553,7 +553,6 @@ z.string.es.tooltip_search_close = 'Cerrar (Esc)';
 
 z.string.es.init_received_self_user = 'Hola, {{user}}.';
 z.string.es.init_received_user_data = 'Buscando mensajes nuevos';
-z.string.es.init_events_progress = 'Cargando mensajes - {{number1}} {{number2}}';
 
 z.string.es.ephememal_units_none = 'Desactivar';
 z.string.es.ephememal_units_second = 'segundo';

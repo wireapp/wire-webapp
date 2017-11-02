@@ -558,7 +558,6 @@ z.string.pt.tooltip_preferences_rename = 'Mudar o seu nome';
 z.string.pt.tooltip_search_close = 'Fechar (Esc)';
 
 z.string.pt.init_received_self_user = 'Olá {{user}}.';
-z.string.pt.init_events_progress = 'A carregar as mensagens - {{number1}} de {{number2}}';
 
 z.string.pt.ephememal_units_none = 'Desligado';
 z.string.pt.ephememal_units_second = 'segundo';

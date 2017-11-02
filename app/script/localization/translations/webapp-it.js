@@ -550,7 +550,6 @@ z.string.it.tooltip_search_close = 'Chiudi (Esc)';
 
 z.string.it.init_received_self_user = 'Ciao, {{user}}.';
 z.string.it.init_received_user_data = 'Controllo nuovi messaggi';
-z.string.it.init_events_progress = 'Caricamento messaggi - {{number1}} di {{number2}}';
 
 z.string.it.ephememal_units_none = 'Off';
 z.string.it.ephememal_units_second = 'secondo';

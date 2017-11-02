@@ -551,11 +551,9 @@ z.string.tr.tooltip_preferences_rename = 'İsminizi değiştirin';
 
 z.string.tr.tooltip_search_close = 'Kapat (Esc)';
 
-z.string.tr.init_received_access_token = 'Giriş yapıldı';
 z.string.tr.init_received_self_user = 'Merhaba, {{user}}.';
 z.string.tr.init_validated_client = 'Bağlantılarınız ve konuşmalarınız alınıyor';
 z.string.tr.init_received_user_data = 'Yeni mesajlar kontrol ediliyor';
-z.string.tr.init_events_progress = 'Mesajlar yükleniyor - {{number2}}’de {{number1}}';
 
 z.string.tr.ephememal_units_none = 'Yok';
 z.string.tr.ephememal_units_second = 'saniye';
