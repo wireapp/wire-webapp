@@ -48,5 +48,3 @@ function runApp() {
 }
 
 runApp();
-
-export default store;
