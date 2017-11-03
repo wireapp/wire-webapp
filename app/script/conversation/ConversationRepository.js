@@ -2625,11 +2625,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
           if (event_from_stream) {
             this.init_handled = this.init_handled + 1;
             if (this.init_handled % 5 === 0 || this.init_handled < 5) {
+              const content = {
+                handled: this.init_handled,
+                total: this.init_total,
+              };
               const progress = this.init_handled / this.init_total * 20 + 75;
-              amplify.publish(z.event.WebApp.APP.UPDATE_PROGRESS, progress, z.string.init_events_progress, [
-                this.init_handled,
-                this.init_total,
-              ]);
+
+              amplify.publish(z.event.WebApp.APP.UPDATE_PROGRESS, progress, z.string.init_events, content);
             }
           }
 

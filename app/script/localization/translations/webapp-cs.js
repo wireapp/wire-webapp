@@ -559,7 +559,6 @@ z.string.cs.tooltip_search_close = 'Zavřít (Esc)';
 
 z.string.cs.init_received_self_user = 'Ahoj, {{user}}.';
 z.string.cs.init_received_user_data = 'Kontrola nových zpráv';
-z.string.cs.init_events_progress = 'Načítání zpráv - {{number1}} z {{number2}}';
 
 z.string.cs.ephememal_units_none = 'Vypnout';
 z.string.cs.ephememal_units_second = 'sekunda';

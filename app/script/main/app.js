@@ -264,7 +264,7 @@ z.main.App = class App {
       .then(() => this._check_single_instance())
       .then(() => this._load_access_token())
       .then(() => {
-        this.view.loading.update_progress(2.5, z.string.init_received_access_token);
+        this.view.loading.update_progress(2.5);
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
         return Promise.all([
           this._get_user_self(),
