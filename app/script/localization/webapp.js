@@ -627,13 +627,13 @@ z.string.tooltip_preferences_rename = 'Change your name';
 z.string.tooltip_search_close = 'Close (Esc)';
 
 // App loading
-z.string.init_received_access_token = 'Signed in';
 z.string.init_received_self_user = 'Hello, {{user}}.';
 z.string.init_validated_client = 'Fetching your connections and conversations';
 z.string.init_received_user_data = 'Checking for new messages';
-z.string.init_decryption_progress = 'Decrypting messages - {{number1}} of {{number2}}';
-z.string.init_events_progress = 'Loading messages - {{number1}} of {{number2}}';
+z.string.init_decryption = 'Decrypting messages';
+z.string.init_events = 'Loading messages';
 z.string.init_updated_from_notifications = 'Almost done - Enjoy Wire';
+z.string.init_progress = ' — {{number1}} of {{number2}}';
 
 z.string.ephememal_units_none = 'Off';
 z.string.ephememal_units_second = 'second';

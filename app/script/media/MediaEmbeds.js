@@ -237,7 +237,7 @@ z.media.MediaEmbeds = (function() {
 
         // convert spotify uri: album/23... -> album:23... -> album%3A23...
         let embed = '';
-        link_src.replace(_regex.spotify, function(match, group1) {
+        link_src.replace(_regex.spotify, (match, group1) => {
           const replace_slashes = group1.replace(/\//g, ':');
           const encoded_params = window.encodeURIComponent(`:${replace_slashes}`);
           return (embed = iframe.replace('$1', encoded_params));
@@ -262,7 +262,9 @@ z.media.MediaEmbeds = (function() {
       const vimeo_color = theme_color ? theme_color.replace('#', '') : undefined;
 
       if (link_src.match(_regex.vimeo)) {
-        if (z.util.StringUtil.includes(link_src, '/user')) return message;
+        if (z.util.StringUtil.includes(link_src, '/user')) {
+          return message;
+        }
 
         const iframe = _create_iframe_container({
           src: `https://player.vimeo.com/video/$1?portrait=0&color=${vimeo_color}&badge=0`,

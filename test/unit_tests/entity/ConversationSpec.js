@@ -283,7 +283,7 @@ describe('Conversation', () => {
   describe('get_last_editable_message', () => {
     let self_user_et = undefined;
 
-    beforeEach(function() {
+    beforeEach(() => {
       self_user_et = new z.entity.User();
       self_user_et.is_me = true;
     });

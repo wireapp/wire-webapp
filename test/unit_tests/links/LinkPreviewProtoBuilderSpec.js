@@ -21,7 +21,7 @@
 
 // grunt test_init && grunt test_run:links/LinkPreviewProtoBuilder
 
-describe('LinkPreviewProtoBuilder', function() {
+describe('LinkPreviewProtoBuilder', () => {
   const compare_article_with_mock = function(url, offset, preview, mock) {
     expect(preview).toBeDefined();
     expect(preview.preview).toBe('article');
@@ -33,24 +33,24 @@ describe('LinkPreviewProtoBuilder', function() {
     expect(() => preview.toArrayBuffer()).not.toThrow();
   };
 
-  beforeAll(function(done) {
+  beforeAll(done => {
     z.util.protobuf
       .load_protos('ext/proto/generic-message-proto/messages.proto')
       .then(done)
       .catch(done.fail);
   });
 
-  it('returns undefined if no data is given', function() {
+  it('returns undefined if no data is given', () => {
     const link_preview = z.links.LinkPreviewProtoBuilder.build_from_open_graph_data();
     expect(link_preview).not.toBeDefined();
   });
 
-  it('returns undefined if data is an empty object', function() {
+  it('returns undefined if data is an empty object', () => {
     const link_preview = z.links.LinkPreviewProtoBuilder.build_from_open_graph_data({});
     expect(link_preview).not.toBeDefined();
   });
 
-  it('returns undefined if title is missing', function() {
+  it('returns undefined if title is missing', () => {
     const url = 'wire.com';
     const mock = OpenGraphMocks.getWireMock();
     delete mock.title;
@@ -58,14 +58,14 @@ describe('LinkPreviewProtoBuilder', function() {
     expect(link_preview).not.toBeDefined();
   });
 
-  it('returns a link preview if type is "website" and title is present', function() {
+  it('returns a link preview if type is "website" and title is present', () => {
     const url = 'wire.com';
     const mock = OpenGraphMocks.getWireMock();
     const link_preview = z.links.LinkPreviewProtoBuilder.build_from_open_graph_data(mock, url);
     compare_article_with_mock(url, 0, link_preview, mock);
   });
 
-  it('returns a link preview if type is image is missing', function() {
+  it('returns a link preview if type is image is missing', () => {
     const url = 'wire.com';
     const mock = OpenGraphMocks.getWireMock();
     delete mock.image;
@@ -73,14 +73,14 @@ describe('LinkPreviewProtoBuilder', function() {
     compare_article_with_mock(url, 0, link_preview, mock);
   });
 
-  it('returns a link preview if title is present and offset is given', function() {
+  it('returns a link preview if title is present and offset is given', () => {
     const url = 'wire.com';
     const mock = OpenGraphMocks.getWireMock();
     const link_preview = z.links.LinkPreviewProtoBuilder.build_from_open_graph_data(mock, url, 12);
     compare_article_with_mock(url, 12, link_preview, mock);
   });
 
-  it('returns a link preview if type is missing and title is present', function() {
+  it('returns a link preview if type is missing and title is present', () => {
     const url = 'heise.de';
     const mock = OpenGraphMocks.getHeiseMock();
     delete mock.type;
@@ -88,7 +88,7 @@ describe('LinkPreviewProtoBuilder', function() {
     compare_article_with_mock(url, 0, link_preview, mock);
   });
 
-  it('returns a link preview even if there is no description', function() {
+  it('returns a link preview even if there is no description', () => {
     const url = 'heise.de';
     const mock = OpenGraphMocks.getHeiseMock();
     delete mock.description;
@@ -96,7 +96,7 @@ describe('LinkPreviewProtoBuilder', function() {
     compare_article_with_mock(url, 0, link_preview, mock);
   });
 
-  it('returns a regular link preview even if site name is Twitter', function() {
+  it('returns a regular link preview even if site name is Twitter', () => {
     const url = 'heise.de';
     const mock = OpenGraphMocks.getHeiseMock();
     mock.site_name = 'Twitter';

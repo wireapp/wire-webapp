@@ -430,7 +430,9 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
       amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.NOT_FOUND_CAMERA);
     }
 
-    if (conversation_id) amplify.publish(z.event.WebApp.CALL.STATE.REJECT, conversation_id);
+    if (conversation_id) {
+      amplify.publish(z.event.WebApp.CALL.STATE.REJECT, conversation_id);
+    }
   }
 
   /**

@@ -21,15 +21,15 @@
 
 'use strict';
 
-describe('z.util.NumberUtil', function() {
-  describe('in_range', function() {
-    it('returns true for values inside the specified range', function() {
+describe('z.util.NumberUtil', () => {
+  describe('in_range', () => {
+    it('returns true for values inside the specified range', () => {
       expect(z.util.NumberUtil.in_range(0, 0, 2)).toBeTruthy();
       expect(z.util.NumberUtil.in_range(1, 0, 2)).toBeTruthy();
       expect(z.util.NumberUtil.in_range(1, 0, 2)).toBeTruthy();
     });
 
-    it('returns false for values outside the specified range', function() {
+    it('returns false for values outside the specified range', () => {
       expect(z.util.NumberUtil.in_range(undefined, 0, 2)).toBeFalsy();
       expect(z.util.NumberUtil.in_range(-1, 0, 2)).toBeFalsy();
       expect(z.util.NumberUtil.in_range(3, 0, 2)).toBeFalsy();

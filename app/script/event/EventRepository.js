@@ -113,11 +113,13 @@ z.event.EventRepository = class EventRepository {
               this.notifications_handled++;
 
               if (this.notifications_handled % 5 === 0 || this.notifications_handled < 5) {
+                const content = {
+                  handled: this.notifications_handled,
+                  total: this.notifications_total,
+                };
                 const progress = this.notifications_handled / this.notifications_total * 50 + 25;
-                amplify.publish(z.event.WebApp.APP.UPDATE_PROGRESS, progress, z.string.init_decryption_progress, [
-                  this.notifications_handled,
-                  this.notifications_total,
-                ]);
+
+                amplify.publish(z.event.WebApp.APP.UPDATE_PROGRESS, progress, z.string.init_decryption, content);
               }
             });
         }
@@ -483,6 +485,10 @@ z.event.EventRepository = class EventRepository {
    * @returns {undefined} No return value
    */
   inject_event(event, source = EventRepository.SOURCE.INJECTED) {
+    if (!event) {
+      throw new z.event.EventError(z.event.EventError.TYPE.NO_EVENT);
+    }
+
     const {conversation: conversation_id, id = 'ID not specified', type} = event;
     if (conversation_id !== this.user_repository.self().id) {
       this.logger.info(`Injected event ID '${id}' of type '${type}'`, event);

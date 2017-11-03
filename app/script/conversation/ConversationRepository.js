@@ -537,6 +537,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves with the Conversation
    */
   get_conversation_by_id(conversation_id) {
+    if (!_.isString(conversation_id)) {
+      const error = new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.NO_CONVERSATION_ID);
+      return Promise.reject(error);
+    }
+
     return this.find_conversation_by_id(conversation_id)
       .catch(error => {
         if (error.type === z.conversation.ConversationError.TYPE.NOT_FOUND) {
@@ -547,11 +552,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       })
       .catch(error => {
         if (error.type !== z.conversation.ConversationError.TYPE.NOT_FOUND) {
-          this.logger.log(
-            this.logger.levels.ERROR,
-            `Failed to get conversation '${conversation_id}': ${error.message}`,
-            error
-          );
+          this.logger.error(`Failed to get conversation '${conversation_id}': ${error.message}`, error);
         }
 
         throw error;
@@ -940,18 +941,20 @@ z.conversation.ConversationRepository = class ConversationRepository {
   add_members(conversation_et, user_ids) {
     return this.conversation_service
       .post_members(conversation_et.id, user_ids)
-      .then(response =>
-        amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE)
-      )
+      .then(response => {
+        if (response) {
+          amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+        }
+      })
       .catch(error => {
-        if (error.label === z.service.BackendClientError.LABEL.TOO_MANY_MEMBERS) {
+        const too_many_members = error.label === z.service.BackendClientError.LABEL.TOO_MANY_MEMBERS;
+        if (too_many_members) {
+          const open_spots = z.config.MAXIMUM_CONVERSATION_SIZE - conversation_et.get_number_of_participants();
+
           return amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.TOO_MANY_MEMBERS, {
             data: {
               max: z.config.MAXIMUM_CONVERSATION_SIZE,
-              open_spots: Math.max(
-                0,
-                z.config.MAXIMUM_CONVERSATION_SIZE - (conversation_et.number_of_participants() + 1)
-              ),
+              open_spots: Math.max(0, open_spots),
             },
           });
         }
@@ -1124,9 +1127,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Team member was removed.
    * @param {string} team_id - ID of team that member was removed from
    * @param {string} user_id - ID of leaving user
+   * @param {Date} date - Date of member removal
    * @returns {undefined} No return value
    */
-  team_member_leave(team_id, user_id) {
+  team_member_leave(team_id, user_id, date) {
     this.user_repository.get_user_by_id(user_id).then(user_et => {
       this.conversations()
         .filter(conversation_et => conversation_et.team_id === team_id && !conversation_et.removed_from_conversation())
@@ -1135,7 +1139,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
             const member_leave_event = z.conversation.EventBuilder.build_team_member_leave(
               conversation_et,
               user_et,
-              this.time_offset
+              date.toISOString()
             );
             amplify.publish(z.event.WebApp.EVENT.INJECT, member_leave_event);
           }
@@ -1321,7 +1325,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const asset_et = message_et.get_first_asset();
 
         asset_et.uploaded_on_this_client(true);
-        return this.asset_service.upload_asset(file, null, function(xhr) {
+        return this.asset_service.upload_asset(file, null, xhr => {
           xhr.upload.onprogress = event => asset_et.upload_progress(Math.round(event.loaded / event.total * 100));
           asset_et.upload_cancel = () => xhr.abort();
         });
@@ -2172,7 +2176,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   _should_send_as_external(conversation_id, generic_message) {
     return this.get_conversation_by_id(conversation_id).then(conversation_et => {
-      const estimated_number_of_clients = conversation_et.number_of_participants() * 4;
+      const estimated_number_of_clients = conversation_et.get_number_of_participants() * 4;
       const message_in_bytes = new Uint8Array(generic_message.toArrayBuffer()).length;
       const estimated_payload_in_bytes = estimated_number_of_clients * message_in_bytes;
 
@@ -2621,11 +2625,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
           if (event_from_stream) {
             this.init_handled = this.init_handled + 1;
             if (this.init_handled % 5 === 0 || this.init_handled < 5) {
+              const content = {
+                handled: this.init_handled,
+                total: this.init_total,
+              };
               const progress = this.init_handled / this.init_total * 20 + 75;
-              amplify.publish(z.event.WebApp.APP.UPDATE_PROGRESS, progress, z.string.init_events_progress, [
-                this.init_handled,
-                this.init_total,
-              ]);
+
+              amplify.publish(z.event.WebApp.APP.UPDATE_PROGRESS, progress, z.string.init_events, content);
             }
           }
 
@@ -3563,7 +3569,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   _track_completed_media_action(conversation_et, generic_message, call_message_et) {
-    let ephemeral_time, message, message_content_type;
+    let ephemeral_time;
+    let message;
+    let message_content_type;
 
     const is_ephemeral = generic_message.content === z.cryptography.GENERIC_MESSAGE_TYPE.EPHEMERAL;
     if (is_ephemeral) {

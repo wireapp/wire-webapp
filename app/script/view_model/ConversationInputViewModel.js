@@ -248,7 +248,7 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
             type: file.type,
           });
           amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
-          window.setTimeout(function() {
+          window.setTimeout(() => {
             amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.UPLOAD_TOO_LARGE, {
               data: z.util.format_bytes(z.config.MAXIMUM_ASSET_FILE_SIZE),
             });

@@ -109,7 +109,7 @@ z.conversation.ConversationService = class ConversationService {
     let all_conversations = [];
 
     const _get_conversations = conversation_id => {
-      return this.get_conversations(limit, conversation_id).then(function({conversations, has_more}) {
+      return this.get_conversations(limit, conversation_id).then(({conversations, has_more}) => {
         if (conversations.length) {
           all_conversations = all_conversations.concat(conversations);
         }
@@ -303,7 +303,7 @@ z.conversation.ConversationService = class ConversationService {
     return this.storage_service
       .delete(z.storage.StorageService.OBJECT_STORE.CONVERSATIONS, conversation_id)
       .then(primary_key => {
-        this.logger.log(this.logger.levels.INFO, `State of conversation '${primary_key}' was deleted`);
+        this.logger.info(`State of conversation '${primary_key}' was deleted`);
         return primary_key;
       });
   }
@@ -359,8 +359,8 @@ z.conversation.ConversationService = class ConversationService {
       .where('time')
       .between(min_date.toISOString(), new Date().toISOString())
       .toArray()
-      .then(function(events) {
-        const conversations = events.reduce(function(accumulated, event) {
+      .then(events => {
+        const conversations = events.reduce((accumulated, event) => {
           if (accumulated[event.conversation]) {
             accumulated[event.conversation] = accumulated[event.conversation] + 1;
           } else {
@@ -541,7 +541,7 @@ z.conversation.ConversationService = class ConversationService {
     return this.storage_service
       .save(z.storage.StorageService.OBJECT_STORE.CONVERSATIONS, conversation_et.id, conversation_et.serialize())
       .then(primary_key => {
-        this.logger.log(this.logger.levels.INFO, `State of conversation '${primary_key}' was stored`);
+        this.logger.info(`State of conversation '${primary_key}' was stored`);
         return conversation_et;
       });
   }

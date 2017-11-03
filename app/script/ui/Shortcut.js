@@ -180,7 +180,7 @@ window.z.ui = z.ui || {};
       _register_event(replaced_shortcut, event);
     }
 
-    return keyboardJS.on(platform_specific_shortcut, function(inputEvent) {
+    return keyboardJS.on(platform_specific_shortcut, inputEvent => {
       keyboardJS.releaseKey(inputEvent.keyCode);
 
       // hotfix WEBAPP-1916
@@ -236,7 +236,7 @@ window.z.ui = z.ui || {};
       if (z.util.Environment.desktop && shortcut_map[shortcut].shortcut.electron.menu) {
         continue;
       }
-      _register_event(get_shortcut(shortcut), data['event']);
+      _register_event(get_shortcut(shortcut), data.event);
     }
   }
 

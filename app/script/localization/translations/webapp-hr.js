@@ -473,7 +473,6 @@ z.string.hr.tooltip_search_close = 'Zatvori (Esc)';
 
 z.string.hr.init_received_self_user = 'Pozdrav, {{user}}.';
 z.string.hr.init_received_user_data = 'Provjeravanje novih poruka';
-z.string.hr.init_events_progress = 'Učitavanje poruka - {{number1}} {{number2}}';
 
 z.string.hr.ephememal_units_none = 'Isključi';
 z.string.hr.ephememal_units_second = 'sekunda';

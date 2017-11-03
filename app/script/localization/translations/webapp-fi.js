@@ -560,7 +560,6 @@ z.string.fi.tooltip_search_close = 'Sulje (Esc)';
 
 z.string.fi.init_received_self_user = 'He, {{user}}.';
 z.string.fi.init_received_user_data = 'Tarkistetaan uusia viestejä';
-z.string.fi.init_events_progress = 'Ladataan viestejä: {{number1}} {{number2}}';
 
 z.string.fi.ephememal_units_none = 'Pois päältä';
 z.string.fi.ephememal_units_second = 'sekunti';

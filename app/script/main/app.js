@@ -121,7 +121,7 @@ z.main.App = class App {
       repositories.user
     );
 
-    repositories.bot = new z.bot.BotRepository(this.service.bot, repositories.conversation);
+    repositories.bot = new z.bot.BotRepository(repositories.conversation);
     repositories.calling = new z.calling.CallingRepository(
       this.service.calling,
       repositories.client,
@@ -150,7 +150,6 @@ z.main.App = class App {
     const services = {};
 
     services.asset = new z.assets.AssetService(this.auth.client);
-    services.bot = new z.bot.BotService();
     services.calling = new z.calling.CallingService(this.auth.client);
     services.connect = new z.connect.ConnectService(this.auth.client);
     services.connect_google = new z.connect.ConnectGoogleService(this.auth.client);
@@ -265,7 +264,7 @@ z.main.App = class App {
       .then(() => this._check_single_instance())
       .then(() => this._load_access_token())
       .then(() => {
-        this.view.loading.update_progress(2.5, z.string.init_received_access_token);
+        this.view.loading.update_progress(2.5);
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
         return Promise.all([
           this._get_user_self(),
@@ -316,9 +315,10 @@ z.main.App = class App {
         this.repository.conversation.map_connections(this.repository.user.connections());
         this._subscribe_to_unload_events();
 
-        return Promise.all([this.repository.event.initialize_from_stream(), this.repository.team.get_team()]);
+        return this.repository.team.get_team();
       })
-      .then(([notifications_count, team_et]) => {
+      .then(() => this.repository.event.initialize_from_stream())
+      .then(notifications_count => {
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
         this.telemetry.add_statistic(
           z.telemetry.app_init.AppInitStatisticsValue.NOTIFICATIONS,
@@ -527,10 +527,14 @@ z.main.App = class App {
    * @returns {undefined} Not return value
    */
   _handle_url_params() {
-    const bot_name = z.util.get_url_parameter(z.auth.URLParameter.BOT);
-    if (bot_name) {
-      this.logger.info(`Found bot token '${bot_name}'`);
-      this.repository.bot.add_bot(bot_name);
+    const botName = z.util.get_url_parameter(z.auth.URLParameter.BOT_NAME);
+    if (botName) {
+      const botProvider = z.util.get_url_parameter(z.auth.URLParameter.BOT_PROVIDER);
+      const botService = z.util.get_url_parameter(z.auth.URLParameter.BOT_SERVICE);
+      if (botProvider && botService) {
+        this.logger.info(`Found bot token '${botName}'`);
+        this.repository.bot.add_bot({botName, botProvider, botService});
+      }
     }
   }
 
@@ -652,7 +656,7 @@ z.main.App = class App {
           self_user.email() || self_user.phone()
         );
 
-        Object.keys(amplify.store()).forEach(function(amplify_key) {
+        Object.keys(amplify.store()).forEach(amplify_key => {
           if (
             !(amplify_key === cookie_label_key && clear_data) &&
             z.util.StringUtil.includes(amplify_key, z.storage.StorageKey.AUTH.COOKIE_LABEL)
@@ -804,7 +808,7 @@ z.main.App = class App {
 // Setting up the App
 //##############################################################################
 
-$(function() {
+$(() => {
   if ($('#wire-main-app').length !== 0) {
     wire.app = new z.main.App(wire.auth);
   }

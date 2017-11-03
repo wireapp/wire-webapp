@@ -61,7 +61,9 @@ z.util.PromiseQueue = class PromiseQueue {
    * @returns {undefined} No return value
    */
   execute() {
-    if (this._paused || this._blocked) return;
+    if (this._paused || this._blocked) {
+      return;
+    }
 
     const queue_entry = this._queue.shift();
     if (queue_entry) {

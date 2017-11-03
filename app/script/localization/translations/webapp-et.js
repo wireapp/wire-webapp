@@ -559,11 +559,9 @@ z.string.et.tooltip_preferences_rename = 'Muuda oma nime';
 
 z.string.et.tooltip_search_close = 'Sulge (Esc)';
 
-z.string.et.init_received_access_token = 'Sisse logitud';
 z.string.et.init_received_self_user = 'Tere, {{user}}.';
 z.string.et.init_validated_client = 'Toon ühendusi ja vestlusi';
 z.string.et.init_received_user_data = 'Kontrollin uusi sõnumeid';
-z.string.et.init_events_progress = 'Laadin sõnumeid - {{number1}}/{{number2}}';
 
 z.string.et.ephememal_units_none = 'Väljas';
 z.string.et.ephememal_units_second = 'sekund';

@@ -21,7 +21,7 @@
 
 'use strict';
 
-describe('z.service.BackendClient', function() {
+describe('z.service.BackendClient', () => {
   let backend_client = null;
   let server = null;
 
@@ -30,31 +30,31 @@ describe('z.service.BackendClient', function() {
     websocket_url: 'wss://localhost',
   };
 
-  beforeEach(function() {
+  beforeEach(() => {
     backend_client = new z.service.BackendClient(urls);
     backend_client.logger.level = backend_client.logger.levels.ERROR;
   });
 
-  afterEach(function() {
+  afterEach(() => {
     backend_client = null;
   });
 
-  describe('execute_on_connectivity', function() {
-    beforeEach(function() {
+  describe('execute_on_connectivity', () => {
+    beforeEach(() => {
       jasmine.clock().install();
       server = sinon.fakeServer.create();
       spyOn(backend_client, 'status').and.callThrough();
     });
 
-    afterEach(function() {
+    afterEach(() => {
       jasmine.clock().uninstall();
       server.restore();
     });
 
-    it('executes callback when backend status is ok', function(done) {
+    it('executes callback when backend status is ok', done => {
       backend_client
         .execute_on_connectivity()
-        .then(function() {
+        .then(() => {
           expect(backend_client.status).toHaveBeenCalled();
           expect(backend_client.status).toHaveBeenCalledTimes(1);
           done();
@@ -65,10 +65,10 @@ describe('z.service.BackendClient', function() {
       server.requests[0].respond(200);
     });
 
-    it('executes callback when backend status return an error', function(done) {
+    it('executes callback when backend status return an error', done => {
       backend_client
         .execute_on_connectivity()
-        .then(function() {
+        .then(() => {
           expect(backend_client.status).toHaveBeenCalled();
           expect(backend_client.status).toHaveBeenCalledTimes(1);
           done();
@@ -79,7 +79,7 @@ describe('z.service.BackendClient', function() {
       server.requests[0].respond(401);
     });
 
-    it('does not execute callback when request times out', function(done) {
+    it('does not execute callback when request times out', done => {
       backend_client
         .execute_on_connectivity()
         .then(response => done.fail(response))
@@ -93,10 +93,10 @@ describe('z.service.BackendClient', function() {
       done();
     });
 
-    it('executes callback when it retries after failure', function(done) {
+    it('executes callback when it retries after failure', done => {
       backend_client
         .execute_on_connectivity()
-        .then(function() {
+        .then(() => {
           expect(backend_client.status).toHaveBeenCalledTimes(2);
           done();
         })
@@ -110,7 +110,7 @@ describe('z.service.BackendClient', function() {
       server.requests[1].respond(401);
     });
 
-    it('does not execute the callback when it retries after failure and fails again', function(done) {
+    it('does not execute the callback when it retries after failure and fails again', done => {
       backend_client
         .execute_on_connectivity()
         .then(response => done.fail(response))
@@ -124,11 +124,11 @@ describe('z.service.BackendClient', function() {
     });
   });
 
-  describe('_send_request', function() {
+  describe('_send_request', () => {
     let config = undefined;
     const url = 'http://localhost/user';
 
-    beforeAll(function() {
+    beforeAll(() => {
       config = {
         timeout: 100,
         type: 'GET',
@@ -136,18 +136,18 @@ describe('z.service.BackendClient', function() {
       };
     });
 
-    beforeEach(function() {
+    beforeEach(() => {
       backend_client.request_queue.pause();
       jasmine.clock().install();
       server = sinon.fakeServer.create();
     });
 
-    afterEach(function() {
+    afterEach(() => {
       jasmine.clock().uninstall();
       server.restore();
     });
 
-    it('should resolve with the request payload', function(done) {
+    it('should resolve with the request payload', done => {
       backend_client
         ._send_request(config)
         .then(done)
@@ -155,7 +155,7 @@ describe('z.service.BackendClient', function() {
       server.requests[0].respond(200);
     });
 
-    it('should cache the request if it was unauthorized', function(done) {
+    it('should cache the request if it was unauthorized', done => {
       const token_refresh = jasmine.createSpy('token_refresh');
       amplify.subscribe(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, token_refresh);
 
@@ -171,7 +171,7 @@ describe('z.service.BackendClient', function() {
       done();
     });
 
-    it('should cache the request if it timed out', function(done) {
+    it('should cache the request if it timed out', done => {
       spyOn(backend_client, 'execute_on_connectivity').and.returnValue(Promise.resolve());
 
       backend_client
@@ -186,10 +186,10 @@ describe('z.service.BackendClient', function() {
     });
   });
 
-  describe('send_json', function() {
+  describe('send_json', () => {
     let original_config = undefined;
 
-    beforeEach(function() {
+    beforeEach(() => {
       original_config = {
         data: 'data',
         headers: {
@@ -203,8 +203,8 @@ describe('z.service.BackendClient', function() {
       };
     });
 
-    it('passes all params to send_request', function(done) {
-      spyOn(backend_client, 'send_request').and.callFake(function(config) {
+    it('passes all params to send_request', done => {
+      spyOn(backend_client, 'send_request').and.callFake(config => {
         expect(config.callback).toBe(original_config.callback);
         expect(config.contentType).toBe('application/json; charset=utf-8');
         expect(config.headers['X-TEST-HEADER']).toBe(original_config.headers['X-TEST-HEADER']);

@@ -5,6 +5,8 @@ dist: trusty
 # https://docs.travis-ci.com/user/encryption-keys/
 env:
   global:
+    # GH_TOKEN
+    - secure: "RBfGLbP6pA2CxVd4giTDy37HWtK47rAbMYNIJZxBtwqZSMNcxGHquIcll5hnSno2n1M5rTKRuL3dTdT45ZJtzzZ0twsD96yjD3ltV3r5wVsX2QHudx9weUSZ1pCK3vy9bPSHbSj8Uwy8FZCXphQmtKNT6Rk3gn3UhowYDnFhKbuFRMYsauT+bYmXihWeRY9kDZ1YIsGfLPPwLXg212ngiALrfP6e0ucLxcT2vYu02xhaZlZlcnY3mrMJtNXkI58lTqWN0MLyC6IyAuCJ8X0VQwrjFJ6ebFKqP7QpenV7978jNVKEeMM29bgzd8wjekGj/zZ/KKvXcRtfciFCjCBTaKGdiFL8TwRj+3eN4Kz0itUf9tharPyuemm+FMJQwNHZeLnEVPzdJgdHNkQuIr8gbNxTiBvTBKDTFDv5RgLyrgz9Up6FF/DIGoJnCko0W9K8fSyUd8ZuDUrvlXkNKQXT88bZHGO6K+t3GfAMa/AghZKdfBt/sRSirVoEvI5EfqqmyHD25OJad7wHJb0CIK9jLZkOg2/2gqxbHhNYYVS6WAbM1KFwv/3hbP1139hhrDnzF1fH3eSXUuH2T+GtO5WH7Oj5su8WQWS2RZ0FKLzSL9i388U4+Mc6Q9WT/xVk1SlQFW3BTsEdfPKaCdF0HvrFoFK03iBT/wzYUUclI5N+kuk="
     # RAYGUN_USERNAME
     - secure: "F+G6JgvLfvXjSmbDrV7VWefMbAD1qaA3aSIRF2OIwJMa9h6h4F3jYaX7w3+5BVBZnoMwl7XJC7tL732aIN4rr7l+VgAB8YjAzwbnTk19LS2/g4DrIBz6GVfBOFQtG9gMtpdJJmW8Xo3bDBuOXrGE2dZipz0E46NrHIp7JtEmqnv2DSLD0RwuCS+KMwtKzO8j9ZePrdNB66IxF/hPAeHOcyQg9t/7+szxXzX58rvqjVdgbLWyt16ZoVgNInuOrECricBJ8k7A5NzCjunvOsSE3YnNe86FRycpQd+XLvozqq3ZGvwuWKHzx6PfnqEEPKVNRun9deiv08BvTVxaqr4bK8pDMZEtqlL83WQcucB1uR+ldOYnG/DVfjgoGJ5kVmEyuUJu4CwTP1GkG0+vl/Bezkvzwt00k2d22x2jdKcdICAfzSXi2cz2SqeSSxF+L4n7Eml+G8a0NyIi/ZzVLQvaW4uZc+AK+Skz2q1HCp3POU0rX9I3cQKvq703oBRmkZjZLO16gySW9DMnlwIqDrIDOAYKG8ETwYIRPqm0juwAC7WkRgGJK+DWDwv2EEJbSD1urUMRUiuJkcXa8fWTPHV5/tA89JRsAqrgYPh+u6GjV9P00u/3boZqnMDPMtPUZVxfKUjcWA0HimfvP/Z+98i40Pg2GF6yUlpy1pMypfrp5jI="
     # RAYGUN_PASSWORD
@@ -29,6 +31,15 @@ node_js:
 cache:
   directories:
     - $HOME/cryptobox
+
+before_install:
+  - yarn global add greenkeeper-lockfile@1
+
+before_script:
+  - greenkeeper-lockfile-update
+
+after_script:
+  - greenkeeper-lockfile-upload
 
 notifications:
   email: false
@@ -95,6 +106,5 @@ deploy:
 after_deploy:
   - "AUTHOR_OF_LAST_COMMIT=$(git log | grep Author: | cut -d' ' -f2- | uniq | head -n1)"
   - "SUMMARY_OF_LAST_COMMIT=$(git log -1 --pretty=%s)"
-  - npm install @wireapp/core@0.0.1
   - chmod ugo+x ./bin/deployment_notification.js
   - node ./bin/deployment_notification.js "$AUTHOR_OF_LAST_COMMIT" "$SUMMARY_OF_LAST_COMMIT"

@@ -559,11 +559,9 @@ z.string.sk.tooltip_preferences_rename = 'Zmeniť Vaše meno';
 
 z.string.sk.tooltip_search_close = 'Zavrieť (Esc)';
 
-z.string.sk.init_received_access_token = 'Prihlásený';
 z.string.sk.init_received_self_user = 'Ahoj, {{user}}.';
 z.string.sk.init_validated_client = 'Získavanie pripojení a konverzácií';
 z.string.sk.init_received_user_data = 'Kontrola nových správ';
-z.string.sk.init_events_progress = 'Načítanie správ - {{number1}} z {{number2}}';
 
 z.string.sk.ephememal_units_none = 'Vypnúť';
 z.string.sk.ephememal_units_second = 'sekunda';

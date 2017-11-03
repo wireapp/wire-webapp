@@ -551,7 +551,6 @@ z.string.el.tooltip_search_close = 'Κλείσιμο (Esc)';
 
 z.string.el.init_received_self_user = 'Γεια σου, {{user}}.';
 z.string.el.init_received_user_data = 'Ελέγξτε για νέα μηνύματα';
-z.string.el.init_events_progress = 'Φόρτωση μηνυμάτων - {{number1}} του {{number2}}';
 
 z.string.el.ephememal_units_none = 'Ανενεργό';
 z.string.el.ephememal_units_second = 'δευτερόλεπτο';

@@ -272,7 +272,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
   _show_upload_warning(warning) {
     amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
-    window.setTimeout(function() {
+    window.setTimeout(() => {
       window.alert(warning);
     }, 200);
     return Promise.reject(new z.user.UserError(z.user.UserError.TYPE.INVALID_UPDATE));

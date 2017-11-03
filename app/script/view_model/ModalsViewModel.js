@@ -120,7 +120,7 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
         this.logger.warn(`Modal of type '${type}' is not supported`);
     }
 
-    const modal = new zeta.webapp.module.Modal(type, null, function() {
+    const modal = new zeta.webapp.module.Modal(type, null, () => {
       $(type)
         .find('.modal-close')
         .off('click');
@@ -156,7 +156,7 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
 
     $(type)
       .find('.modal-action')
-      .click(function() {
+      .click(() => {
         const checkbox = $(type).find('.modal-checkbox');
         const input = $(type).find('.modal-input');
 
@@ -235,7 +235,8 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
   }
 
   _show_modal_new_device(content, title_element, message_element, action_element) {
-    let action_id, message_id;
+    let action_id;
+    let message_id;
     const joined_names = z.util.StringUtil.capitalize_first_char(
       z.util.LocalizerUtil.join_names(content.user_ets, z.string.Declension.NOMINATIVE)
     );

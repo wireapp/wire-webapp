@@ -21,13 +21,13 @@
 
 'use strict';
 
-describe('z.cache.CacheRepository', function() {
+describe('z.cache.CacheRepository', () => {
   const cache_repository = new z.cache.CacheRepository();
   cache_repository.logger.level = cache_repository.logger.levels.ERROR;
   const TEMP_KEY = 'should_be_deleted';
 
-  describe('clear_cache', function() {
-    beforeEach(function() {
+  describe('clear_cache', () => {
+    beforeEach(() => {
       cache_repository.clear_cache();
 
       const conversation = new z.entity.Conversation();
@@ -37,12 +37,12 @@ describe('z.cache.CacheRepository', function() {
       amplify.store(TEMP_KEY, true);
     });
 
-    it('deletes cached keys', function() {
+    it('deletes cached keys', () => {
       const deleted_keys = cache_repository.clear_cache(false);
       expect(deleted_keys.length).toBe(2);
     });
 
-    it('preserves cached conversation inputs while deleting other keys', function() {
+    it('preserves cached conversation inputs while deleting other keys', () => {
       const deleted_keys = cache_repository.clear_cache(true);
       expect(deleted_keys.length).toBe(1);
       expect(deleted_keys[0]).toBe(TEMP_KEY);
