@@ -82,17 +82,22 @@ function fixJSHeader(file) {
   fs.writeFileSync(file, fixedFile);
 }
 
-function format(file, language) {
+function addLanguageProperty(file, language) {
   const zstr = 'z.string.';
-  const zstrRegEx = new RegExp(zstr, 'g');
   const zstrl = `z.string.${language}.`;
+  const zstrRegEx = new RegExp(zstr, 'g');
   const zstrlRegEx = new RegExp(zstrl, 'g');
 
   let fixedFile = fs.readFileSync(file, 'utf8');
-  fixedFile = fixedFile.replace(/='/g, " = '");
   fixedFile = fixedFile.replace(zstrlRegEx, zstr).replace(zstrRegEx, zstrl);
-  fixedFile = fixedFile.replace(/(\r\n|\r|\n){3}/g, '\n\n');
+  fs.writeFileSync(file, fixedFile);
+}
 
+function format(file) {
+  let fixedFile = fs.readFileSync(file, 'utf8');
+  fixedFile = fixedFile.replace(/='/g, " = '");
+  fixedFile = fixedFile.replace(/'use=strict';\n/g, '');
+  fixedFile = fixedFile.replace(/(\r\n|\r|\n){3}/g, '\n\n');
   fs.writeFileSync(file, fixedFile);
 }
 
@@ -113,7 +118,8 @@ function processFiles(files) {
     const newFilename = removeCountryFromFilename(file);
     fixApostrophe(transDir(newFilename));
     fixJSHeader(transDir(newFilename));
-    format(transDir(newFilename), language);
+    addLanguageProperty(transDir(newFilename), language);
+    format(transDir(newFilename));
   });
 }
 
