@@ -561,6 +561,7 @@ z.string.uk.tooltip_search_close = 'Закрити (Esc)';
 z.string.uk.init_received_self_user = 'Привіт {{user}}.';
 z.string.uk.init_validated_client = 'Отримую список контактів та розмов';
 z.string.uk.init_received_user_data = 'Перевіряю наявність нових повідомлень';
+z.string.uk.init_updated_from_notifications = 'Майже завершено - Приємного користування!';
 
 z.string.uk.ephememal_units_none = 'Вимкнений';
 z.string.uk.ephememal_units_second = 'секунда';
