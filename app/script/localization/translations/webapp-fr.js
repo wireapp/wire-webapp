@@ -562,6 +562,7 @@ z.string.fr.tooltip_search_close = 'Fermer (Échap)';
 z.string.fr.init_received_self_user = 'Bonjour, {{user}}.';
 z.string.fr.init_validated_client = 'Téléchargement de vos contacts et de vos conversations';
 z.string.fr.init_received_user_data = 'Recherche de nouveaux messages';
+z.string.fr.init_updated_from_notifications = 'Presque terminé - Profitez de Wire';
 
 z.string.fr.ephememal_units_none = 'Désactivé';
 z.string.fr.ephememal_units_second = 'seconde';
