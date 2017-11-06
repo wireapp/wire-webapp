@@ -43,9 +43,13 @@
     "@bower_components/wire-webapp-cryptobox": "wireapp/wire-webapp-cryptobox#6.2.0",
     "@bower_components/wire-webapp-lru-cache": "wireapp/wire-webapp-lru-cache#2.0.0",
     "@bower_components/wire-webapp-proteus": "wireapp/proteus.js#5.2.0",
+    "babel-plugin-react-intl": "2.3.1",
     "babel-polyfill": "6.26.0",
+    "intl": "1.2.5",
     "react": "16.0.0",
     "react-dom": "16.0.0",
+    "react-intl": "2.4.0",
+    "react-intl-po": "2.1.1",
     "react-redux": "5.0.6",
     "redux": "3.7.2",
     "redux-logger": "3.0.6",
@@ -146,7 +150,12 @@
     "test": "yarn test:script && grunt check && grunt test && yarn test:auth",
     "bundle:test": "webpack --config webpack.config.test.js",
     "bundle:dev": "webpack --config webpack.config.dev.js",
-    "bundle:prod": "webpack --config webpack.config.prod.js"
+    "bundle:prod": "webpack --config webpack.config.prod.js",
+    "translate:buildpot": "rip json2pot 'app/i18n/**/*.json' -o app/i18n/webapp.pot",
+    "translate:extractpo": "rip po2json 'app/i18n/*.po' -m 'app/i18n/**/*.json' -o app/i18n",
+    "translate:download": "./bin/translations_download.js",
+    "translate:postprocess": "./bin/translations_post_processing.js app/script/localization/translations && ./bin/translations_post_processing.js app/i18n",
+    "translate": "yarn translate:buildpot && yarn translate:download && yarn translate:postprocess && yarn translate:extractpo && yarn fix:config"
   },
   "private": true,
   "repository": {

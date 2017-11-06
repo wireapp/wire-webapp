@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 z.string.cs.wire_macos = 'Wire pro macOS';
 z.string.cs.wire_windows = 'Wire pro Windows';
 z.string.cs.wire_linux = 'Wire pro Linux';
@@ -559,7 +557,6 @@ z.string.cs.tooltip_search_close = 'Zavřít (Esc)';
 
 z.string.cs.init_received_self_user = 'Ahoj, {{user}}.';
 z.string.cs.init_received_user_data = 'Kontrola nových zpráv';
-z.string.cs.init_events_progress = 'Načítání zpráv - {{number1}} z {{number2}}';
 
 z.string.cs.ephememal_units_none = 'Vypnout';
 z.string.cs.ephememal_units_second = 'sekunda';
@@ -570,3 +567,4 @@ z.string.cs.ephememal_units_hour = 'hodina';
 z.string.cs.ephememal_units_hours = 'hodin';
 z.string.cs.ephememal_units_day = 'den';
 z.string.cs.ephememal_units_days = 'dnů';
+

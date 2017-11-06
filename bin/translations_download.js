@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 /*
  * Wire
  * Copyright (C) 2017 Wire Swiss GmbH
@@ -17,19 +19,20 @@
  *
  */
 
-import React from 'react';
-import {indexStrings} from '../../strings';
-import {injectIntl} from 'react-intl';
-import {connect} from 'react-redux';
+const {join, resolve} = require('path');
+const {execSync} = require('child_process');
 
-const Root = ({name, intl: {formatMessage: _}}) => (
-  <h1>
-    {_(indexStrings.hello)} {name}!
-  </h1>
-);
+const root = resolve(__dirname, '..');
 
-export default injectIntl(
-  connect(state => ({
-    name: state.authState.name,
-  }))
-)(Root);
+function runCrowdin() {
+  const crowdin_yaml = join(root, 'keys', 'crowdin.yaml');
+  execSync(
+    `crowdin --identity=${crowdin_yaml} upload sources --dryrun &&
+    crowdin --identity=${crowdin_yaml} download`,
+    {
+      stdio: [0, 1],
+    }
+  );
+}
+
+runCrowdin();

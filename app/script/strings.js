@@ -17,19 +17,13 @@
  *
  */
 
-import React from 'react';
-import {indexStrings} from '../../strings';
-import {injectIntl} from 'react-intl';
-import {connect} from 'react-redux';
+import {defineMessages} from 'react-intl';
 
-const Root = ({name, intl: {formatMessage: _}}) => (
-  <h1>
-    {_(indexStrings.hello)} {name}!
-  </h1>
-);
+/* eslint-disable sort-keys */
 
-export default injectIntl(
-  connect(state => ({
-    name: state.authState.name,
-  }))
-)(Root);
+export const indexStrings = defineMessages({
+  hello: {
+    id: 'index.hello',
+    defaultMessage: 'Hello',
+  },
+});

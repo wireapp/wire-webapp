@@ -1,5 +1,14 @@
 {
-  "plugins": ["transform-object-rest-spread", "transform-class-properties"],
+  "plugins": [
+    "transform-object-rest-spread",
+    "transform-class-properties",
+    [
+      "react-intl",
+      {
+        "messagesDir": "./app/i18n"
+      }
+    ]
+  ],
   "presets": [
     "react",
     [

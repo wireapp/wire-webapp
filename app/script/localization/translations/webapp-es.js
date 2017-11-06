@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 z.string.es.wire_macos = 'Wire para macOS';
 z.string.es.wire_windows = 'Wire para Windows';
 z.string.es.wire_linux = 'Wire para Linux';
@@ -553,7 +551,6 @@ z.string.es.tooltip_search_close = 'Cerrar (Esc)';
 
 z.string.es.init_received_self_user = 'Hola, {{user}}.';
 z.string.es.init_received_user_data = 'Buscando mensajes nuevos';
-z.string.es.init_events_progress = 'Cargando mensajes - {{number1}} {{number2}}';
 
 z.string.es.ephememal_units_none = 'Desactivar';
 z.string.es.ephememal_units_second = 'segundo';
@@ -564,3 +561,4 @@ z.string.es.ephememal_units_hour = 'hora';
 z.string.es.ephememal_units_hours = 'horas';
 z.string.es.ephememal_units_day = 'día';
 z.string.es.ephememal_units_days = 'días';
+
