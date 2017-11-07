@@ -21,25 +21,25 @@
 
 // grunt test_init && grunt test_run:search/FullTextSearch
 
-describe('z.search.FullTextSearch', function() {
-  describe('search', function() {
-    it('should return false if text is not found', function() {
+describe('z.search.FullTextSearch', () => {
+  describe('search', () => {
+    it('should return false if text is not found', () => {
       expect(z.search.FullTextSearch.search('aa', '')).toBeFalsy();
       expect(z.search.FullTextSearch.search('aa', undefined)).toBeFalsy();
       expect(z.search.FullTextSearch.search('aa', 'bb')).toBeFalsy();
       expect(z.search.FullTextSearch.search('aa bb', '     ')).toBeFalsy();
     });
 
-    it('should handle special chars', function() {
+    it('should handle special chars', () => {
       expect(z.search.FullTextSearch.search('youtube.com/watch?v=pQHX-Sj', 'youtube.com/watch?v=pQHX-Sj')).toBeTruthy();
     });
 
-    it('general', function() {
+    it('general', () => {
       expect(z.search.FullTextSearch.search('aa bb', 'aa')).toBeTruthy();
       expect(z.search.FullTextSearch.search('aa cc', 'aa bb')).toBeFalsy();
     });
 
-    it('special signs', function() {
+    it('special signs', () => {
       expect(z.search.FullTextSearch.search('aa aa aa', 'aa aa')).toBeTruthy();
       expect(z.search.FullTextSearch.search('aa.bb', 'bb')).toBeTruthy();
       expect(z.search.FullTextSearch.search('aa....bb', 'bb')).toBeTruthy();
@@ -54,15 +54,17 @@ describe('z.search.FullTextSearch', function() {
       expect(z.search.FullTextSearch.search('aa:bb', 'bb')).toBeTruthy();
     });
 
-    it('special cases', function() {
+    it('special cases', () => {
       expect(z.search.FullTextSearch.search('aa 11:45 am bb', '11:45')).toBeTruthy();
-      expect(z.search.FullTextSearch.search('https://www.link.com/something-to-read?q=12&second#reader', 'something to read')).toBeTruthy();
+      expect(
+        z.search.FullTextSearch.search('https://www.link.com/something-to-read?q=12&second#reader', 'something to read')
+      ).toBeTruthy();
       expect(z.search.FullTextSearch.search('@peter', 'peter')).toBeTruthy();
       // expect(z.search.FullTextSearch.search('René', 'rene')).toBeTruthy()
       // expect(z.search.FullTextSearch.search('Håkon Bø', 'Ha')).toBeTruthy()
     });
 
-    it('transliteration', function() {
+    it('transliteration', () => {
       expect(z.search.FullTextSearch.search('bb бб bb', 'бб')).toBeTruthy();
       expect(z.search.FullTextSearch.search('bb бб bb', 'bb')).toBeTruthy();
       expect(z.search.FullTextSearch.search('苹果', '苹果')).toBeTruthy();

@@ -27,7 +27,7 @@ z.user.UserError = class UserError extends Error {
     super();
 
     this.name = this.constructor.name;
-    this.stack = (new Error()).stack;
+    this.stack = new Error().stack;
     this.type = type || UserError.TYPE.UNKNOWN;
 
     switch (this.type) {

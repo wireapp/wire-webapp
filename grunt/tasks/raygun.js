@@ -26,7 +26,7 @@
 const fs = require('fs');
 const request = require('request');
 
-module.exports = (grunt) => {
+module.exports = grunt => {
   grunt.registerTask('raygun', function(env = 'staging') {
     const done = this.async();
 
@@ -38,8 +38,8 @@ module.exports = (grunt) => {
       uri: `https://app.raygun.io/upload/jssymbols/${env === 'prod' ? '8785p7' : 'cmhb9p'}`,
     };
 
-    const files = fs.readdirSync('deploy/min').map((min_script) => {
-      grunt.log.writeln(`File deploy/min/${min_script['cyan']} will be uploaded.`);
+    const files = fs.readdirSync('deploy/min').map(min_script => {
+      grunt.log.writeln(`File deploy/min/${min_script.cyan} will be uploaded.`);
       return `deploy/min/${min_script}`;
     });
 
@@ -47,11 +47,11 @@ module.exports = (grunt) => {
     let failed_upload_count = 0;
 
     files.forEach((file, index) => {
-      grunt.log.writeln(`Adding file #${index + 1} ${files[index].toString()['cyan']} to the upload queue.`);
+      grunt.log.writeln(`Adding file #${index + 1} ${files[index].toString().cyan} to the upload queue.`);
 
       options.headers = {
-        'WireFilename': file,
-        'WireRequest': index,
+        WireFilename: file,
+        WireRequest: index,
       };
 
       const req = request.post(options, (error, response) => {
@@ -65,12 +65,14 @@ module.exports = (grunt) => {
           file = response.request.headers.WireFilename;
           number = response.request.headers.WireRequest;
 
-          grunt.log.write(`File #${number} ${file['cyan']} successfully uploaded`);
+          grunt.log.write(`File #${number} ${file.cyan} successfully uploaded`);
         } else {
           file = response.request.headers.WireFilename;
           number = response.request.headers.WireRequest;
 
-          grunt.log.error(`Upload of file #${number} ${file['cyan']} failed with code ${response.statusCode.toString()['cyan']}`);
+          grunt.log.error(
+            `Upload of file #${number} ${file.cyan} failed with code ${response.statusCode.toString().cyan}`
+          );
           failed_upload_count++;
         }
 
@@ -80,7 +82,7 @@ module.exports = (grunt) => {
           const number_of_files = (files.length - failed_upload_count).toString();
           const file_string = grunt.util.pluralize(files.length, 'file/files');
           grunt.log.writeln('');
-          grunt.log.ok(`${number_of_files['cyan']} ${file_string} uploaded to Raygun.`);
+          grunt.log.ok(`${number_of_files.cyan} ${file_string} uploaded to Raygun.`);
           done();
         } else {
           grunt.log.writeln(`, ${pending_upload_count} files remaining`);

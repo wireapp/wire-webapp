@@ -119,7 +119,7 @@ window.z.util = z.util || {};
   };
 
   z.util.Environment = {
-    _electron_version: (user_agent) => {
+    _electron_version: user_agent => {
       const result = /(Wire|WireInternal)\/(\S+)/.exec(user_agent);
       // [match, app, version]
       return result ? result[2] : undefined;

@@ -21,12 +21,12 @@
 
 'use strict';
 
-describe('z.calling.entities.CallMessage', function() {
-  describe('_create_session_id', function() {
+describe('z.calling.entities.CallMessage', () => {
+  describe('_create_session_id', () => {
     const call_message_et = new z.calling.entities.CallMessage();
 
-    it('always returns an alphanumeric string of length four', function() {
-      _.range(100).map(function() {
+    it('always returns an alphanumeric string of length four', () => {
+      _.range(100).map(() => {
         expect(call_message_et._create_session_id()).toMatch(/(\w|\d){4}/);
       });
     });

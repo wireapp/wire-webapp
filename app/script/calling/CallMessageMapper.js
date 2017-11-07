@@ -23,7 +23,6 @@ window.z = window.z || {};
 window.z.calling = z.calling || {};
 
 z.calling.CallMessageMapper = (function() {
-
   /**
    * Map incoming call message into entity.
    *

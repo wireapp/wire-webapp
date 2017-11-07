@@ -1,0 +1,5 @@
+bracketSpacing: false
+printWidth: 120
+semi: true
+singleQuote: true
+trailingComma: es5

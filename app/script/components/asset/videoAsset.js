@@ -59,11 +59,10 @@ z.components.VideoAssetComponent = class VideoAssetComponent {
   }
 
   _load_video_preview() {
-    this.asset.load_preview()
-      .then((blob) => {
-        this.video_element.setAttribute('poster', window.URL.createObjectURL(blob));
-        this.video_element.style.backgroundColor = '#000';
-      });
+    this.asset.load_preview().then(blob => {
+      this.video_element.setAttribute('poster', window.URL.createObjectURL(blob));
+      this.video_element.style.backgroundColor = '#000';
+    });
   }
 
   on_loadedmetadata() {
@@ -86,15 +85,16 @@ z.components.VideoAssetComponent = class VideoAssetComponent {
         this.video_element.play();
       }
     } else {
-      this.asset.load()
-        .then((blob) => {
+      this.asset
+        .load()
+        .then(blob => {
           this.video_src(window.URL.createObjectURL(blob));
           if (this.video_element) {
             this.video_element.play();
           }
           this.show_bottom_controls(true);
         })
-        .catch((error) => this.logger.error('Failed to load video asset ', error));
+        .catch(error => this.logger.error('Failed to load video asset ', error));
     }
   }
 
@@ -114,8 +114,7 @@ z.components.VideoAssetComponent = class VideoAssetComponent {
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.PLAYED_VIDEO_MESSAGE, {
       duration: z.util.bucket_values(duration, [0, 10, 30, 60, 300, 900, 1800]),
       duration_actual: duration,
-    }
-    );
+    });
   }
 
   dispose() {

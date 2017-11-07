@@ -66,8 +66,9 @@ z.search.SearchRepository = class SearchRepository {
    * @returns {Promise} Resolves with the search results
    */
   search_by_name(name, is_handle, max_results = SearchRepository.CONFIG.MAX_SEARCH_RESULTS) {
-    const directory_search = this.search_service.get_contacts(name, SearchRepository.CONFIG.MAX_DIRECTORY_RESULTS)
-      .then(({documents}) => documents.map((match) => match.id));
+    const directory_search = this.search_service
+      .get_contacts(name, SearchRepository.CONFIG.MAX_DIRECTORY_RESULTS)
+      .then(({documents}) => documents.map(match => match.id));
 
     const search_promises = [directory_search];
 
@@ -83,11 +84,11 @@ z.search.SearchRepository = class SearchRepository {
 
         return directory_results;
       })
-      .then((user_ids) => this.user_repository.get_users_by_id(user_ids))
-      .then((user_ets) => user_ets.filter((user_et) => !user_et.is_connected() && !user_et.is_team_member()))
-      .then((user_ets) => {
+      .then(user_ids => this.user_repository.get_users_by_id(user_ids))
+      .then(user_ets => user_ets.filter(user_et => !user_et.is_connected() && !user_et.is_team_member()))
+      .then(user_ets => {
         if (is_handle) {
-          user_ets = user_ets.filter((user_et) => z.util.StringUtil.starts_with(user_et.username(), name));
+          user_ets = user_ets.filter(user_et => z.util.StringUtil.starts_with(user_et.username(), name));
         }
 
         return user_ets

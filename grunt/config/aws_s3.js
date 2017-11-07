@@ -23,11 +23,13 @@
 
 module.exports = {
   default: {
-    files: [{
-      dest: '/<%= grunt.config("aws.deploy.options.version") %>.zip',
-      src: '<%= dir.aws.s3 %>/ebs.zip',
-      stream: true,
-    }],
+    files: [
+      {
+        dest: '/<%= grunt.config("aws.deploy.options.version") %>.zip',
+        src: '<%= dir.aws.s3 %>/ebs.zip',
+        stream: true,
+      },
+    ],
     options: {
       bucket: 'wire-webapp',
     },

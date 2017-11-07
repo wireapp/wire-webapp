@@ -85,12 +85,13 @@ z.event.NotificationService = class NotificationService {
    * @returns {Promise} Resolves with the stored last event date.
    */
   get_last_event_date_from_db() {
-    return this.storage_service.load(z.storage.StorageService.OBJECT_STORE.AMPLIFY, NotificationService.CONFIG.PRIMARY_KEY_LAST_EVENT)
-      .catch((error) => {
+    return this.storage_service
+      .load(z.storage.StorageService.OBJECT_STORE.AMPLIFY, NotificationService.CONFIG.PRIMARY_KEY_LAST_EVENT)
+      .catch(error => {
         this.logger.error(`Failed to get last event timestamp from storage: ${error.message}`, error);
         throw new z.event.EventError(z.event.EventError.TYPE.DATABASE_FAILURE);
       })
-      .then((record) => {
+      .then(record => {
         if (record && record.value) {
           return record.value;
         }
@@ -103,12 +104,13 @@ z.event.NotificationService = class NotificationService {
    * @returns {Promise} Resolves with the stored last notification ID.
    */
   get_last_notification_id_from_db() {
-    return this.storage_service.load(z.storage.StorageService.OBJECT_STORE.AMPLIFY, NotificationService.CONFIG.PRIMARY_KEY_LAST_NOTIFICATION)
-      .catch((error) => {
+    return this.storage_service
+      .load(z.storage.StorageService.OBJECT_STORE.AMPLIFY, NotificationService.CONFIG.PRIMARY_KEY_LAST_NOTIFICATION)
+      .catch(error => {
         this.logger.error(`Failed to get last notification ID from storage: ${error.message}`, error);
         throw new z.event.EventError(z.event.EventError.TYPE.DATABASE_FAILURE);
       })
-      .then((record) => {
+      .then(record => {
         if (record && record.value) {
           return record.value;
         }
@@ -121,8 +123,9 @@ z.event.NotificationService = class NotificationService {
    * @returns {Promise} Resolves with the stored missed ID.
    */
   get_missed_id_from_db() {
-    return this.storage_service.load(z.storage.StorageService.OBJECT_STORE.AMPLIFY, NotificationService.CONFIG.PRIMARY_KEY_MISSED)
-      .then((record) => {
+    return this.storage_service
+      .load(z.storage.StorageService.OBJECT_STORE.AMPLIFY, NotificationService.CONFIG.PRIMARY_KEY_MISSED)
+      .then(record => {
         if (record && record.value) {
           return record.value;
         }
@@ -135,7 +138,11 @@ z.event.NotificationService = class NotificationService {
    * @returns {Promise} Resolves with the stored record
    */
   save_last_event_date_to_db(event_date) {
-    return this.storage_service.save(z.storage.StorageService.OBJECT_STORE.AMPLIFY, NotificationService.CONFIG.PRIMARY_KEY_LAST_EVENT, {value: event_date});
+    return this.storage_service.save(
+      z.storage.StorageService.OBJECT_STORE.AMPLIFY,
+      NotificationService.CONFIG.PRIMARY_KEY_LAST_EVENT,
+      {value: event_date}
+    );
   }
 
   /**
@@ -144,7 +151,11 @@ z.event.NotificationService = class NotificationService {
    * @returns {Promise} Resolves with the stored record
    */
   save_last_notification_id_to_db(notification_id) {
-    return this.storage_service.save(z.storage.StorageService.OBJECT_STORE.AMPLIFY, NotificationService.CONFIG.PRIMARY_KEY_LAST_NOTIFICATION, {value: notification_id});
+    return this.storage_service.save(
+      z.storage.StorageService.OBJECT_STORE.AMPLIFY,
+      NotificationService.CONFIG.PRIMARY_KEY_LAST_NOTIFICATION,
+      {value: notification_id}
+    );
   }
 
   /**
@@ -153,6 +164,10 @@ z.event.NotificationService = class NotificationService {
    * @returns {Promise} Resolves with the stored record
    */
   save_missed_id_to_db(notification_id) {
-    return this.storage_service.save(z.storage.StorageService.OBJECT_STORE.AMPLIFY, NotificationService.CONFIG.PRIMARY_KEY_MISSED, {value: notification_id});
+    return this.storage_service.save(
+      z.storage.StorageService.OBJECT_STORE.AMPLIFY,
+      NotificationService.CONFIG.PRIMARY_KEY_MISSED,
+      {value: notification_id}
+    );
   }
 };

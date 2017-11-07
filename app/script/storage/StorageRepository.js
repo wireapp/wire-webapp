@@ -37,7 +37,8 @@ z.storage.StorageRepository = class StorageRepository {
    * @returns {Promise} Resolves when stores have been deleted
    */
   clear_all_stores() {
-    return this.storage_service.clear_all_stores()
+    return this.storage_service
+      .clear_all_stores()
       .then(() => this.logger.info(`Cleared database '${this.storage_service.db_name}'`));
   }
 
@@ -73,13 +74,12 @@ z.storage.StorageRepository = class StorageRepository {
    * @returns {Promise} Resolves with the retrieved value
    */
   get_value(primary_key) {
-    return this.storage_service.load(z.storage.StorageService.OBJECT_STORE.AMPLIFY, primary_key)
-      .then((record) => {
-        if (record && record.value) {
-          return record.value;
-        }
-        throw new z.storage.StorageError(z.storage.StorageError.TYPE.NOT_FOUND);
-      });
+    return this.storage_service.load(z.storage.StorageService.OBJECT_STORE.AMPLIFY, primary_key).then(record => {
+      if (record && record.value) {
+        return record.value;
+      }
+      throw new z.storage.StorageError(z.storage.StorageError.TYPE.NOT_FOUND);
+    });
   }
 
   /**

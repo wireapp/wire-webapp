@@ -33,7 +33,7 @@ z.entity.VerificationMessage = class VerificationMessage extends z.entity.Messag
     this.user_ids = ko.observableArray();
 
     this.is_self_device = ko.pureComputed(() => {
-      return (this.user_ids().length === 1) && (this.user_ids()[0] === this.user().id);
+      return this.user_ids().length === 1 && this.user_ids()[0] === this.user().id;
     });
 
     this.caption_user = ko.pureComputed(() => {

@@ -21,28 +21,28 @@
 
 // grunt test_init && grunt test_run:entity/message/File
 
-describe('z.entity.File', function() {
+describe('z.entity.File', () => {
   let file = null;
 
-  beforeEach(function() {
+  beforeEach(() => {
     file = new z.entity.File();
   });
 
-  describe('pending_upload', function() {
-    it('should be true if status is uploading and uploaded on this client', function() {
+  describe('pending_upload', () => {
+    it('should be true if status is uploading and uploaded on this client', () => {
       file.uploaded_on_this_client(true);
       file.status(z.assets.AssetTransferState.UPLOADING);
       expect(file.pending_upload()).toBeTruthy();
     });
   });
 
-  describe('is_video', function() {
-    it('should treat mp4 as video file', function() {
+  describe('is_video', () => {
+    it('should treat mp4 as video file', () => {
       file.file_type = 'video/mp4';
       expect(file.is_video()).toBeTruthy();
     });
 
-    it('should not treat images as video file', function() {
+    it('should not treat images as video file', () => {
       file.file_type = 'image/jpg';
       expect(file.is_video()).toBeFalsy();
       file.file_type = 'image/png';

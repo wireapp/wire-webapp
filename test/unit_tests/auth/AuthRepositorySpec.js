@@ -21,42 +21,43 @@
 
 'use strict';
 
-describe('z.auth.AuthRepository', function() {
+describe('z.auth.AuthRepository', () => {
   const test_factory = new TestFactory();
 
-  beforeAll(function(done) {
-    test_factory.exposeAuthActors()
+  beforeAll(done => {
+    test_factory
+      .exposeAuthActors()
       .then(done)
       .catch(done.fail);
   });
 
-  describe('_schedule_token_refresh', function() {
-    beforeEach(function() {
+  describe('_schedule_token_refresh', () => {
+    beforeEach(() => {
       spyOn(TestFactory.auth_repository, 'renew_access_token');
       jasmine.clock().install();
     });
 
-    afterEach(function() {
+    afterEach(() => {
       jasmine.clock().uninstall();
     });
 
-    afterAll(function() {
+    afterAll(() => {
       jasmine.clock().uninstall();
     });
 
-    it('renews the access token immediately if expiring in the past', function() {
+    it('renews the access token immediately if expiring in the past', () => {
       const expiration_timestamp = Date.now() - 30000;
       TestFactory.auth_repository._schedule_token_refresh(expiration_timestamp);
       expect(TestFactory.auth_repository.renew_access_token).toHaveBeenCalled();
     });
 
-    it('renews the access token immediately if expiring within the next minute', function() {
+    it('renews the access token immediately if expiring within the next minute', () => {
       const expiration_timestamp = Date.now() + 30000;
       TestFactory.auth_repository._schedule_token_refresh(expiration_timestamp);
       expect(TestFactory.auth_repository.renew_access_token).toHaveBeenCalled();
     });
 
-    it('renews the access token at the scheduled time', function() {
+    it('renews the access token at the scheduled time', () => {
       const expiration_timestamp = Date.now() + 60500;
       TestFactory.auth_repository._schedule_token_refresh(expiration_timestamp);
       expect(TestFactory.auth_repository.renew_access_token).not.toHaveBeenCalled();
@@ -64,7 +65,7 @@ describe('z.auth.AuthRepository', function() {
       expect(TestFactory.auth_repository.renew_access_token).toHaveBeenCalled();
     });
 
-    it('clears an existing timeout before scheduling an new refresh', function() {
+    it('clears an existing timeout before scheduling an new refresh', () => {
       spyOn(window, 'clearTimeout').and.callThrough();
       const first_timestamp = Date.now() + 60500;
       const second_timestamp = Date.now() + 61000;

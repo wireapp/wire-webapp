@@ -27,7 +27,7 @@ z.event.EventError = class EventError extends Error {
     super();
 
     this.name = this.constructor.name;
-    this.stack = (new Error()).stack;
+    this.stack = new Error().stack;
     this.type = type || EventError.TYPE.UNKNOWN;
 
     if (message) {
@@ -42,6 +42,9 @@ z.event.EventError = class EventError extends Error {
           break;
         case EventError.TYPE.NO_CLIENT_ID:
           this.message = 'Missing client id';
+          break;
+        case EventError.TYPE.NO_EVENT:
+          this.message = 'Event is missing';
           break;
         case EventError.TYPE.NO_LAST_DATE:
           this.message = 'Last event date not found in storage';
@@ -72,6 +75,7 @@ z.event.EventError = class EventError extends Error {
       DATABASE_FAILURE: 'z.event.EventError.TYPE.DATABASE_FAILURE',
       DEPRECATED_SCHEMA: 'z.event.EventError.TYPE.DEPRECATED_SCHEMA',
       NO_CLIENT_ID: 'z.event.EventError.TYPE.NO_CLIENT_ID',
+      NO_EVENT: 'z.event.EventError.TYPE.NO_EVENT',
       NO_LAST_DATE: 'z.event.EventError.TYPE.NO_LAST_DATE',
       NO_LAST_ID: 'z.event.EventError.TYPE.NO_LAST_ID',
       NO_NOTIFICATIONS: 'z.event.EventError.TYPE.NO_NOTIFICATIONS',

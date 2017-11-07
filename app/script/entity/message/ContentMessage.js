@@ -36,7 +36,7 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
     this.reactions_user_ets = ko.observableArray();
     this.reactions_user_ids = ko.pureComputed(() => {
       this.reactions_user_ets()
-        .map((user_et) => user_et.first_name())
+        .map(user_et => user_et.first_name())
         .join(', ');
     });
 
@@ -52,20 +52,20 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
           this.is_liked_provisional(null);
           return is_liked_provisional;
         }
-        const likes = this.reactions_user_ets().filter((user_et) => user_et.is_me);
+        const likes = this.reactions_user_ets().filter(user_et => user_et.is_me);
         return likes.length === 1;
       },
-      write: (value) => {
+      write: value => {
         return this.is_liked_provisional(value);
       },
     });
-    this.other_likes = ko.pureComputed(() => this.reactions_user_ets().filter((user_et) => !user_et.is_me));
+    this.other_likes = ko.pureComputed(() => this.reactions_user_ets().filter(user_et => !user_et.is_me));
     this.show_likes = ko.observable(false);
 
     this.like_caption = ko.pureComputed(() => {
       if (this.reactions_user_ets().length <= 5) {
         return this.reactions_user_ets()
-          .map((user_et) => user_et.first_name())
+          .map(user_et => user_et.first_name())
           .join(', ');
       }
       return z.l10n.text(z.string.conversation_likes_caption, this.reactions_user_ets().length);
@@ -110,7 +110,7 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
    * @returns {boolean} True, if message has been edited.
    */
   was_edited() {
-    return (this.replacing_message_id != null);
+    return this.replacing_message_id != null;
   }
 
   /**

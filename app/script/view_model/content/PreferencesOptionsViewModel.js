@@ -33,7 +33,7 @@ z.ViewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
     this.is_team = this.team_repository.is_team;
 
     this.option_audio = ko.observable();
-    this.option_audio.subscribe((audio_preference) => {
+    this.option_audio.subscribe(audio_preference => {
       const tracking_value = (() => {
         switch (audio_preference) {
           case z.audio.AudioPreference.ALL:
@@ -43,31 +43,35 @@ z.ViewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
           case z.audio.AudioPreference.NONE:
             return 'neverPlay';
           default:
-            return;
         }
       })();
 
       this.properties_repository.save_preference(z.properties.PROPERTIES_TYPE.SOUND_ALERTS, audio_preference);
-      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SOUND_SETTINGS_CHANGED, {value: tracking_value});
+      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SOUND_SETTINGS_CHANGED, {
+        value: tracking_value,
+      });
     });
 
     this.option_emoji_replace_inline = ko.observable();
-    this.option_emoji_replace_inline.subscribe((emoji_replace_inline_preference) => {
-      this.properties_repository.save_preference(z.properties.PROPERTIES_TYPE.EMOJI.REPLACE_INLINE, emoji_replace_inline_preference);
+    this.option_emoji_replace_inline.subscribe(emoji_replace_inline_preference => {
+      this.properties_repository.save_preference(
+        z.properties.PROPERTIES_TYPE.EMOJI.REPLACE_INLINE,
+        emoji_replace_inline_preference
+      );
     });
 
     this.option_notifications = ko.observable();
-    this.option_notifications.subscribe((notifications_preference) => {
+    this.option_notifications.subscribe(notifications_preference => {
       this.properties_repository.save_preference(z.properties.PROPERTIES_TYPE.NOTIFICATIONS, notifications_preference);
     });
 
     this.option_previews_send = ko.observable();
-    this.option_previews_send.subscribe((previews_send_preference) => {
+    this.option_previews_send.subscribe(previews_send_preference => {
       this.properties_repository.save_preference(z.properties.PROPERTIES_TYPE.PREVIEWS.SEND, previews_send_preference);
     });
 
     this.option_privacy = ko.observable();
-    this.option_privacy.subscribe((privacy_preference) => {
+    this.option_privacy.subscribe(privacy_preference => {
       this.properties_repository.save_preference(z.properties.PROPERTIES_TYPE.PRIVACY, privacy_preference);
     });
 

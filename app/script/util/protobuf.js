@@ -24,8 +24,8 @@ window.z.util = z.util || {};
 
 z.util.protobuf = {
   load_protos: function(file) {
-    return new Promise(function(resolve, reject) {
-      return dcodeIO.ProtoBuf.loadProtoFile(file, function(error, builder) {
+    return new Promise((resolve, reject) => {
+      return dcodeIO.ProtoBuf.loadProtoFile(file, (error, builder) => {
         if (error) {
           return reject(new Error(`Loading protocol buffer file failed: ${error.message}`));
         }

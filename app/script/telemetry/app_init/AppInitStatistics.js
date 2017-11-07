@@ -41,10 +41,10 @@ z.telemetry.app_init.AppInitStatistics = class AppInitStatistics {
     if (bucket_size && _.isNumber(value)) {
       const buckets = Math.floor(value / bucket_size) + (value % bucket_size ? 1 : 0);
 
-      return this[statistic] = value === 0 ? 0 : bucket_size * buckets;
+      return (this[statistic] = value === 0 ? 0 : bucket_size * buckets);
     }
 
-    return this[statistic] = value;
+    return (this[statistic] = value);
   }
 
   get() {
@@ -72,7 +72,10 @@ z.telemetry.app_init.AppInitStatistics = class AppInitStatistics {
         if (_.isNumber(value) || _.isString(value)) {
           const placeholder_key_length = Math.max(AppInitStatistics.CONFIG.LOG_LENGTH_KEY - key.length, 1);
           const placeholder_key = new Array(placeholder_key_length).join(' ');
-          const placeholder_value_length = Math.max(AppInitStatistics.CONFIG.LOG_LENGTH_VALUE - value.toString().length, 1);
+          const placeholder_value_length = Math.max(
+            AppInitStatistics.CONFIG.LOG_LENGTH_VALUE - value.toString().length,
+            1
+          );
           const placeholder_value = new Array(placeholder_value_length).join(' ');
 
           this.logger.info(`${placeholder_key}'${key}':${placeholder_value}${value}`);

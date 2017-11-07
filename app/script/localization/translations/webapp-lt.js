@@ -559,11 +559,9 @@ z.string.lt.tooltip_preferences_rename = 'Pakeisti savo vardą';
 
 z.string.lt.tooltip_search_close = 'Užverti (Esc)';
 
-z.string.lt.init_received_access_token = 'Prisijungta';
 z.string.lt.init_received_self_user = 'Sveiki, {{user}}.';
 z.string.lt.init_validated_client = 'Gaunami jūsų kontaktai ir pokalbiai';
 z.string.lt.init_received_user_data = 'Tikrinama ar yra naujų žinučių';
-z.string.lt.init_events_progress = 'Įkeliamos žinutės - {{number1}} iš {{number2}}';
 
 z.string.lt.ephememal_units_none = 'Išjungta';
 z.string.lt.ephememal_units_second = 'sek.';

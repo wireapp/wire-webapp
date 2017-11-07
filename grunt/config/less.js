@@ -25,11 +25,13 @@ module.exports = {
   // Production/Staging/Edge deployment related
   //##############################################################################
   deploy: {
-    files: [{
-      '<%= dir.deploy %>/style/auth.css': '<%= dir.app.style %>/auth/auth.less',
-      '<%= dir.deploy %>/style/main.css': '<%= dir.app.style %>/main.less',
-      '<%= dir.deploy %>/style/support.css': '<%= dir.app.style %>/support.less',
-    }],
+    files: [
+      {
+        '<%= dir.deploy %>/style/auth.css': '<%= dir.app.style %>/auth/auth.less',
+        '<%= dir.deploy %>/style/main.css': '<%= dir.app.style %>/main.less',
+        '<%= dir.deploy %>/style/support.css': '<%= dir.app.style %>/support.less',
+      },
+    ],
     options: {
       compress: true,
       paths: '<%= dir.app_ %>',
@@ -40,12 +42,13 @@ module.exports = {
   // Local deployment related
   //##############################################################################
   dist: {
-
-    files: [{
-      '<%= dir.dist %>/style/auth.css': '<%= dir.app.style %>/auth/auth.less',
-      '<%= dir.dist %>/style/main.css': '<%= dir.app.style %>/main.less',
-      '<%= dir.dist %>/style/support.css': '<%= dir.app.style %>/support.less',
-    }],
+    files: [
+      {
+        '<%= dir.dist %>/style/auth.css': '<%= dir.app.style %>/auth/auth.less',
+        '<%= dir.dist %>/style/main.css': '<%= dir.app.style %>/main.less',
+        '<%= dir.dist %>/style/support.css': '<%= dir.app.style %>/support.less',
+      },
+    ],
     options: {
       paths: '<%= dir.app_ %>',
     },

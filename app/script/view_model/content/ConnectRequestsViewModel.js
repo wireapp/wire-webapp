@@ -39,9 +39,11 @@ z.ViewModel.content.ConnectRequestsViewModel = class ConnectRequestsViewModel {
 
     this.connect_requests = this.user_repository.connect_requests;
 
-    this.should_update_scrollbar = ko.computed(() => {
-      return this.connect_requests();
-    }).extend({notify: 'always', rateLimit: 500});
+    this.should_update_scrollbar = ko
+      .computed(() => {
+        return this.connect_requests();
+      })
+      .extend({notify: 'always', rateLimit: 500});
   }
 
   /**

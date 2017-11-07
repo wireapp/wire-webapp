@@ -24,31 +24,35 @@
  */
 ko.bindingHandlers.focus_on_keydown = {
   init(element, valueAccessor, allBindings, data, context) {
-    return ko.applyBindingsToNode(window, {
-      event: {
-        keydown(_data, keyboard_event) {
-          if ($('.detail-view').hasClass('modal-show')) {
-            return false;
-          }
-
-          // check for activeElement needed, cause in IE11 i could be undefined under some circumstances
-          const active_element_is_input = document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName);
-          const is_arrow_key = z.util.KeyboardUtil.is_arrow_key(keyboard_event);
-
-          if (!active_element_is_input && !is_arrow_key) {
-            const is_meta_key_pressed = z.util.KeyboardUtil.is_meta_key(keyboard_event);
-            const is_paste_action = z.util.KeyboardUtil.is_paste_action(keyboard_event);
-
-            if (!is_meta_key_pressed || is_paste_action) {
-              element.focus();
+    return ko.applyBindingsToNode(
+      window,
+      {
+        event: {
+          keydown(_data, keyboard_event) {
+            if ($('.detail-view').hasClass('modal-show')) {
+              return false;
             }
-          }
 
-          return true;
+            // check for activeElement needed, cause in IE11 i could be undefined under some circumstances
+            const active_element_is_input =
+              document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName);
+            const is_arrow_key = z.util.KeyboardUtil.is_arrow_key(keyboard_event);
+
+            if (!active_element_is_input && !is_arrow_key) {
+              const is_meta_key_pressed = z.util.KeyboardUtil.is_meta_key(keyboard_event);
+              const is_paste_action = z.util.KeyboardUtil.is_paste_action(keyboard_event);
+
+              if (!is_meta_key_pressed || is_paste_action) {
+                element.focus();
+              }
+            }
+
+            return true;
+          },
         },
       },
-    },
-    context);
+      context
+    );
   },
 };
 
@@ -60,8 +64,10 @@ ko.bindingHandlers.show_all_timestamps = {
     const $element = $(element);
 
     $element.on('mousemove mouseout', function(event) {
-      const rect = $(this).find('.messages')[0].getBoundingClientRect();
-      const show_timestamps = (event.clientX > (rect.right - 64)) && (event.clientX < rect.right);
+      const rect = $(this)
+        .find('.messages')[0]
+        .getBoundingClientRect();
+      const show_timestamps = event.clientX > rect.right - 64 && event.clientX < rect.right;
       $('.time').toggleClass('show-timestamp', show_timestamps);
     });
   },
@@ -76,13 +82,19 @@ ko.bindingHandlers.background_image = {
 
     const _in_view = function(dom_element) {
       const box = dom_element.getBoundingClientRect();
-      return (box.right >= 0) && (box.bottom >= 0) && (box.left <= document.documentElement.clientWidth) && (box.top <= document.documentElement.clientHeight);
+      return (
+        box.right >= 0 &&
+        box.bottom >= 0 &&
+        box.left <= document.documentElement.clientWidth &&
+        box.top <= document.documentElement.clientHeight
+      );
     };
 
-    const _on_viewport_change = _.debounce(function() {
+    const _on_viewport_change = _.debounce(() => {
       if (_in_view(element) && asset_remote_data()) {
-        asset_remote_data().load()
-          .then(function(blob) {
+        asset_remote_data()
+          .load()
+          .then(blob => {
             $(element).removeClass('image-loading');
             object_url = window.URL.createObjectURL(blob);
             image_element[0].src = object_url;
@@ -90,8 +102,7 @@ ko.bindingHandlers.background_image = {
           })
           .catch(() => {});
       }
-    },
-    500);
+    }, 500);
 
     const image_element = $(element).find('img');
     const asset_remote_data = valueAccessor();
@@ -102,7 +113,7 @@ ko.bindingHandlers.background_image = {
 
     _on_viewport_change();
 
-    ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+    ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
       viewport_subscription.dispose();
       asset_subscription.dispose();
       if (object_url) {
@@ -178,8 +189,8 @@ ko.bindingHandlers.relative_timestamp = (function() {
   };
 
   // should be fine to update every minute
-  window.setInterval(function() {
-    timestamps.map((timestamp_func) => timestamp_func());
+  window.setInterval(() => {
+    timestamps.map(timestamp_func => timestamp_func());
   }, 60 * 1000);
 
   const calculate = function(element, timestamp, is_day) {
@@ -202,7 +213,7 @@ ko.bindingHandlers.relative_timestamp = (function() {
       timestamp_func();
       timestamps.push(timestamp_func);
 
-      ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+      ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
         const timestamp_index = timestamps.indexOf(timestamp_func);
         timestamps.splice(timestamp_index, 1);
       });

@@ -21,31 +21,32 @@
 
 'use strict';
 
-describe('z.user.UserRepository', function() {
+describe('z.user.UserRepository', () => {
   let server = null;
   const test_factory = new TestFactory();
 
-  beforeAll(function(done) {
-    test_factory.exposeUserActors()
+  beforeAll(done => {
+    test_factory
+      .exposeUserActors()
       .then(done)
       .catch(done.fail);
   });
 
-  beforeEach(function() {
+  beforeEach(() => {
     server = sinon.fakeServer.create();
     server.autoRespond = true;
   });
 
-  afterEach(function() {
+  afterEach(() => {
     TestFactory.user_repository.users.removeAll();
     server.restore();
   });
 
-  describe('connections', function() {
-    describe('cancel_connection_request', function() {
+  describe('connections', () => {
+    describe('cancel_connection_request', () => {
       let user_et = undefined;
 
-      beforeEach(function() {
+      beforeEach(() => {
         const connection_et = new z.entity.Connection(z.util.create_random_uuid());
         connection_et.to = entities.user.jane_roe.id;
 
@@ -56,21 +57,23 @@ describe('z.user.UserRepository', function() {
         spyOn(TestFactory.user_repository, '_update_connection_status').and.returnValue(Promise.resolve());
       });
 
-      it('sets the connection status to cancelled', function(done) {
-        TestFactory.user_repository.cancel_connection_request(user_et)
-          .then(function() {
+      it('sets the connection status to cancelled', done => {
+        TestFactory.user_repository
+          .cancel_connection_request(user_et)
+          .then(() => {
             expect(TestFactory.user_repository._update_connection_status).toHaveBeenCalled();
             done();
           })
           .catch(done.fail);
       });
 
-      it('it switches the conversation if requested', function(done) {
+      it('it switches the conversation if requested', done => {
         const spy = jasmine.createSpy('conversation_show');
         amplify.subscribe(z.event.WebApp.CONVERSATION.SHOW, spy);
 
-        TestFactory.user_repository.cancel_connection_request(user_et, new z.entity.Conversation())
-          .then(function() {
+        TestFactory.user_repository
+          .cancel_connection_request(user_et, new z.entity.Conversation())
+          .then(() => {
             expect(TestFactory.user_repository._update_connection_status).toHaveBeenCalled();
             expect(spy).toHaveBeenCalled();
             done();
@@ -79,11 +82,11 @@ describe('z.user.UserRepository', function() {
       });
     });
 
-    describe('get_connection_by_conversation_id', function() {
+    describe('get_connection_by_conversation_id', () => {
       let connection_et_a = null;
       let connection_et_b = null;
 
-      beforeEach(function() {
+      beforeEach(() => {
         connection_et_a = new z.entity.Connection();
         connection_et_a.conversation_id = '874d2afe-821d-4f8c-9d3d-3b0fea948e43';
         TestFactory.user_repository.connections.push(connection_et_a);
@@ -92,12 +95,14 @@ describe('z.user.UserRepository', function() {
         TestFactory.user_repository.connections.push(connection_et_b);
       });
 
-      afterEach(function() {
+      afterEach(() => {
         TestFactory.user_repository.connections.removeAll();
       });
 
-      it('should return the expected connection for the given conversation id', function() {
-        let connection_et = TestFactory.user_repository.get_connection_by_conversation_id(connection_et_a.conversation_id);
+      it('should return the expected connection for the given conversation id', () => {
+        let connection_et = TestFactory.user_repository.get_connection_by_conversation_id(
+          connection_et_a.conversation_id
+        );
         expect(connection_et).toBe(connection_et_a);
 
         connection_et = TestFactory.user_repository.get_connection_by_conversation_id('');
@@ -105,26 +110,30 @@ describe('z.user.UserRepository', function() {
       });
     });
 
-    describe('get_connections', function() {
+    describe('get_connections', () => {
       // TODO: This test seems to be flaky!
-      xit('should return the connected users', function(done) {
+      xit('should return the connected users', done => {
         server.respondWith('GET', `${test_factory.settings.connection.rest_url}/connections?size=500`, [
           200,
           {'Content-Type': 'application/json'},
           JSON.stringify(payload.connections.get),
         ]);
 
-        server.respondWith('GET', `${test_factory.settings.connection.rest_url}/users?ids=${entities.user.jane_roe.id}%2C${entities.user.jane_roe.id}`, [
-          200,
-          {'Content-Type': 'application/json'},
-          JSON.stringify(payload.users.get.many),
-        ]);
+        server.respondWith(
+          'GET',
+          `${test_factory.settings.connection.rest_url}/users?ids=${entities.user.jane_roe.id}%2C${entities.user
+            .jane_roe.id}`,
+          [200, {'Content-Type': 'application/json'}, JSON.stringify(payload.users.get.many)]
+        );
 
-        TestFactory.user_repository.get_connections()
-          .then(function() {
+        TestFactory.user_repository
+          .get_connections()
+          .then(() => {
             expect(TestFactory.user_repository.connections().length).toBe(2);
             expect(TestFactory.user_repository.connections()[0].status()).toEqual(z.user.ConnectionStatus.ACCEPTED);
-            expect(TestFactory.user_repository.connections()[1].conversation_id).toEqual('45c8f986-6c8f-465b-9ac9-bd5405e8c944');
+            expect(TestFactory.user_repository.connections()[1].conversation_id).toEqual(
+              '45c8f986-6c8f-465b-9ac9-bd5405e8c944'
+            );
             done();
           })
           .catch(done.fail);
@@ -132,15 +141,16 @@ describe('z.user.UserRepository', function() {
     });
   });
 
-  describe('users', function() {
-    describe('fetch_user_by_id', function() {
-      it('should handle malformed input', function(done) {
-        TestFactory.user_repository.fetch_users_by_id()
-          .then(function(response) {
+  describe('users', () => {
+    describe('fetch_user_by_id', () => {
+      it('should handle malformed input', done => {
+        TestFactory.user_repository
+          .fetch_users_by_id()
+          .then(response => {
             expect(response.length).toBe(0);
             return TestFactory.user_repository.fetch_users_by_id([undefined, undefined, undefined]);
           })
-          .then(function(response) {
+          .then(response => {
             expect(response.length).toBe(0);
             done();
           })
@@ -148,45 +158,48 @@ describe('z.user.UserRepository', function() {
       });
     });
 
-    describe('find_user_by_id', function() {
+    describe('find_user_by_id', () => {
       let user = null;
 
-      beforeEach(function(done) {
+      beforeEach(done => {
         user = new z.entity.User();
         user.id = entities.user.john_doe.id;
-        TestFactory.user_repository.save_user(user)
+        TestFactory.user_repository
+          .save_user(user)
           .then(done)
           .catch(done.fail);
       });
 
-      afterEach(function() {
+      afterEach(() => {
         TestFactory.user_repository.users.removeAll();
       });
 
-      it('should find an existing user', function(done) {
-        TestFactory.user_repository.find_user_by_id(user.id)
-          .then(function(user_et) {
+      it('should find an existing user', done => {
+        TestFactory.user_repository
+          .find_user_by_id(user.id)
+          .then(user_et => {
             expect(user_et).toEqual(user);
             done();
           })
           .catch(done.fail);
       });
 
-      it('should not find an unknown user', function(done) {
-        TestFactory.user_repository.find_user_by_id('1')
+      it('should not find an unknown user', done => {
+        TestFactory.user_repository
+          .find_user_by_id('1')
           .then(done.fail)
-          .catch(function(error) {
+          .catch(error => {
             expect(error.type).toBe(z.user.UserError.TYPE.USER_NOT_FOUND);
             done();
           });
       });
     });
 
-    describe('search_for_connected_users', function() {
+    describe('search_for_connected_users', () => {
       let user_et_a = null;
       let user_et_b = null;
 
-      beforeEach(function(done) {
+      beforeEach(done => {
         const connection_et = new z.entity.Connection();
         connection_et.status(z.user.ConnectionStatus.ACCEPTED);
 
@@ -199,34 +212,35 @@ describe('z.user.UserRepository', function() {
         user_et_b.name('Gregor');
         user_et_b.connection(connection_et);
 
-        TestFactory.user_repository.save_users([user_et_a, user_et_b])
+        TestFactory.user_repository
+          .save_users([user_et_a, user_et_b])
           .then(done)
           .catch(done.fail);
       });
 
-      afterEach(function() {
+      afterEach(() => {
         TestFactory.user_repository.users.removeAll();
       });
 
-      it('finds the correct user by searching for the full name', function() {
+      it('finds the correct user by searching for the full name', () => {
         const result = TestFactory.user_repository.search_for_connected_users('Gregor');
         expect(result.length).toBe(1);
         expect(result[0].id).toBe(user_et_b.id);
       });
 
-      it('finds the correct user by searching for the full name (transliteration)', function() {
+      it('finds the correct user by searching for the full name (transliteration)', () => {
         const result = TestFactory.user_repository.search_for_connected_users('Rene');
         expect(result.length).toBe(1);
         expect(result[0].id).toBe(user_et_a.id);
       });
 
-      it('finds the correct user by searching for the username', function() {
+      it('finds the correct user by searching for the username', () => {
         const result = TestFactory.user_repository.search_for_connected_users('foo');
         expect(result.length).toBe(1);
         expect(result[0].id).toBe(user_et_a.id);
       });
 
-      it('finds the correct users', function() {
+      it('finds the correct users', () => {
         const result = TestFactory.user_repository.search_for_connected_users('e');
         expect(result.length).toBe(2);
         expect(result[0].id).toBe(user_et_b.id);
@@ -234,17 +248,18 @@ describe('z.user.UserRepository', function() {
       });
     });
 
-    describe('save_user', function() {
-      afterEach(function() {
+    describe('save_user', () => {
+      afterEach(() => {
         TestFactory.user_repository.users.removeAll();
       });
 
-      it('saves a user', function(done) {
+      it('saves a user', done => {
         const user = new z.entity.User();
         user.id = entities.user.jane_roe.id;
 
-        TestFactory.user_repository.save_user(user)
-          .then(function() {
+        TestFactory.user_repository
+          .save_user(user)
+          .then(() => {
             expect(TestFactory.user_repository.users().length).toBe(1);
             expect(TestFactory.user_repository.users()[0]).toBe(user);
             done();
@@ -252,12 +267,13 @@ describe('z.user.UserRepository', function() {
           .catch(done.fail);
       });
 
-      it('saves self user', function(done) {
+      it('saves self user', done => {
         const user = new z.entity.User();
         user.id = entities.user.jane_roe.id;
 
-        TestFactory.user_repository.save_user(user, true)
-          .then(function() {
+        TestFactory.user_repository
+          .save_user(user, true)
+          .then(() => {
             expect(TestFactory.user_repository.users().length).toBe(1);
             expect(TestFactory.user_repository.users()[0]).toBe(user);
             expect(TestFactory.user_repository.self()).toBe(user);
@@ -267,37 +283,47 @@ describe('z.user.UserRepository', function() {
       });
     });
 
-    describe('_assign_all_clients', function() {
+    describe('_assign_all_clients', () => {
       let user_jane_roe = null;
       let user_john_doe = null;
 
-      beforeEach(function(done) {
+      beforeEach(done => {
         user_jane_roe = new z.entity.User(entities.user.jane_roe.id);
         user_john_doe = new z.entity.User(entities.user.john_doe.id);
 
-        TestFactory.user_repository.save_users([user_jane_roe, user_john_doe])
-          .then(function() {
-            const permanent_client = TestFactory.client_repository.client_mapper.map_client(entities.clients.john_doe.permanent);
-            const plain_client = TestFactory.client_repository.client_mapper.map_client(entities.clients.jane_roe.plain);
-            const temporary_client = TestFactory.client_repository.client_mapper.map_client(entities.clients.john_doe.temporary);
+        TestFactory.user_repository
+          .save_users([user_jane_roe, user_john_doe])
+          .then(() => {
+            const permanent_client = TestFactory.client_repository.client_mapper.map_client(
+              entities.clients.john_doe.permanent
+            );
+            const plain_client = TestFactory.client_repository.client_mapper.map_client(
+              entities.clients.jane_roe.plain
+            );
+            const temporary_client = TestFactory.client_repository.client_mapper.map_client(
+              entities.clients.john_doe.temporary
+            );
             const recipients = {
               [entities.user.john_doe.id]: [permanent_client, temporary_client],
               [entities.user.jane_roe.id]: [plain_client],
             };
 
-            spyOn(TestFactory.client_repository, 'get_all_clients_from_db').and.returnValue(Promise.resolve(recipients));
+            spyOn(TestFactory.client_repository, 'get_all_clients_from_db').and.returnValue(
+              Promise.resolve(recipients)
+            );
             done();
           })
           .catch(done.fail);
       });
 
-      afterEach(function() {
+      afterEach(() => {
         TestFactory.user_repository.users.removeAll();
       });
 
-      it('assigns all available clients to the users', function(done) {
-        TestFactory.user_repository._assign_all_clients()
-          .then(function() {
+      it('assigns all available clients to the users', done => {
+        TestFactory.user_repository
+          ._assign_all_clients()
+          .then(() => {
             expect(TestFactory.client_repository.get_all_clients_from_db).toHaveBeenCalled();
             expect(user_jane_roe.devices().length).toBe(1);
             expect(user_jane_roe.devices()[0].id).toBe(entities.clients.jane_roe.plain.id);
@@ -310,8 +336,8 @@ describe('z.user.UserRepository', function() {
       });
     });
 
-    describe('verify_usernames', function() {
-      it('resolves with username when username is not taken', function(done) {
+    describe('verify_usernames', () => {
+      it('resolves with username when username is not taken', done => {
         const usernames = ['john_doe'];
         server.respondWith('POST', `${test_factory.settings.connection.rest_url}/users/handles`, [
           200,
@@ -319,15 +345,16 @@ describe('z.user.UserRepository', function() {
           JSON.stringify(usernames),
         ]);
 
-        TestFactory.user_repository.verify_usernames(usernames)
-          .then(function(_usernames) {
+        TestFactory.user_repository
+          .verify_usernames(usernames)
+          .then(_usernames => {
             expect(_usernames).toEqual(usernames);
             done();
           })
           .catch(done.fail);
       });
 
-      it('rejects when username is taken', function(done) {
+      it('rejects when username is taken', done => {
         const usernames = ['john_doe'];
         server.respondWith('POST', `${test_factory.settings.connection.rest_url}/users/handles`, [
           200,
@@ -335,8 +362,9 @@ describe('z.user.UserRepository', function() {
           JSON.stringify([]),
         ]);
 
-        TestFactory.user_repository.verify_usernames(usernames)
-          .then(function(_usernames) {
+        TestFactory.user_repository
+          .verify_usernames(usernames)
+          .then(_usernames => {
             expect(_usernames.length).toBe(0);
             done();
           })
@@ -344,24 +372,34 @@ describe('z.user.UserRepository', function() {
       });
     });
 
-    describe('verify_username', function() {
-      it('resolves with username when username is not taken', function(done) {
+    describe('verify_username', () => {
+      it('resolves with username when username is not taken', done => {
         const username = 'john_doe';
-        server.respondWith('HEAD', `${test_factory.settings.connection.rest_url}/users/handles/${username}`, [404, {}, '']);
+        server.respondWith('HEAD', `${test_factory.settings.connection.rest_url}/users/handles/${username}`, [
+          404,
+          {},
+          '',
+        ]);
 
-        TestFactory.user_repository.verify_username(username)
-          .then(function(_username) {
+        TestFactory.user_repository
+          .verify_username(username)
+          .then(_username => {
             expect(_username).toBe(username);
             done();
           })
           .catch(done.fail);
       });
 
-      it('rejects when username is taken', function(done) {
+      it('rejects when username is taken', done => {
         const username = 'john_doe';
-        server.respondWith('HEAD', `${test_factory.settings.connection.rest_url}/users/handles/${username}`, [200, {}, '']);
+        server.respondWith('HEAD', `${test_factory.settings.connection.rest_url}/users/handles/${username}`, [
+          200,
+          {},
+          '',
+        ]);
 
-        TestFactory.user_repository.verify_username(username)
+        TestFactory.user_repository
+          .verify_username(username)
           .then(done.fail)
           .catch(done);
       });

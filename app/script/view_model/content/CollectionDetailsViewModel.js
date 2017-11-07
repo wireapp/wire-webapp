@@ -53,7 +53,10 @@ z.ViewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
     if (this.conversation_et().id === message_et.conversation_id) {
       switch (this.category) {
         case 'images':
-          if ((message_et.category & z.message.MessageCategory.IMAGE) && !(message_et.category & z.message.MessageCategory.GIF)) {
+          if (
+            message_et.category & z.message.MessageCategory.IMAGE &&
+            !(message_et.category & z.message.MessageCategory.GIF)
+          ) {
             this.items.push(message_et);
           }
           break;
@@ -74,7 +77,7 @@ z.ViewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
   }
 
   item_removed(removed_message_id) {
-    this.items.remove((message_et) => message_et.id === removed_message_id);
+    this.items.remove(message_et => message_et.id === removed_message_id);
     if (!this.items().length) {
       this.click_on_back_button();
     }
@@ -103,7 +106,10 @@ z.ViewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
     }
 
     // We passed today
-    if (!moment(message_et.timestamp()).is_same_day(this.last_message_timestamp) && moment(this.last_message_timestamp).is_today()) {
+    if (
+      !moment(message_et.timestamp()).is_same_day(this.last_message_timestamp) &&
+      moment(this.last_message_timestamp).is_today()
+    ) {
       this.last_message_timestamp = message_et.timestamp();
       return true;
     }

@@ -24,7 +24,13 @@ window.z.ViewModel = z.ViewModel || {};
 window.z.ViewModel.content = z.ViewModel.content || {};
 
 z.ViewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewModel {
-  constructor(element_id, preferences_device_details, client_repository, conversation_repository, cryptography_repository) {
+  constructor(
+    element_id,
+    preferences_device_details,
+    client_repository,
+    conversation_repository,
+    cryptography_repository
+  ) {
     this.click_on_remove_device = this.click_on_remove_device.bind(this);
     this.click_on_show_device = this.click_on_show_device.bind(this);
     this.update_device_info = this.update_device_info.bind(this);
@@ -44,15 +50,17 @@ z.ViewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
     this.devices = ko.observableArray();
     this.fingerprint = ko.observable('');
 
-    this.should_update_scrollbar = ko.computed(() => {
-      return this.devices();
-    }).extend({notify: 'always', rateLimit: 500});
+    this.should_update_scrollbar = ko
+      .computed(() => {
+        return this.devices();
+      })
+      .extend({notify: 'always', rateLimit: 500});
 
     this._update_activation_location('?');
 
     // All clients except the current client
-    this.client_repository.clients.subscribe((client_ets) => {
-      const devices = client_ets.filter((client_et) => client_et.id !== this.current_client().id);
+    this.client_repository.clients.subscribe(client_ets => {
+      const devices = client_ets.filter(client_et => client_et.id !== this.current_client().id);
       this.devices(devices);
     });
   }
@@ -68,12 +76,11 @@ z.ViewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
   }
 
   _update_device_location(location) {
-    z.location.get_location(location.lat, location.lon)
-      .then((retrieved_location) => {
-        if (retrieved_location) {
-          this._update_activation_location(`${retrieved_location.place}, ${retrieved_location.country_code}`);
-        }
-      });
+    z.location.get_location(location.lat, location.lon).then(retrieved_location => {
+      if (retrieved_location) {
+        this._update_activation_location(`${retrieved_location.place}, ${retrieved_location.country_code}`);
+      }
+    });
   }
 
   click_on_show_device(device_et) {
@@ -83,7 +90,7 @@ z.ViewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
 
   click_on_remove_device(device_et, event) {
     amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.REMOVE_DEVICE, {
-      action: (password) => {
+      action: password => {
         this.client_repository.delete_client(device_et.id, password);
       },
       data: device_et.model,

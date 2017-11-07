@@ -19,40 +19,43 @@
 
 'use strict';
 
-describe('AssetsCrypto', function() {
-  it('should encrypt and decrypt arraybuffer', function(done) {
+describe('AssetsCrypto', () => {
+  it('should encrypt and decrypt arraybuffer', done => {
     const bytes = new Uint8Array(16);
     window.crypto.getRandomValues(bytes);
 
-    z.assets.AssetCrypto.encrypt_aes_asset(bytes.buffer)
-      .then(function({cipher_text, key_bytes, sha256}) {
+    z.assets.AssetCrypto
+      .encrypt_aes_asset(bytes.buffer)
+      .then(({cipher_text, key_bytes, sha256}) => {
         return z.assets.AssetCrypto.decrypt_aes_asset(cipher_text, key_bytes, sha256);
       })
-      .then(function(buffer) {
+      .then(buffer => {
         expect(buffer).toEqual(bytes.buffer);
         done();
       })
       .catch(done.fail);
   });
 
-  it('should not decrypt when hash is missing', function(done) {
+  it('should not decrypt when hash is missing', done => {
     const bytes = new Uint8Array(16);
     window.crypto.getRandomValues(bytes);
 
-    z.assets.AssetCrypto.encrypt_aes_asset(bytes.buffer)
-      .then(function({cipher_text, key_bytes}) {
+    z.assets.AssetCrypto
+      .encrypt_aes_asset(bytes.buffer)
+      .then(({cipher_text, key_bytes}) => {
         return z.assets.AssetCrypto.decrypt_aes_asset(cipher_text, key_bytes, null);
       })
       .then(done.fail)
       .catch(done);
   });
 
-  it('should not decrypt when hash is an empty array', function(done) {
+  it('should not decrypt when hash is an empty array', done => {
     const bytes = new Uint8Array(16);
     window.crypto.getRandomValues(bytes);
 
-    z.assets.AssetCrypto.encrypt_aes_asset(bytes.buffer)
-      .then(function({cipher_text, key_bytes}) {
+    z.assets.AssetCrypto
+      .encrypt_aes_asset(bytes.buffer)
+      .then(({cipher_text, key_bytes}) => {
         return z.assets.AssetCrypto.decrypt_aes_asset(cipher_text, key_bytes, new Uint8Array([]));
       })
       .then(done.fail)

@@ -19,50 +19,53 @@
 
 'use strict';
 
-describe('z.links.LinkPreviewRepository', function() {
+describe('z.links.LinkPreviewRepository', () => {
   let link_preview_repository = null;
 
-  beforeEach(function() {
+  beforeEach(() => {
     const properties_repository = new z.properties.PropertiesRepository();
     link_preview_repository = new z.links.LinkPreviewRepository(undefined, properties_repository);
   });
 
-  afterEach(function() {
+  afterEach(() => {
     window.openGraph = undefined;
   });
 
-  describe('get_link_preview', function() {
-    beforeEach(function() {
+  describe('get_link_preview', () => {
+    beforeEach(() => {
       spyOn(link_preview_repository, '_fetch_open_graph_data').and.returnValue(Promise.resolve());
     });
 
-    it('should reject if open graph lib is not available', function(done) {
-      link_preview_repository.get_link_preview()
+    it('should reject if open graph lib is not available', done => {
+      link_preview_repository
+        .get_link_preview()
         .then(done.fail)
-        .catch(function(error) {
+        .catch(error => {
           expect(error.type).toBe(z.links.LinkPreviewError.TYPE.NOT_SUPPORTED);
           done();
         });
     });
 
-    it('should fetch open graph data if openGraph lib is available', function(done) {
+    it('should fetch open graph data if openGraph lib is available', done => {
       window.openGraph = {};
 
-      link_preview_repository.get_link_preview()
+      link_preview_repository
+        .get_link_preview()
         .then(done.fail)
-        .catch(function(error) {
+        .catch(error => {
           expect(link_preview_repository._fetch_open_graph_data).toHaveBeenCalled();
           expect(error.type).toBe(z.links.LinkPreviewError.TYPE.NO_DATA_AVAILABLE);
           done();
         });
     });
 
-    it('should reject if link is blacklisted', function(done) {
+    it('should reject if link is blacklisted', done => {
       window.openGraph = {};
 
-      link_preview_repository.get_link_preview('youtube.com')
+      link_preview_repository
+        .get_link_preview('youtube.com')
         .then(done.fail)
-        .catch(function(error) {
+        .catch(error => {
           expect(error.type).toBe(z.links.LinkPreviewError.TYPE.BLACKLISTED);
           done();
         });

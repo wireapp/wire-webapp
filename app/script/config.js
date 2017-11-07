@@ -36,7 +36,7 @@ window.z.config = {
     OPTIONS: {
       domains: {
         'app.wire.com': () => 0,
-        'localhost': () => 300,
+        localhost: () => 300,
         'wire.ms': () => 300,
         'wire-webapp-staging.wire.com': () => 300,
         'zinfra.io': () => 300,
@@ -93,22 +93,9 @@ window.z.config = {
     },
   },
 
-  SUPPORTED_CONVERSATION_IMAGE_TYPES: [
-    '.jpg-large',
-    'image/jpg',
-    'image/jpeg',
-    'image/png',
-    'image/bmp',
-    'image/gif',
-  ],
+  SUPPORTED_CONVERSATION_IMAGE_TYPES: ['.jpg-large', 'image/jpg', 'image/jpeg', 'image/png', 'image/bmp', 'image/gif'],
 
-  SUPPORTED_PROFILE_IMAGE_TYPES: [
-    '.jpg-large',
-    'image/jpg',
-    'image/jpeg',
-    'image/png',
-    'image/bmp',
-  ],
+  SUPPORTED_PROFILE_IMAGE_TYPES: ['.jpg-large', 'image/jpg', 'image/jpeg', 'image/png', 'image/bmp'],
 
   UNSPLASH_URL: 'https://source.unsplash.com/1200x1200/?landscape',
 
@@ -128,7 +115,7 @@ window.z.config = {
     },
     WEBSITE: {
       PRODUCTION: 'https://wire.com',
-      STAGING: 'https://staging-website.zinfra.io',
+      STAGING: 'https://wire-website-staging.zinfra.io',
     },
   },
 

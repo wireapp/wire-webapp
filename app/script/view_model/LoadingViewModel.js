@@ -41,10 +41,10 @@ z.ViewModel.LoadingViewModel = class LoadingViewModel {
     if (progress > this.loading_progress()) {
       this.loading_progress(progress);
     } else {
-      this.loading_progress(this.loading_progress() + .01);
+      this.loading_progress(this.loading_progress() + 0.01);
     }
 
-    if (message_locator && !z.util.Environment.frontend.is_production()) {
+    if (message_locator) {
       let updated_loading_message;
 
       switch (message_locator) {
@@ -53,14 +53,19 @@ z.ViewModel.LoadingViewModel = class LoadingViewModel {
           break;
         }
 
-        case z.string.init_decryption_progress:
-        case z.string.init_events_progress: {
-          const substitutes = {
-            number1: replace_content[0],
-            number2: replace_content[1],
-          };
+        case z.string.init_decryption:
+        case z.string.init_events: {
+          if (z.util.Environment.frontend.is_production()) {
+            updated_loading_message = z.l10n.text(message_locator);
+          } else {
+            const substitutes = {
+              number1: replace_content.handled,
+              number2: replace_content.total,
+            };
 
-          updated_loading_message = z.l10n.text(message_locator, substitutes);
+            const handling_progress = z.l10n.text(z.string.init_progress, substitutes);
+            updated_loading_message = `${z.l10n.text(message_locator)}${handling_progress}`;
+          }
           break;
         }
 
