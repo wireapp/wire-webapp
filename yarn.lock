@@ -252,9 +252,9 @@
   version "8.0.24"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-8.0.24.tgz#06c580084d9add1fb40c1510ef0b448961246fb1"
 
-"@types/node@8.0.31":
-  version "8.0.31"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.0.31.tgz#d9af61093cf4bfc9f066ca34de0175012cfb0ce9"
+"@types/node@8.0.50":
+  version "8.0.50"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.0.50.tgz#dc545448e128c88c4eec7cd64025fcc3b7604541"
 
 "@types/node@^7.0.29":
   version "7.0.46"
@@ -268,36 +268,38 @@
   version "0.0.32"
   resolved "https://registry.yarnpkg.com/@types/text-encoding/-/text-encoding-0.0.32.tgz#52289b320a406850b14f08f48b475ca021218048"
 
-"@types/tough-cookie@2.3.1":
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/@types/tough-cookie/-/tough-cookie-2.3.1.tgz#2688836dc4535d3156d1789e5ee58d068b992715"
+"@types/tough-cookie@2.3.2":
+  version "2.3.2"
+  resolved "https://registry.yarnpkg.com/@types/tough-cookie/-/tough-cookie-2.3.2.tgz#e0d481d8bb282ad8a8c9e100ceb72c995fb5e709"
 
-"@wireapp/api-client@0.2.3":
-  version "0.2.3"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-0.2.3.tgz#da4d9c42ecd455b6e09c84ab791d9fe76627ac56"
+"@wireapp/api-client@0.2.7":
+  version "0.2.7"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-0.2.7.tgz#12441daf7fd1a9ec60cf36a4f7639d6ddcdffa41"
   dependencies:
-    "@types/node" "8.0.31"
+    "@types/node" "8.0.50"
     "@types/spark-md5" "3.0.0"
     "@types/text-encoding" "0.0.32"
-    "@types/tough-cookie" "2.3.1"
+    "@types/tough-cookie" "2.3.2"
     "@wireapp/queue-priority" "0.0.12"
-    "@wireapp/store-engine" "0.1.0"
-    axios "0.16.2"
+    "@wireapp/store-engine" "0.1.1"
+    axios "0.17.0"
     html5-websocket "2.0.1"
+    logdown "2.2.0"
     reconnecting-websocket "3.2.2"
     spark-md5 "3.0.0"
     tough-cookie "2.3.3"
 
-"@wireapp/core@0.0.3":
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-0.0.3.tgz#4df1d38a3fb5f84e6aff6f2a4e35e05c89b6b236"
+"@wireapp/core@0.0.5":
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-0.0.5.tgz#49b3c1e56c543b54bfde44a018bffef95915bfa1"
   dependencies:
-    "@wireapp/api-client" "0.2.3"
+    "@types/node" "8.0.50"
+    "@wireapp/api-client" "0.2.7"
     "@wireapp/protocol-messaging" "1.19.0"
-    "@wireapp/store-engine" "0.1.0"
+    "@wireapp/store-engine" "0.1.1"
     bazinga64 "5.0.3"
     protobufjs "6.8.0"
-    pure-uuid "1.4.8"
+    pure-uuid "1.4.10"
     wire-webapp-cryptobox "6.2.0"
 
 "@wireapp/protocol-messaging@1.19.0":
@@ -319,6 +321,14 @@
     "@types/node" "8.0.24"
     dexie "1.5.1"
     fs-extra "4.0.1"
+
+"@wireapp/store-engine@0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-0.1.1.tgz#3e04509836ef632347b81f59c44ee1923b54808d"
+  dependencies:
+    "@types/node" "8.0.50"
+    dexie "2.0.1"
+    fs-extra "4.0.2"
 
 abbrev@1:
   version "1.1.1"
@@ -626,9 +636,9 @@ aws4@^1.2.1, aws4@^1.6.0:
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/aws4/-/aws4-1.6.0.tgz#83ef5ca860b2b32e4a0deedee8c771b9db57471e"
 
-axios@0.16.2:
-  version "0.16.2"
-  resolved "https://registry.yarnpkg.com/axios/-/axios-0.16.2.tgz#ba4f92f17167dfbab40983785454b9ac149c3c6d"
+axios@0.17.0:
+  version "0.17.0"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-0.17.0.tgz#7da747916db803f761651d6091d708789b953c6a"
   dependencies:
     follow-redirects "^1.2.3"
     is-buffer "^1.1.5"
@@ -1390,6 +1400,10 @@ detect-libc@^0.2.0:
 dexie@1.5.1:
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/dexie/-/dexie-1.5.1.tgz#ac3ad5a0ebaf7e6e42760db58710418d4a756624"
+
+dexie@2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/dexie/-/dexie-2.0.1.tgz#a6dc4e607461c4da5f934621917a2a8939a18e97"
 
 di@^0.0.1:
   version "0.0.1"
@@ -3165,6 +3179,10 @@ log4js@^0.6.31:
     readable-stream "~1.0.2"
     semver "~4.3.3"
 
+logdown@2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/logdown/-/logdown-2.2.0.tgz#23698490bb0f4eab8e93205c6209d31c06de35b2"
+
 lolex@^1.6.0:
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/lolex/-/lolex-1.6.0.tgz#3a9a0283452a47d7439e72731b9e07d7386e49f6"
@@ -3946,9 +3964,9 @@ punycode@^1.2.4, punycode@^1.4.1:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-1.4.1.tgz#c0d5a63b2718800ad8e1eb0fa5269c84dd41845e"
 
-pure-uuid@1.4.8:
-  version "1.4.8"
-  resolved "https://registry.yarnpkg.com/pure-uuid/-/pure-uuid-1.4.8.tgz#e6281a475690b4c0c28d872c6ad105baa0b3fac6"
+pure-uuid@1.4.10:
+  version "1.4.10"
+  resolved "https://registry.yarnpkg.com/pure-uuid/-/pure-uuid-1.4.10.tgz#884903c01a811a59a69d49959591b5147a51ca18"
 
 qjobs@^1.1.4:
   version "1.1.5"
