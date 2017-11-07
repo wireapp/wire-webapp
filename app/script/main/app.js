@@ -264,7 +264,7 @@ z.main.App = class App {
       .then(() => this._check_single_instance())
       .then(() => this._load_access_token())
       .then(() => {
-        this.view.loading.update_progress(2.5, z.string.init_received_access_token);
+        this.view.loading.update_progress(2.5);
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
         return Promise.all([
           this._get_user_self(),
@@ -315,9 +315,10 @@ z.main.App = class App {
         this.repository.conversation.map_connections(this.repository.user.connections());
         this._subscribe_to_unload_events();
 
-        return Promise.all([this.repository.event.initialize_from_stream(), this.repository.team.get_team()]);
+        return this.repository.team.get_team();
       })
-      .then(([notifications_count, team_et]) => {
+      .then(() => this.repository.event.initialize_from_stream())
+      .then(notifications_count => {
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
         this.telemetry.add_statistic(
           z.telemetry.app_init.AppInitStatisticsValue.NOTIFICATIONS,

@@ -115,7 +115,7 @@ window.z.config = {
     },
     WEBSITE: {
       PRODUCTION: 'https://wire.com',
-      STAGING: 'https://staging-website.zinfra.io',
+      STAGING: 'https://wire-website-staging.zinfra.io',
     },
   },
 
