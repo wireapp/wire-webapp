@@ -80,7 +80,7 @@
     "karma-jasmine": "1.1.0",
     "lint-staged": "4.3.0",
     "load-grunt-tasks": "3.5.2",
-    "prettier": "1.8.0",
+    "prettier": "1.8.1",
     "request": "2.83.0",
     "sinon": "4.1.2"
   },
