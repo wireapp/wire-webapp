@@ -326,7 +326,9 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
 
           if (updated_device) {
             this.logger.warn(
-              `Selected '${media_type}' device '${device_id_observable()}' not found and replaced by '${updated_device.label ||
+              `Selected '${
+                media_type
+              }' device '${device_id_observable()}' not found and replaced by '${updated_device.label ||
                 updated_device.deviceId}'`,
               media_devices
             );
