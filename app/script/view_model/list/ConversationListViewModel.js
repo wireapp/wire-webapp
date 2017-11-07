@@ -34,7 +34,7 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
    * @param {z.conversation.ConversationRepository} conversation_repository - Conversation repository
    * @param {z.team.TeamRepository} team_repository - Team repository
    * @param {z.user.UserRepository} user_repository - User repository
-  */
+   */
   constructor(
     element_id,
     list_view_model,

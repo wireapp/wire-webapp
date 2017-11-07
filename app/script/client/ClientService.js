@@ -75,7 +75,7 @@ z.client.ClientService = class ClientService {
    *
    * @param {string} client_id - ID of client to be retrieved
    * @returns {Promise} Resolves with the requested client
-  */
+   */
   get_client_by_id(client_id) {
     return this.client.send_request({
       type: 'GET',

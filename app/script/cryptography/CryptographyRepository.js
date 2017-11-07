@@ -76,7 +76,9 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     return delete_promise
       .catch(database_error => {
         this.logger.error(
-          `Unsuccessful deleting cryptography-relate database content after failed client validation: ${database_error.message}`,
+          `Unsuccessful deleting cryptography-relate database content after failed client validation: ${
+            database_error.message
+          }`,
           database_error
         );
         throw new z.client.ClientError(z.client.ClientError.TYPE.DATABASE_FAILURE);
@@ -317,7 +319,9 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
       .then(() => {
         if (remote_pre_key) {
           this.logger.log(
-            `Initializing session with Client ID '${client_id}' from User ID '${user_id}' with remote PreKey ID '${remote_pre_key.id}'.`
+            `Initializing session with Client ID '${client_id}' from User ID '${user_id}' with remote PreKey ID '${
+              remote_pre_key.id
+            }'.`
           );
           return this.cryptobox.session_from_prekey(
             this._construct_session_id(user_id, client_id),
@@ -325,13 +329,17 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
           );
         }
         this.logger.warn(
-          `No remote PreKey for User ID '${user_id}' with Client ID '${client_id}' found. The owner probably deleted the client already.`
+          `No remote PreKey for User ID '${user_id}' with Client ID '${
+            client_id
+          }' found. The owner probably deleted the client already.`
         );
         return undefined;
       })
       .catch(error => {
         this.logger.warn(
-          `Invalid remote PreKey for User ID '${user_id}' with Client ID '${client_id}' found. Skipping encryption. Reason: ${error.message}`,
+          `Invalid remote PreKey for User ID '${user_id}' with Client ID '${
+            client_id
+          }' found. Skipping encryption. Reason: ${error.message}`,
           error
         );
         return undefined;
@@ -452,7 +460,9 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     if (is_invalid_message || is_invalid_signature) {
       // Session is broken, let's see what's really causing it...
       this.logger.error(
-        `Session with client '${remote_client_id}' of user '${remote_user_id}' is broken or out of sync.\nReset the session and decryption is likely to work again.`
+        `Session with client '${remote_client_id}' of user '${
+          remote_user_id
+        }' is broken or out of sync.\nReset the session and decryption is likely to work again.`
       );
     } else if (is_remote_identity_changed) {
       // Remote identity changed
@@ -460,7 +470,9 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     }
 
     this.logger.warn(
-      `Failed to decrypt event from client '${remote_client_id}' of user '${remote_user_id}'.\nError Code: '${error_code}'\nError Message: ${error.message}`,
+      `Failed to decrypt event from client '${remote_client_id}' of user '${remote_user_id}'.\nError Code: '${
+        error_code
+      }'\nError Message: ${error.message}`,
       error
     );
     this._report_decryption_failure(error, event);
