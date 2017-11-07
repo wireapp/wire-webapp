@@ -6,3 +6,6 @@ files:
     source: '/app/script/localization/webapp.js'
     translation: '/app/script/localization/translations/webapp-%locale%.js'
     type: 'properties_play'
+  -
+    source: 'app/i18n/webapp.pot'
+    translation: 'app/i18n/webapp-%locale%.po'

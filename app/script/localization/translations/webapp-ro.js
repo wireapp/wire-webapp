@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 z.string.ro.wire = 'Wire';
 z.string.ro.wire_macos = 'Wire pentru macOS';
 z.string.ro.wire_windows = 'Wire pentru Windows';
@@ -559,11 +557,9 @@ z.string.ro.tooltip_preferences_rename = 'Schimbă numele tău';
 
 z.string.ro.tooltip_search_close = 'Închide (Esc)';
 
-z.string.ro.init_received_access_token = 'Conectat';
 z.string.ro.init_received_self_user = 'Bună, {{user}}.';
 z.string.ro.init_validated_client = 'Se încarcă conexiunile și conversațiile tale';
 z.string.ro.init_received_user_data = 'Verifică dacă sunt mesaje noi';
-z.string.ro.init_events_progress = 'Se încacrcă mesajele - {{number1}} din {{number2}}';
 
 z.string.ro.ephememal_units_none = 'Închis';
 z.string.ro.ephememal_units_second = 'secundă';
@@ -574,3 +570,4 @@ z.string.ro.ephememal_units_hour = 'oră';
 z.string.ro.ephememal_units_hours = 'ore';
 z.string.ro.ephememal_units_day = 'zi';
 z.string.ro.ephememal_units_days = 'zile';
+

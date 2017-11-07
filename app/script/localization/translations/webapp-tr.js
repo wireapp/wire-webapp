@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 z.string.tr.wire_macos = 'MacOS için Wire';
 z.string.tr.wire_windows = 'Windows için Wire';
 z.string.tr.wire_linux = 'Linux için Wire';
@@ -551,11 +549,9 @@ z.string.tr.tooltip_preferences_rename = 'İsminizi değiştirin';
 
 z.string.tr.tooltip_search_close = 'Kapat (Esc)';
 
-z.string.tr.init_received_access_token = 'Giriş yapıldı';
 z.string.tr.init_received_self_user = 'Merhaba, {{user}}.';
 z.string.tr.init_validated_client = 'Bağlantılarınız ve konuşmalarınız alınıyor';
 z.string.tr.init_received_user_data = 'Yeni mesajlar kontrol ediliyor';
-z.string.tr.init_events_progress = 'Mesajlar yükleniyor - {{number2}}’de {{number1}}';
 
 z.string.tr.ephememal_units_none = 'Yok';
 z.string.tr.ephememal_units_second = 'saniye';
@@ -566,3 +562,4 @@ z.string.tr.ephememal_units_hour = 'saat';
 z.string.tr.ephememal_units_hours = 'saat';
 z.string.tr.ephememal_units_day = 'gün';
 z.string.tr.ephememal_units_days = 'gün';
+

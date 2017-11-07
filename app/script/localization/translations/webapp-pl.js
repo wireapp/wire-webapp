@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 z.string.pl.wire_macos = 'Wire dla macOS';
 z.string.pl.wire_windows = 'Wire dla Windows';
 z.string.pl.wire_linux = 'Wire dla Linuksa';
@@ -44,6 +42,7 @@ z.string.pl.auth_account_sign_in_phone = 'Numer telefonu';
 z.string.pl.auth_account_terms_of_use = 'Zasady korzystania z usługi';
 z.string.pl.auth_account_terms_of_use_detail = 'Akceptuję';
 
+z.string.pl.auth_blocked_cookies = 'Włącz ciasteczka do zalogowania się do Wire.';
 z.string.pl.auth_blocked_database = 'Wire potrzebuje dostępu do pamięci lokalnej, by wyświetlać wiadomości. Pamięć lokalna nie jest dostępna w trybie prywatnym.';
 z.string.pl.auth_blocked_tabs = 'Wire jest już otwarty w innej zakładce.';
 
@@ -106,6 +105,7 @@ z.string.pl.auth_error_phone_number_budget = 'Zbyt wiele prób logowania. Odczek
 z.string.pl.auth_error_phone_number_forbidden = 'Przepraszamy. Ten numer telefonu został zabroniony.';
 z.string.pl.auth_error_phone_number_invalid = 'Nieprawidłowy numer telefonu';
 z.string.pl.auth_error_phone_number_unknown = 'Nieznany numer telefonu';
+z.string.pl.auth_error_suspended = 'To konto jest już uprawnione do zalogowania się.';
 z.string.pl.auth_error_sign_in = 'Proszę sprawdzić swoje dane i spróbować ponownie.';
 
 z.string.pl.call_state_outgoing = 'Dzwoni…';
@@ -124,6 +124,8 @@ z.string.pl.modal_button_send = 'Wyślij';
 z.string.pl.modal_block_conversation_headline = 'Zablokować {{user}}?';
 z.string.pl.modal_block_conversation_message = '{{user}} nie będzie mógł się z Tobą skontaktować, ani dodać do rozmowy grupowej.';
 z.string.pl.modal_block_conversation_button = 'Zablokuj';
+z.string.pl.modal_bots_unavailable_headline = 'Boty są obecnie niedostępne';
+z.string.pl.modal_bots_unavailable_message = 'Dziękujemy za zainteresowanie naszymi botami. Usługa jest obecnie zawieszona, ponieważ pracujemy nad następną wersją. Bądź na bieżąco.';
 z.string.pl.modal_call_conversation_empty_headline = 'Brak rozmówcy';
 z.string.pl.modal_call_conversation_empty_message = 'Nikogo tutaj nie ma.';
 z.string.pl.modal_call_no_video_in_group_headline = 'Grupowe połączenia video nie są możliwe';
@@ -172,6 +174,9 @@ z.string.pl.modal_new_device_call_incoming = 'Czy nadal chcesz odebrać połącz
 z.string.pl.modal_new_device_call_outgoing = 'Czy nadal chcesz nawiązać połączenie?';
 z.string.pl.modal_new_device_show_device = 'pokaż urządzenie';
 z.string.pl.modal_new_device_send_anyway = 'wyślij mimo wszystko';
+z.string.pl.modal_not_connected_headline = 'Nikt nie został dodany do rozmowy';
+z.string.pl.modal_not_connected_message_one = '{{name}} nie chce być dodany do rozmowy.';
+z.string.pl.modal_not_connected_message_many = 'Jedna z osób, którą wybrałeś, nie chce być dodana do rozmowy.';
 z.string.pl.modal_remove_device_button = 'Usuń urządzenie';
 z.string.pl.modal_remove_device_headline = 'Usuń {{device}}';
 z.string.pl.modal_remove_device_message = 'Aby usunąć to urządzenie wymagane jest hasło.';
@@ -394,8 +399,10 @@ z.string.pl.preferences_about_terms_of_use = 'Regulamin';
 z.string.pl.preferences_about_version = 'Wersja {{version}}';
 z.string.pl.preferences_about_website = 'Strona internetowa Wire';
 
+z.string.pl.preferences_account_create_team = 'Utwórz nowy zespół';
 z.string.pl.preferences_account_delete = 'Usuń konto';
 z.string.pl.preferences_account_log_out = 'Wyloguj się';
+z.string.pl.preferences_account_manage_team = 'Zarządzaj zespołem';
 z.string.pl.preferences_account_reset_password = 'Zresetuj hasło';
 z.string.pl.preferences_account_team = 'w {{name}}';
 z.string.pl.preferences_account_username_placeholder = 'Twoje pełne imię i nazwisko';
@@ -549,11 +556,9 @@ z.string.pl.tooltip_preferences_rename = 'Zmień swoją nazwę';
 
 z.string.pl.tooltip_search_close = 'Zamknij (Esc)';
 
-z.string.pl.init_received_access_token = 'Zalogowano';
 z.string.pl.init_received_self_user = 'Cześć, {{user}}.';
 z.string.pl.init_validated_client = 'Pobieranie Twoich kontaktów i rozmów';
 z.string.pl.init_received_user_data = 'Sprawdzanie nowych wiadomości';
-z.string.pl.init_events_progress = 'Ładowanie wiadomości - {{number1}} z {{number2}}';
 
 z.string.pl.ephememal_units_none = 'Wyłącz';
 z.string.pl.ephememal_units_second = 'sekunda';
@@ -564,3 +569,4 @@ z.string.pl.ephememal_units_hour = 'godzina';
 z.string.pl.ephememal_units_hours = 'godzin';
 z.string.pl.ephememal_units_day = 'dzień';
 z.string.pl.ephememal_units_days = 'dni';
+

@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 z.string.pt.wire_macos = 'Wire para macOS';
 z.string.pt.wire_windows = 'Wire para Windows';
 z.string.pt.wire_linux = 'Wire para Linux';
@@ -558,7 +556,9 @@ z.string.pt.tooltip_preferences_rename = 'Mudar o seu nome';
 z.string.pt.tooltip_search_close = 'Fechar (Esc)';
 
 z.string.pt.init_received_self_user = 'Olá {{user}}.';
-z.string.pt.init_events_progress = 'A carregar as mensagens - {{number1}} de {{number2}}';
+z.string.pt.init_validated_client = 'A descarregar as suas ligações e conversas';
+z.string.pt.init_received_user_data = 'A verificar por novas mensagens';
+z.string.pt.init_updated_from_notifications = 'Quase pronto - Desfrute do Wire';
 
 z.string.pt.ephememal_units_none = 'Desligado';
 z.string.pt.ephememal_units_second = 'segundo';
@@ -569,3 +569,4 @@ z.string.pt.ephememal_units_hour = 'hora';
 z.string.pt.ephememal_units_hours = 'horas';
 z.string.pt.ephememal_units_day = 'dia';
 z.string.pt.ephememal_units_days = 'dias';
+

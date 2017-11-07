@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 z.string.sl.wire = 'Wire';
 z.string.sl.wire_macos = 'Wire za macOS';
 z.string.sl.wire_windows = 'Wire za Windows';
@@ -543,11 +541,9 @@ z.string.sl.tooltip_preferences_rename = 'Spremenite vaše ime';
 
 z.string.sl.tooltip_search_close = 'Zapri (Esc)';
 
-z.string.sl.init_received_access_token = 'Prijava uspešna';
 z.string.sl.init_received_self_user = 'Hej, {{user}}.';
 z.string.sl.init_validated_client = 'Pridobivam vaše povezave in pogovore';
 z.string.sl.init_received_user_data = 'Preverjanje za morebitna nova sporočila';
-z.string.sl.init_events_progress = 'Nalaganje sporočil - {{number1}} od {{number2}}';
 
 z.string.sl.ephememal_units_none = 'Izklopljeno';
 z.string.sl.ephememal_units_second = 'sekunda';
@@ -558,3 +554,4 @@ z.string.sl.ephememal_units_hour = 'ura';
 z.string.sl.ephememal_units_hours = 'ur';
 z.string.sl.ephememal_units_day = 'dan';
 z.string.sl.ephememal_units_days = 'dni';
+
