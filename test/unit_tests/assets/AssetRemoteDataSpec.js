@@ -49,8 +49,7 @@ describe('z.assets.AssetRemoteData', () => {
     const video_type = 'video/mp4';
 
     beforeEach(done => {
-      z.assets.AssetCrypto
-        .encrypt_aes_asset(video_bytes)
+      z.assets.AssetCrypto.encrypt_aes_asset(video_bytes)
         .then(({cipher_text, key_bytes, sha256}) => {
           const conversation_id = z.util.create_random_uuid();
           const asset_id = z.util.create_random_uuid();

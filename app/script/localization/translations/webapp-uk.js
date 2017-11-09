@@ -126,6 +126,8 @@ z.string.uk.modal_button_send = 'Надіслати';
 z.string.uk.modal_block_conversation_headline = 'Заблокувати {{user}}?';
 z.string.uk.modal_block_conversation_message = '{{user}} не буде мати можливості зв’язатися з вами або додати вас до групових розмов.';
 z.string.uk.modal_block_conversation_button = 'Заблокувати';
+z.string.uk.modal_bots_unavailable_headline = 'Боти в даний час недоступні';
+z.string.uk.modal_bots_unavailable_message = 'Дякуємо вам за інтерес, проявлений до ботів. В даний час ця функціональність заморожена, але ми працюємо над тим, щоб активувати її в наступній версії. Слідкуйте за оновленнями.';
 z.string.uk.modal_call_conversation_empty_headline = 'Нікому дзвонити';
 z.string.uk.modal_call_conversation_empty_message = 'Тут більше нікого немає.';
 z.string.uk.modal_call_no_video_in_group_headline = 'Відеодзвінки в групах не підтримуються';
@@ -174,6 +176,9 @@ z.string.uk.modal_new_device_call_incoming = 'Ви все ще хочете пр
 z.string.uk.modal_new_device_call_outgoing = 'Ви все ще хочете здійснити дзвінок?';
 z.string.uk.modal_new_device_show_device = 'Показати пристрій';
 z.string.uk.modal_new_device_send_anyway = 'Все одно надіслати';
+z.string.uk.modal_not_connected_headline = 'Жоден контакт не був доданий до розмови';
+z.string.uk.modal_not_connected_message_one = '{{name}} не хоче, щоб його додавали до розмови.';
+z.string.uk.modal_not_connected_message_many = 'Один з контактів, яких ви вибрали, не хоче, щоб його додавали до розмови.';
 z.string.uk.modal_remove_device_button = 'Видалити пристрій';
 z.string.uk.modal_remove_device_headline = 'Видалити "{{device}}"';
 z.string.uk.modal_remove_device_message = 'Для видалення пристрою необхідно ввести ваш пароль.';
@@ -396,8 +401,10 @@ z.string.uk.preferences_about_terms_of_use = 'Умови використанн�
 z.string.uk.preferences_about_version = 'Версія {{version}}';
 z.string.uk.preferences_about_website = 'Веб-сайт Wire';
 
+z.string.uk.preferences_account_create_team = 'Створити команду';
 z.string.uk.preferences_account_delete = 'Видалити акаунт';
 z.string.uk.preferences_account_log_out = 'Вийти';
+z.string.uk.preferences_account_manage_team = 'Керування командою';
 z.string.uk.preferences_account_reset_password = 'Виконати скидання паролю';
 z.string.uk.preferences_account_team = 'в {{name}}';
 z.string.uk.preferences_account_username_placeholder = 'Ваше повне ім’я';
@@ -551,11 +558,10 @@ z.string.uk.tooltip_preferences_rename = 'Змініть своє ім’я';
 
 z.string.uk.tooltip_search_close = 'Закрити (Esc)';
 
-z.string.uk.init_received_access_token = 'Аутентифікація пройшла успішно';
 z.string.uk.init_received_self_user = 'Привіт {{user}}.';
 z.string.uk.init_validated_client = 'Отримую список контактів та розмов';
 z.string.uk.init_received_user_data = 'Перевіряю наявність нових повідомлень';
-z.string.uk.init_events_progress = 'Завантажую повідомлення - {{number1}} з {{number2}}';
+z.string.uk.init_updated_from_notifications = 'Майже завершено - Приємного користування!';
 
 z.string.uk.ephememal_units_none = 'Вимкнений';
 z.string.uk.ephememal_units_second = 'секунда';

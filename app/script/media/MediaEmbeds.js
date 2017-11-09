@@ -41,7 +41,9 @@ z.media.MediaEmbeds = (function() {
     };
 
     options = _.extend(defaults, options);
-    const iframe_container = `<div class="{0}"><iframe class="${options.type}" width="{1}" height="{2}" src="{3}" frameborder="{4}"{5}></iframe></div>`;
+    const iframe_container = `<div class="{0}"><iframe class="${
+      options.type
+    }" width="{1}" height="{2}" src="{3}" frameborder="{4}"{5}></iframe></div>`;
 
     if (!options.video) {
       options.allowfullscreen = '';
@@ -103,7 +105,7 @@ z.media.MediaEmbeds = (function() {
    * @private
    * @param {string} url - Given youtube url
    * @returns {string} Youtube embed URL
-  */
+   */
   const _generate_youtube_embed_url = function(url) {
     if (url.match(_regex.youtube)) {
       const video_id = url.match(/(?:embed\/|v=|v\/|be\/)([a-zA-Z0-9_-]{11})/);

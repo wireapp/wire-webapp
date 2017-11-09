@@ -206,7 +206,7 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
    * @param {Object} passed_error - Error passed into the report
    * @param {Object} payload - Additional payload for the custom data
    * @returns {undefined} No return value
-  */
+   */
   report_error(description, passed_error, payload) {
     const custom_data = this.create_report();
     const raygun_error = new Error(description);

@@ -101,7 +101,9 @@ describe('User Service', () => {
     });
 
     it('can get multiple existing users from the server', done => {
-      const request_url = `${urls.rest_url}/users?ids=7025598b-ffac-4993-8a81-af3f35b7147f%2C7025598b-ffac-4993-8a81-af3f35b71414`;
+      const request_url = `${
+        urls.rest_url
+      }/users?ids=7025598b-ffac-4993-8a81-af3f35b7147f%2C7025598b-ffac-4993-8a81-af3f35b71414`;
       server.respondWith('GET', request_url, [
         200,
         {'Content-Type': 'application/json'},
@@ -121,7 +123,9 @@ describe('User Service', () => {
     });
 
     it('cannot fetch multiple fake users from the server', done => {
-      const request_url = `${urls.rest_url}/users?ids=7025598b-ffac-4993-8a81-af3f35b71488%2C7025598b-ffac-4993-8a81-af3f35b71414`;
+      const request_url = `${
+        urls.rest_url
+      }/users?ids=7025598b-ffac-4993-8a81-af3f35b71488%2C7025598b-ffac-4993-8a81-af3f35b71414`;
       server.respondWith('GET', request_url, [404, {'Content-Type': 'application/json'}, '']);
 
       user_service
@@ -136,7 +140,9 @@ describe('User Service', () => {
     });
 
     it('can fetch the existing users from the servers in a group with fakes', done => {
-      const request_url = `${urls.rest_url}/users?ids=d5a39ffb-6ce3-4cc8-9048-0e15d031b4c5%2C7025598b-ffac-4993-8a81-af3f35b71425`;
+      const request_url = `${
+        urls.rest_url
+      }/users?ids=d5a39ffb-6ce3-4cc8-9048-0e15d031b4c5%2C7025598b-ffac-4993-8a81-af3f35b71425`;
       server.respondWith('GET', request_url, [
         200,
         {'Content-Type': 'application/json'},

@@ -569,7 +569,9 @@ z.client.ClientRepository = class ClientRepository {
   _remove_obsolete_client_for_user_by_id(user_id, client_ids) {
     return this.get_clients_by_user_id(user_id).then(client_ets => {
       this.logger.info(
-        `For user '${user_id}' backend found '${client_ets.length}' active clients. Locally there are sessions for '${client_ids.length}' clients`,
+        `For user '${user_id}' backend found '${client_ets.length}' active clients. Locally there are sessions for '${
+          client_ids.length
+        }' clients`,
         {
           clients: client_ets,
           sessions: client_ids,
@@ -669,7 +671,7 @@ z.client.ClientRepository = class ClientRepository {
    * @param {string} user_id - User ID to be checked
    * @param {string} client_id - ID of client to be checked
    * @returns {boolean} Is the client the current local client
-  */
+   */
   _is_current_client(user_id, client_id) {
     if (!this.current_client()) {
       throw new z.client.ClientError(z.client.ClientError.TYPE.CLIENT_NOT_SET);

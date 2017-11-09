@@ -558,11 +558,10 @@ z.string.ru.tooltip_preferences_rename = 'Изменить свое имя';
 
 z.string.ru.tooltip_search_close = 'Закрыть (Esc)';
 
-z.string.ru.init_received_access_token = 'Вы вошли';
 z.string.ru.init_received_self_user = 'Здравствуйте, {{user}}.';
 z.string.ru.init_validated_client = 'Загрузка контактов и разговоров';
 z.string.ru.init_received_user_data = 'Проверка наличия новых сообщений';
-z.string.ru.init_events_progress = 'Загрузка сообщений — {{number1}} из {{number2}}';
+z.string.ru.init_updated_from_notifications = 'Почти готово - наслаждайтесь Wire';
 
 z.string.ru.ephememal_units_none = 'Выключен';
 z.string.ru.ephememal_units_second = 'сек';

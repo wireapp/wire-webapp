@@ -567,13 +567,13 @@ z.string.de.tooltip_preferences_rename = 'Ändere deinen Namen';
 
 z.string.de.tooltip_search_close = 'Schließen (Esc)';
 
-z.string.de.init_received_access_token = 'Angemeldet';
 z.string.de.init_received_self_user = 'Hallo, {{user}}.';
 z.string.de.init_validated_client = 'Lade deine Kontakte und Unterhaltungen';
 z.string.de.init_received_user_data = 'Suche nach neuen Events';
-z.string.de.init_decryption_progress = 'Entschlüssele Nachrichten - {{number1}} von {{number2}}';
-z.string.de.init_events_progress = 'Lade Events - {{number1}} von {{number2}}';
+z.string.de.init_decryption = 'Entschlüssele Events';
+z.string.de.init_events = 'Lade Nachrichten';
 z.string.de.init_updated_from_notifications = 'Fast fertig - viel Spaß mit Wire';
+z.string.de.init_progress = ' — {{number1}} von {{number2}}';
 
 z.string.de.ephememal_units_none = 'Aus';
 z.string.de.ephememal_units_second = 'Sekunde';

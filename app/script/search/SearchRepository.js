@@ -49,7 +49,7 @@ z.search.SearchRepository = class SearchRepository {
    * Construct a new Conversation Repository.
    * @param {z.search.SearchService} search_service - Backend REST API search service implementation
    * @param {z.user.UserRepository} user_repository - Repository for all user and connection interactions
-  */
+   */
   constructor(search_service, user_repository) {
     this.search_service = search_service;
     this.user_repository = user_repository;

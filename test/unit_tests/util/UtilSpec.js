@@ -36,20 +36,22 @@ describe('z.util.render_message', () => {
 
   it('renders complicated image links', () => {
     const link =
-      'http://static.err.ee/gridfs/95E91BE0D28DF7236BC00EE349284A451C05949C2D04E7857BC686E4394F1585.jpg?&crop=(0,27,848,506.0960451977401)&cropxunits=848&cropyunits=595&format=jpg&quality=90&width=752&maxheight=42';
+      'http://static.err.ee/gridfs/95E91BE0D28DF7236BC00EE349284A451C05949C2D04E7857BC686E4394F1585.jpg?&amp;crop=(0,27,848,506.0960451977401)&amp;cropxunits=848&amp;cropyunits=595&amp;format=jpg&amp;quality=90&amp;width=752&amp;maxheight=42';
     const expected = `<a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a>`;
     expect(z.util.render_message(link)).toBe(expected);
   });
 
   it('renders URLs with underscores', () => {
     const link = 'http://en.wikipedia.org/wiki/Stormtrooper_(Star_Wars)';
-    const expected = `Stormtroopers: <a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a> !!!`;
+    const expected = `Stormtroopers: <a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${
+      link
+    }</a> !!!`;
     expect(z.util.render_message(`Stormtroopers: ${link} !!!`)).toBe(expected);
   });
 
   it('renders links with multiple underscores', () => {
     const link =
-      'https://www.nike.com/events-registration/event?id=6245&languageLocale=de_de&cp=EUNS_KW_DE_&s_kwcid=AL!2799!3!46005237943!b!!g!!womens%20running';
+      'https://www.nike.com/events-registration/event?id=6245&amp;languageLocale=de_de&amp;cp=EUNS_KW_DE_&amp;s_kwcid=AL!2799!3!46005237943!b!!g!!womens%20running';
     const expected = `<a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a>`;
     expect(z.util.render_message(link)).toBe(expected);
   });
@@ -80,13 +82,25 @@ describe('z.util.render_message', () => {
 
   it('renders URLs with @-signs and text correctly', () => {
     const link = 'https://t.facdn.net/22382738@400-1485204208.jpg';
-    const expected = `Just click <a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a> and download it`;
+    const expected = `Just click <a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${
+      link
+    }</a> and download it`;
     expect(z.util.render_message(`Just click ${link} and download it`)).toBe(expected);
   });
 
   it('escapes links when they are posted as plain HTML', () => {
     const expected = '&lt;a href=&quot;javascript:alert(&#x27;ohoh!&#x27;)&quot;&gt;what?&lt;/a&gt;';
     expect(z.util.render_message('<a href="javascript:alert(\'ohoh!\')">what?</a>')).toBe(expected);
+  });
+
+  it('renders an escaped version of an xss attempt', () => {
+    const expected =
+      '<a href="http://wire.de/jaVasCript:/*-/*`/*\\`/*&#x27;/*&quot;/**/(/**/oNcliCk=alert())//%0D%0A%0d%0a//&lt;/stYle/&lt;/titLe/&lt;/teXtarEa/&lt;/scRipt/--!&gt;\\x3csVg/&lt;sVg/oNloAd=alert()//&gt;\\x3e" target="_blank" rel="nofollow noopener noreferrer">wire.de/jaVasCript:/*-/*`/*\\`/*&#x27;/*&quot;/**/(/**/oNcliCk=alert())//%0D%0A%0d%0a//&lt;/stYle/&lt;/titLe/&lt;/teXtarEa/&lt;/scRipt/--!&gt;\\x3csVg/&lt;sVg/oNloAd=alert()//&gt;\\x3e</a>';
+    expect(
+      z.util.render_message(
+        'wire.de/jaVasCript:/*-/*`/*\\`/*\'/*"/**/(/**/oNcliCk=alert())//%0D%0A%0d%0a//</stYle/</titLe/</teXtarEa/</scRipt/--!>\\x3csVg/<sVg/oNloAd=alert()//>\\x3e'
+      )
+    ).toBe(expected);
   });
 
   it('renders an email address', () => {
@@ -4309,7 +4323,9 @@ describe('Markdown with mixed markups', () => {
     const link_1 = '<a href="http://www.link.com" target="_blank" rel="nofollow noopener noreferrer">www.link.com</a>';
     const link_2 =
       '<a href="http://www.anotherlink.net" target="_blank" rel="nofollow noopener noreferrer">www.anotherlink.net</a>';
-    const expected = `This is <em>italic</em> and <strong>bold</strong> and <strong><em>bold-italic</em></strong> with a ${link_1} and ${link_2}.`;
+    const expected = `This is <em>italic</em> and <strong>bold</strong> and <strong><em>bold-italic</em></strong> with a ${
+      link_1
+    } and ${link_2}.`;
 
     expect(
       z.util.render_message(

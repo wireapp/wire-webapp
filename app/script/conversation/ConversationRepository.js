@@ -323,7 +323,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {Message} message_et - Message entity
    * @param {number} [padding=15] - Padding
    * @returns {Promise} Resolves with the message
-  */
+   */
   get_messages_with_offset(conversation_et, message_et, padding = 15) {
     const message_date = new Date(message_et.timestamp());
 
@@ -1173,7 +1173,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         this._on_member_update(conversation_et, response);
         this.logger.info(
-          `Toggle silence to '${payload.otr_muted}' for conversation '${conversation_et.id}' on '${payload.otr_muted_ref}'`
+          `Toggle silence to '${payload.otr_muted}' for conversation '${conversation_et.id}' on '${
+            payload.otr_muted_ref
+          }'`
         );
         return response;
       })
@@ -1229,7 +1231,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .update_member_properties(conversation_et.id, payload)
       .catch(error => {
         this.logger.error(
-          `Failed to change conversation '${conversation_et.id}' archived state to '${new_archive_state}': ${error.code}`
+          `Failed to change conversation '${conversation_et.id}' archived state to '${new_archive_state}': ${
+            error.code
+          }`
         );
         if (error.code !== z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
           throw error;
@@ -1238,7 +1242,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(() => {
         this._on_member_update(conversation_et, {data: payload});
         this.logger.info(
-          `Update conversation '${conversation_et.id}' archive state to '${new_archive_state}' on '${payload.otr_archived_ref}'`
+          `Update conversation '${conversation_et.id}' archive state to '${new_archive_state}' on '${
+            payload.otr_archived_ref
+          }'`
         );
       });
   }
@@ -1369,8 +1375,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when the asset metadata was sent
    */
   send_asset_metadata(conversation_et, file) {
-    return z.assets.AssetMetaDataBuilder
-      .build_metadata(file)
+    return z.assets.AssetMetaDataBuilder.build_metadata(file)
       .catch(error => {
         this.logger.warn(
           `Couldn't render asset preview from metadata. Asset might be corrupt: ${error.message}`,
@@ -1994,8 +1999,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   ) {
     this.logger.info(`Sending external message of type '${generic_message.content}'`, generic_message);
 
-    return z.assets.AssetCrypto
-      .encrypt_aes_asset(generic_message.toArrayBuffer())
+    return z.assets.AssetCrypto.encrypt_aes_asset(generic_message.toArrayBuffer())
       .then(({key_bytes, sha256, cipher_text}) => {
         const generic_message_external = new z.proto.GenericMessage(z.util.create_random_uuid());
         generic_message_external.set(
@@ -2294,7 +2298,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
       })
       .catch(error => {
         this.logger.info(
-          `Failed to send delete message for everyone with id '${message_et.id}' for conversation '${conversation_et.id}'`,
+          `Failed to send delete message for everyone with id '${message_et.id}' for conversation '${
+            conversation_et.id
+          }'`,
           error
         );
         throw error;
@@ -2625,11 +2631,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
           if (event_from_stream) {
             this.init_handled = this.init_handled + 1;
             if (this.init_handled % 5 === 0 || this.init_handled < 5) {
+              const content = {
+                handled: this.init_handled,
+                total: this.init_total,
+              };
               const progress = this.init_handled / this.init_total * 20 + 75;
-              amplify.publish(z.event.WebApp.APP.UPDATE_PROGRESS, progress, z.string.init_events_progress, [
-                this.init_handled,
-                this.init_total,
-              ]);
+
+              amplify.publish(z.event.WebApp.APP.UPDATE_PROGRESS, progress, z.string.init_events, content);
             }
           }
 
@@ -3378,15 +3386,15 @@ z.conversation.ConversationRepository = class ConversationRepository {
           }
         };
 
-        return Promise.all(
-          this._map_recipients(recipients, _remove_redundant_client, _remove_redundant_user)
-        ).then(() => {
-          if (conversation_et) {
-            this.update_participating_user_ets(conversation_et);
-          }
+        return Promise.all(this._map_recipients(recipients, _remove_redundant_client, _remove_redundant_user)).then(
+          () => {
+            if (conversation_et) {
+              this.update_participating_user_ets(conversation_et);
+            }
 
-          return payload;
-        });
+            return payload;
+          }
+        );
       });
   }
 
@@ -3514,26 +3522,25 @@ z.conversation.ConversationRepository = class ConversationRepository {
   _update_edited_message(conversation_et, event_json) {
     const {data: event_data, from, id, time} = event_json;
 
-    return this.get_message_in_conversation_by_id(
-      conversation_et,
-      event_data.replacing_message_id
-    ).then(original_message_et => {
-      const from_original_user = from === original_message_et.from;
-      if (!from_original_user) {
-        throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_USER);
-      }
+    return this.get_message_in_conversation_by_id(conversation_et, event_data.replacing_message_id).then(
+      original_message_et => {
+        const from_original_user = from === original_message_et.from;
+        if (!from_original_user) {
+          throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_USER);
+        }
 
-      if (!original_message_et.timestamp()) {
-        throw new TypeError('Missing timestamp');
-      }
+        if (!original_message_et.timestamp()) {
+          throw new TypeError('Missing timestamp');
+        }
 
-      event_json.edited_time = time;
-      event_json.time = new Date(original_message_et.timestamp()).toISOString();
-      this._delete_message_by_id(conversation_et, id);
-      this._delete_message_by_id(conversation_et, event_data.replacing_message_id);
-      this.conversation_service.save_event(event_json);
-      return event_json;
-    });
+        event_json.edited_time = time;
+        event_json.time = new Date(original_message_et.timestamp()).toISOString();
+        this._delete_message_by_id(conversation_et, id);
+        this._delete_message_by_id(conversation_et, event_data.replacing_message_id);
+        this.conversation_service.save_event(event_json);
+        return event_json;
+      }
+    );
   }
 
   /**
