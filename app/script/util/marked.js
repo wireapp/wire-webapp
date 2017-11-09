@@ -462,13 +462,15 @@
         const preString = this.output(src.substring(0, pos));
         if (!/[_*`]$/.test(preString)) {
           src = src.substring(pos + cap.value.length);
+          const cleanHref = escape(cap.href);
+          const cleanValue = escape(cap.value);
           out +=
             cap.type === 'email'
-              ? `${preString}<a href="#" onclick="z.util.safe_mailto_open('${cap.href.replace(
-                  'mailto:',
+              ? `${preString}<a href="#" onclick="z.util.safe_mailto_open('${cleanHref.replace(
+                  /^mailto:/,
                   ''
-                )}')">${cap.value}</a>`
-              : `${preString}<a href="${cap.href}" target="_blank" rel="nofollow noopener noreferrer">${cap.value}</a>`;
+                )}')">${cleanValue}</a>`
+              : `${preString}<a href="${cleanHref}" target="_blank" rel="nofollow noopener noreferrer">${cleanValue}</a>`;
           continue;
         }
       }
