@@ -54,7 +54,6 @@ before_deploy:
 deploy:
   # https://wire-webapp-dev.zinfra.io/
   - provider: elasticbeanstalk
-    edge: true
     skip_cleanup: true
     zip-file: 'aws/s3/ebs.zip'
     access-key-id:
@@ -71,7 +70,6 @@ deploy:
 
   # https://wire-webapp-staging.zinfra.io/
   - provider: elasticbeanstalk
-    edge: true
     skip_cleanup: true
     zip-file: 'aws/s3/ebs.zip'
     access-key-id:
@@ -88,7 +86,6 @@ deploy:
 
   # https://wire-webapp-prod-next.wire.com/
   - provider: elasticbeanstalk
-    edge: true
     skip_cleanup: true
     zip-file: 'aws/s3/ebs.zip'
     access-key-id:
