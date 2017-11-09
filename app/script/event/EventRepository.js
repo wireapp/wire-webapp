@@ -615,7 +615,9 @@ z.event.EventRepository = class EventRepository {
 
         if (from_different_user) {
           this.logger.warn(
-            `Ignored '${mapped_type}' in conversation '${conversation_id}' from user '${mapped_from}' with ID '${event_id}' previously used by user '${stored_from}'`,
+            `Ignored '${mapped_type}' in conversation '${conversation_id}' from user '${mapped_from}' with ID '${
+              event_id
+            }' previously used by user '${stored_from}'`,
             event
           );
           throw new z.event.EventError(
@@ -626,7 +628,9 @@ z.event.EventRepository = class EventRepository {
 
         if (!is_mapped_message_add || !is_stored_message_add || !mapped_data.previews.length) {
           this.logger.warn(
-            `Ignored '${mapped_type}' in conversation '${conversation_id}' from user '${mapped_from}' with previously used ID '${event_id}'`,
+            `Ignored '${mapped_type}' in conversation '${conversation_id}' from user '${
+              mapped_from
+            }' with previously used ID '${event_id}'`,
             event
           );
           throw new z.event.EventError(
@@ -637,7 +641,9 @@ z.event.EventRepository = class EventRepository {
 
         if (stored_data.previews.length) {
           this.logger.warn(
-            `Ignored '${mapped_type}' in conversation '${conversation_id}' from user '${mapped_from}' with ID '${event_id}' that previously contained link preview`,
+            `Ignored '${mapped_type}' in conversation '${conversation_id}' from user '${mapped_from}' with ID '${
+              event_id
+            }' that previously contained link preview`,
             event
           );
           throw new z.event.EventError(
@@ -648,7 +654,9 @@ z.event.EventRepository = class EventRepository {
 
         if (mapped_data.content !== stored_data.content) {
           this.logger.warn(
-            `Ignored '${mapped_type}' in conversation '${conversation_id}' from user '${mapped_from}' with ID '${event_id}' not matching text content`,
+            `Ignored '${mapped_type}' in conversation '${conversation_id}' from user '${mapped_from}' with ID '${
+              event_id
+            }' not matching text content`,
             event
           );
           throw new z.event.EventError(
@@ -763,7 +771,9 @@ z.event.EventRepository = class EventRepository {
     }
 
     this.logger.info(
-      `Ignored outdated '${type}' event in conversation '${conversation_id}' - Event: '${threshold_timestamp}', Local: '${corrected_timestamp}'`,
+      `Ignored outdated '${type}' event in conversation '${conversation_id}' - Event: '${
+        threshold_timestamp
+      }', Local: '${corrected_timestamp}'`,
       {event_json: JSON.stringify(event), event_object: event}
     );
     throw new z.event.EventError(z.event.EventError.TYPE.OUTDATED_E_CALL_EVENT);

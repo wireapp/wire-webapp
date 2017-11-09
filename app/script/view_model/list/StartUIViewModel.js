@@ -36,7 +36,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
    * @param {z.search.SearchRepository} search_repository - Search repository
    * @param {z.team.TeamRepository} team_repository - Team repository
    * @param {z.user.UserRepository} user_repository - User repository
-  */
+   */
   constructor(
     element_id,
     list_view_model,

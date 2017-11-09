@@ -158,7 +158,9 @@ z.util.DebugUtil = class DebugUtil {
 
       if (remote_user_id) {
         this.logger.log(
-          `Found '${matching_notifications.length}' notifications between '${local_client_id}' and '${remote_client_id}'`,
+          `Found '${matching_notifications.length}' notifications between '${local_client_id}' and '${
+            remote_client_id
+          }'`,
           matching_notifications
         );
       } else {
