@@ -376,6 +376,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     options.debugMode = !z.util.Environment.frontend.is_production();
 
     Raygun.init(EventTrackingRepository.CONFIG.ERROR_REPORTING.API_KEY, options).attach();
+    Raygun.disableAutoBreadcrumbs();
 
     /*
     Adding a version to the Raygun reports to identify which version of the Wire ran into the issue.

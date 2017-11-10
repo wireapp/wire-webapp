@@ -131,8 +131,9 @@ z.event.WebSocketService = class WebSocketService {
   pending_reconnect() {
     if (this.pending_reconnect_trigger) {
       this.logger.info(
-        `Executing pending WebSocket reconnect triggered by '${this
-          .pending_reconnect_trigger}' after access token refresh`
+        `Executing pending WebSocket reconnect triggered by '${
+          this.pending_reconnect_trigger
+        }' after access token refresh`
       );
       this.reconnect(this.pending_reconnect_trigger);
       this.pending_reconnect_trigger = undefined;

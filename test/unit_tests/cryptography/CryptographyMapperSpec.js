@@ -536,8 +536,7 @@ describe('z.cryptography.CryptographyMapper', () => {
       const generic_message = new z.proto.GenericMessage(generic_message_id);
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, new z.proto.Text(plaintext));
 
-      z.assets.AssetCrypto
-        .encrypt_aes_asset(generic_message.toArrayBuffer())
+      z.assets.AssetCrypto.encrypt_aes_asset(generic_message.toArrayBuffer())
         .then(({cipher_text, key_bytes, sha256}) => {
           key_bytes = new Uint8Array(key_bytes);
           sha256 = new Uint8Array(sha256);
@@ -563,8 +562,7 @@ describe('z.cryptography.CryptographyMapper', () => {
       const ping = new z.proto.GenericMessage(generic_message_id);
       ping.set('knock', new z.proto.Knock(false));
 
-      z.assets.AssetCrypto
-        .encrypt_aes_asset(ping.toArrayBuffer())
+      z.assets.AssetCrypto.encrypt_aes_asset(ping.toArrayBuffer())
         .then(({cipher_text, key_bytes, sha256}) => {
           key_bytes = new Uint8Array(key_bytes);
           sha256 = new Uint8Array(sha256);

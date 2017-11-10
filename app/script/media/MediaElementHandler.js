@@ -45,7 +45,9 @@ z.media.MediaElementHandler = class MediaElementHandler {
       const remote_media_element = this._create_media_element(media_stream_info);
       this.remote_media_elements.push(remote_media_element);
       this.logger.info(
-        `Created MediaElement of type '${remote_media_element.nodeName.toLowerCase()}' for MediaStream of flow '${media_stream_info.flow_id}'`,
+        `Created MediaElement of type '${remote_media_element.nodeName.toLowerCase()}' for MediaStream of flow '${
+          media_stream_info.flow_id
+        }'`,
         remote_media_element
       );
     }
@@ -122,7 +124,7 @@ z.media.MediaElementHandler = class MediaElementHandler {
    * @private
    * @param {string} flow_id - ID of flow to search MediaElements for
    * @returns {Array<HTMLMediaElement>} Related MediaElements
-  */
+   */
   _get_media_elements(flow_id) {
     return this.remote_media_elements().filter(media_element => media_element.dataset.flow_id === flow_id);
   }
@@ -147,8 +149,9 @@ z.media.MediaElementHandler = class MediaElementHandler {
         })
         .catch(error => {
           this.logger.warn(
-            `Failed to attach audio output device '${sink_id}' to flow '${media_element.dataset
-              .flow_id}': ${error.message}`,
+            `Failed to attach audio output device '${sink_id}' to flow '${media_element.dataset.flow_id}': ${
+              error.message
+            }`,
             error
           );
         });

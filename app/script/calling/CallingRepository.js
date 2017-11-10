@@ -1408,7 +1408,9 @@ z.calling.CallingRepository = class CallingRepository {
     let log_message;
     if (is_outgoing) {
       if (remote_user_id) {
-        log_message = `Sending '${type}' message (response: ${response}) to user '${remote_user_id}' in conversation '${conversation_id}'`;
+        log_message = `Sending '${type}' message (response: ${response}) to user '${remote_user_id}' in conversation '${
+          conversation_id
+        }'`;
       } else {
         log_message = `Sending '${type}' message (response: ${response}) to conversation '${conversation_id}'`;
       }
@@ -1417,7 +1419,9 @@ z.calling.CallingRepository = class CallingRepository {
         return;
       }
 
-      log_message = `Received '${type}' message (response: ${response}) from user '${user_id}' in conversation '${conversation_id}'`;
+      log_message = `Received '${type}' message (response: ${response}) from user '${user_id}' in conversation '${
+        conversation_id
+      }'`;
     }
 
     this.logger.info(log_message, call_message_et);

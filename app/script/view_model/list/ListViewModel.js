@@ -35,7 +35,7 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
    * @param {z.search.SearchRepository} search_repository - Search repository
    * @param {z.properties.PropertiesRepository} properties_repository - Properties repository
    * @param {z.team.TeamRepository} team_repository - Team repository
-  */
+   */
   constructor(
     element_id,
     content_view_model,
