@@ -1,0 +1,138 @@
+/*
+ * Wire
+ * Copyright (C) 2017 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+body {
+  font-family: $font-family;
+  font-weight: 300;
+  color: $text-color;
+  line-height: 1.5;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+}
+
+p {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+a {
+  text-decoration: none;
+  color: $blue;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+b,
+strong {
+  font-weight: 600;
+}
+
+h1 {
+  color: $gray-lighten-24;
+  text-align: center;
+  font-size: 32px;
+  font-weight: 600;
+  margin-top: 56px;
+  margin-bottom: 8px;
+
+  @include mobile {
+    font-size: 24px;
+    margin-top: 16px;
+  }
+}
+
+h2 {
+  color: $gray-darken-72;
+  text-align: center;
+  font-size: 32px;
+  font-weight: 600;
+  margin-top: 120px;
+  margin-bottom: 24px;
+
+  @include mobile {
+    font-size: 24px;
+    margin-top: 72px;
+    margin-bottom: 16px;
+    text-align: left;
+  }
+}
+
+h3 {
+  color: $gray-darken-72;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  margin-top: 0;
+}
+
+.tagline {
+  color: $gray-darken-72;
+  font-size: 48px;
+  line-height: 56px;
+  font-weight: 300;
+  text-align: center;
+  margin-bottom: 72px;
+
+  @include mobile {
+    font-size: 32px;
+    line-height: 40px;
+    margin-bottom: 48px;
+  }
+}
+
+.extra-large {
+  color: $gray-darken-72;
+  font-size: 56px;
+  font-weight: 200;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.large {
+  color: $gray-darken-72;
+  font-size: 24px;
+  font-weight: 300;
+  margin-bottom: 56px;
+
+  @include mobile {
+    margin-bottom: 24px;
+  }
+}
+
+.small {
+  font-size: 12px;
+  font-weight: 400;
+  color: $gray;
+
+  a {
+    text-decoration: underline;
+    color: $gray;
+
+    &:hover {
+      text-decoration: none;
+      color: $gray-darken-24;
+    }
+  }
+}
+
+.text-transform-initial {
+  text-transform: initial;
+}
