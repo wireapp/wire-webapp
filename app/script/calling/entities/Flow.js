@@ -527,7 +527,7 @@ z.calling.entities.Flow = class Flow {
    * @private
    * @param {MediaStreamEvent} event - Event that a MediaStream has been removed
    * @returns {undefined} No return value
-  */
+   */
   _on_remove_stream(event) {
     this.logger.info('Remote MediaStream removed from PeerConnection', event);
   }
@@ -718,8 +718,7 @@ z.calling.entities.Flow = class Flow {
   save_remote_sdp(call_message_et) {
     let skip_negotiation = false;
 
-    return z.calling.SDPMapper
-      .map_call_message_to_object(call_message_et)
+    return z.calling.SDPMapper.map_call_message_to_object(call_message_et)
       .then(rtc_sdp => z.calling.SDPMapper.rewrite_sdp(rtc_sdp, z.calling.enum.SDP_SOURCE.REMOTE, this))
       .then(({sdp: remote_sdp}) => {
         const is_remote_offer = remote_sdp.type === z.calling.rtc.SDP_TYPE.OFFER;
@@ -765,8 +764,7 @@ z.calling.entities.Flow = class Flow {
   send_local_sdp(sending_on_timeout = false) {
     this._clear_send_sdp_timeout();
 
-    z.calling.SDPMapper
-      .rewrite_sdp(this.peer_connection.localDescription, z.calling.enum.SDP_SOURCE.LOCAL, this)
+    z.calling.SDPMapper.rewrite_sdp(this.peer_connection.localDescription, z.calling.enum.SDP_SOURCE.LOCAL, this)
       .then(({ice_candidates, sdp: local_sdp}) => {
         this.local_sdp(local_sdp);
 
@@ -778,8 +776,9 @@ z.calling.entities.Flow = class Flow {
         }
 
         this.logger.debug(
-          `Sending local '${local_sdp.type}' SDP containing '${ice_candidates.length}' ICE candidates for flow with '${this.remote_user.name()}'\n${this.local_sdp()
-            .sdp}`
+          `Sending local '${local_sdp.type}' SDP containing '${
+            ice_candidates.length
+          }' ICE candidates for flow with '${this.remote_user.name()}'\n${this.local_sdp().sdp}`
         );
         this.should_send_local_sdp(false);
 
@@ -894,9 +893,9 @@ z.calling.entities.Flow = class Flow {
   _create_sdp_success(rct_sdp) {
     this.logger.info(`Creating '${rct_sdp.type}' successful`, rct_sdp);
 
-    z.calling.SDPMapper
-      .rewrite_sdp(rct_sdp, z.calling.enum.SDP_SOURCE.LOCAL, this)
-      .then(({sdp: local_sdp}) => this.local_sdp(local_sdp));
+    z.calling.SDPMapper.rewrite_sdp(rct_sdp, z.calling.enum.SDP_SOURCE.LOCAL, this).then(({sdp: local_sdp}) =>
+      this.local_sdp(local_sdp)
+    );
   }
 
   /**
@@ -1081,8 +1080,9 @@ z.calling.entities.Flow = class Flow {
    */
   _solve_colliding_states(force_renegotiation = false) {
     this.logger.debug(
-      `Solving state collision: Self user ID '${this.self_user_id}', remote user ID '${this
-        .remote_user_id}', force_renegotiation '${force_renegotiation}'`
+      `Solving state collision: Self user ID '${this.self_user_id}', remote user ID '${
+        this.remote_user_id
+      }', force_renegotiation '${force_renegotiation}'`
     );
 
     const self_user_id_looses = this.self_user_id < this.remote_user_id;
@@ -1344,9 +1344,9 @@ z.calling.entities.Flow = class Flow {
 
       const media_stream = this.media_stream().clone();
 
-      z.media.MediaStreamHandler
-        .get_media_tracks(new_media_stream, media_type)
-        .forEach(media_stream_track => media_stream.addTrack(media_stream_track));
+      z.media.MediaStreamHandler.get_media_tracks(new_media_stream, media_type).forEach(media_stream_track =>
+        media_stream.addTrack(media_stream_track)
+      );
 
       return new z.media.MediaStreamInfo(z.media.MediaStreamSource.LOCAL, 'self', media_stream);
     }
@@ -1370,7 +1370,7 @@ z.calling.entities.Flow = class Flow {
   /**
    * Reset the flow.
    * @returns {undefined} No return value
-    */
+   */
   reset_flow() {
     if (this.media_stream()) {
       this._remove_media_stream(this.media_stream());

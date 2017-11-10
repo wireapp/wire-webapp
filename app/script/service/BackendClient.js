@@ -77,7 +77,7 @@ z.service.BackendClient = class BackendClient {
    * @param {string} settings.environment - Backend environment used
    * @param {string} settings.rest_url - Backend REST URL
    * @param {string} settings.web_socket_url - Backend WebSocket URL
-  */
+   */
   constructor(settings) {
     this.logger = new z.util.Logger('z.service.BackendClient', z.config.LOGGER.OPTIONS);
 
