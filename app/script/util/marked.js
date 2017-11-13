@@ -32,7 +32,7 @@
 
   block.list = replace(block.list)(/bull/g, block.bullet)('hr', '\\n+(?=\\1?(?:[-*_] *){3,}(?:\\n+|$))')(
     'def',
-    `\\n+(?=${block.def.source})`
+    '\\n+(?=' + block.def.source + ')' //eslint-disable-line
   )();
 
   block.blockquote = replace(block.blockquote)('def', block.def)();
