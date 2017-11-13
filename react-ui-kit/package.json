@@ -1,6 +1,21 @@
 {
   "name": "@wireapp/react-ui-kit",
-  "version": "0.0.1",
+  "version": "0.0.0",
+  "main": "./dist/index.js",
+  "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit",
+  "scripts": {
+    "clear": "rimraf dist",
+    "dist": "yarn clear && yarn babel src --out-dir dist --no-comments",
+    "fix:script": "yarn test --fix",
+    "fix": "yarn fix:script",
+    "precommit": "lint-staged",
+    "start": "yarn start:demo",
+    "start:static": "gulp",
+    "start:demo": "webpack-dev-server",
+    "test": "eslint -c .eslintrc.yaml --ignore-path .gitignore --ignore-path .prettierignore '**/*.{js,jsx}'",
+    "preversion": "yarn test",
+    "version": "yarn dist"
+  },
   "dependencies": {
     "color": "2.0.1",
     "gulp-concat": "2.6.1",
@@ -10,6 +25,7 @@
     "styled-normalize": "2.2.1"
   },
   "devDependencies": {
+    "babel-cli": "6.26.0",
     "babel-core": "6.26.0",
     "babel-eslint": "8.0.2",
     "babel-loader": "7.1.2",
@@ -29,26 +45,8 @@
     "lint-staged": "4.3.0",
     "prettier": "1.8.1",
     "react-hot-loader": "3.1.2",
+    "rimraf": "2.6.2",
     "webpack": "3.8.1",
     "webpack-dev-server": "2.9.4"
-  },
-  "lint-staged": {
-    "*.{js,jsx}": ["eslint -c .eslintrc.yaml --ignore-path .prettierignore --fix", "git add"],
-    "*.json": ["prettier --write", "git add"],
-    "*.scss": ["prettier --write", "git add"]
-  },
-  "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit",
-  "scripts": {
-    "clear": "echo \"Error: no clear specified\" && exit 1",
-    "dist": "echo \"Error: no dist specified\" && exit 1",
-    "fix:config": "prettier --write '**/*.json'",
-    "fix:script": "npm run test -- --fix",
-    "fix:style": "prettier --write '**/*.scss'",
-    "fix": "npm run fix:config && npm run fix:style && npm run fix:script",
-    "precommit": "lint-staged",
-    "start": "npm run start:demo",
-    "start:static": "gulp",
-    "start:demo": "webpack-dev-server",
-    "test": "eslint -c .eslintrc.yaml --ignore-path .gitignore --ignore-path .prettierignore '**/*.{js,jsx}'"
   }
 }
