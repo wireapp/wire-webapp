@@ -299,7 +299,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
     conversation_et.is_pending(true);
 
     const first_message = conversation_et.get_first_message();
-    const upper_bound = first_message ? new Date(first_message.timestamp()) : new Date();
+    const upper_bound = first_message
+      ? new Date(first_message.timestamp())
+      : new Date(conversation_et.get_latest_timestamp(this.time_offset) + 1);
 
     return this.conversation_service
       .load_preceding_events_from_db(conversation_et.id, new Date(0), upper_bound, z.config.MESSAGES_FETCH_LIMIT)
@@ -407,8 +409,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   _get_unread_events(conversation_et) {
     const first_message = conversation_et.get_first_message();
-    const upper_bound = first_message ? new Date(first_message.timestamp()) : new Date();
     const lower_bound = new Date(conversation_et.last_read_timestamp());
+    const upper_bound = first_message
+      ? new Date(first_message.timestamp())
+      : new Date(conversation_et.get_latest_timestamp(this.time_offset) + 1);
 
     if (lower_bound < upper_bound) {
       conversation_et.is_pending(true);
