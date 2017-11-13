@@ -1,6 +1,6 @@
 {
   "name": "@wireapp/react-ui-kit",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "main": "./dist/index.js",
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit",
   "scripts": {
