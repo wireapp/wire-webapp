@@ -18,10 +18,9 @@
  */
 
 import {COLOR} from './variables';
-import PropTypes from 'prop-types';
+import React from 'react';
 import {Text} from './Text';
 import {transition} from './mixins';
-import React from 'react';
 
 const Link = ({component = 'a', ...props}) => {
   const StyledLink = Text.withComponent(component).extend`
@@ -35,7 +34,7 @@ const Link = ({component = 'a', ...props}) => {
     &:visited,
     &:link,
     &:active {
-      color: ${props => props.color};
+      color: ${() => props.color};
     }
     &:hover {
       cursor: pointer;
