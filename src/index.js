@@ -37,4 +37,5 @@ export * from './Select';
 export * from './Loading';
 export * from './Checkbox';
 export * from './Form';
+export * from './Link';
 export {COLOR} from './variables';

@@ -37,6 +37,7 @@ import {
   Heading,
   Input,
   Line,
+  Link,
   Loading,
   Logo,
   Muted,
@@ -63,6 +64,7 @@ export default function Demo() {
           <Loading />
         </Column>
       </Columns>
+
       <H1>Grid</H1>
       <Line />
       <ContainerXS>
@@ -80,6 +82,7 @@ export default function Demo() {
           ContainerMD
         </Button>
       </ContainerMD>
+
       <H2>Columns</H2>
       <Line />
       <Columns>
@@ -87,8 +90,10 @@ export default function Demo() {
         <Column>Column</Column>
         <Column>Column</Column>
       </Columns>
+
       <H1>Input</H1>
       <Line />
+
       <H2>Button</H2>
       <Line />
       <Columns>
@@ -103,6 +108,24 @@ export default function Demo() {
           <Button disabled>Default Button</Button>
         </Column>
       </Columns>
+
+      <H2>Link</H2>
+      <Line />
+      <Columns>
+        <Column>Link</Column>
+        <Column>
+          <Link href="#">Link</Link>
+        </Column>
+      </Columns>
+      <Columns>
+        <Column>Link with custom component</Column>
+        <Column>
+          <Link component={Button} color={COLOR.GREEN}>
+            CustomLink
+          </Link>
+        </Column>
+      </Columns>
+
       <H2>Checkbox</H2>
       <Line />
       <Columns>
@@ -121,6 +144,7 @@ export default function Demo() {
           </Checkbox>
         </Column>
       </Columns>
+
       <H2>Select</H2>
       <Line />
       <Columns>
@@ -142,6 +166,7 @@ export default function Demo() {
           </Select>
         </Column>
       </Columns>
+
       <H2>TextInput</H2>
       <Line />
       <Columns>
@@ -156,6 +181,7 @@ export default function Demo() {
           <Input disabled placeholder="Placeholder" />
         </Column>
       </Columns>
+
       <H2>Form</H2>
       <Line />
       <ContainerXS>
@@ -164,6 +190,7 @@ export default function Demo() {
           <Button type="submit">Submit Button</Button>
         </Form>
       </ContainerXS>
+
       <H1>Typography</H1>
       <Line />
       <Columns>
@@ -267,6 +294,7 @@ export default function Demo() {
         dolorum! Magnam perferendis alias porro, placeat totam molestiae similique reiciendis harum consequuntur, earum
         autem excepturi expedita molestias laborum quae non cupiditate!
       </Paragraph>
+
       <H1>Colors</H1>
       <Line />
       {Object.keys(COLOR).map(colorKey => (
