@@ -19,29 +19,32 @@
     "tough-cookie": "2.3.3"
   },
   "devDependencies": {
+    "@wireapp/react-ui-kit": "0.0.1",
+    "babel-core": "6.26.0",
+    "babel-loader": "7.1.2",
+    "babel-preset-react": "6.24.1",
     "browser-sync": "2.18.13",
     "concurrently": "3.5.0",
     "cross-env": "5.1.1",
     "istanbul": "0.4.5",
     "jasmine": "2.8.0",
-    "karma": "1.7.1",
     "karma-chrome-launcher": "2.2.0",
-    "karma-jasmine": "1.1.0",
     "karma-jasmine-diff-reporter": "1.1.1",
+    "karma-jasmine": "1.1.0",
     "karma-sourcemap-loader": "0.3.7",
+    "karma": "1.7.1",
     "nock": "9.0.18",
     "optimist": "0.6.1",
+    "react-hot-loader": "3.1.2",
     "rimraf": "2.6.2",
-    "sinon": "4.1.2",
     "sinon-har-server": "0.3.0",
+    "sinon": "4.1.2",
     "typescript": "2.6.1",
-    "webpack": "3.8.1",
-    "webpack-dev-server": "2.9.4"
+    "webpack-dev-server": "2.9.4",
+    "webpack": "3.8.1"
   },
   "description": "Wire API Client to send and receive data.",
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "license": "GPL-3.0",
   "main": "./dist/commonjs/Client.js",
   "name": "@wireapp/api-client",
@@ -62,7 +65,7 @@
     "test:browser": "karma start karma.conf.js",
     "test:node": "cross-env JASMINE_CONFIG_PATH=src/test/node/support/jasmine.json jasmine",
     "test": "yarn build:node && yarn pack:test && yarn test:node && yarn test:browser",
-    "watch": "webpack-dev-server --config webpack.config.js --open"
+    "watch": "webpack-dev-server --config webpack.config.js"
   },
   "types": "./dist/commonjs/Client.d.ts",
   "version": "0.2.7"
