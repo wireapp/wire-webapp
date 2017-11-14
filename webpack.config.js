@@ -17,9 +17,14 @@
  *
  */
 
+const webpack = require('webpack');
+
 module.exports = {
   devtool: 'cheap-module-source-map',
   devServer: {
+    hot: true,
+    open: true,
+    overlay: true,
     stats: {
       chunks: false,
     },
@@ -33,8 +38,21 @@ module.exports = {
     'fs-extra': '{}',
   },
   output: {
-    path: `${__dirname}/dist`,
-    filename: `[name].js`,
+    filename: `dist/[name].js`,
     publicPath: '/',
   },
+  module: {
+    rules: [
+      {
+        exclude: /(node_modules)/,
+        test: /\.jsx?$/,
+        use: [
+          {
+            loader: 'babel-loader',
+          },
+        ],
+      },
+    ],
+  },
+  plugins: [new webpack.HotModuleReplacementPlugin()],
 };
