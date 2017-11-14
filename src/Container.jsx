@@ -26,6 +26,7 @@ import {media} from './mixins';
 const Container = styled.div`
   position: relative;
   margin: 0 auto;
+  text-align: ${props => (props.center ? 'center' : 'left')};
 
   ${props => {
     switch (props.level) {
