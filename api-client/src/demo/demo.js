@@ -21,13 +21,92 @@ import Client from '../../dist/commonjs/Client';
 import {AccessTokenStore} from '../../dist/commonjs/auth/';
 import {WebSocketClient} from '../../dist/commonjs/tcp/';
 import {MemoryEngine} from '@wireapp/store-engine/dist/commonjs/engine';
-
-import {Button, COLOR, ContainerMD, ContainerXS, Form, H1, Input, Link, Logo, Text} from '@wireapp/react-ui-kit';
+import {
+  Button,
+  COLOR,
+  ContainerMD,
+  ContainerXS,
+  Form,
+  H1,
+  Input,
+  Link,
+  Logo,
+  Text,
+} from '@wireapp/react-ui-kit';
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 
+const BACKEND_ENV = Client.BACKEND.STAGING;
+
+class Auth extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      login: {
+        email: window.wire.email,
+        password: window.wire.password,
+        persist: false,
+      },
+      authenticated: false,
+    };
+    this.doAuth = this.doAuth.bind(this);
+    this.onEmailChange = this.onEmailChange.bind(this);
+    this.onPasswordChange = this.onPasswordChange.bind(this);
+  }
+
+  doAuth(event) {
+    event.preventDefault();
+    this.setState({authenticated: false});
+    return Promise.resolve()
+      .then(() => window.wire.client.init())
+      .catch(error => window.wire.client.login(this.state.login))
+      .then(context => {
+        console.log('Login successful', context);
+        this.setState({authenticated: true});
+        return window.wire.client.connect();
+      });
+  }
+
+  onEmailChange(event) {
+    this.setState({login: Object.assign(this.state.login, {email: event.target.value})});
+  }
+
+  onPasswordChange(event) {
+    this.setState({login: Object.assign(this.state.login, {password: event.target.value})});
+  }
+
+  render() {
+    return (
+      <ContainerMD>
+        <Link href="https://wire.com">
+          <Logo />
+        </Link>
+        <ContainerXS>
+          <H1 center>API-Client</H1>
+          <Form
+            onSubmit={this.doAuth}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
+            <Input onChange={this.onEmailChange} placeholder="Email" />
+            <Input onChange={this.onPasswordChange} type="password" placeholder="Password" />
+            <Button type="submit" backgroundColor={COLOR.GREEN} block>
+              {this.state.authenticated ? '😊' : 'Login'}
+            </Button>
+            <Text center>
+              Backend: <Link href={BACKEND_ENV.rest}>{BACKEND_ENV.rest}</Link>
+            </Text>
+            <Text center>Version: {window.wire.client.VERSION}</Text>
+          </Form>
+        </ContainerXS>
+      </ContainerMD>
+    );
+  }
+}
+
 window.onload = function() {
-  const BACKEND_ENV = Client.BACKEND.STAGING;
   const config = {store: new MemoryEngine('wire-demo'), urls: BACKEND_ENV};
   const client = new Client(config);
   client.transport.ws.on(WebSocketClient.TOPIC.ON_MESSAGE, notification => {
@@ -38,72 +117,5 @@ window.onload = function() {
   });
   window.wire = Object.assign({}, {client});
 
-  class Auth extends Component {
-    constructor(props) {
-      super(props);
-      this.state = {
-        login: {
-          email: window.wire.email,
-          password: window.wire.password,
-          persist: false,
-        },
-        authenticated: false,
-      };
-      this.doAuth = this.doAuth.bind(this);
-      this.onEmailChange = this.onEmailChange.bind(this);
-      this.onPasswordChange = this.onPasswordChange.bind(this);
-    }
-
-    doAuth(event) {
-      event.preventDefault();
-      this.setState({authenticated: false});
-      return Promise.resolve()
-        .then(() => window.wire.client.init())
-        .catch(error => window.wire.client.login(this.state.login))
-        .then(context => {
-          console.log('Login successful', context);
-          this.setState({authenticated: true});
-          return window.wire.client.connect();
-        });
-    }
-
-    onEmailChange(event) {
-      this.setState({login: Object.assign(this.state.login, {email: event.target.value})});
-    }
-
-    onPasswordChange(event) {
-      this.setState({login: Object.assign(this.state.login, {password: event.target.value})});
-    }
-
-    render() {
-      return (
-        <ContainerMD>
-          <Link href="https://wire.com">
-            <Logo />
-          </Link>
-          <ContainerXS>
-            <H1 center>API-Client</H1>
-            <Form
-              onSubmit={this.doAuth}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-              }}
-            >
-              <Input onChange={this.onEmailChange} placeholder="Email" />
-              <Input onChange={this.onPasswordChange} type="password" placeholder="Password" />
-              <Button type="submit" backgroundColor={COLOR.GREEN} block>
-                {this.state.authenticated ? '😊' : 'Login'}
-              </Button>
-              <Text center>
-                Backend: <Link href={BACKEND_ENV.rest}>{BACKEND_ENV.rest}</Link>
-              </Text>
-              <Text center>Version: {window.wire.client.VERSION}</Text>
-            </Form>
-          </ContainerXS>
-        </ContainerMD>
-      );
-    }
-  }
   ReactDOM.render(<Auth />, document.getElementById('app'));
 };

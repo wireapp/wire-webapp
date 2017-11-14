@@ -17,14 +17,17 @@
  *
  */
 
-import {FONT} from './variables';
+import {COLOR, FONT} from './variables';
 import {css} from 'styled-components';
 
 export default css`
+  * {
+    box-sizing: border-box;
+  }
   body {
     font-family: ${FONT.fontFamily};
     font-weight: 300;
-    color: $text-color;
+    color: ${COLOR.GRAY_DARKEN_72};
     line-height: 1.5;
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
