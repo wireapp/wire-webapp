@@ -17,15 +17,12 @@
  *
  */
 
-import {baseStyles, normalizeStyles} from '../src/';
 import {AppContainer} from 'react-hot-loader';
 import Demo from './Demo';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
 function render(Component) {
-  normalizeStyles();
-  baseStyles();
   ReactDOM.render(
     <AppContainer>
       <Component />
