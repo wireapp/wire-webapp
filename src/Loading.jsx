@@ -45,7 +45,10 @@ function LoadingComponent({className, progress}) {
 }
 LoadingComponent.propTypes = {
   className: PropTypes.string.isRequired,
-  progress: PropTypes.number.isRequired,
+  progress: PropTypes.number,
+};
+LoadingComponent.defaultProps = {
+  progress: null,
 };
 
 const fillAnimation = keyframes`
