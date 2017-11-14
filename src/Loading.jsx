@@ -17,41 +17,72 @@
  *
  */
 
-import styled, {keyframes} from 'styled-components';
-import {COLOR} from './variables';
+import styled, {css, keyframes} from 'styled-components';
 import PropTypes from 'prop-types';
+import React from 'react';
 
-const borderRatio = 4;
+const pathLength = 125.68;
 
-const spin = keyframes`
-0%{
-  transform: rotate(0);
+function LoadingComponent({className, progress}) {
+  const additionalProps = {};
+  if (progress !== null) {
+    additionalProps.strokeDashoffset = `${pathLength - pathLength * progress}`;
+  }
+  return (
+    <svg className={className} width="43" height="43" viewBox="0 0 43 43" strokeWidth="3" fill="none">
+      <circle cx="21.5" cy="21.5" r="20" stroke="rgba(48,53,56,.2)" />
+      <circle
+        cx="21.5"
+        cy="21.5"
+        r="20"
+        stroke="#218fd1"
+        transform="rotate(-90 21.5 21.5)"
+        strokeDasharray={pathLength}
+        {...additionalProps}
+      />
+    </svg>
+  );
 }
-100% {
-  transform: rotate(360deg);
-}
+LoadingComponent.propTypes = {
+  className: PropTypes.string.isRequired,
+  progress: PropTypes.number.isRequired,
+};
+
+const fillAnimation = keyframes`
+  0% {
+    stroke-dashoffset: ${pathLength + pathLength};
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
 `;
 
-const Loading = styled.div`
-  animation: ${spin} 1.2s infinite linear;
-  border-color: transparent ${props => props.color};
-  border-radius: 50%;
-  border-style: solid;
-  border-width: ${props => props.size / borderRatio}px;
-  box-sizing: border-box;
-  display: inline-block;
-  height: ${props => props.size}px;
-  width: ${props => props.size}px;
+const rotateAnimation = keyframes`
+  0% {
+    transform: rotate(0);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+`;
+
+const Loading = styled(LoadingComponent)`
+  ${props =>
+    props.progress === null &&
+    css`
+      circle:nth-of-type(2) {
+        stroke-dasharray: ${pathLength};
+      }
+      animation: ${fillAnimation} 2.4s infinite ease-in-out, ${rotateAnimation} 2.4s infinite linear;
+    `};
 `;
 
 Loading.propTypes = {
-  color: PropTypes.string,
-  size: PropTypes.number,
+  progress: PropTypes.number,
 };
 
 Loading.defaultProps = {
-  color: COLOR.GRAY,
-  size: 40,
+  progress: null,
 };
 
 export {Loading};

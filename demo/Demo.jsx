@@ -62,6 +62,8 @@ export default function Demo() {
         </Column>
         <Column>
           <Loading />
+          <Loading progress={0.33} />
+          <Loading progress={0.66} />
         </Column>
       </Columns>
 
