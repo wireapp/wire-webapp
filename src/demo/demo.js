@@ -21,18 +21,7 @@ import Client from '../../dist/commonjs/Client';
 import {AccessTokenStore} from '../../dist/commonjs/auth/';
 import {WebSocketClient} from '../../dist/commonjs/tcp/';
 import {MemoryEngine} from '@wireapp/store-engine/dist/commonjs/engine';
-import {
-  Button,
-  COLOR,
-  ContainerMD,
-  ContainerXS,
-  Form,
-  H1,
-  Input,
-  Link,
-  Logo,
-  Text,
-} from '@wireapp/react-ui-kit';
+import {Button, COLOR, ContainerMD, ContainerXS, Form, H1, Input, Link, Logo, Text} from '@wireapp/react-ui-kit';
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 
@@ -43,8 +32,8 @@ class Auth extends Component {
     super(props);
     this.state = {
       login: {
-        email: window.wire.email,
-        password: window.wire.password,
+        email: '',
+        password: '',
         persist: false,
       },
       authenticated: false,
@@ -105,7 +94,6 @@ class Auth extends Component {
     );
   }
 }
-
 window.onload = function() {
   const config = {store: new MemoryEngine('wire-demo'), urls: BACKEND_ENV};
   const client = new Client(config);
