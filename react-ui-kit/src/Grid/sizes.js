@@ -17,21 +17,16 @@
  *
  */
 
-import {COLOR} from './variables';
-import PropTypes from 'prop-types';
-import styled from 'styled-components';
+/* eslint-disable sort-keys, sort-vars, no-magic-numbers */
 
-const Line = styled.hr`
-  border: none;
-  border-bottom: 1px solid ${props => props.color};
-`;
-
-Line.propTypes = {
-  color: PropTypes.string,
+export const WIDTH = {
+  MOBILE: 480,
+  TABLET_MIN: 640,
+  TABLET_MAX: 919,
+  DESKTOP_MIN: 920,
+  DESKTOP_MAX: 1200,
+  DESKTOP_XL_MIN: 1201,
+  DESKTOP_XL_MAX: 1600,
 };
 
-Line.defaultProps = {
-  color: COLOR.GRAY_LIGHTEN_88,
-};
-
-export {Line};
+export const GUTTER = 12;

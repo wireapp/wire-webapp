@@ -18,10 +18,10 @@
  */
 
 import styled, {css} from 'styled-components';
-import {COLOR} from './variables';
+import {COLOR} from './colors';
 import PropTypes from 'prop-types';
 import React from 'react';
-import {transition} from './mixins';
+import {defaultTransition} from '../Identity/motions';
 
 const width = 57;
 const height = 18;
@@ -40,7 +40,7 @@ Wire.propTypes = {
 const Logo = styled(Wire)`
   path {
     fill: ${COLOR.GRAY_DARKEN_48};
-    ${transition};
+    ${defaultTransition};
   }
   ${props =>
     props.hover &&

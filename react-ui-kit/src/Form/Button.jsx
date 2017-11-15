@@ -17,10 +17,10 @@
  *
  */
 
-import {COLOR} from './variables';
+import {COLOR} from '../Identity';
 import PropTypes from 'prop-types';
-import {Text} from './Text';
-import {transition} from './mixins';
+import {Text} from '../Text';
+import {defaultTransition} from '../Identity/motions';
 
 const Button = Text.withComponent('button').extend`
   /* appearance */
@@ -31,7 +31,7 @@ const Button = Text.withComponent('button').extend`
   cursor: pointer;
   display: inline-block;
   text-decoration: none;
-  ${transition}
+  ${defaultTransition}
 
   /* positioning */
   height: 48px;

@@ -17,42 +17,38 @@
  *
  */
 
-import {SIZE} from './variables';
+import {WIDTH} from './Grid/sizes';
 import {css} from 'styled-components';
 
-export const media = {
+export default {
   desktop: (...content) => css`
-    @media (min-width: ${SIZE.DESKTOP_MIN}px) {
+    @media (min-width: ${WIDTH.DESKTOP_MIN}px) {
       ${css(...content)};
     }
   `,
   desktopXL: (...content) => css`
-    @media (min-width: ${SIZE.DESKTOP_XL_MIN}px) {
+    @media (min-width: ${WIDTH.DESKTOP_XL_MIN}px) {
       ${css(...content)};
     }
   `,
   mobile: (...content) => css`
-    @media (max-width: ${SIZE.MOBILE}px) {
+    @media (max-width: ${WIDTH.MOBILE}px) {
       ${css(...content)};
     }
   `,
   mobileUp: (...content) => css`
-    @media (min-width: ${SIZE.MOBILE}px) {
+    @media (min-width: ${WIDTH.MOBILE}px) {
       ${css(...content)};
     }
   `,
   tablet: (...content) => css`
-    @media (min-width: ${SIZE.TABLET_MIN}px) and (max-width: ${SIZE.TABLET_MAX}px) {
+    @media (min-width: ${WIDTH.TABLET_MIN}px) and (max-width: ${WIDTH.TABLET_MAX}px) {
       ${css(...content)};
     }
   `,
   tabletDown: (...content) => css`
-    @media (min-width: ${SIZE.TABLET_MAX}px) {
+    @media (min-width: ${WIDTH.TABLET_MAX}px) {
       ${css(...content)};
     }
   `,
 };
-
-export const transition = css`
-  transition: all 0.24s;
-`;

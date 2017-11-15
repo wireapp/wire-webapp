@@ -17,38 +17,35 @@
  *
  */
 
-import {COLOR} from './variables';
-import React from 'react';
-import {Text} from './Text';
-import {transition} from './mixins';
+import {GUTTER} from './sizes';
+import media from '../mediaQueries';
+import styled from 'styled-components';
 
-const Link = ({component = 'a', ...props}) => {
-  const StyledLink = Text.withComponent(component).extend`
-    /* appearance */
-    font-weight: 400;
-    text-decoration: none;
-    ${transition}
+const Columns = styled.div`
+  display: flex;
+  ${media.mobile`
+    flex-direction: column;
+  `};
+`;
 
-    /* positioning */
+const Column = styled.div`
+  display: block;
+  flex-grow: 1;
+  flex-basis: 0;
+  flex-shrink: 1;
+  padding: 0 ${GUTTER}px;
+  &:first-child {
+    padding-left: 0;
+  }
+  &:last-child {
+    padding-right: 0;
+  }
 
-    &:visited,
-    &:link,
-    &:active {
-      color: ${() => props.color};
+  ${media.mobile`
+    &, &:first-child, &:last-child{
+      padding: 0;
     }
-    &:hover {
-      cursor: pointer;
-      color: ${COLOR.GRAY_DARKEN_88};
-    }
-  `;
-  return <StyledLink {...props} />;
-};
-Link.propTypes = {
-  ...Text.propTypes,
-};
+  `};
+`;
 
-Link.defaultProps = {
-  ...Text.defaultProps,
-};
-
-export {Link};
+export {Column, Columns};

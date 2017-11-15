@@ -21,25 +21,25 @@
 
 import Color from 'color';
 
-export function shade(color, percentage) {
+function shade(color, percentage) {
   return Color(color)
     .mix(Color(BASE_COLOR.BLACK), percentage)
     .toString();
 }
 
-export function tint(color, percentage) {
+function tint(color, percentage) {
   return Color(color)
     .mix(Color(BASE_COLOR.WHITE), percentage)
     .toString();
 }
 
-export function opaque(color, percentage) {
+function opaque(color, percentage) {
   return Color(color)
     .fade(percentage)
     .toString();
 }
 
-export const BASE_COLOR = {
+const BASE_COLOR = {
   BLACK: '#000',
   BLUE: '#2391d3',
   GRAY: '#8d989f',
@@ -50,7 +50,7 @@ export const BASE_COLOR = {
   YELLOW: '#febf02',
 };
 
-export const DARK_COLOR = {
+const DARK_COLOR = {
   BLUE_DARKEN_8: shade(BASE_COLOR.BLUE, 0.08),
   BLUE_DARKEN_48: shade(BASE_COLOR.BLUE, 0.48),
   BLUE_DARKEN_72: shade(BASE_COLOR.BLUE, 0.72),
@@ -77,7 +77,7 @@ export const DARK_COLOR = {
   YELLOW_DARKEN_88: shade(BASE_COLOR.YELLOW, 0.88),
 };
 
-export const LIGHT_COLOR = {
+const LIGHT_COLOR = {
   GRAY_LIGHTEN_24: tint(BASE_COLOR.GRAY, 0.24),
   GRAY_LIGHTEN_48: tint(BASE_COLOR.GRAY, 0.48),
   GRAY_LIGHTEN_72: tint(BASE_COLOR.GRAY, 0.72),
@@ -85,7 +85,7 @@ export const LIGHT_COLOR = {
   GRAY_LIGHTEN_92: tint(BASE_COLOR.GRAY, 0.92),
 };
 
-export const OPAQUE_COLOR = {
+const OPAQUE_COLOR = {
   BLUE_OPAQUE_16: opaque(BASE_COLOR.BLUE, 0.16),
   BLUE_OPAQUE_24: opaque(BASE_COLOR.BLUE, 0.24),
   GRAY_OPAQUE_16: opaque(BASE_COLOR.GRAY, 0.16),
@@ -105,19 +105,4 @@ export const COLOR = {
   ...DARK_COLOR,
   ...LIGHT_COLOR,
   ...OPAQUE_COLOR,
-};
-
-export const FONT = {
-  fontFamily: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif',
-};
-
-export const SIZE = {
-  GUTTER: 12,
-  MOBILE: 480,
-  TABLET_MIN: 640,
-  TABLET_MAX: 919,
-  DESKTOP_MIN: 920,
-  DESKTOP_MAX: 1200,
-  DESKTOP_XL_MIN: 1201,
-  DESKTOP_XL_MAX: 1600,
 };

@@ -19,35 +19,24 @@
 
 import {
   Bold,
-  Button,
-  ButtonLink,
-  COLOR,
-  Checkbox,
-  Column,
-  Columns,
-  Container,
-  ContainerMD,
-  ContainerSM,
-  ContainerXS,
-  Form,
   H1,
   H2,
   H3,
   H4,
   Heading,
-  Input,
   Line,
   Link,
-  Loading,
-  Logo,
   Muted,
   Paragraph,
-  Select,
   Small,
   Text,
   Uppercase,
-} from '../src/';
+} from '@wireapp/react-ui-kit/dist/Text';
+import {Button, ButtonLink, Checkbox, Form, Input, Select} from '@wireapp/react-ui-kit/dist/Form';
+import {COLOR, Logo} from '@wireapp/react-ui-kit/dist/Identity';
+import {Column, Columns, Container, ContainerMD, ContainerSM, ContainerXS} from '@wireapp/react-ui-kit/dist/Grid';
 import Color from 'color';
+import {Loading} from '@wireapp/react-ui-kit/dist/Progress';
 import React from 'react';
 
 export default function Demo() {
@@ -66,7 +55,6 @@ export default function Demo() {
           <Loading progress={0.66} />
         </Column>
       </Columns>
-
       <H1>Grid</H1>
       <Line />
       <ContainerXS>
