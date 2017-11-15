@@ -89,14 +89,16 @@
   "lint-staged": {
     "*.js": ["eslint -c .eslintrc.yaml --fix", "git add"],
     "*.json": ["prettier --print-width=200 --write", "git add"],
-    "*.less": ["prettier --write", "git add"]
+    "*.less": ["prettier --write", "git add"],
+    "*.md": ["prettier --write", "git add"]
   },
   "scripts": {
     "deploy-travis-dev": "grunt app_deploy_travis:dev",
     "deploy-travis-prod": "grunt app_deploy_travis:prod",
     "deploy-travis-staging": "grunt app_deploy_travis:staging",
-    "fix": "yarn fix:script && yarn fix:config && yarn fix:style",
+    "fix": "yarn fix:script && yarn fix:config && yarn fix:style && yarn fix:docs",
     "fix:config": "prettier --print-width=200 --ignore-path .gitignore --write '**/*.json'",
+    "fix:docs": "prettier --ignore-path .gitignore --write '**/*.md'",
     "fix:style": "prettier --ignore-path .gitignore --write '**/*.less'",
     "fix:script": "npm run test:script -- --fix",
     "postinstall": "grunt init",
