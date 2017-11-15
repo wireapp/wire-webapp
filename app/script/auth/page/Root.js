@@ -18,18 +18,47 @@
  */
 
 import React from 'react';
-import {indexStrings} from '../../strings';
-import {injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
+import {Logo} from '@wireapp/react-ui-kit/Identity';
+import {Small, H3, Link} from '@wireapp/react-ui-kit/Text';
+import {Columns, Column, ContainerXS, ContainerMD} from '@wireapp/react-ui-kit/Grid';
 
-const Root = ({name, intl: {formatMessage: _}}) => (
-  <h1>
-    {_(indexStrings.hello)} {name}!
-  </h1>
+const Root = ({name}) => (
+  <ContainerMD>
+    <ContainerXS center>
+      <br />
+      <Logo id="wire-logo" />
+      <br />
+      Secure messaging for everyone
+      <br />
+      <br />
+      <Columns>
+        <Column>
+          <Link href="#" data-uie-name="go-register-personal">
+            <img src="#" width="100" height="100" />
+            <br />
+            <H3 center>Create an account</H3>
+            for personal use
+          </Link>
+        </Column>
+        <Column>
+          <Link href="#" data-uie-name="go-register-team">
+            <img src="#" width="100" height="100" />
+            <br />
+            <H3 center>Create a team</H3>
+            for work
+          </Link>
+        </Column>
+      </Columns>
+      <br />
+      <br />
+      <Small>Already have an account?</Small>
+      <br />
+      <Link href="#">Login</Link>
+    </ContainerXS>
+  </ContainerMD>
 );
 
-export default injectIntl(
-  connect(state => ({
-    name: state.authState.name,
-  }))
-)(Root);
+export default connect(state => ({
+  name: state.authState.name,
+}))(Root);
