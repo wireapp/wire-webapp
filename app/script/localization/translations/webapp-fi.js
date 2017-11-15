@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 z.string.fi.wire_macos = 'Wire macOS: lle';
 z.string.fi.wire_windows = 'Wire Windowsille';
 z.string.fi.wire_linux = 'Wire Linuxille';
@@ -572,3 +570,4 @@ z.string.fi.ephememal_units_hour = 'tunti';
 z.string.fi.ephememal_units_hours = 'tuntia';
 z.string.fi.ephememal_units_day = 'päivä';
 z.string.fi.ephememal_units_days = 'päivää';
+

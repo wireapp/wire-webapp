@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 z.string.ro.wire = 'Wire';
 z.string.ro.wire_macos = 'Wire pentru macOS';
 z.string.ro.wire_windows = 'Wire pentru Windows';
@@ -572,3 +570,4 @@ z.string.ro.ephememal_units_hour = 'oră';
 z.string.ro.ephememal_units_hours = 'ore';
 z.string.ro.ephememal_units_day = 'zi';
 z.string.ro.ephememal_units_days = 'zile';
+

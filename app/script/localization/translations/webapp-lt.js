@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 z.string.lt.wire = 'Wire';
 z.string.lt.wire_macos = 'Wire, skirta macOS';
 z.string.lt.wire_windows = 'Wire, skirta Windows';
@@ -572,3 +570,4 @@ z.string.lt.ephememal_units_hour = 'val.';
 z.string.lt.ephememal_units_hours = 'val.';
 z.string.lt.ephememal_units_day = 'diena';
 z.string.lt.ephememal_units_days = 'dienos(-ų)';
+

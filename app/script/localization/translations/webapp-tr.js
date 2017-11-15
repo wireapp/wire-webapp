@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 z.string.tr.wire_macos = 'MacOS için Wire';
 z.string.tr.wire_windows = 'Windows için Wire';
 z.string.tr.wire_linux = 'Linux için Wire';
@@ -564,3 +562,4 @@ z.string.tr.ephememal_units_hour = 'saat';
 z.string.tr.ephememal_units_hours = 'saat';
 z.string.tr.ephememal_units_day = 'gün';
 z.string.tr.ephememal_units_days = 'gün';
+

@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 z.string.hu.wire = 'Wire';
 z.string.hu.wire_macos = 'Wire MacOS-hez';
 z.string.hu.wire_windows = 'Wire Windowshoz';
@@ -578,3 +576,4 @@ z.string.hu.ephememal_units_hour = 'óra';
 z.string.hu.ephememal_units_hours = 'óra';
 z.string.hu.ephememal_units_day = 'nap';
 z.string.hu.ephememal_units_days = 'nap';
+

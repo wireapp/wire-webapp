@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 z.string.fr.wire = 'Wire';
 z.string.fr.wire_macos = 'Wire pour macOS';
 z.string.fr.wire_windows = 'Wire pour Windows';
@@ -576,3 +574,4 @@ z.string.fr.ephememal_units_hour = 'heure';
 z.string.fr.ephememal_units_hours = 'heures';
 z.string.fr.ephememal_units_day = 'jour';
 z.string.fr.ephememal_units_days = 'jours';
+

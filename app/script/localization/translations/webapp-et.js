@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 z.string.et.wire = 'Wire';
 z.string.et.wire_macos = 'Wire macOS-ile';
 z.string.et.wire_windows = 'Wire Windowsile';
@@ -573,3 +571,4 @@ z.string.et.ephememal_units_hour = 'tund';
 z.string.et.ephememal_units_hours = 'tundi';
 z.string.et.ephememal_units_day = 'päev';
 z.string.et.ephememal_units_days = 'päeva';
+

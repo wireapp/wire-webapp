@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 z.string.ru.wire = 'Wire';
 z.string.ru.wire_macos = 'Wire для macOS';
 z.string.ru.wire_windows = 'Wire для Windows';
@@ -572,3 +570,4 @@ z.string.ru.ephememal_units_hour = 'час';
 z.string.ru.ephememal_units_hours = 'часов';
 z.string.ru.ephememal_units_day = 'дн.';
 z.string.ru.ephememal_units_days = 'дн.';
+

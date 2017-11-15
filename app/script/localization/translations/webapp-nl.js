@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 z.string.nl.wire = 'Wire';
 z.string.nl.wire_macos = 'Wire voor macOS';
 z.string.nl.wire_windows = 'Wire voor Windows';
@@ -568,3 +566,4 @@ z.string.nl.ephememal_units_hour = 'uur';
 z.string.nl.ephememal_units_hours = 'uren';
 z.string.nl.ephememal_units_day = 'dag';
 z.string.nl.ephememal_units_days = 'dagen';
+

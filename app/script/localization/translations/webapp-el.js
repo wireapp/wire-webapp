@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 z.string.el.wire_macos = 'Wire για macOS';
 z.string.el.wire_windows = 'Wire για Windows';
 z.string.el.wire_linux = 'Wire για Linux';
@@ -561,3 +559,4 @@ z.string.el.ephememal_units_hour = 'ώρα';
 z.string.el.ephememal_units_hours = 'ώρες';
 z.string.el.ephememal_units_day = 'ημέρα';
 z.string.el.ephememal_units_days = 'ημέρες';
+

@@ -37,6 +37,7 @@ before_install:
 
 before_script:
   - greenkeeper-lockfile-update
+  - npm rebuild node-sass
 
 after_script:
   - greenkeeper-lockfile-upload
