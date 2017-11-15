@@ -31,6 +31,7 @@ import {
   Typing,
 } from '../conversation/';
 import {ConversationEvent} from './event/';
+import {ValidationError} from '../validation/';
 import {HttpClient} from '../http/';
 
 export default class ConversationAPI {
@@ -253,6 +254,9 @@ export default class ConversationAPI {
       report_missing?: string;
     }
   ): Promise<ClientMismatch> {
+    if (!clientId) {
+      throw new ValidationError('Unable to send OTR message without client ID.');
+    }
     if (!messageData) {
       messageData = {
         recipients: {},
