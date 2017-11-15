@@ -17,13 +17,13 @@
  *
  */
 
-import Client from '../../dist/commonjs/Client';
-import {AccessTokenStore} from '../../dist/commonjs/auth/';
-import {WebSocketClient} from '../../dist/commonjs/tcp/';
-import {MemoryEngine} from '@wireapp/store-engine/dist/commonjs/engine';
 import {Button, COLOR, ContainerMD, ContainerXS, Form, H1, Input, Link, Logo, Text} from '@wireapp/react-ui-kit';
 import React, {Component} from 'react';
+import {AccessTokenStore} from '../../dist/commonjs/auth/';
+import Client from '../../dist/commonjs/Client';
+import {MemoryEngine} from '@wireapp/store-engine/dist/commonjs/engine';
 import ReactDOM from 'react-dom';
+import {WebSocketClient} from '../../dist/commonjs/tcp/';
 
 const BACKEND_ENV = Client.BACKEND.STAGING;
 
@@ -31,12 +31,12 @@ class Auth extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      authenticated: false,
       login: {
         email: '',
         password: '',
         persist: false,
       },
-      authenticated: false,
     };
     this.doAuth = this.doAuth.bind(this);
     this.onEmailChange = this.onEmailChange.bind(this);
@@ -75,8 +75,8 @@ class Auth extends Component {
           <Form
             onSubmit={this.doAuth}
             style={{
-              display: 'flex',
               alignItems: 'center',
+              display: 'flex',
             }}
           >
             <Input onChange={this.onEmailChange} placeholder="Email" />

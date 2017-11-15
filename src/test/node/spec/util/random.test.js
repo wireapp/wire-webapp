@@ -19,12 +19,14 @@
 
 const {unsafeAlphanumeric} = require('@wireapp/api-client/dist/commonjs/shims/node/random');
 
-describe('"unsafeAlphanumeric"', function() {
-  it('should generate string of length 32 as default', function() {
-    expect(unsafeAlphanumeric(32).length).toBe(32);
+describe('"unsafeAlphanumeric"', () => {
+  it('should generate string of length 32 as default', () => {
+    const maxLength = 32;
+    expect(unsafeAlphanumeric(maxLength).length).toBe(maxLength);
   });
 
-  it('should generate string for the given length', function() {
-    expect(unsafeAlphanumeric(10).length).toBe(10);
+  it('should generate string for the given length', () => {
+    const maxLength = 10;
+    expect(unsafeAlphanumeric(maxLength).length).toBe(maxLength);
   });
 });

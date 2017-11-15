@@ -1,3 +1,4 @@
+/* eslint-disable no-magic-numbers */
 /*
  * Wire
  * Copyright (C) 2017 Wire Swiss GmbH
@@ -26,7 +27,7 @@ const {UserAPI} = require('@wireapp/api-client/dist/commonjs/user/');
 describe('Client', () => {
   const baseURL = Client.BACKEND.PRODUCTION.rest;
 
-  const accessTokenData = {
+  let accessTokenData = {
     access_token:
       'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ==.v=1.k=1.d=1498600993.t=a.l=.u=aaf9a833-ef30-4c22-86a0-9adc8a15b3b4.c=15037015562284012115',
     expires_in: 900,
@@ -47,7 +48,7 @@ describe('Client', () => {
       const client = new Client();
       const TABLE = client.accessTokenStore.ACCESS_TOKEN_TABLE;
       const PRIMARY_KEY = client.accessTokenStore.ACCESS_TOKEN_KEY;
-      const accessTokenData = {
+      accessTokenData = {
         access_token: 'initial-access-token-data',
         expires_in: 900,
         token_type: 'Bearer',
@@ -70,7 +71,7 @@ describe('Client', () => {
   });
 
   describe('"login"', () => {
-    const accessTokenData = {
+    accessTokenData = {
       access_token:
         'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ==.v=1.k=1.d=1498600993.t=a.l=.u=aaf9a833-ef30-4c22-86a0-9adc8a15b3b4.c=15037015562284012115',
       expires_in: 900,
@@ -86,45 +87,45 @@ describe('Client', () => {
 
     const userData = [
       {
-        handle: 'webappbot',
         accent_id: 0,
+        assets: [],
+        handle: 'webappbot',
+        id: '062418ea-9b93-4d93-b59b-11aba3f702d8',
+        name: 'Webapp Bot',
         picture: [
           {
             content_length: 7023,
-            data: null,
             content_type: 'image/jpeg',
+            data: null,
             id: 'bb5c861e-b133-46e1-a92b-555218ecdf52',
             info: {
-              height: 280,
-              tag: 'smallProfile',
-              original_width: 1920,
-              width: 280,
               correlation_id: '83f6d538-fc38-4e24-97ae-312f079f3594',
-              original_height: 1080,
+              height: 280,
               nonce: '83f6d538-fc38-4e24-97ae-312f079f3594',
+              original_height: 1080,
+              original_width: 1920,
               public: true,
+              tag: 'smallProfile',
+              width: 280,
             },
           },
           {
             content_length: 94027,
-            data: null,
             content_type: 'image/jpeg',
+            data: null,
             id: 'efd732aa-2ff2-4959-968a-a621dda342b6',
             info: {
-              height: 1080,
-              tag: 'medium',
-              original_width: 1920,
-              width: 1920,
               correlation_id: '83f6d538-fc38-4e24-97ae-312f079f3594',
-              original_height: 1080,
+              height: 1080,
               nonce: '83f6d538-fc38-4e24-97ae-312f079f3594',
+              original_height: 1080,
+              original_width: 1920,
               public: true,
+              tag: 'medium',
+              width: 1920,
             },
           },
         ],
-        name: 'Webapp Bot',
-        id: '062418ea-9b93-4d93-b59b-11aba3f702d8',
-        assets: [],
       },
     ];
 
