@@ -17,12 +17,21 @@
  *
  */
 
-import setGlobalStyles from './globalStyles';
+import {COLOR} from '../Identity';
+import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
-setGlobalStyles();
+const Line = styled.hr`
+  border: none;
+  border-bottom: 1px solid ${props => props.color};
+`;
 
-export * from './Form';
-export * from './Grid';
-export * from './Identity';
-export * from './Progress';
-export * from './Text';
+Line.propTypes = {
+  color: PropTypes.string,
+};
+
+Line.defaultProps = {
+  color: COLOR.GRAY_LIGHTEN_88,
+};
+
+export {Line};

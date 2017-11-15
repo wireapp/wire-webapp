@@ -19,9 +19,9 @@
 
 /* eslint-disable no-magic-numbers */
 
+import {GUTTER, WIDTH} from './sizes';
 import styled, {css} from 'styled-components';
-import {SIZE} from './variables';
-import {media} from './mixins';
+import media from '../mediaQueries';
 
 const Container = styled.div`
   position: relative;
@@ -32,27 +32,27 @@ const Container = styled.div`
     switch (props.level) {
       case 'md':
         return css`
-          max-width: ${SIZE.TABLET_MAX}px;
+          max-width: ${WIDTH.TABLET_MAX}px;
         `;
       case 'sm':
         return css`
-          max-width: ${SIZE.TABLET_MIN}px;
+          max-width: ${WIDTH.TABLET_MIN}px;
         `;
       case 'xs':
         return css`
-          max-width: ${SIZE.MOBILE}px;
+          max-width: ${WIDTH.MOBILE}px;
         `;
       default:
         return css`
-          padding: 0 ${SIZE.GUTTER * 2}px;
+          padding: 0 ${GUTTER * 2}px;
           ${media.desktop`
             padding: 0;
-            width: ${SIZE.DESKTOP_MIN - SIZE.GUTTER * 4}px;
+            width: ${WIDTH.DESKTOP_MIN - GUTTER * 4}px;
           `};
 
           ${media.desktopXL`
             padding: 0;
-            width: ${SIZE.DESKTOP_MIN - SIZE.GUTTER * 4}px;
+            width: ${WIDTH.DESKTOP_MIN - GUTTER * 4}px;
           `};
         `;
     }

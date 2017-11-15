@@ -18,7 +18,7 @@
  */
 
 import styled, {css} from 'styled-components';
-import {COLOR} from './variables';
+import {COLOR} from '../Identity';
 import PropTypes from 'prop-types';
 
 const Text = styled.span`

@@ -1,16 +1,4 @@
 {
-  "name": "@wireapp/react-ui-kit",
-  "version": "0.0.1",
-  "main": "./dist/index.js",
-  "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit",
-  "scripts": {
-    "clear": "rimraf dist",
-    "dist": "yarn clear && yarn babel src --out-dir dist --no-comments",
-    "start": "yarn start:demo",
-    "start:static": "gulp",
-    "start:demo": "webpack-dev-server",
-    "version": "yarn dist"
-  },
   "dependencies": {
     "color": "2.0.1",
     "gulp-concat": "2.6.1",
@@ -35,5 +23,19 @@
     "rimraf": "2.6.2",
     "webpack": "3.8.1",
     "webpack-dev-server": "2.9.4"
-  }
+  },
+  "license": "GPL-3.0",
+  "main": "./dist/index.js",
+  "name": "@wireapp/react-ui-kit",
+  "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit",
+  "scripts": {
+    "clear": "rimraf dist",
+    "dist": "yarn clear && yarn babel src --out-dir dist --no-comments",
+    "prepare": "yarn dist && node scripts/prepare.js",
+    "start": "yarn start:demo",
+    "start:static": "gulp",
+    "start:demo": "webpack-dev-server",
+    "version": "yarn dist"
+  },
+  "version": "0.0.1"
 }

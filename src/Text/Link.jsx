@@ -17,35 +17,38 @@
  *
  */
 
-import {SIZE} from './variables';
-import {media} from './mixins';
-import styled from 'styled-components';
+import {COLOR} from '../Identity';
+import React from 'react';
+import {Text} from './Text';
+import {defaultTransition} from '../Identity/motions';
 
-const Columns = styled.div`
-  display: flex;
-  ${media.mobile`
-    flex-direction: column;
-  `};
-`;
+const Link = ({component = 'a', ...props}) => {
+  const StyledLink = Text.withComponent(component).extend`
+    /* appearance */
+    font-weight: 400;
+    text-decoration: none;
+    ${defaultTransition}
 
-const Column = styled.div`
-  display: block;
-  flex-grow: 1;
-  flex-basis: 0;
-  flex-shrink: 1;
-  padding: 0 ${SIZE.GUTTER}px;
-  &:first-child {
-    padding-left: 0;
-  }
-  &:last-child {
-    padding-right: 0;
-  }
+    /* positioning */
 
-  ${media.mobile`
-    &, &:first-child, &:last-child{
-      padding: 0;
+    &:visited,
+    &:link,
+    &:active {
+      color: ${() => props.color};
     }
-  `};
-`;
+    &:hover {
+      cursor: pointer;
+      color: ${COLOR.GRAY_DARKEN_88};
+    }
+  `;
+  return <StyledLink {...props} />;
+};
+Link.propTypes = {
+  ...Text.propTypes,
+};
 
-export {Column, Columns};
+Link.defaultProps = {
+  ...Text.defaultProps,
+};
+
+export {Link};

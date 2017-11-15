@@ -17,7 +17,7 @@
  *
  */
 
-import {COLOR} from './variables';
+import {COLOR} from '../Identity';
 import styled from 'styled-components';
 
 const Input = styled.input`
