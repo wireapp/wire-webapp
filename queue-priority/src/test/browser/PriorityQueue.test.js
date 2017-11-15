@@ -1,3 +1,4 @@
+/* eslint-disable no-magic-numbers */
 /*
  * Wire
  * Copyright (C) 2017 Wire Swiss GmbH
@@ -43,7 +44,7 @@ describe('PriorityQueue', () => {
     });
 
     it('supports limiting the amount of retries', done => {
-      const businessLogic = () => Promise.reject('Error');
+      const businessLogic = () => Promise.reject(new Error('Error'));
       const queue = new PriorityQueue({maxRetries: 1});
       queue
         .add(businessLogic)
@@ -211,7 +212,7 @@ describe('PriorityQueue', () => {
       const queue = new PriorityQueue();
 
       const promise1 = () => Promise.resolve('one').then(item => expect(item).toBe('one'));
-      const promise2 = () => Promise.reject('two');
+      const promise2 = () => Promise.reject(new Error('two'));
       const promise3 = () =>
         Promise.resolve('three').then(item => {
           expect(item).toBe('three');
@@ -313,7 +314,7 @@ describe('PriorityQueue', () => {
         });
 
       const promise2 = () =>
-        Promise.reject('two').then(item => {
+        Promise.reject(new Error('two')).then(item => {
           expect(item).toBe('two');
           return 'two';
         });

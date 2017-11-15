@@ -20,7 +20,6 @@
 const webpack = require('webpack');
 
 module.exports = {
-  devtool: 'cheap-module-source-map',
   devServer: {
     hot: true,
     open: true,
@@ -29,17 +28,14 @@ module.exports = {
       chunks: false,
     },
   },
+  devtool: 'cheap-module-source-map',
   entry: {
-    demo: `${__dirname}/src/demo/demo.js`,
     client: `${__dirname}/dist/commonjs/Client.js`,
+    demo: `${__dirname}/src/demo/demo.js`,
     test: `${__dirname}/src/test/browser/index.js`,
   },
   externals: {
     'fs-extra': '{}',
-  },
-  output: {
-    filename: `dist/[name].js`,
-    publicPath: '/',
   },
   module: {
     rules: [
@@ -53,6 +49,10 @@ module.exports = {
         ],
       },
     ],
+  },
+  output: {
+    filename: `dist/[name].js`,
+    publicPath: '/',
   },
   plugins: [new webpack.HotModuleReplacementPlugin()],
 };

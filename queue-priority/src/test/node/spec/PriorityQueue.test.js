@@ -1,3 +1,4 @@
+/* eslint-disable no-magic-numbers */
 /*
  * Wire
  * Copyright (C) 2017 Wire Swiss GmbH
