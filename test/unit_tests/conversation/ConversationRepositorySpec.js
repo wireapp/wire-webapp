@@ -88,8 +88,9 @@ describe('ConversationRepository', () => {
           JSON.stringify(payload.conversations.knock.post),
         ]);
 
-        const mark_as_read_url = `${test_factory.settings.connection
-          .rest_url}/conversations/${conversation_et.id}/self`;
+        const mark_as_read_url = `${test_factory.settings.connection.rest_url}/conversations/${
+          conversation_et.id
+        }/self`;
         server.respondWith('PUT', mark_as_read_url, [200, {}, '']);
 
         return conversation_repository.save_conversation(conversation_et);
@@ -1139,31 +1140,30 @@ describe('ConversationRepository', () => {
       it('should add missing clients to the payload', done => {
         spyOn(TestFactory.user_repository, 'add_client_to_user').and.returnValue(Promise.resolve());
         // TODO: Make this fake method available as a utility function for testing
-        spyOn(
-          TestFactory.cryptography_repository.cryptography_service,
-          'get_users_pre_keys'
-        ).and.callFake(recipients => {
-          return Promise.resolve().then(() => {
-            const pre_key_map = {};
+        spyOn(TestFactory.cryptography_repository.cryptography_service, 'get_users_pre_keys').and.callFake(
+          recipients => {
+            return Promise.resolve().then(() => {
+              const pre_key_map = {};
 
-            for (const user_id in recipients) {
-              if (recipients.hasOwnProperty(user_id)) {
-                const client_ids = recipients[user_id];
-                pre_key_map[user_id] = pre_key_map[user_id] || {};
+              for (const user_id in recipients) {
+                if (recipients.hasOwnProperty(user_id)) {
+                  const client_ids = recipients[user_id];
+                  pre_key_map[user_id] = pre_key_map[user_id] || {};
 
-                client_ids.forEach(client_id => {
-                  pre_key_map[user_id][client_id] = {
-                    key:
-                      'pQABARn//wKhAFgg3OpuTCUwDZMt1fklZB4M+fjDx/3fyx78gJ6j3H3dM2YDoQChAFggQU1orulueQHLv5YDYqEYl3D4O0zA9d+TaGGXXaBJmK0E9g==',
-                    id: 65535,
-                  };
-                });
+                  client_ids.forEach(client_id => {
+                    pre_key_map[user_id][client_id] = {
+                      key:
+                        'pQABARn//wKhAFgg3OpuTCUwDZMt1fklZB4M+fjDx/3fyx78gJ6j3H3dM2YDoQChAFggQU1orulueQHLv5YDYqEYl3D4O0zA9d+TaGGXXaBJmK0E9g==',
+                      id: 65535,
+                    };
+                  });
+                }
               }
-            }
 
-            return pre_key_map;
-          });
-        });
+              return pre_key_map;
+            });
+          }
+        );
 
         client_mismatch = {
           missing: {

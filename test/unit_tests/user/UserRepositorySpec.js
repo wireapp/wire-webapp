@@ -121,8 +121,9 @@ describe('z.user.UserRepository', () => {
 
         server.respondWith(
           'GET',
-          `${test_factory.settings.connection.rest_url}/users?ids=${entities.user.jane_roe.id}%2C${entities.user
-            .jane_roe.id}`,
+          `${test_factory.settings.connection.rest_url}/users?ids=${entities.user.jane_roe.id}%2C${
+            entities.user.jane_roe.id
+          }`,
           [200, {'Content-Type': 'application/json'}, JSON.stringify(payload.users.get.many)]
         );
 

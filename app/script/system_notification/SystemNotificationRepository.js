@@ -466,7 +466,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    * @param {boolean} should_obfuscate_sender - Sender visible in notification
    * @param {z.entity.User} user_et - Sender of message
    * @returns {string} Icon URL
-  */
+   */
   _create_options_icon(should_obfuscate_sender, user_et) {
     if (user_et.preview_picture_resource() && !should_obfuscate_sender) {
       return user_et
@@ -492,7 +492,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    * @private
    * @param {z.entity.Conversation|z.entity.Connection} input - Information to create the tag from
    * @returns {string} Notification message tag
-  */
+   */
   _create_options_tag(input) {
     return input.id || input.conversation_id;
   }
@@ -559,7 +559,9 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
         default:
           this.logger.log(
             this.logger.levels.OFF,
-            `Notification for member message '${message_et.id} in '${conversation_et.id}' does not have specific trigger.`
+            `Notification for member message '${message_et.id} in '${
+              conversation_et.id
+            }' does not have specific trigger.`
           );
       }
     }

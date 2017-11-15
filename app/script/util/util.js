@@ -70,7 +70,9 @@ z.util.check_indexed_db = function() {
 };
 
 z.util.dummy_image = function(width, height) {
-  return `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${width} ${height}' width='${width}' height='${height}'></svg>`;
+  return `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${width} ${height}' width='${
+    width
+  }' height='${height}'></svg>`;
 };
 
 z.util.is_same_location = function(past_location, current_location) {
@@ -454,38 +456,14 @@ z.util.markup_links = function(message) {
 
 // Note: We are using "Underscore.js" to escape HTML in the original message
 z.util.render_message = function(message) {
-  message = marked(message);
-
-  // Parse links with linkifyjs library, ignore code tags
-  const options = {
-    attributes: function(href, type) {
-      if (type === 'url') {
-        return {rel: 'nofollow noopener noreferrer'};
-      }
-      if (type === 'email') {
-        const email = href.replace('mailto:', '');
-        return {onclick: `z.util.safe_mailto_open('${email}')`};
-      }
-      return {};
+  message = marked(message, {
+    highlight: function(code) {
+      return hljs.highlightAuto(code).value;
     },
-    formatHref: function(href, type) {
-      return type === 'email' ? '#' : href;
-    },
-    ignoreTags: ['code', 'pre'],
-    validate: {
-      hashtag: function(value) {
-        return false;
-      },
-      mention: function(value) {
-        return false;
-      },
-    },
-  };
-  message = linkifyHtml(message, options);
+    sanitize: true,
+  });
 
   // Remove this when this is merged: https://github.com/SoapBox/linkifyjs/pull/189
-  message = message.replace(/ class="linkified"/g, '');
-
   message = message.replace(/\n/g, '<br />');
 
   // Remove <br /> if it is the last thing in a message

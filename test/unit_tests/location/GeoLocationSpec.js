@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2016 Wire Swiss GmbH
+ * Copyright (C) 2017 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +31,9 @@ describe('z.location', () => {
 
       const latitude = 52.5233;
       const longitude = 13.4138;
-      const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyCKxxKw5JBZ5zEFtoirtgnw8omvH7gWzfo`;
+      const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${
+        longitude
+      }&key=AIzaSyCKxxKw5JBZ5zEFtoirtgnw8omvH7gWzfo`;
 
       const server = sinon.fakeServer.create();
       server.autoRespond = true;
@@ -56,7 +58,9 @@ describe('z.location', () => {
       const locations = [{'address_components': [{'long_name': '2', 'short_name': '2', 'types': ['street_number']}, {'long_name': 'Alexanderstraße', 'short_name': 'Alexanderstraße', 'types': ['route']}, {'long_name': 'Mitte', 'short_name': 'Mitte', 'types': ['political', 'sublocality', 'sublocality_level_1']}, {'long_name': 'Berlin', 'short_name': 'Berlin', 'types': ['locality', 'political']}, {'long_name': 'Berlin', 'short_name': 'Berlin', 'types': ['administrative_area_level_1', 'political']}, {'long_name': 'Deutschland', 'short_name': '<script>alert("malicious")</script>', 'types': ['country', 'political']}, {'long_name': '10178', 'short_name': '10178', 'types': ['postal_code']}], 'formatted_address': 'Alexanderstraße 2, 10178 Berlin, Deutschland', 'geometry': {'location': {'lat': 52.523824, 'lng': 13.4145348}, 'location_type': 'ROOFTOP', 'viewport': {'northeast': {'lat': 52.52517298029149, 'lng': 13.4158837802915}, 'southwest': {'lat': 52.52247501970849, 'lng': 13.4131858197085}}}, 'place_id': 'ChIJ7xU9wx5OqEcRbjo-v63nALk', 'types': ['street_address']}];
       const latitude = 52.5233;
       const longitude = 13.4138;
-      const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyCKxxKw5JBZ5zEFtoirtgnw8omvH7gWzfo`;
+      const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${
+        longitude
+      }&key=AIzaSyCKxxKw5JBZ5zEFtoirtgnw8omvH7gWzfo`;
 
       const server = sinon.fakeServer.create();
       server.autoRespond = true;

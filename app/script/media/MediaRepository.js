@@ -35,7 +35,7 @@ z.media.MediaRepository = class MediaRepository {
   /**
    * Extended check for MediaDevices support of browser.
    * @returns {boolean} True if MediaDevices are supported
-  */
+   */
   static supports_media_devices() {
     return z.util.Environment.browser.supports.media_devices;
   }
