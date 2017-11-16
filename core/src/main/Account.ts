@@ -59,13 +59,8 @@ export default class Account extends EventEmitter {
     TEXT_MESSAGE: 'Account.INCOMING.TEXT_MESSAGE',
   };
 
-  constructor(loginData: LoginData, storeEngine: CRUDEngine = new MemoryEngine('temporary')) {
+  constructor(storeEngine: CRUDEngine = new MemoryEngine('temporary')) {
     super();
-    this.loginData = {
-      persist: !(storeEngine instanceof MemoryEngine),
-      ...loginData,
-    };
-    this.sanitizeLoginData();
     this.storeEngine = storeEngine;
     this.apiClient = new Client({store: storeEngine});
     this.cryptobox = new Cryptobox(new store.CryptoboxCRUDStore(storeEngine));
@@ -80,23 +75,28 @@ export default class Account extends EventEmitter {
     });
   }
 
-  private sanitizeLoginData(): void {
+  private sanitizeLoginData(loginData: LoginData): LoginData {
     const removeNonPrintableCharacters = new RegExp('[^\x20-\x7E]+', 'gm');
 
-    if (this.loginData.email) {
-      this.loginData.email = this.loginData.email.replace(removeNonPrintableCharacters, '');
+    if (loginData.email) {
+      loginData.email = loginData.email.replace(removeNonPrintableCharacters, '');
     }
 
-    if (this.loginData.password) {
-      this.loginData.password = this.loginData.password.toString().replace(removeNonPrintableCharacters, '');
+    if (loginData.handle) {
+      loginData.handle = loginData.handle.replace(removeNonPrintableCharacters, '');
     }
 
-    if (this.loginData.handle) {
-      this.loginData.handle = this.loginData.handle.replace(removeNonPrintableCharacters, '');
+    if (loginData.password) {
+      loginData.password = loginData.password.toString().replace(removeNonPrintableCharacters, '');
     }
+
+    return {
+      ...loginData,
+      persist: !(this.storeEngine instanceof MemoryEngine),
+    };
   }
 
-  private registerNewClient(): Promise<RegisteredClient> {
+  private registerNewClient(loginData: LoginData): Promise<RegisteredClient> {
     return this.cryptobox
       .create()
       .then((initialPreKeys: Array<Proteus.keys.PreKey>) => {
@@ -113,7 +113,7 @@ export default class Account extends EventEmitter {
           class: 'desktop',
           cookie: 'webapp@1224301118@temporary@1472638149000',
           lastkey: this.cryptobox.serialize_prekey(this.cryptobox.lastResortPreKey),
-          password: this.loginData.password.toString(),
+          password: loginData.password.toString(),
           prekeys: serializedPreKeys,
           sigkeys: {
             enckey: 'Wuec0oJi9/q9VsgOil9Ds4uhhYwBT+CAUrvi/S9vcz0=',
@@ -132,23 +132,24 @@ export default class Account extends EventEmitter {
       .then(() => this.client);
   }
 
-  private initClient(context: Context): Promise<RegisteredClient> {
+  private initClient(context: Context, loginData: LoginData): Promise<RegisteredClient> {
     this.context = context;
     return this.loadExistingClient().catch(error => {
       if (error instanceof RecordNotFoundError) {
-        return this.registerNewClient();
+        return this.registerNewClient(loginData);
       }
       throw error;
     });
   }
 
-  public login(initClient: boolean = true): Promise<Context> {
+  public login(loginData: LoginData, initClient: boolean = true): Promise<Context> {
+    loginData = this.sanitizeLoginData(loginData);
     return this.apiClient
       .init()
-      .catch((error: Error) => this.apiClient.login(this.loginData))
+      .catch((error: Error) => this.apiClient.login(loginData))
       .then((context: Context) => {
         if (initClient) {
-          return this.initClient(context).then(client => {
+          return this.initClient(context, loginData).then(client => {
             this.apiClient.context.clientID = client.id;
           });
         }
@@ -170,7 +171,6 @@ export default class Account extends EventEmitter {
       this.client = undefined;
       this.context = undefined;
       this.cryptobox = undefined;
-      this.loginData = undefined;
     });
   }
 
@@ -228,11 +228,11 @@ export default class Account extends EventEmitter {
     });
   }
 
-  public listen(callback: Function): Promise<WebSocketClient> {
+  public listen(callback: Function, loginData: LoginData): Promise<WebSocketClient> {
     return Promise.resolve()
       .then(() => {
         if (!this.context) {
-          return this.login();
+          return this.login(loginData);
         }
         return undefined;
       })
