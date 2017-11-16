@@ -10,12 +10,20 @@ For licensing information, see the attached LICENSE file and the list of third-p
 
 ### Install
 
-```
+```bash
 yarn
 ```
 
 ### Start
 
-```
+```bash
 yarn start
+```
+
+### Release
+
+```bash
+yarn prepare
+cd ./dist
+yarn publish
 ```

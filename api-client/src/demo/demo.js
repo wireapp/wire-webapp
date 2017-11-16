@@ -17,7 +17,10 @@
  *
  */
 
-import {Button, COLOR, ContainerMD, ContainerXS, Form, H1, Input, Link, Logo, Text} from '@wireapp/react-ui-kit';
+import {Button, Form, Input} from '@wireapp/react-ui-kit/Form';
+import {COLOR, Logo} from '@wireapp/react-ui-kit/Identity';
+import {ContainerXS, Content, Header, StyledApp} from '@wireapp/react-ui-kit/Layout';
+import {H1, Link, Text} from '@wireapp/react-ui-kit/Text';
 import React, {Component} from 'react';
 import {AccessTokenStore} from '../../dist/commonjs/auth/';
 import Client from '../../dist/commonjs/Client';
@@ -66,31 +69,36 @@ class Auth extends Component {
 
   render() {
     return (
-      <ContainerMD>
-        <Link href="https://wire.com">
-          <Logo />
-        </Link>
-        <ContainerXS>
-          <H1 center>API-Client</H1>
-          <Form
-            onSubmit={this.doAuth}
-            style={{
-              alignItems: 'center',
-              display: 'flex',
-            }}
-          >
-            <Input onChange={this.onEmailChange} placeholder="Email" />
-            <Input onChange={this.onPasswordChange} type="password" placeholder="Password" />
-            <Button type="submit" backgroundColor={COLOR.GREEN} block>
-              {this.state.authenticated ? '😊' : 'Login'}
-            </Button>
-            <Text center>
-              Backend: <Link href={BACKEND_ENV.rest}>{BACKEND_ENV.rest}</Link>
-            </Text>
-            <Text center>Version: {window.wire.client.VERSION}</Text>
-          </Form>
-        </ContainerXS>
-      </ContainerMD>
+      <StyledApp>
+        <Header>
+          <Link href="https://wire.com">
+            <Logo />
+          </Link>
+          <div>&nbsp;</div>
+        </Header>
+        <Content>
+          <ContainerXS verticalCenter>
+            <H1 center>API-Client</H1>
+            <Form
+              onSubmit={this.doAuth}
+              style={{
+                alignItems: 'center',
+                display: 'flex',
+              }}
+            >
+              <Input onChange={this.onEmailChange} placeholder="Email" />
+              <Input onChange={this.onPasswordChange} type="password" placeholder="Password" />
+              <Button type="submit" backgroundColor={COLOR.GREEN} block>
+                {this.state.authenticated ? '😊' : 'Login'}
+              </Button>
+              <Text center>
+                Backend: <Link href={BACKEND_ENV.rest}>{BACKEND_ENV.rest}</Link>
+              </Text>
+              <Text center>Version: {window.wire.client.VERSION}</Text>
+            </Form>
+          </ContainerXS>
+        </Content>
+      </StyledApp>
     );
   }
 }
