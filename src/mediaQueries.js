@@ -17,7 +17,7 @@
  *
  */
 
-import {WIDTH} from './Grid/sizes';
+import {WIDTH} from './Layout/sizes';
 import {css} from 'styled-components';
 
 export default {

@@ -53,6 +53,9 @@ module.exports = {
   },
   plugins: [new webpack.HotModuleReplacementPlugin(), new webpack.NamedModulesPlugin()],
   resolve: {
+    alias: {
+      '@wireapp/react-ui-kit': path.resolve(__dirname, 'dist'),
+    },
     extensions: ['.js', '.jsx'],
   },
 };

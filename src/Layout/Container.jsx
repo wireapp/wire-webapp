@@ -21,12 +21,14 @@
 
 import {GUTTER, WIDTH} from './sizes';
 import styled, {css} from 'styled-components';
+import PropTypes from 'prop-types';
 import media from '../mediaQueries';
 
 const Container = styled.div`
   position: relative;
-  margin: 0 auto;
-  text-align: ${props => (props.center ? 'center' : 'left')};
+  margin: ${props => (props.verticalCenter ? 'auto' : '0 auto')};
+  text-align: ${props => (props.centerText ? 'center' : 'left')};
+  width: 100%;
 
   ${props => {
     switch (props.level) {
@@ -44,7 +46,6 @@ const Container = styled.div`
         `;
       default:
         return css`
-          padding: 0 ${GUTTER * 2}px;
           ${media.desktop`
             padding: 0;
             width: ${WIDTH.DESKTOP_MIN - GUTTER * 4}px;
@@ -59,18 +60,33 @@ const Container = styled.div`
   }};
 `;
 
+Container.propTypes = {
+  centerText: PropTypes.bool,
+  level: PropTypes.string,
+  verticalCenter: PropTypes.bool,
+};
+
+Container.defaultProps = {
+  centerText: false,
+  level: '',
+  verticalCenter: false,
+};
+
 const ContainerMD = Container.extend``;
 ContainerMD.defaultProps = {
+  ...Container.defaultProps,
   level: 'md',
 };
 
 const ContainerSM = Container.extend``;
 ContainerSM.defaultProps = {
+  ...Container.defaultProps,
   level: 'sm',
 };
 
 const ContainerXS = Container.extend``;
 ContainerXS.defaultProps = {
+  ...Container.defaultProps,
   level: 'xs',
 };
 
