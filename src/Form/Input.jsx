@@ -38,23 +38,30 @@ const Input = styled.input`
   &::-webkit-input-placeholder {
     /* WebKit, Blink, Edge */
     color: ${COLOR.GRAY_LIGHTEN_24};
+    text-transform: ${props => props.placeholderTextTransform};
   }
   &::-ms-input-placeholder {
     /* Microsoft Edge */
     color: ${COLOR.GRAY_LIGHTEN_24};
+    text-transform: ${props => props.placeholderTextTransform};
   }
   &::-moz-placeholder {
     /* Mozilla Firefox 19+ */
     color: ${COLOR.GRAY_LIGHTEN_24};
     opacity: 1;
+    text-transform: ${props => props.placeholderTextTransform};
   }
   &:invalid {
     box-shadow: none;
   }
 `;
 
-Input.propTypes = {};
+Input.propTypes = {
+  placeholderTextTransform: PropTypes.string,
+};
 
-Input.defaultProps = {};
+Input.defaultProps = {
+  placeholderTextTransform: 'uppercase',
+};
 
 export {Input};
