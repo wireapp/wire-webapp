@@ -22,16 +22,25 @@ import {StyledApp, Content} from '@wireapp/react-ui-kit/Layout';
 import {HashRouter as Router, Route} from 'react-router-dom';
 import Index from './Index';
 import TeamName from './TeamName';
+import {IntlProvider, addLocaleData} from 'react-intl';
+import {connect} from 'react-redux';
+import de from 'react-intl/locale-data/de';
 
-const Root = ({children}) => (
-  <StyledApp>
-    <Router>
-      <Content>
-        <Route exact path="/" component={Index} />
-        <Route path="/newteam" component={TeamName} />
-      </Content>
-    </Router>
-  </StyledApp>
+addLocaleData([...de]);
+
+const Root = ({locale}) => (
+  <IntlProvider locale={locale} messages={require(`../../../i18n/webapp-${locale}.json`)}>
+    <StyledApp>
+      <Router>
+        <Content>
+          <Route exact path="/" component={Index} />
+          <Route path="/newteam" component={TeamName} />
+        </Content>
+      </Router>
+    </StyledApp>
+  </IntlProvider>
 );
 
-export default Root;
+export default connect(state => ({
+  locale: 'de',
+}))(Root);

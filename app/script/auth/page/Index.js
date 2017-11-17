@@ -19,54 +19,58 @@
 
 import React from 'react';
 import {connect} from 'react-redux';
+import {indexStrings} from '../../strings';
+import {injectIntl} from 'react-intl';
 import {Profile, RoundContainer, Team} from '@wireapp/react-ui-kit/Icon';
 import {Logo, COLOR} from '@wireapp/react-ui-kit/Identity';
 import {Link as RRLink} from 'react-router-dom';
 import {Small, Link, Paragraph, Text, Bold} from '@wireapp/react-ui-kit/Text';
 import {Columns, Column, ContainerXS, Spacer} from '@wireapp/react-ui-kit/Layout';
 
-const Root = ({name, history}) => (
+const Index = ({name, history, intl: {formatMessage: _}}) => (
   <ContainerXS centerText verticalCenter>
     <Logo id="wire-logo" scale={1.68} />
     <Paragraph fontSize="16px" center>
-      {'Secure messaging for everyone.'}
+      {_(indexStrings.claim)}
     </Paragraph>
     <Columns style={{margin: '70px auto'}}>
       <Column>
-        <Link to="/newteam" data-uie-name="go-register-personal" component={RRLink}>
+        <Link data-uie-name="go-register-personal">
           <RoundContainer>
             <Profile color={COLOR.WHITE} />
           </RoundContainer>
           <Spacer size={12} />
-          <Bold fontSize="24px">{'Create an account'}</Bold>
+          <Bold fontSize="24px">{_(indexStrings.createAccount)}</Bold>
           <br />
           <Text light fontSize="24px">
-            {'for personal use'}
+            {_(indexStrings.createAccountFor)}
           </Text>
         </Link>
       </Column>
       <Column>
-        <Link href="#" data-uie-name="go-register-team">
+        <Link to="/newteam" data-uie-name="go-register-team" component={RRLink}>
           <RoundContainer color={COLOR.GREEN}>
             <Team color={COLOR.WHITE} />
           </RoundContainer>
           <Spacer size={12} />
-          <Bold fontSize="24px">{'Create a team'}</Bold>
+          <Bold fontSize="24px">{_(indexStrings.createTeam)}</Bold>
           <br />
           <Text light fontSize="24px">
-            {'for work'}
+            {_(indexStrings.createTeamFor)}
           </Text>
         </Link>
       </Column>
     </Columns>
-    <Small>{'Already have an account?'}</Small>
+    <Small>{_(indexStrings.loginInfo)}</Small>
     <br />
     <Link href="#" bold>
-      {'Log In'}
+      {_(indexStrings.login)}
     </Link>
   </ContainerXS>
 );
 
-export default connect(state => ({
-  name: state.authState.name,
-}))(Root);
+export default injectIntl(
+  connect(state => ({
+    name: state.authState.name,
+  }))(Index)
+);
