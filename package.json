@@ -17,9 +17,8 @@
     "@bower_components/libsodium.js": "jedisct1/libsodium.js#0.5.4",
     "@bower_components/linkifyjs": "nfrasser/linkify-shim#2.1.5",
     "@bower_components/long": "dcodeIO/Long.js#*",
-    "@bower_components/marked": "wireapp/marked#18f7f85194ec0f619397f49f7dfdaa5e5b09db09",
     "@bower_components/mixpanel": "mixpanel/mixpanel-js#2.13.0",
-    "@bower_components/moment": "moment/moment#2.19.1",
+    "@bower_components/moment": "moment/moment#2.19.2",
     "@bower_components/normalize-css": "necolas/normalize.css#3.0.3",
     "@bower_components/pako": "nodeca/pako#1.0.6",
     "@bower_components/phone-format": "albeebe/phoneformat.js#1.0.5",
@@ -45,9 +44,9 @@
     "@bower_components/wire-webapp-proteus": "wireapp/proteus.js#5.2.0"
   },
   "devDependencies": {
-    "@wireapp/core": "0.0.3",
+    "@wireapp/core": "0.0.5",
     "autoprefixer": "7.1.6",
-    "eslint": "4.10.0",
+    "eslint": "4.11.0",
     "eslint-config-prettier": "2.7.0",
     "eslint-plugin-jsdoc": "3.2.0",
     "eslint-plugin-prettier": "2.3.1",
@@ -78,9 +77,9 @@
     "karma-chrome-launcher": "2.2.0",
     "karma-coverage": "1.1.1",
     "karma-jasmine": "1.1.0",
-    "lint-staged": "4.3.0",
+    "lint-staged": "5.0.0",
     "load-grunt-tasks": "3.5.2",
-    "prettier": "1.8.1",
+    "prettier": "1.8.2",
     "request": "2.83.0",
     "sinon": "4.1.2"
   },
@@ -90,14 +89,16 @@
   "lint-staged": {
     "*.js": ["eslint -c .eslintrc.yaml --fix", "git add"],
     "*.json": ["prettier --print-width=200 --write", "git add"],
-    "*.less": ["prettier --write", "git add"]
+    "*.less": ["prettier --write", "git add"],
+    "*.md": ["prettier --write", "git add"]
   },
   "scripts": {
     "deploy-travis-dev": "grunt app_deploy_travis:dev",
     "deploy-travis-prod": "grunt app_deploy_travis:prod",
     "deploy-travis-staging": "grunt app_deploy_travis:staging",
-    "fix": "yarn fix:script && yarn fix:config && yarn fix:style",
+    "fix": "yarn fix:script && yarn fix:config && yarn fix:style && yarn fix:docs",
     "fix:config": "prettier --print-width=200 --ignore-path .gitignore --write '**/*.json'",
+    "fix:docs": "prettier --ignore-path .gitignore --write '**/*.md'",
     "fix:style": "prettier --ignore-path .gitignore --write '**/*.less'",
     "fix:script": "npm run test:script -- --fix",
     "postinstall": "grunt init",
@@ -158,9 +159,6 @@
     },
     "@bower_components/long": {
       "js": "dist/long.js"
-    },
-    "@bower_components/marked": {
-      "js": "lib/marked.js"
     },
     "@bower_components/mixpanel": {
       "js": ["mixpanel-jslib-snippet.js", "mixpanel.min.js"]

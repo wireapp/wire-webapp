@@ -201,7 +201,7 @@ z.team.TeamRepository = class TeamRepository {
             const is_self_user = member_et.user_id === this.user_repository.self().id;
 
             if (is_self_user) {
-              this.team_mapper.map_role(this.user_repository.self(), member_et);
+              this.team_mapper.map_role(this.user_repository.self(), member_et.permissions);
             }
 
             return !is_self_user;
@@ -255,13 +255,15 @@ z.team.TeamRepository = class TeamRepository {
   }
 
   _on_member_update(event_json) {
-    const {data: {user: user_id}, team: team_id} = event_json;
+    const {data: {user: user_id}, permissions, team: team_id} = event_json;
     const is_local_team = this.team().id === team_id;
     const is_self_user = this.user_repository.self().id === user_id;
 
     if (is_local_team && is_self_user) {
-      this.get_team_member(team_id, user_id)
-        .then(member_et => this.team_mapper.map_role(this.user_repository.self(), member_et))
+      const member_promise = permissions ? Promise.resolve({permissions}) : this.get_team_member(team_id, user_id);
+
+      member_promise
+        .then(member_et => this.team_mapper.map_role(this.user_repository.self(), member_et.permissions))
         .then(() => this.send_account_info());
     }
   }

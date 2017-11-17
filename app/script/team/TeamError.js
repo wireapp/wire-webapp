@@ -20,29 +20,29 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.system_notification = z.system_notification || {};
+window.z.team = z.team || {};
 
-z.system_notification.SystemNotificationError = class SystemNotificationError extends Error {
+z.team.TeamError = class TeamError extends Error {
   constructor(type) {
     super();
 
     this.name = this.constructor.name;
     this.stack = new Error().stack;
-    this.type = type || z.system_notification.SystemNotificationError.TYPE.UNKNOWN;
+    this.type = type || z.team.TeamError.TYPE.UNKNOWN;
 
     switch (this.type) {
-      case z.system_notification.SystemNotificationError.TYPE.HIDE_NOTIFICATION:
-        this.message = 'Do not show notification for this message';
+      case z.team.TeamError.TYPE.NO_PERMISSIONS:
+        this.message = 'No permissions provided';
         break;
       default:
-        this.message = 'Unknown SystemNotificationError';
+        this.message = 'Unknown TeamError';
     }
   }
 
   static get TYPE() {
     return {
-      HIDE_NOTIFICATION: 'z.system_notification.SystemNotificationError.TYPE.HIDE_NOTIFICATION',
-      UNKNOWN: 'z.system_notification.SystemNotificationError.TYPE.UNKNOWN',
+      NO_PERMISSIONS: 'z.team.TeamError.TYPE.NO_PERMISSIONS',
+      UNKNOWN: 'z.team.TeamError.TYPE.UNKNOWN',
     };
   }
 };

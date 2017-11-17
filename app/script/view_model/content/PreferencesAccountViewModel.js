@@ -81,7 +81,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
       event.target.blur();
     }
 
-    if (new_name.length > z.user.UserRepository.CONFIG.MINIMUM_NAME_LENGTH) {
+    if (new_name.length >= z.user.UserRepository.CONFIG.MINIMUM_NAME_LENGTH) {
       this.user_repository.change_name(new_name).then(() => {
         this.name_saved(true);
         event.target.blur();

@@ -67,10 +67,12 @@ z.team.TeamMapper = class TeamMapper {
     return this.update_member_from_object(data);
   }
 
-  map_role(user_et, member_et) {
-    const team_role = z.team.TeamRole.check_role(member_et.permissions);
-    this.logger.info(`Identified user '${user_et.id}' as '${team_role}'`, member_et);
-    user_et.team_role(team_role);
+  map_role(user_et, permissions) {
+    if (permissions) {
+      const team_role = z.team.TeamRole.check_role(permissions);
+      this.logger.info(`Identified user '${user_et.id}' as '${team_role}'`, permissions);
+      user_et.team_role(team_role);
+    }
   }
 
   update_member_from_object(data, member_et = new z.team.TeamMemberEntity()) {

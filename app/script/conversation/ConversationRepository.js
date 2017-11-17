@@ -299,7 +299,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
     conversation_et.is_pending(true);
 
     const first_message = conversation_et.get_first_message();
-    const upper_bound = first_message ? new Date(first_message.timestamp()) : new Date();
+    const upper_bound = first_message
+      ? new Date(first_message.timestamp())
+      : new Date(conversation_et.get_latest_timestamp(this.time_offset) + 1);
 
     return this.conversation_service
       .load_preceding_events_from_db(conversation_et.id, new Date(0), upper_bound, z.config.MESSAGES_FETCH_LIMIT)
@@ -407,8 +409,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   _get_unread_events(conversation_et) {
     const first_message = conversation_et.get_first_message();
-    const upper_bound = first_message ? new Date(first_message.timestamp()) : new Date();
     const lower_bound = new Date(conversation_et.last_read_timestamp());
+    const upper_bound = first_message
+      ? new Date(first_message.timestamp())
+      : new Date(conversation_et.get_latest_timestamp(this.time_offset) + 1);
 
     if (lower_bound < upper_bound) {
       conversation_et.is_pending(true);
@@ -1005,7 +1009,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   _update_cleared_timestamp(conversation_et) {
-    const timestamp = conversation_et.get_latest_timestamp(this.time_offset);
+    const timestamp = conversation_et.get_last_known_timestamp(this.time_offset);
 
     if (timestamp && conversation_et.set_timestamp(timestamp, z.conversation.TIMESTAMP_TYPE.CLEARED)) {
       const message_content = new z.proto.Cleared(conversation_et.id, timestamp);
@@ -1161,7 +1165,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     const payload = {
       otr_muted: !conversation_et.is_muted(),
-      otr_muted_ref: new Date(conversation_et.get_latest_timestamp(this.time_offset)).toISOString(),
+      otr_muted_ref: new Date(conversation_et.get_last_known_timestamp(this.time_offset)).toISOString(),
     };
 
     return this.conversation_service
@@ -1214,7 +1218,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       );
     }
 
-    const archive_timestamp = conversation_et.get_latest_timestamp(this.time_offset);
+    const archive_timestamp = conversation_et.get_last_known_timestamp(this.time_offset);
     const no_state_change = conversation_et.is_archived() === new_archive_state;
     const no_timestamp_change = conversation_et.archived_timestamp() === archive_timestamp;
     if (no_state_change && no_timestamp_change) {
@@ -1298,7 +1302,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   _update_last_read_timestamp(conversation_et) {
-    const timestamp = conversation_et.get_latest_timestamp(this.time_offset);
+    const timestamp = conversation_et.get_last_known_timestamp(this.time_offset);
 
     if (timestamp && conversation_et.set_timestamp(timestamp, z.conversation.TIMESTAMP_TYPE.LAST_READ)) {
       const message_content = new z.proto.LastRead(conversation_et.id, conversation_et.last_read_timestamp());
