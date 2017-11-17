@@ -18,7 +18,6 @@
  */
 
 import React from 'react';
-import {connect} from 'react-redux';
 import {indexStrings} from '../../strings';
 import {injectIntl} from 'react-intl';
 import {Profile, RoundContainer, Team} from '@wireapp/react-ui-kit/Icon';
@@ -69,8 +68,4 @@ const Index = ({name, history, intl: {formatMessage: _}}) => (
   </ContainerXS>
 );
 
-export default injectIntl(
-  connect(state => ({
-    name: state.authState.name,
-  }))(Index)
-);
+export default injectIntl(Index);
