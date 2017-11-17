@@ -22,8 +22,32 @@ import {defineMessages} from 'react-intl';
 /* eslint-disable sort-keys */
 
 export const indexStrings = defineMessages({
-  hello: {
-    id: 'index.hello',
-    defaultMessage: 'Hello',
+  claim: {
+    id: 'index.claim',
+    defaultMessage: 'Secure messaging for everyone',
+  },
+  createAccount: {
+    id: 'index.createAccount',
+    defaultMessage: 'Create an account',
+  },
+  createAccountFor: {
+    id: 'index.createAccountFor',
+    defaultMessage: 'for personal use',
+  },
+  createTeam: {
+    id: 'index.createTeam',
+    defaultMessage: 'Create a team',
+  },
+  createTeamFor: {
+    id: 'index.createTeamFor',
+    defaultMessage: 'for work',
+  },
+  loginInfo: {
+    id: 'index.loginInfo',
+    defaultMessage: 'Already have an account?',
+  },
+  login: {
+    id: 'index.login',
+    defaultMessage: 'Login',
   },
 });

@@ -18,49 +18,24 @@
  */
 
 import React from 'react';
+import {IntlProvider, addLocaleData} from 'react-intl';
 import {connect} from 'react-redux';
-import {Logo} from '@wireapp/react-ui-kit/Identity';
-import {Small, H3, Link} from '@wireapp/react-ui-kit/Text';
-import {StyledApp, Content, Columns, Column, ContainerXS} from '@wireapp/react-ui-kit/Layout';
+import {StyledApp, Content} from '@wireapp/react-ui-kit/Layout';
+import de from 'react-intl/locale-data/de';
+import Index from './Index';
 
-const Root = ({name}) => (
-  <StyledApp>
-    <Content>
-      <ContainerXS centerText verticalCenter>
-        <br />
-        <Logo id="wire-logo" />
-        <br />
-        Secure messaging for everyone
-        <br />
-        <br />
-        <Columns>
-          <Column>
-            <Link href="#" data-uie-name="go-register-personal">
-              <img src="#" width="100" height="100" />
-              <br />
-              <H3 center>Create an account</H3>
-              for personal use
-            </Link>
-          </Column>
-          <Column>
-            <Link href="#" data-uie-name="go-register-team">
-              <img src="#" width="100" height="100" />
-              <br />
-              <H3 center>Create a team</H3>
-              for work
-            </Link>
-          </Column>
-        </Columns>
-        <br />
-        <br />
-        <Small>Already have an account?</Small>
-        <br />
-        <Link href="#">Login</Link>
-      </ContainerXS>
-    </Content>
-  </StyledApp>
+addLocaleData([...de]);
+
+const Root = ({locale}) => (
+  <IntlProvider locale={locale} messages={require(`../../../i18n/webapp-${locale}.json`)}>
+    <StyledApp>
+      <Content>
+        <Index />
+      </Content>
+    </StyledApp>
+  </IntlProvider>
 );
 
 export default connect(state => ({
-  name: state.authState.name,
+  locale: 'de',
 }))(Root);
