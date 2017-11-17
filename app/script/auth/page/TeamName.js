@@ -17,35 +17,9 @@
  *
  */
 
-import 'babel-polyfill';
 import React from 'react';
-import ReactDOM from 'react-dom';
-import Root from './page/Root';
-import {AppContainer} from 'react-hot-loader';
-import {Provider} from 'react-redux';
-import configureStore from './configureStore';
+import {ContainerXS} from '@wireapp/react-ui-kit/Layout';
 
-const store = configureStore();
+const TeamName = () => <ContainerXS centerText verticalCenter />;
 
-const Wrapper = Component => (
-  <AppContainer>
-    <Provider store={store}>
-      <Component />
-    </Provider>
-  </AppContainer>
-);
-
-const render = Component => {
-  ReactDOM.render(Wrapper(Component), document.getElementById('main'));
-};
-
-function runApp() {
-  render(Root);
-  if (module.hot) {
-    module.hot.accept('./page/Root', () => {
-      render(require('./page/Root').default);
-    });
-  }
-}
-
-runApp();
+export default TeamName;
