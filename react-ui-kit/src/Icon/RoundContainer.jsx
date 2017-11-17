@@ -17,12 +17,29 @@
  *
  */
 
-import setGlobalStyles from '../globalStyles';
+import {COLOR} from '../Identity';
+import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
-setGlobalStyles();
+const RoundContainer = styled.div`
+  width: ${props => parseFloat(props.size)}px;
+  height: ${props => parseFloat(props.size)}px;
+  border-radius: 50%;
+  background-color: ${props => props.color};
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
 
-export * from './Button';
-export * from './Checkbox';
-export * from './Form';
-export * from './Input';
-export * from './Select';
+RoundContainer.propTypes = {
+  color: PropTypes.string,
+  size: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+};
+
+RoundContainer.defaultProps = {
+  color: COLOR.BLUE,
+  size: 72,
+};
+
+export {RoundContainer};

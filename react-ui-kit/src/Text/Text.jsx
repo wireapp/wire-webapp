@@ -25,7 +25,7 @@ const Text = styled.span`
   /* appearance */
   color: ${props => props.color};
   font-size: ${props => props.fontSize};
-  font-weight: ${props => (props.bold ? '600' : 'initial')};
+  font-weight: ${props => (props.bold ? '600' : props.light ? '200' : 'unset')};
   opacity: ${props => (props.muted ? '0.5' : '1')};
   text-align: ${props => (props.center ? 'center' : 'left')};
   text-transform: ${props => props.textTransform};
@@ -51,6 +51,7 @@ Text.propTypes = {
   center: PropTypes.bool,
   color: PropTypes.string,
   fontSize: PropTypes.string,
+  light: PropTypes.bool,
   muted: PropTypes.bool,
   noWrap: PropTypes.bool,
   textTransform: PropTypes.oneOf(['lowercase', 'uppercase', 'capitalize', 'inherit', 'none']),
@@ -62,6 +63,7 @@ Text.defaultProps = {
   center: false,
   color: COLOR.GRAY_DARKEN_48,
   fontSize: '16px',
+  light: false,
   muted: false,
   noWrap: false,
   textTransform: 'none',

@@ -17,12 +17,19 @@
  *
  */
 
-import setGlobalStyles from '../globalStyles';
+import PropTypes from 'prop-types';
+import React from 'react';
 
-setGlobalStyles();
+const Spacer = ({size, vertical}) => <div style={vertical ? {display: 'inline-block', width: size} : {height: size}} />;
 
-export * from './Button';
-export * from './Checkbox';
-export * from './Form';
-export * from './Input';
-export * from './Select';
+Spacer.propTypes = {
+  size: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  vertical: PropTypes.bool,
+};
+
+Spacer.defaultProps = {
+  size: 8,
+  vertical: false,
+};
+
+export {Spacer};

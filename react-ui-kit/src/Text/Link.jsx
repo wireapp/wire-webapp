@@ -25,7 +25,6 @@ import {defaultTransition} from '../Identity/motions';
 const Link = ({component = 'a', ...props}) => {
   const StyledLink = Text.withComponent(component).extend`
     /* appearance */
-    font-weight: 400;
     text-decoration: none;
     ${defaultTransition}
 
