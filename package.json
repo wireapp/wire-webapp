@@ -5,7 +5,7 @@
     "./dist/commonjs/shims/node/cookie": "./dist/commonjs/shims/browser/cookie.js"
   },
   "dependencies": {
-    "@types/node": "8.0.50",
+    "@types/node": "8.0.53",
     "@types/spark-md5": "3.0.0",
     "@types/text-encoding": "0.0.32",
     "@types/tough-cookie": "2.3.2",
@@ -28,23 +28,25 @@
     "cross-env": "5.1.1",
     "istanbul": "0.4.5",
     "jasmine": "2.8.0",
-    "karma-chrome-launcher": "2.2.0",
-    "karma-jasmine-diff-reporter": "1.1.1",
-    "karma-jasmine": "1.1.0",
-    "karma-sourcemap-loader": "0.3.7",
     "karma": "1.7.1",
+    "karma-chrome-launcher": "2.2.0",
+    "karma-jasmine": "1.1.0",
+    "karma-jasmine-diff-reporter": "1.1.1",
+    "karma-sourcemap-loader": "0.3.7",
     "nock": "9.0.18",
     "optimist": "0.6.1",
     "react-hot-loader": "3.1.2",
     "rimraf": "2.6.2",
-    "sinon-har-server": "0.3.0",
     "sinon": "4.1.2",
+    "sinon-har-server": "0.3.0",
     "typescript": "2.6.1",
-    "webpack-dev-server": "2.9.4",
-    "webpack": "3.8.1"
+    "webpack": "3.8.1",
+    "webpack-dev-server": "2.9.4"
   },
   "description": "Wire API Client to send and receive data.",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "license": "GPL-3.0",
   "main": "./dist/commonjs/Client.js",
   "name": "@wireapp/api-client",
