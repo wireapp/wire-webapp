@@ -41,6 +41,4 @@ const Root = ({locale}) => (
   </IntlProvider>
 );
 
-export default connect(state => ({
-  locale: 'de',
-}))(Root);
+export default connect(({languageState}) => ({language: languageState.language}))(Root);
