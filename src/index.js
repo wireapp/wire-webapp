@@ -24,5 +24,6 @@ setGlobalStyles();
 export * from './Form';
 export * from './Grid';
 export * from './Identity';
+export * from './Icon';
 export * from './Progress';
 export * from './Text';

@@ -46,6 +46,7 @@ import {
   Header,
   StyledApp,
 } from '@wireapp/react-ui-kit/Layout';
+import {ProfileIcon, TeamIcon} from '@wireapp/react-ui-kit/Icon';
 import Color from 'color';
 import {Loading} from '@wireapp/react-ui-kit/Progress';
 import React from 'react';
@@ -59,6 +60,8 @@ export default function Demo() {
         <Loading progress={0.33} />
         <Loading progress={0.66} />
         <Logo scale="3" hover />
+        <ProfileIcon />
+        <TeamIcon />
       </Header>
       <Content>
         <Container>
