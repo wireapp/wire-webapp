@@ -87,7 +87,7 @@
     "yarn": ">= 1.0.0"
   },
   "lint-staged": {
-    "*.js": ["eslint -c .eslintrc.yaml --fix", "git add"],
+    "*.js": ["eslint --fix", "git add"],
     "*.json": ["prettier --print-width=200 --write", "git add"],
     "*.less": ["prettier --write", "git add"],
     "*.md": ["prettier --write", "git add"]
@@ -104,7 +104,7 @@
     "postinstall": "grunt init",
     "precommit": "lint-staged",
     "start": "grunt",
-    "test:script": "eslint -c .eslintrc.yaml --ignore-path .gitignore --ignore-path .eslintignore app/script/ test/ bin/ grunt/ Gruntfile.js karma.conf.js",
+    "test:script": "eslint --ignore-path .gitignore --ignore-path .eslintignore app/script/ test/ bin/ grunt/ Gruntfile.js karma.conf.js",
     "test": "yarn test:script && grunt check && grunt test"
   },
   "private": true,
