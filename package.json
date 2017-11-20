@@ -35,7 +35,7 @@
     "@bower_components/webapp-module-logger": "wireapp/webapp-module-logger#1.1.1",
     "@bower_components/webapp-module-modal": "wireapp/webapp-module-modal#1.0.2",
     "@bower_components/webapp-module-namespace": "wireapp/webapp-module-namespace#1.0.2",
-    "@bower_components/webrtc-adapter": "webrtc/adapter#5.0.5",
+    "@bower_components/webrtc-adapter": "webrtc/adapter#6.0.2",
     "@bower_components/wire-audio-files": "wireapp/wire-audio-files#1.1.1",
     "@bower_components/wire-theme": "wireapp/wire-theme#1.0.6",
     "@bower_components/wire-webapp-cbor": "wireapp/wire-webapp-cbor#2.1.5",
@@ -47,7 +47,7 @@
     "@wireapp/core": "0.0.5",
     "autoprefixer": "7.1.6",
     "eslint": "4.11.0",
-    "eslint-config-prettier": "2.7.0",
+    "eslint-config-prettier": "2.8.0",
     "eslint-plugin-jsdoc": "3.2.0",
     "eslint-plugin-prettier": "2.3.1",
     "grunt": "1.0.1",
@@ -89,14 +89,16 @@
   "lint-staged": {
     "*.js": ["eslint --fix", "git add"],
     "*.json": ["prettier --print-width=200 --write", "git add"],
-    "*.less": ["prettier --write", "git add"]
+    "*.less": ["prettier --write", "git add"],
+    "*.md": ["prettier --write", "git add"]
   },
   "scripts": {
     "deploy-travis-dev": "grunt app_deploy_travis:dev",
     "deploy-travis-prod": "grunt app_deploy_travis:prod",
     "deploy-travis-staging": "grunt app_deploy_travis:staging",
-    "fix": "yarn fix:script && yarn fix:config && yarn fix:style",
+    "fix": "yarn fix:script && yarn fix:config && yarn fix:style && yarn fix:docs",
     "fix:config": "prettier --print-width=200 --ignore-path .gitignore --write '**/*.json'",
+    "fix:docs": "prettier --ignore-path .gitignore --write '**/*.md'",
     "fix:style": "prettier --ignore-path .gitignore --write '**/*.less'",
     "fix:script": "npm run test:script -- --fix",
     "postinstall": "grunt init",

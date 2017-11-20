@@ -81,7 +81,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
       event.target.blur();
     }
 
-    if (new_name.length > z.user.UserRepository.CONFIG.MINIMUM_NAME_LENGTH) {
+    if (new_name.length >= z.user.UserRepository.CONFIG.MINIMUM_NAME_LENGTH) {
       this.user_repository.change_name(new_name).then(() => {
         this.name_saved(true);
         event.target.blur();
@@ -241,11 +241,12 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
   click_on_manage() {
     z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.TEAM_SETTINGS, z.config.URL_PATH.MANAGE_TEAM));
+    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
   }
 
   click_on_reset_password() {
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PASSWORD_RESET, {value: 'fromProfile'});
     z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.ACCOUNT, z.config.URL_PATH.PASSWORD_RESET));
+    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PASSWORD_RESET, {value: 'fromProfile'});
   }
 
   set_picture(new_user_picture) {
