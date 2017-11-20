@@ -34,7 +34,8 @@
     "start": "yarn start:demo",
     "start:static": "gulp",
     "start:demo": "webpack-dev-server",
-    "version": "yarn dist"
+    "version": "yarn dist",
+    "publish": "cd ./dist && npm publish"
   },
   "version": "0.0.6"
 }
