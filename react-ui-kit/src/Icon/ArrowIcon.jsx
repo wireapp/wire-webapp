@@ -18,22 +18,43 @@
  */
 
 import IconBase from './IconBase';
+import PropTypes from 'prop-types';
 import React from 'react';
 
-class TeamIcon extends IconBase {
+class ArrowIcon extends IconBase {
   /* eslint-disable no-magic-numbers */
-  width = 28;
-  height = 31;
+  static propTypes = {
+    ...IconBase.propTypes,
+    direction: PropTypes.oneOf(['left', 'right', 'up', 'down', 'n', 'e', 'w', 's']),
+  };
+  static defaultProps = {
+    ...IconBase.defaultProps,
+    direction: 'right',
+  };
+
+  width = 16;
+  height = 16;
   renderSVG(width, height, color) {
+    let rotation = 0;
+    switch (this.props.direction) {
+      case 's':
+      case 'down':
+        rotation = 90;
+        break;
+      case 'w':
+      case 'left':
+        rotation = 180;
+        break;
+      case 'n':
+      case 'up':
+        rotation = 270;
+    }
     return (
-      <svg width={`${width}`} height={`${height}`} viewBox="0 0 28 31">
-        <path
-          fill={color}
-          d="M4.32 9.65V21.2l9.82 5.82 9.82-5.8V9.64l-9.82-5.82-9.82 5.82zM12.54.4c.9-.53 2.33-.53 3.2 0l10.3 6.1c.9.5 1.6 1.8 1.6 2.83v12.2c0 1.04-.72 2.32-1.6 2.84l-10.3 6.1c-.88.52-2.32.5-3.2 0l-10.3-6.1c-.88-.52-1.6-1.8-1.6-2.85V9.32c0-1.04.73-2.3 1.6-2.83L12.54.4z"
-        />
+      <svg width={width} height={height} viewBox="0 0 16 16">
+        <path transform={`rotate(${rotation} 8 8)`} fill={color} d="M5.8 1.5L7.3 0l8 8-8 8-1.5-1.5L11.3 9H.7V7h10.6" />
       </svg>
     );
   }
 }
 
-export {TeamIcon};
+export {ArrowIcon};

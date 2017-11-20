@@ -17,6 +17,7 @@
  *
  */
 
+import {ArrowIcon, PlaneIcon, ProfileIcon, TeamIcon} from '@wireapp/react-ui-kit/Icon';
 import {
   Bold,
   H1,
@@ -46,7 +47,6 @@ import {
   Header,
   StyledApp,
 } from '@wireapp/react-ui-kit/Layout';
-import {ProfileIcon, TeamIcon} from '@wireapp/react-ui-kit/Icon';
 import Color from 'color';
 import {Loading} from '@wireapp/react-ui-kit/Progress';
 import React from 'react';
@@ -62,6 +62,8 @@ export default function Demo() {
         <Logo scale="3" hover />
         <ProfileIcon />
         <TeamIcon />
+        <ArrowIcon direction="down" />
+        <PlaneIcon />
       </Header>
       <Content>
         <Container>
