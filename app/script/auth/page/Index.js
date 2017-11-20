@@ -25,7 +25,7 @@ import {Profile, RoundContainer, Team} from '@wireapp/react-ui-kit/Icon';
 import {Logo, COLOR} from '@wireapp/react-ui-kit/Identity';
 import {Link as RRLink} from 'react-router-dom';
 import {Small, Link, Paragraph, Text, Bold} from '@wireapp/react-ui-kit/Text';
-import {Columns, Column, ContainerXS, Spacer} from '@wireapp/react-ui-kit/Layout';
+import {Columns, Column, ContainerXS} from '@wireapp/react-ui-kit/Layout';
 
 const Index = ({name, history, intl: {formatMessage: _}}) => (
   <ContainerXS centerText verticalCenter>
@@ -36,10 +36,9 @@ const Index = ({name, history, intl: {formatMessage: _}}) => (
     <Columns style={{margin: '70px auto'}}>
       <Column>
         <Link data-uie-name="go-register-personal">
-          <RoundContainer>
+          <RoundContainer style={{marginBottom: 12}}>
             <Profile color={COLOR.WHITE} />
           </RoundContainer>
-          <Spacer size={12} />
           <Bold fontSize="24px">{_(indexStrings.createAccount)}</Bold>
           <br />
           <Text light fontSize="24px">
@@ -49,10 +48,9 @@ const Index = ({name, history, intl: {formatMessage: _}}) => (
       </Column>
       <Column>
         <Link to="/newteam" data-uie-name="go-register-team" component={RRLink}>
-          <RoundContainer color={COLOR.GREEN}>
+          <RoundContainer color={COLOR.GREEN} style={{marginBottom: 12}}>
             <Team color={COLOR.WHITE} />
           </RoundContainer>
-          <Spacer size={12} />
           <Bold fontSize="24px">{_(indexStrings.createTeam)}</Bold>
           <br />
           <Text light fontSize="24px">

@@ -20,10 +20,10 @@
 import React from 'react';
 import {withRouter} from 'react-router';
 import {Container, ContainerXS, Columns, Column} from '@wireapp/react-ui-kit/Layout';
-import {H1, Text, Link} from '@wireapp/react-ui-kit/Text';
-import {Form, Input, Button} from '@wireapp/react-ui-kit/Form';
+import {H1, Link, Small} from '@wireapp/react-ui-kit/Text';
+import {Form, Input, Button, Checkbox} from '@wireapp/react-ui-kit/Form';
 
-const TeamName = ({history}) => (
+const CreateAccount = ({history}) => (
   <Container centerText verticalCenter>
     <Columns>
       <Column />
@@ -33,18 +33,27 @@ const TeamName = ({history}) => (
           style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
         >
           <div>
-            <H1 center>Name your team</H1>
-            <Text muted>You can always change it later.</Text>
+            <H1 center>{'Set up your account'}</H1>
             <Form>
-              <Input placeholder={'Team name'.toUpperCase()} />
-              <Button type="submit" onClick={() => history.push('/createaccount')}>
-                Next
+              <Input placeholder={'Name'.toUpperCase()} />
+              <Input placeholder={'you@yourcompany.com'} />
+              <Input placeholder={'Password (min 8 characters)'.toUpperCase()} />
+              <Checkbox>
+                <Small textTransform="uppercase">
+                  {'I ACCEPT THE '}
+                  <Link href="#" bold fontSize="12px">
+                    {'TERMS AND CONDITIONS'}
+                  </Link>
+                </Small>
+              </Checkbox>
+              <Button type="submit" onClick={() => history.push('/')}>
+                {'Next'}
               </Button>
             </Form>
           </div>
           <div>
             <Link href="#" fontSize="12px" bold style={{alignSelf: 'flex-end'}}>
-              WHAT IS WIRE FOR TEAMS?
+              {'WHAT IS WIRE FOR TEAMS?'}
             </Link>
           </div>
         </ContainerXS>
@@ -54,4 +63,4 @@ const TeamName = ({history}) => (
   </Container>
 );
 
-export default withRouter(TeamName);
+export default withRouter(CreateAccount);

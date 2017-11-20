@@ -22,6 +22,7 @@ import {StyledApp, Content} from '@wireapp/react-ui-kit/Layout';
 import {HashRouter as Router, Route} from 'react-router-dom';
 import Index from './Index';
 import TeamName from './TeamName';
+import CreateAccount from './CreateAccount';
 import {IntlProvider, addLocaleData} from 'react-intl';
 import {connect} from 'react-redux';
 import de from 'react-intl/locale-data/de';
@@ -35,6 +36,7 @@ const Root = ({locale}) => (
         <Content>
           <Route exact path="/" component={Index} />
           <Route path="/newteam" component={TeamName} />
+          <Route path="/createaccount" component={CreateAccount} />
         </Content>
       </Router>
     </StyledApp>
