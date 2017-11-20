@@ -16,13 +16,13 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-import ConversationEvent from './ConversationEvent';
+import {ConversationEvent, ConversationEventType} from '../event/';
 
 interface Rename extends ConversationEvent {
   data: {
     name: string;
   };
-  type: 'conversation.rename';
+  type: ConversationEventType.RENAME;
 }
 
 export default Rename;

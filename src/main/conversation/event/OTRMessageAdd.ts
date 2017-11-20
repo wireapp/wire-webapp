@@ -16,7 +16,7 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-import ConversationEvent from './ConversationEvent';
+import {ConversationEvent, ConversationEventType} from '../event/';
 
 interface OTRMessageAdd extends ConversationEvent {
   data: {
@@ -24,7 +24,7 @@ interface OTRMessageAdd extends ConversationEvent {
     sender: string;
     recipient: string;
   };
-  type: 'conversation.otr-message-add';
+  type: ConversationEventType.OTR_MESSAGE_ADD;
 }
 
 export default OTRMessageAdd;
