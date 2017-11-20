@@ -56,7 +56,7 @@ class Client {
 
   // Configuration
   private accessTokenStore: AccessTokenStore;
-  private config: Config;
+  public config: Config;
   public context: Context = undefined;
   public transport: {http: HttpClient; ws: WebSocketClient} = {
     http: undefined,

@@ -17,7 +17,11 @@
 //
 
 import Account from './Account';
+import CryptographyService from './crypto/CryptographyService';
 
 export = {
   Account,
+  crypto: {
+    CryptographyService,
+  },
 };

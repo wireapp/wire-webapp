@@ -16,20 +16,22 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
+import ConversationEventType from './ConversationEventType';
+
 interface ConversationEvent {
   conversation: string;
   from: string;
   time: string;
   type:
-    | 'conversation.connect-request'
-    | 'conversation.create'
-    | 'conversation.delete'
-    | 'conversation.member-join'
-    | 'conversation.member-leave'
-    | 'conversation.member-update'
-    | 'conversation.otr-message-add'
-    | 'conversation.rename'
-    | 'conversation.typing';
+    | ConversationEventType.CONNECT_REQUEST
+    | ConversationEventType.CREATE
+    | ConversationEventType.DELETE
+    | ConversationEventType.MEMBER_JOIN
+    | ConversationEventType.MEMBER_LEAVE
+    | ConversationEventType.MEMBER_UPDATE
+    | ConversationEventType.OTR_MESSAGE_ADD
+    | ConversationEventType.RENAME
+    | ConversationEventType.TYPING;
 }
 
 export default ConversationEvent;

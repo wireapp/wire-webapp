@@ -16,13 +16,13 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-import ConversationEvent from './ConversationEvent';
+import {ConversationEvent, ConversationEventType} from '../event/';
 
 interface MemberJoin extends ConversationEvent {
   data: {
     user_ids: string[];
   };
-  type: 'conversation.member-join';
+  type: ConversationEventType.MEMBER_JOIN;
 }
 
 export default MemberJoin;

@@ -16,7 +16,7 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-import ConversationEvent from './ConversationEvent';
+import {ConversationEvent, ConversationEventType} from '../event/';
 
 // https://github.com/wearezeta/backend-api-docs/wiki/API-User-Notifications#conversationmember-update-cached
 interface MemberUpdate extends ConversationEvent {
@@ -26,7 +26,7 @@ interface MemberUpdate extends ConversationEvent {
     otr_muted?: boolean; // Whether the conversation has been muted.
     otr_muted_ref?: string; // A reference point associated with the last (un)muting.
   };
-  type: 'conversation.member-update';
+  type: ConversationEventType.MEMBER_UPDATE;
 }
 
 export default MemberUpdate;

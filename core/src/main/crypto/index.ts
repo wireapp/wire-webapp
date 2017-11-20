@@ -16,12 +16,8 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-import ConversationEvent from './ConversationEvent';
-import ConversationEventType from './ConversationEventType';
-import MemberJoin from './MemberJoin';
-import MemberLeave from './MemberLeave';
-import MemberUpdate from './MemberUpdate';
-import OTRMessageAdd from './OTRMessageAdd';
-import Rename from './Rename';
+import GenericMessageType from './GenericMessageType';
+import PayloadBundle from './PayloadBundle';
+import SessionPayloadBundle from './SessionPayloadBundle';
 
-export {ConversationEvent, ConversationEventType, MemberJoin, MemberLeave, MemberUpdate, OTRMessageAdd, Rename};
+export {GenericMessageType, PayloadBundle, SessionPayloadBundle};
