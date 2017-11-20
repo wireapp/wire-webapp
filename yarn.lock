@@ -285,9 +285,9 @@
     spark-md5 "3.0.0"
     tough-cookie "2.3.3"
 
-"@wireapp/core@0.0.5":
-  version "0.0.5"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-0.0.5.tgz#49b3c1e56c543b54bfde44a018bffef95915bfa1"
+"@wireapp/core@0.0.6":
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-0.0.6.tgz#9d6c14b5e3288c5a77e5b93a0b6f53ef63792537"
   dependencies:
     "@types/node" "8.0.50"
     "@wireapp/api-client" "0.2.7"
