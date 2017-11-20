@@ -16,12 +16,8 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-import Account from './Account';
-import CryptographyService from './crypto/CryptographyService';
+import GenericMessageType from './GenericMessageType';
+import PayloadBundle from './PayloadBundle';
+import SessionPayloadBundle from './SessionPayloadBundle';
 
-export = {
-  Account,
-  crypto: {
-    CryptographyService,
-  },
-};
+export {GenericMessageType, PayloadBundle, SessionPayloadBundle};
