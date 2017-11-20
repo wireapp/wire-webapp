@@ -36,5 +36,5 @@
     "start:demo": "webpack-dev-server",
     "version": "yarn dist"
   },
-  "version": "0.0.5"
+  "version": "0.0.6"
 }
