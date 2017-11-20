@@ -17,9 +17,11 @@
  *
  */
 
+import authReducer from './authReducer';
 import languageReducer from './languageReducer';
 
 const reducers = {
+  authState: authReducer,
   languageState: languageReducer,
 };
 

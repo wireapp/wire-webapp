@@ -59,6 +59,9 @@ module.exports = {
       },
     ],
   },
+  node: {
+    fs: 'empty',
+  },
   output: {
     filename: 'script/auth/[name].js',
     path: path.resolve(__dirname, dist),

@@ -24,8 +24,10 @@ import Root from './page/Root';
 import {AppContainer} from 'react-hot-loader';
 import {Provider} from 'react-redux';
 import configureStore from './configureStore';
+import {Account} from '@wireapp/core';
 
-const store = configureStore();
+const core = new Account();
+const store = configureStore({apiClient: core.apiClient, core});
 
 const Wrapper = Component => (
   <AppContainer>

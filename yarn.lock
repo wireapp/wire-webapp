@@ -289,9 +289,9 @@
     spark-md5 "3.0.0"
     tough-cookie "2.3.3"
 
-"@wireapp/core@0.0.5":
-  version "0.0.5"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-0.0.5.tgz#49b3c1e56c543b54bfde44a018bffef95915bfa1"
+"@wireapp/core@0.0.6":
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-0.0.6.tgz#9d6c14b5e3288c5a77e5b93a0b6f53ef63792537"
   dependencies:
     "@types/node" "8.0.50"
     "@wireapp/api-client" "0.2.7"
@@ -314,9 +314,9 @@
   dependencies:
     "@types/node" "8.0.17"
 
-"@wireapp/react-ui-kit@0.0.4":
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-0.0.4.tgz#2c8f02cfd65334bd116b7b9069e87bcb7831ccc9"
+"@wireapp/react-ui-kit@0.0.6":
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-0.0.6.tgz#1dab688508007ef2475790b998d4943c3d25a7d9"
   dependencies:
     color "2.0.1"
     gulp-concat "2.6.1"

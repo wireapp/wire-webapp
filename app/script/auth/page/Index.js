@@ -20,7 +20,7 @@
 import React from 'react';
 import {indexStrings} from '../../strings';
 import {injectIntl} from 'react-intl';
-import {Profile, RoundContainer, Team} from '@wireapp/react-ui-kit/Icon';
+import {ProfileIcon, RoundContainer, TeamIcon} from '@wireapp/react-ui-kit/Icon';
 import {Logo, COLOR} from '@wireapp/react-ui-kit/Identity';
 import {Link as RRLink} from 'react-router-dom';
 import {Small, Link, Paragraph, Text, Bold} from '@wireapp/react-ui-kit/Text';
@@ -36,7 +36,7 @@ const Index = ({name, history, intl: {formatMessage: _}}) => (
       <Column>
         <Link data-uie-name="go-register-personal">
           <RoundContainer>
-            <Profile color={COLOR.WHITE} />
+            <ProfileIcon color={COLOR.WHITE} />
           </RoundContainer>
           <Spacer size={12} />
           <Bold fontSize="24px">{_(indexStrings.createAccount)}</Bold>
@@ -49,7 +49,7 @@ const Index = ({name, history, intl: {formatMessage: _}}) => (
       <Column>
         <Link to="/newteam" data-uie-name="go-register-team" component={RRLink}>
           <RoundContainer color={COLOR.GREEN}>
-            <Team color={COLOR.WHITE} />
+            <TeamIcon color={COLOR.WHITE} />
           </RoundContainer>
           <Spacer size={12} />
           <Bold fontSize="24px">{_(indexStrings.createTeam)}</Bold>
