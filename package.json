@@ -10,6 +10,7 @@
     "@types/text-encoding": "0.0.32",
     "@types/tough-cookie": "2.3.2",
     "@wireapp/queue-priority": "0.0.12",
+    "@wireapp/react-ui-kit": "0.0.4",
     "@wireapp/store-engine": "0.1.1",
     "axios": "0.17.1",
     "html5-websocket": "2.0.1",
@@ -45,7 +46,9 @@
     "webpack-dev-server": "2.9.4"
   },
   "description": "Wire API Client to send and receive data.",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "license": "GPL-3.0",
   "main": "./dist/commonjs/Client.js",
   "name": "@wireapp/api-client",
