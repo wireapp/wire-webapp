@@ -17,10 +17,20 @@
  *
  */
 
-import languageReducer from './languageReducer';
+import {SWITCH_LANGUAGE} from '../action/creator/LanguageActionCreator';
+import {DEFAULT_LANGUAGE, SUPPORTED_LANGUAGE, currentLanguage} from '../../config';
 
-const reducers = {
-  languageState: languageReducer,
+const defaultState = {
+  language: SUPPORTED_LANGUAGE.includes(currentLanguage()) ? currentLanguage() : DEFAULT_LANGUAGE,
 };
 
-export default reducers;
+export default function reducer(state = defaultState, action) {
+  switch (action.type) {
+    case SWITCH_LANGUAGE:
+      return {
+        language: SUPPORTED_LANGUAGE.includes(action.payload) ? action.payload : state.language,
+      };
+    default:
+      return state;
+  }
+}

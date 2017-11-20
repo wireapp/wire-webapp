@@ -17,10 +17,11 @@
  *
  */
 
-import languageReducer from './languageReducer';
+export const SWITCH_LANGUAGE = 'SWITCH_LANGUAGE';
 
-const reducers = {
-  languageState: languageReducer,
-};
-
-export default reducers;
+export function switchLanguage(language) {
+  return {
+    payload: language,
+    type: SWITCH_LANGUAGE,
+  };
+}
