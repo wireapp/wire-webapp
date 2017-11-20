@@ -24,14 +24,15 @@ export const STAGING = 'STAGING';
 export const PRODUCTION = 'PRODUCTION';
 
 export function checkEnvironment() {
-  console.log(`Starting with environment ### ${getEnvironment()} ###`);
-  if (![LOCAL, STAGING, PRODUCTION].includes(getEnvironment())) {
-    throw new Error(`Invalid environment ${getEnvironment()}`);
+  const environment = getEnvironment();
+  console.log(`Starting with environment ### ${environment} ###`);
+  if (![LOCAL, STAGING, PRODUCTION].includes(environment)) {
+    throw new Error(`Invalid environment ${environment}`);
   }
 }
 
 export function getEnvironment() {
-  return config.APP_ENVIRONMENT || PRODUCTION;
+  return config.APP_ENVIRONMENT;
 }
 
 export function isEnvironment(environment) {

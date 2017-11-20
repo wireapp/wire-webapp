@@ -29,9 +29,7 @@ import {Columns, Column, ContainerXS} from '@wireapp/react-ui-kit/Layout';
 const Index = ({name, history, intl: {formatMessage: _}}) => (
   <ContainerXS centerText verticalCenter>
     <Logo id="wire-logo" scale={1.68} />
-    <Paragraph fontSize="16px" center>
-      {_(indexStrings.claim)}
-    </Paragraph>
+    <Paragraph center>{_(indexStrings.claim)}</Paragraph>
     <Columns style={{margin: '70px auto'}}>
       <Column>
         <Link data-uie-name="go-register-personal">
@@ -40,9 +38,7 @@ const Index = ({name, history, intl: {formatMessage: _}}) => (
           </RoundContainer>
           <Bold fontSize="24px">{_(indexStrings.createAccount)}</Bold>
           <br />
-          <Text light fontSize="24px">
-            {_(indexStrings.createAccountFor)}
-          </Text>
+          <Text fontSize="24px">{_(indexStrings.createAccountFor)}</Text>
         </Link>
       </Column>
       <Column>
@@ -52,15 +48,13 @@ const Index = ({name, history, intl: {formatMessage: _}}) => (
           </RoundContainer>
           <Bold fontSize="24px">{_(indexStrings.createTeam)}</Bold>
           <br />
-          <Text light fontSize="24px">
-            {_(indexStrings.createTeamFor)}
-          </Text>
+          <Text fontSize="24px">{_(indexStrings.createTeamFor)}</Text>
         </Link>
       </Column>
     </Columns>
     <Small>{_(indexStrings.loginInfo)}</Small>
     <br />
-    <Link href="#" bold>
+    <Link fontSize="24px" textTransform="unset" href="#">
       {_(indexStrings.login)}
     </Link>
   </ContainerXS>
