@@ -17,7 +17,7 @@
  *
  */
 
-export function activateAccount(code, key) {
+export function doActivateAccount(code, key) {
   const params = [...arguments];
   return function(dispatch, getState, {apiClient}) {
     dispatch(UserActionCreator.startAccountActivation(params));
@@ -28,7 +28,7 @@ export function activateAccount(code, key) {
   };
 }
 
-export function sendActivationCode(email) {
+export function doSendActivationCode(email) {
   const params = [...arguments];
   return function(dispatch, getState, {apiClient}) {
     dispatch(UserActionCreator.startSendActivationCode(params));
