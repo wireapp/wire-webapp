@@ -8,3 +8,8 @@ singleQuote: true
 tabWidth: 2
 trailingComma: es5
 useTabs: false
+
+overrides:
+- files: "*.json"
+  options:
+    printWidth: 200

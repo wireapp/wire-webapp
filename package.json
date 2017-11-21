@@ -87,8 +87,8 @@
     "yarn": ">= 1.0.0"
   },
   "lint-staged": {
-    "*.js": ["eslint -c .eslintrc.yaml --fix", "git add"],
-    "*.json": ["prettier --print-width=200 --write", "git add"],
+    "*.js": ["eslint --fix", "git add"],
+    "*.json": ["prettier --write", "git add"],
     "*.less": ["prettier --write", "git add"],
     "*.md": ["prettier --write", "git add"]
   },
@@ -97,14 +97,14 @@
     "deploy-travis-prod": "grunt app_deploy_travis:prod",
     "deploy-travis-staging": "grunt app_deploy_travis:staging",
     "fix": "yarn fix:script && yarn fix:config && yarn fix:style && yarn fix:docs",
-    "fix:config": "prettier --print-width=200 --ignore-path .gitignore --write '**/*.json'",
-    "fix:docs": "prettier --ignore-path .gitignore --write '**/*.md'",
-    "fix:style": "prettier --ignore-path .gitignore --write '**/*.less'",
+    "fix:config": "prettier --ignore-path .gitignore --write \"**/*.json\"",
+    "fix:docs": "prettier --ignore-path .gitignore --write \"**/*.md\"",
+    "fix:style": "prettier --ignore-path .gitignore --write \"**/*.less\"",
     "fix:script": "npm run test:script -- --fix",
     "postinstall": "grunt init",
     "precommit": "lint-staged",
     "start": "grunt",
-    "test:script": "eslint -c .eslintrc.yaml --ignore-path .gitignore --ignore-path .eslintignore app/script/ test/ bin/ grunt/ Gruntfile.js karma.conf.js",
+    "test:script": "eslint --ignore-path .gitignore --ignore-path .eslintignore app/script/ test/ bin/ grunt/ *.js",
     "test": "yarn test:script && grunt check && grunt test"
   },
   "private": true,
