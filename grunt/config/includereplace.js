@@ -105,6 +105,23 @@ module.exports = {
       prefix: '#',
     },
     rename(dest, src) {
+      return `${dest}/index_new.html`;
+    },
+    src: 'auth_new.html',
+  },
+
+  dist_auth_old: {
+    cwd: '<%= dir.app.page %>',
+    dest: '<%= dir.dist %>/auth',
+    expand: true,
+    options: {
+      globals: {
+        dest: '_dist',
+      },
+      includesDir: '<%= dir.app.page %>/template',
+      prefix: '#',
+    },
+    rename(dest, src) {
       return `${dest}/index_old.html`;
     },
     src: 'auth_old.html',
