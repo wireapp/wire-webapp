@@ -29,8 +29,8 @@ import de from 'react-intl/locale-data/de';
 
 addLocaleData([...de]);
 
-const Root = ({locale}) => (
-  <IntlProvider locale={locale} messages={require(`../../../i18n/webapp-${locale}.json`)}>
+const Root = ({language}) => (
+  <IntlProvider locale={language} messages={require(`../../../i18n/webapp-${language}.json`)}>
     <StyledApp>
       <Router>
         <Content>

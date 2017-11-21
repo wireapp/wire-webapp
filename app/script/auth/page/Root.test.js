@@ -33,6 +33,9 @@ describe('Root', () => {
           authState: {
             name: 'bob',
           },
+          languageState: {
+            language: 'en',
+          },
         })
       )
     );

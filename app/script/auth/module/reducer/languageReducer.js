@@ -18,7 +18,7 @@
  */
 
 import {SWITCH_LANGUAGE} from '../action/creator/LanguageActionCreator';
-import {DEFAULT_LANGUAGE, SUPPORTED_LANGUAGE, currentLanguage} from '../../config';
+import {DEFAULT_LANGUAGE, SUPPORTED_LANGUAGE, currentLanguage} from '../../localeConfig';
 
 const defaultState = {
   language: SUPPORTED_LANGUAGE.includes(currentLanguage()) ? currentLanguage() : DEFAULT_LANGUAGE,

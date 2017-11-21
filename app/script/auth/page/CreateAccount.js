@@ -41,9 +41,7 @@ const CreateAccount = ({history}) => (
               <Checkbox>
                 <Small textTransform="uppercase">
                   {'I ACCEPT THE '}
-                  <Link href="#" bold fontSize="12px">
-                    {'TERMS AND CONDITIONS'}
-                  </Link>
+                  <Link href="#">{'TERMS AND CONDITIONS'}</Link>
                 </Small>
               </Checkbox>
               <Button type="submit" onClick={() => history.push('/')}>
@@ -52,7 +50,7 @@ const CreateAccount = ({history}) => (
             </Form>
           </div>
           <div>
-            <Link href="#" fontSize="12px" bold style={{alignSelf: 'flex-end'}}>
+            <Link href="#" style={{alignSelf: 'flex-end'}}>
               {'WHAT IS WIRE FOR TEAMS?'}
             </Link>
           </div>
