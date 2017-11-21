@@ -22,7 +22,7 @@ import {COLOR} from '../Identity';
 import PropTypes from 'prop-types';
 
 const placeholderStyle = css`
-  color: ${COLOR.GRAY_LIGHTEN_24};
+  color: ${COLOR.GRAY_DARKEN_24};
   font-size: 11px;
   text-transform: ${props => props.placeholderTextTransform};
 `;
@@ -32,8 +32,8 @@ const Input = styled.input`
   background: ${COLOR.WHITE};
   border-radius: 4px;
   border: 1px solid transparent;
-  color: ${COLOR.GRAY_DARKEN_48};
-  font-weight: 300;
+  color: ${COLOR.GRAY_DARKEN_72};
+  font-weight: 400;
   outline: none;
 
   /* positioning */
