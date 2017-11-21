@@ -43,6 +43,7 @@ import {WebSocketClient} from '@wireapp/api-client/dist/commonjs/tcp/';
 import Client = require('@wireapp/api-client');
 import EventEmitter = require('events');
 import {ConversationService} from './conversation/';
+import {ClientClassification, ClientType} from '@wireapp/api-client/dist/commonjs/client/';
 
 export default class Account extends EventEmitter {
   public static INCOMING = {
@@ -52,7 +53,7 @@ export default class Account extends EventEmitter {
   private client: RegisteredClient;
   public context: Context;
   private protocolBuffers: any = {};
-  public service: {conversation: ConversationService; crypto: CryptographyService} = {
+  public service: { conversation: ConversationService; crypto: CryptographyService } = {
     conversation: undefined,
     crypto: undefined,
   };
@@ -124,13 +125,13 @@ export default class Account extends EventEmitter {
     this.context = context;
     return this.service.crypto.loadExistingClient().catch(error => {
       if (error instanceof RecordNotFoundError) {
-        return this.registerNewClient(loginData);
+        return this.registerClient(loginData);
       }
       throw error;
     });
   }
 
-  public listen(callback: Function, loginData: LoginData): Promise<WebSocketClient> {
+  public listen(loginData: LoginData, notificationHandler?: Function): Promise<WebSocketClient> {
     return Promise.resolve()
       .then(() => {
         if (!this.context) {
@@ -139,9 +140,9 @@ export default class Account extends EventEmitter {
         return undefined;
       })
       .then(() => {
-        if (callback) {
+        if (notificationHandler) {
           this.apiClient.transport.ws.on(WebSocketClient.TOPIC.ON_MESSAGE, (notification: IncomingNotification) =>
-            callback(notification)
+            notificationHandler(notification)
           );
         } else {
           this.apiClient.transport.ws.on(WebSocketClient.TOPIC.ON_MESSAGE, this.handleNotification.bind(this));
@@ -152,6 +153,7 @@ export default class Account extends EventEmitter {
 
   public login(loginData: LoginData, initClient: boolean = true): Promise<Context> {
     LoginSanitizer.removeNonPrintableCharacters(loginData);
+    loginData.persist = loginData.persist || (this.apiClient.config.store.constructor.name === 'MemoryEngine') ? false : true;
     return this.apiClient
       .init()
       .catch((error: Error) => this.apiClient.login(loginData))
@@ -182,13 +184,13 @@ export default class Account extends EventEmitter {
     });
   }
 
-  private registerNewClient(loginData: LoginData): Promise<RegisteredClient> {
+  private registerClient(loginData: LoginData, clientClassification: ClientClassification = ClientClassification.DESKTOP, cookieLabel: string = 'default'): Promise<RegisteredClient> {
     return this.service.crypto
       .createCryptobox()
       .then((serializedPreKeys: Array<PreKey>) => {
         const newClient: NewClient = {
-          class: 'desktop',
-          cookie: 'webapp@1224301118@temporary@1472638149000',
+          class: clientClassification,
+          cookie: cookieLabel,
           lastkey: this.service.crypto.cryptobox.serialize_prekey(this.service.crypto.cryptobox.lastResortPreKey),
           password: loginData.password.toString(),
           prekeys: serializedPreKeys,
@@ -196,7 +198,7 @@ export default class Account extends EventEmitter {
             enckey: 'Wuec0oJi9/q9VsgOil9Ds4uhhYwBT+CAUrvi/S9vcz0=',
             mackey: 'Wuec0oJi9/q9VsgOil9Ds4uhhYwBT+CAUrvi/S9vcz0=',
           },
-          type: 'temporary',
+          type: (loginData.persist) ? ClientType.PERMANENT : ClientType.TEMPORARY,
         };
 
         return newClient;
