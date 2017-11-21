@@ -37,12 +37,12 @@ module.exports = {
       prefix: '#',
     },
     rename(dest, src) {
-      return `${dest}/index_old.html`;
+      return `${dest}/index_new.html`;
     },
-    src: 'auth_old.html',
+    src: 'auth_new.html',
   },
 
-  deploy_auth_new: {
+  deploy_auth_old: {
     cwd: '<%= dir.app.page %>',
     dest: '<%= dir.deploy %>/auth',
     expand: true,
@@ -54,9 +54,9 @@ module.exports = {
       prefix: '#',
     },
     rename(dest, src) {
-      return `${dest}/index_new.html`;
+      return `${dest}/index_old.html`;
     },
-    src: 'auth_new.html',
+    src: 'auth_old.html',
   },
 
   deploy_demo: {
@@ -156,12 +156,12 @@ module.exports = {
       prefix: '#',
     },
     rename(dest, src) {
-      return `${dest}/index_old.html`;
+      return `${dest}/index_new.html`;
     },
-    src: 'auth_old.html',
+    src: 'auth_new.html',
   },
 
-  prod_auth_new: {
+  prod_auth_old: {
     cwd: '<%= dir.app.page %>',
     dest: '<%= dir.deploy %>/auth',
     expand: true,
@@ -173,9 +173,9 @@ module.exports = {
       prefix: '#',
     },
     rename(dest, src) {
-      return `${dest}/index_new.html`;
+      return `${dest}/index_old.html`;
     },
-    src: 'auth_new.html',
+    src: 'auth_old.html',
   },
 
   prod_demo: {
