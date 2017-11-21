@@ -25,7 +25,7 @@ const babelSettings = {
   extends: path.join(__dirname, '/.babelrc'),
 };
 
-const dist = 'dist/';
+const dist = 'aws/static/';
 const srcScript = 'app/script/auth/';
 const srcStyle = 'app/style/auth/';
 
@@ -63,7 +63,7 @@ module.exports = {
     fs: 'empty',
   },
   output: {
-    filename: 'script/auth/[name].js',
+    filename: 'min/[name].js',
     path: path.resolve(__dirname, dist),
     publicPath: '/',
   },

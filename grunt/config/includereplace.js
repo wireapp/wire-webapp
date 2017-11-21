@@ -42,6 +42,23 @@ module.exports = {
     src: 'auth.html',
   },
 
+  deploy_auth_new: {
+    cwd: '<%= dir.app.page %>',
+    dest: '<%= dir.deploy %>/auth',
+    expand: true,
+    options: {
+      globals: {
+        dest: '_deploy',
+      },
+      includesDir: '<%= dir.app.page %>/template',
+      prefix: '#',
+    },
+    rename(dest, src) {
+      return `${dest}/index_new.html`;
+    },
+    src: 'auth_new.html',
+  },
+
   deploy_demo: {
     cwd: '<%= dir.app.demo %>',
     dest: '<%= dir.deploy %>/demo',
@@ -142,6 +159,23 @@ module.exports = {
       return `${dest}/index.html`;
     },
     src: 'auth.html',
+  },
+
+  prod_auth_new: {
+    cwd: '<%= dir.app.page %>',
+    dest: '<%= dir.deploy %>/auth',
+    expand: true,
+    options: {
+      globals: {
+        dest: '_prod',
+      },
+      includesDir: '<%= dir.app.page %>/template',
+      prefix: '#',
+    },
+    rename(dest, src) {
+      return `${dest}/index_new.html`;
+    },
+    src: 'auth_new.html',
   },
 
   prod_demo: {

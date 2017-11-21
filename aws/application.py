@@ -48,9 +48,19 @@ def index():
 
 @application.route('/auth/')
 @main.latest_browser_required
+def auth_new():
+  response = flask.make_response(flask.render_template(
+    'auth/index_new.html',
+    country=util.geoip_country(),
+  ))
+  return response
+
+
+@application.route('/auth/old/')
+@main.latest_browser_required
 def auth():
   response = flask.make_response(flask.render_template(
-    'auth/index.html',
+    'auth/index_old.html',
     country=util.geoip_country(),
   ))
   return response
