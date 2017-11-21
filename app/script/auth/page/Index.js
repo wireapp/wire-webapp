@@ -32,7 +32,7 @@ const Index = ({name, history, intl: {formatMessage: _}}) => (
     <Paragraph center>{_(indexStrings.claim)}</Paragraph>
     <Columns style={{margin: '70px auto'}}>
       <Column>
-        <Link data-uie-name="go-register-personal" href="/auth/old/">
+        <Link data-uie-name="go-register-personal" href="/auth/old#register">
           <RoundContainer style={{marginBottom: 12}}>
             <ProfileIcon color={COLOR.WHITE} />
           </RoundContainer>
@@ -54,7 +54,7 @@ const Index = ({name, history, intl: {formatMessage: _}}) => (
     </Columns>
     <Small>{_(indexStrings.loginInfo)}</Small>
     <br />
-    <Link fontSize="24px" textTransform="unset" href="/auth/old/">
+    <Link fontSize="24px" textTransform="unset" href="/auth/old#login">
       {_(indexStrings.login)}
     </Link>
   </ContainerXS>
