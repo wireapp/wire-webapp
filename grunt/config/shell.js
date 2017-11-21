@@ -33,4 +33,10 @@ module.exports = {
       stdout: true,
     },
   },
+  aws_pack: {
+    command: 'yarn bundle:prod',
+    options: {
+      stdout: true,
+    },
+  },
 };
