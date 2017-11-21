@@ -37,9 +37,9 @@ module.exports = {
       prefix: '#',
     },
     rename(dest, src) {
-      return `${dest}/index.html`;
+      return `${dest}/index_old.html`;
     },
-    src: 'auth.html',
+    src: 'auth_old.html',
   },
 
   deploy_auth_new: {
@@ -105,9 +105,9 @@ module.exports = {
       prefix: '#',
     },
     rename(dest, src) {
-      return `${dest}/index.html`;
+      return `${dest}/index_old.html`;
     },
-    src: 'auth.html',
+    src: 'auth_old.html',
   },
 
   dist_demo: {
@@ -156,9 +156,9 @@ module.exports = {
       prefix: '#',
     },
     rename(dest, src) {
-      return `${dest}/index.html`;
+      return `${dest}/index_old.html`;
     },
-    src: 'auth.html',
+    src: 'auth_old.html',
   },
 
   prod_auth_new: {
