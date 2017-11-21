@@ -17,11 +17,13 @@
 //
 
 import Account from './Account';
-import CryptographyService from './crypto/CryptographyService';
+import * as auth from './auth';
+import * as conversation from './conversation';
+import * as crypto from './crypto';
 
 export = {
   Account,
-  crypto: {
-    CryptographyService,
-  },
+  auth,
+  conversation,
+  crypto,
 };
