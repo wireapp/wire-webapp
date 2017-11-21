@@ -16,10 +16,11 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-import {PreKey} from '../auth';
+import {PreKey} from '../auth/';
+import {ClientClassification, ClientType} from '../client/';
 
 interface NewClient {
-  class: 'desktop' | 'phone' | 'tablet';
+  class: ClientClassification.DESKTOP | ClientClassification.PHONE | ClientClassification.TABLET;
   cookie: string;
   label?: string;
   lastkey: PreKey;
@@ -30,7 +31,7 @@ interface NewClient {
     enckey: string;
     mackey: string;
   };
-  type: 'permanent' | 'temporary';
+  type: ClientType.PERMANENT | ClientType.TEMPORARY;
 }
 
 export default NewClient;
