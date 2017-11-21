@@ -101,7 +101,7 @@
     "fix:config": "prettier --ignore-path .gitignore --write \"**/*.json\"",
     "fix:docs": "prettier --ignore-path .gitignore --write \"**/*.md\"",
     "fix:style": "prettier --ignore-path .gitignore --write \"**/*.less\"",
-    "fix:script": "npm run test:script -- --fix",
+    "fix:script": "yarn test:script --fix",
     "postinstall": "grunt init",
     "precommit": "lint-staged",
     "start": "grunt",
