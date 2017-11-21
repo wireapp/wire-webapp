@@ -2,7 +2,7 @@
 // Wire
 // Copyright (C) 2017 Wire Swiss GmbH
 //
-// This program is free software: you can redistribute it and/or modify
+// This program is free software = you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -16,16 +16,10 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-import ClientAPI from './ClientAPI';
-import ClientClassification from './ClientClassification';
-import ClientType from './ClientType';
-import NewClient from './NewClient';
-import PublicClient from './PublicClient';
-import RegisteredClient from './RegisteredClient';
+enum ClientClassification {
+  DESKTOP = 'desktop',
+  PHONE = 'phone',
+  TABLET = 'tablet',
+}
 
-export {
-  ClientAPI,
-  ClientClassification,
-  ClientType,
-  NewClient, PublicClient, RegisteredClient
-};
+export default ClientClassification;
