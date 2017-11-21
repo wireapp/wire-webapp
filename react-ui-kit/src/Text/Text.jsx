@@ -61,7 +61,7 @@ Text.propTypes = {
 Text.defaultProps = {
   bold: false,
   center: false,
-  color: COLOR.GRAY_DARKEN_48,
+  color: COLOR.GRAY_DARKEN_32,
   fontSize: '16px',
   light: false,
   muted: false,

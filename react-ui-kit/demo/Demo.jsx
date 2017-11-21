@@ -134,7 +134,20 @@ export default function Demo() {
             <Column>Checkbox</Column>
             <Column>
               <Checkbox id="ToU">
-                <Text>ToU</Text>
+                <Text bold fontSize="11px" textTransform="uppercase">
+                  {'ToU'}
+                </Text>
+              </Checkbox>
+            </Column>
+          </Columns>
+          <Columns>
+            <Column>Checkbox</Column>
+            <Column>
+              <Checkbox id="ToU">
+                <Text bold fontSize="11px" textTransform="uppercase">
+                  {'ToU '}
+                </Text>
+                <Link href="#">{'Link'}</Link>
               </Checkbox>
             </Column>
           </Columns>
@@ -142,7 +155,9 @@ export default function Demo() {
             <Column>Disabled Checkbox</Column>
             <Column>
               <Checkbox id="disabled" disabled>
-                <Text>Disabled</Text>
+                <Text bold fontSize="11px" textTransform="uppercase">
+                  {'Disabled'}
+                </Text>
               </Checkbox>
             </Column>
           </Columns>
