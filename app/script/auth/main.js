@@ -18,13 +18,13 @@
  */
 
 import 'babel-polyfill';
-import React from 'react';
-import ReactDOM from 'react-dom';
-import Root from './page/Root';
+import {Account} from '@wireapp/core';
 import {AppContainer} from 'react-hot-loader';
 import {Provider} from 'react-redux';
 import configureStore from './configureStore';
-import {Account} from '@wireapp/core';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import Root from './page/Root';
 
 const core = new Account();
 const store = configureStore({apiClient: core.apiClient, core});
