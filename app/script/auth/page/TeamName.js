@@ -21,12 +21,21 @@ import React from 'react';
 import {withRouter} from 'react-router';
 import {Container, ContainerXS, Columns, Column} from '@wireapp/react-ui-kit/Layout';
 import {H1, Text, Link} from '@wireapp/react-ui-kit/Text';
-import {Form, Input, Button} from '@wireapp/react-ui-kit/Form';
+import {Form, InputSubmitCombo, Input, RoundIconButton} from '@wireapp/react-ui-kit/Form';
+import {ArrowIcon} from '@wireapp/react-ui-kit/Icon';
+import ROUTES from '../routes';
+import {Link as RRLink} from 'react-router-dom';
 
 const TeamName = ({history}) => (
   <Container centerText verticalCenter>
     <Columns>
-      <Column />
+      <Column style={{display: 'flex'}}>
+        <div style={{margin: 'auto'}}>
+          <Link to={ROUTES.INDEX} data-uie-name="go-register-team" component={RRLink}>
+            <ArrowIcon direction="left" />
+          </Link>
+        </div>
+      </Column>
       <Column style={{flexGrow: 2}}>
         <ContainerXS
           centerText
@@ -36,14 +45,14 @@ const TeamName = ({history}) => (
             <H1 center>Name your team</H1>
             <Text muted>You can always change it later.</Text>
             <Form>
-              <Input placeholder={'Team name'.toUpperCase()} autoFocus />
-              <Button type="submit" onClick={() => history.push('/createaccount')}>
-                Next
-              </Button>
+              <InputSubmitCombo>
+                <Input data-uie-name="enter-team-name" placeholder={'Team name'.toUpperCase()} autoFocus />
+                <RoundIconButton data-uie-name="do-next" type="submit" onClick={() => history.push('/createaccount')} />
+              </InputSubmitCombo>
             </Form>
           </div>
           <div>
-            <Link href="#" fontSize="12px" bold style={{alignSelf: 'flex-end'}}>
+            <Link data-uie-name="go-what-is" href="#" fontSize="12px" bold style={{alignSelf: 'flex-end'}}>
               WHAT IS WIRE FOR TEAMS?
             </Link>
           </div>

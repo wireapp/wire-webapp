@@ -23,10 +23,12 @@ import {AppContainer} from 'react-hot-loader';
 import {Provider} from 'react-redux';
 import configureStore from './configureStore';
 import configureTracking from './configureTracking';
+import configureWrapper from './configureWrapper';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Root from './page/Root';
 
+configureWrapper();
 const core = new Account();
 const mixpanel = configureTracking();
 

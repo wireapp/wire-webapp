@@ -20,6 +20,7 @@
 import * as TrackingAction from '../module/action/TrackingAction';
 import React, {Component} from 'react';
 import {Columns, Column, ContainerXS} from '@wireapp/react-ui-kit/Layout';
+import ROUTES from '../routes';
 import {connect} from 'react-redux';
 import {indexStrings} from '../../strings';
 import {injectIntl} from 'react-intl';
