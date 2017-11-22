@@ -117,9 +117,9 @@ export default class AuthAPI {
     return sendRequestWithCookie(this.client, config, this.engine).then((response: AxiosResponse) => response.data);
   }
 
-  public postRegister(register: RegisterData): Promise<User> {
+  public postRegister(userAccount: RegisterData): Promise<User> {
     const config: AxiosRequestConfig = {
-      data: register,
+      data: userAccount,
       method: 'post',
       url: AuthAPI.URL.REGISTER,
       withCredentials: true,

@@ -23,6 +23,7 @@ interface RegisterData {
   accent_id?: number;
   locale?: string;
   email?: string;
+  email_code?: string,
   name: string;
   password?: string;
   invitation_code?: string;
