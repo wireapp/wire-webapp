@@ -54,7 +54,7 @@ const Index = ({name, history, intl: {formatMessage: _}}) => (
     </Columns>
     <Small>{_(indexStrings.loginInfo)}</Small>
     <br />
-    <Link fontSize="24px" textTransform="unset" href="/auth/old#login">
+    <Link data-uie-name="go-login" fontSize="24px" textTransform="unset" href="/auth/old#login">
       {_(indexStrings.login)}
     </Link>
   </ContainerXS>
