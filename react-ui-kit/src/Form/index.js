@@ -29,3 +29,4 @@ export * from './InputSubmitCombo';
 export * from './InputBlock';
 export * from './RoundIconButton';
 export * from './Select';
+export * from './CodeInput';

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const { description, version } = require('../../package.json');
+const {description, version} = require('../../package.json');
 const {Account} = require('@wireapp/core');
 const {StoreEngine} = require('@wireapp/store-engine');
 const program = require('commander');
@@ -39,7 +39,9 @@ const apiClient: APIClient = new APIClient({
 const account = new Account(apiClient);
 
 account.on(Account.INCOMING.TEXT_MESSAGE, (data: PayloadBundle) => {
-  console.log(`Received message from user ID "${data.from}" in conversation ID "${data.conversation}": ${data.content}`);
+  console.log(
+    `Received message from user ID "${data.from}" in conversation ID "${data.conversation}": ${data.content}`
+  );
 });
 
 account

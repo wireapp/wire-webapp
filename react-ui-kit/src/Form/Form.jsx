@@ -38,8 +38,4 @@ const Form = styled.form`
   }
 `;
 
-Form.propTypes = {};
-
-Form.defaultProps = {};
-
 export {Form};
