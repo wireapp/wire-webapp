@@ -10,9 +10,15 @@ For licensing information, see the attached LICENSE file and the list of third-p
 
 Command-line interface for Wire's secure messaging platform.
 
+### Installation
+
+```bash
+npm install -g wire-cli
+```
+
 ### Usage
 
-Type `wire-cli.js --help` for usage information.
+Type `wire-cli --help` for usage information.
 
 ```bash
 #!/bin/bash
@@ -21,5 +27,5 @@ WIRE_LOGIN_EMAIL="yourname@email.com"
 WIRE_LOGIN_PASSWORD="secret"
 WIRE_CONVERSATION_ID="594f0908-b9b7-40f9-a06a-45612145e64e"
 
-wire-cli.js -e "$WIRE_LOGIN_EMAIL" -p "$WIRE_LOGIN_PASSWORD" -c "$WIRE_CONVERSATION_ID"
+wire-cli -e "$WIRE_LOGIN_EMAIL" -p "$WIRE_LOGIN_PASSWORD" -c "$WIRE_CONVERSATION_ID"
 ```
