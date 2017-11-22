@@ -17,17 +17,20 @@
  *
  */
 
-import 'babel-polyfill';
+import 'babel-polyfill'; // Polyfill needs to be imported first
 import {Account} from '@wireapp/core';
 import {AppContainer} from 'react-hot-loader';
 import {Provider} from 'react-redux';
 import configureStore from './configureStore';
+import configureTracking from './configureTracking';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Root from './page/Root';
 
 const core = new Account();
-const store = configureStore({apiClient: core.apiClient, core});
+const mixpanel = configureTracking();
+
+const store = configureStore({apiClient: core.apiClient, core, mixpanel});
 
 const Wrapper = Component => (
   <AppContainer>

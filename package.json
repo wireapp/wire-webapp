@@ -47,6 +47,7 @@
     "babel-plugin-react-intl": "2.3.1",
     "babel-polyfill": "6.26.0",
     "intl": "1.2.5",
+    "mixpanel-browser": "2.14.0",
     "react": "16.0.0",
     "react-dom": "16.0.0",
     "react-intl": "2.4.0",
