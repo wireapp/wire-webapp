@@ -1,5 +1,4 @@
 import * as AuthActionCreator from '../action/creator/AuthActionCreator';
-import * as UserActionCreator from '../action/creator/UserActionCreator';
 
 export const initialState = {
   account: {

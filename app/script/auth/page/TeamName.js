@@ -19,7 +19,7 @@
 
 import {connect} from 'react-redux';
 import {Container, ContainerXS, Columns, Column} from '@wireapp/react-ui-kit/Layout';
-import {Form, Input, Button} from '@wireapp/react-ui-kit/Form';
+import {Form, InputSubmitCombo, Input, RoundIconButton} from '@wireapp/react-ui-kit/Form';
 import {H1, Text, Link} from '@wireapp/react-ui-kit/Text';
 import {injectIntl} from 'react-intl';
 import {withRouter} from 'react-router';
@@ -50,18 +50,20 @@ class TeamName extends Component {
                 <H1 center>Name your team</H1>
                 <Text muted>You can always change it later.</Text>
                 <Form>
-                  <Input
-                    defaultValue={this.props.teamName}
-                    innerRef={node => (this.teamNameInput = node)}
-                    placeholder={'Team name'}
-                  />
-                  <Button type="submit" onClick={this.pushTeamName}>
-                    Next
-                  </Button>
+                  <InputSubmitCombo>
+                    <Input
+                      defaultValue={this.props.teamName}
+                      innerRef={node => (this.teamNameInput = node)}
+                      placeholder={'Team name'}
+                      autoFocus
+                      data-uie-name="enter-team-name"
+                    />
+                    <RoundIconButton type="submit" onClick={this.pushTeamName} data-uie-name="do-next" />
+                  </InputSubmitCombo>
                 </Form>
               </div>
               <div>
-                <Link href="#" style={{alignSelf: 'flex-end'}}>
+                <Link href="#" style={{alignSelf: 'flex-end'}} data-uie-name="go-what-is">
                   WHAT IS WIRE FOR TEAMS?
                 </Link>
               </div>
