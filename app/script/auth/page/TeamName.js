@@ -46,13 +46,13 @@ const TeamName = ({history}) => (
             <Text muted>You can always change it later.</Text>
             <Form>
               <InputSubmitCombo>
-                <Input placeholder={'Team name'.toUpperCase()} autoFocus />
-                <RoundIconButton type="submit" onClick={() => history.push('/createaccount')} />
+                <Input data-uie-name="enter-team-name" placeholder={'Team name'.toUpperCase()} autoFocus />
+                <RoundIconButton data-uie-name="do-next" type="submit" onClick={() => history.push('/createaccount')} />
               </InputSubmitCombo>
             </Form>
           </div>
           <div>
-            <Link href="#" fontSize="12px" bold style={{alignSelf: 'flex-end'}}>
+            <Link data-uie-name="go-what-is" href="#" fontSize="12px" bold style={{alignSelf: 'flex-end'}}>
               WHAT IS WIRE FOR TEAMS?
             </Link>
           </div>
