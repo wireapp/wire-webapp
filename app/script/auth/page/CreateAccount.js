@@ -21,12 +21,21 @@ import React from 'react';
 import {withRouter} from 'react-router';
 import {Container, ContainerXS, Columns, Column} from '@wireapp/react-ui-kit/Layout';
 import {H1, Link, Small} from '@wireapp/react-ui-kit/Text';
-import {Form, Input, Button, Checkbox} from '@wireapp/react-ui-kit/Form';
+import {Form, Input, InputBlock, Button, Checkbox} from '@wireapp/react-ui-kit/Form';
+import {ArrowIcon} from '@wireapp/react-ui-kit/Icon';
+import ROUTES from '../routes';
+import {Link as RRLink} from 'react-router-dom';
 
 const CreateAccount = ({history}) => (
   <Container centerText verticalCenter>
     <Columns>
-      <Column />
+      <Column style={{display: 'flex'}}>
+        <div style={{margin: 'auto'}}>
+          <Link to={ROUTES.NEWTEAM} data-uie-name="go-register-team" component={RRLink}>
+            <ArrowIcon direction="left" />
+          </Link>
+        </div>
+      </Column>
       <Column style={{flexGrow: 2}}>
         <ContainerXS
           centerText
@@ -35,30 +44,27 @@ const CreateAccount = ({history}) => (
           <div>
             <H1 center>{'Set up your account'}</H1>
             <Form>
-              <Input data-uie-name="enter-name" placeholder={'Name'.toUpperCase()} autoFocus />
-              <Input data-uie-name="enter-email" type="email" placeholder={'you@yourcompany.com'} />
-              <Input
-                data-uie-name="enter-password"
-                type="password"
-                placeholder={'Password (min 8 characters)'.toUpperCase()}
-              />
+              <InputBlock>
+                <Input data-uie-name="enter-name" placeholder={'Name'} autoFocus />
+                <Input
+                  data-uie-name="enter-email"
+                  placeholder={'you@yourcompany.com'}
+                  placeholderTextTransform="unset"
+                />
+                <Input data-uie-name="enter-password" type="password" placeholder={'Password (min 8 characters)'} />
+              </InputBlock>
               <Checkbox data-uie-name="do-terms">
                 <Small textTransform="uppercase">
                   {'I ACCEPT THE '}
-                  <Link data-uie-name="go-terms" href="#">
+                  <Link data-uie-name="go-terms" href="#" bold fontSize="12px">
                     {'TERMS AND CONDITIONS'}
                   </Link>
                 </Small>
               </Checkbox>
-              <Button data-uie-name="do-next" type="submit" onClick={() => history.push('/')}>
+              <Button data-uie-name="do-next" type="submit" onClick={() => history.push(ROUTES.VERIFY)}>
                 {'Next'}
               </Button>
             </Form>
-          </div>
-          <div>
-            <Link data-uie-name="go-what-is" href="#" style={{alignSelf: 'flex-end'}}>
-              {'WHAT IS WIRE FOR TEAMS?'}
-            </Link>
           </div>
         </ContainerXS>
       </Column>
