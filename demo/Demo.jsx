@@ -37,6 +37,7 @@ import {
   Button,
   ButtonLink,
   Checkbox,
+  CodeInput,
   Form,
   Input,
   InputBlock,
@@ -94,7 +95,6 @@ export default function Demo() {
               ContainerMD
             </Button>
           </ContainerMD>
-
           <H2>Columns</H2>
           <Line />
           <Columns>
@@ -223,6 +223,7 @@ export default function Demo() {
                 </InputSubmitCombo>
               </InputBlock>
             </Form>
+            <CodeInput onCodeComplete={code => console.log(code)} />
           </ContainerXS>
 
           <H1>Typography</H1>
