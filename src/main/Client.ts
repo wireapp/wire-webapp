@@ -110,10 +110,10 @@ class Client {
       .then((accessToken: AccessTokenData) => this.createContext(accessToken.user));
   }
 
-  public register(registerData: RegisterData): Promise<Context> {
+  public register(userAccount: RegisterData): Promise<Context> {
     return Promise.resolve()
       .then(() => this.context && this.logout())
-      .then(() => this.auth.api.postRegister(registerData))
+      .then(() => this.auth.api.postRegister(userAccount))
       .then(() => this.init());
   }
 

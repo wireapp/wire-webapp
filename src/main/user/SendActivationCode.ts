@@ -17,7 +17,7 @@
 //
 
 interface SendActivationCode {
-  /** Email address to send the code to., */
+  /** Email address to send the code to. */
   email?: string;
 
   /** E.164 phone number to send the code to. */
