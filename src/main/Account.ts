@@ -53,7 +53,7 @@ export default class Account extends EventEmitter {
   private client: RegisteredClient;
   public context: Context;
   private protocolBuffers: any = {};
-  public service: { conversation: ConversationService; crypto: CryptographyService } = {
+  public service: {conversation: ConversationService; crypto: CryptographyService} = {
     conversation: undefined,
     crypto: undefined,
   };
@@ -153,7 +153,8 @@ export default class Account extends EventEmitter {
 
   public login(loginData: LoginData, initClient: boolean = true): Promise<Context> {
     LoginSanitizer.removeNonPrintableCharacters(loginData);
-    loginData.persist = loginData.persist || (this.apiClient.config.store.constructor.name === 'MemoryEngine') ? false : true;
+    loginData.persist =
+      loginData.persist || this.apiClient.config.store.constructor.name === 'MemoryEngine' ? false : true;
     return this.apiClient
       .init()
       .catch((error: Error) => this.apiClient.login(loginData))
@@ -184,7 +185,11 @@ export default class Account extends EventEmitter {
     });
   }
 
-  private registerClient(loginData: LoginData, clientClassification: ClientClassification = ClientClassification.DESKTOP, cookieLabel: string = 'default'): Promise<RegisteredClient> {
+  private registerClient(
+    loginData: LoginData,
+    clientClassification: ClientClassification = ClientClassification.DESKTOP,
+    cookieLabel: string = 'default'
+  ): Promise<RegisteredClient> {
     return this.service.crypto
       .createCryptobox()
       .then((serializedPreKeys: Array<PreKey>) => {
@@ -198,7 +203,7 @@ export default class Account extends EventEmitter {
             enckey: 'Wuec0oJi9/q9VsgOil9Ds4uhhYwBT+CAUrvi/S9vcz0=',
             mackey: 'Wuec0oJi9/q9VsgOil9Ds4uhhYwBT+CAUrvi/S9vcz0=',
           },
-          type: (loginData.persist) ? ClientType.PERMANENT : ClientType.TEMPORARY,
+          type: loginData.persist ? ClientType.PERMANENT : ClientType.TEMPORARY,
         };
 
         return newClient;

@@ -8,10 +8,13 @@ import {
 } from '@wireapp/api-client/dist/commonjs/conversation/';
 
 export default class ConversationService {
-  constructor(private apiClient: APIClient) {
-  }
+  constructor(private apiClient: APIClient) {}
 
-  public sendMessage(sendingClientId: string, conversationId: string, recipients: OTRRecipients): Promise<ClientMismatch> {
+  public sendMessage(
+    sendingClientId: string,
+    conversationId: string,
+    recipients: OTRRecipients
+  ): Promise<ClientMismatch> {
     const message: NewOTRMessage = {
       recipients,
       sender: sendingClientId,

@@ -25,17 +25,15 @@ export default class CryptographyService {
   }
 
   public createCryptobox(): Promise<Array<auth.PreKey>> {
-    return this.cryptobox
-      .create()
-      .then((initialPreKeys: Array<Proteus.keys.PreKey>) => {
-        return initialPreKeys
-          .map(preKey => {
-            const preKeyJson: auth.PreKey = this.cryptobox.serialize_prekey(preKey);
-            if (preKeyJson.id !== Proteus.keys.PreKey.MAX_PREKEY_ID) return preKeyJson;
-            return undefined;
-          })
-          .filter(serializedPreKey => serializedPreKey);
-      });
+    return this.cryptobox.create().then((initialPreKeys: Array<Proteus.keys.PreKey>) => {
+      return initialPreKeys
+        .map(preKey => {
+          const preKeyJson: auth.PreKey = this.cryptobox.serialize_prekey(preKey);
+          if (preKeyJson.id !== Proteus.keys.PreKey.MAX_PREKEY_ID) return preKeyJson;
+          return undefined;
+        })
+        .filter(serializedPreKey => serializedPreKey);
+    });
   }
 
   public constructSessionId(userId: string, clientId: string): string {
@@ -82,9 +80,11 @@ export default class CryptographyService {
     });
   }
 
-  private encryptPayloadForSession(sessionId: string,
-                                   plainText: Uint8Array,
-                                   base64EncodedPreKey: string): Promise<SessionPayloadBundle> {
+  private encryptPayloadForSession(
+    sessionId: string,
+    plainText: Uint8Array,
+    base64EncodedPreKey: string
+  ): Promise<SessionPayloadBundle> {
     const decodedPreKeyBundle: Uint8Array = Decoder.fromBase64(base64EncodedPreKey).asBytes;
     return this.cryptobox
       .encrypt(sessionId, plainText, decodedPreKeyBundle.buffer)
@@ -103,6 +103,10 @@ export default class CryptographyService {
   }
 
   public saveClient(client: RegisteredClient): Promise<string> {
-    return this.storeEngine.create(CryptographyService.STORES.CLIENTS, store.CryptoboxCRUDStore.KEYS.LOCAL_IDENTITY, client);
+    return this.storeEngine.create(
+      CryptographyService.STORES.CLIENTS,
+      store.CryptoboxCRUDStore.KEYS.LOCAL_IDENTITY,
+      client
+    );
   }
 }
