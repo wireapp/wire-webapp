@@ -16,13 +16,8 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+import * as Environment from './Environment';
 
-import authReducer from './authReducer';
-import languageReducer from './languageReducer';
-
-const reducers = {
-  authState: authReducer,
-  languageState: languageReducer,
-};
-
-export default reducers;
+export const APP_ENVIRONMENT = window.APP_ENVIRONMENT || Environment.PRODUCTION;
+Environment.checkEnvironment();
+export const VERSION = window.VERSION || '0.0.0';

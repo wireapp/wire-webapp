@@ -18,18 +18,29 @@
  */
 
 import React from 'react';
-import {indexStrings} from '../../strings';
-import {injectIntl} from 'react-intl';
+import {StyledApp, Content} from '@wireapp/react-ui-kit/Layout';
+import {HashRouter as Router, Route} from 'react-router-dom';
+import Index from './Index';
+import TeamName from './TeamName';
+import CreateAccount from './CreateAccount';
+import {IntlProvider, addLocaleData} from 'react-intl';
 import {connect} from 'react-redux';
+import de from 'react-intl/locale-data/de';
 
-const Root = ({name, intl: {formatMessage: _}}) => (
-  <h1>
-    {_(indexStrings.hello)} {name}!
-  </h1>
+addLocaleData([...de]);
+
+const Root = ({language}) => (
+  <IntlProvider locale={language} messages={require(`../../../i18n/webapp-${language}.json`)}>
+    <StyledApp>
+      <Router>
+        <Content>
+          <Route exact path="/" component={Index} />
+          <Route path="/newteam" component={TeamName} />
+          <Route path="/createaccount" component={CreateAccount} />
+        </Content>
+      </Router>
+    </StyledApp>
+  </IntlProvider>
 );
 
-export default injectIntl(
-  connect(state => ({
-    name: state.authState.name,
-  }))
-)(Root);
+export default connect(({languageState}) => ({language: languageState.language}))(Root);

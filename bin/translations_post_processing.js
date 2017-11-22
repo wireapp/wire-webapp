@@ -21,30 +21,7 @@
 
 const {join, resolve} = require('path');
 const fs = require('fs');
-
-const SUPPORTED_LOCALE = [
-  'cs',
-  'da',
-  'de',
-  'el',
-  'es',
-  'et',
-  'fi',
-  'fr',
-  'hr',
-  'hu',
-  'it',
-  'lt',
-  'nl',
-  'pl',
-  'pt',
-  'ro',
-  'ru',
-  'sk',
-  'sl',
-  'tr',
-  'uk',
-];
+const SUPPORTED_LOCALE = require('../app/script/auth/config');
 
 const root = resolve(__dirname, '..');
 const translationsDir = resolve(root, process.argv[2] || '');
