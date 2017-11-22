@@ -24,7 +24,6 @@ import {Text} from './Text';
 
 const H1 = Text.withComponent('h1').extend`
   /* appearance */
-  color: ${props => props.color};
   font-size: 48px;
   font-weight: 300;
 
@@ -37,21 +36,18 @@ const H1 = Text.withComponent('h1').extend`
 
 const H2 = Text.withComponent('h2').extend`
   /* appearance */
-  color: ${props => props.color};
   font-size: 24px;
   font-weight: 300;
 `;
 
 const H3 = Text.withComponent('h3').extend`
   /* appearance */
-  color: ${props => props.color};
   font-size: 18px;
   font-weight: 300;
 `;
 
 const H4 = Text.withComponent('h4').extend`
   /* appearance */
-  color: ${props => props.color};
   font-size: 11px;
   font-weight: 300;
 
@@ -77,6 +73,11 @@ const Heading = ({level, ...props}) => {
 Heading.propTypes = {
   ...Text.propTypes,
   level: PropTypes.oneOf(['1', '2', '3', '4']),
+};
+
+H1.defaultProps = H2.defaultProps = H3.defaultProps = H4.defaultProps = {
+  ...Text.defaultProps,
+  color: COLOR.GRAY_DARKEN_72,
 };
 
 Heading.defaultProps = {

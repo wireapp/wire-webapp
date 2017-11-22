@@ -26,9 +26,9 @@ class IconBase extends React.PureComponent {
 
   static propTypes = {
     color: PropTypes.string,
-    height: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    scale: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    height: PropTypes.number,
+    scale: PropTypes.number,
+    width: PropTypes.number,
   };
 
   static defaultProps = {

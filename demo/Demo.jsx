@@ -33,7 +33,17 @@ import {
   Text,
   Uppercase,
 } from '@wireapp/react-ui-kit/Text';
-import {Button, ButtonLink, Checkbox, Form, Input, Select} from '@wireapp/react-ui-kit/Form';
+import {
+  Button,
+  ButtonLink,
+  Checkbox,
+  Form,
+  Input,
+  InputBlock,
+  InputSubmitCombo,
+  RoundIconButton,
+  Select,
+} from '@wireapp/react-ui-kit/Form';
 import {COLOR, Logo} from '@wireapp/react-ui-kit/Identity';
 import {
   Column,
@@ -205,6 +215,13 @@ export default function Demo() {
             <Form>
               <Input placeholder="Placeholder" type="email" required />
               <Button type="submit">Submit Button</Button>
+              <InputBlock>
+                <Input placeholder="InputBlock" />
+                <InputSubmitCombo>
+                  <Input placeholder="InputSubmitCombo" />
+                  <RoundIconButton type="submit" />
+                </InputSubmitCombo>
+              </InputBlock>
             </Form>
           </ContainerXS>
 

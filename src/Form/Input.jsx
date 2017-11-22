@@ -31,20 +31,17 @@ const Input = styled.input`
   /* appearance */
   background: ${COLOR.WHITE};
   border-radius: 4px;
-  border: 1px solid transparent;
+  border: none;
   color: ${COLOR.GRAY_DARKEN_72};
   font-weight: 400;
   outline: none;
+  caret-color: ${COLOR.BLUE};
 
   /* positioning */
   line-height: 48px;
   margin: 0 0 16px;
-  padding: 0 12px;
+  padding: 0 20px;
   width: 100%;
-
-  & + & {
-    margin-top: -8px;
-  }
 
   &::-webkit-input-placeholder {
     /* WebKit, Blink, Edge */
