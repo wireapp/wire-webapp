@@ -48,8 +48,9 @@ globals:
   zeta: true
 
 plugins:
-  - prettier
+  - class-property
   - jsdoc
+  - prettier
   - react
 
 parserOptions:

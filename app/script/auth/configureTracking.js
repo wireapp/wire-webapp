@@ -1,8 +1,8 @@
-const Mixpanel = require('mixpanel-browser');
+import mixpanel from 'mixpanel-browser';
 import {MIXPANEL_TOKEN} from './config';
 
 export const configureTracking = () => {
-  const mixpanel = Mixpanel.init(MIXPANEL_TOKEN);
+  mixpanel.init(MIXPANEL_TOKEN);
   return mixpanel;
 };
 

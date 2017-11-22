@@ -19,11 +19,22 @@
 
 import * as TrackingActionCreator from './creator/TrackingActionCreator';
 
+export const EVENT_NAME = {
+  START: {
+    OPENED_LOGIN: 'start.opened_login',
+    OPENED_PERSON_REGISTRATION: 'start.opened_person_registration',
+    OPENED_START_SCREEN: 'start.opened_start_screen',
+    OPENED_TEAM_REGISTRATION: 'start.opened_team_registration',
+  },
+};
+
 export function trackEvent(event) {
   return function(dispatch, getState, {mixpanel}) {
     return Promise.resolve()
       .then(() => dispatch(TrackingActionCreator.startTrackingAction(event)))
-      .then(() => mixpanel.track(event.name, event.attributes))
+      .then(
+        () => new Promise(resolve => mixpanel.track(event.name, event.attributes, successCode => resolve(successCode)))
+      )
       .then(trackingResult => dispatch(TrackingActionCreator.successfulTrackingAction(trackingResult)))
       .catch(error => dispatch(TrackingActionCreator.failedTrackingAction(error)));
   };
