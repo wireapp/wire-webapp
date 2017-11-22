@@ -50,7 +50,7 @@ account
   .then(() => {
     stdin.addListener('data', data => {
       const message = data.toString().trim();
-      account.sendTextMessage(conversationID, message);
+      account.service.conversation.sendTextMessage(conversationID, message);
     });
   })
   .catch((error: Error) => {
