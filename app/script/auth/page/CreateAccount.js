@@ -35,9 +35,9 @@ const CreateAccount = ({history}) => (
           <div>
             <H1 center>{'Set up your account'}</H1>
             <Form>
-              <Input placeholder={'Name'.toUpperCase()} />
-              <Input placeholder={'you@yourcompany.com'} />
-              <Input placeholder={'Password (min 8 characters)'.toUpperCase()} />
+              <Input placeholder={'Name'.toUpperCase()} autoFocus />
+              <Input type="email" placeholder={'you@yourcompany.com'} />
+              <Input type="password" placeholder={'Password (min 8 characters)'.toUpperCase()} />
               <Checkbox>
                 <Small textTransform="uppercase">
                   {'I ACCEPT THE '}

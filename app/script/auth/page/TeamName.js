@@ -36,7 +36,7 @@ const TeamName = ({history}) => (
             <H1 center>Name your team</H1>
             <Text muted>You can always change it later.</Text>
             <Form>
-              <Input placeholder={'Team name'.toUpperCase()} />
+              <Input placeholder={'Team name'.toUpperCase()} autoFocus />
               <Button type="submit" onClick={() => history.push('/createaccount')}>
                 Next
               </Button>
