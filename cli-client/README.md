@@ -13,7 +13,7 @@ Command-line interface for Wire's secure messaging platform.
 ### Installation
 
 ```bash
-npm install -g wire-cli
+npm install -g @wireapp/cli-client
 ```
 
 ### Usage

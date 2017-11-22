@@ -18,12 +18,13 @@
   "name": "@wireapp/cli-client",
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client",
   "scripts": {
-    "copy": "cpx dist/commonjs/index.js bin/node/",
     "build": "yarn build:node && yarn copy",
     "build:node": "yarn && yarn clear && tsc",
     "clear": "rimraf dist bin",
+    "copy": "cpx dist/commonjs/index.js bin/node/",
     "dist": "yarn build",
-    "test": "exit 0"
+    "test": "exit 0",
+    "version": "yarn build"
   },
   "types": "./dist/commonjs/index.d.ts",
   "version": "0.0.3"
