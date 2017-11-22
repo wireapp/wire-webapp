@@ -35,22 +35,28 @@ const CreateAccount = ({history}) => (
           <div>
             <H1 center>{'Set up your account'}</H1>
             <Form>
-              <Input placeholder={'Name'.toUpperCase()} autoFocus />
-              <Input type="email" placeholder={'you@yourcompany.com'} />
-              <Input type="password" placeholder={'Password (min 8 characters)'.toUpperCase()} />
-              <Checkbox>
+              <Input data-uie-name="enter-name" placeholder={'Name'.toUpperCase()} autoFocus />
+              <Input data-uie-name="enter-email" type="email" placeholder={'you@yourcompany.com'} />
+              <Input
+                data-uie-name="enter-password"
+                type="password"
+                placeholder={'Password (min 8 characters)'.toUpperCase()}
+              />
+              <Checkbox data-uie-name="do-terms">
                 <Small textTransform="uppercase">
                   {'I ACCEPT THE '}
-                  <Link href="#">{'TERMS AND CONDITIONS'}</Link>
+                  <Link data-uie-name="go-terms" href="#">
+                    {'TERMS AND CONDITIONS'}
+                  </Link>
                 </Small>
               </Checkbox>
-              <Button type="submit" onClick={() => history.push('/')}>
+              <Button data-uie-name="do-next" type="submit" onClick={() => history.push('/')}>
                 {'Next'}
               </Button>
             </Form>
           </div>
           <div>
-            <Link href="#" style={{alignSelf: 'flex-end'}}>
+            <Link data-uie-name="go-what-is" href="#" style={{alignSelf: 'flex-end'}}>
               {'WHAT IS WIRE FOR TEAMS?'}
             </Link>
           </div>
