@@ -20,11 +20,12 @@
 import React from 'react';
 import {indexStrings} from '../../strings';
 import {injectIntl} from 'react-intl';
-import {Profile, RoundContainer, Team} from '@wireapp/react-ui-kit/Icon';
+import {ProfileIcon, RoundContainer, TeamIcon} from '@wireapp/react-ui-kit/Icon';
 import {Logo, COLOR} from '@wireapp/react-ui-kit/Identity';
 import {Link as RRLink} from 'react-router-dom';
 import {Small, Link, Paragraph, Text, Bold} from '@wireapp/react-ui-kit/Text';
 import {Columns, Column, ContainerXS} from '@wireapp/react-ui-kit/Layout';
+import ROUTES from '../routes';
 
 const Index = ({name, history, intl: {formatMessage: _}}) => (
   <ContainerXS centerText verticalCenter>
@@ -36,7 +37,7 @@ const Index = ({name, history, intl: {formatMessage: _}}) => (
       <Column>
         <Link data-uie-name="go-register-personal">
           <RoundContainer style={{marginBottom: 12}}>
-            <Profile color={COLOR.WHITE} />
+            <ProfileIcon color={COLOR.WHITE} />
           </RoundContainer>
           <Bold fontSize="24px">{_(indexStrings.createAccount)}</Bold>
           <br />
@@ -46,9 +47,9 @@ const Index = ({name, history, intl: {formatMessage: _}}) => (
         </Link>
       </Column>
       <Column>
-        <Link to="/newteam" data-uie-name="go-register-team" component={RRLink}>
+        <Link to={ROUTES.NEWTEAM} data-uie-name="go-register-team" component={RRLink}>
           <RoundContainer color={COLOR.GREEN} style={{marginBottom: 12}}>
-            <Team color={COLOR.WHITE} />
+            <TeamIcon color={COLOR.WHITE} />
           </RoundContainer>
           <Bold fontSize="24px">{_(indexStrings.createTeam)}</Bold>
           <br />
