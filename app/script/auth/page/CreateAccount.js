@@ -45,8 +45,8 @@ const CreateAccount = ({history}) => (
             <H1 center>{'Set up your account'}</H1>
             <Form>
               <InputBlock>
-                <Input placeholder={'Name'} />
-                <Input placeholder={'you@yourcompany.com'} />
+                <Input placeholder={'Name'} autoFocus />
+                <Input placeholder={'you@yourcompany.com'} placeholderTextTransform="unset" />
                 <Input placeholder={'Password (min 8 characters)'} />
               </InputBlock>
               <Checkbox>
