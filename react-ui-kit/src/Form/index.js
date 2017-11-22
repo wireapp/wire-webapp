@@ -25,4 +25,7 @@ export * from './Button';
 export * from './Checkbox';
 export * from './Form';
 export * from './Input';
+export * from './InputSubmitCombo';
+export * from './InputBlock';
+export * from './RoundIconButton';
 export * from './Select';

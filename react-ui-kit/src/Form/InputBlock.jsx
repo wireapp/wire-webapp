@@ -17,12 +17,20 @@
  *
  */
 
-import setGlobalStyles from '../globalStyles';
+import {Input, InputSubmitCombo} from './';
+import {COLOR} from '../Identity';
+import styled from 'styled-components';
 
-setGlobalStyles();
+const InputBlock = styled.div`
+  background-color: ${COLOR.GRAY_LIGHTEN_92};
+  border-radius: 4px;
+  box-shadow: inset 20px 20px 0 ${COLOR.WHITE}, inset -20px -20px 0 ${COLOR.WHITE};
+  & > ${() => Input} {
+    margin: 0;
+  }
+  & > ${() => Input} + ${() => Input}, & > ${() => Input} + ${() => InputSubmitCombo} {
+    margin: 1px 0 0;
+  }
+`;
 
-export * from './Text';
-export {Heading, H1, H2, H3, H4} from './Heading';
-export * from './Line';
-export * from './Link';
-export * from './Paragraph';
+export {InputBlock};

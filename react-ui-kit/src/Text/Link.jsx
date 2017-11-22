@@ -18,11 +18,12 @@
  */
 
 import {COLOR} from '../Identity';
+import PropTypes from 'prop-types';
 import React from 'react';
 import {Text} from './Text';
 import {defaultTransition} from '../Identity/motions';
 
-const Link = ({component = 'a', ...props}) => {
+const Link = ({component, ...props}) => {
   const StyledLink = Text.withComponent(component).extend`
     /* appearance */
     text-decoration: none;
@@ -45,12 +46,14 @@ const Link = ({component = 'a', ...props}) => {
 
 Link.propTypes = {
   ...Text.propTypes,
+  component: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
 };
 
 Link.defaultProps = {
   ...Text.defaultProps,
   bold: true,
   color: COLOR.GRAY_DARKEN_72,
+  component: 'a',
   fontSize: '11px',
   textTransform: 'uppercase',
 };

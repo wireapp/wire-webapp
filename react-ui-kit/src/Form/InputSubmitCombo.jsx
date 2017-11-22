@@ -17,12 +17,17 @@
  *
  */
 
-import setGlobalStyles from '../globalStyles';
+import {Input} from './';
 
-setGlobalStyles();
+const InputSubmitCombo = Input.withComponent('div').extend`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  ${() => Input} {
+    padding: 0;
+    margin: 0 10px 0 0;
+    flex-grow: 1;
+  }
+`;
 
-export * from './Text';
-export {Heading, H1, H2, H3, H4} from './Heading';
-export * from './Line';
-export * from './Link';
-export * from './Paragraph';
+export {InputSubmitCombo};

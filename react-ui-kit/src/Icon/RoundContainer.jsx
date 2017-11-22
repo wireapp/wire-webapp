@@ -25,6 +25,7 @@ const RoundContainer = styled.div`
   width: ${props => parseFloat(props.size)}px;
   height: ${props => parseFloat(props.size)}px;
   border-radius: 50%;
+  border: none;
   background-color: ${props => props.color};
   margin: 0 auto;
   display: flex;
@@ -34,7 +35,7 @@ const RoundContainer = styled.div`
 
 RoundContainer.propTypes = {
   color: PropTypes.string,
-  size: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  size: PropTypes.number,
 };
 
 RoundContainer.defaultProps = {
