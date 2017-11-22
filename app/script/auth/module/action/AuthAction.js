@@ -42,6 +42,12 @@ export function doLogin(login) {
   };
 }
 
+export function pushAccountRegistrationData(registration) {
+  return function(dispatch, getState, {apiClient}) {
+    return dispatch(AuthActionCreator.pushAccountRegistrationData(registration));
+  };
+}
+
 export function doRegisterTeam(registration) {
   return function(dispatch, getState, {apiClient}) {
     registration.locale = getLocale();
