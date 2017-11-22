@@ -21,12 +21,21 @@ import React from 'react';
 import {withRouter} from 'react-router';
 import {Container, ContainerXS, Columns, Column} from '@wireapp/react-ui-kit/Layout';
 import {H1, Link, Small} from '@wireapp/react-ui-kit/Text';
-import {Form, Input, Button, Checkbox} from '@wireapp/react-ui-kit/Form';
+import {Form, Input, InputBlock, Button, Checkbox} from '@wireapp/react-ui-kit/Form';
+import {ArrowIcon} from '@wireapp/react-ui-kit/Icon';
+import ROUTES from '../routes';
+import {Link as RRLink} from 'react-router-dom';
 
 const CreateAccount = ({history}) => (
   <Container centerText verticalCenter>
     <Columns>
-      <Column />
+      <Column style={{display: 'flex'}}>
+        <div style={{margin: 'auto'}}>
+          <Link to={ROUTES.NEWTEAM} data-uie-name="go-register-team" component={RRLink}>
+            <ArrowIcon direction="left" />
+          </Link>
+        </div>
+      </Column>
       <Column style={{flexGrow: 2}}>
         <ContainerXS
           centerText
@@ -35,24 +44,23 @@ const CreateAccount = ({history}) => (
           <div>
             <H1 center>{'Set up your account'}</H1>
             <Form>
-              <Input placeholder={'Name'.toUpperCase()} autoFocus />
-              <Input type="email" placeholder={'you@yourcompany.com'} />
-              <Input type="password" placeholder={'Password (min 8 characters)'.toUpperCase()} />
+              <InputBlock>
+                <Input placeholder={'Name'} autoFocus />
+                <Input placeholder={'you@yourcompany.com'} placeholderTextTransform="unset" />
+                <Input placeholder={'Password (min 8 characters)'} />
+              </InputBlock>
               <Checkbox>
                 <Small textTransform="uppercase">
                   {'I ACCEPT THE '}
-                  <Link href="#">{'TERMS AND CONDITIONS'}</Link>
+                  <Link href="#" bold fontSize="12px">
+                    {'TERMS AND CONDITIONS'}
+                  </Link>
                 </Small>
               </Checkbox>
-              <Button type="submit" onClick={() => history.push('/')}>
+              <Button type="submit" onClick={() => history.push(ROUTES.VERIFY)}>
                 {'Next'}
               </Button>
             </Form>
-          </div>
-          <div>
-            <Link href="#" style={{alignSelf: 'flex-end'}}>
-              {'WHAT IS WIRE FOR TEAMS?'}
-            </Link>
           </div>
         </ContainerXS>
       </Column>

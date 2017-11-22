@@ -25,6 +25,7 @@ import {Logo, COLOR} from '@wireapp/react-ui-kit/Identity';
 import {Link as RRLink} from 'react-router-dom';
 import {Small, Link, Paragraph, Text, Bold} from '@wireapp/react-ui-kit/Text';
 import {Columns, Column, ContainerXS} from '@wireapp/react-ui-kit/Layout';
+import ROUTES from '../routes';
 
 const Index = ({name, history, intl: {formatMessage: _}}) => (
   <ContainerXS centerText verticalCenter>
@@ -42,7 +43,7 @@ const Index = ({name, history, intl: {formatMessage: _}}) => (
         </Link>
       </Column>
       <Column>
-        <Link to="/newteam" data-uie-name="go-register-team" component={RRLink}>
+        <Link to={ROUTES.NEWTEAM} data-uie-name="go-register-team" component={RRLink}>
           <RoundContainer color={COLOR.GREEN} style={{marginBottom: 12}}>
             <TeamIcon color={COLOR.WHITE} />
           </RoundContainer>
