@@ -22,13 +22,13 @@ import PropTypes from 'prop-types';
 import {Text} from '../Text';
 import {defaultTransition} from '../Identity/motions';
 
+const darkenAmount = 0.08;
 const Button = Text.withComponent('button').extend`
   /* appearance */
-  background-color: ${props => props.backgroundColor};
+  background-color: ${props => (props.disabled ? COLOR.DISABLED : props.backgroundColor)};
   border-radius: 8px;
   border: 0;
-  box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.12);
-  cursor: pointer;
+  cursor: ${props => (props.disabled ? 'default' : 'pointer')};
   display: inline-block;
   text-decoration: none;
   ${defaultTransition}
@@ -37,31 +37,34 @@ const Button = Text.withComponent('button').extend`
   height: 48px;
   line-height: 48px;
   max-width: 100%;
+  ouline: none;
   padding: 0 32px;
+  min-width: 184px;
   width: ${props => (props.block ? '100%' : 'auto')};
-
   &:hover,
   &:focus {
     /* appearance */
     text-decoration: none;
-    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
-  }
+    background-color: ${props => (props.disabled ? COLOR.DISABLED : COLOR.shade(props.backgroundColor, darkenAmount))}
+   }
 `;
 
 Button.propTypes = {
   ...Text.propTypes,
   backgroundColor: PropTypes.string,
   block: PropTypes.bool,
+  disabled: PropTypes.bool,
   noCapital: PropTypes.bool,
 };
 
 Button.defaultProps = {
   ...Text.defaultProps,
-  backgroundColor: COLOR.GRAY,
+  backgroundColor: COLOR.BLUE,
   block: false,
   bold: true,
   center: true,
   color: COLOR.WHITE,
+  disabled: false,
   noCapital: false,
   nowrap: true,
   textTransform: 'uppercase',

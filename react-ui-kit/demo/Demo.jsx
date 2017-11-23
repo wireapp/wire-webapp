@@ -58,6 +58,7 @@ import {
   Header,
   StyledApp,
 } from '@wireapp/react-ui-kit/Layout';
+import {CheckboxLabel} from '../src/Form/index';
 import Color from 'color';
 import {Loading} from '@wireapp/react-ui-kit/Progress';
 import React from 'react';
@@ -144,9 +145,7 @@ export default function Demo() {
             <Column>Checkbox</Column>
             <Column>
               <Checkbox id="ToU">
-                <Text bold fontSize="11px" textTransform="uppercase">
-                  {'ToU'}
-                </Text>
+                <CheckboxLabel>{'ToU'}</CheckboxLabel>
               </Checkbox>
             </Column>
           </Columns>

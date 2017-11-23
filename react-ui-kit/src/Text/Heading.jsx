@@ -24,7 +24,7 @@ import {Text} from './Text';
 
 const H1 = Text.withComponent('h1').extend`
   /* appearance */
-  font-size: 48px;
+  font-size: 40px;
   font-weight: 300;
 
   /* positioning */

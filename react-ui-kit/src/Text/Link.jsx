@@ -28,6 +28,7 @@ const Link = ({component, ...props}) => {
     /* appearance */
     text-decoration: none;
     ${defaultTransition}
+    cursor: pointer;
 
     /* positioning */
 
@@ -37,8 +38,7 @@ const Link = ({component, ...props}) => {
       color: ${() => props.color};
     }
     &:hover {
-      cursor: pointer;
-      color: ${COLOR.GRAY_DARKEN_72};
+      color: ${COLOR.LINK};
     }
   `;
   return <StyledLink {...props} />;
@@ -52,7 +52,7 @@ Link.propTypes = {
 Link.defaultProps = {
   ...Text.defaultProps,
   bold: true,
-  color: COLOR.GRAY_DARKEN_72,
+  color: COLOR.LINK,
   component: 'a',
   fontSize: '11px',
   textTransform: 'uppercase',

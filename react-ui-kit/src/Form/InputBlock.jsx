@@ -22,7 +22,7 @@ import {COLOR} from '../Identity';
 import styled from 'styled-components';
 
 const InputBlock = styled.div`
-  background-color: ${COLOR.GRAY_LIGHTEN_92};
+  background-color: ${COLOR.GRAY_LIGHTEN_88};
   border-radius: 4px;
   box-shadow: inset 20px 20px 0 ${COLOR.WHITE}, inset -20px -20px 0 ${COLOR.WHITE};
   & > ${() => Input} {

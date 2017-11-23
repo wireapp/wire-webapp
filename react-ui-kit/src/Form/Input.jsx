@@ -38,7 +38,7 @@ const Input = styled.input`
   caret-color: ${COLOR.BLUE};
 
   /* positioning */
-  line-height: 48px;
+  line-height: 56px;
   margin: 0 0 16px;
   padding: 0 20px;
   width: 100%;
