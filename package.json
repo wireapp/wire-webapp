@@ -186,7 +186,8 @@
         "locale/sk.js",
         "locale/sl.js",
         "locale/tr.js",
-        "locale/uk.js"
+        "locale/uk.js",
+        "locale/zh.js"
       ]
     },
     "@bower_components/normalize-css": {

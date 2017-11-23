@@ -46,6 +46,7 @@ SUPPORTED_LOCALE = [
   'sl',
   'tr',
   'uk',
+  'zh',
 ]
 
 root = os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir)

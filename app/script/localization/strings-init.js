@@ -21,8 +21,8 @@
 
 window.z = window.z || {};
 z.string = z.string || {};
-z.string.da = z.string.da || {};
 z.string.cs = z.string.cs || {};
+z.string.da = z.string.da || {};
 z.string.de = z.string.de || {};
 z.string.el = z.string.el || {};
 z.string.es = z.string.es || {};
@@ -42,6 +42,7 @@ z.string.sk = z.string.sk || {};
 z.string.sl = z.string.sl || {};
 z.string.tr = z.string.tr || {};
 z.string.uk = z.string.uk || {};
+z.string.zh = z.string.zh || {};
 
 z.string.Declension = {
   ACCUSATIVE: 'accusative',

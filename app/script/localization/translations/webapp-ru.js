@@ -561,7 +561,10 @@ z.string.ru.tooltip_search_close = 'Закрыть (Esc)';
 z.string.ru.init_received_self_user = 'Здравствуйте, {{user}}.';
 z.string.ru.init_validated_client = 'Загрузка контактов и разговоров';
 z.string.ru.init_received_user_data = 'Проверка наличия новых сообщений';
+z.string.ru.init_decryption = 'Расшифровка сообщений';
+z.string.ru.init_events = 'Загрузка сообщений';
 z.string.ru.init_updated_from_notifications = 'Почти готово - наслаждайтесь Wire';
+z.string.ru.init_progress = ' — {{number1}} из {{number2}}';
 
 z.string.ru.ephememal_units_none = 'Выключен';
 z.string.ru.ephememal_units_second = 'сек';
