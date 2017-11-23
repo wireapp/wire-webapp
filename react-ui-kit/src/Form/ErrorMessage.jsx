@@ -31,6 +31,7 @@ ErrorMessage.defaultProps = {
   center: true,
   color: COLOR.RED,
   fontSize: '11px',
+  textTransform: 'uppercase',
 };
 
 export {ErrorMessage};
