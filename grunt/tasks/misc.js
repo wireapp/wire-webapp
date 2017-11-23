@@ -104,7 +104,6 @@ module.exports = grunt => {
     'uglify:deploy',
     'concat:deploy',
     'clean:deploy_script',
-    'clean:prod',
   ]);
 
   grunt.registerTask('check', file => {
