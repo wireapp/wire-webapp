@@ -37,26 +37,9 @@ module.exports = {
       prefix: '#',
     },
     rename(dest, src) {
-      return `${dest}/index_new.html`;
+      return `${dest}/index.html`;
     },
-    src: 'auth_new.html',
-  },
-
-  deploy_auth_old: {
-    cwd: '<%= dir.app.page %>',
-    dest: '<%= dir.deploy %>/auth',
-    expand: true,
-    options: {
-      globals: {
-        dest: '_deploy',
-      },
-      includesDir: '<%= dir.app.page %>/template',
-      prefix: '#',
-    },
-    rename(dest, src) {
-      return `${dest}/index_old.html`;
-    },
-    src: 'auth_old.html',
+    src: 'auth.html',
   },
 
   deploy_demo: {
@@ -90,6 +73,23 @@ module.exports = {
     src: 'index.html',
   },
 
+  deploy_login: {
+    cwd: '<%= dir.app.page %>',
+    dest: '<%= dir.deploy %>/auth',
+    expand: true,
+    options: {
+      globals: {
+        dest: '_deploy',
+      },
+      includesDir: '<%= dir.app.page %>/template',
+      prefix: '#',
+    },
+    rename(dest, src) {
+      return `${dest}/index.html`;
+    },
+    src: 'login.html',
+  },
+
   //##############################################################################
   // Local deployment related
   //##############################################################################
@@ -105,26 +105,9 @@ module.exports = {
       prefix: '#',
     },
     rename(dest, src) {
-      return `${dest}/index_new.html`;
+      return `${dest}/index.html`;
     },
-    src: 'auth_new.html',
-  },
-
-  dist_auth_old: {
-    cwd: '<%= dir.app.page %>',
-    dest: '<%= dir.dist %>/auth',
-    expand: true,
-    options: {
-      globals: {
-        dest: '_dist',
-      },
-      includesDir: '<%= dir.app.page %>/template',
-      prefix: '#',
-    },
-    rename(dest, src) {
-      return `${dest}/index_old.html`;
-    },
-    src: 'auth_old.html',
+    src: 'auth.html',
   },
 
   dist_demo: {
@@ -158,6 +141,23 @@ module.exports = {
     src: 'index.html',
   },
 
+  dist_login: {
+    cwd: '<%= dir.app.page %>',
+    dest: '<%= dir.dist %>/auth',
+    expand: true,
+    options: {
+      globals: {
+        dest: '_dist',
+      },
+      includesDir: '<%= dir.app.page %>/template',
+      prefix: '#',
+    },
+    rename(dest, src) {
+      return `${dest}/index.html`;
+    },
+    src: 'login.html',
+  },
+
   //##############################################################################
   // Production deployment related
   //##############################################################################
@@ -173,26 +173,9 @@ module.exports = {
       prefix: '#',
     },
     rename(dest, src) {
-      return `${dest}/index_new.html`;
+      return `${dest}/index.html`;
     },
-    src: 'auth_new.html',
-  },
-
-  prod_auth_old: {
-    cwd: '<%= dir.app.page %>',
-    dest: '<%= dir.deploy %>/auth',
-    expand: true,
-    options: {
-      globals: {
-        dest: '_prod',
-      },
-      includesDir: '<%= dir.app.page %>/template',
-      prefix: '#',
-    },
-    rename(dest, src) {
-      return `${dest}/index_old.html`;
-    },
-    src: 'auth_old.html',
+    src: 'auth.html',
   },
 
   prod_demo: {
@@ -224,5 +207,22 @@ module.exports = {
       prefix: '#',
     },
     src: 'index.html',
+  },
+
+  prod_login: {
+    cwd: '<%= dir.app.page %>',
+    dest: '<%= dir.deploy %>/auth',
+    expand: true,
+    options: {
+      globals: {
+        dest: '_prod',
+      },
+      includesDir: '<%= dir.app.page %>/template',
+      prefix: '#',
+    },
+    rename(dest, src) {
+      return `${dest}/index.html`;
+    },
+    src: 'login.html',
   },
 };
