@@ -67,7 +67,7 @@ Text.defaultProps = {
   muted: false,
   noWrap: false,
   textTransform: 'none',
-  truncate: true,
+  truncate: false,
 };
 
 const Bold = Text.withComponent('strong');

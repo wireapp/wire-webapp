@@ -17,17 +17,20 @@
  *
  */
 
-import setGlobalStyles from '../globalStyles';
+import {COLOR} from '../Identity';
+import {Text} from '../Text';
 
-setGlobalStyles();
+const ErrorMessage = Text.extend`
+  display: block;
+  margin-top: 12px;
+`;
 
-export * from './Button';
-export * from './Checkbox';
-export * from './Form';
-export * from './Input';
-export * from './InputSubmitCombo';
-export * from './InputBlock';
-export * from './RoundIconButton';
-export * from './Select';
-export * from './CodeInput';
-export * from './ErrorMessage';
+ErrorMessage.defaultProps = {
+  ...Text.defaultProps,
+  bold: true,
+  center: true,
+  color: COLOR.RED,
+  fontSize: '11px',
+};
+
+export {ErrorMessage};
