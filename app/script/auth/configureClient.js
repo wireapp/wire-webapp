@@ -16,4 +16,20 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-export const VERSION = window.VERSION || '0.0.0';
+
+import * as Environment from './Environment';
+import APIClient from '@wireapp/api-client';
+
+const BACKEND = Environment.onEnvironment(
+  APIClient.BACKEND.STAGING,
+  APIClient.BACKEND.STAGING,
+  APIClient.BACKEND.PRODUCTION
+);
+
+export const configureClient = () => {
+  return new APIClient({
+    urls: BACKEND,
+  });
+};
+
+export default configureClient;

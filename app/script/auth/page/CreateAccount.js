@@ -17,73 +17,134 @@
  *
  */
 
-import React from 'react';
-import {withRouter} from 'react-router';
-import {Container, ContainerXS, Columns, Column} from '@wireapp/react-ui-kit/Layout';
-import {H1, Link} from '@wireapp/react-ui-kit/Text';
-import {Form, Input, InputBlock, Button, Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit/Form';
 import {ArrowIcon} from '@wireapp/react-ui-kit/Icon';
-import ROUTE from '../route';
-import {Link as RRLink} from 'react-router-dom';
 import {COLOR} from '@wireapp/react-ui-kit/Identity';
+import {connect} from 'react-redux';
+import {Container, ContainerXS, Columns, Column} from '@wireapp/react-ui-kit/Layout';
+import {Form, Input, InputBlock, Button, Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit/Form';
+import {H1, Link} from '@wireapp/react-ui-kit/Text';
+import {injectIntl} from 'react-intl';
+import {Link as RRLink} from 'react-router-dom';
+import {withRouter} from 'react-router';
+import * as AuthAction from '../module/action/AuthAction';
+import * as AuthSelector from '../module/selector/AuthSelector';
+import * as UserAction from '../module/action/UserAction';
+import React, {Component} from 'react';
+import ROUTE from '../route';
 
-const CreateAccount = ({history}) => (
-  <Container centerText verticalCenter style={{width: '100%'}}>
-    <Columns>
-      <Column style={{display: 'flex'}}>
-        <div style={{margin: 'auto'}}>
-          <Link to={ROUTE.NEW_TEAM} data-uie-name="go-register-team" component={RRLink}>
-            <ArrowIcon direction="left" color={COLOR.GRAY} />
-          </Link>
-        </div>
-      </Column>
-      <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
-        <ContainerXS
-          centerText
-          style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
-        >
-          <H1 center>{'Set up your account'}</H1>
-          <Form
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              flexGrow: 1,
-              justifyContent: 'space-between',
-              marginTop: 15,
-            }}
-          >
-            <InputBlock>
-              <Input data-uie-name="enter-name" placeholder={'Name'} autoFocus />
-              <Input
-                data-uie-name="enter-email"
-                placeholder={'you@yourcompany.com'}
-                placeholderTextTransform="unset"
-                type="email"
-              />
-              <Input data-uie-name="enter-password" type="password" placeholder={'Password (min 8 characters)'} />
-            </InputBlock>
-            <Checkbox data-uie-name="do-terms" style={{justifyContent: 'center'}}>
-              <CheckboxLabel>
-                {'I ACCEPT THE '}
-                <a data-uie-name="go-terms" href="#">
-                  {'TERMS AND CONDITIONS'}
-                </a>
-              </CheckboxLabel>
-            </Checkbox>
-            <Button
-              data-uie-name="do-next"
-              style={{margin: '0 auto', width: 184}}
-              type="submit"
-              onClick={() => history.push(ROUTE.VERIFY)}
+class CreateAccount extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      email: this.props.account.email,
+      name: this.props.account.name,
+      password: this.props.account.password,
+    };
+  }
+
+  handleSubmit = event => {
+    event.preventDefault();
+    return Promise.resolve()
+      .then(() => this.props.pushAccountRegistrationData({...this.state}))
+      .then(() => this.props.doSendActivationCode(this.state.email))
+      .then(() => this.props.history.push(ROUTE.VERIFY));
+  };
+
+  render() {
+    return (
+      <Container centerText verticalCenter style={{width: '100%'}}>
+        <Columns>
+          <Column style={{display: 'flex'}}>
+            <div style={{margin: 'auto'}}>
+              <Link to={ROUTE.NEW_TEAM} data-uie-name="go-register-team" component={RRLink}>
+                <ArrowIcon direction="left" color={COLOR.GRAY} />
+              </Link>
+            </div>
+          </Column>
+          <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
+            <ContainerXS
+              centerText
+              style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
             >
-              {'Next'}
-            </Button>
-          </Form>
-        </ContainerXS>
-      </Column>
-      <Column />
-    </Columns>
-  </Container>
-);
+              <H1 center>{'Set up your account'}</H1>
+              <Form
+                onSubmit={this.handleSubmit}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  flexGrow: 1,
+                  justifyContent: 'space-between',
+                  marginTop: 15,
+                }}
+              >
+                <InputBlock>
+                  <Input
+                    name="name"
+                    onChange={event => this.setState({name: event.target.value})}
+                    defaultValue={this.state.name}
+                    autoComplete="section-create-team username"
+                    placeholder={'Name'}
+                    autoFocus
+                    maxLength="64"
+                    minLength="2"
+                    pattern=".{2,64}"
+                    required
+                    data-uie-name="enter-name"
+                  />
+                  <Input
+                    name="email"
+                    onChange={event => this.setState({email: event.target.value})}
+                    defaultValue={this.state.email}
+                    autoComplete="section-create-team email"
+                    placeholder={'you@yourcompany.com'}
+                    placeholderTextTransform="unset"
+                    maxLength="128"
+                    type="email"
+                    required
+                    data-uie-name="enter-email"
+                  />
+                  <Input
+                    name="password"
+                    onChange={event => this.setState({password: event.target.value})}
+                    defaultValue={this.state.password}
+                    autoComplete="section-create-team new-password"
+                    type="password"
+                    placeholder={'Password (min. 8 characters)'}
+                    maxLength="1024"
+                    minLength="8"
+                    pattern=".{8,1024}"
+                    required
+                    data-uie-name="enter-password"
+                  />
+                </InputBlock>
+                <Checkbox name="accept" required data-uie-name="do-terms" style={{justifyContent: 'center'}}>
+                  <CheckboxLabel>
+                    {'I ACCEPT THE '}
+                    <a data-uie-name="go-terms" href="#">
+                      {'TERMS AND CONDITIONS'}
+                    </a>
+                  </CheckboxLabel>
+                </Checkbox>
+                <Button data-uie-name="do-next" type="submit" style={{margin: '0 auto', width: 184}}>
+                  {'Next'}
+                </Button>
+              </Form>
+            </ContainerXS>
+          </Column>
+          <Column />
+        </Columns>
+      </Container>
+    );
+  }
+}
 
-export default withRouter(CreateAccount);
+export default withRouter(
+  injectIntl(
+    connect(
+      state => ({
+        account: AuthSelector.getAccount(state),
+      }),
+      {...AuthAction, ...UserAction}
+    )(CreateAccount)
+  )
+);
