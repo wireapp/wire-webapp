@@ -81,7 +81,7 @@ class Index extends Component {
         </Columns>
         <Small>{_(indexStrings.loginInfo)}</Small>
         <br />
-        <Link fontSize="24px" textTransform="unset" onClick={this.onLoginClick}>
+        <Link data-uie-name="go-login" fontSize="24px" textTransform="unset" onClick={this.onLoginClick}>
           {_(indexStrings.login)}
         </Link>
       </ContainerXS>
