@@ -20,7 +20,6 @@
 import * as TrackingAction from '../module/action/TrackingAction';
 import React, {Component} from 'react';
 import {Columns, Column, ContainerXS} from '@wireapp/react-ui-kit/Layout';
-import ROUTES from '../routes';
 import {connect} from 'react-redux';
 import {indexStrings} from '../../strings';
 import {injectIntl} from 'react-intl';
@@ -33,11 +32,14 @@ class Index extends Component {
     this.props.trackEvent({attributes: undefined, name: TrackingAction.EVENT_NAME.START.OPENED_START_SCREEN});
   }
 
-  onRegisterPersonalClick = () => this.trackAndNavigate(TrackingAction.EVENT_NAME.START.OPENED_PERSON_REGISTRATION, '/auth/old#register');
+  onRegisterPersonalClick = () =>
+    this.trackAndNavigate(TrackingAction.EVENT_NAME.START.OPENED_PERSON_REGISTRATION, '/auth/old#register');
 
   onRegisterTeamClick = () => {
     return Promise.resolve()
-      .then(() => this.props.trackEvent({attributes: undefined, name: TrackingAction.EVENT_NAME.START.OPENED_TEAM_REGISTRATION}))
+      .then(() =>
+        this.props.trackEvent({attributes: undefined, name: TrackingAction.EVENT_NAME.START.OPENED_TEAM_REGISTRATION})
+      )
       .then(() => this.props.history.push('/newteam'));
   };
 
