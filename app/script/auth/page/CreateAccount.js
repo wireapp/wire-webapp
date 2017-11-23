@@ -23,6 +23,7 @@ import {Container, ContainerXS, Columns, Column} from '@wireapp/react-ui-kit/Lay
 import {Form, Input, InputBlock, Button, Checkbox} from '@wireapp/react-ui-kit/Form';
 import {H1, Link, Small} from '@wireapp/react-ui-kit/Text';
 import {injectIntl} from 'react-intl';
+import ROUTE from '../route';
 import {Link as RRLink} from 'react-router-dom';
 import {withRouter} from 'react-router';
 import * as AuthAction from '../module/action/AuthAction';

@@ -19,6 +19,7 @@
 
 import * as TrackingAction from '../module/action/TrackingAction';
 import React, {Component} from 'react';
+import ROUTE from '../route';
 import {Columns, Column, ContainerXS} from '@wireapp/react-ui-kit/Layout';
 import {connect} from 'react-redux';
 import {indexStrings} from '../../strings';
@@ -33,7 +34,7 @@ class Index extends Component {
   }
 
   onRegisterPersonalClick = () =>
-    this.trackAndNavigate(TrackingAction.EVENT_NAME.START.OPENED_PERSON_REGISTRATION, '/auth/old#register');
+    this.trackAndNavigate(TrackingAction.EVENT_NAME.START.OPENED_PERSON_REGISTRATION, ROUTE.REGISTER_PERSONAL);
 
   onRegisterTeamClick = () => {
     return Promise.resolve()
@@ -43,7 +44,7 @@ class Index extends Component {
       .then(() => this.props.history.push('/newteam'));
   };
 
-  onLoginClick = () => this.trackAndNavigate(TrackingAction.EVENT_NAME.START.OPENED_LOGIN, '/auth/old#login');
+  onLoginClick = () => this.trackAndNavigate(TrackingAction.EVENT_NAME.START.OPENED_LOGIN, ROUTE.LOGIN);
 
   trackAndNavigate = (eventName, url) => {
     return Promise.resolve()
