@@ -30,7 +30,6 @@ import * as AuthAction from '../module/action/AuthAction';
 import * as UserAction from '../module/action/UserAction';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import React, {Component} from 'react';
-import ROUTES from '../routes';
 
 class CreateAccount extends Component {
   constructor(props) {
@@ -47,7 +46,7 @@ class CreateAccount extends Component {
     return Promise.resolve()
       .then(() => this.props.pushAccountRegistrationData({...this.state}))
       .then(() => this.props.doSendActivationCode(this.state.email))
-      .then(() => this.props.history.push(ROUTES.VERIFY));
+      .then(() => this.props.history.push(ROUTE.VERIFY));
   };
 
   render() {
@@ -56,7 +55,7 @@ class CreateAccount extends Component {
         <Columns>
           <Column style={{display: 'flex'}}>
             <div style={{margin: 'auto'}}>
-              <Link to={ROUTES.NEWTEAM} data-uie-name="go-register-team" component={RRLink}>
+              <Link to={ROUTE.NEW_TEAM} data-uie-name="go-register-team" component={RRLink}>
                 <ArrowIcon direction="left" />
               </Link>
             </div>
