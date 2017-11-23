@@ -17,7 +17,7 @@
  *
  */
 
-import * as config from 'script/config';
+import * as config from './config';
 
 export const LOCAL = 'LOCAL';
 export const STAGING = 'STAGING';
