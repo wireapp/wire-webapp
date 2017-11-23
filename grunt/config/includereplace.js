@@ -75,7 +75,7 @@ module.exports = {
 
   deploy_login: {
     cwd: '<%= dir.app.page %>',
-    dest: '<%= dir.deploy %>/auth',
+    dest: '<%= dir.deploy %>/login',
     expand: true,
     options: {
       globals: {
@@ -143,7 +143,7 @@ module.exports = {
 
   dist_login: {
     cwd: '<%= dir.app.page %>',
-    dest: '<%= dir.dist %>/auth',
+    dest: '<%= dir.dist %>/login',
     expand: true,
     options: {
       globals: {
@@ -211,7 +211,7 @@ module.exports = {
 
   prod_login: {
     cwd: '<%= dir.app.page %>',
-    dest: '<%= dir.deploy %>/auth',
+    dest: '<%= dir.deploy %>/login',
     expand: true,
     options: {
       globals: {

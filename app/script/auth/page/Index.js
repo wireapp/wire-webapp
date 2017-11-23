@@ -41,7 +41,7 @@ class Index extends Component {
       .then(() =>
         this.props.trackEvent({attributes: undefined, name: TrackingAction.EVENT_NAME.START.OPENED_TEAM_REGISTRATION})
       )
-      .then(() => this.props.history.push('/newteam'));
+      .then(() => this.props.history.push(ROUTE.NEW_TEAM));
   };
 
   onLoginClick = () => this.trackAndNavigate(TrackingAction.EVENT_NAME.START.OPENED_LOGIN, ROUTE.LOGIN);
