@@ -28,10 +28,10 @@ const H1 = Text.withComponent('h1').extend`
   font-weight: 300;
 
   /* positioning */
-  line-height: 62px;
-  margin-bottom: 40px;
-  margin-top: 32px;
-  min-height: 62px;
+  line-height: 48px;
+  margin-bottom: 52px;
+  margin-top: 0;
+  min-height: 48px;
 `;
 
 const H2 = Text.withComponent('h2').extend`
