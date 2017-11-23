@@ -26,7 +26,7 @@ import {indexStrings} from '../../strings';
 import {injectIntl} from 'react-intl';
 import {Logo, COLOR} from '@wireapp/react-ui-kit/Identity';
 import {ProfileIcon, RoundContainer, TeamIcon} from '@wireapp/react-ui-kit/Icon';
-import {Small, Link, Paragraph, Text, Bold} from '@wireapp/react-ui-kit/Text';
+import {Link, Paragraph, Text, Bold} from '@wireapp/react-ui-kit/Text';
 
 class Index extends Component {
   componentDidMount() {
@@ -64,9 +64,13 @@ class Index extends Component {
               <RoundContainer style={{marginBottom: 12}}>
                 <ProfileIcon color={COLOR.WHITE} />
               </RoundContainer>
-              <Bold fontSize="24px">{_(indexStrings.createAccount)}</Bold>
+              <Bold fontSize="24px" color={COLOR.LINK}>
+                {_(indexStrings.createAccount)}
+              </Bold>
               <br />
-              <Text fontSize="24px">{_(indexStrings.createAccountFor)}</Text>
+              <Text light fontSize="24px" color={COLOR.LINK}>
+                {_(indexStrings.createAccountFor)}
+              </Text>
             </Link>
           </Column>
           <Column>
@@ -74,13 +78,17 @@ class Index extends Component {
               <RoundContainer color={COLOR.GREEN} style={{marginBottom: 12}}>
                 <TeamIcon color={COLOR.WHITE} />
               </RoundContainer>
-              <Bold fontSize="24px">{_(indexStrings.createTeam)}</Bold>
+              <Bold fontSize="24px" color={COLOR.LINK}>
+                {_(indexStrings.createTeam)}
+              </Bold>
               <br />
-              <Text fontSize="24px">{_(indexStrings.createTeamFor)}</Text>
+              <Text light fontSize="24px" color={COLOR.LINK}>
+                {_(indexStrings.createTeamFor)}
+              </Text>
             </Link>
           </Column>
         </Columns>
-        <Small>{_(indexStrings.loginInfo)}</Small>
+        <Text>{_(indexStrings.loginInfo)}</Text>
         <br />
         <Link data-uie-name="go-login" fontSize="24px" textTransform="unset" onClick={this.onLoginClick}>
           {_(indexStrings.login)}

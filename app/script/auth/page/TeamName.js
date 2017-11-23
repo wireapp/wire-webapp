@@ -17,10 +17,14 @@
  *
  */
 
-import {connect} from 'react-redux';
 import {Container, ContainerXS, Columns, Column} from '@wireapp/react-ui-kit/Layout';
 import {Form, InputSubmitCombo, Input, RoundIconButton} from '@wireapp/react-ui-kit/Form';
 import {H1, Text, Link} from '@wireapp/react-ui-kit/Text';
+import {ArrowIcon} from '@wireapp/react-ui-kit/Icon';
+import ROUTE from '../route';
+import {Link as RRLink} from 'react-router-dom';
+import {connect} from 'react-redux';
+import {COLOR} from '@wireapp/react-ui-kit/Identity';
 import {injectIntl} from 'react-intl';
 import {withRouter} from 'react-router';
 import * as AuthAction from '../module/action/AuthAction';
@@ -33,15 +37,20 @@ class TeamName extends Component {
     return Promise.resolve(this.teamNameInput.value)
       .then(teamName => teamName.trim())
       .then(teamName => this.props.pushAccountRegistrationData({team: {name: teamName}}))
-      .then(() => this.props.history.push('/createaccount'));
+      .then(() => this.props.history.push(ROUTE.CREATE_ACCOUNT));
   };
-
   render() {
     return (
-      <Container centerText verticalCenter>
+      <Container centerText verticalCenter style={{width: '100%'}}>
         <Columns>
-          <Column />
-          <Column style={{flexGrow: 2}}>
+          <Column style={{display: 'flex'}}>
+            <div style={{margin: 'auto'}}>
+              <Link to={ROUTE.INDEX} data-uie-name="go-register-team" component={RRLink}>
+                <ArrowIcon direction="left" color={COLOR.GRAY} />
+              </Link>
+            </div>
+          </Column>
+          <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
             <ContainerXS
               centerText
               style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
@@ -49,7 +58,7 @@ class TeamName extends Component {
               <div>
                 <H1 center>Name your team</H1>
                 <Text muted>You can always change it later.</Text>
-                <Form>
+                <Form style={{marginTop: 30}}>
                   <InputSubmitCombo>
                     <Input
                       defaultValue={this.props.teamName}
@@ -67,7 +76,7 @@ class TeamName extends Component {
                 </Form>
               </div>
               <div>
-                <Link href="#" style={{alignSelf: 'flex-end'}} data-uie-name="go-what-is">
+                <Link href="#" data-uie-name="go-what-is">
                   WHAT IS WIRE FOR TEAMS?
                 </Link>
               </div>
