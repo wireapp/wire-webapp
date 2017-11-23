@@ -27,7 +27,7 @@ import Verify from './Verify';
 import {IntlProvider, addLocaleData} from 'react-intl';
 import {connect} from 'react-redux';
 import de from 'react-intl/locale-data/de';
-import ROUTES from '../routes';
+import ROUTE from '../route';
 
 addLocaleData([...de]);
 
@@ -36,10 +36,10 @@ const Root = ({language}) => (
     <StyledApp>
       <Router>
         <Content>
-          <Route exact path={ROUTES.INDEX} component={Index} />
-          <Route path={ROUTES.NEWTEAM} component={TeamName} />
-          <Route path={ROUTES.CREATEACCOUNT} component={CreateAccount} />
-          <Route path={ROUTES.VERIFY} component={Verify} />
+          <Route exact path={ROUTE.INDEX} component={Index} />
+          <Route path={ROUTE.NEWTEAM} component={TeamName} />
+          <Route path={ROUTE.CREATEACCOUNT} component={CreateAccount} />
+          <Route path={ROUTE.VERIFY} component={Verify} />
         </Content>
       </Router>
     </StyledApp>

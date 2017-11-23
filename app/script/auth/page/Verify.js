@@ -35,13 +35,11 @@ const Verify = ({history}) => (
         <br />
         {'email@mail.com'}
       </Text>
-      <CodeInput autoFocus />
+      <CodeInput autoFocus style={{marginTop: 10}} />
     </div>
     <div>
-      <Link href="#" fontSize="12px" bold>
-        {'RESEND CODE'}
-      </Link>
-      <Link href="#" fontSize="12px" bold style={{marginLeft: 35}}>
+      <Link href="#">{'RESEND CODE'}</Link>
+      <Link href="#" style={{marginLeft: 35}}>
         {'CHANGE EMAIL'}
       </Link>
     </div>

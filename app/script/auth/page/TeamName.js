@@ -17,44 +17,43 @@
  *
  */
 
+import {COLOR} from '@wireapp/react-ui-kit/Identity';
 import React from 'react';
 import {withRouter} from 'react-router';
 import {Container, ContainerXS, Columns, Column} from '@wireapp/react-ui-kit/Layout';
 import {H1, Text, Link} from '@wireapp/react-ui-kit/Text';
 import {Form, InputSubmitCombo, Input, RoundIconButton} from '@wireapp/react-ui-kit/Form';
 import {ArrowIcon} from '@wireapp/react-ui-kit/Icon';
-import ROUTES from '../routes';
+import ROUTE from '../route';
 import {Link as RRLink} from 'react-router-dom';
 
 const TeamName = ({history}) => (
-  <Container centerText verticalCenter>
+  <Container centerText verticalCenter style={{width: '100%'}}>
     <Columns>
       <Column style={{display: 'flex'}}>
         <div style={{margin: 'auto'}}>
-          <Link to={ROUTES.INDEX} data-uie-name="go-register-team" component={RRLink}>
-            <ArrowIcon direction="left" />
+          <Link to={ROUTE.INDEX} data-uie-name="go-register-team" component={RRLink}>
+            <ArrowIcon direction="left" color={COLOR.GRAY} />
           </Link>
         </div>
       </Column>
-      <Column style={{flexGrow: 2}}>
+      <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
         <ContainerXS
           centerText
           style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
         >
           <div>
             <H1 center>Name your team</H1>
-            <Text muted>You can always change it later.</Text>
-            <Form>
+            <Text>You can always change it later.</Text>
+            <Form style={{marginTop: 30}}>
               <InputSubmitCombo>
-                <Input placeholder={'Team name'.toUpperCase()} autoFocus />
-                <RoundIconButton type="submit" onClick={() => history.push('/createaccount')} />
+                <Input placeholder="Team name" autoFocus />
+                <RoundIconButton type="submit" onClick={() => history.push(ROUTE.CREATEACCOUNT)} />
               </InputSubmitCombo>
             </Form>
           </div>
           <div>
-            <Link href="#" fontSize="12px" bold style={{alignSelf: 'flex-end'}}>
-              WHAT IS WIRE FOR TEAMS?
-            </Link>
+            <Link href="#">WHAT IS WIRE FOR TEAMS?</Link>
           </div>
         </ContainerXS>
       </Column>

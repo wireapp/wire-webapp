@@ -20,48 +20,53 @@
 import React from 'react';
 import {withRouter} from 'react-router';
 import {Container, ContainerXS, Columns, Column} from '@wireapp/react-ui-kit/Layout';
-import {H1, Link, Small} from '@wireapp/react-ui-kit/Text';
-import {Form, Input, InputBlock, Button, Checkbox} from '@wireapp/react-ui-kit/Form';
+import {H1, Link} from '@wireapp/react-ui-kit/Text';
+import {Form, Input, InputBlock, Button, Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit/Form';
 import {ArrowIcon} from '@wireapp/react-ui-kit/Icon';
-import ROUTES from '../routes';
+import ROUTE from '../route';
 import {Link as RRLink} from 'react-router-dom';
+import {COLOR} from '@wireapp/react-ui-kit/Identity';
 
 const CreateAccount = ({history}) => (
-  <Container centerText verticalCenter>
+  <Container centerText verticalCenter style={{width: '100%'}}>
     <Columns>
       <Column style={{display: 'flex'}}>
         <div style={{margin: 'auto'}}>
-          <Link to={ROUTES.NEWTEAM} data-uie-name="go-register-team" component={RRLink}>
-            <ArrowIcon direction="left" />
+          <Link to={ROUTE.NEWTEAM} data-uie-name="go-register-team" component={RRLink}>
+            <ArrowIcon direction="left" color={COLOR.GRAY} />
           </Link>
         </div>
       </Column>
-      <Column style={{flexGrow: 2}}>
+      <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
         <ContainerXS
           centerText
           style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
         >
-          <div>
-            <H1 center>{'Set up your account'}</H1>
-            <Form>
-              <InputBlock>
-                <Input placeholder={'Name'} autoFocus />
-                <Input placeholder={'you@yourcompany.com'} placeholderTextTransform="unset" />
-                <Input placeholder={'Password (min 8 characters)'} />
-              </InputBlock>
-              <Checkbox>
-                <Small textTransform="uppercase">
-                  {'I ACCEPT THE '}
-                  <Link href="#" bold fontSize="12px">
-                    {'TERMS AND CONDITIONS'}
-                  </Link>
-                </Small>
-              </Checkbox>
-              <Button type="submit" onClick={() => history.push(ROUTES.VERIFY)}>
-                {'Next'}
-              </Button>
-            </Form>
-          </div>
+          <H1 center>{'Set up your account'}</H1>
+          <Form
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              flexGrow: 1,
+              justifyContent: 'space-between',
+              marginTop: 15,
+            }}
+          >
+            <InputBlock>
+              <Input placeholder={'Name'} autoFocus />
+              <Input placeholder={'you@yourcompany.com'} placeholderTextTransform="unset" />
+              <Input placeholder={'Password (min 8 characters)'} />
+            </InputBlock>
+            <Checkbox style={{justifyContent: 'center'}}>
+              <CheckboxLabel>
+                {'I ACCEPT THE '}
+                <a href="#">{'TERMS AND CONDITIONS'}</a>
+              </CheckboxLabel>
+            </Checkbox>
+            <Button style={{margin: '0 auto', width: 184}} type="submit" onClick={() => history.push(ROUTE.VERIFY)}>
+              {'Next'}
+            </Button>
+          </Form>
         </ContainerXS>
       </Column>
       <Column />
