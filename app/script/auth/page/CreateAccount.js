@@ -23,7 +23,7 @@ import {Container, ContainerXS, Columns, Column} from '@wireapp/react-ui-kit/Lay
 import {H1, Link, Small} from '@wireapp/react-ui-kit/Text';
 import {Form, Input, InputBlock, Button, Checkbox} from '@wireapp/react-ui-kit/Form';
 import {ArrowIcon} from '@wireapp/react-ui-kit/Icon';
-import ROUTES from '../routes';
+import ROUTE from '../route';
 import {Link as RRLink} from 'react-router-dom';
 
 const CreateAccount = ({history}) => (
@@ -31,7 +31,7 @@ const CreateAccount = ({history}) => (
     <Columns>
       <Column style={{display: 'flex'}}>
         <div style={{margin: 'auto'}}>
-          <Link to={ROUTES.NEWTEAM} data-uie-name="go-register-team" component={RRLink}>
+          <Link to={ROUTE.NEW_TEAM} data-uie-name="go-register-team" component={RRLink}>
             <ArrowIcon direction="left" />
           </Link>
         </div>
@@ -61,7 +61,7 @@ const CreateAccount = ({history}) => (
                   </Link>
                 </Small>
               </Checkbox>
-              <Button data-uie-name="do-next" type="submit" onClick={() => history.push(ROUTES.VERIFY)}>
+              <Button data-uie-name="do-next" type="submit" onClick={() => history.push(ROUTE.VERIFY)}>
                 {'Next'}
               </Button>
             </Form>
