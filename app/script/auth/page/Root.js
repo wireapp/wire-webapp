@@ -37,8 +37,8 @@ const Root = ({language}) => (
       <Router>
         <Content>
           <Route exact path={ROUTE.INDEX} component={Index} />
-          <Route path={ROUTE.NEWTEAM} component={TeamName} />
-          <Route path={ROUTE.CREATEACCOUNT} component={CreateAccount} />
+          <Route path={ROUTE.NEW_TEAM} component={TeamName} />
+          <Route path={ROUTE.CREATE_ACCOUNT} component={CreateAccount} />
           <Route path={ROUTE.VERIFY} component={Verify} />
         </Content>
       </Router>
