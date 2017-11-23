@@ -281,7 +281,7 @@ describe('PriorityQueue', () => {
     });
 
     it('supports a custom comparator', done => {
-      const ascendingPriority = (a, b) => a.priority - b.priority;
+      const ascendingPriority = (first, second) => first.priority - second.priority;
       const queue = new PriorityQueue({comparator: ascendingPriority});
       queue.isPending = true;
 
