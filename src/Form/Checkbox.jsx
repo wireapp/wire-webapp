@@ -17,9 +17,11 @@
  *
  */
 
+import {COLOR} from '../index';
 import {Input} from './Input';
 import PropTypes from 'prop-types';
 import React from 'react';
+import {Text} from '../Text';
 import styled from 'styled-components';
 
 const StyledContainerCheckbox = styled.div`
@@ -40,24 +42,42 @@ const StyledCheckbox = Input.withComponent('input').extend.attrs({
   margin-bottom: 0;
 `;
 
-const Checkbox = ({id, children, ...props}) => {
+const Checkbox = ({id, children, style, ...props}) => {
+  if (!id) {
+    id = Math.random().toString();
+  }
   return (
-    <StyledContainerCheckbox>
+    <StyledContainerCheckbox style={style}>
       <StyledCheckbox id={id} {...props} />
       <label htmlFor={id}>{children}</label>
     </StyledContainerCheckbox>
   );
 };
 
+const CheckboxLabel = Text.extend`
+  a {
+    text-decoration: none;
+    color: ${COLOR.LINK};
+  }
+`;
+
+CheckboxLabel.defaultProps = {
+  ...Text.defaultProps,
+  bold: true,
+  fontSize: '11px',
+  textTransform: 'uppercase',
+};
+
 Checkbox.propTypes = {
   ...Input.propTypes,
   children: PropTypes.node,
-  id: PropTypes.string.isRequired,
+  id: PropTypes.string,
 };
 
 Checkbox.defaultProps = {
   ...Input.defaultProps,
   children: null,
+  id: null,
 };
 
-export {Checkbox};
+export {Checkbox, CheckboxLabel};

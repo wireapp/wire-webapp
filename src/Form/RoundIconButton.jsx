@@ -21,12 +21,21 @@ import {ArrowIcon, PlaneIcon, RoundContainer} from '../Icon';
 import {COLOR} from '../Identity';
 import PropTypes from 'prop-types';
 import React from 'react';
+import {defaultTransition} from '../Identity/motions';
+
+const darkenAmount = 0.08;
 
 const Button = RoundContainer.withComponent('button').extend`
+  background-color: ${props => (props.disabled ? COLOR.DISABLED : props.color)};
   min-width: ${props => props.size}px;
+  outline: none;
   padding: 0;
   cursor: ${props => (props.disabled ? 'default' : 'pointer')};
-  opacity: ${props => (props.disabled ? '0.5' : '1')};
+  ${defaultTransition}
+  &:hover,
+  &:focus {
+    background-color: ${props => (props.disabled ? COLOR.DISABLED : COLOR.shade(props.color, darkenAmount))}
+   }
 `;
 
 const RoundIconButton = ({icon, iconColor, iconHeight, iconWidth, ...props}) => (
@@ -50,7 +59,7 @@ RoundIconButton.propTypes = {
 };
 
 RoundIconButton.defaultProps = {
-  color: COLOR.GRAY_LIGHTEN_48,
+  color: COLOR.BLUE,
   disabled: false,
   icon: 'arrow',
   iconColor: COLOR.WHITE,

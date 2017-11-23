@@ -22,7 +22,7 @@ import setGlobalStyles from './globalStyles';
 setGlobalStyles();
 
 export * from './Form';
-export * from './Grid';
+export * from './Layout';
 export * from './Identity';
 export * from './Icon';
 export * from './Progress';

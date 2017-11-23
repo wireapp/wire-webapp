@@ -42,7 +42,7 @@ StyledApp.propTypes = {
 };
 
 StyledApp.defaultProps = {
-  backgroundColor: '#fafafa',
+  backgroundColor: COLOR.GRAY_LIGHTEN_88,
 };
 
 export {StyledApp};

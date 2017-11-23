@@ -25,7 +25,7 @@ const Text = styled.span`
   /* appearance */
   color: ${props => props.color};
   font-size: ${props => props.fontSize};
-  font-weight: ${props => (props.bold ? '600' : props.light ? '200' : 'unset')};
+  font-weight: ${props => (props.bold ? '600' : props.light ? '300' : '400')};
   opacity: ${props => (props.muted ? '0.5' : '1')};
   text-align: ${props => (props.center ? 'center' : 'left')};
   text-transform: ${props => props.textTransform};
@@ -61,7 +61,7 @@ Text.propTypes = {
 Text.defaultProps = {
   bold: false,
   center: false,
-  color: COLOR.GRAY_DARKEN_32,
+  color: COLOR.TEXT,
   fontSize: '16px',
   light: false,
   muted: false,
