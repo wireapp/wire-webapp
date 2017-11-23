@@ -53,17 +53,29 @@ const CreateAccount = ({history}) => (
             }}
           >
             <InputBlock>
-              <Input placeholder={'Name'} autoFocus />
-              <Input placeholder={'you@yourcompany.com'} placeholderTextTransform="unset" />
-              <Input placeholder={'Password (min 8 characters)'} />
+              <Input data-uie-name="enter-name" placeholder={'Name'} autoFocus />
+              <Input
+                data-uie-name="enter-email"
+                placeholder={'you@yourcompany.com'}
+                placeholderTextTransform="unset"
+                type="email"
+              />
+              <Input data-uie-name="enter-password" type="password" placeholder={'Password (min 8 characters)'} />{' '}
             </InputBlock>
-            <Checkbox style={{justifyContent: 'center'}}>
+            <Checkbox data-uie-name="do-terms" style={{justifyContent: 'center'}}>
               <CheckboxLabel>
                 {'I ACCEPT THE '}
-                <a href="#">{'TERMS AND CONDITIONS'}</a>
+                <a data-uie-name="go-terms" href="#">
+                  {'TERMS AND CONDITIONS'}
+                </a>
               </CheckboxLabel>
             </Checkbox>
-            <Button style={{margin: '0 auto', width: 184}} type="submit" onClick={() => history.push(ROUTE.VERIFY)}>
+            <Button
+              data-uie-name="do-next"
+              style={{margin: '0 auto', width: 184}}
+              type="submit"
+              onClick={() => history.push(ROUTE.VERIFY)}
+            >
               {'Next'}
             </Button>
           </Form>

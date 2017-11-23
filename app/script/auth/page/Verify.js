@@ -30,16 +30,18 @@ const Verify = ({history}) => (
   >
     <div>
       <H1 center>{'You’ve got mail'}</H1>
-      <Text>
+      <Text data-uie-name="label-with-email">
         {'Enter the verification code we sent to'}
         <br />
         {'email@mail.com'}
       </Text>
-      <CodeInput autoFocus style={{marginTop: 10}} />
+      <CodeInput data-uie-name="enter-code" autoFocus style={{marginTop: 10}} />
     </div>
     <div>
-      <Link href="#">{'RESEND CODE'}</Link>
-      <Link href="#" style={{marginLeft: 35}}>
+      <Link data-uie-name="do-resend-code" href="#">
+        {'RESEND CODE'}
+      </Link>
+      <Link data-uie-name="go-change-email" href="#" style={{marginLeft: 35}}>
         {'CHANGE EMAIL'}
       </Link>
     </div>

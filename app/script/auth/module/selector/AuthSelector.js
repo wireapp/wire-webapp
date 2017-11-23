@@ -16,14 +16,12 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-import * as Environment from './Environment';
 
-export const APP_ENVIRONMENT = window.APP_ENVIRONMENT || Environment.PRODUCTION;
-Environment.checkEnvironment();
+export const getAccessToken = state => state.authState.accesstoken;
+export const isAuthenticated = state => state.authState.isAuthenticated;
+export const isFetching = state => state.authState.fetching;
+export const getError = state => state.authState.error;
 
-export const VERSION = window.VERSION || '0.0.0';
-export const MIXPANEL_TOKEN = Environment.onEnvironment(
-  '537da3b3bc07df1e420d07e2921a6f6f',
-  '537da3b3bc07df1e420d07e2921a6f6f',
-  'c7dcb15893f14932b1c31b5fb33ff669'
-);
+export const getAccount = state => state.authState.account || {};
+export const getAccountTeam = state => getAccount(state).team || {};
+export const getAccountTeamName = state => getAccountTeam(state).name;

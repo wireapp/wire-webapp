@@ -21,6 +21,9 @@ export const LOGIN_START = 'LOGIN_START';
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
 export const LOGIN_FAILED = 'LOGIN_FAILED';
 
+export const REGISTER_PUSH_ACCOUNT_DATA = 'REGISTER_PUSH_ACCOUNT_DATA';
+export const REGISTER_RESET_ACCOUNT_DATA = 'REGISTER_RESET_ACCOUNT_DATA';
+
 export const REGISTER_TEAM_START = 'REGISTER_TEAM_START';
 export const REGISTER_TEAM_SUCCESS = 'REGISTER_TEAM_SUCCESS';
 export const REGISTER_TEAM_FAILED = 'REGISTER_TEAM_FAILED';
@@ -117,4 +120,12 @@ export function failedLogout(error) {
 
 export function resetError() {
   return {type: AUTH_RESET_ERROR};
+}
+
+export function resetAccountData() {
+  return {type: REGISTER_RESET_ACCOUNT_DATA};
+}
+
+export function pushAccountRegistrationData(accountData) {
+  return {payload: accountData, type: REGISTER_PUSH_ACCOUNT_DATA};
 }
