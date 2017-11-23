@@ -1,8 +1,20 @@
 import * as AuthActionCreator from '../action/creator/AuthActionCreator';
-import * as UserActionCreator from '../action/creator/UserActionCreator';
 
 export const initialState = {
-  activatedEmail: null,
+  account: {
+    accent_id: undefined,
+    assets: undefined,
+    email: undefined,
+    email_code: undefined,
+    invitation_code: undefined,
+    label: undefined,
+    locale: undefined,
+    name: undefined,
+    password: undefined,
+    phone: undefined,
+    phone_code: undefined,
+    team: undefined,
+  },
   error: null,
   fetched: false,
   fetching: false,
@@ -54,16 +66,20 @@ export default function reducer(state = initialState, action) {
     case AuthActionCreator.REGISTER_TEAM_SUCCESS: {
       return {
         ...state,
+        account: {...initialState.account},
         fetched: true,
         fetching: false,
         isAuthenticated: true,
       };
     }
-    case UserActionCreator.USER_ACTIVATION_SUCCESS: {
-      return {...state, activatedEmail: action.payload.email};
+    case AuthActionCreator.REGISTER_PUSH_ACCOUNT_DATA: {
+      return {...state, account: {...state.account, ...action.payload}};
+    }
+    case AuthActionCreator.REGISTER_RESET_ACCOUNT_DATA: {
+      return {...state, account: {...initialState.account}};
     }
     case AuthActionCreator.LOGOUT_SUCCESS: {
-      return {...initialState, deletedAccount: state.deletedAccount};
+      return {...initialState};
     }
     case AuthActionCreator.AUTH_RESET_ERROR: {
       return {...state, error: null};

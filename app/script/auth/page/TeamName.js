@@ -17,50 +17,72 @@
  *
  */
 
-import React from 'react';
-import {withRouter} from 'react-router';
+import {connect} from 'react-redux';
 import {Container, ContainerXS, Columns, Column} from '@wireapp/react-ui-kit/Layout';
-import {H1, Text, Link} from '@wireapp/react-ui-kit/Text';
 import {Form, InputSubmitCombo, Input, RoundIconButton} from '@wireapp/react-ui-kit/Form';
-import {ArrowIcon} from '@wireapp/react-ui-kit/Icon';
-import ROUTES from '../routes';
-import {Link as RRLink} from 'react-router-dom';
+import {H1, Text, Link} from '@wireapp/react-ui-kit/Text';
+import {injectIntl} from 'react-intl';
+import {withRouter} from 'react-router';
+import * as AuthAction from '../module/action/AuthAction';
+import * as AuthSelector from '../module/selector/AuthSelector';
+import React, {Component} from 'react';
 
-const TeamName = ({history}) => (
-  <Container centerText verticalCenter>
-    <Columns>
-      <Column style={{display: 'flex'}}>
-        <div style={{margin: 'auto'}}>
-          <Link to={ROUTES.INDEX} data-uie-name="go-register-team" component={RRLink}>
-            <ArrowIcon direction="left" />
-          </Link>
-        </div>
-      </Column>
-      <Column style={{flexGrow: 2}}>
-        <ContainerXS
-          centerText
-          style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
-        >
-          <div>
-            <H1 center>Name your team</H1>
-            <Text muted>You can always change it later.</Text>
-            <Form>
-              <InputSubmitCombo>
-                <Input data-uie-name="enter-team-name" placeholder={'Team name'.toUpperCase()} autoFocus />
-                <RoundIconButton data-uie-name="do-next" type="submit" onClick={() => history.push('/createaccount')} />
-              </InputSubmitCombo>
-            </Form>
-          </div>
-          <div>
-            <Link data-uie-name="go-what-is" href="#" fontSize="12px" bold style={{alignSelf: 'flex-end'}}>
-              WHAT IS WIRE FOR TEAMS?
-            </Link>
-          </div>
-        </ContainerXS>
-      </Column>
-      <Column />
-    </Columns>
-  </Container>
+class TeamName extends Component {
+  pushTeamName = event => {
+    event.preventDefault();
+    return Promise.resolve(this.teamNameInput.value)
+      .then(teamName => teamName.trim())
+      .then(teamName => this.props.pushAccountRegistrationData({team: {name: teamName}}))
+      .then(() => this.props.history.push('/createaccount'));
+  };
+
+  render() {
+    return (
+      <Container centerText verticalCenter>
+        <Columns>
+          <Column />
+          <Column style={{flexGrow: 2}}>
+            <ContainerXS
+              centerText
+              style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
+            >
+              <div>
+                <H1 center>Name your team</H1>
+                <Text muted>You can always change it later.</Text>
+                <Form>
+                  <InputSubmitCombo>
+                    <Input
+                      defaultValue={this.props.teamName}
+                      innerRef={node => (this.teamNameInput = node)}
+                      placeholder={'Team name'}
+                      autoFocus
+                      data-uie-name="enter-team-name"
+                    />
+                    <RoundIconButton type="submit" onClick={this.pushTeamName} data-uie-name="do-next" />
+                  </InputSubmitCombo>
+                </Form>
+              </div>
+              <div>
+                <Link href="#" style={{alignSelf: 'flex-end'}} data-uie-name="go-what-is">
+                  WHAT IS WIRE FOR TEAMS?
+                </Link>
+              </div>
+            </ContainerXS>
+          </Column>
+          <Column />
+        </Columns>
+      </Container>
+    );
+  }
+}
+
+export default withRouter(
+  injectIntl(
+    connect(
+      state => ({
+        teamName: AuthSelector.getAccountTeamName(state),
+      }),
+      {...AuthAction}
+    )(TeamName)
+  )
 );
-
-export default withRouter(TeamName);
