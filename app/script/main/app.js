@@ -742,8 +742,8 @@ z.main.App = class App {
       .execute_on_connectivity(z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.LOGIN_REDIRECT)
       .then(() => {
         const expectedSignOutReasons = [z.auth.SIGN_OUT_REASON.ACCOUNT_DELETED, z.auth.SIGN_OUT_REASON.NOT_SIGNED_IN];
-        const wasSignedIn = expectedSignOutReasons.includes(sign_out_reason);
-        let url = `/auth/${wasSignedIn ? 'old/' : ''}${location.search}`;
+        const notSignedIn = expectedSignOutReasons.includes(sign_out_reason);
+        let url = `${notSignedIn ? '/auth/' : '/login/'}${location.search}`;
 
         if (App.CONFIG.IMMEDIATE_SIGN_OUT_REASONS.includes(sign_out_reason)) {
           url = z.util.append_url_parameter(url, `${z.auth.URLParameter.REASON}=${sign_out_reason}`);

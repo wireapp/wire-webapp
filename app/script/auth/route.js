@@ -20,8 +20,8 @@
 export default {
   CREATE_ACCOUNT: '/createaccount',
   INDEX: '/',
-  LOGIN: '/auth/old/#login',
+  LOGIN: '/login/#login',
   NEW_TEAM: '/newteam',
-  REGISTER_PERSONAL: '/auth/old/#register',
+  REGISTER_PERSONAL: '/login/#register',
   VERIFY: '/verify',
 };
