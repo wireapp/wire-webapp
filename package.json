@@ -29,16 +29,18 @@
   "name": "@wireapp/core",
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/core",
   "scripts": {
+    "build": "yarn build:node && yarn build:browser",
+    "build:browser": "exit 0",
+    "build:node": "tsc",
     "clear": "rimraf dist && rimraf .tmp",
     "coverage": "istanbul cover --report html ./node_modules/jasmine/bin/jasmine.js",
-    "dist": "yarn clear && tsc",
-    "preversion": "yarn && yarn dist && yarn test",
-    "version": "yarn dist",
-    "postversion": "git push && git push --tags",
+    "dist": "yarn clear && yarn build",
+    "preversion": "yarn && yarn test",
     "start": "rimraf .tmp && yarn dist && node index.js",
     "test": "yarn dist && yarn test:node && yarn test:browser",
+    "test:browser": "exit 0",
     "test:node": "cross-env JASMINE_CONFIG_PATH=src/test/node/support/jasmine.json jasmine",
-    "test:browser": "echo No operation."
+    "version": "yarn dist"
   },
   "types": "./dist/commonjs/index.d.ts",
   "version": "0.0.8"
