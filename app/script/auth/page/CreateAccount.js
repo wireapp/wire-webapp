@@ -17,19 +17,19 @@
  *
  */
 
-import {connect} from 'react-redux';
 import {ArrowIcon} from '@wireapp/react-ui-kit/Icon';
+import {connect} from 'react-redux';
 import {Container, ContainerXS, Columns, Column} from '@wireapp/react-ui-kit/Layout';
 import {Form, Input, InputBlock, Button, Checkbox} from '@wireapp/react-ui-kit/Form';
 import {H1, Link, Small} from '@wireapp/react-ui-kit/Text';
 import {injectIntl} from 'react-intl';
-import ROUTE from '../route';
 import {Link as RRLink} from 'react-router-dom';
 import {withRouter} from 'react-router';
 import * as AuthAction from '../module/action/AuthAction';
-import * as UserAction from '../module/action/UserAction';
 import * as AuthSelector from '../module/selector/AuthSelector';
+import * as UserAction from '../module/action/UserAction';
 import React, {Component} from 'react';
+import ROUTE from '../route';
 
 class CreateAccount extends Component {
   constructor(props) {
