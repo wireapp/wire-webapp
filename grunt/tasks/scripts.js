@@ -59,6 +59,7 @@ module.exports = grunt => {
       app: [],
       auth: [],
       component: [],
+      login: [],
       vendor: [],
     };
 
