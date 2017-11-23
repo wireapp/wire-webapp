@@ -17,11 +17,25 @@
  *
  */
 
-import * as config from './config';
-
 export const LOCAL = 'LOCAL';
 export const STAGING = 'STAGING';
 export const PRODUCTION = 'PRODUCTION';
+
+export const APP_ENVIRONMENT = getEnvironmentFromQuery();
+checkEnvironment();
+
+export function getEnvironmentFromQuery() {
+  const isProductionHost = window.location.hostname.includes('wire.com');
+  const environmentQueryValue = new URL(window.location).searchParams.get('env');
+  switch (environmentQueryValue) {
+    case 'staging':
+      return STAGING;
+    case 'prod':
+      return PRODUCTION;
+    default:
+      return isProductionHost ? PRODUCTION : STAGING;
+  }
+}
 
 export function checkEnvironment() {
   const environment = getEnvironment();
@@ -32,11 +46,11 @@ export function checkEnvironment() {
 }
 
 export function getEnvironment() {
-  return config.APP_ENVIRONMENT;
+  return APP_ENVIRONMENT;
 }
 
 export function isEnvironment(environment) {
-  return config.APP_ENVIRONMENT === environment;
+  return APP_ENVIRONMENT === environment;
 }
 
 export function onEnvironment(onLocal, onStaging, onProduction) {

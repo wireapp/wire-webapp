@@ -22,6 +22,7 @@ import {Account} from '@wireapp/core';
 import {AppContainer} from 'react-hot-loader';
 import {Provider} from 'react-redux';
 import configureStore from './configureStore';
+import configureClient from './configureClient';
 import configureTracking from './configureTracking';
 import configureWrapper from './configureWrapper';
 import React from 'react';
@@ -29,7 +30,8 @@ import ReactDOM from 'react-dom';
 import Root from './page/Root';
 
 configureWrapper();
-const core = new Account();
+const apiClient = configureClient();
+const core = new Account(apiClient);
 const mixpanel = configureTracking();
 
 const store = configureStore({apiClient: core.apiClient, core, mixpanel});

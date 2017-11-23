@@ -55,6 +55,10 @@ class TeamName extends Component {
                       defaultValue={this.props.teamName}
                       innerRef={node => (this.teamNameInput = node)}
                       placeholder={'Team name'}
+                      pattern=".{2,256}"
+                      maxLength="256"
+                      minLength="2"
+                      required
                       autoFocus
                       data-uie-name="enter-team-name"
                     />

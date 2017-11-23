@@ -17,6 +17,8 @@
  *
  */
 
+import * as UserActionCreator from './creator/UserActionCreator';
+
 export function doActivateAccount(code, key) {
   const params = [...arguments];
   return function(dispatch, getState, {apiClient}) {
