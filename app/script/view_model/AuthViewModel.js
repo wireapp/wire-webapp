@@ -2063,7 +2063,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
   logout() {
     this.auth.repository.logout().then(() => {
       this.auth.repository.delete_access_token();
-      window.location.replace('/auth');
+      window.location.replace('/login');
     });
   }
 

@@ -34,7 +34,7 @@ module.exports = {
     },
   },
   aws_pack: {
-    command: 'yarn bundle:prod',
+    command: 'yarn && yarn bundle:prod',
     options: {
       stdout: true,
     },

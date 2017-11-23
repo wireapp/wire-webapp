@@ -32,7 +32,7 @@ module.exports = Object.assign(commonConfig, {
     historyApiFallback: true,
     hotOnly: true,
     open: true,
-    openPage: 'page/auth_new.html',
+    openPage: 'page/auth.html',
     overlay: true,
     publicPath: '/',
     stats: {

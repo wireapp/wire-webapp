@@ -61,7 +61,7 @@ module.exports = grunt => {
     'copy:dist_favicon',
     'includereplace:dist_index',
     'includereplace:dist_auth',
-    'includereplace:dist_auth_old',
+    'includereplace:dist_login',
     'includereplace:dist_demo',
     'clean:dist_app',
   ]);
@@ -69,7 +69,7 @@ module.exports = grunt => {
   grunt.registerTask('prepare_template', [
     'includereplace:dist_index',
     'includereplace:dist_auth',
-    'includereplace:dist_auth_old',
+    'includereplace:dist_login',
     'includereplace:dist_demo',
   ]);
 
@@ -82,7 +82,7 @@ module.exports = grunt => {
     'copy:deploy_favicon',
     'includereplace:deploy_index',
     'includereplace:deploy_auth',
-    'includereplace:deploy_auth_old',
+    'includereplace:deploy_login',
     'includereplace:deploy_demo',
     'clean:deploy_app',
     'uglify:deploy',
@@ -99,7 +99,7 @@ module.exports = grunt => {
     'copy:deploy_favicon',
     'includereplace:prod_index',
     'includereplace:prod_auth',
-    'includereplace:prod_auth_old',
+    'includereplace:prod_login',
     'clean:deploy_app',
     'uglify:deploy',
     'concat:deploy',
