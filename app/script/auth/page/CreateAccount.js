@@ -100,7 +100,7 @@ class CreateAccount extends Component {
                       defaultValue={this.state.password}
                       autoComplete="section-create-team new-password"
                       type="password"
-                      placeholder={'Password (min 8 characters)'}
+                      placeholder={'Password (min. 8 characters)'}
                       maxLength="1024"
                       minLength="8"
                       pattern=".{8,1024}"
