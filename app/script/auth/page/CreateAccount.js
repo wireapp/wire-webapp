@@ -77,7 +77,8 @@ class CreateAccount extends Component {
                       placeholder={'Name'}
                       autoFocus
                       maxLength="64"
-                      pattern=".{1,64}"
+                      minLength="2"
+                      pattern=".{2,64}"
                       required
                       data-uie-name="enter-name"
                     />
@@ -100,6 +101,8 @@ class CreateAccount extends Component {
                       autoComplete="section-create-team new-password"
                       type="password"
                       placeholder={'Password (min 8 characters)'}
+                      maxLength="1024"
+                      minLength="8"
                       pattern=".{8,1024}"
                       required
                       data-uie-name="enter-password"
@@ -107,9 +110,9 @@ class CreateAccount extends Component {
                   </InputBlock>
                   <Checkbox name="accept" required data-uie-name="do-terms">
                     <Small textTransform="uppercase">
-                      {'I ACCEPT THE '}
+                      {'I accept the '}
                       <Link data-uie-name="go-terms" href="#" bold fontSize="12px">
-                        {'TERMS AND CONDITIONS'}
+                        {'terms and conditions'}
                       </Link>
                     </Small>
                   </Checkbox>
