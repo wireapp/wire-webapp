@@ -24,13 +24,11 @@ export const SUPPORTED_LANGUAGE = [
 export const DEFAULT_LANGUAGE = 'en';
 
 export function getLocale() {
-  const languageValue = new URL(window.location).searchParams.get('hl');
-  return (
-    languageValue || (navigator.languages && navigator.languages.length ? navigator.languages[0] : navigator.language)
-  );
+  return navigator.languages && navigator.languages.length ? navigator.languages[0] : navigator.language;
 }
 
 export function currentLanguage() {
   const LANGUAGE_SHORTHAND_LENGTH = 2;
-  return getLocale().substr(0, LANGUAGE_SHORTHAND_LENGTH) || DEFAULT_LANGUAGE;
+  const languageParam = new URL(window.location).searchParams.get('hl');
+  return languageParam || getLocale().substr(0, LANGUAGE_SHORTHAND_LENGTH) || DEFAULT_LANGUAGE;
 }
