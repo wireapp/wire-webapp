@@ -2260,6 +2260,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 $(() => {
   if ($('.auth-page').length) {
     wire.auth.view = new z.ViewModel.AuthViewModel('auth-page', wire.auth);
+    $('.auth-page-container').css({display: 'flex'});
   }
 });
 
