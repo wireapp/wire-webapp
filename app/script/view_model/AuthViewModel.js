@@ -254,6 +254,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     this._init_base();
     this._track_app_launch();
     $(`.${element_id}`).show();
+    $('.auth-page-container').css({display: 'flex'});
   }
 
   _init_base() {
