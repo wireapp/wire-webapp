@@ -48,7 +48,7 @@ const Verify = ({account, authError, history, ...connected}) => {
           <Text data-uie-name="label-with-email">
             {'Enter the verification code we sent to'}
             <br />
-            {'email@mail.com'}
+            {account.email}
           </Text>
           <CodeInput data-uie-name="enter-code" autoFocus style={{marginTop: 10}} onCompleteCode={createAccount} />
           <ErrorMessage>{authError}</ErrorMessage>
