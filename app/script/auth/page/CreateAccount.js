@@ -47,7 +47,8 @@ class CreateAccount extends Component {
     return Promise.resolve()
       .then(() => this.props.pushAccountRegistrationData({...this.state}))
       .then(() => this.props.doSendActivationCode(this.state.email))
-      .then(() => this.props.history.push(ROUTE.VERIFY));
+      .then(() => this.props.history.push(ROUTE.VERIFY))
+      .catch(error => console.error('Failed to send email code', error));
   };
 
   render() {
@@ -117,7 +118,7 @@ class CreateAccount extends Component {
                       data-uie-name="enter-password"
                     />
                   </InputBlock>
-                  <ErrorMessage>{'Email address is already taken.'}</ErrorMessage>
+                  <ErrorMessage>{this.props.authError}</ErrorMessage>
                 </div>
                 <Checkbox name="accept" required data-uie-name="do-terms" style={{justifyContent: 'center'}}>
                   <CheckboxLabel>
@@ -145,6 +146,7 @@ export default withRouter(
     connect(
       state => ({
         account: AuthSelector.getAccount(state),
+        authError: AuthSelector.getError(state),
       }),
       {...AuthAction, ...UserAction}
     )(CreateAccount)
