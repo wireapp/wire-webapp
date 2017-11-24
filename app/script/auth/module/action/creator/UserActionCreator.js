@@ -17,6 +17,8 @@
  *
  */
 
+import BackendError from '../BackendError';
+
 export const USER_ACTIVATION_START = 'USER_ACTIVATION_START';
 export const USER_ACTIVATION_SUCCESS = 'USER_ACTIVATION_SUCCESS';
 export const USER_ACTIVATION_FAILED = 'USER_ACTIVATION_FAILED';
@@ -34,7 +36,7 @@ export function successfulAccountActivation(activationResponse) {
 }
 
 export function failedAccountActivation(error) {
-  return {payload: error, type: USER_ACTIVATION_FAILED};
+  return {payload: BackendError.handle(error), type: USER_ACTIVATION_FAILED};
 }
 
 export function startSendActivationCode(params) {
@@ -46,5 +48,5 @@ export function successfulSendActivationCode(activationResponse) {
 }
 
 export function failedSendActivationCode(error) {
-  return {payload: error, type: USER_SEND_ACTIVATION_CODE_FAILED};
+  return {payload: BackendError.handle(error), type: USER_SEND_ACTIVATION_CODE_FAILED};
 }

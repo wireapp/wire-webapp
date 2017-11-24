@@ -17,6 +17,7 @@
  *
  */
 
+import BackendError from './BackendError';
 import * as AuthActionCreator from './creator/AuthActionCreator';
 import {getLocale} from '../../localeConfig';
 
@@ -36,8 +37,8 @@ export function doLogin(login) {
       .then(() => dispatch(doLogout()))
       .then(() => apiClient.login(login))
       .catch(error => {
-        dispatch(AuthActionCreator.failedLogin(error));
-        throw error;
+        dispatch(AuthActionCreator.failedLogin(handledError));
+        throw BackendError.handle(error);
       });
   };
 }
@@ -69,7 +70,10 @@ export function doRegisterTeam(registration) {
     return Promise.resolve()
       .then(() => dispatch(doLogout()))
       .then(() => apiClient.register(registration))
-      .catch(error => dispatch(AuthActionCreator.failedRegisterTeam(error)));
+      .catch(error => {
+        dispatch(AuthActionCreator.failedRegisterTeam(handledError));
+        throw BackendError.handle(error);
+      });
   };
 }
 
@@ -90,7 +94,10 @@ export function doRegisterPersonal(registration) {
     return Promise.resolve()
       .then(() => dispatch(doLogout()))
       .then(() => apiClient.register(registration))
-      .catch(error => dispatch(AuthActionCreator.failedRegisterPersonal(error)));
+      .catch(error => {
+        dispatch(AuthActionCreator.failedRegisterPersonal(error));
+        throw BackendError.handle(error);
+      });
   };
 }
 

@@ -18,6 +18,7 @@
  */
 
 import * as UserActionCreator from './creator/UserActionCreator';
+import BackendError from './BackendError';
 
 export function doActivateAccount(code, key) {
   const params = [...arguments];
@@ -26,7 +27,10 @@ export function doActivateAccount(code, key) {
     return Promise.resolve()
       .then(() => apiClient.user.api.postActivation({code, dryrun: false, key}))
       .then(activationResponse => dispatch(UserActionCreator.successfulAccountActivation(activationResponse)))
-      .catch(error => dispatch(UserActionCreator.failedAccountActivation(error)));
+      .catch(error => {
+        dispatch(UserActionCreator.failedAccountActivation(error));
+        throw BackendError.handle(error);
+      });
   };
 }
 
@@ -37,6 +41,9 @@ export function doSendActivationCode(email) {
     return Promise.resolve()
       .then(() => apiClient.user.api.postActivationCode({email}))
       .then(activationResponse => dispatch(UserActionCreator.successfulSendActivationCode(activationResponse)))
-      .catch(error => dispatch(UserActionCreator.failedSendActivationCode(error)));
+      .catch(error => {
+        dispatch(UserActionCreator.failedSendActivationCode(error));
+        throw BackendError.handle(error);
+      });
   };
 }
