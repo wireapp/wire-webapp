@@ -24,7 +24,10 @@ export const SUPPORTED_LANGUAGE = [
 export const DEFAULT_LANGUAGE = 'en';
 
 export function getLocale() {
-  return navigator.languages && navigator.languages.length ? navigator.languages[0] : navigator.language;
+  const languageValue = new URL(window.location).searchParams.get('hl');
+  return (
+    languageValue || (navigator.languages && navigator.languages.length ? navigator.languages[0] : navigator.language)
+  );
 }
 
 export function currentLanguage() {
