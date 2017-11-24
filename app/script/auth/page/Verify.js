@@ -41,7 +41,7 @@ const Verify = ({account, authError, history, ...connected}) => {
   const resendCode = event => {
     event.preventDefault();
     return Promise.resolve()
-      .then(() => this.props.doSendActivationCode(account.email))
+      .then(() => connected.doSendActivationCode(account.email))
       .catch(error => console.error('Failed to send email code', error));
   };
   return (
