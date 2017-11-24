@@ -57,7 +57,7 @@ const Verify = ({account, authError, history, intl: {formatMessage: _}, ...conne
           <Text data-uie-name="label-with-email">
             <FormattedHTMLMessage {...verifyStrings.subhead} values={{email: account.email}} />
           </Text>
-          <CodeInput autoFocus style={{marginTop: 10}} onCompleteCode={createAccount} data-uie-name="enter-code" />
+          <CodeInput autoFocus style={{marginTop: 10}} onCodeComplete={createAccount} data-uie-name="enter-code" />
           <ErrorMessage>{authError}</ErrorMessage>
         </div>
         <div>
