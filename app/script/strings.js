@@ -51,3 +51,68 @@ export const indexStrings = defineMessages({
     defaultMessage: 'Login',
   },
 });
+
+export const teamNameStrings = defineMessages({
+  headline: {
+    id: 'teamName.headline',
+    defaultMessage: 'Name your team',
+  },
+  subhead: {
+    id: 'teamName.subhead',
+    defaultMessage: 'You can always change it later.',
+  },
+  teamNamePlaceholder: {
+    id: 'teamName.teamNamePlaceholder',
+    defaultMessage: 'Team name',
+  },
+  whatIsWireTeamsLink: {
+    id: 'teamName.whatIsWireTeamsLink',
+    defaultMessage: 'What is Wire for teams?',
+  },
+});
+
+export const createAccountStrings = defineMessages({
+  headLine: {
+    id: 'createAccount.headLine',
+    defaultMessage: 'Set up your account',
+  },
+  namePlaceholder: {
+    id: 'createAccount.namePlaceholder',
+    defaultMessage: 'Name',
+  },
+  emailPlaceholder: {
+    id: 'createAccount.emailPlaceholder',
+    defaultMessage: 'you@yourcompany.com',
+  },
+  passwordPlaceholder: {
+    id: 'createAccount.passwordPlaceholder',
+    defaultMessage: 'Password (min. 8 characters)',
+  },
+  terms: {
+    id: 'createAccount.terms',
+    defaultMessage: 'I accept the <a {linkParams}>terms and conditions</a>',
+  },
+  nextButton: {
+    id: 'createAccount.nextButton',
+    defaultMessage: 'Next',
+  },
+});
+
+export const verifyStrings = defineMessages({
+  headline: {
+    id: 'verify.headline',
+    defaultMessage: 'You’ve got mail',
+  },
+  subhead: {
+    id: 'verify.subhead',
+    defaultMessage: 'Enter the verification code we sent to<br />{email}',
+  },
+  resendCode: {
+    id: 'verify.resendCode',
+    defaultMessage: 'Resend code',
+  },
+  changeEmail: {
+    id: 'verify.changeEmail',
+    defaultMessage: 'Change email',
+  },
+});

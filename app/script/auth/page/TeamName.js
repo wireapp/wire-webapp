@@ -25,6 +25,7 @@ import ROUTE from '../route';
 import {Link as RRLink} from 'react-router-dom';
 import {connect} from 'react-redux';
 import {COLOR} from '@wireapp/react-ui-kit/Identity';
+import {teamNameStrings} from '../../strings';
 import {injectIntl} from 'react-intl';
 import {withRouter} from 'react-router';
 import * as AuthAction from '../module/action/AuthAction';
@@ -40,6 +41,7 @@ class TeamName extends Component {
       .then(() => this.props.history.push(ROUTE.CREATE_ACCOUNT));
   };
   render() {
+    const {teamName, intl: {formatMessage: _}} = this.props;
     return (
       <Container centerText verticalCenter style={{width: '100%'}}>
         <Columns>
@@ -56,14 +58,14 @@ class TeamName extends Component {
               style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
             >
               <div>
-                <H1 center>Name your team</H1>
-                <Text muted>You can always change it later.</Text>
+                <H1 center>{_(teamNameStrings.headline)}</H1>
+                <Text>{_(teamNameStrings.subhead)}</Text>
                 <Form style={{marginTop: 30}}>
                   <InputSubmitCombo>
                     <Input
-                      defaultValue={this.props.teamName}
+                      defaultValue={teamName}
                       innerRef={node => (this.teamNameInput = node)}
-                      placeholder={'Team name'}
+                      placeholder={_(teamNameStrings.teamNamePlaceholder)}
                       pattern=".{2,256}"
                       maxLength="256"
                       minLength="2"
@@ -77,7 +79,7 @@ class TeamName extends Component {
               </div>
               <div>
                 <Link href="#" data-uie-name="go-what-is">
-                  WHAT IS WIRE FOR TEAMS?
+                  {_(teamNameStrings.whatIsWireTeamsLink)}
                 </Link>
               </div>
             </ContainerXS>
