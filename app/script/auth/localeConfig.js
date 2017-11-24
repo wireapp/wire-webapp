@@ -29,5 +29,6 @@ export function getLocale() {
 
 export function currentLanguage() {
   const LANGUAGE_SHORTHAND_LENGTH = 2;
-  return getLocale().substr(0, LANGUAGE_SHORTHAND_LENGTH) || DEFAULT_LANGUAGE;
+  const languageParam = new URL(window.location).searchParams.get('hl');
+  return languageParam || getLocale().substr(0, LANGUAGE_SHORTHAND_LENGTH) || DEFAULT_LANGUAGE;
 }
