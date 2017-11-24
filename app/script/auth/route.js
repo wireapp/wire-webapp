@@ -19,9 +19,9 @@
 
 export default {
   CREATE_ACCOUNT: '/createaccount',
+  CREATE_TEAM: '/createteam',
   INDEX: '/',
   LOGIN: '/login/#login',
-  NEW_TEAM: '/newteam',
   REGISTER_PERSONAL: '/login/#register',
   VERIFY: '/verify',
 };

@@ -56,7 +56,7 @@ class CreateAccount extends Component {
         <Columns>
           <Column style={{display: 'flex'}}>
             <div style={{margin: 'auto'}}>
-              <Link to={ROUTE.NEW_TEAM} data-uie-name="go-register-team" component={RRLink}>
+              <Link to={ROUTE.CREATE_TEAM} data-uie-name="go-register-team" component={RRLink}>
                 <ArrowIcon direction="left" color={COLOR.GRAY} />
               </Link>
             </div>
