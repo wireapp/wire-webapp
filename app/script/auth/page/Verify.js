@@ -22,9 +22,11 @@ import {connect} from 'react-redux';
 import {ContainerXS} from '@wireapp/react-ui-kit/Layout';
 import {H1, Text, Link} from '@wireapp/react-ui-kit/Text';
 import {injectIntl} from 'react-intl';
+import {Link as RRLink} from 'react-router-dom';
 import {withRouter} from 'react-router';
 import * as AuthAction from '../module/action/AuthAction';
 import * as AuthSelector from '../module/selector/AuthSelector';
+import * as UserAction from '../module/action/UserAction';
 import Page from './Page';
 import React from 'react';
 import ROUTE from '../route';
@@ -35,6 +37,12 @@ const Verify = ({account, authError, history, ...connected}) => {
       .then(() => connected.doRegisterTeam(account))
       .then(() => history.push(ROUTE.INDEX))
       .catch(error => console.error('Failed to create account', error));
+  };
+  const resendCode = event => {
+    event.preventDefault();
+    return Promise.resolve()
+      .then(() => this.props.doSendActivationCode(account.email))
+      .catch(error => console.error('Failed to send email code', error));
   };
   return (
     <Page hasTeamData hasAccountData>
@@ -50,14 +58,14 @@ const Verify = ({account, authError, history, ...connected}) => {
             <br />
             {account.email}
           </Text>
-          <CodeInput data-uie-name="enter-code" autoFocus style={{marginTop: 10}} onCompleteCode={createAccount} />
+          <CodeInput autoFocus style={{marginTop: 10}} onCompleteCode={createAccount} data-uie-name="enter-code" />
           <ErrorMessage>{authError}</ErrorMessage>
         </div>
         <div>
-          <Link data-uie-name="do-resend-code" href="#">
+          <Link onClick={resendCode} data-uie-name="do-resend-code">
             {'RESEND CODE'}
           </Link>
-          <Link data-uie-name="go-change-email" href="#" style={{marginLeft: 35}}>
+          <Link to={ROUTE.CREATE_ACCOUNT} component={RRLink} style={{marginLeft: 35}} data-uie-name="go-change-email">
             {'CHANGE EMAIL'}
           </Link>
         </div>
@@ -73,7 +81,7 @@ export default withRouter(
         account: AuthSelector.getAccount(state),
         authError: AuthSelector.getError(state),
       }),
-      {...AuthAction}
+      {...AuthAction, ...UserAction}
     )(Verify)
   )
 );
