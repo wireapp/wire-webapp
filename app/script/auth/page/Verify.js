@@ -22,6 +22,7 @@ import {connect} from 'react-redux';
 import {ContainerXS} from '@wireapp/react-ui-kit/Layout';
 import {H1, Text, Link} from '@wireapp/react-ui-kit/Text';
 import {injectIntl} from 'react-intl';
+import {Link as RRLink} from 'react-router-dom';
 import {withRouter} from 'react-router';
 import * as AuthAction from '../module/action/AuthAction';
 import * as AuthSelector from '../module/selector/AuthSelector';
@@ -64,7 +65,7 @@ const Verify = ({account, authError, history, ...connected}) => {
           <Link onClick={resendCode} data-uie-name="do-resend-code">
             {'RESEND CODE'}
           </Link>
-          <Link to={ROUTE.CREATE_ACCOUNT} style={{marginLeft: 35}} data-uie-name="go-change-email">
+          <Link to={ROUTE.CREATE_ACCOUNT} component={RRLink} style={{marginLeft: 35}} data-uie-name="go-change-email">
             {'CHANGE EMAIL'}
           </Link>
         </div>
