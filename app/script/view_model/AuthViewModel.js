@@ -955,13 +955,6 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     this._set_hash(z.auth.AuthView.MODE.ACCOUNT_PHONE);
   }
 
-  clicked_on_login() {
-    this._set_hash(z.auth.AuthView.MODE.ACCOUNT_LOGIN);
-    if (this.visible_method() === z.auth.AuthView.MODE.ACCOUNT_PHONE) {
-      $('#wire-login-phone').focus_field();
-    }
-  }
-
   clicked_on_login_password() {
     this._set_hash(z.auth.AuthView.MODE.ACCOUNT_PASSWORD);
   }
@@ -973,10 +966,6 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
   clicked_on_password() {
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PASSWORD_RESET, {value: 'fromSignIn'});
     z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.ACCOUNT, z.config.URL_PATH.PASSWORD_RESET));
-  }
-
-  clicked_on_register() {
-    this._set_hash(z.auth.AuthView.MODE.ACCOUNT_REGISTER);
   }
 
   clicked_on_resend_code() {

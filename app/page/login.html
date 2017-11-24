@@ -12,11 +12,9 @@
   <body>
     <div class="auth-page-container">
       <div class="auth-page-navigation">
-        <div class="auth-page-navigation-back">
-          <a href="/auth">
-            <svg width="16" height="16" viewBox="0 0 16 16"><path transform="rotate(180 8 8)" fill="#FFF" d="M5.8 1.5L7.3 0l8 8-8 8-1.5-1.5L11.3 9H.7V7h10.6"></path></svg>
-          </a>
-        </div>
+        <a class="auth-page-navigation-back" href="/auth">
+          <svg width="16" height="16" viewBox="0 0 16 16"><path transform="rotate(180 8 8)" fill="#FFF" d="M5.8 1.5L7.3 0l8 8-8 8-1.5-1.5L11.3 9H.7V7h10.6"></path></svg>
+        </a>
       </div>
       <div class="auth-page">
         <div class="auth-header">
@@ -32,17 +30,13 @@
             <div data-bind="l10n_text: z.string.auth_account_get_wire" data-uie-name="status-get-wire"></div>
           </div>
           <div id="section-account" class="section">
-            <div class="selector selector-mode" data-bind="css: {'selector-mode-login': account_mode_login}">
-              <div class="column">
-                <button class="button btn-mode btn-register"
-                        data-bind="click: clicked_on_register, css: {'disabled': disabled_by_animation}, l10n_text: z.string.auth_account_create_account"
-                        data-uie-name="go-register"></button>
-              </div>
-              <div class="column">
-                <button class="button btn-mode btn-login"
-                        data-bind="click: clicked_on_login, css: {'disabled': disabled_by_animation}, l10n_text: z.string.auth_account_sign_in"
-                        data-uie-name="go-sign-in"></button>
-              </div>
+            <div class="selector selector-mode">
+              <!-- ko if: account_mode_login -->
+                <button class="button btn-mode btn-login" data-bind="l10n_text: z.string.auth_account_sign_in"></button>
+              <!-- /ko  -->
+              <!-- ko ifnot: account_mode_login -->
+                <button class="button btn-mode btn-register" data-bind="l10n_text: z.string.auth_account_create_account"></button>
+              <!-- /ko  -->
             </div>
 
             <div id="form-account-login" class="form">
