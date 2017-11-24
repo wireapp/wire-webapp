@@ -4,7 +4,7 @@
   "index.createAccountFor": "",
   "index.createTeam": "Créer une équipe",
   "index.createTeamFor": "",
-  "index.loginInfo": "",
+  "index.loginInfo": "Vous avez déjà un compte ?",
   "index.login": "Se connecter",
   "teamName.headline": "",
   "teamName.subhead": "",
@@ -14,10 +14,10 @@
   "createAccount.namePlaceholder": "Nom",
   "createAccount.emailPlaceholder": "",
   "createAccount.passwordPlaceholder": "",
-  "createAccount.terms": "",
+  "createAccount.terms": "J’accepte les <a {linkParams}>termes et conditions</a>",
   "createAccount.nextButton": "Suivant",
   "verify.headline": "",
-  "verify.subhead": "",
+  "verify.subhead": "Saisissez le code de vérification que nous avons envoyé au<br />{email}",
   "verify.resendCode": "",
   "verify.changeEmail": "Modifier l’adresse e-mail"
 }
