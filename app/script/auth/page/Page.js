@@ -23,17 +23,17 @@ import React from 'react';
 import ROUTE from '../route';
 import {Redirect} from 'react-router';
 
-const hasValidAccountData = account => !account.name || !account.email || !account.password;
+const hasInvalidAccountData = account => !account.name || !account.email || !account.password;
 
-const hasValidTeamData = ({team}) => !team || !team.name;
+const hasInvalidTeamData = ({team}) => !team || !team.name;
 
 const createTeamRedirect = <Redirect to={ROUTE.CREATE_TEAM} />;
 
 function Page({hasAccountData, hasTeamData, account, children}) {
-  if (hasAccountData && hasValidAccountData(account)) {
+  if (hasAccountData && hasInvalidAccountData(account)) {
     return createTeamRedirect;
   }
-  if (hasTeamData && hasValidTeamData(account)) {
+  if (hasTeamData && hasInvalidTeamData(account)) {
     return createTeamRedirect;
   }
   return children;
