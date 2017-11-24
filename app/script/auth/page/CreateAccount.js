@@ -29,6 +29,7 @@ import {withRouter} from 'react-router';
 import * as AuthAction from '../module/action/AuthAction';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as UserAction from '../module/action/UserAction';
+import Page from './Page';
 import React, {Component} from 'react';
 import ROUTE from '../route';
 
@@ -53,90 +54,92 @@ class CreateAccount extends Component {
 
   render() {
     return (
-      <Container centerText verticalCenter style={{width: '100%'}}>
-        <Columns>
-          <Column style={{display: 'flex'}}>
-            <div style={{margin: 'auto'}}>
-              <Link to={ROUTE.CREATE_TEAM} data-uie-name="go-register-team" component={RRLink}>
-                <ArrowIcon direction="left" color={COLOR.GRAY} />
-              </Link>
-            </div>
-          </Column>
-          <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
-            <ContainerXS
-              centerText
-              style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
-            >
-              <H1 center>{'Set up your account'}</H1>
-              <Form
-                onSubmit={this.handleSubmit}
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  flexGrow: 1,
-                  justifyContent: 'space-between',
-                }}
+      <Page hasTeamData>
+        <Container centerText verticalCenter style={{width: '100%'}}>
+          <Columns>
+            <Column style={{display: 'flex'}}>
+              <div style={{margin: 'auto'}}>
+                <Link to={ROUTE.CREATE_TEAM} data-uie-name="go-register-team" component={RRLink}>
+                  <ArrowIcon direction="left" color={COLOR.GRAY} />
+                </Link>
+              </div>
+            </Column>
+            <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
+              <ContainerXS
+                centerText
+                style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
               >
-                <div>
-                  <InputBlock>
-                    <Input
-                      name="name"
-                      onChange={event => this.setState({name: event.target.value})}
-                      defaultValue={this.state.name}
-                      autoComplete="section-create-team username"
-                      placeholder={'Name'}
-                      autoFocus
-                      maxLength="64"
-                      minLength="2"
-                      pattern=".{2,64}"
-                      required
-                      data-uie-name="enter-name"
-                    />
-                    <Input
-                      name="email"
-                      onChange={event => this.setState({email: event.target.value})}
-                      defaultValue={this.state.email}
-                      autoComplete="section-create-team email"
-                      placeholder={'you@yourcompany.com'}
-                      placeholderTextTransform="unset"
-                      maxLength="128"
-                      type="email"
-                      required
-                      data-uie-name="enter-email"
-                    />
-                    <Input
-                      name="password"
-                      onChange={event => this.setState({password: event.target.value})}
-                      defaultValue={this.state.password}
-                      autoComplete="section-create-team new-password"
-                      type="password"
-                      placeholder={'Password (min. 8 characters)'}
-                      maxLength="1024"
-                      minLength="8"
-                      pattern=".{8,1024}"
-                      required
-                      data-uie-name="enter-password"
-                    />
-                  </InputBlock>
-                  <ErrorMessage>{this.props.authError}</ErrorMessage>
-                </div>
-                <Checkbox name="accept" required data-uie-name="do-terms" style={{justifyContent: 'center'}}>
-                  <CheckboxLabel>
-                    {'I ACCEPT THE '}
-                    <a data-uie-name="go-terms" href="#">
-                      {'TERMS AND CONDITIONS'}
-                    </a>
-                  </CheckboxLabel>
-                </Checkbox>
-                <Button data-uie-name="do-next" type="submit" style={{margin: '0 auto -16px', width: 184}}>
-                  {'Next'}
-                </Button>
-              </Form>
-            </ContainerXS>
-          </Column>
-          <Column />
-        </Columns>
-      </Container>
+                <H1 center>{'Set up your account'}</H1>
+                <Form
+                  onSubmit={this.handleSubmit}
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    flexGrow: 1,
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <div>
+                    <InputBlock>
+                      <Input
+                        name="name"
+                        onChange={event => this.setState({name: event.target.value})}
+                        defaultValue={this.state.name}
+                        autoComplete="section-create-team username"
+                        placeholder={'Name'}
+                        autoFocus
+                        maxLength="64"
+                        minLength="2"
+                        pattern=".{2,64}"
+                        required
+                        data-uie-name="enter-name"
+                      />
+                      <Input
+                        name="email"
+                        onChange={event => this.setState({email: event.target.value})}
+                        defaultValue={this.state.email}
+                        autoComplete="section-create-team email"
+                        placeholder={'you@yourcompany.com'}
+                        placeholderTextTransform="unset"
+                        maxLength="128"
+                        type="email"
+                        required
+                        data-uie-name="enter-email"
+                      />
+                      <Input
+                        name="password"
+                        onChange={event => this.setState({password: event.target.value})}
+                        defaultValue={this.state.password}
+                        autoComplete="section-create-team new-password"
+                        type="password"
+                        placeholder={'Password (min. 8 characters)'}
+                        maxLength="1024"
+                        minLength="8"
+                        pattern=".{8,1024}"
+                        required
+                        data-uie-name="enter-password"
+                      />
+                    </InputBlock>
+                    <ErrorMessage>{this.props.authError}</ErrorMessage>
+                  </div>
+                  <Checkbox name="accept" required data-uie-name="do-terms" style={{justifyContent: 'center'}}>
+                    <CheckboxLabel>
+                      {'I ACCEPT THE '}
+                      <a data-uie-name="go-terms" href="#">
+                        {'TERMS AND CONDITIONS'}
+                      </a>
+                    </CheckboxLabel>
+                  </Checkbox>
+                  <Button data-uie-name="do-next" type="submit" style={{margin: '0 auto -16px', width: 184}}>
+                    {'Next'}
+                  </Button>
+                </Form>
+              </ContainerXS>
+            </Column>
+            <Column />
+          </Columns>
+        </Container>
+      </Page>
     );
   }
 }
