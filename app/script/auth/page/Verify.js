@@ -36,7 +36,7 @@ const Verify = ({account, authError, history, intl: {formatMessage: _}, ...conne
   const createAccount = () => {
     Promise.resolve()
       .then(() => connected.doRegisterTeam(account))
-      .then(() => history.push(ROUTE.INDEX))
+      .then(() => (window.location = '/login?reason=registration'))
       .catch(error => console.error('Failed to create account', error));
   };
   const resendCode = event => {
