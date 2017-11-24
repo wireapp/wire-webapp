@@ -26,6 +26,7 @@ import {injectIntl, FormattedHTMLMessage} from 'react-intl';
 import {withRouter} from 'react-router';
 import * as AuthAction from '../module/action/AuthAction';
 import * as AuthSelector from '../module/selector/AuthSelector';
+import Page from './Page';
 import React from 'react';
 import ROUTE from '../route';
 
@@ -37,28 +38,30 @@ const Verify = ({account, authError, history, intl: {formatMessage: _}, ...conne
       .catch(error => console.error('Failed to create account', error));
   };
   return (
-    <ContainerXS
-      centerText
-      verticalCenter
-      style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
-    >
-      <div>
-        <H1 center>{_(verifyStrings.headline)}</H1>
-        <Text data-uie-name="label-with-email">
-          <FormattedHTMLMessage {...verifyStrings.subhead} values={{email: 'email@mail.com'}} />
-        </Text>
-        <CodeInput data-uie-name="enter-code" autoFocus style={{marginTop: 10}} onCompleteCode={createAccount} />
-        <ErrorMessage>{authError}</ErrorMessage>
-      </div>
-      <div>
-        <Link data-uie-name="do-resend-code" href="#">
-          {_(verifyStrings.resendCode)}
-        </Link>
-        <Link data-uie-name="go-change-email" href="#" style={{marginLeft: 35}}>
-          {_(verifyStrings.changeEmail)}
-        </Link>
-      </div>
-    </ContainerXS>
+    <Page hasTeamData hasAccountData>
+      <ContainerXS
+        centerText
+        verticalCenter
+        style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
+      >
+        <div>
+          <H1 center>{_(verifyStrings.headline)}</H1>
+          <Text data-uie-name="label-with-email">
+            <FormattedHTMLMessage {...verifyStrings.subhead} values={{email: 'email@mail.com'}} />
+          </Text>
+          <CodeInput data-uie-name="enter-code" autoFocus style={{marginTop: 10}} onCompleteCode={createAccount} />
+          <ErrorMessage>{authError}</ErrorMessage>
+        </div>
+        <div>
+          <Link data-uie-name="do-resend-code" href="#">
+            {_(verifyStrings.resendCode)}
+          </Link>
+          <Link data-uie-name="go-change-email" href="#" style={{marginLeft: 35}}>
+            {_(verifyStrings.changeEmail)}
+          </Link>
+        </div>
+      </ContainerXS>
+    </Page>
   );
 };
 
