@@ -17,12 +17,15 @@
  *
  */
 
-import React from 'react';
+import {CodeInput, ErrorMessage} from '@wireapp/react-ui-kit/Form';
+import {connect} from 'react-redux';
 import {ContainerXS} from '@wireapp/react-ui-kit/Layout';
 import {H1, Text, Link} from '@wireapp/react-ui-kit/Text';
-import {CodeInput, ErrorMessage} from '@wireapp/react-ui-kit/Form';
+import {injectIntl} from 'react-intl';
+import {withRouter} from 'react-router';
 import * as AuthAction from '../module/action/AuthAction';
 import * as AuthSelector from '../module/selector/AuthSelector';
+import React from 'react';
 import ROUTE from '../route';
 
 const Verify = ({account, authError, history, ...connected}) => {
