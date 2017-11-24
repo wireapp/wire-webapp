@@ -36,6 +36,12 @@ const Verify = ({account, authError, history, ...connected}) => {
       .then(() => history.push(ROUTE.INDEX))
       .catch(error => console.error('Failed to create account', error));
   };
+  const resendCode = event => {
+    event.preventDefault();
+    return Promise.resolve()
+      .then(() => this.props.doSendActivationCode(account.email))
+      .catch(error => console.error('Failed to send email code', error));
+  };
   return (
     <Page hasTeamData hasAccountData>
       <ContainerXS
@@ -50,14 +56,14 @@ const Verify = ({account, authError, history, ...connected}) => {
             <br />
             {account.email}
           </Text>
-          <CodeInput data-uie-name="enter-code" autoFocus style={{marginTop: 10}} onCompleteCode={createAccount} />
+          <CodeInput autoFocus style={{marginTop: 10}} onCompleteCode={createAccount} data-uie-name="enter-code" />
           <ErrorMessage>{authError}</ErrorMessage>
         </div>
         <div>
-          <Link data-uie-name="do-resend-code" href="#">
+          <Link onClick={resendCode} data-uie-name="do-resend-code">
             {'RESEND CODE'}
           </Link>
-          <Link data-uie-name="go-change-email" href="#" style={{marginLeft: 35}}>
+          <Link to={ROUTE.CREATE_ACCOUNT} style={{marginLeft: 35}} data-uie-name="go-change-email">
             {'CHANGE EMAIL'}
           </Link>
         </div>
