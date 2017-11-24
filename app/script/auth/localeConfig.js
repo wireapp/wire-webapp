@@ -1,26 +1,5 @@
-export const SUPPORTED_LANGUAGE = [
-  'cs',
-  'da',
-  'de',
-  'el',
-  'es',
-  'et',
-  'fi',
-  'fr',
-  'hr',
-  'hu',
-  'it',
-  'lt',
-  'nl',
-  'pl',
-  'pt',
-  'ro',
-  'ru',
-  'sk',
-  'sl',
-  'tr',
-  'uk',
-];
+export const SUPPORTED_LANGUAGE = require('./supportedLocales');
+
 export const DEFAULT_LANGUAGE = 'en';
 
 export function getLocale() {

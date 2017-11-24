@@ -21,7 +21,8 @@ import {CodeInput, ErrorMessage} from '@wireapp/react-ui-kit/Form';
 import {connect} from 'react-redux';
 import {ContainerXS} from '@wireapp/react-ui-kit/Layout';
 import {H1, Text, Link} from '@wireapp/react-ui-kit/Text';
-import {injectIntl} from 'react-intl';
+import {verifyStrings} from '../../strings';
+import {injectIntl, FormattedHTMLMessage} from 'react-intl';
 import {Link as RRLink} from 'react-router-dom';
 import {withRouter} from 'react-router';
 import * as AuthAction from '../module/action/AuthAction';
@@ -31,7 +32,7 @@ import Page from './Page';
 import React from 'react';
 import ROUTE from '../route';
 
-const Verify = ({account, authError, history, ...connected}) => {
+const Verify = ({account, authError, history, intl: {formatMessage: _}, ...connected}) => {
   const createAccount = () => {
     Promise.resolve()
       .then(() => connected.doRegisterTeam(account))
@@ -52,21 +53,19 @@ const Verify = ({account, authError, history, ...connected}) => {
         style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
       >
         <div>
-          <H1 center>{'You’ve got mail'}</H1>
+          <H1 center>{_(verifyStrings.headline)}</H1>
           <Text data-uie-name="label-with-email">
-            {'Enter the verification code we sent to'}
-            <br />
-            {account.email}
+            <FormattedHTMLMessage {...verifyStrings.subhead} values={{email: account.email}} />
           </Text>
           <CodeInput autoFocus style={{marginTop: 10}} onCompleteCode={createAccount} data-uie-name="enter-code" />
           <ErrorMessage>{authError}</ErrorMessage>
         </div>
         <div>
           <Link onClick={resendCode} data-uie-name="do-resend-code">
-            {'RESEND CODE'}
+            {_(verifyStrings.resendCode)}
           </Link>
           <Link to={ROUTE.CREATE_ACCOUNT} component={RRLink} style={{marginLeft: 35}} data-uie-name="go-change-email">
-            {'CHANGE EMAIL'}
+            {_(verifyStrings.changeEmail)}
           </Link>
         </div>
       </ContainerXS>

@@ -1,1 +1,23 @@
-{"index.hello": "Tere"}
+{
+  "index.claim": "",
+  "index.createAccount": "Konto loomine",
+  "index.createAccountFor": "",
+  "index.createTeam": "Loo meeskond",
+  "index.createTeamFor": "",
+  "index.loginInfo": "",
+  "index.login": "Logi sisse",
+  "teamName.headline": "",
+  "teamName.subhead": "",
+  "teamName.teamNamePlaceholder": "Meeskonna nimi",
+  "teamName.whatIsWireTeamsLink": "",
+  "createAccount.headLine": "",
+  "createAccount.namePlaceholder": "Nimi",
+  "createAccount.emailPlaceholder": "",
+  "createAccount.passwordPlaceholder": "",
+  "createAccount.terms": "",
+  "createAccount.nextButton": "Järgmine",
+  "verify.headline": "",
+  "verify.subhead": "",
+  "verify.resendCode": "",
+  "verify.changeEmail": "Muuda e-posti"
+}

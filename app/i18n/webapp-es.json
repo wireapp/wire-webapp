@@ -1,1 +1,23 @@
-{"index.hello": "Hola"}
+{
+  "index.claim": "",
+  "index.createAccount": "Crear una Cuenta",
+  "index.createAccountFor": "",
+  "index.createTeam": "Crear un equipo",
+  "index.createTeamFor": "",
+  "index.loginInfo": "",
+  "index.login": "Iniciar sesión",
+  "teamName.headline": "",
+  "teamName.subhead": "",
+  "teamName.teamNamePlaceholder": "Nombre del equipo",
+  "teamName.whatIsWireTeamsLink": "",
+  "createAccount.headLine": "",
+  "createAccount.namePlaceholder": "Nombre",
+  "createAccount.emailPlaceholder": "",
+  "createAccount.passwordPlaceholder": "",
+  "createAccount.terms": "",
+  "createAccount.nextButton": "Siguiente",
+  "verify.headline": "",
+  "verify.subhead": "",
+  "verify.resendCode": "",
+  "verify.changeEmail": "Modificar correo"
+}

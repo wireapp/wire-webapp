@@ -90,7 +90,7 @@ class Index extends Component {
         </Columns>
         <Text>{_(indexStrings.loginInfo)}</Text>
         <br />
-        <Link data-uie-name="go-login" fontSize="24px" textTransform="unset" onClick={this.onLoginClick}>
+        <Link data-uie-name="go-login" fontSize="24px" textTransform="none" onClick={this.onLoginClick}>
           {_(indexStrings.login)}
         </Link>
       </ContainerXS>

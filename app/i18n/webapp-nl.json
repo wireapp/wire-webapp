@@ -1,1 +1,23 @@
-{"index.hello": ""}
+{
+  "index.claim": "",
+  "index.createAccount": "Een account aanmaken",
+  "index.createAccountFor": "",
+  "index.createTeam": "Maak een team",
+  "index.createTeamFor": "",
+  "index.loginInfo": "",
+  "index.login": "Inloggen",
+  "teamName.headline": "",
+  "teamName.subhead": "",
+  "teamName.teamNamePlaceholder": "Team-naam",
+  "teamName.whatIsWireTeamsLink": "",
+  "createAccount.headLine": "",
+  "createAccount.namePlaceholder": "Naam",
+  "createAccount.emailPlaceholder": "",
+  "createAccount.passwordPlaceholder": "",
+  "createAccount.terms": "",
+  "createAccount.nextButton": "Volgende",
+  "verify.headline": "",
+  "verify.subhead": "",
+  "verify.resendCode": "",
+  "verify.changeEmail": "E-mailadres wijzigen"
+}

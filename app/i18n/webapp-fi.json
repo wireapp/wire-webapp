@@ -1,1 +1,23 @@
-{"index.hello": "Hei"}
+{
+  "index.claim": "",
+  "index.createAccount": "Luo käyttäjätili",
+  "index.createAccountFor": "",
+  "index.createTeam": "Luo tiimi",
+  "index.createTeamFor": "",
+  "index.loginInfo": "",
+  "index.login": "Kirjaudu sisään",
+  "teamName.headline": "",
+  "teamName.subhead": "",
+  "teamName.teamNamePlaceholder": "Tiimin nimi",
+  "teamName.whatIsWireTeamsLink": "",
+  "createAccount.headLine": "",
+  "createAccount.namePlaceholder": "Nimi",
+  "createAccount.emailPlaceholder": "",
+  "createAccount.passwordPlaceholder": "",
+  "createAccount.terms": "",
+  "createAccount.nextButton": "Seuraava",
+  "verify.headline": "",
+  "verify.subhead": "",
+  "verify.resendCode": "",
+  "verify.changeEmail": "Vaihda sähköpostiosoite"
+}

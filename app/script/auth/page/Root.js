@@ -28,11 +28,19 @@ import {IntlProvider, addLocaleData} from 'react-intl';
 import {connect} from 'react-redux';
 import de from 'react-intl/locale-data/de';
 import ROUTE from '../route';
+import SUPPORTED_LOCALE from '../supportedLocales';
 
 addLocaleData([...de]);
 
+function loadLanguage(language) {
+  if (SUPPORTED_LOCALE.includes(language)) {
+    return require(`../../../i18n/webapp-${language}.json`);
+  }
+  return {};
+}
+
 const Root = ({language}) => (
-  <IntlProvider locale={language} messages={require(`../../../i18n/webapp-${language}.json`)}>
+  <IntlProvider locale={language} messages={loadLanguage(language)}>
     <StyledApp>
       <Router>
         <Content>

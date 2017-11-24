@@ -19,39 +19,24 @@
 
 import {connect} from 'react-redux';
 import * as AuthSelector from '../module/selector/AuthSelector';
-import React, {Component} from 'react';
+import React from 'react';
 import ROUTE from '../route';
+import {Redirect} from 'react-router';
 
-class Page extends Component {
-  restartTeamRegistrationFlow = () => {
-    window.location = ROUTE.CREATE_TEAM;
-  };
+const hasInvalidAccountData = account => !account.name || !account.email || !account.password;
 
-  checkAccountData = account => {
-    if (!account.name || !account.email || !account.password) {
-      this.restartTeamRegistrationFlow();
-    }
-  };
+const hasInvalidTeamData = ({team}) => !team || !team.name;
 
-  checkTeamData = account => {
-    const {team} = account;
-    if (!team || !team.name) {
-      this.restartTeamRegistrationFlow();
-    }
-  };
+const createTeamRedirect = <Redirect to={ROUTE.CREATE_TEAM} />;
 
-  render() {
-    const checkAccountData = this.props.hasAccountData;
-    const checkTeamData = this.props.hasTeamData;
-
-    return (
-      <div>
-        {checkAccountData && this.checkAccountData(this.props.account)}
-        {checkTeamData && this.checkTeamData(this.props.account)}
-        {this.props.children}
-      </div>
-    );
+function Page({hasAccountData, hasTeamData, account, children}) {
+  if (hasAccountData && hasInvalidAccountData(account)) {
+    return createTeamRedirect;
   }
+  if (hasTeamData && hasInvalidTeamData(account)) {
+    return createTeamRedirect;
+  }
+  return children;
 }
 
 export default connect(state => ({

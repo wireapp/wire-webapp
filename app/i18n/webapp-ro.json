@@ -1,1 +1,23 @@
-{"index.hello": ""}
+{
+  "index.claim": "",
+  "index.createAccount": "Creează un cont",
+  "index.createAccountFor": "",
+  "index.createTeam": "Creează o echipă",
+  "index.createTeamFor": "",
+  "index.loginInfo": "",
+  "index.login": "",
+  "teamName.headline": "",
+  "teamName.subhead": "",
+  "teamName.teamNamePlaceholder": "",
+  "teamName.whatIsWireTeamsLink": "",
+  "createAccount.headLine": "",
+  "createAccount.namePlaceholder": "Nume",
+  "createAccount.emailPlaceholder": "",
+  "createAccount.passwordPlaceholder": "",
+  "createAccount.terms": "",
+  "createAccount.nextButton": "Mai departe",
+  "verify.headline": "",
+  "verify.subhead": "",
+  "verify.resendCode": "",
+  "verify.changeEmail": "Schimbă e-mailul"
+}

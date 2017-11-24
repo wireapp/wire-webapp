@@ -1,1 +1,23 @@
-{"index.hello": "Sveiki"}
+{
+  "index.claim": "",
+  "index.createAccount": "Sukurti paskyrą",
+  "index.createAccountFor": "",
+  "index.createTeam": "Sukurti komandą",
+  "index.createTeamFor": "",
+  "index.loginInfo": "",
+  "index.login": "Prisijungti",
+  "teamName.headline": "",
+  "teamName.subhead": "",
+  "teamName.teamNamePlaceholder": "Komandos pavadinimas",
+  "teamName.whatIsWireTeamsLink": "",
+  "createAccount.headLine": "",
+  "createAccount.namePlaceholder": "Vardas",
+  "createAccount.emailPlaceholder": "",
+  "createAccount.passwordPlaceholder": "",
+  "createAccount.terms": "",
+  "createAccount.nextButton": "Kitas",
+  "verify.headline": "",
+  "verify.subhead": "",
+  "verify.resendCode": "",
+  "verify.changeEmail": "Pakeisti el. paštą"
+}

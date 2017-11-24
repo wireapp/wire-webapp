@@ -7,5 +7,5 @@ files:
     translation: '/app/script/localization/translations/webapp-%locale%.js'
     type: 'properties_play'
   -
-    source: 'app/i18n/webapp.pot'
-    translation: 'app/i18n/webapp-%locale%.po'
+    source: 'temp/i18n/webapp.pot'
+    translation: 'temp/i18n/webapp-%locale%.po'

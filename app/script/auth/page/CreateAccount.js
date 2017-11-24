@@ -23,7 +23,8 @@ import {connect} from 'react-redux';
 import {Container, ContainerXS, Columns, Column} from '@wireapp/react-ui-kit/Layout';
 import {Form, Input, InputBlock, Button, Checkbox, CheckboxLabel, ErrorMessage} from '@wireapp/react-ui-kit/Form';
 import {H1, Link} from '@wireapp/react-ui-kit/Text';
-import {injectIntl} from 'react-intl';
+import {createAccountStrings} from '../../strings';
+import {injectIntl, FormattedHTMLMessage} from 'react-intl';
 import {Link as RRLink} from 'react-router-dom';
 import {withRouter} from 'react-router';
 import * as AuthAction from '../module/action/AuthAction';
@@ -53,6 +54,7 @@ class CreateAccount extends Component {
   };
 
   render() {
+    const {intl: {formatMessage: _}} = this.props;
     return (
       <Page hasTeamData>
         <Container centerText verticalCenter style={{width: '100%'}}>
@@ -69,7 +71,7 @@ class CreateAccount extends Component {
                 centerText
                 style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
               >
-                <H1 center>{'Set up your account'}</H1>
+                <H1 center>{_(createAccountStrings.headLine)}</H1>
                 <Form
                   onSubmit={this.handleSubmit}
                   style={{
@@ -86,7 +88,7 @@ class CreateAccount extends Component {
                         onChange={event => this.setState({name: event.target.value})}
                         defaultValue={this.state.name}
                         autoComplete="section-create-team username"
-                        placeholder={'Name'}
+                        placeholder={_(createAccountStrings.namePlaceholder)}
                         autoFocus
                         maxLength="64"
                         minLength="2"
@@ -99,7 +101,7 @@ class CreateAccount extends Component {
                         onChange={event => this.setState({email: event.target.value})}
                         defaultValue={this.state.email}
                         autoComplete="section-create-team email"
-                        placeholder={'you@yourcompany.com'}
+                        placeholder={_(createAccountStrings.emailPlaceholder)}
                         placeholderTextTransform="unset"
                         maxLength="128"
                         type="email"
@@ -112,7 +114,7 @@ class CreateAccount extends Component {
                         defaultValue={this.state.password}
                         autoComplete="section-create-team new-password"
                         type="password"
-                        placeholder={'Password (min. 8 characters)'}
+                        placeholder={_(createAccountStrings.passwordPlaceholder)}
                         maxLength="1024"
                         minLength="8"
                         pattern=".{8,1024}"
@@ -124,14 +126,14 @@ class CreateAccount extends Component {
                   </div>
                   <Checkbox name="accept" required data-uie-name="do-terms" style={{justifyContent: 'center'}}>
                     <CheckboxLabel>
-                      {'I ACCEPT THE '}
-                      <a data-uie-name="go-terms" href="#">
-                        {'TERMS AND CONDITIONS'}
-                      </a>
+                      <FormattedHTMLMessage
+                        {...createAccountStrings.terms}
+                        values={{linkParams: 'data-uie-name="go-terms" href="#"'}}
+                      />
                     </CheckboxLabel>
                   </Checkbox>
                   <Button data-uie-name="do-next" type="submit" style={{margin: '0 auto -16px', width: 184}}>
-                    {'Next'}
+                    {_(createAccountStrings.nextButton)}
                   </Button>
                 </Form>
               </ContainerXS>

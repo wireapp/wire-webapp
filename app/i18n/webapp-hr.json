@@ -1,1 +1,23 @@
-{"index.hello": ""}
+{
+  "index.claim": "",
+  "index.createAccount": "Stvaranje računa",
+  "index.createAccountFor": "",
+  "index.createTeam": "",
+  "index.createTeamFor": "",
+  "index.loginInfo": "",
+  "index.login": "",
+  "teamName.headline": "",
+  "teamName.subhead": "",
+  "teamName.teamNamePlaceholder": "",
+  "teamName.whatIsWireTeamsLink": "",
+  "createAccount.headLine": "",
+  "createAccount.namePlaceholder": "Ime",
+  "createAccount.emailPlaceholder": "",
+  "createAccount.passwordPlaceholder": "",
+  "createAccount.terms": "",
+  "createAccount.nextButton": "",
+  "verify.headline": "",
+  "verify.subhead": "",
+  "verify.resendCode": "",
+  "verify.changeEmail": "Promijeni e-mail"
+}

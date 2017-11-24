@@ -5,7 +5,7 @@
     [
       "react-intl",
       {
-        "messagesDir": "./app/i18n"
+        "messagesDir": "./temp/i18n"
       }
     ]
   ],
