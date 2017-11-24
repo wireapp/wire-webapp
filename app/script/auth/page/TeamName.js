@@ -96,7 +96,7 @@ class TeamName extends Component {
                 </Form>
               </div>
               <div>
-                <Link href="https://wire.com/create-team/" data-uie-name="go-what-is">
+                <Link href="https://wire.com/create-team/" target="_blank" data-uie-name="go-what-is">
                   {_(teamNameStrings.whatIsWireTeamsLink)}
                 </Link>
               </div>
