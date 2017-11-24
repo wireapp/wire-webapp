@@ -17,6 +17,8 @@
  *
  */
 
+import BackendError from '../BackendError';
+
 export const LOGIN_START = 'LOGIN_START';
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
 export const LOGIN_FAILED = 'LOGIN_FAILED';
@@ -55,7 +57,7 @@ export function successfulLogin(authData) {
 }
 
 export function failedLogin(error) {
-  return {payload: error, type: LOGIN_FAILED};
+  return {payload: BackendError.handle(error), type: LOGIN_FAILED};
 }
 
 export function startRegisterTeam(params) {
@@ -67,7 +69,7 @@ export function successfulRegisterTeam(authData) {
 }
 
 export function failedRegisterTeam(error) {
-  return {payload: error, type: REGISTER_TEAM_FAILED};
+  return {payload: BackendError.handle(error), type: REGISTER_TEAM_FAILED};
 }
 
 export function startRegisterPersonal(params) {
@@ -79,7 +81,7 @@ export function successfulRegisterPersonal(authData) {
 }
 
 export function failedRegisterPersonal(error) {
-  return {payload: error, type: REGISTER_PERSONAL_FAILED};
+  return {payload: BackendError.handle(error), type: REGISTER_PERSONAL_FAILED};
 }
 
 export function startRegisterJoin(params) {
@@ -91,7 +93,7 @@ export function successfulRegisterJoin(authData) {
 }
 
 export function failedRegisterJoin(error) {
-  return {payload: error, type: REGISTER_JOIN_FAILED};
+  return {payload: BackendError.handle(error), type: REGISTER_JOIN_FAILED};
 }
 
 export function startRefresh() {
@@ -103,7 +105,7 @@ export function successfulRefresh(authData) {
 }
 
 export function failedRefresh(error) {
-  return {payload: error, type: REFRESH_FAILED};
+  return {payload: BackendError.handle(error), type: REFRESH_FAILED};
 }
 
 export function startLogout() {
@@ -115,7 +117,7 @@ export function successfulLogout() {
 }
 
 export function failedLogout(error) {
-  return {payload: error, type: LOGOUT_FAILED};
+  return {payload: BackendError.handle(error), type: LOGOUT_FAILED};
 }
 
 export function resetError() {
