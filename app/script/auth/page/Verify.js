@@ -25,6 +25,7 @@ import {injectIntl} from 'react-intl';
 import {withRouter} from 'react-router';
 import * as AuthAction from '../module/action/AuthAction';
 import * as AuthSelector from '../module/selector/AuthSelector';
+import * as UserAction from '../module/action/UserAction';
 import Page from './Page';
 import React from 'react';
 import ROUTE from '../route';
@@ -79,7 +80,7 @@ export default withRouter(
         account: AuthSelector.getAccount(state),
         authError: AuthSelector.getError(state),
       }),
-      {...AuthAction}
+      {...AuthAction, ...UserAction}
     )(Verify)
   )
 );
