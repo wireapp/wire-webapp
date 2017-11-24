@@ -33,9 +33,9 @@ import React from 'react';
 import ROUTE from '../route';
 
 const Verify = ({account, authError, history, intl: {formatMessage: _}, ...connected}) => {
-  const createAccount = () => {
+  const createAccount = code => {
     Promise.resolve()
-      .then(() => connected.doRegisterTeam(account))
+      .then(() => connected.doRegisterTeam({...account, email_code: code}))
       .then(() => (window.location = '/login?reason=registration'))
       .catch(error => console.error('Failed to create account', error));
   };
@@ -57,7 +57,12 @@ const Verify = ({account, authError, history, intl: {formatMessage: _}, ...conne
           <Text data-uie-name="label-with-email">
             <FormattedHTMLMessage {...verifyStrings.subhead} values={{email: account.email}} />
           </Text>
-          <CodeInput autoFocus style={{marginTop: 10}} onCodeComplete={createAccount} data-uie-name="enter-code" />
+          <CodeInput
+            autoFocus
+            style={{marginTop: 10}}
+            onCodeComplete={code => createAccount(code)}
+            data-uie-name="enter-code"
+          />
           <ErrorMessage>{authError}</ErrorMessage>
         </div>
         <div>
