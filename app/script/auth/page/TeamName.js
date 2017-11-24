@@ -33,6 +33,12 @@ import * as AuthSelector from '../module/selector/AuthSelector';
 import React, {Component} from 'react';
 
 class TeamName extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isValidTeamName: false,
+    };
+  }
   pushTeamName = event => {
     event.preventDefault();
     return Promise.resolve(this.teamNameInput.value)
@@ -65,6 +71,7 @@ class TeamName extends Component {
                     <Input
                       defaultValue={teamName}
                       innerRef={node => (this.teamNameInput = node)}
+                      onChange={() => this.setState({isValidTeamName: this.teamNameInput.checkValidity()})}
                       placeholder={_(teamNameStrings.teamNamePlaceholder)}
                       pattern=".{2,256}"
                       maxLength="256"
@@ -73,7 +80,12 @@ class TeamName extends Component {
                       autoFocus
                       data-uie-name="enter-team-name"
                     />
-                    <RoundIconButton type="submit" onClick={this.pushTeamName} data-uie-name="do-next" />
+                    <RoundIconButton
+                      disabled={!this.state.isValidTeamName}
+                      type="submit"
+                      onClick={this.pushTeamName}
+                      data-uie-name="do-next"
+                    />
                   </InputSubmitCombo>
                 </Form>
               </div>
