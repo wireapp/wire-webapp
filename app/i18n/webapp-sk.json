@@ -1,8 +1,8 @@
 {
   "index.claim": "",
-  "index.createAccount": "",
+  "index.createAccount": "Vytvoriť konto",
   "index.createAccountFor": "",
-  "index.createTeam": "",
+  "index.createTeam": "Vytvoriť tím",
   "index.createTeamFor": "",
   "index.loginInfo": "",
   "index.login": "",
@@ -11,7 +11,7 @@
   "teamName.teamNamePlaceholder": "",
   "teamName.whatIsWireTeamsLink": "",
   "createAccount.headLine": "",
-  "createAccount.namePlaceholder": "",
+  "createAccount.namePlaceholder": "Meno",
   "createAccount.emailPlaceholder": "",
   "createAccount.passwordPlaceholder": "",
   "createAccount.terms": "",
@@ -19,5 +19,5 @@
   "verify.headline": "",
   "verify.subhead": "",
   "verify.resendCode": "",
-  "verify.changeEmail": ""
+  "verify.changeEmail": "Zmeniť e-mail"
 }

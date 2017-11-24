@@ -27,7 +27,7 @@ const root = resolve(__dirname, '..');
 function runCrowdin() {
   const crowdin_yaml = join(root, 'keys', 'crowdin.yaml');
   execSync(
-    `crowdin --identity=${crowdin_yaml} upload sources --dryrun &&
+    `crowdin --identity=${crowdin_yaml} upload sources &&
     crowdin --identity=${crowdin_yaml} download`,
     {
       stdio: [0, 1],
