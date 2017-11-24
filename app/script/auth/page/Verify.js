@@ -33,9 +33,9 @@ import React from 'react';
 import ROUTE from '../route';
 
 const Verify = ({account, authError, history, intl: {formatMessage: _}, ...connected}) => {
-  const createAccount = code => {
+  const createAccount = email_code => {
     Promise.resolve()
-      .then(() => connected.doRegisterTeam({...account, email_code: code}))
+      .then(() => connected.doRegisterTeam({...account, email_code}))
       .then(() => (window.location = '/login?reason=registration'))
       .catch(error => console.error('Failed to create account', error));
   };
