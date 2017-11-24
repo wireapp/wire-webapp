@@ -21,7 +21,7 @@ import {ArrowIcon} from '@wireapp/react-ui-kit/Icon';
 import {COLOR} from '@wireapp/react-ui-kit/Identity';
 import {connect} from 'react-redux';
 import {Container, ContainerXS, Columns, Column} from '@wireapp/react-ui-kit/Layout';
-import {Form, Input, InputBlock, Button, Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit/Form';
+import {Form, Input, InputBlock, Button, Checkbox, CheckboxLabel, ErrorMessage} from '@wireapp/react-ui-kit/Form';
 import {H1, Link} from '@wireapp/react-ui-kit/Text';
 import {injectIntl} from 'react-intl';
 import {Link as RRLink} from 'react-router-dom';
@@ -74,49 +74,51 @@ class CreateAccount extends Component {
                   flexDirection: 'column',
                   flexGrow: 1,
                   justifyContent: 'space-between',
-                  marginTop: 15,
                 }}
               >
-                <InputBlock>
-                  <Input
-                    name="name"
-                    onChange={event => this.setState({name: event.target.value})}
-                    defaultValue={this.state.name}
-                    autoComplete="section-create-team username"
-                    placeholder={'Name'}
-                    autoFocus
-                    maxLength="64"
-                    minLength="2"
-                    pattern=".{2,64}"
-                    required
-                    data-uie-name="enter-name"
-                  />
-                  <Input
-                    name="email"
-                    onChange={event => this.setState({email: event.target.value})}
-                    defaultValue={this.state.email}
-                    autoComplete="section-create-team email"
-                    placeholder={'you@yourcompany.com'}
-                    placeholderTextTransform="unset"
-                    maxLength="128"
-                    type="email"
-                    required
-                    data-uie-name="enter-email"
-                  />
-                  <Input
-                    name="password"
-                    onChange={event => this.setState({password: event.target.value})}
-                    defaultValue={this.state.password}
-                    autoComplete="section-create-team new-password"
-                    type="password"
-                    placeholder={'Password (min. 8 characters)'}
-                    maxLength="1024"
-                    minLength="8"
-                    pattern=".{8,1024}"
-                    required
-                    data-uie-name="enter-password"
-                  />
-                </InputBlock>
+                <div>
+                  <InputBlock>
+                    <Input
+                      name="name"
+                      onChange={event => this.setState({name: event.target.value})}
+                      defaultValue={this.state.name}
+                      autoComplete="section-create-team username"
+                      placeholder={'Name'}
+                      autoFocus
+                      maxLength="64"
+                      minLength="2"
+                      pattern=".{2,64}"
+                      required
+                      data-uie-name="enter-name"
+                    />
+                    <Input
+                      name="email"
+                      onChange={event => this.setState({email: event.target.value})}
+                      defaultValue={this.state.email}
+                      autoComplete="section-create-team email"
+                      placeholder={'you@yourcompany.com'}
+                      placeholderTextTransform="unset"
+                      maxLength="128"
+                      type="email"
+                      required
+                      data-uie-name="enter-email"
+                    />
+                    <Input
+                      name="password"
+                      onChange={event => this.setState({password: event.target.value})}
+                      defaultValue={this.state.password}
+                      autoComplete="section-create-team new-password"
+                      type="password"
+                      placeholder={'Password (min. 8 characters)'}
+                      maxLength="1024"
+                      minLength="8"
+                      pattern=".{8,1024}"
+                      required
+                      data-uie-name="enter-password"
+                    />
+                  </InputBlock>
+                  <ErrorMessage>{'Email address is already taken.'}</ErrorMessage>
+                </div>
                 <Checkbox name="accept" required data-uie-name="do-terms" style={{justifyContent: 'center'}}>
                   <CheckboxLabel>
                     {'I ACCEPT THE '}
@@ -125,7 +127,7 @@ class CreateAccount extends Component {
                     </a>
                   </CheckboxLabel>
                 </Checkbox>
-                <Button data-uie-name="do-next" type="submit" style={{margin: '0 auto', width: 184}}>
+                <Button data-uie-name="do-next" type="submit" style={{margin: '0 auto -16px', width: 184}}>
                   {'Next'}
                 </Button>
               </Form>
