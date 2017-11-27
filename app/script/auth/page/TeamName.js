@@ -39,6 +39,11 @@ class TeamName extends Component {
       isValidTeamName: false,
     };
   }
+
+  componentDidMount() {
+    this.setState({isValidTeamName: this.teamNameInput.checkValidity()});
+  }
+
   pushTeamName = event => {
     event.preventDefault();
     return Promise.resolve(this.teamNameInput.value)
@@ -46,6 +51,7 @@ class TeamName extends Component {
       .then(teamName => this.props.pushAccountRegistrationData({team: {name: teamName}}))
       .then(() => this.props.history.push(ROUTE.CREATE_ACCOUNT));
   };
+
   render() {
     const {teamName, intl: {formatMessage: _}} = this.props;
     return (
@@ -90,7 +96,7 @@ class TeamName extends Component {
                 </Form>
               </div>
               <div>
-                <Link href="https://wire.com/create-team/" data-uie-name="go-what-is">
+                <Link href="https://wire.com/create-team/" target="_blank" data-uie-name="go-what-is">
                   {_(teamNameStrings.whatIsWireTeamsLink)}
                 </Link>
               </div>

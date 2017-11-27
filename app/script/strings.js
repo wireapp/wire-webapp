@@ -18,6 +18,7 @@
  */
 
 import {defineMessages} from 'react-intl';
+import BackendError from './auth/module/action/BackendError';
 
 /* eslint-disable sort-keys */
 
@@ -114,5 +115,118 @@ export const verifyStrings = defineMessages({
   changeEmail: {
     id: 'verify.changeEmail',
     defaultMessage: 'Change email',
+  },
+});
+
+export const errorHandlerStrings = defineMessages({
+  [BackendError.LABEL.ACCESS_DENIED]: {
+    id: 'BackendError.LABEL.ACCESS_DENIED',
+    defaultMessage: 'Please verify your details and try again.',
+  },
+  [BackendError.LABEL.BLACKLISTED_EMAIL]: {
+    id: 'BackendError.LABEL.BLACKLISTED_EMAIL',
+    defaultMessage: 'This email address is not allowed.',
+  },
+  [BackendError.LABEL.BLACKLISTED_PHONE]: {
+    id: 'BackendError.LABEL.BLACKLISTED_PHONE',
+    defaultMessage: 'This phone number is not allowed.',
+  },
+  [BackendError.LABEL.INVALID_CODE]: {
+    id: 'BackendError.LABEL.INVALID_CODE',
+    defaultMessage: 'This code is invalid.',
+  },
+  [BackendError.LABEL.INVALID_CREDENTIALS]: {
+    id: 'BackendError.LABEL.INVALID_CREDENTIALS',
+    defaultMessage: 'Please verify your details and try again.',
+  },
+  [BackendError.LABEL.INVALID_EMAIL]: {
+    id: 'BackendError.LABEL.INVALID_EMAIL',
+    defaultMessage: 'This email address is invalid.',
+  },
+  [BackendError.LABEL.INVALID_PHONE]: {
+    id: 'BackendError.LABEL.INVALID_PHONE',
+    defaultMessage: 'This phone number is invalid.',
+  },
+  [BackendError.LABEL.KEY_EXISTS]: {
+    id: 'BackendError.LABEL.KEY_EXISTS',
+    defaultMessage:
+      'The email address you provided has already been registered. <a target="_blank" rel="noopener noreferrer" href="https://support.wire.com/hc/articles/115004082129">Learn more</a>',
+  },
+  [BackendError.LABEL.MISSING_AUTH]: {
+    id: 'BackendError.LABEL.MISSING_AUTH',
+    defaultMessage: 'Please verify your details and try again.',
+  },
+  [BackendError.LABEL.PENDING_ACTIVATION]: {
+    id: 'BackendError.LABEL.PENDING_ACTIVATION',
+    defaultMessage: 'The email address you provided has already been invited. Please check your email.',
+  },
+  [BackendError.LABEL.PENDING_LOGIN]: {
+    id: 'BackendError.LABEL.PENDING_LOGIN',
+    defaultMessage: 'BackendError.LABEL.PENDING_LOGIN',
+  },
+  [BackendError.LABEL.TOO_MANY_LOGINS]: {
+    id: 'BackendError.LABEL.TOO_MANY_LOGINS',
+    defaultMessage: 'Please try again later.',
+  },
+  [BackendError.LABEL.BAD_REQUEST]: {
+    id: 'BackendError.LABEL.BAD_REQUEST',
+    defaultMessage: 'Invalid input',
+  },
+  [BackendError.LABEL.INVALID_OPERATION]: {
+    id: 'BackendError.LABEL.INVALID_OPERATION',
+    defaultMessage: 'BackendError.LABEL.INVALID_OPERATION',
+  },
+  [BackendError.LABEL.NOT_FOUND]: {
+    id: 'BackendError.LABEL.NOT_FOUND',
+    defaultMessage: 'Could not find resource',
+  },
+  [BackendError.LABEL.OPERATION_DENIED]: {
+    id: 'BackendError.LABEL.OPERATION_DENIED',
+    defaultMessage: 'You don’t have permission',
+  },
+  [BackendError.LABEL.UNAUTHORIZED]: {
+    id: 'BackendError.LABEL.UNAUTHORIZED',
+    defaultMessage: 'Something went wrong. Please reload the page and try again.',
+  },
+  [BackendError.LABEL.HANDLE_EXISTS]: {
+    id: 'BackendError.LABEL.HANDLE_EXISTS',
+    defaultMessage: 'This username is already taken.',
+  },
+  [BackendError.LABEL.INVALID_HANDLE]: {
+    id: 'BackendError.LABEL.INVALID_HANDLE',
+    defaultMessage: 'This username is invalid.',
+  },
+  [BackendError.LABEL.INVALID_INVITATION_CODE]: {
+    id: 'BackendError.LABEL.INVALID_INVITATION_CODE',
+    defaultMessage: 'Invitation has been revoked or expired',
+  },
+  [BackendError.LABEL.NO_OTHER_OWNER]: {
+    id: 'BackendError.LABEL.NO_OTHER_OWNER',
+    defaultMessage: 'The last owner cannot be removed from the team.',
+  },
+  [BackendError.LABEL.NO_TEAM]: {
+    id: 'BackendError.LABEL.NO_TEAM',
+    defaultMessage: 'Could not find team.',
+  },
+  [BackendError.LABEL.NO_TEAM_MEMBER]: {
+    id: 'BackendError.LABEL.NO_TEAM_MEMBER',
+    defaultMessage: 'Could not find team member.',
+  },
+  [BackendError.LABEL.TOO_MANY_MEMBERS]: {
+    id: 'BackendError.LABEL.TOO_MANY_MEMBERS',
+    defaultMessage: 'This team has reached its maximum size.',
+  },
+  [BackendError.LABEL.SUSPENDED]: {
+    id: 'BackendError.LABEL.SUSPENDED',
+    defaultMessage: 'This account is no longer authorized to log in.',
+  },
+  [BackendError.LABEL.EMAIL_EXISTS]: {
+    id: 'BackendError.LABEL.EMAIL_EXISTS',
+    defaultMessage:
+      'This email address is already in use. <a target="_blank" rel="noopener noreferrer" href="https://support.wire.com/hc/articles/115004082129">Learn more</a>',
+  },
+  unexpected: {
+    id: 'BackendError.unexpected',
+    defaultMessage: 'Unexpected error ({code} {message})',
   },
 });
