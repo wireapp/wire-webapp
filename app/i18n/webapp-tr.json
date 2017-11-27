@@ -13,7 +13,7 @@
   "createAccount.headLine": "",
   "createAccount.namePlaceholder": "İsim",
   "createAccount.emailPlaceholder": "",
-  "createAccount.passwordPlaceholder": "",
+  "createAccount.passwordPlaceholder": "Şifre (en az 8 karakter)",
   "createAccount.terms": "",
   "createAccount.nextButton": "İleri",
   "verify.headline": "",

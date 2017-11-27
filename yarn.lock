@@ -370,14 +370,14 @@
   dependencies:
     "@types/node" "8.0.17"
 
-"@wireapp/react-ui-kit@0.0.11":
-  version "0.0.11"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-0.0.11.tgz#01c0c88920f94cfdc48943c604f252fbff42da01"
+"@wireapp/react-ui-kit@0.0.12":
+  version "0.0.12"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-0.0.12.tgz#72694439e86b2930b94b52c83b3cc866a85bbaa8"
   dependencies:
     color "2.0.1"
     gulp-concat "2.6.1"
     react "16.1.1"
-    react-dom "16.0.0"
+    react-dom "16.1.1"
     styled-components "2.2.3"
     styled-normalize "2.2.1"
 
@@ -6895,6 +6895,15 @@ react-deep-force-update@^2.1.1:
 react-dom@16.0.0:
   version "16.0.0"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.0.0.tgz#9cc3079c3dcd70d4c6e01b84aab2a7e34c303f58"
+  dependencies:
+    fbjs "^0.8.16"
+    loose-envify "^1.1.0"
+    object-assign "^4.1.1"
+    prop-types "^15.6.0"
+
+react-dom@16.1.1:
+  version "16.1.1"
+  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.1.1.tgz#b2e331b6d752faf1a2d31399969399a41d8d45f8"
   dependencies:
     fbjs "^0.8.16"
     loose-envify "^1.1.0"

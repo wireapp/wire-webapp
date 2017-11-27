@@ -13,7 +13,7 @@
   "createAccount.headLine": "",
   "createAccount.namePlaceholder": "Ime",
   "createAccount.emailPlaceholder": "",
-  "createAccount.passwordPlaceholder": "",
+  "createAccount.passwordPlaceholder": "Lozinka (najmanje 8 znakova)",
   "createAccount.terms": "",
   "createAccount.nextButton": "",
   "verify.headline": "",

@@ -13,7 +13,7 @@
   "createAccount.headLine": "",
   "createAccount.namePlaceholder": "Ime",
   "createAccount.emailPlaceholder": "",
-  "createAccount.passwordPlaceholder": "",
+  "createAccount.passwordPlaceholder": "Geslo (vsaj 8 znakov)",
   "createAccount.terms": "",
   "createAccount.nextButton": "",
   "verify.headline": "",
