@@ -466,9 +466,10 @@
           const cleanValue = escape(cap.value);
           out +=
             cap.type === 'email'
-              ? `${preString}<a href="#" onclick="z.util.safe_mailto_open('${cleanHref.replace(/^mailto:/, '')}')">${
-                  cleanValue
-                }</a>`
+              ? `${preString}<a href="${cleanHref}" onclick="z.util.safe_mailto_open(event, '${cleanHref.replace(
+                  /^mailto:/,
+                  ''
+                )}')">${cleanValue}</a>`
               : `${preString}<a href="${cleanHref}" target="_blank" rel="nofollow noopener noreferrer">${
                   cleanValue
                 }</a>`;
