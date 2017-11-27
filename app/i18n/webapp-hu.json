@@ -13,7 +13,7 @@
   "createAccount.headLine": "",
   "createAccount.namePlaceholder": "Név",
   "createAccount.emailPlaceholder": "",
-  "createAccount.passwordPlaceholder": "",
+  "createAccount.passwordPlaceholder": "Jelszó (legalább 8 karakter)",
   "createAccount.terms": "",
   "createAccount.nextButton": "Tovább",
   "verify.headline": "",

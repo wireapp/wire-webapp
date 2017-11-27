@@ -13,7 +13,7 @@
   "createAccount.headLine": "",
   "createAccount.namePlaceholder": "Naam",
   "createAccount.emailPlaceholder": "",
-  "createAccount.passwordPlaceholder": "",
+  "createAccount.passwordPlaceholder": "Wachtwoord (minimaal 8 tekens)",
   "createAccount.terms": "",
   "createAccount.nextButton": "Volgende",
   "verify.headline": "",

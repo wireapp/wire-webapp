@@ -13,7 +13,7 @@
   "createAccount.headLine": "",
   "createAccount.namePlaceholder": "Jméno",
   "createAccount.emailPlaceholder": "",
-  "createAccount.passwordPlaceholder": "",
+  "createAccount.passwordPlaceholder": "Heslo (alespoň 8 znaků)",
   "createAccount.terms": "",
   "createAccount.nextButton": "Další",
   "verify.headline": "",
