@@ -427,7 +427,10 @@ z.util.safe_window_open = function(url, focus = true) {
   return new_window;
 };
 
-z.util.safe_mailto_open = function(email) {
+z.util.safe_mailto_open = function(event, email) {
+  event.preventDefault();
+  event.stopPropagation();
+
   if (!z.util.is_valid_email(email)) {
     return;
   }
