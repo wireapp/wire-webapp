@@ -1172,6 +1172,10 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     this.device_modal.toggle();
   }
 
+  clicked_on_navigate_back() {
+    window.location.replace(`/auth${location.search}`);
+  }
+
   click_on_remove_device_submit(password, device) {
     this.client_repository
       .delete_client(device.id, password)
