@@ -42,6 +42,7 @@ class CreateAccount extends Component {
       email: this.props.account.email,
       name: this.props.account.name,
       password: this.props.account.password,
+      termsAccepted: false,
     };
   }
 
@@ -52,6 +53,11 @@ class CreateAccount extends Component {
       .then(() => this.props.doSendActivationCode(this.state.email))
       .then(() => this.props.history.push(ROUTE.VERIFY))
       .catch(error => console.error('Failed to send email code', error));
+  };
+
+  isSubmitButtonDisabled = () => {
+    const {email, name, password, termsAccepted} = this.state;
+    return !(email && name && password && termsAccepted);
   };
 
   render() {
@@ -124,7 +130,13 @@ class CreateAccount extends Component {
                     </InputBlock>
                     <ErrorMessage>{parseError(this.props.authError)}</ErrorMessage>
                   </div>
-                  <Checkbox name="accept" required data-uie-name="do-terms" style={{justifyContent: 'center'}}>
+                  <Checkbox
+                    onChange={event => this.setState({termsAccepted: event.target.checked})}
+                    name="accept"
+                    required
+                    data-uie-name="do-terms"
+                    style={{justifyContent: 'center'}}
+                  >
                     <CheckboxLabel>
                       <FormattedHTMLMessage
                         {...createAccountStrings.terms}
@@ -132,7 +144,12 @@ class CreateAccount extends Component {
                       />
                     </CheckboxLabel>
                   </Checkbox>
-                  <Button data-uie-name="do-next" type="submit" style={{margin: '0 auto -16px', width: 184}}>
+                  <Button
+                    disabled={this.isSubmitButtonDisabled()}
+                    data-uie-name="do-next"
+                    type="submit"
+                    style={{margin: '0 auto -16px', width: 184}}
+                  >
                     {_(createAccountStrings.nextButton)}
                   </Button>
                 </Form>
