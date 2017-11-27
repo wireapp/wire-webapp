@@ -1,0 +1,39 @@
+{
+  "dependencies": {
+    "@types/node": "8.0.50",
+    "dexie": "2.0.1",
+    "fs-extra": "4.0.2"
+  },
+  "devDependencies": {
+    "cross-env": "5.1.1",
+    "jasmine": "2.8.0",
+    "karma": "1.7.1",
+    "karma-chrome-launcher": "2.2.0",
+    "karma-jasmine": "1.1.0",
+    "karma-jasmine-diff-reporter": "1.1.1",
+    "karma-sourcemap-loader": "0.3.7",
+    "rimraf": "2.6.2",
+    "typescript": "2.6.1",
+    "webpack": "3.8.1"
+  },
+  "description": "Provider for different storage engines.",
+  "files": ["dist"],
+  "license": "GPL-3.0",
+  "main": "./dist/commonjs/index.js",
+  "name": "@wireapp/store-engine",
+  "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine",
+  "scripts": {
+    "build": "yarn build:node && yarn build:browser",
+    "build:browser": "exit 0",
+    "build:node": "tsc",
+    "clear": "rimraf dist",
+    "dist": "yarn clear && yarn build",
+    "preversion": "yarn && yarn test",
+    "test": "yarn dist && yarn test:node && yarn test:browser",
+    "test:browser": "webpack && karma start karma.conf.js",
+    "test:node": "cross-env JASMINE_CONFIG_PATH=src/test/node/support/jasmine.json jasmine",
+    "version": "yarn dist"
+  },
+  "types": "./dist/commonjs/index.d.ts",
+  "version": "0.1.1"
+}
