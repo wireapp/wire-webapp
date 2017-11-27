@@ -54,7 +54,7 @@ Text.propTypes = {
   light: PropTypes.bool,
   muted: PropTypes.bool,
   noWrap: PropTypes.bool,
-  textTransform: PropTypes.oneOf(['lowercase', 'uppercase', 'capitalize', 'inherit', 'none']),
+  textTransform: PropTypes.oneOf(['lowercase', 'uppercase', 'capitalize', 'inherit', 'none', 'unset']),
   truncate: PropTypes.bool,
 };
 

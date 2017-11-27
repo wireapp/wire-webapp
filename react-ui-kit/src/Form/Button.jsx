@@ -37,7 +37,7 @@ const Button = Text.withComponent('button').extend`
   height: 48px;
   line-height: 48px;
   max-width: 100%;
-  ouline: none;
+  outline: none;
   padding: 0 32px;
   min-width: 184px;
   width: ${props => (props.block ? '100%' : 'auto')};
