@@ -29,7 +29,7 @@
   "name": "@wireapp/react-ui-kit",
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit",
   "scripts": {
-    "build": "yarn babel src --out-dir dist --no-comments && node scripts/prepare.js",
+    "build": "babel src --out-dir dist --no-comments && node scripts/prepare.js",
     "clear": "rimraf dist",
     "dist": "yarn clear && yarn build",
     "preversion": "yarn && yarn test",
@@ -39,5 +39,5 @@
     "start:static": "gulp",
     "version": "yarn dist"
   },
-  "version": "0.0.10"
+  "version": "0.0.12"
 }

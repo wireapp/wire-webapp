@@ -21,6 +21,7 @@ import {COLOR} from '../Identity';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {Text} from './Text';
+import media from '../mediaQueries';
 
 const H1 = Text.withComponent('h1').extend`
   /* appearance */
@@ -32,6 +33,9 @@ const H1 = Text.withComponent('h1').extend`
   margin-bottom: 52px;
   margin-top: 0;
   min-height: 48px;
+  ${media.mobile`
+    font-size: 24px;
+  `}
 `;
 
 const H2 = Text.withComponent('h2').extend`
