@@ -21,9 +21,10 @@ import {CodeInput, ErrorMessage} from '@wireapp/react-ui-kit/Form';
 import {connect} from 'react-redux';
 import {ContainerXS} from '@wireapp/react-ui-kit/Layout';
 import {H1, Text, Link} from '@wireapp/react-ui-kit/Text';
-import {verifyStrings} from '../../strings';
 import {injectIntl, FormattedHTMLMessage} from 'react-intl';
 import {Link as RRLink} from 'react-router-dom';
+import {parseError} from '../util/errorUtil';
+import {verifyStrings} from '../../strings';
 import {withRouter} from 'react-router';
 import * as AuthAction from '../module/action/AuthAction';
 import * as AuthSelector from '../module/selector/AuthSelector';
@@ -63,7 +64,7 @@ const Verify = ({account, authError, history, intl: {formatMessage: _}, ...conne
             onCodeComplete={code => createAccount(code)}
             data-uie-name="enter-code"
           />
-          <ErrorMessage>{authError}</ErrorMessage>
+          <ErrorMessage>{parseError(authError)}</ErrorMessage>
         </div>
         <div>
           <Link onClick={resendCode} data-uie-name="do-resend-code">

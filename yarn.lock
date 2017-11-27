@@ -58,12 +58,9 @@
   version "1.1.5"
   resolved "https://codeload.github.com/wireapp/amplify/tar.gz/4dc68e77ccabc9b3f7c2ddd866d8c9dbb1356ba7"
 
-"@bower_components/antiscroll-2@wireapp/antiscroll-2#1.2.8":
-  version "1.0.0"
-  resolved "https://codeload.github.com/wireapp/antiscroll-2/tar.gz/70794db675427b970993fc383a1ab3a481df6589"
-  dependencies:
-    less "2.7.2"
-    lesshat "4.1.0"
+"@bower_components/antiscroll-2@wireapp/antiscroll-2#1.2.9":
+  version "1.2.9"
+  resolved "https://codeload.github.com/wireapp/antiscroll-2/tar.gz/bdb3d0212004130290311b3e2aee0de8a8457885"
 
 "@bower_components/bytebuffer@dcodeIO/ByteBuffer.js#~3":
   version "3.5.5"
@@ -4864,7 +4861,7 @@ lcid@^1.0.0:
   dependencies:
     invert-kv "^1.0.0"
 
-less@2.7.2, less@~2.7.1:
+less@~2.7.1:
   version "2.7.2"
   resolved "https://registry.yarnpkg.com/less/-/less-2.7.2.tgz#368d6cc73e1fb03981183280918743c5dcf9b3df"
   optionalDependencies:
@@ -4876,10 +4873,6 @@ less@2.7.2, less@~2.7.1:
     promise "^7.1.1"
     request "^2.72.0"
     source-map "^0.5.3"
-
-lesshat@4.1.0:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/lesshat/-/lesshat-4.1.0.tgz#5a32dca36a5516569a486f8ed10dffff79d4c8e0"
 
 leven@^2.1.0:
   version "2.1.0"

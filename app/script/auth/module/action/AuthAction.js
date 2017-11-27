@@ -37,7 +37,7 @@ export function doLogin(login) {
       .then(() => dispatch(doLogout()))
       .then(() => apiClient.login(login))
       .catch(error => {
-        dispatch(AuthActionCreator.failedLogin(handledError));
+        dispatch(AuthActionCreator.failedLogin(error));
         throw BackendError.handle(error);
       });
   };
@@ -71,7 +71,7 @@ export function doRegisterTeam(registration) {
       .then(() => dispatch(doLogout()))
       .then(() => apiClient.register(registration))
       .catch(error => {
-        dispatch(AuthActionCreator.failedRegisterTeam(handledError));
+        dispatch(AuthActionCreator.failedRegisterTeam(error));
         throw BackendError.handle(error);
       });
   };
