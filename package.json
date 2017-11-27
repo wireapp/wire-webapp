@@ -29,13 +29,15 @@
   "name": "@wireapp/react-ui-kit",
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit",
   "scripts": {
+    "build": "yarn babel src --out-dir dist --no-comments && node scripts/prepare.js",
     "clear": "rimraf dist",
-    "dist": "yarn clear && yarn babel src --out-dir dist --no-comments && node scripts/prepare.js",
+    "dist": "yarn clear && yarn build",
+    "preversion": "yarn && yarn test",
+    "publish": "cd ./dist && npm publish",
     "start": "yarn start:demo",
-    "start:static": "gulp",
     "start:demo": "webpack-dev-server",
-    "version": "yarn dist",
-    "publish": "cd ./dist && npm publish"
+    "start:static": "gulp",
+    "version": "yarn dist"
   },
   "version": "0.0.10"
 }
