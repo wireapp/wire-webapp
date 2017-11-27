@@ -22,8 +22,10 @@ import {FormattedHTMLMessage} from 'react-intl';
 import React from 'react';
 
 export function parseError(error) {
-  if (errorHandlerStrings.hasOwnProperty(error.label)) {
-    return <FormattedHTMLMessage {...errorHandlerStrings[error.label]} />;
+  if (error) {
+    if (errorHandlerStrings.hasOwnProperty(error.label)) {
+      return <FormattedHTMLMessage {...errorHandlerStrings[error.label]} />;
+    }
+    return <FormattedHTMLMessage {...errorHandlerStrings.unexpected} values={error} />;
   }
-  return <FormattedHTMLMessage {...errorHandlerStrings.unexpected} values={error} />;
 }
