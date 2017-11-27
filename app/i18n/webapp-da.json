@@ -13,7 +13,7 @@
   "createAccount.headLine": "",
   "createAccount.namePlaceholder": "Navn",
   "createAccount.emailPlaceholder": "",
-  "createAccount.passwordPlaceholder": "",
+  "createAccount.passwordPlaceholder": "Adgangskode (mindst 8 tegn)",
   "createAccount.terms": "",
   "createAccount.nextButton": "",
   "verify.headline": "",

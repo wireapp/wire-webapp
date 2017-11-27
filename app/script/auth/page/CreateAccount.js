@@ -103,7 +103,6 @@ class CreateAccount extends Component {
                         defaultValue={this.state.email}
                         autoComplete="section-create-team email"
                         placeholder={_(createAccountStrings.emailPlaceholder)}
-                        placeholderTextTransform="unset"
                         maxLength="128"
                         type="email"
                         required

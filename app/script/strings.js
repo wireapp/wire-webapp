@@ -25,7 +25,7 @@ import BackendError from './auth/module/action/BackendError';
 export const indexStrings = defineMessages({
   claim: {
     id: 'index.claim',
-    defaultMessage: 'Secure messaging for everyone',
+    defaultMessage: 'Secure messaging for everyone.',
   },
   createAccount: {
     id: 'index.createAccount',
@@ -87,7 +87,7 @@ export const createAccountStrings = defineMessages({
   },
   passwordPlaceholder: {
     id: 'createAccount.passwordPlaceholder',
-    defaultMessage: 'Password (min. 8 characters)',
+    defaultMessage: 'Password (at least 8 characters)',
   },
   terms: {
     id: 'createAccount.terms',

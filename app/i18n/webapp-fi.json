@@ -13,7 +13,7 @@
   "createAccount.headLine": "",
   "createAccount.namePlaceholder": "Nimi",
   "createAccount.emailPlaceholder": "",
-  "createAccount.passwordPlaceholder": "",
+  "createAccount.passwordPlaceholder": "Salasana (vähintään 8 merkkiä pitkä)",
   "createAccount.terms": "",
   "createAccount.nextButton": "Seuraava",
   "verify.headline": "",

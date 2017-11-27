@@ -13,7 +13,7 @@
   "createAccount.headLine": "",
   "createAccount.namePlaceholder": "Nombre",
   "createAccount.emailPlaceholder": "",
-  "createAccount.passwordPlaceholder": "",
+  "createAccount.passwordPlaceholder": "Contraseña (mínimo 8 caracteres)",
   "createAccount.terms": "",
   "createAccount.nextButton": "Siguiente",
   "verify.headline": "",
