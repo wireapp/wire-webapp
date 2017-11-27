@@ -21,11 +21,12 @@ import {ArrowIcon} from '@wireapp/react-ui-kit/Icon';
 import {COLOR} from '@wireapp/react-ui-kit/Identity';
 import {connect} from 'react-redux';
 import {Container, ContainerXS, Columns, Column} from '@wireapp/react-ui-kit/Layout';
+import {createAccountStrings} from '../../strings';
 import {Form, Input, InputBlock, Button, Checkbox, CheckboxLabel, ErrorMessage} from '@wireapp/react-ui-kit/Form';
 import {H1, Link} from '@wireapp/react-ui-kit/Text';
-import {createAccountStrings} from '../../strings';
 import {injectIntl, FormattedHTMLMessage} from 'react-intl';
 import {Link as RRLink} from 'react-router-dom';
+import {parseError} from '../util/errorUtil';
 import {withRouter} from 'react-router';
 import * as AuthAction from '../module/action/AuthAction';
 import * as AuthSelector from '../module/selector/AuthSelector';
@@ -122,7 +123,7 @@ class CreateAccount extends Component {
                         data-uie-name="enter-password"
                       />
                     </InputBlock>
-                    <ErrorMessage>{this.props.authError}</ErrorMessage>
+                    <ErrorMessage>{parseError(this.props.authError)}</ErrorMessage>
                   </div>
                   <Checkbox name="accept" required data-uie-name="do-terms" style={{justifyContent: 'center'}}>
                     <CheckboxLabel>
