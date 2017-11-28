@@ -70,6 +70,7 @@ export function doRegisterTeam(registration) {
     return Promise.resolve()
       .then(() => dispatch(doLogout()))
       .then(() => apiClient.register(registration))
+      .then(createdTeam => dispatch(AuthActionCreator.successfulRegisterTeam(createdTeam)))
       .catch(error => {
         dispatch(AuthActionCreator.failedRegisterTeam(error));
         throw BackendError.handle(error);

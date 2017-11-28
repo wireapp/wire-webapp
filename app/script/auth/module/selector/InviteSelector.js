@@ -17,11 +17,5 @@
  *
  */
 
-export default {
-  CREATE_ACCOUNT: '/createaccount',
-  CREATE_TEAM: '/createteam',
-  INDEX: '/',
-  INITIAL_INVITE: '/invite',
-  LOGIN: '/login',
-  VERIFY: '/verify',
-};
+export const getInvites = state => state.inviteState.invites;
+export const getError = state => state.inviteState.error;
