@@ -148,7 +148,7 @@ z.util.append_url_parameter = function(url, parameter) {
 z.util.forward_url_parameter = function(url, parameter_name) {
   const parameter_value = z.util.get_url_parameter(parameter_name);
   if (parameter_value != null) {
-    return (url = z.util.append_url_parameter(url, `${parameter_name}=${parameter_value}`));
+    return z.util.append_url_parameter(url, `${parameter_name}=${parameter_value}`);
   }
   return url;
 };
