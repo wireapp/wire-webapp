@@ -42,12 +42,12 @@ class InitialInvite extends React.PureComponent {
     const {invites, language} = this.props;
     const nextLocation = `/login?hl=${language}&reason=registration`;
     const invited = Boolean(invites.length);
-    const invites = invited ? invites.length : 0;
+    const amountOfInvites = invited ? invites.length : 0;
 
     return Promise.resolve()
       .then(() => {
         this.props.trackEvent({
-          attributes: {invited, invites},
+          attributes: {invited, invites: amountOfInvites},
           name: TrackingAction.EVENT_NAME.TEAM.FINISHED_INVITE_STEP,
         });
       })
