@@ -42,16 +42,16 @@ const content = {
 
 switch (commit.branch) {
   case 'dev':
-    build.url = 'https://wire-webapp-dev.zinfra.io/auth/?env=prod#login';
+    build.url = 'https://wire-webapp-dev.zinfra.io/login/?env=prod#login';
     break;
   case 'edge':
-    build.url = 'https://wire-webapp-edge.zinfra.io/auth/?env=staging#login';
+    build.url = 'https://wire-webapp-edge.zinfra.io/login/?env=staging#login';
     break;
   case 'prod':
-    build.url = 'https://wire-webapp-prod-next.wire.com/auth/#login';
+    build.url = 'https://wire-webapp-prod-next.wire.com/login/#login';
     break;
   case 'staging':
-    build.url = 'https://wire-webapp-staging.zinfra.io/auth/?env=prod#login';
+    build.url = 'https://wire-webapp-staging.zinfra.io/login/?env=prod#login';
     break;
   default:
     build.url = 'https://app.wire.com/';
