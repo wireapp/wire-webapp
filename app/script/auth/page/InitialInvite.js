@@ -47,7 +47,9 @@ class InitialInvite extends React.PureComponent {
         padding: '0 24px 0 20px',
       }}
     >
-      <Text fontSize="14px">{email}</Text>
+      <Text data-uie-name="item-pending-email" fontSize="14px">
+        {email}
+      </Text>
       <CheckIcon color={COLOR.TEXT} />
     </div>
   );
