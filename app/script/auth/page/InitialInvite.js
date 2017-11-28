@@ -71,6 +71,7 @@ class InitialInvite extends React.PureComponent {
   );
 
   render() {
+    const {intl: {formatMessage: _}} = this.props;
     return (
       <Page isAuthenticated>
         <ContainerXS
