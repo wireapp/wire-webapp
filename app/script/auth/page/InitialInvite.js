@@ -30,12 +30,28 @@ import * as LanguageSelector from '../module/selector/LanguageSelector';
 import * as InviteSelector from '../module/selector/InviteSelector';
 import {invite} from '../module/action/InviteAction';
 import {fetchSelf} from '../module/action/SelfAction';
+import {trackEvent} from '../module/action/TrackingAction';
 import Page from './Page';
 
 class InitialInvite extends React.PureComponent {
   componentDidMount() {
     this.props.fetchSelf();
   }
+
+  onInviteDone = () => {
+    const {invites, language} = this.props;
+    const nextLocation = `/login?hl=${language}&reason=registration`;
+    const invited = Boolean(invites.length);
+
+    return Promise.resolve()
+      .then(() => {
+        this.props.trackEvent({
+          attributes: {invited, invites: invites.length},
+          name: TrackingAction.EVENT_NAME.TEAM.FINISHED_INVITE_STEP,
+        });
+      })
+      .then(() => (window.location = nextLocation));
+  };
 
   renderEmail = email => (
     <div
@@ -55,8 +71,6 @@ class InitialInvite extends React.PureComponent {
   );
 
   render() {
-    const {invites, language, error, intl: {formatMessage: _}, ...connected} = this.props;
-    const nextLocation = `/login?hl=${language}&reason=registration`;
     return (
       <Page isAuthenticated>
         <ContainerXS
@@ -94,11 +108,11 @@ class InitialInvite extends React.PureComponent {
           </div>
           <div>
             {invites.length ? (
-              <ButtonLink href={nextLocation} style={{margin: '0 auto -16px'}} data-uie-name="do-next">
+              <ButtonLink style={{margin: '0 auto -16px'}} onClick={this.onInviteDone} data-uie-name="do-next">
                 {_(inviteStrings.nextButton)}
               </ButtonLink>
             ) : (
-              <Link href={nextLocation} data-uie-name="do-skip">
+              <Link data-uie-name="do-skip" onClick={this.onInviteDone}>
                 {_(inviteStrings.skipForNow)}
               </Link>
             )}
@@ -119,6 +133,7 @@ export default injectIntl(
     {
       fetchSelf,
       invite,
+      trackEvent,
     }
   )(InitialInvite)
 );

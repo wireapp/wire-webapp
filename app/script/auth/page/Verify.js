@@ -17,6 +17,7 @@
  *
  */
 
+import * as TrackingAction from '../module/action/TrackingAction';
 import {CodeInput, ErrorMessage} from '@wireapp/react-ui-kit/Form';
 import {connect} from 'react-redux';
 import {ContainerXS} from '@wireapp/react-ui-kit/Layout';
@@ -37,6 +38,10 @@ const Verify = ({account, authError, history, intl: {formatMessage: _}, ...conne
   const createAccount = email_code => {
     Promise.resolve()
       .then(() => connected.doRegisterTeam({...account, email_code}))
+      .then(() => {
+        connected.trackEvent({attributes: undefined, name: TrackingAction.EVENT_NAME.TEAM.CREATED});
+        connected.trackEvent({attributes: undefined, name: TrackingAction.EVENT_NAME.TEAM.VERIFIED});
+      })
       .then(() => history.push(ROUTE.INITIAL_INVITE))
       .catch(error => console.error('Failed to create account', error));
   };
@@ -81,7 +86,7 @@ export default withRouter(
         account: AuthSelector.getAccount(state),
         authError: AuthSelector.getError(state),
       }),
-      {...AuthAction, ...UserAction}
+      {...AuthAction, ...TrackingAction, ...UserAction}
     )(Verify)
   )
 );

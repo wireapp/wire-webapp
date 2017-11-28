@@ -26,6 +26,11 @@ export const EVENT_NAME = {
     OPENED_START_SCREEN: 'start.opened_start_screen',
     OPENED_TEAM_REGISTRATION: 'start.opened_team_registration',
   },
+  TEAM: {
+    CREATED: 'team.created',
+    FINISHED_INVITE_STEP: 'team.finished_invite_step',
+    VERIFIED: 'team.verified',
+  },
 };
 
 export function trackEvent(event) {

@@ -28,6 +28,8 @@ const MIXPANEL_TOKEN = Environment.onEnvironment(
 
 export const configureTracking = () => {
   mixpanel.init(MIXPANEL_TOKEN);
+  // Exposing "mixpanel.get_distinct_id()" for test automation
+  window.mixpanel = mixpanel;
   return mixpanel;
 };
 
