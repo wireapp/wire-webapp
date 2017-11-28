@@ -240,17 +240,21 @@
   version "3.0.32"
   resolved "https://registry.yarnpkg.com/@types/long/-/long-3.0.32.tgz#f4e5af31e9e9b196d8e5fca8a5e2e20aa3d60b69"
 
-"@types/node@8.0.17":
-  version "8.0.17"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.0.17.tgz#677bc8c118cfb76013febb62ede1f31d2c7222a1"
-
 "@types/node@8.0.24":
   version "8.0.24"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-8.0.24.tgz#06c580084d9add1fb40c1510ef0b448961246fb1"
 
+"@types/node@8.0.25":
+  version "8.0.25"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.0.25.tgz#66ecaf4df93f5281b48427ee96fbcdfc4f0cdce1"
+
 "@types/node@8.0.50":
   version "8.0.50"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-8.0.50.tgz#dc545448e128c88c4eec7cd64025fcc3b7604541"
+
+"@types/node@8.0.53":
+  version "8.0.53"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.0.53.tgz#396b35af826fa66aad472c8cb7b8d5e277f4e6d8"
 
 "@types/node@^7.0.29":
   version "7.0.46"
@@ -268,29 +272,29 @@
   version "2.3.2"
   resolved "https://registry.yarnpkg.com/@types/tough-cookie/-/tough-cookie-2.3.2.tgz#e0d481d8bb282ad8a8c9e100ceb72c995fb5e709"
 
-"@wireapp/api-client@0.2.7":
-  version "0.2.7"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-0.2.7.tgz#12441daf7fd1a9ec60cf36a4f7639d6ddcdffa41"
+"@wireapp/api-client@0.2.10":
+  version "0.2.10"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-0.2.10.tgz#72d84a2aa9f37fbac9f12e8f4bb7c91585fc32af"
   dependencies:
-    "@types/node" "8.0.50"
+    "@types/node" "8.0.53"
     "@types/spark-md5" "3.0.0"
     "@types/text-encoding" "0.0.32"
     "@types/tough-cookie" "2.3.2"
-    "@wireapp/queue-priority" "0.0.12"
+    "@wireapp/queue-priority" "0.0.13"
     "@wireapp/store-engine" "0.1.1"
-    axios "0.17.0"
+    axios "0.17.1"
     html5-websocket "2.0.1"
     logdown "2.2.0"
     reconnecting-websocket "3.2.2"
     spark-md5 "3.0.0"
     tough-cookie "2.3.3"
 
-"@wireapp/core@0.0.5":
-  version "0.0.5"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-0.0.5.tgz#49b3c1e56c543b54bfde44a018bffef95915bfa1"
+"@wireapp/core@0.0.9":
+  version "0.0.9"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-0.0.9.tgz#2cd3da455f71b5a1cb256b05b0e9ff94414573d0"
   dependencies:
     "@types/node" "8.0.50"
-    "@wireapp/api-client" "0.2.7"
+    "@wireapp/api-client" "0.2.10"
     "@wireapp/protocol-messaging" "1.19.0"
     "@wireapp/store-engine" "0.1.1"
     bazinga64 "5.0.3"
@@ -304,11 +308,11 @@
   dependencies:
     protobufjs "6.8.0"
 
-"@wireapp/queue-priority@0.0.12":
-  version "0.0.12"
-  resolved "https://registry.yarnpkg.com/@wireapp/queue-priority/-/queue-priority-0.0.12.tgz#4d3a9573035449d326b489b732a605d3136b96d7"
+"@wireapp/queue-priority@0.0.13":
+  version "0.0.13"
+  resolved "https://registry.yarnpkg.com/@wireapp/queue-priority/-/queue-priority-0.0.13.tgz#093e475bb37b41f8fd740a0ff0c54b62668f46e8"
   dependencies:
-    "@types/node" "8.0.17"
+    "@types/node" "8.0.25"
 
 "@wireapp/store-engine@0.1.0":
   version "0.1.0"
@@ -657,11 +661,11 @@ aws4@^1.2.1, aws4@^1.6.0:
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/aws4/-/aws4-1.6.0.tgz#83ef5ca860b2b32e4a0deedee8c771b9db57471e"
 
-axios@0.17.0:
-  version "0.17.0"
-  resolved "https://registry.yarnpkg.com/axios/-/axios-0.17.0.tgz#7da747916db803f761651d6091d708789b953c6a"
+axios@0.17.1:
+  version "0.17.1"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-0.17.1.tgz#2d8e3e5d0bdbd7327f91bc814f5c57660f81824d"
   dependencies:
-    follow-redirects "^1.2.3"
+    follow-redirects "^1.2.5"
     is-buffer "^1.1.5"
 
 babel-code-frame@^6.22.0:
@@ -1344,13 +1348,13 @@ debug@2.3.3:
   dependencies:
     ms "0.7.2"
 
-debug@2.6.9, debug@^2.2.0, debug@^2.6.9:
+debug@2.6.9, debug@^2.2.0:
   version "2.6.9"
   resolved "https://registry.yarnpkg.com/debug/-/debug-2.6.9.tgz#5d128515df134ff327e90a4c93f4e077a536341f"
   dependencies:
     ms "2.0.0"
 
-debug@^3.0.1:
+debug@^3.0.1, debug@^3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/debug/-/debug-3.1.0.tgz#5bb5a0672628b64149566ba16819e61518c67261"
   dependencies:
@@ -1931,11 +1935,11 @@ flat-cache@^1.2.1:
     graceful-fs "^4.1.2"
     write "^0.2.1"
 
-follow-redirects@^1.2.3:
-  version "1.2.5"
-  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.2.5.tgz#ffd3e14cbdd5eaa72f61b6368c1f68516c2a26cc"
+follow-redirects@^1.2.5:
+  version "1.2.6"
+  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.2.6.tgz#4dcdc7e4ab3dd6765a97ff89c3b4c258117c79bf"
   dependencies:
-    debug "^2.6.9"
+    debug "^3.1.0"
 
 for-in@^1.0.1:
   version "1.0.2"
