@@ -173,7 +173,9 @@ class CreateAccount extends Component {
                       />
                     </InputBlock>
                     <ErrorMessage data-uie-name="error-message">{parseError(this.props.authError)}</ErrorMessage>
-                    <ErrorMessage data-uie-name="error-message">{parseValidationErrors(this.state.validationErrors)}</ErrorMessage>
+                    <ErrorMessage data-uie-name="error-message">
+                      {parseValidationErrors(this.state.validationErrors)}
+                    </ErrorMessage>
                   </div>
                   <Checkbox
                     onChange={event => this.setState({termsAccepted: event.target.checked})}
