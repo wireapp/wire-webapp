@@ -12,9 +12,11 @@
   <body>
     <div class="auth-page-container">
       <div class="auth-page-navigation">
-        <div class="auth-page-navigation-back" data-bind="click: clicked_on_navigate_back">
-          <svg width="16" height="16" viewBox="0 0 16 16"><path transform="rotate(180 8 8)" fill="#fff" d="M5.8 1.5L7.3 0l8 8-8 8-1.5-1.5L11.3 9H.7V7h10.6"></path></svg>
-        </div>
+        <!-- ko if: visible_section() === z.auth.AuthView.SECTION.ACCOUNT -->
+          <div class="auth-page-navigation-back" data-bind="click: clicked_on_navigate_back">
+            <svg width="16" height="16" viewBox="0 0 16 16"><path transform="rotate(180 8 8)" fill="#fff" d="M5.8 1.5L7.3 0l8 8-8 8-1.5-1.5L11.3 9H.7V7h10.6"></path></svg>
+          </div>
+        <!-- /ko -->
       </div>
       <div class="auth-page">
         <div class="auth-header">
@@ -33,10 +35,10 @@
             <div class="selector selector-mode">
               <!-- ko if: account_mode_login -->
                 <button class="button btn-mode btn-login" data-bind="l10n_text: z.string.auth_account_sign_in"></button>
-              <!-- /ko  -->
+              <!-- /ko -->
               <!-- ko ifnot: account_mode_login -->
                 <button class="button btn-mode btn-register" data-bind="l10n_text: z.string.auth_account_create_account"></button>
-              <!-- /ko  -->
+              <!-- /ko -->
             </div>
 
             <div id="form-account-login" class="form">
