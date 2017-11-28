@@ -804,7 +804,7 @@
         return this.renderer.table(header, body);
       }
       case 'blockquote_start': {
-        body = '';
+        let body = '';
 
         while (this.next().type !== 'blockquote_end') {
           body += this.tok();
@@ -813,7 +813,7 @@
         return this.renderer.blockquote(body);
       }
       case 'list_start': {
-        body = '';
+        let body = '';
         const ordered = this.token.ordered;
 
         while (this.next().type !== 'list_end') {
@@ -823,7 +823,7 @@
         return this.renderer.list(body, ordered);
       }
       case 'list_item_start': {
-        body = '';
+        let body = '';
 
         while (this.next().type !== 'list_item_end') {
           body += this.token.type === 'text' ? this.parseText() : this.tok();
@@ -832,7 +832,7 @@
         return this.renderer.listitem(body);
       }
       case 'loose_item_start': {
-        body = '';
+        let body = '';
 
         while (this.next().type !== 'list_item_end') {
           body += this.tok();
