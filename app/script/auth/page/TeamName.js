@@ -28,9 +28,14 @@ import {COLOR} from '@wireapp/react-ui-kit/Identity';
 import {teamNameStrings} from '../../strings';
 import {injectIntl} from 'react-intl';
 import {withRouter} from 'react-router';
+import {onEnvironment} from '../Environment';
 import * as AuthAction from '../module/action/AuthAction';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import React, {Component} from 'react';
+
+const stagingWireTeamLink = 'https://wire-website-staging.zinfra.io/en/create-team/';
+
+const wireTeamLink = onEnvironment(stagingWireTeamLink, stagingWireTeamLink, 'https://wire.com/en/create-team/');
 
 class TeamName extends Component {
   constructor(props) {
@@ -96,7 +101,7 @@ class TeamName extends Component {
                 </Form>
               </div>
               <div>
-                <Link href="https://wire.com/create-team/" target="_blank" data-uie-name="go-what-is">
+                <Link href={wireTeamLink} target="_blank" data-uie-name="go-what-is">
                   {_(teamNameStrings.whatIsWireTeamsLink)}
                 </Link>
               </div>
