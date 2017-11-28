@@ -19,10 +19,9 @@
 
 export default class ValidationError extends Error {
   constructor(params) {
-    super();
+    super(params.label);
     this.name = this.constructor.name;
     this.label = params.label;
-    this.message = params.label;
   }
 
   is = label => {
@@ -40,12 +39,10 @@ export default class ValidationError extends Error {
   static handleValidationState(fieldName, validationState) {
     const field = ValidationError.getFieldByName(fieldName);
     const validationStateKeys = ValidationError.getAllPropertyNames(validationState);
-    const errorKeys = [];
-    Object.keys(ValidationError.ERROR).forEach(errorName => errorKeys.push(ValidationError.ERROR[errorName]));
     for (const key of validationStateKeys) {
-      if (errorKeys.includes(key) && validationState[key]) {
+      if (Object.values(ValidationError.ERROR).includes(key) && validationState[key]) {
         return new ValidationError({
-          label: field[ValidationError.getErrorByKey(key)],
+          label: field[ValidationError.getErrorKeyByValue(key)],
         });
       }
     }
@@ -61,20 +58,15 @@ export default class ValidationError extends Error {
     VALUE_MISSING: 'valueMissing',
   };
 
-  static getErrorByKey = key => {
-    for (const errorName of Object.keys(ValidationError.ERROR)) {
-      if (ValidationError.ERROR[errorName] === key) {
-        return errorName;
-      }
-    }
+  static getErrorKeyByValue = errorValue => {
+    return Object.entries(ValidationError.ERROR).find(([key, value]) => value === errorValue)[0];
   };
 
   static mapErrorsToField = fieldName => {
-    const errors = {};
-    Object.keys(ValidationError.ERROR).forEach(errorKey => {
-      errors[errorKey] = `${fieldName}-${ValidationError.ERROR[errorKey]}`;
-    });
-    return errors;
+    return Object.entries(ValidationError.ERROR).reduce(
+      (errors, [key, value]) => ({...errors, [key]: `${fieldName}-${value}`}),
+      {}
+    );
   };
 
   static FIELD = {
@@ -83,12 +75,7 @@ export default class ValidationError extends Error {
     PASSWORD: {...ValidationError.mapErrorsToField('password'), name: 'password'},
   };
 
-  static getFieldByName(name) {
-    for (const fieldKey of Object.keys(ValidationError.FIELD)) {
-      const currentField = ValidationError.FIELD[fieldKey];
-      if (currentField.name === name) {
-        return currentField;
-      }
-    }
-  }
+  static getFieldByName = fieldName => {
+    return Object.entries(ValidationError.FIELD).find(([key, value]) => value.name === fieldName)[1];
+  };
 }
