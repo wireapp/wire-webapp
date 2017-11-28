@@ -18,6 +18,7 @@
  */
 
 export * from './ArrowIcon';
+export * from './CheckIcon';
 export * from './PlaneIcon';
 export * from './ProfileIcon';
 export * from './TeamIcon';

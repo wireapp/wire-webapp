@@ -17,24 +17,20 @@
  *
  */
 
-import {COLOR} from '../Identity';
-import {Text} from '../Text';
+import IconBase from './IconBase';
+import React from 'react';
 
-const ErrorMessage = Text.extend`
-  display: block;
-  margin-top: 12px;
-  a {
-    color: inherit;
+class CheckIcon extends IconBase {
+  /* eslint-disable no-magic-numbers */
+  width = 16;
+  height = 12;
+  renderSVG(width, height, color) {
+    return (
+      <svg width={width} height={height} viewBox="0 0 16 12">
+        <path fill={color} d="M5.66 11.86L15.98 1.4 14.58 0 5.65 9.03 1.4 4.8 0 6.2" />
+      </svg>
+    );
   }
-`;
+}
 
-ErrorMessage.defaultProps = {
-  ...Text.defaultProps,
-  bold: true,
-  center: true,
-  color: COLOR.RED,
-  fontSize: '11px',
-  textTransform: 'uppercase',
-};
-
-export {ErrorMessage};
+export {CheckIcon};
