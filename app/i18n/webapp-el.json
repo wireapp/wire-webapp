@@ -13,7 +13,7 @@
   "createAccount.headLine": "",
   "createAccount.namePlaceholder": "Όνομα",
   "createAccount.emailPlaceholder": "",
-  "createAccount.passwordPlaceholder": "",
+  "createAccount.passwordPlaceholder": "Κωδικος προσβασης (το λιγοτερο 8 χαρακτηρες)",
   "createAccount.terms": "",
   "createAccount.nextButton": "Επόμενο",
   "verify.headline": "",

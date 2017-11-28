@@ -175,6 +175,7 @@ z.string.ru.modal_new_device_call_incoming = 'Вы действительно х
 z.string.ru.modal_new_device_call_outgoing = 'Вы действительно хотите позвонить?';
 z.string.ru.modal_new_device_show_device = 'показать устройство';
 z.string.ru.modal_new_device_send_anyway = 'отправить всё равно';
+z.string.ru.modal_not_connected_headline = 'Никто не добален в беседу';
 z.string.ru.modal_not_connected_message_one = '{{name}} не хочет добавляться в разговоры.';
 z.string.ru.modal_not_connected_message_many = 'Один из выбранных контактов не хочет быть добавлен в разговор.';
 z.string.ru.modal_remove_device_button = 'Удалить устройство';

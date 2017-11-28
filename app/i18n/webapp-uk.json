@@ -13,7 +13,7 @@
   "createAccount.headLine": "",
   "createAccount.namePlaceholder": "Ім’я",
   "createAccount.emailPlaceholder": "",
-  "createAccount.passwordPlaceholder": "",
+  "createAccount.passwordPlaceholder": "Пароль (не менше 8 символів)",
   "createAccount.terms": "",
   "createAccount.nextButton": "",
   "verify.headline": "",

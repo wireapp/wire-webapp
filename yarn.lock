@@ -367,14 +367,14 @@
   dependencies:
     "@types/node" "8.0.25"
 
-"@wireapp/react-ui-kit@0.0.11":
-  version "0.0.11"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-0.0.11.tgz#01c0c88920f94cfdc48943c604f252fbff42da01"
+"@wireapp/react-ui-kit@0.0.12":
+  version "0.0.12"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-0.0.12.tgz#72694439e86b2930b94b52c83b3cc866a85bbaa8"
   dependencies:
     color "2.0.1"
     gulp-concat "2.6.1"
     react "16.1.1"
-    react-dom "16.0.0"
+    react-dom "16.1.1"
     styled-components "2.2.3"
     styled-normalize "2.2.1"
 
