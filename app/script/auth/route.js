@@ -22,7 +22,6 @@ export default {
   CREATE_TEAM: '/createteam',
   INDEX: '/',
   INITIAL_INVITE: '/invite',
-  LOGIN: '/login/#login',
-  REGISTER_PERSONAL: '/login/#register',
+  LOGIN: '/login',
   VERIFY: '/verify',
 };

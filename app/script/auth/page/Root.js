@@ -43,7 +43,7 @@ function loadLanguage(language) {
 const Root = ({language}) => (
   <IntlProvider locale={language} messages={loadLanguage(language)}>
     <StyledApp>
-      <Router>
+      <Router hashType="noslash">
         <Content>
           <Switch>
             <Route exact path={ROUTE.INDEX} component={Index} />
