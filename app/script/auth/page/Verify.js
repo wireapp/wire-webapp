@@ -59,7 +59,7 @@ const Verify = ({account, authError, history, intl: {formatMessage: _}, ...conne
             <FormattedHTMLMessage {...verifyStrings.subhead} values={{email: account.email}} />
           </Text>
           <CodeInput autoFocus style={{marginTop: 10}} onCodeComplete={createAccount} data-uie-name="enter-code" />
-          <ErrorMessage>{parseError(authError)}</ErrorMessage>
+          <ErrorMessage data-uie-name="error-message">{parseError(authError)}</ErrorMessage>
         </div>
         <div>
           <Link onClick={resendCode} data-uie-name="do-resend-code">

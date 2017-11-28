@@ -88,7 +88,7 @@ class InitialInvite extends React.PureComponent {
                 <RoundIconButton icon="plane" type="submit" data-uie-name="do-send-invite" />
               </InputSubmitCombo>
             </Form>
-            <ErrorMessage>{parseError(error)}</ErrorMessage>
+            <ErrorMessage data-uie-name="error-message">{parseError(error)}</ErrorMessage>
           </div>
           <div>
             {invites.length ? (

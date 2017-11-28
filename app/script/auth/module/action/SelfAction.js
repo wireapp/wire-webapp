@@ -27,10 +27,8 @@ export function fetchSelf() {
       .getSelf()
       .then(selfUser => {
         return apiClient.teams.team.api.getTeams().then(({teams}) => {
-          const boundTeams = teams.filter(team => team.binding);
-          if (boundTeams) {
-            selfUser.team = boundTeams[0].id;
-          }
+          const [boundTeam] = teams.filter(team => team.binding);
+          selfUser.team = boundTeam && boundTeam.id;
           return selfUser;
         });
       })
