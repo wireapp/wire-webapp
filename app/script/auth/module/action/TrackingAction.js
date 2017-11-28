@@ -33,7 +33,6 @@ export const EVENT_NAME = {
   },
 };
 
-// TODO: Rename to "doTrackEvent"
 export function trackEvent(event) {
   return function(dispatch, getState, {mixpanel}) {
     return Promise.resolve()

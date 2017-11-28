@@ -30,12 +30,29 @@ import * as LanguageSelector from '../module/selector/LanguageSelector';
 import * as InviteSelector from '../module/selector/InviteSelector';
 import {invite} from '../module/action/InviteAction';
 import {fetchSelf} from '../module/action/SelfAction';
+import {trackEvent} from '../module/action/TrackingAction';
 import Page from './Page';
 
 class InitialInvite extends React.PureComponent {
   componentDidMount() {
     this.props.fetchSelf();
   }
+
+  onInviteAction = () => {
+    const {invites, language} = this.props;
+    const nextLocation = `/login?hl=${language}&reason=registration`;
+    const invited = Boolean(invites.length);
+    const invites = invited ? invites.length : 0;
+
+    return Promise.resolve()
+      .then(() => {
+        this.props.trackEvent({
+          attributes: {invited, invites},
+          name: TrackingAction.EVENT_NAME.TEAM.FINISHED_INVITE_STEP,
+        });
+      })
+      .then(() => (window.location = nextLocation));
+  };
 
   renderEmail = email => (
     <div
@@ -53,8 +70,6 @@ class InitialInvite extends React.PureComponent {
   );
 
   render() {
-    const {invites, language, error, intl: {formatMessage: _}, ...connected} = this.props;
-    const nextLocation = `/login?hl=${language}&reason=registration`;
     return (
       <Page isAuthenticated>
         <ContainerXS
@@ -92,11 +107,11 @@ class InitialInvite extends React.PureComponent {
           </div>
           <div>
             {invites.length ? (
-              <ButtonLink href={nextLocation} style={{margin: '0 auto -16px'}} data-uie-name="do-next">
+              <ButtonLink style={{margin: '0 auto -16px'}} onClick={this.onInviteAction} data-uie-name="do-next">
                 {_(inviteStrings.nextButton)}
               </ButtonLink>
             ) : (
-              <Link href={nextLocation} data-uie-name="do-skip">
+              <Link data-uie-name="do-skip" onClick={this.onInviteAction}>
                 {_(inviteStrings.skipForNow)}
               </Link>
             )}
@@ -117,6 +132,7 @@ export default injectIntl(
     {
       fetchSelf,
       invite,
+      trackEvent,
     }
   )(InitialInvite)
 );
