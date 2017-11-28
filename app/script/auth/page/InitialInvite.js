@@ -20,10 +20,11 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {injectIntl} from 'react-intl';
 import {ContainerXS} from '@wireapp/react-ui-kit/Layout';
-import {InputSubmitCombo, Input, RoundIconButton, Form, ButtonLink} from '@wireapp/react-ui-kit/Form';
+import {InputSubmitCombo, Input, RoundIconButton, Form, ButtonLink, ErrorMessage} from '@wireapp/react-ui-kit/Form';
 import {CheckIcon} from '@wireapp/react-ui-kit/Icon';
 import {H1, Text, Link} from '@wireapp/react-ui-kit/Text';
 import {COLOR} from '@wireapp/react-ui-kit/Identity';
+import {parseError} from '../util/errorUtil';
 import * as LanguageSelector from '../module/selector/LanguageSelector';
 import * as InviteSelector from '../module/selector/InviteSelector';
 import {invite} from '../module/action/InviteAction';
@@ -51,7 +52,7 @@ class InitialInvite extends React.PureComponent {
   );
 
   render() {
-    const {invites, language, ...connected} = this.props;
+    const {invites, language, error, ...connected} = this.props;
     const nextLocation = `/login?hl=${language}&reason=registration`;
     return (
       <Page isAuthenticated>
@@ -86,6 +87,7 @@ class InitialInvite extends React.PureComponent {
                 <RoundIconButton icon="plane" type="submit" data-uie-name="do-send-invite" />
               </InputSubmitCombo>
             </Form>
+            <ErrorMessage>{parseError(error)}</ErrorMessage>
           </div>
           <div>
             {invites.length ? (
