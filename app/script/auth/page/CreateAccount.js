@@ -133,7 +133,7 @@ class CreateAccount extends Component {
                       />
                     </CheckboxLabel>
                   </Checkbox>
-                  <Button data-uie-name="do-next" type="submit" style={{margin: '0 auto -16px', width: 184}}>
+                  <Button data-uie-name="do-next" type="submit" style={{margin: '0 auto -16px'}}>
                     {_(createAccountStrings.nextButton)}
                   </Button>
                 </Form>

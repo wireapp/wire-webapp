@@ -21,6 +21,7 @@ import React from 'react';
 import {StyledApp, Content} from '@wireapp/react-ui-kit/Layout';
 import {HashRouter as Router, Redirect, Route, Switch} from 'react-router-dom';
 import Index from './Index';
+import InitialInvite from './InitialInvite';
 import TeamName from './TeamName';
 import CreateAccount from './CreateAccount';
 import Verify from './Verify';
@@ -49,6 +50,7 @@ const Root = ({language}) => (
             <Route path={ROUTE.CREATE_TEAM} component={TeamName} />
             <Route path={ROUTE.CREATE_ACCOUNT} component={CreateAccount} />
             <Route path={ROUTE.VERIFY} component={Verify} />
+            <Route path={ROUTE.INITIAL_INVITE} component={InitialInvite} />
             <Redirect to={ROUTE.INDEX} />
           </Switch>
         </Content>

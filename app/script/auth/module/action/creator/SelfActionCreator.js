@@ -1,3 +1,4 @@
+/* @flow */
 /*
  * Wire
  * Copyright (C) 2017 Wire Swiss GmbH
@@ -17,12 +18,23 @@
  *
  */
 
-export default {
-  CREATE_ACCOUNT: '/createaccount',
-  CREATE_TEAM: '/createteam',
-  INDEX: '/',
-  INITIAL_INVITE: '/invite',
-  LOGIN: '/login/#login',
-  REGISTER_PERSONAL: '/login/#register',
-  VERIFY: '/verify',
-};
+import BackendError from '../BackendError';
+
+export const SELF_FETCH_START = 'SELF_FETCH_START';
+export const SELF_FETCH_SUCCESS = 'SELF_FETCH_SUCCESS';
+export const SELF_FETCH_FAILED = 'SELF_FETCH_FAILED';
+
+export function startFetchSelf(params) {
+  return {params, type: SELF_FETCH_START};
+}
+
+export function successfulFetchSelf(selfUser) {
+  return {payload: selfUser, type: SELF_FETCH_SUCCESS};
+}
+
+export function failedFetchSelf(error) {
+  return {
+    payload: BackendError.handle(error),
+    type: SELF_FETCH_FAILED,
+  };
+}

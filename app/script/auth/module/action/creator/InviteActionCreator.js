@@ -17,12 +17,29 @@
  *
  */
 
-export default {
-  CREATE_ACCOUNT: '/createaccount',
-  CREATE_TEAM: '/createteam',
-  INDEX: '/',
-  INITIAL_INVITE: '/invite',
-  LOGIN: '/login/#login',
-  REGISTER_PERSONAL: '/login/#register',
-  VERIFY: '/verify',
-};
+import BackendError from '../BackendError';
+
+export const INVITE_ADD_START = 'INVITE_ADD_START';
+export const INVITE_ADD_SUCCESS = 'INVITE_ADD_SUCCESS';
+export const INVITE_ADD_FAILED = 'INVITE_ADD_FAILED';
+
+export function startAddInvite(params) {
+  return {
+    params,
+    type: INVITE_ADD_START,
+  };
+}
+
+export function successfulAddInvite(invite) {
+  return {
+    payload: {invite},
+    type: INVITE_ADD_SUCCESS,
+  };
+}
+
+export function failedAddInvite(error) {
+  return {
+    payload: BackendError.handle(error),
+    type: INVITE_ADD_FAILED,
+  };
+}

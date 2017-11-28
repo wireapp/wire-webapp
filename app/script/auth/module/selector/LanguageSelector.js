@@ -17,12 +17,4 @@
  *
  */
 
-export default {
-  CREATE_ACCOUNT: '/createaccount',
-  CREATE_TEAM: '/createteam',
-  INDEX: '/',
-  INITIAL_INVITE: '/invite',
-  LOGIN: '/login/#login',
-  REGISTER_PERSONAL: '/login/#register',
-  VERIFY: '/verify',
-};
+export const getLanguage = state => state.languageState.language;
