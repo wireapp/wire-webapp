@@ -105,25 +105,25 @@ describe('z.util.render_message', () => {
 
   it('renders an email address', () => {
     const expected =
-      'send it over to <a href="#" onclick="z.util.safe_mailto_open(\'hello@wire.com\')">hello@wire.com</a>';
+      'send it over to <a href="mailto:hello@wire.com" onclick="z.util.safe_mailto_open(event, \'hello@wire.com\')">hello@wire.com</a>';
     expect(z.util.render_message('send it over to hello@wire.com')).toBe(expected);
   });
 
   it('renders an email address with pluses', () => {
     const expected =
-      'send it over to <a href="#" onclick="z.util.safe_mailto_open(\'hello+world@wire.com\')">hello+world@wire.com</a>';
+      'send it over to <a href="mailto:hello+world@wire.com" onclick="z.util.safe_mailto_open(event, \'hello+world@wire.com\')">hello+world@wire.com</a>';
     expect(z.util.render_message('send it over to hello+world@wire.com')).toBe(expected);
   });
 
   it('renders an email long domains', () => {
     const expected =
-      'send it over to <a href="#" onclick="z.util.safe_mailto_open(\'janedoe@school.university.edu\')">janedoe@school.university.edu</a>';
+      'send it over to <a href="mailto:janedoe@school.university.edu" onclick="z.util.safe_mailto_open(event, \'janedoe@school.university.edu\')">janedoe@school.university.edu</a>';
     expect(z.util.render_message('send it over to janedoe@school.university.edu')).toBe(expected);
   });
 
   it('renders an email with multiple subdomains', () => {
     const expected =
-      'send it over to <a href="#" onclick="z.util.safe_mailto_open(\'bla@foo.co.uk\')">bla@foo.co.uk</a>';
+      'send it over to <a href="mailto:bla@foo.co.uk" onclick="z.util.safe_mailto_open(event, \'bla@foo.co.uk\')">bla@foo.co.uk</a>';
     expect(z.util.render_message('send it over to bla@foo.co.uk')).toBe(expected);
   });
 

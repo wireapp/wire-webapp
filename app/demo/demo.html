@@ -133,38 +133,37 @@
 
   <script>
     $(function(){
-
       // microbar
       $('.microbar > li').click(function(e) {
-        item = $(e.currentTarget)
+        const item = $(e.currentTarget)
         $('body')
           .removeClass()
           .addClass('theme-' + item.text())
           .addClass('main-accent-color-' + (item.index('li') + 1))
       });
 
-      var previousScroll = 0;
+      let previousScroll = 0;
       $(window).scroll(function(event){
-         var scroll = $(this).scrollTop();
+         let scroll = $(this).scrollTop();
          $('.microbar').toggleClass('microbar-hidden', scroll > previousScroll);
          previousScroll = scroll;
       });
 
       // user avatars animation
       $('.user-avatars-image user-avatar').click(function() {
-        var avatar = $(this).removeClass('user-avatar-loading-transition user-avatar-image-loaded')
+        let avatar = $(this).removeClass('user-avatar-loading-transition user-avatar-image-loaded')
         setTimeout(function() {
           avatar.addClass('user-avatar-loading-transition user-avatar-image-loaded')
         }, 200)
       });
 
       // icons
-      var $icons = $('#icons');
+      const $icons = $('#icons');
       $.each(document.styleSheets[0].cssRules, (function(index, rule) {
         if (rule.selectorText)
-          var match = rule.selectorText.match(/^.(icon-([a-z]|-)+)/);
+          let match = rule.selectorText.match(/^.(icon-([a-z]|-)+)/);
           if (match) {
-            var wrapper = $('<li></li>').appendTo($icons);
+            let wrapper = $('<li></li>').appendTo($icons);
             $('<span></span>')
               .prop('title', match[1])
               .addClass(match[1])
@@ -177,10 +176,9 @@
         new zeta.webapp.module.Bubble({
           host_selector: "#" + ($(this).attr('id')),
           scroll_selector: window,
-          enable_click: true
+          enable_click: true,
         });
       });
-
     });
   </script>
   </body>
