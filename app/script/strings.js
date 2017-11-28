@@ -118,6 +118,29 @@ export const verifyStrings = defineMessages({
   },
 });
 
+export const inviteStrings = defineMessages({
+  headline: {
+    id: 'invite.headline',
+    defaultMessage: 'Build your team',
+  },
+  subhead: {
+    id: 'invite.subhead',
+    defaultMessage: 'Invite your colleagues to join.',
+  },
+  emailPlaceholder: {
+    id: 'invite.emailPlaceholder',
+    defaultMessage: 'colleague@email.com',
+  },
+  skipForNow: {
+    id: 'invite.skipForNow',
+    defaultMessage: 'Skip for now',
+  },
+  nextButton: {
+    id: 'invite.nextButton',
+    defaultMessage: 'Next',
+  },
+});
+
 export const errorHandlerStrings = defineMessages({
   [BackendError.LABEL.ACCESS_DENIED]: {
     id: 'BackendError.LABEL.ACCESS_DENIED',

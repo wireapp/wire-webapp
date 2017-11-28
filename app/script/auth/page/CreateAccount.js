@@ -148,7 +148,7 @@ class CreateAccount extends Component {
                     disabled={this.isSubmitButtonDisabled()}
                     data-uie-name="do-next"
                     type="submit"
-                    style={{margin: '0 auto -16px', width: 184}}
+                    style={{margin: '0 auto -16px'}}
                   >
                     {_(createAccountStrings.nextButton)}
                   </Button>
