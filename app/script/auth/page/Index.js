@@ -34,7 +34,10 @@ class Index extends Component {
   }
 
   onRegisterPersonalClick = () =>
-    this.trackAndNavigate(TrackingAction.EVENT_NAME.START.OPENED_PERSON_REGISTRATION, ROUTE.REGISTER_PERSONAL);
+    this.trackAndNavigate(
+      TrackingAction.EVENT_NAME.START.OPENED_PERSON_REGISTRATION,
+      `${ROUTE.REGISTER_PERSONAL}?hl=${this.props.language}`
+    );
 
   onRegisterTeamClick = () => {
     return Promise.resolve()
@@ -44,7 +47,8 @@ class Index extends Component {
       .then(() => this.props.history.push(ROUTE.CREATE_TEAM));
   };
 
-  onLoginClick = () => this.trackAndNavigate(TrackingAction.EVENT_NAME.START.OPENED_LOGIN, ROUTE.LOGIN);
+  onLoginClick = () =>
+    this.trackAndNavigate(TrackingAction.EVENT_NAME.START.OPENED_LOGIN, `${ROUTE.LOGIN}?hl=${this.props.language}`);
 
   trackAndNavigate = (eventName, url) => {
     return Promise.resolve()
@@ -98,4 +102,4 @@ class Index extends Component {
   }
 }
 
-export default injectIntl(connect(null, TrackingAction)(Index));
+export default injectIntl(connect(({languageState}) => ({language: languageState.language}), TrackingAction)(Index));

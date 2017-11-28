@@ -13,7 +13,7 @@
   "createAccount.headLine": "",
   "createAccount.namePlaceholder": "Nome",
   "createAccount.emailPlaceholder": "",
-  "createAccount.passwordPlaceholder": "",
+  "createAccount.passwordPlaceholder": "Palavra-passe (pelo menos 8 caracteres)",
   "createAccount.terms": "",
   "createAccount.nextButton": "Seguinte",
   "verify.headline": "",

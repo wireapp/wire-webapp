@@ -13,7 +13,7 @@
   "createAccount.headLine": "",
   "createAccount.namePlaceholder": "Meno",
   "createAccount.emailPlaceholder": "",
-  "createAccount.passwordPlaceholder": "",
+  "createAccount.passwordPlaceholder": "Heslo (minimálne 8 znakov)",
   "createAccount.terms": "",
   "createAccount.nextButton": "",
   "verify.headline": "",
