@@ -18,11 +18,15 @@
  */
 
 import authReducer from './authReducer';
+import inviteReducer from './inviteReducer';
 import languageReducer from './languageReducer';
+import selfReducer from './selfReducer';
 
 const reducers = {
   authState: authReducer,
+  inviteState: inviteReducer,
   languageState: languageReducer,
+  selfState: selfReducer,
 };
 
 export default reducers;

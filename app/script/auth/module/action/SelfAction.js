@@ -1,3 +1,4 @@
+/* @flow */
 /*
  * Wire
  * Copyright (C) 2017 Wire Swiss GmbH
@@ -17,11 +18,21 @@
  *
  */
 
-export default {
-  CREATE_ACCOUNT: '/createaccount',
-  CREATE_TEAM: '/createteam',
-  INDEX: '/',
-  INITIAL_INVITE: '/invite',
-  LOGIN: '/login',
-  VERIFY: '/verify',
-};
+import * as SelfActionCreator from './creator/SelfActionCreator';
+
+export function fetchSelf() {
+  return function(dispatch, getState, {apiClient}) {
+    dispatch(SelfActionCreator.startFetchSelf());
+    return apiClient.self.api
+      .getSelf()
+      .then(selfUser => {
+        return apiClient.teams.team.api.getTeams().then(({teams}) => {
+          const [boundTeam] = teams.filter(team => team.binding);
+          selfUser.team = boundTeam && boundTeam.id;
+          return selfUser;
+        });
+      })
+      .then(selfUser => dispatch(SelfActionCreator.successfulFetchSelf(selfUser)))
+      .catch(error => dispatch(SelfActionCreator.failedFetchSelf(error)));
+  };
+}

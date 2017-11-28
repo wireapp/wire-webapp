@@ -88,16 +88,17 @@ export default function reducer(state = initialState, action) {
       return {
         ...state,
         account: {...initialState.account},
+        error: null,
         fetched: true,
         fetching: false,
         isAuthenticated: true,
       };
     }
     case AuthActionCreator.REGISTER_PUSH_ACCOUNT_DATA: {
-      return {...state, account: {...state.account, ...action.payload}};
+      return {...state, account: {...state.account, ...action.payload}, error: null};
     }
     case AuthActionCreator.REGISTER_RESET_ACCOUNT_DATA: {
-      return {...state, account: {...initialState.account}};
+      return {...state, account: {...initialState.account}, error: null};
     }
     case AuthActionCreator.LOGOUT_SUCCESS: {
       return {...initialState};

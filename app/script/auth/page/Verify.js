@@ -42,7 +42,7 @@ const Verify = ({account, authError, history, intl: {formatMessage: _}, ...conne
         connected.trackEvent({attributes: undefined, name: TrackingAction.EVENT_NAME.TEAM.CREATED});
         connected.trackEvent({attributes: undefined, name: TrackingAction.EVENT_NAME.TEAM.VERIFIED});
       })
-      .then(() => (window.location = '/login?reason=registration'))
+      .then(() => history.push(ROUTE.INITIAL_INVITE))
       .catch(error => console.error('Failed to create account', error));
   };
   const resendCode = event => {
@@ -63,13 +63,8 @@ const Verify = ({account, authError, history, intl: {formatMessage: _}, ...conne
           <Text data-uie-name="label-with-email">
             <FormattedHTMLMessage {...verifyStrings.subhead} values={{email: account.email}} />
           </Text>
-          <CodeInput
-            autoFocus
-            style={{marginTop: 10}}
-            onCodeComplete={code => createAccount(code)}
-            data-uie-name="enter-code"
-          />
-          <ErrorMessage>{parseError(authError)}</ErrorMessage>
+          <CodeInput autoFocus style={{marginTop: 10}} onCodeComplete={createAccount} data-uie-name="enter-code" />
+          <ErrorMessage data-uie-name="error-message">{parseError(authError)}</ErrorMessage>
         </div>
         <div>
           <Link onClick={resendCode} data-uie-name="do-resend-code">

@@ -42,7 +42,7 @@ class CreateAccount extends Component {
       email: this.props.account.email,
       name: this.props.account.name,
       password: this.props.account.password,
-      termsAccepted: false,
+      termsAccepted: this.props.account.termsAccepted,
     };
   }
 
@@ -76,7 +76,7 @@ class CreateAccount extends Component {
             <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
               <ContainerXS
                 centerText
-                style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
+                style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 428}}
               >
                 <H1 center>{_(createAccountStrings.headLine)}</H1>
                 <Form
@@ -128,12 +128,13 @@ class CreateAccount extends Component {
                         data-uie-name="enter-password"
                       />
                     </InputBlock>
-                    <ErrorMessage>{parseError(this.props.authError)}</ErrorMessage>
+                    <ErrorMessage data-uie-name="error-message">{parseError(this.props.authError)}</ErrorMessage>
                   </div>
                   <Checkbox
                     onChange={event => this.setState({termsAccepted: event.target.checked})}
                     name="accept"
                     required
+                    defaultChecked={this.state.termsAccepted}
                     data-uie-name="do-terms"
                     style={{justifyContent: 'center'}}
                   >
@@ -148,7 +149,7 @@ class CreateAccount extends Component {
                     disabled={this.isSubmitButtonDisabled()}
                     data-uie-name="do-next"
                     type="submit"
-                    style={{margin: '0 auto -16px', width: 184}}
+                    style={{margin: '0 auto -16px'}}
                   >
                     {_(createAccountStrings.nextButton)}
                   </Button>
