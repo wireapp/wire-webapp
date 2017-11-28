@@ -17,9 +17,9 @@
  *
  */
 
-import styled, {css} from 'styled-components';
 import {COLOR} from '../Identity';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
 const Text = styled.span`
   /* appearance */
@@ -29,21 +29,13 @@ const Text = styled.span`
   opacity: ${props => (props.muted ? '0.5' : '1')};
   text-align: ${props => (props.center ? 'center' : 'left')};
   text-transform: ${props => props.textTransform};
-  ${props => {
-    if (props.noWrap) {
-      return css`
-        white-space: nowrap;
-      `;
-    }
-  }};
-  ${props => {
-    if (props.truncate) {
-      return css`
+  ${props => props.noWrap && 'white-space: nowrap;'};
+  ${props =>
+    props.truncate &&
+    `
         overflow: hidden;
         text-overflow: ellipsis;
-      `;
-    }
-  }};
+      `};
 `;
 
 Text.propTypes = {
