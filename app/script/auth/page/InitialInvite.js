@@ -16,6 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+import * as TrackingAction from '../module/action/TrackingAction';
 import React from 'react';
 import {connect} from 'react-redux';
 import {injectIntl} from 'react-intl';
@@ -30,7 +31,6 @@ import * as LanguageSelector from '../module/selector/LanguageSelector';
 import * as InviteSelector from '../module/selector/InviteSelector';
 import {invite} from '../module/action/InviteAction';
 import {fetchSelf} from '../module/action/SelfAction';
-import {trackEvent} from '../module/action/TrackingAction';
 import Page from './Page';
 
 class InitialInvite extends React.PureComponent {
@@ -134,7 +134,7 @@ export default injectIntl(
     {
       fetchSelf,
       invite,
-      trackEvent,
+      ...TrackingAction,
     }
   )(InitialInvite)
 );
