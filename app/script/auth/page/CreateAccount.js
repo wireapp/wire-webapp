@@ -172,8 +172,8 @@ class CreateAccount extends Component {
                         data-uie-name="enter-password"
                       />
                     </InputBlock>
-                    <ErrorMessage>{parseError(this.props.authError)}</ErrorMessage>
-                    <ErrorMessage>{parseValidationErrors(this.state.validationErrors)}</ErrorMessage>
+                    <ErrorMessage data-uie-name="error-message">{parseError(this.props.authError)}</ErrorMessage>
+                    <ErrorMessage data-uie-name="error-message">{parseValidationErrors(this.state.validationErrors)}</ErrorMessage>
                   </div>
                   <Checkbox
                     onChange={event => this.setState({termsAccepted: event.target.checked})}
@@ -193,7 +193,7 @@ class CreateAccount extends Component {
                     disabled={this.isSubmitButtonDisabled()}
                     formNoValidate
                     type="submit"
-                    style={{margin: '0 auto -16px', width: 184}}
+                    style={{margin: '0 auto -16px'}}
                     data-uie-name="do-next"
                   >
                     {_(createAccountStrings.nextButton)}

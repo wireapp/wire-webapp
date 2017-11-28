@@ -17,11 +17,5 @@
  *
  */
 
-export default {
-  CREATE_ACCOUNT: '/createaccount',
-  CREATE_TEAM: '/createteam',
-  INDEX: '/',
-  INITIAL_INVITE: '/invite',
-  LOGIN: '/login',
-  VERIFY: '/verify',
-};
+export const getSelfName = state => state.selfState.self.name;
+export const getSelfTeamId = state => state.selfState.self.team;

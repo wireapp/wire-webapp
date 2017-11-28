@@ -36,7 +36,7 @@ class Index extends Component {
   onRegisterPersonalClick = () =>
     this.trackAndNavigate(
       TrackingAction.EVENT_NAME.START.OPENED_PERSON_REGISTRATION,
-      `${ROUTE.REGISTER_PERSONAL}?hl=${this.props.language}`
+      `${ROUTE.LOGIN}?hl=${this.props.language}#register`
     );
 
   onRegisterTeamClick = () => {
@@ -48,7 +48,10 @@ class Index extends Component {
   };
 
   onLoginClick = () =>
-    this.trackAndNavigate(TrackingAction.EVENT_NAME.START.OPENED_LOGIN, `${ROUTE.LOGIN}?hl=${this.props.language}`);
+    this.trackAndNavigate(
+      TrackingAction.EVENT_NAME.START.OPENED_LOGIN,
+      `${ROUTE.LOGIN}?hl=${this.props.language}#login`
+    );
 
   trackAndNavigate = (eventName, url) => {
     return Promise.resolve()

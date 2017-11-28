@@ -17,11 +17,28 @@
  *
  */
 
-export default {
-  CREATE_ACCOUNT: '/createaccount',
-  CREATE_TEAM: '/createteam',
-  INDEX: '/',
-  INITIAL_INVITE: '/invite',
-  LOGIN: '/login',
-  VERIFY: '/verify',
+import * as InviteActionCreator from '../action/creator/InviteActionCreator';
+
+const initialState = {
+  error: null,
+  invites: [],
 };
+
+export default function inviteReducer(state = initialState, action) {
+  switch (action.type) {
+    case InviteActionCreator.INVITE_ADD_SUCCESS: {
+      return {
+        error: null,
+        invites: [...state.invites, action.payload.invite],
+      };
+    }
+    case InviteActionCreator.INVITE_ADD_FAILED: {
+      return {
+        ...state,
+        error: action.payload,
+      };
+    }
+    default:
+      return state;
+  }
+}
