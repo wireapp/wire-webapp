@@ -19,6 +19,7 @@
 
 import {defineMessages} from 'react-intl';
 import BackendError from './auth/module/action/BackendError';
+import ValidationError from './auth/module/action/ValidationError';
 
 /* eslint-disable sort-keys */
 
@@ -224,6 +225,25 @@ export const errorHandlerStrings = defineMessages({
     id: 'BackendError.LABEL.EMAIL_EXISTS',
     defaultMessage:
       'This email address is already in use. <a target="_blank" rel="noopener noreferrer" href="https://support.wire.com/hc/articles/115004082129">Learn more</a>',
+  },
+  unexpected: {
+    id: 'BackendError.unexpected',
+    defaultMessage: 'Unexpected error ({code} {message})',
+  },
+});
+
+export const validationErrorStrings = defineMessages({
+  [ValidationError.FIELD.NAME.PATTERN_MISMATCH]: {
+    id: 'ValidationError.FIELD.NAME.PATTERN_MISMATCH',
+    defaultMessage: 'Enter a name with at least 2 characters',
+  },
+  [ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH]: {
+    id: 'ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH',
+    defaultMessage: 'Enter a password with at least 8 characters',
+  },
+  [ValidationError.FIELD.EMAIL.TYPE_MISMATCH]: {
+    id: 'ValidationError.FIELD.EMAIL.TYPE_MISMATCH',
+    defaultMessage: 'Please enter a valid email address.',
   },
   unexpected: {
     id: 'BackendError.unexpected',

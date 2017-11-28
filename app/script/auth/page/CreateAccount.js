@@ -26,11 +26,12 @@ import {Form, Input, InputBlock, Button, Checkbox, CheckboxLabel, ErrorMessage} 
 import {H1, Link} from '@wireapp/react-ui-kit/Text';
 import {injectIntl, FormattedHTMLMessage} from 'react-intl';
 import {Link as RRLink} from 'react-router-dom';
-import {parseError} from '../util/errorUtil';
+import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {withRouter} from 'react-router';
 import * as AuthAction from '../module/action/AuthAction';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as UserAction from '../module/action/UserAction';
+import ValidationError from '../module/action/ValidationError';
 import Page from './Page';
 import React, {Component} from 'react';
 import ROUTE from '../route';
@@ -38,17 +39,39 @@ import ROUTE from '../route';
 class CreateAccount extends Component {
   constructor(props) {
     super(props);
+    this.inputs = {};
     this.state = {
       email: this.props.account.email,
       name: this.props.account.name,
       password: this.props.account.password,
       termsAccepted: false,
+      validInputs: {
+        email: true,
+        name: true,
+        password: true,
+      },
+      validationErrors: [],
     };
   }
 
   handleSubmit = event => {
     event.preventDefault();
+    const validInputs = this.state.validInputs;
+    const errors = [];
+    for (const inputKey of Object.keys(this.inputs)) {
+      const currentInput = this.inputs[inputKey];
+      if (!currentInput.checkValidity()) {
+        errors.push(ValidationError.handleValidationState(currentInput.name, currentInput.validity));
+      }
+      validInputs[inputKey] = currentInput.validity.valid;
+    }
+    this.setState({validInputs, validationErrors: errors});
     return Promise.resolve()
+      .then(() => {
+        if (errors.length > 0) {
+          throw errors[0];
+        }
+      })
       .then(() => this.props.pushAccountRegistrationData({...this.state}))
       .then(() => this.props.doSendActivationCode(this.state.email))
       .then(() => this.props.history.push(ROUTE.VERIFY))
@@ -92,7 +115,14 @@ class CreateAccount extends Component {
                     <InputBlock>
                       <Input
                         name="name"
-                        onChange={event => this.setState({name: event.target.value})}
+                        onChange={event =>
+                          this.setState({
+                            name: event.target.value,
+                            validInputs: {...this.state.validInputs, name: true},
+                          })
+                        }
+                        innerRef={node => (this.inputs.name = node)}
+                        markInvalid={!this.state.validInputs.name}
                         defaultValue={this.state.name}
                         autoComplete="section-create-team username"
                         placeholder={_(createAccountStrings.namePlaceholder)}
@@ -105,7 +135,14 @@ class CreateAccount extends Component {
                       />
                       <Input
                         name="email"
-                        onChange={event => this.setState({email: event.target.value})}
+                        onChange={event =>
+                          this.setState({
+                            email: event.target.value,
+                            validInputs: {...this.state.validInputs, email: true},
+                          })
+                        }
+                        innerRef={node => (this.inputs.email = node)}
+                        markInvalid={!this.state.validInputs.email}
                         defaultValue={this.state.email}
                         autoComplete="section-create-team email"
                         placeholder={_(createAccountStrings.emailPlaceholder)}
@@ -117,7 +154,14 @@ class CreateAccount extends Component {
                       />
                       <Input
                         name="password"
-                        onChange={event => this.setState({password: event.target.value})}
+                        onChange={event =>
+                          this.setState({
+                            password: event.target.value,
+                            validInputs: {...this.state.validInputs, password: true},
+                          })
+                        }
+                        innerRef={node => (this.inputs.password = node)}
+                        markInvalid={!this.state.validInputs.password}
                         defaultValue={this.state.password}
                         autoComplete="section-create-team new-password"
                         type="password"
@@ -130,6 +174,7 @@ class CreateAccount extends Component {
                       />
                     </InputBlock>
                     <ErrorMessage>{parseError(this.props.authError)}</ErrorMessage>
+                    <ErrorMessage>{parseValidationErrors(this.state.validationErrors)}</ErrorMessage>
                   </div>
                   <Checkbox
                     onChange={event => this.setState({termsAccepted: event.target.checked})}
@@ -147,9 +192,10 @@ class CreateAccount extends Component {
                   </Checkbox>
                   <Button
                     disabled={this.isSubmitButtonDisabled()}
-                    data-uie-name="do-next"
+                    formNoValidate
                     type="submit"
                     style={{margin: '0 auto -16px', width: 184}}
+                    data-uie-name="do-next"
                   >
                     {_(createAccountStrings.nextButton)}
                   </Button>

@@ -17,7 +17,7 @@
  *
  */
 
-import {errorHandlerStrings} from '../../strings';
+import {errorHandlerStrings, validationErrorStrings} from '../../strings';
 import {FormattedHTMLMessage} from 'react-intl';
 import React from 'react';
 
@@ -27,5 +27,29 @@ export function parseError(error) {
       return <FormattedHTMLMessage {...errorHandlerStrings[error.label]} />;
     }
     return <FormattedHTMLMessage {...errorHandlerStrings.unexpected} values={error} />;
+  }
+}
+
+export function parseValidationErrors(errors) {
+  if (errors && errors.length) {
+    const errorHtmlArray = [];
+    for (const error of errors) {
+      if (validationErrorStrings.hasOwnProperty(error.label)) {
+        errorHtmlArray.push(
+          <span>
+            <FormattedHTMLMessage key={errors.indexOf(error)} {...validationErrorStrings[error.label]} />
+            <br />
+          </span>
+        );
+      } else {
+        errorHtmlArray.push(
+          <span>
+            <FormattedHTMLMessage key={errors.indexOf(error)} {...validationErrorStrings.unexpected} values={error} />
+            <br />
+          </span>
+        );
+      }
+    }
+    return errorHtmlArray;
   }
 }
