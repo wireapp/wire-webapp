@@ -19,6 +19,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {injectIntl} from 'react-intl';
+import {inviteStrings} from '../../strings';
 import {ContainerXS} from '@wireapp/react-ui-kit/Layout';
 import {InputSubmitCombo, Input, RoundIconButton, Form, ButtonLink, ErrorMessage} from '@wireapp/react-ui-kit/Form';
 import {CheckIcon} from '@wireapp/react-ui-kit/Icon';
@@ -52,7 +53,7 @@ class InitialInvite extends React.PureComponent {
   );
 
   render() {
-    const {invites, language, error, ...connected} = this.props;
+    const {invites, language, error, intl: {formatMessage: _}, ...connected} = this.props;
     const nextLocation = `/login?hl=${language}&reason=registration`;
     return (
       <Page isAuthenticated>
@@ -62,8 +63,8 @@ class InitialInvite extends React.PureComponent {
           style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 428}}
         >
           <div>
-            <H1 center>{'Build your team'}</H1>
-            <Text>{'Invite your colleagues to join.'}</Text>
+            <H1 center>{_(inviteStrings.headline)}</H1>
+            <Text>{_(inviteStrings.subhead)}</Text>
           </div>
           <div style={{margin: '18px 0'}}>
             {invites.map(({email}) => this.renderEmail(email))}
@@ -78,7 +79,7 @@ class InitialInvite extends React.PureComponent {
               <InputSubmitCombo>
                 <Input
                   name="email"
-                  placeholder={'colleague@email.com'}
+                  placeholder={_(inviteStrings.emailPlaceholder)}
                   type="email"
                   innerRef={node => (this.emailInput = node)}
                   autoFocus
@@ -92,11 +93,11 @@ class InitialInvite extends React.PureComponent {
           <div>
             {invites.length ? (
               <ButtonLink href={nextLocation} style={{margin: '0 auto -16px'}} data-uie-name="do-next">
-                Next
+                {_(inviteStrings.nextButton)}
               </ButtonLink>
             ) : (
               <Link href={nextLocation} data-uie-name="do-skip">
-                Skip for now
+                {_(inviteStrings.skipForNow)}
               </Link>
             )}
           </div>

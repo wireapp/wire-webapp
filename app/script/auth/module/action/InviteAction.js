@@ -25,9 +25,7 @@ import BackendError from './BackendError';
 
 export function invite(invitation) {
   const params = [...arguments];
-  console.log(invitation);
   return function(dispatch, getState, {apiClient}) {
-    console.log('in invite');
     const state = getState();
     const inviteList = InviteSelector.getInvites(state);
     const invitationEmail = invitation.email && invitation.email.toLowerCase();
@@ -40,24 +38,12 @@ export function invite(invitation) {
     invitation.locale = languageSelector.getLanguage(state);
     invitation.inviter_name = selfSelector.getSelfName(state);
     const teamId = selfSelector.getSelfTeamId(state);
-    console.log(invitation);
     return Promise.resolve()
       .then(() => apiClient.teams.invitation.api.postInvitation(teamId, invitation))
       .then(createdInvite => dispatch(InviteActionCreator.successfulAddInvite(createdInvite)))
-      /*      .then(() =>
-        dispatch(
-          TrackingAction.trackEvent({
-            action: 'invited_member',
-            category: 'team',
-            name: JSON.stringify({team_size: members && members.length}),
-          })
-        )
-      )
-*/ .catch(
-        error => {
-          dispatch(InviteActionCreator.failedAddInvite(error));
-          throw BackendError.handle(error);
-        }
-      );
+      .catch(error => {
+        dispatch(InviteActionCreator.failedAddInvite(error));
+        throw BackendError.handle(error);
+      });
   };
 }
