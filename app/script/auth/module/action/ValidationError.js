@@ -18,10 +18,10 @@
  */
 
 export default class ValidationError extends Error {
-  constructor(params) {
-    super(params.label);
+  constructor(label) {
+    super(label);
     this.name = this.constructor.name;
-    this.label = params.label;
+    this.label = label;
   }
 
   is = label => {
