@@ -38,16 +38,15 @@ class InitialInvite extends React.PureComponent {
     this.props.fetchSelf();
   }
 
-  onInviteAction = () => {
+  onInviteDone = () => {
     const {invites, language} = this.props;
     const nextLocation = `/login?hl=${language}&reason=registration`;
     const invited = Boolean(invites.length);
-    const amountOfInvites = invited ? invites.length : 0;
 
     return Promise.resolve()
       .then(() => {
         this.props.trackEvent({
-          attributes: {invited, invites: amountOfInvites},
+          attributes: {invited, invites: invites.length},
           name: TrackingAction.EVENT_NAME.TEAM.FINISHED_INVITE_STEP,
         });
       })
@@ -107,11 +106,11 @@ class InitialInvite extends React.PureComponent {
           </div>
           <div>
             {invites.length ? (
-              <ButtonLink style={{margin: '0 auto -16px'}} onClick={this.onInviteAction} data-uie-name="do-next">
+              <ButtonLink style={{margin: '0 auto -16px'}} onClick={this.onInviteDone} data-uie-name="do-next">
                 {_(inviteStrings.nextButton)}
               </ButtonLink>
             ) : (
-              <Link data-uie-name="do-skip" onClick={this.onInviteAction}>
+              <Link data-uie-name="do-skip" onClick={this.onInviteDone}>
                 {_(inviteStrings.skipForNow)}
               </Link>
             )}
