@@ -161,7 +161,7 @@ describe('ConversationRepository', () => {
   describe('delete_message_everyone', () => {
     beforeEach(() => {
       conversation_et = _generate_conversation(z.conversation.ConversationType.REGULAR);
-      spyOn(TestFactory.conversation_repository, '_send_generic_message').and.returnValue(Promise.resolve());
+      spyOn(TestFactory.conversation_repository, '_sendGenericMessage').and.returnValue(Promise.resolve());
     });
 
     it('should not delete other users messages', done => {
@@ -960,7 +960,7 @@ describe('ConversationRepository', () => {
     });
   });
 
-  describe('_should_send_as_external', () => {
+  describe('_shouldSendAsExternal', () => {
     it('should return true for big payload', done => {
       const external_conversation_et = _generate_conversation();
       external_conversation_et.participating_user_ids(_.range(128));
@@ -976,7 +976,7 @@ describe('ConversationRepository', () => {
             )
           );
 
-          return TestFactory.conversation_repository._should_send_as_external(
+          return TestFactory.conversation_repository._shouldSendAsExternal(
             external_conversation_et.id,
             generic_message
           );
@@ -998,7 +998,7 @@ describe('ConversationRepository', () => {
           const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
           generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, new z.proto.Text('Test'));
 
-          return TestFactory.conversation_repository._should_send_as_external(
+          return TestFactory.conversation_repository._shouldSendAsExternal(
             external_conversation_et.id,
             generic_message
           );

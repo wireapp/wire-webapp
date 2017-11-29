@@ -117,6 +117,7 @@ z.tracking.EventName = {
   },
   SETTINGS: {
     EDITED_USERNAME: 'settings.edited_username',
+    OPENED_MANAGE_TEAM: 'settings.opened_manage_team',
     OPTED_IN_TRACKING: 'settings.opted_in_tracking',
     OPTED_OUT_TRACKING: 'settings.opted_out_tracking',
     REMOVED_DEVICE: 'settings.removed_device',

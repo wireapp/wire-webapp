@@ -907,7 +907,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
   changed_country_code(view_model, event) {
     let country_iso;
-    const country_code_value = event ? event.currentTarget.value : undefined || this.country_code();
+    const country_code_value = event ? event.currentTarget.value : this.country_code();
     const country_code_matches = country_code_value.match(/\d+/g) || [];
     const country_code = country_code_matches.join('').substr(0, 4);
 
@@ -936,7 +936,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
   }
 
   clear_error(mode, input_event) {
-    const error_mode = input_event ? input_event.currentTarget.classList[1] : undefined || mode;
+    const error_mode = input_event ? input_event.currentTarget.classList[1] : mode;
     this._remove_error(error_mode);
   }
 
