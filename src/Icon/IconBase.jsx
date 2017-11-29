@@ -28,6 +28,7 @@ class IconBase extends React.PureComponent {
     color: PropTypes.string,
     height: PropTypes.number,
     scale: PropTypes.number,
+    style: PropTypes.object,
     width: PropTypes.number,
   };
 
@@ -35,21 +36,22 @@ class IconBase extends React.PureComponent {
     color: '#000',
     height: null,
     scale: 1,
+    style: null,
     width: null,
   };
 
   render() {
-    const {color, height, scale, width} = this.props;
+    const {color, height, scale, style, width} = this.props;
     let newScale = scale;
     if (width || height) {
       const widthScale = width ? width / this.width : Infinity;
       const heightScale = height ? height / this.height : Infinity;
       newScale = Math.min(widthScale, heightScale);
     }
-    return this.renderSVG(this.width * newScale, this.height * newScale, color);
+    return this.renderSVG(this.width * newScale, this.height * newScale, color, style);
   }
 
-  renderSVG(width, height, color) {
+  renderSVG(width, height, color, style) {
     return null;
   }
 }

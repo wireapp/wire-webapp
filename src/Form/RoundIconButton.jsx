@@ -41,7 +41,7 @@ const Button = RoundContainer.withComponent('button').extend`
 const RoundIconButton = ({icon, iconColor, iconHeight, iconWidth, ...props}) => (
   <Button {...props}>
     {icon === 'plane' ? (
-      <PlaneIcon color={iconColor} height={iconHeight} width={iconWidth} />
+      <PlaneIcon color={iconColor} height={iconHeight} width={iconWidth} style={{marginLeft: 2}} />
     ) : (
       <ArrowIcon color={iconColor} height={iconHeight} width={iconWidth} />
     )}
