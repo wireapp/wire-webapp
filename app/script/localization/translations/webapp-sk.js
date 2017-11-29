@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 z.string.sk.wire = 'Wire';
 z.string.sk.wire_macos = 'Wire pre macOS';
 z.string.sk.wire_windows = 'Wire pre Windows';
@@ -572,3 +570,4 @@ z.string.sk.ephememal_units_hour = 'hodina';
 z.string.sk.ephememal_units_hours = 'hodiny';
 z.string.sk.ephememal_units_day = 'deň';
 z.string.sk.ephememal_units_days = 'dni';
+

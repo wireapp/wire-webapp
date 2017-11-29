@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 z.string.hr.wire_macos = 'Wire za macOS';
 z.string.hr.wire_windows = 'Wire za Windows';
 z.string.hr.wire_linux = 'Wire za Linux';
@@ -221,7 +219,6 @@ z.string.hr.conversation_edit_timestamp = 'Promijenjeno na {{date}}';
 z.string.hr.conversation_likes_caption = '{{number}} ljudi';
 z.string.hr.conversation_send_pasted_file = 'Slika zaljepljena na {{date}}';
 z.string.hr.conversation_someone = 'Netko';
-
 
 z.string.hr.archive_header = 'Arhiviraj';
 
@@ -483,3 +480,4 @@ z.string.hr.ephememal_units_hour = 'sat';
 z.string.hr.ephememal_units_hours = 'sati';
 z.string.hr.ephememal_units_day = 'dan';
 z.string.hr.ephememal_units_days = 'dani';
+

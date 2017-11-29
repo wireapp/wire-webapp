@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 z.string.tr.wire_macos = 'MacOS için Wire';
 z.string.tr.wire_windows = 'Windows için Wire';
 z.string.tr.wire_linux = 'Linux için Wire';
@@ -126,6 +124,7 @@ z.string.tr.modal_button_send = 'Gönder';
 z.string.tr.modal_block_conversation_headline = '{{user}} engellensin mi?';
 z.string.tr.modal_block_conversation_message = '{{user}} sizinle iletişim kuramayacak ve sizi grup konuşmalarına ekleyemeyecek.';
 z.string.tr.modal_block_conversation_button = 'Engelle';
+z.string.tr.modal_bots_unavailable_headline = 'Botlar şuanda uygun değil';
 z.string.tr.modal_call_conversation_empty_headline = 'Arayacak kimse yok';
 z.string.tr.modal_call_conversation_empty_message = 'Burada kimse kalmadı.';
 z.string.tr.modal_call_no_video_in_group_headline = 'Gruplarda görüntülü konuşma yok';
@@ -174,6 +173,7 @@ z.string.tr.modal_new_device_call_incoming = 'Hala aramayı kabul etmek istiyor 
 z.string.tr.modal_new_device_call_outgoing = 'Hala aramayı istiyor musunuz?';
 z.string.tr.modal_new_device_show_device = 'cihazı göster';
 z.string.tr.modal_new_device_send_anyway = 'yine de gönder';
+z.string.tr.modal_not_connected_headline = 'Hiç kimseye konuşmaya katılmadı';
 z.string.tr.modal_remove_device_button = 'Cihazı kaldır';
 z.string.tr.modal_remove_device_headline = '"{{device}}" cihazını kaldır';
 z.string.tr.modal_remove_device_message = 'Cihazı kaldırmak için şifreniz gereklidir.';
@@ -564,3 +564,4 @@ z.string.tr.ephememal_units_hour = 'saat';
 z.string.tr.ephememal_units_hours = 'saat';
 z.string.tr.ephememal_units_day = 'gün';
 z.string.tr.ephememal_units_days = 'gün';
+

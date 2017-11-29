@@ -56,6 +56,16 @@ def auth():
   return response
 
 
+@application.route('/login/')
+@main.latest_browser_required
+def login():
+  response = flask.make_response(flask.render_template(
+    'login/index.html',
+    country=util.geoip_country(),
+  ))
+  return response
+
+
 @application.route('/robots.txt')
 def robots_txt():
   response = flask.make_response(flask.render_template('robots.txt'))

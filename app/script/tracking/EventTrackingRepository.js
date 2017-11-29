@@ -17,7 +17,6 @@
  *
  */
 
-/* eslint-disable no-undef */
 'use strict';
 
 window.z = window.z || {};
