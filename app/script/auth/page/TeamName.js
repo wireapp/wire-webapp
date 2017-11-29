@@ -28,15 +28,11 @@ import {COLOR} from '@wireapp/react-ui-kit/Identity';
 import {teamNameStrings} from '../../strings';
 import {injectIntl} from 'react-intl';
 import {withRouter} from 'react-router';
-import {onEnvironment} from '../Environment';
 import * as AuthAction from '../module/action/AuthAction';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import React, {Component} from 'react';
 
-const stagingWebsite = 'https://wire-website-staging.zinfra.io';
-const wireWebsite = onEnvironment(stagingWebsite, stagingWebsite, 'https://wire.com');
-
-const wireTeamLink = `${wireWebsite}/create-team/#features`;
+const wireTeamLink = `${ROUTE.WIRE_ROOT}/create-team/#features`;
 
 class TeamName extends Component {
   constructor(props) {

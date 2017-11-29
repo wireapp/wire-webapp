@@ -196,7 +196,9 @@ class CreateAccount extends Component {
                     <CheckboxLabel>
                       <FormattedHTMLMessage
                         {...createAccountStrings.terms}
-                        values={{linkParams: 'data-uie-name="go-terms" href="#"'}}
+                        values={{
+                          linkParams: `target=_blank data-uie-name=go-terms href=${ROUTE.WIRE_ROOT}/legal#terms`,
+                        }}
                       />
                     </CheckboxLabel>
                   </Checkbox>
