@@ -39,5 +39,5 @@
     "start:static": "gulp",
     "version": "yarn dist"
   },
-  "version": "0.0.15"
+  "version": "0.0.16"
 }

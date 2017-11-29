@@ -116,18 +116,18 @@ class CodeInput extends React.PureComponent {
       case 'ArrowRight':
         this.nextField(fieldNum);
         break;
-      default:
-        event.target.select();
     }
-    if (!/^[0-9]$/.test(event.key)) {
-      event.preventDefault();
-    } else {
+    if (/^[0-9]$/.test(event.key)) {
       this.setValue(fieldNum, event.key);
     }
   };
 
   forceSelection(event) {
     event.target.select();
+  }
+
+  forceSelectionPreventDefault(event) {
+    this.forceSelection(event);
     event.preventDefault();
   }
 
@@ -141,10 +141,9 @@ class CodeInput extends React.PureComponent {
           key={index}
           onPaste={event => this.handlePaste(index, event.clipboardData.getData('Text'))}
           onFocus={this.forceSelection}
-          onMouseDown={this.forceSelection}
-          onTouchStart={this.forceSelection}
+          onMouseDown={this.forceSelectionPreventDefault}
+          onTouchStart={this.forceSelectionPreventDefault}
           onKeyDown={event => this.handleKeyDown(index, event)}
-          onKeyPress={this.forceSelection}
           onKeyUp={this.forceSelection}
           innerRef={node => (this.inputs[index] = node)}
           type="text"
