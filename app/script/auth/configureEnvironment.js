@@ -17,13 +17,19 @@
  *
  */
 
-import 'script-loader!../../ext/js/jquery/jquery';
-import 'script-loader!../../ext/js/amplify/amplify';
-import 'script-loader!../../ext/js/platform.js/platform';
+import jQuery from 'jquery';
+import {amplify} from '@bower_components/amplify';
+import platform from 'platform';
 import '../event/WebApp';
-import '../util/Environment';
+
+window.amplify = amplify;
+window.platform = platform;
+window.jQuery = jQuery;
+window.$ = jQuery;
+
+require('../util/Environment');
 
 // Expose wire object in global namespace to satisfy wrapper check
-const configureWrapper = () => (window.wire = {});
+const configureEnvironment = () => (window.wire = {});
 
-export default configureWrapper;
+export default configureEnvironment;
