@@ -19,6 +19,7 @@
 
 import {errorHandlerStrings, validationErrorStrings} from '../../strings';
 import {FormattedHTMLMessage} from 'react-intl';
+import {ErrorMessage} from '@wireapp/react-ui-kit/Form';
 import React from 'react';
 
 export function parseError(error) {
@@ -31,25 +32,14 @@ export function parseError(error) {
 }
 
 export function parseValidationErrors(errors) {
-  if (errors && errors.length) {
-    const errorHtmlArray = [];
-    for (const error of errors) {
-      if (validationErrorStrings.hasOwnProperty(error.label)) {
-        errorHtmlArray.push(
-          <span>
-            <FormattedHTMLMessage key={errors.indexOf(error)} {...validationErrorStrings[error.label]} />
-            <br />
-          </span>
-        );
-      } else {
-        errorHtmlArray.push(
-          <span>
-            <FormattedHTMLMessage key={errors.indexOf(error)} {...validationErrorStrings.unexpected} values={error} />
-            <br />
-          </span>
-        );
-      }
-    }
-    return errorHtmlArray;
-  }
+  const errorMessages = [].concat(errors || []);
+  return errorMessages.map(error => (
+    <ErrorMessage key={error.label}>
+      {validationErrorStrings.hasOwnProperty(error.label) ? (
+        <FormattedHTMLMessage {...validationErrorStrings[error.label]} />
+      ) : (
+        <FormattedHTMLMessage {...validationErrorStrings.unexpected} values={error} />
+      )}
+    </ErrorMessage>
+  ));
 }
