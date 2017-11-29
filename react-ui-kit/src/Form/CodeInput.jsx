@@ -68,7 +68,9 @@ class CodeInput extends React.PureComponent {
       const values = [...this.state.values];
       values[num] = value;
       this.setState({values}, this.handleCompleteCode);
-      this.nextField(num);
+      if (value.length) {
+        this.nextField(num);
+      }
     }
   };
 
