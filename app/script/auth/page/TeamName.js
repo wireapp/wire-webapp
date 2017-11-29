@@ -33,9 +33,10 @@ import * as AuthAction from '../module/action/AuthAction';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import React, {Component} from 'react';
 
-const stagingWireTeamLink = 'https://wire-website-staging.zinfra.io/create-team/';
+const stagingWebsite = 'https://wire-website-staging.zinfra.io';
+const wireWebsite = onEnvironment(stagingWebsite, stagingWebsite, 'https://wire.com');
 
-const wireTeamLink = onEnvironment(stagingWireTeamLink, stagingWireTeamLink, 'https://wire.com/create-team/');
+const wireTeamLink = `${wireWebsite}/create-team/#features`;
 
 class TeamName extends Component {
   constructor(props) {
