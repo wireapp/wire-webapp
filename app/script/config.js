@@ -120,7 +120,7 @@ window.z.config = {
   },
 
   URL_PATH: {
-    CREATE_TEAM: '/create-team/',
+    CREATE_TEAM: '/create-team/#features',
     DECRYPT_ERROR_1: '/privacy/error-1/',
     DECRYPT_ERROR_2: '/privacy/error-2/',
     MANAGE_TEAM: '/login/',
