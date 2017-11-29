@@ -11,13 +11,13 @@ export default class RuntimeUtil {
   static getPlatform() {
     if (z.util.Environment.desktop) {
       if (z.util.Environment.os.win) {
-        return PLATFORM_TYPE.DESKTOP_WINDOWS;
+        return RuntimeUtil.PLATFORM_TYPE.DESKTOP_WINDOWS;
       }
       if (z.util.Environment.os.mac) {
-        return PLATFORM_TYPE.DESKTOP_MACOS;
+        return RuntimeUtil.PLATFORM_TYPE.DESKTOP_MACOS;
       }
-      return PLATFORM_TYPE.DESKTOP_LINUX;
+      return RuntimeUtil.PLATFORM_TYPE.DESKTOP_LINUX;
     }
-    return PLATFORM_TYPE.BROWSER_APP;
+    return RuntimeUtil.PLATFORM_TYPE.BROWSER_APP;
   }
 }
