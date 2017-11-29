@@ -50,14 +50,15 @@
     "mixpanel-browser": "2.14.0",
     "react": "16.1.1",
     "react-dom": "16.1.1",
-    "react-intl": "2.4.0",
     "react-intl-po": "2.1.1",
+    "react-intl": "2.4.0",
     "react-redux": "5.0.6",
-    "react-router": "4.2.0",
     "react-router-dom": "4.2.2",
+    "react-router": "4.2.0",
     "redux": "3.7.2",
     "redux-logger": "3.0.6",
-    "redux-thunk": "2.2.0"
+    "redux-thunk": "2.2.0",
+    "url-search-params-polyfill": "2.0.1"
   },
   "devDependencies": {
     "autoprefixer": "7.1.6",
