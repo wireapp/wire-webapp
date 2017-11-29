@@ -42,7 +42,7 @@
     "@bower_components/wire-webapp-cryptobox": "wireapp/wire-webapp-cryptobox#6.2.0",
     "@bower_components/wire-webapp-lru-cache": "wireapp/wire-webapp-lru-cache#2.0.0",
     "@bower_components/wire-webapp-proteus": "wireapp/proteus.js#5.2.0",
-    "@wireapp/core": "0.0.9",
+    "@wireapp/core": "0.0.10",
     "@wireapp/react-ui-kit": "0.0.13",
     "babel-plugin-react-intl": "2.3.1",
     "babel-polyfill": "6.26.0",
@@ -111,9 +111,9 @@
     "karma-jasmine": "1.1.0",
     "karma-sourcemap-loader": "0.3.7",
     "lint-staged": "5.0.0",
-    "npm-run-all": "4.1.2",
     "load-grunt-tasks": "3.5.2",
     "node-sass": "4.5.3",
+    "npm-run-all": "4.1.2",
     "postcss-cssnext": "3.0.2",
     "postcss-import": "11.0.0",
     "postcss-loader": "2.0.8",
@@ -137,10 +137,22 @@
     "yarn": ">= 1.0.0"
   },
   "lint-staged": {
-    "*.js": ["eslint --fix", "git add"],
-    "*.json": ["prettier --write", "git add"],
-    "*.less": ["prettier --write", "git add"],
-    "*.md": ["prettier --write", "git add"]
+    "*.js": [
+      "eslint --fix",
+      "git add"
+    ],
+    "*.json": [
+      "prettier --write",
+      "git add"
+    ],
+    "*.less": [
+      "prettier --write",
+      "git add"
+    ],
+    "*.md": [
+      "prettier --write",
+      "git add"
+    ]
   },
   "scripts": {
     "bundle:dev": "webpack --config webpack.config.dev.js",
@@ -184,7 +196,13 @@
       "js": "dist/ByteBufferAB.js"
     },
     "@bower_components/cryptojs": {
-      "js": ["core.js", "lib-typedarrays.js", "md5.js", "enc-base64.js", "sha256.js"]
+      "js": [
+        "core.js",
+        "lib-typedarrays.js",
+        "md5.js",
+        "enc-base64.js",
+        "sha256.js"
+      ]
     },
     "@bower_components/dexie": {
       "js": "dist/dexie.js"
@@ -221,7 +239,10 @@
       "js": "dist/long.js"
     },
     "@bower_components/mixpanel": {
-      "js": ["mixpanel-jslib-snippet.js", "mixpanel.min.js"]
+      "js": [
+        "mixpanel-jslib-snippet.js",
+        "mixpanel.min.js"
+      ]
     },
     "@bower_components/moment": {
       "js": [
