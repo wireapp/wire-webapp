@@ -27,8 +27,6 @@ window.platform = platform;
 window.jQuery = jQuery;
 window.$ = jQuery;
 
-require('../util/Environment');
-
 // Expose wire object in global namespace to satisfy wrapper check
 const configureEnvironment = () => (window.wire = {});
 
