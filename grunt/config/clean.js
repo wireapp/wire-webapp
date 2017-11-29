@@ -39,12 +39,6 @@ module.exports = {
   deploy: '<%= dir.deploy %>',
   deploy_app: '<%= dir.deploy %>/app',
   deploy_script: ['<%= dir.deploy %>/script'],
-  prod: [
-    '<%= dir.deploy %>/audio/buzzer',
-    '<%= dir.deploy %>/audio/digits',
-    '<%= dir.deploy %>/image/debug',
-    '<%= dir.deploy %>/min/*.map',
-  ],
 
   //##############################################################################
   // Amazon Web Services related

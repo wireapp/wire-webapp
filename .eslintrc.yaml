@@ -5,6 +5,7 @@ env:
   node: true
 
 extends:
+  - 'plugin:react/recommended'
   - prettier
 
 globals:
@@ -47,8 +48,18 @@ globals:
   zeta: true
 
 plugins:
-  - prettier
   - jsdoc
+  - prettier
+  - react
+
+parser:
+  babel-eslint
+
+parserOptions:
+  ecmaVersion: 6
+  sourceType: module
+  ecmaFeatures:
+    jsx: true
 
 rules:
   curly: 2
@@ -73,6 +84,8 @@ rules:
   prefer-spread: 2
   prefer-template: 2
   prettier/prettier: 2
+  react/prefer-stateless-function: 2
+  react/prop-types: 0
   sort-keys: [2, asc, {caseSensitive: true, natural: true}]
   sort-vars: 2
   valid-jsdoc:

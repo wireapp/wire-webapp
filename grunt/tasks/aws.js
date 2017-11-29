@@ -52,6 +52,7 @@ module.exports = grunt => {
     'copy:aws_templates',
     'clean:aws_app',
     'clean:aws_s3',
+    'shell:aws_pack',
     'compress:aws',
   ]);
   grunt.registerTask('aws_run', ['init', 'prepare_prod', 'aws_prepare', 'open:aws', 'shell:aws']);

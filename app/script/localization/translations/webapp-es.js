@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 z.string.es.wire_macos = 'Wire para macOS';
 z.string.es.wire_windows = 'Wire para Windows';
 z.string.es.wire_linux = 'Wire para Linux';
@@ -126,6 +124,8 @@ z.string.es.modal_button_send = 'Enviar';
 z.string.es.modal_block_conversation_headline = '¿Bloquear a {{user}}?';
 z.string.es.modal_block_conversation_message = '{{user}} no podrá ponerse en contacto contigo o añadirte a chats de grupo.';
 z.string.es.modal_block_conversation_button = 'Bloquear';
+z.string.es.modal_bots_unavailable_headline = 'Bots no disponibles por el momento';
+z.string.es.modal_bots_unavailable_message = 'Gracias por su interés en los bots. El servicio está suspendido mientras trabajamos en la próxima versión.';
 z.string.es.modal_call_conversation_empty_headline = 'Nadie para llamar';
 z.string.es.modal_call_conversation_empty_message = 'No hay nadie aqui.';
 z.string.es.modal_call_no_video_in_group_headline = 'No hay videollamadas en grupos';
@@ -174,6 +174,9 @@ z.string.es.modal_new_device_call_incoming = '¿Desea aceptar la llamada?';
 z.string.es.modal_new_device_call_outgoing = '¿Desea realizar la llamada?';
 z.string.es.modal_new_device_show_device = 'mostrar dispositivo';
 z.string.es.modal_new_device_send_anyway = 'enviar de todos modos';
+z.string.es.modal_not_connected_headline = 'No hay nadie añadido a la conversación';
+z.string.es.modal_not_connected_message_one = '{{name}} no quiere ser añadido a las conversaciones.';
+z.string.es.modal_not_connected_message_many = 'Una de las personas que has seleccionado no quiere ser añadida a conversaciones.';
 z.string.es.modal_remove_device_button = 'Eliminar dispositivo';
 z.string.es.modal_remove_device_headline = 'Eliminar "{{device}}"';
 z.string.es.modal_remove_device_message = 'Se requiere tu contraseña para eliminar el dispositivo.';
@@ -396,8 +399,10 @@ z.string.es.preferences_about_terms_of_use = 'Términos de uso';
 z.string.es.preferences_about_version = 'Versión {{version}}';
 z.string.es.preferences_about_website = 'Página web de Wire';
 
+z.string.es.preferences_account_create_team = 'Crear un equipo';
 z.string.es.preferences_account_delete = 'Eliminar cuenta';
 z.string.es.preferences_account_log_out = 'Cerrar sesión';
+z.string.es.preferences_account_manage_team = 'Administrar equipo';
 z.string.es.preferences_account_reset_password = 'Restablecer contraseña';
 z.string.es.preferences_account_team = 'en {{name}}';
 z.string.es.preferences_account_username_placeholder = 'Tu nombre completo';
@@ -442,7 +447,7 @@ z.string.es.preferences_options_data = 'Reportes de uso y fallas';
 z.string.es.preferences_options_data_checkbox = 'Reportes de uso y fallas';
 z.string.es.preferences_options_data_detail = 'Ayudar a mejorar Wire enviando información anónima.';
 z.string.es.preferences_options_popular = 'Por demanda popular';
-z.string.es.preferences_options_emoji_replace_checkbox = 'Reemplazar emoticonos de tipo por emojis';
+z.string.es.preferences_options_emoji_replace_checkbox = 'Sustituir emoticonos por emojis';
 z.string.es.preferences_options_previews_send_checkbox = 'Crear vistas previas para los enlaces enviados';
 z.string.es.preferences_options_previews_send_detail = 'Las vistas previas todavía pueden mostrarse para enlaces de otras personas.';
 z.string.es.preferences_options_notifications = 'Notificaciones';
@@ -552,7 +557,12 @@ z.string.es.tooltip_preferences_rename = 'Cambiar tu nombre';
 z.string.es.tooltip_search_close = 'Cerrar (Esc)';
 
 z.string.es.init_received_self_user = 'Hola, {{user}}.';
+z.string.es.init_validated_client = 'Cargando conexiones y conversaciones';
 z.string.es.init_received_user_data = 'Buscando mensajes nuevos';
+z.string.es.init_decryption = 'Descifrando mensajes';
+z.string.es.init_events = 'Cargando mensajes';
+z.string.es.init_updated_from_notifications = 'Casi terminado - Disfruta  Wire';
+z.string.es.init_progress = ' — {{number1}} de {{number2}}';
 
 z.string.es.ephememal_units_none = 'Desactivar';
 z.string.es.ephememal_units_second = 'segundo';
@@ -563,3 +573,4 @@ z.string.es.ephememal_units_hour = 'hora';
 z.string.es.ephememal_units_hours = 'horas';
 z.string.es.ephememal_units_day = 'día';
 z.string.es.ephememal_units_days = 'días';
+
