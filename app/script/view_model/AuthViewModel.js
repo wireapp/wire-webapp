@@ -317,6 +317,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     const is_connect = z.util.get_url_parameter(z.auth.URLParameter.CONNECT);
     if (is_connect) {
       this.get_wire(true);
+      this.account_mode(z.auth.AuthView.MODE.ACCOUNT_REGISTER);
       return (this.registration_context = z.auth.AuthView.REGISTRATION_CONTEXT.GENERIC_INVITE);
     }
 
