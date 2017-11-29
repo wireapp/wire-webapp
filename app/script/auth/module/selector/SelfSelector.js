@@ -17,5 +17,6 @@
  *
  */
 
-export const getSelfName = state => state.selfState.self.name;
-export const getSelfTeamId = state => state.selfState.self.team;
+export const getSelf = state => state.selfState.self || {};
+export const getSelfName = state => getSelf(state).name;
+export const getSelfTeamId = state => getSelf(state).team;

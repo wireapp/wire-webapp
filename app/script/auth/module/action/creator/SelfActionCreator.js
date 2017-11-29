@@ -1,4 +1,3 @@
-/* @flow */
 /*
  * Wire
  * Copyright (C) 2017 Wire Swiss GmbH
