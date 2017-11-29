@@ -28,7 +28,11 @@ z.main.App = class App {
       COOKIES_CHECK: {
         COOKIE_NAME: 'cookies_enabled',
       },
-      IMMEDIATE_SIGN_OUT_REASONS: [z.auth.SIGN_OUT_REASON.ACCOUNT_DELETED, z.auth.SIGN_OUT_REASON.SESSION_EXPIRED],
+      IMMEDIATE_SIGN_OUT_REASONS: [
+        z.auth.SIGN_OUT_REASON.ACCOUNT_DELETED,
+        z.auth.SIGN_OUT_REASON.CLIENT_REMOVED,
+        z.auth.SIGN_OUT_REASON.SESSION_EXPIRED,
+      ],
       TABS_CHECK: {
         COOKIE_NAME: 'app_opened',
         COOKIE_TIMEOUT: 5 * 60 * 1000,
