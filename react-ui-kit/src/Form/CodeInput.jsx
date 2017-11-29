@@ -68,9 +68,7 @@ class CodeInput extends React.PureComponent {
       const values = [...this.state.values];
       values[num] = value;
       this.setState({values}, this.handleCompleteCode);
-      if (value.length) {
-        this.nextField(num);
-      }
+      this.nextField(num);
     }
   };
 
@@ -105,7 +103,6 @@ class CodeInput extends React.PureComponent {
   };
 
   handleKeyDown = (fieldNum, event) => {
-    let preventDefault = true;
     switch (event.key) {
       case 'Backspace':
         this.setValue(fieldNum, '');
@@ -118,12 +115,19 @@ class CodeInput extends React.PureComponent {
         this.nextField(fieldNum);
         break;
       default:
-        preventDefault = false;
+        event.target.select();
     }
-    if (preventDefault) {
+    if (!/^[0-9]$/.test(event.key)) {
       event.preventDefault();
+    } else {
+      this.setValue(fieldNum, event.key);
     }
   };
+
+  forceSelection(event) {
+    event.target.select();
+    event.preventDefault();
+  }
 
   render() {
     const {values} = this.state;
@@ -133,10 +137,13 @@ class CodeInput extends React.PureComponent {
         <DigitInput
           autoFocus={index === 0 && this.props.autoFocus}
           key={index}
-          onChange={event => this.setValue(index, event.target.value)}
           onPaste={event => this.handlePaste(index, event.clipboardData.getData('Text'))}
-          onFocus={event => event.target.select()}
+          onFocus={this.forceSelection}
+          onMouseDown={this.forceSelection}
+          onTouchStart={this.forceSelection}
           onKeyDown={event => this.handleKeyDown(index, event)}
+          onKeyPress={this.forceSelection}
+          onKeyUp={this.forceSelection}
           innerRef={node => (this.inputs[index] = node)}
           type="text"
           value={values[index]}

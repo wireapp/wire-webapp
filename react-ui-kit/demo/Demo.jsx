@@ -215,10 +215,10 @@ export default function Demo() {
               <Input placeholder="Placeholder" type="email" required />
               <Button type="submit">Submit Button</Button>
               <InputBlock>
-                <Input placeholder="InputBlock" />
+                <Input placeholder="InputBlock" markInvalid />
                 <InputSubmitCombo>
                   <Input placeholder="InputSubmitCombo" />
-                  <RoundIconButton type="submit" />
+                  <RoundIconButton type="submit" icon="plane" />
                 </InputSubmitCombo>
               </InputBlock>
             </Form>
