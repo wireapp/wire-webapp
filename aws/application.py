@@ -58,7 +58,7 @@ def auth():
 
 @application.route('/login/')
 @main.latest_browser_required
-def auth_old():
+def login():
   response = flask.make_response(flask.render_template(
     'login/index.html',
     country=util.geoip_country(),
