@@ -44,7 +44,7 @@ class CreateAccount extends Component {
       email: this.props.account.email,
       name: this.props.account.name,
       password: this.props.account.password,
-      termsAccepted: false,
+      termsAccepted: this.props.account.termsAccepted,
       validInputs: {
         email: true,
         name: true,
@@ -181,6 +181,7 @@ class CreateAccount extends Component {
                     onChange={event => this.setState({termsAccepted: event.target.checked})}
                     name="accept"
                     required
+                    defaultChecked={this.state.termsAccepted}
                     data-uie-name="do-terms"
                     style={{justifyContent: 'center'}}
                   >
