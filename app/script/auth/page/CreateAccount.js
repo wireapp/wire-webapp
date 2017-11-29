@@ -126,6 +126,11 @@ class CreateAccount extends Component {
                         defaultValue={this.state.name}
                         autoComplete="section-create-team username"
                         placeholder={_(createAccountStrings.namePlaceholder)}
+                        onKeyDown={event => {
+                          if (event.key === 'Enter') {
+                            this.inputs.email.focus();
+                          }
+                        }}
                         autoFocus
                         maxLength="64"
                         minLength="2"
@@ -146,6 +151,11 @@ class CreateAccount extends Component {
                         defaultValue={this.state.email}
                         autoComplete="section-create-team email"
                         placeholder={_(createAccountStrings.emailPlaceholder)}
+                        onKeyDown={event => {
+                          if (event.key === 'Enter') {
+                            this.inputs.password.focus();
+                          }
+                        }}
                         maxLength="128"
                         type="email"
                         required
@@ -173,9 +183,7 @@ class CreateAccount extends Component {
                       />
                     </InputBlock>
                     <ErrorMessage data-uie-name="error-message">{parseError(this.props.authError)}</ErrorMessage>
-                    <ErrorMessage data-uie-name="error-message">
-                      {parseValidationErrors(this.state.validationErrors)}
-                    </ErrorMessage>
+                    <div data-uie-name="error-message">{parseValidationErrors(this.state.validationErrors)}</div>
                   </div>
                   <Checkbox
                     onChange={event => this.setState({termsAccepted: event.target.checked})}
@@ -188,7 +196,9 @@ class CreateAccount extends Component {
                     <CheckboxLabel>
                       <FormattedHTMLMessage
                         {...createAccountStrings.terms}
-                        values={{linkParams: 'data-uie-name="go-terms" href="#"'}}
+                        values={{
+                          linkParams: `target=_blank data-uie-name=go-terms href=${ROUTE.WIRE_ROOT}/legal#terms`,
+                        }}
                       />
                     </CheckboxLabel>
                   </Checkbox>

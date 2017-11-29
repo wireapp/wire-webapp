@@ -17,6 +17,10 @@
  *
  */
 
+import {onEnvironment} from './Environment';
+
+const stagingWebsite = 'https://wire-website-staging.zinfra.io';
+
 export default {
   CREATE_ACCOUNT: '/createaccount',
   CREATE_TEAM: '/createteam',
@@ -24,4 +28,5 @@ export default {
   INITIAL_INVITE: '/invite',
   LOGIN: '/login',
   VERIFY: '/verify',
+  WIRE_ROOT: onEnvironment(stagingWebsite, stagingWebsite, 'https://wire.com'),
 };
