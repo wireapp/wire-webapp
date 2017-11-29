@@ -342,9 +342,9 @@
     spark-md5 "3.0.0"
     tough-cookie "2.3.3"
 
-"@wireapp/core@0.0.9":
-  version "0.0.9"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-0.0.9.tgz#2cd3da455f71b5a1cb256b05b0e9ff94414573d0"
+"@wireapp/core@0.0.10":
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-0.0.10.tgz#e08ba2149988fa904a68b9505e6f8f573337be52"
   dependencies:
     "@types/node" "8.0.50"
     "@wireapp/api-client" "0.2.10"
@@ -353,7 +353,7 @@
     bazinga64 "5.0.3"
     protobufjs "6.8.0"
     pure-uuid "1.4.10"
-    wire-webapp-cryptobox "6.2.0"
+    wire-webapp-cryptobox "6.2.1"
 
 "@wireapp/protocol-messaging@1.19.0":
   version "1.19.0"
@@ -8746,11 +8746,11 @@ wire-webapp-cbor@2.1.5:
   version "2.1.5"
   resolved "https://registry.yarnpkg.com/wire-webapp-cbor/-/wire-webapp-cbor-2.1.5.tgz#742912cb40b037dcc7125ce4c554ea2d6d398064"
 
-wire-webapp-cryptobox@6.2.0:
-  version "6.2.0"
-  resolved "https://registry.yarnpkg.com/wire-webapp-cryptobox/-/wire-webapp-cryptobox-6.2.0.tgz#763a5414fba6446ba03a15591f72edaf82b1ace6"
+wire-webapp-cryptobox@6.2.1:
+  version "6.2.1"
+  resolved "https://registry.yarnpkg.com/wire-webapp-cryptobox/-/wire-webapp-cryptobox-6.2.1.tgz#dbb6b6e16ecd80d7f99f9f0a2b55a36ebd325e77"
   dependencies:
-    "@wireapp/store-engine" "0.1.0"
+    "@wireapp/store-engine" "0.1.1"
     dexie "1.5.1"
     fs-extra "3.0.1"
     rimraf "2.6.1"
