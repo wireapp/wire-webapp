@@ -541,7 +541,7 @@ z.calling.CallingRepository = class CallingRepository {
 
       if (!event_from_stream) {
         promises.push(
-          this.conversation_repository.grant_message(conversation_id, z.ViewModel.MODAL_CONSENT_TYPE.INCOMING_CALL, [
+          this.conversation_repository.grantMessage(conversation_id, z.ViewModel.MODAL_CONSENT_TYPE.INCOMING_CALL, [
             user_id,
           ])
         );

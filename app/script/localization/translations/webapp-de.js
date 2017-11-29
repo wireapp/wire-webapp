@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 z.string.de.wire = 'Wire';
 z.string.de.wire_macos = 'Wire für macOS';
 z.string.de.wire_windows = 'Wire für Windows';
@@ -584,3 +582,4 @@ z.string.de.ephememal_units_hour = 'Stunde';
 z.string.de.ephememal_units_hours = 'Stunden';
 z.string.de.ephememal_units_day = 'Tag';
 z.string.de.ephememal_units_days = 'Tage';
+

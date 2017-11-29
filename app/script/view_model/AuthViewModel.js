@@ -254,6 +254,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     this._init_base();
     this._track_app_launch();
     $(`.${element_id}`).show();
+    $('.auth-page-container').css({display: 'flex'});
   }
 
   _init_base() {
@@ -906,7 +907,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
   changed_country_code(view_model, event) {
     let country_iso;
-    const country_code_value = event ? event.currentTarget.value : undefined || this.country_code();
+    const country_code_value = event ? event.currentTarget.value : this.country_code();
     const country_code_matches = country_code_value.match(/\d+/g) || [];
     const country_code = country_code_matches.join('').substr(0, 4);
 
@@ -935,7 +936,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
   }
 
   clear_error(mode, input_event) {
-    const error_mode = input_event ? input_event.currentTarget.classList[1] : undefined || mode;
+    const error_mode = input_event ? input_event.currentTarget.classList[1] : mode;
     this._remove_error(error_mode);
   }
 
@@ -954,13 +955,6 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     this._set_hash(z.auth.AuthView.MODE.ACCOUNT_PHONE);
   }
 
-  clicked_on_login() {
-    this._set_hash(z.auth.AuthView.MODE.ACCOUNT_LOGIN);
-    if (this.visible_method() === z.auth.AuthView.MODE.ACCOUNT_PHONE) {
-      $('#wire-login-phone').focus_field();
-    }
-  }
-
   clicked_on_login_password() {
     this._set_hash(z.auth.AuthView.MODE.ACCOUNT_PASSWORD);
   }
@@ -972,10 +966,6 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
   clicked_on_password() {
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PASSWORD_RESET, {value: 'fromSignIn'});
     z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.ACCOUNT, z.config.URL_PATH.PASSWORD_RESET));
-  }
-
-  clicked_on_register() {
-    this._set_hash(z.auth.AuthView.MODE.ACCOUNT_REGISTER);
   }
 
   clicked_on_resend_code() {
@@ -1180,6 +1170,10 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
   close_model_manage_devices() {
     this.device_modal.toggle();
+  }
+
+  clicked_on_navigate_back() {
+    window.location.replace(`/auth${location.search}`);
   }
 
   click_on_remove_device_submit(password, device) {
@@ -2063,7 +2057,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
   logout() {
     this.auth.repository.logout().then(() => {
       this.auth.repository.delete_access_token();
-      window.location.replace('/auth');
+      window.location.replace('/login');
     });
   }
 

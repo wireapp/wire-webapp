@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 z.string.hu.wire = 'Wire';
 z.string.hu.wire_macos = 'Wire MacOS-hez';
 z.string.hu.wire_windows = 'Wire Windowshoz';
@@ -568,6 +566,9 @@ z.string.hu.tooltip_search_close = 'Bezárás (Esc)';
 z.string.hu.init_received_self_user = 'Szia {{user}}!';
 z.string.hu.init_validated_client = 'Kapcsolatok és a beszélgetések lekérése';
 z.string.hu.init_received_user_data = 'Új üzenetek megtekintése';
+z.string.hu.init_decryption = 'Üzenetek visszafejtése';
+z.string.hu.init_events = 'Üzenetek betöltése';
+z.string.hu.init_progress = ' — {{number1}} / {{number2}}';
 
 z.string.hu.ephememal_units_none = 'Kikapcsolás';
 z.string.hu.ephememal_units_second = 'másodperc';
@@ -578,3 +579,4 @@ z.string.hu.ephememal_units_hour = 'óra';
 z.string.hu.ephememal_units_hours = 'óra';
 z.string.hu.ephememal_units_day = 'nap';
 z.string.hu.ephememal_units_days = 'nap';
+

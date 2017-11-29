@@ -10,6 +10,8 @@
 /_SpecRunner.html
 /.idea/**/*.xml
 /app/ext
+/app/i18n/**/*
+!/app/i18n/**/*.json
 /aws/s3
 /aws/static
 /aws/templates/**/*.html
@@ -21,6 +23,7 @@
 /deploy
 /dist
 /doc
+/docs/auth-coverage
 /docs/coverage
 /keys
 /nbproject
