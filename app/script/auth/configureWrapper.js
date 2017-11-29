@@ -17,6 +17,12 @@
  *
  */
 
+import 'script-loader!../../ext/js/jquery/jquery';
+import 'script-loader!../../ext/js/amplify/amplify';
+import 'script-loader!../../ext/js/platform.js/platform';
+import '../event/WebApp';
+import '../util/Environment';
+
 // Expose wire object in global namespace to satisfy wrapper check
 const configureWrapper = () => (window.wire = {});
 
