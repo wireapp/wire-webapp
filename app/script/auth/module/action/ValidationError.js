@@ -41,9 +41,7 @@ export default class ValidationError extends Error {
     const validationStateKeys = ValidationError.getAllPropertyNames(validationState);
     for (const key of validationStateKeys) {
       if (Object.values(ValidationError.ERROR).includes(key) && validationState[key]) {
-        return new ValidationError({
-          label: field[ValidationError.getErrorKeyByValue(key)],
-        });
+        return new ValidationError(field[ValidationError.getErrorKeyByValue(key)]);
       }
     }
   }
