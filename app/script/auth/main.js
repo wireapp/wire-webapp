@@ -18,6 +18,7 @@
  */
 
 import 'babel-polyfill'; // Polyfill needs to be imported first
+import 'url-search-params-polyfill';
 import {Account} from '@wireapp/core';
 import {AppContainer} from 'react-hot-loader';
 import {Provider} from 'react-redux';
