@@ -82,7 +82,7 @@ class Index extends Component {
                 {_(indexStrings.createAccount)}
               </Bold>
               <br />
-              <Text light fontSize="24px" color={COLOR.LINK}>
+              <Text light fontSize="16px" color={COLOR.LINK} style={{lineHeight: '36px'}}>
                 {_(indexStrings.createAccountFor)}
               </Text>
             </Link>
@@ -96,7 +96,7 @@ class Index extends Component {
                 {_(indexStrings.createTeam)}
               </Bold>
               <br />
-              <Text light fontSize="24px" color={COLOR.LINK}>
+              <Text light fontSize="16px" color={COLOR.LINK} style={{lineHeight: '36px'}}>
                 {_(indexStrings.createTeamFor)}
               </Text>
             </Link>
