@@ -114,8 +114,8 @@ window.z.util = z.util || {};
   };
 
   const formatted_app_version = () => {
-    const version = app_version().split('-');
-    return `${version[0]}.${version[1]}.${version[2]}.${version[3]}${version[4]}`;
+    const [year, month, day, hour, minute] = app_version().split('-');
+    return `${year}.${month}.${day}.${hour}${minute}`;
   };
 
   z.util.Environment = {

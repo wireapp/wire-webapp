@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 z.string.sl.wire = 'Wire';
 z.string.sl.wire_macos = 'Wire za macOS';
 z.string.sl.wire_windows = 'Wire za Windows';
@@ -556,3 +554,4 @@ z.string.sl.ephememal_units_hour = 'ura';
 z.string.sl.ephememal_units_hours = 'ur';
 z.string.sl.ephememal_units_day = 'dan';
 z.string.sl.ephememal_units_days = 'dni';
+

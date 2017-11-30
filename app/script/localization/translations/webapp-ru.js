@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 z.string.ru.wire = 'Wire';
 z.string.ru.wire_macos = 'Wire для macOS';
 z.string.ru.wire_windows = 'Wire для Windows';
@@ -177,6 +175,7 @@ z.string.ru.modal_new_device_call_incoming = 'Вы действительно х
 z.string.ru.modal_new_device_call_outgoing = 'Вы действительно хотите позвонить?';
 z.string.ru.modal_new_device_show_device = 'показать устройство';
 z.string.ru.modal_new_device_send_anyway = 'отправить всё равно';
+z.string.ru.modal_not_connected_headline = 'Никто не добален в беседу';
 z.string.ru.modal_not_connected_message_one = '{{name}} не хочет добавляться в разговоры.';
 z.string.ru.modal_not_connected_message_many = 'Один из выбранных контактов не хочет быть добавлен в разговор.';
 z.string.ru.modal_remove_device_button = 'Удалить устройство';
@@ -561,7 +560,10 @@ z.string.ru.tooltip_search_close = 'Закрыть (Esc)';
 z.string.ru.init_received_self_user = 'Здравствуйте, {{user}}.';
 z.string.ru.init_validated_client = 'Загрузка контактов и разговоров';
 z.string.ru.init_received_user_data = 'Проверка наличия новых сообщений';
+z.string.ru.init_decryption = 'Расшифровка сообщений';
+z.string.ru.init_events = 'Загрузка сообщений';
 z.string.ru.init_updated_from_notifications = 'Почти готово - наслаждайтесь Wire';
+z.string.ru.init_progress = ' — {{number1}} из {{number2}}';
 
 z.string.ru.ephememal_units_none = 'Выключен';
 z.string.ru.ephememal_units_second = 'сек';
@@ -572,3 +574,4 @@ z.string.ru.ephememal_units_hour = 'час';
 z.string.ru.ephememal_units_hours = 'часов';
 z.string.ru.ephememal_units_day = 'дн.';
 z.string.ru.ephememal_units_days = 'дн.';
+

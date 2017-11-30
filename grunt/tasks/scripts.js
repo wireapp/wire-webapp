@@ -57,8 +57,8 @@ module.exports = grunt => {
 
     const directories = {
       app: [],
-      auth: [],
       component: [],
+      login: [],
       vendor: [],
     };
 
