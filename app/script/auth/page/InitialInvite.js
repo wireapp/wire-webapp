@@ -103,7 +103,7 @@ class InitialInvite extends React.PureComponent {
             <H1 center>{_(inviteStrings.headline)}</H1>
             <Text>{_(inviteStrings.subhead)}</Text>
           </div>
-          <div style={{margin: '18px 0', minHeight: 210}}>
+          <div style={{margin: '18px 0', minHeight: 220}}>
             {invites.map(({email}) => this.renderEmail(email))}
             <Form onSubmit={this.handleSubmit}>
               <InputSubmitCombo>
