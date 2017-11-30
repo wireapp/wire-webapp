@@ -25,9 +25,9 @@
   "invite.subhead": "",
   "invite.emailPlaceholder": "",
   "invite.skipForNow": "",
-  "BackendError.LABEL.ACCESS_DENIED": "Bekræft venligst dine detaljer og prøv igen.",
-  "BackendError.LABEL.INVALID_CREDENTIALS": "Bekræft venligst dine detaljer og prøv igen.",
-  "BackendError.LABEL.MISSING_AUTH": "Bekræft venligst dine detaljer og prøv igen.",
+  "BackendError.LABEL.ACCESS_DENIED": "Bekræft venligst dine detaljer og prøv igen",
+  "BackendError.LABEL.INVALID_CREDENTIALS": "Bekræft venligst dine detaljer og prøv igen",
+  "BackendError.LABEL.MISSING_AUTH": "Bekræft venligst dine detaljer og prøv igen",
   "BackendError.LABEL.BLACKLISTED_EMAIL": "",
   "BackendError.LABEL.BLACKLISTED_PHONE": "",
   "BackendError.LABEL.INVALID_CODE": "",
@@ -51,5 +51,8 @@
   "BackendError.LABEL.TOO_MANY_MEMBERS": "",
   "BackendError.LABEL.SUSPENDED": "",
   "BackendError.LABEL.EMAIL_EXISTS": "",
-  "BackendError.unexpected": ""
+  "BackendError.unexpected": "",
+  "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Indtast et navn på mindst to karakterer",
+  "ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH": "",
+  "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": ""
 }

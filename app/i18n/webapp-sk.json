@@ -25,9 +25,9 @@
   "invite.subhead": "",
   "invite.emailPlaceholder": "",
   "invite.skipForNow": "",
-  "BackendError.LABEL.ACCESS_DENIED": "Prosím, skontrolujte svoje údaje a skúste to znova.",
-  "BackendError.LABEL.INVALID_CREDENTIALS": "Prosím, skontrolujte svoje údaje a skúste to znova.",
-  "BackendError.LABEL.MISSING_AUTH": "Prosím, skontrolujte svoje údaje a skúste to znova.",
+  "BackendError.LABEL.ACCESS_DENIED": "Prosím, skontrolujte svoje údaje a skúste to znova",
+  "BackendError.LABEL.INVALID_CREDENTIALS": "Prosím, skontrolujte svoje údaje a skúste to znova",
+  "BackendError.LABEL.MISSING_AUTH": "Prosím, skontrolujte svoje údaje a skúste to znova",
   "BackendError.LABEL.BLACKLISTED_EMAIL": "",
   "BackendError.LABEL.BLACKLISTED_PHONE": "",
   "BackendError.LABEL.INVALID_CODE": "",
@@ -49,7 +49,10 @@
   "BackendError.LABEL.NO_TEAM": "",
   "BackendError.LABEL.NO_TEAM_MEMBER": "",
   "BackendError.LABEL.TOO_MANY_MEMBERS": "",
-  "BackendError.LABEL.SUSPENDED": "Toto konto už nemá povolené prihlásenie.",
+  "BackendError.LABEL.SUSPENDED": "Toto konto už nemá povolené prihlásenie",
   "BackendError.LABEL.EMAIL_EXISTS": "",
-  "BackendError.unexpected": ""
+  "BackendError.unexpected": "",
+  "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Zadajte meno s minimálne 2 znakmi",
+  "ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH": "",
+  "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": ""
 }

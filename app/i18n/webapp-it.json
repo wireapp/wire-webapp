@@ -25,9 +25,9 @@
   "invite.subhead": "",
   "invite.emailPlaceholder": "",
   "invite.skipForNow": "",
-  "BackendError.LABEL.ACCESS_DENIED": "Verifica i tuoi dati e riprova.",
-  "BackendError.LABEL.INVALID_CREDENTIALS": "Verifica i tuoi dati e riprova.",
-  "BackendError.LABEL.MISSING_AUTH": "Verifica i tuoi dati e riprova.",
+  "BackendError.LABEL.ACCESS_DENIED": "Verifica i tuoi dati e riprova",
+  "BackendError.LABEL.INVALID_CREDENTIALS": "Verifica i tuoi dati e riprova",
+  "BackendError.LABEL.MISSING_AUTH": "Verifica i tuoi dati e riprova",
   "BackendError.LABEL.BLACKLISTED_EMAIL": "",
   "BackendError.LABEL.BLACKLISTED_PHONE": "",
   "BackendError.LABEL.INVALID_CODE": "",
@@ -51,5 +51,8 @@
   "BackendError.LABEL.TOO_MANY_MEMBERS": "",
   "BackendError.LABEL.SUSPENDED": "",
   "BackendError.LABEL.EMAIL_EXISTS": "",
-  "BackendError.unexpected": ""
+  "BackendError.unexpected": "",
+  "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Inserisci un nome con almeno 2 caratteri",
+  "ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH": "",
+  "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": ""
 }

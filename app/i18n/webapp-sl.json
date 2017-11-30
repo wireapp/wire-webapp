@@ -25,9 +25,9 @@
   "invite.subhead": "",
   "invite.emailPlaceholder": "",
   "invite.skipForNow": "",
-  "BackendError.LABEL.ACCESS_DENIED": "Prosimo preverite vaše podatke in poizkusite ponovno.",
-  "BackendError.LABEL.INVALID_CREDENTIALS": "Prosimo preverite vaše podatke in poizkusite ponovno.",
-  "BackendError.LABEL.MISSING_AUTH": "Prosimo preverite vaše podatke in poizkusite ponovno.",
+  "BackendError.LABEL.ACCESS_DENIED": "Prosimo preverite vaše podatke in poizkusite ponovno",
+  "BackendError.LABEL.INVALID_CREDENTIALS": "Prosimo preverite vaše podatke in poizkusite ponovno",
+  "BackendError.LABEL.MISSING_AUTH": "Prosimo preverite vaše podatke in poizkusite ponovno",
   "BackendError.LABEL.BLACKLISTED_EMAIL": "",
   "BackendError.LABEL.BLACKLISTED_PHONE": "",
   "BackendError.LABEL.INVALID_CODE": "",
@@ -51,5 +51,8 @@
   "BackendError.LABEL.TOO_MANY_MEMBERS": "",
   "BackendError.LABEL.SUSPENDED": "",
   "BackendError.LABEL.EMAIL_EXISTS": "",
-  "BackendError.unexpected": ""
+  "BackendError.unexpected": "",
+  "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Vnesite ime z vsaj 2 znakoma",
+  "ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH": "",
+  "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": ""
 }

@@ -249,8 +249,6 @@ z.string.hu.conversation_context_menu_delete_everyone = 'Törlés mindenkinél';
 z.string.hu.conversation_context_menu_download = 'Letöltés';
 z.string.hu.conversation_context_menu_like = 'Tetszik';
 z.string.hu.conversation_context_menu_unlike = 'Nem tetszik';
-z.string.hu.conversation_delete_timestamp = 'Törölve ({{date}})';
-z.string.hu.conversation_edit_timestamp = 'Szerkesztve ({{date}})';
 z.string.hu.conversation_likes_caption = '{{number}} partner';
 z.string.hu.conversation_send_pasted_file = 'Kép beillesztve ({{date}})';
 z.string.hu.conversation_someone = 'Valaki';
@@ -568,6 +566,7 @@ z.string.hu.init_validated_client = 'Kapcsolatok és a beszélgetések lekérés
 z.string.hu.init_received_user_data = 'Új üzenetek megtekintése';
 z.string.hu.init_decryption = 'Üzenetek visszafejtése';
 z.string.hu.init_events = 'Üzenetek betöltése';
+z.string.hu.init_updated_from_notifications = 'Majdnem kész - Élvezd a Wire-t';
 z.string.hu.init_progress = ' — {{number1}} / {{number2}}';
 
 z.string.hu.ephememal_units_none = 'Kikapcsolás';

@@ -25,9 +25,9 @@
   "invite.subhead": "",
   "invite.emailPlaceholder": "",
   "invite.skipForNow": "",
-  "BackendError.LABEL.ACCESS_DENIED": "Будь ласка, перевірте ваші дані та повторіть спробу.",
-  "BackendError.LABEL.INVALID_CREDENTIALS": "Будь ласка, перевірте ваші дані та повторіть спробу.",
-  "BackendError.LABEL.MISSING_AUTH": "Будь ласка, перевірте ваші дані та повторіть спробу.",
+  "BackendError.LABEL.ACCESS_DENIED": "Будь ласка, перевірте ваші дані та повторіть спробу",
+  "BackendError.LABEL.INVALID_CREDENTIALS": "Будь ласка, перевірте ваші дані та повторіть спробу",
+  "BackendError.LABEL.MISSING_AUTH": "Будь ласка, перевірте ваші дані та повторіть спробу",
   "BackendError.LABEL.BLACKLISTED_EMAIL": "",
   "BackendError.LABEL.BLACKLISTED_PHONE": "",
   "BackendError.LABEL.INVALID_CODE": "",
@@ -49,7 +49,10 @@
   "BackendError.LABEL.NO_TEAM": "",
   "BackendError.LABEL.NO_TEAM_MEMBER": "",
   "BackendError.LABEL.TOO_MANY_MEMBERS": "",
-  "BackendError.LABEL.SUSPENDED": "Даний акаунт був заблокований.",
+  "BackendError.LABEL.SUSPENDED": "Даний акаунт був заблокований",
   "BackendError.LABEL.EMAIL_EXISTS": "",
-  "BackendError.unexpected": ""
+  "BackendError.unexpected": "",
+  "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Введіть ім’я довжиною не менше 2 символи",
+  "ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH": "",
+  "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": ""
 }
