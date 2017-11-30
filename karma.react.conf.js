@@ -28,7 +28,7 @@ module.exports = function(config) {
   config.set({
     autoWatch: false,
     basePath: '',
-    browsers: ['ChromeHeadless'],
+    browsers: ['Chrome_Headless'],
     client: {
       useIframe: false,
     },
@@ -37,6 +37,12 @@ module.exports = function(config) {
     coverageReporter: {
       dir: 'docs/auth-coverage',
       type: 'html',
+    },
+    customLaunchers: {
+      Chrome_Headless: {
+        base: 'Chrome',
+        flags: ['--no-sandbox', '--headless', '--disable-gpu', '--remote-debugging-port=9222'],
+      },
     },
     failOnEmptyTestSuite: false,
     files: [`${srcTest}/testmain.js`, `${dist}/script.js`, `${dist}/test.js`],
