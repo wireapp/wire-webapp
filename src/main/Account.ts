@@ -153,7 +153,7 @@ export default class Account extends EventEmitter {
       .then(() => {
         LoginSanitizer.removeNonPrintableCharacters(loginData);
         loginData.persist =
-          loginData.persist || this.apiClient.config.store.constructor.name === 'MemoryEngine' ? false : true;
+          loginData.persist || (this.apiClient.config.store.constructor.name === 'MemoryEngine' ? false : true);
         return this.apiClient.init();
       })
       .catch((error: Error) => this.apiClient.login(loginData))
