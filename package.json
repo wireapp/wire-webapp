@@ -19,7 +19,7 @@
     "tough-cookie": "2.3.3"
   },
   "devDependencies": {
-    "@wireapp/react-ui-kit": "0.0.14",
+    "@wireapp/react-ui-kit": "0.0.16",
     "babel-core": "6.26.0",
     "babel-loader": "7.1.2",
     "babel-preset-react": "6.24.1",
@@ -44,7 +44,9 @@
     "webpack-dev-server": "2.9.4"
   },
   "description": "Wire API Client to send and receive data.",
-  "files": ["dist/commonjs"],
+  "files": [
+    "dist/commonjs"
+  ],
   "license": "GPL-3.0",
   "main": "./dist/commonjs/Client.js",
   "name": "@wireapp/api-client",
