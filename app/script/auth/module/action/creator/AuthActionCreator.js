@@ -41,6 +41,7 @@ export const REGISTER_JOIN_FAILED = 'REGISTER_JOIN_FAILED';
 export const LOGOUT_START = 'LOGOUT_START';
 export const LOGOUT_SUCCESS = 'LOGOUT_SUCCESS';
 export const LOGOUT_FAILED = 'LOGOUT_FAILED';
+export const SILENT_LOGOUT_SUCCESS = 'SILENT_LOGOUT_FAILED';
 
 export const REFRESH_START = 'REFRESH_START';
 export const REFRESH_SUCCESS = 'REFRESH_SUCCESS';
@@ -114,6 +115,10 @@ export function startLogout() {
 
 export function successfulLogout() {
   return {type: LOGOUT_SUCCESS};
+}
+
+export function successfulSilentLogout() {
+  return {type: SILENT_LOGOUT_SUCCESS};
 }
 
 export function failedLogout(error) {
