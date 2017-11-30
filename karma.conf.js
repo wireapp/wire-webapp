@@ -26,12 +26,18 @@ module.exports = function(config) {
   config.set({
     autoWatch: false,
     basePath: '',
-    browsers: ['ChromeHeadless'],
+    browsers: ['ChromeNoSandbox'],
     client: {
       useIframe: false,
     },
     colors: true,
     concurrency: Infinity,
+    customLaunchers: {
+      ChromeNoSandbox: {
+        base: 'ChromeHeadless',
+        flags: ['--no-sandbox'],
+      },
+    },
     files: [`${dist}test.js`],
     frameworks: ['jasmine'],
     logLevel: config.LOG_INFO,

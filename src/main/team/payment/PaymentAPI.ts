@@ -26,6 +26,7 @@ import {
   PaymentStripeCharge,
   PaymentStripeInvoice,
   PaymentStripePlan,
+  PaymentPlan,
 } from '.';
 import {HttpClient} from '../../http';
 
@@ -39,6 +40,7 @@ export default class TeamAPI {
       CHARGES: 'charges',
       INVOICES: 'invoices',
       PLANS: 'plans',
+      PLAN: 'plan',
       TEAMS: '/teams',
     };
   }
@@ -76,6 +78,25 @@ export default class TeamAPI {
     const config: AxiosRequestConfig = {
       method: 'get',
       url: `${TeamAPI.URL.TEAMS}/${teamId}/${TeamAPI.URL.BILLING}/${TeamAPI.URL.INFO}`,
+    };
+
+    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+  }
+
+  public putPaymentPlan(teamId: string, plan: PaymentPlan): AxiosPromise {
+    const config: AxiosRequestConfig = {
+      data: plan,
+      method: 'put',
+      url: `${TeamAPI.URL.TEAMS}/${teamId}/${TeamAPI.URL.BILLING}/${TeamAPI.URL.PLAN}/${plan.id}`,
+    };
+
+    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+  }
+
+  public getPaymentPlan(teamId: string): Promise<PaymentPlan> {
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      url: `${TeamAPI.URL.TEAMS}/${teamId}/${TeamAPI.URL.BILLING}/${TeamAPI.URL.PLAN}`,
     };
 
     return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
