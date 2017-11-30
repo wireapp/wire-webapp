@@ -30,6 +30,7 @@ import {parseError, parseValidationErrors} from '../util/errorUtil';
 import * as LanguageSelector from '../module/selector/LanguageSelector';
 import * as InviteSelector from '../module/selector/InviteSelector';
 import {invite} from '../module/action/InviteAction';
+import {resetError} from '../module/action/creator/InviteActionCreator';
 import {fetchSelf} from '../module/action/SelfAction';
 import ValidationError from '../module/action/ValidationError';
 import Page from './Page';
@@ -84,6 +85,11 @@ class InitialInvite extends React.PureComponent {
     this.emailInput.focus();
   };
 
+  resetErrors = () => {
+    this.setState({error: null});
+    this.props.resetError();
+  };
+
   render() {
     const {invites, error, intl: {formatMessage: _}} = this.props;
     return (
@@ -97,7 +103,7 @@ class InitialInvite extends React.PureComponent {
             <H1 center>{_(inviteStrings.headline)}</H1>
             <Text>{_(inviteStrings.subhead)}</Text>
           </div>
-          <div style={{margin: '18px 0', minHeight: 170}}>
+          <div style={{margin: '18px 0', minHeight: 220}}>
             {invites.map(({email}) => this.renderEmail(email))}
             <Form onSubmit={this.handleSubmit}>
               <InputSubmitCombo>
@@ -105,7 +111,7 @@ class InitialInvite extends React.PureComponent {
                   name="email"
                   placeholder={_(inviteStrings.emailPlaceholder)}
                   type="email"
-                  onChange={() => this.setState({error: null})}
+                  onChange={this.resetErrors}
                   innerRef={node => (this.emailInput = node)}
                   autoFocus
                   data-uie-name="enter-invite-email"
@@ -114,7 +120,7 @@ class InitialInvite extends React.PureComponent {
               </InputSubmitCombo>
             </Form>
             <ErrorMessage data-uie-name="error-message">
-              {parseValidationErrors(this.state.error) || parseError(error)}
+              {this.state.error ? parseValidationErrors(this.state.error) : parseError(error)}
             </ErrorMessage>
           </div>
           <div>
@@ -144,6 +150,7 @@ export default injectIntl(
     {
       fetchSelf,
       invite,
+      resetError,
       ...TrackingAction,
     }
   )(InitialInvite)
