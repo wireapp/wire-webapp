@@ -28,7 +28,7 @@ module.exports = function(config) {
   config.set({
     autoWatch: false,
     basePath: '',
-    browsers: ['ChromeHeadless'],
+    browsers: ['ChromeNoSandbox'],
     client: {
       useIframe: false,
     },
@@ -37,6 +37,12 @@ module.exports = function(config) {
     coverageReporter: {
       dir: 'docs/auth-coverage',
       type: 'html',
+    },
+    customLaunchers: {
+      ChromeNoSandbox: {
+        base: 'ChromeHeadless',
+        flags: ['--no-sandbox'],
+      },
     },
     failOnEmptyTestSuite: false,
     files: [`${srcTest}/testmain.js`, `${dist}/script.js`, `${dist}/test.js`],
