@@ -34,7 +34,7 @@ export function doLogin(login) {
       })
     );
     return Promise.resolve()
-      .then(() => dispatch(doLogout()))
+      .then(() => dispatch(doSilentLogout()))
       .then(() => apiClient.login(login))
       .catch(error => {
         dispatch(AuthActionCreator.failedLogin(error));
@@ -68,7 +68,7 @@ export function doRegisterTeam(registration) {
       })
     );
     return Promise.resolve()
-      .then(() => dispatch(doLogout()))
+      .then(() => dispatch(doSilentLogout()))
       .then(() => apiClient.register(registration))
       .then(createdTeam => dispatch(AuthActionCreator.successfulRegisterTeam(createdTeam)))
       .catch(error => {
@@ -118,6 +118,16 @@ export function doLogout() {
     return apiClient
       .logout()
       .then(() => dispatch(AuthActionCreator.successfulLogout()))
+      .catch(error => dispatch(AuthActionCreator.failedLogout(error)));
+  };
+}
+
+export function doSilentLogout() {
+  return function(dispatch, getState, {apiClient}) {
+    dispatch(AuthActionCreator.startLogout());
+    return apiClient
+      .logout()
+      .then(() => dispatch(AuthActionCreator.successfulSilentLogout()))
       .catch(error => dispatch(AuthActionCreator.failedLogout(error)));
   };
 }

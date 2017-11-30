@@ -103,6 +103,15 @@ export default function reducer(state = initialState, action) {
     case AuthActionCreator.LOGOUT_SUCCESS: {
       return {...initialState};
     }
+    case AuthActionCreator.SILENT_LOGOUT_SUCCESS: {
+      return {
+        ...state,
+        error: null,
+        fetched: false,
+        fetching: false,
+        isAuthenticated: false,
+      };
+    }
     case AuthActionCreator.AUTH_RESET_ERROR: {
       return {...state, error: null};
     }
