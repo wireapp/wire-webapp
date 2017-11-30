@@ -38,6 +38,9 @@ export default function inviteReducer(state = initialState, action) {
         error: action.payload,
       };
     }
+    case InviteActionCreator.INVITE_RESET_ERROR: {
+      return {...state, error: null};
+    }
     default:
       return state;
   }

@@ -63,14 +63,11 @@ content.message =
   `\r\n- Last commit from: ${commit.author}` +
   `\r\n- Last commit message: ${commit.message}`;
 
-const bot = new Account({
-  email: login.email,
-  password: login.password,
-});
+const account = new Account();
 
-bot
-  .listen()
-  .then(() => bot.sendTextMessage(content.conversationId, content.message))
+account
+  .listen({email: login.email, password: login.password})
+  .then(() => account.service.conversation.sendTextMessage(content.conversationId, content.message))
   .then(() => process.exit(0))
   .catch(error => {
     console.error(error.message);
