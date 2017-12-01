@@ -16,40 +16,33 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-import React from 'react';
-import Root from './Root';
-import {Provider} from 'react-redux';
-import {mount} from 'enzyme';
-
 import configureStore from 'redux-mock-store';
+import React from 'react';
+import renderer from 'react-test-renderer';
+import {Provider} from 'react-redux';
+import Root from './Root';
 import thunk from 'redux-thunk';
 
-import renderer from 'react-test-renderer';
+const middlewares = [thunk.withExtraArgument()];
+const mockStore = configureStore(middlewares);
+const withStore = (children, store) => <Provider store={store}>{children}</Provider>;
 
 describe('Root', () => {
-  beforeEach(() => (window.platform = require('platform')));
-
   it('renders the Wire logo', () => {
-    const component = mount(
-      withStore(
-        <Root />,
-        mockStore()({
-          authState: {
-            name: 'bob',
-          },
-          languageState: {
-            language: 'en',
-          },
-        })
-      )
-    );
-    console.log('component', component.html());
-    expect(true).toBe(true);
+    const state = {
+      authState: {
+        name: 'bob',
+      },
+      languageState: {
+        language: 'en',
+      },
+    };
+
+    const markup = <Root />;
+    const store = mockStore(state);
+    const component = renderer.create(withStore(markup, store));
+    const tree = component.toJSON();
+
+    expect(tree.type).toBe('div');
   });
 });
-
-const withStore = (children, store) => {
-  return <Provider store={store}>{children}</Provider>;
-};
-
-const mockStore = () => configureStore([thunk.withExtraArgument()]);
