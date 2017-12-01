@@ -46,20 +46,20 @@ window.z.util = z.util || {};
 
   const _check = {
     get_version: () => {
-      if (platform.version) {
-        return window.parseInt(platform.version.split('.')[0], 10);
+      if (window.platform.version) {
+        return window.parseInt(window.platform.version.split('.')[0], 10);
       }
     },
     is_chrome() {
-      return platform.name === BROWSER_NAME.CHROME || this.is_electron();
+      return window.platform.name === BROWSER_NAME.CHROME || this.is_electron();
     },
     is_desktop() {
       return this.is_electron() && navigator.userAgent.includes(BROWSER_NAME.WIRE);
     },
-    is_edge: () => platform.name === BROWSER_NAME.EDGE,
-    is_electron: () => platform.name === BROWSER_NAME.ELECTRON,
-    is_firefox: () => platform.name === BROWSER_NAME.FIREFOX,
-    is_opera: () => platform.name === BROWSER_NAME.OPERA,
+    is_edge: () => window.platform.name === BROWSER_NAME.EDGE,
+    is_electron: () => window.platform.name === BROWSER_NAME.ELECTRON,
+    is_firefox: () => window.platform.name === BROWSER_NAME.FIREFOX,
+    is_opera: () => window.platform.name === BROWSER_NAME.OPERA,
     supports_audio_output_selection() {
       return this.is_chrome();
     },
@@ -131,7 +131,7 @@ window.z.util = z.util || {};
       chrome: _check.is_chrome(),
       edge: _check.is_edge(),
       firefox: _check.is_firefox(),
-      name: platform.name,
+      name: window.platform.name,
       opera: _check.is_opera(),
       supports: {
         audio_output_selection: _check.supports_audio_output_selection(),

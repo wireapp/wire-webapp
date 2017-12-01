@@ -1,4 +1,4 @@
 module.exports = {
-  testPathIgnorePatterns: ['dist'],
+  testPathIgnorePatterns: ['aws', 'dist'],
   verbose: true,
 };
