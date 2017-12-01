@@ -39,8 +39,8 @@ const Verify = ({account, authError, history, intl: {formatMessage: _}, ...conne
     Promise.resolve()
       .then(() => connected.doRegisterTeam({...account, email_code}))
       .then(() => {
-        connected.trackEvent({attributes: undefined, name: TrackingAction.EVENT_NAME.TEAM.CREATED});
-        connected.trackEvent({attributes: undefined, name: TrackingAction.EVENT_NAME.TEAM.VERIFIED});
+        connected.trackEvent({name: TrackingAction.EVENT_NAME.TEAM.CREATED});
+        connected.trackEvent({name: TrackingAction.EVENT_NAME.TEAM.VERIFIED});
       })
       .then(() => history.push(ROUTE.INITIAL_INVITE))
       .catch(error => console.error('Failed to create account', error));
