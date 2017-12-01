@@ -4,7 +4,7 @@
     "gulp-concat": "2.6.1",
     "react": "16.2.0",
     "react-dom": "16.2.0",
-    "styled-components": "2.2.3",
+    "styled-components": "2.2.4",
     "styled-normalize": "2.2.1"
   },
   "devDependencies": {
