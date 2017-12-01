@@ -23,19 +23,19 @@ export default class RuntimeUtil {
   };
 
   static isElectron() {
-    return platform.name === BROWSER_NAME.ELECTRON;
+    return platform.name === RuntimeUtil.BROWSER_NAME.ELECTRON;
   }
 
   static isDesktop() {
-    return RuntimeUtil.isElectron() && platform.ua.includes(BROWSER_NAME.WIRE);
+    return RuntimeUtil.isElectron() && platform.ua.includes(RuntimeUtil.BROWSER_NAME.WIRE);
   }
 
   static getPlatform() {
     if (isDesktop()) {
-      if (platform.os.family.includes(PLATFORM_NAME.WINDOWS)) {
+      if (platform.os.family.includes(RuntimeUtil.PLATFORM_NAME.WINDOWS)) {
         return RuntimeUtil.PLATFORM_TYPE.DESKTOP_WINDOWS;
       }
-      if (platform.ua.includes(PLATFORM_NAME.MACINTOSH)) {
+      if (platform.ua.includes(RuntimeUtil.PLATFORM_NAME.MACINTOSH)) {
         return RuntimeUtil.PLATFORM_TYPE.DESKTOP_MACOS;
       }
       return RuntimeUtil.PLATFORM_TYPE.DESKTOP_LINUX;
