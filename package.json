@@ -21,7 +21,7 @@
     "gulp-sass": "3.1.0",
     "react-hot-loader": "3.1.2",
     "rimraf": "2.6.2",
-    "webpack": "3.8.1",
+    "webpack": "3.9.1",
     "webpack-dev-server": "2.9.4"
   },
   "license": "GPL-3.0",
