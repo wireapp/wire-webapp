@@ -50,7 +50,7 @@ export default class RuntimeUtil {
   }
 
   static getPlatform() {
-    if (isDesktop()) {
+    if (RuntimeUtil.isDesktop()) {
       if (platform.os.family.includes(RuntimeUtil.PLATFORM_NAME.WINDOWS)) {
         return RuntimeUtil.PLATFORM_TYPE.DESKTOP_WINDOWS;
       }
