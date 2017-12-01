@@ -99,7 +99,7 @@ class CreateAccount extends Component {
             <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
               <ContainerXS
                 centerText
-                style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
+                style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 428}}
               >
                 <H1 center>{_(createAccountStrings.headLine)}</H1>
                 <Form

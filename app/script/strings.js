@@ -145,44 +145,44 @@ export const inviteStrings = defineMessages({
 export const errorHandlerStrings = defineMessages({
   [BackendError.LABEL.ACCESS_DENIED]: {
     id: 'BackendError.LABEL.ACCESS_DENIED',
-    defaultMessage: 'Please verify your details and try again.',
+    defaultMessage: 'Please verify your details and try again',
   },
   [BackendError.LABEL.BLACKLISTED_EMAIL]: {
     id: 'BackendError.LABEL.BLACKLISTED_EMAIL',
-    defaultMessage: 'This email address is not allowed.',
+    defaultMessage: 'This email address is not allowed',
   },
   [BackendError.LABEL.BLACKLISTED_PHONE]: {
     id: 'BackendError.LABEL.BLACKLISTED_PHONE',
-    defaultMessage: 'This phone number is not allowed.',
+    defaultMessage: 'This phone number is not allowed',
   },
   [BackendError.LABEL.INVALID_CODE]: {
     id: 'BackendError.LABEL.INVALID_CODE',
-    defaultMessage: 'This code is invalid.',
+    defaultMessage: 'Please enter a valid code',
   },
   [BackendError.LABEL.INVALID_CREDENTIALS]: {
     id: 'BackendError.LABEL.INVALID_CREDENTIALS',
-    defaultMessage: 'Please verify your details and try again.',
+    defaultMessage: 'Please verify your details and try again',
   },
   [BackendError.LABEL.INVALID_EMAIL]: {
     id: 'BackendError.LABEL.INVALID_EMAIL',
-    defaultMessage: 'This email address is invalid.',
+    defaultMessage: 'This email address is invalid',
   },
   [BackendError.LABEL.INVALID_PHONE]: {
     id: 'BackendError.LABEL.INVALID_PHONE',
-    defaultMessage: 'This phone number is invalid.',
+    defaultMessage: 'This phone number is invalid',
   },
   [BackendError.LABEL.KEY_EXISTS]: {
     id: 'BackendError.LABEL.KEY_EXISTS',
     defaultMessage:
-      'The email address you provided has already been registered. <a target="_blank" rel="noopener noreferrer" href="https://support.wire.com/hc/articles/115004082129">Learn more</a>',
+      'This email address has already been registered. <a target="_blank" rel="noopener noreferrer" href="https://support.wire.com/hc/articles/115004082129">Learn more</a>',
   },
   [BackendError.LABEL.MISSING_AUTH]: {
     id: 'BackendError.LABEL.MISSING_AUTH',
-    defaultMessage: 'Please verify your details and try again.',
+    defaultMessage: 'Please verify your details and try again',
   },
   [BackendError.LABEL.PENDING_ACTIVATION]: {
     id: 'BackendError.LABEL.PENDING_ACTIVATION',
-    defaultMessage: 'The email address you provided has already been invited. Please check your email.',
+    defaultMessage: 'The email address you provided has already been invited. Please check your email',
   },
   [BackendError.LABEL.PENDING_LOGIN]: {
     id: 'BackendError.LABEL.PENDING_LOGIN',
@@ -190,7 +190,7 @@ export const errorHandlerStrings = defineMessages({
   },
   [BackendError.LABEL.TOO_MANY_LOGINS]: {
     id: 'BackendError.LABEL.TOO_MANY_LOGINS',
-    defaultMessage: 'Please try again later.',
+    defaultMessage: 'Please try again later',
   },
   [BackendError.LABEL.BAD_REQUEST]: {
     id: 'BackendError.LABEL.BAD_REQUEST',
@@ -210,15 +210,15 @@ export const errorHandlerStrings = defineMessages({
   },
   [BackendError.LABEL.UNAUTHORIZED]: {
     id: 'BackendError.LABEL.UNAUTHORIZED',
-    defaultMessage: 'Something went wrong. Please reload the page and try again.',
+    defaultMessage: 'Something went wrong. Please reload the page and try again',
   },
   [BackendError.LABEL.HANDLE_EXISTS]: {
     id: 'BackendError.LABEL.HANDLE_EXISTS',
-    defaultMessage: 'This username is already taken.',
+    defaultMessage: 'This username is already taken',
   },
   [BackendError.LABEL.INVALID_HANDLE]: {
     id: 'BackendError.LABEL.INVALID_HANDLE',
-    defaultMessage: 'This username is invalid.',
+    defaultMessage: 'This username is invalid',
   },
   [BackendError.LABEL.INVALID_INVITATION_CODE]: {
     id: 'BackendError.LABEL.INVALID_INVITATION_CODE',
@@ -226,23 +226,23 @@ export const errorHandlerStrings = defineMessages({
   },
   [BackendError.LABEL.NO_OTHER_OWNER]: {
     id: 'BackendError.LABEL.NO_OTHER_OWNER',
-    defaultMessage: 'The last owner cannot be removed from the team.',
+    defaultMessage: 'The last owner cannot be removed from the team',
   },
   [BackendError.LABEL.NO_TEAM]: {
     id: 'BackendError.LABEL.NO_TEAM',
-    defaultMessage: 'Could not find team.',
+    defaultMessage: 'Could not find team',
   },
   [BackendError.LABEL.NO_TEAM_MEMBER]: {
     id: 'BackendError.LABEL.NO_TEAM_MEMBER',
-    defaultMessage: 'Could not find team member.',
+    defaultMessage: 'Could not find team member',
   },
   [BackendError.LABEL.TOO_MANY_MEMBERS]: {
     id: 'BackendError.LABEL.TOO_MANY_MEMBERS',
-    defaultMessage: 'This team has reached its maximum size.',
+    defaultMessage: 'This team has reached its maximum size',
   },
   [BackendError.LABEL.SUSPENDED]: {
     id: 'BackendError.LABEL.SUSPENDED',
-    defaultMessage: 'This account is no longer authorized to log in.',
+    defaultMessage: 'This account is no longer authorized to log in',
   },
   [BackendError.LABEL.EMAIL_EXISTS]: {
     id: 'BackendError.LABEL.EMAIL_EXISTS',
@@ -266,7 +266,7 @@ export const validationErrorStrings = defineMessages({
   },
   [ValidationError.FIELD.EMAIL.TYPE_MISMATCH]: {
     id: 'ValidationError.FIELD.EMAIL.TYPE_MISMATCH',
-    defaultMessage: 'Please enter a valid email address.',
+    defaultMessage: 'Please enter a valid email address',
   },
   unexpected: {
     id: 'BackendError.unexpected',
