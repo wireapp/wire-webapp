@@ -31,3 +31,4 @@ export * from './RoundIconButton';
 export * from './Select';
 export * from './CodeInput';
 export * from './ErrorMessage';
+export * from './ShakeBox';

@@ -38,12 +38,14 @@ import {
   ButtonLink,
   Checkbox,
   CodeInput,
+  ErrorMessage,
   Form,
   Input,
   InputBlock,
   InputSubmitCombo,
   RoundIconButton,
   Select,
+  ShakeBox,
 } from '@wireapp/react-ui-kit/Form';
 import {COLOR, Logo} from '@wireapp/react-ui-kit/Identity';
 import {
@@ -62,6 +64,8 @@ import {CheckboxLabel} from '../src/Form/index';
 import Color from 'color';
 import {Loading} from '@wireapp/react-ui-kit/Progress';
 import React from 'react';
+
+let shakebox = null;
 
 export default function Demo() {
   return (
@@ -211,17 +215,27 @@ export default function Demo() {
           <H2>Form</H2>
           <Line />
           <ContainerXS>
-            <Form>
-              <Input placeholder="Placeholder" type="email" required />
-              <Button type="submit">Submit Button</Button>
-              <InputBlock>
-                <Input placeholder="InputBlock" markInvalid />
-                <InputSubmitCombo>
-                  <Input placeholder="InputSubmitCombo" />
-                  <RoundIconButton type="submit" icon="plane" />
-                </InputSubmitCombo>
-              </InputBlock>
-            </Form>
+            <ShakeBox ref={node => (shakebox = node)}>
+              <Form
+                onSubmit={event => {
+                  shakebox.shake();
+                  event.preventDefault();
+                }}
+              >
+                <Input placeholder="Placeholder" type="email" required />
+                <Button type="submit" formNoValidate>
+                  Submit Button
+                </Button>
+                <InputBlock>
+                  <Input placeholder="InputBlock" markInvalid />
+                  <InputSubmitCombo>
+                    <Input placeholder="InputSubmitCombo" />
+                    <RoundIconButton type="submit" icon="plane" formNoValidate />
+                  </InputSubmitCombo>
+                </InputBlock>
+              </Form>
+            </ShakeBox>
+            <ErrorMessage>Submit form for shake effect</ErrorMessage>
             <CodeInput onCodeComplete={code => console.log(code)} />
           </ContainerXS>
 
