@@ -26,14 +26,18 @@ import {InputSubmitCombo, Input, RoundIconButton, Form, ButtonLink, ErrorMessage
 import {CheckIcon} from '@wireapp/react-ui-kit/Icon';
 import {H1, Text, Link} from '@wireapp/react-ui-kit/Text';
 import {COLOR} from '@wireapp/react-ui-kit/Identity';
-import {parseError} from '../util/errorUtil';
+import {parseError, parseValidationErrors} from '../util/errorUtil';
 import * as LanguageSelector from '../module/selector/LanguageSelector';
 import * as InviteSelector from '../module/selector/InviteSelector';
 import {invite} from '../module/action/InviteAction';
+import {resetError} from '../module/action/creator/InviteActionCreator';
 import {fetchSelf} from '../module/action/SelfAction';
+import ValidationError from '../module/action/ValidationError';
 import Page from './Page';
 
 class InitialInvite extends React.PureComponent {
+  state = {error: null};
+
   componentDidMount() {
     this.props.fetchSelf();
   }
@@ -70,8 +74,24 @@ class InitialInvite extends React.PureComponent {
     </div>
   );
 
+  handleSubmit = event => {
+    event.preventDefault();
+    if (!this.emailInput.checkValidity()) {
+      this.setState({error: ValidationError.handleValidationState('email', this.emailInput.validity)});
+    } else {
+      this.props.invite({email: this.emailInput.value});
+      this.emailInput.value = '';
+    }
+    this.emailInput.focus();
+  };
+
+  resetErrors = () => {
+    this.setState({error: null});
+    this.props.resetError();
+  };
+
   render() {
-    const {invites, error, intl: {formatMessage: _}, ...connected} = this.props;
+    const {invites, error, intl: {formatMessage: _}} = this.props;
     return (
       <Page isAuthenticated>
         <ContainerXS
@@ -83,29 +103,25 @@ class InitialInvite extends React.PureComponent {
             <H1 center>{_(inviteStrings.headline)}</H1>
             <Text>{_(inviteStrings.subhead)}</Text>
           </div>
-          <div style={{margin: '18px 0'}}>
+          <div style={{margin: '18px 0', minHeight: 220}}>
             {invites.map(({email}) => this.renderEmail(email))}
-            <Form
-              onSubmit={event => {
-                event.preventDefault();
-                connected.invite({email: this.emailInput.value});
-                this.emailInput.value = '';
-                this.emailInput.focus();
-              }}
-            >
+            <Form onSubmit={this.handleSubmit}>
               <InputSubmitCombo>
                 <Input
                   name="email"
                   placeholder={_(inviteStrings.emailPlaceholder)}
                   type="email"
+                  onChange={this.resetErrors}
                   innerRef={node => (this.emailInput = node)}
                   autoFocus
                   data-uie-name="enter-invite-email"
                 />
-                <RoundIconButton icon="plane" type="submit" data-uie-name="do-send-invite" />
+                <RoundIconButton icon="plane" type="submit" data-uie-name="do-send-invite" formNoValidate />
               </InputSubmitCombo>
             </Form>
-            <ErrorMessage data-uie-name="error-message">{parseError(error)}</ErrorMessage>
+            <ErrorMessage data-uie-name="error-message">
+              {this.state.error ? parseValidationErrors(this.state.error) : parseError(error)}
+            </ErrorMessage>
           </div>
           <div>
             {invites.length ? (
@@ -134,6 +150,7 @@ export default injectIntl(
     {
       fetchSelf,
       invite,
+      resetError,
       ...TrackingAction,
     }
   )(InitialInvite)

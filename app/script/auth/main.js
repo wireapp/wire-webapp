@@ -18,19 +18,18 @@
  */
 
 import 'babel-polyfill'; // Polyfill needs to be imported first
-import 'url-search-params-polyfill';
 import {Account} from '@wireapp/core';
 import {AppContainer} from 'react-hot-loader';
 import {Provider} from 'react-redux';
 import configureStore from './configureStore';
 import configureClient from './configureClient';
 import configureTracking from './configureTracking';
-import configureWrapper from './configureWrapper';
+import configureEnvironment from './configureEnvironment';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Root from './page/Root';
 
-configureWrapper();
+configureEnvironment();
 const apiClient = configureClient();
 const core = new Account(apiClient);
 const mixpanel = configureTracking();

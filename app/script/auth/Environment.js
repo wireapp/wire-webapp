@@ -24,10 +24,13 @@ export const PRODUCTION = 'PRODUCTION';
 export const APP_ENVIRONMENT = getEnvironmentFromQuery();
 checkEnvironment();
 
+export function getURLParameter(parameterName) {
+  return (window.location.search.split(`${parameterName}=`)[1] || '').split('&')[0];
+}
+
 export function getEnvironmentFromQuery() {
   const isProductionHost = window.location.hostname.includes('wire.com');
-  const environmentQueryValue = new URL(window.location).searchParams.get('env');
-  switch (environmentQueryValue) {
+  switch (getURLParameter('env')) {
     case 'staging':
       return STAGING;
     case 'prod':

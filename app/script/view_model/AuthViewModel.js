@@ -317,6 +317,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     const is_connect = z.util.get_url_parameter(z.auth.URLParameter.CONNECT);
     if (is_connect) {
       this.get_wire(true);
+      this._set_hash(z.auth.AuthView.MODE.ACCOUNT_REGISTER);
       return (this.registration_context = z.auth.AuthView.REGISTRATION_CONTEXT.GENERIC_INVITE);
     }
 
@@ -334,6 +335,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
         break;
       case z.auth.SIGN_OUT_REASON.ACCOUNT_REGISTRATION:
         return this._login_from_teams();
+      case z.auth.SIGN_OUT_REASON.CLIENT_REMOVED:
       case z.auth.SIGN_OUT_REASON.SESSION_EXPIRED:
         this.reason_info(z.l10n.text(z.string.auth_account_expiration));
         break;

@@ -17,7 +17,17 @@
  *
  */
 
-// Expose wire object in global namespace to satisfy wrapper check
-const configureWrapper = () => (window.wire = {});
+import jQuery from 'jquery';
+import {amplify} from '@bower_components/amplify';
+import platform from 'platform';
+import '../event/WebApp';
 
-export default configureWrapper;
+window.amplify = amplify;
+window.platform = platform;
+window.jQuery = jQuery;
+window.$ = jQuery;
+
+// Expose wire object in global namespace to satisfy wrapper check
+const configureEnvironment = () => (window.wire = {});
+
+export default configureEnvironment;

@@ -30,20 +30,18 @@ import {Link, Paragraph, Text, Bold} from '@wireapp/react-ui-kit/Text';
 
 class Index extends Component {
   componentDidMount() {
-    this.props.trackEvent({attributes: undefined, name: TrackingAction.EVENT_NAME.START.OPENED_START_SCREEN});
+    this.props.trackEvent({name: TrackingAction.EVENT_NAME.START.OPENED_START_SCREEN});
   }
 
   onRegisterPersonalClick = () =>
     this.trackAndNavigate(
-      TrackingAction.EVENT_NAME.START.OPENED_PERSON_REGISTRATION,
+      TrackingAction.EVENT_NAME.START.OPENED_PERSONAL_REGISTRATION,
       `${ROUTE.LOGIN}?hl=${this.props.language}#register`
     );
 
   onRegisterTeamClick = () => {
     return Promise.resolve()
-      .then(() =>
-        this.props.trackEvent({attributes: undefined, name: TrackingAction.EVENT_NAME.START.OPENED_TEAM_REGISTRATION})
-      )
+      .then(() => this.props.trackEvent({name: TrackingAction.EVENT_NAME.START.OPENED_TEAM_REGISTRATION}))
       .then(() => this.props.history.push(ROUTE.CREATE_TEAM));
   };
 
@@ -55,7 +53,7 @@ class Index extends Component {
 
   trackAndNavigate = (eventName, url) => {
     return Promise.resolve()
-      .then(() => this.props.trackEvent({attributes: undefined, name: eventName}))
+      .then(() => this.props.trackEvent({name: eventName}))
       .then(() => (window.location = url));
   };
 
@@ -75,7 +73,7 @@ class Index extends Component {
                 {_(indexStrings.createAccount)}
               </Bold>
               <br />
-              <Text light fontSize="24px" color={COLOR.LINK}>
+              <Text light fontSize="16px" color={COLOR.LINK} style={{lineHeight: '36px'}}>
                 {_(indexStrings.createAccountFor)}
               </Text>
             </Link>
@@ -89,7 +87,7 @@ class Index extends Component {
                 {_(indexStrings.createTeam)}
               </Bold>
               <br />
-              <Text light fontSize="24px" color={COLOR.LINK}>
+              <Text light fontSize="16px" color={COLOR.LINK} style={{lineHeight: '36px'}}>
                 {_(indexStrings.createTeamFor)}
               </Text>
             </Link>
