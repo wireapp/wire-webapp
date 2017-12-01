@@ -1,6 +1,20 @@
-import '../../util/Environment';
+import platform from 'platform';
 
 export default class RuntimeUtil {
+  static BROWSER_NAME = {
+    CHROME: 'Chrome',
+    EDGE: 'Microsoft Edge',
+    ELECTRON: 'Electron',
+    FIREFOX: 'Firefox',
+    OPERA: 'Opera',
+    WIRE: 'Wire',
+  };
+
+  static PLATFORM_NAME = {
+    MACINTOSH: 'Mac',
+    WINDOWS: 'Win',
+  };
+
   static PLATFORM_TYPE = {
     BROWSER_APP: 'web',
     DESKTOP_LINUX: 'linux',
@@ -8,12 +22,20 @@ export default class RuntimeUtil {
     DESKTOP_WINDOWS: 'windows',
   };
 
+  static isElectron() {
+    return platform.name === BROWSER_NAME.ELECTRON;
+  }
+
+  static isDesktop() {
+    return RuntimeUtil.isElectron() && platform.ua.includes(BROWSER_NAME.WIRE);
+  }
+
   static getPlatform() {
-    if (z.util.Environment.desktop) {
-      if (z.util.Environment.os.win) {
+    if (isDesktop()) {
+      if (platform.os.family.includes(PLATFORM_NAME.WINDOWS)) {
         return RuntimeUtil.PLATFORM_TYPE.DESKTOP_WINDOWS;
       }
-      if (z.util.Environment.os.mac) {
+      if (platform.os.family.includes(PLATFORM_NAME.MACINTOSH)) {
         return RuntimeUtil.PLATFORM_TYPE.DESKTOP_MACOS;
       }
       return RuntimeUtil.PLATFORM_TYPE.DESKTOP_LINUX;

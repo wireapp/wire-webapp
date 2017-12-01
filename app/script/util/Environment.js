@@ -54,7 +54,7 @@ window.z.util = z.util || {};
       return window.platform.name === BROWSER_NAME.CHROME || this.is_electron();
     },
     is_desktop() {
-      return this.is_electron() && navigator.userAgent.includes(BROWSER_NAME.WIRE);
+      return this.is_electron() && window.platform.ua.includes(BROWSER_NAME.WIRE);
     },
     is_edge: () => window.platform.name === BROWSER_NAME.EDGE,
     is_electron: () => window.platform.name === BROWSER_NAME.ELECTRON,
@@ -95,8 +95,8 @@ window.z.util = z.util || {};
   };
 
   const os = {
-    is_mac: () => navigator.platform.includes(PLATFORM_NAME.MACINTOSH),
-    is_windows: () => navigator.platform.includes(PLATFORM_NAME.WINDOWS),
+    is_mac: () => window.platform.os.family.includes(PLATFORM_NAME.MACINTOSH),
+    is_windows: () => window.platform.os.family.includes(PLATFORM_NAME.WINDOWS),
   };
 
   // add body information
@@ -163,7 +163,7 @@ window.z.util = z.util || {};
         return app_version();
       }
 
-      const electron_version = this._electron_version(navigator.userAgent);
+      const electron_version = this._electron_version(window.platform.ua);
       if (electron_version && show_wrapper_version) {
         return electron_version;
       }
