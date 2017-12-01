@@ -35,7 +35,7 @@ export default class RuntimeUtil {
       if (platform.os.family.includes(PLATFORM_NAME.WINDOWS)) {
         return RuntimeUtil.PLATFORM_TYPE.DESKTOP_WINDOWS;
       }
-      if (platform.os.family.includes(PLATFORM_NAME.MACINTOSH)) {
+      if (platform.ua.includes(PLATFORM_NAME.MACINTOSH)) {
         return RuntimeUtil.PLATFORM_TYPE.DESKTOP_MACOS;
       }
       return RuntimeUtil.PLATFORM_TYPE.DESKTOP_LINUX;

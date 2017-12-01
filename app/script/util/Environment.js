@@ -95,7 +95,7 @@ window.z.util = z.util || {};
   };
 
   const os = {
-    is_mac: () => window.platform.os.family.includes(PLATFORM_NAME.MACINTOSH),
+    is_mac: () => window.platform.ua.includes(PLATFORM_NAME.MACINTOSH),
     is_windows: () => window.platform.os.family.includes(PLATFORM_NAME.WINDOWS),
   };
 

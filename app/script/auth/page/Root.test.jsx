@@ -41,8 +41,8 @@ describe('Root', () => {
     const markup = <Root />;
     const store = mockStore(state);
     const component = renderer.create(withStore(markup, store));
-    const tree = component.toJSON();
 
+    const tree = component.toJSON();
     expect(tree.type).toBe('div');
   });
 });
