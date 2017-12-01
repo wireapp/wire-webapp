@@ -25,7 +25,9 @@ import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 
 describe('Root', () => {
-  it('should render logo', () => {
+  beforeEach(() => (window.platform = require('platform')));
+
+  it('renders the Wire logo', () => {
     const component = mount(
       withStore(
         <Root />,
