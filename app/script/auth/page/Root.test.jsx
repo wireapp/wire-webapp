@@ -23,8 +23,8 @@ import {Provider} from 'react-redux';
 import Root from './Root';
 import thunk from 'redux-thunk';
 
-const middlewares = [thunk.withExtraArgument()];
-const mockStore = configureStore(middlewares);
+const middleWares = [thunk.withExtraArgument()];
+const mockStore = configureStore(middleWares);
 const withStore = (children, store) => <Provider store={store}>{children}</Provider>;
 
 describe('Root', () => {
