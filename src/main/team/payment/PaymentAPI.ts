@@ -93,15 +93,6 @@ export default class TeamAPI {
     return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
   }
 
-  public getPaymentPlan(teamId: string): Promise<PaymentPlan> {
-    const config: AxiosRequestConfig = {
-      method: 'get',
-      url: `${TeamAPI.URL.TEAMS}/${teamId}/${TeamAPI.URL.BILLING}/${TeamAPI.URL.PLAN}`,
-    };
-
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
-  }
-
   public getPlans(teamId: string): Promise<PaymentStripePlan[]> {
     const config: AxiosRequestConfig = {
       method: 'get',
