@@ -111,7 +111,7 @@
     "karma-coverage": "1.1.1",
     "karma-jasmine": "1.1.0",
     "karma-sourcemap-loader": "0.3.7",
-    "lint-staged": "5.0.0",
+    "lint-staged": "6.0.0",
     "load-grunt-tasks": "3.5.2",
     "node-sass": "4.7.2",
     "npm-run-all": "4.1.2",
