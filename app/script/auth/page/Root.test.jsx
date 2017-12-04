@@ -23,7 +23,7 @@ import {Provider} from 'react-redux';
 import Root from './Root';
 import thunk from 'redux-thunk';
 
-const middleWares = [thunk.withExtraArgument()];
+const middleWares = [thunk.withExtraArgument({mixpanel: {track: () => 1}})];
 const mockStore = configureStore(middleWares);
 const withStore = (children, store) => <Provider store={store}>{children}</Provider>;
 
