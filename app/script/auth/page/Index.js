@@ -45,11 +45,17 @@ class Index extends Component {
       .then(() => this.props.history.push(ROUTE.CREATE_TEAM));
   };
 
-  onLoginClick = () =>
+  onLoginClick = () => {
+    const searchParams = window.location.search.replace(/^\?/, '').split('&');
+    const hlParam = searchParams.find(param => /^hl=/.test(param));
+    if (!hlParam) {
+      searchParams.push(`hl=${this.props.language}`);
+    }
     this.trackAndNavigate(
       TrackingAction.EVENT_NAME.START.OPENED_LOGIN,
-      `${ROUTE.LOGIN}?hl=${this.props.language}#login`
+      `${ROUTE.LOGIN}?${searchParams.join('&')}#login`
     );
+  };
 
   trackAndNavigate = (eventName, url) => {
     return Promise.resolve()
