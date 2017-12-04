@@ -27,18 +27,19 @@ const hasInvalidAccountData = account => !account.name || !account.email || !acc
 
 const hasInvalidTeamData = ({team}) => !team || !team.name;
 
-function Page({hasAccountData, hasTeamData, isAuthenticated, isStateAuthenticated, account, children}) {
+function Page({hasAccountData, hasTeamData, isInTeamFlow, isAuthenticated, isStateAuthenticated, account, children}) {
   if (
     (hasAccountData && hasInvalidAccountData(account)) ||
     (hasTeamData && hasInvalidTeamData(account)) ||
     (isAuthenticated && !isStateAuthenticated)
   ) {
-    return <Redirect to={ROUTE.CREATE_TEAM} />;
+    return <Redirect to={isInTeamFlow ? ROUTE.CREATE_TEAM : ROUTE.CREATE_PERSONAL_ACCOUNT} />;
   }
   return children;
 }
 
 export default connect(state => ({
   account: AuthSelector.getAccount(state),
+  isInTeamFlow: AuthSelector.isInTeamFlow(state),
   isStateAuthenticated: AuthSelector.isAuthenticated(state),
 }))(Page);

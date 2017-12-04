@@ -29,6 +29,7 @@ import {injectIntl} from 'react-intl';
 import {Logo, COLOR} from '@wireapp/react-ui-kit/Identity';
 import {ProfileIcon, RoundContainer, TeamIcon} from '@wireapp/react-ui-kit/Icon';
 import {Link, Paragraph, Text, Bold} from '@wireapp/react-ui-kit/Text';
+import {pathWithParams} from '../util/urlUtil';
 
 class Index extends Component {
   componentDidMount() {
@@ -49,8 +50,7 @@ class Index extends Component {
 
   onLoginClick = () => {
     this.props.trackEvent({name: TrackingAction.EVENT_NAME.START.OPENED_LOGIN});
-    const searchParams = window.location.search;
-    window.location = `${ROUTE.LOGIN}${searchParams}#login`;
+    window.location = `${pathWithParams(ROUTE.LOGIN)}#login`;
   };
 
   render() {
