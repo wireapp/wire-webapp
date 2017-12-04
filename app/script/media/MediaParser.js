@@ -42,9 +42,7 @@ class MediaParser {
    * @returns {string} Message with rendered media embeds
    */
   render_media_embeds(message, theme_color) {
-    const div = document.createElement('div');
-    div.innerHTML = message;
-    const links = Array.from(div.querySelectorAll('a'));
+    const links = Array.from(jQuery(message).filter('a'));
 
     for (const link of links) {
       for (const embed of this.embeds) {
