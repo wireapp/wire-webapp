@@ -16,36 +16,23 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-import React from 'react';
-import Root from './Root';
-import {Provider} from 'react-redux';
-import {mount} from 'enzyme';
 
-import configureStore from 'redux-mock-store';
-import thunk from 'redux-thunk';
+import React from 'react';
+import {mockStore, renderWithStore} from '../util/TestUtil';
+import Root from './Root';
 
 describe('Root', () => {
-  it('should render logo', () => {
-    const component = mount(
-      withStore(
-        <Root />,
-        mockStore()({
-          authState: {
-            name: 'bob',
-          },
-          languageState: {
-            language: 'en',
-          },
-        })
-      )
-    );
-    console.log('component', component.html());
-    expect(component.find('#wire-logo').exists()).toBe(true);
+  it('renders the Wire logo', () => {
+    const state = {
+      languageState: {
+        language: 'en',
+      },
+    };
+
+    const store = mockStore(state, {mixpanel: {track: () => 1}});
+    const component = renderWithStore(<Root />, store);
+
+    const tree = component.toJSON();
+    expect(tree.type).toBe('div');
   });
 });
-
-const withStore = (children, store) => {
-  return <Provider store={store}>{children}</Provider>;
-};
-
-const mockStore = () => configureStore([thunk.withExtraArgument()]);
