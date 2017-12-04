@@ -6,7 +6,7 @@
     "@wireapp/store-engine": "0.1.1",
     "bazinga64": "5.0.3",
     "protobufjs": "6.8.3",
-    "pure-uuid": "1.4.10",
+    "pure-uuid": "1.4.11",
     "wire-webapp-cryptobox": "6.2.1"
   },
   "devDependencies": {
