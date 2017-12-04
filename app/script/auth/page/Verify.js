@@ -34,17 +34,28 @@ import Page from './Page';
 import React from 'react';
 import ROUTE from '../route';
 
-const Verify = ({account, authError, history, intl: {formatMessage: _}, ...connected}) => {
+const Verify = ({account, authError, history, isInTeamFlow, intl: {formatMessage: _}, ...connected}) => {
   const createAccount = email_code => {
     Promise.resolve()
-      .then(() => connected.doRegisterTeam({...account, email_code}))
       .then(() => {
-        connected.trackEvent({name: TrackingAction.EVENT_NAME.TEAM.CREATED});
-        connected.trackEvent({name: TrackingAction.EVENT_NAME.TEAM.VERIFIED});
+        if (isInTeamFlow) {
+          connected.doRegisterTeam({...account, email_code});
+        } else {
+          connected.doRegisterPersonal({...account, email_code});
+        }
+      })
+      .then(() => {
+        connected.trackEvent({
+          name: isInTeamFlow ? TrackingAction.EVENT_NAME.TEAM.CREATED : TrackingAction.EVENT_NAME.PERSONAL.CREATED,
+        });
+        connected.trackEvent({
+          name: isInTeamFlow ? TrackingAction.EVENT_NAME.TEAM.VERIFIED : TrackingAction.EVENT_NAME.PERSONAL.VERIFIED,
+        });
       })
       .then(() => history.push(ROUTE.INITIAL_INVITE))
       .catch(error => console.error('Failed to create account', error));
   };
+
   const resendCode = event => {
     event.preventDefault();
     return Promise.resolve()
@@ -85,6 +96,7 @@ export default withRouter(
       state => ({
         account: AuthSelector.getAccount(state),
         authError: AuthSelector.getError(state),
+        isInTeamFlow: AuthSelector.isInTeamFlow(state),
       }),
       {...AuthAction, ...TrackingAction, ...UserAction}
     )(Verify)

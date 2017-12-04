@@ -18,6 +18,8 @@
  */
 
 import * as TrackingAction from '../module/action/TrackingAction';
+import * as AuthAction from '../module/action/creator/AuthActionCreator';
+import {getLanguage} from '../module/selector/LanguageSelector';
 import React, {Component} from 'react';
 import ROUTE from '../route';
 import {Columns, Column, ContainerXS} from '@wireapp/react-ui-kit/Layout';
@@ -33,25 +35,22 @@ class Index extends Component {
     this.props.trackEvent({name: TrackingAction.EVENT_NAME.START.OPENED_START_SCREEN});
   }
 
-  onRegisterPersonalClick = () =>
-    Promise.resolve()
-      .then(() => this.props.trackEvent({name: TrackingAction.EVENT_NAME.START.OPENED_PERSONAL_REGISTRATION}))
-      .then(() => this.props.history.push(ROUTE.CREATE_PERSONAL_ACCOUNT));
-
-  onRegisterTeamClick = () =>
-    Promise.resolve()
-      .then(() => this.props.trackEvent({name: TrackingAction.EVENT_NAME.START.OPENED_TEAM_REGISTRATION}))
-      .then(() => this.props.history.push(ROUTE.CREATE_TEAM));
-
-  onLoginClick = () => {
-    const searchParams = window.location.search;
-    this.trackAndNavigate(TrackingAction.EVENT_NAME.START.OPENED_LOGIN, `${ROUTE.LOGIN}${searchParams}#login`);
+  onRegisterPersonalClick = () => {
+    this.props.trackEvent({name: TrackingAction.EVENT_NAME.START.OPENED_PERSONAL_REGISTRATION});
+    this.props.enterPersonalCreationFlow();
+    this.props.history.push(ROUTE.CREATE_PERSONAL_ACCOUNT);
   };
 
-  trackAndNavigate = (eventName, url) => {
-    return Promise.resolve()
-      .then(() => this.props.trackEvent({name: eventName}))
-      .then(() => (window.location = url));
+  onRegisterTeamClick = () => {
+    this.props.trackEvent({name: TrackingAction.EVENT_NAME.START.OPENED_TEAM_REGISTRATION});
+    this.props.enterTeamCreationFlow();
+    this.props.history.push(ROUTE.CREATE_TEAM);
+  };
+
+  onLoginClick = () => {
+    this.props.trackEvent({name: TrackingAction.EVENT_NAME.START.OPENED_LOGIN});
+    const searchParams = window.location.search;
+    window.location = `${ROUTE.LOGIN}${searchParams}#login`;
   };
 
   render() {
@@ -100,4 +99,6 @@ class Index extends Component {
   }
 }
 
-export default injectIntl(connect(({languageState}) => ({language: languageState.language}), TrackingAction)(Index));
+export default injectIntl(
+  connect(state => ({language: getLanguage(state)}), {...AuthAction, ...TrackingAction})(Index)
+);

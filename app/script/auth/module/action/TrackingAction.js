@@ -21,6 +21,10 @@ import * as TrackingActionCreator from './creator/TrackingActionCreator';
 import RuntimeUtil from '../../util/RuntimeUtil';
 
 export const EVENT_NAME = {
+  PERSONAL: {
+    CREATED: 'personal.created',
+    VERIFIED: 'personal.verified',
+  },
   START: {
     OPENED_LOGIN: 'start.opened_login',
     OPENED_PERSONAL_REGISTRATION: 'start.opened_personal_registration',

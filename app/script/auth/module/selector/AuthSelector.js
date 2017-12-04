@@ -21,6 +21,7 @@ export const getAccessToken = state => state.authState.accesstoken;
 export const isAuthenticated = state => state.authState.isAuthenticated;
 export const isFetching = state => state.authState.fetching;
 export const getError = state => state.authState.error;
+export const isInTeamFlow = state => state.authState.isInTeamFlow;
 
 export const getAccount = state => state.authState.account || {};
 export const getAccountTeam = state => getAccount(state).team || {};
