@@ -45,11 +45,10 @@ class Index extends Component {
       .then(() => this.props.history.push(ROUTE.CREATE_TEAM));
   };
 
-  onLoginClick = () =>
-    this.trackAndNavigate(
-      TrackingAction.EVENT_NAME.START.OPENED_LOGIN,
-      `${ROUTE.LOGIN}?hl=${this.props.language}#login`
-    );
+  onLoginClick = () => {
+    const searchParams = window.location.search;
+    this.trackAndNavigate(TrackingAction.EVENT_NAME.START.OPENED_LOGIN, `${ROUTE.LOGIN}${searchParams}#login`);
+  };
 
   trackAndNavigate = (eventName, url) => {
     return Promise.resolve()
