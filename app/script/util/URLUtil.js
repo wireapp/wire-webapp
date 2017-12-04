@@ -59,9 +59,14 @@ z.util.URLUtil = (() => {
 
   const _build_url = (type, path = '') => `${_get_domain(type)}${path && path.startsWith('/') ? path : ''}`;
 
+  const _get_links_from_html = html => {
+    return html.match(/<a[\s]+([^>]+)>((?:.(?!\<\/a\>))*.)<\/a>/g);
+  };
+
   return {
     TYPE: TYPE,
     build_support_url: _build_support_url,
     build_url: _build_url,
+    get_links_from_html: _get_links_from_html,
   };
 })();
