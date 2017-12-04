@@ -78,6 +78,7 @@
     "eslint-config-prettier": "2.9.0",
     "eslint-plugin-babel": "4.1.2",
     "eslint-plugin-jsdoc": "3.2.0",
+    "eslint-plugin-no-unsanitized": "2.0.2",
     "eslint-plugin-prettier": "2.3.1",
     "eslint-plugin-react": "7.5.1",
     "extract-loader": "1.0.1",
@@ -139,22 +140,10 @@
     "yarn": ">= 1.0.0"
   },
   "lint-staged": {
-    "*.js": [
-      "eslint --fix",
-      "git add"
-    ],
-    "*.json": [
-      "prettier --write",
-      "git add"
-    ],
-    "*.less": [
-      "prettier --write",
-      "git add"
-    ],
-    "*.md": [
-      "prettier --write",
-      "git add"
-    ]
+    "*.js": ["eslint --fix", "git add"],
+    "*.json": ["prettier --write", "git add"],
+    "*.less": ["prettier --write", "git add"],
+    "*.md": ["prettier --write", "git add"]
   },
   "scripts": {
     "bundle:dev": "webpack --config webpack.config.dev.js",
@@ -198,13 +187,7 @@
       "js": "dist/ByteBufferAB.js"
     },
     "@bower_components/cryptojs": {
-      "js": [
-        "core.js",
-        "lib-typedarrays.js",
-        "md5.js",
-        "enc-base64.js",
-        "sha256.js"
-      ]
+      "js": ["core.js", "lib-typedarrays.js", "md5.js", "enc-base64.js", "sha256.js"]
     },
     "@bower_components/dexie": {
       "js": "dist/dexie.js"
@@ -241,10 +224,7 @@
       "js": "dist/long.js"
     },
     "@bower_components/mixpanel": {
-      "js": [
-        "mixpanel-jslib-snippet.js",
-        "mixpanel.min.js"
-      ]
+      "js": ["mixpanel-jslib-snippet.js", "mixpanel.min.js"]
     },
     "@bower_components/moment": {
       "js": [
