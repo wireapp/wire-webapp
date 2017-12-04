@@ -22,11 +22,27 @@
 'use strict';
 
 describe('z.util.URLUtil', () => {
-  describe('get_links_from_html', () => {
+  describe('"get_links_from_html"', () => {
     it('returns an array of links from a given HTML markup', () => {
       const html = '<a href="https://www.google.com" target="_blank" rel="nofollow">https://www.google.com</a>';
       const links = z.util.URLUtil.get_links_from_html(html);
       expect(links.length).toBe(1);
+      const link = links[0];
+      expect(link.href).toBe('https://www.google.com/');
+      expect(link.pathname).toBe('/');
+    });
+
+    it('handles undefined and null values', () => {
+      let links = z.util.URLUtil.get_links_from_html(undefined);
+      expect(links.length).toBe(0);
+      links = z.util.URLUtil.get_links_from_html(null);
+      expect(links.length).toBe(0);
+    });
+
+    it('always returns an array', () => {
+      const html = '🦅🌾';
+      const links = z.util.URLUtil.get_links_from_html(html);
+      expect(links.length).toBe(0);
     });
 
     it('returns an array of links from a given HTML markup with an anchor tag and plaintext', () => {

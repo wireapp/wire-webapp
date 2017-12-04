@@ -60,7 +60,18 @@ z.util.URLUtil = (() => {
   const _build_url = (type, path = '') => `${_get_domain(type)}${path && path.startsWith('/') ? path : ''}`;
 
   const _get_links_from_html = html => {
-    return html.match(/<a[\s]+([^>]+)>((?:.(?!\<\/a\>))*.)<\/a>/g);
+    if (!html) {
+      return [];
+    }
+
+    const anchorTags = new RegExp(/<a[\s]+([^>]+)>((?:.(?!\<\/a\>))*.)<\/a>/, 'g');
+    const links = html.match(anchorTags);
+
+    if (links && links.length) {
+      return links.map(element => $(element)[0]);
+    }
+
+    return [];
   };
 
   return {
