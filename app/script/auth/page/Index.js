@@ -34,16 +34,14 @@ class Index extends Component {
   }
 
   onRegisterPersonalClick = () =>
-    this.trackAndNavigate(
-      TrackingAction.EVENT_NAME.START.OPENED_PERSONAL_REGISTRATION,
-      `${ROUTE.LOGIN}?hl=${this.props.language}#register`
-    );
+    Promise.resolve()
+      .then(() => this.props.trackEvent({name: TrackingAction.EVENT_NAME.START.OPENED_PERSONAL_REGISTRATION}))
+      .then(() => this.props.history.push(ROUTE.CREATE_PERSONAL_ACCOUNT));
 
-  onRegisterTeamClick = () => {
-    return Promise.resolve()
+  onRegisterTeamClick = () =>
+    Promise.resolve()
       .then(() => this.props.trackEvent({name: TrackingAction.EVENT_NAME.START.OPENED_TEAM_REGISTRATION}))
       .then(() => this.props.history.push(ROUTE.CREATE_TEAM));
-  };
 
   onLoginClick = () =>
     this.trackAndNavigate(

@@ -52,7 +52,7 @@ const Verify = ({account, authError, history, intl: {formatMessage: _}, ...conne
       .catch(error => console.error('Failed to send email code', error));
   };
   return (
-    <Page hasTeamData hasAccountData>
+    <Page hasAccountData>
       <ContainerXS
         centerText
         verticalCenter
