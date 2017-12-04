@@ -109,7 +109,7 @@
     "karma": "1.7.1",
     "karma-chrome-launcher": "2.2.0",
     "karma-coverage": "1.1.1",
-    "karma-jasmine": "1.1.0",
+    "karma-jasmine": "1.1.1",
     "karma-sourcemap-loader": "0.3.7",
     "lint-staged": "6.0.0",
     "load-grunt-tasks": "3.5.2",
