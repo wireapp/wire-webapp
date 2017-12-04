@@ -64,6 +64,16 @@ export default class TeamAPI {
     return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
   }
 
+  public deletePaymentData(teamId: string, data: Object): Promise<PaymentData> {
+    const config: AxiosRequestConfig = {
+      data,
+      method: 'delete',
+      url: `${TeamAPI.URL.TEAMS}/${teamId}/${TeamAPI.URL.BILLING}`,
+    };
+
+    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
+  }
+
   public putPaymentBilling(teamId: string, billingInfo: PaymentBillingData): AxiosPromise {
     const config: AxiosRequestConfig = {
       data: billingInfo,
