@@ -144,7 +144,7 @@
   },
   "lint-staged": {
     "*.js": ["eslint --fix", "git add"],
-    "*.json": ["prettier --write", "git add"],
+    "*.json": ["prettier --ignore-path .prettierignore --write", "git add"],
     "*.less": ["prettier --write", "git add"],
     "*.md": ["prettier --write", "git add"]
   },
