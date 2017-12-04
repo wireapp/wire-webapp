@@ -16,31 +16,21 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-import configureStore from 'redux-mock-store';
-import React from 'react';
-import renderer from 'react-test-renderer';
-import {Provider} from 'react-redux';
-import Root from './Root';
-import thunk from 'redux-thunk';
 
-const middleWares = [thunk.withExtraArgument({mixpanel: {track: () => 1}})];
-const mockStore = configureStore(middleWares);
-const withStore = (children, store) => <Provider store={store}>{children}</Provider>;
+import React from 'react';
+import {mockStore, renderWithStore} from '../util/TestUtil';
+import Root from './Root';
 
 describe('Root', () => {
   it('renders the Wire logo', () => {
     const state = {
-      authState: {
-        name: 'bob',
-      },
       languageState: {
         language: 'en',
       },
     };
 
-    const markup = <Root />;
-    const store = mockStore(state);
-    const component = renderer.create(withStore(markup, store));
+    const store = mockStore(state, {mixpanel: {track: () => 1}});
+    const component = renderWithStore(<Root />, store);
 
     const tree = component.toJSON();
     expect(tree.type).toBe('div');
