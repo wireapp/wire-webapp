@@ -154,6 +154,7 @@ z.main.App = class App {
     const services = {};
 
     services.asset = new z.assets.AssetService(this.auth.client);
+    services.broadcast = new z.broadcast.BroadcastService(this.auth.client);
     services.calling = new z.calling.CallingService(this.auth.client);
     services.connect = new z.connect.ConnectService(this.auth.client);
     services.connect_google = new z.connect.ConnectGoogleService(this.auth.client);
@@ -163,7 +164,7 @@ z.main.App = class App {
     services.search = new z.search.SearchService(this.auth.client);
     services.storage = new z.storage.StorageService();
     services.team = new z.team.TeamService(this.auth.client);
-    services.user = new z.user.UserService(this.auth.client);
+    services.user = new z.user.UserService(this.auth.client, services.storage);
     services.properties = new z.properties.PropertiesService(this.auth.client);
     services.web_socket = new z.event.WebSocketService(this.auth.client);
 
@@ -331,7 +332,7 @@ z.main.App = class App {
         );
 
         this.repository.event_tracker.init(this.repository.properties.properties.settings.privacy.improve_wire);
-        return this.repository.conversation.initialize_conversations();
+        return Promise.all([this.repository.conversation.initialize_conversations(), this.repository.user.loadUsers()]);
       })
       .then(() => {
         this.view.loading.update_progress(97.5, z.string.init_updated_from_notifications);

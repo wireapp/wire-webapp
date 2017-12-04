@@ -89,6 +89,7 @@ z.user.UserRepository = class UserRepository {
     amplify.subscribe(z.event.WebApp.CLIENT.REMOVE, this.remove_client_from_user.bind(this));
     amplify.subscribe(z.event.WebApp.CLIENT.UPDATE, this.update_clients_from_user.bind(this));
     amplify.subscribe(z.event.WebApp.USER.EVENT_FROM_BACKEND, this.on_user_event.bind(this));
+    amplify.subscribe(z.event.WebApp.USER.PERSIST, this.saveUserInDb.bind(this));
   }
 
   /**
@@ -116,8 +117,35 @@ z.user.UserRepository = class UserRepository {
       case z.event.Backend.USER.UPDATE:
         this.user_update(event_json);
         break;
+      case z.even.Client.USER.AVAILABILITY:
+        this.onUserAvailability(event_json);
+        break;
       default:
     }
+  }
+
+  loadUsers() {
+    if (this.is_team()) {
+      return this.user_service
+        .loadUserFromDb()
+        .then(users => {
+          if (users.length) {
+            return Promise.all(
+              users.map(user => this.get_user_by_id(user.id).then(userEt => userEt.availability(user.availability)))
+            );
+          }
+        })
+        .then(() => this.users().forEach(userEt => userEt.subscribeToChanges()));
+    }
+  }
+
+  /**
+   * Persists a conversation state in the database.
+   * @param {User} userEt - User which should be persisted
+   * @returns {Promise} Resolves when user was saved
+   */
+  saveUserInDb(userEt) {
+    return this.user_service.saveUserInDb(userEt);
   }
 
   /**
@@ -164,6 +192,18 @@ z.user.UserRepository = class UserRepository {
       window.setTimeout(() => {
         amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.ACCOUNT_DELETED, true);
       }, 50);
+    }
+  }
+
+  /**
+   * Event to update availability of user.
+   * @param {Object} event - Event data
+   * @returns {undefined} No return value
+   */
+  onUserAvailability(event) {
+    if (this.is_team()) {
+      const {from: userId, data: {availability}} = event;
+      this.get_user_by_id(userId).then(userEt => userEt.availability(availability));
     }
   }
 
@@ -521,6 +561,45 @@ z.user.UserRepository = class UserRepository {
     this.get_user_by_id(user_id).then(user_et => {
       user_et.devices(client_ets);
       amplify.publish(z.event.WebApp.USER.CLIENTS_UPDATED, user_id, client_ets);
+    });
+  }
+
+  changeAvailability(availability) {
+    if (availability !== this.self().availability()) {
+      this.self().status(availability);
+
+      const updatedAvailbility = (() => {
+        switch (availability) {
+          case z.user.AvailabilityType.AVAILABLE:
+            return z.proto.Availability.Type.AVAILABLE;
+          case z.user.AvailabilityType.AWAY:
+            return z.proto.Availability.Type.AWAY;
+          case z.user.AvailabilityType.BUSY:
+            return z.proto.Availability.Type.BUSY;
+          case z.user.AvailabilityType.NONE:
+            return z.proto.Availability.Type.NONE;
+          default:
+        }
+      })();
+
+      const genericMessage = new z.proto.GenericMessage(z.util.create_random_uuid());
+      const availabilityMessage = new z.proto.Availability(updatedAvailbility);
+      genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.AVAILABILITY, availabilityMessage);
+
+      amplify.publish(z.event.WebApp.BROADCAST.SEND_MESSAGE, genericMessage);
+      this._trackAvailability(availability);
+    }
+  }
+
+  /**
+   * Track availability action.
+   *
+   * @param {z.user.AvailabilityType} availability - Type of availability
+   * @returns {undefined} No return value
+   */
+  _trackAvailability(availability) {
+    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.REACTED_TO_MESSAGE, {
+      action: availability === z.user.AvailabilityType.NONE ? 'set' : 'unset',
     });
   }
 
