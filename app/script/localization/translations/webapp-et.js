@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 z.string.et.wire = 'Wire';
 z.string.et.wire_macos = 'Wire macOS-ile';
 z.string.et.wire_windows = 'Wire Windowsile';
@@ -562,7 +560,10 @@ z.string.et.tooltip_search_close = 'Sulge (Esc)';
 z.string.et.init_received_self_user = 'Tere, {{user}}.';
 z.string.et.init_validated_client = 'Toon ühendusi ja vestlusi';
 z.string.et.init_received_user_data = 'Kontrollin uusi sõnumeid';
+z.string.et.init_decryption = 'Dekrüptin sõnumeid';
+z.string.et.init_events = 'Laadin sõnumeid';
 z.string.et.init_updated_from_notifications = 'Peaaegu valmis - naudi Wire’i';
+z.string.et.init_progress = ' — {{number1}}/{{number2}}';
 
 z.string.et.ephememal_units_none = 'Väljas';
 z.string.et.ephememal_units_second = 'sekund';
@@ -573,3 +574,4 @@ z.string.et.ephememal_units_hour = 'tund';
 z.string.et.ephememal_units_hours = 'tundi';
 z.string.et.ephememal_units_day = 'päev';
 z.string.et.ephememal_units_days = 'päeva';
+

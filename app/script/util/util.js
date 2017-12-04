@@ -148,7 +148,7 @@ z.util.append_url_parameter = function(url, parameter) {
 z.util.forward_url_parameter = function(url, parameter_name) {
   const parameter_value = z.util.get_url_parameter(parameter_name);
   if (parameter_value != null) {
-    return (url = z.util.append_url_parameter(url, `${parameter_name}=${parameter_value}`));
+    return z.util.append_url_parameter(url, `${parameter_name}=${parameter_value}`);
   }
   return url;
 };
@@ -427,7 +427,10 @@ z.util.safe_window_open = function(url, focus = true) {
   return new_window;
 };
 
-z.util.safe_mailto_open = function(email) {
+z.util.safe_mailto_open = function(event, email) {
+  event.preventDefault();
+  event.stopPropagation();
+
   if (!z.util.is_valid_email(email)) {
     return;
   }
@@ -456,38 +459,14 @@ z.util.markup_links = function(message) {
 
 // Note: We are using "Underscore.js" to escape HTML in the original message
 z.util.render_message = function(message) {
-  message = marked(message);
-
-  // Parse links with linkifyjs library, ignore code tags
-  const options = {
-    attributes: function(href, type) {
-      if (type === 'url') {
-        return {rel: 'nofollow noopener noreferrer'};
-      }
-      if (type === 'email') {
-        const email = href.replace('mailto:', '');
-        return {onclick: `z.util.safe_mailto_open('${email}')`};
-      }
-      return {};
+  message = marked(message, {
+    highlight: function(code) {
+      return hljs.highlightAuto(code).value;
     },
-    formatHref: function(href, type) {
-      return type === 'email' ? '#' : href;
-    },
-    ignoreTags: ['code', 'pre'],
-    validate: {
-      hashtag: function(value) {
-        return false;
-      },
-      mention: function(value) {
-        return false;
-      },
-    },
-  };
-  message = linkifyHtml(message, options);
+    sanitize: true,
+  });
 
   // Remove this when this is merged: https://github.com/SoapBox/linkifyjs/pull/189
-  message = message.replace(/ class="linkified"/g, '');
-
   message = message.replace(/\n/g, '<br />');
 
   // Remove <br /> if it is the last thing in a message

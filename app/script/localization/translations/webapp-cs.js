@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 z.string.cs.wire_macos = 'Wire pro macOS';
 z.string.cs.wire_windows = 'Wire pro Windows';
 z.string.cs.wire_linux = 'Wire pro Linux';
@@ -569,3 +567,4 @@ z.string.cs.ephememal_units_hour = 'hodina';
 z.string.cs.ephememal_units_hours = 'hodin';
 z.string.cs.ephememal_units_day = 'den';
 z.string.cs.ephememal_units_days = 'dnů';
+

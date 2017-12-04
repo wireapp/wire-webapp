@@ -73,6 +73,23 @@ module.exports = {
     src: 'index.html',
   },
 
+  deploy_login: {
+    cwd: '<%= dir.app.page %>',
+    dest: '<%= dir.deploy %>/login',
+    expand: true,
+    options: {
+      globals: {
+        dest: '_deploy',
+      },
+      includesDir: '<%= dir.app.page %>/template',
+      prefix: '#',
+    },
+    rename(dest, src) {
+      return `${dest}/index.html`;
+    },
+    src: 'login.html',
+  },
+
   //##############################################################################
   // Local deployment related
   //##############################################################################
@@ -124,6 +141,23 @@ module.exports = {
     src: 'index.html',
   },
 
+  dist_login: {
+    cwd: '<%= dir.app.page %>',
+    dest: '<%= dir.dist %>/login',
+    expand: true,
+    options: {
+      globals: {
+        dest: '_dist',
+      },
+      includesDir: '<%= dir.app.page %>/template',
+      prefix: '#',
+    },
+    rename(dest, src) {
+      return `${dest}/index.html`;
+    },
+    src: 'login.html',
+  },
+
   //##############################################################################
   // Production deployment related
   //##############################################################################
@@ -173,5 +207,22 @@ module.exports = {
       prefix: '#',
     },
     src: 'index.html',
+  },
+
+  prod_login: {
+    cwd: '<%= dir.app.page %>',
+    dest: '<%= dir.deploy %>/login',
+    expand: true,
+    options: {
+      globals: {
+        dest: '_prod',
+      },
+      includesDir: '<%= dir.app.page %>/template',
+      prefix: '#',
+    },
+    rename(dest, src) {
+      return `${dest}/index.html`;
+    },
+    src: 'login.html',
   },
 };

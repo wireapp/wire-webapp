@@ -36,11 +36,8 @@ describe('z.util.render_message', () => {
 
   it('renders complicated image links', () => {
     const link =
-      'http://static.err.ee/gridfs/95E91BE0D28DF7236BC00EE349284A451C05949C2D04E7857BC686E4394F1585.jpg?&crop=(0,27,848,506.0960451977401)&cropxunits=848&cropyunits=595&format=jpg&quality=90&width=752&maxheight=42';
-    const link_with_entities = link.split('&').join('&amp;');
-    const expected = `<a href="${link_with_entities}" target="_blank" rel="nofollow noopener noreferrer">${
-      link_with_entities
-    }</a>`;
+      'http://static.err.ee/gridfs/95E91BE0D28DF7236BC00EE349284A451C05949C2D04E7857BC686E4394F1585.jpg?&amp;crop=(0,27,848,506.0960451977401)&amp;cropxunits=848&amp;cropyunits=595&amp;format=jpg&amp;quality=90&amp;width=752&amp;maxheight=42';
+    const expected = `<a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a>`;
     expect(z.util.render_message(link)).toBe(expected);
   });
 
@@ -52,9 +49,9 @@ describe('z.util.render_message', () => {
     expect(z.util.render_message(`Stormtroopers: ${link} !!!`)).toBe(expected);
   });
 
-  xit('renders links with multiple underscores', () => {
+  it('renders links with multiple underscores', () => {
     const link =
-      'https://www.nike.com/events-registration/event?id=6245&languageLocale=de_de&cp=EUNS_KW_DE_&s_kwcid=AL!2799!3!46005237943!b!!g!!womens%20running';
+      'https://www.nike.com/events-registration/event?id=6245&amp;languageLocale=de_de&amp;cp=EUNS_KW_DE_&amp;s_kwcid=AL!2799!3!46005237943!b!!g!!womens%20running';
     const expected = `<a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a>`;
     expect(z.util.render_message(link)).toBe(expected);
   });
@@ -96,27 +93,37 @@ describe('z.util.render_message', () => {
     expect(z.util.render_message('<a href="javascript:alert(\'ohoh!\')">what?</a>')).toBe(expected);
   });
 
+  it('renders an escaped version of an xss attempt', () => {
+    const expected =
+      '<a href="http://wire.de/jaVasCript:/*-/*`/*\\`/*&#x27;/*&quot;/**/(/**/oNcliCk=alert())//%0D%0A%0d%0a//&lt;/stYle/&lt;/titLe/&lt;/teXtarEa/&lt;/scRipt/--!&gt;\\x3csVg/&lt;sVg/oNloAd=alert()//&gt;\\x3e" target="_blank" rel="nofollow noopener noreferrer">wire.de/jaVasCript:/*-/*`/*\\`/*&#x27;/*&quot;/**/(/**/oNcliCk=alert())//%0D%0A%0d%0a//&lt;/stYle/&lt;/titLe/&lt;/teXtarEa/&lt;/scRipt/--!&gt;\\x3csVg/&lt;sVg/oNloAd=alert()//&gt;\\x3e</a>';
+    expect(
+      z.util.render_message(
+        'wire.de/jaVasCript:/*-/*`/*\\`/*\'/*"/**/(/**/oNcliCk=alert())//%0D%0A%0d%0a//</stYle/</titLe/</teXtarEa/</scRipt/--!>\\x3csVg/<sVg/oNloAd=alert()//>\\x3e'
+      )
+    ).toBe(expected);
+  });
+
   it('renders an email address', () => {
     const expected =
-      'send it over to <a href="#" onclick="z.util.safe_mailto_open(\'hello@wire.com\')">hello@wire.com</a>';
+      'send it over to <a href="mailto:hello@wire.com" onclick="z.util.safe_mailto_open(event, \'hello@wire.com\')">hello@wire.com</a>';
     expect(z.util.render_message('send it over to hello@wire.com')).toBe(expected);
   });
 
   it('renders an email address with pluses', () => {
     const expected =
-      'send it over to <a href="#" onclick="z.util.safe_mailto_open(\'hello+world@wire.com\')">hello+world@wire.com</a>';
+      'send it over to <a href="mailto:hello+world@wire.com" onclick="z.util.safe_mailto_open(event, \'hello+world@wire.com\')">hello+world@wire.com</a>';
     expect(z.util.render_message('send it over to hello+world@wire.com')).toBe(expected);
   });
 
   it('renders an email long domains', () => {
     const expected =
-      'send it over to <a href="#" onclick="z.util.safe_mailto_open(\'janedoe@school.university.edu\')">janedoe@school.university.edu</a>';
+      'send it over to <a href="mailto:janedoe@school.university.edu" onclick="z.util.safe_mailto_open(event, \'janedoe@school.university.edu\')">janedoe@school.university.edu</a>';
     expect(z.util.render_message('send it over to janedoe@school.university.edu')).toBe(expected);
   });
 
   it('renders an email with multiple subdomains', () => {
     const expected =
-      'send it over to <a href="#" onclick="z.util.safe_mailto_open(\'bla@foo.co.uk\')">bla@foo.co.uk</a>';
+      'send it over to <a href="mailto:bla@foo.co.uk" onclick="z.util.safe_mailto_open(event, \'bla@foo.co.uk\')">bla@foo.co.uk</a>';
     expect(z.util.render_message('send it over to bla@foo.co.uk')).toBe(expected);
   });
 
@@ -146,7 +153,7 @@ describe('z.util.render_message', () => {
     );
   });
 
-  xit('renders an emoticon of someone shrugging', () => {
+  it('renders an emoticon of someone shrugging', () => {
     /* eslint-disable no-useless-escape */
     expect(z.util.render_message('¯_(ツ)_/¯')).toBe('¯_(ツ)_/¯');
   });
@@ -4351,7 +4358,7 @@ describe('Markdown exceptions', () => {
     expect(z.util.render_message(text)).toBe(text);
   });
 
-  xit('does not render underscores to italic when they are within a sentence', () => {
+  it('does not render underscores to italic when they are within a sentence', () => {
     const text = 'calling__voice_channel__fulltitle';
     expect(z.util.render_message(text)).toBe(text);
   });

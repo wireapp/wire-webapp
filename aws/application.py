@@ -1,6 +1,6 @@
 #
 # Wire
-# Copyright (C) 2016 Wire Swiss GmbH
+# Copyright (C) 2017 Wire Swiss GmbH
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -51,6 +51,16 @@ def index():
 def auth():
   response = flask.make_response(flask.render_template(
     'auth/index.html',
+    country=util.geoip_country(),
+  ))
+  return response
+
+
+@application.route('/login/')
+@main.latest_browser_required
+def login():
+  response = flask.make_response(flask.render_template(
+    'login/index.html',
     country=util.geoip_country(),
   ))
   return response

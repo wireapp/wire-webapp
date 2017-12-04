@@ -27,6 +27,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   static get CONFIG() {
     return {
       CONFIRMATION_THRESHOLD: 7 * 24 * 60 * 60 * 1000,
+      EXTERNAL_MESSAGE_THRESHOLD: 200 * 1024,
     };
   }
 
@@ -299,7 +300,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
     conversation_et.is_pending(true);
 
     const first_message = conversation_et.get_first_message();
-    const upper_bound = first_message ? new Date(first_message.timestamp()) : new Date();
+    const upper_bound = first_message
+      ? new Date(first_message.timestamp())
+      : new Date(conversation_et.get_latest_timestamp(this.time_offset) + 1);
 
     return this.conversation_service
       .load_preceding_events_from_db(conversation_et.id, new Date(0), upper_bound, z.config.MESSAGES_FETCH_LIMIT)
@@ -407,8 +410,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   _get_unread_events(conversation_et) {
     const first_message = conversation_et.get_first_message();
-    const upper_bound = first_message ? new Date(first_message.timestamp()) : new Date();
     const lower_bound = new Date(conversation_et.last_read_timestamp());
+    const upper_bound = first_message
+      ? new Date(first_message.timestamp())
+      : new Date(conversation_et.get_latest_timestamp(this.time_offset) + 1);
 
     if (lower_bound < upper_bound) {
       conversation_et.is_pending(true);
@@ -1005,7 +1010,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   _update_cleared_timestamp(conversation_et) {
-    const timestamp = conversation_et.get_latest_timestamp(this.time_offset);
+    const timestamp = conversation_et.get_last_known_timestamp(this.time_offset);
 
     if (timestamp && conversation_et.set_timestamp(timestamp, z.conversation.TIMESTAMP_TYPE.CLEARED)) {
       const message_content = new z.proto.Cleared(conversation_et.id, timestamp);
@@ -1161,7 +1166,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     const payload = {
       otr_muted: !conversation_et.is_muted(),
-      otr_muted_ref: new Date(conversation_et.get_latest_timestamp(this.time_offset)).toISOString(),
+      otr_muted_ref: new Date(conversation_et.get_last_known_timestamp(this.time_offset)).toISOString(),
     };
 
     return this.conversation_service
@@ -1214,7 +1219,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       );
     }
 
-    const archive_timestamp = conversation_et.get_latest_timestamp(this.time_offset);
+    const archive_timestamp = conversation_et.get_last_known_timestamp(this.time_offset);
     const no_state_change = conversation_et.is_archived() === new_archive_state;
     const no_timestamp_change = conversation_et.archived_timestamp() === archive_timestamp;
     if (no_state_change && no_timestamp_change) {
@@ -1298,7 +1303,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   _update_last_read_timestamp(conversation_et) {
-    const timestamp = conversation_et.get_latest_timestamp(this.time_offset);
+    const timestamp = conversation_et.get_last_known_timestamp(this.time_offset);
 
     if (timestamp && conversation_et.set_timestamp(timestamp, z.conversation.TIMESTAMP_TYPE.LAST_READ)) {
       const message_content = new z.proto.LastRead(conversation_et.id, conversation_et.last_read_timestamp());
@@ -1499,7 +1504,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
       this.sending_queue.push(() => {
         return this.create_recipients(conversation_et.id, true, [message_et.user().id]).then(recipients => {
-          return this._send_generic_message(
+          return this._sendGenericMessage(
             conversation_et.id,
             generic_message,
             recipients,
@@ -1534,7 +1539,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           : this.create_recipients(conversation_et.id, false);
 
         return recipients_promise.then(_recipients =>
-          this._send_generic_message(conversation_et.id, generic_message, _recipients, precondition_option)
+          this._sendGenericMessage(conversation_et.id, generic_message, _recipients, precondition_option)
         );
       })
       .then(() => {
@@ -1768,7 +1773,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const recipients = {};
     recipients[user_id] = [client_id];
 
-    return this._send_generic_message(conversation_id, generic_message, recipients, true)
+    return this._sendGenericMessage(conversation_id, generic_message, recipients, true)
       .then(response => {
         this.logger.info(`Sent info about session reset to client '${client_id}' of user '${user_id}'`);
         return response;
@@ -1902,7 +1907,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
       return this.create_recipients(conversation_id, skip_own_clients).then(recipients => {
         const precondition_option = skip_own_clients ? Object.keys(recipients) : undefined;
-        return this._send_generic_message(conversation_id, generic_message, recipients, precondition_option);
+        return this._sendGenericMessage(conversation_id, generic_message, recipients, precondition_option);
       });
     });
   }
@@ -1983,36 +1988,28 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Send encrypted external message
    *
-   * @param {string} conversation_id - Conversation ID
-   * @param {z.proto.GenericMessage} generic_message - Generic message to be sent as external message
+   * @param {string} conversationId - Conversation ID
+   * @param {z.proto.GenericMessage} genericMessage - Generic message to be sent as external message
    * @param {Object} recipients - Optional object containing recipient users and their clients
-   * @param {Array<string>|boolean} precondition_option - Optional level that backend checks for missing clients
-   * @param {boolean} [native_push=true] - Optional if message should enforce native push
+   * @param {Array<string>|boolean} preconditionOption - Optional level that backend checks for missing clients
+   * @param {boolean} [nativePush=true] - Optional if message should enforce native push
    * @returns {Promise} Resolves after sending the external message
    */
-  _send_external_generic_message(
-    conversation_id,
-    generic_message,
-    recipients,
-    precondition_option,
-    native_push = true
-  ) {
-    this.logger.info(`Sending external message of type '${generic_message.content}'`, generic_message);
+  _sendExternalGenericMessage(conversationId, genericMessage, recipients, preconditionOption, nativePush = true) {
+    this.logger.info(`Sending external message of type '${genericMessage.content}'`, genericMessage);
 
-    return z.assets.AssetCrypto.encrypt_aes_asset(generic_message.toArrayBuffer())
+    return z.assets.AssetCrypto.encrypt_aes_asset(genericMessage.toArrayBuffer())
       .then(({key_bytes, sha256, cipher_text}) => {
-        const generic_message_external = new z.proto.GenericMessage(z.util.create_random_uuid());
-        generic_message_external.set(
-          'external',
-          new z.proto.External(new Uint8Array(key_bytes), new Uint8Array(sha256))
-        );
+        const genericMessageExternal = new z.proto.GenericMessage(z.util.create_random_uuid());
+        const externalMessage = new z.proto.External(new Uint8Array(key_bytes), new Uint8Array(sha256));
+        genericMessageExternal.set('external', externalMessage);
 
         return this.cryptography_repository
-          .encrypt_generic_message(recipients, generic_message_external)
+          .encrypt_generic_message(recipients, genericMessageExternal)
           .then(payload => {
             payload.data = z.util.array_to_base64(cipher_text);
-            payload.native_push = native_push;
-            return this._send_encrypted_message(conversation_id, generic_message, payload, precondition_option);
+            payload.native_push = nativePush;
+            return this._sendEncryptedMessage(conversationId, genericMessage, payload, preconditionOption);
           });
       })
       .catch(error => {
@@ -2025,39 +2022,41 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Sends a generic message to a conversation.
    *
    * @private
-   * @param {string} conversation_id - Conversation ID
-   * @param {z.proto.GenericMessage} generic_message - Protobuf message to be encrypted and send
+   * @param {string} conversationId - Conversation ID
+   * @param {z.proto.GenericMessage} genericMessage - Protobuf message to be encrypted and send
    * @param {Object} recipients - Optional object containing recipient users and their clients
-   * @param {Array<string>|boolean} precondition_option - Optional level that backend checks for missing clients
-   * @param {boolean} [native_push=true] - Optional if message should enforce native push
+   * @param {Array<string>|boolean} preconditionOption - Optional level that backend checks for missing clients
+   * @param {boolean} [nativePush=true] - Optional if message should enforce native push
    * @returns {Promise} Resolves when the message was sent
    */
-  _send_generic_message(conversation_id, generic_message, recipients, precondition_option, native_push = true) {
-    return this._should_send_as_external(conversation_id, generic_message)
-      .then(send_as_external => {
-        if (send_as_external) {
-          return this._send_external_generic_message(
-            conversation_id,
-            generic_message,
+  _sendGenericMessage(conversationId, genericMessage, recipients, preconditionOption, nativePush = true) {
+    return this._grantOutgoingMessage(conversationId, genericMessage)
+      .then(() => this._shouldSendAsExternal(conversationId, genericMessage))
+      .then(sendAsExternal => {
+        if (sendAsExternal) {
+          return this._sendExternalGenericMessage(
+            conversationId,
+            genericMessage,
             recipients,
-            precondition_option,
-            native_push
+            preconditionOption,
+            nativePush
           );
         }
 
-        return this.cryptography_repository.encrypt_generic_message(recipients, generic_message).then(payload => {
-          payload.native_push = native_push;
-          return this._send_encrypted_message(conversation_id, generic_message, payload, precondition_option);
+        return this.cryptography_repository.encrypt_generic_message(recipients, genericMessage).then(payload => {
+          payload.native_push = nativePush;
+          return this._sendEncryptedMessage(conversationId, genericMessage, payload, preconditionOption);
         });
       })
       .catch(error => {
-        if (error.code === z.service.BackendClientError.STATUS_CODE.REQUEST_TOO_LARGE) {
-          return this._send_external_generic_message(
-            conversation_id,
-            generic_message,
+        const isRequestTooLarge = error.code === z.service.BackendClientError.STATUS_CODE.REQUEST_TOO_LARGE;
+        if (isRequestTooLarge) {
+          return this._sendExternalGenericMessage(
+            conversationId,
+            genericMessage,
             recipients,
-            precondition_option,
-            native_push
+            preconditionOption,
+            nativePush
           );
         }
 
@@ -2072,22 +2071,20 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @note Options for the precondition check on missing clients are:
    *   'false' - all clients, 'Array<String>' - only clients of listed users, 'true' - force sending
    *
-   * @param {string} conversation_id - Conversation ID
-   * @param {z.proto.GenericMessage} generic_message - Protobuf message to be encrypted and send
+   * @param {string} conversationId - Conversation ID
+   * @param {z.proto.GenericMessage} genericMessage - Protobuf message to be encrypted and send
    * @param {Object} payload - Payload
-   * @param {Array<string>|boolean} precondition_option - Level that backend checks for missing clients
+   * @param {Array<string>|boolean} preconditionOption - Level that backend checks for missing clients
    * @returns {Promise} Promise that resolves after sending the encrypted message
    */
-  _send_encrypted_message(conversation_id, generic_message, payload, precondition_option = false) {
-    this.logger.info(
-      `Sending encrypted '${generic_message.content}' message to conversation '${conversation_id}'`,
-      payload
-    );
+  _sendEncryptedMessage(conversationId, genericMessage, payload, preconditionOption = false) {
+    const messageType = genericMessage.content;
+    this.logger.info(`Sending '${messageType}' message to conversation '${conversationId}'`, payload);
 
-    return this._grant_outgoing_message(conversation_id, generic_message)
-      .then(() => this.conversation_service.post_encrypted_message(conversation_id, payload, precondition_option))
+    return this.conversation_service
+      .post_encrypted_message(conversationId, payload, preconditionOption)
       .then(response => {
-        this._handle_client_mismatch(conversation_id, response);
+        this._handle_client_mismatch(conversationId, response);
         return response;
       })
       .catch(error => {
@@ -2099,60 +2096,58 @@ z.conversation.ConversationRepository = class ConversationRepository {
           throw error;
         }
 
-        let updated_payload;
-        return this._handle_client_mismatch(conversation_id, error, generic_message, payload)
-          .then(payload_with_missing_clients => {
-            updated_payload = payload_with_missing_clients;
-            return this._grant_outgoing_message(conversation_id, generic_message, Object.keys(error.missing));
+        let updatedPayload;
+        return this._handle_client_mismatch(conversationId, error, genericMessage, payload)
+          .then(payloadWithMissingClients => {
+            updatedPayload = payloadWithMissingClients;
+            return this._grantOutgoingMessage(conversationId, genericMessage, Object.keys(error.missing));
           })
           .then(() => {
-            this.logger.info(
-              `Sending updated encrypted '${generic_message.content}' message to conversation '${conversation_id}'`,
-              updated_payload
-            );
-            return this.conversation_service.post_encrypted_message(conversation_id, updated_payload, true);
+            this.logger.info(`Updated '${messageType}' message for conversation '${conversationId}'`, updatedPayload);
+            return this.conversation_service.post_encrypted_message(conversationId, updatedPayload, true);
           });
       });
   }
 
-  _grant_outgoing_message(conversation_id, generic_message, user_ids) {
-    if (['cleared', 'confirmation', 'deleted', 'lastRead'].includes(generic_message.content)) {
+  _grantOutgoingMessage(conversationId, genericMessage, userIds) {
+    const allowedMessageTypes = ['cleared', 'confirmation', 'deleted', 'lastRead'];
+    if (allowedMessageTypes.includes(genericMessage.content)) {
       return Promise.resolve();
     }
 
-    const consent_type =
-      generic_message.content === z.cryptography.GENERIC_MESSAGE_TYPE.CALLING
-        ? z.ViewModel.MODAL_CONSENT_TYPE.OUTGOING_CALL
-        : z.ViewModel.MODAL_CONSENT_TYPE.MESSAGE;
-    return this.grant_message(conversation_id, consent_type, user_ids);
+    const isCallingMessage = genericMessage.content === z.cryptography.GENERIC_MESSAGE_TYPE.CALLING;
+    const consentType = isCallingMessage
+      ? z.ViewModel.MODAL_CONSENT_TYPE.OUTGOING_CALL
+      : z.ViewModel.MODAL_CONSENT_TYPE.MESSAGE;
+    return this.grantMessage(conversationId, consentType, userIds);
   }
 
-  grant_message(conversation_id, consent_type, user_ids) {
-    return this.get_conversation_by_id(conversation_id).then(conversation_et => {
-      const conversation_degraded =
+  grantMessage(conversationId, consentType, userIds) {
+    return this.get_conversation_by_id(conversationId).then(conversation_et => {
+      const conversationDegraded =
         conversation_et.verification_state() === z.conversation.ConversationVerificationState.DEGRADED;
 
-      if (!conversation_degraded) {
+      if (!conversationDegraded) {
         return false;
       }
 
       return new Promise((resolve, reject) => {
-        let send_anyway = false;
+        let sendAnyway = false;
 
-        if (!user_ids) {
-          user_ids = conversation_et.get_users_with_unverified_clients().map(user_et => user_et.id);
+        if (!userIds) {
+          userIds = conversation_et.get_users_with_unverified_clients().map(user_et => user_et.id);
         }
 
-        return this.user_repository.get_users_by_id(user_ids).then(user_ets => {
+        return this.user_repository.get_users_by_id(userIds).then(user_ets => {
           amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.NEW_DEVICE, {
             action() {
-              send_anyway = true;
+              sendAnyway = true;
               conversation_et.verification_state(z.conversation.ConversationVerificationState.UNVERIFIED);
 
               resolve(true);
             },
             close() {
-              if (!send_anyway) {
+              if (!sendAnyway) {
                 reject(
                   new z.conversation.ConversationError(
                     z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION
@@ -2161,7 +2156,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
               }
             },
             data: {
-              consent_type: consent_type,
+              consent_type: consentType,
               user_ets: user_ets,
             },
           });
@@ -2174,17 +2169,17 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Estimate whether message should be send as type external.
    *
    * @private
-   * @param {string} conversation_id - Conversation ID
-   * @param {z.proto.GenericMessage} generic_message - Generic message that will be send
+   * @param {string} conversationId - Conversation ID
+   * @param {z.proto.GenericMessage} genericMessage - Generic message that will be send
    * @returns {boolean} Is payload likely to be too big so that we switch to type external?
    */
-  _should_send_as_external(conversation_id, generic_message) {
-    return this.get_conversation_by_id(conversation_id).then(conversation_et => {
-      const estimated_number_of_clients = conversation_et.get_number_of_participants() * 4;
-      const message_in_bytes = new Uint8Array(generic_message.toArrayBuffer()).length;
-      const estimated_payload_in_bytes = estimated_number_of_clients * message_in_bytes;
+  _shouldSendAsExternal(conversationId, genericMessage) {
+    return this.get_conversation_by_id(conversationId).then(conversation_et => {
+      const estimatedNumberOfClients = conversation_et.get_number_of_participants() * 4;
+      const messageInBytes = new Uint8Array(genericMessage.toArrayBuffer()).length;
+      const estimatedPayloadInBytes = estimatedNumberOfClients * messageInBytes;
 
-      return estimated_payload_in_bytes / 1024 > 200;
+      return estimatedPayloadInBytes > ConversationRepository.CONFIG.EXTERNAL_MESSAGE_THRESHOLD;
     });
   }
 
@@ -2287,7 +2282,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         return this.sending_queue.push(() => {
           return this.create_recipients(conversation_et.id, false, precondition_option).then(recipients =>
-            this._send_generic_message(conversation_et.id, generic_message, recipients, precondition_option)
+            this._sendGenericMessage(conversation_et.id, generic_message, recipients, precondition_option)
           );
         });
       })

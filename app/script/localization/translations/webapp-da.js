@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 z.string.da.wire_macos = 'Wire til macOS';
 z.string.da.wire_windows = 'Wire til Windows';
 z.string.da.wire_linux = 'Wire til Linux';
@@ -530,3 +528,4 @@ z.string.da.ephememal_units_hour = 'time';
 z.string.da.ephememal_units_hours = 'timer';
 z.string.da.ephememal_units_day = 'dag';
 z.string.da.ephememal_units_days = 'dage';
+

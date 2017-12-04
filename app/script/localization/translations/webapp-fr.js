@@ -17,8 +17,6 @@
  *
  */
 
-'use strict';
-
 z.string.fr.wire = 'Wire';
 z.string.fr.wire_macos = 'Wire pour macOS';
 z.string.fr.wire_windows = 'Wire pour Windows';
@@ -118,7 +116,7 @@ z.string.fr.call_decline = 'Décliner';
 z.string.fr.call_accept = 'Accepter';
 z.string.fr.call_join = 'Rejoindre';
 z.string.fr.call_choose_shared_screen = 'Choisissez un écran à partager';
-z.string.fr.call_participants = '{{number}} sur l’’appel';
+z.string.fr.call_participants = '{{number}} sur l’appel';
 
 z.string.fr.modal_button_cancel = 'Annuler';
 z.string.fr.modal_button_ok = 'OK';
@@ -562,7 +560,7 @@ z.string.fr.tooltip_search_close = 'Fermer (Échap)';
 z.string.fr.init_received_self_user = 'Bonjour, {{user}}.';
 z.string.fr.init_validated_client = 'Téléchargement de vos contacts et de vos conversations';
 z.string.fr.init_received_user_data = 'Recherche de nouveaux messages';
-z.string.fr.init_decryption = 'Déchiffrage des messages';
+z.string.fr.init_decryption = 'Déchiffrement des messages';
 z.string.fr.init_events = 'Chargement des messages';
 z.string.fr.init_updated_from_notifications = 'Presque terminé - Profitez de Wire';
 z.string.fr.init_progress = ' — {{number1}} sur {{number2}}';
@@ -576,3 +574,4 @@ z.string.fr.ephememal_units_hour = 'heure';
 z.string.fr.ephememal_units_hours = 'heures';
 z.string.fr.ephememal_units_day = 'jour';
 z.string.fr.ephememal_units_days = 'jours';
+
