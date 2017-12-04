@@ -46,15 +46,8 @@ class Index extends Component {
   };
 
   onLoginClick = () => {
-    const searchParams = window.location.search.replace(/^\?/, '').split('&');
-    const hlParam = searchParams.find(param => /^hl=/.test(param));
-    if (!hlParam) {
-      searchParams.push(`hl=${this.props.language}`);
-    }
-    this.trackAndNavigate(
-      TrackingAction.EVENT_NAME.START.OPENED_LOGIN,
-      `${ROUTE.LOGIN}?${searchParams.join('&')}#login`
-    );
+    const searchParams = window.location.search;
+    this.trackAndNavigate(TrackingAction.EVENT_NAME.START.OPENED_LOGIN, `${ROUTE.LOGIN}${searchParams}#login`);
   };
 
   trackAndNavigate = (eventName, url) => {
