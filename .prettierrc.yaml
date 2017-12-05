@@ -1,3 +1,4 @@
+arrowParens: avoid
 bracketSpacing: false
 jsxBracketSameLine: false
 printWidth: 120
