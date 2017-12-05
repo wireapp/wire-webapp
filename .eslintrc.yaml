@@ -5,6 +5,7 @@ env:
   node: true
 
 extends:
+  - 'plugin:no-unsanitized/DOM'
   - 'plugin:react/recommended'
   - prettier
 
@@ -49,6 +50,7 @@ globals:
 
 plugins:
   - jsdoc
+  - no-unsanitized
   - prettier
   - react
 
