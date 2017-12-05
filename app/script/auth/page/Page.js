@@ -33,7 +33,7 @@ function Page({hasAccountData, hasTeamData, isInTeamFlow, isAuthenticated, isSta
     (hasTeamData && hasInvalidTeamData(account)) ||
     (isAuthenticated && !isStateAuthenticated)
   ) {
-    return <Redirect to={isInTeamFlow ? ROUTE.CREATE_TEAM : ROUTE.CREATE_PERSONAL_ACCOUNT} />;
+    return <Redirect to={isInTeamFlow ? ROUTE.CREATE_TEAM : ROUTE.CREATE_ACCOUNT} />;
   }
   return children;
 }

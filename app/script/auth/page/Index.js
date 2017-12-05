@@ -39,7 +39,7 @@ class Index extends Component {
   onRegisterPersonalClick = () => {
     this.props.trackEvent({name: TrackingAction.EVENT_NAME.START.OPENED_PERSONAL_REGISTRATION});
     this.props.enterPersonalCreationFlow();
-    this.props.history.push(ROUTE.CREATE_PERSONAL_ACCOUNT);
+    this.props.history.push(ROUTE.CREATE_ACCOUNT);
   };
 
   onRegisterTeamClick = () => {

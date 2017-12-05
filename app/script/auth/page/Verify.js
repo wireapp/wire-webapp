@@ -84,7 +84,7 @@ const Verify = ({account, authError, history, isInTeamFlow, intl: {formatMessage
             {_(verifyStrings.resendCode)}
           </Link>
           <Link
-            to={isInTeamFlow ? ROUTE.CREATE_ACCOUNT : ROUTE.CREATE_PERSONAL_ACCOUNT}
+            to={isInTeamFlow ? ROUTE.CREATE_TEAM_ACCOUNT : ROUTE.CREATE_ACCOUNT}
             component={RRLink}
             style={{marginLeft: 35}}
             data-uie-name="go-change-email"

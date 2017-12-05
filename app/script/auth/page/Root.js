@@ -49,8 +49,8 @@ const Root = ({language}) => (
           <Switch>
             <Route exact path={ROUTE.INDEX} component={Index} />
             <Route path={ROUTE.CREATE_TEAM} component={TeamName} />
-            <Route path={ROUTE.CREATE_ACCOUNT} component={CreateAccount} />
-            <Route path={ROUTE.CREATE_PERSONAL_ACCOUNT} component={CreatePersonalAccount} />
+            <Route path={ROUTE.CREATE_TEAM_ACCOUNT} component={CreateAccount} />
+            <Route path={ROUTE.CREATE_ACCOUNT} component={CreatePersonalAccount} />
             <Route path={ROUTE.VERIFY} component={Verify} />
             <Route path={ROUTE.INITIAL_INVITE} component={InitialInvite} />
             <Redirect to={ROUTE.INDEX} />

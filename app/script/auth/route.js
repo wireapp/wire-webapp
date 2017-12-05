@@ -23,8 +23,8 @@ const stagingWebsite = 'https://wire-website-staging.zinfra.io';
 
 export default {
   CREATE_ACCOUNT: '/createaccount',
-  CREATE_PERSONAL_ACCOUNT: '/createpersonalaccount',
   CREATE_TEAM: '/createteam',
+  CREATE_TEAM_ACCOUNT: '/createteamaccount',
   INDEX: '/',
   INITIAL_INVITE: '/invite',
   LOGIN: '/login',

@@ -51,7 +51,7 @@ class TeamName extends Component {
     return Promise.resolve(this.teamNameInput.value)
       .then(teamName => teamName.trim())
       .then(teamName => this.props.pushAccountRegistrationData({team: {name: teamName}}))
-      .then(() => this.props.history.push(ROUTE.CREATE_ACCOUNT));
+      .then(() => this.props.history.push(ROUTE.CREATE_TEAM_ACCOUNT));
   };
 
   render() {
