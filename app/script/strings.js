@@ -73,30 +73,48 @@ export const teamNameStrings = defineMessages({
   },
 });
 
+export const accountFormStrings = defineMessages({
+  namePlaceholder: {
+    id: 'accountForm.namePlaceholder',
+    defaultMessage: 'Name',
+  },
+  emailPlaceholder: {
+    id: 'accountForm.emailPlaceholder',
+    defaultMessage: 'you@yourcompany.com',
+  },
+  passwordPlaceholder: {
+    id: 'accountForm.passwordPlaceholder',
+    defaultMessage: 'Password (at least 8 characters)',
+  },
+  terms: {
+    id: 'accountForm.terms',
+    defaultMessage: 'I accept the <a {linkParams}>terms and conditions</a>',
+  },
+  submitButton: {
+    id: 'accountForm.nextButton',
+    defaultMessage: 'Next',
+  },
+});
+
 export const createAccountStrings = defineMessages({
   headLine: {
     id: 'createAccount.headLine',
     defaultMessage: 'Set up your account',
   },
-  namePlaceholder: {
-    id: 'createAccount.namePlaceholder',
-    defaultMessage: 'Name',
-  },
-  emailPlaceholder: {
-    id: 'createAccount.emailPlaceholder',
-    defaultMessage: 'you@yourcompany.com',
-  },
-  passwordPlaceholder: {
-    id: 'createAccount.passwordPlaceholder',
-    defaultMessage: 'Password (at least 8 characters)',
-  },
-  terms: {
-    id: 'createAccount.terms',
-    defaultMessage: 'I accept the <a {linkParams}>terms and conditions</a>',
-  },
-  nextButton: {
+  submitButton: {
     id: 'createAccount.nextButton',
     defaultMessage: 'Next',
+  },
+});
+
+export const createPersonalAccountStrings = defineMessages({
+  headLine: {
+    id: 'createPersonalAccount.headLine',
+    defaultMessage: 'New account',
+  },
+  submitButton: {
+    id: 'createPersonalAccount.nextButton',
+    defaultMessage: 'Register',
   },
 });
 

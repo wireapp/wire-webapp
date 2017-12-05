@@ -33,18 +33,31 @@ import * as UserAction from '../module/action/UserAction';
 import Page from './Page';
 import React from 'react';
 import ROUTE from '../route';
+import {pathWithParams} from '../util/urlUtil';
 
-const Verify = ({account, authError, history, intl: {formatMessage: _}, ...connected}) => {
+const Verify = ({account, authError, history, isInTeamFlow, intl: {formatMessage: _}, ...connected}) => {
   const createAccount = email_code => {
-    Promise.resolve()
-      .then(() => connected.doRegisterTeam({...account, email_code}))
-      .then(() => {
-        connected.trackEvent({name: TrackingAction.EVENT_NAME.TEAM.CREATED});
-        connected.trackEvent({name: TrackingAction.EVENT_NAME.TEAM.VERIFIED});
-      })
-      .then(() => history.push(ROUTE.INITIAL_INVITE))
-      .catch(error => console.error('Failed to create account', error));
+    if (isInTeamFlow) {
+      Promise.resolve()
+        .then(() => connected.doRegisterTeam({...account, email_code}))
+        .then(() => {
+          connected.trackEvent({name: TrackingAction.EVENT_NAME.TEAM.CREATED});
+          connected.trackEvent({name: TrackingAction.EVENT_NAME.TEAM.VERIFIED});
+        })
+        .then(() => history.push(ROUTE.INITIAL_INVITE))
+        .catch(error => console.error('Failed to create team account', error));
+    } else {
+      Promise.resolve()
+        .then(() => connected.doRegisterPersonal({...account, email_code}))
+        .then(() => {
+          connected.trackEvent({name: TrackingAction.EVENT_NAME.PERSONAL.CREATED});
+          connected.trackEvent({name: TrackingAction.EVENT_NAME.PERSONAL.VERIFIED});
+        })
+        .then(() => (window.location = pathWithParams('/login', 'reason=registration')))
+        .catch(error => console.error('Failed to create personal account', error));
+    }
   };
+
   const resendCode = event => {
     event.preventDefault();
     return Promise.resolve()
@@ -52,7 +65,7 @@ const Verify = ({account, authError, history, intl: {formatMessage: _}, ...conne
       .catch(error => console.error('Failed to send email code', error));
   };
   return (
-    <Page hasTeamData hasAccountData>
+    <Page hasAccountData>
       <ContainerXS
         centerText
         verticalCenter
@@ -70,7 +83,12 @@ const Verify = ({account, authError, history, intl: {formatMessage: _}, ...conne
           <Link onClick={resendCode} data-uie-name="do-resend-code">
             {_(verifyStrings.resendCode)}
           </Link>
-          <Link to={ROUTE.CREATE_ACCOUNT} component={RRLink} style={{marginLeft: 35}} data-uie-name="go-change-email">
+          <Link
+            to={isInTeamFlow ? ROUTE.CREATE_TEAM_ACCOUNT : ROUTE.CREATE_ACCOUNT}
+            component={RRLink}
+            style={{marginLeft: 35}}
+            data-uie-name="go-change-email"
+          >
             {_(verifyStrings.changeEmail)}
           </Link>
         </div>
@@ -85,6 +103,7 @@ export default withRouter(
       state => ({
         account: AuthSelector.getAccount(state),
         authError: AuthSelector.getError(state),
+        isInTeamFlow: AuthSelector.isInTeamFlow(state),
       }),
       {...AuthAction, ...TrackingAction, ...UserAction}
     )(Verify)

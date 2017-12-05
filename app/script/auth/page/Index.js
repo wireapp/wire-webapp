@@ -18,6 +18,8 @@
  */
 
 import * as TrackingAction from '../module/action/TrackingAction';
+import * as AuthAction from '../module/action/creator/AuthActionCreator';
+import {getLanguage} from '../module/selector/LanguageSelector';
 import React, {Component} from 'react';
 import ROUTE from '../route';
 import {Columns, Column, ContainerXS} from '@wireapp/react-ui-kit/Layout';
@@ -27,33 +29,28 @@ import {injectIntl} from 'react-intl';
 import {Logo, COLOR} from '@wireapp/react-ui-kit/Identity';
 import {ProfileIcon, RoundContainer, TeamIcon} from '@wireapp/react-ui-kit/Icon';
 import {Link, Paragraph, Text, Bold} from '@wireapp/react-ui-kit/Text';
+import {pathWithParams} from '../util/urlUtil';
 
 class Index extends Component {
   componentDidMount() {
     this.props.trackEvent({name: TrackingAction.EVENT_NAME.START.OPENED_START_SCREEN});
   }
 
-  onRegisterPersonalClick = () =>
-    this.trackAndNavigate(
-      TrackingAction.EVENT_NAME.START.OPENED_PERSONAL_REGISTRATION,
-      `${ROUTE.LOGIN}?hl=${this.props.language}#register`
-    );
+  onRegisterPersonalClick = () => {
+    this.props.trackEvent({name: TrackingAction.EVENT_NAME.START.OPENED_PERSONAL_REGISTRATION});
+    this.props.enterPersonalCreationFlow();
+    this.props.history.push(ROUTE.CREATE_ACCOUNT);
+  };
 
   onRegisterTeamClick = () => {
-    return Promise.resolve()
-      .then(() => this.props.trackEvent({name: TrackingAction.EVENT_NAME.START.OPENED_TEAM_REGISTRATION}))
-      .then(() => this.props.history.push(ROUTE.CREATE_TEAM));
+    this.props.trackEvent({name: TrackingAction.EVENT_NAME.START.OPENED_TEAM_REGISTRATION});
+    this.props.enterTeamCreationFlow();
+    this.props.history.push(ROUTE.CREATE_TEAM);
   };
 
   onLoginClick = () => {
-    const searchParams = window.location.search;
-    this.trackAndNavigate(TrackingAction.EVENT_NAME.START.OPENED_LOGIN, `${ROUTE.LOGIN}${searchParams}#login`);
-  };
-
-  trackAndNavigate = (eventName, url) => {
-    return Promise.resolve()
-      .then(() => this.props.trackEvent({name: eventName}))
-      .then(() => (window.location = url));
+    this.props.trackEvent({name: TrackingAction.EVENT_NAME.START.OPENED_LOGIN});
+    window.location = `${pathWithParams(ROUTE.LOGIN)}#login`;
   };
 
   render() {
@@ -102,4 +99,6 @@ class Index extends Component {
   }
 }
 
-export default injectIntl(connect(({languageState}) => ({language: languageState.language}), TrackingAction)(Index));
+export default injectIntl(
+  connect(state => ({language: getLanguage(state)}), {...AuthAction, ...TrackingAction})(Index)
+);

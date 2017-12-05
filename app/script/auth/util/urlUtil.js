@@ -17,17 +17,15 @@
  *
  */
 
-import {onEnvironment} from './Environment';
+export function pathWithParams(path, additionalParams) {
+  const searchParams = window.location.search.replace(/^\?/, '').split('&');
+  if (additionalParams) {
+    searchParams.push(additionParams);
+  }
+  const joinedParams = searchParams.join('&');
+  return `${path}${joinedParams.length ? `?${joinedParams}` : ''}`;
+}
 
-const stagingWebsite = 'https://wire-website-staging.zinfra.io';
-
-export default {
-  CREATE_ACCOUNT: '/createaccount',
-  CREATE_TEAM: '/createteam',
-  CREATE_TEAM_ACCOUNT: '/createteamaccount',
-  INDEX: '/',
-  INITIAL_INVITE: '/invite',
-  LOGIN: '/login',
-  VERIFY: '/verify',
-  WIRE_ROOT: onEnvironment(stagingWebsite, stagingWebsite, 'https://wire.com'),
-};
+export function getURLParameter(parameterName) {
+  return (window.location.search.split(`${parameterName}=`)[1] || '').split('&')[0];
+}
