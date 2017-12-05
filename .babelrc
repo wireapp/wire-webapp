@@ -30,6 +30,10 @@
   ],
   "env": {
     "test": {
+      "plugins": [
+        "transform-object-rest-spread",
+        "transform-class-properties"
+      ],
       "presets": [
         "jest",
         "react",
