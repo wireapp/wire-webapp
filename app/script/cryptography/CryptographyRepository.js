@@ -329,17 +329,15 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
           );
         }
         this.logger.warn(
-          `No remote PreKey for User ID '${user_id}' with Client ID '${
-            client_id
-          }' found. The owner probably deleted the client already.`
+          `No remote PreKey for User ID '${user_id}' with Client ID '${client_id}' found. The owner probably deleted the client already.`
         );
         return undefined;
       })
       .catch(error => {
         this.logger.warn(
-          `Invalid remote PreKey for User ID '${user_id}' with Client ID '${
-            client_id
-          }' found. Skipping encryption. Reason: ${error.message}`,
+          `Invalid remote PreKey for User ID '${user_id}' with Client ID '${client_id}' found. Skipping encryption. Reason: ${
+            error.message
+          }`,
           error
         );
         return undefined;
@@ -460,9 +458,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     if (is_invalid_message || is_invalid_signature) {
       // Session is broken, let's see what's really causing it...
       this.logger.error(
-        `Session with client '${remote_client_id}' of user '${
-          remote_user_id
-        }' is broken or out of sync.\nReset the session and decryption is likely to work again.`
+        `Session with client '${remote_client_id}' of user '${remote_user_id}' is broken or out of sync.\nReset the session and decryption is likely to work again.`
       );
     } else if (is_remote_identity_changed) {
       // Remote identity changed
@@ -470,9 +466,9 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     }
 
     this.logger.warn(
-      `Failed to decrypt event from client '${remote_client_id}' of user '${remote_user_id}'.\nError Code: '${
-        error_code
-      }'\nError Message: ${error.message}`,
+      `Failed to decrypt event from client '${remote_client_id}' of user '${remote_user_id}'.\nError Code: '${error_code}'\nError Message: ${
+        error.message
+      }`,
       error
     );
     this._report_decryption_failure(error, event);
