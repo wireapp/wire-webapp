@@ -1,4 +1,4 @@
-import {getURLParameter} from './Environment';
+import {getURLParameter} from './util/urlUtil';
 
 export const SUPPORTED_LANGUAGE = require('./supportedLocales');
 

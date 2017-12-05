@@ -39,6 +39,7 @@ export const initialState = {
   fetched: false,
   fetching: false,
   isAuthenticated: false,
+  isInTeamFlow: false,
 };
 
 export default function reducer(state = initialState, action) {
@@ -114,6 +115,12 @@ export default function reducer(state = initialState, action) {
     }
     case AuthActionCreator.AUTH_RESET_ERROR: {
       return {...state, error: null};
+    }
+    case AuthActionCreator.ENTER_TEAM_CREATION_FLOW: {
+      return {...state, isInTeamFlow: true};
+    }
+    case AuthActionCreator.ENTER_PERSONAL_CREATION_FLOW: {
+      return {...state, isInTeamFlow: false};
     }
     default: {
       return state;

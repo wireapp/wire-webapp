@@ -59,9 +59,25 @@ z.util.URLUtil = (() => {
 
   const _build_url = (type, path = '') => `${_get_domain(type)}${path && path.startsWith('/') ? path : ''}`;
 
+  const _get_links_from_html = html => {
+    if (!html) {
+      return [];
+    }
+
+    const anchorTags = new RegExp(/<a[\s]+([^>]+)>((?:.(?!\<\/a\>))*.)<\/a>/, 'g');
+    const links = html.match(anchorTags);
+
+    if (links && links.length) {
+      return links.map(element => $(element)[0]);
+    }
+
+    return [];
+  };
+
   return {
     TYPE: TYPE,
     build_support_url: _build_support_url,
     build_url: _build_url,
+    get_links_from_html: _get_links_from_html,
   };
 })();

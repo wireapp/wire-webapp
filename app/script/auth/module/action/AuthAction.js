@@ -93,8 +93,9 @@ export function doRegisterPersonal(registration) {
       })
     );
     return Promise.resolve()
-      .then(() => dispatch(doLogout()))
+      .then(() => dispatch(doSilentLogout()))
       .then(() => apiClient.register(registration))
+      .then(createdAccount => dispatch(AuthActionCreator.successfulRegisterPersonal(createdAccount)))
       .catch(error => {
         dispatch(AuthActionCreator.failedRegisterPersonal(error));
         throw BackendError.handle(error);

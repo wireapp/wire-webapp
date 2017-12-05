@@ -17,5 +17,15 @@
  *
  */
 
-export const HOST_HTTP = 'https://staging-nginz-https.zinfra.io';
-export const HOST_WEBSOCKET = 'wss://staging-nginz-ssl.zinfra.io';
+export function pathWithParams(path, additionalParams) {
+  const searchParams = window.location.search.replace(/^\?/, '').split('&');
+  if (additionalParams) {
+    searchParams.push(additionParams);
+  }
+  const joinedParams = searchParams.join('&');
+  return `${path}${joinedParams.length ? `?${joinedParams}` : ''}`;
+}
+
+export function getURLParameter(parameterName) {
+  return (window.location.search.split(`${parameterName}=`)[1] || '').split('&')[0];
+}
