@@ -27,6 +27,7 @@ import {CheckIcon} from '@wireapp/react-ui-kit/Icon';
 import {H1, Text, Link} from '@wireapp/react-ui-kit/Text';
 import {COLOR} from '@wireapp/react-ui-kit/Identity';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
+import {pathWithParams} from '../util/urlUtil';
 import * as LanguageSelector from '../module/selector/LanguageSelector';
 import * as InviteSelector from '../module/selector/InviteSelector';
 import {invite} from '../module/action/InviteAction';
@@ -43,8 +44,8 @@ class InitialInvite extends React.PureComponent {
   }
 
   onInviteDone = () => {
-    const {invites, language} = this.props;
-    const nextLocation = `/login?hl=${language}&reason=registration`;
+    const {invites} = this.props;
+    const nextLocation = pathWithParams('/login', 'reason=registration');
     const invited = Boolean(invites.length);
 
     return Promise.resolve()
