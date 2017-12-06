@@ -27,27 +27,26 @@ import {injectIntl} from 'react-intl';
 import {Logo, COLOR} from '@wireapp/react-ui-kit/Identity';
 import {ProfileIcon, RoundContainer, TeamIcon} from '@wireapp/react-ui-kit/Icon';
 import {Link, Paragraph, Text, Bold} from '@wireapp/react-ui-kit/Text';
+import {pathWithParams} from '../util/urlUtil';
 
 class Index extends Component {
   componentDidMount() {
     this.props.trackEvent({name: TrackingAction.EVENT_NAME.START.OPENED_START_SCREEN});
   }
 
-  onRegisterPersonalClick = () =>
-    this.trackAndNavigate(
-      TrackingAction.EVENT_NAME.START.OPENED_PERSONAL_REGISTRATION,
-      `${ROUTE.LOGIN}?hl=${this.props.language}#register`
-    );
+  onRegisterPersonalClick = () => {
+    const locationPath = pathWithParams(ROUTE.LOGIN, 'mode=register');
+    this.trackAndNavigate(TrackingAction.EVENT_NAME.START.OPENED_PERSONAL_REGISTRATION, locationPath);
+  };
 
   onRegisterTeamClick = () => {
-    return Promise.resolve()
-      .then(() => this.props.trackEvent({name: TrackingAction.EVENT_NAME.START.OPENED_TEAM_REGISTRATION}))
-      .then(() => this.props.history.push(ROUTE.CREATE_TEAM));
+    this.props.trackEvent({name: TrackingAction.EVENT_NAME.START.OPENED_TEAM_REGISTRATION});
+    this.props.history.push(ROUTE.CREATE_TEAM);
   };
 
   onLoginClick = () => {
-    const searchParams = window.location.search;
-    this.trackAndNavigate(TrackingAction.EVENT_NAME.START.OPENED_LOGIN, `${ROUTE.LOGIN}${searchParams}#login`);
+    const locationPath = pathWithParams(ROUTE.LOGIN, 'mode=login');
+    this.trackAndNavigate(TrackingAction.EVENT_NAME.START.OPENED_LOGIN, locationPath);
   };
 
   trackAndNavigate = (eventName, url) => {
