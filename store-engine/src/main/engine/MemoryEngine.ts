@@ -21,9 +21,7 @@ export default class MemoryEngine implements CRUDEngine {
       const record = this.stores[this.storeName][tableName][primaryKey];
 
       if (record) {
-        const message: string = `Record "${primaryKey}" already exists in "${
-          tableName
-        }". You need to delete the record first if you want to overwrite it.`;
+        const message: string = `Record "${primaryKey}" already exists in "${tableName}". You need to delete the record first if you want to overwrite it.`;
         const error = new RecordAlreadyExistsError(message);
         return Promise.reject(error);
       }
@@ -32,9 +30,7 @@ export default class MemoryEngine implements CRUDEngine {
       return Promise.resolve(primaryKey);
     }
 
-    const message: string = `Record "${primaryKey}" cannot be saved in "${
-      tableName
-    }" because it's "undefined" or "null".`;
+    const message: string = `Record "${primaryKey}" cannot be saved in "${tableName}" because it's "undefined" or "null".`;
     return Promise.reject(new RecordTypeError(message));
   }
 

@@ -13,18 +13,14 @@ export default class IndexedDBEngine implements CRUDEngine {
     if (entity) {
       return this.db[tableName].add(entity, primaryKey).catch(error => {
         if (error instanceof Dexie.ConstraintError) {
-          const message: string = `Record "${primaryKey}" already exists in "${
-            tableName
-          }". You need to delete the record first if you want to overwrite it.`;
+          const message: string = `Record "${primaryKey}" already exists in "${tableName}". You need to delete the record first if you want to overwrite it.`;
           throw new RecordAlreadyExistsError(message);
         } else {
           throw error;
         }
       });
     }
-    const message: string = `Record "${primaryKey}" cannot be saved in "${
-      tableName
-    }" because it's "undefined" or "null".`;
+    const message: string = `Record "${primaryKey}" cannot be saved in "${tableName}" because it's "undefined" or "null".`;
     return Promise.reject(new RecordTypeError(message));
   }
 

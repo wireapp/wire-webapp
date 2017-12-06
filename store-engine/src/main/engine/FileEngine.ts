@@ -69,9 +69,7 @@ export default class FileEngine implements CRUDEngine {
                     .then(() => resolve(primaryKey))
                     .catch(error => reject(error));
                 } else if (error.code === 'EEXIST') {
-                  const message: string = `Record "${primaryKey}" already exists in "${
-                    tableName
-                  }". You need to delete the record first if you want to overwrite it.`;
+                  const message: string = `Record "${primaryKey}" already exists in "${tableName}". You need to delete the record first if you want to overwrite it.`;
                   reject(new RecordAlreadyExistsError(message));
                 } else {
                   reject(error);
@@ -83,9 +81,7 @@ export default class FileEngine implements CRUDEngine {
           })
           .catch(reject);
       } else {
-        const message: string = `Record "${primaryKey}" cannot be saved in "${
-          tableName
-        }" because it's "undefined" or "null".`;
+        const message: string = `Record "${primaryKey}" cannot be saved in "${tableName}" because it's "undefined" or "null".`;
         reject(new RecordTypeError(message));
       }
     });
