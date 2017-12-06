@@ -17,20 +17,19 @@
  *
  */
 
-'use strict';
+export function pathWithParams(path, additionalParam) {
+  const searchParams = window.location.search
+    .replace(/^\?/, '')
+    .split('&')
+    .filter(searchParam => searchParam);
 
-window.z = window.z || {};
-window.z.auth = z.auth || {};
+  if (additionalParam) {
+    searchParams.push(additionalParam);
+  }
+  const joinedParams = searchParams.join('&');
+  return `${path}${joinedParams.length ? `?${joinedParams}` : ''}`;
+}
 
-z.auth.URLParameter = {
-  BOT_NAME: 'bot_name',
-  BOT_PROVIDER: 'bot_provider',
-  BOT_SERVICE: 'bot_service',
-  CONNECT: 'connect',
-  ENVIRONMENT: 'env',
-  INVITE: 'invite',
-  LOCALE: 'hl',
-  MODE: 'mode',
-  REASON: 'reason',
-  TRACKING: 'tracking',
-};
+export function getURLParameter(parameterName) {
+  return (window.location.search.split(`${parameterName}=`)[1] || '').split('&')[0];
+}
