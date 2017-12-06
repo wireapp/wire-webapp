@@ -13,7 +13,7 @@ export const mockStore = (state = {}, extraArgument = {}) => {
 
 export const withStore = (children, store) => <Provider store={store}>{children}</Provider>;
 
-export const withIntl = component => <IntlProvider><HashRouter>{component}</HashRouter></IntlProvider>;
+export const withIntl = component => <IntlProvider locale='en'><HashRouter>{component}</HashRouter></IntlProvider>;
 
 export const renderWithIntl = (component, store = () => {}) => renderer.create(withStore(withIntl(component), store));
 
