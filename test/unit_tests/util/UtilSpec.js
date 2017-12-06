@@ -43,9 +43,7 @@ describe('z.util.render_message', () => {
 
   it('renders URLs with underscores', () => {
     const link = 'http://en.wikipedia.org/wiki/Stormtrooper_(Star_Wars)';
-    const expected = `Stormtroopers: <a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${
-      link
-    }</a> !!!`;
+    const expected = `Stormtroopers: <a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a> !!!`;
     expect(z.util.render_message(`Stormtroopers: ${link} !!!`)).toBe(expected);
   });
 
@@ -82,9 +80,7 @@ describe('z.util.render_message', () => {
 
   it('renders URLs with @-signs and text correctly', () => {
     const link = 'https://t.facdn.net/22382738@400-1485204208.jpg';
-    const expected = `Just click <a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${
-      link
-    }</a> and download it`;
+    const expected = `Just click <a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a> and download it`;
     expect(z.util.render_message(`Just click ${link} and download it`)).toBe(expected);
   });
 
@@ -4323,9 +4319,7 @@ describe('Markdown with mixed markups', () => {
     const link_1 = '<a href="http://www.link.com" target="_blank" rel="nofollow noopener noreferrer">www.link.com</a>';
     const link_2 =
       '<a href="http://www.anotherlink.net" target="_blank" rel="nofollow noopener noreferrer">www.anotherlink.net</a>';
-    const expected = `This is <em>italic</em> and <strong>bold</strong> and <strong><em>bold-italic</em></strong> with a ${
-      link_1
-    } and ${link_2}.`;
+    const expected = `This is <em>italic</em> and <strong>bold</strong> and <strong><em>bold-italic</em></strong> with a ${link_1} and ${link_2}.`;
 
     expect(
       z.util.render_message(

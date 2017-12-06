@@ -55,7 +55,7 @@ module.exports = {
         exclude: /(node_modules)/,
         test: /style\.scss$/,
         // prettier-ignore
-        use: extractSass.extract('css-loader?sourceMap!postcss-loader?sourceMap!sass-loader?sourceMap'),
+        use: extractSass.extract('css-loader?sourceMap!postcss-loader?sourceMap!sass-loader?sourceMap')
       },
     ],
   },
