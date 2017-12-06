@@ -42,9 +42,9 @@ export default class HttpClient {
         backendResponse = JSON.stringify(error.response.data);
       } finally {
         this.logger.error(
-          `HTTP Error (${error.response.status}) on '${error.response.config.url}': ${error.message} (${
-            backendResponse
-          }`
+          `HTTP Error (${error.response.status}) on '${error.response.config.url}': ${
+            error.message
+          } (${backendResponse}`
         );
       }
       return Promise.reject(error);
