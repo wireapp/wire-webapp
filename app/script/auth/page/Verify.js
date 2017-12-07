@@ -33,7 +33,6 @@ import * as UserAction from '../module/action/UserAction';
 import Page from './Page';
 import React from 'react';
 import ROUTE from '../route';
-import {pathWithParams} from '../util/urlUtil';
 
 const Verify = ({account, authError, history, isInTeamFlow, intl: {formatMessage: _}, ...connected}) => {
   const createAccount = email_code => {
@@ -53,7 +52,7 @@ const Verify = ({account, authError, history, isInTeamFlow, intl: {formatMessage
           connected.trackEvent({name: TrackingAction.EVENT_NAME.PERSONAL.CREATED});
           connected.trackEvent({name: TrackingAction.EVENT_NAME.PERSONAL.VERIFIED});
         })
-        .then(() => (window.location = pathWithParams('/login', 'reason=registration')))
+        .then(() => history.push(ROUTE.CHOOSE_HANDLE))
         .catch(error => console.error('Failed to create personal account', error));
     }
   };

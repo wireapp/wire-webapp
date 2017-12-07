@@ -17,7 +17,11 @@
  *
  */
 
-export const getSelf = state => state.selfState.self || {};
-export const getSelfName = state => 'andy' || getSelf(state).name;
-export const getSelfTeamId = state => getSelf(state).team;
-export const getSelfError = state => state.selfState.error;
+export function randomArrayElement(array) {
+  return array[randomInt(array.length - 1)];
+}
+
+// returns number: 0 <= number <= max
+export function randomInt(max) {
+  return Math.floor(Math.random() * (max + 1));
+}

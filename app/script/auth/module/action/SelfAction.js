@@ -35,3 +35,14 @@ export function fetchSelf() {
       .catch(error => dispatch(SelfActionCreator.failedFetchSelf(error)));
   };
 }
+
+export function setHandle(handle) {
+  return function(dispatch, getState, {apiClient}) {
+    dispatch(SelfActionCreator.startSetHandle());
+    return apiClient.self.api
+      .putHandle({handle: handle.toLowerCase()})
+      .then(() => dispatch(fetchSelf()).then(action => action.payload))
+      .then(result => dispatch(SelfActionCreator.successfulSetHandle(result)))
+      .catch(error => dispatch(SelfActionCreator.failedSetHandle(error)));
+  };
+}

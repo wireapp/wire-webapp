@@ -23,6 +23,25 @@ export const SELF_FETCH_START = 'SELF_FETCH_START';
 export const SELF_FETCH_SUCCESS = 'SELF_FETCH_SUCCESS';
 export const SELF_FETCH_FAILED = 'SELF_FETCH_FAILED';
 
+export const HANDLE_SET_START = 'HANDLE_SET_START';
+export const HANDLE_SET_SUCCESS = 'HANDLE_SET_SUCCESS';
+export const HANDLE_SET_FAILED = 'HANDLE_SET_FAILED';
+
+export function startSetHandle(params) {
+  return {params, type: HANDLE_SET_START};
+}
+
+export function successfulSetHandle(selfUser: User) {
+  return {payload: selfUser, type: HANDLE_SET_SUCCESS};
+}
+
+export function failedSetHandle(error: any) {
+  return {
+    payload: BackendError.handleError(error),
+    type: HANDLE_SET_FAILED,
+  };
+}
+
 export function startFetchSelf(params) {
   return {params, type: SELF_FETCH_START};
 }

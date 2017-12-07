@@ -25,6 +25,7 @@ import InitialInvite from './InitialInvite';
 import TeamName from './TeamName';
 import CreateAccount from './CreateAccount';
 import CreatePersonalAccount from './CreatePersonalAccount';
+import ChooseHandle from './ChooseHandle';
 import Verify from './Verify';
 import {IntlProvider, addLocaleData} from 'react-intl';
 import {connect} from 'react-redux';
@@ -53,6 +54,7 @@ const Root = ({language}) => (
             <Route path={ROUTE.CREATE_ACCOUNT} component={CreatePersonalAccount} />
             <Route path={ROUTE.VERIFY} component={Verify} />
             <Route path={ROUTE.INITIAL_INVITE} component={InitialInvite} />
+            <Route path={ROUTE.CHOOSE_HANDLE} component={ChooseHandle} />
             <Redirect to={ROUTE.INDEX} />
           </Switch>
         </Content>

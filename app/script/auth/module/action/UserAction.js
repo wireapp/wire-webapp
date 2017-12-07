@@ -47,3 +47,9 @@ export function doSendActivationCode(email) {
       });
   };
 }
+
+export function checkHandles(handles) {
+  return function(dispatch, getState, {apiClient}) {
+    return apiClient.user.api.postHandles({handles, return: 1}).then(result => result[0]);
+  };
+}
