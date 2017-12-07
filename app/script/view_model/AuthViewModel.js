@@ -35,6 +35,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
         z.auth.URLParameter.BOT_PROVIDER,
         z.auth.URLParameter.BOT_SERVICE,
         z.auth.URLParameter.ENVIRONMENT,
+        z.auth.URLParameter.LOCALE,
         z.auth.URLParameter.TRACKING,
       ],
     };
@@ -1185,7 +1186,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
   }
 
   clicked_on_navigate_back() {
-    const locationPath = this._append_existing_parameters(/auth/);
+    const locationPath = this._append_existing_parameters('/auth/');
     window.location.replace(locationPath);
   }
 
