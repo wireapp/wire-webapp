@@ -50,7 +50,7 @@ class Index extends Component {
 
   onLoginClick = () => {
     this.props.trackEvent({name: TrackingAction.EVENT_NAME.START.OPENED_LOGIN});
-    window.location = `${pathWithParams(ROUTE.LOGIN)}#login`;
+    window.location = pathWithParams(ROUTE.LOGIN, 'mode=login');
   };
 
   render() {

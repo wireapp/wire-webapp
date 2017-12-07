@@ -35,6 +35,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
         z.auth.URLParameter.BOT_PROVIDER,
         z.auth.URLParameter.BOT_SERVICE,
         z.auth.URLParameter.ENVIRONMENT,
+        z.auth.URLParameter.LOCALE,
         z.auth.URLParameter.TRACKING,
       ],
     };
@@ -281,6 +282,16 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
   }
 
   _init_url_parameter() {
+    const mode = z.util.get_url_parameter(z.auth.URLParameter.MODE);
+    if (mode) {
+      const expectedModes = [z.auth.AuthView.MODE.ACCOUNT_LOGIN, z.auth.AuthView.MODE.ACCOUNT_REGISTER];
+      const isExpectedMode = expectedModes.includes(mode);
+      if (isExpectedMode) {
+        this._set_hash(mode);
+        return;
+      }
+    }
+
     const reason = z.util.get_url_parameter(z.auth.URLParameter.REASON);
     switch (reason) {
       case z.auth.SIGN_OUT_REASON.ACCOUNT_DELETED:
@@ -1002,7 +1013,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
   }
 
   clicked_on_navigate_back() {
-    window.location.replace(`/auth${location.search}`);
+    const locationPath = this._append_existing_parameters('/auth/');
+    window.location.replace(locationPath);
   }
 
   click_on_remove_device_submit(password, device) {

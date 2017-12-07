@@ -28,6 +28,7 @@ z.auth.URLParameter = {
   BOT_SERVICE: 'bot_service',
   ENVIRONMENT: 'env',
   LOCALE: 'hl',
+  MODE: 'mode',
   REASON: 'reason',
   TRACKING: 'tracking',
 };
