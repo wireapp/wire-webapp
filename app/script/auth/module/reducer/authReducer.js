@@ -47,7 +47,8 @@ export default function reducer(state = initialState, action) {
     case AuthActionCreator.LOGIN_START:
     case AuthActionCreator.REGISTER_JOIN_START:
     case AuthActionCreator.REGISTER_PERSONAL_START:
-    case AuthActionCreator.REGISTER_TEAM_START: {
+    case AuthActionCreator.REGISTER_TEAM_START:
+    case UserActionCreator.USER_SEND_ACTIVATION_CODE_START: {
       return {
         ...state,
         error: null,
@@ -85,7 +86,8 @@ export default function reducer(state = initialState, action) {
     case AuthActionCreator.REFRESH_SUCCESS:
     case AuthActionCreator.REGISTER_JOIN_SUCCESS:
     case AuthActionCreator.REGISTER_PERSONAL_SUCCESS:
-    case AuthActionCreator.REGISTER_TEAM_SUCCESS: {
+    case AuthActionCreator.REGISTER_TEAM_SUCCESS:
+    case UserActionCreator.USER_SEND_ACTIVATION_CODE_SUCCESS: {
       return {
         ...state,
         account: {...initialState.account},
