@@ -470,9 +470,7 @@
                   /^mailto:/,
                   ''
                 )}')">${cleanValue}</a>`
-              : `${preString}<a href="${cleanHref}" target="_blank" rel="nofollow noopener noreferrer">${
-                  cleanValue
-                }</a>`;
+              : `${preString}<a href="${cleanHref}" target="_blank" rel="nofollow noopener noreferrer">${cleanValue}</a>`;
           continue;
         }
       }
@@ -594,9 +592,9 @@
   };
 
   Renderer.prototype.heading = function(text, level, raw) {
-    return `<h${level} id="${this.options.headerPrefix}${raw.toLowerCase().replace(/[^\w]+/g, '-')}">${text}</h${
-      level
-    }>\n`;
+    return `<h${level} id="${this.options.headerPrefix}${raw
+      .toLowerCase()
+      .replace(/[^\w]+/g, '-')}">${text}</h${level}>\n`;
   };
 
   Renderer.prototype.hr = function() {

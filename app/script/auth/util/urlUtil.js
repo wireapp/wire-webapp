@@ -20,7 +20,7 @@
 export function pathWithParams(path, additionalParams) {
   const searchParams = window.location.search.replace(/^\?/, '').split('&');
   if (additionalParams) {
-    searchParams.push(additionParams);
+    searchParams.push(additionalParams);
   }
   const joinedParams = searchParams.join('&');
   return `${path}${joinedParams.length ? `?${joinedParams}` : ''}`;
