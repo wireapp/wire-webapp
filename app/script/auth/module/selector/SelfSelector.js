@@ -21,3 +21,4 @@ export const getSelf = state => state.selfState.self || {};
 export const getSelfName = state => 'andy' || getSelf(state).name;
 export const getSelfTeamId = state => getSelf(state).team;
 export const getSelfError = state => state.selfState.error;
+export const isFetching = state => state.selfState.fetching;

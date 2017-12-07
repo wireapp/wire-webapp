@@ -22,7 +22,7 @@ import {chooseHandleStrings} from '../../strings';
 import {InputSubmitCombo, Input, RoundIconButton, Form, ErrorMessage} from '@wireapp/react-ui-kit/Form';
 import {H1, Text} from '@wireapp/react-ui-kit/Text';
 import {injectIntl} from 'react-intl';
-import {parseError, parseValidationErrors} from '../util/errorUtil';
+import {parseError} from '../util/errorUtil';
 import {pathWithParams} from '../util/urlUtil';
 
 import Page from './Page';
@@ -44,20 +44,21 @@ class ChooseHandle extends React.PureComponent {
     this.props
       .checkHandles(suggestions)
       .then(handle => this.setState({handle}))
-      .catch(error => this.setState({error: error.response.message}));
+      .catch(error => this.setState({error}));
   }
 
   onSetHandle = event => {
     event.preventDefault();
     this.props
-      .setHandle(this.state.data.handle)
-      .then(() => (window.location = pathWithParams('/login', 'reason=registration')));
+      .setHandle(this.state.handle)
+      .then(() => (window.location = pathWithParams('/login', 'reason=registration')))
+      .catch(error => this.setState({error}));
   };
 
   render() {
-    const {error, intl: {formatMessage: _}} = this.props;
+    const {isFetching, intl: {formatMessage: _}} = this.props;
     return (
-      <Page>
+      <Page isAuthenticated>
         <ContainerXS centerText verticalCenter style={{display: 'flex', flexDirection: 'column', minHeight: 428}}>
           <H1 center>{_(chooseHandleStrings.headline)}</H1>
           <Text center>{_(chooseHandleStrings.subhead)}</Text>
@@ -70,22 +71,20 @@ class ChooseHandle extends React.PureComponent {
                 name="handle"
                 placeholder={_(chooseHandleStrings.handlePlaceholder)}
                 type="text"
-                onChange={event => this.setState({handle: event.target.value})}
+                onChange={event => this.setState({error: null, handle: event.target.value})}
                 value={this.state.handle}
                 autoFocus
                 data-uie-name="enter-invite-email"
               />
               <RoundIconButton
-                disabled={this.state.handle.length < 2}
+                disabled={this.state.handle.length < 2 || isFetching}
                 type="submit"
                 data-uie-name="do-send-invite"
                 formNoValidate
               />
             </InputSubmitCombo>
           </Form>
-          <ErrorMessage data-uie-name="error-message">
-            {this.state.error ? parseValidationErrors(this.state.error) : parseError(error)}
-          </ErrorMessage>
+          <ErrorMessage data-uie-name="error-message">{this.state.error && parseError(this.state.error)}</ErrorMessage>
         </ContainerXS>
       </Page>
     );
@@ -95,7 +94,7 @@ class ChooseHandle extends React.PureComponent {
 export default injectIntl(
   connect(
     state => ({
-      error: SelfSelector.getSelfError(state),
+      isFetching: SelfSelector.isFetching(state),
       name: SelfSelector.getSelfName(state),
     }),
     {

@@ -37,7 +37,7 @@ export function successfulSetHandle(selfUser: User) {
 
 export function failedSetHandle(error: any) {
   return {
-    payload: BackendError.handleError(error),
+    payload: BackendError.handle(error),
     type: HANDLE_SET_FAILED,
   };
 }

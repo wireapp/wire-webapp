@@ -18,7 +18,10 @@
  */
 
 export function pathWithParams(path, additionalParams) {
-  const searchParams = window.location.search.replace(/^\?/, '').split('&');
+  const searchParams = window.location.search
+    .replace(/^\?/, '')
+    .split('&')
+    .filter(param => param.length);
   if (additionalParams) {
     searchParams.push(additionalParams);
   }
