@@ -2841,6 +2841,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when the event was handled
    */
   _on_member_update(conversation_et, event_json) {
+    const isFromSelf = event_json.from === this.user_repository.self().id;
+    if (!isFromSelf) {
+      throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_USER);
+    }
+
     const is_active_conversation = this.is_active_conversation(conversation_et);
     const next_conversation_et = is_active_conversation ? this.get_next_conversation(conversation_et) : undefined;
     const previously_archived = conversation_et.is_archived();

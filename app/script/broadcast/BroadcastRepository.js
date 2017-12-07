@@ -41,11 +41,7 @@ z.broadcast.BroadcastRepository = class BroadcastRepository {
     this.userRepository = userRepository;
     this.logger = new z.util.Logger('z.broadcast.BroadcastRepository', z.config.LOGGER.OPTIONS);
 
-    amplify.subscribe(z.event.WebApp.BROADCAST.SEND_MESSAGE, this.sendMessage.bind(this));
-  }
-
-  sendMessage(genericMessage) {
-    return this.broadcastGenericMessage(genericMessage);
+    amplify.subscribe(z.event.WebApp.BROADCAST.SEND_MESSAGE, this.broadcastGenericMessage.bind(this));
   }
 
   /**
@@ -86,7 +82,7 @@ z.broadcast.BroadcastRepository = class BroadcastRepository {
     return Promise.resolve().then(() => {
       const recipients = {};
 
-      for (const user_et of this.userRepository.team_users()) {
+      for (const user_et of this.userRepository.team_users().concat(this.userRepository.self())) {
         recipients[user_et.id] = user_et.devices().map(client_et => client_et.id);
       }
 

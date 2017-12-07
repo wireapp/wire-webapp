@@ -1,6 +1,9 @@
 <div id="conversations" class="conversations left-list-is-visible" data-bind="with: $root.conversations">
   <div class="left-list-header">
-    <span class="left-list-header-text" data-bind="text: team_name" data-uie-name="status-team-name"></span>
+    <!-- ko if: is_team() -->
+      <span data-bind="text: self_availability"></span>
+    <!-- /ko -->
+    <span class="left-list-header-text" data-bind="text: self_name" data-uie-name="status-name"></span>
   </div>
   <!-- ko if: show_calls() -->
     <!-- ko foreach: conversations_calls -->

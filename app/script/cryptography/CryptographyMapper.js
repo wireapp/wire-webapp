@@ -192,8 +192,8 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
               throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE, message);
           }
         })(),
-        type: z.event.Client.USER.AVAILABILITY,
       },
+      type: z.event.Client.USER.AVAILABILITY,
     };
   }
 
