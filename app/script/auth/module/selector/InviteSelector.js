@@ -19,3 +19,4 @@
 
 export const getInvites = state => state.inviteState.invites;
 export const getError = state => state.inviteState.error;
+export const getFetching = state => state.inviteState.fetching;

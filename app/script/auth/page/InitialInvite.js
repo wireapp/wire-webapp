@@ -92,7 +92,7 @@ class InitialInvite extends React.PureComponent {
   };
 
   render() {
-    const {invites, error, intl: {formatMessage: _}} = this.props;
+    const {invites, isFetching, error, intl: {formatMessage: _}} = this.props;
     return (
       <Page isAuthenticated>
         <ContainerXS
@@ -117,7 +117,13 @@ class InitialInvite extends React.PureComponent {
                   autoFocus
                   data-uie-name="enter-invite-email"
                 />
-                <RoundIconButton icon="plane" type="submit" data-uie-name="do-send-invite" formNoValidate />
+                <RoundIconButton
+                  disabled={isFetching}
+                  icon="plane"
+                  type="submit"
+                  data-uie-name="do-send-invite"
+                  formNoValidate
+                />
               </InputSubmitCombo>
             </Form>
             <ErrorMessage data-uie-name="error-message">
@@ -146,6 +152,7 @@ export default injectIntl(
     state => ({
       error: InviteSelector.getError(state),
       invites: InviteSelector.getInvites(state),
+      isFetching: InviteSelector.getFetching(state),
       language: LanguageSelector.getLanguage(state),
     }),
     {
