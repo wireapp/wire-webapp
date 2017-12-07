@@ -126,6 +126,13 @@ z.main.App = class App {
     );
 
     repositories.bot = new z.bot.BotRepository(repositories.conversation);
+    repositories.broadcast = new z.broadcast.BroadcastRepository(
+      this.service.broadcast,
+      repositories.client,
+      repositories.conversation,
+      repositories.cryptography,
+      repositories.user
+    );
     repositories.calling = new z.calling.CallingRepository(
       this.service.calling,
       repositories.client,

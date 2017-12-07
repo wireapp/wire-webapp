@@ -117,7 +117,7 @@ z.user.UserRepository = class UserRepository {
       case z.event.Backend.USER.UPDATE:
         this.user_update(event_json);
         break;
-      case z.even.Client.USER.AVAILABILITY:
+      case z.event.Client.USER.AVAILABILITY:
         this.onUserAvailability(event_json);
         break;
       default:
@@ -565,10 +565,11 @@ z.user.UserRepository = class UserRepository {
   }
 
   changeAvailability(availability) {
-    if (availability !== this.self().availability()) {
-      this.self().status(availability);
+    const hasAvailabilityChanged = availability !== this.self().availability();
+    if (hasAvailabilityChanged) {
+      this.self().availability(availability);
 
-      const updatedAvailbility = (() => {
+      const updatedAvailability = (() => {
         switch (availability) {
           case z.user.AvailabilityType.AVAILABLE:
             return z.proto.Availability.Type.AVAILABLE;
@@ -583,7 +584,7 @@ z.user.UserRepository = class UserRepository {
       })();
 
       const genericMessage = new z.proto.GenericMessage(z.util.create_random_uuid());
-      const availabilityMessage = new z.proto.Availability(updatedAvailbility);
+      const availabilityMessage = new z.proto.Availability(updatedAvailability);
       genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.AVAILABILITY, availabilityMessage);
 
       amplify.publish(z.event.WebApp.BROADCAST.SEND_MESSAGE, genericMessage);

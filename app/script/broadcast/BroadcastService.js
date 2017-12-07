@@ -51,11 +51,7 @@ z.broadcast.BroadcastService = class BroadcastService {
    * @returns {Promise} Promise that resolve when the message was sent
    */
   postBroadcastMessage(payload, preconditionOption) {
-    const conversationId = wire.app.repository.conversation.self_conversation().id;
-    let url = this.client.create_url(`/conversations/${conversationId}/otr/messages`);
-
-    // let url = this.client.create_url(`${BroadcastService.CONFIG.URL_BROADCAST}//otr/messages`);
-
+    let url = this.client.create_url(`${BroadcastService.CONFIG.URL_BROADCAST}/otr/messages`);
     if (_.isArray(preconditionOption)) {
       url = `${url}?report_missing=${preconditionOption.join(',')}`;
     } else if (preconditionOption) {
