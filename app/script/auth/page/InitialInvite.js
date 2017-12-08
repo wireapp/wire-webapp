@@ -152,7 +152,7 @@ export default injectIntl(
     state => ({
       error: InviteSelector.getError(state),
       invites: InviteSelector.getInvites(state),
-      isFetching: InviteSelector.getFetching(state),
+      isFetching: InviteSelector.isFetching(state),
       language: LanguageSelector.getLanguage(state),
     }),
     {
