@@ -14,7 +14,10 @@
             <span class="preferences-account-input-icon" data-bind="css: name_saved() ? 'checkmark' : 'preferences-account-input-icon-edit'"></span>
           </div>
           <!-- ko if: is_team() -->
-            <div class="preferences-account-availability" data-bind="click: clickOnAvailability, text: availability()" data-uie-name="status-availability"></div>
+            <availability-state class="preferences-account-availability"
+                                data-bind="click: clickOnAvailability"
+                                data-uie-name="status-availability"
+                                params="availability: availability"></availability-state>
           <!-- /ko -->
           <div class="preferences-account-username-wrapper">
             <span class="preferences-account-username-atsign">@</span>
