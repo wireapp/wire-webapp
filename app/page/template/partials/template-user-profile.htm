@@ -33,6 +33,11 @@
               <!-- /ko -->
             </div>
           <!-- /ko -->
+          <!-- if: user_repository.is_team -->
+            <availability-state class="user-profile-availability"
+                                data-uie-name="status-availability"
+                                params="availability: userAvailability, label: userAvailabilityLabel"></availability-state>
+          <!-- /ko -->
         </div>
         <div class="user-profile-footer">
           <!-- ko template: {name: get_footer_template} --><!-- /ko -->

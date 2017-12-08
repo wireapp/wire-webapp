@@ -231,6 +231,7 @@ z.event.WebApp = {
     BACKEND_REQUESTS: 'wire.webapp.telemetry.backend_requests',
   },
   USER: {
+    CHANGE_AVAILABILITY: 'wire.webapp.user.change_availability',
     CLIENT_ADDED: 'wire.webapp.user.client_added',
     CLIENT_REMOVED: 'wire.webapp.user.client_removed',
     CLIENTS_UPDATED: 'wire.webapp.user.clients_udpated',

@@ -42,17 +42,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.self_user = this.user_repository.self;
     this.new_clients = ko.observableArray([]);
     this.name = ko.pureComputed(() => this.self_user().name());
-
-    this.availability = ko.pureComputed(() => {
-      let label = z.user.AvailbilityMapper.nameFromType(this.self_user().availability());
-
-      const noStatusSet = this.self_user().availability() === z.user.AvailabilityType.NONE;
-      if (noStatusSet) {
-        label = z.l10n.text(z.string.preferences_account_avaibility_unset);
-      }
-
-      return `${label} ^`;
-    });
+    this.availability = ko.pureComputed(() => this.self_user().availability());
 
     this.username = ko.pureComputed(() => this.self_user().username());
     this.entered_username = ko.observable();
@@ -130,45 +120,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   clickOnAvailability(viewmodel, event) {
-    const entries = [];
-
-    const isAvailable = this.self_user().availability() === z.user.AvailabilityType.AVAILABLE;
-    if (!isAvailable) {
-      entries.push({
-        click: () => this.user_repository.changeAvailability(z.user.AvailabilityType.AVAILABLE),
-        label: z.l10n.text(z.string.user_availability_available),
-        title: z.l10n.text(z.string.user_availability_available),
-      });
-    }
-
-    const isBusy = this.self_user().availability() === z.user.AvailabilityType.BUSY;
-    if (!isBusy) {
-      entries.push({
-        click: () => this.user_repository.changeAvailability(z.user.AvailabilityType.BUSY),
-        label: z.l10n.text(z.string.user_availability_busy),
-        title: z.l10n.text(z.string.user_availability_busy),
-      });
-    }
-
-    const isAway = this.self_user().availability() === z.user.AvailabilityType.AWAY;
-    if (!isAway) {
-      entries.push({
-        click: () => this.user_repository.changeAvailability(z.user.AvailabilityType.AWAY),
-        label: z.l10n.text(z.string.user_availability_away),
-        title: z.l10n.text(z.string.user_availability_away),
-      });
-    }
-
-    const isUnset = this.self_user().availability() === z.user.AvailabilityType.NONE;
-    if (!isUnset) {
-      entries.push({
-        click: () => this.user_repository.changeAvailability(z.user.AvailabilityType.NONE),
-        label: z.l10n.text(z.string.user_availability_none),
-        title: z.l10n.text(z.string.user_availability_none),
-      });
-    }
-
-    z.ui.Context.from(event, entries, 'preferences-account-availability-menu');
+    z.ui.AvailibilityContextMenu.show(event, this.availability(), 'preferences-account-availability-menu');
   }
 
   click_on_username() {
