@@ -17,25 +17,20 @@
  *
  */
 
-'use strict';
+availability-state {
+  display: flex;
+  align-items: center;
 
-window.z = window.z || {};
-window.z.components = z.components || {};
-
-z.components.Availability = class Availability {
-  constructor(params) {
-    this.user = ko.unwrap(params.user);
+  .availability-icon {
+    .square(10px);
+    margin-right: 8px;
+    fill: currentColor;
+    stroke: currentColor;
   }
-};
 
-// Knockout registration of the availability component.
-ko.components.register('availability', {
-  template: `
-    <!-- ko if: $data.availability() ===  -->
-      <input type="radio" name="accent"
-             data-bind="attr: {'id': 'accent' + $data, 'checked': $parent.user.accent_id() === $data}, click: $parent.on_select">
-      <label data-bind="attr: {'for': 'accent' + $data},css: 'accent-color-' + $data"></label>
-    <!-- /ko -->
-  `,
-  viewModel: z.components.Availability,
-});
+  .availability-label {
+    .ellipsis-nowrap();
+    .label-bold-xs();
+    display: inline-block;
+  }
+}

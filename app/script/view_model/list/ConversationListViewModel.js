@@ -62,9 +62,9 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
 
     this.is_team = this.team_repository.is_team;
 
-    this.user = this.user_repository.self;
-    this.self_availability = ko.pureComputed(() => this.user() && this.user().availability());
-    this.self_name = ko.pureComputed(() => this.user() && this.user().name());
+    this.self_user = ko.pureComputed(() => this.user_repository.self && this.user_repository.self());
+    this.selfAvailability = ko.pureComputed(() => this.self_user() && this.self_user().availability());
+    this.selfName = ko.pureComputed(() => this.self_user() && this.self_user().name());
 
     this.connect_requests = this.user_repository.connect_requests;
     this.connect_requests_text = ko.pureComputed(() => {
@@ -112,6 +112,10 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
     this.show_badge = ko.observable(false);
 
     this._init_subscriptions();
+  }
+
+  clickOnAvailability() {
+    z.ui.AvailibilityContextMenu.show(event, this.selfAvailability(), 'left-list-availability-menu');
   }
 
   click_on_connect_requests() {
