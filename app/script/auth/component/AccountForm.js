@@ -68,13 +68,9 @@ class AccountForm extends PureComponent {
       .catch(error => console.error('Failed to send email code', error));
   };
 
-  isSubmitButtonDisabled = () => {
-    const {email, name, password, termsAccepted} = this.state;
-    return !(email && name && password && termsAccepted);
-  };
-
   render() {
-    const {submitText, intl: {formatMessage: _}} = this.props;
+    const {isFetching, submitText, intl: {formatMessage: _}} = this.props;
+    const {name, email, password, termsAccepted, validInputs} = this.state;
     return (
       <Form
         onSubmit={this.handleSubmit}
@@ -92,12 +88,12 @@ class AccountForm extends PureComponent {
               onChange={event =>
                 this.setState({
                   name: event.target.value,
-                  validInputs: {...this.state.validInputs, name: true},
+                  validInputs: {...validInputs, name: true},
                 })
               }
               innerRef={node => (this.inputs.name = node)}
-              markInvalid={!this.state.validInputs.name}
-              defaultValue={this.state.name}
+              markInvalid={!validInputs.name}
+              value={name}
               autoComplete="section-create-team username"
               placeholder={_(accountFormStrings.namePlaceholder)}
               onKeyDown={event => {
@@ -117,12 +113,12 @@ class AccountForm extends PureComponent {
               onChange={event =>
                 this.setState({
                   email: event.target.value,
-                  validInputs: {...this.state.validInputs, email: true},
+                  validInputs: {...validInputs, email: true},
                 })
               }
               innerRef={node => (this.inputs.email = node)}
-              markInvalid={!this.state.validInputs.email}
-              defaultValue={this.state.email}
+              markInvalid={!validInputs.email}
+              value={email}
               autoComplete="section-create-team email"
               placeholder={_(accountFormStrings.emailPlaceholder)}
               onKeyDown={event => {
@@ -140,12 +136,12 @@ class AccountForm extends PureComponent {
               onChange={event =>
                 this.setState({
                   password: event.target.value,
-                  validInputs: {...this.state.validInputs, password: true},
+                  validInputs: {...validInputs, password: true},
                 })
               }
               innerRef={node => (this.inputs.password = node)}
-              markInvalid={!this.state.validInputs.password}
-              defaultValue={this.state.password}
+              markInvalid={!validInputs.password}
+              value={password}
               autoComplete="section-create-team new-password"
               type="password"
               placeholder={_(accountFormStrings.passwordPlaceholder)}
@@ -163,7 +159,7 @@ class AccountForm extends PureComponent {
           onChange={event => this.setState({termsAccepted: event.target.checked})}
           name="accept"
           required
-          defaultChecked={this.state.termsAccepted}
+          checked={termsAccepted}
           data-uie-name="do-terms"
           style={{justifyContent: 'center'}}
         >
@@ -177,7 +173,7 @@ class AccountForm extends PureComponent {
           </CheckboxLabel>
         </Checkbox>
         <Button
-          disabled={this.isSubmitButtonDisabled()}
+          disabled={!(email && name && password && termsAccepted) || isFetching}
           formNoValidate
           type="submit"
           style={{margin: '0 auto -16px'}}
@@ -195,6 +191,7 @@ export default injectIntl(
     state => ({
       account: AuthSelector.getAccount(state),
       authError: AuthSelector.getError(state),
+      isFetching: AuthSelector.isFetching(state),
     }),
     {...AuthAction, ...UserAction}
   )(AccountForm)

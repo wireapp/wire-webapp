@@ -21,14 +21,22 @@ import * as InviteActionCreator from '../action/creator/InviteActionCreator';
 
 const initialState = {
   error: null,
+  fetching: false,
   invites: [],
 };
 
 export default function inviteReducer(state = initialState, action) {
   switch (action.type) {
+    case InviteActionCreator.INVITE_ADD_START: {
+      return {
+        ...state,
+        fetching: true,
+      };
+    }
     case InviteActionCreator.INVITE_ADD_SUCCESS: {
       return {
         error: null,
+        fetching: false,
         invites: [...state.invites, action.payload.invite],
       };
     }
@@ -36,6 +44,7 @@ export default function inviteReducer(state = initialState, action) {
       return {
         ...state,
         error: action.payload,
+        fetching: false,
       };
     }
     case InviteActionCreator.INVITE_RESET_ERROR: {
