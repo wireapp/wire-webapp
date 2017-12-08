@@ -18,7 +18,7 @@
  */
 
 import React from 'react';
-import {mockStore, mockWithIntl} from '../util/TestUtil';
+import {mockStore, mountWithIntl} from '../util/TestUtil';
 import TeamName from './TeamName';
 
 describe('when entering a team name', () => {
@@ -51,10 +51,9 @@ describe('when entering a team name', () => {
     };
 
     const store = mockStore(state, {mixpanel: {track: () => 1}});
-    const component = mockWithIntl(<TeamName />, store);
+    const wrapper = mountWithIntl(<TeamName />, store);
 
-    const tree = component.toJSON();
-    expect(tree.type).toBe('div');
+    expect(wrapper).toBeDefined();
   });
 
   it('shows a next button when the minimum amount of characters are entered', () => {

@@ -18,21 +18,37 @@
  */
 
 import React from 'react';
-import {mockStore, mockWithStore} from '../util/TestUtil';
+import {mockStore, mountWithStore} from '../util/TestUtil';
 import Root from './Root';
 
-describe('Root', () => {
-  it('renders the Wire logo', () => {
+describe('when opening the main path', () => {
+  let store;
+  let wrapper;
+
+  beforeEach(() => {
     const state = {
       languageState: {
         language: 'en',
       },
     };
 
-    const store = mockStore(state, {mixpanel: {track: () => 1}});
-    const component = mockWithStore(<Root />, store);
+    store = mockStore(state, {mixpanel: {track: () => 1}});
+    wrapper = mountWithStore(<Root />, store);
+  });
 
-    const tree = component.html();
-    console.log('T', tree);
+  it('shows the Wire logo', () => {
+    expect(wrapper.find('[data-uie-name="ui-wire-logo"]').exists()).toBe(true);
+  });
+
+  it('shows an option to create a private account', () => {
+    expect(wrapper.find('[data-uie-name="go-register-personal"]').exists()).toBe(true);
+  });
+
+  it('shows an option to create a team', () => {
+    expect(wrapper.find('[data-uie-name="go-register-team"]').exists()).toBe(true);
+  });
+
+  it('shows an option to login', () => {
+    expect(wrapper.find('[data-uie-name="go-login"]').exists()).toBe(true);
   });
 });

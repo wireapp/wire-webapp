@@ -15,6 +15,6 @@ export const withStore = (children, store) => <Provider store={store}>{children}
 
 export const withIntl = component => <IntlProvider locale='en'><HashRouter>{component}</HashRouter></IntlProvider>;
 
-export const mockWithIntl = (component, store = () => {}) => mount(withStore(withIntl(component), store));
+export const mountWithIntl = (component, store = () => {}) => mount(withStore(withIntl(component), store));
 
-export const mockWithStore = (component, store = () => {}) => mount(withStore(component, store));
+export const mountWithStore = (component, store = () => {}) => mount(withStore(component, store));

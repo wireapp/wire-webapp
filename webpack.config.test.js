@@ -29,6 +29,13 @@ const babelSettings = {
 
 module.exports = Object.assign({}, prodConfig, {
   devtool: 'inline-source-map',
+  externals: Object.assign(prodConfig.externals, {
+    // These will help enable enzyme to work properly
+    cheerio: 'window',
+    'react/addons': true,
+    'react/lib/ExecutionEnvironment': true,
+    'react/lib/ReactContext': true,
+  }),
   module: {
     rules: [
       {
