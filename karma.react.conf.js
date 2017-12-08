@@ -47,17 +47,7 @@ module.exports = function(config) {
     },
     reporters: ['progress', 'coverage'],
     singleRun: true,
-    webpack: {
-      devtool: 'inline-source-map',
-      module: {
-        loaders: [
-          {
-            loader: 'babel-loader',
-            test: /\.jsx?$/,
-          },
-        ],
-      },
-    },
+    webpack: require('./webpack.config.test'),
     webpackServer: {
       noInfo: true,
     },

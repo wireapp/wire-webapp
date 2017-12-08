@@ -18,17 +18,29 @@
  */
 
 const webpack = require('webpack');
+const path = require('path');
 const prodConfig = require('./webpack.config.prod');
 const commonConfig = require('./webpack.config.common');
 
+// https://github.com/babel/babel-loader/issues/149
+const babelSettings = {
+  extends: path.join(__dirname, '/.babelrc'),
+};
+
 module.exports = Object.assign({}, prodConfig, {
   devtool: 'inline-source-map',
-  externals: Object.assign(prodConfig.externals, {
-    cheerio: 'window',
-    'react/addons': true,
-    'react/lib/ExecutionEnvironment': true,
-    'react/lib/ReactContext': true,
-  }),
+  module: {
+    rules: [
+      {
+        test: /\.jsx?$/,
+        use: [
+          {
+            loader: `babel-loader?${JSON.stringify(babelSettings)}`,
+          },
+        ],
+      },
+    ],
+  },
   plugins: [
     ...commonConfig.plugins,
     new webpack.DefinePlugin({

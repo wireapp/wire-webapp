@@ -22,7 +22,7 @@ import {mockStore, mockWithStore} from '../util/TestUtil';
 import Root from './Root';
 
 describe('Root', () => {
-  fit('renders the Wire logo', () => {
+  it('renders the Wire logo', () => {
     const state = {
       languageState: {
         language: 'en',
