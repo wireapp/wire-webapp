@@ -3,7 +3,7 @@ import React from 'react';
 import {HashRouter} from 'react-router-dom';
 import {IntlProvider} from 'react-intl';
 import {Provider} from 'react-redux';
-import renderer from 'react-test-renderer';
+import {mount} from 'enzyme';
 import thunk from 'redux-thunk';
 
 export const mockStore = (state = {}, extraArgument = {}) => {
@@ -15,6 +15,6 @@ export const withStore = (children, store) => <Provider store={store}>{children}
 
 export const withIntl = component => <IntlProvider locale='en'><HashRouter>{component}</HashRouter></IntlProvider>;
 
-export const renderWithIntl = (component, store = () => {}) => renderer.create(withStore(withIntl(component), store));
+export const mockWithIntl = (component, store = () => {}) => mount(withStore(withIntl(component), store));
 
-export const renderWithStore = (component, store = () => {}) => renderer.create(withStore(component, store));
+export const mockWithStore = (component, store = () => {}) => mount(withStore(component, store));

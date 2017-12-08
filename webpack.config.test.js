@@ -17,22 +17,24 @@
  *
  */
 
-import React from 'react';
-import {mockStore, mockWithStore} from '../util/TestUtil';
-import Root from './Root';
+const webpack = require('webpack');
+const prodConfig = require('./webpack.config.prod');
+const commonConfig = require('./webpack.config.common');
 
-describe('Root', () => {
-  fit('renders the Wire logo', () => {
-    const state = {
-      languageState: {
-        language: 'en',
+module.exports = Object.assign({}, prodConfig, {
+  devtool: 'inline-source-map',
+  externals: Object.assign(prodConfig.externals, {
+    cheerio: 'window',
+    'react/addons': true,
+    'react/lib/ExecutionEnvironment': true,
+    'react/lib/ReactContext': true,
+  }),
+  plugins: [
+    ...commonConfig.plugins,
+    new webpack.DefinePlugin({
+      'process.env': {
+        NODE_ENV: JSON.stringify('test'),
       },
-    };
-
-    const store = mockStore(state, {mixpanel: {track: () => 1}});
-    const component = mockWithStore(<Root />, store);
-
-    const tree = component.html();
-    console.log('T', tree);
-  });
+    }),
+  ],
 });

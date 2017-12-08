@@ -18,7 +18,7 @@
  */
 
 import React from 'react';
-import {mockStore, renderWithIntl} from '../util/TestUtil';
+import {mockStore, mockWithIntl} from '../util/TestUtil';
 import TeamName from './TeamName';
 
 describe('when entering a team name', () => {
@@ -51,7 +51,7 @@ describe('when entering a team name', () => {
     };
 
     const store = mockStore(state, {mixpanel: {track: () => 1}});
-    const component = renderWithIntl(<TeamName />, store);
+    const component = mockWithIntl(<TeamName />, store);
 
     const tree = component.toJSON();
     expect(tree.type).toBe('div');
