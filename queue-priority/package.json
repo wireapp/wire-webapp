@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@types/node": "8.0.56"
+    "@types/node": "8.0.57"
   },
   "devDependencies": {
     "cross-env": "5.0.5",
