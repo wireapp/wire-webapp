@@ -78,9 +78,11 @@
   version "2.0.1"
   resolved "https://codeload.github.com/dfahlander/Dexie.js/tar.gz/5baf5ccd73d7ac23c5e5ee6f3af65a59b0fe7e88"
 
-"@bower_components/generic-message-proto@wireapp/generic-message-proto#1.18.0":
-  version "0.0.0"
-  resolved "https://codeload.github.com/wireapp/generic-message-proto/tar.gz/227c040c5d3d19bb9ec2f96cff9b6e17d7373094"
+"@bower_components/generic-message-proto@wireapp/generic-message-proto#1.20.0":
+  version "1.20.0"
+  resolved "https://codeload.github.com/wireapp/generic-message-proto/tar.gz/c52403023cd3915af8b6ebc0457b002726d0bbf8"
+  dependencies:
+    protobufjs "6.8.0"
 
 "@bower_components/highlightjs@components/highlightjs#9.12.0":
   version "9.12.0"
@@ -201,7 +203,6 @@
 
 "@bower_components/webrtc-adapter@webrtc/adapter#6.0.3":
   version "6.0.3"
-  uid "3c158d2e4fd7d5f492365aa8d2157aac7e0e7c55"
   resolved "https://codeload.github.com/webrtc/adapter/tar.gz/3c158d2e4fd7d5f492365aa8d2157aac7e0e7c55"
   dependencies:
     rtcpeerconnection-shim "^1.1.13"
