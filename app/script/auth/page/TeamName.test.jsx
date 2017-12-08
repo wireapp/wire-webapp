@@ -18,11 +18,14 @@
  */
 
 import React from 'react';
-import {mockStore, mountWithIntl} from '../util/TestUtil';
+import {mockStore, mountWithIntl, mountWithStore} from '../util/TestUtil';
 import TeamName from './TeamName';
 
 describe('when entering a team name', () => {
-  it(`doesn\'t show a next button if too few characters are entered`, () => {
+  let store;
+  let wrapper;
+
+  beforeEach(() => {
     const state = {
       authState: {
         account: {
@@ -50,10 +53,14 @@ describe('when entering a team name', () => {
       },
     };
 
-    const store = mockStore(state, {mixpanel: {track: () => 1}});
-    const wrapper = mountWithIntl(<TeamName />, store);
+    store = mockStore(state, {mixpanel: {track: () => 1}});
+    wrapper = mountWithIntl(<TeamName />, store);
+  });
 
-    expect(wrapper).toBeDefined();
+  it(`doesn\'t show a next button if too few characters are entered`, () => {
+    const rendered = wrapper.find('[data-uie-name="enter-team-name"]');
+    console.log('R', rendered.props());
+    // expect(rendered.props()).to.have.property('maxLength', '10');
   });
 
   it('shows a next button when the minimum amount of characters are entered', () => {
