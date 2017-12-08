@@ -70,9 +70,7 @@ z.util.check_indexed_db = function() {
 };
 
 z.util.dummy_image = function(width, height) {
-  return `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${width} ${height}' width='${
-    width
-  }' height='${height}'></svg>`;
+  return `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${width} ${height}' width='${width}' height='${height}'></svg>`;
 };
 
 z.util.is_same_location = function(past_location, current_location) {

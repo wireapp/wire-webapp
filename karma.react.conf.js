@@ -17,9 +17,6 @@
  *
  */
 
-const dist = 'dist/script/auth';
-const srcTest = 'test/util';
-
 module.exports = function(config) {
   config.set({
     autoWatch: false,
