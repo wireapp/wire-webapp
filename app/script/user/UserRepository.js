@@ -88,6 +88,7 @@ z.user.UserRepository = class UserRepository {
     amplify.subscribe(z.event.WebApp.CLIENT.ADD, this.add_client_to_user.bind(this));
     amplify.subscribe(z.event.WebApp.CLIENT.REMOVE, this.remove_client_from_user.bind(this));
     amplify.subscribe(z.event.WebApp.CLIENT.UPDATE, this.update_clients_from_user.bind(this));
+    amplify.subscribe(z.event.WebApp.USER.CHANGE_AVAILABILITY, this.changeAvailability.bind(this));
     amplify.subscribe(z.event.WebApp.USER.EVENT_FROM_BACKEND, this.on_user_event.bind(this));
     amplify.subscribe(z.event.WebApp.USER.PERSIST, this.saveUserInDb.bind(this));
   }
