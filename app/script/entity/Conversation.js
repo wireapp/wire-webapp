@@ -49,6 +49,8 @@ z.entity.Conversation = class Conversation {
     this.participating_user_ids = ko.observableArray([]);
     this.self = undefined;
 
+    this.firstParticipatingUserEt = ko.pureComputed(() => this.participating_user_ets()[0]);
+
     this.is_guest = ko.observable(false);
     this.is_managed = false;
 
@@ -469,7 +471,7 @@ z.entity.Conversation = class Conversation {
     message_et.user_ets(this.participating_user_ets().slice(0));
 
     if ([z.conversation.ConversationType.CONNECT, z.conversation.ConversationType.ONE2ONE].includes(this.type())) {
-      if (this.participating_user_ets()[0].is_outgoing_request()) {
+      if (this.firstParticipatingUserEt() && this.firstParticipatingUserEt().is_outgoing_request()) {
         message_et.member_message_type = z.message.SystemMessageType.CONNECTION_REQUEST;
       } else {
         message_et.member_message_type = z.message.SystemMessageType.CONNECTION_ACCEPTED;
@@ -648,11 +650,11 @@ z.entity.Conversation = class Conversation {
       return false;
     }
 
-    if (!(this.participating_user_ets()[0] && this.participating_user_ets()[0].username())) {
+    if (!(this.firstParticipatingUserEt() && this.firstParticipatingUserEt().username())) {
       return false;
     }
 
-    return ['annathebot', 'ottothebot'].includes(this.participating_user_ets()[0].username());
+    return ['annathebot', 'ottothebot'].includes(this.firstParticipatingUserEt().username());
   }
 
   serialize() {
