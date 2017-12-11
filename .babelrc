@@ -35,7 +35,6 @@
         "transform-class-properties"
       ],
       "presets": [
-        "jest",
         "react",
         [
           "env",

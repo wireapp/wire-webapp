@@ -43,7 +43,7 @@ module.exports = function(config) {
     logLevel: config.LOG_INFO,
     port: 9876,
     preprocessors: {
-      'tests.webpack.js': ['webpack', 'sourcemap'],
+      'tests.webpack.js': ['webpack'],
     },
     reporters: ['progress', 'coverage'],
     singleRun: true,
