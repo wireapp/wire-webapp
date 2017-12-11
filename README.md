@@ -24,5 +24,5 @@ yarn start
 
 ```bash
 npm version patch
-yarn publish
+npm publish
 ```
