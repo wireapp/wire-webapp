@@ -18,19 +18,11 @@
  */
 
 import * as UserAction from './UserAction';
-import fetchMock from 'fetch-mock';
 import {mockStore} from '../../util/TestUtil';
 
 describe('UserAction', () => {
-  afterEach(() => {
-    fetchMock.reset();
-    fetchMock.restore();
-  });
-
   describe('when doing something', () => {
     fit('shows success', () => {
-      fetchMock.getOnce('/todos', {body: {todos: ['do something']}, headers: {'content-type': 'application/json'}});
-
       const code = 'A';
       const key = 'B';
 
