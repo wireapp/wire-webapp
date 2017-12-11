@@ -17,23 +17,30 @@
  *
  */
 
+import PropTypes from 'prop-types';
+import React from 'react';
 import {Text} from './Text';
 
-const Label = Text.withComponent('span').extend`
-  /* appearance */
-  font-size: 12px;
-  font-weight: 600;
-  /* positioning */
-  width: 100%;
-  padding: 24px 0 8px;
-`;
+const Label = ({component, ...props}) => {
+  const StyledLabel = Text.withComponent(component).extend`
+    /* positioning */
+    width: 100%;
+    padding: 24px 0 8px;
+  `;
+  return <StyledLabel {...props} />;
+};
 
 Label.propTypes = {
   ...Text.propTypes,
+  component: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
 };
 
 Label.defaultProps = {
   ...Text.defaultProps,
+  bold: true,
+  color: COLOR.LINK,
+  component: 'span',
+  fontSize: '12px',
 };
 
 export {Label};
