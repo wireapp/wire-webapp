@@ -1,3 +1,4 @@
+import Client from '@wireapp/api-client';
 import configureStore from 'redux-mock-store';
 import React from 'react';
 import {HashRouter} from 'react-router-dom';
@@ -6,7 +7,9 @@ import {Provider} from 'react-redux';
 import {mount} from 'enzyme';
 import thunk from 'redux-thunk';
 
-export const mockStore = (state = {}, extraArgument = {}) => {
+const apiClient = new Client(Client.BACKEND.STAGING);
+
+export const mockStore = (state = {}, extraArgument = {apiClient}) => {
   const middlewares = [thunk.withExtraArgument(extraArgument)];
   return configureStore(middlewares)(state);
 };

@@ -1,0 +1,44 @@
+/*
+ * Wire
+ * Copyright (C) 2017 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import * as UserAction from './UserAction';
+import fetchMock from 'fetch-mock';
+import {mockStore} from '../../util/TestUtil';
+
+describe('UserAction', () => {
+  afterEach(() => {
+    fetchMock.reset();
+    fetchMock.restore();
+  });
+
+  describe('when doing something', () => {
+    fit('shows success', () => {
+      fetchMock.getOnce('/todos', {body: {todos: ['do something']}, headers: {'content-type': 'application/json'}});
+
+      const code = 'A';
+      const key = 'B';
+
+      const store = mockStore(undefined, {mixpanel: {track: () => 1}});
+      return store.dispatch(UserAction.doActivateAccount(code, key)).then(() => {
+        console.log('HERE I AM');
+        console.log('A', store.getActions());
+      });
+    });
+  });
+});
