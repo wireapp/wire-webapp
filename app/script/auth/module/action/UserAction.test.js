@@ -26,7 +26,7 @@ describe('UserAction', () => {
       const code = 'A';
       const key = 'B';
 
-      const store = mockStore(undefined, {mixpanel: {track: () => 1}});
+      const store = mockStore();
       return store.dispatch(UserAction.doActivateAccount(code, key)).then(() => {
         console.log('HERE I AM');
         console.log('A', store.getActions());

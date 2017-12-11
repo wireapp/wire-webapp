@@ -4,12 +4,23 @@ import React from 'react';
 import {HashRouter} from 'react-router-dom';
 import {IntlProvider} from 'react-intl';
 import {Provider} from 'react-redux';
+const {StoreEngine} = require('@wireapp/store-engine');
 import {mount} from 'enzyme';
 import thunk from 'redux-thunk';
 
-const apiClient = new Client(Client.BACKEND.STAGING);
+const apiClient = new Client({
+  store: new StoreEngine.MemoryEngine('test-execution'),
+  urls: Client.BACKEND.STAGING,
+});
 
-export const mockStore = (state = {}, extraArgument = {apiClient}) => {
+export const mockStore = (state = {
+  languageState: {
+    language: 'en',
+  },
+}, extraArgument = {
+  apiClient,
+  mixpanel: {track: () => 1}
+}) => {
   const middlewares = [thunk.withExtraArgument(extraArgument)];
   return configureStore(middlewares)(state);
 };
