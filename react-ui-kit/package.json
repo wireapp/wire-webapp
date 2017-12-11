@@ -34,10 +34,11 @@
     "dist": "yarn clear && yarn build",
     "preversion": "yarn && yarn test",
     "publish": "cd ./dist && npm publish",
-    "start": "yarn start:demo",
     "start:demo": "webpack-dev-server",
     "start:static": "gulp",
+    "start": "yarn start:demo",
+    "test": "exit 0",
     "version": "yarn dist"
   },
-  "version": "0.0.17"
+  "version": "0.0.18"
 }

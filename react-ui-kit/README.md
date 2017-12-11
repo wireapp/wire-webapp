@@ -23,7 +23,6 @@ yarn start
 ### Release
 
 ```bash
-yarn prepare
-cd ./dist
+npm version patch
 yarn publish
 ```
