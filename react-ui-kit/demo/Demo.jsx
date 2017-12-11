@@ -346,6 +346,10 @@ export default function Demo() {
           </Paragraph>
 
           <Label>Label</Label>
+          <br />
+          <Label component={Link} href="#">
+            LabelLink
+          </Label>
 
           <H1>Colors</H1>
           <Line />
