@@ -9198,9 +9198,9 @@ uglify-es@^3.2.0:
     commander "~2.12.1"
     source-map "~0.6.1"
 
-uglify-js@3.2.1:
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.2.1.tgz#d6427fd45a25fefc5d196689c0c772a6915e10fe"
+uglify-js@3.2.2:
+  version "3.2.2"
+  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.2.2.tgz#870e4b34ed733d179284f9998efd3293f7fd73f6"
   dependencies:
     commander "~2.12.1"
     source-map "~0.6.1"
