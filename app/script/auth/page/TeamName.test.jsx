@@ -57,9 +57,8 @@ describe('when entering a team name', () => {
     wrapper = mountWithIntl(<TeamName />, store);
   });
 
-  it(`doesn\'t show a next button if too few characters are entered`, () => {
+  xit(`doesn\'t show a next button if too few characters are entered`, () => {
     const rendered = wrapper.find('[data-uie-name="enter-team-name"]');
-    console.log('R', rendered.props());
     // expect(rendered.props()).to.have.property('maxLength', '10');
   });
 
