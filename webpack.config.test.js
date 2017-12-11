@@ -29,6 +29,7 @@ const babelSettings = {
 
 module.exports = Object.assign({}, prodConfig, {
   devtool: false,
+  entry: false,
   externals: Object.assign(prodConfig.externals, {
     // These will help enable enzyme to work properly
     cheerio: 'window',
