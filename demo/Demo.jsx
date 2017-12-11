@@ -25,6 +25,7 @@ import {
   H3,
   H4,
   Heading,
+  Label,
   Line,
   Link,
   Muted,
@@ -343,6 +344,8 @@ export default function Demo() {
             totam molestiae similique reiciendis harum consequuntur, earum autem excepturi expedita molestias laborum
             quae non cupiditate!
           </Paragraph>
+
+          <Label>Label</Label>
 
           <H1>Colors</H1>
           <Line />
