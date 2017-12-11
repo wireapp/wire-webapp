@@ -53,7 +53,11 @@ const Verify = ({account, authError, history, isInTeamFlow, intl: {formatMessage
           connected.trackEvent({name: TrackingAction.EVENT_NAME.PERSONAL.CREATED});
           connected.trackEvent({name: TrackingAction.EVENT_NAME.PERSONAL.VERIFIED});
         })
-        .then(() => (window.location = pathWithParams('/login', 'reason=registration')))
+        .then(() => {
+          const link = document.createElement('a');
+          link.href = pathWithParams('/login', 'reason=registration');
+          link.click();
+        })
         .catch(error => console.error('Failed to create personal account', error));
     }
   };
