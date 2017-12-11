@@ -2,7 +2,7 @@
   "dependencies": {
     "@types/node": "8.0.57",
     "@wireapp/api-client": "0.2.14",
-    "@wireapp/protocol-messaging": "1.19.0",
+    "@wireapp/protocol-messaging": "1.20.0",
     "@wireapp/store-engine": "0.1.1",
     "bazinga64": "5.0.3",
     "protobufjs": "6.8.3",
