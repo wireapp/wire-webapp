@@ -55,6 +55,11 @@ ko.components.register('conversation-list-cell', {
         <!-- /ko -->
       </div>
       <div class="conversation-list-cell-center">
+        <!-- ko if: conversation.is_one2one() -->
+          <availability-state class="conversation-list-cell-availability"
+                              data-bind="css: {'text-theme': is_selected(conversation)}"
+                              params="availability: conversation.firstParticipatingUserEt().availability, label: conversation.display_name()"></availability-state>
+        <!-- /ko -->
         <span class="conversation-list-cell-name" data-bind="text: conversation.display_name(), css: {'text-theme': is_selected(conversation)}"></span>
         <span class="conversation-list-cell-description" data-bind="text: cell_state().description" data-uie-name="secondary-line"></span>
       </div>

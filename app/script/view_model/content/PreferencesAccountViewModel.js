@@ -44,6 +44,17 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.name = ko.pureComputed(() => this.self_user().name());
     this.availability = ko.pureComputed(() => this.self_user().availability());
 
+    this.availabilityLabel = ko.pureComputed(() => {
+      let label = z.user.AvailbilityMapper.nameFromType(this.availability());
+
+      const noStatusSet = this.availability() === z.user.AvailabilityType.NONE;
+      if (noStatusSet) {
+        label = z.l10n.text(z.string.preferences_account_avaibility_unset);
+      }
+
+      return `${label} ^`;
+    });
+
     this.username = ko.pureComputed(() => this.self_user().username());
     this.entered_username = ko.observable();
     this.submitted_username = ko.observable();
