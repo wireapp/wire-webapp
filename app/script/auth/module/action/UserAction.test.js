@@ -18,18 +18,37 @@
  */
 
 import * as UserAction from './UserAction';
+import * as UserActionCreator from './creator/UserActionCreator';
 import {mockStore} from '../../util/TestUtil';
 
 describe('UserAction', () => {
   describe('when doing something', () => {
-    fit('shows success', () => {
-      const code = 'A';
-      const key = 'B';
+    it('shows success', done => {
+      const code = 'code';
+      const key = 'key';
 
-      const store = mockStore();
+      const expectedActions = [
+        {params: [code, key], type: UserActionCreator.USER_ACTIVATION_START},
+        {payload: undefined, type: UserActionCreator.USER_ACTIVATION_SUCCESS},
+      ];
+
+      const store = mockStore(undefined, {
+        apiClient: {
+          user: {
+            api: {
+              postActivation: ({dryrun}) => {
+                expect(dryrun).toBe(false);
+                return Promise.resolve();
+              },
+            },
+          },
+        },
+        mixpanel: {track: () => 1},
+      });
+
       return store.dispatch(UserAction.doActivateAccount(code, key)).then(() => {
-        console.log('HERE I AM');
-        console.log('A', store.getActions());
+        expect(store.getActions()).toEqual(expectedActions);
+        done();
       });
     });
   });
