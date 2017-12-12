@@ -565,7 +565,7 @@ z.user.UserRepository = class UserRepository {
     });
   }
 
-  changeAvailability(availability) {
+  changeAvailability(availability, method) {
     const hasAvailabilityChanged = availability !== this.self().availability();
     if (hasAvailabilityChanged) {
       this.self().availability(availability);
@@ -589,7 +589,7 @@ z.user.UserRepository = class UserRepository {
       genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.AVAILABILITY, availabilityMessage);
 
       amplify.publish(z.event.WebApp.BROADCAST.SEND_MESSAGE, genericMessage);
-      this._trackAvailability(availability);
+      this._trackAvailability(availability, method);
     }
   }
 
@@ -597,11 +597,13 @@ z.user.UserRepository = class UserRepository {
    * Track availability action.
    *
    * @param {z.user.AvailabilityType} availability - Type of availability
+   * @param {string} method - Method used for availability change
    * @returns {undefined} No return value
    */
-  _trackAvailability(availability) {
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.REACTED_TO_MESSAGE, {
-      action: availability === z.user.AvailabilityType.NONE ? 'set' : 'unset',
+  _trackAvailability(availability, method) {
+    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.CHANGED_STATUS, {
+      method: method,
+      status: z.user.AvailbilityMapper.valueFromType(availability),
     });
   }
 
