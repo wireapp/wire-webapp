@@ -17,30 +17,29 @@
  *
  */
 
+import {COLOR} from '../Identity';
+import {Link} from './Link';
 import PropTypes from 'prop-types';
-import React from 'react';
 import {Text} from './Text';
 
-const Label = ({component, ...props}) => {
-  const StyledLabel = Text.withComponent(component).extend`
+const Label = Text.withComponent('span').extend`
     /* positioning */
-    width: 100%;
-    padding: 24px 0 8px;
+    display: ${props => (props.block ? 'block' : 'inline')};
   `;
-  return <StyledLabel {...props} />;
-};
 
 Label.propTypes = {
   ...Text.propTypes,
-  component: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
+  block: PropTypes.bool,
 };
 
 Label.defaultProps = {
   ...Text.defaultProps,
+  block: false,
   bold: true,
   color: COLOR.LINK,
-  component: 'span',
   fontSize: '12px',
 };
 
-export {Label};
+const LabelLink = Label.withComponent(Link);
+
+export {Label, LabelLink};
