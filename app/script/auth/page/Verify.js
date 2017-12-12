@@ -56,6 +56,7 @@ const Verify = ({account, authError, history, isInTeamFlow, intl: {formatMessage
         .then(() => {
           const link = document.createElement('a');
           link.href = pathWithParams(ROUTE.LOGIN, 'reason=registration');
+          document.body.appendChild(link); // workaround for Firefox
           link.click();
         })
         .catch(error => console.error('Failed to create personal account', error));

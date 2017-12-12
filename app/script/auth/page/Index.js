@@ -52,6 +52,7 @@ class Index extends Component {
     this.props.trackEvent({name: TrackingAction.EVENT_NAME.START.OPENED_LOGIN});
     const link = document.createElement('a');
     link.href = pathWithParams(ROUTE.LOGIN, 'mode=login');
+    document.body.appendChild(link); // workaround for Firefox
     link.click();
   };
 
