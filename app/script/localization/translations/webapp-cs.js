@@ -29,18 +29,13 @@ z.string.cs.alert_upload_too_large = 'Tento obrázek je příliš veliký.\nMů�
 z.string.cs.alert_gif_too_large = 'Animace je příliš veliká.\nMaximální velikost je {{number}} MB.';
 
 z.string.cs.auth_account_country_code = 'Kód země';
-z.string.cs.auth_account_create = 'Vytvořit';
-z.string.cs.auth_account_create_account = 'Vytvořit účet';
 z.string.cs.auth_account_deletion = 'Byli jste odhlášeni, protože váš účet byl smazán.';
 z.string.cs.auth_account_expiration = 'Byli jste odhlášeni, protože platnost relace vypršela. Přihlaste se znovu.';
-z.string.cs.auth_account_get_wire = 'Jednoduchá, soukromá & bezpečná aplikace pro chat, hovory, sdílení fotek, hudby, videa, GIFů a dalších.';
 z.string.cs.auth_account_password_forgot = 'Zapomenuté heslo';
 z.string.cs.auth_account_public_computer = 'Toto je veřejný počítač';
 z.string.cs.auth_account_sign_in = 'Přihlásit se';
 z.string.cs.auth_account_sign_in_email = 'Email';
 z.string.cs.auth_account_sign_in_phone = 'Telefon';
-z.string.cs.auth_account_terms_of_use = 'Podmínky používání';
-z.string.cs.auth_account_terms_of_use_detail = 'Souhlasím';
 
 z.string.cs.auth_blocked_cookies = 'Pro přihlášení k Wire povolte soubory cookie.';
 z.string.cs.auth_blocked_database = 'Pro zobrazení zpráv potřebuje Wire potřebuje přístup k úložišti. Úložiště není k dispozici v anonymním režimu.';
@@ -69,23 +64,12 @@ z.string.cs.auth_history_reuse_headline = 'Již jste dříve použili Wire na to
 z.string.cs.auth_history_reuse_description = 'Zprávy odeslané v mezičase se zde nezobrazí.';
 z.string.cs.auth_history_button = 'OK';
 
-z.string.cs.auth_posted_change_email = 'Změnit email';
-z.string.cs.auth_posted_offline_detail = 'Zkontrolujte své připojení k Internetu a zkuste znovu.';
-z.string.cs.auth_posted_offline_headline = 'Drát je hezčí online.';
-z.string.cs.auth_posted_pending_detail = 'Zkontrolujte své emaily nebo zopakujte aktivaci.';
-z.string.cs.auth_posted_pending_headline = 'Účet čeká na aktivaci';
 z.string.cs.auth_posted_resend = 'Znovu odeslat na {{email}}';
 z.string.cs.auth_posted_resend_action = 'Žádný email nedošel?';
 z.string.cs.auth_posted_resend_detail = 'Zkontrolujte doručenou poštu a postupujte dle instrukcí.';
 z.string.cs.auth_posted_resend_headline = 'Přišel ti email.';
-z.string.cs.auth_posted_retry = 'Zkusit znovu a poslat email na {{email}}';
-z.string.cs.auth_posted_retry_action = 'Opakovat?';
-z.string.cs.auth_posted_retry_detail = 'Zkuste to prosím znovu.';
-z.string.cs.auth_posted_retry_headline = 'Něco se pokazilo';
-z.string.cs.auth_posted_verify_later = 'Ověřit později';
 
 z.string.cs.auth_placeholder_email = 'Email';
-z.string.cs.auth_placeholder_name = 'Jméno';
 z.string.cs.auth_placeholder_password_put = 'Heslo';
 z.string.cs.auth_placeholder_password_set = 'Heslo (alespoň 8 znaků)';
 z.string.cs.auth_placeholder_phone = 'Telefonní číslo';

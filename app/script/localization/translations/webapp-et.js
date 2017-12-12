@@ -30,18 +30,13 @@ z.string.et.alert_upload_too_large = 'See pilt on liiga suur.\nSa võid üles la
 z.string.et.alert_gif_too_large = 'Animatsioon on liiga suur.\nMaksimaalne lubatud suurus on {{number}} MB.';
 
 z.string.et.auth_account_country_code = 'Riigi kood';
-z.string.et.auth_account_create = 'Loo';
-z.string.et.auth_account_create_account = 'Konto loomine';
 z.string.et.auth_account_deletion = 'Sind logiti välja, kuna sinu konto kustutati.';
 z.string.et.auth_account_expiration = 'Sind logiti välja, kuna seanss aegus. Palun logi uuesti sisse.';
-z.string.et.auth_account_get_wire = 'Lihtne, privaatne ja turvaline sõnumirakendus vestluste ja kõnede tegemiseks, piltide, muusika, videote, GIFide ja muu jagamiseks.';
 z.string.et.auth_account_password_forgot = 'Unustasid parooli?';
 z.string.et.auth_account_public_computer = 'See on avalik arvuti';
 z.string.et.auth_account_sign_in = 'Logi sisse';
 z.string.et.auth_account_sign_in_email = 'E-post';
 z.string.et.auth_account_sign_in_phone = 'Telefon';
-z.string.et.auth_account_terms_of_use = 'Kasutustingimused';
-z.string.et.auth_account_terms_of_use_detail = 'Nõustun';
 
 z.string.et.auth_blocked_cookies = 'Wire’i sisselogimiseks luba küpsised.';
 z.string.et.auth_blocked_database = 'Wire vajab sõnumite kuvamiseks ligipääsu kohalikule hoidlale (local storage). Kohalik hoidla ei ole privaatrežiimis saadaval.';
@@ -70,23 +65,12 @@ z.string.et.auth_history_reuse_headline = 'Oled sellel seadmel juba varem Wire�
 z.string.et.auth_history_reuse_description = 'Vahepeal saadetud sõnumid ei ilmu siia.';
 z.string.et.auth_history_button = 'OK';
 
-z.string.et.auth_posted_change_email = 'Muuda e-posti';
-z.string.et.auth_posted_offline_detail = 'Kontrolli netiühendust ja proovi uuesti.';
-z.string.et.auth_posted_offline_headline = 'Wire on võrgus parem.';
-z.string.et.auth_posted_pending_detail = 'Kontrolli oma e-postkasti või saada aktiveerimine uuesti.';
-z.string.et.auth_posted_pending_headline = 'Konto on juba ootel';
 z.string.et.auth_posted_resend = 'Saada uuesti aadressile {{email}}';
 z.string.et.auth_posted_resend_action = 'E-kiri ei saabu?';
 z.string.et.auth_posted_resend_detail = 'Kontrolli oma e-postkasti ja järgi kirjas olevaid juhiseid.';
 z.string.et.auth_posted_resend_headline = 'Sulle tuli kiri.';
-z.string.et.auth_posted_retry = 'Proovi uuesti kiri saata aadressile {{email}}';
-z.string.et.auth_posted_retry_action = 'Proovid uuesti?';
-z.string.et.auth_posted_retry_detail = 'Palun proovi uuesti.';
-z.string.et.auth_posted_retry_headline = 'Midagi läks valesti';
-z.string.et.auth_posted_verify_later = 'Kinnita hiljem';
 
 z.string.et.auth_placeholder_email = 'E-post';
-z.string.et.auth_placeholder_name = 'Nimi';
 z.string.et.auth_placeholder_password_put = 'Parool';
 z.string.et.auth_placeholder_password_set = 'Parool (vähemalt 8 märki)';
 z.string.et.auth_placeholder_phone = 'Telefoninumber';

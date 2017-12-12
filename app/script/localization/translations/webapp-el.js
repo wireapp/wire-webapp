@@ -29,18 +29,13 @@ z.string.el.alert_upload_too_large = 'Αυτή η εικόνα είναι πολ
 z.string.el.alert_gif_too_large = 'Η κινούμενη εικόνα είναι πολύ μεγάλη.\nΤο μέγιστο μέγεθος είναι {{number}} MB.';
 
 z.string.el.auth_account_country_code = 'Κωδικός Χώρας';
-z.string.el.auth_account_create = 'Δημιουργία';
-z.string.el.auth_account_create_account = 'Δημιουργήστε ένα λογαριασμό';
 z.string.el.auth_account_deletion = 'Αποσυνδεθήκατε, επειδή ο λογαριασμός έχει διαγραφεί.';
 z.string.el.auth_account_expiration = 'Αποσυνδεθήκατε διότι η περίοδος λειτουργίας σας έληξε. Παρακαλούμε συνδεθείτε ξανά.';
-z.string.el.auth_account_get_wire = 'Απλός, ιδιωτικός και ασφαλές messenger για συνομιλίες, κλήσεις, ανταλλαγής φωτογραφιών, βίντεο, GIF και άλλα.';
 z.string.el.auth_account_password_forgot = 'Ξέχασα τον κωδικό πρόσβασης';
 z.string.el.auth_account_public_computer = 'Αυτός είναι ένας δημόσιος υπολογιστής';
 z.string.el.auth_account_sign_in = 'Σύνδεση';
 z.string.el.auth_account_sign_in_email = 'Email';
 z.string.el.auth_account_sign_in_phone = 'Τηλεφωνο';
-z.string.el.auth_account_terms_of_use = 'Όροι Χρήσης';
-z.string.el.auth_account_terms_of_use_detail = 'Αποδέχομαι';
 
 z.string.el.auth_blocked_cookies = 'Ενεργοποιήστε τα cookies για να συνδεθείτε στο Wire.';
 z.string.el.auth_blocked_database = 'Το Wire χρειάζεται πρόσβαση σε τοπικό αποθηκευτικό χώρο για την προβολή των μηνυμάτων σας. Η τοπική αποθήκευση δεν είναι διαθέσιμη σε ιδιωτική λειτουργία.';
@@ -69,23 +64,12 @@ z.string.el.auth_history_reuse_headline = 'Έχετε χρησιμοποιήσε
 z.string.el.auth_history_reuse_description = 'Τα μηνύματα που αποστέλλονται  την ίδια στιγμή δεν θα εμφανίζονται εδώ.';
 z.string.el.auth_history_button = 'Εντάξει';
 
-z.string.el.auth_posted_change_email = 'Αλλαγή διεύθυνσης ηλεκτρονικού ταχυδρομείου';
-z.string.el.auth_posted_offline_detail = 'Ελέγξτε τη σύνδεσή σας στο internet και προσπαθήστε ξανά.';
-z.string.el.auth_posted_offline_headline = 'Το Wire είναι καλύτερο online.';
-z.string.el.auth_posted_pending_detail = 'Ελέγξτε τα εισερχόμενα email σας ή επαναλάβετε την αποστολή ενεργοποίησης.';
-z.string.el.auth_posted_pending_headline = 'Ο λογαριασμός βρίσκεται ήδη σε αναμονή';
 z.string.el.auth_posted_resend = 'Επαναποστολή σε {{email}}';
 z.string.el.auth_posted_resend_action = 'Δεν εμφανίζεται το email;';
 z.string.el.auth_posted_resend_detail = 'Ελέγξτε τα email σας και ακολουθήστε τις οδηγίες που θα βρείτε.';
 z.string.el.auth_posted_resend_headline = 'Έχετε μήνυμα.';
-z.string.el.auth_posted_retry = 'Προσπάθεια ξανά και αποστολή μηνύματος στο {{email}}';
-z.string.el.auth_posted_retry_action = 'Δοκιμή ξανά;';
-z.string.el.auth_posted_retry_detail = 'Παρακαλούμε δοκιμάστε ξανά.';
-z.string.el.auth_posted_retry_headline = 'Κάτι πήγε στραβά';
-z.string.el.auth_posted_verify_later = 'Επιβεβαιώστε αργότερα';
 
 z.string.el.auth_placeholder_email = 'Email';
-z.string.el.auth_placeholder_name = 'Όνομα';
 z.string.el.auth_placeholder_password_put = 'Κωδικός Πρόσβασης';
 z.string.el.auth_placeholder_password_set = 'Κωδικος προσβασης (το λιγοτερο 8 χαρακτηρες)';
 z.string.el.auth_placeholder_phone = 'Αριθμός Κινητού Τηλεφώνου';

@@ -29,18 +29,13 @@ z.string.tr.alert_upload_too_large = 'Bu resim çok büyük.\nEn fazla {{number}
 z.string.tr.alert_gif_too_large = 'Animasyon çok büyük.\nMaksimum dosya boyutu {{number}} MB.';
 
 z.string.tr.auth_account_country_code = 'Ülke Kodu';
-z.string.tr.auth_account_create = 'Oluştur';
-z.string.tr.auth_account_create_account = 'Bir hesap oluştur';
 z.string.tr.auth_account_deletion = 'Çıkış yaptınız çünkü hesabınız silinmiş.';
 z.string.tr.auth_account_expiration = 'Oturumunuzun süresi dolduğu için çıkış yapıldı. Lütfen tekrar giriş yapın.';
-z.string.tr.auth_account_get_wire = 'Konuşma, arama; fotoğraf, video, müzik ve GIF paylaşmak için basit, gizli ve güvenli mesajlaşma uygulaması.';
 z.string.tr.auth_account_password_forgot = 'Şifremi unuttum';
 z.string.tr.auth_account_public_computer = 'Bu ortak bir bilgisayar';
 z.string.tr.auth_account_sign_in = 'Giriş yap';
 z.string.tr.auth_account_sign_in_email = 'E-posta';
 z.string.tr.auth_account_sign_in_phone = 'Telefon';
-z.string.tr.auth_account_terms_of_use = 'Kullanım Şartları';
-z.string.tr.auth_account_terms_of_use_detail = 'Kabul ediyorum';
 
 z.string.tr.auth_blocked_cookies = 'Wire’a giriş yapabilmek için çerezleri etkinleştirin.';
 z.string.tr.auth_blocked_database = 'Wire’ın mesajları gösterebilmek için yerel diske erişmesi lazım. Gizli modda yerel disk kullanılamaz.';
@@ -69,23 +64,12 @@ z.string.tr.auth_history_reuse_headline = 'Bu cihazdan daha önce Wire kullanmı
 z.string.tr.auth_history_reuse_description = 'Bu sırada gönderilen mesajlar burada görünmeyecektir.';
 z.string.tr.auth_history_button = 'TAMAM';
 
-z.string.tr.auth_posted_change_email = 'E-posta değiştir';
-z.string.tr.auth_posted_offline_detail = 'İnternet bağlantınızı kontrol edin ve tekrar deneyin.';
-z.string.tr.auth_posted_offline_headline = 'Wire çevrimiçi olunca daha güzel.';
-z.string.tr.auth_posted_pending_detail = 'Gelen kutunuzu kontrol edin veya aktivasyonu tekrar gönderin.';
-z.string.tr.auth_posted_pending_headline = 'Hesap zaten beklemede';
 z.string.tr.auth_posted_resend = '{{email}}’a tekrar gönder';
 z.string.tr.auth_posted_resend_action = 'E-posta gelmedi mi?';
 z.string.tr.auth_posted_resend_detail = 'E-posta gelen kutunuzu kontrol edin ve talimatları izleyin.';
 z.string.tr.auth_posted_resend_headline = 'E-posta geldi.';
-z.string.tr.auth_posted_retry = 'Yeniden deneyin ve {{email}} adresine tekrar e-posta gönderin';
-z.string.tr.auth_posted_retry_action = 'Tekrar dene?';
-z.string.tr.auth_posted_retry_detail = 'Lütfen tekrar deneyin.';
-z.string.tr.auth_posted_retry_headline = 'Bir şeyler yanlış gitti';
-z.string.tr.auth_posted_verify_later = 'Daha sonra doğrula';
 
 z.string.tr.auth_placeholder_email = 'E-posta';
-z.string.tr.auth_placeholder_name = 'İsim';
 z.string.tr.auth_placeholder_password_put = 'Şifre';
 z.string.tr.auth_placeholder_password_set = 'Şifre (en az 8 karakter)';
 z.string.tr.auth_placeholder_phone = 'Telefon Numarası';

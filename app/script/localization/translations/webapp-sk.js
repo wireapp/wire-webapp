@@ -30,18 +30,13 @@ z.string.sk.alert_upload_too_large = 'Tento obrázok je príliš veľký. Môže
 z.string.sk.alert_gif_too_large = 'Animácia je príliš veľká. Maximálna veľkosť je {{number}} MB.';
 
 z.string.sk.auth_account_country_code = 'Kód krajiny';
-z.string.sk.auth_account_create = 'Vytvoriť';
-z.string.sk.auth_account_create_account = 'Vytvoriť konto';
 z.string.sk.auth_account_deletion = 'Boli ste odhlásení, pretože vaše konto bolo odstránené.';
 z.string.sk.auth_account_expiration = 'Boli ste odhlásení pretože vypršala platnosť Vášho sedenia. Prihláste sa prosím znova.';
-z.string.sk.auth_account_get_wire = 'Jednoduchý, súkromný & bezpečný messenger pre rozhovory, volania, zdieľanie fotiek, hudby, videí, obrázkov vo formáte GIF a ešte viac.';
 z.string.sk.auth_account_password_forgot = 'Zabudnuté heslo';
 z.string.sk.auth_account_public_computer = 'Toto je verejný počítač';
 z.string.sk.auth_account_sign_in = 'Prihlásenie';
 z.string.sk.auth_account_sign_in_email = 'E-mail';
 z.string.sk.auth_account_sign_in_phone = 'Telefón';
-z.string.sk.auth_account_terms_of_use = 'Podmienky používania';
-z.string.sk.auth_account_terms_of_use_detail = 'Súhlasím';
 
 z.string.sk.auth_blocked_cookies = 'Povoľte cookies na prihlásenie k Wire.';
 z.string.sk.auth_blocked_database = 'Pre zobrazenie Vašich správ potrebuje Wire prístup k lokálnemu úložisku. Lokálne úložisko nie je dostupné v privátnom režime.';
@@ -70,23 +65,12 @@ z.string.sk.auth_history_reuse_headline = 'Použili ste Wire na tomto zariadení
 z.string.sk.auth_history_reuse_description = 'Medzičasom odoslané správy sa tu nezobrazia.';
 z.string.sk.auth_history_button = 'OK';
 
-z.string.sk.auth_posted_change_email = 'Zmeniť e-mail';
-z.string.sk.auth_posted_offline_detail = 'Skontrolujte internetové pripojenie a skúste znova.';
-z.string.sk.auth_posted_offline_headline = 'Wire je krajší online.';
-z.string.sk.auth_posted_pending_detail = 'Skontrolujte Vašu e-mailovú schránku alebo odošlite znovu aktiváciu.';
-z.string.sk.auth_posted_pending_headline = 'Účet už prebieha';
 z.string.sk.auth_posted_resend = 'Znovu odoslať na {{email}}';
 z.string.sk.auth_posted_resend_action = 'Žiadny e-mail sa nezobrazil?';
 z.string.sk.auth_posted_resend_detail = 'Skontrolujte Vašu e-mailovú schránku a postupujte podľa pokynov.';
 z.string.sk.auth_posted_resend_headline = 'Máte e-mail.';
-z.string.sk.auth_posted_retry = 'Zopakovať a odoslať e-mail na {{email}}';
-z.string.sk.auth_posted_retry_action = 'Skúsiť znova?';
-z.string.sk.auth_posted_retry_detail = 'Prosím, skúste znova.';
-z.string.sk.auth_posted_retry_headline = 'Niečo sa pokazilo';
-z.string.sk.auth_posted_verify_later = 'Skontrolovať neskôr';
 
 z.string.sk.auth_placeholder_email = 'E-mail';
-z.string.sk.auth_placeholder_name = 'Meno';
 z.string.sk.auth_placeholder_password_put = 'Heslo';
 z.string.sk.auth_placeholder_password_set = 'Heslo (minimálne 8 znakov)';
 z.string.sk.auth_placeholder_phone = 'Telefónne číslo';

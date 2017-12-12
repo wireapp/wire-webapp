@@ -29,16 +29,11 @@ z.string.hr.alert_upload_too_large = 'Ova slika je prevelika. Možete učitati d
 z.string.hr.alert_gif_too_large = 'Animacija je prevelika. Maksimalne veličine je {{number}} MB.';
 
 z.string.hr.auth_account_country_code = 'Pozivni broj';
-z.string.hr.auth_account_create = 'Stvori';
-z.string.hr.auth_account_create_account = 'Stvaranje računa';
 z.string.hr.auth_account_expiration = 'Odjavljeni ste jer je vaša sesija istekla. Molimo prijavite se ponovno.';
-z.string.hr.auth_account_get_wire = 'Jednostavan, privatan i siguran klijent za razgovor, pozive, dijeljenje slika, glazbe, videa, animacija i više.';
 z.string.hr.auth_account_password_forgot = 'Zaboravljena lozinka';
 z.string.hr.auth_account_sign_in = 'Prijava';
 z.string.hr.auth_account_sign_in_email = 'Email';
 z.string.hr.auth_account_sign_in_phone = 'Telefon';
-z.string.hr.auth_account_terms_of_use = 'Uvjeti korištenja';
-z.string.hr.auth_account_terms_of_use_detail = 'Prihvaćam';
 
 z.string.hr.auth_verify_account_add = 'Dodaj';
 z.string.hr.auth_verify_account_detail = 'Ovo Vam omogućuje da koristite Wire na više uređaja.';
@@ -61,23 +56,12 @@ z.string.hr.auth_history_headline = 'Ovo je prvi put da koristite Wire na ovom u
 z.string.hr.auth_history_description = 'Iz sigurnosnih razloga, povijest razgovora se neće pojaviti ovdje.';
 z.string.hr.auth_history_button = 'U redu';
 
-z.string.hr.auth_posted_change_email = 'Promijeni e-mail';
-z.string.hr.auth_posted_offline_detail = 'Provjerite internetsku vezu i pokušajte ponovno.';
-z.string.hr.auth_posted_offline_headline = 'Wire je ljepši sa internet vezom.';
-z.string.hr.auth_posted_pending_detail = 'Provjerite svoj poštanski sandučić, ili ponovite postupak aktivacije.';
-z.string.hr.auth_posted_pending_headline = 'Izrada računa još u tijeku';
 z.string.hr.auth_posted_resend = 'Ponovno pošalji na {{email}}';
 z.string.hr.auth_posted_resend_action = 'Email se ne pojavljuje?';
 z.string.hr.auth_posted_resend_detail = 'Provjerite svoj email sandučić i slijedite upute.';
 z.string.hr.auth_posted_resend_headline = 'Imate poštu.';
-z.string.hr.auth_posted_retry = 'Ponovno pokušaj i pošalji mail na {{email}}';
-z.string.hr.auth_posted_retry_action = 'Pokušaj ponovno?';
-z.string.hr.auth_posted_retry_detail = 'Molimo Vas da pokušate ponovno.';
-z.string.hr.auth_posted_retry_headline = 'Nešto je pošlo po zlu';
-z.string.hr.auth_posted_verify_later = 'Verificiraj kasnije';
 
 z.string.hr.auth_placeholder_email = 'Email';
-z.string.hr.auth_placeholder_name = 'Ime';
 z.string.hr.auth_placeholder_password_put = 'Lozinka';
 z.string.hr.auth_placeholder_password_set = 'Lozinka (najmanje 8 znakova)';
 z.string.hr.auth_placeholder_phone = 'Telefonski broj';

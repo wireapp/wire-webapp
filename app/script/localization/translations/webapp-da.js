@@ -29,17 +29,12 @@ z.string.da.alert_upload_too_large = 'Dette billede er for stort. Du kan uploade
 z.string.da.alert_gif_too_large = 'Animationen er for stor. Den maksimale størrelse er {{number}} MB.';
 
 z.string.da.auth_account_country_code = 'Landekode';
-z.string.da.auth_account_create = 'Opret';
-z.string.da.auth_account_create_account = 'Opret en konto';
 z.string.da.auth_account_expiration = 'Du er blevet logget af, da din session udløb. Log venligst ind igen.';
-z.string.da.auth_account_get_wire = 'Simpel, privat og sikker messenger til chat, opkald, deling af billeder, musik, videoer, GIF’s og mere.';
 z.string.da.auth_account_password_forgot = 'Glemt adgangskode';
 z.string.da.auth_account_public_computer = 'Dette er en offentlig computer';
 z.string.da.auth_account_sign_in = 'Log ind';
 z.string.da.auth_account_sign_in_email = 'Email';
 z.string.da.auth_account_sign_in_phone = 'Telefon';
-z.string.da.auth_account_terms_of_use = 'Vilkår for anvendelse';
-z.string.da.auth_account_terms_of_use_detail = 'Jeg accepterer';
 
 z.string.da.auth_verify_account_add = 'Tilføj';
 z.string.da.auth_verify_account_detail = 'Dette gør, at du kan bruge Wire på flere enheder.';
@@ -64,23 +59,12 @@ z.string.da.auth_history_reuse_headline = 'Du har brugt Wire på denne enhed fø
 z.string.da.auth_history_reuse_description = 'Beskeder sendt i mellemtiden vises ikke.';
 z.string.da.auth_history_button = 'OK';
 
-z.string.da.auth_posted_change_email = 'Ændre email';
-z.string.da.auth_posted_offline_detail = 'Tjek din internetforbindelse og prøv igen.';
-z.string.da.auth_posted_offline_headline = 'Wire er bedre online.';
-z.string.da.auth_posted_pending_detail = 'Tjek din email indbakke eller gensend aktivering.';
-z.string.da.auth_posted_pending_headline = 'Konto afventer allerede';
 z.string.da.auth_posted_resend = 'Gensend til {{email}}';
 z.string.da.auth_posted_resend_action = 'Ingen email modtaget?';
 z.string.da.auth_posted_resend_detail = 'Tjek din email indbakke og følg anvisningerne.';
 z.string.da.auth_posted_resend_headline = 'Du har post.';
-z.string.da.auth_posted_retry = 'Prøv igen at sende mail til {{email}}';
-z.string.da.auth_posted_retry_action = 'Prøv igen?';
-z.string.da.auth_posted_retry_detail = 'Prøv venligst igen.';
-z.string.da.auth_posted_retry_headline = 'Noget gik galt';
-z.string.da.auth_posted_verify_later = 'Verificér senere';
 
 z.string.da.auth_placeholder_email = 'Email';
-z.string.da.auth_placeholder_name = 'Navn';
 z.string.da.auth_placeholder_password_put = 'Adgangskode';
 z.string.da.auth_placeholder_password_set = 'Adgangskode (mindst 8 tegn)';
 z.string.da.auth_placeholder_phone = 'Telefon Nummer';

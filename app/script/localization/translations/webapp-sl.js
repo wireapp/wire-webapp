@@ -30,17 +30,12 @@ z.string.sl.alert_upload_too_large = 'Ta slika je prevelika. \nNaložite lahko z
 z.string.sl.alert_gif_too_large = 'Animacija je prevelika. \nNajvečja velikost je {{number}} MB.';
 
 z.string.sl.auth_account_country_code = 'Koda države';
-z.string.sl.auth_account_create = 'Ustvari';
-z.string.sl.auth_account_create_account = 'Ustvari račun';
 z.string.sl.auth_account_expiration = 'Ker je vaša seja potekla, ste bili odjavljeni. Prosimo prijavite se ponovno.';
-z.string.sl.auth_account_get_wire = 'Preprosta, zasebna in varna aplikacija za klepet, klice, skupno rabo slik, glasbo, video posnetke, GIFe in še več.';
 z.string.sl.auth_account_password_forgot = 'Pozabljeno geslo';
 z.string.sl.auth_account_public_computer = 'To je javni računalnik';
 z.string.sl.auth_account_sign_in = 'Prijava';
 z.string.sl.auth_account_sign_in_email = 'E-pošta';
 z.string.sl.auth_account_sign_in_phone = 'Telefon';
-z.string.sl.auth_account_terms_of_use = 'Pogoji uporabe';
-z.string.sl.auth_account_terms_of_use_detail = 'Sprejmem';
 
 z.string.sl.auth_blocked_database = 'Wire potrebuje dostop do lokalnega pomnilnika za prikaz sporočil. Lokalni pomnilnik ni na voljo v privatnem načinu.';
 z.string.sl.auth_blocked_tabs = 'Wire je že odprt v drugem oknu.';
@@ -68,23 +63,12 @@ z.string.sl.auth_history_reuse_headline = 'Na tej napravi si že uporabljal(-a) 
 z.string.sl.auth_history_reuse_description = 'Sporočila poslana medtem tukaj ne bodo prikazana.';
 z.string.sl.auth_history_button = 'V redu';
 
-z.string.sl.auth_posted_change_email = 'Ponastavitev elektronskega naslova';
-z.string.sl.auth_posted_offline_detail = 'Preverite vašo spletno povezavo in poizkusite ponovno.';
-z.string.sl.auth_posted_offline_headline = 'Wire je prijetnejši na spletu.';
-z.string.sl.auth_posted_pending_detail = 'Preverite vašo e-pošto ali ponovno pošljite aktivacijo.';
-z.string.sl.auth_posted_pending_headline = 'Ustvaritev računa že v teku';
 z.string.sl.auth_posted_resend = 'Ponovno pošlji na {{email}}';
 z.string.sl.auth_posted_resend_action = 'E-pošta ni prispela?';
 z.string.sl.auth_posted_resend_detail = 'Preverite vašo e-pošto in sledite navodilom.';
 z.string.sl.auth_posted_resend_headline = 'Imate pošto.';
-z.string.sl.auth_posted_retry = 'Poizkusi ponovno in pošlji e-pošto na {{email}}';
-z.string.sl.auth_posted_retry_action = 'Poskusite ponovno?';
-z.string.sl.auth_posted_retry_detail = 'Prosimo poskusite ponovno.';
-z.string.sl.auth_posted_retry_headline = 'Nekaj je šlo narobe';
-z.string.sl.auth_posted_verify_later = 'Preveri kasneje';
 
 z.string.sl.auth_placeholder_email = 'E-pošta';
-z.string.sl.auth_placeholder_name = 'Ime';
 z.string.sl.auth_placeholder_password_put = 'Geslo';
 z.string.sl.auth_placeholder_password_set = 'Geslo (vsaj 8 znakov)';
 z.string.sl.auth_placeholder_phone = 'Telefonska številka';

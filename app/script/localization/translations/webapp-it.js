@@ -29,18 +29,13 @@ z.string.it.alert_upload_too_large = 'Questa immagine è troppo grande. È possi
 z.string.it.alert_gif_too_large = 'L’animazione è troppo grande. La dimensione massima è {{number}} MB.';
 
 z.string.it.auth_account_country_code = 'Codice del paese';
-z.string.it.auth_account_create = 'Creare';
-z.string.it.auth_account_create_account = 'Crea un account';
 z.string.it.auth_account_deletion = 'Sei stato disconnesso perché il tuo account è stato eliminato.';
 z.string.it.auth_account_expiration = 'L’accesso è stato revocato perché la sessione è scaduta. Effettua il login nuovamente.';
-z.string.it.auth_account_get_wire = 'Un app di messaggistica semplice, privata & sicura per la chat, chiamate, condivisione di foto, musica, video, gif e altro.';
 z.string.it.auth_account_password_forgot = 'Ho dimenticato la password';
 z.string.it.auth_account_public_computer = 'Questo computer è pubblico';
 z.string.it.auth_account_sign_in = 'Accedi';
 z.string.it.auth_account_sign_in_email = 'Email';
 z.string.it.auth_account_sign_in_phone = 'Telefono';
-z.string.it.auth_account_terms_of_use = 'Termini di utilizzo';
-z.string.it.auth_account_terms_of_use_detail = 'Accetto';
 
 z.string.it.auth_blocked_database = 'Wire ha bisogno di accedere la memoria locale per visualizzare i messaggi. Archiviazione locale non è disponibile in modalità privata.';
 z.string.it.auth_blocked_tabs = 'Wire è già aperto in un’altra scheda.';
@@ -68,23 +63,12 @@ z.string.it.auth_history_reuse_headline = 'Hai utilizzato Wire su questo disposi
 z.string.it.auth_history_reuse_description = 'I messaggi inviati nel frattempo non verranno visualizzati qui.';
 z.string.it.auth_history_button = 'OK';
 
-z.string.it.auth_posted_change_email = 'Cambia email';
-z.string.it.auth_posted_offline_detail = 'Controlla la connessione a Internet e riprova.';
-z.string.it.auth_posted_offline_headline = 'Wire è più bello online.';
-z.string.it.auth_posted_pending_detail = 'Verifica la tua casella di posta o rinvia il codice di attivazione.';
-z.string.it.auth_posted_pending_headline = 'Account già in attesa di verifica';
 z.string.it.auth_posted_resend = 'Invia di nuovo a {{email}}';
 z.string.it.auth_posted_resend_action = 'Non hai ricevuto nessuna email?';
 z.string.it.auth_posted_resend_detail = 'Verifica la tua casella di posta e segui le istruzioni.';
 z.string.it.auth_posted_resend_headline = 'C’è posta per te.';
-z.string.it.auth_posted_retry = 'Ri-prova e invia una mail a {{email}}';
-z.string.it.auth_posted_retry_action = 'Riprova?';
-z.string.it.auth_posted_retry_detail = 'Per favore riprova.';
-z.string.it.auth_posted_retry_headline = 'Qualcosa è andato storto';
-z.string.it.auth_posted_verify_later = 'Verifica più tardi';
 
 z.string.it.auth_placeholder_email = 'Email';
-z.string.it.auth_placeholder_name = 'Nome';
 z.string.it.auth_placeholder_password_put = 'Password';
 z.string.it.auth_placeholder_password_set = 'Password (almeno 8 caratteri)';
 z.string.it.auth_placeholder_phone = 'Numero di telefono';

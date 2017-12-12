@@ -30,18 +30,13 @@ z.string.ro.alert_upload_too_large = 'Această imagine este prea mare.\nPoți î
 z.string.ro.alert_gif_too_large = 'Animația este prea mare.\nMărimea maximă este {{number}} MB.';
 
 z.string.ro.auth_account_country_code = 'Codul țării';
-z.string.ro.auth_account_create = 'Creează';
-z.string.ro.auth_account_create_account = 'Creează un cont';
 z.string.ro.auth_account_deletion = 'Ai fost deconectat deoarece contul tău a fost șters.';
 z.string.ro.auth_account_expiration = 'Ai fost scos din sesiune pentru că sesiunea ta a expirat. Te rugăm să te autentifici din nou.';
-z.string.ro.auth_account_get_wire = 'Program de mesagerie simplu, privat și sigur pentru chat, apeluri, partajarea de imagini, muzică, videouri, GIF-uri și altele.';
 z.string.ro.auth_account_password_forgot = 'Am uitat parola';
 z.string.ro.auth_account_public_computer = 'Acesta este un calculator public';
 z.string.ro.auth_account_sign_in = 'Autentificare';
 z.string.ro.auth_account_sign_in_email = 'E-mail';
 z.string.ro.auth_account_sign_in_phone = 'Telefon';
-z.string.ro.auth_account_terms_of_use = 'Termeni de folosire';
-z.string.ro.auth_account_terms_of_use_detail = 'Sunt de acord';
 
 z.string.ro.auth_blocked_cookies = 'Activează cookie-urile pentru intra în Wire.';
 z.string.ro.auth_blocked_database = 'Wire are nevoie de acces la stocarea locală pentru a afișa mesaje. Stocarea locală nu este disponibilă în modul privat.';
@@ -70,23 +65,12 @@ z.string.ro.auth_history_reuse_headline = 'Ai mai folosit Wire pe acest dispozit
 z.string.ro.auth_history_reuse_description = 'Mesajele trimise între timp nu vor apărea aici.';
 z.string.ro.auth_history_button = 'OK';
 
-z.string.ro.auth_posted_change_email = 'Schimbă e-mailul';
-z.string.ro.auth_posted_offline_detail = 'Verifică conexiunea la internet și reîncearcă.';
-z.string.ro.auth_posted_offline_headline = 'Wire arată mai bine online.';
-z.string.ro.auth_posted_pending_detail = 'Verifică e-mailul sau retrimite mesajul de activare.';
-z.string.ro.auth_posted_pending_headline = 'Contul este deja în curs de activare';
 z.string.ro.auth_posted_resend = 'Retrimite la {{email}}';
 z.string.ro.auth_posted_resend_action = 'Nu a apărut nici un e-mail?';
 z.string.ro.auth_posted_resend_detail = 'Verifică e-mailul și urmează instrucțiunile.';
 z.string.ro.auth_posted_resend_headline = 'Ai primit un mesaj.';
-z.string.ro.auth_posted_retry = 'Reîncearcă și trimite e-mail la {{email}}';
-z.string.ro.auth_posted_retry_action = 'Reîncearcă?';
-z.string.ro.auth_posted_retry_detail = 'Te rugăm să reîncerci.';
-z.string.ro.auth_posted_retry_headline = 'Ceva nu a funcționat corect';
-z.string.ro.auth_posted_verify_later = 'Verifică mai târziu';
 
 z.string.ro.auth_placeholder_email = 'E-mail';
-z.string.ro.auth_placeholder_name = 'Nume';
 z.string.ro.auth_placeholder_password_put = 'Parolă';
 z.string.ro.auth_placeholder_password_set = 'Parolă (minim 8 caractere)';
 z.string.ro.auth_placeholder_phone = 'Număr de telefon';
