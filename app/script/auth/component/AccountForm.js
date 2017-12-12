@@ -62,6 +62,7 @@ class AccountForm extends PureComponent {
           throw errors[0];
         }
       })
+      .then(() => this.props.beforeSubmit && this.props.beforeSubmit())
       .then(() => this.props.pushAccountRegistrationData({...this.state}))
       .then(() => this.props.doSendActivationCode(this.state.email))
       .then(() => this.props.onSubmit())
