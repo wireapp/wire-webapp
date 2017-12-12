@@ -2,7 +2,7 @@
   "dependencies": {
     "@types/node": "8.0.58",
     "dexie": "2.0.1",
-    "fs-extra": "4.0.3"
+    "fs-extra": "5.0.0"
   },
   "devDependencies": {
     "cross-env": "5.1.1",
