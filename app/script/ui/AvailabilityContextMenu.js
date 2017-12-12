@@ -23,44 +23,29 @@ window.z = window.z || {};
 window.z.ui = z.ui || {};
 
 z.ui.AvailibilityContextMenu = (() => {
-  const show = (event, availability, elementName) => {
-    const entries = [];
-
-    const isAvailable = availability === z.user.AvailabilityType.AVAILABLE;
-    if (!isAvailable) {
-      entries.push({
+  const show = (event, elementName) => {
+    const entries = [
+      {
         click: () => amplify.publish(z.event.WebApp.USER.CHANGE_AVAILABILITY, z.user.AvailabilityType.AVAILABLE),
         label: z.l10n.text(z.string.user_availability_available),
         title: z.l10n.text(z.string.user_availability_available),
-      });
-    }
-
-    const isBusy = availability === z.user.AvailabilityType.BUSY;
-    if (!isBusy) {
-      entries.push({
+      },
+      {
         click: () => amplify.publish(z.event.WebApp.USER.CHANGE_AVAILABILITY, z.user.AvailabilityType.BUSY),
         label: z.l10n.text(z.string.user_availability_busy),
         title: z.l10n.text(z.string.user_availability_busy),
-      });
-    }
-
-    const isAway = availability === z.user.AvailabilityType.AWAY;
-    if (!isAway) {
-      entries.push({
+      },
+      {
         click: () => amplify.publish(z.event.WebApp.USER.CHANGE_AVAILABILITY, z.user.AvailabilityType.AWAY),
         label: z.l10n.text(z.string.user_availability_away),
         title: z.l10n.text(z.string.user_availability_away),
-      });
-    }
-
-    const isUnset = availability === z.user.AvailabilityType.NONE;
-    if (!isUnset) {
-      entries.push({
+      },
+      {
         click: () => amplify.publish(z.event.WebApp.USER.CHANGE_AVAILABILITY, z.user.AvailabilityType.NONE),
         label: z.l10n.text(z.string.user_availability_none),
         title: z.l10n.text(z.string.user_availability_none),
-      });
-    }
+      },
+    ];
 
     z.ui.Context.from(event, entries, elementName);
   };
