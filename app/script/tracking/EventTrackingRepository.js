@@ -59,6 +59,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
           z.tracking.EventName.REGISTRATION.OPENED_EMAIL_SIGN_UP,
           z.tracking.EventName.REGISTRATION.RESENT_EMAIL_VERIFICATION,
           z.tracking.EventName.REGISTRATION.SUCCEEDED,
+          z.tracking.EventName.SETTINGS.CHANGED_STATUS,
           z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM,
           z.tracking.EventName.SETTINGS.OPTED_IN_TRACKING,
           z.tracking.EventName.SETTINGS.OPTED_OUT_TRACKING,
