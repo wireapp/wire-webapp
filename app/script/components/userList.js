@@ -130,6 +130,9 @@ ko.components.register('user-list', {
             <!-- /ko -->
           </div>
           <div class="search-list-item-content">
+             <availability-state class="search-list-item-content-name"
+               data-uie-name="status-availability"
+               params="availability: availability, label: first_name"></availability-state>
             <div class="search-list-item-content-name" data-bind="text: first_name"></div>
           </div>
         <!-- /ko -->
