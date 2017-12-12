@@ -37,7 +37,22 @@ z.user.AvailbilityMapper = (() => {
     }
   };
 
+  const valueFromType = availabilityType => {
+    switch (availabilityType) {
+      case z.user.AvailabilityType.AVAILABLE:
+        return 'available';
+      case z.user.AvailabilityType.AWAY:
+        return 'away';
+      case z.user.AvailabilityType.BUSY:
+        return 'busy';
+      case z.user.AvailabilityType.NONE:
+        return 'none';
+      default:
+    }
+  };
+
   return {
     nameFromType,
+    valueFromType,
   };
 })();
