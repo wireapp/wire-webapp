@@ -131,7 +131,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   clickOnAvailability(viewModel, event) {
-    z.ui.AvailibilityContextMenu.show(event, 'preferences-account-availability-menu');
+    z.ui.AvailibilityContextMenu.show(event, 'settings', 'preferences-account-availability-menu');
   }
 
   click_on_username() {

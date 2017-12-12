@@ -115,7 +115,7 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
   }
 
   clickOnAvailability(viewModel, event) {
-    z.ui.AvailibilityContextMenu.show(event, 'left-list-availability-menu');
+    z.ui.AvailibilityContextMenu.show(event, 'list_header', 'left-list-availability-menu');
   }
 
   click_on_connect_requests() {
