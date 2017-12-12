@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@types/node": "8.0.57",
+    "@types/node": "8.0.58",
     "@wireapp/api-client": "0.2.14",
     "@wireapp/protocol-messaging": "1.20.0",
     "@wireapp/store-engine": "0.1.1",
