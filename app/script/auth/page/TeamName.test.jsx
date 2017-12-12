@@ -57,12 +57,18 @@ describe('when entering a team name', () => {
     wrapper = mountWithIntl(<TeamName />, store);
   });
 
-  xit(`doesn\'t show a next button if too few characters are entered`, () => {
-    const rendered = wrapper.find('[data-uie-name="enter-team-name"]');
-    // expect(rendered.props()).to.have.property('maxLength', '10');
+  it(`doesn\'t show a next button if too few characters are entered`, () => {
+    const teamNameInput = wrapper.find('[data-uie-name="enter-team-name"]').first();
+    const doNextButton = wrapper.find('[data-uie-name="do-next"]').first();
+    expect(teamNameInput.props().required).toBe(true);
+    expect(doNextButton.props().disabled).toBe(true);
   });
 
   it('shows a next button when the minimum amount of characters are entered', () => {
+    const teamNameInput = wrapper.find('[data-uie-name="enter-team-name"]').first();
+    const doNextButton = wrapper.find('[data-uie-name="do-next"]').first();
+    expect(teamNameInput.props().required).toBe(true);
+    expect(doNextButton.props().disabled).toBe(true);
   });
 });
 
