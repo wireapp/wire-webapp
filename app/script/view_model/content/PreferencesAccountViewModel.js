@@ -130,8 +130,8 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     return z.user.UserHandleGenerator.validate_character(input_char.toLowerCase());
   }
 
-  clickOnAvailability(viewmodel, event) {
-    z.ui.AvailibilityContextMenu.show(event, this.availability(), 'preferences-account-availability-menu');
+  clickOnAvailability(viewModel, event) {
+    z.ui.AvailibilityContextMenu.show(event, 'preferences-account-availability-menu');
   }
 
   click_on_username() {
