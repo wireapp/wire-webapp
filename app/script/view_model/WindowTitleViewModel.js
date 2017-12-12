@@ -64,7 +64,7 @@ z.ViewModel.WindowTitleViewModel = class WindowTitleViewModel {
             window_title = `(${badge_count}) · `;
           }
 
-          amplify.publish(z.event.WebApp.CONVERSATION.UNREAD, badge_count);
+          amplify.publish(z.event.WebApp.LIFECYCLE.UNREAD_COUNT, badge_count);
 
           switch (this.content_state()) {
             case z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS: {

@@ -109,7 +109,6 @@ z.event.WebApp = {
     },
     PERSIST_STATE: 'wire.webapp.conversation.persist_state',
     SHOW: 'wire.webapp.conversation.show',
-    UNREAD: 'wire.webapp.conversation.unread',
   },
   DEBUG: {
     UPDATE_LAST_CALL_STATUS: 'wire.webapp.debug.update_last_call_status',
@@ -137,6 +136,7 @@ z.event.WebApp = {
     RESTART: 'wire.webapp.lifecycle.restart',
     SIGN_OUT: 'wire.webapp.lifecycle.sign_out',
     SIGNED_OUT: 'wire.webapp.lifecycle.signed_out',
+    UNREAD_COUNT: 'wire.webapp.lifecycle.unread_count',
     UPDATE: 'wire.webapp.lifecycle.update',
   },
   LIST: {
