@@ -26,6 +26,7 @@ import {
   H4,
   Heading,
   Label,
+  LabelLink,
   Line,
   Link,
   Muted,
@@ -346,10 +347,7 @@ export default function Demo() {
           </Paragraph>
 
           <Label>Label</Label>
-          <br />
-          <Label component={Link} href="#">
-            LabelLink
-          </Label>
+          <LabelLink block>LabelLink</LabelLink>
 
           <H1>Colors</H1>
           <Line />
