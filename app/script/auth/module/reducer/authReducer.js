@@ -47,7 +47,8 @@ export default function reducer(state = initialState, action) {
     case AuthActionCreator.LOGIN_START:
     case AuthActionCreator.REGISTER_JOIN_START:
     case AuthActionCreator.REGISTER_PERSONAL_START:
-    case AuthActionCreator.REGISTER_TEAM_START: {
+    case AuthActionCreator.REGISTER_TEAM_START:
+    case UserActionCreator.USER_SEND_ACTIVATION_CODE_START: {
       return {
         ...state,
         error: null,
@@ -121,6 +122,12 @@ export default function reducer(state = initialState, action) {
     }
     case AuthActionCreator.ENTER_PERSONAL_CREATION_FLOW: {
       return {...state, isInTeamFlow: false};
+    }
+    case UserActionCreator.USER_SEND_ACTIVATION_CODE_SUCCESS: {
+      return {
+        ...state,
+        fetching: false,
+      };
     }
     default: {
       return state;
