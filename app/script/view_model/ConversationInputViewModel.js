@@ -123,7 +123,7 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
 
     this.show_availability_tooltip = ko.pureComputed(() => {
       const isOne2OneConversation = this.conversation_et().is_one2one();
-      const remoteParticipantEt = this.conversation_et().firstParticipatingUserEt();
+      const remoteParticipantEt = this.conversation_et().firstUserEt();
       const availabilityIsNone = remoteParticipantEt.availability() === z.user.AvailabilityType.NONE;
       return this.self().is_team_member() && isOne2OneConversation && !availabilityIsNone;
     });
@@ -131,7 +131,7 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
     this.file_tooltip = z.l10n.text(z.string.tooltip_conversation_file);
     this.input_tooltip = ko.pureComputed(() => {
       if (this.show_availability_tooltip()) {
-        const remoteParticipantEt = this.conversation_et().firstParticipatingUserEt();
+        const remoteParticipantEt = this.conversation_et().firstUserEt();
 
         switch (remoteParticipantEt.availability()) {
           case z.user.AvailabilityType.AVAILABLE:

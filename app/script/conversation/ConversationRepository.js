@@ -2149,7 +2149,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   _shouldSendAsExternal(conversationId, genericMessage) {
     return this.get_conversation_by_id(conversationId).then(conversationEt => {
-      const numberOfKnownClients = conversationEt.get_number_of_clients();
+      const numberOfKnownClients = conversationEt.getNumberOfClients();
       const messageInBytes = new Uint8Array(genericMessage.toArrayBuffer()).length;
       const estimatedPayloadInBytes = numberOfKnownClients * messageInBytes;
 

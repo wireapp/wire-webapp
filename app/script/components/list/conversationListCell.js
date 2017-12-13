@@ -58,7 +58,7 @@ ko.components.register('conversation-list-cell', {
         <!-- ko if: conversation.is_one2one() && conversation.self.is_team_member() -->
           <availability-state class="conversation-list-cell-availability"
                               data-uie-name="status-availability-item"
-                              params="availability: conversation.firstParticipatingUserEt().availability, label: conversation.display_name(), theme: is_selected(conversation)"></availability-state>
+                              params="availability: conversation.firstUserAvailability, label: conversation.display_name(), theme: is_selected(conversation)"></availability-state>
         <!-- /ko -->
         <!-- ko ifnot: conversation.is_one2one() && conversation.self.is_team_member() -->
           <span class="conversation-list-cell-name" data-bind="text: conversation.display_name(), css: {'text-theme': is_selected(conversation)}"></span>
