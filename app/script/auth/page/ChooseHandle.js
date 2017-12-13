@@ -23,8 +23,8 @@ import {InputSubmitCombo, Input, RoundIconButton, Form, ErrorMessage} from '@wir
 import {H1, Text} from '@wireapp/react-ui-kit/Text';
 import {injectIntl} from 'react-intl';
 import {parseError} from '../util/errorUtil';
+import ROUTE from '../route';
 import {pathWithParams} from '../util/urlUtil';
-
 import Page from './Page';
 import React from 'react';
 import {createSuggestions} from '../util/handleUtil';
@@ -62,6 +62,7 @@ class ChooseHandle extends React.PureComponent {
 
   render() {
     const {isFetching, intl: {formatMessage: _}} = this.props;
+    console.log('handle', this.state.handle);
     return (
       <Page isAuthenticated>
         <ContainerXS centerText verticalCenter style={{display: 'flex', flexDirection: 'column', minHeight: 428}}>
@@ -82,7 +83,7 @@ class ChooseHandle extends React.PureComponent {
                 data-uie-name="enter-invite-email"
               />
               <RoundIconButton
-                disabled={this.state.handle.length < 2 || isFetching}
+                disabled={!this.state.handle || isFetching}
                 type="submit"
                 data-uie-name="do-send-invite"
                 formNoValidate
