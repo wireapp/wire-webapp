@@ -64,10 +64,13 @@ describe('when entering a team name', () => {
     expect(doNextButton.props().disabled).toBe(true);
   });
 
-  it('shows a next button when the minimum amount of characters are entered', () => {
-    const teamNameInput = wrapper.find('[data-uie-name="enter-team-name"]').first();
+  it('shows a next button when the minimum amount of characters is entered', () => {
+    wrapper.setState({
+      enteredTeamName: 'Wire',
+      isValidTeamName: true,
+    });
+
     const doNextButton = wrapper.find('[data-uie-name="do-next"]').first();
-    expect(teamNameInput.props().required).toBe(true);
     expect(doNextButton.props().disabled).toBe(false);
   });
 });
