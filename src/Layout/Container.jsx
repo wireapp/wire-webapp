@@ -20,9 +20,17 @@
 /* eslint-disable no-magic-numbers */
 
 import {GUTTER, WIDTH} from './sizes';
-import styled, {css} from 'styled-components';
 import PropTypes from 'prop-types';
+import {defaultProps} from 'recompose';
 import media from '../mediaQueries';
+import styled from 'styled-components';
+
+const LEVEL = {
+  md: `max-width: ${WIDTH.TABLET_MAX}px;`,
+  sm: `max-width: ${WIDTH.TABLET_MIN}px;`,
+  xs: `max-width: ${WIDTH.MOBILE}px;`,
+  xxs: `max-width: ${WIDTH.TINY}px;`,
+};
 
 const Container = styled.div`
   position: relative;
@@ -30,64 +38,34 @@ const Container = styled.div`
   text-align: ${props => (props.centerText ? 'center' : 'left')};
   width: 100%;
 
-  ${props => {
-    switch (props.level) {
-      case 'md':
-        return css`
-          max-width: ${WIDTH.TABLET_MAX}px;
-        `;
-      case 'sm':
-        return css`
-          max-width: ${WIDTH.TABLET_MIN}px;
-        `;
-      case 'xs':
-        return css`
-          max-width: ${WIDTH.MOBILE}px;
-        `;
-      default:
-        return css`
-          ${media.desktop`
+  ${({level}) =>
+    LEVEL[level] ||
+    `${media.desktop`
             padding: 0;
             width: ${WIDTH.DESKTOP_MIN - GUTTER * 4}px;
           `};
-
           ${media.desktopXL`
             padding: 0;
             width: ${WIDTH.DESKTOP_MIN - GUTTER * 4}px;
-          `};
-        `;
-    }
+          `};`}
   }};
 `;
 
 Container.propTypes = {
   centerText: PropTypes.bool,
-  level: PropTypes.string,
+  level: PropTypes.oneOf(Object.keys(LEVEL)),
   verticalCenter: PropTypes.bool,
 };
 
 Container.defaultProps = {
   centerText: false,
-  level: '',
+  level: null,
   verticalCenter: false,
 };
 
-const ContainerMD = Container.extend``;
-ContainerMD.defaultProps = {
-  ...Container.defaultProps,
-  level: 'md',
-};
+const ContainerMD = defaultProps({level: 'md'})(Container);
+const ContainerSM = defaultProps({level: 'sm'})(Container);
+const ContainerXS = defaultProps({level: 'xs'})(Container);
+const ContainerXXS = defaultProps({level: 'xxs'})(Container);
 
-const ContainerSM = Container.extend``;
-ContainerSM.defaultProps = {
-  ...Container.defaultProps,
-  level: 'sm',
-};
-
-const ContainerXS = Container.extend``;
-ContainerXS.defaultProps = {
-  ...Container.defaultProps,
-  level: 'xs',
-};
-
-export {Container, ContainerMD, ContainerSM, ContainerXS};
+export {Container, ContainerMD, ContainerSM, ContainerXS, ContainerXXS};

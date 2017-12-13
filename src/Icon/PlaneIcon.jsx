@@ -17,20 +17,11 @@
  *
  */
 
-import IconBase from './IconBase';
+import IconHOC from './IconHOC';
 import React from 'react';
 
-class PlaneIcon extends IconBase {
-  /* eslint-disable no-magic-numbers */
-  width = 12;
-  height = 12;
-  renderSVG(width, height, color, style) {
-    return (
-      <svg width={width} height={height} style={style} viewBox="0 0 12 12">
-        <path fill={color} d="M0 10.7c0 1 .8 1.6 1.8 1L11.3 7c1-.6 1-1.4 0-2L1.8.3C.8-.3 0 .3 0 1.3V6h9L0 7.5v3.2z" />
-      </svg>
-    );
-  }
-}
+const size = 12;
+const plane = <path d="M0 10.7c0 1 .8 1.6 1.8 1L11.3 7c1-.6 1-1.4 0-2L1.8.3C.8-.3 0 .3 0 1.3V6h9L0 7.5v3.2z" />;
+const PlaneIcon = IconHOC(plane, size, size);
 
 export {PlaneIcon};

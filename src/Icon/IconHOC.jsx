@@ -20,40 +20,36 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-class IconBase extends React.PureComponent {
-  height = 0;
-  width = 0;
-
-  static propTypes = {
+const IconHOC = (svgBody, realWidth = 0, realHeight = 0) => {
+  const wrapper = ({color, scale, width, height, ...props}) => {
+    let newScale = scale;
+    if (width || height) {
+      const widthScale = width ? width / realWidth : Infinity;
+      const heightScale = height ? height / realHeight : Infinity;
+      newScale = Math.min(widthScale, heightScale);
+    }
+    const newWidth = realWidth * newScale;
+    const newHeight = realHeight * newScale;
+    return (
+      <svg width={newWidth} height={newHeight} fill={color} viewBox={`0 0 ${realWidth} ${realHeight}`} {...props}>
+        {typeof svgBody === 'function' ? svgBody(props) : svgBody}
+      </svg>
+    );
+  };
+  wrapper.propTypes = {
     color: PropTypes.string,
     height: PropTypes.number,
     scale: PropTypes.number,
-    style: PropTypes.object,
     width: PropTypes.number,
   };
 
-  static defaultProps = {
+  wrapper.defaultProps = {
     color: '#000',
     height: null,
     scale: 1,
-    style: null,
     width: null,
   };
+  return wrapper;
+};
 
-  render() {
-    const {color, height, scale, style, width} = this.props;
-    let newScale = scale;
-    if (width || height) {
-      const widthScale = width ? width / this.width : Infinity;
-      const heightScale = height ? height / this.height : Infinity;
-      newScale = Math.min(widthScale, heightScale);
-    }
-    return this.renderSVG(this.width * newScale, this.height * newScale, color, style);
-  }
-
-  renderSVG(width, height, color, style) {
-    return null;
-  }
-}
-
-export default IconBase;
+export default IconHOC;

@@ -4,6 +4,7 @@
     "gulp-concat": "2.6.1",
     "react": "16.2.0",
     "react-dom": "16.2.0",
+    "recompose": "0.26.0",
     "styled-components": "2.2.4",
     "styled-normalize": "2.2.1"
   },
@@ -40,5 +41,5 @@
     "test": "exit 0",
     "version": "yarn dist"
   },
-  "version": "0.0.19"
+  "version": "0.0.20"
 }

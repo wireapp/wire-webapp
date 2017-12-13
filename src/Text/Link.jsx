@@ -46,7 +46,7 @@ const Link = ({component, ...props}) => {
 
 Link.propTypes = {
   ...Text.propTypes,
-  component: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
+  component: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
 };
 
 Link.defaultProps = {

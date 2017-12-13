@@ -17,44 +17,24 @@
  *
  */
 
-import IconBase from './IconBase';
+import IconHOC from './IconHOC';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-class ArrowIcon extends IconBase {
-  /* eslint-disable no-magic-numbers */
-  static propTypes = {
-    ...IconBase.propTypes,
-    direction: PropTypes.oneOf(['left', 'right', 'up', 'down', 'n', 'e', 'w', 's']),
-  };
-  static defaultProps = {
-    ...IconBase.defaultProps,
-    direction: 'right',
-  };
+const rotation = {
+  right: 0,
+  down: 90, // eslint-disable-line sort-keys
+  left: 180,
+  up: 270,
+};
 
-  width = 16;
-  height = 16;
-  renderSVG(width, height, color) {
-    let rotation = 0;
-    switch (this.props.direction) {
-      case 's':
-      case 'down':
-        rotation = 90;
-        break;
-      case 'w':
-      case 'left':
-        rotation = 180;
-        break;
-      case 'n':
-      case 'up':
-        rotation = 270;
-    }
-    return (
-      <svg width={width} height={height} viewBox="0 0 16 16">
-        <path transform={`rotate(${rotation} 8 8)`} fill={color} d="M5.8 1.5L7.3 0l8 8-8 8-1.5-1.5L11.3 9H.7V7h10.6" />
-      </svg>
-    );
-  }
-}
+const size = 16;
+const arrow = (
+  {direction} // eslint-disable-line react/prop-types
+) => <path transform={`rotate(${rotation[direction]} 8 8)`} d="M5.8 1.5L7.3 0l8 8-8 8-1.5-1.5L11.3 9H.7V7h10.6" />;
+const ArrowIcon = IconHOC(arrow, size, size);
+
+ArrowIcon.propTypes.direction = PropTypes.oneOf(Object.keys(rotation));
+ArrowIcon.defaultProps.direction = 'right';
 
 export {ArrowIcon};
