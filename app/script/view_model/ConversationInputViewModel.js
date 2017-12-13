@@ -123,6 +123,22 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
 
     this.file_tooltip = z.l10n.text(z.string.tooltip_conversation_file);
     this.input_tooltip = ko.pureComputed(() => {
+      if (this.self().is_team_member()) {
+        const isOne2OneConversation = this.conversation_et().is_one2one();
+        const remoteParticipantEt = this.conversation_et().firstParticipatingUserEt();
+        const availabilityIsNone = remoteParticipantEt.availability() === z.user.AvailabilityType.NONE;
+        if (isOne2OneConversation && !availabilityIsNone) {
+          switch (remoteParticipantEt.availability()) {
+            case z.user.AvailabilityType.AVAILABLE:
+              return z.l10n.text(z.string.tooltip_conversation_input_placeholder_available, remoteParticipantEt.name());
+            case z.user.AvailabilityType.AWAY:
+              return z.l10n.text(z.string.tooltip_conversation_input_placeholder_away, remoteParticipantEt.name());
+            case z.user.AvailabilityType.BUSY:
+              return z.l10n.text(z.string.tooltip_conversation_input_placeholder_busy, remoteParticipantEt.name());
+          }
+        }
+      }
+
       if (this.conversation_et().ephemeral_timer()) {
         return z.l10n.text(z.string.tooltip_conversation_ephemeral);
       }
