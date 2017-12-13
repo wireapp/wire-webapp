@@ -134,7 +134,7 @@ ko.components.register('user-list', {
           <div class="search-list-item-content">
             <!-- ko if: $parent.self().is_team_member() -->
               <availability-state class="search-list-item-content-availability search-list-item-content-name"
-                data-uie-name="status-availability"
+                data-uie-name="status-availability-item"
                 params="availability: availability, label: first_name"></availability-state>
             <!-- /ko -->
             <!-- ko ifnot: $parent.self().is_team_member() -->
