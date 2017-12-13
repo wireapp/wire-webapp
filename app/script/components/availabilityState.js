@@ -33,17 +33,17 @@ z.components.AvailabilityState = class AvailabilityState {
 ko.components.register('availability-state', {
   template: `
       <!-- ko if: $data.availability() === z.user.AvailabilityType.AVAILABLE -->
-        <svg class="availability-icon" viewBox="0 0 10 10" version="1.1" xmlns="http://www.w3.org/2000/svg">
+        <svg data-uie-name="available" class="availability-icon" viewBox="0 0 10 10" version="1.1" xmlns="http://www.w3.org/2000/svg">
           <circle cx="5" cy="5" r="5" stroke="none"></circle>
         </svg>
       <!-- /ko -->
       <!-- ko if: $data.availability() === z.user.AvailabilityType.AWAY -->
-        <svg class="availability-icon" viewBox="0 0 10 10" version="1.1" xmlns="http://www.w3.org/2000/svg">
+        <svg data-uie-name="away" class="availability-icon" viewBox="0 0 10 10" version="1.1" xmlns="http://www.w3.org/2000/svg">
           <circle cx="5" cy="5" r="4" stroke-width="1" fill="none"></circle>
         </svg>
       <!-- /ko -->
       <!-- ko if: $data.availability() === z.user.AvailabilityType.BUSY -->
-        <svg class="availability-icon" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg">
+        <svg data-uie-name="busy" class="availability-icon" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg">
           <path d="M15,30 C6.71572875,30 0,23.2842712 0,15 C0,6.71572875 6.71572875,0 15,0 C23.2842712,0 30,6.71572875 30,15 C30,23.2842712 23.2842712,30 15,30 Z M6,12 L6,18 L24,18 L24,12 L6,12 Z"></path>
         </svg>
       <!-- /ko -->
