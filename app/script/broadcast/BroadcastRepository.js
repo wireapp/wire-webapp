@@ -121,12 +121,16 @@ z.broadcast.BroadcastRepository = class BroadcastRepository {
    * @returns {boolean} Is payload likely to be too big so that we switch to type external?
    */
   _shouldSendAsExternal(conversationId, genericMessage) {
-    return this.conversationRepository.get_conversation_by_id(conversationId).then(conversation_et => {
-      const estimatedNumberOfClients = conversation_et.get_number_of_participants() * 4;
-      const messageInBytes = new Uint8Array(genericMessage.toArrayBuffer()).length;
-      const estimatedPayloadInBytes = estimatedNumberOfClients * messageInBytes;
+    let usersWithoutKnownClients = 0;
 
-      return estimatedPayloadInBytes > ConversationRepository.CONFIG.EXTERNAL_MESSAGE_THRESHOLD;
-    });
+    const numberOfKnownClients = this.userRepository.team_users().reduce(userEt => {
+      if (!userEt.devices().length) {
+        usersWithoutKnownClients = usersWithoutKnownClients + 1;
+      }
+      return userEt.devices().length;
+    }, this.userRepository.self().devices().length);
+
+    const estimatedUnknownClients = usersWithoutKnownClients * 4;
+    return numberOfKnownClients + estimatedUnknownClients;
   }
 };
