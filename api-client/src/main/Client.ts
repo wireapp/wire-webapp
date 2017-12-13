@@ -120,7 +120,7 @@ class Client {
   public logout(): Promise<void> {
     return this.auth.api
       .postLogout()
-      .then(() => this.disconnect())
+      .then(() => this.disconnect('Closed by client logout'))
       .then(() => this.accessTokenStore.delete())
       .then(() => (this.context = undefined));
   }
@@ -138,8 +138,8 @@ class Client {
     return this.context;
   }
 
-  public disconnect(): void {
-    this.transport.ws.disconnect();
+  public disconnect(reason?: string): void {
+    this.transport.ws.disconnect(reason);
   }
 }
 
