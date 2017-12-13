@@ -220,7 +220,7 @@ describe('z.ViewModel.WindowTitleViewModel', () => {
       title_view_model.conversation_repository.conversations_unarchived.push(conversation);
       title_view_model.conversation_repository.active_conversation(conversation);
 
-      amplify.subscribe(z.event.WebApp.CONVERSATION.UNREAD, badge_count => {
+      amplify.subscribe(z.event.WebApp.LIFECYCLE.UNREAD_COUNT, badge_count => {
         expect(badge_count).toBe(1);
         done();
       });

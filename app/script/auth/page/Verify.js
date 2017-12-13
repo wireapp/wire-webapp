@@ -28,6 +28,7 @@ import {parseError} from '../util/errorUtil';
 import {verifyStrings} from '../../strings';
 import {withRouter} from 'react-router';
 import * as AuthAction from '../module/action/AuthAction';
+import {REGISTER_FLOW} from '../module/selector/AuthSelector';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as UserAction from '../module/action/UserAction';
 import Page from './Page';
@@ -35,26 +36,40 @@ import React from 'react';
 import ROUTE from '../route';
 import {pathWithParams} from '../util/urlUtil';
 
-const Verify = ({account, authError, history, isInTeamFlow, intl: {formatMessage: _}, ...connected}) => {
+const nextRedirect = {
+  [REGISTER_FLOW.PERSONAL]: ROUTE.CREATE_ACCOUNT,
+  [REGISTER_FLOW.TEAM]: ROUTE.CREATE_TEAM_ACCOUNT,
+};
+
+const Verify = ({account, authError, history, currentFlow, intl: {formatMessage: _}, ...connected}) => {
   const createAccount = email_code => {
-    if (isInTeamFlow) {
-      Promise.resolve()
-        .then(() => connected.doRegisterTeam({...account, email_code}))
-        .then(() => {
-          connected.trackEvent({name: TrackingAction.EVENT_NAME.TEAM.CREATED});
-          connected.trackEvent({name: TrackingAction.EVENT_NAME.TEAM.VERIFIED});
-        })
-        .then(() => history.push(ROUTE.INITIAL_INVITE))
-        .catch(error => console.error('Failed to create team account', error));
-    } else {
-      Promise.resolve()
-        .then(() => connected.doRegisterPersonal({...account, email_code}))
-        .then(() => {
-          connected.trackEvent({name: TrackingAction.EVENT_NAME.PERSONAL.CREATED});
-          connected.trackEvent({name: TrackingAction.EVENT_NAME.PERSONAL.VERIFIED});
-        })
-        .then(() => (window.location = pathWithParams('/login', 'reason=registration')))
-        .catch(error => console.error('Failed to create personal account', error));
+    switch (currentFlow) {
+      case REGISTER_FLOW.TEAM: {
+        Promise.resolve()
+          .then(() => connected.doRegisterTeam({...account, email_code}))
+          .then(() => {
+            connected.trackEvent({name: TrackingAction.EVENT_NAME.TEAM.CREATED});
+            connected.trackEvent({name: TrackingAction.EVENT_NAME.TEAM.VERIFIED});
+          })
+          .then(() => history.push(ROUTE.INITIAL_INVITE))
+          .catch(error => console.error('Failed to create team account', error));
+        break;
+      }
+      case REGISTER_FLOW.PERSONAL: {
+        Promise.resolve()
+          .then(() => connected.doRegisterPersonal({...account, email_code}))
+          .then(() => {
+            connected.trackEvent({attributes: {context: 'email'}, name: TrackingAction.EVENT_NAME.PERSONAL.CREATED});
+            connected.trackEvent({name: TrackingAction.EVENT_NAME.PERSONAL.VERIFIED});
+          })
+          .then(() => {
+            const link = document.createElement('a');
+            link.href = pathWithParams(ROUTE.LOGIN, 'reason=registration');
+            document.body.appendChild(link); // workaround for Firefox
+            link.click();
+          })
+          .catch(error => console.error('Failed to create personal account', error));
+      }
     }
   };
 
@@ -84,7 +99,7 @@ const Verify = ({account, authError, history, isInTeamFlow, intl: {formatMessage
             {_(verifyStrings.resendCode)}
           </Link>
           <Link
-            to={isInTeamFlow ? ROUTE.CREATE_TEAM_ACCOUNT : ROUTE.CREATE_ACCOUNT}
+            to={nextRedirect[currentFlow]}
             component={RRLink}
             style={{marginLeft: 35}}
             data-uie-name="go-change-email"
@@ -103,7 +118,7 @@ export default withRouter(
       state => ({
         account: AuthSelector.getAccount(state),
         authError: AuthSelector.getError(state),
-        isInTeamFlow: AuthSelector.isInTeamFlow(state),
+        currentFlow: AuthSelector.getCurrentFlow(state),
       }),
       {...AuthAction, ...TrackingAction, ...UserAction}
     )(Verify)
