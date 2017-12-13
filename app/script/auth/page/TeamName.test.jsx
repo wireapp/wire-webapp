@@ -68,14 +68,6 @@ describe('when entering a team name', () => {
     const teamNameInput = wrapper.find('[data-uie-name="enter-team-name"]').first();
     const doNextButton = wrapper.find('[data-uie-name="do-next"]').first();
     expect(teamNameInput.props().required).toBe(true);
-    expect(doNextButton.props().disabled).toBe(true);
-  });
-});
-
-describe(`when clicking on "what are teams"`, () => {
-  it(`opens our company's website in a new browser tab`, () => {
-  });
-
-  it(`opens our company's website showing a list of team features`, () => {
+    expect(doNextButton.props().disabled).toBe(false);
   });
 });
