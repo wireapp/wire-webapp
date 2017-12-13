@@ -1497,10 +1497,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     if (other_user_in_one2one && within_threshold && z.event.EventTypeHandling.CONFIRM.includes(message_et.type)) {
       const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
-      generic_message.set(
-        z.cryptography.GENERIC_MESSAGE_TYPE.CONFIRMATION,
-        new z.proto.Confirmation(message_et.id, z.proto.Confirmation.Type.DELIVERED)
-      );
+      const confirmation = new z.proto.Confirmation(message_et.id, z.proto.Confirmation.Type.DELIVERED);
+      generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.CONFIRMATION, confirmation);
 
       this.sending_queue.push(() => {
         return this.create_recipients(conversation_et.id, true, [message_et.user().id]).then(recipients => {
@@ -2843,6 +2841,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when the event was handled
    */
   _on_member_update(conversation_et, event_json) {
+    const isFromSelf = event_json.from === this.user_repository.self().id;
+    if (!isFromSelf) {
+      throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_USER);
+    }
+
     const is_active_conversation = this.is_active_conversation(conversation_et);
     const next_conversation_et = is_active_conversation ? this.get_next_conversation(conversation_et) : undefined;
     const previously_archived = conversation_et.is_archived();
@@ -3257,7 +3260,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {Object} client_mismatch - Client mismatch object containing client user maps for deleted, missing and obsolete clients
    * @param {z.proto.GenericMessage} [generic_message] - GenericMessage that was sent
    * @param {Object} [payload] - Initial payload resulting in a 412
-   * @returns {Promise} Resolve when mistmatch was handled
+   * @returns {Promise} Resolve when mismatch was handled
    */
   _handle_client_mismatch(conversation_id, client_mismatch, generic_message, payload) {
     return Promise.resolve()
