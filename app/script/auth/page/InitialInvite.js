@@ -37,7 +37,10 @@ import ValidationError from '../module/action/ValidationError';
 import Page from './Page';
 
 class InitialInvite extends React.PureComponent {
-  state = {error: null};
+  state = {
+    enteredEmail: '',
+    error: null,
+  };
 
   componentDidMount() {
     this.props.fetchSelf();
@@ -47,7 +50,6 @@ class InitialInvite extends React.PureComponent {
     const {invites} = this.props;
     const nextLocation = pathWithParams('/login', 'reason=registration');
     const invited = Boolean(invites.length);
-
     return Promise.resolve()
       .then(() => {
         this.props.trackEvent({
@@ -81,7 +83,7 @@ class InitialInvite extends React.PureComponent {
       this.setState({error: ValidationError.handleValidationState('email', this.emailInput.validity)});
     } else {
       this.props.invite({email: this.emailInput.value});
-      this.emailInput.value = '';
+      this.setState({enteredEmail: ''});
     }
     this.emailInput.focus();
   };
@@ -93,6 +95,7 @@ class InitialInvite extends React.PureComponent {
 
   render() {
     const {invites, isFetching, error, intl: {formatMessage: _}} = this.props;
+    const {enteredEmail} = this.state;
     return (
       <Page isAuthenticated>
         <ContainerXS
@@ -112,13 +115,17 @@ class InitialInvite extends React.PureComponent {
                   name="email"
                   placeholder={_(inviteStrings.emailPlaceholder)}
                   type="email"
-                  onChange={this.resetErrors}
+                  onChange={event => {
+                    this.resetErrors();
+                    this.setState({enteredEmail: event.target.value});
+                  }}
+                  value={enteredEmail}
                   innerRef={node => (this.emailInput = node)}
                   autoFocus
                   data-uie-name="enter-invite-email"
                 />
                 <RoundIconButton
-                  disabled={isFetching}
+                  disabled={isFetching || !enteredEmail}
                   icon="plane"
                   type="submit"
                   data-uie-name="do-send-invite"
