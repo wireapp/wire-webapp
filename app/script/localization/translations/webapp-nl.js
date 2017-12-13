@@ -233,6 +233,8 @@ z.string.nl.conversation_context_menu_delete_everyone = 'Verwijderen voor iedere
 z.string.nl.conversation_context_menu_download = 'Download';
 z.string.nl.conversation_context_menu_like = 'Vind ik leuk';
 z.string.nl.conversation_context_menu_unlike = 'Vind ik niet leuk';
+z.string.nl.conversation_delete_timestamp = 'Verwijderd op {{date}}';
+z.string.nl.conversation_edit_timestamp = 'Bewerkt op {{date}}';
 z.string.nl.conversation_likes_caption = '{{number}} mensen';
 z.string.nl.conversation_send_pasted_file = 'Afbeelding geplakt op {{date}}';
 z.string.nl.conversation_someone = 'Iemand';
@@ -545,6 +547,7 @@ z.string.nl.init_received_user_data = 'Controleer voor nieuwe berichten';
 z.string.nl.init_decryption = 'Berichten ontsleutelen';
 z.string.nl.init_events = 'Berichten laden';
 z.string.nl.init_updated_from_notifications = 'Bijna klaar - Geniet van Wire';
+z.string.nl.init_progress = ' — {{number1}} van {{number2}}';
 
 z.string.nl.ephememal_units_none = 'Uit';
 z.string.nl.ephememal_units_second = 'seconde';

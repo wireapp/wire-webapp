@@ -54,6 +54,8 @@ z.string.hr.auth_limit_devices_current = '(Trenutno)';
 
 z.string.hr.auth_history_headline = 'Ovo je prvi put da koristite Wire na ovom uređaju.';
 z.string.hr.auth_history_description = 'Iz sigurnosnih razloga, povijest razgovora se neće pojaviti ovdje.';
+z.string.hr.auth_history_reuse_headline = 'Već ste upotrebljavali Wire na ovom uređaju.';
+z.string.hr.auth_history_reuse_description = 'Poruke poslane u međuvremenu neće se pojaviti.';
 z.string.hr.auth_history_button = 'U redu';
 
 z.string.hr.auth_posted_resend = 'Ponovno pošalji na {{email}}';
@@ -95,6 +97,7 @@ z.string.hr.modal_button_ok = 'Ok';
 z.string.hr.modal_button_send = 'Pošalji';
 
 z.string.hr.modal_block_conversation_headline = 'Blokiraj {{user}}?';
+z.string.hr.modal_block_conversation_message = '{{user}} neće biti u mogućnosti kontaktirati vas ili vas pozvati u grupnu konverzaciju.';
 z.string.hr.modal_block_conversation_button = 'Blokiraj';
 z.string.hr.modal_call_conversation_empty_headline = 'Nemam koga zvati';
 z.string.hr.modal_call_conversation_empty_message = 'Nema osoba u konverzaciji.';
@@ -134,9 +137,15 @@ z.string.hr.modal_leave_conversation_button = 'Izađi';
 z.string.hr.modal_logout_headline = 'Obriši podatke?';
 z.string.hr.modal_logout_message = 'Izbriši sve osobne informacije i razgovore na ovom uređaju.';
 z.string.hr.modal_logout_button = 'Odjava';
+z.string.hr.modal_new_device_headline = '{{user}} počeo koristiti novi uređaj';
+z.string.hr.modal_new_device_headline_many = '{{users}} je počeo/ počela koristiti nove uređaje';
+z.string.hr.modal_new_device_headline_you = '{{user}} počeo koristiti novi uređaj';
 z.string.hr.modal_new_device_message = 'Još uvijek želite poslati poruku?';
+z.string.hr.modal_new_device_call_anyway = 'Svejedno iniciraj poziv';
 z.string.hr.modal_new_device_show_device = 'prikaz uređaja';
 z.string.hr.modal_new_device_send_anyway = 'svejedno pošalji';
+z.string.hr.modal_not_connected_message_one = '{{name}} ne želi biti dodan/a razgovorima.';
+z.string.hr.modal_not_connected_message_many = 'Jedna od osoba koje ste odabrali ne želi biti dodana u razgovore.';
 z.string.hr.modal_remove_device_button = 'Uklanjanje uređaja';
 z.string.hr.modal_remove_device_headline = 'Uklanjanje "{{device}}"';
 z.string.hr.modal_remove_device_message = 'Lozinka potrebna za uklanjanje uređaja.';
@@ -160,9 +169,13 @@ z.string.hr.conversation_connection_blocked = 'Blokiran';
 z.string.hr.conversation_connection_cancel_request = 'Odjavi zahtjev za vezu';
 z.string.hr.conversation_create = ' započela/o je razgovor s {{users}}';
 z.string.hr.conversation_create_you = ' započela/o je razgovor s {{users}}';
+z.string.hr.conversation_device_started_using_one = ' počela/o koristiti';
+z.string.hr.conversation_device_started_using_many = ' počela/o koristiti';
 z.string.hr.conversation_device_unverified = ' neverificirala/o je jedan od';
 z.string.hr.conversation_device_your_devices = ' tvojih uređaja';
 z.string.hr.conversation_device_user_devices = ' {{user}} uređaji';
+z.string.hr.conversation_device_new_device_one = ' novi uređaj';
+z.string.hr.conversation_device_new_device_many = ' novi uređaji';
 z.string.hr.conversation_just_now = 'Upravo';
 z.string.hr.conversation_location_link = 'Otvori kartu';
 z.string.hr.conversation_member_join = ' dodala/o {{users}}';
@@ -187,6 +200,7 @@ z.string.hr.conversation_unable_to_decrypt_2 = '{{user}} identitet uređaja prom
 z.string.hr.conversation_unable_to_decrypt_link = 'Zašto?';
 z.string.hr.conversation_unable_to_decrypt_error_message = 'Pogreška';
 z.string.hr.conversation_unable_to_decrypt_reset_session = 'Resetiraj sesiju';
+z.string.hr.conversation_missed_messages = 'Niste upotrebljavali ovaj uređaj neko vrijeme. Neke poruke možda neće biti vidljive na njemu.';
 z.string.hr.conversation_asset_uploading = 'Učitavanje…';
 z.string.hr.conversation_asset_downloading = 'Preuzimanje…';
 z.string.hr.conversation_asset_upload_failed = 'Prijenos neuspješan';
@@ -198,9 +212,19 @@ z.string.hr.conversation_context_menu_delete_everyone = 'Brisanje poruke za sve 
 z.string.hr.conversation_context_menu_download = 'Preuzimanje';
 z.string.hr.conversation_context_menu_like = 'Sviđa mi se';
 z.string.hr.conversation_context_menu_unlike = 'Ne sviđa mi se';
+z.string.hr.conversation_delete_timestamp = 'Izbrisano na {{date}}';
+z.string.hr.conversation_edit_timestamp = 'Promijenjeno na {{date}}';
 z.string.hr.conversation_likes_caption = '{{number}} ljudi';
 z.string.hr.conversation_send_pasted_file = 'Slika zaljepljena na {{date}}';
 z.string.hr.conversation_someone = 'Netko';
+z.string.hr.conversation_tweet_author = ' na Twitteru';
+
+z.string.hr.collection_section_links = 'Linkovi';
+z.string.hr.collection_section_images = 'Slike';
+z.string.hr.collection_section_files = 'Dokumenti';
+
+z.string.hr.fullsearch_placeholder = 'Pretraži poruke';
+z.string.hr.fullsearch_no_results = 'Nema rezultata.';
 
 z.string.hr.archive_header = 'Arhiviraj';
 
@@ -208,6 +232,8 @@ z.string.hr.conversations_all_archived = 'Sve arhivirano';
 z.string.hr.conversations_contacts = 'Kontakti';
 z.string.hr.conversations_connection_request_many = '{{number}} ljudi čekaju';
 z.string.hr.conversations_connection_request_one = '1 osoba čeka';
+z.string.hr.conversations_empty_conversation = 'Grupni razgovor';
+z.string.hr.conversations_no_conversations = 'Nema razgovora';
 z.string.hr.conversations_popover_archive = 'Arhiviraj';
 z.string.hr.conversations_popover_block = 'Blokiraj';
 z.string.hr.conversations_popover_cancel = 'Poništi zahtjev';
@@ -264,6 +290,7 @@ z.string.hr.people_tabs_device_detail_verify = 'Verificirano';
 z.string.hr.people_verified = 'Verificirano';
 
 z.string.hr.people_block_headline = 'Blokirati?';
+z.string.hr.people_block_message = '{{user}} neće biti u mogućnosti kontaktirati vas ili vas pozvati u grupnu konverzaciju.';
 
 z.string.hr.people_connect_headline = 'Prihvatiti?';
 z.string.hr.people_connect_message = 'Ovo će vas spojiti i otvoriti razgovor s {{user}}.';
@@ -357,6 +384,7 @@ z.string.hr.preferences_options_data_checkbox = 'Izvješće o korištenju i ruš
 z.string.hr.preferences_options_data_detail = 'Poboljšaj Wire slanjem anonimnih informacija.';
 z.string.hr.preferences_options_notifications = 'Obavijesti';
 z.string.hr.preferences_options_notifications_none = 'Isključi';
+z.string.hr.preferences_options_notifications_obfuscate = 'Sakrij detalje';
 z.string.hr.preferences_options_notifications_on = 'Prikaži pošiljatelja i poruku';
 
 z.string.hr.search_group_hint = 'Nastavi pisati ili odaberi više ljudi za stvaranje grupe';
@@ -385,6 +413,9 @@ z.string.hr.warning_call_upgrade_browser = 'Da bi imali pozive, molimo ažuriraj
 z.string.hr.warning_connectivity_connection_lost = 'Povezivanje u tijeku. Postoji mogućnost da Wire neće moći isporučiti poruke.';
 z.string.hr.warning_connectivity_no_internet = 'Nema Interneta. Nećete moći slati ili primati poruke.';
 z.string.hr.warning_learn_more = 'Saznaj više';
+z.string.hr.warning_lifecycle_update = 'Nova verzija Wire je dostupna.';
+z.string.hr.warning_lifecycle_update_notes = 'Što je novo';
+z.string.hr.warning_lifecycle_update_link = 'Ažuriraj sada';
 z.string.hr.warning_not_found_camera = 'Poziv nije moguć jer računalo nema kameru.';
 z.string.hr.warning_not_found_microphone = 'Poziv nije moguć jer računalo nema mikrofon.';
 z.string.hr.warning_permission_denied_camera = 'Poziv nije moguć jer računalo nema pristup kameri.';
@@ -403,6 +434,7 @@ z.string.hr.system_notification_conversation_create = '{{user}} je započela/o r
 z.string.hr.system_notification_conversation_rename = '{{user}} je preimenovala/o razgovor u {{name}}';
 z.string.hr.system_notification_member_join_many = '{{user}} dodala/o {{number}} ljudi u razgovor';
 z.string.hr.system_notification_member_join_one = '{{user1}} dodala/o {{user2}} u razgovor';
+z.string.hr.system_notification_member_leave_removed_you = '{{user}} vas je izbrisao / izbrisala iz razgovora';
 z.string.hr.system_notification_obfuscated = 'Poslao ti je poruku';
 z.string.hr.system_notification_obfuscated_title = 'Netko';
 z.string.hr.system_notification_ping = 'Pingala/o';
@@ -422,6 +454,7 @@ z.string.hr.tooltip_conversation_input_placeholder = 'Upiši poruku';
 z.string.hr.tooltip_conversation_people = 'Ljudi ({{shortcut}})';
 z.string.hr.tooltip_conversation_picture = 'Dodaj sliku';
 z.string.hr.tooltip_conversation_ping = 'Ping ({{shortcut}})';
+z.string.hr.tooltip_conversation_search = 'Traži';
 z.string.hr.tooltip_conversation_video_call = 'Video poziv';
 
 z.string.hr.tooltip_conversations_archive = 'Arhiva ({{shortcut}})';
@@ -451,7 +484,9 @@ z.string.hr.tooltip_preferences_rename = 'Promijeni ime';
 z.string.hr.tooltip_search_close = 'Zatvori (Esc)';
 
 z.string.hr.init_received_self_user = 'Pozdrav, {{user}}.';
+z.string.hr.init_validated_client = 'Učitavanje veze i razgovora';
 z.string.hr.init_received_user_data = 'Provjeravanje novih poruka';
+z.string.hr.init_events = 'Učitavanje poruka';
 
 z.string.hr.ephememal_units_none = 'Isključi';
 z.string.hr.ephememal_units_second = 'sekunda';

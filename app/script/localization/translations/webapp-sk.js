@@ -233,6 +233,8 @@ z.string.sk.conversation_context_menu_delete_everyone = 'Vymazať pre všetkých
 z.string.sk.conversation_context_menu_download = 'Stiahnuť';
 z.string.sk.conversation_context_menu_like = 'Páči sa';
 z.string.sk.conversation_context_menu_unlike = 'Nepáči sa';
+z.string.sk.conversation_delete_timestamp = 'Odstránené {{date}}';
+z.string.sk.conversation_edit_timestamp = 'Upravené {{date}}';
 z.string.sk.conversation_likes_caption = '{{number}} ľudí';
 z.string.sk.conversation_send_pasted_file = 'Vložený obrázok {{date}}';
 z.string.sk.conversation_someone = 'Niekto';
@@ -542,6 +544,8 @@ z.string.sk.tooltip_search_close = 'Zavrieť (Esc)';
 z.string.sk.init_received_self_user = 'Ahoj, {{user}}.';
 z.string.sk.init_validated_client = 'Získavanie pripojení a konverzácií';
 z.string.sk.init_received_user_data = 'Kontrola nových správ';
+z.string.sk.init_decryption = 'Dešifrovať správy';
+z.string.sk.init_events = 'Načítavam správy';
 
 z.string.sk.ephememal_units_none = 'Vypnúť';
 z.string.sk.ephememal_units_second = 'sekunda';

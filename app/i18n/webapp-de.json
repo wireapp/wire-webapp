@@ -1,7 +1,7 @@
 {
   "index.claim": "Sicherer Messenger für alle.",
   "index.createAccount": "Konto erstellen",
-  "index.createAccountFor": "für den privaten Gebrauch",
+  "index.createAccountFor": "für Privat",
   "index.createTeam": "Team erstellen",
   "index.createTeamFor": "für Unternehmen",
   "index.loginInfo": "Hast du bereits ein Benutzerkonto?",
@@ -18,8 +18,8 @@
   "createAccount.nextButton": "Weiter",
   "invite.nextButton": "Weiter",
   "createAccount.headLine": "Eigenes Konto einrichten",
-  "createPersonalAccount.headLine": "",
-  "createPersonalAccount.nextButton": "",
+  "createPersonalAccount.headLine": "Neues Benutzerkonto",
+  "createPersonalAccount.nextButton": "Registrieren",
   "verify.headline": "Du hast Post",
   "verify.subhead": "Gib den Bestätigungs-Code ein, den wir an<br />{email}<br />gesendet haben",
   "verify.resendCode": "Code erneut senden",
@@ -33,7 +33,7 @@
   "BackendError.LABEL.MISSING_AUTH": "Überprüfe deine Eingaben und versuche es erneut",
   "BackendError.LABEL.BLACKLISTED_EMAIL": "Diese E-Mail-Adresse ist nicht zulässig",
   "BackendError.LABEL.BLACKLISTED_PHONE": "Diese Telefonnummer ist nicht zulässig",
-  "BackendError.LABEL.INVALID_CODE": "Dieser Code ist ungültig",
+  "BackendError.LABEL.INVALID_CODE": "Bitte gib den gültigen Code ein",
   "BackendError.LABEL.INVALID_EMAIL": "Diese E-Mail-Adresse ist ungültig",
   "BackendError.LABEL.INVALID_PHONE": "Diese Telefonnummer ist ungültig",
   "BackendError.LABEL.KEY_EXISTS":

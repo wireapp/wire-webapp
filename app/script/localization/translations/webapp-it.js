@@ -88,6 +88,7 @@ z.string.it.auth_error_phone_number_budget = 'Hai eseguito l’accesso troppo sp
 z.string.it.auth_error_phone_number_forbidden = 'Spiacenti. Questo numero di telefono è vietato.';
 z.string.it.auth_error_phone_number_invalid = 'Numero di telefono non valido';
 z.string.it.auth_error_phone_number_unknown = 'Numero di telefono sconosciuto';
+z.string.it.auth_error_suspended = 'Questo account non è più autorizzato ad accedere.';
 z.string.it.auth_error_sign_in = 'Verifica i tuoi dati e riprova.';
 
 z.string.it.call_state_outgoing = 'Sta squillando…';
@@ -154,6 +155,8 @@ z.string.it.modal_new_device_call_incoming = 'Vuoi accettare la chiamata?';
 z.string.it.modal_new_device_call_outgoing = 'Vuoi effettuare la chiamata?';
 z.string.it.modal_new_device_show_device = 'visualizza dispositivo';
 z.string.it.modal_new_device_send_anyway = 'invia comunque';
+z.string.it.modal_not_connected_message_one = '{{name}} non vuole partecipare alle conversazioni.';
+z.string.it.modal_not_connected_message_many = 'Una delle persone che hai selezionato non vuole essere aggiunta alle conversazioni.';
 z.string.it.modal_remove_device_button = 'Rimuovi dispositivo';
 z.string.it.modal_remove_device_headline = 'Rimuovi "{{device}}"';
 z.string.it.modal_remove_device_message = 'La tua password è necessaria per rimuovere il dispositivo.';
@@ -225,6 +228,8 @@ z.string.it.conversation_context_menu_delete_everyone = 'Elimina per tutti';
 z.string.it.conversation_context_menu_download = 'Scarica';
 z.string.it.conversation_context_menu_like = 'Mi piace';
 z.string.it.conversation_context_menu_unlike = 'Non mi piace più';
+z.string.it.conversation_delete_timestamp = 'Cancellato il {{date}}';
+z.string.it.conversation_edit_timestamp = 'Modificato il {{date}}';
 z.string.it.conversation_likes_caption = '{{number}} persone';
 z.string.it.conversation_send_pasted_file = 'Immagine incollata alle {{date}}';
 z.string.it.conversation_someone = 'Qualcuno';
@@ -373,8 +378,10 @@ z.string.it.preferences_about_terms_of_use = 'Termini d’uso';
 z.string.it.preferences_about_version = 'Versione {{version}}';
 z.string.it.preferences_about_website = 'Sito di Wire';
 
+z.string.it.preferences_account_create_team = 'Crea un team';
 z.string.it.preferences_account_delete = 'Elimina account';
 z.string.it.preferences_account_log_out = 'Logout';
+z.string.it.preferences_account_manage_team = 'Gestione Team';
 z.string.it.preferences_account_reset_password = 'Reimposta la password';
 z.string.it.preferences_account_team = 'in {{name}}';
 z.string.it.preferences_account_username_placeholder = 'Il tuo nome e cognome';
@@ -529,7 +536,10 @@ z.string.it.tooltip_preferences_rename = 'Cambia il tuo nome';
 z.string.it.tooltip_search_close = 'Chiudi (Esc)';
 
 z.string.it.init_received_self_user = 'Ciao, {{user}}.';
+z.string.it.init_validated_client = 'Caricamento delle tue connessioni e conversazioni';
 z.string.it.init_received_user_data = 'Controllo nuovi messaggi';
+z.string.it.init_decryption = 'Decriptare i messaggi';
+z.string.it.init_events = 'Caricamento messaggi';
 
 z.string.it.ephememal_units_none = 'Off';
 z.string.it.ephememal_units_second = 'secondo';

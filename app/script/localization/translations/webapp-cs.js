@@ -232,6 +232,8 @@ z.string.cs.conversation_context_menu_delete_everyone = 'Odstranit pro všechny'
 z.string.cs.conversation_context_menu_download = 'Stáhnout';
 z.string.cs.conversation_context_menu_like = 'Líbí';
 z.string.cs.conversation_context_menu_unlike = 'Nelíbí';
+z.string.cs.conversation_delete_timestamp = 'Smazáno v {{date}}';
+z.string.cs.conversation_edit_timestamp = 'Upraveno v {{date}}';
 z.string.cs.conversation_likes_caption = '{{number}} lidí';
 z.string.cs.conversation_send_pasted_file = 'Obrázek vložen {{date}}';
 z.string.cs.conversation_someone = 'Někdo';
@@ -539,6 +541,8 @@ z.string.cs.tooltip_search_close = 'Zavřít (Esc)';
 
 z.string.cs.init_received_self_user = 'Ahoj, {{user}}.';
 z.string.cs.init_received_user_data = 'Kontrola nových zpráv';
+z.string.cs.init_decryption = 'Dešifrovat zprávu';
+z.string.cs.init_events = 'Zprávy se načítají';
 
 z.string.cs.ephememal_units_none = 'Vypnout';
 z.string.cs.ephememal_units_second = 'sekunda';
