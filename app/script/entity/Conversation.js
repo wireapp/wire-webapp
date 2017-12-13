@@ -390,6 +390,23 @@ z.entity.Conversation = class Conversation {
     return this.participating_user_ids().length + (this.removed_from_conversation() ? 0 : 1);
   }
 
+  get_number_of_clients() {
+    const participantsMapped = this.participating_user_ids().length === this.participating_user_ets().length;
+    if (participantsMapped) {
+      const numberOfKnownClients = this.participating_user_ets().reduce(
+        userEt => userEt.devices().length,
+        this.self.devices().length
+      );
+
+      const knownClients = numberOfKnownClients > this.get_number_of_participants();
+      if (knownClients) {
+        return numberOfKnownClients;
+      }
+    }
+
+    return this.get_number_of_participants() * 4;
+  }
+
   /**
    * Prepends messages with new batch of messages.
    * @param {Array<z.entity.Message>} message_ets - Array of messages to be added to conversation

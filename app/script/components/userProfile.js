@@ -47,11 +47,15 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
     this.cryptography_repository = wire.app.repository.cryptography;
     this.user_repository = wire.app.repository.user;
 
-    this.userAvailability = ko.pureComputed(() => this.user_repository.is_team() && this.user().availability());
+    this.is_team = ko.pureComputed(() => {
+      return this.conversation()
+        .self()
+        .is_team_member();
+    });
     this.userAvailabilityLabel = ko.pureComputed(() => {
-      const availabilitySetToNone = this.userAvailability() === z.user.AvailabilityType.NONE;
+      const availabilitySetToNone = this.user().availability() === z.user.AvailabilityType.NONE;
       if (!availabilitySetToNone) {
-        return z.user.AvailbilityMapper.nameFromType(this.userAvailability());
+        return z.user.AvailbilityMapper.nameFromType(this.user().availability());
       }
     });
 

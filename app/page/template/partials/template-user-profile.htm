@@ -33,10 +33,10 @@
               <!-- /ko -->
             </div>
           <!-- /ko -->
-          <!-- if: user_repository.is_team -->
+          <!-- if: is_team -->
             <availability-state class="user-profile-details-availability"
                                 data-uie-name="status-availability"
-                                params="availability: userAvailability, label: userAvailabilityLabel"></availability-state>
+                                params="availability: user().availability(), label: userAvailabilityLabel()"></availability-state>
           <!-- /ko -->
         </div>
         <div class="user-profile-footer">

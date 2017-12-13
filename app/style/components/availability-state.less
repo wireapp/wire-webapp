@@ -21,16 +21,30 @@ availability-state {
   display: flex;
   align-items: center;
 
-  .availability-icon {
+  .availability-state-arrow {
+    display: inline-block;
+    .square(16px);
+    margin-left: 4px;
+    padding-bottom: 4px;
+
+    &::before {
+      content: '';
+      width: 0;
+      height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 4px solid currentColor;
+    }
+  }
+
+  .availability-state-icon {
     .square(10px);
     margin-right: 8px;
     fill: currentColor;
     stroke: currentColor;
   }
 
-  .availability-label {
+  .availability-state-label {
     .ellipsis-nowrap();
-    .label-bold-xs();
-    display: inline-block;
   }
 }
