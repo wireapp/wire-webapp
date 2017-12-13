@@ -19,7 +19,7 @@
                   class="conversation-input-text border-theme"
                   data-bind="event: {'keydown': on_input_key_down, 'keyup': on_input_key_up},
                              focus_on_keydown: true,
-                             css: {'ephemeral-input': has_ephemeral_timer()},
+                             css: {'ephemeral-input': has_ephemeral_timer() && !show_availability_tooltip()},
                              enter: on_input_enter,
                              hasFocus: blinking_cursor,
                              textInput: input,

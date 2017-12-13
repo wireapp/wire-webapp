@@ -52,7 +52,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
         label = z.l10n.text(z.string.preferences_account_avaibility_unset);
       }
 
-      return `${label} ^`;
+      return label;
     });
 
     this.username = ko.pureComputed(() => this.self_user().username());
