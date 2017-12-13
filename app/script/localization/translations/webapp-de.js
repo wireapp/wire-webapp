@@ -466,7 +466,7 @@ z.string.de.url_support_articles = '/hc/de/articles/';
 z.string.de.url_support_requests = '/hc/de/requests/';
 z.string.de.url_webapp_root = '/?hl=de';
 z.string.de.url_website_root = '/de/';
-z.string.de.url_website_create_team = '/de/create-team';
+z.string.de.url_website_create_team = '/de/create-team/';
 z.string.de.url_website_privacy = '/de/privacy';
 z.string.de.warning_call_detail = 'Dein Browser benötigt für Anrufe Zugriff auf das Mikrofon.';
 z.string.de.warning_call_headline = 'Anrufe sind ohne Mikrofon nicht möglich';
