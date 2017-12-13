@@ -17,20 +17,12 @@
  *
  */
 
-import IconBase from './IconBase';
+import IconHOC from './IconHOC';
 import React from 'react';
 
-class CheckIcon extends IconBase {
-  /* eslint-disable no-magic-numbers */
-  width = 16;
-  height = 12;
-  renderSVG(width, height, color) {
-    return (
-      <svg width={width} height={height} viewBox="0 0 16 12">
-        <path fill={color} d="M5.66 11.86L15.98 1.4 14.58 0 5.65 9.03 1.4 4.8 0 6.2" />
-      </svg>
-    );
-  }
-}
+const width = 16;
+const height = 12;
+const check = <path d="M5.66 11.86L15.98 1.4 14.58 0 5.65 9.03 1.4 4.8 0 6.2" />;
+const CheckIcon = IconHOC(check, width, height);
 
 export {CheckIcon};

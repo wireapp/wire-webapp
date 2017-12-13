@@ -20,6 +20,7 @@
 /* eslint-disable sort-keys, sort-vars, no-magic-numbers */
 
 export const WIDTH = {
+  TINY: 320,
   MOBILE: 480,
   TABLET_MIN: 640,
   TABLET_MAX: 919,

@@ -19,6 +19,7 @@
 
 import {COLOR} from '../Identity';
 import PropTypes from 'prop-types';
+import {defaultProps} from 'recompose';
 import styled from 'styled-components';
 
 const Text = styled.span`
@@ -62,28 +63,9 @@ Text.defaultProps = {
   truncate: false,
 };
 
-const Bold = Text.withComponent('strong');
-Bold.defaultProps = {
-  ...Text.defaultProps,
-  bold: true,
-};
-
-const Small = Text.withComponent('small');
-Small.defaultProps = {
-  ...Text.defaultProps,
-  fontSize: '12px',
-};
-
-const Muted = Text.extend``;
-Muted.defaultProps = {
-  ...Text.defaultProps,
-  muted: true,
-};
-
-const Uppercase = Text.extend``;
-Uppercase.defaultProps = {
-  ...Text.defaultProps,
-  textTransform: 'uppercase',
-};
+const Bold = defaultProps({bold: true})(Text);
+const Small = defaultProps({fontSize: '12px'})(Text);
+const Muted = defaultProps({muted: true})(Text);
+const Uppercase = defaultProps({textTransfrom: 'uppercase'})(Text);
 
 export {Bold, Muted, Small, Text, Uppercase};
