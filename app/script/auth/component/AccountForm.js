@@ -28,6 +28,7 @@ import * as UserAction from '../module/action/UserAction';
 import ValidationError from '../module/action/ValidationError';
 import React, {PureComponent} from 'react';
 import ROUTE from '../route';
+import BackendError from '../module/action/BackendError';
 
 class AccountForm extends PureComponent {
   inputs = {};
@@ -62,10 +63,28 @@ class AccountForm extends PureComponent {
           throw errors[0];
         }
       })
+      .then(() => this.props.beforeSubmit && this.props.beforeSubmit())
       .then(() => this.props.pushAccountRegistrationData({...this.state}))
       .then(() => this.props.doSendActivationCode(this.state.email))
       .then(() => this.props.onSubmit())
-      .catch(error => console.error('Failed to send email code', error));
+      .catch(error => {
+        if (error.label) {
+          switch (error.label) {
+            case BackendError.AUTH_ERRORS.BLACKLISTED_EMAIL:
+            case BackendError.AUTH_ERRORS.INVALID_EMAIL:
+            case BackendError.AUTH_ERRORS.KEY_EXISTS: {
+              this.setState(state => ({validInputs: {...state.validInputs, email: false}}));
+              break;
+            }
+            case BackendError.AUTH_ERRORS.INVALID_CREDENTIALS:
+            case BackendError.GENERAL_ERRORS.UNAUTHORIZED: {
+              this.setState(state => ({validInputs: {...state.validInputs, email: false, password: false}}));
+              break;
+            }
+          }
+        }
+        console.error('Failed to send email code', error);
+      });
   };
 
   render() {

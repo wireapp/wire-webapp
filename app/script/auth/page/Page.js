@@ -29,8 +29,8 @@ const hasInvalidTeamData = ({team}) => !team || !team.name;
 
 function Page({hasAccountData, hasTeamData, isInTeamFlow, isAuthenticated, isStateAuthenticated, account, children}) {
   if (
-    (hasAccountData && hasInvalidAccountData(account)) ||
-    (hasTeamData && hasInvalidTeamData(account)) ||
+    (hasAccountData && hasInvalidAccountData(account) && !isStateAuthenticated) ||
+    (hasTeamData && hasInvalidTeamData(account) && !isStateAuthenticated) ||
     (isAuthenticated && !isStateAuthenticated)
   ) {
     return <Redirect to={isInTeamFlow ? ROUTE.CREATE_TEAM : ROUTE.CREATE_ACCOUNT} />;

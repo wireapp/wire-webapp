@@ -29,18 +29,13 @@ z.string.uk.alert_upload_too_large = 'Не вдалося застосувати
 z.string.uk.alert_gif_too_large = 'Файл анімації завеликий.\nМаксимальний розмір —  {{number}} МБ.';
 
 z.string.uk.auth_account_country_code = 'Код країни';
-z.string.uk.auth_account_create = 'Створити';
-z.string.uk.auth_account_create_account = 'Створити акаунт';
 z.string.uk.auth_account_deletion = 'Ви вийшли, оскільки ваш акаунт було видалено.';
 z.string.uk.auth_account_expiration = 'Ви вийшли, оскільки термін дії вашої сесії завершився. Будь ласка, увійдіть ще раз.';
-z.string.uk.auth_account_get_wire = 'Простий, приватний та захищений месенджер для розмов, дзвінків, обміну картинками, музикою, відео, GIF-анімаціями та іншими функціями.';
 z.string.uk.auth_account_password_forgot = 'Забули пароль?';
 z.string.uk.auth_account_public_computer = 'Це загальнодоступний комп’ютер';
 z.string.uk.auth_account_sign_in = 'Увійти';
 z.string.uk.auth_account_sign_in_email = 'Email';
 z.string.uk.auth_account_sign_in_phone = 'Номер телефону';
-z.string.uk.auth_account_terms_of_use = 'Умови використання';
-z.string.uk.auth_account_terms_of_use_detail = 'Я приймаю';
 
 z.string.uk.auth_blocked_cookies = 'Увімкніть файли cookie, щоб увійти в Wire.';
 z.string.uk.auth_blocked_database = 'Wire потребує доступу до локальної бази даних для відображення повідомлень. Локальна база даних недоступна в приватному режимі.';
@@ -69,23 +64,12 @@ z.string.uk.auth_history_reuse_headline = 'Ви уже використовув�
 z.string.uk.auth_history_reuse_description = 'Повідомлення, надіслані в той час, коли ви вийшли з Wire, не відображатимуться.';
 z.string.uk.auth_history_button = 'OK';
 
-z.string.uk.auth_posted_change_email = 'Змінити електронну пошту';
-z.string.uk.auth_posted_offline_detail = 'Перевірте підключення та повторіть спробу.';
-z.string.uk.auth_posted_offline_headline = 'Wire кращий, коли ви онлайн.';
-z.string.uk.auth_posted_pending_detail = 'Перевірте вашу поштову скриньку або повторно надішліть активаційні дані.';
-z.string.uk.auth_posted_pending_headline = 'Обліковий запис уже очікує верифікації';
 z.string.uk.auth_posted_resend = 'Надіслати повторно на {{email}}';
 z.string.uk.auth_posted_resend_action = 'Не показується email?';
 z.string.uk.auth_posted_resend_detail = 'Перевірте вашу поштову скриньку і дотримуйтесь надісланих інструкцій.';
 z.string.uk.auth_posted_resend_headline = 'Ви отримали нового листа.';
-z.string.uk.auth_posted_retry = 'Повторно надіслати листа на {{email}}';
-z.string.uk.auth_posted_retry_action = 'Спробувати ще раз?';
-z.string.uk.auth_posted_retry_detail = 'Будь ласка, спробуйте ще раз.';
-z.string.uk.auth_posted_retry_headline = 'Щось пішло не так';
-z.string.uk.auth_posted_verify_later = 'Верифікувати пізніше';
 
 z.string.uk.auth_placeholder_email = 'Email';
-z.string.uk.auth_placeholder_name = 'Ім’я';
 z.string.uk.auth_placeholder_password_put = 'Пароль';
 z.string.uk.auth_placeholder_password_set = 'Пароль (не менше 8 символів)';
 z.string.uk.auth_placeholder_phone = 'Номер телефону';
@@ -559,7 +543,10 @@ z.string.uk.tooltip_search_close = 'Закрити (Esc)';
 z.string.uk.init_received_self_user = 'Привіт {{user}}.';
 z.string.uk.init_validated_client = 'Отримую список контактів та розмов';
 z.string.uk.init_received_user_data = 'Перевіряю наявність нових повідомлень';
+z.string.uk.init_decryption = 'Дешифрую повідомлення';
+z.string.uk.init_events = 'Завантажую повідомлення';
 z.string.uk.init_updated_from_notifications = 'Майже завершено - Приємного користування!';
+z.string.uk.init_progress = ' — {{number1}} з {{number2}}';
 
 z.string.uk.ephememal_units_none = 'Вимкнений';
 z.string.uk.ephememal_units_second = 'секунда';

@@ -49,7 +49,7 @@ const Verify = ({account, authError, history, isInTeamFlow, intl: {formatMessage
       Promise.resolve()
         .then(() => connected.doRegisterPersonal({...account, email_code}))
         .then(() => {
-          connected.trackEvent({name: TrackingAction.EVENT_NAME.PERSONAL.CREATED});
+          connected.trackEvent({attributes: {context: 'email'}, name: TrackingAction.EVENT_NAME.PERSONAL.CREATED});
           connected.trackEvent({name: TrackingAction.EVENT_NAME.PERSONAL.VERIFIED});
         })
         .then(() => history.push(ROUTE.CHOOSE_HANDLE))

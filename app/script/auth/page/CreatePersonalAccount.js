@@ -23,13 +23,15 @@ import {Container, ContainerXS, Columns, Column} from '@wireapp/react-ui-kit/Lay
 import {createPersonalAccountStrings} from '../../strings';
 import {H1, Link} from '@wireapp/react-ui-kit/Text';
 import {injectIntl} from 'react-intl';
+import {connect} from 'react-redux';
 import {Link as RRLink} from 'react-router-dom';
 import {withRouter} from 'react-router';
 import React from 'react';
 import ROUTE from '../route';
 import AccountForm from '../component/AccountForm';
+import * as TrackingAction from '../module/action/TrackingAction';
 
-function CreatePersonalAccount({history, intl: {formatMessage: _}}) {
+function CreatePersonalAccount({history, intl: {formatMessage: _}, ...connected}) {
   return (
     <Container centerText verticalCenter style={{width: '100%'}}>
       <Columns>
@@ -47,6 +49,7 @@ function CreatePersonalAccount({history, intl: {formatMessage: _}}) {
           >
             <H1 center>{_(createPersonalAccountStrings.headLine)}</H1>
             <AccountForm
+              beforeSubmit={() => connected.trackEvent({name: TrackingAction.EVENT_NAME.PERSONAL.ENTERED_ACCOUNT_DATA})}
               onSubmit={() => history.push(ROUTE.VERIFY)}
               submitText={_(createPersonalAccountStrings.submitButton)}
             />
@@ -58,4 +61,4 @@ function CreatePersonalAccount({history, intl: {formatMessage: _}}) {
   );
 }
 
-export default withRouter(injectIntl(CreatePersonalAccount));
+export default withRouter(injectIntl(connect(undefined, {...TrackingAction})(CreatePersonalAccount)));
