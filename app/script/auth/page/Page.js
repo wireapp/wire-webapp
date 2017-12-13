@@ -18,6 +18,7 @@
  */
 
 import {connect} from 'react-redux';
+import {REGISTER_FLOW} from '../module/selector/AuthSelector';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import React from 'react';
 import ROUTE from '../route';
@@ -27,19 +28,24 @@ const hasInvalidAccountData = account => !account.name || !account.email || !acc
 
 const hasInvalidTeamData = ({team}) => !team || !team.name;
 
-function Page({hasAccountData, hasTeamData, isInTeamFlow, isAuthenticated, isStateAuthenticated, account, children}) {
+const redirects = {
+  [REGISTER_FLOW.PERSONAL]: ROUTE.CREATE_ACCOUNT,
+  [REGISTER_FLOW.TEAM]: ROUTE.CREATE_TEAM,
+};
+
+function Page({hasAccountData, hasTeamData, currentFlow, isAuthenticated, isStateAuthenticated, account, children}) {
   if (
     (hasAccountData && hasInvalidAccountData(account) && !isStateAuthenticated) ||
     (hasTeamData && hasInvalidTeamData(account) && !isStateAuthenticated) ||
     (isAuthenticated && !isStateAuthenticated)
   ) {
-    return <Redirect to={isInTeamFlow ? ROUTE.CREATE_TEAM : ROUTE.CREATE_ACCOUNT} />;
+    return <Redirect to={redirects[currentFlow] || ROUTE.INDEX} />;
   }
   return children;
 }
 
 export default connect(state => ({
   account: AuthSelector.getAccount(state),
-  isInTeamFlow: AuthSelector.isInTeamFlow(state),
+  currentFlow: AuthSelector.getCurrentFlow(state),
   isStateAuthenticated: AuthSelector.isAuthenticated(state),
 }))(Page);
