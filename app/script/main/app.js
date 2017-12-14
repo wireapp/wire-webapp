@@ -329,6 +329,7 @@ z.main.App = class App {
 
         return this.repository.team.get_team();
       })
+      .then(() => this.repository.user.loadUsers())
       .then(() => this.repository.event.initialize_from_stream())
       .then(notifications_count => {
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
@@ -339,7 +340,7 @@ z.main.App = class App {
         );
 
         this.repository.event_tracker.init(this.repository.properties.properties.settings.privacy.improve_wire);
-        return Promise.all([this.repository.conversation.initialize_conversations(), this.repository.user.loadUsers()]);
+        return this.repository.conversation.initialize_conversations();
       })
       .then(() => {
         this.view.loading.update_progress(97.5, z.string.init_updated_from_notifications);
