@@ -394,11 +394,11 @@ z.entity.Conversation = class Conversation {
   getNumberOfClients() {
     const participantsMapped = this.participating_user_ids().length === this.participating_user_ets().length;
     if (participantsMapped) {
-      return this.participating_user_ets().reduce(userEntity => {
+      return this.participating_user_ets().reduce((accumulator, userEntity) => {
         if (userEntity.devices().length) {
-          return userEntity.devices().length;
+          return accumulator + userEntity.devices().length;
         }
-        return z.client.ClientRepository.CONFIG.AVERAGE_NUMBER_OF_CLIENTS;
+        return accumulator + z.client.ClientRepository.CONFIG.AVERAGE_NUMBER_OF_CLIENTS;
       }, this.self.devices().length);
     }
 

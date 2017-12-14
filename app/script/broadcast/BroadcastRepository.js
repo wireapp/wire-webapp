@@ -113,11 +113,11 @@ z.broadcast.BroadcastRepository = class BroadcastRepository {
   }
 
   _getNumberOfClients() {
-    return this.userRepository.team_users().reduce(userEntity => {
+    return this.userRepository.team_users().reduce((accumulator, userEntity) => {
       if (userEntity.devices().length) {
-        return userEntity.devices().length;
+        return accumulator + userEntity.devices().length;
       }
-      return z.client.ClientRepository.CONFIG.AVERAGE_NUMBER_OF_CLIENTS;
+      return accumulator + z.client.ClientRepository.CONFIG.AVERAGE_NUMBER_OF_CLIENTS;
     }, this.userRepository.self().devices().length);
   }
 
