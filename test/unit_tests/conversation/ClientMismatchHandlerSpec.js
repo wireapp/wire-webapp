@@ -130,10 +130,10 @@ describe('ClientMismatchHandler', () => {
 
     it('should remove the payload of deleted clients', done => {
       clientMismatch = {
-        deleted: {},
-        missing: {
+        deleted: {
           [janeRoe.user_id]: [`${janeRoe.client_id}`],
         },
+        missing: {},
         redundant: {},
         time: '2016-04-29T10:38:23.002Z',
       };
