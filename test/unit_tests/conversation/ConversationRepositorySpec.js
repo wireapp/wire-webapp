@@ -888,7 +888,7 @@ describe('ConversationRepository', () => {
     });
 
     describe('"conversation.message-hidden"', () => {
-      let message_id = null;
+      let messageId = null;
 
       beforeEach(done => {
         conversation_et = _generate_conversation(z.conversation.ConversationType.REGULAR);
@@ -896,21 +896,21 @@ describe('ConversationRepository', () => {
         TestFactory.conversation_repository
           .save_conversation(conversation_et)
           .then(() => {
-            const message_to_hide_et = new z.entity.Message(z.util.create_random_uuid());
-            conversation_et.add_message(message_to_hide_et);
+            const messageToHideEt = new z.entity.Message(z.util.create_random_uuid());
+            conversation_et.add_message(messageToHideEt);
 
-            message_id = message_to_hide_et.id;
-            spyOn(TestFactory.conversation_repository, '_on_message_hidden').and.callThrough();
+            messageId = messageToHideEt.id;
+            spyOn(TestFactory.conversation_repository, '_onMessageHidden').and.callThrough();
             done();
           })
           .catch(done.fail);
       });
 
       it('should not hide message if sender is not self user', done => {
-        const message_hidden_event = {
+        const messageHiddenEvent = {
           conversation: conversation_et.id,
           data: {
-            message_id: message_id,
+            message_id: messageId,
             conversation_id: conversation_et.id,
           },
           from: z.util.create_random_uuid(),
@@ -919,25 +919,25 @@ describe('ConversationRepository', () => {
           type: z.event.Client.CONVERSATION.MESSAGE_HIDDEN,
         };
 
-        expect(conversation_et.get_message_by_id(message_id)).toBeDefined();
+        expect(conversation_et.get_message_by_id(messageId)).toBeDefined();
 
         TestFactory.conversation_repository
-          .on_conversation_event(message_hidden_event)
+          .on_conversation_event(messageHiddenEvent)
           .then(done.fail)
           .catch(error => {
             expect(error).toEqual(jasmine.any(z.conversation.ConversationError));
             expect(error.type).toBe(z.conversation.ConversationError.TYPE.WRONG_USER);
-            expect(TestFactory.conversation_repository._on_message_hidden).toHaveBeenCalled();
-            expect(conversation_et.get_message_by_id(message_id)).toBeDefined();
+            expect(TestFactory.conversation_repository._onMessageHidden).toHaveBeenCalled();
+            expect(conversation_et.get_message_by_id(messageId)).toBeDefined();
             done();
           });
       });
 
       it('should hide message if sender is self user', done => {
-        const message_hidden_event = {
+        const messageHiddenEvent = {
           conversation: conversation_et.id,
           data: {
-            message_id: message_id,
+            message_id: messageId,
             conversation_id: conversation_et.id,
           },
           from: TestFactory.user_repository.self().id,
@@ -946,13 +946,38 @@ describe('ConversationRepository', () => {
           type: z.event.Client.CONVERSATION.MESSAGE_HIDDEN,
         };
 
-        expect(conversation_et.get_message_by_id(message_id)).toBeDefined();
+        expect(conversation_et.get_message_by_id(messageId)).toBeDefined();
 
         TestFactory.conversation_repository
-          ._on_message_hidden(message_hidden_event)
+          ._onMessageHidden(messageHiddenEvent)
           .then(() => {
-            expect(TestFactory.conversation_repository._on_message_hidden).toHaveBeenCalled();
-            expect(conversation_et.get_message_by_id(message_id)).not.toBeDefined();
+            expect(TestFactory.conversation_repository._onMessageHidden).toHaveBeenCalled();
+            expect(conversation_et.get_message_by_id(messageId)).not.toBeDefined();
+            done();
+          })
+          .catch(done.fail);
+      });
+
+      it('should not hide message if not send via self conversation', done => {
+        const messageHiddenEvent = {
+          conversation: z.util.create_random_uuid(),
+          data: {
+            message_id: messageId,
+            conversation_id: conversation_et.id,
+          },
+          from: TestFactory.user_repository.self().id,
+          id: z.util.create_random_uuid(),
+          time: new Date().toISOString(),
+          type: z.event.Client.CONVERSATION.MESSAGE_HIDDEN,
+        };
+
+        expect(conversation_et.get_message_by_id(messageId)).toBeDefined();
+
+        TestFactory.conversation_repository
+          ._onMessageHidden(messageHiddenEvent)
+          .then(() => {
+            expect(TestFactory.conversation_repository._onMessageHidden).toHaveBeenCalled();
+            expect(conversation_et.get_message_by_id(messageId)).not.toBeDefined();
             done();
           })
           .catch(done.fail);

@@ -41,7 +41,7 @@ ko.components.register('availability-state', {
       <!-- /ko -->
       <!-- ko if: $data.availability() === z.user.AvailabilityType.AWAY -->
         <svg data-uie-name="away" class="availability-state-icon" viewBox="0 0 10 10" version="1.1" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="5" cy="5" r="4" stroke-width="1" fill="none"></circle>
+          <circle cx="5" cy="5" r="4" stroke-width="2" fill="none"></circle>
         </svg>
       <!-- /ko -->
       <!-- ko if: $data.availability() === z.user.AvailabilityType.BUSY -->

@@ -50,7 +50,7 @@ z.entity.Conversation = class Conversation {
     this.self = undefined;
 
     this.firstUserEt = ko.pureComputed(() => this.participating_user_ets()[0]);
-    this.firstUserAvailability = ko.pureComputed(() => this.firstUserEt() && this.firstUserEt().availability());
+    this.availabilityOfUser = ko.pureComputed(() => this.firstUserEt() && this.firstUserEt().availability());
 
     this.is_guest = ko.observable(false);
     this.is_managed = false;
@@ -394,19 +394,15 @@ z.entity.Conversation = class Conversation {
   getNumberOfClients() {
     const participantsMapped = this.participating_user_ids().length === this.participating_user_ets().length;
     if (participantsMapped) {
-      let usersWithoutKnownClients = 0;
-      const numberOfKnownClients = this.participating_user_ets().reduce(userEt => {
-        if (!userEt.devices().length) {
-          usersWithoutKnownClients = usersWithoutKnownClients + 1;
+      return this.participating_user_ets().reduce(userEt => {
+        if (userEt.devices().length) {
+          return userEt.devices().length;
         }
-        return userEt.devices().length;
+        return z.client.ClientRepository.CONFIG.AVERAGE_NUMBER_OF_CLIENTS;
       }, this.self.devices().length);
-
-      const estimatedUnknownClients = usersWithoutKnownClients * 4;
-      return numberOfKnownClients + estimatedUnknownClients;
     }
 
-    return this.get_number_of_participants() * 4;
+    return this.get_number_of_participants() * z.client.ClientRepository.CONFIG.AVERAGE_NUMBER_OF_CLIENTS;
   }
 
   /**

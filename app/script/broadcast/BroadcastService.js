@@ -42,7 +42,7 @@ z.broadcast.BroadcastService = class BroadcastService {
   /**
    * Post an encrypted message to broadcast it.
    *
-   * !!!!!!! @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/XXXXXXX
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/postOtrBroadcast
    *
    * @param {Object} payload - Payload to be posted
    * @param {Object} payload.recipients - Map with per-recipient data

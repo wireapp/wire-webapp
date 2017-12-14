@@ -1182,7 +1182,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           from: this.user_repository.self().id,
         };
 
-        this._on_member_update(conversation_et, response);
+        this._onMemberUpdate(conversation_et, response);
         this.logger.info(
           `Toggle silence to '${payload.otr_muted}' for conversation '${conversation_et.id}' on '${
             payload.otr_muted_ref
@@ -1256,7 +1256,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           from: this.user_repository.self().id,
         };
 
-        this._on_member_update(conversation_et, response);
+        this._onMemberUpdate(conversation_et, response);
         this.logger.info(
           `Update conversation '${conversation_et.id}' archive state to '${new_archive_state}' on '${
             payload.otr_archived_ref
@@ -2525,7 +2525,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE:
             return this._on_member_leave(conversation_et, event_json);
           case z.event.Backend.CONVERSATION.MEMBER_UPDATE:
-            return this._on_member_update(conversation_et, event_json);
+            return this._onMemberUpdate(conversation_et, event_json);
           case z.event.Backend.CONVERSATION.RENAME:
             return this._on_rename(conversation_et, event_json);
           case z.event.Client.CONVERSATION.ASSET_ADD:
@@ -2537,7 +2537,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           case z.event.Client.CONVERSATION.MESSAGE_DELETE:
             return this._on_message_deleted(conversation_et, event_json);
           case z.event.Client.CONVERSATION.MESSAGE_HIDDEN:
-            return this._on_message_hidden(event_json);
+            return this._onMessageHidden(event_json);
           case z.event.Client.CONVERSATION.REACTION:
             return this._on_reaction(conversation_et, event_json);
           default:
@@ -2818,33 +2818,39 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Membership properties for a conversation were updated.
    *
    * @private
-   * @param {Conversation} conversation_et - Conversation entity that will be updated
-   * @param {Object} event_json - JSON data of 'conversation.member-update' event
+   * @param {Conversation} conversationEt - Conversation entity that will be updated
+   * @param {Object} eventJson - JSON data of 'conversation.member-update' event
    * @returns {Promise} Resolves when the event was handled
    */
-  _on_member_update(conversation_et, event_json) {
-    console.log(event_json);
-    const isFromSelf = event_json.from === this.user_repository.self().id;
+  _onMemberUpdate(conversationEt, eventJson) {
+    const {conversation: conversationId, data: eventData, from} = eventJson;
+
+    const inSelfConversation = !this.self_conversation() || conversationId === this.self_conversation().id;
+    if (conversationId && !inSelfConversation) {
+      throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_CONVERSATION);
+    }
+
+    const isFromSelf = !this.user_repository.self() || from === this.user_repository.self().id;
     if (!isFromSelf) {
       throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_USER);
     }
 
-    const is_active_conversation = this.is_active_conversation(conversation_et);
-    const next_conversation_et = is_active_conversation ? this.get_next_conversation(conversation_et) : undefined;
-    const previously_archived = conversation_et.is_archived();
+    const isActiveConversation = this.is_active_conversation(conversationEt);
+    const nextConversationEt = isActiveConversation ? this.get_next_conversation(conversationEt) : undefined;
+    const previouslyArchived = conversationEt.is_archived();
 
-    this.conversation_mapper.update_self_status(conversation_et, event_json.data);
+    this.conversation_mapper.update_self_status(conversationEt, eventData);
 
-    if (previously_archived && !conversation_et.is_archived()) {
-      return this._fetch_users_and_events(conversation_et);
+    if (previouslyArchived && !conversationEt.is_archived()) {
+      return this._fetch_users_and_events(conversationEt);
     }
 
-    if (conversation_et.is_cleared()) {
-      this._clear_conversation(conversation_et, conversation_et.cleared_timestamp());
+    if (conversationEt.is_cleared()) {
+      this._clear_conversation(conversationEt, conversationEt.cleared_timestamp());
     }
 
-    if (is_active_conversation && (conversation_et.is_archived() || conversation_et.is_cleared())) {
-      amplify.publish(z.event.WebApp.CONVERSATION.SHOW, next_conversation_et);
+    if (isActiveConversation && (conversationEt.is_archived() || conversationEt.is_cleared())) {
+      amplify.publish(z.event.WebApp.CONVERSATION.SHOW, nextConversationEt);
     }
   }
 
@@ -2984,25 +2990,33 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * A hide message received in a conversation.
    *
    * @private
-   * @param {Object} event_json - JSON data of 'conversation.message-hidden'
+   * @param {Object} eventJson - JSON data of 'conversation.message-hidden'
    * @returns {Promise} Resolves when the event was handled
    */
-  _on_message_hidden(event_json) {
-    const {data: event_data, from} = event_json;
+  _onMessageHidden(eventJson) {
+    const {conversation: conversationId, data: eventData, from} = eventJson;
 
-    const is_from_self = from === this.user_repository.self().id;
-    if (!is_from_self) {
-      return Promise.reject(new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_USER));
-    }
+    return Promise.resolve()
+      .then(() => {
+        const inSelfConversation = !this.self_conversation() || conversationId === this.self_conversation().id;
+        if (!inSelfConversation) {
+          throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_CONVERSATION);
+        }
 
-    return this.get_conversation_by_id(event_data.conversation_id)
-      .then(conversation_et => {
-        amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, event_data.message_id);
-        return this._delete_message_by_id(conversation_et, event_data.message_id);
+        const isFromSelf = !this.user_repository.self() || from === this.user_repository.self().id;
+        if (!isFromSelf) {
+          throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_USER);
+        }
+
+        return this.get_conversation_by_id(eventData.conversation_id);
+      })
+      .then(conversationEt => {
+        amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, eventData.message_id);
+        return this._delete_message_by_id(conversationEt, eventData.message_id);
       })
       .catch(error => {
         this.logger.info(
-          `Failed to delete message '${event_data.message_id}' for conversation '${event_data.conversation_id}'`,
+          `Failed to delete message '${eventData.message_id}' for conversation '${eventData.conversation_id}'`,
           error
         );
         throw error;

@@ -88,7 +88,6 @@ z.event.WebApp = {
     ASSET: {
       CANCEL: 'wire.webapp.conversation.asset.cancel',
     },
-    CHANGE_STATUS: 'wire.app.conversation.change_status',
     DEBUG: 'wire.webapp.conversation.debug',
     DETAIL_VIEW: {
       SHOW: 'wire.webapp.conversation.detail_view.show',

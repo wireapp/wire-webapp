@@ -570,22 +570,8 @@ z.user.UserRepository = class UserRepository {
     if (hasAvailabilityChanged) {
       this.self().availability(availability);
 
-      const updatedAvailability = (() => {
-        switch (availability) {
-          case z.user.AvailabilityType.AVAILABLE:
-            return z.proto.Availability.Type.AVAILABLE;
-          case z.user.AvailabilityType.AWAY:
-            return z.proto.Availability.Type.AWAY;
-          case z.user.AvailabilityType.BUSY:
-            return z.proto.Availability.Type.BUSY;
-          case z.user.AvailabilityType.NONE:
-            return z.proto.Availability.Type.NONE;
-          default:
-        }
-      })();
-
       const genericMessage = new z.proto.GenericMessage(z.util.create_random_uuid());
-      const availabilityMessage = new z.proto.Availability(updatedAvailability);
+      const availabilityMessage = new z.proto.Availability(z.user.AvailbilityMapper(availability));
       genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.AVAILABILITY, availabilityMessage);
 
       amplify.publish(z.event.WebApp.BROADCAST.SEND_MESSAGE, genericMessage);

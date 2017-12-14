@@ -37,6 +37,20 @@ z.user.AvailbilityMapper = (() => {
     }
   };
 
+  const protoFromType = availabilityType => {
+    switch (availabilityType) {
+      case z.user.AvailabilityType.AVAILABLE:
+        return z.proto.Availability.Type.AVAILABLE;
+      case z.user.AvailabilityType.AWAY:
+        return z.proto.Availability.Type.AWAY;
+      case z.user.AvailabilityType.BUSY:
+        return z.proto.Availability.Type.BUSY;
+      case z.user.AvailabilityType.NONE:
+        return z.proto.Availability.Type.NONE;
+      default:
+    }
+  };
+
   const valueFromType = availabilityType => {
     switch (availabilityType) {
       case z.user.AvailabilityType.AVAILABLE:
@@ -53,6 +67,7 @@ z.user.AvailbilityMapper = (() => {
 
   return {
     nameFromType,
+    protoFromType,
     valueFromType,
   };
 })();

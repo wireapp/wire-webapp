@@ -25,7 +25,7 @@ window.z.broadcast = z.broadcast || {};
 // Broadcast repository for all broadcast interactions with the broadcast service
 z.broadcast.BroadcastRepository = class BroadcastRepository {
   /**
-   * Construct a new Conversation Repository.
+   * Construct a new Broadcast Repository.
    *
    * @param {BroadcastService} broadcastService - Backend REST API broadcast service implementation
    * @param {ClientRepository} clientRepository - Repository for client interactions
@@ -112,25 +112,26 @@ z.broadcast.BroadcastRepository = class BroadcastRepository {
       });
   }
 
+  _getNumberOfClients() {
+    return this.userRepository.team_users().reduce(userEt => {
+      if (userEt.devices().length) {
+        return userEt.devices().length;
+      }
+      return z.client.ClientRepository.CONFIG.AVERAGE_NUMBER_OF_CLIENTS;
+    }, this.userRepository.self().devices().length);
+  }
+
   /**
    * Estimate whether message should be send as type external.
    *
    * @private
-   * @param {string} conversationId - Conversation ID
    * @param {z.proto.GenericMessage} genericMessage - Generic message that will be send
    * @returns {boolean} Is payload likely to be too big so that we switch to type external?
    */
-  _shouldSendAsExternal(conversationId, genericMessage) {
-    let usersWithoutKnownClients = 0;
+  _shouldSendAsExternal(genericMessage) {
+    const messageInBytes = new Uint8Array(genericMessage.toArrayBuffer()).length;
+    const estimatedPayloadInBytes = this._getNumberOfClients() * messageInBytes;
 
-    const numberOfKnownClients = this.userRepository.team_users().reduce(userEt => {
-      if (!userEt.devices().length) {
-        usersWithoutKnownClients = usersWithoutKnownClients + 1;
-      }
-      return userEt.devices().length;
-    }, this.userRepository.self().devices().length);
-
-    const estimatedUnknownClients = usersWithoutKnownClients * 4;
-    return numberOfKnownClients + estimatedUnknownClients;
+    return estimatedPayloadInBytes > z.conversation.ConversationRepository.CONFIG.EXTERNAL_MESSAGE_THRESHOLD;
   }
 };
