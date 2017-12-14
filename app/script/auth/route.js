@@ -28,6 +28,7 @@ export default {
   INDEX: '/',
   INITIAL_INVITE: '/invite',
   LOGIN: '/login',
+  PERSONAL_INVITE: '/personalinvite',
   VERIFY: '/verify',
   WIRE_ROOT: onEnvironment(stagingWebsite, stagingWebsite, 'https://wire.com'),
 };
