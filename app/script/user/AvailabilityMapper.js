@@ -34,6 +34,7 @@ z.user.AvailbilityMapper = (() => {
       case z.user.AvailabilityType.NONE:
         return z.l10n.text(z.string.user_availability_none);
       default:
+        throw new z.user.UserError(z.user.UserError.TYPE.INVALID_UPDATE);
     }
   };
 
@@ -48,6 +49,7 @@ z.user.AvailbilityMapper = (() => {
       case z.user.AvailabilityType.NONE:
         return z.proto.Availability.Type.NONE;
       default:
+        throw new z.user.UserError(z.user.UserError.TYPE.INVALID_UPDATE);
     }
   };
 
@@ -62,6 +64,7 @@ z.user.AvailbilityMapper = (() => {
       case z.user.AvailabilityType.NONE:
         return 'none';
       default:
+        throw new z.user.UserError(z.user.UserError.TYPE.INVALID_UPDATE);
     }
   };
 
