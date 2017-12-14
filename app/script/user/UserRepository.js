@@ -571,7 +571,7 @@ z.user.UserRepository = class UserRepository {
       this.self().availability(availability);
 
       const genericMessage = new z.proto.GenericMessage(z.util.create_random_uuid());
-      const availabilityMessage = new z.proto.Availability(z.user.AvailbilityMapper(availability));
+      const availabilityMessage = new z.proto.Availability(z.user.AvailbilityMapper.protoFromType(availability));
       genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.AVAILABILITY, availabilityMessage);
 
       amplify.publish(z.event.WebApp.BROADCAST.SEND_MESSAGE, genericMessage);
