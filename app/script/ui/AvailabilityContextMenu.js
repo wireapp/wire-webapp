@@ -22,7 +22,7 @@
 window.z = window.z || {};
 window.z.ui = z.ui || {};
 
-z.ui.AvailibilityContextMenu = (() => {
+z.ui.AvailabilityContextMenu = (() => {
   const show = (event, method, elementName) => {
     const entries = [
       {

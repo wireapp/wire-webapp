@@ -133,21 +133,23 @@ z.user.UserRepository = class UserRepository {
           if (users.length) {
             this.logger.log(`Loaded state of '${users.length}' users from database`, users);
             return Promise.all(
-              users.map(user => this.get_user_by_id(user.id).then(userEt => userEt.availability(user.availability)))
+              users.map(user =>
+                this.get_user_by_id(user.id).then(userEntity => userEntity.availability(user.availability))
+              )
             );
           }
         })
-        .then(() => this.users().forEach(userEt => userEt.subscribeToChanges()));
+        .then(() => this.users().forEach(userEntity => userEntity.subscribeToChanges()));
     }
   }
 
   /**
    * Persists a conversation state in the database.
-   * @param {User} userEt - User which should be persisted
+   * @param {User} userEntity - User which should be persisted
    * @returns {Promise} Resolves when user was saved
    */
-  saveUserInDb(userEt) {
-    return this.user_service.saveUserInDb(userEt);
+  saveUserInDb(userEntity) {
+    return this.user_service.saveUserInDb(userEntity);
   }
 
   /**
@@ -205,7 +207,7 @@ z.user.UserRepository = class UserRepository {
   onUserAvailability(event) {
     if (this.is_team()) {
       const {from: userId, data: {availability}} = event;
-      this.get_user_by_id(userId).then(userEt => userEt.availability(availability));
+      this.get_user_by_id(userId).then(userEntity => userEntity.availability(availability));
     }
   }
 
@@ -572,7 +574,7 @@ z.user.UserRepository = class UserRepository {
       this.self().availability(availability);
 
       const genericMessage = new z.proto.GenericMessage(z.util.create_random_uuid());
-      const availabilityMessage = new z.proto.Availability(z.user.AvailbilityMapper.protoFromType(availability));
+      const availabilityMessage = new z.proto.Availability(z.user.AvailabilityMapper.protoFromType(availability));
       genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.AVAILABILITY, availabilityMessage);
 
       amplify.publish(z.event.WebApp.BROADCAST.SEND_MESSAGE, genericMessage);
@@ -590,7 +592,7 @@ z.user.UserRepository = class UserRepository {
   _trackAvailability(availability, method) {
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.CHANGED_STATUS, {
       method: method,
-      status: z.user.AvailbilityMapper.valueFromType(availability),
+      status: z.user.AvailabilityMapper.valueFromType(availability),
     });
   }
 

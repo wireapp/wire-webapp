@@ -128,7 +128,7 @@ describe('ClientMismatchHandler', () => {
         .catch(done.fail);
     });
 
-    xit('should remove the payload of deleted clients', done => {
+    it('should remove the payload of deleted clients', done => {
       clientMismatch = {
         deleted: {},
         missing: {

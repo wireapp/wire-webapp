@@ -22,7 +22,7 @@
 window.z = window.z || {};
 window.z.user = z.user || {};
 
-z.user.AvailbilityMapper = (() => {
+z.user.AvailabilityMapper = (() => {
   const nameFromType = availabilityType => {
     switch (availabilityType) {
       case z.user.AvailabilityType.AVAILABLE:

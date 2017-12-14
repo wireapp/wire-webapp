@@ -31,7 +31,6 @@ z.components.AvailabilityState = class AvailabilityState {
   }
 };
 
-// Knockout registration of the availability state component.
 ko.components.register('availability-state', {
   template: `
       <!-- ko if: $data.availability() === z.user.AvailabilityType.AVAILABLE -->

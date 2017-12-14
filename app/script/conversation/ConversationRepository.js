@@ -2155,9 +2155,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   _shouldSendAsExternal(conversationId, genericMessage) {
     return this.get_conversation_by_id(conversationId).then(conversationEt => {
-      const numberOfKnownClients = conversationEt.getNumberOfClients();
       const messageInBytes = new Uint8Array(genericMessage.toArrayBuffer()).length;
-      const estimatedPayloadInBytes = numberOfKnownClients * messageInBytes;
+      const estimatedPayloadInBytes = conversationEt.getNumberOfClients() * messageInBytes;
 
       return estimatedPayloadInBytes > ConversationRepository.CONFIG.EXTERNAL_MESSAGE_THRESHOLD;
     });
@@ -2818,11 +2817,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Membership properties for a conversation were updated.
    *
    * @private
-   * @param {Conversation} conversationEt - Conversation entity that will be updated
+   * @param {Conversation} conversationEntity - Conversation entity that will be updated
    * @param {Object} eventJson - JSON data of 'conversation.member-update' event
    * @returns {Promise} Resolves when the event was handled
    */
-  _onMemberUpdate(conversationEt, eventJson) {
+  _onMemberUpdate(conversationEntity, eventJson) {
     const {conversation: conversationId, data: eventData, from} = eventJson;
 
     const inSelfConversation = !this.self_conversation() || conversationId === this.self_conversation().id;
@@ -2835,21 +2834,21 @@ z.conversation.ConversationRepository = class ConversationRepository {
       throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_USER);
     }
 
-    const isActiveConversation = this.is_active_conversation(conversationEt);
-    const nextConversationEt = isActiveConversation ? this.get_next_conversation(conversationEt) : undefined;
-    const previouslyArchived = conversationEt.is_archived();
+    const isActiveConversation = this.is_active_conversation(conversationEntity);
+    const nextConversationEt = isActiveConversation ? this.get_next_conversation(conversationEntity) : undefined;
+    const previouslyArchived = conversationEntity.is_archived();
 
-    this.conversation_mapper.update_self_status(conversationEt, eventData);
+    this.conversation_mapper.update_self_status(conversationEntity, eventData);
 
-    if (previouslyArchived && !conversationEt.is_archived()) {
-      return this._fetch_users_and_events(conversationEt);
+    if (previouslyArchived && !conversationEntity.is_archived()) {
+      return this._fetch_users_and_events(conversationEntity);
     }
 
-    if (conversationEt.is_cleared()) {
-      this._clear_conversation(conversationEt, conversationEt.cleared_timestamp());
+    if (conversationEntity.is_cleared()) {
+      this._clear_conversation(conversationEntity, conversationEntity.cleared_timestamp());
     }
 
-    if (isActiveConversation && (conversationEt.is_archived() || conversationEt.is_cleared())) {
+    if (isActiveConversation && (conversationEntity.is_archived() || conversationEntity.is_cleared())) {
       amplify.publish(z.event.WebApp.CONVERSATION.SHOW, nextConversationEt);
     }
   }
@@ -3010,9 +3009,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         return this.get_conversation_by_id(eventData.conversation_id);
       })
-      .then(conversationEt => {
+      .then(conversationEntity => {
         amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, eventData.message_id);
-        return this._delete_message_by_id(conversationEt, eventData.message_id);
+        return this._delete_message_by_id(conversationEntity, eventData.message_id);
       })
       .catch(error => {
         this.logger.info(

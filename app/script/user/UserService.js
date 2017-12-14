@@ -58,17 +58,17 @@ z.user.UserService = class UserService {
 
   /**
    * Saves a user entity in the local database.
-   * @param {User} userEt - User entity
+   * @param {User} userEntity - User entity
    * @returns {Promise} Resolves with the conversation entity
    */
-  saveUserInDb(userEt) {
-    const userData = userEt.serialize();
+  saveUserInDb(userEntity) {
+    const userData = userEntity.serialize();
 
     return this.storageService
-      .save(z.storage.StorageService.OBJECT_STORE.USERS, userEt.id, userData)
+      .save(z.storage.StorageService.OBJECT_STORE.USERS, userEntity.id, userData)
       .then(primaryKey => {
         this.logger.info(`State of user '${primaryKey}' was stored`, userData);
-        return userEt;
+        return userEntity;
       });
   }
 

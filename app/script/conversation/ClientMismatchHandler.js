@@ -149,7 +149,7 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
           throw error;
         }
       })
-      .then(conversationEt => {
+      .then(conversationEntity => {
         const _removeRedundantClient = (userId, clientId) => {
           if (payload) {
             delete payload.recipients[userId][clientId];
@@ -157,8 +157,8 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
         };
 
         const _removeRedundantUser = userId => {
-          if (conversationEt && conversationEt.is_group()) {
-            conversationEt.participating_user_ids.remove(userId);
+          if (conversationEntity && conversationEntity.is_group()) {
+            conversationEntity.participating_user_ids.remove(userId);
           }
 
           if (payload && !Object.keys(payload.recipients[userId]).length) {
@@ -167,8 +167,8 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
         };
 
         return Promise.all(this._mapRecipients(recipients, _removeRedundantClient, _removeRedundantUser)).then(() => {
-          if (conversationEt) {
-            this.conversationRepository.update_participating_user_ets(conversationEt);
+          if (conversationEntity) {
+            this.conversationRepository.update_participating_user_ets(conversationEntity);
           }
 
           return payload;

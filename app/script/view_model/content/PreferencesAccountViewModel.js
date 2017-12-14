@@ -45,7 +45,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.availability = ko.pureComputed(() => this.self_user().availability());
 
     this.availabilityLabel = ko.pureComputed(() => {
-      let label = z.user.AvailbilityMapper.nameFromType(this.availability());
+      let label = z.user.AvailabilityMapper.nameFromType(this.availability());
 
       const noStatusSet = this.availability() === z.user.AvailabilityType.NONE;
       if (noStatusSet) {
@@ -131,7 +131,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   clickOnAvailability(viewModel, event) {
-    z.ui.AvailibilityContextMenu.show(event, 'settings', 'preferences-account-availability-menu');
+    z.ui.AvailabilityContextMenu.show(event, 'settings', 'preferences-account-availability-menu');
   }
 
   click_on_username() {

@@ -224,7 +224,7 @@ describe('z.cryptography.CryptographyMapper', () => {
         .catch(done.fail);
     });
 
-    it('resolves with a mapped availabilitymessage', done => {
+    it('resolves with a mapped availability message', done => {
       const availability = new z.proto.Availability(z.proto.Availability.Type.AVAILABLE);
 
       const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());

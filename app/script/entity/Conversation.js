@@ -49,8 +49,8 @@ z.entity.Conversation = class Conversation {
     this.participating_user_ids = ko.observableArray([]);
     this.self = undefined;
 
-    this.firstUserEt = ko.pureComputed(() => this.participating_user_ets()[0]);
-    this.availabilityOfUser = ko.pureComputed(() => this.firstUserEt() && this.firstUserEt().availability());
+    this.firstUserEntity = ko.pureComputed(() => this.participating_user_ets()[0]);
+    this.availabilityOfUser = ko.pureComputed(() => this.firstUserEntity() && this.firstUserEntity().availability());
 
     this.is_guest = ko.observable(false);
     this.is_managed = false;
@@ -394,9 +394,9 @@ z.entity.Conversation = class Conversation {
   getNumberOfClients() {
     const participantsMapped = this.participating_user_ids().length === this.participating_user_ets().length;
     if (participantsMapped) {
-      return this.participating_user_ets().reduce(userEt => {
-        if (userEt.devices().length) {
-          return userEt.devices().length;
+      return this.participating_user_ets().reduce(userEntity => {
+        if (userEntity.devices().length) {
+          return userEntity.devices().length;
         }
         return z.client.ClientRepository.CONFIG.AVERAGE_NUMBER_OF_CLIENTS;
       }, this.self.devices().length);
@@ -488,7 +488,7 @@ z.entity.Conversation = class Conversation {
     message_et.user_ets(this.participating_user_ets().slice(0));
 
     if ([z.conversation.ConversationType.CONNECT, z.conversation.ConversationType.ONE2ONE].includes(this.type())) {
-      if (this.firstUserEt() && this.firstUserEt().is_outgoing_request()) {
+      if (this.firstUserEntity() && this.firstUserEntity().is_outgoing_request()) {
         message_et.member_message_type = z.message.SystemMessageType.CONNECTION_REQUEST;
       } else {
         message_et.member_message_type = z.message.SystemMessageType.CONNECTION_ACCEPTED;
@@ -667,11 +667,11 @@ z.entity.Conversation = class Conversation {
       return false;
     }
 
-    if (!(this.firstUserEt() && this.firstUserEt().username())) {
+    if (!(this.firstUserEntity() && this.firstUserEntity().username())) {
       return false;
     }
 
-    return ['annathebot', 'ottothebot'].includes(this.firstUserEt() && this.firstUserEt().username());
+    return ['annathebot', 'ottothebot'].includes(this.firstUserEntity() && this.firstUserEntity().username());
   }
 
   serialize() {
