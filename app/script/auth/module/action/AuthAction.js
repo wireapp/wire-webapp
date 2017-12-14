@@ -19,7 +19,7 @@
 
 import BackendError from './BackendError';
 import * as AuthActionCreator from './creator/AuthActionCreator';
-import {getLocale} from '../../localeConfig';
+import {currentLanguage} from '../../localeConfig';
 
 export function doLogin(login) {
   return function(dispatch, getState, {apiClient}) {
@@ -51,7 +51,7 @@ export function pushAccountRegistrationData(registration) {
 
 export function doRegisterTeam(registration) {
   return function(dispatch, getState, {apiClient}) {
-    registration.locale = getLocale();
+    registration.locale = currentLanguage();
     registration.team.icon = 'default';
     registration.team.binding = true;
     registration.name = registration.name.trim();
@@ -80,7 +80,7 @@ export function doRegisterTeam(registration) {
 
 export function doRegisterPersonal(registration) {
   return function(dispatch, getState, {apiClient}) {
-    registration.locale = getLocale();
+    registration.locale = currentLanguage();
     registration.name = registration.name.trim();
     registration.email = registration.email.trim();
     dispatch(
