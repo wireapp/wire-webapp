@@ -22,8 +22,8 @@ import * as UserActionCreator from './creator/UserActionCreator';
 import {mockStore} from '../../util/TestUtil';
 
 describe('UserAction', () => {
-  describe('when doing something', () => {
-    it('shows success', done => {
+  describe('when activating an account', () => {
+    it('triggers an action', done => {
       const code = 'code';
       const key = 'key';
 

@@ -63,7 +63,7 @@ describe('when entering a team name', () => {
     doNextButton = wrapper.find('[data-uie-name="do-next"]').first();
   });
 
-  it(`doesn\'t show a next button if too few characters are entered`, () => {
+  it('does not show a next button if too few characters are entered', () => {
     expect(teamNameInput.props().required).toBe(true);
     expect(doNextButton.props().disabled).toBe(true);
   });

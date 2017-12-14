@@ -21,34 +21,36 @@ import React from 'react';
 import {mockStore, mountWithStore} from '../util/TestUtil';
 import Root from './Root';
 
-describe('when opening the main path', () => {
-  let store;
-  let wrapper;
+describe('Root', () => {
+  describe('when opening the main path', () => {
+    let store;
+    let wrapper;
 
-  beforeEach(() => {
-    const state = {
-      languageState: {
-        language: 'en',
-      },
-    };
+    beforeEach(() => {
+      const state = {
+        languageState: {
+          language: 'en',
+        },
+      };
 
-    store = mockStore(state, {mixpanel: {track: () => 1}});
-    wrapper = mountWithStore(<Root />, store);
-  });
+      store = mockStore(state, {mixpanel: {track: () => 1}});
+      wrapper = mountWithStore(<Root />, store);
+    });
 
-  it('shows the Wire logo', () => {
-    expect(wrapper.find('[data-uie-name="ui-wire-logo"]').exists()).toBe(true);
-  });
+    it('shows the Wire logo', () => {
+      expect(wrapper.find('[data-uie-name="ui-wire-logo"]').exists()).toBe(true);
+    });
 
-  it('shows an option to create a private account', () => {
-    expect(wrapper.find('[data-uie-name="go-register-personal"]').exists()).toBe(true);
-  });
+    it('shows an option to create a private account', () => {
+      expect(wrapper.find('[data-uie-name="go-register-personal"]').exists()).toBe(true);
+    });
 
-  it('shows an option to create a team', () => {
-    expect(wrapper.find('[data-uie-name="go-register-team"]').exists()).toBe(true);
-  });
+    it('shows an option to create a team', () => {
+      expect(wrapper.find('[data-uie-name="go-register-team"]').exists()).toBe(true);
+    });
 
-  it('shows an option to login', () => {
-    expect(wrapper.find('[data-uie-name="go-login"]').exists()).toBe(true);
+    it('shows an option to login', () => {
+      expect(wrapper.find('[data-uie-name="go-login"]').exists()).toBe(true);
+    });
   });
 });
