@@ -4,7 +4,7 @@ export const SUPPORTED_LANGUAGE = require('./supportedLocales');
 
 export const DEFAULT_LANGUAGE = 'en';
 
-export function getLocale() {
+function getLocale() {
   return navigator.languages && navigator.languages.length ? navigator.languages[0] : navigator.language;
 }
 
