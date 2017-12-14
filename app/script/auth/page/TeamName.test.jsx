@@ -18,12 +18,15 @@
  */
 
 import React from 'react';
-import {mockStore, mountWithIntl, mountWithStore} from '../util/TestUtil';
+import {mockStore, mountWithIntl} from '../util/TestUtil';
 import TeamName from './TeamName';
 
 describe('when entering a team name', () => {
   let store;
   let wrapper;
+
+  let doNextButton;
+  let teamNameInput;
 
   beforeEach(() => {
     const state = {
@@ -53,24 +56,24 @@ describe('when entering a team name', () => {
       },
     };
 
-    store = mockStore(state, {mixpanel: {track: () => 1}});
+    store = mockStore(state);
     wrapper = mountWithIntl(<TeamName />, store);
+
+    teamNameInput = wrapper.find('[data-uie-name="enter-team-name"]').first();
+    doNextButton = wrapper.find('[data-uie-name="do-next"]').first();
   });
 
   it(`doesn\'t show a next button if too few characters are entered`, () => {
-    const teamNameInput = wrapper.find('[data-uie-name="enter-team-name"]').first();
-    const doNextButton = wrapper.find('[data-uie-name="do-next"]').first();
     expect(teamNameInput.props().required).toBe(true);
     expect(doNextButton.props().disabled).toBe(true);
   });
 
-  it('shows a next button when the minimum amount of characters is entered', () => {
-    wrapper.setState({
-      enteredTeamName: 'Wire',
-      isValidTeamName: true,
-    });
-
-    const doNextButton = wrapper.find('[data-uie-name="do-next"]').first();
+  it('shows a next button when the minimum amount of characters is entered', done => {
+    const teamName = 'Mariachi Band';
+    expect(doNextButton.props().disabled).toBe(true);
+    teamNameInput.simulate('change', {target: {value: teamName}});
+    doNextButton = wrapper.find('[data-uie-name="do-next"]').first();
     expect(doNextButton.props().disabled).toBe(false);
+    done();
   });
 });
