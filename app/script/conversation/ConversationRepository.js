@@ -1179,6 +1179,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(() => {
         const response = {
           data: payload,
+          from: this.user_repository.self().id,
         };
 
         this._on_member_update(conversation_et, response);
@@ -1190,7 +1191,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return response;
       })
       .catch(error => {
-        const reject_error = new Error(`Conversation '${conversation_et.id}' could not be muted: ${error.code}`);
+        const reject_error = new Error(`Conversation '${conversation_et.id}' could not be muted: ${error.message}`);
         this.logger.warn(reject_error.message, error);
         throw reject_error;
       });
@@ -1250,7 +1251,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
       })
       .then(() => {
-        this._on_member_update(conversation_et, {data: payload, from: this.user_repository.self().id});
+        const response = {
+          data: payload,
+          from: this.user_repository.self().id,
+        };
+
+        this._on_member_update(conversation_et, response);
         this.logger.info(
           `Update conversation '${conversation_et.id}' archive state to '${new_archive_state}' on '${
             payload.otr_archived_ref
