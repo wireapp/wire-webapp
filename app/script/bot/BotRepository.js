@@ -23,9 +23,9 @@ window.z = window.z || {};
 window.z.bot = z.bot || {};
 
 z.bot.BotRepository = class BotRepository {
-  constructor(conversation_repository) {
+  constructor(conversationRepository) {
     this.logger = new z.util.Logger('z.bot.BotRepository', z.config.LOGGER.OPTIONS);
-    this.conversation_repository = conversation_repository;
+    this.conversationRepository = conversationRepository;
   }
 
   /**
@@ -34,20 +34,20 @@ z.bot.BotRepository = class BotRepository {
    * @option {string} botName - Bot name registered on backend (will be used as conversation name)
    * @option {string} botProvider - Provider UUID
    * @option {string} botService - Service UUID
-   * @param {boolean} [create_conversation=true] - A new conversation is created if true otherwise bot is added to active conversation
+   * @param {boolean} [createConversation=true] - A new conversation is created if true otherwise bot is added to active conversation
    * @returns {Promise} Resolves when bot was added to conversation
    */
-  add_bot({botName, botProvider, botService}, create_conversation = true) {
+  add_bot({botName, botProvider, botService}, createConversation = true) {
     this.logger.info(`Info for bot '${botName}' retrieved.`, {botName, botProvider, botService});
     return Promise.resolve()
       .then(() => {
-        if (create_conversation) {
-          return this.conversation_repository.create_new_conversation([], botName);
+        if (createConversation) {
+          return this.conversationRepository.create_new_conversation([], botName);
         }
-        return {conversation_et: this.conversation_repository.active_conversation()};
+        return {conversation_et: this.conversationRepository.active_conversation()};
       })
       .then(({conversation_et}) => {
-        this.conversation_repository.add_bot(conversation_et, botProvider, botService);
+        this.conversationRepository.add_bot(conversation_et, botProvider, botService);
         amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversation_et);
       })
       .catch(error => {

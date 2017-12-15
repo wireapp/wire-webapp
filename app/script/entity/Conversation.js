@@ -49,6 +49,9 @@ z.entity.Conversation = class Conversation {
     this.participating_user_ids = ko.observableArray([]);
     this.self = undefined;
 
+    this.firstUserEntity = ko.pureComputed(() => this.participating_user_ets()[0]);
+    this.availabilityOfUser = ko.pureComputed(() => this.firstUserEntity() && this.firstUserEntity().availability());
+
     this.is_guest = ko.observable(false);
     this.is_managed = false;
 
@@ -388,6 +391,20 @@ z.entity.Conversation = class Conversation {
     return this.participating_user_ids().length + (this.removed_from_conversation() ? 0 : 1);
   }
 
+  getNumberOfClients() {
+    const participantsMapped = this.participating_user_ids().length === this.participating_user_ets().length;
+    if (participantsMapped) {
+      return this.participating_user_ets().reduce((accumulator, userEntity) => {
+        if (userEntity.devices().length) {
+          return accumulator + userEntity.devices().length;
+        }
+        return accumulator + z.client.ClientRepository.CONFIG.AVERAGE_NUMBER_OF_CLIENTS;
+      }, this.self.devices().length);
+    }
+
+    return this.get_number_of_participants() * z.client.ClientRepository.CONFIG.AVERAGE_NUMBER_OF_CLIENTS;
+  }
+
   /**
    * Prepends messages with new batch of messages.
    * @param {Array<z.entity.Message>} message_ets - Array of messages to be added to conversation
@@ -471,7 +488,7 @@ z.entity.Conversation = class Conversation {
     message_et.user_ets(this.participating_user_ets().slice(0));
 
     if ([z.conversation.ConversationType.CONNECT, z.conversation.ConversationType.ONE2ONE].includes(this.type())) {
-      if (this.participating_user_ets()[0].is_outgoing_request()) {
+      if (this.firstUserEntity() && this.firstUserEntity().is_outgoing_request()) {
         message_et.member_message_type = z.message.SystemMessageType.CONNECTION_REQUEST;
       } else {
         message_et.member_message_type = z.message.SystemMessageType.CONNECTION_ACCEPTED;
@@ -650,11 +667,11 @@ z.entity.Conversation = class Conversation {
       return false;
     }
 
-    if (!(this.participating_user_ets()[0] && this.participating_user_ets()[0].username())) {
+    if (!(this.firstUserEntity() && this.firstUserEntity().username())) {
       return false;
     }
 
-    return ['annathebot', 'ottothebot'].includes(this.participating_user_ets()[0].username());
+    return ['annathebot', 'ottothebot'].includes(this.firstUserEntity() && this.firstUserEntity().username());
   }
 
   serialize() {

@@ -17,26 +17,34 @@
  *
  */
 
-'use strict';
+availability-state {
+  display: flex;
+  align-items: center;
 
-window.z = window.z || {};
-window.z.cryptography = z.cryptography || {};
+  .availability-state-arrow {
+    display: inline-block;
+    .square(16px);
+    margin-left: 4px;
+    padding-bottom: 4px;
 
-z.cryptography.GENERIC_MESSAGE_TYPE = {
-  ASSET: 'asset',
-  AVAILABILITY: 'availability',
-  CALLING: 'calling',
-  CLEARED: 'cleared',
-  CLIENT_ACTION: 'clientAction',
-  CONFIRMATION: 'confirmation',
-  DELETED: 'deleted',
-  EDITED: 'edited',
-  EPHEMERAL: 'ephemeral',
-  HIDDEN: 'hidden',
-  IMAGE: 'image',
-  KNOCK: 'knock',
-  LAST_READ: 'lastRead',
-  LOCATION: 'location',
-  REACTION: 'reaction',
-  TEXT: 'text',
-};
+    &::before {
+      content: '';
+      width: 0;
+      height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 4px solid currentColor;
+    }
+  }
+
+  .availability-state-icon {
+    .square(10px);
+    margin-right: 6px;
+    fill: currentColor;
+    stroke: currentColor;
+  }
+
+  .availability-state-label {
+    .ellipsis-nowrap();
+  }
+}

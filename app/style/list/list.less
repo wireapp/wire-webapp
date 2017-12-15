@@ -52,6 +52,18 @@
   position: relative;
 }
 
+.left-list-header-availability {
+  align-items: flex-end;
+  cursor: pointer;
+
+  .availability-state-label {
+    .label-bold-xs();
+    height: 12px;
+    display: inline-block;
+    max-width: @left-width - 58px;
+  }
+}
+
 .left-list-header-text {
   .ellipsis-nowrap();
   .label-bold-xs();
