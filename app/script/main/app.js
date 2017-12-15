@@ -679,7 +679,7 @@ z.main.App = class App {
         });
 
         const keep_conversation_input = sign_out_reason === z.auth.SIGN_OUT_REASON.SESSION_EXPIRED;
-        this.repository.cache.clear_cache(keep_conversation_input, do_not_delete);
+        this.repository.cache.clearCache(keep_conversation_input, do_not_delete);
       }
 
       // Clear IndexedDB
