@@ -31,6 +31,7 @@ const Button = Text.withComponent('button').extend`
   cursor: ${props => (props.disabled ? 'default' : 'pointer')};
   display: inline-block;
   text-decoration: none;
+  margin-bottom: 16px;
   ${defaultTransition}
 
   /* positioning */
