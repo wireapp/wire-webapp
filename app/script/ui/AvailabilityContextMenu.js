@@ -26,6 +26,11 @@ z.ui.AvailabilityContextMenu = (() => {
   const show = (event, method, elementName) => {
     const entries = [
       {
+        click: () => amplify.publish(z.event.WebApp.USER.CHANGE_AVAILABILITY, z.user.AvailabilityType.NONE, method),
+        label: z.l10n.text(z.string.user_availability_none),
+        title: z.l10n.text(z.string.user_availability_none),
+      },
+      {
         click: () => {
           amplify.publish(z.event.WebApp.USER.CHANGE_AVAILABILITY, z.user.AvailabilityType.AVAILABLE, method);
         },
@@ -41,11 +46,6 @@ z.ui.AvailabilityContextMenu = (() => {
         click: () => amplify.publish(z.event.WebApp.USER.CHANGE_AVAILABILITY, z.user.AvailabilityType.AWAY, method),
         label: z.l10n.text(z.string.user_availability_away),
         title: z.l10n.text(z.string.user_availability_away),
-      },
-      {
-        click: () => amplify.publish(z.event.WebApp.USER.CHANGE_AVAILABILITY, z.user.AvailabilityType.NONE, method),
-        label: z.l10n.text(z.string.user_availability_none),
-        title: z.l10n.text(z.string.user_availability_none),
       },
     ];
 
