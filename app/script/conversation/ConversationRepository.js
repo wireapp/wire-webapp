@@ -2063,7 +2063,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.conversation_service
       .post_encrypted_message(conversationId, payload, preconditionOption)
       .then(response => {
-        this.clientMismatchHandler.onClientMismatch(conversationId, response);
+        this.clientMismatchHandler.onClientMismatch(response, conversationId);
         return response;
       })
       .catch(error => {
@@ -2077,7 +2077,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         let updatedPayload;
         return this.clientMismatchHandler
-          .onClientMismatch(conversationId, error, genericMessage, payload)
+          .onClientMismatch(error, conversationId, genericMessage, payload)
           .then(payloadWithMissingClients => {
             updatedPayload = payloadWithMissingClients;
             return this._grantOutgoingMessage(conversationId, genericMessage, Object.keys(error.missing));
