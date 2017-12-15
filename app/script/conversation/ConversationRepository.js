@@ -2826,8 +2826,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const {conversation: conversationId, data: eventData, from} = eventJson;
 
     const inSelfConversation = !this.self_conversation() || conversationId === this.self_conversation().id;
-    const isBackendEvent = eventData.otr_archived_ref || eventData.otr_muted_ref;
-    if (!inSelfConversation && conversationId && !isBackendEvent) {
+    const isConversationEvent = eventData.cleared_timestamp || eventData.otr_archived_ref || eventData.otr_muted_ref;
+    if (!inSelfConversation && conversationId && !isConversationEvent) {
       throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_CONVERSATION);
     }
 
