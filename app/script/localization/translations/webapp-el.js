@@ -29,18 +29,13 @@ z.string.el.alert_upload_too_large = 'Αυτή η εικόνα είναι πολ
 z.string.el.alert_gif_too_large = 'Η κινούμενη εικόνα είναι πολύ μεγάλη.\nΤο μέγιστο μέγεθος είναι {{number}} MB.';
 
 z.string.el.auth_account_country_code = 'Κωδικός Χώρας';
-z.string.el.auth_account_create = 'Δημιουργία';
-z.string.el.auth_account_create_account = 'Δημιουργήστε ένα λογαριασμό';
 z.string.el.auth_account_deletion = 'Αποσυνδεθήκατε, επειδή ο λογαριασμός έχει διαγραφεί.';
 z.string.el.auth_account_expiration = 'Αποσυνδεθήκατε διότι η περίοδος λειτουργίας σας έληξε. Παρακαλούμε συνδεθείτε ξανά.';
-z.string.el.auth_account_get_wire = 'Απλός, ιδιωτικός και ασφαλές messenger για συνομιλίες, κλήσεις, ανταλλαγής φωτογραφιών, βίντεο, GIF και άλλα.';
 z.string.el.auth_account_password_forgot = 'Ξέχασα τον κωδικό πρόσβασης';
 z.string.el.auth_account_public_computer = 'Αυτός είναι ένας δημόσιος υπολογιστής';
 z.string.el.auth_account_sign_in = 'Σύνδεση';
 z.string.el.auth_account_sign_in_email = 'Email';
 z.string.el.auth_account_sign_in_phone = 'Τηλεφωνο';
-z.string.el.auth_account_terms_of_use = 'Όροι Χρήσης';
-z.string.el.auth_account_terms_of_use_detail = 'Αποδέχομαι';
 
 z.string.el.auth_blocked_cookies = 'Ενεργοποιήστε τα cookies για να συνδεθείτε στο Wire.';
 z.string.el.auth_blocked_database = 'Το Wire χρειάζεται πρόσβαση σε τοπικό αποθηκευτικό χώρο για την προβολή των μηνυμάτων σας. Η τοπική αποθήκευση δεν είναι διαθέσιμη σε ιδιωτική λειτουργία.';
@@ -69,23 +64,12 @@ z.string.el.auth_history_reuse_headline = 'Έχετε χρησιμοποιήσε
 z.string.el.auth_history_reuse_description = 'Τα μηνύματα που αποστέλλονται  την ίδια στιγμή δεν θα εμφανίζονται εδώ.';
 z.string.el.auth_history_button = 'Εντάξει';
 
-z.string.el.auth_posted_change_email = 'Αλλαγή διεύθυνσης ηλεκτρονικού ταχυδρομείου';
-z.string.el.auth_posted_offline_detail = 'Ελέγξτε τη σύνδεσή σας στο internet και προσπαθήστε ξανά.';
-z.string.el.auth_posted_offline_headline = 'Το Wire είναι καλύτερο online.';
-z.string.el.auth_posted_pending_detail = 'Ελέγξτε τα εισερχόμενα email σας ή επαναλάβετε την αποστολή ενεργοποίησης.';
-z.string.el.auth_posted_pending_headline = 'Ο λογαριασμός βρίσκεται ήδη σε αναμονή';
 z.string.el.auth_posted_resend = 'Επαναποστολή σε {{email}}';
 z.string.el.auth_posted_resend_action = 'Δεν εμφανίζεται το email;';
 z.string.el.auth_posted_resend_detail = 'Ελέγξτε τα email σας και ακολουθήστε τις οδηγίες που θα βρείτε.';
 z.string.el.auth_posted_resend_headline = 'Έχετε μήνυμα.';
-z.string.el.auth_posted_retry = 'Προσπάθεια ξανά και αποστολή μηνύματος στο {{email}}';
-z.string.el.auth_posted_retry_action = 'Δοκιμή ξανά;';
-z.string.el.auth_posted_retry_detail = 'Παρακαλούμε δοκιμάστε ξανά.';
-z.string.el.auth_posted_retry_headline = 'Κάτι πήγε στραβά';
-z.string.el.auth_posted_verify_later = 'Επιβεβαιώστε αργότερα';
 
 z.string.el.auth_placeholder_email = 'Email';
-z.string.el.auth_placeholder_name = 'Όνομα';
 z.string.el.auth_placeholder_password_put = 'Κωδικός Πρόσβασης';
 z.string.el.auth_placeholder_password_set = 'Κωδικος προσβασης (το λιγοτερο 8 χαρακτηρες)';
 z.string.el.auth_placeholder_phone = 'Αριθμός Κινητού Τηλεφώνου';
@@ -105,6 +89,7 @@ z.string.el.auth_error_phone_number_budget = 'Έχετε συνδεθεί πολ
 z.string.el.auth_error_phone_number_forbidden = 'Λυπούμαστε. Αυτός ο αριθμός τηλεφώνου δεν είναι επιτρεπτός.';
 z.string.el.auth_error_phone_number_invalid = 'Μη έγκυρος αριθμός τηλεφώνου';
 z.string.el.auth_error_phone_number_unknown = 'Άγνωστος αριθμός τηλεφώνου';
+z.string.el.auth_error_suspended = 'Αυτός ο λογαριασμός δεν είναι πλέον εξουσιοδοτημένος για σύνδεση.';
 z.string.el.auth_error_sign_in = 'Παρακαλούμε επιβεβαιώστε τα στοιχεία σας και προσπαθήστε ξανά.';
 
 z.string.el.call_state_outgoing = 'Καλεί…';
@@ -123,6 +108,7 @@ z.string.el.modal_button_send = 'Αποστολή';
 z.string.el.modal_block_conversation_headline = 'Αποκλεισμός {{user}};';
 z.string.el.modal_block_conversation_message = '{{user}} δεν θα μπορέσει να επικοινωνήσει μαζί σας ή να σας προσθέσει σε ομαδικές συνομιλίες.';
 z.string.el.modal_block_conversation_button = 'Αποκλεισμός';
+z.string.el.modal_bots_unavailable_headline = 'Προσωρινά δεν είναι διαθέσιμο';
 z.string.el.modal_call_conversation_empty_headline = 'Κανένας για κλήση';
 z.string.el.modal_call_conversation_empty_message = 'Δεν υπάρχει κανένας εδώ.';
 z.string.el.modal_call_no_video_in_group_headline = 'Καμία βιντεοκλήση σε ομάδες';
@@ -171,6 +157,8 @@ z.string.el.modal_new_device_call_incoming = 'Είστε σίγουρος ότι
 z.string.el.modal_new_device_call_outgoing = 'Είστε σίγουρος ότι θέλετε να πραγματοποιήσετε την κλήση;';
 z.string.el.modal_new_device_show_device = 'Εμφάνιση συσκευών';
 z.string.el.modal_new_device_send_anyway = 'αποστολή οπωσδήποτε';
+z.string.el.modal_not_connected_message_one = '{{name}} δεν επιθυμεί να προστεθεί στις συνομιλίες.';
+z.string.el.modal_not_connected_message_many = 'Ένα από τα άτομα που επιλέξατε δεν επιθυμεί να προστεθεί στις συνομιλίες.';
 z.string.el.modal_remove_device_button = 'Αφαίρεση συσκευής';
 z.string.el.modal_remove_device_headline = 'Αφαίρεση "{{device}}"';
 z.string.el.modal_remove_device_message = 'Απαιτείται ο κωδικός πρόσβασης σας για να αφαιρέσετε την συσκευή.';
@@ -392,8 +380,10 @@ z.string.el.preferences_about_terms_of_use = 'Όροι Χρήσης';
 z.string.el.preferences_about_version = 'Έκδοση {{version}}';
 z.string.el.preferences_about_website = 'Η Ιστοσελίδα του Wire';
 
+z.string.el.preferences_account_create_team = 'Δημιουργία ομάδος';
 z.string.el.preferences_account_delete = 'Διαγραφή λογαριασμού';
 z.string.el.preferences_account_log_out = 'Αποσύνδεση';
+z.string.el.preferences_account_manage_team = 'Διαχείριση ομάδων';
 z.string.el.preferences_account_reset_password = 'Επαναφορά κωδικού πρόσβασης';
 z.string.el.preferences_account_team = 'στο {{name}}';
 z.string.el.preferences_account_username_placeholder = 'Ονοματεπώνυμο';
@@ -549,6 +539,7 @@ z.string.el.tooltip_search_close = 'Κλείσιμο (Esc)';
 
 z.string.el.init_received_self_user = 'Γεια σου, {{user}}.';
 z.string.el.init_received_user_data = 'Ελέγξτε για νέα μηνύματα';
+z.string.el.init_events = 'Φόρτωση μηνυμάτων';
 
 z.string.el.ephememal_units_none = 'Ανενεργό';
 z.string.el.ephememal_units_second = 'δευτερόλεπτο';

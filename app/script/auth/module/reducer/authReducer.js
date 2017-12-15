@@ -19,6 +19,7 @@
 
 import * as AuthActionCreator from '../action/creator/AuthActionCreator';
 import * as UserActionCreator from '../action/creator/UserActionCreator';
+import {REGISTER_FLOW} from '../selector/AuthSelector';
 
 export const initialState = {
   account: {
@@ -35,6 +36,7 @@ export const initialState = {
     phone_code: undefined,
     team: undefined,
   },
+  currentFlow: null,
   error: null,
   fetched: false,
   fetching: false,
@@ -46,7 +48,8 @@ export default function reducer(state = initialState, action) {
     case AuthActionCreator.LOGIN_START:
     case AuthActionCreator.REGISTER_JOIN_START:
     case AuthActionCreator.REGISTER_PERSONAL_START:
-    case AuthActionCreator.REGISTER_TEAM_START: {
+    case AuthActionCreator.REGISTER_TEAM_START:
+    case UserActionCreator.USER_SEND_ACTIVATION_CODE_START: {
       return {
         ...state,
         error: null,
@@ -114,6 +117,18 @@ export default function reducer(state = initialState, action) {
     }
     case AuthActionCreator.AUTH_RESET_ERROR: {
       return {...state, error: null};
+    }
+    case AuthActionCreator.ENTER_TEAM_CREATION_FLOW: {
+      return {...state, currentFlow: REGISTER_FLOW.TEAM};
+    }
+    case AuthActionCreator.ENTER_PERSONAL_CREATION_FLOW: {
+      return {...state, currentFlow: REGISTER_FLOW.PERSONAL};
+    }
+    case UserActionCreator.USER_SEND_ACTIVATION_CODE_SUCCESS: {
+      return {
+        ...state,
+        fetching: false,
+      };
     }
     default: {
       return state;

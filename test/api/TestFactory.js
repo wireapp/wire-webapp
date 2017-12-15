@@ -253,15 +253,15 @@ window.TestFactory.prototype.exposeConnectActors = function() {
     .then(() => {
       this.logger.info('✓ exposedUserActors');
 
-      TestFactory.connect_service = new z.connect.ConnectService(this.client);
-      TestFactory.connect_service.logger.level = this.settings.logging_level;
+      TestFactory.connectService = new z.connect.ConnectService(this.client);
+      TestFactory.connectService.logger.level = this.settings.logging_level;
 
-      TestFactory.connect_google_service = new z.connect.ConnectGoogleService(this.client);
-      TestFactory.connect_google_service.logger.level = this.settings.logging_level;
+      TestFactory.connectGoogleService = new z.connect.ConnectGoogleService(this.client);
+      TestFactory.connectGoogleService.logger.level = this.settings.logging_level;
 
       TestFactory.connect_repository = new z.connect.ConnectRepository(
-        TestFactory.connect_service,
-        TestFactory.connect_google_service,
+        TestFactory.connectService,
+        TestFactory.connectGoogleService,
         TestFactory.user_repository
       );
       TestFactory.connect_repository.logger.level = this.settings.logging_level;

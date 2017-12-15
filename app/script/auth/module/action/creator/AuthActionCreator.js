@@ -49,6 +49,9 @@ export const REFRESH_FAILED = 'REFRESH_FAILED';
 
 export const AUTH_RESET_ERROR = 'AUTH_RESET_ERROR';
 
+export const ENTER_TEAM_CREATION_FLOW = 'ENTER_TEAM_CREATION_FLOW';
+export const ENTER_PERSONAL_CREATION_FLOW = 'ENTER_PERSONAL_CREATION_FLOW';
+
 export function startLogin(params) {
   return {params, type: LOGIN_START};
 }
@@ -135,4 +138,12 @@ export function resetAccountData() {
 
 export function pushAccountRegistrationData(accountData) {
   return {payload: accountData, type: REGISTER_PUSH_ACCOUNT_DATA};
+}
+
+export function enterTeamCreationFlow() {
+  return {type: ENTER_TEAM_CREATION_FLOW};
+}
+
+export function enterPersonalCreationFlow() {
+  return {type: ENTER_PERSONAL_CREATION_FLOW};
 }

@@ -17,14 +17,14 @@
  *
  */
 
-export function pathWithParams(path, additionalParam) {
+export function pathWithParams(path, additionalParams) {
   const searchParams = window.location.search
     .replace(/^\?/, '')
     .split('&')
     .filter(searchParam => searchParam);
 
-  if (additionalParam) {
-    searchParams.push(additionalParam);
+  if (additionalParams) {
+    searchParams.push(additionalParams);
   }
   const joinedParams = searchParams.join('&');
   return `${path}${joinedParams.length ? `?${joinedParams}` : ''}`;

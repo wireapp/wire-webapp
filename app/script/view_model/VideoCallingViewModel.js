@@ -225,9 +225,9 @@ z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
         const remote_user_name = this.remote_user() ? this.remote_user().name() : undefined;
 
         this.logger.info(
-          `Scheduled minimizing call '${this.videod_call().id}' on timeout as remote user '${
-            remote_user_name
-          }' is not videod`
+          `Scheduled minimizing call '${
+            this.videod_call().id
+          }' on timeout as remote user '${remote_user_name}' is not videod`
         );
         this.minimize_timeout = window.setTimeout(() => {
           if (!this.is_choosing_screen()) {

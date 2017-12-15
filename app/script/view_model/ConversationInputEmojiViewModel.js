@@ -412,10 +412,11 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
     const ibr = input.getBoundingClientRect();
     const mask = document.createElement('div');
     const span = document.createElement('span');
+    const text = document.createTextNode(input.value);
 
+    mask.appendChild(text);
     mask.style.font = css.font;
     mask.style.position = 'fixed';
-    mask.innerHTML = input.value;
     mask.style.left = `${input.clientLeft + ibr.left}px`;
     mask.style.top = `${input.clientTop + ibr.top}px`;
     mask.style.color = 'red';
