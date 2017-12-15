@@ -44,4 +44,7 @@ z.event.Client = {
     VOICE_CHANNEL_ACTIVATE: 'conversation.voice-channel-activate',
     VOICE_CHANNEL_DEACTIVATE: 'conversation.voice-channel-deactivate',
   },
+  USER: {
+    AVAILABILITY: 'user.availability',
+  },
 };

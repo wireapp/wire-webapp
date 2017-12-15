@@ -33,6 +33,7 @@ z.storage.StorageService = class StorageService {
       KEYS: 'keys',
       PRE_KEYS: 'prekeys',
       SESSIONS: 'sessions',
+      USERS: 'users',
     };
   }
 
@@ -159,6 +160,20 @@ z.storage.StorageService = class StorageService {
         [StorageService.OBJECT_STORE.SESSIONS]: '',
       };
 
+      const version_15 = {
+        [StorageService.OBJECT_STORE.AMPLIFY]: '',
+        [StorageService.OBJECT_STORE.CLIENTS]: ', meta.primary_key',
+        [StorageService.OBJECT_STORE.CONVERSATION_EVENTS]:
+          ', category, conversation, time, type, [conversation+time], [conversation+category]',
+        [StorageService.OBJECT_STORE.CONVERSATIONS]: ', id, last_event_timestamp',
+        [StorageService.OBJECT_STORE.EVENTS]:
+          '++primary_key, id, category, conversation, time, type, [conversation+time], [conversation+category]',
+        [StorageService.OBJECT_STORE.KEYS]: '',
+        [StorageService.OBJECT_STORE.PRE_KEYS]: '',
+        [StorageService.OBJECT_STORE.SESSIONS]: '',
+        [StorageService.OBJECT_STORE.USERS]: ', id',
+      };
+
       this.db = new Dexie(this.db_name);
 
       this.db.on('blocked', () => {
@@ -283,6 +298,7 @@ z.storage.StorageService = class StorageService {
             }
           });
         });
+      this.db.version(15).stores(version_15);
 
       this.db
         .open()

@@ -36,11 +36,45 @@ z.user.UserService = class UserService {
    * Construct a new User Service.
    * @class z.user.UserService
    * @param {z.service.BackendClient} client - Client for the API calls
+   * @param {StorageService} storageService - Service for all storage interactions
    */
-  constructor(client) {
+  constructor(client, storageService) {
     this.client = client;
-    this.logger = new z.util.Logger('z.search.SearchService', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('z.user.UserService', z.config.LOGGER.OPTIONS);
+    this.storageService = storageService;
   }
+
+  //##############################################################################
+  // Database interactions
+  //##############################################################################
+
+  /**
+   * Loads user states from the local database.
+   * @returns {Promise} Resolves with all the stored user states
+   */
+  loadUserFromDb() {
+    return this.storageService.get_all(z.storage.StorageService.OBJECT_STORE.USERS);
+  }
+
+  /**
+   * Saves a user entity in the local database.
+   * @param {User} userEntity - User entity
+   * @returns {Promise} Resolves with the conversation entity
+   */
+  saveUserInDb(userEntity) {
+    const userData = userEntity.serialize();
+
+    return this.storageService
+      .save(z.storage.StorageService.OBJECT_STORE.USERS, userEntity.id, userData)
+      .then(primaryKey => {
+        this.logger.info(`State of user '${primaryKey}' was stored`, userData);
+        return userEntity;
+      });
+  }
+
+  //##############################################################################
+  // Backend interactions
+  //##############################################################################
 
   /**
    * Create a connection request to another user.

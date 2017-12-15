@@ -23,6 +23,11 @@ window.z = window.z || {};
 window.z.client = z.client || {};
 
 z.client.ClientRepository = class ClientRepository {
+  static get CONFIG() {
+    return {
+      AVERAGE_NUMBER_OF_CLIENTS: 4,
+    };
+  }
   static get PRIMARY_KEY_CURRENT_CLIENT() {
     return 'local_identity';
   }

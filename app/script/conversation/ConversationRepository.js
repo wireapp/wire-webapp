@@ -66,6 +66,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.conversation_mapper = new z.conversation.ConversationMapper();
     this.event_mapper = new z.conversation.EventMapper(this.asset_service, this.user_repository);
     this.verification_state_handler = new z.conversation.ConversationVerificationStateHandler(this);
+    this.clientMismatchHandler = new z.conversation.ClientMismatchHandler(
+      this,
+      this.cryptography_repository,
+      this.user_repository
+    );
 
     this.active_conversation = ko.observable();
     this.conversations = ko.observableArray([]);
@@ -1174,9 +1179,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(() => {
         const response = {
           data: payload,
+          from: this.user_repository.self().id,
         };
 
-        this._on_member_update(conversation_et, response);
+        this._onMemberUpdate(conversation_et, response);
         this.logger.info(
           `Toggle silence to '${payload.otr_muted}' for conversation '${conversation_et.id}' on '${
             payload.otr_muted_ref
@@ -1185,7 +1191,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return response;
       })
       .catch(error => {
-        const reject_error = new Error(`Conversation '${conversation_et.id}' could not be muted: ${error.code}`);
+        const reject_error = new Error(`Conversation '${conversation_et.id}' could not be muted: ${error.message}`);
         this.logger.warn(reject_error.message, error);
         throw reject_error;
       });
@@ -1245,7 +1251,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
       })
       .then(() => {
-        this._on_member_update(conversation_et, {data: payload});
+        const response = {
+          data: payload,
+          from: this.user_repository.self().id,
+        };
+
+        this._onMemberUpdate(conversation_et, response);
         this.logger.info(
           `Update conversation '${conversation_et.id}' archive state to '${new_archive_state}' on '${
             payload.otr_archived_ref
@@ -1497,10 +1508,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     if (other_user_in_one2one && within_threshold && z.event.EventTypeHandling.CONFIRM.includes(message_et.type)) {
       const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
-      generic_message.set(
-        z.cryptography.GENERIC_MESSAGE_TYPE.CONFIRMATION,
-        new z.proto.Confirmation(message_et.id, z.proto.Confirmation.Type.DELIVERED)
-      );
+      const confirmation = new z.proto.Confirmation(message_et.id, z.proto.Confirmation.Type.DELIVERED);
+      generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.CONFIRMATION, confirmation);
 
       this.sending_queue.push(() => {
         return this.create_recipients(conversation_et.id, true, [message_et.user().id]).then(recipients => {
@@ -1825,36 +1834,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
-   * Map a function to recipients.
-   *
-   * @private
-   * @param {Object} recipients - User client map
-   * @param {Function} client_fn - Function to be executed on clients first
-   * @param {Function} user_fn - Function to be executed on users at the end
-   * @returns {Array} Function array
-   */
-  _map_recipients(recipients, client_fn, user_fn) {
-    const result = [];
-    const user_ids = Object.keys(recipients);
-
-    user_ids.forEach(user_id => {
-      if (recipients.hasOwnProperty(user_id)) {
-        const client_ids = recipients[user_id];
-
-        if (_.isFunction(client_fn)) {
-          client_ids.forEach(client_id => result.push(client_fn(user_id, client_id)));
-        }
-
-        if (_.isFunction(user_fn)) {
-          result.push(user_fn(user_id));
-        }
-      }
-    });
-
-    return result;
-  }
-
-  /**
    * Wraps generic message in ephemeral message.
    *
    * @param {z.proto.GenericMessage} generic_message - Message to be wrapped
@@ -2084,7 +2063,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.conversation_service
       .post_encrypted_message(conversationId, payload, preconditionOption)
       .then(response => {
-        this._handle_client_mismatch(conversationId, response);
+        this.clientMismatchHandler.onClientMismatch(conversationId, response);
         return response;
       })
       .catch(error => {
@@ -2097,7 +2076,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
 
         let updatedPayload;
-        return this._handle_client_mismatch(conversationId, error, genericMessage, payload)
+        return this.clientMismatchHandler
+          .onClientMismatch(conversationId, error, genericMessage, payload)
           .then(payloadWithMissingClients => {
             updatedPayload = payloadWithMissingClients;
             return this._grantOutgoingMessage(conversationId, genericMessage, Object.keys(error.missing));
@@ -2174,10 +2154,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {boolean} Is payload likely to be too big so that we switch to type external?
    */
   _shouldSendAsExternal(conversationId, genericMessage) {
-    return this.get_conversation_by_id(conversationId).then(conversation_et => {
-      const estimatedNumberOfClients = conversation_et.get_number_of_participants() * 4;
+    return this.get_conversation_by_id(conversationId).then(conversationEt => {
       const messageInBytes = new Uint8Array(genericMessage.toArrayBuffer()).length;
-      const estimatedPayloadInBytes = estimatedNumberOfClients * messageInBytes;
+      const estimatedPayloadInBytes = conversationEt.getNumberOfClients() * messageInBytes;
 
       return estimatedPayloadInBytes > ConversationRepository.CONFIG.EXTERNAL_MESSAGE_THRESHOLD;
     });
@@ -2545,7 +2524,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE:
             return this._on_member_leave(conversation_et, event_json);
           case z.event.Backend.CONVERSATION.MEMBER_UPDATE:
-            return this._on_member_update(conversation_et, event_json);
+            return this._onMemberUpdate(conversation_et, event_json);
           case z.event.Backend.CONVERSATION.RENAME:
             return this._on_rename(conversation_et, event_json);
           case z.event.Client.CONVERSATION.ASSET_ADD:
@@ -2557,7 +2536,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           case z.event.Client.CONVERSATION.MESSAGE_DELETE:
             return this._on_message_deleted(conversation_et, event_json);
           case z.event.Client.CONVERSATION.MESSAGE_HIDDEN:
-            return this._on_message_hidden(event_json);
+            return this._onMessageHidden(event_json);
           case z.event.Client.CONVERSATION.REACTION:
             return this._on_reaction(conversation_et, event_json);
           default:
@@ -2838,27 +2817,39 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Membership properties for a conversation were updated.
    *
    * @private
-   * @param {Conversation} conversation_et - Conversation entity that will be updated
-   * @param {Object} event_json - JSON data of 'conversation.member-update' event
+   * @param {Conversation} conversationEntity - Conversation entity that will be updated
+   * @param {Object} eventJson - JSON data of 'conversation.member-update' event
    * @returns {Promise} Resolves when the event was handled
    */
-  _on_member_update(conversation_et, event_json) {
-    const is_active_conversation = this.is_active_conversation(conversation_et);
-    const next_conversation_et = is_active_conversation ? this.get_next_conversation(conversation_et) : undefined;
-    const previously_archived = conversation_et.is_archived();
+  _onMemberUpdate(conversationEntity, eventJson) {
+    const {conversation: conversationId, data: eventData, from} = eventJson;
 
-    this.conversation_mapper.update_self_status(conversation_et, event_json.data);
-
-    if (previously_archived && !conversation_et.is_archived()) {
-      return this._fetch_users_and_events(conversation_et);
+    const inSelfConversation = !this.self_conversation() || conversationId === this.self_conversation().id;
+    if (conversationId && !inSelfConversation) {
+      throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_CONVERSATION);
     }
 
-    if (conversation_et.is_cleared()) {
-      this._clear_conversation(conversation_et, conversation_et.cleared_timestamp());
+    const isFromSelf = !this.user_repository.self() || from === this.user_repository.self().id;
+    if (!isFromSelf) {
+      throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_USER);
     }
 
-    if (is_active_conversation && (conversation_et.is_archived() || conversation_et.is_cleared())) {
-      amplify.publish(z.event.WebApp.CONVERSATION.SHOW, next_conversation_et);
+    const isActiveConversation = this.is_active_conversation(conversationEntity);
+    const nextConversationEt = isActiveConversation ? this.get_next_conversation(conversationEntity) : undefined;
+    const previouslyArchived = conversationEntity.is_archived();
+
+    this.conversation_mapper.update_self_status(conversationEntity, eventData);
+
+    if (previouslyArchived && !conversationEntity.is_archived()) {
+      return this._fetch_users_and_events(conversationEntity);
+    }
+
+    if (conversationEntity.is_cleared()) {
+      this._clear_conversation(conversationEntity, conversationEntity.cleared_timestamp());
+    }
+
+    if (isActiveConversation && (conversationEntity.is_archived() || conversationEntity.is_cleared())) {
+      amplify.publish(z.event.WebApp.CONVERSATION.SHOW, nextConversationEt);
     }
   }
 
@@ -2998,25 +2989,33 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * A hide message received in a conversation.
    *
    * @private
-   * @param {Object} event_json - JSON data of 'conversation.message-hidden'
+   * @param {Object} eventJson - JSON data of 'conversation.message-hidden'
    * @returns {Promise} Resolves when the event was handled
    */
-  _on_message_hidden(event_json) {
-    const {data: event_data, from} = event_json;
+  _onMessageHidden(eventJson) {
+    const {conversation: conversationId, data: eventData, from} = eventJson;
 
-    const is_from_self = from === this.user_repository.self().id;
-    if (!is_from_self) {
-      return Promise.reject(new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_USER));
-    }
+    return Promise.resolve()
+      .then(() => {
+        const inSelfConversation = !this.self_conversation() || conversationId === this.self_conversation().id;
+        if (!inSelfConversation) {
+          throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_CONVERSATION);
+        }
 
-    return this.get_conversation_by_id(event_data.conversation_id)
-      .then(conversation_et => {
-        amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, event_data.message_id);
-        return this._delete_message_by_id(conversation_et, event_data.message_id);
+        const isFromSelf = !this.user_repository.self() || from === this.user_repository.self().id;
+        if (!isFromSelf) {
+          throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_USER);
+        }
+
+        return this.get_conversation_by_id(eventData.conversation_id);
+      })
+      .then(conversationEntity => {
+        amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, eventData.message_id);
+        return this._delete_message_by_id(conversationEntity, eventData.message_id);
       })
       .catch(error => {
         this.logger.info(
-          `Failed to delete message '${event_data.message_id}' for conversation '${event_data.conversation_id}'`,
+          `Failed to delete message '${eventData.message_id}' for conversation '${eventData.conversation_id}'`,
           error
         );
         throw error;
@@ -3247,150 +3246,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
       message_et.id,
       z.assets.AssetUploadFailedReason.CANCELLED
     );
-  }
-
-  /**
-   * Handle client mismatch response from backend.
-   *
-   * @note As part of 412 or general response when sending encrypted message
-   * @param {string} conversation_id - ID of conversation message was sent int
-   * @param {Object} client_mismatch - Client mismatch object containing client user maps for deleted, missing and obsolete clients
-   * @param {z.proto.GenericMessage} [generic_message] - GenericMessage that was sent
-   * @param {Object} [payload] - Initial payload resulting in a 412
-   * @returns {Promise} Resolve when mistmatch was handled
-   */
-  _handle_client_mismatch(conversation_id, client_mismatch, generic_message, payload) {
-    return Promise.resolve()
-      .then(() => {
-        return this._handle_client_mismatch_redundant(client_mismatch.redundant, payload, conversation_id);
-      })
-      .then(updated_payload => {
-        return this._handle_client_mismatch_deleted(client_mismatch.deleted, updated_payload);
-      })
-      .then(updated_payload => {
-        return this._handle_client_mismatch_missing(client_mismatch.missing, updated_payload, generic_message);
-      });
-  }
-
-  /**
-   * Handle the deleted client mismatch.
-   *
-   * @note Contains clients of which the backend is sure that they should not be recipient of a message and verified they no longer exist.
-   * @private
-   *
-   * @param {Object} recipients - User client map containing redundant clients
-   * @param {Object} payload - Optional payload of the failed request
-   * @returns {Promise} Resolves with the updated payload
-   */
-  _handle_client_mismatch_deleted(recipients, payload) {
-    if (_.isEmpty(recipients)) {
-      return Promise.resolve(payload);
-    }
-    this.logger.debug(`Message contains deleted clients of '${Object.keys(recipients).length}' users`, recipients);
-
-    const _remove_deleted_client = (user_id, client_id) => {
-      if (payload) {
-        delete payload.recipients[user_id][client_id];
-      }
-      return this.user_repository.remove_client_from_user(user_id, client_id);
-    };
-
-    const _remove_deleted_user = user_id => {
-      if (payload && !Object.keys(payload.recipients[user_id]).length) {
-        delete payload.recipients[user_id];
-      }
-    };
-
-    return Promise.all(this._map_recipients(recipients, _remove_deleted_client, _remove_deleted_user)).then(() => {
-      this.verification_state_handler.on_client_removed(Object.keys(recipients));
-      return payload;
-    });
-  }
-
-  /**
-   * Handle the missing client mismatch.
-   *
-   * @private
-   * @param {Object} recipients - User client map containing redundant clients
-   * @param {Object} payload - Optional payload of the failed request
-   * @param {z.proto.GenericMessage} generic_message - Protobuffer message to be sent
-   * @returns {Promise} Resolves with the updated payload
-   */
-  _handle_client_mismatch_missing(recipients, payload, generic_message) {
-    if (!payload || _.isEmpty(recipients)) {
-      return Promise.resolve(payload);
-    }
-    this.logger.debug(`Message is missing clients of '${Object.keys(recipients).length}' users`, recipients);
-
-    return this.cryptography_repository
-      .encrypt_generic_message(recipients, generic_message, payload)
-      .then(updated_payload => {
-        payload = updated_payload;
-
-        const _add_missing_client = (user_id, client_id) => {
-          return this.user_repository.add_client_to_user(user_id, new z.client.Client({id: client_id}));
-        };
-
-        return Promise.all(this._map_recipients(recipients, _add_missing_client));
-      })
-      .then(() => {
-        this.verification_state_handler.on_client_add(Object.keys(recipients));
-        return payload;
-      });
-  }
-
-  /**
-   * Handle the redundant client mismatch.
-
-   * @note Contains clients of which the backend is sure that they should not be recipient of a message but cannot say whether they exist.
-   *   Normally only contains clients of users no longer participating in a conversation.
-   *   Sometimes clients of the self user are listed. Thus we cannot remove the payload for all the clients of a user without checking.
-   * @private
-   *
-   * @param {Object} recipients - User client map containing redundant clients
-   * @param {Object} payload - Optional payload of the failed request
-   * @param {string} conversation_id - ID of conversation the message was sent in
-   * @returns {Promise} Resolves with the updated payload
-  */
-  _handle_client_mismatch_redundant(recipients, payload, conversation_id) {
-    if (_.isEmpty(recipients)) {
-      return Promise.resolve(payload);
-    }
-    this.logger.debug(`Message contains redundant clients of '${Object.keys(recipients).length}' users`, recipients);
-
-    return this.get_conversation_by_id(conversation_id)
-      .catch(error => {
-        if (error.type !== z.conversation.ConversationError.TYPE.NOT_FOUND) {
-          throw error;
-        }
-      })
-      .then(conversation_et => {
-        const _remove_redundant_client = function(user_id, client_id) {
-          if (payload) {
-            delete payload.recipients[user_id][client_id];
-          }
-        };
-
-        const _remove_redundant_user = function(user_id) {
-          if (conversation_et && conversation_et.is_group()) {
-            conversation_et.participating_user_ids.remove(user_id);
-          }
-
-          if (payload && !Object.keys(payload.recipients[user_id]).length) {
-            return delete payload.recipients[user_id];
-          }
-        };
-
-        return Promise.all(this._map_recipients(recipients, _remove_redundant_client, _remove_redundant_user)).then(
-          () => {
-            if (conversation_et) {
-              this.update_participating_user_ets(conversation_et);
-            }
-
-            return payload;
-          }
-        );
-      });
   }
 
   /**

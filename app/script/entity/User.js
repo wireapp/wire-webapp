@@ -155,7 +155,6 @@ z.entity.User = class User {
 
     this.is_request = ko.pureComputed(() => this.connection().is_request());
 
-    // e2ee
     this.devices = ko.observableArray();
     this.is_verified = ko.pureComputed(() => {
       if (this.devices().length === 0 && !this.is_me) {
@@ -163,6 +162,12 @@ z.entity.User = class User {
       }
       return this.devices().every(client_et => client_et.meta.is_verified());
     });
+
+    this.availability = ko.observable(z.user.AvailabilityType.NONE);
+  }
+
+  subscribeToChanges() {
+    this.availability.subscribe(() => amplify.publish(z.event.WebApp.USER.PERSIST, this));
   }
 
   add_client(new_client_et) {
@@ -196,5 +201,12 @@ z.entity.User = class User {
       return z.util.StringUtil.starts_with(this.username(), query);
     }
     return z.util.StringUtil.compare_transliteration(this.name(), query) || this.username() === query;
+  }
+
+  serialize() {
+    return {
+      availability: this.availability(),
+      id: this.id,
+    };
   }
 };

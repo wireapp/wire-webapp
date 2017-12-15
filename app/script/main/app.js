@@ -126,6 +126,13 @@ z.main.App = class App {
     );
 
     repositories.bot = new z.bot.BotRepository(repositories.conversation);
+    repositories.broadcast = new z.broadcast.BroadcastRepository(
+      this.service.broadcast,
+      repositories.client,
+      repositories.conversation,
+      repositories.cryptography,
+      repositories.user
+    );
     repositories.calling = new z.calling.CallingRepository(
       this.service.calling,
       repositories.client,
@@ -154,6 +161,7 @@ z.main.App = class App {
     const services = {};
 
     services.asset = new z.assets.AssetService(this.auth.client);
+    services.broadcast = new z.broadcast.BroadcastService(this.auth.client);
     services.calling = new z.calling.CallingService(this.auth.client);
     services.connect = new z.connect.ConnectService(this.auth.client);
     services.connect_google = new z.connect.ConnectGoogleService(this.auth.client);
@@ -163,7 +171,7 @@ z.main.App = class App {
     services.search = new z.search.SearchService(this.auth.client);
     services.storage = new z.storage.StorageService();
     services.team = new z.team.TeamService(this.auth.client);
-    services.user = new z.user.UserService(this.auth.client);
+    services.user = new z.user.UserService(this.auth.client, services.storage);
     services.properties = new z.properties.PropertiesService(this.auth.client);
     services.web_socket = new z.event.WebSocketService(this.auth.client);
 
@@ -321,6 +329,7 @@ z.main.App = class App {
 
         return this.repository.team.get_team();
       })
+      .then(() => this.repository.user.loadUsers())
       .then(() => this.repository.event.initialize_from_stream())
       .then(notifications_count => {
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);

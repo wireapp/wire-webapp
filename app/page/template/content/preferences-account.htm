@@ -13,8 +13,15 @@
                    spellcheck="false" />
             <span class="preferences-account-input-icon" data-bind="css: name_saved() ? 'checkmark' : 'preferences-account-input-icon-edit'"></span>
           </div>
+          <!-- ko if: is_team() -->
+            <availability-state class="preferences-account-availability"
+                                data-bind="click: clickOnAvailability"
+                                data-uie-name="status-availability-in-profile"
+                                params="availability: availability, label: availabilityLabel, showArrow: true">
+            </availability-state>
+          <!-- /ko -->
           <div class="preferences-account-username-wrapper">
-            <span class="preferences-account-username-addsign">@</span>
+            <span class="preferences-account-username-atsign">@</span>
             <input class="preferences-account-username preferences-account-input"
                    id="username" type="text"
                    data-bind="textInput: username, event: {input: verify_username, keypress: check_username_input, blur: reset_username_input}, click: click_on_username, enter: change_username, hasFocus: should_focus_username()"
