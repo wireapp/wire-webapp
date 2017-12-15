@@ -77,8 +77,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     this.time_offset = 0;
 
+    this.is_team = this.team_repository.is_team;
+    this.is_team.subscribe(() => this.map_guest_status_self());
     this.team = this.team_repository.team;
-    this.team.subscribe(() => this.map_guest_status_self());
 
     this.block_event_handling = ko.observable(true);
     this.fetching_conversations = {};
@@ -819,13 +820,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
   map_guest_status_self() {
     this.filtered_conversations().forEach(conversation_et => this._map_guest_status_self(conversation_et));
 
-    if (this.team()) {
+    if (this.is_team()) {
       this.user_repository.self().is_team_member(true);
     }
   }
 
   _map_guest_status_self(conversation_et) {
-    if (this.team()) {
+    if (this.is_team()) {
       const team_id = conversation_et.team_id;
       const is_guest = !!(team_id && this.team().id !== team_id);
       conversation_et.is_guest(is_guest);
