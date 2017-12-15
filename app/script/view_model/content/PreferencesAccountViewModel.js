@@ -252,7 +252,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   click_on_logout() {
-    this.client_repository.logout_client();
+    this.client_repository.logoutClient();
   }
 
   click_on_manage() {
@@ -304,7 +304,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   on_client_remove(user_id, client_id) {
     if (user_id === this.self_user().id) {
       this.new_clients().forEach(client_et => {
-        if (client_et.id === client_id && client_et.is_permanent()) {
+        if (client_et.id === client_id && client_et.isPermanent()) {
           this.new_clients.remove(client_et);
         }
       });

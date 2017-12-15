@@ -54,11 +54,11 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
         user_a = new z.entity.User(z.util.create_random_uuid());
         user_b = new z.entity.User(z.util.create_random_uuid());
 
-        client_a = new z.client.Client();
+        client_a = new z.client.ClientEntity();
         client_a.meta.is_verified(true);
         user_a.devices.push(client_a);
 
-        client_b = new z.client.Client();
+        client_b = new z.client.ClientEntity();
         client_b.meta.is_verified(true);
         user_b.devices.push(client_b);
 
@@ -88,7 +88,7 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
     it('should change state to DEGRADED if new unverified client was added', () => {
       spyOn(z.conversation.EventBuilder, 'build_degraded');
 
-      const new_client_b = new z.client.Client();
+      const new_client_b = new z.client.ClientEntity();
       new_client_b.meta.is_verified(false);
       user_b.devices.push(new_client_b);
 
@@ -102,7 +102,7 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
     it('should not change VERIFIED state if new verified client was added', () => {
       spyOn(z.conversation.EventBuilder, 'build_all_verified');
 
-      const new_client_b = new z.client.Client();
+      const new_client_b = new z.client.ClientEntity();
       new_client_b.meta.is_verified(true);
       user_b.devices.push(new_client_b);
 
@@ -118,7 +118,7 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
       spyOn(z.conversation.EventBuilder, 'build_degraded');
       spyOn(z.conversation.EventBuilder, 'build_all_verified');
 
-      const new_client = new z.client.Client();
+      const new_client = new z.client.ClientEntity();
       new_client.meta.is_verified(false);
       user_self.devices.push(new_client);
 
@@ -142,7 +142,7 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
       spyOn(z.conversation.EventBuilder, 'build_degraded');
       spyOn(z.conversation.EventBuilder, 'build_all_verified');
 
-      const new_client = new z.client.Client();
+      const new_client = new z.client.ClientEntity();
       new_client.meta.is_verified(false);
       user_self.devices.push(new_client);
 
@@ -166,7 +166,7 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
       spyOn(z.conversation.EventBuilder, 'build_degraded');
 
       const new_user = new z.entity.User(z.util.create_random_uuid());
-      const new_client_b = new z.client.Client();
+      const new_client_b = new z.client.ClientEntity();
       new_client_b.meta.is_verified(false);
       new_user.devices.push(new_client_b);
 
@@ -184,7 +184,7 @@ describe('z.conversation.ConversationVerificationStateHandler', () => {
       spyOn(z.conversation.EventBuilder, 'build_degraded');
 
       const new_user = new z.entity.User(z.util.create_random_uuid());
-      const new_client_b = new z.client.Client();
+      const new_client_b = new z.client.ClientEntity();
       new_client_b.meta.is_verified(true);
       new_user.devices.push(new_client_b);
 

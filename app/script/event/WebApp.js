@@ -146,9 +146,6 @@ z.event.WebApp = {
     SCROLL: 'wire.webapp.list.scroll',
   },
   LOADED: 'wire.webapp.loaded', // todo: deprecated - remove when user base of wrappers version >= 2.12 is large enough
-  LOGOUT: {
-    ASK_TO_CLEAR_DATA: 'wire.webapp.logout.ask_to_clear_data',
-  }, // todo: deprecated - remove when user base of wrappers version >= 2.12 is large enough
   PENDING: {
     SHOW: 'wire.webapp.pending.show',
   },
