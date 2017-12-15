@@ -60,7 +60,7 @@ class Index extends Component {
     const {intl: {formatMessage: _}} = this.props;
     return (
       <ContainerXS centerText verticalCenter>
-        <Logo id="wire-logo" scale={1.68} />
+        <Logo data-uie-name="ui-wire-logo" scale={1.68} />
         <Paragraph center>{_(indexStrings.claim)}</Paragraph>
         <Columns style={{margin: '70px auto'}}>
           <Column>

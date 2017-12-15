@@ -115,6 +115,8 @@ z.components.UserListViewModel = class UserListViewModel {
         return this.user_selected().includes(user_et);
       };
     }
+
+    this.self = window.wire.app.repository.user.self;
   }
 };
 
@@ -130,7 +132,14 @@ ko.components.register('user-list', {
             <!-- /ko -->
           </div>
           <div class="search-list-item-content">
-            <div class="search-list-item-content-name" data-bind="text: first_name"></div>
+            <!-- ko if: $parent.self().is_team_member() -->
+              <availability-state class="search-list-item-content-availability search-list-item-content-name"
+                data-uie-name="status-availability-item"
+                params="availability: availability, label: first_name"></availability-state>
+            <!-- /ko -->
+            <!-- ko ifnot: $parent.self().is_team_member() -->
+              <div class="search-list-item-content-name" data-bind="text: first_name"></div>
+            <!-- /ko -->
           </div>
         <!-- /ko -->
         <!-- ko ifnot: $parent.mode === z.components.UserListMode.COMPACT -->
@@ -142,7 +151,14 @@ ko.components.register('user-list', {
             </div>
           </div>
           <div class="search-list-item-content">
-            <div class="search-list-item-content-name" data-bind="text: name"></div>
+            <!-- ko if: $parent.self().is_team_member() -->
+              <availability-state class="search-list-item-content-availability search-list-item-content-name"
+                data-uie-name="status-availability"
+                params="availability: availability, label: name"></availability-state>
+            <!-- /ko -->
+            <!-- ko ifnot: $parent.self().is_team_member() -->
+              <div class="search-list-item-content-name" data-bind="text: name"></div>
+            <!-- /ko -->
             <div class="search-list-item-content-info">
               <!-- ko if: $data.username() -->
                 <span class="search-list-item-content-username label-username" data-bind="text: $data.username"></span>

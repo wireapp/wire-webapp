@@ -33,6 +33,12 @@
               <!-- /ko -->
             </div>
           <!-- /ko -->
+          <!-- if: isTeam -->
+            <availability-state class="user-profile-details-availability"
+                                data-uie-name="status-availability"
+                                params="availability: user().availability(), label: userAvailabilityLabel()">
+            </availability-state>
+          <!-- /ko -->
         </div>
         <div class="user-profile-footer">
           <!-- ko template: {name: get_footer_template} --><!-- /ko -->

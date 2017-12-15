@@ -56,7 +56,7 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     this.connect_repository = connect_repository;
     this.conversation_repository = conversation_repository;
     this.search_repository = search_repository;
-    this.properties_repository = properties_repository;
+    this.propertiesRepository = properties_repository;
     this.team_repository = team_repository;
     this.user_repository = this.conversation_repository.user_repository;
     this.logger = new z.util.Logger('z.ViewModel.list.ListViewModel', z.config.LOGGER.OPTIONS);
@@ -85,7 +85,7 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
       this,
       this.connect_repository,
       this.conversation_repository,
-      this.properties_repository,
+      this.propertiesRepository,
       this.search_repository,
       this.team_repository,
       this.user_repository

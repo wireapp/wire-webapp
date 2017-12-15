@@ -29,18 +29,18 @@ z.entity.Conversation = class Conversation {
    * @param {string} conversation_id - Conversation ID
    */
   constructor(conversation_id = '') {
-    this.creator = undefined;
     this.id = conversation_id;
+
+    this.logger = new z.util.Logger(`z.entity.Conversation (${this.id})`, z.config.LOGGER.OPTIONS);
+
+    this.creator = undefined;
     this.name = ko.observable();
     this.team_id = undefined;
     this.type = ko.observable();
 
-    this.input = ko.observable(
-      z.util.StorageUtil.get_value(`${z.storage.StorageKey.CONVERSATION.INPUT}|${this.id}`) || ''
-    );
-    this.input.subscribe(text =>
-      z.util.StorageUtil.set_value(`${z.storage.StorageKey.CONVERSATION.INPUT}|${this.id}`, text.trim())
-    );
+    const inputStorageKey = `${z.storage.StorageKey.CONVERSATION.INPUT}|${this.id}`;
+    this.input = ko.observable(z.util.StorageUtil.get_value(inputStorageKey) || '');
+    this.input.subscribe(text => z.util.StorageUtil.set_value(inputStorageKey, text.trim()));
 
     this.is_loaded = ko.observable(false);
     this.is_pending = ko.observable(false);
@@ -48,6 +48,9 @@ z.entity.Conversation = class Conversation {
     this.participating_user_ets = ko.observableArray([]); // Does not include self user
     this.participating_user_ids = ko.observableArray([]);
     this.self = undefined;
+
+    this.firstUserEntity = ko.pureComputed(() => this.participating_user_ets()[0]);
+    this.availabilityOfUser = ko.pureComputed(() => this.firstUserEntity() && this.firstUserEntity().availability());
 
     this.is_guest = ko.observable(false);
     this.is_managed = false;
@@ -339,7 +342,7 @@ z.entity.Conversation = class Conversation {
    * @returns {undefined} No return value
    */
   add_message(message_et) {
-    message_et = this._check_for_duplicate(message_et);
+    message_et = this._checkForDuplicate(message_et);
     if (message_et) {
       this.update_timestamps(message_et);
       this.messages_unordered.push(message_et);
@@ -353,7 +356,7 @@ z.entity.Conversation = class Conversation {
    * @returns {undefined} No return value
    */
   add_messages(message_ets) {
-    message_ets = message_ets.map(message_et => this._check_for_duplicate(message_et)).filter(message_et => message_et);
+    message_ets = message_ets.map(message_et => this._checkForDuplicate(message_et)).filter(message_et => message_et);
 
     // in order to avoid multiple db writes check the messages from the end and stop once
     // we found a message from self user
@@ -388,13 +391,27 @@ z.entity.Conversation = class Conversation {
     return this.participating_user_ids().length + (this.removed_from_conversation() ? 0 : 1);
   }
 
+  getNumberOfClients() {
+    const participantsMapped = this.participating_user_ids().length === this.participating_user_ets().length;
+    if (participantsMapped) {
+      return this.participating_user_ets().reduce((accumulator, userEntity) => {
+        if (userEntity.devices().length) {
+          return accumulator + userEntity.devices().length;
+        }
+        return accumulator + z.client.ClientRepository.CONFIG.AVERAGE_NUMBER_OF_CLIENTS;
+      }, this.self.devices().length);
+    }
+
+    return this.get_number_of_participants() * z.client.ClientRepository.CONFIG.AVERAGE_NUMBER_OF_CLIENTS;
+  }
+
   /**
    * Prepends messages with new batch of messages.
    * @param {Array<z.entity.Message>} message_ets - Array of messages to be added to conversation
    * @returns {undefined} No return value
    */
   prepend_messages(message_ets) {
-    message_ets = message_ets.map(message_et => this._check_for_duplicate(message_et)).filter(message_et => message_et);
+    message_ets = message_ets.map(message_et => this._checkForDuplicate(message_et)).filter(message_et => message_et);
 
     z.util.ko_array_unshift_all(this.messages_unordered, message_ets);
   }
@@ -433,22 +450,24 @@ z.entity.Conversation = class Conversation {
    * Checks for message duplicates.
    *
    * @private
-   * @param {z.entity.Message} message_et - Message entity to be added to the conversation
+   * @param {z.entity.Message} messageEt - Message entity to be added to the conversation
    * @returns {z.entity.Message|undefined} Message if it is not a duplicate
    */
-  _check_for_duplicate(message_et) {
-    if (message_et) {
-      for (const existing_message_et of this.messages_unordered()) {
-        const duplicate_message_id = message_et.id && existing_message_et.id === message_et.id;
-        const from_same_sender = existing_message_et.from === message_et.from;
+  _checkForDuplicate(messageEt) {
+    if (messageEt) {
+      for (const existingMessageEt of this.messages_unordered()) {
+        const duplicateMessageId = messageEt.id && existingMessageEt.id === messageEt.id;
+        const fromSameSender = existingMessageEt.from === messageEt.from;
 
-        if (duplicate_message_id && from_same_sender) {
+        if (duplicateMessageId && fromSameSender) {
+          const logData = {additionalMessage: messageEt, existingMessage: existingMessageEt};
+          this.logger.warn(`Filtered message '${messageEt.id}' as duplicate in view`, logData);
           return undefined;
         }
       }
     }
 
-    return message_et;
+    return messageEt;
   }
 
   /**
@@ -469,7 +488,7 @@ z.entity.Conversation = class Conversation {
     message_et.user_ets(this.participating_user_ets().slice(0));
 
     if ([z.conversation.ConversationType.CONNECT, z.conversation.ConversationType.ONE2ONE].includes(this.type())) {
-      if (this.participating_user_ets()[0].is_outgoing_request()) {
+      if (this.firstUserEntity() && this.firstUserEntity().is_outgoing_request()) {
         message_et.member_message_type = z.message.SystemMessageType.CONNECTION_REQUEST;
       } else {
         message_et.member_message_type = z.message.SystemMessageType.CONNECTION_ACCEPTED;
@@ -648,11 +667,11 @@ z.entity.Conversation = class Conversation {
       return false;
     }
 
-    if (!(this.participating_user_ets()[0] && this.participating_user_ets()[0].username())) {
+    if (!(this.firstUserEntity() && this.firstUserEntity().username())) {
       return false;
     }
 
-    return ['annathebot', 'ottothebot'].includes(this.participating_user_ets()[0].username());
+    return ['annathebot', 'ottothebot'].includes(this.firstUserEntity() && this.firstUserEntity().username());
   }
 
   serialize() {

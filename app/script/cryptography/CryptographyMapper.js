@@ -66,6 +66,8 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     switch (generic_message.content) {
       case z.cryptography.GENERIC_MESSAGE_TYPE.ASSET:
         return this._map_asset(generic_message.asset, generic_message.message_id);
+      case z.cryptography.GENERIC_MESSAGE_TYPE.AVAILABILITY:
+        return this._mapAvailability(generic_message.availability);
       case z.cryptography.GENERIC_MESSAGE_TYPE.CALLING:
         return this._map_calling(generic_message.calling, event.data);
       case z.cryptography.GENERIC_MESSAGE_TYPE.CLEARED:
@@ -99,14 +101,6 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
         );
         throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE);
     }
-  }
-
-  _map_calling(calling, event_data) {
-    return {
-      content: JSON.parse(calling.content),
-      sender: event_data.sender,
-      type: z.event.Client.CALL.E_CALL,
-    };
   }
 
   _map_asset(asset, event_nonce) {
@@ -180,6 +174,37 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     }
   }
 
+  _mapAvailability(availability) {
+    return {
+      data: {
+        availability: (() => {
+          switch (availability.type) {
+            case z.proto.Availability.Type.NONE:
+              return z.user.AvailabilityType.NONE;
+            case z.proto.Availability.Type.AVAILABLE:
+              return z.user.AvailabilityType.AVAILABLE;
+            case z.proto.Availability.Type.AWAY:
+              return z.user.AvailabilityType.AWAY;
+            case z.proto.Availability.Type.BUSY:
+              return z.user.AvailabilityType.BUSY;
+            default:
+              const message = 'Unhandled availability type';
+              throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE, message);
+          }
+        })(),
+      },
+      type: z.event.Client.USER.AVAILABILITY,
+    };
+  }
+
+  _map_calling(calling, event_data) {
+    return {
+      content: JSON.parse(calling.content),
+      sender: event_data.sender,
+      type: z.event.Client.CALL.E_CALL,
+    };
+  }
+
   _map_cleared(cleared) {
     return {
       conversation: cleared.conversation_id,
@@ -193,7 +218,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
   _map_confirmation(confirmation) {
     return {
       data: {
-        message_id: confirmation.message_id,
+        message_id: confirmation.first_message_id,
         status: (() => {
           switch (confirmation.type) {
             case z.proto.Confirmation.Type.DELIVERED:
@@ -201,10 +226,8 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
             case z.proto.Confirmation.Type.READ:
               return z.message.StatusType.SEEN;
             default:
-              throw new z.cryptography.CryptographyError(
-                z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE,
-                'Unhandled confirmation type'
-              );
+              const message = 'Unhandled confirmation type';
+              throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE, message);
           }
         })(),
       },
