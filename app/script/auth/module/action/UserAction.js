@@ -19,6 +19,7 @@
 
 import * as UserActionCreator from './creator/UserActionCreator';
 import BackendError from './BackendError';
+import {currentLanguage} from '../../localeConfig';
 
 export function doActivateAccount(code, key) {
   const params = [...arguments];
