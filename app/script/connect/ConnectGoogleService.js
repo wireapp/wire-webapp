@@ -44,10 +44,10 @@ z.connect.ConnectGoogleService = class ConnectGoogleService {
    * Retrieves the user's Google Contacts.
    * @returns {Promise} Resolves with the Google contacts
    */
-  get_contacts() {
-    return this._init_library()
-      .then(() => this._get_access_token())
-      .then(access_token => this._get_contacts(access_token))
+  getContacts() {
+    return this._initLibrary()
+      .then(() => this._getAccessToken())
+      .then(accessToken => this._getContacts(accessToken))
       .catch(error => {
         this.logger.error(`Failed to import contacts from Google: ${error.message}`, error);
       });
@@ -80,14 +80,16 @@ z.connect.ConnectGoogleService = class ConnectGoogleService {
    * Check for cached access token or authenticate with Google.
    * @returns {Promise} Resolves with the access token
    */
-  _get_access_token() {
+  _getAccessToken() {
     return new Promise((resolve, reject) => {
       if (window.gapi.auth) {
-        const auth_token = window.gapi.auth.getToken();
-        if (auth_token) {
-          this.logger.info('Using cached access token to access Google contacts', auth_token);
-          return resolve(auth_token.access_token);
+        const authToken = window.gapi.auth.getToken();
+
+        if (authToken) {
+          this.logger.info('Using cached access token to access Google contacts', authToken);
+          return resolve(authToken.access_token);
         }
+
         return this._authenticate()
           .then(resolve)
           .catch(reject);
@@ -103,11 +105,11 @@ z.connect.ConnectGoogleService = class ConnectGoogleService {
   /**
    * Retrieve the user's Google Contacts using a call to their backend.
    * @private
-   * @param {string} access_token - Access token
+   * @param {string} accessToken - Access token
    * @returns {Promise} Resolves with the user's contacts
    */
-  _get_contacts(access_token) {
-    return fetch(`${this.url}?access_token=${access_token}&alt=json&max-results=15000&v=3.0`)
+  _getContacts(accessToken) {
+    return fetch(`${this.url}?access_token=${accessToken}&alt=json&max-results=15000&v=3.0`)
       .then(response => response.json())
       .then(({feed}) => {
         this.logger.info('Received address book from Google', feed);
@@ -119,23 +121,23 @@ z.connect.ConnectGoogleService = class ConnectGoogleService {
    * Initialize Google Auth Client for JavaScript is loaded.
    * @returns {Promise} Resolves when the authentication library is initialized
    */
-  _init_library() {
-    return window.gapi ? Promise.resolve() : this._load_library();
+  _initLibrary() {
+    return window.gapi ? Promise.resolve() : this._loadLibrary();
   }
 
   /**
    * Lazy loading of the Google Auth Client for JavaScript.
    * @returns {Promise} Resolves when the authentication library is loaded
    */
-  _load_library() {
+  _loadLibrary() {
     return new Promise(resolve => {
       window.gapi_loaded = resolve;
 
       this.logger.info('Lazy loading Google Auth API');
-      const script_node = document.createElement('script');
-      script_node.src = 'https://apis.google.com/js/auth.js?onload=gapi_loaded';
-      const script_element = document.getElementsByTagName('script')[0];
-      return script_element.parentNode.insertBefore(script_node, script_element);
+      const scriptNode = document.createElement('script');
+      scriptNode.src = 'https://apis.google.com/js/auth.js?onload=gapi_loaded';
+      const [scriptElement] = document.getElementsByTagName('script');
+      return scriptElement.parentNode.insertBefore(scriptNode, scriptElement);
     });
   }
 };
