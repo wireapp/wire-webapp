@@ -61,4 +61,4 @@ function CreatePersonalAccount({history, intl: {formatMessage: _}, ...connected}
   );
 }
 
-export default withRouter(injectIntl(connect(undefined, {...TrackingAction})(CreatePersonalAccount)));
+export default withRouter(injectIntl(connect(null, {...TrackingAction})(CreatePersonalAccount)));

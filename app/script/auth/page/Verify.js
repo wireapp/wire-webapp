@@ -36,7 +36,7 @@ import React from 'react';
 import ROUTE from '../route';
 import {pathWithParams} from '../util/urlUtil';
 
-const nextRedirect = {
+const changeEmailRedirect = {
   [REGISTER_FLOW.PERSONAL]: ROUTE.CREATE_ACCOUNT,
   [REGISTER_FLOW.TEAM]: ROUTE.CREATE_TEAM_ACCOUNT,
 };
@@ -99,7 +99,7 @@ const Verify = ({account, authError, history, currentFlow, intl: {formatMessage:
             {_(verifyStrings.resendCode)}
           </Link>
           <Link
-            to={nextRedirect[currentFlow]}
+            to={changeEmailRedirect[currentFlow]}
             component={RRLink}
             style={{marginLeft: 35}}
             data-uie-name="go-change-email"

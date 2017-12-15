@@ -17,48 +17,69 @@
  *
  */
 
-import {ArrowIcon} from '@wireapp/react-ui-kit/Icon';
-import {COLOR} from '@wireapp/react-ui-kit/Identity';
-import {Container, ContainerXS, Columns, Column} from '@wireapp/react-ui-kit/Layout';
+import {connect} from 'react-redux';
+import {ContainerXS} from '@wireapp/react-ui-kit/Layout';
 import {createAccountStrings} from '../../strings';
-import {H1, Link} from '@wireapp/react-ui-kit/Text';
+import {H1} from '@wireapp/react-ui-kit/Text';
 import {injectIntl} from 'react-intl';
-import {Link as RRLink} from 'react-router-dom';
 import {withRouter} from 'react-router';
 import Page from './Page';
 import React from 'react';
 import ROUTE from '../route';
 import AccountForm from '../component/AccountForm';
+import {getURLParameter, pathWithParams} from '../util/urlUtil';
+import {doRegisterPersonal, getInvitationFromCode} from '../module/action/AuthAction';
+import * as AuthSelector from '../module/selector/AuthSelector';
+import {EVENT_NAME, trackEvent} from '../module/action/TrackingAction';
+import {enterPersonalInvitationCreationFlow} from '../module/action/creator/AuthActionCreator';
 
-function CreateAccount({history, intl: {formatMessage: _}}) {
-  return (
-    <Page hasTeamData>
-      <Container centerText verticalCenter style={{width: '100%'}}>
-        <Columns>
-          <Column style={{display: 'flex'}}>
-            <div style={{margin: 'auto'}}>
-              <Link to={ROUTE.CREATE_TEAM} data-uie-name="go-register-team" component={RRLink}>
-                <ArrowIcon direction="left" color={COLOR.GRAY} />
-              </Link>
-            </div>
-          </Column>
-          <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
-            <ContainerXS
-              centerText
-              style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 428}}
-            >
-              <H1 center>{_(createAccountStrings.headLine)}</H1>
-              <AccountForm
-                onSubmit={() => history.push(ROUTE.VERIFY)}
-                submitText={_(createAccountStrings.submitButton)}
-              />
-            </ContainerXS>
-          </Column>
-          <Column />
-        </Columns>
-      </Container>
-    </Page>
-  );
+class PersonalInvite extends React.PureComponent {
+  componentDidMount() {
+    this.invitation_code = getURLParameter('code');
+    this.props.enterPersonalInvitationCreationFlow();
+    this.props.getInvitationFromCode(this.invitation_code);
+  }
+
+  createAccount = () => {
+    this.props
+      .doRegisterPersonal({...this.props.account, invitation_code: this.invitation_code})
+      .then(() => {
+        this.props.trackEvent({attributes: {context: 'email'}, name: EVENT_NAME.PERSONAL.CREATED});
+        this.props.trackEvent({name: EVENT_NAME.PERSONAL.VERIFIED});
+      })
+      .then(() => {
+        const link = document.createElement('a');
+        link.href = pathWithParams(ROUTE.LOGIN, 'reason=registration');
+        document.body.appendChild(link); // workaround for Firefox
+        link.click();
+      })
+      .catch(error => console.error('Failed to create personal account', error));
+  };
+
+  render() {
+    const {intl: {formatMessage: _}} = this.props;
+    return (
+      <Page>
+        <ContainerXS
+          centerText
+          verticalCenter
+          style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 428}}
+        >
+          <H1 center>{_(createAccountStrings.headLine)}</H1>
+          <AccountForm disableEmail onSubmit={this.createAccount} submitText={_(createAccountStrings.submitButton)} />
+        </ContainerXS>
+      </Page>
+    );
+  }
 }
 
-export default withRouter(injectIntl(CreateAccount));
+export default withRouter(
+  injectIntl(
+    connect(
+      state => ({
+        account: AuthSelector.getAccount(state),
+      }),
+      {doRegisterPersonal, enterPersonalInvitationCreationFlow, getInvitationFromCode, trackEvent}
+    )(PersonalInvite)
+  )
+);

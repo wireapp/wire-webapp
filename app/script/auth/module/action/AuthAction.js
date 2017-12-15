@@ -132,3 +132,13 @@ export function doSilentLogout() {
       .catch(error => dispatch(AuthActionCreator.failedLogout(error)));
   };
 }
+
+export function getInvitationFromCode(invitationCode) {
+  return function(dispatch, getState, {apiClient}) {
+    dispatch(AuthActionCreator.startGetInvitationFromCode());
+    return apiClient.invitation.api
+      .getInvitationInfo(invitationCode)
+      .then(invitation => dispatch(AuthActionCreator.successGetInvitationFromCode(invitation)))
+      .catch(error => dispatch(AuthActionCreator.failedGetInvitationFromCode(error)));
+  };
+}

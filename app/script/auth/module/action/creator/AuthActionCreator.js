@@ -47,10 +47,15 @@ export const REFRESH_START = 'REFRESH_START';
 export const REFRESH_SUCCESS = 'REFRESH_SUCCESS';
 export const REFRESH_FAILED = 'REFRESH_FAILED';
 
+export const GET_INVITATION_FROM_CODE_START = 'GET_INVITATION_FROM_CODE_START';
+export const GET_INVITATION_FROM_CODE_SUCCESS = 'GET_INVITATION_FROM_CODE_SUCCESS';
+export const GET_INVITATION_FROM_CODE_FAILED = 'GET_INVITATION_FROM_CODE_FAILED';
+
 export const AUTH_RESET_ERROR = 'AUTH_RESET_ERROR';
 
 export const ENTER_TEAM_CREATION_FLOW = 'ENTER_TEAM_CREATION_FLOW';
 export const ENTER_PERSONAL_CREATION_FLOW = 'ENTER_PERSONAL_CREATION_FLOW';
+export const ENTER_PERSONAL_INVITATION_FLOW = 'ENTER_PERSONAL_INVITATION_FLOW';
 
 export function startLogin(params) {
   return {params, type: LOGIN_START};
@@ -147,3 +152,21 @@ export function enterTeamCreationFlow() {
 export function enterPersonalCreationFlow() {
   return {type: ENTER_PERSONAL_CREATION_FLOW};
 }
+
+export function enterPersonalInvitationCreationFlow() {
+  return {type: ENTER_PERSONAL_INVITATION_FLOW};
+}
+
+export const startGetInvitationFromCode = () => ({
+  type: GET_INVITATION_FROM_CODE_START,
+});
+
+export const successGetInvitationFromCode = invitation => ({
+  payload: invitation,
+  type: GET_INVITATION_FROM_CODE_SUCCESS,
+});
+
+export const failedGetInvitationFromCode = error => ({
+  payload: BackendError.handle(error),
+  type: GET_INVITATION_FROM_CODE_FAILED,
+});
