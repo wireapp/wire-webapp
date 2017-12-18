@@ -81,8 +81,8 @@ const Verify = ({account, authError, history, currentFlow, intl: {formatMessage:
 
   const resendCode = event => {
     event.preventDefault();
-    return Promise.resolve()
-      .then(() => connected.doSendActivationCode(account.email))
+    return connected
+      .doSendActivationCode(account.email)
       .catch(error => console.error('Failed to send email code', error));
   };
   return (

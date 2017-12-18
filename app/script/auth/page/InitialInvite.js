@@ -50,12 +50,10 @@ class InitialInvite extends React.PureComponent {
     const {invites} = this.props;
     const nextLocation = pathWithParams('/login', 'reason=registration');
     const invited = Boolean(invites.length);
-    return Promise.resolve()
-      .then(() => {
-        this.props.trackEvent({
-          attributes: {invited, invites: invites.length},
-          name: TrackingAction.EVENT_NAME.TEAM.FINISHED_INVITE_STEP,
-        });
+    return this.props
+      .trackEvent({
+        attributes: {invited, invites: invites.length},
+        name: TrackingAction.EVENT_NAME.TEAM.FINISHED_INVITE_STEP,
       })
       .then(() => (window.location = nextLocation));
   };
