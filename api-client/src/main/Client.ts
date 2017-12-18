@@ -25,7 +25,7 @@ import {ClientAPI} from './client/';
 import {ConnectionAPI} from './connection/';
 import {ConversationAPI} from './conversation/';
 import {GiphyAPI} from './giphy/';
-import {BackendError, BackendErrorLabel, HttpClient} from './http/';
+import {HttpClient} from './http/';
 import {MemberAPI, PaymentAPI, TeamAPI, TeamInvitationAPI} from './team/';
 import {MemoryEngine} from '@wireapp/store-engine/dist/commonjs/engine';
 import {SelfAPI} from './self/';

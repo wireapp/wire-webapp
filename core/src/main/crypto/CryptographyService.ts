@@ -1,18 +1,12 @@
-import {ConversationEvent, OTRMessageAdd} from '@wireapp/api-client/dist/commonjs/conversation/event/';
 import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/';
 import {Cryptobox, store} from 'wire-webapp-cryptobox';
 import {Decoder, Encoder} from 'bazinga64';
-import {NewClient, RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/';
+import {RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/';
 import {UserPreKeyBundleMap} from '@wireapp/api-client/dist/commonjs/user/';
 import * as Proteus from 'wire-webapp-proteus';
 import * as auth from '@wireapp/api-client/dist/commonjs/auth/';
 import {SessionPayloadBundle} from '../crypto/';
-import {
-  ClientMismatch,
-  NewOTRMessage,
-  OTRRecipients,
-  UserClients,
-} from '@wireapp/api-client/dist/commonjs/conversation/';
+import {OTRRecipients} from '@wireapp/api-client/dist/commonjs/conversation/';
 
 export default class CryptographyService {
   public static STORES = {
@@ -93,7 +87,11 @@ export default class CryptographyService {
       .then(encryptedPayload => ({sessionId, encryptedPayload}));
   }
 
-  public loadExistingClient(): Promise<RegisteredClient> {
+  public deleteClient(): Promise<string> {
+    return this.storeEngine.delete(CryptographyService.STORES.CLIENTS, store.CryptoboxCRUDStore.KEYS.LOCAL_IDENTITY);
+  }
+
+  public loadClient(): Promise<RegisteredClient> {
     return this.cryptobox.load().then((initialPreKeys: Array<Proteus.keys.PreKey>) => {
       return this.storeEngine.read<RegisteredClient>(
         CryptographyService.STORES.CLIENTS,

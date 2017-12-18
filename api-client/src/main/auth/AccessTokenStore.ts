@@ -16,15 +16,12 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-import AccessTokenData from './AccessTokenData';
+import {AUTH_ACCESS_TOKEN_KEY, AUTH_TABLE_NAME, AccessTokenData} from '../auth';
 import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine';
 import {RecordNotFoundError} from '@wireapp/store-engine/dist/commonjs/engine/error';
 import EventEmitter = require('events');
 
 export default class AccessTokenStore extends EventEmitter {
-  private ACCESS_TOKEN_KEY: string = 'access-token';
-  private ACCESS_TOKEN_TABLE: string = 'authentication';
-
   public accessToken: AccessTokenData;
 
   public static TOPIC = {
@@ -36,16 +33,14 @@ export default class AccessTokenStore extends EventEmitter {
   }
 
   public delete(): Promise<void> {
-    return this.tokenStore
-      .delete(this.ACCESS_TOKEN_TABLE, this.ACCESS_TOKEN_KEY)
-      .then(() => (this.accessToken = undefined));
+    return this.tokenStore.delete(AUTH_TABLE_NAME, AUTH_ACCESS_TOKEN_KEY).then(() => (this.accessToken = undefined));
   }
 
   public updateToken(accessToken: AccessTokenData): Promise<AccessTokenData> {
     if (this.accessToken !== accessToken) {
       return this.tokenStore
-        .delete(this.ACCESS_TOKEN_TABLE, this.ACCESS_TOKEN_KEY)
-        .then(() => this.tokenStore.create(this.ACCESS_TOKEN_TABLE, this.ACCESS_TOKEN_KEY, accessToken))
+        .delete(AUTH_TABLE_NAME, AUTH_ACCESS_TOKEN_KEY)
+        .then(() => this.tokenStore.create(AUTH_TABLE_NAME, AUTH_ACCESS_TOKEN_KEY, accessToken))
         .then(() => (this.accessToken = accessToken));
     }
     return Promise.resolve(this.accessToken);
@@ -53,8 +48,8 @@ export default class AccessTokenStore extends EventEmitter {
 
   public init(): Promise<AccessTokenData> {
     return this.tokenStore
-      .read(this.ACCESS_TOKEN_TABLE, this.ACCESS_TOKEN_KEY)
-      .catch(error => {
+      .read(AUTH_TABLE_NAME, AUTH_ACCESS_TOKEN_KEY)
+      .catch((error: Error) => {
         if (error.name === RecordNotFoundError.name) {
           return undefined;
         }

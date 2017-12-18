@@ -17,14 +17,8 @@
 //
 
 const loadProtocolBuffers = require('@wireapp/protocol-messaging');
-import {
-  ClientMismatch,
-  IncomingNotification,
-  NewOTRMessage,
-  OTRRecipients,
-  UserClients,
-} from '@wireapp/api-client/dist/commonjs/conversation/';
-import {CryptographyService} from './crypto/';
+import {IncomingNotification} from '@wireapp/api-client/dist/commonjs/conversation/';
+import {CryptographyService, GenericMessageType, PayloadBundle} from './crypto/';
 import {Context, LoginData, PreKey} from '@wireapp/api-client/dist/commonjs/auth/';
 import {
   ConversationEvent,
@@ -32,17 +26,14 @@ import {
   OTRMessageAdd,
 } from '@wireapp/api-client/dist/commonjs/conversation/event/';
 import {MemoryEngine} from '@wireapp/store-engine/dist/commonjs/engine/';
-import {NewClient, RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/';
+import {ClientClassification, ClientType, NewClient, RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/';
 import {LoginSanitizer} from './auth/';
-import {GenericMessageType, PayloadBundle} from './crypto/';
 import {RecordNotFoundError} from '@wireapp/store-engine/dist/commonjs/engine/error/';
 import {Root} from 'protobufjs';
-import {UserPreKeyBundleMap} from '@wireapp/api-client/dist/commonjs/user/';
 import {WebSocketClient} from '@wireapp/api-client/dist/commonjs/tcp/';
+import {ConversationService} from './conversation/';
 import Client = require('@wireapp/api-client');
 import EventEmitter = require('events');
-import {ConversationService} from './conversation/';
-import {ClientClassification, ClientType} from '@wireapp/api-client/dist/commonjs/client/';
 
 export default class Account extends EventEmitter {
   public static INCOMING = {
@@ -120,7 +111,7 @@ export default class Account extends EventEmitter {
   private initClient(context: Context, loginData: LoginData): Promise<RegisteredClient> {
     this.context = context;
     this.service.conversation.setContext(this.context);
-    return this.service.crypto.loadExistingClient().catch(error => {
+    return this.service.crypto.loadClient().catch(error => {
       if (error instanceof RecordNotFoundError) {
         return this.registerClient(loginData);
       }
@@ -152,8 +143,6 @@ export default class Account extends EventEmitter {
     return this.init()
       .then(() => {
         LoginSanitizer.removeNonPrintableCharacters(loginData);
-        loginData.persist =
-          loginData.persist || (this.apiClient.config.store.constructor.name === 'MemoryEngine' ? false : true);
         return this.apiClient.init();
       })
       .catch((error: Error) => this.apiClient.login(loginData))
@@ -172,13 +161,15 @@ export default class Account extends EventEmitter {
       });
   }
 
+  private resetContext(): void {
+    this.client = undefined;
+    this.context = undefined;
+    this.service.conversation.setContext(undefined);
+    this.service.crypto = undefined;
+  }
+
   public logout(): Promise<void> {
-    return this.apiClient.logout().then(() => {
-      this.client = undefined;
-      this.context = undefined;
-      this.service.conversation.setContext(undefined);
-      this.service.crypto = undefined;
-    });
+    return this.apiClient.logout().then(() => this.resetContext());
   }
 
   private registerClient(
