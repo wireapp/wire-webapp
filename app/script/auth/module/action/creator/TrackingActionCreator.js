@@ -23,14 +23,17 @@ export const TRACKING_ACTION_START = 'TRACKING_ACTION_START';
 export const TRACKING_ACTION_SUCCESS = 'TRACKING_ACTION_SUCCESS';
 export const TRACKING_ACTION_FAILED = 'TRACKING_ACTION_FAILED';
 
-export function startTrackingAction(params) {
-  return {params, type: TRACKING_ACTION_START};
-}
+export const startTrackingAction = params => ({
+  params,
+  type: TRACKING_ACTION_START,
+});
 
-export function successfulTrackingAction(trackingResult) {
-  return {payload: trackingResult, type: TRACKING_ACTION_SUCCESS};
-}
+export const successfulTrackingAction = trackingResult => ({
+  payload: trackingResult,
+  type: TRACKING_ACTION_SUCCESS,
+});
 
-export function failedTrackingAction(error) {
-  return {payload: BackendError.handle(error), type: TRACKING_ACTION_FAILED};
-}
+export const failedTrackingAction = error => ({
+  payload: BackendError.handle(error),
+  type: TRACKING_ACTION_FAILED,
+});

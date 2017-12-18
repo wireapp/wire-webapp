@@ -27,26 +27,32 @@ export const USER_SEND_ACTIVATION_CODE_START = 'USER_SEND_ACTIVATION_CODE_START'
 export const USER_SEND_ACTIVATION_CODE_SUCCESS = 'USER_SEND_ACTIVATION_CODE_SUCCESS';
 export const USER_SEND_ACTIVATION_CODE_FAILED = 'USER_SEND_ACTIVATION_CODE_FAILED';
 
-export function startAccountActivation(params) {
-  return {params, type: USER_ACTIVATION_START};
-}
+export const startAccountActivation = params => ({
+  params,
+  type: USER_ACTIVATION_START,
+});
 
-export function successfulAccountActivation(activationResponse) {
-  return {payload: activationResponse, type: USER_ACTIVATION_SUCCESS};
-}
+export const successfulAccountActivation = activationResponse => ({
+  payload: activationResponse,
+  type: USER_ACTIVATION_SUCCESS,
+});
 
-export function failedAccountActivation(error) {
-  return {payload: BackendError.handle(error), type: USER_ACTIVATION_FAILED};
-}
+export const failedAccountActivation = error => ({
+  payload: BackendError.handle(error),
+  type: USER_ACTIVATION_FAILED,
+});
 
-export function startSendActivationCode(params) {
-  return {params, type: USER_SEND_ACTIVATION_CODE_START};
-}
+export const startSendActivationCode = params => ({
+  params,
+  type: USER_SEND_ACTIVATION_CODE_START,
+});
 
-export function successfulSendActivationCode(activationResponse) {
-  return {payload: activationResponse, type: USER_SEND_ACTIVATION_CODE_SUCCESS};
-}
+export const successfulSendActivationCode = activationResponse => ({
+  payload: activationResponse,
+  type: USER_SEND_ACTIVATION_CODE_SUCCESS,
+});
 
-export function failedSendActivationCode(error) {
-  return {payload: BackendError.handle(error), type: USER_SEND_ACTIVATION_CODE_FAILED};
-}
+export const failedSendActivationCode = error => ({
+  payload: BackendError.handle(error),
+  type: USER_SEND_ACTIVATION_CODE_FAILED,
+});
