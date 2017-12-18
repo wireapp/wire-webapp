@@ -138,7 +138,7 @@ export function getInvitationFromCode(invitationCode) {
     dispatch(AuthActionCreator.startGetInvitationFromCode());
     return apiClient.invitation.api
       .getInvitationInfo(invitationCode)
-      .then(invitation => dispatch(AuthActionCreator.successGetInvitationFromCode(invitation)))
+      .then(invitation => dispatch(AuthActionCreator.successfulGetInvitationFromCode(invitation)))
       .catch(error => dispatch(AuthActionCreator.failedGetInvitationFromCode(error)));
   };
 }

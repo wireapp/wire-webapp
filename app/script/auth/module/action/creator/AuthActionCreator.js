@@ -55,7 +55,7 @@ export const AUTH_RESET_ERROR = 'AUTH_RESET_ERROR';
 
 export const ENTER_TEAM_CREATION_FLOW = 'ENTER_TEAM_CREATION_FLOW';
 export const ENTER_PERSONAL_CREATION_FLOW = 'ENTER_PERSONAL_CREATION_FLOW';
-export const ENTER_GENERIC_INVITATION_FLOW = 'ENTER_PERSONAL_CREATION_FLOW';
+export const ENTER_GENERIC_INVITATION_FLOW = 'ENTER_GENERIC_INVITATION_FLOW';
 export const ENTER_PERSONAL_INVITATION_FLOW = 'ENTER_PERSONAL_INVITATION_FLOW';
 
 export function startLogin(params) {
@@ -166,7 +166,7 @@ export const startGetInvitationFromCode = () => ({
   type: GET_INVITATION_FROM_CODE_START,
 });
 
-export const successGetInvitationFromCode = invitation => ({
+export const successfulGetInvitationFromCode = invitation => ({
   payload: invitation,
   type: GET_INVITATION_FROM_CODE_SUCCESS,
 });

@@ -60,11 +60,7 @@ class PersonalInvite extends React.PureComponent {
     const {intl: {formatMessage: _}} = this.props;
     return (
       <Page>
-        <ContainerXS
-          centerText
-          verticalCenter
-          style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 428}}
-        >
+        <ContainerXS centerText verticalCenter>
           <H1 center>{_(createAccountStrings.headLine)}</H1>
           <AccountForm
             disableEmail

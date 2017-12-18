@@ -31,11 +31,11 @@ import ROUTE from '../route';
 import AccountForm from '../component/AccountForm';
 import * as TrackingAction from '../module/action/TrackingAction';
 import {enterGenericInviteCreationFlow, enterPersonalCreationFlow} from '../module/action/creator/AuthActionCreator';
-import {getURLParameter} from '../util/urlUtil';
+import {hasURLParameter} from '../util/urlUtil';
 
 class CreatePersonalAccount extends React.PureComponent {
   componentDidMount() {
-    this.isInvited = getURLParameter('ref') === 'invite';
+    this.isInvited = hasURLParameter('invite');
     if (this.isInvited) {
       this.props.enterGenericInviteCreationFlow();
     } else {
