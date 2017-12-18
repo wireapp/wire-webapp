@@ -230,12 +230,12 @@ z.event.WebApp = {
     BACKEND_REQUESTS: 'wire.webapp.telemetry.backend_requests',
   },
   USER: {
-    CHANGE_AVAILABILITY: 'wire.webapp.user.change_availability',
     CLIENT_ADDED: 'wire.webapp.user.client_added',
     CLIENT_REMOVED: 'wire.webapp.user.client_removed',
     CLIENTS_UPDATED: 'wire.webapp.user.clients_udpated',
     EVENT_FROM_BACKEND: 'wire.webapp.user.event_from_backend',
     PERSIST: 'wire.webapp.user.persist',
+    SET_AVAILABILITY: 'wire.webapp.user.set_availability',
     UNBLOCKED: 'wire.webapp.user.unblocked',
   },
   WARNING: {

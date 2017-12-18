@@ -812,25 +812,24 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   _handle_mapped_conversation(conversation_et) {
-    this._map_guest_status_self(conversation_et);
+    this._mapGuestStatusSelf(conversation_et);
     conversation_et.self = this.user_repository.self();
     conversation_et.subscribe_to_state_updates();
   }
 
   map_guest_status_self() {
-    this.filtered_conversations().forEach(conversation_et => this._map_guest_status_self(conversation_et));
+    this.filtered_conversations().forEach(conversation_et => this._mapGuestStatusSelf(conversation_et));
 
     if (this.is_team()) {
       this.user_repository.self().is_team_member(true);
     }
   }
 
-  _map_guest_status_self(conversation_et) {
-    if (this.is_team()) {
-      const team_id = conversation_et.team_id;
-      const is_guest = !!(team_id && this.team().id !== team_id);
-      conversation_et.is_guest(is_guest);
-    }
+  _mapGuestStatusSelf(conversationEntity) {
+    const conversationTeamId = conversationEntity.team_id;
+    const selfTeamId = this.team() && this.team().id;
+    const isConversationGuest = !!(conversationTeamId && (!selfTeamId || selfTeamId !== conversationTeamId));
+    conversationEntity.is_guest(isConversationGuest);
   }
 
   /**
