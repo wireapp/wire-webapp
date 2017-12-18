@@ -66,11 +66,11 @@ export default class InvitationAPI {
    */
   public getInvitationInfo(invitationCode: string): Promise<Invitation> {
     const config: AxiosRequestConfig = {
-      data: {
-        code: invitationCode,
-      },
       method: 'get',
       url: `${InvitationAPI.URL.INVITATIONS}/${InvitationAPI.URL.INFO}`,
+      params: {
+        code: invitationCode,
+      },
     };
 
     return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);

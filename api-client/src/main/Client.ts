@@ -26,6 +26,8 @@ import {ConnectionAPI} from './connection/';
 import {ConversationAPI} from './conversation/';
 import {GiphyAPI} from './giphy/';
 import {HttpClient} from './http/';
+import {IncomingMessage} from 'http';
+import {InvitationAPI} from './invitation/';
 import {MemberAPI, PaymentAPI, TeamAPI, TeamInvitationAPI} from './team/';
 import {MemoryEngine} from '@wireapp/store-engine/dist/commonjs/engine';
 import {SelfAPI} from './self/';
@@ -40,6 +42,7 @@ class Client {
   public connection: {api: ConnectionAPI} = {api: undefined};
   public conversation: {api: ConversationAPI} = {api: undefined};
   public giphy: {api: GiphyAPI} = {api: undefined};
+  public invitation: {api: InvitationAPI} = {api: undefined};
   public self: {api: SelfAPI} = {api: undefined};
   public teams: {
     team: {api: TeamAPI};
@@ -84,6 +87,7 @@ class Client {
     this.connection.api = new ConnectionAPI(this.transport.http);
     this.conversation.api = new ConversationAPI(this.transport.http);
     this.giphy.api = new GiphyAPI(this.transport.http);
+    this.invitation.api = new InvitationAPI(this.transport.http);
     this.self.api = new SelfAPI(this.transport.http);
     this.teams.invitation.api = new TeamInvitationAPI(this.transport.http);
     this.teams.member.api = new MemberAPI(this.transport.http);
