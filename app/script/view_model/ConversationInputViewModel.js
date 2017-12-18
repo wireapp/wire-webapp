@@ -135,15 +135,15 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
     this.file_tooltip = z.l10n.text(z.string.tooltip_conversation_file);
     this.input_tooltip = ko.pureComputed(() => {
       if (this.show_availability_tooltip()) {
-        const remoteParticipantEt = this.conversation_et().firstUserEntity();
+        const remoteUserEntity = this.conversation_et().firstUserEntity();
 
-        switch (remoteParticipantEt.availability()) {
+        switch (remoteUserEntity.availability()) {
           case z.user.AvailabilityType.AVAILABLE:
-            return z.l10n.text(z.string.tooltip_conversation_input_placeholder_available, remoteParticipantEt.name());
+            return z.l10n.text(z.string.tooltip_conversation_input_placeholder_available, remoteUserEntity.name());
           case z.user.AvailabilityType.AWAY:
-            return z.l10n.text(z.string.tooltip_conversation_input_placeholder_away, remoteParticipantEt.name());
+            return z.l10n.text(z.string.tooltip_conversation_input_placeholder_away, remoteUserEntity.name());
           case z.user.AvailabilityType.BUSY:
-            return z.l10n.text(z.string.tooltip_conversation_input_placeholder_busy, remoteParticipantEt.name());
+            return z.l10n.text(z.string.tooltip_conversation_input_placeholder_busy, remoteUserEntity.name());
         }
       }
 
