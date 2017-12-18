@@ -482,6 +482,9 @@ z.string.pl.warning_permission_request_notification = '{{icon}} Zezwól na powia
 z.string.pl.warning_permission_request_screen = '{{icon}} zezwól na dostęp do ekranu';
 z.string.pl.warning_tell_me_how = 'Powiedz mi jak';
 
+z.string.pl.user_availability_available = '&Dostępny(a)';
+z.string.pl.user_availability_none = 'Żaden';
+
 z.string.pl.system_notification_asset_add = 'Udostępnił obrazek';
 z.string.pl.system_notification_connection_accepted = 'Zaakceptowane żądania połączenia';
 z.string.pl.system_notification_connection_connected = 'Jesteś już połączony';

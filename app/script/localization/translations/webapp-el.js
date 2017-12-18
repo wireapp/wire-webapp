@@ -479,6 +479,9 @@ z.string.el.warning_permission_request_notification = '{{icon}} Να επιτρ�
 z.string.el.warning_permission_request_screen = '{{icon}} Να επιτρέπεται η πρόσβαση στην οθόνη';
 z.string.el.warning_tell_me_how = 'Πείτε μας πως';
 
+z.string.el.user_availability_available = 'Διαθέσιμο';
+z.string.el.user_availability_none = 'Καθόλου';
+
 z.string.el.system_notification_asset_add = 'Κοινοποίηση εικόνας';
 z.string.el.system_notification_connection_accepted = 'Η αίτηση σύνδεσης σας έγινε αποδεκτή';
 z.string.el.system_notification_connection_connected = 'Μόλις συνδεθήκατε';

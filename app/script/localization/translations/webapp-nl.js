@@ -483,6 +483,9 @@ z.string.nl.warning_permission_request_notification = '{{icon}} Meldingen toesta
 z.string.nl.warning_permission_request_screen = '{{icon}} Toegang tot scherm toestaan';
 z.string.nl.warning_tell_me_how = 'Vertel me meer';
 
+z.string.nl.user_availability_available = 'Beschikbaar';
+z.string.nl.user_availability_none = 'Geen';
+
 z.string.nl.system_notification_asset_add = 'Deelde een foto';
 z.string.nl.system_notification_connection_accepted = 'Accepteer connectie aanvraag';
 z.string.nl.system_notification_connection_connected = 'Zijn nu verbonden';

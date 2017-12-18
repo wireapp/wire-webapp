@@ -477,6 +477,9 @@ z.string.it.warning_permission_request_notification = '{{icon}} Consenti notific
 z.string.it.warning_permission_request_screen = '{{icon}} Consenti accesso allo schermo';
 z.string.it.warning_tell_me_how = 'Dimmi come';
 
+z.string.it.user_availability_available = 'Disponibile';
+z.string.it.user_availability_none = 'Nessuno';
+
 z.string.it.system_notification_asset_add = 'Ha condiviso un’immagine';
 z.string.it.system_notification_connection_accepted = 'Ha accettato la tua richiesta di connessione';
 z.string.it.system_notification_connection_connected = 'Siete connessi ora';

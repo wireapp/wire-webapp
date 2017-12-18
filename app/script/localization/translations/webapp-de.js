@@ -86,6 +86,7 @@ z.string.de.auth_error_name_short = 'Gib deinen Namen mit mindestens zwei Zeiche
 z.string.de.auth_error_offline = 'Keine Internetverbindung';
 z.string.de.auth_error_password_short = 'Wähle ein Passwort mit mindestens acht Zeichen.';
 z.string.de.auth_error_password_wrong = 'Falsches Passwort. Bitte versuche es erneut.';
+z.string.de.auth_error_pending = 'Benutzerkonto noch nicht verifiziert';
 z.string.de.auth_error_phone_number_budget = 'Du hast dich zu oft eingeloggt. Versuche es später erneut.';
 z.string.de.auth_error_phone_number_forbidden = 'Diese Telefonnummer ist leider nicht nutzbar.';
 z.string.de.auth_error_phone_number_invalid = 'Ungültige Telefonnummer';
@@ -466,7 +467,6 @@ z.string.de.url_support_articles = '/hc/de/articles/';
 z.string.de.url_support_requests = '/hc/de/requests/';
 z.string.de.url_webapp_root = '/?hl=de';
 z.string.de.url_website_root = '/de/';
-z.string.de.url_website_create_team = '/de/create-team/';
 z.string.de.url_website_privacy = '/de/privacy';
 z.string.de.warning_call_detail = 'Dein Browser benötigt für Anrufe Zugriff auf das Mikrofon.';
 z.string.de.warning_call_headline = 'Anrufe sind ohne Mikrofon nicht möglich';
@@ -490,6 +490,9 @@ z.string.de.warning_permission_request_microphone = '{{icon}} Zugriff auf Mikrof
 z.string.de.warning_permission_request_notification = '{{icon}} Benachrichtigungen zulassen';
 z.string.de.warning_permission_request_screen = '{{icon}} Zugriff auf Bildschirm gewähren';
 z.string.de.warning_tell_me_how = 'Zeig mir wie';
+
+z.string.de.user_availability_available = 'Verfügbar';
+z.string.de.user_availability_none = 'Keine';
 
 z.string.de.system_notification_asset_add = 'Hat ein Bild geteilt';
 z.string.de.system_notification_connection_accepted = 'Hat deine Kontaktanfrage akzeptiert';

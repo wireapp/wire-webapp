@@ -483,6 +483,9 @@ z.string.sk.warning_permission_request_notification = '{{icon}} Povoliť oznáme
 z.string.sk.warning_permission_request_screen = '{{icon}} Povoliť prístup k obrazovke';
 z.string.sk.warning_tell_me_how = 'Povedz mi, ako';
 
+z.string.sk.user_availability_available = 'Dostupné';
+z.string.sk.user_availability_none = 'Žiadne';
+
 z.string.sk.system_notification_asset_add = 'Zdieľať obrázok';
 z.string.sk.system_notification_connection_accepted = 'Prijal Vašu požiadavku na pripojenie';
 z.string.sk.system_notification_connection_connected = 'Teraz ste pripojení';
