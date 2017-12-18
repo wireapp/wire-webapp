@@ -122,10 +122,14 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
     });
 
     this.show_availability_tooltip = ko.pureComputed(() => {
-      const isOne2OneConversation = this.conversation_et().is_one2one();
-      const remoteParticipantEt = this.conversation_et().firstUserEntity();
-      const availabilityIsNone = remoteParticipantEt.availability() === z.user.AvailabilityType.NONE;
-      return this.self().is_team_member() && isOne2OneConversation && !availabilityIsNone;
+      if (this.conversation_et()) {
+        const isOne2OneConversation = this.conversation_et().is_one2one();
+        const remoteParticipantEt = this.conversation_et().firstUserEntity();
+        const availabilityIsNone = remoteParticipantEt.availability() === z.user.AvailabilityType.NONE;
+        return this.self().is_team_member() && isOne2OneConversation && !availabilityIsNone;
+      }
+
+      return false;
     });
 
     this.file_tooltip = z.l10n.text(z.string.tooltip_conversation_file);
