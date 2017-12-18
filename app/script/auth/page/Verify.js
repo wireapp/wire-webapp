@@ -38,6 +38,7 @@ import {pathWithParams} from '../util/urlUtil';
 
 const changeEmailRedirect = {
   [REGISTER_FLOW.PERSONAL]: ROUTE.CREATE_ACCOUNT,
+  [REGISTER_FLOW.GENERIC_INVITATION]: ROUTE.CREATE_ACCOUNT,
   [REGISTER_FLOW.TEAM]: ROUTE.CREATE_TEAM_ACCOUNT,
 };
 
@@ -45,8 +46,8 @@ const Verify = ({account, authError, history, currentFlow, intl: {formatMessage:
   const createAccount = email_code => {
     switch (currentFlow) {
       case REGISTER_FLOW.TEAM: {
-        Promise.resolve()
-          .then(() => connected.doRegisterTeam({...account, email_code}))
+        connected
+          .doRegisterTeam({...account, email_code})
           .then(() => {
             connected.trackEvent({name: TrackingAction.EVENT_NAME.TEAM.CREATED});
             connected.trackEvent({name: TrackingAction.EVENT_NAME.TEAM.VERIFIED});
@@ -55,12 +56,17 @@ const Verify = ({account, authError, history, currentFlow, intl: {formatMessage:
           .catch(error => console.error('Failed to create team account', error));
         break;
       }
-      case REGISTER_FLOW.PERSONAL: {
-        Promise.resolve()
-          .then(() => connected.doRegisterPersonal({...account, email_code}))
+      case REGISTER_FLOW.PERSONAL:
+      case REGISTER_FLOW.GENERIC_INVITATION: {
+        connected
+          .doRegisterPersonal({...account, email_code})
           .then(() => {
-            connected.trackEvent({attributes: {context: 'email'}, name: TrackingAction.EVENT_NAME.PERSONAL.CREATED});
-            connected.trackEvent({name: TrackingAction.EVENT_NAME.PERSONAL.VERIFIED});
+            const context =
+              currentFlow === REGISTER_FLOW.PERSONAL
+                ? TrackingAction.EVENT_CONTEXT.EMAIL
+                : TrackingAction.EVENT_CONTEXT.GENERIC_INVITE;
+            connected.trackNameWithContext(TrackingAction.EVENT_NAME.PERSONAL.CREATED, context);
+            connected.trackNameWithContext(TrackingAction.EVENT_NAME.PERSONAL.VERIFIED, context);
           })
           .then(() => {
             const link = document.createElement('a');

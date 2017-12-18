@@ -18,7 +18,6 @@
  */
 
 import * as TrackingAction from '../module/action/TrackingAction';
-import * as AuthAction from '../module/action/creator/AuthActionCreator';
 import {getLanguage} from '../module/selector/LanguageSelector';
 import React, {Component} from 'react';
 import ROUTE from '../route';
@@ -38,13 +37,11 @@ class Index extends Component {
 
   onRegisterPersonalClick = () => {
     this.props.trackEvent({name: TrackingAction.EVENT_NAME.START.OPENED_PERSONAL_REGISTRATION});
-    this.props.enterPersonalCreationFlow();
     this.props.history.push(ROUTE.CREATE_ACCOUNT);
   };
 
   onRegisterTeamClick = () => {
     this.props.trackEvent({name: TrackingAction.EVENT_NAME.START.OPENED_TEAM_REGISTRATION});
-    this.props.enterTeamCreationFlow();
     this.props.history.push(ROUTE.CREATE_TEAM);
   };
 
@@ -102,6 +99,4 @@ class Index extends Component {
   }
 }
 
-export default injectIntl(
-  connect(state => ({language: getLanguage(state)}), {...AuthAction, ...TrackingAction})(Index)
-);
+export default injectIntl(connect(state => ({language: getLanguage(state)}), {...TrackingAction})(Index));

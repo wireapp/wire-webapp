@@ -124,6 +124,9 @@ export default function reducer(state = initialState, action) {
     case AuthActionCreator.ENTER_PERSONAL_CREATION_FLOW: {
       return {...state, currentFlow: REGISTER_FLOW.PERSONAL};
     }
+    case AuthActionCreator.ENTER_GENERIC_INVITATION_FLOW: {
+      return {...state, currentFlow: REGISTER_FLOW.GENERIC_INVITATION};
+    }
     case AuthActionCreator.ENTER_PERSONAL_INVITATION_FLOW: {
       return {...state, currentFlow: REGISTER_FLOW.PERSONAL_INVITATION};
     }

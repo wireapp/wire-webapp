@@ -30,35 +30,58 @@ import React from 'react';
 import ROUTE from '../route';
 import AccountForm from '../component/AccountForm';
 import * as TrackingAction from '../module/action/TrackingAction';
+import {enterGenericInviteCreationFlow, enterPersonalCreationFlow} from '../module/action/creator/AuthActionCreator';
+import {getURLParameter} from '../util/urlUtil';
 
-function CreatePersonalAccount({history, intl: {formatMessage: _}, ...connected}) {
-  return (
-    <Container centerText verticalCenter style={{width: '100%'}}>
-      <Columns>
-        <Column style={{display: 'flex'}}>
-          <div style={{margin: 'auto'}}>
-            <Link to={ROUTE.INDEX} data-uie-name="go-index" component={RRLink}>
-              <ArrowIcon direction="left" color={COLOR.GRAY} />
-            </Link>
-          </div>
-        </Column>
-        <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
-          <ContainerXS
-            centerText
-            style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 428}}
-          >
-            <H1 center>{_(createPersonalAccountStrings.headLine)}</H1>
-            <AccountForm
-              beforeSubmit={() => connected.trackEvent({name: TrackingAction.EVENT_NAME.PERSONAL.ENTERED_ACCOUNT_DATA})}
-              onSubmit={() => history.push(ROUTE.VERIFY)}
-              submitText={_(createPersonalAccountStrings.submitButton)}
-            />
-          </ContainerXS>
-        </Column>
-        <Column />
-      </Columns>
-    </Container>
-  );
+class CreatePersonalAccount extends React.PureComponent {
+  componentDidMount() {
+    this.isInvited = getURLParameter('ref') === 'invite';
+    if (this.isInvited) {
+      this.props.enterGenericInviteCreationFlow();
+    } else {
+      this.props.enterPersonalCreationFlow();
+    }
+  }
+
+  render() {
+    const {history, intl: {formatMessage: _}, ...connected} = this.props;
+    return (
+      <Container centerText verticalCenter style={{width: '100%'}}>
+        <Columns>
+          <Column style={{display: 'flex'}}>
+            <div style={{margin: 'auto'}}>
+              <Link to={ROUTE.INDEX} data-uie-name="go-index" component={RRLink}>
+                <ArrowIcon direction="left" color={COLOR.GRAY} />
+              </Link>
+            </div>
+          </Column>
+          <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
+            <ContainerXS
+              centerText
+              style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 428}}
+            >
+              <H1 center>{_(createPersonalAccountStrings.headLine)}</H1>
+              <AccountForm
+                beforeSubmit={() =>
+                  connected.trackNameWithContext(
+                    TrackingAction.EVENT_NAME.PERSONAL.ENTERED_ACCOUNT_DATA,
+                    this.isInvited ? TrackingAction.EVENT_CONTEXT.GENERIC_INVITE : TrackingAction.EVENT_CONTEXT.EMAIL
+                  )
+                }
+                onSubmit={() => history.push(ROUTE.VERIFY)}
+                submitText={_(createPersonalAccountStrings.submitButton)}
+              />
+            </ContainerXS>
+          </Column>
+          <Column />
+        </Columns>
+      </Container>
+    );
+  }
 }
 
-export default withRouter(injectIntl(connect(null, {...TrackingAction})(CreatePersonalAccount)));
+export default withRouter(
+  injectIntl(
+    connect(null, {...TrackingAction, enterGenericInviteCreationFlow, enterPersonalCreationFlow})(CreatePersonalAccount)
+  )
+);

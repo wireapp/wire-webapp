@@ -39,6 +39,12 @@ export const EVENT_NAME = {
   },
 };
 
+export const EVENT_CONTEXT = {
+  EMAIL: 'email',
+  GENERIC_INVITE: 'generic_invite',
+  PERSONAL_INVITE: 'personal_invite',
+};
+
 export function trackEvent(event) {
   return function(dispatch, getState, {mixpanel}) {
     return Promise.resolve()
@@ -59,4 +65,8 @@ export function trackEvent(event) {
       .then(trackingResult => dispatch(TrackingActionCreator.successfulTrackingAction(trackingResult)))
       .catch(error => dispatch(TrackingActionCreator.failedTrackingAction(error)));
   };
+}
+
+export function trackNameWithContext(name, context) {
+  trackEvent({attributes: {context}, name});
 }

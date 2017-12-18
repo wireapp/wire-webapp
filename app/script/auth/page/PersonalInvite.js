@@ -30,7 +30,7 @@ import AccountForm from '../component/AccountForm';
 import {getURLParameter, pathWithParams} from '../util/urlUtil';
 import {doRegisterPersonal, getInvitationFromCode} from '../module/action/AuthAction';
 import * as AuthSelector from '../module/selector/AuthSelector';
-import {EVENT_NAME, trackEvent} from '../module/action/TrackingAction';
+import {EVENT_CONTEXT, EVENT_NAME, trackNameWithContext} from '../module/action/TrackingAction';
 import {enterPersonalInvitationCreationFlow} from '../module/action/creator/AuthActionCreator';
 
 class PersonalInvite extends React.PureComponent {
@@ -44,8 +44,8 @@ class PersonalInvite extends React.PureComponent {
     this.props
       .doRegisterPersonal({...this.props.account, invitation_code: this.invitation_code})
       .then(() => {
-        this.props.trackEvent({attributes: {context: 'email'}, name: EVENT_NAME.PERSONAL.CREATED});
-        this.props.trackEvent({name: EVENT_NAME.PERSONAL.VERIFIED});
+        this.props.trackNameWithContext(EVENT_NAME.PERSONAL.CREATED, EVENT_CONTEXT.PERSONAL_INVITE);
+        this.props.trackNameWithContext(EVENT_NAME.PERSONAL.VERIFIED, EVENT_CONTEXT.PERSONAL_INVITE);
       })
       .then(() => {
         const link = document.createElement('a');
@@ -66,7 +66,14 @@ class PersonalInvite extends React.PureComponent {
           style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 428}}
         >
           <H1 center>{_(createAccountStrings.headLine)}</H1>
-          <AccountForm disableEmail onSubmit={this.createAccount} submitText={_(createAccountStrings.submitButton)} />
+          <AccountForm
+            disableEmail
+            beforeSubmit={() =>
+              this.props.trackNameWithContext(EVENT_NAME.PERSONAL.ENTERED_ACCOUNT_DATA, EVENT_CONTEXT.PERSONAL_INVITE)
+            }
+            onSubmit={this.createAccount}
+            submitText={_(createAccountStrings.submitButton)}
+          />
         </ContainerXS>
       </Page>
     );
@@ -79,7 +86,7 @@ export default withRouter(
       state => ({
         account: AuthSelector.getAccount(state),
       }),
-      {doRegisterPersonal, enterPersonalInvitationCreationFlow, getInvitationFromCode, trackEvent}
+      {doRegisterPersonal, enterPersonalInvitationCreationFlow, getInvitationFromCode, trackNameWithContext}
     )(PersonalInvite)
   )
 );

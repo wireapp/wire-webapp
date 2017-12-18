@@ -55,6 +55,7 @@ export const AUTH_RESET_ERROR = 'AUTH_RESET_ERROR';
 
 export const ENTER_TEAM_CREATION_FLOW = 'ENTER_TEAM_CREATION_FLOW';
 export const ENTER_PERSONAL_CREATION_FLOW = 'ENTER_PERSONAL_CREATION_FLOW';
+export const ENTER_GENERIC_INVITATION_FLOW = 'ENTER_PERSONAL_CREATION_FLOW';
 export const ENTER_PERSONAL_INVITATION_FLOW = 'ENTER_PERSONAL_INVITATION_FLOW';
 
 export function startLogin(params) {
@@ -151,6 +152,10 @@ export function enterTeamCreationFlow() {
 
 export function enterPersonalCreationFlow() {
   return {type: ENTER_PERSONAL_CREATION_FLOW};
+}
+
+export function enterGenericInviteCreationFlow() {
+  return {type: ENTER_GENERIC_INVITATION_FLOW};
 }
 
 export function enterPersonalInvitationCreationFlow() {
