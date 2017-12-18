@@ -441,6 +441,7 @@ z.string.preferences_about_terms_of_use = 'Terms of use';
 z.string.preferences_about_version = 'Version {{version}}';
 z.string.preferences_about_website = 'Wire website';
 
+z.string.preferences_account_avaibility_unset = 'Set a status';
 z.string.preferences_account_create_team = 'Create a team';
 z.string.preferences_account_delete = 'Delete account';
 z.string.preferences_account_log_out = 'Log out';
@@ -551,6 +552,12 @@ z.string.warning_permission_request_notification = '{{icon}} Allow notifications
 z.string.warning_permission_request_screen = '{{icon}} Allow access to screen';
 z.string.warning_tell_me_how = 'Tell me how';
 
+// User Availability
+z.string.user_availability_available = 'Available';
+z.string.user_availability_away = 'Away';
+z.string.user_availability_busy = 'Busy';
+z.string.user_availability_none = 'None';
+
 // Browser notifications
 z.string.system_notification_asset_add = 'Shared a picture';
 z.string.system_notification_connection_accepted = 'Accepted your connection request';
@@ -578,6 +585,9 @@ z.string.tooltip_conversation_call = 'Call';
 z.string.tooltip_conversation_ephemeral = 'Timed message';
 z.string.tooltip_conversation_file = 'Add file';
 z.string.tooltip_conversation_input_placeholder = 'Type a message';
+z.string.tooltip_conversation_input_placeholder_available = '{{user}} is available';
+z.string.tooltip_conversation_input_placeholder_away = '{{user}} is away';
+z.string.tooltip_conversation_input_placeholder_busy = '{{user}} is busy';
 z.string.tooltip_conversation_people = 'People ({{shortcut}})';
 z.string.tooltip_conversation_picture = 'Add picture';
 z.string.tooltip_conversation_ping = 'Ping ({{shortcut}})';

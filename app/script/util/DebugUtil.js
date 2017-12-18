@@ -58,18 +58,6 @@ z.util.DebugUtil = class DebugUtil {
       .then(() => this.logger.log(`Corrupted Session ID '${session_id}'`));
   }
 
-  get_number_of_clients_in_conversation() {
-    const user_ets = this.conversation_repository.active_conversation().participating_user_ets();
-
-    const other_clients = user_ets
-      .map(user_et => user_et.devices().length)
-      .reduce((previous, current) => previous + current);
-
-    const my_clients = this.user_repository.self().devices().length;
-
-    return other_clients + my_clients;
-  }
-
   get_event_info(event) {
     const debug_information = {event};
 

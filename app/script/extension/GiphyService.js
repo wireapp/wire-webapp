@@ -44,7 +44,7 @@ z.extension.GiphyService = class GiphyService {
    * @returns {Promise} Resolves with the size data
    */
   get_by_id(ids) {
-    ids = _.isArray(ids) ? ids : [ids];
+    ids = [].concat(ids);
 
     return this.client.send_request({
       type: 'GET',
@@ -79,7 +79,7 @@ z.extension.GiphyService = class GiphyService {
    */
   get_search(options) {
     return this.client.send_request({
-      data: $.extend(
+      data: Object.assign(
         {
           limit: 25,
           offset: 0,

@@ -20,23 +20,15 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.cryptography = z.cryptography || {};
+window.z.user = z.user || {};
 
-z.cryptography.GENERIC_MESSAGE_TYPE = {
-  ASSET: 'asset',
-  AVAILABILITY: 'availability',
-  CALLING: 'calling',
-  CLEARED: 'cleared',
-  CLIENT_ACTION: 'clientAction',
-  CONFIRMATION: 'confirmation',
-  DELETED: 'deleted',
-  EDITED: 'edited',
-  EPHEMERAL: 'ephemeral',
-  HIDDEN: 'hidden',
-  IMAGE: 'image',
-  KNOCK: 'knock',
-  LAST_READ: 'lastRead',
-  LOCATION: 'location',
-  REACTION: 'reaction',
-  TEXT: 'text',
+/**
+ * Enum for different user availability types.
+ * @type {z.user.AvailabilityType} Enum of availability types
+ */
+z.user.AvailabilityType = {
+  AVAILABLE: 1,
+  AWAY: 2,
+  BUSY: 3,
+  NONE: 0,
 };

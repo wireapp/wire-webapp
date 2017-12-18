@@ -17,33 +17,29 @@
  *
  */
 
+const webpack = require('webpack');
 const path = require('path');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const prodConfig = require('./webpack.config.prod');
+const commonConfig = require('./webpack.config.common');
 
 // https://github.com/babel/babel-loader/issues/149
 const babelSettings = {
   extends: path.join(__dirname, '/.babelrc'),
 };
 
-const dist = 'aws/static/';
-const srcScript = 'app/script/auth/';
-const srcStyle = 'app/style/auth/';
-
-const extractSass = new ExtractTextPlugin({filename: 'style/[name].css'});
-
-module.exports = {
-  devtool: 'source-map',
-  entry: {
-    script: path.resolve(__dirname, srcScript, 'main.js'),
-    style: path.resolve(__dirname, srcStyle, 'style.scss'),
-  },
-  externals: {
-    'fs-extra': '{}',
-  },
+module.exports = Object.assign({}, prodConfig, {
+  devtool: false,
+  entry: false,
+  externals: Object.assign(prodConfig.externals, {
+    // These will help enable enzyme to work properly
+    cheerio: 'window',
+    'react/addons': true,
+    'react/lib/ExecutionEnvironment': true,
+    'react/lib/ReactContext': true,
+  }),
   module: {
     rules: [
       {
-        exclude: /(node_modules)/,
         test: /\.jsx?$/,
         use: [
           {
@@ -51,25 +47,14 @@ module.exports = {
           },
         ],
       },
-      {
-        exclude: /(node_modules)/,
-        test: /style\.scss$/,
-        // prettier-ignore
-        use: extractSass.extract('css-loader?sourceMap!postcss-loader?sourceMap!sass-loader?sourceMap')
-      },
     ],
   },
-  node: {
-    fs: 'empty',
-  },
-  output: {
-    filename: 'min/[name].js',
-    path: path.resolve(__dirname, dist),
-    publicPath: '/',
-  },
-  plugins: [extractSass],
-  resolve: {
-    extensions: ['.js', '.jsx'],
-    modules: [path.resolve(srcScript), 'node_modules'],
-  },
-};
+  plugins: [
+    ...commonConfig.plugins,
+    new webpack.DefinePlugin({
+      'process.env': {
+        NODE_ENV: JSON.stringify('test'),
+      },
+    }),
+  ],
+});

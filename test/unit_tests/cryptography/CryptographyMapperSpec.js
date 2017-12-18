@@ -224,6 +224,27 @@ describe('z.cryptography.CryptographyMapper', () => {
         .catch(done.fail);
     });
 
+    it('resolves with a mapped availability message', done => {
+      const availability = new z.proto.Availability(z.proto.Availability.Type.AVAILABLE);
+
+      const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
+      generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.AVAILABILITY, availability);
+
+      mapper
+        .map_generic_message(generic_message, event)
+        .then(event_json => {
+          expect(_.isObject(event_json)).toBeTruthy();
+          expect(event_json.type).toBe(z.event.Client.USER.AVAILABILITY);
+          expect(event_json.conversation).toBe(event.conversation);
+          expect(event_json.from).toBe(event.from);
+          expect(event_json.time).toBe(event.time);
+          expect(event_json.id).toBe(generic_message.message_id);
+          expect(event_json.data.availability).toBe(z.user.AvailabilityType.AVAILABLE);
+          done();
+        })
+        .catch(done.fail);
+    });
+
     it('resolves with a mapped cleared message', done => {
       const date = Date.now().toString();
       const conversation_id = z.util.create_random_uuid();

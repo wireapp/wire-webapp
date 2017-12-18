@@ -42,7 +42,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
     this.client_repository = client_repository;
     this.conversation_repository = conversation_repository;
     this.media_repository = media_repository;
-    this.properties_repository = properties_repository;
+    this.propertiesRepository = properties_repository;
     this.search_repository = search_repository;
     this.team_repository = team_repository;
     this.logger = new z.util.Logger('z.ViewModel.ContentViewModel', z.config.LOGGER.OPTIONS);
@@ -88,7 +88,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
       'conversation-input',
       this.conversation_repository,
       this.user_repository,
-      this.properties_repository
+      this.propertiesRepository
     );
     this.message_list = new z.ViewModel.MessageListViewModel(
       'message-list',
@@ -126,7 +126,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
     );
     this.preferences_options = new z.ViewModel.content.PreferencesOptionsViewModel(
       'preferences-options',
-      this.properties_repository,
+      this.propertiesRepository,
       this.team_repository
     );
     /* eslint-enable no-multi-spaces */

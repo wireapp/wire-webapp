@@ -459,6 +459,31 @@ describe('Conversation', () => {
     });
   });
 
+  describe('getNumberOfClients', () => {
+    it('should return the number of all known clients  (including own clients)', () => {
+      const first_client = new z.client.Client();
+      first_client.id = '5021d77752286cac';
+
+      const second_client = new z.client.Client();
+      second_client.id = '575b7a890cdb7635';
+
+      const third_client = new z.client.Client();
+      third_client.id = '6c0daa855d6b8b6e';
+
+      const user_et = new z.entity.User();
+      user_et.devices.push(first_client);
+      user_et.devices.push(second_client);
+
+      const second_user_et = new z.entity.User();
+      second_user_et.devices.push(third_client);
+
+      conversation_et.participating_user_ets.push(user_et);
+      conversation_et.participating_user_ets.push(second_user_et);
+
+      expect(conversation_et.getNumberOfClients()).toBe(4);
+    });
+  });
+
   describe('is_verified', () => {
     it('is not verified when nothing is set', () => {
       expect(conversation_et.is_verified()).toBeFalsy();

@@ -23,10 +23,10 @@ window.z = window.z || {};
 window.z.connect = z.connect || {};
 
 z.connect.ConnectRepository = class ConnectRepository {
-  constructor(connect_service, connect_google_service, properties_repository) {
-    this.connect_service = connect_service;
-    this.connect_google_service = connect_google_service;
-    this.properties_repository = properties_repository;
+  constructor(connectService, connectGoogleService, propertiesRepository) {
+    this.connectService = connectService;
+    this.connectGoogleService = connectGoogleService;
+    this.propertiesRepository = propertiesRepository;
     this.logger = new z.util.Logger('z.connect.ConnectRepository', z.config.LOGGER.OPTIONS);
   }
 
@@ -35,32 +35,32 @@ z.connect.ConnectRepository = class ConnectRepository {
    * @param {z.connect.ConnectSource} source - Source for phone book retrieval
    * @returns {Promise} Resolves with the matched user IDs
    */
-  get_contacts(source) {
-    const import_from_icloud = source === z.connect.ConnectSource.ICLOUD;
+  getContacts(source) {
+    const importFromIcloud = source === z.connect.ConnectSource.ICLOUD;
 
-    const import_promise = import_from_icloud ? this._get_macos_contacts() : this._get_google_contacts();
-    return import_promise.then(phone_book => this._upload_contacts(phone_book, source));
+    const importPromise = importFromIcloud ? this._getMacosContacts() : this._getGoogleContacts();
+    return importPromise.then(phoneBook => this._uploadContacts(phoneBook, source));
   }
 
   /**
    * Encode phone book
    *
    * @private
-   * @param {z.connect.PhoneBook} phone_book - Object containing un-encoded phone book data
+   * @param {z.connect.PhoneBook} phoneBook - Object containing un-encoded phone book data
    * @returns {z.connect.PhoneBook} Object containing encoded phone book data
    */
-  _encode_phone_book(phone_book) {
-    const {cards, self} = phone_book;
-    self.forEach((contact, contact_index) => (self[contact_index] = z.util.encode_sha256_base64(contact)));
+  _encodePhoneBook(phoneBook) {
+    const {cards, self} = phoneBook;
+    self.forEach((contact, contactIndex) => (self[contactIndex] = z.util.encode_sha256_base64(contact)));
 
-    cards.forEach((card, card_index) => {
-      card.contact.forEach((contact, contact_index) => {
-        card.contact[contact_index] = z.util.encode_sha256_base64(contact);
+    cards.forEach((card, cardIndex) => {
+      card.contact.forEach((contact, contactIndex) => {
+        card.contact[contactIndex] = z.util.encode_sha256_base64(contact);
       });
-      cards[card_index] = card;
+      cards[cardIndex] = card;
     });
 
-    return phone_book;
+    return phoneBook;
   }
 
   /**
@@ -68,16 +68,16 @@ z.connect.ConnectRepository = class ConnectRepository {
    * @private
    * @returns {Promise} Resolves with the user's Google contacts that match on Wire
    */
-  _get_google_contacts() {
-    return this.connect_google_service
-      .get_contacts()
+  _getGoogleContacts() {
+    return this.connectGoogleService
+      .getContacts()
       .catch(error => {
         this.logger.info('Google Contacts SDK error', error);
         throw new z.connect.ConnectError(z.connect.ConnectError.TYPE.GOOGLE_DOWNLOAD);
       })
       .then(response => {
         amplify.publish(z.event.WebApp.SEARCH.SHOW);
-        return this._parse_google_contacts(response);
+        return this._parseGoogleContacts(response);
       });
   }
 
@@ -86,8 +86,8 @@ z.connect.ConnectRepository = class ConnectRepository {
    * @private
    * @returns {Promise} Resolves with the user's address book contacts that match on Wire
    */
-  _get_macos_contacts() {
-    return this._parse_macos_contacts();
+  _getMacosContacts() {
+    return this._parseMacosContacts();
   }
 
   /**
@@ -95,36 +95,36 @@ z.connect.ConnectRepository = class ConnectRepository {
    * @private
    * @returns {Promise} Resolves with encoded phone book data
    */
-  _parse_macos_contacts() {
+  _parseMacosContacts() {
     return new Promise(resolve => {
       if (!window.wAddressBook) {
         return resolve(undefined);
       }
-      const address_book = window.wAddressBook;
-      const phone_book = new z.connect.PhoneBook();
+      const addressBook = window.wAddressBook;
+      const phoneBook = new z.connect.PhoneBook();
 
-      const {numbers: self_numbers} = address_book.getMe();
-      self_numbers.forEach(number => phone_book.self.push(number));
+      const {numbers: selfNumbers} = addressBook.getMe();
+      selfNumbers.forEach(number => phoneBook.self.push(number));
 
-      address_book.getContacts(
+      addressBook.getContacts(
         percentage => {
           this.logger.info('Importing Contacts', percentage);
         },
         contacts => {
-          contacts.forEach(({firstName: first_name, lastName: last_name, numbers}) => {
+          contacts.forEach(({firstName, lastName, numbers}) => {
             const card = {
-              card_id: CryptoJS.MD5(`${first_name}${last_name}`).toString(),
+              card_id: CryptoJS.MD5(`${firstName}${lastName}`).toString(),
               contact: [],
             };
 
             numbers.forEach(number => card.contact.push(z.util.phone_number_to_e164(number, navigator.language)));
 
             if (card.contact.length) {
-              phone_book.cards.push(card);
+              phoneBook.cards.push(card);
             }
           });
 
-          return resolve(this._encode_phone_book(phone_book));
+          return resolve(this._encodePhoneBook(phoneBook));
         }
       );
     });
@@ -137,8 +137,8 @@ z.connect.ConnectRepository = class ConnectRepository {
    * @param {Array} users - Contacts response from Google API
    * @returns {z.connect.PhoneBook} Encoded phone book data
    */
-  _parse_google_contacts({entry: users}) {
-    const phone_book = new z.connect.PhoneBook();
+  _parseGoogleContacts({entry: users}) {
+    const phoneBook = new z.connect.PhoneBook();
 
     // Add Google contacts
     if (users) {
@@ -160,37 +160,37 @@ z.connect.ConnectRepository = class ConnectRepository {
           }
 
           if (card.contact.length) {
-            phone_book.cards.push(card);
+            phoneBook.cards.push(card);
           }
         }
       });
     }
 
-    return this._encode_phone_book(phone_book);
+    return this._encodePhoneBook(phoneBook);
   }
 
   /**
    * Upload hashed phone booked to backend for matching.
    *
    * @private
-   * @param {z.connect.PhoneBook} phone_book - Encoded phone book data
+   * @param {z.connect.PhoneBook} phoneBook - Encoded phone book data
    * @param {z.connect.ConnectSource} source - Source of phone book data
    * @returns {Promise} Resolves when phone book was uploaded
    */
-  _upload_contacts(phone_book, source = z.connect.ConnectSource.GMAIL) {
-    const {cards} = phone_book;
+  _uploadContacts(phoneBook, source = z.connect.ConnectSource.GMAIL) {
+    const {cards} = phoneBook;
 
     if (!cards.length) {
       this.logger.warn('No contacts found for upload');
       throw new z.connect.ConnectError(z.connect.ConnectError.TYPE.NO_CONTACTS);
     }
 
-    this.logger.info(`Uploading hashes of '${cards.length}' contacts for matching`, phone_book);
-    return this.connect_service
-      .post_onboarding(phone_book)
+    this.logger.info(`Uploading hashes of '${cards.length}' contacts for matching`, phoneBook);
+    return this.connectService
+      .postOnboarding(phoneBook)
       .then(({results}) => {
         this.logger.info(`Upload of '${source}' contacts upload successful: ${results.length} matches`, results);
-        this.properties_repository.save_preference(z.properties.PROPERTIES_TYPE.CONTACT_IMPORT.GOOGLE);
+        this.propertiesRepository.save_preference(z.properties.PROPERTIES_TYPE.CONTACT_IMPORT.GOOGLE);
         return results.map(result => result.id);
       })
       .catch(error => {

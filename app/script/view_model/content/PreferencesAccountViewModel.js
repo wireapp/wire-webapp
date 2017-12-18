@@ -42,6 +42,18 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.self_user = this.user_repository.self;
     this.new_clients = ko.observableArray([]);
     this.name = ko.pureComputed(() => this.self_user().name());
+    this.availability = ko.pureComputed(() => this.self_user().availability());
+
+    this.availabilityLabel = ko.pureComputed(() => {
+      let label = z.user.AvailabilityMapper.nameFromType(this.availability());
+
+      const noStatusSet = this.availability() === z.user.AvailabilityType.NONE;
+      if (noStatusSet) {
+        label = z.l10n.text(z.string.preferences_account_avaibility_unset);
+      }
+
+      return label;
+    });
 
     this.username = ko.pureComputed(() => this.self_user().username());
     this.entered_username = ko.observable();
@@ -116,6 +128,10 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     // Automation: KeyboardEvent triggered during tests is missing key property
     const input_char = keyboard_event.key || String.fromCharCode(event.charCode);
     return z.user.UserHandleGenerator.validate_character(input_char.toLowerCase());
+  }
+
+  clickOnAvailability(viewModel, event) {
+    z.ui.AvailabilityContextMenu.show(event, 'settings', 'preferences-account-availability-menu');
   }
 
   click_on_username() {

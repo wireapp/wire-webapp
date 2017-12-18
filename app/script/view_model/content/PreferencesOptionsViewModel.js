@@ -27,7 +27,7 @@ z.ViewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
   constructor(element_id, properties_repository, team_repository) {
     this.logger = new z.util.Logger('z.ViewModel.content.PreferencesOptionsViewModel', z.config.LOGGER.OPTIONS);
 
-    this.properties_repository = properties_repository;
+    this.propertiesRepository = properties_repository;
     this.team_repository = team_repository;
 
     this.is_team = this.team_repository.is_team;
@@ -46,7 +46,7 @@ z.ViewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
         }
       })();
 
-      this.properties_repository.save_preference(z.properties.PROPERTIES_TYPE.SOUND_ALERTS, audio_preference);
+      this.propertiesRepository.save_preference(z.properties.PROPERTIES_TYPE.SOUND_ALERTS, audio_preference);
       amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SOUND_SETTINGS_CHANGED, {
         value: tracking_value,
       });
@@ -54,7 +54,7 @@ z.ViewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
 
     this.option_emoji_replace_inline = ko.observable();
     this.option_emoji_replace_inline.subscribe(emoji_replace_inline_preference => {
-      this.properties_repository.save_preference(
+      this.propertiesRepository.save_preference(
         z.properties.PROPERTIES_TYPE.EMOJI.REPLACE_INLINE,
         emoji_replace_inline_preference
       );
@@ -62,17 +62,17 @@ z.ViewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
 
     this.option_notifications = ko.observable();
     this.option_notifications.subscribe(notifications_preference => {
-      this.properties_repository.save_preference(z.properties.PROPERTIES_TYPE.NOTIFICATIONS, notifications_preference);
+      this.propertiesRepository.save_preference(z.properties.PROPERTIES_TYPE.NOTIFICATIONS, notifications_preference);
     });
 
     this.option_previews_send = ko.observable();
     this.option_previews_send.subscribe(previews_send_preference => {
-      this.properties_repository.save_preference(z.properties.PROPERTIES_TYPE.PREVIEWS.SEND, previews_send_preference);
+      this.propertiesRepository.save_preference(z.properties.PROPERTIES_TYPE.PREVIEWS.SEND, previews_send_preference);
     });
 
     this.option_privacy = ko.observable();
     this.option_privacy.subscribe(privacy_preference => {
-      this.properties_repository.save_preference(z.properties.PROPERTIES_TYPE.PRIVACY, privacy_preference);
+      this.propertiesRepository.save_preference(z.properties.PROPERTIES_TYPE.PRIVACY, privacy_preference);
     });
 
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.update_properties.bind(this));
