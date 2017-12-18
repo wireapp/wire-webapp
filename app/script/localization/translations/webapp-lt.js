@@ -86,6 +86,7 @@ z.string.lt.auth_error_name_short = 'Įveskite bent 2 simbolių vardą';
 z.string.lt.auth_error_offline = 'Nėra interneto ryšio';
 z.string.lt.auth_error_password_short = 'Pasirinkite bent 8 simbolių slaptažodį.';
 z.string.lt.auth_error_password_wrong = 'Neteisingas slaptažodis. Bandykite dar kartą.';
+z.string.lt.auth_error_pending = 'Paskyra dar nepatvirtinta';
 z.string.lt.auth_error_phone_number_budget = 'Jūs prisijungėte pernelyg dažnai. Pabandykite vėliau dar kartą.';
 z.string.lt.auth_error_phone_number_forbidden = 'Atleiskite. Šis telefono numeris yra uždraustas.';
 z.string.lt.auth_error_phone_number_invalid = 'Neteisingas telefono numeris';
@@ -482,6 +483,9 @@ z.string.lt.warning_permission_request_microphone = '{{icon}} Leisti prieigą pr
 z.string.lt.warning_permission_request_notification = '{{icon}} Leisti pranešimus';
 z.string.lt.warning_permission_request_screen = '{{icon}} Leisti prieigą prie ekrano';
 z.string.lt.warning_tell_me_how = 'Paaiškinkite kaip';
+
+z.string.lt.user_availability_available = 'Prieinamas';
+z.string.lt.user_availability_none = 'Jokių';
 
 z.string.lt.system_notification_asset_add = 'Pasidalino paveikslu';
 z.string.lt.system_notification_connection_accepted = 'Priėmė jūsų kontakto užmezgimo užklausą';

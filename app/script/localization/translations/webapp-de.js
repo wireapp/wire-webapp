@@ -86,6 +86,7 @@ z.string.de.auth_error_name_short = 'Gib deinen Namen mit mindestens zwei Zeiche
 z.string.de.auth_error_offline = 'Keine Internetverbindung';
 z.string.de.auth_error_password_short = 'Wähle ein Passwort mit mindestens acht Zeichen.';
 z.string.de.auth_error_password_wrong = 'Falsches Passwort. Bitte versuche es erneut.';
+z.string.de.auth_error_pending = 'Benutzerkonto noch nicht verifiziert';
 z.string.de.auth_error_phone_number_budget = 'Du hast dich zu oft eingeloggt. Versuche es später erneut.';
 z.string.de.auth_error_phone_number_forbidden = 'Diese Telefonnummer ist leider nicht nutzbar.';
 z.string.de.auth_error_phone_number_invalid = 'Ungültige Telefonnummer';
@@ -384,6 +385,7 @@ z.string.de.preferences_about_terms_of_use = 'Nutzungsbedingungen';
 z.string.de.preferences_about_version = 'Version {{version}}';
 z.string.de.preferences_about_website = 'Wire-Webseite';
 
+z.string.de.preferences_account_avaibility_unset = 'Wähle einen Status';
 z.string.de.preferences_account_create_team = 'Team erstellen';
 z.string.de.preferences_account_delete = 'Benutzerkonto löschen';
 z.string.de.preferences_account_log_out = 'Abmelden';
@@ -491,6 +493,11 @@ z.string.de.warning_permission_request_notification = '{{icon}} Benachrichtigung
 z.string.de.warning_permission_request_screen = '{{icon}} Zugriff auf Bildschirm gewähren';
 z.string.de.warning_tell_me_how = 'Zeig mir wie';
 
+z.string.de.user_availability_available = 'Verfügbar';
+z.string.de.user_availability_away = 'Abwesend';
+z.string.de.user_availability_busy = 'Beschäftigt';
+z.string.de.user_availability_none = 'Kein Status';
+
 z.string.de.system_notification_asset_add = 'Hat ein Bild geteilt';
 z.string.de.system_notification_connection_accepted = 'Hat deine Kontaktanfrage akzeptiert';
 z.string.de.system_notification_connection_connected = 'Ist jetzt ein Kontakt von dir';
@@ -516,6 +523,9 @@ z.string.de.tooltip_conversation_call = 'Anruf';
 z.string.de.tooltip_conversation_ephemeral = 'Temporäre Nachricht';
 z.string.de.tooltip_conversation_file = 'Datei senden';
 z.string.de.tooltip_conversation_input_placeholder = 'Schreibe eine Nachricht';
+z.string.de.tooltip_conversation_input_placeholder_available = '{{user}} ist verfügbar';
+z.string.de.tooltip_conversation_input_placeholder_away = '{{user}} ist abwesend';
+z.string.de.tooltip_conversation_input_placeholder_busy = '{{user}} ist beschäftigt';
 z.string.de.tooltip_conversation_people = 'Unterhaltungsübersicht ({{shortcut}})';
 z.string.de.tooltip_conversation_picture = 'Bild senden';
 z.string.de.tooltip_conversation_ping = 'Ping ({{shortcut}})';
