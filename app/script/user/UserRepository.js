@@ -88,7 +88,7 @@ z.user.UserRepository = class UserRepository {
     amplify.subscribe(z.event.WebApp.CLIENT.ADD, this.add_client_to_user.bind(this));
     amplify.subscribe(z.event.WebApp.CLIENT.REMOVE, this.remove_client_from_user.bind(this));
     amplify.subscribe(z.event.WebApp.CLIENT.UPDATE, this.update_clients_from_user.bind(this));
-    amplify.subscribe(z.event.WebApp.USER.CHANGE_AVAILABILITY, this.changeAvailability.bind(this));
+    amplify.subscribe(z.event.WebApp.USER.SET_AVAILABILITY, this.setAvailability.bind(this));
     amplify.subscribe(z.event.WebApp.USER.EVENT_FROM_BACKEND, this.on_user_event.bind(this));
     amplify.subscribe(z.event.WebApp.USER.PERSIST, this.saveUserInDb.bind(this));
   }
@@ -568,18 +568,21 @@ z.user.UserRepository = class UserRepository {
     });
   }
 
-  changeAvailability(availability, method) {
+  setAvailability(availability, method) {
     const hasAvailabilityChanged = availability !== this.self().availability();
     if (hasAvailabilityChanged) {
+      this.logger.log(`Availability was changed from '${this.self().availability()}' to '${availability}'`);
       this.self().availability(availability);
-
-      const genericMessage = new z.proto.GenericMessage(z.util.create_random_uuid());
-      const availabilityMessage = new z.proto.Availability(z.user.AvailabilityMapper.protoFromType(availability));
-      genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.AVAILABILITY, availabilityMessage);
-
-      amplify.publish(z.event.WebApp.BROADCAST.SEND_MESSAGE, genericMessage);
       this._trackAvailability(availability, method);
+    } else {
+      this.logger.log(`Availability was again set to '${availability}'`);
     }
+
+    const genericMessage = new z.proto.GenericMessage(z.util.create_random_uuid());
+    const availabilityMessage = new z.proto.Availability(z.user.AvailabilityMapper.protoFromType(availability));
+    genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.AVAILABILITY, availabilityMessage);
+
+    amplify.publish(z.event.WebApp.BROADCAST.SEND_MESSAGE, genericMessage);
   }
 
   /**
