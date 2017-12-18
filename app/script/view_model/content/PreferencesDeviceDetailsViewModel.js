@@ -60,21 +60,25 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
     );
     this.fingerprint = ko.observable('');
 
-    this.displayActivatedIn = ko.observable(z.l10n.text(z.string.preferences_devices_activated_in));
+    this.activated_in = ko.observable(z.l10n.text(z.string.preferences_devices_activated_in));
     this.activated_on = ko.observable(z.l10n.text(z.string.preferences_devices_activated_on));
   }
 
-  _update_activation_location(location) {
-    const text = z.l10n.text(z.string.preferences_devices_activated_in, location);
-    const findLocation =
-      location === this.DEFAULT_LOCATION ? new RegExp(`(\\${this.DEFAULT_LOCATION})`) : new RegExp(`(${location})`);
-    const parts = text.split(findLocation).filter(match => match);
-    this.displayActivatedIn(parts);
+  _sanitize_external_input(input, template) {
+    const text = z.l10n.text(template, input);
+    const userInput = input === '?' ? new RegExp('(\\?)') : new RegExp(`(${input})`);
+    return text.split(userInput);
   }
 
-  _update_activation_time(time) {
-    const time_content = `<span class='preferences-devices-activated-bold'>${z.util.format_timestamp(time)}</span>`;
-    this.activated_on(z.l10n.text(z.string.preferences_devices_activated_on, time_content));
+  _update_activation_location(location, template = z.string.preferences_devices_activated_in) {
+    const sanitizedLocation = this._sanitize_external_input(location, template);
+    this.activated_in(sanitizedLocation);
+  }
+
+  _update_activation_time(time, template = z.string.preferences_devices_activated_on) {
+    const time = z.util.format_timestamp(time);
+    const sanitizedTime = this._sanitize_external_input(time, template);
+    this.activated_on(sanitizedTime);
   }
 
   _update_device_location(location) {
