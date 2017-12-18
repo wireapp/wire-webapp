@@ -14,7 +14,9 @@
         </div>
         <div class="preferences-devices-activated">
           <div data-bind="html: activated_on"></div>
-          <div data-bind="html: activated_in"></div>
+          <div data-bind="foreach: displayActivatedIn">
+            <span class="preferences-devices-activated-bold" data-bind="text: $data">?</span>
+          </div>
         </div>
         <div class="preferences-devices-fingerprint-label" data-bind="l10n_text: z.string.preferences_devices_fingerprint"></div>
         <div class="preferences-devices-fingerprint" data-bind="foreach: fingerprint().match(/.{1,2}/g)">

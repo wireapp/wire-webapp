@@ -38,6 +38,7 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
     this.cryptography_repository = cryptography_repository;
     this.logger = new z.util.Logger('z.ViewModel.content.PreferencesDeviceDetailsViewModel', z.config.LOGGER.OPTIONS);
 
+    this.DEFAULT_LOCATION = '?';
     this.self_user = this.client_repository.self_user;
 
     this.device = ko.observable();
@@ -46,7 +47,7 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
         this.session_reset_state(z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET);
         this.fingerprint('');
         this._update_fingerprint();
-        this._update_activation_location('?');
+        this._update_activation_location(this.DEFAULT_LOCATION);
         this._update_activation_time(device_et.time);
         if (device_et.location) {
           this._update_device_location(device_et.location);
@@ -59,13 +60,16 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
     );
     this.fingerprint = ko.observable('');
 
-    this.activated_in = ko.observable(z.l10n.text(z.string.preferences_devices_activated_in));
+    this.displayActivatedIn = ko.observable(z.l10n.text(z.string.preferences_devices_activated_in));
     this.activated_on = ko.observable(z.l10n.text(z.string.preferences_devices_activated_on));
   }
 
   _update_activation_location(location) {
-    const location_content = `<span class='preferences-devices-activated-bold'>${location}</span>`;
-    this.activated_in(z.l10n.text(z.string.preferences_devices_activated_in, location_content));
+    const text = z.l10n.text(z.string.preferences_devices_activated_in, location);
+    const findLocation =
+      location === this.DEFAULT_LOCATION ? new RegExp(`(\\${this.DEFAULT_LOCATION})`) : new RegExp(`(${location})`);
+    const parts = text.split(findLocation).filter(match => match);
+    this.displayActivatedIn(parts);
   }
 
   _update_activation_time(time) {
