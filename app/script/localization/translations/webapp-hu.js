@@ -86,6 +86,7 @@ z.string.hu.auth_error_name_short = 'Legalább 2 karakterből álló nevet adj m
 z.string.hu.auth_error_offline = 'Nincs internetkapcsolat';
 z.string.hu.auth_error_password_short = 'Válassz egy legalább 8 karakter hosszú jelszót.';
 z.string.hu.auth_error_password_wrong = 'Hibás jelszó. Kérjük, próbáld meg újra.';
+z.string.hu.auth_error_pending = 'A fiók még nincs ellenőrizve';
 z.string.hu.auth_error_phone_number_budget = 'Túl gyakran jelentkeztél be. Próbáld meg később.';
 z.string.hu.auth_error_phone_number_forbidden = 'Sajnáljuk. Ez a telefonszám nem megengedett.';
 z.string.hu.auth_error_phone_number_invalid = 'Érvénytelen telefonszám';
@@ -465,7 +466,6 @@ z.string.hu.url_support_articles = '/hc/en-us/articles/';
 z.string.hu.url_support_requests = '/hc/en-us/requests/';
 z.string.hu.url_webapp_root = '/';
 z.string.hu.url_website_root = '/';
-z.string.hu.url_website_create_team = '/create-team';
 z.string.hu.warning_call_detail = 'A hívásokhoz a böngésződnek hozzá kell férnie a mikrofonodhoz.';
 z.string.hu.warning_call_headline = 'Nem kezdeményezhetsz hívást mikrofon nélkül';
 z.string.hu.warning_call_unsupported_incoming = '{{user}} hív. Böngésződ nem támogatja a hanghívásokat.';
@@ -488,6 +488,9 @@ z.string.hu.warning_permission_request_microphone = '{{icon}} Mikrofon hozzáfé
 z.string.hu.warning_permission_request_notification = '{{icon}} Értesítések engedélyezése';
 z.string.hu.warning_permission_request_screen = '{{icon}} Képernyőmegosztás engedélyezése';
 z.string.hu.warning_tell_me_how = 'Mit kell tennem';
+
+z.string.hu.user_availability_available = 'Elérhető';
+z.string.hu.user_availability_none = 'Semmi';
 
 z.string.hu.system_notification_asset_add = 'Megosztott egy képet';
 z.string.hu.system_notification_connection_accepted = 'Elfogadta a csatlakozási kérelmedet';

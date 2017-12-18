@@ -482,6 +482,9 @@ z.string.es.warning_permission_request_notification = '{{icon}} Permitir notific
 z.string.es.warning_permission_request_screen = '{{icon}} Permitir acceso a la pantalla';
 z.string.es.warning_tell_me_how = 'Explíqueme cómo';
 
+z.string.es.user_availability_available = 'Disponible';
+z.string.es.user_availability_none = 'Ninguno';
+
 z.string.es.system_notification_asset_add = 'Compartió una foto';
 z.string.es.system_notification_connection_accepted = 'Aceptó tu solicitud de conexión';
 z.string.es.system_notification_connection_connected = 'Ahora está conectado';
