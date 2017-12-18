@@ -19,22 +19,12 @@
 
 import {COLOR} from '../Identity';
 import {Link} from './Link';
-import PropTypes from 'prop-types';
 import {Text} from './Text';
 
-const Label = Text.withComponent('span').extend`
-    /* positioning */
-    display: ${props => (props.block ? 'block' : 'inline')};
-  `;
-
-Label.propTypes = {
-  ...Text.propTypes,
-  block: PropTypes.bool,
-};
+const Label = Text.withComponent('span');
 
 Label.defaultProps = {
   ...Text.defaultProps,
-  block: false,
   bold: true,
   color: COLOR.LINK,
   fontSize: '12px',

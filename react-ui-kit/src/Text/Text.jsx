@@ -30,6 +30,7 @@ const Text = styled.span`
   opacity: ${props => (props.muted ? '0.5' : '1')};
   text-align: ${props => (props.center ? 'center' : 'left')};
   text-transform: ${props => props.textTransform};
+  display: ${props => (props.block ? 'block' : 'inline')};
   ${props => props.noWrap && 'white-space: nowrap;'};
   ${props =>
     props.truncate &&
@@ -40,6 +41,7 @@ const Text = styled.span`
 `;
 
 Text.propTypes = {
+  block: PropTypes.bool,
   bold: PropTypes.bool,
   center: PropTypes.bool,
   color: PropTypes.string,
@@ -52,6 +54,7 @@ Text.propTypes = {
 };
 
 Text.defaultProps = {
+  block: false,
   bold: false,
   center: false,
   color: COLOR.TEXT,
