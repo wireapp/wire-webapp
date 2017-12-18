@@ -58,109 +58,125 @@ export const ENTER_PERSONAL_CREATION_FLOW = 'ENTER_PERSONAL_CREATION_FLOW';
 export const ENTER_GENERIC_INVITATION_FLOW = 'ENTER_GENERIC_INVITATION_FLOW';
 export const ENTER_PERSONAL_INVITATION_FLOW = 'ENTER_PERSONAL_INVITATION_FLOW';
 
-export function startLogin(params) {
-  return {params, type: LOGIN_START};
-}
+export const startLogin = params => ({
+  params,
+  type: LOGIN_START,
+});
 
-export function successfulLogin(authData) {
-  return {payload: authData, type: LOGIN_SUCCESS};
-}
+export const successfulLogin = authData => ({
+  payload: authData,
+  type: LOGIN_SUCCESS,
+});
 
-export function failedLogin(error) {
-  return {payload: BackendError.handle(error), type: LOGIN_FAILED};
-}
+export const failedLogin = error => ({
+  payload: BackendError.handle(error),
+  type: LOGIN_FAILED,
+});
 
-export function startRegisterTeam(params) {
-  return {params, type: REGISTER_TEAM_START};
-}
+export const startRegisterTeam = params => ({
+  params,
+  type: REGISTER_TEAM_START,
+});
 
-export function successfulRegisterTeam(authData) {
-  return {payload: authData, type: REGISTER_TEAM_SUCCESS};
-}
+export const successfulRegisterTeam = authData => ({
+  payload: authData,
+  type: REGISTER_TEAM_SUCCESS,
+});
 
-export function failedRegisterTeam(error) {
-  return {payload: BackendError.handle(error), type: REGISTER_TEAM_FAILED};
-}
+export const failedRegisterTeam = error => ({
+  payload: BackendError.handle(error),
+  type: REGISTER_TEAM_FAILED,
+});
 
-export function startRegisterPersonal(params) {
-  return {params, type: REGISTER_PERSONAL_START};
-}
+export const startRegisterPersonal = params => ({
+  params,
+  type: REGISTER_PERSONAL_START,
+});
 
-export function successfulRegisterPersonal(authData) {
-  return {payload: authData, type: REGISTER_PERSONAL_SUCCESS};
-}
+export const successfulRegisterPersonal = authData => ({
+  payload: authData,
+  type: REGISTER_PERSONAL_SUCCESS,
+});
 
-export function failedRegisterPersonal(error) {
-  return {payload: BackendError.handle(error), type: REGISTER_PERSONAL_FAILED};
-}
+export const failedRegisterPersonal = error => ({
+  payload: BackendError.handle(error),
+  type: REGISTER_PERSONAL_FAILED,
+});
 
-export function startRegisterJoin(params) {
-  return {params, type: REGISTER_JOIN_START};
-}
+export const startRegisterJoin = params => ({
+  params,
+  type: REGISTER_JOIN_START,
+});
 
-export function successfulRegisterJoin(authData) {
-  return {payload: authData, type: REGISTER_JOIN_SUCCESS};
-}
+export const successfulRegisterJoin = authData => ({
+  payload: authData,
+  type: REGISTER_JOIN_SUCCESS,
+});
 
-export function failedRegisterJoin(error) {
-  return {payload: BackendError.handle(error), type: REGISTER_JOIN_FAILED};
-}
+export const failedRegisterJoin = error => ({
+  payload: BackendError.handle(error),
+  type: REGISTER_JOIN_FAILED,
+});
 
-export function startRefresh() {
-  return {type: REFRESH_START};
-}
+export const startRefresh = () => ({
+  type: REFRESH_START,
+});
 
-export function successfulRefresh(authData) {
-  return {payload: authData, type: REFRESH_SUCCESS};
-}
+export const successfulRefresh = authData => ({
+  payload: authData,
+  type: REFRESH_SUCCESS,
+});
 
-export function failedRefresh(error) {
-  return {payload: BackendError.handle(error), type: REFRESH_FAILED};
-}
+export const failedRefresh = error => ({
+  payload: BackendError.handle(error),
+  type: REFRESH_FAILED,
+});
 
-export function startLogout() {
-  return {type: LOGOUT_START};
-}
+export const startLogout = () => ({
+  type: LOGOUT_START,
+});
 
-export function successfulLogout() {
-  return {type: LOGOUT_SUCCESS};
-}
+export const successfulLogout = () => ({
+  type: LOGOUT_SUCCESS,
+});
 
-export function successfulSilentLogout() {
-  return {type: SILENT_LOGOUT_SUCCESS};
-}
+export const successfulSilentLogout = () => ({
+  type: SILENT_LOGOUT_SUCCESS,
+});
 
-export function failedLogout(error) {
-  return {payload: BackendError.handle(error), type: LOGOUT_FAILED};
-}
+export const failedLogout = error => ({
+  payload: BackendError.handle(error),
+  type: LOGOUT_FAILED,
+});
 
-export function resetError() {
-  return {type: AUTH_RESET_ERROR};
-}
+export const resetError = () => ({
+  type: AUTH_RESET_ERROR,
+});
 
-export function resetAccountData() {
-  return {type: REGISTER_RESET_ACCOUNT_DATA};
-}
+export const resetAccountData = () => ({
+  type: REGISTER_RESET_ACCOUNT_DATA,
+});
 
-export function pushAccountRegistrationData(accountData) {
-  return {payload: accountData, type: REGISTER_PUSH_ACCOUNT_DATA};
-}
+export const pushAccountRegistrationData = accountData => ({
+  payload: accountData,
+  type: REGISTER_PUSH_ACCOUNT_DATA,
+});
 
-export function enterTeamCreationFlow() {
-  return {type: ENTER_TEAM_CREATION_FLOW};
-}
+export const enterTeamCreationFlow = () => ({
+  type: ENTER_TEAM_CREATION_FLOW,
+});
 
-export function enterPersonalCreationFlow() {
-  return {type: ENTER_PERSONAL_CREATION_FLOW};
-}
+export const enterPersonalCreationFlow = () => ({
+  type: ENTER_PERSONAL_CREATION_FLOW,
+});
 
-export function enterGenericInviteCreationFlow() {
-  return {type: ENTER_GENERIC_INVITATION_FLOW};
-}
+export const enterGenericInviteCreationFlow = () => ({
+  type: ENTER_GENERIC_INVITATION_FLOW,
+});
 
-export function enterPersonalInvitationCreationFlow() {
-  return {type: ENTER_PERSONAL_INVITATION_FLOW};
-}
+export const enterPersonalInvitationCreationFlow = () => ({
+  type: ENTER_PERSONAL_INVITATION_FLOW,
+});
 
 export const startGetInvitationFromCode = () => ({
   type: GET_INVITATION_FROM_CODE_START,
