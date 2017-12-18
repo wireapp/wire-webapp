@@ -1509,7 +1509,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     if (other_user_in_one2one && within_threshold && z.event.EventTypeHandling.CONFIRM.includes(message_et.type)) {
       const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
-      const confirmation = new z.proto.Confirmation(message_et.id, z.proto.Confirmation.Type.DELIVERED);
+      const confirmation = new z.proto.Confirmation(z.proto.Confirmation.Type.DELIVERED, message_et.id);
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.CONFIRMATION, confirmation);
 
       this.sending_queue.push(() => {
@@ -2826,7 +2826,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const {conversation: conversationId, data: eventData, from} = eventJson;
 
     const inSelfConversation = !this.self_conversation() || conversationId === this.self_conversation().id;
-    if (conversationId && !inSelfConversation) {
+    const isConversationEvent = eventData.cleared_timestamp || eventData.otr_archived_ref || eventData.otr_muted_ref;
+    if (!inSelfConversation && conversationId && !isConversationEvent) {
       throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_CONVERSATION);
     }
 

@@ -52,6 +52,9 @@ z.conversation.ConversationError = class ConversationError extends Error {
       case ConversationError.TYPE.REQUEST_FAILED:
         this.message = 'Conversation related backend request failed';
         break;
+      case ConversationError.TYPE.WRONG_CONVERSATION:
+        this.message = 'Message was sent in the wrong conversation';
+        break;
       case ConversationError.TYPE.WRONG_TYPE:
         this.message = 'Wrong message to for action';
         break;
