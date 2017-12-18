@@ -427,6 +427,9 @@ z.string.hr.warning_permission_request_notification = '{{icon}} Dopusti notifika
 z.string.hr.warning_permission_request_screen = '{{icon}} dopusti pristup zaslonu';
 z.string.hr.warning_tell_me_how = 'Recite mi kako';
 
+z.string.hr.user_availability_available = 'Dostupno';
+z.string.hr.user_availability_none = 'Ništa';
+
 z.string.hr.system_notification_asset_add = 'Podijelila/o sliku';
 z.string.hr.system_notification_connection_accepted = 'Prihvatila/o zahtjev za vezu';
 z.string.hr.system_notification_connection_request = 'Želi se povezati';

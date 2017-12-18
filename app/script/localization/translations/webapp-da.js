@@ -456,6 +456,9 @@ z.string.da.warning_permission_request_notification = '{{icon}} Tillad meddelels
 z.string.da.warning_permission_request_screen = '{{icon}} Tillad adgang til skærm';
 z.string.da.warning_tell_me_how = 'Fortæl mig hvordan';
 
+z.string.da.user_availability_available = 'Ledig';
+z.string.da.user_availability_none = 'Ingen';
+
 z.string.da.system_notification_asset_add = 'Delte et billede';
 z.string.da.system_notification_connection_accepted = 'Accepterede din anmodning om forbindelse';
 z.string.da.system_notification_connection_connected = 'Du er nu forbundet';

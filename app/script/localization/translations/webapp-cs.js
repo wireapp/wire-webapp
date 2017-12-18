@@ -481,6 +481,9 @@ z.string.cs.warning_permission_request_notification = '{{icon}} Povolit upozorn�
 z.string.cs.warning_permission_request_screen = '{{icon}} Povolit přístup k obrazovce';
 z.string.cs.warning_tell_me_how = 'Jak na to';
 
+z.string.cs.user_availability_available = 'Dostupný';
+z.string.cs.user_availability_none = 'Žádné';
+
 z.string.cs.system_notification_asset_add = 'Sdílel(a) obrázek';
 z.string.cs.system_notification_connection_accepted = 'Přijal(a) váš požadavek na připojení';
 z.string.cs.system_notification_connection_connected = 'Nyní jste připojeni';

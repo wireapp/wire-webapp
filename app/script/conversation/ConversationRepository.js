@@ -1509,7 +1509,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     if (other_user_in_one2one && within_threshold && z.event.EventTypeHandling.CONFIRM.includes(message_et.type)) {
       const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
-      const confirmation = new z.proto.Confirmation(message_et.id, z.proto.Confirmation.Type.DELIVERED);
+      const confirmation = new z.proto.Confirmation(z.proto.Confirmation.Type.DELIVERED, message_et.id);
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.CONFIRMATION, confirmation);
 
       this.sending_queue.push(() => {
@@ -1914,7 +1914,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.OUTGOING_PING);
         }
 
-        this.on_conversation_event(message_stored, z.event.EventRepository.SOURCE.INJECTED);
+        this.onConversationEvent(message_stored, z.event.EventRepository.SOURCE.INJECTED);
 
         return this.send_generic_message_to_conversation(conversation_et.id, generic_message)
           .then(payload => {
@@ -2489,89 +2489,89 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Listener for incoming events.
    *
-   * @param {Object} event_json - JSON data for event
+   * @param {Object} eventJson - JSON data for event
    * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {Promise} Resolves when event was handled
    */
-  on_conversation_event(event_json, source = z.event.EventRepository.SOURCE.STREAM) {
-    if (!event_json) {
+  onConversationEvent(eventJson, source = z.event.EventRepository.SOURCE.STREAM) {
+    if (!eventJson) {
       return Promise.reject(new Error('Conversation Repository Event Handling: Event missing'));
     }
 
-    const {conversation: conversation_id, type} = event_json;
+    const {conversation: conversationId, data: eventData, type} = eventJson;
     this.logger.info(`»» Conversation Event: '${type}' (Source: ${source})`, {
-      event_json: JSON.stringify(event_json),
-      event_object: event_json,
+      eventJson: JSON.stringify(eventJson),
+      eventObject: eventJson,
     });
 
     // Handle conversation create event separately
     if (type === z.event.Backend.CONVERSATION.CREATE) {
-      return this._on_create(event_json);
+      return this._on_create(eventJson);
     }
 
     // Check if conversation was archived
-    let previously_archived;
-    return this.get_conversation_by_id(conversation_id)
-      .then(conversation_et => {
-        previously_archived = conversation_et.is_archived();
+    let previouslyArchived;
+    return this.get_conversation_by_id(eventData.conversationId || conversationId)
+      .then(conversationEntity => {
+        previouslyArchived = conversationEntity.is_archived();
 
-        const is_backend_timestamp = source !== z.event.EventRepository.SOURCE.INJECTED;
-        conversation_et.update_timestamp_server(event_json.server_time || event_json.time, is_backend_timestamp);
+        const isBackendTimestamp = source !== z.event.EventRepository.SOURCE.INJECTED;
+        conversationEntity.update_timestamp_server(eventJson.server_time || eventJson.time, isBackendTimestamp);
 
         switch (type) {
           case z.event.Backend.CONVERSATION.MEMBER_JOIN:
-            return this._on_member_join(conversation_et, event_json);
+            return this._on_member_join(conversationEntity, eventJson);
           case z.event.Backend.CONVERSATION.MEMBER_LEAVE:
           case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE:
-            return this._on_member_leave(conversation_et, event_json);
+            return this._on_member_leave(conversationEntity, eventJson);
           case z.event.Backend.CONVERSATION.MEMBER_UPDATE:
-            return this._onMemberUpdate(conversation_et, event_json);
+            return this._onMemberUpdate(conversationEntity, eventJson);
           case z.event.Backend.CONVERSATION.RENAME:
-            return this._on_rename(conversation_et, event_json);
+            return this._on_rename(conversationEntity, eventJson);
           case z.event.Client.CONVERSATION.ASSET_ADD:
-            return this._on_asset_add(conversation_et, event_json);
+            return this._on_asset_add(conversationEntity, eventJson);
           case z.event.Client.CONVERSATION.CONFIRMATION:
-            return this._on_confirmation(conversation_et, event_json);
+            return this._on_confirmation(conversationEntity, eventJson);
           case z.event.Client.CONVERSATION.MESSAGE_ADD:
-            return this._on_message_add(conversation_et, event_json);
+            return this._on_message_add(conversationEntity, eventJson);
           case z.event.Client.CONVERSATION.MESSAGE_DELETE:
-            return this._on_message_deleted(conversation_et, event_json);
+            return this._on_message_deleted(conversationEntity, eventJson);
           case z.event.Client.CONVERSATION.MESSAGE_HIDDEN:
-            return this._onMessageHidden(event_json);
+            return this._onMessageHidden(eventJson);
           case z.event.Client.CONVERSATION.REACTION:
-            return this._on_reaction(conversation_et, event_json);
+            return this._on_reaction(conversationEntity, eventJson);
           default:
-            return this._on_add_event(conversation_et, event_json);
+            return this._on_add_event(conversationEntity, eventJson);
         }
       })
-      .then((return_value = {}) => {
-        const {conversation_et, message_et} = return_value;
+      .then((returnValue = {}) => {
+        const {conversation_et: conversationEntity, message_et: messageEntity} = returnValue;
 
-        if (conversation_et) {
-          const event_from_web_socket = source === z.event.EventRepository.SOURCE.WEB_SOCKET;
-          const event_from_stream = source === z.event.EventRepository.SOURCE.STREAM;
+        if (conversationEntity) {
+          const eventFromWebSocket = source === z.event.EventRepository.SOURCE.WEB_SOCKET;
+          const eventFromStream = source === z.event.EventRepository.SOURCE.STREAM;
 
-          if (message_et) {
-            const is_remote_event = event_from_stream || event_from_web_socket;
+          if (messageEntity) {
+            const isRemoteEvent = eventFromStream || eventFromWebSocket;
 
-            if (is_remote_event) {
-              this.send_confirmation_status(conversation_et, message_et);
+            if (isRemoteEvent) {
+              this.send_confirmation_status(conversationEntity, messageEntity);
             }
 
-            if (!event_from_stream) {
-              amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et);
+            if (!eventFromStream) {
+              amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversationEntity, messageEntity);
             }
           }
 
           // Check if event needs to be un-archived
-          if (previously_archived) {
+          if (previouslyArchived) {
             // Add to check for unarchive at the end of stream handling
-            if (event_from_stream) {
-              return (this.conversations_with_new_events[conversation_et.id] = conversation_et);
+            if (eventFromStream) {
+              return (this.conversations_with_new_events[conversationEntity.id] = conversationEntity);
             }
 
-            if (event_from_web_socket && conversation_et.should_unarchive()) {
-              return this.unarchive_conversation(conversation_et, 'event from WebSocket');
+            if (eventFromWebSocket && conversationEntity.should_unarchive()) {
+              return this.unarchive_conversation(conversationEntity, 'event from WebSocket');
             }
           }
         }
@@ -2599,7 +2599,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   push_to_receiving_queue(event_json, source) {
     this.receiving_queue
-      .push(() => this.on_conversation_event(event_json, source))
+      .push(() => this.onConversationEvent(event_json, source))
       .then(() => {
         if (this.init_promise) {
           const event_from_stream = source === z.event.EventRepository.SOURCE.STREAM;
@@ -2825,8 +2825,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
   _onMemberUpdate(conversationEntity, eventJson) {
     const {conversation: conversationId, data: eventData, from} = eventJson;
 
+    const isBackendEvent = eventData.otr_archived_ref || eventData.otr_muted_ref;
     const inSelfConversation = !this.self_conversation() || conversationId === this.self_conversation().id;
-    if (conversationId && !inSelfConversation) {
+    if (!inSelfConversation && conversationId && !isBackendEvent) {
       throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_CONVERSATION);
     }
 

@@ -86,6 +86,7 @@ z.string.ro.auth_error_name_short = 'Introdu un nume de cel puțin 2 caractere';
 z.string.ro.auth_error_offline = 'Lipsește conexiunea la internet';
 z.string.ro.auth_error_password_short = 'Alege o parolă de cel puțin 8 caractere.';
 z.string.ro.auth_error_password_wrong = 'Parolă greșită. Reîncearcă.';
+z.string.ro.auth_error_pending = 'Cont neverificat';
 z.string.ro.auth_error_phone_number_budget = 'Te conectezi prea des. Încearcă din nou mai târziu.';
 z.string.ro.auth_error_phone_number_forbidden = 'Ne pare rău. Acest număr de telefon este interzis.';
 z.string.ro.auth_error_phone_number_invalid = 'Număr de telefon nevalid';
@@ -482,6 +483,9 @@ z.string.ro.warning_permission_request_microphone = '{{icon}} permit accesul la 
 z.string.ro.warning_permission_request_notification = '{{icon}} permite notificările';
 z.string.ro.warning_permission_request_screen = '{{icon}} permite accesul la ecran';
 z.string.ro.warning_tell_me_how = 'Spune-mi cum';
+
+z.string.ro.user_availability_available = 'Disponibil';
+z.string.ro.user_availability_none = 'Niciunul';
 
 z.string.ro.system_notification_asset_add = 'A împărtășit o imagine';
 z.string.ro.system_notification_connection_accepted = 'A acceptat cererea de conectare a ta';

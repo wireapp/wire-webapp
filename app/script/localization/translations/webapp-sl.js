@@ -474,6 +474,9 @@ z.string.sl.warning_permission_request_notification = '{{icon}} Dovoli obvestila
 z.string.sl.warning_permission_request_screen = '{{icon}} Dovoli dostop do zaslona';
 z.string.sl.warning_tell_me_how = 'Povej mi kako';
 
+z.string.sl.user_availability_available = 'Na voljo';
+z.string.sl.user_availability_none = 'Nič';
+
 z.string.sl.system_notification_asset_add = 'Je delil(-a) sliko';
 z.string.sl.system_notification_connection_accepted = 'Je sprejel(-a) vašo zahtevo po povezavi';
 z.string.sl.system_notification_connection_connected = 'Zdaj ste povezani';

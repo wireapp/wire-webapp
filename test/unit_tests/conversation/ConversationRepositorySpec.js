@@ -481,7 +481,7 @@ describe('ConversationRepository', () => {
     });
   });
 
-  describe('"on_conversation_event"', () => {
+  describe('"onConversationEvent"', () => {
     describe('"conversation.asset-add"', () => {
       beforeEach(() => {
         const matchUsers = new RegExp(`${test_factory.settings.connection.rest_url}/users\\?ids=([a-z0-9-,]+)`);
@@ -583,13 +583,13 @@ describe('ConversationRepository', () => {
           .then(fetched_conversation => {
             expect(fetched_conversation).toBeDefined();
             TestFactory.conversation_repository.active_conversation(fetched_conversation);
-            return TestFactory.conversation_repository.on_conversation_event(upload_start);
+            return TestFactory.conversation_repository.onConversationEvent(upload_start);
           })
           .then(() => {
             const number_of_messages = Object.keys(TestFactory.conversation_repository.active_conversation().messages())
               .length;
             expect(number_of_messages).toBe(1);
-            return TestFactory.conversation_repository.on_conversation_event(upload_cancel);
+            return TestFactory.conversation_repository.onConversationEvent(upload_cancel);
           })
           .then(() => {
             const number_of_messages = Object.keys(TestFactory.conversation_repository.active_conversation().messages())
@@ -615,13 +615,13 @@ describe('ConversationRepository', () => {
           .then(fetched_conversation => {
             expect(fetched_conversation).toBeDefined();
             TestFactory.conversation_repository.active_conversation(fetched_conversation);
-            return TestFactory.conversation_repository.on_conversation_event(upload_start);
+            return TestFactory.conversation_repository.onConversationEvent(upload_start);
           })
           .then(() => {
             const number_of_messages = Object.keys(TestFactory.conversation_repository.active_conversation().messages())
               .length;
             expect(number_of_messages).toBe(1);
-            return TestFactory.conversation_repository.on_conversation_event(upload_cancel);
+            return TestFactory.conversation_repository.onConversationEvent(upload_cancel);
           })
           .then(() => {
             const number_of_messages = Object.keys(TestFactory.conversation_repository.active_conversation().messages())
@@ -647,13 +647,13 @@ describe('ConversationRepository', () => {
           .then(fetched_conversation => {
             expect(fetched_conversation).toBeDefined();
             TestFactory.conversation_repository.active_conversation(fetched_conversation);
-            return TestFactory.conversation_repository.on_conversation_event(upload_start);
+            return TestFactory.conversation_repository.onConversationEvent(upload_start);
           })
           .then(() => {
             const number_of_messages = Object.keys(TestFactory.conversation_repository.active_conversation().messages())
               .length;
             expect(number_of_messages).toBe(1);
-            return TestFactory.conversation_repository.on_conversation_event(upload_failed);
+            return TestFactory.conversation_repository.onConversationEvent(upload_failed);
           })
           .then(() => {
             const number_of_messages = Object.keys(TestFactory.conversation_repository.active_conversation().messages())
@@ -682,7 +682,7 @@ describe('ConversationRepository', () => {
 
       it('should process create event for a new conversation created locally', done => {
         TestFactory.conversation_repository
-          .on_conversation_event(create_event)
+          .onConversationEvent(create_event)
           .then(() => {
             expect(TestFactory.conversation_repository._on_create).toHaveBeenCalled();
             expect(TestFactory.conversation_repository.map_conversations).toHaveBeenCalledWith(create_event.data, 1);
@@ -697,7 +697,7 @@ describe('ConversationRepository', () => {
         create_event.time = time.toISOString();
 
         TestFactory.conversation_repository
-          .on_conversation_event(create_event)
+          .onConversationEvent(create_event)
           .then(() => {
             expect(TestFactory.conversation_repository._on_create).toHaveBeenCalled();
             expect(TestFactory.conversation_repository.map_conversations).toHaveBeenCalledWith(
@@ -732,7 +732,7 @@ describe('ConversationRepository', () => {
 
       it('should process member-join event when joining a group conversation', done => {
         TestFactory.conversation_repository
-          .on_conversation_event(member_join_event)
+          .onConversationEvent(member_join_event)
           .then(() => {
             expect(TestFactory.conversation_repository._on_member_join).toHaveBeenCalled();
             expect(TestFactory.conversation_repository.update_participating_user_ets).toHaveBeenCalled();
@@ -749,7 +749,7 @@ describe('ConversationRepository', () => {
         TestFactory.user_repository.connections.push(connection_et_a);
 
         TestFactory.conversation_repository
-          .on_conversation_event(member_join_event)
+          .onConversationEvent(member_join_event)
           .then(() => {
             expect(TestFactory.conversation_repository._on_member_join).toHaveBeenCalled();
             expect(TestFactory.conversation_repository.update_participating_user_ets).not.toHaveBeenCalled();
@@ -795,7 +795,7 @@ describe('ConversationRepository', () => {
 
         expect(conversation_et.get_message_by_id(message_et.id)).toBeDefined();
         TestFactory.conversation_repository
-          .on_conversation_event(message_delete_event)
+          .onConversationEvent(message_delete_event)
           .then(done.fail)
           .catch(error => {
             expect(error).toEqual(jasmine.any(z.conversation.ConversationError));
@@ -821,7 +821,7 @@ describe('ConversationRepository', () => {
 
         expect(conversation_et.get_message_by_id(message_et.id)).toBeDefined();
         TestFactory.conversation_repository
-          .on_conversation_event(message_delete_event)
+          .onConversationEvent(message_delete_event)
           .then(() => {
             expect(TestFactory.conversation_repository._on_message_deleted).toHaveBeenCalled();
             expect(conversation_et.get_message_by_id(message_et.id)).not.toBeDefined();
@@ -848,7 +848,7 @@ describe('ConversationRepository', () => {
 
         expect(conversation_et.get_message_by_id(message_et.id)).toBeDefined();
         TestFactory.conversation_repository
-          .on_conversation_event(message_delete_event)
+          .onConversationEvent(message_delete_event)
           .then(() => {
             expect(TestFactory.conversation_repository._on_message_deleted).toHaveBeenCalled();
             expect(conversation_et.get_message_by_id(message_et.id)).not.toBeDefined();
@@ -876,7 +876,7 @@ describe('ConversationRepository', () => {
 
         expect(conversation_et.get_message_by_id(message_et.id)).toBeDefined();
         TestFactory.conversation_repository
-          .on_conversation_event(message_delete_event)
+          .onConversationEvent(message_delete_event)
           .then(() => {
             expect(TestFactory.conversation_repository._on_message_deleted).toHaveBeenCalled();
             expect(conversation_et.get_message_by_id(message_et.id)).not.toBeDefined();
@@ -922,7 +922,7 @@ describe('ConversationRepository', () => {
         expect(conversation_et.get_message_by_id(messageId)).toBeDefined();
 
         TestFactory.conversation_repository
-          .on_conversation_event(messageHiddenEvent)
+          .onConversationEvent(messageHiddenEvent)
           .then(done.fail)
           .catch(error => {
             expect(error).toEqual(jasmine.any(z.conversation.ConversationError));
