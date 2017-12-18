@@ -2511,6 +2511,20 @@ z.conversation.ConversationRepository = class ConversationRepository {
       return this._on_create(eventJson);
     }
 
+    const inSelfConversation = conversationId === this.self_conversation() && this.self_conversation().id;
+    if (inSelfConversation) {
+      const typesInSelfConversation = [
+        z.event.Backend.CONVERSATION.MEMBER_UPDATE,
+        z.event.Client.CONVERSATION.MESSAGE_HIDDEN,
+      ];
+
+      const isExpectedType = typesInSelfConversation.includes(type);
+      if (!isExpectedType) {
+        const error = new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_CONVERSATION);
+        return Promise.reject(error);
+      }
+    }
+
     // Check if conversation was archived
     let previouslyArchived;
     return this.get_conversation_by_id(conversationId)
