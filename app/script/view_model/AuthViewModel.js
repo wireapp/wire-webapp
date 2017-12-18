@@ -223,8 +223,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
     ko.applyBindings(this, document.getElementById(element_id));
 
-    this.tabs_check_interval_id = undefined;
-    this.tabs_check_hash = undefined;
+    this.tabsCheckIntervalId = undefined;
+    this.previousHash = undefined;
 
     this._init_base();
     this._track_app_launch();
@@ -251,7 +251,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     Promise.resolve(this._get_hash())
       .then(current_hash => this._check_cookies(current_hash))
       .then(current_hash => this._check_database(current_hash))
-      .then(() => this._check_single_instance())
+      .then(() => this._checkSingleInstance())
       .then(() => {
         this._init_url_parameter();
         this._init_url_hash();
@@ -274,7 +274,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       z.auth.AuthView.MODE.VERIFY_PASSWORD,
     ];
 
-    if (this._has_no_hash() || modes_to_block.includes(this._get_hash() + 1)) {
+    if (this._has_no_hash() || modes_to_block.includes(this._get_hash())) {
       return this._set_hash(z.auth.AuthView.MODE.ACCOUNT_LOGIN);
     }
 
@@ -372,76 +372,58 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
   /**
    * Check that this is the single instance tab of the app.
-   * @param {boolean} [set_check_interval=true] - Set check interval
    * @returns {Promise} Resolves when page is the first tab
    */
-  _check_single_instance(set_check_interval = true) {
+  _checkSingleInstance() {
     if (!z.util.Environment.electron) {
-      if (Cookies.get(z.main.App.CONFIG.TABS_CHECK.COOKIE_NAME)) {
-        this._handle_blocked_tabs(set_check_interval);
-        return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.MULTIPLE_TABS));
+      if (!this.tabsCheckIntervalId) {
+        this._setTabsCheckInterval();
       }
 
-      if (set_check_interval) {
-        this._set_tabs_check_interval();
+      if (Cookies.get(z.main.App.CONFIG.TABS_CHECK.COOKIE_NAME)) {
+        const currentHash = this._get_hash();
+
+        if (!this.previousHash) {
+          this.previousHash = currentHash;
+
+          const isBlockedTabsHash = currentHash === z.auth.AuthView.MODE.BLOCKED_TABS;
+          if (isBlockedTabsHash) {
+            this._on_hash_change();
+          } else {
+            this._set_hash(z.auth.AuthView.MODE.BLOCKED_TABS);
+          }
+        }
+
+        return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.MULTIPLE_TABS));
       }
     }
 
     return Promise.resolve();
   }
 
-  _clear_tabs_check_interval() {
-    if (this.tabs_check_interval_id) {
-      window.clearInterval(this.tabs_check_interval_id);
-      this.tabs_check_interval_id = undefined;
+  _clearTabsCheckInterval() {
+    if (this.tabsCheckIntervalId) {
+      window.clearInterval(this.tabsCheckIntervalId);
+      this.tabsCheckIntervalId = undefined;
     }
   }
 
-  _handle_blocked_tabs(set_check_interval) {
-    const current_hash = this._get_hash();
-    const is_blocked_tabs_hash = current_hash === z.auth.AuthView.MODE.BLOCKED_TABS;
-
-    if (!is_blocked_tabs_hash) {
-      if (!this.tabs_check_hash) {
-        this.tabs_check_hash = current_hash;
-        this._set_hash(z.auth.AuthView.MODE.BLOCKED_TABS);
-      }
-
-      if (set_check_interval) {
-        this._set_tabs_recheck_interval();
-      }
-    }
-  }
-
-  _set_tabs_check_interval() {
-    this._clear_tabs_check_interval();
-
-    this.tabs_check_interval_id = window.setInterval(() => {
-      this._check_single_instance().catch(error => {
-        if (error.type !== z.auth.AuthError.TYPE.MULTIPLE_TABS) {
-          throw error;
-        }
-        this._handle_blocked_tabs();
-      });
-    }, 500);
-    $(window).on('unload', () => this._clear_tabs_check_interval());
-  }
-
-  _set_tabs_recheck_interval() {
-    this._clear_tabs_check_interval();
-
-    this.tabs_check_interval_id = window.setInterval(() => {
-      this._check_single_instance(false)
+  _setTabsCheckInterval() {
+    this.tabsCheckIntervalId = window.setInterval(() => {
+      this._checkSingleInstance()
         .then(() => {
-          this._set_tabs_check_interval();
-          this._init_url_parameter();
+          const currentHash = this._get_hash();
+          const isBlockedTabsHash = currentHash === z.auth.AuthView.MODE.BLOCKED_TABS;
+          if (isBlockedTabsHash) {
+            this._init_url_parameter();
 
-          if (this.tabs_check_hash) {
-            this._set_hash(this.tabs_check_hash);
-            return (this.tabs_check_hash = undefined);
+            if (this.previousHash) {
+              const wasBlockedTabsHash = this.previousHash === z.auth.AuthView.MODE.BLOCKED_TABS;
+              const nextHash = wasBlockedTabsHash ? z.auth.AuthView.MODE.ACCOUNT_LOGIN : this.previousHash;
+              this.previousHash = undefined;
+              this._set_hash(nextHash);
+            }
           }
-
-          this._init_url_hash();
         })
         .catch(error => {
           if (error.type !== z.auth.AuthError.TYPE.MULTIPLE_TABS) {
@@ -449,6 +431,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
           }
         });
     }, 500);
+    $(window).on('unload', () => this._clearTabsCheckInterval());
   }
 
   //##############################################################################
