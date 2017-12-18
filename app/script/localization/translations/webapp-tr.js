@@ -481,6 +481,9 @@ z.string.tr.warning_permission_request_notification = '{{icon}} Bildirimlere izi
 z.string.tr.warning_permission_request_screen = '{{icon}} Ekrana erişime izin ver';
 z.string.tr.warning_tell_me_how = 'Anlat bana';
 
+z.string.tr.user_availability_available = 'Alınabilir';
+z.string.tr.user_availability_none = 'Hiçbiri';
+
 z.string.tr.system_notification_asset_add = 'Bir resim paylaştı';
 z.string.tr.system_notification_connection_accepted = 'Bağlantı isteğinizi kabul etti';
 z.string.tr.system_notification_connection_connected = 'Şu anda bağlısınız';

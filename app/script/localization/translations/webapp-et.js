@@ -86,6 +86,7 @@ z.string.et.auth_error_name_short = 'Sisesta vähemalt 2-täheline nimi';
 z.string.et.auth_error_offline = 'Internetiühendus puudub';
 z.string.et.auth_error_password_short = 'Vali vähemalt 8-täheline parool.';
 z.string.et.auth_error_password_wrong = 'Vale parool. Palun proovi uuesti.';
+z.string.et.auth_error_pending = 'Konto pole veel kinnitatud';
 z.string.et.auth_error_phone_number_budget = 'Sa logisid liiga tihti sisse. Proovi hiljem uuesti.';
 z.string.et.auth_error_phone_number_forbidden = 'Vabandust. See telefoninumber on keelatud.';
 z.string.et.auth_error_phone_number_invalid = 'Sobimatu telefoninumber';
@@ -210,7 +211,7 @@ z.string.et.conversation_rename_you = ' nimetas vestluse ümber';
 z.string.et.conversation_resume = 'Alusta vestlust kasutajatega {{users}}';
 z.string.et.conversation_team_leave = ' eemaldati meeskonnast';
 z.string.et.conversation_ping = ' pingis';
-z.string.et.conversation_ping_you = ' pingis';
+z.string.et.conversation_ping_you = ' pingisid';
 z.string.et.conversation_today = 'täna';
 z.string.et.conversation_verified = 'Kinnitatud';
 z.string.et.conversation_voice_channel_deactivate = ' helistas';
@@ -482,6 +483,9 @@ z.string.et.warning_permission_request_microphone = '{{icon}} Luba mikrofonile j
 z.string.et.warning_permission_request_notification = '{{icon}} Luba teated';
 z.string.et.warning_permission_request_screen = '{{icon}} Luba ekraanile juurdepääs';
 z.string.et.warning_tell_me_how = 'Ütle, kuidas';
+
+z.string.et.user_availability_available = 'Saadaval';
+z.string.et.user_availability_none = 'Puudub';
 
 z.string.et.system_notification_asset_add = 'Jagas pilti';
 z.string.et.system_notification_connection_accepted = 'Nõustus sinu ühendamistaotlusega';

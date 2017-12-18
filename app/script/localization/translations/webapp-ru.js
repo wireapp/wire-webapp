@@ -86,6 +86,7 @@ z.string.ru.auth_error_name_short = 'Введите имя с минимум 2 �
 z.string.ru.auth_error_offline = 'Отсутствует подключение к интернету';
 z.string.ru.auth_error_password_short = 'Выберите пароль длиной не менее 8 символов.';
 z.string.ru.auth_error_password_wrong = 'Неправильный пароль. Пожалуйста, попробуйте еще раз.';
+z.string.ru.auth_error_pending = 'Учетная запись еще не проверена';
 z.string.ru.auth_error_phone_number_budget = 'Вы делаете попытки войти слишком часто. Повторите попытку позже.';
 z.string.ru.auth_error_phone_number_forbidden = 'Извините, этот номер телефона запрещён.';
 z.string.ru.auth_error_phone_number_invalid = 'Неправильный номер телефона';
@@ -482,6 +483,9 @@ z.string.ru.warning_permission_request_microphone = '{{icon}} Разрешить
 z.string.ru.warning_permission_request_notification = '{{icon}} Разрешить уведомления';
 z.string.ru.warning_permission_request_screen = '{{icon}} Разрешить доступ к экрану';
 z.string.ru.warning_tell_me_how = 'Скажите мне, как';
+
+z.string.ru.user_availability_available = 'Доступно';
+z.string.ru.user_availability_none = 'Отключены';
 
 z.string.ru.system_notification_asset_add = 'Поделился(-лась) картинкой';
 z.string.ru.system_notification_connection_accepted = 'Принял(а) ваш запрос на добавление';
