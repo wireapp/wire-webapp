@@ -385,6 +385,7 @@ z.string.de.preferences_about_terms_of_use = 'Nutzungsbedingungen';
 z.string.de.preferences_about_version = 'Version {{version}}';
 z.string.de.preferences_about_website = 'Wire-Webseite';
 
+z.string.de.preferences_account_avaibility_unset = 'Wähle einen Status';
 z.string.de.preferences_account_create_team = 'Team erstellen';
 z.string.de.preferences_account_delete = 'Benutzerkonto löschen';
 z.string.de.preferences_account_log_out = 'Abmelden';
@@ -467,6 +468,7 @@ z.string.de.url_support_articles = '/hc/de/articles/';
 z.string.de.url_support_requests = '/hc/de/requests/';
 z.string.de.url_webapp_root = '/?hl=de';
 z.string.de.url_website_root = '/de/';
+z.string.de.url_website_create_team = '/de/create-team/';
 z.string.de.url_website_privacy = '/de/privacy';
 z.string.de.warning_call_detail = 'Dein Browser benötigt für Anrufe Zugriff auf das Mikrofon.';
 z.string.de.warning_call_headline = 'Anrufe sind ohne Mikrofon nicht möglich';
@@ -492,7 +494,9 @@ z.string.de.warning_permission_request_screen = '{{icon}} Zugriff auf Bildschirm
 z.string.de.warning_tell_me_how = 'Zeig mir wie';
 
 z.string.de.user_availability_available = 'Verfügbar';
-z.string.de.user_availability_none = 'Keine';
+z.string.de.user_availability_away = 'Abwesend';
+z.string.de.user_availability_busy = 'Beschäftigt';
+z.string.de.user_availability_none = 'Kein Status';
 
 z.string.de.system_notification_asset_add = 'Hat ein Bild geteilt';
 z.string.de.system_notification_connection_accepted = 'Hat deine Kontaktanfrage akzeptiert';
@@ -519,6 +523,9 @@ z.string.de.tooltip_conversation_call = 'Anruf';
 z.string.de.tooltip_conversation_ephemeral = 'Temporäre Nachricht';
 z.string.de.tooltip_conversation_file = 'Datei senden';
 z.string.de.tooltip_conversation_input_placeholder = 'Schreibe eine Nachricht';
+z.string.de.tooltip_conversation_input_placeholder_available = '{{user}} ist verfügbar';
+z.string.de.tooltip_conversation_input_placeholder_away = '{{user}} ist abwesend';
+z.string.de.tooltip_conversation_input_placeholder_busy = '{{user}} ist beschäftigt';
 z.string.de.tooltip_conversation_people = 'Unterhaltungsübersicht ({{shortcut}})';
 z.string.de.tooltip_conversation_picture = 'Bild senden';
 z.string.de.tooltip_conversation_ping = 'Ping ({{shortcut}})';
