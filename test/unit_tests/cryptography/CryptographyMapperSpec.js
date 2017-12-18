@@ -256,11 +256,12 @@ describe('z.cryptography.CryptographyMapper', () => {
         .then(event_json => {
           expect(_.isObject(event_json)).toBeTruthy();
           expect(event_json.type).toBe(z.event.Backend.CONVERSATION.MEMBER_UPDATE);
-          expect(event_json.conversation).toBe(conversation_id);
+          expect(event_json.conversation).toBe(event.conversation);
           expect(event_json.from).toBe(event.from);
           expect(event_json.time).toBe(event.time);
           expect(event_json.id).toBe(generic_message.message_id);
           expect(event_json.data.cleared_timestamp).toBe(date);
+          expect(event_json.data.conversationId).toBe(conversation_id);
           done();
         })
         .catch(done.fail);
@@ -487,10 +488,11 @@ describe('z.cryptography.CryptographyMapper', () => {
         .then(event_json => {
           expect(_.isObject(event_json)).toBeTruthy();
           expect(event_json.type).toBe(z.event.Backend.CONVERSATION.MEMBER_UPDATE);
-          expect(event_json.conversation).toBe(conversation_id);
+          expect(event_json.conversation).toBe(event.conversation);
           expect(event_json.from).toBe(event.from);
           expect(event_json.time).toBe(event.time);
           expect(event_json.id).toBe(generic_message.message_id);
+          expect(event_json.data.conversationId).toBe(conversation_id);
           expect(event_json.data.last_read_timestamp).toBe(date);
           done();
         })
