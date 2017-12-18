@@ -19,6 +19,7 @@
 
 import * as TrackingActionCreator from './creator/TrackingActionCreator';
 import RuntimeUtil from '../../util/RuntimeUtil';
+import {REGISTER_FLOW} from '../selector/AuthSelector';
 
 export const EVENT_NAME = {
   PERSONAL: {
@@ -45,6 +46,12 @@ export const EVENT_CONTEXT = {
   PERSONAL_INVITE: 'personal_invite',
 };
 
+export const FLOW_TO_CONTEXT = {
+  [EVENT_CONTEXT.EMAIL]: REGISTER_FLOW.PERSONAL,
+  [EVENT_CONTEXT.GENERIC_INVITE]: REGISTER_FLOW.GENERIC_INVITATION,
+  [EVENT_CONTEXT.PERSONAL_INVITE]: REGISTER_FLOW.PERSONAL_INVITATION,
+};
+
 export function trackEvent(event) {
   return function(dispatch, getState, {mixpanel}) {
     return Promise.resolve()
@@ -68,5 +75,5 @@ export function trackEvent(event) {
 }
 
 export function trackNameWithContext(name, context) {
-  trackEvent({attributes: {context}, name});
+  return trackEvent({attributes: {context}, name});
 }

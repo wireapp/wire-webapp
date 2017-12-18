@@ -24,7 +24,6 @@ import Index from './Index';
 import InitialInvite from './InitialInvite';
 import TeamName from './TeamName';
 import CreateAccount from './CreateAccount';
-import PersonalInvite from './PersonalInvite';
 import CreatePersonalAccount from './CreatePersonalAccount';
 import Verify from './Verify';
 import {IntlProvider, addLocaleData} from 'react-intl';
@@ -52,7 +51,8 @@ const Root = ({language}) => (
             <Route path={ROUTE.CREATE_TEAM} component={TeamName} />
             <Route path={ROUTE.CREATE_TEAM_ACCOUNT} component={CreateAccount} />
             <Route path={ROUTE.CREATE_ACCOUNT} component={CreatePersonalAccount} />
-            <Route path={ROUTE.PERSONAL_INVITE} component={PersonalInvite} />
+            <Route path={`${ROUTE.INVITE}/:invitationCode`} component={CreatePersonalAccount} />
+            <Route path={ROUTE.INVITE} component={CreatePersonalAccount} />
             <Route path={ROUTE.VERIFY} component={Verify} />
             <Route path={ROUTE.INITIAL_INVITE} component={InitialInvite} />
             <Redirect to={ROUTE.INDEX} />

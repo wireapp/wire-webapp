@@ -29,23 +29,73 @@ import {withRouter} from 'react-router';
 import React from 'react';
 import ROUTE from '../route';
 import AccountForm from '../component/AccountForm';
-import * as TrackingAction from '../module/action/TrackingAction';
-import {enterGenericInviteCreationFlow, enterPersonalCreationFlow} from '../module/action/creator/AuthActionCreator';
-import {hasURLParameter} from '../util/urlUtil';
+import {trackNameWithContext, EVENT_CONTEXT, EVENT_NAME, FLOW_TO_CONTEXT} from '../module/action/TrackingAction';
+import {getAccount, getCurrentFlow, REGISTER_FLOW} from '../module/selector/AuthSelector';
+import * as AuthActionCreator from '../module/action/creator/AuthActionCreator';
+import * as AuthAction from '../module/action/AuthAction';
+import {pathWithParams} from '../util/urlUtil';
 
 class CreatePersonalAccount extends React.PureComponent {
   componentDidMount() {
-    this.isInvited = hasURLParameter('invite');
-    if (this.isInvited) {
+    const {match} = this.props;
+    if (match.path === ROUTE.CREATE_ACCOUNT) {
+      this.props.enterPersonalCreationFlow();
+    } else if (match.path === ROUTE.INVITE) {
       this.props.enterGenericInviteCreationFlow();
     } else {
-      this.props.enterPersonalCreationFlow();
+      this.props.enterPersonalInvitationCreationFlow();
+      this.invitationCode = match.params.invitationCode;
+      this.props.getInvitationFromCode(this.invitationCode);
     }
   }
 
+  createAccount = () => {
+    this.props
+      .doRegisterPersonal({...this.props.account, invitation_code: this.invitationCode})
+      .then(() => {
+        this.props.trackNameWithContext(EVENT_NAME.PERSONAL.CREATED, EVENT_CONTEXT.PERSONAL_INVITE);
+        this.props.trackNameWithContext(EVENT_NAME.PERSONAL.VERIFIED, EVENT_CONTEXT.PERSONAL_INVITE);
+      })
+      .then(() => {
+        const link = document.createElement('a');
+        link.href = pathWithParams(ROUTE.LOGIN, 'reason=registration');
+        document.body.appendChild(link); // workaround for Firefox
+        link.click();
+      })
+      .catch(error => console.error('Failed to create personal account', error));
+  };
+
+  handleBeforeSubmit = () => {
+    const context = FLOW_TO_CONTEXT[this.props.currentFlow];
+    this.props.trackNameWithContext(EVENT_NAME.PERSONAL.ENTERED_ACCOUNT_DATA, context);
+  };
+
+  handleSubmit = () => {
+    if (this.props.currentFlow === REGISTER_FLOW.PERSONAL_INVITATION) {
+      this.createAccount();
+    } else {
+      this.props.history.push(ROUTE.VERIFY);
+    }
+  };
+
   render() {
-    const {history, intl: {formatMessage: _}, ...connected} = this.props;
-    return (
+    const {currentFlow, intl: {formatMessage: _}} = this.props;
+    const pageContent = (
+      <ContainerXS
+        centerText
+        verticalCenter
+        style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 428}}
+      >
+        <H1 center>{_(createPersonalAccountStrings.headLine)}</H1>
+        <AccountForm
+          disableEmail={currentFlow === REGISTER_FLOW.PERSONAL_INVITATION}
+          beforeSubmit={this.handleBeforeSubmit}
+          onSubmit={this.handleSubmit}
+          submitText={_(createPersonalAccountStrings.submitButton)}
+        />
+      </ContainerXS>
+    );
+    return currentFlow === REGISTER_FLOW.PERSONAL ? (
       <Container centerText verticalCenter style={{width: '100%'}}>
         <Columns>
           <Column style={{display: 'flex'}}>
@@ -55,33 +105,22 @@ class CreatePersonalAccount extends React.PureComponent {
               </Link>
             </div>
           </Column>
-          <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
-            <ContainerXS
-              centerText
-              style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 428}}
-            >
-              <H1 center>{_(createPersonalAccountStrings.headLine)}</H1>
-              <AccountForm
-                beforeSubmit={() =>
-                  connected.trackNameWithContext(
-                    TrackingAction.EVENT_NAME.PERSONAL.ENTERED_ACCOUNT_DATA,
-                    this.isInvited ? TrackingAction.EVENT_CONTEXT.GENERIC_INVITE : TrackingAction.EVENT_CONTEXT.EMAIL
-                  )
-                }
-                onSubmit={() => history.push(ROUTE.VERIFY)}
-                submitText={_(createPersonalAccountStrings.submitButton)}
-              />
-            </ContainerXS>
-          </Column>
+          <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>{pageContent}</Column>
           <Column />
         </Columns>
       </Container>
+    ) : (
+      pageContent
     );
   }
 }
 
 export default withRouter(
   injectIntl(
-    connect(null, {...TrackingAction, enterGenericInviteCreationFlow, enterPersonalCreationFlow})(CreatePersonalAccount)
+    connect(state => ({account: getAccount(state), currentFlow: getCurrentFlow(state)}), {
+      trackNameWithContext,
+      ...AuthAction,
+      ...AuthActionCreator,
+    })(CreatePersonalAccount)
   )
 );
