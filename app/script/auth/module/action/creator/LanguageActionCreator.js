@@ -19,9 +19,7 @@
 
 export const SWITCH_LANGUAGE = 'SWITCH_LANGUAGE';
 
-export function switchLanguage(language) {
-  return {
-    payload: language,
-    type: SWITCH_LANGUAGE,
-  };
-}
+export const switchLanguage = language => ({
+  payload: language,
+  type: SWITCH_LANGUAGE,
+});

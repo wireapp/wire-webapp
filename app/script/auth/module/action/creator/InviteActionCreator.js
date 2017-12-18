@@ -25,27 +25,21 @@ export const INVITE_ADD_FAILED = 'INVITE_ADD_FAILED';
 
 export const INVITE_RESET_ERROR = 'INVITE_RESET_ERROR';
 
-export function startAddInvite(params) {
-  return {
-    params,
-    type: INVITE_ADD_START,
-  };
-}
+export const startAddInvite = params => ({
+  params,
+  type: INVITE_ADD_START,
+});
 
-export function successfulAddInvite(invite) {
-  return {
-    payload: {invite},
-    type: INVITE_ADD_SUCCESS,
-  };
-}
+export const successfulAddInvite = invite => ({
+  payload: {invite},
+  type: INVITE_ADD_SUCCESS,
+});
 
-export function failedAddInvite(error) {
-  return {
-    payload: BackendError.handle(error),
-    type: INVITE_ADD_FAILED,
-  };
-}
+export const failedAddInvite = error => ({
+  payload: BackendError.handle(error),
+  type: INVITE_ADD_FAILED,
+});
 
-export function resetError() {
-  return {type: INVITE_RESET_ERROR};
-}
+export const resetError = () => ({
+  type: INVITE_RESET_ERROR,
+});
