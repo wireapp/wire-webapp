@@ -49,6 +49,11 @@ module.exports = {
       },
       {
         color: 'red',
+        name: 'Unsafe Knockout HTML binding',
+        pattern: '"html:',
+      },
+      {
+        color: 'red',
         name: 'Beginning of Git differences (<<<<<<<)',
         pattern: /<<<<<<</,
       },

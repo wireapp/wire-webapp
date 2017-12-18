@@ -38,7 +38,6 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
     this.cryptography_repository = cryptography_repository;
     this.logger = new z.util.Logger('z.ViewModel.content.PreferencesDeviceDetailsViewModel', z.config.LOGGER.OPTIONS);
 
-    this.DEFAULT_LOCATION = '?';
     this.self_user = this.client_repository.self_user;
 
     this.device = ko.observable();
@@ -47,7 +46,7 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
         this.session_reset_state(z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET);
         this.fingerprint('');
         this._update_fingerprint();
-        this._update_activation_location(this.DEFAULT_LOCATION);
+        this._update_activation_location('?');
         this._update_activation_time(device_et.time);
         if (device_et.location) {
           this._update_device_location(device_et.location);
