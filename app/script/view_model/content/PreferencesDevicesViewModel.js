@@ -51,7 +51,7 @@ z.ViewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
     this.activated_in = ko.observable(z.l10n.text(z.string.preferences_devices_activated_in));
     this.activated_on = ko.observable(z.l10n.text(z.string.preferences_devices_activated_on));
     this.devices = ko.observableArray();
-    this.fingerprint = ko.observable('');
+    this.displayFingerPrint = ko.observable('');
 
     this.should_update_scrollbar = ko
       .computed(() => {
@@ -102,13 +102,13 @@ z.ViewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
   }
 
   update_device_info() {
-    if (this.current_client() && !this.fingerprint()) {
+    if (this.current_client() && !this.displayFingerPrint()) {
       if (this.current_client().location) {
         this._update_device_location(this.current_client().location);
       }
 
       this._update_activation_time(this.current_client().time);
-      this.fingerprint(this.cryptography_repository.get_local_fingerprint());
+      this.displayFingerPrint(z.util.zero_padding(this.cryptography_repository.get_local_fingerprint()));
     }
   }
 };
