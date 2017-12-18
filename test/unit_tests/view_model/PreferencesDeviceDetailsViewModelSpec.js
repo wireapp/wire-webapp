@@ -41,29 +41,29 @@ describe('z.ViewModel.content.PreferencesDeviceDetailsViewModel', () => {
   });
 
   describe('_sanitize_external_input', () => {
-    describe('always puts the time at the second position', () => {
-      it('puts the time at the second position when the time comes first', () => {
+    describe('always put the time at the second position when', () => {
+      it('is first', () => {
         const turkish = '{{date}} ’da aktif edildi';
         const time = '22:42';
         const result = viewModel._sanitize_external_input(time, turkish);
         expect(result[1]).toBe(time);
       });
 
-      it('puts the time at the second position when the time comes last', () => {
+      it('is last', () => {
         const greek = 'Ενεργοποιήθηκε στις {{date}}';
         const time = '22:42';
         const result = viewModel._sanitize_external_input(time, greek);
         expect(result[1]).toBe(time);
       });
 
-      it('puts the time at the second position when the time comes in the center', () => {
+      it('is in-between', () => {
         const finish = 'Aktivoitu {{date}}: ssa';
         const time = '22:42';
         const result = viewModel._sanitize_external_input(time, finish);
         expect(result[1]).toBe(time);
       });
 
-      it('works with a default time', () => {
+      it('is a value that must be escaped in regular expressions', () => {
         const english = 'Activated on {{date}}';
         const time = '?';
         const result = viewModel._sanitize_external_input(time, english);

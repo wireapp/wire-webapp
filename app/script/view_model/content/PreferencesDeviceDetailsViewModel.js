@@ -76,8 +76,7 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
   }
 
   _update_activation_time(time, template = z.string.preferences_devices_activated_on) {
-    const time = z.util.format_timestamp(time);
-    const sanitizedTime = this._sanitize_external_input(time, template);
+    const sanitizedTime = this._sanitize_external_input(z.util.format_timestamp(time), template);
     this.activated_on(sanitizedTime);
   }
 
