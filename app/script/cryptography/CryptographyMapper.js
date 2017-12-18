@@ -71,7 +71,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
       case z.cryptography.GENERIC_MESSAGE_TYPE.CALLING:
         return this._map_calling(generic_message.calling, event.data);
       case z.cryptography.GENERIC_MESSAGE_TYPE.CLEARED:
-        return this._map_cleared(generic_message.cleared);
+        return this._mapCleared(generic_message.cleared);
       case z.cryptography.GENERIC_MESSAGE_TYPE.CONFIRMATION:
         return this._map_confirmation(generic_message.confirmation);
       case z.cryptography.GENERIC_MESSAGE_TYPE.DELETED:
@@ -87,7 +87,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
       case z.cryptography.GENERIC_MESSAGE_TYPE.KNOCK:
         return this._map_knock(generic_message.knock, generic_message.message_id);
       case z.cryptography.GENERIC_MESSAGE_TYPE.LAST_READ:
-        return this._map_last_read(generic_message.lastRead);
+        return this._mapLastRead(generic_message.lastRead);
       case z.cryptography.GENERIC_MESSAGE_TYPE.LOCATION:
         return this._map_location(generic_message.location, generic_message.message_id);
       case z.cryptography.GENERIC_MESSAGE_TYPE.REACTION:
@@ -205,11 +205,11 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     };
   }
 
-  _map_cleared(cleared) {
+  _mapCleared(cleared) {
     return {
-      conversation: cleared.conversation_id,
       data: {
         cleared_timestamp: cleared.cleared_timestamp.toString(),
+        conversationId: cleared.conversation_id,
       },
       type: z.event.Backend.CONVERSATION.MEMBER_UPDATE,
     };
@@ -335,11 +335,11 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     };
   }
 
-  _map_last_read(last_read) {
+  _mapLastRead(lastRead) {
     return {
-      conversation: last_read.conversation_id,
       data: {
-        last_read_timestamp: last_read.last_read_timestamp.toString(),
+        conversationId: lastRead.conversation_id,
+        last_read_timestamp: lastRead.last_read_timestamp.toString(),
       },
       type: z.event.Backend.CONVERSATION.MEMBER_UPDATE,
     };
