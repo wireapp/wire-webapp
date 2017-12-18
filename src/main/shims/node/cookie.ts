@@ -16,20 +16,18 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-import {AccessTokenData} from '../../auth';
+import {AUTH_TABLE_NAME, AUTH_COOKIE_KEY, AccessTokenData} from '../../auth';
 import {AxiosPromise, AxiosRequestConfig, AxiosResponse} from 'axios';
 import {Cookie} from 'tough-cookie';
 import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine';
 import {HttpClient} from '../../http';
 import {RecordNotFoundError} from '@wireapp/store-engine/dist/commonjs/engine/error';
 
-const COOKIE_PRIMARY_KEY: string = 'cookie';
 const COOKIE_NAME: string = 'zuid';
-const TABLE_NAME: string = 'authentication';
 
 const loadExistingCookie = (engine: CRUDEngine): Promise<object> => {
   return engine
-    .read(TABLE_NAME, COOKIE_PRIMARY_KEY)
+    .read(AUTH_TABLE_NAME, AUTH_COOKIE_KEY)
     .catch(error => {
       if (error.name === RecordNotFoundError.name) {
         return {isExpired: true};
@@ -50,7 +48,7 @@ const loadExistingCookie = (engine: CRUDEngine): Promise<object> => {
 };
 
 const setInternalCookie = (zuid: string, expiration: Date, engine: CRUDEngine): Promise<string> =>
-  engine.create(TABLE_NAME, COOKIE_PRIMARY_KEY, {zuid, expiration});
+  engine.create(AUTH_TABLE_NAME, AUTH_COOKIE_KEY, {zuid, expiration});
 
 export const retrieveCookie = (response: AxiosResponse, engine: CRUDEngine): Promise<AccessTokenData> => {
   if (response.headers && response.headers['set-cookie']) {

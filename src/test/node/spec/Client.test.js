@@ -21,7 +21,7 @@
 const nock = require('nock');
 
 const Client = require('@wireapp/api-client/dist/commonjs/Client');
-const {AuthAPI} = require('@wireapp/api-client/dist/commonjs/auth/');
+const {AUTH_ACCESS_TOKEN_KEY, AUTH_TABLE_NAME, AuthAPI} = require('@wireapp/api-client/dist/commonjs/auth/');
 const {UserAPI} = require('@wireapp/api-client/dist/commonjs/user/');
 
 describe('Client', () => {
@@ -46,8 +46,7 @@ describe('Client', () => {
   describe('"init"', () => {
     it('loads an access token from the storage by default', done => {
       const client = new Client();
-      const TABLE = client.accessTokenStore.ACCESS_TOKEN_TABLE;
-      const PRIMARY_KEY = client.accessTokenStore.ACCESS_TOKEN_KEY;
+      const PRIMARY_KEY = AUTH_ACCESS_TOKEN_KEY;
       accessTokenData = {
         access_token: 'initial-access-token-data',
         expires_in: 900,
@@ -56,7 +55,7 @@ describe('Client', () => {
       };
 
       client.accessTokenStore.tokenStore
-        .create(TABLE, PRIMARY_KEY, accessTokenData)
+        .create(AUTH_TABLE_NAME, PRIMARY_KEY, accessTokenData)
         .then(primaryKey => {
           expect(primaryKey).toBe(PRIMARY_KEY);
           return client.init();

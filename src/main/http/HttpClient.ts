@@ -44,7 +44,7 @@ export default class HttpClient {
         this.logger.error(
           `HTTP Error (${error.response.status}) on '${error.response.config.url}': ${
             error.message
-          } (${backendResponse}`
+          } (${backendResponse})`
         );
       }
       return Promise.reject(error);
