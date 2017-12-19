@@ -370,16 +370,16 @@
   dependencies:
     "@types/node" "8.0.25"
 
-"@wireapp/react-ui-kit@0.0.27":
-  version "0.0.27"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-0.0.27.tgz#69b1070a73b174bc591d273e0a040520882348f6"
+"@wireapp/react-ui-kit@0.0.29":
+  version "0.0.29"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-0.0.29.tgz#81085d2dd19af60ad3dda753d0e76b693ac7b159"
   dependencies:
     color "2.0.1"
     gulp-concat "2.6.1"
     react "16.2.0"
     react-dom "16.2.0"
     recompose "0.26.0"
-    styled-components "2.2.4"
+    styled-components "2.3.0"
     styled-normalize "2.2.1"
 
 "@wireapp/store-engine@0.1.0":
@@ -8415,9 +8415,9 @@ style-loader@0.19.1:
     loader-utils "^1.0.2"
     schema-utils "^0.3.0"
 
-styled-components@2.2.4:
-  version "2.2.4"
-  resolved "https://registry.yarnpkg.com/styled-components/-/styled-components-2.2.4.tgz#dd87fd3dafd359e7a0d570aec1bd07d691c0b5a2"
+styled-components@2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/styled-components/-/styled-components-2.3.0.tgz#d9cf4574e140fea6426e48632ed0ca4494537718"
   dependencies:
     buffer "^5.0.3"
     css-to-react-native "^2.0.3"
