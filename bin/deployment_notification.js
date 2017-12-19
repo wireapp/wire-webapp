@@ -22,6 +22,7 @@ const {Account} = require('@wireapp/core');
 const login = {
   email: process.env.WIRE_WEBAPP_BOT_EMAIL,
   password: process.env.WIRE_WEBAPP_BOT_PASSWORD,
+  persist: false,
 };
 
 const commit = {
@@ -66,10 +67,10 @@ content.message =
 const account = new Account();
 
 account
-  .listen({email: login.email, password: login.password})
+  .listen(login)
   .then(() => account.service.conversation.sendTextMessage(content.conversationId, content.message))
   .then(() => process.exit(0))
   .catch(error => {
-    console.error(error.message);
+    console.error(error.stack);
     return process.exit(1);
   });
