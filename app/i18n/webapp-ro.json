@@ -1,5 +1,5 @@
 {
-  "index.claim": "",
+  "index.claim": "Mesagerie sigură pentru toată lumea.",
   "index.createAccount": "Creează un cont",
   "index.createAccountFor": "pentru uz personal",
   "index.createTeam": "Creează o echipă",
@@ -18,15 +18,15 @@
   "createAccount.nextButton": "Mai departe",
   "invite.nextButton": "Mai departe",
   "createAccount.headLine": "Configurează contul",
-  "createPersonalAccount.headLine": "",
-  "createPersonalAccount.nextButton": "",
+  "createPersonalAccount.headLine": "Cont nou",
+  "createPersonalAccount.nextButton": "Înregistrare",
   "verify.headline": "Ai primit un mesaj",
   "verify.subhead": "Introdu codul de verificare pe care l-am trimis la<br />{email}",
   "verify.resendCode": "Retrimite codul",
   "verify.changeEmail": "Schimbă e-mailul",
   "invite.headline": "Construiește echipa ta",
-  "invite.subhead": "",
-  "invite.emailPlaceholder": "",
+  "invite.subhead": "Invită colegii să se alăture.",
+  "invite.emailPlaceholder": "coleg@email.com",
   "invite.skipForNow": "Nu fă asta momentan",
   "BackendError.LABEL.ACCESS_DENIED": "Te rugăm să verifici detaliile și să reîncerci",
   "BackendError.LABEL.INVALID_CREDENTIALS": "Te rugăm să verifici detaliile și să reîncerci",
@@ -58,6 +58,6 @@
     "Adresa de e-mail este deja folosită. <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://support.wire.com/hc/articles/115004082129\">Află mai multe</a>",
   "BackendError.unexpected": "Eroare neașteptată ({code} {message})",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Introdu un nume de cel puțin 2 caractere",
-  "ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH": "",
-  "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": ""
+  "ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH": "Introdu o parolă de cel puțin 8 caractere",
+  "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": "Introdu o adresă de e-mail validă"
 }

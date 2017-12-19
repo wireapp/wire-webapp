@@ -86,6 +86,7 @@ z.string.fr.auth_error_name_short = 'Saisissez un nom composé d’au moins 2 ca
 z.string.fr.auth_error_offline = 'Pas de connexion Internet';
 z.string.fr.auth_error_password_short = 'Choisissez un mot de passe d’au moins 8 caractères.';
 z.string.fr.auth_error_password_wrong = 'Mot de passe incorrect. Veuillez réessayer.';
+z.string.fr.auth_error_pending = 'Le compte n’est pas encore vérifié';
 z.string.fr.auth_error_phone_number_budget = 'Vous vous êtes connecté trop souvent. Réessayez plus tard.';
 z.string.fr.auth_error_phone_number_forbidden = 'Désolé. Ce numéro de téléphone est banni.';
 z.string.fr.auth_error_phone_number_invalid = 'Numéro de téléphone non valide';
@@ -482,6 +483,9 @@ z.string.fr.warning_permission_request_microphone = '{{icon}} Autoriser l’acc�
 z.string.fr.warning_permission_request_notification = '{{icon}} Autoriser les notifications';
 z.string.fr.warning_permission_request_screen = '{{icon}} Autoriser l’accès à l’écran';
 z.string.fr.warning_tell_me_how = 'Dites-moi comment faire';
+
+z.string.fr.user_availability_available = 'Disponible';
+z.string.fr.user_availability_none = 'Aucune';
 
 z.string.fr.system_notification_asset_add = 'A partagé une image';
 z.string.fr.system_notification_connection_accepted = 'A accepté votre demande de connexion';

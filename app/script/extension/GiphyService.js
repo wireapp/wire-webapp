@@ -25,7 +25,8 @@ window.z.extension = z.extension || {};
 z.extension.GiphyService = class GiphyService {
   static get CONFIG() {
     return {
-      ENDPOINT_BASE: '/proxy/giphy/v1/gifs',
+      ENDPOINT_BASE: '/giphy/v1/gifs',
+      PROXY_BASE: '/proxy/giphy/v1/gifs',
     };
   }
 
@@ -43,7 +44,7 @@ z.extension.GiphyService = class GiphyService {
    * @returns {Promise} Resolves with the size data
    */
   get_by_id(ids) {
-    ids = _.isArray(ids) ? ids : [ids];
+    ids = [].concat(ids);
 
     return this.client.send_request({
       type: 'GET',
@@ -62,7 +63,7 @@ z.extension.GiphyService = class GiphyService {
         tag: tag,
       },
       type: 'GET',
-      url: this.client.create_url(`${GiphyService.CONFIG.ENDPOINT_BASE}/random`),
+      url: this.client.create_url(`${GiphyService.CONFIG.PROXY_BASE}/random`),
     });
   }
 
@@ -78,7 +79,7 @@ z.extension.GiphyService = class GiphyService {
    */
   get_search(options) {
     return this.client.send_request({
-      data: $.extend(
+      data: Object.assign(
         {
           limit: 25,
           offset: 0,

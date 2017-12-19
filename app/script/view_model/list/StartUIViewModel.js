@@ -62,7 +62,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.list_view_model = list_view_model;
     this.connect_repository = connect_repository;
     this.conversation_repository = conversation_repository;
-    this.properties_repository = properties_repository;
+    this.propertiesRepository = properties_repository;
     this.search_repository = search_repository;
     this.team_repository = team_repository;
     this.user_repository = user_repository;
@@ -497,7 +497,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
    */
   import_contacts(source) {
     this.connect_repository
-      .get_contacts(source)
+      .getContacts(source)
       .then((user_ids = []) => this.user_repository.get_users_by_id(user_ids))
       .then(user_ets => {
         this.selected_people.removeAll();
@@ -531,7 +531,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
   //##############################################################################
 
   update_properties() {
-    const properties = this.properties_repository.properties;
+    const properties = this.propertiesRepository.properties;
     this.has_created_conversation(properties.has_created_conversation);
 
     return true;
@@ -649,7 +649,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
         this.submitted_search = false;
 
         if (response && response.conversation_et) {
-          this.properties_repository.save_preference(z.properties.PROPERTIES_TYPE.HAS_CREATED_CONVERSATION);
+          this.propertiesRepository.save_preference(z.properties.PROPERTIES_TYPE.HAS_CREATED_CONVERSATION);
           amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.CREATE_GROUP_CONVERSATION, {
             creationContext: 'search',
             numberOfParticipants: user_ids.length,

@@ -85,6 +85,7 @@ z.string.uk.auth_error_name_short = 'Введіть ім’я довжиною �
 z.string.uk.auth_error_offline = 'Відсутнє підключення до Інтернету';
 z.string.uk.auth_error_password_short = 'Виберіть пароль довжиною від 6 до 20 символів.';
 z.string.uk.auth_error_password_wrong = 'Невірний пароль. Будь ласка, спробуйте ще раз.';
+z.string.uk.auth_error_pending = 'Акаунт поки що не підтверджений';
 z.string.uk.auth_error_phone_number_budget = 'Ви входите в систему занадто часто. Спробуте пізніше.';
 z.string.uk.auth_error_phone_number_forbidden = 'Вибачте. Використання цього номеру телефону заборонено.';
 z.string.uk.auth_error_phone_number_invalid = 'Невірний номер телефону';
@@ -481,6 +482,9 @@ z.string.uk.warning_permission_request_microphone = '{{icon}} Дозволити
 z.string.uk.warning_permission_request_notification = '{{icon}} Дозволити сповіщення';
 z.string.uk.warning_permission_request_screen = '{{icon}} Дозволити доступ до обміну скріншотами робочого столу';
 z.string.uk.warning_tell_me_how = 'Скажіть мені як';
+
+z.string.uk.user_availability_available = 'Доступний';
+z.string.uk.user_availability_none = 'Все вимкнено';
 
 z.string.uk.system_notification_asset_add = 'Поділився(-лась) картинкою';
 z.string.uk.system_notification_connection_accepted = 'Прийняв(-ла) ваш запит на додавання до контактів';

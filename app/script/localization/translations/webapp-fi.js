@@ -482,6 +482,9 @@ z.string.fi.warning_permission_request_notification = '{{icon}} Salli ilmoitukse
 z.string.fi.warning_permission_request_screen = '{{icon}} Salli näytön käyttö';
 z.string.fi.warning_tell_me_how = 'Kerro miten';
 
+z.string.fi.user_availability_available = 'Saatavilla';
+z.string.fi.user_availability_none = 'Ei mitään';
+
 z.string.fi.system_notification_asset_add = 'Jakoi kuvan';
 z.string.fi.system_notification_connection_accepted = 'Hyväksyi yhteyspyyntösi';
 z.string.fi.system_notification_connection_connected = 'Olet nyt yhteydessä';

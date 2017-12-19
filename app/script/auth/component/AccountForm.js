@@ -33,10 +33,10 @@ import BackendError from '../module/action/BackendError';
 class AccountForm extends PureComponent {
   inputs = {};
   state = {
-    email: this.props.account.email,
-    name: this.props.account.name,
-    password: this.props.account.password,
-    termsAccepted: this.props.account.termsAccepted,
+    email: this.props.account.email || '',
+    name: this.props.account.name || '',
+    password: this.props.account.password || '',
+    termsAccepted: this.props.account.termsAccepted || false,
     validInputs: {
       email: true,
       name: true,
@@ -44,6 +44,17 @@ class AccountForm extends PureComponent {
     },
     validationErrors: [],
   };
+
+  componentWillReceiveProps({account}) {
+    if (account) {
+      if (account.email !== this.state.email) {
+        this.setState({email: account.email});
+      }
+      if (account.name !== this.props.account.name) {
+        this.setState({name: account.name});
+      }
+    }
+  }
 
   handleSubmit = event => {
     event.preventDefault();
@@ -65,7 +76,11 @@ class AccountForm extends PureComponent {
       })
       .then(() => this.props.beforeSubmit && this.props.beforeSubmit())
       .then(() => this.props.pushAccountRegistrationData({...this.state}))
-      .then(() => this.props.doSendActivationCode(this.state.email))
+      .then(
+        () =>
+          this.props.currentFlow !== AuthSelector.REGISTER_FLOW.PERSONAL_INVITATION &&
+          this.props.doSendActivationCode(this.state.email)
+      )
       .then(() => this.props.onSubmit())
       .catch(error => {
         if (error.label) {
@@ -137,6 +152,7 @@ class AccountForm extends PureComponent {
               }
               innerRef={node => (this.inputs.email = node)}
               markInvalid={!validInputs.email}
+              disabled={this.props.disableEmail}
               value={email}
               autoComplete="section-create-team email"
               placeholder={_(accountFormStrings.emailPlaceholder)}
@@ -210,6 +226,7 @@ export default injectIntl(
     state => ({
       account: AuthSelector.getAccount(state),
       authError: AuthSelector.getError(state),
+      currentFlow: AuthSelector.getCurrentFlow(state),
       isFetching: AuthSelector.isFetching(state),
     }),
     {...AuthAction, ...UserAction}

@@ -21,7 +21,8 @@ export function pathWithParams(path, additionalParams) {
   const searchParams = window.location.search
     .replace(/^\?/, '')
     .split('&')
-    .filter(param => param.length);
+    .filter(searchParam => searchParam);
+
   if (additionalParams) {
     searchParams.push(additionalParams);
   }
@@ -31,4 +32,11 @@ export function pathWithParams(path, additionalParams) {
 
 export function getURLParameter(parameterName) {
   return (window.location.search.split(`${parameterName}=`)[1] || '').split('&')[0];
+}
+
+export function hasURLParameter(parameterName) {
+  return window.location.search
+    .split(/\?|&/)
+    .map(parameter => parameter.split('=')[0])
+    .includes(parameterName);
 }

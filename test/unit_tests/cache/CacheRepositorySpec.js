@@ -26,9 +26,9 @@ describe('z.cache.CacheRepository', () => {
   cache_repository.logger.level = cache_repository.logger.levels.ERROR;
   const TEMP_KEY = 'should_be_deleted';
 
-  describe('clear_cache', () => {
+  describe('clearCache', () => {
     beforeEach(() => {
-      cache_repository.clear_cache();
+      cache_repository.clearCache();
 
       const conversation = new z.entity.Conversation();
       conversation.input('Hello World!');
@@ -38,12 +38,12 @@ describe('z.cache.CacheRepository', () => {
     });
 
     it('deletes cached keys', () => {
-      const deleted_keys = cache_repository.clear_cache(false);
+      const deleted_keys = cache_repository.clearCache(false);
       expect(deleted_keys.length).toBe(2);
     });
 
     it('preserves cached conversation inputs while deleting other keys', () => {
-      const deleted_keys = cache_repository.clear_cache(true);
+      const deleted_keys = cache_repository.clearCache(true);
       expect(deleted_keys.length).toBe(1);
       expect(deleted_keys[0]).toBe(TEMP_KEY);
     });

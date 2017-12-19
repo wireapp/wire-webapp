@@ -116,6 +116,7 @@ z.tracking.EventName = {
     SUCCEEDED: 'registration.succeeded',
   },
   SETTINGS: {
+    CHANGED_STATUS: 'settings.changed_status',
     EDITED_USERNAME: 'settings.edited_username',
     OPENED_MANAGE_TEAM: 'settings.opened_manage_team',
     OPTED_IN_TRACKING: 'settings.opted_in_tracking',

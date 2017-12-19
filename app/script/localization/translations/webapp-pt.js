@@ -481,6 +481,9 @@ z.string.pt.warning_permission_request_notification = '{{icon}} Permitir notific
 z.string.pt.warning_permission_request_screen = '{{icon}} Permitir o acesso ao ecrã';
 z.string.pt.warning_tell_me_how = 'Diga-me agora';
 
+z.string.pt.user_availability_available = 'Disponível';
+z.string.pt.user_availability_none = 'Nenhum';
+
 z.string.pt.system_notification_asset_add = 'Partilhou uma foto';
 z.string.pt.system_notification_connection_accepted = 'Aceitou o seu pedido de ligação';
 z.string.pt.system_notification_connection_connected = 'Já está ligado';

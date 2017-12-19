@@ -69,6 +69,7 @@ module.exports = {
   },
   plugins: [extractSass],
   resolve: {
+    extensions: ['.js', '.jsx'],
     modules: [path.resolve(srcScript), 'node_modules'],
   },
 };

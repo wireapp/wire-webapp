@@ -52,6 +52,8 @@ const Root = ({language}) => (
             <Route path={ROUTE.CREATE_TEAM} component={TeamName} />
             <Route path={ROUTE.CREATE_TEAM_ACCOUNT} component={CreateAccount} />
             <Route path={ROUTE.CREATE_ACCOUNT} component={CreatePersonalAccount} />
+            <Route path={`${ROUTE.INVITE}/:invitationCode`} component={CreatePersonalAccount} />
+            <Route path={ROUTE.INVITE} component={CreatePersonalAccount} />
             <Route path={ROUTE.VERIFY} component={Verify} />
             <Route path={ROUTE.INITIAL_INVITE} component={InitialInvite} />
             <Route path={ROUTE.CHOOSE_HANDLE} component={ChooseHandle} />
