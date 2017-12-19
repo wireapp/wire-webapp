@@ -73,12 +73,12 @@ z.user.UserRepository = class UserRepository {
       })
       .extend({rateLimit: 1000});
 
-    this.is_team = ko.observable();
-    this.team_members = undefined;
-    this.team_users = undefined;
+    this.isTeam = ko.observable();
+    this.teamMembers = undefined;
+    this.teamUsers = undefined;
 
     this.number_of_contacts = ko.pureComputed(() => {
-      const contacts = this.is_team() ? this.team_users() : this.connected_users();
+      const contacts = this.isTeam() ? this.teamUsers() : this.connected_users();
       return contacts.filter(user_et => !user_et.is_bot).length;
     });
     this.number_of_contacts.subscribe(number_of_contacts => {
@@ -126,7 +126,7 @@ z.user.UserRepository = class UserRepository {
   }
 
   loadUsers() {
-    if (this.is_team()) {
+    if (this.isTeam()) {
       return this.user_service
         .loadUserFromDb()
         .then(users => {
@@ -205,7 +205,7 @@ z.user.UserRepository = class UserRepository {
    * @returns {undefined} No return value
    */
   onUserAvailability(event) {
-    if (this.is_team()) {
+    if (this.isTeam()) {
       const {from: userId, data: {availability}} = event;
       this.get_user_by_id(userId).then(userEntity => userEntity.availability(availability));
     }
@@ -661,7 +661,7 @@ z.user.UserRepository = class UserRepository {
       .then(resolve_array => {
         const new_user_ets = _.flatten(resolve_array);
 
-        if (this.is_team()) {
+        if (this.isTeam()) {
           this.map_guest_status(new_user_ets);
         }
 
@@ -869,7 +869,7 @@ z.user.UserRepository = class UserRepository {
         this.user_mapper.update_user_from_object(current_user_et, updated_user_data)
       )
       .then(updated_user_et => {
-        if (this.is_team()) {
+        if (this.isTeam()) {
           this.map_guest_status([updated_user_et]);
         }
       });
@@ -1065,7 +1065,7 @@ z.user.UserRepository = class UserRepository {
   }
 
   map_guest_status(user_ets = this.users()) {
-    const team_members = this.team_members();
+    const team_members = this.teamMembers();
 
     user_ets.forEach(user_et => {
       if (!user_et.is_me) {
