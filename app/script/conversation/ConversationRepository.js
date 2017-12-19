@@ -2497,7 +2497,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
       return Promise.reject(new Error('Conversation Repository Event Handling: Event missing'));
     }
 
-    const {conversation: conversationId, data: eventData, type} = eventJson;
+    const {conversation, data: eventData, type} = eventJson;
+    const conversationId = (eventData && eventData.conversationId) || conversation;
     this.logger.info(`»» Conversation Event: '${type}' (Source: ${source})`, {
       eventJson: JSON.stringify(eventJson),
       eventObject: eventJson,
@@ -2510,7 +2511,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     // Check if conversation was archived
     let previouslyArchived;
-    return this.get_conversation_by_id(eventData.conversationId || conversationId)
+    return this.get_conversation_by_id(conversationId)
       .then(conversationEntity => {
         previouslyArchived = conversationEntity.is_archived();
 
