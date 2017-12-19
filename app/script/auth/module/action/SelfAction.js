@@ -44,7 +44,7 @@ export function setHandle(handle) {
   return function(dispatch, getState, {apiClient}) {
     dispatch(SelfActionCreator.startSetHandle());
     return apiClient.self.api
-      .putHandle({handle: handle.toLowerCase()})
+      .putHandle({handle: handle.trim().toLowerCase()})
       .then(() => dispatch(fetchSelf()).then(action => action.payload))
       .then(result => dispatch(SelfActionCreator.successfulSetHandle(result)))
       .catch(error => {

@@ -82,7 +82,7 @@ class ChooseHandle extends React.PureComponent {
                 data-uie-name="enter-invite-email"
               />
               <RoundIconButton
-                disabled={!this.state.handle || isFetching}
+                disabled={!this.state.handle.trim() || isFetching}
                 type="submit"
                 data-uie-name="do-send-invite"
                 formNoValidate
