@@ -61,7 +61,7 @@ const Verify = ({account, authError, history, currentFlow, intl: {formatMessage:
         connected
           .doRegisterPersonal({...account, email_code})
           .then(() => {
-            const context = TrackingAction.FLOW_TO_CONTEXT[currentFlow];
+            const context = TrackingAction.getTrackingContextForFlow(currentFlow);
             connected.trackNameWithContext(TrackingAction.EVENT_NAME.PERSONAL.CREATED, context);
             connected.trackNameWithContext(TrackingAction.EVENT_NAME.PERSONAL.VERIFIED, context);
           })

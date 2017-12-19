@@ -52,6 +52,11 @@ export const FLOW_TO_CONTEXT = {
   [EVENT_CONTEXT.PERSONAL_INVITE]: REGISTER_FLOW.PERSONAL_INVITATION,
 };
 
+export const getTrackingContextForFlow = currentFlow => {
+  const [contextEntry] = Object.entries(FLOW_TO_CONTEXT).find(([, flowEntry]) => flowEntry === currentFlow);
+  return contextEntry;
+};
+
 export function trackEvent(event) {
   return function(dispatch, getState, {mixpanel}) {
     return Promise.resolve()
