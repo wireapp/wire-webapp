@@ -41,7 +41,7 @@ z.components.DeviceCard = class DeviceCard {
       this.data_uie_name += '-current';
     }
 
-    this.activated_in = ko.observable();
+    this.activated_in = ko.observable(z.l10n.text(z.string.preferences_devices_activated_in));
 
     this._update_activation_location('?');
     this._update_location();
@@ -60,9 +60,10 @@ z.components.DeviceCard = class DeviceCard {
     }
   }
 
-  _update_activation_location(location) {
-    const location_content = `<span class='label-bold-xs'>${location}</span>`;
-    this.activated_in(z.l10n.text(z.string.preferences_devices_activated_in, location_content));
+  _update_activation_location(location, template = z.string.preferences_devices_activated_in) {
+    const text = z.l10n.text(template, location);
+    const sanitizedLocation = z.util.StringUtil.splitAtPivotElement(text, location);
+    this.activated_in(sanitizedLocation);
   }
 
   _update_location() {
@@ -88,7 +89,9 @@ ko.components.register('device-card', {
             <span class="device-id-part" data-bind="text: $data"></span>
           </span>
         </div>
-        <div class="label-xs" data-bind="html: activated_in"></div>
+        <div class="label-xs" data-bind="foreach: activated_in">
+          <span class="preferences-devices-activated-bold" data-bind="text: $data">?</span>
+        </div>
         <div class="label-xs" data-bind="text: z.util.format_timestamp(device.time)"></div>
       <!-- /ko -->
       <!-- ko ifnot: detailed -->
