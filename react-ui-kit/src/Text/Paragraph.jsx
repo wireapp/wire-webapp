@@ -32,6 +32,7 @@ Paragraph.propTypes = {
 
 Paragraph.defaultProps = {
   ...Text.defaultProps,
+  block: true,
 };
 
 export {Paragraph};
