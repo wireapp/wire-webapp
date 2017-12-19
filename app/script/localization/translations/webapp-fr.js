@@ -385,6 +385,7 @@ z.string.fr.preferences_about_terms_of_use = 'Conditions d’utilisation';
 z.string.fr.preferences_about_version = 'Version {{version}}';
 z.string.fr.preferences_about_website = 'Site de Wire';
 
+z.string.fr.preferences_account_avaibility_unset = 'Définir un statut';
 z.string.fr.preferences_account_create_team = 'Créer une équipe';
 z.string.fr.preferences_account_delete = 'Supprimer le compte';
 z.string.fr.preferences_account_log_out = 'Se déconnecter';
@@ -461,6 +462,7 @@ z.string.fr.upload_google_headline_error = 'Une erreur\nest survenue.';
 z.string.fr.upload_google_message_error = 'Nous n’avons pas reçu votre information. Veuillez réessayer d’importer vos contacts.';
 z.string.fr.upload_google_button_again = 'Réessayer';
 
+z.string.fr.url_website_create_team = '/create-team/';
 z.string.fr.warning_call_detail = 'Votre navigateur doit avoir accès au micro pour passer des appels.';
 z.string.fr.warning_call_headline = 'Impossible d’appeler sans micro';
 z.string.fr.warning_call_unsupported_incoming = '{{user}} vous appelle. Votre navigateur ne prend pas en charge les appels.';
@@ -485,6 +487,8 @@ z.string.fr.warning_permission_request_screen = '{{icon}} Autoriser l’accès �
 z.string.fr.warning_tell_me_how = 'Dites-moi comment faire';
 
 z.string.fr.user_availability_available = 'Disponible';
+z.string.fr.user_availability_away = 'Absent(e)';
+z.string.fr.user_availability_busy = 'Occupé(e)';
 z.string.fr.user_availability_none = 'Aucune';
 
 z.string.fr.system_notification_asset_add = 'A partagé une image';
@@ -512,6 +516,9 @@ z.string.fr.tooltip_conversation_call = 'Appeler';
 z.string.fr.tooltip_conversation_ephemeral = 'Message éphémère';
 z.string.fr.tooltip_conversation_file = 'Ajouter un fichier';
 z.string.fr.tooltip_conversation_input_placeholder = 'Écrivez un message';
+z.string.fr.tooltip_conversation_input_placeholder_available = '{{user}} est disponible';
+z.string.fr.tooltip_conversation_input_placeholder_away = '{{user}} est absent(e)';
+z.string.fr.tooltip_conversation_input_placeholder_busy = '{{user}} est occupé(e)';
 z.string.fr.tooltip_conversation_people = 'Personnes ({{shortcut}})';
 z.string.fr.tooltip_conversation_picture = 'Ajouter une image';
 z.string.fr.tooltip_conversation_ping = 'Faire un signe ({{shortcut}})';

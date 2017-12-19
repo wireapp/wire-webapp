@@ -385,6 +385,7 @@ z.string.et.preferences_about_terms_of_use = 'Kasutustingimused';
 z.string.et.preferences_about_version = 'Versioon {{version}}';
 z.string.et.preferences_about_website = 'Wire’i koduleht';
 
+z.string.et.preferences_account_avaibility_unset = 'Sea olek';
 z.string.et.preferences_account_create_team = 'Loo meeskond';
 z.string.et.preferences_account_delete = 'Kustuta konto';
 z.string.et.preferences_account_log_out = 'Logi välja';
@@ -485,6 +486,8 @@ z.string.et.warning_permission_request_screen = '{{icon}} Luba ekraanile juurdep
 z.string.et.warning_tell_me_how = 'Ütle, kuidas';
 
 z.string.et.user_availability_available = 'Saadaval';
+z.string.et.user_availability_away = 'Eemal';
+z.string.et.user_availability_busy = 'Hõivatud';
 z.string.et.user_availability_none = 'Puudub';
 
 z.string.et.system_notification_asset_add = 'Jagas pilti';
@@ -512,6 +515,9 @@ z.string.et.tooltip_conversation_call = 'Kõne';
 z.string.et.tooltip_conversation_ephemeral = 'Kustuv sõnum';
 z.string.et.tooltip_conversation_file = 'Lisa fail';
 z.string.et.tooltip_conversation_input_placeholder = 'Kirjuta sõnum';
+z.string.et.tooltip_conversation_input_placeholder_available = '{{user}} on saadaval';
+z.string.et.tooltip_conversation_input_placeholder_away = '{{user}} on eemal';
+z.string.et.tooltip_conversation_input_placeholder_busy = '{{user}} on hõivatud';
 z.string.et.tooltip_conversation_people = 'Inimesed ({{shortcut}})';
 z.string.et.tooltip_conversation_picture = 'Lisa pilt';
 z.string.et.tooltip_conversation_ping = 'Ping ({{shortcut}})';
