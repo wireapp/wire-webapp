@@ -288,7 +288,7 @@
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@protobufjs/utf8/-/utf8-1.1.0.tgz#a777360b5b39a1a2e5106f8e858f2fd2d060c570"
 
-"@types/long@^3.0.31":
+"@types/long@^3.0.31", "@types/long@^3.0.32":
   version "3.0.32"
   resolved "https://registry.yarnpkg.com/@types/long/-/long-3.0.32.tgz#f4e5af31e9e9b196d8e5fca8a5e2e20aa3d60b69"
 
@@ -304,9 +304,9 @@
   version "8.0.50"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-8.0.50.tgz#dc545448e128c88c4eec7cd64025fcc3b7604541"
 
-"@types/node@8.0.53":
-  version "8.0.53"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.0.53.tgz#396b35af826fa66aad472c8cb7b8d5e277f4e6d8"
+"@types/node@8.5.1", "@types/node@^8.0.53":
+  version "8.5.1"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.5.1.tgz#4ec3020bcdfe2abffeef9ba3fbf26fca097514b5"
 
 "@types/node@^6.0.46":
   version "6.0.90"
@@ -328,39 +328,39 @@
   version "2.3.2"
   resolved "https://registry.yarnpkg.com/@types/tough-cookie/-/tough-cookie-2.3.2.tgz#e0d481d8bb282ad8a8c9e100ceb72c995fb5e709"
 
-"@wireapp/api-client@0.2.10":
-  version "0.2.10"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-0.2.10.tgz#72d84a2aa9f37fbac9f12e8f4bb7c91585fc32af"
+"@wireapp/api-client@0.2.17":
+  version "0.2.17"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-0.2.17.tgz#d65650d8b94efe45452374275ad88dcddd6acc83"
   dependencies:
-    "@types/node" "8.0.53"
+    "@types/node" "8.5.1"
     "@types/spark-md5" "3.0.0"
     "@types/text-encoding" "0.0.32"
     "@types/tough-cookie" "2.3.2"
     "@wireapp/queue-priority" "0.0.13"
     "@wireapp/store-engine" "0.1.1"
     axios "0.17.1"
-    html5-websocket "2.0.1"
+    html5-websocket "2.0.2"
     logdown "2.2.0"
     reconnecting-websocket "3.2.2"
     spark-md5 "3.0.0"
     tough-cookie "2.3.3"
 
-"@wireapp/core@0.0.10":
-  version "0.0.10"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-0.0.10.tgz#e08ba2149988fa904a68b9505e6f8f573337be52"
+"@wireapp/core@0.0.11":
+  version "0.0.11"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-0.0.11.tgz#6fa5b9baae9174b9e9c3bb6207d8097f45794a69"
   dependencies:
-    "@types/node" "8.0.50"
-    "@wireapp/api-client" "0.2.10"
-    "@wireapp/protocol-messaging" "1.19.0"
+    "@types/node" "8.5.1"
+    "@wireapp/api-client" "0.2.17"
+    "@wireapp/protocol-messaging" "1.20.0"
     "@wireapp/store-engine" "0.1.1"
     bazinga64 "5.0.3"
-    protobufjs "6.8.0"
-    pure-uuid "1.4.10"
+    protobufjs "6.8.3"
+    pure-uuid "1.4.11"
     wire-webapp-cryptobox "6.2.1"
 
-"@wireapp/protocol-messaging@1.19.0":
-  version "1.19.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/protocol-messaging/-/protocol-messaging-1.19.0.tgz#b20dd2c87587018aefac77e8780f8c28b2caacc3"
+"@wireapp/protocol-messaging@1.20.0":
+  version "1.20.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/protocol-messaging/-/protocol-messaging-1.20.0.tgz#bbc2d1fd7e1ab7bdde0a8794cd3db1066be57d07"
   dependencies:
     protobufjs "6.8.0"
 
@@ -4271,9 +4271,9 @@ html-entities@^1.2.0:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/html-entities/-/html-entities-1.2.1.tgz#0df29351f0721163515dfb9e5543e5f6eed5162f"
 
-html5-websocket@2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/html5-websocket/-/html5-websocket-2.0.1.tgz#953b5e0925c0ed488bf220d9e8a1b3668bd53ec5"
+html5-websocket@2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/html5-websocket/-/html5-websocket-2.0.2.tgz#52bff70507b61c7457ed693fed47ad9244dab438"
   dependencies:
     ws "^3.1.0"
 
@@ -7032,6 +7032,24 @@ protobufjs@6.8.0:
     "@types/node" "^7.0.29"
     long "^3.2.0"
 
+protobufjs@6.8.3:
+  version "6.8.3"
+  resolved "https://registry.yarnpkg.com/protobufjs/-/protobufjs-6.8.3.tgz#d3746fae45f6b2fe77e7e6761471e41080164b19"
+  dependencies:
+    "@protobufjs/aspromise" "^1.1.2"
+    "@protobufjs/base64" "^1.1.2"
+    "@protobufjs/codegen" "^2.0.4"
+    "@protobufjs/eventemitter" "^1.1.0"
+    "@protobufjs/fetch" "^1.1.0"
+    "@protobufjs/float" "^1.0.2"
+    "@protobufjs/inquire" "^1.1.0"
+    "@protobufjs/path" "^1.1.2"
+    "@protobufjs/pool" "^1.1.0"
+    "@protobufjs/utf8" "^1.1.0"
+    "@types/long" "^3.0.32"
+    "@types/node" "^8.0.53"
+    long "^3.2.0"
+
 proxy-addr@~2.0.2:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/proxy-addr/-/proxy-addr-2.0.2.tgz#6571504f47bb988ec8180253f85dd7e14952bdec"
@@ -7086,9 +7104,9 @@ punycode@^1.2.4, punycode@^1.4.1:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-1.4.1.tgz#c0d5a63b2718800ad8e1eb0fa5269c84dd41845e"
 
-pure-uuid@1.4.10:
-  version "1.4.10"
-  resolved "https://registry.yarnpkg.com/pure-uuid/-/pure-uuid-1.4.10.tgz#884903c01a811a59a69d49959591b5147a51ca18"
+pure-uuid@1.4.11:
+  version "1.4.11"
+  resolved "https://registry.yarnpkg.com/pure-uuid/-/pure-uuid-1.4.11.tgz#8bd5b6d1d5a613ea49cb406c1ebbdab4dea81920"
 
 q@^1.1.2:
   version "1.5.1"
