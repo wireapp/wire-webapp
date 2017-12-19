@@ -133,17 +133,17 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
     });
 
     this.file_tooltip = z.l10n.text(z.string.tooltip_conversation_file);
-    this.input_tooltip = ko.pureComputed(() => {
+    this.input_placeholder = ko.pureComputed(() => {
       if (this.show_availability_tooltip()) {
-        const remoteUserEntity = this.conversation_et().firstUserEntity();
+        const userEntity = this.conversation_et().firstUserEntity();
 
-        switch (remoteUserEntity.availability()) {
+        switch (userEntity.availability()) {
           case z.user.AvailabilityType.AVAILABLE:
-            return z.l10n.text(z.string.tooltip_conversation_input_placeholder_available, remoteUserEntity.name());
+            return z.l10n.text(z.string.tooltip_conversation_input_placeholder_available, userEntity.first_name());
           case z.user.AvailabilityType.AWAY:
-            return z.l10n.text(z.string.tooltip_conversation_input_placeholder_away, remoteUserEntity.name());
+            return z.l10n.text(z.string.tooltip_conversation_input_placeholder_away, userEntity.first_name());
           case z.user.AvailabilityType.BUSY:
-            return z.l10n.text(z.string.tooltip_conversation_input_placeholder_busy, remoteUserEntity.name());
+            return z.l10n.text(z.string.tooltip_conversation_input_placeholder_busy, userEntity.first_name());
         }
       }
 
