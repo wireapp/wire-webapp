@@ -483,6 +483,7 @@ z.string.es.warning_permission_request_screen = '{{icon}} Permitir acceso a la p
 z.string.es.warning_tell_me_how = 'Explíqueme cómo';
 
 z.string.es.user_availability_available = 'Disponible';
+z.string.es.user_availability_busy = 'Ocupado';
 z.string.es.user_availability_none = 'Ninguno';
 
 z.string.es.system_notification_asset_add = 'Compartió una foto';
