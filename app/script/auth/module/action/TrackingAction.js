@@ -47,14 +47,9 @@ export const EVENT_CONTEXT = {
 };
 
 export const FLOW_TO_CONTEXT = {
-  [EVENT_CONTEXT.EMAIL]: REGISTER_FLOW.PERSONAL,
-  [EVENT_CONTEXT.GENERIC_INVITE]: REGISTER_FLOW.GENERIC_INVITATION,
-  [EVENT_CONTEXT.PERSONAL_INVITE]: REGISTER_FLOW.PERSONAL_INVITATION,
-};
-
-export const getTrackingContextForFlow = currentFlow => {
-  const [contextEntry] = Object.entries(FLOW_TO_CONTEXT).find(([, flowEntry]) => flowEntry === currentFlow);
-  return contextEntry;
+  [REGISTER_FLOW.PERSONAL]: EVENT_CONTEXT.EMAIL,
+  [REGISTER_FLOW.GENERIC_INVITATION]: EVENT_CONTEXT.GENERIC_INVITE,
+  [REGISTER_FLOW.PERSONAL_INVITATION]: EVENT_CONTEXT.PERSONAL_INVITE,
 };
 
 export function trackEvent(event) {

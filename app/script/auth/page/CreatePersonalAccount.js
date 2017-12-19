@@ -29,12 +29,7 @@ import {withRouter} from 'react-router';
 import React from 'react';
 import ROUTE from '../route';
 import AccountForm from '../component/AccountForm';
-import {
-  trackNameWithContext,
-  getTrackingContextForFlow,
-  EVENT_CONTEXT,
-  EVENT_NAME,
-} from '../module/action/TrackingAction';
+import {trackNameWithContext, EVENT_CONTEXT, EVENT_NAME, FLOW_TO_CONTEXT} from '../module/action/TrackingAction';
 import {getAccount, getCurrentFlow, REGISTER_FLOW} from '../module/selector/AuthSelector';
 import * as AuthActionCreator from '../module/action/creator/AuthActionCreator';
 import * as AuthAction from '../module/action/AuthAction';
@@ -71,7 +66,7 @@ class CreatePersonalAccount extends React.PureComponent {
   };
 
   handleBeforeSubmit = () => {
-    const context = getTrackingContextForFlow(this.props.currentFlow);
+    const context = FLOW_TO_CONTEXT[this.props.currentFlow];
     this.props.trackNameWithContext(EVENT_NAME.PERSONAL.ENTERED_ACCOUNT_DATA, context);
   };
 
