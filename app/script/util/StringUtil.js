@@ -127,6 +127,10 @@ z.util.StringUtil = {
 
     return 0;
   },
+  splitAtPivotElement: function(text, pivot) {
+    const findPivot = pivot === '?' ? new RegExp('(\\?)') : new RegExp(`(${pivot})`);
+    return text.split(findPivot);
+  },
   starts_with: function(string = '', query) {
     return string.toLowerCase().startsWith(query.toLowerCase());
   },

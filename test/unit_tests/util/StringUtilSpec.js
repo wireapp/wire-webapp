@@ -124,6 +124,47 @@ describe('z.util.StringUtil', () => {
     });
   });
 
+  describe('splitAtPivotElement', () => {
+    it('splits a text in two halves at a pivot element', () => {
+      const text = 'Secure messaging for everyone';
+      const pivot = 'messaging';
+
+      const actual = z.util.StringUtil.splitAtPivotElement(text, pivot);
+      expect(actual.length).toBe(3);
+      expect(actual[0]).toBe('Secure ');
+      expect(actual[1]).toBe(pivot);
+      expect(actual[2]).toBe(' for everyone');
+    });
+
+    it('works when the pivot element comes first', () => {
+      const time = '22:42';
+      const turkish = `${time} ’da aktif edildi`;
+      const result = z.util.StringUtil.splitAtPivotElement(turkish, time);
+      expect(result[1]).toBe(time);
+    });
+
+    it('works when the pivot element comes last', () => {
+      const time = '22:42';
+      const greek = `Ενεργοποιήθηκε στις ${time}`;
+      const result = z.util.StringUtil.splitAtPivotElement(greek, time);
+      expect(result[1]).toBe(time);
+    });
+
+    it('works when the pivot element comes in-between', () => {
+      const time = '22:42';
+      const finish = `Aktivoitu ${time}: ssa`;
+      const result = z.util.StringUtil.splitAtPivotElement(finish, time);
+      expect(result[1]).toBe(time);
+    });
+
+    it('works with pivots that need to be escaped in regular expressions', () => {
+      const pivot = '?';
+      const english = `Activated on ${pivot}`;
+      const result = z.util.StringUtil.splitAtPivotElement(english, pivot);
+      expect(result[1]).toBe(pivot);
+    });
+  });
+
   describe('starts_with', () => {
     const string = 'To be, or not to be, that is the question.';
 
