@@ -62,8 +62,8 @@ z.components.DeviceCard = class DeviceCard {
 
   _update_activation_location(location, template = z.string.preferences_devices_activated_in) {
     const text = z.l10n.text(template, location);
-    const sanitizedLocation = z.util.StringUtil.splitAtPivotElement(text, location);
-    this.activated_in(sanitizedLocation);
+    const sanitizedText = z.util.StringUtil.splitAtPivotElement(text, location);
+    this.activated_in(sanitizedText);
   }
 
   _update_location() {

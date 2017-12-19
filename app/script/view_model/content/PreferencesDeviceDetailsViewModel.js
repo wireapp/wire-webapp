@@ -65,15 +65,15 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
 
   _update_activation_location(location, template = z.string.preferences_devices_activated_in) {
     const text = z.l10n.text(template, location);
-    const sanitizedLocation = z.util.StringUtil.splitAtPivotElement(text, location);
-    this.activated_in(sanitizedLocation);
+    const sanitizedText = z.util.StringUtil.splitAtPivotElement(text, location);
+    this.activated_in(sanitizedText);
   }
 
   _update_activation_time(time, template = z.string.preferences_devices_activated_on) {
     const formattedTime = z.util.format_timestamp(time);
     const text = z.l10n.text(template, formattedTime);
-    const sanitizedTime = z.util.StringUtil.splitAtPivotElement(text, formattedTime);
-    this.activated_on(sanitizedTime);
+    const sanitizedText = z.util.StringUtil.splitAtPivotElement(text, formattedTime);
+    this.activated_on(sanitizedText);
   }
 
   _update_device_location(location) {
