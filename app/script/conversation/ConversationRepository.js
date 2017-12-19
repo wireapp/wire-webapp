@@ -1445,36 +1445,32 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Send asset preview message to specified conversation.
    *
-   * @param {Conversation} conversation_et - Conversation that should receive the preview
+   * @param {Conversation} conversationEntity - Conversation that should receive the preview
    * @param {File} file - File to generate preview from
-   * @param {string} message_id - Message ID of the message to generate a preview for
+   * @param {string} messageId - Message ID of the message to generate a preview for
    * @returns {Promise} Resolves when the asset preview was sent
    */
-  send_asset_preview(conversation_et, file, message_id) {
+  sendAssetPreview(conversationEntity, file, messageId) {
     return poster(file)
-      .then(image_blob => {
-        if (!image_blob) {
+      .then(imageBlob => {
+        if (!imageBlob) {
           throw Error('No image available');
         }
 
-        return this.asset_service.upload_asset(image_blob).then(uploaded_image_asset => {
+        return this.asset_service.upload_asset(imageBlob).then(uploadedImageAsset => {
           const asset = new z.proto.Asset();
-          asset.set(
-            'preview',
-            new z.proto.Asset.Preview(image_blob.type, image_blob.size, uploaded_image_asset.uploaded)
-          );
+          const assetPreview = new z.proto.Asset.Preview(imageBlob.type, imageBlob.size, uploadedImageAsset.uploaded);
+          asset.set('preview', assetPreview);
 
-          const generic_message = new z.proto.GenericMessage(message_id);
-          generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
+          const genericMessage = new z.proto.GenericMessage(messageId);
+          genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
 
-          return this._send_and_inject_generic_message(conversation_et, generic_message);
+          return this._send_and_inject_generic_message(conversationEntity, genericMessage);
         });
       })
       .catch(error => {
-        this.logger.warn(
-          `No preview for asset '${message_id}' in conversation '${conversation_et.id}' uploaded `,
-          error
-        );
+        const message = `No preview for asset '${messageId}' in conversation '${conversationEntity.id}' uploaded `;
+        this.logger.warn(message, error);
       });
   }
 
@@ -2220,7 +2216,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.send_asset_metadata(conversation_et, file)
       .then(({id}) => {
         message_id = id;
-        return this.send_asset_preview(conversation_et, file, message_id);
+        return this.sendAssetPreview(conversation_et, file, message_id);
       })
       .then(() => this.send_asset_remotedata(conversation_et, file, message_id))
       .then(() => {
