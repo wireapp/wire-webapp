@@ -26,8 +26,10 @@ export default {
   CREATE_TEAM: '/createteam',
   CREATE_TEAM_ACCOUNT: '/createteamaccount',
   INDEX: '/',
-  INITIAL_INVITE: '/invite',
+  INITIAL_INVITE: '/teaminvite',
+  INVITE: '/invite',
   LOGIN: '/login',
+  PERSONAL_INVITE: '/personalinvite',
   VERIFY: '/verify',
   WIRE_ROOT: onEnvironment(stagingWebsite, stagingWebsite, 'https://wire.com'),
 };

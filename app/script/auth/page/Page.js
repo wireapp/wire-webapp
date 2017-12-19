@@ -30,6 +30,7 @@ const hasInvalidTeamData = ({team}) => !team || !team.name;
 
 const redirects = {
   [REGISTER_FLOW.PERSONAL]: ROUTE.CREATE_ACCOUNT,
+  [REGISTER_FLOW.GENERIC_INVITATION]: ROUTE.CREATE_ACCOUNT,
   [REGISTER_FLOW.TEAM]: ROUTE.CREATE_TEAM,
 };
 

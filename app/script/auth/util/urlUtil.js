@@ -33,3 +33,10 @@ export function pathWithParams(path, additionalParams) {
 export function getURLParameter(parameterName) {
   return (window.location.search.split(`${parameterName}=`)[1] || '').split('&')[0];
 }
+
+export function hasURLParameter(parameterName) {
+  return window.location.search
+    .split(/\?|&/)
+    .map(parameter => parameter.split('=')[0])
+    .includes(parameterName);
+}

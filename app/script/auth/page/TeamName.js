@@ -31,6 +31,7 @@ import {withRouter} from 'react-router';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {resetError} from '../module/action/creator/InviteActionCreator';
 import * as AuthAction from '../module/action/AuthAction';
+import {enterTeamCreationFlow} from '../module/action/creator/AuthActionCreator';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import ValidationError from '../module/action/ValidationError';
 import React, {Component} from 'react';
@@ -43,6 +44,10 @@ class TeamName extends Component {
     error: null,
     isValidTeamName: false,
   };
+
+  componentDidMount() {
+    this.props.enterTeamCreationFlow();
+  }
 
   handleSubmit = event => {
     event.preventDefault();
@@ -137,7 +142,7 @@ export default withRouter(
         error: AuthSelector.getError(state),
         teamName: AuthSelector.getAccountTeamName(state),
       }),
-      {...AuthAction, resetError}
+      {...AuthAction, enterTeamCreationFlow, resetError}
     )(TeamName)
   )
 );
