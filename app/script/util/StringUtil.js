@@ -127,12 +127,16 @@ z.util.StringUtil = {
 
     return 0;
   },
-  splitAtPivotElement: function(text, pivot) {
+  splitAtPivotElement: function(text, pivot, replacement) {
     if (!pivot) {
       return [];
     }
-    const findPivot = pivot === '?' ? new RegExp('(\\?)') : new RegExp(`(${pivot})`);
-    return text.split(findPivot);
+    return text.split(pivot).map(value => {
+      return {
+        isStyled: value === pivot,
+        text: value === pivot ? replacement : value,
+      };
+    });
   },
   starts_with: function(string = '', query) {
     return string.toLowerCase().startsWith(query.toLowerCase());
