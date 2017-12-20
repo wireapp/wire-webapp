@@ -1056,14 +1056,14 @@ describe('ConversationRepository', () => {
       john = new z.entity.User(entities.user.john_doe.id);
       john.name('John');
 
-      const johns_computer = new z.client.Client({id: '83ad5d3c31d3c76b', class: 'tabconst'});
+      const johns_computer = new z.client.ClientEntity({id: '83ad5d3c31d3c76b', class: 'tabconst'});
       john.devices.push(johns_computer);
 
       lara = new z.entity.User();
       lara.name('Lara');
 
-      const bobs_computer = new z.client.Client({id: '74606e4c02b2c7f9', class: 'desktop'});
-      const bobs_phone = new z.client.Client({id: '8f63631e129ed19d', class: 'phone'});
+      const bobs_computer = new z.client.ClientEntity({id: '74606e4c02b2c7f9', class: 'desktop'});
+      const bobs_phone = new z.client.ClientEntity({id: '8f63631e129ed19d', class: 'phone'});
 
       bob.devices.push(bobs_computer);
       bob.devices.push(bobs_phone);

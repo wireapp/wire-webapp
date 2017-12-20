@@ -91,7 +91,7 @@ z.ViewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
   click_on_remove_device(device_et, event) {
     amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.REMOVE_DEVICE, {
       action: password => {
-        this.client_repository.delete_client(device_et.id, password);
+        this.client_repository.deleteClient(device_et.id, password);
       },
       data: device_et.model,
     });

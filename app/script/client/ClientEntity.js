@@ -22,7 +22,7 @@
 window.z = window.z || {};
 window.z.client = z.client || {};
 
-z.client.Client = class Client {
+z.client.ClientEntity = class ClientEntity {
   static get CONFIG() {
     return {
       DEFAULT_VALUE: '?',
@@ -30,11 +30,11 @@ z.client.Client = class Client {
   }
 
   constructor(payload = {}) {
-    this.class = Client.CONFIG.DEFAULT_VALUE;
+    this.class = ClientEntity.CONFIG.DEFAULT_VALUE;
 
     if (payload.address) {
-      this.label = Client.CONFIG.DEFAULT_VALUE;
-      this.model = Client.CONFIG.DEFAULT_VALUE;
+      this.label = ClientEntity.CONFIG.DEFAULT_VALUE;
+      this.model = ClientEntity.CONFIG.DEFAULT_VALUE;
     }
 
     for (const property in payload) {
@@ -57,32 +57,29 @@ z.client.Client = class Client {
    * @param {string} id - Client ID to be dismantled
    * @returns {Object} Object containing the user ID & client ID
    */
-  static dismantle_user_client_id(id) {
-    const [user_id, client_id] = (id ? id.split('@') : undefined) || [];
-    return {
-      client_id: client_id,
-      user_id: user_id,
-    };
+  static dismantleUserClientId(id) {
+    const [userId, clientId] = (id ? id.split('@') : undefined) || [];
+    return {clientId, userId};
   }
 
   /**
    * @returns {boolean} True, if the client is the self user's permanent client.
    */
-  is_permanent() {
+  isPermanent() {
     return this.type === z.client.ClientType.PERMANENT;
   }
 
   /**
    * @returns {boolean} - True, if it is NOT the client of the self user.
    */
-  is_remote() {
-    return !this.is_permanent() && !this.is_temporary();
+  isRemote() {
+    return !this.isPermanent() && !this.isTemporary();
   }
 
   /**
    * @returns {boolean} - True, if the client is the self user's temporary client.
    */
-  is_temporary() {
+  isTemporary() {
     return this.type === z.client.ClientType.TEMPORARY;
   }
 
@@ -90,16 +87,16 @@ z.client.Client = class Client {
    * This method returns a JSON object which can be stored in our local database.
    * @returns {Object} Client data as JSON object
    */
-  to_json() {
-    const json_object = JSON.parse(ko.toJSON(this));
-    delete json_object.session;
+  toJson() {
+    const jsonObject = JSON.parse(ko.toJSON(this));
+    delete jsonObject.session;
 
-    for (const property in json_object) {
-      if (json_object.hasOwnProperty(property) && json_object[property] === Client.CONFIG.DEFAULT_VALUE) {
-        delete json_object[property];
+    for (const property in jsonObject) {
+      if (jsonObject.hasOwnProperty(property) && jsonObject[property] === ClientEntity.CONFIG.DEFAULT_VALUE) {
+        delete jsonObject[property];
       }
     }
 
-    return json_object;
+    return jsonObject;
   }
 };

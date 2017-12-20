@@ -21,19 +21,19 @@
 
 'use strict';
 
-describe('z.client.Client', () => {
-  describe('dismantle_user_client_id', () => {
+describe('z.client.ClientEntity', () => {
+  describe('dismantleUserClientId', () => {
     it('can get the user ID and client ID from a session ID', () => {
-      const session_id = '034060fe-8406-476e-b29d-f0a214c0345b@4b0a0fbf418d264c';
-      const ids = z.client.Client.dismantle_user_client_id(session_id);
-      expect(ids.client_id).toBe('4b0a0fbf418d264c');
-      expect(ids.user_id).toBe('034060fe-8406-476e-b29d-f0a214c0345b');
+      const sessionId = '034060fe-8406-476e-b29d-f0a214c0345b@4b0a0fbf418d264c';
+      const {clientId, userId} = z.client.ClientEntity.dismantleUserClientId(sessionId);
+      expect(clientId).toBe('4b0a0fbf418d264c');
+      expect(userId).toBe('034060fe-8406-476e-b29d-f0a214c0345b');
     });
 
     it('can handle an undefined input', () => {
-      const ids = z.client.Client.dismantle_user_client_id(undefined);
-      expect(ids.client_id).toBe(undefined);
-      expect(ids.user_id).toBe(undefined);
+      const {clientId, userId} = z.client.ClientEntity.dismantleUserClientId(undefined);
+      expect(clientId).toBe(undefined);
+      expect(userId).toBe(undefined);
     });
   });
 });
