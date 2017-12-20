@@ -97,7 +97,7 @@ ko.components.register('device-card', {
         </div>
         <div class="text-graphite-dark label-xs">
           <span data-bind="l10n_text: z.string.preferences_devices_id"></span>
-          <span data-uie-name="device-id" data-bind="foreach: z.util.zero_padding(id, 16).match(/.{1,2}/g)"><span class="device-id-part" data-bind="text: $data"></span></span>          
+          <span data-uie-name="device-id" data-bind="foreach: z.util.zero_padding(id, 16).match(/.{1,2}/g)"><span class="device-id-part" data-bind="text: $data"></span></span>
         </div>
       <!-- /ko -->
     </div>
