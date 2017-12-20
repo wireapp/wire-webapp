@@ -42,10 +42,10 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
     this.mode = params.mode || z.components.UserProfileMode.DEFAULT;
 
     // repository references
-    this.client_repository = wire.app.repository.client;
-    this.conversation_repository = wire.app.repository.conversation;
-    this.cryptography_repository = wire.app.repository.cryptography;
-    this.user_repository = wire.app.repository.user;
+    this.client_repository = window.wire.app.repository.client;
+    this.conversation_repository = window.wire.app.repository.conversation;
+    this.cryptography_repository = window.wire.app.repository.cryptography;
+    this.user_repository = window.wire.app.repository.user;
 
     this.isTeam = ko.pureComputed(() => {
       return this.conversation()
@@ -174,11 +174,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
       const pivot = text.match(textWithHtmlTags)[0];
       const sanitizedText = z.util.StringUtil.splitAtPivotElement(text, pivot);
 
-      if (sanitizedText[1]) {
-        sanitizedText[1] = sanitizedText[1].replace(textWithinHtmlTags, '');
-      }
-
-      return sanitizedText;
+      return sanitizedText[1].replace(textWithinHtmlTags, '');
     });
 
     this.on_cancel_request = () => {
