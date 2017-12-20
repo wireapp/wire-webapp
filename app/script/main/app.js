@@ -725,10 +725,13 @@ z.main.App = class App {
    * @returns {undefined} No return value
    */
   refresh() {
+    this.logger.info(`Refresh to update from source '${this.update_source}' started`);
     if (z.util.Environment.desktop) {
       amplify.publish(z.event.WebApp.LIFECYCLE.RESTART, this.update_source);
     }
-    if (this.update_source === z.lifecycle.UPDATE_SOURCE.WEBAPP) {
+
+    const isWebappSource = this.update_source === z.lifecycle.UPDATE_SOURCE.WEBAPP;
+    if (isWebappSource) {
       window.location.reload(true);
       window.focus();
     }

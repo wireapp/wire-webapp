@@ -570,12 +570,14 @@ z.user.UserRepository = class UserRepository {
 
   setAvailability(availability, method) {
     const hasAvailabilityChanged = availability !== this.self().availability();
+    const newAvailabilityValue = z.user.AvailabilityMapper.valueFromType(availability);
     if (hasAvailabilityChanged) {
-      this.logger.log(`Availability was changed from '${this.self().availability()}' to '${availability}'`);
+      const oldAvailabilityValue = z.user.AvailabilityMapper.valueFromType(this.self().availability());
+      this.logger.log(`Availability was changed from '${oldAvailabilityValue}' to '${newAvailabilityValue}'`);
       this.self().availability(availability);
       this._trackAvailability(availability, method);
     } else {
-      this.logger.log(`Availability was again set to '${availability}'`);
+      this.logger.log(`Availability was again set to '${newAvailabilityValue}'`);
     }
 
     const genericMessage = new z.proto.GenericMessage(z.util.create_random_uuid());
