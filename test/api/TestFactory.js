@@ -305,12 +305,12 @@ window.TestFactory.prototype.exposeTeamActors = function() {
     .then(() => {
       this.logger.info('✓ exposedUserActors');
 
-      TestFactory.team_service = new z.team.TeamService(this.client);
-      TestFactory.team_service.logger.level = this.settings.logging_level;
-      return TestFactory.team_service;
+      TestFactory.teamService = new z.team.TeamService(this.client);
+      TestFactory.teamService.logger.level = this.settings.logging_level;
+      return TestFactory.teamService;
     })
     .then(() => {
-      TestFactory.team_repository = new z.team.TeamRepository(TestFactory.team_service, TestFactory.user_repository);
+      TestFactory.team_repository = new z.team.TeamRepository(TestFactory.teamService, TestFactory.user_repository);
       TestFactory.team_repository.logger.level = this.settings.logging_level;
       return TestFactory.team_repository;
     });

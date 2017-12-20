@@ -39,25 +39,25 @@ z.team.TeamService = class TeamService {
     this.logger = new z.util.Logger('z.team.TeamService', z.config.LOGGER.OPTIONS);
   }
 
-  get_team_member(team_id, user_id) {
+  getTeamMember(teamId, userId) {
     return this.client.send_request({
       type: 'GET',
-      url: this.client.create_url(`${TeamService.URL.TEAMS}/${team_id}/members/${user_id}`),
+      url: this.client.create_url(`${TeamService.URL.TEAMS}/${teamId}/members/${userId}`),
     });
   }
 
-  get_team_members(team_id) {
+  getTeamMembers(teamId) {
     return this.client.send_request({
       type: 'GET',
-      url: this.client.create_url(`${TeamService.URL.TEAMS}/${team_id}/members`),
+      url: this.client.create_url(`${TeamService.URL.TEAMS}/${teamId}/members`),
     });
   }
 
-  get_teams(limit = 100, team_ids) {
+  getTeams(limit = 100, teamIds) {
     return this.client.send_request({
       data: {
         size: limit,
-        start: team_ids,
+        start: teamIds,
       },
       type: 'GET',
       url: this.client.create_url(TeamService.URL.TEAMS),

@@ -327,7 +327,7 @@ z.main.App = class App {
         this.repository.conversation.map_connections(this.repository.user.connections());
         this._subscribe_to_unload_events();
 
-        return this.repository.team.get_team();
+        return this.repository.team.getTeam();
       })
       .then(() => this.repository.user.loadUsers())
       .then(() => this.repository.event.initialize_from_stream())

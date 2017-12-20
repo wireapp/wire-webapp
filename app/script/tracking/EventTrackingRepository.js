@@ -200,8 +200,8 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
     if (this.user_repository) {
       this._set_super_property(z.tracking.SuperProperty.CONTACTS, this.user_repository.number_of_contacts());
-      this._set_super_property(z.tracking.SuperProperty.TEAM.IN_TEAM, this.team_repository.is_team());
-      this._set_super_property(z.tracking.SuperProperty.TEAM.SIZE, this.team_repository.team_size());
+      this._set_super_property(z.tracking.SuperProperty.TEAM.IN_TEAM, this.team_repository.isTeam());
+      this._set_super_property(z.tracking.SuperProperty.TEAM.SIZE, this.team_repository.teamSize());
     }
   }
 
