@@ -85,9 +85,7 @@
           <a data-bind="attr: {href: z.util.URLUtil.build_url(z.util.URLUtil.TYPE.WEBSITE, z.config.URL_PATH.PRIVACY_HOW)}, l10n_text: z.string.people_tabs_device_detail_how_to" rel="nofollow noopener noreferrer" target="_blank" class="text-theme"></a>
         </div>
         <device-card class="user-profile-device-detail-card" params="device: selected_device()"></device-card>
-        <div class="user-profile-device-detail-fingerprint" data-bind="foreach: fingerprint_remote().match(/.{1,2}/g)">
-          <span class="device-id-part" data-bind="text: $data"></span>
-        </div>
+        <div class="user-profile-device-detail-fingerprint" data-bind="foreach: fingerprint_remote().match(/.{1,2}/g)"><span class="device-id-part" data-bind="text: $data"></span></div>
         <div class="user-profile-device-detail-footer">
           <div class="slider">
             <input class="slider-input" type="checkbox" name="toggle" id="toggle" data-bind="checked: selected_device().meta.is_verified">
