@@ -48,7 +48,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
     this.logger = new z.util.Logger('z.ViewModel.ContentViewModel', z.config.LOGGER.OPTIONS);
 
     // Repositories
-    this.cryptography_repository = this.client_repository.cryptography_repository;
+    this.cryptography_repository = this.client_repository.cryptographyRepository;
     this.giphy_repository = this.conversation_repository.giphy_repository;
     this.user_repository = this.conversation_repository.user_repository;
 

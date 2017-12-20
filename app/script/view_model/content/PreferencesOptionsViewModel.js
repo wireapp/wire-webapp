@@ -30,7 +30,7 @@ z.ViewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
     this.propertiesRepository = properties_repository;
     this.team_repository = team_repository;
 
-    this.isTeam = this.team_repository.isTeam;
+    this.is_team = this.team_repository.isTeam;
 
     this.option_audio = ko.observable();
     this.option_audio.subscribe(audio_preference => {

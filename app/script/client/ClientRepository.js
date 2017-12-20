@@ -451,7 +451,7 @@ z.client.ClientRepository = class ClientRepository {
       .deleteClient(clientId, password)
       .then(() => this.deleteClientFromDb(this.selfUser().id, clientId))
       .then(() => {
-        this.selfUser().removeClient(clientId);
+        this.selfUser().remove_client(clientId);
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.REMOVED_DEVICE, {
           outcome: 'success',
         });

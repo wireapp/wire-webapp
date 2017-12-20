@@ -38,7 +38,7 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
     this.cryptography_repository = cryptography_repository;
     this.logger = new z.util.Logger('z.ViewModel.content.PreferencesDeviceDetailsViewModel', z.config.LOGGER.OPTIONS);
 
-    this.self_user = this.client_repository.self_user;
+    this.self_user = this.client_repository.selfUser;
 
     this.device = ko.observable();
     this.device.subscribe(device_et => {
