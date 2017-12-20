@@ -157,7 +157,7 @@ z.client.ClientService = class ClientService {
    * @returns {Promise<JSON|string>} Resolves with the client's payload or the primary key if not found
    */
   loadClientFromDb(primaryKey) {
-    return this.storage_service.db[z.storage.StorageService.OBJECT_STORE.CLIENTS]
+    return this.storageService.db[z.storage.StorageService.OBJECT_STORE.CLIENTS]
       .where('meta.primary_key')
       .equals(primaryKey)
       .first()
