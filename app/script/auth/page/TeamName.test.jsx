@@ -61,13 +61,13 @@ describe('when entering a team name', () => {
     wrapper = mountWithIntl(<TeamName />, store);
   });
 
-  describe('the submit button is', () => {
-    it('disabled if too few characters are entered', () => {
+  describe('the submit button', () => {
+    it('is disabled if too few characters are entered', () => {
       expect(teamNameInput().props().required).toBe(true);
       expect(doNextButton().props().disabled).toBe(true);
     });
 
-    it('enabled when the minimum amount of characters is entered', done => {
+    it('is enabled when the minimum amount of characters is entered', done => {
       const expectedTeamName = 'M';
 
       expect(doNextButton().props().disabled).toBe(true);
@@ -78,7 +78,7 @@ describe('when entering a team name', () => {
       done();
     });
 
-    it('disabled if previous submit with same value failed', done => {
+    it('is disabled if previous submit with same value failed', done => {
       const expectedTeamName = 'M';
       const expectedValidTeamName = 'My Team';
 
@@ -96,7 +96,7 @@ describe('when entering a team name', () => {
       done();
     });
 
-    it('disabled when prefilled with too few characters', done => {
+    it('is disabled when prefilled with too few characters', done => {
       wrapper.setProps({teamName: ''});
       expect(doNextButton().props().disabled).toBe(true);
       done();
