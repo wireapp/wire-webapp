@@ -40,9 +40,9 @@ const wireTeamLink = `${ROUTE.WIRE_ROOT}/create-team/#features`;
 
 class TeamName extends Component {
   state = {
-    enteredTeamName: this.props.teamName,
+    enteredTeamName: this.props.teamName || '',
     error: null,
-    isValidTeamName: false,
+    isValidTeamName: !!this.props.teamName,
   };
 
   componentDidMount() {
@@ -60,7 +60,8 @@ class TeamName extends Component {
       Promise.resolve(this.teamNameInput.value)
         .then(teamName => teamName.trim())
         .then(teamName => this.props.pushAccountRegistrationData({team: {name: teamName}}))
-        .then(() => this.props.history.push(ROUTE.CREATE_TEAM_ACCOUNT));
+        .then(() => this.props.history.push(ROUTE.CREATE_TEAM_ACCOUNT))
+        .catch(error => console.error('error', error));
     }
     this.teamNameInput.focus();
   };
@@ -94,7 +95,7 @@ class TeamName extends Component {
                 <Form style={{marginTop: 30}}>
                   <InputSubmitCombo>
                     <Input
-                      defaultValue={enteredTeamName}
+                      value={enteredTeamName}
                       innerRef={node => (this.teamNameInput = node)}
                       onChange={event => {
                         this.resetErrors();
