@@ -60,7 +60,7 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
     this.content_state = this.content_view_model.content_state;
     this.selected_conversation = ko.observable();
 
-    this.isTeam = this.team_repository.isTeam;
+    this.is_team = this.team_repository.isTeam;
 
     this.self_user = ko.pureComputed(() => this.user_repository.self && this.user_repository.self());
     this.selfAvailability = ko.pureComputed(() => this.self_user() && this.self_user().availability());
