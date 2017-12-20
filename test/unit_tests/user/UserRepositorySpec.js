@@ -295,13 +295,11 @@ describe('z.user.UserRepository', () => {
         TestFactory.user_repository
           .save_users([user_jane_roe, user_john_doe])
           .then(() => {
-            const permanent_client = TestFactory.client_repository.client_mapper.map_client(
+            const permanent_client = TestFactory.client_repository.clientMapper.mapClient(
               entities.clients.john_doe.permanent
             );
-            const plain_client = TestFactory.client_repository.client_mapper.map_client(
-              entities.clients.jane_roe.plain
-            );
-            const temporary_client = TestFactory.client_repository.client_mapper.map_client(
+            const plain_client = TestFactory.client_repository.clientMapper.mapClient(entities.clients.jane_roe.plain);
+            const temporary_client = TestFactory.client_repository.clientMapper.mapClient(
               entities.clients.john_doe.temporary
             );
             const recipients = {
@@ -309,9 +307,7 @@ describe('z.user.UserRepository', () => {
               [entities.user.jane_roe.id]: [plain_client],
             };
 
-            spyOn(TestFactory.client_repository, 'get_all_clients_from_db').and.returnValue(
-              Promise.resolve(recipients)
-            );
+            spyOn(TestFactory.client_repository, 'getAllClientsFromDb').and.returnValue(Promise.resolve(recipients));
             done();
           })
           .catch(done.fail);
@@ -325,7 +321,7 @@ describe('z.user.UserRepository', () => {
         TestFactory.user_repository
           ._assign_all_clients()
           .then(() => {
-            expect(TestFactory.client_repository.get_all_clients_from_db).toHaveBeenCalled();
+            expect(TestFactory.client_repository.getAllClientsFromDb).toHaveBeenCalled();
             expect(user_jane_roe.devices().length).toBe(1);
             expect(user_jane_roe.devices()[0].id).toBe(entities.clients.jane_roe.plain.id);
             expect(user_john_doe.devices().length).toBe(2);

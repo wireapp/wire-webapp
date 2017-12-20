@@ -403,7 +403,7 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise} Promise that resolves with all user entities where client entities have been assigned to.
    */
   _assign_all_clients() {
-    return this.client_repository.get_all_clients_from_db().then(recipients => {
+    return this.client_repository.getAllClientsFromDb().then(recipients => {
       this.logger.info(`Found locally stored clients for '${Object.keys(recipients).length}' users`, recipients);
       const user_ids = Object.keys(recipients);
 
@@ -530,7 +530,7 @@ z.user.UserRepository = class UserRepository {
         return;
       }
 
-      return this.client_repository.save_client_in_db(user_id, client_et.to_json()).then(() => {
+      return this.client_repository.saveClientInDb(user_id, client_et.toJson()).then(() => {
         amplify.publish(z.event.WebApp.USER.CLIENT_ADDED, user_id, client_et);
         if (user_et.is_me) {
           amplify.publish(z.event.WebApp.CLIENT.ADD_OWN_CLIENT, user_id, client_et);
@@ -547,7 +547,7 @@ z.user.UserRepository = class UserRepository {
    */
   remove_client_from_user(user_id, client_id) {
     return this.client_repository
-      .remove_client(user_id, client_id)
+      .removeClient(user_id, client_id)
       .then(() => this.get_user_by_id(user_id))
       .then(user_et => {
         user_et.remove_client(client_id);
@@ -558,7 +558,7 @@ z.user.UserRepository = class UserRepository {
   /**
    * Update clients for given user.
    * @param {string} user_id - ID of user
-   * @param {Array<z.client.Client>} client_ets - Clients which should get updated
+   * @param {Array<z.client.ClientEntity>} client_ets - Clients which should get updated
    * @returns {undefined} No return value
    */
   update_clients_from_user(user_id, client_ets) {
