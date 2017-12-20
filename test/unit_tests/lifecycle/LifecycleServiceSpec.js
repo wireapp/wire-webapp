@@ -52,13 +52,13 @@ describe('z.lifecycle.LifecycleService', () => {
     });
   });
 
-  describe('get_version', () => {
+  describe('getVersion', () => {
     it('fetches the webapp release version', done => {
       const response_body = {version: '2017-03-14-15-05-prod'};
       window.fetch.returns(mock_response(response_body, 200));
 
       TestFactory.lifecycle_service
-        .get_version()
+        .getVersion()
         .then(version => {
           expect(version).toBe(response_body.version);
           done();
