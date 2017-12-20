@@ -30,18 +30,13 @@ z.string.nl.alert_upload_too_large = 'Deze afbeelding is te groot.\nJe kunt best
 z.string.nl.alert_gif_too_large = 'Animatie is te groot.\nMaximale grootte is {{number}} MB.';
 
 z.string.nl.auth_account_country_code = 'Landcode';
-z.string.nl.auth_account_create = 'Aanmaken';
-z.string.nl.auth_account_create_account = 'Een account aanmaken';
 z.string.nl.auth_account_deletion = 'Je bent uitgelogt omdat je account is verwijdert.';
 z.string.nl.auth_account_expiration = 'Je bent afgemeld omdat de sessie verlopen is. Log opnieuw in.';
-z.string.nl.auth_account_get_wire = 'Eenvoudige, privé & veilige messenger voor chat, bellen, het delen van foto’s, muziek, video’s, GIFs en meer.';
 z.string.nl.auth_account_password_forgot = 'Wachtwoord vergeten';
 z.string.nl.auth_account_public_computer = 'Dit is een publieke computer';
 z.string.nl.auth_account_sign_in = 'Inloggen';
 z.string.nl.auth_account_sign_in_email = 'E-mail';
 z.string.nl.auth_account_sign_in_phone = 'Telefoonnummer';
-z.string.nl.auth_account_terms_of_use = 'Gebruikersvoorwaarden';
-z.string.nl.auth_account_terms_of_use_detail = 'Ik ga akkoord';
 
 z.string.nl.auth_blocked_cookies = 'Zet je cookies aan om in te loggen in Wire.';
 z.string.nl.auth_blocked_database = 'Wire heeft toegang nodig tot lokale opslag om je berichten te kunnen laten zien, maar dit is niet mogelijk in privémodus.';
@@ -70,23 +65,12 @@ z.string.nl.auth_history_reuse_headline = 'Je hebt Wire eerder op dit apparaat g
 z.string.nl.auth_history_reuse_description = 'Berichten die in de tussentijd worden verzonden worden niet weergegeven.';
 z.string.nl.auth_history_button = 'OK';
 
-z.string.nl.auth_posted_change_email = 'E-mailadres wijzigen';
-z.string.nl.auth_posted_offline_detail = 'Controleer je internetverbinding en probeer het opnieuw.';
-z.string.nl.auth_posted_offline_headline = 'Online is Wire leuker.';
-z.string.nl.auth_posted_pending_detail = 'Controleer je email of opnieuw activeren.';
-z.string.nl.auth_posted_pending_headline = 'Account is al in behandeling';
 z.string.nl.auth_posted_resend = 'Opnieuw verzenden naar {{email}}';
 z.string.nl.auth_posted_resend_action = 'Geen e-mail ontvangen?';
 z.string.nl.auth_posted_resend_detail = 'Controleer je inbox en volg de instructies.';
 z.string.nl.auth_posted_resend_headline = 'Je hebt e-mail ontvangen.';
-z.string.nl.auth_posted_retry = 'Opnieuw proberen en e-mail verzenden naar {{email}}';
-z.string.nl.auth_posted_retry_action = 'Opnieuw proberen?';
-z.string.nl.auth_posted_retry_detail = 'Probeer het alsjeblieft opnieuw.';
-z.string.nl.auth_posted_retry_headline = 'Er is iets mis gegaan';
-z.string.nl.auth_posted_verify_later = 'Verifier later';
 
 z.string.nl.auth_placeholder_email = 'E-mail';
-z.string.nl.auth_placeholder_name = 'Naam';
 z.string.nl.auth_placeholder_password_put = 'Wachtwoord';
 z.string.nl.auth_placeholder_password_set = 'Wachtwoord (minimaal 8 tekens)';
 z.string.nl.auth_placeholder_phone = 'Telefoonnummer';
@@ -499,6 +483,9 @@ z.string.nl.warning_permission_request_notification = '{{icon}} Meldingen toesta
 z.string.nl.warning_permission_request_screen = '{{icon}} Toegang tot scherm toestaan';
 z.string.nl.warning_tell_me_how = 'Vertel me meer';
 
+z.string.nl.user_availability_available = 'Beschikbaar';
+z.string.nl.user_availability_none = 'Geen';
+
 z.string.nl.system_notification_asset_add = 'Deelde een foto';
 z.string.nl.system_notification_connection_accepted = 'Accepteer connectie aanvraag';
 z.string.nl.system_notification_connection_connected = 'Zijn nu verbonden';
@@ -563,6 +550,7 @@ z.string.nl.init_received_user_data = 'Controleer voor nieuwe berichten';
 z.string.nl.init_decryption = 'Berichten ontsleutelen';
 z.string.nl.init_events = 'Berichten laden';
 z.string.nl.init_updated_from_notifications = 'Bijna klaar - Geniet van Wire';
+z.string.nl.init_progress = ' — {{number1}} van {{number2}}';
 
 z.string.nl.ephememal_units_none = 'Uit';
 z.string.nl.ephememal_units_second = 'seconde';

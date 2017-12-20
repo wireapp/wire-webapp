@@ -17,17 +17,14 @@
  *
  */
 
+import {getURLParameter} from './util/urlUtil';
+
 export const LOCAL = 'LOCAL';
 export const STAGING = 'STAGING';
 export const PRODUCTION = 'PRODUCTION';
 
 export const APP_ENVIRONMENT = getEnvironmentFromQuery();
 checkEnvironment();
-
-export function getURLParameter(parameterName) {
-  return (window.location.search.split(`${parameterName}=`)[1] || '').split('&')[0];
-}
-
 export function getEnvironmentFromQuery() {
   const isProductionHost = window.location.hostname.includes('wire.com');
   switch (getURLParameter('env')) {

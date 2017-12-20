@@ -29,18 +29,13 @@ z.string.fi.alert_upload_too_large = 'Kuva on liian suuri. Voit ladata maksimiss
 z.string.fi.alert_gif_too_large = 'Animaatio on liian suuri. Maksimi koko on {{number}} MB.';
 
 z.string.fi.auth_account_country_code = 'Maakoodi';
-z.string.fi.auth_account_create = 'Luo';
-z.string.fi.auth_account_create_account = 'Luo käyttäjätili';
 z.string.fi.auth_account_deletion = 'Sinut kirjattiin ulos, koska tilisi poistettiin.';
 z.string.fi.auth_account_expiration = 'Sinut kirjattiin ulos, koska istuntosi päättyi. Kirjaudu sisään uudelleen.';
-z.string.fi.auth_account_get_wire = 'Yksinkertainen, privaatti ja turvallinen pikaviestin chattailuun, puheluihin sekä muun muassa kuvien, videoiden ja animaatioiden jakamiseen.';
 z.string.fi.auth_account_password_forgot = 'Unohdin salasanani';
 z.string.fi.auth_account_public_computer = 'Tämä on julkinen tietokone';
 z.string.fi.auth_account_sign_in = 'Kirjaudu sisään';
 z.string.fi.auth_account_sign_in_email = 'Sähköposti';
 z.string.fi.auth_account_sign_in_phone = 'Puhelinnumero';
-z.string.fi.auth_account_terms_of_use = 'Käyttöehdot';
-z.string.fi.auth_account_terms_of_use_detail = 'Hyväksyn';
 
 z.string.fi.auth_blocked_cookies = 'Salli evästeet kirjautuaksesi Wireen.';
 z.string.fi.auth_blocked_database = 'Wire tarvitsee pääsyn paikalliseen säilöösi säilöäkseen viestejä. Paikallinen säilö ei ole saatavilla yksityisessä tilassa.';
@@ -69,23 +64,12 @@ z.string.fi.auth_history_reuse_headline = 'Olet käyttänyt Wireä tällä laitt
 z.string.fi.auth_history_reuse_description = 'Sillä välin lähetetyt viestit eivät näy tässä.';
 z.string.fi.auth_history_button = 'OK';
 
-z.string.fi.auth_posted_change_email = 'Vaihda sähköpostiosoite';
-z.string.fi.auth_posted_offline_detail = 'Tarkista internet-yhteytesi ja yritä uudelleen.';
-z.string.fi.auth_posted_offline_headline = 'Wire on mukavampi internettiin kytkettynä.';
-z.string.fi.auth_posted_pending_detail = 'Tarkista sähköpostisi saapuneet-kansio tai lähetä aktivointiviesti uudelleen.';
-z.string.fi.auth_posted_pending_headline = 'Tili on jo vireillä';
 z.string.fi.auth_posted_resend = 'Lähetä uudelleen sähköpostiosoitteeseen: {{email}}';
 z.string.fi.auth_posted_resend_action = 'Eikö sähköposti saavu perille?';
 z.string.fi.auth_posted_resend_detail = 'Tarkista sähköpostisi saapuneet-kansio ja seuraa ohjeita.';
 z.string.fi.auth_posted_resend_headline = 'Sinulle on sähköpostia.';
-z.string.fi.auth_posted_retry = 'Yritä uudelleen ja lähetä sähköpostia osoitteeseen {{email}}';
-z.string.fi.auth_posted_retry_action = 'Yritä uudelleen?';
-z.string.fi.auth_posted_retry_detail = 'Ole hyvä ja yritä uudelleen.';
-z.string.fi.auth_posted_retry_headline = 'Jokin meni pieleen';
-z.string.fi.auth_posted_verify_later = 'Vahvista myöhemmin';
 
 z.string.fi.auth_placeholder_email = 'Sähköposti';
-z.string.fi.auth_placeholder_name = 'Nimi';
 z.string.fi.auth_placeholder_password_put = 'Salasana';
 z.string.fi.auth_placeholder_password_set = 'Salasana (vähintään 8 merkkiä pitkä)';
 z.string.fi.auth_placeholder_phone = 'Puhelinnumero';
@@ -497,6 +481,9 @@ z.string.fi.warning_permission_request_microphone = '{{icon}} Anna käyttöoikeu
 z.string.fi.warning_permission_request_notification = '{{icon}} Salli ilmoitukset';
 z.string.fi.warning_permission_request_screen = '{{icon}} Salli näytön käyttö';
 z.string.fi.warning_tell_me_how = 'Kerro miten';
+
+z.string.fi.user_availability_available = 'Saatavilla';
+z.string.fi.user_availability_none = 'Ei mitään';
 
 z.string.fi.system_notification_asset_add = 'Jakoi kuvan';
 z.string.fi.system_notification_connection_accepted = 'Hyväksyi yhteyspyyntösi';

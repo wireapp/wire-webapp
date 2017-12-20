@@ -17,10 +17,42 @@
         "debug": true,
         "modules": false,
         "targets": {
-          "browsers": ["chrome >= 56", "firefox >= 52", "edge >= 14", "opera >= 43"]
+          "browsers": [
+            "chrome >= 56",
+            "firefox >= 52",
+            "edge >= 14",
+            "opera >= 43"
+          ]
         },
         "useBuiltIns": true
       }
     ]
-  ]
+  ],
+  "env": {
+    "test": {
+      "plugins": [
+        "transform-object-rest-spread",
+        "transform-class-properties"
+      ],
+      "presets": [
+        "react",
+        [
+          "env",
+          {
+            "debug": false,
+            "modules": "commonjs",
+            "targets": {
+              "browsers": [
+                "chrome >= 56",
+                "firefox >= 52",
+                "edge >= 14",
+                "opera >= 43"
+              ]
+            },
+            "useBuiltIns": true
+          }
+        ]
+      ]
+    }
+  }
 }

@@ -35,18 +35,13 @@ z.string.alert_gif_too_large = 'Animation is too large.\nMaximum size is {{numbe
 // Auth
 // Authentication: ACCOUNT section
 z.string.auth_account_country_code = 'Country Code';
-z.string.auth_account_create = 'Create';
-z.string.auth_account_create_account = 'Create an account';
 z.string.auth_account_deletion = 'You were signed out because your account was deleted.';
 z.string.auth_account_expiration = 'You were signed out because your session expired. Please log in again.';
-z.string.auth_account_get_wire = 'Simple, private & secure messenger for chat, calls, sharing pics, music, videos, GIFs and more.';
 z.string.auth_account_password_forgot = 'Forgot password';
 z.string.auth_account_public_computer = 'This is a public computer';
 z.string.auth_account_sign_in = 'Log in';
 z.string.auth_account_sign_in_email = 'Email';
 z.string.auth_account_sign_in_phone = 'Phone';
-z.string.auth_account_terms_of_use = 'Terms of Use';
-z.string.auth_account_terms_of_use_detail = 'I accept';
 
 // Authentication: BLOCKED section
 z.string.auth_blocked_cookies = 'Enable cookies to log in to Wire.';
@@ -80,24 +75,13 @@ z.string.auth_history_reuse_description = 'Messages sent in the meantime will no
 z.string.auth_history_button = 'OK';
 
 // Authentication: POSTED section
-z.string.auth_posted_change_email = 'Change email';
-z.string.auth_posted_offline_detail = 'Check your Internet connection and try again.';
-z.string.auth_posted_offline_headline = 'Wire is nicer online.';
-z.string.auth_posted_pending_detail = 'Check your email inbox or resend activation.';
-z.string.auth_posted_pending_headline = 'Account already pending';
 z.string.auth_posted_resend = 'Resend to {{email}}';
 z.string.auth_posted_resend_action = 'No email showing up?';
 z.string.auth_posted_resend_detail = 'Check your email inbox and follow the instructions.';
 z.string.auth_posted_resend_headline = 'You’ve got mail.';
-z.string.auth_posted_retry = 'Re-try and send mail to {{email}}';
-z.string.auth_posted_retry_action = 'Try again?';
-z.string.auth_posted_retry_detail = 'Please try again.';
-z.string.auth_posted_retry_headline = 'Something went wrong';
-z.string.auth_posted_verify_later = 'Verify later';
 
 // Authentication: Misc
 z.string.auth_placeholder_email = 'Email';
-z.string.auth_placeholder_name = 'Name';
 z.string.auth_placeholder_password_put = 'Password';
 z.string.auth_placeholder_password_set = 'Password (at least 8 characters)';
 z.string.auth_placeholder_phone = 'Phone Number';
@@ -114,6 +98,7 @@ z.string.auth_error_name_short = 'Enter a name with at least 2 characters';
 z.string.auth_error_offline = 'No Internet connection';
 z.string.auth_error_password_short = 'Choose a password with at least 8 characters.';
 z.string.auth_error_password_wrong = 'Wrong password. Please try again.';
+z.string.auth_error_pending = 'Account is not yet verified';
 z.string.auth_error_phone_number_budget = 'You logged in too often. Try again later.';
 z.string.auth_error_phone_number_forbidden = 'Sorry. This phone number is forbidden.';
 z.string.auth_error_phone_number_invalid = 'Invalid Phone Number';
@@ -456,6 +441,7 @@ z.string.preferences_about_terms_of_use = 'Terms of use';
 z.string.preferences_about_version = 'Version {{version}}';
 z.string.preferences_about_website = 'Wire website';
 
+z.string.preferences_account_avaibility_unset = 'Set a status';
 z.string.preferences_account_create_team = 'Create a team';
 z.string.preferences_account_delete = 'Delete account';
 z.string.preferences_account_log_out = 'Log out';
@@ -541,7 +527,7 @@ z.string.url_support_articles = '/hc/en-us/articles/';
 z.string.url_support_requests = '/hc/en-us/requests/';
 z.string.url_webapp_root = '/';
 z.string.url_website_root = '/';
-z.string.url_website_create_team = '/create-team';
+z.string.url_website_create_team = '/create-team/';
 z.string.url_website_privacy = '/privacy';
 z.string.warning_call_detail = 'Your browser needs access to the microphone to make calls.';
 z.string.warning_call_headline = 'Can’t call without microphone';
@@ -565,6 +551,12 @@ z.string.warning_permission_request_microphone = '{{icon}} Allow access to micro
 z.string.warning_permission_request_notification = '{{icon}} Allow notifications';
 z.string.warning_permission_request_screen = '{{icon}} Allow access to screen';
 z.string.warning_tell_me_how = 'Tell me how';
+
+// User Availability
+z.string.user_availability_available = 'Available';
+z.string.user_availability_away = 'Away';
+z.string.user_availability_busy = 'Busy';
+z.string.user_availability_none = 'None';
 
 // Browser notifications
 z.string.system_notification_asset_add = 'Shared a picture';
@@ -593,6 +585,9 @@ z.string.tooltip_conversation_call = 'Call';
 z.string.tooltip_conversation_ephemeral = 'Timed message';
 z.string.tooltip_conversation_file = 'Add file';
 z.string.tooltip_conversation_input_placeholder = 'Type a message';
+z.string.tooltip_conversation_input_placeholder_available = '{{user}} is available';
+z.string.tooltip_conversation_input_placeholder_away = '{{user}} is away';
+z.string.tooltip_conversation_input_placeholder_busy = '{{user}} is busy';
 z.string.tooltip_conversation_people = 'People ({{shortcut}})';
 z.string.tooltip_conversation_picture = 'Add picture';
 z.string.tooltip_conversation_ping = 'Ping ({{shortcut}})';

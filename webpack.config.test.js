@@ -21,26 +21,36 @@ const webpack = require('webpack');
 const path = require('path');
 const prodConfig = require('./webpack.config.prod');
 const commonConfig = require('./webpack.config.common');
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
-const srcTest = 'test/util';
+// https://github.com/babel/babel-loader/issues/149
+const babelSettings = {
+  extends: path.join(__dirname, '/.babelrc'),
+};
 
 module.exports = Object.assign({}, prodConfig, {
-  devtool: 'inline-source-map',
-  entry: Object.assign(prodConfig.entry, {
-    test: path.resolve(__dirname, srcTest, 'index.js'),
-  }),
+  devtool: false,
+  entry: false,
   externals: Object.assign(prodConfig.externals, {
+    // These will help enable enzyme to work properly
     cheerio: 'window',
     'react/addons': true,
     'react/lib/ExecutionEnvironment': true,
     'react/lib/ReactContext': true,
   }),
+  module: {
+    rules: [
+      {
+        test: /\.jsx?$/,
+        use: [
+          {
+            loader: `babel-loader?${JSON.stringify(babelSettings)}`,
+          },
+        ],
+      },
+    ],
+  },
   plugins: [
     ...commonConfig.plugins,
-    new UglifyJSPlugin({
-      sourceMap: true,
-    }),
     new webpack.DefinePlugin({
       'process.env': {
         NODE_ENV: JSON.stringify('test'),

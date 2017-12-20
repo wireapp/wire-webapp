@@ -29,18 +29,13 @@ z.string.es.alert_upload_too_large = 'Esta imagen es demasiado grande. \nPuedes 
 z.string.es.alert_gif_too_large = 'La animación es demasiado grande.\nEl tamaño máximo es de {{number}} MB.';
 
 z.string.es.auth_account_country_code = 'Código de País';
-z.string.es.auth_account_create = 'Crear';
-z.string.es.auth_account_create_account = 'Crear una Cuenta';
 z.string.es.auth_account_deletion = 'Fue desconectado porque su cuenta fue borrada.';
 z.string.es.auth_account_expiration = 'Su sesión ha vencido. Entrar nuevamente.';
-z.string.es.auth_account_get_wire = 'Un messenger sencillo, privado y seguro para chat y llamadas, y para compartir fotos, música, videos, GIFs y mas.';
 z.string.es.auth_account_password_forgot = 'Contraseña Olvidada';
 z.string.es.auth_account_public_computer = 'Es un ordenador público';
 z.string.es.auth_account_sign_in = 'Iniciar sesión';
 z.string.es.auth_account_sign_in_email = 'Correo';
 z.string.es.auth_account_sign_in_phone = 'Teléfono';
-z.string.es.auth_account_terms_of_use = 'Términos de Uso';
-z.string.es.auth_account_terms_of_use_detail = 'Acepto';
 
 z.string.es.auth_blocked_cookies = 'Habilita las cookies para iniciar sesión.';
 z.string.es.auth_blocked_database = 'Wire necesita acceso al almacenamiento local para mostrar los mensajes. No está disponible en modo privado.';
@@ -69,23 +64,12 @@ z.string.es.auth_history_reuse_headline = 'Ya has utilizado Wire en este disposi
 z.string.es.auth_history_reuse_description = 'Los mensajes enviados mientras tanto no aparecerán aquí.';
 z.string.es.auth_history_button = 'OK';
 
-z.string.es.auth_posted_change_email = 'Modificar correo';
-z.string.es.auth_posted_offline_detail = 'Compruebe su conexión de Internet e inténtelo otra vez.';
-z.string.es.auth_posted_offline_headline = 'Wire es mejor cuando tenga conexción.';
-z.string.es.auth_posted_pending_detail = 'Revise su buzón de correo electrónico o reenviar activación.';
-z.string.es.auth_posted_pending_headline = 'La cuenta ya está pendiente';
 z.string.es.auth_posted_resend = 'Reenviar a {{email}}';
 z.string.es.auth_posted_resend_action = '¿No aparece ningún correo electrónico?';
 z.string.es.auth_posted_resend_detail = 'Revise su buzón de correo electrónico y siga las instrucciones.';
 z.string.es.auth_posted_resend_headline = 'Tiene un correo electrónico.';
-z.string.es.auth_posted_retry = 'Volver a intentar y enviar correo a {{email}}';
-z.string.es.auth_posted_retry_action = '¿Intentar nuevamente?';
-z.string.es.auth_posted_retry_detail = 'Por favor inténtalo de nuevo.';
-z.string.es.auth_posted_retry_headline = 'Algo salió mal';
-z.string.es.auth_posted_verify_later = 'Verifica más tarde';
 
 z.string.es.auth_placeholder_email = 'Correo';
-z.string.es.auth_placeholder_name = 'Nombre';
 z.string.es.auth_placeholder_password_put = 'Contraseña';
 z.string.es.auth_placeholder_password_set = 'Contraseña (mínimo 8 caracteres)';
 z.string.es.auth_placeholder_phone = 'Número de teléfono';
@@ -497,6 +481,10 @@ z.string.es.warning_permission_request_microphone = '{{icon}} Permitir acceso al
 z.string.es.warning_permission_request_notification = '{{icon}} Permitir notificaciones';
 z.string.es.warning_permission_request_screen = '{{icon}} Permitir acceso a la pantalla';
 z.string.es.warning_tell_me_how = 'Explíqueme cómo';
+
+z.string.es.user_availability_available = 'Disponible';
+z.string.es.user_availability_busy = 'Ocupado';
+z.string.es.user_availability_none = 'Ninguno';
 
 z.string.es.system_notification_asset_add = 'Compartió una foto';
 z.string.es.system_notification_connection_accepted = 'Aceptó tu solicitud de conexión';

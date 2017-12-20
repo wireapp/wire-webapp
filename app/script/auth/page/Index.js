@@ -18,6 +18,7 @@
  */
 
 import * as TrackingAction from '../module/action/TrackingAction';
+import {getLanguage} from '../module/selector/LanguageSelector';
 import React, {Component} from 'react';
 import ROUTE from '../route';
 import {Columns, Column, ContainerXS} from '@wireapp/react-ui-kit/Layout';
@@ -35,8 +36,8 @@ class Index extends Component {
   }
 
   onRegisterPersonalClick = () => {
-    const locationPath = pathWithParams(ROUTE.LOGIN, 'mode=register');
-    this.trackAndNavigate(TrackingAction.EVENT_NAME.START.OPENED_PERSONAL_REGISTRATION, locationPath);
+    this.props.trackEvent({name: TrackingAction.EVENT_NAME.START.OPENED_PERSONAL_REGISTRATION});
+    this.props.history.push(ROUTE.CREATE_ACCOUNT);
   };
 
   onRegisterTeamClick = () => {
@@ -45,21 +46,18 @@ class Index extends Component {
   };
 
   onLoginClick = () => {
-    const locationPath = pathWithParams(ROUTE.LOGIN, 'mode=login');
-    this.trackAndNavigate(TrackingAction.EVENT_NAME.START.OPENED_LOGIN, locationPath);
-  };
-
-  trackAndNavigate = (eventName, url) => {
-    return Promise.resolve()
-      .then(() => this.props.trackEvent({name: eventName}))
-      .then(() => (window.location = url));
+    this.props.trackEvent({name: TrackingAction.EVENT_NAME.START.OPENED_LOGIN});
+    const link = document.createElement('a');
+    link.href = pathWithParams(ROUTE.LOGIN, 'mode=login');
+    document.body.appendChild(link); // workaround for Firefox
+    link.click();
   };
 
   render() {
     const {intl: {formatMessage: _}} = this.props;
     return (
       <ContainerXS centerText verticalCenter>
-        <Logo id="wire-logo" scale={1.68} />
+        <Logo data-uie-name="ui-wire-logo" scale={1.68} />
         <Paragraph center>{_(indexStrings.claim)}</Paragraph>
         <Columns style={{margin: '70px auto'}}>
           <Column>
@@ -101,4 +99,4 @@ class Index extends Component {
   }
 }
 
-export default injectIntl(connect(({languageState}) => ({language: languageState.language}), TrackingAction)(Index));
+export default injectIntl(connect(state => ({language: getLanguage(state)}), {...TrackingAction})(Index));

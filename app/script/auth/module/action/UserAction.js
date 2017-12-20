@@ -19,6 +19,7 @@
 
 import * as UserActionCreator from './creator/UserActionCreator';
 import BackendError from './BackendError';
+import {currentLanguage} from '../../localeConfig';
 
 export function doActivateAccount(code, key) {
   const params = [...arguments];
@@ -39,7 +40,7 @@ export function doSendActivationCode(email) {
   return function(dispatch, getState, {apiClient}) {
     dispatch(UserActionCreator.startSendActivationCode(params));
     return Promise.resolve()
-      .then(() => apiClient.user.api.postActivationCode({email}))
+      .then(() => apiClient.user.api.postActivationCode({email, locale: currentLanguage()}))
       .then(activationResponse => dispatch(UserActionCreator.successfulSendActivationCode(activationResponse)))
       .catch(error => {
         dispatch(UserActionCreator.failedSendActivationCode(error));

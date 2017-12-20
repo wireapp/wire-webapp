@@ -17,5 +17,18 @@
  *
  */
 
-export const HOST_HTTP = 'https://staging-nginz-https.zinfra.io';
-export const HOST_WEBSOCKET = 'wss://staging-nginz-ssl.zinfra.io';
+'use strict';
+
+window.z = window.z || {};
+window.z.user = z.user || {};
+
+/**
+ * Enum for different user availability types.
+ * @type {z.user.AvailabilityType} Enum of availability types
+ */
+z.user.AvailabilityType = {
+  AVAILABLE: 1,
+  AWAY: 2,
+  BUSY: 3,
+  NONE: 0,
+};

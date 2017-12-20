@@ -36,6 +36,9 @@ z.event.WebApp = {
     PLAY_IN_LOOP: 'wire.webapp.audio.play_in_loop',
     STOP: 'wire.webapp.audio.stop',
   },
+  BROADCAST: {
+    SEND_MESSAGE: 'wire.app.broadcast.send_message',
+  },
   CALL: {
     EVENT_FROM_BACKEND: 'wire.webapp.call.event_from_backend',
     MEDIA: {
@@ -109,7 +112,6 @@ z.event.WebApp = {
     },
     PERSIST_STATE: 'wire.webapp.conversation.persist_state',
     SHOW: 'wire.webapp.conversation.show',
-    UNREAD: 'wire.webapp.conversation.unread',
   },
   DEBUG: {
     UPDATE_LAST_CALL_STATUS: 'wire.webapp.debug.update_last_call_status',
@@ -137,6 +139,7 @@ z.event.WebApp = {
     RESTART: 'wire.webapp.lifecycle.restart',
     SIGN_OUT: 'wire.webapp.lifecycle.sign_out',
     SIGNED_OUT: 'wire.webapp.lifecycle.signed_out',
+    UNREAD_COUNT: 'wire.webapp.lifecycle.unread_count',
     UPDATE: 'wire.webapp.lifecycle.update',
   },
   LIST: {
@@ -231,6 +234,8 @@ z.event.WebApp = {
     CLIENT_REMOVED: 'wire.webapp.user.client_removed',
     CLIENTS_UPDATED: 'wire.webapp.user.clients_udpated',
     EVENT_FROM_BACKEND: 'wire.webapp.user.event_from_backend',
+    PERSIST: 'wire.webapp.user.persist',
+    SET_AVAILABILITY: 'wire.webapp.user.set_availability',
     UNBLOCKED: 'wire.webapp.user.unblocked',
   },
   WARNING: {

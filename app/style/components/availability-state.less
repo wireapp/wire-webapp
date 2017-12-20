@@ -17,11 +17,35 @@
  *
  */
 
-import Adapter from 'enzyme-adapter-react-16';
-import {configure} from 'enzyme';
+availability-state {
+  display: flex;
+  align-items: center;
 
-configure({adapter: new Adapter()});
+  .availability-state-arrow {
+    display: inline-block;
+    .square(16px);
+    margin-left: 4px;
+    padding-bottom: 4px;
 
-// traverse all testfiles for webpack dependency resolution
-const testsContext = require.context('../../app/script', true, /test\.js$/);
-testsContext.keys().forEach(testsContext);
+    &::before {
+      content: '';
+      width: 0;
+      height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 4px solid currentColor;
+    }
+  }
+
+  .availability-state-icon {
+    .square(10px);
+    margin-right: 6px;
+    fill: currentColor;
+    stroke: currentColor;
+  }
+
+  .availability-state-label {
+    .ellipsis-nowrap();
+    user-select: none;
+  }
+}

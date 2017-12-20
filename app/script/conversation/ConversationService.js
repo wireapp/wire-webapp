@@ -538,10 +538,12 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves with the conversation entity
    */
   save_conversation_state_in_db(conversation_et) {
+    const conversationData = conversation_et.serialize();
+
     return this.storage_service
-      .save(z.storage.StorageService.OBJECT_STORE.CONVERSATIONS, conversation_et.id, conversation_et.serialize())
+      .save(z.storage.StorageService.OBJECT_STORE.CONVERSATIONS, conversation_et.id, conversationData)
       .then(primary_key => {
-        this.logger.info(`State of conversation '${primary_key}' was stored`);
+        this.logger.info(`State of conversation '${primary_key}' was stored`, conversationData);
         return conversation_et;
       });
   }

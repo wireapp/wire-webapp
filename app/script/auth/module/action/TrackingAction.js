@@ -19,8 +19,14 @@
 
 import * as TrackingActionCreator from './creator/TrackingActionCreator';
 import RuntimeUtil from '../../util/RuntimeUtil';
+import {REGISTER_FLOW} from '../selector/AuthSelector';
 
 export const EVENT_NAME = {
+  PERSONAL: {
+    CREATED: 'registration.succeeded',
+    ENTERED_ACCOUNT_DATA: 'registration.entered_email_and_password',
+    VERIFIED: 'registration.verified_email',
+  },
   START: {
     OPENED_LOGIN: 'start.opened_login',
     OPENED_PERSONAL_REGISTRATION: 'start.opened_personal_registration',
@@ -32,6 +38,18 @@ export const EVENT_NAME = {
     FINISHED_INVITE_STEP: 'team.finished_invite_step',
     VERIFIED: 'team.verified',
   },
+};
+
+export const EVENT_CONTEXT = {
+  EMAIL: 'email',
+  GENERIC_INVITE: 'generic_invite',
+  PERSONAL_INVITE: 'personal_invite',
+};
+
+export const FLOW_TO_CONTEXT = {
+  [REGISTER_FLOW.PERSONAL]: EVENT_CONTEXT.EMAIL,
+  [REGISTER_FLOW.GENERIC_INVITATION]: EVENT_CONTEXT.GENERIC_INVITE,
+  [REGISTER_FLOW.PERSONAL_INVITATION]: EVENT_CONTEXT.PERSONAL_INVITE,
 };
 
 export function trackEvent(event) {
@@ -54,4 +72,8 @@ export function trackEvent(event) {
       .then(trackingResult => dispatch(TrackingActionCreator.successfulTrackingAction(trackingResult)))
       .catch(error => dispatch(TrackingActionCreator.failedTrackingAction(error)));
   };
+}
+
+export function trackNameWithContext(name, context) {
+  return trackEvent({attributes: {context}, name});
 }

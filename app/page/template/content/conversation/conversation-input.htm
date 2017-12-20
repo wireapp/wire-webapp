@@ -19,14 +19,14 @@
                   class="conversation-input-text border-theme"
                   data-bind="event: {'keydown': on_input_key_down, 'keyup': on_input_key_up},
                              focus_on_keydown: true,
-                             css: {'ephemeral-input': has_ephemeral_timer()},
+                             css: {'ephemeral-input': has_ephemeral_timer() && !show_availability_tooltip()},
                              enter: on_input_enter,
                              hasFocus: blinking_cursor,
                              textInput: input,
                              resize: input,
                              resize_callback: scroll_message_list,
                              click: on_input_click,
-                             attr: {'placeholder': input_tooltip},
+                             attr: {'placeholder': input_placeholder},
                              paste_file: on_paste_files"
                   data-uie-name="input-message"
                   dir="auto">

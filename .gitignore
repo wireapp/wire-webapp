@@ -33,6 +33,7 @@
 /temp
 /test/_SpecRunner.html
 /Web.config
+/workspace.xml*
 aws-keys.json
 npm-debug.log
 yarn-error.log
