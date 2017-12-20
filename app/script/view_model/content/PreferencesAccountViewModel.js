@@ -60,11 +60,11 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.submitted_username = ko.observable();
     this.username_error = ko.observable();
 
-    this.is_team = this.team_repository.is_team;
-    this.is_team_manager = ko.pureComputed(() => this.is_team() && this.self_user().is_team_manager());
+    this.isTeam = this.team_repository.isTeam;
+    this.is_team_manager = ko.pureComputed(() => this.isTeam() && this.self_user().is_team_manager());
     this.team = this.team_repository.team;
-    this.team_name = ko.pureComputed(() =>
-      z.l10n.text(z.string.preferences_account_team, this.team_repository.team_name())
+    this.teamName = ko.pureComputed(() =>
+      z.l10n.text(z.string.preferences_account_team, this.team_repository.teamName())
     );
 
     this.name_saved = ko.observable();
@@ -252,7 +252,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   click_on_logout() {
-    this.client_repository.logout_client();
+    this.client_repository.logoutClient();
   }
 
   click_on_manage() {
@@ -304,7 +304,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   on_client_remove(user_id, client_id) {
     if (user_id === this.self_user().id) {
       this.new_clients().forEach(client_et => {
-        if (client_et.id === client_id && client_et.is_permanent()) {
+        if (client_et.id === client_id && client_et.isPermanent()) {
           this.new_clients.remove(client_et);
         }
       });

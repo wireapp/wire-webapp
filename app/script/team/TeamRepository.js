@@ -27,75 +27,75 @@ z.team.TeamRepository = class TeamRepository {
    * Construct a new Team Repository.
    * @class z.team.TeamRepository
    *
-   * @param {z.team.TeamService} team_service - Backend REST API team service implementation
-   * @param {z.user.UserRepository} user_repository - epository for all user and connection interactions
+   * @param {z.team.TeamService} teamService - Backend REST API team service implementation
+   * @param {z.user.UserRepository} userRepository - Repository for all user and connection interactions
    */
-  constructor(team_service, user_repository) {
+  constructor(teamService, userRepository) {
     this.logger = new z.util.Logger('z.team.TeamRepository', z.config.LOGGER.OPTIONS);
 
-    this.team_mapper = new z.team.TeamMapper();
-    this.team_service = team_service;
-    this.user_repository = user_repository;
+    this.teamMapper = new z.team.TeamMapper();
+    this.teamService = teamService;
+    this.userRepository = userRepository;
 
-    this.self_user = this.user_repository.self;
+    this.selfUser = this.userRepository.self;
 
     this.team = ko.observable();
 
-    this.is_team = ko.pureComputed(() => (this.team() ? !!this.team().id : false));
+    this.isTeam = ko.pureComputed(() => (this.team() ? !!this.team().id : false));
 
-    this.team_members = ko.pureComputed(() => (this.is_team() ? this.team().members() : []));
-    this.team_name = ko.pureComputed(() => (this.is_team() ? this.team().name() : this.user_repository.self().name()));
-    this.team_size = ko.pureComputed(() => (this.is_team() ? this.team_members().length + 1 : 0));
-    this.team_users = ko.pureComputed(() => {
-      return this.team_members()
-        .concat(this.user_repository.connected_users())
+    this.teamMembers = ko.pureComputed(() => (this.isTeam() ? this.team().members() : []));
+    this.teamName = ko.pureComputed(() => (this.isTeam() ? this.team().name() : this.selfUser().name()));
+    this.teamSize = ko.pureComputed(() => (this.isTeam() ? this.teamMembers().length + 1 : 0));
+    this.teamUsers = ko.pureComputed(() => {
+      return this.teamMembers()
+        .concat(this.userRepository.connected_users())
         .filter((item, index, array) => array.indexOf(item) === index)
-        .sort((user_a, user_b) => z.util.StringUtil.sort_by_priority(user_a.first_name(), user_b.first_name()));
+        .sort((userA, userB) => z.util.StringUtil.sort_by_priority(userA.first_name(), userB.first_name()));
     });
 
-    this.team_members.subscribe(() => this.user_repository.map_guest_status());
-    this.team_size.subscribe(team_size => {
-      amplify.publish(z.event.WebApp.ANALYTICS.SUPER_PROPERTY, z.tracking.SuperProperty.TEAM.SIZE, team_size);
+    this.teamMembers.subscribe(() => this.userRepository.map_guest_status());
+    this.teamSize.subscribe(teamSize => {
+      amplify.publish(z.event.WebApp.ANALYTICS.SUPER_PROPERTY, z.tracking.SuperProperty.TEAM.SIZE, teamSize);
     });
 
-    this.user_repository.is_team = this.is_team;
-    this.user_repository.team_members = this.team_members;
-    this.user_repository.team_users = this.team_users;
+    this.userRepository.isTeam = this.isTeam;
+    this.userRepository.teamMembers = this.teamMembers;
+    this.userRepository.teamUsers = this.teamUsers;
 
-    amplify.subscribe(z.event.WebApp.TEAM.EVENT_FROM_BACKEND, this.on_team_event.bind(this));
-    amplify.subscribe(z.event.WebApp.TEAM.UPDATE_INFO, this.send_account_info.bind(this));
+    amplify.subscribe(z.event.WebApp.TEAM.EVENT_FROM_BACKEND, this.onTeamEvent.bind(this));
+    amplify.subscribe(z.event.WebApp.TEAM.UPDATE_INFO, this.sendAccountInfo.bind(this));
   }
 
-  get_team() {
-    return this.team_service
-      .get_teams()
+  getTeam() {
+    return this.teamService
+      .getTeams()
       .then(({teams}) => {
         if (teams.length) {
           const [team] = teams;
 
           if (team.binding) {
-            const team_et = this.team_mapper.map_team_from_object(team);
-            this.team(team_et);
-            return this.update_team_members(team_et);
+            const teamEntity = this.teamMapper.mapTeamFromObject(team);
+            this.team(teamEntity);
+            return this.updateTeamMembers(teamEntity);
           }
         }
 
         return this.team(new z.team.TeamEntity());
       })
-      .then(() => this.send_account_info())
+      .then(() => this.sendAccountInfo())
       .then(() => this.team());
   }
 
-  get_team_member(team_id, user_id) {
-    return this.team_service
-      .get_team_member(team_id, user_id)
-      .then(member_response => this.team_mapper.map_member_from_object(member_response));
+  getTeamMember(teamId, userId) {
+    return this.teamService
+      .getTeamMember(teamId, userId)
+      .then(memberResponse => this.teamMapper.mapMemberFromObject(memberResponse));
   }
 
-  get_team_members(team_id) {
-    return this.team_service.get_team_members(team_id).then(({members}) => {
+  getTeamMembers(teamId) {
+    return this.teamService.getTeamMembers(teamId).then(({members}) => {
       if (members.length) {
-        return this.team_mapper.map_member_from_array(members);
+        return this.teamMapper.mapMemberFromArray(members);
       }
     });
   }
@@ -103,46 +103,46 @@ z.team.TeamRepository = class TeamRepository {
   /**
    * Listener for incoming team events.
    *
-   * @param {Object} event_json - JSON data for team event
+   * @param {Object} eventJson - JSON data for team event
    * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {Promise} Resolves when event was handled
    */
-  on_team_event(event_json, source) {
-    const type = event_json.type;
+  onTeamEvent(eventJson, source) {
+    const type = eventJson.type;
 
     this.logger.info(`»» Team Event: '${type}' (Source: ${source})`, {
-      event_json: JSON.stringify(event_json),
-      event_object: event_json,
+      event_json: JSON.stringify(eventJson),
+      event_object: eventJson,
     });
 
     switch (type) {
       case z.event.Backend.TEAM.CONVERSATION_CREATE:
       case z.event.Backend.TEAM.CONVERSATION_DELETE: {
-        this._on_unhandled(event_json);
+        this._onUnhandled(eventJson);
         break;
       }
       case z.event.Backend.TEAM.DELETE: {
-        this._on_delete(event_json);
+        this._onDelete(eventJson);
         break;
       }
       case z.event.Backend.TEAM.MEMBER_JOIN: {
-        this._on_member_join(event_json);
+        this._onMemberJoin(eventJson);
         break;
       }
       case z.event.Backend.TEAM.MEMBER_LEAVE: {
-        this._on_member_leave(event_json);
+        this._onMemberLeave(eventJson);
         break;
       }
       case z.event.Backend.TEAM.MEMBER_UPDATE: {
-        this._on_member_update(event_json);
+        this._onMemberUpdate(eventJson);
         break;
       }
       case z.event.Backend.TEAM.UPDATE: {
-        this._on_update(event_json);
+        this._onUpdate(eventJson);
         break;
       }
       default: {
-        this._on_unhandled(event_json);
+        this._onUnhandled(eventJson);
       }
     }
   }
@@ -150,134 +150,134 @@ z.team.TeamRepository = class TeamRepository {
   /**
    * Search for user.
    * @param {string} query - Find user by name or handle
-   * @param {boolean} is_handle - Query string is handle
+   * @param {boolean} isHandle - Query string is handle
    * @returns {Array<z.entity.User>} Matching users
    */
-  search_for_team_users(query, is_handle) {
-    return this.team_users()
-      .filter(user_et => user_et.matches(query, is_handle))
-      .sort((user_a, user_b) => {
-        if (is_handle) {
-          return z.util.StringUtil.sort_by_priority(user_a.username(), user_b.username(), query);
+  searchForTeamUsers(query, isHandle) {
+    return this.teamUsers()
+      .filter(userEntity => userEntity.matches(query, isHandle))
+      .sort((userA, userB) => {
+        if (isHandle) {
+          return z.util.StringUtil.sort_by_priority(userA.username(), userB.username(), query);
         }
-        return z.util.StringUtil.sort_by_priority(user_a.name(), user_b.name(), query);
+        return z.util.StringUtil.sort_by_priority(userA.name(), userB.name(), query);
       });
   }
 
-  send_account_info() {
+  sendAccountInfo() {
     if (z.util.Environment.desktop) {
-      const image_resource = this.is_team()
-        ? this.self_user().preview_picture_resource()
-        : this.self_user().preview_picture_resource();
-      const image_promise = image_resource ? image_resource.load() : Promise.resolve();
+      const imageResource = this.isTeam()
+        ? this.selfUser().preview_picture_resource()
+        : this.selfUser().preview_picture_resource();
+      const imagePromise = imageResource ? imageResource.load() : Promise.resolve();
 
-      image_promise
-        .then(image_blob => {
-          if (image_blob) {
-            return z.util.load_data_url(image_blob);
+      imagePromise
+        .then(imageBlob => {
+          if (imageBlob) {
+            return z.util.load_data_url(imageBlob);
           }
         })
-        .then(image_data_url => {
-          const account_info = {
-            accentID: this.self_user().accent_id(),
-            name: this.team_name(),
-            picture: image_data_url,
+        .then(imageDataUrl => {
+          const accountInfo = {
+            accentID: this.selfUser().accent_id(),
+            name: this.teamName(),
+            picture: imageDataUrl,
             teamID: this.team().id,
-            teamRole: this.self_user().team_role(),
-            userID: this.self_user().id,
+            teamRole: this.selfUser().team_role(),
+            userID: this.selfUser().id,
           };
 
-          this.logger.info('Publishing account info', account_info);
-          amplify.publish(z.event.WebApp.TEAM.INFO, account_info);
+          this.logger.info('Publishing account info', accountInfo);
+          amplify.publish(z.event.WebApp.TEAM.INFO, accountInfo);
         });
     }
   }
 
-  update_team_members(team_et) {
-    return this.get_team_members(team_et.id)
-      .then(team_members => {
-        const member_ids = team_members
-          .filter(member_et => {
-            const is_self_user = member_et.user_id === this.user_repository.self().id;
+  updateTeamMembers(teamEntity) {
+    return this.getTeamMembers(teamEntity.id)
+      .then(teamMembers => {
+        const memberIds = teamMembers
+          .filter(memberEntity => {
+            const isSelfUser = memberEntity.userId === this.selfUser().id;
 
-            if (is_self_user) {
-              this.team_mapper.map_role(this.user_repository.self(), member_et.permissions);
+            if (isSelfUser) {
+              this.teamMapper.mapRole(this.selfUser(), memberEntity.permissions);
             }
 
-            return !is_self_user;
+            return !isSelfUser;
           })
-          .map(member_et => member_et.user_id);
+          .map(memberEntity => memberEntity.userId);
 
-        return this.user_repository.get_users_by_id(member_ids);
+        return this.userRepository.get_users_by_id(memberIds);
       })
-      .then(user_ets => team_et.members(user_ets));
+      .then(userEntities => teamEntity.members(userEntities));
   }
 
-  _add_user_to_team(user_et) {
+  _addUserToTeam(userEntity) {
     const members = this.team().members;
 
-    if (!members().find(member => member.id === user_et.id)) {
-      members.push(user_et);
+    if (!members().find(member => member.id === userEntity.id)) {
+      members.push(userEntity);
     }
   }
 
-  _on_delete({team: team_id}) {
-    if (this.is_team() && this.team().id === team_id) {
+  _onDelete({team: teamId}) {
+    if (this.isTeam() && this.team().id === teamId) {
       window.setTimeout(() => {
         amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.ACCOUNT_DELETED, true);
       }, 50);
     }
   }
 
-  _on_member_join(event_json) {
-    const {data: {user: user_id}, team: team_id} = event_json;
-    const is_local_team = this.team().id === team_id;
-    const is_other_user = this.user_repository.self().id !== user_id;
+  _onMemberJoin(eventJson) {
+    const {data: {user: userId}, team: teamId} = eventJson;
+    const isLocalTeam = this.team().id === teamId;
+    const isOtherUser = this.selfUser().id !== userId;
 
-    if (is_local_team && is_other_user) {
-      this.user_repository.get_user_by_id(user_id).then(user_et => this._add_user_to_team(user_et));
+    if (isLocalTeam && isOtherUser) {
+      this.userRepository.get_user_by_id(userId).then(userEntity => this._addUserToTeam(userEntity));
     }
   }
 
-  _on_member_leave(event_json) {
-    const {data: {user: user_id}, team: team_id, time} = event_json;
-    const is_local_team = this.team().id === team_id;
+  _onMemberLeave(eventJson) {
+    const {data: {user: userId}, team: teamId, time} = eventJson;
+    const isLocalTeam = this.team().id === teamId;
 
-    if (is_local_team) {
-      const is_self_user = this.user_repository.self().id === user_id;
-      if (is_self_user) {
-        return this._on_delete(event_json);
+    if (isLocalTeam) {
+      const isSelfUser = this.selfUser().id === userId;
+      if (isSelfUser) {
+        return this._onDelete(eventJson);
       }
 
-      this.team().members.remove(member => member.id === user_id);
-      amplify.publish(z.event.WebApp.TEAM.MEMBER_LEAVE, team_id, user_id, new Date(time));
+      this.team().members.remove(member => member.id === userId);
+      amplify.publish(z.event.WebApp.TEAM.MEMBER_LEAVE, teamId, userId, new Date(time));
     }
   }
 
-  _on_member_update(event_json) {
-    const {data: {user: user_id}, permissions, team: team_id} = event_json;
-    const is_local_team = this.team().id === team_id;
-    const is_self_user = this.user_repository.self().id === user_id;
+  _onMemberUpdate(eventJson) {
+    const {data: {user: userId}, permissions, team: teamId} = eventJson;
+    const isLocalTeam = this.team().id === teamId;
+    const isSelfUser = this.selfUser().id === userId;
 
-    if (is_local_team && is_self_user) {
-      const member_promise = permissions ? Promise.resolve({permissions}) : this.get_team_member(team_id, user_id);
+    if (isLocalTeam && isSelfUser) {
+      const memberPromise = permissions ? Promise.resolve({permissions}) : this.getTeamMember(teamId, userId);
 
-      member_promise
-        .then(member_et => this.team_mapper.map_role(this.user_repository.self(), member_et.permissions))
-        .then(() => this.send_account_info());
+      memberPromise
+        .then(memberEntity => this.teamMapper.mapRole(this.selfUser(), memberEntity.permissions))
+        .then(() => this.sendAccountInfo());
     }
   }
 
-  _on_unhandled(event_json) {
-    this.logger.log(`Received '${event_json.type}' event from backend which is not yet handled`, event_json);
+  _onUnhandled(eventJson) {
+    this.logger.log(`Received '${eventJson.type}' event from backend which is not yet handled`, eventJson);
   }
 
-  _on_update(event_json) {
-    const {data: team_data, team: team_id} = event_json;
+  _onUpdate(eventJson) {
+    const {data: teamData, team: teamId} = eventJson;
 
-    if (this.team().id === team_id) {
-      this.team_mapper.update_team_from_object(team_data, this.team());
-      this.send_account_info();
+    if (this.team().id === teamId) {
+      this.teamMapper.updateTeamFromObject(teamData, this.team());
+      this.sendAccountInfo();
     }
   }
 };

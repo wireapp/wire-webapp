@@ -43,7 +43,7 @@ z.ViewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
 
     this.self_user = this.client_repository.self_user;
 
-    this.current_client = this.client_repository.current_client;
+    this.current_client = this.client_repository.currentClient;
     this.displayClientId = ko.pureComputed(
       () => (this.current_client() ? z.util.zero_padding(this.current_client().id, 16) : '')
     );
@@ -97,7 +97,7 @@ z.ViewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
   click_on_remove_device(device_et, event) {
     amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.REMOVE_DEVICE, {
       action: password => {
-        this.client_repository.delete_client(device_et.id, password);
+        this.client_repository.deleteClient(device_et.id, password);
       },
       data: device_et.model,
     });

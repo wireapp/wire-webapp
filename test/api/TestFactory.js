@@ -106,7 +106,7 @@ window.TestFactory.prototype.exposeCryptographyActors = function() {
     .then(() => {
       this.logger.info('✓ exposedStorageActors');
 
-      const current_client = new z.client.Client({id: entities.clients.john_doe.permanent.id});
+      const current_client = new z.client.ClientEntity({id: entities.clients.john_doe.permanent.id});
       TestFactory.cryptography_service = new z.cryptography.CryptographyService(this.client);
       TestFactory.cryptography_service.logger.level = this.settings.logging_level;
 
@@ -133,10 +133,14 @@ window.TestFactory.prototype.exposeClientActors = function() {
     .then(() => {
       this.logger.info('✓ exposedCryptographyActors');
 
-      const client = new z.client.Client({address: '192.168.0.1', class: 'desktop', id: '60aee26b7f55a99f'});
+      const clientEntity = new z.client.ClientEntity({
+        address: '192.168.0.1',
+        class: 'desktop',
+        id: '60aee26b7f55a99f',
+      });
 
       const user = new z.entity.User(entities.user.john_doe.id);
-      user.devices.push(client);
+      user.devices.push(clientEntity);
       user.email(entities.user.john_doe.email);
       user.is_me = true;
       user.locale = entities.user.john_doe.locale;
@@ -164,8 +168,8 @@ window.TestFactory.prototype.exposeClientActors = function() {
         time: '2016-10-07T16:01:42.133Z',
         type: 'temporary',
       };
-      const current_client = new z.client.Client(payload);
-      TestFactory.client_repository.current_client(current_client);
+      const current_client = new z.client.ClientEntity(payload);
+      TestFactory.client_repository.currentClient(current_client);
 
       return TestFactory.client_repository;
     });
@@ -236,7 +240,7 @@ window.TestFactory.prototype.exposeUserActors = function() {
         TestFactory.cryptography_repository
       );
       TestFactory.user_repository.logger.level = this.settings.logging_level;
-      TestFactory.user_repository.save_user(TestFactory.client_repository.self_user(), true);
+      TestFactory.user_repository.save_user(TestFactory.client_repository.selfUser(), true);
 
       return TestFactory.user_repository;
     });
@@ -301,12 +305,12 @@ window.TestFactory.prototype.exposeTeamActors = function() {
     .then(() => {
       this.logger.info('✓ exposedUserActors');
 
-      TestFactory.team_service = new z.team.TeamService(this.client);
-      TestFactory.team_service.logger.level = this.settings.logging_level;
-      return TestFactory.team_service;
+      TestFactory.teamService = new z.team.TeamService(this.client);
+      TestFactory.teamService.logger.level = this.settings.logging_level;
+      return TestFactory.teamService;
     })
     .then(() => {
-      TestFactory.team_repository = new z.team.TeamRepository(TestFactory.team_service, TestFactory.user_repository);
+      TestFactory.team_repository = new z.team.TeamRepository(TestFactory.teamService, TestFactory.user_repository);
       TestFactory.team_repository.logger.level = this.settings.logging_level;
       return TestFactory.team_repository;
     });

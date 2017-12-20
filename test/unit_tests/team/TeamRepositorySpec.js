@@ -88,10 +88,10 @@ describe('z.team.TeamRepository', () => {
     server.restore();
   });
 
-  describe('get_team()', () => {
+  describe('getTeam()', () => {
     it('returns the binding team entity', done => {
       team_repository
-        .get_team()
+        .getTeam()
         .then(team_et => {
           const [team_data] = teams_data.teams;
 
@@ -103,10 +103,10 @@ describe('z.team.TeamRepository', () => {
     });
   });
 
-  xdescribe('get_team_members()', () => {
+  xdescribe('getTeamMembers()', () => {
     it('returns team member entities', done => {
       team_repository
-        .get_team_members(team_metadata.id)
+        .getTeamMembers(team_metadata.id)
         .then(entities => {
           expect(entities.length).toEqual(team_members.members.length);
           expect(entities[0].user).toEqual(team_members.members[0].user);
