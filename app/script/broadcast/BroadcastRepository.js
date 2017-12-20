@@ -63,7 +63,7 @@ z.broadcast.BroadcastRepository = class BroadcastRepository {
     return Promise.resolve().then(() => {
       const recipients = {};
 
-      for (const userEntity of this.userRepository.team_users().concat(this.userRepository.self())) {
+      for (const userEntity of this.userRepository.teamUsers().concat(this.userRepository.self())) {
         recipients[userEntity.id] = userEntity.devices().map(clientEntity => clientEntity.id);
       }
 
@@ -113,7 +113,7 @@ z.broadcast.BroadcastRepository = class BroadcastRepository {
   }
 
   _getNumberOfClients() {
-    return this.userRepository.team_users().reduce((accumulator, userEntity) => {
+    return this.userRepository.teamUsers().reduce((accumulator, userEntity) => {
       if (userEntity.devices().length) {
         return accumulator + userEntity.devices().length;
       }

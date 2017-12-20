@@ -21,19 +21,19 @@ window.z = window.z || {};
 window.z.team = z.team || {};
 
 z.team.TeamPermission = (() => {
-  const _permissions_for_role = team_role => {
-    switch (team_role) {
+  const _permissionsForRole = teamRole => {
+    switch (teamRole) {
       case z.team.TeamRole.ROLE.OWNER: {
-        return _combine_permissions([
-          _permissions_for_role(z.team.TeamRole.ROLE.ADMIN),
+        return _combinePermissions([
+          _permissionsForRole(z.team.TeamRole.ROLE.ADMIN),
           PERMISSION.DELETE_TEAM,
           PERMISSION.GET_BILLING,
           PERMISSION.SET_BILLING,
         ]);
       }
       case z.team.TeamRole.ROLE.ADMIN: {
-        return _combine_permissions([
-          _permissions_for_role(z.team.TeamRole.ROLE.MEMBER),
+        return _combinePermissions([
+          _permissionsForRole(z.team.TeamRole.ROLE.MEMBER),
           PERMISSION.ADD_TEAM_MEMBER,
           PERMISSION.REMOVE_TEAM_MEMBER,
           PERMISSION.SET_MEMBER_PERMISSIONS,
@@ -41,7 +41,7 @@ z.team.TeamPermission = (() => {
         ]);
       }
       case z.team.TeamRole.ROLE.MEMBER: {
-        return _combine_permissions([
+        return _combinePermissions([
           PERMISSION.ADD_CONVERSATION_MEMBER,
           PERMISSION.CREATE_CONVERSATION,
           PERMISSION.DELETE_CONVERSATION,
@@ -56,7 +56,7 @@ z.team.TeamPermission = (() => {
     }
   };
 
-  const _combine_permissions = permissions => {
+  const _combinePermissions = permissions => {
     let result = 0;
     for (const permission of permissions) {
       result = result | permission;
@@ -64,14 +64,14 @@ z.team.TeamPermission = (() => {
     return result;
   };
 
-  const _has_permission_for_role = (member_permissions, role) => {
-    const role_permissions = _permissions_for_role(role);
-    return _has_permission(member_permissions, role_permissions);
+  const _hasPermissionForRole = (memberPermissions, role) => {
+    const rolePermissions = _permissionsForRole(role);
+    return _hasPermission(memberPermissions, rolePermissions);
   };
 
-  const _has_permission = (member_permissions, expected_permissions) => {
-    if (Number.isSafeInteger(member_permissions) && member_permissions > 0) {
-      return (member_permissions & expected_permissions) === expected_permissions;
+  const _hasPermission = (memberPermissions, expectedPermissions) => {
+    if (Number.isSafeInteger(memberPermissions) && memberPermissions > 0) {
+      return (memberPermissions & expectedPermissions) === expectedPermissions;
     }
     return false;
   };
@@ -99,7 +99,7 @@ z.team.TeamPermission = (() => {
 
   return {
     PERMISSION: PERMISSION,
-    has_permission: _has_permission,
-    has_permission_for_role: _has_permission_for_role,
+    hasPermission: _hasPermission,
+    hasPermissionForRole: _hasPermissionForRole,
   };
 })();

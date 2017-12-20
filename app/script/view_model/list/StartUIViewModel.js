@@ -70,8 +70,8 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
     this.user = this.user_repository.self;
 
-    this.is_team = this.team_repository.is_team;
-    this.team_name = this.team_repository.team_name;
+    this.is_team = this.team_repository.isTeam;
+    this.team_name = this.team_repository.teamName;
 
     this.submitted_search = false;
 
@@ -98,7 +98,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
           .catch(error => this.logger.error(`Error searching for contacts: ${error.message}`, error));
 
         if (this.is_team()) {
-          this.search_results.contacts(this.team_repository.search_for_team_users(normalized_query, is_handle));
+          this.search_results.contacts(this.team_repository.searchForTeamUsers(normalized_query, is_handle));
         } else {
           this.search_results.contacts(this.user_repository.search_for_connected_users(normalized_query, is_handle));
         }
@@ -126,7 +126,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       }
 
       if (this.is_team()) {
-        return this.team_repository.team_users();
+        return this.team_repository.teamUsers();
       }
 
       return this.user_repository.connected_users();

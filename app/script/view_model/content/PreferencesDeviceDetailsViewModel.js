@@ -38,7 +38,7 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
     this.cryptography_repository = cryptography_repository;
     this.logger = new z.util.Logger('z.ViewModel.content.PreferencesDeviceDetailsViewModel', z.config.LOGGER.OPTIONS);
 
-    this.self_user = this.client_repository.self_user;
+    this.self_user = this.client_repository.selfUser;
 
     this.device = ko.observable();
     this.device.subscribe(device_et => {
@@ -118,7 +118,7 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
     amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.REMOVE_DEVICE, {
       action: password => {
         // @todo Add failure case ux WEBAPP-3570
-        this.client_repository.delete_client(this.device().id, password).then(() => {
+        this.client_repository.deleteClient(this.device().id, password).then(() => {
           this.click_on_details_close();
         });
       },
@@ -128,6 +128,6 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
 
   toggle_device_verification() {
     const toggle_verified = !this.device().meta.is_verified();
-    this.client_repository.verify_client(this.self_user().id, this.device(), toggle_verified);
+    this.client_repository.verifyClient(this.self_user().id, this.device(), toggle_verified);
   }
 };

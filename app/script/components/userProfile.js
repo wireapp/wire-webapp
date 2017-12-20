@@ -388,7 +388,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
     const toggle_verified = !this.selected_device().meta.is_verified();
 
     this.client_repository
-      .verify_client(this.user().id, this.selected_device(), toggle_verified)
+      .verifyClient(this.user().id, this.selected_device(), toggle_verified)
       .catch(error => this.logger.warn(`Client cannot be updated: ${error.message}`));
   }
 
@@ -396,7 +396,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
     if (index === 1) {
       const user_id = this.user().id;
       this.client_repository
-        .get_clients_by_user_id(user_id)
+        .getClientsByUserId(user_id)
         .then(client_ets => this.devices_found(client_ets.length > 0))
         .catch(error => this.logger.error(`Unable to retrieve clients data for user '${user_id}': ${error}`));
     }

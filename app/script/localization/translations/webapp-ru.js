@@ -385,6 +385,7 @@ z.string.ru.preferences_about_terms_of_use = 'Условия использов�
 z.string.ru.preferences_about_version = 'Версия {{version}}';
 z.string.ru.preferences_about_website = 'Веб-сайт Wire';
 
+z.string.ru.preferences_account_avaibility_unset = 'Установить статус';
 z.string.ru.preferences_account_create_team = 'Создать команду';
 z.string.ru.preferences_account_delete = 'Удалить аккаунт';
 z.string.ru.preferences_account_log_out = 'Выход';
@@ -485,6 +486,8 @@ z.string.ru.warning_permission_request_screen = '{{icon}} Разрешить д�
 z.string.ru.warning_tell_me_how = 'Скажите мне, как';
 
 z.string.ru.user_availability_available = 'Доступно';
+z.string.ru.user_availability_away = 'Отошел';
+z.string.ru.user_availability_busy = 'Занят';
 z.string.ru.user_availability_none = 'Отключены';
 
 z.string.ru.system_notification_asset_add = 'Поделился(-лась) картинкой';
@@ -512,6 +515,9 @@ z.string.ru.tooltip_conversation_call = 'Звонок';
 z.string.ru.tooltip_conversation_ephemeral = 'Временное сообщение';
 z.string.ru.tooltip_conversation_file = 'Добавить файл';
 z.string.ru.tooltip_conversation_input_placeholder = 'Наберите сообщение';
+z.string.ru.tooltip_conversation_input_placeholder_available = '{{user}} доступен';
+z.string.ru.tooltip_conversation_input_placeholder_away = '{{user}} отошел';
+z.string.ru.tooltip_conversation_input_placeholder_busy = '{{user}} занят';
 z.string.ru.tooltip_conversation_people = 'Люди ({{shortcut}})';
 z.string.ru.tooltip_conversation_picture = 'Добавить изображение';
 z.string.ru.tooltip_conversation_ping = 'Пинг ({{shortcut}})';

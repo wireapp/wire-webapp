@@ -574,7 +574,7 @@ z.calling.CallingRepository = class CallingRepository {
     if (call_et.is_group) {
       const {dest_client_id, dest_user_id, type} = call_message_et;
 
-      if (dest_user_id !== this.self_user_id() || dest_client_id !== this.client_repository.current_client().id) {
+      if (dest_user_id !== this.self_user_id() || dest_client_id !== this.client_repository.currentClient().id) {
         this.logger.log(`Ignored '${type}' call message for client '${dest_client_id}' of user '${dest_user_id}'`);
         throw new z.calling.CallError(z.calling.CallError.TYPE.MISTARGETED_MESSAGE);
       }
