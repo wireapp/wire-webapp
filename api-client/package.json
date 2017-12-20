@@ -23,7 +23,7 @@
     "babel-core": "6.26.0",
     "babel-loader": "7.1.2",
     "babel-preset-react": "6.24.1",
-    "browser-sync": "2.18.13",
+    "browser-sync": "2.19.0",
     "concurrently": "3.5.1",
     "cross-env": "5.1.1",
     "istanbul": "0.4.5",
