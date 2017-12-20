@@ -168,13 +168,18 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
       const text = z.l10n.text(z.string.people_tabs_device_detail_headline, {
         user: z.util.escape_html(this.user().first_name()),
       });
+
       const textWithHtmlTags = new RegExp('\\{\\{[^\\}]+\\}\\}[^\\{]+\\{\\{[^\\}]+\\}\\}');
       const textWithinHtmlTags = new RegExp('\\{\\{[^\\}]+\\}\\}', 'gm');
 
       const pivot = text.match(textWithHtmlTags)[0];
       const sanitizedText = z.util.StringUtil.splitAtPivotElement(text, pivot);
 
-      return sanitizedText[1].replace(textWithinHtmlTags, '');
+      if (sanitizedText[1]) {
+        sanitizedText[1] = sanitizedText[1].replace(textWithinHtmlTags, '');
+      }
+
+      return sanitizedText;
     });
 
     this.on_cancel_request = () => {

@@ -57,8 +57,8 @@ describe('z.components.UserProfileViewModel', () => {
 
   describe('detail_message', () => {
     it('returns message parts that can safely be rendered by a template engine', () => {
-      const fingerprint_explanation = viewModel.detail_message();
-      expect(fingerprint_explanation.length).toBe(3);
+      const fingerprintExplanation = viewModel.detail_message();
+      expect(fingerprintExplanation.length).toBe(3);
     });
   });
 });
