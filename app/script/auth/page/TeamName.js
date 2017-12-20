@@ -60,8 +60,7 @@ class TeamName extends Component {
       Promise.resolve(this.teamNameInput.value)
         .then(teamName => teamName.trim())
         .then(teamName => this.props.pushAccountRegistrationData({team: {name: teamName}}))
-        .then(() => this.props.history.push(ROUTE.CREATE_TEAM_ACCOUNT))
-        .catch(error => console.error('error', error));
+        .then(() => this.props.history.push(ROUTE.CREATE_TEAM_ACCOUNT));
     }
     this.teamNameInput.focus();
   };
