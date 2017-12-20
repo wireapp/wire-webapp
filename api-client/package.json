@@ -9,8 +9,8 @@
     "@types/spark-md5": "3.0.0",
     "@types/text-encoding": "0.0.32",
     "@types/tough-cookie": "2.3.2",
-    "@wireapp/queue-priority": "0.0.13",
-    "@wireapp/store-engine": "0.1.1",
+    "@wireapp/queue-priority": "^0.0.15",
+    "@wireapp/store-engine": "^0.1.2",
     "axios": "0.17.1",
     "html5-websocket": "2.0.2",
     "logdown": "2.2.0",
@@ -56,14 +56,14 @@
     "clear": "rimraf dist",
     "coverage": "istanbul cover --report html ./node_modules/jasmine/bin/jasmine.js",
     "dist": "yarn clear && yarn build",
-    "preversion": "yarn && yarn test",
+    "prepublish": "yarn && yarn test",
     "start": "yarn build:node && concurrently \"tsc -w\" \"webpack -w\" \"browser-sync start -c bs-config.js\"",
     "test": "yarn dist && yarn test:node && yarn test:browser",
     "test:browser": "webpack && karma start karma.conf.js",
     "test:node": "cross-env JASMINE_CONFIG_PATH=src/test/node/support/jasmine.json jasmine",
-    "version": "yarn dist",
+    "prepare": "yarn dist",
     "watch": "webpack-dev-server --config webpack.config.js"
   },
   "types": "./dist/commonjs/Client.d.ts",
-  "version": "0.2.17"
+  "version": "0.2.22"
 }
