@@ -1725,8 +1725,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
         const client_not_validated = error.type === z.client.ClientError.TYPE.NO_VALID_CLIENT;
         if (client_not_validated) {
-          const client_et = this.client_repository.current_client();
-          this.client_repository.current_client(undefined);
+          const client_et = this.client_repository.currentClient();
+          this.client_repository.currentClient(undefined);
           return this.cryptography_repository.reset_cryptobox(client_et).then(deleted_everything => {
             if (deleted_everything) {
               this.logger.info('Database was completely reset. Reinitializing storage...');
@@ -1736,7 +1736,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
         }
       })
       .then(() => {
-        if (this.client_repository.current_client()) {
+        if (this.client_repository.currentClient()) {
           this.logger.info('Active client found. Redirecting to app...');
           return this._redirect_to_app();
         }
@@ -1828,7 +1828,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
         }
 
         // Make sure client entities always see the history screen
-        if (this.client_repository.current_client().isTemporary()) {
+        if (this.client_repository.currentClient().isTemporary()) {
           return this._set_hash(z.auth.AuthView.MODE.HISTORY);
         }
 

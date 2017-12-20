@@ -43,7 +43,7 @@ z.ViewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
 
     this.self_user = this.client_repository.self_user;
 
-    this.current_client = this.client_repository.current_client;
+    this.current_client = this.client_repository.currentClient;
 
     this.activated_in = ko.observable(z.l10n.text(z.string.preferences_devices_activated_in));
     this.activated_on = ko.observable(z.l10n.text(z.string.preferences_devices_activated_on));
