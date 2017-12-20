@@ -60,10 +60,10 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.submitted_username = ko.observable();
     this.username_error = ko.observable();
 
-    this.isTeam = this.team_repository.isTeam;
-    this.is_team_manager = ko.pureComputed(() => this.isTeam() && this.self_user().is_team_manager());
+    this.is_team = this.team_repository.isTeam;
+    this.is_team_manager = ko.pureComputed(() => this.is_team() && this.self_user().is_team_manager());
     this.team = this.team_repository.team;
-    this.teamName = ko.pureComputed(() =>
+    this.team_name = ko.pureComputed(() =>
       z.l10n.text(z.string.preferences_account_team, this.team_repository.teamName())
     );
 
