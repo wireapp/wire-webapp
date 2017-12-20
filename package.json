@@ -33,13 +33,13 @@
     "build": "babel src --out-dir dist --no-comments && node scripts/prepare.js",
     "clear": "rimraf dist",
     "dist": "yarn clear && yarn build",
-    "preversion": "yarn && yarn test",
+    "prepublish": "yarn && yarn test",
     "release": "cd ./dist && npm publish",
     "start:demo": "webpack-dev-server",
     "start:static": "gulp",
     "start": "yarn start:demo",
     "test": "exit 0",
-    "version": "yarn dist"
+    "prepare": "yarn dist"
   },
-  "version": "0.0.30"
+  "version": "0.0.31"
 }
