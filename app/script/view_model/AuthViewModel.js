@@ -60,15 +60,15 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     // Cryptography
     this.asset_service = new z.assets.AssetService(this.auth.client);
     // @todo Don't operate with the service directly. Get a repository!
-    this.storage_service = new z.storage.StorageService();
-    this.storage_repository = new z.storage.StorageRepository(this.storage_service);
+    this.storageService = new z.storage.StorageService();
+    this.storage_repository = new z.storage.StorageRepository(this.storageService);
 
     this.cryptography_service = new z.cryptography.CryptographyRepository(this.auth.client);
     this.cryptography_repository = new z.cryptography.CryptographyRepository(
       this.cryptography_service,
       this.storage_repository
     );
-    this.client_service = new z.client.ClientService(this.auth.client, this.storage_service);
+    this.client_service = new z.client.ClientService(this.auth.client, this.storageService);
     this.client_repository = new z.client.ClientRepository(this.client_service, this.cryptography_repository);
 
     this.user_mapper = new z.user.UserMapper();
@@ -80,7 +80,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       this.client_repository
     );
 
-    this.notification_service = new z.event.NotificationService(this.auth.client, this.storage_service);
+    this.notification_service = new z.event.NotificationService(this.auth.client, this.storageService);
     this.web_socket_service = new z.event.WebSocketService(this.auth.client);
     this.event_repository = new z.event.EventRepository(
       this.web_socket_service,
@@ -1715,7 +1715,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     this.logger.info('Logging in');
 
     this._get_self_user()
-      .then(() => this.cryptography_repository.load_cryptobox(this.storage_service.db))
+      .then(() => this.cryptography_repository.load_cryptobox(this.storageService.db))
       .then(() => this.client_repository.getValidLocalClient())
       .catch(error => {
         const user_missing_email = error.type === z.user.UserError.TYPE.USER_MISSING_EMAIL;
@@ -1730,7 +1730,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
           return this.cryptography_repository.reset_cryptobox(client_et).then(deleted_everything => {
             if (deleted_everything) {
               this.logger.info('Database was completely reset. Reinitializing storage...');
-              return this.storage_repository.storage_service.init(this.self_user().id);
+              return this.storage_repository.storageService.init(this.self_user().id);
             }
           });
         }
@@ -1773,7 +1773,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
           throw new z.user.UserError(z.user.UserError.TYPE.USER_MISSING_EMAIL);
         }
 
-        return this.storage_service.init(this.self_user().id);
+        return this.storageService.init(this.self_user().id);
       })
       .then(() => {
         this.client_repository.init(this.self_user());
@@ -1787,7 +1787,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
    * @returns {Promise<boolean>} Resolves with whether at least one conversation event was found
    */
   _has_local_history() {
-    return this.storage_service.get_all(z.storage.StorageService.OBJECT_STORE.EVENTS).then(events => events.length > 0);
+    return this.storageService.getAll(z.storage.StorageService.OBJECT_STORE.EVENTS).then(events => events.length > 0);
   }
 
   /**
@@ -1802,7 +1802,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
   _register_client(auto_login) {
     return this.cryptography_repository
-      .create_cryptobox(this.storage_service.db)
+      .create_cryptobox(this.storageService.db)
       .then(() => this.client_repository.registerClient(auto_login ? undefined : this.password()))
       .then(client_observable => {
         this.event_repository.current_client = client_observable;
