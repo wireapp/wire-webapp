@@ -3,7 +3,7 @@
     "wire-cli": "bin/node/index.js"
   },
   "dependencies": {
-    "@wireapp/core": "^0.0.13",
+    "@wireapp/core": "^0.0.14",
     "commander": "2.12.2",
     "dotenv": "4.0.0"
   },
@@ -23,12 +23,12 @@
     "build:node": "tsc",
     "clear": "rimraf dist bin",
     "dist": "yarn clear && yarn build",
-    "prepublish": "yarn && yarn test",
+    "prepublish": "yarn test",
     "test": "yarn dist && yarn test:node && yarn test:browser",
     "test:browser": "exit 0",
     "test:node": "exit 0",
     "prepare": "yarn build"
   },
   "types": "./dist/commonjs/index.d.ts",
-  "version": "0.0.6"
+  "version": "0.0.7"
 }
