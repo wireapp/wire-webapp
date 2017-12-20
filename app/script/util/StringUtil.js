@@ -128,6 +128,9 @@ z.util.StringUtil = {
     return 0;
   },
   splitAtPivotElement: function(text, pivot) {
+    if (!pivot) {
+      return [];
+    }
     const findPivot = pivot === '?' ? new RegExp('(\\?)') : new RegExp(`(${pivot})`);
     return text.split(findPivot);
   },

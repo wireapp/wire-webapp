@@ -168,10 +168,16 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
       const text = z.l10n.text(z.string.people_tabs_device_detail_headline, {
         user: z.util.escape_html(this.user().first_name()),
       });
-      const findHtml = new RegExp('\\{\\{[^\\}]+\\}\\}[^\\{]+\\{\\{[^\\}]+\\}\\}');
-      const pivot = text.match(findHtml)[0];
+      const textWithHtmlTags = new RegExp('\\{\\{[^\\}]+\\}\\}[^\\{]+\\{\\{[^\\}]+\\}\\}');
+      const textWithinHtmlTags = new RegExp('\\{\\{[^\\}]+\\}\\}', 'gm');
+
+      const pivot = text.match(textWithHtmlTags)[0];
       const sanitizedText = z.util.StringUtil.splitAtPivotElement(text, pivot);
-      sanitizedText[1] = sanitizedText[1].replace(new RegExp('\\{\\{[^\\}]+\\}\\}', 'gm'), '');
+
+      if (sanitizedText[1]) {
+        sanitizedText[1] = sanitizedText[1].replace(textWithinHtmlTags, '');
+      }
+
       return sanitizedText;
     });
 

@@ -23,6 +23,7 @@
 
 describe('z.ViewModel.content.PreferencesDeviceDetailsViewModel', () => {
   const testFactory = new TestFactory();
+  let viewModel;
 
   beforeEach(done => {
     testFactory
@@ -37,5 +38,14 @@ describe('z.ViewModel.content.PreferencesDeviceDetailsViewModel', () => {
         done();
       })
       .catch(done.fail);
+  });
+
+  describe('_update_activation_location', () => {
+    it('keeps the location as a pivot element', () => {
+      const location = 'Paris, FR';
+      viewModel._update_activation_location(location);
+      const sanitizedText = viewModel.activated_in();
+      expect(sanitizedText[1]).toBe(location);
+    });
   });
 });

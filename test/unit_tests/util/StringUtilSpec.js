@@ -136,21 +136,21 @@ describe('z.util.StringUtil', () => {
       expect(actual[2]).toBe(' for everyone');
     });
 
-    it('works when the pivot element comes first', () => {
+    it('works when the pivot element is first', () => {
       const time = '22:42';
       const turkish = `${time} ’da aktif edildi`;
       const result = z.util.StringUtil.splitAtPivotElement(turkish, time);
       expect(result[1]).toBe(time);
     });
 
-    it('works when the pivot element comes last', () => {
+    it('works when the pivot element is last', () => {
       const time = '22:42';
       const greek = `Ενεργοποιήθηκε στις ${time}`;
       const result = z.util.StringUtil.splitAtPivotElement(greek, time);
       expect(result[1]).toBe(time);
     });
 
-    it('works when the pivot element comes in-between', () => {
+    it('works when the pivot element is in-between', () => {
       const time = '22:42';
       const finish = `Aktivoitu ${time}: ssa`;
       const result = z.util.StringUtil.splitAtPivotElement(finish, time);
@@ -162,6 +162,12 @@ describe('z.util.StringUtil', () => {
       const english = `Activated on ${pivot}`;
       const result = z.util.StringUtil.splitAtPivotElement(english, pivot);
       expect(result[1]).toBe(pivot);
+    });
+
+    it('returns an empty array when no pivot element is provided', () => {
+      const english = `Activated on 22:42`;
+      const result = z.util.StringUtil.splitAtPivotElement(english);
+      expect(result.length).toBe(0);
     });
   });
 
