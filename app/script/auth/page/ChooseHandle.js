@@ -79,12 +79,12 @@ class ChooseHandle extends React.PureComponent {
                 onChange={event => this.setState({error: null, handle: event.target.value})}
                 value={this.state.handle}
                 autoFocus
-                data-uie-name="enter-invite-email"
+                data-uie-name="enter-handle"
               />
               <RoundIconButton
                 disabled={!this.state.handle.trim() || isFetching}
                 type="submit"
-                data-uie-name="do-send-invite"
+                data-uie-name="do-send-handle"
                 formNoValidate
               />
             </InputSubmitCombo>
