@@ -20,6 +20,7 @@
 import BackendError from './BackendError';
 import * as AuthActionCreator from './creator/AuthActionCreator';
 import {currentLanguage} from '../../localeConfig';
+import {fetchSelf} from './SelfAction';
 
 export function doLogin(login) {
   return function(dispatch, getState, {apiClient}) {
@@ -96,6 +97,7 @@ export function doRegisterPersonal(registration) {
       .then(() => dispatch(doSilentLogout()))
       .then(() => apiClient.register(registration))
       .then(createdAccount => dispatch(AuthActionCreator.successfulRegisterPersonal(createdAccount)))
+      .then(() => dispatch(fetchSelf()))
       .catch(error => {
         dispatch(AuthActionCreator.failedRegisterPersonal(error));
         throw BackendError.handle(error);
