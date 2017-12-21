@@ -129,14 +129,27 @@ z.util.StringUtil = {
   },
   splitAtPivotElement: function(text, pivot, replacement) {
     if (!pivot) {
-      return [];
+      return [
+        {
+          isStyled: false,
+          text,
+        },
+      ];
     }
-    return text.split(pivot).map(value => {
-      return {
-        isStyled: value === pivot,
-        text: value === pivot ? replacement : value,
-      };
-    });
+
+    const findPivot = pivot === '?' ? new RegExp('(\\?)') : new RegExp(`(${pivot})`);
+
+    return text
+      .split(findPivot)
+      .map(value => {
+        return value
+          ? {
+              isStyled: value === pivot,
+              text: value === pivot ? replacement : value,
+            }
+          : undefined;
+      })
+      .filter(item => item);
   },
   starts_with: function(string = '', query) {
     return string.toLowerCase().startsWith(query.toLowerCase());

@@ -126,48 +126,73 @@ describe('z.util.StringUtil', () => {
 
   describe('splitAtPivotElement', () => {
     it('splits a text in two halves at a pivot element', () => {
-      const text = 'Secure messaging for everyone';
-      const pivot = 'messaging';
+      const pivot = '{{variable}}';
+      const replacement = 'messaging';
+      const text = `Secure ${pivot} for everyone.`;
 
-      const actual = z.util.StringUtil.splitAtPivotElement(text, pivot);
+      const actual = z.util.StringUtil.splitAtPivotElement(text, pivot, replacement);
       expect(actual.length).toBe(3);
-      expect(actual[0]).toBe('Secure ');
-      expect(actual[1]).toBe(pivot);
-      expect(actual[2]).toBe(' for everyone');
+      expect(actual[1].text).toBe(replacement);
+      expect(actual[0].isStyled).toBe(false);
+      expect(actual[1].isStyled).toBe(true);
+      expect(actual[2].isStyled).toBe(false);
     });
 
     it('works when the pivot element is first', () => {
-      const time = '22:42';
-      const turkish = `${time} ’da aktif edildi`;
-      const result = z.util.StringUtil.splitAtPivotElement(turkish, time);
-      expect(result[1]).toBe(time);
+      const pivot = '{{time}}';
+      const replacement = '22:42';
+      const turkish = `${pivot} ’da aktif edildi`;
+
+      const actual = z.util.StringUtil.splitAtPivotElement(turkish, pivot, replacement);
+      expect(actual.length).toBe(2);
+      expect(actual[0].text).toBe(replacement);
+      expect(actual[0].isStyled).toBe(true);
+      expect(actual[1].isStyled).toBe(false);
     });
 
     it('works when the pivot element is last', () => {
-      const time = '22:42';
-      const greek = `Ενεργοποιήθηκε στις ${time}`;
-      const result = z.util.StringUtil.splitAtPivotElement(greek, time);
-      expect(result[1]).toBe(time);
+      const pivot = '{{time}}';
+      const replacement = '22:42';
+      const greek = `Ενεργοποιήθηκε στις ${pivot}`;
+
+      const actual = z.util.StringUtil.splitAtPivotElement(greek, pivot, replacement);
+      expect(actual.length).toBe(2);
+      expect(actual[1].text).toBe(replacement);
+      expect(actual[1].isStyled).toBe(true);
+      expect(actual[0].isStyled).toBe(false);
     });
 
     it('works when the pivot element is in-between', () => {
-      const time = '22:42';
-      const finish = `Aktivoitu ${time}: ssa`;
-      const result = z.util.StringUtil.splitAtPivotElement(finish, time);
-      expect(result[1]).toBe(time);
+      const pivot = '{{time}}';
+      const replacement = '22:42';
+      const finish = `Aktivoitu ${pivot}: ssa`;
+
+      const actual = z.util.StringUtil.splitAtPivotElement(finish, pivot, replacement);
+      expect(actual.length).toBe(3);
+      expect(actual[0].isStyled).toBe(false);
+      expect(actual[1].text).toBe(replacement);
+      expect(actual[1].isStyled).toBe(true);
+      expect(actual[2].isStyled).toBe(false);
     });
 
     it('works with pivots that need to be escaped in regular expressions', () => {
-      const pivot = '?';
+      const pivot = '{{time}}';
+      const replacement = '?';
       const english = `Activated on ${pivot}`;
-      const result = z.util.StringUtil.splitAtPivotElement(english, pivot);
-      expect(result[1]).toBe(pivot);
+
+      const actual = z.util.StringUtil.splitAtPivotElement(english, pivot, replacement);
+      expect(actual.length).toBe(2);
+      expect(actual[0].isStyled).toBe(false);
+      expect(actual[1].text).toBe(replacement);
+      expect(actual[1].isStyled).toBe(true);
     });
 
-    it('returns an empty array when no pivot element is provided', () => {
+    it('returns the initial string when no pivot element is provided', () => {
       const english = `Activated on 22:42`;
-      const result = z.util.StringUtil.splitAtPivotElement(english);
-      expect(result.length).toBe(0);
+      const actual = z.util.StringUtil.splitAtPivotElement(english);
+      expect(actual.length).toBe(1);
+      expect(actual[0].isStyled).toBe(false);
+      expect(actual[0].text).toBe(english);
     });
   });
 
