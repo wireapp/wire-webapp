@@ -79,11 +79,11 @@
         <div class="user-profile-back-button button-icon icon-back" data-bind="click: click_on_device_detail_back_button" data-uie-name="do-back"></div>
         <span class="user-profile-my-device-button user-profile-top-right-button button-label text-theme" data-bind="click: click_on_my_fingerprint_button, l10n_text: z.string.people_tabs_device_detail_show_my_device"></span>
         <div class="user-profile-device-detail-message">
-          <div data-bind="foreach: detail_message"><span class="user-profile-device-detail-highlight" data-bind="text: $data.text">?</span></div>
+          <div data-bind="foreach: detail_message"><span data-bind="css: { 'user-profile-device-detail-highlight': $data.isStyled }, text: $data.text">?</span></div>
           <a data-bind="attr: {href: z.util.URLUtil.build_url(z.util.URLUtil.TYPE.WEBSITE, z.config.URL_PATH.PRIVACY_HOW)}, l10n_text: z.string.people_tabs_device_detail_how_to" rel="nofollow noopener noreferrer" target="_blank" class="text-theme"></a>
         </div>
         <device-card class="user-profile-device-detail-card" params="device: selected_device()"></device-card>
-        <div class="user-profile-device-detail-fingerprint" data-bind="foreach: fingerprint_remote().match(/.{1,2}/g)"><span class="device-id-part" data-bind="text: $data.text"></span></div>
+        <div class="user-profile-device-detail-fingerprint" data-bind="foreach: fingerprint_remote().match(/.{1,2}/g)"><span class="device-id-part" data-bind="text: $data"></span></div>
         <div class="user-profile-device-detail-footer">
           <div class="slider">
             <input class="slider-input" type="checkbox" name="toggle" id="toggle" data-bind="checked: selected_device().meta.is_verified">

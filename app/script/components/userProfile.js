@@ -173,13 +173,14 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
       const textWithinHtmlTags = new RegExp('\\{\\{[^\\}]+\\}\\}', 'gm');
 
       const pivot = text.match(textWithHtmlTags)[0];
-      const sanitizedText = z.util.StringUtil.splitAtPivotElement(text, pivot);
+      const sanitizedText = z.util.StringUtil.splitAtPivotElement(text, pivot, pivot);
 
-      if (sanitizedText[1]) {
-        sanitizedText[1] = sanitizedText[1].replace(textWithinHtmlTags, '');
-      }
-
-      return sanitizedText;
+      return sanitizedText.map(element => {
+        if (element.isStyled) {
+          element.text = element.text.replace(textWithinHtmlTags, '');
+        }
+        return element;
+      });
     });
 
     this.on_cancel_request = () => {
