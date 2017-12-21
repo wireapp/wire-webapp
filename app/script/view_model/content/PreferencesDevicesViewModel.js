@@ -48,8 +48,8 @@ z.ViewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
       () => (this.current_client() ? z.util.zero_padding(this.current_client().id, 16) : '')
     );
 
-    this.activated_in = ko.observable(z.l10n.text(z.string.preferences_devices_activated_in));
-    this.activated_on = ko.observable(z.l10n.text(z.string.preferences_devices_activated_on));
+    this.activated_in = ko.observable([]);
+    this.activated_on = ko.observable([]);
     this.devices = ko.observableArray();
     this.displayFingerPrint = ko.observable('');
 

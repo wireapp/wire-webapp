@@ -6,16 +6,14 @@
         <header class="preferences-header" data-bind="l10n_text: z.string.preferences_devices_current"></header>
         <div class="preferences-devices-model" data-bind="text: current_client().model"></div>
         <div class="preferences-devices-id"><span data-bind="l10n_text: z.string.preferences_devices_id"></span>
-          <span data-bind="foreach: displayClientId().match(/.{1,2}/g)" data-uie-name="preferences-device-current-id">
-            <span class="device-id-part" data-bind="text: $data"></span>
-          </span>
+          <span data-bind="foreach: displayClientId().match(/.{1,2}/g)" data-uie-name="preferences-device-current-id"><span class="device-id-part" data-bind="text: $data"></span></span>
         </div>
         <div class="preferences-devices-activated">
-          <div data-bind="foreach: activated_on"><span class="preferences-devices-activated-bold" data-bind="text: $data">?</span></div>
-          <div data-bind="foreach: activated_in"><span class="preferences-devices-activated-bold" data-bind="text: $data">?</span></div>
+          <div data-bind="foreach: activated_on"><span class="preferences-devices-activated-bold" data-bind="text: $data.text">?</span></div>
+          <div data-bind="foreach: activated_in"><span class="preferences-devices-activated-bold" data-bind="text: $data.text">?</span></div>
         </div>
         <div class="preferences-devices-fingerprint-label" data-bind="l10n_text: z.string.preferences_devices_fingerprint"></div>
-        <div class="preferences-devices-fingerprint" data-bind="foreach: displayFingerPrint().match(/.{1,2}/g)"><span class="device-id-part" data-bind="text: $data"></span></div>
+        <div class="preferences-devices-fingerprint" data-bind="foreach: displayFingerPrint().match(/.{1,2}/g)"><span class="device-id-part" data-bind="text: $data.text"></span></div>
       </section>
 
       <hr class="preferences-devices-separator preferences-separator">
@@ -38,7 +36,7 @@
                   <div class="preferences-devices-model" data-bind="text: model" data-uie-name="preferences-device-active-model"></div>
                   <div class="preferences-devices-id">
                     <span data-bind="l10n_text: z.string.preferences_devices_id"></span>
-                    <span data-bind="foreach: z.util.zero_padding(id, 16).match(/.{1,2}/g)" data-uie-name="preferences-device-active-id"><span class="device-id-part" data-bind="text: $data"></span></span>
+                    <span data-bind="foreach: z.util.zero_padding(id, 16).match(/.{1,2}/g)" data-uie-name="preferences-device-active-id"><span class="device-id-part" data-bind="text: $data.text"></span></span>
                   </div>
                 </div>
               </div>

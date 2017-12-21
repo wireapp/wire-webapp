@@ -59,20 +59,19 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
     );
     this.fingerprint = ko.observable('');
 
-    this.activated_in = ko.observable(z.l10n.text(z.string.preferences_devices_activated_in));
-    this.activated_on = ko.observable(z.l10n.text(z.string.preferences_devices_activated_on));
+    this.activated_in = ko.observableArray([]);
+    this.activated_on = ko.observableArray([]);
   }
 
   _update_activation_location(location, template = z.string.preferences_devices_activated_in) {
-    const text = z.l10n.text(template, location);
-    const sanitizedText = z.util.StringUtil.splitAtPivotElement(text, location);
+    const sanitizedText = z.util.StringUtil.splitAtPivotElement(template, '{{location}}', location);
+    console.log('sa', sanitizedText);
     this.activated_in(sanitizedText);
   }
 
   _update_activation_time(time, template = z.string.preferences_devices_activated_on) {
     const formattedTime = z.util.format_timestamp(time);
-    const text = z.l10n.text(template, formattedTime);
-    const sanitizedText = z.util.StringUtil.splitAtPivotElement(text, formattedTime);
+    const sanitizedText = z.util.StringUtil.splitAtPivotElement(template, '{{date}}', formattedTime);
     this.activated_on(sanitizedText);
   }
 
