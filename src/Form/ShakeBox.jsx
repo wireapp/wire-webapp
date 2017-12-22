@@ -26,7 +26,7 @@ class ShakeBox extends React.PureComponent {
 
   static propTypes = {
     amp: PropTypes.number,
-    children: PropTypes.element,
+    children: PropTypes.node,
     damping: PropTypes.number,
     speed: PropTypes.number,
     threshold: PropTypes.number,

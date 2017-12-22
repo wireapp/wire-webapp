@@ -23,6 +23,7 @@ setGlobalStyles();
 
 export * from './Form';
 export * from './Layout';
+export * from './Modal';
 export * from './Identity';
 export * from './Icon';
 export * from './Progress';

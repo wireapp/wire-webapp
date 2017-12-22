@@ -17,10 +17,13 @@
  *
  */
 
-export * from './ArrowIcon';
-export * from './CheckIcon';
-export * from './CloseIcon';
-export * from './PlaneIcon';
-export * from './ProfileIcon';
-export * from './TeamIcon';
-export * from './RoundContainer';
+import IconHOC from './IconHOC';
+import React from 'react';
+
+const size = 14;
+const close = (
+  <path d="M1.4 13.3l5.25-5.23 5.25 5.24 1.4-1.4-5.23-5.24L13.3 1.4 11.9 0 6.65 5.24 1.4 0 0 1.4l5.24 5.26L0 11.9" />
+);
+const CloseIcon = IconHOC(close, size, size);
+
+export {CloseIcon};
