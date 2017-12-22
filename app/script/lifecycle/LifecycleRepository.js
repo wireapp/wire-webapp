@@ -31,28 +31,24 @@ z.lifecycle.LifecycleRepository = class LifecycleRepository {
     };
   }
 
-  constructor(lifecycle_service) {
+  constructor(lifecycleService) {
     this.logger = new z.util.Logger('z.lifecycle.LifecycleRepository', z.config.LOGGER.OPTIONS);
-    this.lifecycle_service = lifecycle_service;
+    this.lifecycleService = lifecycleService;
   }
 
   init() {
     window.setInterval(() => {
-      this.check_version();
+      this.checkVersion();
     }, LifecycleRepository.CONFIG.CHECK_INTERVAL);
   }
 
-  check_version() {
+  checkVersion() {
     if (navigator.onLine) {
-      return this.lifecycle_service.get_version().then(server_version => {
-        this.logger.info(
-          `Checking current webapp version. Server '${server_version}' vs. local '${z.util.Environment.version(
-            false,
-            true
-          )}'`
-        );
+      return this.lifecycleService.getVersion().then(serverVersion => {
+        const currentVersion = z.util.Environment.version(false, true);
+        this.logger.info(`Checking current webapp version. Server '${serverVersion}' vs. local '${currentVersion}'`);
 
-        if (server_version > z.util.Environment.version(false, true)) {
+        if (serverVersion > currentVersion) {
           amplify.publish(z.event.WebApp.LIFECYCLE.UPDATE, z.lifecycle.UPDATE_SOURCE.WEBAPP);
         }
       });

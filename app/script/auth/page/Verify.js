@@ -34,7 +34,6 @@ import * as UserAction from '../module/action/UserAction';
 import Page from './Page';
 import React from 'react';
 import ROUTE from '../route';
-import {pathWithParams} from '../util/urlUtil';
 
 const changeEmailRedirect = {
   [REGISTER_FLOW.PERSONAL]: ROUTE.CREATE_ACCOUNT,
@@ -65,12 +64,7 @@ const Verify = ({account, authError, history, currentFlow, intl: {formatMessage:
             connected.trackNameWithContext(TrackingAction.EVENT_NAME.PERSONAL.CREATED, context);
             connected.trackNameWithContext(TrackingAction.EVENT_NAME.PERSONAL.VERIFIED, context);
           })
-          .then(() => {
-            const link = document.createElement('a');
-            link.href = pathWithParams(ROUTE.LOGIN, 'reason=registration');
-            document.body.appendChild(link); // workaround for Firefox
-            link.click();
-          })
+          .then(() => history.push(ROUTE.CHOOSE_HANDLE))
           .catch(error => console.error('Failed to create personal account', error));
       }
     }

@@ -160,6 +160,21 @@ export const inviteStrings = defineMessages({
   },
 });
 
+export const chooseHandleStrings = defineMessages({
+  headline: {
+    id: 'chooseHandle.headline',
+    defaultMessage: 'Set username',
+  },
+  subhead: {
+    id: 'chooseHandle.subhead',
+    defaultMessage: 'Usernames help people find you.',
+  },
+  handlePlaceholder: {
+    id: 'chooseHandle.handlePlaceholder',
+    defaultMessage: 'Username',
+  },
+});
+
 export const errorHandlerStrings = defineMessages({
   [BackendError.LABEL.ACCESS_DENIED]: {
     id: 'BackendError.LABEL.ACCESS_DENIED',

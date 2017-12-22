@@ -17,34 +17,11 @@
  *
  */
 
-'use strict';
+export function randomArrayElement(array) {
+  return array[randomInt(array.length - 1)];
+}
 
-window.z = window.z || {};
-window.z.lifecycle = z.lifecycle || {};
-
-z.lifecycle.LifecycleService = class LifecycleService {
-  static get CONFIG() {
-    return {
-      URL: {
-        VERSION: 'version/',
-      },
-    };
-  }
-
-  constructor() {
-    this.logger = new z.util.Logger('z.lifecycle.LifecycleService', z.config.LOGGER.OPTIONS);
-  }
-
-  getVersion() {
-    return this._fetchData(LifecycleService.CONFIG.URL.VERSION).then(({version}) => version);
-  }
-
-  _fetchData(url) {
-    return fetch(url).then(response => {
-      if (response.ok) {
-        return response.json();
-      }
-      throw new Error(`Failed to fetch '${url}': ${response.statusText}`);
-    });
-  }
-};
+// returns number: 0 <= number <= max
+export function randomInt(max) {
+  return Math.floor(Math.random() * (max + 1));
+}
