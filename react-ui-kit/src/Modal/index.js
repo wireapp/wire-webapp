@@ -17,10 +17,4 @@
  *
  */
 
-export * from './ArrowIcon';
-export * from './CheckIcon';
-export * from './CloseIcon';
-export * from './PlaneIcon';
-export * from './ProfileIcon';
-export * from './TeamIcon';
-export * from './RoundContainer';
+export * from './Modal';
