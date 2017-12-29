@@ -39,7 +39,7 @@ z.search.SearchService = class SearchService {
    * @param {number} size - Number of requested user
    * @returns {Promise} Resolves with the search results
    */
-  get_contacts(query, size) {
+  getContacts(query, size) {
     return this.client.send_request({
       data: {
         // eslint-disable-next-line id-length
