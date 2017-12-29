@@ -1400,7 +1400,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when the asset metadata was sent
    */
   send_asset_metadata(conversation_et, file) {
-    return z.assets.AssetMetaDataBuilder.build_metadata(file)
+    return z.assets.AssetMetaDataBuilder.buildMetadata(file)
       .catch(error => {
         this.logger.warn(
           `Couldn't render asset preview from metadata. Asset might be corrupt: ${error.message}`,
@@ -1411,11 +1411,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(metadata => {
         const asset = new z.proto.Asset();
 
-        if (z.assets.AssetMetaDataBuilder.is_audio(file)) {
+        if (z.assets.AssetMetaDataBuilder.isAudio(file)) {
           asset.set('original', new z.proto.Asset.Original(file.type, file.size, file.name, null, null, metadata));
-        } else if (z.assets.AssetMetaDataBuilder.is_video(file)) {
+        } else if (z.assets.AssetMetaDataBuilder.isVideo(file)) {
           asset.set('original', new z.proto.Asset.Original(file.type, file.size, file.name, null, metadata));
-        } else if (z.assets.AssetMetaDataBuilder.is_image(file)) {
+        } else if (z.assets.AssetMetaDataBuilder.isImage(file)) {
           asset.set('original', new z.proto.Asset.Original(file.type, file.size, file.name, metadata));
         } else {
           asset.set('original', new z.proto.Asset.Original(file.type, file.size, file.name));
@@ -1982,16 +1982,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
   _sendExternalGenericMessage(conversationId, genericMessage, recipients, preconditionOption, nativePush = true) {
     this.logger.info(`Sending external message of type '${genericMessage.content}'`, genericMessage);
 
-    return z.assets.AssetCrypto.encrypt_aes_asset(genericMessage.toArrayBuffer())
-      .then(({key_bytes, sha256, cipher_text}) => {
+    return z.assets.AssetCrypto.encryptAesAsset(genericMessage.toArrayBuffer())
+      .then(({cipherText, keyBytes, sha256}) => {
         const genericMessageExternal = new z.proto.GenericMessage(z.util.create_random_uuid());
-        const externalMessage = new z.proto.External(new Uint8Array(key_bytes), new Uint8Array(sha256));
+        const externalMessage = new z.proto.External(new Uint8Array(keyBytes), new Uint8Array(sha256));
         genericMessageExternal.set('external', externalMessage);
 
         return this.cryptography_repository
           .encrypt_generic_message(recipients, genericMessageExternal)
           .then(payload => {
-            payload.data = z.util.array_to_base64(cipher_text);
+            payload.data = z.util.array_to_base64(cipherText);
             payload.native_push = nativePush;
             return this._sendEncryptedMessage(conversationId, genericMessage, payload, preconditionOption);
           });

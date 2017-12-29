@@ -45,9 +45,9 @@ z.entity.File = class File extends z.entity.Asset {
     this.preview_resource = ko.observable();
 
     this.download = this.download.bind(this);
-    this.download_progress = ko.pureComputed(() => {
+    this.downloadProgress = ko.pureComputed(() => {
       if (this.original_resource()) {
-        return this.original_resource().download_progress();
+        return this.original_resource().downloadProgress();
       }
 
       return undefined;
@@ -151,7 +151,7 @@ z.entity.File = class File extends z.entity.Asset {
 
   cancel_download() {
     this.status(z.assets.AssetTransferState.UPLOADED);
-    return this.original_resource().cancel_download();
+    return this.original_resource().cancelDownload();
   }
 
   cancel(message_et) {

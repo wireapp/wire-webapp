@@ -38,18 +38,15 @@ z.assets.AssetService = class AssetService {
    * @param {File|Blob} image - Profile image
    * @returns {Promise} Resolves when profile image has been uploaded
    */
-  upload_profile_image(image) {
-    return Promise.all([this._compress_profile_image(image), this._compress_image(image)])
-      .then(([small, medium]) => {
-        const [, small_image_bytes] = small;
-        const [, medium_image_bytes] = medium;
-
+  uploadProfileImage(image) {
+    return Promise.all([this._compressProfileImage(image), this._compressImage(image)])
+      .then(([{compressedBytes: smallImageBytes}, {compressedBytes: mediumImageBytes}]) => {
         return Promise.all([
-          this.post_asset(small_image_bytes, {public: true}),
-          this.post_asset(medium_image_bytes, {public: true}),
+          this.postAsset(smallImageBytes, {public: true}),
+          this.postAsset(mediumImageBytes, {public: true}),
         ]);
       })
-      .then(([small_credentials, medium_credentials]) => [small_credentials.key, medium_credentials.key]);
+      .then(([smallCredentials, mediumCredentials]) => [smallCredentials.key, mediumCredentials.key]);
   }
 
   /**
@@ -60,14 +57,14 @@ z.assets.AssetService = class AssetService {
    * @param {Object} options - Asset upload options
    * @param {boolean} options.public - Flag whether asset is public
    * @param {z.assets.AssetRetentionPolicy} options.retention - Retention duration policy for asset
-   * @param {Function} xhr_accessor_function - Function will get a reference to the underlying XMLHTTPRequest
+   * @param {Function} [xhrAccessorFunction] - Function will get a reference to the underlying XMLHTTPRequest
    * @returns {Promise} Resolves when asset has been uploaded
    */
-  _upload_asset(bytes, options, xhr_accessor_function) {
-    return z.assets.AssetCrypto.encrypt_aes_asset(bytes).then(({cipher_text, key_bytes, sha256}) => {
-      return this.post_asset(new Uint8Array(cipher_text), options, xhr_accessor_function).then(({key, token}) => ({
+  _uploadAsset(bytes, options, xhrAccessorFunction) {
+    return z.assets.AssetCrypto.encryptAesAsset(bytes).then(({cipherText, keyBytes, sha256}) => {
+      return this.postAsset(new Uint8Array(cipherText), options, xhrAccessorFunction).then(({key, token}) => ({
         key,
-        key_bytes,
+        keyBytes,
         sha256,
         token,
       }));
@@ -82,16 +79,16 @@ z.assets.AssetService = class AssetService {
    * @param {Object} options - Asset upload options
    * @param {boolean} options.public - Flag whether asset is public
    * @param {z.assets.AssetRetentionPolicy} options.retention - Retention duration policy for asset
-   * @param {Function} xhr_accessor_function - Function will get a reference to the underlying XMLHTTPRequest
+   * @param {Function} xhrAccessorFunction - Function will get a reference to the underlying XMLHTTPRequest
    * @returns {Promise} Resolves when asset has been uploaded
    */
-  upload_asset(file, options, xhr_accessor_function) {
+  uploadAsset(file, options, xhrAccessorFunction) {
     return z.util
       .load_file_buffer(file)
-      .then(buffer => this._upload_asset(buffer, options, xhr_accessor_function))
-      .then(({key, key_bytes, sha256, token}) => {
+      .then(buffer => this._uploadAsset(buffer, options, xhrAccessorFunction))
+      .then(({key, keyBytes, sha256, token}) => {
         const asset = new z.proto.Asset();
-        asset.set('uploaded', new z.proto.Asset.RemoteData(key_bytes, sha256, key, token));
+        asset.set('uploaded', new z.proto.Asset.RemoteData(keyBytes, sha256, key, token));
         return asset;
       });
   }
@@ -106,13 +103,13 @@ z.assets.AssetService = class AssetService {
    * @param {z.assets.AssetRetentionPolicy} options.retention - Retention duration policy for asset
    * @returns {Promise} Resolves when asset has been uploaded
    */
-  upload_image_asset(image, options) {
-    return this._compress_image(image).then(([compressed_image, compressed_bytes]) => {
-      return this._upload_asset(compressed_bytes, options).then(({key, key_bytes, sha256, token}) => {
-        const image_meta_data = new z.proto.Asset.ImageMetaData(compressed_image.width, compressed_image.height);
+  uploadImageAsset(image, options) {
+    return this._compressImage(image).then(({compressedBytes, compressedImage}) => {
+      return this._uploadAsset(compressedBytes, options).then(({key, keyBytes, sha256, token}) => {
+        const imageMetadata = new z.proto.Asset.ImageMetaData(compressedImage.width, compressedImage.height);
         const asset = new z.proto.Asset();
-        asset.set('original', new z.proto.Asset.Original(image.type, compressed_bytes.length, null, image_meta_data));
-        asset.set('uploaded', new z.proto.Asset.RemoteData(key_bytes, sha256, key, token));
+        asset.set('original', new z.proto.Asset.Original(image.type, compressedBytes.length, null, imageMetadata));
+        asset.set('uploaded', new z.proto.Asset.RemoteData(keyBytes, sha256, key, token));
         return asset;
       });
     });
@@ -122,19 +119,19 @@ z.assets.AssetService = class AssetService {
    * Generates the URL an asset can be downloaded from.
    *
    * @deprecated
-   * @param {string} asset_id - ID of asset
-   * @param {string} conversation_id - Conversation ID
-   * @param {boolean} force_caching - Cache asset in ServiceWorker
-   * @returns {string} URL of v1 asset
+   * @param {string} assetId - ID of asset
+   * @param {string} conversationId - Conversation ID
+   * @param {boolean} forceCaching - Cache asset in ServiceWorker
+   * @returns {Promise} Resolves with URL of v1 asset
    */
-  generate_asset_url(asset_id, conversation_id, force_caching) {
+  generateAssetUrl(assetId, conversationId, forceCaching) {
     return Promise.resolve().then(() => {
-      z.util.ValidationUtil.asset.legacy(asset_id, conversation_id);
-      const url = this.client.create_url(`/assets/${asset_id}`);
-      const caching_param = force_caching ? '&forceCaching=true' : '';
-      const conversation_id_param = `&conv_id=${window.encodeURIComponent(conversation_id)}`;
+      z.util.ValidationUtil.asset.legacy(assetId, conversationId);
+      const url = this.client.create_url(`/assets/${assetId}`);
+      const cachingParam = forceCaching ? '&forceCaching=true' : '';
+      const conversationIdParam = `&conv_id=${window.encodeURIComponent(conversationId)}`;
 
-      return `${url}?access_token=${this.client.access_token}${conversation_id_param}${caching_param}`;
+      return `${url}?access_token=${this.client.access_token}${conversationIdParam}${cachingParam}`;
     });
   }
 
@@ -142,51 +139,51 @@ z.assets.AssetService = class AssetService {
    * Generates the URL for asset api v2.
    *
    * @deprecated
-   * @param {string} asset_id - ID of asset
-   * @param {string} conversation_id - Conversation ID
-   * @param {boolean} force_caching - Cache asset in ServiceWorker
-   * @returns {string} URL of v2 asset
+   * @param {string} assetId - ID of asset
+   * @param {string} conversationId - Conversation ID
+   * @param {boolean} forceCaching - Cache asset in ServiceWorker
+   * @returns {Promise} Resolves with URL of v2 asset
    */
-  generate_asset_url_v2(asset_id, conversation_id, force_caching) {
+  generateAssetUrlV2(assetId, conversationId, forceCaching) {
     return Promise.resolve().then(() => {
-      z.util.ValidationUtil.asset.legacy(asset_id, conversation_id);
-      const url = this.client.create_url(`/conversations/${conversation_id}/otr/assets/${asset_id}`);
-      const caching_param = force_caching ? '&forceCaching=true' : '';
+      z.util.ValidationUtil.asset.legacy(assetId, conversationId);
+      const url = this.client.create_url(`/conversations/${conversationId}/otr/assets/${assetId}`);
+      const cachingParam = forceCaching ? '&forceCaching=true' : '';
 
-      return `${url}?access_token=${this.client.access_token}${caching_param}`;
+      return `${url}?access_token=${this.client.access_token}${cachingParam}`;
     });
   }
 
   /**
    * Generates the URL for asset api v3.
    *
-   * @param {string} asset_key - ID of asset
-   * @param {string} asset_token - Asset token
-   * @param {boolean} force_caching - Cache asset in ServiceWorker
-   * @returns {string} URL of v3 asset
+   * @param {string} assetKey - ID of asset
+   * @param {string} assetToken - Asset token
+   * @param {boolean} forceCaching - Cache asset in ServiceWorker
+   * @returns {Promise} Resolves with URL of v3 asset
    */
-  generate_asset_url_v3(asset_key, asset_token, force_caching) {
+  generateAssetUrlV3(assetKey, assetToken, forceCaching) {
     return Promise.resolve().then(() => {
-      z.util.ValidationUtil.asset.v3(asset_key, asset_token);
-      const url = `${this.client.create_url(`/assets/v3/${asset_key}`)}`;
-      const asset_token_param = asset_token ? `&asset_token=${window.encodeURIComponent(asset_token)}` : '';
-      const caching_param = force_caching ? '&forceCaching=true' : '';
+      z.util.ValidationUtil.asset.v3(assetKey, assetToken);
+      const url = `${this.client.create_url(`/assets/v3/${assetKey}`)}`;
+      const assetTokenParam = assetToken ? `&asset_token=${window.encodeURIComponent(assetToken)}` : '';
+      const cachingParam = forceCaching ? '&forceCaching=true' : '';
 
-      return `${url}?access_token=${this.client.access_token}${asset_token_param}${caching_param}`;
+      return `${url}?access_token=${this.client.access_token}${assetTokenParam}${cachingParam}`;
     });
   }
 
   /**
    * Post assets.
    *
-   * @param {Uint8Array} asset_data - Asset data
+   * @param {Uint8Array} assetData - Asset data
    * @param {Object} metadata - Asset metadata
-   * @param {boolean} metadata.public - Flag whether asset is public
-   * @param {z.assets.AssetRetentionPolicy} metadata.retention - Retention duration policy for asset
-   * @param {Function} xhr_accessor_function - Function will get a reference to the underlying XMLHTTPRequest
+   * @param {boolean} [metadata.public] - Flag whether asset is public
+   * @param {z.assets.AssetRetentionPolicy} [metadata.retention] - Retention duration policy for asset
+   * @param {Function} [xhrAccessorFunction] - Function will get a reference to the underlying XMLHTTPRequest
    * @returns {Promise} Resolves when asset has been uploaded
    */
-  post_asset(asset_data, metadata, xhr_accessor_function) {
+  postAsset(assetData, metadata, xhrAccessorFunction) {
     return new Promise((resolve, reject) => {
       const BOUNDARY = 'frontier';
 
@@ -208,8 +205,8 @@ z.assets.AssetService = class AssetService {
       body += `${metadata}\r\n`;
       body += `--${BOUNDARY}\r\n`;
       body += 'Content-Type: application/octet-stream\r\n';
-      body += `Content-length: ${asset_data.length}\r\n`;
-      body += `Content-MD5: ${z.util.array_to_md5_base64(asset_data)}\r\n`;
+      body += `Content-length: ${assetData.length}\r\n`;
+      body += `Content-MD5: ${z.util.array_to_md5_base64(assetData)}\r\n`;
       body += '\r\n';
       const footer = `\r\n--${BOUNDARY}--\r\n`;
 
@@ -225,11 +222,11 @@ z.assets.AssetService = class AssetService {
       };
       xhr.onerror = reject;
 
-      if (typeof xhr_accessor_function === 'function') {
-        xhr_accessor_function(xhr);
+      if (typeof xhrAccessorFunction === 'function') {
+        xhrAccessorFunction(xhr);
       }
 
-      xhr.send(new Blob([body, asset_data, footer]));
+      xhr.send(new Blob([body, assetData, footer]));
     });
   }
 
@@ -238,8 +235,8 @@ z.assets.AssetService = class AssetService {
    * @param {File|Blob} image - Image to be compressed in ServiceWorker
    * @returns {Promise} Resolves with the compressed imaged
    */
-  _compress_image(image) {
-    return this._compress_image_with_worker('worker/image-worker.js', image, () => image.type === 'image/gif');
+  _compressImage(image) {
+    return this._compressImageWithWorker('worker/image-worker.js', image, () => image.type === 'image/gif');
   }
 
   /**
@@ -247,8 +244,8 @@ z.assets.AssetService = class AssetService {
    * @param {File|Blob} image - Profile image to be compressed in ServiceWorker
    * @returns {Promise} Resolves with the compressed profile imaged
    */
-  _compress_profile_image(image) {
-    return this._compress_image_with_worker('worker/profile-image-worker.js', image);
+  _compressProfileImage(image) {
+    return this._compressImageWithWorker('worker/profile-image-worker.js', image);
   }
 
   /**
@@ -258,7 +255,7 @@ z.assets.AssetService = class AssetService {
    * @param {Function} filter - Optional filter to be applied
    * @returns {Promise} Resolves with the compressed image
    */
-  _compress_image_with_worker(worker, image, filter) {
+  _compressImageWithWorker(worker, image, filter) {
     return z.util
       .load_file_buffer(image)
       .then(buffer => {
@@ -267,8 +264,10 @@ z.assets.AssetService = class AssetService {
         }
         return new z.util.Worker(worker).post(buffer);
       })
-      .then(compressed_bytes => {
-        return Promise.all([z.util.load_image(new Blob([compressed_bytes], {type: image.type})), compressed_bytes]);
+      .then(compressedBytes => {
+        return z.util
+          .load_image(new Blob([compressedBytes], {type: image.type}))
+          .then(compressedImage => ({compressedBytes, compressedImage}));
       });
   }
 };

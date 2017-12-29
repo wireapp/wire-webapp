@@ -56,7 +56,7 @@ z.components.MediaButtonComponent = class MediaButtonComponent {
 
     this.circle_download_progress = ko.pureComputed(() => {
       const size = this.large ? '200' : '100';
-      return `${this.asset.download_progress() * 2} ${size}`;
+      return `${this.asset.downloadProgress() * 2} ${size}`;
     });
 
     this.on_play_button_clicked = function() {

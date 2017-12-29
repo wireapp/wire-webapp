@@ -25,15 +25,15 @@ window.z.assets = z.assets || {};
 z.assets.AssetRemoteData = class AssetRemoteData {
   /**
    * Use either z.assets.AssetRemoteData.v2 or z.assets.AssetRemoteData.v3 to initialize.
-   * @param {Uint8Array} otr_key - Encryption key
+   * @param {Uint8Array} otrKey - Encryption key
    * @param {Uint8Array} sha256 - Checksum
    */
-  constructor(otr_key, sha256) {
-    this.otr_key = otr_key;
+  constructor(otrKey, sha256) {
+    this.otrKey = otrKey;
     this.sha256 = sha256;
-    this.download_progress = ko.observable();
-    this.cancel_download = undefined;
-    this.generate_url = undefined;
+    this.downloadProgress = ko.observable();
+    this.cancelDownload = undefined;
+    this.generateUrl = undefined;
     this.identifier = undefined;
 
     this.logger = new z.util.Logger('z.assets.AssetRemoteData', z.config.LOGGER.OPTIONS);
@@ -42,54 +42,51 @@ z.assets.AssetRemoteData = class AssetRemoteData {
   /**
    * Static initializer for v3 assets.
    *
-   * @param {string} asset_key - ID to retrieve asset with
-   * @param {Uint8Array} [otr_key] - Encryption key
+   * @param {string} assetKey - ID to retrieve asset with
+   * @param {Uint8Array} [otrKey] - Encryption key
    * @param {Uint8Array} [sha256] - Checksum
-   * @param {string} [asset_token] - Token data
-   * @param {boolean} [force_caching=false] - Cache asset in ServiceWorker
+   * @param {string} [assetToken] - Token data
+   * @param {boolean} [forceCaching=false] - Cache asset in ServiceWorker
    * @returns {z.assets.AssetRemoteData} V3 asset remote data
    */
-  static v3(asset_key, otr_key, sha256, asset_token, force_caching = false) {
-    const remote_data = new z.assets.AssetRemoteData(otr_key, sha256);
-    remote_data.generate_url = () =>
-      wire.app.service.asset.generate_asset_url_v3(asset_key, asset_token, force_caching);
-    remote_data.identifier = `${asset_key}`;
-    return remote_data;
+  static v3(assetKey, otrKey, sha256, assetToken, forceCaching = false) {
+    const remoteData = new z.assets.AssetRemoteData(otrKey, sha256);
+    remoteData.generateUrl = () => wire.app.service.asset.generateAssetUrlV3(assetKey, assetToken, forceCaching);
+    remoteData.identifier = `${assetKey}`;
+    return remoteData;
   }
 
   /**
    * Static initializer for v2 assets.
    *
-   * @param {string} conversation_id - ID of conversation
-   * @param {string} asset_id - ID to retrieve asset with
-   * @param {Uint8Array} otr_key - Encryption key
+   * @param {string} conversationId - ID of conversation
+   * @param {string} assetId - ID to retrieve asset with
+   * @param {Uint8Array} otrKey - Encryption key
    * @param {Uint8Array} sha256 - Checksum
-   * @param {boolean} [force_caching=false] - Cache asset in ServiceWorker
+   * @param {boolean} [forceCaching=false] - Cache asset in ServiceWorker
    * @returns {z.assets.AssetRemoteData} V2 asset remote data
    */
-  static v2(conversation_id, asset_id, otr_key, sha256, force_caching = false) {
-    const remote_data = new z.assets.AssetRemoteData(otr_key, sha256);
-    remote_data.generate_url = () =>
-      wire.app.service.asset.generate_asset_url_v2(asset_id, conversation_id, force_caching);
-    remote_data.identifier = `${conversation_id}${asset_id}`;
-    return remote_data;
+  static v2(conversationId, assetId, otrKey, sha256, forceCaching = false) {
+    const remoteData = new z.assets.AssetRemoteData(otrKey, sha256);
+    remoteData.generateUrl = () => wire.app.service.asset.generateAssetUrlV2(assetId, conversationId, forceCaching);
+    remoteData.identifier = `${conversationId}${assetId}`;
+    return remoteData;
   }
 
   /**
    * Static initializer for v1 assets.
    *
    * @deprecated
-   * @param {string} conversation_id - ID of conversation
-   * @param {string} asset_id - ID to retrieve asset with
-   * @param {boolean} [force_caching=false] - Cache asset in ServiceWorker
+   * @param {string} conversationId - ID of conversation
+   * @param {string} assetId - ID to retrieve asset with
+   * @param {boolean} [forceCaching=false] - Cache asset in ServiceWorker
    * @returns {z.assets.AssetRemoteData} V1 asset remote data
    */
-  static v1(conversation_id, asset_id, force_caching = false) {
-    const remote_data = new z.assets.AssetRemoteData();
-    remote_data.generate_url = () =>
-      wire.app.service.asset.generate_asset_url(asset_id, conversation_id, force_caching);
-    remote_data.identifier = `${conversation_id}${asset_id}`;
-    return remote_data;
+  static v1(conversationId, assetId, forceCaching = false) {
+    const remoteData = new z.assets.AssetRemoteData();
+    remoteData.generateUrl = () => wire.app.service.asset.generate_asset_url(assetId, conversationId, forceCaching);
+    remoteData.identifier = `${conversationId}${assetId}`;
+    return remoteData;
   }
 
   /**
@@ -97,17 +94,17 @@ z.assets.AssetRemoteData = class AssetRemoteData {
    * @returns {Promise<Blob>} Resolves with the decrypted asset data
    */
   load() {
-    let mime_type;
+    let type;
 
-    return this._load_buffer()
-      .then(([buffer, type]) => {
-        mime_type = type;
-        if (this.otr_key && this.sha256) {
-          return z.assets.AssetCrypto.decrypt_aes_asset(buffer, this.otr_key.buffer, this.sha256.buffer);
+    return this._loadBuffer()
+      .then(({buffer, mimeType}) => {
+        type = mimeType;
+        if (this.otrKey && this.sha256) {
+          return z.assets.AssetCrypto.decryptAesAsset(buffer, this.otrKey.buffer, this.sha256.buffer);
         }
         return buffer;
       })
-      .then(plaintext => new Blob([new Uint8Array(plaintext)], {mime_type}));
+      .then(plaintext => new Blob([new Uint8Array(plaintext)], {mime_type: type}));
   }
 
   /**
@@ -115,20 +112,20 @@ z.assets.AssetRemoteData = class AssetRemoteData {
    * @returns {Promise<string>} Object URL for asset
    */
   get_object_url() {
-    const object_url = z.assets.AssetURLCache.get_url(this.identifier);
+    const object_url = z.assets.AssetURLCache.getUrl(this.identifier);
     if (object_url) {
       return Promise.resolve(object_url);
     }
 
-    return this.load().then(blob => z.assets.AssetURLCache.set_url(this.identifier, window.URL.createObjectURL(blob)));
+    return this.load().then(blob => z.assets.AssetURLCache.setUrl(this.identifier, window.URL.createObjectURL(blob)));
   }
 
-  _load_buffer() {
-    return this.generate_url()
-      .then(generated_url => {
-        return z.util.load_url_buffer(generated_url, xhr => {
-          xhr.onprogress = event => this.download_progress(Math.round(event.loaded / event.total * 100));
-          return (this.cancel_download = () => xhr.abort.call(xhr));
+  _loadBuffer() {
+    return this.generateUrl()
+      .then(generatedUrl => {
+        return z.util.load_url_buffer(generatedUrl, xhr => {
+          xhr.onprogress = event => this.downloadProgress(Math.round(event.loaded / event.total * 100));
+          this.cancelDownload = () => xhr.abort.call(xhr);
         });
       })
       .catch(error => {
