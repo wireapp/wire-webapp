@@ -41,8 +41,8 @@ describe('Giphy Repository', () => {
     giphy_service = new z.extension.GiphyService(client);
     giphy_repository = new z.extension.GiphyRepository(giphy_service);
 
-    spyOn(giphy_service, 'get_random').and.callThrough();
-    spyOn(giphy_service, 'get_by_id').and.callThrough();
+    spyOn(giphy_service, 'getRandom').and.callThrough();
+    spyOn(giphy_service, 'getById').and.callThrough();
 
     const random_foo_gif = `${urls.rest_url}/proxy/giphy/v1/gifs/random?tag=foo`;
     /* eslint-disable comma-spacing, key-spacing, no-useless-escape, sort-keys, quotes */
@@ -217,13 +217,13 @@ describe('Giphy Repository', () => {
     server.restore();
   });
 
-  describe('get_random_gif', () => {
+  describe('getRandomGif', () => {
     it('can receive a random gif', done => {
       giphy_repository
-        .get_random_gif({tag: 'foo'})
+        .getRandomGif({tag: 'foo'})
         .then(() => {
-          expect(giphy_service.get_random).toHaveBeenCalled();
-          expect(giphy_service.get_by_id).toHaveBeenCalled();
+          expect(giphy_service.getRandom).toHaveBeenCalled();
+          expect(giphy_service.getById).toHaveBeenCalled();
           done();
         })
         .catch(done.fail);

@@ -23,14 +23,22 @@ window.z = window.z || {};
 window.z.extension = z.extension || {};
 
 z.extension.GiphyRepository = class GiphyRepository {
+  static get CONFIG() {
+    return {
+      MAX_RETRIES: 3,
+      MAX_SIZE: 3 * 1024 * 1024, // 3MB
+      NUMBER_OF_RESULTS: 6,
+    };
+  }
+
   /**
    * Construct a new Giphy Repository.
-   * @param {z.extension.GiphyService} giphy_service - Giphy REST API implementation
+   * @param {z.extension.GiphyService} giphyService - Giphy REST API implementation
    */
-  constructor(giphy_service) {
-    this.giphy_service = giphy_service;
+  constructor(giphyService) {
+    this.giphyService = giphyService;
     this.logger = new z.util.Logger('z.extension.GiphyRepository', z.config.LOGGER.OPTIONS);
-    this.gif_query_cache = {};
+    this.gifQueryCache = {};
   }
 
   /**
@@ -42,41 +50,43 @@ z.extension.GiphyRepository = class GiphyRepository {
    * @param {number} [options.max_size=3MB] - Maximum gif size in bytes
    * @returns {Promise} Resolves with a random matching gif
    */
-  get_random_gif(options) {
+  getRandomGif(options) {
     options = $.extend(
       {
-        max_size: 3 * 1024 * 1024,
-        retry: 3,
+        maxRetries: GiphyRepository.CONFIG.MAX_RETRIES,
+        maxSize: GiphyRepository.CONFIG.MAX_SIZE,
       },
       options
     );
 
-    const _get_random_gif = (retries = 0) => {
-      if (options.retry === retries) {
-        throw new Error(`Unable to fetch a proper gif within ${options.retry} retries`);
+    const _getRandomGif = (retry = 0) => {
+      const hasReachedRetryLimit = retry >= options.maxRetries;
+      if (hasReachedRetryLimit) {
+        throw new Error(`Unable to fetch a proper gif within ${options.maxRetries} retries`);
       }
 
-      return this.giphy_service
-        .get_random(options.tag)
-        .then(({data: random_gif}) => this.giphy_service.get_by_id(random_gif.id))
+      return this.giphyService
+        .getRandom(options.tag)
+        .then(({data: randomGif}) => this.giphyService.getById(randomGif.id))
         .then(({data: {images, url}}) => {
-          const static_gif = images[z.extension.GiphyContentSizes.FIXED_WIDTH_STILL];
-          const animated_gif = images[z.extension.GiphyContentSizes.DOWNSIZED];
+          const staticGif = images[z.extension.GiphyContentSizes.FIXED_WIDTH_STILL];
+          const animatedGif = images[z.extension.GiphyContentSizes.DOWNSIZED];
 
-          if (animated_gif.size > options.max_size) {
-            this.logger.info(`Gif size (${animated_gif.size}) is over maximum size (${animated_gif.size})`);
-            return _get_random_gif(retries + 1);
+          const exceedsMaxSize = animatedGif.size > options.maxSize;
+          if (exceedsMaxSize) {
+            this.logger.info(`Gif size (${animatedGif.size}) is over maximum size (${animatedGif.size})`);
+            return _getRandomGif(retry + 1);
           }
 
           return {
-            animated: animated_gif.url,
-            static: static_gif.url,
+            animated: animatedGif.url,
+            static: staticGif.url,
             url: url,
           };
         });
     };
 
-    return _get_random_gif();
+    return _getRandomGif();
   }
 
   /**
@@ -90,14 +100,14 @@ z.extension.GiphyRepository = class GiphyRepository {
    * @param {string} [options.sorting='recent'] - Specify sorting ('relevant' or 'recent')
    * @returns {Promise} Resolves with gifs
    */
-  get_gifs(options) {
+  getGifs(options) {
     let offset = 0;
 
     options = $.extend(
       {
-        max_size: 3 * 1024 * 1024,
-        number: 6,
+        maxSize: GiphyRepository.CONFIG.MAX_SIZE,
         random: true,
+        results: GiphyRepository.CONFIG.NUMBER_OF_RESULTS,
         sorting: 'relevant',
       },
       options
@@ -112,19 +122,15 @@ z.extension.GiphyRepository = class GiphyRepository {
     if (options.random) {
       options.sorting = z.util.ArrayUtil.random_element(['recent', 'relevant']);
 
-      const total = this.gif_query_cache[options.query];
+      const total = this.gifQueryCache[options.query];
       if (total) {
-        if (options.number >= total) {
-          offset = 0;
-        } else {
-          const range = total - options.number;
-          offset = Math.floor(Math.random() * range);
-        }
+        const resultExceedsTotal = options.results >= total;
+        offset = resultExceedsTotal ? 0 : Math.floor(Math.random() * total - options.number);
       }
     }
 
-    return this.giphy_service
-      .get_search({
+    return this.giphyService
+      .getSearch({
         limit: 100,
         offset: offset,
         // eslint-disable-next-line id-length
@@ -138,18 +144,18 @@ z.extension.GiphyRepository = class GiphyRepository {
           gifs = gifs.sort(() => 0.5 - Math.random());
         }
 
-        this.gif_query_cache[options.query] = pagination.total_count;
+        this.gifQueryCache[options.query] = pagination.total_count;
 
-        for (const gif of gifs.slice(0, options.number)) {
-          const {images} = gif;
-          const static_gif = images[z.extension.GiphyContentSizes.FIXED_WIDTH_STILL];
-          const animation_gif = images[z.extension.GiphyContentSizes.DOWNSIZED];
+        for (const {images, url} of gifs.slice(0, options.number)) {
+          const staticGif = images[z.extension.GiphyContentSizes.FIXED_WIDTH_STILL];
+          const animatedGif = images[z.extension.GiphyContentSizes.DOWNSIZED];
 
-          if (animation_gif.size <= options.max_size) {
+          const exceedsMaxSize = animatedGif.size > options.maxSize;
+          if (!exceedsMaxSize) {
             result.push({
-              animated: animation_gif.url,
-              static: static_gif.url,
-              url: gif.url,
+              animated: animatedGif.url,
+              static: staticGif.url,
+              url: url,
             });
           }
         }
