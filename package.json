@@ -16,7 +16,7 @@
     "babel-plugin-transform-object-rest-spread": "6.26.0",
     "babel-preset-env": "1.6.1",
     "babel-preset-react": "6.24.1",
-    "browser-sync": "2.22.0",
+    "browser-sync": "2.23.2",
     "gulp": "3.9.1",
     "gulp-plumber": "1.1.0",
     "gulp-sass": "3.1.0",
