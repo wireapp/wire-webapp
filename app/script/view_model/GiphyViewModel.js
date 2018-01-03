@@ -150,7 +150,7 @@ z.ViewModel.GiphyViewModel = class GiphyViewModel {
       this.show_giphy_button(true);
 
       this.giphy_repository
-        .get_random_gif({
+        .getRandomGif({
           tag: this.query(),
         })
         .then(gif => {
@@ -172,7 +172,7 @@ z.ViewModel.GiphyViewModel = class GiphyViewModel {
       this.show_giphy_button(false);
 
       this.giphy_repository
-        .get_gifs({
+        .getGifs({
           number: GiphyViewModel.CONFIG.NUMBER_OF_GIFS,
           query: this.query(),
         })

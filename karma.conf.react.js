@@ -21,6 +21,7 @@ module.exports = function(config) {
   config.set({
     autoWatch: false,
     basePath: '',
+    browserNoActivityTimeout: 20000,
     browsers: ['ChromeNoSandbox'],
     client: {
       useIframe: false,

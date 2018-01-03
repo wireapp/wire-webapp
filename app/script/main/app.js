@@ -593,7 +593,7 @@ z.main.App = class App {
    * @returns {undefined} No return value
    */
   _show_ui() {
-    const conversation_et = this.repository.conversation.get_most_recent_conversation();
+    const conversation_et = this.repository.conversation.getMostRecentConversation();
     this.logger.info('Showing application UI');
     if (this.repository.user.should_change_username()) {
       amplify.publish(z.event.WebApp.TAKEOVER.SHOW);
