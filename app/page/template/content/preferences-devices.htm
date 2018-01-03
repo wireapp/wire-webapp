@@ -36,7 +36,7 @@
                   <div class="preferences-devices-model" data-bind="text: model" data-uie-name="preferences-device-active-model"></div>
                   <div class="preferences-devices-id">
                     <span data-bind="l10n_text: z.string.preferences_devices_id"></span>
-                    <span data-bind="foreach: z.util.zero_padding(id, 16).match(/.{1,2}/g)" data-uie-name="preferences-device-active-id"><span class="device-id-part" data-bind="text: $data"></span></span>
+                    <span data-bind="foreach: formatId()" data-uie-name="preferences-device-active-id"><span class="device-id-part" data-bind="text: $data"></span></span>
                   </div>
                 </div>
               </div>
