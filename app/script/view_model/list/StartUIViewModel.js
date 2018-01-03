@@ -78,7 +78,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.search = _.debounce(query => {
       this.clear_search_results();
 
-      const normalized_query = z.search.SearchRepository.normalize_query(query);
+      const normalized_query = z.search.SearchRepository.normalizeQuery(query);
       if (normalized_query) {
         this.show_matches(false);
 
@@ -89,8 +89,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
         this.search_repository
           .search_by_name(normalized_query, is_handle)
           .then(user_ets => {
-            const is_current_query =
-              normalized_query === z.search.SearchRepository.normalize_query(this.search_input());
+            const is_current_query = normalized_query === z.search.SearchRepository.normalizeQuery(this.search_input());
             if (is_current_query) {
               this.search_results.others(user_ets);
             }

@@ -22,8 +22,8 @@
 window.z = window.z || {};
 window.z.search = z.search || {};
 
-z.search.FullTextSearch = (function() {
-  const _get_search_regex = function(query) {
+z.search.FullTextSearch = (() => {
+  const _getSearchRegex = query => {
     const delimiter = ' ';
     const flags = 'gumi';
     const regex = query
@@ -35,17 +35,17 @@ z.search.FullTextSearch = (function() {
     return new RegExp(regex, flags);
   };
 
-  const _search = function(text, query = '') {
+  const _search = (text, query = '') => {
     query = query.trim();
 
     if (query.length > 0) {
-      return _get_search_regex(query).test(text);
+      return _getSearchRegex(query).test(text);
     }
     return false;
   };
 
   return {
-    get_search_regex: _get_search_regex,
+    getSearchRegex: _getSearchRegex,
     search: _search,
   };
 })();

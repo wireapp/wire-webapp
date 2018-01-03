@@ -46,7 +46,6 @@ z.user.UserRepository = class UserRepository {
   constructor(user_service, asset_service, search_service, client_repository, cryptography_repository) {
     this.user_service = user_service;
     this.asset_service = asset_service;
-    this.search_service = search_service;
     this.client_repository = client_repository;
     this.cryptography_repository = cryptography_repository;
     this.logger = new z.util.Logger('z.user.UserRepository', z.config.LOGGER.OPTIONS);
