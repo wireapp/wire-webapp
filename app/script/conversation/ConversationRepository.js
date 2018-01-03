@@ -684,10 +684,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
       return this.create_new_conversation([user_et.id], undefined).then(({conversation_et}) => conversation_et);
     }
 
-    return this.fetch_conversation_by_id(user_et.connection().conversation_id).then(conversation_et => {
-      conversation_et.connection(user_et.connection());
-      return this.update_participating_user_ets(conversation_et);
-    });
+    return this.fetch_conversation_by_id(user_et.connection().conversation_id)
+      .then(conversation_et => {
+        conversation_et.connection(user_et.connection());
+        return this.update_participating_user_ets(conversation_et);
+      })
+      .catch(error => {
+        if (error.type !== z.conversation.ConversationError.TYPE.NOT_FOUND) {
+          throw error;
+        }
+      });
   }
 
   /**
