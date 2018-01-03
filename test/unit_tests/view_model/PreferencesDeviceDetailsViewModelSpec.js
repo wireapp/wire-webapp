@@ -45,7 +45,7 @@ describe('z.ViewModel.content.PreferencesDeviceDetailsViewModel', () => {
       const location = 'Paris, FR';
       viewModel._update_activation_location(location);
       const sanitizedText = viewModel.activated_in();
-      expect(sanitizedText[1]).toBe(location);
+      expect(sanitizedText[1].text).toBe(location);
     });
   });
 });
