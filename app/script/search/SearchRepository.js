@@ -35,7 +35,7 @@ z.search.SearchRepository = class SearchRepository {
    * @param {string} query - Search string
    * @returns {string} Normalized search query
    */
-  static normalize_query(query) {
+  static normalizeQuery(query) {
     if (!_.isString(query)) {
       return '';
     }
@@ -47,12 +47,12 @@ z.search.SearchRepository = class SearchRepository {
 
   /**
    * Construct a new Conversation Repository.
-   * @param {z.search.SearchService} search_service - Backend REST API search service implementation
-   * @param {z.user.UserRepository} user_repository - Repository for all user and connection interactions
+   * @param {z.search.SearchService} searchService - Backend REST API search service implementation
+   * @param {z.user.UserRepository} userRepository - Repository for all user and connection interactions
    */
-  constructor(search_service, user_repository) {
-    this.search_service = search_service;
-    this.user_repository = user_repository;
+  constructor(searchService, userRepository) {
+    this.searchService = searchService;
+    this.userRepository = userRepository;
     this.logger = new z.util.Logger('z.search.SearchRepository', z.config.LOGGER.OPTIONS);
   }
 
@@ -61,44 +61,46 @@ z.search.SearchRepository = class SearchRepository {
    * @note We skip a few results as connection changes need a while to reflect on the backend.
    *
    * @param {string} name - Search query
-   * @param {boolean} is_handle - Is query a user handle
-   * @param {number} [max_results=SearchRepository.CONFIG.MAX_SEARCH_RESULTS] - Maximum number of results
+   * @param {boolean} isHandle - Is query a user handle
+   * @param {number} [maxResults=SearchRepository.CONFIG.MAX_SEARCH_RESULTS] - Maximum number of results
    * @returns {Promise} Resolves with the search results
    */
-  search_by_name(name, is_handle, max_results = SearchRepository.CONFIG.MAX_SEARCH_RESULTS) {
-    const directory_search = this.search_service
-      .get_contacts(name, SearchRepository.CONFIG.MAX_DIRECTORY_RESULTS)
+  search_by_name(name, isHandle, maxResults = SearchRepository.CONFIG.MAX_SEARCH_RESULTS) {
+    const directorySearch = this.searchService
+      .getContacts(name, SearchRepository.CONFIG.MAX_DIRECTORY_RESULTS)
       .then(({documents}) => documents.map(match => match.id));
 
-    const search_promises = [directory_search];
+    const searchPromises = [directorySearch];
 
     if (z.user.UserHandleGenerator.validate_handle(name)) {
-      search_promises.push(this.user_repository.get_user_id_by_handle(name));
+      searchPromises.push(this.userRepository.get_user_id_by_handle(name));
     }
 
-    return Promise.all(search_promises)
-      .then(([directory_results, username_result]) => {
-        if (username_result && !directory_results.includes(username_result)) {
-          directory_results.push(username_result);
+    return Promise.all(searchPromises)
+      .then(([directoryResults, usernameResult]) => {
+        if (usernameResult && !directoryResults.includes(usernameResult)) {
+          directoryResults.push(usernameResult);
         }
 
-        return directory_results;
+        return directoryResults;
       })
-      .then(user_ids => this.user_repository.get_users_by_id(user_ids))
-      .then(user_ets => user_ets.filter(user_et => !user_et.is_connected() && !user_et.is_team_member()))
-      .then(user_ets => {
-        if (is_handle) {
-          user_ets = user_ets.filter(user_et => z.util.StringUtil.starts_with(user_et.username(), name));
+      .then(userIds => this.userRepository.get_users_by_id(userIds))
+      .then(userEntities => {
+        return userEntities.filter(userEntity => !userEntity.is_connected() && !userEntity.is_team_member());
+      })
+      .then(userEntities => {
+        if (isHandle) {
+          userEntities = userEntities.filter(userEntity => z.util.StringUtil.starts_with(userEntity.username(), name));
         }
 
-        return user_ets
-          .sort((user_a, user_b) => {
-            if (is_handle) {
-              return z.util.StringUtil.sort_by_priority(user_a.username(), user_b.username(), name);
+        return userEntities
+          .sort((userA, userB) => {
+            if (isHandle) {
+              return z.util.StringUtil.sort_by_priority(userA.username(), userB.username(), name);
             }
-            return z.util.StringUtil.sort_by_priority(user_a.name(), user_b.name(), name);
+            return z.util.StringUtil.sort_by_priority(userA.name(), userB.name(), name);
           })
-          .slice(0, max_results);
+          .slice(0, maxResults);
       });
   }
 };
