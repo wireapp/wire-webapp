@@ -547,8 +547,8 @@ z.util.is_iso_string = function(date_string) {
   return /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z)/.test(date_string);
 };
 
-z.util.sort_groups_by_last_event = function(group_a, group_b) {
-  return group_b.last_event_timestamp() - group_a.last_event_timestamp();
+z.util.sort_groups_by_last_event = (groupA, groupB) => {
+  return groupB.last_event_timestamp() - groupA.last_event_timestamp();
 };
 
 z.util.sort_object_by_keys = function(object, reverse) {
