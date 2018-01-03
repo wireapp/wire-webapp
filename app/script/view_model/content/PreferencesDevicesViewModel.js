@@ -44,9 +44,7 @@ z.ViewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
     this.self_user = this.client_repository.self_user;
 
     this.current_client = this.client_repository.currentClient;
-    this.displayClientId = ko.pureComputed(
-      () => (this.current_client() ? z.util.zero_padding(this.current_client().id, 16) : '')
-    );
+    this.displayClientId = ko.pureComputed(() => (this.current_client() ? this.current_client().formatId() : []));
 
     this.activated_in = ko.observable([]);
     this.activated_on = ko.observable([]);

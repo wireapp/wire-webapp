@@ -6,7 +6,7 @@
         <header class="preferences-header" data-bind="l10n_text: z.string.preferences_devices_current"></header>
         <div class="preferences-devices-model" data-bind="text: current_client().model"></div>
         <div class="preferences-devices-id"><span data-bind="l10n_text: z.string.preferences_devices_id"></span>
-          <span data-bind="foreach: displayClientId().match(/.{1,2}/g)" data-uie-name="preferences-device-current-id"><span class="device-id-part" data-bind="text: $data"></span></span>
+          <span data-bind="foreach: displayClientId()" data-uie-name="preferences-device-current-id"><span class="device-id-part" data-bind="text: $data"></span></span>
         </div>
         <div class="preferences-devices-activated">
           <div data-bind="foreach: activated_on"><span data-bind="css: {'preferences-devices-activated-bold': $data.isStyled}, text: $data.text">?</span></div>
