@@ -374,7 +374,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
         click_on_show_my_devices() {
           amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_DEVICES);
         },
-        device: this.client_repository.current_client,
+        device: this.client_repository.currentClient,
         fingerprint_local: this.fingerprint_local,
       },
       template: '#template-confirm-my-fingerprint',
