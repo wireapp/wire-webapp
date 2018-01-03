@@ -122,7 +122,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
     this.devices_found = ko.observable();
     this.selected_device = ko.observable();
     this.fingerprint_remote = ko.observable('');
-    this.fingerprint_local = ko.observable('');
+    this.fingerprint_local = ko.observableArray([]);
     this.is_resetting_session = ko.observable(false);
 
     // destroy confirm dialog when user changes
@@ -145,7 +145,9 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
 
     this.selected_device_subscription = this.selected_device.subscribe(() => {
       if (this.selected_device()) {
-        this.fingerprint_local(this.cryptography_repository.get_local_fingerprint());
+        this.fingerprint_local(
+          z.util.zero_padding(this.cryptography_repository.get_local_fingerprint(), 16).match(/.{1,2}/g)
+        );
         this.fingerprint_remote('');
         this.cryptography_repository
           .get_remote_fingerprint(this.user().id, this.selected_device().id)
