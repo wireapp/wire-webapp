@@ -17,7 +17,7 @@
           <div data-bind="foreach: activated_in"><span data-bind="css: {'preferences-devices-activated-bold': $data.isStyled}, text: $data.text">?</span></div>
         </div>
         <div class="preferences-devices-fingerprint-label" data-bind="l10n_text: z.string.preferences_devices_fingerprint"></div>
-        <div class="preferences-devices-fingerprint" data-bind="foreach: fingerprint().match(/.{1,2}/g)"><span class="device-id-part" data-bind="text: $data"></span></div>
+        <div class="preferences-devices-fingerprint" data-bind="foreach: fingerprint()"><span class="device-id-part" data-bind="text: $data"></span></div>
         <div class="preferences-devices-verification slider">
           <input class="slider-input" type="checkbox" name="preferences_device_verification_toggle" id="preferences_device_verification" data-bind="checked: device().meta.is_verified">
           <label class="button-label" for="preferences_device_verification" data-bind="click: toggle_device_verification, l10n_text: z.string.preferences_devices_verification" data-uie-name="do-verify"></label>

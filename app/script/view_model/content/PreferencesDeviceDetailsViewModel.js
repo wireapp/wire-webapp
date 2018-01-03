@@ -44,7 +44,7 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
     this.device.subscribe(device_et => {
       if (device_et) {
         this.session_reset_state(z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET);
-        this.fingerprint('');
+        this.fingerprint([]);
         this._update_fingerprint();
         this._update_activation_location('?');
         this._update_activation_time(device_et.time);
@@ -57,7 +57,7 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
     this.session_reset_state = ko.observable(
       z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET
     );
-    this.fingerprint = ko.observable('');
+    this.fingerprint = ko.observableArray([]);
 
     this.activated_in = ko.observableArray([]);
     this.activated_on = ko.observableArray([]);
@@ -85,7 +85,7 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
 
   _update_fingerprint() {
     this.cryptography_repository.get_remote_fingerprint(this.self_user().id, this.device().id).then(fingerprint => {
-      this.fingerprint(z.util.zero_padding(fingerprint, 16));
+      this.fingerprint(z.util.zero_padding(fingerprint, 16).match(/.{1,2}/g));
     });
   }
 
