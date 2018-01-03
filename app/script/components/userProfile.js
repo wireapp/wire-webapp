@@ -121,7 +121,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
     this.devices = ko.observableArray();
     this.devices_found = ko.observable();
     this.selected_device = ko.observable();
-    this.fingerprint_remote = ko.observable('');
+    this.fingerprint_remote = ko.observableArray([]);
     this.fingerprint_local = ko.observableArray([]);
     this.is_resetting_session = ko.observable(false);
 
@@ -133,7 +133,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
       this.tab_index(0);
       this.devices_found(null);
       this.selected_device(null);
-      this.fingerprint_remote('');
+      this.fingerprint_remote([]);
       this.is_resetting_session(false);
     });
 
@@ -145,13 +145,11 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
 
     this.selected_device_subscription = this.selected_device.subscribe(() => {
       if (this.selected_device()) {
-        this.fingerprint_local(
-          z.util.zero_padding(this.cryptography_repository.get_local_fingerprint(), 16).match(/.{1,2}/g)
-        );
-        this.fingerprint_remote('');
+        this.fingerprint_local(this.formatFingerprint(this.cryptography_repository.get_local_fingerprint()));
+        this.fingerprint_remote([]);
         this.cryptography_repository
           .get_remote_fingerprint(this.user().id, this.selected_device().id)
-          .then(fingerprint => this.fingerprint_remote(fingerprint));
+          .then(fingerprint => this.fingerprint_remote(this.formatFingerprint(fingerprint)));
       }
     });
 
@@ -234,6 +232,8 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
         }, SHOW_CONVERSATION_DELAY);
       });
     };
+
+    this.formatFingerprint = fingerprint => z.util.zero_padding(fingerprint, 16).match(/.{1,2}/g);
 
     this.on_connect = () => {
       this.user_repository
