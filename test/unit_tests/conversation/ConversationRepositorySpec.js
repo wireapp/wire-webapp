@@ -670,7 +670,7 @@ describe('ConversationRepository', () => {
       let create_event = null;
 
       beforeEach(() => {
-        spyOn(TestFactory.conversation_repository, '_on_create').and.callThrough();
+        spyOn(TestFactory.conversation_repository, '_onCreate').and.callThrough();
         spyOn(TestFactory.conversation_repository, 'map_conversations').and.returnValue(true);
         spyOn(TestFactory.conversation_repository, 'update_participating_user_ets').and.returnValue(true);
         spyOn(TestFactory.conversation_repository, 'save_conversation').and.returnValue(true);
@@ -684,7 +684,7 @@ describe('ConversationRepository', () => {
         TestFactory.conversation_repository
           .onConversationEvent(create_event)
           .then(() => {
-            expect(TestFactory.conversation_repository._on_create).toHaveBeenCalled();
+            expect(TestFactory.conversation_repository._onCreate).toHaveBeenCalled();
             expect(TestFactory.conversation_repository.map_conversations).toHaveBeenCalledWith(create_event.data, 1);
             expect(TestFactory.conversation_repository._prepare_conversation_create_notification).toHaveBeenCalled();
             done();
@@ -699,7 +699,7 @@ describe('ConversationRepository', () => {
         TestFactory.conversation_repository
           .onConversationEvent(create_event)
           .then(() => {
-            expect(TestFactory.conversation_repository._on_create).toHaveBeenCalled();
+            expect(TestFactory.conversation_repository._onCreate).toHaveBeenCalled();
             expect(TestFactory.conversation_repository.map_conversations).toHaveBeenCalledWith(
               create_event.data,
               time.getTime()

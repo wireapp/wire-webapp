@@ -207,7 +207,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   create_new_conversation(user_ids, name) {
     return this.conversation_service
       .create_conversation(user_ids, name, this.team().id)
-      .then(response => this._on_create({conversation: response.id, data: response}))
+      .then(response => this._onCreate({conversation: response.id, data: response}))
       .catch(error => {
         if (error.label === z.service.BackendClientError.LABEL.NOT_CONNECTED) {
           return this._handle_users_not_connected(user_ids);
@@ -614,12 +614,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   /**
    * Get the most recent event timestamp from any conversation.
+   * @param {boolean} [increment=false] - Increment by one for unique timestamp
    * @returns {number} Timestamp value
    */
-  get_latest_event_timestamp() {
-    const [most_recent_conversation] = this.sorted_conversations();
-    if (most_recent_conversation) {
-      return most_recent_conversation.last_event_timestamp();
+  getLatestEventTimestamp(increment = false) {
+    const mostRecentConversation = this.getMostRecentConversation(true);
+    if (mostRecentConversation) {
+      const lastEventTimestamp = mostRecentConversation.last_event_timestamp();
+      return lastEventTimestamp + (increment ? 1 : 0);
     }
 
     return 1;
@@ -637,10 +639,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   /**
    * Get unarchived conversation with the most recent event.
+   * @param {boolean} [allConversations=false] - Search all conversations
    * @returns {Conversation} Most recent conversation
    */
-  get_most_recent_conversation() {
-    const [conversation_et] = this.conversations_unarchived();
+  getMostRecentConversation(allConversations = false) {
+    const [conversation_et] = allConversations ? this.sorted_conversations() : this.conversations_unarchived();
     return conversation_et;
   }
 
@@ -805,10 +808,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Map conversation payload.
    *
    * @param {JSON} payload - Payload to map
-   * @param {number} [initial_timestamp=this.get_latest_event_timestamp()] - Initial server and event timestamp
+   * @param {number} [initial_timestamp=this.getLatestEventTimestamp()] - Initial server and event timestamp
    * @returns {z.entity.Conversation|Array<z.entity.Conversation>} Mapped conversation/s
    */
-  map_conversations(payload, initial_timestamp = this.get_latest_event_timestamp()) {
+  map_conversations(payload, initial_timestamp = this.getLatestEventTimestamp()) {
     const conversation_data = payload.length ? payload : [payload];
 
     const conversation_ets = this.conversation_mapper.map_conversations(conversation_data, initial_timestamp);
@@ -2508,7 +2511,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     // Handle conversation create event separately
     if (type === z.event.Backend.CONVERSATION.CREATE) {
-      return this._on_create(eventJson);
+      return this._onCreate(eventJson);
     }
 
     const inSelfConversation = conversationId === this.self_conversation() && this.self_conversation().id;
@@ -2717,20 +2720,21 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * A conversation was created.
    *
    * @private
-   * @param {Object} event_json - JSON data of 'conversation.create' event
+   * @param {Object} eventJson - JSON data of 'conversation.create' event
    * @returns {Promise} Resolves when the event was handled
    */
-  _on_create(event_json) {
-    return this.find_conversation_by_id(event_json.conversation)
+  _onCreate(eventJson) {
+    return this.find_conversation_by_id(eventJson.conversation)
       .catch(error => {
-        if (error.type !== z.conversation.ConversationError.TYPE.NOT_FOUND) {
+        const isConversationNotFound = error.type === z.conversation.ConversationError.TYPE.NOT_FOUND;
+        if (!isConversationNotFound) {
           throw error;
         }
 
-        const {data: event_data, time} = event_json;
-        const event_timestamp = new Date(time).getTime();
-        const initial_timestamp = _.isNaN(event_timestamp) ? this.get_latest_event_timestamp() : event_timestamp;
-        return this.map_conversations(event_data, initial_timestamp);
+        const {data: eventData, time} = eventJson;
+        const eventTimestamp = new Date(time).getTime();
+        const initial_timestamp = _.isNaN(eventTimestamp) ? this.getLatestEventTimestamp(true) : eventTimestamp;
+        return this.map_conversations(eventData, initial_timestamp);
       })
       .then(conversation_et => this.update_participating_user_ets(conversation_et))
       .then(conversation_et => this.save_conversation(conversation_et))
