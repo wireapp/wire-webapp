@@ -559,14 +559,14 @@ describe('z.cryptography.CryptographyMapper', () => {
       const generic_message = new z.proto.GenericMessage(generic_message_id);
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, new z.proto.Text(plaintext));
 
-      z.assets.AssetCrypto.encrypt_aes_asset(generic_message.toArrayBuffer())
-        .then(({cipher_text, key_bytes, sha256}) => {
-          key_bytes = new Uint8Array(key_bytes);
+      z.assets.AssetCrypto.encryptAesAsset(generic_message.toArrayBuffer())
+        .then(({cipherText, keyBytes, sha256}) => {
+          keyBytes = new Uint8Array(keyBytes);
           sha256 = new Uint8Array(sha256);
-          event.data.data = z.util.array_to_base64(cipher_text);
+          event.data.data = z.util.array_to_base64(cipherText);
 
           const external_message = new z.proto.GenericMessage(z.util.create_random_uuid());
-          external_message.set('external', new z.proto.External(key_bytes, sha256));
+          external_message.set('external', new z.proto.External(keyBytes, sha256));
 
           return mapper.map_generic_message(external_message, event);
         })
@@ -585,14 +585,14 @@ describe('z.cryptography.CryptographyMapper', () => {
       const ping = new z.proto.GenericMessage(generic_message_id);
       ping.set('knock', new z.proto.Knock(false));
 
-      z.assets.AssetCrypto.encrypt_aes_asset(ping.toArrayBuffer())
-        .then(({cipher_text, key_bytes, sha256}) => {
-          key_bytes = new Uint8Array(key_bytes);
+      z.assets.AssetCrypto.encryptAesAsset(ping.toArrayBuffer())
+        .then(({cipherText, keyBytes, sha256}) => {
+          keyBytes = new Uint8Array(keyBytes);
           sha256 = new Uint8Array(sha256);
-          event.data.data = z.util.array_to_base64(cipher_text);
+          event.data.data = z.util.array_to_base64(cipherText);
 
           external_message = new z.proto.GenericMessage(z.util.create_random_uuid());
-          external_message.set('external', new z.proto.External(key_bytes, sha256));
+          external_message.set('external', new z.proto.External(keyBytes, sha256));
           return mapper.map_generic_message(external_message, event);
         })
         .then(event_json => {

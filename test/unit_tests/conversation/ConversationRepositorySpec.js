@@ -149,9 +149,11 @@ describe('ConversationRepository', () => {
         ._on_asset_upload_complete(conversation_et, event)
         .then(() => {
           expect(TestFactory.conversation_service.update_asset_as_uploaded_in_db).toHaveBeenCalled();
-          expect(message_et.assets()[0].original_resource().otr_key).toBe(event.data.otr_key);
-          expect(message_et.assets()[0].original_resource().sha256).toBe(event.data.sha256);
-          expect(message_et.assets()[0].status()).toBe(z.assets.AssetTransferState.UPLOADED);
+
+          const [firstAsset] = message_et.assets();
+          expect(firstAsset.original_resource().otrKey).toBe(event.data.otr_key);
+          expect(firstAsset.original_resource().sha256).toBe(event.data.sha256);
+          expect(firstAsset.status()).toBe(z.assets.AssetTransferState.UPLOADED);
           done();
         })
         .catch(done.fail);

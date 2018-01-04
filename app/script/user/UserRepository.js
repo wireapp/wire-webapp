@@ -1034,7 +1034,7 @@ z.user.UserRepository = class UserRepository {
    */
   change_picture(picture) {
     return this.asset_service
-      .upload_profile_image(picture)
+      .uploadProfileImage(picture)
       .then(([small_key, medium_key]) => {
         const assets = [
           {key: small_key, size: 'preview', type: 'image'},
