@@ -24,78 +24,78 @@ window.z.assets = z.assets || {};
 
 z.assets.AssetCrypto = (() => {
   /**
-   * @param {ArrayBuffer} ciphertext - Encrypted plaintext
-   * @param {ArrayBuffer} key_bytes - AES key used for encryption
-   * @param {ArrayBuffer} reference_sha256 - SHA-256 checksum of the ciphertext
+   * @param {ArrayBuffer} cipherText - Encrypted plaintext
+   * @param {ArrayBuffer} keyBytes - AES key used for encryption
+   * @param {ArrayBuffer} referenceSha256 - SHA-256 checksum of the cipherText
    * @returns {Promise} Resolves with the decrypted asset
    */
-  function decrypt_aes_asset(ciphertext, key_bytes, reference_sha256) {
+  const _decryptAesAsset = (cipherText, keyBytes, referenceSha256) => {
     return window.crypto.subtle
-      .digest('SHA-256', ciphertext)
-      .then(computed_sha256 => {
-        if (_equal_hashes(reference_sha256, computed_sha256)) {
-          return window.crypto.subtle.importKey('raw', key_bytes, 'AES-CBC', false, ['decrypt']);
+      .digest('SHA-256', cipherText)
+      .then(computedSha256 => {
+        if (_equalHashes(referenceSha256, computedSha256)) {
+          return window.crypto.subtle.importKey('raw', keyBytes, 'AES-CBC', false, ['decrypt']);
         }
 
         throw new Error('Encrypted asset does not match its SHA-256 hash');
       })
       .then(key => {
-        const iv = ciphertext.slice(0, 16);
-        const img_ciphertext = ciphertext.slice(16);
-        return window.crypto.subtle.decrypt({iv: iv, name: 'AES-CBC'}, key, img_ciphertext);
+        const iv = cipherText.slice(0, 16);
+        const assetCipherText = cipherText.slice(16);
+        return window.crypto.subtle.decrypt({iv: iv, name: 'AES-CBC'}, key, assetCipherText);
       });
-  }
+  };
 
   /**
    * @param {ArrayBuffer} plaintext - Plaintext asset to be encrypted
    * @returns {Promise} Resolves with the encrypted asset
    */
-  function encrypt_aes_asset(plaintext) {
-    const iv = _generate_random_bytes(16);
-    const key_bytes_raw = _generate_random_bytes(32);
+  const _encryptAesAsset = plaintext => {
+    const iv = _generateRandomBytes(16);
+    const rawKeyBytes = _generateRandomBytes(32);
     let key = null;
-    let iv_ciphertext = null;
-    let computed_sha256 = null;
+    let ivCipherText = null;
+    let computedSha256 = null;
 
     return window.crypto.subtle
-      .importKey('raw', key_bytes_raw.buffer, 'AES-CBC', true, ['encrypt'])
+      .importKey('raw', rawKeyBytes.buffer, 'AES-CBC', true, ['encrypt'])
       .then(ckey => {
         key = ckey;
 
         return window.crypto.subtle.encrypt({iv: iv.buffer, name: 'AES-CBC'}, key, plaintext);
       })
-      .then(ciphertext => {
-        iv_ciphertext = new Uint8Array(ciphertext.byteLength + iv.byteLength);
-        iv_ciphertext.set(iv, 0);
-        iv_ciphertext.set(new Uint8Array(ciphertext), iv.byteLength);
+      .then(cipherText => {
+        ivCipherText = new Uint8Array(cipherText.byteLength + iv.byteLength);
+        ivCipherText.set(iv, 0);
+        ivCipherText.set(new Uint8Array(cipherText), iv.byteLength);
 
-        return window.crypto.subtle.digest('SHA-256', iv_ciphertext);
+        return window.crypto.subtle.digest('SHA-256', ivCipherText);
       })
       .then(digest => {
-        computed_sha256 = digest;
+        computedSha256 = digest;
 
         return window.crypto.subtle.exportKey('raw', key);
       })
-      .then(key_bytes => ({cipher_text: iv_ciphertext.buffer, key_bytes: key_bytes, sha256: computed_sha256}));
-  }
+      .then(keyBytes => ({cipherText: ivCipherText.buffer, keyBytes: keyBytes, sha256: computedSha256}));
+  };
 
-  function _equal_hashes(buffer_a, buffer_b) {
-    const arr_a = new Uint32Array(buffer_a);
-    const arr_b = new Uint32Array(buffer_b);
-    return arr_a.length === arr_b.length && arr_a.every((value, index) => value === arr_b[index]);
-  }
+  const _equalHashes = (bufferA, bufferB) => {
+    const arrayA = new Uint32Array(bufferA);
+    const arrayB = new Uint32Array(bufferB);
+    return arrayA.length === arrayB.length && arrayA.every((value, index) => value === arrayB[index]);
+  };
 
-  function _generate_random_bytes(length) {
+  const _generateRandomBytes = length => {
     const randomValues = new Uint32Array(length / 4).map(() => libsodium.getRandomValue());
-    const ramdonBytes = new Uint8Array(randomValues.buffer);
-    if (ramdonBytes.length && !ramdonBytes.every(byte => byte === 0)) {
-      return ramdonBytes;
+    const randomBytes = new Uint8Array(randomValues.buffer);
+    if (randomBytes.length && !randomBytes.every(byte => byte === 0)) {
+      return randomBytes;
     }
     throw Error('Failed to initialize iv with random values');
-  }
+  };
 
   return {
-    decrypt_aes_asset,
-    encrypt_aes_asset,
+    decryptAesAsset: _decryptAesAsset,
+    encryptAesAsset: _encryptAesAsset,
   };
 })();

@@ -278,7 +278,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
         const key_bytes = new Uint8Array(otr_key.toArrayBuffer()).buffer;
         const reference_sha256 = new Uint8Array(external.sha256.toArrayBuffer()).buffer;
 
-        return z.assets.AssetCrypto.decrypt_aes_asset(cipher_text, key_bytes, reference_sha256);
+        return z.assets.AssetCrypto.decryptAesAsset(cipher_text, key_bytes, reference_sha256);
       })
       .then(external_message_buffer => z.proto.GenericMessage.decode(external_message_buffer))
       .catch(error => {

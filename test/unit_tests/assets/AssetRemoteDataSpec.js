@@ -29,7 +29,9 @@ describe('z.assets.AssetRemoteData', () => {
       const conversation_id = z.util.create_random_uuid();
       const asset_id = z.util.create_random_uuid();
       remote_data = z.assets.AssetRemoteData.v1(conversation_id, asset_id);
-      spyOn(remote_data, '_load_buffer').and.returnValue(Promise.resolve([video_bytes.buffer, video_type]));
+      spyOn(remote_data, '_loadBuffer').and.returnValue(
+        Promise.resolve({buffer: video_bytes.buffer, mimeType: video_type})
+      );
     });
 
     it('should load and decrypt asset', done => {
@@ -49,17 +51,19 @@ describe('z.assets.AssetRemoteData', () => {
     const video_type = 'video/mp4';
 
     beforeEach(done => {
-      z.assets.AssetCrypto.encrypt_aes_asset(video_bytes)
-        .then(({cipher_text, key_bytes, sha256}) => {
+      z.assets.AssetCrypto.encryptAesAsset(video_bytes)
+        .then(({cipherText, keyBytes, sha256}) => {
           const conversation_id = z.util.create_random_uuid();
           const asset_id = z.util.create_random_uuid();
           remote_data = z.assets.AssetRemoteData.v2(
             conversation_id,
             asset_id,
-            new Uint8Array(key_bytes),
+            new Uint8Array(keyBytes),
             new Uint8Array(sha256)
           );
-          spyOn(remote_data, '_load_buffer').and.returnValue(Promise.resolve([cipher_text, video_type]));
+          spyOn(remote_data, '_loadBuffer').and.returnValue(
+            Promise.resolve({buffer: cipherText, mimeType: video_type})
+          );
           done();
         })
         .catch(done.fail);

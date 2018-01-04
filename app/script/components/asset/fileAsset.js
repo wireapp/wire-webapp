@@ -42,7 +42,7 @@ z.components.FileAssetComponent = class FileAssetComponent {
 
     this.circle_download_progress = ko.pureComputed(() => {
       const size = this.large ? '200' : '100';
-      return `${this.asset.download_progress() * 2} ${size}`;
+      return `${this.asset.downloadProgress() * 2} ${size}`;
     });
 
     this.file_extension = ko.pureComputed(() => {
