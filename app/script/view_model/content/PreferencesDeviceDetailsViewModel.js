@@ -65,7 +65,6 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
 
   _update_activation_location(location, template = z.string.preferences_devices_activated_in) {
     const sanitizedText = z.util.StringUtil.splitAtPivotElement(template, '{{location}}', location);
-    console.log('sa', sanitizedText);
     this.activated_in(sanitizedText);
   }
 

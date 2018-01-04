@@ -22,12 +22,6 @@
 window.z = window.z || {};
 window.z.util = z.util || {};
 
-window.LOG = function() {
-  if (console && console.log) {
-    console.log(...arguments);
-  }
-};
-
 z.util.check_indexed_db = function() {
   if (!z.util.Environment.browser.supports.indexed_db) {
     if (z.util.Environment.browser.edge) {
