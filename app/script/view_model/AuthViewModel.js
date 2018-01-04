@@ -71,7 +71,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     this.client_service = new z.client.ClientService(this.auth.client, this.storage_service);
     this.client_repository = new z.client.ClientRepository(this.client_service, this.cryptography_repository);
 
-    this.user_mapper = new z.user.UserMapper(this.asset_service);
+    this.user_mapper = new z.user.UserMapper();
     this.user_service = new z.user.UserService(this.auth.client);
     this.user_repository = new z.user.UserRepository(
       this.user_service,

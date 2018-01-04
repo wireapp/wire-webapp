@@ -84,7 +84,7 @@ z.assets.AssetRemoteData = class AssetRemoteData {
    */
   static v1(conversationId, assetId, forceCaching = false) {
     const remoteData = new z.assets.AssetRemoteData();
-    remoteData.generateUrl = () => wire.app.service.asset.generate_asset_url(assetId, conversationId, forceCaching);
+    remoteData.generateUrl = () => wire.app.service.asset.generateAssetUrl(assetId, conversationId, forceCaching);
     remoteData.identifier = `${conversationId}${assetId}`;
     return remoteData;
   }
