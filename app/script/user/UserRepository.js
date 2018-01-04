@@ -51,7 +51,7 @@ z.user.UserRepository = class UserRepository {
     this.logger = new z.util.Logger('z.user.UserRepository', z.config.LOGGER.OPTIONS);
 
     this.connection_mapper = new z.user.UserConnectionMapper();
-    this.user_mapper = new z.user.UserMapper(this.asset_service);
+    this.user_mapper = new z.user.UserMapper();
     this.should_set_username = false;
 
     this.self = ko.observable();

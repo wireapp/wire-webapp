@@ -64,7 +64,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.logger = new z.util.Logger('z.conversation.ConversationRepository', z.config.LOGGER.OPTIONS);
 
     this.conversation_mapper = new z.conversation.ConversationMapper();
-    this.event_mapper = new z.conversation.EventMapper(this.asset_service, this.user_repository);
+    this.event_mapper = new z.conversation.EventMapper();
     this.verification_state_handler = new z.conversation.ConversationVerificationStateHandler(this);
     this.clientMismatchHandler = new z.conversation.ClientMismatchHandler(
       this,
@@ -1356,7 +1356,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const asset_et = message_et.get_first_asset();
 
         asset_et.uploaded_on_this_client(true);
-        return this.asset_service.upload_asset(file, null, xhr => {
+        return this.asset_service.uploadAsset(file, null, xhr => {
           xhr.upload.onprogress = event => asset_et.upload_progress(Math.round(event.loaded / event.total * 100));
           asset_et.upload_cancel = () => xhr.abort();
         });
@@ -1460,7 +1460,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           throw Error('No image available');
         }
 
-        return this.asset_service.upload_asset(imageBlob).then(uploadedImageAsset => {
+        return this.asset_service.uploadAsset(imageBlob).then(uploadedImageAsset => {
           const asset = new z.proto.Asset();
           const assetPreview = new z.proto.Asset.Preview(imageBlob.type, imageBlob.size, uploadedImageAsset.uploaded);
           asset.set('preview', assetPreview);
@@ -1584,7 +1584,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   send_image_asset(conversation_et, image) {
     return this.asset_service
-      .upload_image_asset(image)
+      .uploadImageAsset(image)
       .then(asset => {
         let generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
         generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
