@@ -127,6 +127,30 @@ z.util.StringUtil = {
 
     return 0;
   },
+  splitAtPivotElement: function(text, pivot, replacement) {
+    if (!pivot) {
+      return [
+        {
+          isStyled: false,
+          text,
+        },
+      ];
+    }
+
+    const findPivot = pivot === '?' ? new RegExp('(\\?)') : new RegExp(`(${pivot})`);
+
+    return text
+      .split(findPivot)
+      .map(value => {
+        return value
+          ? {
+              isStyled: value === pivot,
+              text: value === pivot ? replacement : value,
+            }
+          : undefined;
+      })
+      .filter(item => item);
+  },
   starts_with: function(string = '', query) {
     return string.toLowerCase().startsWith(query.toLowerCase());
   },

@@ -63,6 +63,14 @@ z.client.ClientEntity = class ClientEntity {
   }
 
   /**
+   * Returns the ID of a client in a format suitable for UI display in user preferences.
+   * @returns {Array<string>} Client ID in pairs of two as an array
+   */
+  formatId() {
+    return z.util.zero_padding(this.id, 16).match(/.{1,2}/g);
+  }
+
+  /**
    * @returns {boolean} True, if the client is the self user's permanent client.
    */
   isPermanent() {
