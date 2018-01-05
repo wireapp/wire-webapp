@@ -25,17 +25,11 @@ window.z.media = z.media || {};
 // https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia#Errors
 z.media.MEDIA_STREAM_ERROR = {
   ABORT_ERROR: 'AbortError',
-  DEVICES_NOT_FOUND_ERROR: 'DevicesNotFoundError',
-  INTERNAL_ERROR: 'InternalError',
-  INVALID_STATE_ERROR: 'InvalidStateError',
   NOT_ALLOWED_ERROR: 'NotAllowedError',
   NOT_FOUND_ERROR: 'NotFoundError',
   NOT_READABLE_ERROR: 'NotReadableError',
-  OVER_CONSTRAINED_ERROR: 'OverConstrainedError',
-  PERMISSION_DENIED_ERROR: 'PermissionDeniedError',
-  PERMISSION_DISMISSED_ERROR: 'PermissionDismissedError',
+  NOT_SUPPORTED_ERROR: 'NotSupportedError',
+  OVERCONSTRAINED_ERROR: 'OverConstrainedError',
   SECURITY_ERROR: 'SecurityError',
-  SOURCE_UNAVAILABLE_ERROR: 'SourceUnavailableError',
-  TRACK_START_ERROR: 'TrackStartError',
   TYPE_ERROR: 'TypeError',
 };
