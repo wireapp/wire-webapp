@@ -182,13 +182,13 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
           return true;
         case z.util.KeyboardUtil.KEY.ARROW_UP:
         case z.util.KeyboardUtil.KEY.ARROW_DOWN:
-          this._rotate_emoji_popup(z.util.KeyboardUtil.is_key(keyboard_event, z.util.KeyboardUtil.KEY.ARROW_UP));
+          this._rotate_emoji_popup(z.util.KeyboardUtil.isKey(keyboard_event, z.util.KeyboardUtil.KEY.ARROW_UP));
           this.suppress_key_up = true;
           keyboard_event.preventDefault();
           return true;
         case z.util.KeyboardUtil.KEY.ENTER:
         case z.util.KeyboardUtil.KEY.TAB:
-          if (keyboard_event.shiftKey && z.util.KeyboardUtil.is_enter_key(keyboard_event)) {
+          if (keyboard_event.shiftKey && z.util.KeyboardUtil.isEnterKey(keyboard_event)) {
             break;
           }
           this._enter_emoji_popup_line(input, this.emoji_div.find('.emoji.selected'));
@@ -200,7 +200,7 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
     }
 
     // Handling inline emoji in the whole text
-    if (z.util.KeyboardUtil.is_enter_key(keyboard_event)) {
+    if (z.util.KeyboardUtil.isEnterKey(keyboard_event)) {
       this._replace_all_inline_emoji(input);
     }
 
