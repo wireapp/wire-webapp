@@ -127,7 +127,7 @@ z.util.load_url_buffer = (url, xhrAccessorFunction) => {
 };
 
 z.util.load_url_blob = url => {
-  return z.util.load_url_buffer(url).then(({buffer, mimeType}) => new Blob([new Uint8Array(buffer)], {mimeType}));
+  return z.util.load_url_buffer(url).then(({buffer, mimeType}) => new Blob([new Uint8Array(buffer)], {type: mimeType}));
 };
 
 z.util.append_url_parameter = function(url, parameter) {
