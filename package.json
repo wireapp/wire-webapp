@@ -5,7 +5,7 @@
     "@wireapp/protocol-messaging": "1.20.0",
     "@wireapp/store-engine": "^0.1.4",
     "bazinga64": "5.0.3",
-    "protobufjs": "6.8.3",
+    "protobufjs": "6.8.4",
     "pure-uuid": "1.4.11",
     "wire-webapp-cryptobox": "6.2.1"
   },
