@@ -31,20 +31,20 @@ z.team.TeamRole = (() => {
     OWNER: 'z.team.TeamRole.ROLE.OWNER',
   };
 
-  const _check_role = permissions => {
+  const _checkRole = permissions => {
     if (!permissions) {
       throw new z.team.TeamError(z.team.TeamError.TYPE.NO_PERMISSIONS);
     }
 
-    if (z.team.TeamPermission.has_permission_for_role(permissions.self, ROLE.OWNER)) {
+    if (z.team.TeamPermission.hasPermissionForRole(permissions.self, ROLE.OWNER)) {
       return ROLE.OWNER;
     }
 
-    if (z.team.TeamPermission.has_permission_for_role(permissions.self, ROLE.ADMIN)) {
+    if (z.team.TeamPermission.hasPermissionForRole(permissions.self, ROLE.ADMIN)) {
       return ROLE.ADMIN;
     }
 
-    if (z.team.TeamPermission.has_permission_for_role(permissions.self, ROLE.MEMBER)) {
+    if (z.team.TeamPermission.hasPermissionForRole(permissions.self, ROLE.MEMBER)) {
       return ROLE.MEMBER;
     }
 
@@ -53,6 +53,6 @@ z.team.TeamRole = (() => {
 
   return {
     ROLE: ROLE,
-    check_role: _check_role,
+    checkRole: _checkRole,
   };
 })();

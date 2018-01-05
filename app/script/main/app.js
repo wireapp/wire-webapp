@@ -290,7 +290,7 @@ z.main.App = class App {
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_SELF_USER);
         this.repository.client.init(self_user_et);
         this.repository.properties.init(self_user_et);
-        return this.repository.client.get_valid_local_client();
+        return this.repository.client.getValidLocalClient();
       })
       .then(client_observable => {
         this.view.loading.update_progress(7.5, z.string.init_validated_client);
@@ -327,7 +327,7 @@ z.main.App = class App {
         this.repository.conversation.map_connections(this.repository.user.connections());
         this._subscribe_to_unload_events();
 
-        return this.repository.team.get_team();
+        return this.repository.team.getTeam();
       })
       .then(() => this.repository.user.loadUsers())
       .then(() => this.repository.event.initialize_from_stream())
@@ -346,7 +346,7 @@ z.main.App = class App {
         this.view.loading.update_progress(97.5, z.string.init_updated_from_notifications);
 
         this._watch_online_status();
-        return this.repository.client.get_clients_for_self();
+        return this.repository.client.getClientsForSelf();
       })
       .then(client_ets => {
         this.view.loading.update_progress(99);
@@ -370,7 +370,7 @@ z.main.App = class App {
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.UPDATED_CONVERSATIONS);
         this.repository.lifecycle.init();
         this.repository.audio.init(true);
-        this.repository.client.cleanup_clients_and_sessions(true);
+        this.repository.client.cleanupClientsAndSessions(true);
         this.repository.conversation.cleanup_conversations();
         this.logger.info('App fully loaded');
       })
@@ -593,7 +593,7 @@ z.main.App = class App {
    * @returns {undefined} No return value
    */
   _show_ui() {
-    const conversation_et = this.repository.conversation.get_most_recent_conversation();
+    const conversation_et = this.repository.conversation.getMostRecentConversation();
     this.logger.info('Showing application UI');
     if (this.repository.user.should_change_username()) {
       amplify.publish(z.event.WebApp.TAKEOVER.SHOW);
@@ -658,16 +658,14 @@ z.main.App = class App {
       // Clear Local Storage (but don't delete the cookie label if you were logged in with a permanent client)
       const do_not_delete = [z.storage.StorageKey.AUTH.SHOW_LOGIN];
 
-      if (this.repository.client.is_current_client_permanent() && !clear_data) {
+      if (this.repository.client.isCurrentClientPermanent() && !clear_data) {
         do_not_delete.push(z.storage.StorageKey.AUTH.PERSIST);
       }
 
       // @todo remove on next iteration
       const self_user = this.repository.user.self();
       if (self_user) {
-        const cookie_label_key = this.repository.client.construct_cookie_label_key(
-          self_user.email() || self_user.phone()
-        );
+        const cookie_label_key = this.repository.client.constructCookieLabelKey(self_user.email() || self_user.phone());
 
         Object.keys(amplify.store()).forEach(amplify_key => {
           if (
@@ -725,10 +723,13 @@ z.main.App = class App {
    * @returns {undefined} No return value
    */
   refresh() {
+    this.logger.info(`Refresh to update from source '${this.update_source}' started`);
     if (z.util.Environment.desktop) {
       amplify.publish(z.event.WebApp.LIFECYCLE.RESTART, this.update_source);
     }
-    if (this.update_source === z.lifecycle.UPDATE_SOURCE.WEBAPP) {
+
+    const isWebappSource = this.update_source === z.lifecycle.UPDATE_SOURCE.WEBAPP;
+    if (isWebappSource) {
       window.location.reload(true);
       window.focus();
     }

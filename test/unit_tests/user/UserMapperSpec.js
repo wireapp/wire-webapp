@@ -22,13 +22,7 @@
 // grunt test_init && grunt test_run:user/UserMapper
 
 describe('User Mapper', () => {
-  const asset_service = {
-    generate_asset_url() {
-      return 'FooBarURL';
-    },
-  };
-
-  const mapper = new z.user.UserMapper(asset_service);
+  const mapper = new z.user.UserMapper();
   mapper.logger.level = z.util.Logger.prototype.levels.ERROR;
 
   let self_user_payload = null;

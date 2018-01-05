@@ -42,10 +42,10 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
     this.mode = params.mode || z.components.UserProfileMode.DEFAULT;
 
     // repository references
-    this.client_repository = wire.app.repository.client;
-    this.conversation_repository = wire.app.repository.conversation;
-    this.cryptography_repository = wire.app.repository.cryptography;
-    this.user_repository = wire.app.repository.user;
+    this.client_repository = window.wire.app.repository.client;
+    this.conversation_repository = window.wire.app.repository.conversation;
+    this.cryptography_repository = window.wire.app.repository.cryptography;
+    this.user_repository = window.wire.app.repository.user;
 
     this.isTeam = ko.pureComputed(() => {
       return this.conversation()
@@ -121,8 +121,8 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
     this.devices = ko.observableArray();
     this.devices_found = ko.observable();
     this.selected_device = ko.observable();
-    this.fingerprint_remote = ko.observable('');
-    this.fingerprint_local = ko.observable('');
+    this.fingerprint_remote = ko.observableArray([]);
+    this.fingerprint_local = ko.observableArray([]);
     this.is_resetting_session = ko.observable(false);
 
     // destroy confirm dialog when user changes
@@ -133,7 +133,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
       this.tab_index(0);
       this.devices_found(null);
       this.selected_device(null);
-      this.fingerprint_remote('');
+      this.fingerprint_remote([]);
       this.is_resetting_session(false);
     });
 
@@ -145,11 +145,11 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
 
     this.selected_device_subscription = this.selected_device.subscribe(() => {
       if (this.selected_device()) {
-        this.fingerprint_local(this.cryptography_repository.get_local_fingerprint());
-        this.fingerprint_remote('');
+        this.fingerprint_local(this.formatFingerprint(this.cryptography_repository.get_local_fingerprint()));
+        this.fingerprint_remote([]);
         this.cryptography_repository
           .get_remote_fingerprint(this.user().id, this.selected_device().id)
-          .then(fingerprint => this.fingerprint_remote(fingerprint));
+          .then(fingerprint => this.fingerprint_remote(this.formatFingerprint(fingerprint)));
       }
     });
 
@@ -165,10 +165,21 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
     });
 
     this.detail_message = ko.pureComputed(() => {
-      return z.l10n.text(z.string.people_tabs_device_detail_headline, {
-        html1: "<span class='user-profile-device-detail-highlight'>",
-        html2: '</span>',
+      const text = z.l10n.text(z.string.people_tabs_device_detail_headline, {
         user: z.util.escape_html(this.user().first_name()),
+      });
+
+      const textWithHtmlTags = new RegExp('\\{\\{[^\\}]+\\}\\}[^\\{]+\\{\\{[^\\}]+\\}\\}');
+      const textWithinHtmlTags = new RegExp('\\{\\{[^\\}]+\\}\\}', 'gm');
+
+      const pivot = text.match(textWithHtmlTags)[0];
+      const sanitizedText = z.util.StringUtil.splitAtPivotElement(text, pivot, pivot);
+
+      return sanitizedText.map(element => {
+        if (element.isStyled) {
+          element.text = element.text.replace(textWithinHtmlTags, '');
+        }
+        return element;
       });
     });
 
@@ -221,6 +232,8 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
         }, SHOW_CONVERSATION_DELAY);
       });
     };
+
+    this.formatFingerprint = fingerprint => z.util.zero_padding(fingerprint, 16).match(/.{1,2}/g);
 
     this.on_connect = () => {
       this.user_repository
@@ -363,7 +376,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
         click_on_show_my_devices() {
           amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_DEVICES);
         },
-        device: this.client_repository.current_client,
+        device: this.client_repository.currentClient,
         fingerprint_local: this.fingerprint_local,
       },
       template: '#template-confirm-my-fingerprint',
@@ -388,7 +401,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
     const toggle_verified = !this.selected_device().meta.is_verified();
 
     this.client_repository
-      .verify_client(this.user().id, this.selected_device(), toggle_verified)
+      .verifyClient(this.user().id, this.selected_device(), toggle_verified)
       .catch(error => this.logger.warn(`Client cannot be updated: ${error.message}`));
   }
 
@@ -396,7 +409,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
     if (index === 1) {
       const user_id = this.user().id;
       this.client_repository
-        .get_clients_by_user_id(user_id)
+        .getClientsByUserId(user_id)
         .then(client_ets => this.devices_found(client_ets.length > 0))
         .catch(error => this.logger.error(`Unable to retrieve clients data for user '${user_id}': ${error}`));
     }

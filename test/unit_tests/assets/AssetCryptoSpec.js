@@ -24,9 +24,9 @@ describe('AssetsCrypto', () => {
     const bytes = new Uint8Array(16);
     window.crypto.getRandomValues(bytes);
 
-    z.assets.AssetCrypto.encrypt_aes_asset(bytes.buffer)
-      .then(({cipher_text, key_bytes, sha256}) => {
-        return z.assets.AssetCrypto.decrypt_aes_asset(cipher_text, key_bytes, sha256);
+    z.assets.AssetCrypto.encryptAesAsset(bytes.buffer)
+      .then(({cipherText, keyBytes, sha256}) => {
+        return z.assets.AssetCrypto.decryptAesAsset(cipherText, keyBytes, sha256);
       })
       .then(buffer => {
         expect(buffer).toEqual(bytes.buffer);
@@ -39,9 +39,9 @@ describe('AssetsCrypto', () => {
     const bytes = new Uint8Array(16);
     window.crypto.getRandomValues(bytes);
 
-    z.assets.AssetCrypto.encrypt_aes_asset(bytes.buffer)
-      .then(({cipher_text, key_bytes}) => {
-        return z.assets.AssetCrypto.decrypt_aes_asset(cipher_text, key_bytes, null);
+    z.assets.AssetCrypto.encryptAesAsset(bytes.buffer)
+      .then(({cipherText, keyBytes}) => {
+        return z.assets.AssetCrypto.decryptAesAsset(cipherText, keyBytes, null);
       })
       .then(done.fail)
       .catch(done);
@@ -51,9 +51,9 @@ describe('AssetsCrypto', () => {
     const bytes = new Uint8Array(16);
     window.crypto.getRandomValues(bytes);
 
-    z.assets.AssetCrypto.encrypt_aes_asset(bytes.buffer)
-      .then(({cipher_text, key_bytes}) => {
-        return z.assets.AssetCrypto.decrypt_aes_asset(cipher_text, key_bytes, new Uint8Array([]));
+    z.assets.AssetCrypto.encryptAesAsset(bytes.buffer)
+      .then(({cipherText, keyBytes}) => {
+        return z.assets.AssetCrypto.decryptAesAsset(cipherText, keyBytes, new Uint8Array([]));
       })
       .then(done.fail)
       .catch(done);

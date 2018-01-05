@@ -22,12 +22,6 @@
 window.z = window.z || {};
 window.z.util = z.util || {};
 
-window.LOG = function() {
-  if (console && console.log) {
-    console.log(...arguments);
-  }
-};
-
 z.util.check_indexed_db = function() {
   if (!z.util.Environment.browser.supports.indexed_db) {
     if (z.util.Environment.browser.edge) {
@@ -112,30 +106,28 @@ z.util.load_file_buffer = function(file) {
   });
 };
 
-z.util.load_url_buffer = function(url, xhr_accessor_function) {
+z.util.load_url_buffer = (url, xhrAccessorFunction) => {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open('GET', url, true);
     xhr.responseType = 'arraybuffer';
-    xhr.onload = function() {
-      if (xhr.status === 200) {
-        return resolve([xhr.response, xhr.getResponseHeader('content-type')]);
+    xhr.onload = () => {
+      const isStatusOK = xhr.status === 200;
+      if (isStatusOK) {
+        return resolve({buffer: xhr.response, mimeType: xhr.getResponseHeader('content-type')});
       }
       return reject(new Error(`Requesting arraybuffer failed with status ${xhr.status}`));
     };
     xhr.onerror = reject;
-    if (typeof xhr_accessor_function === 'function') {
-      xhr_accessor_function(xhr);
+    if (typeof xhrAccessorFunction === 'function') {
+      xhrAccessorFunction(xhr);
     }
     xhr.send();
   });
 };
 
-z.util.load_url_blob = function(url) {
-  return z.util.load_url_buffer(url).then(value => {
-    const [buffer, type] = value;
-    return new Blob([new Uint8Array(buffer)], {type});
-  });
+z.util.load_url_blob = url => {
+  return z.util.load_url_buffer(url).then(({buffer, mimeType}) => new Blob([new Uint8Array(buffer)], {type: mimeType}));
 };
 
 z.util.append_url_parameter = function(url, parameter) {
@@ -547,8 +539,8 @@ z.util.is_iso_string = function(date_string) {
   return /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z)/.test(date_string);
 };
 
-z.util.sort_groups_by_last_event = function(group_a, group_b) {
-  return group_b.last_event_timestamp() - group_a.last_event_timestamp();
+z.util.sort_groups_by_last_event = (groupA, groupB) => {
+  return groupB.last_event_timestamp() - groupA.last_event_timestamp();
 };
 
 z.util.sort_object_by_keys = function(object, reverse) {

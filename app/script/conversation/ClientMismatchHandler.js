@@ -112,7 +112,7 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
         payload = updatedPayload;
 
         const _addMissingClient = (userId, clientId) => {
-          return this.userRepository.add_client_to_user(userId, new z.client.Client({id: clientId}));
+          return this.userRepository.add_client_to_user(userId, new z.client.ClientEntity({id: clientId}));
         };
 
         return Promise.all(this._mapRecipients(recipients, _addMissingClient));

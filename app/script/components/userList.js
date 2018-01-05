@@ -80,7 +80,7 @@ z.components.UserListViewModel = class UserListViewModel {
     // Filter all list items if a filter is provided
     if (this.user_filter) {
       this.filtered_user_ets = ko.pureComputed(() => {
-        const normalized_query = z.search.SearchRepository.normalize_query(this.user_filter());
+        const normalized_query = z.search.SearchRepository.normalizeQuery(this.user_filter());
         return this.user_ets().filter(user_et => {
           const is_username = this.user_filter()
             .trim()

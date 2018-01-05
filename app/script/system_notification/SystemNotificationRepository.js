@@ -471,7 +471,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
     if (user_et.preview_picture_resource() && !should_obfuscate_sender) {
       return user_et
         .preview_picture_resource()
-        .generate_url()
+        .generateUrl()
         .catch(error => {
           if (error instanceof z.util.ValidationUtilError) {
             this.logger.error(`Failed to validate an asset URL: ${error.message}`);

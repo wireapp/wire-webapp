@@ -87,7 +87,7 @@
     <div data-action="cancel" data-uie-name="do-cancel" class="user-profile-top-right-button button-icon icon-close"></div>
     <div data-bind="click: click_on_show_my_devices, l10n_text: z.string.people_tabs_device_detail_device_fingerprint"></div>
     <device-card class="user-profile-device-detail-card" params="device: device()"></device-card>
-    <div class="user-profile-device-detail-fingerprint" data-bind="html: z.util.print_devices_id(fingerprint_local())"></div>
+    <div class="user-profile-device-detail-fingerprint" data-bind="foreach: fingerprint_local()"><span class="device-id-part" data-bind="text: $data"></span></div>
     <div class="user-profile-device-detail-footer">
       <span class="button-label text-theme" data-bind="click: click_on_show_my_devices, l10n_text: z.string.people_tabs_device_detail_all_my_devices"></span>
     </div>

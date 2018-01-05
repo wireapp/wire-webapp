@@ -67,7 +67,7 @@ rules:
   curly: 2
   dot-notation: 2
   jsdoc/require-hyphen-before-param-description: 2
-  no-console: 0
+  no-console: [2, {allow: [error]}]
   no-const-assign: 2
   no-dupe-class-members: 2
   no-else-return: 2

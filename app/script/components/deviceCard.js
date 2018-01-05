@@ -28,6 +28,7 @@ z.components.DeviceCard = class DeviceCard {
 
     const {class: device_class, id, label, model} = this.device;
     this.id = id || '';
+    this.formattedId = id ? this.device.formatId() : [];
     this.label = label || '?';
     this.model = model || device_class || '?'; // devices for other users will only provide the device class
     this.class = device_class || '?';
@@ -41,7 +42,7 @@ z.components.DeviceCard = class DeviceCard {
       this.data_uie_name += '-current';
     }
 
-    this.activated_in = ko.observable();
+    this.activated_in = ko.observable([]);
 
     this._update_activation_location('?');
     this._update_location();
@@ -60,9 +61,9 @@ z.components.DeviceCard = class DeviceCard {
     }
   }
 
-  _update_activation_location(location) {
-    const location_content = `<span class='label-bold-xs'>${location}</span>`;
-    this.activated_in(z.l10n.text(z.string.preferences_devices_activated_in, location_content));
+  _update_activation_location(location, template = z.string.preferences_devices_activated_in) {
+    const sanitizedText = z.util.StringUtil.splitAtPivotElement(template, '{{location}}', location);
+    this.activated_in(sanitizedText);
   }
 
   _update_location() {
@@ -84,9 +85,9 @@ ko.components.register('device-card', {
         <div class="label-xs device-label" data-bind="text: label"></div>
         <div class="label-xs">
           <span data-bind="l10n_text: z.string.preferences_devices_id"></span>
-          <span data-uie-name="device-id" data-bind="html: z.util.print_devices_id(id)"></span>
+          <span data-uie-name="device-id" data-bind="foreach: formattedId"><span class="device-id-part" data-bind="text: $data"></span></span>
         </div>
-        <div class="label-xs" data-bind="html: activated_in"></div>
+        <div class="label-xs" data-bind="foreach: activated_in"><span data-bind="css: {'preferences-devices-activated-bold': $data.isStyled}, text: $data.text">?</span></div>
         <div class="label-xs" data-bind="text: z.util.format_timestamp(device.time)"></div>
       <!-- /ko -->
       <!-- ko ifnot: detailed -->
@@ -96,7 +97,7 @@ ko.components.register('device-card', {
         </div>
         <div class="text-graphite-dark label-xs">
           <span data-bind="l10n_text: z.string.preferences_devices_id"></span>
-          <span data-uie-name="device-id" data-bind="html: z.util.print_devices_id(id)"></span>
+          <span data-uie-name="device-id" data-bind="foreach: formattedId"><span class="device-id-part" data-bind="text: $data"></span></span>
         </div>
       <!-- /ko -->
     </div>

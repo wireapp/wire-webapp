@@ -48,7 +48,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
     this.logger = new z.util.Logger('z.ViewModel.ContentViewModel', z.config.LOGGER.OPTIONS);
 
     // Repositories
-    this.cryptography_repository = this.client_repository.cryptography_repository;
+    this.cryptography_repository = this.client_repository.cryptographyRepository;
     this.giphy_repository = this.conversation_repository.giphy_repository;
     this.user_repository = this.conversation_repository.user_repository;
 
@@ -161,7 +161,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
     this.user_repository.connect_requests.subscribe(requests => {
       const requests_state = this.content_state() === z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS;
       if (requests_state && !requests.length) {
-        this.show_conversation(this.conversation_repository.get_most_recent_conversation());
+        this.show_conversation(this.conversation_repository.getMostRecentConversation());
       }
     });
 

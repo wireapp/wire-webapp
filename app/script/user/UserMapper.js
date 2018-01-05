@@ -26,10 +26,8 @@ z.user.UserMapper = class UserMapper {
   /**
    * Construct a new User Mapper.
    * @class z.user.UserMapper
-   * @param {z.assets.AssetService} asset_service - Backend REST API asset service implementation
    */
-  constructor(asset_service) {
-    this.asset_service = asset_service;
+  constructor() {
     this.logger = new z.util.Logger('z.user.UserMapper', z.config.LOGGER.OPTIONS);
   }
 
