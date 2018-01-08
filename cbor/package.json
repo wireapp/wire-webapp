@@ -29,5 +29,5 @@
     "version": "yarn dist && git add dist/**/* typings/types.d.ts"
   },
   "types": "typings/types.d.ts",
-  "version": "2.1.5"
+  "version": "2.2.0"
 }
