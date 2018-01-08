@@ -14,8 +14,8 @@ module.exports = {
   },
   performance: {
     hints: 'warning',
-    maxAssetSize: 100,
-    maxEntrypointSize: 300,
+    maxAssetSize: 36000,
+    maxEntrypointSize: 36000,
   },
   plugins: [new webpack.BannerPlugin(`${pkg.name} v${pkg.version}`)],
 };

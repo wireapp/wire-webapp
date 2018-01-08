@@ -3,7 +3,6 @@
   "devDependencies": {
     "coveralls": "3.0.0",
     "cross-env": "5.1.3",
-    "eslint": "4.15.0",
     "istanbul": "0.4.5",
     "jasmine": "2.8.0",
     "jsdoc": "3.5.5",
@@ -21,12 +20,9 @@
     "coverage:html": "istanbul cover --report html jasmine",
     "coverage:lcov": "istanbul cover --report lcov jasmine",
     "dist": "webpack",
-    "lint": "eslint src/",
-    "postversion": "git push && git push --tags",
-    "preversion": "yarn lint && yarn test && yarn types",
     "test": "yarn coverage:html",
     "types": "jsdoc --verbose --pedantic --configure jsdoc.json src/ && node typings/replace.js",
-    "version": "yarn dist && git add dist/**/* typings/types.d.ts"
+    "version": "yarn types && git add dist/**/* typings/types.d.ts"
   },
   "types": "typings/types.d.ts",
   "version": "2.2.0"
