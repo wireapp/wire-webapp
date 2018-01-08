@@ -109,7 +109,7 @@ export default class TeamAPI {
       url: `${TeamAPI.URL.TEAMS}/${teamId}/${TeamAPI.URL.BILLING}/${TeamAPI.URL.PLANS}`,
     };
 
-    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data.data);
+    return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
   }
 
   public getCharges(teamId: string): Promise<PaymentStripeCharge[]> {

@@ -20,7 +20,7 @@
 import {PaymentPlan} from '.';
 
 interface PaymentDataUpdate {
-  planId?: PaymentPlan;
+  interval?: 'day' | 'week' | 'month' | 'year';
   source?: string;
 }
 

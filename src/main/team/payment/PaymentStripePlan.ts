@@ -21,11 +21,8 @@
 interface PaymentStripePlan {
   id: string;
   amount: number;
-  created: number;
-  currency: 'eur';
+  currency: 'eur' | 'chf' | 'usd';
   interval: 'day' | 'week' | 'month' | 'year';
-  intervalCount: number;
-  livemode: boolean;
   name: string;
   trialPeriodDays: number;
 }
