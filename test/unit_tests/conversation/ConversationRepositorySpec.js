@@ -149,9 +149,11 @@ describe('ConversationRepository', () => {
         ._on_asset_upload_complete(conversation_et, event)
         .then(() => {
           expect(TestFactory.conversation_service.update_asset_as_uploaded_in_db).toHaveBeenCalled();
-          expect(message_et.assets()[0].original_resource().otr_key).toBe(event.data.otr_key);
-          expect(message_et.assets()[0].original_resource().sha256).toBe(event.data.sha256);
-          expect(message_et.assets()[0].status()).toBe(z.assets.AssetTransferState.UPLOADED);
+
+          const [firstAsset] = message_et.assets();
+          expect(firstAsset.original_resource().otrKey).toBe(event.data.otr_key);
+          expect(firstAsset.original_resource().sha256).toBe(event.data.sha256);
+          expect(firstAsset.status()).toBe(z.assets.AssetTransferState.UPLOADED);
           done();
         })
         .catch(done.fail);
@@ -670,7 +672,7 @@ describe('ConversationRepository', () => {
       let create_event = null;
 
       beforeEach(() => {
-        spyOn(TestFactory.conversation_repository, '_on_create').and.callThrough();
+        spyOn(TestFactory.conversation_repository, '_onCreate').and.callThrough();
         spyOn(TestFactory.conversation_repository, 'map_conversations').and.returnValue(true);
         spyOn(TestFactory.conversation_repository, 'update_participating_user_ets').and.returnValue(true);
         spyOn(TestFactory.conversation_repository, 'save_conversation').and.returnValue(true);
@@ -684,7 +686,7 @@ describe('ConversationRepository', () => {
         TestFactory.conversation_repository
           .onConversationEvent(create_event)
           .then(() => {
-            expect(TestFactory.conversation_repository._on_create).toHaveBeenCalled();
+            expect(TestFactory.conversation_repository._onCreate).toHaveBeenCalled();
             expect(TestFactory.conversation_repository.map_conversations).toHaveBeenCalledWith(create_event.data, 1);
             expect(TestFactory.conversation_repository._prepare_conversation_create_notification).toHaveBeenCalled();
             done();
@@ -699,7 +701,7 @@ describe('ConversationRepository', () => {
         TestFactory.conversation_repository
           .onConversationEvent(create_event)
           .then(() => {
-            expect(TestFactory.conversation_repository._on_create).toHaveBeenCalled();
+            expect(TestFactory.conversation_repository._onCreate).toHaveBeenCalled();
             expect(TestFactory.conversation_repository.map_conversations).toHaveBeenCalledWith(
               create_event.data,
               time.getTime()

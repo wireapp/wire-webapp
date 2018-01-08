@@ -39,7 +39,6 @@ export function getEnvironmentFromQuery() {
 
 export function checkEnvironment() {
   const environment = getEnvironment();
-  console.log(`Starting with environment ### ${environment} ###`);
   if (![LOCAL, STAGING, PRODUCTION].includes(environment)) {
     throw new Error(`Invalid environment ${environment}`);
   }

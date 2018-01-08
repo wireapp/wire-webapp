@@ -81,9 +81,7 @@ describe('z.system_notification.SystemNotificationRepository', () => {
         window.wire.app = {
           service: {
             asset: {
-              generate_asset_url() {
-                return Promise.resolve('/image/logo/notification.png');
-              },
+              generateAssetUrl: () => Promise.resolve('/image/logo/notification.png'),
             },
           },
           view: {

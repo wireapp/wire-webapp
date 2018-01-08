@@ -71,7 +71,7 @@ z.components.FullSearchViewModel = class FullSearchViewModel {
       const input = _.escape(this.input());
 
       message_et.matches_count = 0;
-      let transformed_text = text.replace(z.search.FullTextSearch.get_search_regex(input), match => {
+      let transformed_text = text.replace(z.search.FullTextSearch.getSearchRegex(input), match => {
         message_et.matches_count += 1;
         return `<mark class='full-search-marked' data-uie-name='full-search-item-mark'>${match}</mark>`;
       });

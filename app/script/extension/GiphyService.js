@@ -43,7 +43,7 @@ z.extension.GiphyService = class GiphyService {
    * @param {string|Array} ids - A single id or comma separated list of IDs to fetch GIF size data
    * @returns {Promise} Resolves with the size data
    */
-  get_by_id(ids) {
+  getById(ids) {
     ids = [].concat(ids);
 
     return this.client.send_request({
@@ -57,7 +57,7 @@ z.extension.GiphyService = class GiphyService {
    * @param {string} tag - GIF tag to limit randomness by
    * @returns {Promise} Resolves with random gifs for given tag
    */
-  get_random(tag) {
+  getRandom(tag) {
     return this.client.send_request({
       data: {
         tag: tag,
@@ -77,7 +77,7 @@ z.extension.GiphyService = class GiphyService {
    * @param {string} [options.sorting='recent'] - Specify sorting ('relevant' or 'recent')
    * @returns {Promise} Resolves with matches
    */
-  get_search(options) {
+  getSearch(options) {
     return this.client.send_request({
       data: Object.assign(
         {

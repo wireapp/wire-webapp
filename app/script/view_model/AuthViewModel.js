@@ -71,7 +71,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     this.client_service = new z.client.ClientService(this.auth.client, this.storage_service);
     this.client_repository = new z.client.ClientRepository(this.client_service, this.cryptography_repository);
 
-    this.user_mapper = new z.user.UserMapper(this.asset_service);
+    this.user_mapper = new z.user.UserMapper();
     this.user_service = new z.user.UserService(this.auth.client);
     this.user_repository = new z.user.UserRepository(
       this.user_service,
@@ -872,7 +872,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
   }
 
   keydown_auth(keyboard_event) {
-    if (z.util.KeyboardUtil.is_enter_key(keyboard_event)) {
+    if (z.util.KeyboardUtil.isEnterKey(keyboard_event)) {
       switch (this.visible_mode()) {
         case z.auth.AuthView.MODE.ACCOUNT_LOGIN: {
           if (this.visible_method() === z.auth.AuthView.MODE.ACCOUNT_PHONE) {
@@ -915,11 +915,11 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
   }
 
   keydown_phone_code(view_model, keyboard_event) {
-    if (z.util.KeyboardUtil.is_paste_action(keyboard_event)) {
+    if (z.util.KeyboardUtil.isPasteAction(keyboard_event)) {
       return true;
     }
 
-    if (z.util.KeyboardUtil.is_function_key(keyboard_event)) {
+    if (z.util.KeyboardUtil.isFunctionKey(keyboard_event)) {
       return false;
     }
 

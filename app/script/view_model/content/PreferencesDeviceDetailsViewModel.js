@@ -44,7 +44,7 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
     this.device.subscribe(device_et => {
       if (device_et) {
         this.session_reset_state(z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET);
-        this.fingerprint('');
+        this.fingerprint([]);
         this._update_fingerprint();
         this._update_activation_location('?');
         this._update_activation_time(device_et.time);
@@ -57,20 +57,21 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
     this.session_reset_state = ko.observable(
       z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET
     );
-    this.fingerprint = ko.observable('');
+    this.fingerprint = ko.observableArray([]);
 
-    this.activated_in = ko.observable(z.l10n.text(z.string.preferences_devices_activated_in));
-    this.activated_on = ko.observable(z.l10n.text(z.string.preferences_devices_activated_on));
+    this.activated_in = ko.observableArray([]);
+    this.activated_on = ko.observableArray([]);
   }
 
-  _update_activation_location(location) {
-    const location_content = `<span class='preferences-devices-activated-bold'>${location}</span>`;
-    this.activated_in(z.l10n.text(z.string.preferences_devices_activated_in, location_content));
+  _update_activation_location(location, template = z.string.preferences_devices_activated_in) {
+    const sanitizedText = z.util.StringUtil.splitAtPivotElement(template, '{{location}}', location);
+    this.activated_in(sanitizedText);
   }
 
-  _update_activation_time(time) {
-    const time_content = `<span class='preferences-devices-activated-bold'>${z.util.format_timestamp(time)}</span>`;
-    this.activated_on(z.l10n.text(z.string.preferences_devices_activated_on, time_content));
+  _update_activation_time(time, template = z.string.preferences_devices_activated_on) {
+    const formattedTime = z.util.format_timestamp(time);
+    const sanitizedText = z.util.StringUtil.splitAtPivotElement(template, '{{date}}', formattedTime);
+    this.activated_on(sanitizedText);
   }
 
   _update_device_location(location) {
@@ -83,7 +84,7 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
 
   _update_fingerprint() {
     this.cryptography_repository.get_remote_fingerprint(this.self_user().id, this.device().id).then(fingerprint => {
-      this.fingerprint(fingerprint);
+      this.fingerprint(z.util.zero_padding(fingerprint, 16).match(/.{1,2}/g));
     });
   }
 

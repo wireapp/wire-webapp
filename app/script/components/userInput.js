@@ -53,7 +53,7 @@ z.components.UserListInputViewModel = class UserListInputViewModel {
   }
 
   on_key_press(data, keyboard_event) {
-    if (z.util.KeyboardUtil.is_removal_action(keyboard_event) && !this.input().length) {
+    if (z.util.KeyboardUtil.isRemovalAction(keyboard_event) && !this.input().length) {
       this.selected.pop();
     }
     return true;

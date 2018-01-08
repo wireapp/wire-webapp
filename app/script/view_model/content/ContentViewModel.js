@@ -161,7 +161,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
     this.user_repository.connect_requests.subscribe(requests => {
       const requests_state = this.content_state() === z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS;
       if (requests_state && !requests.length) {
-        this.show_conversation(this.conversation_repository.get_most_recent_conversation());
+        this.show_conversation(this.conversation_repository.getMostRecentConversation());
       }
     });
 

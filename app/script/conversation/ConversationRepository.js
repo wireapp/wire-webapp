@@ -64,7 +64,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.logger = new z.util.Logger('z.conversation.ConversationRepository', z.config.LOGGER.OPTIONS);
 
     this.conversation_mapper = new z.conversation.ConversationMapper();
-    this.event_mapper = new z.conversation.EventMapper(this.asset_service, this.user_repository);
+    this.event_mapper = new z.conversation.EventMapper();
     this.verification_state_handler = new z.conversation.ConversationVerificationStateHandler(this);
     this.clientMismatchHandler = new z.conversation.ClientMismatchHandler(
       this,
@@ -207,7 +207,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   create_new_conversation(user_ids, name) {
     return this.conversation_service
       .create_conversation(user_ids, name, this.team().id)
-      .then(response => this._on_create({conversation: response.id, data: response}))
+      .then(response => this._onCreate({conversation: response.id, data: response}))
       .catch(error => {
         if (error.label === z.service.BackendClientError.LABEL.NOT_CONNECTED) {
           return this._handle_users_not_connected(user_ids);
@@ -614,12 +614,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   /**
    * Get the most recent event timestamp from any conversation.
+   * @param {boolean} [increment=false] - Increment by one for unique timestamp
    * @returns {number} Timestamp value
    */
-  get_latest_event_timestamp() {
-    const [most_recent_conversation] = this.sorted_conversations();
-    if (most_recent_conversation) {
-      return most_recent_conversation.last_event_timestamp();
+  getLatestEventTimestamp(increment = false) {
+    const mostRecentConversation = this.getMostRecentConversation(true);
+    if (mostRecentConversation) {
+      const lastEventTimestamp = mostRecentConversation.last_event_timestamp();
+      return lastEventTimestamp + (increment ? 1 : 0);
     }
 
     return 1;
@@ -637,10 +639,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   /**
    * Get unarchived conversation with the most recent event.
+   * @param {boolean} [allConversations=false] - Search all conversations
    * @returns {Conversation} Most recent conversation
    */
-  get_most_recent_conversation() {
-    const [conversation_et] = this.conversations_unarchived();
+  getMostRecentConversation(allConversations = false) {
+    const [conversation_et] = allConversations ? this.sorted_conversations() : this.conversations_unarchived();
     return conversation_et;
   }
 
@@ -684,10 +687,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
       return this.create_new_conversation([user_et.id], undefined).then(({conversation_et}) => conversation_et);
     }
 
-    return this.fetch_conversation_by_id(user_et.connection().conversation_id).then(conversation_et => {
-      conversation_et.connection(user_et.connection());
-      return this.update_participating_user_ets(conversation_et);
-    });
+    return this.fetch_conversation_by_id(user_et.connection().conversation_id)
+      .then(conversation_et => {
+        conversation_et.connection(user_et.connection());
+        return this.update_participating_user_ets(conversation_et);
+      })
+      .catch(error => {
+        if (error.type !== z.conversation.ConversationError.TYPE.NOT_FOUND) {
+          throw error;
+        }
+      });
   }
 
   /**
@@ -799,10 +808,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Map conversation payload.
    *
    * @param {JSON} payload - Payload to map
-   * @param {number} [initial_timestamp=this.get_latest_event_timestamp()] - Initial server and event timestamp
+   * @param {number} [initial_timestamp=this.getLatestEventTimestamp()] - Initial server and event timestamp
    * @returns {z.entity.Conversation|Array<z.entity.Conversation>} Mapped conversation/s
    */
-  map_conversations(payload, initial_timestamp = this.get_latest_event_timestamp()) {
+  map_conversations(payload, initial_timestamp = this.getLatestEventTimestamp()) {
     const conversation_data = payload.length ? payload : [payload];
 
     const conversation_ets = this.conversation_mapper.map_conversations(conversation_data, initial_timestamp);
@@ -1347,7 +1356,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const asset_et = message_et.get_first_asset();
 
         asset_et.uploaded_on_this_client(true);
-        return this.asset_service.upload_asset(file, null, xhr => {
+        return this.asset_service.uploadAsset(file, null, xhr => {
           xhr.upload.onprogress = event => asset_et.upload_progress(Math.round(event.loaded / event.total * 100));
           asset_et.upload_cancel = () => xhr.abort();
         });
@@ -1391,7 +1400,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when the asset metadata was sent
    */
   send_asset_metadata(conversation_et, file) {
-    return z.assets.AssetMetaDataBuilder.build_metadata(file)
+    return z.assets.AssetMetaDataBuilder.buildMetadata(file)
       .catch(error => {
         this.logger.warn(
           `Couldn't render asset preview from metadata. Asset might be corrupt: ${error.message}`,
@@ -1402,11 +1411,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(metadata => {
         const asset = new z.proto.Asset();
 
-        if (z.assets.AssetMetaDataBuilder.is_audio(file)) {
+        if (z.assets.AssetMetaDataBuilder.isAudio(file)) {
           asset.set('original', new z.proto.Asset.Original(file.type, file.size, file.name, null, null, metadata));
-        } else if (z.assets.AssetMetaDataBuilder.is_video(file)) {
+        } else if (z.assets.AssetMetaDataBuilder.isVideo(file)) {
           asset.set('original', new z.proto.Asset.Original(file.type, file.size, file.name, null, metadata));
-        } else if (z.assets.AssetMetaDataBuilder.is_image(file)) {
+        } else if (z.assets.AssetMetaDataBuilder.isImage(file)) {
           asset.set('original', new z.proto.Asset.Original(file.type, file.size, file.name, metadata));
         } else {
           asset.set('original', new z.proto.Asset.Original(file.type, file.size, file.name));
@@ -1439,36 +1448,32 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Send asset preview message to specified conversation.
    *
-   * @param {Conversation} conversation_et - Conversation that should receive the preview
+   * @param {Conversation} conversationEntity - Conversation that should receive the preview
    * @param {File} file - File to generate preview from
-   * @param {string} message_id - Message ID of the message to generate a preview for
+   * @param {string} messageId - Message ID of the message to generate a preview for
    * @returns {Promise} Resolves when the asset preview was sent
    */
-  send_asset_preview(conversation_et, file, message_id) {
+  sendAssetPreview(conversationEntity, file, messageId) {
     return poster(file)
-      .then(image_blob => {
-        if (!image_blob) {
+      .then(imageBlob => {
+        if (!imageBlob) {
           throw Error('No image available');
         }
 
-        return this.asset_service.upload_asset(image_blob).then(uploaded_image_asset => {
+        return this.asset_service.uploadAsset(imageBlob).then(uploadedImageAsset => {
           const asset = new z.proto.Asset();
-          asset.set(
-            'preview',
-            new z.proto.Asset.Preview(image_blob.type, image_blob.size, uploaded_image_asset.uploaded)
-          );
+          const assetPreview = new z.proto.Asset.Preview(imageBlob.type, imageBlob.size, uploadedImageAsset.uploaded);
+          asset.set('preview', assetPreview);
 
-          const generic_message = new z.proto.GenericMessage(message_id);
-          generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
+          const genericMessage = new z.proto.GenericMessage(messageId);
+          genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
 
-          return this._send_and_inject_generic_message(conversation_et, generic_message);
+          return this._send_and_inject_generic_message(conversationEntity, genericMessage);
         });
       })
       .catch(error => {
-        this.logger.warn(
-          `No preview for asset '${message_id}' in conversation '${conversation_et.id}' uploaded `,
-          error
-        );
+        const message = `No preview for asset '${messageId}' in conversation '${conversationEntity.id}' uploaded `;
+        this.logger.warn(message, error);
       });
   }
 
@@ -1579,7 +1584,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   send_image_asset(conversation_et, image) {
     return this.asset_service
-      .upload_image_asset(image)
+      .uploadImageAsset(image)
       .then(asset => {
         let generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
         generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
@@ -1977,16 +1982,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
   _sendExternalGenericMessage(conversationId, genericMessage, recipients, preconditionOption, nativePush = true) {
     this.logger.info(`Sending external message of type '${genericMessage.content}'`, genericMessage);
 
-    return z.assets.AssetCrypto.encrypt_aes_asset(genericMessage.toArrayBuffer())
-      .then(({key_bytes, sha256, cipher_text}) => {
+    return z.assets.AssetCrypto.encryptAesAsset(genericMessage.toArrayBuffer())
+      .then(({cipherText, keyBytes, sha256}) => {
         const genericMessageExternal = new z.proto.GenericMessage(z.util.create_random_uuid());
-        const externalMessage = new z.proto.External(new Uint8Array(key_bytes), new Uint8Array(sha256));
+        const externalMessage = new z.proto.External(new Uint8Array(keyBytes), new Uint8Array(sha256));
         genericMessageExternal.set('external', externalMessage);
 
         return this.cryptography_repository
           .encrypt_generic_message(recipients, genericMessageExternal)
           .then(payload => {
-            payload.data = z.util.array_to_base64(cipher_text);
+            payload.data = z.util.array_to_base64(cipherText);
             payload.native_push = nativePush;
             return this._sendEncryptedMessage(conversationId, genericMessage, payload, preconditionOption);
           });
@@ -2214,7 +2219,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.send_asset_metadata(conversation_et, file)
       .then(({id}) => {
         message_id = id;
-        return this.send_asset_preview(conversation_et, file, message_id);
+        return this.sendAssetPreview(conversation_et, file, message_id);
       })
       .then(() => this.send_asset_remotedata(conversation_et, file, message_id))
       .then(() => {
@@ -2506,7 +2511,21 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     // Handle conversation create event separately
     if (type === z.event.Backend.CONVERSATION.CREATE) {
-      return this._on_create(eventJson);
+      return this._onCreate(eventJson);
+    }
+
+    const inSelfConversation = conversationId === this.self_conversation() && this.self_conversation().id;
+    if (inSelfConversation) {
+      const typesInSelfConversation = [
+        z.event.Backend.CONVERSATION.MEMBER_UPDATE,
+        z.event.Client.CONVERSATION.MESSAGE_HIDDEN,
+      ];
+
+      const isExpectedType = typesInSelfConversation.includes(type);
+      if (!isExpectedType) {
+        const error = new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_CONVERSATION);
+        return Promise.reject(error);
+      }
     }
 
     // Check if conversation was archived
@@ -2701,20 +2720,21 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * A conversation was created.
    *
    * @private
-   * @param {Object} event_json - JSON data of 'conversation.create' event
+   * @param {Object} eventJson - JSON data of 'conversation.create' event
    * @returns {Promise} Resolves when the event was handled
    */
-  _on_create(event_json) {
-    return this.find_conversation_by_id(event_json.conversation)
+  _onCreate(eventJson) {
+    return this.find_conversation_by_id(eventJson.conversation)
       .catch(error => {
-        if (error.type !== z.conversation.ConversationError.TYPE.NOT_FOUND) {
+        const isConversationNotFound = error.type === z.conversation.ConversationError.TYPE.NOT_FOUND;
+        if (!isConversationNotFound) {
           throw error;
         }
 
-        const {data: event_data, time} = event_json;
-        const event_timestamp = new Date(time).getTime();
-        const initial_timestamp = _.isNaN(event_timestamp) ? this.get_latest_event_timestamp() : event_timestamp;
-        return this.map_conversations(event_data, initial_timestamp);
+        const {data: eventData, time} = eventJson;
+        const eventTimestamp = new Date(time).getTime();
+        const initial_timestamp = _.isNaN(eventTimestamp) ? this.getLatestEventTimestamp(true) : eventTimestamp;
+        return this.map_conversations(eventData, initial_timestamp);
       })
       .then(conversation_et => this.update_participating_user_ets(conversation_et))
       .then(conversation_et => this.save_conversation(conversation_et))
