@@ -1,0 +1,18 @@
+{
+  "tags": {
+    "allowUnknownTags": false
+  },
+  "source": {
+    "exclude": [],
+    "excludePattern": "(^|\\/|\\\\)_",
+    "includePattern": ".+\\.js(doc)?$"
+  },
+  "opts": {
+    "comments": true,
+    "destination": "./typings",
+    "encoding": "utf8",
+    "lenient": true,
+    "recurse": true,
+    "template": "../../node_modules/tsd-jsdoc"
+  }
+}
