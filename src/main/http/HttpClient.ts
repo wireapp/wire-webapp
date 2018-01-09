@@ -36,13 +36,13 @@ export default class HttpClient {
       retryDelay: 1000,
     });
 
-    axios.interceptors.response.use(null, (error: AxiosError) => {
-      let backendResponse: string = undefined;
+    axios.interceptors.response.use(undefined, (error: AxiosError) => {
+      let backendResponse: string = '';
       try {
-        backendResponse = JSON.stringify(error.response.data);
+        backendResponse = JSON.stringify(error!.response!.data);
       } finally {
         this.logger.error(
-          `HTTP Error (${error.response.status}) on '${error.response.config.url}': ${
+          `HTTP Error (${error!.response!.status}) on '${error!.response!.config.url}': ${
             error.message
           } (${backendResponse})`
         );
@@ -88,7 +88,7 @@ export default class HttpClient {
   }
 
   public refreshAccessToken(): Promise<AccessTokenData> {
-    let expiredAccessToken: AccessTokenData = undefined;
+    let expiredAccessToken: AccessTokenData | undefined;
     if (this.accessTokenStore.accessToken && this.accessTokenStore.accessToken.access_token) {
       expiredAccessToken = this.accessTokenStore.accessToken;
     }

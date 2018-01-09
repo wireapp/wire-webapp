@@ -25,24 +25,36 @@ import {RecordNotFoundError} from '@wireapp/store-engine/dist/commonjs/engine/er
 
 const COOKIE_NAME: string = 'zuid';
 
-const loadExistingCookie = (engine: CRUDEngine): Promise<object> => {
+const loadExistingCookie = (
+  engine: CRUDEngine
+): Promise<{
+  expiration: string;
+  isExpired: boolean;
+  zuid: string;
+}> => {
   return engine
-    .read(AUTH_TABLE_NAME, AUTH_COOKIE_KEY)
+    .read<{
+      expiration: string;
+      isExpired: boolean;
+      zuid: string;
+    }>(AUTH_TABLE_NAME, AUTH_COOKIE_KEY)
     .catch(error => {
       if (error.name === RecordNotFoundError.name) {
-        return {isExpired: true};
+        return {expiration: '0', isExpired: true, zuid: ''};
       }
 
       throw error;
     })
-    .then((fileContent: {expiration: string; zuid: string}) => {
+    .then((fileContent: {expiration: string; isExpired: boolean; zuid: string}) => {
       return typeof fileContent === 'object'
         ? {
             isExpired: new Date() > new Date(fileContent.expiration),
             ...fileContent,
           }
         : {
+            expiration: '0',
             isExpired: true,
+            zuid: '',
           };
     });
 };
@@ -69,11 +81,11 @@ export const sendRequestWithCookie = (
   config: AxiosRequestConfig,
   engine: CRUDEngine
 ): AxiosPromise => {
-  return loadExistingCookie(engine).then(({isExpired, zuid}: {isExpired: string; zuid: string}) => {
-    if (!isExpired) {
+  return loadExistingCookie(engine).then((cookie: {expiration: string; zuid: string; isExpired: boolean}) => {
+    if (!cookie.isExpired) {
       // https://github.com/wearezeta/backend-api-docs/wiki/API-User-Authentication#token-refresh
       config.headers = config.headers || {};
-      config.headers['Cookie'] = `zuid=${zuid}`;
+      config.headers['Cookie'] = `zuid=${cookie.zuid}`;
       config.withCredentials = true;
     }
 

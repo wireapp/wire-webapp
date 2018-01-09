@@ -26,7 +26,6 @@ import {ConnectionAPI} from './connection/';
 import {ConversationAPI} from './conversation/';
 import {GiphyAPI} from './giphy/';
 import {HttpClient} from './http/';
-import {IncomingMessage} from 'http';
 import {InvitationAPI} from './invitation/';
 import {MemberAPI, PaymentAPI, TeamAPI, TeamInvitationAPI} from './team/';
 import {MemoryEngine} from '@wireapp/store-engine/dist/commonjs/engine';
@@ -36,64 +35,89 @@ import {WebSocketClient} from './tcp/';
 
 class Client {
   // APIs
-  public asset: {api: AssetAPI} = {api: undefined};
-  public auth: {api: AuthAPI} = {api: undefined};
-  public client: {api: ClientAPI} = {api: undefined};
-  public connection: {api: ConnectionAPI} = {api: undefined};
-  public conversation: {api: ConversationAPI} = {api: undefined};
-  public giphy: {api: GiphyAPI} = {api: undefined};
-  public invitation: {api: InvitationAPI} = {api: undefined};
-  public self: {api: SelfAPI} = {api: undefined};
+  public asset: {api: AssetAPI};
+  public auth: {api: AuthAPI};
+  public client: {api: ClientAPI};
+  public connection: {api: ConnectionAPI};
+  public conversation: {api: ConversationAPI};
+  public giphy: {api: GiphyAPI};
+  public invitation: {api: InvitationAPI};
+  public self: {api: SelfAPI};
   public teams: {
-    team: {api: TeamAPI};
-    member: {api: MemberAPI};
-    invitation: {api: TeamInvitationAPI};
-    payment: {api: PaymentAPI};
+    team: {api: TeamAPI | undefined};
+    member: {api: MemberAPI | undefined};
+    invitation: {api: TeamInvitationAPI | undefined};
+    payment: {api: PaymentAPI | undefined};
   } = {
     team: {api: undefined},
     member: {api: undefined},
     invitation: {api: undefined},
     payment: {api: undefined},
   };
-  public user: {api: UserAPI} = {api: undefined};
+  public user: {api: UserAPI};
 
   // Configuration
   private accessTokenStore: AccessTokenStore;
-  public config: Config;
-  public context: Context = undefined;
-  public transport: {http: HttpClient; ws: WebSocketClient} = {
-    http: undefined,
-    ws: undefined,
-  };
+  public context: Context;
+  public transport: {http: HttpClient; ws: WebSocketClient};
 
   public static BACKEND = Backend;
   public VERSION: string;
 
-  constructor(config: Config) {
-    this.config = {
-      store: new MemoryEngine('wire'),
-      urls: Client.BACKEND.PRODUCTION,
-      ...config,
-    };
-
+  constructor(public config: Config = new Config()) {
     this.accessTokenStore = new AccessTokenStore(this.config.store);
 
-    this.transport.http = new HttpClient(this.config.urls.rest, this.accessTokenStore);
-    this.transport.ws = new WebSocketClient(this.config.urls.ws, this.transport.http);
+    config.urls = config.urls || Client.BACKEND.PRODUCTION;
+    const httpClient = new HttpClient(this.config.urls.rest, this.accessTokenStore);
 
-    this.asset.api = new AssetAPI(this.transport.http);
-    this.auth.api = new AuthAPI(this.transport.http, this.config.store);
-    this.client.api = new ClientAPI(this.transport.http);
-    this.connection.api = new ConnectionAPI(this.transport.http);
-    this.conversation.api = new ConversationAPI(this.transport.http);
-    this.giphy.api = new GiphyAPI(this.transport.http);
-    this.invitation.api = new InvitationAPI(this.transport.http);
-    this.self.api = new SelfAPI(this.transport.http);
-    this.teams.invitation.api = new TeamInvitationAPI(this.transport.http);
-    this.teams.member.api = new MemberAPI(this.transport.http);
-    this.teams.payment.api = new PaymentAPI(this.transport.http);
-    this.teams.team.api = new TeamAPI(this.transport.http);
-    this.user.api = new UserAPI(this.transport.http);
+    this.transport = {
+      http: httpClient,
+      ws: new WebSocketClient(this.config.urls.ws, httpClient),
+    };
+
+    this.asset = {
+      api: new AssetAPI(this.transport.http),
+    };
+    this.auth = {
+      api: new AuthAPI(this.transport.http, this.config.store),
+    };
+    this.client = {
+      api: new ClientAPI(this.transport.http),
+    };
+    this.connection = {
+      api: new ConnectionAPI(this.transport.http),
+    };
+    this.conversation = {
+      api: new ConversationAPI(this.transport.http),
+    };
+    this.giphy = {
+      api: new GiphyAPI(this.transport.http),
+    };
+    this.invitation = {
+      api: new InvitationAPI(this.transport.http),
+    };
+    this.self = {
+      api: new SelfAPI(this.transport.http),
+    };
+
+    this.teams = {
+      invitation: {
+        api: new TeamInvitationAPI(this.transport.http),
+      },
+      member: {
+        api: new MemberAPI(this.transport.http),
+      },
+      payment: {
+        api: new PaymentAPI(this.transport.http),
+      },
+      team: {
+        api: new TeamAPI(this.transport.http),
+      },
+    };
+
+    this.user = {
+      api: new UserAPI(this.transport.http),
+    };
 
     this.transport.http.authAPI = this.auth.api;
   }
@@ -101,7 +125,7 @@ class Client {
   public init(): Promise<Context> {
     return this.accessTokenStore
       .init()
-      .then((accessToken: AccessTokenData) => (accessToken ? accessToken : this.auth.api.postAccess()))
+      .then((accessToken: AccessTokenData | undefined) => (accessToken ? accessToken : this.auth.api.postAccess()))
       .then((accessToken: AccessTokenData) => this.accessTokenStore.updateToken(accessToken))
       .then((accessToken: AccessTokenData) => this.createContext(accessToken.user));
   }
@@ -126,11 +150,13 @@ class Client {
       .postLogout()
       .then(() => this.disconnect('Closed by client logout'))
       .then(() => this.accessTokenStore.delete())
-      .then(() => (this.context = undefined));
+      .then(() => {
+        delete this.context;
+      });
   }
 
   public connect(): Promise<WebSocketClient> {
-    return this.transport.ws.connect(this.context.clientID);
+    return this.transport.ws.connect(this.context!.clientID);
   }
 
   private createContext(userID: string): Context {
