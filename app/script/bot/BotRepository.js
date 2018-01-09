@@ -23,8 +23,9 @@ window.z = window.z || {};
 window.z.bot = z.bot || {};
 
 z.bot.BotRepository = class BotRepository {
-  constructor(conversationRepository) {
+  constructor(botService, conversationRepository) {
     this.logger = new z.util.Logger('z.bot.BotRepository', z.config.LOGGER.OPTIONS);
+    this.botService = botService;
     this.conversationRepository = conversationRepository;
   }
 
