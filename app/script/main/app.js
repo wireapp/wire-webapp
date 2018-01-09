@@ -125,7 +125,10 @@ z.main.App = class App {
       repositories.user
     );
 
-    repositories.bot = new z.bot.BotRepository(this.service.bot, repositories.conversation);
+    repositories.integration = new z.integration.IntegrationRepository(
+      this.service.integration,
+      repositories.conversation
+    );
     repositories.broadcast = new z.broadcast.BroadcastRepository(
       this.service.broadcast,
       repositories.client,
@@ -145,6 +148,7 @@ z.main.App = class App {
       repositories.team,
       repositories.user
     );
+    repositories.integration = new z.integration.IntegrationRepository(repositories.conversation);
     repositories.system_notification = new z.system_notification.SystemNotificationRepository(
       repositories.calling,
       repositories.conversation
@@ -161,7 +165,7 @@ z.main.App = class App {
     const services = {};
 
     services.asset = new z.assets.AssetService(this.auth.client);
-    services.bot = new z.bot.BotService(this.auth.client);
+    services.integration = new z.integration.IntegrationService(this.auth.client);
     services.broadcast = new z.broadcast.BroadcastService(this.auth.client);
     services.calling = new z.calling.CallingService(this.auth.client);
     services.connect = new z.connect.ConnectService(this.auth.client);
@@ -357,7 +361,7 @@ z.main.App = class App {
 
         this.repository.user.self().devices(client_ets);
         this.logger.info('App pre-loading completed');
-        return this._handle_url_params();
+        return this._handleUrlParams();
       })
       .then(() => {
         this._show_ui();
@@ -519,6 +523,13 @@ z.main.App = class App {
     return Promise.resolve();
   }
 
+  _createServiceConversation(serviceInfo) {
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.BOTS_CONFIRM, {
+      action: () => this.repository.integration.addService(serviceInfo),
+      data: serviceInfo,
+    });
+  }
+
   /**
    * Get the self user from the backend.
    * @returns {Promise<z.entity.User>} Resolves with the self user entity
@@ -540,14 +551,14 @@ z.main.App = class App {
    * Handle URL params.
    * @returns {undefined} Not return value
    */
-  _handle_url_params() {
-    const botName = z.util.get_url_parameter(z.auth.URLParameter.BOT_NAME);
-    if (botName) {
-      const botProvider = z.util.get_url_parameter(z.auth.URLParameter.BOT_PROVIDER);
-      const botService = z.util.get_url_parameter(z.auth.URLParameter.BOT_SERVICE);
-      if (botProvider && botService) {
-        this.logger.info(`Found bot token '${botName}'`);
-        this.repository.bot.add_bot({botName, botProvider, botService});
+  _handleUrlParams() {
+    const serviceName = z.util.get_url_parameter(z.auth.URLParameter.BOT_NAME);
+    if (serviceName) {
+      const providerId = z.util.get_url_parameter(z.auth.URLParameter.BOT_PROVIDER);
+      const serviceId = z.util.get_url_parameter(z.auth.URLParameter.BOT_SERVICE);
+      if (providerId && serviceId) {
+        this.logger.info(`Found bot token '${serviceName}'`);
+        this._createServiceConversation({name: serviceName, providerId, serviceId});
       }
     }
   }

@@ -684,7 +684,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
 
     if (team_id) {
-      return this.create_new_conversation([user_et.id], undefined).then(({conversation_et}) => conversation_et);
+      return this.create_new_conversation([user_et.id], undefined);
     }
 
     return this.fetch_conversation_by_id(user_et.connection().conversation_id)
@@ -936,17 +936,19 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Add a bot to an existing conversation.
    *
-   * @param {Conversation} conversation_et - Conversation to add bot to
-   * @param {string} provider_id - ID of bot provider
-   * @param {string} service_id - ID of service provider
+   * @param {Conversation} conversationEntity - Conversation to add bot to
+   * @param {string} providerId - ID of bot provider
+   * @param {string} serviceId - ID of service provider
    * @returns {Promise} Resolves when bot was added
    */
-  add_bot(conversation_et, provider_id, service_id) {
-    return this.conversation_service.post_bots(conversation_et.id, provider_id, service_id).then(response => {
+  addBot(conversationEntity, providerId, serviceId) {
+    return this.conversation_service.post_bots(conversationEntity.id, providerId, serviceId).then(response => {
       if (response && response.event) {
         amplify.publish(z.event.WebApp.EVENT.INJECT, response.event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
-        this.logger.debug(`Successfully added bot to conversation '${conversation_et.display_name()}'`, response);
+        this.logger.debug(`Successfully added bot to conversation '${conversationEntity.display_name()}'`, response);
       }
+
+      return conversationEntity;
     });
   }
 

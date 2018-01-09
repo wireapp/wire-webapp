@@ -260,13 +260,13 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     } else {
       this.conversation_repository
         .create_new_conversation(user_ids.concat(this.user_profile().id), null)
-        .then(({conversation_et}) => {
+        .then(conversationEntity => {
           amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.CREATE_GROUP_CONVERSATION, {
             creationContext: 'addedToOneToOne',
             numberOfParticipants: user_ids.length,
           });
 
-          amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversation_et);
+          amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
         });
     }
 

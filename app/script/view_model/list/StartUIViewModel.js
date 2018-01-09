@@ -644,17 +644,17 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
     return this.conversation_repository
       .create_new_conversation(user_ids, null)
-      .then(response => {
+      .then(conversationEntity => {
         this.submitted_search = false;
 
-        if (response && response.conversation_et) {
+        if (conversationEntity) {
           this.propertiesRepository.save_preference(z.properties.PROPERTIES_TYPE.HAS_CREATED_CONVERSATION);
           amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.CREATE_GROUP_CONVERSATION, {
             creationContext: 'search',
             numberOfParticipants: user_ids.length,
           });
-          this.click_on_group(response.conversation_et);
-          return response.conversation_et;
+          this.click_on_group(conversationEntity);
+          return conversationEntity;
         }
       })
       .catch(error => {
