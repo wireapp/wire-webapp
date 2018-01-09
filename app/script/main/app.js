@@ -124,7 +124,6 @@ z.main.App = class App {
       repositories.team,
       repositories.user
     );
-
     repositories.broadcast = new z.broadcast.BroadcastRepository(
       this.service.broadcast,
       repositories.client,
@@ -144,7 +143,7 @@ z.main.App = class App {
       repositories.team,
       repositories.user
     );
-    repositories.integration = new z.integration.IntegrationRepository(repositories.conversation);
+    repositories.integration = new z.integration.IntegrationRepository(services.integration, repositories.conversation);
     repositories.system_notification = new z.system_notification.SystemNotificationRepository(
       repositories.calling,
       repositories.conversation
@@ -161,6 +160,7 @@ z.main.App = class App {
     const services = {};
 
     services.asset = new z.assets.AssetService(this.auth.client);
+    services.integration = new z.integration.IntegrationService(this.auth.client);
     services.broadcast = new z.broadcast.BroadcastService(this.auth.client);
     services.calling = new z.calling.CallingService(this.auth.client);
     services.connect = new z.connect.ConnectService(this.auth.client);

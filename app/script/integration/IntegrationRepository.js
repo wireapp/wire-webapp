@@ -23,9 +23,10 @@ window.z = window.z || {};
 window.z.integration = z.integration || {};
 
 z.integration.IntegrationRepository = class IntegrationRepository {
-  constructor(conversationRepository) {
+  constructor(integrationService, conversationRepository) {
     this.logger = new z.util.Logger('z.integration.IntegrationRepository', z.config.LOGGER.OPTIONS);
     this.conversationRepository = conversationRepository;
+    this.integrationService = integrationService;
   }
 
   /**
