@@ -19,7 +19,7 @@
 
 import BackendError from './BackendError';
 import * as AuthActionCreator from './creator/AuthActionCreator';
-import {currentLanguage} from '../../localeConfig';
+import {currentLanguage, currentCurrency} from '../../localeConfig';
 import {fetchSelf} from './SelfAction';
 
 export function doLogin(login) {
@@ -53,6 +53,7 @@ export function pushAccountRegistrationData(registration) {
 export function doRegisterTeam(registration) {
   return function(dispatch, getState, {apiClient}) {
     registration.locale = currentLanguage();
+    registration.currency = currentCurrency();
     registration.team.icon = 'default';
     registration.team.binding = true;
     registration.name = registration.name.trim();
@@ -61,6 +62,7 @@ export function doRegisterTeam(registration) {
     dispatch(
       AuthActionCreator.startRegisterTeam({
         accent_id: registration.accent_id,
+        currency: registration.currency,
         email: registration.email,
         locale: registration.locale,
         name: registration.name,
