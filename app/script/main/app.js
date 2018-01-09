@@ -124,11 +124,6 @@ z.main.App = class App {
       repositories.team,
       repositories.user
     );
-
-    repositories.integration = new z.integration.IntegrationRepository(
-      this.service.integration,
-      repositories.conversation
-    );
     repositories.broadcast = new z.broadcast.BroadcastRepository(
       this.service.broadcast,
       repositories.client,

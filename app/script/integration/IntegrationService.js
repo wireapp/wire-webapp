@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,14 +40,6 @@ z.integration.IntegrationService = class IntegrationService {
     this.logger = new z.util.Logger('z.integration.IntegrationService', z.config.LOGGER.OPTIONS);
   }
 
-  getServices(tags, start) {
-    return this.client.send_request({
-      data: {start, tags},
-      type: 'GET',
-      url: this.client.create_url(IntegrationService.URL.SERVICES),
-    });
-  }
-
   getProvider(providerId) {
     return this.client.send_request({
       type: 'GET',
@@ -63,12 +55,21 @@ z.integration.IntegrationService = class IntegrationService {
       ),
     });
   }
+
   getService(providerId, serviceId) {
     return this.client.send_request({
       type: 'GET',
       url: this.client.create_url(
         `${IntegrationService.URL.PROVIDERS}/${providerId}${IntegrationService.URL.SERVICES}/${serviceId}`
       ),
+    });
+  }
+
+  getServices(tags, start) {
+    return this.client.send_request({
+      data: {start, tags},
+      type: 'GET',
+      url: this.client.create_url(IntegrationService.URL.SERVICES),
     });
   }
 };
