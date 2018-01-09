@@ -37,19 +37,17 @@ z.bot.BotRepository = class BotRepository {
    * @param {boolean} [createConversation=true] - A new conversation is created if true otherwise bot is added to active conversation
    * @returns {Promise} Resolves when bot was added to conversation
    */
-  add_bot({botName, botProvider, botService}, createConversation = true) {
+  addBot({botName, botProvider, botService}, createConversation = true) {
     this.logger.info(`Info for bot '${botName}' retrieved.`, {botName, botProvider, botService});
     return Promise.resolve()
       .then(() => {
         if (createConversation) {
           return this.conversationRepository.create_new_conversation([], botName);
         }
-        return {conversation_et: this.conversationRepository.active_conversation()};
+        return this.conversationRepository.active_conversation();
       })
-      .then(({conversation_et}) => {
-        this.conversationRepository.add_bot(conversation_et, botProvider, botService);
-        amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversation_et);
-      })
+      .then(conversationEntity => this.conversationRepository.addBot(conversationEntity, botProvider, botService))
+      .then(conversationEntity => amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity))
       .catch(error => {
         amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.BOTS_UNAVAILABLE);
         throw error;
