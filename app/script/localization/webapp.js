@@ -125,6 +125,10 @@ z.string.modal_button_send = 'Send';
 z.string.modal_block_conversation_headline = 'Block {{user}}?';
 z.string.modal_block_conversation_message = '{{user}} won’t be able to contact you or add you to group conversations.';
 z.string.modal_block_conversation_button = 'Block';
+// Bots confirm
+z.string.modal_bots_confirm_headline = 'Integrate service?';
+z.string.modal_bots_confirm_message = 'Are you sure you want to create a new conversation and integrate {{name}}?';
+z.string.modal_bots_confirm_button = 'Confirm';
 // Bots unavailable
 z.string.modal_bots_unavailable_headline = 'Bots currently unavailable';
 z.string.modal_bots_unavailable_message = 'Thank you for your interest in bots. The service is currently suspended while we work on the next version. Stay tuned.';
