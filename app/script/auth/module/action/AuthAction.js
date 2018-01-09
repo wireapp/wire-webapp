@@ -59,17 +59,7 @@ export function doRegisterTeam(registration) {
     registration.name = registration.name.trim();
     registration.team.name = registration.team.name.trim();
     registration.email = registration.email.trim();
-    dispatch(
-      AuthActionCreator.startRegisterTeam({
-        accent_id: registration.accent_id,
-        currency: registration.currency,
-        email: registration.email,
-        locale: registration.locale,
-        name: registration.name,
-        password: '******',
-        team: registration.team,
-      })
-    );
+    dispatch(AuthActionCreator.startRegisterTeam({...registration, password: '******'}));
     return Promise.resolve()
       .then(() => dispatch(doSilentLogout()))
       .then(() => apiClient.register(registration))
