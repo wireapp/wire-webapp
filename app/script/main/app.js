@@ -143,7 +143,7 @@ z.main.App = class App {
       repositories.team,
       repositories.user
     );
-    repositories.integration = new z.integration.IntegrationRepository(repositories.conversation);
+    repositories.integration = new z.integration.IntegrationRepository(services.integration, repositories.conversation);
     repositories.system_notification = new z.system_notification.SystemNotificationRepository(
       repositories.calling,
       repositories.conversation
