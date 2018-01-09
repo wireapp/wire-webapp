@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,33 +20,33 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.bot = z.bot || {};
+window.z.integration = z.integration || {};
 
-z.bot.BotRepository = class BotRepository {
+z.integration.IntegrationRepository = class IntegrationRepository {
   constructor(conversationRepository) {
-    this.logger = new z.util.Logger('z.bot.BotRepository', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('z.integration.IntegrationRepository', z.config.LOGGER.OPTIONS);
     this.conversationRepository = conversationRepository;
   }
 
   /**
    * Add bot to conversation.
-   * @param {Object} botInfo - Bot tokens
-   * @option {string} botName - Bot name registered on backend (will be used as conversation name)
-   * @option {string} botProvider - Provider UUID
-   * @option {string} botService - Service UUID
+   * @param {Object} serviceInfo - Integration token
+   * @option {string} name - Service name registered on backend (will be used as conversation name)
+   * @option {string} providerId - Provider UUID
+   * @option {string} serviceId - Service UUID
    * @param {boolean} [createConversation=true] - A new conversation is created if true otherwise bot is added to active conversation
-   * @returns {Promise} Resolves when bot was added to conversation
+   * @returns {Promise} Resolves when integration was added to conversation
    */
-  addBot({botName, botProvider, botService}, createConversation = true) {
-    this.logger.info(`Info for bot '${botName}' retrieved.`, {botName, botProvider, botService});
+  addService({name, providerId, serviceId}, createConversation = true) {
+    this.logger.info(`Info for integration service '${name}' retrieved.`, {name, providerId, serviceId});
     return Promise.resolve()
       .then(() => {
         if (createConversation) {
-          return this.conversationRepository.create_new_conversation([], botName);
+          return this.conversationRepository.create_new_conversation([], name);
         }
         return this.conversationRepository.active_conversation();
       })
-      .then(conversationEntity => this.conversationRepository.addBot(conversationEntity, botProvider, botService))
+      .then(conversationEntity => this.conversationRepository.addBot(conversationEntity, providerId, serviceId))
       .then(conversationEntity => amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity))
       .catch(error => {
         amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.BOTS_UNAVAILABLE);
