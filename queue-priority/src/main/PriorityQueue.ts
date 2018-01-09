@@ -21,11 +21,10 @@ import Item from './Item';
 import Priority from './Priority';
 
 export default class PriorityQueue<P> {
-  private config: Config<P>;
   private defaults = {
-    comparator: (a: Item<number>, b: Item<number>): number => {
+    comparator: (a: Item<P>, b: Item<P>): number => {
       if (a.priority === b.priority) return a.timestamp - b.timestamp;
-      return b.priority - a.priority;
+      return <any>b.priority - <any>a.priority;
     },
     maxRetries: Infinity,
     retryDelay: 1000,
@@ -33,7 +32,7 @@ export default class PriorityQueue<P> {
   public isPending: boolean = false;
   private queue: Array<Item<P>> = [];
 
-  constructor(config?: Config<P>) {
+  constructor(private config?: Config<P>) {
     this.config = Object.assign(this.defaults, config);
   }
 
@@ -46,10 +45,10 @@ export default class PriorityQueue<P> {
       queueObject.priority = priority;
       queueObject.reject = reject;
       queueObject.resolve = resolve;
-      queueObject.retry = this.config.maxRetries;
+      queueObject.retry = this.config!.maxRetries;
       queueObject.timestamp = Date.now() + this.size;
       this.queue.push(queueObject);
-      this.queue.sort(this.config.comparator);
+      this.queue.sort(this.config!.comparator);
       this.run();
     });
   }
@@ -77,10 +76,10 @@ export default class PriorityQueue<P> {
         return [true, () => queueObject.resolve(result)];
       })
       .catch((error: Error) => {
-        if (queueObject.retry > 0) {
-          queueObject.retry -= 1;
+        if (queueObject.retry! > 0) {
+          queueObject.retry! -= 1;
           // TODO: Implement configurable reconnection delay (and reconnection delay growth factor)
-          setTimeout(() => this.resolveItems(), this.config.retryDelay);
+          setTimeout(() => this.resolveItems(), this.config!.retryDelay || 1000);
           return [false];
         } else {
           queueObject.reject(error);
@@ -91,7 +90,7 @@ export default class PriorityQueue<P> {
         if (shouldContinue) {
           if (wrappedResolve) wrappedResolve();
           this.isPending = false;
-          const nextItem: Item<P> = this.queue.shift();
+          const nextItem: Item<P> | undefined = this.queue.shift();
           if (nextItem) {
             this.resolveItems();
           }

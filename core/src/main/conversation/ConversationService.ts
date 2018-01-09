@@ -1,5 +1,6 @@
 const UUID = require('pure-uuid');
 import APIClient = require('@wireapp/api-client');
+import {AxiosError} from 'axios';
 import {Context} from '@wireapp/api-client/dist/commonjs/auth/';
 import {
   ClientMismatch,
@@ -12,7 +13,7 @@ import {UserPreKeyBundleMap} from '@wireapp/api-client/dist/commonjs/user/';
 import {CryptographyService} from '../crypto/';
 
 export default class ConversationService {
-  private context: Context;
+  private clientID: string;
 
   constructor(
     private apiClient: APIClient,
@@ -34,7 +35,7 @@ export default class ConversationService {
 
   // TODO: The correct functionality of this function is heavily based on the case that it always runs into the catch block
   private getPreKeyBundles(conversationId: string): Promise<ClientMismatch | UserPreKeyBundleMap> {
-    return this.apiClient.conversation.api.postOTRMessage(this.context.clientID, conversationId).catch(error => {
+    return this.apiClient.conversation.api.postOTRMessage(this.clientID, conversationId).catch((error: AxiosError) => {
       if (error.response && error.response.status === 412) {
         const recipients: UserClients = error.response.data.missing;
         return this.apiClient.user.api.postMultiPreKeyBundles(recipients);
@@ -50,14 +51,14 @@ export default class ConversationService {
     });
 
     return this.getPreKeyBundles(conversationId)
-      .then((preKeyBundles: UserPreKeyBundleMap) => {
+      .then((preKeyBundles: ClientMismatch | UserPreKeyBundleMap) => {
         const typedArray = this.protocolBuffers.GenericMessage.encode(customTextMessage).finish();
-        return this.cryptographyService.encrypt(typedArray, preKeyBundles);
+        return this.cryptographyService.encrypt(typedArray, <UserPreKeyBundleMap>preKeyBundles);
       })
-      .then(payload => this.sendMessage(this.context.clientID, conversationId, payload));
+      .then((payload: OTRRecipients) => this.sendMessage(this.clientID, conversationId, payload));
   }
 
-  public setContext(newContext: Context) {
-    this.context = newContext;
+  public setClientID(clientID: string) {
+    this.clientID = clientID;
   }
 }

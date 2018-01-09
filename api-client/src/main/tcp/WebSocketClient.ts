@@ -25,7 +25,7 @@ const Html5WebSocket = require('html5-websocket');
 const ReconnectingWebsocket = require('reconnecting-websocket');
 
 export default class WebSocketClient extends EventEmitter {
-  private clientId: string;
+  private clientId: string | undefined;
 
   private socket: WebSocket;
 
@@ -54,7 +54,7 @@ export default class WebSocketClient extends EventEmitter {
     super();
   }
 
-  private buildWebSocketURL(accessToken: string = this.client.accessTokenStore.accessToken.access_token): string {
+  private buildWebSocketURL(accessToken: string = this.client.accessTokenStore.accessToken!.access_token): string {
     let url = `${this.baseURL}/await?access_token=${accessToken}`;
     if (this.clientId) {
       // Note: If no client ID is given, then the WebSocket connection will receive all notifications for all clients of the connected user

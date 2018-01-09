@@ -2,16 +2,20 @@ import CRUDEngine from './CRUDEngine';
 import Dexie from 'dexie';
 import {RecordAlreadyExistsError, RecordNotFoundError, RecordTypeError} from './error';
 
+export interface DexieInstance extends Dexie {
+  [index: string]: any;
+}
+
 export default class IndexedDBEngine implements CRUDEngine {
   public storeName: string;
 
-  constructor(private db: Dexie) {
+  constructor(private db: DexieInstance) {
     this.storeName = db.name;
   }
 
   public create<T>(tableName: string, primaryKey: string, entity: T): Promise<string> {
     if (entity) {
-      return this.db[tableName].add(entity, primaryKey).catch(error => {
+      return this.db[tableName].add(entity, primaryKey).catch((error: Dexie.DexieError) => {
         if (error instanceof Dexie.ConstraintError) {
           const message: string = `Record "${primaryKey}" already exists in "${tableName}". You need to delete the record first if you want to overwrite it.`;
           throw new RecordAlreadyExistsError(message);

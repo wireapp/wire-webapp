@@ -23,10 +23,12 @@ export default class CryptographyService {
       return initialPreKeys
         .map(preKey => {
           const preKeyJson: auth.PreKey = this.cryptobox.serialize_prekey(preKey);
-          if (preKeyJson.id !== Proteus.keys.PreKey.MAX_PREKEY_ID) return preKeyJson;
-          return undefined;
+          if (preKeyJson.id !== Proteus.keys.PreKey.MAX_PREKEY_ID) {
+            return preKeyJson;
+          }
+          return {id: -1, key: ''};
         })
-        .filter(serializedPreKey => serializedPreKey);
+        .filter(serializedPreKey => serializedPreKey.key);
     });
   }
 

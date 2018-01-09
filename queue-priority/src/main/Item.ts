@@ -21,6 +21,6 @@ export default class Item<P> {
   priority: P;
   reject: Function;
   resolve: Function;
-  retry: number;
+  retry: number | undefined;
   timestamp: number;
 }

@@ -68,7 +68,7 @@ export default class TransientStore extends EventEmitter {
     };
   }
 
-  public get(primaryKey: string): Promise<TransientBundle> {
+  public get(primaryKey: string): Promise<TransientBundle | undefined> {
     return this.getFromCache(primaryKey)
       .then((cachedBundle: TransientBundle) => {
         return cachedBundle !== undefined ? cachedBundle : this.getFromStore(primaryKey);
@@ -165,7 +165,13 @@ export default class TransientStore extends EventEmitter {
   // TODO: Change method signature to "cacheKey: string, bundle: TransientBundle"
   private startTimer(cacheKey: string): Promise<TransientBundle> {
     const primaryKey = this.constructPrimaryKey(cacheKey);
-    return this.get(primaryKey).then((bundle: TransientBundle) => {
+    return this.get(primaryKey).then((bundle: TransientBundle | undefined) => {
+      if (!bundle) {
+        bundle = new TransientBundle();
+        bundle.expires = 0;
+        bundle.payload = undefined;
+      }
+
       const {expires, timeoutID} = bundle;
       const timespan: number = expires - Date.now();
 

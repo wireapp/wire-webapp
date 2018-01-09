@@ -1,4 +1,4 @@
-import * as fs from 'fs-extra';
+const fs = require('fs-extra');
 import CRUDEngine from './CRUDEngine';
 import path = require('path');
 import {PathValidationError, RecordAlreadyExistsError, RecordNotFoundError, RecordTypeError} from './error';
@@ -28,7 +28,7 @@ export default class FileEngine implements CRUDEngine {
     };
 
     return new Promise((resolve, reject) => {
-      if (isPathTraversal(tableName, primaryKey)) {
+      if (isPathTraversal(tableName, primaryKey || '')) {
         return reject(new PathValidationError(PathValidationError.TYPE.PATH_TRAVERSAL));
       }
 
@@ -61,13 +61,13 @@ export default class FileEngine implements CRUDEngine {
               }
             }
 
-            fs.writeFile(filePath, entity, {flag: 'wx'}, error => {
+            fs.writeFile(filePath, entity, {flag: 'wx'}, (error: NodeJS.ErrnoException) => {
               if (error) {
                 if (error.code === 'ENOENT') {
                   fs
                     .outputFile(filePath, entity)
                     .then(() => resolve(primaryKey))
-                    .catch(error => reject(error));
+                    .catch((error: Error) => reject(error));
                 } else if (error.code === 'EEXIST') {
                   const message: string = `Record "${primaryKey}" already exists in "${tableName}". You need to delete the record first if you want to overwrite it.`;
                   reject(new RecordAlreadyExistsError(message));
@@ -132,7 +132,7 @@ export default class FileEngine implements CRUDEngine {
   readAll<T>(tableName: string): Promise<T[]> {
     return this.resolvePath(tableName).then(directory => {
       return new Promise<T[]>((resolve, reject) => {
-        fs.readdir(directory, (error, files) => {
+        fs.readdir(directory, (error: NodeJS.ErrnoException, files: Array<string>) => {
           if (error) {
             reject(error);
           } else {
@@ -148,7 +148,7 @@ export default class FileEngine implements CRUDEngine {
   readAllPrimaryKeys(tableName: string): Promise<string[]> {
     return this.resolvePath(tableName).then(directory => {
       return new Promise<string[]>(resolve => {
-        fs.readdir(directory, (error, files) => {
+        fs.readdir(directory, (error: NodeJS.ErrnoException, files: Array<string>) => {
           if (error) {
             if (error.code === 'ENOENT') {
               resolve([]);

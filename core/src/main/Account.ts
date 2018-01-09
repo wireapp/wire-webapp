@@ -43,12 +43,9 @@ export default class Account extends EventEmitter {
   private client: RegisteredClient;
   public context: Context;
   private protocolBuffers: any = {};
-  public service: {conversation: ConversationService; crypto: CryptographyService} = {
-    conversation: undefined,
-    crypto: undefined,
-  };
+  public service: {conversation: ConversationService; crypto: CryptographyService};
 
-  constructor(apiClient: Client = new Client({store: new MemoryEngine('temporary')})) {
+  constructor(apiClient: Client = new Client({store: new MemoryEngine('temporary'), urls: Client.BACKEND.PRODUCTION})) {
     super();
     this.apiClient = apiClient;
   }
@@ -103,14 +100,16 @@ export default class Account extends EventEmitter {
         this.protocolBuffers.Text = root.lookup('Text');
       })
       .then(() => {
-        this.service.crypto = new CryptographyService(this.apiClient.config.store);
-        this.service.conversation = new ConversationService(this.apiClient, this.protocolBuffers, this.service.crypto);
+        this.service = {
+          conversation: new ConversationService(this.apiClient, this.protocolBuffers, this.service.crypto),
+          crypto: new CryptographyService(this.apiClient.config.store),
+        };
       });
   }
 
   private initClient(context: Context, loginData: LoginData): Promise<RegisteredClient> {
     this.context = context;
-    this.service.conversation.setContext(this.context);
+    this.service.conversation.setClientID(<string>this.context.clientID);
     return this.service.crypto.loadClient().catch(error => {
       if (error instanceof RecordNotFoundError) {
         return this.registerClient(loginData);
@@ -121,12 +120,7 @@ export default class Account extends EventEmitter {
 
   public listen(loginData: LoginData, notificationHandler?: Function): Promise<WebSocketClient> {
     return Promise.resolve()
-      .then(() => {
-        if (!this.context) {
-          return this.login(loginData);
-        }
-        return undefined;
-      })
+      .then(() => (this.context ? this.context : this.login(loginData, true)))
       .then(() => {
         if (notificationHandler) {
           this.apiClient.transport.ws.on(WebSocketClient.TOPIC.ON_MESSAGE, (notification: IncomingNotification) =>
@@ -156,16 +150,15 @@ export default class Account extends EventEmitter {
       })
       .then(() => {
         this.context = this.apiClient.context;
-        this.service.conversation.setContext(this.context);
+        this.service.conversation.setClientID(<string>this.context.clientID);
         return this.context;
       });
   }
 
   private resetContext(): void {
-    this.client = undefined;
-    this.context = undefined;
-    this.service.conversation.setContext(undefined);
-    this.service.crypto = undefined;
+    delete this.client;
+    delete this.context;
+    delete this.service;
   }
 
   public logout(): Promise<void> {
@@ -184,7 +177,7 @@ export default class Account extends EventEmitter {
           class: clientClassification,
           cookie: cookieLabel,
           lastkey: this.service.crypto.cryptobox.serialize_prekey(this.service.crypto.cryptobox.lastResortPreKey),
-          password: loginData.password.toString(),
+          password: String(loginData.password),
           prekeys: serializedPreKeys,
           sigkeys: {
             enckey: 'Wuec0oJi9/q9VsgOil9Ds4uhhYwBT+CAUrvi/S9vcz0=',

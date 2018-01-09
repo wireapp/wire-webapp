@@ -15,7 +15,7 @@ export default class LocalStorageEngine implements CRUDEngine {
           }
           throw error;
         })
-        .then((record: T) => {
+        .then(record => {
           if (record) {
             const message: string = `Record "${primaryKey}" already exists in "${tableName}". You need to delete the record first if you want to overwrite it.`;
             throw new RecordAlreadyExistsError(message);

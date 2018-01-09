@@ -16,15 +16,16 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine';
+import {Backend} from './env';
+import {CRUDEngine, MemoryEngine} from '@wireapp/store-engine/dist/commonjs/engine';
 
-interface Config {
-  store?: CRUDEngine;
-  urls?: {
-    name?: string;
-    rest: string;
-    ws?: string;
-  };
+export default class Config {
+  constructor(
+    public store: CRUDEngine = new MemoryEngine('wire'),
+    public urls: {
+      name?: string;
+      rest: string;
+      ws: string;
+    } = Backend.PRODUCTION
+  ) {}
 }
-
-export default Config;
