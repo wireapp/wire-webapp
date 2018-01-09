@@ -10,7 +10,7 @@
     "tsd-jsdoc": "dcodeio/tsd-jsdoc#fe76c4dc071b00bb549d3af7a3bad8c555999e81",
     "webpack": "3.10.0"
   },
-  "files": ["dist/"],
+  "files": ["dist/", "src/", "typings"],
   "license": "GPL-3.0",
   "main": "src/cbor.js",
   "name": "@wireapp/cbor",
