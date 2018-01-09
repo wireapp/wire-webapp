@@ -33,12 +33,12 @@ z.ui.Context = (() => {
   function onKeyDown(keyboard_event) {
     keyboard_event.preventDefault();
 
-    if (z.util.KeyboardUtil.is_escape_key(keyboard_event)) {
+    if (z.util.KeyboardUtil.isEscapeKey(keyboard_event)) {
       return cleanup();
     }
 
     if (
-      z.util.KeyboardUtil.is_one_of_keys(keyboard_event, [
+      z.util.KeyboardUtil.isOneOfKeys(keyboard_event, [
         z.util.KeyboardUtil.KEY.ARROW_UP,
         z.util.KeyboardUtil.KEY.ARROW_DOWN,
       ])
@@ -46,7 +46,7 @@ z.ui.Context = (() => {
       return rotateItem(keyboard_event.key);
     }
 
-    if (z.util.KeyboardUtil.is_enter_key(z.util.KeyboardUtil.KEY.ENTER)) {
+    if (z.util.KeyboardUtil.isEnterKey(z.util.KeyboardUtil.KEY.ENTER)) {
       triggerItem();
     }
   }

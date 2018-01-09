@@ -122,7 +122,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   check_username_input(username, keyboard_event) {
-    if (z.util.KeyboardUtil.is_key(keyboard_event, z.util.KeyboardUtil.KEY.BACKSPACE)) {
+    if (z.util.KeyboardUtil.isKey(keyboard_event, z.util.KeyboardUtil.KEY.BACKSPACE)) {
       return true;
     }
     // Automation: KeyboardEvent triggered during tests is missing key property
