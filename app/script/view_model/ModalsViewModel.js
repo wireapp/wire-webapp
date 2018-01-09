@@ -24,6 +24,7 @@ window.z.ViewModel = z.ViewModel || {};
 
 z.ViewModel.ModalType = {
   BLOCK: '.modal-block',
+  BOTS_CONFIRM: '.modal-bots-confirm',
   BOTS_UNAVAILABLE: '.modal-bots-unavailable',
   CALL_EMPTY_CONVERSATION: '.modal-call-conversation-empty',
   CALL_NO_VIDEO_IN_GROUP: '.modal-call-no-video-in-group',
@@ -82,6 +83,9 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
     switch (type) {
       case z.ViewModel.ModalType.BLOCK:
         this._show_modal_block(options.data, title_element, message_element);
+        break;
+      case z.ViewModel.ModalType.BOTS_CONFIRM:
+        this._show_modal_bots_confirm(options.data, message_element);
         break;
       case z.ViewModel.ModalType.CALL_START_ANOTHER:
         this._show_modal_call_start_another(options.data, title_element, message_element);
@@ -182,6 +186,10 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
   _show_modal_block(content, title_element, message_element) {
     title_element.text(z.l10n.text(z.string.modal_block_conversation_headline, content));
     message_element.text(z.l10n.text(z.string.modal_block_conversation_message, content));
+  }
+
+  _show_modal_bots_confirm(content, message_element) {
+    message_element.text(z.l10n.text(z.string.modal_block_conversation_message, content.name));
   }
 
   /**
