@@ -369,16 +369,16 @@
   dependencies:
     "@types/node" "8.0.25"
 
-"@wireapp/react-ui-kit@0.0.30":
-  version "0.0.30"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-0.0.30.tgz#c4e326a3d4eae6912ebc3ec1f253b0678ed16c7a"
+"@wireapp/react-ui-kit@0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-0.1.1.tgz#fc513351782bb982f517097b848fb39aaaffa5af"
   dependencies:
     color "2.0.1"
     gulp-concat "2.6.1"
     react "16.2.0"
     react-dom "16.2.0"
     recompose "0.26.0"
-    styled-components "2.3.0"
+    styled-components "2.4.0"
     styled-normalize "2.2.1"
 
 "@wireapp/store-engine@0.1.0":
@@ -5273,10 +5273,6 @@ is-fullwidth-code-point@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/is-fullwidth-code-point/-/is-fullwidth-code-point-2.0.0.tgz#a3b30a5c4f199183167aaab93beefae3ddfb654f"
 
-is-function@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/is-function/-/is-function-1.0.1.tgz#12cfb98b65b57dd3d193a3121f5f6e2f437602b5"
-
 is-glob@^2.0.0, is-glob@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/is-glob/-/is-glob-2.0.1.tgz#d096f926a3ded5600f3fdfd91198cb0888c2d863"
@@ -9643,15 +9639,14 @@ style-loader@0.19.1:
     loader-utils "^1.0.2"
     schema-utils "^0.3.0"
 
-styled-components@2.3.0:
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/styled-components/-/styled-components-2.3.0.tgz#d9cf4574e140fea6426e48632ed0ca4494537718"
+styled-components@2.4.0:
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/styled-components/-/styled-components-2.4.0.tgz#086d0fd483d54638837fca3ea546a030b94adf75"
   dependencies:
     buffer "^5.0.3"
     css-to-react-native "^2.0.3"
     fbjs "^0.8.9"
     hoist-non-react-statics "^1.2.0"
-    is-function "^1.0.1"
     is-plain-object "^2.0.1"
     prop-types "^15.5.4"
     stylis "^3.4.0"
