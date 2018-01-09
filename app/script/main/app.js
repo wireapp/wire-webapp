@@ -125,7 +125,6 @@ z.main.App = class App {
       repositories.user
     );
 
-    repositories.bot = new z.bot.BotRepository(repositories.conversation);
     repositories.broadcast = new z.broadcast.BroadcastRepository(
       this.service.broadcast,
       repositories.client,
@@ -145,6 +144,7 @@ z.main.App = class App {
       repositories.team,
       repositories.user
     );
+    repositories.integration = new z.integration.IntegrationRepository(repositories.conversation);
     repositories.system_notification = new z.system_notification.SystemNotificationRepository(
       repositories.calling,
       repositories.conversation
@@ -518,10 +518,10 @@ z.main.App = class App {
     return Promise.resolve();
   }
 
-  _createBotConversation(botInfo) {
+  _createServiceConversation(serviceInfo) {
     amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.BOTS_CONFIRM, {
-      action: () => this.repository.bot.addBot(botInfo),
-      data: botInfo,
+      action: () => this.repository.integration.addService(serviceInfo),
+      data: serviceInfo,
     });
   }
 
@@ -547,13 +547,13 @@ z.main.App = class App {
    * @returns {undefined} Not return value
    */
   _handleUrlParams() {
-    const botName = z.util.get_url_parameter(z.auth.URLParameter.BOT_NAME);
-    if (botName) {
-      const botProvider = z.util.get_url_parameter(z.auth.URLParameter.BOT_PROVIDER);
-      const botService = z.util.get_url_parameter(z.auth.URLParameter.BOT_SERVICE);
-      if (botProvider && botService) {
-        this.logger.info(`Found bot token '${botName}'`);
-        this._createBotConversation({botName, botProvider, botService});
+    const serviceName = z.util.get_url_parameter(z.auth.URLParameter.BOT_NAME);
+    if (serviceName) {
+      const providerId = z.util.get_url_parameter(z.auth.URLParameter.BOT_PROVIDER);
+      const serviceId = z.util.get_url_parameter(z.auth.URLParameter.BOT_SERVICE);
+      if (providerId && serviceId) {
+        this.logger.info(`Found bot token '${serviceName}'`);
+        this._createServiceConversation({name: serviceName, providerId, serviceId});
       }
     }
   }
