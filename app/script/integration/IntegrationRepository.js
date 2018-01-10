@@ -25,8 +25,11 @@ window.z.integration = z.integration || {};
 z.integration.IntegrationRepository = class IntegrationRepository {
   constructor(integrationService, conversationRepository) {
     this.logger = new z.util.Logger('z.integration.IntegrationRepository', z.config.LOGGER.OPTIONS);
-    this.conversationRepository = conversationRepository;
+
     this.integrationService = integrationService;
+    this.integrationMapper = new z.integration.IntegrationMapper();
+
+    this.conversationRepository = conversationRepository;
   }
 
   /**
@@ -39,7 +42,7 @@ z.integration.IntegrationRepository = class IntegrationRepository {
    * @returns {Promise} Resolves when integration was added to conversation
    */
   addService({name, providerId, serviceId}, createConversation = true) {
-    this.logger.info(`Info for integration service '${name}' retrieved.`, {name, providerId, serviceId});
+    this.logger.info(`Adding integration service '${name}'`, {name, providerId, serviceId});
     return Promise.resolve()
       .then(() => {
         if (createConversation) {
@@ -53,5 +56,39 @@ z.integration.IntegrationRepository = class IntegrationRepository {
         amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.BOTS_UNAVAILABLE);
         throw error;
       });
+  }
+
+  getProvider(providerId) {
+    return this.integrationService.getProvider(providerId).then(response => {
+      if (response) {
+        return this.integrationMapper.mapProviderFromObject(response);
+      }
+    });
+  }
+
+  getServiceById(providerId, serviceId) {
+    return this.integrationService.getService(providerId, serviceId).then(service => {
+      if (service) {
+        return this.integrationMapper.mapServiceFromObject(service);
+      }
+    });
+  }
+
+  getServices(tags, start) {
+    const tagsArray = _.isArray(tags) ? tags.slice(0, 3) : [z.integration.ServiceTag.TUTORIAL];
+
+    return this.integrationService.getServices(tagsArray.join(','), start).then(({services}) => {
+      if (services.length) {
+        return this.integrationMapper.mapServicesFromArray(services);
+      }
+    });
+  }
+
+  getServicesByProvider(providerId) {
+    return this.integrationService.getProviderServices(providerId).then(services => {
+      if (services.length) {
+        return this.integrationMapper.mapServicesFromArray(services);
+      }
+    });
   }
 };
