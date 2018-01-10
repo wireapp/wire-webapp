@@ -32,5 +32,8 @@ z.integration.ServiceEntity = class ServiceEntity {
     this.name = name || '';
     this.providerId = providerId || '';
     this.tags = tags || [];
+
+    this.mediumPictureResource = ko.observable();
+    this.previewPictureResource = ko.observable();
   }
 };
