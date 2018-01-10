@@ -34,12 +34,12 @@
     "clear": "rimraf dist",
     "dist": "yarn clear && yarn build",
     "prepublish": "yarn test",
-    "release": "cd ./dist && npm publish",
+    "publish": "cd ./dist && npm publish",
     "start:demo": "webpack-dev-server",
     "start:static": "gulp",
     "start": "yarn start:demo",
     "test": "exit 0",
     "prepare": "yarn dist"
   },
-  "version": "0.1.1"
+  "version": "0.1.2"
 }
