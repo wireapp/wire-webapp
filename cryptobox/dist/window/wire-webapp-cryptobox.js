@@ -1,4 +1,4 @@
-/*! @wireapp/cryptobox v6.2.1 */
+/*! @wireapp/cryptobox v6.3.0 */
 var cryptobox =
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -91,7 +91,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var DecryptionError = (function (_super) {
+var DecryptionError = /** @class */ (function (_super) {
     __extends(DecryptionError, _super);
     function DecryptionError(message) {
         var _this = _super.call(this, message) || this;
@@ -148,8 +148,13 @@ var CryptoboxSession_1 = __webpack_require__(4);
 var DecryptionError_1 = __webpack_require__(1);
 var InvalidPreKeyFormatError_1 = __webpack_require__(5);
 var ReadOnlyStore_1 = __webpack_require__(7);
-var Cryptobox = (function (_super) {
+var Cryptobox = /** @class */ (function (_super) {
     __extends(Cryptobox, _super);
+    /**
+     * Constructs a Cryptobox.
+     * @param {CryptoboxCRUDStore} cryptoBoxStore
+     * @param {number} minimumAmountOfPreKeys - Minimum amount of PreKeys (including the last resort PreKey)
+     */
     function Cryptobox(cryptoBoxStore, minimumAmountOfPreKeys) {
         if (minimumAmountOfPreKeys === void 0) { minimumAmountOfPreKeys = 1; }
         var _this = _super.call(this) || this;
@@ -256,6 +261,10 @@ var Cryptobox = (function (_super) {
     Cryptobox.prototype.publish_session_id = function (session) {
         this.publish_event(Cryptobox.TOPIC.NEW_SESSION, session.id);
     };
+    /**
+     * This method returns all PreKeys available, respecting the minimum required amount of PreKeys.
+     * If all available PreKeys don't meet the minimum PreKey amount, new PreKeys will be created.
+     */
     Cryptobox.prototype.refill_prekeys = function () {
         var _this = this;
         return Promise.resolve()
@@ -289,6 +298,10 @@ var Cryptobox = (function (_super) {
             return _this.store.save_identity(identity);
         });
     };
+    /**
+     * Creates a new session which can be used for cryptographic operations (encryption & decryption) from a remote PreKey bundle.
+     * Saving the session takes automatically place when the session is used to encrypt or decrypt a message.
+     */
     Cryptobox.prototype.session_from_prekey = function (session_id, pre_key_bundle) {
         var _this = this;
         return this.session_load(session_id).catch(function (sessionLoadError) {
@@ -306,6 +319,10 @@ var Cryptobox = (function (_super) {
             });
         });
     };
+    /**
+     * Uses a cipher message to create a new session and to decrypt to message which the given cipher message contains.
+     * Saving the newly created session is not needed as it's done during the inbuilt decryption phase.
+     */
     Cryptobox.prototype.session_from_message = function (session_id, envelope) {
         var _this = this;
         var env = Proteus.message.Envelope.deserialise(envelope);
@@ -332,7 +349,9 @@ var Cryptobox = (function (_super) {
         var preKeyDeletionPromises = this.pk_store.prekeys.map(function (preKeyId) { return _this.store.delete_prekey(preKeyId); });
         return Promise.all(preKeyDeletionPromises)
             .then(function (deletedPreKeyIds) {
+            // Remove PreKey from cache
             _this.cachedPreKeys = _this.cachedPreKeys.filter(function (preKey) { return !deletedPreKeyIds.includes(preKey.key_id); });
+            // Remove PreKey from removal list
             _this.pk_store.release_prekeys(deletedPreKeyIds);
             return _this.refill_prekeys();
         })
@@ -367,6 +386,9 @@ var Cryptobox = (function (_super) {
     Cryptobox.prototype.serialize_prekey = function (prekey) {
         return Proteus.keys.PreKeyBundle.new(this.identity.public_key, prekey).serialised_json();
     };
+    /**
+     * Creates new PreKeys and saves them into the storage.
+     */
     Cryptobox.prototype.new_prekeys = function (start, size) {
         var _this = this;
         if (size === void 0) { size = 0; }
@@ -394,6 +416,7 @@ var Cryptobox = (function (_super) {
         })
             .then(function (encrypted) {
             encryptedBuffer = encrypted;
+            // TODO: This should be "update_session"
             return _this.session_update(loadedSession);
         })
             .then(function () { return encryptedBuffer; });
@@ -435,6 +458,7 @@ var Cryptobox = (function (_super) {
     return Cryptobox;
 }(EventEmitter));
 exports.Cryptobox = Cryptobox;
+// Note: Path to "package.json" must be relative to the "commonjs" dist files
 Cryptobox.prototype.VERSION = __webpack_require__(23).version;
 
 
@@ -447,7 +471,7 @@ Cryptobox.prototype.VERSION = __webpack_require__(23).version;
 Object.defineProperty(exports, "__esModule", { value: true });
 var Proteus = __webpack_require__(0);
 var DecryptionError_1 = __webpack_require__(1);
-var CryptoboxSession = (function () {
+var CryptoboxSession = /** @class */ (function () {
     function CryptoboxSession(id, pk_store, session) {
         this.id = id;
         this.pk_store = pk_store;
@@ -494,7 +518,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var InvalidPreKeyFormatError = (function (_super) {
+var InvalidPreKeyFormatError = /** @class */ (function (_super) {
     __extends(InvalidPreKeyFormatError, _super);
     function InvalidPreKeyFormatError(message) {
         var _this = _super.call(this, message) || this;
@@ -539,7 +563,10 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var Proteus = __webpack_require__(0);
-var ReadOnlyStore = (function (_super) {
+/**
+ * This store holds IDs of PreKeys which should be deleted.
+ */
+var ReadOnlyStore = /** @class */ (function (_super) {
     __extends(ReadOnlyStore, _super);
     function ReadOnlyStore(store) {
         var _this = _super.call(this) || this;
@@ -547,6 +574,9 @@ var ReadOnlyStore = (function (_super) {
         _this.prekeys = [];
         return _this;
     }
+    /**
+     * Releases PreKeys from list. Called when PreKeys have been deleted.
+     */
     ReadOnlyStore.prototype.release_prekeys = function (deletedPreKeyIds) {
         var _this = this;
         deletedPreKeyIds.forEach(function (id) {
@@ -556,6 +586,10 @@ var ReadOnlyStore = (function (_super) {
             }
         });
     };
+    /**
+     * Returns a PreKey (if it's not marked for deletion) via the Cryptobox store.
+     * @override
+     */
     ReadOnlyStore.prototype.get_prekey = function (prekey_id) {
         if (this.prekeys.indexOf(prekey_id) !== -1) {
             return Promise.reject(new Error("PreKey \"" + prekey_id + "\" not found."));
@@ -564,6 +598,10 @@ var ReadOnlyStore = (function (_super) {
             return prekey;
         });
     };
+    /**
+     * Saves the PreKey ID which should get deleted.
+     * @override
+     */
     ReadOnlyStore.prototype.remove = function (prekey_id) {
         this.prekeys.push(prekey_id);
         return Promise.resolve(prekey_id);
@@ -581,7 +619,7 @@ exports.ReadOnlyStore = ReadOnlyStore;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var Cryptobox_1 = __webpack_require__(3);
-var SerialisedRecord = (function () {
+var SerialisedRecord = /** @class */ (function () {
     function SerialisedRecord(serialised, id) {
         this.created = Date.now();
         this.id = id;
@@ -602,7 +640,7 @@ exports.SerialisedRecord = SerialisedRecord;
 Object.defineProperty(exports, "__esModule", { value: true });
 var Proteus = __webpack_require__(0);
 
-var Cache = (function () {
+var Cache = /** @class */ (function () {
     function Cache() {
         this.prekeys = {};
         this.sessions = {};
@@ -658,6 +696,7 @@ var Cache = (function () {
             
         }
         catch (error) {
+            // TODO: Keep (and log) error stack trace
             return Promise.reject(new Error("PreKey (no. " + preKey.key_id + ") serialization problem \"" + error.message + "\" at \"" + error.stack + "\"."));
         }
         return Promise.resolve(preKey);
@@ -698,7 +737,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var Proteus = __webpack_require__(0);
 var error_1 = __webpack_require__(2);
 var SerialisedRecord_1 = __webpack_require__(8);
-var CryptoboxCRUDStore = (function () {
+var CryptoboxCRUDStore = /** @class */ (function () {
     function CryptoboxCRUDStore(engine) {
         this.engine = engine;
     }
@@ -850,7 +889,7 @@ var dexie_1 = __webpack_require__(24);
 
 var error_1 = __webpack_require__(2);
 var SerialisedRecord_1 = __webpack_require__(8);
-var IndexedDB = (function () {
+var IndexedDB = /** @class */ (function () {
     function IndexedDB(identifier) {
         var _this = this;
         this.prekeys = {};
@@ -3413,7 +3452,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var CryptoboxError = (function (_super) {
+var CryptoboxError = /** @class */ (function (_super) {
     __extends(CryptoboxError, _super);
     function CryptoboxError(message) {
         var _this = _super.call(this, message) || this;
@@ -3446,7 +3485,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var RecordAlreadyExistsError = (function (_super) {
+var RecordAlreadyExistsError = /** @class */ (function (_super) {
     __extends(RecordAlreadyExistsError, _super);
     function RecordAlreadyExistsError(message) {
         var _this = _super.call(this, message) || this;
@@ -3479,7 +3518,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var RecordNotFoundError = (function (_super) {
+var RecordNotFoundError = /** @class */ (function (_super) {
     __extends(RecordNotFoundError, _super);
     function RecordNotFoundError(message) {
         var _this = _super.call(this, message) || this;
@@ -3512,7 +3551,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var RecordTypeError = (function (_super) {
+var RecordTypeError = /** @class */ (function (_super) {
     __extends(RecordTypeError, _super);
     function RecordTypeError(message) {
         var _this = _super.call(this, message) || this;
@@ -3598,7 +3637,7 @@ module.exports = g;
 /* 23 */
 /***/ (function(module, exports) {
 
-module.exports = {"dependencies":{"@wireapp/store-engine":"0.1.4","dexie":"1.5.1","fs-extra":"5.0.0","wire-webapp-lru-cache":"2.0.0","wire-webapp-proteus":"5.2.0"},"description":"High-level API with persistent storage for Proteus.","devDependencies":{"@types/fs-extra":"5.0.0","@types/node":"8.5.7","browser-sync":"2.23.3","gulp":"3.9.1","gulp-babel":"6.1.2","gulp-bower":"0.0.13","gulp-bower-assets":"0.0.3","gulp-clean":"0.3.2","gulp-concat":"2.6.0","gulp-eslint":"3.0.1","gulp-if":"2.0.2","gulp-jasmine":"2.4.1","gulp-replace":"0.5.4","gulp-typescript":"3.1.6","gulp-util":"3.0.7","gutil":"1.6.4","karma":"1.7.0","karma-chrome-launcher":"2.1.1","karma-jasmine":"1.1.0","logdown":"2.2.0","merge2":"1.0.2","rimraf":"2.6.2","run-sequence":"1.2.2","typescript":"2.6.2","webpack":"2.3.3","yargs":"7.0.2"},"files":["dist/commonjs","dist/typings","dist/window"],"license":"GPL-3.0","main":"dist/commonjs/wire-webapp-cryptobox.js","name":"@wireapp/cryptobox","repository":"https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox","scripts":{"clear":"rimraf dist/commonjs && rimraf dist/lib","dist":"gulp dist --env production","postversion":"git push && git push --tags","preversion":"yarn dist && yarn test","start":"gulp","test:browser":"gulp build && gulp test_browser","test:node":"gulp dist && node dist/index.js && gulp test_node","test:rerun":"gulp test","test":"gulp test","version":"gulp build_ts_browser && git add dist/"},"types":"dist/typings/wire-webapp-cryptobox.d.ts","version":"6.2.1"}
+module.exports = {"dependencies":{"@wireapp/store-engine":"0.1.4","dexie":"1.5.1","fs-extra":"5.0.0","wire-webapp-lru-cache":"2.0.0","wire-webapp-proteus":"5.2.0"},"description":"High-level API with persistent storage for Proteus.","devDependencies":{"@types/fs-extra":"5.0.0","@types/node":"8.5.7","browser-sync":"2.23.3","gulp":"3.9.1","gulp-babel":"6.1.2","gulp-bower":"0.0.13","gulp-bower-assets":"0.0.3","gulp-clean":"0.3.2","gulp-concat":"2.6.0","gulp-eslint":"3.0.1","gulp-if":"2.0.2","gulp-jasmine":"2.4.1","gulp-replace":"0.5.4","gulp-typescript":"3.1.6","gulp-util":"3.0.7","gutil":"1.6.4","karma":"1.7.0","karma-chrome-launcher":"2.1.1","karma-jasmine":"1.1.0","logdown":"2.2.0","merge2":"1.0.2","rimraf":"2.6.2","run-sequence":"1.2.2","typescript":"2.6.2","webpack":"2.3.3","yargs":"7.0.2"},"files":["dist/commonjs","dist/typings","dist/window"],"license":"GPL-3.0","main":"dist/commonjs/wire-webapp-cryptobox.js","name":"@wireapp/cryptobox","repository":"https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox","scripts":{"clear":"rimraf dist/commonjs && rimraf dist/lib","dist":"yarn clear && gulp dist --env production","postversion":"git push && git push --tags","preversion":"yarn dist && yarn test","start":"gulp","test:browser":"gulp build && gulp test_browser","test:node":"gulp dist && node dist/index.js && gulp test_node","test:rerun":"gulp test","test":"gulp test","version":"gulp build_ts_browser && git add dist/"},"types":"dist/typings/wire-webapp-cryptobox.d.ts","version":"6.3.0"}
 
 /***/ }),
 /* 24 */

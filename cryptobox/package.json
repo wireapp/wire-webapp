@@ -53,5 +53,5 @@
     "version": "gulp build_ts_browser && git add dist/"
   },
   "types": "dist/typings/wire-webapp-cryptobox.d.ts",
-  "version": "6.2.1"
+  "version": "6.3.0"
 }

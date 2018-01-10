@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="2.3.0"></a>
+
+# [2.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/cbor/compare/@wireapp/cbor@2.2.3...@wireapp/cbor@2.3.0) (2018-01-10)
+
+### Features
+
+* **cryptobox:** Add wire-web-cryptobox ([#161](https://github.com/wireapp/wire-web-packages/tree/master/packages/cbor/issues/161)) ([d3d8633](https://github.com/wireapp/wire-web-packages/tree/master/packages/cbor/commit/d3d8633))
+
 <a name="2.2.3"></a>
 
 ## [2.2.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/cbor/compare/@wireapp/cbor@2.2.2...@wireapp/cbor@2.2.3) (2018-01-09)
