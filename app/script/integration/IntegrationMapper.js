@@ -69,10 +69,14 @@ z.integration.IntegrationMapper = class IntegrationMapper {
 
   updateServiceFromObject(serviceData, serviceEntity = new z.integration.ServiceEntity()) {
     if (serviceData) {
-      const {description, id, name, provider: providerId, tags} = serviceData;
+      const {assets, description, id, name, provider: providerId, tags} = serviceData;
 
       if (id) {
         serviceEntity.id = id;
+      }
+
+      if (assets && assets.length) {
+        this._mapAssets(serviceEntity, assets);
       }
 
       if (description) {
@@ -93,5 +97,20 @@ z.integration.IntegrationMapper = class IntegrationMapper {
 
       return serviceEntity;
     }
+  }
+
+  _mapAssets(serviceEntity, assets) {
+    return assets.filter(asset => asset.type === 'image').map(asset => {
+      switch (asset.size) {
+        case 'preview':
+          serviceEntity.previewPictureResource(z.assets.AssetRemoteData.v3(asset.key, true));
+          break;
+        case 'complete':
+          serviceEntity.mediumPictureResource(z.assets.AssetRemoteData.v3(asset.key, true));
+          break;
+        default:
+          break;
+      }
+    });
   }
 };
