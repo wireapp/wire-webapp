@@ -227,6 +227,7 @@ z.main.App = class App {
       this.repository.calling,
       this.repository.connect,
       this.repository.conversation,
+      this.repository.integration,
       this.repository.search,
       this.repository.properties,
       this.repository.team

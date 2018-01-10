@@ -32,6 +32,7 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
    * @param {z.calling.CallingRepository} calling_repository - Calling repository
    * @param {z.connect.ConnectRepository} connect_repository - Connect repository
    * @param {z.conversation.ConversationRepository} conversation_repository - Conversation repository
+   * @param {z.integration.IntegrationRepository} integrationRepository - Integration repository
    * @param {z.search.SearchRepository} search_repository - Search repository
    * @param {z.properties.PropertiesRepository} properties_repository - Properties repository
    * @param {z.team.TeamRepository} team_repository - Team repository
@@ -42,6 +43,7 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     calling_repository,
     connect_repository,
     conversation_repository,
+    integrationRepository,
     search_repository,
     properties_repository,
     team_repository
@@ -55,6 +57,7 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     this.calling_repository = calling_repository;
     this.connect_repository = connect_repository;
     this.conversation_repository = conversation_repository;
+    this.integrationRepository = integrationRepository;
     this.search_repository = search_repository;
     this.propertiesRepository = properties_repository;
     this.team_repository = team_repository;
@@ -85,6 +88,7 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
       this,
       this.connect_repository,
       this.conversation_repository,
+      this.integrationRepository,
       this.propertiesRepository,
       this.search_repository,
       this.team_repository,
