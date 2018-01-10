@@ -41,5 +41,5 @@
     "test": "exit 0",
     "prepare": "yarn dist"
   },
-  "version": "0.1.2"
+  "version": "0.1.3"
 }
