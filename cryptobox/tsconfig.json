@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "declaration": false,
+    "lib": ["DOM", "ES7"],
+    "outDir": "dist/commonjs",
+    "rootDir": "src/main/ts",
+    "target": "ES5"
+  },
+  "exclude": ["bower_components", "node_modules", "typings/browser", "typings/browser.d.ts"],
+  "extends": "../../configs/tsconfig.json"
+}

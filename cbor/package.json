@@ -20,7 +20,7 @@
     "coverage:html": "istanbul cover --report html jasmine",
     "coverage:lcov": "istanbul cover --report lcov jasmine",
     "dist": "webpack",
-    "test": "yarn coverage:html",
+    "test": "jasmine",
     "types": "jsdoc --verbose --pedantic --configure jsdoc.json src/ && node typings/replace.js",
     "version": "yarn types && git add dist/**/* typings/types.d.ts"
   },

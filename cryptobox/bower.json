@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "dexie": "1.5.1",
+    "libsodium.js": "0.5.4",
+    "wire-webapp-lru-cache": "2.0.0",
+    "wire-webapp-proteus": "5.2.0"
+  },
+  "devDependencies": {
+    "logdown": "2.2.0"
+  },
+  "license": "GPL-3.0",
+  "main": ["dist/window/wire-webapp-cryptobox.js"],
+  "name": "wire-webapp-cryptobox"
+}
