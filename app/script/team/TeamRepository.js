@@ -167,8 +167,8 @@ z.team.TeamRepository = class TeamRepository {
   sendAccountInfo() {
     if (z.util.Environment.desktop) {
       const imageResource = this.isTeam()
-        ? this.selfUser().preview_picture_resource()
-        : this.selfUser().preview_picture_resource();
+        ? this.selfUser().previewPictureResource()
+        : this.selfUser().previewPictureResource();
       const imagePromise = imageResource ? imageResource.load() : Promise.resolve();
 
       imagePromise

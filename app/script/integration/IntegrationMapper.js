@@ -22,24 +22,20 @@
 window.z = window.z || {};
 window.z.integration = z.integration || {};
 
-z.integration.IntegrationMapper = class IntegrationMapper {
-  constructor() {
-    this.logger = new z.util.Logger('z.integration.IntegrationMapper', z.config.LOGGER.OPTIONS);
-  }
+z.integration.IntegrationMapper = (() => {
+  const _mapProviderFromObject = providerData => {
+    return _updateProviderFromObject(providerData);
+  };
 
-  mapProviderFromObject(providerData) {
-    return this.updateProviderFromObject(providerData);
-  }
+  const _mapServicesFromArray = servicesData => {
+    return servicesData.map(serviceData => _updateServiceFromObject(serviceData));
+  };
 
-  mapServicesFromArray(servicesData) {
-    return servicesData.map(serviceData => this.updateServiceFromObject(serviceData));
-  }
+  const _mapServiceFromObject = serviceData => {
+    return _updateServiceFromObject(serviceData);
+  };
 
-  mapServiceFromObject(serviceData) {
-    return this.updateServiceFromObject(serviceData);
-  }
-
-  updateProviderFromObject(providerData, providerEntity = new z.integration.ProviderEntity()) {
+  const _updateProviderFromObject = (providerData, providerEntity = new z.integration.ProviderEntity()) => {
     if (providerData) {
       const {description, id, name, url, email} = providerData;
 
@@ -65,9 +61,9 @@ z.integration.IntegrationMapper = class IntegrationMapper {
 
       return providerEntity;
     }
-  }
+  };
 
-  updateServiceFromObject(serviceData, serviceEntity = new z.integration.ServiceEntity()) {
+  const _updateServiceFromObject = (serviceData, serviceEntity = new z.integration.ServiceEntity()) => {
     if (serviceData) {
       const {assets, description, id, name, provider: providerId, tags} = serviceData;
 
@@ -76,7 +72,7 @@ z.integration.IntegrationMapper = class IntegrationMapper {
       }
 
       if (assets && assets.length) {
-        this._mapAssets(serviceEntity, assets);
+        z.assets.AssetMapper.mapProfileAssets(serviceEntity, assets);
       }
 
       if (description) {
@@ -97,20 +93,11 @@ z.integration.IntegrationMapper = class IntegrationMapper {
 
       return serviceEntity;
     }
-  }
+  };
 
-  _mapAssets(serviceEntity, assets) {
-    return assets.filter(asset => asset.type === 'image').map(asset => {
-      switch (asset.size) {
-        case 'preview':
-          serviceEntity.previewPictureResource(z.assets.AssetRemoteData.v3(asset.key, true));
-          break;
-        case 'complete':
-          serviceEntity.mediumPictureResource(z.assets.AssetRemoteData.v3(asset.key, true));
-          break;
-        default:
-          break;
-      }
-    });
-  }
-};
+  return {
+    mapProviderFromObject: _mapProviderFromObject,
+    mapServiceFromObject: _mapServiceFromObject,
+    mapServicesFromArray: _mapServicesFromArray,
+  };
+})();

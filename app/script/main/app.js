@@ -496,7 +496,7 @@ z.main.App = class App {
    * @returns {undefined} No return value
    */
   _check_user_information(user_et) {
-    if (!user_et.medium_picture_resource()) {
+    if (!user_et.mediumPictureResource()) {
       this.repository.user.set_default_picture();
     }
     if (!user_et.username()) {

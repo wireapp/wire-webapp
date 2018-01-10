@@ -96,9 +96,9 @@ z.user.UserMapper = class UserMapper {
     }
 
     if (data.assets && data.assets.length > 0) {
-      this._mapProfileAssets(user_et, data.assets);
+      z.assets.AssetMapper.mapProfileAssets(user_et, data.assets);
     } else if (data.picture && data.picture.length > 0) {
-      this._mapProfilePictures(user_et, data.picture);
+      z.assets.AssetMapper.mapProfileAssetsV1(user_et, data.picture);
     }
 
     if (data.email) {
@@ -124,32 +124,5 @@ z.user.UserMapper = class UserMapper {
     }
 
     return user_et;
-  }
-
-  _mapProfileAssets(userEntity, assets) {
-    return assets.filter(asset => asset.type === 'image').map(asset => {
-      switch (asset.size) {
-        case 'preview':
-          userEntity.preview_picture_resource(z.assets.AssetRemoteData.v3(asset.key, true));
-          break;
-        case 'complete':
-          userEntity.medium_picture_resource(z.assets.AssetRemoteData.v3(asset.key, true));
-          break;
-        default:
-          break;
-      }
-    });
-  }
-
-  _mapProfilePictures(userEntity, pictures) {
-    const [previewPicture, mediumPicture] = pictures;
-
-    if (previewPicture) {
-      userEntity.preview_picture_resource(z.assets.AssetRemoteData.v1(userEntity.id, previewPicture.id, true));
-    }
-
-    if (mediumPicture) {
-      return userEntity.medium_picture_resource(z.assets.AssetRemoteData.v1(userEntity.id, mediumPicture.id, true));
-    }
   }
 };
