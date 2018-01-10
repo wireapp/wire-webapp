@@ -1,4 +1,4 @@
-/*! @wireapp/proteus v5.2.0 */
+/*! @wireapp/proteus v5.3.0 */
 var Proteus =
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
