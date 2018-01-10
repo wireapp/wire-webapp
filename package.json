@@ -6,7 +6,7 @@
     "react-dom": "16.2.0",
     "recompose": "0.26.0",
     "styled-components": "2.4.0",
-    "styled-normalize": "2.2.1"
+    "styled-normalize": "2.3.0"
   },
   "devDependencies": {
     "babel-cli": "6.26.0",
