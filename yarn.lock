@@ -295,17 +295,13 @@
   version "8.0.24"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-8.0.24.tgz#06c580084d9add1fb40c1510ef0b448961246fb1"
 
-"@types/node@8.0.25":
-  version "8.0.25"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.0.25.tgz#66ecaf4df93f5281b48427ee96fbcdfc4f0cdce1"
-
 "@types/node@8.0.50":
   version "8.0.50"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-8.0.50.tgz#dc545448e128c88c4eec7cd64025fcc3b7604541"
 
-"@types/node@8.5.1", "@types/node@^8.0.53":
-  version "8.5.1"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.5.1.tgz#4ec3020bcdfe2abffeef9ba3fbf26fca097514b5"
+"@types/node@8.5.7":
+  version "8.5.7"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.5.7.tgz#9c498c35af354dcfbca3790fb2e81129e93cf0e2"
 
 "@types/node@^6.0.46":
   version "6.0.90"
@@ -314,6 +310,10 @@
 "@types/node@^7.0.29":
   version "7.0.46"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-7.0.46.tgz#c3dedd25558c676b3d6303e51799abb9c3f8f314"
+
+"@types/node@^8.5.5":
+  version "8.5.8"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.5.8.tgz#92509422653f10e9c0ac18d87e0610b39f9821c7"
 
 "@types/spark-md5@3.0.0":
   version "3.0.0"
@@ -327,16 +327,16 @@
   version "2.3.2"
   resolved "https://registry.yarnpkg.com/@types/tough-cookie/-/tough-cookie-2.3.2.tgz#e0d481d8bb282ad8a8c9e100ceb72c995fb5e709"
 
-"@wireapp/api-client@0.2.17":
-  version "0.2.17"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-0.2.17.tgz#d65650d8b94efe45452374275ad88dcddd6acc83"
+"@wireapp/api-client@0.2.30":
+  version "0.2.30"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-0.2.30.tgz#0c60c142ccf7d8aaba1e757ae99934b7e94d8ee6"
   dependencies:
-    "@types/node" "8.5.1"
+    "@types/node" "8.5.7"
     "@types/spark-md5" "3.0.0"
     "@types/text-encoding" "0.0.32"
     "@types/tough-cookie" "2.3.2"
-    "@wireapp/queue-priority" "0.0.13"
-    "@wireapp/store-engine" "0.1.1"
+    "@wireapp/queue-priority" "0.0.19"
+    "@wireapp/store-engine" "0.1.6"
     axios "0.17.1"
     html5-websocket "2.0.2"
     logdown "2.2.0"
@@ -344,16 +344,16 @@
     spark-md5 "3.0.0"
     tough-cookie "2.3.3"
 
-"@wireapp/core@0.0.16":
-  version "0.0.16"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-0.0.16.tgz#add9e86169ffe297dee5279889ee2bb18af926b0"
+"@wireapp/core@0.0.18":
+  version "0.0.18"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-0.0.18.tgz#4b5a5bb43ef570bfb4b50fb81af8d5fcd0bbded5"
   dependencies:
-    "@types/node" "8.5.1"
-    "@wireapp/api-client" "0.2.17"
+    "@types/node" "8.5.7"
+    "@wireapp/api-client" "0.2.30"
     "@wireapp/protocol-messaging" "1.20.0"
-    "@wireapp/store-engine" "^0.1.4"
+    "@wireapp/store-engine" "0.1.6"
     bazinga64 "5.0.3"
-    protobufjs "6.8.3"
+    protobufjs "6.8.4"
     pure-uuid "1.4.11"
     wire-webapp-cryptobox "6.2.1"
 
@@ -363,22 +363,22 @@
   dependencies:
     protobufjs "6.8.0"
 
-"@wireapp/queue-priority@0.0.13":
-  version "0.0.13"
-  resolved "https://registry.yarnpkg.com/@wireapp/queue-priority/-/queue-priority-0.0.13.tgz#093e475bb37b41f8fd740a0ff0c54b62668f46e8"
+"@wireapp/queue-priority@0.0.19":
+  version "0.0.19"
+  resolved "https://registry.yarnpkg.com/@wireapp/queue-priority/-/queue-priority-0.0.19.tgz#a8281bb7ac0d3e95c439fd1c81e55ce408d3b0ed"
   dependencies:
-    "@types/node" "8.0.25"
+    "@types/node" "8.5.7"
 
-"@wireapp/react-ui-kit@0.1.1":
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-0.1.1.tgz#fc513351782bb982f517097b848fb39aaaffa5af"
+"@wireapp/react-ui-kit@0.0.30":
+  version "0.0.30"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-0.0.30.tgz#c4e326a3d4eae6912ebc3ec1f253b0678ed16c7a"
   dependencies:
     color "2.0.1"
     gulp-concat "2.6.1"
     react "16.2.0"
     react-dom "16.2.0"
     recompose "0.26.0"
-    styled-components "2.4.0"
+    styled-components "2.3.0"
     styled-normalize "2.2.1"
 
 "@wireapp/store-engine@0.1.0":
@@ -397,11 +397,11 @@
     dexie "2.0.1"
     fs-extra "4.0.2"
 
-"@wireapp/store-engine@^0.1.4":
-  version "0.1.4"
-  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-0.1.4.tgz#44e19e1ac483e952f7e780b37725b0a5fc17baa9"
+"@wireapp/store-engine@0.1.6":
+  version "0.1.6"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-0.1.6.tgz#f27d9af655603f4c51ffbf9d3eb093bd7ed3b2dc"
   dependencies:
-    "@types/node" "8.5.1"
+    "@types/node" "8.5.7"
     dexie "2.0.1"
     fs-extra "5.0.0"
 
@@ -5273,6 +5273,10 @@ is-fullwidth-code-point@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/is-fullwidth-code-point/-/is-fullwidth-code-point-2.0.0.tgz#a3b30a5c4f199183167aaab93beefae3ddfb654f"
 
+is-function@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/is-function/-/is-function-1.0.1.tgz#12cfb98b65b57dd3d193a3121f5f6e2f437602b5"
+
 is-glob@^2.0.0, is-glob@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/is-glob/-/is-glob-2.0.1.tgz#d096f926a3ded5600f3fdfd91198cb0888c2d863"
@@ -7993,9 +7997,9 @@ protobufjs@6.8.0:
     "@types/node" "^7.0.29"
     long "^3.2.0"
 
-protobufjs@6.8.3:
-  version "6.8.3"
-  resolved "https://registry.yarnpkg.com/protobufjs/-/protobufjs-6.8.3.tgz#d3746fae45f6b2fe77e7e6761471e41080164b19"
+protobufjs@6.8.4:
+  version "6.8.4"
+  resolved "https://registry.yarnpkg.com/protobufjs/-/protobufjs-6.8.4.tgz#183f90d1c4aca5f6b34a79eaedd0d89ad21f603b"
   dependencies:
     "@protobufjs/aspromise" "^1.1.2"
     "@protobufjs/base64" "^1.1.2"
@@ -8008,7 +8012,7 @@ protobufjs@6.8.3:
     "@protobufjs/pool" "^1.1.0"
     "@protobufjs/utf8" "^1.1.0"
     "@types/long" "^3.0.32"
-    "@types/node" "^8.0.53"
+    "@types/node" "^8.5.5"
     long "^3.2.0"
 
 proxy-addr@~2.0.2:
@@ -9639,14 +9643,15 @@ style-loader@0.19.1:
     loader-utils "^1.0.2"
     schema-utils "^0.3.0"
 
-styled-components@2.4.0:
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/styled-components/-/styled-components-2.4.0.tgz#086d0fd483d54638837fca3ea546a030b94adf75"
+styled-components@2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/styled-components/-/styled-components-2.3.0.tgz#d9cf4574e140fea6426e48632ed0ca4494537718"
   dependencies:
     buffer "^5.0.3"
     css-to-react-native "^2.0.3"
     fbjs "^0.8.9"
     hoist-non-react-statics "^1.2.0"
+    is-function "^1.0.1"
     is-plain-object "^2.0.1"
     prop-types "^15.5.4"
     stylis "^3.4.0"
@@ -10259,9 +10264,9 @@ webpack-dev-middleware@1.12.2, webpack-dev-middleware@^1.12.0:
     range-parser "^1.0.3"
     time-stamp "^2.0.0"
 
-webpack-dev-server@2.10.0:
-  version "2.10.0"
-  resolved "https://registry.yarnpkg.com/webpack-dev-server/-/webpack-dev-server-2.10.0.tgz#6db9c77c8cf2e2d7ff85c89fb5e4de6f7227be19"
+webpack-dev-server@2.10.1:
+  version "2.10.1"
+  resolved "https://registry.yarnpkg.com/webpack-dev-server/-/webpack-dev-server-2.10.1.tgz#a9768375346e62155860fe3cef3d4d641b24273e"
   dependencies:
     ansi-html "0.0.7"
     array-includes "^3.0.3"
@@ -10289,7 +10294,7 @@ webpack-dev-server@2.10.0:
     strip-ansi "^4.0.0"
     supports-color "^5.1.0"
     webpack-dev-middleware "1.12.2"
-    yargs "^10.0.3"
+    yargs "6.6.0"
 
 webpack-sources@^1.0.1:
   version "1.0.1"
@@ -10544,42 +10549,7 @@ yargs-parser@^7.0.0:
   dependencies:
     camelcase "^4.1.0"
 
-yargs-parser@^8.0.0:
-  version "8.1.0"
-  resolved "https://registry.yarnpkg.com/yargs-parser/-/yargs-parser-8.1.0.tgz#f1376a33b6629a5d063782944da732631e966950"
-  dependencies:
-    camelcase "^4.1.0"
-
-yargs@^10.0.3:
-  version "10.0.3"
-  resolved "https://registry.yarnpkg.com/yargs/-/yargs-10.0.3.tgz#6542debd9080ad517ec5048fb454efe9e4d4aaae"
-  dependencies:
-    cliui "^3.2.0"
-    decamelize "^1.1.1"
-    find-up "^2.1.0"
-    get-caller-file "^1.0.1"
-    os-locale "^2.0.0"
-    require-directory "^2.1.1"
-    require-main-filename "^1.0.1"
-    set-blocking "^2.0.0"
-    string-width "^2.0.0"
-    which-module "^2.0.0"
-    y18n "^3.2.1"
-    yargs-parser "^8.0.0"
-
-yargs@^3.10.0:
-  version "3.32.0"
-  resolved "https://registry.yarnpkg.com/yargs/-/yargs-3.32.0.tgz#03088e9ebf9e756b69751611d2a5ef591482c995"
-  dependencies:
-    camelcase "^2.0.1"
-    cliui "^3.0.3"
-    decamelize "^1.1.1"
-    os-locale "^1.4.0"
-    string-width "^1.0.1"
-    window-size "^0.1.4"
-    y18n "^3.2.0"
-
-yargs@^6.0.0:
+yargs@6.6.0, yargs@^6.0.0:
   version "6.6.0"
   resolved "https://registry.yarnpkg.com/yargs/-/yargs-6.6.0.tgz#782ec21ef403345f830a808ca3d513af56065208"
   dependencies:
@@ -10596,6 +10566,18 @@ yargs@^6.0.0:
     which-module "^1.0.0"
     y18n "^3.2.1"
     yargs-parser "^4.2.0"
+
+yargs@^3.10.0:
+  version "3.32.0"
+  resolved "https://registry.yarnpkg.com/yargs/-/yargs-3.32.0.tgz#03088e9ebf9e756b69751611d2a5ef591482c995"
+  dependencies:
+    camelcase "^2.0.1"
+    cliui "^3.0.3"
+    decamelize "^1.1.1"
+    os-locale "^1.4.0"
+    string-width "^1.0.1"
+    window-size "^0.1.4"
+    y18n "^3.2.0"
 
 yargs@^7.0.0:
   version "7.1.0"
