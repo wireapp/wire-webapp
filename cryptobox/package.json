@@ -13,7 +13,7 @@
     "browser-sync": "2.23.5",
     "gulp": "3.9.1",
     "gulp-babel": "6.1.2",
-    "gulp-bower": "0.0.13",
+    "gulp-bower": "0.0.14",
     "gulp-bower-assets": "0.0.3",
     "gulp-clean": "0.3.2",
     "gulp-concat": "2.6.1",
