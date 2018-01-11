@@ -28,7 +28,7 @@
     "karma-chrome-launcher": "2.1.1",
     "karma-jasmine": "1.1.0",
     "logdown": "2.2.0",
-    "merge2": "1.0.2",
+    "merge2": "1.2.1",
     "rimraf": "2.6.2",
     "run-sequence": "2.2.1",
     "typescript": "2.6.2",
