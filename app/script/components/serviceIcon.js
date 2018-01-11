@@ -31,18 +31,18 @@ z.components.ServiceIcon = class ServiceIcon {
     this.delay = params.delay;
     this.element = $(component_info.element);
 
-    this.avatar_loading_blocked = false;
-    this.avatar_entered_viewport = false;
+    this.avatarLoadingBlocked = false;
+    this.avatarEnteredViewport = false;
 
-    this.on_in_viewport = () => {
-      this.avatar_entered_viewport = true;
-      this._load_avatar_picture();
+    this.onInViewport = () => {
+      this.avatarEnteredViewport = true;
+      this._loadAvatarPicture();
       return true;
     };
 
-    this._load_avatar_picture = () => {
-      if (!this.avatar_loading_blocked) {
-        this.avatar_loading_blocked = true;
+    this._loadAvatarPicture = () => {
+      if (!this.avatarLoadingBlocked) {
+        this.avatarLoadingBlocked = true;
         if (this.service.previewPictureResource()) {
           this.service
             .previewPictureResource()
@@ -55,15 +55,15 @@ z.components.ServiceIcon = class ServiceIcon {
                 .empty()
                 .append(image);
               this.element.addClass('user-avatar-image-loaded user-avatar-loading-transition');
-              this.avatar_loading_blocked = false;
+              this.avatarLoadingBlocked = false;
             });
         }
       }
     };
 
     this.picture_preview_subscription = this.service.previewPictureResource.subscribe(() => {
-      if (this.avatar_entered_viewport) {
-        this._load_avatar_picture();
+      if (this.avatarEnteredViewport) {
+        this._loadAvatarPicture();
       }
     });
   }
@@ -75,7 +75,7 @@ z.components.ServiceIcon = class ServiceIcon {
 
 ko.components.register('service-icon', {
   template: `
-    <div class="service-icon" data-uie-name="service-icon" data-bind="attr: {title: service.name}, in_viewport: on_in_viewport, delay: delay">
+    <div class="service-icon" data-uie-name="service-icon" data-bind="attr: {title: service.name}, in_viewport: onInViewport, delay: delay">
       <div class="service-icon-image"></div>
     </div>
   `,
