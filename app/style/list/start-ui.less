@@ -32,6 +32,10 @@
 
 .start-ui-header {
   padding: 8px;
+  &.start-ui-header-integrations {
+    padding-bottom: 0;
+    margin-bottom: -1px;
+  }
 }
 
 .start-ui-header-icons {
@@ -93,6 +97,30 @@
 
   .icon-spinner {
     font-size: @font-size-xl;
+  }
+}
+
+.start-ui-list-tabs {
+  height: 44px;
+  display: flex;
+  padding: 0 8px;
+  .start-ui-list-tab {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 11px;
+    color: #fff;
+    border-bottom: 1px solid transparent;
+    opacity: 0.65;
+    cursor: pointer;
+    &.active {
+      border-bottom-color: #fff;
+      opacity: 1;
+      cursor: default;
+    }
   }
 }
 
