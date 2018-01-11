@@ -25,14 +25,14 @@ window.z.components = z.components || {};
 z.components.ServiceListViewModel = class ServiceListViewModel {
   constructor(params) {
     this.services = params.services;
-    this.onSelect = params.select;
+    this.onClick = params.click;
   }
 };
 
 ko.components.register('service-list', {
   template: `
     <div class="search-list search-list-lg" data-bind="foreach: services">
-      <div class="search-list-item" data-bind="click: $parent.onSelect">
+      <div class="search-list-item" data-bind="click: $parent.onClick">
         <div class="search-list-item-image">
         </div>
         <div class="search-list-content">
