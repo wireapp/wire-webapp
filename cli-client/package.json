@@ -4,7 +4,7 @@
   },
   "dependencies": {
     "@wireapp/core": "0.0.21",
-    "commander": "2.12.2",
+    "commander": "2.13.0",
     "dotenv": "4.0.0"
   },
   "devDependencies": {
