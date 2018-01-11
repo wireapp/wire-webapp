@@ -35,7 +35,6 @@
     "clear": "rimraf dist && rimraf .tmp",
     "coverage": "istanbul cover --report html ./node_modules/jasmine/bin/jasmine.js",
     "dist": "yarn clear && yarn build",
-    "prepublish": "yarn test",
     "start": "rimraf .tmp && yarn dist && node index.js",
     "test": "yarn dist && yarn test:node && yarn test:browser",
     "test:browser": "exit 0",
