@@ -30,7 +30,7 @@
     "logdown": "2.2.0",
     "merge2": "1.0.2",
     "rimraf": "2.6.2",
-    "run-sequence": "1.2.2",
+    "run-sequence": "2.2.1",
     "typescript": "2.6.2",
     "webpack": "2.3.3",
     "yargs": "7.0.2"
