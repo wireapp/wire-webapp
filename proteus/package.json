@@ -20,11 +20,8 @@
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus",
   "scripts": {
     "clear": "exit 0",
-    "dist": "bower install && webpack --progress",
+    "dist": "yarn clear && bower install && webpack --progress && yarn types",
     "types": "jsdoc --verbose --pedantic --configure jsdoc.json src/ && node replace.js",
-    "preversion": "yarn test && yarn types",
-    "version": "yarn dist && git add dist/**/*",
-    "postversion": "git push && git push --tags",
     "start": "node dist/index.js",
     "test": "yarn dist && yarn test:node",
     "test:node": "mocha -s 30000 -t 30000 --recursive test/harness.js test --trace-warnings"

@@ -19,8 +19,8 @@
     "clear": "rimraf dist",
     "coverage:html": "istanbul cover --report html jasmine",
     "coverage:lcov": "istanbul cover --report lcov jasmine",
-    "dist": "webpack",
-    "test": "jasmine",
+    "dist": "yarn clear && webpack",
+    "test": "yarn dist && jasmine",
     "types": "jsdoc --verbose --pedantic --configure jsdoc.json src/ && node typings/replace.js",
     "version": "yarn types && git add dist/**/* typings/types.d.ts"
   },

@@ -43,14 +43,11 @@
   "scripts": {
     "clear": "rimraf dist/commonjs && rimraf dist/lib",
     "dist": "yarn clear && gulp dist --env production",
-    "postversion": "git push && git push --tags",
-    "preversion": "yarn dist && yarn test",
     "start": "gulp",
     "test:browser": "gulp build && gulp test_browser",
     "test:node": "gulp dist && node dist/index.js && gulp test_node",
     "test:rerun": "gulp test",
-    "test": "gulp test",
-    "version": "gulp build_ts_browser && git add dist/"
+    "test": "yarn dist && gulp test"
   },
   "types": "dist/typings/wire-webapp-cryptobox.d.ts",
   "version": "6.3.0"

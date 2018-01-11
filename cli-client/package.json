@@ -23,7 +23,6 @@
     "build:node": "tsc",
     "clear": "rimraf dist bin",
     "dist": "yarn clear && yarn build",
-    "prepublish": "yarn test",
     "test": "yarn dist && yarn test:node && yarn test:browser",
     "test:browser": "exit 0",
     "test:node": "exit 0",
