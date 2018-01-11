@@ -371,6 +371,7 @@ z.string.people_invite_detail = 'Sharing your contacts helps you connect with ot
 z.string.people_invite_button_contacts = 'From Contacts';
 z.string.people_invite_button_gmail = 'From Gmail';
 z.string.people_invite_headline = 'Bring your friends';
+z.string.people_services = 'Services';
 z.string.people_share = 'Share Contacts';
 z.string.people_tabs_details = 'Details';
 z.string.people_tabs_devices = 'Devices';
@@ -385,6 +386,8 @@ z.string.people_tabs_device_detail_how_to = 'How do I do that?';
 z.string.people_tabs_device_detail_reset_session = 'Reset session';
 z.string.people_tabs_device_detail_show_my_device = 'Show my device fingerprint';
 z.string.people_tabs_device_detail_verify = 'Verified';
+z.string.people_tabs_people = 'People';
+z.string.people_tabs_services = 'Services';
 z.string.people_verified = 'Verified';
 
 // Block user
@@ -412,7 +415,8 @@ z.string.people_unblock_headline = 'Unblock?';
 z.string.people_unblock_message = '{{user}} will be able to contact you and add you to group conversations again.';
 
 // Button labels for the actions
-z.string.people_button_add = 'Add people';
+z.string.people_button_add = 'Add';
+z.string.people_button_add_people = 'Add people';
 z.string.people_button_block = 'Block';
 z.string.people_button_cancel = 'Cancel';
 z.string.people_button_connect = 'Connect';
@@ -510,7 +514,9 @@ z.string.search_connect = 'Connect';
 z.string.search_connections = 'Connections';
 z.string.search_contacts = 'Contacts';
 z.string.search_groups = 'Groups';
+z.string.search_people = 'People';
 z.string.search_placeholder = 'Search by name or username';
+z.string.search_services = 'Services';
 z.string.search_team_groups = 'Team conversations';
 z.string.search_team_members = 'Team members';
 z.string.search_top_people = 'Top people';
@@ -606,7 +612,8 @@ z.string.tooltip_conversations_preferences = 'Open preferences';
 z.string.tooltip_conversations_silence = 'Mute ({{shortcut}})';
 z.string.tooltip_conversations_start = 'Start conversation ({{shortcut}})';
 
-z.string.tooltip_people_add = 'Add people to conversation ({{shortcut}})';
+z.string.tooltip_people_add = 'Add to conversation ({{shortcut}})';
+z.string.tooltip_people_add_people = 'Add people to conversation ({{shortcut}})';
 z.string.tooltip_people_back = 'Back';
 z.string.tooltip_people_block = 'Block';
 z.string.tooltip_people_connect = 'Connect';

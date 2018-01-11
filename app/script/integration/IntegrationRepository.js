@@ -23,12 +23,25 @@ window.z = window.z || {};
 window.z.integration = z.integration || {};
 
 z.integration.IntegrationRepository = class IntegrationRepository {
+  /**
+   * Trim and remove @.
+   * @param {string} query - Service search string
+   * @returns {string} Normalized service search query
+   */
+  static normalizeQuery(query) {
+    if (!_.isString(query)) {
+      return '';
+    }
+    return query.trim().toLowerCase();
+  }
+
   constructor(integrationService, conversationRepository) {
     this.logger = new z.util.Logger('z.integration.IntegrationRepository', z.config.LOGGER.OPTIONS);
 
     this.integrationService = integrationService;
 
     this.conversationRepository = conversationRepository;
+    this.services = ko.observableArray([]);
   }
 
   /**
@@ -91,5 +104,18 @@ z.integration.IntegrationRepository = class IntegrationRepository {
       }
       return [];
     });
+  }
+
+  searchForServices(query, queryObservable) {
+    const normalizedQuery = IntegrationRepository.normalizeQuery(query);
+
+    this.getServices(null, normalizedQuery)
+      .then(servicesEntities => {
+        const isCurrentQuery = normalizedQuery === IntegrationRepository.normalizeQuery(queryObservable());
+        if (isCurrentQuery) {
+          this.services(servicesEntities);
+        }
+      })
+      .catch(error => this.logger.error(`Error searching for services: ${error.message}`, error));
   }
 };
