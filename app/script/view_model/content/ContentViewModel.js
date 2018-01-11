@@ -29,6 +29,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
     calling_repository,
     client_repository,
     conversation_repository,
+    integrationRepository,
     media_repository,
     properties_repository,
     search_repository,
@@ -41,6 +42,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
     this.calling_repository = calling_repository;
     this.client_repository = client_repository;
     this.conversation_repository = conversation_repository;
+    this.integrationRepository = integrationRepository;
     this.media_repository = media_repository;
     this.propertiesRepository = properties_repository;
     this.search_repository = search_repository;
@@ -99,6 +101,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
       'participants',
       this.user_repository,
       this.conversation_repository,
+      this.integrationRepository,
       this.search_repository,
       this.team_repository
     );
