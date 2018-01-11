@@ -27,5 +27,5 @@
     "test:node": "mocha -s 30000 -t 30000 --recursive test/harness.js test --trace-warnings"
   },
   "types": "dist/typings/typings.d.ts",
-  "version": "5.3.0"
+  "version": "5.3.1"
 }

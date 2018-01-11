@@ -50,5 +50,5 @@
     "test": "yarn dist && gulp test"
   },
   "types": "dist/typings/wire-webapp-cryptobox.d.ts",
-  "version": "6.3.0"
+  "version": "6.3.1"
 }
