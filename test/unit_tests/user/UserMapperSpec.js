@@ -146,8 +146,8 @@ describe('User Mapper', () => {
         name: entities.user.jane_roe.name,
       };
       const updated_user_et = mapper.update_user_from_object(user_et, data);
-      expect(updated_user_et.preview_picture_resource()).toBeDefined();
-      expect(updated_user_et.medium_picture_resource()).toBeDefined();
+      expect(updated_user_et.previewPictureResource()).toBeDefined();
+      expect(updated_user_et.mediumPictureResource()).toBeDefined();
     });
   });
 });

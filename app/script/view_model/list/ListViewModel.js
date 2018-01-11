@@ -99,7 +99,7 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
 
     this.self_user_picture = ko.pureComputed(() => {
       if (this.webapp_loaded() && this.user_repository.self()) {
-        return this.user_repository.self().medium_picture_resource();
+        return this.user_repository.self().mediumPictureResource();
       }
     });
 

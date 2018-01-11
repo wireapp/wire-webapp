@@ -106,9 +106,9 @@ z.components.UserAvatar = class UserAvatar {
     this._load_avatar_picture = () => {
       if (!this.avatar_loading_blocked) {
         this.avatar_loading_blocked = true;
-        if (this.user.preview_picture_resource()) {
+        if (this.user.previewPictureResource()) {
           this.user
-            .preview_picture_resource()
+            .previewPictureResource()
             .get_object_url()
             .then(url => {
               const image = new Image();
@@ -124,7 +124,7 @@ z.components.UserAvatar = class UserAvatar {
       }
     };
 
-    this.picture_preview_subscription = this.user.preview_picture_resource.subscribe(() => {
+    this.picture_preview_subscription = this.user.previewPictureResource.subscribe(() => {
       if (this.avatar_entered_viewport) {
         this._load_avatar_picture();
       }
