@@ -19,7 +19,7 @@
     "gulp-concat": "2.6.1",
     "gulp-eslint": "4.0.1",
     "gulp-if": "2.0.2",
-    "gulp-jasmine": "2.4.1",
+    "gulp-jasmine": "3.0.0",
     "gulp-replace": "0.6.1",
     "gulp-typescript": "3.1.6",
     "gulp-util": "3.0.8",
