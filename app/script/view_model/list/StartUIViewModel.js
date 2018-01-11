@@ -91,7 +91,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
         return this._searchPeople(query);
       }
 
-      this._searchServices(query);
+      this.integrationRepository.searchForServices(query, this.search_input);
     }, 300);
 
     this.searched_for_user = _.once(query => {
@@ -125,7 +125,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       contacts: ko.observableArray([]),
       groups: ko.observableArray([]),
       others: ko.observableArray([]),
-      services: ko.observableArray([]),
+      services: this.integrationRepository.services,
     };
 
     // User properties
@@ -243,21 +243,6 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       this.search_results.groups(this.conversation_repository.get_groups_by_name(normalized_query, is_handle));
       this.searched_for_user(query);
     }
-  }
-
-  _searchServices(query) {
-    const _normalizeQuery = plainQuery => plainQuery.trim().toLowerCase();
-    const trimmedQuery = _normalizeQuery(query);
-
-    this.integrationRepository
-      .getServices(null, trimmedQuery)
-      .then(servicesEntities => {
-        const isCurrentQuery = trimmedQuery === _normalizeQuery(this.search_input());
-        if (isCurrentQuery) {
-          this.search_results.services(servicesEntities);
-        }
-      })
-      .catch(error => this.logger.error(`Error searching for services: ${error.message}`, error));
   }
 
   click_on_close() {

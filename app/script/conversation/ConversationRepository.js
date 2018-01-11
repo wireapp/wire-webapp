@@ -208,6 +208,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.conversation_service
       .create_conversation(user_ids, name, this.team().id)
       .then(response => this._onCreate({conversation: response.id, data: response}))
+      .then(({conversation_et}) => conversation_et)
       .catch(error => {
         if (error.label === z.service.BackendClientError.LABEL.NOT_CONNECTED) {
           return this._handle_users_not_connected(user_ids);
