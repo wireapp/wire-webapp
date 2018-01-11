@@ -34,8 +34,9 @@ ko.components.register('service-list', {
     <div class="search-list search-list-lg" data-bind="foreach: services">
       <div class="search-list-item" data-bind="click: $parent.onClick">
         <div class="search-list-item-image">
+          <service-icon class="service-icon-sm" params="service: $data"></service-icon>
         </div>
-        <div class="search-list-content">
+        <div class="search-list-item-content">
           <div class="search-list-item-content-name" data-bind="text: name"></div>
           <div class="search-list-item-content-info">
             <span class="search-list-item-content-username label-username" data-bind="text: description"></span>
