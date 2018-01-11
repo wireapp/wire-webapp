@@ -350,6 +350,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
   clickOnService(service) {
     this.logger.info(service);
   }
+
   updateList() {
     this.show_spinner(false);
 
