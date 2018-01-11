@@ -26,6 +26,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   static get STATE() {
     return {
       ADD_PEOPLE: 'add_people',
+      ADD_SERVICE: 'add_service',
       PARTICIPANTS: 'participants',
     };
   }
