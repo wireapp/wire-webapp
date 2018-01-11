@@ -53,12 +53,12 @@ export function pushAccountRegistrationData(registration) {
 export function doRegisterTeam(registration) {
   return function(dispatch, getState, {apiClient}) {
     registration.locale = currentLanguage();
+    registration.name = registration.name.trim();
+    registration.email = registration.email.trim();
     registration.team.icon = 'default';
     registration.team.binding = true;
     registration.team.currency = currentCurrency();
-    registration.name = registration.name.trim();
     registration.team.name = registration.team.name.trim();
-    registration.email = registration.email.trim();
     dispatch(AuthActionCreator.startRegisterTeam({...registration, password: '******'}));
     return Promise.resolve()
       .then(() => dispatch(doSilentLogout()))

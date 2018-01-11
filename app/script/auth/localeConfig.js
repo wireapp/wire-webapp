@@ -2,7 +2,7 @@ import {getURLParameter} from './util/urlUtil';
 
 export const SUPPORTED_LANGUAGE = require('./supportedLocales');
 
-export const DEFAULT_CURRENCY = 'eur';
+export const DEFAULT_CURRENCY = 'EUR';
 export const DEFAULT_LANGUAGE = 'en';
 
 const QUERY = {
@@ -20,5 +20,5 @@ export function currentLanguage() {
 }
 
 export function currentCurrency() {
-  return getURLParameter(QUERY.CURRENCY) || DEFAULT_CURRENCY;
+  return getURLParameter(QUERY.CURRENCY).toUpperCase() || DEFAULT_CURRENCY;
 }
