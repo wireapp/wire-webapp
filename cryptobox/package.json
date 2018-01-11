@@ -10,7 +10,7 @@
   "devDependencies": {
     "@types/fs-extra": "5.0.0",
     "@types/node": "8.5.7",
-    "browser-sync": "2.23.3",
+    "browser-sync": "2.23.5",
     "gulp": "3.9.1",
     "gulp-babel": "6.1.2",
     "gulp-bower": "0.0.13",
