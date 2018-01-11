@@ -3,7 +3,7 @@
     <span class="left-list-header-text" data-bind="text: team_name" data-uie-name="status-team-name-search"></span>
     <span class="left-list-header-close-button button-icon-large icon-close" data-bind="click: click_on_close, l10n_tooltip: z.string.tooltip_search_close" data-uie-name="do-close"></span>
   </div>
-  <div id="start-ui-header" class="start-ui-header border-theme">
+  <div id="start-ui-header" class="start-ui-header border-theme" data-bind="css: {'start-ui-header-integrations': enableIntegrations()}">
     <user-input data-bind="input_hint: {text: z.l10n.text(z.string.search_group_hint), trigger: show_hint}"
                 class="start-ui-header-user-input"
                 params="input: search_input, placeholder: z.string.search_placeholder, selected: selected_people, enter: on_submit_search"
@@ -26,6 +26,12 @@
           </label>
         <!-- /ko -->
       </div>
+      <!-- ko if: enableIntegrations() -->
+        <div class="start-ui-list-tabs">
+          <div class="start-ui-list-tab" data-bind="click: function() { clickOnTab(0) }, css: {'active' : peopleTabActive()}, l10n_text: 'People'"></div>
+          <div class="start-ui-list-tab" data-bind="click: function() { clickOnTab(1) }, css: {'active' : !peopleTabActive()}, l10n_text: 'Services'"></div>
+        </div>
+      <!-- /ko  -->
   </div>
 
   <div class="left-list-center start-ui-list-wrapper">
@@ -37,11 +43,6 @@
       <!-- /ko -->
 
       <!-- ko ifnot: show_spinner() -->
-        <!-- ko if: enableIntegrations() -->
-          <span data-bind="click: function() { clickOnTab(0) }, l10n_text: 'People'"></span>
-          <span data-bind="click: function() { clickOnTab(1) }, l10n_text: 'Services'"></span>
-        <!-- /ko  -->
-
         <!-- ko if: peopleTabActive() -->
           <!-- ko ifnot: show_search_results() -->
             <!-- ko if: show_top_people() -->
