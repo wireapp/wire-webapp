@@ -32,6 +32,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
    * @param {z.ViewModel.list.ListViewModel} list_view_model - List view model
    * @param {z.connect.ConnectRepository} connect_repository - Connect repository
    * @param {z.conversation.ConversationRepository} conversation_repository - Conversation repository
+   * @param {z.integration.IntegrationRepository} integrationRepository - Integration repository
    * @param {z.properties.PropertiesRepository} properties_repository - Properties repository
    * @param {z.search.SearchRepository} search_repository - Search repository
    * @param {z.team.TeamRepository} team_repository - Team repository
@@ -42,6 +43,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     list_view_model,
     connect_repository,
     conversation_repository,
+    integrationRepository,
     properties_repository,
     search_repository,
     team_repository,
@@ -50,7 +52,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.click_on_close = this.click_on_close.bind(this);
     this.click_on_group = this.click_on_group.bind(this);
     this.click_on_other = this.click_on_other.bind(this);
-
+    this.clickOnService = this.clickOnService.bind(this);
     this.on_cancel_request = this.on_cancel_request.bind(this);
     this.on_submit_search = this.on_submit_search.bind(this);
     this.on_user_accept = this.on_user_accept.bind(this);
@@ -62,6 +64,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.list_view_model = list_view_model;
     this.connect_repository = connect_repository;
     this.conversation_repository = conversation_repository;
+    this.integrationRepository = integrationRepository;
     this.propertiesRepository = properties_repository;
     this.search_repository = search_repository;
     this.team_repository = team_repository;
@@ -75,36 +78,20 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
     this.submitted_search = false;
 
+    this.clickOnTab = index => this.tabIndex(index);
+    this.tabIndex = ko.observable(0);
+    this.tabIndex.subscribe(() => this.updateList());
+
+    this.peopleTabActive = ko.pureComputed(() => this.tabIndex() === 0);
+
     this.search = _.debounce(query => {
-      this.clear_search_results();
+      this.clearSearchResults();
 
-      const normalized_query = z.search.SearchRepository.normalizeQuery(query);
-      if (normalized_query) {
-        this.show_matches(false);
-
-        // Contacts, groups and others
-        const trimmed_query = query.trim();
-        const is_handle = trimmed_query.startsWith('@') && z.user.UserHandleGenerator.validate_handle(normalized_query);
-
-        this.search_repository
-          .search_by_name(normalized_query, is_handle)
-          .then(user_ets => {
-            const is_current_query = normalized_query === z.search.SearchRepository.normalizeQuery(this.search_input());
-            if (is_current_query) {
-              this.search_results.others(user_ets);
-            }
-          })
-          .catch(error => this.logger.error(`Error searching for contacts: ${error.message}`, error));
-
-        if (this.is_team()) {
-          this.search_results.contacts(this.team_repository.searchForTeamUsers(normalized_query, is_handle));
-        } else {
-          this.search_results.contacts(this.user_repository.search_for_connected_users(normalized_query, is_handle));
-        }
-
-        this.search_results.groups(this.conversation_repository.get_groups_by_name(normalized_query, is_handle));
-        this.searched_for_user(query);
+      if (this.peopleTabActive()) {
+        return this._searchPeople(query);
       }
+
+      this._searchServices(query);
     }, 300);
 
     this.searched_for_user = _.once(query => {
@@ -138,6 +125,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       contacts: ko.observableArray([]),
       groups: ko.observableArray([]),
       others: ko.observableArray([]),
+      services: ko.observableArray([]),
     };
 
     // User properties
@@ -151,6 +139,10 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
         this.search_results.others().length
       );
     });
+
+    this.enableIntegrations = ko.pureComputed(
+      () => true || (this.is_team() && !z.util.Environment.frontend.is_production())
+    );
 
     this.show_content = ko.pureComputed(
       () => this.show_contacts() || this.show_matches() || this.show_search_results()
@@ -175,7 +167,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
     this.show_search_results = ko.pureComputed(() => {
       if (!this.selected_people().length && !this.search_input().length) {
-        this.clear_search_results();
+        this.clearSearchResults();
         return false;
       }
       return this.has_search_results() || this.search_input().length;
@@ -221,6 +213,51 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     amplify.subscribe(z.event.WebApp.CONNECT.IMPORT_CONTACTS, this.import_contacts.bind(this));
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.HAS_CREATED_CONVERSATION, this.update_properties);
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.update_properties);
+  }
+
+  _searchPeople(query) {
+    const normalized_query = z.search.SearchRepository.normalizeQuery(query);
+    if (normalized_query) {
+      this.show_matches(false);
+
+      // Contacts, groups and others
+      const trimmed_query = query.trim();
+      const is_handle = trimmed_query.startsWith('@') && z.user.UserHandleGenerator.validate_handle(normalized_query);
+
+      this.search_repository
+        .search_by_name(normalized_query, is_handle)
+        .then(user_ets => {
+          const is_current_query = normalized_query === z.search.SearchRepository.normalizeQuery(this.search_input());
+          if (is_current_query) {
+            this.search_results.others(user_ets);
+          }
+        })
+        .catch(error => this.logger.error(`Error searching for contacts: ${error.message}`, error));
+
+      if (this.is_team()) {
+        this.search_results.contacts(this.team_repository.searchForTeamUsers(normalized_query, is_handle));
+      } else {
+        this.search_results.contacts(this.user_repository.search_for_connected_users(normalized_query, is_handle));
+      }
+
+      this.search_results.groups(this.conversation_repository.get_groups_by_name(normalized_query, is_handle));
+      this.searched_for_user(query);
+    }
+  }
+
+  _searchServices(query) {
+    const _normalizeQuery = plainQuery => plainQuery.trim().toLowerCase();
+    const trimmedQuery = _normalizeQuery(query);
+
+    this.integrationRepository
+      .getServices(null, trimmedQuery)
+      .then(servicesEntities => {
+        const isCurrentQuery = trimmedQuery === _normalizeQuery(this.search_input());
+        if (isCurrentQuery) {
+          this.search_results.services(servicesEntities);
+        }
+      })
+      .catch(error => this.logger.error(`Error searching for services: ${error.message}`, error));
   }
 
   click_on_close() {
@@ -310,16 +347,33 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     }
   }
 
-  update_list() {
-    this.get_top_people().then(user_ets => this.top_users(user_ets));
+  clickOnService(service) {
+    this.logger.info(service);
+  }
 
+  updateList() {
     this.show_spinner(false);
 
     // Clean up
     this.selected_people.removeAll();
-    this.clear_search_results();
+    this.clearSearchResults();
     this.user_profile(null);
     $('user-input input').focus();
+
+    if (this.peopleTabActive()) {
+      return this._updatePeopleList();
+    }
+    this._updateServicesList();
+  }
+
+  _updatePeopleList() {
+    if (!this.is_team()) {
+      this.get_top_people().then(user_ets => this.top_users(user_ets));
+    }
+  }
+
+  _updateServicesList() {
+    this.search(this.search_input());
   }
 
   _close_list() {
@@ -540,9 +594,10 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
   // Search
   //##############################################################################
 
-  clear_search_results() {
+  clearSearchResults() {
     this.search_results.groups.removeAll();
     this.search_results.contacts.removeAll();
+    this.search_results.services.removeAll();
     this.search_results.others.removeAll();
   }
 
