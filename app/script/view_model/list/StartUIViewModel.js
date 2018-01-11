@@ -80,12 +80,14 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
     this.clickOnTab = index => this.tabIndex(index);
     this.tabIndex = ko.observable(0);
+    this.tabIndex.subscribe(() => this.updateList());
+
+    this.peopleTabActive = ko.pureComputed(() => this.tabIndex() === 0);
 
     this.search = _.debounce(query => {
-      this.clear_search_results();
+      this.clearSearchResults();
 
-      const peopleTabActive = this.tabIndex() === 0;
-      if (peopleTabActive) {
+      if (this.peopleTabActive()) {
         return this._searchPeople(query);
       }
 
@@ -138,7 +140,9 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       );
     });
 
-    this.enableIntegrations = ko.pureComputed(() => this.is_team() && !z.util.Environment.frontend.is_production());
+    this.enableIntegrations = ko.pureComputed(
+      () => true || (this.is_team() && !z.util.Environment.frontend.is_production())
+    );
 
     this.show_content = ko.pureComputed(
       () => this.show_contacts() || this.show_matches() || this.show_search_results()
@@ -163,7 +167,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
     this.show_search_results = ko.pureComputed(() => {
       if (!this.selected_people().length && !this.search_input().length) {
-        this.clear_search_results();
+        this.clearSearchResults();
         return false;
       }
       return this.has_search_results() || this.search_input().length;
@@ -343,16 +347,29 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     }
   }
 
-  update_list() {
-    this.get_top_people().then(user_ets => this.top_users(user_ets));
-
+  updateList() {
     this.show_spinner(false);
 
     // Clean up
     this.selected_people.removeAll();
-    this.clear_search_results();
+    this.clearSearchResults();
     this.user_profile(null);
     $('user-input input').focus();
+
+    if (this.peopleTabActive()) {
+      return this._updatePeopleList();
+    }
+    this._updateServicesList();
+  }
+
+  _updatePeopleList() {
+    if (!this.is_team()) {
+      this.get_top_people().then(user_ets => this.top_users(user_ets));
+    }
+  }
+
+  _updateServicesList() {
+    this.search(this.search_input());
   }
 
   _close_list() {
@@ -573,9 +590,10 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
   // Search
   //##############################################################################
 
-  clear_search_results() {
+  clearSearchResults() {
     this.search_results.groups.removeAll();
     this.search_results.contacts.removeAll();
+    this.search_results.services.removeAll();
     this.search_results.others.removeAll();
   }
 

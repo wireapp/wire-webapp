@@ -42,7 +42,7 @@
           <span data-bind="click: function() { clickOnTab(1) }, l10n_text: 'Services'"></span>
         <!-- /ko  -->
 
-        <!-- ko if: tabIndex() === 0 -->
+        <!-- ko if: peopleTabActive() -->
           <!-- ko ifnot: show_search_results() -->
             <!-- ko if: show_top_people() -->
               <div class="start-ui-list-top-people" data-uie-name="status-top-people">
@@ -66,7 +66,7 @@
           <!-- ko if: show_search_results() -->
             <div class="start-ui-list-search-results">
               <div class="contacts" data-bind="visible: search_results.contacts().length > 0">
-                <!-- ko if: is_team() -->
+                <!-- ko if: is_team() && !enableIntegrations() -->
                   <span class="start-ui-list-header start-ui-list-header-contacts" data-bind="l10n_text: z.string.search_contacts"></span>
                 <!-- /ko  -->
                 <!-- ko ifnot: is_team() -->
@@ -91,9 +91,12 @@
           <!-- /ko  -->
         <!-- /ko  -->
 
-        <!-- ko if: tabIndex() === 1 -->
+        <!-- ko ifnot: peopleTabActive() -->
           <!-- ko if: show_search_results() -->
-            <user-list class="search-list-theme-black" params="user: search_results.services, selected: selected_people"></user-list>
+            <!-- ko foreach: search_results.services() -->
+              <div data-bind="text: name"></div>
+            <!-- /ko  -->
+            <!-- <user-list class="search-list-theme-black" params="user: search_results.services, selected: selected_people"></user-list> -->
           <!-- /ko  -->
         <!-- /ko  -->
       <!-- /ko  -->

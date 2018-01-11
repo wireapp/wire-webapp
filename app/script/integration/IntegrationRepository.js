@@ -80,6 +80,7 @@ z.integration.IntegrationRepository = class IntegrationRepository {
       if (services.length) {
         return z.integration.IntegrationMapper.mapServicesFromArray(services);
       }
+      return [];
     });
   }
 
@@ -88,6 +89,7 @@ z.integration.IntegrationRepository = class IntegrationRepository {
       if (services.length) {
         return z.integration.IntegrationMapper.mapServicesFromArray(services);
       }
+      return [];
     });
   }
 };

@@ -251,7 +251,7 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
         this.archive.update_list();
         break;
       case z.ViewModel.list.LIST_STATE.START_UI:
-        this.start_ui.update_list();
+        this.start_ui.updateList();
         break;
       case z.ViewModel.list.LIST_STATE.PREFERENCES:
         amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT);
