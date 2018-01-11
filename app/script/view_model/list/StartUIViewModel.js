@@ -52,7 +52,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.click_on_close = this.click_on_close.bind(this);
     this.click_on_group = this.click_on_group.bind(this);
     this.click_on_other = this.click_on_other.bind(this);
-
+    this.clickOnService = this.clickOnService.bind(this);
     this.on_cancel_request = this.on_cancel_request.bind(this);
     this.on_submit_search = this.on_submit_search.bind(this);
     this.on_user_accept = this.on_user_accept.bind(this);
@@ -347,6 +347,9 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     }
   }
 
+  clickOnService(service) {
+    this.logger.info(service);
+  }
   updateList() {
     this.show_spinner(false);
 

@@ -93,10 +93,7 @@
 
         <!-- ko ifnot: peopleTabActive() -->
           <!-- ko if: show_search_results() -->
-            <!-- ko foreach: search_results.services() -->
-              <div data-bind="text: name"></div>
-            <!-- /ko  -->
-            <!-- <user-list class="search-list-theme-black" params="user: search_results.services, selected: selected_people"></user-list> -->
+            <service-list params="services: search_results.services(), select: clickOnService"></service-list>
           <!-- /ko  -->
         <!-- /ko  -->
       <!-- /ko  -->
