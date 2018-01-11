@@ -27,7 +27,6 @@ z.integration.IntegrationRepository = class IntegrationRepository {
     this.logger = new z.util.Logger('z.integration.IntegrationRepository', z.config.LOGGER.OPTIONS);
 
     this.integrationService = integrationService;
-    this.integrationMapper = new z.integration.IntegrationMapper();
 
     this.conversationRepository = conversationRepository;
   }
@@ -61,7 +60,7 @@ z.integration.IntegrationRepository = class IntegrationRepository {
   getProvider(providerId) {
     return this.integrationService.getProvider(providerId).then(response => {
       if (response) {
-        return this.integrationMapper.mapProviderFromObject(response);
+        return z.integration.IntegrationMapper.mapProviderFromObject(response);
       }
     });
   }
@@ -69,7 +68,7 @@ z.integration.IntegrationRepository = class IntegrationRepository {
   getServiceById(providerId, serviceId) {
     return this.integrationService.getService(providerId, serviceId).then(service => {
       if (service) {
-        return this.integrationMapper.mapServiceFromObject(service);
+        return z.integration.IntegrationMapper.mapServiceFromObject(service);
       }
     });
   }
@@ -79,16 +78,18 @@ z.integration.IntegrationRepository = class IntegrationRepository {
 
     return this.integrationService.getServices(tagsArray.join(','), start).then(({services}) => {
       if (services.length) {
-        return this.integrationMapper.mapServicesFromArray(services);
+        return z.integration.IntegrationMapper.mapServicesFromArray(services);
       }
+      return [];
     });
   }
 
   getServicesByProvider(providerId) {
     return this.integrationService.getProviderServices(providerId).then(services => {
       if (services.length) {
-        return this.integrationMapper.mapServicesFromArray(services);
+        return z.integration.IntegrationMapper.mapServicesFromArray(services);
       }
+      return [];
     });
   }
 };

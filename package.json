@@ -42,8 +42,8 @@
     "@bower_components/wire-webapp-cryptobox": "wireapp/wire-webapp-cryptobox#6.2.0",
     "@bower_components/wire-webapp-lru-cache": "wireapp/wire-webapp-lru-cache#2.0.0",
     "@bower_components/wire-webapp-proteus": "wireapp/proteus.js#5.2.0",
-    "@wireapp/core": "0.0.16",
-    "@wireapp/react-ui-kit": "0.1.1",
+    "@wireapp/core": "0.0.18",
+    "@wireapp/react-ui-kit": "0.0.30",
     "babel-plugin-react-intl": "2.3.1",
     "babel-polyfill": "6.26.0",
     "intl": "1.2.5",
@@ -137,7 +137,7 @@
     "uglify-js": "3.3.5",
     "uglifyjs-webpack-plugin": "1.1.6",
     "webpack": "3.10.0",
-    "webpack-dev-server": "2.10.0"
+    "webpack-dev-server": "2.10.1"
   },
   "engines": {
     "yarn": ">= 1.0.0"

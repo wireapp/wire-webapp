@@ -227,6 +227,7 @@ z.main.App = class App {
       this.repository.calling,
       this.repository.connect,
       this.repository.conversation,
+      this.repository.integration,
       this.repository.search,
       this.repository.properties,
       this.repository.team
@@ -496,7 +497,7 @@ z.main.App = class App {
    * @returns {undefined} No return value
    */
   _check_user_information(user_et) {
-    if (!user_et.medium_picture_resource()) {
+    if (!user_et.mediumPictureResource()) {
       this.repository.user.set_default_picture();
     }
     if (!user_et.username()) {

@@ -133,8 +133,8 @@ z.entity.User = class User {
 
     this.username = ko.observable();
 
-    this.preview_picture_resource = ko.observable();
-    this.medium_picture_resource = ko.observable();
+    this.previewPictureResource = ko.observable();
+    this.mediumPictureResource = ko.observable();
 
     this.connection = ko.observable(new z.entity.Connection());
 
