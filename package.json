@@ -26,11 +26,24 @@
     "webpack-dev-server": "2.10.1"
   },
   "license": "GPL-3.0",
-  "main": "./dist/index.js",
+  "main": "./index.js",
+  "files": [
+    "dist",
+    "README.md",
+    "index.js",
+    "Form.js",
+    "Icon.js",
+    "Identity.js",
+    "Layout.js",
+    "Modal.js",
+    "Progress.js",
+    "Text.js"
+  ],
   "name": "@wireapp/react-ui-kit",
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit",
   "scripts": {
-    "build": "babel src --out-dir dist --no-comments && node scripts/prepare.js",
+    "build":
+      "babel alias --out-dir ./ --no-comments && babel src --out-dir dist --no-comments",
     "clear": "rimraf dist",
     "dist": "yarn clear && yarn build",
     "prepublish": "yarn test",
