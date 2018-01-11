@@ -33,7 +33,7 @@
     "run-sequence": "2.2.1",
     "typescript": "2.6.2",
     "webpack": "2.3.3",
-    "yargs": "7.0.2"
+    "yargs": "10.1.1"
   },
   "files": ["dist/commonjs", "dist/typings", "dist/window"],
   "license": "GPL-3.0",
