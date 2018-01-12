@@ -61,7 +61,7 @@ z.components.ServiceIcon = class ServiceIcon {
       }
     };
 
-    this.picture_preview_subscription = this.service.previewPictureResource.subscribe(() => {
+    this.picturePreviewSubscription = this.service.previewPictureResource.subscribe(() => {
       if (this.avatarEnteredViewport) {
         this._loadAvatarPicture();
       }
@@ -69,7 +69,7 @@ z.components.ServiceIcon = class ServiceIcon {
   }
 
   dispose() {
-    this.picture_preview_subscription.dispose();
+    this.picturePreviewSubscription.dispose();
   }
 };
 
@@ -80,8 +80,8 @@ ko.components.register('service-icon', {
     </div>
   `,
   viewModel: {
-    createViewModel(params, component_info) {
-      return new z.components.ServiceIcon(params, component_info);
+    createViewModel(params, componentInfo) {
+      return new z.components.ServiceIcon(params, componentInfo);
     },
   },
 });
