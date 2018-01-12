@@ -25,6 +25,27 @@ service-icon {
   user-select: none;
   border-radius: 15%;
   background-color: #fff;
+  .service-icon {
+    height: 100%;
+    & > div {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+    }
+  }
+  .service-icon-placeholder {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    & > svg {
+      width: 60%;
+      & > path {
+        fill: fade(@graphite-dark, 20%);
+      }
+    }
+  }
   .service-icon-image {
     border-radius: 15%;
   }
