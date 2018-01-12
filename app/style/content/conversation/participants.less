@@ -164,9 +164,12 @@
 }
 
 .participants-search-header {
+  padding: 16px 8px 8px;
+}
+
+.participants-search-header-row {
   display: flex;
   align-items: flex-start;
-  padding: 16px 8px 8px;
 }
 
 .participants-search-header-list {
@@ -219,6 +222,30 @@
   .label-bold-xs();
   margin-bottom: 8px;
   line-height: 24px;
+}
+
+.participants-search-tabs {
+  height: 44px;
+  display: flex;
+  padding: 0 8px;
+  .participants-search-tab {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 11px;
+    color: @graphite-dark;
+    border-bottom: 1px solid transparent;
+    opacity: 0.56;
+    cursor: pointer;
+    &.active {
+      border-bottom-color: fade(@graphite-dark, 40%);
+      opacity: 1;
+      cursor: default;
+    }
+  }
 }
 
 // ----------------------------------------------------------------------------
