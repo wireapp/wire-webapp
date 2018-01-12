@@ -94,17 +94,19 @@
 
         <!-- ko ifnot: peopleTabActive() -->
           <!-- ko if: show_search_results() -->
+            <span class="start-ui-list-header"></span>
             <service-list params="services: search_results.services(), click: clickOnService"></service-list>
           <!-- /ko  -->
         <!-- /ko  -->
       <!-- /ko  -->
+      <!-- ko if: peopleTabActive() -->
+        <!-- ko if: show_no_matches() -->
+          <div class="start-ui-no-contacts" data-bind="l10n_text: z.string.search_no_contacts_on_wire"></div>
+        <!-- /ko  -->
 
-      <!-- ko if: show_no_matches() -->
-        <div class="start-ui-no-contacts" data-bind="l10n_text: z.string.search_no_contacts_on_wire"></div>
-      <!-- /ko  -->
-
-      <!-- ko if: show_no_search_results() -->
-        <div class="start-ui-no-search-results" data-bind="l10n_text: z.string.search_try_search"></div>
+        <!-- ko if: show_no_search_results() -->
+          <div class="start-ui-no-search-results" data-bind="l10n_text: z.string.search_try_search"></div>
+        <!-- /ko  -->
       <!-- /ko  -->
     </div>
   </div>
