@@ -17,7 +17,7 @@
  *
  */
 
-service-icon {
+service-avatar {
   position: relative;
   display: inline-block;
   cursor: pointer;
@@ -25,7 +25,7 @@ service-icon {
   user-select: none;
   border-radius: 15%;
   background-color: #fff;
-  .service-icon {
+  .service-avatar {
     height: 100%;
     & > div {
       position: absolute;
@@ -35,7 +35,7 @@ service-icon {
       right: 0;
     }
   }
-  .service-icon-placeholder {
+  .service-avatar-placeholder {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -46,10 +46,10 @@ service-icon {
       }
     }
   }
-  .service-icon-image {
+  .service-avatar-image {
     border-radius: 15%;
   }
-  &.service-icon-sm {
+  &.service-avatar-sm {
     .square(@avatar-diameter-sm);
   }
 }

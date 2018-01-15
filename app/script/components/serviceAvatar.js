@@ -22,7 +22,7 @@
 window.z = window.z || {};
 window.z.components = z.components || {};
 
-z.components.ServiceIcon = class ServiceIcon {
+z.components.ServiceAvatar = class ServiceAvatar {
   constructor(params, component_info) {
     this.dispose = this.dispose.bind(this);
 
@@ -51,7 +51,7 @@ z.components.ServiceIcon = class ServiceIcon {
               const image = new Image();
               image.src = url;
               this.element
-                .find('.service-icon-image')
+                .find('.service-avatar-image')
                 .empty()
                 .append(image);
               this.element.addClass('user-avatar-image-loaded user-avatar-loading-transition');
@@ -73,20 +73,20 @@ z.components.ServiceIcon = class ServiceIcon {
   }
 };
 
-ko.components.register('service-icon', {
+ko.components.register('service-avatar', {
   template: `
-    <div class="service-icon" data-uie-name="service-icon" data-bind="attr: {title: service.name}, in_viewport: onInViewport, delay: delay">
-      <div class="service-icon-placeholder">
+    <div class="service-avatar" data-uie-name="service-avatar" data-bind="attr: {title: service.name}, in_viewport: onInViewport, delay: delay">
+      <div class="service-avatar-placeholder">
         <svg width="32" height="32" viewBox="0 0 32 32">
           <path d="M10.5 12A6.5 6.5 0 0 0 4 18.5V24a1 1 0 0 0 1 1h22a1 1 0 0 0 1-1v-5.5a6.5 6.5 0 0 0-6.5-6.5h-11zm-7.12-1.22L.24 4.95a2 2 0 1 1 3.52-1.9L6.8 8.68C7.94 8.24 9.19 8 10.5 8h11C27.3 8 32 12.7 32 18.5V24a5 5 0 0 1-5 5H5a5 5 0 0 1-5-5v-5.5c0-3.05 1.3-5.8 3.38-7.72zM11 19a2 2 0 1 1-4 0 2 2 0 0 1 4 0m7 0a2 2 0 1 1-4 0 2 2 0 0 1 4 0m5 2a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm5.26-9.55a2 2 0 0 1-3.52-1.9l3.5-6.5a2 2 0 0 1 3.52 1.9l-3.5 6.5z"/>
         </svg>
       </div>
-      <div class="service-icon-image"></div>
+      <div class="service-avatar-image"></div>
     </div>
   `,
   viewModel: {
     createViewModel(params, componentInfo) {
-      return new z.components.ServiceIcon(params, componentInfo);
+      return new z.components.ServiceAvatar(params, componentInfo);
     },
   },
 });
