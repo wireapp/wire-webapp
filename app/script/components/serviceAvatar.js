@@ -54,7 +54,7 @@ z.components.ServiceAvatar = class ServiceAvatar {
                 .find('.service-avatar-image')
                 .empty()
                 .append(image);
-              this.element.addClass('user-avatar-image-loaded user-avatar-loading-transition');
+              this.element.addClass('service-avatar-image-loaded service-avatar-loading-transition');
               this.avatarLoadingBlocked = false;
             });
         }
