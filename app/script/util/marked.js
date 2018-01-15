@@ -615,17 +615,17 @@
   };
 
   Renderer.prototype.table = function(header, body) {
-    return `${'<table>\n' + '<thead>\n'}${header}</thead>\n` + `<tbody>\n${body}</tbody>\n` + '</table>\n';
+    return `${'<table>' + '<thead>'}${header}</thead>` + `<tbody>${body}</tbody>` + '</table>\n';
   };
 
   Renderer.prototype.tablerow = function(content) {
-    return `<tr>\n${content}</tr>\n`;
+    return `<tr>${content}</tr>`;
   };
 
   Renderer.prototype.tablecell = function(content, flags) {
     const type = flags.header ? 'th' : 'td';
     const tag = flags.align ? `<${type} style="text-align:${flags.align}">` : `<${type}>`;
-    return `${tag + content}</${type}>\n`;
+    return `${tag + content}</${type}>`;
   };
 
   // span level renderer
@@ -781,7 +781,6 @@
         // header
         cell = '';
         for (i = 0; i < this.token.header.length; i++) {
-          flags = {align: this.token.align[i], header: true};
           cell += this.renderer.tablecell(this.inline.output(this.token.header[i]), {
             align: this.token.align[i],
             header: true,
