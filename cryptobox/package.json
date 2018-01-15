@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@wireapp/store-engine": "0.1.4",
+    "@wireapp/store-engine": "0.1.8",
     "dexie": "2.0.1",
     "fs-extra": "5.0.0",
     "wire-webapp-lru-cache": "2.0.0",
