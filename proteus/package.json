@@ -24,7 +24,9 @@
     "types": "jsdoc --verbose --pedantic --configure jsdoc.json src/ && node replace.js",
     "start": "node dist/index.js",
     "test": "yarn dist && yarn test:node",
-    "test:node": "mocha -s 30000 -t 30000 --recursive test/harness.js test --trace-warnings"
+    "test:node":
+      "mocha -s 30000 -t 30000 --recursive test/harness.js test --trace-warnings --grep LongRunning --invert",
+    "test:longrunning": "mocha -s 30000 -t 30000 --recursive test/harness.js test --trace-warnings --grep LongRunning"
   },
   "types": "dist/typings/typings.d.ts",
   "version": "5.3.1"
