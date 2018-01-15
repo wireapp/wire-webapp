@@ -46,10 +46,47 @@ service-avatar {
       }
     }
   }
+
   .service-avatar-image {
+    .full-screen;
+    transform: scale(0.88);
     border-radius: 15%;
+    overflow: hidden;
+    opacity: 0;
+
+    > img {
+      width: 100%;
+      height: 100%;
+    }
+
+    .user-avatar-image-loaded & {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  .service-avatar-loading-transition {
+    .service-avatar-image {
+      transition: all @animation-timing-slow @ease-out-quart @animation-timing-faster;
+    }
+  }
+
+  &.service-avatar-lg {
+    .square(@avatar-diameter-lg);
+  }
+  &.service-avatar-md {
+    .square(@avatar-diameter-md);
   }
   &.service-avatar-sm {
     .square(@avatar-diameter-sm);
+  }
+  &.service-avatar-s {
+    .square(@avatar-diameter-s);
+  }
+  &.service-avatar-xs {
+    .square(@avatar-diameter-xs);
+  }
+  &.service-avatar-xxs {
+    .square(@avatar-diameter-xxs);
   }
 }
