@@ -33,8 +33,7 @@ account.on(Account.INCOMING.TEXT_MESSAGE, (data: PayloadBundle) => {
   account.service.conversation.sendTextMessage(data.conversation, data.content);
 });
 
-account.listen(login)
-.catch((error) => {
+account.listen(login).catch(error => {
   console.error(error.stack);
   return process.exit(1);
 });

@@ -21,9 +21,15 @@ module.exports = function(config) {
   config.set({
     autoWatch: false,
     basePath: '',
-    browsers: ['ChromeHeadless'],
+    browsers: ['ChromeNoSandbox'],
     colors: true,
     concurrency: Infinity,
+    customLaunchers: {
+      ChromeNoSandbox: {
+        base: 'ChromeHeadless',
+        flags: ['--no-sandbox'],
+      },
+    },
     exclude: [],
     frameworks: ['jasmine'],
     port: 9876,
