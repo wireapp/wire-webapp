@@ -99,10 +99,20 @@
         <!-- ko if: state() === z.ViewModel.ParticipantsViewModel.STATE.ADD_SERVICE -->
           <div class="participants-search-content">
             <div class="participants-search-list" data-bind="antiscroll: selectedUsers">
-              <service-list class="service-list-light" params="services: integrationRepository.services, click: clickToAddService"></service-list>
+              <service-list class="service-list-light" params="services: integrationRepository.services, click: clickOnSelectService"></service-list>
             </div>
           </div>
         <!-- /ko -->
+      </div>
+    <!-- /ko -->
+
+    <!-- ko if: showConfirmService() -->
+      <div class="participants-service-confirmation">
+        <service-avatar class="service-avatar-sm" params="service: selectedService"></service-avatar>
+        <div class="participants-service-confirmation-name" data-bind="text: selectedService().name"></div>
+        <div class="participants-service-confirmation-provider" data-bind="text: 'Provider Name'"></div>
+        <div class="participants-service-confirmation-description" data-bind="text: selectedService().description"></div>
+        <button class="participants-service-confirmation-button" data-bind="click: clickToAddService, l10n_text: z.string.people_service_confirm_button"></button>
       </div>
     <!-- /ko -->
   </div>

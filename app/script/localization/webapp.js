@@ -371,6 +371,7 @@ z.string.people_invite_detail = 'Sharing your contacts helps you connect with ot
 z.string.people_invite_button_contacts = 'From Contacts';
 z.string.people_invite_button_gmail = 'From Gmail';
 z.string.people_invite_headline = 'Bring your friends';
+z.string.people_service_confirm_button = 'Add service';
 z.string.people_services = 'Services';
 z.string.people_share = 'Share Contacts';
 z.string.people_tabs_details = 'Details';
