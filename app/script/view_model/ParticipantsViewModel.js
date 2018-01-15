@@ -27,6 +27,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     return {
       ADD_PEOPLE: 'add_people',
       ADD_SERVICE: 'add_service',
+      CONFIRM_SERVICE: 'confirm_service',
       PARTICIPANTS: 'participants',
     };
   }
@@ -40,6 +41,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     team_repository
   ) {
     this.clickOnAddPeople = this.clickOnAddPeople.bind(this);
+    this.clickOnSelectService = this.clickOnSelectService.bind(this);
     this.clickToAddService = this.clickToAddService.bind(this);
     this.block = this.block.bind(this);
     this.close = this.close.bind(this);
@@ -85,7 +87,8 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
     this.services = ko.observableArray([]);
 
-    this.placeholder_participant = new z.entity.User();
+    this.placeholderParticipant = new z.entity.User();
+    this.placeholderService = new z.integration.ServiceEntity();
 
     ko.computed(() => {
       const conversationEntity = this.conversation();
@@ -116,7 +119,8 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.confirm_dialog = undefined;
 
     // Selected group user
-    this.user_profile = ko.observable(this.placeholder_participant);
+    this.user_profile = ko.observable(this.placeholderParticipant);
+    this.selectedService = ko.observable(this.placeholderService);
 
     // Switch between div and input field to edit the conversation name
     this.editing = ko.observable(false);
@@ -168,6 +172,12 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
       return z.l10n.text(identifier, shortcut);
     });
 
+    this.showConfirmService = ko.pureComputed(() => {
+      const isConfirmServiceState = this.state() === ParticipantsViewModel.STATE.CONFIRM_SERVICE;
+      const hasSelectedService = this.selectedService().id !== this.placeholderService.id;
+      return isConfirmServiceState && hasSelectedService;
+    });
+
     amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, this.switch_content.bind(this));
     amplify.subscribe(z.event.WebApp.PEOPLE.SHOW, this.show_participant);
     amplify.subscribe(z.event.WebApp.PEOPLE.TOGGLE, this.toggle_participants_bubble.bind(this));
@@ -180,6 +190,11 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   clickOnAddService() {
     this.state(ParticipantsViewModel.STATE.ADD_SERVICE);
     this.searchServices(this.searchInput());
+  }
+
+  clickOnSelectService(serviceEntity) {
+    this.selectedService(serviceEntity);
+    this.state(ParticipantsViewModel.STATE.CONFIRM_SERVICE);
   }
 
   clickOnShowParticipant(userEntity) {
@@ -196,8 +211,8 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     }
   }
 
-  clickToAddService(serviceEntity) {
-    const {id, name, providerId} = serviceEntity;
+  clickToAddService(serviceEntity = this.selectedService()) {
+    const {id, name, providerId} = this.selectedService();
     this.logger.info(`Adding service '${name}' to conversation '${this.conversation().id}'`, serviceEntity);
     this.conversation_repository.addBot(this.conversation(), providerId, id);
     this.close();
@@ -225,7 +240,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
         if (user_et && !this.conversation().is_group()) {
           this.user_profile(user_et);
         } else {
-          this.user_profile(this.placeholder_participant);
+          this.user_profile(this.placeholderParticipant);
         }
 
         this.render_participants(true);
@@ -261,7 +276,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   change_conversation(conversation_et) {
     this.participants_bubble.hide();
     this.conversation(conversation_et);
-    this.user_profile(this.placeholder_participant);
+    this.user_profile(this.placeholderParticipant);
   }
 
   reset_view() {
@@ -271,7 +286,8 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     if (this.confirm_dialog) {
       this.confirm_dialog.destroy();
     }
-    this.user_profile(this.placeholder_participant);
+    this.user_profile(this.placeholderParticipant);
+    this.selectedService(this.placeholderService);
   }
 
   addParticipants() {
