@@ -385,6 +385,7 @@ z.string.lt.preferences_about_terms_of_use = 'Naudojimosi sąlygos';
 z.string.lt.preferences_about_version = 'Versija {{version}}';
 z.string.lt.preferences_about_website = 'Wire svetainė';
 
+z.string.lt.preferences_account_avaibility_unset = 'Pasirinkite būseną';
 z.string.lt.preferences_account_create_team = 'Sukurti komandą';
 z.string.lt.preferences_account_delete = 'Ištrinti paskyrą';
 z.string.lt.preferences_account_log_out = 'Atsijungti';
@@ -485,6 +486,8 @@ z.string.lt.warning_permission_request_screen = '{{icon}} Leisti prieigą prie e
 z.string.lt.warning_tell_me_how = 'Paaiškinkite kaip';
 
 z.string.lt.user_availability_available = 'Prieinamas';
+z.string.lt.user_availability_away = 'Pasišalinęs';
+z.string.lt.user_availability_busy = 'Užsiėmęs';
 z.string.lt.user_availability_none = 'Jokių';
 
 z.string.lt.system_notification_asset_add = 'Pasidalino paveikslu';
@@ -512,6 +515,9 @@ z.string.lt.tooltip_conversation_call = 'Skambutis';
 z.string.lt.tooltip_conversation_ephemeral = 'Laikina žinutė';
 z.string.lt.tooltip_conversation_file = 'Pridėti failą';
 z.string.lt.tooltip_conversation_input_placeholder = 'Rašykite žinutę';
+z.string.lt.tooltip_conversation_input_placeholder_available = '{{user}} yra prisijungęs';
+z.string.lt.tooltip_conversation_input_placeholder_away = '{{user}} yra pasišalinęs';
+z.string.lt.tooltip_conversation_input_placeholder_busy = '{{user}} yra užsiėmęs';
 z.string.lt.tooltip_conversation_people = 'Žmonės ({{shortcut}})';
 z.string.lt.tooltip_conversation_picture = 'Pridėti paveikslą';
 z.string.lt.tooltip_conversation_ping = 'Tikrinti ryšį ({{shortcut}})';
