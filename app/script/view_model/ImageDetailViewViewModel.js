@@ -193,7 +193,7 @@ z.ViewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
       action: like_action,
       conversation_type: z.tracking.helpers.get_conversation_type(conversation_et),
       type: type,
-      with_bot: conversation_et.is_with_bot(),
+      with_service: conversation_et.isWithBot(),
     });
   }
 };

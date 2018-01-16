@@ -3527,7 +3527,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         conversation_type: z.tracking.helpers.get_conversation_type(conversation_et),
         ephemeral_time: is_ephemeral ? ephemeral_time : undefined,
         is_ephemeral: is_ephemeral,
-        with_bot: conversation_et.is_with_bot(),
+        with_service: conversation_et.isWithBot(),
       });
     }
   }
@@ -3587,7 +3587,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       reacted_to_last_message: conversation_et.get_last_message() === message_et,
       type: z.tracking.helpers.get_message_type(message_et),
       user: message_et.user().is_me ? 'sender' : 'receiver',
-      with_bot: conversation_et.is_with_bot(),
+      with_service: conversation_et.isWithBot(),
     });
   }
 };

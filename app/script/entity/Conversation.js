@@ -654,10 +654,10 @@ z.entity.Conversation = class Conversation {
   }
 
   /**
-   * Check whether the conversation is held with a bot like Anna or Otto.
+   * Check whether the conversation is held with a service bot like Anna or Otto.
    * @returns {boolean} True, if conversation with a bot
    */
-  is_with_bot() {
+  isWithBot() {
     for (const user_et of this.participating_user_ets()) {
       if (user_et.isBot) {
         return true;
