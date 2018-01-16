@@ -615,7 +615,7 @@
   };
 
   Renderer.prototype.table = function(header, body) {
-    return `${'<table>' + '<thead>'}${header}</thead>` + `<tbody>${body}</tbody>` + '</table>\n';
+    return `<table><thead>${header}</thead><tbody>${body}</tbody></table>\n`;
   };
 
   Renderer.prototype.tablerow = function(content) {
