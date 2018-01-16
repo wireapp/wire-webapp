@@ -108,11 +108,26 @@
 
     <!-- ko if: showConfirmService() -->
       <div class="participants-service-confirmation">
-        <service-avatar class="service-avatar-sm" params="service: selectedService"></service-avatar>
-        <div class="participants-service-confirmation-name" data-bind="text: selectedService().name"></div>
-        <div class="participants-service-confirmation-provider" data-bind="text: 'Provider Name'"></div>
-        <div class="participants-service-confirmation-description" data-bind="text: selectedService().description"></div>
-        <button class="participants-service-confirmation-button" data-bind="click: clickToAddService, l10n_text: z.string.people_service_confirm_button"></button>
+        <div class="service-confirmation-header">
+          <div class="service-confirmation-back" data-bind="click: clickOnServiceBack, l10n_tooltip: z.string.tooltip_people_back" data-uie-name="do-back">
+              <svg width="16" height="16" viewBox="0 0 16 16">
+                  <path fill="#33373A" d="M4.83 9l5.24 5.24-1.41 1.41L1 8 8.66.34l1.41 1.41L4.83 7H15v2z"/>
+              </svg>
+          </div>
+        </div>
+        <div class="service-confirmation-body">
+          <div class="service-confirmation-summary">
+            <service-avatar class="service-avatar-md" params="service: selectedService"></service-avatar>
+            <div class="service-confirmation-summary-text">
+              <div class="service-confirmation-name" data-bind="text: selectedService().name"></div>
+              <div class="service-confirmation-provider" data-bind="text: 'Provider Name'"></div>
+            </div>
+          </div>
+          <div class="service-confirmation-description" data-bind="text: selectedService().description"></div>
+        </div>
+        <div class="service-confirmation-footer">
+          <button class="participants-service-confirmation-button" data-bind="click: clickToAddService, l10n_text: z.string.people_service_confirm_button"></button>
+        </div>
       </div>
     <!-- /ko -->
   </div>
