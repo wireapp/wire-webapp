@@ -202,11 +202,17 @@ z.string.modal_not_connected_message_many = 'One of the people you selected does
 z.string.modal_remove_device_button = 'Remove device';
 z.string.modal_remove_device_headline = 'Remove "{{device}}"';
 z.string.modal_remove_device_message = 'Your password is required to remove the device.';
+// Service unavailable
+z.string.modal_service_disabled_headline = 'z.string.modal_service_disabled_headline';
+z.string.modal_service_disabled_message = 'z.string.modal_service_disabled_message';
 // Session Reset
 z.string.modal_session_reset_headline = 'The session has been reset';
 z.string.modal_session_reset_message_1 = 'If the problem is not resolved,';
 z.string.modal_session_reset_message_link = 'contact';
 z.string.modal_session_reset_message_2 = 'us.';
+// Too many bots in conversation
+z.string.modal_too_many_bots_headline = 'z.string.modal_too_many_members_headline';
+z.string.modal_too_many_bots_message = 'z.string.modal_too_many_bots_message';
 // Too many members in conversation
 z.string.modal_too_many_members_headline = 'Full house';
 z.string.modal_too_many_members_message = 'Up to {{number1}} people can join a conversation. There is room for {{number2}} more people in here.';

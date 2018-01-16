@@ -210,8 +210,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(response => this._onCreate({conversation: response.id, data: response}))
       .then(({conversation_et}) => conversation_et)
       .catch(error => {
-        if (error.label === z.service.BackendClientError.LABEL.NOT_CONNECTED) {
-          return this._handle_users_not_connected(user_ids);
+        const notConnected = error.label === z.service.BackendClientError.LABEL.NOT_CONNECTED;
+        if (notConnected) {
+          return this._handleUsersNotConnected(user_ids);
         }
 
         throw error;
@@ -943,50 +944,70 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when bot was added
    */
   addBot(conversationEntity, providerId, serviceId) {
-    return this.conversation_service.post_bots(conversationEntity.id, providerId, serviceId).then(response => {
-      if (response && response.event) {
-        amplify.publish(z.event.WebApp.EVENT.INJECT, response.event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
-        this.logger.debug(`Successfully added bot to conversation '${conversationEntity.display_name()}'`, response);
-      }
+    return this.conversation_service
+      .post_bots(conversationEntity.id, providerId, serviceId)
+      .then(response => {
+        if (response && response.event) {
+          amplify.publish(z.event.WebApp.EVENT.INJECT, response.event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+          this.logger.debug(`Successfully added bot to conversation '${conversationEntity.display_name()}'`, response);
+        }
 
-      return conversationEntity;
-    });
+        return conversationEntity;
+      })
+      .catch(error => this._handleAddToConversationError(error, conversationEntity, [serviceId]));
   }
 
   /**
    * Add users to an existing conversation.
    *
-   * @param {Conversation} conversation_et - Conversation to add users to
-   * @param {Array<string>} user_ids - IDs of users to be added to the conversation
+   * @param {Conversation} conversationEntity - Conversation to add users to
+   * @param {Array<string>} userIds - IDs of users to be added to the conversation
    * @returns {Promise} Resolves when members were added
    */
-  add_members(conversation_et, user_ids) {
+  addMembers(conversationEntity, userIds) {
     return this.conversation_service
-      .post_members(conversation_et.id, user_ids)
+      .post_members(conversationEntity.id, userIds)
       .then(response => {
         if (response) {
           amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
         }
       })
-      .catch(error => {
-        const too_many_members = error.label === z.service.BackendClientError.LABEL.TOO_MANY_MEMBERS;
-        if (too_many_members) {
-          const open_spots = z.config.MAXIMUM_CONVERSATION_SIZE - conversation_et.get_number_of_participants();
+      .catch(error => this._handleAddToConversationError(error, conversationEntity, userIds));
+  }
 
-          return amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.TOO_MANY_MEMBERS, {
-            data: {
-              max: z.config.MAXIMUM_CONVERSATION_SIZE,
-              open_spots: Math.max(0, open_spots),
-            },
-          });
-        }
+  _handleAddToConversationError(error, conversationEntity, userIds) {
+    switch (error.label) {
+      case z.service.BackendClientError.LABEL.NOT_CONNECTED: {
+        this._handleUsersNotConnected(userIds);
+        break;
+      }
 
-        if (error.label === z.service.BackendClientError.LABEL.NOT_CONNECTED) {
-          return this._handle_users_not_connected(user_ids);
-        }
+      case z.service.BackendClientError.LABEL.SERVICE_DISABLED: {
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.SERVICE_DISABLED);
+        break;
+      }
 
+      case z.service.BackendClientError.LABEL.TOO_MANY_BOTS: {
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.TOO_MANY_BOTS);
+        break;
+      }
+
+      case z.service.BackendClientError.LABEL.TOO_MANY_MEMBERS: {
+        const openSpots = z.config.MAXIMUM_CONVERSATION_SIZE - conversationEntity.get_number_of_participants();
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.TOO_MANY_MEMBERS, {
+          data: {
+            max: z.config.MAXIMUM_CONVERSATION_SIZE,
+            open_spots: Math.max(0, openSpots),
+          },
+        });
+
+        break;
+      }
+
+      default: {
         throw error;
-      });
+      }
+    }
   }
 
   /**
@@ -1307,8 +1328,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
   }
 
-  _handle_users_not_connected(user_ids) {
-    const user_promise = user_ids.length === 1 ? this.user_repository.get_user_by_id(user_ids[0]) : Promise.resolve();
+  _handleUsersNotConnected(userIds = []) {
+    const [userID] = userIds;
+    const user_promise = userIds.length === 1 ? this.user_repository.get_user_by_id(userID) : Promise.resolve();
 
     user_promise.then(user_et => {
       const username = user_et ? user_et.first_name() : undefined;
