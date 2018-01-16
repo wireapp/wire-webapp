@@ -23,6 +23,7 @@ const nock = require('nock');
 const Client = require('@wireapp/api-client/dist/commonjs/Client');
 const {AUTH_ACCESS_TOKEN_KEY, AUTH_TABLE_NAME, AuthAPI} = require('@wireapp/api-client/dist/commonjs/auth/');
 const {UserAPI} = require('@wireapp/api-client/dist/commonjs/user/');
+const {MemoryEngine} = require('@wireapp/store-engine/dist/commonjs/engine/');
 
 describe('Client', () => {
   const baseURL = Client.BACKEND.PRODUCTION.rest;
@@ -36,10 +37,25 @@ describe('Client', () => {
   };
 
   describe('"constructor"', () => {
-    it('constructs a client with production backend by default', () => {
+    it('constructs a client with production backend and StoreEngine by default', () => {
       const client = new Client();
       expect(client.transport.http.baseURL).toBe(Client.BACKEND.PRODUCTION.rest);
       expect(client.transport.ws.baseURL).toBe(Client.BACKEND.PRODUCTION.ws);
+      expect(client.transport.http.accessTokenStore.tokenStore).toBeDefined();
+    });
+
+    it('constructs StoreEngine when only the URLs is provided', () => {
+      const client = new Client({urls: Client.BACKEND.PRODUCTION});
+      expect(client.transport.http.baseURL).toBe(Client.BACKEND.PRODUCTION.rest);
+      expect(client.transport.ws.baseURL).toBe(Client.BACKEND.PRODUCTION.ws);
+      expect(client.transport.http.accessTokenStore.tokenStore).toBeDefined();
+    });
+
+    it('constructs URLs when only the StoreEngine is provided', () => {
+      const client = new Client({store: new MemoryEngine('wire-test')});
+      expect(client.transport.http.baseURL).toBe(Client.BACKEND.PRODUCTION.rest);
+      expect(client.transport.ws.baseURL).toBe(Client.BACKEND.PRODUCTION.ws);
+      expect(client.transport.http.accessTokenStore.tokenStore).toBeDefined();
     });
   });
 
