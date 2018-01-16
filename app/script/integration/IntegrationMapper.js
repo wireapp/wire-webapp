@@ -39,7 +39,7 @@ z.integration.IntegrationMapper = (() => {
 
   const _updateProviderFromObject = (providerData, providerEntity = new z.integration.ProviderEntity()) => {
     if (providerData) {
-      const {description, id, name, url, email} = providerData;
+      const {description, email, id, name, url} = providerData;
 
       if (id) {
         providerEntity.id = id;
@@ -67,7 +67,7 @@ z.integration.IntegrationMapper = (() => {
 
   const _updateServiceFromObject = (serviceData, serviceEntity = new z.integration.ServiceEntity()) => {
     if (serviceData) {
-      const {assets, description, id, name, provider: providerId, tags} = serviceData;
+      const {assets, description, id, name, provider: providerId, summary, tags} = serviceData;
 
       if (id) {
         serviceEntity.id = id;
@@ -87,6 +87,10 @@ z.integration.IntegrationMapper = (() => {
 
       if (providerId) {
         serviceEntity.providerId = providerId;
+      }
+
+      if (summary) {
+        serviceEntity.summary = summary;
       }
 
       if (tags) {
