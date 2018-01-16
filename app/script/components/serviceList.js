@@ -39,7 +39,7 @@ ko.components.register('service-list', {
         <div class="search-list-item-content">
           <div class="search-list-item-content-name" data-bind="text: name"></div>
           <div class="search-list-item-content-info">
-            <span class="search-list-item-content-username label-username" data-bind="text: description"></span>
+            <span class="search-list-item-content-username" data-bind="text: description"></span>
           </div>
         </div>
       </div>

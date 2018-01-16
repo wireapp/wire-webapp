@@ -250,11 +250,55 @@
 
 .participants-service-confirmation {
   .bubble-content();
-  padding: 16px;
+  .service-confirmation-header {
+    flex-basis: 48px;
+    padding: 16px;
+    display: flex;
+  }
+  .service-confirmation-back {
+    cursor: pointer;
+  }
+  .service-confirmation-body {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    background-color: @app-bg;
+  }
+  .service-confirmation-footer {
+    padding: 24px;
+  }
+  .service-confirmation-summary {
+    display: flex;
+
+    service-avatar {
+      border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+  }
+  .service-confirmation-summary-text {
+    margin-left: 16px;
+  }
+  .service-confirmation-name {
+    font-size: 24px;
+    line-height: 32px;
+    font-weight: @font-weight-regular;
+  }
+  .service-confirmation-provider {
+    margin-top: 4px;
+    font-size: 12px;
+    line-height: 16px;
+    opacity: 0.56;
+  }
+  .service-confirmation-description {
+    margin-top: 16px;
+    font-size: 14px;
+  }
 }
 
 .participants-service-confirmation-button {
   .button();
+  width: 100%;
+  height: 48px;
 }
 
 // ----------------------------------------------------------------------------

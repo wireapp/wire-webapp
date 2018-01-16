@@ -211,6 +211,11 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     }
   }
 
+  clickOnServiceBack() {
+    this.state(ParticipantsViewModel.STATE.ADD_SERVICE);
+    $('.participants-search').addClass('participants-search-show');
+  }
+
   clickToAddService(serviceEntity = this.selectedService()) {
     const {id, name, providerId} = this.selectedService();
     this.logger.info(`Adding service '${name}' to conversation '${this.conversation().id}'`, serviceEntity);
