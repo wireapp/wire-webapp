@@ -24,13 +24,14 @@ window.z.integration = z.integration || {};
 
 z.integration.ServiceEntity = class ServiceEntity {
   constructor(serviceData = {}) {
-    const {description, id, name, provider: providerId, tags} = serviceData;
+    const {description, id, name, provider: providerId, summary, tags} = serviceData;
 
     this.id = id || '';
 
     this.description = description || '';
     this.name = name || '';
     this.providerId = providerId || '';
+    this.summary = summary || '';
     this.tags = tags || [];
 
     this.mediumPictureResource = ko.observable();
