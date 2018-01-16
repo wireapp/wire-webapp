@@ -45,7 +45,8 @@ z.string.auth_account_sign_in_phone = 'Phone';
 
 // Authentication: BLOCKED section
 z.string.auth_blocked_cookies = 'Enable cookies to log in to Wire.';
-z.string.auth_blocked_database = 'Wire needs access to local storage to display your messages. Local storage is not available in private mode.';
+z.string.auth_blocked_database =
+  'Wire needs access to local storage to display your messages. Local storage is not available in private mode.';
 z.string.auth_blocked_tabs = 'Wire is already open in another tab.';
 
 // Authentication: VERIFY section
@@ -127,7 +128,8 @@ z.string.modal_block_conversation_message = '{{user}} won’t be able to contact
 z.string.modal_block_conversation_button = 'Block';
 // Bots unavailable
 z.string.modal_bots_unavailable_headline = 'Bots currently unavailable';
-z.string.modal_bots_unavailable_message = 'Thank you for your interest in bots. The service is currently suspended while we work on the next version. Stay tuned.';
+z.string.modal_bots_unavailable_message =
+  'Thank you for your interest in bots. The service is currently suspended while we work on the next version. Stay tuned.';
 // Cannot create the call because there is nobody to call (conversation_empty)
 z.string.modal_call_conversation_empty_headline = 'No one to call';
 z.string.modal_call_conversation_empty_message = 'There is no one left here.';
@@ -159,7 +161,8 @@ z.string.modal_connected_device_manage_devices = 'manage devices';
 // Delete account
 z.string.modal_delete_account_action = 'Delete';
 z.string.modal_delete_account_headline = 'Delete account';
-z.string.modal_delete_account_message = 'We will send a message via email or SMS. Follow the link to permanently delete your account.';
+z.string.modal_delete_account_message =
+  'We will send a message via email or SMS. Follow the link to permanently delete your account.';
 // Delete message
 z.string.modal_delete_button = 'Delete';
 z.string.modal_delete_headline = 'Delete only for me?';
@@ -173,7 +176,8 @@ z.string.modal_too_long_headline = 'Message too long';
 z.string.modal_too_long_message = 'You can send messages up to {{number}} characters long.';
 // Leave a conversation
 z.string.modal_leave_conversation_headline = 'Leave "{{name}}" conversation?';
-z.string.modal_leave_conversation_message = 'The participants will be notified and the conversation removed from your list.';
+z.string.modal_leave_conversation_message =
+  'The participants will be notified and the conversation removed from your list.';
 z.string.modal_leave_conversation_button = 'Leave';
 // Logout
 z.string.modal_logout_headline = 'Clear Data?';
@@ -193,7 +197,8 @@ z.string.modal_new_device_send_anyway = 'send anyway';
 // Not connected
 z.string.modal_not_connected_headline = 'No one added to conversation';
 z.string.modal_not_connected_message_one = '{{name}} does not want to be added to conversations.';
-z.string.modal_not_connected_message_many = 'One of the people you selected does not want to be added to conversations.';
+z.string.modal_not_connected_message_many =
+  'One of the people you selected does not want to be added to conversations.';
 // Remove device
 z.string.modal_remove_device_button = 'Remove device';
 z.string.modal_remove_device_headline = 'Remove "{{device}}"';
@@ -205,7 +210,8 @@ z.string.modal_session_reset_message_link = 'contact';
 z.string.modal_session_reset_message_2 = 'us.';
 // Too many members in conversation
 z.string.modal_too_many_members_headline = 'Full house';
-z.string.modal_too_many_members_message = 'Up to {{number1}} people can join a conversation. There is room for {{number2}} more people in here.';
+z.string.modal_too_many_members_message =
+  'Up to {{number1}} people can join a conversation. There is room for {{number2}} more people in here.';
 // Parallel uploads
 z.string.modal_uploads_parallel = 'You can send up to {{number}} files at once.';
 
@@ -363,20 +369,23 @@ z.string.people_search_placeholder = 'Search by name';
 z.string.people_everyone_participates = 'Everyone you’re\nconnected to is already in\nthis conversation.';
 z.string.people_no_matches = 'No matching results.\nTry entering a different name.';
 z.string.people_invite = 'Invite people to join Wire';
-z.string.people_invite_detail = 'Sharing your contacts helps you connect with others. We anonymize all the information and do not share it with anyone else.';
+z.string.people_invite_detail =
+  'Sharing your contacts helps you connect with others. We anonymize all the information and do not share it with anyone else.';
 z.string.people_invite_button_contacts = 'From Contacts';
 z.string.people_invite_button_gmail = 'From Gmail';
 z.string.people_invite_headline = 'Bring your friends';
 z.string.people_share = 'Share Contacts';
 z.string.people_tabs_details = 'Details';
 z.string.people_tabs_devices = 'Devices';
-z.string.people_tabs_devices_headline = 'Wire gives every device a unique fingerprint. Compare them with {{user}} and verify your conversation.';
+z.string.people_tabs_devices_headline =
+  'Wire gives every device a unique fingerprint. Compare them with {{user}} and verify your conversation.';
 z.string.people_tabs_devices_learn_more = 'Learn more';
 z.string.people_tabs_devices_why_verify = 'Why verify conversation?';
 z.string.people_tabs_no_devices_headline = '{{user}} is using an old version of Wire. No devices are shown here.';
 z.string.people_tabs_device_detail_all_my_devices = 'Show all my devices';
 z.string.people_tabs_device_detail_device_fingerprint = 'Device fingerprint';
-z.string.people_tabs_device_detail_headline = 'Verify that this matches the fingerprint shown on {{html1}}{{user}}’s device{{html2}}.';
+z.string.people_tabs_device_detail_headline =
+  'Verify that this matches the fingerprint shown on {{html1}}{{user}}’s device{{html2}}.';
 z.string.people_tabs_device_detail_how_to = 'How do I do that?';
 z.string.people_tabs_device_detail_reset_session = 'Reset session';
 z.string.people_tabs_device_detail_show_my_device = 'Show my device fingerprint';
@@ -461,16 +470,20 @@ z.string.preferences_av_speakers = 'Speakers';
 z.string.preferences_devices_activated_in = 'in {{location}}';
 z.string.preferences_devices_activated_on = 'Activated on {{date}}';
 z.string.preferences_devices_active = 'Active';
-z.string.preferences_devices_active_detail = 'If you don’t recognize a device above, remove it and reset your password.';
+z.string.preferences_devices_active_detail =
+  'If you don’t recognize a device above, remove it and reset your password.';
 z.string.preferences_devices_current = 'Current';
 z.string.preferences_devices_fingerprint = 'Key fingerprint';
-z.string.preferences_devices_fingerprint_detail = 'Wire gives every device a unique fingerprint. Compare them and verify your devices and conversations.';
+z.string.preferences_devices_fingerprint_detail =
+  'Wire gives every device a unique fingerprint. Compare them and verify your devices and conversations.';
 z.string.preferences_devices_id = 'ID: ';
 z.string.preferences_devices_remove = 'Remove';
 z.string.preferences_devices_remove_cancel = 'Cancel';
-z.string.preferences_devices_remove_detail = 'Remove this device if you have stopped using it. You will be logged out of this device immediately.';
+z.string.preferences_devices_remove_detail =
+  'Remove this device if you have stopped using it. You will be logged out of this device immediately.';
 z.string.preferences_devices_session_confirmation = 'The session has been reset.';
-z.string.preferences_devices_session_detail = 'If fingerprints don’t match, reset the session to generate new encryption keys on both sides.';
+z.string.preferences_devices_session_detail =
+  'If fingerprints don’t match, reset the session to generate new encryption keys on both sides.';
 z.string.preferences_devices_session_reset = 'Reset session';
 z.string.preferences_devices_session_ongoing = 'Resetting session…';
 z.string.preferences_devices_verification = 'Verified';
@@ -485,7 +498,8 @@ z.string.preferences_options_audio_some_detail = 'Pings and calls';
 z.string.preferences_options_contacts = 'Contacts';
 z.string.preferences_options_contacts_gmail = 'Import from Gmail';
 z.string.preferences_options_contacts_macos = 'Import from Contacts';
-z.string.preferences_options_contacts_detail = 'We use your contact data to connect you with others. We anonymize all information and do not share it with anyone else.';
+z.string.preferences_options_contacts_detail =
+  'We use your contact data to connect you with others. We anonymize all information and do not share it with anyone else.';
 z.string.preferences_options_data = 'Usage and crash reports';
 z.string.preferences_options_data_checkbox = 'Send anonymous data';
 z.string.preferences_options_data_detail = 'Make Wire better by sending anonymous information.';
@@ -512,11 +526,13 @@ z.string.search_team_members = 'Team members';
 z.string.search_top_people = 'Top people';
 z.string.search_try_search = 'Find people by\nname or username';
 z.string.search_no_contacts_on_wire = 'You have no contacts on Wire.\nTry finding people by\nname or username.';
+z.string.search_member_invite = 'Invite people to join the team';
 z.string.search_others = 'Connect';
 
 // Google contacts upload
 z.string.upload_google_headline = 'Find people\nto talk to.';
-z.string.upload_google_message = 'We use your contact data to connect you with others. We anonymize all information and do not share it with anyone else.';
+z.string.upload_google_message =
+  'We use your contact data to connect you with others. We anonymize all information and do not share it with anyone else.';
 z.string.upload_google_headline_error = 'Something\nwent wrong.';
 z.string.upload_google_message_error = 'We did not receive your information. Please try importing your contacts again.';
 z.string.upload_google_button_again = 'Try again';
@@ -544,7 +560,8 @@ z.string.warning_lifecycle_update_link = 'Update now';
 z.string.warning_not_found_camera = 'You cannot call because your computer does not have a camera.';
 z.string.warning_not_found_microphone = 'You cannot call because your computer does not have a microphone.';
 z.string.warning_permission_denied_camera = 'You cannot call because your browser does not have access to the camera.';
-z.string.warning_permission_denied_microphone = 'You cannot call because your browser does not have access to the microphone.';
+z.string.warning_permission_denied_microphone =
+  'You cannot call because your browser does not have access to the microphone.';
 z.string.warning_permission_denied_screen = 'Your browser needs permission to share your screen.';
 z.string.warning_permission_request_camera = '{{icon}} Allow access to camera';
 z.string.warning_permission_request_microphone = '{{icon}} Allow access to microphone';

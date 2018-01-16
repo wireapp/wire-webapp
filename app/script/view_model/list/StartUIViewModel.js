@@ -72,6 +72,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
     this.is_team = this.team_repository.isTeam;
     this.team_name = this.team_repository.teamName;
+    this.team_size = this.team_repository.teamSize;
 
     this.submitted_search = false;
 
@@ -162,6 +163,12 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.show_matches = ko.observable(false);
 
     this.show_no_contacts = ko.pureComputed(() => !this.is_team() && !this.show_content());
+    this.is_self_team_owner = ko.pureComputed(
+      () => !this.user().is_guest() && z.team.TeamRole.ROLE.OWNER === this.user().team_role()
+    );
+    this.show_member_invite = ko.pureComputed(
+      () => this.is_team() && this.is_self_team_owner && this.show_no_matches() && this.team_size() === 1
+    );
     this.show_no_matches = ko.pureComputed(
       () => (this.is_team() || this.show_matches()) && !this.show_contacts() && !this.show_search_results()
     );
@@ -225,6 +232,11 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
   click_on_close() {
     this._close_list();
+  }
+
+  click_on_member_invite() {
+    z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.TEAM_SETTINGS, z.config.URL_PATH.MANAGE_TEAM));
+    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
   }
 
   click_on_group(conversation_et) {
