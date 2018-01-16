@@ -21,7 +21,7 @@ import {CRUDEngine, MemoryEngine} from '@wireapp/store-engine/dist/commonjs/engi
 
 export default class Config {
   constructor(
-    public store: CRUDEngine = new MemoryEngine('wire'),
+    public store: CRUDEngine = new MemoryEngine('temporary'),
     public urls: {
       name?: string;
       rest: string;

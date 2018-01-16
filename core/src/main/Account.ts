@@ -45,7 +45,7 @@ export default class Account extends EventEmitter {
   private protocolBuffers: any = {};
   public service: {conversation: ConversationService; crypto: CryptographyService};
 
-  constructor(apiClient: Client = new Client({store: new MemoryEngine('temporary'), urls: Client.BACKEND.PRODUCTION})) {
+  constructor(apiClient: Client = new Client()) {
     super();
     this.apiClient = apiClient;
   }

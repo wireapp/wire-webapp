@@ -65,9 +65,9 @@ class Client {
   public VERSION: string;
 
   constructor(public config: Config = new Config()) {
+    this.config = new Config(config.store, config.urls);
     this.accessTokenStore = new AccessTokenStore(this.config.store);
 
-    config.urls = config.urls || Client.BACKEND.PRODUCTION;
     const httpClient = new HttpClient(this.config.urls.rest, this.accessTokenStore);
 
     this.transport = {
