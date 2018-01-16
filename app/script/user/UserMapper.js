@@ -118,9 +118,9 @@ z.user.UserMapper = class UserMapper {
     }
 
     if (data.service) {
-      user_et.is_bot = true;
-      user_et.provider_id = data.service.provider;
-      user_et.service_id = data.service.id;
+      user_et.isBot = true;
+      user_et.providerId = data.service.provider;
+      user_et.serviceId = data.service.id;
     }
 
     return user_et;

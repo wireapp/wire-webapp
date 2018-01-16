@@ -81,9 +81,9 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.group_mode = ko.observable(false);
 
     this.participants = ko.observableArray();
-    this.participantsServices = ko.observableArray();
-    this.participants_unverified = ko.observableArray();
-    this.participants_verified = ko.observableArray();
+    this.serviceParticipants = ko.observableArray();
+    this.unverifiedParticipants = ko.observableArray();
+    this.verifiedParticipants = ko.observableArray();
 
     this.services = ko.observableArray([]);
 
@@ -97,17 +97,18 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
         .sort((user_a, user_b) => z.util.StringUtil.sort_by_priority(user_a.first_name(), user_b.first_name()));
 
       this.participants(sortedUserEntities);
-      this.participants_verified.removeAll();
-      this.participants_unverified.removeAll();
+      this.serviceParticipants.removeAll();
+      this.verifiedParticipants.removeAll();
+      this.unverifiedParticipants.removeAll();
 
       sortedUserEntities.map(userEntity => {
-        if (userEntity.is_bot) {
-          return this.participantsServices.push(userEntity);
+        if (userEntity.isBot) {
+          return this.serviceParticipants.push(userEntity);
         }
         if (userEntity.is_verified()) {
-          return this.participants_verified.push(userEntity);
+          return this.verifiedParticipants.push(userEntity);
         }
-        this.participants_unverified.push(userEntity);
+        this.unverifiedParticipants.push(userEntity);
       });
     });
 
@@ -253,7 +254,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
       if (add_people && !this.conversation().is_guest()) {
         if (!this.participants_bubble.is_visible()) {
-          return this.participants_bubble.show().then(() => this.addPeople());
+          return this.participants_bubble.show().then(() => this.addParticipants());
         }
 
         const is_adding_people = this.state() === ParticipantsViewModel.STATE.ADD_PEOPLE;
@@ -262,7 +263,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
           return this.participants_bubble.hide();
         }
 
-        return this.addPeople();
+        return this.addParticipants();
       }
 
       return this.participants_bubble.toggle();

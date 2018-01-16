@@ -658,7 +658,7 @@ z.entity.Conversation = class Conversation {
    */
   is_with_bot() {
     for (const user_et of this.participating_user_ets()) {
-      if (user_et.is_bot) {
+      if (user_et.isBot) {
         return true;
       }
     }
