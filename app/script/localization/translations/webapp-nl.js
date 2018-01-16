@@ -86,6 +86,7 @@ z.string.nl.auth_error_name_short = 'Voer een naam met ten minste 2 karakters';
 z.string.nl.auth_error_offline = 'Geen internet connectie';
 z.string.nl.auth_error_password_short = 'Kies een wachtwoord van minimaal 8 tekens.';
 z.string.nl.auth_error_password_wrong = 'Fout wachtwoord. Probeer opnieuw.';
+z.string.nl.auth_error_pending = 'Account is nog niet geverifieerd';
 z.string.nl.auth_error_phone_number_budget = 'Je vaak ingelogd. Probeer het later opnieuw.';
 z.string.nl.auth_error_phone_number_forbidden = 'Sorry. Dit telefoon nummer is verboden.';
 z.string.nl.auth_error_phone_number_invalid = 'Ongeldig Telefoonnummer';
@@ -384,6 +385,7 @@ z.string.nl.preferences_about_terms_of_use = 'Gebruikersvoorwaarden';
 z.string.nl.preferences_about_version = 'Versie {{version}}';
 z.string.nl.preferences_about_website = 'Wire Website';
 
+z.string.nl.preferences_account_avaibility_unset = 'Een status instellen';
 z.string.nl.preferences_account_create_team = 'Maak een team';
 z.string.nl.preferences_account_delete = 'Verwijder account';
 z.string.nl.preferences_account_log_out = 'Uitloggen';
@@ -484,6 +486,8 @@ z.string.nl.warning_permission_request_screen = '{{icon}} Toegang tot scherm toe
 z.string.nl.warning_tell_me_how = 'Vertel me meer';
 
 z.string.nl.user_availability_available = 'Beschikbaar';
+z.string.nl.user_availability_away = 'Afwezig';
+z.string.nl.user_availability_busy = 'Bezet';
 z.string.nl.user_availability_none = 'Geen';
 
 z.string.nl.system_notification_asset_add = 'Deelde een foto';
@@ -511,6 +515,9 @@ z.string.nl.tooltip_conversation_call = 'Oproep';
 z.string.nl.tooltip_conversation_ephemeral = 'Tijdelijk bericht';
 z.string.nl.tooltip_conversation_file = 'Bestand toevoegen';
 z.string.nl.tooltip_conversation_input_placeholder = 'Typ een bericht';
+z.string.nl.tooltip_conversation_input_placeholder_available = '{{user}} is beschikbaar';
+z.string.nl.tooltip_conversation_input_placeholder_away = '{{user}} is afwezig';
+z.string.nl.tooltip_conversation_input_placeholder_busy = '{{user}} is bezet';
 z.string.nl.tooltip_conversation_people = 'Mensen ({{shortcut}})';
 z.string.nl.tooltip_conversation_picture = 'Voeg foto toe';
 z.string.nl.tooltip_conversation_ping = 'Ping ({{shortcut}})';
