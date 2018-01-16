@@ -22,26 +22,50 @@
 window.z = window.z || {};
 window.z.components = z.components || {};
 
+z.components.ServiceListMode = {
+  COMPACT: 'compact',
+  DEFAULT: 'default',
+  OTHERS: 'others',
+};
+
 z.components.ServiceListViewModel = class ServiceListViewModel {
   constructor(params) {
     this.services = params.services;
     this.onClick = params.click;
+    this.mode = params.mode || z.components.ServiceListMode.DEFAULT;
+
+    this.css_classes = ko.pureComputed(() => {
+      if (this.mode === z.components.ServiceListMode.COMPACT) {
+        return 'search-list-sm';
+      }
+      return 'search-list-lg';
+    });
   }
 };
 
 ko.components.register('service-list', {
   template: `
-    <div class="search-list search-list-lg" data-bind="foreach: services">
+    <div class="search-list" data-bind="css: css_classes(), foreach: services">
       <div class="search-list-item" data-bind="click: $parent.onClick">
-        <div class="search-list-item-image">
-          <service-avatar class="service-avatar-sm" params="service: $data"></service-avatar>
-        </div>
-        <div class="search-list-item-content">
-          <div class="search-list-item-content-name" data-bind="text: name"></div>
-          <div class="search-list-item-content-info">
-            <span class="search-list-item-content-username" data-bind="text: description"></span>
+        <!-- ko ifnot: $parent.mode === z.components.ServiceListMode.COMPACT -->
+          <div class="search-list-item-image">
+            <service-avatar class="service-avatar-sm" params="service: $data"></service-avatar>
           </div>
-        </div>
+          <div class="search-list-item-content">
+            <div class="search-list-item-content-name" data-bind="text: name"></div>
+            <div class="search-list-item-content-info">
+              <span class="search-list-item-content-username" data-bind="text: description"></span>
+            </div>
+          </div>
+        <!-- /ko -->
+        <!-- ko if: $parent.mode === z.components.ServiceListMode.COMPACT -->
+          <div class="search-list-item-image">
+            <service-avatar class="service-avatar-md" params="service: $data"></service-avatar>
+          </div>
+          <div class="search-list-item-content">
+            <div class="search-list-item-content-name" data-bind="text: name"></div>
+          </div>
+        <!-- /ko -->
       </div>
     </div>
   `,
