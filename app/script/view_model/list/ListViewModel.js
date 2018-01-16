@@ -235,7 +235,7 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     this.list_state(new_list_state);
     this.last_update(Date.now());
     $(document).on('keydown.list_view', keyboard_event => {
-      if (z.util.KeyboardUtil.is_escape_key(keyboard_event)) {
+      if (z.util.KeyboardUtil.isEscapeKey(keyboard_event)) {
         this.switch_list(z.ViewModel.list.LIST_STATE.CONVERSATIONS);
       }
     });

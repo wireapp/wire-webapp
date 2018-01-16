@@ -430,7 +430,7 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
 
         case z.util.KeyboardUtil.KEY.ENTER: {
           if (keyboard_event.altKey || keyboard_event.metaKey) {
-            z.util.KeyboardUtil.insert_at_caret(keyboard_event.target, '\n');
+            z.util.KeyboardUtil.insertAtCaret(keyboard_event.target, '\n');
             $(keyboard_event.target).change();
             keyboard_event.preventDefault();
           }

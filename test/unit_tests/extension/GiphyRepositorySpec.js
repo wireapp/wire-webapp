@@ -80,7 +80,7 @@ describe('Giphy Repository', () => {
     ]);
     /* eslint-enable comma-spacing, key-spacing, no-useless-escape, sort-keys, quotes */
 
-    const random_foo_gif_data = `${urls.rest_url}/giphy/v1/gifs/GKLmFicoabZrW`;
+    const random_foo_gif_data = `${urls.rest_url}/proxy/giphy/v1/gifs/GKLmFicoabZrW`;
     /* eslint-disable comma-spacing, key-spacing, no-useless-escape, sort-keys, quotes */
     server.respondWith('GET', random_foo_gif_data, [
       200,
