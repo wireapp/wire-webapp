@@ -28,6 +28,9 @@
   "invite.subhead": "Invită colegii să se alăture.",
   "invite.emailPlaceholder": "coleg@email.com",
   "invite.skipForNow": "Nu fă asta momentan",
+  "chooseHandle.headline": "",
+  "chooseHandle.subhead": "",
+  "chooseHandle.handlePlaceholder": "Nume utilizator",
   "BackendError.LABEL.ACCESS_DENIED": "Te rugăm să verifici detaliile și să reîncerci",
   "BackendError.LABEL.INVALID_CREDENTIALS": "Te rugăm să verifici detaliile și să reîncerci",
   "BackendError.LABEL.MISSING_AUTH": "Te rugăm să verifici detaliile și să reîncerci",
@@ -38,6 +41,7 @@
   "BackendError.LABEL.INVALID_PHONE": "Acest număr de telefon este nevalid",
   "BackendError.LABEL.KEY_EXISTS":
     "Adresa de e-mail furnizată a fost deja înregistrată.<a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://support.wire.com/hc/articles/115004082129\">Află mai multe</a>",
+  "BackendError.LABEL.ALREADY_INVITED": "",
   "BackendError.LABEL.PENDING_ACTIVATION": "Adresa de e-mail furnizată a primit deja o invitație. Verifică mail-ul",
   "BackendError.LABEL.PENDING_LOGIN": "BackendError.LABEL.PENDING_LOGIN",
   "BackendError.LABEL.TOO_MANY_LOGINS": "Încercă din nou mai târziu",
