@@ -329,7 +329,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   on_search_add() {
     const user_ids = this.user_selected().map(user_et => user_et.id);
     if (this.conversation().is_group()) {
-      this.conversation_repository.add_members(this.conversation(), user_ids).then(() => {
+      this.conversation_repository.addMembers(this.conversation(), user_ids).then(() => {
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.ADD_TO_GROUP_CONVERSATION, {
           numberOfGroupParticipants: this.conversation().get_number_of_participants(),
           numberOfParticipantsAdded: user_ids.length,

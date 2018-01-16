@@ -298,6 +298,17 @@
     </div>
   </div>
 
+  <div class="modal modal-service-disabled" data-uie-name="modal-service-disabled">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-close icon-close icon-button pull-right"></div>
+        <div class="modal-title" data-bind="l10n_text: z.string.modal_service_disabled_headline"></div>
+      </div>
+      <div class="modal-text" data-bind="l10n_text: z.string.modal_service_disabled_message"></div>
+      <div class="modal-close button button-medium button-fluid" data-bind="l10n_text: z.string.modal_button_ok" data-uie-name="do-close"></div>
+    </div>
+  </div>
+
   <div class="modal modal-session-reset" data-uie-name="modal-session-reset">
     <div class="modal-content">
       <div class="modal-header">
@@ -309,6 +320,17 @@
         <a data-bind="l10n_href: {support: z.config.SUPPORT.FORM.BUG}, l10n_text: z.string.modal_session_reset_message_link" rel="nofollow noopener noreferrer" target="_blank"></a>
         <span data-bind="l10n_text: z.string.modal_session_reset_message_2"></span>
       </div>
+      <div class="modal-close button button-medium button-fluid" data-bind="l10n_text: z.string.modal_button_ok" data-uie-name="do-close"></div>
+    </div>
+  </div>
+
+  <div class="modal modal-too-many-bots" data-uie-name="modal-too-many-bots">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-close icon-close icon-button pull-right"></div>
+        <div class="modal-title" data-bind="l10n_text: z.string.modal_too_many_bots_headline"></div>
+      </div>
+      <div class="modal-text" data-bind="l10n_text: z.string.modal_too_many_bots_message"></div>
       <div class="modal-close button button-medium button-fluid" data-bind="l10n_text: z.string.modal_button_ok" data-uie-name="do-close"></div>
     </div>
   </div>
