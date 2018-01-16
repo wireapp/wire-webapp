@@ -82,6 +82,10 @@
     this.tokens.links = {};
     this.options = options || marked.defaults;
     this.rules = block.normal;
+
+    if (this.options.gfm) {
+      this.rules = block.gfm;
+    }
   }
 
   /**
