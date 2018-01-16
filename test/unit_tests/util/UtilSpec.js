@@ -4347,6 +4347,12 @@ describe('Ignored Markdown syntax', () => {
       '<strong><em><br />No horizontal lines<br /></em></strong>'
     );
   });
+
+  it('does not render tables', () => {
+    const input = 'First Header | Second Header\n------------ | -------------\nCell 1 | Cell 2';
+    const expected = `First Header | Second Header<br />------------ | -------------<br />Cell 1 | Cell 2`;
+    expect(z.util.render_message(input)).toBe(expected);
+  });
 });
 
 // The exceptions are not fixed yet, that's why we collect and exclude them here
