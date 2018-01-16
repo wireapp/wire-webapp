@@ -191,7 +191,7 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
   }
 
   _show_modal_bots_confirm(content, message_element) {
-    message_element.text(z.l10n.text(z.string.modal_block_conversation_message, content.name));
+    message_element.text(z.l10n.text(z.string.modal_bots_confirm_message, content.name));
   }
 
   /**
