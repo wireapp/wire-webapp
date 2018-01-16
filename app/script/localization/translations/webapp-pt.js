@@ -85,6 +85,7 @@ z.string.pt.auth_error_name_short = 'Introduza um nome com pelo menos 2 caracter
 z.string.pt.auth_error_offline = 'Sem ligação à Internet';
 z.string.pt.auth_error_password_short = 'Escolha uma palavra-passe com pelo menos 8 caracteres.';
 z.string.pt.auth_error_password_wrong = 'Palavra-passe incorreta. Por favor, tente de novo.';
+z.string.pt.auth_error_pending = 'A conta ainda não está verificada';
 z.string.pt.auth_error_phone_number_budget = 'Iniciou sessão demasiadas vezes. Tente novamente mais tarde.';
 z.string.pt.auth_error_phone_number_forbidden = 'Este numero de telefone não é permitido.';
 z.string.pt.auth_error_phone_number_invalid = 'Número de telefone inválido';
@@ -382,6 +383,7 @@ z.string.pt.preferences_about_terms_of_use = 'Condições de Utilização';
 z.string.pt.preferences_about_version = 'Versão {{version}}';
 z.string.pt.preferences_about_website = 'Site do Wire';
 
+z.string.pt.preferences_account_avaibility_unset = 'Definir estado';
 z.string.pt.preferences_account_create_team = 'Criar uma equipa';
 z.string.pt.preferences_account_delete = 'Eliminar conta';
 z.string.pt.preferences_account_log_out = 'Terminar sessão';
@@ -482,6 +484,8 @@ z.string.pt.warning_permission_request_screen = '{{icon}} Permitir o acesso ao e
 z.string.pt.warning_tell_me_how = 'Diga-me agora';
 
 z.string.pt.user_availability_available = 'Disponível';
+z.string.pt.user_availability_away = 'Ausente';
+z.string.pt.user_availability_busy = 'Ocupado';
 z.string.pt.user_availability_none = 'Nenhum';
 
 z.string.pt.system_notification_asset_add = 'Partilhou uma foto';
@@ -509,6 +513,9 @@ z.string.pt.tooltip_conversation_call = 'Chamada';
 z.string.pt.tooltip_conversation_ephemeral = 'Mensagem agendada';
 z.string.pt.tooltip_conversation_file = 'Adicionar ficheiro';
 z.string.pt.tooltip_conversation_input_placeholder = 'Escreva uma mensagem';
+z.string.pt.tooltip_conversation_input_placeholder_available = '{{user}} está disponível';
+z.string.pt.tooltip_conversation_input_placeholder_away = '{{user}} está ausente';
+z.string.pt.tooltip_conversation_input_placeholder_busy = '{{user}} está ocupado';
 z.string.pt.tooltip_conversation_people = 'Pessoas ({{shortcut}})';
 z.string.pt.tooltip_conversation_picture = 'Adicionar imagem';
 z.string.pt.tooltip_conversation_ping = 'Ping ({{shortcut}})';
