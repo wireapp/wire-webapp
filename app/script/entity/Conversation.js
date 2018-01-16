@@ -229,6 +229,7 @@ z.entity.Conversation = class Conversation {
 
         if (this.participating_user_ets().length > 0) {
           return this.participating_user_ets()
+            .filter(user_et => !user_et.isBot)
             .map(user_et => user_et.first_name())
             .join(', ');
         }

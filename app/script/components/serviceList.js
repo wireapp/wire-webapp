@@ -25,7 +25,6 @@ window.z.components = z.components || {};
 z.components.ServiceListMode = {
   COMPACT: 'compact',
   DEFAULT: 'default',
-  OTHERS: 'others',
 };
 
 z.components.ServiceListViewModel = class ServiceListViewModel {
