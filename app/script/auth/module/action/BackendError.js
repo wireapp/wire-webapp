@@ -82,6 +82,7 @@ export default class BackendError extends Error {
   };
 
   static TEAM_INVITE_ERRORS = {
+    ALREADY_INVITED: 'already-invited',
     EMAIL_EXISTS: 'email-exists',
   };
 
