@@ -74,10 +74,18 @@
   <!-- ko if: !$parent.should_hide_user_avatar($data) -->
     <div class="message-header">
       <div class="message-header-icon">
-        <user-avatar class="sender-avatar user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: message.user(), click: $parent.on_message_user_click"></user-avatar>
+        <!-- ko if: message.user().isBot -->
+          <service-avatar class="sender-avatar service-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: message.user(), click: $parent.on_message_user_click"></service-avatar>
+        <!-- /ko -->
+        <!-- ko ifnot: message.user().isBot -->
+          <user-avatar class="sender-avatar user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: message.user(), click: $parent.on_message_user_click"></user-avatar>
+        <!-- /ko -->
       </div>
       <div class="message-header-label">
         <span class="message-header-label-sender" data-bind='css: message.accent_color(), text: message.user().first_name()' data-uie-name="sender-name"></span>
+        <!-- ko if: message.user().isBot -->
+          <span class="message-header-label-service" data-bind="l10n_text: z.string.conversation_bot_user"></span>
+        <!-- /ko -->
         <!-- ko if: was_edited() -->
           <span class="message-header-label-icon icon-edit" data-bind="attr: {title: message.display_edited_timestamp()}"></span>
         <!-- /ko -->

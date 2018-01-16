@@ -15,8 +15,8 @@
           </div>
           <div class="participants-group-list">
             <!-- ko if: render_participants -->
-              <user-list params="user: participants_unverified, click: clickOnShowParticipant, mode: z.components.UserListMode.COMPACT"></user-list>
-              <!-- ko if: participants_verified().length -->
+              <user-list params="user: unverifiedParticipants, click: clickOnShowParticipant, mode: z.components.UserListMode.COMPACT"></user-list>
+              <!-- ko if: verifiedParticipants().length -->
                 <div class="participants-group-list-separator">
                   <svg width="16" height="16">
                     <use xlink:href="#icon-verified"></use>
@@ -24,14 +24,14 @@
                   <span class="label-xs" data-bind="l10n_text: z.string.people_verified"></span>
                   <hr>
                 </div>
-                <user-list params="user: participants_verified, click: clickOnShowParticipant, mode: z.components.UserListMode.COMPACT"></user-list>
+                <user-list params="user: verifiedParticipants, click: clickOnShowParticipant, mode: z.components.UserListMode.COMPACT"></user-list>
               <!-- /ko -->
-              <!-- ko if: participantsServices().length -->
+              <!-- ko if: serviceParticipants().length -->
                 <div class="participants-group-list-separator">
                   <span class="label-xs" data-bind="l10n_text: z.string.people_services"></span>
                   <hr>
                 </div>
-                <service-list params="services: participantsServices, click: clickOnShowService"></service-list>
+                <service-list params="services: serviceParticipants, click: clickOnShowService"></service-list>
               <!-- /ko -->
             <!-- /ko -->
           </div>

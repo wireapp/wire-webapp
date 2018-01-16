@@ -225,6 +225,7 @@ z.string.conversation_you_nominative = 'you';
 z.string.conversation_you_dative = 'you';
 z.string.conversation_you_accusative = 'you';
 
+z.string.conversation_bot_user = 'Bot';
 z.string.conversation_connection_accepted = 'Connected';
 z.string.conversation_connection_blocked = 'Blocked';
 z.string.conversation_connection_cancel_request = 'Cancel connection request';

@@ -1080,7 +1080,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when participant was removed from the conversation
    */
   remove_participant(conversation_et, user_et) {
-    if (user_et.is_bot) {
+    if (user_et.isBot) {
       return this.remove_bot(conversation_et, user_et.id);
     }
 
