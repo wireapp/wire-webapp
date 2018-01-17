@@ -106,7 +106,7 @@
       </div>
     <!-- /ko -->
 
-    <!-- ko if: showConfirmService() -->
+    <!-- ko if: showServiceStates() -->
       <div class="participants-service-confirmation">
         <div class="service-confirmation-header">
           <div class="service-confirmation-back" data-bind="click: clickOnServiceBack, l10n_tooltip: z.string.tooltip_people_back" data-uie-name="do-back">
@@ -126,7 +126,12 @@
           <div class="service-confirmation-description" data-bind="text: selectedService().description"></div>
         </div>
         <div class="service-confirmation-footer">
-          <button class="participants-service-confirmation-button" data-bind="click: clickToAddService, l10n_text: z.string.people_service_confirm_button"></button>
+          <!-- ko if: state() === z.ViewModel.ParticipantsViewModel.STATE.SERVICE_CONFIRMATIONS -->
+              <button class="participants-service-confirmation-button" data-bind="click: clickToAddService, l10n_text: z.string.people_service_confirm_button"></button>
+          <!-- /ko -->
+          <!-- ko if: state() === z.ViewModel.ParticipantsViewModel.STATE.SERVICE_DETAILS -->
+            <button class="participants-service-confirmation-button theme-red" data-bind="click: clickToRemoveService, l10n_text: z.string.people_service_removal_button"></button>
+          <!-- /ko -->
         </div>
       </div>
     <!-- /ko -->

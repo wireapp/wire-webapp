@@ -1068,7 +1068,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {string} bot_user_id - ID of bot to be removed from the conversation
    * @returns {Promise} Resolves when bot was removed from the conversation
    */
-  remove_bot(conversation_et, bot_user_id) {
+  removeBot(conversation_et, bot_user_id) {
     return this.conversation_service.delete_bots(conversation_et.id, bot_user_id).then(response => {
       if (response) {
         amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
@@ -1102,7 +1102,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   remove_participant(conversation_et, user_et) {
     if (user_et.isBot) {
-      return this.remove_bot(conversation_et, user_et.id);
+      return this.removeBot(conversation_et, user_et.id);
     }
 
     return this.remove_member(conversation_et, user_et.id);

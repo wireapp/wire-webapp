@@ -25,10 +25,11 @@ window.z.ViewModel = z.ViewModel || {};
 z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   static get STATE() {
     return {
-      ADD_PEOPLE: 'add_people',
-      ADD_SERVICE: 'add_service',
-      CONFIRM_SERVICE: 'confirm_service',
-      PARTICIPANTS: 'participants',
+      ADD_PEOPLE: 'ParticipantsViewModel.STATE.ADD_PEOPLE',
+      ADD_SERVICE: 'ParticipantsViewModel.STATE.ADD_SERVICE',
+      PARTICIPANTS: 'ParticipantsViewModel.STATE.PARTICIPANTS',
+      SERVICE_CONFIRMATION: 'ParticipantsViewModel.STATE.SERVICE_CONFIRMATION',
+      SERVICE_DETAILS: 'ParticipantsViewModel.STATE.SERVICE_DETAILS',
     };
   }
 
@@ -67,6 +68,10 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.activeAddState = ko.pureComputed(() => {
       const addStates = [ParticipantsViewModel.STATE.ADD_PEOPLE, ParticipantsViewModel.STATE.ADD_SERVICE];
       return addStates.includes(this.state());
+    });
+    this.activeServiceState = ko.pureComputed(() => {
+      const states = [ParticipantsViewModel.STATE.SERVICE_CONFIRMATION, ParticipantsViewModel.STATE.SERVICE_DETAILS];
+      return states.includes(this.state());
     });
 
     this.conversation = ko.observable(new z.entity.Conversation());
@@ -173,10 +178,9 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
       return z.l10n.text(identifier, shortcut);
     });
 
-    this.showConfirmService = ko.pureComputed(() => {
-      const isConfirmServiceState = this.state() === ParticipantsViewModel.STATE.CONFIRM_SERVICE;
+    this.showServiceStates = ko.pureComputed(() => {
       const hasSelectedService = this.selectedService().id !== this.placeholderService.id;
-      return isConfirmServiceState && hasSelectedService;
+      return this.activeServiceState() && hasSelectedService;
     });
 
     amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, this.switch_content.bind(this));
@@ -195,7 +199,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
   clickOnSelectService(serviceEntity) {
     this.selectedService(serviceEntity);
-    this.state(ParticipantsViewModel.STATE.CONFIRM_SERVICE);
+    this.state(ParticipantsViewModel.STATE.SERVICE_CONFIRMATION);
   }
 
   clickOnShowParticipant(userEntity) {
@@ -203,7 +207,10 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   }
 
   clickOnShowService(userEntity) {
-    this.logger.info('Click on show bot participant', userEntity);
+    this.integrationRepository.getServiceById(userEntity.serviceId).then(serviceEntity => {
+      this.selectedService(serviceEntity);
+      this.state(ParticipantsViewModel.STATE.SERVICE_DETAILS);
+    });
   }
 
   searchServices(query) {
@@ -222,6 +229,14 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.logger.info(`Adding service '${name}' to conversation '${this.conversation().id}'`, serviceEntity);
     this.conversation_repository.addBot(this.conversation(), providerId, id);
     this.close();
+  }
+
+  clickToRemoveService(serviceEntity = this.selectedService()) {
+    this.conversation_repository.removeBot(this.conversation(), serviceEntity.id).then(response => {
+      if (response) {
+        this.reset_view();
+      }
+    });
   }
 
   show_participant(user_et, group_mode = false) {
@@ -289,6 +304,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.state(ParticipantsViewModel.STATE.PARTICIPANTS);
     this.selectedUsers.removeAll();
     this.services.removeAll();
+    this.searchInput('');
     if (this.confirm_dialog) {
       this.confirm_dialog.destroy();
     }
