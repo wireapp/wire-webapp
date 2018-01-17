@@ -58,19 +58,15 @@
 }
 
 .conversation-hint {
-  .full-screen();
-  .flex-center();
-  .label-xs();
-  .text-center();
   .text-white();
-  flex-direction: column;
+  .label-nocase-xs();
+  margin-left: 20px;
+  margin-right: 24px;
+  position: absolute;
+  bottom: 0;
 }
 
-.conversation-hint-header {
-  .label-bold-xs();
-  margin-bottom: 16px;
-}
-
-.conversation-hint-detail {
-  margin: 0 16px;
+.conversation-hint-text {
+  font-size: @font-size-lg;
+  margin-bottom: 24px;
 }
