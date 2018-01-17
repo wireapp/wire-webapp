@@ -14,3 +14,6 @@ overrides:
 - files: "*.json"
   options:
     printWidth: 200
+- files: "app/script/localization/*.js"
+  options:
+    printWidth: 200
