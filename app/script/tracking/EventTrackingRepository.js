@@ -55,6 +55,8 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
           z.tracking.EventName.CALLING.SHARED_SCREEN,
           z.tracking.EventName.CONTRIBUTED,
           z.tracking.EventName.E2EE.FAILED_MESSAGE_DECRYPTION,
+          z.tracking.EventName.INTEGRATION.ADDED_SERVICE,
+          z.tracking.EventName.INTEGRATION.REMOVED_SERVICE,
           z.tracking.EventName.REGISTRATION.ENTERED_CREDENTIALS,
           z.tracking.EventName.REGISTRATION.OPENED_EMAIL_SIGN_UP,
           z.tracking.EventName.REGISTRATION.RESENT_EMAIL_VERIFICATION,

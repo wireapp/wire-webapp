@@ -128,7 +128,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
           ].includes(event_name)
             ? this.remote_version
             : undefined,
-          with_bot: conversation_et.is_with_bot(),
+          with_service: conversation_et.isWithBot(),
         },
         attributes
       );
@@ -190,7 +190,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
         duration_sec: duration,
         reason: termination_reason,
         remote_version: this.remote_version,
-        with_bot: conversation_et.is_with_bot(),
+        with_service: conversation_et.isWithBot(),
       };
 
       let event_name = z.tracking.EventName.CALLING.ENDED_CALL;
