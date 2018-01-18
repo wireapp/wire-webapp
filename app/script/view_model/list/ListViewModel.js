@@ -399,7 +399,7 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
 
   click_on_leave_action(conversation_et) {
     amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.LEAVE, {
-      action: () => this.conversation_repository.remove_member(conversation_et, this.user_repository.self().id),
+      action: () => this.conversation_repository.removeMember(conversation_et, this.user_repository.self().id),
       data: conversation_et.display_name(),
     });
   }

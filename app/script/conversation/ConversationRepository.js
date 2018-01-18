@@ -1033,7 +1033,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this._clear_conversation(conversation_et);
 
     if (leave_conversation) {
-      this.remove_member(conversation_et, this.user_repository.self().id);
+      this.removeMember(conversation_et, this.user_repository.self().id);
     }
 
     if (is_active_conversation) {
