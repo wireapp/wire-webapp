@@ -218,9 +218,9 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   }
 
   clickToAddService(serviceEntity = this.selectedService()) {
-    const {id, name, providerId} = this.selectedService();
+    const {id, name, providerId} = serviceEntity;
     this.logger.info(`Adding service '${name}' to conversation '${this.conversation().id}'`, serviceEntity);
-    this.conversation_repository.addBot(this.conversation(), providerId, id);
+    this.conversation_repository.addBot(this.conversation(), providerId, id, 'conversation_details');
     this.close();
   }
 

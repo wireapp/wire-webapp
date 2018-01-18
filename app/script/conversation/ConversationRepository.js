@@ -941,15 +941,19 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {Conversation} conversationEntity - Conversation to add bot to
    * @param {string} providerId - ID of bot provider
    * @param {string} serviceId - ID of service provider
+   * @param {string} method - Method used to add service
    * @returns {Promise} Resolves when bot was added
    */
-  addBot(conversationEntity, providerId, serviceId) {
+  addBot(conversationEntity, providerId, serviceId, method) {
     return this.conversation_service
       .post_bots(conversationEntity.id, providerId, serviceId)
       .then(response => {
         if (response && response.event) {
           amplify.publish(z.event.WebApp.EVENT.INJECT, response.event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
           this.logger.debug(`Successfully added bot to conversation '${conversationEntity.display_name()}'`, response);
+
+          const attributes = {method: method, service_id: serviceId};
+          amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.INTEGRATION.ADDED_SERVICE, attributes);
         }
 
         return conversationEntity;
@@ -2234,12 +2238,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
       size_mb: z.util.bucket_values(file.size / 1024 / 1024, [0, 5, 10, 15, 20, 25]),
       type: z.util.get_file_extension(file.name),
     };
+
     const conversation_type = z.tracking.helpers.get_conversation_type(conversation_et);
-    amplify.publish(
-      z.event.WebApp.ANALYTICS.EVENT,
-      z.tracking.EventName.FILE.UPLOAD_INITIATED,
-      $.extend(tracking_data, {conversation_type})
-    );
+    const initiatedAttributes = $.extend(tracking_data, {conversation_type});
+    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_INITIATED, initiatedAttributes);
 
     return this.send_asset_metadata(conversation_et, file)
       .then(({id}) => {
@@ -2248,14 +2250,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
       })
       .then(() => this.send_asset_remotedata(conversation_et, file, message_id))
       .then(() => {
-        const upload_duration = (Date.now() - upload_started) / 1000;
-
         this.logger.info(`Finished to upload asset for conversation'${conversation_et.id} in ${upload_duration}`);
-        amplify.publish(
-          z.event.WebApp.ANALYTICS.EVENT,
-          z.tracking.EventName.FILE.UPLOAD_SUCCESSFUL,
-          $.extend(tracking_data, {time: upload_duration})
-        );
+
+        const upload_duration = (Date.now() - upload_started) / 1000;
+        const successAttributes = $.extend(tracking_data, {time: upload_duration});
+        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_SUCCESSFUL, successAttributes);
       })
       .catch(error => {
         if (error.type === z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
