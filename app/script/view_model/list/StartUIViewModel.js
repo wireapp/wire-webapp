@@ -140,7 +140,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       );
     });
 
-    this.enableIntegrations = this.integrationRepository.enableIntegrations;
+    this.enableIntegrations = () => false;
 
     this.show_content = ko.pureComputed(() => {
       return this.show_contacts() || this.show_matches() || this.show_search_results();
