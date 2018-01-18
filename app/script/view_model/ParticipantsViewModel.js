@@ -42,20 +42,19 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     team_repository
   ) {
     this.clickOnAddPeople = this.clickOnAddPeople.bind(this);
+    this.clickOnClose = this.clickOnClose.bind(this);
+    this.clickOnPending = this.clickOnPending.bind(this);
     this.clickOnSelectService = this.clickOnSelectService.bind(this);
     this.clickOnShowMember = this.clickOnShowMember.bind(this);
     this.clickOnShowService = this.clickOnShowService.bind(this);
     this.clickToAddService = this.clickToAddService.bind(this);
+    this.clickToBlock = this.clickToBlock.bind(this);
+    this.clickToConnect = this.clickToConnect.bind(this);
+    this.clickToLeave = this.clickToLeave.bind(this);
     this.clickToRemoveMember = this.clickToRemoveMember.bind(this);
     this.clickToRemoveService = this.clickToRemoveService.bind(this);
-    this.block = this.block.bind(this);
-    this.close = this.close.bind(this);
-    this.connect = this.connect.bind(this);
-    this.leave_conversation = this.leave_conversation.bind(this);
-    this.on_search_close = this.on_search_close.bind(this);
-    this.pending = this.pending.bind(this);
-    this.show_participant = this.show_participant.bind(this);
-    this.unblock = this.unblock.bind(this);
+    this.clickToUnblock = this.clickToUnblock.bind(this);
+    this.showParticipant = this.showParticipant.bind(this);
 
     this.element_id = element_id;
     this.user_repository = user_repository;
@@ -148,7 +147,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.participants_bubble = new zeta.webapp.module.Bubble({
       host_selector: '#show-participants',
       modal: true,
-      on_hide: () => this.reset_view(),
+      on_hide: () => this.resetView(),
       scroll_selector: '.messages-wrap',
     });
 
@@ -183,18 +182,42 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
       return this.activeServiceState() && hasSelectedService;
     });
 
-    amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, this.switch_content.bind(this));
-    amplify.subscribe(z.event.WebApp.PEOPLE.SHOW, this.show_participant);
+    amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, this.switchContent.bind(this));
+    amplify.subscribe(z.event.WebApp.PEOPLE.SHOW, this.showParticipant);
     amplify.subscribe(z.event.WebApp.PEOPLE.TOGGLE, this.toggle_participants_bubble.bind(this));
+  }
+
+  changeConversation(conversationEntity) {
+    this.participants_bubble.hide();
+    this.conversation(conversationEntity);
+    this.resetView();
   }
 
   clickOnAddPeople() {
     this.state(ParticipantsViewModel.STATE.ADD_PEOPLE);
+    $('.participants-search').addClass('participants-search-show');
   }
 
   clickOnAddService() {
     this.state(ParticipantsViewModel.STATE.ADD_SERVICE);
     this.searchServices(this.searchInput());
+  }
+
+  clickOnClose() {
+    this.resetView();
+  }
+
+  clickOnPending(userEntity) {
+    const onSuccess = () => this.participants_bubble.hide();
+
+    this.confirm_dialog = $('#participants').confirm({
+      cancel: () => this.user_repository.ignore_connection_request(userEntity).then(() => onSuccess()),
+      confirm: () => this.user_repository.accept_connection_request(userEntity, true).then(() => onSuccess()),
+      data: {
+        user: this.user_profile(),
+      },
+      template: '#template-confirm-connect',
+    });
   }
 
   clickOnSelectService(serviceEntity) {
@@ -208,8 +231,15 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     });
   }
 
+  clickOnServiceBack() {
+    this.state(ParticipantsViewModel.STATE.ADD_SERVICE);
+    this.selectedService(this.placeholderService);
+    this.user_profile(this.placeholderParticipant);
+    $('.participants-search').addClass('participants-search-show');
+  }
+
   clickOnShowMember(userEntity) {
-    this.show_participant(userEntity, true);
+    this.showParticipant(userEntity, true);
   }
 
   clickOnShowService(userEntity) {
@@ -226,33 +256,99 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
       .then(providerEntity => this.selectedService().providerName(providerEntity.name));
   }
 
+  clickToAddService(serviceEntity = this.selectedService()) {
+    this.integrationRepository.addService(this.conversation(), serviceEntity, 'conversation_details');
+    this.close();
+  }
+
+  clickToBlock(userEntity) {
+    amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
+
+    this.confirm_dialog = $('#participants').confirm({
+      confirm: () => {
+        const nextConversationEt = this.conversation_repository.get_next_conversation(this.conversation());
+
+        this.participants_bubble.hide();
+        this.user_repository.block_user(userEntity, nextConversationEt);
+      },
+      data: {
+        user: userEntity,
+      },
+      template: '#template-confirm-block',
+    });
+  }
+
+  clickToConnect(userEntity) {
+    this.participants_bubble.hide();
+
+    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.SENT_CONNECT_REQUEST, {
+      context: 'participants',
+    });
+  }
+
+  clickToLeave() {
+    amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
+
+    this.confirm_dialog = $('#participants').confirm({
+      confirm: () => {
+        this.participants_bubble.hide();
+        this.conversation_repository.removeMember(this.conversation(), this.user_repository.self().id);
+      },
+      template: '#template-confirm-leave',
+    });
+  }
+
+  clickToRemoveMember(userEntity) {
+    amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
+
+    this.confirm_dialog = $('#participants').confirm({
+      confirm: () => {
+        this.conversation_repository.removeMember(this.conversation(), userEntity).then(response => {
+          if (response) {
+            this.resetView();
+          }
+        });
+      },
+      data: {
+        user: userEntity,
+      },
+      template: '#template-confirm-remove',
+    });
+  }
+
+  clickToRemoveService() {
+    this.integrationRepository.removeService(this.conversation(), this.user_profile()).then(response => {
+      if (response) {
+        this.resetView();
+      }
+    });
+  }
+
+  clickToUnblock(userEntity) {
+    this.confirm_dialog = $('#participants').confirm({
+      confirm: () => {
+        this.user_repository
+          .unblock_user(userEntity)
+          .then(() => {
+            this.participants_bubble.hide();
+            return this.conversation_repository.get_1to1_conversation(userEntity);
+          })
+          .then(conversationEntity => this.conversation_repository.update_participating_user_ets(conversationEntity));
+      },
+      data: {
+        user: userEntity,
+      },
+      template: '#template-confirm-unblock',
+    });
+  }
+
   searchServices(query) {
     if (this.state() === ParticipantsViewModel.STATE.ADD_SERVICE) {
       this.integrationRepository.searchForServices(query, this.searchInput);
     }
   }
 
-  clickOnServiceBack() {
-    this.state(ParticipantsViewModel.STATE.ADD_SERVICE);
-    this.selectedService(this.placeholderService);
-    this.user_profile(this.placeholderParticipant);
-    $('.participants-search').addClass('participants-search-show');
-  }
-
-  clickToAddService(serviceEntity = this.selectedService()) {
-    this.integrationRepository.addService(this.conversation(), serviceEntity, 'conversation_details');
-    this.close();
-  }
-
-  clickToRemoveService() {
-    this.integrationRepository.removeService(this.conversation(), this.user_profile()).then(response => {
-      if (response) {
-        this.reset_view();
-      }
-    });
-  }
-
-  show_participant(participantEntity, groupMode = false) {
+  showParticipant(participantEntity, groupMode = false) {
     if (participantEntity) {
       this.group_mode(groupMode);
       if (participantEntity.isBot) {
@@ -262,8 +358,9 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     }
   }
 
-  switch_content(content_state) {
-    if (content_state === z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS) {
+  switchContent(contentState) {
+    const isConnectionRequests = contentState === z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS;
+    if (isConnectionRequests) {
       this.participants_bubble.hide();
     }
   }
@@ -271,7 +368,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   toggle_participants_bubble(add_people = false) {
     const toggle_bubble = () => {
       if (!this.participants_bubble.is_visible()) {
-        this.reset_view();
+        this.resetView();
 
         const [user_et] = this.participants();
         if (user_et && !this.conversation().is_group()) {
@@ -285,7 +382,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
       if (add_people && !this.conversation().is_guest()) {
         if (!this.participants_bubble.is_visible()) {
-          return this.participants_bubble.show().then(() => this.addParticipants());
+          return this.participants_bubble.show().then(() => this.clickOnAddPeople());
         }
 
         const is_adding_people = this.state() === ParticipantsViewModel.STATE.ADD_PEOPLE;
@@ -294,7 +391,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
           return this.participants_bubble.hide();
         }
 
-        return this.addParticipants();
+        return this.clickOnAddPeople();
       }
 
       return this.participants_bubble.toggle();
@@ -310,13 +407,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     }
   }
 
-  change_conversation(conversation_et) {
-    this.participants_bubble.hide();
-    this.conversation(conversation_et);
-    this.user_profile(this.placeholderParticipant);
-  }
-
-  reset_view() {
+  resetView() {
     this.state(ParticipantsViewModel.STATE.PARTICIPANTS);
     this.selectedUsers.removeAll();
     this.services.removeAll();
@@ -331,18 +422,6 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   addParticipants() {
     this.state(ParticipantsViewModel.STATE.ADD_PEOPLE);
     $('.participants-search').addClass('participants-search-show');
-  }
-
-  leave_conversation() {
-    amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
-
-    this.confirm_dialog = $('#participants').confirm({
-      confirm: () => {
-        this.participants_bubble.hide();
-        this.conversation_repository.remove_member(this.conversation(), this.user_repository.self().id);
-      },
-      template: '#template-confirm-leave',
-    });
   }
 
   rename_conversation(data, event) {
@@ -383,95 +462,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.participants_bubble.hide();
   }
 
-  on_search_close() {
-    this.reset_view();
-  }
-
-  close() {
-    this.reset_view();
-  }
-
-  clickToRemoveMember(userEntity) {
-    amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
-
-    this.confirm_dialog = $('#participants').confirm({
-      confirm: () => {
-        this.conversation_repository.removeMember(this.conversation(), userEntity).then(response => {
-          if (response) {
-            this.reset_view();
-          }
-        });
-      },
-      data: {
-        user: userEntity,
-      },
-      template: '#template-confirm-remove',
-    });
-  }
-
   show_preferences_account() {
     amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT);
-  }
-
-  unblock(user_et) {
-    this.confirm_dialog = $('#participants').confirm({
-      confirm: () => {
-        this.user_repository
-          .unblock_user(user_et)
-          .then(() => {
-            this.participants_bubble.hide();
-            return this.conversation_repository.get_1to1_conversation(user_et);
-          })
-          .then(conversation_et => {
-            this.conversation_repository.update_participating_user_ets(conversation_et);
-          });
-      },
-      data: {
-        user: user_et,
-      },
-      template: '#template-confirm-unblock',
-    });
-  }
-
-  block(user_et) {
-    amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
-
-    this.confirm_dialog = $('#participants').confirm({
-      confirm: () => {
-        const next_conversation_et = this.conversation_repository.get_next_conversation(this.conversation());
-
-        this.participants_bubble.hide();
-        this.user_repository.block_user(user_et, next_conversation_et);
-      },
-      data: {
-        user: user_et,
-      },
-      template: '#template-confirm-block',
-    });
-  }
-
-  connect(user_et) {
-    this.participants_bubble.hide();
-
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.SENT_CONNECT_REQUEST, {
-      context: 'participants',
-    });
-  }
-
-  pending(user_et) {
-    const on_success = () => this.participants_bubble.hide();
-
-    this.confirm_dialog = $('#participants').confirm({
-      cancel: () => {
-        this.user_repository.ignore_connection_request(user_et).then(() => on_success());
-      },
-      confirm: () => {
-        this.user_repository.accept_connection_request(user_et, true).then(() => on_success());
-      },
-      data: {
-        user: this.user_profile(),
-      },
-      template: '#template-confirm-connect',
-    });
   }
 };
