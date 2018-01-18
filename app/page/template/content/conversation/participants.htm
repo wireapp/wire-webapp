@@ -15,7 +15,7 @@
           </div>
           <div class="participants-group-list">
             <!-- ko if: render_participants -->
-              <user-list params="user: unverifiedParticipants, click: clickOnShowParticipant, mode: z.components.UserListMode.COMPACT"></user-list>
+              <user-list params="user: unverifiedParticipants, click: clickOnShowMember, mode: z.components.UserListMode.COMPACT"></user-list>
               <!-- ko if: verifiedParticipants().length -->
                 <div class="participants-group-list-separator">
                   <svg width="16" height="16">
@@ -24,7 +24,7 @@
                   <span class="label-xs" data-bind="l10n_text: z.string.people_verified"></span>
                   <hr>
                 </div>
-                <user-list params="user: verifiedParticipants, click: clickOnShowParticipant, mode: z.components.UserListMode.COMPACT"></user-list>
+                <user-list params="user: verifiedParticipants, click: clickOnShowMember, mode: z.components.UserListMode.COMPACT"></user-list>
               <!-- /ko -->
               <!-- ko if: serviceParticipants().length -->
                 <div class="participants-group-list-separator">

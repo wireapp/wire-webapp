@@ -43,13 +43,13 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   ) {
     this.clickOnAddPeople = this.clickOnAddPeople.bind(this);
     this.clickOnSelectService = this.clickOnSelectService.bind(this);
+    this.clickOnShowMember = this.clickOnShowMember.bind(this);
     this.clickOnShowService = this.clickOnShowService.bind(this);
     this.clickToAddService = this.clickToAddService.bind(this);
     this.clickToRemoveMember = this.clickToRemoveMember.bind(this);
     this.clickToRemoveService = this.clickToRemoveService.bind(this);
     this.block = this.block.bind(this);
     this.close = this.close.bind(this);
-    this.clickOnShowParticipant = this.clickOnShowParticipant.bind(this);
     this.connect = this.connect.bind(this);
     this.leave_conversation = this.leave_conversation.bind(this);
     this.on_search_close = this.on_search_close.bind(this);
@@ -210,7 +210,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     });
   }
 
-  clickOnShowParticipant(userEntity) {
+  clickOnShowMember(userEntity) {
     this.show_participant(userEntity, true);
   }
 
