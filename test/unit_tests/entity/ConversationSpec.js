@@ -548,7 +548,7 @@ describe('Conversation', () => {
     });
   });
 
-  describe('is_with_bot', () =>
+  describe('isWithBot', () =>
     it('detects bot conversations by the username of the remote participant', () => {
       const user_et = new z.entity.User(z.util.create_random_uuid());
 
@@ -557,31 +557,31 @@ describe('Conversation', () => {
 
       user_et.username('ottothebot');
       conversation_et.type(z.conversation.ConversationType.SELF);
-      expect(conversation_et.is_with_bot()).toBe(false);
+      expect(conversation_et.isWithBot()).toBe(false);
 
       conversation_et.type(z.conversation.ConversationType.ONE2ONE);
-      expect(conversation_et.is_with_bot()).toBe(true);
+      expect(conversation_et.isWithBot()).toBe(true);
 
       user_et.username('annathebot');
-      expect(conversation_et.is_with_bot()).toBe(true);
+      expect(conversation_et.isWithBot()).toBe(true);
 
       user_et.username(undefined);
-      expect(conversation_et.is_with_bot()).toBe(false);
+      expect(conversation_et.isWithBot()).toBe(false);
 
       user_et.username('');
-      expect(conversation_et.is_with_bot()).toBe(false);
+      expect(conversation_et.isWithBot()).toBe(false);
 
       user_et.username('bob');
-      expect(conversation_et.is_with_bot()).toBe(false);
+      expect(conversation_et.isWithBot()).toBe(false);
 
       user_et.username('bobthebot');
-      expect(conversation_et.is_with_bot()).toBe(false);
+      expect(conversation_et.isWithBot()).toBe(false);
 
       user_et.username('bot');
-      expect(conversation_et.is_with_bot()).toBe(false);
+      expect(conversation_et.isWithBot()).toBe(false);
 
       user_et.username('wire');
-      expect(conversation_et.is_with_bot()).toBe(false);
+      expect(conversation_et.isWithBot()).toBe(false);
     }));
 
   describe('messages_visible', () => {

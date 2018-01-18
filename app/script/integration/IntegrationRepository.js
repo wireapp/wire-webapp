@@ -62,8 +62,16 @@ z.integration.IntegrationRepository = class IntegrationRepository {
         }
         return this.conversationRepository.active_conversation();
       })
-      .then(conversationEntity => this.conversationRepository.addBot(conversationEntity, providerId, serviceId))
-      .then(conversationEntity => amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity))
+      .then(conversationEntity => {
+        if (conversationEntity) {
+          return this.conversationRepository.addBot(conversationEntity, providerId, serviceId, 'url_param');
+        }
+      })
+      .then(conversationEntity => {
+        if (conversationEntity) {
+          amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
+        }
+      })
       .catch(error => {
         amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.BOTS_UNAVAILABLE);
         throw error;
