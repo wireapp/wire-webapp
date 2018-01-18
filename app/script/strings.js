@@ -209,6 +209,10 @@ export const errorHandlerStrings = defineMessages({
     defaultMessage:
       'This email address has already been registered. <a target="_blank" rel="noopener noreferrer" href="https://support.wire.com/hc/articles/115004082129">Learn more</a>',
   },
+  [BackendError.LABEL.ALREADY_INVITED]: {
+    id: 'BackendError.LABEL.ALREADY_INVITED',
+    defaultMessage: 'This email has already been invited',
+  },
   [BackendError.LABEL.MISSING_AUTH]: {
     id: 'BackendError.LABEL.MISSING_AUTH',
     defaultMessage: 'Please verify your details and try again',

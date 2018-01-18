@@ -26,15 +26,21 @@ import BackendError from './BackendError';
 export function invite(invitation) {
   const params = [...arguments];
   return function(dispatch, getState, {apiClient}) {
+    dispatch(InviteActionCreator.startAddInvite(params));
     const state = getState();
     const inviteList = InviteSelector.getInvites(state);
     const invitationEmail = invitation.email && invitation.email.toLowerCase();
     const alreadyInvited = inviteList.find(inviteItem => inviteItem.email.toLowerCase() === invitationEmail);
     if (alreadyInvited) {
-      return null;
+      const error = new BackendError({
+        code: 409,
+        label: BackendError.LABEL.ALREADY_INVITED,
+        message: 'This email has already been invited',
+      });
+      dispatch(InviteActionCreator.failedAddInvite(error));
+      throw BackendError.handle(error);
     }
 
-    dispatch(InviteActionCreator.startAddInvite(params));
     invitation.locale = languageSelector.getLanguage(state);
     invitation.inviter_name = selfSelector.getSelfName(state);
     const teamId = selfSelector.getSelfTeamId(state);

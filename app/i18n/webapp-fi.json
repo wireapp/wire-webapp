@@ -28,6 +28,9 @@
   "invite.subhead": "Kutsu kollegat liittymään.",
   "invite.emailPlaceholder": "",
   "invite.skipForNow": "Ohita toistaiseksi",
+  "chooseHandle.headline": "",
+  "chooseHandle.subhead": "",
+  "chooseHandle.handlePlaceholder": "Käyttäjänimi",
   "BackendError.LABEL.ACCESS_DENIED": "Vahvista tietosi ja yritä uudelleen",
   "BackendError.LABEL.INVALID_CREDENTIALS": "Vahvista tietosi ja yritä uudelleen",
   "BackendError.LABEL.MISSING_AUTH": "Vahvista tietosi ja yritä uudelleen",
@@ -38,6 +41,7 @@
   "BackendError.LABEL.INVALID_PHONE": "Puhelinnumero on virheellinen",
   "BackendError.LABEL.KEY_EXISTS":
     "Sähköpostiosoite jonka annoit on jo rekisteröity. <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://support.wire.com/hc/articles/115004082129\">Lue lisää</a>",
+  "BackendError.LABEL.ALREADY_INVITED": "",
   "BackendError.LABEL.PENDING_ACTIVATION": "Sähköpostiosoite jonka annoit on jo saanut kutsun. Tarkista sähköpostisi",
   "BackendError.LABEL.PENDING_LOGIN": "BackendError.LABEL.PENDING_LOGIN",
   "BackendError.LABEL.TOO_MANY_LOGINS": "Yritä myöhemmin uudelleen",

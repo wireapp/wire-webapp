@@ -385,6 +385,7 @@ z.string.hu.preferences_about_terms_of_use = 'Felhasználási feltételek';
 z.string.hu.preferences_about_version = 'Verzió {{version}}';
 z.string.hu.preferences_about_website = 'Wire weboldala';
 
+z.string.hu.preferences_account_avaibility_unset = 'Állapot beállítása';
 z.string.hu.preferences_account_create_team = 'Csapat létrehozása';
 z.string.hu.preferences_account_delete = 'Fiók törlése';
 z.string.hu.preferences_account_log_out = 'Kijelentkezés';
@@ -490,6 +491,8 @@ z.string.hu.warning_permission_request_screen = '{{icon}} Képernyőmegosztás e
 z.string.hu.warning_tell_me_how = 'Mit kell tennem';
 
 z.string.hu.user_availability_available = 'Elérhető';
+z.string.hu.user_availability_away = 'Nincs a gépnél';
+z.string.hu.user_availability_busy = 'Elfoglalt';
 z.string.hu.user_availability_none = 'Semmi';
 
 z.string.hu.system_notification_asset_add = 'Megosztott egy képet';
@@ -517,6 +520,9 @@ z.string.hu.tooltip_conversation_call = 'Hívás';
 z.string.hu.tooltip_conversation_ephemeral = 'Időzített üzenet';
 z.string.hu.tooltip_conversation_file = 'Fájl hozzáadása';
 z.string.hu.tooltip_conversation_input_placeholder = 'Üzenet írása';
+z.string.hu.tooltip_conversation_input_placeholder_available = '{{user}} elérhető';
+z.string.hu.tooltip_conversation_input_placeholder_away = '{{user}} nincs a gépnél';
+z.string.hu.tooltip_conversation_input_placeholder_busy = '{{user}} elfoglalt';
 z.string.hu.tooltip_conversation_people = 'Partnerek ({{shortcut}})';
 z.string.hu.tooltip_conversation_picture = 'Kép hozzáadása';
 z.string.hu.tooltip_conversation_ping = 'Kopogás ({{shortcut}})';
