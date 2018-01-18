@@ -140,13 +140,11 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       );
     });
 
-    this.enableIntegrations = ko.pureComputed(
-      () => true || (this.is_team() && !z.util.Environment.frontend.is_production())
-    );
+    this.enableIntegrations = this.integrationRepository.enableIntegrations;
 
-    this.show_content = ko.pureComputed(
-      () => this.show_contacts() || this.show_matches() || this.show_search_results()
-    );
+    this.show_content = ko.pureComputed(() => {
+      return this.show_contacts() || this.show_matches() || this.show_search_results();
+    });
 
     this.show_contacts = ko.pureComputed(() => this.contacts().length);
     this.show_hint = ko.pureComputed(() => this.selected_people().length === 1 && !this.has_created_conversation());
@@ -154,9 +152,10 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.show_matches = ko.observable(false);
 
     this.show_no_contacts = ko.pureComputed(() => !this.is_team() && !this.show_content());
-    this.show_no_matches = ko.pureComputed(
-      () => (this.is_team() || this.show_matches()) && !this.show_contacts() && !this.show_search_results()
-    );
+    this.show_no_matches = ko.pureComputed(() => {
+      const isTeamOrMatch = this.is_team() || this.show_matches();
+      return isTeamOrMatch && !this.show_contacts() && !this.show_search_results();
+    });
     this.show_no_search_results = ko.pureComputed(() => {
       return (
         !this.show_matches() && this.show_search_results() && !this.has_search_results() && this.search_input().length

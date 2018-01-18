@@ -146,7 +146,8 @@ z.main.App = class App {
     );
     repositories.integration = new z.integration.IntegrationRepository(
       this.service.integration,
-      repositories.conversation
+      repositories.conversation,
+      repositories.team
     );
     repositories.system_notification = new z.system_notification.SystemNotificationRepository(
       repositories.calling,
@@ -561,6 +562,11 @@ z.main.App = class App {
         this.logger.info(`Found bot token '${serviceName}'`);
         this._createServiceConversation({name: serviceName, providerId, serviceId});
       }
+    }
+
+    const supportIntegrations = z.util.get_url_parameter(z.auth.URLParameter.INTEGRATIONS);
+    if (Boolean(supportIntegrations)) {
+      this.repository.integration.supportIntegrations(supportIntegrations);
     }
   }
 
