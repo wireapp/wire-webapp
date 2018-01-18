@@ -23,14 +23,14 @@ window.z = window.z || {};
 window.z.components = z.components || {};
 
 z.components.ParticipantAvatar = class ParticipantAvatar {
-  constructor(params, component_info) {
+  constructor(params, componentInfo) {
     this.participant = ko.unwrap(params.participant);
     this.isUser = this.participant instanceof z.entity.User && !this.participant.isBot;
     this.isService = this.participant instanceof z.integration.ServiceEntity || this.participant.isBot;
 
     this.delay = params.delay;
     this.size = params.size;
-    this.element = $(component_info.element);
+    this.element = $(componentInfo.element);
 
     if (this.size) {
       this.element.addClass(`${this.isService ? 'service' : 'user'}-avatar-${this.size}`);
