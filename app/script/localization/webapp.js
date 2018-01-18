@@ -126,8 +126,8 @@ z.string.modal_block_conversation_headline = 'Block {{user}}?';
 z.string.modal_block_conversation_message = '{{user}} won’t be able to contact you or add you to group conversations.';
 z.string.modal_block_conversation_button = 'Block';
 // Bots confirm
-z.string.modal_bots_confirm_headline = 'Integrate service?';
-z.string.modal_bots_confirm_message = 'Are you sure you want to create a new conversation and integrate {{name}}?';
+z.string.modal_bots_confirm_headline = 'Add Service';
+z.string.modal_bots_confirm_message = 'Are you sure you want to start a new conversation with {{name}}?';
 z.string.modal_bots_confirm_button = 'Confirm';
 // Bots unavailable
 z.string.modal_bots_unavailable_headline = 'Bots currently unavailable';
@@ -203,16 +203,16 @@ z.string.modal_remove_device_button = 'Remove device';
 z.string.modal_remove_device_headline = 'Remove "{{device}}"';
 z.string.modal_remove_device_message = 'Your password is required to remove the device.';
 // Service unavailable
-z.string.modal_service_disabled_headline = 'modal_service_disabled_headline';
-z.string.modal_service_disabled_message = 'modal_service_disabled_message';
+z.string.modal_service_disabled_headline = 'Adding service not possible';
+z.string.modal_service_disabled_message = 'The service is unavailable a the moment.';
 // Session Reset
 z.string.modal_session_reset_headline = 'The session has been reset';
 z.string.modal_session_reset_message_1 = 'If the problem is not resolved,';
 z.string.modal_session_reset_message_link = 'contact';
 z.string.modal_session_reset_message_2 = 'us.';
 // Too many bots in conversation
-z.string.modal_too_many_bots_headline = 'modal_too_many_bots_headline';
-z.string.modal_too_many_bots_message = 'modal_too_many_bots_message';
+z.string.modal_too_many_bots_headline = 'Adding service not possible';
+z.string.modal_too_many_bots_message = 'The bot is already part of this conversation';
 // Too many members in conversation
 z.string.modal_too_many_members_headline = 'Full house';
 z.string.modal_too_many_members_message = 'Up to {{number1}} people can join a conversation. There is room for {{number2}} more people in here.';
