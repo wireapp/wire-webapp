@@ -200,6 +200,12 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   clickOnSelectService(serviceEntity) {
     this.selectedService(serviceEntity);
     this.state(ParticipantsViewModel.STATE.SERVICE_CONFIRMATION);
+
+    this.integrationRepository.getProviderById(serviceEntity.providerId).then(providerEntity => {
+      if (this.selectedService()) {
+        this.selectedService().providerName(providerEntity.name);
+      }
+    });
   }
 
   clickOnShowParticipant(userEntity) {
@@ -207,10 +213,14 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   }
 
   clickOnShowService(userEntity) {
-    this.integrationRepository.getServiceById(userEntity.serviceId).then(serviceEntity => {
-      this.selectedService(serviceEntity);
-      this.state(ParticipantsViewModel.STATE.SERVICE_DETAILS);
-    });
+    this.integrationRepository
+      .getServiceById(userEntity.serviceId)
+      .then(serviceEntity => {
+        this.selectedService(serviceEntity);
+        this.state(ParticipantsViewModel.STATE.SERVICE_DETAILS);
+        return this.integrationRepository.getProviderById(userEntity.providerId);
+      })
+      .then(providerEntity => this.selectedService().providerName(providerEntity.name));
   }
 
   searchServices(query) {

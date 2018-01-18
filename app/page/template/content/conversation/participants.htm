@@ -120,7 +120,7 @@
             <service-avatar class="service-avatar-md" params="service: selectedService"></service-avatar>
             <div class="service-confirmation-summary-text">
               <div class="service-confirmation-name" data-bind="text: selectedService().name"></div>
-              <div class="service-confirmation-provider" data-bind="text: 'Provider Name'"></div>
+              <div class="service-confirmation-provider" data-bind="text: selectedService().providerName()"></div>
             </div>
           </div>
           <div class="service-confirmation-description" data-bind="text: selectedService().description"></div>

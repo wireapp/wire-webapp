@@ -70,7 +70,7 @@ z.integration.IntegrationRepository = class IntegrationRepository {
       });
   }
 
-  getProvider(providerId) {
+  getProviderById(providerId) {
     return this.integrationService.getProvider(providerId).then(response => {
       if (response) {
         return z.integration.IntegrationMapper.mapProviderFromObject(response);
