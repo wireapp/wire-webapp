@@ -64,7 +64,7 @@
           pending: pending,
           leave: leave_conversation,
           profile: show_preferences_account,
-          remove: removeMember,
+          remove: clickToRemoveMember,
           unblock: unblock
         "></user-profile>
 
@@ -108,6 +108,7 @@
 
     <!-- ko if: showServiceStates() -->
       <div class="participants-service-confirmation">
+        <!-- ko if: group_mode() -->
         <div class="service-confirmation-header">
           <div class="service-confirmation-back" data-bind="click: clickOnServiceBack, l10n_tooltip: z.string.tooltip_people_back" data-uie-name="do-back">
               <svg width="16" height="16" viewBox="0 0 16 16">
@@ -115,6 +116,7 @@
               </svg>
           </div>
         </div>
+        <!-- /ko -->
         <div class="service-confirmation-body">
           <div class="service-confirmation-summary">
             <service-avatar class="service-avatar-md" params="service: selectedService"></service-avatar>

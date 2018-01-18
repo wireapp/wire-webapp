@@ -41,12 +41,12 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
 
     this.dispose = this.dispose.bind(this);
 
-    if (this.isUser) {
-      this.element.attr({
-        id: z.util.create_random_uuid(),
-        'user-id': this.participant.id,
-      });
+    this.element.attr({
+      id: z.util.create_random_uuid(),
+      'user-id': this.participant.id,
+    });
 
+    if (this.isUser) {
       this.initials = ko.pureComputed(() => {
         if (this.element.hasClass('user-avatar-xs')) {
           return z.util.StringUtil.get_first_character(this.participant.initials());
