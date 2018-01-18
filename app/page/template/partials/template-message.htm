@@ -74,12 +74,7 @@
   <!-- ko if: !$parent.should_hide_user_avatar($data) -->
     <div class="message-header">
       <div class="message-header-icon">
-        <!-- ko if: message.user().isBot -->
-          <service-avatar class="sender-avatar service-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: message.user(), click: $parent.on_message_user_click"></service-avatar>
-        <!-- /ko -->
-        <!-- ko ifnot: message.user().isBot -->
-          <user-avatar class="sender-avatar user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: message.user(), click: $parent.on_message_user_click"></user-avatar>
-        <!-- /ko -->
+        <participant-avatar class="sender-avatar" data-bubble="#participants-bubble" data-placement="vertical" params="participant: message.user(), click: $parent.on_message_user_click, size: 'xs'"></participant-avatar>
       </div>
       <div class="message-header-label">
         <span class="message-header-label-sender" data-bind='css: message.accent_color(), text: message.user().first_name()' data-uie-name="sender-name"></span>

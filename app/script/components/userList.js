@@ -126,7 +126,7 @@ ko.components.register('user-list', {
       <div class="search-list-item" data-bind="click: $parent.on_select, css: {'search-list-item-selected': $parent.is_selected($data)}, attr: {'data-uie-uid': $data.id, 'data-uie-value': $data.name(), 'data-uie-status': $data.connection().status()}" data-uie-name="item-user">
         <!-- ko if: $parent.mode === z.components.UserListMode.COMPACT -->
           <div class="search-list-item-image">
-            <user-avatar class="user-avatar-md" params="user: $data, selected: $parent.is_selected($data)"></user-avatar>
+            <participant-avatar params="participant: $data, selected: $parent.is_selected($data), size: 'md'"></user-avatar>
             <!-- ko if: $data.is_guest() -->
               <div class="search-list-item-image-guest-indicator-badge" data-bind="l10n_text: z.string.conversation_guest_indicator" data-uie-name="status-guest"></div>
             <!-- /ko -->
