@@ -384,6 +384,7 @@ z.string.uk.preferences_about_terms_of_use = 'Умови використанн�
 z.string.uk.preferences_about_version = 'Версія {{version}}';
 z.string.uk.preferences_about_website = 'Веб-сайт Wire';
 
+z.string.uk.preferences_account_avaibility_unset = 'Встановити статус';
 z.string.uk.preferences_account_create_team = 'Створити команду';
 z.string.uk.preferences_account_delete = 'Видалити акаунт';
 z.string.uk.preferences_account_log_out = 'Вийти';
@@ -484,6 +485,8 @@ z.string.uk.warning_permission_request_screen = '{{icon}} Дозволити д�
 z.string.uk.warning_tell_me_how = 'Скажіть мені як';
 
 z.string.uk.user_availability_available = 'Доступний';
+z.string.uk.user_availability_away = 'Не на місці';
+z.string.uk.user_availability_busy = 'Не турбувати';
 z.string.uk.user_availability_none = 'Все вимкнено';
 
 z.string.uk.system_notification_asset_add = 'Поділився(-лась) картинкою';
@@ -511,6 +514,9 @@ z.string.uk.tooltip_conversation_call = 'Аудіодзвінок';
 z.string.uk.tooltip_conversation_ephemeral = 'Тимчасове повідомлення';
 z.string.uk.tooltip_conversation_file = 'Додати файл';
 z.string.uk.tooltip_conversation_input_placeholder = 'Напишіть повідомлення';
+z.string.uk.tooltip_conversation_input_placeholder_available = '{{user}}: онлайн';
+z.string.uk.tooltip_conversation_input_placeholder_away = '{{user}}: не на місці';
+z.string.uk.tooltip_conversation_input_placeholder_busy = '{{user}}: не турбувати';
 z.string.uk.tooltip_conversation_people = 'Учасники ({{shortcut}})';
 z.string.uk.tooltip_conversation_picture = 'Додати картинку';
 z.string.uk.tooltip_conversation_ping = 'Надіслати пінг ({{shortcut}})';
