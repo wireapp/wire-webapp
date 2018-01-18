@@ -1,20 +1,20 @@
 <div id="participants-bubble" class="bubble">
-  <div id="participants" class="participants" data-bind="with: $root.participants, css: {'show-user': $root.participants.user_profile().id !== ''}">
+  <div id="participants" class="participants" data-bind="with: $root.participants, css: {'show-user': $root.participants.selectedUser().id !== ''}">
 
-    <!-- ko if: state() === z.ViewModel.ParticipantsViewModel.STATE.PARTICIPANTS -->
+    <!-- ko if: stateParticipants() -->
       <div class="participants-transition">
 
         <div class="participants-group">
           <div class="participants-group-header">
             <div class="name popover-title">
-              <div data-bind="visible: !editing(), text: conversation().display_name(), click: edit, l10n_tooltip: z.string.tooltip_people_rename" data-uie-name="status-name"></div>
-              <textarea data-bind="visible: editing, value: conversation().display_name(), enter: rename_conversation, hasFocus: editing, resize" data-uie-name="enter-name" maxlength="64" dir="auto"></textarea>
+              <div data-bind="visible: !isEditing(), text: conversation().display_name(), click: clickToEdit, l10n_tooltip: z.string.tooltip_people_rename" data-uie-name="status-name"></div>
+              <textarea data-bind="visible: isEditing, value: conversation().display_name(), enter: renameConversation, hasFocus: isEditing, resize" data-uie-name="enter-name" maxlength="64" dir="auto"></textarea>
             </div>
-            <span class="edit icon-edit" data-bind="visible: editable() && !editing(), click: edit"></span>
+            <span class="edit icon-edit" data-bind="visible: isEditable() && !isEditing(), click: clickToEdit"></span>
             <div class="people popover-meta text-uppercase" data-bind="l10n_text: {'id': z.string.people_people, 'substitute': participants().length}"></div>
           </div>
           <div class="participants-group-list">
-            <!-- ko if: render_participants -->
+            <!-- ko if: renderParticipants -->
               <user-list params="user: unverifiedParticipants, click: clickOnShowMember, mode: z.components.UserListMode.COMPACT"></user-list>
               <!-- ko if: verifiedParticipants().length -->
                 <div class="participants-group-list-separator">
@@ -40,13 +40,8 @@
               <!-- ko ifnot: conversation().is_guest() -->
                 <div class="button-icon pull-left" data-bind="click: clickOnAddPeople, attr:{'title': addPeopleTooltip}" data-uie-name="do-add-people">
                   <div class="button-icon icon-people-add"></div>
-                  <!-- ko if: enableIntegrations() -->
-                    <label data-bind="l10n_text: z.string.people_button_add"></label>
-                  <!-- /ko -->
-                  <!-- ko ifnot: enableIntegrations() -->
-                    <label data-bind="l10n_text: z.string.people_button_add_people"></label>
-                  <!-- /ko -->
-                </div>
+                    <label data-bind="l10n_text: addActionText"></label>
+                  </div>
               <!-- /ko -->
               <div class="button-icon icon-minus pull-right" data-bind="click: clickToLeave, l10n_tooltip: z.string.tooltip_people_leave" data-uie-name="do-leave"></div>
             <!-- /ko -->
@@ -56,14 +51,14 @@
         <user-profile class="group-user-profile" params="
           conversation: conversation,
           mode: z.components.UserProfileMode.PEOPLE,
-          user: user_profile,
+          user: selectedUser,
           add_people: clickOnAddPeople,
           block: clickToBlock,
           close: clickOnClose,
           connect: clickToConnect,
           pending: clickOnPending,
           leave: clickToLeave,
-          profile: show_preferences_account,
+          profile: clickOnSelfProfile,
           remove: clickToRemoveMember,
           unblock: clickToUnblock
         "></user-profile>
@@ -78,25 +73,25 @@
             <user-input class="participants-search-header-list user-list-light" params="input: searchInput, selected: selectedUsers, placeholder: z.string.people_search_placeholder" spellcheck="false"></user-input>
             <div class="participants-search-header-close icon-close icon-button" data-bind="click: clickOnClose, l10n_tooltip: z.string.tooltip_search_close" data-uie-name="do-close"></div>
           </div>
-          <!-- ko if: enableIntegrations() -->
+          <!-- ko if: showIntegrations() -->
             <div class="participants-search-tabs">
-              <div class="participants-search-tab" data-bind="css: {'active': state() === z.ViewModel.ParticipantsViewModel.STATE.ADD_PEOPLE}, click: clickOnAddPeople, l10n_text: z.string.people_tabs_people"></div>
-              <div class="participants-search-tab" data-bind="css: {'active': state() === z.ViewModel.ParticipantsViewModel.STATE.ADD_SERVICE}, click: clickOnAddService, l10n_text: z.string.people_tabs_services"></div>
+              <div class="participants-search-tab" data-bind="css: {'active': stateAddPeople}, click: clickOnAddPeople, l10n_text: z.string.people_tabs_people"></div>
+              <div class="participants-search-tab" data-bind="css: {'active': stateAddService}, click: clickOnAddService, l10n_text: z.string.people_tabs_services"></div>
             </div >
           <!-- /ko -->
         </div >
-        <!-- ko if: state() === z.ViewModel.ParticipantsViewModel.STATE.ADD_PEOPLE -->
+        <!-- ko if: stateAddPeople() -->
           <div class="participants-search-content">
             <div class="participants-search-list" data-bind="antiscroll: selectedUsers">
               <user-list class="user-list-light" params="user: users, filter: searchInput, selected: selectedUsers"></user-list>
             </div>
           </div>
-          <button class="participants-search-footer button button-full" data-bind="enable: selectedUsers().length > 0, click: on_search_add" data-uie-name="do-create">
+          <button class="participants-search-footer button button-full" data-bind="enable: selectedUsers().length > 0, click: clickToAddMembers" data-uie-name="do-create">
             <span class="icon-people-add participants-search-icon"></span>
-            <span data-bind="l10n_text: search_action"></span>
+            <span data-bind="l10n_text: searchActionText"></span>
           </button>
         <!-- /ko -->
-        <!-- ko if: state() === z.ViewModel.ParticipantsViewModel.STATE.ADD_SERVICE -->
+        <!-- ko if: stateAddService() -->
           <div class="participants-search-content">
             <div class="participants-search-list" data-bind="antiscroll: selectedUsers">
               <service-list class="service-list-light" params="services: integrationRepository.services, click: clickOnSelectService"></service-list>
@@ -108,7 +103,7 @@
 
     <!-- ko if: showServiceStates() -->
       <div class="participants-service-confirmation">
-        <!-- ko if: group_mode() -->
+        <!-- ko if: groupMode() -->
           <div class="service-confirmation-header">
             <div class="service-confirmation-back" data-bind="click: clickOnServiceBack, l10n_tooltip: z.string.tooltip_people_back" data-uie-name="do-back">
                 <svg width="16" height="16" viewBox="0 0 16 16">
@@ -128,10 +123,10 @@
           <div class="service-confirmation-description" data-bind="text: selectedService().description"></div>
         </div>
         <div class="service-confirmation-footer">
-          <!-- ko if: state() === z.ViewModel.ParticipantsViewModel.STATE.SERVICE_CONFIRMATIONS -->
+          <!-- ko if: stateServiceConfirmations() -->
             <button class="participants-service-confirmation-button" data-bind="click: clickToAddService, l10n_text: z.string.people_service_confirm_button"></button>
           <!-- /ko -->
-          <!-- ko if: state() === z.ViewModel.ParticipantsViewModel.STATE.SERVICE_DETAILS -->
+          <!-- ko if: stateServiceDetails() -->
             <button class="participants-service-confirmation-button button-theme-red" data-bind="click: clickToRemoveService, l10n_text: z.string.people_service_removal_button"></button>
           <!-- /ko -->
         </div>

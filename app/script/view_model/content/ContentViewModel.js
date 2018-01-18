@@ -99,11 +99,10 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
     );
     this.participants = new z.ViewModel.ParticipantsViewModel(
       'participants',
-      this.user_repository,
       this.conversation_repository,
       this.integrationRepository,
-      this.search_repository,
-      this.team_repository
+      this.team_repository,
+      this.user_repository
     );
     this.giphy = new z.ViewModel.GiphyViewModel('giphy-modal', this.conversation_repository, this.giphy_repository);
 
