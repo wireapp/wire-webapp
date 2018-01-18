@@ -1069,13 +1069,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Remove bot from conversation.
    *
    * @param {Conversation} conversation_et - Conversation to remove member from
-   * @param {string} bot_user_id - ID of bot to be removed from the conversation
+   * @param {z.entity.User} botUserEntity - Bot user to be removed from the conversation
    * @returns {Promise} Resolves when bot was removed from the conversation
    */
-  remove_bot(conversation_et, bot_user_id) {
-    return this.conversation_service.delete_bots(conversation_et.id, bot_user_id).then(response => {
+  remove_bot(conversation_et, botUserEntity) {
+    return this.conversation_service.delete_bots(conversation_et.id, botUserEntity.id).then(response => {
       if (response) {
         amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+
+        const attributes = {service_id: botUserEntity.serviceId};
+        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.INTEGRATION.REMOVED_SERVICE, attributes);
         return response;
       }
     });
@@ -1106,7 +1109,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   remove_participant(conversation_et, user_et) {
     if (user_et.isBot) {
-      return this.remove_bot(conversation_et, user_et.id);
+      return this.remove_bot(conversation_et, user_et);
     }
 
     return this.remove_member(conversation_et, user_et.id);
