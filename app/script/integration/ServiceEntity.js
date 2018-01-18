@@ -31,6 +31,7 @@ z.integration.ServiceEntity = class ServiceEntity {
     this.description = description || '';
     this.name = name || '';
     this.providerId = providerId || '';
+    this.providerName = ko.observable('');
     this.summary = summary || '';
     this.tags = tags || [];
 

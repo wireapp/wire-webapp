@@ -25,10 +25,11 @@ window.z.ViewModel = z.ViewModel || {};
 z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   static get STATE() {
     return {
-      ADD_PEOPLE: 'add_people',
-      ADD_SERVICE: 'add_service',
-      CONFIRM_SERVICE: 'confirm_service',
-      PARTICIPANTS: 'participants',
+      ADD_PEOPLE: 'ParticipantsViewModel.STATE.ADD_PEOPLE',
+      ADD_SERVICE: 'ParticipantsViewModel.STATE.ADD_SERVICE',
+      PARTICIPANTS: 'ParticipantsViewModel.STATE.PARTICIPANTS',
+      SERVICE_CONFIRMATION: 'ParticipantsViewModel.STATE.SERVICE_CONFIRMATION',
+      SERVICE_DETAILS: 'ParticipantsViewModel.STATE.SERVICE_DETAILS',
     };
   }
 
@@ -42,15 +43,17 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   ) {
     this.clickOnAddPeople = this.clickOnAddPeople.bind(this);
     this.clickOnSelectService = this.clickOnSelectService.bind(this);
+    this.clickOnShowMember = this.clickOnShowMember.bind(this);
+    this.clickOnShowService = this.clickOnShowService.bind(this);
     this.clickToAddService = this.clickToAddService.bind(this);
+    this.clickToRemoveMember = this.clickToRemoveMember.bind(this);
+    this.clickToRemoveService = this.clickToRemoveService.bind(this);
     this.block = this.block.bind(this);
     this.close = this.close.bind(this);
-    this.clickOnShowParticipant = this.clickOnShowParticipant.bind(this);
     this.connect = this.connect.bind(this);
     this.leave_conversation = this.leave_conversation.bind(this);
     this.on_search_close = this.on_search_close.bind(this);
     this.pending = this.pending.bind(this);
-    this.remove = this.remove.bind(this);
     this.show_participant = this.show_participant.bind(this);
     this.unblock = this.unblock.bind(this);
 
@@ -67,6 +70,10 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.activeAddState = ko.pureComputed(() => {
       const addStates = [ParticipantsViewModel.STATE.ADD_PEOPLE, ParticipantsViewModel.STATE.ADD_SERVICE];
       return addStates.includes(this.state());
+    });
+    this.activeServiceState = ko.pureComputed(() => {
+      const states = [ParticipantsViewModel.STATE.SERVICE_CONFIRMATION, ParticipantsViewModel.STATE.SERVICE_DETAILS];
+      return states.includes(this.state());
     });
 
     this.conversation = ko.observable(new z.entity.Conversation());
@@ -171,10 +178,9 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
       return z.l10n.text(identifier, shortcut);
     });
 
-    this.showConfirmService = ko.pureComputed(() => {
-      const isConfirmServiceState = this.state() === ParticipantsViewModel.STATE.CONFIRM_SERVICE;
+    this.showServiceStates = ko.pureComputed(() => {
       const hasSelectedService = this.selectedService().id !== this.placeholderService.id;
-      return isConfirmServiceState && hasSelectedService;
+      return this.activeServiceState() && hasSelectedService;
     });
 
     amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, this.switch_content.bind(this));
@@ -193,15 +199,31 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
   clickOnSelectService(serviceEntity) {
     this.selectedService(serviceEntity);
-    this.state(ParticipantsViewModel.STATE.CONFIRM_SERVICE);
+    this.state(ParticipantsViewModel.STATE.SERVICE_CONFIRMATION);
+
+    this.integrationRepository.getProviderById(serviceEntity.providerId).then(providerEntity => {
+      if (this.selectedService()) {
+        this.selectedService().providerName(providerEntity.name);
+      }
+    });
   }
 
-  clickOnShowParticipant(userEntity) {
+  clickOnShowMember(userEntity) {
     this.show_participant(userEntity, true);
   }
 
   clickOnShowService(userEntity) {
-    this.logger.info('Click on show bot participant', userEntity);
+    this.user_profile(userEntity);
+    const {providerId, serviceId} = userEntity;
+
+    this.integrationRepository
+      .getServiceById(providerId, serviceId)
+      .then(serviceEntity => {
+        this.selectedService(serviceEntity);
+        this.state(ParticipantsViewModel.STATE.SERVICE_DETAILS);
+        return this.integrationRepository.getProviderById(providerId);
+      })
+      .then(providerEntity => this.selectedService().providerName(providerEntity.name));
   }
 
   searchServices(query) {
@@ -212,6 +234,8 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
   clickOnServiceBack() {
     this.state(ParticipantsViewModel.STATE.ADD_SERVICE);
+    this.selectedService(this.placeholderService);
+    this.user_profile(this.placeholderParticipant);
     $('.participants-search').addClass('participants-search-show');
   }
 
@@ -220,6 +244,14 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.logger.info(`Adding service '${name}' to conversation '${this.conversation().id}'`, serviceEntity);
     this.conversation_repository.addBot(this.conversation(), providerId, id, 'conversation_details');
     this.close();
+  }
+
+  clickToRemoveService() {
+    this.conversation_repository.removeBot(this.conversation(), this.user_profile()).then(response => {
+      if (response) {
+        this.reset_view();
+      }
+    });
   }
 
   show_participant(user_et, group_mode = false) {
@@ -287,6 +319,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.state(ParticipantsViewModel.STATE.PARTICIPANTS);
     this.selectedUsers.removeAll();
     this.services.removeAll();
+    this.searchInput('');
     if (this.confirm_dialog) {
       this.confirm_dialog.destroy();
     }
@@ -357,19 +390,19 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.reset_view();
   }
 
-  remove(user_et) {
+  clickToRemoveMember(userEntity) {
     amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
 
     this.confirm_dialog = $('#participants').confirm({
       confirm: () => {
-        this.conversation_repository.remove_participant(this.conversation(), user_et).then(response => {
+        this.conversation_repository.removeMember(this.conversation(), userEntity).then(response => {
           if (response) {
             this.reset_view();
           }
         });
       },
       data: {
-        user: user_et,
+        user: userEntity,
       },
       template: '#template-confirm-remove',
     });

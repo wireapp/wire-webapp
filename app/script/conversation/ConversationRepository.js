@@ -946,7 +946,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   addBot(conversationEntity, providerId, serviceId, method) {
     return this.conversation_service
-      .post_bots(conversationEntity.id, providerId, serviceId)
+      .postBots(conversationEntity.id, providerId, serviceId)
       .then(response => {
         if (response && response.event) {
           amplify.publish(z.event.WebApp.EVENT.INJECT, response.event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
@@ -970,7 +970,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   addMembers(conversationEntity, userIds) {
     return this.conversation_service
-      .post_members(conversationEntity.id, userIds)
+      .postMembers(conversationEntity.id, userIds)
       .then(response => {
         if (response) {
           amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
@@ -1068,51 +1068,42 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Remove bot from conversation.
    *
-   * @param {Conversation} conversation_et - Conversation to remove member from
-   * @param {z.entity.User} botUserEntity - Bot user to be removed from the conversation
+   * @param {Conversation} conversationEntity - Conversation to remove member from
+   * @param {z.entity.User} userEntity - Bot user to be removed from the conversation
    * @returns {Promise} Resolves when bot was removed from the conversation
    */
-  remove_bot(conversation_et, botUserEntity) {
-    return this.conversation_service.delete_bots(conversation_et.id, botUserEntity.id).then(response => {
-      if (response) {
-        amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+  removeBot(conversationEntity, userEntity) {
+    const {id: userId, serviceId} = userEntity;
 
-        const attributes = {service_id: botUserEntity.serviceId};
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.INTEGRATION.REMOVED_SERVICE, attributes);
-        return response;
-      }
+    return this.conversation_service.deleteBots(conversationEntity.id, userId).then(response => {
+      const hasResponse = response && response.event;
+      const event = hasResponse
+        ? response.event
+        : z.conversation.EventBuilder.build_member_leave(conversationEntity, userId, this.time_offset);
+
+      amplify.publish(z.event.WebApp.EVENT.INJECT, event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+
+      const attributes = {service_id: serviceId};
+      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.INTEGRATION.REMOVED_SERVICE, attributes);
+      return event;
     });
   }
 
   /**
    * Remove member from conversation.
    *
-   * @param {Conversation} conversation_et - Conversation to remove member from
-   * @param {string} user_id - ID of member to be removed from the conversation
+   * @param {Conversation} conversationEntity - Conversation to remove member from
+   * @param {string} userId - ID of member to be removed from the conversation
    * @returns {Promise} Resolves when member was removed from the conversation
    */
-  remove_member(conversation_et, user_id) {
-    return this.conversation_service.delete_members(conversation_et.id, user_id).then(response => {
-      if (response) {
-        amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
-        return response;
-      }
+  removeMember(conversationEntity, userId) {
+    return this.conversation_service.deleteMembers(conversationEntity.id, userId).then(response => {
+      const event =
+        response || z.conversation.EventBuilder.build_member_leave(conversationEntity, userId, this.time_offset);
+
+      amplify.publish(z.event.WebApp.EVENT.INJECT, event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+      return event;
     });
-  }
-
-  /**
-   * Remove participant from conversation.
-   *
-   * @param {Conversation} conversation_et - Conversation to remove participant from
-   * @param {User} user_et - User to be removed from the conversation
-   * @returns {Promise} Resolves when participant was removed from the conversation
-   */
-  remove_participant(conversation_et, user_et) {
-    if (user_et.isBot) {
-      return this.remove_bot(conversation_et, user_et);
-    }
-
-    return this.remove_member(conversation_et, user_et.id);
   }
 
   /**

@@ -15,7 +15,7 @@
           </div>
           <div class="participants-group-list">
             <!-- ko if: render_participants -->
-              <user-list params="user: unverifiedParticipants, click: clickOnShowParticipant, mode: z.components.UserListMode.COMPACT"></user-list>
+              <user-list params="user: unverifiedParticipants, click: clickOnShowMember, mode: z.components.UserListMode.COMPACT"></user-list>
               <!-- ko if: verifiedParticipants().length -->
                 <div class="participants-group-list-separator">
                   <svg width="16" height="16">
@@ -24,7 +24,7 @@
                   <span class="label-xs" data-bind="l10n_text: z.string.people_verified"></span>
                   <hr>
                 </div>
-                <user-list params="user: verifiedParticipants, click: clickOnShowParticipant, mode: z.components.UserListMode.COMPACT"></user-list>
+                <user-list params="user: verifiedParticipants, click: clickOnShowMember, mode: z.components.UserListMode.COMPACT"></user-list>
               <!-- /ko -->
               <!-- ko if: serviceParticipants().length -->
                 <div class="participants-group-list-separator">
@@ -64,7 +64,7 @@
           pending: pending,
           leave: leave_conversation,
           profile: show_preferences_account,
-          remove: remove,
+          remove: removeMember,
           unblock: unblock
         "></user-profile>
 
@@ -106,7 +106,7 @@
       </div>
     <!-- /ko -->
 
-    <!-- ko if: showConfirmService() -->
+    <!-- ko if: showServiceStates() -->
       <div class="participants-service-confirmation">
         <div class="service-confirmation-header">
           <div class="service-confirmation-back" data-bind="click: clickOnServiceBack, l10n_tooltip: z.string.tooltip_people_back" data-uie-name="do-back">
@@ -120,13 +120,18 @@
             <service-avatar class="service-avatar-md" params="service: selectedService"></service-avatar>
             <div class="service-confirmation-summary-text">
               <div class="service-confirmation-name" data-bind="text: selectedService().name"></div>
-              <div class="service-confirmation-provider" data-bind="text: 'Provider Name'"></div>
+              <div class="service-confirmation-provider" data-bind="text: selectedService().providerName()"></div>
             </div>
           </div>
           <div class="service-confirmation-description" data-bind="text: selectedService().description"></div>
         </div>
         <div class="service-confirmation-footer">
-          <button class="participants-service-confirmation-button" data-bind="click: clickToAddService, l10n_text: z.string.people_service_confirm_button"></button>
+          <!-- ko if: state() === z.ViewModel.ParticipantsViewModel.STATE.SERVICE_CONFIRMATIONS -->
+            <button class="participants-service-confirmation-button" data-bind="click: clickToAddService, l10n_text: z.string.people_service_confirm_button"></button>
+          <!-- /ko -->
+          <!-- ko if: state() === z.ViewModel.ParticipantsViewModel.STATE.SERVICE_DETAILS -->
+            <button class="participants-service-confirmation-button button-theme-red" data-bind="click: clickToRemoveService, l10n_text: z.string.people_service_removal_button"></button>
+          <!-- /ko -->
         </div>
       </div>
     <!-- /ko -->
