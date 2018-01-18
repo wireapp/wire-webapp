@@ -35,13 +35,25 @@ z.integration.IntegrationRepository = class IntegrationRepository {
     return query.trim().toLowerCase();
   }
 
-  constructor(integrationService, conversationRepository) {
+  constructor(integrationService, conversationRepository, teamRepository) {
     this.logger = new z.util.Logger('z.integration.IntegrationRepository', z.config.LOGGER.OPTIONS);
 
     this.integrationService = integrationService;
 
     this.conversationRepository = conversationRepository;
+    this.teamRepository = teamRepository;
+
+    this.isTeam = this.teamRepository.isTeam;
     this.services = ko.observableArray([]);
+
+    this.supportIntegrations = ko.observable();
+    this.enableIntegrations = ko.pureComputed(() => {
+      if (Boolean(this.supportIntegrations())) {
+        return this.supportIntegrations();
+      }
+
+      return this.isTeam() && !z.util.Environment.frontend.is_production();
+    });
   }
 
   /**

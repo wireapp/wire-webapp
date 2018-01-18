@@ -27,6 +27,7 @@ z.auth.URLParameter = {
   BOT_PROVIDER: 'bot_provider',
   BOT_SERVICE: 'bot_service',
   ENVIRONMENT: 'env',
+  INTEGRATIONS: 'integrations',
   LOCALE: 'hl',
   MODE: 'mode',
   REASON: 'reason',

@@ -112,9 +112,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
       });
     });
 
-    this.enableIntegrations = ko.pureComputed(
-      () => true || (this.isTeam() && !z.util.Environment.frontend.is_production())
-    );
+    this.enableIntegrations = this.integrationRepository.enableIntegrations;
 
     // Confirm dialog reference
     this.confirm_dialog = undefined;
