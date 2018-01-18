@@ -525,13 +525,6 @@ z.main.App = class App {
     return Promise.resolve();
   }
 
-  _createServiceConversation(serviceEntity) {
-    amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.BOTS_CONFIRM, {
-      action: () => this.repository.integration.createNewConversation(serviceEntity),
-      data: serviceEntity,
-    });
-  }
-
   /**
    * Get the self user from the backend.
    * @returns {Promise<z.entity.User>} Resolves with the self user entity
@@ -554,15 +547,11 @@ z.main.App = class App {
    * @returns {undefined} Not return value
    */
   _handleUrlParams() {
-    const serviceName = z.util.get_url_parameter(z.auth.URLParameter.BOT_NAME);
-    if (serviceName) {
-      const providerId = z.util.get_url_parameter(z.auth.URLParameter.BOT_PROVIDER);
-      const serviceId = z.util.get_url_parameter(z.auth.URLParameter.BOT_SERVICE);
-      if (providerId && serviceId) {
-        this.logger.info(`Found bot conversation initialization params for '${serviceName}'`);
-        const serviceEntity = new z.integration.ServiceEntity({id: serviceId, name: serviceName, provider: providerId});
-        this._createServiceConversation(serviceEntity);
-      }
+    const providerId = z.util.get_url_parameter(z.auth.URLParameter.BOT_PROVIDER);
+    const serviceId = z.util.get_url_parameter(z.auth.URLParameter.BOT_SERVICE);
+    if (providerId && serviceId) {
+      this.logger.info(`Found bot conversation initialization params '${serviceId}'`);
+      this.repository.integration.addServiceFromParam(providerId, serviceId);
     }
 
     const supportIntegrations = z.util.get_url_parameter(z.auth.URLParameter.INTEGRATIONS);

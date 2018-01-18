@@ -76,6 +76,15 @@ z.integration.IntegrationRepository = class IntegrationRepository {
     });
   }
 
+  addServiceFromParam(providerId, serviceId) {
+    this.getServiceById(providerId, serviceId).then(serviceEntity => {
+      amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.BOTS_CONFIRM, {
+        action: () => this.createNewConversation(serviceEntity),
+        data: serviceEntity.name,
+      });
+    });
+  }
+
   /**
    * Add bot to conversation.
    * @param {z.integration.ServiceEntity} serviceEntity - Information about service to be added

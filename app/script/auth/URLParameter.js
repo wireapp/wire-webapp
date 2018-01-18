@@ -23,7 +23,6 @@ window.z = window.z || {};
 window.z.auth = z.auth || {};
 
 z.auth.URLParameter = {
-  BOT_NAME: 'bot_name',
   BOT_PROVIDER: 'bot_provider',
   BOT_SERVICE: 'bot_service',
   ENVIRONMENT: 'env',
