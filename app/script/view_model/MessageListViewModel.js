@@ -423,8 +423,8 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
     };
 
     const show_bubble = () => {
-      if (wire.app.view.content.participants.confirm_dialog) {
-        wire.app.view.content.participants.confirm_dialog.destroy();
+      if (wire.app.view.content.participants.confirmDialog) {
+        wire.app.view.content.participants.confirmDialog.destroy();
       }
 
       // We clicked on the same bubble

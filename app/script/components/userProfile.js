@@ -110,7 +110,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
     };
 
     // cancel request confirm dialog
-    this.confirm_dialog = undefined;
+    this.confirmDialog = undefined;
 
     // tabs
     this.click_on_tab = index => this.tab_index(index);
@@ -127,8 +127,8 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
 
     // destroy confirm dialog when user changes
     this.cleanup_computed = ko.computed(() => {
-      if (this.user() && this.confirm_dialog) {
-        this.confirm_dialog.destroy();
+      if (this.user() && this.confirmDialog) {
+        this.confirmDialog.destroy();
       }
       this.tab_index(0);
       this.devices_found(null);
@@ -186,7 +186,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
     this.on_cancel_request = () => {
       amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
 
-      this.confirm_dialog = this.element.confirm({
+      this.confirmDialog = this.element.confirm({
         confirm: () => {
           const should_block = this.element.find('.checkbox input').is(':checked');
           if (should_block) {
@@ -371,7 +371,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
   }
 
   click_on_my_fingerprint_button() {
-    this.confirm_dialog = $('#participants').confirm({
+    this.confirmDialog = $('#participants').confirm({
       data: {
         click_on_show_my_devices() {
           amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_DEVICES);

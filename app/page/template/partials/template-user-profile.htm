@@ -6,7 +6,7 @@
       <div class="user-profile-header">
         <div class="name popover-title ellipsis" data-bind="text: user().name(), attr: {'data-uie-uid': user().id, 'data-uie-value': user().name()}" data-uie-name="status-user"></div>
         <div class="username popover-meta label-username" data-bind="text: user().username(), attr: {'data-uie-value': user().name()}" data-uie-name="status-username"></div>
-        <!-- ko if: show_back_button() && $parent.group_mode() -->
+        <!-- ko if: show_back_button() && $parent.groupMode() -->
           <div class="user-profile-back-button button-icon icon-back" data-bind="click: on_close, l10n_tooltip: z.string.tooltip_people_back" data-uie-name="do-back"></div>
         <!-- /ko -->
         <!-- ko if: user().is_verified() -->
