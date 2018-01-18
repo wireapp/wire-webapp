@@ -43,7 +43,9 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   ) {
     this.clickOnAddPeople = this.clickOnAddPeople.bind(this);
     this.clickOnSelectService = this.clickOnSelectService.bind(this);
+    this.clickOnShowService = this.clickOnShowService.bind(this);
     this.clickToAddService = this.clickToAddService.bind(this);
+    this.clickToRemoveService = this.clickToRemoveService.bind(this);
     this.block = this.block.bind(this);
     this.close = this.close.bind(this);
     this.clickOnShowParticipant = this.clickOnShowParticipant.bind(this);
@@ -213,12 +215,14 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   }
 
   clickOnShowService(userEntity) {
+    const {providerId, serviceId} = userEntity;
+
     this.integrationRepository
-      .getServiceById(userEntity.serviceId)
+      .getServiceById(providerId, serviceId)
       .then(serviceEntity => {
         this.selectedService(serviceEntity);
         this.state(ParticipantsViewModel.STATE.SERVICE_DETAILS);
-        return this.integrationRepository.getProviderById(userEntity.providerId);
+        return this.integrationRepository.getProviderById(providerId);
       })
       .then(providerEntity => this.selectedService().providerName(providerEntity.name));
   }
@@ -241,8 +245,8 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.close();
   }
 
-  clickToRemoveService(serviceEntity = this.selectedService()) {
-    this.conversation_repository.removeBot(this.conversation(), serviceEntity.id).then(response => {
+  clickToRemoveService() {
+    this.conversation_repository.removeBot(this.conversation(), this.selectedService()).then(response => {
       if (response) {
         this.reset_view();
       }

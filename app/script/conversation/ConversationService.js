@@ -183,16 +183,14 @@ z.conversation.ConversationService = class ConversationService {
   /**
    * Remove bot from conversation.
    *
-   * @param {string} conversation_id - ID of conversation to remove bot from
-   * @param {string} bot_user_id - ID of bot to be removed from the the conversation
+   * @param {string} conversationId - ID of conversation to remove bot from
+   * @param {string} userId - ID of bot to be removed from the the conversation
    * @returns {Promise} Resolves with the server response
    */
-  delete_bots(conversation_id, bot_user_id) {
+  deleteBots(conversationId, userId) {
     return this.client.send_request({
       type: 'DELETE',
-      url: this.client.create_url(
-        `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversation_id}/bots/${bot_user_id}`
-      ),
+      url: this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/bots/${userId}`),
     });
   }
 

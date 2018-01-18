@@ -1073,7 +1073,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when bot was removed from the conversation
    */
   removeBot(conversationEntity, botUserEntity) {
-    return this.conversation_service.delete_bots(conversationEntity.id, botUserEntity.id).then(response => {
+    return this.conversation_service.deleteBots(conversationEntity.id, botUserEntity.id).then(response => {
       if (response) {
         amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
 
