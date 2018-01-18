@@ -348,10 +348,13 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     }
   }
 
-  showParticipant(userEntity, groupMode = false) {
-    if (userEntity) {
-      this.user_profile(userEntity);
+  showParticipant(participantEntity, groupMode = false) {
+    if (participantEntity) {
       this.group_mode(groupMode);
+      if (participantEntity.isBot) {
+        return this.clickOnShowService(participantEntity);
+      }
+      this.user_profile(participantEntity);
     }
   }
 
