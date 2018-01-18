@@ -48,11 +48,9 @@ z.integration.IntegrationRepository = class IntegrationRepository {
 
     this.supportIntegrations = ko.observable();
     this.enableIntegrations = ko.pureComputed(() => {
-      if (Boolean(this.supportIntegrations())) {
-        return this.supportIntegrations();
-      }
-
-      return this.isTeam() && !z.util.Environment.frontend.is_production();
+      const isBoolean = Boolean(this.supportIntegrations());
+      const isEnabled = isBoolean ? this.supportIntegrations() : !z.util.Environment.frontend.is_production();
+      return this.isTeam() && isEnabled;
     });
   }
 
