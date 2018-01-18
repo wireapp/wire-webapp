@@ -42,14 +42,14 @@ describe('z.lifecycle.LifecycleService', () => {
 
       return Promise.resolve(response);
     };
+  });
 
-    beforeEach(() => {
-      sinon.stub(window, 'fetch');
-    });
+  beforeEach(() => {
+    sinon.stub(window, 'fetch');
+  });
 
-    afterEach(() => {
-      window.fetch.restore();
-    });
+  afterEach(() => {
+    window.fetch.restore();
   });
 
   describe('getVersion', () => {
