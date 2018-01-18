@@ -98,9 +98,6 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
     this.services = ko.observableArray([]);
 
-    this.placeholderParticipant = new z.entity.User();
-    this.placeholderService = new z.integration.ServiceEntity();
-
     ko.computed(() => {
       const conversationEntity = this.conversation();
       const sortedUserEntities = []
@@ -130,8 +127,8 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.confirmDialog = undefined;
 
     // Selected group user
-    this.selectedService = ko.observable(this.placeholderService);
-    this.selectedUser = ko.observable(this.placeholderParticipant);
+    this.selectedService = ko.observable(undefined);
+    this.selectedUser = ko.observable(undefined);
 
     // Switch between div and input field to edit the conversation name
     this.isEditable = ko.pureComputed(() => !this.conversation().removed_from_conversation());
@@ -180,10 +177,8 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
       return z.l10n.text(identifier, shortcut);
     });
 
-    this.showServiceStates = ko.pureComputed(() => {
-      const hasSelectedService = this.selectedService().id !== this.placeholderService.id;
-      return this.activeServiceState() && hasSelectedService;
-    });
+    this.showServiceStates = ko.pureComputed(() => this.activeServiceState() && this.selectedService());
+    this.showUserProfile = ko.pureComputed(() => this.selectedUser() && !this.selectedService());
 
     amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, this.switchContent.bind(this));
     amplify.subscribe(z.event.WebApp.PEOPLE.SHOW, this.showParticipant);
@@ -240,8 +235,8 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
   clickOnServiceBack() {
     this.state(ParticipantsViewModel.STATE.ADD_SERVICE);
-    this.selectedService(this.placeholderService);
-    this.selectedUser(this.placeholderParticipant);
+    this.selectedService(undefined);
+    this.selectedUser(undefined);
     $('.participants-search').addClass('participants-search-show');
   }
 
@@ -409,11 +404,8 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
         this.resetView();
 
         const [userEntity] = this.participants();
-        if (userEntity && this.conversation().is_one2one()) {
-          this.selectedUser(userEntity);
-        } else {
-          this.selectedUser(this.placeholderParticipant);
-        }
+        const initialUser = userEntity && this.conversation().is_one2one() ? userEntity : undefined;
+        this.selectedUser(initialUser);
 
         this.renderParticipants(true);
       }
@@ -466,7 +458,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     if (this.confirmDialog) {
       this.confirmDialog.destroy();
     }
-    this.selectedService(this.placeholderService);
-    this.selectedUser(this.placeholderParticipant);
+    this.selectedService();
+    this.selectedUser();
   }
 };
