@@ -199,15 +199,15 @@ z.conversation.ConversationService = class ConversationService {
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/removeMember
    *
-   * @param {string} conversation_id - ID of conversation to remove member from
-   * @param {string} user_id - ID of member to be removed from the the conversation
+   * @param {string} conversationId - ID of conversation to remove member from
+   * @param {string} userId - ID of member to be removed from the the conversation
    * @returns {Promise} Resolves with the server response
    */
-  delete_members(conversation_id, user_id) {
+  deleteMembers(conversationId, userId) {
     return this.client.send_request({
       type: 'DELETE',
       url: this.client.create_url(
-        `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversation_id}/members/${user_id}`
+        `${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/members/${userId}`
       ),
     });
   }
@@ -215,19 +215,19 @@ z.conversation.ConversationService = class ConversationService {
   /**
    * Add a bot to an existing conversation.
    *
-   * @param {string} conversation_id - ID of conversation to add users to
-   * @param {string} provider_id - ID of bot provider
-   * @param {string} service_id - ID of service provider
+   * @param {string} conversationId - ID of conversation to add users to
+   * @param {string} providerId - ID of bot provider
+   * @param {string} serviceId - ID of service provider
    * @returns {Promise} Resolves with the server response
    */
-  post_bots(conversation_id, provider_id, service_id) {
+  postBots(conversationId, providerId, serviceId) {
     return this.client.send_json({
       data: {
-        provider: provider_id,
-        service: service_id,
+        provider: providerId,
+        service: serviceId,
       },
       type: 'POST',
-      url: this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversation_id}/bots`),
+      url: this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/bots`),
     });
   }
 
@@ -274,17 +274,17 @@ z.conversation.ConversationService = class ConversationService {
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/addMembers
    *
-   * @param {string} conversation_id - ID of conversation to add users to
-   * @param {Array<string>} user_ids - IDs of users to be added to the conversation
+   * @param {string} conversationId - ID of conversation to add users to
+   * @param {Array<string>} userIds - IDs of users to be added to the conversation
    * @returns {Promise} Resolves with the server response
    */
-  post_members(conversation_id, user_ids) {
+  postMembers(conversationId, userIds) {
     return this.client.send_json({
       data: {
-        users: user_ids,
+        users: userIds,
       },
       type: 'POST',
-      url: this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversation_id}/members`),
+      url: this.client.create_url(`${ConversationService.CONFIG.URL_CONVERSATIONS}/${conversationId}/members`),
     });
   }
 

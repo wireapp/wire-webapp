@@ -45,6 +45,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.clickOnSelectService = this.clickOnSelectService.bind(this);
     this.clickOnShowService = this.clickOnShowService.bind(this);
     this.clickToAddService = this.clickToAddService.bind(this);
+    this.clickToRemoveMember = this.clickToRemoveMember.bind(this);
     this.clickToRemoveService = this.clickToRemoveService.bind(this);
     this.block = this.block.bind(this);
     this.close = this.close.bind(this);
@@ -53,7 +54,6 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.leave_conversation = this.leave_conversation.bind(this);
     this.on_search_close = this.on_search_close.bind(this);
     this.pending = this.pending.bind(this);
-    this.remove = this.remove.bind(this);
     this.show_participant = this.show_participant.bind(this);
     this.unblock = this.unblock.bind(this);
 
@@ -215,6 +215,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   }
 
   clickOnShowService(userEntity) {
+    this.user_profile(userEntity);
     const {providerId, serviceId} = userEntity;
 
     this.integrationRepository
@@ -235,6 +236,8 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
   clickOnServiceBack() {
     this.state(ParticipantsViewModel.STATE.ADD_SERVICE);
+    this.selectedService(this.placeholderService);
+    this.user_profile(this.placeholderParticipant);
     $('.participants-search').addClass('participants-search-show');
   }
 
@@ -246,7 +249,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   }
 
   clickToRemoveService() {
-    this.conversation_repository.removeBot(this.conversation(), this.selectedService()).then(response => {
+    this.conversation_repository.removeBot(this.conversation(), this.user_profile()).then(response => {
       if (response) {
         this.reset_view();
       }
@@ -389,19 +392,19 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.reset_view();
   }
 
-  remove(user_et) {
+  clickToRemoveMember(userEntity) {
     amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
 
     this.confirm_dialog = $('#participants').confirm({
       confirm: () => {
-        this.conversation_repository.remove_participant(this.conversation(), user_et).then(response => {
+        this.conversation_repository.removeMember(this.conversation(), userEntity).then(response => {
           if (response) {
             this.reset_view();
           }
         });
       },
       data: {
-        user: user_et,
+        user: userEntity,
       },
       template: '#template-confirm-remove',
     });
