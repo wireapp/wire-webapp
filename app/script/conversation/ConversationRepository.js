@@ -941,22 +941,19 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {Conversation} conversationEntity - Conversation to add bot to
    * @param {string} providerId - ID of bot provider
    * @param {string} serviceId - ID of service provider
-   * @param {string} method - Method used to add service
    * @returns {Promise} Resolves when bot was added
    */
-  addBot(conversationEntity, providerId, serviceId, method) {
+  addBot(conversationEntity, providerId, serviceId) {
     return this.conversation_service
       .postBots(conversationEntity.id, providerId, serviceId)
       .then(response => {
-        if (response && response.event) {
+        const event = response && response.event ? response.event : undefined;
+        if (event) {
           amplify.publish(z.event.WebApp.EVENT.INJECT, response.event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
           this.logger.debug(`Successfully added bot to conversation '${conversationEntity.display_name()}'`, response);
-
-          const attributes = {method: method, service_id: serviceId};
-          amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.INTEGRATION.ADDED_SERVICE, attributes);
         }
 
-        return conversationEntity;
+        return event;
       })
       .catch(error => this._handleAddToConversationError(error, conversationEntity, [serviceId]));
   }
@@ -1068,13 +1065,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Remove bot from conversation.
    *
-   * @param {Conversation} conversationEntity - Conversation to remove member from
-   * @param {z.entity.User} userEntity - Bot user to be removed from the conversation
+   * @param {Conversation} conversationEntity - Conversation to remove bot from
+   * @param {z.entity.User} userId - ID of bot user to be removed from the conversation
    * @returns {Promise} Resolves when bot was removed from the conversation
    */
-  removeBot(conversationEntity, userEntity) {
-    const {id: userId, serviceId} = userEntity;
-
+  removeBot(conversationEntity, userId) {
     return this.conversation_service.deleteBots(conversationEntity.id, userId).then(response => {
       const hasResponse = response && response.event;
       const event = hasResponse
@@ -1082,9 +1077,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
         : z.conversation.EventBuilder.build_member_leave(conversationEntity, userId, this.time_offset);
 
       amplify.publish(z.event.WebApp.EVENT.INJECT, event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
-
-      const attributes = {service_id: serviceId};
-      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.INTEGRATION.REMOVED_SERVICE, attributes);
       return event;
     });
   }

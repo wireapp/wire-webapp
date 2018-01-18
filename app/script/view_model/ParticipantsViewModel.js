@@ -240,14 +240,12 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   }
 
   clickToAddService(serviceEntity = this.selectedService()) {
-    const {id, name, providerId} = serviceEntity;
-    this.logger.info(`Adding service '${name}' to conversation '${this.conversation().id}'`, serviceEntity);
-    this.conversation_repository.addBot(this.conversation(), providerId, id, 'conversation_details');
+    this.integrationRepository.addService(this.conversation(), serviceEntity, 'conversation_details');
     this.close();
   }
 
   clickToRemoveService() {
-    this.conversation_repository.removeBot(this.conversation(), this.user_profile()).then(response => {
+    this.integrationRepository.removeService(this.conversation(), this.user_profile()).then(response => {
       if (response) {
         this.reset_view();
       }

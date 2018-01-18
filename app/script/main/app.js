@@ -525,10 +525,10 @@ z.main.App = class App {
     return Promise.resolve();
   }
 
-  _createServiceConversation(serviceInfo) {
+  _createServiceConversation(serviceEntity) {
     amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.BOTS_CONFIRM, {
-      action: () => this.repository.integration.addService(serviceInfo),
-      data: serviceInfo,
+      action: () => this.repository.integration.createNewConversation(serviceEntity),
+      data: serviceEntity,
     });
   }
 
@@ -559,8 +559,9 @@ z.main.App = class App {
       const providerId = z.util.get_url_parameter(z.auth.URLParameter.BOT_PROVIDER);
       const serviceId = z.util.get_url_parameter(z.auth.URLParameter.BOT_SERVICE);
       if (providerId && serviceId) {
-        this.logger.info(`Found bot token '${serviceName}'`);
-        this._createServiceConversation({name: serviceName, providerId, serviceId});
+        this.logger.info(`Found bot conversation initialization params for '${serviceName}'`);
+        const serviceEntity = new z.integration.ServiceEntity({id: serviceId, name: serviceName, provider: providerId});
+        this._createServiceConversation(serviceEntity);
       }
     }
 

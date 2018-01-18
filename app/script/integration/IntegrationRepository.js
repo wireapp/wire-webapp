@@ -55,26 +55,38 @@ z.integration.IntegrationRepository = class IntegrationRepository {
   }
 
   /**
+   * Add a bot to an existing conversation.
+   *
+   * @param {Conversation} conversationEntity - Conversation to add bot to
+   * @param {z.integration.ServiceEntity} serviceEntity - Service to be added to conversation
+   * @param {string} method - Method used to add service
+   * @returns {Promise} Resolves when bot was added
+   */
+  addService(conversationEntity, serviceEntity, method) {
+    const {id: serviceId, name, providerId} = serviceEntity;
+    this.logger.info(`Adding service '${name}' to conversation '${conversationEntity.id}'`, serviceEntity);
+
+    return this.conversationRepository.addBot(conversationEntity, providerId, serviceId).then(event => {
+      if (event) {
+        const attributes = {method: method, service_id: serviceId, service_name: name.toLowerCase()};
+        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.INTEGRATION.ADDED_SERVICE, attributes);
+      }
+
+      return event;
+    });
+  }
+
+  /**
    * Add bot to conversation.
-   * @param {Object} serviceInfo - Integration token
-   * @option {string} name - Service name registered on backend (will be used as conversation name)
-   * @option {string} providerId - Provider UUID
-   * @option {string} serviceId - Service UUID
-   * @param {boolean} [createConversation=true] - A new conversation is created if true otherwise bot is added to active conversation
+   * @param {z.integration.ServiceEntity} serviceEntity - Information about service to be added
    * @returns {Promise} Resolves when integration was added to conversation
    */
-  addService({name, providerId, serviceId}, createConversation = true) {
-    this.logger.info(`Adding integration service '${name}'`, {name, providerId, serviceId});
+  createNewConversation(serviceEntity) {
     return Promise.resolve()
-      .then(() => {
-        if (createConversation) {
-          return this.conversationRepository.create_new_conversation([], name);
-        }
-        return this.conversationRepository.active_conversation();
-      })
+      .then(() => this.conversationRepository.create_new_conversation([], serviceEntity.name))
       .then(conversationEntity => {
         if (conversationEntity) {
-          return this.conversationRepository.addBot(conversationEntity, providerId, serviceId, 'url_param');
+          return this.addService(conversationEntity, serviceEntity, 'url_param');
         }
       })
       .then(conversationEntity => {
@@ -121,6 +133,25 @@ z.integration.IntegrationRepository = class IntegrationRepository {
         return z.integration.IntegrationMapper.mapServicesFromArray(services);
       }
       return [];
+    });
+  }
+
+  /**
+   * Remove service from conversation.
+   *
+   * @param {Conversation} conversationEntity - Conversation to remove service from
+   * @param {z.entity.User} userEntity - Bot user to be removed from the conversation
+   * @returns {Promise} Resolves when bot was removed from the conversation
+   */
+  removeService(conversationEntity, userEntity) {
+    const {id: userId, serviceId} = userEntity;
+
+    return this.conversationRepository.removeBot(conversationEntity, userId).then(event => {
+      if (event) {
+        const attributes = {service_id: serviceId};
+        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.INTEGRATION.REMOVED_SERVICE, attributes);
+        return event;
+      }
     });
   }
 
