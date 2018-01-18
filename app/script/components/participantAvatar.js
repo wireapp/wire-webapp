@@ -78,13 +78,13 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
       this.cssClasses = ko.pureComputed(() => {
         return `accent-color-${this.participant.accent_id()} ${this.state()}`;
       });
-
-      this.onClick = (data, event) => {
-        if (typeof params.click === 'function') {
-          params.click(data.user, event.currentTarget.parentNode);
-        }
-      };
     }
+
+    this.onClick = (data, event) => {
+      if (typeof params.click === 'function') {
+        params.click(data.user, event.currentTarget.parentNode);
+      }
+    };
 
     this.onInViewport = () => {
       this.avatarEnteredViewport = true;
