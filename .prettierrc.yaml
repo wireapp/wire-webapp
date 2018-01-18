@@ -11,12 +11,9 @@ trailingComma: es5
 useTabs: false
 
 overrides:
-- files: "*.json"
-  options:
-    printWidth: 200
-- files: "app/script/localization/webapp.js"
-  options:
-    printWidth: 200
-- files: "app/script/localization/translations/*.js"
+- files:
+    - "*.json"
+    - "app/script/localization/webapp.js"
+    - "app/script/localization/translations/*.js"
   options:
     printWidth: 200
