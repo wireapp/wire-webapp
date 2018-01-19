@@ -235,7 +235,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this._close_list();
   }
 
-  click_on_member_invite() {
+  clickOnMemberInvite() {
     z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.TEAM_SETTINGS, z.config.URL_PATH.MANAGE_TEAM));
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
   }
