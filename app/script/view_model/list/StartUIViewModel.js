@@ -174,7 +174,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
         !this.show_contacts() &&
         !this.show_search_results()
     );
-    this.show_no_search_results = ko.pureComputed(() => {
+    this.showNoSearchResults = ko.pureComputed(() => {
       return (
         !this.show_matches() && this.show_search_results() && !this.has_search_results() && this.search_input().length
       );
