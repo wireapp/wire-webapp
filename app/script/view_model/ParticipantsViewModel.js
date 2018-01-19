@@ -224,6 +224,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   }
 
   clickOnSelectService(serviceEntity) {
+    this.groupMode(true);
     this.selectedService(serviceEntity);
     this.state(ParticipantsViewModel.STATE.SERVICE_CONFIRMATION);
 
@@ -290,7 +291,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
   clickToAddService(serviceEntity = this.selectedService()) {
     this.integrationRepository.addService(this.conversation(), serviceEntity, 'conversation_details');
-    this.close();
+    this.clickOnClose();
   }
 
   clickToBlock(userEntity) {
