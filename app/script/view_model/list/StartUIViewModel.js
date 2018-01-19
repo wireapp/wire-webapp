@@ -361,6 +361,11 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
   }
 
   _close_list() {
+    $('user-input input').blur();
+
+    amplify.publish(z.event.WebApp.SEARCH.HIDE);
+    this.list_view_model.switch_list(z.ViewModel.list.LIST_STATE.CONVERSATIONS);
+
     if (this.user_bubble) {
       this.user_bubble.hide();
     }
@@ -374,10 +379,6 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
     this.selected_people.removeAll();
     this.search_input('');
-    $('user-input input').blur();
-
-    amplify.publish(z.event.WebApp.SEARCH.HIDE);
-    this.list_view_model.switch_list(z.ViewModel.list.LIST_STATE.CONVERSATIONS);
   }
 
   //##############################################################################
