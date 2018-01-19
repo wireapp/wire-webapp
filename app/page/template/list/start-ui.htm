@@ -46,10 +46,10 @@
           <!-- /ko  -->
           <!-- ko if: show_contacts() -->
             <div class="start-ui-list-contacts" data-uie-name="status-contacts">
-              <!-- ko if: is_team() -->
+              <!-- ko if: isTeam() -->
                 <span class="start-ui-list-header start-ui-list-header-contacts" data-bind="l10n_text: z.string.search_contacts"></span>
               <!-- /ko  -->
-              <!-- ko ifnot: is_team() -->
+              <!-- ko ifnot: isTeam() -->
                 <span class="start-ui-list-header" data-bind="l10n_text: z.string.search_connections"></span>
               <!-- /ko  -->
               <user-list class="search-list-theme-black" params="user: contacts, selected: selected_people"></user-list>
@@ -60,19 +60,19 @@
         <!-- ko if: show_search_results() -->
           <div class="start-ui-list-search-results">
             <div class="contacts" data-bind="visible: search_results.contacts().length > 0">
-              <!-- ko if: is_team() -->
+              <!-- ko if: isTeam() -->
                 <span class="start-ui-list-header start-ui-list-header-contacts" data-bind="l10n_text: z.string.search_contacts"></span>
               <!-- /ko  -->
-              <!-- ko ifnot: is_team() -->
+              <!-- ko ifnot: isTeam() -->
                 <span class="start-ui-list-header start-ui-list-header-connections" data-bind="l10n_text: z.string.search_connections"></span>
               <!-- /ko  -->
               <user-list class="search-list-theme-black" params="user: search_results.contacts, selected: selected_people"></user-list>
             </div>
             <div class="start-ui-groups" data-bind="visible: search_results.groups().length > 0">
-              <!-- ko if: is_team() -->
+              <!-- ko if: isTeam() -->
                 <span class="start-ui-list-header" data-bind="l10n_text: z.string.search_team_groups"></span>
               <!-- /ko  -->
-              <!-- ko ifnot: is_team() -->
+              <!-- ko ifnot: isTeam() -->
                 <span class="start-ui-list-header" data-bind="l10n_text: z.string.search_groups"></span>
               <!-- /ko  -->
               <group-list params="groups: search_results.groups, click: click_on_group"></group-list>
