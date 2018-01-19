@@ -257,7 +257,6 @@ z.string.cs.conversations_connection_request_one = '1 čekající osoba';
 z.string.cs.conversations_empty_conversation = 'Skupinová konverzace';
 z.string.cs.conversations_empty_conversation_description = 'Všichni opustili konverzaci';
 z.string.cs.conversations_no_conversations = 'Zatím žádné konverzace';
-z.string.cs.conversations_no_conversations_detail = 'Zahájit konverzaci nebo vytvořte skupinu.';
 z.string.cs.conversations_popover_archive = 'Archivovat';
 z.string.cs.conversations_popover_block = 'Blokovat';
 z.string.cs.conversations_popover_cancel = 'Zrušit žádost';

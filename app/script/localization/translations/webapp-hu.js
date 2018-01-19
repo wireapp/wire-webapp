@@ -259,7 +259,6 @@ z.string.hu.conversations_connection_request_one = '1 partner várakozik';
 z.string.hu.conversations_empty_conversation = 'Csoportos beszélgetés';
 z.string.hu.conversations_empty_conversation_description = 'Mindenki elhagyta a beszélgetést';
 z.string.hu.conversations_no_conversations = 'Még nincsenek beszélgetések';
-z.string.hu.conversations_no_conversations_detail = 'Indíts egy beszélgetést vagy hozz létre egy csoportot.';
 z.string.hu.conversations_popover_archive = 'Archiválás';
 z.string.hu.conversations_popover_block = 'Tiltás';
 z.string.hu.conversations_popover_cancel = 'Kérelem visszavonása';
