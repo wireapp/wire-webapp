@@ -25,8 +25,8 @@ window.z.components = z.components || {};
 z.components.ParticipantAvatar = class ParticipantAvatar {
   constructor(params, componentInfo) {
     this.participant = ko.unwrap(params.participant);
-    this.isUser = this.participant instanceof z.entity.User && !this.participant.isBot;
     this.isService = this.participant instanceof z.integration.ServiceEntity || this.participant.isBot;
+    this.isUser = this.participant instanceof z.entity.User && !this.participant.isBot;
 
     const avatarType = `${this.isUser ? 'user' : 'service'}-avatar`;
     this.delay = params.delay;
@@ -131,14 +131,20 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
 ko.components.register('participant-avatar', {
   template: `
     <div class="participant-avatar" data-bind="attr: {title: participant.name}, css: cssClasses(), click: onClick, in_viewport: onInViewport, delay: delay">
-      <div class="avatar-initials" data-bind="text: initials"></div>
-      <div class="avatar-service-placeholder">
-          <svg width="32" height="32" viewBox="0 0 32 32">
-            <path d="M10.5 12A6.5 6.5 0 0 0 4 18.5V24a1 1 0 0 0 1 1h22a1 1 0 0 0 1-1v-5.5a6.5 6.5 0 0 0-6.5-6.5h-11zm-7.12-1.22L.24 4.95a2 2 0 1 1 3.52-1.9L6.8 8.68C7.94 8.24 9.19 8 10.5 8h11C27.3 8 32 12.7 32 18.5V24a5 5 0 0 1-5 5H5a5 5 0 0 1-5-5v-5.5c0-3.05 1.3-5.8 3.38-7.72zM11 19a2 2 0 1 1-4 0 2 2 0 0 1 4 0m7 0a2 2 0 1 1-4 0 2 2 0 0 1 4 0m5 2a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm5.26-9.55a2 2 0 0 1-3.52-1.9l3.5-6.5a2 2 0 0 1 3.52 1.9l-3.5 6.5z"/>
-          </svg>
-      </div>
+      <!-- ko if: isUser() -->
+        <div class="avatar-initials" data-bind="text: initials"></div>
+      <!-- /ko -->
+      <!-- ko if: isService() -->
+        <div class="avatar-service-placeholder">
+            <svg width="32" height="32" viewBox="0 0 32 32">
+              <path d="M10.5 12A6.5 6.5 0 0 0 4 18.5V24a1 1 0 0 0 1 1h22a1 1 0 0 0 1-1v-5.5a6.5 6.5 0 0 0-6.5-6.5h-11zm-7.12-1.22L.24 4.95a2 2 0 1 1 3.52-1.9L6.8 8.68C7.94 8.24 9.19 8 10.5 8h11C27.3 8 32 12.7 32 18.5V24a5 5 0 0 1-5 5H5a5 5 0 0 1-5-5v-5.5c0-3.05 1.3-5.8 3.38-7.72zM11 19a2 2 0 1 1-4 0 2 2 0 0 1 4 0m7 0a2 2 0 1 1-4 0 2 2 0 0 1 4 0m5 2a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm5.26-9.55a2 2 0 0 1-3.52-1.9l3.5-6.5a2 2 0 0 1 3.52 1.9l-3.5 6.5z"/>
+            </svg>
+        </div>
+      <!-- /ko -->
       <div class="avatar-image"></div>
-      <div class="avatar-badge"></div>
+      <!-- ko if: isUser() -->
+        <div class="avatar-badge"></div>
+      <!-- /ko -->
       <div class="avatar-border"></div>
     </div>
     `,
