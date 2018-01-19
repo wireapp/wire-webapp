@@ -249,7 +249,6 @@ z.string.sl.conversations_connection_request_one = '1 oseba čaka';
 z.string.sl.conversations_empty_conversation = 'Skupinski pogovor';
 z.string.sl.conversations_empty_conversation_description = 'Vsi so zapustili pogovor';
 z.string.sl.conversations_no_conversations = 'Še ni pogovorov';
-z.string.sl.conversations_no_conversations_detail = 'Pogovor zaènete ali ustvarite skupino.';
 z.string.sl.conversations_popover_archive = 'Arhiviraj';
 z.string.sl.conversations_popover_block = 'Blokiraj';
 z.string.sl.conversations_popover_cancel = 'Prekliči prošnjo';

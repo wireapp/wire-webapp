@@ -259,7 +259,6 @@ z.string.fr.conversations_connection_request_one = '1 personne en attente';
 z.string.fr.conversations_empty_conversation = 'Conversation de groupe';
 z.string.fr.conversations_empty_conversation_description = 'Tout le monde est parti';
 z.string.fr.conversations_no_conversations = 'Pas encore de conversation';
-z.string.fr.conversations_no_conversations_detail = 'Commencez une conversation ou créez un groupe.';
 z.string.fr.conversations_popover_archive = 'Archiver';
 z.string.fr.conversations_popover_block = 'Bloquer';
 z.string.fr.conversations_popover_cancel = 'Annuler la demande';
