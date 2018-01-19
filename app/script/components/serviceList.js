@@ -67,7 +67,7 @@ ko.components.register('service-list', {
         <!-- /ko -->
       </div>
     </div>
-    <!-- ko if: services.length < 1 -->
+    <!-- ko ifnot: services().length -->
       <div class="no-results" data-bind="l10n_text: z.string.people_no_matches"></div>
     <!-- /ko -->
   `,

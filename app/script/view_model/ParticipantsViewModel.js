@@ -121,7 +121,11 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     });
 
     this.enableIntegrations = this.integrationRepository.enableIntegrations;
-    this.showIntegrations = ko.pureComputed(() => this.enableIntegrations());
+    this.showIntegrations = ko.pureComputed(() => {
+      const hasBotUser = this.conversation().firstUserEntity() && this.conversation().firstUserEntity().isBot;
+      const allowIntegrations = this.conversation().is_group() || hasBotUser;
+      return this.enableIntegrations() && allowIntegrations;
+    });
 
     // Confirm dialog reference
     this.confirmDialog = undefined;
@@ -287,7 +291,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
   clickToAddService(serviceEntity = this.selectedService()) {
     this.integrationRepository.addService(this.conversation(), serviceEntity, 'conversation_details');
-    this.close();
+    this.resetView();
   }
 
   clickToBlock(userEntity) {
