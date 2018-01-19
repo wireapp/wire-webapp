@@ -48,7 +48,7 @@ ko.components.register('service-list', {
       <div class="search-list-item" data-uie-name="item-service" data-bind="click: $parent.onClick">
         <!-- ko ifnot: $parent.mode === z.components.ServiceListMode.COMPACT -->
           <div class="search-list-item-image">
-            <service-avatar class="service-avatar-sm" params="service: $data"></service-avatar>
+            <participant-avatar params="participant: $data, size: 'sm'"></participant-avatar>
           </div>
           <div class="search-list-item-content">
             <div class="search-list-item-content-name" data-uie-name="status-content-name" data-bind="text: name"></div>
@@ -59,7 +59,7 @@ ko.components.register('service-list', {
         <!-- /ko -->
         <!-- ko if: $parent.mode === z.components.ServiceListMode.COMPACT -->
           <div class="search-list-item-image">
-            <service-avatar class="service-avatar-md" params="service: $data"></service-avatar>
+            <participant-avatar params="participant: $data, size: 'md'"></participant-avatar>
           </div>
           <div class="search-list-item-content">
             <div class="search-list-item-content-name" data-bind="text: name"></div>

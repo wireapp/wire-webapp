@@ -9,7 +9,7 @@
   <!-- ko if: conversation_et() && !conversation_et().connection().is_outgoing_request() -->
     <div class="controls-left">
       <!-- ko if: input().length > 0 -->
-        <user-avatar class="user-avatar-xs cursor-default" params="user: self()"></user-avatar>
+        <participant-avatar class="cursor-default" params="participant: self(), size: 'xs'"></participant-avatar>
       <!-- /ko -->
     </div>
 

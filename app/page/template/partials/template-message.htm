@@ -58,7 +58,7 @@
 <script type="text/html" id="delete">
   <div class="message-header">
     <div class="message-header-icon">
-      <user-avatar class="sender-avatar user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: message.user(), click: $parent.on_message_user_click"></user-avatar>
+      <participant-avatar class="sender-avatar" data-bubble="#participants-bubble" data-placement="vertical" params="participant: message.user(), click: $parent.on_message_user_click, size: 'xs'"></participant-avatar>
     </div>
     <div class="message-header-label">
       <span class="message-header-label-sender" data-bind='text: message.sender_name()'></span>
@@ -181,10 +181,9 @@
       <!-- ko if: message.show_likes() -->
         <div class="message-footer-bottom" data-uie-name="message-liked-avatars">
           <!-- ko foreach: message.reactions_user_ets() -->
-            <user-avatar class="user-avatar-xs"
-                         data-bubble="#participants-bubble"
+            <participant-avatar data-bubble="#participants-bubble"
                          data-placement="vertical"
-                         params="user: $data, click: $parents[1].on_message_user_click"></user-avatar>
+                         params="participant: $data, click: $parents[1].on_message_user_click, size: 'xs'"></participant-avatar>
           <!-- /ko -->
           <span class="message-footer-close-button icon-close" data-bind="click: function() { $data.show_likes(false) }"></span>
         </div>
@@ -214,9 +213,9 @@
     <div class="message-connected">
       <span class="message-connected-header" data-bind='text: other_user().name()'></span>
       <span class="message-connected-username label-username" data-bind='text: other_user().username()'></span>
-      <user-avatar class="message-connected-avatar user-avatar-lg user-avatar-no-badge cursor-default"
-                   data-bind="css: {'user-avatar-no-badge': other_user().is_outgoing_request()}"
-                   params="user: other_user()"></user-avatar>
+      <participant-avatar class="message-connected-avatar avatar-no-badge cursor-default"
+                   data-bind="css: {'avatar-no-badge': other_user().is_outgoing_request()}"
+                   params="participant: other_user(), size: 'lg'"></participant-avatar>
       <!-- ko if: other_user().is_outgoing_request() -->
         <div class="message-connected-cancel text-theme"
              data-bind="click: $parent.click_on_cancel_request,
@@ -246,17 +245,16 @@
     <div class="message-body">
       <!-- ko foreach: remote_user_ets -->
         <!-- ko if: message.is_conversation_initialization() -->
-          <user-avatar class="user-avatar-sm user-avatar-no-border"
+          <participant-avatar class="avatar-no-border"
                        data-bubble="#participants-bubble"
                        data-placement="vertical"
-                       params="user: $data, click: $parents[1].on_message_user_click"></user-avatar>
+                       params="participant: $data, click: $parents[1].on_message_user_click, size: 'sm'"></participant-avatar>
         <!-- /ko -->
         <!-- ko if: message.is_member_join() || message.is_member_leave() -->
-          <user-avatar class="user-avatar-xs"
-                       data-bind="css: {'translucent': message.is_member_leave()}"
+          <participant-avatar data-bind="css: {'translucent': message.is_member_leave()}"
                        data-bubble="#participants-bubble"
                        data-placement="vertical"
-                       params="user: $data, click: $parents[1].on_message_user_click"></user-avatar>
+                       params="participant: $data, click: $parents[1].on_message_user_click, size: 'xs'"></participant-avatar>
         <!-- /ko -->
       <!-- /ko -->
     </div>

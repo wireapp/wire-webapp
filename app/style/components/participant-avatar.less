@@ -17,17 +17,226 @@
  *
  */
 
-.participant-avatar-loading-transition {
-  .user-avatar-image,
-  .service-avatar-image {
-    transition: all @animation-timing-slow @ease-out-quart @animation-timing-faster;
+.avatar-size(@size) {
+  @diameter: 'avatar-diameter-@{size}';
+  @initials: 'avatar-initials-@{size}';
+  .square(@@diameter);
+  .avatar-initials {
+    font-size: @@initials;
+    line-height: @@diameter;
   }
 }
 
-.participant-avatar-image-loaded {
-  .user-avatar-image,
-  .service-avatar-image {
-    transform: scale(1);
-    opacity: 1;
+participant-avatar {
+  position: relative;
+  display: inline-block;
+  transform: translateZ(0);
+  user-select: none;
+  cursor: pointer;
+  overflow: hidden;
+
+  &.avatar-no-border {
+    .avatar-border {
+      display: none;
+    }
+  }
+
+  &.avatar-no-badge {
+    .avatar-badge {
+      display: none;
+    }
+  }
+
+  &.avatar-no-filter {
+    .avatar-image {
+      filter: none !important;
+    }
+  }
+
+  .avatar-border {
+    border: 1px solid fade(#000, 8%);
+  }
+
+  .participant-avatar {
+    height: 100%;
+    background-color: currentColor;
+    & > div {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+    }
+
+    &.pending,
+    &.blocked,
+    &.unknown,
+    &.ignored {
+      .avatar-image {
+        filter: grayscale(100%);
+      }
+      .avatar-border {
+        display: none;
+      }
+    }
+
+    &.selected,
+    &.pending,
+    &.blocked {
+      .avatar-badge {
+        background-color: fade(#000, 56%);
+      }
+    }
+
+    &.selected {
+      .avatar-badge::before {
+        .icon-mixin('\e102', @icon-size-sm); // icon-check
+      }
+    }
+
+    &.pending {
+      .avatar-badge::before {
+        .icon-mixin('\e165', @icon-size-sm); // icon-pending
+      }
+    }
+
+    &.blocked {
+      .avatar-badge::before {
+        .icon-mixin('\e104', @icon-size-sm); // icon-block
+      }
+    }
+
+    &.camera {
+      .avatar-badge::before {
+        .icon-mixin('\e143', @icon-size-lg); // icon-camera
+      }
+    }
+
+    &.unknown {
+      background-color: @w-gray;
+    }
+  }
+
+  &.avatar-lg {
+    .avatar-size(lg);
+  }
+
+  &.avatar-md {
+    .avatar-size(md);
+  }
+
+  &.avatar-sm {
+    .avatar-size(sm);
+  }
+
+  &.avatar-s {
+    .avatar-size(s);
+  }
+
+  &.avatar-xs {
+    .avatar-size(xs);
+  }
+
+  &.avatar-xss {
+    .avatar-size(xxs);
+  }
+
+  &.avatar-md,
+  &.avatar-sm {
+    .avatar-border {
+      display: none;
+    }
+  }
+
+  &.avatar-s,
+  &.avatar-xs,
+  &.avatar-xss {
+    .avatar-image {
+      .no-transition();
+    }
+    .avatar-badge {
+      display: none;
+    }
+  }
+
+  .avatar-badge {
+    .flex-center;
+    color: #fff;
+  }
+
+  .avatar-initials {
+    .text-center;
+    user-select: none;
+    color: #fff;
+  }
+
+  .avatar-image {
+    transform: scale(0.88);
+    opacity: 0;
+    > img {
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  &.avatar-loading-transition {
+    .avatar-initials {
+      transition: opacity @animation-timing-faster @ease-in-quart;
+    }
+    .avatar-image {
+      transition: all @animation-timing-slow @ease-out-quart @animation-timing-faster;
+    }
+  }
+  &.avatar-image-loaded {
+    .avatar-initials {
+      opacity: 0;
+    }
+    .avatar-image {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+  .avatar-service-placeholder {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    & > svg {
+      width: 60%;
+      & > path {
+        fill: fade(@graphite-dark, 20%);
+      }
+    }
+  }
+
+  &.service-avatar {
+    &,
+    .avatar-border {
+      border-radius: 15%;
+    }
+    .avatar-bagde,
+    .avatar-initials {
+      display: none;
+    }
+  }
+
+  &.user-avatar {
+    &,
+    .avatar-border {
+      border-radius: 50%;
+    }
+    .avatar-service-placeholder {
+      display: none;
+    }
+  }
+}
+
+.avatar-halo {
+  .flex-center;
+  .square(36px);
+  &.avatar-halo-active {
+    .accent-border-color;
+    border-width: 2px;
+    border-style: solid;
+    border-radius: 50%;
   }
 }

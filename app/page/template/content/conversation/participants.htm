@@ -31,7 +31,7 @@
                   <span class="label-xs" data-bind="l10n_text: z.string.people_services"></span>
                   <hr>
                 </div>
-                <service-list data-uie-name="list-services" params="services: serviceParticipants, click: clickOnShowService, mode: z.components.ServiceListMode.COMPACT"></service-list>
+                <service-list data-uie-name="list-services" params="services: serviceParticipants, click: clickOnShowMember, mode: z.components.ServiceListMode.COMPACT"></service-list>
               <!-- /ko -->
             <!-- /ko -->
           </div>
@@ -114,7 +114,7 @@
         <!-- /ko -->
         <div class="service-confirmation-body">
           <div class="service-confirmation-summary">
-            <service-avatar class="service-avatar-md" params="service: selectedService"></service-avatar>
+            <participant-avatar params="participant: selectedService, size: 'md'"></participant-avatar>
             <div class="service-confirmation-summary-text">
               <div data-uie-name="status-service-name" class="service-confirmation-name" data-bind="text: selectedService().name"></div>
               <div data-uie-name="status-service-provider" class="service-confirmation-provider" data-bind="text: selectedService().providerName()"></div>

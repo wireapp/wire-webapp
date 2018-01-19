@@ -133,7 +133,7 @@ ko.components.register('full-search', {
     <div class="full-search-list" data-uie-name="full-search-list" data-bind="foreach: {data: message_ets_rendered}">
       <div class="full-search-item" data-uie-name="full-search-item" data-bind="click: $parent.on_message_click">
         <div class="full-search-item-avatar">
-          <user-avatar class="user-avatar-xs" params="user: user()"></user-avatar>
+          <participant-avatar params="participant: user(), size: 'xs'"></participant-avatar>
         </div>
         <div class="full-search-item-content">
           <div class="full-search-item-content-text ellipsis" data-uie-name="full-search-item-text" data-bind="html: $parent.transform_text($data)"></div>
