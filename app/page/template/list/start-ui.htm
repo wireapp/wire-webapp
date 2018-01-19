@@ -10,28 +10,28 @@
                 data-uie-name="enter-search">
     </user-input>
     <div class="start-ui-header-actions clear" data-bind="css: {'start-ui-header-actions-visible': selected_people().length > 0}">
-        <!-- ko if: selected_people().length === 1 -->
-          <div class="button button-small button-fluid pull-left" data-bind="click: on_submit_search, l10n_text: z.string.search_open" data-uie-name="do-open"></div>
-        <!-- /ko -->
-        <!-- ko if: selected_people().length > 1 -->
-          <div class="button button-small button-fluid pull-left" data-bind="click: on_submit_search, l10n_text: z.string.search_open_group" data-uie-name="do-add-create"></div>
-        <!-- /ko -->
-        <!-- ko if: selected_people().length >= 1 -->
-          <div class="start-ui-header-actions-last button-round button-round-theme icon-call pull-right" data-bind="click: on_audio_call" data-uie-name="do-audio-call"></div>
-        <!-- /ko -->
-        <!-- ko if: selected_people().length === 1 -->
-          <div class="start-ui-header-actions-last button-round button-round-theme icon-video pull-right" data-bind="click: on_video_call" data-uie-name="do-video-call"></div>
-          <label class="start-ui-header-actions-last button-round button-round-theme icon-library pull-right" data-uie-name="do-photo">
-            <input data-bind="file_select: on_photo" type="file" multiple="multiple" accept=".jpg-large, image/jpeg, image/png, image/bmp, image/gif" />
-          </label>
-        <!-- /ko -->
-      </div>
-      <!-- ko if: enableIntegrations() -->
-        <div class="start-ui-list-tabs">
-          <div class="start-ui-list-tab" data-bind="click: function() { clickOnTab(0) }, css: {'active' : peopleTabActive()}, l10n_text: z.string.search_people"></div>
-          <div class="start-ui-list-tab" data-bind="click: function() { clickOnTab(1) }, css: {'active' : !peopleTabActive()}, l10n_text: z.string.search_services"></div>
-        </div>
+      <!-- ko if: selected_people().length === 1 -->
+        <div class="button button-small button-fluid pull-left" data-bind="click: on_submit_search, l10n_text: z.string.search_open" data-uie-name="do-open"></div>
       <!-- /ko -->
+      <!-- ko if: selected_people().length > 1 -->
+        <div class="button button-small button-fluid pull-left" data-bind="click: on_submit_search, l10n_text: z.string.search_open_group" data-uie-name="do-add-create"></div>
+      <!-- /ko -->
+      <!-- ko if: selected_people().length >= 1 -->
+        <div class="start-ui-header-actions-last button-round button-round-theme icon-call pull-right" data-bind="click: on_audio_call" data-uie-name="do-audio-call"></div>
+      <!-- /ko -->
+      <!-- ko if: selected_people().length === 1 -->
+        <div class="start-ui-header-actions-last button-round button-round-theme icon-video pull-right" data-bind="click: on_video_call" data-uie-name="do-video-call"></div>
+        <label class="start-ui-header-actions-last button-round button-round-theme icon-library pull-right" data-uie-name="do-photo">
+          <input data-bind="file_select: on_photo" type="file" multiple="multiple" accept=".jpg-large, image/jpeg, image/png, image/bmp, image/gif" />
+        </label>
+      <!-- /ko -->
+    </div>
+    <!-- ko if: enableIntegrations() -->
+      <div class="start-ui-list-tabs">
+        <div class="start-ui-list-tab" data-bind="click: function() { clickOnTab(0) }, css: {'active' : peopleTabActive()}, l10n_text: z.string.search_people"></div>
+        <div class="start-ui-list-tab" data-bind="click: function() { clickOnTab(1) }, css: {'active' : !peopleTabActive()}, l10n_text: z.string.search_services"></div>
+      </div>
+    <!-- /ko -->
   </div>
 
   <div class="left-list-center start-ui-list-wrapper">
@@ -87,6 +87,7 @@
               <div class="others" data-bind="visible: search_results.others().length > 0">
                 <span class="start-ui-list-header" data-bind="l10n_text: z.string.search_others"></span>
                 <user-list class="search-list-theme-black" params="user: search_results.others, click: click_on_other, mode: z.components.UserListMode.OTHERS"></user-list>
+              </div>
             </div>
           <!-- /ko -->
         <!-- /ko -->
@@ -98,6 +99,7 @@
           <!-- /ko -->
         <!-- /ko -->
       <!-- /ko -->
+
       <!-- ko if: peopleTabActive() -->
         <!-- ko if: showMemberInvite() -->
           <ul class="left-list-items">
@@ -106,7 +108,7 @@
               <div class="center-column" data-bind="l10n_text: z.string.search_member_invite"></div>
             </li>
           </ul>
-        <!-- /ko  -->
+        <!-- /ko -->
         <!-- ko if: showNowMatches() -->
           <div class="start-ui-no-contacts" data-bind="l10n_text: z.string.search_no_contacts_on_wire"></div>
         <!-- /ko -->
