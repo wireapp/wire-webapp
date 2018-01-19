@@ -71,7 +71,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.user = this.user_repository.self;
 
     this.isTeam = this.team_repository.isTeam;
-    this.team_name = this.team_repository.teamName;
+    this.teamName = this.team_repository.teamName;
     this.teamSize = this.team_repository.teamSize;
 
     this.submitted_search = false;
