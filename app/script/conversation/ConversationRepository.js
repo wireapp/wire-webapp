@@ -2236,9 +2236,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
       })
       .then(() => this.send_asset_remotedata(conversation_et, file, message_id))
       .then(() => {
+        const upload_duration = (Date.now() - upload_started) / 1000;
         this.logger.info(`Finished to upload asset for conversation'${conversation_et.id} in ${upload_duration}`);
 
-        const upload_duration = (Date.now() - upload_started) / 1000;
         const successAttributes = Object.assign(tracking_data, {time: upload_duration});
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_SUCCESSFUL, successAttributes);
       })
