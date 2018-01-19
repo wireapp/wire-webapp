@@ -360,7 +360,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
   }
 
   _updatePeopleList() {
-    if (!this.is_team()) {
+    if (!this.isTeam()) {
       this.get_top_people().then(user_ets => this.top_users(user_ets));
     }
   }
