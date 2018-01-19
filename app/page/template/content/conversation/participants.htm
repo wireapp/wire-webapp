@@ -1,5 +1,5 @@
 <div id="participants-bubble" class="bubble">
-  <div id="participants" class="participants" data-bind="with: $root.participants, css: {'show-user': showUserProfile()}">
+  <div id="participants" class="participants" data-bind="with: $root.participants, css: {'show-user': $root.participants.showUserProfile()}">
 
     <!-- ko if: stateParticipants() -->
       <div class="participants-transition">

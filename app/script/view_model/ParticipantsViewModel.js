@@ -178,7 +178,9 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     });
 
     this.showServiceStates = ko.pureComputed(() => this.activeServiceState() && this.selectedService());
-    this.showUserProfile = ko.pureComputed(() => this.selectedUser() && !this.selectedService());
+    this.showUserProfile = ko.pureComputed(() => {
+      return this.stateParticipants() && this.selectedUser() && !this.selectedService();
+    });
 
     amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, this.switchContent.bind(this));
     amplify.subscribe(z.event.WebApp.PEOPLE.SHOW, this.showParticipant);
@@ -336,7 +338,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
     this.confirmDialog = $('#participants').confirm({
       confirm: () => {
-        this.conversationRepository.removeMember(this.conversation(), userEntity).then(response => {
+        this.conversationRepository.removeMember(this.conversation(), userEntity.id).then(response => {
           if (response) {
             this.resetView();
           }
