@@ -70,8 +70,9 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
     this.user = this.user_repository.self;
 
-    this.is_team = this.team_repository.isTeam;
-    this.team_name = this.team_repository.teamName;
+    this.isTeam = this.team_repository.isTeam;
+    this.teamName = this.team_repository.teamName;
+    this.teamSize = this.team_repository.teamSize;
 
     this.submitted_search = false;
 
@@ -96,7 +97,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
           })
           .catch(error => this.logger.error(`Error searching for contacts: ${error.message}`, error));
 
-        if (this.is_team()) {
+        if (this.isTeam()) {
           this.search_results.contacts(this.team_repository.searchForTeamUsers(normalized_query, is_handle));
         } else {
           this.search_results.contacts(this.user_repository.search_for_connected_users(normalized_query, is_handle));
@@ -124,7 +125,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
         return this.matched_users();
       }
 
-      if (this.is_team()) {
+      if (this.isTeam()) {
         return this.team_repository.teamUsers();
       }
 
@@ -158,14 +159,21 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
     this.show_contacts = ko.pureComputed(() => this.contacts().length);
     this.show_hint = ko.pureComputed(() => this.selected_people().length === 1 && !this.has_created_conversation());
-    this.show_invite = ko.pureComputed(() => !this.is_team());
+    this.show_invite = ko.pureComputed(() => !this.isTeam());
     this.show_matches = ko.observable(false);
 
-    this.show_no_contacts = ko.pureComputed(() => !this.is_team() && !this.show_content());
-    this.show_no_matches = ko.pureComputed(
-      () => (this.is_team() || this.show_matches()) && !this.show_contacts() && !this.show_search_results()
+    this.show_no_contacts = ko.pureComputed(() => !this.isTeam() && !this.show_content());
+    this.showMemberInvite = ko.pureComputed(
+      () => this.user().isTeamOwner() && this.teamSize() === 1 && !this.show_contacts() && !this.show_search_results()
     );
-    this.show_no_search_results = ko.pureComputed(() => {
+    this.showNoMatches = ko.pureComputed(
+      () =>
+        !this.showMemberInvite() &&
+        (this.isTeam() || this.show_matches()) &&
+        !this.show_contacts() &&
+        !this.show_search_results()
+    );
+    this.showNoSearchResults = ko.pureComputed(() => {
       return (
         !this.show_matches() && this.show_search_results() && !this.has_search_results() && this.search_input().length
       );
@@ -181,7 +189,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       return this.has_search_results() || this.search_input().length;
     });
 
-    this.show_top_people = ko.pureComputed(() => !this.is_team() && this.top_users().length && !this.show_matches());
+    this.show_top_people = ko.pureComputed(() => !this.isTeam() && this.top_users().length && !this.show_matches());
 
     // Invite bubble states
     this.show_invite_form = ko.observable(true);
@@ -225,6 +233,11 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
   click_on_close() {
     this._close_list();
+  }
+
+  clickOnMemberInvite() {
+    z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.TEAM_SETTINGS, z.config.URL_PATH.MANAGE_TEAM));
+    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
   }
 
   click_on_group(conversation_et) {
