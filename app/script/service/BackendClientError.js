@@ -41,6 +41,7 @@ z.service.BackendClientError = class BackendClientError extends Error {
 
   static get LABEL() {
     return {
+      BAD_GATEWAY: 'bad-gateway',
       BAD_REQUEST: 'bad-request',
       BLACKLISTED_EMAIL: 'blacklisted-email',
       BLACKLISTED_PHONE: 'blacklisted-phone',
