@@ -152,7 +152,7 @@ z.entity.User = class User {
     this.is_team_manager = ko.pureComputed(() =>
       [z.team.TeamRole.ROLE.ADMIN, z.team.TeamRole.ROLE.OWNER].includes(this.team_role())
     );
-    this.is_team_owner = ko.pureComputed(() => z.team.TeamRole.ROLE.OWNER === this.team_role());
+    this.isTeamOwner = ko.pureComputed(() => z.team.TeamRole.ROLE.OWNER === this.team_role());
 
     this.is_request = ko.pureComputed(() => this.connection().is_request());
 
