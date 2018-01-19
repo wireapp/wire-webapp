@@ -289,9 +289,9 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.participantsBubble.hide();
   }
 
-  clickToAddService(serviceEntity = this.selectedService()) {
-    this.integrationRepository.addService(this.conversation(), serviceEntity, 'conversation_details');
-    this.resetView();
+  clickToAddService() {
+    this.integrationRepository.addService(this.conversation(), this.selectedService(), 'conversation_details');
+    this.participantsBubble.hide();
   }
 
   clickToBlock(userEntity) {
