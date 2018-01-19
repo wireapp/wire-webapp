@@ -156,11 +156,11 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.showMemberInvite = ko.pureComputed(() => {
       return this.user().isTeamOwner() && this.teamSize() === 1 && !this.show_contacts() && !this.show_search_results();
     });
-    this.show_no_matches = ko.pureComputed(() => {
+    this.showNoMatches = ko.pureComputed(() => {
       const isTeamOrMatch = this.isTeam() || this.show_matches();
       return isTeamOrMatch && !this.showMemberInvite() && !this.show_contacts() && !this.show_search_results();
     });
-    this.show_no_search_results = ko.pureComputed(() => {
+    this.showNoSearchResults = ko.pureComputed(() => {
       return (
         !this.show_matches() && this.show_search_results() && !this.has_search_results() && this.search_input().length
       );
