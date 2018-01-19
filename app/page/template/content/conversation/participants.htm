@@ -116,18 +116,18 @@
           <div class="service-confirmation-summary">
             <service-avatar class="service-avatar-md" params="service: selectedService"></service-avatar>
             <div class="service-confirmation-summary-text">
-              <div class="service-confirmation-name" data-bind="text: selectedService().name"></div>
-              <div class="service-confirmation-provider" data-bind="text: selectedService().providerName()"></div>
+              <div data-uie-name="status-service-name" class="service-confirmation-name" data-bind="text: selectedService().name"></div>
+              <div data-uie-name="status-service-provider" class="service-confirmation-provider" data-bind="text: selectedService().providerName()"></div>
             </div>
           </div>
-          <div class="service-confirmation-description" data-bind="text: selectedService().description"></div>
+          <div data-uie-name="status-service-description" class="service-confirmation-description" data-bind="text: selectedService().description"></div>
         </div>
         <div class="service-confirmation-footer">
           <!-- ko if: stateServiceConfirmations() -->
-            <button class="participants-service-confirmation-button" data-bind="click: clickToAddService, l10n_text: z.string.people_service_confirm_button"></button>
+            <button data-uie-name="do-service-confirm" class="participants-service-confirmation-button" data-bind="click: clickToAddService, l10n_text: z.string.people_service_confirm_button"></button>
           <!-- /ko -->
           <!-- ko if: stateServiceDetails() -->
-            <button class="participants-service-confirmation-button button-theme-red" data-bind="click: clickToRemoveService, l10n_text: z.string.people_service_removal_button"></button>
+            <button data-uie-name="do-service-remove" class="participants-service-confirmation-button button-theme-red" data-bind="click: clickToRemoveService, l10n_text: z.string.people_service_removal_button"></button>
           <!-- /ko -->
         </div>
       </div>
