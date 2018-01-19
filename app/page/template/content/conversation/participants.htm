@@ -75,8 +75,8 @@
           </div>
           <!-- ko if: showIntegrations() -->
             <div class="participants-search-tabs">
-              <div class="participants-search-tab" data-bind="css: {'active': stateAddPeople}, click: clickOnAddPeople, l10n_text: z.string.people_tabs_people"></div>
-              <div class="participants-search-tab" data-bind="css: {'active': stateAddService}, click: clickOnAddService, l10n_text: z.string.people_tabs_services"></div>
+              <div data-uie-name="do-add-people" class="participants-search-tab" data-bind="css: {'active': stateAddPeople}, click: clickOnAddPeople, l10n_text: z.string.people_tabs_people"></div>
+              <div data-uie-name="do-add-services" class="participants-search-tab" data-bind="css: {'active': stateAddService}, click: clickOnAddService, l10n_text: z.string.people_tabs_services"></div>
             </div >
           <!-- /ko -->
         </div >
