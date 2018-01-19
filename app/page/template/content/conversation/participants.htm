@@ -15,7 +15,7 @@
           </div>
           <div class="participants-group-list">
             <!-- ko if: renderParticipants -->
-              <user-list params="user: unverifiedParticipants, click: clickOnShowMember, mode: z.components.UserListMode.COMPACT"></user-list>
+              <user-list data-uie-name="list-unverified" params="user: unverifiedParticipants, click: clickOnShowMember, mode: z.components.UserListMode.COMPACT"></user-list>
               <!-- ko if: verifiedParticipants().length -->
                 <div class="participants-group-list-separator">
                   <svg width="16" height="16">
@@ -24,14 +24,14 @@
                   <span class="label-xs" data-bind="l10n_text: z.string.people_verified"></span>
                   <hr>
                 </div>
-                <user-list params="user: verifiedParticipants, click: clickOnShowMember, mode: z.components.UserListMode.COMPACT"></user-list>
+                <user-list data-uie-name="list-verified" params="user: verifiedParticipants, click: clickOnShowMember, mode: z.components.UserListMode.COMPACT"></user-list>
               <!-- /ko -->
               <!-- ko if: serviceParticipants().length -->
                 <div class="participants-group-list-separator">
                   <span class="label-xs" data-bind="l10n_text: z.string.people_services"></span>
                   <hr>
                 </div>
-                <service-list params="services: serviceParticipants, click: clickOnShowService, mode: z.components.ServiceListMode.COMPACT"></service-list>
+                <service-list data-uie-name="list-services" params="services: serviceParticipants, click: clickOnShowService, mode: z.components.ServiceListMode.COMPACT"></service-list>
               <!-- /ko -->
             <!-- /ko -->
           </div>
