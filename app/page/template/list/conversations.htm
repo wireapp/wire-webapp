@@ -56,7 +56,7 @@
       <!-- /ko -->
     </ul>
     <!-- /ko -->
-    <!-- ko if: conversations_empty() -->
+    <!-- ko if: noConversations() -->
       <!-- ko if: conversations_archived().length === 0 -->
         <div class="conversations-hint" data-uie-name="status-start-conversation-hint">
           <div class="conversations-hint-text" data-bind="l10n_text: z.string.conversations_no_conversations"></div>
