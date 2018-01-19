@@ -45,8 +45,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.clickOnClose = this.clickOnClose.bind(this);
     this.clickOnPending = this.clickOnPending.bind(this);
     this.clickOnSelectService = this.clickOnSelectService.bind(this);
-    this.clickOnShowMember = this.clickOnShowMember.bind(this);
-    this.clickOnShowService = this.clickOnShowService.bind(this);
+    this.clickOnShowParticipant = this.clickOnShowParticipant.bind(this);
     this.clickToAddService = this.clickToAddService.bind(this);
     this.clickToBlock = this.clickToBlock.bind(this);
     this.clickToConnect = this.clickToConnect.bind(this);
@@ -247,22 +246,8 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     $('.participants-search').addClass('participants-search-show');
   }
 
-  clickOnShowMember(userEntity) {
+  clickOnShowParticipant(userEntity) {
     this.showParticipant(userEntity, true);
-  }
-
-  clickOnShowService(userEntity) {
-    this.selectedUser(userEntity);
-    const {providerId, serviceId} = userEntity;
-
-    this.integrationRepository
-      .getServiceById(providerId, serviceId)
-      .then(serviceEntity => {
-        this.selectedService(serviceEntity);
-        this.state(ParticipantsViewModel.STATE.SERVICE_DETAILS);
-        return this.integrationRepository.getProviderById(providerId);
-      })
-      .then(providerEntity => this.selectedService().providerName(providerEntity.name));
   }
 
   clickToAddMembers() {
@@ -392,10 +377,24 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     if (participantEntity) {
       this.groupMode(groupMode);
       if (participantEntity.isBot) {
-        return this.clickOnShowService(participantEntity);
+        return this.showService(participantEntity);
       }
       this.selectedUser(participantEntity);
     }
+  }
+
+  showService(userEntity) {
+    this.selectedUser(userEntity);
+    const {providerId, serviceId} = userEntity;
+
+    this.integrationRepository
+      .getServiceById(providerId, serviceId)
+      .then(serviceEntity => {
+        this.selectedService(serviceEntity);
+        this.state(ParticipantsViewModel.STATE.SERVICE_DETAILS);
+        return this.integrationRepository.getProviderById(providerId);
+      })
+      .then(providerEntity => this.selectedService().providerName(providerEntity.name));
   }
 
   switchContent(contentState) {
