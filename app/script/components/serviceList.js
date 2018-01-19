@@ -45,14 +45,14 @@ z.components.ServiceListViewModel = class ServiceListViewModel {
 ko.components.register('service-list', {
   template: `
     <div class="search-list" data-bind="css: css_classes(), foreach: services">
-      <div class="search-list-item" data-bind="click: $parent.onClick">
+      <div class="search-list-item" data-uie-name="item-service" data-bind="click: $parent.onClick">
         <!-- ko ifnot: $parent.mode === z.components.ServiceListMode.COMPACT -->
           <div class="search-list-item-image">
             <participant-avatar params="participant: $data, size: 'sm'"></participant-avatar>
           </div>
           <div class="search-list-item-content">
-            <div class="search-list-item-content-name" data-bind="text: name"></div>
-            <div class="search-list-item-content-info">
+            <div class="search-list-item-content-name" data-uie-name="status-content-name" data-bind="text: name"></div>
+            <div class="search-list-item-content-info" data-uie-name="status-content-info">
               <span class="search-list-item-content-username" data-bind="text: summary"></span>
             </div>
           </div>

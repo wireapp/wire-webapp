@@ -68,7 +68,7 @@ ko.components.register('device-remove', {
       <span class="device-remove-button text-red"
           data-bind="attr: {'data-uie-value': model}, click: click_on_remove_device, l10n_text: z.string.preferences_devices_remove"
           data-uie-name="go-remove-device"></span>
-    <!-- /ko  -->
+    <!-- /ko -->
     <!-- ko if: remove_form_visible() -->
       <form class="device-remove-form" data-bind="submit: click_on_submit, attr: {'data-uie-value': model}" data-ui-name="device-remove-form">
         <input  class="device-remove-input"

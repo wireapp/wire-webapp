@@ -22,8 +22,8 @@
 window.z = window.z || {};
 window.z.assets = z.assets || {};
 
-z.assets.AssetMapper = (() => {
-  const _mapProfileAssets = (entity, assets) => {
+z.assets.AssetMapper = {
+  mapProfileAssets: (entity, assets) => {
     return assets.filter(asset => asset.type === 'image').map(asset => {
       const assetRemoteData = z.assets.AssetRemoteData.v3(asset.key, true);
 
@@ -38,9 +38,8 @@ z.assets.AssetMapper = (() => {
           break;
       }
     });
-  };
-
-  const _mapProfileAssetsV1 = (entity, pictures) => {
+  },
+  mapProfileAssetsV1: (entity, pictures) => {
     const [previewPicture, mediumPicture] = pictures;
 
     if (previewPicture) {
@@ -50,10 +49,5 @@ z.assets.AssetMapper = (() => {
     if (mediumPicture) {
       entity.mediumPictureResource(z.assets.AssetRemoteData.v1(entity.id, mediumPicture.id, true));
     }
-  };
-
-  return {
-    mapProfileAssets: _mapProfileAssets,
-    mapProfileAssetsV1: _mapProfileAssetsV1,
-  };
-})();
+  },
+};

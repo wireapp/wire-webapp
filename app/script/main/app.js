@@ -555,7 +555,7 @@ z.main.App = class App {
     }
 
     const supportIntegrations = z.util.get_url_parameter(z.auth.URLParameter.INTEGRATIONS);
-    if (Boolean(supportIntegrations)) {
+    if (_.isBoolean(supportIntegrations)) {
       this.repository.integration.supportIntegrations(supportIntegrations);
     }
   }
