@@ -947,7 +947,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.conversation_service
       .postBots(conversationEntity.id, providerId, serviceId)
       .then(response => {
-        const event = response && response.event ? response.event : undefined;
+        const event = response ? response.event : undefined;
         if (event) {
           amplify.publish(z.event.WebApp.EVENT.INJECT, response.event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
           this.logger.debug(`Successfully added bot to conversation '${conversationEntity.display_name()}'`, response);
@@ -2226,7 +2226,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     };
 
     const conversation_type = z.tracking.helpers.get_conversation_type(conversation_et);
-    const initiatedAttributes = $.extend(tracking_data, {conversation_type});
+    const initiatedAttributes = Object.assign(tracking_data, {conversation_type});
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_INITIATED, initiatedAttributes);
 
     return this.send_asset_metadata(conversation_et, file)
@@ -2239,7 +2239,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         this.logger.info(`Finished to upload asset for conversation'${conversation_et.id} in ${upload_duration}`);
 
         const upload_duration = (Date.now() - upload_started) / 1000;
-        const successAttributes = $.extend(tracking_data, {time: upload_duration});
+        const successAttributes = Object.assign(tracking_data, {time: upload_duration});
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_SUCCESSFUL, successAttributes);
       })
       .catch(error => {
