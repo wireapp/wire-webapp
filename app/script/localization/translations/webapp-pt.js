@@ -258,7 +258,6 @@ z.string.pt.conversations_connection_request_one = '1 pessoa em espera';
 z.string.pt.conversations_empty_conversation = 'Conversa em grupo';
 z.string.pt.conversations_empty_conversation_description = 'Saíram todos';
 z.string.pt.conversations_no_conversations = 'Ainda não existem conversas';
-z.string.pt.conversations_no_conversations_detail = 'Iniciar uma conversa ou criar um grupo.';
 z.string.pt.conversations_popover_archive = 'Arquivar';
 z.string.pt.conversations_popover_block = 'Bloquear';
 z.string.pt.conversations_popover_cancel = 'Cancelar pedido';

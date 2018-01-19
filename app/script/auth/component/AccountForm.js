@@ -103,7 +103,7 @@ class AccountForm extends PureComponent {
   };
 
   render() {
-    const {isFetching, submitText, intl: {formatMessage: _}} = this.props;
+    const {isFetching, submitText, currentFlow, intl: {formatMessage: _}} = this.props;
     const {name, email, password, termsAccepted, validInputs} = this.state;
     return (
       <Form
@@ -155,7 +155,11 @@ class AccountForm extends PureComponent {
               disabled={this.props.disableEmail}
               value={email}
               autoComplete="section-create-team email"
-              placeholder={_(accountFormStrings.emailPlaceholder)}
+              placeholder={_(
+                currentFlow === AuthSelector.REGISTER_FLOW.PERSONAL
+                  ? accountFormStrings.emailPersonalPlaceholder
+                  : accountFormStrings.emailTeamPlaceholder
+              )}
               onKeyDown={event => {
                 if (event.key === 'Enter') {
                   this.inputs.password.focus();

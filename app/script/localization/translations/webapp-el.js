@@ -255,7 +255,6 @@ z.string.el.conversations_connection_request_one = '1 άτομο σε αναμο
 z.string.el.conversations_empty_conversation = 'Ομαδική συζήτηση';
 z.string.el.conversations_empty_conversation_description = 'Αποχώρηση όλων';
 z.string.el.conversations_no_conversations = 'Δεν υπάρχουν ακόμα συζητήσεις';
-z.string.el.conversations_no_conversations_detail = 'Ξεκινήστε μία συνομιλία ή δημιουργήστε μία ομάδα.';
 z.string.el.conversations_popover_archive = 'Αρχειοθέτηση';
 z.string.el.conversations_popover_block = 'Αποκλεισμός';
 z.string.el.conversations_popover_cancel = 'Ακύρωση αιτήματος';

@@ -57,20 +57,29 @@
   top: 5px;
 }
 
-.conversation-hint {
+.conversations-hint {
   margin-left: 20px;
   margin-right: 24px;
   position: absolute;
   bottom: 0;
 }
 
-.conversation-hint-text {
+.conversations-hint-text {
   .text-white();
   font-size: @font-size-lg;
   font-weight: @font-weight-regular;
   margin-bottom: 24px;
 }
 
-.conversation-hint-arrow {
+.conversations-hint-arrow {
   opacity: 0.4;
+}
+
+.conversations-all-archived {
+  .full-screen();
+  .flex-center();
+  .label-xs();
+  .text-center();
+  .text-white();
+  flex-direction: column;
 }

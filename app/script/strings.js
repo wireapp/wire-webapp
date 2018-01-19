@@ -78,9 +78,13 @@ export const accountFormStrings = defineMessages({
     id: 'accountForm.namePlaceholder',
     defaultMessage: 'Name',
   },
-  emailPlaceholder: {
-    id: 'accountForm.emailPlaceholder',
+  emailTeamPlaceholder: {
+    id: 'accountForm.emailTeamPlaceholder',
     defaultMessage: 'you@yourcompany.com',
+  },
+  emailPersonalPlaceholder: {
+    id: 'accountForm.emailPersonalPlaceholder',
+    defaultMessage: 'you@email.com',
   },
   passwordPlaceholder: {
     id: 'accountForm.passwordPlaceholder',

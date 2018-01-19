@@ -253,7 +253,6 @@ z.string.it.conversations_connection_request_one = '1 persona in attesa';
 z.string.it.conversations_empty_conversation = 'Conversazione di gruppo';
 z.string.it.conversations_empty_conversation_description = 'Tutti gli utenti hanno abbandonato';
 z.string.it.conversations_no_conversations = 'Nessuna conversazione';
-z.string.it.conversations_no_conversations_detail = 'Inizia una conversazione o crea un gruppo.';
 z.string.it.conversations_popover_archive = 'Archivia';
 z.string.it.conversations_popover_block = 'Blocca';
 z.string.it.conversations_popover_cancel = 'Annulla richiesta';

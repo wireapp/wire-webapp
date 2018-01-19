@@ -257,7 +257,6 @@ z.string.pl.conversations_connection_request_one = '1 osoba czeka';
 z.string.pl.conversations_empty_conversation = 'Rozmowa grupowa';
 z.string.pl.conversations_empty_conversation_description = 'Wszyscy opuścili rozmowę';
 z.string.pl.conversations_no_conversations = 'Brak jeszcze konwersacji';
-z.string.pl.conversations_no_conversations_detail = 'Rozpocznij nową konwersację lub utwórz grupę.';
 z.string.pl.conversations_popover_archive = 'Archiwizuj';
 z.string.pl.conversations_popover_block = 'Zablokuj';
 z.string.pl.conversations_popover_cancel = 'Anuluj żądanie';

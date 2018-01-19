@@ -530,6 +530,7 @@ z.string.search_team_members = 'Team members';
 z.string.search_top_people = 'Top people';
 z.string.search_try_search = 'Find people by\nname or username';
 z.string.search_no_contacts_on_wire = 'You have no contacts on Wire.\nTry finding people by\nname or username.';
+z.string.search_member_invite = 'Invite people to join the team';
 z.string.search_others = 'Connect';
 
 // Google contacts upload

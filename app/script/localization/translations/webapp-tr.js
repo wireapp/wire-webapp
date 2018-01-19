@@ -258,7 +258,6 @@ z.string.tr.conversations_connection_request_one = 'Bir kişi bekliyor';
 z.string.tr.conversations_empty_conversation = 'Grup sohbeti';
 z.string.tr.conversations_empty_conversation_description = 'Herkes ayrıldı';
 z.string.tr.conversations_no_conversations = 'Hiç konuşma yok';
-z.string.tr.conversations_no_conversations_detail = 'Bir konuşma başlat ya da bir grup oluştur.';
 z.string.tr.conversations_popover_archive = 'Arşivle';
 z.string.tr.conversations_popover_block = 'Engelle';
 z.string.tr.conversations_popover_cancel = 'İsteği iptal et';

@@ -259,7 +259,6 @@ z.string.ro.conversations_connection_request_one = '1 persoană așteaptă';
 z.string.ro.conversations_empty_conversation = 'Conversație de grup';
 z.string.ro.conversations_empty_conversation_description = 'Toată lumea a plecat';
 z.string.ro.conversations_no_conversations = 'Nu sunt încă conversații';
-z.string.ro.conversations_no_conversations_detail = 'Începe o conversație sau creează un grup.';
 z.string.ro.conversations_popover_archive = 'Arhivă';
 z.string.ro.conversations_popover_block = 'Blochează';
 z.string.ro.conversations_popover_cancel = 'Anulează cererea';

@@ -257,7 +257,6 @@ z.string.fi.conversations_connection_request_one = '1 ihminen odottaa';
 z.string.fi.conversations_empty_conversation = 'Ryhmäkeskustelu';
 z.string.fi.conversations_empty_conversation_description = 'Kaikki poistuivat';
 z.string.fi.conversations_no_conversations = 'Ei vielä keskusteluita';
-z.string.fi.conversations_no_conversations_detail = 'Aloita keskustelu tai luo ryhmä.';
 z.string.fi.conversations_popover_archive = 'Arkistoi';
 z.string.fi.conversations_popover_block = 'Estä';
 z.string.fi.conversations_popover_cancel = 'Peru pyyntö';

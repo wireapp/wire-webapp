@@ -259,7 +259,6 @@ z.string.et.conversations_connection_request_one = '1 inimene on ootel';
 z.string.et.conversations_empty_conversation = 'Grupivestlus';
 z.string.et.conversations_empty_conversation_description = 'Kõik lahkusid';
 z.string.et.conversations_no_conversations = 'Pole veel vestlusi';
-z.string.et.conversations_no_conversations_detail = 'Alusta vestlust või loo grupp.';
 z.string.et.conversations_popover_archive = 'Arhiveeri';
 z.string.et.conversations_popover_block = 'Blokeeri';
 z.string.et.conversations_popover_cancel = 'Tühista taotlus';
