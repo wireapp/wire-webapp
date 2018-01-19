@@ -259,7 +259,6 @@ z.string.de.conversations_connection_request_one = 'Eine Kontaktanfrage';
 z.string.de.conversations_empty_conversation = 'Gruppenunterhaltung';
 z.string.de.conversations_empty_conversation_description = 'Leere Unterhaltung';
 z.string.de.conversations_no_conversations = 'Noch keine Unterhaltungen';
-z.string.de.conversations_no_conversations_detail = 'Beginne eine Unterhaltung oder erstelle eine Gruppe.';
 z.string.de.conversations_popover_archive = 'Archivieren';
 z.string.de.conversations_popover_block = 'Blockieren';
 z.string.de.conversations_popover_cancel = 'Anfrage abbrechen';
