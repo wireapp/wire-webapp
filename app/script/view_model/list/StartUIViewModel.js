@@ -237,7 +237,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
         })
         .catch(error => this.logger.error(`Error searching for contacts: ${error.message}`, error));
 
-      if (this.is_team()) {
+      if (this.isTeam()) {
         this.search_results.contacts(this.team_repository.searchForTeamUsers(normalized_query, is_handle));
       } else {
         this.search_results.contacts(this.user_repository.search_for_connected_users(normalized_query, is_handle));
