@@ -23,6 +23,16 @@ window.z = window.z || {};
 window.z.components = z.components || {};
 
 z.components.ParticipantAvatar = class ParticipantAvatar {
+  static SIZE() {
+    return {
+      LARGE: 'ParticipantAvatar.SIZE.LARGE',
+      MEDIUM: 'ParticipantAvatar.SIZE.MEDIUM',
+      SMALL: 'ParticipantAvatar.SIZE.SMALL',
+      X_SMALL: 'ParticipantAvatar.SIZE.X_SMALL',
+      XX_SMALL: 'ParticipantAvatar.SIZE.XX_SMALL',
+    };
+  }
+
   constructor(params, componentInfo) {
     this.participant = ko.unwrap(params.participant);
     this.isService = this.participant instanceof z.integration.ServiceEntity || this.participant.isBot;
@@ -30,7 +40,7 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
 
     const avatarType = `${this.isUser ? 'user' : 'service'}-avatar`;
     this.delay = params.delay;
-    this.size = params.size;
+    this.size = params.size || ParticipantAvatar.SIZE.MEDIA_STREAM_ERROR;
     this.element = $(componentInfo.element);
 
     if (this.size) {

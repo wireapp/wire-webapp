@@ -27,7 +27,7 @@
           <div class="user-profile-details">
             <!-- ko if: render_avatar -->
               <div class="user-profile-details-avatar">
-                <participant-avatar class="cursor-default" params="participant: user, size: 'lg'" data-uie-name="status-profile-picture"></participant-avatar>
+                <participant-avatar class="cursor-default" params="participant: user, size: z.components.ParticipantAvatar.SIZE.LARGE" data-uie-name="status-profile-picture"></participant-avatar>
                 <!-- ko if: (mode === z.components.UserProfileMode.PEOPLE || user().is_connected()) && user().is_guest() -->
                   <span class="user-profile-details-guest-badge" data-bind="l10n_text: z.string.conversation_guest_indicator" data-uie-name="status-guest"></span>
                 <!-- /ko -->

@@ -22,19 +22,24 @@
 window.z = window.z || {};
 window.z.components = z.components || {};
 
-z.components.ServiceListMode = {
-  COMPACT: 'compact',
-  DEFAULT: 'default',
-};
+z.components.ServiceList = class ServiceList {
+  static MODE() {
+    return {
+      COMPACT: 'ServiceList.MODE.COMPACT',
+      DEFAULT: 'ServiceList.MODE.DEFAULT',
+    };
+  }
 
-z.components.ServiceListViewModel = class ServiceListViewModel {
   constructor(params) {
     this.services = params.services;
     this.onClick = params.click;
-    this.mode = params.mode || z.components.ServiceListMode.DEFAULT;
+    this.mode = params.mode || ServiceList.MODE.DEFAULT;
+
+    this.isCompactMode = this.mode === ServiceList.MODE.COMPACT;
+    this.isDefaultMode = this.mode === ServiceList.MODE.DEFAULT;
 
     this.css_classes = ko.pureComputed(() => {
-      if (this.mode === z.components.ServiceListMode.COMPACT) {
+      if (this.isCompactMode) {
         return 'search-list-sm';
       }
       return 'search-list-lg';
@@ -46,9 +51,17 @@ ko.components.register('service-list', {
   template: `
     <div class="search-list" data-bind="css: css_classes(), foreach: services">
       <div class="search-list-item" data-uie-name="item-service" data-bind="click: $parent.onClick">
-        <!-- ko ifnot: $parent.mode === z.components.ServiceListMode.COMPACT -->
+        <!-- ko if: $parent.isCompactMode -->
           <div class="search-list-item-image">
-            <participant-avatar params="participant: $data, size: 'sm'"></participant-avatar>
+            <participant-avatar params="participant: $data, size: z.components.ParticipantAvatar.SIZE.MEDIUM"></participant-avatar>
+          </div>
+          <div class="search-list-item-content">
+            <div class="search-list-item-content-name" data-bind="text: name"></div>
+          </div>
+        <!-- /ko -->
+        <!-- ko ifnot: $parent.isCompactMode -->
+          <div class="search-list-item-image">
+            <participant-avatar params="participant: $data, size: z.components.ParticipantAvatar.SIZE.SMALL"></participant-avatar>
           </div>
           <div class="search-list-item-content">
             <div class="search-list-item-content-name" data-uie-name="status-content-name" data-bind="text: name"></div>
@@ -57,19 +70,11 @@ ko.components.register('service-list', {
             </div>
           </div>
         <!-- /ko -->
-        <!-- ko if: $parent.mode === z.components.ServiceListMode.COMPACT -->
-          <div class="search-list-item-image">
-            <participant-avatar params="participant: $data, size: 'md'"></participant-avatar>
-          </div>
-          <div class="search-list-item-content">
-            <div class="search-list-item-content-name" data-bind="text: name"></div>
-          </div>
-        <!-- /ko -->
       </div>
     </div>
     <!-- ko ifnot: services().length -->
       <div class="no-results" data-bind="l10n_text: z.string.people_no_matches"></div>
     <!-- /ko -->
   `,
-  viewModel: z.components.ServiceListViewModel,
+  viewModel: z.components.ServiceList,
 });
