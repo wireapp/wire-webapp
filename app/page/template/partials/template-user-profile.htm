@@ -18,8 +18,8 @@
 
       <!-- ko if: user().is_connected() || user().is_team_member() -->
         <div class="user-profile-tabs" data-bind="attr: {'data-tab-index': tab_index}">
-          <span data-uie-name="go-profile-details" class="user-profile-tab" data-bind="click: function() { click_on_tab(0) }, l10n_text: z.string.people_tabs_details"></span>
-          <span data-uie-name="go-profile-devices" class="user-profile-tab" data-bind="click: function() { click_on_tab(1) }, l10n_text: z.string.people_tabs_devices"></span>
+          <span class="user-profile-tab" data-bind="click: function() { click_on_tab(0) }, l10n_text: z.string.people_tabs_details" data-uie-name="go-profile-details"></span>
+          <span class="user-profile-tab" data-bind="click: function() { click_on_tab(1) }, l10n_text: z.string.people_tabs_devices" data-uie-name="go-profile-devices"></span>
         </div>
       <!-- /ko -->
 
@@ -56,10 +56,10 @@
               <div class="user-profile-device" data-bind="click: $parent.click_on_device">
                 <svg class="user-profile-device-verified" width="16" height="16">
                   <!-- ko if: meta.is_verified()-->
-                    <use data-uie-name="user-device-verified" xlink:href="#icon-verified"></use>
+                    <use xlink:href="#icon-verified" data-uie-name="user-device-verified"></use>
                   <!-- /ko -->
                   <!-- ko ifnot: meta.is_verified()-->
-                    <use data-uie-name="user-device-not-verified" xlink:href="#icon-not-verified"></use>
+                    <use xlink:href="#icon-not-verified" data-uie-name="user-device-not-verified"></use>
                   <!-- /ko -->
                 </svg>
                 <device-card params="device: $data, click: $parent.click_on_device"></device-card>
@@ -140,8 +140,8 @@
 
 <script type="text/html" id="user-profile-footer-ignore-accept">
   <div class="footer-controls-buttons">
-    <div class="button button-medium button-inverted" data-uie-name="do-ignore" data-bind="click: on_ignore, l10n_text: z.string.people_button_ignore"></div>
-    <div class="button button-medium" data-uie-name="do-connect" data-bind="click: on_accept, l10n_text: z.string.people_button_connect"></div>
+    <div class="button button-medium button-inverted" data-bind="click: on_ignore, l10n_text: z.string.people_button_ignore" data-uie-name="do-ignore"></div>
+    <div class="button button-medium" data-bind="click: on_accept, l10n_text: z.string.people_button_connect" data-uie-name="do-connect"></div>
   </div>
 </script>
 

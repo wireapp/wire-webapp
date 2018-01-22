@@ -128,7 +128,7 @@ z.components.VideoAssetComponent = class VideoAssetComponent {
 ko.components.register('video-asset', {
   template: `
     <!-- ko ifnot: expired() -->
-      <div class="video-asset-container" data-uie-name="video-asset" data-bind="hide_controls: 2000, attr: {'data-uie-value': asset.file_name}">
+      <div class="video-asset-container" data-bind="hide_controls: 2000, attr: {'data-uie-value': asset.file_name}" data-uie-name="video-asset">
         <video data-bind="attr: {src: video_src},
                           css: {hidden: asset.status() === z.assets.AssetTransferState.UPLOADING},
                           event: { loadedmetadata: on_loadedmetadata,
@@ -159,7 +159,7 @@ ko.components.register('video-asset', {
             </div>
             <div class='video-controls-bottom' data-bind='visible: show_bottom_controls()'>
               <seek-bar data-ui-name="status-video-seekbar" class="video-controls-seekbar" params="src: video_element"></seek-bar>
-              <span class="video-controls-time label-xs" data-uie-name="status-video-time" data-bind="text: z.util.format_seconds(video_time_rest())"></span>
+              <span class="video-controls-time label-xs" data-bind="text: z.util.format_seconds(video_time_rest())" data-uie-name="status-video-time"></span>
             </div>
           <!-- /ko -->
         <!-- /ko -->

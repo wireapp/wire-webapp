@@ -57,11 +57,11 @@ class Index extends Component {
     const {intl: {formatMessage: _}} = this.props;
     return (
       <ContainerXS centerText verticalCenter>
-        <Logo data-uie-name="ui-wire-logo" scale={1.68} />
+        <Logo scale={1.68} data-uie-name="ui-wire-logo" />
         <Paragraph center>{_(indexStrings.claim)}</Paragraph>
         <Columns style={{margin: '70px auto'}}>
           <Column>
-            <Link data-uie-name="go-register-personal" onClick={this.onRegisterPersonalClick}>
+            <Link onClick={this.onRegisterPersonalClick} data-uie-name="go-register-personal">
               <RoundContainer style={{marginBottom: 12}}>
                 <ProfileIcon color={COLOR.WHITE} />
               </RoundContainer>
@@ -75,7 +75,7 @@ class Index extends Component {
             </Link>
           </Column>
           <Column>
-            <Link data-uie-name="go-register-team" onClick={this.onRegisterTeamClick}>
+            <Link onClick={this.onRegisterTeamClick} data-uie-name="go-register-team">
               <RoundContainer color={COLOR.GREEN} style={{marginBottom: 12}}>
                 <TeamIcon color={COLOR.WHITE} />
               </RoundContainer>
@@ -91,7 +91,7 @@ class Index extends Component {
         </Columns>
         <Text>{_(indexStrings.loginInfo)}</Text>
         <br />
-        <Link data-uie-name="go-login" fontSize="24px" textTransform="none" onClick={this.onLoginClick}>
+        <Link fontSize="24px" textTransform="none" onClick={this.onLoginClick} data-uie-name="go-login">
           {_(indexStrings.login)}
         </Link>
       </ContainerXS>

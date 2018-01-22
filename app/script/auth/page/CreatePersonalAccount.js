@@ -100,7 +100,7 @@ class CreatePersonalAccount extends React.PureComponent {
         <Columns>
           <Column style={{display: 'flex'}}>
             <div style={{margin: 'auto'}}>
-              <Link to={ROUTE.INDEX} data-uie-name="go-index" component={RRLink}>
+              <Link to={ROUTE.INDEX} component={RRLink} data-uie-name="go-index">
                 <ArrowIcon direction="left" color={COLOR.GRAY} />
               </Link>
             </div>
