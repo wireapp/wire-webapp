@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="6.3.2"></a>
+
+## [6.3.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@6.3.1...@wireapp/cryptobox@6.3.2) (2018-01-22)
+
+### Bug Fixes
+
+* Release fixes ([#202](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/issues/202)) ([902130d](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/commit/902130d))
+
 <a name="6.3.1"></a>
 
 ## [6.3.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@6.3.0...@wireapp/cryptobox@6.3.1) (2018-01-11)

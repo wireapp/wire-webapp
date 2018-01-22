@@ -29,5 +29,5 @@
     "test:longrunning": "mocha -s 30000 -t 30000 --recursive test/harness.js test --trace-warnings --grep LongRunning"
   },
   "types": "dist/types.d.ts",
-  "version": "5.3.1"
+  "version": "5.3.2"
 }

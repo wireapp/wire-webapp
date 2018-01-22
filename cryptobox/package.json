@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@wireapp/store-engine": "0.1.8",
+    "@wireapp/store-engine": "0.1.9",
     "dexie": "2.0.1",
     "fs-extra": "5.0.0",
     "wire-webapp-lru-cache": "2.0.0",
@@ -50,5 +50,5 @@
     "test": "yarn dist && gulp test"
   },
   "types": "dist/wire-webapp-cryptobox.d.ts",
-  "version": "6.3.1"
+  "version": "6.3.2"
 }
