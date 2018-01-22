@@ -18,7 +18,7 @@
 
         <!-- ko if: search_input().length === 0 -->
           <!-- ko if: images().length -->
-            <section class="collection-section" data-uie-name="collection-section-image" data-bind="attr: {'data-uie-collection-size': images().length}">
+            <section class="collection-section" data-bind="attr: {'data-uie-collection-size': images().length}" data-uie-name="collection-section-image">
               <header>
                 <span class="collection-header-icon icon-library"></span>
                 <span class="label-bold-xs" data-bind="l10n_text: z.string.collection_section_images"></span>
@@ -35,7 +35,7 @@
           <!-- /ko -->
 
           <!-- ko if: links().length -->
-            <section class="collection-section" data-uie-name="collection-section-link" data-bind="attr: {'data-uie-collection-size': links().length}">
+            <section class="collection-section" data-bind="attr: {'data-uie-collection-size': links().length}" data-uie-name="collection-section-link">
               <header>
                 <span class="collection-header-icon icon-link"></span>
                 <span class="label-bold-xs" data-bind="l10n_text: z.string.collection_section_links"></span>
@@ -52,7 +52,7 @@
           <!-- /ko -->
 
           <!-- ko if: audio().length -->
-            <section class="collection-section" data-uie-name="collection-section-audio" data-bind="attr: {'data-uie-collection-size': audio().length}">
+            <section class="collection-section" data-bind="attr: {'data-uie-collection-size': audio().length}" data-uie-name="collection-section-audio">
               <header>
                 <span class="collection-header-icon icon-microphone"></span>
                 <span class="label-bold-xs" data-bind="l10n_text: z.string.collection_section_audio"></span>
@@ -69,7 +69,7 @@
           <!-- /ko -->
 
           <!-- ko if: files().length -->
-            <section class="collection-section" data-uie-name="collection-section-file" data-bind="attr: {'data-uie-collection-size': files().length}">
+            <section class="collection-section" data-bind="attr: {'data-uie-collection-size': files().length}" data-uie-name="collection-section-file">
               <header>
                 <span class="collection-header-icon icon-file"></span>
                 <span class="label-bold-xs" data-bind="l10n_text: z.string.collection_section_files"></span>

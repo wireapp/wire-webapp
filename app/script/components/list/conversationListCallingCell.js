@@ -140,7 +140,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
 
 ko.components.register('conversation-list-calling-cell', {
   template: `
-    <div data-uie-name="item-call" class="conversation-list-calling-cell conversation-list-cell" data-bind="attr: {'data-uie-uid': conversation.id, 'data-uie-value': conversation.display_name}, css: {'conversation-list-cell-active': is_selected(conversation)}">
+    <div class="conversation-list-calling-cell conversation-list-cell" data-bind="attr: {'data-uie-uid': conversation.id, 'data-uie-value': conversation.display_name}, css: {'conversation-list-cell-active': is_selected(conversation)}" data-uie-name="item-call">
       <div class="conversation-list-cell-left">
         <!-- ko if: conversation.is_group() -->
           <group-avatar class="conversation-list-cell-avatar-arrow" params="users: users(), conversation: conversation"></group-avatar>
@@ -182,12 +182,12 @@ ko.components.register('conversation-list-calling-cell', {
     <!-- ko if: show_call_controls -->
     <div class="conversation-list-calling-cell-controls">
       <!-- ko if: show_participants_button -->
-        <div data-uie-name="do-toggle-participants" class="conversation-list-calling-cell-controls-button cursor-pointer conversation-list-calling-cell-controls-on-call" data-bind="click: on_participants_button_click, text: participants_button_label, css: show_participants() ? 'cell-badge-light' : 'cell-badge-dark'"></div>
+        <div class="conversation-list-calling-cell-controls-button cursor-pointer conversation-list-calling-cell-controls-on-call" data-bind="click: on_participants_button_click, text: participants_button_label, css: show_participants() ? 'cell-badge-light' : 'cell-badge-dark'" data-uie-name="do-toggle-participants"></div>
       <!-- /ko -->
-      <div data-uie-name="do-toggle-mute" class="conversation-list-calling-cell-controls-button icon-mute-small cursor-pointer" data-bind="click: on_toggle_audio, css: self_stream_state.audio_send() ? 'cell-badge-dark' : 'cell-badge-light'"></div>
+      <div class="conversation-list-calling-cell-controls-button icon-mute-small cursor-pointer" data-bind="click: on_toggle_audio, css: self_stream_state.audio_send() ? 'cell-badge-dark' : 'cell-badge-light'" data-uie-name="do-toggle-mute"></div>
       <!-- ko if: call_is_ongoing -->
         <!-- ko if: show_video_button() -->
-          <div data-uie-name="do-toggle-video" class="conversation-list-calling-cell-controls-button icon-video cursor-pointer" data-bind="click: on_toggle_video, css: self_stream_state.video_send() ? 'cell-badge-light' : 'cell-badge-dark'"></div>
+          <div class="conversation-list-calling-cell-controls-button icon-video cursor-pointer" data-bind="click: on_toggle_video, css: self_stream_state.video_send() ? 'cell-badge-light' : 'cell-badge-dark'" data-uie-name="do-toggle-video"></div>
         <!-- /ko -->
         <!-- ko if: show_screensharing_button() -->
           <div data-uie-name="do-toggle-screenshare" class="conversation-list-calling-cell-controls-button icon-screensharing-small cursor-pointer"
