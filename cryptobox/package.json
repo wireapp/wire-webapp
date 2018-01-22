@@ -35,7 +35,7 @@
     "webpack": "2.3.3",
     "yargs": "10.1.1"
   },
-  "files": ["dist/commonjs", "dist/typings", "dist/window"],
+  "files": ["dist/commonjs", "dist/wire-webapp-cryptobox.d.ts", "dist/window"],
   "license": "GPL-3.0",
   "main": "dist/commonjs/wire-webapp-cryptobox.js",
   "name": "@wireapp/cryptobox",
@@ -49,6 +49,6 @@
     "test:rerun": "gulp test",
     "test": "yarn dist && gulp test"
   },
-  "types": "dist/typings/wire-webapp-cryptobox.d.ts",
+  "types": "dist/wire-webapp-cryptobox.d.ts",
   "version": "6.3.1"
 }

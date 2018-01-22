@@ -78,7 +78,7 @@ gulp.task('build_ts_node', () => {
   gutil.log(gutil.colors.yellow(`Disable log statements: ${disableLogging}`));
 
   return merge([
-    tsResult.dts.pipe(gulp.dest('dist/typings')),
+    tsResult.dts.pipe(gulp.dest('dist/')),
     tsResult.js
       .pipe(replace('exports.default = {', 'module.exports = {'))
       .pipe(gulpif(disableLogging, replace(/(const|var) Logdown[^\n]*/gi, '')))

@@ -13,7 +13,7 @@
     "tsd-jsdoc": "dcodeio/tsd-jsdoc#fe76c4dc071b00bb549d3af7a3bad8c555999e81",
     "webpack": "3.10.0"
   },
-  "files": ["dist/typings", "dist/window", "src"],
+  "files": ["dist/types.d.ts", "dist/window", "src"],
   "license": "GPL-3.0",
   "main": "src/proteus.js",
   "name": "@wireapp/proteus",
@@ -28,6 +28,6 @@
       "mocha -s 30000 -t 30000 --recursive test/harness.js test --trace-warnings --grep LongRunning --invert",
     "test:longrunning": "mocha -s 30000 -t 30000 --recursive test/harness.js test --trace-warnings --grep LongRunning"
   },
-  "types": "dist/typings/typings.d.ts",
+  "types": "dist/types.d.ts",
   "version": "5.3.1"
 }

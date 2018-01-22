@@ -10,7 +10,7 @@
     "tsd-jsdoc": "dcodeio/tsd-jsdoc#fe76c4dc071b00bb549d3af7a3bad8c555999e81",
     "webpack": "3.10.0"
   },
-  "files": ["dist/", "src/", "typings"],
+  "files": ["dist/", "src/"],
   "license": "GPL-3.0",
   "main": "src/cbor.js",
   "name": "@wireapp/cbor",
@@ -19,11 +19,10 @@
     "clear": "rimraf dist",
     "coverage:html": "istanbul cover --report html jasmine",
     "coverage:lcov": "istanbul cover --report lcov jasmine",
-    "dist": "yarn clear && webpack",
+    "dist": "yarn clear && webpack && yarn types",
     "test": "yarn dist && jasmine",
-    "types": "jsdoc --verbose --pedantic --configure jsdoc.json src/ && node typings/replace.js",
-    "version": "yarn types && git add dist/**/* typings/types.d.ts"
+    "types": "jsdoc --verbose --pedantic --configure jsdoc.json src/ && node replace.js"
   },
-  "types": "typings/types.d.ts",
+  "types": "dist/types.d.ts",
   "version": "2.3.1"
 }

@@ -9,7 +9,7 @@
   },
   "opts": {
     "comments": true,
-    "destination": "./typings",
+    "destination": "./dist/",
     "encoding": "utf8",
     "lenient": true,
     "recurse": true,

@@ -19,7 +19,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const file = path.resolve(__dirname, 'dist/typings/types.d.ts');
+const file = path.resolve(__dirname, 'dist/types.d.ts');
 const regex = /^(module [^ ]+ {)$/gm;
 
 fs.readFile(file, 'utf8', (err, content) => {

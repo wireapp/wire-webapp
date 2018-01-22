@@ -1,5 +1,3 @@
-'use strict';
-
 const Proteus = require('../src/proteus');
 const sodium = require('libsodium-wrappers-sumo');
 
