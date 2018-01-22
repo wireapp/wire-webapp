@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.0.24"></a>
+
+## [0.0.24](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@0.0.22...@wireapp/core@0.0.24) (2018-01-22)
+
+### Bug Fixes
+
+* Release fixes ([#202](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/202)) ([902130d](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/902130d))
+* **api-client:** Mutual config ([#206](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/206)) ([9eb6fa0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/9eb6fa0))
+* **core:** Fixed service setup ([6826cf9](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/6826cf9))
+
 <a name="0.0.22"></a>
 
 ## [0.0.22](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@0.0.21...@wireapp/core@0.0.22) (2018-01-11)
