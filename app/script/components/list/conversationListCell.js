@@ -50,7 +50,7 @@ ko.components.register('conversation-list-cell', {
         <!-- /ko -->
         <!-- ko if: !conversation.is_group() && users().length -->
           <div class="avatar-halo">
-            <participant-avatar params="participant: users()[0], size: 's'"></participant-avatar>
+            <participant-avatar params="participant: users()[0], size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
           </div>
         <!-- /ko -->
       </div>
