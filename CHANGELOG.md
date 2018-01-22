@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.1.5"></a>
+
+## [0.1.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@0.1.4...@wireapp/react-ui-kit@0.1.5) (2018-01-22)
+
+### Bug Fixes
+
+* Release fixes ([#202](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/202)) ([902130d](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/902130d))
+
 <a name="0.1.4"></a>
 
 ## [0.1.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@0.1.3...@wireapp/react-ui-kit@0.1.4) (2018-01-11)
