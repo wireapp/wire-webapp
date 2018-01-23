@@ -12,7 +12,7 @@
   "license": "GPL-3.0",
   "main": "dist/commonjs/LRUCache.js",
   "name": "@wireapp/lru-cache",
-  "repository": "https://github.com/wireapp/wire-web-packages/tree/master/lru-cache",
+  "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/lru-cache",
   "scripts": {
     "build": "yarn build:node && yarn build:browser",
     "build:browser": "webpack --progress",
