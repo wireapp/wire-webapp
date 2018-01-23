@@ -42,8 +42,8 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
   constructor(elementId, conversationRepository, integrationRepository, teamRepository, userRepository) {
     this.clickOnAddPeople = this.clickOnAddPeople.bind(this);
-    this.clickOnClose = this.clickOnClose.bind(this);
     this.clickOnPending = this.clickOnPending.bind(this);
+    this.clickOnMemberBack = this.clickOnMemberBack.bind(this);
     this.clickOnSelectService = this.clickOnSelectService.bind(this);
     this.clickOnShowParticipant = this.clickOnShowParticipant.bind(this);
     this.clickToAddService = this.clickToAddService.bind(this);
@@ -206,10 +206,6 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.searchServices(this.searchInput());
   }
 
-  clickOnClose() {
-    this.resetView();
-  }
-
   clickOnPending(userEntity) {
     const onSuccess = () => this.participantsBubble.hide();
 
@@ -221,6 +217,10 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
       },
       template: '#template-confirm-connect',
     });
+  }
+
+  clickOnCloseAdding() {
+    this.resetView();
   }
 
   clickOnSelectService(serviceEntity) {
@@ -237,6 +237,10 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
   clickOnSelfProfile() {
     amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT);
+  }
+
+  clickOnMemberBack() {
+    this.resetView();
   }
 
   clickOnServiceBack() {
@@ -367,6 +371,31 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     });
   }
 
+  renameConversation(data, event) {
+    const currentConversationName = this.conversation()
+      .display_name()
+      .trim();
+    const newConversationName = z.util.StringUtil.remove_line_breaks(event.target.value.trim());
+
+    if (newConversationName.length && newConversationName !== currentConversationName) {
+      event.target.value = currentConversationName;
+      this.isEditing(false);
+      this.conversationRepository.rename_conversation(this.conversation(), newConversationName);
+    }
+  }
+
+  resetView() {
+    this.state(ParticipantsViewModel.STATE.PARTICIPANTS);
+    this.selectedUsers.removeAll();
+    this.services.removeAll();
+    this.searchInput('');
+    if (this.confirmDialog) {
+      this.confirmDialog.destroy();
+    }
+    this.selectedService(undefined);
+    this.selectedUser(undefined);
+  }
+
   searchServices(query) {
     if (this.stateAddService()) {
       this.integrationRepository.searchForServices(query, this.searchInput);
@@ -433,37 +462,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     };
 
     const bubble = wire.app.view.content.message_list.participant_bubble;
-    if (bubble && bubble.is_visible()) {
-      window.setTimeout(() => {
-        toggleBubble();
-      }, 550);
-    } else {
-      toggleBubble();
-    }
-  }
-
-  renameConversation(data, event) {
-    const currentConversationName = this.conversation()
-      .display_name()
-      .trim();
-    const newConversationName = z.util.StringUtil.remove_line_breaks(event.target.value.trim());
-
-    if (newConversationName.length && newConversationName !== currentConversationName) {
-      event.target.value = currentConversationName;
-      this.isEditing(false);
-      this.conversationRepository.rename_conversation(this.conversation(), newConversationName);
-    }
-  }
-
-  resetView() {
-    this.state(ParticipantsViewModel.STATE.PARTICIPANTS);
-    this.selectedUsers.removeAll();
-    this.services.removeAll();
-    this.searchInput('');
-    if (this.confirmDialog) {
-      this.confirmDialog.destroy();
-    }
-    this.selectedService();
-    this.selectedUser();
+    const timeout = bubble && bubble.is_visible() ? 550 : 0;
+    window.setTimeout(() => toggleBubble(), timeout);
   }
 };
