@@ -67,7 +67,7 @@ ko.components.register('conversation-list-cell', {
         <span class="conversation-list-cell-description" data-bind="text: cell_state().description" data-uie-name="secondary-line"></span>
       </div>
       <div class="conversation-list-cell-right">
-        <span class="conversation-list-cell-context-menu" data-uie-name="go-options" data-bind="click: function(data, event) {on_click(conversation, event)}"></span>
+        <span class="conversation-list-cell-context-menu" data-bind="click: function(data, event) {on_click(conversation, event)}" data-uie-name="go-options"></span>
         <!-- ko if: cell_state().icon === z.conversation.ConversationStatusIcon.PENDING_CONNECTION -->
           <span class="conversation-list-cell-badge cell-badge-dark icon-pending" data-uie-name="status-pending"></span>
         <!-- /ko -->
@@ -81,7 +81,7 @@ ko.components.register('conversation-list-cell', {
           <span class="conversation-list-cell-badge cell-badge-dark icon-silence" data-uie-name="status-silence"></span>
         <!-- /ko -->
         <!-- ko if: cell_state().icon === z.conversation.ConversationStatusIcon.UNREAD_MESSAGES && conversation.unread_message_count() > 0 -->
-          <span class="conversation-list-cell-badge cell-badge-light" data-uie-name="status-unread" data-bind="text: conversation.unread_message_count()"></span>
+          <span class="conversation-list-cell-badge cell-badge-light" data-bind="text: conversation.unread_message_count()" data-uie-name="status-unread"></span>
         <!-- /ko -->
       </div>
     </div>

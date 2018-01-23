@@ -98,8 +98,8 @@ z.components.MediaButtonComponent = class MediaButtonComponent {
 ko.components.register('media-button', {
   template: `
     <!-- ko if: asset.status() === z.assets.AssetTransferState.UPLOADED -->
-      <div class='media-button media-button-play icon-play' data-uie-name="do-play-media" data-bind="click: on_play_button_clicked, visible: !media_is_playing()"></div>
-      <div class='media-button media-button-pause icon-pause' data-uie-name="do-pause-media" data-bind="click: on_pause_button_clicked, visible: media_is_playing()"></div>
+      <div class='media-button media-button-play icon-play' data-bind="click: on_play_button_clicked, visible: !media_is_playing()" data-uie-name="do-play-media"></div>
+      <div class='media-button media-button-pause icon-pause' data-bind="click: on_pause_button_clicked, visible: media_is_playing()" data-uie-name="do-pause-media"></div>
     <!-- /ko -->
     <!-- ko if: asset.status() === z.assets.AssetTransferState.DOWNLOADING -->
       <div class="media-button icon-close" data-bind="click: asset.cancel_download" data-uie-name="status-loading-media">
@@ -110,7 +110,7 @@ ko.components.register('media-button', {
       </div>
     <!-- /ko -->
     <!-- ko if: asset.uploaded_on_this_client() && asset.status() === z.assets.AssetTransferState.UPLOADING -->
-      <div class="media-button icon-close" data-uie-name="do-cancel-media" data-bind="click: on_cancel_button_clicked">
+      <div class="media-button icon-close" data-bind="click: on_cancel_button_clicked" data-uie-name="do-cancel-media">
         <div class='media-button-border-fill'></div>
         <svg class="svg-theme" data-bind="attr: {viewBox: svg_view_box}">
           <circle data-bind="style: {'stroke-dasharray': circle_upload_progress}" class="stroke-theme" r="50%" cx="50%" cy="50%"></circle>

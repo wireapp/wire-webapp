@@ -19,16 +19,16 @@
       <!-- ko if: message.verification_message_type === z.message.VerificationMessageType.UNVERIFIED -->
         <span class="label-bold" data-bind="text: message.sender_name()"></span>
         <span class="ellipsis" data-bind="l10n_text: z.string.conversation_device_unverified"></span>
-        <span class="ellipsis text-theme" data-uie-name="go-devices" data-bind="click: click_on_device, text: message.caption_unverified_device"></span>
+        <span class="ellipsis text-theme" data-bind="click: click_on_device, text: message.caption_unverified_device" data-uie-name="go-devices"></span>
       <!-- /ko -->
       <!-- ko if: message.verification_message_type === z.message.VerificationMessageType.NEW_DEVICE -->
         <span class="label-bold" data-bind='text: message.caption_user'></span>
         <span class="ellipsis" data-bind="text: message.caption_started_using"></span>
-        <span class="ellipsis text-theme" data-uie-name="go-devices" data-bind="click: click_on_device, text: message.caption_new_device"></span>
+        <span class="ellipsis text-theme" data-bind="click: click_on_device, text: message.caption_new_device" data-uie-name="go-devices"></span>
       <!-- /ko -->
       <!-- ko if: message.verification_message_type === z.message.VerificationMessageType.NEW_MEMBER -->
         <span class="ellipsis" data-bind="l10n_text: z.string.conversation_device_new_people_joined"></span>
-        <span class="ellipsis text-theme" data-uie-name="go-devices" data-bind="click: click_on_device, l10n_text: z.string.conversation_device_new_people_joined_verify"></span>
+        <span class="ellipsis text-theme" data-bind="click: click_on_device, l10n_text: z.string.conversation_device_new_people_joined_verify" data-uie-name="go-devices"></span>
       <!-- /ko -->
       <hr class="message-header-line" />
     </div>
@@ -173,7 +173,7 @@
         </span>
       </div>
       <div class="message-footer-label cursor-pointer" data-bind="click: function() {$data.show_likes(true)}">
-        <span class="font-size-xs text-graphite" data-uie-name="message-liked-names" data-bind="text: like_caption, attr: {'data-uie-value': reactions_user_ids()}" ></span>
+        <span class="font-size-xs text-graphite" data-bind="text: like_caption, attr: {'data-uie-value': reactions_user_ids()}"  data-uie-name="message-liked-names"></span>
         <!-- ko if: !message.show_likes() && message.other_likes().length > 5 -->
           <span class="icon-more font-size-xs"></span>
         <!-- /ko -->

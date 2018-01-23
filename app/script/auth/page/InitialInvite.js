@@ -68,7 +68,7 @@ class InitialInvite extends React.PureComponent {
         padding: '0 24px 0 20px',
       }}
     >
-      <Text data-uie-name="item-pending-email" fontSize="14px">
+      <Text fontSize="14px" data-uie-name="item-pending-email">
         {email}
       </Text>
       <CheckIcon color={COLOR.TEXT} />
@@ -141,7 +141,7 @@ class InitialInvite extends React.PureComponent {
                 {_(inviteStrings.nextButton)}
               </ButtonLink>
             ) : (
-              <Link data-uie-name="do-skip" onClick={this.onInviteDone}>
+              <Link onClick={this.onInviteDone} data-uie-name="do-skip">
                 {_(inviteStrings.skipForNow)}
               </Link>
             )}

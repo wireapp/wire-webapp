@@ -8,7 +8,7 @@
           <div class="participants-group-header">
             <div class="name popover-title">
               <div data-bind="visible: !isEditing(), text: conversation().display_name(), click: clickToEdit, l10n_tooltip: z.string.tooltip_people_rename" data-uie-name="status-name"></div>
-              <textarea data-bind="visible: isEditing, value: conversation().display_name(), enter: renameConversation, hasFocus: isEditing, resize" data-uie-name="enter-name" maxlength="64" dir="auto"></textarea>
+              <textarea data-bind="visible: isEditing, value: conversation().display_name(), enter: renameConversation, hasFocus: isEditing, resize" maxlength="64" dir="auto" data-uie-name="enter-name"></textarea>
             </div>
             <span class="edit icon-edit" data-bind="visible: isEditable() && !isEditing(), click: clickToEdit"></span>
             <div class="people popover-meta text-uppercase" data-bind="l10n_text: {'id': z.string.people_people, 'substitute': participants().length}"></div>

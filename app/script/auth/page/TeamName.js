@@ -78,7 +78,7 @@ class TeamName extends Component {
         <Columns>
           <Column style={{display: 'flex'}}>
             <div style={{margin: 'auto'}}>
-              <Link to={ROUTE.INDEX} data-uie-name="go-register-team" component={RRLink}>
+              <Link to={ROUTE.INDEX} component={RRLink} data-uie-name="go-register-team">
                 <ArrowIcon direction="left" color={COLOR.GRAY} />
               </Link>
             </div>
