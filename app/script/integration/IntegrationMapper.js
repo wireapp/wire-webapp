@@ -69,6 +69,8 @@ z.integration.IntegrationMapper = (() => {
     if (serviceData) {
       const {assets, description, id, name, provider: providerId, summary, tags} = serviceData;
 
+      serviceEntity.isBot = true;
+
       if (id) {
         serviceEntity.id = id;
       }

@@ -24,6 +24,13 @@ window.z.ViewModel = z.ViewModel || {};
 window.z.ViewModel.list = z.ViewModel.list || {};
 
 z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
+  static get STATE() {
+    return {
+      ADD_PEOPLE: 'StartUIViewModel.STATE.ADD_PEOPLE',
+      ADD_SERVICE: 'StartUIViewModel.STATE.ADD_SERVICE',
+    };
+  }
+
   /**
    * View model for the start UI.
    * @class z.ViewModel.list.StartUIViewModel
@@ -51,7 +58,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
   ) {
     this.click_on_close = this.click_on_close.bind(this);
     this.click_on_group = this.click_on_group.bind(this);
-    this.click_on_other = this.click_on_other.bind(this);
+    this.clickOnOther = this.clickOnOther.bind(this);
     this.clickOnService = this.clickOnService.bind(this);
     this.on_cancel_request = this.on_cancel_request.bind(this);
     this.on_submit_search = this.on_submit_search.bind(this);
@@ -79,15 +86,13 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
     this.submitted_search = false;
 
-    this.clickOnTab = index => this.tabIndex(index);
-    this.tabIndex = ko.observable(0);
-    this.tabIndex.subscribe(() => this.updateList());
+    this.state = ko.observable(StartUIViewModel.STATE.ADD_PEOPLE);
+    this.state.subscribe(() => this.updateList());
 
-    this.peopleTabActive = ko.pureComputed(() => this.tabIndex() === 0);
+    this.peopleTabActive = ko.pureComputed(() => this.state() === StartUIViewModel.STATE.ADD_PEOPLE);
 
     this.search = _.debounce(query => {
       this.clearSearchResults();
-
       if (this.peopleTabActive()) {
         return this._searchPeople(query);
       }
@@ -137,11 +142,12 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       return (
         this.search_results.groups().length ||
         this.search_results.contacts().length ||
-        this.search_results.others().length
+        this.search_results.others().length ||
+        this.search_results.services().length
       );
     });
 
-    this.enableIntegrations = () => false;
+    this.enableIntegrations = this.integrationRepository.enableIntegrations;
 
     this.show_content = ko.pureComputed(() => {
       return this.show_contacts() || this.show_matches() || this.show_search_results();
@@ -281,26 +287,28 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     });
   }
 
-  click_on_other(user_et, event) {
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.SELECTED_USER_FROM_SEARCH, {
-      connection_type: (() => {
-        switch (user_et.connection().status()) {
-          case z.user.ConnectionStatus.ACCEPTED:
-            return 'connected';
-          case z.user.ConnectionStatus.UNKNOWN:
-            return 'unconnected';
-          case z.user.ConnectionStatus.PENDING:
-            return 'pending_incoming';
-          case z.user.ConnectionStatus.SENT:
-            return 'pending_outgoing';
-          default:
-        }
-      })(),
-      context: 'startui',
-    });
+  clickOnOther(userEntity, event) {
+    if (!userEntity.isBot) {
+      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.SELECTED_USER_FROM_SEARCH, {
+        connection_type: (() => {
+          switch (userEntity.connection().status()) {
+            case z.user.ConnectionStatus.ACCEPTED:
+              return 'connected';
+            case z.user.ConnectionStatus.UNKNOWN:
+              return 'unconnected';
+            case z.user.ConnectionStatus.PENDING:
+              return 'pending_incoming';
+            case z.user.ConnectionStatus.SENT:
+              return 'pending_outgoing';
+            default:
+          }
+        })(),
+        context: 'startui',
+      });
+    }
 
     const create_bubble = element_id => {
-      this.user_profile(user_et);
+      this.user_profile(userEntity);
       this.user_bubble_last_id = element_id;
       this.user_bubble = new zeta.webapp.module.Bubble({
         host_selector: `#${element.attr('id')}`,
@@ -338,6 +346,14 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     } else {
       create_bubble(element[0].id);
     }
+  }
+  clickOnAddService() {
+    this.state(StartUIViewModel.STATE.ADD_SERVICE);
+    this._updateServicesList();
+  }
+  clickOnAddPeople() {
+    this.state(StartUIViewModel.STATE.ADD_PEOPLE);
+    this._updateServicesList();
   }
 
   clickOnService(service) {
