@@ -86,7 +86,7 @@
               </div>
               <div class="others" data-bind="visible: search_results.others().length > 0">
                 <span class="start-ui-list-header" data-bind="l10n_text: z.string.search_others"></span>
-                <user-list class="search-list-theme-black" params="user: search_results.others, click: clickOnOther, mode: z.components.UserListMode.OTHERS"></user-list>
+                <user-list class="search-list-theme-black" params="user: search_results.others, click: clickOnOther, mode: z.components.UserList.MODE.OTHERS"></user-list>
               </div>
             </div>
           <!-- /ko -->

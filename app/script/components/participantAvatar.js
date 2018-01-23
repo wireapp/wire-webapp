@@ -23,6 +23,17 @@ window.z = window.z || {};
 window.z.components = z.components || {};
 
 z.components.ParticipantAvatar = class ParticipantAvatar {
+  static get SIZE() {
+    return {
+      LARGE: 'avatar-lg',
+      MEDIUM: 'avatar-md',
+      SMALL: 'avatar-s',
+      X_LARGE: 'avatar-xl',
+      X_SMALL: 'avatar-xs',
+      XX_SMALL: 'avatar-xxs',
+    };
+  }
+
   constructor(params, componentInfo) {
     this.participant = ko.unwrap(params.participant);
     this.isService = this.participant instanceof z.integration.ServiceEntity || this.participant.isBot;
@@ -30,12 +41,9 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
 
     const avatarType = `${this.isUser ? 'user' : 'service'}-avatar`;
     this.delay = params.delay;
-    this.size = params.size;
+    this.size = params.size || ParticipantAvatar.SIZE.LARGE;
     this.element = $(componentInfo.element);
-
-    if (this.size) {
-      this.element.addClass(`${avatarType} avatar-${this.size}`);
-    }
+    this.element.addClass(`${avatarType} ${this.size}`);
 
     this.avatarLoadingBlocked = false;
     this.avatarEnteredViewport = false;

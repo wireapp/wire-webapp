@@ -117,16 +117,16 @@ participant-avatar {
     }
   }
 
+  &.avatar-xl {
+    .avatar-size(xl);
+  }
+
   &.avatar-lg {
     .avatar-size(lg);
   }
 
   &.avatar-md {
     .avatar-size(md);
-  }
-
-  &.avatar-sm {
-    .avatar-size(sm);
   }
 
   &.avatar-s {
@@ -137,12 +137,12 @@ participant-avatar {
     .avatar-size(xs);
   }
 
-  &.avatar-xss {
+  &.avatar-xxs {
     .avatar-size(xxs);
   }
 
-  &.avatar-md,
-  &.avatar-sm {
+  &.avatar-lg,
+  &.avatar-md {
     .avatar-border {
       display: none;
     }
@@ -150,8 +150,9 @@ participant-avatar {
 
   &.avatar-s,
   &.avatar-xs,
-  &.avatar-xss {
-    .avatar-image {
+  &.avatar-xxs {
+    .avatar-image,
+    .avatar-service-placeholder {
       .no-transition();
     }
     .avatar-badge {
@@ -180,7 +181,8 @@ participant-avatar {
   }
 
   &.avatar-loading-transition {
-    .avatar-initials {
+    .avatar-initials,
+    .avatar-service-placeholder {
       transition: opacity @animation-timing-faster @ease-in-quart;
     }
     .avatar-image {
@@ -188,7 +190,8 @@ participant-avatar {
     }
   }
   &.avatar-image-loaded {
-    .avatar-initials {
+    .avatar-initials,
+    .avatar-service-placeholder {
       opacity: 0;
     }
     .avatar-image {
@@ -210,14 +213,16 @@ participant-avatar {
 
   &.service-avatar {
     &,
-    .avatar-border {
+    .avatar-border,
+    .avatar-image > img {
       border-radius: 15%;
     }
   }
 
   &.user-avatar {
     &,
-    .avatar-border {
+    .avatar-border,
+    .avatar-image > img {
       border-radius: 50%;
     }
   }

@@ -58,7 +58,7 @@
 <script type="text/html" id="delete">
   <div class="message-header">
     <div class="message-header-icon">
-      <participant-avatar class="sender-avatar" data-bubble="#participants-bubble" data-placement="vertical" params="participant: message.user(), click: $parent.on_message_user_click, size: 'xs'"></participant-avatar>
+      <participant-avatar class="sender-avatar" data-bubble="#participants-bubble" data-placement="vertical" params="participant: message.user(), click: $parent.on_message_user_click, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
     </div>
     <div class="message-header-label">
       <span class="message-header-label-sender" data-bind='text: message.sender_name()'></span>
@@ -74,7 +74,7 @@
   <!-- ko if: !$parent.should_hide_user_avatar($data) -->
     <div class="message-header">
       <div class="message-header-icon">
-        <participant-avatar class="sender-avatar" data-bubble="#participants-bubble" data-placement="vertical" params="participant: message.user(), click: $parent.on_message_user_click, size: 'xs'"></participant-avatar>
+        <participant-avatar class="sender-avatar" data-bubble="#participants-bubble" data-placement="vertical" params="participant: message.user(), click: $parent.on_message_user_click, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
       </div>
       <div class="message-header-label">
         <span class="message-header-label-sender" data-bind='css: message.accent_color(), text: message.user().first_name()' data-uie-name="sender-name"></span>
@@ -183,7 +183,7 @@
           <!-- ko foreach: message.reactions_user_ets() -->
             <participant-avatar data-bubble="#participants-bubble"
                          data-placement="vertical"
-                         params="participant: $data, click: $parents[1].on_message_user_click, size: 'xs'"></participant-avatar>
+                         params="participant: $data, click: $parents[1].on_message_user_click, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
           <!-- /ko -->
           <span class="message-footer-close-button icon-close" data-bind="click: function() { $data.show_likes(false) }"></span>
         </div>
@@ -215,7 +215,7 @@
       <span class="message-connected-username label-username" data-bind='text: other_user().username()'></span>
       <participant-avatar class="message-connected-avatar avatar-no-badge cursor-default"
                    data-bind="css: {'avatar-no-badge': other_user().is_outgoing_request()}"
-                   params="participant: other_user(), size: 'lg'"></participant-avatar>
+                   params="participant: other_user(), size: z.components.ParticipantAvatar.SIZE.X_LARGE"></participant-avatar>
       <!-- ko if: other_user().is_outgoing_request() -->
         <div class="message-connected-cancel text-theme"
              data-bind="click: $parent.click_on_cancel_request,
@@ -248,13 +248,13 @@
           <participant-avatar class="avatar-no-border"
                        data-bubble="#participants-bubble"
                        data-placement="vertical"
-                       params="participant: $data, click: $parents[1].on_message_user_click, size: 'sm'"></participant-avatar>
+                       params="participant: $data, click: $parents[1].on_message_user_click, size: z.components.ParticipantAvatar.SIZE.MEDIUM"></participant-avatar>
         <!-- /ko -->
         <!-- ko if: message.is_member_join() || message.is_member_leave() -->
           <participant-avatar data-bind="css: {'translucent': message.is_member_leave()}"
                        data-bubble="#participants-bubble"
                        data-placement="vertical"
-                       params="participant: $data, click: $parents[1].on_message_user_click, size: 'xs'"></participant-avatar>
+                       params="participant: $data, click: $parents[1].on_message_user_click, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
         <!-- /ko -->
       <!-- /ko -->
     </div>
