@@ -215,7 +215,7 @@
       <span class="message-connected-username label-username" data-bind='text: other_user().username()'></span>
       <participant-avatar class="message-connected-avatar avatar-no-badge cursor-default"
                    data-bind="css: {'avatar-no-badge': other_user().is_outgoing_request()}"
-                   params="participant: other_user(), size: z.components.ParticipantAvatar.SIZE.LARGE"></participant-avatar>
+                   params="participant: other_user(), size: z.components.ParticipantAvatar.SIZE.X_LARGE"></participant-avatar>
       <!-- ko if: other_user().is_outgoing_request() -->
         <div class="message-connected-cancel text-theme"
              data-bind="click: $parent.click_on_cancel_request,

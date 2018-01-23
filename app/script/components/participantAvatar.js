@@ -28,6 +28,7 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
       LARGE: 'avatar-lg',
       MEDIUM: 'avatar-md',
       SMALL: 'avatar-s',
+      X_LARGE: 'avatar-xl',
       X_SMALL: 'avatar-xs',
       XX_SMALL: 'avatar-xxs',
     };
@@ -40,7 +41,7 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
 
     const avatarType = `${this.isUser ? 'user' : 'service'}-avatar`;
     this.delay = params.delay;
-    this.size = params.size || ParticipantAvatar.SIZE.MEDIUM;
+    this.size = params.size || ParticipantAvatar.SIZE.LARGE;
     this.element = $(componentInfo.element);
     this.element.addClass(`${avatarType} ${this.size}`);
 
