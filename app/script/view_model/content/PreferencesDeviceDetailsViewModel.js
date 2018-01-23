@@ -103,7 +103,7 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
           this.session_reset_state(
             z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.CONFIRMATION
           );
-        }, 550);
+        }, z.motion.MotionDuration.LONG);
 
         window.setTimeout(() => {
           this.session_reset_state(z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET);

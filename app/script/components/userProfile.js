@@ -30,8 +30,6 @@ z.components.UserProfileMode = {
 
 z.components.UserProfileViewModel = class UserProfileViewModel {
   constructor(params, component_info) {
-    const SHOW_CONVERSATION_DELAY = 550;
-
     this.dispose = this.dispose.bind(this);
     this.click_on_device = this.click_on_device.bind(this);
 
@@ -201,7 +199,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
               const next_conversation_et = this.conversation_repository.get_next_conversation(conversation_et);
               window.setTimeout(() => {
                 amplify.publish(z.event.WebApp.CONVERSATION.SHOW, next_conversation_et);
-              }, SHOW_CONVERSATION_DELAY);
+              }, z.motion.MotionDuration.LONG);
             }
           });
 
@@ -229,7 +227,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
           if (typeof params.open === 'function') {
             params.open(this.user());
           }
-        }, SHOW_CONVERSATION_DELAY);
+        }, z.motion.MotionDuration.LONG);
       });
     };
 
@@ -387,7 +385,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
     const reset_progress = () => {
       window.setTimeout(() => {
         this.is_resetting_session(false);
-      }, 550);
+      }, z.motion.MotionDuration.LONG);
     };
 
     this.is_resetting_session(true);

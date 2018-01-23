@@ -462,7 +462,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     };
 
     const bubble = wire.app.view.content.message_list.participant_bubble;
-    const timeout = bubble && bubble.is_visible() ? 550 : 0;
+    const timeout = bubble && bubble.is_visible() ? z.motion.MotionDuration.LONG : 0;
     window.setTimeout(() => toggleBubble(), timeout);
   }
 };
