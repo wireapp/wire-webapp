@@ -72,7 +72,6 @@ z.integration.IntegrationRepository = class IntegrationRepository {
           conversation_size: conversationEntity.getNumberOfParticpants(true, false),
           method: method,
           service_id: serviceId,
-          service_name: name.toLowerCase(),
           services_size: conversationEntity.getNumberOfBots(),
         };
 
