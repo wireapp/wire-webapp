@@ -368,7 +368,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   }
 
   searchServices(query) {
-    if (this.state() === ParticipantsViewModel.STATE.ADD_SERVICE) {
+    if (this.stateAddService()) {
       this.integrationRepository.searchForServices(query, this.searchInput);
     }
   }
@@ -421,9 +421,8 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
           return this.participantsBubble.show().then(() => this.clickOnAddPeople());
         }
 
-        const isAddingPeople = this.state() === ParticipantsViewModel.STATE.ADD_PEOPLE;
         const isConfirmingAction = this.confirmDialog && this.confirmDialog.is_visible();
-        if (isAddingPeople || isConfirmingAction) {
+        if (this.stateAddPeople() || isConfirmingAction) {
           return this.participantsBubble.hide();
         }
 

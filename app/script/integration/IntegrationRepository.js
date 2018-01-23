@@ -24,7 +24,7 @@ window.z.integration = z.integration || {};
 
 z.integration.IntegrationRepository = class IntegrationRepository {
   /**
-   * Trim and remove @.
+   * Trim query string for search.
    * @param {string} query - Service search string
    * @returns {string} Normalized service search query
    */
@@ -79,7 +79,7 @@ z.integration.IntegrationRepository = class IntegrationRepository {
   addServiceFromParam(providerId, serviceId) {
     this.getServiceById(providerId, serviceId).then(serviceEntity => {
       amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.BOTS_CONFIRM, {
-        action: () => this.createNewConversation(serviceEntity),
+        action: () => this.createConversationWithService(serviceEntity),
         data: serviceEntity.name,
       });
     });
@@ -90,7 +90,7 @@ z.integration.IntegrationRepository = class IntegrationRepository {
    * @param {z.integration.ServiceEntity} serviceEntity - Information about service to be added
    * @returns {Promise} Resolves when integration was added to conversation
    */
-  createNewConversation(serviceEntity) {
+  createConversationWithService(serviceEntity) {
     return Promise.resolve()
       .then(() => this.conversationRepository.create_new_conversation([], serviceEntity.name))
       .then(conversationEntity => {
