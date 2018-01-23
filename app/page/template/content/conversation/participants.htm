@@ -80,23 +80,21 @@
             </div >
           <!-- /ko -->
         </div >
-        <!-- ko if: stateAddPeople() -->
-          <div class="participants-search-content">
-            <div class="participants-search-list" data-bind="antiscroll: selectedUsers">
+        <div class="participants-search-content">
+          <div class="participants-search-list" data-bind="antiscroll: shouldUpdateScrollbar">
+            <!-- ko if: stateAddPeople() -->
               <user-list class="user-list-light" params="user: users, filter: searchInput, selected: selectedUsers"></user-list>
-            </div>
+            <!-- /ko -->
+            <!-- ko if: stateAddService() -->
+              <service-list class="service-list-light" params="services: services, click: clickOnSelectService"></service-list>
+            <!-- /ko -->
           </div>
+        </div>
+        <!-- ko if: stateAddPeople() -->
           <button class="participants-search-footer button button-full" data-bind="enable: selectedUsers().length > 0, click: clickToAddMembers" data-uie-name="do-create">
             <span class="icon-people-add participants-search-icon"></span>
             <span data-bind="l10n_text: searchActionText"></span>
           </button>
-        <!-- /ko -->
-        <!-- ko if: stateAddService() -->
-          <div class="participants-search-content">
-            <div class="participants-search-list" data-bind="antiscroll: selectedUsers">
-              <service-list class="service-list-light" params="services: integrationRepository.services, click: clickOnSelectService"></service-list>
-            </div>
-          </div>
         <!-- /ko -->
       </div>
     <!-- /ko -->

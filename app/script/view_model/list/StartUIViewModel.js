@@ -202,9 +202,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.user_bubble_last_id = undefined;
 
     this.should_update_scrollbar = ko
-      .computed(() => {
-        return this.list_view_model.last_update();
-      })
+      .computed(() => this.list_view_model.last_update())
       .extend({notify: 'always', rateLimit: 500});
 
     this._init_subscriptions();
