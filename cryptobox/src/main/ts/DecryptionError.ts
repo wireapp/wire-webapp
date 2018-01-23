@@ -1,4 +1,4 @@
-export class DecryptionError extends Error {
+class DecryptionError extends Error {
   constructor(public message: string) {
     super(message);
     Object.setPrototypeOf(this, DecryptionError.prototype);
@@ -8,3 +8,5 @@ export class DecryptionError extends Error {
     this.stack = new Error().stack;
   }
 }
+
+export default DecryptionError;

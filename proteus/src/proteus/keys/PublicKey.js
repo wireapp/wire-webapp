@@ -17,7 +17,7 @@
  *
  */
 
-const CBOR = require('wire-webapp-cbor');
+const CBOR = require('@wireapp/cbor');
 const ed2curve = require('ed2curve');
 const sodium = require('libsodium-wrappers-sumo');
 
@@ -33,24 +33,27 @@ const TypeUtil = require('../util/TypeUtil');
  */
 class PublicKey {
   constructor() {
+    /** @type {Uint8Array} */
+    this.pub_edward = undefined;
+    /** @type {Uint8Array} */
+    this.pub_curve = undefined;
+
     throw new DontCallConstructor(this);
   }
 
   /**
    * @param {!Uint8Array} pub_edward
    * @param {!Uint8Array} pub_curve
-   * @returns {PublicKey} - `this`
+   * @returns {keys.PublicKey} - `this`
    */
   static new(pub_edward, pub_curve) {
     TypeUtil.assert_is_instance(Uint8Array, pub_edward);
     TypeUtil.assert_is_instance(Uint8Array, pub_curve);
 
-    /** @type {PublicKey} */
+    /** @type {keys.PublicKey} */
     const pk = ClassUtil.new_instance(PublicKey);
 
-    /** @type {Uint8Array} */
     pk.pub_edward = pub_edward;
-    /** @type {Uint8Array} */
     pk.pub_curve = pub_curve;
     return pk;
   }
@@ -84,7 +87,7 @@ class PublicKey {
 
   /**
    * @param {!CBOR.Decoder} decoder
-   * @returns {PublicKey}
+   * @returns {keys.PublicKey}
    */
   static decode(decoder) {
     TypeUtil.assert_is_instance(CBOR.Decoder, decoder);

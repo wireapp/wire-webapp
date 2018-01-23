@@ -1,3 +1,5 @@
-export interface SerialisedUpdate {
+interface SerialisedUpdate {
   serialised: ArrayBuffer;
 }
+
+export default SerialisedUpdate;

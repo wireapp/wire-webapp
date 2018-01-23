@@ -1,9 +1,9 @@
 import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/';
-import {Cryptobox, store} from 'wire-webapp-cryptobox';
+import {Cryptobox, store} from '@wireapp/cryptobox';
 import {Decoder, Encoder} from 'bazinga64';
 import {RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/';
 import {UserPreKeyBundleMap} from '@wireapp/api-client/dist/commonjs/user/';
-import * as Proteus from 'wire-webapp-proteus';
+import * as Proteus from '@wireapp/proteus';
 import * as auth from '@wireapp/api-client/dist/commonjs/auth/';
 import {SessionPayloadBundle} from '../crypto/';
 import {OTRRecipients} from '@wireapp/api-client/dist/commonjs/conversation/';

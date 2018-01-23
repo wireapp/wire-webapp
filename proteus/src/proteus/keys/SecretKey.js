@@ -17,7 +17,7 @@
  *
  */
 
-const CBOR = require('wire-webapp-cbor');
+const CBOR = require('@wireapp/cbor');
 const ed2curve = require('ed2curve');
 const sodium = require('libsodium-wrappers-sumo');
 
@@ -34,6 +34,11 @@ const TypeUtil = require('../util/TypeUtil');
  */
 class SecretKey {
   constructor() {
+    /** @type {Uint8Array} */
+    this.sec_edward = undefined;
+    /** @type {Uint8Array} */
+    this.sec_curve = undefined;
+
     throw new DontCallConstructor(this);
   }
 
@@ -48,9 +53,7 @@ class SecretKey {
 
     const sk = ClassUtil.new_instance(SecretKey);
 
-    /** @type {Uint8Array} */
     sk.sec_edward = sec_edward;
-    /** @type {Uint8Array} */
     sk.sec_curve = sec_curve;
     return sk;
   }

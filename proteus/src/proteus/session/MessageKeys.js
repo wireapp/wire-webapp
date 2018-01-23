@@ -19,7 +19,7 @@
 
 /* eslint no-magic-numbers: "off" */
 
-const CBOR = require('wire-webapp-cbor');
+const CBOR = require('@wireapp/cbor');
 
 const ClassUtil = require('../util/ClassUtil');
 const DontCallConstructor = require('../errors/DontCallConstructor');
@@ -36,6 +36,13 @@ const MacKey = require('../derived/MacKey');
  */
 class MessageKeys {
   constructor() {
+    /** @type {derived.CipherKey} */
+    this.cipher_key = undefined;
+    /** @type {derived.MacKey} */
+    this.mac_key = undefined;
+    /** @type {number} */
+    this.counter = undefined;
+
     throw new DontCallConstructor(this);
   }
 

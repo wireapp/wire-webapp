@@ -1,10 +1,10 @@
 {
   "dependencies": {
+    "@wireapp/proteus": "5.3.2",
     "@wireapp/store-engine": "0.1.9",
     "dexie": "2.0.1",
     "fs-extra": "5.0.0",
-    "wire-webapp-lru-cache": "2.0.0",
-    "wire-webapp-proteus": "5.2.0"
+    "wire-webapp-lru-cache": "2.0.0"
   },
   "description": "High-level API with persistent storage for Proteus.",
   "devDependencies": {
@@ -21,7 +21,7 @@
     "gulp-if": "2.0.2",
     "gulp-jasmine": "3.0.0",
     "gulp-replace": "0.6.1",
-    "gulp-typescript": "3.1.6",
+    "gulp-typescript": "3.2.3",
     "gulp-util": "3.0.8",
     "gutil": "1.6.4",
     "karma": "1.7.0",
@@ -37,7 +37,7 @@
   },
   "files": ["dist/commonjs", "dist/wire-webapp-cryptobox.d.ts", "dist/window"],
   "license": "GPL-3.0",
-  "main": "dist/commonjs/wire-webapp-cryptobox.js",
+  "main": "dist/commonjs/index.js",
   "name": "@wireapp/cryptobox",
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox",
   "scripts": {
@@ -49,6 +49,6 @@
     "test:rerun": "gulp test",
     "test": "yarn dist && gulp test"
   },
-  "types": "dist/wire-webapp-cryptobox.d.ts",
+  "types": "dist/index.d.ts",
   "version": "6.3.2"
 }

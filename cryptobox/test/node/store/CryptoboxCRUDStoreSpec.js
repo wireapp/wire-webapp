@@ -19,11 +19,11 @@
 
 /* eslint no-magic-numbers: "off" */
 
-const cryptobox = require('../../../dist/commonjs/wire-webapp-cryptobox');
+const cryptobox = require('../../../dist/commonjs/index');
 const fs = require('fs-extra');
 const LRUCache = require('wire-webapp-lru-cache');
 const path = require('path');
-const Proteus = require('wire-webapp-proteus');
+const Proteus = require('@wireapp/proteus');
 const {FileEngine} = require('@wireapp/store-engine/dist/commonjs/engine');
 
 // gulp test_node --file "node/store/CryptoboxCRUDStoreSpec.js"
@@ -45,7 +45,7 @@ describe('cryptobox.store.CryptoboxCRUDStore', () => {
   );
 
   describe('"delete_all"', () => {
-    it('deletes everything from the storage', done => {
+    fit('deletes everything from the storage', done => {
       let sessionWithBob;
       const alicePreKeys = Proteus.keys.PreKey.generate_prekeys(0, 10);
 
@@ -164,7 +164,7 @@ describe('cryptobox.store.CryptoboxCRUDStore', () => {
 
   describe('session_from_prekey', () => {
     it('saves and caches a valid session from a serialized PreKey bundle', done => {
-      const alice = new cryptobox.Cryptobox(fileStore, 1);
+      const alice = new cryptobox.Cryptobox.default(fileStore, 1);
       const sessionId = 'session_with_bob';
 
       const bob = Proteus.keys.IdentityKeyPair.new();
@@ -193,7 +193,7 @@ describe('cryptobox.store.CryptoboxCRUDStore', () => {
     });
 
     it('reinforces a session from the store without cache', done => {
-      const alice = new cryptobox.Cryptobox(fileStore, 1);
+      const alice = new cryptobox.Cryptobox.default(fileStore, 1);
       const sessionId = 'session_with_bob';
 
       const bob = Proteus.keys.IdentityKeyPair.new();

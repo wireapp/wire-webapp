@@ -19,7 +19,7 @@
 
 /* eslint no-magic-numbers: "off" */
 
-const CBOR = require('wire-webapp-cbor');
+const CBOR = require('@wireapp/cbor');
 
 const ArrayUtil = require('../util/ArrayUtil');
 const ClassUtil = require('../util/ClassUtil');
@@ -53,9 +53,13 @@ const Session = require('./Session');
 /** @class SessionState */
 class SessionState {
   constructor() {
+    /** @type {Array<RecvChain> | null} */
     this.recv_chains = null;
+    /** @type {SendChain | null} */
     this.send_chain = null;
+    /** @type {RootKey | null} */
     this.root_key = null;
+    /** @type {number | null} */
     this.prev_counter = null;
 
     throw new DontCallConstructor(this);

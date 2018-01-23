@@ -19,7 +19,7 @@
 
 /* eslint no-magic-numbers: "off" */
 
-const CBOR = require('wire-webapp-cbor');
+const CBOR = require('@wireapp/cbor');
 
 const ClassUtil = require('../util/ClassUtil');
 const DontCallConstructor = require('../errors/DontCallConstructor');
@@ -38,6 +38,13 @@ const KeyPair = require('./KeyPair');
  */
 class PreKey {
   constructor() {
+    /** @type {number} */
+    this.key_id = undefined;
+    /** @type {keys.KeyPair} */
+    this.key_pair = undefined;
+    /** @type {number} */
+    this.version = undefined;
+
     throw new DontCallConstructor(this);
   }
 

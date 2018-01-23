@@ -1,16 +1,20 @@
-import * as Proteus from 'wire-webapp-proteus';
+import * as Proteus from '@wireapp/proteus';
 import CryptoboxCRUDStore from './store/CryptoboxCRUDStore';
+import {CryptoboxError} from './error/';
+import CryptoboxSession from './CryptoboxSession';
+import DecryptionError from './DecryptionError';
+import InvalidPreKeyFormatError from './InvalidPreKeyFormatError';
+import {ReadOnlyStore} from './store/';
 import EventEmitter = require('events');
 import Logdown = require('logdown');
 import LRUCache = require('wire-webapp-lru-cache');
-import {CryptoboxError} from './error';
-import {CryptoboxSession} from './CryptoboxSession';
-import {DecryptionError} from './DecryptionError';
-import {InvalidPreKeyFormatError} from './InvalidPreKeyFormatError';
-import {ReadOnlyStore} from './store/ReadOnlyStore';
-import {RecordAlreadyExistsError} from './store/error';
 
-export class Cryptobox extends EventEmitter {
+export interface SessionFromMessageTuple extends Array<CryptoboxSession | Uint8Array> {
+  0: CryptoboxSession;
+  1: Uint8Array;
+}
+
+class Cryptobox extends EventEmitter {
   public static TOPIC = {
     NEW_PREKEYS: 'new-prekeys',
     NEW_SESSION: 'new-session',
@@ -98,7 +102,7 @@ export class Cryptobox extends EventEmitter {
     this.logger.log(`Initializing Cryptobox. Loading local identity...`);
     return this.store
       .load_identity()
-      .then((identity: Proteus.keys.IdentityKeyPair) => {
+      .then((identity: Proteus.keys.IdentityKeyPair | undefined) => {
         if (identity) {
           this.logger.log(
             `Initialized Cryptobox with existing local identity. Fingerprint is "${identity.public_key.fingerprint()}".`,
@@ -143,11 +147,11 @@ export class Cryptobox extends EventEmitter {
 
   public get_serialized_standard_prekeys(): Promise<Array<{id: number; key: string}>> {
     const standardPreKeys: Array<{id: number; key: string}> = this.cachedPreKeys
-      .map((preKey: Proteus.keys.PreKey) => {
+      .filter((preKey: Proteus.keys.PreKey) => {
         const isLastResortPreKey = preKey.key_id === Proteus.keys.PreKey.MAX_PREKEY_ID;
-        return isLastResortPreKey ? undefined : this.serialize_prekey(preKey);
+        return !isLastResortPreKey;
       })
-      .filter(preKeyJson => preKeyJson);
+      .map((preKey: Proteus.keys.PreKey) => this.serialize_prekey(preKey));
 
     return Promise.resolve(standardPreKeys);
   }
@@ -246,14 +250,15 @@ export class Cryptobox extends EventEmitter {
    * Uses a cipher message to create a new session and to decrypt to message which the given cipher message contains.
    * Saving the newly created session is not needed as it's done during the inbuilt decryption phase.
    */
-  private session_from_message(session_id: string, envelope: ArrayBuffer): Promise<any> {
+  private session_from_message(session_id: string, envelope: ArrayBuffer): Promise<SessionFromMessageTuple> {
     const env: Proteus.message.Envelope = Proteus.message.Envelope.deserialise(envelope);
 
     return Proteus.session.Session.init_from_message(this.identity, this.pk_store, env).then(
-      (tuple: Proteus.session.SessionFromMessageTuple) => {
-        const [session, decrypted]: [Proteus.session.Session, Uint8Array] = tuple;
+      (tuple: Array<Proteus.session.Session | Uint8Array>) => {
+        const session: Proteus.session.Session | Uint8Array = <Proteus.session.Session>tuple[0];
+        const decrypted: Proteus.session.Session | Uint8Array = <Uint8Array>tuple[1];
         const cryptoBoxSession: CryptoboxSession = new CryptoboxSession(session_id, this.pk_store, session);
-        return [cryptoBoxSession, decrypted];
+        return <SessionFromMessageTuple>[cryptoBoxSession, decrypted];
       }
     );
   }
@@ -398,3 +403,5 @@ export class Cryptobox extends EventEmitter {
 
 // Note: Path to "package.json" must be relative to the "commonjs" dist files
 Cryptobox.prototype.VERSION = require('../../package.json').version;
+
+export default Cryptobox;

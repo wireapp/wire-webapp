@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "declaration": false,
+    "declaration": true,
     "lib": ["DOM", "ES7"],
     "outDir": "dist/commonjs",
     "rootDir": "src/main/ts",

@@ -17,7 +17,7 @@
  *
  */
 
-const CBOR = require('wire-webapp-cbor');
+const CBOR = require('@wireapp/cbor');
 const sodium = require('libsodium-wrappers-sumo');
 
 const DontCallConstructor = require('../errors/DontCallConstructor');
@@ -36,6 +36,9 @@ const RandomUtil = require('../util/RandomUtil');
  */
 class SessionTag {
   constructor() {
+    /** @type {Uint8Array} */
+    this.tag = undefined;
+
     throw new DontCallConstructor(this);
   }
 

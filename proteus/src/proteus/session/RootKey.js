@@ -17,7 +17,7 @@
  *
  */
 
-const CBOR = require('wire-webapp-cbor');
+const CBOR = require('@wireapp/cbor');
 
 const ClassUtil = require('../util/ClassUtil');
 const DontCallConstructor = require('../errors/DontCallConstructor');
@@ -37,6 +37,9 @@ const PublicKey = require('../keys/PublicKey');
  */
 class RootKey {
   constructor() {
+    /** @type {derived.CipherKey} */
+    this.key = undefined;
+
     throw new DontCallConstructor(this);
   }
 

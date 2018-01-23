@@ -19,7 +19,7 @@
 
 /* eslint no-magic-numbers: "off" */
 
-const CBOR = require('wire-webapp-cbor');
+const CBOR = require('@wireapp/cbor');
 
 const ClassUtil = require('../util/ClassUtil');
 const DontCallConstructor = require('../errors/DontCallConstructor');
@@ -44,6 +44,13 @@ const MessageKeys = require('./MessageKeys');
  */
 class RecvChain {
   constructor() {
+    /** @type {ChainKey} */
+    this.chain_key = undefined;
+    /** @type {Array<MessageKeys>} */
+    this.message_keys = undefined;
+    /** @type {keys.PublicKey} */
+    this.ratchet_key = undefined;
+
     throw new DontCallConstructor(this);
   }
 

@@ -1,11 +1,9 @@
-import * as Proteus from 'wire-webapp-proteus';
-import PersistedRecord from './PersistedRecord';
+import * as Proteus from '@wireapp/proteus';
 import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine';
-import {CryptoboxStore} from './CryptoboxStore';
-import {RecordNotFoundError} from './error';
-import {SerialisedRecord} from './SerialisedRecord';
+import {CryptoboxStore, PersistedRecord, SerialisedRecord} from '../store/';
+import {error as storeError} from '../store/';
 
-export default class CryptoboxCRUDStore implements CryptoboxStore {
+class CryptoboxCRUDStore implements CryptoboxStore {
   constructor(private engine: CRUDEngine) {}
 
   static get KEYS() {
@@ -54,31 +52,31 @@ export default class CryptoboxCRUDStore implements CryptoboxStore {
     return this.engine.delete(CryptoboxCRUDStore.STORES.PRE_KEYS, prekey_id.toString()).then(() => prekey_id);
   }
 
-  public load_identity(): Promise<Error | Proteus.keys.IdentityKeyPair> {
+  public load_identity(): Promise<Proteus.keys.IdentityKeyPair | undefined> {
     return this.engine
-      .read(CryptoboxCRUDStore.STORES.LOCAL_IDENTITY, CryptoboxCRUDStore.KEYS.LOCAL_IDENTITY)
+      .read<PersistedRecord>(CryptoboxCRUDStore.STORES.LOCAL_IDENTITY, CryptoboxCRUDStore.KEYS.LOCAL_IDENTITY)
       .then((payload: PersistedRecord) => {
         const record: SerialisedRecord = this.from_store(payload);
         const identity: Proteus.keys.IdentityKeyPair = Proteus.keys.IdentityKeyPair.deserialise(record.serialised);
         return identity;
       })
-      .catch(function(error: Error) {
-        if (error instanceof RecordNotFoundError) {
+      .catch((error: Error) => {
+        if (error instanceof storeError.RecordNotFoundError) {
           return undefined;
         }
         throw error;
       });
   }
 
-  public load_prekey(prekey_id: number): Promise<Error | Proteus.keys.PreKey> {
+  public load_prekey(prekey_id: number): Promise<Proteus.keys.PreKey | undefined> {
     return this.engine
-      .read(CryptoboxCRUDStore.STORES.PRE_KEYS, prekey_id.toString())
+      .read<PersistedRecord>(CryptoboxCRUDStore.STORES.PRE_KEYS, prekey_id.toString())
       .then((payload: PersistedRecord) => {
         const record: SerialisedRecord = this.from_store(payload);
         return Proteus.keys.PreKey.deserialise(record.serialised);
       })
-      .catch(function(error: Error) {
-        if (error instanceof RecordNotFoundError) {
+      .catch((error: Error) => {
+        if (error instanceof storeError.RecordNotFoundError) {
           return undefined;
         }
         throw error;
@@ -123,10 +121,12 @@ export default class CryptoboxCRUDStore implements CryptoboxStore {
   }
 
   public read_session(identity: Proteus.keys.IdentityKeyPair, session_id: string): Promise<Proteus.session.Session> {
-    return this.engine.read(CryptoboxCRUDStore.STORES.SESSIONS, session_id).then((payload: PersistedRecord) => {
-      const record: SerialisedRecord = this.from_store(payload);
-      return Proteus.session.Session.deserialise(identity, record.serialised);
-    });
+    return this.engine
+      .read<PersistedRecord>(CryptoboxCRUDStore.STORES.SESSIONS, session_id)
+      .then((payload: PersistedRecord) => {
+        const record: SerialisedRecord = this.from_store(payload);
+        return Proteus.session.Session.deserialise(identity, record.serialised);
+      });
   }
 
   public update_session(session_id: string, session: Proteus.session.Session): Promise<Proteus.session.Session> {
@@ -143,3 +143,5 @@ export default class CryptoboxCRUDStore implements CryptoboxStore {
       .then((primary_key: string) => primary_key);
   }
 }
+
+export default CryptoboxCRUDStore;

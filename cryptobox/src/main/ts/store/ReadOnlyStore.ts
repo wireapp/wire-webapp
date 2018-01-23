@@ -1,10 +1,10 @@
-import * as Proteus from 'wire-webapp-proteus';
-import {CryptoboxStore} from './CryptoboxStore';
+import * as Proteus from '@wireapp/proteus';
+import {CryptoboxStore} from '../store';
 
 /**
  * This store holds IDs of PreKeys which should be deleted.
  */
-export class ReadOnlyStore extends Proteus.session.PreKeyStore {
+class ReadOnlyStore extends Proteus.session.PreKeyStore {
   public prekeys: Array<number> = [];
 
   constructor(private store: CryptoboxStore) {
@@ -27,13 +27,11 @@ export class ReadOnlyStore extends Proteus.session.PreKeyStore {
    * Returns a PreKey (if it's not marked for deletion) via the Cryptobox store.
    * @override
    */
-  get_prekey(prekey_id: number): Promise<Proteus.keys.PreKey> {
+  get_prekey(prekey_id: number): Promise<Proteus.keys.PreKey | undefined> {
     if (this.prekeys.indexOf(prekey_id) !== -1) {
       return Promise.reject(new Error(`PreKey "${prekey_id}" not found.`));
     }
-    return this.store.load_prekey(prekey_id).then(function(prekey: Proteus.keys.PreKey) {
-      return prekey;
-    });
+    return this.store.load_prekey(prekey_id);
   }
 
   /**
@@ -45,3 +43,5 @@ export class ReadOnlyStore extends Proteus.session.PreKeyStore {
     return Promise.resolve(prekey_id);
   }
 }
+
+export default ReadOnlyStore;

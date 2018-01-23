@@ -1,15 +1,19 @@
-import * as Proteus from 'wire-webapp-proteus';
+import * as Proteus from '@wireapp/proteus';
 import Dexie from 'dexie';
 import Logdown = require('logdown');
-import {CryptoboxStore} from './CryptoboxStore';
-import {RecordAlreadyExistsError, RecordNotFoundError, RecordTypeError} from './error';
-import {SerialisedRecord} from './SerialisedRecord';
+import CryptoboxStore from './CryptoboxStore';
+import {error as storeError} from '../store/';
+import {SerialisedRecord} from '../store';
 
-export default class IndexedDB implements CryptoboxStore {
+export interface DexieInstance extends Dexie {
+  [index: string]: any;
+}
+
+class IndexedDB implements CryptoboxStore {
   public identity: Proteus.keys.IdentityKeyPair;
 
-  private db: Dexie;
-  private prekeys: Object = {};
+  private db: DexieInstance;
+  private prekeys: {[index: string]: Proteus.keys.PreKey} = {};
   private TABLE = {
     LOCAL_IDENTITY: 'keys',
     PRE_KEYS: 'prekeys',
@@ -18,7 +22,7 @@ export default class IndexedDB implements CryptoboxStore {
   private logger: Logdown;
   private localIdentityKey: string = 'local_identity';
 
-  constructor(identifier: string | Dexie) {
+  constructor(identifier: string | DexieInstance) {
     this.logger = new Logdown({alignOutput: true, markdown: false, prefix: 'cryptobox.store.IndexedDB'});
 
     if (typeof indexedDB === 'undefined') {
@@ -38,11 +42,6 @@ export default class IndexedDB implements CryptoboxStore {
       this.db = identifier;
       this.logger.log(`Using cryptobox with existing database "${this.db.name}".`);
     }
-
-    this.db.on('blocked', event => {
-      this.logger.warn(`Database access to "${this.db.name}" got blocked.`, event);
-      this.db.close();
-    });
   }
 
   private create(store_name: string, primary_key: string, entity: SerialisedRecord): Promise<string> {
@@ -52,13 +51,13 @@ export default class IndexedDB implements CryptoboxStore {
         return this.db[store_name].add(entity, primary_key);
       }
 
-      throw new RecordTypeError(
+      throw new storeError.RecordTypeError(
         `Entity is "undefined" or "null". Store name "${store_name}", Primary Key "${primary_key}".`
       );
     });
   }
 
-  private read(store_name: string, primary_key: string): Promise<Object> {
+  private read<T>(store_name: string, primary_key: string): Promise<T> {
     return Promise.resolve()
       .then(() => {
         this.logger.log(`Trying to load record "${primary_key}" from object store "${store_name}".`);
@@ -72,7 +71,7 @@ export default class IndexedDB implements CryptoboxStore {
 
         const message: string = `Record "${primary_key}" from object store "${store_name}" could not be found.`;
         this.logger.warn(message);
-        throw new RecordNotFoundError(message);
+        throw new storeError.RecordNotFoundError(message);
       });
   }
 
@@ -123,26 +122,26 @@ export default class IndexedDB implements CryptoboxStore {
     });
   }
 
-  public load_identity(): Promise<Proteus.keys.IdentityKeyPair> {
-    return this.read(this.TABLE.LOCAL_IDENTITY, this.localIdentityKey)
+  public load_identity(): Promise<Proteus.keys.IdentityKeyPair | undefined> {
+    return this.read<SerialisedRecord>(this.TABLE.LOCAL_IDENTITY, this.localIdentityKey)
       .then((record: SerialisedRecord) => {
         return Proteus.keys.IdentityKeyPair.deserialise(record.serialised);
       })
       .catch(function(error: Error) {
-        if (error instanceof RecordNotFoundError) {
+        if (error instanceof storeError.RecordNotFoundError) {
           return undefined;
         }
         throw error;
       });
   }
 
-  public load_prekey(prekey_id: number): Promise<Proteus.keys.PreKey> {
-    return this.read(this.TABLE.PRE_KEYS, prekey_id.toString())
+  public load_prekey(prekey_id: number): Promise<Proteus.keys.PreKey | undefined> {
+    return this.read<SerialisedRecord>(this.TABLE.PRE_KEYS, prekey_id.toString())
       .then((record: SerialisedRecord) => {
         return Proteus.keys.PreKey.deserialise(record.serialised);
       })
       .catch(function(error: Error) {
-        if (error instanceof RecordNotFoundError) {
+        if (error instanceof storeError.RecordNotFoundError) {
           return undefined;
         }
         throw error;
@@ -162,7 +161,7 @@ export default class IndexedDB implements CryptoboxStore {
   }
 
   public read_session(identity: Proteus.keys.IdentityKeyPair, session_id: string): Promise<Proteus.session.Session> {
-    return this.read(this.TABLE.SESSIONS, session_id).then((payload: SerialisedRecord) => {
+    return this.read<SerialisedRecord>(this.TABLE.SESSIONS, session_id).then((payload: SerialisedRecord) => {
       return Proteus.session.Session.deserialise(identity, payload.serialised);
     });
   }
@@ -236,7 +235,7 @@ export default class IndexedDB implements CryptoboxStore {
       .catch((error: Error) => {
         if (error instanceof Dexie.ConstraintError) {
           const message: string = `Session with ID '${session_id}' already exists and cannot get overwritten. You need to delete the session first if you want to do it.`;
-          throw new RecordAlreadyExistsError(message);
+          throw new storeError.RecordAlreadyExistsError(message);
         }
 
         throw error;
@@ -255,3 +254,5 @@ export default class IndexedDB implements CryptoboxStore {
     });
   }
 }
+
+export default IndexedDB;

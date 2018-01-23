@@ -1,6 +1,6 @@
-import * as Proteus from 'wire-webapp-proteus';
+import * as Proteus from '@wireapp/proteus';
 
-export interface CryptoboxStore {
+interface CryptoboxStore {
   delete_all(): Promise<boolean>;
 
   /**
@@ -13,13 +13,13 @@ export interface CryptoboxStore {
    * Loads the local identity.
    * @return Promise<Proteus.keys.IdentityKeyPair> Resolves with the "key pair" from the local identity.
    */
-  load_identity(): Promise<Error | Proteus.keys.IdentityKeyPair>;
+  load_identity(): Promise<Proteus.keys.IdentityKeyPair | undefined>;
 
   /**
    * Loads and deserializes a specified PreKey.
    * @return Promise<Proteus.keys.PreKey> Resolves with the the specified "PreKey".
    */
-  load_prekey(prekey_id: number): Promise<Error | Proteus.keys.PreKey>;
+  load_prekey(prekey_id: number): Promise<Proteus.keys.PreKey | undefined>;
 
   /**
    * Loads all available PreKeys.
@@ -64,3 +64,5 @@ export interface CryptoboxStore {
    */
   delete_session(session_id: string): Promise<string>;
 }
+
+export default CryptoboxStore;

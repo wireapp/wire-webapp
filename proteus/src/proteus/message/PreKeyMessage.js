@@ -19,7 +19,7 @@
 
 /* eslint no-magic-numbers: "off" */
 
-const CBOR = require('wire-webapp-cbor');
+const CBOR = require('@wireapp/cbor');
 
 const ClassUtil = require('../util/ClassUtil');
 const DontCallConstructor = require('../errors/DontCallConstructor');
@@ -40,6 +40,16 @@ const Message = require('./Message');
 class PreKeyMessage extends Message {
   constructor() {
     super();
+
+    /** @type {number} */
+    this.prekey_id = undefined;
+    /** @type {keys.PublicKey} */
+    this.base_key = undefined;
+    /** @type {keys.IdentityKey} */
+    this.identity_key = undefined;
+    /** @type {CipherMessage} */
+    this.message = undefined;
+
     throw new DontCallConstructor(this);
   }
 

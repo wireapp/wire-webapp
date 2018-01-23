@@ -26,7 +26,7 @@ fs.readFile(file, 'utf8', (err, content) => {
   if (err !== null) {
     throw err;
   }
-  content = `import * as CBOR from 'wire-webapp-cbor';\n\n${content.replace(regex, 'export $1')}`;
+  content = `import * as CBOR from '@wireapp/cbor';\n\n${content.replace(regex, 'export $1')}`;
   fs.writeFile(file, content, error => {
     if (error !== null) {
       throw error;

@@ -35,6 +35,11 @@ const MacKey = require('./MacKey');
  */
 class DerivedSecrets {
   constructor() {
+    /** @type {derived.CipherKey} */
+    this.cipher_key = undefined;
+    /** @type {derived.MacKey} */
+    this.mac_key = undefined;
+
     throw new DontCallConstructor(this);
   }
 
@@ -55,9 +60,7 @@ class DerivedSecrets {
     MemoryUtil.zeroize(output_key_material.buffer);
 
     const ds = ClassUtil.new_instance(DerivedSecrets);
-    /** @type {derived.CipherKey} */
     ds.cipher_key = CipherKey.new(cipher_key);
-    /** @type {derived.MacKey} */
     ds.mac_key = MacKey.new(mac_key);
     return ds;
   }

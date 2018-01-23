@@ -1,6 +1,6 @@
-import {Cryptobox} from '../Cryptobox';
+import Cryptobox from '../Cryptobox';
 
-export class SerialisedRecord {
+class SerialisedRecord {
   public created: number;
   public id: string;
   public serialised: ArrayBuffer;
@@ -13,3 +13,5 @@ export class SerialisedRecord {
     this.version = Cryptobox.prototype.VERSION;
   }
 }
+
+export default SerialisedRecord;

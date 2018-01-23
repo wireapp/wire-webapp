@@ -30,8 +30,8 @@ describe('cryptobox.Cryptobox', () => {
       Proteus = window.Proteus;
       done();
     } else {
-      cryptobox = require('../../dist/commonjs/wire-webapp-cryptobox');
-      Proteus = require('wire-webapp-proteus');
+      cryptobox = require('../../dist/commonjs/index');
+      Proteus = require('@wireapp/proteus');
       sodium = require('libsodium-wrappers-sumo');
       done();
     }
@@ -94,7 +94,7 @@ describe('cryptobox.Cryptobox', () => {
     });
   });
 
-  describe('load', () => {
+  describe('"load"', () => {
     it('initializes a Cryptobox with an existing identity and the last resort PreKey', done => {
       let box = new cryptobox.Cryptobox(store, 4);
       let initialFingerPrint = undefined;
@@ -188,6 +188,7 @@ describe('cryptobox.Cryptobox', () => {
             identity: Proteus.keys.IdentityKeyPair.new(),
             prekey: Proteus.keys.PreKey.new(Proteus.keys.PreKey.MAX_PREKEY_ID),
           };
+
           bob.bundle = Proteus.keys.PreKeyBundle.new(bob.identity.public_key, bob.prekey);
 
           return Proteus.session.Session.init_from_prekey(box.identity, bob.bundle);
@@ -202,7 +203,7 @@ describe('cryptobox.Cryptobox', () => {
         .catch(done.fail);
     });
 
-    describe('session_from_prekey', () => {
+    describe('"session_from_prekey"', () => {
       it('creates a session from a valid PreKey format', done => {
         const remotePreKey = {
           id: 65535,
@@ -242,7 +243,7 @@ describe('cryptobox.Cryptobox', () => {
       });
     });
 
-    describe('session_load', () => {
+    describe('"session_load"', () => {
       it('loads a session from the cache', done => {
         spyOn(box, 'load_session_from_cache').and.callThrough();
         spyOn(box.store, 'read_session').and.callThrough();
@@ -257,7 +258,7 @@ describe('cryptobox.Cryptobox', () => {
       });
     });
 
-    describe('encrypt', () => {
+    describe('"encrypt"', () => {
       it('saves the session after successful encryption', done => {
         spyOn(box.store, 'create_session').and.callThrough();
         box
