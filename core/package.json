@@ -1,8 +1,8 @@
 {
   "dependencies": {
     "@types/node": "9.3.0",
-    "@wireapp/api-client": "0.2.35",
-    "@wireapp/cryptobox": "6.3.2",
+    "@wireapp/api-client": "0.2.36",
+    "@wireapp/cryptobox": "6.3.3",
     "@wireapp/protocol-messaging": "1.20.0",
     "@wireapp/store-engine": "0.1.9",
     "bazinga64": "5.0.3",
@@ -23,7 +23,9 @@
     "webpack": "3.10.0"
   },
   "description": "Wire for Web's communication core.",
-  "files": ["dist/commonjs"],
+  "files": [
+    "dist/commonjs"
+  ],
   "license": "GPL-3.0",
   "main": "./dist/commonjs/index.js",
   "name": "@wireapp/core",
@@ -42,5 +44,5 @@
     "prepare": "yarn dist"
   },
   "types": "./dist/commonjs/index.d.ts",
-  "version": "0.0.24"
+  "version": "0.0.25"
 }

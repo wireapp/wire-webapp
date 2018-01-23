@@ -1,8 +1,8 @@
 {
   "dependencies": {
+    "@wireapp/cbor": "2.3.2",
     "ed2curve": "0.2.1",
-    "libsodium-wrappers-sumo": "0.5.4",
-    "@wireapp/cbor": "2.3.2"
+    "libsodium-wrappers-sumo": "0.5.4"
   },
   "description": "Axolotl protocol implementation for JavaScript.",
   "devDependencies": {
@@ -13,7 +13,11 @@
     "tsd-jsdoc": "dcodeio/tsd-jsdoc#fe76c4dc071b00bb549d3af7a3bad8c555999e81",
     "webpack": "3.10.0"
   },
-  "files": ["dist/types.d.ts", "dist/window", "src"],
+  "files": [
+    "dist/types.d.ts",
+    "dist/window",
+    "src"
+  ],
   "license": "GPL-3.0",
   "main": "src/proteus.js",
   "name": "@wireapp/proteus",
@@ -24,10 +28,9 @@
     "types": "jsdoc --verbose --pedantic --configure jsdoc.json src/ && node replace.js",
     "start": "node dist/index.js",
     "test": "yarn dist && yarn test:node",
-    "test:node":
-      "mocha -s 30000 -t 30000 --recursive test/harness.js test --trace-warnings --grep LongRunning --invert",
+    "test:node": "mocha -s 30000 -t 30000 --recursive test/harness.js test --trace-warnings --grep LongRunning --invert",
     "test:longrunning": "mocha -s 30000 -t 30000 --recursive test/harness.js test --trace-warnings --grep LongRunning"
   },
   "types": "dist/types.d.ts",
-  "version": "5.3.2"
+  "version": "5.3.3"
 }

@@ -8,7 +8,9 @@
     "rimraf": "2.6.1",
     "typescript": "2.6.2"
   },
-  "files": ["dist/commonjs/"],
+  "files": [
+    "dist/commonjs/"
+  ],
   "license": "GPL-3.0",
   "main": "dist/commonjs/LRUCache.js",
   "name": "@wireapp/lru-cache",
@@ -24,5 +26,5 @@
     "test:node": "jasmine JASMINE_CONFIG_PATH=jasmine.json"
   },
   "types": "dist/commonjs/LRUCache.d.ts",
-  "version": "2.0.0"
+  "version": "2.0.1"
 }
