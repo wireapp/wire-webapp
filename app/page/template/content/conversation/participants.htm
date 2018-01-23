@@ -54,7 +54,7 @@
           user: selectedUser,
           add_people: clickOnAddPeople,
           block: clickToBlock,
-          close: clickOnClose,
+          close: clickOnMemberBack,
           connect: clickToConnect,
           pending: clickOnPending,
           leave: clickToLeave,
@@ -71,7 +71,7 @@
         <div class="participants-search-header">
           <div class="participants-search-header-row">
             <user-input class="participants-search-header-list user-list-light" params="input: searchInput, selected: selectedUsers, placeholder: z.string.people_search_placeholder" spellcheck="false"></user-input>
-            <div class="participants-search-header-close icon-close icon-button" data-bind="click: clickOnClose, l10n_tooltip: z.string.tooltip_search_close" data-uie-name="do-close"></div>
+            <div class="participants-search-header-close icon-close icon-button" data-bind="click: clickOnCloseAdding, l10n_tooltip: z.string.tooltip_search_close" data-uie-name="do-close"></div>
           </div>
           <!-- ko if: showIntegrations() -->
             <div class="participants-search-tabs">
