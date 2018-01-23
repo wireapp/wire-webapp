@@ -150,7 +150,7 @@ ko.components.register('user-list', {
         <!-- /ko -->
         <!-- ko ifnot: $parent.isCompactMode -->
           <div class="search-list-item-image">
-            <participant-avatar params="participant: $data, selected: $parent.is_selected($data), size: z.components.ParticipantAvatar.SIZE.SMALL"></participant-avatar>
+            <participant-avatar params="participant: $data, selected: $parent.is_selected($data), size: z.components.ParticipantAvatar.SIZE.MEDIUM"></participant-avatar>
             <div class="search-list-item-image-overlay">
               <div class="background"></div>
               <div class="checkmark icon-check"></div>
