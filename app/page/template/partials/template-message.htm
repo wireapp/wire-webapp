@@ -248,7 +248,7 @@
           <participant-avatar class="avatar-no-border"
                        data-bubble="#participants-bubble"
                        data-placement="vertical"
-                       params="participant: $data, click: $parents[1].on_message_user_click, size: z.components.ParticipantAvatar.SIZE.SMALL"></participant-avatar>
+                       params="participant: $data, click: $parents[1].on_message_user_click, size: z.components.ParticipantAvatar.SIZE.MEDIUM"></participant-avatar>
         <!-- /ko -->
         <!-- ko if: message.is_member_join() || message.is_member_leave() -->
           <participant-avatar data-bind="css: {'translucent': message.is_member_leave()}"
