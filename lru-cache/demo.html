@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<!-- Wire, Copyright (C) 2016 Wire Swiss GmbH -->
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Demo</title>
+    <link rel="shortcut icon" href="data:image/x-icon;" type="image/x-icon" />
+    <script src="window/LRUCache.js"></script>
+  </head>
+  <body>
+    <script>
+      var cache = new LRUCache(3);
+      cache.set('1', 'Apple');
+      cache.set('2', 'Orange');
+      cache.set('3', 'Tomato');
+      cache.delete('2');
+      document.write(cache.size()); // 2
+    </script>
+  </body>
+</html>

@@ -1,0 +1,28 @@
+{
+  "dependencies": {
+    "webpack": "3.10.0"
+  },
+  "description": "Least Recently Used (LRU) Cache for JavaScript and TypeScript.",
+  "devDependencies": {
+    "jasmine": "2.9.0",
+    "rimraf": "2.6.1",
+    "typescript": "2.6.2"
+  },
+  "files": ["dist/commonjs/"],
+  "license": "GPL-3.0",
+  "main": "dist/commonjs/LRUCache.js",
+  "name": "@wireapp/lru-cache",
+  "repository": "https://github.com/wireapp/wire-web-packages/tree/master/lru-cache",
+  "scripts": {
+    "build": "yarn build:node && yarn build:browser",
+    "build:browser": "webpack --progress",
+    "build:node": "tsc",
+    "clear": "rimraf dist",
+    "dist": "yarn clear && yarn build",
+    "test": "yarn dist && yarn test:node && yarn test:browser",
+    "test:browser": "exit 0",
+    "test:node": "jasmine JASMINE_CONFIG_PATH=jasmine.json"
+  },
+  "types": "dist/commonjs/LRUCache.d.ts",
+  "version": "2.0.0"
+}
