@@ -462,12 +462,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     };
 
     const bubble = wire.app.view.content.message_list.participant_bubble;
-    if (bubble && bubble.is_visible()) {
-      window.setTimeout(() => {
-        toggleBubble();
-      }, 550);
-    } else {
-      toggleBubble();
-    }
+    const timeout = bubble && bubble.is_visible() ? 550 : 0;
+    window.setTimeout(() => toggleBubble(), timeout);
   }
 };
