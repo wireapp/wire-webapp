@@ -208,9 +208,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.conversation_service
       .create_conversation(user_ids, name, this.team().id)
       .then(response => this._onCreate({conversation: response.id, data: response}))
+      .then(({conversation_et}) => conversation_et)
       .catch(error => {
-        if (error.label === z.service.BackendClientError.LABEL.NOT_CONNECTED) {
-          return this._handle_users_not_connected(user_ids);
+        const notConnected = error.label === z.service.BackendClientError.LABEL.NOT_CONNECTED;
+        if (notConnected) {
+          return this._handleUsersNotConnected(user_ids);
         }
 
         throw error;
@@ -684,7 +686,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
 
     if (team_id) {
-      return this.create_new_conversation([user_et.id], undefined).then(({conversation_et}) => conversation_et);
+      return this.create_new_conversation([user_et.id], undefined);
     }
 
     return this.fetch_conversation_by_id(user_et.connection().conversation_id)
@@ -936,54 +938,78 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Add a bot to an existing conversation.
    *
-   * @param {Conversation} conversation_et - Conversation to add bot to
-   * @param {string} provider_id - ID of bot provider
-   * @param {string} service_id - ID of service provider
+   * @param {Conversation} conversationEntity - Conversation to add bot to
+   * @param {string} providerId - ID of bot provider
+   * @param {string} serviceId - ID of service provider
    * @returns {Promise} Resolves when bot was added
    */
-  add_bot(conversation_et, provider_id, service_id) {
-    return this.conversation_service.post_bots(conversation_et.id, provider_id, service_id).then(response => {
-      if (response && response.event) {
-        amplify.publish(z.event.WebApp.EVENT.INJECT, response.event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
-        this.logger.debug(`Successfully added bot to conversation '${conversation_et.display_name()}'`, response);
-      }
-    });
+  addBot(conversationEntity, providerId, serviceId) {
+    return this.conversation_service
+      .postBots(conversationEntity.id, providerId, serviceId)
+      .then(response => {
+        const event = response ? response.event : undefined;
+        if (event) {
+          amplify.publish(z.event.WebApp.EVENT.INJECT, response.event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+          this.logger.debug(`Successfully added bot to conversation '${conversationEntity.display_name()}'`, response);
+        }
+
+        return event;
+      })
+      .catch(error => this._handleAddToConversationError(error, conversationEntity, [serviceId]));
   }
 
   /**
    * Add users to an existing conversation.
    *
-   * @param {Conversation} conversation_et - Conversation to add users to
-   * @param {Array<string>} user_ids - IDs of users to be added to the conversation
+   * @param {Conversation} conversationEntity - Conversation to add users to
+   * @param {Array<string>} userIds - IDs of users to be added to the conversation
    * @returns {Promise} Resolves when members were added
    */
-  add_members(conversation_et, user_ids) {
+  addMembers(conversationEntity, userIds) {
     return this.conversation_service
-      .post_members(conversation_et.id, user_ids)
+      .postMembers(conversationEntity.id, userIds)
       .then(response => {
         if (response) {
           amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
         }
       })
-      .catch(error => {
-        const too_many_members = error.label === z.service.BackendClientError.LABEL.TOO_MANY_MEMBERS;
-        if (too_many_members) {
-          const open_spots = z.config.MAXIMUM_CONVERSATION_SIZE - conversation_et.get_number_of_participants();
+      .catch(error => this._handleAddToConversationError(error, conversationEntity, userIds));
+  }
 
-          return amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.TOO_MANY_MEMBERS, {
-            data: {
-              max: z.config.MAXIMUM_CONVERSATION_SIZE,
-              open_spots: Math.max(0, open_spots),
-            },
-          });
-        }
+  _handleAddToConversationError(error, conversationEntity, userIds) {
+    switch (error.label) {
+      case z.service.BackendClientError.LABEL.NOT_CONNECTED: {
+        this._handleUsersNotConnected(userIds);
+        break;
+      }
 
-        if (error.label === z.service.BackendClientError.LABEL.NOT_CONNECTED) {
-          return this._handle_users_not_connected(user_ids);
-        }
+      case z.service.BackendClientError.LABEL.BAD_GATEWAY:
+      case z.service.BackendClientError.LABEL.SERVICE_DISABLED: {
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.SERVICE_DISABLED);
+        break;
+      }
 
+      case z.service.BackendClientError.LABEL.TOO_MANY_BOTS: {
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.TOO_MANY_BOTS);
+        break;
+      }
+
+      case z.service.BackendClientError.LABEL.TOO_MANY_MEMBERS: {
+        const openSpots = z.config.MAXIMUM_CONVERSATION_SIZE - conversationEntity.getNumberOfParticipants();
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.TOO_MANY_MEMBERS, {
+          data: {
+            max: z.config.MAXIMUM_CONVERSATION_SIZE,
+            open_spots: Math.max(0, openSpots),
+          },
+        });
+
+        break;
+      }
+
+      default: {
         throw error;
-      });
+      }
+    }
   }
 
   /**
@@ -1008,7 +1034,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this._clear_conversation(conversation_et);
 
     if (leave_conversation) {
-      this.remove_member(conversation_et, this.user_repository.self().id);
+      this.removeMember(conversation_et, this.user_repository.self().id);
     }
 
     if (is_active_conversation) {
@@ -1040,48 +1066,37 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Remove bot from conversation.
    *
-   * @param {Conversation} conversation_et - Conversation to remove member from
-   * @param {string} bot_user_id - ID of bot to be removed from the conversation
+   * @param {Conversation} conversationEntity - Conversation to remove bot from
+   * @param {z.entity.User} userId - ID of bot user to be removed from the conversation
    * @returns {Promise} Resolves when bot was removed from the conversation
    */
-  remove_bot(conversation_et, bot_user_id) {
-    return this.conversation_service.delete_bots(conversation_et.id, bot_user_id).then(response => {
-      if (response) {
-        amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
-        return response;
-      }
+  removeBot(conversationEntity, userId) {
+    return this.conversation_service.deleteBots(conversationEntity.id, userId).then(response => {
+      const hasResponse = response && response.event;
+      const event = hasResponse
+        ? response.event
+        : z.conversation.EventBuilder.build_member_leave(conversationEntity, userId, this.time_offset);
+
+      amplify.publish(z.event.WebApp.EVENT.INJECT, event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+      return event;
     });
   }
 
   /**
    * Remove member from conversation.
    *
-   * @param {Conversation} conversation_et - Conversation to remove member from
-   * @param {string} user_id - ID of member to be removed from the conversation
+   * @param {Conversation} conversationEntity - Conversation to remove member from
+   * @param {string} userId - ID of member to be removed from the conversation
    * @returns {Promise} Resolves when member was removed from the conversation
    */
-  remove_member(conversation_et, user_id) {
-    return this.conversation_service.delete_members(conversation_et.id, user_id).then(response => {
-      if (response) {
-        amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
-        return response;
-      }
+  removeMember(conversationEntity, userId) {
+    return this.conversation_service.deleteMembers(conversationEntity.id, userId).then(response => {
+      const event =
+        response || z.conversation.EventBuilder.build_member_leave(conversationEntity, userId, this.time_offset);
+
+      amplify.publish(z.event.WebApp.EVENT.INJECT, event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+      return event;
     });
-  }
-
-  /**
-   * Remove participant from conversation.
-   *
-   * @param {Conversation} conversation_et - Conversation to remove participant from
-   * @param {User} user_et - User to be removed from the conversation
-   * @returns {Promise} Resolves when participant was removed from the conversation
-   */
-  remove_participant(conversation_et, user_et) {
-    if (user_et.is_bot) {
-      return this.remove_bot(conversation_et, user_et.id);
-    }
-
-    return this.remove_member(conversation_et, user_et.id);
   }
 
   /**
@@ -1304,8 +1319,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
   }
 
-  _handle_users_not_connected(user_ids) {
-    const user_promise = user_ids.length === 1 ? this.user_repository.get_user_by_id(user_ids[0]) : Promise.resolve();
+  _handleUsersNotConnected(userIds = []) {
+    const [userID] = userIds;
+    const user_promise = userIds.length === 1 ? this.user_repository.get_user_by_id(userID) : Promise.resolve();
 
     user_promise.then(user_et => {
       const username = user_et ? user_et.first_name() : undefined;
@@ -2209,12 +2225,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
       size_mb: z.util.bucket_values(file.size / 1024 / 1024, [0, 5, 10, 15, 20, 25]),
       type: z.util.get_file_extension(file.name),
     };
+
     const conversation_type = z.tracking.helpers.get_conversation_type(conversation_et);
-    amplify.publish(
-      z.event.WebApp.ANALYTICS.EVENT,
-      z.tracking.EventName.FILE.UPLOAD_INITIATED,
-      $.extend(tracking_data, {conversation_type})
-    );
+    const initiatedAttributes = Object.assign(tracking_data, {conversation_type});
+    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_INITIATED, initiatedAttributes);
 
     return this.send_asset_metadata(conversation_et, file)
       .then(({id}) => {
@@ -2224,13 +2238,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(() => this.send_asset_remotedata(conversation_et, file, message_id))
       .then(() => {
         const upload_duration = (Date.now() - upload_started) / 1000;
-
         this.logger.info(`Finished to upload asset for conversation'${conversation_et.id} in ${upload_duration}`);
-        amplify.publish(
-          z.event.WebApp.ANALYTICS.EVENT,
-          z.tracking.EventName.FILE.UPLOAD_SUCCESSFUL,
-          $.extend(tracking_data, {time: upload_duration})
-        );
+
+        const successAttributes = Object.assign(tracking_data, {time: upload_duration});
+        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_SUCCESSFUL, successAttributes);
       })
       .catch(error => {
         if (error.type === z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
@@ -3502,7 +3513,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         conversation_type: z.tracking.helpers.get_conversation_type(conversation_et),
         ephemeral_time: is_ephemeral ? ephemeral_time : undefined,
         is_ephemeral: is_ephemeral,
-        with_bot: conversation_et.is_with_bot(),
+        with_service: conversation_et.isWithBot(),
       });
     }
   }
@@ -3562,7 +3573,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       reacted_to_last_message: conversation_et.get_last_message() === message_et,
       type: z.tracking.helpers.get_message_type(message_et),
       user: message_et.user().is_me ? 'sender' : 'receiver',
-      with_bot: conversation_et.is_with_bot(),
+      with_service: conversation_et.isWithBot(),
     });
   }
 };

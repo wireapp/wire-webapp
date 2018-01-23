@@ -128,6 +128,7 @@
   display: flex;
   margin-bottom: 16px;
   align-items: center;
+  padding-right: 24px;
 
   > svg {
     margin-right: 16px;
@@ -164,9 +165,12 @@
 }
 
 .participants-search-header {
+  padding: 16px 8px 0;
+}
+
+.participants-search-header-row {
   display: flex;
   align-items: flex-start;
-  padding: 16px 8px 8px;
 }
 
 .participants-search-header-list {
@@ -180,9 +184,10 @@
 }
 
 .participants-search-content {
+  background-color: @app-bg;
   flex: 1 1 auto;
   position: relative;
-  margin-left: 16px;
+  padding-left: 16px;
 }
 
 .participants-search-footer {
@@ -201,6 +206,7 @@
 
 .participants-search-list {
   .full-screen();
+  left: 16px;
   font-weight: 300;
   overflow-x: hidden;
   overflow-y: scroll;
@@ -213,12 +219,90 @@
     margin: 106px 18px;
     white-space: pre;
   }
+
+  user-list,
+  service-list {
+    margin-top: 8px;
+  }
 }
 
 .participant-search-list-header {
   .label-bold-xs();
   margin-bottom: 8px;
   line-height: 24px;
+}
+
+.participants-search-tabs {
+  height: 44px;
+  display: flex;
+  padding: 0 8px;
+  .participants-search-tab {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 11px;
+    color: @graphite-dark;
+    border-bottom: 1px solid transparent;
+    opacity: 0.56;
+    cursor: pointer;
+    &.active {
+      border-bottom-color: fade(@graphite-dark, 40%);
+      opacity: 1;
+      cursor: default;
+    }
+  }
+}
+
+.participants-service-confirmation {
+  .bubble-content();
+  .service-confirmation-header {
+    flex-basis: 48px;
+    padding: 16px;
+    display: flex;
+  }
+  .service-confirmation-back {
+    cursor: pointer;
+  }
+  .service-confirmation-body {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    background-color: @app-bg;
+  }
+  .service-confirmation-footer {
+    padding: 24px;
+  }
+  .service-confirmation-summary {
+    display: flex;
+  }
+  .service-confirmation-summary-text {
+    margin-left: 16px;
+  }
+  .service-confirmation-name {
+    font-size: 24px;
+    line-height: 32px;
+    font-weight: @font-weight-regular;
+  }
+  .service-confirmation-provider {
+    margin-top: 4px;
+    font-size: 12px;
+    line-height: 16px;
+    opacity: 0.56;
+  }
+  .service-confirmation-description {
+    margin-top: 16px;
+    font-size: 14px;
+  }
+}
+
+.participants-service-confirmation-button {
+  .button();
+  width: 100%;
+  height: 48px;
 }
 
 // ----------------------------------------------------------------------------

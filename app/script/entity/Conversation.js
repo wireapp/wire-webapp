@@ -229,6 +229,7 @@ z.entity.Conversation = class Conversation {
 
         if (this.participating_user_ets().length > 0) {
           return this.participating_user_ets()
+            .filter(user_et => !user_et.isBot)
             .map(user_et => user_et.first_name())
             .join(', ');
         }
@@ -387,8 +388,19 @@ z.entity.Conversation = class Conversation {
     return new Date(timestamp).toISOString();
   }
 
-  get_number_of_participants() {
-    return this.participating_user_ids().length + (this.removed_from_conversation() ? 0 : 1);
+  getNumberOfBots() {
+    return this.participating_user_ets().filter(userEntity => userEntity.isBot).length;
+  }
+
+  getNumberOfParticipants(countSelf = true, countBots = true) {
+    const adjustCountForSelf = countSelf && !this.removed_from_conversation() ? 1 : 0;
+
+    if (!countBots) {
+      const numberOfParticipants = this.participating_user_ets().filter(userEntity => !userEntity.isBot).length;
+      return numberOfParticipants + adjustCountForSelf;
+    }
+
+    return this.participating_user_ids().length + adjustCountForSelf;
   }
 
   getNumberOfClients() {
@@ -402,7 +414,7 @@ z.entity.Conversation = class Conversation {
       }, this.self.devices().length);
     }
 
-    return this.get_number_of_participants() * z.client.ClientRepository.CONFIG.AVERAGE_NUMBER_OF_CLIENTS;
+    return this.getNumberOfParticipants() * z.client.ClientRepository.CONFIG.AVERAGE_NUMBER_OF_CLIENTS;
   }
 
   /**
@@ -653,12 +665,12 @@ z.entity.Conversation = class Conversation {
   }
 
   /**
-   * Check whether the conversation is held with a bot like Anna or Otto.
+   * Check whether the conversation is held with a service bot like Anna or Otto.
    * @returns {boolean} True, if conversation with a bot
    */
-  is_with_bot() {
+  isWithBot() {
     for (const user_et of this.participating_user_ets()) {
-      if (user_et.is_bot) {
+      if (user_et.isBot) {
         return true;
       }
     }

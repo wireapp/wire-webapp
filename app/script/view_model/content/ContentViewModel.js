@@ -29,6 +29,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
     calling_repository,
     client_repository,
     conversation_repository,
+    integrationRepository,
     media_repository,
     properties_repository,
     search_repository,
@@ -41,6 +42,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
     this.calling_repository = calling_repository;
     this.client_repository = client_repository;
     this.conversation_repository = conversation_repository;
+    this.integrationRepository = integrationRepository;
     this.media_repository = media_repository;
     this.propertiesRepository = properties_repository;
     this.search_repository = search_repository;
@@ -97,10 +99,10 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
     );
     this.participants = new z.ViewModel.ParticipantsViewModel(
       'participants',
-      this.user_repository,
       this.conversation_repository,
-      this.search_repository,
-      this.team_repository
+      this.integrationRepository,
+      this.team_repository,
+      this.user_repository
     );
     this.giphy = new z.ViewModel.GiphyViewModel('giphy-modal', this.conversation_repository, this.giphy_repository);
 
@@ -235,7 +237,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
       this.conversation_repository.active_conversation(conversationEt);
       this.message_list.change_conversation(conversationEt, messageEt).then(() => {
         this._show_content(z.ViewModel.content.CONTENT_STATE.CONVERSATION);
-        this.participants.change_conversation(conversationEt);
+        this.participants.changeConversation(conversationEt);
         this.previous_conversation = this.conversation_repository.active_conversation();
       });
     });

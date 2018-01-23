@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,25 @@
  *
  */
 
-user-list,
-service-list {
-  display: block;
+'use strict';
 
-  .no-results {
-    .text-center;
-    line-height: 24px;
-    margin: 106px 18px;
-    white-space: pre;
+window.z = window.z || {};
+window.z.integration = z.integration || {};
+
+z.integration.ServiceEntity = class ServiceEntity {
+  constructor(serviceData = {}) {
+    const {description, id, name, provider: providerId, summary, tags} = serviceData;
+
+    this.id = id || '';
+
+    this.description = description || '';
+    this.name = name || '';
+    this.providerId = providerId || '';
+    this.providerName = ko.observable('');
+    this.summary = summary || '';
+    this.tags = tags || [];
+
+    this.mediumPictureResource = ko.observable();
+    this.previewPictureResource = ko.observable();
   }
-}
+};

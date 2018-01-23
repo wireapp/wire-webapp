@@ -352,7 +352,8 @@ z.string.de.people_remove_message = '{{user}} wird in dieser Unterhaltung keine 
 z.string.de.people_unblock_headline = 'Freigeben?';
 z.string.de.people_unblock_message = '{{user}} wird dich wieder kontaktieren und zu Gruppen hinzufügen können.';
 
-z.string.de.people_button_add = 'Personen hinzufügen';
+z.string.de.people_button_add = 'Hinzufügen';
+z.string.de.people_button_add_people = 'Personen hinzufügen';
 z.string.de.people_button_block = 'Blockieren';
 z.string.de.people_button_cancel = 'Abbrechen';
 z.string.de.people_button_connect = 'Hinzufügen';

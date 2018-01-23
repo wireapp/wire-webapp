@@ -22,13 +22,15 @@
 window.z = window.z || {};
 window.z.components = z.components || {};
 
-z.components.UserListMode = {
-  COMPACT: 'compact',
-  DEFAULT: 'default',
-  OTHERS: 'others',
-};
+z.components.UserList = class UserList {
+  static get MODE() {
+    return {
+      COMPACT: 'UserList.MODE.COMPACT',
+      DEFAULT: 'UserList.MODE.DEFAULT',
+      OTHERS: 'UserList.MODE.OTHERS',
+    };
+  }
 
-z.components.UserListViewModel = class UserListViewModel {
   /**
    * Displays a list of user_ets
    *
@@ -48,10 +50,14 @@ z.components.UserListViewModel = class UserListViewModel {
     this.user_filter = params.filter;
     this.user_selected = params.selected;
     this.user_selected_filter = params.selectable;
-    this.mode = params.mode || z.components.UserListMode.DEFAULT;
+    this.mode = params.mode || UserList.MODE.DEFAULT;
+
+    this.isCompactMode = this.mode === UserList.MODE.COMPACT;
+    this.isDefaultMode = this.mode === UserList.MODE.DEFAULT;
+    this.isOthersMode = this.mode === UserList.MODE.OTHERS;
 
     this.css_classes = ko.pureComputed(() => {
-      if (this.mode === z.components.UserListMode.COMPACT) {
+      if (this.isCompactMode) {
         return 'search-list-sm';
       }
       return 'search-list-lg';
@@ -124,9 +130,9 @@ ko.components.register('user-list', {
   template: `
     <div class="search-list" data-bind="css: css_classes(), foreach: {data: filtered_user_ets}">
       <div class="search-list-item" data-bind="click: $parent.on_select, css: {'search-list-item-selected': $parent.is_selected($data)}, attr: {'data-uie-uid': $data.id, 'data-uie-value': $data.name(), 'data-uie-status': $data.connection().status()}" data-uie-name="item-user">
-        <!-- ko if: $parent.mode === z.components.UserListMode.COMPACT -->
+        <!-- ko if: $parent.isCompactMode -->
           <div class="search-list-item-image">
-            <user-avatar class="user-avatar-md" params="user: $data, selected: $parent.is_selected($data)"></user-avatar>
+            <participant-avatar params="participant: $data, selected: $parent.is_selected($data), size: z.components.ParticipantAvatar.SIZE.LARGE"></participant-avatar>
             <!-- ko if: $data.is_guest() -->
               <div class="search-list-item-image-guest-indicator-badge" data-bind="l10n_text: z.string.conversation_guest_indicator" data-uie-name="status-guest"></div>
             <!-- /ko -->
@@ -142,9 +148,9 @@ ko.components.register('user-list', {
             <!-- /ko -->
           </div>
         <!-- /ko -->
-        <!-- ko ifnot: $parent.mode === z.components.UserListMode.COMPACT -->
+        <!-- ko ifnot: $parent.isCompactMode -->
           <div class="search-list-item-image">
-            <user-avatar class="user-avatar-sm" params="user: $data, selected: $parent.is_selected($data)"></user-avatar>
+            <participant-avatar params="participant: $data, selected: $parent.is_selected($data), size: z.components.ParticipantAvatar.SIZE.MEDIUM"></participant-avatar>
             <div class="search-list-item-image-overlay">
               <div class="background"></div>
               <div class="checkmark icon-check"></div>
@@ -165,7 +171,7 @@ ko.components.register('user-list', {
               <!-- /ko -->
             </div>
           </div>
-          <!-- ko if: $parent.mode !== z.components.UserListMode.OTHERS && $data.is_guest() -->
+          <!-- ko if: !$parent.isOthersMode && $data.is_guest() -->
             <div class="search-list-item-guest-indicator" data-uie-name="status-guest">
               <div class="search-list-item-guest-indicator-badge" data-bind="l10n_text: z.string.conversation_guest_indicator"></div>
             </div>
@@ -182,5 +188,5 @@ ko.components.register('user-list', {
       <!-- /ko -->
     <!-- /ko -->
   `,
-  viewModel: z.components.UserListViewModel,
+  viewModel: z.components.UserList,
 });
