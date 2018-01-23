@@ -318,7 +318,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       this.user_bubble.hide();
       window.setTimeout(() => {
         create_bubble(element[0].id);
-      }, 550);
+      }, z.motion.MotionDuration.LONG);
     } else {
       create_bubble(element[0].id);
     }
