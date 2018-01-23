@@ -995,7 +995,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       }
 
       case z.service.BackendClientError.LABEL.TOO_MANY_MEMBERS: {
-        const openSpots = z.config.MAXIMUM_CONVERSATION_SIZE - conversationEntity.get_number_of_participants();
+        const openSpots = z.config.MAXIMUM_CONVERSATION_SIZE - conversationEntity.getNumberOfParticipants();
         amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.TOO_MANY_MEMBERS, {
           data: {
             max: z.config.MAXIMUM_CONVERSATION_SIZE,

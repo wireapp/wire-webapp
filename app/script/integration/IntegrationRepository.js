@@ -68,7 +68,14 @@ z.integration.IntegrationRepository = class IntegrationRepository {
 
     return this.conversationRepository.addBot(conversationEntity, providerId, serviceId).then(event => {
       if (event) {
-        const attributes = {method: method, service_id: serviceId, service_name: name.toLowerCase()};
+        const attributes = {
+          conversation_size: conversationEntity.getNumberOfParticpants(true, false),
+          method: method,
+          service_id: serviceId,
+          service_name: name.toLowerCase(),
+          services_size: conversationEntity.getNumberOfBots(),
+        };
+
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.INTEGRATION.ADDED_SERVICE, attributes);
       }
 

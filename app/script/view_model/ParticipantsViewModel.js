@@ -259,7 +259,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     if (this.conversation().is_group()) {
       this.conversationRepository.addMembers(this.conversation(), userIds).then(() => {
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.ADD_TO_GROUP_CONVERSATION, {
-          numberOfGroupParticipants: this.conversation().get_number_of_participants(),
+          numberOfGroupParticipants: this.conversation().getNumberOfParticipants(),
           numberOfParticipantsAdded: userIds.length,
         });
       });

@@ -388,8 +388,19 @@ z.entity.Conversation = class Conversation {
     return new Date(timestamp).toISOString();
   }
 
-  get_number_of_participants() {
-    return this.participating_user_ids().length + (this.removed_from_conversation() ? 0 : 1);
+  getNumberOfBots() {
+    return this.participating_user_ets().filter(userEntity => userEntity.isBot).length;
+  }
+
+  getNumberOfParticipants(countSelf = true, countBots = true) {
+    const adjustCountForSelf = countSelf && !this.removed_from_conversation() ? 1 : 0;
+
+    if (!countBots) {
+      const numberOfParticipants = this.participating_user_ets().filter(userEntity => !userEntity.isBot).length;
+      return numberOfParticipants + adjustCountForSelf;
+    }
+
+    return this.participating_user_ids().length + adjustCountForSelf;
   }
 
   getNumberOfClients() {
@@ -403,7 +414,7 @@ z.entity.Conversation = class Conversation {
       }, this.self.devices().length);
     }
 
-    return this.get_number_of_participants() * z.client.ClientRepository.CONFIG.AVERAGE_NUMBER_OF_CLIENTS;
+    return this.getNumberOfParticipants() * z.client.ClientRepository.CONFIG.AVERAGE_NUMBER_OF_CLIENTS;
   }
 
   /**
