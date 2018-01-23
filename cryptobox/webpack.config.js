@@ -12,7 +12,6 @@ module.exports = {
     dexie: 'Dexie',
     'fs-extra': false,
     logdown: 'Logdown',
-    'wire-webapp-lru-cache': 'LRUCache',
   },
   node: {
     fs: 'empty',

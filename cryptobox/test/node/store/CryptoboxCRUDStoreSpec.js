@@ -21,7 +21,7 @@
 
 const cryptobox = require('../../../dist/commonjs/index');
 const fs = require('fs-extra');
-const LRUCache = require('wire-webapp-lru-cache');
+const LRUCache = require('@wireapp/lru-cache').default;
 const path = require('path');
 const Proteus = require('@wireapp/proteus');
 const {FileEngine} = require('@wireapp/store-engine/dist/commonjs/engine');

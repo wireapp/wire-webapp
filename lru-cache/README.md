@@ -14,28 +14,12 @@ For licensing information, see the attached LICENSE file and the list of third-p
 yarn add @wireapp/lru-cache
 ```
 
-### Import
-
-**TypeScript**
-
-```typescript
-import LRUCache = require('@wireapp/lru-cache');
-let cache = new LRUCache();
-```
-
-**CommonJS**
-
-```javascript
-const LRUCache = require('@wireapp/lru-cache');
-let cache = new LRUCache();
-```
-
 ### Usage
 
 **Browser**
 
-* [index.html](./demo.html)
+* [demo.html](./demo.html)
 
 **Node.js**
 
-* [index.js](./demo.js)
+* [LRUCacheSpec.js](./test/specs/LRUCacheSpec.js)

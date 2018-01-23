@@ -7,7 +7,7 @@ import InvalidPreKeyFormatError from './InvalidPreKeyFormatError';
 import {ReadOnlyStore} from './store/';
 import EventEmitter = require('events');
 import Logdown = require('logdown');
-import LRUCache = require('wire-webapp-lru-cache');
+import LRUCache from '@wireapp/lru-cache';
 
 export interface SessionFromMessageTuple extends Array<CryptoboxSession | Uint8Array> {
   0: CryptoboxSession;
