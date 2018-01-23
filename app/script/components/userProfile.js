@@ -311,7 +311,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
             return 'user-profile-footer-profile';
           }
 
-          if (user_et.is_connected() || conversation_et.team_id) {
+          if (user_et.is_connected() || user_et.is_team_member()) {
             return 'user-profile-footer-add-block';
           }
 
