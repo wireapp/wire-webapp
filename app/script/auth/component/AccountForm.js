@@ -62,6 +62,7 @@ class AccountForm extends PureComponent {
     const errors = [];
     for (const inputKey of Object.keys(this.inputs)) {
       const currentInput = this.inputs[inputKey];
+      currentInput.value = currentInput.value.trim();
       if (!currentInput.checkValidity()) {
         errors.push(ValidationError.handleValidationState(currentInput.name, currentInput.validity));
       }
@@ -218,7 +219,7 @@ class AccountForm extends PureComponent {
           style={{margin: '0 auto -16px'}}
           data-uie-name="do-next"
         >
-          {submitText || _(accountFormStrings.nextButton)}
+          {submitText || _(accountFormStrings.submitButton)}
         </Button>
       </Form>
     );

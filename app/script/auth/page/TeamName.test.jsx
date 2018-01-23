@@ -116,5 +116,19 @@ describe('when entering a team name', () => {
 
       done();
     });
+
+    it('appears when input gets trimmed', done => {
+      const actualTeamName = '  ';
+      const expectedTeamName = '  ';
+      const expectedErrorMessage = 'Enter a name with at least 2 characters';
+
+      teamNameInput().simulate('change', {target: {value: actualTeamName}});
+      expect(teamNameInput().props().value).toBe(expectedTeamName);
+
+      doNextButton().simulate('click');
+      expect(errorMessage().text()).toBe(expectedErrorMessage);
+
+      done();
+    });
   });
 });

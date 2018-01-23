@@ -51,6 +51,7 @@ class TeamName extends Component {
 
   handleSubmit = event => {
     event.preventDefault();
+    this.teamNameInput.value = this.teamNameInput.value.trim();
     if (!this.teamNameInput.checkValidity()) {
       this.setState({
         error: ValidationError.handleValidationState('name', this.teamNameInput.validity),
