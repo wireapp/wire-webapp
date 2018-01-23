@@ -102,13 +102,12 @@ window.z.util = z.util || {};
   // add body information
   const os_css_class = os.is_mac() ? 'os-mac' : 'os-pc';
   const platform_css_class = _check.is_electron() ? 'platform-electron' : 'platform-web';
-  $(document.body).addClass(`${os_css_class} ${platform_css_class}`);
+  document.body.classList.add(os_css_class, platform_css_class);
 
   const app_version = () => {
-    if ($("[property='wire:version']").attr('version')) {
-      return $("[property='wire:version']")
-        .attr('version')
-        .trim();
+    const versionElement = document.body.querySelector("[property='wire:version']");
+    if (versionElement && versionElement.hasAttribute('version')) {
+      return versionElement.getAttribute('version').trim();
     }
     return '';
   };

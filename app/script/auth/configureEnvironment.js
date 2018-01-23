@@ -27,6 +27,9 @@ window.platform = platform;
 window.jQuery = jQuery;
 window.$ = jQuery;
 
+// Adding "window.z.util.Environment" which is required by "wire-desktop"
+import '../util/Environment';
+
 // Expose wire object in global namespace to satisfy wrapper check
 const configureEnvironment = () => (window.wire = {});
 

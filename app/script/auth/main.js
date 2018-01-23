@@ -18,8 +18,6 @@
  */
 
 import 'babel-polyfill'; // Polyfill needs to be imported first
-// Adding "window.z.util.Environment" which is required by "wire-desktop"
-import '../../util/Environment';
 import {Account} from '@wireapp/core';
 import {AppContainer} from 'react-hot-loader';
 import {Provider} from 'react-redux';
