@@ -117,7 +117,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
 
       attributes = $.extend(
         {
-          conversation_participants: conversation_et.get_number_of_participants(),
+          conversation_participants: conversation_et.getNumberOfParticipants(),
           conversation_participants_in_call: max_number_of_participants ? max_number_of_participants : undefined,
           conversation_type: is_group
             ? z.tracking.attribute.ConversationType.GROUP
@@ -180,7 +180,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
       }
 
       const attributes = {
-        conversation_participants: conversation_et.get_number_of_participants(),
+        conversation_participants: conversation_et.getNumberOfParticipants(),
         conversation_participants_in_call: max_number_of_participants,
         conversation_type: is_group
           ? z.tracking.attribute.ConversationType.GROUP
