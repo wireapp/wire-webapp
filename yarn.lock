@@ -327,16 +327,16 @@
   version "2.3.2"
   resolved "https://registry.yarnpkg.com/@types/tough-cookie/-/tough-cookie-2.3.2.tgz#e0d481d8bb282ad8a8c9e100ceb72c995fb5e709"
 
-"@wireapp/api-client@0.2.34":
-  version "0.2.34"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-0.2.34.tgz#4779de7a979cb1e1280c4dc8ddc3646552506a4e"
+"@wireapp/api-client@0.2.35":
+  version "0.2.35"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-0.2.35.tgz#bf26efbd058093b0dcbf47d6a8386f4a7d3d5b5f"
   dependencies:
     "@types/node" "9.3.0"
     "@types/spark-md5" "3.0.0"
     "@types/text-encoding" "0.0.32"
     "@types/tough-cookie" "2.3.2"
-    "@wireapp/queue-priority" "0.0.21"
-    "@wireapp/store-engine" "0.1.8"
+    "@wireapp/queue-priority" "0.0.22"
+    "@wireapp/store-engine" "0.1.9"
     axios "0.17.1"
     html5-websocket "2.0.2"
     logdown "2.2.0"
@@ -344,14 +344,14 @@
     spark-md5 "3.0.0"
     tough-cookie "2.3.3"
 
-"@wireapp/core@0.0.23":
-  version "0.0.23"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-0.0.23.tgz#0b54ceae22b4c03812644dbc475f17118ad0126c"
+"@wireapp/core@0.0.24":
+  version "0.0.24"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-0.0.24.tgz#33ad9fccfc659af0e6ff51d0cc88d1dcf88d804e"
   dependencies:
     "@types/node" "9.3.0"
-    "@wireapp/api-client" "0.2.34"
+    "@wireapp/api-client" "0.2.35"
     "@wireapp/protocol-messaging" "1.20.0"
-    "@wireapp/store-engine" "0.1.8"
+    "@wireapp/store-engine" "0.1.9"
     bazinga64 "5.0.3"
     protobufjs "6.8.4"
     pure-uuid "1.4.11"
@@ -363,9 +363,9 @@
   dependencies:
     protobufjs "6.8.0"
 
-"@wireapp/queue-priority@0.0.21":
-  version "0.0.21"
-  resolved "https://registry.yarnpkg.com/@wireapp/queue-priority/-/queue-priority-0.0.21.tgz#421028b7f897038171c8ac2c1340d1cb982b806c"
+"@wireapp/queue-priority@0.0.22":
+  version "0.0.22"
+  resolved "https://registry.yarnpkg.com/@wireapp/queue-priority/-/queue-priority-0.0.22.tgz#54ceb94fd40764aff94f518e9bbc997a4563d6b2"
   dependencies:
     "@types/node" "9.3.0"
 
@@ -397,9 +397,9 @@
     dexie "2.0.1"
     fs-extra "4.0.2"
 
-"@wireapp/store-engine@0.1.8":
-  version "0.1.8"
-  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-0.1.8.tgz#569ccd76d8227c54ba40a64c79e7c3301a6e5828"
+"@wireapp/store-engine@0.1.9":
+  version "0.1.9"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-0.1.9.tgz#a0693678471fb632a04bb5f2198a99e6f895bba2"
   dependencies:
     "@types/node" "9.3.0"
     dexie "2.0.1"
