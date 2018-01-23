@@ -27,7 +27,6 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
     return {
       LARGE: 'avatar-lg',
       MEDIUM: 'avatar-md',
-      MEDIUMSMALL: 'avatar-sm',
       SMALL: 'avatar-s',
       X_SMALL: 'avatar-xs',
       XX_SMALL: 'avatar-xxs',
