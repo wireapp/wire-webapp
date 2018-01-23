@@ -23,7 +23,7 @@ window.z = window.z || {};
 window.z.components = z.components || {};
 
 z.components.ServiceList = class ServiceList {
-  static MODE() {
+  static get MODE() {
     return {
       COMPACT: 'ServiceList.MODE.COMPACT',
       DEFAULT: 'ServiceList.MODE.DEFAULT',
@@ -53,7 +53,7 @@ ko.components.register('service-list', {
       <div class="search-list-item" data-uie-name="item-service" data-bind="click: $parent.onClick">
         <!-- ko if: $parent.isCompactMode -->
           <div class="search-list-item-image">
-            <participant-avatar params="participant: $data, size: z.components.ParticipantAvatar.SIZE.MEDIUM"></participant-avatar>
+            <participant-avatar params="participant: $data, size: z.components.ParticipantAvatar.SIZE.LARGE"></participant-avatar>
           </div>
           <div class="search-list-item-content">
             <div class="search-list-item-content-name" data-bind="text: name"></div>
@@ -61,7 +61,7 @@ ko.components.register('service-list', {
         <!-- /ko -->
         <!-- ko ifnot: $parent.isCompactMode -->
           <div class="search-list-item-image">
-            <participant-avatar params="participant: $data, size: z.components.ParticipantAvatar.SIZE.SMALL"></participant-avatar>
+            <participant-avatar params="participant: $data, size: z.components.ParticipantAvatar.SIZE.MEDIUM"></participant-avatar>
           </div>
           <div class="search-list-item-content">
             <div class="search-list-item-content-name" data-uie-name="status-content-name" data-bind="text: name"></div>

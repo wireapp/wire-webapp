@@ -23,13 +23,14 @@ window.z = window.z || {};
 window.z.components = z.components || {};
 
 z.components.ParticipantAvatar = class ParticipantAvatar {
-  static SIZE() {
+  static get SIZE() {
     return {
-      LARGE: 'ParticipantAvatar.SIZE.LARGE',
-      MEDIUM: 'ParticipantAvatar.SIZE.MEDIUM',
-      SMALL: 'ParticipantAvatar.SIZE.SMALL',
-      X_SMALL: 'ParticipantAvatar.SIZE.X_SMALL',
-      XX_SMALL: 'ParticipantAvatar.SIZE.XX_SMALL',
+      LARGE: 'avatar-lg',
+      MEDIUM: 'avatar-md',
+      SMALL: 'avatar-s',
+      X_LARGE: 'avatar-xl',
+      X_SMALL: 'avatar-xs',
+      XX_SMALL: 'avatar-xxs',
     };
   }
 
@@ -40,12 +41,9 @@ z.components.ParticipantAvatar = class ParticipantAvatar {
 
     const avatarType = `${this.isUser ? 'user' : 'service'}-avatar`;
     this.delay = params.delay;
-    this.size = params.size || ParticipantAvatar.SIZE.MEDIA_STREAM_ERROR;
+    this.size = params.size || ParticipantAvatar.SIZE.LARGE;
     this.element = $(componentInfo.element);
-
-    if (this.size) {
-      this.element.addClass(`${avatarType} avatar-${this.size}`);
-    }
+    this.element.addClass(`${avatarType} ${this.size}`);
 
     this.avatarLoadingBlocked = false;
     this.avatarEnteredViewport = false;

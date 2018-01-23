@@ -23,7 +23,7 @@ window.z = window.z || {};
 window.z.components = z.components || {};
 
 z.components.UserList = class UserList {
-  static MODE() {
+  static get MODE() {
     return {
       COMPACT: 'UserList.MODE.COMPACT',
       DEFAULT: 'UserList.MODE.DEFAULT',
@@ -132,7 +132,7 @@ ko.components.register('user-list', {
       <div class="search-list-item" data-bind="click: $parent.on_select, css: {'search-list-item-selected': $parent.is_selected($data)}, attr: {'data-uie-uid': $data.id, 'data-uie-value': $data.name(), 'data-uie-status': $data.connection().status()}" data-uie-name="item-user">
         <!-- ko if: $parent.isCompactMode -->
           <div class="search-list-item-image">
-            <participant-avatar params="participant: $data, selected: $parent.is_selected($data), size: z.components.ParticipantAvatar.SIZE.MEDIUM"></participant-avatar>
+            <participant-avatar params="participant: $data, selected: $parent.is_selected($data), size: z.components.ParticipantAvatar.SIZE.LARGE"></participant-avatar>
             <!-- ko if: $data.is_guest() -->
               <div class="search-list-item-image-guest-indicator-badge" data-bind="l10n_text: z.string.conversation_guest_indicator" data-uie-name="status-guest"></div>
             <!-- /ko -->
@@ -148,9 +148,9 @@ ko.components.register('user-list', {
             <!-- /ko -->
           </div>
         <!-- /ko -->
-        <!-- ko ifnot: $parent.isCompact -->
+        <!-- ko ifnot: $parent.isCompactMode -->
           <div class="search-list-item-image">
-            <participant-avatar params="participant: $data, selected: $parent.is_selected($data), size: z.components.ParticipantAvatar.SIZE.SMALL"></participant-avatar>
+            <participant-avatar params="participant: $data, selected: $parent.is_selected($data), size: z.components.ParticipantAvatar.SIZE.MEDIUM"></participant-avatar>
             <div class="search-list-item-image-overlay">
               <div class="background"></div>
               <div class="checkmark icon-check"></div>
