@@ -197,7 +197,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     if (bubble && bubble.is_visible()) {
       window.setTimeout(() => {
         toggle_bubble();
-      }, 550);
+      }, z.motion.MotionDuration.LONG);
     } else {
       toggle_bubble();
     }
