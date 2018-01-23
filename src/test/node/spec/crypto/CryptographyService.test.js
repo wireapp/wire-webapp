@@ -19,8 +19,8 @@
 
 /* eslint-disable no-magic-numbers */
 const bazinga64 = require('bazinga64');
-const cryptobox = require('wire-webapp-cryptobox');
-const Proteus = require('wire-webapp-proteus');
+const cryptobox = require('@wireapp/cryptobox');
+const Proteus = require('@wireapp/proteus');
 const {crypto} = require('@wireapp/core');
 const {MemoryEngine} = require('@wireapp/store-engine').StoreEngine;
 
