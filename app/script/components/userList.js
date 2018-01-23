@@ -23,7 +23,7 @@ window.z = window.z || {};
 window.z.components = z.components || {};
 
 z.components.UserList = class UserList {
-  static MODE() {
+  static get MODE() {
     return {
       COMPACT: 'UserList.MODE.COMPACT',
       DEFAULT: 'UserList.MODE.DEFAULT',
@@ -148,7 +148,7 @@ ko.components.register('user-list', {
             <!-- /ko -->
           </div>
         <!-- /ko -->
-        <!-- ko ifnot: $parent.isCompact -->
+        <!-- ko ifnot: $parent.isCompactMode -->
           <div class="search-list-item-image">
             <participant-avatar params="participant: $data, selected: $parent.is_selected($data), size: z.components.ParticipantAvatar.SIZE.SMALL"></participant-avatar>
             <div class="search-list-item-image-overlay">

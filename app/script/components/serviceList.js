@@ -23,7 +23,7 @@ window.z = window.z || {};
 window.z.components = z.components || {};
 
 z.components.ServiceList = class ServiceList {
-  static MODE() {
+  static get MODE() {
     return {
       COMPACT: 'ServiceList.MODE.COMPACT',
       DEFAULT: 'ServiceList.MODE.DEFAULT',
