@@ -204,6 +204,12 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
     // Selected user bubble
     this.user_profile = ko.observable(null);
+    this.userProfileIsService = ko.observable(false);
+
+    this.user_profile.subscribe(newProfile => {
+      this.userProfileIsService(newProfile instanceof z.integration.ServiceEntity);
+    });
+
     this.user_bubble = undefined;
     this.user_bubble_last_id = undefined;
 
@@ -288,7 +294,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
   }
 
   clickOnOther(userEntity, event) {
-    if (!userEntity.isBot) {
+    if (userEntity instanceof z.entity.User) {
       amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.SELECTED_USER_FROM_SEARCH, {
         connection_type: (() => {
           switch (userEntity.connection().status()) {
@@ -357,7 +363,8 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
   }
 
   clickOnService(service) {
-    this.logger.info(service);
+    this.conversation_repository.get_conversations().then(conversations => this.logger.info(conversations));
+    this.logger.info(this.user_profile());
   }
 
   updateList() {

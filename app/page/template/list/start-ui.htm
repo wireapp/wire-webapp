@@ -148,7 +148,7 @@
 
   <!-- ko if: user_profile() -->
     <div id="start-ui-user-bubble" class="start-ui-user-bubble bubble">
-      <!-- ko ifnot: user_profile().isBot -->
+      <!-- ko ifnot: userProfileIsService() -->
       <user-profile params="user: user_profile,
                             open: on_user_open,
                             accept: on_user_accept,
@@ -159,7 +159,7 @@
                             mode: z.components.UserProfileMode.SEARCH"></user-profile>
 
       <!-- /ko -->
-      <!-- ko if: user_profile().isBot -->
+      <!-- ko if: userProfileIsService() -->
         <div class="service-confirmation">
           <div class="service-confirmation-body">
             <div class="service-confirmation-summary">
@@ -172,7 +172,7 @@
             <div data-uie-name="status-service-description" class="service-confirmation-description" data-bind="text: user_profile().description"></div>
           </div>
           <div class="service-confirmation-footer">
-            <button data-uie-name="do-service-confirm" class="participants-service-confirmation-button" data-bind="l10n_text: z.string.people_service_confirm_button"></button>
+            <button data-uie-name="do-service-confirm" class="participants-service-confirmation-button" data-bind="click: clickOnService, l10n_text: z.string.people_service_confirm_button"></button>
           </div>
         </div>
       <!-- /ko -->
