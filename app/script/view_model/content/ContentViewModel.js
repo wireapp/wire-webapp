@@ -104,6 +104,10 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
     );
     this.giphy = new z.ViewModel.GiphyViewModel('giphy-modal', this.conversation_repository, this.giphy_repository);
 
+    this.preferencesAbout = new z.ViewModel.content.PreferencesAboutViewModel(
+      'preferences-about',
+      this.user_repository
+    );
     this.preferences_account = new z.ViewModel.content.PreferencesAccountViewModel(
       'preferences-account',
       this.client_repository,
