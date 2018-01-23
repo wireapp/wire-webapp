@@ -200,9 +200,9 @@
   version "1.0.2"
   resolved "https://codeload.github.com/wireapp/webapp-module-namespace/tar.gz/24c17f5dc8e0025e65e02d35593310931856134e"
 
-"@bower_components/webrtc-adapter@webrtc/adapter#6.0.3":
-  version "6.0.3"
-  resolved "https://codeload.github.com/webrtc/adapter/tar.gz/3c158d2e4fd7d5f492365aa8d2157aac7e0e7c55"
+"@bower_components/webrtc-adapter@webrtc/adapter#6.1.0":
+  version "6.1.0"
+  resolved "https://codeload.github.com/webrtc/adapter/tar.gz/aea1b6d06e63e27173e18d53b44275dcecb98eb0"
   dependencies:
     rtcpeerconnection-shim "^1.1.13"
     sdp "^2.3.0"
