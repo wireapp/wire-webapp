@@ -38,7 +38,7 @@ z.conversation.ConversationServiceNoCompound = class ConversationServiceNoCompou
    * @returns {Promise} Resolves with matching events
    */
   load_events_with_category_from_db(conversation_id, category) {
-    return this.storage_service.db[z.storage.StorageService.OBJECT_STORE.EVENTS]
+    return this.storageService.db[z.storage.StorageService.OBJECT_STORE.EVENTS]
       .where('conversation')
       .equals(conversation_id)
       .sortBy('time')
@@ -68,7 +68,7 @@ z.conversation.ConversationServiceNoCompound = class ConversationServiceNoCompou
     lower_bound = lower_bound.getTime();
     upper_bound = upper_bound.getTime();
 
-    return this.storage_service.db[z.storage.StorageService.OBJECT_STORE.EVENTS]
+    return this.storageService.db[z.storage.StorageService.OBJECT_STORE.EVENTS]
       .where('conversation')
       .equals(conversation_id)
       .reverse()

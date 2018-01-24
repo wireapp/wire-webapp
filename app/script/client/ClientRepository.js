@@ -393,7 +393,7 @@ z.client.ClientRepository = class ClientRepository {
       value: cookieLabel,
     });
 
-    return this.cryptographyRepository.storage_repository.save_value(indexedDbKey, cookieLabel);
+    return this.cryptographyRepository.storage_repository.saveValue(indexedDbKey, cookieLabel);
   }
 
   /**
@@ -473,7 +473,7 @@ z.client.ClientRepository = class ClientRepository {
   }
 
   removeLocalClient() {
-    this.cryptographyRepository.storage_repository.delete_cryptography().then(() => {
+    this.cryptographyRepository.storage_repository.deleteCryptographyStores().then(() => {
       const isTemporaryClient = this.currentClient().isTemporary();
       amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.CLIENT_REMOVED, isTemporaryClient);
     });
