@@ -1052,9 +1052,9 @@ babel-plugin-check-es2015-constants@^6.22.0:
   dependencies:
     babel-runtime "^6.22.0"
 
-babel-plugin-react-intl@2.3.1:
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/babel-plugin-react-intl/-/babel-plugin-react-intl-2.3.1.tgz#3d43912e824da005e08e8e8239d5ba784374bb00"
+babel-plugin-react-intl@2.4.0:
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/babel-plugin-react-intl/-/babel-plugin-react-intl-2.4.0.tgz#292fca8030603a9e0476973290836aa0c7da17e2"
   dependencies:
     babel-runtime "^6.2.0"
     intl-messageformat-parser "^1.2.0"
