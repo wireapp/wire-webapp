@@ -1052,9 +1052,9 @@ babel-plugin-check-es2015-constants@^6.22.0:
   dependencies:
     babel-runtime "^6.22.0"
 
-babel-plugin-react-intl@2.3.1:
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/babel-plugin-react-intl/-/babel-plugin-react-intl-2.3.1.tgz#3d43912e824da005e08e8e8239d5ba784374bb00"
+babel-plugin-react-intl@2.4.0:
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/babel-plugin-react-intl/-/babel-plugin-react-intl-2.4.0.tgz#292fca8030603a9e0476973290836aa0c7da17e2"
   dependencies:
     babel-runtime "^6.2.0"
     intl-messageformat-parser "^1.2.0"
@@ -3214,9 +3214,9 @@ enzyme-adapter-utils@^1.3.0:
     object.assign "^4.0.4"
     prop-types "^15.6.0"
 
-enzyme-to-json@3.3.0:
-  version "3.3.0"
-  resolved "https://registry.yarnpkg.com/enzyme-to-json/-/enzyme-to-json-3.3.0.tgz#553e23a09ffb4b0cf09287e2edf9c6539fddaa84"
+enzyme-to-json@3.3.1:
+  version "3.3.1"
+  resolved "https://registry.yarnpkg.com/enzyme-to-json/-/enzyme-to-json-3.3.1.tgz#64239dcd417e2fb552f4baa6632de4744b9b5b93"
   dependencies:
     lodash "^4.17.4"
 
@@ -7315,9 +7315,9 @@ pkg-up@^1.0.0:
   dependencies:
     find-up "^1.0.0"
 
-platform@1.3.4:
-  version "1.3.4"
-  resolved "https://registry.yarnpkg.com/platform/-/platform-1.3.4.tgz#6f0fb17edaaa48f21442b3a975c063130f1c3ebd"
+platform@1.3.5:
+  version "1.3.5"
+  resolved "https://registry.yarnpkg.com/platform/-/platform-1.3.5.tgz#fb6958c696e07e2918d2eeda0f0bc9448d733444"
 
 pleeease-filters@^4.0.0:
   version "4.0.0"
@@ -9151,9 +9151,9 @@ simple-swizzle@^0.2.2:
   dependencies:
     is-arrayish "^0.3.1"
 
-sinon@4.2.0:
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/sinon/-/sinon-4.2.0.tgz#3b7c0d2289a80d2d84c4685f2ec130b7ab9af621"
+sinon@4.2.1:
+  version "4.2.1"
+  resolved "https://registry.yarnpkg.com/sinon/-/sinon-4.2.1.tgz#3664e90ea4bccec6ebde3c06e3da8179983371d9"
   dependencies:
     diff "^3.1.0"
     formatio "1.2.0"
