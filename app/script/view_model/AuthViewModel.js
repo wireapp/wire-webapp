@@ -284,8 +284,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
   _init_url_parameter() {
     const mode = z.util.get_url_parameter(z.auth.URLParameter.MODE);
     if (mode) {
-      const expectedModes = [z.auth.AuthView.MODE.ACCOUNT_LOGIN, z.auth.AuthView.MODE.ACCOUNT_REGISTER];
-      const isExpectedMode = expectedModes.includes(mode);
+      const isExpectedMode = mode === z.auth.AuthView.MODE.ACCOUNT_LOGIN;
       if (isExpectedMode) {
         this._set_hash(mode);
         return;
@@ -445,7 +444,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.SHOW_LOGIN, true);
 
     this.auth.repository
-      .get_access_token()
+      .getAccessToken()
       .then(() => {
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ACCOUNT.LOGGED_IN, {
           context: 'auto',
@@ -541,7 +540,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       const payload = this._create_payload(z.auth.AuthView.MODE.ACCOUNT_PHONE);
 
       this.auth.repository
-        .request_login_code(payload)
+        .requestLoginCode(payload)
         .then(response => _on_code_request_success(response))
         .catch(error => {
           this.pending_server_request(false);
@@ -1685,7 +1684,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
    */
   logout() {
     this.auth.repository.logout().then(() => {
-      this.auth.repository.delete_access_token();
+      this.auth.repository.deleteAccessToken();
       window.location.replace('/login');
     });
   }
