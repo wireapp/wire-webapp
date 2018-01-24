@@ -44,9 +44,7 @@
     "webpack-dev-server": "2.11.1"
   },
   "description": "Wire API Client to send and receive data.",
-  "files": [
-    "dist/commonjs"
-  ],
+  "files": ["dist/commonjs"],
   "license": "GPL-3.0",
   "main": "./dist/commonjs/Client.js",
   "name": "@wireapp/api-client",
