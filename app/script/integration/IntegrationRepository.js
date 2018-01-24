@@ -83,12 +83,14 @@ z.integration.IntegrationRepository = class IntegrationRepository {
   }
 
   addServiceFromParam(providerId, serviceId) {
-    this.getServiceById(providerId, serviceId).then(serviceEntity => {
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.BOTS_CONFIRM, {
-        action: () => this.createConversationWithService(serviceEntity),
-        data: serviceEntity.name,
+    if (this.isTeam()) {
+      this.getServiceById(providerId, serviceId).then(serviceEntity => {
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.BOTS_CONFIRM, {
+          action: () => this.createConversationWithService(serviceEntity),
+          data: serviceEntity.name,
+        });
       });
-    });
+    }
   }
 
   /**
