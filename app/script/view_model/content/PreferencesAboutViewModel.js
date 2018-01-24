@@ -32,7 +32,7 @@ z.ViewModel.content.PreferencesAboutViewModel = class PreferencesAboutViewModel 
   }
 
   clickOnToU() {
-    const path = `${z.config.URL_PATH.TERMS_OF_USE}${this.selfUser().is_team_member() ? 'teams' : 'personal'}`;
+    const path = `${z.config.URL_PATH.TERMS_OF_USE}${this.selfUser().is_team_member() ? 'teams' : 'personal'}/`;
     z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.WEBSITE, path));
   }
 };
