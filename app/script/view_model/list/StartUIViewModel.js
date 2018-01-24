@@ -210,6 +210,17 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       this.userProfileIsService(newProfile instanceof z.integration.ServiceEntity);
     });
 
+    this.renderAvatar = ko.observable(false);
+    this.renderAvatarComputed = ko.computed(() => {
+      const has_user_id = !!this.user_profile();
+
+      // swap value to re-render avatar
+      this.renderAvatar(false);
+      window.setTimeout(() => {
+        this.renderAvatar(has_user_id);
+      }, 0);
+    });
+
     this.user_bubble = undefined;
     this.user_bubble_last_id = undefined;
 
@@ -327,7 +338,13 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
         },
         scroll_selector: '.start-ui-list',
       });
-
+      if (this.userProfileIsService()) {
+        this.integrationRepository.getProviderById(this.user_profile().providerId).then(providerEntity => {
+          if (this.user_profile()) {
+            this.user_profile().providerName(providerEntity.name);
+          }
+        });
+      }
       this.user_bubble.toggle();
     };
 
@@ -363,7 +380,6 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
   }
 
   clickOnService(service) {
-    this.conversation_repository.get_conversations().then(conversations => this.logger.info(conversations));
     this.logger.info(this.user_profile());
   }
 
@@ -733,5 +749,9 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
         this.submitted_search = false;
         throw new Error(`Unable to create conversation: ${error.message}`);
       });
+  }
+
+  dispose() {
+    this.renderAvatarComputed.dispose();
   }
 };
