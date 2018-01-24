@@ -105,7 +105,7 @@ window.z.util = z.util || {};
   document.body.classList.add(os_css_class, platform_css_class);
 
   const app_version = () => {
-    const versionElement = document.body.querySelector("[property='wire:version']");
+    const versionElement = document.head.querySelector("[property='wire:version']");
     if (versionElement && versionElement.hasAttribute('version')) {
       return versionElement.getAttribute('version').trim();
     }
