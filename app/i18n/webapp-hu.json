@@ -12,7 +12,7 @@
   "teamName.whatIsWireTeamsLink": "Mi a Wire Csapatoknak?",
   "accountForm.namePlaceholder": "Név",
   "accountForm.emailTeamPlaceholder": "te@céged.hu",
-  "accountForm.emailPersonalPlaceholder": "",
+  "accountForm.emailPersonalPlaceholder": "te@cimed.hu",
   "accountForm.passwordPlaceholder": "Jelszó (legalább 8 karakter)",
   "accountForm.terms": "Elfogadom a <a {linkParams}>felhasználási feltételeket</a>",
   "accountForm.nextButton": "Tovább",

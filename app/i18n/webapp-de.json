@@ -12,7 +12,7 @@
   "teamName.whatIsWireTeamsLink": "Was sind Teams auf Wire?",
   "accountForm.namePlaceholder": "Name",
   "accountForm.emailTeamPlaceholder": "name@unternehmen.de",
-  "accountForm.emailPersonalPlaceholder": "",
+  "accountForm.emailPersonalPlaceholder": "deine@email.de",
   "accountForm.passwordPlaceholder": "Passwort (min. acht Zeichen)",
   "accountForm.terms": "Ich akzeptiere die <a {linkParams}>Nutzungbedingungen</a>",
   "accountForm.nextButton": "Weiter",
