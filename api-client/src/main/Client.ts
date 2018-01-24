@@ -28,7 +28,6 @@ import {GiphyAPI} from './giphy/';
 import {HttpClient} from './http/';
 import {InvitationAPI} from './invitation/';
 import {MemberAPI, PaymentAPI, TeamAPI, TeamInvitationAPI} from './team/';
-import {MemoryEngine} from '@wireapp/store-engine/dist/commonjs/engine';
 import {SelfAPI} from './self/';
 import {UserAPI} from './user/';
 import {WebSocketClient} from './tcp/';

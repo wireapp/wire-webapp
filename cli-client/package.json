@@ -5,7 +5,8 @@
   "dependencies": {
     "@wireapp/core": "0.0.26",
     "commander": "2.13.0",
-    "dotenv": "4.0.0"
+    "dotenv": "4.0.0",
+    "fs-extra": "5.0.0"
   },
   "devDependencies": {
     "cpx": "1.5.0",
@@ -13,10 +14,7 @@
     "typescript": "2.6.1"
   },
   "description": "Command-line interface for Wire's secure messaging platform.",
-  "files": [
-    "bin",
-    "dist"
-  ],
+  "files": ["bin", "dist"],
   "license": "GPL-3.0",
   "name": "@wireapp/cli-client",
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client",
