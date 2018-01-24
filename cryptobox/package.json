@@ -54,5 +54,5 @@
     "test": "yarn dist && gulp test"
   },
   "types": "dist/index.d.ts",
-  "version": "6.3.3"
+  "version": "6.3.4"
 }

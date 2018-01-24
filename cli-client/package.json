@@ -3,7 +3,7 @@
     "wire-cli": "bin/node/index.js"
   },
   "dependencies": {
-    "@wireapp/core": "0.0.25",
+    "@wireapp/core": "0.0.26",
     "commander": "2.13.0",
     "dotenv": "4.0.0"
   },
@@ -32,5 +32,5 @@
     "prepare": "yarn build"
   },
   "types": "./dist/commonjs/index.d.ts",
-  "version": "0.0.17"
+  "version": "0.0.18"
 }
