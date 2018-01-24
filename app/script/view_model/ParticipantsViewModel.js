@@ -95,7 +95,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.unverifiedParticipants = ko.observableArray();
     this.verifiedParticipants = ko.observableArray();
 
-    this.services = ko.observableArray([]);
+    this.services = this.integrationRepository.services;
 
     ko.computed(() => {
       const conversationEntity = this.conversation();
@@ -174,9 +174,13 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
         .sort((userA, userB) => z.util.StringUtil.sort_by_priority(userA.first_name(), userB.first_name()));
     });
 
+    this.shouldUpdateScrollbar = ko
+      .computed(() => this.services() && this.selectedUsers() && this.stateAddPeople() && this.stateAddService())
+      .extend({notify: 'always', rateLimit: 500});
+
     const shortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.ADD_PEOPLE);
     this.addPeopleTooltip = ko.pureComputed(() => {
-      const identifier = this.enableIntegrations() ? z.string.tooltip_people_add : z.string.tooltip_people_add_people;
+      const identifier = this.showIntegrations() ? z.string.tooltip_people_add : z.string.tooltip_people_add_people;
       return z.l10n.text(identifier, shortcut);
     });
 
@@ -387,7 +391,6 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   resetView() {
     this.state(ParticipantsViewModel.STATE.PARTICIPANTS);
     this.selectedUsers.removeAll();
-    this.services.removeAll();
     this.searchInput('');
     if (this.confirmDialog) {
       this.confirmDialog.destroy();
