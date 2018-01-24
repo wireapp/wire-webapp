@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.3.0"></a>
+# [0.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@0.2.37...@wireapp/api-client@0.3.0) (2018-01-24)
+
+
+### Features
+
+* **cli-client:** Automatically remove a registered client if there are too many ([03fc0ff](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/03fc0ff))
+
+
+
+
 <a name="0.2.37"></a>
 ## [0.2.37](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@0.2.36...@wireapp/api-client@0.2.37) (2018-01-24)
 
