@@ -125,6 +125,10 @@ z.string.modal_button_send = 'Send';
 z.string.modal_block_conversation_headline = 'Block {{user}}?';
 z.string.modal_block_conversation_message = '{{user}} won’t be able to contact you or add you to group conversations.';
 z.string.modal_block_conversation_button = 'Block';
+// Bots confirm
+z.string.modal_bots_confirm_headline = 'Add Service';
+z.string.modal_bots_confirm_message = 'Are you sure you want to start a new conversation with {{name}}?';
+z.string.modal_bots_confirm_button = 'Confirm';
 // Bots unavailable
 z.string.modal_bots_unavailable_headline = 'Bots currently unavailable';
 z.string.modal_bots_unavailable_message = 'Thank you for your interest in bots. The service is currently suspended while we work on the next version. Stay tuned.';
@@ -198,11 +202,17 @@ z.string.modal_not_connected_message_many = 'One of the people you selected does
 z.string.modal_remove_device_button = 'Remove device';
 z.string.modal_remove_device_headline = 'Remove "{{device}}"';
 z.string.modal_remove_device_message = 'Your password is required to remove the device.';
+// Service unavailable
+z.string.modal_service_disabled_headline = 'Adding service not possible';
+z.string.modal_service_disabled_message = 'The service is unavailable a the moment.';
 // Session Reset
 z.string.modal_session_reset_headline = 'The session has been reset';
 z.string.modal_session_reset_message_1 = 'If the problem is not resolved,';
 z.string.modal_session_reset_message_link = 'contact';
 z.string.modal_session_reset_message_2 = 'us.';
+// Too many bots in conversation
+z.string.modal_too_many_bots_headline = 'Adding service not possible';
+z.string.modal_too_many_bots_message = 'The bot is already part of this conversation.';
 // Too many members in conversation
 z.string.modal_too_many_members_headline = 'Full house';
 z.string.modal_too_many_members_message = 'Up to {{number1}} people can join a conversation. There is room for {{number2}} more people in here.';
@@ -221,6 +231,7 @@ z.string.conversation_you_nominative = 'you';
 z.string.conversation_you_dative = 'you';
 z.string.conversation_you_accusative = 'you';
 
+z.string.conversation_bot_user = 'Bot';
 z.string.conversation_connection_accepted = 'Connected';
 z.string.conversation_connection_blocked = 'Blocked';
 z.string.conversation_connection_cancel_request = 'Cancel connection request';
@@ -300,8 +311,7 @@ z.string.conversations_connection_request_many = '{{number}} people waiting';
 z.string.conversations_connection_request_one = '1 person waiting';
 z.string.conversations_empty_conversation = 'Group conversation';
 z.string.conversations_empty_conversation_description = 'Everyone left';
-z.string.conversations_no_conversations = 'No conversations yet';
-z.string.conversations_no_conversations_detail = 'Start a conversation or create a group.';
+z.string.conversations_no_conversations = 'Start a conversation or create a group.';
 z.string.conversations_popover_archive = 'Archive';
 z.string.conversations_popover_block = 'Block';
 z.string.conversations_popover_cancel = 'Cancel request';
@@ -367,6 +377,9 @@ z.string.people_invite_detail = 'Sharing your contacts helps you connect with ot
 z.string.people_invite_button_contacts = 'From Contacts';
 z.string.people_invite_button_gmail = 'From Gmail';
 z.string.people_invite_headline = 'Bring your friends';
+z.string.people_service_confirm_button = 'Add service';
+z.string.people_service_removal_button = 'Remove service';
+z.string.people_services = 'Services';
 z.string.people_share = 'Share Contacts';
 z.string.people_tabs_details = 'Details';
 z.string.people_tabs_devices = 'Devices';
@@ -381,6 +394,8 @@ z.string.people_tabs_device_detail_how_to = 'How do I do that?';
 z.string.people_tabs_device_detail_reset_session = 'Reset session';
 z.string.people_tabs_device_detail_show_my_device = 'Show my device fingerprint';
 z.string.people_tabs_device_detail_verify = 'Verified';
+z.string.people_tabs_people = 'People';
+z.string.people_tabs_services = 'Services';
 z.string.people_verified = 'Verified';
 
 // Block user
@@ -408,7 +423,8 @@ z.string.people_unblock_headline = 'Unblock?';
 z.string.people_unblock_message = '{{user}} will be able to contact you and add you to group conversations again.';
 
 // Button labels for the actions
-z.string.people_button_add = 'Add people';
+z.string.people_button_add = 'Add';
+z.string.people_button_add_people = 'Add people';
 z.string.people_button_block = 'Block';
 z.string.people_button_cancel = 'Cancel';
 z.string.people_button_connect = 'Connect';
@@ -506,12 +522,15 @@ z.string.search_connect = 'Connect';
 z.string.search_connections = 'Connections';
 z.string.search_contacts = 'Contacts';
 z.string.search_groups = 'Groups';
+z.string.search_people = 'People';
 z.string.search_placeholder = 'Search by name or username';
+z.string.search_services = 'Services';
 z.string.search_team_groups = 'Team conversations';
 z.string.search_team_members = 'Team members';
 z.string.search_top_people = 'Top people';
 z.string.search_try_search = 'Find people by\nname or username';
 z.string.search_no_contacts_on_wire = 'You have no contacts on Wire.\nTry finding people by\nname or username.';
+z.string.search_member_invite = 'Invite people to join the team';
 z.string.search_others = 'Connect';
 
 // Google contacts upload
@@ -602,7 +621,8 @@ z.string.tooltip_conversations_preferences = 'Open preferences';
 z.string.tooltip_conversations_silence = 'Mute ({{shortcut}})';
 z.string.tooltip_conversations_start = 'Start conversation ({{shortcut}})';
 
-z.string.tooltip_people_add = 'Add people to conversation ({{shortcut}})';
+z.string.tooltip_people_add = 'Add to conversation ({{shortcut}})';
+z.string.tooltip_people_add_people = 'Add people to conversation ({{shortcut}})';
 z.string.tooltip_people_back = 'Back';
 z.string.tooltip_people_block = 'Block';
 z.string.tooltip_people_connect = 'Connect';

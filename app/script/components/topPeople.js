@@ -50,7 +50,7 @@ ko.components.register('top-people', {
   template: `
     <div class="search-list search-list-sm" data-bind="foreach: {data: displayed_users}">
       <div class="search-list-item" data-bind="click: $parent.on_select, css: {'search-list-item-selected': $parent.is_selected($data)}, attr: {'data-uie-uid': $data.id, 'data-uie-value': $data.name(), 'data-uie-status': $data.connection().status()}" data-uie-name="item-user">
-        <user-avatar class="search-list-item-image user-avatar-md" params="user: $data, selected: $parent.is_selected($data), delay: 300"></user-avatar>
+        <participant-avatar class="search-list-item-image" params="participant: $data, selected: $parent.is_selected($data), delay: 300, size: z.components.ParticipantAvatar.SIZE.LARGE"></participant-avatar>
         <div class="search-list-item-content">
           <div class="search-list-item-content-name" data-bind="text: first_name"></div>
         </div>

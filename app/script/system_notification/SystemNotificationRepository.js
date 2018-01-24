@@ -468,9 +468,9 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    * @returns {string} Icon URL
    */
   _create_options_icon(should_obfuscate_sender, user_et) {
-    if (user_et.preview_picture_resource() && !should_obfuscate_sender) {
+    if (user_et.previewPictureResource() && !should_obfuscate_sender) {
       return user_et
-        .preview_picture_resource()
+        .previewPictureResource()
         .generateUrl()
         .catch(error => {
           if (error instanceof z.util.ValidationUtilError) {

@@ -56,6 +56,11 @@ class AccountForm extends PureComponent {
     }
   }
 
+  createURLForToU = () => {
+    const isPersonalFlow = this.props.currentFlow === AuthSelector.REGISTER_FLOW.PERSONAL;
+    return `${ROUTE.WIRE_ROOT}/legal/terms/${isPersonalFlow ? 'personal' : 'teams'}/`;
+  };
+
   handleSubmit = event => {
     event.preventDefault();
     const validInputs = this.state.validInputs;
@@ -103,7 +108,7 @@ class AccountForm extends PureComponent {
   };
 
   render() {
-    const {isFetching, submitText, intl: {formatMessage: _}} = this.props;
+    const {isFetching, submitText, currentFlow, intl: {formatMessage: _}} = this.props;
     const {name, email, password, termsAccepted, validInputs} = this.state;
     return (
       <Form
@@ -155,7 +160,11 @@ class AccountForm extends PureComponent {
               disabled={this.props.disableEmail}
               value={email}
               autoComplete="section-create-team email"
-              placeholder={_(accountFormStrings.emailPlaceholder)}
+              placeholder={_(
+                currentFlow === AuthSelector.REGISTER_FLOW.PERSONAL
+                  ? accountFormStrings.emailPersonalPlaceholder
+                  : accountFormStrings.emailTeamPlaceholder
+              )}
               onKeyDown={event => {
                 if (event.key === 'Enter') {
                   this.inputs.password.focus();
@@ -202,7 +211,7 @@ class AccountForm extends PureComponent {
             <FormattedHTMLMessage
               {...accountFormStrings.terms}
               values={{
-                linkParams: `target=_blank data-uie-name=go-terms href=${ROUTE.WIRE_ROOT}/legal#terms`,
+                linkParams: `target=_blank data-uie-name=go-terms href=${this.createURLForToU()}`,
               }}
             />
           </CheckboxLabel>

@@ -104,6 +104,20 @@ z.conversation.EventBuilder = (function() {
     };
   };
 
+  const _buildMemberLeave = (conversationEntity, userId, timeOffset) => {
+    const {self, id} = conversationEntity;
+
+    return {
+      conversation: id,
+      data: {
+        user_ids: [userId],
+      },
+      from: self.id,
+      time: conversationEntity.get_next_iso_date(timeOffset),
+      type: z.event.Backend.CONVERSATION.MEMBER_LEAVE,
+    };
+  };
+
   const _build_message_add = (conversation_et, time_offset) => {
     const {self, id} = conversation_et;
 
@@ -197,6 +211,7 @@ z.conversation.EventBuilder = (function() {
     build_degraded: _build_degraded,
     build_delete: _build_delete,
     build_incoming_message_too_big: _build_incoming_message_too_big,
+    build_member_leave: _buildMemberLeave,
     build_message_add: _build_message_add,
     build_missed: _build_missed,
     build_team_member_leave: _build_team_member_leave,

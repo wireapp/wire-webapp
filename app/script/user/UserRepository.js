@@ -78,7 +78,7 @@ z.user.UserRepository = class UserRepository {
 
     this.number_of_contacts = ko.pureComputed(() => {
       const contacts = this.isTeam() ? this.teamUsers() : this.connected_users();
-      return contacts.filter(user_et => !user_et.is_bot).length;
+      return contacts.filter(user_et => !user_et.isBot).length;
     });
     this.number_of_contacts.subscribe(number_of_contacts => {
       amplify.publish(z.event.WebApp.ANALYTICS.SUPER_PROPERTY, z.tracking.SuperProperty.CONTACTS, number_of_contacts);

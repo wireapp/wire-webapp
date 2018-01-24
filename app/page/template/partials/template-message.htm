@@ -19,16 +19,16 @@
       <!-- ko if: message.verification_message_type === z.message.VerificationMessageType.UNVERIFIED -->
         <span class="label-bold" data-bind="text: message.sender_name()"></span>
         <span class="ellipsis" data-bind="l10n_text: z.string.conversation_device_unverified"></span>
-        <span class="ellipsis text-theme" data-uie-name="go-devices" data-bind="click: click_on_device, text: message.caption_unverified_device"></span>
+        <span class="ellipsis text-theme" data-bind="click: click_on_device, text: message.caption_unverified_device" data-uie-name="go-devices"></span>
       <!-- /ko -->
       <!-- ko if: message.verification_message_type === z.message.VerificationMessageType.NEW_DEVICE -->
         <span class="label-bold" data-bind='text: message.caption_user'></span>
         <span class="ellipsis" data-bind="text: message.caption_started_using"></span>
-        <span class="ellipsis text-theme" data-uie-name="go-devices" data-bind="click: click_on_device, text: message.caption_new_device"></span>
+        <span class="ellipsis text-theme" data-bind="click: click_on_device, text: message.caption_new_device" data-uie-name="go-devices"></span>
       <!-- /ko -->
       <!-- ko if: message.verification_message_type === z.message.VerificationMessageType.NEW_MEMBER -->
         <span class="ellipsis" data-bind="l10n_text: z.string.conversation_device_new_people_joined"></span>
-        <span class="ellipsis text-theme" data-uie-name="go-devices" data-bind="click: click_on_device, l10n_text: z.string.conversation_device_new_people_joined_verify"></span>
+        <span class="ellipsis text-theme" data-bind="click: click_on_device, l10n_text: z.string.conversation_device_new_people_joined_verify" data-uie-name="go-devices"></span>
       <!-- /ko -->
       <hr class="message-header-line" />
     </div>
@@ -58,7 +58,7 @@
 <script type="text/html" id="delete">
   <div class="message-header">
     <div class="message-header-icon">
-      <user-avatar class="sender-avatar user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: message.user(), click: $parent.on_message_user_click"></user-avatar>
+      <participant-avatar class="sender-avatar" data-bubble="#participants-bubble" data-placement="vertical" params="participant: message.user(), click: $parent.on_message_user_click, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
     </div>
     <div class="message-header-label">
       <span class="message-header-label-sender" data-bind='text: message.sender_name()'></span>
@@ -74,10 +74,13 @@
   <!-- ko if: !$parent.should_hide_user_avatar($data) -->
     <div class="message-header">
       <div class="message-header-icon">
-        <user-avatar class="sender-avatar user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: message.user(), click: $parent.on_message_user_click"></user-avatar>
+        <participant-avatar class="sender-avatar" data-bubble="#participants-bubble" data-placement="vertical" params="participant: message.user(), click: $parent.on_message_user_click, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
       </div>
       <div class="message-header-label">
         <span class="message-header-label-sender" data-bind='css: message.accent_color(), text: message.user().first_name()' data-uie-name="sender-name"></span>
+        <!-- ko if: message.user().isBot -->
+          <span class="message-header-label-service" data-bind="l10n_text: z.string.conversation_bot_user"></span>
+        <!-- /ko -->
         <!-- ko if: was_edited() -->
           <span class="message-header-label-icon icon-edit" data-bind="attr: {title: message.display_edited_timestamp()}"></span>
         <!-- /ko -->
@@ -170,7 +173,7 @@
         </span>
       </div>
       <div class="message-footer-label cursor-pointer" data-bind="click: function() {$data.show_likes(true)}">
-        <span class="font-size-xs text-graphite" data-uie-name="message-liked-names" data-bind="text: like_caption, attr: {'data-uie-value': reactions_user_ids()}" ></span>
+        <span class="font-size-xs text-graphite" data-bind="text: like_caption, attr: {'data-uie-value': reactions_user_ids()}"  data-uie-name="message-liked-names"></span>
         <!-- ko if: !message.show_likes() && message.other_likes().length > 5 -->
           <span class="icon-more font-size-xs"></span>
         <!-- /ko -->
@@ -178,10 +181,9 @@
       <!-- ko if: message.show_likes() -->
         <div class="message-footer-bottom" data-uie-name="message-liked-avatars">
           <!-- ko foreach: message.reactions_user_ets() -->
-            <user-avatar class="user-avatar-xs"
-                         data-bubble="#participants-bubble"
+            <participant-avatar data-bubble="#participants-bubble"
                          data-placement="vertical"
-                         params="user: $data, click: $parents[1].on_message_user_click"></user-avatar>
+                         params="participant: $data, click: $parents[1].on_message_user_click, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
           <!-- /ko -->
           <span class="message-footer-close-button icon-close" data-bind="click: function() { $data.show_likes(false) }"></span>
         </div>
@@ -211,9 +213,9 @@
     <div class="message-connected">
       <span class="message-connected-header" data-bind='text: other_user().name()'></span>
       <span class="message-connected-username label-username" data-bind='text: other_user().username()'></span>
-      <user-avatar class="message-connected-avatar user-avatar-lg user-avatar-no-badge cursor-default"
-                   data-bind="css: {'user-avatar-no-badge': other_user().is_outgoing_request()}"
-                   params="user: other_user()"></user-avatar>
+      <participant-avatar class="message-connected-avatar avatar-no-badge cursor-default"
+                   data-bind="css: {'avatar-no-badge': other_user().is_outgoing_request()}"
+                   params="participant: other_user(), size: z.components.ParticipantAvatar.SIZE.X_LARGE"></participant-avatar>
       <!-- ko if: other_user().is_outgoing_request() -->
         <div class="message-connected-cancel text-theme"
              data-bind="click: $parent.click_on_cancel_request,
@@ -243,17 +245,16 @@
     <div class="message-body">
       <!-- ko foreach: remote_user_ets -->
         <!-- ko if: message.is_conversation_initialization() -->
-          <user-avatar class="user-avatar-sm user-avatar-no-border"
+          <participant-avatar class="avatar-no-border"
                        data-bubble="#participants-bubble"
                        data-placement="vertical"
-                       params="user: $data, click: $parents[1].on_message_user_click"></user-avatar>
+                       params="participant: $data, click: $parents[1].on_message_user_click, size: z.components.ParticipantAvatar.SIZE.MEDIUM"></participant-avatar>
         <!-- /ko -->
         <!-- ko if: message.is_member_join() || message.is_member_leave() -->
-          <user-avatar class="user-avatar-xs"
-                       data-bind="css: {'translucent': message.is_member_leave()}"
+          <participant-avatar data-bind="css: {'translucent': message.is_member_leave()}"
                        data-bubble="#participants-bubble"
                        data-placement="vertical"
-                       params="user: $data, click: $parents[1].on_message_user_click"></user-avatar>
+                       params="participant: $data, click: $parents[1].on_message_user_click, size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
         <!-- /ko -->
       <!-- /ko -->
     </div>

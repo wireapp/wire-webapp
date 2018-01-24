@@ -68,7 +68,7 @@ ko.components.register('link-preview-asset', {
           <div class="link-preview-image-placeholder icon-link"></div>
         <!-- /ko -->
         <!-- ko if: preview.image_resource() -->
-          <image-component class="link-preview-image" data-uie-name="link-preview-image" params="asset: preview.image_resource"></image-component>
+          <image-component class="link-preview-image" params="asset: preview.image_resource" data-uie-name="link-preview-image"></image-component>
         <!-- /ko -->
       </div>
 
@@ -77,15 +77,15 @@ ko.components.register('link-preview-asset', {
           <asset-header class="link-preview-info-header" params="message: message_et"></asset-header>
         <!-- /ko -->
         <!-- ko if: is_tweet -->
-          <div class="link-preview-info-title" data-uie-name="link-preview-title" data-bind="text: preview.title, css: header ? 'link-preview-info-title-singleline' : 'link-preview-info-title-multiline'"></div>
-          <div class="link-preview-info-link text-graphite" data-uie-name="link-preview-tweet-author" data-bind="attr: {title: preview.url}">
+          <div class="link-preview-info-title" data-bind="text: preview.title, css: header ? 'link-preview-info-title-singleline' : 'link-preview-info-title-multiline'" data-uie-name="link-preview-title"></div>
+          <div class="link-preview-info-link text-graphite" data-bind="attr: {title: preview.url}" data-uie-name="link-preview-tweet-author">
             <span class="font-weight-bold link-preview-info-title-singleline" data-bind="text: author"></span>
             <span data-bind="l10n_text: z.string.conversation_tweet_author"></span>
           </div>
         <!-- /ko -->
         <!-- ko ifnot: is_tweet -->
-          <div class="link-preview-info-title" data-uie-name="link-preview-title" data-bind="text: preview.title, css: header ? 'link-preview-info-title-singleline' : 'link-preview-info-title-multiline'"></div>
-          <div class="link-preview-info-link text-graphite ellipsis" data-uie-name="link-preview-url" data-bind="text: z.util.naked_url(preview.url), attr: {title: preview.url}"></div>
+          <div class="link-preview-info-title" data-bind="text: preview.title, css: header ? 'link-preview-info-title-singleline' : 'link-preview-info-title-multiline'" data-uie-name="link-preview-title"></div>
+          <div class="link-preview-info-link text-graphite ellipsis" data-bind="text: z.util.naked_url(preview.url), attr: {title: preview.url}" data-uie-name="link-preview-url"></div>
         <!-- /ko -->
       </div>
     <!-- /ko -->

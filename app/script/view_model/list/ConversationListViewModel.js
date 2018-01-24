@@ -79,6 +79,11 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
     this.conversations_archived = this.conversation_repository.conversations_archived;
     this.conversations_unarchived = this.conversation_repository.conversations_unarchived;
 
+    this.noConversations = ko.pureComputed(() => {
+      const noConversations = !this.conversations_unarchived().length && !this.conversations_calls().length;
+      return noConversations && !this.connect_requests().length;
+    });
+
     this.webapp_is_loaded = ko.observable(false);
 
     this.should_update_scrollbar = ko

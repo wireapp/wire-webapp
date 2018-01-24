@@ -88,6 +88,10 @@ z.tracking.EventName = {
     UPLOAD_TOO_BIG: 'file.attempted_too_big_file_upload',
   },
   IMAGE_SENT_ERROR: 'Image Sent Error',
+  INTEGRATION: {
+    ADDED_SERVICE: 'integration.added_service',
+    REMOVED_SERVICE: 'integration.removed_service',
+  },
   MEDIA: {
     PLAYED_AUDIO_MESSAGE: 'media.played_audio_message',
     PLAYED_VIDEO_MESSAGE: 'media.played_video_message',
