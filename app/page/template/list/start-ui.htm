@@ -29,7 +29,7 @@
     <!-- ko if: enableIntegrations() -->
       <div class="start-ui-list-tabs">
         <div class="start-ui-list-tab" data-bind="click: clickOnAddPeople, css: {'active' : peopleTabActive()}, l10n_text: z.string.search_people"></div>
-        <div class="start-ui-list-tab" data-bind="click: clickOnAddService, css: {'active' : !peopleTabActive()}, l10n_text: z.string.search_services"></div>
+        <div class="start-ui-list-tab" data-bind="click: clickOnService, css: {'active' : !peopleTabActive()}, l10n_text: z.string.search_services"></div>
       </div>
     <!-- /ko -->
   </div>
@@ -171,10 +171,21 @@
                 <div data-uie-name="status-service-provider" class="service-confirmation-provider" data-bind="text: user_profile().providerName()"></div>
               </div>
             </div>
-            <div data-uie-name="status-service-description" class="service-confirmation-description" data-bind="text: user_profile().description"></div>
+            <!-- ko ifnot: showServiceConversationList -->
+              <div data-uie-name="status-service-description" class="service-confirmation-description" data-bind="text: user_profile().description"></div>
+            <!-- /ko -->
+            <!-- ko if: showServiceConversationList -->
+              <!-- ko foreach: serviceConversationList -->
+              <conversation-list-cell
+              data-bind=""
+              data-uie-name="item-conversation"
+              params="conversation: $data">
+            </conversation-list-cell>
+              <!-- /ko -->
+            <!-- /ko -->
           </div>
           <div class="service-confirmation-footer">
-            <button data-uie-name="do-service-confirm" class="participants-service-confirmation-button" data-bind="click: clickOnService, l10n_text: z.string.people_service_confirm_button"></button>
+            <button data-uie-name="do-service-confirm" class="participants-service-confirmation-button" data-bind="click: clickOnAddService, l10n_text: z.string.people_service_confirm_button"></button>
           </div>
         </div>
       <!-- /ko -->
