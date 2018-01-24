@@ -66,8 +66,13 @@ z.integration.IntegrationService = class IntegrationService {
   }
 
   getServices(tags, start) {
+    const params = {tags};
+    if (start) {
+      params.start = start;
+    }
+
     return this.client.send_request({
-      data: {start, tags},
+      data: params,
       type: 'GET',
       url: this.client.create_url(IntegrationService.URL.SERVICES),
     });
