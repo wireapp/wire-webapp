@@ -59,7 +59,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.click_on_close = this.click_on_close.bind(this);
     this.click_on_group = this.click_on_group.bind(this);
     this.clickOnOther = this.clickOnOther.bind(this);
-    this.clickOnService = this.clickOnService.bind(this);
+    this.clickOnAddServiceToConversation = this.clickOnAddServiceToConversation.bind(this);
     this.on_cancel_request = this.on_cancel_request.bind(this);
     this.on_submit_search = this.on_submit_search.bind(this);
     this.on_user_accept = this.on_user_accept.bind(this);
@@ -228,9 +228,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.user_bubble_last_id = undefined;
 
     this.should_update_scrollbar = ko
-      .computed(() => {
-        return this.list_view_model.last_update();
-      })
+      .computed(() => this.list_view_model.last_update())
       .extend({notify: 'always', rateLimit: 500});
 
     this._init_subscriptions();
@@ -279,7 +277,8 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
   }
 
   clickOnMemberInvite() {
-    z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.TEAM_SETTINGS, z.config.URL_PATH.MANAGE_TEAM));
+    const path = `${z.config.URL_PATH.MANAGE_TEAM}?utm_source=client_landing&utm_term=desktop`;
+    z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.TEAM_SETTINGS, path));
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
   }
 
@@ -369,12 +368,12 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       this.user_bubble.hide();
       window.setTimeout(() => {
         create_bubble(element[0].id);
-      }, 550);
+      }, z.motion.MotionDuration.LONG);
     } else {
       create_bubble(element[0].id);
     }
   }
-  clickOnService() {
+  clickOnAddService() {
     this.state(StartUIViewModel.STATE.ADD_SERVICE);
     this._updateServicesList();
   }
@@ -383,7 +382,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this._updateServicesList();
   }
 
-  clickOnAddService(service) {
+  clickOnAddServiceToConversation(service) {
     this.showServiceConversationList(true);
     this.serviceConversationList(this.conversationRepository.get_groups_by_name(''));
   }

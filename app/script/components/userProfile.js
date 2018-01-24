@@ -22,24 +22,24 @@
 window.z = window.z || {};
 window.z.components = z.components || {};
 
-z.components.UserProfileMode = {
-  DEFAULT: 'default',
-  PEOPLE: 'people',
-  SEARCH: 'search',
-};
+z.components.UserProfile = class UserProfile {
+  static get MODE() {
+    return {
+      DEFAULT: 'UserProfile.MODE.DEFAULT',
+      PEOPLE: 'UserProfile.MODE.PEOPLE',
+      SEARCH: 'USerProfile.MODE.SEARCH',
+    };
+  }
 
-z.components.UserProfileViewModel = class UserProfileViewModel {
   constructor(params, component_info) {
-    const SHOW_CONVERSATION_DELAY = 550;
-
     this.dispose = this.dispose.bind(this);
     this.click_on_device = this.click_on_device.bind(this);
 
-    this.logger = new z.util.Logger('z.components.UserProfileViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('z.components.UserProfile', z.config.LOGGER.OPTIONS);
 
     this.user = params.user;
     this.conversation = params.conversation;
-    this.mode = params.mode || z.components.UserProfileMode.DEFAULT;
+    this.mode = params.mode || UserProfile.MODE.DEFAULT;
 
     // repository references
     this.client_repository = window.wire.app.repository.client;
@@ -53,9 +53,11 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
         .is_team_member();
     });
     this.userAvailabilityLabel = ko.pureComputed(() => {
-      const availabilitySetToNone = this.user().availability() === z.user.AvailabilityType.NONE;
-      if (!availabilitySetToNone) {
-        return z.user.AvailabilityMapper.nameFromType(this.user().availability());
+      if (this.user()) {
+        const availabilitySetToNone = this.user().availability() === z.user.AvailabilityType.NONE;
+        if (!availabilitySetToNone) {
+          return z.user.AvailabilityMapper.nameFromType(this.user().availability());
+        }
       }
     });
 
@@ -78,8 +80,9 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
         params.block(this.user());
       }
     };
-    this.on_close = function() {
+    this.on_close = () => {
       if (typeof params.close === 'function') {
+        this.render_avatar(false);
         params.close();
       }
     };
@@ -201,7 +204,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
               const next_conversation_et = this.conversation_repository.get_next_conversation(conversation_et);
               window.setTimeout(() => {
                 amplify.publish(z.event.WebApp.CONVERSATION.SHOW, next_conversation_et);
-              }, SHOW_CONVERSATION_DELAY);
+              }, z.motion.MotionDuration.LONG);
             }
           });
 
@@ -229,7 +232,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
           if (typeof params.open === 'function') {
             params.open(this.user());
           }
-        }, SHOW_CONVERSATION_DELAY);
+        }, z.motion.MotionDuration.LONG);
       });
     };
 
@@ -311,7 +314,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
             return 'user-profile-footer-profile';
           }
 
-          if (user_et.is_connected() || conversation_et.team_id) {
+          if (user_et.is_connected() || user_et.is_team_member()) {
             return 'user-profile-footer-add-block';
           }
 
@@ -387,7 +390,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
     const reset_progress = () => {
       window.setTimeout(() => {
         this.is_resetting_session(false);
-      }, 550);
+      }, z.motion.MotionDuration.LONG);
     };
 
     this.is_resetting_session(true);
@@ -428,7 +431,7 @@ ko.components.register('user-profile', {
   },
   viewModel: {
     createViewModel(params, component_info) {
-      return new z.components.UserProfileViewModel(params, component_info);
+      return new z.components.UserProfile(params, component_info);
     },
   },
 });

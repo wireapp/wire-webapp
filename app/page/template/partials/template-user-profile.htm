@@ -23,12 +23,12 @@
           </div>
         <!-- /ko -->
 
-        <!-- ko if: tab_index() === 0 -->
+        <!-- ko if: tab_index() === 0 && user() -->
           <div class="user-profile-details">
             <!-- ko if: render_avatar -->
               <div class="user-profile-details-avatar">
                 <participant-avatar class="cursor-default" params="participant: user, size: z.components.ParticipantAvatar.SIZE.X_LARGE" data-uie-name="status-profile-picture"></participant-avatar>
-                <!-- ko if: (mode === z.components.UserProfileMode.PEOPLE || user().is_connected()) && user().is_guest() -->
+                <!-- ko if: (mode === z.components.UserProfile.MODE.PEOPLE || user().is_connected()) && user().is_guest() -->
                   <span class="user-profile-details-guest-badge" data-bind="l10n_text: z.string.conversation_guest_indicator" data-uie-name="status-guest"></span>
                 <!-- /ko -->
               </div>
@@ -45,7 +45,7 @@
           </div>
         <!-- /ko -->
 
-        <!-- ko if: tab_index() === 1 -->
+        <!-- ko if: tab_index() === 1 && user() -->
           <div class="user-profile-devices">
             <!-- ko if: devices_found() -->
               <div class="user-profile-device-message">
@@ -140,8 +140,8 @@
 
 <script type="text/html" id="user-profile-footer-ignore-accept">
   <div class="footer-controls-buttons">
-    <div class="button button-medium button-inverted" data-uie-name="do-ignore" data-bind="click: on_ignore, l10n_text: z.string.people_button_ignore"></div>
-    <div class="button button-medium" data-uie-name="do-connect" data-bind="click: on_accept, l10n_text: z.string.people_button_connect"></div>
+    <div class="button button-medium button-inverted" data-bind="click: on_ignore, l10n_text: z.string.people_button_ignore" data-uie-name="do-ignore"></div>
+    <div class="button button-medium" data-bind="click: on_accept, l10n_text: z.string.people_button_connect" data-uie-name="do-connect"></div>
   </div>
 </script>
 

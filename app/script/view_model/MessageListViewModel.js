@@ -441,7 +441,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
         }
         window.setTimeout(() => {
           create_bubble(element.id);
-        }, 550);
+        }, z.motion.MotionDuration.LONG);
       } else {
         create_bubble(element.id);
       }
@@ -467,7 +467,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
       window.setTimeout(() => {
         message_et.is_resetting_session(false);
         amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.SESSION_RESET);
-      }, 550);
+      }, z.motion.MotionDuration.LONG);
 
     message_et.is_resetting_session(true);
     this.conversation_repository

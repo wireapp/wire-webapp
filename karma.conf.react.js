@@ -38,7 +38,6 @@ module.exports = function(config) {
         flags: ['--no-sandbox'],
       },
     },
-    failOnEmptyTestSuite: false,
     files: ['tests.webpack.js'],
     frameworks: ['jasmine'],
     logLevel: config.LOG_INFO,

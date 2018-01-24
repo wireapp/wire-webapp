@@ -24,7 +24,7 @@ window.z.integration = z.integration || {};
 
 z.integration.IntegrationRepository = class IntegrationRepository {
   /**
-   * Trim and remove @.
+   * Trim query string for search.
    * @param {string} query - Service search string
    * @returns {string} Normalized service search query
    */
@@ -68,7 +68,13 @@ z.integration.IntegrationRepository = class IntegrationRepository {
 
     return this.conversationRepository.addBot(conversationEntity, providerId, serviceId).then(event => {
       if (event) {
-        const attributes = {method: method, service_id: serviceId, service_name: name.toLowerCase()};
+        const attributes = {
+          conversation_size: conversationEntity.getNumberOfParticipants(true, false),
+          method: method,
+          service_id: serviceId,
+          services_size: conversationEntity.getNumberOfBots(),
+        };
+
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.INTEGRATION.ADDED_SERVICE, attributes);
       }
 
@@ -77,12 +83,14 @@ z.integration.IntegrationRepository = class IntegrationRepository {
   }
 
   addServiceFromParam(providerId, serviceId) {
-    this.getServiceById(providerId, serviceId).then(serviceEntity => {
-      amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.BOTS_CONFIRM, {
-        action: () => this.createNewConversation(serviceEntity),
-        data: serviceEntity.name,
+    if (this.isTeam()) {
+      this.getServiceById(providerId, serviceId).then(serviceEntity => {
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.BOTS_CONFIRM, {
+          action: () => this.createConversationWithService(serviceEntity),
+          data: serviceEntity.name,
+        });
       });
-    });
+    }
   }
 
   /**
@@ -90,7 +98,7 @@ z.integration.IntegrationRepository = class IntegrationRepository {
    * @param {z.integration.ServiceEntity} serviceEntity - Information about service to be added
    * @returns {Promise} Resolves when integration was added to conversation
    */
-  createNewConversation(serviceEntity) {
+  createConversationWithService(serviceEntity) {
     return Promise.resolve()
       .then(() => this.conversationRepository.create_new_conversation([], serviceEntity.name))
       .then(conversationEntity => {

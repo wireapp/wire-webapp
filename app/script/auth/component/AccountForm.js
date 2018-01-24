@@ -56,6 +56,11 @@ class AccountForm extends PureComponent {
     }
   }
 
+  createURLForToU = () => {
+    const isPersonalFlow = this.props.currentFlow === AuthSelector.REGISTER_FLOW.PERSONAL;
+    return `${ROUTE.WIRE_ROOT}/legal/terms/${isPersonalFlow ? 'personal' : 'teams'}/`;
+  };
+
   handleSubmit = event => {
     event.preventDefault();
     const validInputs = this.state.validInputs;
@@ -206,7 +211,7 @@ class AccountForm extends PureComponent {
             <FormattedHTMLMessage
               {...accountFormStrings.terms}
               values={{
-                linkParams: `target=_blank data-uie-name=go-terms href=${ROUTE.WIRE_ROOT}/legal#terms`,
+                linkParams: `target=_blank data-uie-name=go-terms href=${this.createURLForToU()}`,
               }}
             />
           </CheckboxLabel>

@@ -29,7 +29,7 @@
     <!-- ko if: enableIntegrations() -->
       <div class="start-ui-list-tabs">
         <div class="start-ui-list-tab" data-bind="click: clickOnAddPeople, css: {'active' : peopleTabActive()}, l10n_text: z.string.search_people"></div>
-        <div class="start-ui-list-tab" data-bind="click: clickOnService, css: {'active' : !peopleTabActive()}, l10n_text: z.string.search_services"></div>
+        <div class="start-ui-list-tab" data-bind="click: clickOnAddService, css: {'active' : !peopleTabActive()}, l10n_text: z.string.search_services"></div>
       </div>
     <!-- /ko -->
   </div>
@@ -86,22 +86,22 @@
               </div>
               <div class="others" data-bind="visible: search_results.others().length > 0">
                 <span class="start-ui-list-header" data-bind="l10n_text: z.string.search_others"></span>
-                <user-list class="search-list-theme-black" params="user: search_results.others, click: clickOnOther, mode: z.components.UserList.MODE.OTHERS"></user-list>
+                <user-list class="search-list-theme-black" params="user: search_results.others, click: click_on_other, mode: z.components.UserList.MODE.OTHERS"></user-list>
               </div>
             </div>
           <!-- /ko -->
         <!-- /ko -->
 
         <!-- ko ifnot: peopleTabActive() -->
-            <span class="start-ui-list-header"></span>
-            <service-list params="services: search_results.services(), click: clickOnOther"></service-list>
+          <span class="start-ui-list-header"></span>
+          <service-list params="services: search_results.services(), click: clickOnOther"></service-list>
         <!-- /ko -->
       <!-- /ko -->
 
       <!-- ko if: peopleTabActive() -->
         <!-- ko if: showMemberInvite() -->
           <ul class="left-list-items">
-            <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnMemberInvite">
+            <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnMemberInvite" data-uie-name="do-invite-member">
               <div class="left-column icon-envelope"></div>
               <div class="center-column" data-bind="l10n_text: z.string.search_member_invite"></div>
             </li>
@@ -123,12 +123,12 @@
       <div>
         <h1 class="start-ui-import-headline" data-bind="l10n_text: z.string.people_invite_headline"></h1>
         <!-- ko if: window.wAddressBook || window.zAddressBook -->
-          <div class="start-ui-import-buttons" data-uie-name="from-contacts" data-bind="click: click_on_contacts_import">
+          <div class="start-ui-import-buttons" data-bind="click: click_on_contacts_import" data-uie-name="from-contacts">
             <div class="start-ui-import-buttons-icon icon-contacts"></div>
             <span class="label-bold-xs" data-bind="l10n_text: z.string.people_invite_button_contacts"></span>
           </div>
         <!-- /ko -->
-        <div class="start-ui-import-buttons" data-uie-name="from-gmail" data-bind="click: click_on_gmail_import">
+        <div class="start-ui-import-buttons" data-bind="click: click_on_gmail_import" data-uie-name="from-gmail">
           <svg class="start-ui-import-buttons-icon">
             <use xlink:href="#icon-gmail"></use>
           </svg>
@@ -156,7 +156,7 @@
                             ignore: on_user_ignore,
                             unblock: on_user_unblock,
                             cancel_request: on_cancel_request
-                            mode: z.components.UserProfileMode.SEARCH"></user-profile>
+                            mode: z.components.UserProfile.MODE.SEARCH"></user-profile>
 
       <!-- /ko -->
       <!-- ko if: userProfileIsService() -->
@@ -185,7 +185,7 @@
             <!-- /ko -->
           </div>
           <div class="service-confirmation-footer">
-            <button data-uie-name="do-service-confirm" class="participants-service-confirmation-button" data-bind="click: clickOnAddService, l10n_text: z.string.people_service_confirm_button"></button>
+            <button data-uie-name="do-service-confirm" class="participants-service-confirmation-button" data-bind="click: clickOnAddServiceToConversation, l10n_text: z.string.people_service_confirm_button"></button>
           </div>
         </div>
       <!-- /ko -->

@@ -17,8 +17,6 @@
  *
  */
 
-// Adding "window.z.util.Environment" which is required by "wire-desktop"
-import '../../util/Environment';
 import platform from 'platform';
 
 export default class RuntimeUtil {

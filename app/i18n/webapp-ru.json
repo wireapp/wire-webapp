@@ -12,7 +12,7 @@
   "teamName.whatIsWireTeamsLink": "Что такое Wire для команд?",
   "accountForm.namePlaceholder": "Имя",
   "accountForm.emailTeamPlaceholder": "you@yourcompany.com",
-  "accountForm.emailPersonalPlaceholder": "",
+  "accountForm.emailPersonalPlaceholder": "you@email.com",
   "accountForm.passwordPlaceholder": "Пароль (минимум 8 символов)",
   "accountForm.terms": "Я принимаю <a {linkParams}>положения и условия</a>",
   "accountForm.nextButton": "Вперед",

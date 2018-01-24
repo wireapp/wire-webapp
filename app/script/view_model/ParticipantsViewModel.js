@@ -42,8 +42,8 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
   constructor(elementId, conversationRepository, integrationRepository, teamRepository, userRepository) {
     this.clickOnAddPeople = this.clickOnAddPeople.bind(this);
-    this.clickOnClose = this.clickOnClose.bind(this);
     this.clickOnPending = this.clickOnPending.bind(this);
+    this.clickOnMemberBack = this.clickOnMemberBack.bind(this);
     this.clickOnSelectService = this.clickOnSelectService.bind(this);
     this.clickOnShowParticipant = this.clickOnShowParticipant.bind(this);
     this.clickToAddService = this.clickToAddService.bind(this);
@@ -95,7 +95,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.unverifiedParticipants = ko.observableArray();
     this.verifiedParticipants = ko.observableArray();
 
-    this.services = ko.observableArray([]);
+    this.services = this.integrationRepository.services;
 
     ko.computed(() => {
       const conversationEntity = this.conversation();
@@ -174,9 +174,13 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
         .sort((userA, userB) => z.util.StringUtil.sort_by_priority(userA.first_name(), userB.first_name()));
     });
 
+    this.shouldUpdateScrollbar = ko
+      .computed(() => this.services() && this.selectedUsers() && this.stateAddPeople() && this.stateAddService())
+      .extend({notify: 'always', rateLimit: 500});
+
     const shortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.ADD_PEOPLE);
     this.addPeopleTooltip = ko.pureComputed(() => {
-      const identifier = this.enableIntegrations() ? z.string.tooltip_people_add : z.string.tooltip_people_add_people;
+      const identifier = this.showIntegrations() ? z.string.tooltip_people_add : z.string.tooltip_people_add_people;
       return z.l10n.text(identifier, shortcut);
     });
 
@@ -206,10 +210,6 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.searchServices(this.searchInput());
   }
 
-  clickOnClose() {
-    this.resetView();
-  }
-
   clickOnPending(userEntity) {
     const onSuccess = () => this.participantsBubble.hide();
 
@@ -221,6 +221,10 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
       },
       template: '#template-confirm-connect',
     });
+  }
+
+  clickOnCloseAdding() {
+    this.resetView();
   }
 
   clickOnSelectService(serviceEntity) {
@@ -239,6 +243,10 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT);
   }
 
+  clickOnMemberBack() {
+    this.resetView();
+  }
+
   clickOnServiceBack() {
     this.state(ParticipantsViewModel.STATE.ADD_SERVICE);
     this.selectedService(undefined);
@@ -255,7 +263,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     if (this.conversation().is_group()) {
       this.conversationRepository.addMembers(this.conversation(), userIds).then(() => {
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.ADD_TO_GROUP_CONVERSATION, {
-          numberOfGroupParticipants: this.conversation().get_number_of_participants(),
+          numberOfGroupParticipants: this.conversation().getNumberOfParticipants(),
           numberOfParticipantsAdded: userIds.length,
         });
       });
@@ -367,8 +375,32 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     });
   }
 
+  renameConversation(data, event) {
+    const currentConversationName = this.conversation()
+      .display_name()
+      .trim();
+    const newConversationName = z.util.StringUtil.remove_line_breaks(event.target.value.trim());
+
+    if (newConversationName.length && newConversationName !== currentConversationName) {
+      event.target.value = currentConversationName;
+      this.isEditing(false);
+      this.conversationRepository.rename_conversation(this.conversation(), newConversationName);
+    }
+  }
+
+  resetView() {
+    this.state(ParticipantsViewModel.STATE.PARTICIPANTS);
+    this.selectedUsers.removeAll();
+    this.searchInput('');
+    if (this.confirmDialog) {
+      this.confirmDialog.destroy();
+    }
+    this.selectedService(undefined);
+    this.selectedUser(undefined);
+  }
+
   searchServices(query) {
-    if (this.state() === ParticipantsViewModel.STATE.ADD_SERVICE) {
+    if (this.stateAddService()) {
       this.integrationRepository.searchForServices(query, this.searchInput);
     }
   }
@@ -421,9 +453,8 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
           return this.participantsBubble.show().then(() => this.clickOnAddPeople());
         }
 
-        const isAddingPeople = this.state() === ParticipantsViewModel.STATE.ADD_PEOPLE;
         const isConfirmingAction = this.confirmDialog && this.confirmDialog.is_visible();
-        if (isAddingPeople || isConfirmingAction) {
+        if (this.stateAddPeople() || isConfirmingAction) {
           return this.participantsBubble.hide();
         }
 
@@ -434,37 +465,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     };
 
     const bubble = wire.app.view.content.message_list.participant_bubble;
-    if (bubble && bubble.is_visible()) {
-      window.setTimeout(() => {
-        toggleBubble();
-      }, 550);
-    } else {
-      toggleBubble();
-    }
-  }
-
-  renameConversation(data, event) {
-    const currentConversationName = this.conversation()
-      .display_name()
-      .trim();
-    const newConversationName = z.util.StringUtil.remove_line_breaks(event.target.value.trim());
-
-    if (newConversationName.length && newConversationName !== currentConversationName) {
-      event.target.value = currentConversationName;
-      this.isEditing(false);
-      this.conversationRepository.rename_conversation(this.conversation(), newConversationName);
-    }
-  }
-
-  resetView() {
-    this.state(ParticipantsViewModel.STATE.PARTICIPANTS);
-    this.selectedUsers.removeAll();
-    this.services.removeAll();
-    this.searchInput('');
-    if (this.confirmDialog) {
-      this.confirmDialog.destroy();
-    }
-    this.selectedService();
-    this.selectedUser();
+    const timeout = bubble && bubble.is_visible() ? z.motion.MotionDuration.LONG : 0;
+    window.setTimeout(() => toggleBubble(), timeout);
   }
 };

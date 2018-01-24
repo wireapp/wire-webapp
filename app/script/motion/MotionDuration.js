@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,20 +17,14 @@
  *
  */
 
-import jQuery from 'jquery';
-import {amplify} from '@bower_components/amplify';
-import platform from 'platform';
-import '../event/WebApp';
+'use strict';
 
-window.amplify = amplify;
-window.platform = platform;
-window.jQuery = jQuery;
-window.$ = jQuery;
+window.z = window.z || {};
+window.z.motion = z.motion || {};
 
-// Adding "window.z.util.Environment" which is required by "wire-desktop"
-import '../util/Environment';
-
-// Expose wire object in global namespace to satisfy wrapper check
-const configureEnvironment = () => (window.wire = {});
-
-export default configureEnvironment;
+z.motion.MotionDuration = {
+  LONG: 550,
+  MEDIUM: 350,
+  SHORT: 150,
+  X_LONG: 700,
+};
