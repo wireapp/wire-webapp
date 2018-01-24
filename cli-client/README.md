@@ -20,6 +20,8 @@ npm install -g @wireapp/cli-client
 
 Type `wire-cli --help` for usage information.
 
+#### Bash
+
 ```bash
 #!/bin/bash
 
@@ -28,4 +30,10 @@ WIRE_LOGIN_PASSWORD="secret"
 WIRE_CONVERSATION_ID="594f0908-b9b7-40f9-a06a-45612145e64e"
 
 wire-cli -e "$WIRE_LOGIN_EMAIL" -p "$WIRE_LOGIN_PASSWORD" -c "$WIRE_CONVERSATION_ID"
+```
+
+#### Node.js
+
+```bash
+tsc && node dist/commonjs/index.js -e "yourname@email.com" -p "secret"
 ```
