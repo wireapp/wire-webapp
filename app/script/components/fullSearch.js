@@ -142,7 +142,7 @@ ko.components.register('full-search', {
             <span data-bind="text: moment($data.timestamp()).format('MMMM D, YYYY')" data-uie-name="full-search-item-timestamp"></span>
           </div>
         </div>
-        <div class="badge" data-bind="text: matches_count, visible: matches_count  data-uie-name="full-search-item-badge"> 1"></div>
+        <div class="badge" data-bind="text: matches_count, visible: matches_count" data-uie-name="full-search-item-badge"> 1"></div>
       </div>
     </div>
   `,
