@@ -69,7 +69,7 @@ z.integration.IntegrationRepository = class IntegrationRepository {
     return this.conversationRepository.addBot(conversationEntity, providerId, serviceId).then(event => {
       if (event) {
         const attributes = {
-          conversation_size: conversationEntity.getNumberOfParticpants(true, false),
+          conversation_size: conversationEntity.getNumberOfParticipants(true, false),
           method: method,
           service_id: serviceId,
           services_size: conversationEntity.getNumberOfBots(),
