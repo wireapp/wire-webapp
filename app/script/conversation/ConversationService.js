@@ -377,7 +377,7 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves with all the stored conversation states
    */
   load_conversation_states_from_db() {
-    return this.storageService.get_all(z.storage.StorageService.OBJECT_STORE.CONVERSATIONS);
+    return this.storageService.getAll(z.storage.StorageService.OBJECT_STORE.CONVERSATIONS);
   }
 
   /**

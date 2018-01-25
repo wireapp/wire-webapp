@@ -53,7 +53,7 @@ z.user.UserService = class UserService {
    * @returns {Promise} Resolves with all the stored user states
    */
   loadUserFromDb() {
-    return this.storageService.get_all(z.storage.StorageService.OBJECT_STORE.USERS);
+    return this.storageService.getAll(z.storage.StorageService.OBJECT_STORE.USERS);
   }
 
   /**
