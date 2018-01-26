@@ -60,6 +60,8 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.click_on_group = this.click_on_group.bind(this);
     this.clickOnOther = this.clickOnOther.bind(this);
     this.clickOnAddServiceToConversation = this.clickOnAddServiceToConversation.bind(this);
+    this.clickOnServiceConversation = this.clickOnServiceConversation.bind(this);
+    this.clickOnCreateServiceConversation = this.clickOnCreateServiceConversation.bind(this);
     this.on_cancel_request = this.on_cancel_request.bind(this);
     this.on_submit_search = this.on_submit_search.bind(this);
     this.on_user_accept = this.on_user_accept.bind(this);
@@ -210,6 +212,13 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       this.userProfileIsService(newProfile instanceof z.integration.ServiceEntity);
     });
 
+    this.bubbleExtraClass = ko.pureComputed(
+      () =>
+        `${this.userProfileIsService() ? 'service-bubble' : ''}${
+          this.showServiceConversationList() ? '-conversation-list' : ''
+        }`
+    );
+
     this.renderAvatar = ko.observable(false);
     this.renderAvatarComputed = ko.computed(() => {
       const has_user_id = !!this.user_profile();
@@ -223,7 +232,13 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
     this.showServiceConversationList = ko.observable(false);
     this.serviceConversationList = ko.observable([]);
-
+    this.searchConversation = ko.observable('');
+    this.searchConversation.subscribe(query =>
+      this.serviceConversationList(this.conversationRepository.get_groups_by_name(query))
+    );
+    this.shouldUpdateServiceConversationScrollbar = ko
+      .computed(() => this.serviceConversationList())
+      .extend({notify: 'always', rateLimit: 500});
     this.user_bubble = undefined;
     this.user_bubble_last_id = undefined;
 
@@ -382,9 +397,24 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this._updateServicesList();
   }
 
-  clickOnAddServiceToConversation(service) {
+  clickOnAddServiceToConversation() {
     this.showServiceConversationList(true);
     this.serviceConversationList(this.conversationRepository.get_groups_by_name(''));
+  }
+
+  clickOnServiceConversation(conversationEntity) {
+    this.integrationRepository.addService(conversationEntity, this.user_profile());
+    this.click_on_group(conversationEntity);
+    if (this.user_bubble) {
+      this.user_bubble.hide();
+    }
+  }
+
+  clickOnCreateServiceConversation() {
+    this.integrationRepository.createConversationWithService(this.user_profile());
+    if (this.user_bubble) {
+      this.user_bubble.hide();
+    }
   }
 
   updateList() {

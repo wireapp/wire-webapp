@@ -177,6 +177,19 @@
 }
 
 .start-ui-user-bubble {
+  &.service-bubble.bubble-left-top,
+  &.service-bubble.bubble-left,
+  &.service-bubble-conversation-list.bubble-left-top {
+    &:before {
+      background-color: @app-bg;
+    }
+    &:after {
+      background: linear-gradient(-45deg, @app-bg 0%, @app-bg 50%, transparent 50%, transparent 100%);
+    }
+  }
+}
+
+.start-ui-user-bubble {
   user-profile,
   .service-confirmation {
     background: #fff;
@@ -184,7 +197,16 @@
     margin: -@bubble-border-radius;
   }
   .service-confirmation-body {
-    background: transparent;
+    padding: 8px;
+    .service-confirmation-summary,
+    .service-confirmation-description {
+      padding: 8px;
+    }
+  }
+  &.service-bubble-conversation-list {
+    .service-confirmation-body {
+      flex-grow: 0;
+    }
   }
 }
 
@@ -227,4 +249,24 @@
   line-height: @line-height-sm;
   margin-bottom: 16px;
   margin-top: 16px;
+}
+
+.service-conversation-view {
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+  .service-conversation-create {
+    display: flex;
+    align-items: center;
+    height: 56px;
+    cursor: pointer;
+    .icon-plus {
+      width: 60px;
+      text-align: center;
+    }
+    .service-conversation-create-text {
+      font-size: 14px;
+      font-weight: 400;
+    }
+  }
 }
