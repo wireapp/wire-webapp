@@ -24,6 +24,13 @@ window.z.ViewModel = z.ViewModel || {};
 window.z.ViewModel.list = z.ViewModel.list || {};
 
 z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
+  static get STATE() {
+    return {
+      ADD_PEOPLE: 'StartUIViewModel.STATE.ADD_PEOPLE',
+      ADD_SERVICE: 'StartUIViewModel.STATE.ADD_SERVICE',
+    };
+  }
+
   /**
    * View model for the start UI.
    * @class z.ViewModel.list.StartUIViewModel
@@ -31,7 +38,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
    * @param {string} element_id - HTML selector
    * @param {z.ViewModel.list.ListViewModel} list_view_model - List view model
    * @param {z.connect.ConnectRepository} connect_repository - Connect repository
-   * @param {z.conversation.ConversationRepository} conversation_repository - Conversation repository
+   * @param {z.conversation.ConversationRepository} conversationRepository - Conversation repository
    * @param {z.integration.IntegrationRepository} integrationRepository - Integration repository
    * @param {z.properties.PropertiesRepository} properties_repository - Properties repository
    * @param {z.search.SearchRepository} search_repository - Search repository
@@ -42,7 +49,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     element_id,
     list_view_model,
     connect_repository,
-    conversation_repository,
+    conversationRepository,
     integrationRepository,
     properties_repository,
     search_repository,
@@ -51,8 +58,10 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
   ) {
     this.click_on_close = this.click_on_close.bind(this);
     this.click_on_group = this.click_on_group.bind(this);
-    this.click_on_other = this.click_on_other.bind(this);
-    this.clickOnService = this.clickOnService.bind(this);
+    this.clickOnOther = this.clickOnOther.bind(this);
+    this.clickOnAddServiceToConversation = this.clickOnAddServiceToConversation.bind(this);
+    this.clickOnServiceConversation = this.clickOnServiceConversation.bind(this);
+    this.clickOnCreateServiceConversation = this.clickOnCreateServiceConversation.bind(this);
     this.on_cancel_request = this.on_cancel_request.bind(this);
     this.on_submit_search = this.on_submit_search.bind(this);
     this.on_user_accept = this.on_user_accept.bind(this);
@@ -63,7 +72,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
     this.list_view_model = list_view_model;
     this.connect_repository = connect_repository;
-    this.conversation_repository = conversation_repository;
+    this.conversationRepository = conversationRepository;
     this.integrationRepository = integrationRepository;
     this.propertiesRepository = properties_repository;
     this.search_repository = search_repository;
@@ -79,15 +88,13 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
     this.submitted_search = false;
 
-    this.clickOnTab = index => this.tabIndex(index);
-    this.tabIndex = ko.observable(0);
-    this.tabIndex.subscribe(() => this.updateList());
+    this.state = ko.observable(StartUIViewModel.STATE.ADD_PEOPLE);
+    this.state.subscribe(() => this.updateList());
 
-    this.peopleTabActive = ko.pureComputed(() => this.tabIndex() === 0);
+    this.peopleTabActive = ko.pureComputed(() => this.state() === StartUIViewModel.STATE.ADD_PEOPLE);
 
     this.search = _.debounce(query => {
       this.clearSearchResults();
-
       if (this.peopleTabActive()) {
         return this._searchPeople(query);
       }
@@ -137,11 +144,12 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       return (
         this.search_results.groups().length ||
         this.search_results.contacts().length ||
-        this.search_results.others().length
+        this.search_results.others().length ||
+        this.search_results.services().length
       );
     });
 
-    this.enableIntegrations = () => false;
+    this.enableIntegrations = this.integrationRepository.enableIntegrations;
 
     this.show_content = ko.pureComputed(() => {
       return this.show_contacts() || this.show_matches() || this.show_search_results();
@@ -198,6 +206,39 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
     // Selected user bubble
     this.user_profile = ko.observable(null);
+    this.userProfileIsService = ko.observable(false);
+
+    this.user_profile.subscribe(newProfile => {
+      this.userProfileIsService(newProfile instanceof z.integration.ServiceEntity);
+    });
+
+    this.bubbleExtraClass = ko.pureComputed(
+      () =>
+        `${this.userProfileIsService() ? 'service-bubble' : ''}${
+          this.showServiceConversationList() ? '-conversation-list' : ''
+        }`
+    );
+
+    this.renderAvatar = ko.observable(false);
+    this.renderAvatarComputed = ko.computed(() => {
+      const has_user_id = !!this.user_profile();
+
+      // swap value to re-render avatar
+      this.renderAvatar(false);
+      window.setTimeout(() => {
+        this.renderAvatar(has_user_id);
+      }, 0);
+    });
+
+    this.showServiceConversationList = ko.observable(false);
+    this.serviceConversationList = ko.observable([]);
+    this.searchConversation = ko.observable('');
+    this.searchConversation.subscribe(query =>
+      this.serviceConversationList(this.conversationRepository.get_groups_by_name(query))
+    );
+    this.shouldUpdateServiceConversationScrollbar = ko
+      .computed(() => this.serviceConversationList())
+      .extend({notify: 'always', rateLimit: 500});
     this.user_bubble = undefined;
     this.user_bubble_last_id = undefined;
 
@@ -241,7 +282,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
         this.search_results.contacts(this.user_repository.search_for_connected_users(normalized_query, is_handle));
       }
 
-      this.search_results.groups(this.conversation_repository.get_groups_by_name(normalized_query, is_handle));
+      this.search_results.groups(this.conversationRepository.get_groups_by_name(normalized_query, is_handle));
       this.searched_for_user(query);
     }
   }
@@ -259,12 +300,12 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
   click_on_group(conversation_et) {
     const promise =
       conversation_et instanceof z.entity.User
-        ? this.conversation_repository.get_1to1_conversation(conversation_et)
+        ? this.conversationRepository.get_1to1_conversation(conversation_et)
         : Promise.resolve(conversation_et);
 
     return promise.then(_conversation_et => {
       if (_conversation_et.is_archived()) {
-        this.conversation_repository.unarchive_conversation(_conversation_et, 'opened conversation from search');
+        this.conversationRepository.unarchive_conversation(_conversation_et, 'opened conversation from search');
       }
 
       if (_conversation_et.is_cleared()) {
@@ -280,26 +321,29 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     });
   }
 
-  click_on_other(user_et, event) {
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.SELECTED_USER_FROM_SEARCH, {
-      connection_type: (() => {
-        switch (user_et.connection().status()) {
-          case z.user.ConnectionStatus.ACCEPTED:
-            return 'connected';
-          case z.user.ConnectionStatus.UNKNOWN:
-            return 'unconnected';
-          case z.user.ConnectionStatus.PENDING:
-            return 'pending_incoming';
-          case z.user.ConnectionStatus.SENT:
-            return 'pending_outgoing';
-          default:
-        }
-      })(),
-      context: 'startui',
-    });
+  clickOnOther(userEntity, event) {
+    this.showServiceConversationList(false);
+    if (userEntity instanceof z.entity.User) {
+      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.SELECTED_USER_FROM_SEARCH, {
+        connection_type: (() => {
+          switch (userEntity.connection().status()) {
+            case z.user.ConnectionStatus.ACCEPTED:
+              return 'connected';
+            case z.user.ConnectionStatus.UNKNOWN:
+              return 'unconnected';
+            case z.user.ConnectionStatus.PENDING:
+              return 'pending_incoming';
+            case z.user.ConnectionStatus.SENT:
+              return 'pending_outgoing';
+            default:
+          }
+        })(),
+        context: 'startui',
+      });
+    }
 
     const create_bubble = element_id => {
-      this.user_profile(user_et);
+      this.user_profile(userEntity);
       this.user_bubble_last_id = element_id;
       this.user_bubble = new zeta.webapp.module.Bubble({
         host_selector: `#${element.attr('id')}`,
@@ -312,7 +356,13 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
         },
         scroll_selector: '.start-ui-list',
       });
-
+      if (this.userProfileIsService()) {
+        this.integrationRepository.getProviderById(this.user_profile().providerId).then(providerEntity => {
+          if (this.user_profile()) {
+            this.user_profile().providerName(providerEntity.name);
+          }
+        });
+      }
       this.user_bubble.toggle();
     };
 
@@ -338,9 +388,33 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       create_bubble(element[0].id);
     }
   }
+  clickOnAddService() {
+    this.state(StartUIViewModel.STATE.ADD_SERVICE);
+    this._updateServicesList();
+  }
+  clickOnAddPeople() {
+    this.state(StartUIViewModel.STATE.ADD_PEOPLE);
+    this._updateServicesList();
+  }
 
-  clickOnService(service) {
-    this.logger.info(service);
+  clickOnAddServiceToConversation() {
+    this.showServiceConversationList(true);
+    this.serviceConversationList(this.conversationRepository.get_groups_by_name(''));
+  }
+
+  clickOnServiceConversation(conversationEntity) {
+    this.integrationRepository.addService(conversationEntity, this.user_profile());
+    this.click_on_group(conversationEntity);
+    if (this.user_bubble) {
+      this.user_bubble.hide();
+    }
+  }
+
+  clickOnCreateServiceConversation() {
+    this.integrationRepository.createConversationWithService(this.user_profile());
+    if (this.user_bubble) {
+      this.user_bubble.hide();
+    }
   }
 
   updateList() {
@@ -394,7 +468,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
   //##############################################################################
 
   get_top_people() {
-    return this.conversation_repository
+    return this.conversationRepository
       .get_most_active_conversations()
       .then(conversation_ets => {
         return conversation_ets
@@ -673,7 +747,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
   _open_1to1_conversation(user_et) {
     this.submitted_search = true;
 
-    return this.conversation_repository
+    return this.conversationRepository
       .get_1to1_conversation(user_et)
       .then(conversation_et => {
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.OPENED_CONVERSATION);
@@ -690,7 +764,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
   _open_group_conversation(user_ids) {
     this.submitted_search = true;
 
-    return this.conversation_repository
+    return this.conversationRepository
       .create_new_conversation(user_ids, null)
       .then(conversationEntity => {
         this.submitted_search = false;
@@ -709,5 +783,9 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
         this.submitted_search = false;
         throw new Error(`Unable to create conversation: ${error.message}`);
       });
+  }
+
+  dispose() {
+    this.renderAvatarComputed.dispose();
   }
 };

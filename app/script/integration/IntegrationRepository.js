@@ -103,8 +103,9 @@ z.integration.IntegrationRepository = class IntegrationRepository {
       .then(() => this.conversationRepository.create_new_conversation([], serviceEntity.name))
       .then(conversationEntity => {
         if (conversationEntity) {
-          return this.addService(conversationEntity, serviceEntity, 'url_param');
+          this.addService(conversationEntity, serviceEntity, 'url_param');
         }
+        return conversationEntity;
       })
       .then(conversationEntity => {
         if (conversationEntity) {
