@@ -35,11 +35,7 @@
     "webpack": "2.3.3",
     "yargs": "11.0.0"
   },
-  "files": [
-    "dist/commonjs",
-    "dist/wire-webapp-cryptobox.d.ts",
-    "dist/window"
-  ],
+  "files": ["dist", "!dist/lib"],
   "license": "GPL-3.0",
   "main": "dist/commonjs/index.js",
   "name": "@wireapp/cryptobox",
