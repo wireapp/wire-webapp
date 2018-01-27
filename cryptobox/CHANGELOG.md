@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="6.3.6"></a>
+## [6.3.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@6.3.5...@wireapp/cryptobox@6.3.6) (2018-01-27)
+
+
+### Bug Fixes
+
+* **cryptobox:** Missing type definitions in dist folder ([c5df1b8](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/commit/c5df1b8))
+
+
+
+
 <a name="6.3.5"></a>
 ## [6.3.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@6.3.4...@wireapp/cryptobox@6.3.5) (2018-01-25)
 
