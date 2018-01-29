@@ -256,7 +256,7 @@ z.string.de.collection_section_files = 'Dateien';
 z.string.de.collection_section_audio = 'Audio-Nachrichten';
 
 z.string.de.fullsearchPlaceholder = 'Nachrichten durchsuchen';
-z.string.de.fullsearch_no_results = 'Kein Treffer';
+z.string.de.fullsearchNoTesults = 'Kein Treffer';
 
 z.string.de.archiveHeader = 'Archivieren';
 

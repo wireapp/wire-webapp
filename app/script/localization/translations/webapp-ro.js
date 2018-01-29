@@ -249,7 +249,7 @@ z.string.ro.collection_section_files = 'Fișiere';
 z.string.ro.collection_section_audio = 'Mesaje audio';
 
 z.string.ro.fullsearchPlaceholder = 'Caută prin mesaje text';
-z.string.ro.fullsearch_no_results = 'Fără rezultate.';
+z.string.ro.fullsearchNoTesults = 'Fără rezultate.';
 
 z.string.ro.archiveHeader = 'Arhivă';
 

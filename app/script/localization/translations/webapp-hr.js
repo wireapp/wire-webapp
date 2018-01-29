@@ -224,7 +224,7 @@ z.string.hr.collection_section_images = 'Slike';
 z.string.hr.collection_section_files = 'Dokumenti';
 
 z.string.hr.fullsearchPlaceholder = 'Pretraži poruke';
-z.string.hr.fullsearch_no_results = 'Nema rezultata.';
+z.string.hr.fullsearchNoTesults = 'Nema rezultata.';
 
 z.string.hr.archiveHeader = 'Arhiviraj';
 

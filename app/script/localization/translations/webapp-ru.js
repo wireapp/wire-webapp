@@ -248,7 +248,7 @@ z.string.ru.collection_section_files = 'Файлы';
 z.string.ru.collection_section_audio = 'Аудиосообщения';
 
 z.string.ru.fullsearchPlaceholder = 'Поиск в текстовых сообщениях';
-z.string.ru.fullsearch_no_results = 'Ничего не найдено.';
+z.string.ru.fullsearchNoTesults = 'Ничего не найдено.';
 
 z.string.ru.archiveHeader = 'Архив';
 

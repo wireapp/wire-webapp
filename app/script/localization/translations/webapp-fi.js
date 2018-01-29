@@ -247,7 +247,7 @@ z.string.fi.collection_section_files = 'Tiedostot';
 z.string.fi.collection_section_audio = 'Ääniviestit';
 
 z.string.fi.fullsearchPlaceholder = 'Etsi viestejä';
-z.string.fi.fullsearch_no_results = 'Ei tuloksia.';
+z.string.fi.fullsearchNoTesults = 'Ei tuloksia.';
 
 z.string.fi.archiveHeader = 'Arkistoi';
 

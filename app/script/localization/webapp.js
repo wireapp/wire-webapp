@@ -299,7 +299,7 @@ z.string.collection_section_audio = 'Audio messages';
 
 // Full Search
 z.string.fullsearchPlaceholder = 'Search text messages';
-z.string.fullsearch_no_results = 'No results.';
+z.string.fullsearchNoTesults = 'No results.';
 
 // Archive
 z.string.archiveHeader = 'Archive';

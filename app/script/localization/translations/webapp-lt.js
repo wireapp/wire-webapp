@@ -249,7 +249,7 @@ z.string.lt.collection_section_files = 'Failai';
 z.string.lt.collection_section_audio = 'Garso žinutės';
 
 z.string.lt.fullsearchPlaceholder = 'Ieškoti tekstinėse žinutėse';
-z.string.lt.fullsearch_no_results = 'Rezultatų nėra.';
+z.string.lt.fullsearchNoTesults = 'Rezultatų nėra.';
 
 z.string.lt.archiveHeader = 'Archyvuoti';
 

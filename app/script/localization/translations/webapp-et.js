@@ -249,7 +249,7 @@ z.string.et.collection_section_files = 'Failid';
 z.string.et.collection_section_audio = 'Helisõnumid';
 
 z.string.et.fullsearchPlaceholder = 'Otsi tekstsõnumeid';
-z.string.et.fullsearch_no_results = 'Tulemusi ei leitud.';
+z.string.et.fullsearchNoTesults = 'Tulemusi ei leitud.';
 
 z.string.et.archiveHeader = 'Arhiveeri';
 

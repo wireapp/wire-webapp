@@ -242,7 +242,7 @@ z.string.it.collection_section_files = 'Files';
 z.string.it.collection_section_audio = 'Messaggi audio';
 
 z.string.it.fullsearchPlaceholder = 'Cerca messaggi di testo';
-z.string.it.fullsearch_no_results = 'Nessun risultato.';
+z.string.it.fullsearchNoTesults = 'Nessun risultato.';
 
 z.string.it.archiveHeader = 'Archivia';
 

@@ -247,7 +247,7 @@ z.string.uk.collection_section_files = 'Файли';
 z.string.uk.collection_section_audio = 'Аудіоповідомлення';
 
 z.string.uk.fullsearchPlaceholder = 'Шукайте текстові повідомлення';
-z.string.uk.fullsearch_no_results = 'Нічого не знайдено.';
+z.string.uk.fullsearchNoTesults = 'Нічого не знайдено.';
 
 z.string.uk.archiveHeader = 'Архівувати';
 

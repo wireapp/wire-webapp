@@ -238,7 +238,7 @@ z.string.sl.collection_section_files = 'Zbirke';
 z.string.sl.collection_section_audio = 'Zvočna sporočila';
 
 z.string.sl.fullsearchPlaceholder = 'Išči po sporočilih';
-z.string.sl.fullsearch_no_results = 'Ni rezultatov.';
+z.string.sl.fullsearchNoTesults = 'Ni rezultatov.';
 
 z.string.sl.archiveHeader = 'Arhiviraj';
 

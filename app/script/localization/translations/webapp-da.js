@@ -234,7 +234,7 @@ z.string.da.collection_section_files = 'Filer';
 z.string.da.collection_section_audio = 'Lydbeskeder';
 
 z.string.da.fullsearchPlaceholder = 'Søg i tekstbeskeder';
-z.string.da.fullsearch_no_results = 'Ingen resultater.';
+z.string.da.fullsearchNoTesults = 'Ingen resultater.';
 
 z.string.da.archiveHeader = 'Arkivér';
 
