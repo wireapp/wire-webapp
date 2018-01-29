@@ -249,7 +249,7 @@ z.string.fr.collection_section_files = 'Fichiers';
 z.string.fr.collection_section_audio = 'Messages vocaux';
 
 z.string.fr.fullsearchPlaceholder = 'Chercher dans les messages';
-z.string.fr.fullsearchNoTesults = 'Aucun résultat.';
+z.string.fr.fullsearchNoResults = 'Aucun résultat.';
 
 z.string.fr.archiveHeader = 'Archives';
 

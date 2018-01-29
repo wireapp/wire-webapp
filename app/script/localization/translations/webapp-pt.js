@@ -248,7 +248,7 @@ z.string.pt.collection_section_files = 'Ficheiros';
 z.string.pt.collection_section_audio = 'Mensagens de áudio';
 
 z.string.pt.fullsearchPlaceholder = 'Procurar mensagens de texto';
-z.string.pt.fullsearchNoTesults = 'Sem resultados.';
+z.string.pt.fullsearchNoResults = 'Sem resultados.';
 
 z.string.pt.archiveHeader = 'Arquivar';
 

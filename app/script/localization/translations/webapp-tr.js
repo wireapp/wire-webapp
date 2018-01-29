@@ -248,7 +248,7 @@ z.string.tr.collection_section_files = 'Dosyalar';
 z.string.tr.collection_section_audio = 'Sesli mesajlar';
 
 z.string.tr.fullsearchPlaceholder = 'Metin mesajlarında ara';
-z.string.tr.fullsearchNoTesults = 'Sonuç yok.';
+z.string.tr.fullsearchNoResults = 'Sonuç yok.';
 
 z.string.tr.archiveHeader = 'Arşivle';
 

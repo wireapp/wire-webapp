@@ -246,7 +246,7 @@ z.string.cs.collection_section_files = 'Soubory';
 z.string.cs.collection_section_audio = 'Zvukové zprávy';
 
 z.string.cs.fullsearchPlaceholder = 'Prohledat zprávy';
-z.string.cs.fullsearchNoTesults = 'Žádné výsledky.';
+z.string.cs.fullsearchNoResults = 'Žádné výsledky.';
 
 z.string.cs.archiveHeader = 'Archivovat';
 

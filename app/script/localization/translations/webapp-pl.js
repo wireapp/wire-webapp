@@ -247,7 +247,7 @@ z.string.pl.collection_section_files = 'Pliki';
 z.string.pl.collection_section_audio = 'Wiadomości audio';
 
 z.string.pl.fullsearchPlaceholder = 'Wyszukiwanie wiadomości';
-z.string.pl.fullsearchNoTesults = 'Brak wyników.';
+z.string.pl.fullsearchNoResults = 'Brak wyników.';
 
 z.string.pl.archiveHeader = 'Archiwizuj';
 

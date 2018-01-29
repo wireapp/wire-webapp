@@ -245,7 +245,7 @@ z.string.el.collection_section_files = 'Αρχεία';
 z.string.el.collection_section_audio = 'Ηχητικά μηνύματα';
 
 z.string.el.fullsearchPlaceholder = 'Αναζήτηση μηνυμάτων κειμένου';
-z.string.el.fullsearchNoTesults = 'Χωρίς Αποτέλεσμα.';
+z.string.el.fullsearchNoResults = 'Χωρίς Αποτέλεσμα.';
 
 z.string.el.archiveHeader = 'Αρχειοθέτηση';
 

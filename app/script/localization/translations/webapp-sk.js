@@ -247,7 +247,7 @@ z.string.sk.collection_section_files = 'Súbory';
 z.string.sk.collection_section_audio = 'Zvukové správy';
 
 z.string.sk.fullsearchPlaceholder = 'Vyhľadať textové správy';
-z.string.sk.fullsearchNoTesults = 'Žiadne výsledky.';
+z.string.sk.fullsearchNoResults = 'Žiadne výsledky.';
 
 z.string.sk.archiveHeader = 'Archív';
 

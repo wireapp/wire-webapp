@@ -249,7 +249,7 @@ z.string.hu.collection_section_files = 'Fájlok';
 z.string.hu.collection_section_audio = 'Hangüzenetek';
 
 z.string.hu.fullsearchPlaceholder = 'Szöveges üzenetek keresése';
-z.string.hu.fullsearchNoTesults = 'Nincs találat.';
+z.string.hu.fullsearchNoResults = 'Nincs találat.';
 
 z.string.hu.archiveHeader = 'Archiválás';
 

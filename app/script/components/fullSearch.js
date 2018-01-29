@@ -128,7 +128,7 @@ ko.components.register('full-search', {
       </div>
     </header>
     <!-- ko if: show_no_results_text() -->
-      <div class="full-search-no-result" data-bind="l10n_text: z.string.fullsearchNoTesults" data-uie-name="full-search-no-results"></div>
+      <div class="full-search-no-result" data-bind="l10n_text: z.string.fullsearchNoResults" data-uie-name="full-search-no-results"></div>
     <!-- /ko -->
     <div class="full-search-list" data-bind="foreach: {data: message_ets_rendered}" data-uie-name="full-search-list">
       <div class="full-search-item" data-bind="click: $parent.on_message_click" data-uie-name="full-search-item">

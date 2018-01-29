@@ -249,7 +249,7 @@ z.string.nl.collection_section_files = 'Bestanden';
 z.string.nl.collection_section_audio = 'Audio berichten';
 
 z.string.nl.fullsearchPlaceholder = 'Zoek tekst berichten';
-z.string.nl.fullsearchNoTesults = 'Geen resultaten.';
+z.string.nl.fullsearchNoResults = 'Geen resultaten.';
 
 z.string.nl.archiveHeader = 'Archiveren';
 
