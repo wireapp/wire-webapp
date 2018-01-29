@@ -18,8 +18,8 @@
  */
 
 z.string.et.wire = 'Wire';
-z.string.et.wire_macos = 'Wire macOS-ile';
-z.string.et.wire_windows = 'Wire Windowsile';
+z.string.et.wireMacos = 'Wire macOS-ile';
+z.string.et.wireWindows = 'Wire Windowsile';
 z.string.et.wire_linux = 'Wire Linuxile';
 z.string.et.nonexistent_user = 'Kustutatud kasutaja';
 z.string.et.and = 'ja';
@@ -173,7 +173,7 @@ z.string.et.modal_session_reset_message_link = 'kontakteeru';
 z.string.et.modal_session_reset_message_2 = 'meiega.';
 z.string.et.modal_too_many_members_headline = 'Täismaja';
 z.string.et.modal_too_many_members_message = 'Kuni {{number1}} inimest saavad vestlusega liituda. Siin on ruumi veel {{number2}} inimesele.';
-z.string.et.modal_uploads_parallel = 'Sa saad ühekorraga saata kuni {{number}} faili.';
+z.string.et.modalUploadsParallel = 'Sa saad ühekorraga saata kuni {{number}} faili.';
 
 z.string.et.connection_request_connect = 'Ühendu';
 z.string.et.connection_request_ignore = 'Ignoreeri';
@@ -556,21 +556,21 @@ z.string.et.tooltip_preferences_rename = 'Muuda oma nime';
 
 z.string.et.tooltip_search_close = 'Sulge (Esc)';
 
-z.string.et.init_received_self_user = 'Tere, {{user}}.';
-z.string.et.init_validated_client = 'Toon ühendusi ja vestlusi';
-z.string.et.init_received_user_data = 'Kontrollin uusi sõnumeid';
+z.string.et.initReceivedSelfUser = 'Tere, {{user}}.';
+z.string.et.initValidatedClient = 'Toon ühendusi ja vestlusi';
+z.string.et.initReceivedUserData = 'Kontrollin uusi sõnumeid';
 z.string.et.init_decryption = 'Dekrüptin sõnumeid';
 z.string.et.init_events = 'Laadin sõnumeid';
 z.string.et.init_updated_from_notifications = 'Peaaegu valmis - naudi Wire’i';
 z.string.et.init_progress = ' — {{number1}}/{{number2}}';
 
-z.string.et.ephememal_units_none = 'Väljas';
-z.string.et.ephememal_units_second = 'sekund';
-z.string.et.ephememal_units_seconds = 'sekundit';
-z.string.et.ephememal_units_minute = 'minut';
-z.string.et.ephememal_units_minutes = 'minutit';
-z.string.et.ephememal_units_hour = 'tund';
-z.string.et.ephememal_units_hours = 'tundi';
-z.string.et.ephememal_units_day = 'päev';
-z.string.et.ephememal_units_days = 'päeva';
+z.string.et.ephememalUnitsNone = 'Väljas';
+z.string.et.ephememalUnitsSecond = 'sekund';
+z.string.et.ephememalUnitsSeconds = 'sekundit';
+z.string.et.ephememalUnitsMinute = 'minut';
+z.string.et.ephememalUnitsMinutes = 'minutit';
+z.string.et.ephememalUnitsHour = 'tund';
+z.string.et.ephememalUnitsHours = 'tundi';
+z.string.et.ephememalUnitsDay = 'päev';
+z.string.et.ephememalUnitsDays = 'päeva';
 

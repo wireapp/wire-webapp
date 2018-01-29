@@ -17,8 +17,8 @@
  *
  */
 
-z.string.tr.wire_macos = 'MacOS için Wire';
-z.string.tr.wire_windows = 'Windows için Wire';
+z.string.tr.wireMacos = 'MacOS için Wire';
+z.string.tr.wireWindows = 'Windows için Wire';
 z.string.tr.wire_linux = 'Linux için Wire';
 z.string.tr.nonexistent_user = 'Silinmiş Kullanıcı';
 z.string.tr.and = 've';
@@ -172,7 +172,7 @@ z.string.tr.modal_session_reset_message_link = 'iletişime geç';
 z.string.tr.modal_session_reset_message_2 = 'biz.';
 z.string.tr.modal_too_many_members_headline = 'Dolup taşmış';
 z.string.tr.modal_too_many_members_message = 'Görüşmeye en fazla {{number1}} kişi katılabilir. Burada {{number2}} kişi için daha boş yer var.';
-z.string.tr.modal_uploads_parallel = 'Tek seferde en fazla {{number}} boyutunda dosya gönderebilirsiniz.';
+z.string.tr.modalUploadsParallel = 'Tek seferde en fazla {{number}} boyutunda dosya gönderebilirsiniz.';
 
 z.string.tr.connection_request_connect = 'Bağlan';
 z.string.tr.connection_request_ignore = 'Görmezden gel';
@@ -555,21 +555,21 @@ z.string.tr.tooltip_preferences_rename = 'İsminizi değiştirin';
 
 z.string.tr.tooltip_search_close = 'Kapat (Esc)';
 
-z.string.tr.init_received_self_user = 'Merhaba, {{user}}.';
-z.string.tr.init_validated_client = 'Bağlantılarınız ve konuşmalarınız alınıyor';
-z.string.tr.init_received_user_data = 'Yeni mesajlar kontrol ediliyor';
+z.string.tr.initReceivedSelfUser = 'Merhaba, {{user}}.';
+z.string.tr.initValidatedClient = 'Bağlantılarınız ve konuşmalarınız alınıyor';
+z.string.tr.initReceivedUserData = 'Yeni mesajlar kontrol ediliyor';
 z.string.tr.init_decryption = 'Mesajların şifresini çöz';
 z.string.tr.init_events = 'İletiler yükleniyor';
 z.string.tr.init_updated_from_notifications = 'Neredeyse bitti - Wire’ın keyfini çıkarın';
 z.string.tr.init_progress = ' — {{number2}}’de/da {{number1}}';
 
-z.string.tr.ephememal_units_none = 'Yok';
-z.string.tr.ephememal_units_second = 'saniye';
-z.string.tr.ephememal_units_seconds = 'saniye';
-z.string.tr.ephememal_units_minute = 'dakika';
-z.string.tr.ephememal_units_minutes = 'dakika';
-z.string.tr.ephememal_units_hour = 'saat';
-z.string.tr.ephememal_units_hours = 'saat';
-z.string.tr.ephememal_units_day = 'gün';
-z.string.tr.ephememal_units_days = 'gün';
+z.string.tr.ephememalUnitsNone = 'Yok';
+z.string.tr.ephememalUnitsSecond = 'saniye';
+z.string.tr.ephememalUnitsSeconds = 'saniye';
+z.string.tr.ephememalUnitsMinute = 'dakika';
+z.string.tr.ephememalUnitsMinutes = 'dakika';
+z.string.tr.ephememalUnitsHour = 'saat';
+z.string.tr.ephememalUnitsHours = 'saat';
+z.string.tr.ephememalUnitsDay = 'gün';
+z.string.tr.ephememalUnitsDays = 'gün';
 

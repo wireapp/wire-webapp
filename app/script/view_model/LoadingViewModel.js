@@ -48,7 +48,7 @@ z.ViewModel.LoadingViewModel = class LoadingViewModel {
       let updated_loading_message;
 
       switch (message_locator) {
-        case z.string.init_received_self_user: {
+        case z.string.initReceivedSelfUser: {
           updated_loading_message = z.l10n.text(message_locator, this.user_repository.self().first_name());
           break;
         }

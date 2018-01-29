@@ -25,15 +25,15 @@ z.localization = z.localization || {};
 class Localizer {
   constructor() {
     const DEFAULT_LOCALE = 'en';
-    const query_param = z.util.get_url_parameter(z.auth.URLParameter.LOCALE);
-    const current_browser_locale = navigator.language.substr(0, 2);
-    let stored_locale = z.util.StorageUtil.get_value(z.storage.StorageKey.LOCALIZATION.LOCALE);
+    const queryParam = z.util.get_url_parameter(z.auth.URLParameter.LOCALE);
+    const currentBrowserLocale = navigator.language.substr(0, 2);
+    let storedLocale = z.util.StorageUtil.get_value(z.storage.StorageKey.LOCALIZATION.LOCALE);
 
-    if (query_param) {
-      stored_locale = z.util.StorageUtil.set_value(z.storage.StorageKey.LOCALIZATION.LOCALE, query_param);
+    if (queryParam) {
+      storedLocale = z.util.StorageUtil.set_value(z.storage.StorageKey.LOCALIZATION.LOCALE, queryParam);
     }
 
-    this.locale = stored_locale || current_browser_locale || DEFAULT_LOCALE;
+    this.locale = storedLocale || currentBrowserLocale || DEFAULT_LOCALE;
 
     moment.locale([this.locale, DEFAULT_LOCALE]);
 

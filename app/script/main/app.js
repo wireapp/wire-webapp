@@ -293,14 +293,14 @@ z.main.App = class App {
         ]);
       })
       .then(([self_user_et]) => {
-        this.view.loading.update_progress(5, z.string.init_received_self_user);
+        this.view.loading.update_progress(5, z.string.initReceivedSelfUser);
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_SELF_USER);
         this.repository.client.init(self_user_et);
         this.repository.properties.init(self_user_et);
         return this.repository.client.getValidLocalClient();
       })
       .then(client_observable => {
-        this.view.loading.update_progress(7.5, z.string.init_validated_client);
+        this.view.loading.update_progress(7.5, z.string.initValidatedClient);
 
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.VALIDATED_CLIENT);
         this.telemetry.add_statistic(z.telemetry.app_init.AppInitStatisticsValue.CLIENT_TYPE, client_observable().type);
@@ -317,7 +317,7 @@ z.main.App = class App {
         return Promise.all([this.repository.conversation.get_conversations(), this.repository.user.get_connections()]);
       })
       .then(([conversation_ets, connection_ets]) => {
-        this.view.loading.update_progress(25, z.string.init_received_user_data);
+        this.view.loading.update_progress(25, z.string.initReceivedUserData);
 
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_USER_DATA);
         this.telemetry.add_statistic(

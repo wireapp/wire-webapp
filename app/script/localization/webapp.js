@@ -20,8 +20,8 @@
 'use strict';
 
 z.string.wire = 'Wire';
-z.string.wire_macos = 'Wire for macOS';
-z.string.wire_windows = 'Wire for Windows';
+z.string.wireMacos = 'Wire for macOS';
+z.string.wireWindows = 'Wire for Windows';
 z.string.wire_linux = 'Wire for Linux';
 z.string.nonexistent_user = 'Deleted User';
 z.string.and = 'and';
@@ -217,7 +217,7 @@ z.string.modal_too_many_bots_message = 'The bot is already part of this conversa
 z.string.modal_too_many_members_headline = 'Full house';
 z.string.modal_too_many_members_message = 'Up to {{number1}} people can join a conversation. There is room for {{number2}} more people in here.';
 // Parallel uploads
-z.string.modal_uploads_parallel = 'You can send up to {{number}} files at once.';
+z.string.modalUploadsParallel = 'You can send up to {{number}} files at once.';
 
 // Connection requests
 z.string.connection_request_connect = 'Connect';
@@ -642,20 +642,20 @@ z.string.tooltip_preferences_rename = 'Change your name';
 z.string.tooltip_search_close = 'Close (Esc)';
 
 // App loading
-z.string.init_received_self_user = 'Hello, {{user}}.';
-z.string.init_validated_client = 'Fetching your connections and conversations';
-z.string.init_received_user_data = 'Checking for new messages';
+z.string.initReceivedSelfUser = 'Hello, {{user}}.';
+z.string.initValidatedClient = 'Fetching your connections and conversations';
+z.string.initReceivedUserData = 'Checking for new messages';
 z.string.init_decryption = 'Decrypting messages';
 z.string.init_events = 'Loading messages';
 z.string.init_updated_from_notifications = 'Almost done - Enjoy Wire';
 z.string.init_progress = ' — {{number1}} of {{number2}}';
 
-z.string.ephememal_units_none = 'Off';
-z.string.ephememal_units_second = 'second';
-z.string.ephememal_units_seconds = 'seconds';
-z.string.ephememal_units_minute = 'minute';
-z.string.ephememal_units_minutes = 'minutes';
-z.string.ephememal_units_hour = 'hour';
-z.string.ephememal_units_hours = 'hours';
-z.string.ephememal_units_day = 'day';
-z.string.ephememal_units_days = 'days';
+z.string.ephememalUnitsNone = 'Off';
+z.string.ephememalUnitsSecond = 'second';
+z.string.ephememalUnitsSeconds = 'seconds';
+z.string.ephememalUnitsMinute = 'minute';
+z.string.ephememalUnitsMinutes = 'minutes';
+z.string.ephememalUnitsHour = 'hour';
+z.string.ephememalUnitsHours = 'hours';
+z.string.ephememalUnitsDay = 'day';
+z.string.ephememalUnitsDays = 'days';

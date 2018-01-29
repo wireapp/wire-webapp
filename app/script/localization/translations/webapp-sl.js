@@ -18,8 +18,8 @@
  */
 
 z.string.sl.wire = 'Wire';
-z.string.sl.wire_macos = 'Wire za macOS';
-z.string.sl.wire_windows = 'Wire za Windows';
+z.string.sl.wireMacos = 'Wire za macOS';
+z.string.sl.wireWindows = 'Wire za Windows';
 z.string.sl.wire_linux = 'Wire za Linux';
 z.string.sl.nonexistent_user = 'Izbrisan uporabnik';
 z.string.sl.and = 'in';
@@ -164,7 +164,7 @@ z.string.sl.modal_session_reset_message_link = 'kontaktirajte';
 z.string.sl.modal_session_reset_message_2 = 'nas.';
 z.string.sl.modal_too_many_members_headline = 'Polna hiša';
 z.string.sl.modal_too_many_members_message = 'Do {{number1}} oseb se lahko pridruži pogovoru. Tukaj je prostora še za {{number2}} oseb.';
-z.string.sl.modal_uploads_parallel = 'Lahko pošljete do {{number}} zbirk naenkrat.';
+z.string.sl.modalUploadsParallel = 'Lahko pošljete do {{number}} zbirk naenkrat.';
 
 z.string.sl.connection_request_connect = 'Poveži';
 z.string.sl.connection_request_ignore = 'Ignoriraj';
@@ -539,18 +539,18 @@ z.string.sl.tooltip_preferences_rename = 'Spremenite vaše ime';
 
 z.string.sl.tooltip_search_close = 'Zapri (Esc)';
 
-z.string.sl.init_received_self_user = 'Hej, {{user}}.';
-z.string.sl.init_validated_client = 'Pridobivam vaše povezave in pogovore';
-z.string.sl.init_received_user_data = 'Preverjanje za morebitna nova sporočila';
+z.string.sl.initReceivedSelfUser = 'Hej, {{user}}.';
+z.string.sl.initValidatedClient = 'Pridobivam vaše povezave in pogovore';
+z.string.sl.initReceivedUserData = 'Preverjanje za morebitna nova sporočila';
 z.string.sl.init_events = 'Nalagam sporočila';
 
-z.string.sl.ephememal_units_none = 'Izklopljeno';
-z.string.sl.ephememal_units_second = 'sekunda';
-z.string.sl.ephememal_units_seconds = 'sekund';
-z.string.sl.ephememal_units_minute = 'minuta';
-z.string.sl.ephememal_units_minutes = 'minut';
-z.string.sl.ephememal_units_hour = 'ura';
-z.string.sl.ephememal_units_hours = 'ur';
-z.string.sl.ephememal_units_day = 'dan';
-z.string.sl.ephememal_units_days = 'dni';
+z.string.sl.ephememalUnitsNone = 'Izklopljeno';
+z.string.sl.ephememalUnitsSecond = 'sekunda';
+z.string.sl.ephememalUnitsSeconds = 'sekund';
+z.string.sl.ephememalUnitsMinute = 'minuta';
+z.string.sl.ephememalUnitsMinutes = 'minut';
+z.string.sl.ephememalUnitsHour = 'ura';
+z.string.sl.ephememalUnitsHours = 'ur';
+z.string.sl.ephememalUnitsDay = 'dan';
+z.string.sl.ephememalUnitsDays = 'dni';
 

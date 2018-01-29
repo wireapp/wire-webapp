@@ -18,8 +18,8 @@
  */
 
 z.string.ro.wire = 'Wire';
-z.string.ro.wire_macos = 'Wire pentru macOS';
-z.string.ro.wire_windows = 'Wire pentru Windows';
+z.string.ro.wireMacos = 'Wire pentru macOS';
+z.string.ro.wireWindows = 'Wire pentru Windows';
 z.string.ro.wire_linux = 'Wire pentru Linux';
 z.string.ro.nonexistent_user = 'Utilizator șters';
 z.string.ro.and = 'și';
@@ -173,7 +173,7 @@ z.string.ro.modal_session_reset_message_link = 'contactează-';
 z.string.ro.modal_session_reset_message_2 = 'ne.';
 z.string.ro.modal_too_many_members_headline = 'Canalul este plin';
 z.string.ro.modal_too_many_members_message = 'Maxim {{number1}} persoane se pot alătura conversației. Mai este loc pentru {{number2}} persoane aici.';
-z.string.ro.modal_uploads_parallel = 'Poți trimite maxim {{number}} fișiere simultan.';
+z.string.ro.modalUploadsParallel = 'Poți trimite maxim {{number}} fișiere simultan.';
 
 z.string.ro.connection_request_connect = 'Conectare';
 z.string.ro.connection_request_ignore = 'Ignoră';
@@ -550,21 +550,21 @@ z.string.ro.tooltip_preferences_rename = 'Schimbă numele tău';
 
 z.string.ro.tooltip_search_close = 'Închide (Esc)';
 
-z.string.ro.init_received_self_user = 'Bună, {{user}}.';
-z.string.ro.init_validated_client = 'Se încarcă conexiunile și conversațiile tale';
-z.string.ro.init_received_user_data = 'Verifică dacă sunt mesaje noi';
+z.string.ro.initReceivedSelfUser = 'Bună, {{user}}.';
+z.string.ro.initValidatedClient = 'Se încarcă conexiunile și conversațiile tale';
+z.string.ro.initReceivedUserData = 'Verifică dacă sunt mesaje noi';
 z.string.ro.init_decryption = 'Se decriptează mesaje';
 z.string.ro.init_events = 'Se încarcă mesaje';
 z.string.ro.init_updated_from_notifications = 'Aproape gata - Bucură-te de Wire';
 z.string.ro.init_progress = ' — {{number1}} din {{number2}}';
 
-z.string.ro.ephememal_units_none = 'Închis';
-z.string.ro.ephememal_units_second = 'secundă';
-z.string.ro.ephememal_units_seconds = 'secunde';
-z.string.ro.ephememal_units_minute = 'minut';
-z.string.ro.ephememal_units_minutes = 'minute';
-z.string.ro.ephememal_units_hour = 'oră';
-z.string.ro.ephememal_units_hours = 'ore';
-z.string.ro.ephememal_units_day = 'zi';
-z.string.ro.ephememal_units_days = 'zile';
+z.string.ro.ephememalUnitsNone = 'Închis';
+z.string.ro.ephememalUnitsSecond = 'secundă';
+z.string.ro.ephememalUnitsSeconds = 'secunde';
+z.string.ro.ephememalUnitsMinute = 'minut';
+z.string.ro.ephememalUnitsMinutes = 'minute';
+z.string.ro.ephememalUnitsHour = 'oră';
+z.string.ro.ephememalUnitsHours = 'ore';
+z.string.ro.ephememalUnitsDay = 'zi';
+z.string.ro.ephememalUnitsDays = 'zile';
 

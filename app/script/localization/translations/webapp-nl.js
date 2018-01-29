@@ -18,8 +18,8 @@
  */
 
 z.string.nl.wire = 'Wire';
-z.string.nl.wire_macos = 'Wire voor macOS';
-z.string.nl.wire_windows = 'Wire voor Windows';
+z.string.nl.wireMacos = 'Wire voor macOS';
+z.string.nl.wireWindows = 'Wire voor Windows';
 z.string.nl.wire_linux = 'Wire voor Linux';
 z.string.nl.nonexistent_user = 'Verwijderde gebruiker';
 z.string.nl.and = 'en';
@@ -173,7 +173,7 @@ z.string.nl.modal_session_reset_message_link = 'contact';
 z.string.nl.modal_session_reset_message_2 = 'ons.';
 z.string.nl.modal_too_many_members_headline = 'Full house';
 z.string.nl.modal_too_many_members_message = 'Maximaal {{number1}} mensen kunnen in een groepsgesprek. Er is nog ruimte voor {{number2}} mensen.';
-z.string.nl.modal_uploads_parallel = 'Je kan tot {{number}} bestanden tegelijk versturen.';
+z.string.nl.modalUploadsParallel = 'Je kan tot {{number}} bestanden tegelijk versturen.';
 
 z.string.nl.connection_request_connect = 'Verbind';
 z.string.nl.connection_request_ignore = 'Negeer';
@@ -556,21 +556,21 @@ z.string.nl.tooltip_preferences_rename = 'Wijzig je naam';
 
 z.string.nl.tooltip_search_close = 'Sluiten (esc)';
 
-z.string.nl.init_received_self_user = 'Hallo {{user}}!';
-z.string.nl.init_validated_client = 'Je gesprekken en connecties worden opgehaald';
-z.string.nl.init_received_user_data = 'Controleer voor nieuwe berichten';
+z.string.nl.initReceivedSelfUser = 'Hallo {{user}}!';
+z.string.nl.initValidatedClient = 'Je gesprekken en connecties worden opgehaald';
+z.string.nl.initReceivedUserData = 'Controleer voor nieuwe berichten';
 z.string.nl.init_decryption = 'Berichten ontsleutelen';
 z.string.nl.init_events = 'Berichten laden';
 z.string.nl.init_updated_from_notifications = 'Bijna klaar - Geniet van Wire';
 z.string.nl.init_progress = ' — {{number1}} van {{number2}}';
 
-z.string.nl.ephememal_units_none = 'Uit';
-z.string.nl.ephememal_units_second = 'seconde';
-z.string.nl.ephememal_units_seconds = 'secondes';
-z.string.nl.ephememal_units_minute = 'minuut';
-z.string.nl.ephememal_units_minutes = 'minuten';
-z.string.nl.ephememal_units_hour = 'uur';
-z.string.nl.ephememal_units_hours = 'uren';
-z.string.nl.ephememal_units_day = 'dag';
-z.string.nl.ephememal_units_days = 'dagen';
+z.string.nl.ephememalUnitsNone = 'Uit';
+z.string.nl.ephememalUnitsSecond = 'seconde';
+z.string.nl.ephememalUnitsSeconds = 'secondes';
+z.string.nl.ephememalUnitsMinute = 'minuut';
+z.string.nl.ephememalUnitsMinutes = 'minuten';
+z.string.nl.ephememalUnitsHour = 'uur';
+z.string.nl.ephememalUnitsHours = 'uren';
+z.string.nl.ephememalUnitsDay = 'dag';
+z.string.nl.ephememalUnitsDays = 'dagen';
 

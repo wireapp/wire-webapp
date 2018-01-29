@@ -17,8 +17,8 @@
  *
  */
 
-z.string.hr.wire_macos = 'Wire za macOS';
-z.string.hr.wire_windows = 'Wire za Windows';
+z.string.hr.wireMacos = 'Wire za macOS';
+z.string.hr.wireWindows = 'Wire za Windows';
 z.string.hr.wire_linux = 'Wire za Linux';
 z.string.hr.nonexistent_user = 'Izbrisani korisnik';
 z.string.hr.and = 'i';
@@ -155,7 +155,7 @@ z.string.hr.modal_session_reset_message_link = 'kontaktirajte';
 z.string.hr.modal_session_reset_message_2 = 'nas.';
 z.string.hr.modal_too_many_members_headline = 'Puna kuća';
 z.string.hr.modal_too_many_members_message = 'Do {{number1}} ljudi može pristupiti razgovoru. Ima mjesta za još {{number2}} ljudi ovdje.';
-z.string.hr.modal_uploads_parallel = 'Možete poslati {{number}} datoteke odjednom.';
+z.string.hr.modalUploadsParallel = 'Možete poslati {{number}} datoteke odjednom.';
 
 z.string.hr.connection_request_connect = 'Poveži se';
 z.string.hr.connection_request_ignore = 'Ignoriraj';
@@ -491,18 +491,18 @@ z.string.hr.tooltip_preferences_rename = 'Promijeni ime';
 
 z.string.hr.tooltip_search_close = 'Zatvori (Esc)';
 
-z.string.hr.init_received_self_user = 'Pozdrav, {{user}}.';
-z.string.hr.init_validated_client = 'Učitavanje veze i razgovora';
-z.string.hr.init_received_user_data = 'Provjeravanje novih poruka';
+z.string.hr.initReceivedSelfUser = 'Pozdrav, {{user}}.';
+z.string.hr.initValidatedClient = 'Učitavanje veze i razgovora';
+z.string.hr.initReceivedUserData = 'Provjeravanje novih poruka';
 z.string.hr.init_events = 'Učitavanje poruka';
 
-z.string.hr.ephememal_units_none = 'Isključi';
-z.string.hr.ephememal_units_second = 'sekunda';
-z.string.hr.ephememal_units_seconds = 'sekundi';
-z.string.hr.ephememal_units_minute = 'minuta';
-z.string.hr.ephememal_units_minutes = 'minuta';
-z.string.hr.ephememal_units_hour = 'sat';
-z.string.hr.ephememal_units_hours = 'sati';
-z.string.hr.ephememal_units_day = 'dan';
-z.string.hr.ephememal_units_days = 'dani';
+z.string.hr.ephememalUnitsNone = 'Isključi';
+z.string.hr.ephememalUnitsSecond = 'sekunda';
+z.string.hr.ephememalUnitsSeconds = 'sekundi';
+z.string.hr.ephememalUnitsMinute = 'minuta';
+z.string.hr.ephememalUnitsMinutes = 'minuta';
+z.string.hr.ephememalUnitsHour = 'sat';
+z.string.hr.ephememalUnitsHours = 'sati';
+z.string.hr.ephememalUnitsDay = 'dan';
+z.string.hr.ephememalUnitsDays = 'dani';
 

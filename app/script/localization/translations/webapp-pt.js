@@ -17,8 +17,8 @@
  *
  */
 
-z.string.pt.wire_macos = 'Wire para macOS';
-z.string.pt.wire_windows = 'Wire para Windows';
+z.string.pt.wireMacos = 'Wire para macOS';
+z.string.pt.wireWindows = 'Wire para Windows';
 z.string.pt.wire_linux = 'Wire para Linux';
 z.string.pt.nonexistent_user = 'Utilizador eliminado';
 z.string.pt.and = 'e';
@@ -172,7 +172,7 @@ z.string.pt.modal_session_reset_message_link = 'contacto';
 z.string.pt.modal_session_reset_message_2 = 'nós.';
 z.string.pt.modal_too_many_members_headline = 'Casa cheia';
 z.string.pt.modal_too_many_members_message = 'Até {{number1}} as pessoas podem participar de uma conversa. Há espaço para mais {{number2}} pessoas.';
-z.string.pt.modal_uploads_parallel = 'Pode enviar até {{number}} ficheiros de cada vez.';
+z.string.pt.modalUploadsParallel = 'Pode enviar até {{number}} ficheiros de cada vez.';
 
 z.string.pt.connection_request_connect = 'Ligar';
 z.string.pt.connection_request_ignore = 'Ignorar';
@@ -554,21 +554,21 @@ z.string.pt.tooltip_preferences_rename = 'Mudar o seu nome';
 
 z.string.pt.tooltip_search_close = 'Fechar (Esc)';
 
-z.string.pt.init_received_self_user = 'Olá {{user}}.';
-z.string.pt.init_validated_client = 'A descarregar as suas ligações e conversas';
-z.string.pt.init_received_user_data = 'A verificar por novas mensagens';
+z.string.pt.initReceivedSelfUser = 'Olá {{user}}.';
+z.string.pt.initValidatedClient = 'A descarregar as suas ligações e conversas';
+z.string.pt.initReceivedUserData = 'A verificar por novas mensagens';
 z.string.pt.init_decryption = 'A desencriptar mensagens';
 z.string.pt.init_events = 'A carregar mensagens';
 z.string.pt.init_updated_from_notifications = 'Quase pronto - Desfrute do Wire';
 z.string.pt.init_progress = ' — {{number1}} de {{number2}}';
 
-z.string.pt.ephememal_units_none = 'Desligado';
-z.string.pt.ephememal_units_second = 'segundo';
-z.string.pt.ephememal_units_seconds = 'segundos';
-z.string.pt.ephememal_units_minute = 'minuto';
-z.string.pt.ephememal_units_minutes = 'minutos';
-z.string.pt.ephememal_units_hour = 'hora';
-z.string.pt.ephememal_units_hours = 'horas';
-z.string.pt.ephememal_units_day = 'dia';
-z.string.pt.ephememal_units_days = 'dias';
+z.string.pt.ephememalUnitsNone = 'Desligado';
+z.string.pt.ephememalUnitsSecond = 'segundo';
+z.string.pt.ephememalUnitsSeconds = 'segundos';
+z.string.pt.ephememalUnitsMinute = 'minuto';
+z.string.pt.ephememalUnitsMinutes = 'minutos';
+z.string.pt.ephememalUnitsHour = 'hora';
+z.string.pt.ephememalUnitsHours = 'horas';
+z.string.pt.ephememalUnitsDay = 'dia';
+z.string.pt.ephememalUnitsDays = 'dias';
 

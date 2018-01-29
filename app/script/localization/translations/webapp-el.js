@@ -17,8 +17,8 @@
  *
  */
 
-z.string.el.wire_macos = 'Wire για macOS';
-z.string.el.wire_windows = 'Wire για Windows';
+z.string.el.wireMacos = 'Wire για macOS';
+z.string.el.wireWindows = 'Wire για Windows';
 z.string.el.wire_linux = 'Wire για Linux';
 z.string.el.nonexistent_user = 'Διεγραμμένος χρήστης';
 z.string.el.and = 'και';
@@ -169,7 +169,7 @@ z.string.el.modal_session_reset_message_link = 'επαφή';
 z.string.el.modal_session_reset_message_2 = 'Εμάς.';
 z.string.el.modal_too_many_members_headline = 'Full house';
 z.string.el.modal_too_many_members_message = 'Μέχρι και {{number1}} άτομα μπορούν να συμμετάσχουν σε μια συνομιλία. Υπάρχει χώρος για {{number2}} επιπλέον άτομα εδώ.';
-z.string.el.modal_uploads_parallel = 'Μπορείτε να στείλετε μέχρι και {{number}} αρχεία ταυτόχρονα.';
+z.string.el.modalUploadsParallel = 'Μπορείτε να στείλετε μέχρι και {{number}} αρχεία ταυτόχρονα.';
 
 z.string.el.connection_request_connect = 'Σύνδεση';
 z.string.el.connection_request_ignore = 'Αγνόηση';
@@ -545,17 +545,17 @@ z.string.el.tooltip_preferences_rename = 'Επιλέξτε το όνομα σα�
 
 z.string.el.tooltip_search_close = 'Κλείσιμο (Esc)';
 
-z.string.el.init_received_self_user = 'Γεια σου, {{user}}.';
-z.string.el.init_received_user_data = 'Ελέγξτε για νέα μηνύματα';
+z.string.el.initReceivedSelfUser = 'Γεια σου, {{user}}.';
+z.string.el.initReceivedUserData = 'Ελέγξτε για νέα μηνύματα';
 z.string.el.init_events = 'Φόρτωση μηνυμάτων';
 
-z.string.el.ephememal_units_none = 'Ανενεργό';
-z.string.el.ephememal_units_second = 'δευτερόλεπτο';
-z.string.el.ephememal_units_seconds = 'δευτερόλεπτα';
-z.string.el.ephememal_units_minute = 'λεπτό';
-z.string.el.ephememal_units_minutes = 'λεπτά';
-z.string.el.ephememal_units_hour = 'ώρα';
-z.string.el.ephememal_units_hours = 'ώρες';
-z.string.el.ephememal_units_day = 'ημέρα';
-z.string.el.ephememal_units_days = 'ημέρες';
+z.string.el.ephememalUnitsNone = 'Ανενεργό';
+z.string.el.ephememalUnitsSecond = 'δευτερόλεπτο';
+z.string.el.ephememalUnitsSeconds = 'δευτερόλεπτα';
+z.string.el.ephememalUnitsMinute = 'λεπτό';
+z.string.el.ephememalUnitsMinutes = 'λεπτά';
+z.string.el.ephememalUnitsHour = 'ώρα';
+z.string.el.ephememalUnitsHours = 'ώρες';
+z.string.el.ephememalUnitsDay = 'ημέρα';
+z.string.el.ephememalUnitsDays = 'ημέρες';
 

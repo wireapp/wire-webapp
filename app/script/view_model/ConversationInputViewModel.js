@@ -483,23 +483,23 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
   _get_localized_unit_string(number, unit) {
     if (unit === 's') {
       if (number === 1) {
-        return z.l10n.text(z.string.ephememal_units_second);
+        return z.l10n.text(z.string.ephememalUnitsSecond);
       }
-      return z.l10n.text(z.string.ephememal_units_seconds);
+      return z.l10n.text(z.string.ephememalUnitsSeconds);
     }
 
     if (unit === 'm') {
       if (number === 1) {
-        return z.l10n.text(z.string.ephememal_units_minute);
+        return z.l10n.text(z.string.ephememalUnitsMinute);
       }
-      return z.l10n.text(z.string.ephememal_units_minutes);
+      return z.l10n.text(z.string.ephememalUnitsMinutes);
     }
 
     if (unit === 'd') {
       if (number === 1) {
-        return z.l10n.text(z.string.ephememal_units_day);
+        return z.l10n.text(z.string.ephememalUnitsDay);
       }
-      return z.l10n.text(z.string.ephememal_units_days);
+      return z.l10n.text(z.string.ephememalUnitsDays);
     }
   }
 
@@ -513,7 +513,7 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
     const entries = [
       {
         click: () => this.set_ephemeral_timer(0),
-        label: z.l10n.text(z.string.ephememal_units_none),
+        label: z.l10n.text(z.string.ephememalUnitsNone),
       },
     ].concat(
       z.ephemeral.timings.get_values().map(milliseconds => {

@@ -18,8 +18,8 @@
  */
 
 z.string.hu.wire = 'Wire';
-z.string.hu.wire_macos = 'Wire MacOS-hez';
-z.string.hu.wire_windows = 'Wire Windowshoz';
+z.string.hu.wireMacos = 'Wire MacOS-hez';
+z.string.hu.wireWindows = 'Wire Windowshoz';
 z.string.hu.wire_linux = 'Wire Linuxhoz';
 z.string.hu.nonexistent_user = 'Törölt felhasználó';
 z.string.hu.and = 'és';
@@ -173,7 +173,7 @@ z.string.hu.modal_session_reset_message_link = 'lépj kapcsolatba';
 z.string.hu.modal_session_reset_message_2 = 'velünk.';
 z.string.hu.modal_too_many_members_headline = 'Telt ház';
 z.string.hu.modal_too_many_members_message = 'Legfeljebb {{number1}} partner tud csatlakozni a beszélgetéshez. Még {{number2}} partner számára van hely.';
-z.string.hu.modal_uploads_parallel = 'Egyszerre {{number}} fájt küldhetsz.';
+z.string.hu.modalUploadsParallel = 'Egyszerre {{number}} fájt küldhetsz.';
 
 z.string.hu.connection_request_connect = 'Csatlakozás';
 z.string.hu.connection_request_ignore = 'Figyelmen kívül hagyás';
@@ -561,21 +561,21 @@ z.string.hu.tooltip_preferences_rename = 'Név módosítása';
 
 z.string.hu.tooltip_search_close = 'Bezárás (Esc)';
 
-z.string.hu.init_received_self_user = 'Szia {{user}}!';
-z.string.hu.init_validated_client = 'Kapcsolatok és a beszélgetések lekérése';
-z.string.hu.init_received_user_data = 'Új üzenetek megtekintése';
+z.string.hu.initReceivedSelfUser = 'Szia {{user}}!';
+z.string.hu.initValidatedClient = 'Kapcsolatok és a beszélgetések lekérése';
+z.string.hu.initReceivedUserData = 'Új üzenetek megtekintése';
 z.string.hu.init_decryption = 'Üzenetek visszafejtése';
 z.string.hu.init_events = 'Üzenetek betöltése';
 z.string.hu.init_updated_from_notifications = 'Majdnem kész - Élvezd a Wire-t';
 z.string.hu.init_progress = ' — {{number1}} / {{number2}}';
 
-z.string.hu.ephememal_units_none = 'Kikapcsolás';
-z.string.hu.ephememal_units_second = 'másodperc';
-z.string.hu.ephememal_units_seconds = 'másodperc';
-z.string.hu.ephememal_units_minute = 'perc';
-z.string.hu.ephememal_units_minutes = 'perc';
-z.string.hu.ephememal_units_hour = 'óra';
-z.string.hu.ephememal_units_hours = 'óra';
-z.string.hu.ephememal_units_day = 'nap';
-z.string.hu.ephememal_units_days = 'nap';
+z.string.hu.ephememalUnitsNone = 'Kikapcsolás';
+z.string.hu.ephememalUnitsSecond = 'másodperc';
+z.string.hu.ephememalUnitsSeconds = 'másodperc';
+z.string.hu.ephememalUnitsMinute = 'perc';
+z.string.hu.ephememalUnitsMinutes = 'perc';
+z.string.hu.ephememalUnitsHour = 'óra';
+z.string.hu.ephememalUnitsHours = 'óra';
+z.string.hu.ephememalUnitsDay = 'nap';
+z.string.hu.ephememalUnitsDays = 'nap';
 

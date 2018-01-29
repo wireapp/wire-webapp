@@ -18,8 +18,8 @@
  */
 
 z.string.sk.wire = 'Wire';
-z.string.sk.wire_macos = 'Wire pre macOS';
-z.string.sk.wire_windows = 'Wire pre Windows';
+z.string.sk.wireMacos = 'Wire pre macOS';
+z.string.sk.wireWindows = 'Wire pre Windows';
 z.string.sk.wire_linux = 'Wire pre Linux';
 z.string.sk.nonexistent_user = 'Odstránený používateľ';
 z.string.sk.and = 'a';
@@ -171,7 +171,7 @@ z.string.sk.modal_session_reset_message_link = 'kontakt';
 z.string.sk.modal_session_reset_message_2 = 'nás.';
 z.string.sk.modal_too_many_members_headline = 'Priveľa účastníkov';
 z.string.sk.modal_too_many_members_message = 'Do rozhovoru sa môže zapojiť {{number1}} ľudí. ';
-z.string.sk.modal_uploads_parallel = 'Súčasne môžete poslať až {{number}} súborov.';
+z.string.sk.modalUploadsParallel = 'Súčasne môžete poslať až {{number}} súborov.';
 
 z.string.sk.connection_request_connect = 'Pripojiť';
 z.string.sk.connection_request_ignore = 'Ignorovať';
@@ -548,19 +548,19 @@ z.string.sk.tooltip_preferences_rename = 'Zmeniť Vaše meno';
 
 z.string.sk.tooltip_search_close = 'Zavrieť (Esc)';
 
-z.string.sk.init_received_self_user = 'Ahoj, {{user}}.';
-z.string.sk.init_validated_client = 'Získavanie pripojení a konverzácií';
-z.string.sk.init_received_user_data = 'Kontrola nových správ';
+z.string.sk.initReceivedSelfUser = 'Ahoj, {{user}}.';
+z.string.sk.initValidatedClient = 'Získavanie pripojení a konverzácií';
+z.string.sk.initReceivedUserData = 'Kontrola nových správ';
 z.string.sk.init_decryption = 'Dešifrovať správy';
 z.string.sk.init_events = 'Načítavam správy';
 
-z.string.sk.ephememal_units_none = 'Vypnúť';
-z.string.sk.ephememal_units_second = 'sekunda';
-z.string.sk.ephememal_units_seconds = 'sekundy';
-z.string.sk.ephememal_units_minute = 'minúta';
-z.string.sk.ephememal_units_minutes = 'minúty';
-z.string.sk.ephememal_units_hour = 'hodina';
-z.string.sk.ephememal_units_hours = 'hodiny';
-z.string.sk.ephememal_units_day = 'deň';
-z.string.sk.ephememal_units_days = 'dni';
+z.string.sk.ephememalUnitsNone = 'Vypnúť';
+z.string.sk.ephememalUnitsSecond = 'sekunda';
+z.string.sk.ephememalUnitsSeconds = 'sekundy';
+z.string.sk.ephememalUnitsMinute = 'minúta';
+z.string.sk.ephememalUnitsMinutes = 'minúty';
+z.string.sk.ephememalUnitsHour = 'hodina';
+z.string.sk.ephememalUnitsHours = 'hodiny';
+z.string.sk.ephememalUnitsDay = 'deň';
+z.string.sk.ephememalUnitsDays = 'dni';
 

@@ -17,8 +17,8 @@
  *
  */
 
-z.string.es.wire_macos = 'Wire para macOS';
-z.string.es.wire_windows = 'Wire para Windows';
+z.string.es.wireMacos = 'Wire para macOS';
+z.string.es.wireWindows = 'Wire para Windows';
 z.string.es.wire_linux = 'Wire para Linux';
 z.string.es.nonexistent_user = 'Usuario Borrado';
 z.string.es.and = 'y';
@@ -172,7 +172,7 @@ z.string.es.modal_session_reset_message_link = 'comunicarse con';
 z.string.es.modal_session_reset_message_2 = 'nosotros.';
 z.string.es.modal_too_many_members_headline = 'Llamada llena';
 z.string.es.modal_too_many_members_message = 'Hasta {{number1}} personas pueden unirse a una conversación. Hay espacio para {{number2}} más personas aquí.';
-z.string.es.modal_uploads_parallel = 'Puede enviar hasta {{number}} archivos a la vez.';
+z.string.es.modalUploadsParallel = 'Puede enviar hasta {{number}} archivos a la vez.';
 
 z.string.es.connection_request_connect = 'Conectar';
 z.string.es.connection_request_ignore = 'Ignorar';
@@ -555,21 +555,21 @@ z.string.es.tooltip_preferences_rename = 'Cambiar tu nombre';
 
 z.string.es.tooltip_search_close = 'Cerrar (Esc)';
 
-z.string.es.init_received_self_user = 'Hola, {{user}}.';
-z.string.es.init_validated_client = 'Cargando conexiones y conversaciones';
-z.string.es.init_received_user_data = 'Buscando mensajes nuevos';
+z.string.es.initReceivedSelfUser = 'Hola, {{user}}.';
+z.string.es.initValidatedClient = 'Cargando conexiones y conversaciones';
+z.string.es.initReceivedUserData = 'Buscando mensajes nuevos';
 z.string.es.init_decryption = 'Descifrando mensajes';
 z.string.es.init_events = 'Cargando mensajes';
 z.string.es.init_updated_from_notifications = 'Casi terminado - Disfruta  Wire';
 z.string.es.init_progress = ' — {{number1}} de {{number2}}';
 
-z.string.es.ephememal_units_none = 'Desactivar';
-z.string.es.ephememal_units_second = 'segundo';
-z.string.es.ephememal_units_seconds = 'segundos';
-z.string.es.ephememal_units_minute = 'minuto';
-z.string.es.ephememal_units_minutes = 'minutos';
-z.string.es.ephememal_units_hour = 'hora';
-z.string.es.ephememal_units_hours = 'horas';
-z.string.es.ephememal_units_day = 'día';
-z.string.es.ephememal_units_days = 'días';
+z.string.es.ephememalUnitsNone = 'Desactivar';
+z.string.es.ephememalUnitsSecond = 'segundo';
+z.string.es.ephememalUnitsSeconds = 'segundos';
+z.string.es.ephememalUnitsMinute = 'minuto';
+z.string.es.ephememalUnitsMinutes = 'minutos';
+z.string.es.ephememalUnitsHour = 'hora';
+z.string.es.ephememalUnitsHours = 'horas';
+z.string.es.ephememalUnitsDay = 'día';
+z.string.es.ephememalUnitsDays = 'días';
 

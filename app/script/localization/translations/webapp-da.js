@@ -17,8 +17,8 @@
  *
  */
 
-z.string.da.wire_macos = 'Wire til macOS';
-z.string.da.wire_windows = 'Wire til Windows';
+z.string.da.wireMacos = 'Wire til macOS';
+z.string.da.wireWindows = 'Wire til Windows';
 z.string.da.wire_linux = 'Wire til Linux';
 z.string.da.nonexistent_user = 'Slet bruger';
 z.string.da.and = 'og';
@@ -159,7 +159,7 @@ z.string.da.modal_session_reset_message_link = 'kontakt';
 z.string.da.modal_session_reset_message_2 = 'os.';
 z.string.da.modal_too_many_members_headline = 'Fuldt hus';
 z.string.da.modal_too_many_members_message = 'Op til {{number1}} personer kan deltage i en samtale. Der er plads til {{number2}} personer mere herinde.';
-z.string.da.modal_uploads_parallel = 'Du kan sende op til {{number}} filer på én gang.';
+z.string.da.modalUploadsParallel = 'Du kan sende op til {{number}} filer på én gang.';
 
 z.string.da.connection_request_connect = 'Forbind';
 z.string.da.connection_request_ignore = 'Ignorér';
@@ -521,18 +521,18 @@ z.string.da.tooltip_preferences_rename = 'Ændre dit navn';
 
 z.string.da.tooltip_search_close = 'Luk (Esc)';
 
-z.string.da.init_received_self_user = 'Hej, {{user}}.';
-z.string.da.init_validated_client = 'Henter dine forbindelser og samtaler';
-z.string.da.init_received_user_data = 'Tjekker for nye beskeder';
+z.string.da.initReceivedSelfUser = 'Hej, {{user}}.';
+z.string.da.initValidatedClient = 'Henter dine forbindelser og samtaler';
+z.string.da.initReceivedUserData = 'Tjekker for nye beskeder';
 z.string.da.init_events = 'Indlæser meddelelser';
 
-z.string.da.ephememal_units_none = 'Slået Fra';
-z.string.da.ephememal_units_second = 'sekund';
-z.string.da.ephememal_units_seconds = 'sekunder';
-z.string.da.ephememal_units_minute = 'minut';
-z.string.da.ephememal_units_minutes = 'minutter';
-z.string.da.ephememal_units_hour = 'time';
-z.string.da.ephememal_units_hours = 'timer';
-z.string.da.ephememal_units_day = 'dag';
-z.string.da.ephememal_units_days = 'dage';
+z.string.da.ephememalUnitsNone = 'Slået Fra';
+z.string.da.ephememalUnitsSecond = 'sekund';
+z.string.da.ephememalUnitsSeconds = 'sekunder';
+z.string.da.ephememalUnitsMinute = 'minut';
+z.string.da.ephememalUnitsMinutes = 'minutter';
+z.string.da.ephememalUnitsHour = 'time';
+z.string.da.ephememalUnitsHours = 'timer';
+z.string.da.ephememalUnitsDay = 'dag';
+z.string.da.ephememalUnitsDays = 'dage';
 

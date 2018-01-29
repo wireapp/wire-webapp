@@ -17,8 +17,8 @@
  *
  */
 
-z.string.uk.wire_macos = 'Wire для macOS';
-z.string.uk.wire_windows = 'Wire для Windows';
+z.string.uk.wireMacos = 'Wire для macOS';
+z.string.uk.wireWindows = 'Wire для Windows';
 z.string.uk.wire_linux = 'Wire для Linux';
 z.string.uk.nonexistent_user = 'Видалений користувач';
 z.string.uk.and = 'і';
@@ -171,7 +171,7 @@ z.string.uk.modal_session_reset_message_link = 'зв’яжіться';
 z.string.uk.modal_session_reset_message_2 = 'з нами.';
 z.string.uk.modal_too_many_members_headline = 'Голосовий канал переповнений';
 z.string.uk.modal_too_many_members_message = 'В розмові може бути до {{number1}} учасників. В даній розмові уже не вистачає місця для {{number}} учасників.';
-z.string.uk.modal_uploads_parallel = 'Ви можете надіслати до {{number}} файлів за один раз.';
+z.string.uk.modalUploadsParallel = 'Ви можете надіслати до {{number}} файлів за один раз.';
 
 z.string.uk.connection_request_connect = 'Додати до контактів';
 z.string.uk.connection_request_ignore = 'Ігнорувати';
@@ -554,21 +554,21 @@ z.string.uk.tooltip_preferences_rename = 'Змініть своє ім’я';
 
 z.string.uk.tooltip_search_close = 'Закрити (Esc)';
 
-z.string.uk.init_received_self_user = 'Привіт {{user}}.';
-z.string.uk.init_validated_client = 'Отримую список контактів та розмов';
-z.string.uk.init_received_user_data = 'Перевіряю наявність нових повідомлень';
+z.string.uk.initReceivedSelfUser = 'Привіт {{user}}.';
+z.string.uk.initValidatedClient = 'Отримую список контактів та розмов';
+z.string.uk.initReceivedUserData = 'Перевіряю наявність нових повідомлень';
 z.string.uk.init_decryption = 'Дешифрую повідомлення';
 z.string.uk.init_events = 'Завантажую повідомлення';
 z.string.uk.init_updated_from_notifications = 'Майже завершено - Приємного користування!';
 z.string.uk.init_progress = ' — {{number1}} з {{number2}}';
 
-z.string.uk.ephememal_units_none = 'Вимкнений';
-z.string.uk.ephememal_units_second = 'секунда';
-z.string.uk.ephememal_units_seconds = 'сек';
-z.string.uk.ephememal_units_minute = 'хв';
-z.string.uk.ephememal_units_minutes = 'хв';
-z.string.uk.ephememal_units_hour = 'година';
-z.string.uk.ephememal_units_hours = 'годин';
-z.string.uk.ephememal_units_day = 'день';
-z.string.uk.ephememal_units_days = 'дні';
+z.string.uk.ephememalUnitsNone = 'Вимкнений';
+z.string.uk.ephememalUnitsSecond = 'секунда';
+z.string.uk.ephememalUnitsSeconds = 'сек';
+z.string.uk.ephememalUnitsMinute = 'хв';
+z.string.uk.ephememalUnitsMinutes = 'хв';
+z.string.uk.ephememalUnitsHour = 'година';
+z.string.uk.ephememalUnitsHours = 'годин';
+z.string.uk.ephememalUnitsDay = 'день';
+z.string.uk.ephememalUnitsDays = 'дні';
 

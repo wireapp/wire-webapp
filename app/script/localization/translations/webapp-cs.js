@@ -17,8 +17,8 @@
  *
  */
 
-z.string.cs.wire_macos = 'Wire pro macOS';
-z.string.cs.wire_windows = 'Wire pro Windows';
+z.string.cs.wireMacos = 'Wire pro macOS';
+z.string.cs.wireWindows = 'Wire pro Windows';
 z.string.cs.wire_linux = 'Wire pro Linux';
 z.string.cs.nonexistent_user = 'Smazaný uživatel';
 z.string.cs.and = 'a';
@@ -170,7 +170,7 @@ z.string.cs.modal_session_reset_message_link = 'kontaktujte';
 z.string.cs.modal_session_reset_message_2 = 'nás.';
 z.string.cs.modal_too_many_members_headline = 'Přeplněné kupé';
 z.string.cs.modal_too_many_members_message = 'Ke konverzaci se může připojit az {{number1}} účastníků. Je zde ještě místo pro {{number2}}.';
-z.string.cs.modal_uploads_parallel = 'Najednou můžete poslat až {{number}} souborů.';
+z.string.cs.modalUploadsParallel = 'Najednou můžete poslat až {{number}} souborů.';
 
 z.string.cs.connection_request_connect = 'Připojit';
 z.string.cs.connection_request_ignore = 'Ignorovat';
@@ -546,18 +546,18 @@ z.string.cs.tooltip_preferences_rename = 'Změnit jméno';
 
 z.string.cs.tooltip_search_close = 'Zavřít (Esc)';
 
-z.string.cs.init_received_self_user = 'Ahoj, {{user}}.';
-z.string.cs.init_received_user_data = 'Kontrola nových zpráv';
+z.string.cs.initReceivedSelfUser = 'Ahoj, {{user}}.';
+z.string.cs.initReceivedUserData = 'Kontrola nových zpráv';
 z.string.cs.init_decryption = 'Dešifrovat zprávu';
 z.string.cs.init_events = 'Zprávy se načítají';
 
-z.string.cs.ephememal_units_none = 'Vypnout';
-z.string.cs.ephememal_units_second = 'sekunda';
-z.string.cs.ephememal_units_seconds = 'sekund(y)';
-z.string.cs.ephememal_units_minute = 'minuta';
-z.string.cs.ephememal_units_minutes = 'minut';
-z.string.cs.ephememal_units_hour = 'hodina';
-z.string.cs.ephememal_units_hours = 'hodin';
-z.string.cs.ephememal_units_day = 'den';
-z.string.cs.ephememal_units_days = 'dnů';
+z.string.cs.ephememalUnitsNone = 'Vypnout';
+z.string.cs.ephememalUnitsSecond = 'sekunda';
+z.string.cs.ephememalUnitsSeconds = 'sekund(y)';
+z.string.cs.ephememalUnitsMinute = 'minuta';
+z.string.cs.ephememalUnitsMinutes = 'minut';
+z.string.cs.ephememalUnitsHour = 'hodina';
+z.string.cs.ephememalUnitsHours = 'hodin';
+z.string.cs.ephememalUnitsDay = 'den';
+z.string.cs.ephememalUnitsDays = 'dnů';
 

@@ -17,8 +17,8 @@
  *
  */
 
-z.string.fi.wire_macos = 'Wire macOS: lle';
-z.string.fi.wire_windows = 'Wire Windowsille';
+z.string.fi.wireMacos = 'Wire macOS: lle';
+z.string.fi.wireWindows = 'Wire Windowsille';
 z.string.fi.wire_linux = 'Wire Linuxille';
 z.string.fi.nonexistent_user = 'Poistettu käyttäjä';
 z.string.fi.and = 'ja';
@@ -171,7 +171,7 @@ z.string.fi.modal_session_reset_message_link = 'ota yhteys';
 z.string.fi.modal_session_reset_message_2 = 'meihin.';
 z.string.fi.modal_too_many_members_headline = 'Kaikki puhelukanavat varattuja';
 z.string.fi.modal_too_many_members_message = 'Maksimissaan {{number1}} henkilöä voi liittyä keskusteluun. Tässä keskustelussa on tilaa {{number2}} hengelle.';
-z.string.fi.modal_uploads_parallel = 'Voit lähettää jopa {{number}} tiedostoa samaan aikaan.';
+z.string.fi.modalUploadsParallel = 'Voit lähettää jopa {{number}} tiedostoa samaan aikaan.';
 
 z.string.fi.connection_request_connect = 'Yhdistä';
 z.string.fi.connection_request_ignore = 'Hylkää';
@@ -548,21 +548,21 @@ z.string.fi.tooltip_preferences_rename = 'Vaihda nimesi';
 
 z.string.fi.tooltip_search_close = 'Sulje (Esc)';
 
-z.string.fi.init_received_self_user = 'He, {{user}}.';
-z.string.fi.init_validated_client = 'Haetaan yhteyksiäsi ja keskustelujasi';
-z.string.fi.init_received_user_data = 'Tarkistetaan uusia viestejä';
+z.string.fi.initReceivedSelfUser = 'He, {{user}}.';
+z.string.fi.initValidatedClient = 'Haetaan yhteyksiäsi ja keskustelujasi';
+z.string.fi.initReceivedUserData = 'Tarkistetaan uusia viestejä';
 z.string.fi.init_decryption = 'Puretaan viestejä';
 z.string.fi.init_events = 'Ladataan viestejä';
 z.string.fi.init_updated_from_notifications = 'Melkein valmista - nauti Wirestä';
 z.string.fi.init_progress = ' — {{number1}} / {{number2}}';
 
-z.string.fi.ephememal_units_none = 'Pois päältä';
-z.string.fi.ephememal_units_second = 'sekunti';
-z.string.fi.ephememal_units_seconds = 'sekuntia';
-z.string.fi.ephememal_units_minute = 'minuutti';
-z.string.fi.ephememal_units_minutes = 'minuutia';
-z.string.fi.ephememal_units_hour = 'tunti';
-z.string.fi.ephememal_units_hours = 'tuntia';
-z.string.fi.ephememal_units_day = 'päivä';
-z.string.fi.ephememal_units_days = 'päivää';
+z.string.fi.ephememalUnitsNone = 'Pois päältä';
+z.string.fi.ephememalUnitsSecond = 'sekunti';
+z.string.fi.ephememalUnitsSeconds = 'sekuntia';
+z.string.fi.ephememalUnitsMinute = 'minuutti';
+z.string.fi.ephememalUnitsMinutes = 'minuutia';
+z.string.fi.ephememalUnitsHour = 'tunti';
+z.string.fi.ephememalUnitsHours = 'tuntia';
+z.string.fi.ephememalUnitsDay = 'päivä';
+z.string.fi.ephememalUnitsDays = 'päivää';
 

@@ -332,9 +332,9 @@ z.client.ClientRepository = class ClientRepository {
     if (z.util.Environment.desktop) {
       let identifier;
       if (z.util.Environment.os.mac) {
-        identifier = z.string.wire_macos;
+        identifier = z.string.wireMacos;
       } else if (z.util.Environment.os.win) {
-        identifier = z.string.wire_windows;
+        identifier = z.string.wireWindows;
       } else {
         identifier = z.string.wire_linux;
       }

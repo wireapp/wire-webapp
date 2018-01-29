@@ -18,8 +18,8 @@
  */
 
 z.string.lt.wire = 'Wire';
-z.string.lt.wire_macos = 'Wire, skirta macOS';
-z.string.lt.wire_windows = 'Wire, skirta Windows';
+z.string.lt.wireMacos = 'Wire, skirta macOS';
+z.string.lt.wireWindows = 'Wire, skirta Windows';
 z.string.lt.wire_linux = 'Wire, skirta Linux';
 z.string.lt.nonexistent_user = 'Ištrintas naudotojas';
 z.string.lt.and = 'ir';
@@ -173,7 +173,7 @@ z.string.lt.modal_session_reset_message_link = 'susisiekite';
 z.string.lt.modal_session_reset_message_2 = 'su mumis.';
 z.string.lt.modal_too_many_members_headline = 'Balso kanalas perpildytas';
 z.string.lt.modal_too_many_members_message = 'Prie pokalbio gali prisijungti iki {{number1}} žmonių. Čia yra vietos tik dar {{number2}} žmonėms.';
-z.string.lt.modal_uploads_parallel = 'Jūs vienu metu galite siųsti iki {{number}} failų.';
+z.string.lt.modalUploadsParallel = 'Jūs vienu metu galite siųsti iki {{number}} failų.';
 
 z.string.lt.connection_request_connect = 'Užmegzti kontaktą';
 z.string.lt.connection_request_ignore = 'Nepaisyti';
@@ -556,21 +556,21 @@ z.string.lt.tooltip_preferences_rename = 'Pakeisti savo vardą';
 
 z.string.lt.tooltip_search_close = 'Užverti (Esc)';
 
-z.string.lt.init_received_self_user = 'Sveiki, {{user}}.';
-z.string.lt.init_validated_client = 'Gaunami jūsų kontaktai ir pokalbiai';
-z.string.lt.init_received_user_data = 'Tikrinama ar yra naujų žinučių';
+z.string.lt.initReceivedSelfUser = 'Sveiki, {{user}}.';
+z.string.lt.initValidatedClient = 'Gaunami jūsų kontaktai ir pokalbiai';
+z.string.lt.initReceivedUserData = 'Tikrinama ar yra naujų žinučių';
 z.string.lt.init_decryption = 'Iššifruojamos žinutės';
 z.string.lt.init_events = 'Įkeliamos žinutės';
 z.string.lt.init_updated_from_notifications = 'Beveik baigta – mėgaukitės „Wire“';
 z.string.lt.init_progress = ' — {{number1}} iš {{number2}}';
 
-z.string.lt.ephememal_units_none = 'Išjungta';
-z.string.lt.ephememal_units_second = 'sek.';
-z.string.lt.ephememal_units_seconds = 'sek.';
-z.string.lt.ephememal_units_minute = 'min.';
-z.string.lt.ephememal_units_minutes = 'min.';
-z.string.lt.ephememal_units_hour = 'val.';
-z.string.lt.ephememal_units_hours = 'val.';
-z.string.lt.ephememal_units_day = 'diena';
-z.string.lt.ephememal_units_days = 'dienos(-ų)';
+z.string.lt.ephememalUnitsNone = 'Išjungta';
+z.string.lt.ephememalUnitsSecond = 'sek.';
+z.string.lt.ephememalUnitsSeconds = 'sek.';
+z.string.lt.ephememalUnitsMinute = 'min.';
+z.string.lt.ephememalUnitsMinutes = 'min.';
+z.string.lt.ephememalUnitsHour = 'val.';
+z.string.lt.ephememalUnitsHours = 'val.';
+z.string.lt.ephememalUnitsDay = 'diena';
+z.string.lt.ephememalUnitsDays = 'dienos(-ų)';
 

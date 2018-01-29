@@ -299,7 +299,7 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
   }
 
   _show_modal_upload_parallel(content, title_element) {
-    title_element.text(z.l10n.text(z.string.modal_uploads_parallel, content));
+    title_element.text(z.l10n.text(z.string.modalUploadsParallel, content));
   }
 
   _show_modal_upload_too_large(content, title_element) {

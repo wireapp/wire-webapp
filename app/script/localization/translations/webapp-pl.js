@@ -17,8 +17,8 @@
  *
  */
 
-z.string.pl.wire_macos = 'Wire dla macOS';
-z.string.pl.wire_windows = 'Wire dla Windows';
+z.string.pl.wireMacos = 'Wire dla macOS';
+z.string.pl.wireWindows = 'Wire dla Windows';
 z.string.pl.wire_linux = 'Wire dla Linuksa';
 z.string.pl.nonexistent_user = 'Użytkownik usunięty';
 z.string.pl.and = 'oraz';
@@ -171,7 +171,7 @@ z.string.pl.modal_session_reset_message_link = 'kontakt';
 z.string.pl.modal_session_reset_message_2 = 'nas.';
 z.string.pl.modal_too_many_members_headline = 'Zbyt wielu uczestników rozmowy';
 z.string.pl.modal_too_many_members_message = 'Maksymalna liczba rozmówców to {{number1}}. Nie ma już miejsca na dodatkowe {{number2}} osoby.';
-z.string.pl.modal_uploads_parallel = 'Jednorazowo możesz wysłać maksymalnie {{number}} plików.';
+z.string.pl.modalUploadsParallel = 'Jednorazowo możesz wysłać maksymalnie {{number}} plików.';
 
 z.string.pl.connection_request_connect = 'Połącz';
 z.string.pl.connection_request_ignore = 'Ignoruj';
@@ -548,21 +548,21 @@ z.string.pl.tooltip_preferences_rename = 'Zmień swoją nazwę';
 
 z.string.pl.tooltip_search_close = 'Zamknij (Esc)';
 
-z.string.pl.init_received_self_user = 'Cześć, {{user}}.';
-z.string.pl.init_validated_client = 'Pobieranie Twoich kontaktów i rozmów';
-z.string.pl.init_received_user_data = 'Sprawdzanie nowych wiadomości';
+z.string.pl.initReceivedSelfUser = 'Cześć, {{user}}.';
+z.string.pl.initValidatedClient = 'Pobieranie Twoich kontaktów i rozmów';
+z.string.pl.initReceivedUserData = 'Sprawdzanie nowych wiadomości';
 z.string.pl.init_decryption = 'Odszyfrowywanie wiadomości';
 z.string.pl.init_events = 'Ładowanie wiadomości';
 z.string.pl.init_updated_from_notifications = 'Prawie skończone - miłego korzystania z Wire';
 z.string.pl.init_progress = ' — {{number1}} z {{number2}}';
 
-z.string.pl.ephememal_units_none = 'Wyłącz';
-z.string.pl.ephememal_units_second = 'sekunda';
-z.string.pl.ephememal_units_seconds = 'sekund';
-z.string.pl.ephememal_units_minute = 'minuta';
-z.string.pl.ephememal_units_minutes = 'minut';
-z.string.pl.ephememal_units_hour = 'godzina';
-z.string.pl.ephememal_units_hours = 'godzin';
-z.string.pl.ephememal_units_day = 'dzień';
-z.string.pl.ephememal_units_days = 'dni';
+z.string.pl.ephememalUnitsNone = 'Wyłącz';
+z.string.pl.ephememalUnitsSecond = 'sekunda';
+z.string.pl.ephememalUnitsSeconds = 'sekund';
+z.string.pl.ephememalUnitsMinute = 'minuta';
+z.string.pl.ephememalUnitsMinutes = 'minut';
+z.string.pl.ephememalUnitsHour = 'godzina';
+z.string.pl.ephememalUnitsHours = 'godzin';
+z.string.pl.ephememalUnitsDay = 'dzień';
+z.string.pl.ephememalUnitsDays = 'dni';
 

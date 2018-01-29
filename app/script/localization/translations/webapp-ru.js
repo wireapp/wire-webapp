@@ -18,8 +18,8 @@
  */
 
 z.string.ru.wire = 'Wire';
-z.string.ru.wire_macos = 'Wire для macOS';
-z.string.ru.wire_windows = 'Wire для Windows';
+z.string.ru.wireMacos = 'Wire для macOS';
+z.string.ru.wireWindows = 'Wire для Windows';
 z.string.ru.wire_linux = 'Wire для Linux';
 z.string.ru.nonexistent_user = 'Удаленный пользователь';
 z.string.ru.and = 'и';
@@ -172,7 +172,7 @@ z.string.ru.modal_session_reset_message_link = 'cвяжитесь';
 z.string.ru.modal_session_reset_message_2 = 'с нами.';
 z.string.ru.modal_too_many_members_headline = 'Канал переполнен';
 z.string.ru.modal_too_many_members_message = 'К разговору может присоединиться до {{number1}} человек. Здесь хватит места еще для {{number2}} человек.';
-z.string.ru.modal_uploads_parallel = 'Вы можете отправить до {{number}} файлов за раз.';
+z.string.ru.modalUploadsParallel = 'Вы можете отправить до {{number}} файлов за раз.';
 
 z.string.ru.connection_request_connect = 'Связаться';
 z.string.ru.connection_request_ignore = 'Игнорировать';
@@ -555,21 +555,21 @@ z.string.ru.tooltip_preferences_rename = 'Изменить свое имя';
 
 z.string.ru.tooltip_search_close = 'Закрыть (Esc)';
 
-z.string.ru.init_received_self_user = 'Здравствуйте, {{user}}.';
-z.string.ru.init_validated_client = 'Загрузка контактов и разговоров';
-z.string.ru.init_received_user_data = 'Проверка наличия новых сообщений';
+z.string.ru.initReceivedSelfUser = 'Здравствуйте, {{user}}.';
+z.string.ru.initValidatedClient = 'Загрузка контактов и разговоров';
+z.string.ru.initReceivedUserData = 'Проверка наличия новых сообщений';
 z.string.ru.init_decryption = 'Расшифровка сообщений';
 z.string.ru.init_events = 'Загрузка сообщений';
 z.string.ru.init_updated_from_notifications = 'Почти готово - наслаждайтесь Wire';
 z.string.ru.init_progress = ' — {{number1}} из {{number2}}';
 
-z.string.ru.ephememal_units_none = 'Выключен';
-z.string.ru.ephememal_units_second = 'сек';
-z.string.ru.ephememal_units_seconds = 'сек.';
-z.string.ru.ephememal_units_minute = 'мин.';
-z.string.ru.ephememal_units_minutes = 'мин.';
-z.string.ru.ephememal_units_hour = 'час';
-z.string.ru.ephememal_units_hours = 'часов';
-z.string.ru.ephememal_units_day = 'дн.';
-z.string.ru.ephememal_units_days = 'дн.';
+z.string.ru.ephememalUnitsNone = 'Выключен';
+z.string.ru.ephememalUnitsSecond = 'сек';
+z.string.ru.ephememalUnitsSeconds = 'сек.';
+z.string.ru.ephememalUnitsMinute = 'мин.';
+z.string.ru.ephememalUnitsMinutes = 'мин.';
+z.string.ru.ephememalUnitsHour = 'час';
+z.string.ru.ephememalUnitsHours = 'часов';
+z.string.ru.ephememalUnitsDay = 'дн.';
+z.string.ru.ephememalUnitsDays = 'дн.';
 
