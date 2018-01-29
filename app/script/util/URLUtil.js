@@ -53,7 +53,7 @@ z.util.URLUtil = (() => {
   const _is_production_backend = () => z.util.Environment.backend.current === z.service.BackendEnvironment.PRODUCTION;
 
   const _build_support_url = support_id => {
-    const url_path = _.isNumber(support_id) ? z.string.url_support_articles : z.string.url_support_requests;
+    const url_path = _.isNumber(support_id) ? z.string.urlSupportArticles : z.string.urlSupportRequests;
     return `${_get_domain(TYPE.SUPPORT)}${z.l10n.text(url_path)}${support_id}`;
   };
 

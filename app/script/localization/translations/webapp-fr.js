@@ -467,7 +467,7 @@ z.string.fr.uploadGoogleHeadlineError = 'Une erreur\nest survenue.';
 z.string.fr.uploadGoogleMessageError = 'Nous n’avons pas reçu votre information. Veuillez réessayer d’importer vos contacts.';
 z.string.fr.uploadGoogleButtonAgain = 'Réessayer';
 
-z.string.fr.url_website_create_team = '/create-team/';
+z.string.fr.urlWebsiteCreateTeam = '/create-team/';
 z.string.fr.warning_call_detail = 'Votre navigateur doit avoir accès au micro pour passer des appels.';
 z.string.fr.warning_call_headline = 'Impossible d’appeler sans micro';
 z.string.fr.warning_call_unsupported_incoming = '{{user}} vous appelle. Votre navigateur ne prend pas en charge les appels.';

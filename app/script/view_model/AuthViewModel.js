@@ -866,7 +866,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
   clicked_on_wire_link() {
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.NAVIGATION.OPENED_WIRE_WEBSITE);
-    const path = z.l10n.text(z.string.url_website_root);
+    const path = z.l10n.text(z.string.urlWebsiteRoot);
     z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.WEBSITE, path));
   }
 

@@ -467,11 +467,11 @@ z.string.hu.uploadGoogleHeadlineError = 'Valami nem stimmel.';
 z.string.hu.uploadGoogleMessageError = 'Nem kaptuk meg az adataidat. Kérjük, próbáld meg újra a névjegyek importálását.';
 z.string.hu.uploadGoogleButtonAgain = 'Újra próbálás';
 
-z.string.hu.url_support_root = '/';
-z.string.hu.url_support_articles = '/hc/en-us/articles/';
-z.string.hu.url_support_requests = '/hc/en-us/requests/';
-z.string.hu.url_webapp_root = '/';
-z.string.hu.url_website_root = '/';
+z.string.hu.urlSupportRoot = '/';
+z.string.hu.urlSupportArticles = '/hc/en-us/articles/';
+z.string.hu.urlSupportRequests = '/hc/en-us/requests/';
+z.string.hu.urlWebappRoot = '/';
+z.string.hu.urlWebsiteRoot = '/';
 z.string.hu.warning_call_detail = 'A hívásokhoz a böngésződnek hozzá kell férnie a mikrofonodhoz.';
 z.string.hu.warning_call_headline = 'Nem kezdeményezhetsz hívást mikrofon nélkül';
 z.string.hu.warning_call_unsupported_incoming = '{{user}} hív. Böngésződ nem támogatja a hanghívásokat.';

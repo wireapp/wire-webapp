@@ -541,13 +541,13 @@ z.string.uploadGoogleMessageError = 'We did not receive your information. Please
 z.string.uploadGoogleButtonAgain = 'Try again';
 
 // URLs & Warnings: Permission requests & permission callbacks
-z.string.url_support_root = '/';
-z.string.url_support_articles = '/hc/en-us/articles/';
-z.string.url_support_requests = '/hc/en-us/requests/';
-z.string.url_webapp_root = '/';
-z.string.url_website_root = '/';
-z.string.url_website_create_team = '/create-team/';
-z.string.url_website_privacy = '/privacy';
+z.string.urlSupportRoot = '/';
+z.string.urlSupportArticles = '/hc/en-us/articles/';
+z.string.urlSupportRequests = '/hc/en-us/requests/';
+z.string.urlWebappRoot = '/';
+z.string.urlWebsiteRoot = '/';
+z.string.urlWebsiteCreateTeam = '/create-team/';
+z.string.urlWebsitePrivacy = '/privacy';
 z.string.warning_call_detail = 'Your browser needs access to the microphone to make calls.';
 z.string.warning_call_headline = 'Can’t call without microphone';
 z.string.warning_call_unsupported_incoming = '{{user}} is calling. Your browser doesn’t support calls.';
