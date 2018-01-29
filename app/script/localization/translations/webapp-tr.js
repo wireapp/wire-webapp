@@ -298,13 +298,13 @@ z.string.tr.inviteHeadline = 'İnsanların Wire’a davet et';
 z.string.tr.inviteMessage = 'Wire’dayım, {{username}} olarak arat ya da get.wire.com adresini ziyaret et.';
 z.string.tr.inviteMessageNoEmail = 'Wire’dayım. get.wire.com ’u ziyaret ederek bana bağlanabilirsin.';
 
-z.string.tr.extensions_bubble_button_gif = 'Gif';
+z.string.tr.extensionsBubbleButtonGif = 'Gif';
 
-z.string.tr.extensions_giphy_button_ok = 'Gönder';
-z.string.tr.extensions_giphy_button_more = 'Başkasını Dene';
-z.string.tr.extensions_giphy_message = '{{tag}} • giphy.com aracılığıyla';
-z.string.tr.extensions_giphy_no_gifs = 'Olamaz, hiç Gif yok';
-z.string.tr.extensions_giphy_random = 'Rastgele';
+z.string.tr.extensionsGiphyButtonOk = 'Gönder';
+z.string.tr.extensionsGiphyButtonMore = 'Başkasını Dene';
+z.string.tr.extensionsGiphyMessage = '{{tag}} • giphy.com aracılığıyla';
+z.string.tr.extensionsGiphyNoGifs = 'Olamaz, hiç Gif yok';
+z.string.tr.extensionsGiphyRandom = 'Rastgele';
 
 z.string.tr.search_open = 'Aç';
 z.string.tr.search_open_group = 'Grup oluştur';

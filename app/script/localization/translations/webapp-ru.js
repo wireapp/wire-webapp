@@ -298,13 +298,13 @@ z.string.ru.inviteHeadline = 'Пригласите людей в Wire';
 z.string.ru.inviteMessage = 'Я в Wire, ищи меня там по имени пользователя {{username}} или зайди на сайт get.wire.com.';
 z.string.ru.inviteMessageNoEmail = 'Я использую Wire. Перейди на get.wire.com, чтобы связаться со мной.';
 
-z.string.ru.extensions_bubble_button_gif = 'Gif';
+z.string.ru.extensionsBubbleButtonGif = 'Gif';
 
-z.string.ru.extensions_giphy_button_ok = 'Отправить';
-z.string.ru.extensions_giphy_button_more = 'Попробуйте ещё';
-z.string.ru.extensions_giphy_message = '{{tag}} • через giphy.com';
-z.string.ru.extensions_giphy_no_gifs = 'Упс, нет GIF-ок';
-z.string.ru.extensions_giphy_random = 'Случайно';
+z.string.ru.extensionsGiphyButtonOk = 'Отправить';
+z.string.ru.extensionsGiphyButtonMore = 'Попробуйте ещё';
+z.string.ru.extensionsGiphyMessage = '{{tag}} • через giphy.com';
+z.string.ru.extensionsGiphyNoGifs = 'Упс, нет GIF-ок';
+z.string.ru.extensionsGiphyRandom = 'Случайно';
 
 z.string.ru.search_open = 'Открыть';
 z.string.ru.search_open_group = 'Создать группу';

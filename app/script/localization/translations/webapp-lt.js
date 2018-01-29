@@ -299,13 +299,13 @@ z.string.lt.inviteHeadline = 'Pakvieskite žmones į Wire';
 z.string.lt.inviteMessage = 'Aš naudoju Wire. Ieškokite manęs kaip {{username}} arba apsilankykite get.wire.com.';
 z.string.lt.inviteMessageNoEmail = 'Aš naudoju Wire. Apsilankyk get.wire.com , kad su manimi susisiektum.';
 
-z.string.lt.extensions_bubble_button_gif = 'Gif';
+z.string.lt.extensionsBubbleButtonGif = 'Gif';
 
-z.string.lt.extensions_giphy_button_ok = 'Siųsti';
-z.string.lt.extensions_giphy_button_more = 'Pabandyti kitą';
-z.string.lt.extensions_giphy_message = '{{tag}} • per giphy.com';
-z.string.lt.extensions_giphy_no_gifs = 'Oi, nėra gif';
-z.string.lt.extensions_giphy_random = 'Atsitiktinis';
+z.string.lt.extensionsGiphyButtonOk = 'Siųsti';
+z.string.lt.extensionsGiphyButtonMore = 'Pabandyti kitą';
+z.string.lt.extensionsGiphyMessage = '{{tag}} • per giphy.com';
+z.string.lt.extensionsGiphyNoGifs = 'Oi, nėra gif';
+z.string.lt.extensionsGiphyRandom = 'Atsitiktinis';
 
 z.string.lt.search_open = 'Atverti';
 z.string.lt.search_open_group = 'Sukurti grupę';

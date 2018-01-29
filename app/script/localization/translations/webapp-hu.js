@@ -299,13 +299,13 @@ z.string.hu.inviteHeadline = 'Hívj meg másokat is a Wire-re';
 z.string.hu.inviteMessage = 'Fent vagyok a Wire-ön. Keress rá a felhasználónevemre: {{username}} vagy nyisd meg a get.wire.com weboldalt.';
 z.string.hu.inviteMessageNoEmail = 'Fent vagyok a Wire-ön. Látogass el a get.wire.com weboldalra és lépj kapcsolatba velem.';
 
-z.string.hu.extensions_bubble_button_gif = 'Gif';
+z.string.hu.extensionsBubbleButtonGif = 'Gif';
 
-z.string.hu.extensions_giphy_button_ok = 'Küldés';
-z.string.hu.extensions_giphy_button_more = 'Másik keresése';
-z.string.hu.extensions_giphy_message = '{{tag}} • Forrás: giphy.com';
-z.string.hu.extensions_giphy_no_gifs = 'Hoppá, nincs gif';
-z.string.hu.extensions_giphy_random = 'Véletlenszerű';
+z.string.hu.extensionsGiphyButtonOk = 'Küldés';
+z.string.hu.extensionsGiphyButtonMore = 'Másik keresése';
+z.string.hu.extensionsGiphyMessage = '{{tag}} • Forrás: giphy.com';
+z.string.hu.extensionsGiphyNoGifs = 'Hoppá, nincs gif';
+z.string.hu.extensionsGiphyRandom = 'Véletlenszerű';
 
 z.string.hu.search_open = 'Megnyitás';
 z.string.hu.search_open_group = 'Csoport létrehozása';

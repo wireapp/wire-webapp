@@ -295,13 +295,13 @@ z.string.el.inviteHeadline = 'Πρόσκληση ατόμων στο Wire';
 z.string.el.inviteMessage = 'Είμαι στο Wire, αναζήτησε για {{username}} ή επισκέψου την ιστοσελίδα get.wire.com.';
 z.string.el.inviteMessageNoEmail = 'Είμαι στο Wire.Επισκέψου την ιστοσελίδα get.wire.com για να συνδεθείς μαζί μου.';
 
-z.string.el.extensions_bubble_button_gif = 'Εικόνες Gif';
+z.string.el.extensionsBubbleButtonGif = 'Εικόνες Gif';
 
-z.string.el.extensions_giphy_button_ok = 'Αποστολή';
-z.string.el.extensions_giphy_button_more = 'Δοκιμάστε ξανά';
-z.string.el.extensions_giphy_message = '{{tag}} • μέσω giphy.com';
-z.string.el.extensions_giphy_no_gifs = 'Ουπς! δεν υπάρχουν gifs';
-z.string.el.extensions_giphy_random = 'Τυχαία';
+z.string.el.extensionsGiphyButtonOk = 'Αποστολή';
+z.string.el.extensionsGiphyButtonMore = 'Δοκιμάστε ξανά';
+z.string.el.extensionsGiphyMessage = '{{tag}} • μέσω giphy.com';
+z.string.el.extensionsGiphyNoGifs = 'Ουπς! δεν υπάρχουν gifs';
+z.string.el.extensionsGiphyRandom = 'Τυχαία';
 
 z.string.el.search_open = 'Άνοιγμα';
 z.string.el.search_open_group = 'Δημιουργία Ομάδος';

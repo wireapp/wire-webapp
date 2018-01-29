@@ -1148,11 +1148,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   send_gif(conversation_et, url, tag) {
     if (!tag) {
-      tag = z.l10n.text(z.string.extensions_giphy_random);
+      tag = z.l10n.text(z.string.extensionsGiphyRandom);
     }
 
     return z.util.load_url_blob(url).then(blob => {
-      this.send_text(z.l10n.text(z.string.extensions_giphy_message, tag), conversation_et);
+      this.send_text(z.l10n.text(z.string.extensionsGiphyMessage, tag), conversation_et);
       return this.upload_images(conversation_et, [blob]);
     });
   }

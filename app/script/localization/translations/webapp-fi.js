@@ -297,13 +297,13 @@ z.string.fi.inviteHeadline = 'Kutsu ihmisiä Wireen';
 z.string.fi.inviteMessage = 'Olen Wiressä, etsi {{username}} tai mene osoitteeseen get.wire.com.';
 z.string.fi.inviteMessageNoEmail = 'Olen Wiressä. Mene osoitteeseen get.wire.com ottaaksesi minuun yhteyttä.';
 
-z.string.fi.extensions_bubble_button_gif = 'Gif';
+z.string.fi.extensionsBubbleButtonGif = 'Gif';
 
-z.string.fi.extensions_giphy_button_ok = 'Lähetä';
-z.string.fi.extensions_giphy_button_more = 'Kokeile toista';
-z.string.fi.extensions_giphy_message = '{{tag}} • giphy.com:in kautta';
-z.string.fi.extensions_giphy_no_gifs = 'Upsista, ei giffejä';
-z.string.fi.extensions_giphy_random = 'Satunnainen';
+z.string.fi.extensionsGiphyButtonOk = 'Lähetä';
+z.string.fi.extensionsGiphyButtonMore = 'Kokeile toista';
+z.string.fi.extensionsGiphyMessage = '{{tag}} • giphy.com:in kautta';
+z.string.fi.extensionsGiphyNoGifs = 'Upsista, ei giffejä';
+z.string.fi.extensionsGiphyRandom = 'Satunnainen';
 
 z.string.fi.search_open = 'Avaa';
 z.string.fi.search_open_group = 'Luo Ryhmä';

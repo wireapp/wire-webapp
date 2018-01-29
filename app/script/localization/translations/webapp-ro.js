@@ -299,13 +299,13 @@ z.string.ro.inviteHeadline = 'Invită persoane pe Wire';
 z.string.ro.inviteMessage = 'Bună, sunt pe Wire. Caută-mă cu numele {{username}} sau vizitează get.wire.com.';
 z.string.ro.inviteMessageNoEmail = 'Sunt pe Wire. Vizitează get.wire.com pentru a te conecta cu mine.';
 
-z.string.ro.extensions_bubble_button_gif = 'Gif';
+z.string.ro.extensionsBubbleButtonGif = 'Gif';
 
-z.string.ro.extensions_giphy_button_ok = 'Trimite';
-z.string.ro.extensions_giphy_button_more = 'Încearcă altul';
-z.string.ro.extensions_giphy_message = '{{tag}} • via giphy.com';
-z.string.ro.extensions_giphy_no_gifs = 'Ups, nu sunt gif-uri';
-z.string.ro.extensions_giphy_random = 'La întâmplare';
+z.string.ro.extensionsGiphyButtonOk = 'Trimite';
+z.string.ro.extensionsGiphyButtonMore = 'Încearcă altul';
+z.string.ro.extensionsGiphyMessage = '{{tag}} • via giphy.com';
+z.string.ro.extensionsGiphyNoGifs = 'Ups, nu sunt gif-uri';
+z.string.ro.extensionsGiphyRandom = 'La întâmplare';
 
 z.string.ro.search_open = 'Deschide';
 z.string.ro.search_open_group = 'Creează grup';

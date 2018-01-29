@@ -298,13 +298,13 @@ z.string.es.inviteHeadline = 'Invitar amigos a Wire';
 z.string.es.inviteMessage = 'Estoy en Wire, búscame como {{username}} o visita get.wire.com.';
 z.string.es.inviteMessageNoEmail = 'Estoy en Wire. Visita get.wire.com para conectar conmigo.';
 
-z.string.es.extensions_bubble_button_gif = 'Gif';
+z.string.es.extensionsBubbleButtonGif = 'Gif';
 
-z.string.es.extensions_giphy_button_ok = 'Enviar';
-z.string.es.extensions_giphy_button_more = 'Buscar otro';
-z.string.es.extensions_giphy_message = '{{tag}} · vía giphy.com';
-z.string.es.extensions_giphy_no_gifs = 'Uups, no hay gifs';
-z.string.es.extensions_giphy_random = 'Aleatorio';
+z.string.es.extensionsGiphyButtonOk = 'Enviar';
+z.string.es.extensionsGiphyButtonMore = 'Buscar otro';
+z.string.es.extensionsGiphyMessage = '{{tag}} · vía giphy.com';
+z.string.es.extensionsGiphyNoGifs = 'Uups, no hay gifs';
+z.string.es.extensionsGiphyRandom = 'Aleatorio';
 
 z.string.es.search_open = 'Abrir';
 z.string.es.search_open_group = 'Crear Grupo';

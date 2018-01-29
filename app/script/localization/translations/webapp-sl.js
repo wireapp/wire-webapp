@@ -288,13 +288,13 @@ z.string.sl.inviteHeadline = 'Povabite osebe na Wire';
 z.string.sl.inviteMessage = 'Sem na Wire, poišči {{username}} ali obišči get.wire.com.';
 z.string.sl.inviteMessageNoEmail = 'Sem na Wire. Obišči get.wire.com za povezavo z mano.';
 
-z.string.sl.extensions_bubble_button_gif = 'Gif';
+z.string.sl.extensionsBubbleButtonGif = 'Gif';
 
-z.string.sl.extensions_giphy_button_ok = 'Pošlji';
-z.string.sl.extensions_giphy_button_more = 'Poizkusi drugega';
-z.string.sl.extensions_giphy_message = '{{tag}} • preko giphy.com';
-z.string.sl.extensions_giphy_no_gifs = 'Ups, ni najdenih gifov';
-z.string.sl.extensions_giphy_random = 'Naključno';
+z.string.sl.extensionsGiphyButtonOk = 'Pošlji';
+z.string.sl.extensionsGiphyButtonMore = 'Poizkusi drugega';
+z.string.sl.extensionsGiphyMessage = '{{tag}} • preko giphy.com';
+z.string.sl.extensionsGiphyNoGifs = 'Ups, ni najdenih gifov';
+z.string.sl.extensionsGiphyRandom = 'Naključno';
 
 z.string.sl.search_open = 'Odpri';
 z.string.sl.search_open_group = 'Ustvari skupino';

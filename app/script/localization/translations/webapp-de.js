@@ -306,13 +306,13 @@ z.string.de.inviteHeadline = 'Lade Freunde zu Wire ein';
 z.string.de.inviteMessage = 'Ich benutze Wire. Suche nach {{username}} oder gehe auf get.wire.com.';
 z.string.de.inviteMessageNoEmail = 'Ich benutze Wire. Gehe auf get.wire.com, um mich als Kontakt hinzuzufügen.';
 
-z.string.de.extensions_bubble_button_gif = 'Gif';
+z.string.de.extensionsBubbleButtonGif = 'Gif';
 
-z.string.de.extensions_giphy_button_ok = 'Senden';
-z.string.de.extensions_giphy_button_more = 'Neues Gif';
-z.string.de.extensions_giphy_message = '{{tag}} • über giphy.com';
-z.string.de.extensions_giphy_no_gifs = 'Ups, kein GIF';
-z.string.de.extensions_giphy_random = 'Zufällig';
+z.string.de.extensionsGiphyButtonOk = 'Senden';
+z.string.de.extensionsGiphyButtonMore = 'Neues Gif';
+z.string.de.extensionsGiphyMessage = '{{tag}} • über giphy.com';
+z.string.de.extensionsGiphyNoGifs = 'Ups, kein GIF';
+z.string.de.extensionsGiphyRandom = 'Zufällig';
 
 z.string.de.search_open = 'Öffnen';
 z.string.de.search_open_group = 'Unterhaltung erstellen';

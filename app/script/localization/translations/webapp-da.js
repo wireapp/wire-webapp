@@ -276,13 +276,13 @@ z.string.da.inviteHeadline = 'Inviter personer til Wire';
 z.string.da.inviteMessage = 'Jeg er på Wire, søg efter {{username}} eller besøg get.wire.com.';
 z.string.da.inviteMessageNoEmail = 'Jeg er på Wire. Besøg get.wire.com for at forbinde dig med mig.';
 
-z.string.da.extensions_bubble_button_gif = 'Gif';
+z.string.da.extensionsBubbleButtonGif = 'Gif';
 
-z.string.da.extensions_giphy_button_ok = 'Send';
-z.string.da.extensions_giphy_button_more = 'Prøv en anden';
-z.string.da.extensions_giphy_message = '{{tag}} • via giphy.com';
-z.string.da.extensions_giphy_no_gifs = 'Ups, ingen gifs';
-z.string.da.extensions_giphy_random = 'Tilfældig';
+z.string.da.extensionsGiphyButtonOk = 'Send';
+z.string.da.extensionsGiphyButtonMore = 'Prøv en anden';
+z.string.da.extensionsGiphyMessage = '{{tag}} • via giphy.com';
+z.string.da.extensionsGiphyNoGifs = 'Ups, ingen gifs';
+z.string.da.extensionsGiphyRandom = 'Tilfældig';
 
 z.string.da.search_open = 'Åbn';
 z.string.da.search_open_group = 'Opret Gruppe';

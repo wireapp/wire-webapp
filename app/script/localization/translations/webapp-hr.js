@@ -256,13 +256,13 @@ z.string.hr.inviteHintSelected = 'Pritisnite {{meta_key}} + C za kopiranje';
 z.string.hr.inviteHintUnselected = 'Odaberite i pritisnite {{meta_key}} + C';
 z.string.hr.inviteHeadline = 'Pozvati ljude na Wire';
 
-z.string.hr.extensions_bubble_button_gif = 'Gif';
+z.string.hr.extensionsBubbleButtonGif = 'Gif';
 
-z.string.hr.extensions_giphy_button_ok = 'Pošalji';
-z.string.hr.extensions_giphy_button_more = 'Probaj nešto drugo';
-z.string.hr.extensions_giphy_message = '• {{tag}} s giphy.com';
-z.string.hr.extensions_giphy_no_gifs = 'Ups, nema Gif-ova';
-z.string.hr.extensions_giphy_random = 'Nasumično';
+z.string.hr.extensionsGiphyButtonOk = 'Pošalji';
+z.string.hr.extensionsGiphyButtonMore = 'Probaj nešto drugo';
+z.string.hr.extensionsGiphyMessage = '• {{tag}} s giphy.com';
+z.string.hr.extensionsGiphyNoGifs = 'Ups, nema Gif-ova';
+z.string.hr.extensionsGiphyRandom = 'Nasumično';
 
 z.string.hr.search_open = 'Otvori';
 z.string.hr.search_open_group = 'Napravi grupu';

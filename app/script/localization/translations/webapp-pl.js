@@ -297,13 +297,13 @@ z.string.pl.inviteHeadline = 'Zaproś innych do Wire';
 z.string.pl.inviteMessage = 'Jestem na Wire. Odszukaj {{username}}, lub odwiedź get.wire.com.';
 z.string.pl.inviteMessageNoEmail = 'Używam Wire. Wejdź na get.wire.com aby się ze mną połączyć.';
 
-z.string.pl.extensions_bubble_button_gif = 'Gif';
+z.string.pl.extensionsBubbleButtonGif = 'Gif';
 
-z.string.pl.extensions_giphy_button_ok = 'Wyślij';
-z.string.pl.extensions_giphy_button_more = 'Spróbuj użyć innego';
-z.string.pl.extensions_giphy_message = '{{tag}} • via giphy.com';
-z.string.pl.extensions_giphy_no_gifs = 'Ups, nie ma plików Gif';
-z.string.pl.extensions_giphy_random = 'Losowa kolejność';
+z.string.pl.extensionsGiphyButtonOk = 'Wyślij';
+z.string.pl.extensionsGiphyButtonMore = 'Spróbuj użyć innego';
+z.string.pl.extensionsGiphyMessage = '{{tag}} • via giphy.com';
+z.string.pl.extensionsGiphyNoGifs = 'Ups, nie ma plików Gif';
+z.string.pl.extensionsGiphyRandom = 'Losowa kolejność';
 
 z.string.pl.search_open = 'Otwórz';
 z.string.pl.search_open_group = 'Utwórz grupę';

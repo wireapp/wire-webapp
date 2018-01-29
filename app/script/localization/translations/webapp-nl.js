@@ -299,13 +299,13 @@ z.string.nl.inviteHeadline = 'Nodig anderen uit voor Wire';
 z.string.nl.inviteMessage = 'Ik gebruik Wire, zoek naar {{username}} of bezoek get.wire.com.';
 z.string.nl.inviteMessageNoEmail = 'Ik gebruik Wire. Ga naar get.wire.com om met mij te verbinden.';
 
-z.string.nl.extensions_bubble_button_gif = 'Gif';
+z.string.nl.extensionsBubbleButtonGif = 'Gif';
 
-z.string.nl.extensions_giphy_button_ok = 'Stuur';
-z.string.nl.extensions_giphy_button_more = 'Probeer een andere';
-z.string.nl.extensions_giphy_message = '{{tag}} • via giphy.com';
-z.string.nl.extensions_giphy_no_gifs = 'Oeps, geen gifjes';
-z.string.nl.extensions_giphy_random = 'Random';
+z.string.nl.extensionsGiphyButtonOk = 'Stuur';
+z.string.nl.extensionsGiphyButtonMore = 'Probeer een andere';
+z.string.nl.extensionsGiphyMessage = '{{tag}} • via giphy.com';
+z.string.nl.extensionsGiphyNoGifs = 'Oeps, geen gifjes';
+z.string.nl.extensionsGiphyRandom = 'Random';
 
 z.string.nl.search_open = 'Openen';
 z.string.nl.search_open_group = 'Groep aanmaken';

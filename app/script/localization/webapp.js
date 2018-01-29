@@ -355,14 +355,14 @@ z.string.inviteMessage = 'I’m on Wire, search for {{username}} or visit get.wi
 z.string.inviteMessageNoEmail = 'I’m on Wire. Visit get.wire.com to connect with me.';
 
 // Extensions
-z.string.extensions_bubble_button_gif = 'Gif';
+z.string.extensionsBubbleButtonGif = 'Gif';
 
 // Extensions Giphy
-z.string.extensions_giphy_button_ok = 'Send';
-z.string.extensions_giphy_button_more = 'Try Another';
-z.string.extensions_giphy_message = '{{tag}} • via giphy.com';
-z.string.extensions_giphy_no_gifs = 'Oops, no gifs';
-z.string.extensions_giphy_random = 'Random';
+z.string.extensionsGiphyButtonOk = 'Send';
+z.string.extensionsGiphyButtonMore = 'Try Another';
+z.string.extensionsGiphyMessage = '{{tag}} • via giphy.com';
+z.string.extensionsGiphyNoGifs = 'Oops, no gifs';
+z.string.extensionsGiphyRandom = 'Random';
 
 // People View
 z.string.search_open = 'Open';

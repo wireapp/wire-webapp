@@ -297,13 +297,13 @@ z.string.sk.inviteHeadline = 'Pozvať ľudí do Wire';
 z.string.sk.inviteMessage = 'Používam Wire, hľadajte {{username}} alebo navštívte get.wire.com.';
 z.string.sk.inviteMessageNoEmail = 'Používam Wire. Ak sa chcete so mnou spojiť navštívte get.wire.com.';
 
-z.string.sk.extensions_bubble_button_gif = 'Gif';
+z.string.sk.extensionsBubbleButtonGif = 'Gif';
 
-z.string.sk.extensions_giphy_button_ok = 'Poslať';
-z.string.sk.extensions_giphy_button_more = 'Skúste iný';
-z.string.sk.extensions_giphy_message = '{{tag}} • cez giphy.com';
-z.string.sk.extensions_giphy_no_gifs = 'Ej, žiadne gify';
-z.string.sk.extensions_giphy_random = 'Náhodný';
+z.string.sk.extensionsGiphyButtonOk = 'Poslať';
+z.string.sk.extensionsGiphyButtonMore = 'Skúste iný';
+z.string.sk.extensionsGiphyMessage = '{{tag}} • cez giphy.com';
+z.string.sk.extensionsGiphyNoGifs = 'Ej, žiadne gify';
+z.string.sk.extensionsGiphyRandom = 'Náhodný';
 
 z.string.sk.search_open = 'Otvoriť';
 z.string.sk.search_open_group = 'Vytvoriť skupinu';

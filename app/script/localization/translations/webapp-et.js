@@ -299,13 +299,13 @@ z.string.et.inviteHeadline = 'Kutsu inimesi Wire’iga liituma';
 z.string.et.inviteMessage = 'Kasutan suhtlemiseks Wire äppi. Mu kasutajanimi on {{username}}. Tõmba äpp siit get.wire.com';
 z.string.et.inviteMessageNoEmail = 'Kasutan suhtluseks Wire äppi. Külasta get.wire.com et minuga suhelda.';
 
-z.string.et.extensions_bubble_button_gif = 'Gif';
+z.string.et.extensionsBubbleButtonGif = 'Gif';
 
-z.string.et.extensions_giphy_button_ok = 'Saada';
-z.string.et.extensions_giphy_button_more = 'Proovi järgmist';
-z.string.et.extensions_giphy_message = '{{tag}} • via giphy.com';
-z.string.et.extensions_giphy_no_gifs = 'Ups, gif-e pole';
-z.string.et.extensions_giphy_random = 'Juhuslik';
+z.string.et.extensionsGiphyButtonOk = 'Saada';
+z.string.et.extensionsGiphyButtonMore = 'Proovi järgmist';
+z.string.et.extensionsGiphyMessage = '{{tag}} • via giphy.com';
+z.string.et.extensionsGiphyNoGifs = 'Ups, gif-e pole';
+z.string.et.extensionsGiphyRandom = 'Juhuslik';
 
 z.string.et.search_open = 'Ava';
 z.string.et.search_open_group = 'Loo grupp';

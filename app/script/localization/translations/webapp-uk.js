@@ -297,13 +297,13 @@ z.string.uk.inviteHeadline = 'Запросити людей в Wire';
 z.string.uk.inviteMessage = 'Я в Wire. Шукайте мене як {{username}} або відвідайте get.wire.com.';
 z.string.uk.inviteMessageNoEmail = 'Я уже в Wire. Відвідайте get.wire.com, щоб додати мене.';
 
-z.string.uk.extensions_bubble_button_gif = 'Gif';
+z.string.uk.extensionsBubbleButtonGif = 'Gif';
 
-z.string.uk.extensions_giphy_button_ok = 'Надіслати';
-z.string.uk.extensions_giphy_button_more = 'Спробувати іншу';
-z.string.uk.extensions_giphy_message = '{{tag}} • через giphy.com';
-z.string.uk.extensions_giphy_no_gifs = 'Упс, анімацій не знайдено';
-z.string.uk.extensions_giphy_random = 'Випадкова';
+z.string.uk.extensionsGiphyButtonOk = 'Надіслати';
+z.string.uk.extensionsGiphyButtonMore = 'Спробувати іншу';
+z.string.uk.extensionsGiphyMessage = '{{tag}} • через giphy.com';
+z.string.uk.extensionsGiphyNoGifs = 'Упс, анімацій не знайдено';
+z.string.uk.extensionsGiphyRandom = 'Випадкова';
 
 z.string.uk.search_open = 'Вiдкрити';
 z.string.uk.search_open_group = 'Створити групу';

@@ -296,13 +296,13 @@ z.string.cs.inviteHeadline = 'Pozvat lidi do aplikace Wire';
 z.string.cs.inviteMessage = 'Jsem na Wire, hledejte {{username}} nebo navštivte get.wire.com.';
 z.string.cs.inviteMessageNoEmail = 'Jsem k zastižení na síti Wire. K navázání kontaktu navštivte https://get.wire.com.';
 
-z.string.cs.extensions_bubble_button_gif = 'Gif';
+z.string.cs.extensionsBubbleButtonGif = 'Gif';
 
-z.string.cs.extensions_giphy_button_ok = 'Odeslat';
-z.string.cs.extensions_giphy_button_more = 'Zkusit jiný';
-z.string.cs.extensions_giphy_message = '{{tag}} • přes giphy.com';
-z.string.cs.extensions_giphy_no_gifs = 'Uups, žádné gify';
-z.string.cs.extensions_giphy_random = 'Náhodně';
+z.string.cs.extensionsGiphyButtonOk = 'Odeslat';
+z.string.cs.extensionsGiphyButtonMore = 'Zkusit jiný';
+z.string.cs.extensionsGiphyMessage = '{{tag}} • přes giphy.com';
+z.string.cs.extensionsGiphyNoGifs = 'Uups, žádné gify';
+z.string.cs.extensionsGiphyRandom = 'Náhodně';
 
 z.string.cs.search_open = 'Otevřít';
 z.string.cs.search_open_group = 'Vytvořit skupinu';
