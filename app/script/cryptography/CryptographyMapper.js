@@ -254,7 +254,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     const millis_as_number = generic_message.ephemeral.expire_after_millis.toNumber();
     generic_message.ephemeral.message_id = generic_message.message_id;
     const embedded_message = this._map_generic_message(generic_message.ephemeral, event);
-    embedded_message.ephemeral_expires = z.ephemeral.timings.map_to_closest_timing(millis_as_number);
+    embedded_message.ephemeral_expires = z.ephemeral.timings.mapToClosestTiming(millis_as_number);
     return embedded_message;
   }
 
