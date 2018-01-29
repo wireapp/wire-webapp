@@ -192,7 +192,12 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
       return this.stateParticipants() && this.selectedUser() && !this.selectedService();
     });
 
-    this.selectedIsInConversation = ko.observable(false);
+    this.selectedIsInConversation = ko.pureComputed(() => {
+      if (this.selectedUser()) {
+        return this.participants().some(entity => entity.id === this.selectedUser().id);
+      }
+      return false;
+    });
     this.showRemoveButton = ko.pureComputed(
       () => this.stateServiceDetails() && !this.userRepository.self().is_guest() && this.selectedIsInConversation()
     );
@@ -424,7 +429,6 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   }
 
   showService(userEntity) {
-    this.selectedIsInConversation(this.participants().some(entity => entity.id === userEntity.id));
     this.selectedUser(userEntity);
     const {providerId, serviceId} = userEntity;
 
