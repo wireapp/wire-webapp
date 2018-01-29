@@ -44,13 +44,13 @@ z.string.authAccountSignInEmail = 'Email';
 z.string.authAccountSignInPhone = 'Phone';
 
 // Authentication: BLOCKED section
-z.string.auth_blocked_cookies = 'Enable cookies to log in to Wire.';
-z.string.auth_blocked_database = 'Wire needs access to local storage to display your messages. Local storage is not available in private mode.';
-z.string.auth_blocked_tabs = 'Wire is already open in another tab.';
+z.string.authBlockedCookies = 'Enable cookies to log in to Wire.';
+z.string.authBlockedDatabase = 'Wire needs access to local storage to display your messages. Local storage is not available in private mode.';
+z.string.authBlockedTabs = 'Wire is already open in another tab.';
 
 // Authentication: VERIFY section
-z.string.auth_verify_account_add = 'Add';
-z.string.auth_verify_account_detail = 'This lets you use Wire on multiple devices.';
+z.string.authVerifyAccountAdd = 'Add';
+z.string.authVerifyAccountDetail = 'This lets you use Wire on multiple devices.';
 z.string.auth_verify_account_headline = 'Add email address and password.';
 z.string.auth_verify_account_logout = 'Log out';
 z.string.auth_verify_code_description = 'Enter the verification code\nwe sent to {{number}}.';
@@ -572,10 +572,10 @@ z.string.warning_permission_request_screen = '{{icon}} Allow access to screen';
 z.string.warning_tell_me_how = 'Tell me how';
 
 // User Availability
-z.string.user_availability_available = 'Available';
-z.string.user_availability_away = 'Away';
-z.string.user_availability_busy = 'Busy';
-z.string.user_availability_none = 'None';
+z.string.userAvailabilityAvailable = 'Available';
+z.string.userAvailabilityAway = 'Away';
+z.string.userAvailabilityBusy = 'Busy';
+z.string.userAvailabilityNone = 'None';
 
 // Browser notifications
 z.string.system_notification_asset_add = 'Shared a picture';

@@ -37,12 +37,12 @@ z.string.fi.authAccountSignIn = 'Kirjaudu sisään';
 z.string.fi.authAccountSignInEmail = 'Sähköposti';
 z.string.fi.authAccountSignInPhone = 'Puhelinnumero';
 
-z.string.fi.auth_blocked_cookies = 'Salli evästeet kirjautuaksesi Wireen.';
-z.string.fi.auth_blocked_database = 'Wire tarvitsee pääsyn paikalliseen säilöösi säilöäkseen viestejä. Paikallinen säilö ei ole saatavilla yksityisessä tilassa.';
-z.string.fi.auth_blocked_tabs = 'Wire on jo avoinna toisessa välilehdessä.';
+z.string.fi.authBlockedCookies = 'Salli evästeet kirjautuaksesi Wireen.';
+z.string.fi.authBlockedDatabase = 'Wire tarvitsee pääsyn paikalliseen säilöösi säilöäkseen viestejä. Paikallinen säilö ei ole saatavilla yksityisessä tilassa.';
+z.string.fi.authBlockedTabs = 'Wire on jo avoinna toisessa välilehdessä.';
 
-z.string.fi.auth_verify_account_add = 'Lisää';
-z.string.fi.auth_verify_account_detail = 'Tämä mahdollistaa Wiren käytön useilla laitteilla.';
+z.string.fi.authVerifyAccountAdd = 'Lisää';
+z.string.fi.authVerifyAccountDetail = 'Tämä mahdollistaa Wiren käytön useilla laitteilla.';
 z.string.fi.auth_verify_account_headline = 'Lisää sähköpostiosoitteesi ja salasanasi.';
 z.string.fi.auth_verify_account_logout = 'Kirjaudu ulos';
 z.string.fi.auth_verify_code_description = 'Syötä vahvistuskoodi jonka lähetimme {{number}}.';
@@ -487,8 +487,8 @@ z.string.fi.warning_permission_request_notification = '{{icon}} Salli ilmoitukse
 z.string.fi.warning_permission_request_screen = '{{icon}} Salli näytön käyttö';
 z.string.fi.warning_tell_me_how = 'Kerro miten';
 
-z.string.fi.user_availability_available = 'Saatavilla';
-z.string.fi.user_availability_none = 'Ei mitään';
+z.string.fi.userAvailabilityAvailable = 'Saatavilla';
+z.string.fi.userAvailabilityNone = 'Ei mitään';
 
 z.string.fi.system_notification_asset_add = 'Jakoi kuvan';
 z.string.fi.system_notification_connection_accepted = 'Hyväksyi yhteyspyyntösi';

@@ -38,12 +38,12 @@ z.string.lt.authAccountSignIn = 'Prisijungti';
 z.string.lt.authAccountSignInEmail = 'El. paštas';
 z.string.lt.authAccountSignInPhone = 'Telefonas';
 
-z.string.lt.auth_blocked_cookies = 'Aktyvuokite slapukus, kad galėtumėte prisijungti prie „Wire“.';
-z.string.lt.auth_blocked_database = 'Norint rodyti žinutes, Wire reikia prieigos prie jūsų vietinės saugyklos. Vietinė saugykla nėra prieinama privačioje veiksenoje.';
-z.string.lt.auth_blocked_tabs = 'Wire jau yra atverta kitoje kortelėje.';
+z.string.lt.authBlockedCookies = 'Aktyvuokite slapukus, kad galėtumėte prisijungti prie „Wire“.';
+z.string.lt.authBlockedDatabase = 'Norint rodyti žinutes, Wire reikia prieigos prie jūsų vietinės saugyklos. Vietinė saugykla nėra prieinama privačioje veiksenoje.';
+z.string.lt.authBlockedTabs = 'Wire jau yra atverta kitoje kortelėje.';
 
-z.string.lt.auth_verify_account_add = 'Pridėti';
-z.string.lt.auth_verify_account_detail = 'Tai leidžia jums naudoti „Wire“ keliuose įrenginiuose.';
+z.string.lt.authVerifyAccountAdd = 'Pridėti';
+z.string.lt.authVerifyAccountDetail = 'Tai leidžia jums naudoti „Wire“ keliuose įrenginiuose.';
 z.string.lt.auth_verify_account_headline = 'Pridėkite el. pašto adresą ir slaptažodį.';
 z.string.lt.auth_verify_account_logout = 'Atsijungti';
 z.string.lt.auth_verify_code_description = 'Įveskite patvirtinimo kodą,\nkurį mes išsiuntėme į {{number}}.';
@@ -490,10 +490,10 @@ z.string.lt.warning_permission_request_notification = '{{icon}} Leisti pranešim
 z.string.lt.warning_permission_request_screen = '{{icon}} Leisti prieigą prie ekrano';
 z.string.lt.warning_tell_me_how = 'Paaiškinkite kaip';
 
-z.string.lt.user_availability_available = 'Prieinamas';
-z.string.lt.user_availability_away = 'Pasišalinęs';
-z.string.lt.user_availability_busy = 'Užsiėmęs';
-z.string.lt.user_availability_none = 'Jokių';
+z.string.lt.userAvailabilityAvailable = 'Prieinamas';
+z.string.lt.userAvailabilityAway = 'Pasišalinęs';
+z.string.lt.userAvailabilityBusy = 'Užsiėmęs';
+z.string.lt.userAvailabilityNone = 'Jokių';
 
 z.string.lt.system_notification_asset_add = 'Pasidalino paveikslu';
 z.string.lt.system_notification_connection_accepted = 'Priėmė jūsų kontakto užmezgimo užklausą';

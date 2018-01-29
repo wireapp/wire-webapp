@@ -35,8 +35,8 @@ z.string.hr.authAccountSignIn = 'Prijava';
 z.string.hr.authAccountSignInEmail = 'Email';
 z.string.hr.authAccountSignInPhone = 'Telefon';
 
-z.string.hr.auth_verify_account_add = 'Dodaj';
-z.string.hr.auth_verify_account_detail = 'Ovo Vam omogućuje da koristite Wire na više uređaja.';
+z.string.hr.authVerifyAccountAdd = 'Dodaj';
+z.string.hr.authVerifyAccountDetail = 'Ovo Vam omogućuje da koristite Wire na više uređaja.';
 z.string.hr.auth_verify_account_headline = 'Dodajte email adresu i lozinku.';
 z.string.hr.auth_verify_account_logout = 'Odjava';
 z.string.hr.auth_verify_code_description = 'Unesite kontrolni kod koji smo poslali na {{number}}.';
@@ -432,8 +432,8 @@ z.string.hr.warning_permission_request_notification = '{{icon}} Dopusti notifika
 z.string.hr.warning_permission_request_screen = '{{icon}} dopusti pristup zaslonu';
 z.string.hr.warning_tell_me_how = 'Recite mi kako';
 
-z.string.hr.user_availability_available = 'Dostupno';
-z.string.hr.user_availability_none = 'Ništa';
+z.string.hr.userAvailabilityAvailable = 'Dostupno';
+z.string.hr.userAvailabilityNone = 'Ništa';
 
 z.string.hr.system_notification_asset_add = 'Podijelila/o sliku';
 z.string.hr.system_notification_connection_accepted = 'Prihvatila/o zahtjev za vezu';

@@ -38,12 +38,12 @@ z.string.ru.authAccountSignIn = 'Вход';
 z.string.ru.authAccountSignInEmail = 'Email';
 z.string.ru.authAccountSignInPhone = 'Телефон';
 
-z.string.ru.auth_blocked_cookies = 'Включите файлы cookie для входа в Wire.';
-z.string.ru.auth_blocked_database = 'Для отображения сообщений Wire необходим доступ к локальному хранилищу. Локальное хранилище недоступно в приватном режиме.';
-z.string.ru.auth_blocked_tabs = 'Wire уже открыто в другой вкладке.';
+z.string.ru.authBlockedCookies = 'Включите файлы cookie для входа в Wire.';
+z.string.ru.authBlockedDatabase = 'Для отображения сообщений Wire необходим доступ к локальному хранилищу. Локальное хранилище недоступно в приватном режиме.';
+z.string.ru.authBlockedTabs = 'Wire уже открыто в другой вкладке.';
 
-z.string.ru.auth_verify_account_add = 'Добавить';
-z.string.ru.auth_verify_account_detail = 'Это позволяет использовать Wire на нескольких устройствах.';
+z.string.ru.authVerifyAccountAdd = 'Добавить';
+z.string.ru.authVerifyAccountDetail = 'Это позволяет использовать Wire на нескольких устройствах.';
 z.string.ru.auth_verify_account_headline = 'Добавить email и пароль.';
 z.string.ru.auth_verify_account_logout = 'Выход';
 z.string.ru.auth_verify_code_description = 'Введите код подтверждения,\nкоторый мы отправили на {{number}}.';
@@ -489,10 +489,10 @@ z.string.ru.warning_permission_request_notification = '{{icon}} Разрешит
 z.string.ru.warning_permission_request_screen = '{{icon}} Разрешить доступ к экрану';
 z.string.ru.warning_tell_me_how = 'Скажите мне, как';
 
-z.string.ru.user_availability_available = 'Доступно';
-z.string.ru.user_availability_away = 'Отошел';
-z.string.ru.user_availability_busy = 'Занят';
-z.string.ru.user_availability_none = 'Отключены';
+z.string.ru.userAvailabilityAvailable = 'Доступно';
+z.string.ru.userAvailabilityAway = 'Отошел';
+z.string.ru.userAvailabilityBusy = 'Занят';
+z.string.ru.userAvailabilityNone = 'Отключены';
 
 z.string.ru.system_notification_asset_add = 'Поделился(-лась) картинкой';
 z.string.ru.system_notification_connection_accepted = 'Принял(а) ваш запрос на добавление';

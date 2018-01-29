@@ -37,12 +37,12 @@ z.string.cs.authAccountSignIn = 'Přihlásit se';
 z.string.cs.authAccountSignInEmail = 'Email';
 z.string.cs.authAccountSignInPhone = 'Telefon';
 
-z.string.cs.auth_blocked_cookies = 'Pro přihlášení k Wire povolte soubory cookie.';
-z.string.cs.auth_blocked_database = 'Pro zobrazení zpráv potřebuje Wire potřebuje přístup k úložišti. Úložiště není k dispozici v anonymním režimu.';
-z.string.cs.auth_blocked_tabs = 'Wire je již otevřen na jiné záložce.';
+z.string.cs.authBlockedCookies = 'Pro přihlášení k Wire povolte soubory cookie.';
+z.string.cs.authBlockedDatabase = 'Pro zobrazení zpráv potřebuje Wire potřebuje přístup k úložišti. Úložiště není k dispozici v anonymním režimu.';
+z.string.cs.authBlockedTabs = 'Wire je již otevřen na jiné záložce.';
 
-z.string.cs.auth_verify_account_add = 'Přidat';
-z.string.cs.auth_verify_account_detail = 'To umožňuje používat Wire na více zařízeních.';
+z.string.cs.authVerifyAccountAdd = 'Přidat';
+z.string.cs.authVerifyAccountDetail = 'To umožňuje používat Wire na více zařízeních.';
 z.string.cs.auth_verify_account_headline = 'Přidat emailovou adresu a heslo.';
 z.string.cs.auth_verify_account_logout = 'Odhlásit se';
 z.string.cs.auth_verify_code_description = 'Zadejte ověřovací kód,\nkterý byl zaslán na {{number}}.';
@@ -485,8 +485,8 @@ z.string.cs.warning_permission_request_notification = '{{icon}} Povolit upozorn�
 z.string.cs.warning_permission_request_screen = '{{icon}} Povolit přístup k obrazovce';
 z.string.cs.warning_tell_me_how = 'Jak na to';
 
-z.string.cs.user_availability_available = 'Dostupný';
-z.string.cs.user_availability_none = 'Žádné';
+z.string.cs.userAvailabilityAvailable = 'Dostupný';
+z.string.cs.userAvailabilityNone = 'Žádné';
 
 z.string.cs.system_notification_asset_add = 'Sdílel(a) obrázek';
 z.string.cs.system_notification_connection_accepted = 'Přijal(a) váš požadavek na připojení';

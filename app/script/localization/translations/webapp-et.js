@@ -38,12 +38,12 @@ z.string.et.authAccountSignIn = 'Logi sisse';
 z.string.et.authAccountSignInEmail = 'E-post';
 z.string.et.authAccountSignInPhone = 'Telefon';
 
-z.string.et.auth_blocked_cookies = 'Wire’i sisselogimiseks luba küpsised.';
-z.string.et.auth_blocked_database = 'Wire vajab sõnumite kuvamiseks ligipääsu kohalikule hoidlale (local storage). Kohalik hoidla ei ole privaatrežiimis saadaval.';
-z.string.et.auth_blocked_tabs = 'Wire on juba teisel kaardil avatud.';
+z.string.et.authBlockedCookies = 'Wire’i sisselogimiseks luba küpsised.';
+z.string.et.authBlockedDatabase = 'Wire vajab sõnumite kuvamiseks ligipääsu kohalikule hoidlale (local storage). Kohalik hoidla ei ole privaatrežiimis saadaval.';
+z.string.et.authBlockedTabs = 'Wire on juba teisel kaardil avatud.';
 
-z.string.et.auth_verify_account_add = 'Lisa';
-z.string.et.auth_verify_account_detail = 'See võimaldab kasutada Wire’i mitmes seadmes.';
+z.string.et.authVerifyAccountAdd = 'Lisa';
+z.string.et.authVerifyAccountDetail = 'See võimaldab kasutada Wire’i mitmes seadmes.';
 z.string.et.auth_verify_account_headline = 'Lisa meiliaadress ja parool.';
 z.string.et.auth_verify_account_logout = 'Logi välja';
 z.string.et.auth_verify_code_description = 'Sisesta kinnituskood,\nmille saatsime numbrile {{number}}.';
@@ -490,10 +490,10 @@ z.string.et.warning_permission_request_notification = '{{icon}} Luba teated';
 z.string.et.warning_permission_request_screen = '{{icon}} Luba ekraanile juurdepääs';
 z.string.et.warning_tell_me_how = 'Ütle, kuidas';
 
-z.string.et.user_availability_available = 'Saadaval';
-z.string.et.user_availability_away = 'Eemal';
-z.string.et.user_availability_busy = 'Hõivatud';
-z.string.et.user_availability_none = 'Puudub';
+z.string.et.userAvailabilityAvailable = 'Saadaval';
+z.string.et.userAvailabilityAway = 'Eemal';
+z.string.et.userAvailabilityBusy = 'Hõivatud';
+z.string.et.userAvailabilityNone = 'Puudub';
 
 z.string.et.system_notification_asset_add = 'Jagas pilti';
 z.string.et.system_notification_connection_accepted = 'Nõustus sinu ühendamistaotlusega';

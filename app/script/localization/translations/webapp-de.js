@@ -38,12 +38,12 @@ z.string.de.authAccountSignIn = 'Login';
 z.string.de.authAccountSignInEmail = 'E-Mail';
 z.string.de.authAccountSignInPhone = 'Handy';
 
-z.string.de.auth_blocked_cookies = 'Aktiviere Cookies, um dich bei Wire einzuloggen.';
-z.string.de.auth_blocked_database = 'Wire benötigt zum Anzeigen deiner Nachrichten Zugriff auf den lokalen Speicher. In Privaten Fenstern ist dieser nicht verfügbar.';
-z.string.de.auth_blocked_tabs = 'Wire ist bereits in einem anderen Tab geöffnet.';
+z.string.de.authBlockedCookies = 'Aktiviere Cookies, um dich bei Wire einzuloggen.';
+z.string.de.authBlockedDatabase = 'Wire benötigt zum Anzeigen deiner Nachrichten Zugriff auf den lokalen Speicher. In Privaten Fenstern ist dieser nicht verfügbar.';
+z.string.de.authBlockedTabs = 'Wire ist bereits in einem anderen Tab geöffnet.';
 
-z.string.de.auth_verify_account_add = 'Hinzufügen';
-z.string.de.auth_verify_account_detail = 'Hiermit kannst du Wire auf mehreren Geräten verwenden.';
+z.string.de.authVerifyAccountAdd = 'Hinzufügen';
+z.string.de.authVerifyAccountDetail = 'Hiermit kannst du Wire auf mehreren Geräten verwenden.';
 z.string.de.auth_verify_account_headline = 'E-Mail-Adresse und Passwort hinzufügen.';
 z.string.de.auth_verify_account_logout = 'Abmelden';
 z.string.de.auth_verify_code_description = 'Gib den Code ein, den wir an \n{{number}} gesendet haben.';
@@ -509,10 +509,10 @@ z.string.de.warning_permission_request_notification = '{{icon}} Benachrichtigung
 z.string.de.warning_permission_request_screen = '{{icon}} Zugriff auf Bildschirm gewähren';
 z.string.de.warning_tell_me_how = 'Zeig mir wie';
 
-z.string.de.user_availability_available = 'Verfügbar';
-z.string.de.user_availability_away = 'Abwesend';
-z.string.de.user_availability_busy = 'Beschäftigt';
-z.string.de.user_availability_none = 'Kein Status';
+z.string.de.userAvailabilityAvailable = 'Verfügbar';
+z.string.de.userAvailabilityAway = 'Abwesend';
+z.string.de.userAvailabilityBusy = 'Beschäftigt';
+z.string.de.userAvailabilityNone = 'Kein Status';
 
 z.string.de.system_notification_asset_add = 'Hat ein Bild geteilt';
 z.string.de.system_notification_connection_accepted = 'Hat deine Kontaktanfrage akzeptiert';

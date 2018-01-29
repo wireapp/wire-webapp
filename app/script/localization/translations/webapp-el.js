@@ -37,12 +37,12 @@ z.string.el.authAccountSignIn = 'Σύνδεση';
 z.string.el.authAccountSignInEmail = 'Email';
 z.string.el.authAccountSignInPhone = 'Τηλεφωνο';
 
-z.string.el.auth_blocked_cookies = 'Ενεργοποιήστε τα cookies για να συνδεθείτε στο Wire.';
-z.string.el.auth_blocked_database = 'Το Wire χρειάζεται πρόσβαση σε τοπικό αποθηκευτικό χώρο για την προβολή των μηνυμάτων σας. Η τοπική αποθήκευση δεν είναι διαθέσιμη σε ιδιωτική λειτουργία.';
-z.string.el.auth_blocked_tabs = 'Το Wire είναι ήδη ανοικτό σε άλλη καρτέλα.';
+z.string.el.authBlockedCookies = 'Ενεργοποιήστε τα cookies για να συνδεθείτε στο Wire.';
+z.string.el.authBlockedDatabase = 'Το Wire χρειάζεται πρόσβαση σε τοπικό αποθηκευτικό χώρο για την προβολή των μηνυμάτων σας. Η τοπική αποθήκευση δεν είναι διαθέσιμη σε ιδιωτική λειτουργία.';
+z.string.el.authBlockedTabs = 'Το Wire είναι ήδη ανοικτό σε άλλη καρτέλα.';
 
-z.string.el.auth_verify_account_add = 'Προσθήκη';
-z.string.el.auth_verify_account_detail = 'Αυτό σας επιτρέπει να χρησιμοποιήσετε το Wire σε πολλαπλές συσκευές.';
+z.string.el.authVerifyAccountAdd = 'Προσθήκη';
+z.string.el.authVerifyAccountDetail = 'Αυτό σας επιτρέπει να χρησιμοποιήσετε το Wire σε πολλαπλές συσκευές.';
 z.string.el.auth_verify_account_headline = 'Προσθέστε email και κωδικό πρόσβασης.';
 z.string.el.auth_verify_account_logout = 'Αποσύνδεση';
 z.string.el.auth_verify_code_description = 'Εισάγετε τον κωδικό επαλήθευσης που στείλαμε στο {{number}}.';
@@ -484,8 +484,8 @@ z.string.el.warning_permission_request_notification = '{{icon}} Να επιτρ�
 z.string.el.warning_permission_request_screen = '{{icon}} Να επιτρέπεται η πρόσβαση στην οθόνη';
 z.string.el.warning_tell_me_how = 'Πείτε μας πως';
 
-z.string.el.user_availability_available = 'Διαθέσιμο';
-z.string.el.user_availability_none = 'Καθόλου';
+z.string.el.userAvailabilityAvailable = 'Διαθέσιμο';
+z.string.el.userAvailabilityNone = 'Καθόλου';
 
 z.string.el.system_notification_asset_add = 'Κοινοποίηση εικόνας';
 z.string.el.system_notification_connection_accepted = 'Η αίτηση σύνδεσης σας έγινε αποδεκτή';

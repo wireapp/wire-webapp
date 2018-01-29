@@ -131,7 +131,7 @@
           <div id="section-verify" class="section">
             <form id="form-verify-account" class="form" data-bind="submit: verify_account">
               <div class="auth-headline" data-bind="l10n_text: z.string.auth_verify_account_headline"></div>
-              <div class="auth-headline-sub" data-bind="l10n_text: z.string.auth_verify_account_detail"></div>
+              <div class="auth-headline-sub" data-bind="l10n_text: z.string.authVerifyAccountDetail"></div>
               <div id="wire-verify-account-email-container" class="form-control">
                 <input class="input email" id="wire-verify-account-email" type="text" autocomplete="email" maxlength="128" spellcheck="false"
                        data-bind="css: {'input-error': failed_validation_email}, event: {input: clear_error}, l10n_tooltip: z.string.auth_placeholder_email, l10n_placeholder: z.string.auth_placeholder_email, textInput: username"
@@ -150,7 +150,7 @@
               <div class="footer">
                 <div class="column">
                   <input id="wire-verify-account" class="button button-white btn-action" type="submit"
-                         data-bind="enable: can_login_password, l10n_input: z.string.auth_verify_account_add"
+                         data-bind="enable: can_login_password, l10n_input: z.string.authVerifyAccountAdd"
                          data-uie-name="do-verify-account">
                 </div>
                 <div class="column">
@@ -300,13 +300,13 @@
           <div id="section-blocked" class="section">
             <div class="form-blocked">
               <div id="form-blocked-cookies" class="blocked-content" data-bind="visible: blocked_mode_cookies">
-                <div class="auth-headline" data-bind="l10n_text: z.string.auth_blocked_cookies"></div>
+                <div class="auth-headline" data-bind="l10n_text: z.string.authBlockedCookies"></div>
               </div>
               <div id="form-blocked-database" class="blocked-content" data-bind="visible: blocked_mode_database">
-                <div class="auth-headline" data-bind="l10n_text: z.string.auth_blocked_database"></div>
+                <div class="auth-headline" data-bind="l10n_text: z.string.authBlockedDatabase"></div>
               </div>
               <div id="form-blocked-tabs" class="blocked-content" data-bind="visible: blocked_mode_tabs">
-                <div class="auth-headline" data-bind="l10n_text: z.string.auth_blocked_tabs"></div>
+                <div class="auth-headline" data-bind="l10n_text: z.string.authBlockedTabs"></div>
               </div>
             </div>
           </div>

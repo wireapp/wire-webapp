@@ -37,12 +37,12 @@ z.string.tr.authAccountSignIn = 'Giriş yap';
 z.string.tr.authAccountSignInEmail = 'E-posta';
 z.string.tr.authAccountSignInPhone = 'Telefon';
 
-z.string.tr.auth_blocked_cookies = 'Wire’a giriş yapabilmek için çerezleri etkinleştirin.';
-z.string.tr.auth_blocked_database = 'Wire’ın mesajları gösterebilmek için yerel diske erişmesi lazım. Gizli modda yerel disk kullanılamaz.';
-z.string.tr.auth_blocked_tabs = 'Wire zaten başka bir sekmede açık.';
+z.string.tr.authBlockedCookies = 'Wire’a giriş yapabilmek için çerezleri etkinleştirin.';
+z.string.tr.authBlockedDatabase = 'Wire’ın mesajları gösterebilmek için yerel diske erişmesi lazım. Gizli modda yerel disk kullanılamaz.';
+z.string.tr.authBlockedTabs = 'Wire zaten başka bir sekmede açık.';
 
-z.string.tr.auth_verify_account_add = 'Ekle';
-z.string.tr.auth_verify_account_detail = 'Bu sizin Wire’ı birden fazla cihazda kullanmanıza olanak sağlar.';
+z.string.tr.authVerifyAccountAdd = 'Ekle';
+z.string.tr.authVerifyAccountDetail = 'Bu sizin Wire’ı birden fazla cihazda kullanmanıza olanak sağlar.';
 z.string.tr.auth_verify_account_headline = 'Bir e-posta adresi ve şifre ekleyin.';
 z.string.tr.auth_verify_account_logout = 'Çıkış yap';
 z.string.tr.auth_verify_code_description = '{{number}} gönderdiğimiz doğrulama kodunu girin.';
@@ -489,10 +489,10 @@ z.string.tr.warning_permission_request_notification = '{{icon}} Bildirimlere izi
 z.string.tr.warning_permission_request_screen = '{{icon}} Ekrana erişime izin ver';
 z.string.tr.warning_tell_me_how = 'Anlat bana';
 
-z.string.tr.user_availability_available = 'Alınabilir';
-z.string.tr.user_availability_away = 'Uzakta';
-z.string.tr.user_availability_busy = 'Meşgul';
-z.string.tr.user_availability_none = 'Hiçbiri';
+z.string.tr.userAvailabilityAvailable = 'Alınabilir';
+z.string.tr.userAvailabilityAway = 'Uzakta';
+z.string.tr.userAvailabilityBusy = 'Meşgul';
+z.string.tr.userAvailabilityNone = 'Hiçbiri';
 
 z.string.tr.system_notification_asset_add = 'Bir resim paylaştı';
 z.string.tr.system_notification_connection_accepted = 'Bağlantı isteğinizi kabul etti';

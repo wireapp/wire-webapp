@@ -38,12 +38,12 @@ z.string.nl.authAccountSignIn = 'Inloggen';
 z.string.nl.authAccountSignInEmail = 'E-mail';
 z.string.nl.authAccountSignInPhone = 'Telefoonnummer';
 
-z.string.nl.auth_blocked_cookies = 'Zet je cookies aan om in te loggen in Wire.';
-z.string.nl.auth_blocked_database = 'Wire heeft toegang nodig tot lokale opslag om je berichten te kunnen laten zien, maar dit is niet mogelijk in privémodus.';
-z.string.nl.auth_blocked_tabs = 'Wire is al open in een ander tabblad.';
+z.string.nl.authBlockedCookies = 'Zet je cookies aan om in te loggen in Wire.';
+z.string.nl.authBlockedDatabase = 'Wire heeft toegang nodig tot lokale opslag om je berichten te kunnen laten zien, maar dit is niet mogelijk in privémodus.';
+z.string.nl.authBlockedTabs = 'Wire is al open in een ander tabblad.';
 
-z.string.nl.auth_verify_account_add = 'Toevoegen';
-z.string.nl.auth_verify_account_detail = 'Dit zorgt ervoor dat je Wire op meerdere apparaten kunt gebruiken.';
+z.string.nl.authVerifyAccountAdd = 'Toevoegen';
+z.string.nl.authVerifyAccountDetail = 'Dit zorgt ervoor dat je Wire op meerdere apparaten kunt gebruiken.';
 z.string.nl.auth_verify_account_headline = 'E-mailadres en wachtwoord toevoegen.';
 z.string.nl.auth_verify_account_logout = 'Uitloggen';
 z.string.nl.auth_verify_code_description = 'Voer de verificatiecode in die\nwe naar {{number}} hebben gestuurd.';
@@ -490,10 +490,10 @@ z.string.nl.warning_permission_request_notification = '{{icon}} Meldingen toesta
 z.string.nl.warning_permission_request_screen = '{{icon}} Toegang tot scherm toestaan';
 z.string.nl.warning_tell_me_how = 'Vertel me meer';
 
-z.string.nl.user_availability_available = 'Beschikbaar';
-z.string.nl.user_availability_away = 'Afwezig';
-z.string.nl.user_availability_busy = 'Bezet';
-z.string.nl.user_availability_none = 'Geen';
+z.string.nl.userAvailabilityAvailable = 'Beschikbaar';
+z.string.nl.userAvailabilityAway = 'Afwezig';
+z.string.nl.userAvailabilityBusy = 'Bezet';
+z.string.nl.userAvailabilityNone = 'Geen';
 
 z.string.nl.system_notification_asset_add = 'Deelde een foto';
 z.string.nl.system_notification_connection_accepted = 'Accepteer connectie aanvraag';

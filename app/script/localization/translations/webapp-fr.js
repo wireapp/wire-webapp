@@ -38,12 +38,12 @@ z.string.fr.authAccountSignIn = 'Se connecter';
 z.string.fr.authAccountSignInEmail = 'E-mail';
 z.string.fr.authAccountSignInPhone = 'Téléphone';
 
-z.string.fr.auth_blocked_cookies = 'Autorisez les cookies pour vous connecter à Wire.';
-z.string.fr.auth_blocked_database = 'Wire a besoin d’accéder à votre espace de stockage pour afficher les messages. Il n’est pas disponible en navigation privée.';
-z.string.fr.auth_blocked_tabs = 'Wire est déjà ouvert dans un autre onglet.';
+z.string.fr.authBlockedCookies = 'Autorisez les cookies pour vous connecter à Wire.';
+z.string.fr.authBlockedDatabase = 'Wire a besoin d’accéder à votre espace de stockage pour afficher les messages. Il n’est pas disponible en navigation privée.';
+z.string.fr.authBlockedTabs = 'Wire est déjà ouvert dans un autre onglet.';
 
-z.string.fr.auth_verify_account_add = 'Ajouter';
-z.string.fr.auth_verify_account_detail = 'Cela vous permet d’utiliser Wire sur plusieurs appareils.';
+z.string.fr.authVerifyAccountAdd = 'Ajouter';
+z.string.fr.authVerifyAccountDetail = 'Cela vous permet d’utiliser Wire sur plusieurs appareils.';
 z.string.fr.auth_verify_account_headline = 'Ajouter une adresse e-mail et un mot de passe.';
 z.string.fr.auth_verify_account_logout = 'Se déconnecter';
 z.string.fr.auth_verify_code_description = 'Saisissez le code de vérification que nous avons envoyé au {{number}}.';
@@ -491,10 +491,10 @@ z.string.fr.warning_permission_request_notification = '{{icon}} Autoriser les no
 z.string.fr.warning_permission_request_screen = '{{icon}} Autoriser l’accès à l’écran';
 z.string.fr.warning_tell_me_how = 'Dites-moi comment faire';
 
-z.string.fr.user_availability_available = 'Disponible';
-z.string.fr.user_availability_away = 'Absent(e)';
-z.string.fr.user_availability_busy = 'Occupé(e)';
-z.string.fr.user_availability_none = 'Aucune';
+z.string.fr.userAvailabilityAvailable = 'Disponible';
+z.string.fr.userAvailabilityAway = 'Absent(e)';
+z.string.fr.userAvailabilityBusy = 'Occupé(e)';
+z.string.fr.userAvailabilityNone = 'Aucune';
 
 z.string.fr.system_notification_asset_add = 'A partagé une image';
 z.string.fr.system_notification_connection_accepted = 'A accepté votre demande de connexion';

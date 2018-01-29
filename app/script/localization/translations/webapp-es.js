@@ -37,12 +37,12 @@ z.string.es.authAccountSignIn = 'Iniciar sesión';
 z.string.es.authAccountSignInEmail = 'Correo';
 z.string.es.authAccountSignInPhone = 'Teléfono';
 
-z.string.es.auth_blocked_cookies = 'Habilita las cookies para iniciar sesión.';
-z.string.es.auth_blocked_database = 'Wire necesita acceso al almacenamiento local para mostrar los mensajes. No está disponible en modo privado.';
-z.string.es.auth_blocked_tabs = 'Wire ya está abierto en otra pestaña.';
+z.string.es.authBlockedCookies = 'Habilita las cookies para iniciar sesión.';
+z.string.es.authBlockedDatabase = 'Wire necesita acceso al almacenamiento local para mostrar los mensajes. No está disponible en modo privado.';
+z.string.es.authBlockedTabs = 'Wire ya está abierto en otra pestaña.';
 
-z.string.es.auth_verify_account_add = 'Agregar';
-z.string.es.auth_verify_account_detail = 'Esto le permite usar Wire en múltiples dispositivos.';
+z.string.es.authVerifyAccountAdd = 'Agregar';
+z.string.es.authVerifyAccountDetail = 'Esto le permite usar Wire en múltiples dispositivos.';
 z.string.es.auth_verify_account_headline = 'Agregar dirección de correo electrónico y contraseña.';
 z.string.es.auth_verify_account_logout = 'Cerrar sesión';
 z.string.es.auth_verify_code_description = 'Ingresa el código de verificación\nque hemos enviado a {{number}}.';
@@ -489,10 +489,10 @@ z.string.es.warning_permission_request_notification = '{{icon}} Permitir notific
 z.string.es.warning_permission_request_screen = '{{icon}} Permitir acceso a la pantalla';
 z.string.es.warning_tell_me_how = 'Explíqueme cómo';
 
-z.string.es.user_availability_available = 'Disponible';
-z.string.es.user_availability_away = 'Ausente';
-z.string.es.user_availability_busy = 'Ocupado';
-z.string.es.user_availability_none = 'Ninguno';
+z.string.es.userAvailabilityAvailable = 'Disponible';
+z.string.es.userAvailabilityAway = 'Ausente';
+z.string.es.userAvailabilityBusy = 'Ocupado';
+z.string.es.userAvailabilityNone = 'Ninguno';
 
 z.string.es.system_notification_asset_add = 'Compartió una foto';
 z.string.es.system_notification_connection_accepted = 'Aceptó tu solicitud de conexión';

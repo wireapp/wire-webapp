@@ -37,12 +37,12 @@ z.string.uk.authAccountSignIn = 'Увійти';
 z.string.uk.authAccountSignInEmail = 'Email';
 z.string.uk.authAccountSignInPhone = 'Номер телефону';
 
-z.string.uk.auth_blocked_cookies = 'Увімкніть файли cookie, щоб увійти в Wire.';
-z.string.uk.auth_blocked_database = 'Wire потребує доступу до локальної бази даних для відображення повідомлень. Локальна база даних недоступна в приватному режимі.';
-z.string.uk.auth_blocked_tabs = 'Wire уже відкрито в іншій вкладці браузера.';
+z.string.uk.authBlockedCookies = 'Увімкніть файли cookie, щоб увійти в Wire.';
+z.string.uk.authBlockedDatabase = 'Wire потребує доступу до локальної бази даних для відображення повідомлень. Локальна база даних недоступна в приватному режимі.';
+z.string.uk.authBlockedTabs = 'Wire уже відкрито в іншій вкладці браузера.';
 
-z.string.uk.auth_verify_account_add = 'Додати';
-z.string.uk.auth_verify_account_detail = 'Це дасть змогу використовувати Wire на різних пристроях.';
+z.string.uk.authVerifyAccountAdd = 'Додати';
+z.string.uk.authVerifyAccountDetail = 'Це дасть змогу використовувати Wire на різних пристроях.';
 z.string.uk.auth_verify_account_headline = 'Додайте email та пароль.';
 z.string.uk.auth_verify_account_logout = 'Вийти';
 z.string.uk.auth_verify_code_description = 'Введіть код верифікації,\nякий ми вислали на номер {{number}}.';
@@ -488,10 +488,10 @@ z.string.uk.warning_permission_request_notification = '{{icon}} Дозволит
 z.string.uk.warning_permission_request_screen = '{{icon}} Дозволити доступ до обміну скріншотами робочого столу';
 z.string.uk.warning_tell_me_how = 'Скажіть мені як';
 
-z.string.uk.user_availability_available = 'Доступний';
-z.string.uk.user_availability_away = 'Не на місці';
-z.string.uk.user_availability_busy = 'Не турбувати';
-z.string.uk.user_availability_none = 'Все вимкнено';
+z.string.uk.userAvailabilityAvailable = 'Доступний';
+z.string.uk.userAvailabilityAway = 'Не на місці';
+z.string.uk.userAvailabilityBusy = 'Не турбувати';
+z.string.uk.userAvailabilityNone = 'Все вимкнено';
 
 z.string.uk.system_notification_asset_add = 'Поділився(-лась) картинкою';
 z.string.uk.system_notification_connection_accepted = 'Прийняв(-ла) ваш запит на додавання до контактів';

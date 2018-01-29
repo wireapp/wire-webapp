@@ -38,12 +38,12 @@ z.string.ro.authAccountSignIn = 'Autentificare';
 z.string.ro.authAccountSignInEmail = 'E-mail';
 z.string.ro.authAccountSignInPhone = 'Telefon';
 
-z.string.ro.auth_blocked_cookies = 'Activează cookie-urile pentru intra în Wire.';
-z.string.ro.auth_blocked_database = 'Wire are nevoie de acces la stocarea locală pentru a afișa mesaje. Stocarea locală nu este disponibilă în modul privat.';
-z.string.ro.auth_blocked_tabs = 'Wire este deja deschis în altă filă.';
+z.string.ro.authBlockedCookies = 'Activează cookie-urile pentru intra în Wire.';
+z.string.ro.authBlockedDatabase = 'Wire are nevoie de acces la stocarea locală pentru a afișa mesaje. Stocarea locală nu este disponibilă în modul privat.';
+z.string.ro.authBlockedTabs = 'Wire este deja deschis în altă filă.';
 
-z.string.ro.auth_verify_account_add = 'Adaugă';
-z.string.ro.auth_verify_account_detail = 'Aceasta îți permite să folosești Wire pe mai multe dispozitive.';
+z.string.ro.authVerifyAccountAdd = 'Adaugă';
+z.string.ro.authVerifyAccountDetail = 'Aceasta îți permite să folosești Wire pe mai multe dispozitive.';
 z.string.ro.auth_verify_account_headline = 'Adaugă o adresă de e-mail și o parolă.';
 z.string.ro.auth_verify_account_logout = 'Deconectare';
 z.string.ro.auth_verify_code_description = 'Introdu codul de verificare\nl-am trimis la {{number}}.';
@@ -489,8 +489,8 @@ z.string.ro.warning_permission_request_notification = '{{icon}} permite notific�
 z.string.ro.warning_permission_request_screen = '{{icon}} permite accesul la ecran';
 z.string.ro.warning_tell_me_how = 'Spune-mi cum';
 
-z.string.ro.user_availability_available = 'Disponibil';
-z.string.ro.user_availability_none = 'Niciunul';
+z.string.ro.userAvailabilityAvailable = 'Disponibil';
+z.string.ro.userAvailabilityNone = 'Niciunul';
 
 z.string.ro.system_notification_asset_add = 'A împărtășit o imagine';
 z.string.ro.system_notification_connection_accepted = 'A acceptat cererea de conectare a ta';

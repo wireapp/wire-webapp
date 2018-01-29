@@ -37,11 +37,11 @@ z.string.sl.authAccountSignIn = 'Prijava';
 z.string.sl.authAccountSignInEmail = 'E-pošta';
 z.string.sl.authAccountSignInPhone = 'Telefon';
 
-z.string.sl.auth_blocked_database = 'Wire potrebuje dostop do lokalnega pomnilnika za prikaz sporočil. Lokalni pomnilnik ni na voljo v privatnem načinu.';
-z.string.sl.auth_blocked_tabs = 'Wire je že odprt v drugem oknu.';
+z.string.sl.authBlockedDatabase = 'Wire potrebuje dostop do lokalnega pomnilnika za prikaz sporočil. Lokalni pomnilnik ni na voljo v privatnem načinu.';
+z.string.sl.authBlockedTabs = 'Wire je že odprt v drugem oknu.';
 
-z.string.sl.auth_verify_account_add = 'Dodaj';
-z.string.sl.auth_verify_account_detail = 'To vam omogoča uporabo Wire na večih napravah.';
+z.string.sl.authVerifyAccountAdd = 'Dodaj';
+z.string.sl.authVerifyAccountDetail = 'To vam omogoča uporabo Wire na večih napravah.';
 z.string.sl.auth_verify_account_headline = 'Dodajte e-poštni naslov in geslo.';
 z.string.sl.auth_verify_account_logout = 'Odjava';
 z.string.sl.auth_verify_code_description = 'Vnesite verifikacijsko kodo,\nki smo jo poslali na {{number}}.';
@@ -478,8 +478,8 @@ z.string.sl.warning_permission_request_notification = '{{icon}} Dovoli obvestila
 z.string.sl.warning_permission_request_screen = '{{icon}} Dovoli dostop do zaslona';
 z.string.sl.warning_tell_me_how = 'Povej mi kako';
 
-z.string.sl.user_availability_available = 'Na voljo';
-z.string.sl.user_availability_none = 'Nič';
+z.string.sl.userAvailabilityAvailable = 'Na voljo';
+z.string.sl.userAvailabilityNone = 'Nič';
 
 z.string.sl.system_notification_asset_add = 'Je delil(-a) sliko';
 z.string.sl.system_notification_connection_accepted = 'Je sprejel(-a) vašo zahtevo po povezavi';

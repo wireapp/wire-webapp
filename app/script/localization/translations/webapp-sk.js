@@ -38,12 +38,12 @@ z.string.sk.authAccountSignIn = 'Prihlásenie';
 z.string.sk.authAccountSignInEmail = 'E-mail';
 z.string.sk.authAccountSignInPhone = 'Telefón';
 
-z.string.sk.auth_blocked_cookies = 'Povoľte cookies na prihlásenie k Wire.';
-z.string.sk.auth_blocked_database = 'Pre zobrazenie Vašich správ potrebuje Wire prístup k lokálnemu úložisku. Lokálne úložisko nie je dostupné v privátnom režime.';
-z.string.sk.auth_blocked_tabs = 'Wire je už otvorený na inej karte.';
+z.string.sk.authBlockedCookies = 'Povoľte cookies na prihlásenie k Wire.';
+z.string.sk.authBlockedDatabase = 'Pre zobrazenie Vašich správ potrebuje Wire prístup k lokálnemu úložisku. Lokálne úložisko nie je dostupné v privátnom režime.';
+z.string.sk.authBlockedTabs = 'Wire je už otvorený na inej karte.';
 
-z.string.sk.auth_verify_account_add = 'Pridať';
-z.string.sk.auth_verify_account_detail = 'To vám umožní používať Wire na viacerých zariadeniach.';
+z.string.sk.authVerifyAccountAdd = 'Pridať';
+z.string.sk.authVerifyAccountDetail = 'To vám umožní používať Wire na viacerých zariadeniach.';
 z.string.sk.auth_verify_account_headline = 'Pridať e-mailovú adresu a heslo.';
 z.string.sk.auth_verify_account_logout = 'Odhlásenie';
 z.string.sk.auth_verify_code_description = 'Zadajte overovací kód, ktorý sme zaslali na {{number}}.';
@@ -487,8 +487,8 @@ z.string.sk.warning_permission_request_notification = '{{icon}} Povoliť oznáme
 z.string.sk.warning_permission_request_screen = '{{icon}} Povoliť prístup k obrazovke';
 z.string.sk.warning_tell_me_how = 'Povedz mi, ako';
 
-z.string.sk.user_availability_available = 'Dostupné';
-z.string.sk.user_availability_none = 'Žiadne';
+z.string.sk.userAvailabilityAvailable = 'Dostupné';
+z.string.sk.userAvailabilityNone = 'Žiadne';
 
 z.string.sk.system_notification_asset_add = 'Zdieľať obrázok';
 z.string.sk.system_notification_connection_accepted = 'Prijal Vašu požiadavku na pripojenie';

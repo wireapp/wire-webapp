@@ -37,12 +37,12 @@ z.string.pt.authAccountSignIn = 'Iniciar sessão';
 z.string.pt.authAccountSignInEmail = 'E-mail';
 z.string.pt.authAccountSignInPhone = 'Telefone';
 
-z.string.pt.auth_blocked_cookies = 'Ative os cookies para iniciar sessão no Wire.';
-z.string.pt.auth_blocked_database = 'O Wire necessita de acesso ao armazenamento local para mostrar as suas mensagens. O armazenamento local não está disponível no modo privado.';
-z.string.pt.auth_blocked_tabs = 'O Wire já está aberto noutro separador.';
+z.string.pt.authBlockedCookies = 'Ative os cookies para iniciar sessão no Wire.';
+z.string.pt.authBlockedDatabase = 'O Wire necessita de acesso ao armazenamento local para mostrar as suas mensagens. O armazenamento local não está disponível no modo privado.';
+z.string.pt.authBlockedTabs = 'O Wire já está aberto noutro separador.';
 
-z.string.pt.auth_verify_account_add = 'Adicionar';
-z.string.pt.auth_verify_account_detail = 'Permite que use o Wire em vários dispositivos.';
+z.string.pt.authVerifyAccountAdd = 'Adicionar';
+z.string.pt.authVerifyAccountDetail = 'Permite que use o Wire em vários dispositivos.';
 z.string.pt.auth_verify_account_headline = 'Adicionar o endereço de e-mail e palavra-passe.';
 z.string.pt.auth_verify_account_logout = 'Terminar sessão';
 z.string.pt.auth_verify_code_description = 'Introduza o código de verificação que foi enviado para o {{number}}.';
@@ -488,10 +488,10 @@ z.string.pt.warning_permission_request_notification = '{{icon}} Permitir notific
 z.string.pt.warning_permission_request_screen = '{{icon}} Permitir o acesso ao ecrã';
 z.string.pt.warning_tell_me_how = 'Diga-me agora';
 
-z.string.pt.user_availability_available = 'Disponível';
-z.string.pt.user_availability_away = 'Ausente';
-z.string.pt.user_availability_busy = 'Ocupado';
-z.string.pt.user_availability_none = 'Nenhum';
+z.string.pt.userAvailabilityAvailable = 'Disponível';
+z.string.pt.userAvailabilityAway = 'Ausente';
+z.string.pt.userAvailabilityBusy = 'Ocupado';
+z.string.pt.userAvailabilityNone = 'Nenhum';
 
 z.string.pt.system_notification_asset_add = 'Partilhou uma foto';
 z.string.pt.system_notification_connection_accepted = 'Aceitou o seu pedido de ligação';

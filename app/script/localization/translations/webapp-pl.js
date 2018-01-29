@@ -37,12 +37,12 @@ z.string.pl.authAccountSignIn = 'Zaloguj się';
 z.string.pl.authAccountSignInEmail = 'Adres e-mail';
 z.string.pl.authAccountSignInPhone = 'Numer telefonu';
 
-z.string.pl.auth_blocked_cookies = 'Włącz ciasteczka do zalogowania się do Wire.';
-z.string.pl.auth_blocked_database = 'Wire potrzebuje dostępu do pamięci lokalnej, by wyświetlać wiadomości. Pamięć lokalna nie jest dostępna w trybie prywatnym.';
-z.string.pl.auth_blocked_tabs = 'Wire jest już otwarty w innej zakładce.';
+z.string.pl.authBlockedCookies = 'Włącz ciasteczka do zalogowania się do Wire.';
+z.string.pl.authBlockedDatabase = 'Wire potrzebuje dostępu do pamięci lokalnej, by wyświetlać wiadomości. Pamięć lokalna nie jest dostępna w trybie prywatnym.';
+z.string.pl.authBlockedTabs = 'Wire jest już otwarty w innej zakładce.';
 
-z.string.pl.auth_verify_account_add = 'Dodaj';
-z.string.pl.auth_verify_account_detail = 'To pozwala Ci używać Wire na więcej niż jednym urządzeniu.';
+z.string.pl.authVerifyAccountAdd = 'Dodaj';
+z.string.pl.authVerifyAccountDetail = 'To pozwala Ci używać Wire na więcej niż jednym urządzeniu.';
 z.string.pl.auth_verify_account_headline = 'Dodaj adres e-mail i hasło.';
 z.string.pl.auth_verify_account_logout = 'Wyloguj się';
 z.string.pl.auth_verify_code_description = 'Wpisz kod weryfikacyjny, który wysłaliśmy do {{number}}.';
@@ -487,8 +487,8 @@ z.string.pl.warning_permission_request_notification = '{{icon}} Zezwól na powia
 z.string.pl.warning_permission_request_screen = '{{icon}} zezwól na dostęp do ekranu';
 z.string.pl.warning_tell_me_how = 'Powiedz mi jak';
 
-z.string.pl.user_availability_available = '&Dostępny(a)';
-z.string.pl.user_availability_none = 'Żaden';
+z.string.pl.userAvailabilityAvailable = '&Dostępny(a)';
+z.string.pl.userAvailabilityNone = 'Żaden';
 
 z.string.pl.system_notification_asset_add = 'Udostępnił obrazek';
 z.string.pl.system_notification_connection_accepted = 'Zaakceptowane żądania połączenia';

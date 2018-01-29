@@ -27,23 +27,23 @@ z.ui.AvailabilityContextMenu = (() => {
     const entries = [
       {
         click: () => amplify.publish(z.event.WebApp.USER.SET_AVAILABILITY, z.user.AvailabilityType.NONE, method),
-        label: z.l10n.text(z.string.user_availability_none),
-        title: z.l10n.text(z.string.user_availability_none),
+        label: z.l10n.text(z.string.userAvailabilityNone),
+        title: z.l10n.text(z.string.userAvailabilityNone),
       },
       {
         click: () => amplify.publish(z.event.WebApp.USER.SET_AVAILABILITY, z.user.AvailabilityType.AVAILABLE, method),
-        label: z.l10n.text(z.string.user_availability_available),
-        title: z.l10n.text(z.string.user_availability_available),
+        label: z.l10n.text(z.string.userAvailabilityAvailable),
+        title: z.l10n.text(z.string.userAvailabilityAvailable),
       },
       {
         click: () => amplify.publish(z.event.WebApp.USER.SET_AVAILABILITY, z.user.AvailabilityType.BUSY, method),
-        label: z.l10n.text(z.string.user_availability_busy),
-        title: z.l10n.text(z.string.user_availability_busy),
+        label: z.l10n.text(z.string.userAvailabilityBusy),
+        title: z.l10n.text(z.string.userAvailabilityBusy),
       },
       {
         click: () => amplify.publish(z.event.WebApp.USER.SET_AVAILABILITY, z.user.AvailabilityType.AWAY, method),
-        label: z.l10n.text(z.string.user_availability_away),
-        title: z.l10n.text(z.string.user_availability_away),
+        label: z.l10n.text(z.string.userAvailabilityAway),
+        title: z.l10n.text(z.string.userAvailabilityAway),
       },
     ];
 

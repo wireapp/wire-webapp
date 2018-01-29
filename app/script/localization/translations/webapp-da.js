@@ -36,8 +36,8 @@ z.string.da.authAccountSignIn = 'Log ind';
 z.string.da.authAccountSignInEmail = 'Email';
 z.string.da.authAccountSignInPhone = 'Telefon';
 
-z.string.da.auth_verify_account_add = 'Tilføj';
-z.string.da.auth_verify_account_detail = 'Dette gør, at du kan bruge Wire på flere enheder.';
+z.string.da.authVerifyAccountAdd = 'Tilføj';
+z.string.da.authVerifyAccountDetail = 'Dette gør, at du kan bruge Wire på flere enheder.';
 z.string.da.auth_verify_account_headline = 'Tilføj email adresse og adgangskode.';
 z.string.da.auth_verify_account_logout = 'Log ud';
 z.string.da.auth_verify_code_description = 'Indtast bekræftelseskoden vi sendte til {{number}}.';
@@ -461,8 +461,8 @@ z.string.da.warning_permission_request_notification = '{{icon}} Tillad meddelels
 z.string.da.warning_permission_request_screen = '{{icon}} Tillad adgang til skærm';
 z.string.da.warning_tell_me_how = 'Fortæl mig hvordan';
 
-z.string.da.user_availability_available = 'Ledig';
-z.string.da.user_availability_none = 'Ingen';
+z.string.da.userAvailabilityAvailable = 'Ledig';
+z.string.da.userAvailabilityNone = 'Ingen';
 
 z.string.da.system_notification_asset_add = 'Delte et billede';
 z.string.da.system_notification_connection_accepted = 'Accepterede din anmodning om forbindelse';

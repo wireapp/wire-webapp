@@ -38,12 +38,12 @@ z.string.hu.authAccountSignIn = 'Bejelentkezés';
 z.string.hu.authAccountSignInEmail = 'E-mail';
 z.string.hu.authAccountSignInPhone = 'Telefon';
 
-z.string.hu.auth_blocked_cookies = 'A bejelentkezéshez engedélyezni kell a böngésző-sütiket.';
-z.string.hu.auth_blocked_database = 'Az üzenetek megjelenítéséhez a Wire-nek el kell érnie a helyi tárhelyet. A böngésző privát módú használatakor a helyi tárhely nem áll rendelkezésre.';
-z.string.hu.auth_blocked_tabs = 'A Wire már nyitva van egy másik böngészőlapon.';
+z.string.hu.authBlockedCookies = 'A bejelentkezéshez engedélyezni kell a böngésző-sütiket.';
+z.string.hu.authBlockedDatabase = 'Az üzenetek megjelenítéséhez a Wire-nek el kell érnie a helyi tárhelyet. A böngésző privát módú használatakor a helyi tárhely nem áll rendelkezésre.';
+z.string.hu.authBlockedTabs = 'A Wire már nyitva van egy másik böngészőlapon.';
 
-z.string.hu.auth_verify_account_add = 'Hozzáadás';
-z.string.hu.auth_verify_account_detail = 'Ezáltal akár több eszközön is használhatod a Wire-t.';
+z.string.hu.authVerifyAccountAdd = 'Hozzáadás';
+z.string.hu.authVerifyAccountDetail = 'Ezáltal akár több eszközön is használhatod a Wire-t.';
 z.string.hu.auth_verify_account_headline = 'E-mail cím és jelszó megadása.';
 z.string.hu.auth_verify_account_logout = 'Kijelentkezés';
 z.string.hu.auth_verify_code_description = 'Írd be az ellenőrző kódot,\namit a {{number}} telefonszámra küldtünk.';
@@ -495,10 +495,10 @@ z.string.hu.warning_permission_request_notification = '{{icon}} Értesítések e
 z.string.hu.warning_permission_request_screen = '{{icon}} Képernyőmegosztás engedélyezése';
 z.string.hu.warning_tell_me_how = 'Mit kell tennem';
 
-z.string.hu.user_availability_available = 'Elérhető';
-z.string.hu.user_availability_away = 'Nincs a gépnél';
-z.string.hu.user_availability_busy = 'Elfoglalt';
-z.string.hu.user_availability_none = 'Semmi';
+z.string.hu.userAvailabilityAvailable = 'Elérhető';
+z.string.hu.userAvailabilityAway = 'Nincs a gépnél';
+z.string.hu.userAvailabilityBusy = 'Elfoglalt';
+z.string.hu.userAvailabilityNone = 'Semmi';
 
 z.string.hu.system_notification_asset_add = 'Megosztott egy képet';
 z.string.hu.system_notification_connection_accepted = 'Elfogadta a csatlakozási kérelmedet';

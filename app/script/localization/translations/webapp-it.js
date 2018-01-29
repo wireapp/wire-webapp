@@ -37,11 +37,11 @@ z.string.it.authAccountSignIn = 'Accedi';
 z.string.it.authAccountSignInEmail = 'Email';
 z.string.it.authAccountSignInPhone = 'Telefono';
 
-z.string.it.auth_blocked_database = 'Wire ha bisogno di accedere la memoria locale per visualizzare i messaggi. Archiviazione locale non è disponibile in modalità privata.';
-z.string.it.auth_blocked_tabs = 'Wire è già aperto in un’altra scheda.';
+z.string.it.authBlockedDatabase = 'Wire ha bisogno di accedere la memoria locale per visualizzare i messaggi. Archiviazione locale non è disponibile in modalità privata.';
+z.string.it.authBlockedTabs = 'Wire è già aperto in un’altra scheda.';
 
-z.string.it.auth_verify_account_add = 'Aggiungi';
-z.string.it.auth_verify_account_detail = 'Questo ti consente di usare Wire su più dispositivi.';
+z.string.it.authVerifyAccountAdd = 'Aggiungi';
+z.string.it.authVerifyAccountDetail = 'Questo ti consente di usare Wire su più dispositivi.';
 z.string.it.auth_verify_account_headline = 'Aggiungi indirizzo email e password.';
 z.string.it.auth_verify_account_logout = 'Logout';
 z.string.it.auth_verify_code_description = 'Inserisci il codice di verifica che abbiamo inviato a {{number}}.';
@@ -481,8 +481,8 @@ z.string.it.warning_permission_request_notification = '{{icon}} Consenti notific
 z.string.it.warning_permission_request_screen = '{{icon}} Consenti accesso allo schermo';
 z.string.it.warning_tell_me_how = 'Dimmi come';
 
-z.string.it.user_availability_available = 'Disponibile';
-z.string.it.user_availability_none = 'Nessuno';
+z.string.it.userAvailabilityAvailable = 'Disponibile';
+z.string.it.userAvailabilityNone = 'Nessuno';
 
 z.string.it.system_notification_asset_add = 'Ha condiviso un’immagine';
 z.string.it.system_notification_connection_accepted = 'Ha accettato la tua richiesta di connessione';
