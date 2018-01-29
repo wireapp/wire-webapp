@@ -63,6 +63,8 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.logger = new z.util.Logger('z.ViewModel.ParticipantsViewModel', z.config.LOGGER.OPTIONS);
 
     this.state = ko.observable(ParticipantsViewModel.STATE.PARTICIPANTS);
+    this.previousState = ko.observable(this.state());
+    this.state.subscribe(oldState => this.previousState(oldState), null, 'beforeChange');
 
     this.activeAddState = ko.pureComputed(() => ParticipantsViewModel.CONFIG.ADD_STATES.includes(this.state()));
     this.activeServiceState = ko.pureComputed(() => ParticipantsViewModel.CONFIG.SERVICE_STATES.includes(this.state()));
@@ -155,6 +157,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.addActionText = ko.pureComputed(() => {
       return this.showIntegrations() ? z.string.people_button_add : z.string.people_button_add_people;
     });
+
     this.searchActionText = ko.pureComputed(() => {
       if (this.conversation()) {
         const isGroup = this.conversation().is_group();
@@ -188,6 +191,11 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.showUserProfile = ko.pureComputed(() => {
       return this.stateParticipants() && this.selectedUser() && !this.selectedService();
     });
+
+    this.selectedIsInConversation = ko.observable(false);
+    this.showRemoveButton = ko.pureComputed(
+      () => this.stateServiceDetails() && !this.userRepository.self().is_guest() && this.selectedIsInConversation()
+    );
 
     amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, this.switchContent.bind(this));
     amplify.subscribe(z.event.WebApp.PEOPLE.SHOW, this.showParticipant);
@@ -248,7 +256,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   }
 
   clickOnServiceBack() {
-    this.state(ParticipantsViewModel.STATE.ADD_SERVICE);
+    this.state(this.previousState());
     this.selectedService(undefined);
     this.selectedUser(undefined);
     $('.participants-search').addClass('participants-search-show');
@@ -416,6 +424,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   }
 
   showService(userEntity) {
+    this.selectedIsInConversation(this.participants().some(entity => entity.id === userEntity.id));
     this.selectedUser(userEntity);
     const {providerId, serviceId} = userEntity;
 

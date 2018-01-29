@@ -1,8 +1,8 @@
 <div id="participants-bubble" class="bubble">
-  <div id="participants" class="participants" data-bind="with: $root.participants, css: {'show-user': $root.participants.showUserProfile()}">
+  <div id="participants" class="participants" data-bind="with: $root.participants, css: {'show-user': $root.participants.showUserProfile() || $root.participants.showServiceStates()}">
 
+    <div class="participants-transition">
     <!-- ko if: stateParticipants() -->
-      <div class="participants-transition">
 
         <div class="participants-group">
           <div class="participants-group-header">
@@ -62,8 +62,6 @@
           remove: clickToRemoveMember,
           unblock: clickToUnblock
         "></user-profile>
-
-      </div>
     <!-- /ko -->
 
     <!-- ko if: activeAddState() -->
@@ -100,7 +98,8 @@
     <!-- /ko -->
 
     <!-- ko if: showServiceStates() -->
-      <div class="participants-service-confirmation">
+    <div class="user-profile-transition">
+      <div class="participants-service-confirmation group-service-profile">
         <!-- ko if: groupMode() -->
           <div class="service-confirmation-header">
             <div class="service-confirmation-back" data-bind="click: clickOnServiceBack, l10n_tooltip: z.string.tooltip_people_back" data-uie-name="do-back">
@@ -120,15 +119,19 @@
           </div>
           <div data-uie-name="status-service-description" class="service-confirmation-description" data-bind="text: selectedService().description"></div>
         </div>
-        <div class="service-confirmation-footer">
-          <!-- ko if: stateServiceConfirmations() -->
+        <!-- ko if: stateServiceConfirmations -->
+          <div class="service-confirmation-footer">
             <button data-uie-name="do-service-confirm" class="participants-service-confirmation-button" data-bind="click: clickToAddService, l10n_text: z.string.people_service_confirm_button"></button>
-          <!-- /ko -->
-          <!-- ko if: stateServiceDetails() -->
+          </div>
+        <!-- /ko -->
+        <!-- ko if: showRemoveButton -->
+          <div class="service-confirmation-footer">
             <button data-uie-name="do-service-remove" class="participants-service-confirmation-button button-theme-red" data-bind="click: clickToRemoveService, l10n_text: z.string.people_service_removal_button"></button>
-          <!-- /ko -->
-        </div>
+          </div>
+        <!-- /ko -->
       </div>
-    <!-- /ko -->
+      </div>
+      <!-- /ko -->
+    </div>
   </div>
 </div>
