@@ -19,23 +19,23 @@
 
 z.string.it.wireMacos = 'Wire per macOS';
 z.string.it.wireWindows = 'Wire per Windows';
-z.string.it.wire_linux = 'Wire per Linux';
-z.string.it.nonexistent_user = 'Elimina utente';
+z.string.it.wireLinux = 'Wire per Linux';
+z.string.it.nonexistentUser = 'Elimina utente';
 z.string.it.and = 'e';
 
-z.string.it.alert_upload_file_format = 'Non è possibile utilizzare questa immagine. \nSi prega di scegliere un file PNG o JPEG.';
-z.string.it.alert_upload_too_small = 'Non è possibile utilizzare questa immagine. \nSi prega di scegliere una foto di almeno 320 x 320 pixels.';
-z.string.it.alert_upload_too_large = 'Questa immagine è troppo grande. È possibile caricare file fino a {{number}} MB.';
-z.string.it.alert_gif_too_large = 'L’animazione è troppo grande. La dimensione massima è {{number}} MB.';
+z.string.it.alertUploadFileFormat = 'Non è possibile utilizzare questa immagine. \nSi prega di scegliere un file PNG o JPEG.';
+z.string.it.alertUploadTooSmall = 'Non è possibile utilizzare questa immagine. \nSi prega di scegliere una foto di almeno 320 x 320 pixels.';
+z.string.it.alertUploadTooLarge = 'Questa immagine è troppo grande. È possibile caricare file fino a {{number}} MB.';
+z.string.it.alertGifTooLarge = 'L’animazione è troppo grande. La dimensione massima è {{number}} MB.';
 
-z.string.it.auth_account_country_code = 'Codice del paese';
-z.string.it.auth_account_deletion = 'Sei stato disconnesso perché il tuo account è stato eliminato.';
-z.string.it.auth_account_expiration = 'L’accesso è stato revocato perché la sessione è scaduta. Effettua il login nuovamente.';
-z.string.it.auth_account_password_forgot = 'Ho dimenticato la password';
-z.string.it.auth_account_public_computer = 'Questo computer è pubblico';
-z.string.it.auth_account_sign_in = 'Accedi';
-z.string.it.auth_account_sign_in_email = 'Email';
-z.string.it.auth_account_sign_in_phone = 'Telefono';
+z.string.it.authAccountCountryCode = 'Codice del paese';
+z.string.it.authAccountDeletion = 'Sei stato disconnesso perché il tuo account è stato eliminato.';
+z.string.it.authAccountExpiration = 'L’accesso è stato revocato perché la sessione è scaduta. Effettua il login nuovamente.';
+z.string.it.authAccountPasswordForgot = 'Ho dimenticato la password';
+z.string.it.authAccountPublicComputer = 'Questo computer è pubblico';
+z.string.it.authAccountSignIn = 'Accedi';
+z.string.it.authAccountSignInEmail = 'Email';
+z.string.it.authAccountSignInPhone = 'Telefono';
 
 z.string.it.auth_blocked_database = 'Wire ha bisogno di accedere la memoria locale per visualizzare i messaggi. Archiviazione locale non è disponibile in modalità privata.';
 z.string.it.auth_blocked_tabs = 'Wire è già aperto in un’altra scheda.';

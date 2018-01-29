@@ -19,23 +19,23 @@
 
 z.string.tr.wireMacos = 'MacOS için Wire';
 z.string.tr.wireWindows = 'Windows için Wire';
-z.string.tr.wire_linux = 'Linux için Wire';
-z.string.tr.nonexistent_user = 'Silinmiş Kullanıcı';
+z.string.tr.wireLinux = 'Linux için Wire';
+z.string.tr.nonexistentUser = 'Silinmiş Kullanıcı';
 z.string.tr.and = 've';
 
-z.string.tr.alert_upload_file_format = 'Bu fotoğrafı kullanamazsınız.\nLütfen PNG veya JPEG formatında bir dosya seçin.';
-z.string.tr.alert_upload_too_small = 'Bu resmi kullanamazsınız.\nLütfen en az 320x320 piksellik bir resim seçin.';
-z.string.tr.alert_upload_too_large = 'Bu resim çok büyük.\nEn fazla {{number}} MB’lık dosyalar yükleyebilirsiniz.';
-z.string.tr.alert_gif_too_large = 'Animasyon çok büyük.\nMaksimum dosya boyutu {{number}} MB.';
+z.string.tr.alertUploadFileFormat = 'Bu fotoğrafı kullanamazsınız.\nLütfen PNG veya JPEG formatında bir dosya seçin.';
+z.string.tr.alertUploadTooSmall = 'Bu resmi kullanamazsınız.\nLütfen en az 320x320 piksellik bir resim seçin.';
+z.string.tr.alertUploadTooLarge = 'Bu resim çok büyük.\nEn fazla {{number}} MB’lık dosyalar yükleyebilirsiniz.';
+z.string.tr.alertGifTooLarge = 'Animasyon çok büyük.\nMaksimum dosya boyutu {{number}} MB.';
 
-z.string.tr.auth_account_country_code = 'Ülke Kodu';
-z.string.tr.auth_account_deletion = 'Çıkış yaptınız çünkü hesabınız silinmiş.';
-z.string.tr.auth_account_expiration = 'Oturumunuzun süresi dolduğu için çıkış yapıldı. Lütfen tekrar giriş yapın.';
-z.string.tr.auth_account_password_forgot = 'Şifremi unuttum';
-z.string.tr.auth_account_public_computer = 'Bu ortak bir bilgisayar';
-z.string.tr.auth_account_sign_in = 'Giriş yap';
-z.string.tr.auth_account_sign_in_email = 'E-posta';
-z.string.tr.auth_account_sign_in_phone = 'Telefon';
+z.string.tr.authAccountCountryCode = 'Ülke Kodu';
+z.string.tr.authAccountDeletion = 'Çıkış yaptınız çünkü hesabınız silinmiş.';
+z.string.tr.authAccountExpiration = 'Oturumunuzun süresi dolduğu için çıkış yapıldı. Lütfen tekrar giriş yapın.';
+z.string.tr.authAccountPasswordForgot = 'Şifremi unuttum';
+z.string.tr.authAccountPublicComputer = 'Bu ortak bir bilgisayar';
+z.string.tr.authAccountSignIn = 'Giriş yap';
+z.string.tr.authAccountSignInEmail = 'E-posta';
+z.string.tr.authAccountSignInPhone = 'Telefon';
 
 z.string.tr.auth_blocked_cookies = 'Wire’a giriş yapabilmek için çerezleri etkinleştirin.';
 z.string.tr.auth_blocked_database = 'Wire’ın mesajları gösterebilmek için yerel diske erişmesi lazım. Gizli modda yerel disk kullanılamaz.';

@@ -20,23 +20,23 @@
 z.string.ro.wire = 'Wire';
 z.string.ro.wireMacos = 'Wire pentru macOS';
 z.string.ro.wireWindows = 'Wire pentru Windows';
-z.string.ro.wire_linux = 'Wire pentru Linux';
-z.string.ro.nonexistent_user = 'Utilizator șters';
+z.string.ro.wireLinux = 'Wire pentru Linux';
+z.string.ro.nonexistentUser = 'Utilizator șters';
 z.string.ro.and = 'și';
 
-z.string.ro.alert_upload_file_format = 'Nu se poate folosi această imagine.\nTe rugăm să alegi un fișier PNG sau JPEG.';
-z.string.ro.alert_upload_too_small = 'Nu se poate utiliza această imagine.\nTe rugăm să alegi o imagine de cel puțin 320 x 320 px.';
-z.string.ro.alert_upload_too_large = 'Această imagine este prea mare.\nPoți încărca fișiere până la {{number}} MB.';
-z.string.ro.alert_gif_too_large = 'Animația este prea mare.\nMărimea maximă este {{number}} MB.';
+z.string.ro.alertUploadFileFormat = 'Nu se poate folosi această imagine.\nTe rugăm să alegi un fișier PNG sau JPEG.';
+z.string.ro.alertUploadTooSmall = 'Nu se poate utiliza această imagine.\nTe rugăm să alegi o imagine de cel puțin 320 x 320 px.';
+z.string.ro.alertUploadTooLarge = 'Această imagine este prea mare.\nPoți încărca fișiere până la {{number}} MB.';
+z.string.ro.alertGifTooLarge = 'Animația este prea mare.\nMărimea maximă este {{number}} MB.';
 
-z.string.ro.auth_account_country_code = 'Codul țării';
-z.string.ro.auth_account_deletion = 'Ai fost deconectat deoarece contul tău a fost șters.';
-z.string.ro.auth_account_expiration = 'Ai fost scos din sesiune pentru că sesiunea ta a expirat. Te rugăm să te autentifici din nou.';
-z.string.ro.auth_account_password_forgot = 'Am uitat parola';
-z.string.ro.auth_account_public_computer = 'Acesta este un calculator public';
-z.string.ro.auth_account_sign_in = 'Autentificare';
-z.string.ro.auth_account_sign_in_email = 'E-mail';
-z.string.ro.auth_account_sign_in_phone = 'Telefon';
+z.string.ro.authAccountCountryCode = 'Codul țării';
+z.string.ro.authAccountDeletion = 'Ai fost deconectat deoarece contul tău a fost șters.';
+z.string.ro.authAccountExpiration = 'Ai fost scos din sesiune pentru că sesiunea ta a expirat. Te rugăm să te autentifici din nou.';
+z.string.ro.authAccountPasswordForgot = 'Am uitat parola';
+z.string.ro.authAccountPublicComputer = 'Acesta este un calculator public';
+z.string.ro.authAccountSignIn = 'Autentificare';
+z.string.ro.authAccountSignInEmail = 'E-mail';
+z.string.ro.authAccountSignInPhone = 'Telefon';
 
 z.string.ro.auth_blocked_cookies = 'Activează cookie-urile pentru intra în Wire.';
 z.string.ro.auth_blocked_database = 'Wire are nevoie de acces la stocarea locală pentru a afișa mesaje. Stocarea locală nu este disponibilă în modul privat.';

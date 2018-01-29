@@ -19,21 +19,21 @@
 
 z.string.hr.wireMacos = 'Wire za macOS';
 z.string.hr.wireWindows = 'Wire za Windows';
-z.string.hr.wire_linux = 'Wire za Linux';
-z.string.hr.nonexistent_user = 'Izbrisani korisnik';
+z.string.hr.wireLinux = 'Wire za Linux';
+z.string.hr.nonexistentUser = 'Izbrisani korisnik';
 z.string.hr.and = 'i';
 
-z.string.hr.alert_upload_file_format = 'Ne možete koristiti ovu sliku. Molimo izaberite PNG ili JPEG datoteku.';
-z.string.hr.alert_upload_too_small = 'Ne možete koristiti ovu sliku. Odaberite sliku koja je barem 320 x 320 px.';
-z.string.hr.alert_upload_too_large = 'Ova slika je prevelika. Možete učitati datoteke do {{number}} MB.';
-z.string.hr.alert_gif_too_large = 'Animacija je prevelika. Maksimalne veličine je {{number}} MB.';
+z.string.hr.alertUploadFileFormat = 'Ne možete koristiti ovu sliku. Molimo izaberite PNG ili JPEG datoteku.';
+z.string.hr.alertUploadTooSmall = 'Ne možete koristiti ovu sliku. Odaberite sliku koja je barem 320 x 320 px.';
+z.string.hr.alertUploadTooLarge = 'Ova slika je prevelika. Možete učitati datoteke do {{number}} MB.';
+z.string.hr.alertGifTooLarge = 'Animacija je prevelika. Maksimalne veličine je {{number}} MB.';
 
-z.string.hr.auth_account_country_code = 'Pozivni broj';
-z.string.hr.auth_account_expiration = 'Odjavljeni ste jer je vaša sesija istekla. Molimo prijavite se ponovno.';
-z.string.hr.auth_account_password_forgot = 'Zaboravljena lozinka';
-z.string.hr.auth_account_sign_in = 'Prijava';
-z.string.hr.auth_account_sign_in_email = 'Email';
-z.string.hr.auth_account_sign_in_phone = 'Telefon';
+z.string.hr.authAccountCountryCode = 'Pozivni broj';
+z.string.hr.authAccountExpiration = 'Odjavljeni ste jer je vaša sesija istekla. Molimo prijavite se ponovno.';
+z.string.hr.authAccountPasswordForgot = 'Zaboravljena lozinka';
+z.string.hr.authAccountSignIn = 'Prijava';
+z.string.hr.authAccountSignInEmail = 'Email';
+z.string.hr.authAccountSignInPhone = 'Telefon';
 
 z.string.hr.auth_verify_account_add = 'Dodaj';
 z.string.hr.auth_verify_account_detail = 'Ovo Vam omogućuje da koristite Wire na više uređaja.';

@@ -19,22 +19,22 @@
 
 z.string.da.wireMacos = 'Wire til macOS';
 z.string.da.wireWindows = 'Wire til Windows';
-z.string.da.wire_linux = 'Wire til Linux';
-z.string.da.nonexistent_user = 'Slet bruger';
+z.string.da.wireLinux = 'Wire til Linux';
+z.string.da.nonexistentUser = 'Slet bruger';
 z.string.da.and = 'og';
 
-z.string.da.alert_upload_file_format = 'Kan ikke anvende dette billede. Vælg venligst en PNG eller JPEG-fil.';
-z.string.da.alert_upload_too_small = 'Kan ikke anvende dette billede. Vælg venligst et billede der er mindst 320 x 320 px.';
-z.string.da.alert_upload_too_large = 'Dette billede er for stort. Du kan uploade filer op til {{number}} MB.';
-z.string.da.alert_gif_too_large = 'Animationen er for stor. Den maksimale størrelse er {{number}} MB.';
+z.string.da.alertUploadFileFormat = 'Kan ikke anvende dette billede. Vælg venligst en PNG eller JPEG-fil.';
+z.string.da.alertUploadTooSmall = 'Kan ikke anvende dette billede. Vælg venligst et billede der er mindst 320 x 320 px.';
+z.string.da.alertUploadTooLarge = 'Dette billede er for stort. Du kan uploade filer op til {{number}} MB.';
+z.string.da.alertGifTooLarge = 'Animationen er for stor. Den maksimale størrelse er {{number}} MB.';
 
-z.string.da.auth_account_country_code = 'Landekode';
-z.string.da.auth_account_expiration = 'Du er blevet logget af, da din session udløb. Log venligst ind igen.';
-z.string.da.auth_account_password_forgot = 'Glemt adgangskode';
-z.string.da.auth_account_public_computer = 'Dette er en offentlig computer';
-z.string.da.auth_account_sign_in = 'Log ind';
-z.string.da.auth_account_sign_in_email = 'Email';
-z.string.da.auth_account_sign_in_phone = 'Telefon';
+z.string.da.authAccountCountryCode = 'Landekode';
+z.string.da.authAccountExpiration = 'Du er blevet logget af, da din session udløb. Log venligst ind igen.';
+z.string.da.authAccountPasswordForgot = 'Glemt adgangskode';
+z.string.da.authAccountPublicComputer = 'Dette er en offentlig computer';
+z.string.da.authAccountSignIn = 'Log ind';
+z.string.da.authAccountSignInEmail = 'Email';
+z.string.da.authAccountSignInPhone = 'Telefon';
 
 z.string.da.auth_verify_account_add = 'Tilføj';
 z.string.da.auth_verify_account_detail = 'Dette gør, at du kan bruge Wire på flere enheder.';

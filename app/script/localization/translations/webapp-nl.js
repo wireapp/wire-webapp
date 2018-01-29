@@ -20,23 +20,23 @@
 z.string.nl.wire = 'Wire';
 z.string.nl.wireMacos = 'Wire voor macOS';
 z.string.nl.wireWindows = 'Wire voor Windows';
-z.string.nl.wire_linux = 'Wire voor Linux';
-z.string.nl.nonexistent_user = 'Verwijderde gebruiker';
+z.string.nl.wireLinux = 'Wire voor Linux';
+z.string.nl.nonexistentUser = 'Verwijderde gebruiker';
 z.string.nl.and = 'en';
 
-z.string.nl.alert_upload_file_format = 'Kan deze afbeelding niet gebruiken.\nKies een PNG of JPEG bestand.';
-z.string.nl.alert_upload_too_small = 'Kan deze afbeelding niet gebruiken.\nKies een afbeelding van tenminste 320 x 320 pixels.';
-z.string.nl.alert_upload_too_large = 'Deze afbeelding is te groot.\nJe kunt bestanden uploaden tot {{number}} MB.';
-z.string.nl.alert_gif_too_large = 'Animatie is te groot.\nMaximale grootte is {{number}} MB.';
+z.string.nl.alertUploadFileFormat = 'Kan deze afbeelding niet gebruiken.\nKies een PNG of JPEG bestand.';
+z.string.nl.alertUploadTooSmall = 'Kan deze afbeelding niet gebruiken.\nKies een afbeelding van tenminste 320 x 320 pixels.';
+z.string.nl.alertUploadTooLarge = 'Deze afbeelding is te groot.\nJe kunt bestanden uploaden tot {{number}} MB.';
+z.string.nl.alertGifTooLarge = 'Animatie is te groot.\nMaximale grootte is {{number}} MB.';
 
-z.string.nl.auth_account_country_code = 'Landcode';
-z.string.nl.auth_account_deletion = 'Je bent uitgelogt omdat je account is verwijdert.';
-z.string.nl.auth_account_expiration = 'Je bent afgemeld omdat de sessie verlopen is. Log opnieuw in.';
-z.string.nl.auth_account_password_forgot = 'Wachtwoord vergeten';
-z.string.nl.auth_account_public_computer = 'Dit is een publieke computer';
-z.string.nl.auth_account_sign_in = 'Inloggen';
-z.string.nl.auth_account_sign_in_email = 'E-mail';
-z.string.nl.auth_account_sign_in_phone = 'Telefoonnummer';
+z.string.nl.authAccountCountryCode = 'Landcode';
+z.string.nl.authAccountDeletion = 'Je bent uitgelogt omdat je account is verwijdert.';
+z.string.nl.authAccountExpiration = 'Je bent afgemeld omdat de sessie verlopen is. Log opnieuw in.';
+z.string.nl.authAccountPasswordForgot = 'Wachtwoord vergeten';
+z.string.nl.authAccountPublicComputer = 'Dit is een publieke computer';
+z.string.nl.authAccountSignIn = 'Inloggen';
+z.string.nl.authAccountSignInEmail = 'E-mail';
+z.string.nl.authAccountSignInPhone = 'Telefoonnummer';
 
 z.string.nl.auth_blocked_cookies = 'Zet je cookies aan om in te loggen in Wire.';
 z.string.nl.auth_blocked_database = 'Wire heeft toegang nodig tot lokale opslag om je berichten te kunnen laten zien, maar dit is niet mogelijk in privémodus.';

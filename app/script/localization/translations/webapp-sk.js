@@ -20,23 +20,23 @@
 z.string.sk.wire = 'Wire';
 z.string.sk.wireMacos = 'Wire pre macOS';
 z.string.sk.wireWindows = 'Wire pre Windows';
-z.string.sk.wire_linux = 'Wire pre Linux';
-z.string.sk.nonexistent_user = 'Odstránený používateľ';
+z.string.sk.wireLinux = 'Wire pre Linux';
+z.string.sk.nonexistentUser = 'Odstránený používateľ';
 z.string.sk.and = 'a';
 
-z.string.sk.alert_upload_file_format = 'Tento obrázok nie je možné použiť.\nVyberte prosím súbor PNG alebo JPG.';
-z.string.sk.alert_upload_too_small = 'Tento obrázok nie je možné použiť.\nVyberte prosím obrázok minimálne 320 x 320 px.';
-z.string.sk.alert_upload_too_large = 'Tento obrázok je príliš veľký. Môžete nahrať súbory maximálne {{number}} MB.';
-z.string.sk.alert_gif_too_large = 'Animácia je príliš veľká. Maximálna veľkosť je {{number}} MB.';
+z.string.sk.alertUploadFileFormat = 'Tento obrázok nie je možné použiť.\nVyberte prosím súbor PNG alebo JPG.';
+z.string.sk.alertUploadTooSmall = 'Tento obrázok nie je možné použiť.\nVyberte prosím obrázok minimálne 320 x 320 px.';
+z.string.sk.alertUploadTooLarge = 'Tento obrázok je príliš veľký. Môžete nahrať súbory maximálne {{number}} MB.';
+z.string.sk.alertGifTooLarge = 'Animácia je príliš veľká. Maximálna veľkosť je {{number}} MB.';
 
-z.string.sk.auth_account_country_code = 'Kód krajiny';
-z.string.sk.auth_account_deletion = 'Boli ste odhlásení, pretože vaše konto bolo odstránené.';
-z.string.sk.auth_account_expiration = 'Boli ste odhlásení pretože vypršala platnosť Vášho sedenia. Prihláste sa prosím znova.';
-z.string.sk.auth_account_password_forgot = 'Zabudnuté heslo';
-z.string.sk.auth_account_public_computer = 'Toto je verejný počítač';
-z.string.sk.auth_account_sign_in = 'Prihlásenie';
-z.string.sk.auth_account_sign_in_email = 'E-mail';
-z.string.sk.auth_account_sign_in_phone = 'Telefón';
+z.string.sk.authAccountCountryCode = 'Kód krajiny';
+z.string.sk.authAccountDeletion = 'Boli ste odhlásení, pretože vaše konto bolo odstránené.';
+z.string.sk.authAccountExpiration = 'Boli ste odhlásení pretože vypršala platnosť Vášho sedenia. Prihláste sa prosím znova.';
+z.string.sk.authAccountPasswordForgot = 'Zabudnuté heslo';
+z.string.sk.authAccountPublicComputer = 'Toto je verejný počítač';
+z.string.sk.authAccountSignIn = 'Prihlásenie';
+z.string.sk.authAccountSignInEmail = 'E-mail';
+z.string.sk.authAccountSignInPhone = 'Telefón';
 
 z.string.sk.auth_blocked_cookies = 'Povoľte cookies na prihlásenie k Wire.';
 z.string.sk.auth_blocked_database = 'Pre zobrazenie Vašich správ potrebuje Wire prístup k lokálnemu úložisku. Lokálne úložisko nie je dostupné v privátnom režime.';

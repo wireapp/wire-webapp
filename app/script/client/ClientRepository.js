@@ -336,7 +336,7 @@ z.client.ClientRepository = class ClientRepository {
       } else if (z.util.Environment.os.win) {
         identifier = z.string.wireWindows;
       } else {
-        identifier = z.string.wire_linux;
+        identifier = z.string.wireLinux;
       }
       deviceModel = z.l10n.text(identifier);
       if (!z.util.Environment.frontend.is_production()) {

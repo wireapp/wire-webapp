@@ -19,23 +19,23 @@
 
 z.string.cs.wireMacos = 'Wire pro macOS';
 z.string.cs.wireWindows = 'Wire pro Windows';
-z.string.cs.wire_linux = 'Wire pro Linux';
-z.string.cs.nonexistent_user = 'Smazaný uživatel';
+z.string.cs.wireLinux = 'Wire pro Linux';
+z.string.cs.nonexistentUser = 'Smazaný uživatel';
 z.string.cs.and = 'a';
 
-z.string.cs.alert_upload_file_format = 'Tento obrázek nelze použít.\nVyberte prosím PNG nebo JPEG soubor.';
-z.string.cs.alert_upload_too_small = 'Tento obrázek nelze použít.\nVyberte prosím obrázek, který je veliký alespoň 320 x 320 px.';
-z.string.cs.alert_upload_too_large = 'Tento obrázek je příliš veliký.\nMůžete nahrávat soubory až do velikosti {{number}} MB.';
-z.string.cs.alert_gif_too_large = 'Animace je příliš veliká.\nMaximální velikost je {{number}} MB.';
+z.string.cs.alertUploadFileFormat = 'Tento obrázek nelze použít.\nVyberte prosím PNG nebo JPEG soubor.';
+z.string.cs.alertUploadTooSmall = 'Tento obrázek nelze použít.\nVyberte prosím obrázek, který je veliký alespoň 320 x 320 px.';
+z.string.cs.alertUploadTooLarge = 'Tento obrázek je příliš veliký.\nMůžete nahrávat soubory až do velikosti {{number}} MB.';
+z.string.cs.alertGifTooLarge = 'Animace je příliš veliká.\nMaximální velikost je {{number}} MB.';
 
-z.string.cs.auth_account_country_code = 'Kód země';
-z.string.cs.auth_account_deletion = 'Byli jste odhlášeni, protože váš účet byl smazán.';
-z.string.cs.auth_account_expiration = 'Byli jste odhlášeni, protože platnost relace vypršela. Přihlaste se znovu.';
-z.string.cs.auth_account_password_forgot = 'Zapomenuté heslo';
-z.string.cs.auth_account_public_computer = 'Toto je veřejný počítač';
-z.string.cs.auth_account_sign_in = 'Přihlásit se';
-z.string.cs.auth_account_sign_in_email = 'Email';
-z.string.cs.auth_account_sign_in_phone = 'Telefon';
+z.string.cs.authAccountCountryCode = 'Kód země';
+z.string.cs.authAccountDeletion = 'Byli jste odhlášeni, protože váš účet byl smazán.';
+z.string.cs.authAccountExpiration = 'Byli jste odhlášeni, protože platnost relace vypršela. Přihlaste se znovu.';
+z.string.cs.authAccountPasswordForgot = 'Zapomenuté heslo';
+z.string.cs.authAccountPublicComputer = 'Toto je veřejný počítač';
+z.string.cs.authAccountSignIn = 'Přihlásit se';
+z.string.cs.authAccountSignInEmail = 'Email';
+z.string.cs.authAccountSignInPhone = 'Telefon';
 
 z.string.cs.auth_blocked_cookies = 'Pro přihlášení k Wire povolte soubory cookie.';
 z.string.cs.auth_blocked_database = 'Pro zobrazení zpráv potřebuje Wire potřebuje přístup k úložišti. Úložiště není k dispozici v anonymním režimu.';

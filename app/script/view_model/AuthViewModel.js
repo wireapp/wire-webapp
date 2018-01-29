@@ -294,13 +294,13 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     const reason = z.util.get_url_parameter(z.auth.URLParameter.REASON);
     switch (reason) {
       case z.auth.SIGN_OUT_REASON.ACCOUNT_DELETED:
-        this.reason_info(z.l10n.text(z.string.auth_account_deletion));
+        this.reason_info(z.l10n.text(z.string.authAccountDeletion));
         break;
       case z.auth.SIGN_OUT_REASON.ACCOUNT_REGISTRATION:
         return this._login_from_teams();
       case z.auth.SIGN_OUT_REASON.CLIENT_REMOVED:
       case z.auth.SIGN_OUT_REASON.SESSION_EXPIRED:
-        this.reason_info(z.l10n.text(z.string.auth_account_expiration));
+        this.reason_info(z.l10n.text(z.string.authAccountExpiration));
         break;
       default:
         break;

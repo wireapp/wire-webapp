@@ -19,23 +19,23 @@
 
 z.string.pt.wireMacos = 'Wire para macOS';
 z.string.pt.wireWindows = 'Wire para Windows';
-z.string.pt.wire_linux = 'Wire para Linux';
-z.string.pt.nonexistent_user = 'Utilizador eliminado';
+z.string.pt.wireLinux = 'Wire para Linux';
+z.string.pt.nonexistentUser = 'Utilizador eliminado';
 z.string.pt.and = 'e';
 
-z.string.pt.alert_upload_file_format = 'Não é possível usar esta imagem. Por favor, escolha um ficheiro PNG ou JPEG.';
-z.string.pt.alert_upload_too_small = 'Não é possível usar esta imagem. Por favor, escolha uma imagem com pelo menos 320 x 320 px.';
-z.string.pt.alert_upload_too_large = 'A foto é demasiado grande. Você pode carregar ficheiros até {{number}} MB.';
-z.string.pt.alert_gif_too_large = 'Animação é demasiado grande. O tamanho máximo é {{number}} MB.';
+z.string.pt.alertUploadFileFormat = 'Não é possível usar esta imagem. Por favor, escolha um ficheiro PNG ou JPEG.';
+z.string.pt.alertUploadTooSmall = 'Não é possível usar esta imagem. Por favor, escolha uma imagem com pelo menos 320 x 320 px.';
+z.string.pt.alertUploadTooLarge = 'A foto é demasiado grande. Você pode carregar ficheiros até {{number}} MB.';
+z.string.pt.alertGifTooLarge = 'Animação é demasiado grande. O tamanho máximo é {{number}} MB.';
 
-z.string.pt.auth_account_country_code = 'Código de País';
-z.string.pt.auth_account_deletion = 'Foi desconectado porque a sua conta foi eliminada.';
-z.string.pt.auth_account_expiration = 'A sessão terminou por ter expirado. Inicie sessão novamente.';
-z.string.pt.auth_account_password_forgot = 'Esqueci a palavra-passe';
-z.string.pt.auth_account_public_computer = 'Este computador é publico';
-z.string.pt.auth_account_sign_in = 'Iniciar sessão';
-z.string.pt.auth_account_sign_in_email = 'E-mail';
-z.string.pt.auth_account_sign_in_phone = 'Telefone';
+z.string.pt.authAccountCountryCode = 'Código de País';
+z.string.pt.authAccountDeletion = 'Foi desconectado porque a sua conta foi eliminada.';
+z.string.pt.authAccountExpiration = 'A sessão terminou por ter expirado. Inicie sessão novamente.';
+z.string.pt.authAccountPasswordForgot = 'Esqueci a palavra-passe';
+z.string.pt.authAccountPublicComputer = 'Este computador é publico';
+z.string.pt.authAccountSignIn = 'Iniciar sessão';
+z.string.pt.authAccountSignInEmail = 'E-mail';
+z.string.pt.authAccountSignInPhone = 'Telefone';
 
 z.string.pt.auth_blocked_cookies = 'Ative os cookies para iniciar sessão no Wire.';
 z.string.pt.auth_blocked_database = 'O Wire necessita de acesso ao armazenamento local para mostrar as suas mensagens. O armazenamento local não está disponível no modo privado.';

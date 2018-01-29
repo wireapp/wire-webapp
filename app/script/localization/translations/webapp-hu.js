@@ -20,23 +20,23 @@
 z.string.hu.wire = 'Wire';
 z.string.hu.wireMacos = 'Wire MacOS-hez';
 z.string.hu.wireWindows = 'Wire Windowshoz';
-z.string.hu.wire_linux = 'Wire Linuxhoz';
-z.string.hu.nonexistent_user = 'Törölt felhasználó';
+z.string.hu.wireLinux = 'Wire Linuxhoz';
+z.string.hu.nonexistentUser = 'Törölt felhasználó';
 z.string.hu.and = 'és';
 
-z.string.hu.alert_upload_file_format = 'Ezt a képet nem használhatod.\nPNG vagy JPEG fájlt válassz.';
-z.string.hu.alert_upload_too_small = 'Ezt a képet nem használhatod.\nVálassz egy képet, ami legalább 320 x 320 px méretű.';
-z.string.hu.alert_upload_too_large = 'A kép mérete túl nagy.\nMaximum {{number}} MB méretű fájlt tudsz feltölteni.';
-z.string.hu.alert_gif_too_large = 'Az Animáció mérete túl nagy.\nA maximális méret {{number}} MB.';
+z.string.hu.alertUploadFileFormat = 'Ezt a képet nem használhatod.\nPNG vagy JPEG fájlt válassz.';
+z.string.hu.alertUploadTooSmall = 'Ezt a képet nem használhatod.\nVálassz egy képet, ami legalább 320 x 320 px méretű.';
+z.string.hu.alertUploadTooLarge = 'A kép mérete túl nagy.\nMaximum {{number}} MB méretű fájlt tudsz feltölteni.';
+z.string.hu.alertGifTooLarge = 'Az Animáció mérete túl nagy.\nA maximális méret {{number}} MB.';
 
-z.string.hu.auth_account_country_code = 'Országhívó-kód';
-z.string.hu.auth_account_deletion = 'Ki lettél jelentkeztetve, mert a felhasználói fiókodat törölték.';
-z.string.hu.auth_account_expiration = 'A munkamenet lejárt, ezért ki lettél jelentkeztetve. Kérjük, jelentkezz be újra.';
-z.string.hu.auth_account_password_forgot = 'Elfelejtett jelszó';
-z.string.hu.auth_account_public_computer = 'Ez egy nyilvános számítógép';
-z.string.hu.auth_account_sign_in = 'Bejelentkezés';
-z.string.hu.auth_account_sign_in_email = 'E-mail';
-z.string.hu.auth_account_sign_in_phone = 'Telefon';
+z.string.hu.authAccountCountryCode = 'Országhívó-kód';
+z.string.hu.authAccountDeletion = 'Ki lettél jelentkeztetve, mert a felhasználói fiókodat törölték.';
+z.string.hu.authAccountExpiration = 'A munkamenet lejárt, ezért ki lettél jelentkeztetve. Kérjük, jelentkezz be újra.';
+z.string.hu.authAccountPasswordForgot = 'Elfelejtett jelszó';
+z.string.hu.authAccountPublicComputer = 'Ez egy nyilvános számítógép';
+z.string.hu.authAccountSignIn = 'Bejelentkezés';
+z.string.hu.authAccountSignInEmail = 'E-mail';
+z.string.hu.authAccountSignInPhone = 'Telefon';
 
 z.string.hu.auth_blocked_cookies = 'A bejelentkezéshez engedélyezni kell a böngésző-sütiket.';
 z.string.hu.auth_blocked_database = 'Az üzenetek megjelenítéséhez a Wire-nek el kell érnie a helyi tárhelyet. A böngésző privát módú használatakor a helyi tárhely nem áll rendelkezésre.';

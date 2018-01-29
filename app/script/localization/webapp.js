@@ -22,26 +22,26 @@
 z.string.wire = 'Wire';
 z.string.wireMacos = 'Wire for macOS';
 z.string.wireWindows = 'Wire for Windows';
-z.string.wire_linux = 'Wire for Linux';
-z.string.nonexistent_user = 'Deleted User';
+z.string.wireLinux = 'Wire for Linux';
+z.string.nonexistentUser = 'Deleted User';
 z.string.and = 'and';
 
 // Alert view when trying to set a profile image that's too small
-z.string.alert_upload_file_format = 'Can’t use this picture.\nPlease choose a PNG or JPEG file.';
-z.string.alert_upload_too_small = 'Can’t use this picture.\nPlease choose a picture that’s at least 320 x 320 px.';
-z.string.alert_upload_too_large = 'This picture is too large.\nYou can upload files up to {{number}} MB.';
-z.string.alert_gif_too_large = 'Animation is too large.\nMaximum size is {{number}} MB.';
+z.string.alertUploadFileFormat = 'Can’t use this picture.\nPlease choose a PNG or JPEG file.';
+z.string.alertUploadTooSmall = 'Can’t use this picture.\nPlease choose a picture that’s at least 320 x 320 px.';
+z.string.alertUploadTooLarge = 'This picture is too large.\nYou can upload files up to {{number}} MB.';
+z.string.alertGifTooLarge = 'Animation is too large.\nMaximum size is {{number}} MB.';
 
 // Auth
 // Authentication: ACCOUNT section
-z.string.auth_account_country_code = 'Country Code';
-z.string.auth_account_deletion = 'You were signed out because your account was deleted.';
-z.string.auth_account_expiration = 'You were signed out because your session expired. Please log in again.';
-z.string.auth_account_password_forgot = 'Forgot password';
-z.string.auth_account_public_computer = 'This is a public computer';
-z.string.auth_account_sign_in = 'Log in';
-z.string.auth_account_sign_in_email = 'Email';
-z.string.auth_account_sign_in_phone = 'Phone';
+z.string.authAccountCountryCode = 'Country Code';
+z.string.authAccountDeletion = 'You were signed out because your account was deleted.';
+z.string.authAccountExpiration = 'You were signed out because your session expired. Please log in again.';
+z.string.authAccountPasswordForgot = 'Forgot password';
+z.string.authAccountPublicComputer = 'This is a public computer';
+z.string.authAccountSignIn = 'Log in';
+z.string.authAccountSignInEmail = 'Email';
+z.string.authAccountSignInPhone = 'Phone';
 
 // Authentication: BLOCKED section
 z.string.auth_blocked_cookies = 'Enable cookies to log in to Wire.';

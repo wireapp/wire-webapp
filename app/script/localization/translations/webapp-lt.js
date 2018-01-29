@@ -20,23 +20,23 @@
 z.string.lt.wire = 'Wire';
 z.string.lt.wireMacos = 'Wire, skirta macOS';
 z.string.lt.wireWindows = 'Wire, skirta Windows';
-z.string.lt.wire_linux = 'Wire, skirta Linux';
-z.string.lt.nonexistent_user = 'Ištrintas naudotojas';
+z.string.lt.wireLinux = 'Wire, skirta Linux';
+z.string.lt.nonexistentUser = 'Ištrintas naudotojas';
 z.string.lt.and = 'ir';
 
-z.string.lt.alert_upload_file_format = 'Neįmanoma naudoti šio paveikslėlio.\nPasirinkite PNG arba JPEG failą.';
-z.string.lt.alert_upload_too_small = 'Neįmanoma naudoti šio paveikslėlio.\nPasirinkite paveikslėlį, kuris būtų bent 320 x 320 pikselių.';
-z.string.lt.alert_upload_too_large = 'Šis paveikslas yra per didelis.\nJūs galite įkelti failus iki {{number}} MB.';
-z.string.lt.alert_gif_too_large = 'Animacija yra per didelė.\nDidžiausias dydis yra {{number}} MB.';
+z.string.lt.alertUploadFileFormat = 'Neįmanoma naudoti šio paveikslėlio.\nPasirinkite PNG arba JPEG failą.';
+z.string.lt.alertUploadTooSmall = 'Neįmanoma naudoti šio paveikslėlio.\nPasirinkite paveikslėlį, kuris būtų bent 320 x 320 pikselių.';
+z.string.lt.alertUploadTooLarge = 'Šis paveikslas yra per didelis.\nJūs galite įkelti failus iki {{number}} MB.';
+z.string.lt.alertGifTooLarge = 'Animacija yra per didelė.\nDidžiausias dydis yra {{number}} MB.';
 
-z.string.lt.auth_account_country_code = 'Šalies kodas';
-z.string.lt.auth_account_deletion = 'Buvote atjungti, nes jūsų paskyra buvo ištrinta.';
-z.string.lt.auth_account_expiration = 'Buvote atjungti, nes baigėsi jūsų seansas. Prisijunkite dar kartą.';
-z.string.lt.auth_account_password_forgot = 'Pamiršau slaptažodį';
-z.string.lt.auth_account_public_computer = 'Tai yra viešas kompiuteris';
-z.string.lt.auth_account_sign_in = 'Prisijungti';
-z.string.lt.auth_account_sign_in_email = 'El. paštas';
-z.string.lt.auth_account_sign_in_phone = 'Telefonas';
+z.string.lt.authAccountCountryCode = 'Šalies kodas';
+z.string.lt.authAccountDeletion = 'Buvote atjungti, nes jūsų paskyra buvo ištrinta.';
+z.string.lt.authAccountExpiration = 'Buvote atjungti, nes baigėsi jūsų seansas. Prisijunkite dar kartą.';
+z.string.lt.authAccountPasswordForgot = 'Pamiršau slaptažodį';
+z.string.lt.authAccountPublicComputer = 'Tai yra viešas kompiuteris';
+z.string.lt.authAccountSignIn = 'Prisijungti';
+z.string.lt.authAccountSignInEmail = 'El. paštas';
+z.string.lt.authAccountSignInPhone = 'Telefonas';
 
 z.string.lt.auth_blocked_cookies = 'Aktyvuokite slapukus, kad galėtumėte prisijungti prie „Wire“.';
 z.string.lt.auth_blocked_database = 'Norint rodyti žinutes, Wire reikia prieigos prie jūsų vietinės saugyklos. Vietinė saugykla nėra prieinama privačioje veiksenoje.';

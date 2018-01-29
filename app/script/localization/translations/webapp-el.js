@@ -19,23 +19,23 @@
 
 z.string.el.wireMacos = 'Wire για macOS';
 z.string.el.wireWindows = 'Wire για Windows';
-z.string.el.wire_linux = 'Wire για Linux';
-z.string.el.nonexistent_user = 'Διεγραμμένος χρήστης';
+z.string.el.wireLinux = 'Wire για Linux';
+z.string.el.nonexistentUser = 'Διεγραμμένος χρήστης';
 z.string.el.and = 'και';
 
-z.string.el.alert_upload_file_format = 'Αδύνατη η χρήση αυτής της εικόνας. Παρακαλώ επιλέξτε ένα αρχείο PNG ή JPEG.';
-z.string.el.alert_upload_too_small = 'Δεν μπορεί να χρησιμοποιηθεί η συγκεκριμένη εικόνα.\nΠαρακαλούμε επιλέξτε μια εικόνα η οποία να είναι τουλάχιστον 320 x 320 px.';
-z.string.el.alert_upload_too_large = 'Αυτή η εικόνα είναι πολύ μεγάλη.\nΜπορείτε να ανεβάσετε αρχεία έως {{number}} MB.';
-z.string.el.alert_gif_too_large = 'Η κινούμενη εικόνα είναι πολύ μεγάλη.\nΤο μέγιστο μέγεθος είναι {{number}} MB.';
+z.string.el.alertUploadFileFormat = 'Αδύνατη η χρήση αυτής της εικόνας. Παρακαλώ επιλέξτε ένα αρχείο PNG ή JPEG.';
+z.string.el.alertUploadTooSmall = 'Δεν μπορεί να χρησιμοποιηθεί η συγκεκριμένη εικόνα.\nΠαρακαλούμε επιλέξτε μια εικόνα η οποία να είναι τουλάχιστον 320 x 320 px.';
+z.string.el.alertUploadTooLarge = 'Αυτή η εικόνα είναι πολύ μεγάλη.\nΜπορείτε να ανεβάσετε αρχεία έως {{number}} MB.';
+z.string.el.alertGifTooLarge = 'Η κινούμενη εικόνα είναι πολύ μεγάλη.\nΤο μέγιστο μέγεθος είναι {{number}} MB.';
 
-z.string.el.auth_account_country_code = 'Κωδικός Χώρας';
-z.string.el.auth_account_deletion = 'Αποσυνδεθήκατε, επειδή ο λογαριασμός έχει διαγραφεί.';
-z.string.el.auth_account_expiration = 'Αποσυνδεθήκατε διότι η περίοδος λειτουργίας σας έληξε. Παρακαλούμε συνδεθείτε ξανά.';
-z.string.el.auth_account_password_forgot = 'Ξέχασα τον κωδικό πρόσβασης';
-z.string.el.auth_account_public_computer = 'Αυτός είναι ένας δημόσιος υπολογιστής';
-z.string.el.auth_account_sign_in = 'Σύνδεση';
-z.string.el.auth_account_sign_in_email = 'Email';
-z.string.el.auth_account_sign_in_phone = 'Τηλεφωνο';
+z.string.el.authAccountCountryCode = 'Κωδικός Χώρας';
+z.string.el.authAccountDeletion = 'Αποσυνδεθήκατε, επειδή ο λογαριασμός έχει διαγραφεί.';
+z.string.el.authAccountExpiration = 'Αποσυνδεθήκατε διότι η περίοδος λειτουργίας σας έληξε. Παρακαλούμε συνδεθείτε ξανά.';
+z.string.el.authAccountPasswordForgot = 'Ξέχασα τον κωδικό πρόσβασης';
+z.string.el.authAccountPublicComputer = 'Αυτός είναι ένας δημόσιος υπολογιστής';
+z.string.el.authAccountSignIn = 'Σύνδεση';
+z.string.el.authAccountSignInEmail = 'Email';
+z.string.el.authAccountSignInPhone = 'Τηλεφωνο';
 
 z.string.el.auth_blocked_cookies = 'Ενεργοποιήστε τα cookies για να συνδεθείτε στο Wire.';
 z.string.el.auth_blocked_database = 'Το Wire χρειάζεται πρόσβαση σε τοπικό αποθηκευτικό χώρο για την προβολή των μηνυμάτων σας. Η τοπική αποθήκευση δεν είναι διαθέσιμη σε ιδιωτική λειτουργία.';

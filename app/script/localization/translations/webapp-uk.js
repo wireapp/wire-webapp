@@ -19,23 +19,23 @@
 
 z.string.uk.wireMacos = 'Wire для macOS';
 z.string.uk.wireWindows = 'Wire для Windows';
-z.string.uk.wire_linux = 'Wire для Linux';
-z.string.uk.nonexistent_user = 'Видалений користувач';
+z.string.uk.wireLinux = 'Wire для Linux';
+z.string.uk.nonexistentUser = 'Видалений користувач';
 z.string.uk.and = 'і';
 
-z.string.uk.alert_upload_file_format = 'Не вдалося застосувати дану картинку.\nБудь ласка, оберіть файл в форматі PNG або JPEG.';
-z.string.uk.alert_upload_too_small = 'Не вдалося застосувати дану картинку.\nБудь ласка, оберіть файл роздільною здатністю не менше 320 x 320 пікселів.';
-z.string.uk.alert_upload_too_large = 'Не вдалося застосувати дану картинку.\nВи можете завантажувати файли розміром до {{number}} МБ.';
-z.string.uk.alert_gif_too_large = 'Файл анімації завеликий.\nМаксимальний розмір —  {{number}} МБ.';
+z.string.uk.alertUploadFileFormat = 'Не вдалося застосувати дану картинку.\nБудь ласка, оберіть файл в форматі PNG або JPEG.';
+z.string.uk.alertUploadTooSmall = 'Не вдалося застосувати дану картинку.\nБудь ласка, оберіть файл роздільною здатністю не менше 320 x 320 пікселів.';
+z.string.uk.alertUploadTooLarge = 'Не вдалося застосувати дану картинку.\nВи можете завантажувати файли розміром до {{number}} МБ.';
+z.string.uk.alertGifTooLarge = 'Файл анімації завеликий.\nМаксимальний розмір —  {{number}} МБ.';
 
-z.string.uk.auth_account_country_code = 'Код країни';
-z.string.uk.auth_account_deletion = 'Ви вийшли, оскільки ваш акаунт було видалено.';
-z.string.uk.auth_account_expiration = 'Ви вийшли, оскільки термін дії вашої сесії завершився. Будь ласка, увійдіть ще раз.';
-z.string.uk.auth_account_password_forgot = 'Забули пароль?';
-z.string.uk.auth_account_public_computer = 'Це загальнодоступний комп’ютер';
-z.string.uk.auth_account_sign_in = 'Увійти';
-z.string.uk.auth_account_sign_in_email = 'Email';
-z.string.uk.auth_account_sign_in_phone = 'Номер телефону';
+z.string.uk.authAccountCountryCode = 'Код країни';
+z.string.uk.authAccountDeletion = 'Ви вийшли, оскільки ваш акаунт було видалено.';
+z.string.uk.authAccountExpiration = 'Ви вийшли, оскільки термін дії вашої сесії завершився. Будь ласка, увійдіть ще раз.';
+z.string.uk.authAccountPasswordForgot = 'Забули пароль?';
+z.string.uk.authAccountPublicComputer = 'Це загальнодоступний комп’ютер';
+z.string.uk.authAccountSignIn = 'Увійти';
+z.string.uk.authAccountSignInEmail = 'Email';
+z.string.uk.authAccountSignInPhone = 'Номер телефону';
 
 z.string.uk.auth_blocked_cookies = 'Увімкніть файли cookie, щоб увійти в Wire.';
 z.string.uk.auth_blocked_database = 'Wire потребує доступу до локальної бази даних для відображення повідомлень. Локальна база даних недоступна в приватному режимі.';

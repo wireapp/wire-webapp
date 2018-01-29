@@ -19,23 +19,23 @@
 
 z.string.pl.wireMacos = 'Wire dla macOS';
 z.string.pl.wireWindows = 'Wire dla Windows';
-z.string.pl.wire_linux = 'Wire dla Linuksa';
-z.string.pl.nonexistent_user = 'Użytkownik usunięty';
+z.string.pl.wireLinux = 'Wire dla Linuksa';
+z.string.pl.nonexistentUser = 'Użytkownik usunięty';
 z.string.pl.and = 'oraz';
 
-z.string.pl.alert_upload_file_format = 'Nie można użyć tego obrazu. Proszę wybrać plik PNG lub JPEG.';
-z.string.pl.alert_upload_too_small = 'Nie można użyć tego obrazu. Proszę wybrać obraz o rozmiarach co najmniej 320 x 320 px.';
-z.string.pl.alert_upload_too_large = 'Ten obraz jest zbyt duży. Możesz przesyłać pliki o rozmiarze max. {{number}} MB.';
-z.string.pl.alert_gif_too_large = 'Animacja jest zbyt duża. Maksymalny rozmiar to {{number}} MB.';
+z.string.pl.alertUploadFileFormat = 'Nie można użyć tego obrazu. Proszę wybrać plik PNG lub JPEG.';
+z.string.pl.alertUploadTooSmall = 'Nie można użyć tego obrazu. Proszę wybrać obraz o rozmiarach co najmniej 320 x 320 px.';
+z.string.pl.alertUploadTooLarge = 'Ten obraz jest zbyt duży. Możesz przesyłać pliki o rozmiarze max. {{number}} MB.';
+z.string.pl.alertGifTooLarge = 'Animacja jest zbyt duża. Maksymalny rozmiar to {{number}} MB.';
 
-z.string.pl.auth_account_country_code = 'Kierunkowy kraju';
-z.string.pl.auth_account_deletion = 'Zostałeś wylogowany, ponieważ Twoje konto zostało usunięte.';
-z.string.pl.auth_account_expiration = 'Zostałeś wylogowany ponieważ twoja sesja wygasła. Proszę zalogować się ponownie.';
-z.string.pl.auth_account_password_forgot = 'Zapomniałem hasła';
-z.string.pl.auth_account_public_computer = 'To jest komputer publiczny';
-z.string.pl.auth_account_sign_in = 'Zaloguj się';
-z.string.pl.auth_account_sign_in_email = 'Adres e-mail';
-z.string.pl.auth_account_sign_in_phone = 'Numer telefonu';
+z.string.pl.authAccountCountryCode = 'Kierunkowy kraju';
+z.string.pl.authAccountDeletion = 'Zostałeś wylogowany, ponieważ Twoje konto zostało usunięte.';
+z.string.pl.authAccountExpiration = 'Zostałeś wylogowany ponieważ twoja sesja wygasła. Proszę zalogować się ponownie.';
+z.string.pl.authAccountPasswordForgot = 'Zapomniałem hasła';
+z.string.pl.authAccountPublicComputer = 'To jest komputer publiczny';
+z.string.pl.authAccountSignIn = 'Zaloguj się';
+z.string.pl.authAccountSignInEmail = 'Adres e-mail';
+z.string.pl.authAccountSignInPhone = 'Numer telefonu';
 
 z.string.pl.auth_blocked_cookies = 'Włącz ciasteczka do zalogowania się do Wire.';
 z.string.pl.auth_blocked_database = 'Wire potrzebuje dostępu do pamięci lokalnej, by wyświetlać wiadomości. Pamięć lokalna nie jest dostępna w trybie prywatnym.';

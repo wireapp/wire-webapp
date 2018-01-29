@@ -20,23 +20,23 @@
 z.string.fr.wire = 'Wire';
 z.string.fr.wireMacos = 'Wire pour macOS';
 z.string.fr.wireWindows = 'Wire pour Windows';
-z.string.fr.wire_linux = 'Wire pour Linux';
-z.string.fr.nonexistent_user = 'Utilisateur supprimé';
+z.string.fr.wireLinux = 'Wire pour Linux';
+z.string.fr.nonexistentUser = 'Utilisateur supprimé';
 z.string.fr.and = 'et';
 
-z.string.fr.alert_upload_file_format = 'Cette image ne peut être utilisée. Veuillez choisir un fichier PNG ou JPEG.';
-z.string.fr.alert_upload_too_small = 'Cette image ne peut être utilisée. Veuillez choisir une image qui mesure au moins 320 x 320 pixels.';
-z.string.fr.alert_upload_too_large = 'Cette image est trop lourde. Vous pouvez envoyer des fichiers allant jusqu’à {{number}} Mo.';
-z.string.fr.alert_gif_too_large = 'L’animation est trop lourde. La taille maximale est de {{number}} Mo.';
+z.string.fr.alertUploadFileFormat = 'Cette image ne peut être utilisée. Veuillez choisir un fichier PNG ou JPEG.';
+z.string.fr.alertUploadTooSmall = 'Cette image ne peut être utilisée. Veuillez choisir une image qui mesure au moins 320 x 320 pixels.';
+z.string.fr.alertUploadTooLarge = 'Cette image est trop lourde. Vous pouvez envoyer des fichiers allant jusqu’à {{number}} Mo.';
+z.string.fr.alertGifTooLarge = 'L’animation est trop lourde. La taille maximale est de {{number}} Mo.';
 
-z.string.fr.auth_account_country_code = 'Indicatif du pays';
-z.string.fr.auth_account_deletion = 'Vous avez été déconnecté car votre compte a été supprimé.';
-z.string.fr.auth_account_expiration = 'Vous avez été déconnecté car votre session a expirée. Veuillez vous reconnecter.';
-z.string.fr.auth_account_password_forgot = 'Mot de passe oublié';
-z.string.fr.auth_account_public_computer = 'Cet ordinateur est public';
-z.string.fr.auth_account_sign_in = 'Se connecter';
-z.string.fr.auth_account_sign_in_email = 'E-mail';
-z.string.fr.auth_account_sign_in_phone = 'Téléphone';
+z.string.fr.authAccountCountryCode = 'Indicatif du pays';
+z.string.fr.authAccountDeletion = 'Vous avez été déconnecté car votre compte a été supprimé.';
+z.string.fr.authAccountExpiration = 'Vous avez été déconnecté car votre session a expirée. Veuillez vous reconnecter.';
+z.string.fr.authAccountPasswordForgot = 'Mot de passe oublié';
+z.string.fr.authAccountPublicComputer = 'Cet ordinateur est public';
+z.string.fr.authAccountSignIn = 'Se connecter';
+z.string.fr.authAccountSignInEmail = 'E-mail';
+z.string.fr.authAccountSignInPhone = 'Téléphone';
 
 z.string.fr.auth_blocked_cookies = 'Autorisez les cookies pour vous connecter à Wire.';
 z.string.fr.auth_blocked_database = 'Wire a besoin d’accéder à votre espace de stockage pour afficher les messages. Il n’est pas disponible en navigation privée.';

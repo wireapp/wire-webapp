@@ -20,23 +20,23 @@
 z.string.ru.wire = 'Wire';
 z.string.ru.wireMacos = 'Wire для macOS';
 z.string.ru.wireWindows = 'Wire для Windows';
-z.string.ru.wire_linux = 'Wire для Linux';
-z.string.ru.nonexistent_user = 'Удаленный пользователь';
+z.string.ru.wireLinux = 'Wire для Linux';
+z.string.ru.nonexistentUser = 'Удаленный пользователь';
 z.string.ru.and = 'и';
 
-z.string.ru.alert_upload_file_format = 'Нельзя использовать это изображение.\nПожалуйста, выберите изображение в формате PNG или JPEG.';
-z.string.ru.alert_upload_too_small = 'Нельзя использовать это изображение.\nПожалуйста, выберите изображение размером не менее 320×320 пикселей.';
-z.string.ru.alert_upload_too_large = 'Это изображение слишком большое.\nВы можете загружать файлы размером до {{number}} МБ.';
-z.string.ru.alert_gif_too_large = 'Анимация слишком большая. \nМаксимальный размер {{number}} МБ.';
+z.string.ru.alertUploadFileFormat = 'Нельзя использовать это изображение.\nПожалуйста, выберите изображение в формате PNG или JPEG.';
+z.string.ru.alertUploadTooSmall = 'Нельзя использовать это изображение.\nПожалуйста, выберите изображение размером не менее 320×320 пикселей.';
+z.string.ru.alertUploadTooLarge = 'Это изображение слишком большое.\nВы можете загружать файлы размером до {{number}} МБ.';
+z.string.ru.alertGifTooLarge = 'Анимация слишком большая. \nМаксимальный размер {{number}} МБ.';
 
-z.string.ru.auth_account_country_code = 'Код страны';
-z.string.ru.auth_account_deletion = 'Вы вышли из системы потому что ваша учётная запись была удалена.';
-z.string.ru.auth_account_expiration = 'Вы были отключены, потому что срок действия вашей сессии истек. Пожалуйста, войдите снова.';
-z.string.ru.auth_account_password_forgot = 'Восстановление пароля';
-z.string.ru.auth_account_public_computer = 'Это общедоступный компьютер';
-z.string.ru.auth_account_sign_in = 'Вход';
-z.string.ru.auth_account_sign_in_email = 'Email';
-z.string.ru.auth_account_sign_in_phone = 'Телефон';
+z.string.ru.authAccountCountryCode = 'Код страны';
+z.string.ru.authAccountDeletion = 'Вы вышли из системы потому что ваша учётная запись была удалена.';
+z.string.ru.authAccountExpiration = 'Вы были отключены, потому что срок действия вашей сессии истек. Пожалуйста, войдите снова.';
+z.string.ru.authAccountPasswordForgot = 'Восстановление пароля';
+z.string.ru.authAccountPublicComputer = 'Это общедоступный компьютер';
+z.string.ru.authAccountSignIn = 'Вход';
+z.string.ru.authAccountSignInEmail = 'Email';
+z.string.ru.authAccountSignInPhone = 'Телефон';
 
 z.string.ru.auth_blocked_cookies = 'Включите файлы cookie для входа в Wire.';
 z.string.ru.auth_blocked_database = 'Для отображения сообщений Wire необходим доступ к локальному хранилищу. Локальное хранилище недоступно в приватном режиме.';

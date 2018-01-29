@@ -20,22 +20,22 @@
 z.string.sl.wire = 'Wire';
 z.string.sl.wireMacos = 'Wire za macOS';
 z.string.sl.wireWindows = 'Wire za Windows';
-z.string.sl.wire_linux = 'Wire za Linux';
-z.string.sl.nonexistent_user = 'Izbrisan uporabnik';
+z.string.sl.wireLinux = 'Wire za Linux';
+z.string.sl.nonexistentUser = 'Izbrisan uporabnik';
 z.string.sl.and = 'in';
 
-z.string.sl.alert_upload_file_format = 'Ne morete uporabiti te slike.\nProsimo izberite zbirko PNG ali JPEG.';
-z.string.sl.alert_upload_too_small = 'Ne morete uporabiti te slike.\nProsimo izberite sliko, ki je vsaj 320 x 320 px.';
-z.string.sl.alert_upload_too_large = 'Ta slika je prevelika. \nNaložite lahko zbirke do {{number}} MB.';
-z.string.sl.alert_gif_too_large = 'Animacija je prevelika. \nNajvečja velikost je {{number}} MB.';
+z.string.sl.alertUploadFileFormat = 'Ne morete uporabiti te slike.\nProsimo izberite zbirko PNG ali JPEG.';
+z.string.sl.alertUploadTooSmall = 'Ne morete uporabiti te slike.\nProsimo izberite sliko, ki je vsaj 320 x 320 px.';
+z.string.sl.alertUploadTooLarge = 'Ta slika je prevelika. \nNaložite lahko zbirke do {{number}} MB.';
+z.string.sl.alertGifTooLarge = 'Animacija je prevelika. \nNajvečja velikost je {{number}} MB.';
 
-z.string.sl.auth_account_country_code = 'Koda države';
-z.string.sl.auth_account_expiration = 'Ker je vaša seja potekla, ste bili odjavljeni. Prosimo prijavite se ponovno.';
-z.string.sl.auth_account_password_forgot = 'Pozabljeno geslo';
-z.string.sl.auth_account_public_computer = 'To je javni računalnik';
-z.string.sl.auth_account_sign_in = 'Prijava';
-z.string.sl.auth_account_sign_in_email = 'E-pošta';
-z.string.sl.auth_account_sign_in_phone = 'Telefon';
+z.string.sl.authAccountCountryCode = 'Koda države';
+z.string.sl.authAccountExpiration = 'Ker je vaša seja potekla, ste bili odjavljeni. Prosimo prijavite se ponovno.';
+z.string.sl.authAccountPasswordForgot = 'Pozabljeno geslo';
+z.string.sl.authAccountPublicComputer = 'To je javni računalnik';
+z.string.sl.authAccountSignIn = 'Prijava';
+z.string.sl.authAccountSignInEmail = 'E-pošta';
+z.string.sl.authAccountSignInPhone = 'Telefon';
 
 z.string.sl.auth_blocked_database = 'Wire potrebuje dostop do lokalnega pomnilnika za prikaz sporočil. Lokalni pomnilnik ni na voljo v privatnem načinu.';
 z.string.sl.auth_blocked_tabs = 'Wire je že odprt v drugem oknu.';

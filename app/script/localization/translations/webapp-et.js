@@ -20,23 +20,23 @@
 z.string.et.wire = 'Wire';
 z.string.et.wireMacos = 'Wire macOS-ile';
 z.string.et.wireWindows = 'Wire Windowsile';
-z.string.et.wire_linux = 'Wire Linuxile';
-z.string.et.nonexistent_user = 'Kustutatud kasutaja';
+z.string.et.wireLinux = 'Wire Linuxile';
+z.string.et.nonexistentUser = 'Kustutatud kasutaja';
 z.string.et.and = 'ja';
 
-z.string.et.alert_upload_file_format = 'Seda pilti ei saa kasutada.\nPalun vali PNG või JPEG fail.';
-z.string.et.alert_upload_too_small = 'Seda pilti ei saa kasutada.\nPalun vali pilt, mis on vähemalt 320x320 pikslit.';
-z.string.et.alert_upload_too_large = 'See pilt on liiga suur.\nSa võid üles laadida faile suurusega kuni {{number}} MB.';
-z.string.et.alert_gif_too_large = 'Animatsioon on liiga suur.\nMaksimaalne lubatud suurus on {{number}} MB.';
+z.string.et.alertUploadFileFormat = 'Seda pilti ei saa kasutada.\nPalun vali PNG või JPEG fail.';
+z.string.et.alertUploadTooSmall = 'Seda pilti ei saa kasutada.\nPalun vali pilt, mis on vähemalt 320x320 pikslit.';
+z.string.et.alertUploadTooLarge = 'See pilt on liiga suur.\nSa võid üles laadida faile suurusega kuni {{number}} MB.';
+z.string.et.alertGifTooLarge = 'Animatsioon on liiga suur.\nMaksimaalne lubatud suurus on {{number}} MB.';
 
-z.string.et.auth_account_country_code = 'Riigi kood';
-z.string.et.auth_account_deletion = 'Sind logiti välja, kuna sinu konto kustutati.';
-z.string.et.auth_account_expiration = 'Sind logiti välja, kuna seanss aegus. Palun logi uuesti sisse.';
-z.string.et.auth_account_password_forgot = 'Unustasid parooli?';
-z.string.et.auth_account_public_computer = 'See on avalik arvuti';
-z.string.et.auth_account_sign_in = 'Logi sisse';
-z.string.et.auth_account_sign_in_email = 'E-post';
-z.string.et.auth_account_sign_in_phone = 'Telefon';
+z.string.et.authAccountCountryCode = 'Riigi kood';
+z.string.et.authAccountDeletion = 'Sind logiti välja, kuna sinu konto kustutati.';
+z.string.et.authAccountExpiration = 'Sind logiti välja, kuna seanss aegus. Palun logi uuesti sisse.';
+z.string.et.authAccountPasswordForgot = 'Unustasid parooli?';
+z.string.et.authAccountPublicComputer = 'See on avalik arvuti';
+z.string.et.authAccountSignIn = 'Logi sisse';
+z.string.et.authAccountSignInEmail = 'E-post';
+z.string.et.authAccountSignInPhone = 'Telefon';
 
 z.string.et.auth_blocked_cookies = 'Wire’i sisselogimiseks luba küpsised.';
 z.string.et.auth_blocked_database = 'Wire vajab sõnumite kuvamiseks ligipääsu kohalikule hoidlale (local storage). Kohalik hoidla ei ole privaatrežiimis saadaval.';

@@ -320,7 +320,7 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
   }
 
   _show_upload_warning(image) {
-    const string_id = image.type === 'image/gif' ? z.string.alert_gif_too_large : z.string.alert_upload_too_large;
+    const string_id = image.type === 'image/gif' ? z.string.alertGifTooLarge : z.string.alertUploadTooLarge;
     const warning_text = z.l10n.text(string_id, z.config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024);
 
     const attributes = {

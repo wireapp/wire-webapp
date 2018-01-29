@@ -30,19 +30,19 @@
         <div class="content">
           <div id="section-account" class="section">
             <div class="selector selector-mode">
-              <button class="button btn-mode btn-login" data-bind="l10n_text: z.string.auth_account_sign_in"></button>
+              <button class="button btn-mode btn-login" data-bind="l10n_text: z.string.authAccountSignIn"></button>
             </div>
 
             <div id="form-account-login" class="form">
               <div class="selector selector-method">
                 <div class="column">
                   <button class="button btn-method btn-login-password"
-                          data-bind="click: clicked_on_login_password, css: {'disabled': disabled_by_animation}, l10n_text: z.string.auth_account_sign_in_email"
+                          data-bind="click: clicked_on_login_password, css: {'disabled': disabled_by_animation}, l10n_text: z.string.authAccountSignInEmail"
                           data-uie-name="go-sign-in-email"></button>
                 </div>
                 <div class="column">
                   <button class="button btn-method btn-login-phone"
-                          data-bind="click: clicked_on_login_phone, css: {'disabled': disabled_by_animation}, l10n_text: z.string.auth_account_sign_in_phone"
+                          data-bind="click: clicked_on_login_phone, css: {'disabled': disabled_by_animation}, l10n_text: z.string.authAccountSignInPhone"
                           data-uie-name="go-sign-in-phone"></button>
                 </div>
               </div>
@@ -68,18 +68,18 @@
                 <div id="wire-login-password-remember" data-bind="electron_remove">
                   <div class="checkbox checkbox-remember">
                     <input type="checkbox" id="checkbox-public-computer" data-bind="checked: is_public_computer" data-uie-name="enter-public-computer-sign-in">
-                    <label class="label-xs" for="checkbox-public-computer" data-bind="l10n_text: z.string.auth_account_public_computer"></label>
+                    <label class="label-xs" for="checkbox-public-computer" data-bind="l10n_text: z.string.authAccountPublicComputer"></label>
                   </div>
                 </div>
                 <div class="footer">
                   <div class="column">
                     <input id="wire-password-login" class="button button-white btn-action btn-sign-in-email" type="submit"
-                           data-bind="enable: can_login_password, l10n_input: z.string.auth_account_sign_in"
+                           data-bind="enable: can_login_password, l10n_input: z.string.authAccountSignIn"
                            data-uie-name="do-sign-in">
                   </div>
                   <div class="column">
                     <a class="auth-link-button"
-                       data-bind="click: clicked_on_password, l10n_text: z.string.auth_account_password_forgot"
+                       data-bind="click: clicked_on_password, l10n_text: z.string.authAccountPasswordForgot"
                        data-uie-name="go-forgot-password">
                     </a>
                   </div>
@@ -90,7 +90,7 @@
                   <select class="input phone" id="wire-login-country" name="select"
                           data-bind="event: {change: changed_country}, textInput: country"
                           data-uie-name="enter-country">
-                    <option value="X0" style="display:none;" data-bind="l10n_text: z.string.auth_account_country_code"></option>
+                    <option value="X0" style="display:none;" data-bind="l10n_text: z.string.authAccountCountryCode"></option>
                     <option value="X1" style="display:none;" data-bind="l10n_text: z.string.auth_error_country_code_invalid"></option>
                     <!-- ko foreach: z.util.CountryCodes.COUNTRY_CODES -->
                       <option data-bind="value: iso, text: name"></option>
@@ -101,7 +101,7 @@
                 <div class="form-control">
                   <div class="input-group" data-bind="css: {'input-error': failed_validation_phone}">
                     <input class="input phone" id="wire-login-country-code" type="tel" autocomplete="off" maxlength="5" spellcheck="false"
-                           data-bind="event: {change: changed_country_code, input: clear_error}, l10n_tooltip: z.string.auth_account_country_code, textInput: country_code"
+                           data-bind="event: {change: changed_country_code, input: clear_error}, l10n_tooltip: z.string.authAccountCountryCode, textInput: country_code"
                            data-uie-name="enter-county-code">
                     <input class="input phone" id="wire-login-phone" type="tel" autocomplete="off" maxlength="15" spellcheck="false"
                            data-bind="event: {change: changed_phone_number, input: clear_error}, l10n_tooltip: z.string.auth_placeholder_phone, l10n_placeholder: z.string.auth_placeholder_phone, textInput: phone_number"
@@ -116,12 +116,12 @@
                 <div id="wire-login-phone-remember" data-bind="electron_remove">
                   <div class="checkbox checkbox-remember">
                     <input type="checkbox" id="checkbox-public-computer-phone" data-bind="checked: is_public_computer" data-uie-name="enter-public-computer-phone-sign-in">
-                    <label class="label-xs" for="checkbox-public-computer-phone" data-bind="l10n_text: z.string.auth_account_public_computer"></label>
+                    <label class="label-xs" for="checkbox-public-computer-phone" data-bind="l10n_text: z.string.authAccountPublicComputer"></label>
                   </div>
                 </div>
                 <div class="footer">
                     <input id="wire-phone-login" class="button button-white btn-action btn-sign-in-phone" type="submit"
-                           data-bind="enable: can_login_phone, l10n_input: z.string.auth_account_sign_in"
+                           data-bind="enable: can_login_phone, l10n_input: z.string.authAccountSignIn"
                            data-uie-name="do-sign-in-phone">
                 </div>
               </form>
@@ -227,12 +227,12 @@
               <div class="footer">
                 <div class="column">
                   <input id="wire-verify-password" class="button button-white btn-action" type="submit"
-                         data-bind="enable: can_verify_password, l10n_input: z.string.auth_account_sign_in"
+                         data-bind="enable: can_verify_password, l10n_input: z.string.authAccountSignIn"
                          data-uie-name="do-login-in">
                 </div>
                 <div class="column">
                   <a class="auth-link-button"
-                     data-bind="click: clicked_on_password, l10n_text: z.string.auth_account_password_forgot"
+                     data-bind="click: clicked_on_password, l10n_text: z.string.authAccountPasswordForgot"
                      data-uie-name="go-forgot-password">
                   </a>
                 </div>

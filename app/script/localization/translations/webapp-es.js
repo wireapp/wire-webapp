@@ -19,23 +19,23 @@
 
 z.string.es.wireMacos = 'Wire para macOS';
 z.string.es.wireWindows = 'Wire para Windows';
-z.string.es.wire_linux = 'Wire para Linux';
-z.string.es.nonexistent_user = 'Usuario Borrado';
+z.string.es.wireLinux = 'Wire para Linux';
+z.string.es.nonexistentUser = 'Usuario Borrado';
 z.string.es.and = 'y';
 
-z.string.es.alert_upload_file_format = 'No se puede utilizar esta foto.\nPor favor, elija un archivo PNG o JPEG.';
-z.string.es.alert_upload_too_small = 'No se puede utilizar esta foto.\nPor favor, elija una imagen de al menos 320 x 320 px.';
-z.string.es.alert_upload_too_large = 'Esta imagen es demasiado grande. \nPuedes subir archivos de hasta {{number}} MB.';
-z.string.es.alert_gif_too_large = 'La animación es demasiado grande.\nEl tamaño máximo es de {{number}} MB.';
+z.string.es.alertUploadFileFormat = 'No se puede utilizar esta foto.\nPor favor, elija un archivo PNG o JPEG.';
+z.string.es.alertUploadTooSmall = 'No se puede utilizar esta foto.\nPor favor, elija una imagen de al menos 320 x 320 px.';
+z.string.es.alertUploadTooLarge = 'Esta imagen es demasiado grande. \nPuedes subir archivos de hasta {{number}} MB.';
+z.string.es.alertGifTooLarge = 'La animación es demasiado grande.\nEl tamaño máximo es de {{number}} MB.';
 
-z.string.es.auth_account_country_code = 'Código de País';
-z.string.es.auth_account_deletion = 'Fue desconectado porque su cuenta fue borrada.';
-z.string.es.auth_account_expiration = 'Su sesión ha vencido. Entrar nuevamente.';
-z.string.es.auth_account_password_forgot = 'Contraseña Olvidada';
-z.string.es.auth_account_public_computer = 'Es un ordenador público';
-z.string.es.auth_account_sign_in = 'Iniciar sesión';
-z.string.es.auth_account_sign_in_email = 'Correo';
-z.string.es.auth_account_sign_in_phone = 'Teléfono';
+z.string.es.authAccountCountryCode = 'Código de País';
+z.string.es.authAccountDeletion = 'Fue desconectado porque su cuenta fue borrada.';
+z.string.es.authAccountExpiration = 'Su sesión ha vencido. Entrar nuevamente.';
+z.string.es.authAccountPasswordForgot = 'Contraseña Olvidada';
+z.string.es.authAccountPublicComputer = 'Es un ordenador público';
+z.string.es.authAccountSignIn = 'Iniciar sesión';
+z.string.es.authAccountSignInEmail = 'Correo';
+z.string.es.authAccountSignInPhone = 'Teléfono';
 
 z.string.es.auth_blocked_cookies = 'Habilita las cookies para iniciar sesión.';
 z.string.es.auth_blocked_database = 'Wire necesita acceso al almacenamiento local para mostrar los mensajes. No está disponible en modo privado.';

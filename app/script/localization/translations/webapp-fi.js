@@ -19,23 +19,23 @@
 
 z.string.fi.wireMacos = 'Wire macOS: lle';
 z.string.fi.wireWindows = 'Wire Windowsille';
-z.string.fi.wire_linux = 'Wire Linuxille';
-z.string.fi.nonexistent_user = 'Poistettu käyttäjä';
+z.string.fi.wireLinux = 'Wire Linuxille';
+z.string.fi.nonexistentUser = 'Poistettu käyttäjä';
 z.string.fi.and = 'ja';
 
-z.string.fi.alert_upload_file_format = 'Kuvaa ei voi käyttää. Valitse PNG- tai JPEG-tiedosto.';
-z.string.fi.alert_upload_too_small = 'Kuvaa ei voi käyttää. Valitse kuva, jonka koko on vähintään 320 X 320 pikseliä.';
-z.string.fi.alert_upload_too_large = 'Kuva on liian suuri. Voit ladata maksimissaan {{number}} MB kokoisia kuvia.';
-z.string.fi.alert_gif_too_large = 'Animaatio on liian suuri. Maksimi koko on {{number}} MB.';
+z.string.fi.alertUploadFileFormat = 'Kuvaa ei voi käyttää. Valitse PNG- tai JPEG-tiedosto.';
+z.string.fi.alertUploadTooSmall = 'Kuvaa ei voi käyttää. Valitse kuva, jonka koko on vähintään 320 X 320 pikseliä.';
+z.string.fi.alertUploadTooLarge = 'Kuva on liian suuri. Voit ladata maksimissaan {{number}} MB kokoisia kuvia.';
+z.string.fi.alertGifTooLarge = 'Animaatio on liian suuri. Maksimi koko on {{number}} MB.';
 
-z.string.fi.auth_account_country_code = 'Maakoodi';
-z.string.fi.auth_account_deletion = 'Sinut kirjattiin ulos, koska tilisi poistettiin.';
-z.string.fi.auth_account_expiration = 'Sinut kirjattiin ulos, koska istuntosi päättyi. Kirjaudu sisään uudelleen.';
-z.string.fi.auth_account_password_forgot = 'Unohdin salasanani';
-z.string.fi.auth_account_public_computer = 'Tämä on julkinen tietokone';
-z.string.fi.auth_account_sign_in = 'Kirjaudu sisään';
-z.string.fi.auth_account_sign_in_email = 'Sähköposti';
-z.string.fi.auth_account_sign_in_phone = 'Puhelinnumero';
+z.string.fi.authAccountCountryCode = 'Maakoodi';
+z.string.fi.authAccountDeletion = 'Sinut kirjattiin ulos, koska tilisi poistettiin.';
+z.string.fi.authAccountExpiration = 'Sinut kirjattiin ulos, koska istuntosi päättyi. Kirjaudu sisään uudelleen.';
+z.string.fi.authAccountPasswordForgot = 'Unohdin salasanani';
+z.string.fi.authAccountPublicComputer = 'Tämä on julkinen tietokone';
+z.string.fi.authAccountSignIn = 'Kirjaudu sisään';
+z.string.fi.authAccountSignInEmail = 'Sähköposti';
+z.string.fi.authAccountSignInPhone = 'Puhelinnumero';
 
 z.string.fi.auth_blocked_cookies = 'Salli evästeet kirjautuaksesi Wireen.';
 z.string.fi.auth_blocked_database = 'Wire tarvitsee pääsyn paikalliseen säilöösi säilöäkseen viestejä. Paikallinen säilö ei ole saatavilla yksityisessä tilassa.';

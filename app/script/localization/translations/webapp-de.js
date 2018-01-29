@@ -20,23 +20,23 @@
 z.string.de.wire = 'Wire';
 z.string.de.wireMacos = 'Wire für macOS';
 z.string.de.wireWindows = 'Wire für Windows';
-z.string.de.wire_linux = 'Wire für Linux';
-z.string.de.nonexistent_user = 'Gelöschte Person';
+z.string.de.wireLinux = 'Wire für Linux';
+z.string.de.nonexistentUser = 'Gelöschte Person';
 z.string.de.and = 'und';
 
-z.string.de.alert_upload_file_format = 'Das Bild kann nicht verwendet werden. Bitte wähle eine PNG- oder JPEG-Datei.';
-z.string.de.alert_upload_too_small = 'Das Bild kann nicht verwendet werden. Bitte wähle ein Bild mit mindestens 320 x 320 Pixeln.';
-z.string.de.alert_upload_too_large = 'Das Bild ist zu groß. Du kannst Dateien bis zu {{number}} MB hochladen.';
-z.string.de.alert_gif_too_large = 'Das GIF ist zu groß. Die maximale Größe beträgt {{number}} MB.';
+z.string.de.alertUploadFileFormat = 'Das Bild kann nicht verwendet werden. Bitte wähle eine PNG- oder JPEG-Datei.';
+z.string.de.alertUploadTooSmall = 'Das Bild kann nicht verwendet werden. Bitte wähle ein Bild mit mindestens 320 x 320 Pixeln.';
+z.string.de.alertUploadTooLarge = 'Das Bild ist zu groß. Du kannst Dateien bis zu {{number}} MB hochladen.';
+z.string.de.alertGifTooLarge = 'Das GIF ist zu groß. Die maximale Größe beträgt {{number}} MB.';
 
-z.string.de.auth_account_country_code = 'Landesvorwahl';
-z.string.de.auth_account_deletion = 'Du wurdest abgemeldet, da dein Benutzerkonto gelöscht wurde.';
-z.string.de.auth_account_expiration = 'Du wurdest abgemeldet, da deine Session abgelaufen ist. Bitte melde dich erneut an.';
-z.string.de.auth_account_password_forgot = 'Passwort vergessen';
-z.string.de.auth_account_public_computer = 'Dies ist ein öffentlicher Computer';
-z.string.de.auth_account_sign_in = 'Login';
-z.string.de.auth_account_sign_in_email = 'E-Mail';
-z.string.de.auth_account_sign_in_phone = 'Handy';
+z.string.de.authAccountCountryCode = 'Landesvorwahl';
+z.string.de.authAccountDeletion = 'Du wurdest abgemeldet, da dein Benutzerkonto gelöscht wurde.';
+z.string.de.authAccountExpiration = 'Du wurdest abgemeldet, da deine Session abgelaufen ist. Bitte melde dich erneut an.';
+z.string.de.authAccountPasswordForgot = 'Passwort vergessen';
+z.string.de.authAccountPublicComputer = 'Dies ist ein öffentlicher Computer';
+z.string.de.authAccountSignIn = 'Login';
+z.string.de.authAccountSignInEmail = 'E-Mail';
+z.string.de.authAccountSignInPhone = 'Handy';
 
 z.string.de.auth_blocked_cookies = 'Aktiviere Cookies, um dich bei Wire einzuloggen.';
 z.string.de.auth_blocked_database = 'Wire benötigt zum Anzeigen deiner Nachrichten Zugriff auf den lokalen Speicher. In Privaten Fenstern ist dieser nicht verfügbar.';
