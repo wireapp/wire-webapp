@@ -516,7 +516,7 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
         label: z.l10n.text(z.string.ephememalUnitsNone),
       },
     ].concat(
-      z.ephemeral.timings.get_values().map(milliseconds => {
+      z.ephemeral.timings.getValues().map(milliseconds => {
         const [number, unit] = z.util.format_milliseconds_short(milliseconds);
         const unit_locale = this._get_localized_unit_string(number, unit);
         return {
