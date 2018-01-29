@@ -76,8 +76,8 @@ z.string.ru.auth_placeholder_password_set = 'Пароль (минимум 8 си
 z.string.ru.auth_placeholder_phone = 'Номер телефона';
 
 z.string.ru.authErrorCode = 'Неверный код';
-z.string.ru.auth_error_country_code_invalid = 'Неверный код страны';
-z.string.ru.auth_error_email_exists = 'Такой email уже используется';
+z.string.ru.authErrorCountryCodeInvalid = 'Неверный код страны';
+z.string.ru.authErrorEmailExists = 'Такой email уже используется';
 z.string.ru.auth_error_email_forbidden = 'Извините, этот адрес email запрещен.';
 z.string.ru.auth_error_email_malformed = 'Пожалуйста, введите правильный email.';
 z.string.ru.auth_error_email_missing = 'Пожалуйста, введите email.';

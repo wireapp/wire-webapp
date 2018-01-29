@@ -74,8 +74,8 @@ z.string.it.auth_placeholder_password_set = 'Password (almeno 8 caratteri)';
 z.string.it.auth_placeholder_phone = 'Numero di telefono';
 
 z.string.it.authErrorCode = 'Codice non valido';
-z.string.it.auth_error_country_code_invalid = 'Prefisso paese non valido';
-z.string.it.auth_error_email_exists = 'Indirizzo email già registrato';
+z.string.it.authErrorCountryCodeInvalid = 'Prefisso paese non valido';
+z.string.it.authErrorEmailExists = 'Indirizzo email già registrato';
 z.string.it.auth_error_email_forbidden = 'Siamo spiacenti. Questo indirizzo email è vietato.';
 z.string.it.auth_error_email_malformed = 'Inserisci un indirizzo email valido.';
 z.string.it.auth_error_email_missing = 'Inserisci un indirizzo email.';

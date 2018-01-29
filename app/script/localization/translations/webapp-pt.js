@@ -75,8 +75,8 @@ z.string.pt.auth_placeholder_password_set = 'Palavra-passe (pelo menos 8 caracte
 z.string.pt.auth_placeholder_phone = 'Telefone';
 
 z.string.pt.authErrorCode = 'Código inválido';
-z.string.pt.auth_error_country_code_invalid = 'Código de País Inválido';
-z.string.pt.auth_error_email_exists = 'O endereço de correio eletrónico já está a ser utilizado';
+z.string.pt.authErrorCountryCodeInvalid = 'Código de País Inválido';
+z.string.pt.authErrorEmailExists = 'O endereço de correio eletrónico já está a ser utilizado';
 z.string.pt.auth_error_email_forbidden = 'Este endereço de e-mail não é permitido.';
 z.string.pt.auth_error_email_malformed = 'Por favor, introduza um endereço de email válido.';
 z.string.pt.auth_error_email_missing = 'Por favor insera um endereço de email.';

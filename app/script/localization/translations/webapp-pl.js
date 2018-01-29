@@ -75,8 +75,8 @@ z.string.pl.auth_placeholder_password_set = 'Hasło (musi mieć przynajmniej 8 z
 z.string.pl.auth_placeholder_phone = 'Numer telefonu';
 
 z.string.pl.authErrorCode = 'Nieprawidłowy kod';
-z.string.pl.auth_error_country_code_invalid = 'Błędy kierunkowy kraju';
-z.string.pl.auth_error_email_exists = 'Adres e-mail już istnieje';
+z.string.pl.authErrorCountryCodeInvalid = 'Błędy kierunkowy kraju';
+z.string.pl.authErrorEmailExists = 'Adres e-mail już istnieje';
 z.string.pl.auth_error_email_forbidden = 'Przepraszamy. Ten adres e-mail został zabroniony.';
 z.string.pl.auth_error_email_malformed = 'Wpisz proszę prawidłowy adres e-mail.';
 z.string.pl.auth_error_email_missing = 'Podaj adres e-mail.';

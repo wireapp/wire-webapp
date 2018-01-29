@@ -75,8 +75,8 @@ z.string.cs.auth_placeholder_password_set = 'Heslo (alespoň 8 znaků)';
 z.string.cs.auth_placeholder_phone = 'Telefonní číslo';
 
 z.string.cs.authErrorCode = 'Neplatný kód';
-z.string.cs.auth_error_country_code_invalid = 'Neplatný kód země';
-z.string.cs.auth_error_email_exists = 'Emailová adresa je již používána';
+z.string.cs.authErrorCountryCodeInvalid = 'Neplatný kód země';
+z.string.cs.authErrorEmailExists = 'Emailová adresa je již používána';
 z.string.cs.auth_error_email_forbidden = 'Omlouváme se. Tato emailová adresa byla zakázána.';
 z.string.cs.auth_error_email_malformed = 'Zadejte prosím platnou emailovou adresu.';
 z.string.cs.auth_error_email_missing = 'Zadejte prosím emailovou adresu.';

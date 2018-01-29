@@ -76,8 +76,8 @@ z.string.sk.auth_placeholder_password_set = 'Heslo (minimálne 8 znakov)';
 z.string.sk.auth_placeholder_phone = 'Telefónne číslo';
 
 z.string.sk.authErrorCode = 'Neplatný kód';
-z.string.sk.auth_error_country_code_invalid = 'Neplatný kód krajiny';
-z.string.sk.auth_error_email_exists = 'E-mailová adresa sa už používa';
+z.string.sk.authErrorCountryCodeInvalid = 'Neplatný kód krajiny';
+z.string.sk.authErrorEmailExists = 'E-mailová adresa sa už používa';
 z.string.sk.auth_error_email_forbidden = 'Prepáčte. Táto emailová adresa je zakázaná.';
 z.string.sk.auth_error_email_malformed = 'Prosím, zadajte platnú e-mailovú adresu.';
 z.string.sk.auth_error_email_missing = 'Zdajte e-mailovú adresu.';

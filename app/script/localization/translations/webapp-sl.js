@@ -74,8 +74,8 @@ z.string.sl.auth_placeholder_password_set = 'Geslo (vsaj 8 znakov)';
 z.string.sl.auth_placeholder_phone = 'Telefonska številka';
 
 z.string.sl.authErrorCode = 'Neveljavna koda';
-z.string.sl.auth_error_country_code_invalid = 'Neveljavna koda države';
-z.string.sl.auth_error_email_exists = 'E-poštni naslov je že zaseden';
+z.string.sl.authErrorCountryCodeInvalid = 'Neveljavna koda države';
+z.string.sl.authErrorEmailExists = 'E-poštni naslov je že zaseden';
 z.string.sl.auth_error_email_forbidden = 'Se opravičujemo. Ta e-poštni naslov je prepovedan.';
 z.string.sl.auth_error_email_malformed = 'Prosimo, vnesite veljaven e-poštni naslov.';
 z.string.sl.auth_error_email_missing = 'Prosimo, vnesite e-poštni naslov.';

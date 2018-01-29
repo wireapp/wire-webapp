@@ -75,8 +75,8 @@ z.string.el.auth_placeholder_password_set = 'Κωδικος προσβασης (
 z.string.el.auth_placeholder_phone = 'Αριθμός Κινητού Τηλεφώνου';
 
 z.string.el.authErrorCode = 'Μη έγκυρος κωδικός';
-z.string.el.auth_error_country_code_invalid = 'Μη έγκυρος κωδικός χώρας';
-z.string.el.auth_error_email_exists = 'Η Διεύθυνση Ηλ. Ταχυδρομείου χρησιμοποιείται ήδη';
+z.string.el.authErrorCountryCodeInvalid = 'Μη έγκυρος κωδικός χώρας';
+z.string.el.authErrorEmailExists = 'Η Διεύθυνση Ηλ. Ταχυδρομείου χρησιμοποιείται ήδη';
 z.string.el.auth_error_email_forbidden = 'Λυπούμαστε. Αυτή η διεύθυνση email δεν επιτρέπεται.';
 z.string.el.auth_error_email_malformed = 'Παρακαλούμε εισάγετε μια έγκυρη διεύθυνση email.';
 z.string.el.auth_error_email_missing = 'Παρακαλώ εισάγετε μια διεύθυνση email.';

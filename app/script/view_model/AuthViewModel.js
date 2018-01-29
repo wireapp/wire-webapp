@@ -614,7 +614,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
                 this._add_error(z.string.auth_error_email_forbidden, z.auth.AuthView.TYPE.EMAIL);
                 break;
               case z.service.BackendClientError.LABEL.KEY_EXISTS:
-                this._add_error(z.string.auth_error_email_exists, z.auth.AuthView.TYPE.EMAIL);
+                this._add_error(z.string.authErrorEmailExists, z.auth.AuthView.TYPE.EMAIL);
                 break;
               case z.service.BackendClientError.LABEL.INVALID_EMAIL:
                 this._add_error(z.string.auth_error_email_malformed, z.auth.AuthView.TYPE.EMAIL);

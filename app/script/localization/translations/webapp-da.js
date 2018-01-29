@@ -70,8 +70,8 @@ z.string.da.auth_placeholder_password_set = 'Adgangskode (mindst 8 tegn)';
 z.string.da.auth_placeholder_phone = 'Telefon Nummer';
 
 z.string.da.authErrorCode = 'Ugyldig Kode';
-z.string.da.auth_error_country_code_invalid = 'Ugyldig Lande Kode';
-z.string.da.auth_error_email_exists = 'Email adresse allerede brugt';
+z.string.da.authErrorCountryCodeInvalid = 'Ugyldig Lande Kode';
+z.string.da.authErrorEmailExists = 'Email adresse allerede brugt';
 z.string.da.auth_error_email_forbidden = 'Beklager. Denne email adresse er forbudt.';
 z.string.da.auth_error_email_malformed = 'Indtast venligst en gyldig email adresse.';
 z.string.da.auth_error_email_missing = 'Indtast venligst en e-mailadresse.';

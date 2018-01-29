@@ -76,8 +76,8 @@ z.string.de.auth_placeholder_password_set = 'Passwort (min. acht Zeichen)';
 z.string.de.auth_placeholder_phone = 'Telefonnummer';
 
 z.string.de.authErrorCode = 'Ungültiger Verifizierungs-Code';
-z.string.de.auth_error_country_code_invalid = 'Ungültige Landesvorwahl';
-z.string.de.auth_error_email_exists = 'E-Mail-Adresse bereits vergeben';
+z.string.de.authErrorCountryCodeInvalid = 'Ungültige Landesvorwahl';
+z.string.de.authErrorEmailExists = 'E-Mail-Adresse bereits vergeben';
 z.string.de.auth_error_email_forbidden = 'Es tut uns leid. Diese E-Mail-Adresse ist verboten.';
 z.string.de.auth_error_email_malformed = 'Bitte gib eine gültige E-Mail-Adresse ein.';
 z.string.de.auth_error_email_missing = 'Bitte gib eine E-Mail-Adresse ein.';

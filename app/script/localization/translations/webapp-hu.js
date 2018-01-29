@@ -76,8 +76,8 @@ z.string.hu.auth_placeholder_password_set = 'Jelszó (legalább 8 karakter)';
 z.string.hu.auth_placeholder_phone = 'Telefonszám';
 
 z.string.hu.authErrorCode = 'Érvénytelen kód';
-z.string.hu.auth_error_country_code_invalid = 'Érvénytelen az Országhívó-kód';
-z.string.hu.auth_error_email_exists = 'Ez az e-mail cím már foglalt';
+z.string.hu.authErrorCountryCodeInvalid = 'Érvénytelen az Országhívó-kód';
+z.string.hu.authErrorEmailExists = 'Ez az e-mail cím már foglalt';
 z.string.hu.auth_error_email_forbidden = 'Sajnáljuk. Ez az e-mail cím nem megengedett.';
 z.string.hu.auth_error_email_malformed = 'Kérjük, valós e-mail címet adj meg.';
 z.string.hu.auth_error_email_missing = 'Kérjük, add meg az e-mail címed.';

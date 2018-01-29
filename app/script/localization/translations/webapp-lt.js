@@ -76,8 +76,8 @@ z.string.lt.auth_placeholder_password_set = 'Slaptažodis (bent 8 simboliai)';
 z.string.lt.auth_placeholder_phone = 'Telefono numeris';
 
 z.string.lt.authErrorCode = 'Neteisingas kodas';
-z.string.lt.auth_error_country_code_invalid = 'Neteisingas šalies kodas';
-z.string.lt.auth_error_email_exists = 'El. pašto adresas jau užimtas';
+z.string.lt.authErrorCountryCodeInvalid = 'Neteisingas šalies kodas';
+z.string.lt.authErrorEmailExists = 'El. pašto adresas jau užimtas';
 z.string.lt.auth_error_email_forbidden = 'Atleiskite. Šis el. pašto adresas yra uždraustas.';
 z.string.lt.auth_error_email_malformed = 'Įveskite taisyklingą el. pašto adresą.';
 z.string.lt.auth_error_email_missing = 'Įrašykite el. pašto adresą.';

@@ -75,8 +75,8 @@ z.string.es.auth_placeholder_password_set = 'Contraseña (mínimo 8 caracteres)'
 z.string.es.auth_placeholder_phone = 'Número de teléfono';
 
 z.string.es.authErrorCode = 'Código no válido';
-z.string.es.auth_error_country_code_invalid = 'Código de país no válido';
-z.string.es.auth_error_email_exists = 'Este correo electrónico ya está registrado';
+z.string.es.authErrorCountryCodeInvalid = 'Código de país no válido';
+z.string.es.authErrorEmailExists = 'Este correo electrónico ya está registrado';
 z.string.es.auth_error_email_forbidden = 'Lo sentimos. Esta dirección de correo electrónico está prohibida.';
 z.string.es.auth_error_email_malformed = 'Por favor, introduce una dirección de correo electrónico válida.';
 z.string.es.auth_error_email_missing = 'Por favor, introduce una dirección de correo electrónico.';

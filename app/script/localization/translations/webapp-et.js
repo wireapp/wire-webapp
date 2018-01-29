@@ -76,8 +76,8 @@ z.string.et.auth_placeholder_password_set = 'Parool (vähemalt 8 märki)';
 z.string.et.auth_placeholder_phone = 'Telefoninumber';
 
 z.string.et.authErrorCode = 'Vigane kood';
-z.string.et.auth_error_country_code_invalid = 'Vale riigikood';
-z.string.et.auth_error_email_exists = 'E-posti aadress on juba kasutusel';
+z.string.et.authErrorCountryCodeInvalid = 'Vale riigikood';
+z.string.et.authErrorEmailExists = 'E-posti aadress on juba kasutusel';
 z.string.et.auth_error_email_forbidden = 'Vabandust. See e-posti aadress on keelatud.';
 z.string.et.auth_error_email_malformed = 'Palun sisesta korrektne e-posti aadress.';
 z.string.et.auth_error_email_missing = 'Palun sisesta e-posti aadress.';

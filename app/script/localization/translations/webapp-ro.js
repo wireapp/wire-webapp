@@ -76,8 +76,8 @@ z.string.ro.auth_placeholder_password_set = 'Parolă (minim 8 caractere)';
 z.string.ro.auth_placeholder_phone = 'Număr de telefon';
 
 z.string.ro.authErrorCode = 'Cod nevalid';
-z.string.ro.auth_error_country_code_invalid = 'Cod de țară nevalid';
-z.string.ro.auth_error_email_exists = 'Adresa de e-mail este deja folosită';
+z.string.ro.authErrorCountryCodeInvalid = 'Cod de țară nevalid';
+z.string.ro.authErrorEmailExists = 'Adresa de e-mail este deja folosită';
 z.string.ro.auth_error_email_forbidden = 'Ne pare rău. Această adresa de e-mail este interzisă.';
 z.string.ro.auth_error_email_malformed = 'Te rugăm să introduci o adresă de e-mail validă.';
 z.string.ro.auth_error_email_missing = 'Introdu o adresă de e-mail.';

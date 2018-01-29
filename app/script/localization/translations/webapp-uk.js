@@ -75,8 +75,8 @@ z.string.uk.auth_placeholder_password_set = 'Пароль (не менше 8 с�
 z.string.uk.auth_placeholder_phone = 'Номер телефону';
 
 z.string.uk.authErrorCode = 'Невірний код';
-z.string.uk.auth_error_country_code_invalid = 'Невірний код країни';
-z.string.uk.auth_error_email_exists = 'Email вже використовується';
+z.string.uk.authErrorCountryCodeInvalid = 'Невірний код країни';
+z.string.uk.authErrorEmailExists = 'Email вже використовується';
 z.string.uk.auth_error_email_forbidden = 'Вибачте. Ця електронна адреса не дозволена для використання.';
 z.string.uk.auth_error_email_malformed = 'Будь ласка, введіть дійсний email.';
 z.string.uk.auth_error_email_missing = 'Будь ласка, введіть адресу електронної пошти.';

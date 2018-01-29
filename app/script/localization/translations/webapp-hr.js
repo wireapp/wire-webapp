@@ -69,8 +69,8 @@ z.string.hr.auth_placeholder_password_set = 'Lozinka (najmanje 8 znakova)';
 z.string.hr.auth_placeholder_phone = 'Telefonski broj';
 
 z.string.hr.authErrorCode = 'Neispravan kod';
-z.string.hr.auth_error_country_code_invalid = 'Nevažeći kod države';
-z.string.hr.auth_error_email_exists = 'Email adresa je već u upotrebi';
+z.string.hr.authErrorCountryCodeInvalid = 'Nevažeći kod države';
+z.string.hr.authErrorEmailExists = 'Email adresa je već u upotrebi';
 z.string.hr.auth_error_email_forbidden = 'Ova email adresa je zabranjena.';
 z.string.hr.auth_error_email_malformed = 'Molimo unesite ispravnu e-mail adresu.';
 z.string.hr.auth_error_email_missing = 'Molimo unesite email adresu.';

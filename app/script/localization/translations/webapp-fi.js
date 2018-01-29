@@ -75,8 +75,8 @@ z.string.fi.auth_placeholder_password_set = 'Salasana (vähintään 8 merkkiä p
 z.string.fi.auth_placeholder_phone = 'Puhelinnumero';
 
 z.string.fi.authErrorCode = 'Virheellinen koodi';
-z.string.fi.auth_error_country_code_invalid = 'Maakoodi ei kelpaa';
-z.string.fi.auth_error_email_exists = 'Tälle sähköpostille on jo luotu tunnus';
+z.string.fi.authErrorCountryCodeInvalid = 'Maakoodi ei kelpaa';
+z.string.fi.authErrorEmailExists = 'Tälle sähköpostille on jo luotu tunnus';
 z.string.fi.auth_error_email_forbidden = 'Valitettavasti tämä sähköpostiosoite on kielletty.';
 z.string.fi.auth_error_email_malformed = 'Kirjoita voimassa oleva sähköpostiosoite.';
 z.string.fi.auth_error_email_missing = 'Kirjoita sähköpostiosoite.';

@@ -91,7 +91,7 @@
                           data-bind="event: {change: changed_country}, textInput: country"
                           data-uie-name="enter-country">
                     <option value="X0" style="display:none;" data-bind="l10n_text: z.string.authAccountCountryCode"></option>
-                    <option value="X1" style="display:none;" data-bind="l10n_text: z.string.auth_error_country_code_invalid"></option>
+                    <option value="X1" style="display:none;" data-bind="l10n_text: z.string.authErrorCountryCodeInvalid"></option>
                     <!-- ko foreach: z.util.CountryCodes.COUNTRY_CODES -->
                       <option data-bind="value: iso, text: name"></option>
                     <!-- /ko -->

@@ -88,8 +88,8 @@ z.string.auth_placeholder_phone = 'Phone Number';
 
 // Authentication: Validation errors
 z.string.authErrorCode = 'Invalid Code';
-z.string.auth_error_country_code_invalid = 'Invalid Country Code';
-z.string.auth_error_email_exists = 'Email address already taken';
+z.string.authErrorCountryCodeInvalid = 'Invalid Country Code';
+z.string.authErrorEmailExists = 'Email address already taken';
 z.string.auth_error_email_forbidden = 'Sorry. This email address is forbidden.';
 z.string.auth_error_email_malformed = 'Please enter a valid email address.';
 z.string.auth_error_email_missing = 'Please enter an email address.';

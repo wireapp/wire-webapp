@@ -76,8 +76,8 @@ z.string.nl.auth_placeholder_password_set = 'Wachtwoord (minimaal 8 tekens)';
 z.string.nl.auth_placeholder_phone = 'Telefoonnummer';
 
 z.string.nl.authErrorCode = 'Ongeldige code';
-z.string.nl.auth_error_country_code_invalid = 'Ongeldige landscode';
-z.string.nl.auth_error_email_exists = 'Email adres word algebruikt';
+z.string.nl.authErrorCountryCodeInvalid = 'Ongeldige landscode';
+z.string.nl.authErrorEmailExists = 'Email adres word algebruikt';
 z.string.nl.auth_error_email_forbidden = 'Sorry. Dit e-mailadres is verboden.';
 z.string.nl.auth_error_email_malformed = 'Voer alsjeblieft een geldig e-mailadres in.';
 z.string.nl.auth_error_email_missing = 'Voer alsjeblieft een e-mailadres in.';

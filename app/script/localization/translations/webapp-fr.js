@@ -76,8 +76,8 @@ z.string.fr.auth_placeholder_password_set = 'Mot de passe (8 caractères minimum
 z.string.fr.auth_placeholder_phone = 'Numéro de téléphone';
 
 z.string.fr.authErrorCode = 'Code invalide';
-z.string.fr.auth_error_country_code_invalid = 'Indicatif du pays invalide';
-z.string.fr.auth_error_email_exists = 'Adresse e-mail déjà utilisée';
+z.string.fr.authErrorCountryCodeInvalid = 'Indicatif du pays invalide';
+z.string.fr.authErrorEmailExists = 'Adresse e-mail déjà utilisée';
 z.string.fr.auth_error_email_forbidden = 'Désolé. Cette adresse e-mail est bannie.';
 z.string.fr.auth_error_email_malformed = 'Veuillez saisir une adresse e-mail valide.';
 z.string.fr.auth_error_email_missing = 'Veuillez saisir une adresse e-mail.';

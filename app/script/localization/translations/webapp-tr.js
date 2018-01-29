@@ -75,8 +75,8 @@ z.string.tr.auth_placeholder_password_set = 'Şifre (en az 8 karakter)';
 z.string.tr.auth_placeholder_phone = 'Telefon Numarası';
 
 z.string.tr.authErrorCode = 'Geçersiz Kod';
-z.string.tr.auth_error_country_code_invalid = 'Geçersiz Ülke Kodu';
-z.string.tr.auth_error_email_exists = 'E-posta adresi zaten kullanımda';
+z.string.tr.authErrorCountryCodeInvalid = 'Geçersiz Ülke Kodu';
+z.string.tr.authErrorEmailExists = 'E-posta adresi zaten kullanımda';
 z.string.tr.auth_error_email_forbidden = 'Üzgünüz. Bu e-posta adresi yasaklı.';
 z.string.tr.auth_error_email_malformed = 'Lütfen geçerli bir e-posta adresi girin.';
 z.string.tr.auth_error_email_missing = 'Lütfen bir e-posta adresi girin.';
