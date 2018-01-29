@@ -44,12 +44,12 @@ z.string.de.authBlockedTabs = 'Wire ist bereits in einem anderen Tab geöffnet.'
 
 z.string.de.authVerifyAccountAdd = 'Hinzufügen';
 z.string.de.authVerifyAccountDetail = 'Hiermit kannst du Wire auf mehreren Geräten verwenden.';
-z.string.de.auth_verify_account_headline = 'E-Mail-Adresse und Passwort hinzufügen.';
-z.string.de.auth_verify_account_logout = 'Abmelden';
-z.string.de.auth_verify_code_description = 'Gib den Code ein, den wir an \n{{number}} gesendet haben.';
-z.string.de.auth_verify_code_resend = 'Keinen Code erhalten?';
-z.string.de.auth_verify_code_resend_detail = 'Erneut senden';
-z.string.de.auth_verify_code_resend_timer = 'Du kannst {{expiration}} einen neuen Code anfordern.';
+z.string.de.authVerifyAccountHeadline = 'E-Mail-Adresse und Passwort hinzufügen.';
+z.string.de.authVerifyAccountLogout = 'Abmelden';
+z.string.de.authVerifyCodeDescription = 'Gib den Code ein, den wir an \n{{number}} gesendet haben.';
+z.string.de.authVerifyCodeResend = 'Keinen Code erhalten?';
+z.string.de.authVerifyCodeResendDetail = 'Erneut senden';
+z.string.de.authVerifyCodeResendTimer = 'Du kannst {{expiration}} einen neuen Code anfordern.';
 z.string.de.auth_verify_code_change_phone = 'Telefonnummer ändern';
 z.string.de.auth_verify_password_headline = 'Passwort eingeben';
 
@@ -579,10 +579,10 @@ z.string.de.tooltip_search_close = 'Schließen (Esc)';
 z.string.de.initReceivedSelfUser = 'Hallo, {{user}}.';
 z.string.de.initValidatedClient = 'Lade deine Kontakte und Unterhaltungen';
 z.string.de.initReceivedUserData = 'Suche nach neuen Events';
-z.string.de.init_decryption = 'Entschlüssele Events';
-z.string.de.init_events = 'Lade Nachrichten';
-z.string.de.init_updated_from_notifications = 'Fast fertig - viel Spaß mit Wire';
-z.string.de.init_progress = ' — {{number1}} von {{number2}}';
+z.string.de.initDecryption = 'Entschlüssele Events';
+z.string.de.initEvents = 'Lade Nachrichten';
+z.string.de.initUpdatedFromNotifications = 'Fast fertig - viel Spaß mit Wire';
+z.string.de.initProgress = ' — {{number1}} von {{number2}}';
 
 z.string.de.ephememalUnitsNone = 'Aus';
 z.string.de.ephememalUnitsSecond = 'Sekunde';

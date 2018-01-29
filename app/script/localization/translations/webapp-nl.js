@@ -44,12 +44,12 @@ z.string.nl.authBlockedTabs = 'Wire is al open in een ander tabblad.';
 
 z.string.nl.authVerifyAccountAdd = 'Toevoegen';
 z.string.nl.authVerifyAccountDetail = 'Dit zorgt ervoor dat je Wire op meerdere apparaten kunt gebruiken.';
-z.string.nl.auth_verify_account_headline = 'E-mailadres en wachtwoord toevoegen.';
-z.string.nl.auth_verify_account_logout = 'Uitloggen';
-z.string.nl.auth_verify_code_description = 'Voer de verificatiecode in die\nwe naar {{number}} hebben gestuurd.';
-z.string.nl.auth_verify_code_resend = 'Geen code ontvangen?';
-z.string.nl.auth_verify_code_resend_detail = 'Opnieuw sturen';
-z.string.nl.auth_verify_code_resend_timer = 'Je kunt een nieuwe code aanvragen {{expiration}}.';
+z.string.nl.authVerifyAccountHeadline = 'E-mailadres en wachtwoord toevoegen.';
+z.string.nl.authVerifyAccountLogout = 'Uitloggen';
+z.string.nl.authVerifyCodeDescription = 'Voer de verificatiecode in die\nwe naar {{number}} hebben gestuurd.';
+z.string.nl.authVerifyCodeResend = 'Geen code ontvangen?';
+z.string.nl.authVerifyCodeResendDetail = 'Opnieuw sturen';
+z.string.nl.authVerifyCodeResendTimer = 'Je kunt een nieuwe code aanvragen {{expiration}}.';
 z.string.nl.auth_verify_code_change_phone = 'Telefoonnummer wijzigen';
 z.string.nl.auth_verify_password_headline = 'Voer je wachtwoord in';
 
@@ -559,10 +559,10 @@ z.string.nl.tooltip_search_close = 'Sluiten (esc)';
 z.string.nl.initReceivedSelfUser = 'Hallo {{user}}!';
 z.string.nl.initValidatedClient = 'Je gesprekken en connecties worden opgehaald';
 z.string.nl.initReceivedUserData = 'Controleer voor nieuwe berichten';
-z.string.nl.init_decryption = 'Berichten ontsleutelen';
-z.string.nl.init_events = 'Berichten laden';
-z.string.nl.init_updated_from_notifications = 'Bijna klaar - Geniet van Wire';
-z.string.nl.init_progress = ' — {{number1}} van {{number2}}';
+z.string.nl.initDecryption = 'Berichten ontsleutelen';
+z.string.nl.initEvents = 'Berichten laden';
+z.string.nl.initUpdatedFromNotifications = 'Bijna klaar - Geniet van Wire';
+z.string.nl.initProgress = ' — {{number1}} van {{number2}}';
 
 z.string.nl.ephememalUnitsNone = 'Uit';
 z.string.nl.ephememalUnitsSecond = 'seconde';

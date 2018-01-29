@@ -44,12 +44,12 @@ z.string.ro.authBlockedTabs = 'Wire este deja deschis în altă filă.';
 
 z.string.ro.authVerifyAccountAdd = 'Adaugă';
 z.string.ro.authVerifyAccountDetail = 'Aceasta îți permite să folosești Wire pe mai multe dispozitive.';
-z.string.ro.auth_verify_account_headline = 'Adaugă o adresă de e-mail și o parolă.';
-z.string.ro.auth_verify_account_logout = 'Deconectare';
-z.string.ro.auth_verify_code_description = 'Introdu codul de verificare\nl-am trimis la {{number}}.';
-z.string.ro.auth_verify_code_resend = 'Nu e afișat niciun cod?';
-z.string.ro.auth_verify_code_resend_detail = 'Retrimite';
-z.string.ro.auth_verify_code_resend_timer = 'Poți cere un nou cod de {{expiration}}.';
+z.string.ro.authVerifyAccountHeadline = 'Adaugă o adresă de e-mail și o parolă.';
+z.string.ro.authVerifyAccountLogout = 'Deconectare';
+z.string.ro.authVerifyCodeDescription = 'Introdu codul de verificare\nl-am trimis la {{number}}.';
+z.string.ro.authVerifyCodeResend = 'Nu e afișat niciun cod?';
+z.string.ro.authVerifyCodeResendDetail = 'Retrimite';
+z.string.ro.authVerifyCodeResendTimer = 'Poți cere un nou cod de {{expiration}}.';
 z.string.ro.auth_verify_code_change_phone = 'Schimbă numărul de telefon';
 z.string.ro.auth_verify_password_headline = 'Introdu parola ta';
 
@@ -553,10 +553,10 @@ z.string.ro.tooltip_search_close = 'Închide (Esc)';
 z.string.ro.initReceivedSelfUser = 'Bună, {{user}}.';
 z.string.ro.initValidatedClient = 'Se încarcă conexiunile și conversațiile tale';
 z.string.ro.initReceivedUserData = 'Verifică dacă sunt mesaje noi';
-z.string.ro.init_decryption = 'Se decriptează mesaje';
-z.string.ro.init_events = 'Se încarcă mesaje';
-z.string.ro.init_updated_from_notifications = 'Aproape gata - Bucură-te de Wire';
-z.string.ro.init_progress = ' — {{number1}} din {{number2}}';
+z.string.ro.initDecryption = 'Se decriptează mesaje';
+z.string.ro.initEvents = 'Se încarcă mesaje';
+z.string.ro.initUpdatedFromNotifications = 'Aproape gata - Bucură-te de Wire';
+z.string.ro.initProgress = ' — {{number1}} din {{number2}}';
 
 z.string.ro.ephememalUnitsNone = 'Închis';
 z.string.ro.ephememalUnitsSecond = 'secundă';

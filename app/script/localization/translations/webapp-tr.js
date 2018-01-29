@@ -43,12 +43,12 @@ z.string.tr.authBlockedTabs = 'Wire zaten başka bir sekmede açık.';
 
 z.string.tr.authVerifyAccountAdd = 'Ekle';
 z.string.tr.authVerifyAccountDetail = 'Bu sizin Wire’ı birden fazla cihazda kullanmanıza olanak sağlar.';
-z.string.tr.auth_verify_account_headline = 'Bir e-posta adresi ve şifre ekleyin.';
-z.string.tr.auth_verify_account_logout = 'Çıkış yap';
-z.string.tr.auth_verify_code_description = '{{number}} gönderdiğimiz doğrulama kodunu girin.';
-z.string.tr.auth_verify_code_resend = 'Kod gelmedi mi?';
-z.string.tr.auth_verify_code_resend_detail = 'Tekrar gönder';
-z.string.tr.auth_verify_code_resend_timer = '{{expiration}} içerisinde yeni bir kod isteyebilirsiniz.';
+z.string.tr.authVerifyAccountHeadline = 'Bir e-posta adresi ve şifre ekleyin.';
+z.string.tr.authVerifyAccountLogout = 'Çıkış yap';
+z.string.tr.authVerifyCodeDescription = '{{number}} gönderdiğimiz doğrulama kodunu girin.';
+z.string.tr.authVerifyCodeResend = 'Kod gelmedi mi?';
+z.string.tr.authVerifyCodeResendDetail = 'Tekrar gönder';
+z.string.tr.authVerifyCodeResendTimer = '{{expiration}} içerisinde yeni bir kod isteyebilirsiniz.';
 z.string.tr.auth_verify_code_change_phone = 'Telefon numarasını değiştir';
 z.string.tr.auth_verify_password_headline = 'Şifrenizi girin';
 
@@ -558,10 +558,10 @@ z.string.tr.tooltip_search_close = 'Kapat (Esc)';
 z.string.tr.initReceivedSelfUser = 'Merhaba, {{user}}.';
 z.string.tr.initValidatedClient = 'Bağlantılarınız ve konuşmalarınız alınıyor';
 z.string.tr.initReceivedUserData = 'Yeni mesajlar kontrol ediliyor';
-z.string.tr.init_decryption = 'Mesajların şifresini çöz';
-z.string.tr.init_events = 'İletiler yükleniyor';
-z.string.tr.init_updated_from_notifications = 'Neredeyse bitti - Wire’ın keyfini çıkarın';
-z.string.tr.init_progress = ' — {{number2}}’de/da {{number1}}';
+z.string.tr.initDecryption = 'Mesajların şifresini çöz';
+z.string.tr.initEvents = 'İletiler yükleniyor';
+z.string.tr.initUpdatedFromNotifications = 'Neredeyse bitti - Wire’ın keyfini çıkarın';
+z.string.tr.initProgress = ' — {{number2}}’de/da {{number1}}';
 
 z.string.tr.ephememalUnitsNone = 'Yok';
 z.string.tr.ephememalUnitsSecond = 'saniye';

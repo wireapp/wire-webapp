@@ -43,12 +43,12 @@ z.string.cs.authBlockedTabs = 'Wire je již otevřen na jiné záložce.';
 
 z.string.cs.authVerifyAccountAdd = 'Přidat';
 z.string.cs.authVerifyAccountDetail = 'To umožňuje používat Wire na více zařízeních.';
-z.string.cs.auth_verify_account_headline = 'Přidat emailovou adresu a heslo.';
-z.string.cs.auth_verify_account_logout = 'Odhlásit se';
-z.string.cs.auth_verify_code_description = 'Zadejte ověřovací kód,\nkterý byl zaslán na {{number}}.';
-z.string.cs.auth_verify_code_resend = 'Kód nedošel?';
-z.string.cs.auth_verify_code_resend_detail = 'Odeslat znovu';
-z.string.cs.auth_verify_code_resend_timer = 'Můžete si vyžádat nový kód {{expiration}}.';
+z.string.cs.authVerifyAccountHeadline = 'Přidat emailovou adresu a heslo.';
+z.string.cs.authVerifyAccountLogout = 'Odhlásit se';
+z.string.cs.authVerifyCodeDescription = 'Zadejte ověřovací kód,\nkterý byl zaslán na {{number}}.';
+z.string.cs.authVerifyCodeResend = 'Kód nedošel?';
+z.string.cs.authVerifyCodeResendDetail = 'Odeslat znovu';
+z.string.cs.authVerifyCodeResendTimer = 'Můžete si vyžádat nový kód {{expiration}}.';
 z.string.cs.auth_verify_code_change_phone = 'Změnit telefonní číslo';
 z.string.cs.auth_verify_password_headline = 'Zadejte své heslo';
 
@@ -548,8 +548,8 @@ z.string.cs.tooltip_search_close = 'Zavřít (Esc)';
 
 z.string.cs.initReceivedSelfUser = 'Ahoj, {{user}}.';
 z.string.cs.initReceivedUserData = 'Kontrola nových zpráv';
-z.string.cs.init_decryption = 'Dešifrovat zprávu';
-z.string.cs.init_events = 'Zprávy se načítají';
+z.string.cs.initDecryption = 'Dešifrovat zprávu';
+z.string.cs.initEvents = 'Zprávy se načítají';
 
 z.string.cs.ephememalUnitsNone = 'Vypnout';
 z.string.cs.ephememalUnitsSecond = 'sekunda';

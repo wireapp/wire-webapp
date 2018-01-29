@@ -2642,7 +2642,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
               };
               const progress = this.init_handled / this.init_total * 20 + 75;
 
-              amplify.publish(z.event.WebApp.APP.UPDATE_PROGRESS, progress, z.string.init_events, content);
+              amplify.publish(z.event.WebApp.APP.UPDATE_PROGRESS, progress, z.string.initEvents, content);
             }
           }
 

@@ -44,12 +44,12 @@ z.string.ru.authBlockedTabs = 'Wire уже открыто в другой вкл
 
 z.string.ru.authVerifyAccountAdd = 'Добавить';
 z.string.ru.authVerifyAccountDetail = 'Это позволяет использовать Wire на нескольких устройствах.';
-z.string.ru.auth_verify_account_headline = 'Добавить email и пароль.';
-z.string.ru.auth_verify_account_logout = 'Выход';
-z.string.ru.auth_verify_code_description = 'Введите код подтверждения,\nкоторый мы отправили на {{number}}.';
-z.string.ru.auth_verify_code_resend = 'Не приходит код?';
-z.string.ru.auth_verify_code_resend_detail = 'Отправить повторно';
-z.string.ru.auth_verify_code_resend_timer = 'Вы можете запросить новый код {{expiration}}.';
+z.string.ru.authVerifyAccountHeadline = 'Добавить email и пароль.';
+z.string.ru.authVerifyAccountLogout = 'Выход';
+z.string.ru.authVerifyCodeDescription = 'Введите код подтверждения,\nкоторый мы отправили на {{number}}.';
+z.string.ru.authVerifyCodeResend = 'Не приходит код?';
+z.string.ru.authVerifyCodeResendDetail = 'Отправить повторно';
+z.string.ru.authVerifyCodeResendTimer = 'Вы можете запросить новый код {{expiration}}.';
 z.string.ru.auth_verify_code_change_phone = 'Изменить номер телефона';
 z.string.ru.auth_verify_password_headline = 'Введите свой пароль';
 
@@ -558,10 +558,10 @@ z.string.ru.tooltip_search_close = 'Закрыть (Esc)';
 z.string.ru.initReceivedSelfUser = 'Здравствуйте, {{user}}.';
 z.string.ru.initValidatedClient = 'Загрузка контактов и разговоров';
 z.string.ru.initReceivedUserData = 'Проверка наличия новых сообщений';
-z.string.ru.init_decryption = 'Расшифровка сообщений';
-z.string.ru.init_events = 'Загрузка сообщений';
-z.string.ru.init_updated_from_notifications = 'Почти готово - наслаждайтесь Wire';
-z.string.ru.init_progress = ' — {{number1}} из {{number2}}';
+z.string.ru.initDecryption = 'Расшифровка сообщений';
+z.string.ru.initEvents = 'Загрузка сообщений';
+z.string.ru.initUpdatedFromNotifications = 'Почти готово - наслаждайтесь Wire';
+z.string.ru.initProgress = ' — {{number1}} из {{number2}}';
 
 z.string.ru.ephememalUnitsNone = 'Выключен';
 z.string.ru.ephememalUnitsSecond = 'сек';

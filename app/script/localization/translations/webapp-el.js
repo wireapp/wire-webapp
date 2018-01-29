@@ -43,12 +43,12 @@ z.string.el.authBlockedTabs = 'Το Wire είναι ήδη ανοικτό σε �
 
 z.string.el.authVerifyAccountAdd = 'Προσθήκη';
 z.string.el.authVerifyAccountDetail = 'Αυτό σας επιτρέπει να χρησιμοποιήσετε το Wire σε πολλαπλές συσκευές.';
-z.string.el.auth_verify_account_headline = 'Προσθέστε email και κωδικό πρόσβασης.';
-z.string.el.auth_verify_account_logout = 'Αποσύνδεση';
-z.string.el.auth_verify_code_description = 'Εισάγετε τον κωδικό επαλήθευσης που στείλαμε στο {{number}}.';
-z.string.el.auth_verify_code_resend = 'Δεν εμφανίζεται ο κωδικός;';
-z.string.el.auth_verify_code_resend_detail = 'Επαναποστολή';
-z.string.el.auth_verify_code_resend_timer = 'Μπορείτε να ζητήσετε νέο κωδικό {{expiration}}.';
+z.string.el.authVerifyAccountHeadline = 'Προσθέστε email και κωδικό πρόσβασης.';
+z.string.el.authVerifyAccountLogout = 'Αποσύνδεση';
+z.string.el.authVerifyCodeDescription = 'Εισάγετε τον κωδικό επαλήθευσης που στείλαμε στο {{number}}.';
+z.string.el.authVerifyCodeResend = 'Δεν εμφανίζεται ο κωδικός;';
+z.string.el.authVerifyCodeResendDetail = 'Επαναποστολή';
+z.string.el.authVerifyCodeResendTimer = 'Μπορείτε να ζητήσετε νέο κωδικό {{expiration}}.';
 z.string.el.auth_verify_code_change_phone = 'Αλλαγή αριθμού τηλεφώνου';
 z.string.el.auth_verify_password_headline = 'Εισάγετε τον κωδικό σας';
 
@@ -547,7 +547,7 @@ z.string.el.tooltip_search_close = 'Κλείσιμο (Esc)';
 
 z.string.el.initReceivedSelfUser = 'Γεια σου, {{user}}.';
 z.string.el.initReceivedUserData = 'Ελέγξτε για νέα μηνύματα';
-z.string.el.init_events = 'Φόρτωση μηνυμάτων';
+z.string.el.initEvents = 'Φόρτωση μηνυμάτων';
 
 z.string.el.ephememalUnitsNone = 'Ανενεργό';
 z.string.el.ephememalUnitsSecond = 'δευτερόλεπτο';

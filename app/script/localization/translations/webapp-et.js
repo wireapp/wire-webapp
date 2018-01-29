@@ -44,12 +44,12 @@ z.string.et.authBlockedTabs = 'Wire on juba teisel kaardil avatud.';
 
 z.string.et.authVerifyAccountAdd = 'Lisa';
 z.string.et.authVerifyAccountDetail = 'See võimaldab kasutada Wire’i mitmes seadmes.';
-z.string.et.auth_verify_account_headline = 'Lisa meiliaadress ja parool.';
-z.string.et.auth_verify_account_logout = 'Logi välja';
-z.string.et.auth_verify_code_description = 'Sisesta kinnituskood,\nmille saatsime numbrile {{number}}.';
-z.string.et.auth_verify_code_resend = 'Kood ei saabu?';
-z.string.et.auth_verify_code_resend_detail = 'Saada uuesti';
-z.string.et.auth_verify_code_resend_timer = 'Sa võid uue koodi tellida {{expiration}} pärast.';
+z.string.et.authVerifyAccountHeadline = 'Lisa meiliaadress ja parool.';
+z.string.et.authVerifyAccountLogout = 'Logi välja';
+z.string.et.authVerifyCodeDescription = 'Sisesta kinnituskood,\nmille saatsime numbrile {{number}}.';
+z.string.et.authVerifyCodeResend = 'Kood ei saabu?';
+z.string.et.authVerifyCodeResendDetail = 'Saada uuesti';
+z.string.et.authVerifyCodeResendTimer = 'Sa võid uue koodi tellida {{expiration}} pärast.';
 z.string.et.auth_verify_code_change_phone = 'Numbri muutmine';
 z.string.et.auth_verify_password_headline = 'Sisesta parool';
 
@@ -559,10 +559,10 @@ z.string.et.tooltip_search_close = 'Sulge (Esc)';
 z.string.et.initReceivedSelfUser = 'Tere, {{user}}.';
 z.string.et.initValidatedClient = 'Toon ühendusi ja vestlusi';
 z.string.et.initReceivedUserData = 'Kontrollin uusi sõnumeid';
-z.string.et.init_decryption = 'Dekrüptin sõnumeid';
-z.string.et.init_events = 'Laadin sõnumeid';
-z.string.et.init_updated_from_notifications = 'Peaaegu valmis - naudi Wire’i';
-z.string.et.init_progress = ' — {{number1}}/{{number2}}';
+z.string.et.initDecryption = 'Dekrüptin sõnumeid';
+z.string.et.initEvents = 'Laadin sõnumeid';
+z.string.et.initUpdatedFromNotifications = 'Peaaegu valmis - naudi Wire’i';
+z.string.et.initProgress = ' — {{number1}}/{{number2}}';
 
 z.string.et.ephememalUnitsNone = 'Väljas';
 z.string.et.ephememalUnitsSecond = 'sekund';

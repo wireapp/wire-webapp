@@ -38,12 +38,12 @@ z.string.da.authAccountSignInPhone = 'Telefon';
 
 z.string.da.authVerifyAccountAdd = 'Tilføj';
 z.string.da.authVerifyAccountDetail = 'Dette gør, at du kan bruge Wire på flere enheder.';
-z.string.da.auth_verify_account_headline = 'Tilføj email adresse og adgangskode.';
-z.string.da.auth_verify_account_logout = 'Log ud';
-z.string.da.auth_verify_code_description = 'Indtast bekræftelseskoden vi sendte til {{number}}.';
-z.string.da.auth_verify_code_resend = 'Ingen kode vist?';
-z.string.da.auth_verify_code_resend_detail = 'Gensend';
-z.string.da.auth_verify_code_resend_timer = 'Du kan anmode om en ny kode {{expiration}}.';
+z.string.da.authVerifyAccountHeadline = 'Tilføj email adresse og adgangskode.';
+z.string.da.authVerifyAccountLogout = 'Log ud';
+z.string.da.authVerifyCodeDescription = 'Indtast bekræftelseskoden vi sendte til {{number}}.';
+z.string.da.authVerifyCodeResend = 'Ingen kode vist?';
+z.string.da.authVerifyCodeResendDetail = 'Gensend';
+z.string.da.authVerifyCodeResendTimer = 'Du kan anmode om en ny kode {{expiration}}.';
 z.string.da.auth_verify_code_change_phone = 'Ændre telefon nummer';
 z.string.da.auth_verify_password_headline = 'Indtast din adgangskode';
 
@@ -524,7 +524,7 @@ z.string.da.tooltip_search_close = 'Luk (Esc)';
 z.string.da.initReceivedSelfUser = 'Hej, {{user}}.';
 z.string.da.initValidatedClient = 'Henter dine forbindelser og samtaler';
 z.string.da.initReceivedUserData = 'Tjekker for nye beskeder';
-z.string.da.init_events = 'Indlæser meddelelser';
+z.string.da.initEvents = 'Indlæser meddelelser';
 
 z.string.da.ephememalUnitsNone = 'Slået Fra';
 z.string.da.ephememalUnitsSecond = 'sekund';

@@ -42,12 +42,12 @@ z.string.it.authBlockedTabs = 'Wire è già aperto in un’altra scheda.';
 
 z.string.it.authVerifyAccountAdd = 'Aggiungi';
 z.string.it.authVerifyAccountDetail = 'Questo ti consente di usare Wire su più dispositivi.';
-z.string.it.auth_verify_account_headline = 'Aggiungi indirizzo email e password.';
-z.string.it.auth_verify_account_logout = 'Logout';
-z.string.it.auth_verify_code_description = 'Inserisci il codice di verifica che abbiamo inviato a {{number}}.';
-z.string.it.auth_verify_code_resend = 'Non hai ricevuto nessun codice?';
-z.string.it.auth_verify_code_resend_detail = 'Inviare di nuovo';
-z.string.it.auth_verify_code_resend_timer = 'È possibile richiedere un nuovo codice {{expiration}}.';
+z.string.it.authVerifyAccountHeadline = 'Aggiungi indirizzo email e password.';
+z.string.it.authVerifyAccountLogout = 'Logout';
+z.string.it.authVerifyCodeDescription = 'Inserisci il codice di verifica che abbiamo inviato a {{number}}.';
+z.string.it.authVerifyCodeResend = 'Non hai ricevuto nessun codice?';
+z.string.it.authVerifyCodeResendDetail = 'Inviare di nuovo';
+z.string.it.authVerifyCodeResendTimer = 'È possibile richiedere un nuovo codice {{expiration}}.';
 z.string.it.auth_verify_code_change_phone = 'Cambia numero di telefono';
 z.string.it.auth_verify_password_headline = 'Inserisci la tua password';
 
@@ -545,8 +545,8 @@ z.string.it.tooltip_search_close = 'Chiudi (Esc)';
 z.string.it.initReceivedSelfUser = 'Ciao, {{user}}.';
 z.string.it.initValidatedClient = 'Caricamento delle tue connessioni e conversazioni';
 z.string.it.initReceivedUserData = 'Controllo nuovi messaggi';
-z.string.it.init_decryption = 'Decriptare i messaggi';
-z.string.it.init_events = 'Caricamento messaggi';
+z.string.it.initDecryption = 'Decriptare i messaggi';
+z.string.it.initEvents = 'Caricamento messaggi';
 
 z.string.it.ephememalUnitsNone = 'Off';
 z.string.it.ephememalUnitsSecond = 'secondo';

@@ -44,12 +44,12 @@ z.string.lt.authBlockedTabs = 'Wire jau yra atverta kitoje kortelėje.';
 
 z.string.lt.authVerifyAccountAdd = 'Pridėti';
 z.string.lt.authVerifyAccountDetail = 'Tai leidžia jums naudoti „Wire“ keliuose įrenginiuose.';
-z.string.lt.auth_verify_account_headline = 'Pridėkite el. pašto adresą ir slaptažodį.';
-z.string.lt.auth_verify_account_logout = 'Atsijungti';
-z.string.lt.auth_verify_code_description = 'Įveskite patvirtinimo kodą,\nkurį mes išsiuntėme į {{number}}.';
-z.string.lt.auth_verify_code_resend = 'Negaunate kodo?';
-z.string.lt.auth_verify_code_resend_detail = 'Siųsti iš naujo';
-z.string.lt.auth_verify_code_resend_timer = 'Jūs galite užklausti naują kodą {{expiration}}.';
+z.string.lt.authVerifyAccountHeadline = 'Pridėkite el. pašto adresą ir slaptažodį.';
+z.string.lt.authVerifyAccountLogout = 'Atsijungti';
+z.string.lt.authVerifyCodeDescription = 'Įveskite patvirtinimo kodą,\nkurį mes išsiuntėme į {{number}}.';
+z.string.lt.authVerifyCodeResend = 'Negaunate kodo?';
+z.string.lt.authVerifyCodeResendDetail = 'Siųsti iš naujo';
+z.string.lt.authVerifyCodeResendTimer = 'Jūs galite užklausti naują kodą {{expiration}}.';
 z.string.lt.auth_verify_code_change_phone = 'Pakeisti telefono numerį';
 z.string.lt.auth_verify_password_headline = 'Įveskite savo slaptažodį';
 
@@ -559,10 +559,10 @@ z.string.lt.tooltip_search_close = 'Užverti (Esc)';
 z.string.lt.initReceivedSelfUser = 'Sveiki, {{user}}.';
 z.string.lt.initValidatedClient = 'Gaunami jūsų kontaktai ir pokalbiai';
 z.string.lt.initReceivedUserData = 'Tikrinama ar yra naujų žinučių';
-z.string.lt.init_decryption = 'Iššifruojamos žinutės';
-z.string.lt.init_events = 'Įkeliamos žinutės';
-z.string.lt.init_updated_from_notifications = 'Beveik baigta – mėgaukitės „Wire“';
-z.string.lt.init_progress = ' — {{number1}} iš {{number2}}';
+z.string.lt.initDecryption = 'Iššifruojamos žinutės';
+z.string.lt.initEvents = 'Įkeliamos žinutės';
+z.string.lt.initUpdatedFromNotifications = 'Beveik baigta – mėgaukitės „Wire“';
+z.string.lt.initProgress = ' — {{number1}} iš {{number2}}';
 
 z.string.lt.ephememalUnitsNone = 'Išjungta';
 z.string.lt.ephememalUnitsSecond = 'sek.';

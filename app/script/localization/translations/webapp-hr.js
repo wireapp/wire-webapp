@@ -37,12 +37,12 @@ z.string.hr.authAccountSignInPhone = 'Telefon';
 
 z.string.hr.authVerifyAccountAdd = 'Dodaj';
 z.string.hr.authVerifyAccountDetail = 'Ovo Vam omogućuje da koristite Wire na više uređaja.';
-z.string.hr.auth_verify_account_headline = 'Dodajte email adresu i lozinku.';
-z.string.hr.auth_verify_account_logout = 'Odjava';
-z.string.hr.auth_verify_code_description = 'Unesite kontrolni kod koji smo poslali na {{number}}.';
-z.string.hr.auth_verify_code_resend = 'Kod se ne pojavljuje?';
-z.string.hr.auth_verify_code_resend_detail = 'Ponovno pošalji';
-z.string.hr.auth_verify_code_resend_timer = 'Možete zatražiti novi kod {{expiration}}.';
+z.string.hr.authVerifyAccountHeadline = 'Dodajte email adresu i lozinku.';
+z.string.hr.authVerifyAccountLogout = 'Odjava';
+z.string.hr.authVerifyCodeDescription = 'Unesite kontrolni kod koji smo poslali na {{number}}.';
+z.string.hr.authVerifyCodeResend = 'Kod se ne pojavljuje?';
+z.string.hr.authVerifyCodeResendDetail = 'Ponovno pošalji';
+z.string.hr.authVerifyCodeResendTimer = 'Možete zatražiti novi kod {{expiration}}.';
 z.string.hr.auth_verify_code_change_phone = 'Promjeni broj telefona';
 z.string.hr.auth_verify_password_headline = 'Upišite Vašu šifru';
 
@@ -494,7 +494,7 @@ z.string.hr.tooltip_search_close = 'Zatvori (Esc)';
 z.string.hr.initReceivedSelfUser = 'Pozdrav, {{user}}.';
 z.string.hr.initValidatedClient = 'Učitavanje veze i razgovora';
 z.string.hr.initReceivedUserData = 'Provjeravanje novih poruka';
-z.string.hr.init_events = 'Učitavanje poruka';
+z.string.hr.initEvents = 'Učitavanje poruka';
 
 z.string.hr.ephememalUnitsNone = 'Isključi';
 z.string.hr.ephememalUnitsSecond = 'sekunda';

@@ -44,12 +44,12 @@ z.string.sk.authBlockedTabs = 'Wire je už otvorený na inej karte.';
 
 z.string.sk.authVerifyAccountAdd = 'Pridať';
 z.string.sk.authVerifyAccountDetail = 'To vám umožní používať Wire na viacerých zariadeniach.';
-z.string.sk.auth_verify_account_headline = 'Pridať e-mailovú adresu a heslo.';
-z.string.sk.auth_verify_account_logout = 'Odhlásenie';
-z.string.sk.auth_verify_code_description = 'Zadajte overovací kód, ktorý sme zaslali na {{number}}.';
-z.string.sk.auth_verify_code_resend = 'Žiadny kód sa neukázal?';
-z.string.sk.auth_verify_code_resend_detail = 'Poslať znovu';
-z.string.sk.auth_verify_code_resend_timer = 'Môžete požiadať o nový kód {{expiration}}.';
+z.string.sk.authVerifyAccountHeadline = 'Pridať e-mailovú adresu a heslo.';
+z.string.sk.authVerifyAccountLogout = 'Odhlásenie';
+z.string.sk.authVerifyCodeDescription = 'Zadajte overovací kód, ktorý sme zaslali na {{number}}.';
+z.string.sk.authVerifyCodeResend = 'Žiadny kód sa neukázal?';
+z.string.sk.authVerifyCodeResendDetail = 'Poslať znovu';
+z.string.sk.authVerifyCodeResendTimer = 'Môžete požiadať o nový kód {{expiration}}.';
 z.string.sk.auth_verify_code_change_phone = 'Zmeniť telefónne číslo';
 z.string.sk.auth_verify_password_headline = 'Zadajte Vaše heslo';
 
@@ -551,8 +551,8 @@ z.string.sk.tooltip_search_close = 'Zavrieť (Esc)';
 z.string.sk.initReceivedSelfUser = 'Ahoj, {{user}}.';
 z.string.sk.initValidatedClient = 'Získavanie pripojení a konverzácií';
 z.string.sk.initReceivedUserData = 'Kontrola nových správ';
-z.string.sk.init_decryption = 'Dešifrovať správy';
-z.string.sk.init_events = 'Načítavam správy';
+z.string.sk.initDecryption = 'Dešifrovať správy';
+z.string.sk.initEvents = 'Načítavam správy';
 
 z.string.sk.ephememalUnitsNone = 'Vypnúť';
 z.string.sk.ephememalUnitsSecond = 'sekunda';

@@ -350,7 +350,7 @@ z.main.App = class App {
         return this.repository.conversation.initialize_conversations();
       })
       .then(() => {
-        this.view.loading.update_progress(97.5, z.string.init_updated_from_notifications);
+        this.view.loading.update_progress(97.5, z.string.initUpdatedFromNotifications);
 
         this._watch_online_status();
         return this.repository.client.getClientsForSelf();

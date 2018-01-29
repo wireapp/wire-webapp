@@ -44,12 +44,12 @@ z.string.hu.authBlockedTabs = 'A Wire már nyitva van egy másik böngészőlapo
 
 z.string.hu.authVerifyAccountAdd = 'Hozzáadás';
 z.string.hu.authVerifyAccountDetail = 'Ezáltal akár több eszközön is használhatod a Wire-t.';
-z.string.hu.auth_verify_account_headline = 'E-mail cím és jelszó megadása.';
-z.string.hu.auth_verify_account_logout = 'Kijelentkezés';
-z.string.hu.auth_verify_code_description = 'Írd be az ellenőrző kódot,\namit a {{number}} telefonszámra küldtünk.';
-z.string.hu.auth_verify_code_resend = 'Nem kaptál kódot?';
-z.string.hu.auth_verify_code_resend_detail = 'Újraküldés';
-z.string.hu.auth_verify_code_resend_timer = 'Új kódot kérhetsz {{expiration}} múlva.';
+z.string.hu.authVerifyAccountHeadline = 'E-mail cím és jelszó megadása.';
+z.string.hu.authVerifyAccountLogout = 'Kijelentkezés';
+z.string.hu.authVerifyCodeDescription = 'Írd be az ellenőrző kódot,\namit a {{number}} telefonszámra küldtünk.';
+z.string.hu.authVerifyCodeResend = 'Nem kaptál kódot?';
+z.string.hu.authVerifyCodeResendDetail = 'Újraküldés';
+z.string.hu.authVerifyCodeResendTimer = 'Új kódot kérhetsz {{expiration}} múlva.';
 z.string.hu.auth_verify_code_change_phone = 'Telefonszám módosítása';
 z.string.hu.auth_verify_password_headline = 'Add meg a jelszavad';
 
@@ -564,10 +564,10 @@ z.string.hu.tooltip_search_close = 'Bezárás (Esc)';
 z.string.hu.initReceivedSelfUser = 'Szia {{user}}!';
 z.string.hu.initValidatedClient = 'Kapcsolatok és a beszélgetések lekérése';
 z.string.hu.initReceivedUserData = 'Új üzenetek megtekintése';
-z.string.hu.init_decryption = 'Üzenetek visszafejtése';
-z.string.hu.init_events = 'Üzenetek betöltése';
-z.string.hu.init_updated_from_notifications = 'Majdnem kész - Élvezd a Wire-t';
-z.string.hu.init_progress = ' — {{number1}} / {{number2}}';
+z.string.hu.initDecryption = 'Üzenetek visszafejtése';
+z.string.hu.initEvents = 'Üzenetek betöltése';
+z.string.hu.initUpdatedFromNotifications = 'Majdnem kész - Élvezd a Wire-t';
+z.string.hu.initProgress = ' — {{number1}} / {{number2}}';
 
 z.string.hu.ephememalUnitsNone = 'Kikapcsolás';
 z.string.hu.ephememalUnitsSecond = 'másodperc';

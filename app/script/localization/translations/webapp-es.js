@@ -43,12 +43,12 @@ z.string.es.authBlockedTabs = 'Wire ya está abierto en otra pestaña.';
 
 z.string.es.authVerifyAccountAdd = 'Agregar';
 z.string.es.authVerifyAccountDetail = 'Esto le permite usar Wire en múltiples dispositivos.';
-z.string.es.auth_verify_account_headline = 'Agregar dirección de correo electrónico y contraseña.';
-z.string.es.auth_verify_account_logout = 'Cerrar sesión';
-z.string.es.auth_verify_code_description = 'Ingresa el código de verificación\nque hemos enviado a {{number}}.';
-z.string.es.auth_verify_code_resend = '¿No ha recibido ningún código?';
-z.string.es.auth_verify_code_resend_detail = 'Reenviar';
-z.string.es.auth_verify_code_resend_timer = 'Puede solicitar un nuevo código en {{expiration}}.';
+z.string.es.authVerifyAccountHeadline = 'Agregar dirección de correo electrónico y contraseña.';
+z.string.es.authVerifyAccountLogout = 'Cerrar sesión';
+z.string.es.authVerifyCodeDescription = 'Ingresa el código de verificación\nque hemos enviado a {{number}}.';
+z.string.es.authVerifyCodeResend = '¿No ha recibido ningún código?';
+z.string.es.authVerifyCodeResendDetail = 'Reenviar';
+z.string.es.authVerifyCodeResendTimer = 'Puede solicitar un nuevo código en {{expiration}}.';
 z.string.es.auth_verify_code_change_phone = 'Cambiar número de teléfono';
 z.string.es.auth_verify_password_headline = 'Introduzca su contraseña';
 
@@ -558,10 +558,10 @@ z.string.es.tooltip_search_close = 'Cerrar (Esc)';
 z.string.es.initReceivedSelfUser = 'Hola, {{user}}.';
 z.string.es.initValidatedClient = 'Cargando conexiones y conversaciones';
 z.string.es.initReceivedUserData = 'Buscando mensajes nuevos';
-z.string.es.init_decryption = 'Descifrando mensajes';
-z.string.es.init_events = 'Cargando mensajes';
-z.string.es.init_updated_from_notifications = 'Casi terminado - Disfruta  Wire';
-z.string.es.init_progress = ' — {{number1}} de {{number2}}';
+z.string.es.initDecryption = 'Descifrando mensajes';
+z.string.es.initEvents = 'Cargando mensajes';
+z.string.es.initUpdatedFromNotifications = 'Casi terminado - Disfruta  Wire';
+z.string.es.initProgress = ' — {{number1}} de {{number2}}';
 
 z.string.es.ephememalUnitsNone = 'Desactivar';
 z.string.es.ephememalUnitsSecond = 'segundo';

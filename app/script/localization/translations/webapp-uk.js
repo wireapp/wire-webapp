@@ -43,12 +43,12 @@ z.string.uk.authBlockedTabs = 'Wire уже відкрито в іншій вкл
 
 z.string.uk.authVerifyAccountAdd = 'Додати';
 z.string.uk.authVerifyAccountDetail = 'Це дасть змогу використовувати Wire на різних пристроях.';
-z.string.uk.auth_verify_account_headline = 'Додайте email та пароль.';
-z.string.uk.auth_verify_account_logout = 'Вийти';
-z.string.uk.auth_verify_code_description = 'Введіть код верифікації,\nякий ми вислали на номер {{number}}.';
-z.string.uk.auth_verify_code_resend = 'SMS так і не прийшло?';
-z.string.uk.auth_verify_code_resend_detail = 'Надіслати ще раз';
-z.string.uk.auth_verify_code_resend_timer = 'Ви можете надіслати запит запит на новий код {{expiration}}.';
+z.string.uk.authVerifyAccountHeadline = 'Додайте email та пароль.';
+z.string.uk.authVerifyAccountLogout = 'Вийти';
+z.string.uk.authVerifyCodeDescription = 'Введіть код верифікації,\nякий ми вислали на номер {{number}}.';
+z.string.uk.authVerifyCodeResend = 'SMS так і не прийшло?';
+z.string.uk.authVerifyCodeResendDetail = 'Надіслати ще раз';
+z.string.uk.authVerifyCodeResendTimer = 'Ви можете надіслати запит запит на новий код {{expiration}}.';
 z.string.uk.auth_verify_code_change_phone = 'Змінити номер телефону';
 z.string.uk.auth_verify_password_headline = 'Введіть свій пароль';
 
@@ -557,10 +557,10 @@ z.string.uk.tooltip_search_close = 'Закрити (Esc)';
 z.string.uk.initReceivedSelfUser = 'Привіт {{user}}.';
 z.string.uk.initValidatedClient = 'Отримую список контактів та розмов';
 z.string.uk.initReceivedUserData = 'Перевіряю наявність нових повідомлень';
-z.string.uk.init_decryption = 'Дешифрую повідомлення';
-z.string.uk.init_events = 'Завантажую повідомлення';
-z.string.uk.init_updated_from_notifications = 'Майже завершено - Приємного користування!';
-z.string.uk.init_progress = ' — {{number1}} з {{number2}}';
+z.string.uk.initDecryption = 'Дешифрую повідомлення';
+z.string.uk.initEvents = 'Завантажую повідомлення';
+z.string.uk.initUpdatedFromNotifications = 'Майже завершено - Приємного користування!';
+z.string.uk.initProgress = ' — {{number1}} з {{number2}}';
 
 z.string.uk.ephememalUnitsNone = 'Вимкнений';
 z.string.uk.ephememalUnitsSecond = 'секунда';

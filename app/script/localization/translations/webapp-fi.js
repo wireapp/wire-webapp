@@ -43,12 +43,12 @@ z.string.fi.authBlockedTabs = 'Wire on jo avoinna toisessa välilehdessä.';
 
 z.string.fi.authVerifyAccountAdd = 'Lisää';
 z.string.fi.authVerifyAccountDetail = 'Tämä mahdollistaa Wiren käytön useilla laitteilla.';
-z.string.fi.auth_verify_account_headline = 'Lisää sähköpostiosoitteesi ja salasanasi.';
-z.string.fi.auth_verify_account_logout = 'Kirjaudu ulos';
-z.string.fi.auth_verify_code_description = 'Syötä vahvistuskoodi jonka lähetimme {{number}}.';
-z.string.fi.auth_verify_code_resend = 'Eikö koodi ole tullut perille?';
-z.string.fi.auth_verify_code_resend_detail = 'Lähetä uudelleen';
-z.string.fi.auth_verify_code_resend_timer = 'Voit pyytää uuden koodin {{expiration}} kuluttua.';
+z.string.fi.authVerifyAccountHeadline = 'Lisää sähköpostiosoitteesi ja salasanasi.';
+z.string.fi.authVerifyAccountLogout = 'Kirjaudu ulos';
+z.string.fi.authVerifyCodeDescription = 'Syötä vahvistuskoodi jonka lähetimme {{number}}.';
+z.string.fi.authVerifyCodeResend = 'Eikö koodi ole tullut perille?';
+z.string.fi.authVerifyCodeResendDetail = 'Lähetä uudelleen';
+z.string.fi.authVerifyCodeResendTimer = 'Voit pyytää uuden koodin {{expiration}} kuluttua.';
 z.string.fi.auth_verify_code_change_phone = 'Vaihda puhelinnumero';
 z.string.fi.auth_verify_password_headline = 'Kirjoita salasanasi';
 
@@ -551,10 +551,10 @@ z.string.fi.tooltip_search_close = 'Sulje (Esc)';
 z.string.fi.initReceivedSelfUser = 'He, {{user}}.';
 z.string.fi.initValidatedClient = 'Haetaan yhteyksiäsi ja keskustelujasi';
 z.string.fi.initReceivedUserData = 'Tarkistetaan uusia viestejä';
-z.string.fi.init_decryption = 'Puretaan viestejä';
-z.string.fi.init_events = 'Ladataan viestejä';
-z.string.fi.init_updated_from_notifications = 'Melkein valmista - nauti Wirestä';
-z.string.fi.init_progress = ' — {{number1}} / {{number2}}';
+z.string.fi.initDecryption = 'Puretaan viestejä';
+z.string.fi.initEvents = 'Ladataan viestejä';
+z.string.fi.initUpdatedFromNotifications = 'Melkein valmista - nauti Wirestä';
+z.string.fi.initProgress = ' — {{number1}} / {{number2}}';
 
 z.string.fi.ephememalUnitsNone = 'Pois päältä';
 z.string.fi.ephememalUnitsSecond = 'sekunti';

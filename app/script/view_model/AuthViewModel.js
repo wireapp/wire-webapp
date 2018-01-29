@@ -183,11 +183,11 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     this.verify_code_text = ko.pureComputed(() => {
       const phone_number =
         PhoneFormat.formatNumberForMobileDialing('', this.phone_number_e164()) || this.phone_number_e164();
-      return z.l10n.text(z.string.auth_verify_code_description, phone_number);
+      return z.l10n.text(z.string.authVerifyCodeDescription, phone_number);
     });
 
     this.verify_code_timer_text = ko.pureComputed(() =>
-      z.l10n.text(z.string.auth_verify_code_resend_timer, this.code_expiration_in())
+      z.l10n.text(z.string.authVerifyCodeResendTimer, this.code_expiration_in())
     );
 
     this.visible_section = ko.observable(undefined);

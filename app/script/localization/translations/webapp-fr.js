@@ -44,12 +44,12 @@ z.string.fr.authBlockedTabs = 'Wire est déjà ouvert dans un autre onglet.';
 
 z.string.fr.authVerifyAccountAdd = 'Ajouter';
 z.string.fr.authVerifyAccountDetail = 'Cela vous permet d’utiliser Wire sur plusieurs appareils.';
-z.string.fr.auth_verify_account_headline = 'Ajouter une adresse e-mail et un mot de passe.';
-z.string.fr.auth_verify_account_logout = 'Se déconnecter';
-z.string.fr.auth_verify_code_description = 'Saisissez le code de vérification que nous avons envoyé au {{number}}.';
-z.string.fr.auth_verify_code_resend = 'Pas de code à l’horizon ?';
-z.string.fr.auth_verify_code_resend_detail = 'Renvoyer';
-z.string.fr.auth_verify_code_resend_timer = 'Vous pourrez demander un nouveau code {{expiration}}.';
+z.string.fr.authVerifyAccountHeadline = 'Ajouter une adresse e-mail et un mot de passe.';
+z.string.fr.authVerifyAccountLogout = 'Se déconnecter';
+z.string.fr.authVerifyCodeDescription = 'Saisissez le code de vérification que nous avons envoyé au {{number}}.';
+z.string.fr.authVerifyCodeResend = 'Pas de code à l’horizon ?';
+z.string.fr.authVerifyCodeResendDetail = 'Renvoyer';
+z.string.fr.authVerifyCodeResendTimer = 'Vous pourrez demander un nouveau code {{expiration}}.';
 z.string.fr.auth_verify_code_change_phone = 'Changer le numéro de téléphone';
 z.string.fr.auth_verify_password_headline = 'Saisissez votre mot de passe';
 
@@ -560,10 +560,10 @@ z.string.fr.tooltip_search_close = 'Fermer (Échap)';
 z.string.fr.initReceivedSelfUser = 'Bonjour, {{user}}.';
 z.string.fr.initValidatedClient = 'Téléchargement de vos contacts et de vos conversations';
 z.string.fr.initReceivedUserData = 'Recherche de nouveaux messages';
-z.string.fr.init_decryption = 'Déchiffrement des messages';
-z.string.fr.init_events = 'Chargement des messages';
-z.string.fr.init_updated_from_notifications = 'Presque terminé - Profitez de Wire';
-z.string.fr.init_progress = ' — {{number1}} sur {{number2}}';
+z.string.fr.initDecryption = 'Déchiffrement des messages';
+z.string.fr.initEvents = 'Chargement des messages';
+z.string.fr.initUpdatedFromNotifications = 'Presque terminé - Profitez de Wire';
+z.string.fr.initProgress = ' — {{number1}} sur {{number2}}';
 
 z.string.fr.ephememalUnitsNone = 'Désactivé';
 z.string.fr.ephememalUnitsSecond = 'seconde';

@@ -130,7 +130,7 @@
 
           <div id="section-verify" class="section">
             <form id="form-verify-account" class="form" data-bind="submit: verify_account">
-              <div class="auth-headline" data-bind="l10n_text: z.string.auth_verify_account_headline"></div>
+              <div class="auth-headline" data-bind="l10n_text: z.string.authVerifyAccountHeadline"></div>
               <div class="auth-headline-sub" data-bind="l10n_text: z.string.authVerifyAccountDetail"></div>
               <div id="wire-verify-account-email-container" class="form-control">
                 <input class="input email" id="wire-verify-account-email" type="text" autocomplete="email" maxlength="128" spellcheck="false"
@@ -198,10 +198,10 @@
                 <!-- /ko -->
               </ul>
               <div class="footer">
-                <div class="verify-action-detail" data-bind="l10n_text: z.string.auth_verify_code_resend"></div>
+                <div class="verify-action-detail" data-bind="l10n_text: z.string.authVerifyCodeResend"></div>
                 <!-- ko if: can_resend_code -->
                   <div id="wire-resend-code" class="auth-text-link verify-link verify-action-link"
-                       data-bind="click: clicked_on_resend_code, l10n_text: z.string.auth_verify_code_resend_detail"></div>
+                       data-bind="click: clicked_on_resend_code, l10n_text: z.string.authVerifyCodeResendDetail"></div>
                 <!-- /ko -->
                 <!-- ko ifnot: can_resend_code -->
                   <div class="verify-action-detail" data-bind="text: verify_code_timer_text"></div>

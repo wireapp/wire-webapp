@@ -43,12 +43,12 @@ z.string.pt.authBlockedTabs = 'O Wire já está aberto noutro separador.';
 
 z.string.pt.authVerifyAccountAdd = 'Adicionar';
 z.string.pt.authVerifyAccountDetail = 'Permite que use o Wire em vários dispositivos.';
-z.string.pt.auth_verify_account_headline = 'Adicionar o endereço de e-mail e palavra-passe.';
-z.string.pt.auth_verify_account_logout = 'Terminar sessão';
-z.string.pt.auth_verify_code_description = 'Introduza o código de verificação que foi enviado para o {{number}}.';
-z.string.pt.auth_verify_code_resend = 'Não chegou o código?';
-z.string.pt.auth_verify_code_resend_detail = 'Reenviar';
-z.string.pt.auth_verify_code_resend_timer = 'Pode solicitar um novo código {{expiration}}.';
+z.string.pt.authVerifyAccountHeadline = 'Adicionar o endereço de e-mail e palavra-passe.';
+z.string.pt.authVerifyAccountLogout = 'Terminar sessão';
+z.string.pt.authVerifyCodeDescription = 'Introduza o código de verificação que foi enviado para o {{number}}.';
+z.string.pt.authVerifyCodeResend = 'Não chegou o código?';
+z.string.pt.authVerifyCodeResendDetail = 'Reenviar';
+z.string.pt.authVerifyCodeResendTimer = 'Pode solicitar um novo código {{expiration}}.';
 z.string.pt.auth_verify_code_change_phone = 'Alterar o número de telefone';
 z.string.pt.auth_verify_password_headline = 'Insira a sua palavra-passe';
 
@@ -557,10 +557,10 @@ z.string.pt.tooltip_search_close = 'Fechar (Esc)';
 z.string.pt.initReceivedSelfUser = 'Olá {{user}}.';
 z.string.pt.initValidatedClient = 'A descarregar as suas ligações e conversas';
 z.string.pt.initReceivedUserData = 'A verificar por novas mensagens';
-z.string.pt.init_decryption = 'A desencriptar mensagens';
-z.string.pt.init_events = 'A carregar mensagens';
-z.string.pt.init_updated_from_notifications = 'Quase pronto - Desfrute do Wire';
-z.string.pt.init_progress = ' — {{number1}} de {{number2}}';
+z.string.pt.initDecryption = 'A desencriptar mensagens';
+z.string.pt.initEvents = 'A carregar mensagens';
+z.string.pt.initUpdatedFromNotifications = 'Quase pronto - Desfrute do Wire';
+z.string.pt.initProgress = ' — {{number1}} de {{number2}}';
 
 z.string.pt.ephememalUnitsNone = 'Desligado';
 z.string.pt.ephememalUnitsSecond = 'segundo';

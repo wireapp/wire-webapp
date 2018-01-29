@@ -51,12 +51,12 @@ z.string.authBlockedTabs = 'Wire is already open in another tab.';
 // Authentication: VERIFY section
 z.string.authVerifyAccountAdd = 'Add';
 z.string.authVerifyAccountDetail = 'This lets you use Wire on multiple devices.';
-z.string.auth_verify_account_headline = 'Add email address and password.';
-z.string.auth_verify_account_logout = 'Log out';
-z.string.auth_verify_code_description = 'Enter the verification code\nwe sent to {{number}}.';
-z.string.auth_verify_code_resend = 'No code showing up?';
-z.string.auth_verify_code_resend_detail = 'Resend';
-z.string.auth_verify_code_resend_timer = 'You can request a new code {{expiration}}.';
+z.string.authVerifyAccountHeadline = 'Add email address and password.';
+z.string.authVerifyAccountLogout = 'Log out';
+z.string.authVerifyCodeDescription = 'Enter the verification code\nwe sent to {{number}}.';
+z.string.authVerifyCodeResend = 'No code showing up?';
+z.string.authVerifyCodeResendDetail = 'Resend';
+z.string.authVerifyCodeResendTimer = 'You can request a new code {{expiration}}.';
 z.string.auth_verify_code_change_phone = 'Change phone number';
 z.string.auth_verify_password_headline = 'Enter your password';
 
@@ -645,10 +645,10 @@ z.string.tooltip_search_close = 'Close (Esc)';
 z.string.initReceivedSelfUser = 'Hello, {{user}}.';
 z.string.initValidatedClient = 'Fetching your connections and conversations';
 z.string.initReceivedUserData = 'Checking for new messages';
-z.string.init_decryption = 'Decrypting messages';
-z.string.init_events = 'Loading messages';
-z.string.init_updated_from_notifications = 'Almost done - Enjoy Wire';
-z.string.init_progress = ' — {{number1}} of {{number2}}';
+z.string.initDecryption = 'Decrypting messages';
+z.string.initEvents = 'Loading messages';
+z.string.initUpdatedFromNotifications = 'Almost done - Enjoy Wire';
+z.string.initProgress = ' — {{number1}} of {{number2}}';
 
 z.string.ephememalUnitsNone = 'Off';
 z.string.ephememalUnitsSecond = 'second';

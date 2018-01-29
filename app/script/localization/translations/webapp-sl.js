@@ -42,12 +42,12 @@ z.string.sl.authBlockedTabs = 'Wire je že odprt v drugem oknu.';
 
 z.string.sl.authVerifyAccountAdd = 'Dodaj';
 z.string.sl.authVerifyAccountDetail = 'To vam omogoča uporabo Wire na večih napravah.';
-z.string.sl.auth_verify_account_headline = 'Dodajte e-poštni naslov in geslo.';
-z.string.sl.auth_verify_account_logout = 'Odjava';
-z.string.sl.auth_verify_code_description = 'Vnesite verifikacijsko kodo,\nki smo jo poslali na {{number}}.';
-z.string.sl.auth_verify_code_resend = 'Koda ni prispela?';
-z.string.sl.auth_verify_code_resend_detail = 'Ponovno pošlji';
-z.string.sl.auth_verify_code_resend_timer = 'Lahko zahtevate novo kodo {{expiration}}.';
+z.string.sl.authVerifyAccountHeadline = 'Dodajte e-poštni naslov in geslo.';
+z.string.sl.authVerifyAccountLogout = 'Odjava';
+z.string.sl.authVerifyCodeDescription = 'Vnesite verifikacijsko kodo,\nki smo jo poslali na {{number}}.';
+z.string.sl.authVerifyCodeResend = 'Koda ni prispela?';
+z.string.sl.authVerifyCodeResendDetail = 'Ponovno pošlji';
+z.string.sl.authVerifyCodeResendTimer = 'Lahko zahtevate novo kodo {{expiration}}.';
 z.string.sl.auth_verify_code_change_phone = 'Spremeni telefonsko številko';
 z.string.sl.auth_verify_password_headline = 'Vnesite vaše geslo';
 
@@ -542,7 +542,7 @@ z.string.sl.tooltip_search_close = 'Zapri (Esc)';
 z.string.sl.initReceivedSelfUser = 'Hej, {{user}}.';
 z.string.sl.initValidatedClient = 'Pridobivam vaše povezave in pogovore';
 z.string.sl.initReceivedUserData = 'Preverjanje za morebitna nova sporočila';
-z.string.sl.init_events = 'Nalagam sporočila';
+z.string.sl.initEvents = 'Nalagam sporočila';
 
 z.string.sl.ephememalUnitsNone = 'Izklopljeno';
 z.string.sl.ephememalUnitsSecond = 'sekunda';

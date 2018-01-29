@@ -43,12 +43,12 @@ z.string.pl.authBlockedTabs = 'Wire jest już otwarty w innej zakładce.';
 
 z.string.pl.authVerifyAccountAdd = 'Dodaj';
 z.string.pl.authVerifyAccountDetail = 'To pozwala Ci używać Wire na więcej niż jednym urządzeniu.';
-z.string.pl.auth_verify_account_headline = 'Dodaj adres e-mail i hasło.';
-z.string.pl.auth_verify_account_logout = 'Wyloguj się';
-z.string.pl.auth_verify_code_description = 'Wpisz kod weryfikacyjny, który wysłaliśmy do {{number}}.';
-z.string.pl.auth_verify_code_resend = 'Nie otrzymałeś(aś) kodu?';
-z.string.pl.auth_verify_code_resend_detail = 'Wyślij ponownie';
-z.string.pl.auth_verify_code_resend_timer = 'Możesz poprosić o nowy kod {{expiration}}.';
+z.string.pl.authVerifyAccountHeadline = 'Dodaj adres e-mail i hasło.';
+z.string.pl.authVerifyAccountLogout = 'Wyloguj się';
+z.string.pl.authVerifyCodeDescription = 'Wpisz kod weryfikacyjny, który wysłaliśmy do {{number}}.';
+z.string.pl.authVerifyCodeResend = 'Nie otrzymałeś(aś) kodu?';
+z.string.pl.authVerifyCodeResendDetail = 'Wyślij ponownie';
+z.string.pl.authVerifyCodeResendTimer = 'Możesz poprosić o nowy kod {{expiration}}.';
 z.string.pl.auth_verify_code_change_phone = 'Zmień numer telefonu';
 z.string.pl.auth_verify_password_headline = 'Wprowadź hasło';
 
@@ -551,10 +551,10 @@ z.string.pl.tooltip_search_close = 'Zamknij (Esc)';
 z.string.pl.initReceivedSelfUser = 'Cześć, {{user}}.';
 z.string.pl.initValidatedClient = 'Pobieranie Twoich kontaktów i rozmów';
 z.string.pl.initReceivedUserData = 'Sprawdzanie nowych wiadomości';
-z.string.pl.init_decryption = 'Odszyfrowywanie wiadomości';
-z.string.pl.init_events = 'Ładowanie wiadomości';
-z.string.pl.init_updated_from_notifications = 'Prawie skończone - miłego korzystania z Wire';
-z.string.pl.init_progress = ' — {{number1}} z {{number2}}';
+z.string.pl.initDecryption = 'Odszyfrowywanie wiadomości';
+z.string.pl.initEvents = 'Ładowanie wiadomości';
+z.string.pl.initUpdatedFromNotifications = 'Prawie skończone - miłego korzystania z Wire';
+z.string.pl.initProgress = ' — {{number1}} z {{number2}}';
 
 z.string.pl.ephememalUnitsNone = 'Wyłącz';
 z.string.pl.ephememalUnitsSecond = 'sekunda';
