@@ -107,14 +107,14 @@ z.string.auth_error_suspended = 'This account is no longer authorized to log in.
 z.string.auth_error_sign_in = 'Please verify your details and try again.';
 
 // Call stuff
-z.string.call_state_outgoing = 'Ringing…';
-z.string.call_state_connecting = 'Connecting…';
-z.string.call_state_incoming = 'Calling…';
+z.string.callStateOutgoing = 'Ringing…';
+z.string.callStateConnecting = 'Connecting…';
+z.string.callStateIncoming = 'Calling…';
 z.string.callDecline = 'Decline';
 z.string.callAccept = 'Accept';
 z.string.callJoin = 'Join';
 z.string.callChooseSharedScreen = 'Choose a screen to share';
-z.string.call_participants = '{{number}} on call';
+z.string.callParticipants = '{{number}} on call';
 
 // Warnings
 z.string.modal_button_cancel = 'Cancel';
@@ -346,13 +346,13 @@ z.string.takeoverButtonChoose = 'Choose your own';
 z.string.takeoverButtonKeep = 'Keep this one';
 
 // Invites
-z.string.invite_meta_key_mac = 'Cmd';
-z.string.invite_meta_key_pc = 'Ctrl';
-z.string.invite_hint_selected = 'Press {{meta_key}} + C to copy';
-z.string.invite_hint_unselected = 'Select and Press {{meta_key}} + C';
-z.string.invite_headline = 'Invite people to Wire';
-z.string.invite_message = 'I’m on Wire, search for {{username}} or visit get.wire.com.';
-z.string.invite_message_no_email = 'I’m on Wire. Visit get.wire.com to connect with me.';
+z.string.inviteMetaKeyMac = 'Cmd';
+z.string.inviteMetaKeyPc = 'Ctrl';
+z.string.inviteHintSelected = 'Press {{meta_key}} + C to copy';
+z.string.inviteHintUnselected = 'Select and Press {{meta_key}} + C';
+z.string.inviteHeadline = 'Invite people to Wire';
+z.string.inviteMessage = 'I’m on Wire, search for {{username}} or visit get.wire.com.';
+z.string.inviteMessageNoEmail = 'I’m on Wire. Visit get.wire.com to connect with me.';
 
 // Extensions
 z.string.extensions_bubble_button_gif = 'Gif';
@@ -534,11 +534,11 @@ z.string.search_member_invite = 'Invite people to join the team';
 z.string.search_others = 'Connect';
 
 // Google contacts upload
-z.string.upload_google_headline = 'Find people\nto talk to.';
-z.string.upload_google_message = 'We use your contact data to connect you with others. We anonymize all information and do not share it with anyone else.';
-z.string.upload_google_headline_error = 'Something\nwent wrong.';
-z.string.upload_google_message_error = 'We did not receive your information. Please try importing your contacts again.';
-z.string.upload_google_button_again = 'Try again';
+z.string.uploadGoogleHeadline = 'Find people\nto talk to.';
+z.string.uploadGoogleMessage = 'We use your contact data to connect you with others. We anonymize all information and do not share it with anyone else.';
+z.string.uploadGoogleHeadlineError = 'Something\nwent wrong.';
+z.string.uploadGoogleMessageError = 'We did not receive your information. Please try importing your contacts again.';
+z.string.uploadGoogleButtonAgain = 'Try again';
 
 // URLs & Warnings: Permission requests & permission callbacks
 z.string.url_support_root = '/';

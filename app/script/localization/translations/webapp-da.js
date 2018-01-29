@@ -85,9 +85,9 @@ z.string.da.auth_error_phone_number_invalid = 'Ugyldigt telefonnummer';
 z.string.da.auth_error_phone_number_unknown = 'Ukendt telefonnummer';
 z.string.da.auth_error_sign_in = 'Bekræft venligst dine detaljer og prøv igen.';
 
-z.string.da.call_state_outgoing = 'Ringer op…';
-z.string.da.call_state_connecting = 'Forbinder…';
-z.string.da.call_state_incoming = 'Ringer op…';
+z.string.da.callStateOutgoing = 'Ringer op…';
+z.string.da.callStateConnecting = 'Forbinder…';
+z.string.da.callStateIncoming = 'Ringer op…';
 z.string.da.callDecline = 'Afvis';
 z.string.da.callAccept = 'Besvar';
 z.string.da.callJoin = 'Deltag';
@@ -268,13 +268,13 @@ z.string.da.takeoverLink = 'Lær mere';
 z.string.da.takeoverButtonChoose = 'Vælg dit eget';
 z.string.da.takeoverButtonKeep = 'Behold denne';
 
-z.string.da.invite_meta_key_mac = 'Cmd';
-z.string.da.invite_meta_key_pc = 'Ctrl';
-z.string.da.invite_hint_selected = 'Tryk {{meta_key}} + C for at kopiere';
-z.string.da.invite_hint_unselected = 'Vælg og tryk {{meta_key}} + C';
-z.string.da.invite_headline = 'Inviter personer til Wire';
-z.string.da.invite_message = 'Jeg er på Wire, søg efter {{username}} eller besøg get.wire.com.';
-z.string.da.invite_message_no_email = 'Jeg er på Wire. Besøg get.wire.com for at forbinde dig med mig.';
+z.string.da.inviteMetaKeyMac = 'Cmd';
+z.string.da.inviteMetaKeyPc = 'Ctrl';
+z.string.da.inviteHintSelected = 'Tryk {{meta_key}} + C for at kopiere';
+z.string.da.inviteHintUnselected = 'Vælg og tryk {{meta_key}} + C';
+z.string.da.inviteHeadline = 'Inviter personer til Wire';
+z.string.da.inviteMessage = 'Jeg er på Wire, søg efter {{username}} eller besøg get.wire.com.';
+z.string.da.inviteMessageNoEmail = 'Jeg er på Wire. Besøg get.wire.com for at forbinde dig med mig.';
 
 z.string.da.extensions_bubble_button_gif = 'Gif';
 
@@ -432,11 +432,11 @@ z.string.da.search_try_search = 'Find personer ved navn eller Brugernavn';
 z.string.da.search_no_contacts_on_wire = 'Du har ingen kontakter på Wire. Prøv at finde folk ved navn eller brugernavn.';
 z.string.da.search_others = 'Forbind';
 
-z.string.da.upload_google_headline = 'Finde personer at snakke med.';
-z.string.da.upload_google_message = 'Vi bruger dine kontaktdata til at forbinde dig med andre. Vi anonymisere alle oplysninger og deler ikke det med alle andre.';
-z.string.da.upload_google_headline_error = 'Noget \ngik galt.';
-z.string.da.upload_google_message_error = 'Vi har ikke modtaget dine oplysninger. Venligst prøv at importere dine kontakter igen.';
-z.string.da.upload_google_button_again = 'Prøv igen';
+z.string.da.uploadGoogleHeadline = 'Finde personer at snakke med.';
+z.string.da.uploadGoogleMessage = 'Vi bruger dine kontaktdata til at forbinde dig med andre. Vi anonymisere alle oplysninger og deler ikke det med alle andre.';
+z.string.da.uploadGoogleHeadlineError = 'Noget \ngik galt.';
+z.string.da.uploadGoogleMessageError = 'Vi har ikke modtaget dine oplysninger. Venligst prøv at importere dine kontakter igen.';
+z.string.da.uploadGoogleButtonAgain = 'Prøv igen';
 
 z.string.da.warning_call_detail = 'Din browser skal have adgang til mikrofonen for at foretage opkald.';
 z.string.da.warning_call_headline = 'Kan ikke ringe uden mikrofon';

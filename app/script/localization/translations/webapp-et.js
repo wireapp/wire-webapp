@@ -94,14 +94,14 @@ z.string.et.auth_error_phone_number_unknown = 'Tundmatu telefoninumber';
 z.string.et.auth_error_suspended = 'See konto ei ole enam sisse logimiseks autoriseeritud.';
 z.string.et.auth_error_sign_in = 'Palun kinnita oma andmeid ja proovi uuesti.';
 
-z.string.et.call_state_outgoing = 'Heliseb…';
-z.string.et.call_state_connecting = 'Ühendan…';
-z.string.et.call_state_incoming = 'Helistab…';
+z.string.et.callStateOutgoing = 'Heliseb…';
+z.string.et.callStateConnecting = 'Ühendan…';
+z.string.et.callStateIncoming = 'Helistab…';
 z.string.et.callDecline = 'Keeldu';
 z.string.et.callAccept = 'Nõustu';
 z.string.et.callJoin = 'Liitu';
 z.string.et.callChooseSharedScreen = 'Vali ekraan, mida jagada';
-z.string.et.call_participants = '{{number}} kõnes';
+z.string.et.callParticipants = '{{number}} kõnes';
 
 z.string.et.modal_button_cancel = 'Tühista';
 z.string.et.modal_button_ok = 'Ok';
@@ -291,13 +291,13 @@ z.string.et.takeoverLink = 'Loe lähemalt';
 z.string.et.takeoverButtonChoose = 'Vali enda oma';
 z.string.et.takeoverButtonKeep = 'Vali see sama';
 
-z.string.et.invite_meta_key_mac = 'Cmd';
-z.string.et.invite_meta_key_pc = 'Ctrl';
-z.string.et.invite_hint_selected = 'Kopeerimiseks vajuta {{meta_key}} + C';
-z.string.et.invite_hint_unselected = 'Vali ja vajuta {{meta_key}} + C';
-z.string.et.invite_headline = 'Kutsu inimesi Wire’iga liituma';
-z.string.et.invite_message = 'Kasutan suhtlemiseks Wire äppi. Mu kasutajanimi on {{username}}. Tõmba äpp siit get.wire.com';
-z.string.et.invite_message_no_email = 'Kasutan suhtluseks Wire äppi. Külasta get.wire.com et minuga suhelda.';
+z.string.et.inviteMetaKeyMac = 'Cmd';
+z.string.et.inviteMetaKeyPc = 'Ctrl';
+z.string.et.inviteHintSelected = 'Kopeerimiseks vajuta {{meta_key}} + C';
+z.string.et.inviteHintUnselected = 'Vali ja vajuta {{meta_key}} + C';
+z.string.et.inviteHeadline = 'Kutsu inimesi Wire’iga liituma';
+z.string.et.inviteMessage = 'Kasutan suhtlemiseks Wire äppi. Mu kasutajanimi on {{username}}. Tõmba äpp siit get.wire.com';
+z.string.et.inviteMessageNoEmail = 'Kasutan suhtluseks Wire äppi. Külasta get.wire.com et minuga suhelda.';
 
 z.string.et.extensions_bubble_button_gif = 'Gif';
 
@@ -461,11 +461,11 @@ z.string.et.search_try_search = 'Leia inimesi\nnime või kasutajanime järgi';
 z.string.et.search_no_contacts_on_wire = 'Sul pole Wire’is ühtegi kontakti.\nProovi inimesi leida\nnime või kasutajanime järgi.';
 z.string.et.search_others = 'Ühendu';
 
-z.string.et.upload_google_headline = 'Otsi inimesi\nkellega rääkida.';
-z.string.et.upload_google_message = 'Me kasutame su kontakte, et ühendada sind teistega. Me muudame kogu info anonüümseks ja ei jaga seda kellegi teisega.';
-z.string.et.upload_google_headline_error = 'Midagi\nläks valesti.';
-z.string.et.upload_google_message_error = 'Me ei saanud sinu infot kätte. Palun proovi uuesti kontakte importida.';
-z.string.et.upload_google_button_again = 'Proovi uuesti';
+z.string.et.uploadGoogleHeadline = 'Otsi inimesi\nkellega rääkida.';
+z.string.et.uploadGoogleMessage = 'Me kasutame su kontakte, et ühendada sind teistega. Me muudame kogu info anonüümseks ja ei jaga seda kellegi teisega.';
+z.string.et.uploadGoogleHeadlineError = 'Midagi\nläks valesti.';
+z.string.et.uploadGoogleMessageError = 'Me ei saanud sinu infot kätte. Palun proovi uuesti kontakte importida.';
+z.string.et.uploadGoogleButtonAgain = 'Proovi uuesti';
 
 z.string.et.warning_call_detail = 'Sinu brauser vajab mikrofonile juurdepääsu kõnede tegemiseks.';
 z.string.et.warning_call_headline = 'Mikrofonita ei saa helistada';

@@ -90,9 +90,9 @@ z.string.sl.auth_error_phone_number_invalid = 'Neveljavna telefonska številka';
 z.string.sl.auth_error_phone_number_unknown = 'Neznana telefonska številka';
 z.string.sl.auth_error_sign_in = 'Prosimo preverite vaše podatke in poizkusite ponovno.';
 
-z.string.sl.call_state_outgoing = 'Zvonjenje…';
-z.string.sl.call_state_connecting = 'Povezovanje…';
-z.string.sl.call_state_incoming = 'Klicanje…';
+z.string.sl.callStateOutgoing = 'Zvonjenje…';
+z.string.sl.callStateConnecting = 'Povezovanje…';
+z.string.sl.callStateIncoming = 'Klicanje…';
 z.string.sl.callDecline = 'Zavrni';
 z.string.sl.callAccept = 'Sprejmi';
 z.string.sl.callJoin = 'Pridruži';
@@ -280,13 +280,13 @@ z.string.sl.takeoverLink = 'Nauči se več';
 z.string.sl.takeoverButtonChoose = 'Izberi svojo';
 z.string.sl.takeoverButtonKeep = 'Obdrži to';
 
-z.string.sl.invite_meta_key_mac = 'Cmd';
-z.string.sl.invite_meta_key_pc = 'Ctrl';
-z.string.sl.invite_hint_selected = 'Pritisnite {{meta_key}} + C za kopiranje';
-z.string.sl.invite_hint_unselected = 'Izberite in pritisnite {{meta_key}} + C';
-z.string.sl.invite_headline = 'Povabite osebe na Wire';
-z.string.sl.invite_message = 'Sem na Wire, poišči {{username}} ali obišči get.wire.com.';
-z.string.sl.invite_message_no_email = 'Sem na Wire. Obišči get.wire.com za povezavo z mano.';
+z.string.sl.inviteMetaKeyMac = 'Cmd';
+z.string.sl.inviteMetaKeyPc = 'Ctrl';
+z.string.sl.inviteHintSelected = 'Pritisnite {{meta_key}} + C za kopiranje';
+z.string.sl.inviteHintUnselected = 'Izberite in pritisnite {{meta_key}} + C';
+z.string.sl.inviteHeadline = 'Povabite osebe na Wire';
+z.string.sl.inviteMessage = 'Sem na Wire, poišči {{username}} ali obišči get.wire.com.';
+z.string.sl.inviteMessageNoEmail = 'Sem na Wire. Obišči get.wire.com za povezavo z mano.';
 
 z.string.sl.extensions_bubble_button_gif = 'Gif';
 
@@ -449,11 +449,11 @@ z.string.sl.search_try_search = 'Najdi osebe po imenu ali uporabniškem imenu';
 z.string.sl.search_no_contacts_on_wire = 'Nimate nobenih stikov na Wire.\nPoizkusite najti osebe po imenu\nali uporabniškem imenu.';
 z.string.sl.search_others = 'Poveži';
 
-z.string.sl.upload_google_headline = 'Poiščite osebe\nza pogovor.';
-z.string.sl.upload_google_message = 'Uporabljamo vaše podatke stikov pri povezovanju z drugimi. Vse informacije anonimiziramo in ne delimo z drugimi.';
-z.string.sl.upload_google_headline_error = 'Nekaj je\nšlo narobe.';
-z.string.sl.upload_google_message_error = 'Nismo prejeli vaših podatkov. Prosimo poizkusite ponovno uvoziti stike.';
-z.string.sl.upload_google_button_again = 'Poskusite ponovno';
+z.string.sl.uploadGoogleHeadline = 'Poiščite osebe\nza pogovor.';
+z.string.sl.uploadGoogleMessage = 'Uporabljamo vaše podatke stikov pri povezovanju z drugimi. Vse informacije anonimiziramo in ne delimo z drugimi.';
+z.string.sl.uploadGoogleHeadlineError = 'Nekaj je\nšlo narobe.';
+z.string.sl.uploadGoogleMessageError = 'Nismo prejeli vaših podatkov. Prosimo poizkusite ponovno uvoziti stike.';
+z.string.sl.uploadGoogleButtonAgain = 'Poskusite ponovno';
 
 z.string.sl.warning_call_detail = 'Vaš brskalnik potrebuje dostop do mikrofona za klicanje.';
 z.string.sl.warning_call_headline = 'Klic ni mogoč brez mikrofona';

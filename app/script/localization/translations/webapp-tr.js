@@ -93,14 +93,14 @@ z.string.tr.auth_error_phone_number_unknown = 'Bilinmeyen Telefon Numarası';
 z.string.tr.auth_error_suspended = 'Bu hesap artık giriş yapmak için yeterli yetkiye sahip değil.';
 z.string.tr.auth_error_sign_in = 'Lütfen bilgilerinizi doğrulayıp öyle tekrar deneyiniz.';
 
-z.string.tr.call_state_outgoing = 'Çalıyor…';
-z.string.tr.call_state_connecting = 'Bağlanıyor…';
-z.string.tr.call_state_incoming = 'Arıyor…';
+z.string.tr.callStateOutgoing = 'Çalıyor…';
+z.string.tr.callStateConnecting = 'Bağlanıyor…';
+z.string.tr.callStateIncoming = 'Arıyor…';
 z.string.tr.callDecline = 'Reddet';
 z.string.tr.callAccept = 'Kabul et';
 z.string.tr.callJoin = 'Katıl';
 z.string.tr.callChooseSharedScreen = 'Paylaşmak için bir ekran seçin';
-z.string.tr.call_participants = '{{number}} çağrıda';
+z.string.tr.callParticipants = '{{number}} çağrıda';
 
 z.string.tr.modal_button_cancel = 'İptal';
 z.string.tr.modal_button_ok = 'Tamam';
@@ -290,13 +290,13 @@ z.string.tr.takeoverLink = 'Daha fazla bilgi';
 z.string.tr.takeoverButtonChoose = 'Kendininkini seç';
 z.string.tr.takeoverButtonKeep = 'Bunu sakla';
 
-z.string.tr.invite_meta_key_mac = 'Cmd';
-z.string.tr.invite_meta_key_pc = 'Ctrl';
-z.string.tr.invite_hint_selected = 'Kopyalamak için {{meta_key}} + C';
-z.string.tr.invite_hint_unselected = 'Seç ve {{meta_key}} + C tuşlarına bas';
-z.string.tr.invite_headline = 'İnsanların Wire’a davet et';
-z.string.tr.invite_message = 'Wire’dayım, {{username}} olarak arat ya da get.wire.com adresini ziyaret et.';
-z.string.tr.invite_message_no_email = 'Wire’dayım. get.wire.com ’u ziyaret ederek bana bağlanabilirsin.';
+z.string.tr.inviteMetaKeyMac = 'Cmd';
+z.string.tr.inviteMetaKeyPc = 'Ctrl';
+z.string.tr.inviteHintSelected = 'Kopyalamak için {{meta_key}} + C';
+z.string.tr.inviteHintUnselected = 'Seç ve {{meta_key}} + C tuşlarına bas';
+z.string.tr.inviteHeadline = 'İnsanların Wire’a davet et';
+z.string.tr.inviteMessage = 'Wire’dayım, {{username}} olarak arat ya da get.wire.com adresini ziyaret et.';
+z.string.tr.inviteMessageNoEmail = 'Wire’dayım. get.wire.com ’u ziyaret ederek bana bağlanabilirsin.';
 
 z.string.tr.extensions_bubble_button_gif = 'Gif';
 
@@ -460,11 +460,11 @@ z.string.tr.search_try_search = 'İnsanları isimlerine veya kullanıcı adları
 z.string.tr.search_no_contacts_on_wire = 'Wire’da hiç kişiniz yok. İnsanları isimlerine veya kullanıcı adlarına göre bulmayı deneyin.';
 z.string.tr.search_others = 'Bağlan';
 
-z.string.tr.upload_google_headline = 'Konuşmak için\ninsanları bul.';
-z.string.tr.upload_google_message = 'İletişim verilerinizi sizi başkalarıyla bağlayabilmek için kullanıyoruz. Tüm bilgilerinizi gizler ve kimseyle paylaşmayız.';
-z.string.tr.upload_google_headline_error = 'Bir şeyler \nyanlış gitti.';
-z.string.tr.upload_google_message_error = 'Bilgilerinzi alamadık. Lütfen kişileriniz yeniden içe aktarmayı deneyin.';
-z.string.tr.upload_google_button_again = 'Tekrar deneyin';
+z.string.tr.uploadGoogleHeadline = 'Konuşmak için\ninsanları bul.';
+z.string.tr.uploadGoogleMessage = 'İletişim verilerinizi sizi başkalarıyla bağlayabilmek için kullanıyoruz. Tüm bilgilerinizi gizler ve kimseyle paylaşmayız.';
+z.string.tr.uploadGoogleHeadlineError = 'Bir şeyler \nyanlış gitti.';
+z.string.tr.uploadGoogleMessageError = 'Bilgilerinzi alamadık. Lütfen kişileriniz yeniden içe aktarmayı deneyin.';
+z.string.tr.uploadGoogleButtonAgain = 'Tekrar deneyin';
 
 z.string.tr.warning_call_detail = 'Sesli aramalar yapmak için tarayıcınızın mikrofona erişim izni alması gerekir.';
 z.string.tr.warning_call_headline = 'Mikrofon olmadan arama yapılamaz';

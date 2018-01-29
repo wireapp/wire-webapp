@@ -84,9 +84,9 @@ z.string.hr.auth_error_phone_number_invalid = 'Nevažeći broj';
 z.string.hr.auth_error_phone_number_unknown = 'Nepoznat broj';
 z.string.hr.auth_error_sign_in = 'Molimo provjerite vaše podatke i pokušajte ponovno.';
 
-z.string.hr.call_state_outgoing = 'Zvoni...';
-z.string.hr.call_state_connecting = 'Povezivanje…';
-z.string.hr.call_state_incoming = 'Pozivanje…';
+z.string.hr.callStateOutgoing = 'Zvoni...';
+z.string.hr.callStateConnecting = 'Povezivanje…';
+z.string.hr.callStateIncoming = 'Pozivanje…';
 z.string.hr.callDecline = 'Odbij';
 z.string.hr.callAccept = 'Prihvati';
 z.string.hr.callJoin = 'Pridruži se';
@@ -250,11 +250,11 @@ z.string.hr.takeoverLink = 'Saznaj više';
 z.string.hr.takeoverButtonChoose = 'Odaberite vlastitu';
 z.string.hr.takeoverButtonKeep = 'Zadrži ovu';
 
-z.string.hr.invite_meta_key_mac = 'Cmd';
-z.string.hr.invite_meta_key_pc = 'Ctrl';
-z.string.hr.invite_hint_selected = 'Pritisnite {{meta_key}} + C za kopiranje';
-z.string.hr.invite_hint_unselected = 'Odaberite i pritisnite {{meta_key}} + C';
-z.string.hr.invite_headline = 'Pozvati ljude na Wire';
+z.string.hr.inviteMetaKeyMac = 'Cmd';
+z.string.hr.inviteMetaKeyPc = 'Ctrl';
+z.string.hr.inviteHintSelected = 'Pritisnite {{meta_key}} + C za kopiranje';
+z.string.hr.inviteHintUnselected = 'Odaberite i pritisnite {{meta_key}} + C';
+z.string.hr.inviteHeadline = 'Pozvati ljude na Wire';
 
 z.string.hr.extensions_bubble_button_gif = 'Gif';
 
@@ -403,11 +403,11 @@ z.string.hr.search_try_search = 'Traženje ljudi po imenu ili korisničkom imenu
 z.string.hr.search_no_contacts_on_wire = 'Nemate veza na Wire. Pokušajte pronaći ljude po imenu ili korisničkom imenu.';
 z.string.hr.search_others = 'Poveži se';
 
-z.string.hr.upload_google_headline = 'Pronađi ljude za razgovor.';
-z.string.hr.upload_google_message = 'Mi koristimo vaše kontakt podatke za povezivanje s drugima. Sve informacije su anonimiziane i nisu dijeljene s drugima.';
-z.string.hr.upload_google_headline_error = 'Nešto je pogrešno.';
-z.string.hr.upload_google_message_error = 'Nismo dobili podatke. Pokušajte ponovno uvesti svoje kontakte.';
-z.string.hr.upload_google_button_again = 'Pokušaj ponovno';
+z.string.hr.uploadGoogleHeadline = 'Pronađi ljude za razgovor.';
+z.string.hr.uploadGoogleMessage = 'Mi koristimo vaše kontakt podatke za povezivanje s drugima. Sve informacije su anonimiziane i nisu dijeljene s drugima.';
+z.string.hr.uploadGoogleHeadlineError = 'Nešto je pogrešno.';
+z.string.hr.uploadGoogleMessageError = 'Nismo dobili podatke. Pokušajte ponovno uvesti svoje kontakte.';
+z.string.hr.uploadGoogleButtonAgain = 'Pokušaj ponovno';
 
 z.string.hr.warning_call_detail = 'Your browser needs access to the microphone to make calls.';
 z.string.hr.warning_call_headline = 'Poziv nije moguć bez mikrofona';

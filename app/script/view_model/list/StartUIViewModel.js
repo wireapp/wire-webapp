@@ -183,17 +183,17 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
     // Invite bubble
     this.invite_bubble = null;
-    this.invite_message = ko.observable('');
+    this.inviteMessage = ko.observable('');
     this.invite_message_selected = ko.observable(true);
     this.invite_hints = ko.pureComputed(() => {
       const meta_key = z.util.Environment.os.mac
-        ? z.l10n.text(z.string.invite_meta_key_mac)
-        : z.l10n.text(z.string.invite_meta_key_pc);
+        ? z.l10n.text(z.string.inviteMetaKeyMac)
+        : z.l10n.text(z.string.inviteMetaKeyPc);
 
       if (this.invite_message_selected()) {
-        return z.l10n.text(z.string.invite_hint_selected, meta_key);
+        return z.l10n.text(z.string.inviteHintSelected, meta_key);
       }
-      return z.l10n.text(z.string.invite_hint_unselected, meta_key);
+      return z.l10n.text(z.string.inviteHintUnselected, meta_key);
     });
 
     // Selected user bubble
@@ -482,9 +482,9 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       const self = this.user_repository.self();
 
       if (self.username()) {
-        this.invite_message(z.l10n.text(z.string.invite_message, `@${self.username()}`));
+        this.inviteMessage(z.l10n.text(z.string.inviteMessage, `@${self.username()}`));
       } else {
-        this.invite_message(z.l10n.text(z.string.invite_message_no_email));
+        this.inviteMessage(z.l10n.text(z.string.inviteMessageNoEmail));
       }
 
       this.invite_bubble = new zeta.webapp.module.Bubble({

@@ -94,14 +94,14 @@ z.string.ru.auth_error_phone_number_unknown = 'Неизвестный номер
 z.string.ru.auth_error_suspended = 'У этой учетной записи истек срок действия авторизации.';
 z.string.ru.auth_error_sign_in = 'Пожалуйста, проверьте ваши данные\nи попробуйте еще раз.';
 
-z.string.ru.call_state_outgoing = 'Звонит…';
-z.string.ru.call_state_connecting = 'Подключение…';
-z.string.ru.call_state_incoming = 'Звонит…';
+z.string.ru.callStateOutgoing = 'Звонит…';
+z.string.ru.callStateConnecting = 'Подключение…';
+z.string.ru.callStateIncoming = 'Звонит…';
 z.string.ru.callDecline = 'Отменить';
 z.string.ru.callAccept = 'Принять';
 z.string.ru.callJoin = 'Присоединиться';
 z.string.ru.callChooseSharedScreen = 'Выберите экран для демонстрации';
-z.string.ru.call_participants = '{{number}} участвуют(ет) в звонке';
+z.string.ru.callParticipants = '{{number}} участвуют(ет) в звонке';
 
 z.string.ru.modal_button_cancel = 'Отменить';
 z.string.ru.modal_button_ok = 'OK';
@@ -290,13 +290,13 @@ z.string.ru.takeoverLink = 'Подробнее';
 z.string.ru.takeoverButtonChoose = 'Выбрать своё';
 z.string.ru.takeoverButtonKeep = 'Оставить это';
 
-z.string.ru.invite_meta_key_mac = 'Cmd';
-z.string.ru.invite_meta_key_pc = 'Ctrl';
-z.string.ru.invite_hint_selected = 'Нажмите {{meta_key}} + C для копирования';
-z.string.ru.invite_hint_unselected = 'Выделите и нажмите {{meta_key}} + C';
-z.string.ru.invite_headline = 'Пригласите людей в Wire';
-z.string.ru.invite_message = 'Я в Wire, ищи меня там по имени пользователя {{username}} или зайди на сайт get.wire.com.';
-z.string.ru.invite_message_no_email = 'Я использую Wire. Перейди на get.wire.com, чтобы связаться со мной.';
+z.string.ru.inviteMetaKeyMac = 'Cmd';
+z.string.ru.inviteMetaKeyPc = 'Ctrl';
+z.string.ru.inviteHintSelected = 'Нажмите {{meta_key}} + C для копирования';
+z.string.ru.inviteHintUnselected = 'Выделите и нажмите {{meta_key}} + C';
+z.string.ru.inviteHeadline = 'Пригласите людей в Wire';
+z.string.ru.inviteMessage = 'Я в Wire, ищи меня там по имени пользователя {{username}} или зайди на сайт get.wire.com.';
+z.string.ru.inviteMessageNoEmail = 'Я использую Wire. Перейди на get.wire.com, чтобы связаться со мной.';
 
 z.string.ru.extensions_bubble_button_gif = 'Gif';
 
@@ -460,11 +460,11 @@ z.string.ru.search_try_search = 'Найдите людей по имени\nил
 z.string.ru.search_no_contacts_on_wire = 'У вас нет контактов в Wire.\nПопробуйте найти людей по имени\nили имени пользователя.';
 z.string.ru.search_others = 'Связаться';
 
-z.string.ru.upload_google_headline = 'Найти людей,\nчтобы поговорить.';
-z.string.ru.upload_google_message = 'Мы используем ваши контактные данные, чтобы соединить вас с другими пользователями. Мы анонимизируем всю информацию и не делимся ей с кем-либо еще.';
-z.string.ru.upload_google_headline_error = 'Что-то \nпошло не так.';
-z.string.ru.upload_google_message_error = 'Мы не получили вашу информацию. Пожалуйста, попробуйте импортировать ваши контакты еще раз.';
-z.string.ru.upload_google_button_again = 'Повторить';
+z.string.ru.uploadGoogleHeadline = 'Найти людей,\nчтобы поговорить.';
+z.string.ru.uploadGoogleMessage = 'Мы используем ваши контактные данные, чтобы соединить вас с другими пользователями. Мы анонимизируем всю информацию и не делимся ей с кем-либо еще.';
+z.string.ru.uploadGoogleHeadlineError = 'Что-то \nпошло не так.';
+z.string.ru.uploadGoogleMessageError = 'Мы не получили вашу информацию. Пожалуйста, попробуйте импортировать ваши контакты еще раз.';
+z.string.ru.uploadGoogleButtonAgain = 'Повторить';
 
 z.string.ru.warning_call_detail = 'Вашему браузеру необходим доступ к микрофону для совершения звонков.';
 z.string.ru.warning_call_headline = 'Невозможно позвонить без доступа к микрофону';

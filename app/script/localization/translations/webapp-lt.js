@@ -94,14 +94,14 @@ z.string.lt.auth_error_phone_number_unknown = 'Nežinomas telefono numeris';
 z.string.lt.auth_error_suspended = 'Ši paskyra daugiau nebeturi įgaliojimų prisijungti.';
 z.string.lt.auth_error_sign_in = 'Patvirtinkite savo duomenis ir bandykite dar kartą.';
 
-z.string.lt.call_state_outgoing = 'Kviečiama…';
-z.string.lt.call_state_connecting = 'Sujungiama…';
-z.string.lt.call_state_incoming = 'Skambinama…';
+z.string.lt.callStateOutgoing = 'Kviečiama…';
+z.string.lt.callStateConnecting = 'Sujungiama…';
+z.string.lt.callStateIncoming = 'Skambinama…';
 z.string.lt.callDecline = 'Atmesti';
 z.string.lt.callAccept = 'Priimti';
 z.string.lt.callJoin = 'Prisijungti';
 z.string.lt.callChooseSharedScreen = 'Pasirinkite ekraną, kurį bendrinti';
-z.string.lt.call_participants = '{{number}} kalba';
+z.string.lt.callParticipants = '{{number}} kalba';
 
 z.string.lt.modal_button_cancel = 'Atsisakyti';
 z.string.lt.modal_button_ok = 'Gerai';
@@ -291,13 +291,13 @@ z.string.lt.takeoverLink = 'Sužinoti daugiau';
 z.string.lt.takeoverButtonChoose = 'Pasirinkti savo asmeninį';
 z.string.lt.takeoverButtonKeep = 'Palikti šį';
 
-z.string.lt.invite_meta_key_mac = 'Cmd';
-z.string.lt.invite_meta_key_pc = 'Ctrl';
-z.string.lt.invite_hint_selected = 'Norėdami nukopijuoti, paspauskite {{meta_key}} + C';
-z.string.lt.invite_hint_unselected = 'Pažymėkite ir paspauskite {{meta_key}} + C';
-z.string.lt.invite_headline = 'Pakvieskite žmones į Wire';
-z.string.lt.invite_message = 'Aš naudoju Wire. Ieškokite manęs kaip {{username}} arba apsilankykite get.wire.com.';
-z.string.lt.invite_message_no_email = 'Aš naudoju Wire. Apsilankyk get.wire.com , kad su manimi susisiektum.';
+z.string.lt.inviteMetaKeyMac = 'Cmd';
+z.string.lt.inviteMetaKeyPc = 'Ctrl';
+z.string.lt.inviteHintSelected = 'Norėdami nukopijuoti, paspauskite {{meta_key}} + C';
+z.string.lt.inviteHintUnselected = 'Pažymėkite ir paspauskite {{meta_key}} + C';
+z.string.lt.inviteHeadline = 'Pakvieskite žmones į Wire';
+z.string.lt.inviteMessage = 'Aš naudoju Wire. Ieškokite manęs kaip {{username}} arba apsilankykite get.wire.com.';
+z.string.lt.inviteMessageNoEmail = 'Aš naudoju Wire. Apsilankyk get.wire.com , kad su manimi susisiektum.';
 
 z.string.lt.extensions_bubble_button_gif = 'Gif';
 
@@ -461,11 +461,11 @@ z.string.lt.search_try_search = 'Raskite žmones pagal vardą arba naudotojo var
 z.string.lt.search_no_contacts_on_wire = 'Jūs neturite Wire kontaktų.\nPabandykite rasti žmones pagal\nvardą arba naudotojo vardą.';
 z.string.lt.search_others = 'Užmegzti kontaktą';
 
-z.string.lt.upload_google_headline = 'Raskite žmones\nsu kuriais pasikalbėti.';
-z.string.lt.upload_google_message = 'Mes naudojame jūsų kontaktinius duomenis tam, kad padėtume jums užmegzti kontaktą su kitais. Mes padarome visą informaciją anoniminę ir su niekuo ja nesidaliname.';
-z.string.lt.upload_google_headline_error = 'Kažkas\nnutiko.';
-z.string.lt.upload_google_message_error = 'Mes negavome jūsų informacijos. Bandykite importuoti savo kontaktus dar kartą.';
-z.string.lt.upload_google_button_again = 'Bandyti dar kartą';
+z.string.lt.uploadGoogleHeadline = 'Raskite žmones\nsu kuriais pasikalbėti.';
+z.string.lt.uploadGoogleMessage = 'Mes naudojame jūsų kontaktinius duomenis tam, kad padėtume jums užmegzti kontaktą su kitais. Mes padarome visą informaciją anoniminę ir su niekuo ja nesidaliname.';
+z.string.lt.uploadGoogleHeadlineError = 'Kažkas\nnutiko.';
+z.string.lt.uploadGoogleMessageError = 'Mes negavome jūsų informacijos. Bandykite importuoti savo kontaktus dar kartą.';
+z.string.lt.uploadGoogleButtonAgain = 'Bandyti dar kartą';
 
 z.string.lt.warning_call_detail = 'Norint skambinti, jūsų naršyklei reikia prieigos prie jūsų mikrofono.';
 z.string.lt.warning_call_headline = 'Nepavyksta skambinti be mikrofono';

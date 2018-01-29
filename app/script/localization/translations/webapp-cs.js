@@ -92,14 +92,14 @@ z.string.cs.auth_error_phone_number_unknown = 'Neznámé telefonní číslo';
 z.string.cs.auth_error_suspended = 'Pro tento účet již není povoleno se přihlásit.';
 z.string.cs.auth_error_sign_in = 'Zkontrolujte své údaje a zkuste znovu.';
 
-z.string.cs.call_state_outgoing = 'Zvoní…';
-z.string.cs.call_state_connecting = 'Připojuji…';
-z.string.cs.call_state_incoming = 'Volá…';
+z.string.cs.callStateOutgoing = 'Zvoní…';
+z.string.cs.callStateConnecting = 'Připojuji…';
+z.string.cs.callStateIncoming = 'Volá…';
 z.string.cs.callDecline = 'Zamítnout';
 z.string.cs.callAccept = 'Přijmout';
 z.string.cs.callJoin = 'Vstoupit';
 z.string.cs.callChooseSharedScreen = 'Vybrat obrazovku ke sdílení';
-z.string.cs.call_participants = '{{number}} se účastní hovoru';
+z.string.cs.callParticipants = '{{number}} se účastní hovoru';
 
 z.string.cs.modal_button_cancel = 'Zrušit';
 z.string.cs.modal_button_ok = 'Ok';
@@ -288,13 +288,13 @@ z.string.cs.takeoverLink = 'Dozvědět se více';
 z.string.cs.takeoverButtonChoose = 'Vyberte své vlastní';
 z.string.cs.takeoverButtonKeep = 'Ponechat tento';
 
-z.string.cs.invite_meta_key_mac = 'Cmd';
-z.string.cs.invite_meta_key_pc = 'Ctrl';
-z.string.cs.invite_hint_selected = 'Stiskněte {{meta_key}} + C pro kopírování';
-z.string.cs.invite_hint_unselected = 'Vybrat a stisknout {{meta_key}} + C';
-z.string.cs.invite_headline = 'Pozvat lidi do aplikace Wire';
-z.string.cs.invite_message = 'Jsem na Wire, hledejte {{username}} nebo navštivte get.wire.com.';
-z.string.cs.invite_message_no_email = 'Jsem k zastižení na síti Wire. K navázání kontaktu navštivte https://get.wire.com.';
+z.string.cs.inviteMetaKeyMac = 'Cmd';
+z.string.cs.inviteMetaKeyPc = 'Ctrl';
+z.string.cs.inviteHintSelected = 'Stiskněte {{meta_key}} + C pro kopírování';
+z.string.cs.inviteHintUnselected = 'Vybrat a stisknout {{meta_key}} + C';
+z.string.cs.inviteHeadline = 'Pozvat lidi do aplikace Wire';
+z.string.cs.inviteMessage = 'Jsem na Wire, hledejte {{username}} nebo navštivte get.wire.com.';
+z.string.cs.inviteMessageNoEmail = 'Jsem k zastižení na síti Wire. K navázání kontaktu navštivte https://get.wire.com.';
 
 z.string.cs.extensions_bubble_button_gif = 'Gif';
 
@@ -456,11 +456,11 @@ z.string.cs.search_try_search = 'Vyhledávání osob podle\nvlastního nebo uži
 z.string.cs.search_no_contacts_on_wire = 'V aplikaci Wire nemáte žádné kontakty.\nZkuste vyhledat kontakty podle jména nebo\nuživatelského jména.';
 z.string.cs.search_others = 'Připojit';
 
-z.string.cs.upload_google_headline = 'Najít kontakty\npro konverzaci.';
-z.string.cs.upload_google_message = 'Vaše údaje o kontaktech používáme k propojení s ostatními uživateli. Všechny informace anonymizujeme a nesdílíme je s nikým dalším.';
-z.string.cs.upload_google_headline_error = 'Něco se\npokazilo.';
-z.string.cs.upload_google_message_error = 'Neobdrželi jsme vaše data. Zkuste prosím kontakty importovat znovu.';
-z.string.cs.upload_google_button_again = 'Zkusit znovu';
+z.string.cs.uploadGoogleHeadline = 'Najít kontakty\npro konverzaci.';
+z.string.cs.uploadGoogleMessage = 'Vaše údaje o kontaktech používáme k propojení s ostatními uživateli. Všechny informace anonymizujeme a nesdílíme je s nikým dalším.';
+z.string.cs.uploadGoogleHeadlineError = 'Něco se\npokazilo.';
+z.string.cs.uploadGoogleMessageError = 'Neobdrželi jsme vaše data. Zkuste prosím kontakty importovat znovu.';
+z.string.cs.uploadGoogleButtonAgain = 'Zkusit znovu';
 
 z.string.cs.warning_call_detail = 'Pro volání potřebuje prohlížeč přístup k mikrofonu.';
 z.string.cs.warning_call_headline = 'Nelze volat bez mikrofonu';

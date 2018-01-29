@@ -94,14 +94,14 @@ z.string.hu.auth_error_phone_number_unknown = 'Ismeretlen telefonszám';
 z.string.hu.auth_error_suspended = 'Ezzel az azonosítóval már nem lehet bejelentkezni.';
 z.string.hu.auth_error_sign_in = 'Kérjük, ellenőrizd az adataid, majd próbáld meg újra.';
 
-z.string.hu.call_state_outgoing = 'Kicsengés…';
-z.string.hu.call_state_connecting = 'Csatlakozás…';
-z.string.hu.call_state_incoming = 'Hívás…';
+z.string.hu.callStateOutgoing = 'Kicsengés…';
+z.string.hu.callStateConnecting = 'Csatlakozás…';
+z.string.hu.callStateIncoming = 'Hívás…';
 z.string.hu.callDecline = 'Elutasítás';
 z.string.hu.callAccept = 'Elfogadás';
 z.string.hu.callJoin = 'Csatlakozás';
 z.string.hu.callChooseSharedScreen = 'Válaszd ki a megosztandó képernyőt';
-z.string.hu.call_participants = '{{number}} partner a vonalban';
+z.string.hu.callParticipants = '{{number}} partner a vonalban';
 
 z.string.hu.modal_button_cancel = 'Mégsem';
 z.string.hu.modal_button_ok = 'Ok';
@@ -291,13 +291,13 @@ z.string.hu.takeoverLink = 'További információ';
 z.string.hu.takeoverButtonChoose = 'Válaszd ki a sajátod';
 z.string.hu.takeoverButtonKeep = 'Tartsd meg ezt';
 
-z.string.hu.invite_meta_key_mac = 'Cmd';
-z.string.hu.invite_meta_key_pc = 'Ctrl';
-z.string.hu.invite_hint_selected = 'Nyomd meg a {{meta_key}} + C billentyűkombinációt a másoláshoz';
-z.string.hu.invite_hint_unselected = 'Jelöld ki a szöveget, majd nyomd meg a {{meta_key}} + C billentyűkombinációt';
-z.string.hu.invite_headline = 'Hívj meg másokat is a Wire-re';
-z.string.hu.invite_message = 'Fent vagyok a Wire-ön. Keress rá a felhasználónevemre: {{username}} vagy nyisd meg a get.wire.com weboldalt.';
-z.string.hu.invite_message_no_email = 'Fent vagyok a Wire-ön. Látogass el a get.wire.com weboldalra és lépj kapcsolatba velem.';
+z.string.hu.inviteMetaKeyMac = 'Cmd';
+z.string.hu.inviteMetaKeyPc = 'Ctrl';
+z.string.hu.inviteHintSelected = 'Nyomd meg a {{meta_key}} + C billentyűkombinációt a másoláshoz';
+z.string.hu.inviteHintUnselected = 'Jelöld ki a szöveget, majd nyomd meg a {{meta_key}} + C billentyűkombinációt';
+z.string.hu.inviteHeadline = 'Hívj meg másokat is a Wire-re';
+z.string.hu.inviteMessage = 'Fent vagyok a Wire-ön. Keress rá a felhasználónevemre: {{username}} vagy nyisd meg a get.wire.com weboldalt.';
+z.string.hu.inviteMessageNoEmail = 'Fent vagyok a Wire-ön. Látogass el a get.wire.com weboldalra és lépj kapcsolatba velem.';
 
 z.string.hu.extensions_bubble_button_gif = 'Gif';
 
@@ -461,11 +461,11 @@ z.string.hu.search_try_search = 'Partnerek keresése\nnév vagy felhasználóné
 z.string.hu.search_no_contacts_on_wire = 'Nincsenek névjegyeid a Wire-ön.\nPróbálj új partnereket keresni, \nnév vagy @felhasználónév alapján.';
 z.string.hu.search_others = 'Kapcsolatfelvétel';
 
-z.string.hu.upload_google_headline = 'Keress partnereket\na Wire-ön.';
-z.string.hu.upload_google_message = 'A névjegyeid importálásával könnyebben kapcsolatba léphetsz másokkal. Minden információt anonimizálunk, és semmit nem osszuk meg senki mással.';
-z.string.hu.upload_google_headline_error = 'Valami nem stimmel.';
-z.string.hu.upload_google_message_error = 'Nem kaptuk meg az adataidat. Kérjük, próbáld meg újra a névjegyek importálását.';
-z.string.hu.upload_google_button_again = 'Újra próbálás';
+z.string.hu.uploadGoogleHeadline = 'Keress partnereket\na Wire-ön.';
+z.string.hu.uploadGoogleMessage = 'A névjegyeid importálásával könnyebben kapcsolatba léphetsz másokkal. Minden információt anonimizálunk, és semmit nem osszuk meg senki mással.';
+z.string.hu.uploadGoogleHeadlineError = 'Valami nem stimmel.';
+z.string.hu.uploadGoogleMessageError = 'Nem kaptuk meg az adataidat. Kérjük, próbáld meg újra a névjegyek importálását.';
+z.string.hu.uploadGoogleButtonAgain = 'Újra próbálás';
 
 z.string.hu.url_support_root = '/';
 z.string.hu.url_support_articles = '/hc/en-us/articles/';

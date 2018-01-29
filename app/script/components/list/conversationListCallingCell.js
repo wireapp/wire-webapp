@@ -59,7 +59,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
 
     this.users = ko.pureComputed(() => this.conversation.participating_user_ets());
     this.call = ko.pureComputed(() => this.conversation.call());
-    this.call_participants = ko.pureComputed(() => {
+    this.callParticipants = ko.pureComputed(() => {
       return this.call()
         .participants()
         .map(participant_et => participant_et.user);
@@ -68,8 +68,8 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     const MAX_DISPLAYED_PARTICIPANTS = 9;
     this.call_participants_rest = ko.observable(0);
     this.call_participants_displayed = ko.pureComputed(() => {
-      const displayed_user_ets = this.call_participants().slice(0, MAX_DISPLAYED_PARTICIPANTS);
-      this.call_participants_rest(this.call_participants().length - displayed_user_ets.length);
+      const displayed_user_ets = this.callParticipants().slice(0, MAX_DISPLAYED_PARTICIPANTS);
+      this.call_participants_rest(this.callParticipants().length - displayed_user_ets.length);
       return displayed_user_ets;
     });
 
@@ -127,7 +127,7 @@ z.components.ConversationListCallingCell = class ConversationListCallingCell {
     };
 
     this.participants_button_label = ko.pureComputed(() => {
-      return z.l10n.text(z.string.call_participants, this.call_participants().length);
+      return z.l10n.text(z.string.callParticipants, this.callParticipants().length);
     });
 
     this.show_participants_button = ko.pureComputed(() => {
@@ -152,10 +152,10 @@ ko.components.register('conversation-list-calling-cell', {
       <div class="conversation-list-cell-center">
         <span class="conversation-list-cell-name" data-bind="text: conversation.display_name(), css: {'text-theme': is_selected(conversation)}"></span>
         <!-- ko if: call_is_outgoing -->
-          <span class="conversation-list-cell-description" data-bind="l10n_text: z.string.call_state_outgoing" data-uie-name="call-label-outgoing"></span>
+          <span class="conversation-list-cell-description" data-bind="l10n_text: z.string.callStateOutgoing" data-uie-name="call-label-outgoing"></span>
         <!-- /ko -->
         <!-- ko if: call_is_incoming -->
-          <span class="conversation-list-cell-description" data-bind="l10n_text: z.string.call_state_incoming" data-uie-name="call-label-incoming"></span>
+          <span class="conversation-list-cell-description" data-bind="l10n_text: z.string.callStateIncoming" data-uie-name="call-label-incoming"></span>
         <!-- /ko -->
         <!-- ko if: show_call_timer -->
           <span class="conversation-list-cell-description" data-bind="text: z.util.format_seconds(call().duration_time())" data-uie-name="call-duration"></span>

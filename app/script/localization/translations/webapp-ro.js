@@ -94,14 +94,14 @@ z.string.ro.auth_error_phone_number_unknown = 'Număr de telefon necunoscut';
 z.string.ro.auth_error_suspended = 'Acest cont nu mai este autorizat pentru autentificare.';
 z.string.ro.auth_error_sign_in = 'Te rugăm să verifici detaliile și să reîncerci.';
 
-z.string.ro.call_state_outgoing = 'Se sună…';
-z.string.ro.call_state_connecting = 'Se conectează…';
-z.string.ro.call_state_incoming = 'Se apelează…';
+z.string.ro.callStateOutgoing = 'Se sună…';
+z.string.ro.callStateConnecting = 'Se conectează…';
+z.string.ro.callStateIncoming = 'Se apelează…';
 z.string.ro.callDecline = 'Refuză';
 z.string.ro.callAccept = 'Acceptă';
 z.string.ro.callJoin = 'Alătură-te';
 z.string.ro.callChooseSharedScreen = 'Alege un ecran pentru a partaja';
-z.string.ro.call_participants = '{{number}} în apel';
+z.string.ro.callParticipants = '{{number}} în apel';
 
 z.string.ro.modal_button_cancel = 'Renunță';
 z.string.ro.modal_button_ok = 'Ok';
@@ -291,13 +291,13 @@ z.string.ro.takeoverLink = 'Află mai multe';
 z.string.ro.takeoverButtonChoose = 'Alege propriul nume';
 z.string.ro.takeoverButtonKeep = 'Păstrează acest nume';
 
-z.string.ro.invite_meta_key_mac = 'Cmd';
-z.string.ro.invite_meta_key_pc = 'Ctrl';
-z.string.ro.invite_hint_selected = 'Apasă {{meta_key}} + C pentru a copia';
-z.string.ro.invite_hint_unselected = 'Selectează și apasă {{meta_key}} + C';
-z.string.ro.invite_headline = 'Invită persoane pe Wire';
-z.string.ro.invite_message = 'Bună, sunt pe Wire. Caută-mă cu numele {{username}} sau vizitează get.wire.com.';
-z.string.ro.invite_message_no_email = 'Sunt pe Wire. Vizitează get.wire.com pentru a te conecta cu mine.';
+z.string.ro.inviteMetaKeyMac = 'Cmd';
+z.string.ro.inviteMetaKeyPc = 'Ctrl';
+z.string.ro.inviteHintSelected = 'Apasă {{meta_key}} + C pentru a copia';
+z.string.ro.inviteHintUnselected = 'Selectează și apasă {{meta_key}} + C';
+z.string.ro.inviteHeadline = 'Invită persoane pe Wire';
+z.string.ro.inviteMessage = 'Bună, sunt pe Wire. Caută-mă cu numele {{username}} sau vizitează get.wire.com.';
+z.string.ro.inviteMessageNoEmail = 'Sunt pe Wire. Vizitează get.wire.com pentru a te conecta cu mine.';
 
 z.string.ro.extensions_bubble_button_gif = 'Gif';
 
@@ -460,11 +460,11 @@ z.string.ro.search_try_search = 'Caută oameni după\nnume sau nume utilizator';
 z.string.ro.search_no_contacts_on_wire = 'Nu ai contacte pe Wire.\nÎncearcă să găsește oameni după\nnume sau nume utilizator.';
 z.string.ro.search_others = 'Conectare';
 
-z.string.ro.upload_google_headline = 'Caută persoane\ncu care să vorbești.';
-z.string.ro.upload_google_message = 'Vom folosi datele tale de contact pentru a te conecta cu alții. Vom anonimiza toate informațiile și nu le vom împărtăși cu altcineva.';
-z.string.ro.upload_google_headline_error = 'Ceva\na mers prost.';
-z.string.ro.upload_google_message_error = 'Nu am primit nicio informație. Încearcă importarea contactelor din nou.';
-z.string.ro.upload_google_button_again = 'Reîncearcă';
+z.string.ro.uploadGoogleHeadline = 'Caută persoane\ncu care să vorbești.';
+z.string.ro.uploadGoogleMessage = 'Vom folosi datele tale de contact pentru a te conecta cu alții. Vom anonimiza toate informațiile și nu le vom împărtăși cu altcineva.';
+z.string.ro.uploadGoogleHeadlineError = 'Ceva\na mers prost.';
+z.string.ro.uploadGoogleMessageError = 'Nu am primit nicio informație. Încearcă importarea contactelor din nou.';
+z.string.ro.uploadGoogleButtonAgain = 'Reîncearcă';
 
 z.string.ro.warning_call_detail = 'Browserul tău are nevoie de acces la microfon pentru a face apeluri.';
 z.string.ro.warning_call_headline = 'Nu se poate apela fără microfon';

@@ -94,14 +94,14 @@ z.string.nl.auth_error_phone_number_unknown = 'Onbekend Telefoon Nummer';
 z.string.nl.auth_error_suspended = 'Dit account is niet langer geautoriseerd om in te loggen.';
 z.string.nl.auth_error_sign_in = 'Controleer je gegevens en probeer het nog eens.';
 
-z.string.nl.call_state_outgoing = 'Bellen…';
-z.string.nl.call_state_connecting = 'Verbinden…';
-z.string.nl.call_state_incoming = 'Bellen…';
+z.string.nl.callStateOutgoing = 'Bellen…';
+z.string.nl.callStateConnecting = 'Verbinden…';
+z.string.nl.callStateIncoming = 'Bellen…';
 z.string.nl.callDecline = 'Leg op';
 z.string.nl.callAccept = 'Neem op';
 z.string.nl.callJoin = 'Deelnemen';
 z.string.nl.callChooseSharedScreen = 'Kies een scherm om te delen';
-z.string.nl.call_participants = '{{number}} bellen';
+z.string.nl.callParticipants = '{{number}} bellen';
 
 z.string.nl.modal_button_cancel = 'Annuleer';
 z.string.nl.modal_button_ok = 'Ok';
@@ -291,13 +291,13 @@ z.string.nl.takeoverLink = 'Leer meer';
 z.string.nl.takeoverButtonChoose = 'Kies je eigen';
 z.string.nl.takeoverButtonKeep = 'Behoud deze';
 
-z.string.nl.invite_meta_key_mac = 'Cmd';
-z.string.nl.invite_meta_key_pc = 'Ctrl';
-z.string.nl.invite_hint_selected = 'Toets {{meta_key}} + C om te kopiëren';
-z.string.nl.invite_hint_unselected = 'Selecteer en toets {{meta_key}} + C';
-z.string.nl.invite_headline = 'Nodig anderen uit voor Wire';
-z.string.nl.invite_message = 'Ik gebruik Wire, zoek naar {{username}} of bezoek get.wire.com.';
-z.string.nl.invite_message_no_email = 'Ik gebruik Wire. Ga naar get.wire.com om met mij te verbinden.';
+z.string.nl.inviteMetaKeyMac = 'Cmd';
+z.string.nl.inviteMetaKeyPc = 'Ctrl';
+z.string.nl.inviteHintSelected = 'Toets {{meta_key}} + C om te kopiëren';
+z.string.nl.inviteHintUnselected = 'Selecteer en toets {{meta_key}} + C';
+z.string.nl.inviteHeadline = 'Nodig anderen uit voor Wire';
+z.string.nl.inviteMessage = 'Ik gebruik Wire, zoek naar {{username}} of bezoek get.wire.com.';
+z.string.nl.inviteMessageNoEmail = 'Ik gebruik Wire. Ga naar get.wire.com om met mij te verbinden.';
 
 z.string.nl.extensions_bubble_button_gif = 'Gif';
 
@@ -461,11 +461,11 @@ z.string.nl.search_try_search = 'Vind mensen met hun \nnaam of gebruikersnaam';
 z.string.nl.search_no_contacts_on_wire = 'Je hebt geen contacten op Wire\nProbeer mensen te vinden met hun\nnaam of gebruikersnaam.';
 z.string.nl.search_others = 'Verbind';
 
-z.string.nl.upload_google_headline = 'Zoek mensen \nom mee te praten.';
-z.string.nl.upload_google_message = 'Dit helpt je om met anderen te verbinden. We anonimiseren alle informatie en delen deze niet met iemand anders.';
-z.string.nl.upload_google_headline_error = 'Er is iets \nfout gegaan.';
-z.string.nl.upload_google_message_error = 'We hebben geen informatie ontvangen. Probeer opnieuw je contacten te importeren.';
-z.string.nl.upload_google_button_again = 'Probeer opnieuw';
+z.string.nl.uploadGoogleHeadline = 'Zoek mensen \nom mee te praten.';
+z.string.nl.uploadGoogleMessage = 'Dit helpt je om met anderen te verbinden. We anonimiseren alle informatie en delen deze niet met iemand anders.';
+z.string.nl.uploadGoogleHeadlineError = 'Er is iets \nfout gegaan.';
+z.string.nl.uploadGoogleMessageError = 'We hebben geen informatie ontvangen. Probeer opnieuw je contacten te importeren.';
+z.string.nl.uploadGoogleButtonAgain = 'Probeer opnieuw';
 
 z.string.nl.warning_call_detail = 'Uw browser heeft toegang nodig tot de microfoon om te bellen.';
 z.string.nl.warning_call_headline = 'Je kan niet bellen zonder microfoon';

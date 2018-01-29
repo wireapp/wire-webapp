@@ -92,14 +92,14 @@ z.string.pl.auth_error_phone_number_unknown = 'Nieznany numer telefonu';
 z.string.pl.auth_error_suspended = 'To konto jest już uprawnione do zalogowania się.';
 z.string.pl.auth_error_sign_in = 'Proszę sprawdzić swoje dane i spróbować ponownie.';
 
-z.string.pl.call_state_outgoing = 'Dzwoni…';
-z.string.pl.call_state_connecting = 'Łączenie…';
-z.string.pl.call_state_incoming = 'Dzwoni…';
+z.string.pl.callStateOutgoing = 'Dzwoni…';
+z.string.pl.callStateConnecting = 'Łączenie…';
+z.string.pl.callStateIncoming = 'Dzwoni…';
 z.string.pl.callDecline = 'Odrzuć';
 z.string.pl.callAccept = 'Odbierz';
 z.string.pl.callJoin = 'Dołącz';
 z.string.pl.callChooseSharedScreen = 'Wybierz ekran do współdzielenia';
-z.string.pl.call_participants = '{{number}} uczestników';
+z.string.pl.callParticipants = '{{number}} uczestników';
 
 z.string.pl.modal_button_cancel = 'Anuluj';
 z.string.pl.modal_button_ok = 'OK';
@@ -289,13 +289,13 @@ z.string.pl.takeoverLink = 'Więcej informacji';
 z.string.pl.takeoverButtonChoose = 'Wybierz swój własny';
 z.string.pl.takeoverButtonKeep = 'Zachowaj wybrany';
 
-z.string.pl.invite_meta_key_mac = 'Cmd';
-z.string.pl.invite_meta_key_pc = 'Ctrl';
-z.string.pl.invite_hint_selected = 'Naciśnij {{meta_key}} + C aby skopiować';
-z.string.pl.invite_hint_unselected = 'Wybierz opcję i naciśnij {{meta_key}} + C';
-z.string.pl.invite_headline = 'Zaproś innych do Wire';
-z.string.pl.invite_message = 'Jestem na Wire. Odszukaj {{username}}, lub odwiedź get.wire.com.';
-z.string.pl.invite_message_no_email = 'Używam Wire. Wejdź na get.wire.com aby się ze mną połączyć.';
+z.string.pl.inviteMetaKeyMac = 'Cmd';
+z.string.pl.inviteMetaKeyPc = 'Ctrl';
+z.string.pl.inviteHintSelected = 'Naciśnij {{meta_key}} + C aby skopiować';
+z.string.pl.inviteHintUnselected = 'Wybierz opcję i naciśnij {{meta_key}} + C';
+z.string.pl.inviteHeadline = 'Zaproś innych do Wire';
+z.string.pl.inviteMessage = 'Jestem na Wire. Odszukaj {{username}}, lub odwiedź get.wire.com.';
+z.string.pl.inviteMessageNoEmail = 'Używam Wire. Wejdź na get.wire.com aby się ze mną połączyć.';
 
 z.string.pl.extensions_bubble_button_gif = 'Gif';
 
@@ -458,11 +458,11 @@ z.string.pl.search_try_search = 'Znajdź osoby według nazwy lub nazwy użytkown
 z.string.pl.search_no_contacts_on_wire = 'Nie masz dodanych żadnych kontaktów Spróbuj wyszukać osoby według nazwy lub nazwy użytkownika.';
 z.string.pl.search_others = 'Połącz';
 
-z.string.pl.upload_google_headline = 'Znajdź osoby do rozmowy.';
-z.string.pl.upload_google_message = 'Wykorzystujemy Twoje dane kontaktowe do łączenia Cię z innymi. Wszystkie informacje są anonimowe i nie dzielimy ich z nikim innym.';
-z.string.pl.upload_google_headline_error = 'Ups! Coś poszło nie tak.';
-z.string.pl.upload_google_message_error = 'Nie otrzymaliśmy Twoich informacji. Spróbuj ponownie zaimportować swoje kontakty.';
-z.string.pl.upload_google_button_again = 'Spróbuj ponownie';
+z.string.pl.uploadGoogleHeadline = 'Znajdź osoby do rozmowy.';
+z.string.pl.uploadGoogleMessage = 'Wykorzystujemy Twoje dane kontaktowe do łączenia Cię z innymi. Wszystkie informacje są anonimowe i nie dzielimy ich z nikim innym.';
+z.string.pl.uploadGoogleHeadlineError = 'Ups! Coś poszło nie tak.';
+z.string.pl.uploadGoogleMessageError = 'Nie otrzymaliśmy Twoich informacji. Spróbuj ponownie zaimportować swoje kontakty.';
+z.string.pl.uploadGoogleButtonAgain = 'Spróbuj ponownie';
 
 z.string.pl.warning_call_detail = 'Aby wykonywać połączenia, Twoja przeglądarka musi mieć dostęp do mikrofonu.';
 z.string.pl.warning_call_headline = 'Nie można dzwonić bez mikrofonu';

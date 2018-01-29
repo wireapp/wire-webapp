@@ -92,14 +92,14 @@ z.string.fi.auth_error_phone_number_unknown = 'Tuntematon puhelinnumero';
 z.string.fi.auth_error_suspended = 'Tämä tili ei ole enää oikeutettu kirjautumaan sisään.';
 z.string.fi.auth_error_sign_in = 'Vahvista tietosi ja yritä uudelleen.';
 
-z.string.fi.call_state_outgoing = 'Soi…';
-z.string.fi.call_state_connecting = 'Yhdistetään…';
-z.string.fi.call_state_incoming = 'Soitetaan…';
+z.string.fi.callStateOutgoing = 'Soi…';
+z.string.fi.callStateConnecting = 'Yhdistetään…';
+z.string.fi.callStateIncoming = 'Soitetaan…';
 z.string.fi.callDecline = 'Kieltäydy';
 z.string.fi.callAccept = 'Hyväksy';
 z.string.fi.callJoin = 'Liity';
 z.string.fi.callChooseSharedScreen = 'Valitse näyttö jonka haluat jakaa';
-z.string.fi.call_participants = '{{number}} puhelussa';
+z.string.fi.callParticipants = '{{number}} puhelussa';
 
 z.string.fi.modal_button_cancel = 'Peruuta';
 z.string.fi.modal_button_ok = 'Ok';
@@ -289,13 +289,13 @@ z.string.fi.takeoverLink = 'Lue lisää';
 z.string.fi.takeoverButtonChoose = 'Valitse omasi';
 z.string.fi.takeoverButtonKeep = 'Pidä tämä';
 
-z.string.fi.invite_meta_key_mac = 'Cmd';
-z.string.fi.invite_meta_key_pc = 'Ctrl';
-z.string.fi.invite_hint_selected = 'Paina {{meta_key}} + C kopioidaksesi';
-z.string.fi.invite_hint_unselected = 'Valitse ja paina {{meta_key}} + C';
-z.string.fi.invite_headline = 'Kutsu ihmisiä Wireen';
-z.string.fi.invite_message = 'Olen Wiressä, etsi {{username}} tai mene osoitteeseen get.wire.com.';
-z.string.fi.invite_message_no_email = 'Olen Wiressä. Mene osoitteeseen get.wire.com ottaaksesi minuun yhteyttä.';
+z.string.fi.inviteMetaKeyMac = 'Cmd';
+z.string.fi.inviteMetaKeyPc = 'Ctrl';
+z.string.fi.inviteHintSelected = 'Paina {{meta_key}} + C kopioidaksesi';
+z.string.fi.inviteHintUnselected = 'Valitse ja paina {{meta_key}} + C';
+z.string.fi.inviteHeadline = 'Kutsu ihmisiä Wireen';
+z.string.fi.inviteMessage = 'Olen Wiressä, etsi {{username}} tai mene osoitteeseen get.wire.com.';
+z.string.fi.inviteMessageNoEmail = 'Olen Wiressä. Mene osoitteeseen get.wire.com ottaaksesi minuun yhteyttä.';
 
 z.string.fi.extensions_bubble_button_gif = 'Gif';
 
@@ -458,11 +458,11 @@ z.string.fi.search_try_search = 'Etsi käyttäjiä nimellä tai käyttäjänimel
 z.string.fi.search_no_contacts_on_wire = 'Sinulla ei ole kontakteja Wiressä. Yritä etsiä muita käyttäjiä nimellä tai käyttäjänimellä.';
 z.string.fi.search_others = 'Yhdistä';
 
-z.string.fi.upload_google_headline = 'Etsi ihmisiä joiden kanssa jutella.';
-z.string.fi.upload_google_message = 'Käytämme sinun kontaktitietoja yhdistääksemme sinut muiden kanssa. Anonymisoimme kaiken tiedon ja emme jaa sitä ulkopuolisille.';
-z.string.fi.upload_google_headline_error = 'Jotain meni pieleen.';
-z.string.fi.upload_google_message_error = 'Emme vastaanottaneet tietojasi. Ole hyvä ja yritä tuoda kontaktisi uudelleen.';
-z.string.fi.upload_google_button_again = 'Yritä uudelleen';
+z.string.fi.uploadGoogleHeadline = 'Etsi ihmisiä joiden kanssa jutella.';
+z.string.fi.uploadGoogleMessage = 'Käytämme sinun kontaktitietoja yhdistääksemme sinut muiden kanssa. Anonymisoimme kaiken tiedon ja emme jaa sitä ulkopuolisille.';
+z.string.fi.uploadGoogleHeadlineError = 'Jotain meni pieleen.';
+z.string.fi.uploadGoogleMessageError = 'Emme vastaanottaneet tietojasi. Ole hyvä ja yritä tuoda kontaktisi uudelleen.';
+z.string.fi.uploadGoogleButtonAgain = 'Yritä uudelleen';
 
 z.string.fi.warning_call_detail = 'Selaimellasi täytyy olla käyttöoikeus mikrofoniisi voidaksesi käydä puhelinkeskusteluja.';
 z.string.fi.warning_call_headline = 'Et voi käydä puhelinkeskusteluja ilman mikrofonia';

@@ -92,14 +92,14 @@ z.string.el.auth_error_phone_number_unknown = 'Άγνωστος αριθμός �
 z.string.el.auth_error_suspended = 'Αυτός ο λογαριασμός δεν είναι πλέον εξουσιοδοτημένος για σύνδεση.';
 z.string.el.auth_error_sign_in = 'Παρακαλούμε επιβεβαιώστε τα στοιχεία σας και προσπαθήστε ξανά.';
 
-z.string.el.call_state_outgoing = 'Καλεί…';
-z.string.el.call_state_connecting = 'Συνδέεται…';
-z.string.el.call_state_incoming = 'Καλεί…';
+z.string.el.callStateOutgoing = 'Καλεί…';
+z.string.el.callStateConnecting = 'Συνδέεται…';
+z.string.el.callStateIncoming = 'Καλεί…';
 z.string.el.callDecline = 'Απόρριψη';
 z.string.el.callAccept = 'Αποδοχή';
 z.string.el.callJoin = 'Συμμετοχή';
 z.string.el.callChooseSharedScreen = 'Επιλέξτε μια οθόνη για κοινή χρήση';
-z.string.el.call_participants = '{{number}} στο τηλεφώνημα';
+z.string.el.callParticipants = '{{number}} στο τηλεφώνημα';
 
 z.string.el.modal_button_cancel = 'Ακύρωση';
 z.string.el.modal_button_ok = 'Εντάξει';
@@ -287,13 +287,13 @@ z.string.el.takeoverLink = 'Μάθετε περισσότερα';
 z.string.el.takeoverButtonChoose = 'Επιλέξτε το δικό σας';
 z.string.el.takeoverButtonKeep = 'Κρατήστε το';
 
-z.string.el.invite_meta_key_mac = 'Cmd';
-z.string.el.invite_meta_key_pc = 'Ctrl';
-z.string.el.invite_hint_selected = 'Πατήστε {{meta_key}} + C για αντιγραφή';
-z.string.el.invite_hint_unselected = 'Επιλέξτε και Πατήστε {{meta_key}} + C';
-z.string.el.invite_headline = 'Πρόσκληση ατόμων στο Wire';
-z.string.el.invite_message = 'Είμαι στο Wire, αναζήτησε για {{username}} ή επισκέψου την ιστοσελίδα get.wire.com.';
-z.string.el.invite_message_no_email = 'Είμαι στο Wire.Επισκέψου την ιστοσελίδα get.wire.com για να συνδεθείς μαζί μου.';
+z.string.el.inviteMetaKeyMac = 'Cmd';
+z.string.el.inviteMetaKeyPc = 'Ctrl';
+z.string.el.inviteHintSelected = 'Πατήστε {{meta_key}} + C για αντιγραφή';
+z.string.el.inviteHintUnselected = 'Επιλέξτε και Πατήστε {{meta_key}} + C';
+z.string.el.inviteHeadline = 'Πρόσκληση ατόμων στο Wire';
+z.string.el.inviteMessage = 'Είμαι στο Wire, αναζήτησε για {{username}} ή επισκέψου την ιστοσελίδα get.wire.com.';
+z.string.el.inviteMessageNoEmail = 'Είμαι στο Wire.Επισκέψου την ιστοσελίδα get.wire.com για να συνδεθείς μαζί μου.';
 
 z.string.el.extensions_bubble_button_gif = 'Εικόνες Gif';
 
@@ -455,11 +455,11 @@ z.string.el.search_try_search = 'Εύρεση ατόμων βάση ονόματ
 z.string.el.search_no_contacts_on_wire = 'Δεν έχετε επαφές στο Wire. Προσπαθήστε να βρείτε άτομα με το όνομα ή το όνομα χρήστη τους.';
 z.string.el.search_others = 'Σύνδεση';
 
-z.string.el.upload_google_headline = 'Εύρεση ατόμων για συνομιλία.';
-z.string.el.upload_google_message = 'Χρησιμοποιούμε τις επαφές σας για να συνδέεστε με άλλους. Κρατάμε όλες σας τις πληροφορίες ανώνυμες και δεν τις μοιραζόμαστε με κανέναν άλλον.';
-z.string.el.upload_google_headline_error = 'Κάτι πήγε στραβά.';
-z.string.el.upload_google_message_error = 'Δεν λάβαμε πληροφορίες σας. Παρακαλούμε προσπαθήστε ξανά να εισάγετε τις επαφές σας.';
-z.string.el.upload_google_button_again = 'Προσπαθήστε ξανά';
+z.string.el.uploadGoogleHeadline = 'Εύρεση ατόμων για συνομιλία.';
+z.string.el.uploadGoogleMessage = 'Χρησιμοποιούμε τις επαφές σας για να συνδέεστε με άλλους. Κρατάμε όλες σας τις πληροφορίες ανώνυμες και δεν τις μοιραζόμαστε με κανέναν άλλον.';
+z.string.el.uploadGoogleHeadlineError = 'Κάτι πήγε στραβά.';
+z.string.el.uploadGoogleMessageError = 'Δεν λάβαμε πληροφορίες σας. Παρακαλούμε προσπαθήστε ξανά να εισάγετε τις επαφές σας.';
+z.string.el.uploadGoogleButtonAgain = 'Προσπαθήστε ξανά';
 
 z.string.el.warning_call_detail = 'Το πρόγραμμα περιήγησής σας χρειάζεται πρόσβαση στο μικρόφωνο για να κάνετε κλήσεις.';
 z.string.el.warning_call_headline = 'Αδύνατη η κλήση χωρίς μικρόφωνο';

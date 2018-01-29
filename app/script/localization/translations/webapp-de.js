@@ -94,14 +94,14 @@ z.string.de.auth_error_phone_number_unknown = 'Unbekannte Telefonnummer';
 z.string.de.auth_error_suspended = 'Benutzerkonto ist nicht mehr zum Login berechtigt.';
 z.string.de.auth_error_sign_in = 'Überprüfe deine Eingaben und versuche es erneut.';
 
-z.string.de.call_state_outgoing = 'Klingelt…';
-z.string.de.call_state_connecting = 'Verbinde…';
-z.string.de.call_state_incoming = 'Klingelt…';
+z.string.de.callStateOutgoing = 'Klingelt…';
+z.string.de.callStateConnecting = 'Verbinde…';
+z.string.de.callStateIncoming = 'Klingelt…';
 z.string.de.callDecline = 'Ablehnen';
 z.string.de.callAccept = 'Annehmen';
 z.string.de.callJoin = 'Beitreten';
 z.string.de.callChooseSharedScreen = 'Wähle einen Bildschirm aus';
-z.string.de.call_participants = '{{number}} im Anruf';
+z.string.de.callParticipants = '{{number}} im Anruf';
 
 z.string.de.modal_button_cancel = 'Abbrechen';
 z.string.de.modal_button_ok = 'Ok';
@@ -298,13 +298,13 @@ z.string.de.takeoverLink = 'Erfahre mehr';
 z.string.de.takeoverButtonChoose = 'Wähle deinen eigenen';
 z.string.de.takeoverButtonKeep = 'Behalte diesen';
 
-z.string.de.invite_meta_key_mac = 'Cmd';
-z.string.de.invite_meta_key_pc = 'Strg';
-z.string.de.invite_hint_selected = 'Zum Kopieren {{meta_key}} + C drücken';
-z.string.de.invite_hint_unselected = 'Markieren und {{meta_key}} + C drücken';
-z.string.de.invite_headline = 'Lade Freunde zu Wire ein';
-z.string.de.invite_message = 'Ich benutze Wire. Suche nach {{username}} oder gehe auf get.wire.com.';
-z.string.de.invite_message_no_email = 'Ich benutze Wire. Gehe auf get.wire.com, um mich als Kontakt hinzuzufügen.';
+z.string.de.inviteMetaKeyMac = 'Cmd';
+z.string.de.inviteMetaKeyPc = 'Strg';
+z.string.de.inviteHintSelected = 'Zum Kopieren {{meta_key}} + C drücken';
+z.string.de.inviteHintUnselected = 'Markieren und {{meta_key}} + C drücken';
+z.string.de.inviteHeadline = 'Lade Freunde zu Wire ein';
+z.string.de.inviteMessage = 'Ich benutze Wire. Suche nach {{username}} oder gehe auf get.wire.com.';
+z.string.de.inviteMessageNoEmail = 'Ich benutze Wire. Gehe auf get.wire.com, um mich als Kontakt hinzuzufügen.';
 
 z.string.de.extensions_bubble_button_gif = 'Gif';
 
@@ -473,11 +473,11 @@ z.string.de.search_no_contacts_on_wire = 'Du hast keine Kontakte auf Wire.\nSuch
 z.string.de.search_member_invite = 'Lade weitere Mitglieder ein';
 z.string.de.search_others = 'Suchergebnisse';
 
-z.string.de.upload_google_headline = 'Finde Kontakte \nauf Wire.';
-z.string.de.upload_google_message = 'Wir verwenden deine Daten, um Kontakte für dich zu erstellen. Wir anonymisieren alle Informationen und teilen sie mit niemand anderem.';
-z.string.de.upload_google_headline_error = 'Ein Fehler ist aufgetreten.';
-z.string.de.upload_google_message_error = 'Wir haben die Informationen nicht erhalten. Bitte importiere deine Kontakte erneut.';
-z.string.de.upload_google_button_again = 'Erneut versuchen';
+z.string.de.uploadGoogleHeadline = 'Finde Kontakte \nauf Wire.';
+z.string.de.uploadGoogleMessage = 'Wir verwenden deine Daten, um Kontakte für dich zu erstellen. Wir anonymisieren alle Informationen und teilen sie mit niemand anderem.';
+z.string.de.uploadGoogleHeadlineError = 'Ein Fehler ist aufgetreten.';
+z.string.de.uploadGoogleMessageError = 'Wir haben die Informationen nicht erhalten. Bitte importiere deine Kontakte erneut.';
+z.string.de.uploadGoogleButtonAgain = 'Erneut versuchen';
 
 z.string.de.url_support_root = '/hc/de';
 z.string.de.url_support_articles = '/hc/de/articles/';

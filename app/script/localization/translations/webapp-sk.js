@@ -93,14 +93,14 @@ z.string.sk.auth_error_phone_number_unknown = 'Neznáme telefónne číslo';
 z.string.sk.auth_error_suspended = 'Toto konto už nemá povolené prihlásenie.';
 z.string.sk.auth_error_sign_in = 'Prosím, skontrolujte svoje údaje a skúste to znova.';
 
-z.string.sk.call_state_outgoing = 'Zvoní…';
-z.string.sk.call_state_connecting = 'Pripájanie…';
-z.string.sk.call_state_incoming = 'Volanie…';
+z.string.sk.callStateOutgoing = 'Zvoní…';
+z.string.sk.callStateConnecting = 'Pripájanie…';
+z.string.sk.callStateIncoming = 'Volanie…';
 z.string.sk.callDecline = 'Odmietnuť';
 z.string.sk.callAccept = 'Prijať';
 z.string.sk.callJoin = 'Pripojiť';
 z.string.sk.callChooseSharedScreen = 'Vybrať obrazovku pre zdieľanie';
-z.string.sk.call_participants = '{{number}} je dostupné';
+z.string.sk.callParticipants = '{{number}} je dostupné';
 
 z.string.sk.modal_button_cancel = 'Zrušiť';
 z.string.sk.modal_button_ok = 'OK';
@@ -289,13 +289,13 @@ z.string.sk.takeoverLink = 'Zistiť viac';
 z.string.sk.takeoverButtonChoose = 'Vybrať vlastné';
 z.string.sk.takeoverButtonKeep = 'Ponechať tento';
 
-z.string.sk.invite_meta_key_mac = 'Cmd';
-z.string.sk.invite_meta_key_pc = 'Ctrl';
-z.string.sk.invite_hint_selected = 'Stlačte {{meta_key}} + C pre kopírovanie';
-z.string.sk.invite_hint_unselected = 'Vyberte a stlačte {{meta_key}} + C';
-z.string.sk.invite_headline = 'Pozvať ľudí do Wire';
-z.string.sk.invite_message = 'Používam Wire, hľadajte {{username}} alebo navštívte get.wire.com.';
-z.string.sk.invite_message_no_email = 'Používam Wire. Ak sa chcete so mnou spojiť navštívte get.wire.com.';
+z.string.sk.inviteMetaKeyMac = 'Cmd';
+z.string.sk.inviteMetaKeyPc = 'Ctrl';
+z.string.sk.inviteHintSelected = 'Stlačte {{meta_key}} + C pre kopírovanie';
+z.string.sk.inviteHintUnselected = 'Vyberte a stlačte {{meta_key}} + C';
+z.string.sk.inviteHeadline = 'Pozvať ľudí do Wire';
+z.string.sk.inviteMessage = 'Používam Wire, hľadajte {{username}} alebo navštívte get.wire.com.';
+z.string.sk.inviteMessageNoEmail = 'Používam Wire. Ak sa chcete so mnou spojiť navštívte get.wire.com.';
 
 z.string.sk.extensions_bubble_button_gif = 'Gif';
 
@@ -458,11 +458,11 @@ z.string.sk.search_try_search = 'Nájsť ľudí podľa názvu, alebo užívateľ
 z.string.sk.search_no_contacts_on_wire = 'Nemáte žiadne kontakty Wire. Skúste nájsť ľudí podľa názvu alebo užívateľského mena.';
 z.string.sk.search_others = 'Pripojiť';
 
-z.string.sk.upload_google_headline = 'Nájsť ľudí\npre rozhovor.';
-z.string.sk.upload_google_message = 'Vaše údaje o kontaktoch používame na pripojenie k iným užívateľom. Všetky informácie anonymizujeme a nezdieľame ich s nikým iným.';
-z.string.sk.upload_google_headline_error = 'Niečo sa pokazilo.';
-z.string.sk.upload_google_message_error = 'Neprijali sme Vaše informácie. Skúste prosím znovu importovať Vaše kontakty.';
-z.string.sk.upload_google_button_again = 'Skúsiť znova';
+z.string.sk.uploadGoogleHeadline = 'Nájsť ľudí\npre rozhovor.';
+z.string.sk.uploadGoogleMessage = 'Vaše údaje o kontaktoch používame na pripojenie k iným užívateľom. Všetky informácie anonymizujeme a nezdieľame ich s nikým iným.';
+z.string.sk.uploadGoogleHeadlineError = 'Niečo sa pokazilo.';
+z.string.sk.uploadGoogleMessageError = 'Neprijali sme Vaše informácie. Skúste prosím znovu importovať Vaše kontakty.';
+z.string.sk.uploadGoogleButtonAgain = 'Skúsiť znova';
 
 z.string.sk.warning_call_detail = 'Pre volanie potrebuje Váš prehliadač prístup k mikrofónu.';
 z.string.sk.warning_call_headline = 'Nemôžete volať bez mikrofónu';

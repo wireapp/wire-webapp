@@ -94,14 +94,14 @@ z.string.fr.auth_error_phone_number_unknown = 'Numéro de téléphone inconnu';
 z.string.fr.auth_error_suspended = 'Ce compte n’est plus autorisé à se connecter.';
 z.string.fr.auth_error_sign_in = 'Veuillez vérifier vos informations et réessayez.';
 
-z.string.fr.call_state_outgoing = 'Sonnerie…';
-z.string.fr.call_state_connecting = 'Connexion…';
-z.string.fr.call_state_incoming = 'Appel…';
+z.string.fr.callStateOutgoing = 'Sonnerie…';
+z.string.fr.callStateConnecting = 'Connexion…';
+z.string.fr.callStateIncoming = 'Appel…';
 z.string.fr.callDecline = 'Décliner';
 z.string.fr.callAccept = 'Accepter';
 z.string.fr.callJoin = 'Rejoindre';
 z.string.fr.callChooseSharedScreen = 'Choisissez un écran à partager';
-z.string.fr.call_participants = '{{number}} sur l’appel';
+z.string.fr.callParticipants = '{{number}} sur l’appel';
 
 z.string.fr.modal_button_cancel = 'Annuler';
 z.string.fr.modal_button_ok = 'OK';
@@ -291,13 +291,13 @@ z.string.fr.takeoverLink = 'En savoir plus';
 z.string.fr.takeoverButtonChoose = 'Choisissez le vôtre';
 z.string.fr.takeoverButtonKeep = 'Garder celui-là';
 
-z.string.fr.invite_meta_key_mac = 'Cmd';
-z.string.fr.invite_meta_key_pc = 'Ctrl';
-z.string.fr.invite_hint_selected = 'Appuyez sur {{meta_key}} + C pour copier';
-z.string.fr.invite_hint_unselected = 'Sélectionnez et appuyez sur {{meta_key}} + C';
-z.string.fr.invite_headline = 'Invitez des personnes sur Wire';
-z.string.fr.invite_message = 'Je suis sur Wire, cherche {{username}} ou va sur get.wire.com .';
-z.string.fr.invite_message_no_email = 'Je suis sur Wire. Va sur get.wire.com pour me rejoindre.';
+z.string.fr.inviteMetaKeyMac = 'Cmd';
+z.string.fr.inviteMetaKeyPc = 'Ctrl';
+z.string.fr.inviteHintSelected = 'Appuyez sur {{meta_key}} + C pour copier';
+z.string.fr.inviteHintUnselected = 'Sélectionnez et appuyez sur {{meta_key}} + C';
+z.string.fr.inviteHeadline = 'Invitez des personnes sur Wire';
+z.string.fr.inviteMessage = 'Je suis sur Wire, cherche {{username}} ou va sur get.wire.com .';
+z.string.fr.inviteMessageNoEmail = 'Je suis sur Wire. Va sur get.wire.com pour me rejoindre.';
 
 z.string.fr.extensions_bubble_button_gif = 'Gif';
 
@@ -461,11 +461,11 @@ z.string.fr.search_try_search = 'Trouver des contacts par\nnom ou identifiant';
 z.string.fr.search_no_contacts_on_wire = 'Vous n’avez pas de contacts sur Wire.\nEssayez de trouver des gens par\nleur nom ou leur nom d’utilisateur.';
 z.string.fr.search_others = 'Se connecter';
 
-z.string.fr.upload_google_headline = 'Trouvez des personnes\nà qui parler.';
-z.string.fr.upload_google_message = 'Nous utilisons les données de vos contacts afin de vous connecter à d’autres personnes. Nous anonymisons toutes les informations et ne les partageons avec personne d’autre.';
-z.string.fr.upload_google_headline_error = 'Une erreur\nest survenue.';
-z.string.fr.upload_google_message_error = 'Nous n’avons pas reçu votre information. Veuillez réessayer d’importer vos contacts.';
-z.string.fr.upload_google_button_again = 'Réessayer';
+z.string.fr.uploadGoogleHeadline = 'Trouvez des personnes\nà qui parler.';
+z.string.fr.uploadGoogleMessage = 'Nous utilisons les données de vos contacts afin de vous connecter à d’autres personnes. Nous anonymisons toutes les informations et ne les partageons avec personne d’autre.';
+z.string.fr.uploadGoogleHeadlineError = 'Une erreur\nest survenue.';
+z.string.fr.uploadGoogleMessageError = 'Nous n’avons pas reçu votre information. Veuillez réessayer d’importer vos contacts.';
+z.string.fr.uploadGoogleButtonAgain = 'Réessayer';
 
 z.string.fr.url_website_create_team = '/create-team/';
 z.string.fr.warning_call_detail = 'Votre navigateur doit avoir accès au micro pour passer des appels.';

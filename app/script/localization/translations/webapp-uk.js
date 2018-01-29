@@ -93,14 +93,14 @@ z.string.uk.auth_error_phone_number_unknown = 'Невідомий номер т�
 z.string.uk.auth_error_suspended = 'Даний акаунт був заблокований.';
 z.string.uk.auth_error_sign_in = 'Будь ласка, перевірте ваші дані та повторіть спробу.';
 
-z.string.uk.call_state_outgoing = 'Дзвінок…';
-z.string.uk.call_state_connecting = 'Підключення…';
-z.string.uk.call_state_incoming = 'Дзвінок…';
+z.string.uk.callStateOutgoing = 'Дзвінок…';
+z.string.uk.callStateConnecting = 'Підключення…';
+z.string.uk.callStateIncoming = 'Дзвінок…';
 z.string.uk.callDecline = 'Скасувати';
 z.string.uk.callAccept = 'Прийняти';
 z.string.uk.callJoin = 'Приєднатись';
 z.string.uk.callChooseSharedScreen = 'Оберіть робочий стіл, скріншотами якого ви хочете поділитися';
-z.string.uk.call_participants = '{{number}} учасників';
+z.string.uk.callParticipants = '{{number}} учасників';
 
 z.string.uk.modal_button_cancel = 'Скасувати';
 z.string.uk.modal_button_ok = 'ОК';
@@ -289,13 +289,13 @@ z.string.uk.takeoverLink = 'Дізнатися більше';
 z.string.uk.takeoverButtonChoose = 'Вибрати власний';
 z.string.uk.takeoverButtonKeep = 'Залишити цей';
 
-z.string.uk.invite_meta_key_mac = 'Cmd';
-z.string.uk.invite_meta_key_pc = 'Ctrl';
-z.string.uk.invite_hint_selected = 'Натисніть {{meta_key}} + C, щоб скопіювати';
-z.string.uk.invite_hint_unselected = 'Виділіть та натисніть {{meta_key}} + C';
-z.string.uk.invite_headline = 'Запросити людей в Wire';
-z.string.uk.invite_message = 'Я в Wire. Шукайте мене як {{username}} або відвідайте get.wire.com.';
-z.string.uk.invite_message_no_email = 'Я уже в Wire. Відвідайте get.wire.com, щоб додати мене.';
+z.string.uk.inviteMetaKeyMac = 'Cmd';
+z.string.uk.inviteMetaKeyPc = 'Ctrl';
+z.string.uk.inviteHintSelected = 'Натисніть {{meta_key}} + C, щоб скопіювати';
+z.string.uk.inviteHintUnselected = 'Виділіть та натисніть {{meta_key}} + C';
+z.string.uk.inviteHeadline = 'Запросити людей в Wire';
+z.string.uk.inviteMessage = 'Я в Wire. Шукайте мене як {{username}} або відвідайте get.wire.com.';
+z.string.uk.inviteMessageNoEmail = 'Я уже в Wire. Відвідайте get.wire.com, щоб додати мене.';
 
 z.string.uk.extensions_bubble_button_gif = 'Gif';
 
@@ -459,11 +459,11 @@ z.string.uk.search_try_search = 'Шукайте людай\nза іменем а
 z.string.uk.search_no_contacts_on_wire = 'У вас поки що немає контактів в Wire.\nСпробуйте знайти людей\nза їхніми іменами або ніками.';
 z.string.uk.search_others = 'Додати до контактів';
 
-z.string.uk.upload_google_headline = 'Знайдіть людей,\nщоб порозмовляти.';
-z.string.uk.upload_google_message = 'Ми використовуємо дані про ваші контакти, щоб ви могли знайти людей, яких ви знаєте. Ми анонімізуємо всю інформацію та не передаємо її третім особам.';
-z.string.uk.upload_google_headline_error = 'Щось пішло\nне так.';
-z.string.uk.upload_google_message_error = 'Ми не отримали вашу інформацію. Будь ласка, повторіть імпорт контактів.';
-z.string.uk.upload_google_button_again = 'Спробувати ще раз';
+z.string.uk.uploadGoogleHeadline = 'Знайдіть людей,\nщоб порозмовляти.';
+z.string.uk.uploadGoogleMessage = 'Ми використовуємо дані про ваші контакти, щоб ви могли знайти людей, яких ви знаєте. Ми анонімізуємо всю інформацію та не передаємо її третім особам.';
+z.string.uk.uploadGoogleHeadlineError = 'Щось пішло\nне так.';
+z.string.uk.uploadGoogleMessageError = 'Ми не отримали вашу інформацію. Будь ласка, повторіть імпорт контактів.';
+z.string.uk.uploadGoogleButtonAgain = 'Спробувати ще раз';
 
 z.string.uk.warning_call_detail = 'Надайте вашому браузеру доступ до мікрофону, щоб робити дзвінки.';
 z.string.uk.warning_call_headline = 'Неможливо здійснити дзвінок без доступу до мікрофону';
