@@ -198,9 +198,9 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
       }
       return false;
     });
-    this.showRemoveButton = ko.pureComputed(
-      () => this.stateServiceDetails() && !this.userRepository.self().is_guest() && this.selectedIsInConversation()
-    );
+    this.showServiceRemove = ko.pureComputed(() => {
+      return this.stateServiceDetails() && !this.userRepository.self().is_guest() && this.selectedIsInConversation();
+    });
 
     amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, this.switchContent.bind(this));
     amplify.subscribe(z.event.WebApp.PEOPLE.SHOW, this.showParticipant);
