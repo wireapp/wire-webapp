@@ -90,8 +90,8 @@ z.string.auth_placeholder_phone = 'Phone Number';
 z.string.authErrorCode = 'Invalid Code';
 z.string.authErrorCountryCodeInvalid = 'Invalid Country Code';
 z.string.authErrorEmailExists = 'Email address already taken';
-z.string.auth_error_email_forbidden = 'Sorry. This email address is forbidden.';
-z.string.auth_error_email_malformed = 'Please enter a valid email address.';
+z.string.authErrorEmailForbidden = 'Sorry. This email address is forbidden.';
+z.string.authErrorEmailMalformed = 'Please enter a valid email address.';
 z.string.auth_error_email_missing = 'Please enter an email address.';
 z.string.auth_error_misc = 'Problems with the connection. Please try again.';
 z.string.auth_error_name_short = 'Enter a name with at least 2 characters';
@@ -110,10 +110,10 @@ z.string.auth_error_sign_in = 'Please verify your details and try again.';
 z.string.call_state_outgoing = 'Ringing…';
 z.string.call_state_connecting = 'Connecting…';
 z.string.call_state_incoming = 'Calling…';
-z.string.call_decline = 'Decline';
-z.string.call_accept = 'Accept';
-z.string.call_join = 'Join';
-z.string.call_choose_shared_screen = 'Choose a screen to share';
+z.string.callDecline = 'Decline';
+z.string.callAccept = 'Accept';
+z.string.callJoin = 'Join';
+z.string.callChooseSharedScreen = 'Choose a screen to share';
 z.string.call_participants = '{{number}} on call';
 
 // Warnings
@@ -567,8 +567,8 @@ z.string.warning_permission_denied_microphone = 'You cannot call because your br
 z.string.warning_permission_denied_screen = 'Your browser needs permission to share your screen.';
 z.string.warning_permission_request_camera = '{{icon}} Allow access to camera';
 z.string.warning_permission_request_microphone = '{{icon}} Allow access to microphone';
-z.string.warning_permission_request_notification = '{{icon}} Allow notifications';
-z.string.warning_permission_request_screen = '{{icon}} Allow access to screen';
+z.string.warningPermissionRequestNotification = '{{icon}} Allow notifications';
+z.string.warningPermissionRequestScreen = '{{icon}} Allow access to screen';
 z.string.warningTellMeHow = 'Tell me how';
 
 // User Availability

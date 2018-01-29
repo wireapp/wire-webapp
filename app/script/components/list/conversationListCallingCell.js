@@ -175,7 +175,7 @@ ko.components.register('conversation-list-calling-cell', {
           <div class="conversation-list-calling-cell-controls-button fill-green icon-video" data-bind="click: on_join_call" data-uie-name="do-call-controls-call-accept"></div>
         <!-- /ko -->
         <!-- ko if: show_join_button -->
-          <div class="conversation-list-calling-cell-controls-button conversation-list-calling-cell-controls-join-button" data-bind="click: on_join_call, l10n_text: z.string.call_join" data-uie-name="do-call-controls-call-join"></div>
+          <div class="conversation-list-calling-cell-controls-button conversation-list-calling-cell-controls-join-button" data-bind="click: on_join_call, l10n_text: z.string.callJoin" data-uie-name="do-call-controls-call-join"></div>
         <!-- /ko -->
       </div>
     </div>

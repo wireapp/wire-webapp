@@ -611,16 +611,16 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
           if (error) {
             switch (error.label) {
               case z.service.BackendClientError.LABEL.BLACKLISTED_EMAIL:
-                this._add_error(z.string.auth_error_email_forbidden, z.auth.AuthView.TYPE.EMAIL);
+                this._add_error(z.string.authErrorEmailForbidden, z.auth.AuthView.TYPE.EMAIL);
                 break;
               case z.service.BackendClientError.LABEL.KEY_EXISTS:
                 this._add_error(z.string.authErrorEmailExists, z.auth.AuthView.TYPE.EMAIL);
                 break;
               case z.service.BackendClientError.LABEL.INVALID_EMAIL:
-                this._add_error(z.string.auth_error_email_malformed, z.auth.AuthView.TYPE.EMAIL);
+                this._add_error(z.string.authErrorEmailMalformed, z.auth.AuthView.TYPE.EMAIL);
                 break;
               default:
-                this._add_error(z.string.auth_error_email_malformed, z.auth.AuthView.TYPE.EMAIL);
+                this._add_error(z.string.authErrorEmailMalformed, z.auth.AuthView.TYPE.EMAIL);
             }
             return this._has_errors();
           }
@@ -1583,7 +1583,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     }
 
     if (!z.util.is_valid_email(username)) {
-      this._add_error(z.string.auth_error_email_malformed, z.auth.AuthView.TYPE.EMAIL);
+      this._add_error(z.string.authErrorEmailMalformed, z.auth.AuthView.TYPE.EMAIL);
     }
   }
 
@@ -1669,7 +1669,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       !z.util.is_valid_username(username) &&
       !z.util.is_valid_phone_number(phone)
     ) {
-      this._add_error(z.string.auth_error_email_malformed, z.auth.AuthView.TYPE.EMAIL);
+      this._add_error(z.string.authErrorEmailMalformed, z.auth.AuthView.TYPE.EMAIL);
     }
   }
 

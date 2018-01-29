@@ -38,7 +38,7 @@
 
       <!-- ko if: top_warning() === z.ViewModel.WarningType.REQUEST_SCREEN -->
         <div class="warning-bar warning-bar-feature bg-theme">
-          <div class="warning-bar-message" data-bind="l10n_html: {'id': z.string.warning_permission_request_screen, 'substitute': '<span class=\'warning-bar-icon icon-screensharing\'></span>'}"></div>
+          <div class="warning-bar-message" data-bind="l10n_html: {'id': z.string.warningPermissionRequestScreen, 'substitute': '<span class=\'warning-bar-icon icon-screensharing\'></span>'}"></div>
           <span class="warning-bar-close icon-close button-icon" data-bind="click: close_warning"></span>
         </div>
       <!-- /ko -->
@@ -76,7 +76,7 @@
       <!-- ko if: top_warning() === z.ViewModel.WarningType.REQUEST_NOTIFICATION -->
         <div class="warning-bar warning-bar-feature bg-theme">
           <div class="warning-bar-message"
-               data-bind="l10n_html: {'id': z.string.warning_permission_request_notification, 'substitute': '<span class=\'warning-bar-icon icon-envelope\'></span>'}"></div>
+               data-bind="l10n_html: {'id': z.string.warningPermissionRequestNotification, 'substitute': '<span class=\'warning-bar-icon icon-envelope\'></span>'}"></div>
           <span class="warning-bar-close icon-close button-round button-round-dark"
                 data-bind="click: close_warning"
                 data-uie-name="do-close-warning"></span>
