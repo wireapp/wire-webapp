@@ -69,7 +69,7 @@ z.string.da.auth_placeholder_password_put = 'Adgangskode';
 z.string.da.auth_placeholder_password_set = 'Adgangskode (mindst 8 tegn)';
 z.string.da.auth_placeholder_phone = 'Telefon Nummer';
 
-z.string.da.auth_error_code = 'Ugyldig Kode';
+z.string.da.authErrorCode = 'Ugyldig Kode';
 z.string.da.auth_error_country_code_invalid = 'Ugyldig Lande Kode';
 z.string.da.auth_error_email_exists = 'Email adresse allerede brugt';
 z.string.da.auth_error_email_forbidden = 'Beklager. Denne email adresse er forbudt.';
@@ -233,10 +233,10 @@ z.string.da.collection_section_images = 'Billeder';
 z.string.da.collection_section_files = 'Filer';
 z.string.da.collection_section_audio = 'Lydbeskeder';
 
-z.string.da.fullsearch_placeholder = 'Søg i tekstbeskeder';
+z.string.da.fullsearchPlaceholder = 'Søg i tekstbeskeder';
 z.string.da.fullsearch_no_results = 'Ingen resultater.';
 
-z.string.da.archive_header = 'Arkivér';
+z.string.da.archiveHeader = 'Arkivér';
 
 z.string.da.conversations_all_archived = 'Alt arkiveret';
 z.string.da.conversations_contacts = 'Kontakter';
@@ -263,10 +263,10 @@ z.string.da.conversations_secondary_line_pings = '{{number}} pings';
 z.string.da.conversations_secondary_line_timed_message = 'Tidsbestemt besked';
 z.string.da.conversations_secondary_line_you_left = 'Du forlod';
 
-z.string.da.takeover_sub = 'Vælg dit unikke navn på Wire.';
-z.string.da.takeover_link = 'Lær mere';
-z.string.da.takeover_button_choose = 'Vælg dit eget';
-z.string.da.takeover_button_keep = 'Behold denne';
+z.string.da.takeoverSub = 'Vælg dit unikke navn på Wire.';
+z.string.da.takeoverLink = 'Lær mere';
+z.string.da.takeoverButtonChoose = 'Vælg dit eget';
+z.string.da.takeoverButtonKeep = 'Behold denne';
 
 z.string.da.invite_meta_key_mac = 'Cmd';
 z.string.da.invite_meta_key_pc = 'Ctrl';
@@ -459,7 +459,7 @@ z.string.da.warning_permission_request_camera = '{{icon}} Tillad adgang til kame
 z.string.da.warning_permission_request_microphone = '{{icon}} Tillad adgang til mikrofon';
 z.string.da.warning_permission_request_notification = '{{icon}} Tillad meddelelser';
 z.string.da.warning_permission_request_screen = '{{icon}} Tillad adgang til skærm';
-z.string.da.warning_tell_me_how = 'Fortæl mig hvordan';
+z.string.da.warningTellMeHow = 'Fortæl mig hvordan';
 
 z.string.da.userAvailabilityAvailable = 'Ledig';
 z.string.da.userAvailabilityNone = 'Ingen';

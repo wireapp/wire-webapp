@@ -75,7 +75,7 @@ z.string.de.auth_placeholder_password_put = 'Passwort';
 z.string.de.auth_placeholder_password_set = 'Passwort (min. acht Zeichen)';
 z.string.de.auth_placeholder_phone = 'Telefonnummer';
 
-z.string.de.auth_error_code = 'Ungültiger Verifizierungs-Code';
+z.string.de.authErrorCode = 'Ungültiger Verifizierungs-Code';
 z.string.de.auth_error_country_code_invalid = 'Ungültige Landesvorwahl';
 z.string.de.auth_error_email_exists = 'E-Mail-Adresse bereits vergeben';
 z.string.de.auth_error_email_forbidden = 'Es tut uns leid. Diese E-Mail-Adresse ist verboten.';
@@ -255,10 +255,10 @@ z.string.de.collection_section_images = 'Bilder';
 z.string.de.collection_section_files = 'Dateien';
 z.string.de.collection_section_audio = 'Audio-Nachrichten';
 
-z.string.de.fullsearch_placeholder = 'Nachrichten durchsuchen';
+z.string.de.fullsearchPlaceholder = 'Nachrichten durchsuchen';
 z.string.de.fullsearch_no_results = 'Kein Treffer';
 
-z.string.de.archive_header = 'Archivieren';
+z.string.de.archiveHeader = 'Archivieren';
 
 z.string.de.conversations_all_archived = 'Alle Unterhaltungen archiviert';
 z.string.de.conversations_contacts = 'Kontakte';
@@ -293,10 +293,10 @@ z.string.de.conversations_secondary_line_timed_message = 'Temporäre Nachricht';
 z.string.de.conversations_secondary_line_you_left = 'Du hast die Unterhaltung verlassen';
 z.string.de.conversations_secondary_line_you_were_removed = 'Du wurdest entfent';
 
-z.string.de.takeover_sub = 'Sichere dir deinen persönlichen Benutzernamen auf Wire.';
-z.string.de.takeover_link = 'Erfahre mehr';
-z.string.de.takeover_button_choose = 'Wähle deinen eigenen';
-z.string.de.takeover_button_keep = 'Behalte diesen';
+z.string.de.takeoverSub = 'Sichere dir deinen persönlichen Benutzernamen auf Wire.';
+z.string.de.takeoverLink = 'Erfahre mehr';
+z.string.de.takeoverButtonChoose = 'Wähle deinen eigenen';
+z.string.de.takeoverButtonKeep = 'Behalte diesen';
 
 z.string.de.invite_meta_key_mac = 'Cmd';
 z.string.de.invite_meta_key_pc = 'Strg';
@@ -507,7 +507,7 @@ z.string.de.warning_permission_request_camera = '{{icon}} Zugriff auf Kamera gew
 z.string.de.warning_permission_request_microphone = '{{icon}} Zugriff auf Mikrofon gewähren';
 z.string.de.warning_permission_request_notification = '{{icon}} Benachrichtigungen zulassen';
 z.string.de.warning_permission_request_screen = '{{icon}} Zugriff auf Bildschirm gewähren';
-z.string.de.warning_tell_me_how = 'Zeig mir wie';
+z.string.de.warningTellMeHow = 'Zeig mir wie';
 
 z.string.de.userAvailabilityAvailable = 'Verfügbar';
 z.string.de.userAvailabilityAway = 'Abwesend';

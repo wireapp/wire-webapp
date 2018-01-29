@@ -68,7 +68,7 @@ z.string.hr.auth_placeholder_password_put = 'Lozinka';
 z.string.hr.auth_placeholder_password_set = 'Lozinka (najmanje 8 znakova)';
 z.string.hr.auth_placeholder_phone = 'Telefonski broj';
 
-z.string.hr.auth_error_code = 'Neispravan kod';
+z.string.hr.authErrorCode = 'Neispravan kod';
 z.string.hr.auth_error_country_code_invalid = 'Nevažeći kod države';
 z.string.hr.auth_error_email_exists = 'Email adresa je već u upotrebi';
 z.string.hr.auth_error_email_forbidden = 'Ova email adresa je zabranjena.';
@@ -223,10 +223,10 @@ z.string.hr.collection_section_links = 'Linkovi';
 z.string.hr.collection_section_images = 'Slike';
 z.string.hr.collection_section_files = 'Dokumenti';
 
-z.string.hr.fullsearch_placeholder = 'Pretraži poruke';
+z.string.hr.fullsearchPlaceholder = 'Pretraži poruke';
 z.string.hr.fullsearch_no_results = 'Nema rezultata.';
 
-z.string.hr.archive_header = 'Arhiviraj';
+z.string.hr.archiveHeader = 'Arhiviraj';
 
 z.string.hr.conversations_all_archived = 'Sve arhivirano';
 z.string.hr.conversations_contacts = 'Kontakti';
@@ -245,10 +245,10 @@ z.string.hr.conversations_popover_unarchive = 'Dearhiviraj';
 
 z.string.hr.conversations_secondary_line_timed_message = 'Odgođeno slanje';
 
-z.string.hr.takeover_sub = 'Zatražite svoje jedinstveno ime na Wire.';
-z.string.hr.takeover_link = 'Saznaj više';
-z.string.hr.takeover_button_choose = 'Odaberite vlastitu';
-z.string.hr.takeover_button_keep = 'Zadrži ovu';
+z.string.hr.takeoverSub = 'Zatražite svoje jedinstveno ime na Wire.';
+z.string.hr.takeoverLink = 'Saznaj više';
+z.string.hr.takeoverButtonChoose = 'Odaberite vlastitu';
+z.string.hr.takeoverButtonKeep = 'Zadrži ovu';
 
 z.string.hr.invite_meta_key_mac = 'Cmd';
 z.string.hr.invite_meta_key_pc = 'Ctrl';
@@ -430,7 +430,7 @@ z.string.hr.warning_permission_request_camera = '{{icon}} dopusti pristup kameri
 z.string.hr.warning_permission_request_microphone = '{{icon}} dopusti pristup mikrofonu';
 z.string.hr.warning_permission_request_notification = '{{icon}} Dopusti notifikacije';
 z.string.hr.warning_permission_request_screen = '{{icon}} dopusti pristup zaslonu';
-z.string.hr.warning_tell_me_how = 'Recite mi kako';
+z.string.hr.warningTellMeHow = 'Recite mi kako';
 
 z.string.hr.userAvailabilityAvailable = 'Dostupno';
 z.string.hr.userAvailabilityNone = 'Ništa';

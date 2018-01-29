@@ -73,7 +73,7 @@ z.string.it.auth_placeholder_password_put = 'Password';
 z.string.it.auth_placeholder_password_set = 'Password (almeno 8 caratteri)';
 z.string.it.auth_placeholder_phone = 'Numero di telefono';
 
-z.string.it.auth_error_code = 'Codice non valido';
+z.string.it.authErrorCode = 'Codice non valido';
 z.string.it.auth_error_country_code_invalid = 'Prefisso paese non valido';
 z.string.it.auth_error_email_exists = 'Indirizzo email già registrato';
 z.string.it.auth_error_email_forbidden = 'Siamo spiacenti. Questo indirizzo email è vietato.';
@@ -241,10 +241,10 @@ z.string.it.collection_section_images = 'Immagini';
 z.string.it.collection_section_files = 'Files';
 z.string.it.collection_section_audio = 'Messaggi audio';
 
-z.string.it.fullsearch_placeholder = 'Cerca messaggi di testo';
+z.string.it.fullsearchPlaceholder = 'Cerca messaggi di testo';
 z.string.it.fullsearch_no_results = 'Nessun risultato.';
 
-z.string.it.archive_header = 'Archivia';
+z.string.it.archiveHeader = 'Archivia';
 
 z.string.it.conversations_all_archived = 'Tutto archiviato';
 z.string.it.conversations_contacts = 'Contatti';
@@ -279,10 +279,10 @@ z.string.it.conversations_secondary_line_timed_message = 'Messaggio a tempo';
 z.string.it.conversations_secondary_line_you_left = 'Hai abbandonato';
 z.string.it.conversations_secondary_line_you_were_removed = 'Sei stato rimosso';
 
-z.string.it.takeover_sub = 'Rivendica il tuo username su Wire.';
-z.string.it.takeover_link = 'Ulteriori informazioni';
-z.string.it.takeover_button_choose = 'Scegli il tuo';
-z.string.it.takeover_button_keep = 'Tieni questo';
+z.string.it.takeoverSub = 'Rivendica il tuo username su Wire.';
+z.string.it.takeoverLink = 'Ulteriori informazioni';
+z.string.it.takeoverButtonChoose = 'Scegli il tuo';
+z.string.it.takeoverButtonKeep = 'Tieni questo';
 
 z.string.it.invite_meta_key_mac = 'Cmd';
 z.string.it.invite_meta_key_pc = 'Ctrl';
@@ -479,7 +479,7 @@ z.string.it.warning_permission_request_camera = '{{icon}} Consenti accesso alla 
 z.string.it.warning_permission_request_microphone = '{{icon}} Consenti accesso al microfono';
 z.string.it.warning_permission_request_notification = '{{icon}} Consenti notifiche';
 z.string.it.warning_permission_request_screen = '{{icon}} Consenti accesso allo schermo';
-z.string.it.warning_tell_me_how = 'Dimmi come';
+z.string.it.warningTellMeHow = 'Dimmi come';
 
 z.string.it.userAvailabilityAvailable = 'Disponibile';
 z.string.it.userAvailabilityNone = 'Nessuno';

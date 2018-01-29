@@ -75,7 +75,7 @@ z.string.fr.auth_placeholder_password_put = 'Mot de passe';
 z.string.fr.auth_placeholder_password_set = 'Mot de passe (8 caractères minimum)';
 z.string.fr.auth_placeholder_phone = 'Numéro de téléphone';
 
-z.string.fr.auth_error_code = 'Code invalide';
+z.string.fr.authErrorCode = 'Code invalide';
 z.string.fr.auth_error_country_code_invalid = 'Indicatif du pays invalide';
 z.string.fr.auth_error_email_exists = 'Adresse e-mail déjà utilisée';
 z.string.fr.auth_error_email_forbidden = 'Désolé. Cette adresse e-mail est bannie.';
@@ -248,10 +248,10 @@ z.string.fr.collection_section_images = 'Images';
 z.string.fr.collection_section_files = 'Fichiers';
 z.string.fr.collection_section_audio = 'Messages vocaux';
 
-z.string.fr.fullsearch_placeholder = 'Chercher dans les messages';
+z.string.fr.fullsearchPlaceholder = 'Chercher dans les messages';
 z.string.fr.fullsearch_no_results = 'Aucun résultat.';
 
-z.string.fr.archive_header = 'Archives';
+z.string.fr.archiveHeader = 'Archives';
 
 z.string.fr.conversations_all_archived = 'Tout a été archivé';
 z.string.fr.conversations_contacts = 'Contacts';
@@ -286,10 +286,10 @@ z.string.fr.conversations_secondary_line_timed_message = 'Message éphémère';
 z.string.fr.conversations_secondary_line_you_left = 'Vous êtes parti';
 z.string.fr.conversations_secondary_line_you_were_removed = 'Vous avez été exclu';
 
-z.string.fr.takeover_sub = 'Choisissez votre nom d’utilisateur unique sur Wire.';
-z.string.fr.takeover_link = 'En savoir plus';
-z.string.fr.takeover_button_choose = 'Choisissez le vôtre';
-z.string.fr.takeover_button_keep = 'Garder celui-là';
+z.string.fr.takeoverSub = 'Choisissez votre nom d’utilisateur unique sur Wire.';
+z.string.fr.takeoverLink = 'En savoir plus';
+z.string.fr.takeoverButtonChoose = 'Choisissez le vôtre';
+z.string.fr.takeoverButtonKeep = 'Garder celui-là';
 
 z.string.fr.invite_meta_key_mac = 'Cmd';
 z.string.fr.invite_meta_key_pc = 'Ctrl';
@@ -489,7 +489,7 @@ z.string.fr.warning_permission_request_camera = '{{icon}} Autoriser l’accès �
 z.string.fr.warning_permission_request_microphone = '{{icon}} Autoriser l’accès au micro';
 z.string.fr.warning_permission_request_notification = '{{icon}} Autoriser les notifications';
 z.string.fr.warning_permission_request_screen = '{{icon}} Autoriser l’accès à l’écran';
-z.string.fr.warning_tell_me_how = 'Dites-moi comment faire';
+z.string.fr.warningTellMeHow = 'Dites-moi comment faire';
 
 z.string.fr.userAvailabilityAvailable = 'Disponible';
 z.string.fr.userAvailabilityAway = 'Absent(e)';

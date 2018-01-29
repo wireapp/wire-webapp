@@ -74,7 +74,7 @@ z.string.tr.auth_placeholder_password_put = 'Şifre';
 z.string.tr.auth_placeholder_password_set = 'Şifre (en az 8 karakter)';
 z.string.tr.auth_placeholder_phone = 'Telefon Numarası';
 
-z.string.tr.auth_error_code = 'Geçersiz Kod';
+z.string.tr.authErrorCode = 'Geçersiz Kod';
 z.string.tr.auth_error_country_code_invalid = 'Geçersiz Ülke Kodu';
 z.string.tr.auth_error_email_exists = 'E-posta adresi zaten kullanımda';
 z.string.tr.auth_error_email_forbidden = 'Üzgünüz. Bu e-posta adresi yasaklı.';
@@ -247,10 +247,10 @@ z.string.tr.collection_section_images = 'Resimler';
 z.string.tr.collection_section_files = 'Dosyalar';
 z.string.tr.collection_section_audio = 'Sesli mesajlar';
 
-z.string.tr.fullsearch_placeholder = 'Metin mesajlarında ara';
+z.string.tr.fullsearchPlaceholder = 'Metin mesajlarında ara';
 z.string.tr.fullsearch_no_results = 'Sonuç yok.';
 
-z.string.tr.archive_header = 'Arşivle';
+z.string.tr.archiveHeader = 'Arşivle';
 
 z.string.tr.conversations_all_archived = 'Her şey arşivlendi';
 z.string.tr.conversations_contacts = 'Kişiler';
@@ -285,10 +285,10 @@ z.string.tr.conversations_secondary_line_timed_message = 'Süreli Mesaj';
 z.string.tr.conversations_secondary_line_you_left = 'Ayrıldın';
 z.string.tr.conversations_secondary_line_you_were_removed = 'Çıkartıldınız';
 
-z.string.tr.takeover_sub = 'Wire üzerinden size özel isminizi hemen alın.';
-z.string.tr.takeover_link = 'Daha fazla bilgi';
-z.string.tr.takeover_button_choose = 'Kendininkini seç';
-z.string.tr.takeover_button_keep = 'Bunu sakla';
+z.string.tr.takeoverSub = 'Wire üzerinden size özel isminizi hemen alın.';
+z.string.tr.takeoverLink = 'Daha fazla bilgi';
+z.string.tr.takeoverButtonChoose = 'Kendininkini seç';
+z.string.tr.takeoverButtonKeep = 'Bunu sakla';
 
 z.string.tr.invite_meta_key_mac = 'Cmd';
 z.string.tr.invite_meta_key_pc = 'Ctrl';
@@ -487,7 +487,7 @@ z.string.tr.warning_permission_request_camera = '{{icon}} Kameraya erişime izin
 z.string.tr.warning_permission_request_microphone = '{{icon}} Mikrofona erişime izin ver';
 z.string.tr.warning_permission_request_notification = '{{icon}} Bildirimlere izin ver';
 z.string.tr.warning_permission_request_screen = '{{icon}} Ekrana erişime izin ver';
-z.string.tr.warning_tell_me_how = 'Anlat bana';
+z.string.tr.warningTellMeHow = 'Anlat bana';
 
 z.string.tr.userAvailabilityAvailable = 'Alınabilir';
 z.string.tr.userAvailabilityAway = 'Uzakta';

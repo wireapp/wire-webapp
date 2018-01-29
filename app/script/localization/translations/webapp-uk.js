@@ -74,7 +74,7 @@ z.string.uk.auth_placeholder_password_put = 'Пароль';
 z.string.uk.auth_placeholder_password_set = 'Пароль (не менше 8 символів)';
 z.string.uk.auth_placeholder_phone = 'Номер телефону';
 
-z.string.uk.auth_error_code = 'Невірний код';
+z.string.uk.authErrorCode = 'Невірний код';
 z.string.uk.auth_error_country_code_invalid = 'Невірний код країни';
 z.string.uk.auth_error_email_exists = 'Email вже використовується';
 z.string.uk.auth_error_email_forbidden = 'Вибачте. Ця електронна адреса не дозволена для використання.';
@@ -246,10 +246,10 @@ z.string.uk.collection_section_images = 'Картинки';
 z.string.uk.collection_section_files = 'Файли';
 z.string.uk.collection_section_audio = 'Аудіоповідомлення';
 
-z.string.uk.fullsearch_placeholder = 'Шукайте текстові повідомлення';
+z.string.uk.fullsearchPlaceholder = 'Шукайте текстові повідомлення';
 z.string.uk.fullsearch_no_results = 'Нічого не знайдено.';
 
-z.string.uk.archive_header = 'Архівувати';
+z.string.uk.archiveHeader = 'Архівувати';
 
 z.string.uk.conversations_all_archived = 'Усі розмови заархівовано';
 z.string.uk.conversations_contacts = 'Контакти';
@@ -284,10 +284,10 @@ z.string.uk.conversations_secondary_line_timed_message = 'Тимчасове п�
 z.string.uk.conversations_secondary_line_you_left = 'Ви вийшли';
 z.string.uk.conversations_secondary_line_you_were_removed = 'Вас видалили';
 
-z.string.uk.takeover_sub = 'Зарезервуйте свій унікальний нік в Wire.';
-z.string.uk.takeover_link = 'Дізнатися більше';
-z.string.uk.takeover_button_choose = 'Вибрати власний';
-z.string.uk.takeover_button_keep = 'Залишити цей';
+z.string.uk.takeoverSub = 'Зарезервуйте свій унікальний нік в Wire.';
+z.string.uk.takeoverLink = 'Дізнатися більше';
+z.string.uk.takeoverButtonChoose = 'Вибрати власний';
+z.string.uk.takeoverButtonKeep = 'Залишити цей';
 
 z.string.uk.invite_meta_key_mac = 'Cmd';
 z.string.uk.invite_meta_key_pc = 'Ctrl';
@@ -486,7 +486,7 @@ z.string.uk.warning_permission_request_camera = '{{icon}} Дозволити д�
 z.string.uk.warning_permission_request_microphone = '{{icon}} Дозволити доступ до мікрофону';
 z.string.uk.warning_permission_request_notification = '{{icon}} Дозволити сповіщення';
 z.string.uk.warning_permission_request_screen = '{{icon}} Дозволити доступ до обміну скріншотами робочого столу';
-z.string.uk.warning_tell_me_how = 'Скажіть мені як';
+z.string.uk.warningTellMeHow = 'Скажіть мені як';
 
 z.string.uk.userAvailabilityAvailable = 'Доступний';
 z.string.uk.userAvailabilityAway = 'Не на місці';

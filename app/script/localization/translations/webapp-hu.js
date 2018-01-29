@@ -75,7 +75,7 @@ z.string.hu.auth_placeholder_password_put = 'Jelszó';
 z.string.hu.auth_placeholder_password_set = 'Jelszó (legalább 8 karakter)';
 z.string.hu.auth_placeholder_phone = 'Telefonszám';
 
-z.string.hu.auth_error_code = 'Érvénytelen kód';
+z.string.hu.authErrorCode = 'Érvénytelen kód';
 z.string.hu.auth_error_country_code_invalid = 'Érvénytelen az Országhívó-kód';
 z.string.hu.auth_error_email_exists = 'Ez az e-mail cím már foglalt';
 z.string.hu.auth_error_email_forbidden = 'Sajnáljuk. Ez az e-mail cím nem megengedett.';
@@ -248,10 +248,10 @@ z.string.hu.collection_section_images = 'Képek';
 z.string.hu.collection_section_files = 'Fájlok';
 z.string.hu.collection_section_audio = 'Hangüzenetek';
 
-z.string.hu.fullsearch_placeholder = 'Szöveges üzenetek keresése';
+z.string.hu.fullsearchPlaceholder = 'Szöveges üzenetek keresése';
 z.string.hu.fullsearch_no_results = 'Nincs találat.';
 
-z.string.hu.archive_header = 'Archiválás';
+z.string.hu.archiveHeader = 'Archiválás';
 
 z.string.hu.conversations_all_archived = 'Minden archiválva';
 z.string.hu.conversations_contacts = 'Névjegyek';
@@ -286,10 +286,10 @@ z.string.hu.conversations_secondary_line_timed_message = 'Időzített üzenet';
 z.string.hu.conversations_secondary_line_you_left = 'Kiléptél';
 z.string.hu.conversations_secondary_line_you_were_removed = 'El lettél távolítva';
 
-z.string.hu.takeover_sub = 'Foglald le egyedi Wire felhasználóneved.';
-z.string.hu.takeover_link = 'További információ';
-z.string.hu.takeover_button_choose = 'Válaszd ki a sajátod';
-z.string.hu.takeover_button_keep = 'Tartsd meg ezt';
+z.string.hu.takeoverSub = 'Foglald le egyedi Wire felhasználóneved.';
+z.string.hu.takeoverLink = 'További információ';
+z.string.hu.takeoverButtonChoose = 'Válaszd ki a sajátod';
+z.string.hu.takeoverButtonKeep = 'Tartsd meg ezt';
 
 z.string.hu.invite_meta_key_mac = 'Cmd';
 z.string.hu.invite_meta_key_pc = 'Ctrl';
@@ -493,7 +493,7 @@ z.string.hu.warning_permission_request_camera = '{{icon}} Kamera hozzáférés e
 z.string.hu.warning_permission_request_microphone = '{{icon}} Mikrofon hozzáférés engedélyezése';
 z.string.hu.warning_permission_request_notification = '{{icon}} Értesítések engedélyezése';
 z.string.hu.warning_permission_request_screen = '{{icon}} Képernyőmegosztás engedélyezése';
-z.string.hu.warning_tell_me_how = 'Mit kell tennem';
+z.string.hu.warningTellMeHow = 'Mit kell tennem';
 
 z.string.hu.userAvailabilityAvailable = 'Elérhető';
 z.string.hu.userAvailabilityAway = 'Nincs a gépnél';

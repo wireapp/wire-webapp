@@ -73,7 +73,7 @@ z.string.sl.auth_placeholder_password_put = 'Geslo';
 z.string.sl.auth_placeholder_password_set = 'Geslo (vsaj 8 znakov)';
 z.string.sl.auth_placeholder_phone = 'Telefonska številka';
 
-z.string.sl.auth_error_code = 'Neveljavna koda';
+z.string.sl.authErrorCode = 'Neveljavna koda';
 z.string.sl.auth_error_country_code_invalid = 'Neveljavna koda države';
 z.string.sl.auth_error_email_exists = 'E-poštni naslov je že zaseden';
 z.string.sl.auth_error_email_forbidden = 'Se opravičujemo. Ta e-poštni naslov je prepovedan.';
@@ -237,10 +237,10 @@ z.string.sl.collection_section_images = 'Slike';
 z.string.sl.collection_section_files = 'Zbirke';
 z.string.sl.collection_section_audio = 'Zvočna sporočila';
 
-z.string.sl.fullsearch_placeholder = 'Išči po sporočilih';
+z.string.sl.fullsearchPlaceholder = 'Išči po sporočilih';
 z.string.sl.fullsearch_no_results = 'Ni rezultatov.';
 
-z.string.sl.archive_header = 'Arhiviraj';
+z.string.sl.archiveHeader = 'Arhiviraj';
 
 z.string.sl.conversations_all_archived = 'Vse je arhivirano';
 z.string.sl.conversations_contacts = 'Stiki';
@@ -275,10 +275,10 @@ z.string.sl.conversations_secondary_line_timed_message = 'Časovno sporočilo';
 z.string.sl.conversations_secondary_line_you_left = 'Si zapustil(-a)';
 z.string.sl.conversations_secondary_line_you_were_removed = 'Bil(-a) si odstranjen(-a)';
 
-z.string.sl.takeover_sub = 'Zavzemite vaše unikatno ime na Wire.';
-z.string.sl.takeover_link = 'Nauči se več';
-z.string.sl.takeover_button_choose = 'Izberi svojo';
-z.string.sl.takeover_button_keep = 'Obdrži to';
+z.string.sl.takeoverSub = 'Zavzemite vaše unikatno ime na Wire.';
+z.string.sl.takeoverLink = 'Nauči se več';
+z.string.sl.takeoverButtonChoose = 'Izberi svojo';
+z.string.sl.takeoverButtonKeep = 'Obdrži to';
 
 z.string.sl.invite_meta_key_mac = 'Cmd';
 z.string.sl.invite_meta_key_pc = 'Ctrl';
@@ -476,7 +476,7 @@ z.string.sl.warning_permission_request_camera = '{{icon}} Dovoli dostop do kamer
 z.string.sl.warning_permission_request_microphone = '{{icon}} Dovoli dostop do mikrofona';
 z.string.sl.warning_permission_request_notification = '{{icon}} Dovoli obvestila';
 z.string.sl.warning_permission_request_screen = '{{icon}} Dovoli dostop do zaslona';
-z.string.sl.warning_tell_me_how = 'Povej mi kako';
+z.string.sl.warningTellMeHow = 'Povej mi kako';
 
 z.string.sl.userAvailabilityAvailable = 'Na voljo';
 z.string.sl.userAvailabilityNone = 'Nič';

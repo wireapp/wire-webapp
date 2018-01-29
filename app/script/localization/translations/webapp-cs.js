@@ -74,7 +74,7 @@ z.string.cs.auth_placeholder_password_put = 'Heslo';
 z.string.cs.auth_placeholder_password_set = 'Heslo (alespoň 8 znaků)';
 z.string.cs.auth_placeholder_phone = 'Telefonní číslo';
 
-z.string.cs.auth_error_code = 'Neplatný kód';
+z.string.cs.authErrorCode = 'Neplatný kód';
 z.string.cs.auth_error_country_code_invalid = 'Neplatný kód země';
 z.string.cs.auth_error_email_exists = 'Emailová adresa je již používána';
 z.string.cs.auth_error_email_forbidden = 'Omlouváme se. Tato emailová adresa byla zakázána.';
@@ -245,10 +245,10 @@ z.string.cs.collection_section_images = 'Obrázky';
 z.string.cs.collection_section_files = 'Soubory';
 z.string.cs.collection_section_audio = 'Zvukové zprávy';
 
-z.string.cs.fullsearch_placeholder = 'Prohledat zprávy';
+z.string.cs.fullsearchPlaceholder = 'Prohledat zprávy';
 z.string.cs.fullsearch_no_results = 'Žádné výsledky.';
 
-z.string.cs.archive_header = 'Archivovat';
+z.string.cs.archiveHeader = 'Archivovat';
 
 z.string.cs.conversations_all_archived = 'Vše archivováno';
 z.string.cs.conversations_contacts = 'Kontakty';
@@ -283,10 +283,10 @@ z.string.cs.conversations_secondary_line_timed_message = 'Časované zprávy';
 z.string.cs.conversations_secondary_line_you_left = 'Opustil(a) jste konverzaci';
 z.string.cs.conversations_secondary_line_you_were_removed = 'Byl(a) jste odebrán(a)';
 
-z.string.cs.takeover_sub = 'Vytvořte si vaše jedinečné jméno na Wire.';
-z.string.cs.takeover_link = 'Dozvědět se více';
-z.string.cs.takeover_button_choose = 'Vyberte své vlastní';
-z.string.cs.takeover_button_keep = 'Ponechat tento';
+z.string.cs.takeoverSub = 'Vytvořte si vaše jedinečné jméno na Wire.';
+z.string.cs.takeoverLink = 'Dozvědět se více';
+z.string.cs.takeoverButtonChoose = 'Vyberte své vlastní';
+z.string.cs.takeoverButtonKeep = 'Ponechat tento';
 
 z.string.cs.invite_meta_key_mac = 'Cmd';
 z.string.cs.invite_meta_key_pc = 'Ctrl';
@@ -483,7 +483,7 @@ z.string.cs.warning_permission_request_camera = '{{icon}} Povolit přístup ke k
 z.string.cs.warning_permission_request_microphone = '{{icon}} Povolit přístup k mikrofonu';
 z.string.cs.warning_permission_request_notification = '{{icon}} Povolit upozornění';
 z.string.cs.warning_permission_request_screen = '{{icon}} Povolit přístup k obrazovce';
-z.string.cs.warning_tell_me_how = 'Jak na to';
+z.string.cs.warningTellMeHow = 'Jak na to';
 
 z.string.cs.userAvailabilityAvailable = 'Dostupný';
 z.string.cs.userAvailabilityNone = 'Žádné';

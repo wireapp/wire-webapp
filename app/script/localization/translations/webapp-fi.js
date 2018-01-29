@@ -74,7 +74,7 @@ z.string.fi.auth_placeholder_password_put = 'Salasana';
 z.string.fi.auth_placeholder_password_set = 'Salasana (vähintään 8 merkkiä pitkä)';
 z.string.fi.auth_placeholder_phone = 'Puhelinnumero';
 
-z.string.fi.auth_error_code = 'Virheellinen koodi';
+z.string.fi.authErrorCode = 'Virheellinen koodi';
 z.string.fi.auth_error_country_code_invalid = 'Maakoodi ei kelpaa';
 z.string.fi.auth_error_email_exists = 'Tälle sähköpostille on jo luotu tunnus';
 z.string.fi.auth_error_email_forbidden = 'Valitettavasti tämä sähköpostiosoite on kielletty.';
@@ -246,10 +246,10 @@ z.string.fi.collection_section_images = 'Kuvat';
 z.string.fi.collection_section_files = 'Tiedostot';
 z.string.fi.collection_section_audio = 'Ääniviestit';
 
-z.string.fi.fullsearch_placeholder = 'Etsi viestejä';
+z.string.fi.fullsearchPlaceholder = 'Etsi viestejä';
 z.string.fi.fullsearch_no_results = 'Ei tuloksia.';
 
-z.string.fi.archive_header = 'Arkistoi';
+z.string.fi.archiveHeader = 'Arkistoi';
 
 z.string.fi.conversations_all_archived = 'Kaikki arkistoitu';
 z.string.fi.conversations_contacts = 'Yhteystiedot';
@@ -284,10 +284,10 @@ z.string.fi.conversations_secondary_line_timed_message = 'Ajoitettu viesti';
 z.string.fi.conversations_secondary_line_you_left = 'Poistuit';
 z.string.fi.conversations_secondary_line_you_were_removed = 'Sinut poistettiin';
 
-z.string.fi.takeover_sub = 'Valtaa yksilöllinen nimesi Wiressä.';
-z.string.fi.takeover_link = 'Lue lisää';
-z.string.fi.takeover_button_choose = 'Valitse omasi';
-z.string.fi.takeover_button_keep = 'Pidä tämä';
+z.string.fi.takeoverSub = 'Valtaa yksilöllinen nimesi Wiressä.';
+z.string.fi.takeoverLink = 'Lue lisää';
+z.string.fi.takeoverButtonChoose = 'Valitse omasi';
+z.string.fi.takeoverButtonKeep = 'Pidä tämä';
 
 z.string.fi.invite_meta_key_mac = 'Cmd';
 z.string.fi.invite_meta_key_pc = 'Ctrl';
@@ -485,7 +485,7 @@ z.string.fi.warning_permission_request_camera = '{{icon}} Anna käyttöoikeus ka
 z.string.fi.warning_permission_request_microphone = '{{icon}} Anna käyttöoikeus mikrofoniin';
 z.string.fi.warning_permission_request_notification = '{{icon}} Salli ilmoitukset';
 z.string.fi.warning_permission_request_screen = '{{icon}} Salli näytön käyttö';
-z.string.fi.warning_tell_me_how = 'Kerro miten';
+z.string.fi.warningTellMeHow = 'Kerro miten';
 
 z.string.fi.userAvailabilityAvailable = 'Saatavilla';
 z.string.fi.userAvailabilityNone = 'Ei mitään';

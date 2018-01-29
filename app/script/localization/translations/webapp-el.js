@@ -74,7 +74,7 @@ z.string.el.auth_placeholder_password_put = 'Κωδικός Πρόσβασης';
 z.string.el.auth_placeholder_password_set = 'Κωδικος προσβασης (το λιγοτερο 8 χαρακτηρες)';
 z.string.el.auth_placeholder_phone = 'Αριθμός Κινητού Τηλεφώνου';
 
-z.string.el.auth_error_code = 'Μη έγκυρος κωδικός';
+z.string.el.authErrorCode = 'Μη έγκυρος κωδικός';
 z.string.el.auth_error_country_code_invalid = 'Μη έγκυρος κωδικός χώρας';
 z.string.el.auth_error_email_exists = 'Η Διεύθυνση Ηλ. Ταχυδρομείου χρησιμοποιείται ήδη';
 z.string.el.auth_error_email_forbidden = 'Λυπούμαστε. Αυτή η διεύθυνση email δεν επιτρέπεται.';
@@ -244,10 +244,10 @@ z.string.el.collection_section_images = 'Εικόνες';
 z.string.el.collection_section_files = 'Αρχεία';
 z.string.el.collection_section_audio = 'Ηχητικά μηνύματα';
 
-z.string.el.fullsearch_placeholder = 'Αναζήτηση μηνυμάτων κειμένου';
+z.string.el.fullsearchPlaceholder = 'Αναζήτηση μηνυμάτων κειμένου';
 z.string.el.fullsearch_no_results = 'Χωρίς Αποτέλεσμα.';
 
-z.string.el.archive_header = 'Αρχειοθέτηση';
+z.string.el.archiveHeader = 'Αρχειοθέτηση';
 
 z.string.el.conversations_all_archived = 'Τα πάντα αρχειοθετήθηκαν';
 z.string.el.conversations_contacts = 'Επαφές';
@@ -282,10 +282,10 @@ z.string.el.conversations_secondary_line_timed_message = 'Προσωρινό μ�
 z.string.el.conversations_secondary_line_you_left = 'Αποχωρήσατε';
 z.string.el.conversations_secondary_line_you_were_removed = 'Σας αφαίρεσαν';
 
-z.string.el.takeover_sub = 'Ζητήστε το μοναδικό σας όνομα στο Wire.';
-z.string.el.takeover_link = 'Μάθετε περισσότερα';
-z.string.el.takeover_button_choose = 'Επιλέξτε το δικό σας';
-z.string.el.takeover_button_keep = 'Κρατήστε το';
+z.string.el.takeoverSub = 'Ζητήστε το μοναδικό σας όνομα στο Wire.';
+z.string.el.takeoverLink = 'Μάθετε περισσότερα';
+z.string.el.takeoverButtonChoose = 'Επιλέξτε το δικό σας';
+z.string.el.takeoverButtonKeep = 'Κρατήστε το';
 
 z.string.el.invite_meta_key_mac = 'Cmd';
 z.string.el.invite_meta_key_pc = 'Ctrl';
@@ -482,7 +482,7 @@ z.string.el.warning_permission_request_camera = '{{icon}} Να επιτρέπε�
 z.string.el.warning_permission_request_microphone = '{{icon}} Να επιτρέπεται η πρόσβαση στο μικρόφωνο';
 z.string.el.warning_permission_request_notification = '{{icon}} Να επιτρέπονται οι ειδοποιήσεις';
 z.string.el.warning_permission_request_screen = '{{icon}} Να επιτρέπεται η πρόσβαση στην οθόνη';
-z.string.el.warning_tell_me_how = 'Πείτε μας πως';
+z.string.el.warningTellMeHow = 'Πείτε μας πως';
 
 z.string.el.userAvailabilityAvailable = 'Διαθέσιμο';
 z.string.el.userAvailabilityNone = 'Καθόλου';

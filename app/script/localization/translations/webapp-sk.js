@@ -75,7 +75,7 @@ z.string.sk.auth_placeholder_password_put = 'Heslo';
 z.string.sk.auth_placeholder_password_set = 'Heslo (minimálne 8 znakov)';
 z.string.sk.auth_placeholder_phone = 'Telefónne číslo';
 
-z.string.sk.auth_error_code = 'Neplatný kód';
+z.string.sk.authErrorCode = 'Neplatný kód';
 z.string.sk.auth_error_country_code_invalid = 'Neplatný kód krajiny';
 z.string.sk.auth_error_email_exists = 'E-mailová adresa sa už používa';
 z.string.sk.auth_error_email_forbidden = 'Prepáčte. Táto emailová adresa je zakázaná.';
@@ -246,10 +246,10 @@ z.string.sk.collection_section_images = 'Obrázky';
 z.string.sk.collection_section_files = 'Súbory';
 z.string.sk.collection_section_audio = 'Zvukové správy';
 
-z.string.sk.fullsearch_placeholder = 'Vyhľadať textové správy';
+z.string.sk.fullsearchPlaceholder = 'Vyhľadať textové správy';
 z.string.sk.fullsearch_no_results = 'Žiadne výsledky.';
 
-z.string.sk.archive_header = 'Archív';
+z.string.sk.archiveHeader = 'Archív';
 
 z.string.sk.conversations_all_archived = 'Všetko archivované';
 z.string.sk.conversations_contacts = 'Kontakty';
@@ -284,10 +284,10 @@ z.string.sk.conversations_secondary_line_timed_message = 'Časovaná správa';
 z.string.sk.conversations_secondary_line_you_left = 'Odišli ste';
 z.string.sk.conversations_secondary_line_you_were_removed = 'Boli ste odstránený';
 
-z.string.sk.takeover_sub = 'Potvrďte Vaše jednoznačné meno pre Wire.';
-z.string.sk.takeover_link = 'Zistiť viac';
-z.string.sk.takeover_button_choose = 'Vybrať vlastné';
-z.string.sk.takeover_button_keep = 'Ponechať tento';
+z.string.sk.takeoverSub = 'Potvrďte Vaše jednoznačné meno pre Wire.';
+z.string.sk.takeoverLink = 'Zistiť viac';
+z.string.sk.takeoverButtonChoose = 'Vybrať vlastné';
+z.string.sk.takeoverButtonKeep = 'Ponechať tento';
 
 z.string.sk.invite_meta_key_mac = 'Cmd';
 z.string.sk.invite_meta_key_pc = 'Ctrl';
@@ -485,7 +485,7 @@ z.string.sk.warning_permission_request_camera = '{{icon}} Povoliť prístup ku k
 z.string.sk.warning_permission_request_microphone = '{{icon}} Povoliť prístup k mikrofónu';
 z.string.sk.warning_permission_request_notification = '{{icon}} Povoliť oznámenia';
 z.string.sk.warning_permission_request_screen = '{{icon}} Povoliť prístup k obrazovke';
-z.string.sk.warning_tell_me_how = 'Povedz mi, ako';
+z.string.sk.warningTellMeHow = 'Povedz mi, ako';
 
 z.string.sk.userAvailabilityAvailable = 'Dostupné';
 z.string.sk.userAvailabilityNone = 'Žiadne';

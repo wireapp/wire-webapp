@@ -75,7 +75,7 @@ z.string.nl.auth_placeholder_password_put = 'Wachtwoord';
 z.string.nl.auth_placeholder_password_set = 'Wachtwoord (minimaal 8 tekens)';
 z.string.nl.auth_placeholder_phone = 'Telefoonnummer';
 
-z.string.nl.auth_error_code = 'Ongeldige code';
+z.string.nl.authErrorCode = 'Ongeldige code';
 z.string.nl.auth_error_country_code_invalid = 'Ongeldige landscode';
 z.string.nl.auth_error_email_exists = 'Email adres word algebruikt';
 z.string.nl.auth_error_email_forbidden = 'Sorry. Dit e-mailadres is verboden.';
@@ -248,10 +248,10 @@ z.string.nl.collection_section_images = 'Afbeeldingen';
 z.string.nl.collection_section_files = 'Bestanden';
 z.string.nl.collection_section_audio = 'Audio berichten';
 
-z.string.nl.fullsearch_placeholder = 'Zoek tekst berichten';
+z.string.nl.fullsearchPlaceholder = 'Zoek tekst berichten';
 z.string.nl.fullsearch_no_results = 'Geen resultaten.';
 
-z.string.nl.archive_header = 'Archiveren';
+z.string.nl.archiveHeader = 'Archiveren';
 
 z.string.nl.conversations_all_archived = 'Alles gearchiveerd';
 z.string.nl.conversations_contacts = 'Contacten';
@@ -286,10 +286,10 @@ z.string.nl.conversations_secondary_line_timed_message = 'Tijdelijk bericht';
 z.string.nl.conversations_secondary_line_you_left = 'Je hebt het gesprek verlaten';
 z.string.nl.conversations_secondary_line_you_were_removed = 'Je bent verwijderd';
 
-z.string.nl.takeover_sub = 'Claim je unieke gebruikers naam op Wire.';
-z.string.nl.takeover_link = 'Leer meer';
-z.string.nl.takeover_button_choose = 'Kies je eigen';
-z.string.nl.takeover_button_keep = 'Behoud deze';
+z.string.nl.takeoverSub = 'Claim je unieke gebruikers naam op Wire.';
+z.string.nl.takeoverLink = 'Leer meer';
+z.string.nl.takeoverButtonChoose = 'Kies je eigen';
+z.string.nl.takeoverButtonKeep = 'Behoud deze';
 
 z.string.nl.invite_meta_key_mac = 'Cmd';
 z.string.nl.invite_meta_key_pc = 'Ctrl';
@@ -488,7 +488,7 @@ z.string.nl.warning_permission_request_camera = '{{icon}} Toegang tot camera toe
 z.string.nl.warning_permission_request_microphone = '{{icon}} Toegang tot de microfoon toestaan';
 z.string.nl.warning_permission_request_notification = '{{icon}} Meldingen toestaan';
 z.string.nl.warning_permission_request_screen = '{{icon}} Toegang tot scherm toestaan';
-z.string.nl.warning_tell_me_how = 'Vertel me meer';
+z.string.nl.warningTellMeHow = 'Vertel me meer';
 
 z.string.nl.userAvailabilityAvailable = 'Beschikbaar';
 z.string.nl.userAvailabilityAway = 'Afwezig';

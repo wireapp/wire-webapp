@@ -74,7 +74,7 @@ z.string.es.auth_placeholder_password_put = 'Contraseña';
 z.string.es.auth_placeholder_password_set = 'Contraseña (mínimo 8 caracteres)';
 z.string.es.auth_placeholder_phone = 'Número de teléfono';
 
-z.string.es.auth_error_code = 'Código no válido';
+z.string.es.authErrorCode = 'Código no válido';
 z.string.es.auth_error_country_code_invalid = 'Código de país no válido';
 z.string.es.auth_error_email_exists = 'Este correo electrónico ya está registrado';
 z.string.es.auth_error_email_forbidden = 'Lo sentimos. Esta dirección de correo electrónico está prohibida.';
@@ -247,10 +247,10 @@ z.string.es.collection_section_images = 'Fotos';
 z.string.es.collection_section_files = 'Ficheros';
 z.string.es.collection_section_audio = 'Mensajes de audio';
 
-z.string.es.fullsearch_placeholder = 'Buscar mensajes';
+z.string.es.fullsearchPlaceholder = 'Buscar mensajes';
 z.string.es.fullsearch_no_results = 'Ningún resultado.';
 
-z.string.es.archive_header = 'Archivar';
+z.string.es.archiveHeader = 'Archivar';
 
 z.string.es.conversations_all_archived = 'Todo archivado';
 z.string.es.conversations_contacts = 'Contactos';
@@ -285,10 +285,10 @@ z.string.es.conversations_secondary_line_timed_message = 'Mensaje temporizado';
 z.string.es.conversations_secondary_line_you_left = 'Te fuiste';
 z.string.es.conversations_secondary_line_you_were_removed = 'Te han eliminado';
 
-z.string.es.takeover_sub = 'Reclama tu nombre único en Wire.';
-z.string.es.takeover_link = 'Aprender más';
-z.string.es.takeover_button_choose = 'Elegir tu propio nombre';
-z.string.es.takeover_button_keep = 'Conservar este';
+z.string.es.takeoverSub = 'Reclama tu nombre único en Wire.';
+z.string.es.takeoverLink = 'Aprender más';
+z.string.es.takeoverButtonChoose = 'Elegir tu propio nombre';
+z.string.es.takeoverButtonKeep = 'Conservar este';
 
 z.string.es.invite_meta_key_mac = 'Cmd';
 z.string.es.invite_meta_key_pc = 'Ctrl';
@@ -487,7 +487,7 @@ z.string.es.warning_permission_request_camera = '{{icon}} Permitir acceso a la c
 z.string.es.warning_permission_request_microphone = '{{icon}} Permitir acceso al micrófono';
 z.string.es.warning_permission_request_notification = '{{icon}} Permitir notificaciones';
 z.string.es.warning_permission_request_screen = '{{icon}} Permitir acceso a la pantalla';
-z.string.es.warning_tell_me_how = 'Explíqueme cómo';
+z.string.es.warningTellMeHow = 'Explíqueme cómo';
 
 z.string.es.userAvailabilityAvailable = 'Disponible';
 z.string.es.userAvailabilityAway = 'Ausente';

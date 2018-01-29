@@ -74,7 +74,7 @@ z.string.pl.auth_placeholder_password_put = 'Hasło';
 z.string.pl.auth_placeholder_password_set = 'Hasło (musi mieć przynajmniej 8 znaków)';
 z.string.pl.auth_placeholder_phone = 'Numer telefonu';
 
-z.string.pl.auth_error_code = 'Nieprawidłowy kod';
+z.string.pl.authErrorCode = 'Nieprawidłowy kod';
 z.string.pl.auth_error_country_code_invalid = 'Błędy kierunkowy kraju';
 z.string.pl.auth_error_email_exists = 'Adres e-mail już istnieje';
 z.string.pl.auth_error_email_forbidden = 'Przepraszamy. Ten adres e-mail został zabroniony.';
@@ -246,10 +246,10 @@ z.string.pl.collection_section_images = 'Zdjęcia';
 z.string.pl.collection_section_files = 'Pliki';
 z.string.pl.collection_section_audio = 'Wiadomości audio';
 
-z.string.pl.fullsearch_placeholder = 'Wyszukiwanie wiadomości';
+z.string.pl.fullsearchPlaceholder = 'Wyszukiwanie wiadomości';
 z.string.pl.fullsearch_no_results = 'Brak wyników.';
 
-z.string.pl.archive_header = 'Archiwizuj';
+z.string.pl.archiveHeader = 'Archiwizuj';
 
 z.string.pl.conversations_all_archived = 'Wszystko zarchiwizowane';
 z.string.pl.conversations_contacts = 'Kontakty';
@@ -284,10 +284,10 @@ z.string.pl.conversations_secondary_line_timed_message = 'Wiadomość tymczasowa
 z.string.pl.conversations_secondary_line_you_left = 'Opuściłeś/aś';
 z.string.pl.conversations_secondary_line_you_were_removed = 'Zostałeś usunięty/Zostałaś usunięta';
 
-z.string.pl.takeover_sub = 'Wybierz swoją unikalną nazwę w Wire.';
-z.string.pl.takeover_link = 'Więcej informacji';
-z.string.pl.takeover_button_choose = 'Wybierz swój własny';
-z.string.pl.takeover_button_keep = 'Zachowaj wybrany';
+z.string.pl.takeoverSub = 'Wybierz swoją unikalną nazwę w Wire.';
+z.string.pl.takeoverLink = 'Więcej informacji';
+z.string.pl.takeoverButtonChoose = 'Wybierz swój własny';
+z.string.pl.takeoverButtonKeep = 'Zachowaj wybrany';
 
 z.string.pl.invite_meta_key_mac = 'Cmd';
 z.string.pl.invite_meta_key_pc = 'Ctrl';
@@ -485,7 +485,7 @@ z.string.pl.warning_permission_request_camera = '{{icon}} Zezwól na dostęp do 
 z.string.pl.warning_permission_request_microphone = '{{icon}} Zezwól na dostęp do mikrofonu';
 z.string.pl.warning_permission_request_notification = '{{icon}} Zezwól na powiadomienia';
 z.string.pl.warning_permission_request_screen = '{{icon}} zezwól na dostęp do ekranu';
-z.string.pl.warning_tell_me_how = 'Powiedz mi jak';
+z.string.pl.warningTellMeHow = 'Powiedz mi jak';
 
 z.string.pl.userAvailabilityAvailable = '&Dostępny(a)';
 z.string.pl.userAvailabilityNone = 'Żaden';

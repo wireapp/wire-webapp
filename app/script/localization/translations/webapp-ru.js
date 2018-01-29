@@ -75,7 +75,7 @@ z.string.ru.auth_placeholder_password_put = 'Пароль';
 z.string.ru.auth_placeholder_password_set = 'Пароль (минимум 8 символов)';
 z.string.ru.auth_placeholder_phone = 'Номер телефона';
 
-z.string.ru.auth_error_code = 'Неверный код';
+z.string.ru.authErrorCode = 'Неверный код';
 z.string.ru.auth_error_country_code_invalid = 'Неверный код страны';
 z.string.ru.auth_error_email_exists = 'Такой email уже используется';
 z.string.ru.auth_error_email_forbidden = 'Извините, этот адрес email запрещен.';
@@ -247,10 +247,10 @@ z.string.ru.collection_section_images = 'Изображения';
 z.string.ru.collection_section_files = 'Файлы';
 z.string.ru.collection_section_audio = 'Аудиосообщения';
 
-z.string.ru.fullsearch_placeholder = 'Поиск в текстовых сообщениях';
+z.string.ru.fullsearchPlaceholder = 'Поиск в текстовых сообщениях';
 z.string.ru.fullsearch_no_results = 'Ничего не найдено.';
 
-z.string.ru.archive_header = 'Архив';
+z.string.ru.archiveHeader = 'Архив';
 
 z.string.ru.conversations_all_archived = 'Все разговоры отправлены в архив';
 z.string.ru.conversations_contacts = 'Контакты';
@@ -285,10 +285,10 @@ z.string.ru.conversations_secondary_line_timed_message = 'Временное с�
 z.string.ru.conversations_secondary_line_you_left = 'Вы покинули разговор';
 z.string.ru.conversations_secondary_line_you_were_removed = 'Вы были удалены';
 
-z.string.ru.takeover_sub = 'Зарегистрируйте своё уникальное имя в Wire.';
-z.string.ru.takeover_link = 'Подробнее';
-z.string.ru.takeover_button_choose = 'Выбрать своё';
-z.string.ru.takeover_button_keep = 'Оставить это';
+z.string.ru.takeoverSub = 'Зарегистрируйте своё уникальное имя в Wire.';
+z.string.ru.takeoverLink = 'Подробнее';
+z.string.ru.takeoverButtonChoose = 'Выбрать своё';
+z.string.ru.takeoverButtonKeep = 'Оставить это';
 
 z.string.ru.invite_meta_key_mac = 'Cmd';
 z.string.ru.invite_meta_key_pc = 'Ctrl';
@@ -487,7 +487,7 @@ z.string.ru.warning_permission_request_camera = '{{icon}} Разрешить д�
 z.string.ru.warning_permission_request_microphone = '{{icon}} Разрешить доступ к микрофону';
 z.string.ru.warning_permission_request_notification = '{{icon}} Разрешить уведомления';
 z.string.ru.warning_permission_request_screen = '{{icon}} Разрешить доступ к экрану';
-z.string.ru.warning_tell_me_how = 'Скажите мне, как';
+z.string.ru.warningTellMeHow = 'Скажите мне, как';
 
 z.string.ru.userAvailabilityAvailable = 'Доступно';
 z.string.ru.userAvailabilityAway = 'Отошел';

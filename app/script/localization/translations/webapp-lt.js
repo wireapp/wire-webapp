@@ -75,7 +75,7 @@ z.string.lt.auth_placeholder_password_put = 'Slaptažodis';
 z.string.lt.auth_placeholder_password_set = 'Slaptažodis (bent 8 simboliai)';
 z.string.lt.auth_placeholder_phone = 'Telefono numeris';
 
-z.string.lt.auth_error_code = 'Neteisingas kodas';
+z.string.lt.authErrorCode = 'Neteisingas kodas';
 z.string.lt.auth_error_country_code_invalid = 'Neteisingas šalies kodas';
 z.string.lt.auth_error_email_exists = 'El. pašto adresas jau užimtas';
 z.string.lt.auth_error_email_forbidden = 'Atleiskite. Šis el. pašto adresas yra uždraustas.';
@@ -248,10 +248,10 @@ z.string.lt.collection_section_images = 'Paveikslai';
 z.string.lt.collection_section_files = 'Failai';
 z.string.lt.collection_section_audio = 'Garso žinutės';
 
-z.string.lt.fullsearch_placeholder = 'Ieškoti tekstinėse žinutėse';
+z.string.lt.fullsearchPlaceholder = 'Ieškoti tekstinėse žinutėse';
 z.string.lt.fullsearch_no_results = 'Rezultatų nėra.';
 
-z.string.lt.archive_header = 'Archyvuoti';
+z.string.lt.archiveHeader = 'Archyvuoti';
 
 z.string.lt.conversations_all_archived = 'Viskas užarchyvuota';
 z.string.lt.conversations_contacts = 'Kontaktai';
@@ -286,10 +286,10 @@ z.string.lt.conversations_secondary_line_timed_message = 'Laikina žinutė';
 z.string.lt.conversations_secondary_line_you_left = 'Jūs išėjote';
 z.string.lt.conversations_secondary_line_you_were_removed = 'Jūs buvote pašalinti';
 
-z.string.lt.takeover_sub = 'Užsirezervuokite savo unikalų Wire vardą.';
-z.string.lt.takeover_link = 'Sužinoti daugiau';
-z.string.lt.takeover_button_choose = 'Pasirinkti savo asmeninį';
-z.string.lt.takeover_button_keep = 'Palikti šį';
+z.string.lt.takeoverSub = 'Užsirezervuokite savo unikalų Wire vardą.';
+z.string.lt.takeoverLink = 'Sužinoti daugiau';
+z.string.lt.takeoverButtonChoose = 'Pasirinkti savo asmeninį';
+z.string.lt.takeoverButtonKeep = 'Palikti šį';
 
 z.string.lt.invite_meta_key_mac = 'Cmd';
 z.string.lt.invite_meta_key_pc = 'Ctrl';
@@ -488,7 +488,7 @@ z.string.lt.warning_permission_request_camera = '{{icon}} Leisti prieigą prie k
 z.string.lt.warning_permission_request_microphone = '{{icon}} Leisti prieigą prie mikrofono';
 z.string.lt.warning_permission_request_notification = '{{icon}} Leisti pranešimus';
 z.string.lt.warning_permission_request_screen = '{{icon}} Leisti prieigą prie ekrano';
-z.string.lt.warning_tell_me_how = 'Paaiškinkite kaip';
+z.string.lt.warningTellMeHow = 'Paaiškinkite kaip';
 
 z.string.lt.userAvailabilityAvailable = 'Prieinamas';
 z.string.lt.userAvailabilityAway = 'Pasišalinęs';

@@ -87,7 +87,7 @@ z.string.auth_placeholder_password_set = 'Password (at least 8 characters)';
 z.string.auth_placeholder_phone = 'Phone Number';
 
 // Authentication: Validation errors
-z.string.auth_error_code = 'Invalid Code';
+z.string.authErrorCode = 'Invalid Code';
 z.string.auth_error_country_code_invalid = 'Invalid Country Code';
 z.string.auth_error_email_exists = 'Email address already taken';
 z.string.auth_error_email_forbidden = 'Sorry. This email address is forbidden.';
@@ -298,11 +298,11 @@ z.string.collection_section_files = 'Files';
 z.string.collection_section_audio = 'Audio messages';
 
 // Full Search
-z.string.fullsearch_placeholder = 'Search text messages';
+z.string.fullsearchPlaceholder = 'Search text messages';
 z.string.fullsearch_no_results = 'No results.';
 
 // Archive
-z.string.archive_header = 'Archive';
+z.string.archiveHeader = 'Archive';
 
 // Conversations
 z.string.conversations_all_archived = 'Everything archived';
@@ -340,10 +340,10 @@ z.string.conversations_secondary_line_you_left = 'You left';
 z.string.conversations_secondary_line_you_were_removed = 'You were removed';
 
 // Takeover
-z.string.takeover_sub = 'Claim your unique name on Wire.';
-z.string.takeover_link = 'Learn more';
-z.string.takeover_button_choose = 'Choose your own';
-z.string.takeover_button_keep = 'Keep this one';
+z.string.takeoverSub = 'Claim your unique name on Wire.';
+z.string.takeoverLink = 'Learn more';
+z.string.takeoverButtonChoose = 'Choose your own';
+z.string.takeoverButtonKeep = 'Keep this one';
 
 // Invites
 z.string.invite_meta_key_mac = 'Cmd';
@@ -569,7 +569,7 @@ z.string.warning_permission_request_camera = '{{icon}} Allow access to camera';
 z.string.warning_permission_request_microphone = '{{icon}} Allow access to microphone';
 z.string.warning_permission_request_notification = '{{icon}} Allow notifications';
 z.string.warning_permission_request_screen = '{{icon}} Allow access to screen';
-z.string.warning_tell_me_how = 'Tell me how';
+z.string.warningTellMeHow = 'Tell me how';
 
 // User Availability
 z.string.userAvailabilityAvailable = 'Available';

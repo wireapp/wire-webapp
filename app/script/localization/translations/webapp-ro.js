@@ -75,7 +75,7 @@ z.string.ro.auth_placeholder_password_put = 'Parolă';
 z.string.ro.auth_placeholder_password_set = 'Parolă (minim 8 caractere)';
 z.string.ro.auth_placeholder_phone = 'Număr de telefon';
 
-z.string.ro.auth_error_code = 'Cod nevalid';
+z.string.ro.authErrorCode = 'Cod nevalid';
 z.string.ro.auth_error_country_code_invalid = 'Cod de țară nevalid';
 z.string.ro.auth_error_email_exists = 'Adresa de e-mail este deja folosită';
 z.string.ro.auth_error_email_forbidden = 'Ne pare rău. Această adresa de e-mail este interzisă.';
@@ -248,10 +248,10 @@ z.string.ro.collection_section_images = 'Imagini';
 z.string.ro.collection_section_files = 'Fișiere';
 z.string.ro.collection_section_audio = 'Mesaje audio';
 
-z.string.ro.fullsearch_placeholder = 'Caută prin mesaje text';
+z.string.ro.fullsearchPlaceholder = 'Caută prin mesaje text';
 z.string.ro.fullsearch_no_results = 'Fără rezultate.';
 
-z.string.ro.archive_header = 'Arhivă';
+z.string.ro.archiveHeader = 'Arhivă';
 
 z.string.ro.conversations_all_archived = 'Totul a fost arhivat';
 z.string.ro.conversations_contacts = 'Contacte';
@@ -286,10 +286,10 @@ z.string.ro.conversations_secondary_line_timed_message = 'Mesaj temporizat';
 z.string.ro.conversations_secondary_line_you_left = 'Ai ieșit';
 z.string.ro.conversations_secondary_line_you_were_removed = 'Ai fost scos din conversație';
 
-z.string.ro.takeover_sub = 'Obține numele tău unic pe Wire.';
-z.string.ro.takeover_link = 'Află mai multe';
-z.string.ro.takeover_button_choose = 'Alege propriul nume';
-z.string.ro.takeover_button_keep = 'Păstrează acest nume';
+z.string.ro.takeoverSub = 'Obține numele tău unic pe Wire.';
+z.string.ro.takeoverLink = 'Află mai multe';
+z.string.ro.takeoverButtonChoose = 'Alege propriul nume';
+z.string.ro.takeoverButtonKeep = 'Păstrează acest nume';
 
 z.string.ro.invite_meta_key_mac = 'Cmd';
 z.string.ro.invite_meta_key_pc = 'Ctrl';
@@ -487,7 +487,7 @@ z.string.ro.warning_permission_request_camera = '{{icon}} permite accesul la cam
 z.string.ro.warning_permission_request_microphone = '{{icon}} permit accesul la microfon';
 z.string.ro.warning_permission_request_notification = '{{icon}} permite notificările';
 z.string.ro.warning_permission_request_screen = '{{icon}} permite accesul la ecran';
-z.string.ro.warning_tell_me_how = 'Spune-mi cum';
+z.string.ro.warningTellMeHow = 'Spune-mi cum';
 
 z.string.ro.userAvailabilityAvailable = 'Disponibil';
 z.string.ro.userAvailabilityNone = 'Niciunul';

@@ -648,7 +648,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
         })
         .catch(() => {
           if (!this.validation_errors().length) {
-            this._add_error(z.string.auth_error_code, z.auth.AuthView.TYPE.CODE);
+            this._add_error(z.string.authErrorCode, z.auth.AuthView.TYPE.CODE);
             this._has_errors();
           }
           this.pending_server_request(false);

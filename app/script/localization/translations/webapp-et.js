@@ -75,7 +75,7 @@ z.string.et.auth_placeholder_password_put = 'Parool';
 z.string.et.auth_placeholder_password_set = 'Parool (vähemalt 8 märki)';
 z.string.et.auth_placeholder_phone = 'Telefoninumber';
 
-z.string.et.auth_error_code = 'Vigane kood';
+z.string.et.authErrorCode = 'Vigane kood';
 z.string.et.auth_error_country_code_invalid = 'Vale riigikood';
 z.string.et.auth_error_email_exists = 'E-posti aadress on juba kasutusel';
 z.string.et.auth_error_email_forbidden = 'Vabandust. See e-posti aadress on keelatud.';
@@ -248,10 +248,10 @@ z.string.et.collection_section_images = 'Pildid';
 z.string.et.collection_section_files = 'Failid';
 z.string.et.collection_section_audio = 'Helisõnumid';
 
-z.string.et.fullsearch_placeholder = 'Otsi tekstsõnumeid';
+z.string.et.fullsearchPlaceholder = 'Otsi tekstsõnumeid';
 z.string.et.fullsearch_no_results = 'Tulemusi ei leitud.';
 
-z.string.et.archive_header = 'Arhiveeri';
+z.string.et.archiveHeader = 'Arhiveeri';
 
 z.string.et.conversations_all_archived = 'Kõik on arhiveeritud';
 z.string.et.conversations_contacts = 'Kontaktid';
@@ -286,10 +286,10 @@ z.string.et.conversations_secondary_line_timed_message = 'Kustuv sõnum';
 z.string.et.conversations_secondary_line_you_left = 'Sa lahkusid';
 z.string.et.conversations_secondary_line_you_were_removed = 'Sind eemaldati vestlusest';
 
-z.string.et.takeover_sub = 'Haara oma unikaalne nimi Wire’is.';
-z.string.et.takeover_link = 'Loe lähemalt';
-z.string.et.takeover_button_choose = 'Vali enda oma';
-z.string.et.takeover_button_keep = 'Vali see sama';
+z.string.et.takeoverSub = 'Haara oma unikaalne nimi Wire’is.';
+z.string.et.takeoverLink = 'Loe lähemalt';
+z.string.et.takeoverButtonChoose = 'Vali enda oma';
+z.string.et.takeoverButtonKeep = 'Vali see sama';
 
 z.string.et.invite_meta_key_mac = 'Cmd';
 z.string.et.invite_meta_key_pc = 'Ctrl';
@@ -488,7 +488,7 @@ z.string.et.warning_permission_request_camera = '{{icon}} Luba kaamerale juurdep
 z.string.et.warning_permission_request_microphone = '{{icon}} Luba mikrofonile juurdepääs';
 z.string.et.warning_permission_request_notification = '{{icon}} Luba teated';
 z.string.et.warning_permission_request_screen = '{{icon}} Luba ekraanile juurdepääs';
-z.string.et.warning_tell_me_how = 'Ütle, kuidas';
+z.string.et.warningTellMeHow = 'Ütle, kuidas';
 
 z.string.et.userAvailabilityAvailable = 'Saadaval';
 z.string.et.userAvailabilityAway = 'Eemal';
