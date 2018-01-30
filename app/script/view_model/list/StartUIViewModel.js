@@ -463,6 +463,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.show_spinner(false);
 
     this.selected_people.removeAll();
+    this.state(StartUIViewModel.STATE.ADD_PEOPLE);
     this.search_input('');
   }
 
