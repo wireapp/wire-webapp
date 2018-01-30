@@ -167,6 +167,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
     this.searchInput = ko.observable('');
     this.searchInput.subscribe(searchInput => this.searchServices(searchInput));
+    this.isSearching = ko.pureComputed(() => this.searchInput().length);
 
     this.selectedUsers = ko.observableArray([]);
     this.users = ko.pureComputed(() => {
