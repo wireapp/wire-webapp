@@ -363,13 +363,11 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
         },
         scroll_selector: '.start-ui-list',
       });
+
       if (this.userProfileIsService()) {
-        this.integrationRepository.getProviderById(this.user_profile().providerId).then(providerEntity => {
-          if (this.user_profile()) {
-            this.user_profile().providerName(providerEntity.name);
-          }
-        });
+        this.integrationRepository.getProviderNameForService(this.user_profile());
       }
+
       this.user_bubble.toggle();
     };
 

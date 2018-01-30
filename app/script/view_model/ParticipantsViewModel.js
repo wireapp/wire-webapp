@@ -245,11 +245,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.selectedService(serviceEntity);
     this.state(ParticipantsViewModel.STATE.SERVICE_CONFIRMATION);
 
-    this.integrationRepository.getProviderById(serviceEntity.providerId).then(providerEntity => {
-      if (this.selectedService()) {
-        this.selectedService().providerName(providerEntity.name);
-      }
-    });
+    this.integrationRepository.getProviderNameForService(serviceEntity);
   }
 
   clickOnSelfProfile() {

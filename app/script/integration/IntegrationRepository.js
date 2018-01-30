@@ -129,6 +129,12 @@ z.integration.IntegrationRepository = class IntegrationRepository {
     });
   }
 
+  getProviderNameForService(serviceEntity) {
+    return this.getProviderById(serviceEntity.providerId).then(providerEntity => {
+      serviceEntity.providerName(providerEntity.name);
+    });
+  }
+
   getServiceById(providerId, serviceId) {
     return this.integrationService.getService(providerId, serviceId).then(service => {
       if (service) {
