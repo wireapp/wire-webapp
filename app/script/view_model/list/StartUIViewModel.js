@@ -237,14 +237,20 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       const conversations = this.conversationRepository.get_groups_by_name(query, false);
       this.serviceConversations(conversations);
     });
-    this.shouldUpdateServiceConversationScrollbar = ko
-      .computed(() => this.serviceConversations())
-      .extend({notify: 'always', rateLimit: 500});
+
     this.user_bubble = undefined;
     this.user_bubble_last_id = undefined;
 
-    this.should_update_scrollbar = ko
-      .computed(() => this.list_view_model.last_update())
+    this.shouldUpdateScrollbar = ko
+      .computed(() => {
+        return this.list_view_model.last_update();
+      })
+      .extend({notify: 'always', rateLimit: 500});
+
+    this.shouldUpdateServiceScrollbar = ko
+      .computed(() => {
+        return this.serviceConversations();
+      })
       .extend({notify: 'always', rateLimit: 500});
 
     this._init_subscriptions();
