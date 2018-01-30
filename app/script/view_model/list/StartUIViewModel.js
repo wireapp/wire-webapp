@@ -231,13 +231,14 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     });
 
     this.showServiceConversationList = ko.observable(false);
-    this.serviceConversationList = ko.observable([]);
-    this.searchConversation = ko.observable('');
-    this.searchConversation.subscribe(query =>
-      this.serviceConversationList(this.conversationRepository.get_groups_by_name(query))
-    );
+    this.serviceConversations = ko.observable([]);
+    this.searchConversationInput = ko.observable('');
+    this.searchConversationInput.subscribe(query => {
+      const conversations = this.conversationRepository.get_groups_by_name(query, false);
+      this.serviceConversations(conversations);
+    });
     this.shouldUpdateServiceConversationScrollbar = ko
-      .computed(() => this.serviceConversationList())
+      .computed(() => this.serviceConversations())
       .extend({notify: 'always', rateLimit: 500});
     this.user_bubble = undefined;
     this.user_bubble_last_id = undefined;
@@ -399,19 +400,20 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
   clickOnAddServiceToConversation() {
     this.showServiceConversationList(true);
-    this.serviceConversationList(this.conversationRepository.get_groups_by_name(''));
+    this.serviceConversations(this.conversationRepository.get_groups_by_name('', false));
   }
 
   clickOnServiceConversation(conversationEntity) {
-    this.integrationRepository.addService(conversationEntity, this.user_profile());
-    this.click_on_group(conversationEntity);
-    if (this.user_bubble) {
-      this.user_bubble.hide();
-    }
+    this.integrationRepository.addService(conversationEntity, this.user_profile(), 'start_ui').then(() => {
+      this.click_on_group(conversationEntity);
+      if (this.user_bubble) {
+        this.user_bubble.hide();
+      }
+    });
   }
 
   clickOnCreateServiceConversation() {
-    this.integrationRepository.createConversationWithService(this.user_profile());
+    this.integrationRepository.createConversationWithService(this.user_profile(), 'start_ui');
     if (this.user_bubble) {
       this.user_bubble.hide();
     }

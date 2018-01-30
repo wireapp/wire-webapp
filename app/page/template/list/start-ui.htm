@@ -160,41 +160,39 @@
       <!-- /ko -->
 
       <!-- ko if: userProfileIsService() -->
-        <div class="service-confirmation">
-          <div class="service-confirmation-body">
-            <div class="service-confirmation-summary">
+        <div class="start-ui-service-profile">
+          <div class="start-ui-service-profile-body">
+            <div class="start-ui-service-profile-details">
               <!-- ko if: renderAvatar() -->
                 <participant-avatar params="participant: user_profile, size: z.components.ParticipantAvatar.SIZE.LARGE"></participant-avatar>
               <!-- /ko -->
-              <div class="service-confirmation-summary-text">
-                <div data-uie-name="status-service-name" class="service-confirmation-name" data-bind="text: user_profile().name"></div>
-                <div data-uie-name="status-service-provider" class="service-confirmation-provider" data-bind="text: user_profile().providerName()"></div>
+              <div class="start-ui-service-profile-details-content">
+                <div class="start-ui-service-profile-name" data-bind="text: user_profile().name" data-uie-name="status-service-name"></div>
+                <div class="start-ui-service-profile-provider" data-bind="text: user_profile().providerName()" data-uie-name="status-service-provider"></div>
               </div>
             </div>
             <!-- ko ifnot: showServiceConversationList() -->
-              <div data-uie-name="status-service-description" class="service-confirmation-description" data-bind="text: user_profile().description"></div>
+              <div class="start-ui-service-profile-description" data-bind="text: user_profile().description" data-uie-name="status-service-description"></div>
             <!-- /ko -->
           </div>
           <!-- ko if: showServiceConversationList() -->
-          <div class="service-conversation-view">
-            <user-input class="participants-search-header-list user-list-light" params="input: searchConversation, placeholder: z.string.people_search_placeholder" spellcheck="false" data-uie-name="enter-conversations"></user-input>
-            <div class="service-conversation-list-wrapper">
-              <div class="service-conversation-list" data-bind="antiscroll: shouldUpdateServiceConversationScrollbar">
-                <div>
-                <div class="service-conversation-create" data-bind="click: clickOnCreateServiceConversation" data-uie-name="do-create-conversation">
-                  <div class="icon-plus"></div><div class="service-conversation-create-text" data-bind="text: z.string.people_service_new_conversation"></div>
+            <div class="start-ui-service-conversation-view">
+              <user-input class="start-ui-service-conversation-list user-list-light" params="input: searchConversationInput, placeholder: z.string.people_search_placeholder" spellcheck="false" data-uie-name="enter-conversations"></user-input>
+              <div class="start-ui-service-conversation-list-wrapper">
+                <div class="start-ui-service-conversation-list" data-bind="antiscroll: shouldUpdateServiceConversationScrollbar">
+                  <div class="start-ui-service-conversation-create" data-bind="click: clickOnCreateServiceConversation" data-uie-name="do-create-conversation">
+                    <div class="icon-plus"></div><div class="start-ui-service-conversation-create-text" data-bind="text: z.string.people_service_new_conversation"></div>
+                  </div>
+                  <!-- ko foreach: serviceConversationList() -->
+                    <conversation-list-cell
+                      data-bind="click: $parent.clickOnServiceConversation"
+                      data-uie-name="item-conversation"
+                      params="conversation: $data">
+                    </conversation-list-cell>
+                  <!-- /ko -->
                 </div>
-                <!-- ko foreach: serviceConversationList() -->
-                  <conversation-list-cell
-                    data-bind="click: $parent.clickOnServiceConversation"
-                    data-uie-name="item-conversation"
-                    params="conversation: $data">
-                  </conversation-list-cell>
-                <!-- /ko -->
-              </div>
               </div>
             </div>
-          </div>
           <!-- /ko -->
           <!-- ko ifnot: showServiceConversationList() -->
             <div class="service-confirmation-footer">

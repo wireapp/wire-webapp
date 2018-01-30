@@ -193,23 +193,27 @@
 
 .start-ui-user-bubble {
   user-profile,
-  .service-confirmation {
+  .start-ui-service-profile {
     background: #fff;
     border-radius: 4px;
     margin: -@bubble-border-radius;
   }
 
-  .service-confirmation-body {
+  .start-ui-service-conversation-list {
+    flex: 1 1 auto;
+  }
+
+  .start-ui-service-profile-body {
     padding: 8px;
 
-    .service-confirmation-summary,
-    .service-confirmation-description {
+    .start-ui-service-profile-details,
+    .start-ui-service-profile-description {
       padding: 8px;
     }
   }
 
-  &.service-bubble-conversation-list {
-    .service-confirmation-body {
+  &.start-ui-service-conversation-list {
+    .start-ui-service-profile-body {
       flex-grow: 0;
     }
   }

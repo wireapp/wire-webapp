@@ -86,7 +86,7 @@ z.integration.IntegrationRepository = class IntegrationRepository {
     if (this.isTeam()) {
       this.getServiceById(providerId, serviceId).then(serviceEntity => {
         amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.BOTS_CONFIRM, {
-          action: () => this.createConversationWithService(serviceEntity),
+          action: () => this.createConversationWithService(serviceEntity, 'url_param'),
           data: serviceEntity.name,
         });
       });
@@ -96,14 +96,15 @@ z.integration.IntegrationRepository = class IntegrationRepository {
   /**
    * Add bot to conversation.
    * @param {z.integration.ServiceEntity} serviceEntity - Information about service to be added
+   * @param {string} method - Method to used to start service conversation
    * @returns {Promise} Resolves when integration was added to conversation
    */
-  createConversationWithService(serviceEntity) {
+  createConversationWithService(serviceEntity, method = '') {
     return Promise.resolve()
       .then(() => this.conversationRepository.create_new_conversation([], serviceEntity.name))
       .then(conversationEntity => {
         if (conversationEntity) {
-          this.addService(conversationEntity, serviceEntity, 'url_param');
+          return this.addService(conversationEntity, serviceEntity, method).then(() => conversationEntity);
         }
         return conversationEntity;
       })
