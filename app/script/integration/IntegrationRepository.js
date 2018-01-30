@@ -95,18 +95,20 @@ z.integration.IntegrationRepository = class IntegrationRepository {
 
   /**
    * Add bot to conversation.
+   *
    * @param {z.integration.ServiceEntity} serviceEntity - Information about service to be added
-   * @param {string} method - Method to used to start service conversation
+   * @param {string} [method] - Method used to trigger integration setup
    * @returns {Promise} Resolves when integration was added to conversation
    */
-  createConversationWithService(serviceEntity, method = '') {
-    return Promise.resolve()
-      .then(() => this.conversationRepository.create_new_conversation([], serviceEntity.name))
+  createConversationWithService(serviceEntity, method) {
+    return this.conversationRepository
+      .create_new_conversation([], serviceEntity.name)
       .then(conversationEntity => {
         if (conversationEntity) {
           return this.addService(conversationEntity, serviceEntity, method).then(() => conversationEntity);
         }
-        return conversationEntity;
+
+        throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND);
       })
       .then(conversationEntity => {
         if (conversationEntity) {
