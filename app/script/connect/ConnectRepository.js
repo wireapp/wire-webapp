@@ -190,7 +190,7 @@ z.connect.ConnectRepository = class ConnectRepository {
       .postOnboarding(phoneBook)
       .then(({results}) => {
         this.logger.info(`Upload of '${source}' contacts upload successful: ${results.length} matches`, results);
-        this.propertiesRepository.save_preference(z.properties.PROPERTIES_TYPE.CONTACT_IMPORT.GOOGLE);
+        this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.CONTACT_IMPORT.GOOGLE);
         return results.map(result => result.id);
       })
       .catch(error => {

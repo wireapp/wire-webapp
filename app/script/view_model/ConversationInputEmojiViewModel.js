@@ -107,7 +107,7 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
     this.emoji_start_pos = -1;
     this.emoji_usage_count = z.util.StorageUtil.get_value(z.storage.StorageKey.CONVERSATION.EMOJI_USAGE_COUNT) || {};
 
-    this.should_replace_inline_emoji = properties_repository.get_preference(
+    this.should_replace_inline_emoji = properties_repository.getPreference(
       z.properties.PROPERTIES_TYPE.EMOJI.REPLACE_INLINE
     );
 
