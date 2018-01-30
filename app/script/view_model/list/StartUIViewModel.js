@@ -683,7 +683,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
         this.submittedSearch = false;
 
         if (conversationEntity) {
-          this.propertiesRepository.save_preference(z.properties.PROPERTIES_TYPE.HAS_CREATED_CONVERSATION);
+          this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.HAS_CREATED_CONVERSATION);
           amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.CREATE_GROUP_CONVERSATION, {
             creationContext: 'search',
             numberOfParticipants: userIds.length,

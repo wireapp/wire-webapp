@@ -41,7 +41,7 @@ describe('z.tracking.EventTrackingRepository', () => {
       spyOn(TestFactory.tracking_repository, '_init_tracking').and.callThrough();
       spyOn(TestFactory.tracking_repository, '_subscribe_to_tracking_events').and.callThrough();
 
-      const properties = new z.properties.Properties();
+      const properties = new z.properties.PropertiesEntity();
       TestFactory.tracking_repository.init(properties.settings.privacy.improve_wire).then(() => {
         expect(TestFactory.tracking_repository.mixpanel).toBeDefined();
         expect(TestFactory.tracking_repository._enable_error_reporting).toHaveBeenCalled();
