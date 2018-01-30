@@ -493,7 +493,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
             if (error.label) {
               switch (error.label) {
                 case z.service.BackendClientError.LABEL.PENDING_ACTIVATION:
-                  this._add_error(z.string.auth_error_pending);
+                  this._add_error(z.string.authErrorPending);
                   break;
                 case z.service.BackendClientError.LABEL.SUSPENDED:
                   this._add_error(z.string.auth_error_suspended);
@@ -505,10 +505,10 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
                   ]);
               }
             } else {
-              this._add_error(z.string.auth_error_misc);
+              this._add_error(z.string.authErrorMisc);
             }
           } else {
-            this._add_error(z.string.auth_error_offline);
+            this._add_error(z.string.authErrorOffline);
           }
           this._has_errors();
         });
@@ -547,10 +547,10 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
           if (navigator.onLine) {
             switch (error.label) {
               case z.service.BackendClientError.LABEL.BAD_REQUEST:
-                this._add_error(z.string.auth_error_phone_number_invalid, z.auth.AuthView.TYPE.PHONE);
+                this._add_error(z.string.authErrorPhoneNumberInvalid, z.auth.AuthView.TYPE.PHONE);
                 break;
               case z.service.BackendClientError.LABEL.INVALID_PHONE:
-                this._add_error(z.string.auth_error_phone_number_unknown, z.auth.AuthView.TYPE.PHONE);
+                this._add_error(z.string.authErrorPhoneNumberUnknown, z.auth.AuthView.TYPE.PHONE);
                 break;
               case z.service.BackendClientError.LABEL.PASSWORD_EXISTS:
                 this._set_hash(z.auth.AuthView.MODE.VERIFY_PASSWORD);
@@ -559,19 +559,19 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
                 _on_code_request_success(error);
                 break;
               case z.service.BackendClientError.LABEL.PHONE_BUDGET_EXHAUSTED:
-                this._add_error(z.string.auth_error_phone_number_budget, z.auth.AuthView.TYPE.PHONE);
+                this._add_error(z.string.authErrorPhoneNumberBudget, z.auth.AuthView.TYPE.PHONE);
                 break;
               case z.service.BackendClientError.LABEL.SUSPENDED:
                 this._add_error(z.string.auth_error_suspended);
                 break;
               case z.service.BackendClientError.LABEL.UNAUTHORIZED:
-                this._add_error(z.string.auth_error_phone_number_forbidden, z.auth.AuthView.TYPE.PHONE);
+                this._add_error(z.string.authErrorPhoneNumberForbidden, z.auth.AuthView.TYPE.PHONE);
                 break;
               default:
-                this._add_error(z.string.auth_error_misc);
+                this._add_error(z.string.authErrorMisc);
             }
           } else {
-            this._add_error(z.string.auth_error_offline);
+            this._add_error(z.string.authErrorOffline);
           }
           this._has_errors();
         });
@@ -680,15 +680,15 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
           if (navigator.onLine) {
             if (error.label) {
               if (error.label === z.service.BackendClientError.LABEL.PENDING_ACTIVATION) {
-                this._add_error(z.string.auth_error_pending);
+                this._add_error(z.string.authErrorPending);
               } else {
                 this._add_error(z.string.auth_error_sign_in, z.auth.AuthView.TYPE.PASSWORD);
               }
             } else {
-              this._add_error(z.string.auth_error_misc);
+              this._add_error(z.string.authErrorMisc);
             }
           } else {
-            this._add_error(z.string.auth_error_offline);
+            this._add_error(z.string.authErrorOffline);
           }
           this._has_errors();
         });
@@ -799,7 +799,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     this.phone_number(phone_number);
 
     if (input_value.length && !this.phone_number().length) {
-      this._add_error(z.string.auth_error_phone_number_invalid, z.auth.AuthView.TYPE.PHONE);
+      this._add_error(z.string.authErrorPhoneNumberInvalid, z.auth.AuthView.TYPE.PHONE);
     }
   }
 
@@ -1579,7 +1579,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       .toLowerCase();
 
     if (!username.length) {
-      return this._add_error(z.string.auth_error_email_missing, z.auth.AuthView.TYPE.EMAIL);
+      return this._add_error(z.string.authErrorEmailMissing, z.auth.AuthView.TYPE.EMAIL);
     }
 
     if (!z.util.is_valid_email(username)) {
@@ -1632,9 +1632,9 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
   _validate_password(mode) {
     if (this.password().length < z.config.MINIMUM_PASSWORD_LENGTH) {
       if (mode === z.auth.AuthView.MODE.ACCOUNT_PASSWORD) {
-        return this._add_error(z.string.auth_error_password_wrong, z.auth.AuthView.TYPE.PASSWORD);
+        return this._add_error(z.string.authErrorPasswordWrong, z.auth.AuthView.TYPE.PASSWORD);
       }
-      this._add_error(z.string.auth_error_password_short, z.auth.AuthView.TYPE.PASSWORD);
+      this._add_error(z.string.authErrorPasswordShort, z.auth.AuthView.TYPE.PASSWORD);
     }
   }
 
@@ -1645,7 +1645,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
    */
   _validate_phone() {
     if (!z.util.is_valid_phone_number(this.phone_number_e164())) {
-      this._add_error(z.string.auth_error_phone_number_invalid, z.auth.AuthView.TYPE.PHONE);
+      this._add_error(z.string.authErrorPhoneNumberInvalid, z.auth.AuthView.TYPE.PHONE);
     }
   }
 
@@ -1660,7 +1660,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       .toLowerCase();
 
     if (!username.length) {
-      return this._add_error(z.string.auth_error_email_missing, z.auth.AuthView.TYPE.EMAIL);
+      return this._add_error(z.string.authErrorEmailMissing, z.auth.AuthView.TYPE.EMAIL);
     }
 
     const phone = z.util.phone_number_to_e164(username, this.country() || navigator.language);
@@ -1746,7 +1746,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       .catch(error => {
         if (error.type !== z.user.UserError.TYPE.USER_MISSING_EMAIL) {
           this.logger.error(`Login failed: ${error.message}`, error);
-          this._add_error(z.string.auth_error_misc);
+          this._add_error(z.string.authErrorMisc);
           this._has_errors();
           this._set_hash(z.auth.AuthView.MODE.ACCOUNT_LOGIN);
         }

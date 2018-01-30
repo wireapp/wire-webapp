@@ -4,7 +4,7 @@
     <div class="warning" data-bind="css:{'warning-dimmed': warning_dimmed}">
       <!-- ko if: top_warning() === z.ViewModel.WarningType.REQUEST_CAMERA -->
         <div class="warning-bar warning-bar-feature bg-theme">
-          <div class="warning-bar-message" data-bind="l10n_html: {'id': z.string.warning_permission_request_camera, 'substitute': '<span class=\'warning-bar-icon icon-camera\'></span>'}"></div>
+          <div class="warning-bar-message" data-bind="l10n_html: {'id': z.string.warningPermissionRequestCamera, 'substitute': '<span class=\'warning-bar-icon icon-camera\'></span>'}"></div>
           <span class="warning-bar-close icon-close button-icon" data-bind="click: close_warning"></span>
         </div>
       <!-- /ko -->
@@ -12,7 +12,7 @@
       <!-- ko if: top_warning() === z.ViewModel.WarningType.DENIED_CAMERA -->
         <div class="warning-bar warning-bar-feature bg-theme">
           <div class="warning-bar-message">
-            <span data-bind="l10n_text: z.string.warning_permission_denied_camera"></span>&nbsp;
+            <span data-bind="l10n_text: z.string.warningPermissionDeniedCamera"></span>&nbsp;
             <a class="warning-bar-link" data-bind="l10n_href: {support: z.config.SUPPORT.ID.CAMERA_ACCESS_DENIED}, l10n_text: z.string.warning_learn_more" rel="nofollow noopener noreferrer" target="_blank"></a>
           </div>
           <span class="warning-bar-close icon-close button-round button-round-dark" data-bind="click: close_warning"></span>
@@ -21,7 +21,7 @@
 
       <!-- ko if: top_warning() === z.ViewModel.WarningType.REQUEST_MICROPHONE -->
         <div class="warning-bar warning-bar-feature bg-theme">
-          <div class="warning-bar-message" data-bind="l10n_html: {'id': z.string.warning_permission_request_microphone, 'substitute': '<span class=\'warning-bar-icon icon-microphone\'></span>'}"></div>
+          <div class="warning-bar-message" data-bind="l10n_html: {'id': z.string.warningPermissionRequestMicrophone, 'substitute': '<span class=\'warning-bar-icon icon-microphone\'></span>'}"></div>
           <span class="warning-bar-close icon-close button-round button-round-dark" data-bind="click: close_warning"></span>
         </div>
       <!-- /ko -->
@@ -29,7 +29,7 @@
       <!-- ko if: top_warning() === z.ViewModel.WarningType.DENIED_MICROPHONE -->
         <div class="warning-bar warning-bar-feature bg-theme">
           <div class="warning-bar-message">
-            <span data-bind="l10n_text: z.string.warning_permission_denied_microphone"></span>&nbsp;
+            <span data-bind="l10n_text: z.string.warningPermissionDeniedMicrophone"></span>&nbsp;
             <a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="l10n_href: {support: z.config.SUPPORT.ID.MICROPHONE_ACCESS_DENIED}, l10n_text: z.string.warning_learn_more"></a>
           </div>
           <span class="warning-bar-close icon-close button-round button-round-dark" data-bind="click: close_warning"></span>
@@ -46,7 +46,7 @@
       <!-- ko if: top_warning() === z.ViewModel.WarningType.DENIED_SCREEN -->
         <div class="warning-bar warning-bar-feature bg-theme">
           <div class="warning-bar-message">
-            <span data-bind="l10n_text: z.string.warning_permission_denied_screen"></span>&nbsp;
+            <span data-bind="l10n_text: z.string.warningPermissionDeniedScreen"></span>&nbsp;
             <a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="l10n_href: {support: z.config.SUPPORT.ID.SCREEN_ACCESS_DENIED}, l10n_text: z.string.warning_learn_more"></a>
           </div>
           <span class="warning-bar-close icon-close button-round button-round-dark" data-bind="click: close_warning"></span>
@@ -56,7 +56,7 @@
       <!-- ko if: top_warning() === z.ViewModel.WarningType.NOT_FOUND_CAMERA -->
       <div class="warning-bar warning-bar-feature bg-theme">
         <div class="warning-bar-message">
-          <span data-bind="l10n_text: z.string.warning_not_found_camera"></span>&nbsp;
+          <span data-bind="l10n_text: z.string.warningNotFoundCamera"></span>&nbsp;
           <a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="l10n_href: {support: z.config.SUPPORT.ID.DEVICE_NOT_FOUND}, l10n_text: z.string.warning_learn_more"></a>
         </div>
         <span class="warning-bar-close icon-close button-round button-round-dark" data-bind="click: close_warning"></span>
@@ -66,7 +66,7 @@
       <!-- ko if: top_warning() === z.ViewModel.WarningType.NOT_FOUND_MICROPHONE -->
         <div class="warning-bar warning-bar-feature bg-theme">
           <div class="warning-bar-message">
-            <span data-bind="l10n_text: z.string.warning_not_found_microphone"></span>&nbsp;
+            <span data-bind="l10n_text: z.string.warningNotFoundMicrophone"></span>&nbsp;
             <a class="warning-bar-link" rel="nofollow noopener noreferrer" target="_blank" data-bind="l10n_href: {support: z.config.SUPPORT.ID.DEVICE_NOT_FOUND}, l10n_text: z.string.warning_learn_more"></a>
           </div>
           <span class="warning-bar-close icon-close button-round button-round-dark" data-bind="click: close_warning"></span>
@@ -150,9 +150,9 @@
       <!-- ko if: top_warning() === z.ViewModel.WarningType.LIFECYCLE_UPDATE -->
         <div class="warning-bar warning-bar-connection bg-theme">
           <div class="warning-bar-message">
-            <span data-bind="l10n_text: z.string.warning_lifecycle_update"></span>&nbsp;
-            <a class="warning-bar-link" href="https://medium.com/wire-news/desktop-updates" data-bind="l10n_text: z.string.warning_lifecycle_update_notes" rel="nofollow noopener noreferrer" target="_blank"></a>&nbsp;·&nbsp;
-            <a class="warning-bar-link" data-bind="click: function(){amplify.publish(z.event.WebApp.LIFECYCLE.REFRESH)}, l10n_text: z.string.warning_lifecycle_update_link" rel="nofollow noopener noreferrer" target="_blank"></a>
+            <span data-bind="l10n_text: z.string.warningLifecycleUpdate"></span>&nbsp;
+            <a class="warning-bar-link" href="https://medium.com/wire-news/desktop-updates" data-bind="l10n_text: z.string.warningLifecycleUpdateNotes" rel="nofollow noopener noreferrer" target="_blank"></a>&nbsp;·&nbsp;
+            <a class="warning-bar-link" data-bind="click: function(){amplify.publish(z.event.WebApp.LIFECYCLE.REFRESH)}, l10n_text: z.string.warningLifecycleUpdateLink" rel="nofollow noopener noreferrer" target="_blank"></a>
           </div>
         </div>
       <!-- /ko -->
