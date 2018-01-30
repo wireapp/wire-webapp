@@ -984,6 +984,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       }
 
       case z.service.BackendClientError.LABEL.BAD_GATEWAY:
+      case z.service.BackendClientError.LABEL.SERVER_ERROR:
       case z.service.BackendClientError.LABEL.SERVICE_DISABLED: {
         amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.SERVICE_DISABLED);
         break;
