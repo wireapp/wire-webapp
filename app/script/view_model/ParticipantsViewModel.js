@@ -317,10 +317,6 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
   clickToConnect(userEntity) {
     this.participantsBubble.hide();
-
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.SENT_CONNECT_REQUEST, {
-      context: 'participants',
-    });
   }
 
   clickToEdit() {

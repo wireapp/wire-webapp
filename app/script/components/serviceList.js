@@ -31,15 +31,15 @@ z.components.ServiceList = class ServiceList {
   }
 
   constructor(params) {
-    this.services = params.services;
     this.isSearching = params.isSearching || z.util.noop;
-    this.onClick = params.click;
     this.mode = params.mode || ServiceList.MODE.DEFAULT;
+    this.onClick = params.click;
+    this.services = params.services;
 
     this.isCompactMode = this.mode === ServiceList.MODE.COMPACT;
     this.isDefaultMode = this.mode === ServiceList.MODE.DEFAULT;
 
-    this.css_classes = ko.pureComputed(() => {
+    this.cssClasses = ko.pureComputed(() => {
       if (this.isCompactMode) {
         return 'search-list-sm';
       }
@@ -50,7 +50,7 @@ z.components.ServiceList = class ServiceList {
 
 ko.components.register('service-list', {
   template: `
-    <div class="search-list" data-bind="css: css_classes(), foreach: services">
+    <div class="search-list" data-bind="css: cssClasses(), foreach: services">
       <div class="search-list-item" data-uie-name="item-service" data-bind="click: $parent.onClick">
         <!-- ko if: $parent.isCompactMode -->
           <div class="search-list-item-image">

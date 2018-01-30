@@ -55,15 +55,6 @@ z.tracking.EventName = {
     OPENED_ITEM: 'collections.opened_item',
     SELECTED_SEARCH_RESULT: 'collection.selected_search_result',
   },
-  CONNECT: {
-    OPENED_CONVERSATION: 'connect.opened_conversation',
-    OPENED_GENERIC_INVITE_MENU: 'connect.opened_generic_invite_menu',
-    SELECTED_USER_FROM_SEARCH: 'connect.selected_user_from_search',
-    SENT_CONNECT_REQUEST: 'connect.sent_connect_request',
-  },
-  CONTACTS: {
-    ENTERED_SEARCH: 'contacts.entered_search',
-  },
   CONTRIBUTED: 'contributed',
   CONVERSATION: {
     ADD_TO_GROUP_CONVERSATION: 'addContactToGroupConversation',
@@ -109,9 +100,6 @@ z.tracking.EventName = {
     SEEN_USERNAME_SCREEN: 'onboarding.seen_username_screen',
   },
   PASSWORD_RESET: 'resetPassword',
-  PREFERENCES: {
-    IMPORTED_CONTACTS: 'preferences.imported_contacts',
-  },
   PROFILE_PICTURE_CHANGED: 'changedProfilePicture',
   REGISTRATION: {
     ENTERED_CREDENTIALS: 'registration.entered_credentials',
