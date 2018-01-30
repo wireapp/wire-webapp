@@ -213,7 +213,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     });
 
     this.additionalBubbleClasses = ko.pureComputed(() => {
-      const serviceBubbleClass = this.userProfileIsService() ? 'service-bubble' : '';
+      const serviceBubbleClass = this.userProfileIsService() ? 'start-ui-service-bubble' : '';
       const serviceConversationClass = this.showServiceConversationList() ? '-conversation-list' : '';
       return `${serviceBubbleClass}${serviceConversationClass}`;
     });
