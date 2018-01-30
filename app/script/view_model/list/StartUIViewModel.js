@@ -233,8 +233,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.serviceConversations = ko.observable([]);
     this.searchConversationInput = ko.observable('');
     this.searchConversationInput.subscribe(query => {
-      const conversations = this.conversationRepository.get_groups_by_name(query, false);
-      this.serviceConversations(conversations);
+      this.serviceConversations(this._searchConversationsForServices(query));
     });
 
     this.user_bubble = undefined;
@@ -261,6 +260,14 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     amplify.subscribe(z.event.WebApp.CONNECT.IMPORT_CONTACTS, this.import_contacts.bind(this));
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.HAS_CREATED_CONVERSATION, this.update_properties);
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.update_properties);
+  }
+
+  _searchConversationsForServices(query) {
+    const normalizedQuery = z.search.SearchRepository.normalizeQuery(query);
+    const conversationsForServices = this.conversationRepository
+      .get_groups_by_name(normalizedQuery, false)
+      .filter(conversationEntity => conversationEntity.team_id);
+    this.serviceConversations(conversationsForServices);
   }
 
   _searchPeople(query) {
@@ -404,8 +411,8 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
   }
 
   clickOnAddServiceToConversation() {
+    this.serviceConversations(this._searchConversationsForServices(''));
     this.showServiceConversationList(true);
-    this.serviceConversations(this.conversationRepository.get_groups_by_name('', false));
   }
 
   clickOnServiceConversation(conversationEntity) {
