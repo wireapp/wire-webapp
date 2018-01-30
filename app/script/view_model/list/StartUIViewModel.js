@@ -226,9 +226,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.showServiceConversationList = ko.observable(false);
     this.serviceConversations = ko.observable([]);
     this.searchConversationInput = ko.observable('');
-    this.searchConversationInput.subscribe(query => {
-      this.serviceConversations(this._searchConversationsForServices(query));
-    });
+    this.searchConversationInput.subscribe(query => this._searchConversationsForServices(query));
 
     this.user_bubble = undefined;
     this.user_bubble_last_id = undefined;
@@ -403,7 +401,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
   }
 
   clickOnAddServiceToConversation() {
-    this.serviceConversations(this._searchConversationsForServices(''));
+    this._searchConversationsForServices('');
     this.showServiceConversationList(true);
   }
 
