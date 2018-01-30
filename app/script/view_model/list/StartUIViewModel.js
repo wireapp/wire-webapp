@@ -105,6 +105,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
     this.searchInput = ko.observable('');
     this.searchInput.subscribe(this.search);
+    this.isSearching = ko.pureComputed(() => this.searchInput().length);
     this.selectedPeople = ko.observableArray([]);
 
     // User lists
@@ -159,15 +160,15 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       return isTeamOrMatch && !this.showInviteMember() && !this.showContacts() && !this.showSearchResults();
     });
     this.showNoSearchResults = ko.pureComputed(() => {
-      return !this.showMatches() && this.showSearchResults() && !this.hasSearchResults() && this.searchInput().length;
+      return !this.showMatches() && this.showSearchResults() && !this.hasSearchResults() && this.isSearching();
     });
 
     this.showSearchResults = ko.pureComputed(() => {
-      if (!this.selectedPeople().length && !this.searchInput().length) {
+      if (!this.selectedPeople().length && !this.isSearching()) {
         this._clearSearchResults();
         return false;
       }
-      return this.hasSearchResults() || this.searchInput().length;
+      return this.hasSearchResults() || this.isSearching();
     });
     this.showSpinner = ko.observable(false);
     this.showTopPeople = ko.pureComputed(() => !this.isTeam() && this.topUsers().length && !this.showMatches());
@@ -381,7 +382,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       return Promise.resolve();
     }
 
-    if (this.searchInput().length) {
+    if (this.isSearching()) {
       const matchHandled = this._handleSearchInput();
       if (matchHandled) {
         return Promise.resolve();
@@ -619,6 +620,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.searchResults.groups.removeAll();
     this.searchResults.contacts.removeAll();
     this.searchResults.others.removeAll();
+    this.services.removeAll();
   }
 
   _handleSearchInput() {
