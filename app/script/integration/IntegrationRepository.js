@@ -135,7 +135,7 @@ z.integration.IntegrationRepository = class IntegrationRepository {
   }
 
   getServices(tags, start) {
-    const tagsArray = _.isArray(tags) ? tags.slice(0, 3) : [z.integration.ServiceTag.TUTORIAL];
+    const tagsArray = _.isArray(tags) ? tags.slice(0, 3) : [z.integration.ServiceTag.INTEGRATION];
 
     return this.integrationService.getServices(tagsArray.join(','), start).then(({services}) => {
       if (services.length) {

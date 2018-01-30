@@ -33,7 +33,7 @@ describe('ConversationService', () => {
       .exposeStorageActors()
       .then(storage_repository => {
         const {client} = test_factory;
-        ({storage_service} = storage_repository);
+        ({storageService: storage_service} = storage_repository);
         conversation_service = new z.conversation.ConversationService(client, storage_service);
         conversation_mapper = new z.conversation.ConversationMapper();
         server = sinon.fakeServer.create();
@@ -43,7 +43,7 @@ describe('ConversationService', () => {
   });
 
   afterEach(() => {
-    storage_service.clear_all_stores();
+    storage_service.clearStores();
     server.restore();
   });
 

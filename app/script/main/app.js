@@ -582,7 +582,7 @@ z.main.App = class App {
     const is_redirect_from_auth = document.referrer.toLowerCase().includes('/auth');
     const get_cached_token = is_localhost || is_redirect_from_auth;
 
-    return get_cached_token ? this.auth.repository.get_cached_access_token() : this.auth.repository.get_access_token();
+    return get_cached_token ? this.auth.repository.getCachedAccessToken() : this.auth.repository.getAccessToken();
   }
 
   /**
@@ -692,7 +692,7 @@ z.main.App = class App {
       // Clear IndexedDB
       if (clear_data) {
         this.repository.storage
-          .delete_everything()
+          .deleteDatabase()
           .catch(error => this.logger.error('Failed to delete database before logout', error))
           .then(() => {
             amplify.publish(z.event.WebApp.LIFECYCLE.SIGNED_OUT, clear_data);
