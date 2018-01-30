@@ -149,21 +149,21 @@
   <!-- ko if: user_profile() -->
     <div id="start-ui-user-bubble" class="start-ui-user-bubble bubble" data-bind="css: bubbleExtraClass">
       <!-- ko ifnot: userProfileIsService() -->
-      <user-profile params="user: user_profile,
-                            open: on_user_open,
-                            accept: on_user_accept,
-                            connect: on_user_connect,
-                            ignore: on_user_ignore,
-                            unblock: on_user_unblock,
-                            cancel_request: on_cancel_request
-                            mode: z.components.UserProfile.MODE.SEARCH"></user-profile>
-
+        <user-profile params="user: user_profile,
+                              open: on_user_open,
+                              accept: on_user_accept,
+                              connect: on_user_connect,
+                              ignore: on_user_ignore,
+                              unblock: on_user_unblock,
+                              cancel_request: on_cancel_request
+                              mode: z.components.UserProfile.MODE.SEARCH"></user-profile>
       <!-- /ko -->
+
       <!-- ko if: userProfileIsService() -->
         <div class="service-confirmation">
           <div class="service-confirmation-body">
             <div class="service-confirmation-summary">
-              <!-- ko if: renderAvatar -->
+              <!-- ko if: renderAvatar() -->
                 <participant-avatar params="participant: user_profile, size: z.components.ParticipantAvatar.SIZE.LARGE"></participant-avatar>
               <!-- /ko -->
               <div class="service-confirmation-summary-text">
@@ -171,11 +171,11 @@
                 <div data-uie-name="status-service-provider" class="service-confirmation-provider" data-bind="text: user_profile().providerName()"></div>
               </div>
             </div>
-            <!-- ko ifnot: showServiceConversationList -->
+            <!-- ko ifnot: showServiceConversationList() -->
               <div data-uie-name="status-service-description" class="service-confirmation-description" data-bind="text: user_profile().description"></div>
             <!-- /ko -->
           </div>
-          <!-- ko if: showServiceConversationList -->
+          <!-- ko if: showServiceConversationList() -->
           <div class="service-conversation-view">
             <user-input class="participants-search-header-list user-list-light" params="input: searchConversation, placeholder: z.string.people_search_placeholder" spellcheck="false" data-uie-name="enter-conversations"></user-input>
             <div class="service-conversation-list-wrapper">
@@ -184,7 +184,7 @@
                 <div class="service-conversation-create" data-bind="click: clickOnCreateServiceConversation" data-uie-name="do-create-conversation">
                   <div class="icon-plus"></div><div class="service-conversation-create-text" data-bind="text: z.string.people_service_new_conversation"></div>
                 </div>
-                <!-- ko foreach: serviceConversationList -->
+                <!-- ko foreach: serviceConversationList() -->
                   <conversation-list-cell
                     data-bind="click: $parent.clickOnServiceConversation"
                     data-uie-name="item-conversation"
@@ -196,7 +196,7 @@
             </div>
           </div>
           <!-- /ko -->
-          <!-- ko ifnot: showServiceConversationList -->
+          <!-- ko ifnot: showServiceConversationList() -->
             <div class="service-confirmation-footer">
               <button data-uie-name="do-service-confirm" class="participants-service-confirmation-button" data-bind="click: clickOnAddServiceToConversation, l10n_text: z.string.people_service_confirm_button"></button>
             </div>

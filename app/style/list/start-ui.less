@@ -101,21 +101,23 @@
 }
 
 .start-ui-list-tabs {
-  height: 44px;
   display: flex;
+  height: 44px;
   padding: 0 8px;
+
   .start-ui-list-tab {
-    flex-grow: 1;
     display: flex;
-    justify-content: center;
     align-items: center;
-    text-transform: uppercase;
-    font-weight: 600;
-    font-size: 11px;
-    color: #fff;
+    flex-grow: 1;
+    justify-content: center;
     border-bottom: 1px solid transparent;
     opacity: 0.56;
+    color: #fff;
     cursor: pointer;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+
     &.active {
       border-bottom-color: #fff;
       opacity: 1;
@@ -196,13 +198,16 @@
     border-radius: 4px;
     margin: -@bubble-border-radius;
   }
+
   .service-confirmation-body {
     padding: 8px;
+
     .service-confirmation-summary,
     .service-confirmation-description {
       padding: 8px;
     }
   }
+
   &.service-bubble-conversation-list {
     .service-confirmation-body {
       flex-grow: 0;
