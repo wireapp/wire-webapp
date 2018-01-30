@@ -410,9 +410,6 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
   clickOnServiceConversation(conversationEntity) {
     this.integrationRepository.addService(conversationEntity, this.user_profile(), 'start_ui').then(() => {
       this.click_on_group(conversationEntity);
-      if (this.user_bubble) {
-        this.user_bubble.hide();
-      }
     });
   }
 
