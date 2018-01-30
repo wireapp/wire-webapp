@@ -74,7 +74,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.stateParticipants = ko.pureComputed(() => {
       return this.state() === z.ViewModel.ParticipantsViewModel.STATE.PARTICIPANTS;
     });
-    this.stateServiceConfirmations = ko.pureComputed(() => {
+    this.stateServiceConfirmation = ko.pureComputed(() => {
       return this.state() === z.ViewModel.ParticipantsViewModel.STATE.SERVICE_CONFIRMATION;
     });
     this.stateServiceDetails = ko.pureComputed(() => {
@@ -167,6 +167,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
     this.searchInput = ko.observable('');
     this.searchInput.subscribe(searchInput => this.searchServices(searchInput));
+    this.isSearching = ko.pureComputed(() => this.searchInput().length);
 
     this.selectedUsers = ko.observableArray([]);
     this.users = ko.pureComputed(() => {
@@ -245,11 +246,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.selectedService(serviceEntity);
     this.state(ParticipantsViewModel.STATE.SERVICE_CONFIRMATION);
 
-    this.integrationRepository.getProviderById(serviceEntity.providerId).then(providerEntity => {
-      if (this.selectedService()) {
-        this.selectedService().providerName(providerEntity.name);
-      }
-    });
+    this.integrationRepository.getProviderNameForService(serviceEntity);
   }
 
   clickOnSelfProfile() {
@@ -320,10 +317,6 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
   clickToConnect(userEntity) {
     this.participantsBubble.hide();
-
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.SENT_CONNECT_REQUEST, {
-      context: 'participants',
-    });
   }
 
   clickToEdit() {

@@ -193,20 +193,24 @@ participant-avatar {
       transition: all @animation-timing-slow @ease-out-quart @animation-timing-faster;
     }
   }
+
   &.avatar-image-loaded {
     .avatar-initials,
     .avatar-service-placeholder {
       opacity: 0;
     }
+
     .avatar-image {
       transform: scale(1);
       opacity: 1;
     }
   }
+
   .avatar-service-placeholder {
     display: flex;
     justify-content: center;
     align-items: center;
+
     & > svg {
       width: 60%;
       & > path {
@@ -218,6 +222,7 @@ participant-avatar {
   &.service-avatar {
     &,
     .avatar-border,
+    .avatar-background,
     .avatar-image > img {
       border-radius: 15%;
     }
@@ -226,6 +231,7 @@ participant-avatar {
   &.user-avatar {
     &,
     .avatar-border,
+    .avatar-background,
     .avatar-image > img {
       border-radius: 50%;
     }
@@ -235,6 +241,7 @@ participant-avatar {
 .avatar-halo {
   .flex-center;
   .square(36px);
+
   &.avatar-halo-active {
     .accent-border-color;
     border-width: 2px;

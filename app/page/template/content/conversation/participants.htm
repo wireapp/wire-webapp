@@ -1,6 +1,7 @@
 <div id="participants-bubble" class="bubble">
   <div id="participants" class="participants" data-bind="with: $root.participants, css: {'show-user': $root.participants.showUserProfile() || $root.participants.showServiceStates()}">
     <div class="participants-transition">
+
       <!-- ko if: stateParticipants() -->
         <div class="participants-group">
           <div class="participants-group-header">
@@ -13,7 +14,7 @@
           </div>
           <div class="participants-group-list">
             <!-- ko if: renderParticipants -->
-              <user-list data-uie-name="list-unverified" params="user: unverifiedParticipants, click: clickOnShowParticipant, mode: z.components.UserList.MODE.COMPACT"></user-list>
+              <user-list params="user: unverifiedParticipants, click: clickOnShowParticipant, mode: z.components.UserList.MODE.COMPACT" data-uie-name="list-unverified"></user-list>
               <!-- ko if: verifiedParticipants().length -->
                 <div class="participants-group-list-separator">
                   <svg width="16" height="16">
@@ -22,14 +23,14 @@
                   <span class="label-xs" data-bind="l10n_text: z.string.people_verified"></span>
                   <hr>
                 </div>
-                <user-list data-uie-name="list-verified" params="user: verifiedParticipants, click: clickOnShowParticipant, mode: z.components.UserList.MODE.COMPACT"></user-list>
+                <user-list params="user: verifiedParticipants, click: clickOnShowParticipant, mode: z.components.UserList.MODE.COMPACT" data-uie-name="list-verified"></user-list>
               <!-- /ko -->
               <!-- ko if: serviceParticipants().length -->
                 <div class="participants-group-list-separator">
                   <span class="label-xs" data-bind="l10n_text: z.string.people_services"></span>
                   <hr>
                 </div>
-                <service-list data-uie-name="list-services" params="services: serviceParticipants, click: clickOnShowParticipant, mode: z.components.ServiceList.MODE.COMPACT"></service-list>
+                <service-list params="services: serviceParticipants, click: clickOnShowParticipant, mode: z.components.ServiceList.MODE.COMPACT" data-uie-name="list-services"></service-list>
               <!-- /ko -->
             <!-- /ko -->
           </div>
@@ -46,7 +47,7 @@
           </div>
         </div>
 
-        <user-profile class="group-user-profile" params="
+        <user-profile class="participants-user-profile" params="
           conversation: conversation,
           mode: z.components.UserProfile.MODE.PEOPLE,
           user: selectedUser,
@@ -71,8 +72,8 @@
             </div>
             <!-- ko if: showIntegrations() -->
               <div class="participants-search-tabs">
-                <div data-uie-name="do-add-people" class="participants-search-tab" data-bind="css: {'active': stateAddPeople}, click: clickOnAddPeople, l10n_text: z.string.people_tabs_people"></div>
-                <div data-uie-name="do-add-services" class="participants-search-tab" data-bind="css: {'active': stateAddService}, click: clickOnAddService, l10n_text: z.string.people_tabs_services"></div>
+                <div class="participants-search-tab" data-bind="css: {'active': stateAddPeople}, click: clickOnAddPeople, l10n_text: z.string.people_tabs_people" data-uie-name="do-add-people"></div>
+                <div class="participants-search-tab" data-bind="css: {'active': stateAddService}, click: clickOnAddService, l10n_text: z.string.people_tabs_services" data-uie-name="do-add-services"></div>
               </div >
             <!-- /ko -->
           </div >
@@ -82,7 +83,7 @@
                 <user-list class="user-list-light" params="user: users, filter: searchInput, selected: selectedUsers"></user-list>
               <!-- /ko -->
               <!-- ko if: stateAddService() -->
-                <service-list class="service-list-light" params="services: services, click: clickOnSelectService"></service-list>
+                <service-list class="service-list-light" params="services: services, click: clickOnSelectService, isSearching: isSearching"></service-list>
               <!-- /ko -->
             </div>
           </div>
@@ -97,34 +98,34 @@
 
       <!-- ko if: showServiceStates() -->
         <div class="user-profile-transition">
-          <div class="participants-service-confirmation group-service-profile">
+          <div class="participants-service-profile">
             <!-- ko if: groupMode() -->
-              <div class="service-confirmation-header">
-                <div class="service-confirmation-back" data-bind="click: clickOnServiceBack, l10n_tooltip: z.string.tooltip_people_back" data-uie-name="do-back">
+              <div class="participants-service-profile-header">
+                <div class="participants-service-profile-back" data-bind="click: clickOnServiceBack, l10n_tooltip: z.string.tooltip_people_back" data-uie-name="do-back">
                   <svg width="16" height="16" viewBox="0 0 16 16">
                     <path fill="#33373A" d="M4.83 9l5.24 5.24-1.41 1.41L1 8 8.66.34l1.41 1.41L4.83 7H15v2z"/>
                   </svg>
                 </div>
               </div>
             <!-- /ko -->
-            <div class="service-confirmation-body">
-              <div class="service-confirmation-summary">
+            <div class="participants-service-profile-body">
+              <div class="participants-service-profile-details">
                 <participant-avatar params="participant: selectedService, size: z.components.ParticipantAvatar.SIZE.LARGE"></participant-avatar>
-                <div class="service-confirmation-summary-text">
-                  <div data-uie-name="status-service-name" class="service-confirmation-name" data-bind="text: selectedService().name"></div>
-                  <div data-uie-name="status-service-provider" class="service-confirmation-provider" data-bind="text: selectedService().providerName()"></div>
+                <div class="participants-service-profile-details-content">
+                  <div class="participants-service-profile-name" data-bind="text: selectedService().name" data-uie-name="status-service-name"></div>
+                  <div class="participants-service-profile-provider" data-bind="text: selectedService().providerName()" data-uie-name="status-service-provider"></div>
                 </div>
               </div>
-              <div data-uie-name="status-service-description" class="service-confirmation-description" data-bind="text: selectedService().description"></div>
+              <div class="participants-service-profile-description" data-bind="text: selectedService().description" data-uie-name=status-service-description"></div>
             </div>
-            <!-- ko if: stateServiceConfirmations -->
-              <div class="service-confirmation-footer">
-                <button data-uie-name="do-service-confirm" class="participants-service-confirmation-button" data-bind="click: clickToAddService, l10n_text: z.string.people_service_confirm_button"></button>
-              </div>
-            <!-- /ko -->
-            <!-- ko if: showServiceRemove -->
-              <div class="service-confirmation-footer">
-                <button data-uie-name="do-service-remove" class="participants-service-confirmation-button button-theme-red" data-bind="click: clickToRemoveService, l10n_text: z.string.people_service_removal_button"></button>
+            <!-- ko if: stateServiceConfirmation() || showServiceRemove() -->
+              <div class="participants-service-profile-footer">
+                <!-- ko if: stateServiceConfirmation() -->
+                  <button class="participants-service-profile-button" data-bind="click: clickToAddService, l10n_text: z.string.people_service_confirm_button" data-uie-name="do-service-confirm"></button>
+                <!-- /ko -->
+                <!-- ko if: showServiceRemove() -->
+                  <button class="participants-service-profile-button button-theme-red" data-bind="click: clickToRemoveService, l10n_text: z.string.people_service_removal_button" data-uie-name="do-service-remove"></button>
+                <!-- /ko -->
               </div>
             <!-- /ko -->
           </div>
