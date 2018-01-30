@@ -228,8 +228,9 @@ z.entity.Conversation = class Conversation {
         }
 
         if (this.participating_user_ets().length > 0) {
+          const isJustBots = this.participating_user_ets().every(user_et => user_et.isBot);
           return this.participating_user_ets()
-            .filter(user_et => !user_et.isBot)
+            .filter(user_et => isJustBots || !user_et.isBot)
             .map(user_et => user_et.first_name())
             .join(', ');
         }

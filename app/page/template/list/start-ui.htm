@@ -28,14 +28,14 @@
     </div>
     <!-- ko if: enableIntegrations() -->
       <div class="start-ui-list-tabs">
-        <div class="start-ui-list-tab" data-bind="click: function() { clickOnTab(0) }, css: {'active' : peopleTabActive()}, l10n_text: z.string.search_people"></div>
-        <div class="start-ui-list-tab" data-bind="click: function() { clickOnTab(1) }, css: {'active' : !peopleTabActive()}, l10n_text: z.string.search_services"></div>
+        <div class="start-ui-list-tab" data-bind="click: clickOnAddPeople, css: {'active' : peopleTabActive()}, l10n_text: z.string.search_people" data-uie-name="do-add-people"></div>
+        <div class="start-ui-list-tab" data-bind="click: clickOnAddService, css: {'active' : !peopleTabActive()}, l10n_text: z.string.search_services" data-uie-name="do-add-services"></div>
       </div>
     <!-- /ko -->
   </div>
 
   <div class="left-list-center start-ui-list-wrapper">
-    <div class="start-ui-list" data-bind="antiscroll: should_update_scrollbar, bordered_list: teamName">
+    <div class="start-ui-list" data-bind="antiscroll: shouldUpdateScrollbar, bordered_list: teamName">
       <!-- ko if: show_spinner() -->
         <div class="start-ui-list-spinner">
           <span class="icon-spinner spin"></span>
@@ -86,17 +86,15 @@
               </div>
               <div class="others" data-bind="visible: search_results.others().length > 0">
                 <span class="start-ui-list-header" data-bind="l10n_text: z.string.search_others"></span>
-                <user-list class="search-list-theme-black" params="user: search_results.others, click: click_on_other, mode: z.components.UserList.MODE.OTHERS"></user-list>
+                <user-list class="search-list-theme-black" params="user: search_results.others, click: clickOnOther, mode: z.components.UserList.MODE.OTHERS"></user-list>
               </div>
             </div>
           <!-- /ko -->
         <!-- /ko -->
 
         <!-- ko ifnot: peopleTabActive() -->
-          <!-- ko if: show_search_results() -->
-            <span class="start-ui-list-header"></span>
-            <service-list params="services: search_results.services(), click: clickOnService"></service-list>
-          <!-- /ko -->
+          <span class="start-ui-list-header"></span>
+          <service-list params="services: search_results.services(), click: clickOnOther"></service-list>
         <!-- /ko -->
       <!-- /ko -->
 
@@ -149,15 +147,64 @@
   <!-- /ko -->
 
   <!-- ko if: user_profile() -->
-    <div id="start-ui-user-bubble" class="start-ui-user-bubble bubble">
-      <user-profile params="user: user_profile,
-                            open: on_user_open,
-                            accept: on_user_accept,
-                            connect: on_user_connect,
-                            ignore: on_user_ignore,
-                            unblock: on_user_unblock,
-                            cancel_request: on_cancel_request
-                            mode: z.components.UserProfile.MODE.SEARCH"></user-profile>
+    <div id="start-ui-user-bubble" class="start-ui-user-bubble bubble" data-bind="css: additionalBubbleClasses">
+      <!-- ko ifnot: userProfileIsService() -->
+        <user-profile params="user: user_profile,
+                              open: on_user_open,
+                              accept: on_user_accept,
+                              connect: on_user_connect,
+                              ignore: on_user_ignore,
+                              unblock: on_user_unblock,
+                              cancel_request: on_cancel_request
+                              mode: z.components.UserProfile.MODE.SEARCH"></user-profile>
+      <!-- /ko -->
+
+      <!-- ko if: userProfileIsService() -->
+        <div class="start-ui-service">
+          <div class="start-ui-service-body">
+            <div class="start-ui-service-details">
+              <!-- ko if: renderAvatar() -->
+                <participant-avatar params="participant: user_profile, size: z.components.ParticipantAvatar.SIZE.LARGE"></participant-avatar>
+              <!-- /ko -->
+              <div class="start-ui-service-details-content">
+                <div class="start-ui-service-name" data-bind="text: user_profile().name" data-uie-name="status-service-name"></div>
+                <div class="start-ui-service-provider" data-bind="text: user_profile().providerName()" data-uie-name="status-service-provider"></div>
+              </div>
+            </div>
+
+            <!-- ko ifnot: showServiceConversationList() -->
+              <div class="start-ui-service-description" data-bind="text: user_profile().description" data-uie-name="status-service-description"></div>
+            <!-- /ko -->
+          </div>
+
+          <!-- ko if: showServiceConversationList() -->
+            <div class="start-ui-service-conversations">
+              <user-input class="start-ui-service-conversations-input user-list-light" params="input: searchConversationInput, placeholder: z.string.people_search_placeholder" spellcheck="false" data-uie-name="enter-conversations"></user-input>
+              <div class="start-ui-service-conversation-list-wrapper">
+                <div class="start-ui-service-conversations-list" data-bind="antiscroll: shouldUpdateServiceScrollbar">
+                  <div class="start-ui-service-conversations-create" data-bind="click: clickOnCreateServiceConversation" data-uie-name="do-create-conversation">
+                    <div class="icon-plus"></div>
+                    <div class="start-ui-service-conversations-create-text" data-bind="text: z.string.people_service_new_conversation"></div>
+                  </div>
+                  <!-- ko foreach: serviceConversations() -->
+                    <conversation-list-cell
+                      params="conversation: $data"
+                      data-bind="click: $parent.clickOnServiceConversation"
+                      data-uie-name="item-conversation">
+                    </conversation-list-cell>
+                  <!-- /ko -->
+                </div>
+              </div>
+            </div>
+          <!-- /ko -->
+
+          <!-- ko ifnot: showServiceConversationList() -->
+            <div class="start-ui-service-footer">
+              <button class="start-ui-service-button" data-bind="click: clickOnAddServiceToConversation, l10n_text: z.string.people_service_confirm_button" data-uie-name="do-service-confirm"></button>
+            </div>
+          <!-- /ko -->
+        </div>
+      <!-- /ko -->
     </div>
   <!-- /ko -->
 
@@ -200,5 +247,4 @@
       <!-- /ko -->
     </div>
   </div>
-
 </div>

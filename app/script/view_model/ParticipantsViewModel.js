@@ -74,7 +74,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.stateParticipants = ko.pureComputed(() => {
       return this.state() === z.ViewModel.ParticipantsViewModel.STATE.PARTICIPANTS;
     });
-    this.stateServiceConfirmations = ko.pureComputed(() => {
+    this.stateServiceConfirmation = ko.pureComputed(() => {
       return this.state() === z.ViewModel.ParticipantsViewModel.STATE.SERVICE_CONFIRMATION;
     });
     this.stateServiceDetails = ko.pureComputed(() => {
@@ -245,11 +245,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.selectedService(serviceEntity);
     this.state(ParticipantsViewModel.STATE.SERVICE_CONFIRMATION);
 
-    this.integrationRepository.getProviderById(serviceEntity.providerId).then(providerEntity => {
-      if (this.selectedService()) {
-        this.selectedService().providerName(providerEntity.name);
-      }
-    });
+    this.integrationRepository.getProviderNameForService(serviceEntity);
   }
 
   clickOnSelfProfile() {
