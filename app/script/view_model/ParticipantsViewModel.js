@@ -63,6 +63,8 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.logger = new z.util.Logger('z.ViewModel.ParticipantsViewModel', z.config.LOGGER.OPTIONS);
 
     this.state = ko.observable(ParticipantsViewModel.STATE.PARTICIPANTS);
+    this.previousState = ko.observable(this.state());
+    this.state.subscribe(oldState => this.previousState(oldState), null, 'beforeChange');
 
     this.activeAddState = ko.pureComputed(() => ParticipantsViewModel.CONFIG.ADD_STATES.includes(this.state()));
     this.activeServiceState = ko.pureComputed(() => ParticipantsViewModel.CONFIG.SERVICE_STATES.includes(this.state()));
@@ -155,6 +157,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.addActionText = ko.pureComputed(() => {
       return this.showIntegrations() ? z.string.people_button_add : z.string.people_button_add_people;
     });
+
     this.searchActionText = ko.pureComputed(() => {
       if (this.conversation()) {
         const isGroup = this.conversation().is_group();
@@ -187,6 +190,16 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.showServiceStates = ko.pureComputed(() => this.activeServiceState() && this.selectedService());
     this.showUserProfile = ko.pureComputed(() => {
       return this.stateParticipants() && this.selectedUser() && !this.selectedService();
+    });
+
+    this.selectedIsInConversation = ko.pureComputed(() => {
+      if (this.selectedUser()) {
+        return this.participants().some(entity => entity.id === this.selectedUser().id);
+      }
+      return false;
+    });
+    this.showServiceRemove = ko.pureComputed(() => {
+      return this.stateServiceDetails() && !this.userRepository.self().is_guest() && this.selectedIsInConversation();
     });
 
     amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, this.switchContent.bind(this));
@@ -248,7 +261,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   }
 
   clickOnServiceBack() {
-    this.state(ParticipantsViewModel.STATE.ADD_SERVICE);
+    this.state(this.previousState());
     this.selectedService(undefined);
     this.selectedUser(undefined);
     $('.participants-search').addClass('participants-search-show');
