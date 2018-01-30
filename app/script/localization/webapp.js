@@ -291,11 +291,11 @@ z.string.conversation_someone = 'Someone';
 z.string.conversation_tweet_author = ' on Twitter';
 
 // Collection
-z.string.collection_show_all = 'Show all {{number}}';
-z.string.collection_section_links = 'Links';
-z.string.collection_section_images = 'Pictures';
-z.string.collection_section_files = 'Files';
-z.string.collection_section_audio = 'Audio messages';
+z.string.collectionShowAll = 'Show all {{number}}';
+z.string.collectionSectionLinks = 'Links';
+z.string.collectionSectionImages = 'Pictures';
+z.string.collectionSectionFiles = 'Files';
+z.string.collectionSectionAudio = 'Audio messages';
 
 // Full Search
 z.string.fullsearchPlaceholder = 'Search text messages';
@@ -548,15 +548,15 @@ z.string.urlWebappRoot = '/';
 z.string.urlWebsiteRoot = '/';
 z.string.urlWebsiteCreateTeam = '/create-team/';
 z.string.urlWebsitePrivacy = '/privacy';
-z.string.warning_call_detail = 'Your browser needs access to the microphone to make calls.';
-z.string.warning_call_headline = 'Can’t call without microphone';
-z.string.warning_call_unsupported_incoming = '{{user}} is calling. Your browser doesn’t support calls.';
-z.string.warning_call_unsupported_outgoing = 'You cannot call because your browser doesn’t support calls.';
-z.string.warning_call_issues = 'This version of Wire can not participate in the call. Please use';
-z.string.warning_call_upgrade_browser = 'To call, please update Google Chrome.';
-z.string.warning_connectivity_connection_lost = 'Trying to connect. Wire may not be able to deliver messages.';
-z.string.warning_connectivity_no_internet = 'No Internet. You won’t be able to send or receive messages.';
-z.string.warning_learn_more = 'Learn more';
+z.string.warningCallDetail = 'Your browser needs access to the microphone to make calls.';
+z.string.warningCallHeadline = 'Can’t call without microphone';
+z.string.warningCallUnsupportedIncoming = '{{user}} is calling. Your browser doesn’t support calls.';
+z.string.warningCallUnsupportedOutgoing = 'You cannot call because your browser doesn’t support calls.';
+z.string.warningCallIssues = 'This version of Wire can not participate in the call. Please use';
+z.string.warningCallUpgradeBrowser = 'To call, please update Google Chrome.';
+z.string.warningConnectivityConnectionLost = 'Trying to connect. Wire may not be able to deliver messages.';
+z.string.warningConnectivityNoInternet = 'No Internet. You won’t be able to send or receive messages.';
+z.string.warningLearnMore = 'Learn more';
 z.string.warningLifecycleUpdate = 'A new version of Wire is available.';
 z.string.warningLifecycleUpdateNotes = 'What’s new';
 z.string.warningLifecycleUpdateLink = 'Update now';

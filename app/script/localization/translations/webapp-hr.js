@@ -219,9 +219,9 @@ z.string.hr.conversation_send_pasted_file = 'Slika zaljepljena na {{date}}';
 z.string.hr.conversation_someone = 'Netko';
 z.string.hr.conversation_tweet_author = ' na Twitteru';
 
-z.string.hr.collection_section_links = 'Linkovi';
-z.string.hr.collection_section_images = 'Slike';
-z.string.hr.collection_section_files = 'Dokumenti';
+z.string.hr.collectionSectionLinks = 'Linkovi';
+z.string.hr.collectionSectionImages = 'Slike';
+z.string.hr.collectionSectionFiles = 'Dokumenti';
 
 z.string.hr.fullsearchPlaceholder = 'Pretraži poruke';
 z.string.hr.fullsearchNoResults = 'Nema rezultata.';
@@ -409,15 +409,15 @@ z.string.hr.uploadGoogleHeadlineError = 'Nešto je pogrešno.';
 z.string.hr.uploadGoogleMessageError = 'Nismo dobili podatke. Pokušajte ponovno uvesti svoje kontakte.';
 z.string.hr.uploadGoogleButtonAgain = 'Pokušaj ponovno';
 
-z.string.hr.warning_call_detail = 'Your browser needs access to the microphone to make calls.';
-z.string.hr.warning_call_headline = 'Poziv nije moguć bez mikrofona';
-z.string.hr.warning_call_unsupported_incoming = '{{user}} zove. Vaš preglednik ne podržava pozive.';
-z.string.hr.warning_call_unsupported_outgoing = 'Poziv nije moguć jer vaš preglednik ne podržava pozive.';
-z.string.hr.warning_call_issues = 'Ova verzija Wire nema pozive. Molimo vas da koristite';
-z.string.hr.warning_call_upgrade_browser = 'Da bi imali pozive, molimo ažurirajte Google Chrome.';
-z.string.hr.warning_connectivity_connection_lost = 'Povezivanje u tijeku. Postoji mogućnost da Wire neće moći isporučiti poruke.';
-z.string.hr.warning_connectivity_no_internet = 'Nema Interneta. Nećete moći slati ili primati poruke.';
-z.string.hr.warning_learn_more = 'Saznaj više';
+z.string.hr.warningCallDetail = 'Your browser needs access to the microphone to make calls.';
+z.string.hr.warningCallHeadline = 'Poziv nije moguć bez mikrofona';
+z.string.hr.warningCallUnsupportedIncoming = '{{user}} zove. Vaš preglednik ne podržava pozive.';
+z.string.hr.warningCallUnsupportedOutgoing = 'Poziv nije moguć jer vaš preglednik ne podržava pozive.';
+z.string.hr.warningCallIssues = 'Ova verzija Wire nema pozive. Molimo vas da koristite';
+z.string.hr.warningCallUpgradeBrowser = 'Da bi imali pozive, molimo ažurirajte Google Chrome.';
+z.string.hr.warningConnectivityConnectionLost = 'Povezivanje u tijeku. Postoji mogućnost da Wire neće moći isporučiti poruke.';
+z.string.hr.warningConnectivityNoInternet = 'Nema Interneta. Nećete moći slati ili primati poruke.';
+z.string.hr.warningLearnMore = 'Saznaj više';
 z.string.hr.warningLifecycleUpdate = 'Nova verzija Wire je dostupna.';
 z.string.hr.warningLifecycleUpdateNotes = 'Što je novo';
 z.string.hr.warningLifecycleUpdateLink = 'Ažuriraj sada';
