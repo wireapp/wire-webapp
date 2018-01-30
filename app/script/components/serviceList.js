@@ -39,6 +39,10 @@ z.components.ServiceList = class ServiceList {
     this.isCompactMode = this.mode === ServiceList.MODE.COMPACT;
     this.isDefaultMode = this.mode === ServiceList.MODE.DEFAULT;
 
+    this.avatarSize = this.isCompactMode
+      ? z.components.ParticipantAvatar.SIZE.LARGE
+      : z.components.ParticipantAvatar.SIZE.MEDIUM;
+
     this.cssClasses = ko.pureComputed(() => {
       if (this.isCompactMode) {
         return 'search-list-sm';
@@ -52,25 +56,17 @@ ko.components.register('service-list', {
   template: `
     <div class="search-list" data-bind="css: cssClasses(), foreach: services">
       <div class="search-list-item" data-uie-name="item-service" data-bind="click: $parent.onClick">
-        <!-- ko if: $parent.isCompactMode -->
-          <div class="search-list-item-image">
-            <participant-avatar params="participant: $data, size: z.components.ParticipantAvatar.SIZE.LARGE"></participant-avatar>
-          </div>
-          <div class="search-list-item-content">
-            <div class="search-list-item-content-name" data-bind="text: name"></div>
-          </div>
-        <!-- /ko -->
-        <!-- ko ifnot: $parent.isCompactMode -->
-          <div class="search-list-item-image">
-            <participant-avatar params="participant: $data, size: z.components.ParticipantAvatar.SIZE.MEDIUM"></participant-avatar>
-          </div>
-          <div class="search-list-item-content">
-            <div class="search-list-item-content-name" data-uie-name="status-content-name" data-bind="text: name"></div>
+        <div class="search-list-item-image">
+          <participant-avatar params="participant: $data, size: $parent.avatarSize"></participant-avatar>
+        </div>
+        <div class="search-list-item-content">
+          <div class="search-list-item-content-name" data-bind="text: name" data-uie-name="status-content-name"></div>
+          <!-- ko ifnot: $parent.isCompactMode -->
             <div class="search-list-item-content-info" data-uie-name="status-content-info">
               <span class="search-list-item-content-username" data-bind="text: summary"></span>
             </div>
-          </div>
-        <!-- /ko -->
+          <!-- /ko -->
+        </div>
       </div>
     </div>
     <!-- ko if: isSearching() && !services().length -->
