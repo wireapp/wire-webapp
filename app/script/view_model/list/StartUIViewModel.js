@@ -394,13 +394,13 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       create_bubble(element[0].id);
     }
   }
-  clickOnAddService() {
-    this.state(StartUIViewModel.STATE.ADD_SERVICE);
-    this._updateServicesList();
-  }
+
   clickOnAddPeople() {
     this.state(StartUIViewModel.STATE.ADD_PEOPLE);
-    this._updateServicesList();
+  }
+
+  clickOnAddService() {
+    this.state(StartUIViewModel.STATE.ADD_SERVICE);
   }
 
   clickOnAddServiceToConversation() {
