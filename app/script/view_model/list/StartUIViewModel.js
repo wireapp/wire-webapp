@@ -112,6 +112,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.search_input = ko.observable('');
     this.search_input.subscribe(this.search);
     this.selected_people = ko.observableArray([]);
+    this.isSearching = ko.pureComputed(() => this.search_input().length);
 
     // User lists
     this.contacts = ko.pureComputed(() => {

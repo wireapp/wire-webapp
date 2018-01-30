@@ -32,6 +32,7 @@ z.components.ServiceList = class ServiceList {
 
   constructor(params) {
     this.services = params.services;
+    this.isSearching = params.isSearching || z.util.noop;
     this.onClick = params.click;
     this.mode = params.mode || ServiceList.MODE.DEFAULT;
 
@@ -72,7 +73,7 @@ ko.components.register('service-list', {
         <!-- /ko -->
       </div>
     </div>
-    <!-- ko ifnot: services().length -->
+    <!-- ko if: isSearching() && !services().length -->
       <div class="no-results" data-bind="l10n_text: z.string.people_no_matches"></div>
     <!-- /ko -->
   `,
