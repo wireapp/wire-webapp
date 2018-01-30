@@ -248,7 +248,7 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
   _update_list(new_list_state, respect_last_state) {
     switch (new_list_state) {
       case z.ViewModel.list.LIST_STATE.ARCHIVE:
-        this.archive.update_list();
+        this.archive.updateList();
         break;
       case z.ViewModel.list.LIST_STATE.START_UI:
         this.start_ui.updateList();
