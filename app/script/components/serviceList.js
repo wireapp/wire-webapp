@@ -32,9 +32,9 @@ z.components.ServiceList = class ServiceList {
 
   constructor(params) {
     this.isSearching = params.isSearching || z.util.noop;
-    this.services = params.services;
-    this.onClick = params.click;
     this.mode = params.mode || ServiceList.MODE.DEFAULT;
+    this.onClick = params.click;
+    this.services = params.services;
 
     this.isCompactMode = this.mode === ServiceList.MODE.COMPACT;
     this.isDefaultMode = this.mode === ServiceList.MODE.DEFAULT;
