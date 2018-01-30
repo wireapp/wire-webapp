@@ -147,7 +147,7 @@
   <!-- /ko -->
 
   <!-- ko if: user_profile() -->
-    <div id="start-ui-user-bubble" class="start-ui-user-bubble bubble" data-bind="css: bubbleExtraClass">
+    <div id="start-ui-user-bubble" class="start-ui-user-bubble bubble" data-bind="css: additionalBubbleClasses">
       <!-- ko ifnot: userProfileIsService() -->
         <user-profile params="user: user_profile,
                               open: on_user_open,

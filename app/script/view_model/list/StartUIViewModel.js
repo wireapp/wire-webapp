@@ -212,12 +212,11 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       this.userProfileIsService(newProfile instanceof z.integration.ServiceEntity);
     });
 
-    this.bubbleExtraClass = ko.pureComputed(
-      () =>
-        `${this.userProfileIsService() ? 'service-bubble' : ''}${
-          this.showServiceConversationList() ? '-conversation-list' : ''
-        }`
-    );
+    this.additionalBubbleClasses = ko.pureComputed(() => {
+      const serviceBubbleClass = this.userProfileIsService() ? 'service-bubble' : '';
+      const serviceConversationClass = this.showServiceConversationList() ? '-conversation-list' : '';
+      return `${serviceBubbleClass}${serviceConversationClass}`;
+    });
 
     this.renderAvatar = ko.observable(false);
     this.renderAvatarComputed = ko.computed(() => {
@@ -395,13 +394,13 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       create_bubble(element[0].id);
     }
   }
-  clickOnAddService() {
-    this.state(StartUIViewModel.STATE.ADD_SERVICE);
-    this._updateServicesList();
-  }
+
   clickOnAddPeople() {
     this.state(StartUIViewModel.STATE.ADD_PEOPLE);
-    this._updateServicesList();
+  }
+
+  clickOnAddService() {
+    this.state(StartUIViewModel.STATE.ADD_SERVICE);
   }
 
   clickOnAddServiceToConversation() {
