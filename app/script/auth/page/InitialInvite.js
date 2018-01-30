@@ -82,6 +82,7 @@ class InitialInvite extends React.PureComponent {
     } else {
       this.props.invite({email: this.emailInput.value});
       this.setState({enteredEmail: ''});
+      this.emailInput.value = '';
     }
     this.emailInput.focus();
   };
@@ -117,7 +118,6 @@ class InitialInvite extends React.PureComponent {
                     this.resetErrors();
                     this.setState({enteredEmail: event.target.value});
                   }}
-                  value={enteredEmail}
                   innerRef={node => (this.emailInput = node)}
                   autoFocus
                   data-uie-name="enter-invite-email"
