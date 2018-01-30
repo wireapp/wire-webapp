@@ -89,7 +89,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.submitted_search = false;
 
     this.state = ko.observable(StartUIViewModel.STATE.ADD_PEOPLE);
-    this.state.subscribe(() => this.updateList());
+    this.state.subscribe(newState => this.updateList(newState));
 
     this.peopleTabActive = ko.pureComputed(() => this.state() === StartUIViewModel.STATE.ADD_PEOPLE);
 
@@ -206,11 +206,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
     // Selected user bubble
     this.user_profile = ko.observable(null);
-    this.userProfileIsService = ko.observable(false);
-
-    this.user_profile.subscribe(newProfile => {
-      this.userProfileIsService(newProfile instanceof z.integration.ServiceEntity);
-    });
+    this.userProfileIsService = ko.pureComputed(() => this.user_profile() instanceof z.integration.ServiceEntity);
 
     this.additionalBubbleClasses = ko.pureComputed(() => {
       const serviceBubbleClass = this.userProfileIsService() ? 'start-ui-service-bubble' : '';
@@ -220,13 +216,11 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
     this.renderAvatar = ko.observable(false);
     this.renderAvatarComputed = ko.computed(() => {
-      const has_user_id = !!this.user_profile();
+      const hasUserId = Boolean(this.user_profile());
 
       // swap value to re-render avatar
       this.renderAvatar(false);
-      window.setTimeout(() => {
-        this.renderAvatar(has_user_id);
-      }, 0);
+      window.setTimeout(() => this.renderAvatar(hasUserId), 0);
     });
 
     this.showServiceConversationList = ko.observable(false);
@@ -431,7 +425,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     }
   }
 
-  updateList() {
+  updateList(state = StartUIViewModel.STATE.ADD_PEOPLE) {
     this.show_spinner(false);
 
     // Clean up
@@ -440,7 +434,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.user_profile(null);
     $('user-input input').focus();
 
-    if (this.peopleTabActive()) {
+    if (state === StartUIViewModel.STATE.ADD_PEOPLE) {
       return this._updatePeopleList();
     }
     this._updateServicesList();
