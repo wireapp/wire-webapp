@@ -86,7 +86,7 @@ z.integration.IntegrationRepository = class IntegrationRepository {
     if (this.isTeam()) {
       this.getServiceById(providerId, serviceId).then(serviceEntity => {
         amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.BOTS_CONFIRM, {
-          action: () => this.createConversationWithService(serviceEntity),
+          action: () => this.createConversationWithService(serviceEntity, 'url_param'),
           data: serviceEntity.name,
         });
       });
@@ -95,16 +95,20 @@ z.integration.IntegrationRepository = class IntegrationRepository {
 
   /**
    * Add bot to conversation.
+   *
    * @param {z.integration.ServiceEntity} serviceEntity - Information about service to be added
+   * @param {string} [method] - Method used to trigger integration setup
    * @returns {Promise} Resolves when integration was added to conversation
    */
-  createConversationWithService(serviceEntity) {
-    return Promise.resolve()
-      .then(() => this.conversationRepository.create_new_conversation([], serviceEntity.name))
+  createConversationWithService(serviceEntity, method) {
+    return this.conversationRepository
+      .create_new_conversation([], serviceEntity.name)
       .then(conversationEntity => {
         if (conversationEntity) {
-          return this.addService(conversationEntity, serviceEntity, 'url_param');
+          return this.addService(conversationEntity, serviceEntity, method).then(() => conversationEntity);
         }
+
+        throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND);
       })
       .then(conversationEntity => {
         if (conversationEntity) {
@@ -125,6 +129,12 @@ z.integration.IntegrationRepository = class IntegrationRepository {
     });
   }
 
+  getProviderNameForService(serviceEntity) {
+    return this.getProviderById(serviceEntity.providerId).then(providerEntity => {
+      serviceEntity.providerName(providerEntity.name);
+    });
+  }
+
   getServiceById(providerId, serviceId) {
     return this.integrationService.getService(providerId, serviceId).then(service => {
       if (service) {
@@ -134,7 +144,7 @@ z.integration.IntegrationRepository = class IntegrationRepository {
   }
 
   getServices(tags, start) {
-    const tagsArray = _.isArray(tags) ? tags.slice(0, 3) : [z.integration.ServiceTag.TUTORIAL];
+    const tagsArray = _.isArray(tags) ? tags.slice(0, 3) : [z.integration.ServiceTag.INTEGRATION];
 
     return this.integrationService.getServices(tagsArray.join(','), start).then(({services}) => {
       if (services.length) {

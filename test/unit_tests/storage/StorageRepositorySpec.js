@@ -32,16 +32,16 @@ describe('z.storage.StorageRepository', () => {
   });
 
   beforeEach(() => {
-    TestFactory.storage_repository.clear_all_stores();
+    TestFactory.storage_repository.clearStores();
   });
 
-  describe('save_value', () => {
+  describe('saveValue', () => {
     it('persists primitive values in an object format', done => {
       const primary_key = 'test_key';
       const primitive_value = 'test_value';
 
       TestFactory.storage_repository
-        .save_value(primary_key, primitive_value)
+        .saveValue(primary_key, primitive_value)
         .then(storage_key => {
           expect(storage_key).toBe(primary_key);
           return done();

@@ -33,7 +33,6 @@ participant-avatar {
   transform: translateZ(0);
   user-select: none;
   cursor: pointer;
-  overflow: hidden;
 
   &.avatar-no-border {
     .avatar-border {
@@ -58,14 +57,11 @@ participant-avatar {
   }
 
   .participant-avatar {
-    height: 100%;
-    background-color: currentColor;
+    .full-screen;
+    border-radius: 50%;
+    overflow: hidden;
     & > div {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      left: 0;
-      right: 0;
+      .full-screen;
     }
 
     &.pending,
@@ -75,6 +71,7 @@ participant-avatar {
       .avatar-image {
         filter: grayscale(100%);
       }
+
       .avatar-border {
         display: none;
       }
@@ -155,6 +152,7 @@ participant-avatar {
     .avatar-service-placeholder {
       .no-transition();
     }
+
     .avatar-badge {
       display: none;
     }
@@ -171,9 +169,15 @@ participant-avatar {
     color: #fff;
   }
 
+  .avatar-background {
+    background-color: currentColor;
+    transform: scale(0.9916);
+  }
+
   .avatar-image {
     transform: scale(0.88);
     opacity: 0;
+
     > img {
       width: 100%;
       height: 100%;
@@ -185,26 +189,32 @@ participant-avatar {
     .avatar-service-placeholder {
       transition: opacity @animation-timing-faster @ease-in-quart;
     }
+
     .avatar-image {
       transition: all @animation-timing-slow @ease-out-quart @animation-timing-faster;
     }
   }
+
   &.avatar-image-loaded {
     .avatar-initials,
     .avatar-service-placeholder {
       opacity: 0;
     }
+
     .avatar-image {
       transform: scale(1);
       opacity: 1;
     }
   }
+
   .avatar-service-placeholder {
     display: flex;
     justify-content: center;
     align-items: center;
+
     & > svg {
       width: 60%;
+
       & > path {
         fill: fade(@graphite-dark, 20%);
       }
@@ -214,6 +224,7 @@ participant-avatar {
   &.service-avatar {
     &,
     .avatar-border,
+    .avatar-background,
     .avatar-image > img {
       border-radius: 15%;
     }
@@ -222,6 +233,7 @@ participant-avatar {
   &.user-avatar {
     &,
     .avatar-border,
+    .avatar-background,
     .avatar-image > img {
       border-radius: 50%;
     }
@@ -231,6 +243,7 @@ participant-avatar {
 .avatar-halo {
   .flex-center;
   .square(36px);
+
   &.avatar-halo-active {
     .accent-border-color;
     border-width: 2px;

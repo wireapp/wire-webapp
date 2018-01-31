@@ -222,7 +222,7 @@
 
   user-list,
   service-list {
-    margin-top: 8px;
+    margin-top: 16px;
   }
 }
 
@@ -256,61 +256,73 @@
   }
 }
 
-.participants-service-confirmation {
+// ----------------------------------------------------------------------------
+// User and service profile
+// ----------------------------------------------------------------------------
+
+.participants-user-profile,
+.participants-service-profile {
+  position: absolute;
+  top: 0;
+  right: -@bubble-transition_offset;
+}
+
+.participants-service-profile {
   .bubble-content();
-  .service-confirmation-header {
-    flex-basis: 48px;
-    padding: 16px;
-    display: flex;
-  }
-  .service-confirmation-back {
+  color: @graphite-dark;
+  position: relative;
+
+  .participants-service-profile-back {
     cursor: pointer;
   }
-  .service-confirmation-body {
+
+  .participants-service-profile-body {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
     padding: 16px;
     background-color: @app-bg;
   }
-  .service-confirmation-footer {
-    padding: 24px;
+
+  .participants-service-profile-button {
+    .button();
+    width: 100%;
+    height: 48px;
   }
-  .service-confirmation-summary {
+
+  .participants-service-profile-description {
+    margin-top: 16px;
+    font-size: 14px;
+  }
+
+  .participants-service-profile-details {
     display: flex;
   }
-  .service-confirmation-summary-text {
+
+  .participants-service-profile-details-content {
     margin-left: 16px;
   }
-  .service-confirmation-name {
+
+  .participants-service-profile-header {
+    flex-basis: 48px;
+    padding: 16px;
+    display: flex;
+  }
+
+  .participants-service-profile-footer {
+    padding: 24px;
+  }
+
+  .participants-service-profile-name {
     font-size: 24px;
     line-height: 32px;
     font-weight: @font-weight-regular;
   }
-  .service-confirmation-provider {
+
+  .participants-service-profile-provider {
     margin-top: 4px;
     font-size: 12px;
     line-height: 16px;
     opacity: 0.56;
   }
-  .service-confirmation-description {
-    margin-top: 16px;
-    font-size: 14px;
-  }
-}
-
-.participants-service-confirmation-button {
-  .button();
-  width: 100%;
-  height: 48px;
-}
-
-// ----------------------------------------------------------------------------
-// user profile
-// ----------------------------------------------------------------------------
-
-.group-user-profile {
-  position: absolute;
-  top: 0;
-  right: -@bubble-transition_offset;
 }

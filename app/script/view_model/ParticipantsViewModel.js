@@ -63,6 +63,8 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.logger = new z.util.Logger('z.ViewModel.ParticipantsViewModel', z.config.LOGGER.OPTIONS);
 
     this.state = ko.observable(ParticipantsViewModel.STATE.PARTICIPANTS);
+    this.previousState = ko.observable(this.state());
+    this.state.subscribe(oldState => this.previousState(oldState), null, 'beforeChange');
 
     this.activeAddState = ko.pureComputed(() => ParticipantsViewModel.CONFIG.ADD_STATES.includes(this.state()));
     this.activeServiceState = ko.pureComputed(() => ParticipantsViewModel.CONFIG.SERVICE_STATES.includes(this.state()));
@@ -72,7 +74,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.stateParticipants = ko.pureComputed(() => {
       return this.state() === z.ViewModel.ParticipantsViewModel.STATE.PARTICIPANTS;
     });
-    this.stateServiceConfirmations = ko.pureComputed(() => {
+    this.stateServiceConfirmation = ko.pureComputed(() => {
       return this.state() === z.ViewModel.ParticipantsViewModel.STATE.SERVICE_CONFIRMATION;
     });
     this.stateServiceDetails = ko.pureComputed(() => {
@@ -155,6 +157,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.addActionText = ko.pureComputed(() => {
       return this.showIntegrations() ? z.string.people_button_add : z.string.people_button_add_people;
     });
+
     this.searchActionText = ko.pureComputed(() => {
       if (this.conversation()) {
         const isGroup = this.conversation().is_group();
@@ -164,6 +167,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
     this.searchInput = ko.observable('');
     this.searchInput.subscribe(searchInput => this.searchServices(searchInput));
+    this.isSearching = ko.pureComputed(() => this.searchInput().length);
 
     this.selectedUsers = ko.observableArray([]);
     this.users = ko.pureComputed(() => {
@@ -187,6 +191,16 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.showServiceStates = ko.pureComputed(() => this.activeServiceState() && this.selectedService());
     this.showUserProfile = ko.pureComputed(() => {
       return this.stateParticipants() && this.selectedUser() && !this.selectedService();
+    });
+
+    this.selectedIsInConversation = ko.pureComputed(() => {
+      if (this.selectedUser()) {
+        return this.participants().some(entity => entity.id === this.selectedUser().id);
+      }
+      return false;
+    });
+    this.showServiceRemove = ko.pureComputed(() => {
+      return this.stateServiceDetails() && !this.conversation().is_guest() && this.selectedIsInConversation();
     });
 
     amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, this.switchContent.bind(this));
@@ -232,11 +246,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.selectedService(serviceEntity);
     this.state(ParticipantsViewModel.STATE.SERVICE_CONFIRMATION);
 
-    this.integrationRepository.getProviderById(serviceEntity.providerId).then(providerEntity => {
-      if (this.selectedService()) {
-        this.selectedService().providerName(providerEntity.name);
-      }
-    });
+    this.integrationRepository.getProviderNameForService(serviceEntity);
   }
 
   clickOnSelfProfile() {
@@ -248,7 +258,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   }
 
   clickOnServiceBack() {
-    this.state(ParticipantsViewModel.STATE.ADD_SERVICE);
+    this.state(this.previousState());
     this.selectedService(undefined);
     this.selectedUser(undefined);
     $('.participants-search').addClass('participants-search-show');
@@ -307,10 +317,6 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
   clickToConnect(userEntity) {
     this.participantsBubble.hide();
-
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.SENT_CONNECT_REQUEST, {
-      context: 'participants',
-    });
   }
 
   clickToEdit() {
@@ -352,7 +358,10 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   clickToRemoveService() {
     this.integrationRepository.removeService(this.conversation(), this.selectedUser()).then(response => {
       if (response) {
-        this.resetView();
+        if (this.groupMode()) {
+          return this.resetView();
+        }
+        this.participantsBubble.hide();
       }
     });
   }

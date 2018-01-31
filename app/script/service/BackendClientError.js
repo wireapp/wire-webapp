@@ -59,6 +59,7 @@ z.service.BackendClientError = class BackendClientError extends Error {
       PENDING_ACTIVATION: 'pending-activation',
       PENDING_LOGIN: 'pending-login',
       PHONE_BUDGET_EXHAUSTED: 'phone-budget-exhausted',
+      SERVER_ERROR: 'server-error',
       SERVICE_DISABLED: 'service-disabled',
       SUSPENDED: 'suspended',
       TOO_MANY_BOTS: 'too-many-bots',

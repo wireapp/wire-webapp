@@ -70,8 +70,8 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
   reset_cryptobox(client_et) {
     const delete_everything = client_et ? client_et.isTemporary() : false;
     const delete_promise = delete_everything
-      ? this.storage_repository.delete_everything()
-      : this.storage_repository.delete_cryptography();
+      ? this.storage_repository.deleteDatabase()
+      : this.storage_repository.deleteCryptographyStores();
 
     return delete_promise
       .catch(database_error => {

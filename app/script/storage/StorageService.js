@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,8 +44,8 @@ z.storage.StorageService = class StorageService {
     this.logger = new z.util.Logger('z.storage.StorageService', z.config.LOGGER.OPTIONS);
 
     this.db = undefined;
-    this.db_name = undefined;
-    this.user_id = undefined;
+    this.dbName = undefined;
+    this.userId = undefined;
   }
 
   //##############################################################################
@@ -55,19 +55,19 @@ z.storage.StorageService = class StorageService {
   /**
    * Initialize the IndexedDB for a user.
    *
-   * @param {string} user_id - User ID
+   * @param {string} userId - User ID
    * @returns {Promise} Resolves with the database name
    */
-  init(user_id = this.user_id) {
+  init(userId = this.userId) {
     return new Promise((resolve, reject) => {
-      const is_permanent = z.util.StorageUtil.get_value(z.storage.StorageKey.AUTH.PERSIST);
-      const client_type = is_permanent ? z.client.ClientType.PERMANENT : z.client.ClientType.TEMPORARY;
+      const isPermanent = z.util.StorageUtil.get_value(z.storage.StorageKey.AUTH.PERSIST);
+      const clientType = isPermanent ? z.client.ClientType.PERMANENT : z.client.ClientType.TEMPORARY;
 
-      this.user_id = user_id;
-      this.db_name = `wire@${z.util.Environment.backend.current}@${user_id}@${client_type}`;
+      this.userId = userId;
+      this.dbName = `wire@${z.util.Environment.backend.current}@${userId}@${clientType}`;
 
       // https://github.com/dfahlander/Dexie.js/wiki/Version.stores()
-      const version_1 = {
+      const version1 = {
         [StorageService.OBJECT_STORE.AMPLIFY]: '',
         [StorageService.OBJECT_STORE.CLIENTS]: '',
         [StorageService.OBJECT_STORE.CONVERSATION_EVENTS]: ', raw.conversation, raw.time, meta.timestamp',
@@ -76,7 +76,7 @@ z.storage.StorageService = class StorageService {
         [StorageService.OBJECT_STORE.SESSIONS]: '',
       };
 
-      const version_2 = {
+      const version2 = {
         [StorageService.OBJECT_STORE.AMPLIFY]: '',
         [StorageService.OBJECT_STORE.CLIENTS]: '',
         [StorageService.OBJECT_STORE.CONVERSATION_EVENTS]: ', raw.conversation, raw.time, raw.type, meta.timestamp',
@@ -85,7 +85,7 @@ z.storage.StorageService = class StorageService {
         [StorageService.OBJECT_STORE.SESSIONS]: '',
       };
 
-      const version_3 = {
+      const version3 = {
         [StorageService.OBJECT_STORE.AMPLIFY]: '',
         [StorageService.OBJECT_STORE.CLIENTS]: '',
         [StorageService.OBJECT_STORE.CONVERSATION_EVENTS]: ', raw.conversation, raw.time, raw.type, meta.timestamp',
@@ -95,7 +95,7 @@ z.storage.StorageService = class StorageService {
         [StorageService.OBJECT_STORE.SESSIONS]: '',
       };
 
-      const version_4 = {
+      const version4 = {
         [StorageService.OBJECT_STORE.AMPLIFY]: '',
         [StorageService.OBJECT_STORE.CLIENTS]: ', meta.primary_key',
         [StorageService.OBJECT_STORE.CONVERSATION_EVENTS]: ', raw.conversation, raw.time, raw.type, meta.timestamp',
@@ -105,7 +105,7 @@ z.storage.StorageService = class StorageService {
         [StorageService.OBJECT_STORE.SESSIONS]: '',
       };
 
-      const version_5 = {
+      const version5 = {
         [StorageService.OBJECT_STORE.AMPLIFY]: '',
         [StorageService.OBJECT_STORE.CLIENTS]: ', meta.primary_key',
         [StorageService.OBJECT_STORE.CONVERSATION_EVENTS]: ', conversation, time, type',
@@ -115,7 +115,7 @@ z.storage.StorageService = class StorageService {
         [StorageService.OBJECT_STORE.SESSIONS]: '',
       };
 
-      const version_9 = {
+      const version9 = {
         [StorageService.OBJECT_STORE.AMPLIFY]: '',
         [StorageService.OBJECT_STORE.CLIENTS]: ', meta.primary_key',
         [StorageService.OBJECT_STORE.CONVERSATION_EVENTS]: ', conversation, time, type, [conversation+time]',
@@ -125,7 +125,7 @@ z.storage.StorageService = class StorageService {
         [StorageService.OBJECT_STORE.SESSIONS]: '',
       };
 
-      const version_10 = {
+      const version10 = {
         [StorageService.OBJECT_STORE.AMPLIFY]: '',
         [StorageService.OBJECT_STORE.CLIENTS]: ', meta.primary_key',
         [StorageService.OBJECT_STORE.CONVERSATION_EVENTS]:
@@ -136,7 +136,7 @@ z.storage.StorageService = class StorageService {
         [StorageService.OBJECT_STORE.SESSIONS]: '',
       };
 
-      const version_11 = {
+      const version11 = {
         [StorageService.OBJECT_STORE.AMPLIFY]: '',
         [StorageService.OBJECT_STORE.CLIENTS]: ', meta.primary_key',
         [StorageService.OBJECT_STORE.CONVERSATION_EVENTS]:
@@ -147,7 +147,7 @@ z.storage.StorageService = class StorageService {
         [StorageService.OBJECT_STORE.SESSIONS]: '',
       };
 
-      const version_12 = {
+      const version12 = {
         [StorageService.OBJECT_STORE.AMPLIFY]: '',
         [StorageService.OBJECT_STORE.CLIENTS]: ', meta.primary_key',
         [StorageService.OBJECT_STORE.CONVERSATION_EVENTS]:
@@ -160,7 +160,7 @@ z.storage.StorageService = class StorageService {
         [StorageService.OBJECT_STORE.SESSIONS]: '',
       };
 
-      const version_15 = {
+      const version15 = {
         [StorageService.OBJECT_STORE.AMPLIFY]: '',
         [StorageService.OBJECT_STORE.CLIENTS]: ', meta.primary_key',
         [StorageService.OBJECT_STORE.CONVERSATION_EVENTS]:
@@ -174,7 +174,7 @@ z.storage.StorageService = class StorageService {
         [StorageService.OBJECT_STORE.USERS]: ', id',
       };
 
-      this.db = new Dexie(this.db_name);
+      this.db = new Dexie(this.dbName);
 
       this.db.on('blocked', () => {
         this.logger.error('Database is blocked');
@@ -182,12 +182,12 @@ z.storage.StorageService = class StorageService {
 
       // @see https://github.com/dfahlander/Dexie.js/wiki/Version.upgrade()
       // @see https://github.com/dfahlander/Dexie.js/wiki/WriteableCollection.modify()
-      this.db.version(1).stores(version_1);
-      this.db.version(2).stores(version_2);
-      this.db.version(3).stores(version_3);
+      this.db.version(1).stores(version1);
+      this.db.version(2).stores(version2);
+      this.db.version(3).stores(version3);
       this.db
         .version(4)
-        .stores(version_4)
+        .stores(version4)
         .upgrade(transaction => {
           this.logger.warn('Database upgrade to version 4', transaction);
           transaction[StorageService.OBJECT_STORE.CLIENTS].toCollection().modify(client => {
@@ -197,10 +197,10 @@ z.storage.StorageService = class StorageService {
             });
           });
         });
-      this.db.version(5).stores(version_4);
+      this.db.version(5).stores(version4);
       this.db
         .version(6)
-        .stores(version_4)
+        .stores(version4)
         .upgrade(transaction => {
           this.logger.warn('Database upgrade to version 6', transaction);
           transaction[StorageService.OBJECT_STORE.CONVERSATIONS].toCollection().eachKey(key => {
@@ -215,20 +215,20 @@ z.storage.StorageService = class StorageService {
         });
       this.db
         .version(7)
-        .stores(version_5)
+        .stores(version5)
         .upgrade(transaction => {
           this.logger.warn('Database upgrade to version 7', transaction);
           transaction[StorageService.OBJECT_STORE.CONVERSATION_EVENTS].toCollection().modify(event => {
-            const mapped_event = event.mapped || event.raw;
+            const mappedEvent = event.mapped || event.raw;
             delete event.mapped;
             delete event.raw;
             delete event.meta;
-            $.extend(event, mapped_event);
+            $.extend(event, mappedEvent);
           });
         });
       this.db
         .version(8)
-        .stores(version_5)
+        .stores(version5)
         .upgrade(transaction => {
           this.logger.warn('Database upgrade to version 8', transaction);
           transaction[StorageService.OBJECT_STORE.CONVERSATION_EVENTS].toCollection().modify(event => {
@@ -237,10 +237,10 @@ z.storage.StorageService = class StorageService {
             }
           });
         });
-      this.db.version(9).stores(version_9);
+      this.db.version(9).stores(version9);
       this.db
         .version(10)
-        .stores(version_10)
+        .stores(version10)
         .upgrade(transaction => {
           this.logger.warn('Database upgrade to version 10', transaction);
           transaction[StorageService.OBJECT_STORE.CONVERSATION_EVENTS].toCollection().modify(event => {
@@ -249,20 +249,22 @@ z.storage.StorageService = class StorageService {
         });
       this.db
         .version(11)
-        .stores(version_11)
+        .stores(version11)
         .upgrade(transaction => {
           this.logger.warn('Database upgrade to version 11', transaction);
-          const expected_primary_key = z.client.ClientRepository.PRIMARY_KEY_CURRENT_CLIENT;
+          const expectedPrimaryKey = z.client.ClientRepository.PRIMARY_KEY_CURRENT_CLIENT;
           transaction[StorageService.OBJECT_STORE.CLIENTS].toCollection().each((client, cursor) => {
-            if (client.meta.primary_key === expected_primary_key && client.primary_key !== expected_primary_key) {
+            const isExpectedMetaPrimaryKey = client.meta.primary_key === expectedPrimaryKey;
+            const isExpectedPrimaryKey = client.primary_key === expectedPrimaryKey;
+            if (isExpectedMetaPrimaryKey && isExpectedPrimaryKey) {
               transaction[StorageService.OBJECT_STORE.CLIENTS].delete(cursor.primaryKey);
-              transaction[StorageService.OBJECT_STORE.CLIENTS].put(client, expected_primary_key);
+              transaction[StorageService.OBJECT_STORE.CLIENTS].put(client, expectedPrimaryKey);
             }
           });
         });
       this.db
         .version(12)
-        .stores(version_11)
+        .stores(version11)
         .upgrade(transaction => {
           this.logger.warn('Database upgrade to version 12', transaction);
           transaction[StorageService.OBJECT_STORE.KEYS].toCollection().modify(record => {
@@ -277,7 +279,7 @@ z.storage.StorageService = class StorageService {
         });
       this.db
         .version(13)
-        .stores(version_12)
+        .stores(version12)
         .upgrade(transaction => {
           this.logger.warn('Database upgrade to version 13', transaction);
           transaction[StorageService.OBJECT_STORE.CONVERSATION_EVENTS]
@@ -289,7 +291,7 @@ z.storage.StorageService = class StorageService {
         });
       this.db
         .version(14)
-        .stores(version_12)
+        .stores(version12)
         .upgrade(transaction => {
           this.logger.warn('Database upgrade to version 14', transaction);
           transaction[StorageService.OBJECT_STORE.EVENTS].toCollection().modify(event => {
@@ -298,17 +300,17 @@ z.storage.StorageService = class StorageService {
             }
           });
         });
-      this.db.version(15).stores(version_15);
+      this.db.version(15).stores(version15);
 
       this.db
         .open()
         .then(() => {
-          this.logger.info(`Storage Service initialized with database '${this.db_name}' version '${this.db.verno}'`);
-          resolve(this.db_name);
+          this.logger.info(`Storage Service initialized with database '${this.dbName}' version '${this.db.verno}'`);
+          resolve(this.dbName);
         })
         .catch(error => {
           this.logger.error(
-            `Failed to initialize database '${this.db_name}' for Storage Service: ${error.message || error}`,
+            `Failed to initialize database '${this.dbName}' for Storage Service: ${error.message || error}`,
             {error: error}
           );
           reject(new z.storage.StorageError(z.storage.StorageError.TYPE.FAILED_TO_OPEN));
@@ -324,31 +326,28 @@ z.storage.StorageService = class StorageService {
    * Clear all stores.
    * @returns {Promise} Resolves when all stores have been cleared
    */
-  clear_all_stores() {
-    const delete_store_promises = Object.keys(this.db._dbSchema).map(store_name => {
-      this.delete_store(store_name);
-    });
-
-    return Promise.all(delete_store_promises);
+  clearStores() {
+    const deleteStorePromises = Object.keys(this.db._dbSchema).map(storeName => this.deleteStore(storeName));
+    return Promise.all(deleteStorePromises);
   }
 
   /**
    * Removes persisted data.
    *
-   * @param {string} store_name - Name of the object store
-   * @param {string} primary_key - Primary key
+   * @param {string} storeName - Name of the object store
+   * @param {string} primaryKey - Primary key
    * @returns {Promise} Resolves when the object is deleted
    */
-  delete(store_name, primary_key) {
-    if (this.db[store_name]) {
-      return this.db[store_name]
-        .delete(primary_key)
+  delete(storeName, primaryKey) {
+    if (this.db[storeName]) {
+      return this.db[storeName]
+        .delete(primaryKey)
         .then(() => {
-          this.logger.info(`Deleted '${primary_key}' from object store '${store_name}'`);
-          return primary_key;
+          this.logger.info(`Deleted '${primaryKey}' from object store '${storeName}'`);
+          return primaryKey;
         })
         .catch(error => {
-          this.logger.error(`Failed to delete '${primary_key}' from store '${store_name}'`, error);
+          this.logger.error(`Failed to delete '${primaryKey}' from store '${storeName}'`, error);
           throw error;
         });
     }
@@ -360,58 +359,55 @@ z.storage.StorageService = class StorageService {
    * Delete the IndexedDB with all its stores.
    * @returns {Promise} Resolves if a database is found and cleared
    */
-  delete_everything() {
+  deleteDatabase() {
     if (this.db) {
       return this.db
         .delete()
         .then(() => {
-          this.logger.info(`Clearing IndexedDB '${this.db_name}' successful`);
+          this.logger.info(`Clearing IndexedDB '${this.dbName}' successful`);
           return true;
         })
         .catch(error => {
-          this.logger.error(`Clearing IndexedDB '${this.db_name}' failed`);
+          this.logger.error(`Clearing IndexedDB '${this.dbName}' failed`);
           throw error;
         });
     }
-    this.logger.error(`IndexedDB '${this.db_name}' not found`);
+    this.logger.error(`IndexedDB '${this.dbName}' not found`);
     return Promise.resolve(true);
   }
 
   /**
    * Delete a database store.
-   * @param {string} store_name - Name of database store to delete
+   * @param {string} storeName - Name of database store to delete
    * @returns {Promise} Resolves when the store has been deleted
    */
-  delete_store(store_name) {
-    this.logger.info(`Clearing object store '${store_name}' in database '${this.db_name}'`);
-    return this.db[store_name].clear();
+  deleteStore(storeName) {
+    this.logger.info(`Clearing object store '${storeName}' in database '${this.dbName}'`);
+    return this.db[storeName].clear();
   }
 
   /**
    * Delete multiple database stores.
-   * @param {Array<string>} store_names - Names of database stores to delete
+   * @param {Array<string>} storeNames - Names of database stores to delete
    * @returns {Promise} Resolves when the stores have been deleted
    */
-  delete_stores(store_names) {
-    const delete_store_promises = store_names.map(store_name => {
-      return this.delete_store(store_name);
-    });
-
-    return Promise.all(delete_store_promises);
+  deleteStores(storeNames) {
+    const deleteStorePromises = storeNames.map(storeName => this.deleteStore(storeName));
+    return Promise.all(deleteStorePromises);
   }
 
   /**
    * Returns an array of all records for a given object store.
    *
-   * @param {string} store_name - Name of object store
+   * @param {string} storeName - Name of object store
    * @returns {Promise} Resolves with the records from the object store
    */
-  get_all(store_name) {
-    return this.db[store_name]
+  getAll(storeName) {
+    return this.db[storeName]
       .toArray()
-      .then(result_array => result_array.filter(result => result))
+      .then(resultArray => resultArray.filter(result => result))
       .catch(error => {
-        this.logger.error(`Failed to load objects from store '${store_name}'`, error);
+        this.logger.error(`Failed to load objects from store '${storeName}'`, error);
         throw error;
       });
   }
@@ -420,13 +416,13 @@ z.storage.StorageService = class StorageService {
    * Loads persisted data via a promise.
    * @note If a key cannot be found, it resolves and returns "undefined".
    *
-   * @param {string} store_name - Name of object store
-   * @param {string} primary_key - Primary key of object to be retrieved
+   * @param {string} storeName - Name of object store
+   * @param {string} primaryKey - Primary key of object to be retrieved
    * @returns {Promise} Resolves with the record matching the primary key
    */
-  load(store_name, primary_key) {
-    return this.db[store_name].get(primary_key).catch(error => {
-      this.logger.error(`Failed to load '${primary_key}' from store '${store_name}'`, error);
+  load(storeName, primaryKey) {
+    return this.db[storeName].get(primaryKey).catch(error => {
+      this.logger.error(`Failed to load '${primaryKey}' from store '${storeName}'`, error);
       throw error;
     });
   }
@@ -434,18 +430,18 @@ z.storage.StorageService = class StorageService {
   /**
    * Saves objects in the local database.
    *
-   * @param {string} store_name - Name of object store where to save the object
-   * @param {string} primary_key - Primary key which should be used to store the object
+   * @param {string} storeName - Name of object store where to save the object
+   * @param {string} primaryKey - Primary key which should be used to store the object
    * @param {Object} entity - Data to store in object store
    * @returns {Promise} Resolves with the primary key of the persisted object
    */
-  save(store_name, primary_key, entity) {
+  save(storeName, primaryKey, entity) {
     if (!entity) {
       return Promise.reject(new z.storage.StorageError(z.storage.StorageError.TYPE.NO_DATA));
     }
 
-    return this.db[store_name].put(entity, primary_key).catch(error => {
-      this.logger.error(`Failed to put '${primary_key}' into store '${store_name}'`, error);
+    return this.db[storeName].put(entity, primaryKey).catch(error => {
+      this.logger.error(`Failed to put '${primaryKey}' into store '${storeName}'`, error);
       throw error;
     });
   }
@@ -464,23 +460,23 @@ z.storage.StorageService = class StorageService {
   /**
    * Update previously persisted data via a promise.
    *
-   * @param {string} store_name - Name of object store
-   * @param {string} primary_key - Primary key of object to be updated
+   * @param {string} storeName - Name of object store
+   * @param {string} primaryKey - Primary key of object to be updated
    * @param {Object} changes - Object containing the key paths to each property you want to change
    * @returns {Promise} Promise with the number of updated records (0 if no records were changed).
    */
-  update(store_name, primary_key, changes) {
-    return this.db[store_name]
-      .update(primary_key, changes)
+  update(storeName, primaryKey, changes) {
+    return this.db[storeName]
+      .update(primaryKey, changes)
       .then(number_of_updates => {
         this.logger.info(
-          `Updated ${number_of_updates} record(s) with key '${primary_key}' in store '${store_name}'`,
+          `Updated ${number_of_updates} record(s) with key '${primaryKey}' in store '${storeName}'`,
           changes
         );
         return number_of_updates;
       })
       .catch(error => {
-        this.logger.error(`Failed to update '${primary_key}' in store '${store_name}'`, error);
+        this.logger.error(`Failed to update '${primaryKey}' in store '${storeName}'`, error);
         throw error;
       });
   }
