@@ -174,8 +174,8 @@ z.string.es.modal_too_many_members_headline = 'Llamada llena';
 z.string.es.modal_too_many_members_message = 'Hasta {{number1}} personas pueden unirse a una conversación. Hay espacio para {{number2}} más personas aquí.';
 z.string.es.modalUploadsParallel = 'Puede enviar hasta {{number}} archivos a la vez.';
 
-z.string.es.connection_request_connect = 'Conectar';
-z.string.es.connection_request_ignore = 'Ignorar';
+z.string.es.connectionRequestConnect = 'Conectar';
+z.string.es.connectionRequestIgnore = 'Ignorar';
 
 z.string.es.conversation_guest_indicator = 'Invitado';
 
@@ -378,14 +378,14 @@ z.string.es.preferences_devices = 'Dispositivos';
 z.string.es.preferences_headline = 'Preferencias';
 z.string.es.preferences_options = 'Opciones';
 
-z.string.es.preferences_about_copyright = '© Wire Swiss GmbH';
-z.string.es.preferences_about_privacy_policy = 'Política de Privacidad';
-z.string.es.preferences_about_support = 'Soporte';
-z.string.es.preferences_about_support_website = 'Sitio web de Soporte';
-z.string.es.preferences_about_support_contact = 'Contactar con Soporte';
-z.string.es.preferences_about_terms_of_use = 'Términos de uso';
-z.string.es.preferences_about_version = 'Versión {{version}}';
-z.string.es.preferences_about_website = 'Página web de Wire';
+z.string.es.preferencesAboutCopyright = '© Wire Swiss GmbH';
+z.string.es.preferencesAboutPrivacyPolicy = 'Política de Privacidad';
+z.string.es.preferencesAboutSupport = 'Soporte';
+z.string.es.preferencesAboutSupportWebsite = 'Sitio web de Soporte';
+z.string.es.preferencesAboutSupportContact = 'Contactar con Soporte';
+z.string.es.preferencesAboutTermsOfUse = 'Términos de uso';
+z.string.es.preferencesAboutVersion = 'Versión {{version}}';
+z.string.es.preferencesAboutWebsite = 'Página web de Wire';
 
 z.string.es.preferences_account_avaibility_unset = 'Establecer estado';
 z.string.es.preferences_account_create_team = 'Crear un equipo';

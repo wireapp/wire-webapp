@@ -181,8 +181,8 @@ z.string.lt.modal_too_many_members_headline = 'Balso kanalas perpildytas';
 z.string.lt.modal_too_many_members_message = 'Prie pokalbio gali prisijungti iki {{number1}} žmonių. Čia yra vietos tik dar {{number2}} žmonėms.';
 z.string.lt.modalUploadsParallel = 'Jūs vienu metu galite siųsti iki {{number}} failų.';
 
-z.string.lt.connection_request_connect = 'Užmegzti kontaktą';
-z.string.lt.connection_request_ignore = 'Nepaisyti';
+z.string.lt.connectionRequestConnect = 'Užmegzti kontaktą';
+z.string.lt.connectionRequestIgnore = 'Nepaisyti';
 
 z.string.lt.conversation_guest_indicator = 'Svečias';
 
@@ -389,14 +389,14 @@ z.string.lt.preferences_devices = 'Įrenginiai';
 z.string.lt.preferences_headline = 'Nuostatos';
 z.string.lt.preferences_options = 'Parinktys';
 
-z.string.lt.preferences_about_copyright = '© Wire Swiss GmbH';
-z.string.lt.preferences_about_privacy_policy = 'Privatumo politika';
-z.string.lt.preferences_about_support = 'Palaikymas';
-z.string.lt.preferences_about_support_website = 'Palaikymo svetainė';
-z.string.lt.preferences_about_support_contact = 'Susisiekti su palaikymu';
-z.string.lt.preferences_about_terms_of_use = 'Naudojimosi sąlygos';
-z.string.lt.preferences_about_version = 'Versija {{version}}';
-z.string.lt.preferences_about_website = 'Wire svetainė';
+z.string.lt.preferencesAboutCopyright = '© Wire Swiss GmbH';
+z.string.lt.preferencesAboutPrivacyPolicy = 'Privatumo politika';
+z.string.lt.preferencesAboutSupport = 'Palaikymas';
+z.string.lt.preferencesAboutSupportWebsite = 'Palaikymo svetainė';
+z.string.lt.preferencesAboutSupportContact = 'Susisiekti su palaikymu';
+z.string.lt.preferencesAboutTermsOfUse = 'Naudojimosi sąlygos';
+z.string.lt.preferencesAboutVersion = 'Versija {{version}}';
+z.string.lt.preferencesAboutWebsite = 'Wire svetainė';
 
 z.string.lt.preferences_account_avaibility_unset = 'Pasirinkite būseną';
 z.string.lt.preferences_account_create_team = 'Sukurti komandą';

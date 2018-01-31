@@ -173,8 +173,8 @@ z.string.uk.modal_too_many_members_headline = 'Голосовий канал п�
 z.string.uk.modal_too_many_members_message = 'В розмові може бути до {{number1}} учасників. В даній розмові уже не вистачає місця для {{number}} учасників.';
 z.string.uk.modalUploadsParallel = 'Ви можете надіслати до {{number}} файлів за один раз.';
 
-z.string.uk.connection_request_connect = 'Додати до контактів';
-z.string.uk.connection_request_ignore = 'Ігнорувати';
+z.string.uk.connectionRequestConnect = 'Додати до контактів';
+z.string.uk.connectionRequestIgnore = 'Ігнорувати';
 
 z.string.uk.conversation_guest_indicator = 'Гість';
 
@@ -377,14 +377,14 @@ z.string.uk.preferences_devices = 'Пристрої';
 z.string.uk.preferences_headline = 'Параметри';
 z.string.uk.preferences_options = 'Налаштування';
 
-z.string.uk.preferences_about_copyright = '© Wire Swiss GmbH';
-z.string.uk.preferences_about_privacy_policy = 'Політика конфіденційності';
-z.string.uk.preferences_about_support = 'Підтримка';
-z.string.uk.preferences_about_support_website = 'Сайт підтримки';
-z.string.uk.preferences_about_support_contact = 'Звернутися до служби підтримки';
-z.string.uk.preferences_about_terms_of_use = 'Умови використання';
-z.string.uk.preferences_about_version = 'Версія {{version}}';
-z.string.uk.preferences_about_website = 'Веб-сайт Wire';
+z.string.uk.preferencesAboutCopyright = '© Wire Swiss GmbH';
+z.string.uk.preferencesAboutPrivacyPolicy = 'Політика конфіденційності';
+z.string.uk.preferencesAboutSupport = 'Підтримка';
+z.string.uk.preferencesAboutSupportWebsite = 'Сайт підтримки';
+z.string.uk.preferencesAboutSupportContact = 'Звернутися до служби підтримки';
+z.string.uk.preferencesAboutTermsOfUse = 'Умови використання';
+z.string.uk.preferencesAboutVersion = 'Версія {{version}}';
+z.string.uk.preferencesAboutWebsite = 'Веб-сайт Wire';
 
 z.string.uk.preferences_account_avaibility_unset = 'Встановити статус';
 z.string.uk.preferences_account_create_team = 'Створити команду';

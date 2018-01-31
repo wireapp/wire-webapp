@@ -180,8 +180,8 @@ z.string.ru.modal_too_many_members_headline = 'Канал переполнен';
 z.string.ru.modal_too_many_members_message = 'К разговору может присоединиться до {{number1}} человек. Здесь хватит места еще для {{number2}} человек.';
 z.string.ru.modalUploadsParallel = 'Вы можете отправить до {{number}} файлов за раз.';
 
-z.string.ru.connection_request_connect = 'Связаться';
-z.string.ru.connection_request_ignore = 'Игнорировать';
+z.string.ru.connectionRequestConnect = 'Связаться';
+z.string.ru.connectionRequestIgnore = 'Игнорировать';
 
 z.string.ru.conversation_guest_indicator = 'Гость';
 
@@ -388,14 +388,14 @@ z.string.ru.preferences_devices = 'Устройства';
 z.string.ru.preferences_headline = 'Настройки';
 z.string.ru.preferences_options = 'Настройки';
 
-z.string.ru.preferences_about_copyright = '© Wire Swiss GmbH';
-z.string.ru.preferences_about_privacy_policy = 'Политика конфиденциальности';
-z.string.ru.preferences_about_support = 'Поддержка';
-z.string.ru.preferences_about_support_website = 'Сайт поддержки';
-z.string.ru.preferences_about_support_contact = 'Связаться с поддержкой';
-z.string.ru.preferences_about_terms_of_use = 'Условия использования';
-z.string.ru.preferences_about_version = 'Версия {{version}}';
-z.string.ru.preferences_about_website = 'Веб-сайт Wire';
+z.string.ru.preferencesAboutCopyright = '© Wire Swiss GmbH';
+z.string.ru.preferencesAboutPrivacyPolicy = 'Политика конфиденциальности';
+z.string.ru.preferencesAboutSupport = 'Поддержка';
+z.string.ru.preferencesAboutSupportWebsite = 'Сайт поддержки';
+z.string.ru.preferencesAboutSupportContact = 'Связаться с поддержкой';
+z.string.ru.preferencesAboutTermsOfUse = 'Условия использования';
+z.string.ru.preferencesAboutVersion = 'Версия {{version}}';
+z.string.ru.preferencesAboutWebsite = 'Веб-сайт Wire';
 
 z.string.ru.preferences_account_avaibility_unset = 'Установить статус';
 z.string.ru.preferences_account_create_team = 'Создать команду';

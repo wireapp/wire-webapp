@@ -173,8 +173,8 @@ z.string.fi.modal_too_many_members_headline = 'Kaikki puhelukanavat varattuja';
 z.string.fi.modal_too_many_members_message = 'Maksimissaan {{number1}} henkilöä voi liittyä keskusteluun. Tässä keskustelussa on tilaa {{number2}} hengelle.';
 z.string.fi.modalUploadsParallel = 'Voit lähettää jopa {{number}} tiedostoa samaan aikaan.';
 
-z.string.fi.connection_request_connect = 'Yhdistä';
-z.string.fi.connection_request_ignore = 'Hylkää';
+z.string.fi.connectionRequestConnect = 'Yhdistä';
+z.string.fi.connectionRequestIgnore = 'Hylkää';
 
 z.string.fi.conversation_guest_indicator = 'Vieras';
 
@@ -377,14 +377,14 @@ z.string.fi.preferences_devices = 'Laitteet';
 z.string.fi.preferences_headline = 'Asetukset';
 z.string.fi.preferences_options = 'Valinnat';
 
-z.string.fi.preferences_about_copyright = '© Wire Swiss GmbH';
-z.string.fi.preferences_about_privacy_policy = 'Yksityisyyskäytännöt';
-z.string.fi.preferences_about_support = 'Tuki';
-z.string.fi.preferences_about_support_website = 'Tuki sivusto';
-z.string.fi.preferences_about_support_contact = 'Ota yhteyttä tukeen';
-z.string.fi.preferences_about_terms_of_use = 'Käyttöehdot';
-z.string.fi.preferences_about_version = 'Versio {{version}}';
-z.string.fi.preferences_about_website = 'Wiren verkkosivu';
+z.string.fi.preferencesAboutCopyright = '© Wire Swiss GmbH';
+z.string.fi.preferencesAboutPrivacyPolicy = 'Yksityisyyskäytännöt';
+z.string.fi.preferencesAboutSupport = 'Tuki';
+z.string.fi.preferencesAboutSupportWebsite = 'Tuki sivusto';
+z.string.fi.preferencesAboutSupportContact = 'Ota yhteyttä tukeen';
+z.string.fi.preferencesAboutTermsOfUse = 'Käyttöehdot';
+z.string.fi.preferencesAboutVersion = 'Versio {{version}}';
+z.string.fi.preferencesAboutWebsite = 'Wiren verkkosivu';
 
 z.string.fi.preferences_account_create_team = 'Luo tiimi';
 z.string.fi.preferences_account_delete = 'Poista tili';

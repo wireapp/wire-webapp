@@ -181,8 +181,8 @@ z.string.ro.modal_too_many_members_headline = 'Canalul este plin';
 z.string.ro.modal_too_many_members_message = 'Maxim {{number1}} persoane se pot alătura conversației. Mai este loc pentru {{number2}} persoane aici.';
 z.string.ro.modalUploadsParallel = 'Poți trimite maxim {{number}} fișiere simultan.';
 
-z.string.ro.connection_request_connect = 'Conectare';
-z.string.ro.connection_request_ignore = 'Ignoră';
+z.string.ro.connectionRequestConnect = 'Conectare';
+z.string.ro.connectionRequestIgnore = 'Ignoră';
 
 z.string.ro.conversation_guest_indicator = 'Vizitator';
 
@@ -389,14 +389,14 @@ z.string.ro.preferences_devices = 'Dispozitive';
 z.string.ro.preferences_headline = 'Preferințe';
 z.string.ro.preferences_options = 'Opțiuni';
 
-z.string.ro.preferences_about_copyright = '© Wire Swiss GmbH';
-z.string.ro.preferences_about_privacy_policy = 'Politică de confidențialitate';
-z.string.ro.preferences_about_support = 'Suport';
-z.string.ro.preferences_about_support_website = 'Site de suport';
-z.string.ro.preferences_about_support_contact = 'Contactează echipa de asistență';
-z.string.ro.preferences_about_terms_of_use = 'Termeni de folosire';
-z.string.ro.preferences_about_version = 'Versiune {{version}}';
-z.string.ro.preferences_about_website = 'Site web Wire';
+z.string.ro.preferencesAboutCopyright = '© Wire Swiss GmbH';
+z.string.ro.preferencesAboutPrivacyPolicy = 'Politică de confidențialitate';
+z.string.ro.preferencesAboutSupport = 'Suport';
+z.string.ro.preferencesAboutSupportWebsite = 'Site de suport';
+z.string.ro.preferencesAboutSupportContact = 'Contactează echipa de asistență';
+z.string.ro.preferencesAboutTermsOfUse = 'Termeni de folosire';
+z.string.ro.preferencesAboutVersion = 'Versiune {{version}}';
+z.string.ro.preferencesAboutWebsite = 'Site web Wire';
 
 z.string.ro.preferences_account_avaibility_unset = 'Stabilește o stare';
 z.string.ro.preferences_account_create_team = 'Creează o echipă';

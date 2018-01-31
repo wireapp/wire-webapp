@@ -172,8 +172,8 @@ z.string.cs.modal_too_many_members_headline = 'Přeplněné kupé';
 z.string.cs.modal_too_many_members_message = 'Ke konverzaci se může připojit az {{number1}} účastníků. Je zde ještě místo pro {{number2}}.';
 z.string.cs.modalUploadsParallel = 'Najednou můžete poslat až {{number}} souborů.';
 
-z.string.cs.connection_request_connect = 'Připojit';
-z.string.cs.connection_request_ignore = 'Ignorovat';
+z.string.cs.connectionRequestConnect = 'Připojit';
+z.string.cs.connectionRequestIgnore = 'Ignorovat';
 
 z.string.cs.conversation_guest_indicator = 'Host';
 
@@ -376,13 +376,13 @@ z.string.cs.preferences_devices = 'Přístroje';
 z.string.cs.preferences_headline = 'Předvolby';
 z.string.cs.preferences_options = 'Nastavení';
 
-z.string.cs.preferences_about_privacy_policy = 'Ochrana osobních údajů';
-z.string.cs.preferences_about_support = 'Podpora';
-z.string.cs.preferences_about_support_website = 'Webové stránky podpory';
-z.string.cs.preferences_about_support_contact = 'Kontaktovat podporu';
-z.string.cs.preferences_about_terms_of_use = 'Podmínky používání';
-z.string.cs.preferences_about_version = 'Verze {{version}}';
-z.string.cs.preferences_about_website = 'Wire webové stránky';
+z.string.cs.preferencesAboutPrivacyPolicy = 'Ochrana osobních údajů';
+z.string.cs.preferencesAboutSupport = 'Podpora';
+z.string.cs.preferencesAboutSupportWebsite = 'Webové stránky podpory';
+z.string.cs.preferencesAboutSupportContact = 'Kontaktovat podporu';
+z.string.cs.preferencesAboutTermsOfUse = 'Podmínky používání';
+z.string.cs.preferencesAboutVersion = 'Verze {{version}}';
+z.string.cs.preferencesAboutWebsite = 'Wire webové stránky';
 
 z.string.cs.preferences_account_create_team = 'Vytvořit tým';
 z.string.cs.preferences_account_delete = 'Smazat účet';

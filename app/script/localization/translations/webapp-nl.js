@@ -181,8 +181,8 @@ z.string.nl.modal_too_many_members_headline = 'Full house';
 z.string.nl.modal_too_many_members_message = 'Maximaal {{number1}} mensen kunnen in een groepsgesprek. Er is nog ruimte voor {{number2}} mensen.';
 z.string.nl.modalUploadsParallel = 'Je kan tot {{number}} bestanden tegelijk versturen.';
 
-z.string.nl.connection_request_connect = 'Verbind';
-z.string.nl.connection_request_ignore = 'Negeer';
+z.string.nl.connectionRequestConnect = 'Verbind';
+z.string.nl.connectionRequestIgnore = 'Negeer';
 
 z.string.nl.conversation_guest_indicator = 'Gast';
 
@@ -388,14 +388,14 @@ z.string.nl.preferences_devices = 'Apparaten';
 z.string.nl.preferences_headline = 'Voorkeuren';
 z.string.nl.preferences_options = 'Opties';
 
-z.string.nl.preferences_about_copyright = '© Wire Swiss GmbH';
-z.string.nl.preferences_about_privacy_policy = 'Privacy Policy';
-z.string.nl.preferences_about_support = 'Ondersteuning';
-z.string.nl.preferences_about_support_website = 'Support Website';
-z.string.nl.preferences_about_support_contact = 'Contact Support';
-z.string.nl.preferences_about_terms_of_use = 'Gebruikersvoorwaarden';
-z.string.nl.preferences_about_version = 'Versie {{version}}';
-z.string.nl.preferences_about_website = 'Wire Website';
+z.string.nl.preferencesAboutCopyright = '© Wire Swiss GmbH';
+z.string.nl.preferencesAboutPrivacyPolicy = 'Privacy Policy';
+z.string.nl.preferencesAboutSupport = 'Ondersteuning';
+z.string.nl.preferencesAboutSupportWebsite = 'Support Website';
+z.string.nl.preferencesAboutSupportContact = 'Contact Support';
+z.string.nl.preferencesAboutTermsOfUse = 'Gebruikersvoorwaarden';
+z.string.nl.preferencesAboutVersion = 'Versie {{version}}';
+z.string.nl.preferencesAboutWebsite = 'Wire Website';
 
 z.string.nl.preferences_account_avaibility_unset = 'Een status instellen';
 z.string.nl.preferences_account_create_team = 'Maak een team';

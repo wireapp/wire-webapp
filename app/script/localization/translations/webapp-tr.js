@@ -174,8 +174,8 @@ z.string.tr.modal_too_many_members_headline = 'Dolup taşmış';
 z.string.tr.modal_too_many_members_message = 'Görüşmeye en fazla {{number1}} kişi katılabilir. Burada {{number2}} kişi için daha boş yer var.';
 z.string.tr.modalUploadsParallel = 'Tek seferde en fazla {{number}} boyutunda dosya gönderebilirsiniz.';
 
-z.string.tr.connection_request_connect = 'Bağlan';
-z.string.tr.connection_request_ignore = 'Görmezden gel';
+z.string.tr.connectionRequestConnect = 'Bağlan';
+z.string.tr.connectionRequestIgnore = 'Görmezden gel';
 
 z.string.tr.conversation_guest_indicator = 'Misafir';
 
@@ -378,14 +378,14 @@ z.string.tr.preferences_devices = 'Cihazlar';
 z.string.tr.preferences_headline = 'Seçenekler';
 z.string.tr.preferences_options = 'Ayarlar';
 
-z.string.tr.preferences_about_copyright = '© Wire Swiss GmbH';
-z.string.tr.preferences_about_privacy_policy = 'Gizlilik Politikası';
-z.string.tr.preferences_about_support = 'Destek';
-z.string.tr.preferences_about_support_website = 'Destek İnternet Sitesi';
-z.string.tr.preferences_about_support_contact = 'Destekle İletişime Geç';
-z.string.tr.preferences_about_terms_of_use = 'Kullanım Şartları';
-z.string.tr.preferences_about_version = 'Sürüm: {{version}}';
-z.string.tr.preferences_about_website = 'Wire İnternet Sitesi';
+z.string.tr.preferencesAboutCopyright = '© Wire Swiss GmbH';
+z.string.tr.preferencesAboutPrivacyPolicy = 'Gizlilik Politikası';
+z.string.tr.preferencesAboutSupport = 'Destek';
+z.string.tr.preferencesAboutSupportWebsite = 'Destek İnternet Sitesi';
+z.string.tr.preferencesAboutSupportContact = 'Destekle İletişime Geç';
+z.string.tr.preferencesAboutTermsOfUse = 'Kullanım Şartları';
+z.string.tr.preferencesAboutVersion = 'Sürüm: {{version}}';
+z.string.tr.preferencesAboutWebsite = 'Wire İnternet Sitesi';
 
 z.string.tr.preferences_account_avaibility_unset = 'Bir durum ayarlayın';
 z.string.tr.preferences_account_create_team = 'Takım oluştur';

@@ -173,8 +173,8 @@ z.string.sk.modal_too_many_members_headline = 'Priveľa účastníkov';
 z.string.sk.modal_too_many_members_message = 'Do rozhovoru sa môže zapojiť {{number1}} ľudí. ';
 z.string.sk.modalUploadsParallel = 'Súčasne môžete poslať až {{number}} súborov.';
 
-z.string.sk.connection_request_connect = 'Pripojiť';
-z.string.sk.connection_request_ignore = 'Ignorovať';
+z.string.sk.connectionRequestConnect = 'Pripojiť';
+z.string.sk.connectionRequestIgnore = 'Ignorovať';
 
 z.string.sk.conversation_guest_indicator = 'Hosť';
 
@@ -377,14 +377,14 @@ z.string.sk.preferences_devices = 'Zariadenia';
 z.string.sk.preferences_headline = 'Nastavenia';
 z.string.sk.preferences_options = 'Možnosti';
 
-z.string.sk.preferences_about_copyright = '© Wire Swiss GmbH';
-z.string.sk.preferences_about_privacy_policy = 'Pravidlá ochrany súkromia';
-z.string.sk.preferences_about_support = 'Podpora';
-z.string.sk.preferences_about_support_website = 'Webová lokalita podpory';
-z.string.sk.preferences_about_support_contact = 'Kontaktovať podporu';
-z.string.sk.preferences_about_terms_of_use = 'Podmienky používania';
-z.string.sk.preferences_about_version = 'Verzia {{version}}';
-z.string.sk.preferences_about_website = 'Webová stránka Wire';
+z.string.sk.preferencesAboutCopyright = '© Wire Swiss GmbH';
+z.string.sk.preferencesAboutPrivacyPolicy = 'Pravidlá ochrany súkromia';
+z.string.sk.preferencesAboutSupport = 'Podpora';
+z.string.sk.preferencesAboutSupportWebsite = 'Webová lokalita podpory';
+z.string.sk.preferencesAboutSupportContact = 'Kontaktovať podporu';
+z.string.sk.preferencesAboutTermsOfUse = 'Podmienky používania';
+z.string.sk.preferencesAboutVersion = 'Verzia {{version}}';
+z.string.sk.preferencesAboutWebsite = 'Webová stránka Wire';
 
 z.string.sk.preferences_account_create_team = 'Vytvoriť tím';
 z.string.sk.preferences_account_delete = 'Vymazať účet';

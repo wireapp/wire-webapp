@@ -174,8 +174,8 @@ z.string.pt.modal_too_many_members_headline = 'Casa cheia';
 z.string.pt.modal_too_many_members_message = 'Até {{number1}} as pessoas podem participar de uma conversa. Há espaço para mais {{number2}} pessoas.';
 z.string.pt.modalUploadsParallel = 'Pode enviar até {{number}} ficheiros de cada vez.';
 
-z.string.pt.connection_request_connect = 'Ligar';
-z.string.pt.connection_request_ignore = 'Ignorar';
+z.string.pt.connectionRequestConnect = 'Ligar';
+z.string.pt.connectionRequestIgnore = 'Ignorar';
 
 z.string.pt.conversation_guest_indicator = 'Convidado';
 
@@ -378,13 +378,13 @@ z.string.pt.preferences_devices = 'Dispositivos';
 z.string.pt.preferences_headline = 'Preferências';
 z.string.pt.preferences_options = 'Opções';
 
-z.string.pt.preferences_about_privacy_policy = 'Política de privacidade';
-z.string.pt.preferences_about_support = 'Suporte';
-z.string.pt.preferences_about_support_website = 'Página de suporte';
-z.string.pt.preferences_about_support_contact = 'Contactar o Suporte';
-z.string.pt.preferences_about_terms_of_use = 'Condições de Utilização';
-z.string.pt.preferences_about_version = 'Versão {{version}}';
-z.string.pt.preferences_about_website = 'Site do Wire';
+z.string.pt.preferencesAboutPrivacyPolicy = 'Política de privacidade';
+z.string.pt.preferencesAboutSupport = 'Suporte';
+z.string.pt.preferencesAboutSupportWebsite = 'Página de suporte';
+z.string.pt.preferencesAboutSupportContact = 'Contactar o Suporte';
+z.string.pt.preferencesAboutTermsOfUse = 'Condições de Utilização';
+z.string.pt.preferencesAboutVersion = 'Versão {{version}}';
+z.string.pt.preferencesAboutWebsite = 'Site do Wire';
 
 z.string.pt.preferences_account_avaibility_unset = 'Definir estado';
 z.string.pt.preferences_account_create_team = 'Criar uma equipa';

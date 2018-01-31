@@ -161,8 +161,8 @@ z.string.da.modal_too_many_members_headline = 'Fuldt hus';
 z.string.da.modal_too_many_members_message = 'Op til {{number1}} personer kan deltage i en samtale. Der er plads til {{number2}} personer mere herinde.';
 z.string.da.modalUploadsParallel = 'Du kan sende op til {{number}} filer på én gang.';
 
-z.string.da.connection_request_connect = 'Forbind';
-z.string.da.connection_request_ignore = 'Ignorér';
+z.string.da.connectionRequestConnect = 'Forbind';
+z.string.da.connectionRequestIgnore = 'Ignorér';
 
 z.string.da.conversation_guest_indicator = 'Gæst';
 
@@ -356,14 +356,14 @@ z.string.da.preferences_devices = 'Enheder';
 z.string.da.preferences_headline = 'Indstillinger';
 z.string.da.preferences_options = 'Egenskaber';
 
-z.string.da.preferences_about_copyright = '© Wire Swiss GmbH';
-z.string.da.preferences_about_privacy_policy = 'Privatlivspolitik';
-z.string.da.preferences_about_support = 'Support';
-z.string.da.preferences_about_support_website = 'Support hjemmeside';
-z.string.da.preferences_about_support_contact = 'Kontakt Support';
-z.string.da.preferences_about_terms_of_use = 'Vilkår for anvendelse';
-z.string.da.preferences_about_version = 'Version {{version}}';
-z.string.da.preferences_about_website = 'Wire hjemmeside';
+z.string.da.preferencesAboutCopyright = '© Wire Swiss GmbH';
+z.string.da.preferencesAboutPrivacyPolicy = 'Privatlivspolitik';
+z.string.da.preferencesAboutSupport = 'Support';
+z.string.da.preferencesAboutSupportWebsite = 'Support hjemmeside';
+z.string.da.preferencesAboutSupportContact = 'Kontakt Support';
+z.string.da.preferencesAboutTermsOfUse = 'Vilkår for anvendelse';
+z.string.da.preferencesAboutVersion = 'Version {{version}}';
+z.string.da.preferencesAboutWebsite = 'Wire hjemmeside';
 
 z.string.da.preferences_account_create_team = 'Opret team';
 z.string.da.preferences_account_delete = 'Slet konto';

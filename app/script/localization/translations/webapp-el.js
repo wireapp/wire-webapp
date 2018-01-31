@@ -171,8 +171,8 @@ z.string.el.modal_too_many_members_headline = 'Full house';
 z.string.el.modal_too_many_members_message = 'Μέχρι και {{number1}} άτομα μπορούν να συμμετάσχουν σε μια συνομιλία. Υπάρχει χώρος για {{number2}} επιπλέον άτομα εδώ.';
 z.string.el.modalUploadsParallel = 'Μπορείτε να στείλετε μέχρι και {{number}} αρχεία ταυτόχρονα.';
 
-z.string.el.connection_request_connect = 'Σύνδεση';
-z.string.el.connection_request_ignore = 'Αγνόηση';
+z.string.el.connectionRequestConnect = 'Σύνδεση';
+z.string.el.connectionRequestIgnore = 'Αγνόηση';
 
 z.string.el.conversation_guest_indicator = 'Επισκέπτης';
 
@@ -375,13 +375,13 @@ z.string.el.preferences_devices = 'Συσκευές';
 z.string.el.preferences_headline = 'Προτιμησεις';
 z.string.el.preferences_options = 'Επιλογές';
 
-z.string.el.preferences_about_privacy_policy = 'Πολιτική Απορρήτου';
-z.string.el.preferences_about_support = 'Υποστήριξη';
-z.string.el.preferences_about_support_website = 'Ιστοσελίδα υποστήριξης';
-z.string.el.preferences_about_support_contact = 'Επικοινωνήστε με το τμήμα υποστήριξης';
-z.string.el.preferences_about_terms_of_use = 'Όροι Χρήσης';
-z.string.el.preferences_about_version = 'Έκδοση {{version}}';
-z.string.el.preferences_about_website = 'Η Ιστοσελίδα του Wire';
+z.string.el.preferencesAboutPrivacyPolicy = 'Πολιτική Απορρήτου';
+z.string.el.preferencesAboutSupport = 'Υποστήριξη';
+z.string.el.preferencesAboutSupportWebsite = 'Ιστοσελίδα υποστήριξης';
+z.string.el.preferencesAboutSupportContact = 'Επικοινωνήστε με το τμήμα υποστήριξης';
+z.string.el.preferencesAboutTermsOfUse = 'Όροι Χρήσης';
+z.string.el.preferencesAboutVersion = 'Έκδοση {{version}}';
+z.string.el.preferencesAboutWebsite = 'Η Ιστοσελίδα του Wire';
 
 z.string.el.preferences_account_create_team = 'Δημιουργία ομάδος';
 z.string.el.preferences_account_delete = 'Διαγραφή λογαριασμού';

@@ -157,8 +157,8 @@ z.string.hr.modal_too_many_members_headline = 'Puna kuća';
 z.string.hr.modal_too_many_members_message = 'Do {{number1}} ljudi može pristupiti razgovoru. Ima mjesta za još {{number2}} ljudi ovdje.';
 z.string.hr.modalUploadsParallel = 'Možete poslati {{number}} datoteke odjednom.';
 
-z.string.hr.connection_request_connect = 'Poveži se';
-z.string.hr.connection_request_ignore = 'Ignoriraj';
+z.string.hr.connectionRequestConnect = 'Poveži se';
+z.string.hr.connectionRequestIgnore = 'Ignoriraj';
 
 z.string.hr.conversation_you_nominative = 'ti';
 z.string.hr.conversation_you_dative = 'ti';
@@ -332,14 +332,14 @@ z.string.hr.preferences_devices = 'Uređaji';
 z.string.hr.preferences_headline = 'Osobne postavke';
 z.string.hr.preferences_options = 'Opcije';
 
-z.string.hr.preferences_about_copyright = '© Wire Swiss GmbH';
-z.string.hr.preferences_about_privacy_policy = 'Pravilnik o zaštiti privatnosti';
-z.string.hr.preferences_about_support = 'Podrška';
-z.string.hr.preferences_about_support_website = 'Wire Podrška';
-z.string.hr.preferences_about_support_contact = 'Kontaktirajte podršku';
-z.string.hr.preferences_about_terms_of_use = 'Uvjeti uporabe';
-z.string.hr.preferences_about_version = 'Verzija {{version}}';
-z.string.hr.preferences_about_website = 'Wire website';
+z.string.hr.preferencesAboutCopyright = '© Wire Swiss GmbH';
+z.string.hr.preferencesAboutPrivacyPolicy = 'Pravilnik o zaštiti privatnosti';
+z.string.hr.preferencesAboutSupport = 'Podrška';
+z.string.hr.preferencesAboutSupportWebsite = 'Wire Podrška';
+z.string.hr.preferencesAboutSupportContact = 'Kontaktirajte podršku';
+z.string.hr.preferencesAboutTermsOfUse = 'Uvjeti uporabe';
+z.string.hr.preferencesAboutVersion = 'Verzija {{version}}';
+z.string.hr.preferencesAboutWebsite = 'Wire website';
 
 z.string.hr.preferences_account_delete = 'Brisanje računa';
 z.string.hr.preferences_account_log_out = 'Odjava';

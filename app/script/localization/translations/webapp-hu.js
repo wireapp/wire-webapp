@@ -181,8 +181,8 @@ z.string.hu.modal_too_many_members_headline = 'Telt ház';
 z.string.hu.modal_too_many_members_message = 'Legfeljebb {{number1}} partner tud csatlakozni a beszélgetéshez. Még {{number2}} partner számára van hely.';
 z.string.hu.modalUploadsParallel = 'Egyszerre {{number}} fájt küldhetsz.';
 
-z.string.hu.connection_request_connect = 'Csatlakozás';
-z.string.hu.connection_request_ignore = 'Figyelmen kívül hagyás';
+z.string.hu.connectionRequestConnect = 'Csatlakozás';
+z.string.hu.connectionRequestIgnore = 'Figyelmen kívül hagyás';
 
 z.string.hu.conversation_guest_indicator = 'Vendég';
 
@@ -389,14 +389,14 @@ z.string.hu.preferences_devices = 'Eszközök';
 z.string.hu.preferences_headline = 'Beállítások';
 z.string.hu.preferences_options = 'Beállítások';
 
-z.string.hu.preferences_about_copyright = '© Wire Swiss GmbH';
-z.string.hu.preferences_about_privacy_policy = 'Adatvédelmi Nyilatkozat';
-z.string.hu.preferences_about_support = 'Ügyfélszolgálat';
-z.string.hu.preferences_about_support_website = 'Wire Ügyfélszolgálat';
-z.string.hu.preferences_about_support_contact = 'Kapcsolatfelvétel az Ügyfélszolgálattal';
-z.string.hu.preferences_about_terms_of_use = 'Felhasználási feltételek';
-z.string.hu.preferences_about_version = 'Verzió {{version}}';
-z.string.hu.preferences_about_website = 'Wire weboldala';
+z.string.hu.preferencesAboutCopyright = '© Wire Swiss GmbH';
+z.string.hu.preferencesAboutPrivacyPolicy = 'Adatvédelmi Nyilatkozat';
+z.string.hu.preferencesAboutSupport = 'Ügyfélszolgálat';
+z.string.hu.preferencesAboutSupportWebsite = 'Wire Ügyfélszolgálat';
+z.string.hu.preferencesAboutSupportContact = 'Kapcsolatfelvétel az Ügyfélszolgálattal';
+z.string.hu.preferencesAboutTermsOfUse = 'Felhasználási feltételek';
+z.string.hu.preferencesAboutVersion = 'Verzió {{version}}';
+z.string.hu.preferencesAboutWebsite = 'Wire weboldala';
 
 z.string.hu.preferences_account_avaibility_unset = 'Állapot beállítása';
 z.string.hu.preferences_account_create_team = 'Csapat létrehozása';

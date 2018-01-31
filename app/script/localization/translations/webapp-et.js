@@ -181,8 +181,8 @@ z.string.et.modal_too_many_members_headline = 'Täismaja';
 z.string.et.modal_too_many_members_message = 'Kuni {{number1}} inimest saavad vestlusega liituda. Siin on ruumi veel {{number2}} inimesele.';
 z.string.et.modalUploadsParallel = 'Sa saad ühekorraga saata kuni {{number}} faili.';
 
-z.string.et.connection_request_connect = 'Ühendu';
-z.string.et.connection_request_ignore = 'Ignoreeri';
+z.string.et.connectionRequestConnect = 'Ühendu';
+z.string.et.connectionRequestIgnore = 'Ignoreeri';
 
 z.string.et.conversation_guest_indicator = 'Külaline';
 
@@ -389,14 +389,14 @@ z.string.et.preferences_devices = 'Seadmed';
 z.string.et.preferences_headline = 'Eelistused';
 z.string.et.preferences_options = 'Valikud';
 
-z.string.et.preferences_about_copyright = '© Wire Swiss GmbH';
-z.string.et.preferences_about_privacy_policy = 'Privaatsuspoliitika';
-z.string.et.preferences_about_support = 'Klienditugi';
-z.string.et.preferences_about_support_website = 'Kasutajatoe veebisait';
-z.string.et.preferences_about_support_contact = 'Võta kasutajatoega ühendust';
-z.string.et.preferences_about_terms_of_use = 'Kasutustingimused';
-z.string.et.preferences_about_version = 'Versioon {{version}}';
-z.string.et.preferences_about_website = 'Wire’i koduleht';
+z.string.et.preferencesAboutCopyright = '© Wire Swiss GmbH';
+z.string.et.preferencesAboutPrivacyPolicy = 'Privaatsuspoliitika';
+z.string.et.preferencesAboutSupport = 'Klienditugi';
+z.string.et.preferencesAboutSupportWebsite = 'Kasutajatoe veebisait';
+z.string.et.preferencesAboutSupportContact = 'Võta kasutajatoega ühendust';
+z.string.et.preferencesAboutTermsOfUse = 'Kasutustingimused';
+z.string.et.preferencesAboutVersion = 'Versioon {{version}}';
+z.string.et.preferencesAboutWebsite = 'Wire’i koduleht';
 
 z.string.et.preferences_account_avaibility_unset = 'Sea olek';
 z.string.et.preferences_account_create_team = 'Loo meeskond';

@@ -220,8 +220,8 @@ z.string.modal_too_many_members_message = 'Up to {{number1}} people can join a c
 z.string.modalUploadsParallel = 'You can send up to {{number}} files at once.';
 
 // Connection requests
-z.string.connection_request_connect = 'Connect';
-z.string.connection_request_ignore = 'Ignore';
+z.string.connectionRequestConnect = 'Connect';
+z.string.connectionRequestIgnore = 'Ignore';
 
 // Guests
 z.string.conversation_guest_indicator = 'Guest';
@@ -449,14 +449,14 @@ z.string.preferences_devices = 'Devices';
 z.string.preferences_headline = 'Preferences';
 z.string.preferences_options = 'Options';
 
-z.string.preferences_about_copyright = '© Wire Swiss GmbH';
-z.string.preferences_about_privacy_policy = 'Privacy policy';
-z.string.preferences_about_support = 'Support';
-z.string.preferences_about_support_website = 'Support website';
-z.string.preferences_about_support_contact = 'Contact Support';
-z.string.preferences_about_terms_of_use = 'Terms of use';
-z.string.preferences_about_version = 'Version {{version}}';
-z.string.preferences_about_website = 'Wire website';
+z.string.preferencesAboutCopyright = '© Wire Swiss GmbH';
+z.string.preferencesAboutPrivacyPolicy = 'Privacy policy';
+z.string.preferencesAboutSupport = 'Support';
+z.string.preferencesAboutSupportWebsite = 'Support website';
+z.string.preferencesAboutSupportContact = 'Contact Support';
+z.string.preferencesAboutTermsOfUse = 'Terms of use';
+z.string.preferencesAboutVersion = 'Version {{version}}';
+z.string.preferencesAboutWebsite = 'Wire website';
 
 z.string.preferences_account_avaibility_unset = 'Set a status';
 z.string.preferences_account_create_team = 'Create a team';
