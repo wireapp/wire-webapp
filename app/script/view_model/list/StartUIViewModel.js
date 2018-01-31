@@ -540,7 +540,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     if (this.inviteBubble) {
       this.inviteBubble.hide();
     }
-    this.importContacts(z.connect.ConnectSource.ICLOUD);
+    this.importContacts(type);
   }
 
   _focusInviteForm() {
