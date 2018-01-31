@@ -49,30 +49,30 @@ z.string.fi.authVerifyCodeDescription = 'Syötä vahvistuskoodi jonka lähetimme
 z.string.fi.authVerifyCodeResend = 'Eikö koodi ole tullut perille?';
 z.string.fi.authVerifyCodeResendDetail = 'Lähetä uudelleen';
 z.string.fi.authVerifyCodeResendTimer = 'Voit pyytää uuden koodin {{expiration}} kuluttua.';
-z.string.fi.auth_verify_code_change_phone = 'Vaihda puhelinnumero';
-z.string.fi.auth_verify_password_headline = 'Kirjoita salasanasi';
+z.string.fi.authVerifyCodeChangePhone = 'Vaihda puhelinnumero';
+z.string.fi.authVerifyPasswordHeadline = 'Kirjoita salasanasi';
 
-z.string.fi.auth_limit_devices_headline = 'Laitteet';
-z.string.fi.auth_limit_description = 'Poista yksi laitteistasi aloittaaksesi Wiren käytön tässä laiteessa.';
-z.string.fi.auth_limit_button_manage = 'Hallitse laitteita';
-z.string.fi.auth_limit_button_sign_out = 'Kirjaudu ulos';
-z.string.fi.auth_limit_devices_current = '(Nykyinen)';
+z.string.fi.authLimitDevicesHeadline = 'Laitteet';
+z.string.fi.authLimitDescription = 'Poista yksi laitteistasi aloittaaksesi Wiren käytön tässä laiteessa.';
+z.string.fi.authLimitButtonManage = 'Hallitse laitteita';
+z.string.fi.authLimitButtonSignOut = 'Kirjaudu ulos';
+z.string.fi.authLimitDevicesCurrent = '(Nykyinen)';
 
-z.string.fi.auth_history_headline = 'Käytät Wireä ensimmäistä kertaa tällä laitteella.';
-z.string.fi.auth_history_description = 'Tietosuojasyistä keskusteluhistoriasi ei näy täällä.';
-z.string.fi.auth_history_reuse_headline = 'Olet käyttänyt Wireä tällä laitteella aiemmin.';
-z.string.fi.auth_history_reuse_description = 'Sillä välin lähetetyt viestit eivät näy tässä.';
-z.string.fi.auth_history_button = 'OK';
+z.string.fi.authHistoryHeadline = 'Käytät Wireä ensimmäistä kertaa tällä laitteella.';
+z.string.fi.authHistoryDescription = 'Tietosuojasyistä keskusteluhistoriasi ei näy täällä.';
+z.string.fi.authHistoryReuseHeadline = 'Olet käyttänyt Wireä tällä laitteella aiemmin.';
+z.string.fi.authHistoryReuseDescription = 'Sillä välin lähetetyt viestit eivät näy tässä.';
+z.string.fi.authHistoryButton = 'OK';
 
-z.string.fi.auth_posted_resend = 'Lähetä uudelleen sähköpostiosoitteeseen: {{email}}';
-z.string.fi.auth_posted_resend_action = 'Eikö sähköposti saavu perille?';
-z.string.fi.auth_posted_resend_detail = 'Tarkista sähköpostisi saapuneet-kansio ja seuraa ohjeita.';
-z.string.fi.auth_posted_resend_headline = 'Sinulle on sähköpostia.';
+z.string.fi.authPostedResend = 'Lähetä uudelleen sähköpostiosoitteeseen: {{email}}';
+z.string.fi.authPostedResendAction = 'Eikö sähköposti saavu perille?';
+z.string.fi.authPostedResendDetail = 'Tarkista sähköpostisi saapuneet-kansio ja seuraa ohjeita.';
+z.string.fi.authPostedResendHeadline = 'Sinulle on sähköpostia.';
 
-z.string.fi.auth_placeholder_email = 'Sähköposti';
-z.string.fi.auth_placeholder_password_put = 'Salasana';
-z.string.fi.auth_placeholder_password_set = 'Salasana (vähintään 8 merkkiä pitkä)';
-z.string.fi.auth_placeholder_phone = 'Puhelinnumero';
+z.string.fi.authPlaceholderEmail = 'Sähköposti';
+z.string.fi.authPlaceholderPasswordPut = 'Salasana';
+z.string.fi.authPlaceholderPasswordSet = 'Salasana (vähintään 8 merkkiä pitkä)';
+z.string.fi.authPlaceholderPhone = 'Puhelinnumero';
 
 z.string.fi.authErrorCode = 'Virheellinen koodi';
 z.string.fi.authErrorCountryCodeInvalid = 'Maakoodi ei kelpaa';
@@ -89,8 +89,8 @@ z.string.fi.authErrorPhoneNumberBudget = 'Kirjauduit sisään liian usein. Yrit�
 z.string.fi.authErrorPhoneNumberForbidden = 'Valitettavasti tämä puhelinnumero on kielletty.';
 z.string.fi.authErrorPhoneNumberInvalid = 'Virheellinen puhelinnumero';
 z.string.fi.authErrorPhoneNumberUnknown = 'Tuntematon puhelinnumero';
-z.string.fi.auth_error_suspended = 'Tämä tili ei ole enää oikeutettu kirjautumaan sisään.';
-z.string.fi.auth_error_sign_in = 'Vahvista tietosi ja yritä uudelleen.';
+z.string.fi.authErrorSuspended = 'Tämä tili ei ole enää oikeutettu kirjautumaan sisään.';
+z.string.fi.authErrorSignIn = 'Vahvista tietosi ja yritä uudelleen.';
 
 z.string.fi.callStateOutgoing = 'Soi…';
 z.string.fi.callStateConnecting = 'Yhdistetään…';

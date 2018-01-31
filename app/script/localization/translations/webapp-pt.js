@@ -49,30 +49,30 @@ z.string.pt.authVerifyCodeDescription = 'Introduza o código de verificação qu
 z.string.pt.authVerifyCodeResend = 'Não chegou o código?';
 z.string.pt.authVerifyCodeResendDetail = 'Reenviar';
 z.string.pt.authVerifyCodeResendTimer = 'Pode solicitar um novo código {{expiration}}.';
-z.string.pt.auth_verify_code_change_phone = 'Alterar o número de telefone';
-z.string.pt.auth_verify_password_headline = 'Insira a sua palavra-passe';
+z.string.pt.authVerifyCodeChangePhone = 'Alterar o número de telefone';
+z.string.pt.authVerifyPasswordHeadline = 'Insira a sua palavra-passe';
 
-z.string.pt.auth_limit_devices_headline = 'Dispositivos';
-z.string.pt.auth_limit_description = 'Remova um dos seus outros dispositivos para começar a usar o Wire neste.';
-z.string.pt.auth_limit_button_manage = 'Gerir dispositivos';
-z.string.pt.auth_limit_button_sign_out = 'Terminar sessão';
-z.string.pt.auth_limit_devices_current = '(Atual)';
+z.string.pt.authLimitDevicesHeadline = 'Dispositivos';
+z.string.pt.authLimitDescription = 'Remova um dos seus outros dispositivos para começar a usar o Wire neste.';
+z.string.pt.authLimitButtonManage = 'Gerir dispositivos';
+z.string.pt.authLimitButtonSignOut = 'Terminar sessão';
+z.string.pt.authLimitDevicesCurrent = '(Atual)';
 
-z.string.pt.auth_history_headline = 'É a primeira vez que está a usar o Wire neste dispositivo.';
-z.string.pt.auth_history_description = 'Por razões de privacidade, o seu histórico de conversa não será mostrado aqui.';
-z.string.pt.auth_history_reuse_headline = 'Você já usou o Wire neste dispositivo.';
-z.string.pt.auth_history_reuse_description = 'As mensagens entretanto enviadas não aparecerão aqui.';
-z.string.pt.auth_history_button = 'OK';
+z.string.pt.authHistoryHeadline = 'É a primeira vez que está a usar o Wire neste dispositivo.';
+z.string.pt.authHistoryDescription = 'Por razões de privacidade, o seu histórico de conversa não será mostrado aqui.';
+z.string.pt.authHistoryReuseHeadline = 'Você já usou o Wire neste dispositivo.';
+z.string.pt.authHistoryReuseDescription = 'As mensagens entretanto enviadas não aparecerão aqui.';
+z.string.pt.authHistoryButton = 'OK';
 
-z.string.pt.auth_posted_resend = 'Reenviar para {{email}}';
-z.string.pt.auth_posted_resend_action = 'Não chegou a mensagem?';
-z.string.pt.auth_posted_resend_detail = 'Verifique sua caixa de correio eletrónico e siga as instruções.';
-z.string.pt.auth_posted_resend_headline = 'Recebeu email.';
+z.string.pt.authPostedResend = 'Reenviar para {{email}}';
+z.string.pt.authPostedResendAction = 'Não chegou a mensagem?';
+z.string.pt.authPostedResendDetail = 'Verifique sua caixa de correio eletrónico e siga as instruções.';
+z.string.pt.authPostedResendHeadline = 'Recebeu email.';
 
-z.string.pt.auth_placeholder_email = 'Email';
-z.string.pt.auth_placeholder_password_put = 'Palavra-passe';
-z.string.pt.auth_placeholder_password_set = 'Palavra-passe (pelo menos 8 caracteres)';
-z.string.pt.auth_placeholder_phone = 'Telefone';
+z.string.pt.authPlaceholderEmail = 'Email';
+z.string.pt.authPlaceholderPasswordPut = 'Palavra-passe';
+z.string.pt.authPlaceholderPasswordSet = 'Palavra-passe (pelo menos 8 caracteres)';
+z.string.pt.authPlaceholderPhone = 'Telefone';
 
 z.string.pt.authErrorCode = 'Código inválido';
 z.string.pt.authErrorCountryCodeInvalid = 'Código de País Inválido';
@@ -90,8 +90,8 @@ z.string.pt.authErrorPhoneNumberBudget = 'Iniciou sessão demasiadas vezes. Tent
 z.string.pt.authErrorPhoneNumberForbidden = 'Este numero de telefone não é permitido.';
 z.string.pt.authErrorPhoneNumberInvalid = 'Número de telefone inválido';
 z.string.pt.authErrorPhoneNumberUnknown = 'Número de telefone desconhecido';
-z.string.pt.auth_error_suspended = 'Esta conta já não está autorizada a iniciar sessão.';
-z.string.pt.auth_error_sign_in = 'Por favor verifique os seus detalhes e tente de novo.';
+z.string.pt.authErrorSuspended = 'Esta conta já não está autorizada a iniciar sessão.';
+z.string.pt.authErrorSignIn = 'Por favor verifique os seus detalhes e tente de novo.';
 
 z.string.pt.callStateOutgoing = 'A tocar…';
 z.string.pt.callStateConnecting = 'A ligar…';

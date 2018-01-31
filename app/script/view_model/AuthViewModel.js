@@ -179,7 +179,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     this.can_resend_verification = ko.pureComputed(() => !this.disabled_by_animation() && this.username().length);
     this.can_verify_password = ko.pureComputed(() => !this.disabled_by_animation() && this.password().length);
 
-    this.posted_text = ko.pureComputed(() => z.l10n.text(z.string.auth_posted_resend, this.username()));
+    this.posted_text = ko.pureComputed(() => z.l10n.text(z.string.authPostedResend, this.username()));
     this.verify_code_text = ko.pureComputed(() => {
       const phone_number =
         PhoneFormat.formatNumberForMobileDialing('', this.phone_number_e164()) || this.phone_number_e164();
@@ -496,10 +496,10 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
                   this._add_error(z.string.authErrorPending);
                   break;
                 case z.service.BackendClientError.LABEL.SUSPENDED:
-                  this._add_error(z.string.auth_error_suspended);
+                  this._add_error(z.string.authErrorSuspended);
                   break;
                 default:
-                  this._add_error(z.string.auth_error_sign_in, [
+                  this._add_error(z.string.authErrorSignIn, [
                     z.auth.AuthView.TYPE.EMAIL,
                     z.auth.AuthView.TYPE.PASSWORD,
                   ]);
@@ -562,7 +562,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
                 this._add_error(z.string.authErrorPhoneNumberBudget, z.auth.AuthView.TYPE.PHONE);
                 break;
               case z.service.BackendClientError.LABEL.SUSPENDED:
-                this._add_error(z.string.auth_error_suspended);
+                this._add_error(z.string.authErrorSuspended);
                 break;
               case z.service.BackendClientError.LABEL.UNAUTHORIZED:
                 this._add_error(z.string.authErrorPhoneNumberForbidden, z.auth.AuthView.TYPE.PHONE);
@@ -682,7 +682,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
               if (error.label === z.service.BackendClientError.LABEL.PENDING_ACTIVATION) {
                 this._add_error(z.string.authErrorPending);
               } else {
-                this._add_error(z.string.auth_error_sign_in, z.auth.AuthView.TYPE.PASSWORD);
+                this._add_error(z.string.authErrorSignIn, z.auth.AuthView.TYPE.PASSWORD);
               }
             } else {
               this._add_error(z.string.authErrorMisc);

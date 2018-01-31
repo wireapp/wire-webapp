@@ -43,30 +43,30 @@ z.string.hr.authVerifyCodeDescription = 'Unesite kontrolni kod koji smo poslali 
 z.string.hr.authVerifyCodeResend = 'Kod se ne pojavljuje?';
 z.string.hr.authVerifyCodeResendDetail = 'Ponovno pošalji';
 z.string.hr.authVerifyCodeResendTimer = 'Možete zatražiti novi kod {{expiration}}.';
-z.string.hr.auth_verify_code_change_phone = 'Promjeni broj telefona';
-z.string.hr.auth_verify_password_headline = 'Upišite Vašu šifru';
+z.string.hr.authVerifyCodeChangePhone = 'Promjeni broj telefona';
+z.string.hr.authVerifyPasswordHeadline = 'Upišite Vašu šifru';
 
-z.string.hr.auth_limit_devices_headline = 'Uređaji';
-z.string.hr.auth_limit_description = 'Uklonite jedan od Vaših ostalih uređaja kako bi ste počeli koristiti Wire na ovom.';
-z.string.hr.auth_limit_button_manage = 'Upravljanje uređajima';
-z.string.hr.auth_limit_button_sign_out = 'Odjava';
-z.string.hr.auth_limit_devices_current = '(Trenutno)';
+z.string.hr.authLimitDevicesHeadline = 'Uređaji';
+z.string.hr.authLimitDescription = 'Uklonite jedan od Vaših ostalih uređaja kako bi ste počeli koristiti Wire na ovom.';
+z.string.hr.authLimitButtonManage = 'Upravljanje uređajima';
+z.string.hr.authLimitButtonSignOut = 'Odjava';
+z.string.hr.authLimitDevicesCurrent = '(Trenutno)';
 
-z.string.hr.auth_history_headline = 'Ovo je prvi put da koristite Wire na ovom uređaju.';
-z.string.hr.auth_history_description = 'Iz sigurnosnih razloga, povijest razgovora se neće pojaviti ovdje.';
-z.string.hr.auth_history_reuse_headline = 'Već ste upotrebljavali Wire na ovom uređaju.';
-z.string.hr.auth_history_reuse_description = 'Poruke poslane u međuvremenu neće se pojaviti.';
-z.string.hr.auth_history_button = 'U redu';
+z.string.hr.authHistoryHeadline = 'Ovo je prvi put da koristite Wire na ovom uređaju.';
+z.string.hr.authHistoryDescription = 'Iz sigurnosnih razloga, povijest razgovora se neće pojaviti ovdje.';
+z.string.hr.authHistoryReuseHeadline = 'Već ste upotrebljavali Wire na ovom uređaju.';
+z.string.hr.authHistoryReuseDescription = 'Poruke poslane u međuvremenu neće se pojaviti.';
+z.string.hr.authHistoryButton = 'U redu';
 
-z.string.hr.auth_posted_resend = 'Ponovno pošalji na {{email}}';
-z.string.hr.auth_posted_resend_action = 'Email se ne pojavljuje?';
-z.string.hr.auth_posted_resend_detail = 'Provjerite svoj email sandučić i slijedite upute.';
-z.string.hr.auth_posted_resend_headline = 'Imate poštu.';
+z.string.hr.authPostedResend = 'Ponovno pošalji na {{email}}';
+z.string.hr.authPostedResendAction = 'Email se ne pojavljuje?';
+z.string.hr.authPostedResendDetail = 'Provjerite svoj email sandučić i slijedite upute.';
+z.string.hr.authPostedResendHeadline = 'Imate poštu.';
 
-z.string.hr.auth_placeholder_email = 'Email';
-z.string.hr.auth_placeholder_password_put = 'Lozinka';
-z.string.hr.auth_placeholder_password_set = 'Lozinka (najmanje 8 znakova)';
-z.string.hr.auth_placeholder_phone = 'Telefonski broj';
+z.string.hr.authPlaceholderEmail = 'Email';
+z.string.hr.authPlaceholderPasswordPut = 'Lozinka';
+z.string.hr.authPlaceholderPasswordSet = 'Lozinka (najmanje 8 znakova)';
+z.string.hr.authPlaceholderPhone = 'Telefonski broj';
 
 z.string.hr.authErrorCode = 'Neispravan kod';
 z.string.hr.authErrorCountryCodeInvalid = 'Nevažeći kod države';
@@ -82,7 +82,7 @@ z.string.hr.authErrorPasswordWrong = 'Pogrešna lozinka, molimo pokušajte ponov
 z.string.hr.authErrorPhoneNumberForbidden = 'Ova email adresa je zabranjena.';
 z.string.hr.authErrorPhoneNumberInvalid = 'Nevažeći broj';
 z.string.hr.authErrorPhoneNumberUnknown = 'Nepoznat broj';
-z.string.hr.auth_error_sign_in = 'Molimo provjerite vaše podatke i pokušajte ponovno.';
+z.string.hr.authErrorSignIn = 'Molimo provjerite vaše podatke i pokušajte ponovno.';
 
 z.string.hr.callStateOutgoing = 'Zvoni...';
 z.string.hr.callStateConnecting = 'Povezivanje…';

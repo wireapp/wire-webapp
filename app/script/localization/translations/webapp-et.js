@@ -50,30 +50,30 @@ z.string.et.authVerifyCodeDescription = 'Sisesta kinnituskood,\nmille saatsime n
 z.string.et.authVerifyCodeResend = 'Kood ei saabu?';
 z.string.et.authVerifyCodeResendDetail = 'Saada uuesti';
 z.string.et.authVerifyCodeResendTimer = 'Sa võid uue koodi tellida {{expiration}} pärast.';
-z.string.et.auth_verify_code_change_phone = 'Numbri muutmine';
-z.string.et.auth_verify_password_headline = 'Sisesta parool';
+z.string.et.authVerifyCodeChangePhone = 'Numbri muutmine';
+z.string.et.authVerifyPasswordHeadline = 'Sisesta parool';
 
-z.string.et.auth_limit_devices_headline = 'Seadmed';
-z.string.et.auth_limit_description = 'Eemalda üks oma teistest seadmetest, et sellel Wire’i kasutada.';
-z.string.et.auth_limit_button_manage = 'Seadmete haldus';
-z.string.et.auth_limit_button_sign_out = 'Logi välja';
-z.string.et.auth_limit_devices_current = '(Praegune)';
+z.string.et.authLimitDevicesHeadline = 'Seadmed';
+z.string.et.authLimitDescription = 'Eemalda üks oma teistest seadmetest, et sellel Wire’i kasutada.';
+z.string.et.authLimitButtonManage = 'Seadmete haldus';
+z.string.et.authLimitButtonSignOut = 'Logi välja';
+z.string.et.authLimitDevicesCurrent = '(Praegune)';
 
-z.string.et.auth_history_headline = 'Kasutad sellel seadmel Wire’it esimest korda.';
-z.string.et.auth_history_description = 'Privaatuse tagamiseks ei ilmu siia sinu varasemad vestlused.';
-z.string.et.auth_history_reuse_headline = 'Oled sellel seadmel juba varem Wire’i kasutanud.';
-z.string.et.auth_history_reuse_description = 'Vahepeal saadetud sõnumid ei ilmu siia.';
-z.string.et.auth_history_button = 'OK';
+z.string.et.authHistoryHeadline = 'Kasutad sellel seadmel Wire’it esimest korda.';
+z.string.et.authHistoryDescription = 'Privaatuse tagamiseks ei ilmu siia sinu varasemad vestlused.';
+z.string.et.authHistoryReuseHeadline = 'Oled sellel seadmel juba varem Wire’i kasutanud.';
+z.string.et.authHistoryReuseDescription = 'Vahepeal saadetud sõnumid ei ilmu siia.';
+z.string.et.authHistoryButton = 'OK';
 
-z.string.et.auth_posted_resend = 'Saada uuesti aadressile {{email}}';
-z.string.et.auth_posted_resend_action = 'E-kiri ei saabu?';
-z.string.et.auth_posted_resend_detail = 'Kontrolli oma e-postkasti ja järgi kirjas olevaid juhiseid.';
-z.string.et.auth_posted_resend_headline = 'Sulle tuli kiri.';
+z.string.et.authPostedResend = 'Saada uuesti aadressile {{email}}';
+z.string.et.authPostedResendAction = 'E-kiri ei saabu?';
+z.string.et.authPostedResendDetail = 'Kontrolli oma e-postkasti ja järgi kirjas olevaid juhiseid.';
+z.string.et.authPostedResendHeadline = 'Sulle tuli kiri.';
 
-z.string.et.auth_placeholder_email = 'E-post';
-z.string.et.auth_placeholder_password_put = 'Parool';
-z.string.et.auth_placeholder_password_set = 'Parool (vähemalt 8 märki)';
-z.string.et.auth_placeholder_phone = 'Telefoninumber';
+z.string.et.authPlaceholderEmail = 'E-post';
+z.string.et.authPlaceholderPasswordPut = 'Parool';
+z.string.et.authPlaceholderPasswordSet = 'Parool (vähemalt 8 märki)';
+z.string.et.authPlaceholderPhone = 'Telefoninumber';
 
 z.string.et.authErrorCode = 'Vigane kood';
 z.string.et.authErrorCountryCodeInvalid = 'Vale riigikood';
@@ -91,8 +91,8 @@ z.string.et.authErrorPhoneNumberBudget = 'Sa logisid liiga tihti sisse. Proovi h
 z.string.et.authErrorPhoneNumberForbidden = 'Vabandust. See telefoninumber on keelatud.';
 z.string.et.authErrorPhoneNumberInvalid = 'Sobimatu telefoninumber';
 z.string.et.authErrorPhoneNumberUnknown = 'Tundmatu telefoninumber';
-z.string.et.auth_error_suspended = 'See konto ei ole enam sisse logimiseks autoriseeritud.';
-z.string.et.auth_error_sign_in = 'Palun kinnita oma andmeid ja proovi uuesti.';
+z.string.et.authErrorSuspended = 'See konto ei ole enam sisse logimiseks autoriseeritud.';
+z.string.et.authErrorSignIn = 'Palun kinnita oma andmeid ja proovi uuesti.';
 
 z.string.et.callStateOutgoing = 'Heliseb…';
 z.string.et.callStateConnecting = 'Ühendan…';

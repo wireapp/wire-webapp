@@ -57,34 +57,34 @@ z.string.authVerifyCodeDescription = 'Enter the verification code\nwe sent to {{
 z.string.authVerifyCodeResend = 'No code showing up?';
 z.string.authVerifyCodeResendDetail = 'Resend';
 z.string.authVerifyCodeResendTimer = 'You can request a new code {{expiration}}.';
-z.string.auth_verify_code_change_phone = 'Change phone number';
-z.string.auth_verify_password_headline = 'Enter your password';
+z.string.authVerifyCodeChangePhone = 'Change phone number';
+z.string.authVerifyPasswordHeadline = 'Enter your password';
 
 // Authentication: LIMIT section
-z.string.auth_limit_devices_headline = 'Devices';
-z.string.auth_limit_description = 'Remove one of your other devices to start using Wire on this one.';
-z.string.auth_limit_button_manage = 'Manage devices';
-z.string.auth_limit_button_sign_out = 'Log out';
-z.string.auth_limit_devices_current = '(Current)';
+z.string.authLimitDevicesHeadline = 'Devices';
+z.string.authLimitDescription = 'Remove one of your other devices to start using Wire on this one.';
+z.string.authLimitButtonManage = 'Manage devices';
+z.string.authLimitButtonSignOut = 'Log out';
+z.string.authLimitDevicesCurrent = '(Current)';
 
 // Authentication: HISTORY section
-z.string.auth_history_headline = 'It’s the first time you’re using Wire on this device.';
-z.string.auth_history_description = 'For privacy reasons, your conversation history will not appear here.';
-z.string.auth_history_reuse_headline = 'You’ve used Wire on this device before.';
-z.string.auth_history_reuse_description = 'Messages sent in the meantime will not appear here.';
-z.string.auth_history_button = 'OK';
+z.string.authHistoryHeadline = 'It’s the first time you’re using Wire on this device.';
+z.string.authHistoryDescription = 'For privacy reasons, your conversation history will not appear here.';
+z.string.authHistoryReuseHeadline = 'You’ve used Wire on this device before.';
+z.string.authHistoryReuseDescription = 'Messages sent in the meantime will not appear here.';
+z.string.authHistoryButton = 'OK';
 
 // Authentication: POSTED section
-z.string.auth_posted_resend = 'Resend to {{email}}';
-z.string.auth_posted_resend_action = 'No email showing up?';
-z.string.auth_posted_resend_detail = 'Check your email inbox and follow the instructions.';
-z.string.auth_posted_resend_headline = 'You’ve got mail.';
+z.string.authPostedResend = 'Resend to {{email}}';
+z.string.authPostedResendAction = 'No email showing up?';
+z.string.authPostedResendDetail = 'Check your email inbox and follow the instructions.';
+z.string.authPostedResendHeadline = 'You’ve got mail.';
 
 // Authentication: Misc
-z.string.auth_placeholder_email = 'Email';
-z.string.auth_placeholder_password_put = 'Password';
-z.string.auth_placeholder_password_set = 'Password (at least 8 characters)';
-z.string.auth_placeholder_phone = 'Phone Number';
+z.string.authPlaceholderEmail = 'Email';
+z.string.authPlaceholderPasswordPut = 'Password';
+z.string.authPlaceholderPasswordSet = 'Password (at least 8 characters)';
+z.string.authPlaceholderPhone = 'Phone Number';
 
 // Authentication: Validation errors
 z.string.authErrorCode = 'Invalid Code';
@@ -103,8 +103,8 @@ z.string.authErrorPhoneNumberBudget = 'You logged in too often. Try again later.
 z.string.authErrorPhoneNumberForbidden = 'Sorry. This phone number is forbidden.';
 z.string.authErrorPhoneNumberInvalid = 'Invalid Phone Number';
 z.string.authErrorPhoneNumberUnknown = 'Unknown Phone Number';
-z.string.auth_error_suspended = 'This account is no longer authorized to log in.';
-z.string.auth_error_sign_in = 'Please verify your details and try again.';
+z.string.authErrorSuspended = 'This account is no longer authorized to log in.';
+z.string.authErrorSignIn = 'Please verify your details and try again.';
 
 // Call stuff
 z.string.callStateOutgoing = 'Ringing…';

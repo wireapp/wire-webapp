@@ -50,30 +50,30 @@ z.string.lt.authVerifyCodeDescription = 'Įveskite patvirtinimo kodą,\nkurį me
 z.string.lt.authVerifyCodeResend = 'Negaunate kodo?';
 z.string.lt.authVerifyCodeResendDetail = 'Siųsti iš naujo';
 z.string.lt.authVerifyCodeResendTimer = 'Jūs galite užklausti naują kodą {{expiration}}.';
-z.string.lt.auth_verify_code_change_phone = 'Pakeisti telefono numerį';
-z.string.lt.auth_verify_password_headline = 'Įveskite savo slaptažodį';
+z.string.lt.authVerifyCodeChangePhone = 'Pakeisti telefono numerį';
+z.string.lt.authVerifyPasswordHeadline = 'Įveskite savo slaptažodį';
 
-z.string.lt.auth_limit_devices_headline = 'Įrenginiai';
-z.string.lt.auth_limit_description = 'Norėdami pradėti naudoti Wire šiame įrenginyje, pašalinkite vieną iš savo kitų įrenginių.';
-z.string.lt.auth_limit_button_manage = 'Tvarkyti įrenginius';
-z.string.lt.auth_limit_button_sign_out = 'Atsijungti';
-z.string.lt.auth_limit_devices_current = '(Esamas)';
+z.string.lt.authLimitDevicesHeadline = 'Įrenginiai';
+z.string.lt.authLimitDescription = 'Norėdami pradėti naudoti Wire šiame įrenginyje, pašalinkite vieną iš savo kitų įrenginių.';
+z.string.lt.authLimitButtonManage = 'Tvarkyti įrenginius';
+z.string.lt.authLimitButtonSignOut = 'Atsijungti';
+z.string.lt.authLimitDevicesCurrent = '(Esamas)';
 
-z.string.lt.auth_history_headline = 'Pirmą kartą naudojate „Wire“ šiame įrenginyje.';
-z.string.lt.auth_history_description = 'Privatumo sumetimais, jūsų pokalbio istorija čia nebus rodoma.';
-z.string.lt.auth_history_reuse_headline = 'Naudojote „Wire“ šiame įrenginyje.';
-z.string.lt.auth_history_reuse_description = 'Per tą laikotarpį išsiųstos žinutės, čia nebus rodomos.';
-z.string.lt.auth_history_button = 'GERAI';
+z.string.lt.authHistoryHeadline = 'Pirmą kartą naudojate „Wire“ šiame įrenginyje.';
+z.string.lt.authHistoryDescription = 'Privatumo sumetimais, jūsų pokalbio istorija čia nebus rodoma.';
+z.string.lt.authHistoryReuseHeadline = 'Naudojote „Wire“ šiame įrenginyje.';
+z.string.lt.authHistoryReuseDescription = 'Per tą laikotarpį išsiųstos žinutės, čia nebus rodomos.';
+z.string.lt.authHistoryButton = 'GERAI';
 
-z.string.lt.auth_posted_resend = 'Siųsti iš naujo į {{email}}';
-z.string.lt.auth_posted_resend_action = 'Negaunate el. laiško?';
-z.string.lt.auth_posted_resend_detail = 'Patikrinkite savo el. paštą ir sekite nurodymus.';
-z.string.lt.auth_posted_resend_headline = 'Jūs gavote laišką.';
+z.string.lt.authPostedResend = 'Siųsti iš naujo į {{email}}';
+z.string.lt.authPostedResendAction = 'Negaunate el. laiško?';
+z.string.lt.authPostedResendDetail = 'Patikrinkite savo el. paštą ir sekite nurodymus.';
+z.string.lt.authPostedResendHeadline = 'Jūs gavote laišką.';
 
-z.string.lt.auth_placeholder_email = 'El. paštas';
-z.string.lt.auth_placeholder_password_put = 'Slaptažodis';
-z.string.lt.auth_placeholder_password_set = 'Slaptažodis (bent 8 simboliai)';
-z.string.lt.auth_placeholder_phone = 'Telefono numeris';
+z.string.lt.authPlaceholderEmail = 'El. paštas';
+z.string.lt.authPlaceholderPasswordPut = 'Slaptažodis';
+z.string.lt.authPlaceholderPasswordSet = 'Slaptažodis (bent 8 simboliai)';
+z.string.lt.authPlaceholderPhone = 'Telefono numeris';
 
 z.string.lt.authErrorCode = 'Neteisingas kodas';
 z.string.lt.authErrorCountryCodeInvalid = 'Neteisingas šalies kodas';
@@ -91,8 +91,8 @@ z.string.lt.authErrorPhoneNumberBudget = 'Jūs prisijungėte pernelyg dažnai. P
 z.string.lt.authErrorPhoneNumberForbidden = 'Atleiskite. Šis telefono numeris yra uždraustas.';
 z.string.lt.authErrorPhoneNumberInvalid = 'Neteisingas telefono numeris';
 z.string.lt.authErrorPhoneNumberUnknown = 'Nežinomas telefono numeris';
-z.string.lt.auth_error_suspended = 'Ši paskyra daugiau nebeturi įgaliojimų prisijungti.';
-z.string.lt.auth_error_sign_in = 'Patvirtinkite savo duomenis ir bandykite dar kartą.';
+z.string.lt.authErrorSuspended = 'Ši paskyra daugiau nebeturi įgaliojimų prisijungti.';
+z.string.lt.authErrorSignIn = 'Patvirtinkite savo duomenis ir bandykite dar kartą.';
 
 z.string.lt.callStateOutgoing = 'Kviečiama…';
 z.string.lt.callStateConnecting = 'Sujungiama…';

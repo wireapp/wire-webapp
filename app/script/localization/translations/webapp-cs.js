@@ -49,30 +49,30 @@ z.string.cs.authVerifyCodeDescription = 'Zadejte ověřovací kód,\nkterý byl 
 z.string.cs.authVerifyCodeResend = 'Kód nedošel?';
 z.string.cs.authVerifyCodeResendDetail = 'Odeslat znovu';
 z.string.cs.authVerifyCodeResendTimer = 'Můžete si vyžádat nový kód {{expiration}}.';
-z.string.cs.auth_verify_code_change_phone = 'Změnit telefonní číslo';
-z.string.cs.auth_verify_password_headline = 'Zadejte své heslo';
+z.string.cs.authVerifyCodeChangePhone = 'Změnit telefonní číslo';
+z.string.cs.authVerifyPasswordHeadline = 'Zadejte své heslo';
 
-z.string.cs.auth_limit_devices_headline = 'Přístroje';
-z.string.cs.auth_limit_description = 'Odeberte jeden ze svých přístrojů abyste mohli začít používat Wire na tomto zařízení.';
-z.string.cs.auth_limit_button_manage = 'Spravovat přístroje';
-z.string.cs.auth_limit_button_sign_out = 'Odhlásit se';
-z.string.cs.auth_limit_devices_current = '(Aktuální)';
+z.string.cs.authLimitDevicesHeadline = 'Přístroje';
+z.string.cs.authLimitDescription = 'Odeberte jeden ze svých přístrojů abyste mohli začít používat Wire na tomto zařízení.';
+z.string.cs.authLimitButtonManage = 'Spravovat přístroje';
+z.string.cs.authLimitButtonSignOut = 'Odhlásit se';
+z.string.cs.authLimitDevicesCurrent = '(Aktuální)';
 
-z.string.cs.auth_history_headline = 'Toto je poprvé kdy používáte Wire na tomto přístroji.';
-z.string.cs.auth_history_description = 'Z důvodů ochrany soukromí se zde nezobrazí historie vaší konverzace.';
-z.string.cs.auth_history_reuse_headline = 'Již jste dříve použili Wire na tomto zařízení.';
-z.string.cs.auth_history_reuse_description = 'Zprávy odeslané v mezičase se zde nezobrazí.';
-z.string.cs.auth_history_button = 'OK';
+z.string.cs.authHistoryHeadline = 'Toto je poprvé kdy používáte Wire na tomto přístroji.';
+z.string.cs.authHistoryDescription = 'Z důvodů ochrany soukromí se zde nezobrazí historie vaší konverzace.';
+z.string.cs.authHistoryReuseHeadline = 'Již jste dříve použili Wire na tomto zařízení.';
+z.string.cs.authHistoryReuseDescription = 'Zprávy odeslané v mezičase se zde nezobrazí.';
+z.string.cs.authHistoryButton = 'OK';
 
-z.string.cs.auth_posted_resend = 'Znovu odeslat na {{email}}';
-z.string.cs.auth_posted_resend_action = 'Žádný email nedošel?';
-z.string.cs.auth_posted_resend_detail = 'Zkontrolujte doručenou poštu a postupujte dle instrukcí.';
-z.string.cs.auth_posted_resend_headline = 'Přišel ti email.';
+z.string.cs.authPostedResend = 'Znovu odeslat na {{email}}';
+z.string.cs.authPostedResendAction = 'Žádný email nedošel?';
+z.string.cs.authPostedResendDetail = 'Zkontrolujte doručenou poštu a postupujte dle instrukcí.';
+z.string.cs.authPostedResendHeadline = 'Přišel ti email.';
 
-z.string.cs.auth_placeholder_email = 'Email';
-z.string.cs.auth_placeholder_password_put = 'Heslo';
-z.string.cs.auth_placeholder_password_set = 'Heslo (alespoň 8 znaků)';
-z.string.cs.auth_placeholder_phone = 'Telefonní číslo';
+z.string.cs.authPlaceholderEmail = 'Email';
+z.string.cs.authPlaceholderPasswordPut = 'Heslo';
+z.string.cs.authPlaceholderPasswordSet = 'Heslo (alespoň 8 znaků)';
+z.string.cs.authPlaceholderPhone = 'Telefonní číslo';
 
 z.string.cs.authErrorCode = 'Neplatný kód';
 z.string.cs.authErrorCountryCodeInvalid = 'Neplatný kód země';
@@ -89,8 +89,8 @@ z.string.cs.authErrorPhoneNumberBudget = 'Příliš často se přihlašujete. Op
 z.string.cs.authErrorPhoneNumberForbidden = 'Omlouváme se. Toto telefonní číslo bylo zakázáno.';
 z.string.cs.authErrorPhoneNumberInvalid = 'Neplatné telefonní číslo';
 z.string.cs.authErrorPhoneNumberUnknown = 'Neznámé telefonní číslo';
-z.string.cs.auth_error_suspended = 'Pro tento účet již není povoleno se přihlásit.';
-z.string.cs.auth_error_sign_in = 'Zkontrolujte své údaje a zkuste znovu.';
+z.string.cs.authErrorSuspended = 'Pro tento účet již není povoleno se přihlásit.';
+z.string.cs.authErrorSignIn = 'Zkontrolujte své údaje a zkuste znovu.';
 
 z.string.cs.callStateOutgoing = 'Zvoní…';
 z.string.cs.callStateConnecting = 'Připojuji…';

@@ -44,30 +44,30 @@ z.string.da.authVerifyCodeDescription = 'Indtast bekræftelseskoden vi sendte ti
 z.string.da.authVerifyCodeResend = 'Ingen kode vist?';
 z.string.da.authVerifyCodeResendDetail = 'Gensend';
 z.string.da.authVerifyCodeResendTimer = 'Du kan anmode om en ny kode {{expiration}}.';
-z.string.da.auth_verify_code_change_phone = 'Ændre telefon nummer';
-z.string.da.auth_verify_password_headline = 'Indtast din adgangskode';
+z.string.da.authVerifyCodeChangePhone = 'Ændre telefon nummer';
+z.string.da.authVerifyPasswordHeadline = 'Indtast din adgangskode';
 
-z.string.da.auth_limit_devices_headline = 'Enheder';
-z.string.da.auth_limit_description = 'Fjern en af dine andre enheder for at begynde at bruge Wire på denne.';
-z.string.da.auth_limit_button_manage = 'Administrér enheder';
-z.string.da.auth_limit_button_sign_out = 'Log ud';
-z.string.da.auth_limit_devices_current = '(Nuværende)';
+z.string.da.authLimitDevicesHeadline = 'Enheder';
+z.string.da.authLimitDescription = 'Fjern en af dine andre enheder for at begynde at bruge Wire på denne.';
+z.string.da.authLimitButtonManage = 'Administrér enheder';
+z.string.da.authLimitButtonSignOut = 'Log ud';
+z.string.da.authLimitDevicesCurrent = '(Nuværende)';
 
-z.string.da.auth_history_headline = 'Det er første gang du bruger Wire på denne enhed.';
-z.string.da.auth_history_description = 'Af hensyn til fortrolighed, vil din chathistorik ikke vises her.';
-z.string.da.auth_history_reuse_headline = 'Du har brugt Wire på denne enhed før.';
-z.string.da.auth_history_reuse_description = 'Beskeder sendt i mellemtiden vises ikke.';
-z.string.da.auth_history_button = 'OK';
+z.string.da.authHistoryHeadline = 'Det er første gang du bruger Wire på denne enhed.';
+z.string.da.authHistoryDescription = 'Af hensyn til fortrolighed, vil din chathistorik ikke vises her.';
+z.string.da.authHistoryReuseHeadline = 'Du har brugt Wire på denne enhed før.';
+z.string.da.authHistoryReuseDescription = 'Beskeder sendt i mellemtiden vises ikke.';
+z.string.da.authHistoryButton = 'OK';
 
-z.string.da.auth_posted_resend = 'Gensend til {{email}}';
-z.string.da.auth_posted_resend_action = 'Ingen email modtaget?';
-z.string.da.auth_posted_resend_detail = 'Tjek din email indbakke og følg anvisningerne.';
-z.string.da.auth_posted_resend_headline = 'Du har post.';
+z.string.da.authPostedResend = 'Gensend til {{email}}';
+z.string.da.authPostedResendAction = 'Ingen email modtaget?';
+z.string.da.authPostedResendDetail = 'Tjek din email indbakke og følg anvisningerne.';
+z.string.da.authPostedResendHeadline = 'Du har post.';
 
-z.string.da.auth_placeholder_email = 'Email';
-z.string.da.auth_placeholder_password_put = 'Adgangskode';
-z.string.da.auth_placeholder_password_set = 'Adgangskode (mindst 8 tegn)';
-z.string.da.auth_placeholder_phone = 'Telefon Nummer';
+z.string.da.authPlaceholderEmail = 'Email';
+z.string.da.authPlaceholderPasswordPut = 'Adgangskode';
+z.string.da.authPlaceholderPasswordSet = 'Adgangskode (mindst 8 tegn)';
+z.string.da.authPlaceholderPhone = 'Telefon Nummer';
 
 z.string.da.authErrorCode = 'Ugyldig Kode';
 z.string.da.authErrorCountryCodeInvalid = 'Ugyldig Lande Kode';
@@ -83,7 +83,7 @@ z.string.da.authErrorPasswordWrong = 'Forkert adgangskode. Prøv igen.';
 z.string.da.authErrorPhoneNumberForbidden = 'Beklager. Dette telefonnummer er ikke tilladt.';
 z.string.da.authErrorPhoneNumberInvalid = 'Ugyldigt telefonnummer';
 z.string.da.authErrorPhoneNumberUnknown = 'Ukendt telefonnummer';
-z.string.da.auth_error_sign_in = 'Bekræft venligst dine detaljer og prøv igen.';
+z.string.da.authErrorSignIn = 'Bekræft venligst dine detaljer og prøv igen.';
 
 z.string.da.callStateOutgoing = 'Ringer op…';
 z.string.da.callStateConnecting = 'Forbinder…';

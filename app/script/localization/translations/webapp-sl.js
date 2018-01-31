@@ -48,30 +48,30 @@ z.string.sl.authVerifyCodeDescription = 'Vnesite verifikacijsko kodo,\nki smo jo
 z.string.sl.authVerifyCodeResend = 'Koda ni prispela?';
 z.string.sl.authVerifyCodeResendDetail = 'Ponovno pošlji';
 z.string.sl.authVerifyCodeResendTimer = 'Lahko zahtevate novo kodo {{expiration}}.';
-z.string.sl.auth_verify_code_change_phone = 'Spremeni telefonsko številko';
-z.string.sl.auth_verify_password_headline = 'Vnesite vaše geslo';
+z.string.sl.authVerifyCodeChangePhone = 'Spremeni telefonsko številko';
+z.string.sl.authVerifyPasswordHeadline = 'Vnesite vaše geslo';
 
-z.string.sl.auth_limit_devices_headline = 'Naprave';
-z.string.sl.auth_limit_description = 'Odstranite eno izmed vaših naprav za začetek uporabe Wire na tej.';
-z.string.sl.auth_limit_button_manage = 'Upravljanje naprav';
-z.string.sl.auth_limit_button_sign_out = 'Odjava';
-z.string.sl.auth_limit_devices_current = '(Trenutna)';
+z.string.sl.authLimitDevicesHeadline = 'Naprave';
+z.string.sl.authLimitDescription = 'Odstranite eno izmed vaših naprav za začetek uporabe Wire na tej.';
+z.string.sl.authLimitButtonManage = 'Upravljanje naprav';
+z.string.sl.authLimitButtonSignOut = 'Odjava';
+z.string.sl.authLimitDevicesCurrent = '(Trenutna)';
 
-z.string.sl.auth_history_headline = 'Prvič uporabljate Wire na tej napravi.';
-z.string.sl.auth_history_description = 'Zaradi zasebnosti se vaša zgodovina pogovorov ne bo pojavila tukaj.';
-z.string.sl.auth_history_reuse_headline = 'Na tej napravi si že uporabljal(-a) Wire.';
-z.string.sl.auth_history_reuse_description = 'Sporočila poslana medtem tukaj ne bodo prikazana.';
-z.string.sl.auth_history_button = 'V redu';
+z.string.sl.authHistoryHeadline = 'Prvič uporabljate Wire na tej napravi.';
+z.string.sl.authHistoryDescription = 'Zaradi zasebnosti se vaša zgodovina pogovorov ne bo pojavila tukaj.';
+z.string.sl.authHistoryReuseHeadline = 'Na tej napravi si že uporabljal(-a) Wire.';
+z.string.sl.authHistoryReuseDescription = 'Sporočila poslana medtem tukaj ne bodo prikazana.';
+z.string.sl.authHistoryButton = 'V redu';
 
-z.string.sl.auth_posted_resend = 'Ponovno pošlji na {{email}}';
-z.string.sl.auth_posted_resend_action = 'E-pošta ni prispela?';
-z.string.sl.auth_posted_resend_detail = 'Preverite vašo e-pošto in sledite navodilom.';
-z.string.sl.auth_posted_resend_headline = 'Imate pošto.';
+z.string.sl.authPostedResend = 'Ponovno pošlji na {{email}}';
+z.string.sl.authPostedResendAction = 'E-pošta ni prispela?';
+z.string.sl.authPostedResendDetail = 'Preverite vašo e-pošto in sledite navodilom.';
+z.string.sl.authPostedResendHeadline = 'Imate pošto.';
 
-z.string.sl.auth_placeholder_email = 'E-pošta';
-z.string.sl.auth_placeholder_password_put = 'Geslo';
-z.string.sl.auth_placeholder_password_set = 'Geslo (vsaj 8 znakov)';
-z.string.sl.auth_placeholder_phone = 'Telefonska številka';
+z.string.sl.authPlaceholderEmail = 'E-pošta';
+z.string.sl.authPlaceholderPasswordPut = 'Geslo';
+z.string.sl.authPlaceholderPasswordSet = 'Geslo (vsaj 8 znakov)';
+z.string.sl.authPlaceholderPhone = 'Telefonska številka';
 
 z.string.sl.authErrorCode = 'Neveljavna koda';
 z.string.sl.authErrorCountryCodeInvalid = 'Neveljavna koda države';
@@ -88,7 +88,7 @@ z.string.sl.authErrorPhoneNumberBudget = 'Da prijavljeni prepogosto. Poskusite z
 z.string.sl.authErrorPhoneNumberForbidden = 'Se opravičujemo. Ta telefonska številka je prepovedana.';
 z.string.sl.authErrorPhoneNumberInvalid = 'Neveljavna telefonska številka';
 z.string.sl.authErrorPhoneNumberUnknown = 'Neznana telefonska številka';
-z.string.sl.auth_error_sign_in = 'Prosimo preverite vaše podatke in poizkusite ponovno.';
+z.string.sl.authErrorSignIn = 'Prosimo preverite vaše podatke in poizkusite ponovno.';
 
 z.string.sl.callStateOutgoing = 'Zvonjenje…';
 z.string.sl.callStateConnecting = 'Povezovanje…';

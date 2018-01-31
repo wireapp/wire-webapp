@@ -50,30 +50,30 @@ z.string.de.authVerifyCodeDescription = 'Gib den Code ein, den wir an \n{{number
 z.string.de.authVerifyCodeResend = 'Keinen Code erhalten?';
 z.string.de.authVerifyCodeResendDetail = 'Erneut senden';
 z.string.de.authVerifyCodeResendTimer = 'Du kannst {{expiration}} einen neuen Code anfordern.';
-z.string.de.auth_verify_code_change_phone = 'Telefonnummer ändern';
-z.string.de.auth_verify_password_headline = 'Passwort eingeben';
+z.string.de.authVerifyCodeChangePhone = 'Telefonnummer ändern';
+z.string.de.authVerifyPasswordHeadline = 'Passwort eingeben';
 
-z.string.de.auth_limit_devices_headline = 'Geräte';
-z.string.de.auth_limit_description = 'Entferne eines deiner anderen Geräte, um Wire hier zu nutzen.';
-z.string.de.auth_limit_button_manage = 'Geräte verwalten';
-z.string.de.auth_limit_button_sign_out = 'Abmelden';
-z.string.de.auth_limit_devices_current = '(Aktuelles Gerät)';
+z.string.de.authLimitDevicesHeadline = 'Geräte';
+z.string.de.authLimitDescription = 'Entferne eines deiner anderen Geräte, um Wire hier zu nutzen.';
+z.string.de.authLimitButtonManage = 'Geräte verwalten';
+z.string.de.authLimitButtonSignOut = 'Abmelden';
+z.string.de.authLimitDevicesCurrent = '(Aktuelles Gerät)';
 
-z.string.de.auth_history_headline = 'Du benutzt Wire zum ersten Mal auf diesem Gerät.';
-z.string.de.auth_history_description = 'Aus Datenschutzgründen wird dein bisheriger Gesprächsverlauf nicht angezeigt.';
-z.string.de.auth_history_reuse_headline = 'Du hast Wire auf diesem Gerät bereits früher genutzt.';
-z.string.de.auth_history_reuse_description = 'Nachrichten, die in der Zwischenzeit gesendet wurden, werden nicht angezeigt.';
-z.string.de.auth_history_button = 'Verstanden';
+z.string.de.authHistoryHeadline = 'Du benutzt Wire zum ersten Mal auf diesem Gerät.';
+z.string.de.authHistoryDescription = 'Aus Datenschutzgründen wird dein bisheriger Gesprächsverlauf nicht angezeigt.';
+z.string.de.authHistoryReuseHeadline = 'Du hast Wire auf diesem Gerät bereits früher genutzt.';
+z.string.de.authHistoryReuseDescription = 'Nachrichten, die in der Zwischenzeit gesendet wurden, werden nicht angezeigt.';
+z.string.de.authHistoryButton = 'Verstanden';
 
-z.string.de.auth_posted_resend = 'Erneut an {{email}} senden';
-z.string.de.auth_posted_resend_action = 'E-Mail nicht erhalten?';
-z.string.de.auth_posted_resend_detail = 'Schaue in deinen Posteingang und folge den Anweisungen.';
-z.string.de.auth_posted_resend_headline = 'Du hast Post.';
+z.string.de.authPostedResend = 'Erneut an {{email}} senden';
+z.string.de.authPostedResendAction = 'E-Mail nicht erhalten?';
+z.string.de.authPostedResendDetail = 'Schaue in deinen Posteingang und folge den Anweisungen.';
+z.string.de.authPostedResendHeadline = 'Du hast Post.';
 
-z.string.de.auth_placeholder_email = 'E-Mail';
-z.string.de.auth_placeholder_password_put = 'Passwort';
-z.string.de.auth_placeholder_password_set = 'Passwort (min. acht Zeichen)';
-z.string.de.auth_placeholder_phone = 'Telefonnummer';
+z.string.de.authPlaceholderEmail = 'E-Mail';
+z.string.de.authPlaceholderPasswordPut = 'Passwort';
+z.string.de.authPlaceholderPasswordSet = 'Passwort (min. acht Zeichen)';
+z.string.de.authPlaceholderPhone = 'Telefonnummer';
 
 z.string.de.authErrorCode = 'Ungültiger Verifizierungs-Code';
 z.string.de.authErrorCountryCodeInvalid = 'Ungültige Landesvorwahl';
@@ -91,8 +91,8 @@ z.string.de.authErrorPhoneNumberBudget = 'Du hast dich zu oft eingeloggt. Versuc
 z.string.de.authErrorPhoneNumberForbidden = 'Diese Telefonnummer ist leider nicht nutzbar.';
 z.string.de.authErrorPhoneNumberInvalid = 'Ungültige Telefonnummer';
 z.string.de.authErrorPhoneNumberUnknown = 'Unbekannte Telefonnummer';
-z.string.de.auth_error_suspended = 'Benutzerkonto ist nicht mehr zum Login berechtigt.';
-z.string.de.auth_error_sign_in = 'Überprüfe deine Eingaben und versuche es erneut.';
+z.string.de.authErrorSuspended = 'Benutzerkonto ist nicht mehr zum Login berechtigt.';
+z.string.de.authErrorSignIn = 'Überprüfe deine Eingaben und versuche es erneut.';
 
 z.string.de.callStateOutgoing = 'Klingelt…';
 z.string.de.callStateConnecting = 'Verbinde…';

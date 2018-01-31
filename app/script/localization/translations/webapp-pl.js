@@ -49,30 +49,30 @@ z.string.pl.authVerifyCodeDescription = 'Wpisz kod weryfikacyjny, który wysłal
 z.string.pl.authVerifyCodeResend = 'Nie otrzymałeś(aś) kodu?';
 z.string.pl.authVerifyCodeResendDetail = 'Wyślij ponownie';
 z.string.pl.authVerifyCodeResendTimer = 'Możesz poprosić o nowy kod {{expiration}}.';
-z.string.pl.auth_verify_code_change_phone = 'Zmień numer telefonu';
-z.string.pl.auth_verify_password_headline = 'Wprowadź hasło';
+z.string.pl.authVerifyCodeChangePhone = 'Zmień numer telefonu';
+z.string.pl.authVerifyPasswordHeadline = 'Wprowadź hasło';
 
-z.string.pl.auth_limit_devices_headline = 'Urządzenia';
-z.string.pl.auth_limit_description = 'Żeby dodać to urządzenie, usuń jedno z poprzednich.';
-z.string.pl.auth_limit_button_manage = 'Zarządzaj urządzeniami';
-z.string.pl.auth_limit_button_sign_out = 'Wyloguj się';
-z.string.pl.auth_limit_devices_current = '(Używane urządzenie)';
+z.string.pl.authLimitDevicesHeadline = 'Urządzenia';
+z.string.pl.authLimitDescription = 'Żeby dodać to urządzenie, usuń jedno z poprzednich.';
+z.string.pl.authLimitButtonManage = 'Zarządzaj urządzeniami';
+z.string.pl.authLimitButtonSignOut = 'Wyloguj się';
+z.string.pl.authLimitDevicesCurrent = '(Używane urządzenie)';
 
-z.string.pl.auth_history_headline = 'Uruchomiłeś Wire na tym urządzeniu po raz pierwszy.';
-z.string.pl.auth_history_description = 'Ze względu na prywatność, poprzednie rozmowy nie będą tutaj widoczne.';
-z.string.pl.auth_history_reuse_headline = 'Używałeś wcześniej Wire na tym urządzeniu.';
-z.string.pl.auth_history_reuse_description = 'Wiadomości wysłane w międzyczasie nie pojawią się.';
-z.string.pl.auth_history_button = 'OK';
+z.string.pl.authHistoryHeadline = 'Uruchomiłeś Wire na tym urządzeniu po raz pierwszy.';
+z.string.pl.authHistoryDescription = 'Ze względu na prywatność, poprzednie rozmowy nie będą tutaj widoczne.';
+z.string.pl.authHistoryReuseHeadline = 'Używałeś wcześniej Wire na tym urządzeniu.';
+z.string.pl.authHistoryReuseDescription = 'Wiadomości wysłane w międzyczasie nie pojawią się.';
+z.string.pl.authHistoryButton = 'OK';
 
-z.string.pl.auth_posted_resend = 'Wyślij ponownie na {{email}}';
-z.string.pl.auth_posted_resend_action = 'Nie otrzymałeś e-maila?';
-z.string.pl.auth_posted_resend_detail = 'Sprawdź swoją skrzynkę e-mail i postępuj zgodnie z instrukcjami.';
-z.string.pl.auth_posted_resend_headline = 'Masz wiadomość.';
+z.string.pl.authPostedResend = 'Wyślij ponownie na {{email}}';
+z.string.pl.authPostedResendAction = 'Nie otrzymałeś e-maila?';
+z.string.pl.authPostedResendDetail = 'Sprawdź swoją skrzynkę e-mail i postępuj zgodnie z instrukcjami.';
+z.string.pl.authPostedResendHeadline = 'Masz wiadomość.';
 
-z.string.pl.auth_placeholder_email = 'Adres e-mail';
-z.string.pl.auth_placeholder_password_put = 'Hasło';
-z.string.pl.auth_placeholder_password_set = 'Hasło (musi mieć przynajmniej 8 znaków)';
-z.string.pl.auth_placeholder_phone = 'Numer telefonu';
+z.string.pl.authPlaceholderEmail = 'Adres e-mail';
+z.string.pl.authPlaceholderPasswordPut = 'Hasło';
+z.string.pl.authPlaceholderPasswordSet = 'Hasło (musi mieć przynajmniej 8 znaków)';
+z.string.pl.authPlaceholderPhone = 'Numer telefonu';
 
 z.string.pl.authErrorCode = 'Nieprawidłowy kod';
 z.string.pl.authErrorCountryCodeInvalid = 'Błędy kierunkowy kraju';
@@ -89,8 +89,8 @@ z.string.pl.authErrorPhoneNumberBudget = 'Zbyt wiele prób logowania. Odczekaj c
 z.string.pl.authErrorPhoneNumberForbidden = 'Przepraszamy. Ten numer telefonu został zabroniony.';
 z.string.pl.authErrorPhoneNumberInvalid = 'Nieprawidłowy numer telefonu';
 z.string.pl.authErrorPhoneNumberUnknown = 'Nieznany numer telefonu';
-z.string.pl.auth_error_suspended = 'To konto jest już uprawnione do zalogowania się.';
-z.string.pl.auth_error_sign_in = 'Proszę sprawdzić swoje dane i spróbować ponownie.';
+z.string.pl.authErrorSuspended = 'To konto jest już uprawnione do zalogowania się.';
+z.string.pl.authErrorSignIn = 'Proszę sprawdzić swoje dane i spróbować ponownie.';
 
 z.string.pl.callStateOutgoing = 'Dzwoni…';
 z.string.pl.callStateConnecting = 'Łączenie…';

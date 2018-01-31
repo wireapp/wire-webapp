@@ -48,30 +48,30 @@ z.string.it.authVerifyCodeDescription = 'Inserisci il codice di verifica che abb
 z.string.it.authVerifyCodeResend = 'Non hai ricevuto nessun codice?';
 z.string.it.authVerifyCodeResendDetail = 'Inviare di nuovo';
 z.string.it.authVerifyCodeResendTimer = 'È possibile richiedere un nuovo codice {{expiration}}.';
-z.string.it.auth_verify_code_change_phone = 'Cambia numero di telefono';
-z.string.it.auth_verify_password_headline = 'Inserisci la tua password';
+z.string.it.authVerifyCodeChangePhone = 'Cambia numero di telefono';
+z.string.it.authVerifyPasswordHeadline = 'Inserisci la tua password';
 
-z.string.it.auth_limit_devices_headline = 'Dispositivi';
-z.string.it.auth_limit_description = 'Rimuovi uno dei tuoi dispositivi per iniziare a utilizzare Wire su questo.';
-z.string.it.auth_limit_button_manage = 'Gestione dei dispositivi';
-z.string.it.auth_limit_button_sign_out = 'Logout';
-z.string.it.auth_limit_devices_current = '(Corrente)';
+z.string.it.authLimitDevicesHeadline = 'Dispositivi';
+z.string.it.authLimitDescription = 'Rimuovi uno dei tuoi dispositivi per iniziare a utilizzare Wire su questo.';
+z.string.it.authLimitButtonManage = 'Gestione dei dispositivi';
+z.string.it.authLimitButtonSignOut = 'Logout';
+z.string.it.authLimitDevicesCurrent = '(Corrente)';
 
-z.string.it.auth_history_headline = 'È la prima volta che utilizzi Wire questo dispositivo.';
-z.string.it.auth_history_description = 'Per motivi di privacy, la cronologia delle tue conversazioni non apparirà qui.';
-z.string.it.auth_history_reuse_headline = 'Hai utilizzato Wire su questo dispositivo prima.';
-z.string.it.auth_history_reuse_description = 'I messaggi inviati nel frattempo non verranno visualizzati qui.';
-z.string.it.auth_history_button = 'OK';
+z.string.it.authHistoryHeadline = 'È la prima volta che utilizzi Wire questo dispositivo.';
+z.string.it.authHistoryDescription = 'Per motivi di privacy, la cronologia delle tue conversazioni non apparirà qui.';
+z.string.it.authHistoryReuseHeadline = 'Hai utilizzato Wire su questo dispositivo prima.';
+z.string.it.authHistoryReuseDescription = 'I messaggi inviati nel frattempo non verranno visualizzati qui.';
+z.string.it.authHistoryButton = 'OK';
 
-z.string.it.auth_posted_resend = 'Invia di nuovo a {{email}}';
-z.string.it.auth_posted_resend_action = 'Non hai ricevuto nessuna email?';
-z.string.it.auth_posted_resend_detail = 'Verifica la tua casella di posta e segui le istruzioni.';
-z.string.it.auth_posted_resend_headline = 'C’è posta per te.';
+z.string.it.authPostedResend = 'Invia di nuovo a {{email}}';
+z.string.it.authPostedResendAction = 'Non hai ricevuto nessuna email?';
+z.string.it.authPostedResendDetail = 'Verifica la tua casella di posta e segui le istruzioni.';
+z.string.it.authPostedResendHeadline = 'C’è posta per te.';
 
-z.string.it.auth_placeholder_email = 'Email';
-z.string.it.auth_placeholder_password_put = 'Password';
-z.string.it.auth_placeholder_password_set = 'Password (almeno 8 caratteri)';
-z.string.it.auth_placeholder_phone = 'Numero di telefono';
+z.string.it.authPlaceholderEmail = 'Email';
+z.string.it.authPlaceholderPasswordPut = 'Password';
+z.string.it.authPlaceholderPasswordSet = 'Password (almeno 8 caratteri)';
+z.string.it.authPlaceholderPhone = 'Numero di telefono';
 
 z.string.it.authErrorCode = 'Codice non valido';
 z.string.it.authErrorCountryCodeInvalid = 'Prefisso paese non valido';
@@ -88,8 +88,8 @@ z.string.it.authErrorPhoneNumberBudget = 'Hai eseguito l’accesso troppo spesso
 z.string.it.authErrorPhoneNumberForbidden = 'Spiacenti. Questo numero di telefono è vietato.';
 z.string.it.authErrorPhoneNumberInvalid = 'Numero di telefono non valido';
 z.string.it.authErrorPhoneNumberUnknown = 'Numero di telefono sconosciuto';
-z.string.it.auth_error_suspended = 'Questo account non è più autorizzato ad accedere.';
-z.string.it.auth_error_sign_in = 'Verifica i tuoi dati e riprova.';
+z.string.it.authErrorSuspended = 'Questo account non è più autorizzato ad accedere.';
+z.string.it.authErrorSignIn = 'Verifica i tuoi dati e riprova.';
 
 z.string.it.callStateOutgoing = 'Sta squillando…';
 z.string.it.callStateConnecting = 'Connessione in corso…';

@@ -50,30 +50,30 @@ z.string.ru.authVerifyCodeDescription = 'Введите код подтверж�
 z.string.ru.authVerifyCodeResend = 'Не приходит код?';
 z.string.ru.authVerifyCodeResendDetail = 'Отправить повторно';
 z.string.ru.authVerifyCodeResendTimer = 'Вы можете запросить новый код {{expiration}}.';
-z.string.ru.auth_verify_code_change_phone = 'Изменить номер телефона';
-z.string.ru.auth_verify_password_headline = 'Введите свой пароль';
+z.string.ru.authVerifyCodeChangePhone = 'Изменить номер телефона';
+z.string.ru.authVerifyPasswordHeadline = 'Введите свой пароль';
 
-z.string.ru.auth_limit_devices_headline = 'Устройства';
-z.string.ru.auth_limit_description = 'Удалите одно из ваших устройств для того, чтобы начать использовать Wire на этом.';
-z.string.ru.auth_limit_button_manage = 'Управление устройствами';
-z.string.ru.auth_limit_button_sign_out = 'Выход';
-z.string.ru.auth_limit_devices_current = '(Текущее)';
+z.string.ru.authLimitDevicesHeadline = 'Устройства';
+z.string.ru.authLimitDescription = 'Удалите одно из ваших устройств для того, чтобы начать использовать Wire на этом.';
+z.string.ru.authLimitButtonManage = 'Управление устройствами';
+z.string.ru.authLimitButtonSignOut = 'Выход';
+z.string.ru.authLimitDevicesCurrent = '(Текущее)';
 
-z.string.ru.auth_history_headline = 'Вы впервые используете Wire на этом устройстве.';
-z.string.ru.auth_history_description = 'Из соображений конфиденциальности история ваших разговоров не будет показана здесь.';
-z.string.ru.auth_history_reuse_headline = 'Вы уже использовали Wire на этом устройстве.';
-z.string.ru.auth_history_reuse_description = 'Сообщения, отправленные в то время, пока устройство не использовалось, не будут показаны здесь.';
-z.string.ru.auth_history_button = 'OK';
+z.string.ru.authHistoryHeadline = 'Вы впервые используете Wire на этом устройстве.';
+z.string.ru.authHistoryDescription = 'Из соображений конфиденциальности история ваших разговоров не будет показана здесь.';
+z.string.ru.authHistoryReuseHeadline = 'Вы уже использовали Wire на этом устройстве.';
+z.string.ru.authHistoryReuseDescription = 'Сообщения, отправленные в то время, пока устройство не использовалось, не будут показаны здесь.';
+z.string.ru.authHistoryButton = 'OK';
 
-z.string.ru.auth_posted_resend = 'Отправить снова на {{email}}';
-z.string.ru.auth_posted_resend_action = 'Не приходит письмо?';
-z.string.ru.auth_posted_resend_detail = 'Проверьте свой почтовый ящик и следуйте инструкциям.';
-z.string.ru.auth_posted_resend_headline = 'Вам письмо.';
+z.string.ru.authPostedResend = 'Отправить снова на {{email}}';
+z.string.ru.authPostedResendAction = 'Не приходит письмо?';
+z.string.ru.authPostedResendDetail = 'Проверьте свой почтовый ящик и следуйте инструкциям.';
+z.string.ru.authPostedResendHeadline = 'Вам письмо.';
 
-z.string.ru.auth_placeholder_email = 'Email';
-z.string.ru.auth_placeholder_password_put = 'Пароль';
-z.string.ru.auth_placeholder_password_set = 'Пароль (минимум 8 символов)';
-z.string.ru.auth_placeholder_phone = 'Номер телефона';
+z.string.ru.authPlaceholderEmail = 'Email';
+z.string.ru.authPlaceholderPasswordPut = 'Пароль';
+z.string.ru.authPlaceholderPasswordSet = 'Пароль (минимум 8 символов)';
+z.string.ru.authPlaceholderPhone = 'Номер телефона';
 
 z.string.ru.authErrorCode = 'Неверный код';
 z.string.ru.authErrorCountryCodeInvalid = 'Неверный код страны';
@@ -91,8 +91,8 @@ z.string.ru.authErrorPhoneNumberBudget = 'Вы делаете попытки в�
 z.string.ru.authErrorPhoneNumberForbidden = 'Извините, этот номер телефона запрещён.';
 z.string.ru.authErrorPhoneNumberInvalid = 'Неправильный номер телефона';
 z.string.ru.authErrorPhoneNumberUnknown = 'Неизвестный номер телефона';
-z.string.ru.auth_error_suspended = 'У этой учетной записи истек срок действия авторизации.';
-z.string.ru.auth_error_sign_in = 'Пожалуйста, проверьте ваши данные\nи попробуйте еще раз.';
+z.string.ru.authErrorSuspended = 'У этой учетной записи истек срок действия авторизации.';
+z.string.ru.authErrorSignIn = 'Пожалуйста, проверьте ваши данные\nи попробуйте еще раз.';
 
 z.string.ru.callStateOutgoing = 'Звонит…';
 z.string.ru.callStateConnecting = 'Подключение…';

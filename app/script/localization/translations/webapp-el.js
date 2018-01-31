@@ -49,30 +49,30 @@ z.string.el.authVerifyCodeDescription = 'Εισάγετε τον κωδικό ε
 z.string.el.authVerifyCodeResend = 'Δεν εμφανίζεται ο κωδικός;';
 z.string.el.authVerifyCodeResendDetail = 'Επαναποστολή';
 z.string.el.authVerifyCodeResendTimer = 'Μπορείτε να ζητήσετε νέο κωδικό {{expiration}}.';
-z.string.el.auth_verify_code_change_phone = 'Αλλαγή αριθμού τηλεφώνου';
-z.string.el.auth_verify_password_headline = 'Εισάγετε τον κωδικό σας';
+z.string.el.authVerifyCodeChangePhone = 'Αλλαγή αριθμού τηλεφώνου';
+z.string.el.authVerifyPasswordHeadline = 'Εισάγετε τον κωδικό σας';
 
-z.string.el.auth_limit_devices_headline = 'Συσκευές';
-z.string.el.auth_limit_description = 'Αφαιρέστε μία από τις άλλες συσκευές σας για να αρχίσετε να χρησιμοποιείτε το Wire σε αυτήν.';
-z.string.el.auth_limit_button_manage = 'Διαχείριση συσκευών';
-z.string.el.auth_limit_button_sign_out = 'Αποσύνδεση';
-z.string.el.auth_limit_devices_current = '(Τρέχουσα)';
+z.string.el.authLimitDevicesHeadline = 'Συσκευές';
+z.string.el.authLimitDescription = 'Αφαιρέστε μία από τις άλλες συσκευές σας για να αρχίσετε να χρησιμοποιείτε το Wire σε αυτήν.';
+z.string.el.authLimitButtonManage = 'Διαχείριση συσκευών';
+z.string.el.authLimitButtonSignOut = 'Αποσύνδεση';
+z.string.el.authLimitDevicesCurrent = '(Τρέχουσα)';
 
-z.string.el.auth_history_headline = 'Είναι η πρώτη φορά που χρησιμοποιείτε το Wire σε αυτήν τη συσκευή.';
-z.string.el.auth_history_description = 'Για λόγους απορρήτου, το ιστορικό συνομιλιών σας δεν θα εμφανίζεται εδώ.';
-z.string.el.auth_history_reuse_headline = 'Έχετε χρησιμοποιήσει ξανά το Wire σε αυτήν την συσκευή.';
-z.string.el.auth_history_reuse_description = 'Τα μηνύματα που αποστέλλονται  την ίδια στιγμή δεν θα εμφανίζονται εδώ.';
-z.string.el.auth_history_button = 'Εντάξει';
+z.string.el.authHistoryHeadline = 'Είναι η πρώτη φορά που χρησιμοποιείτε το Wire σε αυτήν τη συσκευή.';
+z.string.el.authHistoryDescription = 'Για λόγους απορρήτου, το ιστορικό συνομιλιών σας δεν θα εμφανίζεται εδώ.';
+z.string.el.authHistoryReuseHeadline = 'Έχετε χρησιμοποιήσει ξανά το Wire σε αυτήν την συσκευή.';
+z.string.el.authHistoryReuseDescription = 'Τα μηνύματα που αποστέλλονται  την ίδια στιγμή δεν θα εμφανίζονται εδώ.';
+z.string.el.authHistoryButton = 'Εντάξει';
 
-z.string.el.auth_posted_resend = 'Επαναποστολή σε {{email}}';
-z.string.el.auth_posted_resend_action = 'Δεν εμφανίζεται το email;';
-z.string.el.auth_posted_resend_detail = 'Ελέγξτε τα email σας και ακολουθήστε τις οδηγίες που θα βρείτε.';
-z.string.el.auth_posted_resend_headline = 'Έχετε μήνυμα.';
+z.string.el.authPostedResend = 'Επαναποστολή σε {{email}}';
+z.string.el.authPostedResendAction = 'Δεν εμφανίζεται το email;';
+z.string.el.authPostedResendDetail = 'Ελέγξτε τα email σας και ακολουθήστε τις οδηγίες που θα βρείτε.';
+z.string.el.authPostedResendHeadline = 'Έχετε μήνυμα.';
 
-z.string.el.auth_placeholder_email = 'Email';
-z.string.el.auth_placeholder_password_put = 'Κωδικός Πρόσβασης';
-z.string.el.auth_placeholder_password_set = 'Κωδικος προσβασης (το λιγοτερο 8 χαρακτηρες)';
-z.string.el.auth_placeholder_phone = 'Αριθμός Κινητού Τηλεφώνου';
+z.string.el.authPlaceholderEmail = 'Email';
+z.string.el.authPlaceholderPasswordPut = 'Κωδικός Πρόσβασης';
+z.string.el.authPlaceholderPasswordSet = 'Κωδικος προσβασης (το λιγοτερο 8 χαρακτηρες)';
+z.string.el.authPlaceholderPhone = 'Αριθμός Κινητού Τηλεφώνου';
 
 z.string.el.authErrorCode = 'Μη έγκυρος κωδικός';
 z.string.el.authErrorCountryCodeInvalid = 'Μη έγκυρος κωδικός χώρας';
@@ -89,8 +89,8 @@ z.string.el.authErrorPhoneNumberBudget = 'Έχετε συνδεθεί πολλέ
 z.string.el.authErrorPhoneNumberForbidden = 'Λυπούμαστε. Αυτός ο αριθμός τηλεφώνου δεν είναι επιτρεπτός.';
 z.string.el.authErrorPhoneNumberInvalid = 'Μη έγκυρος αριθμός τηλεφώνου';
 z.string.el.authErrorPhoneNumberUnknown = 'Άγνωστος αριθμός τηλεφώνου';
-z.string.el.auth_error_suspended = 'Αυτός ο λογαριασμός δεν είναι πλέον εξουσιοδοτημένος για σύνδεση.';
-z.string.el.auth_error_sign_in = 'Παρακαλούμε επιβεβαιώστε τα στοιχεία σας και προσπαθήστε ξανά.';
+z.string.el.authErrorSuspended = 'Αυτός ο λογαριασμός δεν είναι πλέον εξουσιοδοτημένος για σύνδεση.';
+z.string.el.authErrorSignIn = 'Παρακαλούμε επιβεβαιώστε τα στοιχεία σας και προσπαθήστε ξανά.';
 
 z.string.el.callStateOutgoing = 'Καλεί…';
 z.string.el.callStateConnecting = 'Συνδέεται…';

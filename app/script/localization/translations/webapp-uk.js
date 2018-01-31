@@ -49,30 +49,30 @@ z.string.uk.authVerifyCodeDescription = 'Введіть код верифіка�
 z.string.uk.authVerifyCodeResend = 'SMS так і не прийшло?';
 z.string.uk.authVerifyCodeResendDetail = 'Надіслати ще раз';
 z.string.uk.authVerifyCodeResendTimer = 'Ви можете надіслати запит запит на новий код {{expiration}}.';
-z.string.uk.auth_verify_code_change_phone = 'Змінити номер телефону';
-z.string.uk.auth_verify_password_headline = 'Введіть свій пароль';
+z.string.uk.authVerifyCodeChangePhone = 'Змінити номер телефону';
+z.string.uk.authVerifyPasswordHeadline = 'Введіть свій пароль';
 
-z.string.uk.auth_limit_devices_headline = 'Пристрої';
-z.string.uk.auth_limit_description = 'Видаліть один з ваших пристроїв, щоб почати використовувати Wire на цьому.';
-z.string.uk.auth_limit_button_manage = 'Керування пристроями';
-z.string.uk.auth_limit_button_sign_out = 'Вийти';
-z.string.uk.auth_limit_devices_current = '(Поточний)';
+z.string.uk.authLimitDevicesHeadline = 'Пристрої';
+z.string.uk.authLimitDescription = 'Видаліть один з ваших пристроїв, щоб почати використовувати Wire на цьому.';
+z.string.uk.authLimitButtonManage = 'Керування пристроями';
+z.string.uk.authLimitButtonSignOut = 'Вийти';
+z.string.uk.authLimitDevicesCurrent = '(Поточний)';
 
-z.string.uk.auth_history_headline = 'Це перший раз, коли ви використовуєте Wire на цьому пристрої.';
-z.string.uk.auth_history_description = 'З міркувань конфіденційності, історія ваших розмов тут не показується.';
-z.string.uk.auth_history_reuse_headline = 'Ви уже використовували Wire на цьому пристрої раніше.';
-z.string.uk.auth_history_reuse_description = 'Повідомлення, надіслані в той час, коли ви вийшли з Wire, не відображатимуться.';
-z.string.uk.auth_history_button = 'OK';
+z.string.uk.authHistoryHeadline = 'Це перший раз, коли ви використовуєте Wire на цьому пристрої.';
+z.string.uk.authHistoryDescription = 'З міркувань конфіденційності, історія ваших розмов тут не показується.';
+z.string.uk.authHistoryReuseHeadline = 'Ви уже використовували Wire на цьому пристрої раніше.';
+z.string.uk.authHistoryReuseDescription = 'Повідомлення, надіслані в той час, коли ви вийшли з Wire, не відображатимуться.';
+z.string.uk.authHistoryButton = 'OK';
 
-z.string.uk.auth_posted_resend = 'Надіслати повторно на {{email}}';
-z.string.uk.auth_posted_resend_action = 'Не показується email?';
-z.string.uk.auth_posted_resend_detail = 'Перевірте вашу поштову скриньку і дотримуйтесь надісланих інструкцій.';
-z.string.uk.auth_posted_resend_headline = 'Ви отримали нового листа.';
+z.string.uk.authPostedResend = 'Надіслати повторно на {{email}}';
+z.string.uk.authPostedResendAction = 'Не показується email?';
+z.string.uk.authPostedResendDetail = 'Перевірте вашу поштову скриньку і дотримуйтесь надісланих інструкцій.';
+z.string.uk.authPostedResendHeadline = 'Ви отримали нового листа.';
 
-z.string.uk.auth_placeholder_email = 'Email';
-z.string.uk.auth_placeholder_password_put = 'Пароль';
-z.string.uk.auth_placeholder_password_set = 'Пароль (не менше 8 символів)';
-z.string.uk.auth_placeholder_phone = 'Номер телефону';
+z.string.uk.authPlaceholderEmail = 'Email';
+z.string.uk.authPlaceholderPasswordPut = 'Пароль';
+z.string.uk.authPlaceholderPasswordSet = 'Пароль (не менше 8 символів)';
+z.string.uk.authPlaceholderPhone = 'Номер телефону';
 
 z.string.uk.authErrorCode = 'Невірний код';
 z.string.uk.authErrorCountryCodeInvalid = 'Невірний код країни';
@@ -90,8 +90,8 @@ z.string.uk.authErrorPhoneNumberBudget = 'Ви входите в систему 
 z.string.uk.authErrorPhoneNumberForbidden = 'Вибачте. Використання цього номеру телефону заборонено.';
 z.string.uk.authErrorPhoneNumberInvalid = 'Невірний номер телефону';
 z.string.uk.authErrorPhoneNumberUnknown = 'Невідомий номер телефону';
-z.string.uk.auth_error_suspended = 'Даний акаунт був заблокований.';
-z.string.uk.auth_error_sign_in = 'Будь ласка, перевірте ваші дані та повторіть спробу.';
+z.string.uk.authErrorSuspended = 'Даний акаунт був заблокований.';
+z.string.uk.authErrorSignIn = 'Будь ласка, перевірте ваші дані та повторіть спробу.';
 
 z.string.uk.callStateOutgoing = 'Дзвінок…';
 z.string.uk.callStateConnecting = 'Підключення…';

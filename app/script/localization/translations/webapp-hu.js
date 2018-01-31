@@ -50,30 +50,30 @@ z.string.hu.authVerifyCodeDescription = 'Írd be az ellenőrző kódot,\namit a 
 z.string.hu.authVerifyCodeResend = 'Nem kaptál kódot?';
 z.string.hu.authVerifyCodeResendDetail = 'Újraküldés';
 z.string.hu.authVerifyCodeResendTimer = 'Új kódot kérhetsz {{expiration}} múlva.';
-z.string.hu.auth_verify_code_change_phone = 'Telefonszám módosítása';
-z.string.hu.auth_verify_password_headline = 'Add meg a jelszavad';
+z.string.hu.authVerifyCodeChangePhone = 'Telefonszám módosítása';
+z.string.hu.authVerifyPasswordHeadline = 'Add meg a jelszavad';
 
-z.string.hu.auth_limit_devices_headline = 'Eszközök';
-z.string.hu.auth_limit_description = 'Ahhoz, hogy használni tudd a Wire-t ezen az eszközön, először távolítsd el azt valamelyik másikról.';
-z.string.hu.auth_limit_button_manage = 'Eszközök kezelése';
-z.string.hu.auth_limit_button_sign_out = 'Kijelentkezés';
-z.string.hu.auth_limit_devices_current = '(Ez az eszköz)';
+z.string.hu.authLimitDevicesHeadline = 'Eszközök';
+z.string.hu.authLimitDescription = 'Ahhoz, hogy használni tudd a Wire-t ezen az eszközön, először távolítsd el azt valamelyik másikról.';
+z.string.hu.authLimitButtonManage = 'Eszközök kezelése';
+z.string.hu.authLimitButtonSignOut = 'Kijelentkezés';
+z.string.hu.authLimitDevicesCurrent = '(Ez az eszköz)';
 
-z.string.hu.auth_history_headline = 'Első alkalommal használod a Wire-t ezen az eszközön.';
-z.string.hu.auth_history_description = 'Adatvédelmi okokból a beszélgetés előzményei nem jelennek meg.';
-z.string.hu.auth_history_reuse_headline = 'Már használtad a Wire-t ezen az eszközön.';
-z.string.hu.auth_history_reuse_description = 'Az előző használat óta elküldött üzenetek ezen az eszközön nem fognak megjelenni.';
-z.string.hu.auth_history_button = 'OK';
+z.string.hu.authHistoryHeadline = 'Első alkalommal használod a Wire-t ezen az eszközön.';
+z.string.hu.authHistoryDescription = 'Adatvédelmi okokból a beszélgetés előzményei nem jelennek meg.';
+z.string.hu.authHistoryReuseHeadline = 'Már használtad a Wire-t ezen az eszközön.';
+z.string.hu.authHistoryReuseDescription = 'Az előző használat óta elküldött üzenetek ezen az eszközön nem fognak megjelenni.';
+z.string.hu.authHistoryButton = 'OK';
 
-z.string.hu.auth_posted_resend = 'Újraküldés ide: {{email}}';
-z.string.hu.auth_posted_resend_action = 'Nem kaptál e-mailt?';
-z.string.hu.auth_posted_resend_detail = 'Ellenőrizd bejövő e-mailjeidet és kövesd az utasításokat.';
-z.string.hu.auth_posted_resend_headline = 'Leveled érkezett.';
+z.string.hu.authPostedResend = 'Újraküldés ide: {{email}}';
+z.string.hu.authPostedResendAction = 'Nem kaptál e-mailt?';
+z.string.hu.authPostedResendDetail = 'Ellenőrizd bejövő e-mailjeidet és kövesd az utasításokat.';
+z.string.hu.authPostedResendHeadline = 'Leveled érkezett.';
 
-z.string.hu.auth_placeholder_email = 'E-mail';
-z.string.hu.auth_placeholder_password_put = 'Jelszó';
-z.string.hu.auth_placeholder_password_set = 'Jelszó (legalább 8 karakter)';
-z.string.hu.auth_placeholder_phone = 'Telefonszám';
+z.string.hu.authPlaceholderEmail = 'E-mail';
+z.string.hu.authPlaceholderPasswordPut = 'Jelszó';
+z.string.hu.authPlaceholderPasswordSet = 'Jelszó (legalább 8 karakter)';
+z.string.hu.authPlaceholderPhone = 'Telefonszám';
 
 z.string.hu.authErrorCode = 'Érvénytelen kód';
 z.string.hu.authErrorCountryCodeInvalid = 'Érvénytelen az Országhívó-kód';
@@ -91,8 +91,8 @@ z.string.hu.authErrorPhoneNumberBudget = 'Túl gyakran jelentkeztél be. Próbá
 z.string.hu.authErrorPhoneNumberForbidden = 'Sajnáljuk. Ez a telefonszám nem megengedett.';
 z.string.hu.authErrorPhoneNumberInvalid = 'Érvénytelen telefonszám';
 z.string.hu.authErrorPhoneNumberUnknown = 'Ismeretlen telefonszám';
-z.string.hu.auth_error_suspended = 'Ezzel az azonosítóval már nem lehet bejelentkezni.';
-z.string.hu.auth_error_sign_in = 'Kérjük, ellenőrizd az adataid, majd próbáld meg újra.';
+z.string.hu.authErrorSuspended = 'Ezzel az azonosítóval már nem lehet bejelentkezni.';
+z.string.hu.authErrorSignIn = 'Kérjük, ellenőrizd az adataid, majd próbáld meg újra.';
 
 z.string.hu.callStateOutgoing = 'Kicsengés…';
 z.string.hu.callStateConnecting = 'Csatlakozás…';

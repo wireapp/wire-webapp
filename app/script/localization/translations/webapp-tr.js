@@ -49,30 +49,30 @@ z.string.tr.authVerifyCodeDescription = '{{number}} gönderdiğimiz doğrulama k
 z.string.tr.authVerifyCodeResend = 'Kod gelmedi mi?';
 z.string.tr.authVerifyCodeResendDetail = 'Tekrar gönder';
 z.string.tr.authVerifyCodeResendTimer = '{{expiration}} içerisinde yeni bir kod isteyebilirsiniz.';
-z.string.tr.auth_verify_code_change_phone = 'Telefon numarasını değiştir';
-z.string.tr.auth_verify_password_headline = 'Şifrenizi girin';
+z.string.tr.authVerifyCodeChangePhone = 'Telefon numarasını değiştir';
+z.string.tr.authVerifyPasswordHeadline = 'Şifrenizi girin';
 
-z.string.tr.auth_limit_devices_headline = 'Cihazlar';
-z.string.tr.auth_limit_description = 'Bu cihazda Wire’ı kullanabilmek için diğer cihazlarınızdan birini kaldırınız.';
-z.string.tr.auth_limit_button_manage = 'Cihazları yönet';
-z.string.tr.auth_limit_button_sign_out = 'Çıkış yap';
-z.string.tr.auth_limit_devices_current = '(Mevcut)';
+z.string.tr.authLimitDevicesHeadline = 'Cihazlar';
+z.string.tr.authLimitDescription = 'Bu cihazda Wire’ı kullanabilmek için diğer cihazlarınızdan birini kaldırınız.';
+z.string.tr.authLimitButtonManage = 'Cihazları yönet';
+z.string.tr.authLimitButtonSignOut = 'Çıkış yap';
+z.string.tr.authLimitDevicesCurrent = '(Mevcut)';
 
-z.string.tr.auth_history_headline = 'Wire’ı bu cihazda ilk kez kullanıyorsunuz.';
-z.string.tr.auth_history_description = 'Gizlilik sebeplerinden ötürü, mesaj geçmişiniz burada gösterilmemektedir.';
-z.string.tr.auth_history_reuse_headline = 'Bu cihazdan daha önce Wire kullanmışsınız.';
-z.string.tr.auth_history_reuse_description = 'Bu sırada gönderilen mesajlar burada görünmeyecektir.';
-z.string.tr.auth_history_button = 'TAMAM';
+z.string.tr.authHistoryHeadline = 'Wire’ı bu cihazda ilk kez kullanıyorsunuz.';
+z.string.tr.authHistoryDescription = 'Gizlilik sebeplerinden ötürü, mesaj geçmişiniz burada gösterilmemektedir.';
+z.string.tr.authHistoryReuseHeadline = 'Bu cihazdan daha önce Wire kullanmışsınız.';
+z.string.tr.authHistoryReuseDescription = 'Bu sırada gönderilen mesajlar burada görünmeyecektir.';
+z.string.tr.authHistoryButton = 'TAMAM';
 
-z.string.tr.auth_posted_resend = '{{email}}’a tekrar gönder';
-z.string.tr.auth_posted_resend_action = 'E-posta gelmedi mi?';
-z.string.tr.auth_posted_resend_detail = 'E-posta gelen kutunuzu kontrol edin ve talimatları izleyin.';
-z.string.tr.auth_posted_resend_headline = 'E-posta geldi.';
+z.string.tr.authPostedResend = '{{email}}’a tekrar gönder';
+z.string.tr.authPostedResendAction = 'E-posta gelmedi mi?';
+z.string.tr.authPostedResendDetail = 'E-posta gelen kutunuzu kontrol edin ve talimatları izleyin.';
+z.string.tr.authPostedResendHeadline = 'E-posta geldi.';
 
-z.string.tr.auth_placeholder_email = 'E-posta';
-z.string.tr.auth_placeholder_password_put = 'Şifre';
-z.string.tr.auth_placeholder_password_set = 'Şifre (en az 8 karakter)';
-z.string.tr.auth_placeholder_phone = 'Telefon Numarası';
+z.string.tr.authPlaceholderEmail = 'E-posta';
+z.string.tr.authPlaceholderPasswordPut = 'Şifre';
+z.string.tr.authPlaceholderPasswordSet = 'Şifre (en az 8 karakter)';
+z.string.tr.authPlaceholderPhone = 'Telefon Numarası';
 
 z.string.tr.authErrorCode = 'Geçersiz Kod';
 z.string.tr.authErrorCountryCodeInvalid = 'Geçersiz Ülke Kodu';
@@ -90,8 +90,8 @@ z.string.tr.authErrorPhoneNumberBudget = 'Çok sık giriş yaptınız. Tekrardan
 z.string.tr.authErrorPhoneNumberForbidden = 'Üzgünüz. Bu telefon numarası yasaklı.';
 z.string.tr.authErrorPhoneNumberInvalid = 'Geçersiz Telefon Numarası';
 z.string.tr.authErrorPhoneNumberUnknown = 'Bilinmeyen Telefon Numarası';
-z.string.tr.auth_error_suspended = 'Bu hesap artık giriş yapmak için yeterli yetkiye sahip değil.';
-z.string.tr.auth_error_sign_in = 'Lütfen bilgilerinizi doğrulayıp öyle tekrar deneyiniz.';
+z.string.tr.authErrorSuspended = 'Bu hesap artık giriş yapmak için yeterli yetkiye sahip değil.';
+z.string.tr.authErrorSignIn = 'Lütfen bilgilerinizi doğrulayıp öyle tekrar deneyiniz.';
 
 z.string.tr.callStateOutgoing = 'Çalıyor…';
 z.string.tr.callStateConnecting = 'Bağlanıyor…';

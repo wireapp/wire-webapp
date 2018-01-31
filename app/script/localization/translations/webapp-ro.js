@@ -50,30 +50,30 @@ z.string.ro.authVerifyCodeDescription = 'Introdu codul de verificare\nl-am trimi
 z.string.ro.authVerifyCodeResend = 'Nu e afișat niciun cod?';
 z.string.ro.authVerifyCodeResendDetail = 'Retrimite';
 z.string.ro.authVerifyCodeResendTimer = 'Poți cere un nou cod de {{expiration}}.';
-z.string.ro.auth_verify_code_change_phone = 'Schimbă numărul de telefon';
-z.string.ro.auth_verify_password_headline = 'Introdu parola ta';
+z.string.ro.authVerifyCodeChangePhone = 'Schimbă numărul de telefon';
+z.string.ro.authVerifyPasswordHeadline = 'Introdu parola ta';
 
-z.string.ro.auth_limit_devices_headline = 'Dispozitive';
-z.string.ro.auth_limit_description = 'Șterge unul din celelalte dispozitive pentru a folosi Wire pe acesta.';
-z.string.ro.auth_limit_button_manage = 'Gestionare dispozitive';
-z.string.ro.auth_limit_button_sign_out = 'Deconectare';
-z.string.ro.auth_limit_devices_current = '(Curent)';
+z.string.ro.authLimitDevicesHeadline = 'Dispozitive';
+z.string.ro.authLimitDescription = 'Șterge unul din celelalte dispozitive pentru a folosi Wire pe acesta.';
+z.string.ro.authLimitButtonManage = 'Gestionare dispozitive';
+z.string.ro.authLimitButtonSignOut = 'Deconectare';
+z.string.ro.authLimitDevicesCurrent = '(Curent)';
 
-z.string.ro.auth_history_headline = 'Folosești Wire pentru prima dată pe acest dispozitiv.';
-z.string.ro.auth_history_description = 'Din motive de confidențialitate, istoricul conversației nu va apărea aici.';
-z.string.ro.auth_history_reuse_headline = 'Ai mai folosit Wire pe acest dispozitiv.';
-z.string.ro.auth_history_reuse_description = 'Mesajele trimise între timp nu vor apărea aici.';
-z.string.ro.auth_history_button = 'OK';
+z.string.ro.authHistoryHeadline = 'Folosești Wire pentru prima dată pe acest dispozitiv.';
+z.string.ro.authHistoryDescription = 'Din motive de confidențialitate, istoricul conversației nu va apărea aici.';
+z.string.ro.authHistoryReuseHeadline = 'Ai mai folosit Wire pe acest dispozitiv.';
+z.string.ro.authHistoryReuseDescription = 'Mesajele trimise între timp nu vor apărea aici.';
+z.string.ro.authHistoryButton = 'OK';
 
-z.string.ro.auth_posted_resend = 'Retrimite la {{email}}';
-z.string.ro.auth_posted_resend_action = 'Nu a apărut nici un e-mail?';
-z.string.ro.auth_posted_resend_detail = 'Verifică e-mailul și urmează instrucțiunile.';
-z.string.ro.auth_posted_resend_headline = 'Ai primit un mesaj.';
+z.string.ro.authPostedResend = 'Retrimite la {{email}}';
+z.string.ro.authPostedResendAction = 'Nu a apărut nici un e-mail?';
+z.string.ro.authPostedResendDetail = 'Verifică e-mailul și urmează instrucțiunile.';
+z.string.ro.authPostedResendHeadline = 'Ai primit un mesaj.';
 
-z.string.ro.auth_placeholder_email = 'E-mail';
-z.string.ro.auth_placeholder_password_put = 'Parolă';
-z.string.ro.auth_placeholder_password_set = 'Parolă (minim 8 caractere)';
-z.string.ro.auth_placeholder_phone = 'Număr de telefon';
+z.string.ro.authPlaceholderEmail = 'E-mail';
+z.string.ro.authPlaceholderPasswordPut = 'Parolă';
+z.string.ro.authPlaceholderPasswordSet = 'Parolă (minim 8 caractere)';
+z.string.ro.authPlaceholderPhone = 'Număr de telefon';
 
 z.string.ro.authErrorCode = 'Cod nevalid';
 z.string.ro.authErrorCountryCodeInvalid = 'Cod de țară nevalid';
@@ -91,8 +91,8 @@ z.string.ro.authErrorPhoneNumberBudget = 'Te conectezi prea des. Încearcă din 
 z.string.ro.authErrorPhoneNumberForbidden = 'Ne pare rău. Acest număr de telefon este interzis.';
 z.string.ro.authErrorPhoneNumberInvalid = 'Număr de telefon nevalid';
 z.string.ro.authErrorPhoneNumberUnknown = 'Număr de telefon necunoscut';
-z.string.ro.auth_error_suspended = 'Acest cont nu mai este autorizat pentru autentificare.';
-z.string.ro.auth_error_sign_in = 'Te rugăm să verifici detaliile și să reîncerci.';
+z.string.ro.authErrorSuspended = 'Acest cont nu mai este autorizat pentru autentificare.';
+z.string.ro.authErrorSignIn = 'Te rugăm să verifici detaliile și să reîncerci.';
 
 z.string.ro.callStateOutgoing = 'Se sună…';
 z.string.ro.callStateConnecting = 'Se conectează…';

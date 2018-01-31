@@ -50,30 +50,30 @@ z.string.sk.authVerifyCodeDescription = 'Zadajte overovací kód, ktorý sme zas
 z.string.sk.authVerifyCodeResend = 'Žiadny kód sa neukázal?';
 z.string.sk.authVerifyCodeResendDetail = 'Poslať znovu';
 z.string.sk.authVerifyCodeResendTimer = 'Môžete požiadať o nový kód {{expiration}}.';
-z.string.sk.auth_verify_code_change_phone = 'Zmeniť telefónne číslo';
-z.string.sk.auth_verify_password_headline = 'Zadajte Vaše heslo';
+z.string.sk.authVerifyCodeChangePhone = 'Zmeniť telefónne číslo';
+z.string.sk.authVerifyPasswordHeadline = 'Zadajte Vaše heslo';
 
-z.string.sk.auth_limit_devices_headline = 'Zariadenia';
-z.string.sk.auth_limit_description = 'Odstráňte jedno z Vašich iných zariadení aby ste mohli používať Wire na tomto.';
-z.string.sk.auth_limit_button_manage = 'Správa zariadení';
-z.string.sk.auth_limit_button_sign_out = 'Odhlásenie';
-z.string.sk.auth_limit_devices_current = '(Aktuálne)';
+z.string.sk.authLimitDevicesHeadline = 'Zariadenia';
+z.string.sk.authLimitDescription = 'Odstráňte jedno z Vašich iných zariadení aby ste mohli používať Wire na tomto.';
+z.string.sk.authLimitButtonManage = 'Správa zariadení';
+z.string.sk.authLimitButtonSignOut = 'Odhlásenie';
+z.string.sk.authLimitDevicesCurrent = '(Aktuálne)';
 
-z.string.sk.auth_history_headline = 'Je to prvýkrát čo používate Wire na tomto zariadení.';
-z.string.sk.auth_history_description = 'Z dôvodu ochrany osobných údajov sa tu Vaše rozhovory nezobrazia.';
-z.string.sk.auth_history_reuse_headline = 'Použili ste Wire na tomto zariadení.';
-z.string.sk.auth_history_reuse_description = 'Medzičasom odoslané správy sa tu nezobrazia.';
-z.string.sk.auth_history_button = 'OK';
+z.string.sk.authHistoryHeadline = 'Je to prvýkrát čo používate Wire na tomto zariadení.';
+z.string.sk.authHistoryDescription = 'Z dôvodu ochrany osobných údajov sa tu Vaše rozhovory nezobrazia.';
+z.string.sk.authHistoryReuseHeadline = 'Použili ste Wire na tomto zariadení.';
+z.string.sk.authHistoryReuseDescription = 'Medzičasom odoslané správy sa tu nezobrazia.';
+z.string.sk.authHistoryButton = 'OK';
 
-z.string.sk.auth_posted_resend = 'Znovu odoslať na {{email}}';
-z.string.sk.auth_posted_resend_action = 'Žiadny e-mail sa nezobrazil?';
-z.string.sk.auth_posted_resend_detail = 'Skontrolujte Vašu e-mailovú schránku a postupujte podľa pokynov.';
-z.string.sk.auth_posted_resend_headline = 'Máte e-mail.';
+z.string.sk.authPostedResend = 'Znovu odoslať na {{email}}';
+z.string.sk.authPostedResendAction = 'Žiadny e-mail sa nezobrazil?';
+z.string.sk.authPostedResendDetail = 'Skontrolujte Vašu e-mailovú schránku a postupujte podľa pokynov.';
+z.string.sk.authPostedResendHeadline = 'Máte e-mail.';
 
-z.string.sk.auth_placeholder_email = 'E-mail';
-z.string.sk.auth_placeholder_password_put = 'Heslo';
-z.string.sk.auth_placeholder_password_set = 'Heslo (minimálne 8 znakov)';
-z.string.sk.auth_placeholder_phone = 'Telefónne číslo';
+z.string.sk.authPlaceholderEmail = 'E-mail';
+z.string.sk.authPlaceholderPasswordPut = 'Heslo';
+z.string.sk.authPlaceholderPasswordSet = 'Heslo (minimálne 8 znakov)';
+z.string.sk.authPlaceholderPhone = 'Telefónne číslo';
 
 z.string.sk.authErrorCode = 'Neplatný kód';
 z.string.sk.authErrorCountryCodeInvalid = 'Neplatný kód krajiny';
@@ -90,8 +90,8 @@ z.string.sk.authErrorPhoneNumberBudget = 'Prihlasujete sa príliš často. Skús
 z.string.sk.authErrorPhoneNumberForbidden = 'Prepáčte. Toto telefónne číslo je zakázané.';
 z.string.sk.authErrorPhoneNumberInvalid = 'Neplatné telefónne číslo';
 z.string.sk.authErrorPhoneNumberUnknown = 'Neznáme telefónne číslo';
-z.string.sk.auth_error_suspended = 'Toto konto už nemá povolené prihlásenie.';
-z.string.sk.auth_error_sign_in = 'Prosím, skontrolujte svoje údaje a skúste to znova.';
+z.string.sk.authErrorSuspended = 'Toto konto už nemá povolené prihlásenie.';
+z.string.sk.authErrorSignIn = 'Prosím, skontrolujte svoje údaje a skúste to znova.';
 
 z.string.sk.callStateOutgoing = 'Zvoní…';
 z.string.sk.callStateConnecting = 'Pripájanie…';

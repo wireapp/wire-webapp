@@ -50,30 +50,30 @@ z.string.fr.authVerifyCodeDescription = 'Saisissez le code de vérification que 
 z.string.fr.authVerifyCodeResend = 'Pas de code à l’horizon ?';
 z.string.fr.authVerifyCodeResendDetail = 'Renvoyer';
 z.string.fr.authVerifyCodeResendTimer = 'Vous pourrez demander un nouveau code {{expiration}}.';
-z.string.fr.auth_verify_code_change_phone = 'Changer le numéro de téléphone';
-z.string.fr.auth_verify_password_headline = 'Saisissez votre mot de passe';
+z.string.fr.authVerifyCodeChangePhone = 'Changer le numéro de téléphone';
+z.string.fr.authVerifyPasswordHeadline = 'Saisissez votre mot de passe';
 
-z.string.fr.auth_limit_devices_headline = 'Appareils';
-z.string.fr.auth_limit_description = 'Supprimez un de vos autres appareils pour commencer à utiliser Wire sur celui-ci.';
-z.string.fr.auth_limit_button_manage = 'Gérer les appareils';
-z.string.fr.auth_limit_button_sign_out = 'Se déconnecter';
-z.string.fr.auth_limit_devices_current = '(actuel)';
+z.string.fr.authLimitDevicesHeadline = 'Appareils';
+z.string.fr.authLimitDescription = 'Supprimez un de vos autres appareils pour commencer à utiliser Wire sur celui-ci.';
+z.string.fr.authLimitButtonManage = 'Gérer les appareils';
+z.string.fr.authLimitButtonSignOut = 'Se déconnecter';
+z.string.fr.authLimitDevicesCurrent = '(actuel)';
 
-z.string.fr.auth_history_headline = 'C’est la première fois que vous utilisez Wire sur cet appareil.';
-z.string.fr.auth_history_description = 'Pour des raisons de confidentialité, votre historique de conversation n’apparaîtra pas ici.';
-z.string.fr.auth_history_reuse_headline = 'Vous avez déjà utilisé Wire sur cet appareil.';
-z.string.fr.auth_history_reuse_description = 'Les messages envoyés entre-temps n’apparaîtront pas ici.';
-z.string.fr.auth_history_button = 'OK';
+z.string.fr.authHistoryHeadline = 'C’est la première fois que vous utilisez Wire sur cet appareil.';
+z.string.fr.authHistoryDescription = 'Pour des raisons de confidentialité, votre historique de conversation n’apparaîtra pas ici.';
+z.string.fr.authHistoryReuseHeadline = 'Vous avez déjà utilisé Wire sur cet appareil.';
+z.string.fr.authHistoryReuseDescription = 'Les messages envoyés entre-temps n’apparaîtront pas ici.';
+z.string.fr.authHistoryButton = 'OK';
 
-z.string.fr.auth_posted_resend = 'Renvoyer à {{email}}';
-z.string.fr.auth_posted_resend_action = 'Aucun e-mail à l’horizon ?';
-z.string.fr.auth_posted_resend_detail = 'Vérifiez votre boîte de réception et suivez les instructions.';
-z.string.fr.auth_posted_resend_headline = 'Vous avez du courrier.';
+z.string.fr.authPostedResend = 'Renvoyer à {{email}}';
+z.string.fr.authPostedResendAction = 'Aucun e-mail à l’horizon ?';
+z.string.fr.authPostedResendDetail = 'Vérifiez votre boîte de réception et suivez les instructions.';
+z.string.fr.authPostedResendHeadline = 'Vous avez du courrier.';
 
-z.string.fr.auth_placeholder_email = 'E-mail';
-z.string.fr.auth_placeholder_password_put = 'Mot de passe';
-z.string.fr.auth_placeholder_password_set = 'Mot de passe (8 caractères minimum)';
-z.string.fr.auth_placeholder_phone = 'Numéro de téléphone';
+z.string.fr.authPlaceholderEmail = 'E-mail';
+z.string.fr.authPlaceholderPasswordPut = 'Mot de passe';
+z.string.fr.authPlaceholderPasswordSet = 'Mot de passe (8 caractères minimum)';
+z.string.fr.authPlaceholderPhone = 'Numéro de téléphone';
 
 z.string.fr.authErrorCode = 'Code invalide';
 z.string.fr.authErrorCountryCodeInvalid = 'Indicatif du pays invalide';
@@ -91,8 +91,8 @@ z.string.fr.authErrorPhoneNumberBudget = 'Vous vous êtes connecté trop souvent
 z.string.fr.authErrorPhoneNumberForbidden = 'Désolé. Ce numéro de téléphone est banni.';
 z.string.fr.authErrorPhoneNumberInvalid = 'Numéro de téléphone non valide';
 z.string.fr.authErrorPhoneNumberUnknown = 'Numéro de téléphone inconnu';
-z.string.fr.auth_error_suspended = 'Ce compte n’est plus autorisé à se connecter.';
-z.string.fr.auth_error_sign_in = 'Veuillez vérifier vos informations et réessayez.';
+z.string.fr.authErrorSuspended = 'Ce compte n’est plus autorisé à se connecter.';
+z.string.fr.authErrorSignIn = 'Veuillez vérifier vos informations et réessayez.';
 
 z.string.fr.callStateOutgoing = 'Sonnerie…';
 z.string.fr.callStateConnecting = 'Connexion…';

@@ -50,30 +50,30 @@ z.string.nl.authVerifyCodeDescription = 'Voer de verificatiecode in die\nwe naar
 z.string.nl.authVerifyCodeResend = 'Geen code ontvangen?';
 z.string.nl.authVerifyCodeResendDetail = 'Opnieuw sturen';
 z.string.nl.authVerifyCodeResendTimer = 'Je kunt een nieuwe code aanvragen {{expiration}}.';
-z.string.nl.auth_verify_code_change_phone = 'Telefoonnummer wijzigen';
-z.string.nl.auth_verify_password_headline = 'Voer je wachtwoord in';
+z.string.nl.authVerifyCodeChangePhone = 'Telefoonnummer wijzigen';
+z.string.nl.authVerifyPasswordHeadline = 'Voer je wachtwoord in';
 
-z.string.nl.auth_limit_devices_headline = 'Apparaten';
-z.string.nl.auth_limit_description = 'Verwijder een van je andere apparaten om Wire op dit apparaat te gebruiken.';
-z.string.nl.auth_limit_button_manage = 'Beheer apparaten';
-z.string.nl.auth_limit_button_sign_out = 'Uitloggen';
-z.string.nl.auth_limit_devices_current = '(Huidig)';
+z.string.nl.authLimitDevicesHeadline = 'Apparaten';
+z.string.nl.authLimitDescription = 'Verwijder een van je andere apparaten om Wire op dit apparaat te gebruiken.';
+z.string.nl.authLimitButtonManage = 'Beheer apparaten';
+z.string.nl.authLimitButtonSignOut = 'Uitloggen';
+z.string.nl.authLimitDevicesCurrent = '(Huidig)';
 
-z.string.nl.auth_history_headline = 'Het is de eerste keer dat je Wire op dit apparaat gebruikt.';
-z.string.nl.auth_history_description = 'Om privacyredenen wordt je gespreksgeschiedenis hier niet getoond.';
-z.string.nl.auth_history_reuse_headline = 'Je hebt Wire eerder op dit apparaat gebruikt.';
-z.string.nl.auth_history_reuse_description = 'Berichten die in de tussentijd worden verzonden worden niet weergegeven.';
-z.string.nl.auth_history_button = 'OK';
+z.string.nl.authHistoryHeadline = 'Het is de eerste keer dat je Wire op dit apparaat gebruikt.';
+z.string.nl.authHistoryDescription = 'Om privacyredenen wordt je gespreksgeschiedenis hier niet getoond.';
+z.string.nl.authHistoryReuseHeadline = 'Je hebt Wire eerder op dit apparaat gebruikt.';
+z.string.nl.authHistoryReuseDescription = 'Berichten die in de tussentijd worden verzonden worden niet weergegeven.';
+z.string.nl.authHistoryButton = 'OK';
 
-z.string.nl.auth_posted_resend = 'Opnieuw verzenden naar {{email}}';
-z.string.nl.auth_posted_resend_action = 'Geen e-mail ontvangen?';
-z.string.nl.auth_posted_resend_detail = 'Controleer je inbox en volg de instructies.';
-z.string.nl.auth_posted_resend_headline = 'Je hebt e-mail ontvangen.';
+z.string.nl.authPostedResend = 'Opnieuw verzenden naar {{email}}';
+z.string.nl.authPostedResendAction = 'Geen e-mail ontvangen?';
+z.string.nl.authPostedResendDetail = 'Controleer je inbox en volg de instructies.';
+z.string.nl.authPostedResendHeadline = 'Je hebt e-mail ontvangen.';
 
-z.string.nl.auth_placeholder_email = 'E-mail';
-z.string.nl.auth_placeholder_password_put = 'Wachtwoord';
-z.string.nl.auth_placeholder_password_set = 'Wachtwoord (minimaal 8 tekens)';
-z.string.nl.auth_placeholder_phone = 'Telefoonnummer';
+z.string.nl.authPlaceholderEmail = 'E-mail';
+z.string.nl.authPlaceholderPasswordPut = 'Wachtwoord';
+z.string.nl.authPlaceholderPasswordSet = 'Wachtwoord (minimaal 8 tekens)';
+z.string.nl.authPlaceholderPhone = 'Telefoonnummer';
 
 z.string.nl.authErrorCode = 'Ongeldige code';
 z.string.nl.authErrorCountryCodeInvalid = 'Ongeldige landscode';
@@ -91,8 +91,8 @@ z.string.nl.authErrorPhoneNumberBudget = 'Je vaak ingelogd. Probeer het later op
 z.string.nl.authErrorPhoneNumberForbidden = 'Sorry. Dit telefoon nummer is verboden.';
 z.string.nl.authErrorPhoneNumberInvalid = 'Ongeldig Telefoonnummer';
 z.string.nl.authErrorPhoneNumberUnknown = 'Onbekend Telefoon Nummer';
-z.string.nl.auth_error_suspended = 'Dit account is niet langer geautoriseerd om in te loggen.';
-z.string.nl.auth_error_sign_in = 'Controleer je gegevens en probeer het nog eens.';
+z.string.nl.authErrorSuspended = 'Dit account is niet langer geautoriseerd om in te loggen.';
+z.string.nl.authErrorSignIn = 'Controleer je gegevens en probeer het nog eens.';
 
 z.string.nl.callStateOutgoing = 'Bellen…';
 z.string.nl.callStateConnecting = 'Verbinden…';

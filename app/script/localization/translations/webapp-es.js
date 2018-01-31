@@ -49,30 +49,30 @@ z.string.es.authVerifyCodeDescription = 'Ingresa el código de verificación\nqu
 z.string.es.authVerifyCodeResend = '¿No ha recibido ningún código?';
 z.string.es.authVerifyCodeResendDetail = 'Reenviar';
 z.string.es.authVerifyCodeResendTimer = 'Puede solicitar un nuevo código en {{expiration}}.';
-z.string.es.auth_verify_code_change_phone = 'Cambiar número de teléfono';
-z.string.es.auth_verify_password_headline = 'Introduzca su contraseña';
+z.string.es.authVerifyCodeChangePhone = 'Cambiar número de teléfono';
+z.string.es.authVerifyPasswordHeadline = 'Introduzca su contraseña';
 
-z.string.es.auth_limit_devices_headline = 'Dispositivos';
-z.string.es.auth_limit_description = 'Quite uno de los dispositivos para comenzar a usar Wire en este dispositivo.';
-z.string.es.auth_limit_button_manage = 'Administrar dispositivos';
-z.string.es.auth_limit_button_sign_out = 'Cerrar sesión';
-z.string.es.auth_limit_devices_current = '(Actual)';
+z.string.es.authLimitDevicesHeadline = 'Dispositivos';
+z.string.es.authLimitDescription = 'Quite uno de los dispositivos para comenzar a usar Wire en este dispositivo.';
+z.string.es.authLimitButtonManage = 'Administrar dispositivos';
+z.string.es.authLimitButtonSignOut = 'Cerrar sesión';
+z.string.es.authLimitDevicesCurrent = '(Actual)';
 
-z.string.es.auth_history_headline = 'Es la primera vez que usas Wire en este dispositivo.';
-z.string.es.auth_history_description = 'Por motivos de privacidad, tu historial de conversación no aparecerá aquí.';
-z.string.es.auth_history_reuse_headline = 'Ya has utilizado Wire en este dispositivo antes.';
-z.string.es.auth_history_reuse_description = 'Los mensajes enviados mientras tanto no aparecerán aquí.';
-z.string.es.auth_history_button = 'OK';
+z.string.es.authHistoryHeadline = 'Es la primera vez que usas Wire en este dispositivo.';
+z.string.es.authHistoryDescription = 'Por motivos de privacidad, tu historial de conversación no aparecerá aquí.';
+z.string.es.authHistoryReuseHeadline = 'Ya has utilizado Wire en este dispositivo antes.';
+z.string.es.authHistoryReuseDescription = 'Los mensajes enviados mientras tanto no aparecerán aquí.';
+z.string.es.authHistoryButton = 'OK';
 
-z.string.es.auth_posted_resend = 'Reenviar a {{email}}';
-z.string.es.auth_posted_resend_action = '¿No aparece ningún correo electrónico?';
-z.string.es.auth_posted_resend_detail = 'Revise su buzón de correo electrónico y siga las instrucciones.';
-z.string.es.auth_posted_resend_headline = 'Tiene un correo electrónico.';
+z.string.es.authPostedResend = 'Reenviar a {{email}}';
+z.string.es.authPostedResendAction = '¿No aparece ningún correo electrónico?';
+z.string.es.authPostedResendDetail = 'Revise su buzón de correo electrónico y siga las instrucciones.';
+z.string.es.authPostedResendHeadline = 'Tiene un correo electrónico.';
 
-z.string.es.auth_placeholder_email = 'Correo';
-z.string.es.auth_placeholder_password_put = 'Contraseña';
-z.string.es.auth_placeholder_password_set = 'Contraseña (mínimo 8 caracteres)';
-z.string.es.auth_placeholder_phone = 'Número de teléfono';
+z.string.es.authPlaceholderEmail = 'Correo';
+z.string.es.authPlaceholderPasswordPut = 'Contraseña';
+z.string.es.authPlaceholderPasswordSet = 'Contraseña (mínimo 8 caracteres)';
+z.string.es.authPlaceholderPhone = 'Número de teléfono';
 
 z.string.es.authErrorCode = 'Código no válido';
 z.string.es.authErrorCountryCodeInvalid = 'Código de país no válido';
@@ -90,8 +90,8 @@ z.string.es.authErrorPhoneNumberBudget = 'Has entrado muchas veces. Prueba más 
 z.string.es.authErrorPhoneNumberForbidden = 'Lo sentimos. Este número de teléfono está prohibido.';
 z.string.es.authErrorPhoneNumberInvalid = 'Número de teléfono no válido';
 z.string.es.authErrorPhoneNumberUnknown = 'Número de Teléfono Desconocido';
-z.string.es.auth_error_suspended = 'Esta cuenta ya no está autorizada a iniciar sesión.';
-z.string.es.auth_error_sign_in = 'Por favor, verifica tus datos y vuelve a intentarlo.';
+z.string.es.authErrorSuspended = 'Esta cuenta ya no está autorizada a iniciar sesión.';
+z.string.es.authErrorSignIn = 'Por favor, verifica tus datos y vuelve a intentarlo.';
 
 z.string.es.callStateOutgoing = 'Sonando…';
 z.string.es.callStateConnecting = 'Conectando…';
