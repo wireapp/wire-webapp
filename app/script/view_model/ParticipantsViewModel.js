@@ -358,7 +358,10 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   clickToRemoveService() {
     this.integrationRepository.removeService(this.conversation(), this.selectedUser()).then(response => {
       if (response) {
-        this.resetView();
+        if (this.groupMode()) {
+          return this.resetView();
+        }
+        this.participantsBubble.hide();
       }
     });
   }
