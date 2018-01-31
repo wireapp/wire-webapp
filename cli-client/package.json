@@ -5,7 +5,7 @@
   "dependencies": {
     "@wireapp/core": "0.0.30",
     "commander": "2.13.0",
-    "dotenv": "4.0.0",
+    "dotenv": "5.0.0",
     "fs-extra": "5.0.0"
   },
   "devDependencies": {
