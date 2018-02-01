@@ -140,7 +140,7 @@ describe('Event Mapper', () => {
       expect(message_et.get_first_asset().file_size).toBe(event.data.content_length);
       expect(message_et.get_first_asset().file_type).toBe(event.data.content_type);
       expect(message_et.get_first_asset().type).toBe(z.assets.AssetType.IMAGE);
-      expect(message_et.get_first_asset().resource().otr_key).toBe(event.data.otr_key);
+      expect(message_et.get_first_asset().resource().otrKey).toBe(event.data.otr_key);
       expect(message_et.get_first_asset().resource().sha256).toBe(event.data.sha256);
       expect(message_et).toBeDefined();
     });
@@ -168,7 +168,7 @@ describe('Event Mapper', () => {
       const asset_et = event_mapper._map_asset_image(event, true);
 
       try {
-        asset_et.resource().generate_url();
+        asset_et.resource().generateUrl();
       } catch (error) {
         expect(error).toEqual(jasmine.any(z.util.ValidationUtilError));
       }

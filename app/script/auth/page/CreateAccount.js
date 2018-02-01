@@ -37,7 +37,7 @@ function CreateAccount({history, intl: {formatMessage: _}}) {
         <Columns>
           <Column style={{display: 'flex'}}>
             <div style={{margin: 'auto'}}>
-              <Link to={ROUTE.CREATE_TEAM} data-uie-name="go-register-team" component={RRLink}>
+              <Link to={ROUTE.CREATE_TEAM} component={RRLink} data-uie-name="go-register-team">
                 <ArrowIcon direction="left" color={COLOR.GRAY} />
               </Link>
             </div>

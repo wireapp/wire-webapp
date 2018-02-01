@@ -23,11 +23,14 @@ window.z = window.z || {};
 window.z.ephemeral = z.ephemeral || {};
 
 z.ephemeral.timings = (() => {
-  const timings = [1000 * 5, 1000 * 15, 1000 * 30, 1000 * 60, 1000 * 60 * 5, 1000 * 60 * 60 * 24];
-  const get_values = () => timings;
-  const map_to_closest_timing = milliseconds => z.util.ArrayUtil.find_closest(timings, milliseconds);
+  const TIMINGS = [1000 * 5, 1000 * 15, 1000 * 30, 1000 * 60, 1000 * 60 * 5, 1000 * 60 * 60 * 24];
+
+  const _getValues = () => TIMINGS;
+
+  const _mapToClosestTiming = milliseconds => z.util.ArrayUtil.find_closest(TIMINGS, milliseconds);
+
   return {
-    get_values,
-    map_to_closest_timing,
+    getValues: _getValues,
+    mapToClosestTiming: _mapToClosestTiming,
   };
 })();

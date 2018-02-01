@@ -25,8 +25,9 @@ describe('when entering a team name', () => {
   let store;
   let wrapper;
 
-  let doNextButton;
-  let teamNameInput;
+  const teamNameInput = () => wrapper.find('[data-uie-name="enter-team-name"]').first();
+  const doNextButton = () => wrapper.find('[data-uie-name="do-next"]').first();
+  const errorMessage = () => wrapper.find('[data-uie-name="error-message"]').first();
 
   beforeEach(() => {
     const state = {
@@ -58,22 +59,62 @@ describe('when entering a team name', () => {
 
     store = mockStore(state);
     wrapper = mountWithIntl(<TeamName />, store);
-
-    teamNameInput = wrapper.find('[data-uie-name="enter-team-name"]').first();
-    doNextButton = wrapper.find('[data-uie-name="do-next"]').first();
   });
 
-  it('does not show a next button if too few characters are entered', () => {
-    expect(teamNameInput.props().required).toBe(true);
-    expect(doNextButton.props().disabled).toBe(true);
+  describe('the submit button', () => {
+    it('is disabled if too few characters are entered', () => {
+      expect(teamNameInput().props().required).toBe(true);
+      expect(doNextButton().props().disabled).toBe(true);
+    });
+
+    it('is enabled when the minimum amount of characters is entered', done => {
+      const expectedTeamName = 'M';
+
+      expect(doNextButton().props().disabled).toBe(true);
+
+      teamNameInput().simulate('change', {target: {value: expectedTeamName}});
+      expect(doNextButton().props().disabled).toBe(false);
+
+      done();
+    });
+
+    it('is disabled if previous submit with same value failed', done => {
+      const expectedTeamName = 'M';
+      const expectedValidTeamName = 'My Team';
+
+      expect(doNextButton().props().disabled).toBe(true);
+
+      teamNameInput().simulate('change', {target: {value: expectedTeamName}});
+      expect(doNextButton().props().disabled).toBe(false);
+
+      doNextButton().simulate('click');
+      expect(doNextButton().props().disabled).toBe(true);
+
+      teamNameInput().simulate('change', {target: {value: expectedValidTeamName}});
+      expect(doNextButton().props().disabled).toBe(false);
+
+      done();
+    });
+
+    it('is disabled when prefilled with too few characters', done => {
+      wrapper.setProps({teamName: ''});
+      expect(doNextButton().props().disabled).toBe(true);
+      done();
+    });
   });
 
-  it('shows a next button when the minimum amount of characters is entered', done => {
-    const teamName = 'Mariachi Band';
-    expect(doNextButton.props().disabled).toBe(true);
-    teamNameInput.simulate('change', {target: {value: teamName}});
-    doNextButton = wrapper.find('[data-uie-name="do-next"]').first();
-    expect(doNextButton.props().disabled).toBe(false);
-    done();
+  describe('an error message', () => {
+    it('appears if too few characters are entered', done => {
+      const expectedTeamName = 'M';
+      const expectedErrorMessage = 'Enter a name with at least 2 characters';
+
+      teamNameInput().simulate('change', {target: {value: expectedTeamName}});
+      expect(teamNameInput().props().value).toBe(expectedTeamName);
+
+      doNextButton().simulate('click');
+      expect(errorMessage().text()).toBe(expectedErrorMessage);
+
+      done();
+    });
   });
 });

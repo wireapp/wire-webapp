@@ -68,10 +68,10 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
   }
 
   reset_cryptobox(client_et) {
-    const delete_everything = client_et ? client_et.is_temporary() : false;
+    const delete_everything = client_et ? client_et.isTemporary() : false;
     const delete_promise = delete_everything
-      ? this.storage_repository.delete_everything()
-      : this.storage_repository.delete_cryptography();
+      ? this.storage_repository.deleteDatabase()
+      : this.storage_repository.deleteCryptographyStores();
 
     return delete_promise
       .catch(database_error => {
@@ -110,8 +110,8 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
       });
 
       this.cryptobox.on(cryptobox.Cryptobox.TOPIC.NEW_SESSION, session_id => {
-        const {user_id, client_id} = z.client.Client.dismantle_user_client_id(session_id);
-        amplify.publish(z.event.WebApp.CLIENT.ADD, user_id, new z.client.Client({id: client_id}));
+        const {userId, clientId} = z.client.ClientEntity.dismantleUserClientId(session_id);
+        amplify.publish(z.event.WebApp.CLIENT.ADD, userId, new z.client.ClientEntity({id: clientId}));
       });
     });
   }
@@ -193,9 +193,9 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
   create_user_session_map() {
     const user_session_map = {};
     for (const session_id in this.storage_repository.sessions) {
-      const {user_id, client_id} = z.client.Client.dismantle_user_client_id(session_id);
-      user_session_map[user_id] = user_session_map[user_id] || [];
-      user_session_map[user_id].push(client_id);
+      const {userId, clientId} = z.client.ClientEntity.dismantleUserClientId(session_id);
+      user_session_map[userId] = user_session_map[userId] || [];
+      user_session_map[userId].push(clientId);
     }
     return user_session_map;
   }
@@ -247,21 +247,21 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
         const recipients_for_missing_sessions = {};
 
         cipher_payloads.forEach(({cipher_text, session_id}) => {
-          const {user_id, client_id} = z.client.Client.dismantle_user_client_id(session_id);
+          const {userId, clientId} = z.client.ClientEntity.dismantleUserClientId(session_id);
           if (cipher_text) {
-            return (payload.recipients[user_id][client_id] = cipher_text);
+            return (payload.recipients[userId][clientId] = cipher_text);
           }
-          recipients_for_missing_sessions[user_id] = recipients_for_missing_sessions[user_id] || [];
-          recipients_for_missing_sessions[user_id].push(client_id);
+          recipients_for_missing_sessions[userId] = recipients_for_missing_sessions[userId] || [];
+          recipients_for_missing_sessions[userId].push(clientId);
         });
 
         return this._encrypt_generic_message_for_new_sessions(recipients_for_missing_sessions, generic_message);
       })
       .then(additional_cipher_payloads => {
         additional_cipher_payloads.forEach(({cipher_text, session_id}) => {
-          const {user_id, client_id} = z.client.Client.dismantle_user_client_id(session_id);
-          payload.recipients[user_id] = payload.recipients[user_id] || {};
-          payload.recipients[user_id][client_id] = cipher_text;
+          const {userId, clientId} = z.client.ClientEntity.dismantleUserClientId(session_id);
+          payload.recipients[userId] = payload.recipients[userId] || {};
+          payload.recipients[userId][clientId] = cipher_text;
         });
         return payload;
       });

@@ -13,7 +13,6 @@
       <excludeFolder url="file://$MODULE_DIR$/app/ext/swf" />
       <excludeFolder url="file://$MODULE_DIR$/aws/s3" />
       <excludeFolder url="file://$MODULE_DIR$/aws/static" />
-      <excludeFolder url="file://$MODULE_DIR$/bin" />
       <excludeFolder url="file://$MODULE_DIR$/deploy" />
       <excludeFolder url="file://$MODULE_DIR$/dist" />
       <excludeFolder url="file://$MODULE_DIR$/docs/coverage" />

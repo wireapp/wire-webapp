@@ -34,17 +34,17 @@ z.components.AvailabilityState = class AvailabilityState {
 ko.components.register('availability-state', {
   template: `
       <!-- ko if: $data.availability() === z.user.AvailabilityType.AVAILABLE -->
-        <svg data-uie-name="available" class="availability-state-icon" viewBox="0 0 10 10">
+        <svg class="availability-state-icon" viewBox="0 0 10 10" data-uie-name="available">
           <circle cx="5" cy="5" r="5" stroke="none"></circle>
         </svg>
       <!-- /ko -->
       <!-- ko if: $data.availability() === z.user.AvailabilityType.AWAY -->
-        <svg data-uie-name="away" class="availability-state-icon" viewBox="0 0 10 10">
+        <svg class="availability-state-icon" viewBox="0 0 10 10" data-uie-name="away">
           <circle cx="5" cy="5" r="4" stroke-width="2" fill="none"></circle>
         </svg>
       <!-- /ko -->
       <!-- ko if: $data.availability() === z.user.AvailabilityType.BUSY -->
-        <svg data-uie-name="busy" class="availability-state-icon" viewBox="0 0 10 10">
+        <svg class="availability-state-icon" viewBox="0 0 10 10" data-uie-name="busy">
           <path stroke="none" d="M5 10A5 5 0 1 1 5 0a5 5 0 0 1 0 10zM2 4v2h6V4H2z"></path>
         </svg>
       <!-- /ko -->

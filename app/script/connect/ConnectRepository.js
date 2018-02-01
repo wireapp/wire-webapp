@@ -96,9 +96,9 @@ z.connect.ConnectRepository = class ConnectRepository {
    * @returns {Promise} Resolves with encoded phone book data
    */
   _parseMacosContacts() {
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
       if (!window.wAddressBook) {
-        return resolve(undefined);
+        return reject(new z.connect.ConnectError(z.connect.ConnectError.TYPE.NOT_SUPPORTED));
       }
       const addressBook = window.wAddressBook;
       const phoneBook = new z.connect.PhoneBook();
@@ -190,7 +190,7 @@ z.connect.ConnectRepository = class ConnectRepository {
       .postOnboarding(phoneBook)
       .then(({results}) => {
         this.logger.info(`Upload of '${source}' contacts upload successful: ${results.length} matches`, results);
-        this.propertiesRepository.save_preference(z.properties.PROPERTIES_TYPE.CONTACT_IMPORT.GOOGLE);
+        this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.CONTACT_IMPORT.GOOGLE);
         return results.map(result => result.id);
       })
       .catch(error => {

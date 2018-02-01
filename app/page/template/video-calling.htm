@@ -17,8 +17,8 @@
         <!-- ko if: show_remote_participant() -->
           <div class="video-element-remote-participant">
             <!-- ko ifnot: videod_call().is_group -->
-              <user-avatar class="video-element-remote-participant user-avatar-lg user-avatar-no-badge"
-                           params="user: remote_user()"></user-avatar>
+              <participant-avatar class="video-element-remote-participant avatar-no-badge"
+                           params="participant: remote_user(), size: z.components.ParticipantAvatar.SIZE.X_LARGE"></participant-avatar>
             <!-- /ko -->
           </div>
         <!-- /ko -->

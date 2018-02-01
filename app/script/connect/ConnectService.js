@@ -25,10 +25,10 @@ window.z.connect = z.connect || {};
 z.connect.ConnectService = class ConnectService {
   /**
    * Construct an new ConnectService.
-   * @param {z.client.Client} client - Local client
+   * @param {z.client.ClientEntity} clientEntity - Local client
    */
-  constructor(client) {
-    this.client = client;
+  constructor(clientEntity) {
+    this.client = clientEntity;
     this.logger = new z.util.Logger('z.connect.ConnectService', z.config.LOGGER.OPTIONS);
   }
 

@@ -24,6 +24,7 @@ window.z.ViewModel = z.ViewModel || {};
 
 z.ViewModel.ModalType = {
   BLOCK: '.modal-block',
+  BOTS_CONFIRM: '.modal-bots-confirm',
   BOTS_UNAVAILABLE: '.modal-bots-unavailable',
   CALL_EMPTY_CONVERSATION: '.modal-call-conversation-empty',
   CALL_NO_VIDEO_IN_GROUP: '.modal-call-no-video-in-group',
@@ -41,8 +42,10 @@ z.ViewModel.ModalType = {
   NEW_DEVICE: '.modal-new-device',
   NOT_CONNECTED: '.modal-not-connected',
   REMOVE_DEVICE: '.modal-remove-device',
+  SERVICE_DISABLED: '.modal-service-disabled',
   SESSION_RESET: '.modal-session-reset',
   TOO_LONG_MESSAGE: '.modal-too-long-message',
+  TOO_MANY_BOTS: '.modal-too-many-bots',
   TOO_MANY_MEMBERS: '.modal-too-many-members',
   UPLOAD_PARALLEL: '.modal-asset-upload-parallel',
   UPLOAD_TOO_LARGE: '.modal-asset-upload-too-large',
@@ -82,6 +85,9 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
     switch (type) {
       case z.ViewModel.ModalType.BLOCK:
         this._show_modal_block(options.data, title_element, message_element);
+        break;
+      case z.ViewModel.ModalType.BOTS_CONFIRM:
+        this._show_modal_bots_confirm(options.data, message_element);
         break;
       case z.ViewModel.ModalType.CALL_START_ANOTHER:
         this._show_modal_call_start_another(options.data, title_element, message_element);
@@ -182,6 +188,10 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
   _show_modal_block(content, title_element, message_element) {
     title_element.text(z.l10n.text(z.string.modal_block_conversation_headline, content));
     message_element.text(z.l10n.text(z.string.modal_block_conversation_message, content));
+  }
+
+  _show_modal_bots_confirm(content, message_element) {
+    message_element.text(z.l10n.text(z.string.modal_bots_confirm_message, content));
   }
 
   /**

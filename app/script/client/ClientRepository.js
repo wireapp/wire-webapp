@@ -32,57 +32,55 @@ z.client.ClientRepository = class ClientRepository {
     return 'local_identity';
   }
 
-  constructor(client_service, cryptography_repository) {
-    this.client_service = client_service;
-    this.cryptography_repository = cryptography_repository;
-    this.self_user = ko.observable(undefined);
+  constructor(clientService, cryptographyRepository) {
+    this.clientService = clientService;
+    this.cryptographyRepository = cryptographyRepository;
+    this.selfUser = ko.observable(undefined);
     this.logger = new z.util.Logger('z.client.ClientRepository', z.config.LOGGER.OPTIONS);
 
-    this.client_mapper = new z.client.ClientMapper();
-    this.clients = ko.pureComputed(() => (this.self_user() ? this.self_user().devices() : []));
-    this.current_client = ko.observable();
+    this.clientMapper = new z.client.ClientMapper();
+    this.clients = ko.pureComputed(() => (this.selfUser() ? this.selfUser().devices() : []));
+    this.currentClient = ko.observable();
 
-    amplify.subscribe(z.event.WebApp.LIFECYCLE.ASK_TO_CLEAR_DATA, this.logout_client.bind(this));
-    // todo: deprecated - remove when user base of wrappers version >= 2.12 is large enough
-    amplify.subscribe(z.event.WebApp.LOGOUT.ASK_TO_CLEAR_DATA, this.logout_client.bind(this));
-    amplify.subscribe(z.event.WebApp.USER.EVENT_FROM_BACKEND, this.on_user_event.bind(this));
+    amplify.subscribe(z.event.WebApp.LIFECYCLE.ASK_TO_CLEAR_DATA, this.logoutClient.bind(this));
+    amplify.subscribe(z.event.WebApp.USER.EVENT_FROM_BACKEND, this.onUserEvent.bind(this));
   }
 
-  init(self_user) {
-    this.self_user(self_user);
-    this.logger.info(`Initialized repository with user ID '${this.self_user().id}'`);
+  init(selfUser) {
+    this.selfUser(selfUser);
+    this.logger.info(`Initialized repository with user ID '${this.selfUser().id}'`);
   }
 
   //##############################################################################
   // Service interactions
   //##############################################################################
 
-  delete_client_from_db(user_id, client_id) {
-    return this.client_service.delete_client_from_db(this._construct_primary_key(user_id, client_id));
+  deleteClientFromDb(userId, clientId) {
+    return this.clientService.deleteClientFromDb(this._constructPrimaryKey(userId, clientId));
   }
 
   /**
    * Delete the temporary client on the backend.
    * @returns {Promise} Resolves when the temporary client was deleted on the backend
    */
-  delete_temporary_client() {
-    return this.client_service.delete_temporary_client(this.current_client().id);
+  deleteTemporaryClient() {
+    return this.clientService.deleteTemporaryClient(this.currentClient().id);
   }
 
   /**
    * Load all known clients from the database.
    * @returns {Promise} Resolves with all the clients found in the local database
    */
-  get_all_clients_from_db() {
-    return this.client_service.load_all_clients_from_db().then(clients => {
+  getAllClientsFromDb() {
+    return this.clientService.loadAllClientsFromDb().then(clients => {
       const recipients = {};
-      const skipped_user_ids = [this.self_user().id, z.client.ClientRepository.PRIMARY_KEY_CURRENT_CLIENT];
+      const skippedUserIds = [this.selfUser().id, z.client.ClientRepository.PRIMARY_KEY_CURRENT_CLIENT];
 
       for (const client of clients) {
-        const ids = z.client.Client.dismantle_user_client_id(client.meta.primary_key);
-        if (ids.user_id && !skipped_user_ids.includes(ids.user_id)) {
-          recipients[ids.user_id] = recipients[ids.user_id] || [];
-          recipients[ids.user_id].push(this.client_mapper.map_client(client));
+        const {userId} = z.client.ClientEntity.dismantleUserClientId(client.meta.primary_key);
+        if (userId && !skippedUserIds.includes(userId)) {
+          recipients[userId] = recipients[userId] || [];
+          recipients[userId].push(this.clientMapper.mapClient(client));
         }
       }
       return recipients;
@@ -91,14 +89,14 @@ z.client.ClientRepository = class ClientRepository {
 
   /**
    * Retrieves meta information about specific client of the self user.
-   * @param {string} client_id - ID of client to be retrieved
+   * @param {string} clientId - ID of client to be retrieved
    * @returns {Promise} Resolves with the retrieved client information
    */
-  get_client_by_id_from_backend(client_id) {
-    return this.client_service.get_client_by_id(client_id).catch(error => {
-      const client_not_found_backend = error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND;
-      if (client_not_found_backend) {
-        this.logger.warn(`Local client '${client_id}' no longer exists on the backend`, error);
+  getClientByIdFromBackend(clientId) {
+    return this.clientService.getClientById(clientId).catch(error => {
+      const clientNotFoundBackend = error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND;
+      if (clientNotFoundBackend) {
+        this.logger.warn(`Local client '${clientId}' no longer exists on the backend`, error);
         throw new z.client.ClientError(z.client.ClientError.TYPE.NO_VALID_CLIENT);
       }
 
@@ -108,24 +106,24 @@ z.client.ClientRepository = class ClientRepository {
 
   /**
    * Loads a client from the database (if it exists).
-   * @returns {Promise<z.client.Client>} Resolves with the local client
+   * @returns {Promise<z.client.ClientEntity>} Resolves with the local client
    */
-  get_current_client_from_db() {
-    return this.client_service
-      .load_client_from_db(z.client.ClientRepository.PRIMARY_KEY_CURRENT_CLIENT)
+  getCurrentClientFromDb() {
+    return this.clientService
+      .loadClientFromDb(z.client.ClientRepository.PRIMARY_KEY_CURRENT_CLIENT)
       .catch(() => {
         throw new z.client.ClientError(z.client.ClientError.TYPE.DATABASE_FAILURE);
       })
-      .then(client_payload => {
-        if (_.isString(client_payload)) {
+      .then(clientPayload => {
+        if (_.isString(clientPayload)) {
           this.logger.info('No local client found in database');
           throw new z.client.ClientError(z.client.ClientError.TYPE.NO_VALID_CLIENT);
         }
 
-        const client_et = this.client_mapper.map_client(client_payload);
-        this.current_client(client_et);
-        this.logger.info(`Loaded local client '${client_et.id}'`, this.current_client());
-        return this.current_client();
+        const clientEntity = this.clientMapper.mapClient(clientPayload);
+        this.currentClient(clientEntity);
+        this.logger.info(`Loaded local client '${clientEntity.id}'`, this.currentClient());
+        return this.currentClient();
       });
   }
 
@@ -133,61 +131,61 @@ z.client.ClientRepository = class ClientRepository {
    * Construct the primary key to store clients in database.
    * @private
    *
-   * @param {string} user_id - User ID from the owner of the client
-   * @param {string} client_id - ID of the client
+   * @param {string} userId - User ID from the owner of the client
+   * @param {string} clientId - ID of the client
    * @returns {string} Primary key
    */
-  _construct_primary_key(user_id, client_id) {
-    if (!user_id) {
+  _constructPrimaryKey(userId, clientId) {
+    if (!userId) {
       throw new z.client.ClientError(z.client.ClientError.TYPE.NO_USER_ID);
     }
-    if (!client_id) {
+    if (!clientId) {
       throw new z.client.ClientError(z.client.ClientError.TYPE.NO_CLIENT_ID);
     }
-    return `${user_id}@${client_id}`;
+    return `${userId}@${clientId}`;
   }
 
   /**
    * Save the a client into the database.
    *
    * @private
-   * @param {string} user_id - ID of user client to be stored belongs to
-   * @param {Object} client_payload - Client data to be stored in database
+   * @param {string} userId - ID of user client to be stored belongs to
+   * @param {Object} clientPayload - Client data to be stored in database
    * @returns {Promise} Resolves with the record stored in database
    */
-  save_client_in_db(user_id, client_payload) {
-    const primary_key = this._construct_primary_key(user_id, client_payload.id);
-    return this.client_service.save_client_in_db(primary_key, client_payload);
+  saveClientInDb(userId, clientPayload) {
+    const primaryKey = this._constructPrimaryKey(userId, clientPayload.id);
+    return this.clientService.saveClientInDb(primaryKey, clientPayload);
   }
 
   /**
    * Updates properties for a client record in database.
    *
    * @todo Merge "meta" property before updating it, Object.assign(payload.meta, changes.meta)
-   * @param {string} user_id - User ID of the client owner
-   * @param {string} client_id - Client ID which needs to get updated
+   * @param {string} userId - User ID of the client owner
+   * @param {string} clientId - Client ID which needs to get updated
    * @param {string} changes - New values which should be updated on the client
    * @returns {number} Number of updated records
    */
-  update_client_in_db(user_id, client_id, changes) {
-    const primary_key = this._construct_primary_key(user_id, client_id);
+  updateClientInDb(userId, clientId, changes) {
+    const primaryKey = this._constructPrimaryKey(userId, clientId);
     // Preserve primary key on update
-    changes.meta.primary_key = primary_key;
-    return this.client_service.update_client_in_db(primary_key, changes);
+    changes.meta.primary_key = primaryKey;
+    return this.clientService.updateClientInDb(primaryKey, changes);
   }
 
   /**
    * Change verification state of client.
    *
-   * @param {string} user_id - User ID of the client owner
-   * @param {z.client.Client} client_et - Client which needs to get updated
-   * @param {boolean} is_verified - New state to apply
+   * @param {string} userId - User ID of the client owner
+   * @param {z.client.ClientEntity} clientEntity - Client which needs to get updated
+   * @param {boolean} isVerified - New state to apply
    * @returns {Promise} Resolves when the verification state has been updated
    */
-  verify_client(user_id, client_et, is_verified) {
-    return this.update_client_in_db(user_id, client_et.id, {meta: {is_verified}}).then(() => {
-      client_et.meta.is_verified(is_verified);
-      return amplify.publish(z.event.WebApp.CLIENT.VERIFICATION_STATE_CHANGED, user_id, client_et, is_verified);
+  verifyClient(userId, clientEntity, isVerified) {
+    return this.updateClientInDb(userId, clientEntity.id, {meta: {is_verified: isVerified}}).then(() => {
+      clientEntity.meta.is_verified(isVerified);
+      return amplify.publish(z.event.WebApp.CLIENT.VERIFICATION_STATE_CHANGED, userId, clientEntity, isVerified);
     });
   }
 
@@ -195,28 +193,28 @@ z.client.ClientRepository = class ClientRepository {
    * Save the local client into the database.
    *
    * @private
-   * @param {Object} client_payload - Client data to be stored in database
+   * @param {Object} clientPayload - Client data to be stored in database
    * @returns {Promise} Resolves with the record stored in database
    */
-  _save_current_client_in_db(client_payload) {
-    client_payload.meta = {is_verified: true};
-    return this.client_service.save_client_in_db(z.client.ClientRepository.PRIMARY_KEY_CURRENT_CLIENT, client_payload);
+  _saveCurrentClientInDb(clientPayload) {
+    clientPayload.meta = {is_verified: true};
+    return this.clientService.saveClientInDb(z.client.ClientRepository.PRIMARY_KEY_CURRENT_CLIENT, clientPayload);
   }
 
   /**
    * Updates a client payload if it does not fit the current database structure.
    *
    * @private
-   * @param {string} user_id - User ID of the client owner
-   * @param {Object} client_payload - Client data to be stored in database
+   * @param {string} userId - User ID of the client owner
+   * @param {Object} clientPayload - Client data to be stored in database
    * @returns {Promise} Resolves with the record stored in database
    */
-  _update_client_schema_in_db(user_id, client_payload) {
-    client_payload.meta = {
+  _updateClientSchemaInDb(userId, clientPayload) {
+    clientPayload.meta = {
       is_verified: false,
-      primary_key: this._construct_primary_key(user_id, client_payload.id),
+      primary_key: this._constructPrimaryKey(userId, clientPayload.id),
     };
-    return this.save_client_in_db(user_id, client_payload);
+    return this.saveClientInDb(userId, clientPayload);
   }
 
   //##############################################################################
@@ -226,39 +224,39 @@ z.client.ClientRepository = class ClientRepository {
   /**
    * Constructs the value for a cookie label.
    * @param {string} login - Email or phone number of the user
-   * @param {z.client.ClientType} client_type - Temporary or permanent client type
+   * @param {z.client.ClientType} clientType - Temporary or permanent client type
    * @returns {string} Cookie label
    */
-  construct_cookie_label(login, client_type = this._load_current_client_type()) {
-    const login_hash = z.util.murmurhash3(login, 42);
-    return `webapp@${login_hash}@${client_type}@${Date.now()}`;
+  constructCookieLabel(login, clientType = this._loadCurrentClientType()) {
+    const loginHash = z.util.murmurhash3(login, 42);
+    return `webapp@${loginHash}@${clientType}@${Date.now()}`;
   }
 
   /**
    * Constructs the key for a cookie label.
    * @param {string} login - Email or phone number of the user
-   * @param {z.client.ClientType} client_type - Temporary or permanent client type
+   * @param {z.client.ClientType} clientType - Temporary or permanent client type
    * @returns {string} Cookie label key
    */
-  construct_cookie_label_key(login, client_type = this._load_current_client_type()) {
-    const login_hash = z.util.murmurhash3(login, 42);
-    return `${z.storage.StorageKey.AUTH.COOKIE_LABEL}@${login_hash}@${client_type}`;
+  constructCookieLabelKey(login, clientType = this._loadCurrentClientType()) {
+    const loginHash = z.util.murmurhash3(login, 42);
+    return `${z.storage.StorageKey.AUTH.COOKIE_LABEL}@${loginHash}@${clientType}`;
   }
 
   /**
    * Get and validate the local client.
    * @returns {Promise} Resolve with an observable containing the client if valid
    */
-  get_valid_local_client() {
-    return this.get_current_client_from_db()
-      .then(client_et => this.get_client_by_id_from_backend(client_et.id))
-      .then(client_et => {
-        this.logger.info(`Client with ID '${client_et.id}' (${client_et.type}) validated on backend`);
-        return this.current_client;
+  getValidLocalClient() {
+    return this.getCurrentClientFromDb()
+      .then(clientEntity => this.getClientByIdFromBackend(clientEntity.id))
+      .then(clientEntity => {
+        this.logger.info(`Client with ID '${clientEntity.id}' (${clientEntity.type}) validated on backend`);
+        return this.currentClient;
       })
       .catch(error => {
-        const client_not_validated = error.type === z.client.ClientError.TYPE.NO_VALID_CLIENT;
-        if (!client_not_validated) {
+        const clientNotValidated = error.type === z.client.ClientError.TYPE.NO_VALID_CLIENT;
+        if (!clientNotValidated) {
           this.logger.error(`Getting valid local client failed: ${error.code || error.message}`, error);
         }
 
@@ -272,16 +270,17 @@ z.client.ClientRepository = class ClientRepository {
    *
    * @note Password is needed for the registration of a client once 1st client has been registered.
    * @param {string|undefined} password - User password for verification
-   * @returns {Promise<z.client.Client>} Resolve with the newly registered client
+   * @returns {Promise<z.client.ClientEntity>} Resolve with the newly registered client
    */
-  register_client(password) {
-    const client_type = this._load_current_client_type();
+  registerClient(password) {
+    const clientType = this._loadCurrentClientType();
 
-    return this.cryptography_repository
+    return this.cryptographyRepository
       .generate_client_keys()
-      .then(keys => this.client_service.post_clients(this._create_registration_payload(client_type, password, keys)))
+      .then(keys => this.clientService.postClients(this._createRegistrationPayload(clientType, password, keys)))
       .catch(error => {
-        if (error.label === z.service.BackendClientError.LABEL.TOO_MANY_CLIENTS) {
+        const tooManyClients = error.label === z.service.BackendClientError.LABEL.TOO_MANY_CLIENTS;
+        if (tooManyClients) {
           throw new z.client.ClientError(z.client.ClientError.TYPE.TOO_MANY_CLIENTS);
         }
         this.logger.error(`Client registration request failed: ${error.message}`, error);
@@ -290,20 +289,20 @@ z.client.ClientRepository = class ClientRepository {
       .then(response => {
         const {cookie, id, type} = response;
         this.logger.info(`Registered '${type}' client '${id}' with cookie label '${cookie}'`, response);
-        this.current_client(this.client_mapper.map_client(response));
-        return this._save_current_client_in_db(response);
+        this.currentClient(this.clientMapper.mapClient(response));
+        return this._saveCurrentClientInDb(response);
       })
       .catch(error => {
-        const handled_errors = [z.client.ClientError.TYPE.REQUEST_FAILURE, z.client.ClientError.TYPE.TOO_MANY_CLIENTS];
+        const handledErrors = [z.client.ClientError.TYPE.REQUEST_FAILURE, z.client.ClientError.TYPE.TOO_MANY_CLIENTS];
 
-        if (handled_errors.includes(error.type)) {
+        if (handledErrors.includes(error.type)) {
           throw error;
         }
         this.logger.error(`Failed to save client: ${error.message}`, error);
         throw new z.client.ClientError(z.client.ClientError.TYPE.DATABASE_FAILURE);
       })
-      .then(client_payload => this._transfer_cookie_label(client_type, client_payload.cookie))
-      .then(() => this.current_client)
+      .then(clientPayload => this._transferCookieLabel(clientType, clientPayload.cookie))
+      .then(() => this.currentClient)
       .catch(error => {
         this.logger.error(`Client registration failed: ${error.message}`, error);
         throw error;
@@ -314,21 +313,21 @@ z.client.ClientRepository = class ClientRepository {
    * Create payload for client registration.
    *
    * @private
-   * @param {z.client.ClientType} client_type - Type of client to be registered
+   * @param {z.client.ClientType} clientType - Type of client to be registered
    * @param {string} password - User password
-   * @param {string} last_resort_key - Last resort key
-   * @param {Array<string>} pre_keys - Pre-keys
-   * @param {Array<string>} signaling_keys - Signaling keys
+   * @param {string} lastResortKey - Last resort key
+   * @param {Array<string>} preKeys - Pre-keys
+   * @param {Array<string>} signalingKeys - Signaling keys
    * @returns {Object} - Payload to register client with backend
    */
-  _create_registration_payload(client_type, password, [last_resort_key, pre_keys, signaling_keys]) {
+  _createRegistrationPayload(clientType, password, [lastResortKey, preKeys, signalingKeys]) {
     let device_label = `${platform.os.family}`;
 
     if (platform.os.version) {
       device_label += ` ${platform.os.version}`;
     }
 
-    let device_model = platform.name;
+    let deviceModel = platform.name;
 
     if (z.util.Environment.desktop) {
       let identifier;
@@ -339,24 +338,24 @@ z.client.ClientRepository = class ClientRepository {
       } else {
         identifier = z.string.wire_linux;
       }
-      device_model = z.l10n.text(identifier);
+      deviceModel = z.l10n.text(identifier);
       if (!z.util.Environment.frontend.is_production()) {
-        device_model = `${device_model} (Internal)`;
+        deviceModel = `${deviceModel} (Internal)`;
       }
-    } else if (client_type === z.client.ClientType.TEMPORARY) {
-      device_model = `${device_model} (Temporary)`;
+    } else if (clientType === z.client.ClientType.TEMPORARY) {
+      deviceModel = `${deviceModel} (Temporary)`;
     }
 
     return {
       class: 'desktop',
-      cookie: this._get_cookie_label_value(this.self_user().email() || this.self_user().phone()),
+      cookie: this._getCookieLabelValue(this.selfUser().email() || this.selfUser().phone()),
       label: device_label,
-      lastkey: last_resort_key,
-      model: device_model,
+      lastkey: lastResortKey,
+      model: deviceModel,
       password: password,
-      prekeys: pre_keys,
-      sigkeys: signaling_keys,
-      type: client_type,
+      prekeys: preKeys,
+      sigkeys: signalingKeys,
+      type: clientType,
     };
   }
 
@@ -366,35 +365,35 @@ z.client.ClientRepository = class ClientRepository {
    * @param {string} login - Email or phone number of the user
    * @returns {string} Cookie label
    */
-  _get_cookie_label_value(login) {
-    return z.util.StorageUtil.get_value(this.construct_cookie_label_key(login));
+  _getCookieLabelValue(login) {
+    return z.util.StorageUtil.get_value(this.constructCookieLabelKey(login));
   }
 
   /**
    * Loads the cookie label value from the Local Storage and saves it into IndexedDB.
    *
    * @private
-   * @param {z.client.ClientType} client_type - Temporary or permanent client type
-   * @param {string} cookie_label - Cookie label, something like "webapp@2153234453@temporary@145770538393"
+   * @param {z.client.ClientType} clientType - Temporary or permanent client type
+   * @param {string} cookieLabel - Cookie label, something like "webapp@2153234453@temporary@145770538393"
    * @returns {Promise} Resolves with the key of the stored cookie label
    */
-  _transfer_cookie_label(client_type, cookie_label) {
-    const indexed_db_key = z.storage.StorageKey.AUTH.COOKIE_LABEL;
-    const user_identifier = this.self_user().email() || this.self_user().phone();
-    const local_storage_key = this.construct_cookie_label_key(user_identifier, client_type);
+  _transferCookieLabel(clientType, cookieLabel) {
+    const indexedDbKey = z.storage.StorageKey.AUTH.COOKIE_LABEL;
+    const userIdentifier = this.selfUser().email() || this.selfUser().phone();
+    const localStorageKey = this.constructCookieLabelKey(userIdentifier, clientType);
 
-    if (cookie_label === undefined) {
-      cookie_label = this.construct_cookie_label(user_identifier, client_type);
-      this.logger.warn(`Cookie label is in an invalid state. We created a new one: '${cookie_label}'`);
-      z.util.StorageUtil.set_value(local_storage_key, cookie_label);
+    if (cookieLabel === undefined) {
+      cookieLabel = this.constructCookieLabel(userIdentifier, clientType);
+      this.logger.warn(`Cookie label is in an invalid state. We created a new one: '${cookieLabel}'`);
+      z.util.StorageUtil.set_value(localStorageKey, cookieLabel);
     }
 
-    this.logger.info(`Saving cookie label '${cookie_label}' in IndexedDB`, {
-      key: local_storage_key,
-      value: cookie_label,
+    this.logger.info(`Saving cookie label '${cookieLabel}' in IndexedDB`, {
+      key: localStorageKey,
+      value: cookieLabel,
     });
 
-    return this.cryptography_repository.storage_repository.save_value(indexed_db_key, cookie_label);
+    return this.cryptographyRepository.storage_repository.saveValue(indexedDbKey, cookieLabel);
   }
 
   /**
@@ -402,12 +401,12 @@ z.client.ClientRepository = class ClientRepository {
    * @private
    * @returns {z.client.ClientType} Type of current client
    */
-  _load_current_client_type() {
-    if (this.current_client()) {
-      return this.current_client().type;
+  _loadCurrentClientType() {
+    if (this.currentClient()) {
+      return this.currentClient().type;
     }
-    const is_permanent = z.util.StorageUtil.get_value(z.storage.StorageKey.AUTH.PERSIST);
-    const type = is_permanent ? z.client.ClientType.PERMANENT : z.client.ClientType.TEMPORARY;
+    const isPermanent = z.util.StorageUtil.get_value(z.storage.StorageKey.AUTH.PERSIST);
+    const type = isPermanent ? z.client.ClientType.PERMANENT : z.client.ClientType.TEMPORARY;
     return z.util.Environment.electron ? z.client.ClientType.PERMANENT : type;
   }
 
@@ -418,19 +417,19 @@ z.client.ClientRepository = class ClientRepository {
   /**
    * Cleanup local sessions.
    * @note If quick_clean parameter is set to false, there will be one backend request per user that has a session.
-   * @param {boolean} [quick_clean=true] - Optional value whether to check all users with local sessions or the ones with too many sessions
+   * @param {boolean} [quickClean=true] - Optional value whether to check all users with local sessions or the ones with too many sessions
    * @returns {undefined} No return value
    */
-  cleanup_clients_and_sessions(quick_clean = true) {
-    const object = this.cryptography_repository.create_user_session_map();
+  cleanupClientsAndSessions(quickClean = true) {
+    const object = this.cryptographyRepository.create_user_session_map();
 
-    for (const user_id in object) {
-      const client_ids = object[user_id];
-      const log_level = client_ids > 8 ? this.logger.levels.WARN : this.logger.levels.INFO;
+    for (const userId in object) {
+      const clientIds = object[userId];
+      const logLevel = clientIds > 8 ? this.logger.levels.WARN : this.logger.levels.INFO;
 
-      if (!quick_clean || !(client_ids.length <= 8)) {
-        this.logger.log(log_level, `User '${user_id}' has session with '${client_ids.length}' clients locally`);
-        this._remove_obsolete_client_for_user_by_id(user_id, client_ids);
+      if (!quickClean || !(clientIds.length <= 8)) {
+        this.logger.log(logLevel, `User '${user_id}' has session with '${clientIds.length}' clients locally`);
+        this._removeObsoleteClientsForUserById(user_id, clientIds);
       }
     }
   }
@@ -438,62 +437,58 @@ z.client.ClientRepository = class ClientRepository {
   /**
    * Delete client of a user on backend and removes it locally.
    *
-   * @param {string} client_id - ID of the client that should be deleted
+   * @param {string} clientId - ID of the client that should be deleted
    * @param {string} password - Password entered by user
    * @returns {Promise} Resolves with the remaining user devices
    */
-  delete_client(client_id, password) {
+  deleteClient(clientId, password) {
     if (!password) {
-      this.logger.error(`Could not delete client '${client_id}' because password is missing`);
+      this.logger.error(`Could not delete client '${clientId}' because password is missing`);
       return Promise.reject(new z.client.ClientError(z.client.ClientError.TYPE.REQUEST_FORBIDDEN));
     }
 
-    return this.client_service
-      .delete_client(client_id, password)
-      .then(() => this.delete_client_from_db(this.self_user().id, client_id))
+    return this.clientService
+      .deleteClient(clientId, password)
+      .then(() => this.deleteClientFromDb(this.selfUser().id, clientId))
       .then(() => {
-        this.self_user().remove_client(client_id);
+        this.selfUser().remove_client(clientId);
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.REMOVED_DEVICE, {
           outcome: 'success',
         });
-        amplify.publish(z.event.WebApp.USER.CLIENT_REMOVED, this.self_user().id, client_id);
+        amplify.publish(z.event.WebApp.USER.CLIENT_REMOVED, this.selfUser().id, clientId);
         return this.clients();
       })
       .catch(error => {
-        this.logger.error(`Unable to delete client '${client_id}': ${error.message}`, error);
+        this.logger.error(`Unable to delete client '${clientId}': ${error.message}`, error);
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.REMOVED_DEVICE, {
           outcome: 'fail',
         });
 
-        const is_forbidden = z.service.BackendClientError.STATUS_CODE.FORBIDDEN;
-        const error_type = is_forbidden
+        const isForbidden = z.service.BackendClientError.STATUS_CODE.FORBIDDEN;
+        const error_type = isForbidden
           ? z.client.ClientError.TYPE.REQUEST_FORBIDDEN
           : z.client.ClientError.TYPE.REQUEST_FAILURE;
         throw new z.client.ClientError(error_type);
       });
   }
 
-  remove_local_client() {
-    this.cryptography_repository.storage_repository.delete_cryptography().then(() => {
-      const is_temporary_client = this.current_client().is_temporary();
-      amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.CLIENT_REMOVED, is_temporary_client);
+  removeLocalClient() {
+    this.cryptographyRepository.storage_repository.deleteCryptographyStores().then(() => {
+      const isTemporaryClient = this.currentClient().isTemporary();
+      amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.CLIENT_REMOVED, isTemporaryClient);
     });
   }
 
-  logout_client() {
-    if (this.current_client()) {
-      if (this.current_client().type === z.client.ClientType.PERMANENT) {
+  logoutClient() {
+    if (this.currentClient()) {
+      if (this.currentClient().type === z.client.ClientType.PERMANENT) {
         return amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.LOGOUT, {
-          action(clear_data) {
-            return amplify.publish(
-              z.event.WebApp.LIFECYCLE.SIGN_OUT,
-              z.auth.SIGN_OUT_REASON.USER_REQUESTED,
-              clear_data
-            );
+          action(clearData) {
+            return amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.USER_REQUESTED, clearData);
           },
         });
       }
-      return this.delete_temporary_client().then(() =>
+      return this.deleteTemporaryClient().then(() =>
         amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.USER_REQUESTED, true)
       );
     }
@@ -502,38 +497,39 @@ z.client.ClientRepository = class ClientRepository {
   /**
    * Removes a stored client and the session connected with it.
    *
-   * @param {string} user_id - ID of user
-   * @param {string} client_id - ID of client to be deleted
+   * @param {string} userId - ID of user
+   * @param {string} clientId - ID of client to be deleted
    * @returns {Promise} Resolves when a client and its session have been deleted
    */
-  remove_client(user_id, client_id) {
-    return this.cryptography_repository
-      .delete_session(user_id, client_id)
-      .then(() => this.delete_client_from_db(user_id, client_id));
+  removeClient(userId, clientId) {
+    return this.cryptographyRepository
+      .delete_session(userId, clientId)
+      .then(() => this.deleteClientFromDb(userId, clientId));
   }
 
   /**
    * Retrieves meta information about all the clients of a given user.
-   * @note If you want to get very detailed information about the devices from the own user, then use "@get_clients"
+   * @note If you want to get very detailed information about the devices from the own user, then use "@getClients"
    *
-   * @param {string} user_id - User ID to retrieve client information for
+   * @param {string} userId - User ID to retrieve client information for
    * @returns {Promise} Resolves with an array of client entities
    */
-  get_clients_by_user_id(user_id) {
-    return this.client_service
-      .get_clients_by_user_id(user_id)
-      .then(clients => this._update_clients_for_user(user_id, clients))
-      .then(client_ets => {
-        amplify.publish(z.event.WebApp.CLIENT.UPDATE, user_id, client_ets);
-        return client_ets;
+  getClientsByUserId(userId) {
+    return this.clientService
+      .getClientsByUserId(userId)
+      .then(clients => this._updateClientsForUser(userId, clients))
+      .then(clientEntities => {
+        amplify.publish(z.event.WebApp.CLIENT.UPDATE, userId, clientEntities);
+        return clientEntities;
       });
   }
 
-  get_client_by_user_id_from_db(user_id) {
-    return this.client_service.load_all_clients_from_db().then(clients => {
-      return clients.filter(
-        client => z.client.Client.dismantle_user_client_id(client.meta.primary_key).user_id === user_id
-      );
+  getClientByUserIdFromDb(requestedUserId) {
+    return this.clientService.loadAllClientsFromDb().then(clients => {
+      return clients.filter(client => {
+        const {userId} = z.client.ClientEntity.dismantleUserClientId(client.meta.primary_key);
+        return userId === requestedUserId;
+      });
     });
   }
 
@@ -541,14 +537,14 @@ z.client.ClientRepository = class ClientRepository {
    * Retrieves meta information about all the clients of the self user.
    * @returns {Promise} Resolves with the retrieved information about the clients
    */
-  get_clients_for_self() {
-    this.logger.info(`Retrieving all clients for the self user '${this.self_user().id}'`);
-    return this.client_service
-      .get_clients()
-      .then(response => this._update_clients_for_user(this.self_user().id, response))
-      .then(client_ets => {
-        client_ets.forEach(client_et => this.self_user().add_client(client_et));
-        return this.self_user().devices();
+  getClientsForSelf() {
+    this.logger.info(`Retrieving all clients for the self user '${this.selfUser().id}'`);
+    return this.clientService
+      .getClients()
+      .then(response => this._updateClientsForUser(this.selfUser().id, response))
+      .then(clientEntities => {
+        clientEntities.forEach(clientEntity => this.selfUser().add_client(clientEntity));
+        return this.selfUser().devices();
       });
   }
 
@@ -556,39 +552,39 @@ z.client.ClientRepository = class ClientRepository {
    * Is the current client permanent.
    * @returns {boolean} Type of current client is permanent
    */
-  is_current_client_permanent() {
-    if (!this.current_client()) {
+  isCurrentClientPermanent() {
+    if (!this.currentClient()) {
       throw new z.client.ClientError(z.client.ClientError.TYPE.CLIENT_NOT_SET);
     }
-    return z.util.Environment.electron || this.current_client().is_permanent();
+    return z.util.Environment.electron || this.currentClient().isPermanent();
   }
 
   /**
    * Remove obsolete clients and sessions for given user.
    *
    * @private
-   * @param {string} user_id - ID of user to check clients and sessions off
-   * @param {Array<string>} client_ids - Contains IDs of local sessions for user
+   * @param {string} userId - ID of user to check clients and sessions off
+   * @param {Array<string>} clientIds - Contains IDs of local sessions for user
    * @returns {Promise} Resolves when obsolete clients have been removed
    */
-  _remove_obsolete_client_for_user_by_id(user_id, client_ids) {
-    return this.get_clients_by_user_id(user_id).then(client_ets => {
+  _removeObsoleteClientsForUserById(userId, clientIds) {
+    return this.getClientsByUserId(userId).then(clientEntities => {
       this.logger.info(
-        `For user '${user_id}' backend found '${client_ets.length}' active clients. Locally there are sessions for '${
-          client_ids.length
-        }' clients`,
+        `For user '${userId}' backend found '${
+          clientEntities.length
+        }' active clients. Locally there are sessions for '${clientIds.length}' clients`,
         {
-          clients: client_ets,
-          sessions: client_ids,
+          clients: clientEntities,
+          sessions: clientIds,
         }
       );
 
-      for (const client_id of client_ids) {
-        const delete_client = !client_ets.find(({id}) => id === client_id);
+      for (const clientId of clientIds) {
+        const deleteClient = !clientEntities.find(({id}) => id === clientId);
 
-        if (delete_client) {
-          this.logger.log(`Client '${client_id}' of user '${user_id}' is obsolete and will be removed`);
-          this.remove_client(user_id, client_id);
+        if (deleteClient) {
+          this.logger.log(`Client '${clientId}' of user '${userId}' is obsolete and will be removed`);
+          this.removeClient(userId, clientId);
         }
       }
     });
@@ -600,71 +596,71 @@ z.client.ClientRepository = class ClientRepository {
    *   Clients will then be updated with the backend payload in the database and mapped into entities.
    *
    * @private
-   * @param {string} user_id - ID of user to update clients for
+   * @param {string} userId - ID of user to update clients for
    * @param {Object} clients - Payload from the backend
    * @returns {Promise<Array<z.client.Client>>} Resolves with the client entities
    */
-  _update_clients_for_user(user_id, clients) {
-    const clients_from_backend = {};
-    const clients_stored_in_db = [];
+  _updateClientsForUser(userId, clients) {
+    const clientsFromBackend = {};
+    const clientsStoredInDb = [];
 
     for (const client of clients) {
-      clients_from_backend[client.id] = client;
+      clientsFromBackend[client.id] = client;
     }
 
     // Find clients in database
-    return this.get_client_by_user_id_from_db(user_id)
+    return this.getClientByUserIdFromDb(userId)
       .then(results => {
         const promises = [];
 
         for (const result of results) {
-          if (clients_from_backend[result.id]) {
-            const {client, was_updated} = this.client_mapper.update_client(result, clients_from_backend[result.id]);
+          if (clientsFromBackend[result.id]) {
+            const {client, wasUpdated} = this.clientMapper.updateClient(result, clientsFromBackend[result.id]);
 
-            delete clients_from_backend[result.id];
+            delete clientsFromBackend[result.id];
 
-            if (this.current_client() && this._is_current_client(user_id, result.id)) {
+            if (this.currentClient() && this._isCurrentClient(userId, result.id)) {
               this.logger.warn(`Removing duplicate self client '${result.id}' locally`);
-              this.remove_client(user_id, result.id);
+              this.removeClient(userId, result.id);
             }
 
             // Locally known client changed on backend
-            if (was_updated) {
-              this.logger.info(`Updating client '${result.id}' of user '${user_id}' locally`);
-              promises.push(this.save_client_in_db(user_id, client));
+            if (wasUpdated) {
+              this.logger.info(`Updating client '${result.id}' of user '${userId}' locally`);
+              promises.push(this.saveClientInDb(userId, client));
               continue;
             }
 
             // Locally known client unchanged on backend
-            clients_stored_in_db.push(client);
+            clientsStoredInDb.push(client);
             continue;
           }
 
           // Locally known client deleted on backend
-          this.logger.warn(`Removing client '${result.id}' of user '${user_id}' locally`);
-          this.remove_client(user_id, result.id);
+          this.logger.warn(`Removing client '${result.id}' of user '${userId}' locally`);
+          this.removeClient(userId, result.id);
         }
 
-        for (const client_id in clients_from_backend) {
-          const client_payload = clients_from_backend[client_id];
+        for (const clientId in clientsFromBackend) {
+          const clientPayload = clientsFromBackend[clientId];
 
-          if (this.current_client() && this._is_current_client(user_id, client_id)) {
+          if (this.currentClient() && this._isCurrentClient(userId, clientId)) {
             continue;
           }
 
           // Locally unknown client new on backend
-          this.logger.info(`New client '${client_id}' of user '${user_id}' will be stored locally`);
-          if (this.self_user().id === user_id) {
-            this.on_client_add({client: client_payload});
+          this.logger.info(`New client '${clientId}' of user '${userId}' will be stored locally`);
+          if (this.selfUser().id === userId) {
+            this.onClientAdd({client: clientPayload});
           }
-          promises.push(this._update_client_schema_in_db(user_id, client_payload));
+          promises.push(this._updateClientSchemaInDb(userId, clientPayload));
         }
 
         return Promise.all(promises);
       })
-      .then(new_records => this.client_mapper.map_clients(clients_stored_in_db.concat(new_records)))
+      .then(newRecords => this.clientMapper.mapClients(clientsStoredInDb.concat(newRecords)))
       .catch(error => {
-        this.logger.error(`Unable to retrieve clients for user '${user_id}': ${error.message}`, error);
+        this.logger.error(`Unable to retrieve clients for user '${userId}': ${error.message}`, error);
         throw error;
       });
   }
@@ -673,21 +669,21 @@ z.client.ClientRepository = class ClientRepository {
    * Check if client is current local client.
    *
    * @private
-   * @param {string} user_id - User ID to be checked
-   * @param {string} client_id - ID of client to be checked
+   * @param {string} userId - User ID to be checked
+   * @param {string} clientId - ID of client to be checked
    * @returns {boolean} Is the client the current local client
    */
-  _is_current_client(user_id, client_id) {
-    if (!this.current_client()) {
+  _isCurrentClient(userId, clientId) {
+    if (!this.currentClient()) {
       throw new z.client.ClientError(z.client.ClientError.TYPE.CLIENT_NOT_SET);
     }
-    if (!user_id) {
+    if (!userId) {
       throw new z.client.ClientError(z.client.ClientError.TYPE.NO_USER_ID);
     }
-    if (!client_id) {
+    if (!clientId) {
       throw new z.client.ClientError(z.client.ClientError.TYPE.NO_CLIENT_ID);
     }
-    return user_id === this.self_user().id && client_id === this.current_client().id;
+    return userId === this.selfUser().id && clientId === this.currentClient().id;
   }
 
   //##############################################################################
@@ -697,47 +693,47 @@ z.client.ClientRepository = class ClientRepository {
   /**
    * Listener for incoming user events.
    *
-   * @param {Object} event_json - JSON data for event
+   * @param {Object} eventJson - JSON data for event
    * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
-  on_user_event(event_json, source) {
-    const {type} = event_json;
+  onUserEvent(eventJson, source) {
+    const {type} = eventJson;
 
     if (type === z.event.Backend.USER.CLIENT_ADD) {
-      return this.on_client_add(event_json);
+      return this.onClientAdd(eventJson);
     }
 
     if (type === z.event.Backend.USER.CLIENT_REMOVE) {
-      this.on_client_remove(event_json);
+      this.onClientRemove(eventJson);
     }
   }
 
   /**
    * A client was added by the self user.
-   * @param {Object} event_json - JSON data of 'user.client-add' event
+   * @param {Object} eventJson - JSON data of 'user.client-add' event
    * @returns {undefined} No return value
    */
-  on_client_add(event_json) {
-    this.logger.info('Client of self user added', event_json);
-    const client_et = this.client_mapper.map_client(event_json.client);
-    amplify.publish(z.event.WebApp.CLIENT.ADD, this.self_user().id, client_et);
+  onClientAdd(eventJson) {
+    this.logger.info('Client of self user added', eventJson);
+    const clientEntity = this.clientMapper.mapClient(eventJson.client);
+    amplify.publish(z.event.WebApp.CLIENT.ADD, this.selfUser().id, clientEntity);
   }
 
   /**
    * A client was removed by the self user.
-   * @param {Object} [event_json={}] - JSON data of 'user.client-remove' event
+   * @param {Object} [eventJson={}] - JSON data of 'user.client-remove' event
    * @returns {Promise} Resolves when the event has been handled
    */
-  on_client_remove(event_json = {}) {
-    const client_id = event_json.client ? event_json.client.id : undefined;
-    if (client_id) {
-      const is_current_client = client_id === this.current_client().id;
-      if (is_current_client) {
-        return this.remove_local_client();
+  onClientRemove(eventJson = {}) {
+    const clientId = eventJson.client ? eventJson.client.id : undefined;
+    if (clientId) {
+      const isCurrentClient = clientId === this.currentClient().id;
+      if (isCurrentClient) {
+        return this.removeLocalClient();
       }
 
-      amplify.publish(z.event.WebApp.CLIENT.REMOVE, this.self_user().id, client_id);
+      amplify.publish(z.event.WebApp.CLIENT.REMOVE, this.selfUser().id, clientId);
     }
   }
 };

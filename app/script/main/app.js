@@ -125,7 +125,6 @@ z.main.App = class App {
       repositories.user
     );
 
-    repositories.bot = new z.bot.BotRepository(repositories.conversation);
     repositories.broadcast = new z.broadcast.BroadcastRepository(
       this.service.broadcast,
       repositories.client,
@@ -145,6 +144,11 @@ z.main.App = class App {
       repositories.team,
       repositories.user
     );
+    repositories.integration = new z.integration.IntegrationRepository(
+      this.service.integration,
+      repositories.conversation,
+      repositories.team
+    );
     repositories.system_notification = new z.system_notification.SystemNotificationRepository(
       repositories.calling,
       repositories.conversation
@@ -161,6 +165,7 @@ z.main.App = class App {
     const services = {};
 
     services.asset = new z.assets.AssetService(this.auth.client);
+    services.integration = new z.integration.IntegrationService(this.auth.client);
     services.broadcast = new z.broadcast.BroadcastService(this.auth.client);
     services.calling = new z.calling.CallingService(this.auth.client);
     services.connect = new z.connect.ConnectService(this.auth.client);
@@ -212,6 +217,7 @@ z.main.App = class App {
       this.repository.calling,
       this.repository.client,
       this.repository.conversation,
+      this.repository.integration,
       this.repository.media,
       this.repository.properties,
       this.repository.search,
@@ -223,6 +229,7 @@ z.main.App = class App {
       this.repository.calling,
       this.repository.connect,
       this.repository.conversation,
+      this.repository.integration,
       this.repository.search,
       this.repository.properties,
       this.repository.team
@@ -290,7 +297,7 @@ z.main.App = class App {
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.RECEIVED_SELF_USER);
         this.repository.client.init(self_user_et);
         this.repository.properties.init(self_user_et);
-        return this.repository.client.get_valid_local_client();
+        return this.repository.client.getValidLocalClient();
       })
       .then(client_observable => {
         this.view.loading.update_progress(7.5, z.string.init_validated_client);
@@ -327,7 +334,7 @@ z.main.App = class App {
         this.repository.conversation.map_connections(this.repository.user.connections());
         this._subscribe_to_unload_events();
 
-        return this.repository.team.get_team();
+        return this.repository.team.getTeam();
       })
       .then(() => this.repository.user.loadUsers())
       .then(() => this.repository.event.initialize_from_stream())
@@ -346,7 +353,7 @@ z.main.App = class App {
         this.view.loading.update_progress(97.5, z.string.init_updated_from_notifications);
 
         this._watch_online_status();
-        return this.repository.client.get_clients_for_self();
+        return this.repository.client.getClientsForSelf();
       })
       .then(client_ets => {
         this.view.loading.update_progress(99);
@@ -356,7 +363,7 @@ z.main.App = class App {
 
         this.repository.user.self().devices(client_ets);
         this.logger.info('App pre-loading completed');
-        return this._handle_url_params();
+        return this._handleUrlParams();
       })
       .then(() => {
         this._show_ui();
@@ -370,7 +377,7 @@ z.main.App = class App {
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.UPDATED_CONVERSATIONS);
         this.repository.lifecycle.init();
         this.repository.audio.init(true);
-        this.repository.client.cleanup_clients_and_sessions(true);
+        this.repository.client.cleanupClientsAndSessions(true);
         this.repository.conversation.cleanup_conversations();
         this.logger.info('App fully loaded');
       })
@@ -492,7 +499,7 @@ z.main.App = class App {
    * @returns {undefined} No return value
    */
   _check_user_information(user_et) {
-    if (!user_et.medium_picture_resource()) {
+    if (!user_et.mediumPictureResource()) {
       this.repository.user.set_default_picture();
     }
     if (!user_et.username()) {
@@ -539,15 +546,17 @@ z.main.App = class App {
    * Handle URL params.
    * @returns {undefined} Not return value
    */
-  _handle_url_params() {
-    const botName = z.util.get_url_parameter(z.auth.URLParameter.BOT_NAME);
-    if (botName) {
-      const botProvider = z.util.get_url_parameter(z.auth.URLParameter.BOT_PROVIDER);
-      const botService = z.util.get_url_parameter(z.auth.URLParameter.BOT_SERVICE);
-      if (botProvider && botService) {
-        this.logger.info(`Found bot token '${botName}'`);
-        this.repository.bot.add_bot({botName, botProvider, botService});
-      }
+  _handleUrlParams() {
+    const providerId = z.util.get_url_parameter(z.auth.URLParameter.BOT_PROVIDER);
+    const serviceId = z.util.get_url_parameter(z.auth.URLParameter.BOT_SERVICE);
+    if (providerId && serviceId) {
+      this.logger.info(`Found bot conversation initialization params '${serviceId}'`);
+      this.repository.integration.addServiceFromParam(providerId, serviceId);
+    }
+
+    const supportIntegrations = z.util.get_url_parameter(z.auth.URLParameter.INTEGRATIONS);
+    if (_.isBoolean(supportIntegrations)) {
+      this.repository.integration.supportIntegrations(supportIntegrations);
     }
   }
 
@@ -573,7 +582,7 @@ z.main.App = class App {
     const is_redirect_from_auth = document.referrer.toLowerCase().includes('/auth');
     const get_cached_token = is_localhost || is_redirect_from_auth;
 
-    return get_cached_token ? this.auth.repository.get_cached_access_token() : this.auth.repository.get_access_token();
+    return get_cached_token ? this.auth.repository.getCachedAccessToken() : this.auth.repository.getAccessToken();
   }
 
   /**
@@ -593,7 +602,7 @@ z.main.App = class App {
    * @returns {undefined} No return value
    */
   _show_ui() {
-    const conversation_et = this.repository.conversation.get_most_recent_conversation();
+    const conversation_et = this.repository.conversation.getMostRecentConversation();
     this.logger.info('Showing application UI');
     if (this.repository.user.should_change_username()) {
       amplify.publish(z.event.WebApp.TAKEOVER.SHOW);
@@ -658,16 +667,14 @@ z.main.App = class App {
       // Clear Local Storage (but don't delete the cookie label if you were logged in with a permanent client)
       const do_not_delete = [z.storage.StorageKey.AUTH.SHOW_LOGIN];
 
-      if (this.repository.client.is_current_client_permanent() && !clear_data) {
+      if (this.repository.client.isCurrentClientPermanent() && !clear_data) {
         do_not_delete.push(z.storage.StorageKey.AUTH.PERSIST);
       }
 
       // @todo remove on next iteration
       const self_user = this.repository.user.self();
       if (self_user) {
-        const cookie_label_key = this.repository.client.construct_cookie_label_key(
-          self_user.email() || self_user.phone()
-        );
+        const cookie_label_key = this.repository.client.constructCookieLabelKey(self_user.email() || self_user.phone());
 
         Object.keys(amplify.store()).forEach(amplify_key => {
           if (
@@ -685,7 +692,7 @@ z.main.App = class App {
       // Clear IndexedDB
       if (clear_data) {
         this.repository.storage
-          .delete_everything()
+          .deleteDatabase()
           .catch(error => this.logger.error('Failed to delete database before logout', error))
           .then(() => {
             amplify.publish(z.event.WebApp.LIFECYCLE.SIGNED_OUT, clear_data);
@@ -725,10 +732,13 @@ z.main.App = class App {
    * @returns {undefined} No return value
    */
   refresh() {
+    this.logger.info(`Refresh to update from source '${this.update_source}' started`);
     if (z.util.Environment.desktop) {
       amplify.publish(z.event.WebApp.LIFECYCLE.RESTART, this.update_source);
     }
-    if (this.update_source === z.lifecycle.UPDATE_SOURCE.WEBAPP) {
+
+    const isWebappSource = this.update_source === z.lifecycle.UPDATE_SOURCE.WEBAPP;
+    if (isWebappSource) {
       window.location.reload(true);
       window.focus();
     }
@@ -776,7 +786,7 @@ z.main.App = class App {
    */
   disable_debugging() {
     z.config.LOGGER.OPTIONS.domains['app.wire.com'] = () => 0;
-    this.repository.properties.save_preference(z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING, false);
+    this.repository.properties.savePreference(z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING, false);
   }
 
   /**
@@ -785,7 +795,7 @@ z.main.App = class App {
    */
   enable_debugging() {
     z.config.LOGGER.OPTIONS.domains['app.wire.com'] = () => 300;
-    this.repository.properties.save_preference(z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING, true);
+    this.repository.properties.savePreference(z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING, true);
   }
 
   /**

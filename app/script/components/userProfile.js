@@ -22,30 +22,30 @@
 window.z = window.z || {};
 window.z.components = z.components || {};
 
-z.components.UserProfileMode = {
-  DEFAULT: 'default',
-  PEOPLE: 'people',
-  SEARCH: 'search',
-};
+z.components.UserProfile = class UserProfile {
+  static get MODE() {
+    return {
+      DEFAULT: 'UserProfile.MODE.DEFAULT',
+      PEOPLE: 'UserProfile.MODE.PEOPLE',
+      SEARCH: 'USerProfile.MODE.SEARCH',
+    };
+  }
 
-z.components.UserProfileViewModel = class UserProfileViewModel {
   constructor(params, component_info) {
-    const SHOW_CONVERSATION_DELAY = 550;
-
     this.dispose = this.dispose.bind(this);
     this.click_on_device = this.click_on_device.bind(this);
 
-    this.logger = new z.util.Logger('z.components.UserProfileViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('z.components.UserProfile', z.config.LOGGER.OPTIONS);
 
     this.user = params.user;
     this.conversation = params.conversation;
-    this.mode = params.mode || z.components.UserProfileMode.DEFAULT;
+    this.mode = params.mode || UserProfile.MODE.DEFAULT;
 
     // repository references
-    this.client_repository = wire.app.repository.client;
-    this.conversation_repository = wire.app.repository.conversation;
-    this.cryptography_repository = wire.app.repository.cryptography;
-    this.user_repository = wire.app.repository.user;
+    this.client_repository = window.wire.app.repository.client;
+    this.conversation_repository = window.wire.app.repository.conversation;
+    this.cryptography_repository = window.wire.app.repository.cryptography;
+    this.user_repository = window.wire.app.repository.user;
 
     this.isTeam = ko.pureComputed(() => {
       return this.conversation()
@@ -53,9 +53,11 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
         .is_team_member();
     });
     this.userAvailabilityLabel = ko.pureComputed(() => {
-      const availabilitySetToNone = this.user().availability() === z.user.AvailabilityType.NONE;
-      if (!availabilitySetToNone) {
-        return z.user.AvailabilityMapper.nameFromType(this.user().availability());
+      if (this.user()) {
+        const availabilitySetToNone = this.user().availability() === z.user.AvailabilityType.NONE;
+        if (!availabilitySetToNone) {
+          return z.user.AvailabilityMapper.nameFromType(this.user().availability());
+        }
       }
     });
 
@@ -78,8 +80,9 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
         params.block(this.user());
       }
     };
-    this.on_close = function() {
+    this.on_close = () => {
       if (typeof params.close === 'function') {
+        this.render_avatar(false);
         params.close();
       }
     };
@@ -110,7 +113,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
     };
 
     // cancel request confirm dialog
-    this.confirm_dialog = undefined;
+    this.confirmDialog = undefined;
 
     // tabs
     this.click_on_tab = index => this.tab_index(index);
@@ -121,19 +124,19 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
     this.devices = ko.observableArray();
     this.devices_found = ko.observable();
     this.selected_device = ko.observable();
-    this.fingerprint_remote = ko.observable('');
-    this.fingerprint_local = ko.observable('');
+    this.fingerprint_remote = ko.observableArray([]);
+    this.fingerprint_local = ko.observableArray([]);
     this.is_resetting_session = ko.observable(false);
 
     // destroy confirm dialog when user changes
     this.cleanup_computed = ko.computed(() => {
-      if (this.user() && this.confirm_dialog) {
-        this.confirm_dialog.destroy();
+      if (this.user() && this.confirmDialog) {
+        this.confirmDialog.destroy();
       }
       this.tab_index(0);
       this.devices_found(null);
       this.selected_device(null);
-      this.fingerprint_remote('');
+      this.fingerprint_remote([]);
       this.is_resetting_session(false);
     });
 
@@ -145,11 +148,11 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
 
     this.selected_device_subscription = this.selected_device.subscribe(() => {
       if (this.selected_device()) {
-        this.fingerprint_local(this.cryptography_repository.get_local_fingerprint());
-        this.fingerprint_remote('');
+        this.fingerprint_local(this.formatFingerprint(this.cryptography_repository.get_local_fingerprint()));
+        this.fingerprint_remote([]);
         this.cryptography_repository
           .get_remote_fingerprint(this.user().id, this.selected_device().id)
-          .then(fingerprint => this.fingerprint_remote(fingerprint));
+          .then(fingerprint => this.fingerprint_remote(this.formatFingerprint(fingerprint)));
       }
     });
 
@@ -165,17 +168,28 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
     });
 
     this.detail_message = ko.pureComputed(() => {
-      return z.l10n.text(z.string.people_tabs_device_detail_headline, {
-        html1: "<span class='user-profile-device-detail-highlight'>",
-        html2: '</span>',
+      const text = z.l10n.text(z.string.people_tabs_device_detail_headline, {
         user: z.util.escape_html(this.user().first_name()),
+      });
+
+      const textWithHtmlTags = new RegExp('\\{\\{[^\\}]+\\}\\}[^\\{]+\\{\\{[^\\}]+\\}\\}');
+      const textWithinHtmlTags = new RegExp('\\{\\{[^\\}]+\\}\\}', 'gm');
+
+      const pivot = text.match(textWithHtmlTags)[0];
+      const sanitizedText = z.util.StringUtil.splitAtPivotElement(text, pivot, pivot);
+
+      return sanitizedText.map(element => {
+        if (element.isStyled) {
+          element.text = element.text.replace(textWithinHtmlTags, '');
+        }
+        return element;
       });
     });
 
     this.on_cancel_request = () => {
       amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
 
-      this.confirm_dialog = this.element.confirm({
+      this.confirmDialog = this.element.confirm({
         confirm: () => {
           const should_block = this.element.find('.checkbox input').is(':checked');
           if (should_block) {
@@ -190,7 +204,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
               const next_conversation_et = this.conversation_repository.get_next_conversation(conversation_et);
               window.setTimeout(() => {
                 amplify.publish(z.event.WebApp.CONVERSATION.SHOW, next_conversation_et);
-              }, SHOW_CONVERSATION_DELAY);
+              }, z.motion.MotionDuration.LONG);
             }
           });
 
@@ -218,9 +232,11 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
           if (typeof params.open === 'function') {
             params.open(this.user());
           }
-        }, SHOW_CONVERSATION_DELAY);
+        }, z.motion.MotionDuration.LONG);
       });
     };
+
+    this.formatFingerprint = fingerprint => z.util.zero_padding(fingerprint, 16).match(/.{1,2}/g);
 
     this.on_connect = () => {
       this.user_repository
@@ -298,7 +314,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
             return 'user-profile-footer-profile';
           }
 
-          if (user_et.is_connected() || conversation_et.team_id) {
+          if (user_et.is_connected() || user_et.is_team_member()) {
             return 'user-profile-footer-add-block';
           }
 
@@ -358,12 +374,12 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
   }
 
   click_on_my_fingerprint_button() {
-    this.confirm_dialog = $('#participants').confirm({
+    this.confirmDialog = $('#participants').confirm({
       data: {
         click_on_show_my_devices() {
           amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_DEVICES);
         },
-        device: this.client_repository.current_client,
+        device: this.client_repository.currentClient,
         fingerprint_local: this.fingerprint_local,
       },
       template: '#template-confirm-my-fingerprint',
@@ -374,7 +390,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
     const reset_progress = () => {
       window.setTimeout(() => {
         this.is_resetting_session(false);
-      }, 550);
+      }, z.motion.MotionDuration.LONG);
     };
 
     this.is_resetting_session(true);
@@ -388,7 +404,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
     const toggle_verified = !this.selected_device().meta.is_verified();
 
     this.client_repository
-      .verify_client(this.user().id, this.selected_device(), toggle_verified)
+      .verifyClient(this.user().id, this.selected_device(), toggle_verified)
       .catch(error => this.logger.warn(`Client cannot be updated: ${error.message}`));
   }
 
@@ -396,7 +412,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
     if (index === 1) {
       const user_id = this.user().id;
       this.client_repository
-        .get_clients_by_user_id(user_id)
+        .getClientsByUserId(user_id)
         .then(client_ets => this.devices_found(client_ets.length > 0))
         .catch(error => this.logger.error(`Unable to retrieve clients data for user '${user_id}': ${error}`));
     }
@@ -415,7 +431,7 @@ ko.components.register('user-profile', {
   },
   viewModel: {
     createViewModel(params, component_info) {
-      return new z.components.UserProfileViewModel(params, component_info);
+      return new z.components.UserProfile(params, component_info);
     },
   },
 });

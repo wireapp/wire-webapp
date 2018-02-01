@@ -55,7 +55,7 @@ z.ViewModel.list.TakeoverViewModel = class TakeoverViewModel {
     this.user_repository
       .change_username(this.username())
       .then(() => {
-        const conversation_et = this.conversation_repository.get_most_recent_conversation();
+        const conversation_et = this.conversation_repository.getMostRecentConversation();
         if (conversation_et) {
           amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversation_et);
         } else if (this.user_repository.connect_requests().length) {

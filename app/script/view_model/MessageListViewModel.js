@@ -405,7 +405,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
     const difference = BUBBLE_HEIGHT - largest_distance;
 
     const create_bubble = element_id => {
-      wire.app.view.content.participants.reset_view();
+      wire.app.view.content.participants.resetView();
       this.participant_bubble_last_id = element_id;
       this.participant_bubble = new zeta.webapp.module.Bubble({
         host_selector: `#${element_id}`,
@@ -423,8 +423,8 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
     };
 
     const show_bubble = () => {
-      if (wire.app.view.content.participants.confirm_dialog) {
-        wire.app.view.content.participants.confirm_dialog.destroy();
+      if (wire.app.view.content.participants.confirmDialog) {
+        wire.app.view.content.participants.confirmDialog.destroy();
       }
 
       // We clicked on the same bubble
@@ -441,7 +441,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
         }
         window.setTimeout(() => {
           create_bubble(element.id);
-        }, 550);
+        }, z.motion.MotionDuration.LONG);
       } else {
         create_bubble(element.id);
       }
@@ -467,7 +467,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
       window.setTimeout(() => {
         message_et.is_resetting_session(false);
         amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.SESSION_RESET);
-      }, 550);
+      }, z.motion.MotionDuration.LONG);
 
     message_et.is_resetting_session(true);
     this.conversation_repository

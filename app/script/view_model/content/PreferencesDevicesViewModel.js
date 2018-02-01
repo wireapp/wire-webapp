@@ -43,18 +43,15 @@ z.ViewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
 
     this.self_user = this.client_repository.self_user;
 
-    this.current_client = this.client_repository.current_client;
+    this.current_client = this.client_repository.currentClient;
+    this.displayClientId = ko.pureComputed(() => (this.current_client() ? this.current_client().formatId() : []));
 
-    this.activated_in = ko.observable(z.l10n.text(z.string.preferences_devices_activated_in));
-    this.activated_on = ko.observable(z.l10n.text(z.string.preferences_devices_activated_on));
+    this.activated_in = ko.observable([]);
+    this.activated_on = ko.observable([]);
     this.devices = ko.observableArray();
-    this.fingerprint = ko.observable('');
+    this.displayFingerPrint = ko.observable();
 
-    this.should_update_scrollbar = ko
-      .computed(() => {
-        return this.devices();
-      })
-      .extend({notify: 'always', rateLimit: 500});
+    this.should_update_scrollbar = ko.computed(() => this.devices()).extend({notify: 'always', rateLimit: 500});
 
     this._update_activation_location('?');
 
@@ -65,14 +62,15 @@ z.ViewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
     });
   }
 
-  _update_activation_location(location) {
-    const location_content = `<span class='preferences-devices-activated-bold'>${location}</span>`;
-    this.activated_in(z.l10n.text(z.string.preferences_devices_activated_in, location_content));
+  _update_activation_location(location, template = z.string.preferences_devices_activated_in) {
+    const sanitizedText = z.util.StringUtil.splitAtPivotElement(template, '{{location}}', location);
+    this.activated_in(sanitizedText);
   }
 
-  _update_activation_time(time) {
-    const time_content = `<span class='preferences-devices-activated-bold'>${z.util.format_timestamp(time)}</span>`;
-    this.activated_on(z.l10n.text(z.string.preferences_devices_activated_on, time_content));
+  _update_activation_time(time, template = z.string.preferences_devices_activated_on) {
+    const formattedTime = z.util.format_timestamp(time);
+    const sanitizedText = z.util.StringUtil.splitAtPivotElement(template, '{{date}}', formattedTime);
+    this.activated_on(sanitizedText);
   }
 
   _update_device_location(location) {
@@ -91,7 +89,7 @@ z.ViewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
   click_on_remove_device(device_et, event) {
     amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.REMOVE_DEVICE, {
       action: password => {
-        this.client_repository.delete_client(device_et.id, password);
+        this.client_repository.deleteClient(device_et.id, password);
       },
       data: device_et.model,
     });
@@ -99,13 +97,15 @@ z.ViewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
   }
 
   update_device_info() {
-    if (this.current_client() && !this.fingerprint()) {
+    if (this.current_client() && !this.displayFingerPrint()) {
       if (this.current_client().location) {
         this._update_device_location(this.current_client().location);
       }
 
       this._update_activation_time(this.current_client().time);
-      this.fingerprint(this.cryptography_repository.get_local_fingerprint());
+      this.displayFingerPrint(
+        z.util.zero_padding(this.cryptography_repository.get_local_fingerprint(), 16).match(/.{1,2}/g)
+      );
     }
   }
 };

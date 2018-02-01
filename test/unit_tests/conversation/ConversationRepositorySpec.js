@@ -76,7 +76,7 @@ describe('ConversationRepository', () => {
           z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE,
           z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET
         );
-        ({storage_service} = conversation_repository.conversation_service);
+        ({storageService: storage_service} = conversation_repository.conversation_service);
 
         conversation_et = _generate_conversation(z.conversation.ConversationType.SELF);
         conversation_et.id = payload.conversations.knock.post.conversation;
@@ -101,7 +101,7 @@ describe('ConversationRepository', () => {
 
   afterEach(() => {
     server.restore();
-    storage_service.clear_all_stores();
+    storage_service.clearStores();
     jQuery.ajax.restore();
     TestFactory.conversation_repository.conversations.removeAll();
   });
@@ -149,9 +149,11 @@ describe('ConversationRepository', () => {
         ._on_asset_upload_complete(conversation_et, event)
         .then(() => {
           expect(TestFactory.conversation_service.update_asset_as_uploaded_in_db).toHaveBeenCalled();
-          expect(message_et.assets()[0].original_resource().otr_key).toBe(event.data.otr_key);
-          expect(message_et.assets()[0].original_resource().sha256).toBe(event.data.sha256);
-          expect(message_et.assets()[0].status()).toBe(z.assets.AssetTransferState.UPLOADED);
+
+          const [firstAsset] = message_et.assets();
+          expect(firstAsset.original_resource().otrKey).toBe(event.data.otr_key);
+          expect(firstAsset.original_resource().sha256).toBe(event.data.sha256);
+          expect(firstAsset.status()).toBe(z.assets.AssetTransferState.UPLOADED);
           done();
         })
         .catch(done.fail);
@@ -670,7 +672,7 @@ describe('ConversationRepository', () => {
       let create_event = null;
 
       beforeEach(() => {
-        spyOn(TestFactory.conversation_repository, '_on_create').and.callThrough();
+        spyOn(TestFactory.conversation_repository, '_onCreate').and.callThrough();
         spyOn(TestFactory.conversation_repository, 'map_conversations').and.returnValue(true);
         spyOn(TestFactory.conversation_repository, 'update_participating_user_ets').and.returnValue(true);
         spyOn(TestFactory.conversation_repository, 'save_conversation').and.returnValue(true);
@@ -684,7 +686,7 @@ describe('ConversationRepository', () => {
         TestFactory.conversation_repository
           .onConversationEvent(create_event)
           .then(() => {
-            expect(TestFactory.conversation_repository._on_create).toHaveBeenCalled();
+            expect(TestFactory.conversation_repository._onCreate).toHaveBeenCalled();
             expect(TestFactory.conversation_repository.map_conversations).toHaveBeenCalledWith(create_event.data, 1);
             expect(TestFactory.conversation_repository._prepare_conversation_create_notification).toHaveBeenCalled();
             done();
@@ -699,7 +701,7 @@ describe('ConversationRepository', () => {
         TestFactory.conversation_repository
           .onConversationEvent(create_event)
           .then(() => {
-            expect(TestFactory.conversation_repository._on_create).toHaveBeenCalled();
+            expect(TestFactory.conversation_repository._onCreate).toHaveBeenCalled();
             expect(TestFactory.conversation_repository.map_conversations).toHaveBeenCalledWith(
               create_event.data,
               time.getTime()
@@ -1056,14 +1058,14 @@ describe('ConversationRepository', () => {
       john = new z.entity.User(entities.user.john_doe.id);
       john.name('John');
 
-      const johns_computer = new z.client.Client({id: '83ad5d3c31d3c76b', class: 'tabconst'});
+      const johns_computer = new z.client.ClientEntity({id: '83ad5d3c31d3c76b', class: 'tabconst'});
       john.devices.push(johns_computer);
 
       lara = new z.entity.User();
       lara.name('Lara');
 
-      const bobs_computer = new z.client.Client({id: '74606e4c02b2c7f9', class: 'desktop'});
-      const bobs_phone = new z.client.Client({id: '8f63631e129ed19d', class: 'phone'});
+      const bobs_computer = new z.client.ClientEntity({id: '74606e4c02b2c7f9', class: 'desktop'});
+      const bobs_phone = new z.client.ClientEntity({id: '8f63631e129ed19d', class: 'phone'});
 
       bob.devices.push(bobs_computer);
       bob.devices.push(bobs_phone);

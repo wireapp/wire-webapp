@@ -46,7 +46,7 @@ z.util.KeyboardUtil = (() => {
 
   const KEYBOARD_KEY = z.util.Environment.browser.edge ? Object.assign(KEY_DEFAULT, KEY_EDGE) : KEY_DEFAULT;
 
-  const _insert_at_caret = (areaId, text) => {
+  const _insertAtCaret = (areaId, text) => {
     // http://stackoverflow.com/a/1064139
     const textArea = document.getElementById(areaId);
     if (!textArea) {
@@ -88,8 +88,8 @@ z.util.KeyboardUtil = (() => {
     textArea.scrollTop = scrollPos;
   };
 
-  const _is_arrow_key = keyboard_event => {
-    return _is_one_of_keys(keyboard_event, [
+  const _isArrowKey = keyboardEvent => {
+    return _isOneOfKeys(keyboardEvent, [
       KEYBOARD_KEY.ARROW_DOWN,
       KEYBOARD_KEY.ARROW_LEFT,
       KEYBOARD_KEY.ARROW_RIGHT,
@@ -97,53 +97,53 @@ z.util.KeyboardUtil = (() => {
     ]);
   };
 
-  const _is_backspace_key = keyboard_event => _is_key(keyboard_event, KEYBOARD_KEY.BACKSPACE);
+  const _isBackspaceKey = keyboardEvent => _isKey(keyboardEvent, KEYBOARD_KEY.BACKSPACE);
 
-  const _is_delete_key = keyboard_event => _is_key(keyboard_event, KEYBOARD_KEY.DELETE);
+  const _isDeleteKey = keyboardEvent => _isKey(keyboardEvent, KEYBOARD_KEY.DELETE);
 
-  const _is_enter_key = keyboard_event => _is_key(keyboard_event, KEYBOARD_KEY.ENTER);
+  const _isEnterKey = keyboardEvent => _isKey(keyboardEvent, KEYBOARD_KEY.ENTER);
 
-  const _is_escape_key = keyboard_event => _is_key(keyboard_event, KEYBOARD_KEY.ESC);
+  const _isEscapeKey = keyboardEvent => _isKey(keyboardEvent, KEYBOARD_KEY.ESC);
 
-  const _is_function_key = keyboard_event => {
-    return keyboard_event.altKey || keyboard_event.ctrlKey || keyboard_event.metaKey || keyboard_event.shiftKey;
+  const _isFunctionKey = keyboardEvent => {
+    return keyboardEvent.altKey || keyboardEvent.ctrlKey || keyboardEvent.metaKey || keyboardEvent.shiftKey;
   };
 
-  const _is_key = (keyboard_event = {}, expected_key = '') => {
-    const key = keyboard_event.key ? keyboard_event.key : '';
-    return key.toLowerCase() === expected_key.toLowerCase();
+  const _isKey = (keyboardEvent = {}, expectedKey = '') => {
+    const eventKey = keyboardEvent.key ? keyboardEvent.key.toLowerCase() : '';
+    return eventKey === expectedKey.toLowerCase();
   };
 
-  const _is_meta_key = keyboard_event => keyboard_event.metaKey || keyboard_event.ctrlKey;
+  const _isMetaKey = keyboardEvent => keyboardEvent.metaKey || keyboardEvent.ctrlKey;
 
-  const _is_one_of_keys = (keyboard_event, expected_keys = []) => {
-    expected_keys = expected_keys.map(key => key.toLowerCase());
+  const _isOneOfKeys = (keyboardEvent, expectedKeys = []) => {
+    expectedKeys = expectedKeys.map(key => key.toLowerCase());
 
-    const event_key = keyboard_event.key.toLowerCase();
-    return !!expected_keys.find(key => key === event_key);
+    const eventKey = keyboardEvent.key ? keyboardEvent.key.toLowerCase() : '';
+    return !!expectedKeys.find(key => key === eventKey);
   };
 
-  const _is_paste_action = keyboard_event => {
-    return _is_meta_key(keyboard_event) && _is_key(keyboard_event, KEYBOARD_KEY.KEY_V);
+  const _isPasteAction = keyboardEvent => {
+    return _isMetaKey(keyboardEvent) && _isKey(keyboardEvent, KEYBOARD_KEY.KEY_V);
   };
 
-  const _is_removal_action = keyboard_event => {
-    return _is_one_of_keys(keyboard_event, [KEYBOARD_KEY.BACKSPACE, KEYBOARD_KEY.DELETE]);
+  const _isRemovalAction = keyboardEvent => {
+    return _isOneOfKeys(keyboardEvent, [KEYBOARD_KEY.BACKSPACE, KEYBOARD_KEY.DELETE]);
   };
 
   return {
     KEY: KEYBOARD_KEY,
-    insert_at_caret: _insert_at_caret,
-    is_arrow_key: _is_arrow_key,
-    is_backspace_key: _is_backspace_key,
-    is_delete_key: _is_delete_key,
-    is_enter_key: _is_enter_key,
-    is_escape_key: _is_escape_key,
-    is_function_key: _is_function_key,
-    is_key: _is_key,
-    is_meta_key: _is_meta_key,
-    is_one_of_keys: _is_one_of_keys,
-    is_paste_action: _is_paste_action,
-    is_removal_action: _is_removal_action,
+    insertAtCaret: _insertAtCaret,
+    isArrowKey: _isArrowKey,
+    isBackspaceKey: _isBackspaceKey,
+    isDeleteKey: _isDeleteKey,
+    isEnterKey: _isEnterKey,
+    isEscapeKey: _isEscapeKey,
+    isFunctionKey: _isFunctionKey,
+    isKey: _isKey,
+    isMetaKey: _isMetaKey,
+    isOneOfKeys: _isOneOfKeys,
+    isPasteAction: _isPasteAction,
+    isRemovalAction: _isRemovalAction,
   };
 })();

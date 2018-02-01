@@ -430,7 +430,7 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
 
         case z.util.KeyboardUtil.KEY.ENTER: {
           if (keyboard_event.altKey || keyboard_event.metaKey) {
-            z.util.KeyboardUtil.insert_at_caret(keyboard_event.target, '\n');
+            z.util.KeyboardUtil.insertAtCaret(keyboard_event.target, '\n');
             $(keyboard_event.target).change();
             keyboard_event.preventDefault();
           }
@@ -516,7 +516,7 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
         label: z.l10n.text(z.string.ephememal_units_none),
       },
     ].concat(
-      z.ephemeral.timings.get_values().map(milliseconds => {
+      z.ephemeral.timings.getValues().map(milliseconds => {
         const [number, unit] = z.util.format_milliseconds_short(milliseconds);
         const unit_locale = this._get_localized_unit_string(number, unit);
         return {

@@ -68,7 +68,7 @@ class InitialInvite extends React.PureComponent {
         padding: '0 24px 0 20px',
       }}
     >
-      <Text data-uie-name="item-pending-email" fontSize="14px">
+      <Text fontSize="14px" data-uie-name="item-pending-email">
         {email}
       </Text>
       <CheckIcon color={COLOR.TEXT} />
@@ -82,6 +82,7 @@ class InitialInvite extends React.PureComponent {
     } else {
       this.props.invite({email: this.emailInput.value});
       this.setState({enteredEmail: ''});
+      this.emailInput.value = '';
     }
     this.emailInput.focus();
   };
@@ -117,7 +118,6 @@ class InitialInvite extends React.PureComponent {
                     this.resetErrors();
                     this.setState({enteredEmail: event.target.value});
                   }}
-                  value={enteredEmail}
                   innerRef={node => (this.emailInput = node)}
                   autoFocus
                   data-uie-name="enter-invite-email"
@@ -141,7 +141,7 @@ class InitialInvite extends React.PureComponent {
                 {_(inviteStrings.nextButton)}
               </ButtonLink>
             ) : (
-              <Link data-uie-name="do-skip" onClick={this.onInviteDone}>
+              <Link onClick={this.onInviteDone} data-uie-name="do-skip">
                 {_(inviteStrings.skipForNow)}
               </Link>
             )}

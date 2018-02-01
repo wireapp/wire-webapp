@@ -40,9 +40,9 @@ const wireTeamLink = `${ROUTE.WIRE_ROOT}/create-team/#features`;
 
 class TeamName extends Component {
   state = {
-    enteredTeamName: this.props.teamName,
+    enteredTeamName: this.props.teamName || '',
     error: null,
-    isValidTeamName: false,
+    isValidTeamName: !!this.props.teamName,
   };
 
   componentDidMount() {
@@ -78,7 +78,7 @@ class TeamName extends Component {
         <Columns>
           <Column style={{display: 'flex'}}>
             <div style={{margin: 'auto'}}>
-              <Link to={ROUTE.INDEX} data-uie-name="go-register-team" component={RRLink}>
+              <Link to={ROUTE.INDEX} component={RRLink} data-uie-name="go-register-team">
                 <ArrowIcon direction="left" color={COLOR.GRAY} />
               </Link>
             </div>
@@ -94,7 +94,7 @@ class TeamName extends Component {
                 <Form style={{marginTop: 30}}>
                   <InputSubmitCombo>
                     <Input
-                      defaultValue={enteredTeamName}
+                      value={enteredTeamName}
                       innerRef={node => (this.teamNameInput = node)}
                       onChange={event => {
                         this.resetErrors();

@@ -31,8 +31,8 @@
               <group-avatar params="users: connect_requests()"></group-avatar>
             <!-- /ko -->
             <!-- ko if: connect_requests().length === 1 -->
-            <div class="user-avatar-halo">
-              <user-avatar class="user-avatar-s" params="user: connect_requests()[0]"></user-avatar>
+            <div class="avatar-halo">
+              <participant-avatar params="participant: connect_requests()[0], size: z.components.ParticipantAvatar.SIZE.SMALL"></participant-avatar>
             </div>
             <!-- /ko -->
           </div>
@@ -56,15 +56,17 @@
       <!-- /ko -->
     </ul>
     <!-- /ko -->
-    <!-- ko if: conversations_unarchived().length === 0 && connect_requests().length === 0 && conversations_calls().length === 0 -->
+    <!-- ko if: noConversations() -->
       <!-- ko if: conversations_archived().length === 0 -->
-        <div class="conversation-hint" data-uie-name="status-start-conversation-hint">
-          <div class="conversation-hint-header" data-bind="l10n_text: z.string.conversations_no_conversations"></div>
-          <div class="conversation-hint-detail" data-bind="l10n_text: z.string.conversations_no_conversations_detail"></div>
+        <div class="conversations-hint" data-uie-name="status-start-conversation-hint">
+          <div class="conversations-hint-text" data-bind="l10n_text: z.string.conversations_no_conversations"></div>
+          <svg class="conversations-hint-arrow" width="16" height="53" viewBox="0 0 16 53">
+            <path d="M13.9 43l1.414 1.414-7.657 7.657L0 44.414 1.414 43l5.24 5.24V0h2v48.246z" fill="#FFF" fill-rule="evenodd"/>
+          </svg>
         </div>
       <!-- /ko -->
       <!-- ko if: conversations_archived().length > 0 -->
-        <div class="conversation-hint" data-bind="l10n_text: z.string.conversations_all_archived"></div>
+        <div class="conversations-all-archived" data-bind="l10n_text: z.string.conversations_all_archived"></div>
       <!-- /ko -->
     <!-- /ko -->
   </div>

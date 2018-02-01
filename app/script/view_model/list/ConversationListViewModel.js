@@ -60,7 +60,7 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
     this.content_state = this.content_view_model.content_state;
     this.selected_conversation = ko.observable();
 
-    this.is_team = this.team_repository.is_team;
+    this.is_team = this.team_repository.isTeam;
 
     this.self_user = ko.pureComputed(() => this.user_repository.self && this.user_repository.self());
     this.selfAvailability = ko.pureComputed(() => this.self_user() && this.self_user().availability());
@@ -78,6 +78,11 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
     this.conversations_calls = this.conversation_repository.conversations_calls;
     this.conversations_archived = this.conversation_repository.conversations_archived;
     this.conversations_unarchived = this.conversation_repository.conversations_unarchived;
+
+    this.noConversations = ko.pureComputed(() => {
+      const noConversations = !this.conversations_unarchived().length && !this.conversations_calls().length;
+      return noConversations && !this.connect_requests().length;
+    });
 
     this.webapp_is_loaded = ko.observable(false);
 

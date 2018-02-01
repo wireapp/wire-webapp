@@ -71,7 +71,7 @@ z.components.FullSearchViewModel = class FullSearchViewModel {
       const input = _.escape(this.input());
 
       message_et.matches_count = 0;
-      let transformed_text = text.replace(z.search.FullTextSearch.get_search_regex(input), match => {
+      let transformed_text = text.replace(z.search.FullTextSearch.getSearchRegex(input), match => {
         message_et.matches_count += 1;
         return `<mark class='full-search-marked' data-uie-name='full-search-item-mark'>${match}</mark>`;
       });
@@ -124,25 +124,25 @@ ko.components.register('full-search', {
       <span class="full-search-header-icon icon-search"></span>
       <div class="full-search-header-input">
         <input type="text" data-bind="hasFocus: true, l10n_placeholder: z.string.fullsearch_placeholder, textInput: input" data-uie-name="full-search-header-input"/>
-        <span class="button-icon icon-dismiss" data-uie-name="full-search-dismiss" data-bind="click: on_dismiss_button_click, visible: input()"></span>
+        <span class="button-icon icon-dismiss" data-bind="click: on_dismiss_button_click, visible: input()" data-uie-name="full-search-dismiss"></span>
       </div>
     </header>
     <!-- ko if: show_no_results_text() -->
-      <div class="full-search-no-result" data-uie-name="full-search-no-results" data-bind="l10n_text: z.string.fullsearch_no_results"></div>
+      <div class="full-search-no-result" data-bind="l10n_text: z.string.fullsearch_no_results" data-uie-name="full-search-no-results"></div>
     <!-- /ko -->
-    <div class="full-search-list" data-uie-name="full-search-list" data-bind="foreach: {data: message_ets_rendered}">
-      <div class="full-search-item" data-uie-name="full-search-item" data-bind="click: $parent.on_message_click">
+    <div class="full-search-list" data-bind="foreach: {data: message_ets_rendered}" data-uie-name="full-search-list">
+      <div class="full-search-item" data-bind="click: $parent.on_message_click" data-uie-name="full-search-item">
         <div class="full-search-item-avatar">
-          <user-avatar class="user-avatar-xs" params="user: user()"></user-avatar>
+          <participant-avatar params="participant: user(), size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
         </div>
         <div class="full-search-item-content">
-          <div class="full-search-item-content-text ellipsis" data-uie-name="full-search-item-text" data-bind="html: $parent.transform_text($data)"></div>
+          <div class="full-search-item-content-text ellipsis" data-bind="html: $parent.transform_text($data)" data-uie-name="full-search-item-text"></div>
           <div class="full-search-item-content-info">
-            <span class="font-weight-bold" data-uie-name="full-search-item-sender" data-bind="text: user().first_name()"></span>
-            <span data-uie-name="full-search-item-timestamp" data-bind="text: moment($data.timestamp()).format('MMMM D, YYYY')"></span>
+            <span class="font-weight-bold" data-bind="text: user().first_name()" data-uie-name="full-search-item-sender"></span>
+            <span data-bind="text: moment($data.timestamp()).format('MMMM D, YYYY')" data-uie-name="full-search-item-timestamp"></span>
           </div>
         </div>
-        <div class="badge" data-uie-name="full-search-item-badge" data-bind="text: matches_count, visible: matches_count > 1"></div>
+        <div class="badge" data-bind="text: matches_count, visible: matches_count > 1" data-uie-name="full-search-item-badge"></div>
       </div>
     </div>
   `,

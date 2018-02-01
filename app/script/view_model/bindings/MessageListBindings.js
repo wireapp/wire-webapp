@@ -28,19 +28,20 @@ ko.bindingHandlers.focus_on_keydown = {
       window,
       {
         event: {
-          keydown(_data, keyboard_event) {
+          keydown(_data, jquery_event) {
             if ($('.detail-view').hasClass('modal-show')) {
               return false;
             }
 
+            const keyboard_event = jquery_event.originalEvent || jquery_event;
             // check for activeElement needed, cause in IE11 i could be undefined under some circumstances
             const active_element_is_input =
               document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName);
-            const is_arrow_key = z.util.KeyboardUtil.is_arrow_key(keyboard_event);
+            const is_arrow_key = z.util.KeyboardUtil.isArrowKey(keyboard_event);
 
             if (!active_element_is_input && !is_arrow_key) {
-              const is_meta_key_pressed = z.util.KeyboardUtil.is_meta_key(keyboard_event);
-              const is_paste_action = z.util.KeyboardUtil.is_paste_action(keyboard_event);
+              const is_meta_key_pressed = z.util.KeyboardUtil.isMetaKey(keyboard_event);
+              const is_paste_action = z.util.KeyboardUtil.isPasteAction(keyboard_event);
 
               if (!is_meta_key_pressed || is_paste_action) {
                 element.focus();

@@ -27,68 +27,66 @@ z.team.TeamMapper = class TeamMapper {
     this.logger = new z.util.Logger('z.team.TeamMapper', z.config.LOGGER.OPTIONS);
   }
 
-  map_team_from_object(data) {
-    return this.update_team_from_object(data);
+  mapTeamFromObject(data) {
+    return this.updateTeamFromObject(data);
   }
 
-  update_team_from_object(data, team_et = new z.team.TeamEntity()) {
-    if (!data) {
-      return;
-    }
+  updateTeamFromObject(teamData, teamEntity = new z.team.TeamEntity()) {
+    if (teamData) {
+      const {creator, icon, icon_key: iconKey, id, name} = teamData;
 
-    if (data.creator) {
-      team_et.creator = data.creator;
-    }
+      if (creator) {
+        teamEntity.creator = creator;
+      }
 
-    if (data.icon) {
-      team_et.icon = data.icon;
-    }
+      if (icon) {
+        teamEntity.icon = icon;
+      }
 
-    if (data.icon_key) {
-      team_et.icon_key = data.icon_key;
-    }
+      if (iconKey) {
+        teamEntity.iconKey = iconKey;
+      }
 
-    if (data.id) {
-      team_et.id = data.id;
-    }
+      if (id) {
+        teamEntity.id = id;
+      }
 
-    if (data.name) {
-      team_et.name(data.name);
-    }
+      if (name) {
+        teamEntity.name(name);
+      }
 
-    return team_et;
+      return teamEntity;
+    }
   }
 
-  map_member_from_array(members_data) {
-    return members_data.map(data => this.update_member_from_object(data));
+  mapMemberFromArray(membersData) {
+    return membersData.map(data => this.updateMemberFromObject(data));
   }
 
-  map_member_from_object(data) {
-    return this.update_member_from_object(data);
+  mapMemberFromObject(data) {
+    return this.updateMemberFromObject(data);
   }
 
-  map_role(user_et, permissions) {
+  mapRole(userEntity, permissions) {
     if (permissions) {
-      const team_role = z.team.TeamRole.check_role(permissions);
-      this.logger.info(`Identified user '${user_et.id}' as '${team_role}'`, permissions);
-      user_et.team_role(team_role);
+      const teamRole = z.team.TeamRole.checkRole(permissions);
+      this.logger.info(`Identified user '${userEntity.id}' as '${teamRole}'`, permissions);
+      userEntity.team_role(teamRole);
     }
   }
 
-  update_member_from_object(data, member_et = new z.team.TeamMemberEntity()) {
-    if (!data) {
-      return;
-    }
+  updateMemberFromObject(memberData, memberEntity = new z.team.TeamMemberEntity()) {
+    if (memberData) {
+      const {permissions, user} = memberData;
+      if (permissions) {
+        memberEntity.permissions = permissions;
+      }
 
-    const {permissions, user} = data;
-    if (permissions) {
-      member_et.permissions = permissions;
-    }
+      if (user) {
+        memberEntity.userId = user;
+      }
 
-    if (user) {
-      member_et.user_id = user;
+      return memberEntity;
     }
-
-    return member_et;
   }
 };

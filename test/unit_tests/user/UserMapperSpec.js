@@ -22,13 +22,7 @@
 // grunt test_init && grunt test_run:user/UserMapper
 
 describe('User Mapper', () => {
-  const asset_service = {
-    generate_asset_url() {
-      return 'FooBarURL';
-    },
-  };
-
-  const mapper = new z.user.UserMapper(asset_service);
+  const mapper = new z.user.UserMapper();
   mapper.logger.level = z.util.Logger.prototype.levels.ERROR;
 
   let self_user_payload = null;
@@ -152,8 +146,8 @@ describe('User Mapper', () => {
         name: entities.user.jane_roe.name,
       };
       const updated_user_et = mapper.update_user_from_object(user_et, data);
-      expect(updated_user_et.preview_picture_resource()).toBeDefined();
-      expect(updated_user_et.medium_picture_resource()).toBeDefined();
+      expect(updated_user_et.previewPictureResource()).toBeDefined();
+      expect(updated_user_et.mediumPictureResource()).toBeDefined();
     });
   });
 });

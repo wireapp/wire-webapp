@@ -33,7 +33,7 @@ describe('ConversationServiceNoCompound', () => {
       .exposeStorageActors()
       .then(storage_repository => {
         const {client} = test_factory;
-        ({storage_service} = storage_repository);
+        ({storageService: storage_service} = storage_repository);
         conversation_service = new z.conversation.ConversationServiceNoCompound(client, storage_service);
 
         conversation_mapper = new z.conversation.ConversationMapper();
@@ -46,7 +46,7 @@ describe('ConversationServiceNoCompound', () => {
   afterEach(done => {
     server.restore();
     storage_service
-      .clear_all_stores()
+      .clearStores()
       .then(done)
       .catch(done.fail);
   });

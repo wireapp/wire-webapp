@@ -60,18 +60,18 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     // Cryptography
     this.asset_service = new z.assets.AssetService(this.auth.client);
     // @todo Don't operate with the service directly. Get a repository!
-    this.storage_service = new z.storage.StorageService();
-    this.storage_repository = new z.storage.StorageRepository(this.storage_service);
+    this.storageService = new z.storage.StorageService();
+    this.storage_repository = new z.storage.StorageRepository(this.storageService);
 
     this.cryptography_service = new z.cryptography.CryptographyRepository(this.auth.client);
     this.cryptography_repository = new z.cryptography.CryptographyRepository(
       this.cryptography_service,
       this.storage_repository
     );
-    this.client_service = new z.client.ClientService(this.auth.client, this.storage_service);
+    this.client_service = new z.client.ClientService(this.auth.client, this.storageService);
     this.client_repository = new z.client.ClientRepository(this.client_service, this.cryptography_repository);
 
-    this.user_mapper = new z.user.UserMapper(this.asset_service);
+    this.user_mapper = new z.user.UserMapper();
     this.user_service = new z.user.UserService(this.auth.client);
     this.user_repository = new z.user.UserRepository(
       this.user_service,
@@ -80,7 +80,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       this.client_repository
     );
 
-    this.notification_service = new z.event.NotificationService(this.auth.client, this.storage_service);
+    this.notification_service = new z.event.NotificationService(this.auth.client, this.storageService);
     this.web_socket_service = new z.event.WebSocketService(this.auth.client);
     this.event_repository = new z.event.EventRepository(
       this.web_socket_service,
@@ -284,8 +284,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
   _init_url_parameter() {
     const mode = z.util.get_url_parameter(z.auth.URLParameter.MODE);
     if (mode) {
-      const expectedModes = [z.auth.AuthView.MODE.ACCOUNT_LOGIN, z.auth.AuthView.MODE.ACCOUNT_REGISTER];
-      const isExpectedMode = expectedModes.includes(mode);
+      const isExpectedMode = mode === z.auth.AuthView.MODE.ACCOUNT_LOGIN;
       if (isExpectedMode) {
         this._set_hash(mode);
         return;
@@ -445,7 +444,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.SHOW_LOGIN, true);
 
     this.auth.repository
-      .get_access_token()
+      .getAccessToken()
       .then(() => {
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ACCOUNT.LOGGED_IN, {
           context: 'auto',
@@ -541,7 +540,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       const payload = this._create_payload(z.auth.AuthView.MODE.ACCOUNT_PHONE);
 
       this.auth.repository
-        .request_login_code(payload)
+        .requestLoginCode(payload)
         .then(response => _on_code_request_success(response))
         .catch(error => {
           this.pending_server_request(false);
@@ -712,8 +711,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     switch (mode) {
       case z.auth.AuthView.MODE.ACCOUNT_PASSWORD: {
         payload = {
-          label: this.client_repository.construct_cookie_label(username, this.client_type()),
-          label_key: this.client_repository.construct_cookie_label_key(username, this.client_type()),
+          label: this.client_repository.constructCookieLabel(username, this.client_type()),
+          label_key: this.client_repository.constructCookieLabelKey(username, this.client_type()),
           password: this.password(),
         };
 
@@ -739,8 +738,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       case z.auth.AuthView.MODE.VERIFY_CODE: {
         payload = {
           code: this.code(),
-          label: this.client_repository.construct_cookie_label(this.phone_number_e164(), this.client_type()),
-          label_key: this.client_repository.construct_cookie_label_key(this.phone_number_e164(), this.client_type()),
+          label: this.client_repository.constructCookieLabel(this.phone_number_e164(), this.client_type()),
+          label_key: this.client_repository.constructCookieLabelKey(this.phone_number_e164(), this.client_type()),
           phone: this.phone_number_e164(),
         };
         break;
@@ -748,8 +747,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
       case z.auth.AuthView.MODE.VERIFY_PASSWORD: {
         payload = {
-          label: this.client_repository.construct_cookie_label(this.phone_number_e164(), this.client_type()),
-          label_key: this.client_repository.construct_cookie_label_key(this.phone_number_e164(), this.client_type()),
+          label: this.client_repository.constructCookieLabel(this.phone_number_e164(), this.client_type()),
+          label_key: this.client_repository.constructCookieLabelKey(this.phone_number_e164(), this.client_type()),
           password: this.password(),
           phone: this.phone_number_e164(),
         };
@@ -872,7 +871,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
   }
 
   keydown_auth(keyboard_event) {
-    if (z.util.KeyboardUtil.is_enter_key(keyboard_event)) {
+    if (z.util.KeyboardUtil.isEnterKey(keyboard_event)) {
       switch (this.visible_mode()) {
         case z.auth.AuthView.MODE.ACCOUNT_LOGIN: {
           if (this.visible_method() === z.auth.AuthView.MODE.ACCOUNT_PHONE) {
@@ -915,11 +914,11 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
   }
 
   keydown_phone_code(view_model, keyboard_event) {
-    if (z.util.KeyboardUtil.is_paste_action(keyboard_event)) {
+    if (z.util.KeyboardUtil.isPasteAction(keyboard_event)) {
       return true;
     }
 
-    if (z.util.KeyboardUtil.is_function_key(keyboard_event)) {
+    if (z.util.KeyboardUtil.isFunctionKey(keyboard_event)) {
       return false;
     }
 
@@ -985,7 +984,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     }
 
     if (this.device_modal.is_hidden()) {
-      this.client_repository.get_clients_for_self();
+      this.client_repository.getClientsForSelf();
     }
 
     this.device_modal.toggle();
@@ -1002,7 +1001,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
   click_on_remove_device_submit(password, device) {
     this.client_repository
-      .delete_client(device.id, password)
+      .deleteClient(device.id, password)
       .then(() => this._register_client())
       .then(() => this.device_modal.toggle())
       .catch(error => {
@@ -1685,7 +1684,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
    */
   logout() {
     this.auth.repository.logout().then(() => {
-      this.auth.repository.delete_access_token();
+      this.auth.repository.deleteAccessToken();
       window.location.replace('/login');
     });
   }
@@ -1715,8 +1714,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     this.logger.info('Logging in');
 
     this._get_self_user()
-      .then(() => this.cryptography_repository.load_cryptobox(this.storage_service.db))
-      .then(() => this.client_repository.get_valid_local_client())
+      .then(() => this.cryptography_repository.load_cryptobox(this.storageService.db))
+      .then(() => this.client_repository.getValidLocalClient())
       .catch(error => {
         const user_missing_email = error.type === z.user.UserError.TYPE.USER_MISSING_EMAIL;
         if (user_missing_email) {
@@ -1725,18 +1724,18 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
         const client_not_validated = error.type === z.client.ClientError.TYPE.NO_VALID_CLIENT;
         if (client_not_validated) {
-          const client_et = this.client_repository.current_client();
-          this.client_repository.current_client(undefined);
+          const client_et = this.client_repository.currentClient();
+          this.client_repository.currentClient(undefined);
           return this.cryptography_repository.reset_cryptobox(client_et).then(deleted_everything => {
             if (deleted_everything) {
               this.logger.info('Database was completely reset. Reinitializing storage...');
-              return this.storage_repository.storage_service.init(this.self_user().id);
+              return this.storage_repository.storageService.init(this.self_user().id);
             }
           });
         }
       })
       .then(() => {
-        if (this.client_repository.current_client()) {
+        if (this.client_repository.currentClient()) {
           this.logger.info('Active client found. Redirecting to app...');
           return this._redirect_to_app();
         }
@@ -1773,7 +1772,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
           throw new z.user.UserError(z.user.UserError.TYPE.USER_MISSING_EMAIL);
         }
 
-        return this.storage_service.init(this.self_user().id);
+        return this.storageService.init(this.self_user().id);
       })
       .then(() => {
         this.client_repository.init(this.self_user());
@@ -1787,7 +1786,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
    * @returns {Promise<boolean>} Resolves with whether at least one conversation event was found
    */
   _has_local_history() {
-    return this.storage_service.get_all(z.storage.StorageService.OBJECT_STORE.EVENTS).then(events => events.length > 0);
+    return this.storageService.getAll(z.storage.StorageService.OBJECT_STORE.EVENTS).then(events => events.length > 0);
   }
 
   /**
@@ -1802,8 +1801,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
   _register_client(auto_login) {
     return this.cryptography_repository
-      .create_cryptobox(this.storage_service.db)
-      .then(() => this.client_repository.register_client(auto_login ? undefined : this.password()))
+      .create_cryptobox(this.storageService.db)
+      .then(() => this.client_repository.registerClient(auto_login ? undefined : this.password()))
       .then(client_observable => {
         this.event_repository.current_client = client_observable;
         return this.event_repository.initialize_stream_state(client_observable().id);
@@ -1814,7 +1813,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
         }
         throw error;
       })
-      .then(() => this.client_repository.get_clients_for_self())
+      .then(() => this.client_repository.getClientsForSelf())
       .then(client_ets => {
         const number_of_clients = client_ets ? client_ets.length : 0;
         this.logger.info(`User has '${number_of_clients}' registered clients`, client_ets);
@@ -1828,7 +1827,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
         }
 
         // Make sure client entities always see the history screen
-        if (this.client_repository.current_client().is_temporary()) {
+        if (this.client_repository.currentClient().isTemporary()) {
           return this._set_hash(z.auth.AuthView.MODE.HISTORY);
         }
 

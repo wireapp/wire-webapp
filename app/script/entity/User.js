@@ -51,7 +51,7 @@ z.entity.User = class User {
   constructor(id = '') {
     this.id = id;
     this.is_me = false;
-    this.is_bot = false;
+    this.isBot = false;
 
     this.joaat_hash = -1;
 
@@ -133,8 +133,8 @@ z.entity.User = class User {
 
     this.username = ko.observable();
 
-    this.preview_picture_resource = ko.observable();
-    this.medium_picture_resource = ko.observable();
+    this.previewPictureResource = ko.observable();
+    this.mediumPictureResource = ko.observable();
 
     this.connection = ko.observable(new z.entity.Connection());
 
@@ -152,6 +152,7 @@ z.entity.User = class User {
     this.is_team_manager = ko.pureComputed(() =>
       [z.team.TeamRole.ROLE.ADMIN, z.team.TeamRole.ROLE.OWNER].includes(this.team_role())
     );
+    this.isTeamOwner = ko.pureComputed(() => z.team.TeamRole.ROLE.OWNER === this.team_role());
 
     this.is_request = ko.pureComputed(() => this.connection().is_request());
 

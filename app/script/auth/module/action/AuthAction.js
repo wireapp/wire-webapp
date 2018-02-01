@@ -19,7 +19,8 @@
 
 import BackendError from './BackendError';
 import * as AuthActionCreator from './creator/AuthActionCreator';
-import {currentLanguage} from '../../localeConfig';
+import {currentLanguage, currentCurrency} from '../../localeConfig';
+import {fetchSelf} from './SelfAction';
 
 export function doLogin(login) {
   return function(dispatch, getState, {apiClient}) {
@@ -52,21 +53,13 @@ export function pushAccountRegistrationData(registration) {
 export function doRegisterTeam(registration) {
   return function(dispatch, getState, {apiClient}) {
     registration.locale = currentLanguage();
+    registration.name = registration.name.trim();
+    registration.email = registration.email.trim();
     registration.team.icon = 'default';
     registration.team.binding = true;
-    registration.name = registration.name.trim();
+    registration.team.currency = currentCurrency();
     registration.team.name = registration.team.name.trim();
-    registration.email = registration.email.trim();
-    dispatch(
-      AuthActionCreator.startRegisterTeam({
-        accent_id: registration.accent_id,
-        email: registration.email,
-        locale: registration.locale,
-        name: registration.name,
-        password: '******',
-        team: registration.team,
-      })
-    );
+    dispatch(AuthActionCreator.startRegisterTeam({...registration, password: '******'}));
     return Promise.resolve()
       .then(() => dispatch(doSilentLogout()))
       .then(() => apiClient.register(registration))
@@ -96,6 +89,7 @@ export function doRegisterPersonal(registration) {
       .then(() => dispatch(doSilentLogout()))
       .then(() => apiClient.register(registration))
       .then(createdAccount => dispatch(AuthActionCreator.successfulRegisterPersonal(createdAccount)))
+      .then(() => dispatch(fetchSelf()))
       .catch(error => {
         dispatch(AuthActionCreator.failedRegisterPersonal(error));
         throw BackendError.handle(error);
