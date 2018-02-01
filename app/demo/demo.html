@@ -19,7 +19,7 @@
       .microbar {
         position: fixed;
         width: 100%;
-        height: 28px;
+        height: 36px;
         top: 0;
         left: 0;
         margin: 0;
@@ -32,8 +32,8 @@
       }
 
       .microbar-hidden {
-        -webkit-transform: translateY(-28px);
-                transform: translateY(-28px);
+        -webkit-transform: translateY(-32px);
+                transform: translateY(-32px);
       }
 
       .microbar > li {
@@ -93,6 +93,8 @@
         display: inline-block;
       }
       .box-list > li {
+        color: #fff;
+        text-transform: uppercase;
         float: left;
         height: 64px;
         min-width: 96px;
@@ -140,7 +142,7 @@
 
       let previousScroll = 0;
       $(window).scroll(() => {
-         const scroll = $(this).scrollTop();
+         const scroll = $(window).scrollTop();
          $('.microbar').toggleClass('microbar-hidden', scroll > previousScroll);
          previousScroll = scroll;
       });
