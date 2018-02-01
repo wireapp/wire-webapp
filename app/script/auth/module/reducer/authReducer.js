@@ -19,22 +19,24 @@
 
 import * as AuthActionCreator from '../action/creator/AuthActionCreator';
 import * as UserActionCreator from '../action/creator/UserActionCreator';
+import {REGISTER_FLOW} from '../selector/AuthSelector';
 
 export const initialState = {
   account: {
-    accent_id: undefined,
-    assets: undefined,
-    email: undefined,
-    email_code: undefined,
-    invitation_code: undefined,
-    label: undefined,
-    locale: undefined,
-    name: undefined,
-    password: undefined,
-    phone: undefined,
-    phone_code: undefined,
-    team: undefined,
+    accent_id: null,
+    assets: null,
+    email: null,
+    email_code: null,
+    invitation_code: null,
+    label: null,
+    locale: null,
+    name: null,
+    password: null,
+    phone: null,
+    phone_code: null,
+    team: null,
   },
+  currentFlow: null,
   error: null,
   fetched: false,
   fetching: false,
@@ -46,7 +48,8 @@ export default function reducer(state = initialState, action) {
     case AuthActionCreator.LOGIN_START:
     case AuthActionCreator.REGISTER_JOIN_START:
     case AuthActionCreator.REGISTER_PERSONAL_START:
-    case AuthActionCreator.REGISTER_TEAM_START: {
+    case AuthActionCreator.REGISTER_TEAM_START:
+    case UserActionCreator.USER_SEND_ACTIVATION_CODE_START: {
       return {
         ...state,
         error: null,
@@ -114,6 +117,27 @@ export default function reducer(state = initialState, action) {
     }
     case AuthActionCreator.AUTH_RESET_ERROR: {
       return {...state, error: null};
+    }
+    case AuthActionCreator.ENTER_TEAM_CREATION_FLOW: {
+      return {...state, currentFlow: REGISTER_FLOW.TEAM};
+    }
+    case AuthActionCreator.ENTER_PERSONAL_CREATION_FLOW: {
+      return {...state, currentFlow: REGISTER_FLOW.PERSONAL};
+    }
+    case AuthActionCreator.ENTER_GENERIC_INVITATION_FLOW: {
+      return {...state, currentFlow: REGISTER_FLOW.GENERIC_INVITATION};
+    }
+    case AuthActionCreator.ENTER_PERSONAL_INVITATION_FLOW: {
+      return {...state, currentFlow: REGISTER_FLOW.PERSONAL_INVITATION};
+    }
+    case UserActionCreator.USER_SEND_ACTIVATION_CODE_SUCCESS: {
+      return {
+        ...state,
+        fetching: false,
+      };
+    }
+    case AuthActionCreator.GET_INVITATION_FROM_CODE_SUCCESS: {
+      return {...state, account: {...state.account, email: action.payload.email, name: action.payload.name}};
     }
     default: {
       return state;

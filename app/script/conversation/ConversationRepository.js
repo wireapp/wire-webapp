@@ -64,16 +64,22 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.logger = new z.util.Logger('z.conversation.ConversationRepository', z.config.LOGGER.OPTIONS);
 
     this.conversation_mapper = new z.conversation.ConversationMapper();
-    this.event_mapper = new z.conversation.EventMapper(this.asset_service, this.user_repository);
+    this.event_mapper = new z.conversation.EventMapper();
     this.verification_state_handler = new z.conversation.ConversationVerificationStateHandler(this);
+    this.clientMismatchHandler = new z.conversation.ClientMismatchHandler(
+      this,
+      this.cryptography_repository,
+      this.user_repository
+    );
 
     this.active_conversation = ko.observable();
     this.conversations = ko.observableArray([]);
 
     this.time_offset = 0;
 
+    this.isTeam = this.team_repository.isTeam;
+    this.isTeam.subscribe(() => this.map_guest_status_self());
     this.team = this.team_repository.team;
-    this.team.subscribe(() => this.map_guest_status_self());
 
     this.block_event_handling = ko.observable(true);
     this.fetching_conversations = {};
@@ -201,10 +207,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
   create_new_conversation(user_ids, name) {
     return this.conversation_service
       .create_conversation(user_ids, name, this.team().id)
-      .then(response => this._on_create({conversation: response.id, data: response}))
+      .then(response => this._onCreate({conversation: response.id, data: response}))
+      .then(({conversation_et}) => conversation_et)
       .catch(error => {
-        if (error.label === z.service.BackendClientError.LABEL.NOT_CONNECTED) {
-          return this._handle_users_not_connected(user_ids);
+        const notConnected = error.label === z.service.BackendClientError.LABEL.NOT_CONNECTED;
+        if (notConnected) {
+          return this._handleUsersNotConnected(user_ids);
         }
 
         throw error;
@@ -608,12 +616,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   /**
    * Get the most recent event timestamp from any conversation.
+   * @param {boolean} [increment=false] - Increment by one for unique timestamp
    * @returns {number} Timestamp value
    */
-  get_latest_event_timestamp() {
-    const [most_recent_conversation] = this.sorted_conversations();
-    if (most_recent_conversation) {
-      return most_recent_conversation.last_event_timestamp();
+  getLatestEventTimestamp(increment = false) {
+    const mostRecentConversation = this.getMostRecentConversation(true);
+    if (mostRecentConversation) {
+      const lastEventTimestamp = mostRecentConversation.last_event_timestamp();
+      return lastEventTimestamp + (increment ? 1 : 0);
     }
 
     return 1;
@@ -631,10 +641,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   /**
    * Get unarchived conversation with the most recent event.
+   * @param {boolean} [allConversations=false] - Search all conversations
    * @returns {Conversation} Most recent conversation
    */
-  get_most_recent_conversation() {
-    const [conversation_et] = this.conversations_unarchived();
+  getMostRecentConversation(allConversations = false) {
+    const [conversation_et] = allConversations ? this.sorted_conversations() : this.conversations_unarchived();
     return conversation_et;
   }
 
@@ -675,13 +686,19 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
 
     if (team_id) {
-      return this.create_new_conversation([user_et.id], undefined).then(({conversation_et}) => conversation_et);
+      return this.create_new_conversation([user_et.id], undefined);
     }
 
-    return this.fetch_conversation_by_id(user_et.connection().conversation_id).then(conversation_et => {
-      conversation_et.connection(user_et.connection());
-      return this.update_participating_user_ets(conversation_et);
-    });
+    return this.fetch_conversation_by_id(user_et.connection().conversation_id)
+      .then(conversation_et => {
+        conversation_et.connection(user_et.connection());
+        return this.update_participating_user_ets(conversation_et);
+      })
+      .catch(error => {
+        if (error.type !== z.conversation.ConversationError.TYPE.NOT_FOUND) {
+          throw error;
+        }
+      });
   }
 
   /**
@@ -793,10 +810,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Map conversation payload.
    *
    * @param {JSON} payload - Payload to map
-   * @param {number} [initial_timestamp=this.get_latest_event_timestamp()] - Initial server and event timestamp
+   * @param {number} [initial_timestamp=this.getLatestEventTimestamp()] - Initial server and event timestamp
    * @returns {z.entity.Conversation|Array<z.entity.Conversation>} Mapped conversation/s
    */
-  map_conversations(payload, initial_timestamp = this.get_latest_event_timestamp()) {
+  map_conversations(payload, initial_timestamp = this.getLatestEventTimestamp()) {
     const conversation_data = payload.length ? payload : [payload];
 
     const conversation_ets = this.conversation_mapper.map_conversations(conversation_data, initial_timestamp);
@@ -806,25 +823,24 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   _handle_mapped_conversation(conversation_et) {
-    this._map_guest_status_self(conversation_et);
+    this._mapGuestStatusSelf(conversation_et);
     conversation_et.self = this.user_repository.self();
     conversation_et.subscribe_to_state_updates();
   }
 
   map_guest_status_self() {
-    this.filtered_conversations().forEach(conversation_et => this._map_guest_status_self(conversation_et));
+    this.filtered_conversations().forEach(conversation_et => this._mapGuestStatusSelf(conversation_et));
 
-    if (this.team()) {
+    if (this.isTeam()) {
       this.user_repository.self().is_team_member(true);
     }
   }
 
-  _map_guest_status_self(conversation_et) {
-    if (this.team()) {
-      const team_id = conversation_et.team_id;
-      const is_guest = !!(team_id && this.team().id !== team_id);
-      conversation_et.is_guest(is_guest);
-    }
+  _mapGuestStatusSelf(conversationEntity) {
+    const conversationTeamId = conversationEntity.team_id;
+    const selfTeamId = this.team() && this.team().id;
+    const isConversationGuest = !!(conversationTeamId && (!selfTeamId || selfTeamId !== conversationTeamId));
+    conversationEntity.is_guest(isConversationGuest);
   }
 
   /**
@@ -922,54 +938,79 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Add a bot to an existing conversation.
    *
-   * @param {Conversation} conversation_et - Conversation to add bot to
-   * @param {string} provider_id - ID of bot provider
-   * @param {string} service_id - ID of service provider
+   * @param {Conversation} conversationEntity - Conversation to add bot to
+   * @param {string} providerId - ID of bot provider
+   * @param {string} serviceId - ID of service provider
    * @returns {Promise} Resolves when bot was added
    */
-  add_bot(conversation_et, provider_id, service_id) {
-    return this.conversation_service.post_bots(conversation_et.id, provider_id, service_id).then(response => {
-      if (response && response.event) {
-        amplify.publish(z.event.WebApp.EVENT.INJECT, response.event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
-        this.logger.debug(`Successfully added bot to conversation '${conversation_et.display_name()}'`, response);
-      }
-    });
+  addBot(conversationEntity, providerId, serviceId) {
+    return this.conversation_service
+      .postBots(conversationEntity.id, providerId, serviceId)
+      .then(response => {
+        const event = response ? response.event : undefined;
+        if (event) {
+          amplify.publish(z.event.WebApp.EVENT.INJECT, response.event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+          this.logger.debug(`Successfully added bot to conversation '${conversationEntity.display_name()}'`, response);
+        }
+
+        return event;
+      })
+      .catch(error => this._handleAddToConversationError(error, conversationEntity, [serviceId]));
   }
 
   /**
    * Add users to an existing conversation.
    *
-   * @param {Conversation} conversation_et - Conversation to add users to
-   * @param {Array<string>} user_ids - IDs of users to be added to the conversation
+   * @param {Conversation} conversationEntity - Conversation to add users to
+   * @param {Array<string>} userIds - IDs of users to be added to the conversation
    * @returns {Promise} Resolves when members were added
    */
-  add_members(conversation_et, user_ids) {
+  addMembers(conversationEntity, userIds) {
     return this.conversation_service
-      .post_members(conversation_et.id, user_ids)
+      .postMembers(conversationEntity.id, userIds)
       .then(response => {
         if (response) {
           amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
         }
       })
-      .catch(error => {
-        const too_many_members = error.label === z.service.BackendClientError.LABEL.TOO_MANY_MEMBERS;
-        if (too_many_members) {
-          const open_spots = z.config.MAXIMUM_CONVERSATION_SIZE - conversation_et.get_number_of_participants();
+      .catch(error => this._handleAddToConversationError(error, conversationEntity, userIds));
+  }
 
-          return amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.TOO_MANY_MEMBERS, {
-            data: {
-              max: z.config.MAXIMUM_CONVERSATION_SIZE,
-              open_spots: Math.max(0, open_spots),
-            },
-          });
-        }
+  _handleAddToConversationError(error, conversationEntity, userIds) {
+    switch (error.label) {
+      case z.service.BackendClientError.LABEL.NOT_CONNECTED: {
+        this._handleUsersNotConnected(userIds);
+        break;
+      }
 
-        if (error.label === z.service.BackendClientError.LABEL.NOT_CONNECTED) {
-          return this._handle_users_not_connected(user_ids);
-        }
+      case z.service.BackendClientError.LABEL.BAD_GATEWAY:
+      case z.service.BackendClientError.LABEL.SERVER_ERROR:
+      case z.service.BackendClientError.LABEL.SERVICE_DISABLED: {
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.SERVICE_DISABLED);
+        break;
+      }
 
+      case z.service.BackendClientError.LABEL.TOO_MANY_BOTS: {
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.TOO_MANY_BOTS);
+        break;
+      }
+
+      case z.service.BackendClientError.LABEL.TOO_MANY_MEMBERS: {
+        const openSpots = z.config.MAXIMUM_CONVERSATION_SIZE - conversationEntity.getNumberOfParticipants();
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.TOO_MANY_MEMBERS, {
+          data: {
+            max: z.config.MAXIMUM_CONVERSATION_SIZE,
+            open_spots: Math.max(0, openSpots),
+          },
+        });
+
+        break;
+      }
+
+      default: {
         throw error;
-      });
+      }
+    }
   }
 
   /**
@@ -994,7 +1035,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this._clear_conversation(conversation_et);
 
     if (leave_conversation) {
-      this.remove_member(conversation_et, this.user_repository.self().id);
+      this.removeMember(conversation_et, this.user_repository.self().id);
     }
 
     if (is_active_conversation) {
@@ -1026,48 +1067,37 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Remove bot from conversation.
    *
-   * @param {Conversation} conversation_et - Conversation to remove member from
-   * @param {string} bot_user_id - ID of bot to be removed from the conversation
+   * @param {Conversation} conversationEntity - Conversation to remove bot from
+   * @param {z.entity.User} userId - ID of bot user to be removed from the conversation
    * @returns {Promise} Resolves when bot was removed from the conversation
    */
-  remove_bot(conversation_et, bot_user_id) {
-    return this.conversation_service.delete_bots(conversation_et.id, bot_user_id).then(response => {
-      if (response) {
-        amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
-        return response;
-      }
+  removeBot(conversationEntity, userId) {
+    return this.conversation_service.deleteBots(conversationEntity.id, userId).then(response => {
+      const hasResponse = response && response.event;
+      const event = hasResponse
+        ? response.event
+        : z.conversation.EventBuilder.build_member_leave(conversationEntity, userId, this.time_offset);
+
+      amplify.publish(z.event.WebApp.EVENT.INJECT, event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+      return event;
     });
   }
 
   /**
    * Remove member from conversation.
    *
-   * @param {Conversation} conversation_et - Conversation to remove member from
-   * @param {string} user_id - ID of member to be removed from the conversation
+   * @param {Conversation} conversationEntity - Conversation to remove member from
+   * @param {string} userId - ID of member to be removed from the conversation
    * @returns {Promise} Resolves when member was removed from the conversation
    */
-  remove_member(conversation_et, user_id) {
-    return this.conversation_service.delete_members(conversation_et.id, user_id).then(response => {
-      if (response) {
-        amplify.publish(z.event.WebApp.EVENT.INJECT, response, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
-        return response;
-      }
+  removeMember(conversationEntity, userId) {
+    return this.conversation_service.deleteMembers(conversationEntity.id, userId).then(response => {
+      const event =
+        response || z.conversation.EventBuilder.build_member_leave(conversationEntity, userId, this.time_offset);
+
+      amplify.publish(z.event.WebApp.EVENT.INJECT, event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+      return event;
     });
-  }
-
-  /**
-   * Remove participant from conversation.
-   *
-   * @param {Conversation} conversation_et - Conversation to remove participant from
-   * @param {User} user_et - User to be removed from the conversation
-   * @returns {Promise} Resolves when participant was removed from the conversation
-   */
-  remove_participant(conversation_et, user_et) {
-    if (user_et.is_bot) {
-      return this.remove_bot(conversation_et, user_et.id);
-    }
-
-    return this.remove_member(conversation_et, user_et.id);
   }
 
   /**
@@ -1174,9 +1204,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(() => {
         const response = {
           data: payload,
+          from: this.user_repository.self().id,
         };
 
-        this._on_member_update(conversation_et, response);
+        this._onMemberUpdate(conversation_et, response);
         this.logger.info(
           `Toggle silence to '${payload.otr_muted}' for conversation '${conversation_et.id}' on '${
             payload.otr_muted_ref
@@ -1185,7 +1216,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return response;
       })
       .catch(error => {
-        const reject_error = new Error(`Conversation '${conversation_et.id}' could not be muted: ${error.code}`);
+        const reject_error = new Error(`Conversation '${conversation_et.id}' could not be muted: ${error.message}`);
         this.logger.warn(reject_error.message, error);
         throw reject_error;
       });
@@ -1245,7 +1276,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
       })
       .then(() => {
-        this._on_member_update(conversation_et, {data: payload});
+        const response = {
+          data: payload,
+          from: this.user_repository.self().id,
+        };
+
+        this._onMemberUpdate(conversation_et, response);
         this.logger.info(
           `Update conversation '${conversation_et.id}' archive state to '${new_archive_state}' on '${
             payload.otr_archived_ref
@@ -1284,8 +1320,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
   }
 
-  _handle_users_not_connected(user_ids) {
-    const user_promise = user_ids.length === 1 ? this.user_repository.get_user_by_id(user_ids[0]) : Promise.resolve();
+  _handleUsersNotConnected(userIds = []) {
+    const [userID] = userIds;
+    const user_promise = userIds.length === 1 ? this.user_repository.get_user_by_id(userID) : Promise.resolve();
 
     user_promise.then(user_et => {
       const username = user_et ? user_et.first_name() : undefined;
@@ -1336,7 +1373,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const asset_et = message_et.get_first_asset();
 
         asset_et.uploaded_on_this_client(true);
-        return this.asset_service.upload_asset(file, null, xhr => {
+        return this.asset_service.uploadAsset(file, null, xhr => {
           xhr.upload.onprogress = event => asset_et.upload_progress(Math.round(event.loaded / event.total * 100));
           asset_et.upload_cancel = () => xhr.abort();
         });
@@ -1380,7 +1417,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when the asset metadata was sent
    */
   send_asset_metadata(conversation_et, file) {
-    return z.assets.AssetMetaDataBuilder.build_metadata(file)
+    return z.assets.AssetMetaDataBuilder.buildMetadata(file)
       .catch(error => {
         this.logger.warn(
           `Couldn't render asset preview from metadata. Asset might be corrupt: ${error.message}`,
@@ -1391,11 +1428,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(metadata => {
         const asset = new z.proto.Asset();
 
-        if (z.assets.AssetMetaDataBuilder.is_audio(file)) {
+        if (z.assets.AssetMetaDataBuilder.isAudio(file)) {
           asset.set('original', new z.proto.Asset.Original(file.type, file.size, file.name, null, null, metadata));
-        } else if (z.assets.AssetMetaDataBuilder.is_video(file)) {
+        } else if (z.assets.AssetMetaDataBuilder.isVideo(file)) {
           asset.set('original', new z.proto.Asset.Original(file.type, file.size, file.name, null, metadata));
-        } else if (z.assets.AssetMetaDataBuilder.is_image(file)) {
+        } else if (z.assets.AssetMetaDataBuilder.isImage(file)) {
           asset.set('original', new z.proto.Asset.Original(file.type, file.size, file.name, metadata));
         } else {
           asset.set('original', new z.proto.Asset.Original(file.type, file.size, file.name));
@@ -1428,36 +1465,32 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Send asset preview message to specified conversation.
    *
-   * @param {Conversation} conversation_et - Conversation that should receive the preview
+   * @param {Conversation} conversationEntity - Conversation that should receive the preview
    * @param {File} file - File to generate preview from
-   * @param {string} message_id - Message ID of the message to generate a preview for
+   * @param {string} messageId - Message ID of the message to generate a preview for
    * @returns {Promise} Resolves when the asset preview was sent
    */
-  send_asset_preview(conversation_et, file, message_id) {
+  sendAssetPreview(conversationEntity, file, messageId) {
     return poster(file)
-      .then(image_blob => {
-        if (!image_blob) {
+      .then(imageBlob => {
+        if (!imageBlob) {
           throw Error('No image available');
         }
 
-        return this.asset_service.upload_asset(image_blob).then(uploaded_image_asset => {
+        return this.asset_service.uploadAsset(imageBlob).then(uploadedImageAsset => {
           const asset = new z.proto.Asset();
-          asset.set(
-            'preview',
-            new z.proto.Asset.Preview(image_blob.type, image_blob.size, uploaded_image_asset.uploaded)
-          );
+          const assetPreview = new z.proto.Asset.Preview(imageBlob.type, imageBlob.size, uploadedImageAsset.uploaded);
+          asset.set('preview', assetPreview);
 
-          const generic_message = new z.proto.GenericMessage(message_id);
-          generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
+          const genericMessage = new z.proto.GenericMessage(messageId);
+          genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
 
-          return this._send_and_inject_generic_message(conversation_et, generic_message);
+          return this._send_and_inject_generic_message(conversationEntity, genericMessage);
         });
       })
       .catch(error => {
-        this.logger.warn(
-          `No preview for asset '${message_id}' in conversation '${conversation_et.id}' uploaded `,
-          error
-        );
+        const message = `No preview for asset '${messageId}' in conversation '${conversationEntity.id}' uploaded `;
+        this.logger.warn(message, error);
       });
   }
 
@@ -1497,10 +1530,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     if (other_user_in_one2one && within_threshold && z.event.EventTypeHandling.CONFIRM.includes(message_et.type)) {
       const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
-      generic_message.set(
-        z.cryptography.GENERIC_MESSAGE_TYPE.CONFIRMATION,
-        new z.proto.Confirmation(message_et.id, z.proto.Confirmation.Type.DELIVERED)
-      );
+      const confirmation = new z.proto.Confirmation(z.proto.Confirmation.Type.DELIVERED, message_et.id);
+      generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.CONFIRMATION, confirmation);
 
       this.sending_queue.push(() => {
         return this.create_recipients(conversation_et.id, true, [message_et.user().id]).then(recipients => {
@@ -1570,7 +1601,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   send_image_asset(conversation_et, image) {
     return this.asset_service
-      .upload_image_asset(image)
+      .uploadImageAsset(image)
       .then(asset => {
         let generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
         generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
@@ -1825,36 +1856,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
-   * Map a function to recipients.
-   *
-   * @private
-   * @param {Object} recipients - User client map
-   * @param {Function} client_fn - Function to be executed on clients first
-   * @param {Function} user_fn - Function to be executed on users at the end
-   * @returns {Array} Function array
-   */
-  _map_recipients(recipients, client_fn, user_fn) {
-    const result = [];
-    const user_ids = Object.keys(recipients);
-
-    user_ids.forEach(user_id => {
-      if (recipients.hasOwnProperty(user_id)) {
-        const client_ids = recipients[user_id];
-
-        if (_.isFunction(client_fn)) {
-          client_ids.forEach(client_id => result.push(client_fn(user_id, client_id)));
-        }
-
-        if (_.isFunction(user_fn)) {
-          result.push(user_fn(user_id));
-        }
-      }
-    });
-
-    return result;
-  }
-
-  /**
    * Wraps generic message in ephemeral message.
    *
    * @param {z.proto.GenericMessage} generic_message - Message to be wrapped
@@ -1934,7 +1935,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.OUTGOING_PING);
         }
 
-        this.on_conversation_event(message_stored, z.event.EventRepository.SOURCE.INJECTED);
+        this.onConversationEvent(message_stored, z.event.EventRepository.SOURCE.INJECTED);
 
         return this.send_generic_message_to_conversation(conversation_et.id, generic_message)
           .then(payload => {
@@ -1998,16 +1999,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
   _sendExternalGenericMessage(conversationId, genericMessage, recipients, preconditionOption, nativePush = true) {
     this.logger.info(`Sending external message of type '${genericMessage.content}'`, genericMessage);
 
-    return z.assets.AssetCrypto.encrypt_aes_asset(genericMessage.toArrayBuffer())
-      .then(({key_bytes, sha256, cipher_text}) => {
+    return z.assets.AssetCrypto.encryptAesAsset(genericMessage.toArrayBuffer())
+      .then(({cipherText, keyBytes, sha256}) => {
         const genericMessageExternal = new z.proto.GenericMessage(z.util.create_random_uuid());
-        const externalMessage = new z.proto.External(new Uint8Array(key_bytes), new Uint8Array(sha256));
+        const externalMessage = new z.proto.External(new Uint8Array(keyBytes), new Uint8Array(sha256));
         genericMessageExternal.set('external', externalMessage);
 
         return this.cryptography_repository
           .encrypt_generic_message(recipients, genericMessageExternal)
           .then(payload => {
-            payload.data = z.util.array_to_base64(cipher_text);
+            payload.data = z.util.array_to_base64(cipherText);
             payload.native_push = nativePush;
             return this._sendEncryptedMessage(conversationId, genericMessage, payload, preconditionOption);
           });
@@ -2084,7 +2085,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.conversation_service
       .post_encrypted_message(conversationId, payload, preconditionOption)
       .then(response => {
-        this._handle_client_mismatch(conversationId, response);
+        this.clientMismatchHandler.onClientMismatch(response, conversationId);
         return response;
       })
       .catch(error => {
@@ -2097,7 +2098,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
 
         let updatedPayload;
-        return this._handle_client_mismatch(conversationId, error, genericMessage, payload)
+        return this.clientMismatchHandler
+          .onClientMismatch(error, conversationId, genericMessage, payload)
           .then(payloadWithMissingClients => {
             updatedPayload = payloadWithMissingClients;
             return this._grantOutgoingMessage(conversationId, genericMessage, Object.keys(error.missing));
@@ -2174,10 +2176,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {boolean} Is payload likely to be too big so that we switch to type external?
    */
   _shouldSendAsExternal(conversationId, genericMessage) {
-    return this.get_conversation_by_id(conversationId).then(conversation_et => {
-      const estimatedNumberOfClients = conversation_et.get_number_of_participants() * 4;
+    return this.get_conversation_by_id(conversationId).then(conversationEt => {
       const messageInBytes = new Uint8Array(genericMessage.toArrayBuffer()).length;
-      const estimatedPayloadInBytes = estimatedNumberOfClients * messageInBytes;
+      const estimatedPayloadInBytes = conversationEt.getNumberOfClients() * messageInBytes;
 
       return estimatedPayloadInBytes > ConversationRepository.CONFIG.EXTERNAL_MESSAGE_THRESHOLD;
     });
@@ -2225,28 +2226,23 @@ z.conversation.ConversationRepository = class ConversationRepository {
       size_mb: z.util.bucket_values(file.size / 1024 / 1024, [0, 5, 10, 15, 20, 25]),
       type: z.util.get_file_extension(file.name),
     };
+
     const conversation_type = z.tracking.helpers.get_conversation_type(conversation_et);
-    amplify.publish(
-      z.event.WebApp.ANALYTICS.EVENT,
-      z.tracking.EventName.FILE.UPLOAD_INITIATED,
-      $.extend(tracking_data, {conversation_type})
-    );
+    const initiatedAttributes = Object.assign(tracking_data, {conversation_type});
+    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_INITIATED, initiatedAttributes);
 
     return this.send_asset_metadata(conversation_et, file)
       .then(({id}) => {
         message_id = id;
-        return this.send_asset_preview(conversation_et, file, message_id);
+        return this.sendAssetPreview(conversation_et, file, message_id);
       })
       .then(() => this.send_asset_remotedata(conversation_et, file, message_id))
       .then(() => {
         const upload_duration = (Date.now() - upload_started) / 1000;
-
         this.logger.info(`Finished to upload asset for conversation'${conversation_et.id} in ${upload_duration}`);
-        amplify.publish(
-          z.event.WebApp.ANALYTICS.EVENT,
-          z.tracking.EventName.FILE.UPLOAD_SUCCESSFUL,
-          $.extend(tracking_data, {time: upload_duration})
-        );
+
+        const successAttributes = Object.assign(tracking_data, {time: upload_duration});
+        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_SUCCESSFUL, successAttributes);
       })
       .catch(error => {
         if (error.type === z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
@@ -2509,89 +2505,104 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Listener for incoming events.
    *
-   * @param {Object} event_json - JSON data for event
+   * @param {Object} eventJson - JSON data for event
    * @param {z.event.EventRepository.SOURCE} source - Source of event
    * @returns {Promise} Resolves when event was handled
    */
-  on_conversation_event(event_json, source = z.event.EventRepository.SOURCE.STREAM) {
-    if (!event_json) {
+  onConversationEvent(eventJson, source = z.event.EventRepository.SOURCE.STREAM) {
+    if (!eventJson) {
       return Promise.reject(new Error('Conversation Repository Event Handling: Event missing'));
     }
 
-    const {conversation: conversation_id, type} = event_json;
+    const {conversation, data: eventData, type} = eventJson;
+    const conversationId = (eventData && eventData.conversationId) || conversation;
     this.logger.info(`»» Conversation Event: '${type}' (Source: ${source})`, {
-      event_json: JSON.stringify(event_json),
-      event_object: event_json,
+      eventJson: JSON.stringify(eventJson),
+      eventObject: eventJson,
     });
 
     // Handle conversation create event separately
     if (type === z.event.Backend.CONVERSATION.CREATE) {
-      return this._on_create(event_json);
+      return this._onCreate(eventJson);
+    }
+
+    const inSelfConversation = conversationId === this.self_conversation() && this.self_conversation().id;
+    if (inSelfConversation) {
+      const typesInSelfConversation = [
+        z.event.Backend.CONVERSATION.MEMBER_UPDATE,
+        z.event.Client.CONVERSATION.MESSAGE_HIDDEN,
+      ];
+
+      const isExpectedType = typesInSelfConversation.includes(type);
+      if (!isExpectedType) {
+        const error = new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_CONVERSATION);
+        return Promise.reject(error);
+      }
     }
 
     // Check if conversation was archived
-    let previously_archived;
-    return this.get_conversation_by_id(conversation_id)
-      .then(conversation_et => {
-        previously_archived = conversation_et.is_archived();
+    let previouslyArchived;
+    return this.get_conversation_by_id(conversationId)
+      .then(conversationEntity => {
+        previouslyArchived = conversationEntity.is_archived();
 
-        const is_backend_timestamp = source !== z.event.EventRepository.SOURCE.INJECTED;
-        conversation_et.update_timestamp_server(event_json.server_time || event_json.time, is_backend_timestamp);
+        const isBackendTimestamp = source !== z.event.EventRepository.SOURCE.INJECTED;
+        conversationEntity.update_timestamp_server(eventJson.server_time || eventJson.time, isBackendTimestamp);
 
         switch (type) {
           case z.event.Backend.CONVERSATION.MEMBER_JOIN:
-            return this._on_member_join(conversation_et, event_json);
+            return this._on_member_join(conversationEntity, eventJson);
           case z.event.Backend.CONVERSATION.MEMBER_LEAVE:
           case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE:
-            return this._on_member_leave(conversation_et, event_json);
+            return this._on_member_leave(conversationEntity, eventJson);
           case z.event.Backend.CONVERSATION.MEMBER_UPDATE:
-            return this._on_member_update(conversation_et, event_json);
+            return this._onMemberUpdate(conversationEntity, eventJson);
           case z.event.Backend.CONVERSATION.RENAME:
-            return this._on_rename(conversation_et, event_json);
+            return this._on_rename(conversationEntity, eventJson);
           case z.event.Client.CONVERSATION.ASSET_ADD:
-            return this._on_asset_add(conversation_et, event_json);
+            return this._on_asset_add(conversationEntity, eventJson);
           case z.event.Client.CONVERSATION.CONFIRMATION:
-            return this._on_confirmation(conversation_et, event_json);
+            return this._on_confirmation(conversationEntity, eventJson);
           case z.event.Client.CONVERSATION.MESSAGE_ADD:
-            return this._on_message_add(conversation_et, event_json);
+            return this._on_message_add(conversationEntity, eventJson);
           case z.event.Client.CONVERSATION.MESSAGE_DELETE:
-            return this._on_message_deleted(conversation_et, event_json);
+            return this._on_message_deleted(conversationEntity, eventJson);
           case z.event.Client.CONVERSATION.MESSAGE_HIDDEN:
-            return this._on_message_hidden(event_json);
+            return this._onMessageHidden(eventJson);
           case z.event.Client.CONVERSATION.REACTION:
-            return this._on_reaction(conversation_et, event_json);
+            return this._on_reaction(conversationEntity, eventJson);
           default:
-            return this._on_add_event(conversation_et, event_json);
+            return this._on_add_event(conversationEntity, eventJson);
         }
       })
-      .then((return_value = {}) => {
-        const {conversation_et, message_et} = return_value;
+      .then((returnValue = {}) => {
+        const {conversation_et: conversationEntity, message_et: messageEntity} = returnValue;
 
-        if (conversation_et) {
-          const event_from_web_socket = source === z.event.EventRepository.SOURCE.WEB_SOCKET;
-          const event_from_stream = source === z.event.EventRepository.SOURCE.STREAM;
+        if (conversationEntity) {
+          const eventFromWebSocket = source === z.event.EventRepository.SOURCE.WEB_SOCKET;
+          const eventFromStream = source === z.event.EventRepository.SOURCE.STREAM;
 
-          if (message_et) {
-            const is_remote_event = event_from_stream || event_from_web_socket;
+          if (messageEntity) {
+            const isRemoteEvent = eventFromStream || eventFromWebSocket;
 
-            if (is_remote_event) {
-              this.send_confirmation_status(conversation_et, message_et);
+            if (isRemoteEvent) {
+              this.send_confirmation_status(conversationEntity, messageEntity);
             }
 
-            if (!event_from_stream) {
-              amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et);
+            if (!eventFromStream) {
+              amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversationEntity, messageEntity);
             }
           }
 
           // Check if event needs to be un-archived
-          if (previously_archived) {
+          if (previouslyArchived) {
             // Add to check for unarchive at the end of stream handling
-            if (event_from_stream) {
-              return (this.conversations_with_new_events[conversation_et.id] = conversation_et);
+            if (eventFromStream) {
+              return (this.conversations_with_new_events[conversationEntity.id] = conversationEntity);
             }
 
-            if (event_from_web_socket && conversation_et.should_unarchive()) {
-              return this.unarchive_conversation(conversation_et, 'event from WebSocket');
+            if (eventFromWebSocket && conversationEntity.should_unarchive()) {
+              return this.unarchive_conversation(conversationEntity, 'event from WebSocket');
             }
           }
         }
@@ -2619,7 +2630,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   push_to_receiving_queue(event_json, source) {
     this.receiving_queue
-      .push(() => this.on_conversation_event(event_json, source))
+      .push(() => this.onConversationEvent(event_json, source))
       .then(() => {
         if (this.init_promise) {
           const event_from_stream = source === z.event.EventRepository.SOURCE.STREAM;
@@ -2721,20 +2732,21 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * A conversation was created.
    *
    * @private
-   * @param {Object} event_json - JSON data of 'conversation.create' event
+   * @param {Object} eventJson - JSON data of 'conversation.create' event
    * @returns {Promise} Resolves when the event was handled
    */
-  _on_create(event_json) {
-    return this.find_conversation_by_id(event_json.conversation)
+  _onCreate(eventJson) {
+    return this.find_conversation_by_id(eventJson.conversation)
       .catch(error => {
-        if (error.type !== z.conversation.ConversationError.TYPE.NOT_FOUND) {
+        const isConversationNotFound = error.type === z.conversation.ConversationError.TYPE.NOT_FOUND;
+        if (!isConversationNotFound) {
           throw error;
         }
 
-        const {data: event_data, time} = event_json;
-        const event_timestamp = new Date(time).getTime();
-        const initial_timestamp = _.isNaN(event_timestamp) ? this.get_latest_event_timestamp() : event_timestamp;
-        return this.map_conversations(event_data, initial_timestamp);
+        const {data: eventData, time} = eventJson;
+        const eventTimestamp = new Date(time).getTime();
+        const initial_timestamp = _.isNaN(eventTimestamp) ? this.getLatestEventTimestamp(true) : eventTimestamp;
+        return this.map_conversations(eventData, initial_timestamp);
       })
       .then(conversation_et => this.update_participating_user_ets(conversation_et))
       .then(conversation_et => this.save_conversation(conversation_et))
@@ -2838,27 +2850,40 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Membership properties for a conversation were updated.
    *
    * @private
-   * @param {Conversation} conversation_et - Conversation entity that will be updated
-   * @param {Object} event_json - JSON data of 'conversation.member-update' event
+   * @param {Conversation} conversationEntity - Conversation entity that will be updated
+   * @param {Object} eventJson - JSON data of 'conversation.member-update' event
    * @returns {Promise} Resolves when the event was handled
    */
-  _on_member_update(conversation_et, event_json) {
-    const is_active_conversation = this.is_active_conversation(conversation_et);
-    const next_conversation_et = is_active_conversation ? this.get_next_conversation(conversation_et) : undefined;
-    const previously_archived = conversation_et.is_archived();
+  _onMemberUpdate(conversationEntity, eventJson) {
+    const {conversation: conversationId, data: eventData, from} = eventJson;
 
-    this.conversation_mapper.update_self_status(conversation_et, event_json.data);
-
-    if (previously_archived && !conversation_et.is_archived()) {
-      return this._fetch_users_and_events(conversation_et);
+    const isBackendEvent = eventData.otr_archived_ref || eventData.otr_muted_ref;
+    const inSelfConversation = !this.self_conversation() || conversationId === this.self_conversation().id;
+    if (!inSelfConversation && conversationId && !isBackendEvent) {
+      throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_CONVERSATION);
     }
 
-    if (conversation_et.is_cleared()) {
-      this._clear_conversation(conversation_et, conversation_et.cleared_timestamp());
+    const isFromSelf = !this.user_repository.self() || from === this.user_repository.self().id;
+    if (!isFromSelf) {
+      throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_USER);
     }
 
-    if (is_active_conversation && (conversation_et.is_archived() || conversation_et.is_cleared())) {
-      amplify.publish(z.event.WebApp.CONVERSATION.SHOW, next_conversation_et);
+    const isActiveConversation = this.is_active_conversation(conversationEntity);
+    const nextConversationEt = isActiveConversation ? this.get_next_conversation(conversationEntity) : undefined;
+    const previouslyArchived = conversationEntity.is_archived();
+
+    this.conversation_mapper.update_self_status(conversationEntity, eventData);
+
+    if (previouslyArchived && !conversationEntity.is_archived()) {
+      return this._fetch_users_and_events(conversationEntity);
+    }
+
+    if (conversationEntity.is_cleared()) {
+      this._clear_conversation(conversationEntity, conversationEntity.cleared_timestamp());
+    }
+
+    if (isActiveConversation && (conversationEntity.is_archived() || conversationEntity.is_cleared())) {
+      amplify.publish(z.event.WebApp.CONVERSATION.SHOW, nextConversationEt);
     }
   }
 
@@ -2998,25 +3023,33 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * A hide message received in a conversation.
    *
    * @private
-   * @param {Object} event_json - JSON data of 'conversation.message-hidden'
+   * @param {Object} eventJson - JSON data of 'conversation.message-hidden'
    * @returns {Promise} Resolves when the event was handled
    */
-  _on_message_hidden(event_json) {
-    const {data: event_data, from} = event_json;
+  _onMessageHidden(eventJson) {
+    const {conversation: conversationId, data: eventData, from} = eventJson;
 
-    const is_from_self = from === this.user_repository.self().id;
-    if (!is_from_self) {
-      return Promise.reject(new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_USER));
-    }
+    return Promise.resolve()
+      .then(() => {
+        const inSelfConversation = !this.self_conversation() || conversationId === this.self_conversation().id;
+        if (!inSelfConversation) {
+          throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_CONVERSATION);
+        }
 
-    return this.get_conversation_by_id(event_data.conversation_id)
-      .then(conversation_et => {
-        amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, event_data.message_id);
-        return this._delete_message_by_id(conversation_et, event_data.message_id);
+        const isFromSelf = !this.user_repository.self() || from === this.user_repository.self().id;
+        if (!isFromSelf) {
+          throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_USER);
+        }
+
+        return this.get_conversation_by_id(eventData.conversation_id);
+      })
+      .then(conversationEntity => {
+        amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, eventData.message_id);
+        return this._delete_message_by_id(conversationEntity, eventData.message_id);
       })
       .catch(error => {
         this.logger.info(
-          `Failed to delete message '${event_data.message_id}' for conversation '${event_data.conversation_id}'`,
+          `Failed to delete message '${eventData.message_id}' for conversation '${eventData.conversation_id}'`,
           error
         );
         throw error;
@@ -3247,150 +3280,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
       message_et.id,
       z.assets.AssetUploadFailedReason.CANCELLED
     );
-  }
-
-  /**
-   * Handle client mismatch response from backend.
-   *
-   * @note As part of 412 or general response when sending encrypted message
-   * @param {string} conversation_id - ID of conversation message was sent int
-   * @param {Object} client_mismatch - Client mismatch object containing client user maps for deleted, missing and obsolete clients
-   * @param {z.proto.GenericMessage} [generic_message] - GenericMessage that was sent
-   * @param {Object} [payload] - Initial payload resulting in a 412
-   * @returns {Promise} Resolve when mistmatch was handled
-   */
-  _handle_client_mismatch(conversation_id, client_mismatch, generic_message, payload) {
-    return Promise.resolve()
-      .then(() => {
-        return this._handle_client_mismatch_redundant(client_mismatch.redundant, payload, conversation_id);
-      })
-      .then(updated_payload => {
-        return this._handle_client_mismatch_deleted(client_mismatch.deleted, updated_payload);
-      })
-      .then(updated_payload => {
-        return this._handle_client_mismatch_missing(client_mismatch.missing, updated_payload, generic_message);
-      });
-  }
-
-  /**
-   * Handle the deleted client mismatch.
-   *
-   * @note Contains clients of which the backend is sure that they should not be recipient of a message and verified they no longer exist.
-   * @private
-   *
-   * @param {Object} recipients - User client map containing redundant clients
-   * @param {Object} payload - Optional payload of the failed request
-   * @returns {Promise} Resolves with the updated payload
-   */
-  _handle_client_mismatch_deleted(recipients, payload) {
-    if (_.isEmpty(recipients)) {
-      return Promise.resolve(payload);
-    }
-    this.logger.debug(`Message contains deleted clients of '${Object.keys(recipients).length}' users`, recipients);
-
-    const _remove_deleted_client = (user_id, client_id) => {
-      if (payload) {
-        delete payload.recipients[user_id][client_id];
-      }
-      return this.user_repository.remove_client_from_user(user_id, client_id);
-    };
-
-    const _remove_deleted_user = user_id => {
-      if (payload && !Object.keys(payload.recipients[user_id]).length) {
-        delete payload.recipients[user_id];
-      }
-    };
-
-    return Promise.all(this._map_recipients(recipients, _remove_deleted_client, _remove_deleted_user)).then(() => {
-      this.verification_state_handler.on_client_removed(Object.keys(recipients));
-      return payload;
-    });
-  }
-
-  /**
-   * Handle the missing client mismatch.
-   *
-   * @private
-   * @param {Object} recipients - User client map containing redundant clients
-   * @param {Object} payload - Optional payload of the failed request
-   * @param {z.proto.GenericMessage} generic_message - Protobuffer message to be sent
-   * @returns {Promise} Resolves with the updated payload
-   */
-  _handle_client_mismatch_missing(recipients, payload, generic_message) {
-    if (!payload || _.isEmpty(recipients)) {
-      return Promise.resolve(payload);
-    }
-    this.logger.debug(`Message is missing clients of '${Object.keys(recipients).length}' users`, recipients);
-
-    return this.cryptography_repository
-      .encrypt_generic_message(recipients, generic_message, payload)
-      .then(updated_payload => {
-        payload = updated_payload;
-
-        const _add_missing_client = (user_id, client_id) => {
-          return this.user_repository.add_client_to_user(user_id, new z.client.Client({id: client_id}));
-        };
-
-        return Promise.all(this._map_recipients(recipients, _add_missing_client));
-      })
-      .then(() => {
-        this.verification_state_handler.on_client_add(Object.keys(recipients));
-        return payload;
-      });
-  }
-
-  /**
-   * Handle the redundant client mismatch.
-
-   * @note Contains clients of which the backend is sure that they should not be recipient of a message but cannot say whether they exist.
-   *   Normally only contains clients of users no longer participating in a conversation.
-   *   Sometimes clients of the self user are listed. Thus we cannot remove the payload for all the clients of a user without checking.
-   * @private
-   *
-   * @param {Object} recipients - User client map containing redundant clients
-   * @param {Object} payload - Optional payload of the failed request
-   * @param {string} conversation_id - ID of conversation the message was sent in
-   * @returns {Promise} Resolves with the updated payload
-  */
-  _handle_client_mismatch_redundant(recipients, payload, conversation_id) {
-    if (_.isEmpty(recipients)) {
-      return Promise.resolve(payload);
-    }
-    this.logger.debug(`Message contains redundant clients of '${Object.keys(recipients).length}' users`, recipients);
-
-    return this.get_conversation_by_id(conversation_id)
-      .catch(error => {
-        if (error.type !== z.conversation.ConversationError.TYPE.NOT_FOUND) {
-          throw error;
-        }
-      })
-      .then(conversation_et => {
-        const _remove_redundant_client = function(user_id, client_id) {
-          if (payload) {
-            delete payload.recipients[user_id][client_id];
-          }
-        };
-
-        const _remove_redundant_user = function(user_id) {
-          if (conversation_et && conversation_et.is_group()) {
-            conversation_et.participating_user_ids.remove(user_id);
-          }
-
-          if (payload && !Object.keys(payload.recipients[user_id]).length) {
-            return delete payload.recipients[user_id];
-          }
-        };
-
-        return Promise.all(this._map_recipients(recipients, _remove_redundant_client, _remove_redundant_user)).then(
-          () => {
-            if (conversation_et) {
-              this.update_participating_user_ets(conversation_et);
-            }
-
-            return payload;
-          }
-        );
-      });
   }
 
   /**
@@ -3625,7 +3514,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         conversation_type: z.tracking.helpers.get_conversation_type(conversation_et),
         ephemeral_time: is_ephemeral ? ephemeral_time : undefined,
         is_ephemeral: is_ephemeral,
-        with_bot: conversation_et.is_with_bot(),
+        with_service: conversation_et.isWithBot(),
       });
     }
   }
@@ -3685,7 +3574,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       reacted_to_last_message: conversation_et.get_last_message() === message_et,
       type: z.tracking.helpers.get_message_type(message_et),
       user: message_et.user().is_me ? 'sender' : 'receiver',
-      with_bot: conversation_et.is_with_bot(),
+      with_service: conversation_et.isWithBot(),
     });
   }
 };

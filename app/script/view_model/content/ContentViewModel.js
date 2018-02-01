@@ -29,6 +29,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
     calling_repository,
     client_repository,
     conversation_repository,
+    integrationRepository,
     media_repository,
     properties_repository,
     search_repository,
@@ -41,14 +42,15 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
     this.calling_repository = calling_repository;
     this.client_repository = client_repository;
     this.conversation_repository = conversation_repository;
+    this.integrationRepository = integrationRepository;
     this.media_repository = media_repository;
-    this.properties_repository = properties_repository;
+    this.propertiesRepository = properties_repository;
     this.search_repository = search_repository;
     this.team_repository = team_repository;
     this.logger = new z.util.Logger('z.ViewModel.ContentViewModel', z.config.LOGGER.OPTIONS);
 
     // Repositories
-    this.cryptography_repository = this.client_repository.cryptography_repository;
+    this.cryptography_repository = this.client_repository.cryptographyRepository;
     this.giphy_repository = this.conversation_repository.giphy_repository;
     this.user_repository = this.conversation_repository.user_repository;
 
@@ -88,7 +90,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
       'conversation-input',
       this.conversation_repository,
       this.user_repository,
-      this.properties_repository
+      this.propertiesRepository
     );
     this.message_list = new z.ViewModel.MessageListViewModel(
       'message-list',
@@ -97,13 +99,17 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
     );
     this.participants = new z.ViewModel.ParticipantsViewModel(
       'participants',
-      this.user_repository,
       this.conversation_repository,
-      this.search_repository,
-      this.team_repository
+      this.integrationRepository,
+      this.team_repository,
+      this.user_repository
     );
     this.giphy = new z.ViewModel.GiphyViewModel('giphy-modal', this.conversation_repository, this.giphy_repository);
 
+    this.preferencesAbout = new z.ViewModel.content.PreferencesAboutViewModel(
+      'preferences-about',
+      this.user_repository
+    );
     this.preferences_account = new z.ViewModel.content.PreferencesAccountViewModel(
       'preferences-account',
       this.client_repository,
@@ -126,7 +132,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
     );
     this.preferences_options = new z.ViewModel.content.PreferencesOptionsViewModel(
       'preferences-options',
-      this.properties_repository,
+      this.propertiesRepository,
       this.team_repository
     );
     /* eslint-enable no-multi-spaces */
@@ -161,7 +167,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
     this.user_repository.connect_requests.subscribe(requests => {
       const requests_state = this.content_state() === z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS;
       if (requests_state && !requests.length) {
-        this.show_conversation(this.conversation_repository.get_most_recent_conversation());
+        this.show_conversation(this.conversation_repository.getMostRecentConversation());
       }
     });
 
@@ -235,7 +241,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
       this.conversation_repository.active_conversation(conversationEt);
       this.message_list.change_conversation(conversationEt, messageEt).then(() => {
         this._show_content(z.ViewModel.content.CONTENT_STATE.CONVERSATION);
-        this.participants.change_conversation(conversationEt);
+        this.participants.changeConversation(conversationEt);
         this.previous_conversation = this.conversation_repository.active_conversation();
       });
     });

@@ -128,8 +128,19 @@ user-profile {
   position: relative;
 }
 
+.user-profile-details-availability {
+  margin-top: 24px;
+  align-items: flex-end;
+
+  .availability-state-label {
+    .label-bold-xs();
+    display: inline-block;
+    line-height: 12px;
+  }
+}
+
 .user-profile-details-avatar {
-  .square(@avatar-diameter-lg);
+  .square(@avatar-diameter-xl);
   position: relative;
 }
 

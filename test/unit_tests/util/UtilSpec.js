@@ -43,9 +43,7 @@ describe('z.util.render_message', () => {
 
   it('renders URLs with underscores', () => {
     const link = 'http://en.wikipedia.org/wiki/Stormtrooper_(Star_Wars)';
-    const expected = `Stormtroopers: <a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${
-      link
-    }</a> !!!`;
+    const expected = `Stormtroopers: <a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a> !!!`;
     expect(z.util.render_message(`Stormtroopers: ${link} !!!`)).toBe(expected);
   });
 
@@ -82,9 +80,7 @@ describe('z.util.render_message', () => {
 
   it('renders URLs with @-signs and text correctly', () => {
     const link = 'https://t.facdn.net/22382738@400-1485204208.jpg';
-    const expected = `Just click <a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${
-      link
-    }</a> and download it`;
+    const expected = `Just click <a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a> and download it`;
     expect(z.util.render_message(`Just click ${link} and download it`)).toBe(expected);
   });
 
@@ -4048,50 +4044,54 @@ describe('z.util.is_iso_string', () => {
 
 describe('z.util.sort_groups_by_last_event', () => {
   it('finds out that Group A is more recent than Group B', () => {
-    const group_a = new z.entity.Conversation();
-    group_a.name('Latest');
-    group_a.last_event_timestamp(1414505857975);
+    const groupA = new z.entity.Conversation();
+    groupA.name('Latest');
+    groupA.last_event_timestamp(1414505857975);
 
-    const group_b = new z.entity.Conversation();
-    group_b.name('Older');
-    group_b.last_event_timestamp(1414505766449);
+    const groupB = new z.entity.Conversation();
+    groupB.name('Older');
+    groupB.last_event_timestamp(1414505766449);
 
-    const groups = [group_a, group_b];
-    const ordered_groups = groups.sort(z.util.sort_groups_by_last_event);
+    const groups = [groupA, groupB];
+    const [firstGroup, secondGroup] = groups.sort(z.util.sort_groups_by_last_event);
 
-    expect(ordered_groups[0].name()).toEqual(group_a.name());
-    expect(ordered_groups[1].name()).toEqual(group_b.name());
+    expect(firstGroup.name()).toEqual(groupA.name());
+    expect(secondGroup.name()).toEqual(groupB.name());
   });
 
   it('finds out that Group B is more recent than Group A', () => {
-    const group_a = new z.entity.Conversation();
-    group_a.name('Older');
-    group_a.last_event_timestamp(1414505766449);
+    const groupA = new z.entity.Conversation();
+    groupA.name('Older');
+    groupA.last_event_timestamp(1414505766449);
 
-    const group_b = new z.entity.Conversation();
-    group_b.name('Latest');
-    group_b.last_event_timestamp(1414505857975);
+    const groupB = new z.entity.Conversation();
+    groupB.name('Latest');
+    groupB.last_event_timestamp(1414505857975);
 
-    const groups = [group_a, group_b];
-    const ordered_groups = groups.sort(z.util.sort_groups_by_last_event);
+    const groups = [groupA, groupB];
+    const [firstGroup, secondGroup] = groups.sort(z.util.sort_groups_by_last_event);
 
-    expect(ordered_groups[0].name()).toEqual(group_b.name());
-    expect(ordered_groups[1].name()).toEqual(group_a.name());
+    expect(firstGroup.name()).toEqual(groupB.name());
+    expect(secondGroup.name()).toEqual(groupA.name());
   });
 
   it('finds out if two groups are equally recent', () => {
-    const group_a = new z.entity.Conversation();
-    group_a.name('Latest');
-    group_a.last_event_timestamp(1414505857975);
+    const groupA = new z.entity.Conversation();
+    const timestamp = 1414505857975;
+    groupA.name('Group A');
+    groupA.last_event_timestamp(timestamp);
 
-    const group_b = new z.entity.Conversation();
-    group_b.name('Latest');
-    group_b.last_event_timestamp(1414505857975);
+    const groupB = new z.entity.Conversation();
+    groupB.name('Group B');
+    groupB.last_event_timestamp(timestamp);
 
-    const actual = z.util.sort_groups_by_last_event(group_a, group_b);
-    const expected = 0;
+    expect(z.util.sort_groups_by_last_event(groupA, groupB)).toEqual(0);
 
-    expect(actual).toEqual(expected);
+    const groups = [groupA, groupB];
+    const [firstGroup, secondGroup] = groups.sort(z.util.sort_groups_by_last_event);
+
+    expect(firstGroup.name()).toEqual(groupA.name());
+    expect(secondGroup.name()).toEqual(groupB.name());
   });
 });
 
@@ -4323,9 +4323,7 @@ describe('Markdown with mixed markups', () => {
     const link_1 = '<a href="http://www.link.com" target="_blank" rel="nofollow noopener noreferrer">www.link.com</a>';
     const link_2 =
       '<a href="http://www.anotherlink.net" target="_blank" rel="nofollow noopener noreferrer">www.anotherlink.net</a>';
-    const expected = `This is <em>italic</em> and <strong>bold</strong> and <strong><em>bold-italic</em></strong> with a ${
-      link_1
-    } and ${link_2}.`;
+    const expected = `This is <em>italic</em> and <strong>bold</strong> and <strong><em>bold-italic</em></strong> with a ${link_1} and ${link_2}.`;
 
     expect(
       z.util.render_message(
@@ -4348,6 +4346,12 @@ describe('Ignored Markdown syntax', () => {
     expect(z.util.render_message('***\nNo horizontal lines\n***')).toBe(
       '<strong><em><br />No horizontal lines<br /></em></strong>'
     );
+  });
+
+  it('does not render tables', () => {
+    const input = 'First Header | Second Header\n------------ | -------------\nCell 1 | Cell 2';
+    const expected = `First Header | Second Header<br />------------ | -------------<br />Cell 1 | Cell 2`;
+    expect(z.util.render_message(input)).toBe(expected);
   });
 });
 

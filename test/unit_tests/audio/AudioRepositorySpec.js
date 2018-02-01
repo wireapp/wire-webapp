@@ -34,21 +34,21 @@ describe('z.audio.AudioRepository', () => {
       .catch(done.fail);
   });
 
-  describe('_check_sound_setting', () => {
+  describe('_checkSoundSetting', () => {
     beforeAll(() => {
-      TestFactory.audio_repository.audio_preference(z.audio.AudioPreference.SOME);
+      TestFactory.audio_repository.audioPreference(z.audio.AudioPreference.SOME);
     });
 
     it('plays a sound that should be played', done => {
       TestFactory.audio_repository
-        ._check_sound_setting(z.audio.AudioType.NETWORK_INTERRUPTION)
+        ._checkSoundSetting(z.audio.AudioType.NETWORK_INTERRUPTION)
         .then(done)
         .catch(done.fail);
     });
 
     it('ignores a sound that should not be played', done => {
       TestFactory.audio_repository
-        ._check_sound_setting(z.audio.AudioType.ALERT)
+        ._checkSoundSetting(z.audio.AudioType.ALERT)
         .then(done.fail)
         .catch(error => {
           expect(error).toEqual(jasmine.any(z.audio.AudioError));
@@ -58,10 +58,10 @@ describe('z.audio.AudioRepository', () => {
     });
   });
 
-  describe('_get_sound_by_id', () => {
+  describe('_getSoundById', () => {
     it('finds an available sound', done => {
       TestFactory.audio_repository
-        ._get_sound_by_id(z.audio.AudioType.NETWORK_INTERRUPTION)
+        ._getSoundById(z.audio.AudioType.NETWORK_INTERRUPTION)
         .then(audio_element => {
           expect(audio_element).toEqual(jasmine.any(HTMLAudioElement));
           done();
@@ -71,7 +71,7 @@ describe('z.audio.AudioRepository', () => {
 
     it('handles a missing sound', done => {
       TestFactory.audio_repository
-        ._get_sound_by_id('foo')
+        ._getSoundById('foo')
         .then(done.fail)
         .catch(error => {
           expect(error).toEqual(jasmine.any(z.audio.AudioError));
@@ -83,20 +83,20 @@ describe('z.audio.AudioRepository', () => {
 
   xdescribe('_play', () => {
     beforeEach(() => {
-      TestFactory.audio_repository.audio_elements[z.audio.AudioType.OUTGOING_CALL] = new Audio(
+      TestFactory.audio_repository.audioElements[z.audio.AudioType.OUTGOING_CALL] = new Audio(
         `/audio/${z.audio.AudioType.OUTGOING_CALL}.mp3`
       );
     });
 
     afterEach(() => {
-      TestFactory.audio_repository.audio_elements[z.audio.AudioType.OUTGOING_CALL].pause();
+      TestFactory.audio_repository.audioElements[z.audio.AudioType.OUTGOING_CALL].pause();
     });
 
     it('plays an available sound', done => {
       TestFactory.audio_repository
         ._play(
           z.audio.AudioType.OUTGOING_CALL,
-          TestFactory.audio_repository.audio_elements[z.audio.AudioType.OUTGOING_CALL],
+          TestFactory.audio_repository.audioElements[z.audio.AudioType.OUTGOING_CALL],
           false
         )
         .then(audio_element => {
@@ -111,7 +111,7 @@ describe('z.audio.AudioRepository', () => {
       TestFactory.audio_repository
         ._play(
           z.audio.AudioType.OUTGOING_CALL,
-          TestFactory.audio_repository.audio_elements[z.audio.AudioType.OUTGOING_CALL],
+          TestFactory.audio_repository.audioElements[z.audio.AudioType.OUTGOING_CALL],
           true
         )
         .then(audio_element => {
@@ -123,12 +123,12 @@ describe('z.audio.AudioRepository', () => {
     });
 
     it('does not play a sound twice concurrently', done => {
-      TestFactory.audio_repository.audio_elements[z.audio.AudioType.OUTGOING_CALL]
+      TestFactory.audio_repository.audioElements[z.audio.AudioType.OUTGOING_CALL]
         .play()
         .then(() => {
           TestFactory.audio_repository._play(
             z.audio.AudioType.OUTGOING_CALL,
-            TestFactory.audio_repository.audio_elements[z.audio.AudioType.OUTGOING_CALL]
+            TestFactory.audio_repository.audioElements[z.audio.AudioType.OUTGOING_CALL]
           );
         })
         .then(done.fail)
@@ -142,7 +142,7 @@ describe('z.audio.AudioRepository', () => {
 
     it('handles a missing audio id sound', done => {
       TestFactory.audio_repository
-        ._play(undefined, TestFactory.audio_repository.audio_elements[z.audio.AudioType.OUTGOING_CALL])
+        ._play(undefined, TestFactory.audio_repository.audioElements[z.audio.AudioType.OUTGOING_CALL])
         .catch(error => {
           expect(error).toEqual(jasmine.any(z.audio.AudioError));
           expect(error.type).toBe(z.audio.AudioError.TYPE.NOT_FOUND);

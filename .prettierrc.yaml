@@ -1,7 +1,8 @@
+arrowParens: avoid
 bracketSpacing: false
 jsxBracketSameLine: false
 printWidth: 120
-proseWrap: false
+proseWrap: never
 requirePragma: false
 semi: true
 singleQuote: true
@@ -10,6 +11,9 @@ trailingComma: es5
 useTabs: false
 
 overrides:
-- files: "*.json"
+- files:
+    - "*.json"
+    - "app/script/localization/webapp.js"
+    - "app/script/localization/translations/*.js"
   options:
     printWidth: 200

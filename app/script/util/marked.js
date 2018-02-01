@@ -20,9 +20,7 @@
     lheading: /^([^\n]+)\n *(=|-){2,} *(?:\n+|$)/,
     list: /^( *)(bull) [\s\S]+?(?:hr|def|\n{2,}(?! )(?!\1bull )\n*|\s*$)/,
     newline: /^\n+/,
-    nptable: noop,
     paragraph: /^((?:[^\n]+\n?(?!hr|heading|lheading|blockquote|tag|def))+)\n*/,
-    table: noop,
     text: /^[^\n]+/,
   };
 
@@ -76,15 +74,6 @@
   )();
 
   /**
-   * GFM + Tables Block Grammar
-   */
-
-  block.tables = merge({}, block.gfm, {
-    nptable: /^ *(\S.*\|.*)\n *([-:]+ *\|[-| :]*)\n((?:.*\|.*(?:\n|$))*)\n*/,
-    table: /^ *\|(.+)\n *\|( *[-:]+[-| :]*)\n((?: *\|.*(?:\n|$))*)\n*/,
-  });
-
-  /**
    * Block Lexer
    */
 
@@ -95,11 +84,7 @@
     this.rules = block.normal;
 
     if (this.options.gfm) {
-      if (this.options.tables) {
-        this.rules = block.tables;
-      } else {
-        this.rules = block.gfm;
-      }
+      this.rules = block.gfm;
     }
   }
 
@@ -139,8 +124,6 @@
   Lexer.prototype.token = function(src, top, bq) {
     src = src.replace(/^ +$/gm, '');
     let cap;
-    let item;
-    let i;
 
     while (src) {
       // newline
@@ -175,38 +158,6 @@
         continue;
       }
 
-      // table no leading pipe (gfm)
-      if (top && (cap = this.rules.nptable.exec(src))) {
-        src = src.substring(cap[0].length);
-
-        item = {
-          align: cap[2].replace(/^ *|\| *$/g, '').split(/ *\| */),
-          cells: cap[3].replace(/\n$/, '').split('\n'),
-          header: cap[1].replace(/^ *| *\| *$/g, '').split(/ *\| */),
-          type: 'table',
-        };
-
-        for (i = 0; i < item.align.length; i++) {
-          if (/^ *-+: *$/.test(item.align[i])) {
-            item.align[i] = 'right';
-          } else if (/^ *:-+: *$/.test(item.align[i])) {
-            item.align[i] = 'center';
-          } else if (/^ *:-+ *$/.test(item.align[i])) {
-            item.align[i] = 'left';
-          } else {
-            item.align[i] = null;
-          }
-        }
-
-        for (i = 0; i < item.cells.length; i++) {
-          item.cells[i] = item.cells[i].split(/ *\| */);
-        }
-
-        this.tokens.push(item);
-
-        continue;
-      }
-
       // lheading
       if ((cap = this.rules.lheading.exec(src))) {
         src = src.substring(cap[0].length);
@@ -236,38 +187,6 @@
           href: cap[2],
           title: cap[3],
         };
-        continue;
-      }
-
-      // table (gfm)
-      if (top && (cap = this.rules.table.exec(src))) {
-        src = src.substring(cap[0].length);
-
-        item = {
-          align: cap[2].replace(/^ *|\| *$/g, '').split(/ *\| */),
-          cells: cap[3].replace(/(?: *\| *)?\n$/, '').split('\n'),
-          header: cap[1].replace(/^ *| *\| *$/g, '').split(/ *\| */),
-          type: 'table',
-        };
-
-        for (i = 0; i < item.align.length; i++) {
-          if (/^ *-+: *$/.test(item.align[i])) {
-            item.align[i] = 'right';
-          } else if (/^ *:-+: *$/.test(item.align[i])) {
-            item.align[i] = 'center';
-          } else if (/^ *:-+ *$/.test(item.align[i])) {
-            item.align[i] = 'left';
-          } else {
-            item.align[i] = null;
-          }
-        }
-
-        for (i = 0; i < item.cells.length; i++) {
-          item.cells[i] = item.cells[i].replace(/^ *\| *| *\| *$/g, '').split(/ *\| */);
-        }
-
-        this.tokens.push(item);
-
         continue;
       }
 
@@ -470,9 +389,7 @@
                   /^mailto:/,
                   ''
                 )}')">${cleanValue}</a>`
-              : `${preString}<a href="${cleanHref}" target="_blank" rel="nofollow noopener noreferrer">${
-                  cleanValue
-                }</a>`;
+              : `${preString}<a href="${cleanHref}" target="_blank" rel="nofollow noopener noreferrer">${cleanValue}</a>`;
           continue;
         }
       }
@@ -594,9 +511,9 @@
   };
 
   Renderer.prototype.heading = function(text, level, raw) {
-    return `<h${level} id="${this.options.headerPrefix}${raw.toLowerCase().replace(/[^\w]+/g, '-')}">${text}</h${
-      level
-    }>\n`;
+    return `<h${level} id="${this.options.headerPrefix}${raw
+      .toLowerCase()
+      .replace(/[^\w]+/g, '-')}">${text}</h${level}>\n`;
   };
 
   Renderer.prototype.hr = function() {
@@ -614,20 +531,6 @@
 
   Renderer.prototype.paragraph = function(text) {
     return `${text.replace(/\n$/, '')}\n`;
-  };
-
-  Renderer.prototype.table = function(header, body) {
-    return `${'<table>\n' + '<thead>\n'}${header}</thead>\n` + `<tbody>\n${body}</tbody>\n` + '</table>\n';
-  };
-
-  Renderer.prototype.tablerow = function(content) {
-    return `<tr>\n${content}</tr>\n`;
-  };
-
-  Renderer.prototype.tablecell = function(content, flags) {
-    const type = flags.header ? 'th' : 'td';
-    const tag = flags.align ? `<${type} style="text-align:${flags.align}">` : `<${type}>`;
-    return `${tag + content}</${type}>\n`;
   };
 
   // span level renderer
@@ -771,37 +674,6 @@
       }
       case 'code': {
         return this.renderer.code(this.token.text, this.token.lang, this.token.escaped);
-      }
-      case 'table': {
-        let header = '';
-        let body = '';
-        let i;
-        let row;
-        let cell;
-        let j;
-
-        // header
-        cell = '';
-        for (i = 0; i < this.token.header.length; i++) {
-          flags = {align: this.token.align[i], header: true};
-          cell += this.renderer.tablecell(this.inline.output(this.token.header[i]), {
-            align: this.token.align[i],
-            header: true,
-          });
-        }
-        header += this.renderer.tablerow(cell);
-
-        for (i = 0; i < this.token.cells.length; i++) {
-          row = this.token.cells[i];
-
-          cell = '';
-          for (j = 0; j < row.length; j++) {
-            cell += this.renderer.tablecell(this.inline.output(row[j]), {align: this.token.align[j], header: false});
-          }
-
-          body += this.renderer.tablerow(cell);
-        }
-        return this.renderer.table(header, body);
       }
       case 'blockquote_start': {
         let body = '';
@@ -1030,7 +902,6 @@
     silent: false,
     smartLists: false,
     smartypants: false,
-    tables: true,
     xhtml: false,
   };
 

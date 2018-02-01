@@ -25,10 +25,10 @@ window.z.connect = z.connect || {};
 z.connect.ConnectService = class ConnectService {
   /**
    * Construct an new ConnectService.
-   * @param {z.client.Client} client - Local client
+   * @param {z.client.ClientEntity} clientEntity - Local client
    */
-  constructor(client) {
-    this.client = client;
+  constructor(clientEntity) {
+    this.client = clientEntity;
     this.logger = new z.util.Logger('z.connect.ConnectService', z.config.LOGGER.OPTIONS);
   }
 
@@ -36,12 +36,12 @@ z.connect.ConnectService = class ConnectService {
    * Upload address book data for matching.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/addressbook/onboardingV3
    *
-   * @param {z.connect.PhoneBook} phone_book - Phone book containing the address cards
+   * @param {z.connect.PhoneBook} phoneBook - Phone book containing the address cards
    * @returns {Promise} Resolves with the matched contacts from the user's phone book
    */
-  post_onboarding(phone_book) {
+  postOnboarding(phoneBook) {
     return this.client.send_json({
-      data: phone_book,
+      data: phoneBook,
       type: 'POST',
       url: this.client.create_url('/onboarding/v3'),
     });

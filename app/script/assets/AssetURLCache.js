@@ -22,30 +22,30 @@
 window.z = window.z || {};
 window.z.assets = z.assets || {};
 
-z.assets.AssetURLCache = (function() {
-  const lru_cache = new LRUCache(100);
+z.assets.AssetURLCache = (() => {
+  const _lruCache = new LRUCache(100);
 
-  const set_url = function(identifier, url) {
-    const existing_url = get_url(identifier);
+  const _getUrl = identifier => _lruCache.get(identifier);
 
-    if (existing_url) {
+  const _setUrl = (identifier, url) => {
+    const isExistingUrl = _getUrl(identifier);
+
+    if (isExistingUrl) {
       window.URL.revokeObjectURL(url);
-      return existing_url;
+      return isExistingUrl;
     }
 
-    const outdated_url = lru_cache.set(identifier, url);
+    const outdatedUrl = _lruCache.set(identifier, url);
 
-    if (outdated_url != null) {
-      window.URL.revokeObjectURL(outdated_url);
+    if (outdatedUrl != null) {
+      window.URL.revokeObjectURL(outdatedUrl);
     }
 
     return url;
   };
 
-  const get_url = identifier => lru_cache.get(identifier);
-
   return {
-    get_url,
-    set_url,
+    getUrl: _getUrl,
+    setUrl: _setUrl,
   };
 })();

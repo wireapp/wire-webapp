@@ -17,31 +17,11 @@
  *
  */
 
-import * as testconfig from 'test/util/testconfig';
-import configureStore from 'redux-mock-store';
-import {createLogger} from 'redux-logger';
-import thunk from 'redux-thunk';
+export function randomArrayElement(array) {
+  return array[randomInt(array.length - 1)];
+}
 
-const mockStoreFactory = (config = testconfig) =>
-  configureStore([
-    thunk.withExtraArgument({config}),
-    createLogger({
-      actionTransformer(action) {
-        return JSON.stringify(action);
-      },
-      colors: {
-        action: false,
-        error: false,
-        nextState: false,
-        prevState: false,
-        title: false,
-      },
-      level: {
-        action: 'info',
-        nextState: false,
-        prevState: false,
-      },
-    }),
-  ]);
-
-export default mockStoreFactory;
+// returns number: 0 <= number <= max
+export function randomInt(max) {
+  return Math.floor(Math.random() * (max + 1));
+}

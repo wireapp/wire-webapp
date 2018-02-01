@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,50 +31,52 @@ z.properties.PropertiesRepository = class PropertiesRepository {
 
   /**
    * Construct a new User properties repository.
-   * @param {z.properties.PropertiesService} properties_service - Backend REST API properties service implementation
+   * @param {z.properties.PropertiesService} propertiesService - Backend REST API properties service implementation
    */
-  constructor(properties_service) {
-    this.properties_service = properties_service;
+  constructor(propertiesService) {
+    this.propertiesService = propertiesService;
     this.logger = new z.util.Logger('z.properties.PropertiesRepository', z.config.LOGGER.OPTIONS);
 
-    this.properties = new z.properties.Properties();
-    this.self = ko.observable();
+    this.properties = new z.properties.PropertiesEntity();
+    this.selfUser = ko.observable();
 
-    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.properties_updated.bind(this));
+    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.propertiesUpdated.bind(this));
   }
 
   /**
    * Get the current preference for a property type.
-   * @param {z.properties.PROPERTIES_TYPE} properties_type - Type of preference to get
+   * @param {z.properties.PROPERTIES_TYPE} propertiesType - Type of preference to get
    * @returns {*} Preference value
    */
-  get_preference(properties_type) {
-    const type_parts = properties_type.split('.');
-    switch (type_parts.length) {
+  getPreference(propertiesType) {
+    const typeParts = propertiesType.split('.');
+    const [partOne, partTwo, partThree] = typeParts;
+
+    switch (typeParts.length) {
       case 1:
-        return this.properties[type_parts[0]];
+        return this.properties[partOne];
       case 2:
-        return this.properties[type_parts[0]][type_parts[1]];
+        return this.properties[partOne][partTwo];
       case 3:
-        return this.properties[type_parts[0]][type_parts[1]][type_parts[2]];
+        return this.properties[partOne][partTwo][partThree];
       default:
-        throw new Error(`Failed to get preference of type ${properties_type}`);
+        throw new Error(`Failed to get preference of type ${propertiesType}`);
     }
   }
 
   /**
    * Initialize properties on app startup.
-   * @param {z.entity.User} self_user_et - Self user
+   * @param {z.entity.User} selfUserEntity - Self user
    * @returns {undefined} No return value
    */
-  init(self_user_et) {
-    this.properties_service
-      .get_properties()
+  init(selfUserEntity) {
+    this.propertiesService
+      .getProperties()
       .then(keys => {
-        this.self(self_user_et);
+        this.selfUser(selfUserEntity);
         if (keys.includes(PropertiesRepository.CONFIG.PROPERTIES_KEY)) {
-          return this.properties_service
-            .get_properties_by_key(PropertiesRepository.CONFIG.PROPERTIES_KEY)
+          return this.propertiesService
+            .getPropertiesByKey(PropertiesRepository.CONFIG.PROPERTIES_KEY)
             .then(properties => {
               $.extend(true, this.properties, properties);
               this.logger.info('Loaded user properties', this.properties);
@@ -93,7 +95,7 @@ z.properties.PropertiesRepository = class PropertiesRepository {
    * @param {z.properties.Properties} properties - New properties
    * @returns {boolean} Always returns true to ensure other subscribers handling the event
    */
-  properties_updated(properties) {
+  propertiesUpdated(properties) {
     if (properties[z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING]) {
       amplify.publish(z.util.Logger.prototype.LOG_ON_DEBUG, properties[z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING]);
     }
@@ -103,58 +105,58 @@ z.properties.PropertiesRepository = class PropertiesRepository {
   /**
    * Save property setting.
    *
-   * @param {z.properties.PROPERTIES_TYPE} properties_type - Type of preference to update
-   * @param {*} updated_preference - New property setting
+   * @param {z.properties.PROPERTIES_TYPE} propertiesType - Type of preference to update
+   * @param {*} updatedPreference - New property setting
    * @returns {undefined} No return value
    */
-  save_preference(properties_type, updated_preference) {
-    if (updated_preference === undefined) {
-      switch (properties_type) {
+  savePreference(propertiesType, updatedPreference) {
+    if (updatedPreference === undefined) {
+      switch (propertiesType) {
         case z.properties.PROPERTIES_TYPE.CONTACT_IMPORT.GOOGLE:
         case z.properties.PROPERTIES_TYPE.CONTACT_IMPORT.MACOS:
-          updated_preference = Date.now();
+          updatedPreference = Date.now();
           break;
         default:
-          updated_preference = true;
+          updatedPreference = true;
       }
     }
 
-    if (updated_preference !== this.get_preference(properties_type)) {
-      this.set_preference(properties_type, updated_preference);
+    if (updatedPreference !== this.getPreference(propertiesType)) {
+      this._setPreference(propertiesType, updatedPreference);
 
-      this.properties_service
-        .put_properties_by_key(PropertiesRepository.CONFIG.PROPERTIES_KEY, this.properties)
+      this.propertiesService
+        .putPropertiesByKey(PropertiesRepository.CONFIG.PROPERTIES_KEY, this.properties)
         .then(() => {
-          this.logger.info(`Saved updated preference: '${properties_type}' - '${updated_preference}'`);
+          this.logger.info(`Saved updated preference: '${propertiesType}' - '${updatedPreference}'`);
 
-          switch (properties_type) {
+          switch (propertiesType) {
             case z.properties.PROPERTIES_TYPE.CONTACT_IMPORT.GOOGLE:
             case z.properties.PROPERTIES_TYPE.CONTACT_IMPORT.MACOS:
-              amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.CONTACTS, updated_preference);
+              amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.CONTACTS, updatedPreference);
               break;
             case z.properties.PROPERTIES_TYPE.EMOJI.REPLACE_INLINE:
-              amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE, updated_preference);
+              amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE, updatedPreference);
               break;
             case z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING:
-              amplify.publish(z.util.Logger.prototype.LOG_ON_DEBUG, updated_preference);
+              amplify.publish(z.util.Logger.prototype.LOG_ON_DEBUG, updatedPreference);
               break;
             case z.properties.PROPERTIES_TYPE.HAS_CREATED_CONVERSATION:
-              amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.HAS_CREATED_CONVERSATION, updated_preference);
+              amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.HAS_CREATED_CONVERSATION, updatedPreference);
               break;
             case z.properties.PROPERTIES_TYPE.NOTIFICATIONS:
-              amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.NOTIFICATIONS, updated_preference);
+              amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.NOTIFICATIONS, updatedPreference);
               break;
             case z.properties.PROPERTIES_TYPE.PREVIEWS.SEND:
-              amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.PREVIEWS.SEND, updated_preference);
+              amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.PREVIEWS.SEND, updatedPreference);
               break;
             case z.properties.PROPERTIES_TYPE.PRIVACY:
-              amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.PRIVACY, updated_preference);
+              amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.PRIVACY, updatedPreference);
               break;
             case z.properties.PROPERTIES_TYPE.SOUND_ALERTS:
-              amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.SOUND_ALERTS, updated_preference);
+              amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.SOUND_ALERTS, updatedPreference);
               break;
             default:
-              throw new Error(`Failed to update preference of unhandled type '${properties_type}'`);
+              throw new Error(`Failed to update preference of unhandled type '${propertiesType}'`);
           }
         });
     }
@@ -162,24 +164,28 @@ z.properties.PropertiesRepository = class PropertiesRepository {
 
   /**
    * Set the preference of specified type
-   * @param {z.properties.PROPERTIES_TYPE} properties_type - Type of preference to set
-   * @param {*} changed_preference - New preference to set
+   *
+   * @private
+   * @param {z.properties.PROPERTIES_TYPE} propertiesType - Type of preference to set
+   * @param {*} changedPreference - New preference to set
    * @returns {undefined} No return value
    */
-  set_preference(properties_type, changed_preference) {
-    const type_parts = properties_type.split('.');
-    switch (type_parts.length) {
+  _setPreference(propertiesType, changedPreference) {
+    const typeParts = propertiesType.split('.');
+    const [partOne, partTwo, partThree] = typeParts;
+
+    switch (typeParts.length) {
       case 1:
-        this.properties[type_parts[0]] = changed_preference;
+        this.properties[partOne] = changedPreference;
         break;
       case 2:
-        this.properties[type_parts[0]][type_parts[1]] = changed_preference;
+        this.properties[partOne][partTwo] = changedPreference;
         break;
       case 3:
-        this.properties[type_parts[0]][type_parts[1]][type_parts[2]] = changed_preference;
+        this.properties[partOne][partTwo][partThree] = changedPreference;
         break;
       default:
-        throw new Error(`Failed to set preference of type ${properties_type}`);
+        throw new Error(`Failed to set preference of type ${propertiesType}`);
     }
   }
 };

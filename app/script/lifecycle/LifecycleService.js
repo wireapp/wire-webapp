@@ -35,11 +35,11 @@ z.lifecycle.LifecycleService = class LifecycleService {
     this.logger = new z.util.Logger('z.lifecycle.LifecycleService', z.config.LOGGER.OPTIONS);
   }
 
-  get_version() {
-    return this._fetch_data(LifecycleService.CONFIG.URL.VERSION).then(({version}) => version);
+  getVersion() {
+    return this._fetchData(LifecycleService.CONFIG.URL.VERSION).then(({version}) => version);
   }
 
-  _fetch_data(url) {
+  _fetchData(url) {
     return fetch(url).then(response => {
       if (response.ok) {
         return response.json();

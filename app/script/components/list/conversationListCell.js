@@ -49,17 +49,25 @@ ko.components.register('conversation-list-cell', {
           <group-avatar class="conversation-list-cell-avatar-arrow" params="users: users(), conversation: conversation"></group-avatar>
         <!-- /ko -->
         <!-- ko if: !conversation.is_group() && users().length -->
-          <div class="user-avatar-halo">
-            <user-avatar class="user-avatar-s" params="user: users()[0]"></user-avatar>
+          <div class="avatar-halo">
+            <participant-avatar params="participant: users()[0], size: z.components.ParticipantAvatar.SIZE.SMALL"></participant-avatar>
           </div>
         <!-- /ko -->
       </div>
       <div class="conversation-list-cell-center">
-        <span class="conversation-list-cell-name" data-bind="text: conversation.display_name(), css: {'text-theme': is_selected(conversation)}"></span>
+        <!-- ko if: conversation.is_one2one() && conversation.self.is_team_member() -->
+          <availability-state class="conversation-list-cell-availability"
+                              data-uie-name="status-availability-item"
+                              params="availability: conversation.availabilityOfUser, label: conversation.display_name(), theme: is_selected(conversation)">
+          </availability-state>
+        <!-- /ko -->
+        <!-- ko ifnot: conversation.is_one2one() && conversation.self.is_team_member() -->
+          <span class="conversation-list-cell-name" data-bind="text: conversation.display_name(), css: {'text-theme': is_selected(conversation)}"></span>
+        <!-- /ko -->
         <span class="conversation-list-cell-description" data-bind="text: cell_state().description" data-uie-name="secondary-line"></span>
       </div>
       <div class="conversation-list-cell-right">
-        <span class="conversation-list-cell-context-menu" data-uie-name="go-options" data-bind="click: function(data, event) {on_click(conversation, event)}"></span>
+        <span class="conversation-list-cell-context-menu" data-bind="click: function(data, event) {on_click(conversation, event)}" data-uie-name="go-options"></span>
         <!-- ko if: cell_state().icon === z.conversation.ConversationStatusIcon.PENDING_CONNECTION -->
           <span class="conversation-list-cell-badge cell-badge-dark icon-pending" data-uie-name="status-pending"></span>
         <!-- /ko -->
@@ -73,7 +81,7 @@ ko.components.register('conversation-list-cell', {
           <span class="conversation-list-cell-badge cell-badge-dark icon-silence" data-uie-name="status-silence"></span>
         <!-- /ko -->
         <!-- ko if: cell_state().icon === z.conversation.ConversationStatusIcon.UNREAD_MESSAGES && conversation.unread_message_count() > 0 -->
-          <span class="conversation-list-cell-badge cell-badge-light" data-uie-name="status-unread" data-bind="text: conversation.unread_message_count()"></span>
+          <span class="conversation-list-cell-badge cell-badge-light" data-bind="text: conversation.unread_message_count()" data-uie-name="status-unread"></span>
         <!-- /ko -->
       </div>
     </div>

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,13 +23,12 @@ window.z = window.z || {};
 window.z.auth = z.auth || {};
 
 z.auth.URLParameter = {
-  BOT_NAME: 'bot_name',
   BOT_PROVIDER: 'bot_provider',
   BOT_SERVICE: 'bot_service',
-  CONNECT: 'connect',
   ENVIRONMENT: 'env',
-  INVITE: 'invite',
+  INTEGRATIONS: 'integrations',
   LOCALE: 'hl',
+  MODE: 'mode',
   REASON: 'reason',
   TRACKING: 'tracking',
 };

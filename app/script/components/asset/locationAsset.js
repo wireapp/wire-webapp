@@ -36,7 +36,7 @@ z.components.LocationAssetComponent = class LocationAssetComponent {
 ko.components.register('location-asset', {
   template: `
     <div class="location-asset-icon icon-location"></div>
-    <div class="location-asset-title" data-uie-name="location-name" data-bind="text: asset.name"></div>
+    <div class="location-asset-title" data-bind="text: asset.name" data-uie-name="location-name"></div>
     <a target="_blank" rel="nofollow noopener noreferrer" class="label-xs text-theme" data-bind="attr: {href: asset.link_src}, l10n_text: z.string.conversation_location_link"></a>
   `,
   viewModel: z.components.LocationAssetComponent,

@@ -18,6 +18,7 @@
  */
 
 import * as TrackingAction from '../module/action/TrackingAction';
+import {getLanguage} from '../module/selector/LanguageSelector';
 import React, {Component} from 'react';
 import ROUTE from '../route';
 import {Columns, Column, ContainerXS} from '@wireapp/react-ui-kit/Layout';
@@ -27,45 +28,40 @@ import {injectIntl} from 'react-intl';
 import {Logo, COLOR} from '@wireapp/react-ui-kit/Identity';
 import {ProfileIcon, RoundContainer, TeamIcon} from '@wireapp/react-ui-kit/Icon';
 import {Link, Paragraph, Text, Bold} from '@wireapp/react-ui-kit/Text';
+import {pathWithParams} from '../util/urlUtil';
 
 class Index extends Component {
   componentDidMount() {
     this.props.trackEvent({name: TrackingAction.EVENT_NAME.START.OPENED_START_SCREEN});
   }
 
-  onRegisterPersonalClick = () =>
-    this.trackAndNavigate(
-      TrackingAction.EVENT_NAME.START.OPENED_PERSONAL_REGISTRATION,
-      `${ROUTE.LOGIN}?hl=${this.props.language}#register`
-    );
-
-  onRegisterTeamClick = () => {
-    return Promise.resolve()
-      .then(() => this.props.trackEvent({name: TrackingAction.EVENT_NAME.START.OPENED_TEAM_REGISTRATION}))
-      .then(() => this.props.history.push(ROUTE.CREATE_TEAM));
+  onRegisterPersonalClick = () => {
+    this.props.trackEvent({name: TrackingAction.EVENT_NAME.START.OPENED_PERSONAL_REGISTRATION});
+    this.props.history.push(ROUTE.CREATE_ACCOUNT);
   };
 
-  onLoginClick = () =>
-    this.trackAndNavigate(
-      TrackingAction.EVENT_NAME.START.OPENED_LOGIN,
-      `${ROUTE.LOGIN}?hl=${this.props.language}#login`
-    );
+  onRegisterTeamClick = () => {
+    this.props.trackEvent({name: TrackingAction.EVENT_NAME.START.OPENED_TEAM_REGISTRATION});
+    this.props.history.push(ROUTE.CREATE_TEAM);
+  };
 
-  trackAndNavigate = (eventName, url) => {
-    return Promise.resolve()
-      .then(() => this.props.trackEvent({name: eventName}))
-      .then(() => (window.location = url));
+  onLoginClick = () => {
+    this.props.trackEvent({name: TrackingAction.EVENT_NAME.START.OPENED_LOGIN});
+    const link = document.createElement('a');
+    link.href = pathWithParams(ROUTE.LOGIN, 'mode=login');
+    document.body.appendChild(link); // workaround for Firefox
+    link.click();
   };
 
   render() {
     const {intl: {formatMessage: _}} = this.props;
     return (
       <ContainerXS centerText verticalCenter>
-        <Logo id="wire-logo" scale={1.68} />
+        <Logo scale={1.68} data-uie-name="ui-wire-logo" />
         <Paragraph center>{_(indexStrings.claim)}</Paragraph>
         <Columns style={{margin: '70px auto'}}>
           <Column>
-            <Link data-uie-name="go-register-personal" onClick={this.onRegisterPersonalClick}>
+            <Link onClick={this.onRegisterPersonalClick} data-uie-name="go-register-personal">
               <RoundContainer style={{marginBottom: 12}}>
                 <ProfileIcon color={COLOR.WHITE} />
               </RoundContainer>
@@ -79,7 +75,7 @@ class Index extends Component {
             </Link>
           </Column>
           <Column>
-            <Link data-uie-name="go-register-team" onClick={this.onRegisterTeamClick}>
+            <Link onClick={this.onRegisterTeamClick} data-uie-name="go-register-team">
               <RoundContainer color={COLOR.GREEN} style={{marginBottom: 12}}>
                 <TeamIcon color={COLOR.WHITE} />
               </RoundContainer>
@@ -95,7 +91,7 @@ class Index extends Component {
         </Columns>
         <Text>{_(indexStrings.loginInfo)}</Text>
         <br />
-        <Link data-uie-name="go-login" fontSize="24px" textTransform="none" onClick={this.onLoginClick}>
+        <Link fontSize="24px" textTransform="none" onClick={this.onLoginClick} data-uie-name="go-login">
           {_(indexStrings.login)}
         </Link>
       </ContainerXS>
@@ -103,4 +99,4 @@ class Index extends Component {
   }
 }
 
-export default injectIntl(connect(({languageState}) => ({language: languageState.language}), TrackingAction)(Index));
+export default injectIntl(connect(state => ({language: getLanguage(state)}), {...TrackingAction})(Index));

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,14 @@
  *
  */
 
-// create initial div element with ID 'main' for react
-const main = document.createElement('div');
-main.id = 'main';
-document.body.appendChild(main);
+'use strict';
+
+window.z = window.z || {};
+window.z.motion = z.motion || {};
+
+z.motion.MotionDuration = {
+  LONG: 550,
+  MEDIUM: 350,
+  SHORT: 150,
+  X_LONG: 700,
+};

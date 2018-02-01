@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ z.properties.PropertiesService = class PropertiesService {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/clearProperties
    * @returns {Promise} Resolves when all properties for user have been cleared
    */
-  delete_properties() {
+  deleteProperties() {
     return this.client.send_request({
       type: 'DELETE',
       url: this.client.create_url(PropertiesService.CONFIG.URL_PROPERTIES),
@@ -56,7 +56,7 @@ z.properties.PropertiesService = class PropertiesService {
    * @param {string} key - Key used to store user properties
    * @returns {Promise} Resolves when the requested property for user has been cleared
    */
-  delete_properties_by_key(key) {
+  deletePropertiesByKey(key) {
     return this.client.send_request({
       type: 'DELETE',
       url: this.client.create_url(`${PropertiesService.CONFIG.URL_PROPERTIES}/${key}`),
@@ -68,7 +68,7 @@ z.properties.PropertiesService = class PropertiesService {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/listPropertyKeys
    * @returns {Promise} Resolves with an array of the property keys stored for the user
    */
-  get_properties() {
+  getProperties() {
     return this.client.send_request({
       type: 'GET',
       url: this.client.create_url(PropertiesService.CONFIG.URL_PROPERTIES),
@@ -82,7 +82,7 @@ z.properties.PropertiesService = class PropertiesService {
    * @param {string} key - Key used to store user properties
    * @returns {Promise} Resolves with the property set for the given key
    */
-  get_properties_by_key(key) {
+  getPropertiesByKey(key) {
     return this.client.send_request({
       type: 'GET',
       url: this.client.create_url(`${PropertiesService.CONFIG.URL_PROPERTIES}/${key}`),
@@ -97,7 +97,7 @@ z.properties.PropertiesService = class PropertiesService {
    * @param {Object} properties - Payload to be stored
    * @returns {Promise} Resolves when the property has been stored
    */
-  put_properties_by_key(key, properties) {
+  putPropertiesByKey(key, properties) {
     return this.client.send_json({
       data: properties,
       type: 'PUT',

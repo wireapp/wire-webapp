@@ -55,10 +55,13 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
           z.tracking.EventName.CALLING.SHARED_SCREEN,
           z.tracking.EventName.CONTRIBUTED,
           z.tracking.EventName.E2EE.FAILED_MESSAGE_DECRYPTION,
+          z.tracking.EventName.INTEGRATION.ADDED_SERVICE,
+          z.tracking.EventName.INTEGRATION.REMOVED_SERVICE,
           z.tracking.EventName.REGISTRATION.ENTERED_CREDENTIALS,
           z.tracking.EventName.REGISTRATION.OPENED_EMAIL_SIGN_UP,
           z.tracking.EventName.REGISTRATION.RESENT_EMAIL_VERIFICATION,
           z.tracking.EventName.REGISTRATION.SUCCEEDED,
+          z.tracking.EventName.SETTINGS.CHANGED_STATUS,
           z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM,
           z.tracking.EventName.SETTINGS.OPTED_IN_TRACKING,
           z.tracking.EventName.SETTINGS.OPTED_OUT_TRACKING,
@@ -199,8 +202,8 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
     if (this.user_repository) {
       this._set_super_property(z.tracking.SuperProperty.CONTACTS, this.user_repository.number_of_contacts());
-      this._set_super_property(z.tracking.SuperProperty.TEAM.IN_TEAM, this.team_repository.is_team());
-      this._set_super_property(z.tracking.SuperProperty.TEAM.SIZE, this.team_repository.team_size());
+      this._set_super_property(z.tracking.SuperProperty.TEAM.IN_TEAM, this.team_repository.isTeam());
+      this._set_super_property(z.tracking.SuperProperty.TEAM.SIZE, this.team_repository.teamSize());
     }
   }
 

@@ -42,17 +42,29 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     this.self_user = this.user_repository.self;
     this.new_clients = ko.observableArray([]);
     this.name = ko.pureComputed(() => this.self_user().name());
+    this.availability = ko.pureComputed(() => this.self_user().availability());
+
+    this.availabilityLabel = ko.pureComputed(() => {
+      let label = z.user.AvailabilityMapper.nameFromType(this.availability());
+
+      const noStatusSet = this.availability() === z.user.AvailabilityType.NONE;
+      if (noStatusSet) {
+        label = z.l10n.text(z.string.preferences_account_avaibility_unset);
+      }
+
+      return label;
+    });
 
     this.username = ko.pureComputed(() => this.self_user().username());
     this.entered_username = ko.observable();
     this.submitted_username = ko.observable();
     this.username_error = ko.observable();
 
-    this.is_team = this.team_repository.is_team;
+    this.is_team = this.team_repository.isTeam;
     this.is_team_manager = ko.pureComputed(() => this.is_team() && this.self_user().is_team_manager());
     this.team = this.team_repository.team;
     this.team_name = ko.pureComputed(() =>
-      z.l10n.text(z.string.preferences_account_team, this.team_repository.team_name())
+      z.l10n.text(z.string.preferences_account_team, this.team_repository.teamName())
     );
 
     this.name_saved = ko.observable();
@@ -110,12 +122,16 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   check_username_input(username, keyboard_event) {
-    if (z.util.KeyboardUtil.is_key(keyboard_event, z.util.KeyboardUtil.KEY.BACKSPACE)) {
+    if (z.util.KeyboardUtil.isKey(keyboard_event, z.util.KeyboardUtil.KEY.BACKSPACE)) {
       return true;
     }
     // Automation: KeyboardEvent triggered during tests is missing key property
     const input_char = keyboard_event.key || String.fromCharCode(event.charCode);
     return z.user.UserHandleGenerator.validate_character(input_char.toLowerCase());
+  }
+
+  clickOnAvailability(viewModel, event) {
+    z.ui.AvailabilityContextMenu.show(event, 'settings', 'preferences-account-availability-menu');
   }
 
   click_on_username() {
@@ -231,16 +247,17 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   click_on_create() {
-    const path = z.l10n.text(z.string.url_website_create_team);
+    const path = `${z.l10n.text(z.string.url_website_create_team)}?pk_campaign=client&pk_kwd=desktop`;
     z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.WEBSITE, path));
   }
 
   click_on_logout() {
-    this.client_repository.logout_client();
+    this.client_repository.logoutClient();
   }
 
   click_on_manage() {
-    z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.TEAM_SETTINGS, z.config.URL_PATH.MANAGE_TEAM));
+    const path = `${z.config.URL_PATH.MANAGE_TEAM}?utm_source=client_settings&utm_term=desktop`;
+    z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.TEAM_SETTINGS, path));
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.OPENED_MANAGE_TEAM);
   }
 
@@ -287,7 +304,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   on_client_remove(user_id, client_id) {
     if (user_id === this.self_user().id) {
       this.new_clients().forEach(client_et => {
-        if (client_et.id === client_id && client_et.is_permanent()) {
+        if (client_et.id === client_id && client_et.isPermanent()) {
           this.new_clients.remove(client_et);
         }
       });

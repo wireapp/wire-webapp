@@ -19,6 +19,7 @@
 
 import * as Environment from './Environment';
 import APIClient from '@wireapp/api-client';
+import {StoreEngine} from '@wireapp/store-engine';
 
 const BACKEND = Environment.onEnvironment(
   APIClient.BACKEND.STAGING,
@@ -28,6 +29,7 @@ const BACKEND = Environment.onEnvironment(
 
 export const configureClient = () => {
   return new APIClient({
+    store: new StoreEngine.MemoryEngine('wire-webapp'),
     urls: BACKEND,
   });
 };

@@ -60,7 +60,11 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
     this.content_state = this.content_view_model.content_state;
     this.selected_conversation = ko.observable();
 
-    this.user = this.user_repository.self;
+    this.is_team = this.team_repository.isTeam;
+
+    this.self_user = ko.pureComputed(() => this.user_repository.self && this.user_repository.self());
+    this.selfAvailability = ko.pureComputed(() => this.self_user() && this.self_user().availability());
+    this.selfName = ko.pureComputed(() => this.self_user() && this.self_user().name());
 
     this.connect_requests = this.user_repository.connect_requests;
     this.connect_requests_text = ko.pureComputed(() => {
@@ -75,6 +79,11 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
     this.conversations_archived = this.conversation_repository.conversations_archived;
     this.conversations_unarchived = this.conversation_repository.conversations_unarchived;
 
+    this.noConversations = ko.pureComputed(() => {
+      const noConversations = !this.conversations_unarchived().length && !this.conversations_calls().length;
+      return noConversations && !this.connect_requests().length;
+    });
+
     this.webapp_is_loaded = ko.observable(false);
 
     this.should_update_scrollbar = ko
@@ -87,9 +96,6 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
         );
       })
       .extend({notify: 'always', rateLimit: 500});
-
-    this.is_team = this.team_repository.is_team;
-    this.team_name = this.team_repository.team_name;
 
     this.active_conversation_id = ko.pureComputed(() => {
       if (this.conversation_repository.active_conversation()) {
@@ -111,6 +117,10 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
     this.show_badge = ko.observable(false);
 
     this._init_subscriptions();
+  }
+
+  clickOnAvailability(viewModel, event) {
+    z.ui.AvailabilityContextMenu.show(event, 'list_header', 'left-list-availability-menu');
   }
 
   click_on_connect_requests() {

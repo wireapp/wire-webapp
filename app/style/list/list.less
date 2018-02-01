@@ -51,6 +51,21 @@
   height: @left-list-header-height;
   position: relative;
 }
+.left-list-header-start-ui {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.left-list-header-availability {
+  align-items: flex-end;
+  cursor: pointer;
+
+  .availability-state-label {
+    .label-bold-xs();
+    line-height: 12px;
+    display: inline-block;
+    max-width: @left-width - 58px;
+  }
+}
 
 .left-list-header-text {
   .ellipsis-nowrap();

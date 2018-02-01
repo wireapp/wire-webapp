@@ -20,31 +20,15 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.properties = z.properties || {};
+window.z.user = z.user || {};
 
-z.properties.Properties = class Properties {
-  constructor() {
-    this[z.properties.PROPERTIES_TYPE.VERSION] = 1;
-    this.settings = {
-      emoji: {
-        replace_inline: true,
-      },
-      notifications: z.system_notification.SystemNotificationPreference.ON,
-      previews: {
-        send: true,
-      },
-      privacy: {
-        improve_wire: true,
-      },
-      sound: {
-        alerts: z.audio.AudioPreference.ALL,
-      },
-    };
-    this.contact_import = {
-      google: undefined,
-      macos: undefined,
-    };
-    this[z.properties.PROPERTIES_TYPE.HAS_CREATED_CONVERSATION] = false;
-    this[z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING] = false;
-  }
+/**
+ * Enum for different user availability types.
+ * @type {z.user.AvailabilityType} Enum of availability types
+ */
+z.user.AvailabilityType = {
+  AVAILABLE: 1,
+  AWAY: 2,
+  BUSY: 3,
+  NONE: 0,
 };

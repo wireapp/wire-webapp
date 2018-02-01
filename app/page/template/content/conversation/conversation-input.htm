@@ -9,7 +9,7 @@
   <!-- ko if: conversation_et() && !conversation_et().connection().is_outgoing_request() -->
     <div class="controls-left">
       <!-- ko if: input().length > 0 -->
-        <user-avatar class="user-avatar-xs cursor-default" params="user: self()"></user-avatar>
+        <participant-avatar class="cursor-default" params="participant: self(), size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
       <!-- /ko -->
     </div>
 
@@ -19,14 +19,14 @@
                   class="conversation-input-text border-theme"
                   data-bind="event: {'keydown': on_input_key_down, 'keyup': on_input_key_up},
                              focus_on_keydown: true,
-                             css: {'ephemeral-input': has_ephemeral_timer()},
+                             css: {'ephemeral-input': has_ephemeral_timer() && !show_availability_tooltip()},
                              enter: on_input_enter,
                              hasFocus: blinking_cursor,
                              textInput: input,
                              resize: input,
                              resize_callback: scroll_message_list,
                              click: on_input_click,
-                             attr: {'placeholder': input_tooltip},
+                             attr: {'placeholder': input_placeholder},
                              paste_file: on_paste_files"
                   data-uie-name="input-message"
                   dir="auto">

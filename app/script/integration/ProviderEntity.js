@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,5 +17,20 @@
  *
  */
 
-export const HOST_HTTP = 'https://staging-nginz-https.zinfra.io';
-export const HOST_WEBSOCKET = 'wss://staging-nginz-ssl.zinfra.io';
+'use strict';
+
+window.z = window.z || {};
+window.z.integration = z.integration || {};
+
+z.integration.ProviderEntity = class ProviderEntity {
+  constructor(providerData = {}) {
+    const {description, id, name, url, email} = providerData;
+
+    this.id = id || '';
+
+    this.description = description || '';
+    this.email = email || '';
+    this.name = name || '';
+    this.url = url || '';
+  }
+};

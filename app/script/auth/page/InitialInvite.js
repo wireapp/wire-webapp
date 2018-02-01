@@ -27,6 +27,7 @@ import {CheckIcon} from '@wireapp/react-ui-kit/Icon';
 import {H1, Text, Link} from '@wireapp/react-ui-kit/Text';
 import {COLOR} from '@wireapp/react-ui-kit/Identity';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
+import {pathWithParams} from '../util/urlUtil';
 import * as LanguageSelector from '../module/selector/LanguageSelector';
 import * as InviteSelector from '../module/selector/InviteSelector';
 import {invite} from '../module/action/InviteAction';
@@ -36,23 +37,23 @@ import ValidationError from '../module/action/ValidationError';
 import Page from './Page';
 
 class InitialInvite extends React.PureComponent {
-  state = {error: null};
+  state = {
+    enteredEmail: '',
+    error: null,
+  };
 
   componentDidMount() {
     this.props.fetchSelf();
   }
 
   onInviteDone = () => {
-    const {invites, language} = this.props;
-    const nextLocation = `/login?hl=${language}&reason=registration`;
+    const {invites} = this.props;
+    const nextLocation = pathWithParams('/login', 'reason=registration');
     const invited = Boolean(invites.length);
-
-    return Promise.resolve()
-      .then(() => {
-        this.props.trackEvent({
-          attributes: {invited, invites: invites.length},
-          name: TrackingAction.EVENT_NAME.TEAM.FINISHED_INVITE_STEP,
-        });
+    return this.props
+      .trackEvent({
+        attributes: {invited, invites: invites.length},
+        name: TrackingAction.EVENT_NAME.TEAM.FINISHED_INVITE_STEP,
       })
       .then(() => (window.location = nextLocation));
   };
@@ -67,7 +68,7 @@ class InitialInvite extends React.PureComponent {
         padding: '0 24px 0 20px',
       }}
     >
-      <Text data-uie-name="item-pending-email" fontSize="14px">
+      <Text fontSize="14px" data-uie-name="item-pending-email">
         {email}
       </Text>
       <CheckIcon color={COLOR.TEXT} />
@@ -80,6 +81,7 @@ class InitialInvite extends React.PureComponent {
       this.setState({error: ValidationError.handleValidationState('email', this.emailInput.validity)});
     } else {
       this.props.invite({email: this.emailInput.value});
+      this.setState({enteredEmail: ''});
       this.emailInput.value = '';
     }
     this.emailInput.focus();
@@ -91,7 +93,8 @@ class InitialInvite extends React.PureComponent {
   };
 
   render() {
-    const {invites, error, intl: {formatMessage: _}} = this.props;
+    const {invites, isFetching, error, intl: {formatMessage: _}} = this.props;
+    const {enteredEmail} = this.state;
     return (
       <Page isAuthenticated>
         <ContainerXS
@@ -111,12 +114,21 @@ class InitialInvite extends React.PureComponent {
                   name="email"
                   placeholder={_(inviteStrings.emailPlaceholder)}
                   type="email"
-                  onChange={this.resetErrors}
+                  onChange={event => {
+                    this.resetErrors();
+                    this.setState({enteredEmail: event.target.value});
+                  }}
                   innerRef={node => (this.emailInput = node)}
                   autoFocus
                   data-uie-name="enter-invite-email"
                 />
-                <RoundIconButton icon="plane" type="submit" data-uie-name="do-send-invite" formNoValidate />
+                <RoundIconButton
+                  disabled={isFetching || !enteredEmail}
+                  icon="plane"
+                  type="submit"
+                  data-uie-name="do-send-invite"
+                  formNoValidate
+                />
               </InputSubmitCombo>
             </Form>
             <ErrorMessage data-uie-name="error-message">
@@ -129,7 +141,7 @@ class InitialInvite extends React.PureComponent {
                 {_(inviteStrings.nextButton)}
               </ButtonLink>
             ) : (
-              <Link data-uie-name="do-skip" onClick={this.onInviteDone}>
+              <Link onClick={this.onInviteDone} data-uie-name="do-skip">
                 {_(inviteStrings.skipForNow)}
               </Link>
             )}
@@ -145,6 +157,7 @@ export default injectIntl(
     state => ({
       error: InviteSelector.getError(state),
       invites: InviteSelector.getInvites(state),
+      isFetching: InviteSelector.isFetching(state),
       language: LanguageSelector.getLanguage(state),
     }),
     {

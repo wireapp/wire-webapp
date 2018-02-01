@@ -37,26 +37,26 @@ z.cache.CacheRepository = class CacheRepository {
   /**
    * Deletes cached data.
    *
-   * @param {boolean} [keep_conversation_input=false] - Should conversation input be kept
-   * @param {Array<string>} [protected_key_patterns=[z.storage.StorageKey.AUTH.SHOW_LOGIN]] - Keys which should NOT be deleted from the cache
+   * @param {boolean} [keepConversationInput=false] - Should conversation input be kept
+   * @param {Array<string>} [protectedKeyPatterns=[z.storage.StorageKey.AUTH.SHOW_LOGIN]] - Keys which should NOT be deleted from the cache
    * @returns {Array<string>} Keys which have been deleted from the cache
    */
-  clear_cache(keep_conversation_input = false, protected_key_patterns = [z.storage.StorageKey.AUTH.SHOW_LOGIN]) {
-    const deleted_keys = [];
+  clearCache(keepConversationInput = false, protectedKeyPatterns = [z.storage.StorageKey.AUTH.SHOW_LOGIN]) {
+    const deletedKeys = [];
 
-    if (keep_conversation_input) {
-      protected_key_patterns.push(z.storage.StorageKey.CONVERSATION.INPUT);
+    if (keepConversationInput) {
+      protectedKeyPatterns.push(z.storage.StorageKey.CONVERSATION.INPUT);
     }
 
-    for (const stored_key in amplify.store()) {
-      const should_be_deleted = !protected_key_patterns.some(pattern => stored_key.startsWith(pattern));
+    for (const storedKey in amplify.store()) {
+      const shouldBeDeleted = !protectedKeyPatterns.some(pattern => storedKey.startsWith(pattern));
 
-      if (should_be_deleted) {
-        z.util.StorageUtil.reset_value(stored_key);
-        deleted_keys.push(stored_key);
+      if (shouldBeDeleted) {
+        z.util.StorageUtil.reset_value(storedKey);
+        deletedKeys.push(storedKey);
       }
     }
 
-    return deleted_keys;
+    return deletedKeys;
   }
 };

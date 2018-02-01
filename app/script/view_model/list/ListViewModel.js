@@ -32,6 +32,7 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
    * @param {z.calling.CallingRepository} calling_repository - Calling repository
    * @param {z.connect.ConnectRepository} connect_repository - Connect repository
    * @param {z.conversation.ConversationRepository} conversation_repository - Conversation repository
+   * @param {z.integration.IntegrationRepository} integrationRepository - Integration repository
    * @param {z.search.SearchRepository} search_repository - Search repository
    * @param {z.properties.PropertiesRepository} properties_repository - Properties repository
    * @param {z.team.TeamRepository} team_repository - Team repository
@@ -42,6 +43,7 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     calling_repository,
     connect_repository,
     conversation_repository,
+    integrationRepository,
     search_repository,
     properties_repository,
     team_repository
@@ -55,8 +57,9 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     this.calling_repository = calling_repository;
     this.connect_repository = connect_repository;
     this.conversation_repository = conversation_repository;
+    this.integrationRepository = integrationRepository;
     this.search_repository = search_repository;
-    this.properties_repository = properties_repository;
+    this.propertiesRepository = properties_repository;
     this.team_repository = team_repository;
     this.user_repository = this.conversation_repository.user_repository;
     this.logger = new z.util.Logger('z.ViewModel.list.ListViewModel', z.config.LOGGER.OPTIONS);
@@ -85,7 +88,8 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
       this,
       this.connect_repository,
       this.conversation_repository,
-      this.properties_repository,
+      this.integrationRepository,
+      this.propertiesRepository,
       this.search_repository,
       this.team_repository,
       this.user_repository
@@ -99,7 +103,7 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
 
     this.self_user_picture = ko.pureComputed(() => {
       if (this.webapp_loaded() && this.user_repository.self()) {
-        return this.user_repository.self().medium_picture_resource();
+        return this.user_repository.self().mediumPictureResource();
       }
     });
 
@@ -235,7 +239,7 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     this.list_state(new_list_state);
     this.last_update(Date.now());
     $(document).on('keydown.list_view', keyboard_event => {
-      if (z.util.KeyboardUtil.is_escape_key(keyboard_event)) {
+      if (z.util.KeyboardUtil.isEscapeKey(keyboard_event)) {
         this.switch_list(z.ViewModel.list.LIST_STATE.CONVERSATIONS);
       }
     });
@@ -244,10 +248,10 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
   _update_list(new_list_state, respect_last_state) {
     switch (new_list_state) {
       case z.ViewModel.list.LIST_STATE.ARCHIVE:
-        this.archive.update_list();
+        this.archive.updateList();
         break;
       case z.ViewModel.list.LIST_STATE.START_UI:
-        this.start_ui.update_list();
+        this.start_ui.updateList();
         break;
       case z.ViewModel.list.LIST_STATE.PREFERENCES:
         amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT);
@@ -395,7 +399,7 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
 
   click_on_leave_action(conversation_et) {
     amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.LEAVE, {
-      action: () => this.conversation_repository.remove_member(conversation_et, this.user_repository.self().id),
+      action: () => this.conversation_repository.removeMember(conversation_et, this.user_repository.self().id),
       data: conversation_et.display_name(),
     });
   }

@@ -121,8 +121,32 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
       },
     });
 
+    this.show_availability_tooltip = ko.pureComputed(() => {
+      if (this.conversation_et() && this.conversation_et().firstUserEntity()) {
+        const isOne2OneConversation = this.conversation_et().is_one2one();
+        const firstUserEntity = this.conversation_et().firstUserEntity();
+        const availabilityIsNone = firstUserEntity.availability() === z.user.AvailabilityType.NONE;
+        return this.self().is_team_member() && isOne2OneConversation && !availabilityIsNone;
+      }
+
+      return false;
+    });
+
     this.file_tooltip = z.l10n.text(z.string.tooltip_conversation_file);
-    this.input_tooltip = ko.pureComputed(() => {
+    this.input_placeholder = ko.pureComputed(() => {
+      if (this.show_availability_tooltip()) {
+        const userEntity = this.conversation_et().firstUserEntity();
+
+        switch (userEntity.availability()) {
+          case z.user.AvailabilityType.AVAILABLE:
+            return z.l10n.text(z.string.tooltip_conversation_input_placeholder_available, userEntity.first_name());
+          case z.user.AvailabilityType.AWAY:
+            return z.l10n.text(z.string.tooltip_conversation_input_placeholder_away, userEntity.first_name());
+          case z.user.AvailabilityType.BUSY:
+            return z.l10n.text(z.string.tooltip_conversation_input_placeholder_busy, userEntity.first_name());
+        }
+      }
+
       if (this.conversation_et().ephemeral_timer()) {
         return z.l10n.text(z.string.tooltip_conversation_ephemeral);
       }
@@ -406,7 +430,7 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
 
         case z.util.KeyboardUtil.KEY.ENTER: {
           if (keyboard_event.altKey || keyboard_event.metaKey) {
-            z.util.KeyboardUtil.insert_at_caret(keyboard_event.target, '\n');
+            z.util.KeyboardUtil.insertAtCaret(keyboard_event.target, '\n');
             $(keyboard_event.target).change();
             keyboard_event.preventDefault();
           }
@@ -492,7 +516,7 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
         label: z.l10n.text(z.string.ephememal_units_none),
       },
     ].concat(
-      z.ephemeral.timings.get_values().map(milliseconds => {
+      z.ephemeral.timings.getValues().map(milliseconds => {
         const [number, unit] = z.util.format_milliseconds_short(milliseconds);
         const unit_locale = this._get_localized_unit_string(number, unit);
         return {

@@ -85,7 +85,6 @@ function processFiles(files) {
 
     const language = locale.split('-')[0];
     if (!SUPPORTED_LOCALE.includes(language)) {
-      console.log(`Removing unsupported locale "${locale}"`);
       fs.unlinkSync(transDir(file));
       return;
     }

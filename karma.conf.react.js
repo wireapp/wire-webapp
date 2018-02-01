@@ -17,17 +17,11 @@
  *
  */
 
-const dist = 'dist/script/auth';
-const srcTest = 'test/util';
-
-const preprocessors = {};
-preprocessors[`${dist}/script.js`] = ['coverage'];
-preprocessors['**/*.js'] = ['sourcemap'];
-
 module.exports = function(config) {
   config.set({
     autoWatch: false,
     basePath: '',
+    browserNoActivityTimeout: 20000,
     browsers: ['ChromeNoSandbox'],
     client: {
       useIframe: false,
@@ -44,13 +38,18 @@ module.exports = function(config) {
         flags: ['--no-sandbox'],
       },
     },
-    failOnEmptyTestSuite: false,
-    files: [`${srcTest}/testmain.js`, `${dist}/script.js`, `${dist}/test.js`],
+    files: ['tests.webpack.js'],
     frameworks: ['jasmine'],
     logLevel: config.LOG_INFO,
     port: 9876,
-    preprocessors,
+    preprocessors: {
+      'tests.webpack.js': ['webpack'],
+    },
     reporters: ['progress', 'coverage'],
     singleRun: true,
+    webpack: require('./webpack.config.test'),
+    webpackServer: {
+      noInfo: true,
+    },
   });
 };

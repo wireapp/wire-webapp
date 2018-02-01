@@ -32,7 +32,7 @@ describe('z.storage.StorageRepository', () => {
   });
 
   beforeEach(() => {
-    TestFactory.storage_repository.clear_all_stores();
+    TestFactory.storage_repository.clearStores();
   });
 
   describe('save', () => {

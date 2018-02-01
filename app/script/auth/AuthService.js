@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,29 +43,12 @@ z.auth.AuthService = class AuthService {
 
   /**
    * Get all cookies for a user.
-   *
    * @returns {Promise} Promise that resolves with an array of cookies.
    */
-  get_cookies() {
+  getCookies() {
     return this.client.send_request({
       type: 'GET',
       url: this.client.create_url(AuthService.CONFIG.URL_COOKIES),
-    });
-  }
-
-  /**
-   * Get invite information.
-   *
-   * @param {string} code - Invite code
-   * @returns {Promise} Promise that resolves with invitations information.
-   */
-  get_invitations_info(code) {
-    return this.client.send_request({
-      data: {
-        code: code,
-      },
-      type: 'GET',
-      url: this.client.create_url(`${AuthService.CONFIG.URL_INVITATIONS}/info`),
     });
   }
 
@@ -74,10 +57,10 @@ z.auth.AuthService = class AuthService {
    *
    * @note Don't use our client wrapper here, because to query "/access" we need to set "withCredentials" to "true" in order to send the cookie.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/auth/authenticate
-   * @param {number} retry_attempt - Retry attempts when a request fails
+   * @param {number} retryAttempt - Retry attempts when a request fails
    * @returns {Promise} Promise which resolves with access token data (token_type, etc.).
    */
-  post_access(retry_attempt = 1) {
+  postAccess(retryAttempt = 1) {
     return new Promise((resolve, reject) => {
       const config = {
         crossDomain: true,
@@ -96,27 +79,27 @@ z.auth.AuthService = class AuthService {
 
       config.success = data => {
         this.client.clear_queue_unblock();
-        this.save_access_token_in_client(data.token_type, data.access_token);
+        this.saveAccessTokenInClient(data.token_type, data.access_token);
         resolve(data);
       };
 
       config.error = (jqXHR, textStatus, errorThrown) => {
         const request_forbidden = jqXHR.status === z.service.BackendClientError.STATUS_CODE.FORBIDDEN;
         if (request_forbidden) {
-          this.logger.error(`Requesting access token failed after ${retry_attempt} attempt(s): ${errorThrown}`, jqXHR);
+          this.logger.error(`Requesting access token failed after ${retryAttempt} attempt(s): ${errorThrown}`, jqXHR);
           reject(new z.auth.AccessTokenError(z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN));
         }
 
-        if (retry_attempt <= AuthService.CONFIG.POST_ACCESS_RETRY_LIMIT) {
-          retry_attempt++;
+        if (retryAttempt <= AuthService.CONFIG.POST_ACCESS_RETRY_LIMIT) {
+          retryAttempt++;
 
           const _retry = () =>
-            this.post_access(retry_attempt)
+            this.postAccess(retryAttempt)
               .then(resolve)
               .catch(reject);
 
-          const connectivity_problem = jqXHR.status === z.service.BackendClientError.STATUS_CODE.CONNECTIVITY_PROBLEM;
-          if (connectivity_problem) {
+          const isConnectivityProblem = jqXHR.status === z.service.BackendClientError.STATUS_CODE.CONNECTIVITY_PROBLEM;
+          if (isConnectivityProblem) {
             this.logger.warn('Access token refresh delayed due to suspected connectivity issue');
             this.client.clear_queue_unblock();
 
@@ -131,31 +114,15 @@ z.auth.AuthService = class AuthService {
           }
 
           return window.setTimeout(() => {
-            this.logger.info(`Trying to get a new access token: '${retry_attempt}' attempt`);
+            this.logger.info(`Trying to get a new access token: '${retryAttempt}' attempt`);
             return _retry();
           }, AuthService.CONFIG.POST_ACCESS_RETRY_TIMEOUT);
         }
-        this.save_access_token_in_client();
+        this.saveAccessTokenInClient();
         return reject(new z.auth.AccessTokenError(z.auth.AccessTokenError.TYPE.RETRIES_EXCEEDED));
       };
 
       $.ajax(config);
-    });
-  }
-
-  /**
-   * Resend an email or phone activation code.
-   *
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/sendActivationCode
-   * @param {Object} send_activation_code - Containing the email or phone number needed to resend activation email
-   * @option {string} send_activation_code - email
-   * @returns {Promise} Promise that resolves on successful code resend
-   */
-  post_activate_send(send_activation_code) {
-    return this.client.send_json({
-      data: send_activation_code,
-      type: 'POST',
-      url: this.client.create_url(`${AuthService.CONFIG.URL_ACTIVATE}/send`),
     });
   }
 
@@ -167,7 +134,7 @@ z.auth.AuthService = class AuthService {
    * @param {string[]} labels - A list of cookie labels to remove from the system (optional)
    * @returns {jQuery.jqXHR} A superset of the XMLHTTPRequest object.
    */
-  post_cookies_remove(email, password, labels) {
+  postCookiesRemove(email, password, labels) {
     return this.client.send_json({
       data: {
         email: email,
@@ -193,8 +160,8 @@ z.auth.AuthService = class AuthService {
    * @param {boolean} persist - Request a persistent cookie instead of a session cookie
    * @returns {Promise} Promise that resolves with access token
    */
-  post_login(login, persist) {
-    const persist_param = window.encodeURIComponent(persist.toString());
+  postLogin(login, persist) {
+    const persistParam = window.encodeURIComponent(persist.toString());
     return new Promise((resolve, reject) => {
       $.ajax({
         contentType: 'application/json; charset=utf-8',
@@ -205,7 +172,7 @@ z.auth.AuthService = class AuthService {
         },
         processData: false,
         type: 'POST',
-        url: `${this.client.create_url(AuthService.CONFIG.URL_LOGIN)}?persist=${persist_param}`,
+        url: `${this.client.create_url(AuthService.CONFIG.URL_LOGIN)}?persist=${persistParam}`,
         xhrFields: {
           withCredentials: true,
         },
@@ -221,12 +188,12 @@ z.auth.AuthService = class AuthService {
    * @note Only one login code may be pending at a time.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/sendLoginCode
    *
-   * @param {Object} request_code - Containing the phone number in E.164 format and whether a code should be forced
+   * @param {Object} requestCode - Containing the phone number in E.164 format and whether a code should be forced
    * @returns {Promise} Promise that resolves on successful login code request
    */
-  post_login_send(request_code) {
+  postLoginSend(requestCode) {
     return this.client.send_json({
-      data: request_code,
+      data: requestCode,
       type: 'POST',
       url: this.client.create_url(`${AuthService.CONFIG.URL_LOGIN}/send`),
     });
@@ -237,50 +204,11 @@ z.auth.AuthService = class AuthService {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/auth/logout
    * @returns {jQuery.jqXHR} A superset of the XMLHTTPRequest object.
    */
-  post_logout() {
+  postLogout() {
     return this.client.send_request({
       type: 'POST',
       url: this.client.create_url(`${AuthService.CONFIG.URL_ACCESS}/logout`),
       withCredentials: true,
-    });
-  }
-
-  /**
-   * Register a new user.
-   *
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/register
-   *
-   * @param {Object} new_user - Containing the email, username and password needed for account creation
-   * @option {string} new_user - name
-   * @option {string} new_user - email
-   * @option {string} new_user - password
-   * @option {string} new_user - locale
-   * @returns {Promise} Promise that will resolve on success
-   */
-  post_register(new_user) {
-    return new Promise((resolve, reject) => {
-      const config = {
-        contentType: 'application/json; charset=utf-8',
-        crossDomain: true,
-        data: pako.gzip(JSON.stringify(new_user)),
-        headers: {
-          'Content-Encoding': 'gzip',
-        },
-        processData: false,
-        type: 'POST',
-        url: `${this.client.create_url(AuthService.CONFIG.URL_REGISTER)}`,
-        xhrFields: {
-          withCredentials: true,
-        },
-      };
-
-      $.ajax(config)
-        .done(data => {
-          resolve(data);
-        })
-        .fail((jqXHR, textStatus, errorThrown) => {
-          reject(jqXHR.responseJSON || errorThrown);
-        });
     });
   }
 
@@ -291,7 +219,7 @@ z.auth.AuthService = class AuthService {
    * @param {string} value - Access token
    * @returns {undefined}
    */
-  save_access_token_in_client(type = '', value = '') {
+  saveAccessTokenInClient(type = '', value = '') {
     this.client.access_token_type = type;
     this.client.access_token = value;
   }

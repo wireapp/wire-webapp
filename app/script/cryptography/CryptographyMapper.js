@@ -66,10 +66,12 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     switch (generic_message.content) {
       case z.cryptography.GENERIC_MESSAGE_TYPE.ASSET:
         return this._map_asset(generic_message.asset, generic_message.message_id);
+      case z.cryptography.GENERIC_MESSAGE_TYPE.AVAILABILITY:
+        return this._mapAvailability(generic_message.availability);
       case z.cryptography.GENERIC_MESSAGE_TYPE.CALLING:
         return this._map_calling(generic_message.calling, event.data);
       case z.cryptography.GENERIC_MESSAGE_TYPE.CLEARED:
-        return this._map_cleared(generic_message.cleared);
+        return this._mapCleared(generic_message.cleared);
       case z.cryptography.GENERIC_MESSAGE_TYPE.CONFIRMATION:
         return this._map_confirmation(generic_message.confirmation);
       case z.cryptography.GENERIC_MESSAGE_TYPE.DELETED:
@@ -85,7 +87,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
       case z.cryptography.GENERIC_MESSAGE_TYPE.KNOCK:
         return this._map_knock(generic_message.knock, generic_message.message_id);
       case z.cryptography.GENERIC_MESSAGE_TYPE.LAST_READ:
-        return this._map_last_read(generic_message.lastRead);
+        return this._mapLastRead(generic_message.lastRead);
       case z.cryptography.GENERIC_MESSAGE_TYPE.LOCATION:
         return this._map_location(generic_message.location, generic_message.message_id);
       case z.cryptography.GENERIC_MESSAGE_TYPE.REACTION:
@@ -99,14 +101,6 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
         );
         throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE);
     }
-  }
-
-  _map_calling(calling, event_data) {
-    return {
-      content: JSON.parse(calling.content),
-      sender: event_data.sender,
-      type: z.event.Client.CALL.E_CALL,
-    };
   }
 
   _map_asset(asset, event_nonce) {
@@ -180,11 +174,42 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     }
   }
 
-  _map_cleared(cleared) {
+  _mapAvailability(availability) {
     return {
-      conversation: cleared.conversation_id,
+      data: {
+        availability: (() => {
+          switch (availability.type) {
+            case z.proto.Availability.Type.NONE:
+              return z.user.AvailabilityType.NONE;
+            case z.proto.Availability.Type.AVAILABLE:
+              return z.user.AvailabilityType.AVAILABLE;
+            case z.proto.Availability.Type.AWAY:
+              return z.user.AvailabilityType.AWAY;
+            case z.proto.Availability.Type.BUSY:
+              return z.user.AvailabilityType.BUSY;
+            default:
+              const message = 'Unhandled availability type';
+              throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE, message);
+          }
+        })(),
+      },
+      type: z.event.Client.USER.AVAILABILITY,
+    };
+  }
+
+  _map_calling(calling, event_data) {
+    return {
+      content: JSON.parse(calling.content),
+      sender: event_data.sender,
+      type: z.event.Client.CALL.E_CALL,
+    };
+  }
+
+  _mapCleared(cleared) {
+    return {
       data: {
         cleared_timestamp: cleared.cleared_timestamp.toString(),
+        conversationId: cleared.conversation_id,
       },
       type: z.event.Backend.CONVERSATION.MEMBER_UPDATE,
     };
@@ -193,7 +218,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
   _map_confirmation(confirmation) {
     return {
       data: {
-        message_id: confirmation.message_id,
+        message_id: confirmation.first_message_id,
         status: (() => {
           switch (confirmation.type) {
             case z.proto.Confirmation.Type.DELIVERED:
@@ -201,10 +226,8 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
             case z.proto.Confirmation.Type.READ:
               return z.message.StatusType.SEEN;
             default:
-              throw new z.cryptography.CryptographyError(
-                z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE,
-                'Unhandled confirmation type'
-              );
+              const message = 'Unhandled confirmation type';
+              throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE, message);
           }
         })(),
       },
@@ -231,7 +254,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     const millis_as_number = generic_message.ephemeral.expire_after_millis.toNumber();
     generic_message.ephemeral.message_id = generic_message.message_id;
     const embedded_message = this._map_generic_message(generic_message.ephemeral, event);
-    embedded_message.ephemeral_expires = z.ephemeral.timings.map_to_closest_timing(millis_as_number);
+    embedded_message.ephemeral_expires = z.ephemeral.timings.mapToClosestTiming(millis_as_number);
     return embedded_message;
   }
 
@@ -255,7 +278,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
         const key_bytes = new Uint8Array(otr_key.toArrayBuffer()).buffer;
         const reference_sha256 = new Uint8Array(external.sha256.toArrayBuffer()).buffer;
 
-        return z.assets.AssetCrypto.decrypt_aes_asset(cipher_text, key_bytes, reference_sha256);
+        return z.assets.AssetCrypto.decryptAesAsset(cipher_text, key_bytes, reference_sha256);
       })
       .then(external_message_buffer => z.proto.GenericMessage.decode(external_message_buffer))
       .catch(error => {
@@ -312,11 +335,11 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     };
   }
 
-  _map_last_read(last_read) {
+  _mapLastRead(lastRead) {
     return {
-      conversation: last_read.conversation_id,
       data: {
-        last_read_timestamp: last_read.last_read_timestamp.toString(),
+        conversationId: lastRead.conversation_id,
+        last_read_timestamp: lastRead.last_read_timestamp.toString(),
       },
       type: z.event.Backend.CONVERSATION.MEMBER_UPDATE,
     };

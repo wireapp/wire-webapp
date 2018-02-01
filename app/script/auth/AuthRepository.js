@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,12 @@ window.z = window.z || {};
 window.z.auth = z.auth || {};
 
 z.auth.AuthRepository = class AuthRepository {
+  static get CONFIG() {
+    return {
+      REFRESH_THRESHOLD: 60 * 1000,
+    };
+  }
+
   static get ACCESS_TOKEN_TRIGGER() {
     return {
       IMMEDIATE: 'AuthRepository.ACCESS_TOKEN_TRIGGER.IMMEDIATE',
@@ -35,30 +41,30 @@ z.auth.AuthRepository = class AuthRepository {
 
   /**
    * Construct a new AuthService
-   * @param {z.auth.AuthService} auth_service - Service for authentication interactions with the backend
+   * @param {z.auth.AuthService} authService - Service for authentication interactions with the backend
    */
-  constructor(auth_service) {
-    this.access_token_refresh = undefined;
-    this.auth_service = auth_service;
+  constructor(authService) {
+    this.accessTokenRefresh = undefined;
+    this.authService = authService;
     this.logger = new z.util.Logger('z.auth.AuthRepository', z.config.LOGGER.OPTIONS);
 
-    this.queue_state = this.auth_service.client.queue_state;
+    this.queueState = this.authService.client.queue_state;
 
-    amplify.subscribe(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, this.renew_access_token.bind(this));
+    amplify.subscribe(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, this.renewAccessToken.bind(this));
   }
 
   /**
    * Print all cookies for a user in the console.
    * @returns {undefined} No return value
    */
-  list_cookies() {
-    this.auth_service
-      .get_cookies()
+  listCookies() {
+    this.authService
+      .getCookies()
       .then(({cookies}) => {
         this.logger.force_log('Backend cookies:');
         cookies.forEach((cookie, index) => {
-          const expiration = z.util.format_timestamp(cookie.time, false);
-          const log = `Label: ${cookie.label} | Type: ${cookie.type} |  Expiration: ${expiration}`;
+          const expirationDate = z.util.format_timestamp(cookie.time, false);
+          const log = `Label: ${cookie.label} | Type: ${cookie.type} |  Expiration: ${expirationDate}`;
           this.logger.force_log(`Cookie No. ${index + 1} | ${log}`);
         });
       })
@@ -77,11 +83,11 @@ z.auth.AuthRepository = class AuthRepository {
    * @returns {Promise} Promise that resolves with the received access token
    */
   login(login, persist) {
-    return this.auth_service.post_login(login, persist).then(access_token_data => {
-      this.save_access_token(access_token_data);
+    return this.authService.postLogin(login, persist).then(accessTokenData => {
+      this.saveAccessToken(accessTokenData);
       z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.PERSIST, persist);
       z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.SHOW_LOGIN, true);
-      return access_token_data;
+      return accessTokenData;
     });
   }
 
@@ -90,96 +96,49 @@ z.auth.AuthRepository = class AuthRepository {
    * @returns {Promise} Will always resolve
    */
   logout() {
-    return this.auth_service
-      .post_logout()
+    return this.authService
+      .postLogout()
       .then(() => this.logger.info('Log out on backend successful'))
       .catch(error => this.logger.warn(`Log out on backend failed: ${error.message}`, error));
   }
 
   /**
-   * Register a new user (with email).
-   *
-   * @param {Object} new_user - Containing the email, username and password needed for account creation
-   * @param {string} new_user.name - Username
-   * @param {string} new_user.email - Email address
-   * @param {string} new_user.password - Password for user
-   * @param {string} new_user.label - Cookie label
-   * @returns {Promise} Resolves on success
-   */
-  register(new_user) {
-    return this.auth_service.post_register(new_user).then(response => {
-      z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.PERSIST, true);
-      z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.SHOW_LOGIN, true);
-      z.util.StorageUtil.set_value(new_user.label_key, new_user.label);
-      this.logger.info(
-        `COOKIE::'${new_user.label}' Saved cookie label with key '${new_user.label_key}' in Local Storage`,
-        {
-          key: new_user.label_key,
-          value: new_user.label,
-        }
-      );
-      return response;
-    });
-  }
-
-  /**
-   * Resend an email or phone activation code.
-   *
-   * @param {Object} send_activation_code - Containing the email or phone number needed to resend activation email
-   * @param {string} send_activation_code.email - Email address
-   * @param {string} send_activation_code.phone - Phone number
-   * @returns {Promise} Resolves on success
-   */
-  resend_activation(send_activation_code) {
-    return this.auth_service.post_activate_send(send_activation_code);
-  }
-
-  /**
-   * Retrieve personal invite information.
-   * @param {string} invite - Invite code
-   * @returns {Promise} Resolves with the invite data
-   */
-  retrieve_invite(invite) {
-    return this.auth_service.get_invitations_info(invite);
-  }
-
-  /**
    * Request SMS validation code.
-   * @param {Object} request_code - Containing the phone number in E.164 format and whether a code should be forced
+   * @param {Object} requestCode - Containing the phone number in E.164 format and whether a code should be forced
    * @returns {Promise} Resolves on success
    */
-  request_login_code(request_code) {
-    return this.auth_service.post_login_send(request_code);
+  requestLoginCode(requestCode) {
+    return this.authService.postLoginSend(requestCode);
   }
 
   /**
    * Renew access-token provided a valid cookie.
-   * @param {AuthRepository.ACCESS_TOKEN_TRIGGER} renewal_trigger - Trigger for access token renewal
+   * @param {AuthRepository.ACCESS_TOKEN_TRIGGER} renewalTrigger - Trigger for access token renewal
    * @returns {undefined} No return value
    */
-  renew_access_token(renewal_trigger) {
-    const is_refreshing_token = this.queue_state() === z.service.QUEUE_STATE.ACCESS_TOKEN_REFRESH;
+  renewAccessToken(renewalTrigger) {
+    const isRefreshingToken = this.queueState() === z.service.QUEUE_STATE.ACCESS_TOKEN_REFRESH;
 
-    if (!is_refreshing_token) {
-      this.queue_state(z.service.QUEUE_STATE.ACCESS_TOKEN_REFRESH);
-      this.auth_service.client.schedule_queue_unblock();
-      this.logger.info(`Access token renewal started. Source: ${renewal_trigger}`);
+    if (!isRefreshingToken) {
+      this.queueState(z.service.QUEUE_STATE.ACCESS_TOKEN_REFRESH);
+      this.authService.client.schedule_queue_unblock();
+      this.logger.info(`Access token renewal started. Source: ${renewalTrigger}`);
 
-      this.get_access_token()
+      this.getAccessToken()
         .then(() => {
-          this.auth_service.client.execute_request_queue();
+          this.authService.client.execute_request_queue();
           amplify.publish(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEWED);
         })
         .catch(error => {
           const {message, type} = error;
-          const is_request_forbidden = type === z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN;
-          if (is_request_forbidden || z.util.Environment.frontend.is_localhost()) {
+          const isRequestForbidden = type === z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN;
+          if (isRequestForbidden || z.util.Environment.frontend.is_localhost()) {
             this.logger.warn(`Session expired on access token refresh: ${message}`, error);
             Raygun.send(error);
             return amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.SESSION_EXPIRED, false);
           }
 
-          this.queue_state(z.service.QUEUE_STATE.READY);
+          this.queueState(z.service.QUEUE_STATE.READY);
           this.logger.error(`Refreshing access token failed: '${type}'`, error);
           amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECONNECT);
         });
@@ -190,7 +149,7 @@ z.auth.AuthRepository = class AuthRepository {
    * Deletes all access token data stored on the client.
    * @returns {undefined} No return value
    */
-  delete_access_token() {
+  deleteAccessToken() {
     z.util.StorageUtil.reset_value(z.storage.StorageKey.AUTH.ACCESS_TOKEN.VALUE);
     z.util.StorageUtil.reset_value(z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION);
     z.util.StorageUtil.reset_value(z.storage.StorageKey.AUTH.ACCESS_TOKEN.TTL);
@@ -201,15 +160,15 @@ z.auth.AuthRepository = class AuthRepository {
    * Get the cached access token from the Amplify store.
    * @returns {Promise} Resolves when the access token was retrieved
    */
-  get_cached_access_token() {
+  getCachedAccessToken() {
     return new Promise((resolve, reject) => {
-      const access_token = z.util.StorageUtil.get_value(z.storage.StorageKey.AUTH.ACCESS_TOKEN.VALUE);
-      const access_token_type = z.util.StorageUtil.get_value(z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE);
+      const accessToken = z.util.StorageUtil.get_value(z.storage.StorageKey.AUTH.ACCESS_TOKEN.VALUE);
+      const accessTokenType = z.util.StorageUtil.get_value(z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE);
 
-      if (access_token) {
-        this.logger.info('Cached access token found in Local Storage', {access_token});
-        this.auth_service.save_access_token_in_client(access_token_type, access_token);
-        this._schedule_token_refresh(z.util.StorageUtil.get_value(z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION));
+      if (accessToken) {
+        this.logger.info('Cached access token found in Local Storage', {access_token: accessToken});
+        this.authService.saveAccessTokenInClient(accessTokenType, accessToken);
+        this._scheduleTokenRefresh(z.util.StorageUtil.get_value(z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION));
         return resolve();
       }
 
@@ -221,8 +180,8 @@ z.auth.AuthRepository = class AuthRepository {
    * Initially get access-token provided a valid cookie.
    * @returns {Promise} Resolves with the access token data
    */
-  get_access_token() {
-    return this.auth_service.post_access().then(access_token => this.save_access_token(access_token));
+  getAccessToken() {
+    return this.authService.postAccess().then(accessToken => this.saveAccessToken(accessToken));
   }
 
   /**
@@ -234,58 +193,58 @@ z.auth.AuthRepository = class AuthRepository {
    *  access_token_type: Bearer
    *  access_token_ttl: 900000 => 900s/15min
    *
-   * @param {Object|string} access_token_data - Access Token
-   * @option {string} access_token_data - access_token
-   * @option {string} access_token_data - expires_in
-   * @option {string} access_token_data - type
+   * @param {Object|string} accessTokenData - Access Token
+   * @option {string} accessTokenData - access_token
+   * @option {string} accessTokenData - expires_in
+   * @option {string} accessTokenData - type
    * @returns {Object} Access token data
    */
-  save_access_token(access_token_data) {
-    const expires_in_millis = 1000 * access_token_data.expires_in;
-    const expiration_timestamp = Date.now() + expires_in_millis;
+  saveAccessToken(accessTokenData) {
+    const expiresInMillis = 1000 * accessTokenData.expires_in;
+    const expirationTimestamp = Date.now() + expiresInMillis;
 
     z.util.StorageUtil.set_value(
       z.storage.StorageKey.AUTH.ACCESS_TOKEN.VALUE,
-      access_token_data.access_token,
-      access_token_data.expires_in
+      accessTokenData.access_token,
+      accessTokenData.expires_in
     );
     z.util.StorageUtil.set_value(
       z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION,
-      expiration_timestamp,
-      access_token_data.expires_in
+      expirationTimestamp,
+      accessTokenData.expires_in
     );
     z.util.StorageUtil.set_value(
       z.storage.StorageKey.AUTH.ACCESS_TOKEN.TTL,
-      expires_in_millis,
-      access_token_data.expires_in
+      expiresInMillis,
+      accessTokenData.expires_in
     );
     z.util.StorageUtil.set_value(
       z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE,
-      access_token_data.token_type,
-      access_token_data.expires_in
+      accessTokenData.token_type,
+      accessTokenData.expires_in
     );
 
-    this.auth_service.save_access_token_in_client(access_token_data.token_type, access_token_data.access_token);
+    this.authService.saveAccessTokenInClient(accessTokenData.token_type, accessTokenData.access_token);
 
-    this._log_access_token_update(access_token_data, expiration_timestamp);
-    this._schedule_token_refresh(expiration_timestamp);
-    return access_token_data;
+    this._logAccessTokenUpdate(accessTokenData, expirationTimestamp);
+    this._scheduleTokenRefresh(expirationTimestamp);
+    return accessTokenData;
   }
 
   /**
    * Logs the update of the access token.
    *
    * @private
-   * @param {Object|string} access_token_data - Access Token
-   * @option {string} access_token_data - access_token
-   * @option {string} access_token_data - expires_in
-   * @option {string} access_token_data - type
-   * @param {number} expiration_timestamp - Timestamp when access token expires
+   * @param {Object|string} accessTokenData - Access Token
+   * @option {string} accessTokenData - access_token
+   * @option {string} accessTokenData - expires_in
+   * @option {string} accessTokenData - type
+   * @param {number} expirationTimestamp - Timestamp when access token expires
    * @returns {undefined}
    */
-  _log_access_token_update(access_token_data, expiration_timestamp) {
-    const expiration_log = z.util.format_timestamp(expiration_timestamp, false);
-    this.logger.info(`Saved updated access token. It will expire on: ${expiration_log}`, access_token_data);
+  _logAccessTokenUpdate(accessTokenData, expirationTimestamp) {
+    const expirationDate = z.util.format_timestamp(expirationTimestamp, false);
+    this.logger.info(`Saved updated access token. It will expire on: ${expirationDate}`, accessTokenData);
   }
 
   /**
@@ -293,31 +252,31 @@ z.auth.AuthRepository = class AuthRepository {
    *
    * @private
    * @note Access token will be refreshed 1 minute (60000ms) before it expires
-   * @param {number} expiration_timestamp - The expiration date (and time) as timestamp
+   * @param {number} expirationTimestamp - The expiration date (and time) as timestamp
    * @returns {undefined} No undefined value
    */
-  _schedule_token_refresh(expiration_timestamp) {
-    if (this.access_token_refresh) {
-      window.clearTimeout(this.access_token_refresh);
+  _scheduleTokenRefresh(expirationTimestamp) {
+    if (this.accessTokenRefresh) {
+      window.clearTimeout(this.accessTokenRefresh);
     }
-    const callback_timestamp = expiration_timestamp - 60000;
+    const callbackTimestamp = expirationTimestamp - AuthRepository.CONFIG.REFRESH_THRESHOLD;
 
-    if (callback_timestamp < Date.now()) {
-      return this.renew_access_token(AuthRepository.ACCESS_TOKEN_TRIGGER.IMMEDIATE);
+    if (callbackTimestamp < Date.now()) {
+      return this.renewAccessToken(AuthRepository.ACCESS_TOKEN_TRIGGER.IMMEDIATE);
     }
-    const time = z.util.format_timestamp(callback_timestamp, false);
-    this.logger.info(`Scheduling next access token refresh for '${time}'`);
+    const refreshDate = z.util.format_timestamp(callbackTimestamp, false);
+    this.logger.info(`Scheduling next access token refresh for '${refreshDate}'`);
 
-    this.access_token_refresh = window.setTimeout(() => {
-      if (callback_timestamp > Date.now() + 15000) {
-        this.logger.info(`Access token refresh scheduled for '${time}' skipped because it was executed late`);
+    this.accessTokenRefresh = window.setTimeout(() => {
+      if (callbackTimestamp > Date.now() + 15000) {
+        this.logger.info(`Access token refresh scheduled for '${refreshDate}' skipped because it was executed late`);
       }
 
       if (navigator.onLine) {
-        return this.renew_access_token(`Schedule for '${time}'`);
+        return this.renewAccessToken(`Schedule for '${refreshDate}'`);
       }
 
-      this.logger.info(`Access token refresh scheduled for '${time}' skipped because we are offline`);
-    }, callback_timestamp - Date.now());
+      this.logger.info(`Access token refresh scheduled for '${refreshDate}' skipped because we are offline`);
+    }, callbackTimestamp - Date.now());
   }
 };

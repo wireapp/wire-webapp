@@ -30,7 +30,7 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
     this.asset_service = asset_service;
     this.logger = new z.util.Logger('z.links.LinkPreviewRepository', z.config.LOGGER.OPTIONS);
 
-    this.should_send_previews = properties_repository.get_preference(z.properties.PROPERTIES_TYPE.PREVIEWS.SEND);
+    this.should_send_previews = properties_repository.getPreference(z.properties.PROPERTIES_TYPE.PREVIEWS.SEND);
 
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.PREVIEWS.SEND, this.updated_send_preference);
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, properties => {
@@ -164,7 +164,7 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
    */
   _upload_preview_image(data_URI) {
     return Promise.resolve(z.util.base64_to_blob(data_URI)).then(blob =>
-      this.asset_service.upload_image_asset(blob, {public: true})
+      this.asset_service.uploadImageAsset(blob, {public: true})
     );
   }
 };

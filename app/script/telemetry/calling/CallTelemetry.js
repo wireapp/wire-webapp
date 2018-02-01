@@ -117,7 +117,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
 
       attributes = $.extend(
         {
-          conversation_participants: conversation_et.get_number_of_participants(),
+          conversation_participants: conversation_et.getNumberOfParticipants(),
           conversation_participants_in_call: max_number_of_participants ? max_number_of_participants : undefined,
           conversation_type: is_group
             ? z.tracking.attribute.ConversationType.GROUP
@@ -128,7 +128,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
           ].includes(event_name)
             ? this.remote_version
             : undefined,
-          with_bot: conversation_et.is_with_bot(),
+          with_service: conversation_et.isWithBot(),
         },
         attributes
       );
@@ -180,7 +180,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
       }
 
       const attributes = {
-        conversation_participants: conversation_et.get_number_of_participants(),
+        conversation_participants: conversation_et.getNumberOfParticipants(),
         conversation_participants_in_call: max_number_of_participants,
         conversation_type: is_group
           ? z.tracking.attribute.ConversationType.GROUP
@@ -190,7 +190,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
         duration_sec: duration,
         reason: termination_reason,
         remote_version: this.remote_version,
-        with_bot: conversation_et.is_with_bot(),
+        with_service: conversation_et.isWithBot(),
       };
 
       let event_name = z.tracking.EventName.CALLING.ENDED_CALL;

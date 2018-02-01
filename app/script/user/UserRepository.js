@@ -46,13 +46,12 @@ z.user.UserRepository = class UserRepository {
   constructor(user_service, asset_service, search_service, client_repository, cryptography_repository) {
     this.user_service = user_service;
     this.asset_service = asset_service;
-    this.search_service = search_service;
     this.client_repository = client_repository;
     this.cryptography_repository = cryptography_repository;
     this.logger = new z.util.Logger('z.user.UserRepository', z.config.LOGGER.OPTIONS);
 
     this.connection_mapper = new z.user.UserConnectionMapper();
-    this.user_mapper = new z.user.UserMapper(this.asset_service);
+    this.user_mapper = new z.user.UserMapper();
     this.should_set_username = false;
 
     this.self = ko.observable();
@@ -73,13 +72,13 @@ z.user.UserRepository = class UserRepository {
       })
       .extend({rateLimit: 1000});
 
-    this.is_team = ko.observable();
-    this.team_members = undefined;
-    this.team_users = undefined;
+    this.isTeam = ko.observable();
+    this.teamMembers = undefined;
+    this.teamUsers = undefined;
 
     this.number_of_contacts = ko.pureComputed(() => {
-      const contacts = this.is_team() ? this.team_users() : this.connected_users();
-      return contacts.filter(user_et => !user_et.is_bot).length;
+      const contacts = this.isTeam() ? this.teamUsers() : this.connected_users();
+      return contacts.filter(user_et => !user_et.isBot).length;
     });
     this.number_of_contacts.subscribe(number_of_contacts => {
       amplify.publish(z.event.WebApp.ANALYTICS.SUPER_PROPERTY, z.tracking.SuperProperty.CONTACTS, number_of_contacts);
@@ -88,7 +87,9 @@ z.user.UserRepository = class UserRepository {
     amplify.subscribe(z.event.WebApp.CLIENT.ADD, this.add_client_to_user.bind(this));
     amplify.subscribe(z.event.WebApp.CLIENT.REMOVE, this.remove_client_from_user.bind(this));
     amplify.subscribe(z.event.WebApp.CLIENT.UPDATE, this.update_clients_from_user.bind(this));
+    amplify.subscribe(z.event.WebApp.USER.SET_AVAILABILITY, this.setAvailability.bind(this));
     amplify.subscribe(z.event.WebApp.USER.EVENT_FROM_BACKEND, this.on_user_event.bind(this));
+    amplify.subscribe(z.event.WebApp.USER.PERSIST, this.saveUserInDb.bind(this));
   }
 
   /**
@@ -116,8 +117,38 @@ z.user.UserRepository = class UserRepository {
       case z.event.Backend.USER.UPDATE:
         this.user_update(event_json);
         break;
+      case z.event.Client.USER.AVAILABILITY:
+        this.onUserAvailability(event_json);
+        break;
       default:
     }
+  }
+
+  loadUsers() {
+    if (this.isTeam()) {
+      return this.user_service
+        .loadUserFromDb()
+        .then(users => {
+          if (users.length) {
+            this.logger.log(`Loaded state of '${users.length}' users from database`, users);
+            return Promise.all(
+              users.map(user =>
+                this.get_user_by_id(user.id).then(userEntity => userEntity.availability(user.availability))
+              )
+            );
+          }
+        })
+        .then(() => this.users().forEach(userEntity => userEntity.subscribeToChanges()));
+    }
+  }
+
+  /**
+   * Persists a conversation state in the database.
+   * @param {User} userEntity - User which should be persisted
+   * @returns {Promise} Resolves when user was saved
+   */
+  saveUserInDb(userEntity) {
+    return this.user_service.saveUserInDb(userEntity);
   }
 
   /**
@@ -164,6 +195,18 @@ z.user.UserRepository = class UserRepository {
       window.setTimeout(() => {
         amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SIGN_OUT_REASON.ACCOUNT_DELETED, true);
       }, 50);
+    }
+  }
+
+  /**
+   * Event to update availability of user.
+   * @param {Object} event - Event data
+   * @returns {undefined} No return value
+   */
+  onUserAvailability(event) {
+    if (this.isTeam()) {
+      const {from: userId, data: {availability}} = event;
+      this.get_user_by_id(userId).then(userEntity => userEntity.availability(availability));
     }
   }
 
@@ -359,7 +402,7 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise} Promise that resolves with all user entities where client entities have been assigned to.
    */
   _assign_all_clients() {
-    return this.client_repository.get_all_clients_from_db().then(recipients => {
+    return this.client_repository.getAllClientsFromDb().then(recipients => {
       this.logger.info(`Found locally stored clients for '${Object.keys(recipients).length}' users`, recipients);
       const user_ids = Object.keys(recipients);
 
@@ -486,7 +529,7 @@ z.user.UserRepository = class UserRepository {
         return;
       }
 
-      return this.client_repository.save_client_in_db(user_id, client_et.to_json()).then(() => {
+      return this.client_repository.saveClientInDb(user_id, client_et.toJson()).then(() => {
         amplify.publish(z.event.WebApp.USER.CLIENT_ADDED, user_id, client_et);
         if (user_et.is_me) {
           amplify.publish(z.event.WebApp.CLIENT.ADD_OWN_CLIENT, user_id, client_et);
@@ -503,7 +546,7 @@ z.user.UserRepository = class UserRepository {
    */
   remove_client_from_user(user_id, client_id) {
     return this.client_repository
-      .remove_client(user_id, client_id)
+      .removeClient(user_id, client_id)
       .then(() => this.get_user_by_id(user_id))
       .then(user_et => {
         user_et.remove_client(client_id);
@@ -514,13 +557,46 @@ z.user.UserRepository = class UserRepository {
   /**
    * Update clients for given user.
    * @param {string} user_id - ID of user
-   * @param {Array<z.client.Client>} client_ets - Clients which should get updated
+   * @param {Array<z.client.ClientEntity>} client_ets - Clients which should get updated
    * @returns {undefined} No return value
    */
   update_clients_from_user(user_id, client_ets) {
     this.get_user_by_id(user_id).then(user_et => {
       user_et.devices(client_ets);
       amplify.publish(z.event.WebApp.USER.CLIENTS_UPDATED, user_id, client_ets);
+    });
+  }
+
+  setAvailability(availability, method) {
+    const hasAvailabilityChanged = availability !== this.self().availability();
+    const newAvailabilityValue = z.user.AvailabilityMapper.valueFromType(availability);
+    if (hasAvailabilityChanged) {
+      const oldAvailabilityValue = z.user.AvailabilityMapper.valueFromType(this.self().availability());
+      this.logger.log(`Availability was changed from '${oldAvailabilityValue}' to '${newAvailabilityValue}'`);
+      this.self().availability(availability);
+      this._trackAvailability(availability, method);
+    } else {
+      this.logger.log(`Availability was again set to '${newAvailabilityValue}'`);
+    }
+
+    const genericMessage = new z.proto.GenericMessage(z.util.create_random_uuid());
+    const availabilityMessage = new z.proto.Availability(z.user.AvailabilityMapper.protoFromType(availability));
+    genericMessage.set(z.cryptography.GENERIC_MESSAGE_TYPE.AVAILABILITY, availabilityMessage);
+
+    amplify.publish(z.event.WebApp.BROADCAST.SEND_MESSAGE, genericMessage);
+  }
+
+  /**
+   * Track availability action.
+   *
+   * @param {z.user.AvailabilityType} availability - Type of availability
+   * @param {string} method - Method used for availability change
+   * @returns {undefined} No return value
+   */
+  _trackAvailability(availability, method) {
+    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.CHANGED_STATUS, {
+      method: method,
+      status: z.user.AvailabilityMapper.valueFromType(availability),
     });
   }
 
@@ -586,7 +662,7 @@ z.user.UserRepository = class UserRepository {
       .then(resolve_array => {
         const new_user_ets = _.flatten(resolve_array);
 
-        if (this.is_team()) {
+        if (this.isTeam()) {
           this.map_guest_status(new_user_ets);
         }
 
@@ -794,7 +870,7 @@ z.user.UserRepository = class UserRepository {
         this.user_mapper.update_user_from_object(current_user_et, updated_user_data)
       )
       .then(updated_user_et => {
-        if (this.is_team()) {
+        if (this.isTeam()) {
           this.map_guest_status([updated_user_et]);
         }
       });
@@ -958,7 +1034,7 @@ z.user.UserRepository = class UserRepository {
    */
   change_picture(picture) {
     return this.asset_service
-      .upload_profile_image(picture)
+      .uploadProfileImage(picture)
       .then(([small_key, medium_key]) => {
         const assets = [
           {key: small_key, size: 'preview', type: 'image'},
@@ -990,7 +1066,7 @@ z.user.UserRepository = class UserRepository {
   }
 
   map_guest_status(user_ets = this.users()) {
-    const team_members = this.team_members();
+    const team_members = this.teamMembers();
 
     user_ets.forEach(user_et => {
       if (!user_et.is_me) {

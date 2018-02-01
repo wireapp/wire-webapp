@@ -51,7 +51,7 @@ z.entity.User = class User {
   constructor(id = '') {
     this.id = id;
     this.is_me = false;
-    this.is_bot = false;
+    this.isBot = false;
 
     this.joaat_hash = -1;
 
@@ -133,8 +133,8 @@ z.entity.User = class User {
 
     this.username = ko.observable();
 
-    this.preview_picture_resource = ko.observable();
-    this.medium_picture_resource = ko.observable();
+    this.previewPictureResource = ko.observable();
+    this.mediumPictureResource = ko.observable();
 
     this.connection = ko.observable(new z.entity.Connection());
 
@@ -152,10 +152,10 @@ z.entity.User = class User {
     this.is_team_manager = ko.pureComputed(() =>
       [z.team.TeamRole.ROLE.ADMIN, z.team.TeamRole.ROLE.OWNER].includes(this.team_role())
     );
+    this.isTeamOwner = ko.pureComputed(() => z.team.TeamRole.ROLE.OWNER === this.team_role());
 
     this.is_request = ko.pureComputed(() => this.connection().is_request());
 
-    // e2ee
     this.devices = ko.observableArray();
     this.is_verified = ko.pureComputed(() => {
       if (this.devices().length === 0 && !this.is_me) {
@@ -163,6 +163,12 @@ z.entity.User = class User {
       }
       return this.devices().every(client_et => client_et.meta.is_verified());
     });
+
+    this.availability = ko.observable(z.user.AvailabilityType.NONE);
+  }
+
+  subscribeToChanges() {
+    this.availability.subscribe(() => amplify.publish(z.event.WebApp.USER.PERSIST, this));
   }
 
   add_client(new_client_et) {
@@ -196,5 +202,12 @@ z.entity.User = class User {
       return z.util.StringUtil.starts_with(this.username(), query);
     }
     return z.util.StringUtil.compare_transliteration(this.name(), query) || this.username() === query;
+  }
+
+  serialize() {
+    return {
+      availability: this.availability(),
+      id: this.id,
+    };
   }
 };

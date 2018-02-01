@@ -50,7 +50,7 @@ export const indexStrings = defineMessages({
   },
   login: {
     id: 'index.login',
-    defaultMessage: 'Log In',
+    defaultMessage: 'Log in',
   },
 });
 
@@ -73,30 +73,52 @@ export const teamNameStrings = defineMessages({
   },
 });
 
+export const accountFormStrings = defineMessages({
+  namePlaceholder: {
+    id: 'accountForm.namePlaceholder',
+    defaultMessage: 'Name',
+  },
+  emailTeamPlaceholder: {
+    id: 'accountForm.emailTeamPlaceholder',
+    defaultMessage: 'you@yourcompany.com',
+  },
+  emailPersonalPlaceholder: {
+    id: 'accountForm.emailPersonalPlaceholder',
+    defaultMessage: 'you@email.com',
+  },
+  passwordPlaceholder: {
+    id: 'accountForm.passwordPlaceholder',
+    defaultMessage: 'Password (at least 8 characters)',
+  },
+  terms: {
+    id: 'accountForm.terms',
+    defaultMessage: 'I accept the <a {linkParams}>terms and conditions</a>',
+  },
+  submitButton: {
+    id: 'accountForm.nextButton',
+    defaultMessage: 'Next',
+  },
+});
+
 export const createAccountStrings = defineMessages({
   headLine: {
     id: 'createAccount.headLine',
     defaultMessage: 'Set up your account',
   },
-  namePlaceholder: {
-    id: 'createAccount.namePlaceholder',
-    defaultMessage: 'Name',
-  },
-  emailPlaceholder: {
-    id: 'createAccount.emailPlaceholder',
-    defaultMessage: 'you@yourcompany.com',
-  },
-  passwordPlaceholder: {
-    id: 'createAccount.passwordPlaceholder',
-    defaultMessage: 'Password (at least 8 characters)',
-  },
-  terms: {
-    id: 'createAccount.terms',
-    defaultMessage: 'I accept the <a {linkParams}>terms and conditions</a>',
-  },
-  nextButton: {
+  submitButton: {
     id: 'createAccount.nextButton',
     defaultMessage: 'Next',
+  },
+});
+
+export const createPersonalAccountStrings = defineMessages({
+  headLine: {
+    id: 'createPersonalAccount.headLine',
+    defaultMessage: 'New account',
+  },
+  submitButton: {
+    id: 'createPersonalAccount.nextButton',
+    defaultMessage: 'Register',
   },
 });
 
@@ -142,6 +164,21 @@ export const inviteStrings = defineMessages({
   },
 });
 
+export const chooseHandleStrings = defineMessages({
+  headline: {
+    id: 'chooseHandle.headline',
+    defaultMessage: 'Set username',
+  },
+  subhead: {
+    id: 'chooseHandle.subhead',
+    defaultMessage: 'Usernames help people find you.',
+  },
+  handlePlaceholder: {
+    id: 'chooseHandle.handlePlaceholder',
+    defaultMessage: 'Username',
+  },
+});
+
 export const errorHandlerStrings = defineMessages({
   [BackendError.LABEL.ACCESS_DENIED]: {
     id: 'BackendError.LABEL.ACCESS_DENIED',
@@ -175,6 +212,10 @@ export const errorHandlerStrings = defineMessages({
     id: 'BackendError.LABEL.KEY_EXISTS',
     defaultMessage:
       'This email address has already been registered. <a target="_blank" rel="noopener noreferrer" href="https://support.wire.com/hc/articles/115004082129">Learn more</a>',
+  },
+  [BackendError.LABEL.ALREADY_INVITED]: {
+    id: 'BackendError.LABEL.ALREADY_INVITED',
+    defaultMessage: 'This email has already been invited',
   },
   [BackendError.LABEL.MISSING_AUTH]: {
     id: 'BackendError.LABEL.MISSING_AUTH',

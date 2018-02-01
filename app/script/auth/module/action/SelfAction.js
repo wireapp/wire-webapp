@@ -18,6 +18,7 @@
  */
 
 import * as SelfActionCreator from './creator/SelfActionCreator';
+import BackendError from './BackendError';
 
 export function fetchSelf() {
   return function(dispatch, getState, {apiClient}) {
@@ -32,6 +33,23 @@ export function fetchSelf() {
         });
       })
       .then(selfUser => dispatch(SelfActionCreator.successfulFetchSelf(selfUser)))
-      .catch(error => dispatch(SelfActionCreator.failedFetchSelf(error)));
+      .catch(error => {
+        dispatch(SelfActionCreator.failedFetchSelf(error));
+        throw BackendError.handle(error);
+      });
+  };
+}
+
+export function setHandle(handle) {
+  return function(dispatch, getState, {apiClient}) {
+    dispatch(SelfActionCreator.startSetHandle());
+    return apiClient.self.api
+      .putHandle({handle: handle.trim().toLowerCase()})
+      .then(() => dispatch(fetchSelf()).then(action => action.payload))
+      .then(result => dispatch(SelfActionCreator.successfulSetHandle(result)))
+      .catch(error => {
+        dispatch(SelfActionCreator.failedSetHandle(error));
+        throw BackendError.handle(error);
+      });
   };
 }

@@ -459,13 +459,38 @@ describe('Conversation', () => {
     });
   });
 
+  describe('getNumberOfClients', () => {
+    it('should return the number of all known clients  (including own clients)', () => {
+      const first_client = new z.client.ClientEntity();
+      first_client.id = '5021d77752286cac';
+
+      const second_client = new z.client.ClientEntity();
+      second_client.id = '575b7a890cdb7635';
+
+      const third_client = new z.client.ClientEntity();
+      third_client.id = '6c0daa855d6b8b6e';
+
+      const user_et = new z.entity.User();
+      user_et.devices.push(first_client);
+      user_et.devices.push(second_client);
+
+      const second_user_et = new z.entity.User();
+      second_user_et.devices.push(third_client);
+
+      conversation_et.participating_user_ets.push(user_et);
+      conversation_et.participating_user_ets.push(second_user_et);
+
+      expect(conversation_et.getNumberOfClients()).toBe(4);
+    });
+  });
+
   describe('is_verified', () => {
     it('is not verified when nothing is set', () => {
       expect(conversation_et.is_verified()).toBeFalsy();
     });
 
     it('is verified when self user has no remote clients', () => {
-      const verified_client_et = new z.client.Client();
+      const verified_client_et = new z.client.ClientEntity();
       verified_client_et.meta.is_verified(true);
 
       const self_user_et = new z.entity.User();
@@ -480,8 +505,8 @@ describe('Conversation', () => {
     });
 
     it('is not verified when participant has unverified device', () => {
-      const unverified_client_et = new z.client.Client();
-      const verified_client_et = new z.client.Client();
+      const unverified_client_et = new z.client.ClientEntity();
+      const verified_client_et = new z.client.ClientEntity();
       verified_client_et.meta.is_verified(true);
 
       const self_user_et = new z.entity.User();
@@ -502,7 +527,7 @@ describe('Conversation', () => {
     });
 
     it('is verified when all users are verified', () => {
-      const verified_client_et = new z.client.Client();
+      const verified_client_et = new z.client.ClientEntity();
       verified_client_et.meta.is_verified(true);
 
       const self_user_et = new z.entity.User();
@@ -523,7 +548,7 @@ describe('Conversation', () => {
     });
   });
 
-  describe('is_with_bot', () =>
+  describe('isWithBot', () =>
     it('detects bot conversations by the username of the remote participant', () => {
       const user_et = new z.entity.User(z.util.create_random_uuid());
 
@@ -532,31 +557,31 @@ describe('Conversation', () => {
 
       user_et.username('ottothebot');
       conversation_et.type(z.conversation.ConversationType.SELF);
-      expect(conversation_et.is_with_bot()).toBe(false);
+      expect(conversation_et.isWithBot()).toBe(false);
 
       conversation_et.type(z.conversation.ConversationType.ONE2ONE);
-      expect(conversation_et.is_with_bot()).toBe(true);
+      expect(conversation_et.isWithBot()).toBe(true);
 
       user_et.username('annathebot');
-      expect(conversation_et.is_with_bot()).toBe(true);
+      expect(conversation_et.isWithBot()).toBe(true);
 
       user_et.username(undefined);
-      expect(conversation_et.is_with_bot()).toBe(false);
+      expect(conversation_et.isWithBot()).toBe(false);
 
       user_et.username('');
-      expect(conversation_et.is_with_bot()).toBe(false);
+      expect(conversation_et.isWithBot()).toBe(false);
 
       user_et.username('bob');
-      expect(conversation_et.is_with_bot()).toBe(false);
+      expect(conversation_et.isWithBot()).toBe(false);
 
       user_et.username('bobthebot');
-      expect(conversation_et.is_with_bot()).toBe(false);
+      expect(conversation_et.isWithBot()).toBe(false);
 
       user_et.username('bot');
-      expect(conversation_et.is_with_bot()).toBe(false);
+      expect(conversation_et.isWithBot()).toBe(false);
 
       user_et.username('wire');
-      expect(conversation_et.is_with_bot()).toBe(false);
+      expect(conversation_et.isWithBot()).toBe(false);
     }));
 
   describe('messages_visible', () => {

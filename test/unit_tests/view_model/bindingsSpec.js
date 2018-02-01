@@ -17,7 +17,7 @@
  *
  */
 
-// grunt test_init && grunt test_run:util/bindings
+// grunt test_init && grunt test_run:view_model/bindings
 
 'use strict';
 
@@ -31,9 +31,7 @@ describe('ko.bindingHandlers', () => {
       element = document.createElement('div');
 
       handler = {
-        on_enter() {
-          return 'yay';
-        },
+        on_enter: () => 'yay',
       };
 
       // we need the callFake since the spyOn will overwrite the on_enter property
@@ -65,9 +63,7 @@ describe('ko.bindingHandlers', () => {
     beforeEach(() => {
       observable = ko.observable(false);
       handler = {
-        callback() {
-          return 'yay';
-        },
+        callback: () => 'yay',
       };
 
       spyOn(handler, 'callback');

@@ -26,11 +26,9 @@ window.z.conversation = z.conversation || {};
 z.conversation.EventMapper = class EventMapper {
   /**
    * Construct a new Event Mapper.
-   * @param {AssetService} asset_service - Asset handling service
    */
-  constructor(asset_service) {
+  constructor() {
     this.map_json_event = this.map_json_event.bind(this);
-    this.asset_service = asset_service;
     this.logger = new z.util.Logger('z.conversation.EventMapper', z.config.LOGGER.OPTIONS);
   }
 

@@ -199,8 +199,10 @@ ko.bindingHandlers.resize = (function() {
  */
 ko.bindingHandlers.enter = {
   init(element, valueAccessor, allBindings, data, context) {
-    const wrapper = function(_data, keyboard_event) {
-      if (z.util.KeyboardUtil.is_enter_key(keyboard_event) && !keyboard_event.shiftKey && !keyboard_event.altKey) {
+    const wrapper = function(_data, jquery_event) {
+      const keyboard_event = jquery_event.originalEvent || jquery_event;
+
+      if (z.util.KeyboardUtil.isEnterKey(keyboard_event) && !keyboard_event.shiftKey && !keyboard_event.altKey) {
         const callback = valueAccessor();
         if (typeof callback === 'function') {
           callback.call(this, data, keyboard_event);
@@ -336,6 +338,7 @@ ko.bindingHandlers.antiscroll = {
     $(element).antiscroll({
       autoHide: true,
       autoWrap: true,
+      notHorizontal: true,
     });
 
     const parent_element = $(element).parent();

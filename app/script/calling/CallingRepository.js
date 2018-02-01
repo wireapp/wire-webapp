@@ -574,7 +574,7 @@ z.calling.CallingRepository = class CallingRepository {
     if (call_et.is_group) {
       const {dest_client_id, dest_user_id, type} = call_message_et;
 
-      if (dest_user_id !== this.self_user_id() || dest_client_id !== this.client_repository.current_client().id) {
+      if (dest_user_id !== this.self_user_id() || dest_client_id !== this.client_repository.currentClient().id) {
         this.logger.log(`Ignored '${type}' call message for client '${dest_client_id}' of user '${dest_user_id}'`);
         throw new z.calling.CallError(z.calling.CallError.TYPE.MISTARGETED_MESSAGE);
       }
@@ -1408,9 +1408,7 @@ z.calling.CallingRepository = class CallingRepository {
     let log_message;
     if (is_outgoing) {
       if (remote_user_id) {
-        log_message = `Sending '${type}' message (response: ${response}) to user '${remote_user_id}' in conversation '${
-          conversation_id
-        }'`;
+        log_message = `Sending '${type}' message (response: ${response}) to user '${remote_user_id}' in conversation '${conversation_id}'`;
       } else {
         log_message = `Sending '${type}' message (response: ${response}) to conversation '${conversation_id}'`;
       }
@@ -1419,9 +1417,7 @@ z.calling.CallingRepository = class CallingRepository {
         return;
       }
 
-      log_message = `Received '${type}' message (response: ${response}) from user '${user_id}' in conversation '${
-        conversation_id
-      }'`;
+      log_message = `Received '${type}' message (response: ${response}) from user '${user_id}' in conversation '${conversation_id}'`;
     }
 
     this.logger.info(log_message, call_message_et);

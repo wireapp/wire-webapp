@@ -28,17 +28,9 @@
           </div>
         </div>
         <div class="content">
-          <div class="get-wire-info" data-bind="visible: get_wire">
-            <div data-bind="l10n_text: z.string.auth_account_get_wire" data-uie-name="status-get-wire"></div>
-          </div>
           <div id="section-account" class="section">
             <div class="selector selector-mode">
-              <!-- ko if: account_mode_login -->
-                <button class="button btn-mode btn-login" data-bind="l10n_text: z.string.auth_account_sign_in"></button>
-              <!-- /ko -->
-              <!-- ko ifnot: account_mode_login -->
-                <button class="button btn-mode btn-register" data-bind="l10n_text: z.string.auth_account_create_account"></button>
-              <!-- /ko -->
+              <button class="button btn-mode btn-login" data-bind="l10n_text: z.string.auth_account_sign_in"></button>
             </div>
 
             <div id="form-account-login" class="form">
@@ -134,49 +126,6 @@
                 </div>
               </form>
             </div>
-
-            <form id="form-account-register" class="form" data-bind="submit: register">
-              <div id="wire-register-name-container" class="form-control">
-                <input class="input name" id="wire-register-name" type="text" maxlength="64" spellcheck="false"
-                       data-bind="css: {'input-error': failed_validation_name}, event: {input: clear_error}, l10n_tooltip: z.string.auth_placeholder_name, l10n_placeholder: z.string.auth_placeholder_name, textInput: name"
-                       data-uie-name="enter-name" tabindex="1" dir="auto">
-              </div>
-              <div id="wire-register-email-container" class="form-control">
-                <input class="input email" id="wire-register-email" type="text" autocomplete="email" maxlength="128" spellcheck="false"
-                       data-bind="css: {'input-error': failed_validation_email}, event: {input: clear_error}, l10n_tooltip: z.string.auth_placeholder_email, l10n_placeholder: z.string.auth_placeholder_email, textInput: username"
-                       data-uie-name="enter-email" tabindex="2">
-              </div>
-              <div id="wire-register-password-container" class="form-control">
-                <input class="input password" id="wire-register-password" type="password" maxlength="1024"
-                       data-bind="css: {'input-error': failed_validation_password}, event: {input: clear_error_password}, l10n_tooltip: z.string.auth_placeholder_password_set, l10n_placeholder: z.string.auth_placeholder_password_set, textInput: password"
-                       data-uie-name="enter-password" tabindex="3">
-              </div>
-              <div class="spacer">
-                <ul class="error-list" data-uie-name="status-error">
-                  <!-- ko foreach: validation_errors -->
-                    <li class="error" data-bind="text: message"></li>
-                  <!-- /ko -->
-                </ul>
-              </div>
-              <div class="footer">
-                <div class="column">
-                  <input id="wire-register" class="button button-white btn-action" type="submit"
-                         data-bind="enable: can_register, l10n_input: z.string.auth_account_create"
-                         data-uie-name="do-register" tabindex="5">
-                </div>
-                <div class="column column-terms-of-use">
-                  <div class="checkbox checkbox-terms-of-use" data-bind="css: {'input-error': failed_validation_terms}">
-                    <input type="checkbox" id="checkbox-terms-of-use" data-bind="checked: accepted_terms_of_use" tabindex="4">
-                    <label class="auth-text" for="checkbox-terms-of-use">
-                      <span data-bind="l10n_text: z.string.auth_account_terms_of_use_detail" data-uie-name="do-terms-of-use"></span>
-                      <a class="auth-text-link" rel="nofollow noopener noreferrer" target="_blank" tabindex="-1"
-                         data-bind="click: clicked_on_terms, l10n_text: z.string.auth_account_terms_of_use"
-                         data-uie-name="go-terms-of-use"></a>
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </form>
           </div>
 
           <div id="section-verify" class="section">
@@ -335,50 +284,17 @@
             <div class="posted-icon">
               <div class="icon-envelope"></div>
               <div class="icon-check"></div>
-              <div class="icon-error"></div>
               <div class="icon-spinner spin"></div>
             </div>
             <div class="form-posted">
-              <div id="form-posted-offline" class="posted-content" data-bind="visible: posted_mode_offline">
-                <div class="auth-headline" data-bind="l10n_text: z.string.auth_posted_offline_headline"></div>
-                <div class="auth-headline-sub posted-message-detail" data-bind="l10n_text: z.string.auth_posted_offline_detail"></div>
-                <div class="posted-action-detail" data-bind="l10n_text: z.string.auth_posted_resend_action"></div>
-                <div id="wire-offline-resend" class="auth-text-link posted-link posted-action-link"
-                     data-bind="click: clicked_on_retry_registration, enabled: can_register, text: account_resend_text"></div>
-              </div>
-              <div id="form-posted-pending" class="posted-content" data-bind="visible: posted_mode_pending">
-                <div class="auth-headline" data-bind="l10n_text: z.string.auth_posted_pending_headline"></div>
-                <div class="auth-headline-sub posted-message-detail" data-bind="l10n_text: z.string.auth_posted_pending_detail"></div>
-                <div class="posted-action-detail" data-bind="l10n_text: z.string.auth_posted_resend_action"></div>
-                <div id="wire-pending-resend" class="auth-text-link posted-link posted-action-link"
-                     data-bind="click: clicked_on_resend_registration, enabled: can_resend_registration, text: account_resend_text"></div>
-              </div>
-              <div id="form-posted-resend" class="posted-content" data-bind="visible: posted_mode_resend">
-                <div class="auth-headline" data-bind="l10n_text: z.string.auth_posted_resend_headline"></div>
-                <div class="auth-headline-sub posted-message-detail" data-bind="l10n_text: z.string.auth_posted_resend_detail"></div>
-                <div class="posted-action-detail" data-bind="l10n_text: z.string.auth_posted_resend_action"></div>
-                <div id="wire-resend" class="auth-text-link posted-link posted-action-link"
-                     data-bind="click: clicked_on_resend_registration, enabled: can_resend_registration, text: account_resend_text"></div>
-              </div>
-              <div id="form-posted-retry" class="posted-content" data-bind="visible: posted_mode_retry">
-                <div class="auth-headline" data-bind="l10n_text: z.string.auth_posted_retry_headline"></div>
-                <div class="auth-headline-sub posted-message-detail" data-bind="l10n_text: z.string.auth_posted_retry_detail"></div>
-                <div class="posted-action-detail" data-bind="l10n_text: z.string.auth_posted_retry_action"></div>
-                <div id="wire-retry" class="auth-text-link posted-link posted-action-link"
-                     data-bind="click: clicked_on_retry_registration, enabled: can_register, text: account_retry_text" ></div>
-              </div>
               <div id="form-posted-verify" class="posted-content" data-bind="visible: posted_mode_verify">
                 <div class="auth-headline" data-bind="l10n_text: z.string.auth_posted_resend_headline"></div>
                 <div class="auth-headline-sub posted-message-detail" data-bind="l10n_text: z.string.auth_posted_resend_detail"></div>
                 <div class="posted-action-detail" data-bind="l10n_text: z.string.auth_posted_resend_action"></div>
                 <div id="wire-verify" class="auth-text-link posted-link posted-action-link"
-                     data-bind="click: clicked_on_resend_verification, enabled: can_register, text: account_resend_text" ></div>
+                     data-bind="click: clicked_on_resend_verification, enabled: can_register, text: posted_text" ></div>
               </div>
             </div>
-            <div id="posted-change-link" class="auth-text-link posted-link"
-                 data-bind="click: clicked_on_change_email, l10n_text: z.string.auth_posted_change_email, visible: !posted_mode_verify()"></div>
-            <div id="posted-later-link" class="auth-text-link posted-link"
-                 data-bind="click: clicked_on_verify_later, l10n_text: z.string.auth_posted_verify_later, visible: posted_mode_verify()"></div>
           </div>
 
           <div id="section-blocked" class="section">
@@ -406,7 +322,7 @@
           </header>
           <!-- ko foreach: permanent_devices -->
             <section class="modal-limit-section">
-              <span class="modal-limit-section-header" data-uie-name="device-header-model" data-bind="text: $data.model"></span>
+              <span class="modal-limit-section-header" data-bind="text: $data.model" data-uie-name="device-header-model"></span>
               <device-card params="device: $data, detailed: true"></device-card>
               <device-remove params="device: $data, error: $parent.remove_form_error, remove: $parent.click_on_remove_device_submit"></device-remove>
             </section>

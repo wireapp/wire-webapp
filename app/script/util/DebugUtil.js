@@ -49,25 +49,13 @@ z.util.DebugUtil = class DebugUtil {
           version: 'broken_by_qa',
         };
 
-        return wire.app.repository.storage.storage_service.save(
+        return wire.app.repository.storage.storageService.save(
           z.storage.StorageService.OBJECT_STORE.SESSIONS,
           session_id,
           record
         );
       })
       .then(() => this.logger.log(`Corrupted Session ID '${session_id}'`));
-  }
-
-  get_number_of_clients_in_conversation() {
-    const user_ets = this.conversation_repository.active_conversation().participating_user_ets();
-
-    const other_clients = user_ets
-      .map(user_et => user_et.devices().length)
-      .reduce((previous, current) => previous + current);
-
-    const my_clients = this.user_repository.self().devices().length;
-
-    return other_clients + my_clients;
   }
 
   get_event_info(event) {
@@ -90,14 +78,14 @@ z.util.DebugUtil = class DebugUtil {
   }
 
   get_serialised_session(session_id) {
-    return wire.app.repository.storage.storage_service.load('sessions', session_id).then(record => {
+    return wire.app.repository.storage.storageService.load('sessions', session_id).then(record => {
       record.serialised = z.util.array_to_base64(record.serialised);
       return record;
     });
   }
 
   get_serialised_identity() {
-    return wire.app.repository.storage.storage_service.load('keys', 'local_identity').then(record => {
+    return wire.app.repository.storage.storageService.load('keys', 'local_identity').then(record => {
       record.serialised = z.util.array_to_base64(record.serialised);
       return record;
     });
@@ -158,9 +146,9 @@ z.util.DebugUtil = class DebugUtil {
 
       if (remote_user_id) {
         this.logger.log(
-          `Found '${matching_notifications.length}' notifications between '${local_client_id}' and '${
-            remote_client_id
-          }'`,
+          `Found '${
+            matching_notifications.length
+          }' notifications between '${local_client_id}' and '${remote_client_id}'`,
           matching_notifications
         );
       } else {
@@ -214,7 +202,7 @@ z.util.DebugUtil = class DebugUtil {
   log_connection_status() {
     this.logger.log('Online Status');
     this.logger.log(`-- Browser online: ${window.navigator.onLine}`);
-    this.logger.log(`-- IndexedDB open: ${wire.app.repository.storage.storage_service.db.isOpen()}`);
+    this.logger.log(`-- IndexedDB open: ${wire.app.repository.storage.storageService.db.isOpen()}`);
     this.logger.log(`-- WebSocket ready state: ${window.wire.app.service.web_socket.socket.readyState}`);
   }
 };

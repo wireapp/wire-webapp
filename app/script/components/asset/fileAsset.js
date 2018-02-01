@@ -42,7 +42,7 @@ z.components.FileAssetComponent = class FileAssetComponent {
 
     this.circle_download_progress = ko.pureComputed(() => {
       const size = this.large ? '200' : '100';
-      return `${this.asset.download_progress() * 2} ${size}`;
+      return `${this.asset.downloadProgress() * 2} ${size}`;
     });
 
     this.file_extension = ko.pureComputed(() => {
@@ -72,7 +72,7 @@ ko.components.register('file-asset', {
         <!-- /ko -->
         <!-- ko ifnot: !asset.uploaded_on_this_client() && asset.status() === z.assets.AssetTransferState.UPLOADING -->
           <!-- ko if: asset.status() === z.assets.AssetTransferState.UPLOADED -->
-            <div class="file-icon icon-file" data-uie-name="file-icon" data-bind="click: asset.download, clickBubble: false">
+            <div class="file-icon icon-file" data-bind="click: asset.download, clickBubble: false" data-uie-name="file-icon">
               <span class="file-icon-ext icon-view"></span>
             </div>
           <!-- /ko -->
@@ -102,18 +102,18 @@ ko.components.register('file-asset', {
                  data-bind="text: z.util.trim_file_extension(asset.file_name)"
                  class="label-bold-xs ellipsis"></div>
             <ul class="file-desc-meta label-xs text-graphite">
-              <li data-uie-name="file-size" data-bind="text: z.util.format_bytes(asset.file_size)"></li>
+              <li data-bind="text: z.util.format_bytes(asset.file_size)" data-uie-name="file-size"></li>
               <!-- ko if: z.util.get_file_extension(asset.file_name) -->
-                <li data-uie-name="file-type" data-bind="text: z.util.get_file_extension(asset.file_name)"></li>
+                <li data-bind="text: z.util.get_file_extension(asset.file_name)" data-uie-name="file-type"></li>
               <!-- /ko -->
               <!-- ko if: asset.status() === z.assets.AssetTransferState.UPLOADING -->
-                <li data-uie-name="file-status" data-bind="l10n_text: z.string.conversation_asset_uploading"></li>
+                <li data-bind="l10n_text: z.string.conversation_asset_uploading" data-uie-name="file-status"></li>
               <!-- /ko -->
               <!-- ko if: asset.status() === z.assets.AssetTransferState.UPLOAD_FAILED -->
-                <li data-uie-name="file-status" data-bind="l10n_text: z.string.conversation_asset_upload_failed" class="text-red" ></li>
+                <li data-bind="l10n_text: z.string.conversation_asset_upload_failed" class="text-red"  data-uie-name="file-status"></li>
               <!-- /ko -->
               <!-- ko if: asset.status() === z.assets.AssetTransferState.DOWNLOADING -->
-                <li data-uie-name="file-status" data-bind="l10n_text: z.string.conversation_asset_downloading"></li>
+                <li data-bind="l10n_text: z.string.conversation_asset_downloading" data-uie-name="file-status"></li>
               <!-- /ko -->
             </ul>
           </div>

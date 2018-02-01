@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,11 +17,25 @@
  *
  */
 
-import Adapter from 'enzyme-adapter-react-16';
-import {configure} from 'enzyme';
+'use strict';
 
-configure({adapter: new Adapter()});
+window.z = window.z || {};
+window.z.integration = z.integration || {};
 
-// traverse all testfiles for webpack dependency resolution
-const testsContext = require.context('../../app/script', true, /test\.js$/);
-testsContext.keys().forEach(testsContext);
+z.integration.ServiceEntity = class ServiceEntity {
+  constructor(serviceData = {}) {
+    const {description, id, name, provider: providerId, summary, tags} = serviceData;
+
+    this.id = id || '';
+
+    this.description = description || '';
+    this.name = name || '';
+    this.providerId = providerId || '';
+    this.providerName = ko.observable('');
+    this.summary = summary || '';
+    this.tags = tags || [];
+
+    this.mediumPictureResource = ko.observable();
+    this.previewPictureResource = ko.observable();
+  }
+};

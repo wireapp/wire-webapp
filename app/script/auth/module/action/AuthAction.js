@@ -19,7 +19,8 @@
 
 import BackendError from './BackendError';
 import * as AuthActionCreator from './creator/AuthActionCreator';
-import {getLocale} from '../../localeConfig';
+import {currentLanguage, currentCurrency} from '../../localeConfig';
+import {fetchSelf} from './SelfAction';
 
 export function doLogin(login) {
   return function(dispatch, getState, {apiClient}) {
@@ -51,22 +52,14 @@ export function pushAccountRegistrationData(registration) {
 
 export function doRegisterTeam(registration) {
   return function(dispatch, getState, {apiClient}) {
-    registration.locale = getLocale();
+    registration.locale = currentLanguage();
+    registration.name = registration.name.trim();
+    registration.email = registration.email.trim();
     registration.team.icon = 'default';
     registration.team.binding = true;
-    registration.name = registration.name.trim();
+    registration.team.currency = currentCurrency();
     registration.team.name = registration.team.name.trim();
-    registration.email = registration.email.trim();
-    dispatch(
-      AuthActionCreator.startRegisterTeam({
-        accent_id: registration.accent_id,
-        email: registration.email,
-        locale: registration.locale,
-        name: registration.name,
-        password: '******',
-        team: registration.team,
-      })
-    );
+    dispatch(AuthActionCreator.startRegisterTeam({...registration, password: '******'}));
     return Promise.resolve()
       .then(() => dispatch(doSilentLogout()))
       .then(() => apiClient.register(registration))
@@ -80,7 +73,7 @@ export function doRegisterTeam(registration) {
 
 export function doRegisterPersonal(registration) {
   return function(dispatch, getState, {apiClient}) {
-    registration.locale = getLocale();
+    registration.locale = currentLanguage();
     registration.name = registration.name.trim();
     registration.email = registration.email.trim();
     dispatch(
@@ -93,8 +86,10 @@ export function doRegisterPersonal(registration) {
       })
     );
     return Promise.resolve()
-      .then(() => dispatch(doLogout()))
+      .then(() => dispatch(doSilentLogout()))
       .then(() => apiClient.register(registration))
+      .then(createdAccount => dispatch(AuthActionCreator.successfulRegisterPersonal(createdAccount)))
+      .then(() => dispatch(fetchSelf()))
       .catch(error => {
         dispatch(AuthActionCreator.failedRegisterPersonal(error));
         throw BackendError.handle(error);
@@ -129,5 +124,15 @@ export function doSilentLogout() {
       .logout()
       .then(() => dispatch(AuthActionCreator.successfulSilentLogout()))
       .catch(error => dispatch(AuthActionCreator.failedLogout(error)));
+  };
+}
+
+export function getInvitationFromCode(invitationCode) {
+  return function(dispatch, getState, {apiClient}) {
+    dispatch(AuthActionCreator.startGetInvitationFromCode());
+    return apiClient.invitation.api
+      .getInvitationInfo(invitationCode)
+      .then(invitation => dispatch(AuthActionCreator.successfulGetInvitationFromCode(invitation)))
+      .catch(error => dispatch(AuthActionCreator.failedGetInvitationFromCode(error)));
   };
 }
