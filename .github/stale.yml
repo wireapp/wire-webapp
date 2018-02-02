@@ -1,7 +1,7 @@
 # Configuration for probot-stale - https://github.com/probot/stale
 
-daysUntilStale: 60
-daysUntilClose: 7
+daysUntilStale: 365
+daysUntilClose: false
 exemptLabels:
   - security
   - "type: Bug"
