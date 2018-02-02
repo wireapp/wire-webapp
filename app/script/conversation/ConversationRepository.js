@@ -2090,7 +2090,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       })
       .catch(error => {
         if (error.label === z.service.BackendClientError.LABEL.UNKNOWN_CLIENT) {
-          this.client_repository.remove_local_client();
+          this.client_repository.removeLocalClient();
         }
 
         if (!error.missing) {
