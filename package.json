@@ -121,7 +121,7 @@
     "npm-run-all": "4.1.2",
     "postcss-cssnext": "3.1.0",
     "postcss-import": "11.0.0",
-    "postcss-loader": "2.0.10",
+    "postcss-loader": "2.1.0",
     "postcss-scss": "1.0.3",
     "prettier": "1.10.2",
     "raf": "3.4.0",
