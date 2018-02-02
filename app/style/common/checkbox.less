@@ -30,7 +30,9 @@
   display: inline-block;
 
   input[type='checkbox'] {
-    display: none;
+    opacity: 0;
+    position: absolute;
+    left: -9999px;
 
     &:checked + label {
       &::after {
