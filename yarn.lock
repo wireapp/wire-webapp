@@ -6432,9 +6432,9 @@ mixin-object@^2.0.1:
     for-in "^0.1.3"
     is-extendable "^0.1.1"
 
-mixpanel-browser@2.16.0:
-  version "2.16.0"
-  resolved "https://registry.yarnpkg.com/mixpanel-browser/-/mixpanel-browser-2.16.0.tgz#0f08331699a4f946af98af608dbbbe768d997949"
+mixpanel-browser@2.17.0:
+  version "2.17.0"
+  resolved "https://registry.yarnpkg.com/mixpanel-browser/-/mixpanel-browser-2.17.0.tgz#c86b4dffdc16f71fdfbb1fb4c692f99d954e936b"
 
 mkdirp@0.5.x, "mkdirp@>=0.5 0", mkdirp@^0.5.0, mkdirp@^0.5.1, mkdirp@~0.5.0, mkdirp@~0.5.1:
   version "0.5.1"
