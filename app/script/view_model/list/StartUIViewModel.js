@@ -265,24 +265,17 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
   }
 
   clickOnConversation(conversationEntity) {
-    const promise =
-      conversationEntity instanceof z.entity.User
-        ? this.conversationRepository.get_1to1_conversation(conversationEntity)
-        : Promise.resolve(conversationEntity);
+    if (conversationEntity.is_archived()) {
+      this.conversationRepository.unarchive_conversation(conversationEntity, 'opened conversation from search');
+    }
 
-    return promise.then(_conversationEntity => {
-      if (_conversationEntity.is_archived()) {
-        this.conversationRepository.unarchive_conversation(_conversationEntity, 'opened conversation from search');
-      }
+    if (conversationEntity.is_cleared()) {
+      conversationEntity.cleared_timestamp(0);
+    }
 
-      if (_conversationEntity.is_cleared()) {
-        _conversationEntity.cleared_timestamp(0);
-      }
-
-      amplify.publish(z.event.WebApp.CONVERSATION.SHOW, _conversationEntity);
-      this._closeList();
-      return _conversationEntity;
-    });
+    amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
+    this._closeList();
+    return conversationEntity;
   }
 
   clickOnInviteMember() {
@@ -366,7 +359,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
   clickToAddService(conversationEntity) {
     this.integrationRepository.addService(conversationEntity, this.userProfile(), 'start_ui').then(() => {
-      this.clickOnConversation(conversationEntity);
+      amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
     });
   }
 
@@ -678,17 +671,13 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.submittedSearch = true;
 
     return this.conversationRepository
-      .create_new_conversation(userIds, null)
+      .createConversation(userIds, null)
       .then(conversationEntity => {
         this.submittedSearch = false;
 
         if (conversationEntity) {
           this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.HAS_CREATED_CONVERSATION);
-          amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.CREATE_GROUP_CONVERSATION, {
-            creationContext: 'search',
-            numberOfParticipants: userIds.length,
-          });
-          this.clickOnConversation(conversationEntity);
+          amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
           return conversationEntity;
         }
       })

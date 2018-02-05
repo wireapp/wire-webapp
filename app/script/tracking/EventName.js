@@ -59,7 +59,6 @@ z.tracking.EventName = {
   CONVERSATION: {
     ADD_TO_GROUP_CONVERSATION: 'addContactToGroupConversation',
     CHARACTER_LIMIT_REACHED: 'conversation.character_limit_reached',
-    CREATE_GROUP_CONVERSATION: 'createGroupConversation',
     DELETED_MESSAGE: 'conversation.deleted_message',
     EDITED_MESSAGE: 'conversation.edited_message',
     REACTED_TO_MESSAGE: 'conversation.reacted_to_message',

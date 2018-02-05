@@ -279,15 +279,8 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
       });
     } else {
       this.conversationRepository
-        .create_new_conversation(userIds.concat(this.selectedUser().id), null)
-        .then(conversationEntity => {
-          amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.CREATE_GROUP_CONVERSATION, {
-            creationContext: 'addedToOneToOne',
-            numberOfParticipants: userIds.length,
-          });
-
-          amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
-        });
+        .createConversation(userIds.concat(this.selectedUser().id), null)
+        .then(conversationEntity => amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity));
     }
 
     this.participantsBubble.hide();
