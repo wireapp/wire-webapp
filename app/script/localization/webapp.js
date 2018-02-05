@@ -589,25 +589,25 @@ z.string.user_availability_busy = 'Busy';
 z.string.user_availability_none = 'None';
 
 // Browser notifications
-z.string.system_notification_asset_add = 'Shared a picture';
-z.string.system_notification_connection_accepted = 'Accepted your connection request';
-z.string.system_notification_connection_connected = 'You are now connected';
-z.string.system_notification_connection_request = 'Wants to connect';
-z.string.system_notification_conversation_create = '{{user}} started a conversation';
-z.string.system_notification_conversation_rename = '{{user}} renamed the conversation to {{name}}';
-z.string.system_notification_member_join_many = '{{user}} added {{number}} people to the conversation';
-z.string.system_notification_member_join_one = '{{user1}} added {{user2}} to the conversation';
-z.string.system_notification_member_leave_removed_you = '{{user}} removed you from the conversation';
-z.string.system_notification_obfuscated = 'Sent you a message';
-z.string.system_notification_obfuscated_title = 'Someone';
-z.string.system_notification_ping = 'Pinged';
-z.string.system_notification_reaction = '{{reaction}} your message';
-z.string.system_notification_shared_audio = 'Shared an audio message';
-z.string.system_notification_shared_file = 'Shared a file';
-z.string.system_notification_shared_location = 'Shared a location';
-z.string.system_notification_shared_video = 'Shared a video';
-z.string.system_notification_voice_channel_activate = 'Calling';
-z.string.system_notification_voice_channel_deactivate = 'Called';
+z.string.notification_asset_add = 'Shared a picture';
+z.string.notification_connection_accepted = 'Accepted your connection request';
+z.string.notification_connection_connected = 'You are now connected';
+z.string.notification_connection_request = 'Wants to connect';
+z.string.notification_conversation_create = '{{user}} started a conversation';
+z.string.notification_conversation_rename = '{{user}} renamed the conversation to {{name}}';
+z.string.notification_member_join_many = '{{user}} added {{number}} people to the conversation';
+z.string.notification_member_join_one = '{{user1}} added {{user2}} to the conversation';
+z.string.notification_member_leave_removed_you = '{{user}} removed you from the conversation';
+z.string.notification_obfuscated = 'Sent you a message';
+z.string.notification_obfuscated_title = 'Someone';
+z.string.notification_ping = 'Pinged';
+z.string.notification_reaction = '{{reaction}} your message';
+z.string.notification_shared_audio = 'Shared an audio message';
+z.string.notification_shared_file = 'Shared a file';
+z.string.notification_shared_location = 'Shared a location';
+z.string.notification_shared_video = 'Shared a video';
+z.string.notification_voice_channel_activate = 'Calling';
+z.string.notification_voice_channel_deactivate = 'Called';
 
 // Tooltips
 z.string.tooltip_conversation_all_verified = 'All fingerprints are verified';

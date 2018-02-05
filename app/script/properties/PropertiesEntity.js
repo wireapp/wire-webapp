@@ -29,7 +29,7 @@ z.properties.PropertiesEntity = class PropertiesEntity {
       emoji: {
         replace_inline: true,
       },
-      notifications: z.system_notification.SystemNotificationPreference.ON,
+      notifications: z.notification.NotificationPreference.ON,
       previews: {
         send: true,
       },
