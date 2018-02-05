@@ -204,7 +204,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {string} name - User defined name for the Conversation (optional)
    * @returns {Promise} Resolves when the conversation was created
    */
-  create_new_conversation(user_ids, name) {
+  createConversation(user_ids, name) {
     return this.conversation_service
       .create_conversation(user_ids, name, this.team().id)
       .then(response => this._onCreate({conversation: response.id, data: response}))

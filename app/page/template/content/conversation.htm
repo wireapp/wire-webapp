@@ -1,7 +1,5 @@
 <div id="conversation" class="conversation" data-bind="drop_file: $root.conversation_input.on_drop_files">
-
   <!-- ko if: $root.conversation_repository.active_conversation() -->
-
     <!-- ko ifnot: $root.conversation_repository.active_conversation().is_loaded() -->
       <div class="conversation-loading">
         <div class="icon-spinner spin text-theme"></div>
@@ -13,9 +11,7 @@
       #include('content/conversation/message-list.htm')
       #include('content/conversation/conversation-input.htm')
       #include('content/conversation/participants.htm')
-      #include('content/conversation/giphy.htm')
+      #include('modal/giphy.htm')
     <!-- /ko -->
-
   <!-- /ko -->
-
 </div>
