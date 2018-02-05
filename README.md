@@ -13,8 +13,28 @@ Wire for Web's communication core.
 ### Example
 
 ```bash
-yarn add @wireapp/core@0.0.23
+yarn add @wireapp/core@0.0.30
 ```
+
+#### JavaScript (Node.js)
+
+```javascript
+const {Account} = require('@wireapp/core');
+
+const account = new Account();
+
+account.on(Account.INCOMING.TEXT_MESSAGE, ({conversation, content}) => {
+  account.service.conversation.sendTextMessage(conversation, `Echo: ${content}`);
+});
+
+account.listen({
+  email: 'name@email.com',
+  password: 'secret',
+  persist: false,
+});
+```
+
+#### TypeScript
 
 ```typescript
 import {Account} from '@wireapp/core';
