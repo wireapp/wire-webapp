@@ -429,7 +429,7 @@ z.notification.NotificationRepository = class NotificationRepository {
         case z.message.SuperType.CONTENT:
           return this._createBodyContent(messageEntity);
         case z.message.SuperType.MEMBER:
-          return this._createBodyMemberUpdate(messageEntity, conversationEntity);
+          return this._createBodyMemberUpdate(messageEntity, connectionEntity, conversationEntity);
         case z.message.SuperType.PING:
           return this._createBodyPing();
         case z.message.SuperType.REACTION:
@@ -547,6 +547,7 @@ z.notification.NotificationRepository = class NotificationRepository {
     if (messageEntity.is_member()) {
       switch (messageEntity.member_message_type) {
         case z.message.SystemMessageType.CONNECTION_ACCEPTED:
+        case z.message.SystemMessageType.CONNECTION_CONNECTED:
           return () => amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationId);
         case z.message.SystemMessageType.CONNECTION_REQUEST:
           return () => {

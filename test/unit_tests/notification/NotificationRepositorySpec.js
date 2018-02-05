@@ -34,7 +34,7 @@ describe('z.notification.NotificationRepository', () => {
   let verify_notification_obfuscated;
   let verify_notification_system = undefined;
 
-  const [first_name] = `${entities.user.john_doe.name.split(' ')}`;
+  const [first_name] = entities.user.john_doe.name.split(' ');
   let notification_content = null;
 
   beforeEach(done => {
@@ -99,7 +99,11 @@ describe('z.notification.NotificationRepository', () => {
           TestFactory.notification_repository
             .notify(_message, undefined, _conversation)
             .then(() => {
+              expect(TestFactory.notification_repository._showNotification).toHaveBeenCalledTimes(1);
+
+              const trigger = TestFactory.notification_repository._createTrigger(message_et, null, conversation_et);
               notification_content.options.body = _expected_body;
+              notification_content.trigger = trigger;
 
               if (_conversation.is_group()) {
                 const titleLength = z.notification.NotificationRepository.CONFIG.TITLE_LENGTH;
@@ -110,14 +114,8 @@ describe('z.notification.NotificationRepository', () => {
                 notification_content.title = '…';
               }
 
-              const trigger = TestFactory.notification_repository._createTrigger(message_et, null, conversation_et);
-              notification_content.trigger = trigger;
-
               const [firstResultArgs] = TestFactory.notification_repository._showNotification.calls.first().args;
-              const result = JSON.stringify(firstResultArgs);
-
-              expect(result).toEqual(JSON.stringify(notification_content));
-              expect(TestFactory.notification_repository._showNotification).toHaveBeenCalledTimes(1);
+              expect(JSON.stringify(firstResultArgs)).toEqual(JSON.stringify(notification_content));
               _done();
             })
             .catch(_done.fail);
@@ -127,17 +125,15 @@ describe('z.notification.NotificationRepository', () => {
           TestFactory.notification_repository
             .notify(_message, undefined, _conversation)
             .then(() => {
-              const trigger = TestFactory.notification_repository._createTrigger(message_et, null, conversation_et);
+              expect(TestFactory.notification_repository._showNotification).toHaveBeenCalledTimes(1);
 
+              const trigger = TestFactory.notification_repository._createTrigger(message_et, null, conversation_et);
               notification_content.options.body = z.string.notification_obfuscated;
               notification_content.title = z.string.notification_obfuscated_title;
               notification_content.trigger = trigger;
 
               const [firstResultArgs] = TestFactory.notification_repository._showNotification.calls.first().args;
-              const result = JSON.stringify(firstResultArgs);
-
-              expect(result).toEqual(JSON.stringify(notification_content));
-              expect(TestFactory.notification_repository._showNotification).toHaveBeenCalledTimes(1);
+              expect(JSON.stringify(firstResultArgs)).toEqual(JSON.stringify(notification_content));
               _done();
             })
             .catch(_done.fail);
@@ -147,7 +143,13 @@ describe('z.notification.NotificationRepository', () => {
           TestFactory.notification_repository
             .notify(_message, undefined, _conversation)
             .then(() => {
-              if (_setting === z.notification.NotificationPreference.OBFUSCATE_MESSAGE) {
+              expect(TestFactory.notification_repository._showNotification).toHaveBeenCalledTimes(1);
+
+              const trigger = TestFactory.notification_repository._createTrigger(message_et, null, conversation_et);
+              notification_content.trigger = trigger;
+
+              const obfuscateMessage = _setting === z.notification.NotificationPreference.OBFUSCATE_MESSAGE;
+              if (obfuscateMessage) {
                 const titleLength = z.notification.NotificationRepository.CONFIG.TITLE_LENGTH;
                 const titleText = `${message_et.user().first_name()} in ${conversation_et.display_name()}`;
 
@@ -157,14 +159,9 @@ describe('z.notification.NotificationRepository', () => {
                 notification_content.options.body = z.string.notification_obfuscated;
                 notification_content.title = z.string.notification_obfuscated_title;
               }
-              const trigger = TestFactory.notification_repository._createTrigger(message_et, null, conversation_et);
-              notification_content.trigger = trigger;
 
               const [firstResultArgs] = TestFactory.notification_repository._showNotification.calls.first().args;
-              const result = JSON.stringify(firstResultArgs);
-
-              expect(result).toEqual(JSON.stringify(notification_content));
-              expect(TestFactory.notification_repository._showNotification).toHaveBeenCalledTimes(1);
+              expect(JSON.stringify(firstResultArgs)).toEqual(JSON.stringify(notification_content));
               _done();
             })
             .catch(_done.fail);
@@ -174,20 +171,20 @@ describe('z.notification.NotificationRepository', () => {
           TestFactory.notification_repository
             .notify(_message, undefined, _conversation)
             .then(() => {
+              expect(TestFactory.notification_repository._showNotification).toHaveBeenCalledTimes(1);
+
+              const trigger = TestFactory.notification_repository._createTrigger(message_et, null, conversation_et);
+              notification_content.trigger = trigger;
               notification_content.options.body = _expected_body;
+
               if (_expected_title) {
-                notification_content.options.data.conversation_id = _conversation.id;
+                notification_content.options.data.conversationId = _conversation.id;
                 notification_content.options.tag = _conversation.id;
                 notification_content.title = _expected_title;
               }
-              const trigger = TestFactory.notification_repository._createTrigger(message_et, null, conversation_et);
-              notification_content.trigger = trigger;
 
               const [firstResultArgs] = TestFactory.notification_repository._showNotification.calls.first().args;
-              const result = JSON.stringify(firstResultArgs);
-
-              expect(result).toEqual(JSON.stringify(notification_content));
-              expect(TestFactory.notification_repository._showNotification).toHaveBeenCalledTimes(1);
+              expect(JSON.stringify(firstResultArgs)).toEqual(JSON.stringify(notification_content));
               _done();
             })
             .catch(_done.fail);
@@ -506,7 +503,7 @@ describe('z.notification.NotificationRepository', () => {
       it('with one user being added to the conversation', done => {
         message_et.user_ets([other_user_et]);
 
-        const first_name_added = `${entities.user.jane_roe.name.split(' ')[0]}`;
+        const [first_name_added] = entities.user.jane_roe.name.split(' ');
         const expected_body = `${first_name} added ${first_name_added} to the conversation`;
         verify_notification_system(done, conversation_et, message_et, expected_body);
       });
