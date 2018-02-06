@@ -269,17 +269,11 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   }
 
   clickToAddMembers() {
-    const userIds = this.selectedUsers().map(userEntity => userEntity.id);
     if (this.conversation().is_group()) {
-      this.conversationRepository.addMembers(this.conversation(), userIds).then(() => {
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.ADD_TO_GROUP_CONVERSATION, {
-          numberOfGroupParticipants: this.conversation().getNumberOfParticipants(),
-          numberOfParticipantsAdded: userIds.length,
-        });
-      });
+      this.conversationRepository.addMembers(this.conversation(), this.selectedUsers());
     } else {
       this.conversationRepository
-        .createConversation(userIds.concat(this.selectedUser().id), null)
+        .createGroupConversation(this.selectedUsers().concat(this.selectedUser()))
         .then(conversationEntity => amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity));
     }
 

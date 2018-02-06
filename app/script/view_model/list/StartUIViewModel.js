@@ -645,8 +645,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       }
 
       default: {
-        const userIds = this.selectedPeople().map(user_et => user_et.id);
-        return this._openGroupConversation(userIds);
+        return this._openGroupConversation(this.selectedPeople());
       }
     }
   }
@@ -667,11 +666,11 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       });
   }
 
-  _openGroupConversation(userIds) {
+  _openGroupConversation(userEntities) {
     this.submittedSearch = true;
 
     return this.conversationRepository
-      .createConversation(userIds, null)
+      .createGroupConversation(userEntities)
       .then(conversationEntity => {
         this.submittedSearch = false;
 
