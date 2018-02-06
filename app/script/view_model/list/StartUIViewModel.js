@@ -135,11 +135,10 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.hasCreatedConversation = ko.observable(false);
 
     // View states
-    this.hasSearchResults = ko.pureComputed(() => {
-      return (
+    this.hasSearchResults = ko.pureComputed(
+      () =>
         this.searchResults.groups().length || this.searchResults.contacts().length || this.searchResults.others().length
-      );
-    });
+    );
 
     this.enableIntegrations = this.integrationRepository.enableIntegrations;
 
@@ -150,18 +149,16 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.showMatches = ko.observable(false);
 
     this.showNoContacts = ko.pureComputed(() => !this.isTeam() && !this.showContent());
-    this.showInviteMember = ko.pureComputed(() => {
-      return (
-        this.selfUser().isTeamOwner() && this.teamSize() === 1 && !this.showContacts() && !this.showSearchResults()
-      );
-    });
+    this.showInviteMember = ko.pureComputed(
+      () => this.selfUser().isTeamOwner() && this.teamSize() === 1 && !this.showSearchResults()
+    );
     this.showNoMatches = ko.pureComputed(() => {
       const isTeamOrMatch = this.isTeam() || this.showMatches();
       return isTeamOrMatch && !this.showInviteMember() && !this.showContacts() && !this.showSearchResults();
     });
-    this.showNoSearchResults = ko.pureComputed(() => {
-      return !this.showMatches() && this.showSearchResults() && !this.hasSearchResults() && this.isSearching();
-    });
+    this.showNoSearchResults = ko.pureComputed(
+      () => !this.showMatches() && this.showSearchResults() && !this.hasSearchResults() && this.isSearching()
+    );
 
     this.showSearchResults = ko.pureComputed(() => {
       if (!this.selectedPeople().length && !this.isSearching()) {
