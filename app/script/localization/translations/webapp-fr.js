@@ -242,6 +242,9 @@ z.string.fr.conversation_send_pasted_file = 'Image collée le {{date}}';
 z.string.fr.conversation_someone = 'Quelqu’un';
 z.string.fr.conversation_tweet_author = ' via Twitter';
 
+z.string.fr.conversation_creation_preferences_action = 'Suivant';
+z.string.fr.conversation_creation_participants_placeholder = 'Rechercher par nom';
+
 z.string.fr.collection_show_all = 'Tout afficher ({{number}})';
 z.string.fr.collection_section_links = 'Liens';
 z.string.fr.collection_section_images = 'Images';

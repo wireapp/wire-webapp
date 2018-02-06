@@ -248,6 +248,10 @@ z.string.ru.conversation_send_pasted_file = 'Изображение добавл
 z.string.ru.conversation_someone = 'Кто-то';
 z.string.ru.conversation_tweet_author = ' в Twitter';
 
+z.string.ru.conversation_creation_preferences_action = 'Вперед';
+z.string.ru.conversation_creation_participants_header = 'Добавить людей';
+z.string.ru.conversation_creation_participants_placeholder = 'Поиск по имени';
+
 z.string.ru.collection_show_all = 'Показать все {{number}}';
 z.string.ru.collection_section_links = 'Ссылки';
 z.string.ru.collection_section_images = 'Изображения';
@@ -327,6 +331,7 @@ z.string.ru.people_invite_button_gmail = 'Из Gmail';
 z.string.ru.people_invite_headline = 'Приведите друзей';
 z.string.ru.people_service_confirm_button = 'Добавить службу';
 z.string.ru.people_service_removal_button = 'Удалить службу';
+z.string.ru.people_service_new_conversation = 'Создать новый разговор';
 z.string.ru.people_services = 'Сервисы';
 z.string.ru.people_share = 'Поделиться контактами';
 z.string.ru.people_tabs_details = 'Подробнее';

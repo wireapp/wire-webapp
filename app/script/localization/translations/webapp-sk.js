@@ -240,6 +240,8 @@ z.string.sk.conversation_send_pasted_file = 'Vložený obrázok {{date}}';
 z.string.sk.conversation_someone = 'Niekto';
 z.string.sk.conversation_tweet_author = ' na Twitteri';
 
+z.string.sk.conversation_creation_participants_placeholder = 'Vyhľadať podľa mena';
+
 z.string.sk.collection_show_all = 'Zobraziť všetky {{number}}';
 z.string.sk.collection_section_links = 'Odkazy';
 z.string.sk.collection_section_images = 'Obrázky';

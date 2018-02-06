@@ -15,7 +15,7 @@
   "accountForm.emailPersonalPlaceholder": "",
   "accountForm.passwordPlaceholder": "Salasana (vähintään 8 merkkiä pitkä)",
   "accountForm.terms": "",
-  "accountForm.nextButton": "Seuraava",
+  "accountForm.submitButton": "Seuraava",
   "createAccount.nextButton": "Seuraava",
   "invite.nextButton": "Seuraava",
   "createAccount.headLine": "",
@@ -63,6 +63,7 @@
     "Sähköpostiosoite jonka annoit on jo käytössä. <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://support.wire.com/hc/articles/115004082129\">Lue lisää</a>",
   "BackendError.unexpected": "Odottamaton virhe ({code} {message})",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Kirjoita nimi, jossa on vähintään 2 merkkiä",
+  "ValidationError.FIELD.NAME.VALUE_MISSING": "Kirjoita nimi, jossa on vähintään 2 merkkiä",
   "ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH": "Valitse salasana, jossa on vähintään 8 merkkiä.",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": ""
 }
