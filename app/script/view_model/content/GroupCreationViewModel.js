@@ -84,8 +84,6 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
   }
 
   showCreateGroup(userEntity) {
-    //this._resetView();
-
     if (!this.modal) {
       this.modal = new zeta.webapp.module.Modal('#group-creation-modal', this._afterHideModal.bind(this));
     }
