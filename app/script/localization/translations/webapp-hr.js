@@ -219,6 +219,8 @@ z.string.hr.conversation_send_pasted_file = 'Slika zaljepljena na {{date}}';
 z.string.hr.conversation_someone = 'Netko';
 z.string.hr.conversation_tweet_author = ' na Twitteru';
 
+z.string.hr.conversation_creation_participants_placeholder = 'Traži po imenu';
+
 z.string.hr.collection_section_links = 'Linkovi';
 z.string.hr.collection_section_images = 'Slike';
 z.string.hr.collection_section_files = 'Dokumenti';

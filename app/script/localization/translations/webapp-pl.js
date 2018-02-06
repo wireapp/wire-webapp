@@ -240,6 +240,9 @@ z.string.pl.conversation_send_pasted_file = 'Wklejono obraz {{date}}';
 z.string.pl.conversation_someone = 'Ktoś';
 z.string.pl.conversation_tweet_author = ' na Twitterze';
 
+z.string.pl.conversation_creation_preferences_action = 'Dalej';
+z.string.pl.conversation_creation_participants_placeholder = 'Szukaj według nazwy';
+
 z.string.pl.collection_show_all = 'Pokaż wszystkie {{number}}';
 z.string.pl.collection_section_links = 'Linki';
 z.string.pl.collection_section_images = 'Zdjęcia';

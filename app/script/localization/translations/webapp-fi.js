@@ -240,6 +240,9 @@ z.string.fi.conversation_send_pasted_file = 'Liitetty kuva, {{date}}';
 z.string.fi.conversation_someone = 'Joku';
 z.string.fi.conversation_tweet_author = ' Twitterissä';
 
+z.string.fi.conversation_creation_preferences_action = 'Seuraava';
+z.string.fi.conversation_creation_participants_placeholder = 'Hae nimellä';
+
 z.string.fi.collection_show_all = 'Näytä kaikki {{number}}';
 z.string.fi.collection_section_links = 'Linkit';
 z.string.fi.collection_section_images = 'Kuvat';

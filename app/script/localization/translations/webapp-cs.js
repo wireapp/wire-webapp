@@ -239,6 +239,9 @@ z.string.cs.conversation_send_pasted_file = 'Obrázek vložen {{date}}';
 z.string.cs.conversation_someone = 'Někdo';
 z.string.cs.conversation_tweet_author = ' na Twittru';
 
+z.string.cs.conversation_creation_preferences_action = 'Další';
+z.string.cs.conversation_creation_participants_placeholder = 'Hledat podle jména';
+
 z.string.cs.collection_show_all = 'Zobrazit všechny {{number}}';
 z.string.cs.collection_section_links = 'Odkazy';
 z.string.cs.collection_section_images = 'Obrázky';

@@ -15,7 +15,7 @@
   "accountForm.emailPersonalPlaceholder": "",
   "accountForm.passwordPlaceholder": "Password (almeno 8 caratteri)",
   "accountForm.terms": "",
-  "accountForm.nextButton": "",
+  "accountForm.submitButton": "",
   "createAccount.nextButton": "",
   "invite.nextButton": "",
   "createAccount.headLine": "",
@@ -61,6 +61,7 @@
   "BackendError.LABEL.EMAIL_EXISTS": "",
   "BackendError.unexpected": "",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Inserisci un nome con almeno 2 caratteri",
+  "ValidationError.FIELD.NAME.VALUE_MISSING": "Inserisci un nome con almeno 2 caratteri",
   "ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH": "",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": ""
 }
