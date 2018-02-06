@@ -151,9 +151,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
     this.showNoContacts = ko.pureComputed(() => !this.isTeam() && !this.showContent());
     this.showInviteMember = ko.pureComputed(() => {
-      return (
-        this.selfUser().isTeamOwner() && this.teamSize() === 1 && !this.showContacts() && !this.showSearchResults()
-      );
+      return this.selfUser().isTeamOwner() && this.teamSize() === 1 && !this.showSearchResults();
     });
     this.showNoMatches = ko.pureComputed(() => {
       const isTeamOrMatch = this.isTeam() || this.showMatches();
