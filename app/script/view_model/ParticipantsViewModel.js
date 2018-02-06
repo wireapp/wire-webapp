@@ -131,9 +131,9 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     // Confirm dialog reference
     this.confirmDialog = undefined;
 
-    // Selected group user
-    this.selectedService = ko.observable(undefined);
+    // Selected group participant
     this.selectedParticipant = ko.observable(undefined);
+    this.participantIsUser = ko.pureComputed(() => this.selectedParticipant() instanceof z.entity.User);
 
     // Switch between div and input field to edit the conversation name
     this.isEditable = ko.pureComputed(() => !this.conversation().removed_from_conversation());
@@ -181,10 +181,9 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
       return z.l10n.text(identifier, shortcut);
     });
 
-    this.showServiceStates = ko.pureComputed(() => this.activeServiceState() && this.selectedService());
-    this.showUserProfile = ko.pureComputed(() => {
-      return this.stateParticipants() && this.selectedContacts() && !this.selectedService();
-    });
+    this.showServiceStates = ko.pureComputed(() => this.activeServiceState() && this.selectedParticipant());
+    this.showUserState = ko.pureComputed(() => this.stateParticipants() && this.selectedParticipant());
+    this.showParticipantProfile = ko.pureComputed(() => this.showServiceStates() || this.showUserState());
 
     this.selectedIsInConversation = ko.pureComputed(() => {
       if (this.selectedParticipant()) {
@@ -241,7 +240,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
   clickOnSelectService(serviceEntity) {
     this.groupMode(true);
-    this.selectedService(serviceEntity);
+    this.selectedParticipant(serviceEntity);
     this.state(ParticipantsViewModel.STATE.SERVICE_CONFIRMATION);
 
     this.integrationRepository.getProviderNameForService(serviceEntity);
@@ -257,7 +256,6 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
   clickOnServiceBack() {
     this.state(this.previousState());
-    this.selectedService(undefined);
     this.selectedParticipant(undefined);
     $('.participants-search').addClass('participants-search-show');
   }
@@ -274,7 +272,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   }
 
   clickToAddService() {
-    this.integrationRepository.addService(this.conversation(), this.selectedService(), 'conversation_details');
+    this.integrationRepository.addService(this.conversation(), this.selectedParticipant(), 'conversation_details');
     this.participantsBubble.hide();
   }
 
@@ -384,7 +382,6 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     if (this.confirmDialog) {
       this.confirmDialog.destroy();
     }
-    this.selectedService(undefined);
     this.selectedParticipant(undefined);
   }
 
@@ -411,11 +408,11 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.integrationRepository
       .getServiceById(providerId, serviceId)
       .then(serviceEntity => {
-        this.selectedService(serviceEntity);
+        this.selectedParticipant(serviceEntity);
         this.state(ParticipantsViewModel.STATE.SERVICE_DETAILS);
         return this.integrationRepository.getProviderById(providerId);
       })
-      .then(providerEntity => this.selectedService().providerName(providerEntity.name));
+      .then(providerEntity => this.selectedParticipant().providerName(providerEntity.name));
   }
 
   switchContent(contentState) {

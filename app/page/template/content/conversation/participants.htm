@@ -1,5 +1,5 @@
 <div id="participants-bubble" class="bubble">
-  <div id="participants" class="participants" data-bind="with: $root.participants, css: {'show-user': $root.participants.showUserProfile() || $root.participants.showServiceStates()}">
+  <div id="participants" class="participants" data-bind="with: $root.participants, css: {'show-participant': $root.participants.showParticipantProfile()}">
     <div class="participants-transition">
 
       <!-- ko if: stateParticipants() -->
@@ -47,20 +47,22 @@
           </div>
         </div>
 
-        <user-profile class="participants-user-profile" params="
-          conversation: conversation,
-          mode: z.components.UserProfile.MODE.PEOPLE,
-          user: selectedParticipant,
-          add_people: clickOnAddPeople,
-          block: clickToBlock,
-          close: clickOnMemberBack,
-          connect: clickToConnect,
-          pending: clickOnPending,
-          leave: clickToLeave,
-          profile: clickOnSelfProfile,
-          remove: clickToRemoveMember,
-          unblock: clickToUnblock
-        "></user-profile>
+        <!-- ko if: participantIsUser -->
+          <user-profile class="participants-user-profile" params="
+            conversation: conversation,
+            mode: z.components.UserProfile.MODE.PEOPLE,
+            user: selectedParticipant,
+            add_people: clickOnAddPeople,
+            block: clickToBlock,
+            close: clickOnMemberBack,
+            connect: clickToConnect,
+            pending: clickOnPending,
+            leave: clickToLeave,
+            profile: clickOnSelfProfile,
+            remove: clickToRemoveMember,
+            unblock: clickToUnblock
+          "></user-profile>
+        <!-- /ko -->
       <!-- /ko -->
 
       <!-- ko if: activeAddState() -->
@@ -110,13 +112,13 @@
             <!-- /ko -->
             <div class="participants-service-profile-body">
               <div class="participants-service-profile-details">
-                <participant-avatar params="participant: selectedService, size: z.components.ParticipantAvatar.SIZE.LARGE"></participant-avatar>
+                <participant-avatar params="participant: selectedParticipant, size: z.components.ParticipantAvatar.SIZE.LARGE"></participant-avatar>
                 <div class="participants-service-profile-details-content">
-                  <div class="participants-service-profile-name" data-bind="text: selectedService().name" data-uie-name="status-service-name"></div>
-                  <div class="participants-service-profile-provider" data-bind="text: selectedService().providerName()" data-uie-name="status-service-provider"></div>
+                  <div class="participants-service-profile-name" data-bind="text: selectedParticipant().name" data-uie-name="status-service-name"></div>
+                  <div class="participants-service-profile-provider" data-bind="text: selectedParticipant().providerName()" data-uie-name="status-service-provider"></div>
                 </div>
               </div>
-              <div class="participants-service-profile-description" data-bind="text: selectedService().description" data-uie-name="status-service-description"></div>
+              <div class="participants-service-profile-description" data-bind="text: selectedParticipant().description" data-uie-name="status-service-description"></div>
             </div>
             <!-- ko if: stateServiceConfirmation() || showServiceRemove() -->
               <div class="participants-service-profile-footer">
