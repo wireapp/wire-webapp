@@ -29,20 +29,25 @@ z.components.UserListInput = class UserListInput {
     this.input = params.input;
     this.onEnter = params.enter;
     this.placeholderText = params.placeholder;
-    this.selectedUsers = params.selected || ko.observableArray([]);
+    this.selectedUsers = params.selected;
 
     this.element = component_info.element;
     this.innerElement = $(this.element).find('.search-inner');
     this.inputElement = $(this.element).find('.search-input');
 
-    this.selectedSubscription = this.selectedUsers.subscribe(() => {
-      this.input('');
-      this.inputElement.focus();
-      window.setTimeout(() => this.innerElement.scrollTop(this.innerElement[0].scrollHeight));
-    });
+    if (typeof this.selectedUsers === 'function') {
+      this.selectedSubscription = this.selectedUsers.subscribe(() => {
+        this.input('');
+        this.inputElement.focus();
+        window.setTimeout(() => this.innerElement.scrollTop(this.innerElement[0].scrollHeight));
+      });
+    }
 
     this.placeholder = ko.pureComputed(() => {
-      if (this.input() === '' && this.selectedUsers().length === 0) {
+      const hasEmptyInput = this.input() === '';
+      const noUsersSelected = !this.selectedUsers || this.selectedUsers().length === 0;
+
+      if (hasEmptyInput && noUsersSelected) {
         return z.l10n.text(this.placeholderText);
       }
 
@@ -51,14 +56,18 @@ z.components.UserListInput = class UserListInput {
   }
 
   onKeyDown(data, keyboardEvent) {
-    if (z.util.KeyboardUtil.isRemovalAction(keyboardEvent) && !this.input().length) {
-      this.selectedUsers.pop();
+    if (typeof this.selectedUsers === 'function') {
+      if (z.util.KeyboardUtil.isRemovalAction(keyboardEvent) && !this.input().length) {
+        this.selectedUsers.pop();
+      }
     }
     return true;
   }
 
   dispose() {
-    this.selectedSubscription.dispose();
+    if (this.selectedSubscription) {
+      this.selectedSubscription.dispose();
+    }
   }
 };
 

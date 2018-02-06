@@ -38,131 +38,104 @@ z.components.UserList = class UserList {
    * @param {ko.observableArray} params.user - User data source
    * @param {ko.observable} params.filter - Filter list items
    * @param {Function} params.click - Called when a list item is selected
-   * @param {Function} params.connect - Called when the connect button is clicked
    * @param {ko.observableArray} params.selected - Populated will all the selected items
-   * @param {Function} params.selected_filter - Determines if the user can be selected
    */
   constructor(params) {
-    // parameter list
-    this.user_ets = params.user;
-    this.user_click = params.click;
-    this.user_connect = params.connect;
-    this.user_filter = params.filter;
-    this.user_selected = params.selected;
-    this.user_selected_filter = params.selectable;
+    this.click = params.click;
+    this.filter = params.filter;
+    this.selectedUsers = params.selected;
     this.mode = params.mode || UserList.MODE.DEFAULT;
+    this.userEntities = params.user;
 
     this.isCompactMode = this.mode === UserList.MODE.COMPACT;
     this.isDefaultMode = this.mode === UserList.MODE.DEFAULT;
     this.isOthersMode = this.mode === UserList.MODE.OTHERS;
 
-    this.css_classes = ko.pureComputed(() => {
+    this.cssClasses = ko.pureComputed(() => {
       if (this.isCompactMode) {
         return 'search-list-sm';
       }
       return 'search-list-lg';
     });
 
-    this.show_buttons = () => {
-      return this.user_connect !== undefined;
-    };
-
-    this.filtered_user_ets = this.user_ets;
-    this.is_selected = () => false;
-    this.is_selectable = () => true;
-
-    this.on_select = (user_et, event) => {
-      if (typeof this.user_click === 'function') {
-        this.user_click(user_et, event);
+    this.onUserClick = (userEntity, event) => {
+      if (typeof this.selectedUsers === 'function') {
+        if (this.isSelected(userEntity)) {
+          this.selectedUsers.remove(userEntity);
+        } else {
+          this.selectedUsers.push(userEntity);
+        }
       }
-    };
-    this.on_connect = (user_et, event) => {
-      event.stopPropagation();
-      if (typeof this.user_connect === 'function') {
-        this.user_connect(user_et, event);
+      if (typeof this.click === 'function') {
+        this.click(userEntity, event);
       }
     };
 
     // Filter all list items if a filter is provided
-    if (this.user_filter) {
-      this.filtered_user_ets = ko.pureComputed(() => {
-        const normalized_query = z.search.SearchRepository.normalizeQuery(this.user_filter());
-        return this.user_ets().filter(user_et => {
-          const is_username = this.user_filter()
-            .trim()
-            .startsWith('@');
-
-          return user_et.matches(normalized_query, is_username);
-        });
-      });
-    }
-
-    // check every list item before selection if selected_filter is provided
-    if (this.user_selected_filter) {
-      this.is_selectable = this.user_selected_filter;
-    }
-
-    // List will be selectable if select is provided
-    if (this.user_selected) {
-      this.on_select = user_et => {
-        const is_selected = this.is_selected(user_et);
-        if (is_selected) {
-          this.user_selected.remove(user_et);
-        } else if (this.is_selectable(user_et)) {
-          this.user_selected.push(user_et);
+    this.filteredUserEntities = ko.pureComputed(() => {
+      if (typeof this.filter === 'function') {
+        const normalizedQuery = z.search.SearchRepository.normalizeQuery(this.filter());
+        if (normalizedQuery) {
+          const trimmedQuery = this.filter().trim();
+          const isHandle = trimmedQuery.startsWith('@') && z.user.UserHandleGenerator.validate_handle(normalizedQuery);
+          return this.userEntities().filter(userEntity => userEntity.matches(normalizedQuery, isHandle));
         }
+      }
+      return this.userEntities();
+    });
 
-        if (typeof this.user_click === 'function') {
-          this.user_click(user_et, !is_selected);
-        }
-      };
+    this.isSelected = userEntity => {
+      if (typeof this.selectedUsers === 'function') {
+        return this.selectedUsers().includes(userEntity);
+      }
+    };
 
-      this.is_selected = user_et => {
-        return this.user_selected().includes(user_et);
-      };
-    }
-
-    this.self = window.wire.app.repository.user.self;
+    this.selfUser = window.wire.app.repository.user.self;
   }
 };
 
 ko.components.register('user-list', {
   template: `
-    <div class="search-list" data-bind="css: css_classes(), foreach: {data: filtered_user_ets}">
-      <div class="search-list-item" data-bind="click: $parent.on_select, css: {'search-list-item-selected': $parent.is_selected($data)}, attr: {'data-uie-uid': $data.id, 'data-uie-value': $data.name(), 'data-uie-status': $data.connection().status()}" data-uie-name="item-user">
+    <div class="search-list" data-bind="css: cssClasses(), foreach: {data: filteredUserEntities}">
+      <div class="search-list-item" data-bind="click: $parent.onUserClick, css: {'search-list-item-selected': $parent.isSelected($data)}, attr: {'data-uie-uid': $data.id, 'data-uie-value': $data.name(), 'data-uie-status': $data.connection().status()}" data-uie-name="item-user">
         <!-- ko if: $parent.isCompactMode -->
           <div class="search-list-item-image">
-            <participant-avatar params="participant: $data, selected: $parent.is_selected($data), size: z.components.ParticipantAvatar.SIZE.LARGE"></participant-avatar>
+            <participant-avatar params="participant: $data, selected: $parent.isSelected($data), size: z.components.ParticipantAvatar.SIZE.LARGE"></participant-avatar>
             <!-- ko if: $data.is_guest() -->
               <div class="search-list-item-image-guest-indicator-badge" data-bind="l10n_text: z.string.conversation_guest_indicator" data-uie-name="status-guest"></div>
             <!-- /ko -->
           </div>
+
           <div class="search-list-item-content">
-            <!-- ko if: $parent.self().is_team_member() -->
+            <!-- ko if: $parent.selfUser().is_team_member() -->
               <availability-state class="search-list-item-content-availability search-list-item-content-name"
                 data-uie-name="status-availability-item"
                 params="availability: availability, label: first_name"></availability-state>
             <!-- /ko -->
-            <!-- ko ifnot: $parent.self().is_team_member() -->
+
+            <!-- ko ifnot: $parent.selfUser().is_team_member() -->
               <div class="search-list-item-content-name" data-bind="text: first_name"></div>
             <!-- /ko -->
           </div>
         <!-- /ko -->
+
         <!-- ko ifnot: $parent.isCompactMode -->
           <div class="search-list-item-image">
-            <participant-avatar params="participant: $data, selected: $parent.is_selected($data), size: z.components.ParticipantAvatar.SIZE.MEDIUM"></participant-avatar>
+            <participant-avatar params="participant: $data, selected: $parent.isSelected($data), size: z.components.ParticipantAvatar.SIZE.MEDIUM"></participant-avatar>
             <div class="search-list-item-image-overlay">
               <div class="background"></div>
               <div class="checkmark icon-check"></div>
             </div>
           </div>
+
           <div class="search-list-item-content">
-            <!-- ko if: $parent.self().is_team_member() -->
+            <!-- ko if: $parent.selfUser().is_team_member() -->
               <availability-state class="search-list-item-content-availability search-list-item-content-name"
                 data-uie-name="status-availability"
                 params="availability: availability, label: name"></availability-state>
             <!-- /ko -->
-            <!-- ko ifnot: $parent.self().is_team_member() -->
+
+            <!-- ko ifnot: $parent.selfUser().is_team_member() -->
               <div class="search-list-item-content-name" data-bind="text: name"></div>
             <!-- /ko -->
             <div class="search-list-item-content-info">
@@ -171,6 +144,7 @@ ko.components.register('user-list', {
               <!-- /ko -->
             </div>
           </div>
+
           <!-- ko if: !$parent.isOthersMode && $data.is_guest() -->
             <div class="search-list-item-guest-indicator" data-uie-name="status-guest">
               <div class="search-list-item-guest-indicator-badge" data-bind="l10n_text: z.string.conversation_guest_indicator"></div>
@@ -179,11 +153,13 @@ ko.components.register('user-list', {
         <!-- /ko -->
       </div>
     </div>
-    <!-- ko if: user_filter != null -->
-      <!-- ko if: user_ets().length === 0 -->
+
+    <!-- ko if: typeof filter === 'function' -->
+      <!-- ko if: userEntities().length === 0 -->
         <div class="no-results" data-bind="l10n_text: z.string.people_everyone_participates"></div>
       <!-- /ko -->
-      <!-- ko if: user_ets().length > 0 && filtered_user_ets().length === 0 -->
+
+      <!-- ko if: userEntities().length > 0 && filteredUserEntities().length === 0 -->
         <div class="no-results" data-bind="l10n_text: z.string.people_no_matches"></div>
       <!-- /ko -->
     <!-- /ko -->

@@ -31,17 +31,17 @@ z.components.TopPeople = class TopPeople {
 
     this.displayedUsers = ko.pureComputed(() => this.userEntities().slice(0, this.maxUsers));
 
-    this.onUserClick = userEntity => {
-      if (typeof this.click === 'function') {
-        return this.click(userEntity);
-      }
-
+    this.onUserClick = (userEntity, event) => {
       if (typeof this.selectedUsers === 'function') {
         if (this.isSelected(userEntity)) {
-          return this.selectedUsers.remove(userEntity);
+          this.selectedUsers.remove(userEntity);
+        } else {
+          this.selectedUsers.push(userEntity);
         }
 
-        this.selectedUsers.push(userEntity);
+        if (typeof this.click === 'function') {
+          return this.click(userEntity, event);
+        }
       }
     };
 
