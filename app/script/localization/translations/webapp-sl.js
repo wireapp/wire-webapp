@@ -231,6 +231,8 @@ z.string.sl.conversation_send_pasted_file = 'Prilepljena slika ob {{date}}';
 z.string.sl.conversation_someone = 'Nekdo';
 z.string.sl.conversation_tweet_author = ' na Twitterju';
 
+z.string.sl.conversation_creation_participants_placeholder = 'Iskanje po imenu';
+
 z.string.sl.collection_show_all = 'Prikaži vse {{number}}';
 z.string.sl.collection_section_links = 'Povezave';
 z.string.sl.collection_section_images = 'Slike';

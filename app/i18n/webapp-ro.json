@@ -15,7 +15,7 @@
   "accountForm.emailPersonalPlaceholder": "tu@email.com",
   "accountForm.passwordPlaceholder": "Parolă (minim 8 caractere)",
   "accountForm.terms": "Accept <a {linkParams}>termenii și condițiile</a>",
-  "accountForm.nextButton": "Mai departe",
+  "accountForm.submitButton": "Mai departe",
   "createAccount.nextButton": "Mai departe",
   "invite.nextButton": "Mai departe",
   "createAccount.headLine": "Configurează contul",
@@ -63,6 +63,7 @@
     "Adresa de e-mail este deja folosită. <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://support.wire.com/hc/articles/115004082129\">Află mai multe</a>",
   "BackendError.unexpected": "Eroare neașteptată ({code} {message})",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Introdu un nume de cel puțin 2 caractere",
+  "ValidationError.FIELD.NAME.VALUE_MISSING": "Introdu un nume de cel puțin 2 caractere",
   "ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH": "Introdu o parolă de cel puțin 8 caractere",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": "Introdu o adresă de e-mail validă"
 }

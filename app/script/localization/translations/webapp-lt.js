@@ -249,6 +249,10 @@ z.string.lt.conversation_send_pasted_file = 'Paveikslas įdėtas {{date}}';
 z.string.lt.conversation_someone = 'Kažkas';
 z.string.lt.conversation_tweet_author = ' socialiniame tinkle Twitter';
 
+z.string.lt.conversation_creation_preferences_action = 'Kitas';
+z.string.lt.conversation_creation_participants_header = 'Pridėti žmonių';
+z.string.lt.conversation_creation_participants_placeholder = 'Ieškokite pagal vardą';
+
 z.string.lt.collection_show_all = 'Rodyti visus {{number}}';
 z.string.lt.collection_section_links = 'Nuorodos';
 z.string.lt.collection_section_images = 'Paveikslai';
@@ -328,6 +332,7 @@ z.string.lt.people_invite_button_gmail = 'Iš Gmail';
 z.string.lt.people_invite_headline = 'Pasikvieskite savo draugus';
 z.string.lt.people_service_confirm_button = 'Pridėti paslaugą';
 z.string.lt.people_service_removal_button = 'Išimti paslaugą';
+z.string.lt.people_service_new_conversation = 'Kurti naują susirašinėjimą';
 z.string.lt.people_services = 'Paslaugos';
 z.string.lt.people_share = 'Dalintis kontaktais';
 z.string.lt.people_tabs_details = 'Išsamiau';

@@ -238,6 +238,9 @@ z.string.el.conversation_send_pasted_file = 'Επικολλημένη εικόν
 z.string.el.conversation_someone = 'Κάποιος';
 z.string.el.conversation_tweet_author = ' στο Twitter';
 
+z.string.el.conversation_creation_preferences_action = 'Επόμενο';
+z.string.el.conversation_creation_participants_placeholder = 'Αναζήτηση βάση ονόματος';
+
 z.string.el.collection_show_all = 'Προβολή όλων {{number}}';
 z.string.el.collection_section_links = 'Σύνδεσμοι';
 z.string.el.collection_section_images = 'Εικόνες';

@@ -15,7 +15,7 @@
   "accountForm.emailPersonalPlaceholder": "ви@емейл.com",
   "accountForm.passwordPlaceholder": "Пароль (не менше 8 символів)",
   "accountForm.terms": "Я приймаю <a {linkParams}>умови користування</a>",
-  "accountForm.nextButton": "Далі",
+  "accountForm.submitButton": "Далі",
   "createAccount.nextButton": "Далі",
   "invite.nextButton": "Далі",
   "createAccount.headLine": "Налаштуйте ваш акаунт",
@@ -62,6 +62,7 @@
     "Ця адреса електронної пошти вже використовується. <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://support.wire.com/hc/articles/115004082129\">Детальніше</a>",
   "BackendError.unexpected": "Неочікувана помилка ({code} {message})",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Введіть ім’я довжиною не менше 2 символи",
+  "ValidationError.FIELD.NAME.VALUE_MISSING": "Введіть ім’я довжиною не менше 2 символи",
   "ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH": "Введіть пароль довжиною від 8 символів",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": "Будь ласка, введіть актуальну адресу електронної пошти"
 }

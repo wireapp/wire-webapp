@@ -249,6 +249,9 @@ z.string.nl.conversation_send_pasted_file = 'Afbeelding geplakt op {{date}}';
 z.string.nl.conversation_someone = 'Iemand';
 z.string.nl.conversation_tweet_author = ' op Twitter';
 
+z.string.nl.conversation_creation_preferences_action = 'Volgende';
+z.string.nl.conversation_creation_participants_placeholder = 'Zoeken op naam';
+
 z.string.nl.collection_show_all = 'Toon alle {{number}}';
 z.string.nl.collection_section_links = 'Links';
 z.string.nl.collection_section_images = 'Afbeeldingen';
