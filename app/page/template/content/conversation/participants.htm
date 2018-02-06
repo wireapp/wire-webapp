@@ -49,18 +49,18 @@
 
         <!-- ko if: participantIsUser -->
           <user-profile class="participants-user-profile" params="
-            conversation: conversation,
-            mode: z.components.UserProfile.MODE.PEOPLE,
-            user: selectedParticipant,
             add_people: clickOnAddPeople,
             block: clickToBlock,
             close: clickOnMemberBack,
             connect: clickToConnect,
-            pending: clickOnPending,
+            conversation: conversation,
             leave: clickToLeave,
+            mode: z.components.UserProfile.MODE.PEOPLE,
+            pending: clickOnPending,
             profile: clickOnSelfProfile,
             remove: clickToRemoveMember,
             unblock: clickToUnblock
+            user: selectedParticipant,
           "></user-profile>
         <!-- /ko -->
       <!-- /ko -->
