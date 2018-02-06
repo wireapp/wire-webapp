@@ -88,6 +88,7 @@ z.event.WebApp = {
     ASSET: {
       CANCEL: 'wire.webapp.conversation.asset.cancel',
     },
+    CREATE_GROUP: 'wire.webapp.conversation.create_group',
     DEBUG: 'wire.webapp.conversation.debug',
     DETAIL_VIEW: {
       SHOW: 'wire.webapp.conversation.detail_view.show',
@@ -126,7 +127,6 @@ z.event.WebApp = {
       SEND: 'wire.webapp.extionsions.giphy.send',
       SHOW: 'wire.webapp.extionsions.giphy.show',
     },
-    SHOW: 'wire.webapp.extionsions.show',
   },
   LEFT: {
     FADE_IN: 'wire.webapp.left.fade_in',

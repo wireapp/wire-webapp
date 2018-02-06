@@ -28,6 +28,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return {
       CONFIRMATION_THRESHOLD: 7 * 24 * 60 * 60 * 1000,
       EXTERNAL_MESSAGE_THRESHOLD: 200 * 1024,
+      GROUP: {
+        MAX_NAME_LENGTH: 64,
+        MAX_SIZE: 128,
+      },
     };
   }
 
@@ -1000,10 +1004,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
       }
 
       case z.service.BackendClientError.LABEL.TOO_MANY_MEMBERS: {
-        const openSpots = z.config.MAXIMUM_CONVERSATION_SIZE - conversationEntity.getNumberOfParticipants();
+        const openSpots = ConversationRepository.CONFIG.GROUP.MAX_SIZE - conversationEntity.getNumberOfParticipants();
         amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.TOO_MANY_MEMBERS, {
           data: {
-            max: z.config.MAXIMUM_CONVERSATION_SIZE,
+            max: ConversationRepository.CONFIG.GROUP.MAX_SIZE,
             open_spots: Math.max(0, openSpots),
           },
         });

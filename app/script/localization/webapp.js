@@ -290,15 +290,17 @@ z.string.conversation_send_pasted_file = 'Pasted image at {{date}}';
 z.string.conversation_someone = 'Someone';
 z.string.conversation_tweet_author = ' on Twitter';
 
-// Conversation creation
-z.string.conversation_creation_preferences_action = 'Next';
-z.string.conversation_creation_preferences_header = 'Create conversation';
-z.string.conversation_creation_preferences_placeholder = 'Conversation name';
-z.string.conversation_creation_participants_action_create = 'Create';
-z.string.conversation_creation_participants_action_skip = 'Skip';
-z.string.conversation_creation_participants_header = 'Add people';
-z.string.conversation_creation_participants_header_with_counter = 'Add people ({{number}})';
-z.string.conversation_creation_participants_placeholder = 'Search by name';
+// Group creation
+z.string.group_creation_preferences_action = 'Next';
+z.string.group_creation_preferences_error_name_short = 'At least 1 character';
+z.string.group_creation_preferences_error_name_long = 'Too many characters';
+z.string.group_creation_preferences_header = 'New group';
+z.string.group_creation_preferences_placeholder = 'Group name';
+z.string.group_creation_participants_action_create = 'Create';
+z.string.group_creation_participants_action_skip = 'Skip';
+z.string.group_creation_participants_header = 'Add people';
+z.string.group_creation_participants_header_with_counter = 'Add people ({{number}})';
+z.string.group_creation_participants_placeholder = 'Search by name';
 
 // Collection
 z.string.collection_show_all = 'Show all {{number}}';
@@ -529,6 +531,7 @@ z.string.preferences_options_notifications_on = 'Show sender and message';
 z.string.search_connect = 'Connect';
 z.string.search_connections = 'Connections';
 z.string.search_contacts = 'Contacts';
+z.string.search_create_group = 'Create group';
 z.string.search_groups = 'Groups';
 z.string.search_people = 'People';
 z.string.search_placeholder = 'Search by name or username';

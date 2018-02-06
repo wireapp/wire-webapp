@@ -50,7 +50,7 @@
         <user-profile class="participants-user-profile" params="
           conversation: conversation,
           mode: z.components.UserProfile.MODE.PEOPLE,
-          user: selectedUser,
+          user: selectedParticipant,
           add_people: clickOnAddPeople,
           block: clickToBlock,
           close: clickOnMemberBack,
@@ -67,7 +67,7 @@
         <div class="participants-search">
           <div class="participants-search-header">
             <div class="participants-search-header-row">
-              <user-input class="participants-search-header-list user-list-light" params="input: searchInput, selected: selectedUsers, placeholder: z.string.people_search_placeholder" spellcheck="false"></user-input>
+              <user-input class="participants-search-header-list user-list-light" params="input: searchInput, selected: selectedContacts, placeholder: z.string.people_search_placeholder" spellcheck="false"></user-input>
               <div class="participants-search-header-close icon-close icon-button" data-bind="click: clickOnCloseAdding, l10n_tooltip: z.string.tooltip_search_close" data-uie-name="do-close"></div>
             </div>
             <!-- ko if: showIntegrations() -->
@@ -80,7 +80,7 @@
           <div class="participants-search-content">
             <div class="participants-search-list" data-bind="antiscroll: shouldUpdateScrollbar">
               <!-- ko if: stateAddPeople() -->
-                <user-list class="user-list-light" params="user: users, filter: searchInput, selected: selectedUsers"></user-list>
+                <user-list class="user-list-light" params="user: contacts, filter: searchInput, selected: selectedContacts"></user-list>
               <!-- /ko -->
               <!-- ko if: stateAddService() -->
                 <service-list class="service-list-light" params="services: services, click: clickOnSelectService, isSearching: isSearching"></service-list>
@@ -88,9 +88,9 @@
             </div>
           </div>
           <!-- ko if: stateAddPeople() -->
-            <button class="participants-search-footer button button-full" data-bind="enable: selectedUsers().length > 0, click: clickToAddMembers" data-uie-name="do-create">
+            <button class="participants-search-footer button button-full" data-bind="enable: selectedContacts().length > 0, click: clickToAddMembers" data-uie-name="do-create">
               <span class="icon-people-add participants-search-icon"></span>
-              <span data-bind="l10n_text: searchActionText"></span>
+              <span data-bind="l10n_text: z.string.people_confirm_label"></span>
             </button>
           <!-- /ko -->
         </div>
