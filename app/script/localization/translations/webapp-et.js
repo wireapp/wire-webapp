@@ -249,6 +249,10 @@ z.string.et.conversation_send_pasted_file = 'Kleepis pildi kuupäeval {{date}}';
 z.string.et.conversation_someone = 'Keegi';
 z.string.et.conversation_tweet_author = ' Twitteris';
 
+z.string.et.conversation_creation_preferences_action = 'Järgmine';
+z.string.et.conversation_creation_participants_header = 'Lisa inimesi';
+z.string.et.conversation_creation_participants_placeholder = 'Otsi nime järgi';
+
 z.string.et.collection_show_all = 'Kuva kõik {{number}}';
 z.string.et.collection_section_links = 'Lingid';
 z.string.et.collection_section_images = 'Pildid';
@@ -328,6 +332,7 @@ z.string.et.people_invite_button_gmail = 'Gmailist';
 z.string.et.people_invite_headline = 'Too oma sõbrad';
 z.string.et.people_service_confirm_button = 'Lisa teenus';
 z.string.et.people_service_removal_button = 'Eemalda teenus';
+z.string.et.people_service_new_conversation = 'Loo uus vestlus';
 z.string.et.people_services = 'Teenused';
 z.string.et.people_share = 'Jaga kontakte';
 z.string.et.people_tabs_details = 'Üksikasjad';

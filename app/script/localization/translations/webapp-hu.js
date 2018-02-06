@@ -249,6 +249,10 @@ z.string.hu.conversation_send_pasted_file = 'Kép beillesztve ({{date}})';
 z.string.hu.conversation_someone = 'Valaki';
 z.string.hu.conversation_tweet_author = ' Twitteren';
 
+z.string.hu.conversation_creation_preferences_action = 'Tovább';
+z.string.hu.conversation_creation_participants_header = 'Partnerek hozzáadása';
+z.string.hu.conversation_creation_participants_placeholder = 'Keresés név szerint';
+
 z.string.hu.collection_show_all = 'Mind a(z) {{number}} mutatása';
 z.string.hu.collection_section_links = 'Hivatkozások';
 z.string.hu.collection_section_images = 'Képek';
@@ -328,6 +332,7 @@ z.string.hu.people_invite_button_gmail = 'Gmail-ből';
 z.string.hu.people_invite_headline = 'Hozd a barátaidat is';
 z.string.hu.people_service_confirm_button = 'Új szolgáltatás';
 z.string.hu.people_service_removal_button = 'Szolgáltatás eltávolítása';
+z.string.hu.people_service_new_conversation = 'Új beszélgetés létrehozása';
 z.string.hu.people_services = 'Szolgáltatások';
 z.string.hu.people_share = 'Névjegyek megosztása';
 z.string.hu.people_tabs_details = 'Részletek';

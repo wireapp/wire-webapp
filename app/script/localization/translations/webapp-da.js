@@ -227,6 +227,8 @@ z.string.da.conversation_send_pasted_file = 'Indsatte billede d. {{date}}';
 z.string.da.conversation_someone = 'Nogen';
 z.string.da.conversation_tweet_author = ' på Twitter';
 
+z.string.da.conversation_creation_participants_placeholder = 'Søg ved navn';
+
 z.string.da.collection_show_all = 'Vis alle {{number}}';
 z.string.da.collection_section_links = 'Links';
 z.string.da.collection_section_images = 'Billeder';

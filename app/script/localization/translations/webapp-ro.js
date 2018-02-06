@@ -249,6 +249,10 @@ z.string.ro.conversation_send_pasted_file = 'A postat o imagine pe {{date}}';
 z.string.ro.conversation_someone = 'Cineva';
 z.string.ro.conversation_tweet_author = ' pe Twitter';
 
+z.string.ro.conversation_creation_preferences_action = 'Mai departe';
+z.string.ro.conversation_creation_participants_header = 'Adaugă persoane';
+z.string.ro.conversation_creation_participants_placeholder = 'Caută după nume';
+
 z.string.ro.collection_show_all = 'Arată toate {{number}}';
 z.string.ro.collection_section_links = 'Legături';
 z.string.ro.collection_section_images = 'Imagini';

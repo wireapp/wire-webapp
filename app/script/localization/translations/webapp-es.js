@@ -241,6 +241,9 @@ z.string.es.conversation_send_pasted_file = 'Imagen añadida el {{date}}';
 z.string.es.conversation_someone = 'Alguien';
 z.string.es.conversation_tweet_author = ' en Twitter';
 
+z.string.es.conversation_creation_preferences_action = 'Siguiente';
+z.string.es.conversation_creation_participants_placeholder = 'Buscar por nombre';
+
 z.string.es.collection_show_all = 'Mostrar los {{number}}';
 z.string.es.collection_section_links = 'Enlaces';
 z.string.es.collection_section_images = 'Fotos';

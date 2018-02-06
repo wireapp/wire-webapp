@@ -235,6 +235,8 @@ z.string.it.conversation_send_pasted_file = 'Immagine incollata alle {{date}}';
 z.string.it.conversation_someone = 'Qualcuno';
 z.string.it.conversation_tweet_author = ' su Twitter';
 
+z.string.it.conversation_creation_participants_placeholder = 'Cerca per nome';
+
 z.string.it.collection_show_all = 'Mostra tutti i {{number}}';
 z.string.it.collection_section_links = 'Link';
 z.string.it.collection_section_images = 'Immagini';

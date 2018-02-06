@@ -15,7 +15,7 @@
   "accountForm.emailPersonalPlaceholder": "deine@email.de",
   "accountForm.passwordPlaceholder": "Passwort (min. acht Zeichen)",
   "accountForm.terms": "Ich akzeptiere die <a {linkParams}>Nutzungbedingungen</a>",
-  "accountForm.nextButton": "Weiter",
+  "accountForm.submitButton": "Weiter",
   "createAccount.nextButton": "Weiter",
   "invite.nextButton": "Weiter",
   "createAccount.headLine": "Eigenes Konto einrichten",
@@ -63,6 +63,7 @@
     "Die angegebene E-Mail-Adresse wird bereits verwendet. <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://support.wire.com/hc/de/articles/115004082129\">Mehr erfahren</a>",
   "BackendError.unexpected": "Unerwarteter Fehler ({code} {message})",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Gib einen Namen mit mindestens zwei Zeichen ein",
+  "ValidationError.FIELD.NAME.VALUE_MISSING": "Gib einen Namen mit mindestens zwei Zeichen ein",
   "ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH": "Wähle ein Passwort mit mindestens acht Zeichen",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": "Bitte gib eine gültige \nE-Mail-Adresse ein"
 }
