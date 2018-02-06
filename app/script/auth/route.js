@@ -30,7 +30,9 @@ export default {
   INITIAL_INVITE: '/teaminvite',
   INVITE: '/invite',
   LOGIN: '/login',
+  PASSWORD_RESET: '/forgot',
   PERSONAL_INVITE: '/personalinvite',
+  PHONE_LOGIN: '/login#phone',
   VERIFY: '/verify',
   WIRE_ROOT: onEnvironment(stagingWebsite, stagingWebsite, 'https://wire.com'),
 };

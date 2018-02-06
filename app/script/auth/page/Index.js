@@ -28,7 +28,6 @@ import {injectIntl} from 'react-intl';
 import {Logo, COLOR} from '@wireapp/react-ui-kit/Identity';
 import {ProfileIcon, RoundContainer, TeamIcon} from '@wireapp/react-ui-kit/Icon';
 import {Link, Paragraph, Text, Bold} from '@wireapp/react-ui-kit/Text';
-import {pathWithParams} from '../util/urlUtil';
 
 class Index extends Component {
   componentDidMount() {
@@ -47,10 +46,7 @@ class Index extends Component {
 
   onLoginClick = () => {
     this.props.trackEvent({name: TrackingAction.EVENT_NAME.START.OPENED_LOGIN});
-    const link = document.createElement('a');
-    link.href = pathWithParams(ROUTE.LOGIN, 'mode=login');
-    document.body.appendChild(link); // workaround for Firefox
-    link.click();
+    this.props.history.push(ROUTE.LOGIN);
   };
 
   render() {

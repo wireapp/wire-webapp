@@ -314,3 +314,34 @@ export const validationErrorStrings = defineMessages({
     defaultMessage: 'Unexpected error ({code} {message})',
   },
 });
+
+export const loginStrings = defineMessages({
+  headline: {
+    id: 'login.headline',
+    defaultMessage: 'Log in',
+  },
+  subhead: {
+    id: 'login.subhead',
+    defaultMessage: 'Enter your email address or username.',
+  },
+  emailPlaceholder: {
+    id: 'login.emailPlaceholder',
+    defaultMessage: 'Email or username',
+  },
+  passwordPlaceholder: {
+    id: 'login.passwordPlaceholder',
+    defaultMessage: 'Password',
+  },
+  forgotPassword: {
+    id: 'login.forgotPassword',
+    defaultMessage: 'Forgot password?',
+  },
+  phoneLogin: {
+    id: 'login.phoneLogin',
+    defaultMessage: 'Log in with phone number',
+  },
+  publicComputer: {
+    id: 'login.publicComputer',
+    defaultMessage: 'This is a public computer',
+  },
+});

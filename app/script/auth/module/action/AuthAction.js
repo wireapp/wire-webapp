@@ -26,12 +26,8 @@ export function doLogin(login) {
   return function(dispatch, getState, {apiClient}) {
     dispatch(
       AuthActionCreator.startLogin({
-        code: login.code,
         email: login.email,
-        handle: login.handle,
         password: '******',
-        persist: login.persist,
-        phone: login.phone,
       })
     );
     return Promise.resolve()
