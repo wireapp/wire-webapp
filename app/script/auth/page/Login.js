@@ -41,6 +41,7 @@ import {doLogin} from '../module/action/AuthAction';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import ValidationError from '../module/action/ValidationError';
 import {loginStrings} from '../../strings';
+import RuntimeUtil from '../util/RuntimeUtil';
 
 class Login extends React.PureComponent {
   inputs = {};
@@ -90,6 +91,10 @@ class Login extends React.PureComponent {
       })
       .then(() => window.location.replace(`/${window.location.search}`));
   };
+
+  forgotPassword() {
+    z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.ACCOUNT, z.config.URL_PATH.PASSWORD_RESET));
+  }
 
   render() {
     const {intl: {formatMessage: _}, loginError} = this.props;
@@ -173,22 +178,24 @@ class Login extends React.PureComponent {
                   ) : loginError ? (
                     <ErrorMessage data-uie-name="error-message">{parseError(loginError)}</ErrorMessage>
                   ) : null}
-                  <Checkbox
-                    onChange={event => this.setState({persist: event.target.checked})}
-                    checked={persist}
-                    data-uie-name="check-persist"
-                    style={{justifyContent: 'center'}}
-                  >
-                    <CheckboxLabel>{_(loginStrings.publicComputer)}</CheckboxLabel>
-                  </Checkbox>
+                  {!RuntimeUtil.isDesktop() && (
+                    <Checkbox
+                      onChange={event => this.setState({persist: event.target.checked})}
+                      checked={persist}
+                      data-uie-name="check-persist"
+                      style={{justifyContent: 'center'}}
+                    >
+                      <CheckboxLabel>{_(loginStrings.publicComputer)}</CheckboxLabel>
+                    </Checkbox>
+                  )}
                 </Form>
               </div>
               <Columns>
                 <Column>
-                  <Link href={ROUTE.PHONE_LOGIN + window.location.search}>{_(loginStrings.forgotPassword)}</Link>
+                  <Link onClick={this.forgotPassword}>{_(loginStrings.forgotPassword)}</Link>
                 </Column>
                 <Column>
-                  <Link href={ROUTE.PASSWORD_RESET + window.location.search}>{_(loginStrings.phoneLogin)}</Link>
+                  <Link href={ROUTE.PHONE_LOGIN + window.location.search}>{_(loginStrings.phoneLogin)}</Link>
                 </Column>
               </Columns>
             </ContainerXS>
