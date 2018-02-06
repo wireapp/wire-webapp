@@ -58,7 +58,6 @@ participant-avatar {
 
   .participant-avatar {
     .full-screen;
-    border-radius: 50%;
     overflow: hidden;
     & > div {
       .full-screen;
@@ -110,7 +109,9 @@ participant-avatar {
     }
 
     &.unknown {
-      background-color: @w-gray;
+      .avatar-background {
+        background-color: @w-gray;
+      }
     }
   }
 
@@ -118,12 +119,12 @@ participant-avatar {
     .avatar-size(xl);
   }
 
-  &.avatar-lg {
-    .avatar-size(lg);
+  &.avatar-l {
+    .avatar-size(l);
   }
 
-  &.avatar-md {
-    .avatar-size(md);
+  &.avatar-m {
+    .avatar-size(m);
   }
 
   &.avatar-s {
@@ -234,6 +235,7 @@ participant-avatar {
     &,
     .avatar-border,
     .avatar-background,
+    .avatar-badge,
     .avatar-image > img {
       border-radius: 50%;
     }

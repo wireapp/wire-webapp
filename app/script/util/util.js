@@ -31,10 +31,16 @@ z.util.check_indexed_db = function() {
   }
 
   if (z.util.Environment.browser.firefox) {
-    let db;
+    let dbOpenRequest;
 
     try {
-      db = window.indexedDB.open('test');
+      dbOpenRequest = window.indexedDB.open('test');
+      dbOpenRequest.onerror = event => {
+        if (dbOpenRequest.error) {
+          event.preventDefault();
+          return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.PRIVATE_MODE));
+        }
+      };
     } catch (error) {
       return Promise.reject(new z.auth.AuthError(z.auth.AuthError.TYPE.PRIVATE_MODE));
     }
@@ -47,7 +53,7 @@ z.util.check_indexed_db = function() {
       const interval_id = window.setInterval(() => {
         current_attempt = current_attempt + 1;
 
-        if (db.readyState === 'done' && !db.result) {
+        if (dbOpenRequest.readyState === 'done' && !dbOpenRequest.result) {
           window.clearInterval(interval_id);
           return reject(new z.auth.AuthError(z.auth.AuthError.TYPE.PRIVATE_MODE));
         }

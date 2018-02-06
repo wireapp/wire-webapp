@@ -1,5 +1,5 @@
 <div id="start-ui" data-bind="with: $root.start_ui">
-  <div class="left-list-header">
+  <div class="left-list-header left-list-header-start-ui">
     <span class="left-list-header-text" data-bind="text: teamName" data-uie-name="status-team-name-search"></span>
     <span class="left-list-header-close-button button-icon-large icon-close" data-bind="click: clickOnClose, l10n_tooltip: z.string.tooltip_search_close" data-uie-name="do-close"></span>
   </div>
@@ -44,6 +44,23 @@
 
       <!-- ko ifnot: showSpinner() -->
         <!-- ko if: peopleTabActive() -->
+          <!-- ko if: showInviteMember() -->
+            <ul class="start-ui-invite-people left-list-items">
+              <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnInviteMember" data-uie-name="do-invite-member">
+                <div class="left-column icon-envelope"></div>
+                <div class="center-column" data-bind="l10n_text: z.string.search_member_invite"></div>
+              </li>
+            </ul>
+          <!-- /ko -->
+
+          <!-- ko if: showNoMatches() -->
+            <div class="start-ui-no-contacts" data-bind="l10n_text: z.string.search_no_contacts_on_wire"></div>
+          <!-- /ko -->
+
+          <!-- ko if: showNoSearchResults() -->
+            <div class="start-ui-no-search-results" data-bind="l10n_text: z.string.search_try_search"></div>
+          <!-- /ko -->
+
           <!-- ko ifnot: showSearchResults() -->
             <!-- ko if: showTopPeople() -->
               <div class="start-ui-list-top-people" data-uie-name="status-top-people">
@@ -95,24 +112,6 @@
         <!-- ko ifnot: peopleTabActive() -->
           <span class="start-ui-list-header"></span>
           <service-list params="services: services, click: clickOnOther, isSearching: isSearching"></service-list>
-        <!-- /ko -->
-      <!-- /ko -->
-
-      <!-- ko if: peopleTabActive() -->
-        <!-- ko if: showInviteMember() -->
-          <ul class="left-list-items">
-            <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnInviteMember" data-uie-name="do-invite-member">
-              <div class="left-column icon-envelope"></div>
-              <div class="center-column" data-bind="l10n_text: z.string.search_member_invite"></div>
-            </li>
-          </ul>
-        <!-- /ko -->
-        <!-- ko if: showNoMatches() -->
-          <div class="start-ui-no-contacts" data-bind="l10n_text: z.string.search_no_contacts_on_wire"></div>
-        <!-- /ko -->
-
-        <!-- ko if: showNoSearchResults() -->
-          <div class="start-ui-no-search-results" data-bind="l10n_text: z.string.search_try_search"></div>
         <!-- /ko -->
       <!-- /ko -->
     </div>
