@@ -290,6 +290,16 @@ z.string.conversation_send_pasted_file = 'Pasted image at {{date}}';
 z.string.conversation_someone = 'Someone';
 z.string.conversation_tweet_author = ' on Twitter';
 
+// Conversation creation
+z.string.conversation_creation_preferences_action = 'Next';
+z.string.conversation_creation_preferences_header = 'Create conversation';
+z.string.conversation_creation_preferences_placeholder = 'Conversation name';
+z.string.conversation_creation_participants_action_create = 'Create';
+z.string.conversation_creation_participants_action_skip = 'Skip';
+z.string.conversation_creation_participants_header = 'Add people';
+z.string.conversation_creation_participants_header_with_counter = 'Add people ({{number}})';
+z.string.conversation_creation_participants_placeholder = 'Search by name';
+
 // Collection
 z.string.collection_show_all = 'Show all {{number}}';
 z.string.collection_section_links = 'Links';

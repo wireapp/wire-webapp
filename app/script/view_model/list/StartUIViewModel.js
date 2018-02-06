@@ -135,11 +135,10 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.hasCreatedConversation = ko.observable(false);
 
     // View states
-    this.hasSearchResults = ko.pureComputed(() => {
-      return (
+    this.hasSearchResults = ko.pureComputed(
+      () =>
         this.searchResults.groups().length || this.searchResults.contacts().length || this.searchResults.others().length
-      );
-    });
+    );
 
     this.enableIntegrations = this.integrationRepository.enableIntegrations;
 
@@ -150,18 +149,16 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.showMatches = ko.observable(false);
 
     this.showNoContacts = ko.pureComputed(() => !this.isTeam() && !this.showContent());
-    this.showInviteMember = ko.pureComputed(() => {
-      return (
-        this.selfUser().isTeamOwner() && this.teamSize() === 1 && !this.showContacts() && !this.showSearchResults()
-      );
-    });
+    this.showInviteMember = ko.pureComputed(
+      () => this.selfUser().isTeamOwner() && this.teamSize() === 1 && !this.showSearchResults()
+    );
     this.showNoMatches = ko.pureComputed(() => {
       const isTeamOrMatch = this.isTeam() || this.showMatches();
       return isTeamOrMatch && !this.showInviteMember() && !this.showContacts() && !this.showSearchResults();
     });
-    this.showNoSearchResults = ko.pureComputed(() => {
-      return !this.showMatches() && this.showSearchResults() && !this.hasSearchResults() && this.isSearching();
-    });
+    this.showNoSearchResults = ko.pureComputed(
+      () => !this.showMatches() && this.showSearchResults() && !this.hasSearchResults() && this.isSearching()
+    );
 
     this.showSearchResults = ko.pureComputed(() => {
       if (!this.selectedPeople().length && !this.isSearching()) {
@@ -265,24 +262,17 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
   }
 
   clickOnConversation(conversationEntity) {
-    const promise =
-      conversationEntity instanceof z.entity.User
-        ? this.conversationRepository.get_1to1_conversation(conversationEntity)
-        : Promise.resolve(conversationEntity);
+    if (conversationEntity.is_archived()) {
+      this.conversationRepository.unarchive_conversation(conversationEntity, 'opened conversation from search');
+    }
 
-    return promise.then(_conversationEntity => {
-      if (_conversationEntity.is_archived()) {
-        this.conversationRepository.unarchive_conversation(_conversationEntity, 'opened conversation from search');
-      }
+    if (conversationEntity.is_cleared()) {
+      conversationEntity.cleared_timestamp(0);
+    }
 
-      if (_conversationEntity.is_cleared()) {
-        _conversationEntity.cleared_timestamp(0);
-      }
-
-      amplify.publish(z.event.WebApp.CONVERSATION.SHOW, _conversationEntity);
-      this._closeList();
-      return _conversationEntity;
-    });
+    amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
+    this._closeList();
+    return conversationEntity;
   }
 
   clickOnInviteMember() {
@@ -366,7 +356,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
   clickToAddService(conversationEntity) {
     this.integrationRepository.addService(conversationEntity, this.userProfile(), 'start_ui').then(() => {
-      this.clickOnConversation(conversationEntity);
+      amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
     });
   }
 
@@ -652,8 +642,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       }
 
       default: {
-        const userIds = this.selectedPeople().map(user_et => user_et.id);
-        return this._openGroupConversation(userIds);
+        return this._openGroupConversation(this.selectedPeople());
       }
     }
   }
@@ -674,21 +663,17 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       });
   }
 
-  _openGroupConversation(userIds) {
+  _openGroupConversation(userEntities) {
     this.submittedSearch = true;
 
     return this.conversationRepository
-      .create_new_conversation(userIds, null)
+      .createGroupConversation(userEntities)
       .then(conversationEntity => {
         this.submittedSearch = false;
 
         if (conversationEntity) {
           this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.HAS_CREATED_CONVERSATION);
-          amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.CREATE_GROUP_CONVERSATION, {
-            creationContext: 'search',
-            numberOfParticipants: userIds.length,
-          });
-          this.clickOnConversation(conversationEntity);
+          amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
           return conversationEntity;
         }
       })
