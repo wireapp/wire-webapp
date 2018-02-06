@@ -98,9 +98,8 @@ z.ViewModel.content.ConversationCreationViewModel = class ConversationCreationVi
     if (!this.isCreatingConversation) {
       this.isCreatingConversation = true;
 
-      const userIds = this.selectedContacts().map(userEntity => userEntity.id);
       this.conversationRepository
-        .createConversation(userIds, this.nameInput())
+        .createGroupConversation(this.selectedContacts(), this.nameInput())
         .then(conversationEntity => {
           this._resetView();
           amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);

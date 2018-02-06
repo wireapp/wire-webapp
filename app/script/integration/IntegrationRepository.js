@@ -102,7 +102,7 @@ z.integration.IntegrationRepository = class IntegrationRepository {
    */
   createConversationWithService(serviceEntity, method) {
     return this.conversationRepository
-      .createConversation([], serviceEntity.name)
+      .createGroupConversation([], serviceEntity.name)
       .then(conversationEntity => {
         if (conversationEntity) {
           return this.addService(conversationEntity, serviceEntity, method).then(() => conversationEntity);
