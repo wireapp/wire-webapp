@@ -31,7 +31,6 @@ z.properties.PROPERTIES_TYPE = {
     REPLACE_INLINE: 'settings.emoji.replace_inline',
   },
   ENABLE_DEBUGGING: 'enable_debugging',
-  HAS_CREATED_CONVERSATION: 'has_created_conversation',
   NOTIFICATIONS: 'settings.notifications',
   PREVIEWS: {
     SEND: 'settings.previews.send',
