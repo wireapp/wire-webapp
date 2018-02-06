@@ -170,7 +170,6 @@ z.event.WebApp = {
       EMOJI: {
         REPLACE_INLINE: 'wire.webapp.properties.update.emoji.replace_inline',
       },
-      HAS_CREATED_CONVERSATION: 'wire.webapp.properties.update.has_created_conversation',
       NOTIFICATIONS: 'wire.webapp.properties.update.notifications',
       PREVIEWS: {
         SEND: 'wire.webapp.properties.update.previews.send',

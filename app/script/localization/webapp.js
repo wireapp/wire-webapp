@@ -375,8 +375,6 @@ z.string.extensions_giphy_no_gifs = 'Oops, no gifs';
 z.string.extensions_giphy_random = 'Random';
 
 // People View
-z.string.search_open = 'Open';
-z.string.search_open_group = 'Create Group';
 z.string.people_confirm_label = 'Add people to group';
 z.string.people_people = '{{number}} People';
 z.string.people_search_placeholder = 'Search by name';
@@ -528,7 +526,6 @@ z.string.preferences_options_notifications_obfuscate_message = 'Show sender';
 z.string.preferences_options_notifications_on = 'Show sender and message';
 
 // Search
-z.string.search_group_hint = 'Keep typing or pick more people to create a group';
 z.string.search_connect = 'Connect';
 z.string.search_connections = 'Connections';
 z.string.search_contacts = 'Contacts';
