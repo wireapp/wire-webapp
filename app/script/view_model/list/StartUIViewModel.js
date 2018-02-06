@@ -157,9 +157,9 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       const isTeamOrMatch = this.isTeam() || this.showMatches();
       return isTeamOrMatch && !this.showInviteMember() && !this.showContacts() && !this.showSearchResults();
     });
-    this.showNoSearchResults = ko.pureComputed(() => {
-      return !this.showMatches() && this.showSearchResults() && !this.hasSearchResults() && this.isSearching();
-    });
+    this.showNoSearchResults = ko.pureComputed(
+      () => !this.showMatches() && this.showSearchResults() && !this.hasSearchResults() && this.isSearching()
+    );
 
     this.showSearchResults = ko.pureComputed(() => {
       if (!this.selectedPeople().length && !this.isSearching()) {
