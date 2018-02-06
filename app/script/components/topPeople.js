@@ -22,40 +22,47 @@
 window.z = window.z || {};
 window.z.components = z.components || {};
 
-z.components.TopPeopleViewModel = class TopPeopleViewModel {
+z.components.TopPeople = class TopPeople {
   constructor(params) {
-    this.user_ets = params.user;
-    this.user_selected = params.selected;
-    this.max_users = params.max || 9;
+    this.click = params.click;
+    this.selectedUsers = params.selected;
+    this.maxUsers = params.max || 9;
+    this.userEntities = params.user;
 
-    this.displayed_users = ko.pureComputed(() => {
-      return this.user_ets().slice(0, this.max_users);
-    });
+    this.displayedUsers = ko.pureComputed(() => this.userEntities().slice(0, this.maxUsers));
 
-    this.on_select = user_et => {
-      if (this.is_selected(user_et)) {
-        return this.user_selected.remove(user_et);
+    this.onUserClick = userEntity => {
+      if (typeof this.click === 'function') {
+        return this.click(userEntity);
       }
 
-      return this.user_selected.push(user_et);
+      if (typeof this.selectedUsers === 'function') {
+        if (this.isSelected(userEntity)) {
+          return this.selectedUsers.remove(userEntity);
+        }
+
+        this.selectedUsers.push(userEntity);
+      }
     };
 
-    this.is_selected = user_et => {
-      return this.user_selected().includes(user_et);
+    this.isSelected = userEntity => {
+      if (typeof this.selectedUsers === 'function') {
+        return this.selectedUsers().includes(userEntity);
+      }
     };
   }
 };
 
 ko.components.register('top-people', {
   template: `
-    <div class="search-list search-list-sm" data-bind="foreach: {data: displayed_users}">
-      <div class="search-list-item" data-bind="click: $parent.on_select, css: {'search-list-item-selected': $parent.is_selected($data)}, attr: {'data-uie-uid': $data.id, 'data-uie-value': $data.name(), 'data-uie-status': $data.connection().status()}" data-uie-name="item-user">
-        <participant-avatar class="search-list-item-image" params="participant: $data, selected: $parent.is_selected($data), delay: 300, size: z.components.ParticipantAvatar.SIZE.LARGE"></participant-avatar>
+    <div class="search-list search-list-sm" data-bind="foreach: {data: displayedUsers}">
+      <div class="search-list-item" data-bind="click: $parent.onUserClick, css: {'search-list-item-selected': $parent.isSelected($data)}, attr: {'data-uie-uid': $data.id, 'data-uie-value': $data.name(), 'data-uie-status': $data.connection().status()}" data-uie-name="item-user">
+        <participant-avatar class="search-list-item-image" params="participant: $data, selected: $parent.isSelected($data), delay: 300, size: z.components.ParticipantAvatar.SIZE.LARGE"></participant-avatar>
         <div class="search-list-item-content">
           <div class="search-list-item-content-name" data-bind="text: first_name"></div>
         </div>
       </div>
     </div>
   `,
-  viewModel: z.components.TopPeopleViewModel,
+  viewModel: z.components.TopPeople,
 });
