@@ -19,9 +19,9 @@
 
 'use strict';
 
-// grunt test_init && grunt test_run:view_model/UserProfileViewModel
+// grunt test_init && grunt test_run:components/UserProfile
 
-describe('z.components.UserProfileViewModel', () => {
+describe('z.components.UserProfile', () => {
   const testFactory = new TestFactory();
   let viewModel;
 
@@ -30,7 +30,7 @@ describe('z.components.UserProfileViewModel', () => {
       .exposeConversationActors()
       .then(conversation_repository => {
         const conversation = new z.entity.Conversation(z.util.create_random_uuid());
-        conversation.name('z.components.UserProfileViewModel');
+        conversation.name('z.components.UserProfile');
         conversation.type(z.conversation.ConversationType.REGULAR);
         conversation_repository.active_conversation(conversation);
 
@@ -43,7 +43,7 @@ describe('z.components.UserProfileViewModel', () => {
           },
         };
 
-        viewModel = new z.components.UserProfileViewModel(
+        viewModel = new z.components.UserProfile(
           {
             conversation: TestFactory.conversation_repository.active_conversation,
             user: TestFactory.user_repository.self,

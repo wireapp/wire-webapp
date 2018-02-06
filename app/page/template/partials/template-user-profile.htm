@@ -1,110 +1,110 @@
 <script type="text/html" id="user-profile-template">
-
   <div class="user-profile-transition" data-bind="css: {'user-profile-transition-push': selected_device() != null}">
 
-    <div class="user-profile-default">
-      <div class="user-profile-header">
-        <div class="name popover-title ellipsis" data-bind="text: user().name(), attr: {'data-uie-uid': user().id, 'data-uie-value': user().name()}" data-uie-name="status-user"></div>
-        <div class="username popover-meta label-username" data-bind="text: user().username(), attr: {'data-uie-value': user().name()}" data-uie-name="status-username"></div>
-        <!-- ko if: show_back_button() && $parent.group_mode() -->
-          <div class="user-profile-back-button button-icon icon-back" data-bind="click: on_close, l10n_tooltip: z.string.tooltip_people_back" data-uie-name="do-back"></div>
+    <!-- ko if: user() -->
+      <div class="user-profile-default">
+        <div class="user-profile-header">
+          <div class="name popover-title ellipsis" data-bind="text: user().name(), attr: {'data-uie-uid': user().id, 'data-uie-value': user().name()}" data-uie-name="status-user"></div>
+          <div class="username popover-meta label-username" data-bind="text: user().username(), attr: {'data-uie-value': user().name()}" data-uie-name="status-username"></div>
+          <!-- ko if: show_back_button() && $parent.groupMode() -->
+            <div class="user-profile-back-button button-icon icon-back" data-bind="click: on_close, l10n_tooltip: z.string.tooltip_people_back" data-uie-name="do-back"></div>
+          <!-- /ko -->
+          <!-- ko if: user().is_verified() -->
+            <svg class="user-profile-user-verified" width="16" height="16">
+              <use xlink:href="#icon-verified"></use>
+            </svg>
+          <!-- /ko -->
+        </div>
+
+        <!-- ko if: user().is_connected() || user().is_team_member() -->
+          <div class="user-profile-tabs" data-bind="attr: {'data-tab-index': tab_index}">
+            <span data-uie-name="go-profile-details" class="user-profile-tab" data-bind="click: function() { click_on_tab(0) }, l10n_text: z.string.people_tabs_details"></span>
+            <span data-uie-name="go-profile-devices" class="user-profile-tab" data-bind="click: function() { click_on_tab(1) }, l10n_text: z.string.people_tabs_devices"></span>
+          </div>
         <!-- /ko -->
-        <!-- ko if: user().is_verified() -->
-          <svg class="user-profile-user-verified" width="16" height="16">
-            <use xlink:href="#icon-verified"></use>
-          </svg>
+
+        <!-- ko if: tab_index() === 0 && user() -->
+          <div class="user-profile-details">
+            <!-- ko if: render_avatar -->
+              <div class="user-profile-details-avatar">
+                <participant-avatar class="cursor-default" params="participant: user, size: z.components.ParticipantAvatar.SIZE.X_LARGE" data-uie-name="status-profile-picture"></participant-avatar>
+                <!-- ko if: (mode === z.components.UserProfile.MODE.PEOPLE || user().is_connected()) && user().is_guest() -->
+                  <span class="user-profile-details-guest-badge" data-bind="l10n_text: z.string.conversation_guest_indicator" data-uie-name="status-guest"></span>
+                <!-- /ko -->
+              </div>
+            <!-- /ko -->
+            <!-- if: isTeam -->
+              <availability-state class="user-profile-details-availability"
+                                  data-uie-name="status-availability"
+                                  params="availability: user().availability(), label: userAvailabilityLabel()">
+              </availability-state>
+            <!-- /ko -->
+          </div>
+          <div class="user-profile-footer">
+            <!-- ko template: {name: get_footer_template} --><!-- /ko -->
+          </div>
+        <!-- /ko -->
+
+        <!-- ko if: tab_index() === 1 && user() -->
+          <div class="user-profile-devices">
+            <!-- ko if: devices_found() -->
+              <div class="user-profile-device-message">
+                <div data-bind="text: device_headline"></div>
+                <a data-bind="attr: {href: z.util.URLUtil.build_url(z.util.URLUtil.TYPE.WEBSITE, z.config.URL_PATH.PRIVACY_WHY)}, l10n_text: z.string.people_tabs_devices_why_verify" rel="nofollow noopener noreferrer" target="_blank" class="text-theme"></a>
+              </div>
+              <div data-bind="foreach: user().devices">
+                <div class="user-profile-device" data-bind="click: $parent.click_on_device">
+                  <svg class="user-profile-device-verified" width="16" height="16">
+                    <!-- ko if: meta.is_verified()-->
+                      <use data-uie-name="user-device-verified" xlink:href="#icon-verified"></use>
+                    <!-- /ko -->
+                    <!-- ko ifnot: meta.is_verified()-->
+                      <use data-uie-name="user-device-not-verified" xlink:href="#icon-not-verified"></use>
+                    <!-- /ko -->
+                  </svg>
+                  <device-card params="device: $data, click: $parent.click_on_device"></device-card>
+                </div>
+              </div>
+            <!-- /ko -->
+            <!-- ko ifnot: devices_found() -->
+              <div data-bind="text: no_device_headline"></div>
+              <a data-bind="l10n_text: z.string.people_tabs_devices_learn_more, l10n_href: {type: z.util.URLUtil.TYPE.WEBSITE, path: z.string.url_website_privacy}" rel="nofollow noopener noreferrer" target="_blank" class="text-theme"></a>
+            <!-- /ko -->
+          </div>
         <!-- /ko -->
       </div>
 
-      <!-- ko if: user().is_connected() || user().is_team_member() -->
-        <div class="user-profile-tabs" data-bind="attr: {'data-tab-index': tab_index}">
-          <span class="user-profile-tab" data-bind="click: function() { click_on_tab(0) }, l10n_text: z.string.people_tabs_details" data-uie-name="go-profile-details"></span>
-          <span class="user-profile-tab" data-bind="click: function() { click_on_tab(1) }, l10n_text: z.string.people_tabs_devices" data-uie-name="go-profile-devices"></span>
-        </div>
-      <!-- /ko -->
-
-      <!-- ko if: tab_index() === 0 -->
-        <div class="user-profile-details">
-          <!-- ko if: render_avatar -->
-            <div class="user-profile-details-avatar">
-              <user-avatar class="user-avatar-lg cursor-default" params="user: user" data-uie-name="status-profile-picture"></user-avatar>
-              <!-- ko if: (mode === z.components.UserProfileMode.PEOPLE || user().is_connected()) && user().is_guest() -->
-                <span class="user-profile-details-guest-badge" data-bind="l10n_text: z.string.conversation_guest_indicator" data-uie-name="status-guest"></span>
-              <!-- /ko -->
-            </div>
-          <!-- /ko -->
-          <!-- if: isTeam -->
-            <availability-state class="user-profile-details-availability"
-                                data-uie-name="status-availability"
-                                params="availability: user().availability(), label: userAvailabilityLabel()">
-            </availability-state>
-          <!-- /ko -->
-        </div>
-        <div class="user-profile-footer">
-          <!-- ko template: {name: get_footer_template} --><!-- /ko -->
-        </div>
-      <!-- /ko -->
-
-      <!-- ko if: tab_index() === 1 -->
-        <div class="user-profile-devices">
-          <!-- ko if: devices_found() -->
-            <div class="user-profile-device-message">
-              <div data-bind="text: device_headline"></div>
-              <a data-bind="attr: {href: z.util.URLUtil.build_url(z.util.URLUtil.TYPE.WEBSITE, z.config.URL_PATH.PRIVACY_WHY)}, l10n_text: z.string.people_tabs_devices_why_verify" rel="nofollow noopener noreferrer" target="_blank" class="text-theme"></a>
-            </div>
-            <div data-bind="foreach: user().devices">
-              <div class="user-profile-device" data-bind="click: $parent.click_on_device">
-                <svg class="user-profile-device-verified" width="16" height="16">
-                  <!-- ko if: meta.is_verified()-->
-                    <use xlink:href="#icon-verified" data-uie-name="user-device-verified"></use>
-                  <!-- /ko -->
-                  <!-- ko ifnot: meta.is_verified()-->
-                    <use xlink:href="#icon-not-verified" data-uie-name="user-device-not-verified"></use>
-                  <!-- /ko -->
-                </svg>
-                <device-card params="device: $data, click: $parent.click_on_device"></device-card>
-              </div>
-            </div>
-          <!-- /ko -->
-          <!-- ko ifnot: devices_found() -->
-            <div data-bind="text: no_device_headline"></div>
-            <a data-bind="l10n_text: z.string.people_tabs_devices_learn_more, l10n_href: {type: z.util.URLUtil.TYPE.WEBSITE, path: z.string.url_website_privacy}" rel="nofollow noopener noreferrer" target="_blank" class="text-theme"></a>
-          <!-- /ko -->
-        </div>
-      <!-- /ko -->
-    </div>
-
-    <div class="user-profile-device-detail">
-      <!-- ko if: selected_device()-->
-        <div class="user-profile-back-button button-icon icon-back" data-bind="click: click_on_device_detail_back_button" data-uie-name="do-back"></div>
-        <span class="user-profile-my-device-button user-profile-top-right-button button-label text-theme" data-bind="click: click_on_my_fingerprint_button, l10n_text: z.string.people_tabs_device_detail_show_my_device"></span>
-        <div class="user-profile-device-detail-message">
-          <div data-bind="foreach: detail_message"><span data-bind="css: {'user-profile-device-detail-highlight': $data.isStyled}, text: $data.text">?</span></div>
-          <a data-bind="attr: {href: z.util.URLUtil.build_url(z.util.URLUtil.TYPE.WEBSITE, z.config.URL_PATH.PRIVACY_HOW)}, l10n_text: z.string.people_tabs_device_detail_how_to" rel="nofollow noopener noreferrer" target="_blank" class="text-theme"></a>
-        </div>
-        <device-card class="user-profile-device-detail-card" params="device: selected_device()"></device-card>
-        <div class="user-profile-device-detail-fingerprint" data-bind="foreach: fingerprint_remote()"><span class="device-id-part" data-bind="text: $data"></span></div>
-        <div class="user-profile-device-detail-footer">
-          <div class="slider">
-            <input class="slider-input" type="checkbox" name="toggle" id="toggle" data-bind="checked: selected_device().meta.is_verified">
-            <label class="button-label" for="toggle" data-bind="click: click_on_verify_client, l10n_text: z.string.people_tabs_device_detail_verify"></label>
+      <div class="user-profile-device-detail">
+        <!-- ko if: selected_device()-->
+          <div class="user-profile-back-button button-icon icon-back" data-bind="click: click_on_device_detail_back_button" data-uie-name="do-back"></div>
+          <span class="user-profile-my-device-button user-profile-top-right-button button-label text-theme" data-bind="click: click_on_my_fingerprint_button, l10n_text: z.string.people_tabs_device_detail_show_my_device"></span>
+          <div class="user-profile-device-detail-message">
+            <div data-bind="foreach: detail_message"><span data-bind="css: {'user-profile-device-detail-highlight': $data.isStyled}, text: $data.text">?</span></div>
+            <a data-bind="attr: {href: z.util.URLUtil.build_url(z.util.URLUtil.TYPE.WEBSITE, z.config.URL_PATH.PRIVACY_HOW)}, l10n_text: z.string.people_tabs_device_detail_how_to" rel="nofollow noopener noreferrer" target="_blank" class="text-theme"></a>
           </div>
-          <div class="user-profile-device-reset">
-            <svg class="user-profile-device-reset-spinner svg-theme spin"
-                 data-bind="style : { visibility : is_resetting_session() ? 'visible' : 'hidden' }"
-                 width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" data-uie-name="status-loading">
-              <path class="fill-theme" d="M12.416 12.417c-2.374 2.375-6.28 2.33-8.72-.112-2.444-2.442-2.488-6.347-.113-8.72 1.658-1.66 4.12-2.18 6.343-1.394.477.17 1-.08 1.17-.557.167-.477-.083-1-.56-1.17C7.658-.552 4.453.124 2.286 2.29-.808 5.384-.75 10.448 2.4 13.6c3.15 3.152 8.216 3.21 11.312.113 2.165-2.166 2.84-5.37 1.824-8.25-.168-.476-.692-.726-1.17-.558-.476.17-.726.692-.557 1.17.784 2.222.265 4.684-1.394 6.342z"></path>
-            </svg>
-            <span class="button-label text-theme"
-                  data-bind="style : { visibility : !is_resetting_session() ? 'visible' : 'hidden' },
-                            click: click_on_reset_session, l10n_text: z.string.people_tabs_device_detail_reset_session"></span>
+          <device-card class="user-profile-device-detail-card" params="device: selected_device()"></device-card>
+          <div class="user-profile-device-detail-fingerprint" data-bind="foreach: fingerprint_remote()"><span class="device-id-part" data-bind="text: $data"></span></div>
+          <div class="user-profile-device-detail-footer">
+            <div class="slider">
+              <input class="slider-input" type="checkbox" name="toggle" id="toggle" data-bind="checked: selected_device().meta.is_verified">
+              <label class="button-label" for="toggle" data-bind="click: click_on_verify_client, l10n_text: z.string.people_tabs_device_detail_verify"></label>
+            </div>
+            <div class="user-profile-device-reset">
+              <svg class="user-profile-device-reset-spinner svg-theme spin"
+                   data-bind="style : { visibility : is_resetting_session() ? 'visible' : 'hidden' }"
+                   width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" data-uie-name="status-loading">
+                <path class="fill-theme" d="M12.416 12.417c-2.374 2.375-6.28 2.33-8.72-.112-2.444-2.442-2.488-6.347-.113-8.72 1.658-1.66 4.12-2.18 6.343-1.394.477.17 1-.08 1.17-.557.167-.477-.083-1-.56-1.17C7.658-.552 4.453.124 2.286 2.29-.808 5.384-.75 10.448 2.4 13.6c3.15 3.152 8.216 3.21 11.312.113 2.165-2.166 2.84-5.37 1.824-8.25-.168-.476-.692-.726-1.17-.558-.476.17-.726.692-.557 1.17.784 2.222.265 4.684-1.394 6.342z"></path>
+              </svg>
+              <span class="button-label text-theme"
+                    data-bind="style : { visibility : !is_resetting_session() ? 'visible' : 'hidden' },
+                              click: click_on_reset_session, l10n_text: z.string.people_tabs_device_detail_reset_session"></span>
+            </div>
           </div>
-        </div>
-      <!-- /ko -->
-    </div>
+        <!-- /ko -->
+      </div>
+    <!-- /ko -->
 
   </div>
-
 </script>
 
 <script type="text/html" id="user-profile-footer-add">

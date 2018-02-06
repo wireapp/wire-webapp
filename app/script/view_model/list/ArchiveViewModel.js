@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,39 +27,37 @@ z.ViewModel.list.ArchiveViewModel = class ArchiveViewModel {
   /**
    * View model for the archive.
    *
-   * @param {string} element_id - HTML selector
-   * @param {z.ViewModel.list.ListViewModel} list_view_model - List view model
-   * @param {z.conversation.ConversationRepository} conversation_repository - Conversation repository
+   * @param {string} elementId - HTML selector
+   * @param {z.ViewModel.list.ListViewModel} listViewModel - List view model
+   * @param {z.conversation.ConversationRepository} conversationRepository - Conversation repository
    */
-  constructor(element_id, list_view_model, conversation_repository) {
-    this.click_on_archived_conversation = this.click_on_archived_conversation.bind(this);
-    this.click_on_close_archive = this.click_on_close_archive.bind(this);
-    this.update_list = this.update_list.bind(this);
+  constructor(elementId, listViewModel, conversationRepository) {
+    this.clickOnConversation = this.clickOnConversation.bind(this);
+    this.clickOnClose = this.clickOnClose.bind(this);
+    this.updateList = this.updateList.bind(this);
 
-    this.list_view_model = list_view_model;
-    this.conversation_repository = conversation_repository;
+    this.listViewModel = listViewModel;
+    this.conversationRepository = conversationRepository;
     this.logger = new z.util.Logger('z.ViewModel.list.ArchiveViewModel', z.config.LOGGER.OPTIONS);
 
-    this.conversations_archived = this.conversation_repository.conversations_archived;
+    this.archivedConversations = this.conversationRepository.conversations_archived;
 
-    this.should_update_scrollbar = ko
-      .computed(() => {
-        return this.list_view_model.last_update();
-      })
+    this.shouldUpdateScrollbar = ko
+      .computed(() => this.listViewModel.last_update())
       .extend({notify: 'always', rateLimit: 500});
   }
 
-  click_on_archived_conversation(conversation_et) {
-    this.conversation_repository.unarchive_conversation(conversation_et, 'opened conversation from archive');
-    this.list_view_model.switch_list(z.ViewModel.list.LIST_STATE.CONVERSATIONS);
-    amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversation_et);
+  clickOnConversation(conversationEntity) {
+    this.conversationRepository.unarchive_conversation(conversationEntity, 'opened conversation from archive');
+    this.listViewModel.switch_list(z.ViewModel.list.LIST_STATE.CONVERSATIONS);
+    amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
   }
 
-  click_on_close_archive() {
-    this.list_view_model.switch_list(z.ViewModel.list.LIST_STATE.CONVERSATIONS);
+  clickOnClose() {
+    this.listViewModel.switch_list(z.ViewModel.list.LIST_STATE.CONVERSATIONS);
   }
 
-  update_list() {
-    this.conversation_repository.update_conversations_archived();
+  updateList() {
+    this.conversationRepository.update_conversations_archived();
   }
 };

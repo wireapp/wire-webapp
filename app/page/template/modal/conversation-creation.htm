@@ -1,0 +1,25 @@
+<div id="conversation-creation-modal" data-bind="with: $root.conversationCreation" class="conversation-creation-modal modal modal-large">
+  <div class="modal-content conversation-creation-modal-content">
+    <div class="modal-header conversation-creation-modal-header">
+      <!-- ko if: stateIsParticipants() -->
+        <span class="button-icon icon-back" data-bind="click: clickOnBack" data-uie-name="go-back"></span>
+        <span class="label-xs" data-bind="text: participantsHeaderText"></span>
+        <span class="conversation-creation-modal-action text-theme pull-right" data-bind="click: clickOnCreate, text: participantsActionText"></span>
+      <!-- /ko -->
+      <!-- ko if: stateIsPreferences() -->
+        <span class="button-icon icon-close" data-bind="click: clickOnClose" data-uie-name="do-close"></span>
+        <span class="label-xs" data-bind="l10n_text: z.string.conversation_creation_preferences_header"></span>
+        <span class="conversation-creation-modal-action pull-right" data-bind="click: clickOnNext, css: {'text-theme': nameInput().length}, enable: nameInput().length, l10n_text: z.string.conversation_creation_preferences_action"></span>
+      <!-- /ko -->
+    </div>
+    <div class="modal-center conversation-creation-modal-center">
+      <!-- ko if: stateIsParticipants() -->
+        <user-input class="conversation-creation-modal-participants-input user-list-light" params="input: participantsInput, selected: selectedContacts, placeholder: z.string.conversation_creation_participants_placeholder" spellcheck="false"></user-input>
+        <user-list class="conversation-creation-modal-participants-list user-list-light" params="user: contacts, filter: participantsInput, selected: selectedContacts" data-bind="antiscroll: shouldUpdateScrollbar"></user-list>
+      <!-- /ko -->
+      <!-- ko if: stateIsPreferences() -->
+        <input class="input" autocomplete="off" maxlength="64" required spellcheck="false" type="text" data-bind="textInput: nameInput, hasFocus: true, l10n_placeholder: z.string.conversation_creation_preferences_placeholder">
+      <!-- /ko -->
+    </div>
+  </div>
+</div>

@@ -22,22 +22,24 @@
 window.z = window.z || {};
 window.z.components = z.components || {};
 
-z.components.UserProfileMode = {
-  DEFAULT: 'default',
-  PEOPLE: 'people',
-  SEARCH: 'search',
-};
+z.components.UserProfile = class UserProfile {
+  static get MODE() {
+    return {
+      DEFAULT: 'UserProfile.MODE.DEFAULT',
+      PEOPLE: 'UserProfile.MODE.PEOPLE',
+      SEARCH: 'USerProfile.MODE.SEARCH',
+    };
+  }
 
-z.components.UserProfileViewModel = class UserProfileViewModel {
   constructor(params, component_info) {
     this.dispose = this.dispose.bind(this);
     this.click_on_device = this.click_on_device.bind(this);
 
-    this.logger = new z.util.Logger('z.components.UserProfileViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('z.components.UserProfile', z.config.LOGGER.OPTIONS);
 
     this.user = params.user;
     this.conversation = params.conversation;
-    this.mode = params.mode || z.components.UserProfileMode.DEFAULT;
+    this.mode = params.mode || UserProfile.MODE.DEFAULT;
 
     // repository references
     this.client_repository = window.wire.app.repository.client;
@@ -51,9 +53,11 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
         .is_team_member();
     });
     this.userAvailabilityLabel = ko.pureComputed(() => {
-      const availabilitySetToNone = this.user().availability() === z.user.AvailabilityType.NONE;
-      if (!availabilitySetToNone) {
-        return z.user.AvailabilityMapper.nameFromType(this.user().availability());
+      if (this.user()) {
+        const availabilitySetToNone = this.user().availability() === z.user.AvailabilityType.NONE;
+        if (!availabilitySetToNone) {
+          return z.user.AvailabilityMapper.nameFromType(this.user().availability());
+        }
       }
     });
 
@@ -76,8 +80,9 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
         params.block(this.user());
       }
     };
-    this.on_close = function() {
+    this.on_close = () => {
       if (typeof params.close === 'function') {
+        this.render_avatar(false);
         params.close();
       }
     };
@@ -108,7 +113,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
     };
 
     // cancel request confirm dialog
-    this.confirm_dialog = undefined;
+    this.confirmDialog = undefined;
 
     // tabs
     this.click_on_tab = index => this.tab_index(index);
@@ -125,8 +130,8 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
 
     // destroy confirm dialog when user changes
     this.cleanup_computed = ko.computed(() => {
-      if (this.user() && this.confirm_dialog) {
-        this.confirm_dialog.destroy();
+      if (this.user() && this.confirmDialog) {
+        this.confirmDialog.destroy();
       }
       this.tab_index(0);
       this.devices_found(null);
@@ -184,7 +189,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
     this.on_cancel_request = () => {
       amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
 
-      this.confirm_dialog = this.element.confirm({
+      this.confirmDialog = this.element.confirm({
         confirm: () => {
           const should_block = this.element.find('.checkbox input').is(':checked');
           if (should_block) {
@@ -369,7 +374,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
   }
 
   click_on_my_fingerprint_button() {
-    this.confirm_dialog = $('#participants').confirm({
+    this.confirmDialog = $('#participants').confirm({
       data: {
         click_on_show_my_devices() {
           amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_DEVICES);
@@ -426,7 +431,7 @@ ko.components.register('user-profile', {
   },
   viewModel: {
     createViewModel(params, component_info) {
-      return new z.components.UserProfileViewModel(params, component_info);
+      return new z.components.UserProfile(params, component_info);
     },
   },
 });

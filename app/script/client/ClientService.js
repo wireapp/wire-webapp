@@ -148,7 +148,7 @@ z.client.ClientService = class ClientService {
    * @returns {Promise} Resolves with all the clients payloads
    */
   loadAllClientsFromDb() {
-    return this.storageService.get_all(z.storage.StorageService.OBJECT_STORE.CLIENTS);
+    return this.storageService.getAll(z.storage.StorageService.OBJECT_STORE.CLIENTS);
   }
 
   /**

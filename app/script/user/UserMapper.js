@@ -96,9 +96,9 @@ z.user.UserMapper = class UserMapper {
     }
 
     if (data.assets && data.assets.length > 0) {
-      this._map_profile_assets(user_et, data.assets);
+      z.assets.AssetMapper.mapProfileAssets(user_et, data.assets);
     } else if (data.picture && data.picture.length > 0) {
-      this._map_profile_pictures(user_et, data.picture);
+      z.assets.AssetMapper.mapProfileAssetsV1(user_et, data.picture);
     }
 
     if (data.email) {
@@ -118,36 +118,11 @@ z.user.UserMapper = class UserMapper {
     }
 
     if (data.service) {
-      user_et.is_bot = true;
-      user_et.provider_id = data.service.provider;
-      user_et.service_id = data.service.id;
+      user_et.isBot = true;
+      user_et.providerId = data.service.provider;
+      user_et.serviceId = data.service.id;
     }
 
     return user_et;
-  }
-
-  _map_profile_pictures(user_et, picture) {
-    if (picture[0]) {
-      user_et.preview_picture_resource(z.assets.AssetRemoteData.v1(user_et.id, picture[0].id, true));
-    }
-
-    if (picture[1]) {
-      return user_et.medium_picture_resource(z.assets.AssetRemoteData.v1(user_et.id, picture[1].id, true));
-    }
-  }
-
-  _map_profile_assets(user_et, assets) {
-    return assets.filter(asset => asset.type === 'image').map(asset => {
-      switch (asset.size) {
-        case 'preview':
-          user_et.preview_picture_resource(z.assets.AssetRemoteData.v3(asset.key, true));
-          break;
-        case 'complete':
-          user_et.medium_picture_resource(z.assets.AssetRemoteData.v3(asset.key, true));
-          break;
-        default:
-          break;
-      }
-    });
   }
 };

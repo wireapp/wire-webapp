@@ -67,10 +67,10 @@ window.TestFactory.prototype.exposeAudioActors = function() {
 window.TestFactory.prototype.exposeAuthActors = function() {
   this.logger.info('- exposeAuthActors');
   return Promise.resolve().then(() => {
-    TestFactory.auth_service = new z.auth.AuthService(this.client);
-    TestFactory.auth_service.logger.level = this.settings.logging_level;
+    TestFactory.authService = new z.auth.AuthService(this.client);
+    TestFactory.authService.logger.level = this.settings.logging_level;
 
-    TestFactory.auth_repository = new z.auth.AuthRepository(TestFactory.auth_service);
+    TestFactory.auth_repository = new z.auth.AuthRepository(TestFactory.authService);
     TestFactory.auth_repository.logger.level = this.settings.logging_level;
     return TestFactory.auth_repository;
   });

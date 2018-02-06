@@ -1,4 +1,4 @@
-<div id="preferences-about" class="preferences-page preferences-about">
+<div id="preferences-about" class="preferences-page preferences-about" data-bind="with: $root.preferencesAbout">
   <div class="preferences-titlebar" data-bind="l10n_text: z.string.preferences_about"></div>
   <div class="preferences-content-wrapper">
     <div class="preferences-content" data-bind="antiscroll">
@@ -9,7 +9,7 @@
       </section>
       <section class="preferences-section">
         <header class="preferences-header" data-bind="l10n_text: z.string.wire"></header>
-        <a class="preferences-link" data-bind="attr: {href: z.util.URLUtil.build_url(z.util.URLUtil.TYPE.WEBSITE, z.config.URL_PATH.terms_of_use)}, l10n_text: z.string.preferences_about_terms_of_use" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-legal"></a>
+        <a class="preferences-link" data-bind="click: clickOnToU, l10n_text: z.string.preferences_about_terms_of_use" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-legal"></a>
         <a class="preferences-link" data-bind="l10n_href: {type: z.util.URLUtil.TYPE.WEBSITE, path: z.string.url_website_privacy}, l10n_text: z.string.preferences_about_privacy_policy" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-privacy"></a>
         <a class="preferences-link" data-bind="l10n_href: {type: z.util.URLUtil.TYPE.WEBSITE, path: z.string.url_website_root}, l10n_text: z.string.preferences_about_website" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="go-wire-dot-com"></a>
       </section>

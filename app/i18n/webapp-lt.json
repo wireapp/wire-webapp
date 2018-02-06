@@ -12,7 +12,7 @@
   "teamName.whatIsWireTeamsLink": "Kas yra „Wire“ komandoms?",
   "accountForm.namePlaceholder": "Vardas",
   "accountForm.emailTeamPlaceholder": "tavo@organizacija.lt",
-  "accountForm.emailPersonalPlaceholder": "",
+  "accountForm.emailPersonalPlaceholder": "tavo@adresas.lt",
   "accountForm.passwordPlaceholder": "Slaptažodis (bent 8 simboliai)",
   "accountForm.terms": "Sutinku su<a {linkParams}>nuostatomis ir sąlygomis</a>",
   "accountForm.nextButton": "Kitas",

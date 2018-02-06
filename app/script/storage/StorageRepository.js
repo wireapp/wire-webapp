@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,10 +25,10 @@ window.z.storage = z.storage || {};
 z.storage.StorageRepository = class StorageRepository {
   /**
    * Construct an new Storage Repository.
-   * @param {z.storage.StorageService} storage_service - Service for all storage related interactions
+   * @param {z.storage.StorageService} storageService - Service for all storage related interactions
    */
-  constructor(storage_service) {
-    this.storage_service = storage_service;
+  constructor(storageService) {
+    this.storageService = storageService;
     this.logger = new z.util.Logger('z.storage.StorageRepository', z.config.LOGGER.OPTIONS);
   }
 
@@ -36,10 +36,10 @@ z.storage.StorageRepository = class StorageRepository {
    * Clear all database stores.
    * @returns {Promise} Resolves when stores have been deleted
    */
-  clear_all_stores() {
-    return this.storage_service
-      .clear_all_stores()
-      .then(() => this.logger.info(`Cleared database '${this.storage_service.db_name}'`));
+  clearStores() {
+    return this.storageService
+      .clearStores()
+      .then(() => this.logger.info(`Cleared database '${this.storageService.dbName}'`));
   }
 
   /**
@@ -47,8 +47,8 @@ z.storage.StorageRepository = class StorageRepository {
    * @note Retain history but clean other information.
    * @returns {Promise} Resolves when stores have been deleted
    */
-  delete_cryptography() {
-    return this.storage_service.delete_stores([
+  deleteCryptographyStores() {
+    return this.storageService.deleteStores([
       z.storage.StorageService.OBJECT_STORE.AMPLIFY,
       z.storage.StorageService.OBJECT_STORE.CLIENTS,
       z.storage.StorageService.OBJECT_STORE.KEYS,
@@ -62,19 +62,19 @@ z.storage.StorageRepository = class StorageRepository {
    * @note Nukes it - no way to recover data
    * @returns {Promise} Resolves when database has been deleted
    */
-  delete_everything() {
-    this.logger.warn(`Deleting database '${this.storage_service.db_name}'`);
-    return this.storage_service.delete_everything();
+  deleteDatabase() {
+    this.logger.warn(`Deleting database '${this.storageService.dbName}'`);
+    return this.storageService.deleteDatabase();
   }
 
   /**
    * Get a value for a given primary key from the amplify value store.
    *
-   * @param {string} primary_key - Primary key to retrieve the object for
+   * @param {string} primaryKey - Primary key to retrieve the object for
    * @returns {Promise} Resolves with the retrieved value
    */
-  get_value(primary_key) {
-    return this.storage_service.load(z.storage.StorageService.OBJECT_STORE.AMPLIFY, primary_key).then(record => {
+  getValue(primaryKey) {
+    return this.storageService.load(z.storage.StorageService.OBJECT_STORE.AMPLIFY, primaryKey).then(record => {
       if (record && record.value) {
         return record.value;
       }
@@ -85,12 +85,12 @@ z.storage.StorageRepository = class StorageRepository {
   /**
    * Save a value in the amplify value store.
    *
-   * @param {string} primary_key - Primary key to save the object with
+   * @param {string} primaryKey - Primary key to save the object with
    * @param {value} value - Object to be stored
    * @returns {Promise} Resolves with the primary key
    */
-  save_value(primary_key, value) {
-    return this.storage_service.save(z.storage.StorageService.OBJECT_STORE.AMPLIFY, primary_key, {value: value});
+  saveValue(primaryKey, value) {
+    return this.storageService.save(z.storage.StorageService.OBJECT_STORE.AMPLIFY, primaryKey, {value: value});
   }
 
   /**
@@ -99,6 +99,6 @@ z.storage.StorageRepository = class StorageRepository {
    * @returns {undefined} No return value
    */
   terminate(reason) {
-    this.storage_service.terminate(reason);
+    this.storageService.terminate(reason);
   }
 };

@@ -405,7 +405,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
     const difference = BUBBLE_HEIGHT - largest_distance;
 
     const create_bubble = element_id => {
-      wire.app.view.content.participants.reset_view();
+      wire.app.view.content.participants.resetView();
       this.participant_bubble_last_id = element_id;
       this.participant_bubble = new zeta.webapp.module.Bubble({
         host_selector: `#${element_id}`,
@@ -423,8 +423,8 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
     };
 
     const show_bubble = () => {
-      if (wire.app.view.content.participants.confirm_dialog) {
-        wire.app.view.content.participants.confirm_dialog.destroy();
+      if (wire.app.view.content.participants.confirmDialog) {
+        wire.app.view.content.participants.confirmDialog.destroy();
       }
 
       // We clicked on the same bubble

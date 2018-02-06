@@ -146,7 +146,7 @@ ko.components.register('conversation-list-calling-cell', {
           <group-avatar class="conversation-list-cell-avatar-arrow" params="users: users(), conversation: conversation"></group-avatar>
         <!-- /ko -->
         <!-- ko if: !conversation.is_group() && users().length -->
-          <user-avatar class="user-avatar-s" params="user: users()[0]"></user-avatar>
+          <participant-avatar params="participant: users()[0], size: z.components.ParticipantAvatar.SIZE.SMALL"></participant-avatar>
         <!-- /ko -->
       </div>
       <div class="conversation-list-cell-center">
@@ -204,7 +204,7 @@ ko.components.register('conversation-list-calling-cell', {
     <!-- ko if: show_participants -->
       <div class="conversation-list-calling-cell-participants">
         <!-- ko foreach: call_participants_displayed() -->
-          <user-avatar class="conversation-list-calling-cell-participant user-avatar-xxs" params="user: $data"></user-avatar>
+          <participant-avatar class="conversation-list-calling-cell-participant" params="participant: $data, size: z.components.ParticipantAvatar.SIZE.XX_SMALL"></participant-avatar>
         <!-- /ko -->
         <!-- ko if: call_participants_rest() > 0 -->
           <div class="conversation-list-calling-cell-participants-rest" data-bind="text: call_participants_rest()"></div>

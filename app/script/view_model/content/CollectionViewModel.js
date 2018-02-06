@@ -148,8 +148,8 @@ z.ViewModel.content.CollectionViewModel = class CollectionViewModel {
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.COLLECTION.OPENED_COLLECTIONS, {
       conversation_type: z.tracking.helpers.get_conversation_type(conversation_et),
       is_empty: is_empty,
-      with_bot: conversation_et.is_with_bot(),
       with_search_result: false,
+      with_service: conversation_et.isWithBot(),
     });
   }
 
@@ -157,7 +157,7 @@ z.ViewModel.content.CollectionViewModel = class CollectionViewModel {
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.COLLECTION.OPENED_ITEM, {
       conversation_type: z.tracking.helpers.get_conversation_type(conversation_et),
       type: type,
-      with_bot: conversation_et.is_with_bot(),
+      with_service: conversation_et.isWithBot(),
     });
   }
 };

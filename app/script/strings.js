@@ -50,7 +50,7 @@ export const indexStrings = defineMessages({
   },
   login: {
     id: 'index.login',
-    defaultMessage: 'Log In',
+    defaultMessage: 'Log in',
   },
 });
 

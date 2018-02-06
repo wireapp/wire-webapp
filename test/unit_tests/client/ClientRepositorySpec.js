@@ -38,7 +38,7 @@ describe('z.client.ClientRepository', () => {
 
   beforeEach(done => {
     TestFactory.storage_repository
-      .clear_all_stores()
+      .clearStores()
       .then(done)
       .catch(done.fail);
   });
@@ -136,7 +136,7 @@ describe('z.client.ClientRepository', () => {
 
     it('rejects with an error if client removed on backend', done => {
       spyOn(TestFactory.client_service, 'loadClientFromDb').and.returnValue(Promise.resolve(clientPayloadDatabase));
-      spyOn(TestFactory.storage_service, 'delete_everything').and.returnValue(Promise.resolve(true));
+      spyOn(TestFactory.storage_service, 'deleteDatabase').and.returnValue(Promise.resolve(true));
 
       TestFactory.client_repository
         .getValidLocalClient()

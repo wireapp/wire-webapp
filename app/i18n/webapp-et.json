@@ -12,7 +12,7 @@
   "teamName.whatIsWireTeamsLink": "Mis on Wire meeskondadele?",
   "accountForm.namePlaceholder": "Nimi",
   "accountForm.emailTeamPlaceholder": "sina@sinufirma.ee",
-  "accountForm.emailPersonalPlaceholder": "",
+  "accountForm.emailPersonalPlaceholder": "sina@email.ee",
   "accountForm.passwordPlaceholder": "Parool (vähemalt 8 märki)",
   "accountForm.terms": "Ma nõustun <a {linkParams}>kasutustingimustega</a>",
   "accountForm.nextButton": "Järgmine",

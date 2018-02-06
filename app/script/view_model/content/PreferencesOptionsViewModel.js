@@ -46,7 +46,7 @@ z.ViewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
         }
       })();
 
-      this.propertiesRepository.save_preference(z.properties.PROPERTIES_TYPE.SOUND_ALERTS, audio_preference);
+      this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.SOUND_ALERTS, audio_preference);
       amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SOUND_SETTINGS_CHANGED, {
         value: tracking_value,
       });
@@ -54,7 +54,7 @@ z.ViewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
 
     this.option_emoji_replace_inline = ko.observable();
     this.option_emoji_replace_inline.subscribe(emoji_replace_inline_preference => {
-      this.propertiesRepository.save_preference(
+      this.propertiesRepository.savePreference(
         z.properties.PROPERTIES_TYPE.EMOJI.REPLACE_INLINE,
         emoji_replace_inline_preference
       );
@@ -62,17 +62,17 @@ z.ViewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
 
     this.option_notifications = ko.observable();
     this.option_notifications.subscribe(notifications_preference => {
-      this.propertiesRepository.save_preference(z.properties.PROPERTIES_TYPE.NOTIFICATIONS, notifications_preference);
+      this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.NOTIFICATIONS, notifications_preference);
     });
 
     this.option_previews_send = ko.observable();
     this.option_previews_send.subscribe(previews_send_preference => {
-      this.propertiesRepository.save_preference(z.properties.PROPERTIES_TYPE.PREVIEWS.SEND, previews_send_preference);
+      this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.PREVIEWS.SEND, previews_send_preference);
     });
 
     this.option_privacy = ko.observable();
     this.option_privacy.subscribe(privacy_preference => {
-      this.propertiesRepository.save_preference(z.properties.PROPERTIES_TYPE.PRIVACY, privacy_preference);
+      this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.PRIVACY, privacy_preference);
     });
 
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.update_properties.bind(this));

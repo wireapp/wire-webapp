@@ -46,14 +46,14 @@
 
 .search-list-item-image {
   .search-list-sm & {
-    .square(@avatar-diameter-md);
+    .square(@avatar-diameter-l);
     position: relative;
     margin-bottom: 3px;
   }
 
   .search-list-lg & {
     flex: 0 0 auto;
-    height: @avatar-diameter-sm;
+    height: @avatar-diameter-m;
     position: relative;
   }
 }
@@ -91,12 +91,12 @@
   flex-direction: column;
 
   .search-list-sm & {
-    width: @avatar-diameter-md;
+    width: @avatar-diameter-l;
   }
 
   .search-list-lg & {
     flex: 1 1;
-    height: @avatar-diameter-sm;
+    height: @avatar-diameter-m;
     margin-left: 16px;
     min-width: 0; // this will ensure that ellipses is working
   }
@@ -131,8 +131,8 @@
 
 .search-list-item-header {
   .ellipsis;
-  height: @avatar-diameter-sm;
-  line-height: @avatar-diameter-sm;
+  height: @avatar-diameter-m;
+  line-height: @avatar-diameter-m;
   margin-left: 16px;
   max-width: 184px;
 }
@@ -144,7 +144,7 @@
 
 .search-list-item-guest-indicator {
   font-size: @font-size-xs;
-  height: @avatar-diameter-sm;
+  height: @avatar-diameter-m;
   display: flex;
   align-items: center;
 }

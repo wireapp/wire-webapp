@@ -133,7 +133,7 @@ ko.components.register('full-search', {
     <div class="full-search-list" data-bind="foreach: {data: message_ets_rendered}" data-uie-name="full-search-list">
       <div class="full-search-item" data-bind="click: $parent.on_message_click" data-uie-name="full-search-item">
         <div class="full-search-item-avatar">
-          <user-avatar class="user-avatar-xs" params="user: user()"></user-avatar>
+          <participant-avatar params="participant: user(), size: z.components.ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
         </div>
         <div class="full-search-item-content">
           <div class="full-search-item-content-text ellipsis" data-bind="html: $parent.transform_text($data)" data-uie-name="full-search-item-text"></div>
@@ -142,7 +142,7 @@ ko.components.register('full-search', {
             <span data-bind="text: moment($data.timestamp()).format('MMMM D, YYYY')" data-uie-name="full-search-item-timestamp"></span>
           </div>
         </div>
-        <div class="badge" data-bind="text: matches_count, visible: matches_count  data-uie-name="full-search-item-badge"> 1"></div>
+        <div class="badge" data-bind="text: matches_count, visible: matches_count > 1" data-uie-name="full-search-item-badge"></div>
       </div>
     </div>
   `,

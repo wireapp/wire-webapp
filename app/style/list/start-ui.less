@@ -31,7 +31,12 @@
 }
 
 .start-ui-header {
+  background-color: rgba(255, 255, 255, 0.08);
   padding: 8px;
+  &.start-ui-header-integrations {
+    padding-bottom: 0;
+    margin-bottom: -1px;
+  }
 }
 
 .start-ui-header-icons {
@@ -96,6 +101,38 @@
   }
 }
 
+.start-ui-list-tabs {
+  display: flex;
+  height: 44px;
+  padding: 0 8px;
+
+  .start-ui-list-tab {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+    justify-content: center;
+    border-bottom: 1px solid transparent;
+    opacity: 0.56;
+    color: #fff;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+
+    &.active {
+      border-bottom-color: #fff;
+      opacity: 1;
+      cursor: default;
+    }
+  }
+}
+
+.start-ui-invite-people {
+  position: relative;
+  padding: 0;
+  margin: 0 0 -16px -24px;
+}
+
 .start-ui-list-top-people {
   overflow: hidden;
 
@@ -149,10 +186,111 @@
 }
 
 .start-ui-user-bubble {
-  user-profile {
+  user-profile,
+  .start-ui-service {
+    .bubble-content();
     background: #fff;
     border-radius: 4px;
+    color: @graphite-dark;
     margin: -@bubble-border-radius;
+    position: relative;
+  }
+
+  .start-ui-service-body {
+    display: flex;
+    flex-basis: 104px;
+    flex-direction: column;
+    flex-grow: 1;
+    border-radius: 4px;
+    padding: 16px;
+    background-color: @app-bg;
+  }
+
+  .start-ui-service-button {
+    .button();
+    width: 100%;
+    height: 48px;
+  }
+
+  .start-ui-service-conversations {
+    flex-grow: 1;
+    flex-basis: 336px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 4px;
+
+    .start-ui-service-conversations-input {
+      margin: 8px 8px 0;
+    }
+
+    .start-ui-service-conversations-create {
+      display: flex;
+      align-items: center;
+      height: 56px;
+      cursor: pointer;
+
+      .icon-plus {
+        width: 60px;
+        text-align: center;
+      }
+
+      .start-ui-service-conversations-create-text {
+        font-size: 14px;
+        font-weight: 400;
+      }
+    }
+
+    .start-ui-service-conversations-list {
+      height: 296px;
+    }
+  }
+
+  .start-ui-service-details {
+    display: flex;
+  }
+
+  .start-ui-service-details-content {
+    margin-left: 16px;
+  }
+
+  .start-ui-service-description {
+    font-size: 14px;
+    margin-top: 16px;
+    padding: 8px;
+  }
+
+  .start-ui-service-header {
+    flex-basis: 48px;
+    padding: 16px;
+    display: flex;
+  }
+
+  .start-ui-service-footer {
+    padding: 24px;
+  }
+
+  .start-ui-service-name {
+    font-size: 24px;
+    line-height: 32px;
+    font-weight: @font-weight-regular;
+  }
+
+  .start-ui-service-provider {
+    margin-top: 4px;
+    font-size: 12px;
+    line-height: 16px;
+    opacity: 0.56;
+  }
+
+  &.start-ui-service-bubble.bubble-left-top,
+  &.start-ui-service-bubble.bubble-left,
+  &.start-ui-service-bubble-conversation-list.bubble-left-top {
+    &:before {
+      background-color: @app-bg;
+    }
+    &:after {
+      background: linear-gradient(-45deg, @app-bg 0%, @app-bg 50%, transparent 50%, transparent 100%);
+    }
   }
 }
 
