@@ -62,14 +62,14 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
 
     this._get_caption_connection = function(user_et) {
       if (user_et.is_blocked()) {
-        return z.l10n.text(z.string.conversation_connection_blocked);
+        return z.l10n.text(z.string.conversationConnectionBlocked);
       }
 
       if (user_et.is_outgoing_request()) {
         return '';
       }
 
-      return z.l10n.text(z.string.conversation_connection_accepted);
+      return z.l10n.text(z.string.conversationConnectionAccepted);
     };
 
     this.show_large_avatar = () => {

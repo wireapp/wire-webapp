@@ -157,7 +157,7 @@ z.components.UserProfile = class UserProfile {
     });
 
     const shortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.ADD_PEOPLE);
-    this.add_people_tooltip = z.l10n.text(z.string.tooltip_people_add, shortcut);
+    this.add_people_tooltip = z.l10n.text(z.string.tooltipPeopleAdd, shortcut);
 
     this.device_headline = ko.pureComputed(() => {
       return z.l10n.text(z.string.people_tabs_devices_headline, this.user().first_name());
