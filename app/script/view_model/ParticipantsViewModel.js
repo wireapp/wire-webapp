@@ -214,6 +214,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     }
 
     amplify.publish(z.event.WebApp.CONVERSATION.CREATE_GROUP, this.selectedParticipant());
+    this.participantsBubble.hide();
   }
 
   clickOnAddService() {
