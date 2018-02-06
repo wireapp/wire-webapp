@@ -33,6 +33,8 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
   constructor(elementId, conversationRepository, teamRepository, userRepository) {
     this.logger = new z.util.Logger('z.ViewModel.content.GroupCreationViewModel', z.config.LOGGER.OPTIONS);
 
+    this.clickOnCreate = this.clickOnCreate.bind(this);
+
     this.elementId = elementId;
     this.conversationRepository = conversationRepository;
     this.teamRepository = teamRepository;
@@ -85,7 +87,7 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
     //this._resetView();
 
     if (!this.modal) {
-      this.modal = new zeta.webapp.module.Modal('#group-creation-modal');
+      this.modal = new zeta.webapp.module.Modal('#group-creation-modal', this._afterHideModal.bind(this));
     }
 
     if (userEntity) {
@@ -100,7 +102,7 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
   }
 
   clickOnClose() {
-    this._resetView();
+    this._hideModal();
   }
 
   clickOnCreate() {
@@ -110,7 +112,7 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
       this.conversationRepository
         .createGroupConversation(this.selectedContacts(), this.nameInput())
         .then(conversationEntity => {
-          this._resetView();
+          this._hideModal();
           amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
         })
         .catch(error => {
@@ -143,15 +145,18 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
       .trim()
       .slice(0, 64);
   }
-  _resetView() {
-    if (this.modal) {
-      this.modal.hide();
-    }
 
+  _afterHideModal() {
     this.isCreatingConversation = false;
     this.nameInput('');
     this.participantsInput('');
     this.selectedContacts([]);
     this.state(GroupCreationViewModel.STATE.PREFERENCES);
+  }
+
+  _hideModal() {
+    if (this.modal) {
+      this.modal.hide();
+    }
   }
 };
