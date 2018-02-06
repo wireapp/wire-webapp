@@ -47,16 +47,22 @@
             <!-- ko if: showTopPeople() -->
               <div class="start-ui-list-top-people" data-uie-name="status-top-people">
                 <span class="start-ui-list-header start-ui-list-header-top-people" data-bind="l10n_text: z.string.search_top_people"></span>
-                <top-people class="search-list-theme-black" params="user: topUsers, selected: selectedPeople"></top-people>
+                <top-people class="search-list-theme-black" params="user: topUsers, click: clickOnContact"></top-people>
               </div>
             <!-- /ko -->
             <!-- ko if: showContacts() -->
               <div class="start-ui-list-contacts" data-uie-name="status-contacts">
-                <!-- ko if: isTeam() -->
-                  <span class="start-ui-list-header start-ui-list-header-contacts" data-bind="l10n_text: z.string.search_contacts"></span>
-                <!-- /ko -->
                 <!-- ko ifnot: isTeam() -->
                   <span class="start-ui-list-header" data-bind="l10n_text: z.string.search_connections"></span>
+                <!-- /ko -->
+                <ul class="start-ui-create-group left-list-items">
+                  <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnCreateGroup" data-uie-name="do-create-group">
+                    <div class="left-column icon-group"></div>
+                    <div class="center-column" data-bind="l10n_text: z.string.search_create_group"></div>
+                  </li>
+                </ul>
+                <!-- ko if: isTeam() -->
+                  <span class="start-ui-list-header start-ui-list-header-contacts" data-bind="l10n_text: z.string.search_contacts"></span>
                 <!-- /ko -->
                 <user-list class="search-list-theme-black" params="user: contacts, click: clickOnContact"></user-list>
               </div>

@@ -17,53 +17,36 @@
  *
  */
 
-.conversation-creation-modal {
-  .conversation-creation-modal-action {
+.group-creation-modal {
+  .group-creation-modal-action {
     &:enabled {
       cursor: pointer;
     }
   }
 
-  .conversation-creation-modal-center {
+  .group-creation-modal-center {
     background-color: @app-bg;
     margin: 0;
     overflow: hidden;
+    width: 100%;
   }
 
-  .conversation-creation-modal-content {
+  .group-creation-modal-content {
     padding: 0;
   }
 
-  .conversation-creation-modal-header {
+  .group-creation-modal-header {
     margin: 24px 8px 8px;
     align-items: center;
     display: flex;
     justify-content: space-between;
   }
 
-  .conversation-creation-modal-participants-input {
+  .group-creation-modal-participants-input {
     background-color: #fff;
     margin: 0 8px 8px;
   }
 
-  .conversation-creation-modal-participants-list {
-    .full-screen();
-    left: 16px;
-    font-weight: 300;
-    overflow-x: hidden;
-    overflow-y: scroll;
-    padding-right: 16px;
-
-    .everyone-participates {
-      .text-center;
-      font-weight: 400;
-      line-height: 24px;
-      margin: 106px 18px;
-      white-space: pre;
-    }
-
-    user-list {
-      margin-top: 16px;
-    }
+  .group-creation-modal-participants-list {
   }
 }
