@@ -241,6 +241,9 @@ z.string.tr.conversation_send_pasted_file = 'Yapıştırılmış resim, {{date}}
 z.string.tr.conversation_someone = 'Birisi';
 z.string.tr.conversation_tweet_author = ' Twitter’da';
 
+z.string.tr.conversation_creation_preferences_action = 'İleri';
+z.string.tr.conversation_creation_participants_placeholder = 'İsme göre ara';
+
 z.string.tr.collection_show_all = '{{number}}’nun tümünü göster';
 z.string.tr.collection_section_links = 'Bağlantılar';
 z.string.tr.collection_section_images = 'Resimler';
