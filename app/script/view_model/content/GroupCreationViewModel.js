@@ -121,19 +121,21 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
   }
 
   clickOnNext() {
-    this.nameInput(this._normalizeNameInput());
+    if (this.nameInput().length) {
+      this.nameInput(this._normalizeNameInput());
 
-    const nameTooLong = this.nameInput().length > z.conversation.ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
-    if (nameTooLong) {
-      return this.nameError(z.l10n.text(z.string.group_creation_preferences_error_name_long));
+      const nameTooLong = this.nameInput().length > z.conversation.ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
+      if (nameTooLong) {
+        return this.nameError(z.l10n.text(z.string.group_creation_preferences_error_name_long));
+      }
+
+      const nameTooShort = !this.nameInput().length;
+      if (nameTooShort) {
+        return this.nameError(z.l10n.text(z.string.group_creation_preferences_error_name_short));
+      }
+
+      return this.state(GroupCreationViewModel.STATE.PARTICIPANTS);
     }
-
-    const nameTooShort = !this.nameInput().length;
-    if (nameTooShort) {
-      return this.nameError(z.l10n.text(z.string.group_creation_preferences_error_name_short));
-    }
-
-    return this.state(GroupCreationViewModel.STATE.PARTICIPANTS);
   }
 
   _normalizeNameInput() {

@@ -14,11 +14,12 @@
     </div>
     <div class="modal-center group-creation-modal-center">
       <!-- ko if: stateIsParticipants() -->
-        <user-input class="group-creation-modal-participants-input user-list-light" params="input: participantsInput, selected: selectedContacts, placeholder: z.string.group_creation_participants_placeholder" spellcheck="false"></user-input>
+        <user-input class="group-creation-modal-participants-input user-list-light" params="input: participantsInput, selected: selectedContacts, placeholder: z.string.group_creation_participants_placeholder, enter: clickOnNext" spellcheck="false"></user-input>
         <user-list class="group-creation-modal-participants-list user-list-light" params="user: contacts, filter: participantsInput, selected: selectedContacts" data-bind="antiscroll: shouldUpdateScrollbar"></user-list>
       <!-- /ko -->
       <!-- ko if: stateIsPreferences() -->
-        <input class="input" autocomplete="off" maxlength="64" required spellcheck="false" type="text" data-bind="textInput: nameInput, hasFocus: true, l10n_placeholder: z.string.group_creation_preferences_placeholder">
+        <input class="input" autocomplete="off" maxlength="64" required spellcheck="false" type="text" data-bind="textInput: nameInput, hasFocus: true, l10n_placeholder: z.string.group_creation_preferences_placeholder, enter: clickOnNext">
+        <div data-bind="text: nameError, visible: nameError().length"></div>
       <!-- /ko -->
     </div>
   </div>
