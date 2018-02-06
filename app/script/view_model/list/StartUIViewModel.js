@@ -135,11 +135,10 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.hasCreatedConversation = ko.observable(false);
 
     // View states
-    this.hasSearchResults = ko.pureComputed(() => {
-      return (
+    this.hasSearchResults = ko.pureComputed(
+      () =>
         this.searchResults.groups().length || this.searchResults.contacts().length || this.searchResults.others().length
-      );
-    });
+    );
 
     this.enableIntegrations = this.integrationRepository.enableIntegrations;
 
