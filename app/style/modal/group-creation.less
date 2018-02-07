@@ -19,7 +19,10 @@
 
 .group-creation-modal {
   .group-creation-modal-action {
-    &:enabled {
+    opacity: 0.32;
+    transition: all 0.25s ease-in-out;
+    &.enabled {
+      opacity: 1;
       cursor: pointer;
     }
   }
@@ -33,18 +36,47 @@
 
   .group-creation-modal-content {
     padding: 0;
+    width: 423px;
   }
 
   .group-creation-modal-header {
-    margin: 24px 8px 8px;
+    margin: 0 16px;
+    min-height: 44px;
     align-items: center;
     display: flex;
     justify-content: space-between;
+    .icon-close {
+      margin: 0;
+    }
+  }
+  .group-creation-modal-title,
+  .group-creation-modal-action {
+    .label-bold-xs();
+    line-height: 12px;
   }
 
-  .group-creation-modal-participants-input {
+  .group-creation-modal-teamname-input {
     background-color: #fff;
-    margin: 0 8px 8px;
+    color: @graphite-dark;
+    margin: 59px 0 0;
+    height: 56px;
+    line-height: 56px;
+    border-radius: 0;
+    &::placeholder {
+      color: @graphite;
+      font-size: 11px;
+      padding: 0 10px;
+    }
+  }
+  .group-creation-modal-participants-input {
+    margin: 8px;
+  }
+
+  user-list {
+    .search-list-item {
+      align-items: center;
+      margin: 0 16px;
+    }
   }
 
   .group-creation-modal-participants-list {
