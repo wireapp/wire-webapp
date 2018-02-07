@@ -220,11 +220,7 @@ z.calling.entities.Call = class Call {
 
       this.terminationReason = terminationReason;
       callMessageEt.userId = this.creatingUser.id;
-      this.callingRepository.inject_deactivate_event(
-        callMessageEt,
-        z.event.EventRepository.SOURCE.WEB_SOCKET,
-        reason
-      );
+      this.callingRepository.inject_deactivate_event(callMessageEt, z.event.EventRepository.SOURCE.WEB_SOCKET, reason);
 
       return this.callingRepository.deleteCall(this.id);
     }
@@ -510,12 +506,7 @@ z.calling.entities.Call = class Call {
   confirmMessage(incomingCallMessageEt) {
     const {clientId, type, userId} = incomingCallMessageEt;
 
-    const additionalPayload = z.calling.CallMessageBuilder.createPayload(
-      this.id,
-      this.selfUser.id,
-      userId,
-      clientId
-    );
+    const additionalPayload = z.calling.CallMessageBuilder.createPayload(this.id, this.selfUser.id, userId, clientId);
     let callMessageEt;
 
     switch (type) {

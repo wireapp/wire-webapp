@@ -234,11 +234,7 @@ z.calling.entities.Flow = class Flow {
     });
 
     this.canSetRemoteSdp = ko.pureComputed(() => {
-      return (
-        this.pcInitialized() &&
-        this.shouldSetRemoteSdp() &&
-        this.properRemoteSdpState() &&
-        !this.sdpStateChanging()
+      return ( this.pcInitialized() && this.shouldSetRemoteSdp() && this.properRemoteSdpState() &&!this.sdpStateChanging()
       );
     });
 
@@ -323,10 +319,7 @@ z.calling.entities.Flow = class Flow {
    * @param {MediaStream} [mediaStream=this.mediaStream()] - Local media stream
    * @returns {undefined} No return value
    */
-  startNegotiation(
-    negotiationMode = z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT,
-    mediaStream = this.mediaStream()
-  ) {
+  startNegotiation(negotiationMode = z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT, mediaStream = this.mediaStream()) {
     this.logger.info(
       `Start negotiating PeerConnection with '${this.remoteUser.name()}' triggered by '${negotiationMode}'`
     );
@@ -353,11 +346,7 @@ z.calling.entities.Flow = class Flow {
     this.participantEt.isConnected(false);
 
     this.callEt
-      .deleteParticipant(
-        this.participantEt.id,
-        this.remoteClientId,
-        z.calling.enum.TERMINATION_REASON.CONNECTION_DROP
-      )
+      .deleteParticipant(this.participantEt.id, this.remoteClientId, z.calling.enum.TERMINATION_REASON.CONNECTION_DROP)
       .then(() => {
         if (!this.callEt.participants().length) {
           if (!terminationReason) {

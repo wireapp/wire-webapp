@@ -654,12 +654,7 @@ z.calling.CallingRepository = class CallingRepository {
             callMessageEt.type = z.calling.enum.CALL_MESSAGE_TYPE.CANCEL;
           }
 
-          return this.conversationRepository.sendECall(
-            conversationEt,
-            callMessageEt,
-            recipients,
-            preconditionOption
-          );
+          return this.conversationRepository.sendECall(conversationEt, callMessageEt, recipients, preconditionOption);
         });
       })
       .then(() => this.logMessage(true, callMessageEt));
@@ -898,11 +893,7 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {undefined} No return value
    */
   participantLeft(conversationId, userId) {
-    const additionalPayload = z.calling.CallMessageBuilder.createPayload(
-      conversationId,
-      this.selfUserId(),
-      userId
-    );
+    const additionalPayload = z.calling.CallMessageBuilder.createPayload(conversationId, this.selfUserId(), userId);
     const callMessageEt = z.calling.CallMessageBuilder.buildGroupLeave(false, this.sessionId, additionalPayload);
 
     this.onGroupLeave(callMessageEt, z.calling.enum.TERMINATION_REASON.MEMBER_LEAVE);
