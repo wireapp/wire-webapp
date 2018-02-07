@@ -37,23 +37,23 @@ z.calling.entities.CallMessage = class CallMessage {
    * @class z.calling.entities.CallMessage
    * @param {z.calling.enum.CALL_MESSAGE_TYPE} type - Type of call message
    * @param {boolean} [response=false] - Is message a response, defaults to false
-   * @param {string} session_id - Optional session ID
+   * @param {string} sessionId - Optional session ID
    */
-  constructor(type, response = false, session_id) {
+  constructor(type, response = false, sessionId) {
     this.type = type;
     this.response = response;
-    this.session_id = session_id || this._create_session_id();
+    this.sessionId = sessionId || this.createSessionId();
   }
 
   /**
    * Add additional payload to message.
-   * @param {Object} [additional_properties={}] - Optional object containing additional message payload
+   * @param {Object} [additionalProperties={}] - Optional object containing additional message payload
    * @returns {undefined} No return value
    */
-  add_properties(additional_properties = {}) {
-    for (const key in additional_properties) {
-      if (additional_properties.hasOwnProperty(key)) {
-        this[key] = additional_properties[key];
+  addProperties(additionalProperties = {}) {
+    for (const key in additionalProperties) {
+      if (additionalProperties.hasOwnProperty(key)) {
+        this[key] = additionalProperties[key];
       }
     }
   }
@@ -62,48 +62,48 @@ z.calling.entities.CallMessage = class CallMessage {
    * Cast call message to JSON.
    * @returns {{version: string, resp: boolean, sessid: string, type: z.calling.enum.CALL_MESSAGE_TYPE}} - JSON representation of call message
    */
-  to_JSON() {
-    const json_payload = {
+  toJSON() {
+    const jsonPayload = {
       resp: this.response,
-      sessid: this.session_id,
+      sessid: this.sessionId,
       type: this.type,
       version: CallMessage.CONFIG.VERSION,
     };
 
-    const extended_message_types = [
+    const extendedMessageTypes = [
       z.calling.enum.CALL_MESSAGE_TYPE.GROUP_SETUP,
       z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC,
       z.calling.enum.CALL_MESSAGE_TYPE.SETUP,
       z.calling.enum.CALL_MESSAGE_TYPE.UPDATE,
     ];
 
-    if (extended_message_types.includes(this.type)) {
-      json_payload.props = this.props;
+    if (extendedMessageTypes.includes(this.type)) {
+      jsonPayload.props = this.props;
       if (this.type !== z.calling.enum.CALL_MESSAGE_TYPE.PROP_SYNC) {
-        json_payload.sdp = this.sdp;
+        jsonPayload.sdp = this.sdp;
       }
     }
 
-    const targeted_message_types = [
+    const targetedMessageTypes = [
       z.calling.enum.CALL_MESSAGE_TYPE.CANCEL,
       z.calling.enum.CALL_MESSAGE_TYPE.GROUP_SETUP,
       z.calling.enum.CALL_MESSAGE_TYPE.UPDATE,
     ];
 
-    if (targeted_message_types.includes(this.type)) {
-      json_payload.dest_clientid = this.remote_client_id;
-      json_payload.dest_userid = this.remote_user_id;
+    if (targetedMessageTypes.includes(this.type)) {
+      jsonPayload.destClientid = this.remoteClientId;
+      jsonPayload.destUserid = this.remoteUserId;
     }
 
-    return json_payload;
+    return jsonPayload;
   }
 
   /**
    * Cast call message to string.
    * @returns {string} Stringified JSON representation of call message
    */
-  to_content_string() {
-    return JSON.stringify(this.to_JSON());
+  toContentString() {
+    return JSON.stringify(this.toJSON());
   }
 
   /**
@@ -111,9 +111,9 @@ z.calling.entities.CallMessage = class CallMessage {
    * @private
    * @returns {string} Random char session ID of length CallMessage.CONFIG.SESSION_ID_LENGTH
    */
-  _create_session_id() {
+  createSessionId() {
     return _.range(CallMessage.CONFIG.SESSION_ID_LENGTH)
-      .map(() => z.util.StringUtil.get_random_character())
+      .map(() => z.util.StringUtil.getRandomCharacter())
       .join('');
   }
 };
