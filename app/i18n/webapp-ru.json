@@ -5,7 +5,7 @@
   "index.createTeam": "Создать команду",
   "index.createTeamFor": "для работы",
   "index.loginInfo": "Уже зарегистрированы?",
-  "index.login": "Войти",
+  "index.login": "Вход",
   "teamName.headline": "Назовите команду",
   "teamName.subhead": "Вы всегда можете изменить название позже.",
   "teamName.teamNamePlaceholder": "Название команды",
@@ -15,7 +15,7 @@
   "accountForm.emailPersonalPlaceholder": "you@email.com",
   "accountForm.passwordPlaceholder": "Пароль (минимум 8 символов)",
   "accountForm.terms": "Я принимаю <a {linkParams}>положения и условия</a>",
-  "accountForm.nextButton": "Вперед",
+  "accountForm.submitButton": "Вперед",
   "createAccount.nextButton": "Вперед",
   "invite.nextButton": "Вперед",
   "createAccount.headLine": "Настройка учетной записи",
@@ -63,6 +63,7 @@
     "Этот адрес электронной почты уже используется. <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://support.wire.com/hc/articles/115004082129\">Подробнее</a>",
   "BackendError.unexpected": "Неожиданная ошибка ({code} {message})",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Введите имя с минимум 2 символами",
+  "ValidationError.FIELD.NAME.VALUE_MISSING": "Введите имя с минимум 2 символами",
   "ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH": "Введите пароль длиной не менее 8 символов",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": "Пожалуйста, введите правильный email"
 }

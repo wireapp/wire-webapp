@@ -5,7 +5,7 @@
   "index.createTeam": "Opret team",
   "index.createTeamFor": "",
   "index.loginInfo": "",
-  "index.login": "",
+  "index.login": "Log ind",
   "teamName.headline": "",
   "teamName.subhead": "",
   "teamName.teamNamePlaceholder": "",
@@ -15,7 +15,7 @@
   "accountForm.emailPersonalPlaceholder": "",
   "accountForm.passwordPlaceholder": "Adgangskode (mindst 8 tegn)",
   "accountForm.terms": "",
-  "accountForm.nextButton": "",
+  "accountForm.submitButton": "",
   "createAccount.nextButton": "",
   "invite.nextButton": "",
   "createAccount.headLine": "",
@@ -61,6 +61,7 @@
   "BackendError.LABEL.EMAIL_EXISTS": "",
   "BackendError.unexpected": "",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Indtast et navn på mindst to karakterer",
+  "ValidationError.FIELD.NAME.VALUE_MISSING": "Indtast et navn på mindst to karakterer",
   "ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH": "",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": ""
 }

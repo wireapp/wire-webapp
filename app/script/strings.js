@@ -95,7 +95,7 @@ export const accountFormStrings = defineMessages({
     defaultMessage: 'I accept the <a {linkParams}>terms and conditions</a>',
   },
   submitButton: {
-    id: 'accountForm.nextButton',
+    id: 'accountForm.submitButton',
     defaultMessage: 'Next',
   },
 });
@@ -299,6 +299,10 @@ export const errorHandlerStrings = defineMessages({
 export const validationErrorStrings = defineMessages({
   [ValidationError.FIELD.NAME.PATTERN_MISMATCH]: {
     id: 'ValidationError.FIELD.NAME.PATTERN_MISMATCH',
+    defaultMessage: 'Enter a name with at least 2 characters',
+  },
+  [ValidationError.FIELD.NAME.VALUE_MISSING]: {
+    id: 'ValidationError.FIELD.NAME.VALUE_MISSING',
     defaultMessage: 'Enter a name with at least 2 characters',
   },
   [ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH]: {

@@ -15,7 +15,7 @@
   "accountForm.emailPersonalPlaceholder": "",
   "accountForm.passwordPlaceholder": "Mot de passe (8 caractères minimum)",
   "accountForm.terms": "J’accepte les <a {linkParams}>termes et conditions</a>",
-  "accountForm.nextButton": "Suivant",
+  "accountForm.submitButton": "Suivant",
   "createAccount.nextButton": "Suivant",
   "invite.nextButton": "Suivant",
   "createAccount.headLine": "Configurez votre compte",
@@ -63,6 +63,7 @@
     "Cette adresse e-mail est déjà utilisée. <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://support.wire.com/hc/articles/115004082129\">En savoir plus</a>",
   "BackendError.unexpected": "Erreur inattendue ({code} {message})",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Saisissez un nom composé d’au moins 2 caractères",
+  "ValidationError.FIELD.NAME.VALUE_MISSING": "Saisissez un nom composé d’au moins 2 caractères",
   "ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH": "Saisir un mot de passe contenant au moins 8 caractères",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": "Veuillez saisir une adresse e-mail valide"
 }
