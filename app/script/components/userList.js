@@ -46,6 +46,7 @@ z.components.UserList = class UserList {
     this.selectedUsers = params.selected;
     this.mode = params.mode || UserList.MODE.DEFAULT;
     this.userEntities = params.user;
+    this.isSelectEnabled = typeof params.selected === 'function';
 
     this.isCompactMode = this.mode === UserList.MODE.COMPACT;
     this.isDefaultMode = this.mode === UserList.MODE.DEFAULT;
@@ -59,7 +60,7 @@ z.components.UserList = class UserList {
     });
 
     this.onUserClick = (userEntity, event) => {
-      if (typeof this.selectedUsers === 'function') {
+      if (this.isSelectEnabled) {
         if (this.isSelected(userEntity)) {
           this.selectedUsers.remove(userEntity);
         } else {
@@ -85,7 +86,7 @@ z.components.UserList = class UserList {
     });
 
     this.isSelected = userEntity => {
-      if (typeof this.selectedUsers === 'function') {
+      if (this.isSelectEnabled) {
         return this.selectedUsers().includes(userEntity);
       }
     };
@@ -121,7 +122,7 @@ ko.components.register('user-list', {
 
         <!-- ko ifnot: $parent.isCompactMode -->
           <div class="search-list-item-image">
-            <participant-avatar params="participant: $data, selected: $parent.isSelected($data), size: z.components.ParticipantAvatar.SIZE.MEDIUM"></participant-avatar>
+            <participant-avatar params="participant: $data, size: z.components.ParticipantAvatar.SIZE.MEDIUM"></participant-avatar>
             <div class="search-list-item-image-overlay">
               <div class="background"></div>
               <div class="checkmark icon-check"></div>
@@ -149,6 +150,9 @@ ko.components.register('user-list', {
             <div class="search-list-item-guest-indicator" data-uie-name="status-guest">
               <div class="search-list-item-guest-indicator-badge" data-bind="l10n_text: z.string.conversation_guest_indicator"></div>
             </div>
+          <!-- /ko -->
+          <!-- ko if: $parent.isSelectEnabled -->
+            <div class="search-list-item-select icon-check" data-bind="css: {'selected': $parent.isSelected($data)}"></div>
           <!-- /ko -->
         <!-- /ko -->
       </div>

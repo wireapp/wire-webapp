@@ -57,7 +57,11 @@
                 <!-- /ko -->
                 <ul class="start-ui-create-group left-list-items">
                   <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnCreateGroup" data-uie-name="do-create-group">
-                    <div class="left-column icon-group"></div>
+                    <div class="left-column">
+                      <svg width="16" height="16" viewBox="0 0 16 16">
+                        <path fill="#fff" d="M8 4a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 12a2 2 0 1 1 0-4 2 2 0 0 1 0 4zM2 7a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm12 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0-6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"></path>
+                      </svg>
+                    </div>
                     <div class="center-column" data-bind="l10n_text: z.string.search_create_group"></div>
                   </li>
                 </ul>
@@ -174,11 +178,7 @@
                     <div class="start-ui-service-conversations-create-text" data-bind="text: z.string.people_service_new_conversation"></div>
                   </div>
                   <!-- ko foreach: serviceConversations() -->
-                    <conversation-list-cell
-                      params="conversation: $data"
-                      data-bind="click: $parent.clickToAddService"
-                      data-uie-name="item-conversation">
-                    </conversation-list-cell>
+                    <conversation-list-cell params="conversation: $data" data-bind="click: $parent.clickToAddService" data-uie-name="item-conversation"></conversation-list-cell>
                   <!-- /ko -->
                 </div>
               </div>

@@ -149,6 +149,30 @@
   align-items: center;
 }
 
+.search-list-item-select {
+  .square(24px);
+  display: block;
+  border: 2px solid fade(@graphite-dark, 0.64);
+  border-radius: 12px;
+  margin: 8px 0 8px 16px;
+
+  &::before {
+    color: #fff;
+    font-size: 12px;
+    margin-left: 4.5px;
+    opacity: 0;
+  }
+
+  &.selected {
+    border: 2px solid @graphite-dark;
+    background-color: @graphite-dark;
+
+    &::before {
+      opacity: 1;
+    }
+  }
+}
+
 .search-list-item-guest-indicator-badge {
   .guest-badge;
 
