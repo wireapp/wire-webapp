@@ -2,29 +2,26 @@
   <div class="modal-content group-creation-modal-content">
     <div class="modal-header group-creation-modal-header">
       <!-- ko if: stateIsParticipants() -->
-      <span class="button-icon icon-back" data-bind="click: clickOnBack" data-uie-name="go-back"></span>
-      <span class="label-xs group-creation-modal-title" data-bind="text: participantsHeaderText"></span>
-      <span class="group-creation-modal-action text-theme pull-right enabled" data-bind="click: clickOnCreate, text: participantsActionText"></span>
+        <span class="button-icon icon-back" data-bind="click: clickOnBack" data-uie-name="go-back"></span>
+        <span class="label-xs group-creation-modal-title" data-bind="text: participantsHeaderText"></span>
+        <span class="group-creation-modal-action text-theme pull-right enabled" data-bind="click: clickOnCreate, text: participantsActionText"></span>
       <!-- /ko -->
       <!-- ko if: stateIsPreferences() -->
-      <span class="button-icon icon-close" data-bind="click: clickOnClose" data-uie-name="do-close"></span>
-      <span class="label-xs group-creation-modal-title" data-bind="l10n_text: z.string.group_creation_preferences_header"></span>
-      <span class="group-creation-modal-action pull-right" data-bind="click: clickOnNext, css: {'text-theme': nameInput().length, 'enabled': nameInput().length}, enable: nameInput().length, l10n_text: z.string.group_creation_preferences_action"></span>
+        <span class="button-icon icon-close" data-bind="click: clickOnClose" data-uie-name="do-close"></span>
+        <span class="label-xs group-creation-modal-title" data-bind="l10n_text: z.string.group_creation_preferences_header"></span>
+        <span class="group-creation-modal-action pull-right" data-bind="click: clickOnNext, css: {'text-theme': nameInput().length, 'enabled': nameInput().length}, enable: nameInput().length, l10n_text: z.string.group_creation_preferences_action"></span>
       <!-- /ko -->
     </div>
     <!-- ko if: stateIsParticipants -->
-      <user-input class="group-creation-modal-participants-input user-list-light" params="input: participantsInput, selected: selectedContacts, placeholder: z.string.group_creation_participants_placeholder, enter: clickOnCreate"
-      spellcheck="false"></user-input>
+      <user-input class="group-creation-modal-participants-input user-list-light" params="input: participantsInput, selected: selectedContacts, placeholder: z.string.group_creation_participants_placeholder, enter: clickOnCreate" spellcheck="false"></user-input>
     <!-- /ko -->
     <div class="modal-center group-creation-modal-center">
       <!-- ko if: stateIsParticipants() -->
-      <user-list class="group-creation-modal-participants-list user-list-light" params="user: contacts, filter: participantsInput, selected: selectedContacts"
-        data-bind="antiscroll: shouldUpdateScrollbar"></user-list>
+        <user-list class="group-creation-modal-participants-list user-list-light" params="user: contacts, filter: participantsInput, selected: selectedContacts" data-bind="antiscroll: shouldUpdateScrollbar"></user-list>
       <!-- /ko -->
       <!-- ko if: stateIsPreferences() -->
-      <input class="input group-creation-modal-teamname-input" autofocus autocomplete="off" maxlength="64" required spellcheck="false"
-        type="text" data-bind="textInput: nameInput, hasFocus: true, l10n_placeholder: z.string.group_creation_preferences_placeholder, enter: clickOnNext">
-      <div data-bind="text: nameError, visible: nameError().length"></div>
+        <input class="input group-creation-modal-teamname-input" autofocus autocomplete="off" maxlength="64" required spellcheck="false" type="text" data-bind="textInput: nameInput, hasFocus: true, l10n_placeholder: z.string.group_creation_preferences_placeholder, enter: clickOnNext">
+        <div data-bind="text: nameError, visible: nameError().length"></div>
       <!-- /ko -->
     </div>
   </div>
