@@ -25,6 +25,7 @@ window.z.ViewModel = z.ViewModel || {};
 z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
   static get STATE() {
     return {
+      DEFAULT: 'GroupCreationViewModel.STATE.DEFAULT',
       PARTICIPANTS: 'GroupCreationViewModel.STATE.PARTICIPANTS',
       PREFERENCES: 'GroupCreationViewModel.STATE.PREFERENCES',
     };
@@ -41,7 +42,7 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
     this.userRepository = userRepository;
 
     this.modal = undefined;
-    this.state = ko.observable(GroupCreationViewModel.STATE.PREFERENCES);
+    this.state = ko.observable(GroupCreationViewModel.STATE.DEFAULT);
 
     this.contacts = ko.pureComputed(() => {
       if (this.teamRepository.isTeam()) {
@@ -62,14 +63,14 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
     this.activateNext = ko.pureComputed(() => this.nameInput().length);
     this.participantsActionText = ko.pureComputed(() => {
       const stringSelector = this.selectedContacts().length
-        ? z.string.group_creation_participants_action_create
-        : z.string.group_creation_participants_action_skip;
+        ? z.string.groupCreationParticipantsActionCreate
+        : z.string.groupCreationParticipantsActionSkip;
       return z.l10n.text(stringSelector);
     });
     this.participantsHeaderText = ko.pureComputed(() => {
       const stringSelector = this.selectedContacts().length
-        ? z.string.group_creation_participants_header_with_counter
-        : z.string.group_creation_participants_header;
+        ? z.string.groupCreationParticipantsHeaderWithCounter
+        : z.string.groupCreationParticipantsHeader;
       return z.l10n.text(stringSelector, {number: this.selectedContacts().length});
     });
 
@@ -88,11 +89,13 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
       this.modal = new zeta.webapp.module.Modal('#group-creation-modal', this._afterHideModal.bind(this));
     }
 
+    this.state(GroupCreationViewModel.STATE.PREFERENCES);
     if (userEntity) {
       this.selectedContacts.push(userEntity);
     }
 
     this.modal.show();
+    $('.group-creation-modal-teamname-input').focus();
   }
 
   clickOnBack() {
@@ -126,12 +129,12 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
 
       const nameTooLong = this.nameInput().length > z.conversation.ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
       if (nameTooLong) {
-        return this.nameError(z.l10n.text(z.string.group_creation_preferences_error_name_long));
+        return this.nameError(z.l10n.text(z.string.groupCreationPreferencesErrorNameLong));
       }
 
       const nameTooShort = !this.nameInput().length;
       if (nameTooShort) {
-        return this.nameError(z.l10n.text(z.string.group_creation_preferences_error_name_short));
+        return this.nameError(z.l10n.text(z.string.groupCreationPreferencesErrorNameShort));
       }
 
       return this.state(GroupCreationViewModel.STATE.PARTICIPANTS);
@@ -146,10 +149,11 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
 
   _afterHideModal() {
     this.isCreatingConversation = false;
+    this.nameError('');
     this.nameInput('');
     this.participantsInput('');
     this.selectedContacts([]);
-    this.state(GroupCreationViewModel.STATE.PREFERENCES);
+    this.state(GroupCreationViewModel.STATE.DEFAULT);
   }
 
   _hideModal() {
