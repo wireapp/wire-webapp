@@ -28,135 +28,135 @@ z.calling.entities.FlowAudio = class FlowAudio {
    * Create a new flow audio.
    *
    * @class z.calling.entities.FlowAudio
-   * @param {z.entities.Flow} flow_et - Flow entity
-   * @param {MediaRepository} media_repository - Media repository
+   * @param {z.entities.Flow} flowEt - Flow entity
+   * @param {MediaRepository} mediaRepository - Media repository
    */
-  constructor(flow_et, media_repository) {
-    this.set_gain_node = this.set_gain_node.bind(this);
+  constructor(flowEt, mediaRepository) {
+    this.setGainNode = this.setGainNode.bind(this);
 
-    this.flow_et = flow_et;
-    this.media_repository = media_repository;
-    this.logger = new z.util.Logger(`z.calling.FlowAudio (${this.flow_et.id})`, z.config.LOGGER.OPTIONS);
+    this.flowEt = flowEt;
+    this.mediaRepository = mediaRepository;
+    this.logger = new z.util.Logger(`z.calling.FlowAudio (${this.flowEt.id})`, z.config.LOGGER.OPTIONS);
 
-    this.audio_context = undefined;
+    this.audioContext = undefined;
 
     // Panning
-    this.panning = this.flow_et.participant_et.panning;
-    this.panning.subscribe(updated_panning_value => {
-      this.logger.debug(`Panning of ${this.flow_et.remote_user.name()} changed to '${updated_panning_value}'`);
-      this.set_pan(updated_panning_value);
+    this.panning = this.flowEt.participantEt.panning;
+    this.panning.subscribe(updatedPanningValue => {
+      this.logger.debug(`Panning of ${this.flowEt.remoteUser.name()} changed to '${updatedPanningValue}'`);
+      this.setPan(updatedPanningValue);
     });
 
-    this.pan_node = undefined;
-    this.gain_node = undefined;
-    this.audio_source = undefined;
-    this.audio_remote = undefined;
+    this.panNode = undefined;
+    this.gainNode = undefined;
+    this.audioSource = undefined;
+    this.audioRemote = undefined;
 
-    amplify.subscribe(z.event.WebApp.CALL.MEDIA.MUTE_AUDIO, this.set_gain_node);
+    amplify.subscribe(z.event.WebApp.CALL.MEDIA.MUTE_AUDIO, this.setGainNode);
   }
 
   /**
    * Hookup flow audio.
-   * @param {boolean} is_active - Whether the flow is active
+   * @param {boolean} isActive - Whether the flow is active
    * @returns {undefined} No return value
    */
-  hookup(is_active) {
-    if (is_active) {
-      return this._hookup_audio();
+  hookup(isActive) {
+    if (isActive) {
+      return this.hookupAudio();
     }
 
-    if (this.audio_source) {
-      this.audio_source.disconnect();
+    if (this.audioSource) {
+      this.audioSource.disconnect();
     }
   }
 
   /**
    * Set muted state on gain node.
-   * @param {boolean} is_muted - Muted state
+   * @param {boolean} isMuted - Muted state
    * @returns {undefined} No return value
    */
-  set_gain_node(is_muted) {
-    if (this.gain_node) {
-      if (is_muted) {
-        this.gain_node.gain.value = 0;
+  setGainNode(isMuted) {
+    if (this.gainNode) {
+      if (isMuted) {
+        this.gainNode.gain.value = 0;
       } else {
-        this.gain_node.gain.value = 1;
+        this.gainNode.gain.value = 1;
       }
-      this.logger.debug(`Outgoing audio on flow muted '${is_muted}'`);
+      this.logger.debug(`Outgoing audio on flow muted '${isMuted}'`);
     }
   }
 
   /**
    * Set pan value.
-   * @param {number} panning_value - Updated panning value
+   * @param {number} panningValue - Updated panning value
    * @returns {undefined} No return value
    */
-  set_pan(panning_value) {
-    if (this.pan_node) {
-      this.pan_node.pan.value = panning_value;
+  setPan(panningValue) {
+    if (this.panNode) {
+      this.panNode.pan.value = panningValue;
     }
   }
 
   /**
    * Wrap audio input stream.
-   * @param {MediaStream} media_stream - MediaStream to wrap
+   * @param {MediaStream} mediaStream - MediaStream to wrap
    * @returns {MediaStream} Wrapped MediaStream
    */
-  wrap_audio_input_stream(media_stream) {
-    const audio_context = this._get_audio_context();
+  wrapAudioInputStream(mediaStream) {
+    const audioContext = this.getAudioContext();
 
-    if (audio_context) {
-      this.audio_source = audio_context.createMediaStreamSource(media_stream);
-      this.gain_node = audio_context.createGain();
-      this.audio_remote = audio_context.createMediaStreamDestination();
-      this._hookup_audio();
+    if (audioContext) {
+      this.audioSource = audioContext.createMediaStreamSource(mediaStream);
+      this.gainNode = audioContext.createGain();
+      this.audioRemote = audioContext.createMediaStreamDestination();
+      this.hookupAudio();
 
-      Object.assign(media_stream, this.audio_remote.stream);
-      this.logger.debug('Wrapped audio stream from microphone', media_stream);
+      Object.assign(mediaStream, this.audioRemote.stream);
+      this.logger.debug('Wrapped audio stream from microphone', mediaStream);
     }
 
-    return media_stream;
+    return mediaStream;
   }
 
   /**
    * Wrap audio output stream.
-   * @param {MediaStream} media_stream - MediaStream to wrap
+   * @param {MediaStream} mediaStream - MediaStream to wrap
    * @returns {MediaStream} Wrapped MediaStream
    */
-  wrap_audio_output_stream(media_stream) {
+  wrapAudioOutputStream(mediaStream) {
     if (z.util.Environment.browser.firefox) {
-      const audio_context = this._get_audio_context();
+      const audioContext = this.getAudioContext();
 
-      if (audio_context) {
-        const remote_source = audio_context.createMediaStreamSource(media_stream);
-        const audio_output_device = audio_context.createMediaStreamDestination();
+      if (audioContext) {
+        const remoteSource = audioContext.createMediaStreamSource(mediaStream);
+        const audioOutputDevice = audioContext.createMediaStreamDestination();
 
-        this.pan_node = audio_context.createStereoPanner();
-        this.pan_node.pan.value = this.panning();
+        this.panNode = audioContext.createStereoPanner();
+        this.panNode.pan.value = this.panning();
 
-        remote_source.connect(this.pan_node);
-        this.pan_node.connect(audio_output_device);
+        remoteSource.connect(this.panNode);
+        this.panNode.connect(audioOutputDevice);
 
-        Object.assign(media_stream, audio_output_device.stream);
+        Object.assign(mediaStream, audioOutputDevice.stream);
         this.logger.debug(
           `Wrapped audio stream to speaker to create stereo. Initial panning set to '${this.panning()}'.`,
-          media_stream
+          mediaStream
         );
       }
     }
 
-    return media_stream;
+    return mediaStream;
   }
 
   /**
    * Get running AudioContext.
    * @returns {AudioContext} Active AudioContext
    */
-  _get_audio_context() {
-    if (!this.audio_context || this.audio_context.state === z.media.MediaRepository.AUDIO_CONTEXT_STATE.CLOSED) {
-      this.audio_context = this.media_repository.get_audio_context();
+  getAudioContext() {
+    if (!this.audioContext || this.audioContext.state === z.media.MediaRepository.AUDIO_CONTEXT_STATE.CLOSED) {
+      this.audioContext = this.mediaRepository.getAudioContext();
     }
-    return this.audio_context;
+    return this.audioContext;
   }
 
   /**
@@ -164,10 +164,10 @@ z.calling.entities.FlowAudio = class FlowAudio {
    * @private
    * @returns {undefined} No return value
    */
-  _hookup_audio() {
-    if (this.audio_source && this.gain_node) {
-      this.audio_source.connect(this.gain_node);
-      this.gain_node.connect(this.audio_remote);
+  hookupAudio() {
+    if (this.audioSource && this.gainNode) {
+      this.audioSource.connect(this.gainNode);
+      this.gainNode.connect(this.audioRemote);
     }
   }
 };

@@ -28,34 +28,34 @@ z.calling.entities.Participant = class Participant {
    * Construct a new participant.
    *
    * @class z.calling.entities.Participant
-   * @param {Call} call_et - Call entity
+   * @param {Call} callEt - Call entity
    * @param {z.entity.User} user - User entity to base the participant on
    * @param {CallSetupTimings} timings - Timing statistics of call setup steps
    */
-  constructor(call_et, user, timings) {
-    this.call_et = call_et;
+  constructor(callEt, user, timings) {
+    this.callEt = callEt;
     this.user = user;
     this.id = this.user.id;
-    this.session_id = undefined;
+    this.sessionId = undefined;
 
     this.logger = new z.util.Logger(`z.calling.entities.Participant (${this.id})`, z.config.LOGGER.OPTIONS);
 
-    this.is_connected = ko.observable(false);
+    this.isConnected = ko.observable(false);
     this.panning = ko.observable(0.0);
-    this.was_connected = false;
+    this.wasConnected = false;
 
     this.state = {
-      audio_send: ko.observable(true),
-      screen_send: ko.observable(false),
-      video_send: ko.observable(false),
+      audioSend: ko.observable(true),
+      screenSend: ko.observable(false),
+      videoSend: ko.observable(false),
     };
 
-    this.flow_et = new z.calling.entities.Flow(this.call_et, this, timings);
+    this.flowEt = new z.calling.entities.Flow(this.callEt, this, timings);
 
-    this.is_connected.subscribe(is_connected => {
-      if (is_connected && !this.was_connected) {
+    this.isConnected.subscribe(isConnected => {
+      if (isConnected && !this.wasConnected) {
         amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.READY_TO_TALK);
-        this.was_connected = true;
+        this.wasConnected = true;
       }
     });
   }
@@ -64,9 +64,9 @@ z.calling.entities.Participant = class Participant {
    * Reset the participant.
    * @returns {undefined} No return value
    */
-  reset_participant() {
-    if (this.flow_et) {
-      this.flow_et.reset_flow();
+  resetParticipant() {
+    if (this.flowEt) {
+      this.flowEt.reset_flow();
     }
   }
 
@@ -74,24 +74,24 @@ z.calling.entities.Participant = class Participant {
    * Start negotiating the peer connection.
    * @returns {undefined} No return value
    */
-  start_negotiation() {
-    this.flow_et.start_negotiation();
+  startNegotiation() {
+    this.flowEt.startNegotiation();
   }
 
   /**
    * Update the participant state.
-   * @param {CallMessage} call_message_et - Call message to update state from.
+   * @param {CallMessage} callMessageEt - Call message to update state from.
    * @returns {Promise} Resolves when the state was updated
    */
-  update_state(call_message_et) {
-    const {client_id, props, sdp: rtc_sdp, session_id} = call_message_et;
+  updateState(callMessageEt) {
+    const {clientId, props, sdp: rtcSdp, sessionId} = callMessageEt;
 
-    return this.update_properties(props).then(() => {
-      this.session_id = session_id;
-      this.flow_et.set_remote_client_id(client_id);
+    return this.updateProperties(props).then(() => {
+      this.sessionId = sessionId;
+      this.flowEt.setRemoteClientId(clientId);
 
-      if (rtc_sdp) {
-        return this.flow_et.save_remote_sdp(call_message_et);
+      if (rtcSdp) {
+        return this.flowEt.saveRemoteSdp(callMessageEt);
       }
 
       return false;
@@ -103,21 +103,21 @@ z.calling.entities.Participant = class Participant {
    * @param {Object} properties - Properties to update with
    * @returns {Promise} Resolves when the properties have been updated
    */
-  update_properties(properties) {
+  updateProperties(properties) {
     return Promise.resolve().then(() => {
       if (properties) {
-        const {audiosend: audio_send, screensend: screen_send, videosend: video_send} = properties;
+        const {audiosend: audioSend, screensend: screenSend, videosend: videoSend} = properties;
 
-        if (audio_send !== undefined) {
-          this.state.audio_send(audio_send === z.calling.enum.PROPERTY_STATE.TRUE);
+        if (audioSend !== undefined) {
+          this.state.audioSend(audioSend === z.calling.enum.PROPERTY_STATE.TRUE);
         }
 
-        if (screen_send !== undefined) {
-          this.state.screen_send(screen_send === z.calling.enum.PROPERTY_STATE.TRUE);
+        if (screenSend !== undefined) {
+          this.state.screenSend(screenSend === z.calling.enum.PROPERTY_STATE.TRUE);
         }
 
-        if (video_send !== undefined) {
-          this.state.video_send(video_send === z.calling.enum.PROPERTY_STATE.TRUE);
+        if (videoSend !== undefined) {
+          this.state.videoSend(videoSend === z.calling.enum.PROPERTY_STATE.TRUE);
         }
       }
     });
@@ -125,21 +125,21 @@ z.calling.entities.Participant = class Participant {
 
   /**
    * Verifiy client IDs match.
-   * @param {string} client_id - Client ID to match with participant one
+   * @param {string} clientId - Client ID to match with participant one
    * @returns {undefined} No return value
    */
-  verify_client_id(client_id) {
-    if (client_id) {
-      const connected_client_id = this.flow_et.remote_client_id;
+  verifyClientId(clientId) {
+    if (clientId) {
+      const connectedClientId = this.flowEt.remoteClientId;
 
-      if (connected_client_id && client_id !== connected_client_id) {
+      if (connectedClientId && clientId !== connectedClientId) {
         this.logger.warn(
-          `State change requested from '${client_id}' while we are connected to '${connected_client_id}'`,
+          `State change requested from '${clientId}' while we are connected to '${connectedClientId}'`,
           this
         );
         throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_SENDER);
       }
-      this.flow_et.remote_client_id = client_id;
+      this.flowEt.remoteClientId = clientId;
     } else {
       throw new z.calling.CallError(z.calling.CallError.TYPE.WRONG_SENDER, 'Sender ID missing');
     }
