@@ -25,6 +25,7 @@ window.z.ViewModel = z.ViewModel || {};
 z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
   static get STATE() {
     return {
+      DEFAULT: 'GroupCreationViewModel.STATE.DEFAULT',
       PARTICIPANTS: 'GroupCreationViewModel.STATE.PARTICIPANTS',
       PREFERENCES: 'GroupCreationViewModel.STATE.PREFERENCES',
     };
@@ -41,7 +42,7 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
     this.userRepository = userRepository;
 
     this.modal = undefined;
-    this.state = ko.observable(GroupCreationViewModel.STATE.PREFERENCES);
+    this.state = ko.observable(GroupCreationViewModel.STATE.DEFAULT);
 
     this.contacts = ko.pureComputed(() => {
       if (this.teamRepository.isTeam()) {
@@ -88,11 +89,13 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
       this.modal = new zeta.webapp.module.Modal('#group-creation-modal', this._afterHideModal.bind(this));
     }
 
+    this.state(GroupCreationViewModel.STATE.PREFERENCES);
     if (userEntity) {
       this.selectedContacts.push(userEntity);
     }
 
     this.modal.show();
+    $('.group-creation-modal-teamname-input').focus();
   }
 
   clickOnBack() {
@@ -150,7 +153,7 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
     this.nameInput('');
     this.participantsInput('');
     this.selectedContacts([]);
-    this.state(GroupCreationViewModel.STATE.PREFERENCES);
+    this.state(GroupCreationViewModel.STATE.DEFAULT);
   }
 
   _hideModal() {
