@@ -234,7 +234,8 @@ z.calling.entities.Flow = class Flow {
     });
 
     this.canSetRemoteSdp = ko.pureComputed(() => {
-      return ( this.pcInitialized() && this.shouldSetRemoteSdp() && this.properRemoteSdpState() &&!this.sdpStateChanging()
+      return (
+        this.pcInitialized() && this.shouldSetRemoteSdp() && this.properRemoteSdpState() && !this.sdpStateChanging()
       );
     });
 
