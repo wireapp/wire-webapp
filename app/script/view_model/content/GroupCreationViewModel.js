@@ -62,14 +62,14 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
     this.activateNext = ko.pureComputed(() => this.nameInput().length);
     this.participantsActionText = ko.pureComputed(() => {
       const stringSelector = this.selectedContacts().length
-        ? z.string.group_creation_participants_action_create
-        : z.string.group_creation_participants_action_skip;
+        ? z.string.groupCreationParticipantsActionCreate
+        : z.string.groupCreationParticipantsActionSkip;
       return z.l10n.text(stringSelector);
     });
     this.participantsHeaderText = ko.pureComputed(() => {
       const stringSelector = this.selectedContacts().length
-        ? z.string.group_creation_participants_header_with_counter
-        : z.string.group_creation_participants_header;
+        ? z.string.groupCreationParticipantsHeaderWithCounter
+        : z.string.groupCreationParticipantsHeader;
       return z.l10n.text(stringSelector, {number: this.selectedContacts().length});
     });
 
@@ -126,12 +126,12 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
 
       const nameTooLong = this.nameInput().length > z.conversation.ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
       if (nameTooLong) {
-        return this.nameError(z.l10n.text(z.string.group_creation_preferences_error_name_long));
+        return this.nameError(z.l10n.text(z.string.groupCreationPreferencesErrorNameLong));
       }
 
       const nameTooShort = !this.nameInput().length;
       if (nameTooShort) {
-        return this.nameError(z.l10n.text(z.string.group_creation_preferences_error_name_short));
+        return this.nameError(z.l10n.text(z.string.groupCreationPreferencesErrorNameShort));
       }
 
       return this.state(GroupCreationViewModel.STATE.PARTICIPANTS);

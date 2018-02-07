@@ -288,16 +288,16 @@ z.string.conversation_someone = 'Someone';
 z.string.conversation_tweet_author = ' on Twitter';
 
 // Group creation
-z.string.group_creation_preferences_action = 'Next';
-z.string.group_creation_preferences_error_name_short = 'At least 1 character';
-z.string.group_creation_preferences_error_name_long = 'Too many characters';
-z.string.group_creation_preferences_header = 'New group';
-z.string.group_creation_preferences_placeholder = 'Group name';
-z.string.group_creation_participants_action_create = 'Create';
-z.string.group_creation_participants_action_skip = 'Skip';
-z.string.group_creation_participants_header = 'Add people';
-z.string.group_creation_participants_header_with_counter = 'Add people ({{number}})';
-z.string.group_creation_participants_placeholder = 'Search by name';
+z.string.groupCreationPreferencesAction = 'Next';
+z.string.groupCreationPreferencesErrorNameShort = 'At least 1 character';
+z.string.groupCreationPreferencesErrorNameLong = 'Too many characters';
+z.string.groupCreationPreferencesHeader = 'New group';
+z.string.groupCreationPreferencesPlaceholder = 'Group name';
+z.string.groupCreationParticipantsActionCreate = 'Create';
+z.string.groupCreationParticipantsActionSkip = 'Skip';
+z.string.groupCreationParticipantsHeader = 'Add people';
+z.string.groupCreationParticipantsHeaderWithCounter = 'Add people ({{number}})';
+z.string.groupCreationParticipantsPlaceholder = 'Search by name';
 
 // Collection
 z.string.collection_show_all = 'Show all {{number}}';
