@@ -146,6 +146,7 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
 
   _afterHideModal() {
     this.isCreatingConversation = false;
+    this.nameError('');
     this.nameInput('');
     this.participantsInput('');
     this.selectedContacts([]);
