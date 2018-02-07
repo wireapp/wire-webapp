@@ -289,7 +289,7 @@ z.components.UserProfile = class UserProfile {
 
     this.render_avatar = ko.observable(false);
     this.render_avatar_computed = ko.computed(() => {
-      const has_user_id = !!this.user();
+      const has_user_id = this.user && !!this.user();
 
       // swap value to re-render avatar
       this.render_avatar(false);
