@@ -146,6 +146,13 @@ z.event.WebApp = {
     SCROLL: 'wire.webapp.list.scroll',
   },
   LOADED: 'wire.webapp.loaded', // todo: deprecated - remove when user base of wrappers version >= 2.12 is large enough
+  NOTIFICATION: {
+    CLICK: 'wire.webapp.notification.click',
+    NOTIFY: 'wire.webapp.notification.notify',
+    PERMISSION_STATE: 'wire.webapp.notification.permissionState',
+    REMOVE_READ: 'wire.webapp.notification.remove_read',
+    SHOW: 'wire.webapp.notification.show',
+  },
   PENDING: {
     SHOW: 'wire.webapp.pending.show',
   },
@@ -206,11 +213,7 @@ z.event.WebApp = {
     SAVE_ENTITY: 'wire.webapp.storage.save_entity',
   },
   SYSTEM_NOTIFICATION: {
-    CLICK: 'wire.webapp.system_notification.click',
-    NOTIFY: 'wire.webapp.system_notification.notify',
-    PERMISSION_STATE: 'wire.webapp.system_notification.permission_state',
-    REMOVE_READ: 'wire.webapp.system_notification.remove_read',
-    SHOW: 'wire.webapp.system_notification.show',
+    CLICK: 'wire.webapp.notification.click', // todo: deprecated - remove when user base of wrappers version >= 3.2 is large enough
   },
   TAKEOVER: {
     DISMISS: 'wire.webapp.takeover.dismiss',

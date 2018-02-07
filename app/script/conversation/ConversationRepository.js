@@ -859,7 +859,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     if (has_unread_events && !this.block_event_handling()) {
       this._update_last_read_timestamp(conversation_et);
-      amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.REMOVE_READ);
+      amplify.publish(z.event.WebApp.NOTIFICATION.REMOVE_READ);
     }
   }
 
@@ -2598,7 +2598,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
             }
 
             if (!eventFromStream) {
-              amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversationEntity, messageEntity);
+              amplify.publish(z.event.WebApp.NOTIFICATION.NOTIFY, messageEntity, undefined, conversationEntity);
             }
           }
 
@@ -3196,7 +3196,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
-   * Forward the 'conversation.create' event to the SystemNotification repository for browser and audio notifications.
+   * Forward the 'conversation.create' event to the Notification repository for browser and audio notifications.
    *
    * @private
    * @param {Conversation} conversation_et - Conversation that was created
@@ -3212,7 +3212,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
-   * Forward the reaction event to the SystemNotification repository for browser and audio notifications.
+   * Forward the reaction event to the Notification repository for browser and audio notifications.
    *
    * @private
    * @param {Conversation} conversation_et - Conversation that event was received in

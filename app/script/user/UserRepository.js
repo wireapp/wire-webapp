@@ -512,7 +512,7 @@ z.user.UserRepository = class UserRepository {
             break;
         }
 
-        amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, connection_et, message_et);
+        amplify.publish(z.event.WebApp.NOTIFICATION.NOTIFY, message_et, connection_et);
       });
     }
   }
