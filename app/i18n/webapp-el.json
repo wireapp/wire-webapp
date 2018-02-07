@@ -15,7 +15,7 @@
   "accountForm.emailPersonalPlaceholder": "",
   "accountForm.passwordPlaceholder": "Κωδικος προσβασης (το λιγοτερο 8 χαρακτηρες)",
   "accountForm.terms": "",
-  "accountForm.nextButton": "Επόμενο",
+  "accountForm.submitButton": "Επόμενο",
   "createAccount.nextButton": "Επόμενο",
   "invite.nextButton": "Επόμενο",
   "createAccount.headLine": "",
@@ -61,6 +61,7 @@
   "BackendError.LABEL.EMAIL_EXISTS": "",
   "BackendError.unexpected": "",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Πληκτρολογήστε ένα όνομα με τουλάχιστον 2 χαρακτήρες",
+  "ValidationError.FIELD.NAME.VALUE_MISSING": "Πληκτρολογήστε ένα όνομα με τουλάχιστον 2 χαρακτήρες",
   "ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH": "",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": ""
 }

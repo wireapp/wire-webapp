@@ -197,22 +197,24 @@ z.conversation.ConversationRepository = class ConversationRepository {
   //##############################################################################
 
   /**
-   * Create a new conversation.
+   * Create a group conversation.
    * @note Supply at least 2 user IDs! Do not include the requestor
    *
-   * @param {Array<string>} user_ids - IDs of users (excluding the requestor) to be part of the conversation
-   * @param {string} name - User defined name for the Conversation (optional)
+   * @param {Array<z.entity.User>} userEntities - Users (excluding the requestor) to be part of the conversation
+   * @param {string} [groupName] - Name for the conversation
    * @returns {Promise} Resolves when the conversation was created
    */
-  create_new_conversation(user_ids, name) {
+  createGroupConversation(userEntities, groupName) {
+    const userIds = userEntities.map(userEntity => userEntity.id);
+
     return this.conversation_service
-      .create_conversation(user_ids, name, this.team().id)
+      .postConversations(userIds, groupName, this.team().id)
       .then(response => this._onCreate({conversation: response.id, data: response}))
       .then(({conversation_et}) => conversation_et)
       .catch(error => {
         const notConnected = error.label === z.service.BackendClientError.LABEL.NOT_CONNECTED;
         if (notConnected) {
-          return this._handleUsersNotConnected(user_ids);
+          return this._handleUsersNotConnected(userIds);
         }
 
         throw error;
@@ -853,7 +855,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     if (has_unread_events && !this.block_event_handling()) {
       this._update_last_read_timestamp(conversation_et);
-      amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.REMOVE_READ);
+      amplify.publish(z.event.WebApp.NOTIFICATION.REMOVE_READ);
     }
   }
 
@@ -962,10 +964,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Add users to an existing conversation.
    *
    * @param {Conversation} conversationEntity - Conversation to add users to
-   * @param {Array<string>} userIds - IDs of users to be added to the conversation
+   * @param {Array<z.entity.User>} userEntities - Users to be added to the conversation
    * @returns {Promise} Resolves when members were added
    */
-  addMembers(conversationEntity, userIds) {
+  addMembers(conversationEntity, userEntities) {
+    const userIds = userEntities.map(userEntity => userEntity.id);
+
     return this.conversation_service
       .postMembers(conversationEntity.id, userIds)
       .then(response => {
@@ -2090,7 +2094,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       })
       .catch(error => {
         if (error.label === z.service.BackendClientError.LABEL.UNKNOWN_CLIENT) {
-          this.client_repository.remove_local_client();
+          this.client_repository.removeLocalClient();
         }
 
         if (!error.missing) {
@@ -2590,7 +2594,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
             }
 
             if (!eventFromStream) {
-              amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversationEntity, messageEntity);
+              amplify.publish(z.event.WebApp.NOTIFICATION.NOTIFY, messageEntity, undefined, conversationEntity);
             }
           }
 
@@ -3188,7 +3192,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
-   * Forward the 'conversation.create' event to the SystemNotification repository for browser and audio notifications.
+   * Forward the 'conversation.create' event to the Notification repository for browser and audio notifications.
    *
    * @private
    * @param {Conversation} conversation_et - Conversation that was created
@@ -3204,7 +3208,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
-   * Forward the reaction event to the SystemNotification repository for browser and audio notifications.
+   * Forward the reaction event to the Notification repository for browser and audio notifications.
    *
    * @private
    * @param {Conversation} conversation_et - Conversation that event was received in

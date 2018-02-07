@@ -96,9 +96,9 @@ z.connect.ConnectRepository = class ConnectRepository {
    * @returns {Promise} Resolves with encoded phone book data
    */
   _parseMacosContacts() {
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
       if (!window.wAddressBook) {
-        return resolve(undefined);
+        return reject(new z.connect.ConnectError(z.connect.ConnectError.TYPE.NOT_SUPPORTED));
       }
       const addressBook = window.wAddressBook;
       const phoneBook = new z.connect.PhoneBook();

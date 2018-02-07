@@ -5,7 +5,7 @@
   "index.createTeam": "Takım oluştur",
   "index.createTeamFor": "iş için",
   "index.loginInfo": "Zaten bir hesabınız var mı?",
-  "index.login": "Giriş Yap",
+  "index.login": "Giriş yap",
   "teamName.headline": "Takımınızı adlandırın",
   "teamName.subhead": "Bunu istediğiniz zaman değiştirebilirsiniz.",
   "teamName.teamNamePlaceholder": "Takım adı",
@@ -15,7 +15,7 @@
   "accountForm.emailPersonalPlaceholder": "",
   "accountForm.passwordPlaceholder": "Şifre (en az 8 karakter)",
   "accountForm.terms": "<a {linkParams}>şartlar ve koşulları</a> kabul ediyorum",
-  "accountForm.nextButton": "İleri",
+  "accountForm.submitButton": "İleri",
   "createAccount.nextButton": "İleri",
   "invite.nextButton": "İleri",
   "createAccount.headLine": "Hesabınızı kurun",
@@ -61,6 +61,7 @@
   "BackendError.LABEL.EMAIL_EXISTS": "E-posta zaten kullanılıyor. <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://support.wire.com/hc/articles/115004082129\">Daha fazla bilgi</a>",
   "BackendError.unexpected": "Beklenmeyen hata ({code} {message})",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "En az 2 karakterlik bir isim girin",
+  "ValidationError.FIELD.NAME.VALUE_MISSING": "En az 2 karakterlik bir isim girin",
   "ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH": "En az 8 karakterlik bir şifre seçin",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": "Lütfen geçerli bir e-posta adresi girin"
 }

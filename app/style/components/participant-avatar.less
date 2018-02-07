@@ -33,7 +33,6 @@ participant-avatar {
   transform: translateZ(0);
   user-select: none;
   cursor: pointer;
-  overflow: hidden;
 
   &.avatar-no-border {
     .avatar-border {
@@ -58,13 +57,10 @@ participant-avatar {
   }
 
   .participant-avatar {
-    height: 100%;
+    .full-screen;
+    overflow: hidden;
     & > div {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      left: 0;
-      right: 0;
+      .full-screen;
     }
 
     &.pending,
@@ -74,6 +70,7 @@ participant-avatar {
       .avatar-image {
         filter: grayscale(100%);
       }
+
       .avatar-border {
         display: none;
       }
@@ -112,7 +109,9 @@ participant-avatar {
     }
 
     &.unknown {
-      background-color: @w-gray;
+      .avatar-background {
+        background-color: @w-gray;
+      }
     }
   }
 
@@ -120,12 +119,12 @@ participant-avatar {
     .avatar-size(xl);
   }
 
-  &.avatar-lg {
-    .avatar-size(lg);
+  &.avatar-l {
+    .avatar-size(l);
   }
 
-  &.avatar-md {
-    .avatar-size(md);
+  &.avatar-m {
+    .avatar-size(m);
   }
 
   &.avatar-s {
@@ -154,6 +153,7 @@ participant-avatar {
     .avatar-service-placeholder {
       .no-transition();
     }
+
     .avatar-badge {
       display: none;
     }
@@ -178,6 +178,7 @@ participant-avatar {
   .avatar-image {
     transform: scale(0.88);
     opacity: 0;
+
     > img {
       width: 100%;
       height: 100%;
@@ -189,6 +190,7 @@ participant-avatar {
     .avatar-service-placeholder {
       transition: opacity @animation-timing-faster @ease-in-quart;
     }
+
     .avatar-image {
       transition: all @animation-timing-slow @ease-out-quart @animation-timing-faster;
     }
@@ -213,6 +215,7 @@ participant-avatar {
 
     & > svg {
       width: 60%;
+
       & > path {
         fill: fade(@graphite-dark, 20%);
       }
@@ -232,6 +235,7 @@ participant-avatar {
     &,
     .avatar-border,
     .avatar-background,
+    .avatar-badge,
     .avatar-image > img {
       border-radius: 50%;
     }

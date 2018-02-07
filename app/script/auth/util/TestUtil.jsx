@@ -51,7 +51,7 @@ export const withStore = (children, store) => <Provider store={store}>{children}
 
 export const withIntl = component => (
   <IntlProvider locale="en">
-    <HashRouter>{component}</HashRouter>
+    <HashRouter hashType="noslash">{component}</HashRouter>
   </IntlProvider>
 );
 
