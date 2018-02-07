@@ -22,8 +22,8 @@
 window.z = window.z || {};
 window.z.components = z.components || {};
 
-z.components.UserListInput = class UserListInput {
-  constructor(params, component_info) {
+z.components.UserInput = class UserInput {
+  constructor(params, componentInfo) {
     this.dispose = this.dispose.bind(this);
 
     this.input = params.input;
@@ -31,23 +31,28 @@ z.components.UserListInput = class UserListInput {
     this.placeholderText = params.placeholder;
     this.selectedUsers = params.selected;
 
-    this.element = component_info.element;
+    this.element = componentInfo.element;
     this.innerElement = $(this.element).find('.search-inner');
     this.inputElement = $(this.element).find('.search-input');
 
+    this.noSelectedUsers = ko.pureComputed(() => {
+      return typeof this.selectedUsers !== 'function' || !this.selectedUsers().length;
+    });
+
     if (typeof this.selectedUsers === 'function') {
       this.selectedSubscription = this.selectedUsers.subscribe(() => {
-        this.input('');
+        if (typeof this.input === 'function') {
+          this.input('');
+        }
+
         this.inputElement.focus();
         window.setTimeout(() => this.innerElement.scrollTop(this.innerElement[0].scrollHeight));
       });
     }
 
     this.placeholder = ko.pureComputed(() => {
-      const hasEmptyInput = this.input() === '';
-      const noUsersSelected = !this.selectedUsers || this.selectedUsers().length === 0;
-
-      if (hasEmptyInput && noUsersSelected) {
+      const emptyInput = typeof this.input !== 'function' || !this.input().length;
+      if (emptyInput && this.noSelectedUsers()) {
         return z.l10n.text(this.placeholderText);
       }
 
@@ -77,8 +82,10 @@ ko.components.register('user-input', {
       <div class="search-inner-wrap">
         <div class="search-inner"">
           <div class="search-icon icon-search"></div>
-          <!-- ko foreach: selectedUsers -->
-            <span data-bind="text: first_name()"></span>
+          <!-- ko ifnot: noSelectedUsers-->
+            <!-- ko foreach: selectedUsers -->
+              <span data-bind="text: first_name()"></span>
+            <!-- /ko -->
           <!-- /ko -->
           <input type="text" style="display:none" /> <!-- prevent chrome from autocomplete -->
           <input autocomplete="off" maxlength="128" required spellcheck="false" class="search-input" type="text" data-bind="textInput: input, hasFocus: true, attr: {placeholder: placeholder}, css: {'search-input-show-placeholder': placeholder}, event: {keydown: onKeyDown}, enter: onEnter" data-uie-name="enter-users">
@@ -86,5 +93,9 @@ ko.components.register('user-input', {
       </div>
     </div>
   `,
-  viewModel: z.components.UserListInput,
+  viewModel: {
+    createViewModel(params, componentInfo) {
+      return new z.components.UserInput(params, componentInfo);
+    },
+  },
 });

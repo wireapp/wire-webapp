@@ -31,7 +31,7 @@ z.components.UserProfile = class UserProfile {
     };
   }
 
-  constructor(params, component_info) {
+  constructor(params, componentInfo) {
     this.dispose = this.dispose.bind(this);
     this.click_on_device = this.click_on_device.bind(this);
 
@@ -62,7 +62,7 @@ z.components.UserProfile = class UserProfile {
     });
 
     // component dom element
-    this.element = $(component_info.element);
+    this.element = $(componentInfo.element);
 
     // actions
     this.on_accept = () => {
@@ -130,7 +130,7 @@ z.components.UserProfile = class UserProfile {
 
     // destroy confirm dialog when user changes
     this.cleanup_computed = ko.computed(() => {
-      if (this.user() && this.confirmDialog) {
+      if (typeof this.user === 'function' && this.user() && this.confirmDialog) {
         this.confirmDialog.destroy();
       }
       this.tab_index(0);
@@ -430,8 +430,8 @@ ko.components.register('user-profile', {
     element: 'user-profile-template',
   },
   viewModel: {
-    createViewModel(params, component_info) {
-      return new z.components.UserProfile(params, component_info);
+    createViewModel(params, componentInfo) {
+      return new z.components.UserProfile(params, componentInfo);
     },
   },
 });
