@@ -186,12 +186,12 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
   }
 
   _show_modal_block(content, title_element, message_element) {
-    title_element.text(z.l10n.text(z.string.modal_block_conversation_headline, content));
-    message_element.text(z.l10n.text(z.string.modal_block_conversation_message, content));
+    title_element.text(z.l10n.text(z.string.modalBlockConversationHeadline, content));
+    message_element.text(z.l10n.text(z.string.modalBlockConversationMessage, content));
   }
 
   _show_modal_bots_confirm(content, message_element) {
-    message_element.text(z.l10n.text(z.string.modal_bots_confirm_message, content));
+    message_element.text(z.l10n.text(z.string.modalBotsConfirmMessage, content));
   }
 
   /**

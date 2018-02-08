@@ -117,34 +117,34 @@ z.string.callChooseSharedScreen = 'Choose a screen to share';
 z.string.callParticipants = '{{number}} on call';
 
 // Warnings
-z.string.modal_button_cancel = 'Cancel';
-z.string.modal_button_ok = 'Ok';
-z.string.modal_button_send = 'Send';
+z.string.modalButtonCancel = 'Cancel';
+z.string.modalButtonOk = 'Ok';
+z.string.modalButtonSend = 'Send';
 
 // Block a user
-z.string.modal_block_conversation_headline = 'Block {{user}}?';
-z.string.modal_block_conversation_message = '{{user}} won’t be able to contact you or add you to group conversations.';
-z.string.modal_block_conversation_button = 'Block';
+z.string.modalBlockConversationHeadline = 'Block {{user}}?';
+z.string.modalBlockConversationMessage = '{{user}} won’t be able to contact you or add you to group conversations.';
+z.string.modalBlockConversationButton = 'Block';
 // Bots confirm
-z.string.modal_bots_confirm_headline = 'Add Service';
-z.string.modal_bots_confirm_message = 'Are you sure you want to start a new conversation with {{name}}?';
-z.string.modal_bots_confirm_button = 'Confirm';
+z.string. modalBotsConfirmHeadline = 'Add Service';
+z.string.modalBotsConfirmMessage = 'Are you sure you want to start a new conversation with {{name}}?';
+z.string.modalBotsConfirmButton = 'Confirm';
 // Bots unavailable
-z.string.modal_bots_unavailable_headline = 'Bots currently unavailable';
-z.string.modal_bots_unavailable_message = 'Thank you for your interest in bots. The service is currently suspended while we work on the next version. Stay tuned.';
+z.string.modalBotsUnavailableHeadline = 'Bots currently unavailable';
+z.string.modalBotsUnavailableMessage = 'Thank you for your interest in bots. The service is currently suspended while we work on the next version. Stay tuned.';
 // Cannot create the call because there is nobody to call (conversation_empty)
-z.string.modal_call_conversation_empty_headline = 'No one to call';
-z.string.modal_call_conversation_empty_message = 'There is no one left here.';
+z.string.modalCallConversationEmptyHeadline = 'No one to call';
+z.string.modalCallConversationEmptyMessage = 'There is no one left here.';
 // Cannot video call in group conversations
-z.string.modal_call_no_video_in_group_headline = 'No video calls in groups';
-z.string.modal_call_no_video_in_group_message = 'Video calls are not available in group conversations.';
+z.string.modalCallNoVideoInGroupHeadline = 'No video calls in groups';
+z.string.modalCallNoVideoInGroupMessage = 'Video calls are not available in group conversations.';
 // Second incoming call
-z.string.modal_call_second_incoming_headline = 'Answer call?';
-z.string.modal_call_second_incoming_message = 'Your current call will end.';
-z.string.modal_call_second_incoming_action = 'Answer';
+z.string.modalCallSecondIncomingHeadline = 'Answer call?';
+z.string.modalCallSecondIncomingMessage = 'Your current call will end.';
+z.string.modalCallSecondIncomingAction = 'Answer';
 // Second ongoing call
-z.string.modal_call_second_ongoing_headline = 'Hang up call on another device?';
-z.string.modal_call_second_ongoing_message = 'You can only be in one call at a time.';
+z.string.modalCallSecondOngoingHeadline = 'Hang up call on another device?';
+z.string.modalCallSecondOngoingMessage = 'You can only be in one call at a time.';
 z.string.modal_call_second_ongoing_action = 'Hang Up';
 // Second outgoing call
 z.string.modal_call_second_outgoing_headline = 'Hang up current call?';
@@ -633,13 +633,13 @@ z.string.tooltip_conversations_silence = 'Mute ({{shortcut}})';
 z.string.tooltip_conversations_start = 'Start conversation ({{shortcut}})';
 
 z.string.tooltipPeopleAdd = 'Add to conversation ({{shortcut}})';
-z.string. tooltipPeopleAddPeople = 'Add people to conversation ({{shortcut}})';
+z.string.tooltipPeopleAddPeople = 'Add people to conversation ({{shortcut}})';
 z.string.tooltipPeopleBack = 'Back';
 z.string.tooltipPeopleBlock = 'Block';
 z.string.tooltipPeopleConnect = 'Connect';
 z.string.tooltipPeopleLeave = 'Leave conversation';
-z.string. tooltipPeopleOpen = 'Open conversation';
-z.string. tooltipPeopleProfile = 'Open your profile';
+z.string.tooltipPeopleOpen = 'Open conversation';
+z.string.tooltipPeopleProfile = 'Open your profile';
 z.string.tooltipPeopleRename = 'Change conversation name';
 z.string.tooltipPeopleRemove = 'Remove from conversation';
 z.string.tooltipPeopleUnblock = 'Unblock';
