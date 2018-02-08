@@ -84,7 +84,7 @@ ko.components.register('user-input', {
           <div class="search-icon icon-search"></div>
           <!-- ko ifnot: noSelectedUsers-->
             <!-- ko foreach: selectedUsers -->
-              <span data-bind="text: first_name()"></span>
+              <span data-bind="text: first_name()" data-uie-name="item-selected"></span>
             <!-- /ko -->
           <!-- /ko -->
           <input type="text" style="display:none" /> <!-- prevent chrome from autocomplete -->
