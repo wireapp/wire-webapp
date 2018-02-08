@@ -23,6 +23,14 @@ window.z = window.z || {};
 window.z.components = z.components || {};
 
 z.components.UserProfile = class UserProfile {
+  static get DEVICE_MODE() {
+    return {
+      AVAILABLE: 'UserProfile.DEVICE_MODE.AVAILABLE',
+      NONE: 'UserProfile.DEVICE_MODE.NONE',
+      REQUESTING: 'UserProfile.DEVICE_MODE.REQUESTING',
+    };
+  }
+
   static get MODE() {
     return {
       DEFAULT: 'UserProfile.MODE.DEFAULT',
@@ -31,151 +39,130 @@ z.components.UserProfile = class UserProfile {
     };
   }
 
+  static get TAB_MODE() {
+    return {
+      DETAILS: 'UserProfile.TAB_MODE.DETAILS',
+      DEVICES: 'UserProfile.TAB_MODE.DEVICES',
+    };
+  }
+
   constructor(params, componentInfo) {
     this.dispose = this.dispose.bind(this);
-    this.click_on_device = this.click_on_device.bind(this);
+    this.clickOnDevice = this.clickOnDevice.bind(this);
 
     this.logger = new z.util.Logger('z.components.UserProfile', z.config.LOGGER.OPTIONS);
 
-    this.user = params.user;
     this.conversation = params.conversation;
     this.mode = params.mode || UserProfile.MODE.DEFAULT;
+    this.userEntity = params.user;
+    this.element = $(componentInfo.element);
 
-    // repository references
-    this.client_repository = window.wire.app.repository.client;
-    this.conversation_repository = window.wire.app.repository.conversation;
-    this.cryptography_repository = window.wire.app.repository.cryptography;
-    this.user_repository = window.wire.app.repository.user;
+    this.clientRepository = window.wire.app.repository.client;
+    this.conversationRepository = window.wire.app.repository.conversation;
+    this.cryptographyRepository = window.wire.app.repository.cryptography;
+    this.userRepository = window.wire.app.repository.user;
 
-    this.isTeam = ko.pureComputed(() => {
-      return this.conversation()
-        .self()
-        .is_team_member();
-    });
+    this.selfUser = this.userRepository.self;
+
+    this.hasUser = ko.pureComputed(() => typeof this.userEntity === 'function' && this.userEntity());
+
+    this.isTeam = ko.pureComputed(() => this.selfUser().is_team_member());
+
     this.userAvailabilityLabel = ko.pureComputed(() => {
-      if (this.user()) {
-        const availabilitySetToNone = this.user().availability() === z.user.AvailabilityType.NONE;
+      if (this.userEntity()) {
+        const availabilitySetToNone = this.userEntity().availability() === z.user.AvailabilityType.NONE;
         if (!availabilitySetToNone) {
-          return z.user.AvailabilityMapper.nameFromType(this.user().availability());
+          return z.user.AvailabilityMapper.nameFromType(this.userEntity().availability());
         }
       }
     });
 
-    // component dom element
-    this.element = $(componentInfo.element);
-
-    // actions
-    this.on_accept = () => {
-      if (typeof params.accept === 'function') {
-        params.accept(this.user());
-      }
-    };
-    this.on_add_people = () => {
-      if (typeof params.add_people === 'function') {
-        params.add_people(this.user());
-      }
-    };
-    this.on_block = () => {
-      if (typeof params.block === 'function') {
-        params.block(this.user());
-      }
-    };
-    this.on_close = () => {
-      if (typeof params.close === 'function') {
-        this.render_avatar(false);
-        params.close();
-      }
-    };
-    this.on_ignore = () => {
-      if (typeof params.ignore === 'function') {
-        params.ignore(this.user());
-      }
-    };
-    this.on_leave = () => {
-      if (typeof params.leave === 'function') {
-        params.leave(this.user());
-      }
-    };
-    this.on_profile = () => {
-      if (typeof params.profile === 'function') {
-        params.profile(this.user());
-      }
-    };
-    this.on_remove = () => {
-      if (typeof params.remove === 'function') {
-        params.remove(this.user());
-      }
-    };
-    this.on_unblock = () => {
-      if (typeof params.unblock === 'function') {
-        params.unblock(this.user());
-      }
-    };
-
-    // cancel request confirm dialog
+    // Confirmation dialog
     this.confirmDialog = undefined;
 
-    // tabs
-    this.click_on_tab = index => this.tab_index(index);
-    this.tab_index = ko.observable(0);
-    this.tab_index.subscribe(this.on_tab_index_changed.bind(this));
-
-    // devices
+    // Devices
     this.devices = ko.observableArray();
-    this.devices_found = ko.observable();
-    this.selected_device = ko.observable();
-    this.fingerprint_remote = ko.observableArray([]);
-    this.fingerprint_local = ko.observableArray([]);
-    this.is_resetting_session = ko.observable(false);
+    this.selectedDevice = ko.observable();
+    this.fingerprintLocal = ko.observableArray([]);
+    this.fingerprintRemote = ko.observableArray([]);
+    this.isResettingSession = ko.observable(false);
 
-    // destroy confirm dialog when user changes
-    this.cleanup_computed = ko.computed(() => {
-      if (typeof this.user === 'function' && this.user() && this.confirmDialog) {
-        this.confirmDialog.destroy();
+    this.deviceMode = ko.observable(UserProfile.DEVICE_MODE.REQUESTING);
+    this.deviceModeIsAvailable = ko.pureComputed(() => this.deviceMode() === UserProfile.DEVICE_MODE.AVAILABLE);
+    this.deviceModeIsNone = ko.pureComputed(() => this.deviceMode() === UserProfile.DEVICE_MODE.NONE);
+
+    // Tabs
+    this.tabMode = ko.observable(UserProfile.TAB_MODE.DETAILS);
+    this.tabModeIsDetails = ko.pureComputed(() => this.tabMode() === UserProfile.TAB_MODE.DETAILS);
+    this.tabModeIsDevices = ko.pureComputed(() => this.tabMode() === UserProfile.TAB_MODE.DEVICES);
+    this.tabModeIsDevices.subscribe(tabModeIsDevices => {
+      if (this.hasUser() && tabModeIsDevices) {
+        const userId = this.userEntity().id;
+        this.clientRepository
+          .getClientsByUserId(userId)
+          .then(clientEntities => {
+            const hasDevices = clientEntities.length > 0;
+            const deviceMode = hasDevices ? UserProfile.DEVICE_MODE.AVAILABLE : UserProfile.DEVICE_MODE.NONE;
+            this.deviceMode(deviceMode);
+          })
+          .catch(error => this.logger.error(`Unable to retrieve clients data for user '${user_id}': ${error}`));
       }
-      this.tab_index(0);
-      this.devices_found(null);
-      this.selected_device(null);
-      this.fingerprint_remote([]);
-      this.is_resetting_session(false);
+    });
+    this.tabModeActiveCSS = ko.pureComputed(() => {
+      if (this.tabModeIsDetails()) {
+        return 'user-profile-tab-active-details';
+      }
+      return 'user-profile-tab-active-devices';
     });
 
-    this.show_back_button = ko.pureComputed(() => {
+    // destroy confirm dialog when user changes
+    this.cleanupComputed = ko.computed(() => {
+      if (this.hasUser() && this.confirmDialog) {
+        this.confirmDialog.destroy();
+      }
+
+      this.deviceMode(UserProfile.DEVICE_MODE.REQUESTING);
+      this.tabMode(UserProfile.TAB_MODE.DETAILS);
+      this.selectedDevice(null);
+      this.fingerprintRemote([]);
+      this.isResettingSession(false);
+    });
+
+    this.showBackButton = ko.pureComputed(() => {
       if (typeof this.conversation === 'function') {
         return this.conversation().is_group();
       }
     });
 
-    this.selected_device_subscription = this.selected_device.subscribe(() => {
-      if (this.selected_device()) {
-        this.fingerprint_local(this.formatFingerprint(this.cryptography_repository.get_local_fingerprint()));
-        this.fingerprint_remote([]);
-        this.cryptography_repository
-          .get_remote_fingerprint(this.user().id, this.selected_device().id)
-          .then(fingerprint => this.fingerprint_remote(this.formatFingerprint(fingerprint)));
+    this.selectedDeviceSubscription = this.selectedDevice.subscribe(() => {
+      if (this.selectedDevice()) {
+        this.fingerprintLocal(this._formatFingerprint(this.cryptographyRepository.get_local_fingerprint()));
+        this.fingerprintRemote([]);
+        this.cryptographyRepository
+          .get_remote_fingerprint(this.userEntity().id, this.selectedDevice().id)
+          .then(fingerprint => this.fingerprintRemote(this._formatFingerprint(fingerprint)));
       }
     });
 
     const shortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.ADD_PEOPLE);
-    this.add_people_tooltip = z.l10n.text(z.string.tooltip_people_add, shortcut);
+    this.addPeopleTooltip = z.l10n.text(z.string.tooltip_people_add, shortcut);
 
-    this.device_headline = ko.pureComputed(() => {
-      return z.l10n.text(z.string.people_tabs_devices_headline, this.user().first_name());
+    this.deviceHeadline = ko.pureComputed(() => {
+      return z.l10n.text(z.string.people_tabs_devices_headline, this.userEntity().first_name());
     });
 
-    this.no_device_headline = ko.pureComputed(() => {
-      return z.l10n.text(z.string.people_tabs_no_devices_headline, this.user().first_name());
+    this.noDeviceHeadline = ko.pureComputed(() => {
+      return z.l10n.text(z.string.people_tabs_no_devices_headline, this.userEntity().first_name());
     });
 
-    this.detail_message = ko.pureComputed(() => {
-      const text = z.l10n.text(z.string.people_tabs_device_detail_headline, {
-        user: z.util.escape_html(this.user().first_name()),
-      });
+    this.detailMessage = ko.pureComputed(() => {
+      const substitution = {user: z.util.escape_html(this.userEntity().first_name())};
+      const text = z.l10n.text(z.string.people_tabs_device_detail_headline, substitution);
 
       const textWithHtmlTags = new RegExp('\\{\\{[^\\}]+\\}\\}[^\\{]+\\{\\{[^\\}]+\\}\\}');
       const textWithinHtmlTags = new RegExp('\\{\\{[^\\}]+\\}\\}', 'gm');
 
-      const pivot = text.match(textWithHtmlTags)[0];
+      const [pivot] = text.match(textWithHtmlTags) || [];
       const sanitizedText = z.util.StringUtil.splitAtPivotElement(text, pivot, pivot);
 
       return sanitizedText.map(element => {
@@ -186,177 +173,241 @@ z.components.UserProfile = class UserProfile {
       });
     });
 
-    this.on_cancel_request = () => {
-      amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
-
-      this.confirmDialog = this.element.confirm({
-        confirm: () => {
-          const should_block = this.element.find('.checkbox input').is(':checked');
-          if (should_block) {
-            this.user_repository.block_user(this.user());
-          } else {
-            this.user_repository.cancel_connection_request(this.user());
-          }
-
-          this.conversation_repository.get_1to1_conversation(this.user()).then(conversation_et => {
-            if (this.conversation_repository.is_active_conversation(conversation_et)) {
-              amplify.publish(z.event.WebApp.CONVERSATION.PEOPLE.HIDE);
-              const next_conversation_et = this.conversation_repository.get_next_conversation(conversation_et);
-              window.setTimeout(() => {
-                amplify.publish(z.event.WebApp.CONVERSATION.SHOW, next_conversation_et);
-              }, z.motion.MotionDuration.LONG);
-            }
-          });
-
-          if (typeof params.cancel_request === 'function') {
-            params.cancel_request(this.user());
-          }
-        },
-        data: {
-          user: this.user(),
-        },
-        template: '#template-confirm-cancel_request',
-      });
-    };
-
-    this.on_open = () => {
-      amplify.publish(z.event.WebApp.CONVERSATION.PEOPLE.HIDE);
-
-      this.conversation_repository.get_1to1_conversation(this.user()).then(conversation_et => {
-        if (conversation_et.is_archived()) {
-          this.conversation_repository.unarchive_conversation(conversation_et);
-        }
-
-        window.setTimeout(() => {
-          amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversation_et);
-          if (typeof params.open === 'function') {
-            params.open(this.user());
-          }
-        }, z.motion.MotionDuration.LONG);
-      });
-    };
-
-    this.formatFingerprint = fingerprint => z.util.zero_padding(fingerprint, 16).match(/.{1,2}/g);
-
-    this.on_connect = () => {
-      this.user_repository
-        .create_connection(this.user(), true)
-        .then(() => amplify.publish(z.event.WebApp.CONVERSATION.PEOPLE.HIDE));
-
-      if (typeof params.connect === 'function') {
-        params.connect(this.user());
+    // Actions
+    this.clickOnAddPeople = () => {
+      if (this.hasUser() && typeof params.add_people === 'function') {
+        params.add_people(this.userEntity());
       }
     };
 
-    this.on_pending = () => {
-      if (this.user().is_ignored() || this.user().is_incoming_request()) {
-        if (typeof params.pending === 'function') {
-          params.pending(this.user());
+    this.clickOnClose = () => {
+      if (typeof params.close === 'function') {
+        this.renderAvatar(false);
+        params.close();
+      }
+    };
+
+    this.clickOnPending = () => {
+      if (this.hasUser()) {
+        const isPendingRequest = this.userEntity().is_ignored() || this.userEntity().is_incoming_request();
+        if (isPendingRequest && typeof params.pending === 'function') {
+          params.pending(this.userEntity());
         }
       } else {
-        this.on_open();
+        this.clickToOpenConversation();
       }
     };
 
-    this.accent_color = ko.pureComputed(() => {
-      if (this.user()) {
-        return `accent-color-${this.user().accent_id()}`;
+    this.clickOnShowProfile = () => {
+      if (this.hasUser() && typeof params.profile === 'function') {
+        params.profile(this.userEntity());
       }
+    };
+
+    this.clickToAcceptInvite = () => {
+      if (this.hasUser() && typeof params.accept === 'function') {
+        params.accept(this.userEntity());
+      }
+    };
+
+    this.clickToBlock = () => {
+      if (this.hasUser() && typeof params.block === 'function') {
+        params.block(this.userEntity());
+      }
+    };
+
+    this.clickToCancelRequest = () => {
+      if (this.hasUser()) {
+        amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT);
+
+        this.confirmDialog = this.element.confirm({
+          confirm: () => {
+            const shouldBlock = this.element.find('.checkbox input').is(':checked');
+            if (shouldBlock) {
+              this.userRepository.block_user(this.userEntity());
+            } else {
+              this.userRepository.cancel_connection_request(this.userEntity());
+            }
+
+            this.conversationRepository.get_1to1_conversation(this.userEntity()).then(conversationEntity => {
+              if (this.conversationRepository.is_active_conversation(conversationEntity)) {
+                amplify.publish(z.event.WebApp.CONVERSATION.PEOPLE.HIDE);
+
+                const nextConversationEntity = this.conversationRepository.get_next_conversation(conversationEntity);
+                window.setTimeout(() => {
+                  amplify.publish(z.event.WebApp.CONVERSATION.SHOW, nextConversationEntity);
+                }, z.motion.MotionDuration.LONG);
+              }
+            });
+
+            if (typeof params.cancel_request === 'function') {
+              params.cancel_request(this.userEntity());
+            }
+          },
+          data: {
+            user: this.userEntity(),
+          },
+          template: '#template-confirm-cancel_request',
+        });
+      }
+    };
+
+    this.clickToIgnoreInvite = () => {
+      if (this.hasUser() && typeof params.ignore === 'function') {
+        params.ignore(this.userEntity());
+      }
+    };
+
+    this.clickToLeaveConversation = () => {
+      if (this.hasUser() && typeof params.leave === 'function') {
+        params.leave(this.userEntity());
+      }
+    };
+
+    this.clickToOpenConversation = () => {
+      if (this.hasUser()) {
+        amplify.publish(z.event.WebApp.CONVERSATION.PEOPLE.HIDE);
+
+        this.conversationRepository.get_1to1_conversation(this.userEntity()).then(conversationEntity => {
+          if (conversationEntity.is_archived()) {
+            this.conversationRepository.unarchive_conversation(conversationEntity);
+          }
+
+          window.setTimeout(() => {
+            amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
+
+            if (typeof params.open === 'function') {
+              params.open(this.userEntity());
+            }
+          }, z.motion.MotionDuration.LONG);
+        });
+      }
+    };
+
+    this.clickToRemoveFromConversation = () => {
+      if (this.hasUser() && typeof params.remove === 'function') {
+        params.remove(this.userEntity());
+      }
+    };
+
+    this.clickToSendRequest = () => {
+      if (this.hasUser()) {
+        this.userRepository
+          .create_connection(this.userEntity(), true)
+          .then(() => amplify.publish(z.event.WebApp.CONVERSATION.PEOPLE.HIDE));
+      }
+
+      if (typeof params.connect === 'function') {
+        params.connect(this.userEntity());
+      }
+    };
+
+    this.clickToUnblock = () => {
+      if (this.hasUser() && typeof params.unblock === 'function') {
+        params.unblock(this.userEntity());
+      }
+    };
+
+    this.accentColor = ko.pureComputed(() => {
+      if (this.hasUser()) {
+        return `accent-color-${this.hasUser().accent_id()}`;
+      }
+      return '';
     });
 
-    this.show_gray_image = ko.pureComputed(() => {
-      if (!this.user()) {
+    this.showGrayImage = ko.pureComputed(() => {
+      if (!this.hasUser()) {
         return false;
       }
 
-      return !this.user().is_me && !this.user.is_connected();
+      return !this.hasUser().is_me && !this.hasUser().is_connected();
     });
 
-    this.connection_is_not_established = ko.pureComputed(() => {
-      if (this.user()) {
-        return this.user().is_request() || this.user().is_ignored();
+    this.connectionIsNotEstablished = ko.pureComputed(() => {
+      if (this.hasUser()) {
+        return this.hasUser().is_request() || this.hasUser().is_ignored();
       }
     });
 
-    this.user_is_removed_from_conversation = ko.pureComputed(() => {
-      if (!this.user() || !this.conversation()) {
-        return true;
+    this.isUserRemovable = ko.pureComputed(() => {
+      if (!this.hasUser() || !this.conversation()) {
+        return false;
       }
 
-      const participating_user_ets = this.conversation().participating_user_ets();
-      return !participating_user_ets.includes(this.user());
+      const participatingUserEntities = this.conversation().participating_user_ets();
+      const isSelfParticipant = !this.conversation().removed_from_conversation() && !this.conversation().is_guest();
+      const isUserParticipant = participatingUserEntities.includes(this.userEntity());
+      return isSelfParticipant && isUserParticipant;
     });
 
-    this.render_avatar = ko.observable(false);
-    this.render_avatar_computed = ko.computed(() => {
-      const has_user_id = this.user && !!this.user();
+    this.renderAvatar = ko.observable(false);
+    this.renderAvatarComputed = ko.computed(() => {
+      const hasUserId = this.hasUser();
 
       // swap value to re-render avatar
-      this.render_avatar(false);
-      window.setTimeout(() => {
-        this.render_avatar(has_user_id);
-      }, 0);
+      this.renderAvatar(false);
+      window.setTimeout(() => this.renderAvatar(hasUserId), 0);
     });
 
     // footer
-    this.get_footer_template = ko.pureComputed(() => {
-      const user_et = this.user();
-      if (!user_et || this.tab_index() === 1) {
+    this.getFooterTemplate = ko.pureComputed(() => {
+      if (!this.hasUser() || !this.tabModeIsDetails()) {
         return 'user-profile-footer-empty';
       }
+      const userEntity = this.userEntity();
 
       // When used in conversation!
       if (typeof this.conversation === 'function') {
-        const conversation_et = this.conversation();
+        const conversationEntity = this.conversation();
 
-        if (conversation_et.is_one2one() || conversation_et.is_request()) {
-          if (user_et.is_me) {
+        if (conversationEntity.is_one2one() || conversationEntity.is_request()) {
+          if (userEntity.is_me) {
             return 'user-profile-footer-profile';
           }
 
-          if (user_et.is_connected() || user_et.is_team_member()) {
+          if (userEntity.is_connected() || userEntity.is_team_member()) {
             return 'user-profile-footer-add-block';
           }
 
-          if (user_et.is_outgoing_request()) {
+          if (userEntity.is_outgoing_request()) {
             return 'user-profile-footer-pending';
           }
-        } else if (conversation_et.is_group()) {
-          if (user_et.is_me) {
+        } else if (conversationEntity.is_group()) {
+          if (userEntity.is_me) {
             return 'user-profile-footer-profile-leave';
           }
 
-          if (user_et.is_connected() || user_et.is_team_member()) {
+          if (userEntity.is_connected() || userEntity.is_team_member()) {
             return 'user-profile-footer-message-remove';
           }
 
-          if (user_et.is_unknown()) {
+          if (userEntity.is_unknown()) {
             return 'user-profile-footer-connect-remove';
           }
 
-          if (user_et.is_ignored() || user_et.is_request()) {
+          if (userEntity.is_ignored() || userEntity.is_request()) {
             return 'user-profile-footer-pending-remove';
           }
 
-          if (user_et.is_blocked()) {
+          if (userEntity.is_blocked()) {
             return 'user-profile-footer-unblock-remove';
           }
         }
         // When used in Search!
       } else {
-        if (user_et.is_blocked()) {
+        if (userEntity.is_blocked()) {
           return 'user-profile-footer-unblock';
         }
 
-        if (user_et.is_outgoing_request()) {
+        if (userEntity.is_outgoing_request()) {
           return 'user-profile-footer-pending';
         }
 
-        if (user_et.is_ignored() || this.user().is_incoming_request()) {
+        if (userEntity.is_ignored() || userEntity.is_incoming_request()) {
           return 'user-profile-footer-ignore-accept';
         }
 
-        if (user_et.is_unknown()) {
+        if (userEntity.is_unknown()) {
           return 'user-profile-footer-add';
         }
       }
@@ -365,63 +416,65 @@ z.components.UserProfile = class UserProfile {
     });
   }
 
-  click_on_device(client_et) {
-    this.selected_device(client_et);
+  _formatFingerprint(fingerprint) {
+    z.util.zero_padding(fingerprint, 16).match(/.{1,2}/g);
   }
 
-  click_on_device_detail_back_button() {
-    this.selected_device(null);
+  clickOnDevice(clientEntity) {
+    this.selectedDevice(clientEntity);
   }
 
-  click_on_my_fingerprint_button() {
+  clickOnDeviceDetailBack() {
+    this.selectedDevice(null);
+  }
+
+  clickToSeeSelfFingerprint() {
     this.confirmDialog = $('#participants').confirm({
       data: {
         click_on_show_my_devices() {
           amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_DEVICES);
         },
-        device: this.client_repository.currentClient,
-        fingerprint_local: this.fingerprint_local,
+        device: this.clientRepository.currentClient,
+        fingerprint_local: this.fingerprintLocal,
       },
       template: '#template-confirm-my-fingerprint',
     });
   }
 
-  click_on_reset_session() {
+  clickToResetSession() {
     const reset_progress = () => {
       window.setTimeout(() => {
-        this.is_resetting_session(false);
+        this.isResettingSession(false);
       }, z.motion.MotionDuration.LONG);
     };
 
-    this.is_resetting_session(true);
-    this.conversation_repository
-      .reset_session(this.user().id, this.selected_device().id, this.conversation().id)
+    this.isResettingSession(true);
+    this.conversationRepository
+      .reset_session(this.userEntity().id, this.selectedDevice().id, this.conversation().id)
       .then(() => reset_progress())
       .catch(() => reset_progress());
   }
 
-  click_on_verify_client() {
-    const toggle_verified = !this.selected_device().meta.is_verified();
+  clickToToggleDeviceVerification() {
+    const toggleVerified = !this.selectedDevice().meta.is_verified();
 
-    this.client_repository
-      .verifyClient(this.user().id, this.selected_device(), toggle_verified)
-      .catch(error => this.logger.warn(`Client cannot be updated: ${error.message}`));
+    this.clientRepository
+      .verifyClient(this.userEntity().id, this.selectedDevice(), toggleVerified)
+      .catch(error => this.logger.warn(`Failed to toggle client verification: ${error.message}`));
   }
 
-  on_tab_index_changed(index) {
-    if (index === 1) {
-      const user_id = this.user().id;
-      this.client_repository
-        .getClientsByUserId(user_id)
-        .then(client_ets => this.devices_found(client_ets.length > 0))
-        .catch(error => this.logger.error(`Unable to retrieve clients data for user '${user_id}': ${error}`));
-    }
+  clickOnTabDevices() {
+    this.tabMode(UserProfile.TAB_MODE.DEVICES);
+  }
+
+  clickOnTabDetails() {
+    this.tabMode(UserProfile.TAB_MODE.DETAILS);
   }
 
   dispose() {
-    this.cleanup_computed.dispose();
-    this.render_avatar_computed.dispose();
-    this.selected_device_subscription.dispose();
+    this.cleanupComputed.dispose();
+    this.renderAvatarComputed.dispose();
+    this.selectedDeviceSubscription.dispose();
   }
 };
 
