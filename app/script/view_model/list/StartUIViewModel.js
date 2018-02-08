@@ -340,7 +340,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.state(StartUIViewModel.STATE.ADD_PEOPLE);
   }
 
-  clickOnShowService() {
+  clickOnShowServices() {
     this.state(StartUIViewModel.STATE.ADD_SERVICE);
   }
 
