@@ -38,10 +38,10 @@ z.components.TopPeople = class TopPeople {
         } else {
           this.selectedUsers.push(userEntity);
         }
+      }
 
-        if (typeof this.click === 'function') {
-          return this.click(userEntity, event);
-        }
+      if (typeof this.click === 'function') {
+        return this.click(userEntity, event);
       }
     };
 
