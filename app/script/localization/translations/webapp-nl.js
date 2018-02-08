@@ -543,10 +543,10 @@ z.string.nl.tooltip_conversation_video_call = 'Video-oproep';
 z.string.nl.tooltip_conversations_archive = 'Archief ({{shortcut}})';
 z.string.nl.tooltip_conversations_archived = 'Toon archief ({{number}})';
 z.string.nl.tooltip_conversations_more = 'Meer';
-z.string.nl.tooltip_conversations_notify = 'Dempen uit ({{shortcut}})';
-z.string.nl.tooltip_conversations_preferences = 'Open instelllingen';
-z.string.nl.tooltip_conversations_silence = 'Dempen ({{shortcut}})';
-z.string.nl.tooltip_conversations_start = 'Start gesprek ({{shortcut}})';
+z.string.nl.tooltipConversationsNotify = 'Dempen uit ({{shortcut}})';
+z.string.nl.tooltipConversationsPreferences = 'Open instelllingen';
+z.string.nl.tooltipConversationsSilence = 'Dempen ({{shortcut}})';
+z.string.nl.tooltipConversationsStart = 'Start gesprek ({{shortcut}})';
 
 z.string.nl.tooltipPeopleAdd = 'Mensen toevoegen aan het gesprek ({{shortcut}})';
 z.string.nl. tooltipPeopleAddPeople = 'Mensen toevoegen aan het gesprek ({{shortcut}})';

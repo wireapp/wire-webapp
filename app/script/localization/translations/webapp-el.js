@@ -524,10 +524,10 @@ z.string.el.tooltip_conversation_video_call = 'Βιντεοκλήση';
 z.string.el.tooltip_conversations_archive = 'Αρχειοθέτηση ({{shortcut}})';
 z.string.el.tooltip_conversations_archived = 'Προβολή αρχειοθέτησης ({{number}})';
 z.string.el.tooltip_conversations_more = 'Περισσότερα';
-z.string.el.tooltip_conversations_notify = 'Αύξηση έντασης ({{shortcut}})';
-z.string.el.tooltip_conversations_preferences = 'Ανοίξτε τις προτιμήσεις';
-z.string.el.tooltip_conversations_silence = 'Σίγαση ({{shortcut}})';
-z.string.el.tooltip_conversations_start = 'Ξεκινήστε συνομιλία ({{shortcut}})';
+z.string.el.tooltipConversationsNotify = 'Αύξηση έντασης ({{shortcut}})';
+z.string.el.tooltipConversationsPreferences = 'Ανοίξτε τις προτιμήσεις';
+z.string.el.tooltipConversationsSilence = 'Σίγαση ({{shortcut}})';
+z.string.el.tooltipConversationsStart = 'Ξεκινήστε συνομιλία ({{shortcut}})';
 
 z.string.el.tooltipPeopleAdd = 'Προσθέστε άτομα σε συνομιλία ({{shortcut}})';
 z.string.el.tooltipPeopleBack = 'Πίσω';

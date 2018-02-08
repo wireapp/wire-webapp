@@ -525,10 +525,10 @@ z.string.cs.tooltip_conversation_video_call = 'Videohovor';
 z.string.cs.tooltip_conversations_archive = 'Archivovat ({{shortcut}})';
 z.string.cs.tooltip_conversations_archived = 'Zobrazit archiv ({{number}})';
 z.string.cs.tooltip_conversations_more = 'Další';
-z.string.cs.tooltip_conversations_notify = 'Zapnout zvuk ({{shortcut}})';
-z.string.cs.tooltip_conversations_preferences = 'Otevřít předvolby';
-z.string.cs.tooltip_conversations_silence = 'Ztlumit ({{shortcut}})';
-z.string.cs.tooltip_conversations_start = 'Spustit konverzaci ({{shortcut}})';
+z.string.cs.tooltipConversationsNotify = 'Zapnout zvuk ({{shortcut}})';
+z.string.cs.tooltipConversationsPreferences = 'Otevřít předvolby';
+z.string.cs.tooltipConversationsSilence = 'Ztlumit ({{shortcut}})';
+z.string.cs.tooltipConversationsStart = 'Spustit konverzaci ({{shortcut}})';
 
 z.string.cs.tooltipPeopleAdd = 'Přidat kontakty ke konverzaci ({{shortcut}})';
 z.string.cs.tooltipPeopleBack = 'Zpět';

@@ -536,10 +536,10 @@ z.string.fr.tooltip_conversation_video_call = 'Appel vidéo';
 z.string.fr.tooltip_conversations_archive = 'Archiver ({{shortcut}})';
 z.string.fr.tooltip_conversations_archived = 'Voir les archives ({{number}})';
 z.string.fr.tooltip_conversations_more = 'Plus';
-z.string.fr.tooltip_conversations_notify = 'Activer les notifications ({{shortcut}})';
-z.string.fr.tooltip_conversations_preferences = 'Ouvrir les préférences';
-z.string.fr.tooltip_conversations_silence = 'Désactiver les notifications ({{shortcut}})';
-z.string.fr.tooltip_conversations_start = 'Commencer une conversation ({{shortcut}})';
+z.string.fr.tooltipConversationsNotify = 'Activer les notifications ({{shortcut}})';
+z.string.fr.tooltipConversationsPreferences = 'Ouvrir les préférences';
+z.string.fr.tooltipConversationsSilence = 'Désactiver les notifications ({{shortcut}})';
+z.string.fr.tooltipConversationsStart = 'Commencer une conversation ({{shortcut}})';
 
 z.string.fr.tooltipPeopleAdd = 'Ajouter des personnes à la conversation ({{shortcut}})';
 z.string.fr.tooltipPeopleBack = 'Précédent';

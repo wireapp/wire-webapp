@@ -545,10 +545,10 @@ z.string.ru.tooltip_conversation_video_call = 'Видеозвонок';
 z.string.ru.tooltip_conversations_archive = 'Архивировать ({{shortcut}})';
 z.string.ru.tooltip_conversations_archived = 'Показать архив ({{number}})';
 z.string.ru.tooltip_conversations_more = 'Больше';
-z.string.ru.tooltip_conversations_notify = 'Включить звук ({{shortcut}})';
-z.string.ru.tooltip_conversations_preferences = 'Открыть настройки';
-z.string.ru.tooltip_conversations_silence = 'Выключить звук ({{shortcut}})';
-z.string.ru.tooltip_conversations_start = 'Начать разговор ({{shortcut}})';
+z.string.ru.tooltipConversationsNotify = 'Включить звук ({{shortcut}})';
+z.string.ru.tooltipConversationsPreferences = 'Открыть настройки';
+z.string.ru.tooltipConversationsSilence = 'Выключить звук ({{shortcut}})';
+z.string.ru.tooltipConversationsStart = 'Начать разговор ({{shortcut}})';
 
 z.string.ru.tooltipPeopleAdd = 'Добавить в разговор ({{shortcut}})';
 z.string.ru. tooltipPeopleAddPeople = 'Добавить людей в разговор ({{shortcut}})';

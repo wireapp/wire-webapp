@@ -470,9 +470,9 @@ z.string.hr.tooltip_conversation_video_call = 'Video poziv';
 z.string.hr.tooltip_conversations_archive = 'Arhiva ({{shortcut}})';
 z.string.hr.tooltip_conversations_archived = 'Pokaži arhivu ({{number}})';
 z.string.hr.tooltip_conversations_more = 'Više';
-z.string.hr.tooltip_conversations_notify = 'Uključi zvukove ({{shortcut}})';
-z.string.hr.tooltip_conversations_silence = 'Isključi zvukove ({{shortcut}})';
-z.string.hr.tooltip_conversations_start = 'Početak razgovora ({{shortcut}})';
+z.string.hr.tooltipConversationsNotify = 'Uključi zvukove ({{shortcut}})';
+z.string.hr.tooltipConversationsSilence = 'Isključi zvukove ({{shortcut}})';
+z.string.hr.tooltipConversationsStart = 'Početak razgovora ({{shortcut}})';
 
 z.string.hr.tooltipPeopleAdd = 'Dodaj ljude u razgovor ({{shortcut}})';
 z.string.hr.tooltipPeopleBack = 'Natrag';

@@ -546,10 +546,10 @@ z.string.uk.tooltip_conversation_video_call = 'Відеодзвінок';
 z.string.uk.tooltip_conversations_archive = 'Архівувати ({{shortcut}})';
 z.string.uk.tooltip_conversations_archived = 'Показати архів ({{number}})';
 z.string.uk.tooltip_conversations_more = 'Більше';
-z.string.uk.tooltip_conversations_notify = 'Увімкнути звук ({{shortcut}})';
-z.string.uk.tooltip_conversations_preferences = 'Відкрити налаштування';
-z.string.uk.tooltip_conversations_silence = 'Вимкнути звук ({{shortcut}})';
-z.string.uk.tooltip_conversations_start = 'Почати розмову ({{shortcut}})';
+z.string.uk.tooltipConversationsNotify = 'Увімкнути звук ({{shortcut}})';
+z.string.uk.tooltipConversationsPreferences = 'Відкрити налаштування';
+z.string.uk.tooltipConversationsSilence = 'Вимкнути звук ({{shortcut}})';
+z.string.uk.tooltipConversationsStart = 'Почати розмову ({{shortcut}})';
 
 z.string.uk.tooltip_people_add = 'Додати учасників до розмови ({{shortcut}})';
 z.string.uk.tooltip_people_add_people = 'Додати учасників до розмови ({{shortcut}})';

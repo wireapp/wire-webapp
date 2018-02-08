@@ -517,10 +517,10 @@ z.string.sl.tooltip_conversation_video_call = 'Videoklic';
 z.string.sl.tooltip_conversations_archive = 'Arhiviraj ({{shortcut}})';
 z.string.sl.tooltip_conversations_archived = 'Prikaži arhiv ({{number}})';
 z.string.sl.tooltip_conversations_more = 'Več';
-z.string.sl.tooltip_conversations_notify = 'Povrni zvok ({{shortcut}})';
-z.string.sl.tooltip_conversations_preferences = 'Odpri nastavitve';
-z.string.sl.tooltip_conversations_silence = 'Utišaj ({{shortcut}})';
-z.string.sl.tooltip_conversations_start = 'Začni pogovor ({{shortcut}})';
+z.string.sl.tooltipConversationsNotify = 'Povrni zvok ({{shortcut}})';
+z.string.sl.tooltipConversationsPreferences = 'Odpri nastavitve';
+z.string.sl.tooltipConversationsSilence = 'Utišaj ({{shortcut}})';
+z.string.sl.tooltipConversationsStart = 'Začni pogovor ({{shortcut}})';
 
 z.string.sl.tooltipPeopleAdd = 'Dodaj osebe v pogovor ({{shortcut}})';
 z.string.sl.tooltipPeopleBack = 'Nazaj';

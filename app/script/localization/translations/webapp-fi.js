@@ -527,10 +527,10 @@ z.string.fi.tooltip_conversation_video_call = 'Videopuhelu';
 z.string.fi.tooltip_conversations_archive = 'Arkisto ({{shortcut}})';
 z.string.fi.tooltip_conversations_archived = 'Näytä arkisto ({{number}})';
 z.string.fi.tooltip_conversations_more = 'Lisää';
-z.string.fi.tooltip_conversations_notify = 'Poist mykistys ({{shortcut}})';
-z.string.fi.tooltip_conversations_preferences = 'Avaa asetukset';
-z.string.fi.tooltip_conversations_silence = 'Mykistä ({{shortcut}})';
-z.string.fi.tooltip_conversations_start = 'Aloita keskustelu ({{shortcut}})';
+z.string.fi.tooltipConversationsNotify = 'Poist mykistys ({{shortcut}})';
+z.string.fi.tooltipConversationsPreferences = 'Avaa asetukset';
+z.string.fi.tooltipConversationsSilence = 'Mykistä ({{shortcut}})';
+z.string.fi.tooltipConversationsStart = 'Aloita keskustelu ({{shortcut}})';
 
 z.string.fi.tooltipPeopleAdd = 'Lisää henkilöitä keskusteluun ({{shortcut}})';
 z.string.fi.tooltipPeopleBack = 'Takaisin';

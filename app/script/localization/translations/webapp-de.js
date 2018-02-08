@@ -554,10 +554,10 @@ z.string.de.tooltip_conversation_video_call = 'Videoanruf';
 z.string.de.tooltip_conversations_archive = 'Archivieren ({{shortcut}})';
 z.string.de.tooltip_conversations_archived = 'Archiv anzeigen ({{number}})';
 z.string.de.tooltip_conversations_more = 'Mehr';
-z.string.de.tooltip_conversations_notify = 'Benachrichtigen ({{shortcut}})';
-z.string.de.tooltip_conversations_preferences = 'Einstellungen öffnen';
-z.string.de.tooltip_conversations_silence = 'Stummschalten ({{shortcut}})';
-z.string.de.tooltip_conversations_start = 'Unterhaltung beginnen ({{shortcut}})';
+z.string.de.tooltipConversationsNotify = 'Benachrichtigen ({{shortcut}})';
+z.string.de.tooltipConversationsPreferences = 'Einstellungen öffnen';
+z.string.de.tooltipConversationsSilence = 'Stummschalten ({{shortcut}})';
+z.string.de.tooltipConversationsStart = 'Unterhaltung beginnen ({{shortcut}})';
 
 z.string.de.tooltipPeopleAdd = 'Zur Unterhaltung hinzufügen ({{shortcut}})';
 z.string.de. tooltipPeopleAddPeople = 'Kontakte zur Unterhaltung hinzufügen ({{shortcut}})';

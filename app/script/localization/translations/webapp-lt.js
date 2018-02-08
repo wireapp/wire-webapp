@@ -546,10 +546,10 @@ z.string.lt.tooltip_conversation_video_call = 'Vaizdo skambutis';
 z.string.lt.tooltip_conversations_archive = 'Archyvuoti ({{shortcut}})';
 z.string.lt.tooltip_conversations_archived = 'Rodyti archyvą ({{number}})';
 z.string.lt.tooltip_conversations_more = 'Daugiau';
-z.string.lt.tooltip_conversations_notify = 'Įjungti pranešimus ({{shortcut}})';
-z.string.lt.tooltip_conversations_preferences = 'Atverti nuostatas';
-z.string.lt.tooltip_conversations_silence = 'Išjungti pranešimus ({{shortcut}})';
-z.string.lt.tooltip_conversations_start = 'Pradėti pokalbį ({{shortcut}})';
+z.string.lt.tooltipConversationsNotify = 'Įjungti pranešimus ({{shortcut}})';
+z.string.lt.tooltipConversationsPreferences = 'Atverti nuostatas';
+z.string.lt.tooltipConversationsSilence = 'Išjungti pranešimus ({{shortcut}})';
+z.string.lt.tooltipConversationsStart = 'Pradėti pokalbį ({{shortcut}})';
 
 z.string.lt.tooltipPeopleAdd = 'Pridėti žmones į pokalbį ({{shortcut}})';
 z.string.lt. tooltipPeopleAddPeople = 'Pridėti žmonių į susirašinėjimą ({{shortcut}})';

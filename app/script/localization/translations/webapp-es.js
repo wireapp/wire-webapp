@@ -534,10 +534,10 @@ z.string.es.tooltip_conversation_video_call = 'Videollamada';
 z.string.es.tooltip_conversations_archive = 'Archivo ({{shortcut}})';
 z.string.es.tooltip_conversations_archived = 'Mostrar archivo ({{number}})';
 z.string.es.tooltip_conversations_more = 'Más';
-z.string.es.tooltip_conversations_notify = 'Activar sónido ({{shortcut}})';
-z.string.es.tooltip_conversations_preferences = 'Abrir preferencias';
-z.string.es.tooltip_conversations_silence = 'Silenciar ({{shortcut}})';
-z.string.es.tooltip_conversations_start = 'Empezar una conversación ({{shortcut}})';
+z.string.es.tooltipConversationsNotify = 'Activar sónido ({{shortcut}})';
+z.string.es.tooltipConversationsPreferences = 'Abrir preferencias';
+z.string.es.tooltipConversationsSilence = 'Silenciar ({{shortcut}})';
+z.string.es.tooltipConversationsStart = 'Empezar una conversación ({{shortcut}})';
 
 z.string.es.tooltipPeopleAdd = 'Añadir personas a la conversación ({{shortcut}})';
 z.string.es.tooltipPeopleBack = 'Atrás';

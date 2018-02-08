@@ -545,10 +545,10 @@ z.string.ro.tooltip_conversation_video_call = 'Apel video';
 z.string.ro.tooltip_conversations_archive = 'Arhivează ({{shortcut}})';
 z.string.ro.tooltip_conversations_archived = 'Arată arhiva ({{number}})';
 z.string.ro.tooltip_conversations_more = 'Mai multe';
-z.string.ro.tooltip_conversations_notify = 'Demutizează ({{shortcut}})';
-z.string.ro.tooltip_conversations_preferences = 'Deschide preferințele';
-z.string.ro.tooltip_conversations_silence = 'Mutizează ({{shortcut}})';
-z.string.ro.tooltip_conversations_start = 'Începe conversația ({{shortcut}})';
+z.string.ro.tooltipConversationsNotify = 'Demutizează ({{shortcut}})';
+z.string.ro.tooltipConversationsPreferences = 'Deschide preferințele';
+z.string.ro.tooltipConversationsSilence = 'Mutizează ({{shortcut}})';
+z.string.ro.tooltipConversationsStart = 'Începe conversația ({{shortcut}})';
 
 z.string.ro.tooltipPeopleAdd = 'Adaugă persoane la conversație ({{shortcut}})';
 z.string.ro. tooltipPeopleAddPeople = 'Adaugă persoane la conversație ({{shortcut}})';

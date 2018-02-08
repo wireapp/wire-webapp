@@ -520,10 +520,10 @@ z.string.it.tooltip_conversation_video_call = 'Videochiama';
 z.string.it.tooltip_conversations_archive = 'Archivio ({{shortcut}})';
 z.string.it.tooltip_conversations_archived = 'Mostra archivio ({{number}})';
 z.string.it.tooltip_conversations_more = 'Altro';
-z.string.it.tooltip_conversations_notify = 'Riattiva audio ({{shortcut}})';
-z.string.it.tooltip_conversations_preferences = 'Apri le preferenze';
-z.string.it.tooltip_conversations_silence = 'Silenzia ({{shortcut}})';
-z.string.it.tooltip_conversations_start = 'Avviare conversazione ({{shortcut}})';
+z.string.it.tooltipConversationsNotify = 'Riattiva audio ({{shortcut}})';
+z.string.it.tooltipConversationsPreferences = 'Apri le preferenze';
+z.string.it.tooltipConversationsSilence = 'Silenzia ({{shortcut}})';
+z.string.it.tooltipConversationsStart = 'Avviare conversazione ({{shortcut}})';
 
 z.string.it.tooltipPeopleAdd = 'Aggiungi persone alla conversazione ({{shortcut}})';
 z.string.it.tooltipPeopleBack = 'Indietro';

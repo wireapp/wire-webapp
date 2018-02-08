@@ -551,10 +551,10 @@ z.string.hu.tooltip_conversation_video_call = 'Videóhívás';
 z.string.hu.tooltip_conversations_archive = 'Archiválás ({{shortcut}})';
 z.string.hu.tooltip_conversations_archived = 'Archívum megtekintése ({{number}})';
 z.string.hu.tooltip_conversations_more = 'Továbbiak';
-z.string.hu.tooltip_conversations_notify = 'Némítás feloldása ({{shortcut}})';
-z.string.hu.tooltip_conversations_preferences = 'Beállítások megnyitása';
-z.string.hu.tooltip_conversations_silence = 'Némítás ({{shortcut}})';
-z.string.hu.tooltip_conversations_start = 'Beszélgetés megkezdése ({{shortcut}})';
+z.string.hu.tooltipConversationsNotify = 'Némítás feloldása ({{shortcut}})';
+z.string.hu.tooltipConversationsPreferences = 'Beállítások megnyitása';
+z.string.hu.tooltipConversationsSilence = 'Némítás ({{shortcut}})';
+z.string.hu.tooltipConversationsStart = 'Beszélgetés megkezdése ({{shortcut}})';
 
 z.string.hu.tooltipPeopleAdd = 'Partnerek hozzáadása a beszélgetéshez ({{shortcut}})';
 z.string.hu. tooltipPeopleAddPeople = 'Partnerek hozzáadása a beszélgetéshez ({{shortcut}})';

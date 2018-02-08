@@ -526,10 +526,10 @@ z.string.sk.tooltip_conversation_video_call = 'Videohovor';
 z.string.sk.tooltip_conversations_archive = 'Archív ({{shortcut}})';
 z.string.sk.tooltip_conversations_archived = 'Zobraziť archív ({{number}})';
 z.string.sk.tooltip_conversations_more = 'Viac';
-z.string.sk.tooltip_conversations_notify = 'Zrušiť stlmenie ({{shortcut}})';
-z.string.sk.tooltip_conversations_preferences = 'Otvoriť predvoľby';
-z.string.sk.tooltip_conversations_silence = 'Stlmiť ({{shortcut}})';
-z.string.sk.tooltip_conversations_start = 'Začať rozhovor ({{shortcut}})';
+z.string.sk.tooltipConversationsNotify = 'Zrušiť stlmenie ({{shortcut}})';
+z.string.sk.tooltipConversationsPreferences = 'Otvoriť predvoľby';
+z.string.sk.tooltipConversationsSilence = 'Stlmiť ({{shortcut}})';
+z.string.sk.tooltipConversationsStart = 'Začať rozhovor ({{shortcut}})';
 
 z.string.sk.tooltipPeopleAdd = 'Pridať ľudí do rozhovoru ({{shortcut}})';
 z.string.sk.tooltipPeopleBack = 'Späť';

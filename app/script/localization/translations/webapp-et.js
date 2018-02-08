@@ -546,10 +546,10 @@ z.string.et.tooltip_conversation_video_call = 'Videokõne';
 z.string.et.tooltip_conversations_archive = 'Arhiveeri ({{shortcut}})';
 z.string.et.tooltip_conversations_archived = 'Kuva arhiiv ({{number}})';
 z.string.et.tooltip_conversations_more = 'Veel';
-z.string.et.tooltip_conversations_notify = 'Eemalda vaigistus ({{shortcut}})';
-z.string.et.tooltip_conversations_preferences = 'Ava eelistused';
-z.string.et.tooltip_conversations_silence = 'Vaigista ({{shortcut}})';
-z.string.et.tooltip_conversations_start = 'Alusta vestlust ({{shortcut}})';
+z.string.et.tooltipConversationsNotify = 'Eemalda vaigistus ({{shortcut}})';
+z.string.et.tooltipConversationsPreferences = 'Ava eelistused';
+z.string.et.tooltipConversationsSilence = 'Vaigista ({{shortcut}})';
+z.string.et.tooltipConversationsStart = 'Alusta vestlust ({{shortcut}})';
 
 z.string.et.tooltipPeopleAdd = 'Lisa inimesi vestlusse ({{shortcut}})';
 z.string.et. tooltipPeopleAddPeople = 'Lisa inimesi vestlusse ({{shortcut}})';

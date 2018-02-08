@@ -527,10 +527,10 @@ z.string.pl.tooltip_conversation_video_call = 'Połączenie video';
 z.string.pl.tooltip_conversations_archive = 'Archiwum ({{shortcut}})';
 z.string.pl.tooltip_conversations_archived = 'Pokaż archiwum ({{number}})';
 z.string.pl.tooltip_conversations_more = 'Więcej';
-z.string.pl.tooltip_conversations_notify = 'Wyłącz wyciszenie ({{shortcut}})';
-z.string.pl.tooltip_conversations_preferences = 'Ustawienia';
-z.string.pl.tooltip_conversations_silence = 'Wycisz ({{shortcut}})';
-z.string.pl.tooltip_conversations_start = 'Zacznij rozmowę ({{shortcut}})';
+z.string.pl.tooltipConversationsNotify = 'Wyłącz wyciszenie ({{shortcut}})';
+z.string.pl.tooltipConversationsPreferences = 'Ustawienia';
+z.string.pl.tooltipConversationsSilence = 'Wycisz ({{shortcut}})';
+z.string.pl.tooltipConversationsStart = 'Zacznij rozmowę ({{shortcut}})';
 
 z.string.pl.tooltipPeopleAdd = 'Dodaj uczestników do rozmowy ({{shortcut}})';
 z.string.pl.tooltipPeopleBack = 'Z powrotem';

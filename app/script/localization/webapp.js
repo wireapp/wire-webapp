@@ -624,10 +624,10 @@ z.string.tooltip_conversation_video_call = 'Video Call';
 z.string.tooltip_conversations_archive = 'Archive ({{shortcut}})';
 z.string.tooltip_conversations_archived = 'Show archive ({{number}})';
 z.string.tooltip_conversations_more = 'More';
-z.string.tooltip_conversations_notify = 'Unmute ({{shortcut}})';
-z.string.tooltip_conversations_preferences = 'Open preferences';
-z.string.tooltip_conversations_silence = 'Mute ({{shortcut}})';
-z.string.tooltip_conversations_start = 'Start conversation ({{shortcut}})';
+z.string.tooltipConversationsNotify = 'Unmute ({{shortcut}})';
+z.string.tooltipConversationsPreferences = 'Open preferences';
+z.string.tooltipConversationsSilence = 'Mute ({{shortcut}})';
+z.string.tooltipConversationsStart = 'Start conversation ({{shortcut}})';
 
 z.string.tooltipPeopleAdd = 'Add to conversation ({{shortcut}})';
 z.string.tooltipPeopleAddPeople = 'Add people to conversation ({{shortcut}})';

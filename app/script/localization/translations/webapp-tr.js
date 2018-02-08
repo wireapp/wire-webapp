@@ -534,10 +534,10 @@ z.string.tr.tooltip_conversation_video_call = 'Görüntülü Ara';
 z.string.tr.tooltip_conversations_archive = 'Arşivle ({{shortcut}})';
 z.string.tr.tooltip_conversations_archived = 'Arşivi göster ({{number}})';
 z.string.tr.tooltip_conversations_more = 'Daha';
-z.string.tr.tooltip_conversations_notify = 'Sesi aç ({{shortcut}})';
-z.string.tr.tooltip_conversations_preferences = 'Seçenekleri aç';
-z.string.tr.tooltip_conversations_silence = 'Sessize al ({{shortcut}})';
-z.string.tr.tooltip_conversations_start = 'Konuşma başlat ({{shortcut}})';
+z.string.tr.tooltipConversationsNotify = 'Sesi aç ({{shortcut}})';
+z.string.tr.tooltipConversationsPreferences = 'Seçenekleri aç';
+z.string.tr.tooltipConversationsSilence = 'Sessize al ({{shortcut}})';
+z.string.tr.tooltipConversationsStart = 'Konuşma başlat ({{shortcut}})';
 
 z.string.tr.tooltipPeopleAdd = 'Konuşmaya birilerini ekle ({{shortcut}})';
 z.string.tr.tooltipPeopleBack = 'Geri';

@@ -500,9 +500,9 @@ z.string.da.tooltip_conversation_video_call = 'Videoopkald';
 z.string.da.tooltip_conversations_archive = 'Arkiv ({{shortcut}})';
 z.string.da.tooltip_conversations_archived = 'Vis arkiv ({{number}})';
 z.string.da.tooltip_conversations_more = 'Mere';
-z.string.da.tooltip_conversations_notify = 'Unmute ({{shortcut}})';
-z.string.da.tooltip_conversations_silence = 'Mute ({{shortcut}})';
-z.string.da.tooltip_conversations_start = 'Start samtale ({{shortcut}})';
+z.string.da.tooltipConversationsNotify = 'Unmute ({{shortcut}})';
+z.string.da.tooltipConversationsSilence = 'Mute ({{shortcut}})';
+z.string.da.tooltipConversationsStart = 'Start samtale ({{shortcut}})';
 
 z.string.da.tooltipPeopleAdd = 'Tilføj personer til samtalen ({{shortcut}})';
 z.string.da.tooltipPeopleBack = 'Tilbage';
