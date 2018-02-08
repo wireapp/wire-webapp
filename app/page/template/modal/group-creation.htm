@@ -17,11 +17,11 @@
     <!-- /ko -->
     <div class="modal-center group-creation-modal-center">
       <!-- ko if: stateIsParticipants() -->
-        <user-list class="group-creation-modal-participants-list user-list-light user-list-light-badge" params="user: contacts, filter: participantsInput, selected: selectedContacts" data-bind="antiscroll: shouldUpdateScrollbar"></user-list>
+        <user-list class="group-creation-modal-participants-list user-list-light" params="user: contacts, filter: participantsInput, selected: selectedContacts" data-bind="antiscroll: shouldUpdateScrollbar"></user-list>
       <!-- /ko -->
       <!-- ko if: stateIsPreferences() -->
         <input class="input group-creation-modal-teamname-input" autofocus autocomplete="off" maxlength="64" required spellcheck="false" type="text" data-bind="textInput: nameInput, hasFocus: true, l10n_placeholder: z.string.groupCreationPreferencesPlaceholder, enter: clickOnNext" data-uie-name="enter-group-name">
-        <div data-bind="text: nameError, visible: nameError().length"></div>
+        <div class="group-creation-error" data-bind="text: nameError, visible: nameError().length"></div>
       <!-- /ko -->
     </div>
   </div>
