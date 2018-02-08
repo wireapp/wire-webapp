@@ -694,7 +694,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
 
     if (team_id) {
-      return this.createGroupConversation([user_et.id]);
+      return this.createGroupConversation([user_et]);
     }
 
     return this.fetch_conversation_by_id(user_et.connection().conversation_id)
