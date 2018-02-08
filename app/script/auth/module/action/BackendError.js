@@ -71,6 +71,7 @@ export default class BackendError extends Error {
 
   static HANDLE_ERRORS = {
     HANDLE_EXISTS: 'handle-exists',
+    HANDLE_TOO_SHORT: 'handle-too-short', // Synthetic error label
     INVALID_HANDLE: 'invalid-handle',
   };
 
