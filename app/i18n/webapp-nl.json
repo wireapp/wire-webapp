@@ -15,7 +15,7 @@
   "accountForm.emailPersonalPlaceholder": "uw@email.eu",
   "accountForm.passwordPlaceholder": "Wachtwoord (minimaal 8 tekens)",
   "accountForm.terms": "Ik accepteer de <a {linkParams}> Gebruiksvoorwaarden</a>",
-  "accountForm.nextButton": "Volgende",
+  "accountForm.submitButton": "Volgende",
   "createAccount.nextButton": "Volgende",
   "invite.nextButton": "Volgende",
   "createAccount.headLine": "Stel je account in",
@@ -63,6 +63,7 @@
     "Dit e-mailadres is al in gebruik. <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://support.wire.com/hc/articles/115004082129\">Meer informatie (Engels)</a>",
   "BackendError.unexpected": "Onverwachte fout ({code} {message})",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Voer een naam met ten minste 2 karakters",
+  "ValidationError.FIELD.NAME.VALUE_MISSING": "Voer een naam met ten minste 2 karakters",
   "ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH": "Kies een wachtwoord van minimaal 8 tekens",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": "Voer een geldig e-mailadres in"
 }

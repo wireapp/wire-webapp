@@ -15,7 +15,7 @@
   "accountForm.emailPersonalPlaceholder": "tavo@adresas.lt",
   "accountForm.passwordPlaceholder": "Slaptažodis (bent 8 simboliai)",
   "accountForm.terms": "Sutinku su<a {linkParams}>nuostatomis ir sąlygomis</a>",
-  "accountForm.nextButton": "Kitas",
+  "accountForm.submitButton": "Kitas",
   "createAccount.nextButton": "Kitas",
   "invite.nextButton": "Kitas",
   "createAccount.headLine": "Susikurkite paskyrą",
@@ -63,6 +63,7 @@
     "Šis el. pašto adresas jau užregistruotas. <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://support.wire.com/hc/articles/115004082129\">Sužinokite daugiau</a>",
   "BackendError.unexpected": "Netikėta klaida ({code} {message})",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Įveskite bent 2 simbolių vardą",
+  "ValidationError.FIELD.NAME.VALUE_MISSING": "Įveskite bent 2 simbolių vardą",
   "ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH": "Įrašykite bent 8 simbolių slaptažodį",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": "Įrašykite teisingą el. pašto adresą"
 }
