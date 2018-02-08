@@ -688,7 +688,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
 
     if (team_id) {
-      return this.create_new_conversation([user_et.id], undefined);
+      return this.createGroupConversation([user_et.id], undefined);
     }
 
     return this.fetch_conversation_by_id(user_et.connection().conversation_id)
@@ -989,13 +989,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
       case z.service.BackendClientError.LABEL.BAD_GATEWAY:
       case z.service.BackendClientError.LABEL.SERVER_ERROR:
-      case z.service.BackendClientError.LABEL.SERVICE_DISABLED: {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.SERVICE_DISABLED);
-        break;
-      }
-
+      case z.service.BackendClientError.LABEL.SERVICE_DISABLED:
       case z.service.BackendClientError.LABEL.TOO_MANY_BOTS: {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.TOO_MANY_BOTS);
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.SERVICE_UNAVAILABLE);
         break;
       }
 
