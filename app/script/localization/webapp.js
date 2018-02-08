@@ -203,18 +203,15 @@ z.string.modal_remove_device_button = 'Remove device';
 z.string.modal_remove_device_headline = 'Remove "{{device}}"';
 z.string.modal_remove_device_message = 'Your password is required to remove the device.';
 // Service unavailable
-z.string.modal_service_disabled_headline = 'Adding service not possible';
-z.string.modal_service_disabled_message = 'The service is unavailable a the moment.';
+z.string.modalServiceUnavailableHeadline = 'Adding service not possible';
+z.string.modalServiceUnavailableMessage = 'The service is unavailable a the moment.';
 // Session Reset
 z.string.modal_session_reset_headline = 'The session has been reset';
 z.string.modal_session_reset_message_1 = 'If the problem is not resolved,';
 z.string.modal_session_reset_message_link = 'contact';
 z.string.modal_session_reset_message_2 = 'us.';
-// Too many bots in conversation
-z.string.modal_too_many_bots_headline = 'Adding service not possible';
-z.string.modal_too_many_bots_message = 'The bot is already part of this conversation.';
 // Too many members in conversation
-z.string.modal_too_many_members_headline = 'Full house';
+z.string.modalTooManyMembersHeadline = 'Full house';
 z.string.modal_too_many_members_message = 'Up to {{number1}} people can join a conversation. There is room for {{number2}} more people in here.';
 // Parallel uploads
 z.string.modalUploadsParallel = 'You can send up to {{number}} files at once.';

@@ -171,7 +171,7 @@ z.string.fr.modal_session_reset_headline = 'La session a été réinitialisée';
 z.string.fr.modal_session_reset_message_1 = 'Si le problème n’est pas résolu,';
 z.string.fr.modal_session_reset_message_link = 'contactez';
 z.string.fr.modal_session_reset_message_2 = '-nous.';
-z.string.fr.modal_too_many_members_headline = 'Salle comble';
+z.string.fr.modalTooManyMembersHeadline = 'Salle comble';
 z.string.fr.modal_too_many_members_message = 'Jusqu’à {{number1}} personne(s) peuvent se joindre à une conversation. Il y a encore de la place pour {{number2}} personne(s) ici.';
 z.string.fr.modalUploadsParallel = 'Vous pouvez envoyer jusqu’à {{number}} fichiers à la fois.';
 

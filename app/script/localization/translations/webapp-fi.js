@@ -169,7 +169,7 @@ z.string.fi.modal_session_reset_headline = 'Istunto on nollattu';
 z.string.fi.modal_session_reset_message_1 = 'Jos ongelma ei ole ratkennut';
 z.string.fi.modal_session_reset_message_link = 'ota yhteys';
 z.string.fi.modal_session_reset_message_2 = 'meihin.';
-z.string.fi.modal_too_many_members_headline = 'Kaikki puhelukanavat varattuja';
+z.string.fi.modalTooManyMembersHeadline = 'Kaikki puhelukanavat varattuja';
 z.string.fi.modal_too_many_members_message = 'Maksimissaan {{number1}} henkilöä voi liittyä keskusteluun. Tässä keskustelussa on tilaa {{number2}} hengelle.';
 z.string.fi.modalUploadsParallel = 'Voit lähettää jopa {{number}} tiedostoa samaan aikaan.';
 

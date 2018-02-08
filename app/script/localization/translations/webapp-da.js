@@ -157,7 +157,7 @@ z.string.da.modal_session_reset_headline = 'Sessionen er blevet nulstillet';
 z.string.da.modal_session_reset_message_1 = 'Hvis problemet ikke er løst,';
 z.string.da.modal_session_reset_message_link = 'kontakt';
 z.string.da.modal_session_reset_message_2 = 'os.';
-z.string.da.modal_too_many_members_headline = 'Fuldt hus';
+z.string.da.modalTooManyMembersHeadline = 'Fuldt hus';
 z.string.da.modal_too_many_members_message = 'Op til {{number1}} personer kan deltage i en samtale. Der er plads til {{number2}} personer mere herinde.';
 z.string.da.modalUploadsParallel = 'Du kan sende op til {{number}} filer på én gang.';
 

@@ -168,7 +168,7 @@ z.string.cs.modal_session_reset_headline = 'Sezení bylo zresetováno';
 z.string.cs.modal_session_reset_message_1 = 'Pokud problém není vyřešen,';
 z.string.cs.modal_session_reset_message_link = 'kontaktujte';
 z.string.cs.modal_session_reset_message_2 = 'nás.';
-z.string.cs.modal_too_many_members_headline = 'Přeplněné kupé';
+z.string.cs.modalTooManyMembersHeadline = 'Přeplněné kupé';
 z.string.cs.modal_too_many_members_message = 'Ke konverzaci se může připojit az {{number1}} účastníků. Je zde ještě místo pro {{number2}}.';
 z.string.cs.modalUploadsParallel = 'Najednou můžete poslat až {{number}} souborů.';
 

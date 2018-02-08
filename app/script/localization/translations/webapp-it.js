@@ -164,7 +164,7 @@ z.string.it.modal_session_reset_headline = 'La sessione è stata reimpostata';
 z.string.it.modal_session_reset_message_1 = 'Se il problema non viene risolto,';
 z.string.it.modal_session_reset_message_link = 'contatta';
 z.string.it.modal_session_reset_message_2 = 'Wire.';
-z.string.it.modal_too_many_members_headline = 'Chiamata piena';
+z.string.it.modalTooManyMembersHeadline = 'Chiamata piena';
 z.string.it.modal_too_many_members_message = 'Fino a {{number1}} persone possono partecipare a una conversazione. C’è spazio per ancora {{number2}} persone qui dentro.';
 z.string.it.modalUploadsParallel = 'È possibile inviare fino a {{number}} file in una sola volta.';
 

@@ -170,7 +170,7 @@ z.string.tr.modal_session_reset_headline = 'Oturum sıfırlandı';
 z.string.tr.modal_session_reset_message_1 = 'Eğer sorun çözülmemişse,';
 z.string.tr.modal_session_reset_message_link = 'iletişime geç';
 z.string.tr.modal_session_reset_message_2 = 'biz.';
-z.string.tr.modal_too_many_members_headline = 'Dolup taşmış';
+z.string.tr.modalTooManyMembersHeadline = 'Dolup taşmış';
 z.string.tr.modal_too_many_members_message = 'Görüşmeye en fazla {{number1}} kişi katılabilir. Burada {{number2}} kişi için daha boş yer var.';
 z.string.tr.modalUploadsParallel = 'Tek seferde en fazla {{number}} boyutunda dosya gönderebilirsiniz.';
 

@@ -167,7 +167,7 @@ z.string.el.modal_session_reset_headline = 'Η περίοδος λειτουργ
 z.string.el.modal_session_reset_message_1 = 'Εάν το πρόβλημα δεν επιλυθεί,';
 z.string.el.modal_session_reset_message_link = 'επαφή';
 z.string.el.modal_session_reset_message_2 = 'Εμάς.';
-z.string.el.modal_too_many_members_headline = 'Full house';
+z.string.el.modalTooManyMembersHeadline = 'Full house';
 z.string.el.modal_too_many_members_message = 'Μέχρι και {{number1}} άτομα μπορούν να συμμετάσχουν σε μια συνομιλία. Υπάρχει χώρος για {{number2}} επιπλέον άτομα εδώ.';
 z.string.el.modalUploadsParallel = 'Μπορείτε να στείλετε μέχρι και {{number}} αρχεία ταυτόχρονα.';
 

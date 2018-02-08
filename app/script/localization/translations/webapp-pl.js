@@ -169,7 +169,7 @@ z.string.pl.modal_session_reset_headline = 'Sesja została zresetowana';
 z.string.pl.modal_session_reset_message_1 = 'Jeśli problem nie zostanie rozwiązany,';
 z.string.pl.modal_session_reset_message_link = 'kontakt';
 z.string.pl.modal_session_reset_message_2 = 'nas.';
-z.string.pl.modal_too_many_members_headline = 'Zbyt wielu uczestników rozmowy';
+z.string.pl.modalTooManyMembersHeadline = 'Zbyt wielu uczestników rozmowy';
 z.string.pl.modal_too_many_members_message = 'Maksymalna liczba rozmówców to {{number1}}. Nie ma już miejsca na dodatkowe {{number2}} osoby.';
 z.string.pl.modalUploadsParallel = 'Jednorazowo możesz wysłać maksymalnie {{number}} plików.';
 

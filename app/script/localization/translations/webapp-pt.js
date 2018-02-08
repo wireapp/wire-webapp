@@ -170,7 +170,7 @@ z.string.pt.modal_session_reset_headline = 'A sessão foi reposta';
 z.string.pt.modal_session_reset_message_1 = 'Se o problema não está resolvido,';
 z.string.pt.modal_session_reset_message_link = 'contacto';
 z.string.pt.modal_session_reset_message_2 = 'nós.';
-z.string.pt.modal_too_many_members_headline = 'Casa cheia';
+z.string.pt.modalTooManyMembersHeadline = 'Casa cheia';
 z.string.pt.modal_too_many_members_message = 'Até {{number1}} as pessoas podem participar de uma conversa. Há espaço para mais {{number2}} pessoas.';
 z.string.pt.modalUploadsParallel = 'Pode enviar até {{number}} ficheiros de cada vez.';
 

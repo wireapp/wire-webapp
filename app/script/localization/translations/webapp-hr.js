@@ -153,7 +153,7 @@ z.string.hr.modal_session_reset_headline = 'Sesija je resetirana';
 z.string.hr.modal_session_reset_message_1 = 'Ako problem nije razriješen,';
 z.string.hr.modal_session_reset_message_link = 'kontaktirajte';
 z.string.hr.modal_session_reset_message_2 = 'nas.';
-z.string.hr.modal_too_many_members_headline = 'Puna kuća';
+z.string.hr.modalTooManyMembersHeadline = 'Puna kuća';
 z.string.hr.modal_too_many_members_message = 'Do {{number1}} ljudi može pristupiti razgovoru. Ima mjesta za još {{number2}} ljudi ovdje.';
 z.string.hr.modalUploadsParallel = 'Možete poslati {{number}} datoteke odjednom.';
 

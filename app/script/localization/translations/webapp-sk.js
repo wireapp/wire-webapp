@@ -169,7 +169,7 @@ z.string.sk.modal_session_reset_headline = 'Relácia bola obnovená';
 z.string.sk.modal_session_reset_message_1 = 'Ak problém nebol vyriešený,';
 z.string.sk.modal_session_reset_message_link = 'kontakt';
 z.string.sk.modal_session_reset_message_2 = 'nás.';
-z.string.sk.modal_too_many_members_headline = 'Priveľa účastníkov';
+z.string.sk.modalTooManyMembersHeadline = 'Priveľa účastníkov';
 z.string.sk.modal_too_many_members_message = 'Do rozhovoru sa môže zapojiť {{number1}} ľudí. ';
 z.string.sk.modalUploadsParallel = 'Súčasne môžete poslať až {{number}} súborov.';
 

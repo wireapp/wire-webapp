@@ -176,7 +176,7 @@ z.string.uk.modal_session_reset_message_link = 'зв’яжіться';
 z.string.uk.modal_session_reset_message_2 = 'з нами.';
 z.string.uk.modal_too_many_bots_headline = 'Неможливо додати сервіс';
 z.string.uk.modal_too_many_bots_message = 'Бот вже є частиною цієї розмови.';
-z.string.uk.modal_too_many_members_headline = 'Голосовий канал переповнений';
+z.string.uk.modalTooManyMembersHeadline = 'Голосовий канал переповнений';
 z.string.uk.modal_too_many_members_message = 'В розмові може бути до {{number1}} учасників. В даній розмові уже не вистачає місця для {{number}} учасників.';
 z.string.uk.modalUploadsParallel = 'Ви можете надіслати до {{number}} файлів за один раз.';
 

@@ -170,7 +170,7 @@ z.string.es.modal_session_reset_headline = 'La sesión ha sido restablecida';
 z.string.es.modal_session_reset_message_1 = 'Si no se resuelva el problema,';
 z.string.es.modal_session_reset_message_link = 'comunicarse con';
 z.string.es.modal_session_reset_message_2 = 'nosotros.';
-z.string.es.modal_too_many_members_headline = 'Llamada llena';
+z.string.es.modalTooManyMembersHeadline = 'Llamada llena';
 z.string.es.modal_too_many_members_message = 'Hasta {{number1}} personas pueden unirse a una conversación. Hay espacio para {{number2}} más personas aquí.';
 z.string.es.modalUploadsParallel = 'Puede enviar hasta {{number}} archivos a la vez.';
 

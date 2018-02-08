@@ -162,7 +162,7 @@ z.string.sl.modal_session_reset_headline = 'Seja je bila ponastavljena';
 z.string.sl.modal_session_reset_message_1 = 'Če težave niste odpravili,';
 z.string.sl.modal_session_reset_message_link = 'kontaktirajte';
 z.string.sl.modal_session_reset_message_2 = 'nas.';
-z.string.sl.modal_too_many_members_headline = 'Polna hiša';
+z.string.sl.modalTooManyMembersHeadline = 'Polna hiša';
 z.string.sl.modal_too_many_members_message = 'Do {{number1}} oseb se lahko pridruži pogovoru. Tukaj je prostora še za {{number2}} oseb.';
 z.string.sl.modalUploadsParallel = 'Lahko pošljete do {{number}} zbirk naenkrat.';
 

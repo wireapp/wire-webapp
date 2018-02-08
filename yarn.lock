@@ -323,9 +323,9 @@
   version "2.3.2"
   resolved "https://registry.yarnpkg.com/@types/tough-cookie/-/tough-cookie-2.3.2.tgz#e0d481d8bb282ad8a8c9e100ceb72c995fb5e709"
 
-"@wireapp/api-client@0.3.2":
-  version "0.3.2"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-0.3.2.tgz#c4e5eeecedbbc07455351fcbc7093b7516cf2653"
+"@wireapp/api-client@0.3.3":
+  version "0.3.3"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-0.3.3.tgz#fba3d4dc0849ba0094db3e9a684f5925c23d0954"
   dependencies:
     "@types/node" "9.3.0"
     "@types/spark-md5" "3.0.0"
@@ -344,12 +344,12 @@
   version "2.3.2"
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-2.3.2.tgz#e2944384680f3625df99c750404292a359969415"
 
-"@wireapp/core@0.0.31":
-  version "0.0.31"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-0.0.31.tgz#8ce90a3b86026f1133ed6a3328c1d4b79320aaad"
+"@wireapp/core@0.0.32":
+  version "0.0.32"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-0.0.32.tgz#12edb3816264c864b62669e9c53d57a9a5a11860"
   dependencies:
     "@types/node" "9.3.0"
-    "@wireapp/api-client" "0.3.2"
+    "@wireapp/api-client" "0.3.3"
     "@wireapp/cryptobox" "6.3.7"
     "@wireapp/protocol-messaging" "1.20.0"
     "@wireapp/store-engine" "0.1.9"
@@ -2247,9 +2247,9 @@ code-point-at@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/code-point-at/-/code-point-at-1.1.0.tgz#0d070b4d043a5bea33a2f1a40e2edb3d9a4ccf77"
 
-coffee-script@~1.10.0:
+coffeescript@~1.10.0:
   version "1.10.0"
-  resolved "https://registry.yarnpkg.com/coffee-script/-/coffee-script-1.10.0.tgz#12938bcf9be1948fa006f92e0c4c9e81705108c0"
+  resolved "https://registry.yarnpkg.com/coffeescript/-/coffeescript-1.10.0.tgz#e7aa8301917ef621b35d8a39f348dcdd1db7e33e"
 
 collection-visit@^1.0.0:
   version "1.0.0"
@@ -4547,11 +4547,11 @@ grunt-todo@0.5.0:
     chalk "^1.0.0"
     text-table "^0.2.0"
 
-grunt@1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/grunt/-/grunt-1.0.1.tgz#e8778764e944b18f32bb0f10b9078475c9dfb56b"
+grunt@1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/grunt/-/grunt-1.0.2.tgz#4e6a5e695b70472fd5304f5fa9e34236836a73bc"
   dependencies:
-    coffee-script "~1.10.0"
+    coffeescript "~1.10.0"
     dateformat "~1.0.12"
     eventemitter2 "~0.4.13"
     exit "~0.1.1"
@@ -4563,7 +4563,7 @@ grunt@1.0.1:
     grunt-legacy-util "~1.0.0"
     iconv-lite "~0.4.13"
     js-yaml "~3.5.2"
-    minimatch "~3.0.0"
+    minimatch "~3.0.2"
     nopt "~3.0.6"
     path-is-absolute "~1.0.0"
     rimraf "~2.2.8"
@@ -5520,9 +5520,9 @@ jasmine-ajax@3.3.1:
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/jasmine-ajax/-/jasmine-ajax-3.3.1.tgz#f8cad9fd49dfd44f3cf798d36f4e857d125c75c5"
 
-jasmine-core@2.9.1:
-  version "2.9.1"
-  resolved "https://registry.yarnpkg.com/jasmine-core/-/jasmine-core-2.9.1.tgz#b6bbc1d8e65250d56f5888461705ebeeeb88f22f"
+jasmine-core@2.99.1:
+  version "2.99.1"
+  resolved "https://registry.yarnpkg.com/jasmine-core/-/jasmine-core-2.99.1.tgz#e6400df1e6b56e130b61c4bcd093daa7f6e8ca15"
 
 jest-docblock@^21.0.0:
   version "21.2.0"
@@ -6401,7 +6401,7 @@ minimalistic-crypto-utils@^1.0.0, minimalistic-crypto-utils@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/minimalistic-crypto-utils/-/minimalistic-crypto-utils-1.0.1.tgz#f6c00c1c0b082246e5c4d99dfb8c7c083b2b582a"
 
-"minimatch@2 || 3", minimatch@^3.0.0, minimatch@^3.0.2, minimatch@^3.0.4, minimatch@~3.0.0, minimatch@~3.0.2:
+"minimatch@2 || 3", minimatch@^3.0.0, minimatch@^3.0.2, minimatch@^3.0.4, minimatch@~3.0.2:
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-3.0.4.tgz#5166e286457f03306064be5497e8dbb0c3d32083"
   dependencies:
