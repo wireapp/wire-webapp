@@ -77,6 +77,17 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
     this.stateIsPreferences = ko.pureComputed(() => this.state() === GroupCreationViewModel.STATE.PREFERENCES);
     this.stateIsParticipants = ko.pureComputed(() => this.state() === GroupCreationViewModel.STATE.PARTICIPANTS);
 
+    this.stateIsPreferences.subscribe(stateIsPreference => {
+      if (stateIsPreference) {
+        return $(document).on('keydown.groupCreation', keyboard_event => {
+          if (z.util.KeyboardUtil.isEscapeKey(keyboard_event)) {
+            this._hideModal();
+          }
+        });
+      }
+      return $(document).off('keydown.groupCreation');
+    });
+
     this.shouldUpdateScrollbar = ko
       .computed(() => this.selectedContacts() && this.stateIsPreferences())
       .extend({notify: 'always', rateLimit: 500});
@@ -87,6 +98,7 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
   showCreateGroup(userEntity) {
     if (!this.modal) {
       this.modal = new zeta.webapp.module.Modal('#group-creation-modal', this._afterHideModal.bind(this));
+      this.modal.autoclose = false;
     }
 
     this.state(GroupCreationViewModel.STATE.PREFERENCES);
