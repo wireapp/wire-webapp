@@ -152,7 +152,7 @@
 .search-list-item-select {
   .square(24px);
   display: block;
-  border: 2px solid fade(@graphite-dark, 0.64);
+  border: 2px solid fade(@graphite-dark, 64%);
   border-radius: 12px;
   margin: 8px 0 8px 16px;
 
@@ -176,7 +176,7 @@
 .search-list-item-guest-indicator-badge {
   .guest-badge;
 
-  .user-list-light & {
+  .user-list-light:not(.user-list-light-badge) & {
     .cell-badge-dark();
   }
 }
