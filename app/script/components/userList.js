@@ -152,7 +152,7 @@ ko.components.register('user-list', {
             </div>
           <!-- /ko -->
           <!-- ko if: $parent.isSelectEnabled -->
-            <div class="search-list-item-select icon-check" data-bind="css: {'selected': $parent.isSelected($data)}"></div>
+            <div class="search-list-item-select icon-check" data-bind="css: {'selected': $parent.isSelected($data)}" data-uie-name="status-selected"></div>
           <!-- /ko -->
         <!-- /ko -->
       </div>
