@@ -15,7 +15,7 @@
   "accountForm.emailPersonalPlaceholder": "sina@email.ee",
   "accountForm.passwordPlaceholder": "Parool (vähemalt 8 märki)",
   "accountForm.terms": "Ma nõustun <a {linkParams}>kasutustingimustega</a>",
-  "accountForm.nextButton": "Järgmine",
+  "accountForm.submitButton": "Järgmine",
   "createAccount.nextButton": "Järgmine",
   "invite.nextButton": "Järgmine",
   "createAccount.headLine": "Seadista oma konto",
@@ -62,6 +62,7 @@
   "BackendError.LABEL.EMAIL_EXISTS": "See e-posti aadress on juba kasutusel. <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://support.wire.com/hc/articles/115004082129\">Lisateave</a>",
   "BackendError.unexpected": "Ootamatu tõrge ({code} {message})",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Sisesta vähemalt 2-täheline nimi",
+  "ValidationError.FIELD.NAME.VALUE_MISSING": "Sisesta vähemalt 2-täheline nimi",
   "ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH": "Sisesta vähemalt 8-märgiline parool",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": "Palun sisesta kehtiv e-posti aadress"
 }

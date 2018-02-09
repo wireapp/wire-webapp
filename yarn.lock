@@ -295,10 +295,6 @@
   version "8.0.24"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-8.0.24.tgz#06c580084d9add1fb40c1510ef0b448961246fb1"
 
-"@types/node@8.0.50":
-  version "8.0.50"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.0.50.tgz#dc545448e128c88c4eec7cd64025fcc3b7604541"
-
 "@types/node@9.3.0":
   version "9.3.0"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-9.3.0.tgz#3a129cda7c4e5df2409702626892cb4b96546dd5"
@@ -327,9 +323,9 @@
   version "2.3.2"
   resolved "https://registry.yarnpkg.com/@types/tough-cookie/-/tough-cookie-2.3.2.tgz#e0d481d8bb282ad8a8c9e100ceb72c995fb5e709"
 
-"@wireapp/api-client@0.2.35":
-  version "0.2.35"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-0.2.35.tgz#bf26efbd058093b0dcbf47d6a8386f4a7d3d5b5f"
+"@wireapp/api-client@0.3.3":
+  version "0.3.3"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-0.3.3.tgz#fba3d4dc0849ba0094db3e9a684f5925c23d0954"
   dependencies:
     "@types/node" "9.3.0"
     "@types/spark-md5" "3.0.0"
@@ -344,18 +340,46 @@
     spark-md5 "3.0.0"
     tough-cookie "2.3.3"
 
-"@wireapp/core@0.0.24":
-  version "0.0.24"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-0.0.24.tgz#33ad9fccfc659af0e6ff51d0cc88d1dcf88d804e"
+"@wireapp/cbor@2.3.2":
+  version "2.3.2"
+  resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-2.3.2.tgz#e2944384680f3625df99c750404292a359969415"
+
+"@wireapp/core@0.0.32":
+  version "0.0.32"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-0.0.32.tgz#12edb3816264c864b62669e9c53d57a9a5a11860"
   dependencies:
     "@types/node" "9.3.0"
-    "@wireapp/api-client" "0.2.35"
+    "@wireapp/api-client" "0.3.3"
+    "@wireapp/cryptobox" "6.3.7"
     "@wireapp/protocol-messaging" "1.20.0"
     "@wireapp/store-engine" "0.1.9"
     bazinga64 "5.0.3"
     protobufjs "6.8.4"
     pure-uuid "1.4.11"
-    wire-webapp-cryptobox "6.2.1"
+
+"@wireapp/cryptobox@6.3.7":
+  version "6.3.7"
+  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-6.3.7.tgz#fb1d9ea2aff573e036859526624edbc277943cca"
+  dependencies:
+    "@wireapp/lru-cache" "2.0.1"
+    "@wireapp/proteus" "5.3.3"
+    "@wireapp/store-engine" "0.1.9"
+    dexie "2.0.1"
+    fs-extra "5.0.0"
+
+"@wireapp/lru-cache@2.0.1":
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/@wireapp/lru-cache/-/lru-cache-2.0.1.tgz#e9d2376d37f265146488532b7991d5bfca3922d9"
+  dependencies:
+    webpack "3.10.0"
+
+"@wireapp/proteus@5.3.3":
+  version "5.3.3"
+  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-5.3.3.tgz#47c0b2ebf4fce4d35f83ca58c429a3f84adaba87"
+  dependencies:
+    "@wireapp/cbor" "2.3.2"
+    ed2curve "0.2.1"
+    libsodium-wrappers-sumo "0.5.4"
 
 "@wireapp/protocol-messaging@1.20.0":
   version "1.20.0"
@@ -388,14 +412,6 @@
     "@types/node" "8.0.24"
     dexie "1.5.1"
     fs-extra "4.0.1"
-
-"@wireapp/store-engine@0.1.1":
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-0.1.1.tgz#3e04509836ef632347b81f59c44ee1923b54808d"
-  dependencies:
-    "@types/node" "8.0.50"
-    dexie "2.0.1"
-    fs-extra "4.0.2"
 
 "@wireapp/store-engine@0.1.9":
   version "0.1.9"
@@ -2231,9 +2247,9 @@ code-point-at@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/code-point-at/-/code-point-at-1.1.0.tgz#0d070b4d043a5bea33a2f1a40e2edb3d9a4ccf77"
 
-coffee-script@~1.10.0:
+coffeescript@~1.10.0:
   version "1.10.0"
-  resolved "https://registry.yarnpkg.com/coffee-script/-/coffee-script-1.10.0.tgz#12938bcf9be1948fa006f92e0c4c9e81705108c0"
+  resolved "https://registry.yarnpkg.com/coffeescript/-/coffeescript-1.10.0.tgz#e7aa8301917ef621b35d8a39f348dcdd1db7e33e"
 
 collection-visit@^1.0.0:
   version "1.0.0"
@@ -2338,13 +2354,17 @@ commander@^2.11.0, commander@^2.9.0:
   version "2.11.0"
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.11.0.tgz#157152fd1e7a6c8d98a5b715cf376df928004563"
 
-commander@^2.13.0, commander@~2.13.0:
+commander@^2.13.0:
   version "2.13.0"
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.13.0.tgz#6964bca67685df7c1f1430c584f07d7597885b9c"
 
 commander@~2.12.1:
   version "2.12.2"
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.12.2.tgz#0f5946c427ed9ec0d91a46bb9def53e54650e555"
+
+commander@~2.14.1:
+  version "2.14.1"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-2.14.1.tgz#2235123e37af8ca3c65df45b026dbd357b01b9aa"
 
 comment-parser@^0.4.2:
   version "0.4.2"
@@ -3401,9 +3421,9 @@ eslint-plugin-no-unsanitized@2.0.2:
   dependencies:
     eslint "^3.19.0"
 
-eslint-plugin-prettier@2.5.0:
-  version "2.5.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-prettier/-/eslint-plugin-prettier-2.5.0.tgz#39a91dd7528eaf19cd42c0ee3f2c1f684606a05f"
+eslint-plugin-prettier@2.6.0:
+  version "2.6.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-prettier/-/eslint-plugin-prettier-2.6.0.tgz#33e4e228bdb06142d03c560ce04ec23f6c767dd7"
   dependencies:
     fast-diff "^1.1.1"
     jest-docblock "^21.0.0"
@@ -3428,9 +3448,9 @@ eslint-visitor-keys@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/eslint-visitor-keys/-/eslint-visitor-keys-1.0.0.tgz#3f3180fb2e291017716acb4c9d6d5b5c34a6a81d"
 
-eslint@4.16.0:
-  version "4.16.0"
-  resolved "https://registry.yarnpkg.com/eslint/-/eslint-4.16.0.tgz#934ada9e98715e1d7bbfd6f6f0519ed2fab35cc1"
+eslint@4.17.0:
+  version "4.17.0"
+  resolved "https://registry.yarnpkg.com/eslint/-/eslint-4.17.0.tgz#dc24bb51ede48df629be7031c71d9dc0ee4f3ddf"
   dependencies:
     ajv "^5.3.0"
     babel-code-frame "^6.22.0"
@@ -4531,11 +4551,11 @@ grunt-todo@0.5.0:
     chalk "^1.0.0"
     text-table "^0.2.0"
 
-grunt@1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/grunt/-/grunt-1.0.1.tgz#e8778764e944b18f32bb0f10b9078475c9dfb56b"
+grunt@1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/grunt/-/grunt-1.0.2.tgz#4e6a5e695b70472fd5304f5fa9e34236836a73bc"
   dependencies:
-    coffee-script "~1.10.0"
+    coffeescript "~1.10.0"
     dateformat "~1.0.12"
     eventemitter2 "~0.4.13"
     exit "~0.1.1"
@@ -4547,7 +4567,7 @@ grunt@1.0.1:
     grunt-legacy-util "~1.0.0"
     iconv-lite "~0.4.13"
     js-yaml "~3.5.2"
-    minimatch "~3.0.0"
+    minimatch "~3.0.2"
     nopt "~3.0.6"
     path-is-absolute "~1.0.0"
     rimraf "~2.2.8"
@@ -5504,9 +5524,9 @@ jasmine-ajax@3.3.1:
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/jasmine-ajax/-/jasmine-ajax-3.3.1.tgz#f8cad9fd49dfd44f3cf798d36f4e857d125c75c5"
 
-jasmine-core@2.9.1:
-  version "2.9.1"
-  resolved "https://registry.yarnpkg.com/jasmine-core/-/jasmine-core-2.9.1.tgz#b6bbc1d8e65250d56f5888461705ebeeeb88f22f"
+jasmine-core@2.99.1:
+  version "2.99.1"
+  resolved "https://registry.yarnpkg.com/jasmine-core/-/jasmine-core-2.99.1.tgz#e6400df1e6b56e130b61c4bcd093daa7f6e8ca15"
 
 jest-docblock@^21.0.0:
   version "21.2.0"
@@ -6385,7 +6405,7 @@ minimalistic-crypto-utils@^1.0.0, minimalistic-crypto-utils@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/minimalistic-crypto-utils/-/minimalistic-crypto-utils-1.0.1.tgz#f6c00c1c0b082246e5c4d99dfb8c7c083b2b582a"
 
-"minimatch@2 || 3", minimatch@^3.0.0, minimatch@^3.0.2, minimatch@^3.0.4, minimatch@~3.0.0, minimatch@~3.0.2:
+"minimatch@2 || 3", minimatch@^3.0.0, minimatch@^3.0.2, minimatch@^3.0.4, minimatch@~3.0.2:
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-3.0.4.tgz#5166e286457f03306064be5497e8dbb0c3d32083"
   dependencies:
@@ -6432,9 +6452,9 @@ mixin-object@^2.0.1:
     for-in "^0.1.3"
     is-extendable "^0.1.1"
 
-mixpanel-browser@2.15.0:
-  version "2.15.0"
-  resolved "https://registry.yarnpkg.com/mixpanel-browser/-/mixpanel-browser-2.15.0.tgz#371946d3d9930f04a8358c70c5922ea7f3ec19aa"
+mixpanel-browser@2.17.1:
+  version "2.17.1"
+  resolved "https://registry.yarnpkg.com/mixpanel-browser/-/mixpanel-browser-2.17.1.tgz#1b90a0478ec912f35f761c52e08d4228fc37867f"
 
 mkdirp@0.5.x, "mkdirp@>=0.5 0", mkdirp@^0.5.0, mkdirp@^0.5.1, mkdirp@~0.5.0, mkdirp@~0.5.1:
   version "0.5.1"
@@ -7623,14 +7643,14 @@ postcss-load-plugins@^2.3.0:
     cosmiconfig "^2.1.1"
     object-assign "^4.1.0"
 
-postcss-loader@2.0.10:
-  version "2.0.10"
-  resolved "https://registry.yarnpkg.com/postcss-loader/-/postcss-loader-2.0.10.tgz#090db0540140bd56a7a7f717c41bc29aeef4c674"
+postcss-loader@2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/postcss-loader/-/postcss-loader-2.1.0.tgz#038c2d6d59753fef4667827fd3ae03f5dc5e6a7a"
   dependencies:
     loader-utils "^1.1.0"
     postcss "^6.0.0"
     postcss-load-config "^1.2.0"
-    schema-utils "^0.3.0"
+    schema-utils "^0.4.0"
 
 postcss-media-minmax@^3.0.0:
   version "3.0.0"
@@ -8950,7 +8970,7 @@ schema-utils@^0.3.0:
   dependencies:
     ajv "^5.0.0"
 
-schema-utils@^0.4.2, schema-utils@^0.4.3:
+schema-utils@^0.4.0, schema-utils@^0.4.2, schema-utils@^0.4.3:
   version "0.4.3"
   resolved "https://registry.yarnpkg.com/schema-utils/-/schema-utils-0.4.3.tgz#e2a594d3395834d5e15da22b48be13517859458e"
   dependencies:
@@ -9971,11 +9991,11 @@ uglify-es@^3.3.4:
     commander "~2.12.1"
     source-map "~0.6.1"
 
-uglify-js@3.3.9:
-  version "3.3.9"
-  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.3.9.tgz#33869666c8ab7f7658ce3d22f0f1ced40097d33a"
+uglify-js@3.3.10:
+  version "3.3.10"
+  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.3.10.tgz#8e47821d4cf28e14c1826a0078ba0825ed094da8"
   dependencies:
-    commander "~2.13.0"
+    commander "~2.14.1"
     source-map "~0.6.1"
 
 uglify-js@^2.6, uglify-js@^2.8.27, uglify-js@^2.8.29:
@@ -10427,17 +10447,6 @@ window-size@^0.1.4:
 wire-webapp-cbor@2.1.5:
   version "2.1.5"
   resolved "https://registry.yarnpkg.com/wire-webapp-cbor/-/wire-webapp-cbor-2.1.5.tgz#742912cb40b037dcc7125ce4c554ea2d6d398064"
-
-wire-webapp-cryptobox@6.2.1:
-  version "6.2.1"
-  resolved "https://registry.yarnpkg.com/wire-webapp-cryptobox/-/wire-webapp-cryptobox-6.2.1.tgz#dbb6b6e16ecd80d7f99f9f0a2b55a36ebd325e77"
-  dependencies:
-    "@wireapp/store-engine" "0.1.1"
-    dexie "1.5.1"
-    fs-extra "3.0.1"
-    rimraf "2.6.1"
-    wire-webapp-lru-cache "2.0.0"
-    wire-webapp-proteus "5.2.0"
 
 wire-webapp-lru-cache@2.0.0:
   version "2.0.0"

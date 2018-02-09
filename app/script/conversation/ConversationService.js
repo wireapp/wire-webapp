@@ -46,26 +46,26 @@ z.conversation.ConversationService = class ConversationService {
   //##############################################################################
 
   /**
-   * Create a new conversation.
+   * Create a group conversation.
    *
    * @note Supply at least 2 user IDs! Do not include the requestor
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/createGroupConversation
    *
-   * @param {Array<string>} user_ids - IDs of users (excluding the requestor) to be part of the conversation
-   * @param {string} name - User defined name for the Conversation (optional)
-   * @param {string} team_id - ID of team conversation belongs to
+   * @param {Array<string>} userIds - IDs of users (excluding the requestor) to be part of the conversation
+   * @param {string} [name] - User defined name for the Conversation
+   * @param {string} [teamId] - ID of team conversation belongs to
    * @returns {Promise} Resolves when the conversation was created
    */
-  create_conversation(user_ids, name, team_id) {
+  postConversations(userIds, name, teamId) {
     const payload = {
       name: name,
-      users: user_ids,
+      users: userIds,
     };
 
-    if (team_id) {
+    if (teamId) {
       payload.team = {
         managed: false,
-        teamid: team_id,
+        teamid: teamId,
       };
     }
 

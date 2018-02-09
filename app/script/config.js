@@ -54,8 +54,6 @@ window.z.config = {
   // Maximum of parallel uploads
   MAXIMUM_ASSET_UPLOADS: 10,
 
-  MAXIMUM_CONVERSATION_SIZE: 128,
-
   // 15 megabyte image upload limit
   MAXIMUM_IMAGE_FILE_SIZE: 15 * 1024 * 1024,
 

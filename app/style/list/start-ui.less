@@ -50,30 +50,6 @@
   right: 0;
 }
 
-.start-ui-header-actions {
-  height: 0;
-  overflow: hidden;
-  transition-property: height;
-  transition-timing-function: @ease-out-expo;
-  transition-duration: @animation-timing-fast;
-
-  .button {
-    padding-left: 8px;
-    padding-right: 8px;
-    transform: translateZ(0);
-  }
-
-  &.start-ui-header-actions-visible {
-    margin-top: 8px;
-    transition-duration: @animation-timing-slow;
-    height: 28px;
-  }
-}
-
-.start-ui-header-actions-last {
-  margin-left: 16px;
-}
-
 .start-ui-list-wrapper {
   display: flex;
   flex-direction: column;
@@ -124,6 +100,30 @@
       opacity: 1;
       cursor: default;
     }
+  }
+}
+
+.start-ui-create-group,
+.start-ui-invite-people {
+  position: relative;
+  padding: 0;
+  margin: 0 0 -16px -24px;
+  overflow: hidden;
+}
+.start-ui-create-group {
+  margin-left: 0;
+
+  .left-list-item {
+    height: 56px;
+    line-height: 56px;
+  }
+
+  .left-column {
+    width: 28px;
+  }
+
+  .center-column {
+    margin-left: 16px;
   }
 }
 

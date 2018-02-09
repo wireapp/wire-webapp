@@ -15,7 +15,7 @@
   "accountForm.emailPersonalPlaceholder": "te@cimed.hu",
   "accountForm.passwordPlaceholder": "Jelszó (legalább 8 karakter)",
   "accountForm.terms": "Elfogadom a <a {linkParams}>felhasználási feltételeket</a>",
-  "accountForm.nextButton": "Tovább",
+  "accountForm.submitButton": "Tovább",
   "createAccount.nextButton": "Tovább",
   "invite.nextButton": "Tovább",
   "createAccount.headLine": "Állítsd be a fiókodat",
@@ -63,6 +63,7 @@
     "A megadott e-mail cím már használatban van. <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://support.wire.com/hc/articles/115004082129\">További infó</a>",
   "BackendError.unexpected": "Váratlan hiba ({code} {message})",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Legalább 2 karakterből álló nevet adj meg",
+  "ValidationError.FIELD.NAME.VALUE_MISSING": "Legalább 2 karakterből álló nevet adj meg",
   "ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH": "Válassz egy legalább 8 karakter hosszú jelszót",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": "Kérjük, érvényes e-mail címet adj meg"
 }

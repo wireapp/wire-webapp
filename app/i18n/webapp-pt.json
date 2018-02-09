@@ -15,7 +15,7 @@
   "accountForm.emailPersonalPlaceholder": "",
   "accountForm.passwordPlaceholder": "Palavra-passe (pelo menos 8 caracteres)",
   "accountForm.terms": "Aceito os <a {linkParams}> termos e condições</a>",
-  "accountForm.nextButton": "Seguinte",
+  "accountForm.submitButton": "Seguinte",
   "createAccount.nextButton": "Seguinte",
   "invite.nextButton": "Seguinte",
   "createAccount.headLine": "Configure a sua conta",
@@ -63,6 +63,7 @@
     "Este endereço de email já está em uso. <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://support.wire.com/hc/articles/115004082129\"> Saiba mais</a>",
   "BackendError.unexpected": "Erro inesperado ({code} {message})",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Introduza um nome com pelo menos 2 caracteres",
+  "ValidationError.FIELD.NAME.VALUE_MISSING": "Introduza um nome com pelo menos 2 caracteres",
   "ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH": "",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": ""
 }
