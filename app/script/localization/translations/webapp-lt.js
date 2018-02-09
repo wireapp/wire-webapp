@@ -267,7 +267,6 @@ z.string.lt.conversations_contacts = 'Kontaktai';
 z.string.lt.conversations_connection_request_many = 'Laukia {{number}} žmonės';
 z.string.lt.conversations_connection_request_one = '1 asmuo laukia';
 z.string.lt.conversations_empty_conversation = 'Grupės pokalbis';
-z.string.lt.conversations_empty_conversation_description = 'Visi išėjo';
 z.string.lt.conversations_no_conversations = 'Kol kas nėra pokalbių';
 z.string.lt.conversations_popover_archive = 'Archyvuoti';
 z.string.lt.conversations_popover_block = 'Užblokuoti';

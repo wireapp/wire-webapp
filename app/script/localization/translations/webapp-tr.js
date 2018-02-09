@@ -260,7 +260,6 @@ z.string.tr.conversations_contacts = 'Kişiler';
 z.string.tr.conversations_connection_request_many = '{{number}} kişi bekliyor';
 z.string.tr.conversations_connection_request_one = 'Bir kişi bekliyor';
 z.string.tr.conversations_empty_conversation = 'Grup sohbeti';
-z.string.tr.conversations_empty_conversation_description = 'Herkes ayrıldı';
 z.string.tr.conversations_no_conversations = 'Hiç konuşma yok';
 z.string.tr.conversations_popover_archive = 'Arşivle';
 z.string.tr.conversations_popover_block = 'Engelle';

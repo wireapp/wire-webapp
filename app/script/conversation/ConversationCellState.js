@@ -94,18 +94,6 @@ z.conversation.ConversationCellState = (() => {
     },
   };
 
-  const empty_state = {
-    description() {
-      return z.l10n.text(z.string.conversations_empty_conversation_description);
-    },
-    icon() {
-      return z.conversation.ConversationStatusIcon.NONE;
-    },
-    match(conversation_et) {
-      return conversation_et.participating_user_ids().length === 0;
-    },
-  };
-
   const removed_state = {
     description(conversation_et) {
       const last_message_et = conversation_et.get_last_message();
@@ -285,7 +273,6 @@ z.conversation.ConversationCellState = (() => {
 
   function _generate(conversation_et) {
     const states = [
-      empty_state,
       removed_state,
       muted_state,
       alert_state,

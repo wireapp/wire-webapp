@@ -257,7 +257,6 @@ z.string.el.conversations_contacts = 'Επαφές';
 z.string.el.conversations_connection_request_many = '{{number}} άτομα σε αναμονή';
 z.string.el.conversations_connection_request_one = '1 άτομο σε αναμονή';
 z.string.el.conversations_empty_conversation = 'Ομαδική συζήτηση';
-z.string.el.conversations_empty_conversation_description = 'Αποχώρηση όλων';
 z.string.el.conversations_no_conversations = 'Δεν υπάρχουν ακόμα συζητήσεις';
 z.string.el.conversations_popover_archive = 'Αρχειοθέτηση';
 z.string.el.conversations_popover_block = 'Αποκλεισμός';

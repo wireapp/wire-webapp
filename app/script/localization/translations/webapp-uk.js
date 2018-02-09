@@ -267,7 +267,6 @@ z.string.uk.conversations_contacts = 'Контакти';
 z.string.uk.conversations_connection_request_many = '{{number}} людей очікують';
 z.string.uk.conversations_connection_request_one = '1 людина очікує';
 z.string.uk.conversations_empty_conversation = 'Групова розмова';
-z.string.uk.conversations_empty_conversation_description = 'Всі вийшли';
 z.string.uk.conversations_no_conversations = 'Розпочніть розмову або створіть групу.';
 z.string.uk.conversations_popover_archive = 'Архівувати';
 z.string.uk.conversations_popover_block = 'Заблокувати';
