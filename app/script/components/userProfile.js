@@ -191,11 +191,11 @@ z.components.UserProfile = class UserProfile {
       if (this.hasUser()) {
         const isPendingRequest = this.userEntity().is_ignored() || this.userEntity().is_incoming_request();
         if (isPendingRequest && typeof params.pending === 'function') {
-          params.pending(this.userEntity());
+          return params.pending(this.userEntity());
         }
-      } else {
-        this.clickToOpenConversation();
       }
+
+      this.clickToOpenConversation();
     };
 
     this.clickOnShowProfile = () => {
