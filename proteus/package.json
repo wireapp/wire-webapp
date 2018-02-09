@@ -3,7 +3,7 @@
     "@types/chai": "4.1.2",
     "@types/ed2curve": "0.2.1",
     "@types/node": "9.4.0",
-    "@wireapp/cbor": "2.3.2",
+    "@wireapp/cbor": "3.0.0",
     "ed2curve": "0.2.1",
     "libsodium-wrappers-sumo": "0.7.3"
   },
@@ -16,7 +16,9 @@
     "typescript": "2.7.1",
     "webpack": "3.10.0"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "license": "GPL-3.0",
   "main": "dist/index.js",
   "name": "@wireapp/proteus",
@@ -32,5 +34,5 @@
     "test:longrunning": "jasmine --config=spec/support/jasmine.longrunning.json"
   },
   "types": "dist/index.d.ts",
-  "version": "5.3.3"
+  "version": "6.0.0"
 }

@@ -10,7 +10,10 @@
     "tsd-jsdoc": "dcodeio/tsd-jsdoc#fe76c4dc071b00bb549d3af7a3bad8c555999e81",
     "webpack": "3.10.0"
   },
-  "files": ["dist/", "src/"],
+  "files": [
+    "dist/",
+    "src/"
+  ],
   "license": "GPL-3.0",
   "main": "src/cbor.js",
   "name": "@wireapp/cbor",
@@ -24,5 +27,5 @@
     "types": "jsdoc --verbose --pedantic --configure jsdoc.json src/ && node replace.js"
   },
   "types": "dist/types.d.ts",
-  "version": "2.3.2"
+  "version": "3.0.0"
 }
