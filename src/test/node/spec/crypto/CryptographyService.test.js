@@ -24,11 +24,11 @@ const Proteus = require('@wireapp/proteus');
 const {crypto} = require('@wireapp/core');
 const {MemoryEngine} = require('@wireapp/store-engine').StoreEngine;
 
-let cryptographyService;
-let aliceLastResortPreKey;
-let bob;
-
 describe('CryptographyService', () => {
+  let cryptographyService;
+  let aliceLastResortPreKey;
+  let bob;
+
   beforeEach(done => {
     cryptographyService = new crypto.CryptographyService(new MemoryEngine('alice'));
     cryptographyService.cryptobox
@@ -61,22 +61,20 @@ describe('CryptographyService', () => {
   });
 
   describe('"decrypt"', () => {
-    it('decrypts a Base64-encoded cipher message.', done => {
+    it('decrypts a Base64-encoded cipher message.', async done => {
       const alicePublicKey = cryptographyService.cryptobox.identity.public_key;
       const publicPreKeyBundle = Proteus.keys.PreKeyBundle.new(alicePublicKey, aliceLastResortPreKey);
       const text = 'Hello Alice!';
-      bob
-        .encrypt('alice-user-id@alice-client-id', text, publicPreKeyBundle.serialise())
-        .then(encryptedPreKeyMessage => {
-          const encodedPreKeyMessage = bazinga64.Encoder.toBase64(encryptedPreKeyMessage).asString;
-          return cryptographyService.decrypt('bob-user-id@bob-client-id', encodedPreKeyMessage);
-        })
-        .then(decodedMessageBuffer => {
-          const plaintext = Buffer.from(decodedMessageBuffer).toString('utf8');
-          expect(plaintext).toBe(text);
-          done();
-        })
-        .catch(done.fail);
+      const encryptedPreKeyMessage = await bob.encrypt(
+        'alice-user-id@alice-client-id',
+        text,
+        publicPreKeyBundle.serialise()
+      );
+      const encodedPreKeyMessage = bazinga64.Encoder.toBase64(encryptedPreKeyMessage).asString;
+      const decodedMessageBuffer = await cryptographyService.decrypt('bob-user-id@bob-client-id', encodedPreKeyMessage);
+      const plaintext = Buffer.from(decodedMessageBuffer).toString('utf8');
+      expect(plaintext).toBe(text);
+      done();
     });
   });
 
