@@ -3,12 +3,12 @@
     <div class="modal-header group-creation-modal-header">
       <!-- ko if: stateIsParticipants() -->
         <span class="button-icon icon-back" data-bind="click: clickOnBack" data-uie-name="go-back"></span>
-        <span class="label-xs group-creation-modal-title" data-bind="text: participantsHeaderText"></span>
+        <span class="label-xs group-creation-modal-title" data-bind="text: participantsHeaderText" data-uie-name="status-people-selected"></span>
         <span class="group-creation-modal-action text-theme pull-right enabled" data-bind="click: clickOnCreate, text: participantsActionText" data-uie-name="do-create-group"></span>
       <!-- /ko -->
       <!-- ko if: stateIsPreferences() -->
         <span class="button-icon icon-close" data-bind="click: clickOnClose" data-uie-name="do-close"></span>
-        <span class="label-xs group-creation-modal-title" data-bind="l10n_text: z.string.groupCreationPreferencesHeader" data-uie-name="status-people-selected"></span>
+        <span class="label-xs group-creation-modal-title" data-bind="l10n_text: z.string.groupCreationPreferencesHeader"></span>
         <span class="group-creation-modal-action pull-right" data-bind="click: clickOnNext, css: {'text-theme': nameInput().length, 'enabled': nameInput().length}, enable: nameInput().length, l10n_text: z.string.groupCreationPreferencesAction" data-uie-name="go-next"></span>
       <!-- /ko -->
     </div>
