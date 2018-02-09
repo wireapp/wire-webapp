@@ -88,7 +88,6 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.teamSize = this.teamRepository.teamSize;
 
     this.state = ko.observable(StartUIViewModel.STATE.ADD_PEOPLE);
-    this.state.subscribe(newState => this.updateList(newState));
 
     this.peopleTabActive = ko.pureComputed(() => this.state() === StartUIViewModel.STATE.ADD_PEOPLE);
 
@@ -318,11 +317,11 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
   }
 
   clickOnShowPeople() {
-    this.state(StartUIViewModel.STATE.ADD_PEOPLE);
+    this.updateList(StartUIViewModel.STATE.ADD_PEOPLE);
   }
 
   clickOnShowServices() {
-    this.state(StartUIViewModel.STATE.ADD_SERVICE);
+    this.updateList(StartUIViewModel.STATE.ADD_SERVICE);
   }
 
   clickToAddService(conversationEntity) {
@@ -361,6 +360,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.userProfile(null);
     $('user-input input').focus();
 
+    this.state(state);
     const isAddingPeople = state === StartUIViewModel.STATE.ADD_PEOPLE;
     if (isAddingPeople) {
       return this._updatePeopleList();
