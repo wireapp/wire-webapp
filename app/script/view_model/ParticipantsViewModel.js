@@ -133,7 +133,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
     // Selected group participant
     this.selectedParticipant = ko.observable(undefined);
-    this.participantIsUser = ko.pureComputed(() => this.selectedParticipant() instanceof z.entity.User);
+    this.selectedService = ko.observable(undefined);
 
     // Switch between div and input field to edit the conversation name
     this.isEditable = ko.pureComputed(() => !this.conversation().removed_from_conversation());
@@ -181,7 +181,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
       return z.l10n.text(identifier, shortcut);
     });
 
-    this.showServiceStates = ko.pureComputed(() => this.activeServiceState() && this.selectedParticipant());
+    this.showServiceStates = ko.pureComputed(() => this.activeServiceState() && this.selectedService());
     this.showUserState = ko.pureComputed(() => this.stateParticipants() && this.selectedParticipant());
     this.showParticipantProfile = ko.pureComputed(() => this.showServiceStates() || this.showUserState());
 
@@ -257,6 +257,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   clickOnServiceBack() {
     this.state(this.previousState());
     this.selectedParticipant(undefined);
+    this.selectedService(undefined);
     $('.participants-search').addClass('participants-search-show');
   }
 
@@ -408,11 +409,11 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.integrationRepository
       .getServiceById(providerId, serviceId)
       .then(serviceEntity => {
-        this.selectedParticipant(serviceEntity);
+        this.selectedService(serviceEntity);
         this.state(ParticipantsViewModel.STATE.SERVICE_DETAILS);
         return this.integrationRepository.getProviderById(providerId);
       })
-      .then(providerEntity => this.selectedParticipant().providerName(providerEntity.name));
+      .then(providerEntity => this.selectedService().providerName(providerEntity.name));
   }
 
   switchContent(contentState) {
