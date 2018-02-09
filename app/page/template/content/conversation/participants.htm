@@ -47,7 +47,7 @@
           </div>
         </div>
 
-        <!-- ko if: participantIsUser -->
+        <!-- ko if: showUserState -->
           <user-profile class="participants-user-profile" params="
             add_people: clickOnAddPeople,
             block: clickToBlock,
@@ -114,11 +114,11 @@
               <div class="participants-service-profile-details">
                 <participant-avatar params="participant: selectedParticipant, size: z.components.ParticipantAvatar.SIZE.LARGE"></participant-avatar>
                 <div class="participants-service-profile-details-content">
-                  <div class="participants-service-profile-name" data-bind="text: selectedParticipant().name" data-uie-name="status-service-name"></div>
-                  <div class="participants-service-profile-provider" data-bind="text: selectedParticipant().providerName()" data-uie-name="status-service-provider"></div>
+                  <div class="participants-service-profile-name" data-bind="text: selectedService().name" data-uie-name="status-service-name"></div>
+                  <div class="participants-service-profile-provider" data-bind="text: selectedService().providerName()" data-uie-name="status-service-provider"></div>
                 </div>
               </div>
-              <div class="participants-service-profile-description" data-bind="text: selectedParticipant().description" data-uie-name="status-service-description"></div>
+              <div class="participants-service-profile-description" data-bind="text: selectedService().description" data-uie-name="status-service-description"></div>
             </div>
             <!-- ko if: stateServiceConfirmation() || showServiceRemove() -->
               <div class="participants-service-profile-footer">
