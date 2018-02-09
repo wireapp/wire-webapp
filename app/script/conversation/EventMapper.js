@@ -53,7 +53,7 @@ z.conversation.EventMapper = class EventMapper {
    *
    * @param {Object} event - Event data
    * @param {Conversation} conversation_et - Conversation entity the event belong to
-   * @param {boolean} should_create_dummy_image - Create a dummy image
+   * @param {boolean} [should_create_dummy_image] - Create a dummy image
    * @returns {Message} Mapped message entity
    */
   map_json_event(event, conversation_et, should_create_dummy_image) {

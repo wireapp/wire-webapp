@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -57,6 +57,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     userRepository
   ) {
     this.clickOnClose = this.clickOnClose.bind(this);
+    this.clickOnContact = this.clickOnContact.bind(this);
     this.clickOnConversation = this.clickOnConversation.bind(this);
     this.clickOnOther = this.clickOnOther.bind(this);
     this.clickToAddService = this.clickToAddService.bind(this);
@@ -69,7 +70,6 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.clickToUnblock = this.clickToUnblock.bind(this);
 
     this.handleSearchInput = this.handleSearchInput.bind(this);
-    this.updateProperties = this.updateProperties.bind(this);
 
     this.listViewModel = listViewModel;
     this.connectRepository = connectRepository;
@@ -105,7 +105,6 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.searchInput = ko.observable('');
     this.searchInput.subscribe(this.search);
     this.isSearching = ko.pureComputed(() => this.searchInput().length);
-    this.selectedPeople = ko.observableArray([]);
 
     // User lists
     this.contacts = ko.pureComputed(() => {
@@ -130,9 +129,6 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       others: ko.observableArray([]),
     };
 
-    // User properties
-    this.hasCreatedConversation = ko.observable(false);
-
     // View states
     this.hasSearchResults = ko.pureComputed(
       () =>
@@ -143,14 +139,11 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
     this.showContent = ko.pureComputed(() => this.showContacts() || this.showMatches() || this.showSearchResults());
     this.showContacts = ko.pureComputed(() => this.contacts().length);
-    this.showGroupHint = ko.pureComputed(() => this.selectedPeople().length === 1 && !this.hasCreatedConversation());
     this.showInvitePeople = ko.pureComputed(() => !this.isTeam());
     this.showMatches = ko.observable(false);
 
     this.showNoContacts = ko.pureComputed(() => !this.isTeam() && !this.showContent());
-    this.showInviteMember = ko.pureComputed(
-      () => this.selfUser().isTeamOwner() && this.teamSize() === 1 && !this.showSearchResults()
-    );
+    this.showInviteMember = ko.pureComputed(() => this.selfUser().isTeamOwner() && this.teamSize() === 1);
     this.showNoMatches = ko.pureComputed(() => {
       const isTeamOrMatch = this.isTeam() || this.showMatches();
       return isTeamOrMatch && !this.showInviteMember() && !this.showContacts() && !this.showSearchResults();
@@ -160,11 +153,11 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     );
 
     this.showSearchResults = ko.pureComputed(() => {
-      if (!this.selectedPeople().length && !this.isSearching()) {
+      const shouldShowResults = this.hasSearchResults() || this.isSearching();
+      if (!shouldShowResults) {
         this._clearSearchResults();
-        return false;
       }
-      return this.hasSearchResults() || this.isSearching();
+      return shouldShowResults;
     });
     this.showSpinner = ko.observable(false);
     this.showTopPeople = ko.pureComputed(() => !this.isTeam() && this.topUsers().length && !this.showMatches());
@@ -237,8 +230,6 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
   _initSubscriptions() {
     amplify.subscribe(z.event.WebApp.CONNECT.IMPORT_CONTACTS, this.importContacts.bind(this));
-    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.HAS_CREATED_CONVERSATION, this.updateProperties);
-    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.updateProperties);
   }
 
   clickOnAddService() {
@@ -246,18 +237,14 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.showServiceConversationList(true);
   }
 
-  clickOnAudioCall() {
-    this._selectConversationForAction().then(conversationEntity => {
-      if (conversationEntity) {
-        window.setTimeout(() => {
-          amplify.publish(z.event.WebApp.CALL.STATE.TOGGLE, z.media.MediaType.AUDIO, conversationEntity);
-        }, 500);
-      }
-    });
-  }
-
   clickOnClose() {
     this._closeList();
+  }
+
+  clickOnContact(userEntity) {
+    return this.conversationRepository.get_1to1_conversation(userEntity).then(conversationEntity => {
+      return this.clickOnConversation(conversationEntity);
+    });
   }
 
   clickOnConversation(conversationEntity) {
@@ -272,6 +259,10 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
     this._closeList();
     return conversationEntity;
+  }
+
+  clickOnCreateGroup() {
+    amplify.publish(z.event.WebApp.CONVERSATION.CREATE_GROUP);
   }
 
   clickOnInviteMember() {
@@ -325,32 +316,12 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     window.setTimeout(() => createBubble(element[0].id), timeout);
   }
 
-  clickOnSendImages(images) {
-    this._selectConversationForAction().then(conversationEntity => {
-      if (conversationEntity) {
-        window.setTimeout(() => {
-          amplify.publish(z.event.WebApp.CONVERSATION.IMAGE.SEND, images);
-        }, 500);
-      }
-    });
-  }
-
   clickOnShowPeople() {
     this.updateList(StartUIViewModel.STATE.ADD_PEOPLE);
   }
 
   clickOnShowServices() {
     this.updateList(StartUIViewModel.STATE.ADD_SERVICE);
-  }
-
-  clickOnVideoCall() {
-    this._selectConversationForAction().then(conversationEntity => {
-      if (conversationEntity) {
-        window.setTimeout(() => {
-          amplify.publish(z.event.WebApp.CALL.STATE.TOGGLE, z.media.MediaType.AUDIO_VIDEO, conversationEntity);
-        }, 500);
-      }
-    });
   }
 
   clickToAddService(conversationEntity) {
@@ -367,25 +338,24 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
   }
 
   handleSearchInput() {
-    if (this.submittedSearch) {
-      return Promise.resolve();
-    }
+    if (!this.submittedSearch && this.isSearching()) {
+      const [matchingContact] = this.searchResults.contacts();
+      if (matchingContact) {
+        this.submittedSearch = true;
+        return this.clickOnContact(matchingContact).then(() => (this.submittedSearch = false));
+      }
 
-    if (this.isSearching()) {
-      const matchHandled = this._handleSearchInput();
-      if (matchHandled) {
-        return Promise.resolve();
+      const [matchingGroup] = this.searchResults.groups();
+      if (matchingGroup) {
+        return this.clickOnConversation(matchingGroup);
       }
     }
-
-    this._selectConversationForAction();
   }
 
   updateList(state = StartUIViewModel.STATE.ADD_PEOPLE) {
     this.showSpinner(false);
 
     // Clean up
-    this.selectedPeople.removeAll();
     this._clearSearchResults();
     this.userProfile(null);
     $('user-input input').focus();
@@ -415,7 +385,6 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.showMatches(false);
     this.showSpinner(false);
 
-    this.selectedPeople.removeAll();
     this.state(StartUIViewModel.STATE.ADD_PEOPLE);
     this.searchInput('');
   }
@@ -424,10 +393,11 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     if (!this.isTeam()) {
       this.getTopPeople().then(userEntities => this.topUsers(userEntities));
     }
+    this._searchPeople(this.searchInput());
   }
 
   _updateServicesList() {
-    this.search(this.searchInput());
+    this.integrationRepository.searchForServices(this.searchInput(), this.searchInput);
   }
 
   //##############################################################################
@@ -572,7 +542,6 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       .getContacts(source)
       .then((userIds = []) => this.userRepository.get_users_by_id(userIds))
       .then(userEntities => {
-        this.selectedPeople.removeAll();
         this.matchedUsers(userEntities);
         this.showMatches(true);
       })
@@ -592,17 +561,6 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
   }
 
   //##############################################################################
-  // User Properties
-  //##############################################################################
-
-  updateProperties() {
-    const properties = this.propertiesRepository.properties;
-    this.hasCreatedConversation(properties.has_created_conversation);
-
-    return true;
-  }
-
-  //##############################################################################
   // Search
   //##############################################################################
 
@@ -611,76 +569,6 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.searchResults.contacts.removeAll();
     this.searchResults.others.removeAll();
     this.services.removeAll();
-  }
-
-  _handleSearchInput() {
-    for (const userEntity of this.searchResults.contacts()) {
-      if (!this.selectedPeople().includes(userEntity)) {
-        this.selectedPeople.push(userEntity);
-        return true;
-      }
-    }
-
-    const [matchingGroup] = this.searchResults.groups();
-    if (matchingGroup) {
-      this.clickOnConversation(matchingGroup);
-      return true;
-    }
-
-    return false;
-  }
-
-  _selectConversationForAction() {
-    switch (this.selectedPeople().length) {
-      case 0: {
-        return Promise.resolve();
-      }
-
-      case 1: {
-        const [selectedUserEntity] = this.selectedPeople();
-        return this._open1to1Conversation(selectedUserEntity);
-      }
-
-      default: {
-        return this._openGroupConversation(this.selectedPeople());
-      }
-    }
-  }
-
-  _open1to1Conversation(userEntity) {
-    this.submittedSearch = true;
-
-    return this.conversationRepository
-      .get_1to1_conversation(userEntity)
-      .then(conversationEntity => {
-        this.clickOnConversation(conversationEntity);
-        this.submittedSearch = false;
-        return conversationEntity;
-      })
-      .catch(error => {
-        this.submittedSearch = false;
-        throw error;
-      });
-  }
-
-  _openGroupConversation(userEntities) {
-    this.submittedSearch = true;
-
-    return this.conversationRepository
-      .createGroupConversation(userEntities)
-      .then(conversationEntity => {
-        this.submittedSearch = false;
-
-        if (conversationEntity) {
-          this.propertiesRepository.savePreference(z.properties.PROPERTIES_TYPE.HAS_CREATED_CONVERSATION);
-          amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
-          return conversationEntity;
-        }
-      })
-      .catch(error => {
-        this.submittedSearch = false;
-        throw new Error(`Unable to create conversation: ${error.message}`);
-      });
   }
 
   _searchConversationsForServices(query) {

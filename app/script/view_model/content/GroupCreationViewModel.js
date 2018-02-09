@@ -22,16 +22,19 @@
 window.z = window.z || {};
 window.z.ViewModel = z.ViewModel || {};
 
-z.ViewModel.content.ConversationCreationViewModel = class ConversationCreationViewModel {
+z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
   static get STATE() {
     return {
-      PARTICIPANTS: 'ConversationCreationViewModel.STATE.PARTICIPANTS',
-      PREFERENCES: 'ConversationCreationViewModel.STATE.PREFERENCES',
+      DEFAULT: 'GroupCreationViewModel.STATE.DEFAULT',
+      PARTICIPANTS: 'GroupCreationViewModel.STATE.PARTICIPANTS',
+      PREFERENCES: 'GroupCreationViewModel.STATE.PREFERENCES',
     };
   }
 
   constructor(elementId, conversationRepository, teamRepository, userRepository) {
-    this.logger = new z.util.Logger('z.ViewModel.content.ConversationCreationViewModel', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('z.ViewModel.content.GroupCreationViewModel', z.config.LOGGER.OPTIONS);
+
+    this.clickOnCreate = this.clickOnCreate.bind(this);
 
     this.elementId = elementId;
     this.conversationRepository = conversationRepository;
@@ -39,7 +42,7 @@ z.ViewModel.content.ConversationCreationViewModel = class ConversationCreationVi
     this.userRepository = userRepository;
 
     this.modal = undefined;
-    this.state = ko.observable(ConversationCreationViewModel.STATE.PREFERENCES);
+    this.state = ko.observable(GroupCreationViewModel.STATE.DEFAULT);
 
     this.contacts = ko.pureComputed(() => {
       if (this.teamRepository.isTeam()) {
@@ -50,48 +53,69 @@ z.ViewModel.content.ConversationCreationViewModel = class ConversationCreationVi
     });
 
     this.isCreatingConversation = false;
+    this.nameError = ko.observable('');
     this.nameInput = ko.observable('');
     this.selectedContacts = ko.observableArray([]);
     this.participantsInput = ko.observable('');
 
+    this.nameInput.subscribe(() => this.nameError(''));
+
     this.activateNext = ko.pureComputed(() => this.nameInput().length);
     this.participantsActionText = ko.pureComputed(() => {
       const stringSelector = this.selectedContacts().length
-        ? z.string.conversation_creation_participants_action_create
-        : z.string.conversation_creation_participants_action_skip;
+        ? z.string.groupCreationParticipantsActionCreate
+        : z.string.groupCreationParticipantsActionSkip;
       return z.l10n.text(stringSelector);
     });
     this.participantsHeaderText = ko.pureComputed(() => {
       const stringSelector = this.selectedContacts().length
-        ? z.string.conversation_creation_participants_header_with_counter
-        : z.string.conversation_creation_participants_header;
+        ? z.string.groupCreationParticipantsHeaderWithCounter
+        : z.string.groupCreationParticipantsHeader;
       return z.l10n.text(stringSelector, {number: this.selectedContacts().length});
     });
 
-    this.stateIsPreferences = ko.pureComputed(() => this.state() === ConversationCreationViewModel.STATE.PREFERENCES);
-    this.stateIsParticipants = ko.pureComputed(() => this.state() === ConversationCreationViewModel.STATE.PARTICIPANTS);
+    this.stateIsPreferences = ko.pureComputed(() => this.state() === GroupCreationViewModel.STATE.PREFERENCES);
+    this.stateIsParticipants = ko.pureComputed(() => this.state() === GroupCreationViewModel.STATE.PARTICIPANTS);
+
+    this.stateIsPreferences.subscribe(stateIsPreference => {
+      if (stateIsPreference) {
+        return $(document).on('keydown.groupCreation', keyboard_event => {
+          if (z.util.KeyboardUtil.isEscapeKey(keyboard_event)) {
+            this._hideModal();
+          }
+        });
+      }
+      return $(document).off('keydown.groupCreation');
+    });
 
     this.shouldUpdateScrollbar = ko
       .computed(() => this.selectedContacts() && this.stateIsPreferences())
       .extend({notify: 'always', rateLimit: 500});
+
+    amplify.subscribe(z.event.WebApp.CONVERSATION.CREATE_GROUP, this.showCreateGroup.bind(this));
   }
 
-  showCreateConversation() {
-    this._resetView();
-
+  showCreateGroup(userEntity) {
     if (!this.modal) {
-      this.modal = new zeta.webapp.module.Modal('#conversation-creation-modal');
+      this.modal = new zeta.webapp.module.Modal('#group-creation-modal', this._afterHideModal.bind(this));
+      this.modal.autoclose = false;
+    }
+
+    this.state(GroupCreationViewModel.STATE.PREFERENCES);
+    if (userEntity) {
+      this.selectedContacts.push(userEntity);
     }
 
     this.modal.show();
+    $('.group-creation-modal-teamname-input').focus();
   }
 
   clickOnBack() {
-    this.state(ConversationCreationViewModel.STATE.PREFERENCES);
+    this.state(GroupCreationViewModel.STATE.PREFERENCES);
   }
 
   clickOnClose() {
-    this._resetView();
+    this._hideModal();
   }
 
   clickOnCreate() {
@@ -101,7 +125,7 @@ z.ViewModel.content.ConversationCreationViewModel = class ConversationCreationVi
       this.conversationRepository
         .createGroupConversation(this.selectedContacts(), this.nameInput())
         .then(conversationEntity => {
-          this._resetView();
+          this._hideModal();
           amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
         })
         .catch(error => {
@@ -112,28 +136,40 @@ z.ViewModel.content.ConversationCreationViewModel = class ConversationCreationVi
   }
 
   clickOnNext() {
-    this.nameInput(this._normalizeNameInput());
-
     if (this.nameInput().length) {
-      return this.state(ConversationCreationViewModel.STATE.PARTICIPANTS);
+      const trimmedNameInput = this.nameInput().trim();
+      const nameTooLong = trimmedNameInput.length > z.conversation.ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
+      const nameTooShort = !trimmedNameInput.length;
+
+      this.nameInput(this.nameInput().slice(0, z.conversation.ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH));
+      if (nameTooLong) {
+        return this.nameError(z.l10n.text(z.string.groupCreationPreferencesErrorNameLong));
+      }
+
+      if (nameTooShort) {
+        return this.nameError(z.l10n.text(z.string.groupCreationPreferencesErrorNameShort));
+      }
+
+      return this.state(GroupCreationViewModel.STATE.PARTICIPANTS);
     }
-    // Show error
   }
 
   _normalizeNameInput() {
-    return this.nameInput()
-      .trim()
-      .slice(0, 64);
+    return this.nameInput().trim();
   }
-  _resetView() {
-    if (this.modal) {
-      this.modal.hide();
-    }
 
+  _afterHideModal() {
     this.isCreatingConversation = false;
+    this.nameError('');
     this.nameInput('');
     this.participantsInput('');
     this.selectedContacts([]);
-    this.state(ConversationCreationViewModel.STATE.PREFERENCES);
+    this.state(GroupCreationViewModel.STATE.DEFAULT);
+  }
+
+  _hideModal() {
+    if (this.modal) {
+      this.modal.hide();
+    }
   }
 };

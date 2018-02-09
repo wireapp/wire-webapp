@@ -105,8 +105,8 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
       this.user_repository
     );
     this.giphy = new z.ViewModel.GiphyViewModel('giphy-modal', this.conversation_repository, this.giphy_repository);
-    this.conversationCreation = new z.ViewModel.content.ConversationCreationViewModel(
-      'conversation-creation-modal',
+    this.groupCreation = new z.ViewModel.content.GroupCreationViewModel(
+      'group-creation-modal',
       this.conversation_repository,
       this.team_repository,
       this.user_repository
