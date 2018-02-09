@@ -137,14 +137,15 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
 
   clickOnNext() {
     if (this.nameInput().length) {
-      this.nameInput(this._normalizeNameInput());
+      const trimmedNameInput = this.nameInput().trim();
+      const nameTooLong = trimmedNameInput.length > z.conversation.ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
+      const nameTooShort = !trimmedNameInput.length;
 
-      const nameTooLong = this.nameInput().length > z.conversation.ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
+      this.nameInput(this.nameInput().slice(0, z.conversation.ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH));
       if (nameTooLong) {
         return this.nameError(z.l10n.text(z.string.groupCreationPreferencesErrorNameLong));
       }
 
-      const nameTooShort = !this.nameInput().length;
       if (nameTooShort) {
         return this.nameError(z.l10n.text(z.string.groupCreationPreferencesErrorNameShort));
       }
@@ -154,9 +155,7 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
   }
 
   _normalizeNameInput() {
-    return this.nameInput()
-      .trim()
-      .slice(0, 64);
+    return this.nameInput().trim();
   }
 
   _afterHideModal() {
