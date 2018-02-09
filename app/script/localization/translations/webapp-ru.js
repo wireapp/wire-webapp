@@ -266,7 +266,6 @@ z.string.ru.conversations_contacts = 'Контакты';
 z.string.ru.conversations_connection_request_many = '{{number}} ожидающих';
 z.string.ru.conversations_connection_request_one = '1 человек ожидает';
 z.string.ru.conversations_empty_conversation = 'Групповой разговор';
-z.string.ru.conversations_empty_conversation_description = 'Все вышли';
 z.string.ru.conversations_no_conversations = 'Начните разговор или создайте группу.';
 z.string.ru.conversations_popover_archive = 'Архивировать';
 z.string.ru.conversations_popover_block = 'Заблокировать';

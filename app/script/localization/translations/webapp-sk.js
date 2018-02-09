@@ -258,7 +258,6 @@ z.string.sk.conversations_contacts = 'Kontakty';
 z.string.sk.conversations_connection_request_many = '{{number}} ľudí čaká';
 z.string.sk.conversations_connection_request_one = '1 osoba čaká';
 z.string.sk.conversations_empty_conversation = 'Skupinová konverzácia';
-z.string.sk.conversations_empty_conversation_description = 'Všetci opustili rozhovor';
 z.string.sk.conversations_no_conversations = 'Zatiaľ žiadne konverzácie';
 z.string.sk.conversations_popover_archive = 'Archív';
 z.string.sk.conversations_popover_block = 'Blokovať';
