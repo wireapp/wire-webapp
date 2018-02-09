@@ -6,6 +6,6 @@
     "rootDir": "src/main/ts",
     "target": "ES5"
   },
-  "exclude": ["bower_components", "node_modules", "typings/browser", "typings/browser.d.ts"],
+  "exclude": ["bower_components", "dist", "node_modules"],
   "extends": "../../configs/tsconfig.json"
 }

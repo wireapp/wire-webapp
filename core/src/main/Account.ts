@@ -25,7 +25,6 @@ import {
   ConversationEventType,
   OTRMessageAdd,
 } from '@wireapp/api-client/dist/commonjs/conversation/event/';
-import {MemoryEngine} from '@wireapp/store-engine/dist/commonjs/engine/';
 import {ClientClassification, ClientType, NewClient, RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/';
 import {LoginSanitizer} from './auth/';
 import {RecordNotFoundError} from '@wireapp/store-engine/dist/commonjs/engine/error/';
@@ -175,20 +174,24 @@ export default class Account extends EventEmitter {
     return this.service.crypto
       .createCryptobox()
       .then((serializedPreKeys: Array<PreKey>) => {
-        const newClient: NewClient = {
-          class: clientClassification,
-          cookie: cookieLabel,
-          lastkey: this.service.crypto.cryptobox.serialize_prekey(this.service.crypto.cryptobox.lastResortPreKey),
-          password: String(loginData.password),
-          prekeys: serializedPreKeys,
-          sigkeys: {
-            enckey: 'Wuec0oJi9/q9VsgOil9Ds4uhhYwBT+CAUrvi/S9vcz0=',
-            mackey: 'Wuec0oJi9/q9VsgOil9Ds4uhhYwBT+CAUrvi/S9vcz0=',
-          },
-          type: loginData.persist ? ClientType.PERMANENT : ClientType.TEMPORARY,
-        };
+        if (this.service.crypto.cryptobox.lastResortPreKey) {
+          const newClient: NewClient = {
+            class: clientClassification,
+            cookie: cookieLabel,
+            lastkey: this.service.crypto.cryptobox.serialize_prekey(this.service.crypto.cryptobox.lastResortPreKey),
+            password: String(loginData.password),
+            prekeys: serializedPreKeys,
+            sigkeys: {
+              enckey: 'Wuec0oJi9/q9VsgOil9Ds4uhhYwBT+CAUrvi/S9vcz0=',
+              mackey: 'Wuec0oJi9/q9VsgOil9Ds4uhhYwBT+CAUrvi/S9vcz0=',
+            },
+            type: loginData.persist ? ClientType.PERMANENT : ClientType.TEMPORARY,
+          };
 
-        return newClient;
+          return newClient;
+        } else {
+          throw new Error('Cryptobox got initialized without a last resort PreKey.');
+        }
       })
       .then((newClient: NewClient) => this.apiClient.client.api.postClient(newClient))
       .then((client: RegisteredClient) => {

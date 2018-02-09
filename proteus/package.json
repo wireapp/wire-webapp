@@ -1,36 +1,36 @@
 {
   "dependencies": {
+    "@types/chai": "4.1.2",
+    "@types/ed2curve": "0.2.1",
+    "@types/node": "9.4.0",
     "@wireapp/cbor": "2.3.2",
     "ed2curve": "0.2.1",
-    "libsodium-wrappers-sumo": "0.5.4"
+    "libsodium-wrappers-sumo": "0.7.3"
   },
   "description": "Axolotl protocol implementation for JavaScript.",
   "devDependencies": {
     "bower": "1.8.2",
     "chai": "4.1.2",
-    "jsdoc": "3.5.5",
-    "mocha": "2.5.3",
-    "tsd-jsdoc": "dcodeio/tsd-jsdoc#fe76c4dc071b00bb549d3af7a3bad8c555999e81",
+    "jasmine": "2.9.0",
+    "rimraf": "2.6.2",
+    "typescript": "2.7.1",
     "webpack": "3.10.0"
   },
-  "files": [
-    "dist/types.d.ts",
-    "dist/window",
-    "src"
-  ],
+  "files": ["dist"],
   "license": "GPL-3.0",
-  "main": "src/proteus.js",
+  "main": "dist/index.js",
   "name": "@wireapp/proteus",
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus",
   "scripts": {
-    "clear": "exit 0",
-    "dist": "yarn clear && bower install && webpack --progress && yarn types",
-    "types": "jsdoc --verbose --pedantic --configure jsdoc.json src/ && node replace.js",
+    "build": "tsc",
+    "clear": "rimraf dist",
+    "dist": "yarn clear && yarn build && bower install && webpack --progress",
     "start": "node dist/index.js",
     "test": "yarn dist && yarn test:node",
-    "test:node": "mocha -s 30000 -t 30000 --recursive test/harness.js test --trace-warnings --grep LongRunning --invert",
-    "test:longrunning": "mocha -s 30000 -t 30000 --recursive test/harness.js test --trace-warnings --grep LongRunning"
+    "test:all": "yarn test && yarn test:longrunning",
+    "test:node": "jasmine",
+    "test:longrunning": "jasmine --config=spec/support/jasmine.longrunning.json"
   },
-  "types": "dist/types.d.ts",
+  "types": "dist/index.d.ts",
   "version": "5.3.3"
 }

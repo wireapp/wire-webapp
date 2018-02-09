@@ -34,10 +34,10 @@ module.exports = {
     fs: 'empty',
   },
   output: {
-    filename: 'proteus.js',
+    filename: `${pkg.name.substr(pkg.name.indexOf('/') + 1)}.js`,
     library: 'Proteus',
     libraryTarget: 'var',
-    path: `${__dirname}/dist/window`,
+    path: `${__dirname}/dist`,
   },
   performance: {
     hints: 'warning',

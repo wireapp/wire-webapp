@@ -1,10 +1,7 @@
 {
   "dynamic": {
     "dexie@copy": ["dexie/dist/dexie.js"],
-    "libsodium.js@copy": ["libsodium.js/dist/browsers-sumo/combined/sodium.js"],
-    "logdown@copy": ["logdown/dist/logdown.js"],
-    "wire-webapp-cbor@copy": ["wire-webapp-cbor/dist/window/wire-webapp-cbor.js"],
-    "wire-webapp-lru-cache@copy": ["wire-webapp-lru-cache/dist/window/LRUCache.js"],
-    "wire-webapp-proteus@copy": ["wire-webapp-proteus/dist/window/proteus.js"]
+    "libsodium.js@copy": ["libsodium.js/dist/browsers-sumo/sodium.js"],
+    "logdown@copy": ["logdown/dist/logdown.js"]
   }
 }

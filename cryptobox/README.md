@@ -28,20 +28,3 @@ yarn add @wireapp/cryptobox
 #### Node.js
 
 * [demo.js](./demo.js)
-
-### Development
-
-#### Testing
-
-Run individual test:
-
-```bash
-# Example
-gulp test_browser --file "common/CacheSpec.js"
-```
-
-Run all tests (in Chrome & Node.js):
-
-```bash
-yarn test
-```

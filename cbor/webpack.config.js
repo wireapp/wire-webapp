@@ -7,10 +7,10 @@ module.exports = {
     filename: `${__dirname}/${pkg.main}`,
   },
   output: {
-    filename: `${pkg.name}.js`,
+    filename: `${pkg.name.substr(pkg.name.indexOf('/') + 1)}.js`,
     library: 'CBOR',
     libraryTarget: 'var',
-    path: `${__dirname}/dist/window`,
+    path: `${__dirname}/dist`,
   },
   performance: {
     hints: 'warning',

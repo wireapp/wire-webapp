@@ -1,0 +1,106 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+/* eslint no-magic-numbers: "off" */
+
+import ProteusError from './ProteusError';
+
+class DecryptError extends ProteusError {
+  static CODE = {
+    CASE_200: 200,
+    CASE_201: 201,
+    CASE_202: 202,
+    CASE_203: 203,
+    CASE_204: 204,
+    CASE_205: 205,
+    CASE_206: 206,
+    CASE_207: 207,
+    CASE_208: 208,
+    CASE_209: 209,
+    CASE_210: 210,
+    CASE_211: 211,
+    CASE_212: 212,
+  };
+
+  constructor(message = 'Unknown decryption error', code = 2) {
+    super(message, code);
+    Object.setPrototypeOf(this, DecryptError.prototype);
+  }
+}
+
+class RemoteIdentityChanged extends DecryptError {
+  constructor(message = 'Remote identity changed', code: number) {
+    super(message, code);
+    Object.setPrototypeOf(this, RemoteIdentityChanged.prototype);
+  }
+}
+
+class InvalidSignature extends DecryptError {
+  constructor(message = 'Invalid signature', code: number) {
+    super(message, code);
+    Object.setPrototypeOf(this, InvalidSignature.prototype);
+  }
+}
+
+class InvalidMessage extends DecryptError {
+  constructor(message = 'Invalid message', code: number) {
+    super(message, code);
+    Object.setPrototypeOf(this, InvalidMessage.prototype);
+  }
+}
+
+class DuplicateMessage extends DecryptError {
+  constructor(message = 'Duplicate message', code: number) {
+    super(message, code);
+    Object.setPrototypeOf(this, DuplicateMessage.prototype);
+  }
+}
+
+class TooDistantFuture extends DecryptError {
+  constructor(message = 'Message is from too distant in the future', code: number) {
+    super(message, code);
+    Object.setPrototypeOf(this, TooDistantFuture.prototype);
+  }
+}
+
+class OutdatedMessage extends DecryptError {
+  constructor(message = 'Outdated message', code: number) {
+    super(message, code);
+    Object.setPrototypeOf(this, OutdatedMessage.prototype);
+  }
+}
+
+class PrekeyNotFound extends DecryptError {
+  constructor(message = 'Pre-key not found', code: number) {
+    super(message, code);
+    Object.setPrototypeOf(this, PrekeyNotFound.prototype);
+  }
+}
+
+Object.assign(DecryptError, {
+  DuplicateMessage,
+  InvalidMessage,
+  InvalidSignature,
+  OutdatedMessage,
+  PrekeyNotFound,
+  RemoteIdentityChanged,
+  TooDistantFuture,
+});
+
+export default DecryptError;

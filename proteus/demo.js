@@ -1,12 +1,17 @@
-const Proteus = require('../src/proteus');
-const sodium = require('libsodium-wrappers-sumo');
+(async () => {
+  const Proteus = require('@wireapp/proteus');
+  const _sodium = require('libsodium-wrappers-sumo');
 
-const identity = Proteus.keys.IdentityKeyPair.new();
-const fingerprint = identity.public_key.fingerprint();
-const serializedIdentity = identity.serialise();
-const encodedSerializedIdentity = sodium.to_base64(new Uint8Array(serializedIdentity));
+  await _sodium.ready;
+  sodium = _sodium;
 
-const messageFingerprint = `Identity Test (Fingerprint): ${fingerprint}`;
-const messageSerialization = `Identity Test (Serialization): ${encodedSerializedIdentity}`;
+  const identity = await Proteus.keys.IdentityKeyPair.new();
+  const fingerprint = identity.public_key.fingerprint();
+  const serializedIdentity = identity.serialise();
+  const encodedSerializedIdentity = sodium.to_base64(new Uint8Array(serializedIdentity));
 
-console.log(`${messageFingerprint}\r\n${messageSerialization}`);
+  const messageFingerprint = `Identity Test (Fingerprint): ${fingerprint}`;
+  const messageSerialization = `Identity Test (Serialization): ${encodedSerializedIdentity}`;
+
+  console.log(`${messageFingerprint}\r\n${messageSerialization}`);
+})();

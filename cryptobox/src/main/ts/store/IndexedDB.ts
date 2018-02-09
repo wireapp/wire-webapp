@@ -1,6 +1,7 @@
-import * as Proteus from '@wireapp/proteus';
+import * as ProteusKeys from '@wireapp/proteus/dist/keys/';
+import * as ProteusSession from '@wireapp/proteus/dist/session/';
 import Dexie from 'dexie';
-import Logdown = require('logdown');
+const logdown = require('logdown');
 import CryptoboxStore from './CryptoboxStore';
 import {error as storeError} from '../store/';
 import {SerialisedRecord} from '../store';
@@ -10,21 +11,22 @@ export interface DexieInstance extends Dexie {
 }
 
 class IndexedDB implements CryptoboxStore {
-  public identity: Proteus.keys.IdentityKeyPair;
+  public identity: ProteusKeys.IdentityKeyPair | undefined;
 
   private db: DexieInstance;
-  private prekeys: {[index: string]: Proteus.keys.PreKey} = {};
+  private prekeys: {[index: string]: ProteusKeys.PreKey} = {};
   private TABLE = {
     LOCAL_IDENTITY: 'keys',
     PRE_KEYS: 'prekeys',
     SESSIONS: 'sessions',
   };
-  private logger: Logdown;
+  private logger: any = logdown('cryptobox.store.IndexedDB', {
+    logger: console,
+    markdown: false,
+  });
   private localIdentityKey: string = 'local_identity';
 
   constructor(identifier: string | DexieInstance) {
-    this.logger = new Logdown({alignOutput: true, markdown: false, prefix: 'cryptobox.store.IndexedDB'});
-
     if (typeof indexedDB === 'undefined') {
       const warning = `IndexedDB isn't supported by your platform.`;
       throw new Error(warning);
@@ -122,10 +124,10 @@ class IndexedDB implements CryptoboxStore {
     });
   }
 
-  public load_identity(): Promise<Proteus.keys.IdentityKeyPair | undefined> {
+  public load_identity(): Promise<ProteusKeys.IdentityKeyPair | undefined> {
     return this.read<SerialisedRecord>(this.TABLE.LOCAL_IDENTITY, this.localIdentityKey)
       .then((record: SerialisedRecord) => {
-        return Proteus.keys.IdentityKeyPair.deserialise(record.serialised);
+        return ProteusKeys.IdentityKeyPair.deserialise(record.serialised);
       })
       .catch(function(error: Error) {
         if (error instanceof storeError.RecordNotFoundError) {
@@ -135,10 +137,10 @@ class IndexedDB implements CryptoboxStore {
       });
   }
 
-  public load_prekey(prekey_id: number): Promise<Proteus.keys.PreKey | undefined> {
+  public load_prekey(prekey_id: number): Promise<ProteusKeys.PreKey | undefined> {
     return this.read<SerialisedRecord>(this.TABLE.PRE_KEYS, prekey_id.toString())
       .then((record: SerialisedRecord) => {
-        return Proteus.keys.PreKey.deserialise(record.serialised);
+        return ProteusKeys.PreKey.deserialise(record.serialised);
       })
       .catch(function(error: Error) {
         if (error instanceof storeError.RecordNotFoundError) {
@@ -148,25 +150,25 @@ class IndexedDB implements CryptoboxStore {
       });
   }
 
-  public load_prekeys(): Promise<Array<Proteus.keys.PreKey>> {
+  public load_prekeys(): Promise<Array<ProteusKeys.PreKey>> {
     return Promise.resolve()
       .then(() => {
         return this.db[this.TABLE.PRE_KEYS].toArray();
       })
       .then((records: any) => {
         return records.map((record: SerialisedRecord) => {
-          return Proteus.keys.PreKey.deserialise(record.serialised);
+          return ProteusKeys.PreKey.deserialise(record.serialised);
         });
       });
   }
 
-  public read_session(identity: Proteus.keys.IdentityKeyPair, session_id: string): Promise<Proteus.session.Session> {
+  public read_session(identity: ProteusKeys.IdentityKeyPair, session_id: string): Promise<ProteusSession.Session> {
     return this.read<SerialisedRecord>(this.TABLE.SESSIONS, session_id).then((payload: SerialisedRecord) => {
-      return Proteus.session.Session.deserialise(identity, payload.serialised);
+      return ProteusSession.Session.deserialise(identity, payload.serialised);
     });
   }
 
-  public save_identity(identity: Proteus.keys.IdentityKeyPair): Promise<Proteus.keys.IdentityKeyPair> {
+  public save_identity(identity: ProteusKeys.IdentityKeyPair): Promise<ProteusKeys.IdentityKeyPair> {
     const payload: SerialisedRecord = new SerialisedRecord(identity.serialise(), this.localIdentityKey);
     this.identity = identity;
 
@@ -180,7 +182,7 @@ class IndexedDB implements CryptoboxStore {
     });
   }
 
-  public save_prekey(prekey: Proteus.keys.PreKey): Promise<Proteus.keys.PreKey> {
+  public save_prekey(prekey: ProteusKeys.PreKey): Promise<ProteusKeys.PreKey> {
     const payload: SerialisedRecord = new SerialisedRecord(prekey.serialise(), prekey.key_id.toString());
     this.prekeys[prekey.key_id] = prekey;
 
@@ -193,13 +195,13 @@ class IndexedDB implements CryptoboxStore {
     });
   }
 
-  public save_prekeys(prekeys: Array<Proteus.keys.PreKey>): Promise<Array<Proteus.keys.PreKey>> {
+  public save_prekeys(prekeys: Array<ProteusKeys.PreKey>): Promise<Array<ProteusKeys.PreKey>> {
     if (prekeys.length === 0) {
       return Promise.resolve(prekeys);
     }
 
     const items: Array<SerialisedRecord> = [];
-    const keys: Array<string> = prekeys.map(function(preKey: Proteus.keys.PreKey) {
+    const keys: Array<string> = prekeys.map(function(preKey: ProteusKeys.PreKey) {
       const key: string = preKey.key_id.toString();
       const payload: SerialisedRecord = new SerialisedRecord(preKey.serialise(), key);
       items.push(payload);
@@ -221,7 +223,7 @@ class IndexedDB implements CryptoboxStore {
       });
   }
 
-  public create_session(session_id: string, session: Proteus.session.Session): Promise<Proteus.session.Session> {
+  public create_session(session_id: string, session: ProteusSession.Session): Promise<ProteusSession.Session> {
     const payload: SerialisedRecord = new SerialisedRecord(session.serialise(), session_id);
 
     return this.create(this.TABLE.SESSIONS, payload.id, payload)
@@ -242,7 +244,7 @@ class IndexedDB implements CryptoboxStore {
       });
   }
 
-  public update_session(session_id: string, session: Proteus.session.Session): Promise<Proteus.session.Session> {
+  public update_session(session_id: string, session: ProteusSession.Session): Promise<ProteusSession.Session> {
     const payload: SerialisedRecord = new SerialisedRecord(session.serialise(), session_id);
 
     return this.update(this.TABLE.SESSIONS, payload.id, {serialised: payload.serialised}).then((primaryKey: string) => {
