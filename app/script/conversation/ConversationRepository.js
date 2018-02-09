@@ -2580,7 +2580,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           case z.event.Client.CONVERSATION.REACTION:
             return this._on_reaction(conversationEntity, eventJson);
           default:
-            return this._on_add_event(conversationEntity, eventJson);
+            return this._onAddEvent(conversationEntity, eventJson);
         }
       })
       .then((entityObject = {}) => this._handledConversationEvent(entityObject, eventSource, previouslyArchived));
@@ -2677,15 +2677,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * A message or ping received in a conversation.
    *
    * @private
-   * @param {Conversation} conversation_et - Conversation to add the event to
-   * @param {Object} event_json - JSON data of 'conversation.message-add' or 'conversation.knock' event
+   * @param {Conversation} conversationEntity - Conversation to add the event to
+   * @param {Object} eventJson - JSON data of 'conversation.message-add' or 'conversation.knock' event
    * @returns {Promise} Resolves when event was handled
    */
-  _on_add_event(conversation_et, event_json) {
-    return this._add_event_to_conversation(event_json, conversation_et).then(message_et => ({
-      conversation_et: conversation_et,
-      message_et: message_et,
-    }));
+  _onAddEvent(conversationEntity, eventJson) {
+    return this._add_event_to_conversation(eventJson, conversationEntity).then(messageEntity => {
+      return {conversationEntity, messageEntity};
+    });
   }
 
   /**
@@ -2922,7 +2921,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       })
       .then(updated_event_json => {
         if (updated_event_json) {
-          return this._on_add_event(conversation_et, updated_event_json);
+          return this._onAddEvent(conversation_et, updated_event_json);
         }
       })
       .catch(error => {
@@ -2980,10 +2979,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
         if (event) {
           conversation_et.remove_message_by_id(event_json.id);
 
-          return this._on_add_event(conversation_et, event).then(({message_et}) => {
-            const first_asset = message_et.get_first_asset();
+          return this._onAddEvent(conversation_et, event).then(({messageEntity}) => {
+            const first_asset = messageEntity.get_first_asset();
             if (first_asset.is_image() || first_asset.status() === z.assets.AssetTransferState.UPLOADED) {
-              return {conversationEntity: conversation_et, messageEntity: message_et};
+              return {conversationEntity: conversation_et, messageEntity};
             }
           });
         }
