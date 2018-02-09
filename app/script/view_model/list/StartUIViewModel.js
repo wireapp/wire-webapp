@@ -393,10 +393,11 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     if (!this.isTeam()) {
       this.getTopPeople().then(userEntities => this.topUsers(userEntities));
     }
+    this._searchPeople(this.searchInput());
   }
 
   _updateServicesList() {
-    this.search(this.searchInput());
+    this.integrationRepository.searchForServices(this.searchInput(), this.searchInput);
   }
 
   //##############################################################################
