@@ -417,7 +417,7 @@ z.components.UserProfile = class UserProfile {
   }
 
   _formatFingerprint(fingerprint) {
-    z.util.zero_padding(fingerprint, 16).match(/.{1,2}/g);
+    return z.util.zero_padding(fingerprint, 16).match(/.{1,2}/g) || [];
   }
 
   clickOnDevice(clientEntity) {
