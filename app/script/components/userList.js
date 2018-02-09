@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -98,7 +98,7 @@ z.components.UserList = class UserList {
 ko.components.register('user-list', {
   template: `
     <div class="search-list" data-bind="css: cssClasses(), foreach: {data: filteredUserEntities}">
-      <div class="search-list-item" data-bind="click: $parent.onUserClick, css: {'search-list-item-selected': $parent.isSelected($data)}, attr: {'data-uie-uid': $data.id, 'data-uie-value': $data.name(), 'data-uie-status': $data.connection().status()}" data-uie-name="item-user">
+      <div class="search-list-item" data-bind="click: $parent.onUserClick, attr: {'data-uie-uid': $data.id, 'data-uie-value': $data.name(), 'data-uie-status': $data.connection().status()}" data-uie-name="item-user">
         <!-- ko if: $parent.isCompactMode -->
           <div class="search-list-item-image">
             <participant-avatar params="participant: $data, selected: $parent.isSelected($data), size: z.components.ParticipantAvatar.SIZE.LARGE"></participant-avatar>

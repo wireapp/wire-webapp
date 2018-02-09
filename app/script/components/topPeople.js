@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,29 +25,14 @@ window.z.components = z.components || {};
 z.components.TopPeople = class TopPeople {
   constructor(params) {
     this.click = params.click;
-    this.selectedUsers = params.selected;
     this.maxUsers = params.max || 9;
-    this.userEntities = params.user;
+    this.userEntities = params.users;
 
     this.displayedUsers = ko.pureComputed(() => this.userEntities().slice(0, this.maxUsers));
 
     this.onUserClick = (userEntity, event) => {
-      if (typeof this.selectedUsers === 'function') {
-        if (this.isSelected(userEntity)) {
-          this.selectedUsers.remove(userEntity);
-        } else {
-          this.selectedUsers.push(userEntity);
-        }
-      }
-
       if (typeof this.click === 'function') {
         return this.click(userEntity, event);
-      }
-    };
-
-    this.isSelected = userEntity => {
-      if (typeof this.selectedUsers === 'function') {
-        return this.selectedUsers().includes(userEntity);
       }
     };
   }
@@ -56,8 +41,8 @@ z.components.TopPeople = class TopPeople {
 ko.components.register('top-people', {
   template: `
     <div class="search-list search-list-sm" data-bind="foreach: {data: displayedUsers}">
-      <div class="search-list-item" data-bind="click: $parent.onUserClick, css: {'search-list-item-selected': $parent.isSelected($data)}, attr: {'data-uie-uid': $data.id, 'data-uie-value': $data.name(), 'data-uie-status': $data.connection().status()}" data-uie-name="item-user">
-        <participant-avatar class="search-list-item-image" params="participant: $data, selected: $parent.isSelected($data), delay: 300, size: z.components.ParticipantAvatar.SIZE.LARGE"></participant-avatar>
+      <div class="search-list-item" data-bind="click: $parent.onUserClick, attr: {'data-uie-uid': $data.id, 'data-uie-value': $data.name(), 'data-uie-status': $data.connection().status()}" data-uie-name="item-user">
+        <participant-avatar class="search-list-item-image" params="participant: $data, delay: 300, size: z.components.ParticipantAvatar.SIZE.LARGE"></participant-avatar>
         <div class="search-list-item-content">
           <div class="search-list-item-content-name" data-bind="text: first_name"></div>
         </div>
