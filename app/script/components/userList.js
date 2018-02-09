@@ -164,7 +164,7 @@ ko.components.register('user-list', {
       <!-- /ko -->
 
       <!-- ko if: userEntities().length > 0 && filteredUserEntities().length === 0 -->
-        <div class="no-results" data-bind="l10n_text: z.string.people_no_matches"></div>
+        <div class="no-results" data-bind="l10n_text: z.string.people_no_matches" data-uie-name="status-no-matches"></div>
       <!-- /ko -->
     <!-- /ko -->
   `,
