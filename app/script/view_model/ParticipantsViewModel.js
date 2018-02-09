@@ -240,7 +240,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
   clickOnSelectService(serviceEntity) {
     this.groupMode(true);
-    this.selectedParticipant(serviceEntity);
+    this.selectedService(serviceEntity);
     this.state(ParticipantsViewModel.STATE.SERVICE_CONFIRMATION);
 
     this.integrationRepository.getProviderNameForService(serviceEntity);
