@@ -247,9 +247,17 @@ z.string.de.conversation_send_pasted_file = 'Bild eingefügt am {{date}}';
 z.string.de.conversation_someone = 'Jemand';
 z.string.de.conversation_tweet_author = ' auf Twitter';
 
-z.string.de.conversation_creation_preferences_action = 'Weiter';
-z.string.de.conversation_creation_participants_header = 'Personen hinzufügen';
-z.string.de.conversation_creation_participants_placeholder = 'Nach Namen suchen';
+// Group creation
+z.string.de.groupCreationPreferencesAction = 'Weiter';
+z.string.de.groupCreationPreferencesErrorNameShort = 'Gib mindestens ein Zeichen ein';
+z.string.de.groupCreationPreferencesErrorNameLong = 'Der eingegebene Gruppenname ist zu lang';
+z.string.de.groupCreationPreferencesHeader = 'Neue Gruppe';
+z.string.de.groupCreationPreferencesPlaceholder = 'Gruppenname';
+z.string.de.groupCreationParticipantsActionCreate = 'Fertig';
+z.string.de.groupCreationParticipantsActionSkip = 'Überspringen';
+z.string.de.groupCreationParticipantsHeader = 'Personen hinzufügen';
+z.string.de.groupCreationParticipantsHeaderWithCounter = 'Personen hinzufügen ({{number}})';
+z.string.de.groupCreationParticipantsPlaceholder = 'Nach Namen suchen';
 
 z.string.de.collection_show_all = 'Zeige alle {{number}}';
 z.string.de.collection_section_links = 'Links';
