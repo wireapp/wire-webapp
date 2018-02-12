@@ -410,7 +410,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       .then(conversationEntities => {
         return conversationEntities
           .filter(conversationEntity => conversationEntity.is_one2one())
-          .slice(0, 9)
+          .slice(0, 6)
           .map(conversationEntity => conversationEntity.participating_user_ids()[0]);
       })
       .then(userIds => this.userRepository.get_users_by_id(userIds))
