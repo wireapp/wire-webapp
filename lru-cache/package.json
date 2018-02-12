@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "webpack": "3.10.0"
+    "webpack": "3.11.0"
   },
   "description": "Least Recently Used (LRU) Cache for JavaScript and TypeScript.",
   "devDependencies": {

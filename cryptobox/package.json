@@ -31,7 +31,7 @@
     "rimraf": "2.6.2",
     "run-sequence": "2.2.1",
     "typescript": "2.7.1",
-    "webpack": "2.3.3",
+    "webpack": "3.11.0",
     "yargs": "11.0.0"
   },
   "files": [
