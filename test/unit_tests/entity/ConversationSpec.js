@@ -802,14 +802,14 @@ describe('Conversation', () => {
       other_user.connection().status(z.user.ConnectionStatus.SENT);
       const creation_message = conversation_et._creation_message();
       expect(creation_message).toBeDefined();
-      expect(creation_message.member_message_type).toBe(z.message.SystemMessageType.CONNECTION_REQUEST);
+      expect(creation_message.memberMessageType).toBe(z.message.SystemMessageType.CONNECTION_REQUEST);
     });
 
     it('can create a message for an accepted connection request', () => {
       conversation_et.type(z.conversation.ConversationType.ONE2ONE);
       const creation_message = conversation_et._creation_message();
       expect(creation_message).toBeDefined();
-      expect(creation_message.member_message_type).toBe(z.message.SystemMessageType.CONNECTION_ACCEPTED);
+      expect(creation_message.memberMessageType).toBe(z.message.SystemMessageType.CONNECTION_ACCEPTED);
     });
 
     it('can create a message for a group the user started', () => {
@@ -817,7 +817,7 @@ describe('Conversation', () => {
       conversation_et.creator = self_user.id;
       const creation_message = conversation_et._creation_message();
       expect(creation_message).toBeDefined();
-      expect(creation_message.member_message_type).toBe(z.message.SystemMessageType.CONVERSATION_CREATE);
+      expect(creation_message.memberMessageType).toBe(z.message.SystemMessageType.CONVERSATION_CREATE);
       expect(creation_message.user().id).toBe(self_user.id);
     });
 
@@ -826,7 +826,7 @@ describe('Conversation', () => {
       conversation_et.creator = other_user.id;
       const creation_message = conversation_et._creation_message();
       expect(creation_message).toBeDefined();
-      expect(creation_message.member_message_type).toBe(z.message.SystemMessageType.CONVERSATION_CREATE);
+      expect(creation_message.memberMessageType).toBe(z.message.SystemMessageType.CONVERSATION_CREATE);
       expect(creation_message.user().id).toBe(other_user.id);
     });
 
@@ -835,7 +835,7 @@ describe('Conversation', () => {
       conversation_et.creator = z.util.create_random_uuid;
       const creation_message = conversation_et._creation_message();
       expect(creation_message).toBeDefined();
-      expect(creation_message.member_message_type).toBe(z.message.SystemMessageType.CONVERSATION_RESUME);
+      expect(creation_message.memberMessageType).toBe(z.message.SystemMessageType.CONVERSATION_RESUME);
       expect(creation_message.user().id).toBe('');
     });
 

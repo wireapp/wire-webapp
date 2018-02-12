@@ -464,7 +464,7 @@ describe('z.notification.NotificationRepository', () => {
       conversation_et.from = payload.users.get.one[0].id;
       message_et = new z.entity.MemberMessage();
       message_et.user(user_et);
-      message_et.member_message_type = z.message.SystemMessageType.CONVERSATION_CREATE;
+      message_et.memberMessageType = z.message.SystemMessageType.CONVERSATION_CREATE;
 
       const expected_body = `${first_name} started a conversation`;
       verify_notification_system(done, conversation_et, message_et, expected_body);
@@ -486,7 +486,7 @@ describe('z.notification.NotificationRepository', () => {
     beforeEach(() => {
       message_et = new z.entity.MemberMessage();
       message_et.user(user_et);
-      message_et.member_message_type = z.message.SystemMessageType.NORMAL;
+      message_et.memberMessageType = z.message.SystemMessageType.NORMAL;
       other_user_et = TestFactory.user_repository.user_mapper.map_user_from_object(payload.users.get.many[1]);
     });
 
@@ -596,21 +596,21 @@ describe('z.notification.NotificationRepository', () => {
 
     it('if a connection request is incoming', done => {
       connection_et.status = 'pending';
-      message_et.member_message_type = z.message.SystemMessageType.CONNECTION_REQUEST;
+      message_et.memberMessageType = z.message.SystemMessageType.CONNECTION_REQUEST;
 
       const expected_body = z.string.notification_connection_request;
       verify_notification_system(done, conversation_et, message_et, expected_body, expected_title);
     });
 
     it('if your connection request was accepted', done => {
-      message_et.member_message_type = z.message.SystemMessageType.CONNECTION_ACCEPTED;
+      message_et.memberMessageType = z.message.SystemMessageType.CONNECTION_ACCEPTED;
 
       const expected_body = z.string.notification_connection_accepted;
       verify_notification_system(done, conversation_et, message_et, expected_body, expected_title);
     });
 
     it('if you are automatically connected', done => {
-      message_et.member_message_type = z.message.SystemMessageType.CONNECTION_CONNECTED;
+      message_et.memberMessageType = z.message.SystemMessageType.CONNECTION_CONNECTED;
 
       const expected_body = z.string.notification_connection_connected;
       verify_notification_system(done, conversation_et, message_et, expected_body, expected_title);

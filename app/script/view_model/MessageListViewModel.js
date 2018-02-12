@@ -49,7 +49,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
     this.center_messages = ko.pureComputed(() => {
       const [firstVisibleMessage] = this.conversation().messages_visible();
       if (firstVisibleMessage && firstVisibleMessage.is_member()) {
-        return this.conversation().messages_visible().length === 1 && firstVisibleMessage.is_connection();
+        return this.conversation().messages_visible().length === 1 && firstVisibleMessage.isConnection();
       }
     });
 

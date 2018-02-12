@@ -717,7 +717,7 @@ describe('ConversationRepository', () => {
       let member_join_event = null;
 
       beforeEach(() => {
-        spyOn(TestFactory.conversation_repository, '_on_member_join').and.callThrough();
+        spyOn(TestFactory.conversation_repository, '_onMemberJoin').and.callThrough();
         spyOn(TestFactory.conversation_repository, 'update_participating_user_ets').and.callThrough();
 
         member_join_event = {
@@ -736,7 +736,7 @@ describe('ConversationRepository', () => {
         TestFactory.conversation_repository
           .onConversationEvent(member_join_event)
           .then(() => {
-            expect(TestFactory.conversation_repository._on_member_join).toHaveBeenCalled();
+            expect(TestFactory.conversation_repository._onMemberJoin).toHaveBeenCalled();
             expect(TestFactory.conversation_repository.update_participating_user_ets).toHaveBeenCalled();
             done();
           })
@@ -753,7 +753,7 @@ describe('ConversationRepository', () => {
         TestFactory.conversation_repository
           .onConversationEvent(member_join_event)
           .then(() => {
-            expect(TestFactory.conversation_repository._on_member_join).toHaveBeenCalled();
+            expect(TestFactory.conversation_repository._onMemberJoin).toHaveBeenCalled();
             expect(TestFactory.conversation_repository.update_participating_user_ets).not.toHaveBeenCalled();
             done();
           })
