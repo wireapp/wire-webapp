@@ -287,6 +287,16 @@
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@protobufjs/utf8/-/utf8-1.1.0.tgz#a777360b5b39a1a2e5106f8e858f2fd2d060c570"
 
+"@types/chai@4.1.2":
+  version "4.1.2"
+  resolved "https://registry.yarnpkg.com/@types/chai/-/chai-4.1.2.tgz#f1af664769cfb50af805431c407425ed619daa21"
+
+"@types/ed2curve@0.2.1":
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/@types/ed2curve/-/ed2curve-0.2.1.tgz#e1ba68eb377eeaa1c565e22bb61ba406d5195966"
+  dependencies:
+    tweetnacl "^1.0.0"
+
 "@types/long@^3.0.31", "@types/long@^3.0.32":
   version "3.0.32"
   resolved "https://registry.yarnpkg.com/@types/long/-/long-3.0.32.tgz#f4e5af31e9e9b196d8e5fca8a5e2e20aa3d60b69"
@@ -298,6 +308,10 @@
 "@types/node@9.3.0":
   version "9.3.0"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-9.3.0.tgz#3a129cda7c4e5df2409702626892cb4b96546dd5"
+
+"@types/node@9.4.0":
+  version "9.4.0"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-9.4.0.tgz#b85a0bcf1e1cc84eb4901b7e96966aedc6f078d1"
 
 "@types/node@^6.0.46":
   version "6.0.90"
@@ -340,29 +354,29 @@
     spark-md5 "3.0.0"
     tough-cookie "2.3.3"
 
-"@wireapp/cbor@2.3.2":
-  version "2.3.2"
-  resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-2.3.2.tgz#e2944384680f3625df99c750404292a359969415"
+"@wireapp/cbor@3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.0.tgz#2986c98a29bcbf3918c4be962317c7c7bfd96c01"
 
-"@wireapp/core@0.0.32":
-  version "0.0.32"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-0.0.32.tgz#12edb3816264c864b62669e9c53d57a9a5a11860"
+"@wireapp/core@1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-1.0.0.tgz#5224c06e6854c4b65be95f5381cd430c06607c3b"
   dependencies:
     "@types/node" "9.3.0"
     "@wireapp/api-client" "0.3.3"
-    "@wireapp/cryptobox" "6.3.7"
+    "@wireapp/cryptobox" "7.0.0"
     "@wireapp/protocol-messaging" "1.20.0"
     "@wireapp/store-engine" "0.1.9"
     bazinga64 "5.0.3"
     protobufjs "6.8.4"
     pure-uuid "1.4.11"
 
-"@wireapp/cryptobox@6.3.7":
-  version "6.3.7"
-  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-6.3.7.tgz#fb1d9ea2aff573e036859526624edbc277943cca"
+"@wireapp/cryptobox@7.0.0":
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-7.0.0.tgz#b377add5e1cfc19e4ffcbc8d761f363cb06b9fb3"
   dependencies:
     "@wireapp/lru-cache" "2.0.1"
-    "@wireapp/proteus" "5.3.3"
+    "@wireapp/proteus" "6.0.0"
     "@wireapp/store-engine" "0.1.9"
     dexie "2.0.1"
     fs-extra "5.0.0"
@@ -373,13 +387,16 @@
   dependencies:
     webpack "3.10.0"
 
-"@wireapp/proteus@5.3.3":
-  version "5.3.3"
-  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-5.3.3.tgz#47c0b2ebf4fce4d35f83ca58c429a3f84adaba87"
+"@wireapp/proteus@6.0.0":
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-6.0.0.tgz#1a7e8cd1c6f044503ffe48e62e7f81d702f93368"
   dependencies:
-    "@wireapp/cbor" "2.3.2"
+    "@types/chai" "4.1.2"
+    "@types/ed2curve" "0.2.1"
+    "@types/node" "9.4.0"
+    "@wireapp/cbor" "3.0.0"
     ed2curve "0.2.1"
-    libsodium-wrappers-sumo "0.5.4"
+    libsodium-wrappers-sumo "0.7.3"
 
 "@wireapp/protocol-messaging@1.20.0":
   version "1.20.0"
@@ -5865,11 +5882,21 @@ libsodium-sumo@0.5.4:
   version "0.5.4"
   resolved "https://registry.yarnpkg.com/libsodium-sumo/-/libsodium-sumo-0.5.4.tgz#08af4af945754ee9daf2de9d1385c9fc0e64cec0"
 
+libsodium-sumo@0.7.3:
+  version "0.7.3"
+  resolved "https://registry.yarnpkg.com/libsodium-sumo/-/libsodium-sumo-0.7.3.tgz#c38d99dc3b2c056870ca8f3ac8f1ecbb150ecbbf"
+
 libsodium-wrappers-sumo@0.5.4:
   version "0.5.4"
   resolved "https://registry.yarnpkg.com/libsodium-wrappers-sumo/-/libsodium-wrappers-sumo-0.5.4.tgz#ee69f6c960965e0d7d65cc4282c2fb33485d06a2"
   dependencies:
     libsodium-sumo "0.5.4"
+
+libsodium-wrappers-sumo@0.7.3:
+  version "0.7.3"
+  resolved "https://registry.yarnpkg.com/libsodium-wrappers-sumo/-/libsodium-wrappers-sumo-0.7.3.tgz#eeb4fc93a9802c34558e0f2ec350295ba6246fc8"
+  dependencies:
+    libsodium-sumo "0.7.3"
 
 libsodium@0.5.4:
   version "0.5.4"
@@ -9958,6 +9985,10 @@ tunnel-agent@~0.4.1:
 tweetnacl@0.x.x, tweetnacl@^0.14.3, tweetnacl@~0.14.0:
   version "0.14.5"
   resolved "https://registry.yarnpkg.com/tweetnacl/-/tweetnacl-0.14.5.tgz#5ae68177f192d4456269d108afa93ff8743f4f64"
+
+tweetnacl@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/tweetnacl/-/tweetnacl-1.0.0.tgz#713d8b818da42068740bf68386d0479e66fc8a7b"
 
 type-check@~0.3.2:
   version "0.3.2"
