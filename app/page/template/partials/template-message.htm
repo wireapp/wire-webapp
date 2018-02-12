@@ -227,7 +227,7 @@
   <!-- ko ifnot: show_large_avatar() -->
     <div class="message-header">
       <div class="message-header-icon text-graphite">
-        <span class="icon-chat" data-bind="visible: message.is_conversation_initialization()"></span>
+        <span class="icon-chat" data-bind="visible: message.isGroupCreation()"></span>
         <span class="icon-minus" data-bind="visible: message.is_member_removal()"></span>
         <span class="icon-plus" data-bind="visible: message.is_member_join()"></span>
       </div>
@@ -244,7 +244,7 @@
     </div>
     <div class="message-body">
       <!-- ko foreach: remote_user_ets -->
-        <!-- ko if: message.is_conversation_initialization() -->
+        <!-- ko if: message.isGroupCreation() -->
           <participant-avatar class="avatar-no-border"
                        data-bubble="#participants-bubble"
                        data-placement="vertical"

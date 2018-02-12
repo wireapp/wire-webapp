@@ -96,7 +96,7 @@ z.conversation.ConversationCellState = (() => {
 
   const removed_state = {
     description(conversation_et) {
-      const last_message_et = conversation_et.get_last_message();
+      const last_message_et = conversation_et.getLastMessage();
       const self_user_id = conversation_et.self.id;
 
       const is_removal_message = last_message_et && last_message_et.is_member() && last_message_et.is_member_removal();
@@ -150,7 +150,7 @@ z.conversation.ConversationCellState = (() => {
 
   const group_activity_state = {
     description(conversation_et) {
-      const last_message_et = conversation_et.get_last_message();
+      const last_message_et = conversation_et.getLastMessage();
 
       if (last_message_et.is_member()) {
         const user_count = last_message_et.user_ets().length;
@@ -191,7 +191,7 @@ z.conversation.ConversationCellState = (() => {
       }
     },
     icon(conversation_et) {
-      const last_message_et = conversation_et.get_last_message();
+      const last_message_et = conversation_et.getLastMessage();
       if (last_message_et.is_member() && last_message_et.is_member_removal()) {
         if (conversation_et.is_muted()) {
           return z.conversation.ConversationStatusIcon.MUTED;
@@ -200,7 +200,7 @@ z.conversation.ConversationCellState = (() => {
       }
     },
     match(conversation_et) {
-      const last_message_et = conversation_et.get_last_message();
+      const last_message_et = conversation_et.getLastMessage();
       const expected_message_type = last_message_et
         ? last_message_et.is_member() || last_message_et.is_system()
         : false;
@@ -265,7 +265,7 @@ z.conversation.ConversationCellState = (() => {
       }
     },
     match(conversation_et) {
-      const last_message_et = conversation_et.get_last_message();
+      const last_message_et = conversation_et.getLastMessage();
       const is_member_join = last_message_et && last_message_et.is_member() && last_message_et.is_member_join();
       return conversation_et.is_request() || (conversation_et.is_one2one() && is_member_join);
     },

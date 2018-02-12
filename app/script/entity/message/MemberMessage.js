@@ -155,12 +155,12 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
     return this.member_message_type === z.message.SystemMessageType.CONVERSATION_CREATE;
   }
 
-  is_conversation_initialization() {
-    return this.is_conversation_create() || this.is_conversation_resume();
-  }
-
   is_conversation_resume() {
     return this.member_message_type === z.message.SystemMessageType.CONVERSATION_RESUME;
+  }
+
+  isGroupCreation() {
+    return this.is_conversation_create() || this.is_conversation_resume();
   }
 
   is_member_change() {

@@ -395,7 +395,7 @@ describe('ConversationRepository', () => {
     });
   });
 
-  describe('get_preceding_messages', () => {
+  describe('getPrecedingMessages', () => {
     it('gets messages which are not broken by design', done => {
       spyOn(TestFactory.user_repository, 'get_user_by_id').and.returnValue(Promise.resolve(new z.entity.User()));
 
@@ -412,7 +412,7 @@ describe('ConversationRepository', () => {
       storage_service
         .save(z.storage.StorageService.OBJECT_STORE.EVENTS, bad_message_key, bad_message)
         .catch(() => storage_service.save(z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, good_message))
-        .then(() => TestFactory.conversation_repository.get_preceding_messages(conversation_et))
+        .then(() => TestFactory.conversation_repository.getPrecedingMessages(conversation_et))
         .then(loaded_events => {
           expect(loaded_events.length).toBe(1);
           done();

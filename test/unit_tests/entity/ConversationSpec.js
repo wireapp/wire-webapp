@@ -131,7 +131,7 @@ describe('Conversation', () => {
       conversation_et.add_message(message_et);
 
       expect(conversation_et.messages().length).toBe(2);
-      const last_message_et = conversation_et.get_last_message();
+      const last_message_et = conversation_et.getLastMessage();
       expect(last_message_et.id).toBe(message_et.id);
       expect(last_message_et.timestamp()).toBe(second_timestamp);
     });
@@ -144,7 +144,7 @@ describe('Conversation', () => {
       conversation_et.add_message(message_et);
 
       expect(conversation_et.messages().length).toBe(2);
-      const last_message_et = conversation_et.get_first_message();
+      const last_message_et = conversation_et.getFirstMessage();
       expect(last_message_et.id).toBe(message_et.id);
       expect(last_message_et.timestamp()).toBe(older_timestamp);
     });
@@ -594,7 +594,7 @@ describe('Conversation', () => {
       conversation_et.self = self_user;
       conversation_et.participating_user_ets.push(other_user);
       conversation_et.id = z.util.create_random_uuid();
-      conversation_et.has_further_messages(false);
+      conversation_et.hasAdditionalMessages(false);
 
       expect(conversation_et.messages_visible().length).toBe(1);
       expect(conversation_et.messages_visible()[0].super_type).toBe(z.message.SuperType.MEMBER);
@@ -661,7 +661,7 @@ describe('Conversation', () => {
 
       conversation_et.release();
 
-      expect(conversation_et.has_further_messages()).toBeTruthy();
+      expect(conversation_et.hasAdditionalMessages()).toBeTruthy();
       expect(conversation_et.is_loaded()).toBeFalsy();
       expect(conversation_et.messages().length).toBe(0);
       expect(conversation_et.unread_event_count()).toBe(0);
