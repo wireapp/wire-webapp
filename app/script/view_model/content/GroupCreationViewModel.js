@@ -53,6 +53,7 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
     });
 
     this.isCreatingConversation = false;
+    this.method = undefined;
     this.nameError = ko.observable('');
     this.nameInput = ko.observable('');
     this.selectedContacts = ko.observableArray([]);
@@ -95,7 +96,9 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
     amplify.subscribe(z.event.WebApp.CONVERSATION.CREATE_GROUP, this.showCreateGroup.bind(this));
   }
 
-  showCreateGroup(userEntity) {
+  showCreateGroup(method, userEntity) {
+    this.method = method;
+
     if (!this.modal) {
       this.modal = new zeta.webapp.module.Modal('#group-creation-modal', this._afterHideModal.bind(this));
       this.modal.autoclose = false;
@@ -108,6 +111,10 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
 
     this.modal.show();
     $('.group-creation-modal-teamname-input').focus();
+
+    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.OPENED_GROUP_CREATION, {
+      method: this.method,
+    });
   }
 
   clickOnBack() {
@@ -125,7 +132,14 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
       this.conversationRepository
         .createGroupConversation(this.selectedContacts(), this.nameInput())
         .then(conversationEntity => {
+          amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.GROUP_CREATION_SUCCEEDED, {
+            conversation_name_length: this.nameInput().length,
+            conversation_size: this.selectedContacts().length + 1,
+            method: this.method,
+          });
+
           this._hideModal();
+
           amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
         })
         .catch(error => {
@@ -150,6 +164,10 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
         return this.nameError(z.l10n.text(z.string.groupCreationPreferencesErrorNameShort));
       }
 
+      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.OPENED_SELECT_PARTICIPANTS, {
+        method: this.method,
+      });
+
       return this.state(GroupCreationViewModel.STATE.PARTICIPANTS);
     }
   }
@@ -160,6 +178,7 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
 
   _afterHideModal() {
     this.isCreatingConversation = false;
+    this.method = undefined;
     this.nameError('');
     this.nameInput('');
     this.participantsInput('');
