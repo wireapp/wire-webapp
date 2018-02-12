@@ -262,7 +262,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
   }
 
   clickOnCreateGroup() {
-    amplify.publish(z.event.WebApp.CONVERSATION.CREATE_GROUP);
+    amplify.publish(z.event.WebApp.CONVERSATION.CREATE_GROUP, 'start_ui');
   }
 
   clickOnInviteMember() {

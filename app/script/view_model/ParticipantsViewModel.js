@@ -212,7 +212,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
       return $('.participants-search').addClass('participants-search-show');
     }
 
-    amplify.publish(z.event.WebApp.CONVERSATION.CREATE_GROUP, this.selectedParticipant());
+    amplify.publish(z.event.WebApp.CONVERSATION.CREATE_GROUP, 'conversation_details', this.selectedParticipant());
     this.participantsBubble.hide();
   }
 
