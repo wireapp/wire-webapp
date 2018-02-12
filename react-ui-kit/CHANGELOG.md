@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.1.9"></a>
+## [0.1.9](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@0.1.8...@wireapp/react-ui-kit@0.1.9) (2018-02-12)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Color import ([#258](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/258)) ([5bfeaeb](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/5bfeaeb))
+
+
+
+
 <a name="0.1.8"></a>
 ## [0.1.8](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@0.1.7...@wireapp/react-ui-kit@0.1.8) (2018-01-27)
 

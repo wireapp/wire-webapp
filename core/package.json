@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "@types/node": "9.3.0",
-    "@wireapp/api-client": "0.3.3",
+    "@wireapp/api-client": "0.3.4",
     "@wireapp/cryptobox": "7.0.0",
     "@wireapp/protocol-messaging": "1.20.0",
     "@wireapp/store-engine": "0.1.9",
@@ -44,5 +44,5 @@
     "prepare": "yarn dist"
   },
   "types": "./dist/commonjs/index.d.ts",
-  "version": "1.0.0"
+  "version": "1.0.1"
 }
