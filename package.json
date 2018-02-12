@@ -80,7 +80,7 @@
     "eslint-config-prettier": "2.9.0",
     "eslint-plugin-babel": "4.1.2",
     "eslint-plugin-jsdoc": "3.3.1",
-    "eslint-plugin-no-unsanitized": "2.0.2",
+    "eslint-plugin-no-unsanitized": "3.0.0",
     "eslint-plugin-prettier": "2.6.0",
     "eslint-plugin-react": "7.6.1",
     "extract-loader": "1.0.2",
