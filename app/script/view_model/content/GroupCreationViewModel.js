@@ -44,23 +44,25 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
     this.modal = undefined;
     this.state = ko.observable(GroupCreationViewModel.STATE.DEFAULT);
 
-    this.contacts = ko.pureComputed(() => {
-      if (this.teamRepository.isTeam()) {
-        return this.teamRepository.teamUsers();
-      }
-
-      return this.userRepository.connected_users();
-    });
-
     this.isCreatingConversation = false;
     this.nameError = ko.observable('');
     this.nameInput = ko.observable('');
     this.selectedContacts = ko.observableArray([]);
+    this.showContacts = ko.observable(false);
     this.participantsInput = ko.observable('');
 
-    this.nameInput.subscribe(() => this.nameError(''));
-
     this.activateNext = ko.pureComputed(() => this.nameInput().length);
+    this.contacts = ko.pureComputed(() => {
+      if (this.showContacts()) {
+        if (this.teamRepository.isTeam()) {
+          return this.teamRepository.teamUsers();
+        }
+
+        return this.userRepository.connected_users();
+      }
+
+      return [];
+    });
     this.participantsActionText = ko.pureComputed(() => {
       const stringSelector = this.selectedContacts().length
         ? z.string.groupCreationParticipantsActionCreate
@@ -73,10 +75,10 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
         : z.string.groupCreationParticipantsHeader;
       return z.l10n.text(stringSelector, {number: this.selectedContacts().length});
     });
-
     this.stateIsPreferences = ko.pureComputed(() => this.state() === GroupCreationViewModel.STATE.PREFERENCES);
     this.stateIsParticipants = ko.pureComputed(() => this.state() === GroupCreationViewModel.STATE.PARTICIPANTS);
 
+    this.nameInput.subscribe(() => this.nameError(''));
     this.stateIsPreferences.subscribe(stateIsPreference => {
       if (stateIsPreference) {
         return $(document).on('keydown.groupCreation', keyboard_event => {
@@ -86,6 +88,12 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
         });
       }
       return $(document).off('keydown.groupCreation');
+    });
+    this.stateIsParticipants.subscribe(stateIsParticipants => {
+      if (stateIsParticipants) {
+        return window.setTimeout(() => this.showContacts(true));
+      }
+      this.showContacts(false);
     });
 
     this.shouldUpdateScrollbar = ko
@@ -150,7 +158,7 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
         return this.nameError(z.l10n.text(z.string.groupCreationPreferencesErrorNameShort));
       }
 
-      return this.state(GroupCreationViewModel.STATE.PARTICIPANTS);
+      this.state(GroupCreationViewModel.STATE.PARTICIPANTS);
     }
   }
 
