@@ -15,7 +15,9 @@
     "webpack": "3.11.0"
   },
   "description": "A Promise-based dynamic priority queue runner.",
-  "files": ["dist/commonjs"],
+  "files": [
+    "dist/commonjs"
+  ],
   "license": "GPL-3.0",
   "main": "./dist/commonjs/index.js",
   "name": "@wireapp/queue-priority",
@@ -31,5 +33,5 @@
     "test:node": "cross-env JASMINE_CONFIG_PATH=src/test/node/support/jasmine.json jasmine"
   },
   "types": "./dist/commonjs/index.d.ts",
-  "version": "0.0.22"
+  "version": "0.0.23"
 }

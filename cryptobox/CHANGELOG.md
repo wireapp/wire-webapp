@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="7.0.1"></a>
+## [7.0.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@7.0.0...@wireapp/cryptobox@7.0.1) (2018-02-12)
+
+
+
+
+**Note:** Version bump only for package @wireapp/cryptobox
+
 <a name="7.0.0"></a>
 # [7.0.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@6.3.7...@wireapp/cryptobox@7.0.0) (2018-02-09)
 

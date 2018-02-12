@@ -1,6 +1,15 @@
 # Change Log
 
-All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+<a name="0.0.23"></a>
+## 0.0.23 (2018-02-12)
+
+
+
+
+**Note:** Version bump only for package @wireapp/queue-priority
 
 <a name="0.0.22"></a>
 
