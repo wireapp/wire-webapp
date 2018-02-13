@@ -285,7 +285,7 @@ z.conversation.EventMapper = class EventMapper {
       }
     }
 
-    messageEntity.user_ids(eventData.user_ids);
+    messageEntity.userIds(eventData.user_ids);
 
     return messageEntity;
   }
@@ -299,7 +299,7 @@ z.conversation.EventMapper = class EventMapper {
    */
   _map_event_member_leave({data: event_data}) {
     const message_et = new z.entity.MemberMessage();
-    message_et.user_ids(event_data.user_ids);
+    message_et.userIds(event_data.user_ids);
     return message_et;
   }
 
