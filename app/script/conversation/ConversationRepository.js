@@ -2811,9 +2811,15 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(conversationEntity => this.update_participating_user_ets(conversationEntity))
       .then(conversationEntity => this.save_conversation(conversationEntity))
       .then(conversationEntity => {
-        const creationMessage = z.conversation.EventBuilder.buildGroupCreation(conversationEntity, initialTimestamp);
-        amplify.publish(z.event.WebApp.EVENT.INJECT, creationMessage, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
-        return {conversationEntity};
+        if (conversationEntity) {
+          const creationMessage = z.conversation.EventBuilder.buildGroupCreation(conversationEntity, initialTimestamp);
+          amplify.publish(
+            z.event.WebApp.EVENT.INJECT,
+            creationMessage,
+            z.event.EventRepository.SOURCE.BACKEND_RESPONSE
+          );
+          return {conversationEntity};
+        }
       });
   }
 
@@ -2854,13 +2860,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
   _onMemberJoin(conversationEntity, eventJson) {
     // Ignore if we join a 1to1 conversation (accept a connection request)
     const connectionEntity = this.user_repository.get_connection_by_conversation_id(conversationEntity.id);
-    if (connectionEntity && connectionEntity.status() === z.user.ConnectionStatus.PENDING) {
+    const isPendingConnection = connectionEntity && connectionEntity.status() === z.user.ConnectionStatus.PENDING;
+    if (isPendingConnection) {
       return Promise.resolve();
     }
 
     const eventData = eventJson.data;
 
-    eventData.userIds.forEach(userId => {
+    eventData.user_ids.forEach(userId => {
       const isSelfUser = userId === this.selfUser().id;
       const isParticipatingUser = conversationEntity.participating_user_ids().includes(userId);
       if (!isSelfUser && !isParticipatingUser) {
@@ -2869,7 +2876,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     });
 
     // Self user joins again
-    const selfUserRejoins = eventData.userIds.includes(this.selfUser().id);
+    const selfUserRejoins = eventData.user_ids.includes(this.selfUser().id);
     if (selfUserRejoins) {
       conversationEntity.status(z.conversation.ConversationStatus.CURRENT_MEMBER);
     }

@@ -675,7 +675,7 @@ describe('ConversationRepository', () => {
         spyOn(TestFactory.conversation_repository, '_onCreate').and.callThrough();
         spyOn(TestFactory.conversation_repository, 'map_conversations').and.returnValue(true);
         spyOn(TestFactory.conversation_repository, 'update_participating_user_ets').and.returnValue(true);
-        spyOn(TestFactory.conversation_repository, 'save_conversation').and.returnValue(true);
+        spyOn(TestFactory.conversation_repository, 'save_conversation').and.returnValue(false);
 
         conversationId = z.util.create_random_uuid();
         createEvent = {conversation: conversationId, data: {}, type: z.event.Backend.CONVERSATION.CREATE};

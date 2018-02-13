@@ -131,7 +131,7 @@ describe('Conversation', () => {
       conversation_et.add_message(message_et);
 
       expect(conversation_et.messages().length).toBe(2);
-      const last_message_et = conversation_et.getLastMessage();
+      const last_message_et = conversation_et.get_last_message();
       expect(last_message_et.id).toBe(message_et.id);
       expect(last_message_et.timestamp()).toBe(second_timestamp);
     });
@@ -144,7 +144,7 @@ describe('Conversation', () => {
       conversation_et.add_message(message_et);
 
       expect(conversation_et.messages().length).toBe(2);
-      const last_message_et = conversation_et.getFirstMessage();
+      const last_message_et = conversation_et.get_first_message();
       expect(last_message_et.id).toBe(message_et.id);
       expect(last_message_et.timestamp()).toBe(older_timestamp);
     });
@@ -459,38 +459,13 @@ describe('Conversation', () => {
     });
   });
 
-  describe('getNumberOfClients', () => {
-    it('should return the number of all known clients  (including own clients)', () => {
-      const first_client = new z.client.ClientEntity();
-      first_client.id = '5021d77752286cac';
-
-      const second_client = new z.client.ClientEntity();
-      second_client.id = '575b7a890cdb7635';
-
-      const third_client = new z.client.ClientEntity();
-      third_client.id = '6c0daa855d6b8b6e';
-
-      const user_et = new z.entity.User();
-      user_et.devices.push(first_client);
-      user_et.devices.push(second_client);
-
-      const second_user_et = new z.entity.User();
-      second_user_et.devices.push(third_client);
-
-      conversation_et.participating_user_ets.push(user_et);
-      conversation_et.participating_user_ets.push(second_user_et);
-
-      expect(conversation_et.getNumberOfClients()).toBe(4);
-    });
-  });
-
   describe('is_verified', () => {
     it('is not verified when nothing is set', () => {
       expect(conversation_et.is_verified()).toBeFalsy();
     });
 
     it('is verified when self user has no remote clients', () => {
-      const verified_client_et = new z.client.ClientEntity();
+      const verified_client_et = new z.client.Client();
       verified_client_et.meta.is_verified(true);
 
       const self_user_et = new z.entity.User();
@@ -505,8 +480,8 @@ describe('Conversation', () => {
     });
 
     it('is not verified when participant has unverified device', () => {
-      const unverified_client_et = new z.client.ClientEntity();
-      const verified_client_et = new z.client.ClientEntity();
+      const unverified_client_et = new z.client.Client();
+      const verified_client_et = new z.client.Client();
       verified_client_et.meta.is_verified(true);
 
       const self_user_et = new z.entity.User();
@@ -527,7 +502,7 @@ describe('Conversation', () => {
     });
 
     it('is verified when all users are verified', () => {
-      const verified_client_et = new z.client.ClientEntity();
+      const verified_client_et = new z.client.Client();
       verified_client_et.meta.is_verified(true);
 
       const self_user_et = new z.entity.User();
@@ -548,7 +523,7 @@ describe('Conversation', () => {
     });
   });
 
-  describe('isWithBot', () =>
+  describe('is_with_bot', () =>
     it('detects bot conversations by the username of the remote participant', () => {
       const user_et = new z.entity.User(z.util.create_random_uuid());
 
@@ -557,55 +532,37 @@ describe('Conversation', () => {
 
       user_et.username('ottothebot');
       conversation_et.type(z.conversation.ConversationType.SELF);
-      expect(conversation_et.isWithBot()).toBe(false);
+      expect(conversation_et.is_with_bot()).toBe(false);
 
       conversation_et.type(z.conversation.ConversationType.ONE2ONE);
-      expect(conversation_et.isWithBot()).toBe(true);
+      expect(conversation_et.is_with_bot()).toBe(true);
 
       user_et.username('annathebot');
-      expect(conversation_et.isWithBot()).toBe(true);
+      expect(conversation_et.is_with_bot()).toBe(true);
 
       user_et.username(undefined);
-      expect(conversation_et.isWithBot()).toBe(false);
+      expect(conversation_et.is_with_bot()).toBe(false);
 
       user_et.username('');
-      expect(conversation_et.isWithBot()).toBe(false);
+      expect(conversation_et.is_with_bot()).toBe(false);
 
       user_et.username('bob');
-      expect(conversation_et.isWithBot()).toBe(false);
+      expect(conversation_et.is_with_bot()).toBe(false);
 
       user_et.username('bobthebot');
-      expect(conversation_et.isWithBot()).toBe(false);
+      expect(conversation_et.is_with_bot()).toBe(false);
 
       user_et.username('bot');
-      expect(conversation_et.isWithBot()).toBe(false);
+      expect(conversation_et.is_with_bot()).toBe(false);
 
       user_et.username('wire');
-      expect(conversation_et.isWithBot()).toBe(false);
+      expect(conversation_et.is_with_bot()).toBe(false);
     }));
 
   describe('messages_visible', () => {
     it('should return no messages if conversation ID is empty', () => {
       expect(conversation_et.id).toBe('');
       expect(conversation_et.messages_visible().length).toBe(0);
-    });
-
-    it('creates a creation message and returns visible messages', () => {
-      conversation_et.self = self_user;
-      conversation_et.participating_user_ets.push(other_user);
-      conversation_et.id = z.util.create_random_uuid();
-      conversation_et.hasAdditionalMessages(false);
-
-      expect(conversation_et.messages_visible().length).toBe(1);
-      expect(conversation_et.messages_visible()[0].super_type).toBe(z.message.SuperType.MEMBER);
-
-      const member_message = new z.entity.MemberMessage();
-      member_message.super_type = z.message.SuperType.MEMBER;
-
-      conversation_et.add_message(member_message);
-
-      expect(conversation_et.messages_visible().length).toBe(2);
-      expect(conversation_et.messages_visible()[0].super_type).toBe(z.message.SuperType.MEMBER);
     });
 
     it('returns visible unmerged pings', () => {
@@ -661,7 +618,7 @@ describe('Conversation', () => {
 
       conversation_et.release();
 
-      expect(conversation_et.hasAdditionalMessages()).toBeTruthy();
+      expect(conversation_et.has_further_messages()).toBeTruthy();
       expect(conversation_et.is_loaded()).toBeFalsy();
       expect(conversation_et.messages().length).toBe(0);
       expect(conversation_et.unread_event_count()).toBe(0);
@@ -791,6 +748,61 @@ describe('Conversation', () => {
     });
   });
 
+  describe('_creation_message', () => {
+    beforeEach(() => {
+      conversation_et.self = self_user;
+      conversation_et.participating_user_ets.push(other_user);
+    });
+
+    it('can create a message for an outgoing connection request', () => {
+      conversation_et.type(z.conversation.ConversationType.CONNECT);
+      other_user.connection().status(z.user.ConnectionStatus.SENT);
+      const creation_message = conversation_et._creation_message();
+      expect(creation_message).toBeDefined();
+      expect(creation_message.member_message_type).toBe(z.message.SystemMessageType.CONNECTION_REQUEST);
+    });
+
+    it('can create a message for an accepted connection request', () => {
+      conversation_et.type(z.conversation.ConversationType.ONE2ONE);
+      const creation_message = conversation_et._creation_message();
+      expect(creation_message).toBeDefined();
+      expect(creation_message.member_message_type).toBe(z.message.SystemMessageType.CONNECTION_ACCEPTED);
+    });
+
+    it('can create a message for a group the user started', () => {
+      conversation_et.type(z.conversation.ConversationType.REGULAR);
+      conversation_et.creator = self_user.id;
+      const creation_message = conversation_et._creation_message();
+      expect(creation_message).toBeDefined();
+      expect(creation_message.member_message_type).toBe(z.message.SystemMessageType.CONVERSATION_CREATE);
+      expect(creation_message.user().id).toBe(self_user.id);
+    });
+
+    it('can create a message for a group another user started', () => {
+      conversation_et.type(z.conversation.ConversationType.REGULAR);
+      conversation_et.creator = other_user.id;
+      const creation_message = conversation_et._creation_message();
+      expect(creation_message).toBeDefined();
+      expect(creation_message.member_message_type).toBe(z.message.SystemMessageType.CONVERSATION_CREATE);
+      expect(creation_message.user().id).toBe(other_user.id);
+    });
+
+    it('can create a message for a group a user started that is no longer part of the group', () => {
+      conversation_et.type(z.conversation.ConversationType.REGULAR);
+      conversation_et.creator = z.util.create_random_uuid;
+      const creation_message = conversation_et._creation_message();
+      expect(creation_message).toBeDefined();
+      expect(creation_message.member_message_type).toBe(z.message.SystemMessageType.CONVERSATION_RESUME);
+      expect(creation_message.user().id).toBe('');
+    });
+
+    it('returns undefined if there are no participating users', () => {
+      conversation_et.participating_user_ets([]);
+      const creation_message = conversation_et._creation_message();
+      expect(creation_message).toBeUndefined();
+    });
+  });
+
   describe('_increment_time_only', () => {
     it('should update only to newer timestamps', () => {
       expect(conversation_et._increment_time_only(first_timestamp, second_timestamp)).toBe(second_timestamp);
@@ -816,12 +828,48 @@ describe('Conversation', () => {
     it('updates the participating user IDs with the user ID of the other party', () => {
       const connector_user_id = 'b43b376d-7b5a-4d77-89be-81a02892db8c';
 
-      // prettier-ignore
+      // @formatter:off
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
-      const payload_connection = {"status":"sent","conversation":"15a7f358-8eba-4b8e-bcf2-61a08eb53349","to":`${connector_user_id}`,"from":"616cbbeb-1360-4e17-b333-e000662257bd","last_update":"2017-05-10T11:34:18.396Z","message":" "};
-      // prettier-ignore
-      const payload_conversation = {"access":["private"],"creator":"616cbbeb-1360-4e17-b333-e000662257bd","members":{"self":{"hidden_ref":null,"status":0,"last_read":"1.800122000a73cb62","muted_time":null,"service":null,"otr_muted_ref":null,"muted":null,"status_time":"2017-05-10T11:34:18.376Z","hidden":false,"status_ref":"0.0","id":"616cbbeb-1360-4e17-b333-e000662257bd","otr_archived":false,"cleared":null,"otr_muted":false,"otr_archived_ref":null,"archived":null},"others":[]},"name":"Marco","id":"15a7f358-8eba-4b8e-bcf2-61a08eb53349","type":3,"last_event_time":"2017-05-10T11:34:18.376Z","last_event":"2.800122000a73cb63"};
+      const payload_connection = {
+        status: 'sent',
+        conversation: '15a7f358-8eba-4b8e-bcf2-61a08eb53349',
+        to: `${connector_user_id}`,
+        from: '616cbbeb-1360-4e17-b333-e000662257bd',
+        last_update: '2017-05-10T11:34:18.396Z',
+        message: ' ',
+      };
+      const payload_conversation = {
+        access: ['private'],
+        creator: '616cbbeb-1360-4e17-b333-e000662257bd',
+        members: {
+          self: {
+            hidden_ref: null,
+            status: 0,
+            last_read: '1.800122000a73cb62',
+            muted_time: null,
+            service: null,
+            otr_muted_ref: null,
+            muted: null,
+            status_time: '2017-05-10T11:34:18.376Z',
+            hidden: false,
+            status_ref: '0.0',
+            id: '616cbbeb-1360-4e17-b333-e000662257bd',
+            otr_archived: false,
+            cleared: null,
+            otr_muted: false,
+            otr_archived_ref: null,
+            archived: null,
+          },
+          others: [],
+        },
+        name: 'Marco',
+        id: '15a7f358-8eba-4b8e-bcf2-61a08eb53349',
+        type: 3,
+        last_event_time: '2017-05-10T11:34:18.376Z',
+        last_event: '2.800122000a73cb63',
+      };
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
+      // @formatter:on
 
       const user_connection_mapper = new z.user.UserConnectionMapper();
       const connection_et = user_connection_mapper.map_user_connection_from_json(payload_connection);
