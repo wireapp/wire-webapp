@@ -343,16 +343,16 @@
   version "2.3.2"
   resolved "https://registry.yarnpkg.com/@types/tough-cookie/-/tough-cookie-2.3.2.tgz#e0d481d8bb282ad8a8c9e100ceb72c995fb5e709"
 
-"@wireapp/api-client@0.3.4":
-  version "0.3.4"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-0.3.4.tgz#5728eb7ee77c5434c3071a54e2ba97aabe69f390"
+"@wireapp/api-client@0.3.5":
+  version "0.3.5"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-0.3.5.tgz#7128c249ecbca9e6490898d8006e713b66e680d8"
   dependencies:
     "@types/node" "9.3.0"
     "@types/spark-md5" "3.0.0"
     "@types/text-encoding" "0.0.32"
     "@types/tough-cookie" "2.3.2"
-    "@wireapp/queue-priority" "0.0.22"
-    "@wireapp/store-engine" "0.1.9"
+    "@wireapp/queue-priority" "0.0.23"
+    "@wireapp/store-engine" "0.1.10"
     axios "0.17.1"
     html5-websocket "2.0.2"
     logdown "2.2.0"
@@ -360,47 +360,47 @@
     spark-md5 "3.0.0"
     tough-cookie "2.3.3"
 
-"@wireapp/cbor@3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.0.tgz#2986c98a29bcbf3918c4be962317c7c7bfd96c01"
+"@wireapp/cbor@3.0.1":
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.1.tgz#a9586abb190aa4e5dd6c64eab5ae4da6fc473337"
 
-"@wireapp/core@1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-1.0.1.tgz#a1cd1f59f2ec333e494ca361f7f1977314cde44e"
+"@wireapp/core@1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-1.0.2.tgz#cd2979560c23935dabef90da530ca7dcccfebb21"
   dependencies:
     "@types/node" "9.3.0"
-    "@wireapp/api-client" "0.3.4"
-    "@wireapp/cryptobox" "7.0.0"
+    "@wireapp/api-client" "0.3.5"
+    "@wireapp/cryptobox" "7.0.1"
     "@wireapp/protocol-messaging" "1.20.0"
-    "@wireapp/store-engine" "0.1.9"
+    "@wireapp/store-engine" "0.1.10"
     bazinga64 "5.0.3"
     protobufjs "6.8.4"
     pure-uuid "1.4.11"
 
-"@wireapp/cryptobox@7.0.0":
-  version "7.0.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-7.0.0.tgz#b377add5e1cfc19e4ffcbc8d761f363cb06b9fb3"
+"@wireapp/cryptobox@7.0.1":
+  version "7.0.1"
+  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-7.0.1.tgz#ffeba2e217dac88a4a1bb52e5430837895baf692"
   dependencies:
-    "@wireapp/lru-cache" "2.0.1"
-    "@wireapp/proteus" "6.0.0"
-    "@wireapp/store-engine" "0.1.9"
+    "@wireapp/lru-cache" "2.0.2"
+    "@wireapp/proteus" "6.0.1"
+    "@wireapp/store-engine" "0.1.10"
     dexie "2.0.1"
     fs-extra "5.0.0"
 
-"@wireapp/lru-cache@2.0.1":
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/lru-cache/-/lru-cache-2.0.1.tgz#e9d2376d37f265146488532b7991d5bfca3922d9"
+"@wireapp/lru-cache@2.0.2":
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/@wireapp/lru-cache/-/lru-cache-2.0.2.tgz#af9838062abce19354df7df1999a667a33389b82"
   dependencies:
-    webpack "3.10.0"
+    webpack "3.11.0"
 
-"@wireapp/proteus@6.0.0":
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-6.0.0.tgz#1a7e8cd1c6f044503ffe48e62e7f81d702f93368"
+"@wireapp/proteus@6.0.1":
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-6.0.1.tgz#90a22c94c349fcbf92a200bab07e8f6d7ae9850c"
   dependencies:
     "@types/chai" "4.1.2"
     "@types/ed2curve" "0.2.1"
     "@types/node" "9.4.0"
-    "@wireapp/cbor" "3.0.0"
+    "@wireapp/cbor" "3.0.1"
     ed2curve "0.2.1"
     libsodium-wrappers-sumo "0.7.3"
 
@@ -410,9 +410,9 @@
   dependencies:
     protobufjs "6.8.0"
 
-"@wireapp/queue-priority@0.0.22":
-  version "0.0.22"
-  resolved "https://registry.yarnpkg.com/@wireapp/queue-priority/-/queue-priority-0.0.22.tgz#54ceb94fd40764aff94f518e9bbc997a4563d6b2"
+"@wireapp/queue-priority@0.0.23":
+  version "0.0.23"
+  resolved "https://registry.yarnpkg.com/@wireapp/queue-priority/-/queue-priority-0.0.23.tgz#31c987cf4a774013b375501a39b45a4006cb4a07"
   dependencies:
     "@types/node" "9.3.0"
 
@@ -436,9 +436,9 @@
     dexie "1.5.1"
     fs-extra "4.0.1"
 
-"@wireapp/store-engine@0.1.9":
-  version "0.1.9"
-  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-0.1.9.tgz#a0693678471fb632a04bb5f2198a99e6f895bba2"
+"@wireapp/store-engine@0.1.10":
+  version "0.1.10"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-0.1.10.tgz#d80be2200210fd82edbf3fcd5a0c6dc0603cce2e"
   dependencies:
     "@types/node" "9.3.0"
     dexie "2.0.1"
@@ -520,10 +520,6 @@ ajv-keywords@^1.1.1:
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/ajv-keywords/-/ajv-keywords-1.5.1.tgz#314dd0a4b3368fad3dfcdc54ede6171b886daf3c"
 
-ajv-keywords@^2.0.0:
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/ajv-keywords/-/ajv-keywords-2.1.1.tgz#617997fc5f60576894c435f940d819e135b80762"
-
 ajv-keywords@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/ajv-keywords/-/ajv-keywords-2.1.0.tgz#a296e17f7bfae7c1ce4f7e0de53d29cb32162df0"
@@ -539,7 +535,7 @@ ajv@^4.7.0, ajv@^4.9.1:
     co "^4.6.0"
     json-stable-stringify "^1.0.1"
 
-ajv@^5.0.0, ajv@^5.1.5, ajv@^5.3.0:
+ajv@^5.0.0, ajv@^5.3.0:
   version "5.3.0"
   resolved "https://registry.yarnpkg.com/ajv/-/ajv-5.3.0.tgz#4414ff74a50879c208ee5fdc826e32c303549eda"
   dependencies:
@@ -10256,33 +10252,6 @@ webpack-sources@^1.1.0:
   dependencies:
     source-list-map "^2.0.0"
     source-map "~0.6.1"
-
-webpack@3.10.0:
-  version "3.10.0"
-  resolved "https://registry.yarnpkg.com/webpack/-/webpack-3.10.0.tgz#5291b875078cf2abf42bdd23afe3f8f96c17d725"
-  dependencies:
-    acorn "^5.0.0"
-    acorn-dynamic-import "^2.0.0"
-    ajv "^5.1.5"
-    ajv-keywords "^2.0.0"
-    async "^2.1.2"
-    enhanced-resolve "^3.4.0"
-    escope "^3.6.0"
-    interpret "^1.0.0"
-    json-loader "^0.5.4"
-    json5 "^0.5.1"
-    loader-runner "^2.3.0"
-    loader-utils "^1.1.0"
-    memory-fs "~0.4.1"
-    mkdirp "~0.5.0"
-    node-libs-browser "^2.0.0"
-    source-map "^0.5.3"
-    supports-color "^4.2.1"
-    tapable "^0.2.7"
-    uglifyjs-webpack-plugin "^0.4.6"
-    watchpack "^1.4.0"
-    webpack-sources "^1.0.1"
-    yargs "^8.0.2"
 
 webpack@3.11.0:
   version "3.11.0"
