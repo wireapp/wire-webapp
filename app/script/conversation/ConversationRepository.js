@@ -1355,7 +1355,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
   }
 
-  _handleTooManyMembersError(participants = 0) {
+  _handleTooManyMembersError(participants = 128) {
     const openSpots = ConversationRepository.CONFIG.GROUP.MAX_SIZE - participants;
     amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.TOO_MANY_MEMBERS, {
       data: {
