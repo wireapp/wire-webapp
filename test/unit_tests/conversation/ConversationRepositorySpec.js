@@ -676,7 +676,6 @@ describe('ConversationRepository', () => {
         spyOn(TestFactory.conversation_repository, 'map_conversations').and.returnValue(true);
         spyOn(TestFactory.conversation_repository, 'update_participating_user_ets').and.returnValue(true);
         spyOn(TestFactory.conversation_repository, 'save_conversation').and.returnValue(true);
-        spyOn(TestFactory.conversation_repository, '_prepareConversationCreateNotification').and.returnValue(true);
 
         conversationId = z.util.create_random_uuid();
         createEvent = {conversation: conversationId, data: {}, type: z.event.Backend.CONVERSATION.CREATE};
@@ -688,7 +687,6 @@ describe('ConversationRepository', () => {
           .then(() => {
             expect(TestFactory.conversation_repository._onCreate).toHaveBeenCalled();
             expect(TestFactory.conversation_repository.map_conversations).toHaveBeenCalledWith(createEvent.data, 1);
-            expect(TestFactory.conversation_repository._prepareConversationCreateNotification).toHaveBeenCalled();
             done();
           })
           .catch(done.fail);
@@ -706,7 +704,6 @@ describe('ConversationRepository', () => {
               createEvent.data,
               time.getTime()
             );
-            expect(TestFactory.conversation_repository._prepareConversationCreateNotification).toHaveBeenCalled();
             done();
           })
           .catch(done.fail);

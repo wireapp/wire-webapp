@@ -501,7 +501,7 @@ describe('z.notification.NotificationRepository', () => {
       });
 
       it('with one user being added to the conversation', done => {
-        message_et.user_ets([other_user_et]);
+        message_et.userEntities([other_user_et]);
 
         const [first_name_added] = entities.user.jane_roe.name.split(' ');
         const expected_body = `${first_name} added ${first_name_added} to the conversation`;
@@ -510,7 +510,7 @@ describe('z.notification.NotificationRepository', () => {
 
       it('with you being added to the conversation', done => {
         other_user_et.is_me = true;
-        message_et.user_ets([other_user_et]);
+        message_et.userEntities([other_user_et]);
 
         const expected_body = `${first_name} added you to the conversation`;
         verify_notification_system(done, conversation_et, message_et, expected_body);
@@ -518,7 +518,7 @@ describe('z.notification.NotificationRepository', () => {
 
       it('with multiple users being added to the conversation', done => {
         const user_ids = [entities.user.john_doe.id, entities.user.jane_roe.id];
-        message_et.user_ids(user_ids);
+        message_et.userIds(user_ids);
 
         const expected_body = `${first_name} added 2 people to the conversation`;
         verify_notification_system(done, conversation_et, message_et, expected_body);
@@ -535,7 +535,7 @@ describe('z.notification.NotificationRepository', () => {
       });
 
       it('with one user being removed from the conversation', done => {
-        message_et.user_ets([other_user_et]);
+        message_et.userEntities([other_user_et]);
 
         TestFactory.notification_repository
           .notify(message_et, undefined, conversation_et)
@@ -548,7 +548,7 @@ describe('z.notification.NotificationRepository', () => {
 
       it('with you being removed from the conversation', done => {
         other_user_et.is_me = true;
-        message_et.user_ets([other_user_et]);
+        message_et.userEntities([other_user_et]);
 
         const expected_body = `${first_name} removed you from the conversation`;
         verify_notification_system(done, conversation_et, message_et, expected_body);
@@ -556,7 +556,7 @@ describe('z.notification.NotificationRepository', () => {
 
       it('with multiple users being removed from the conversation', done => {
         const user_ets = TestFactory.user_repository.user_mapper.map_users_from_object(payload.users.get.many);
-        message_et.user_ets(user_ets);
+        message_et.userEntities(user_ets);
 
         TestFactory.notification_repository
           .notify(message_et, undefined, conversation_et)
@@ -568,7 +568,7 @@ describe('z.notification.NotificationRepository', () => {
       });
 
       it('with someone leaving the conversation by himself', done => {
-        message_et.user_ets([message_et.user()]);
+        message_et.userEntities([message_et.user()]);
 
         TestFactory.notification_repository
           .notify(message_et, undefined, conversation_et)

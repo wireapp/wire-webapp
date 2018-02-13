@@ -118,7 +118,7 @@ z.conversation.EventMapper = class EventMapper {
         message_et = this._map_event_unable_to_decrypt(event);
         break;
       case z.event.Client.CONVERSATION.VERIFICATION:
-        message_et = this._map_event_verification(event);
+        message_et = this._mapEventVerification(event);
         break;
       case z.event.Client.CONVERSATION.VOICE_CHANNEL_ACTIVATE:
         message_et = this._map_event_voice_channel_activate();
@@ -407,16 +407,16 @@ z.conversation.EventMapper = class EventMapper {
    * Maps JSON data of conversation.verification message into message entity
    *
    * @private
-   * @param {Object} event_data - Message data
+   * @param {Object} eventData - Message data
    * @returns {VerificationMessage} Verification message entity
    */
-  _map_event_verification({data: event_data}) {
-    const message_et = new z.entity.VerificationMessage();
+  _mapEventVerification({data: eventData}) {
+    const messageEntity = new z.entity.VerificationMessage();
 
-    message_et.user_ids(event_data.user_ids);
-    message_et.verification_message_type = event_data.type;
+    messageEntity.userIds(eventData.user_ids);
+    messageEntity.verification_message_type = eventData.type;
 
-    return message_et;
+    return messageEntity;
   }
   /**
    * Maps JSON data of conversation.voice-channel-activate message into message entity
