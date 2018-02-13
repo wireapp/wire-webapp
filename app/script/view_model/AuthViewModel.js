@@ -292,6 +292,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       case z.auth.SIGN_OUT_REASON.ACCOUNT_DELETED:
         this.reason_info(z.l10n.text(z.string.auth_account_deletion));
         break;
+      case z.auth.SIGN_OUT_REASON.ACCOUNT_LOGIN:
+        return this._loginFromAuth();
       case z.auth.SIGN_OUT_REASON.ACCOUNT_REGISTRATION:
         return this._login_from_teams();
       case z.auth.SIGN_OUT_REASON.CLIENT_REMOVED:
@@ -432,6 +434,22 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
   //##############################################################################
   // Invitation Stuff
   //##############################################################################
+
+  _loginFromAuth() {
+    this.pending_server_request(true);
+
+    const persist = z.util.get_url_parameter(z.auth.URLParameter.PERSIST);
+    z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.PERSIST, persist);
+    z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.SHOW_LOGIN, true);
+
+    this.auth.repository
+      .getAccessToken()
+      .then(() => this._authentication_successful(true))
+      .catch(error => {
+        this.pending_server_request(false);
+        window.location.replace('/auth/#login');
+      });
+  }
 
   _login_from_teams() {
     this.pending_server_request(true);

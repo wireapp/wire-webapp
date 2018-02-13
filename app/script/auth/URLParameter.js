@@ -29,6 +29,7 @@ z.auth.URLParameter = {
   INTEGRATIONS: 'integrations',
   LOCALE: 'hl',
   MODE: 'mode',
+  PERSIST: 'persist',
   REASON: 'reason',
   TRACKING: 'tracking',
 };
