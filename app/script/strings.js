@@ -257,6 +257,10 @@ export const errorHandlerStrings = defineMessages({
     id: 'BackendError.LABEL.HANDLE_EXISTS',
     defaultMessage: 'This username is already taken',
   },
+  [BackendError.LABEL.HANDLE_TOO_SHORT]: {
+    id: 'BackendError.LABEL.HANDLE_TOO_SHORT',
+    defaultMessage: 'Please enter a username with at least 2 characters',
+  },
   [BackendError.LABEL.INVALID_HANDLE]: {
     id: 'BackendError.LABEL.INVALID_HANDLE',
     defaultMessage: 'This username is invalid',

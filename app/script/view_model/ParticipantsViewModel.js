@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -131,9 +131,9 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     // Confirm dialog reference
     this.confirmDialog = undefined;
 
-    // Selected group user
+    // Selected group participant
+    this.selectedParticipant = ko.observable(undefined);
     this.selectedService = ko.observable(undefined);
-    this.selectedUser = ko.observable(undefined);
 
     // Switch between div and input field to edit the conversation name
     this.isEditable = ko.pureComputed(() => !this.conversation().removed_from_conversation());
@@ -158,19 +158,12 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
       return this.showIntegrations() ? z.string.people_button_add : z.string.people_button_add_people;
     });
 
-    this.searchActionText = ko.pureComputed(() => {
-      if (this.conversation()) {
-        const isGroup = this.conversation().is_group();
-        return isGroup ? z.string.people_confirm_label : z.string.search_open_group;
-      }
-    });
-
     this.searchInput = ko.observable('');
     this.searchInput.subscribe(searchInput => this.searchServices(searchInput));
     this.isSearching = ko.pureComputed(() => this.searchInput().length);
 
-    this.selectedUsers = ko.observableArray([]);
-    this.users = ko.pureComputed(() => {
+    this.selectedContacts = ko.observableArray([]);
+    this.contacts = ko.pureComputed(() => {
       const userEntities = this.isTeam() ? this.teamUsers() : this.userRepository.connected_users();
 
       return userEntities
@@ -179,7 +172,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     });
 
     this.shouldUpdateScrollbar = ko
-      .computed(() => this.services() && this.selectedUsers() && this.stateAddPeople() && this.stateAddService())
+      .computed(() => this.services() && this.selectedContacts() && this.stateAddPeople() && this.stateAddService())
       .extend({notify: 'always', rateLimit: 500});
 
     const shortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.ADD_PEOPLE);
@@ -189,13 +182,12 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     });
 
     this.showServiceStates = ko.pureComputed(() => this.activeServiceState() && this.selectedService());
-    this.showUserProfile = ko.pureComputed(() => {
-      return this.stateParticipants() && this.selectedUser() && !this.selectedService();
-    });
+    this.showUserState = ko.pureComputed(() => this.stateParticipants() && this.selectedParticipant());
+    this.showParticipantProfile = ko.pureComputed(() => this.showServiceStates() || this.showUserState());
 
     this.selectedIsInConversation = ko.pureComputed(() => {
-      if (this.selectedUser()) {
-        return this.participants().some(entity => entity.id === this.selectedUser().id);
+      if (this.selectedParticipant()) {
+        return this.participants().some(entity => entity.id === this.selectedParticipant().id);
       }
       return false;
     });
@@ -215,8 +207,13 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   }
 
   clickOnAddPeople() {
-    this.state(ParticipantsViewModel.STATE.ADD_PEOPLE);
-    $('.participants-search').addClass('participants-search-show');
+    if (this.conversation().is_group()) {
+      this.state(ParticipantsViewModel.STATE.ADD_PEOPLE);
+      return $('.participants-search').addClass('participants-search-show');
+    }
+
+    amplify.publish(z.event.WebApp.CONVERSATION.CREATE_GROUP, 'conversation_details', this.selectedParticipant());
+    this.participantsBubble.hide();
   }
 
   clickOnAddService() {
@@ -231,7 +228,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
       cancel: () => this.userRepository.ignore_connection_request(userEntity).then(() => onSuccess()),
       confirm: () => this.userRepository.accept_connection_request(userEntity, true).then(() => onSuccess()),
       data: {
-        user: this.selectedUser(),
+        user: this.selectedParticipant(),
       },
       template: '#template-confirm-connect',
     });
@@ -259,8 +256,8 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
   clickOnServiceBack() {
     this.state(this.previousState());
+    this.selectedParticipant(undefined);
     this.selectedService(undefined);
-    this.selectedUser(undefined);
     $('.participants-search').addClass('participants-search-show');
   }
 
@@ -270,13 +267,8 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
   clickToAddMembers() {
     if (this.conversation().is_group()) {
-      this.conversationRepository.addMembers(this.conversation(), this.selectedUsers());
-    } else {
-      this.conversationRepository
-        .createGroupConversation(this.selectedUsers().concat(this.selectedUser()))
-        .then(conversationEntity => amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity));
+      this.conversationRepository.addMembers(this.conversation(), this.selectedContacts());
     }
-
     this.participantsBubble.hide();
   }
 
@@ -343,7 +335,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   }
 
   clickToRemoveService() {
-    this.integrationRepository.removeService(this.conversation(), this.selectedUser()).then(response => {
+    this.integrationRepository.removeService(this.conversation(), this.selectedParticipant()).then(response => {
       if (response) {
         if (this.groupMode()) {
           return this.resetView();
@@ -386,13 +378,12 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
   resetView() {
     this.state(ParticipantsViewModel.STATE.PARTICIPANTS);
-    this.selectedUsers.removeAll();
+    this.selectedContacts.removeAll();
     this.searchInput('');
     if (this.confirmDialog) {
       this.confirmDialog.destroy();
     }
-    this.selectedService(undefined);
-    this.selectedUser(undefined);
+    this.selectedParticipant(undefined);
   }
 
   searchServices(query) {
@@ -407,12 +398,12 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
       if (participantEntity.isBot) {
         return this.showService(participantEntity);
       }
-      this.selectedUser(participantEntity);
+      this.selectedParticipant(participantEntity);
     }
   }
 
   showService(userEntity) {
-    this.selectedUser(userEntity);
+    this.selectedParticipant(userEntity);
     const {providerId, serviceId} = userEntity;
 
     this.integrationRepository
@@ -439,7 +430,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
         const [userEntity] = this.participants();
         const initialUser = userEntity && this.conversation().is_one2one() ? userEntity : undefined;
-        this.selectedUser(initialUser);
+        this.selectedParticipant(initialUser);
 
         this.renderParticipants(true);
       }

@@ -28,6 +28,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return {
       CONFIRMATION_THRESHOLD: 7 * 24 * 60 * 60 * 1000,
       EXTERNAL_MESSAGE_THRESHOLD: 200 * 1024,
+      GROUP: {
+        MAX_NAME_LENGTH: 64,
+        MAX_SIZE: 128,
+      },
     };
   }
 
@@ -81,6 +85,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.isTeam.subscribe(() => this.map_guest_status_self());
     this.team = this.team_repository.team;
 
+    this.selfUser = this.user_repository.self;
+
     this.block_event_handling = ko.observable(true);
     this.fetching_conversations = {};
     this.conversations_with_new_events = {};
@@ -91,8 +97,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
     });
 
     this.self_conversation = ko.pureComputed(() => {
-      if (this.user_repository.self()) {
-        return this._find_conversation_by_id(this.user_repository.self().id);
+      if (this.selfUser()) {
+        return this._find_conversation_by_id(this.selfUser().id);
       }
     });
 
@@ -210,7 +216,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.conversation_service
       .postConversations(userIds, groupName, this.team().id)
       .then(response => this._onCreate({conversation: response.id, data: response}))
-      .then(({conversation_et}) => conversation_et)
+      .then(({conversationEntity}) => conversationEntity)
       .catch(error => {
         const notConnected = error.label === z.service.BackendClientError.LABEL.NOT_CONNECTED;
         if (notConnected) {
@@ -542,7 +548,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   get_all_users_in_conversation(conversation_id) {
     return this.get_conversation_by_id(conversation_id).then(conversation_et =>
-      [this.user_repository.self()].concat(conversation_et.participating_user_ets())
+      [this.selfUser()].concat(conversation_et.participating_user_ets())
     );
   }
 
@@ -688,7 +694,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
 
     if (team_id) {
-      return this.create_new_conversation([user_et.id], undefined);
+      return this.createGroupConversation([user_et]);
     }
 
     return this.fetch_conversation_by_id(user_et.connection().conversation_id)
@@ -826,7 +832,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   _handle_mapped_conversation(conversation_et) {
     this._mapGuestStatusSelf(conversation_et);
-    conversation_et.self = this.user_repository.self();
+    conversation_et.self = this.selfUser();
     conversation_et.subscribe_to_state_updates();
   }
 
@@ -834,7 +840,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.filtered_conversations().forEach(conversation_et => this._mapGuestStatusSelf(conversation_et));
 
     if (this.isTeam()) {
-      this.user_repository.self().is_team_member(true);
+      this.selfUser().is_team_member(true);
     }
   }
 
@@ -855,7 +861,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     if (has_unread_events && !this.block_event_handling()) {
       this._update_last_read_timestamp(conversation_et);
-      amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.REMOVE_READ);
+      amplify.publish(z.event.WebApp.NOTIFICATION.REMOVE_READ);
     }
   }
 
@@ -989,21 +995,17 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
       case z.service.BackendClientError.LABEL.BAD_GATEWAY:
       case z.service.BackendClientError.LABEL.SERVER_ERROR:
-      case z.service.BackendClientError.LABEL.SERVICE_DISABLED: {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.SERVICE_DISABLED);
-        break;
-      }
-
+      case z.service.BackendClientError.LABEL.SERVICE_DISABLED:
       case z.service.BackendClientError.LABEL.TOO_MANY_BOTS: {
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.TOO_MANY_BOTS);
+        amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.SERVICE_UNAVAILABLE);
         break;
       }
 
       case z.service.BackendClientError.LABEL.TOO_MANY_MEMBERS: {
-        const openSpots = z.config.MAXIMUM_CONVERSATION_SIZE - conversationEntity.getNumberOfParticipants();
+        const openSpots = ConversationRepository.CONFIG.GROUP.MAX_SIZE - conversationEntity.getNumberOfParticipants();
         amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.TOO_MANY_MEMBERS, {
           data: {
-            max: z.config.MAXIMUM_CONVERSATION_SIZE,
+            max: ConversationRepository.CONFIG.GROUP.MAX_SIZE,
             open_spots: Math.max(0, openSpots),
           },
         });
@@ -1039,7 +1041,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this._clear_conversation(conversation_et);
 
     if (leave_conversation) {
-      this.removeMember(conversation_et, this.user_repository.self().id);
+      this.removeMember(conversation_et, this.selfUser().id);
     }
 
     if (is_active_conversation) {
@@ -1208,7 +1210,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(() => {
         const response = {
           data: payload,
-          from: this.user_repository.self().id,
+          from: this.selfUser().id,
         };
 
         this._onMemberUpdate(conversation_et, response);
@@ -1282,7 +1284,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(() => {
         const response = {
           data: payload,
-          from: this.user_repository.self().id,
+          from: this.selfUser().id,
         };
 
         this._onMemberUpdate(conversation_et, response);
@@ -2378,7 +2380,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
 
         if (conversation_et.is_group()) {
-          const user_ids = _.union([this.user_repository.self().id], [message_et.from]);
+          const user_ids = _.union([this.selfUser().id], [message_et.from]);
           return this.delete_message_everyone(conversation_et, message_et, user_ids);
         }
 
@@ -2510,25 +2512,20 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Listener for incoming events.
    *
    * @param {Object} eventJson - JSON data for event
-   * @param {z.event.EventRepository.SOURCE} source - Source of event
+   * @param {z.event.EventRepository.SOURCE} eventSource - Source of event
    * @returns {Promise} Resolves when event was handled
    */
-  onConversationEvent(eventJson, source = z.event.EventRepository.SOURCE.STREAM) {
+  onConversationEvent(eventJson, eventSource = z.event.EventRepository.SOURCE.STREAM) {
     if (!eventJson) {
       return Promise.reject(new Error('Conversation Repository Event Handling: Event missing'));
     }
 
     const {conversation, data: eventData, type} = eventJson;
     const conversationId = (eventData && eventData.conversationId) || conversation;
-    this.logger.info(`»» Conversation Event: '${type}' (Source: ${source})`, {
+    this.logger.info(`»» Conversation Event: '${type}' (Source: ${eventSource})`, {
       eventJson: JSON.stringify(eventJson),
       eventObject: eventJson,
     });
-
-    // Handle conversation create event separately
-    if (type === z.event.Backend.CONVERSATION.CREATE) {
-      return this._onCreate(eventJson);
-    }
 
     const inSelfConversation = conversationId === this.self_conversation() && this.self_conversation().id;
     if (inSelfConversation) {
@@ -2544,16 +2541,23 @@ z.conversation.ConversationRepository = class ConversationRepository {
       }
     }
 
-    // Check if conversation was archived
+    const isConversationCreate = type === z.event.Backend.CONVERSATION.CREATE;
+    const onEventPromise = isConversationCreate ? Promise.resolve() : this.get_conversation_by_id(conversationId);
     let previouslyArchived;
-    return this.get_conversation_by_id(conversationId)
-      .then(conversationEntity => {
-        previouslyArchived = conversationEntity.is_archived();
 
-        const isBackendTimestamp = source !== z.event.EventRepository.SOURCE.INJECTED;
-        conversationEntity.update_timestamp_server(eventJson.server_time || eventJson.time, isBackendTimestamp);
+    return onEventPromise
+      .then(conversationEntity => {
+        if (conversationEntity) {
+          // Check if conversation was archived
+          previouslyArchived = conversationEntity.is_archived();
+
+          const isBackendTimestamp = eventSource !== z.event.EventRepository.SOURCE.INJECTED;
+          conversationEntity.update_timestamp_server(eventJson.server_time || eventJson.time, isBackendTimestamp);
+        }
 
         switch (type) {
+          case z.event.Backend.CONVERSATION.CREATE:
+            return this._onCreate(eventJson);
           case z.event.Backend.CONVERSATION.MEMBER_JOIN:
             return this._on_member_join(conversationEntity, eventJson);
           case z.event.Backend.CONVERSATION.MEMBER_LEAVE:
@@ -2562,7 +2566,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           case z.event.Backend.CONVERSATION.MEMBER_UPDATE:
             return this._onMemberUpdate(conversationEntity, eventJson);
           case z.event.Backend.CONVERSATION.RENAME:
-            return this._on_rename(conversationEntity, eventJson);
+            return this._onRename(conversationEntity, eventJson);
           case z.event.Client.CONVERSATION.ASSET_ADD:
             return this._on_asset_add(conversationEntity, eventJson);
           case z.event.Client.CONVERSATION.CONFIRMATION:
@@ -2576,41 +2580,43 @@ z.conversation.ConversationRepository = class ConversationRepository {
           case z.event.Client.CONVERSATION.REACTION:
             return this._on_reaction(conversationEntity, eventJson);
           default:
-            return this._on_add_event(conversationEntity, eventJson);
+            return this._onAddEvent(conversationEntity, eventJson);
         }
       })
-      .then((returnValue = {}) => {
-        const {conversation_et: conversationEntity, message_et: messageEntity} = returnValue;
+      .then((entityObject = {}) => this._handledConversationEvent(entityObject, eventSource, previouslyArchived));
+  }
 
-        if (conversationEntity) {
-          const eventFromWebSocket = source === z.event.EventRepository.SOURCE.WEB_SOCKET;
-          const eventFromStream = source === z.event.EventRepository.SOURCE.STREAM;
+  _handledConversationEvent(entityObject = {}, eventSource, previouslyArchived) {
+    const {conversationEntity, messageEntity} = entityObject;
 
-          if (messageEntity) {
-            const isRemoteEvent = eventFromStream || eventFromWebSocket;
+    if (conversationEntity) {
+      const eventFromWebSocket = eventSource === z.event.EventRepository.SOURCE.WEB_SOCKET;
+      const eventFromStream = eventSource === z.event.EventRepository.SOURCE.STREAM;
 
-            if (isRemoteEvent) {
-              this.send_confirmation_status(conversationEntity, messageEntity);
-            }
+      if (messageEntity) {
+        const isRemoteEvent = eventFromStream || eventFromWebSocket;
 
-            if (!eventFromStream) {
-              amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversationEntity, messageEntity);
-            }
-          }
-
-          // Check if event needs to be un-archived
-          if (previouslyArchived) {
-            // Add to check for unarchive at the end of stream handling
-            if (eventFromStream) {
-              return (this.conversations_with_new_events[conversationEntity.id] = conversationEntity);
-            }
-
-            if (eventFromWebSocket && conversationEntity.should_unarchive()) {
-              return this.unarchive_conversation(conversationEntity, 'event from WebSocket');
-            }
-          }
+        if (isRemoteEvent) {
+          this.send_confirmation_status(conversationEntity, messageEntity);
         }
-      });
+
+        if (!eventFromStream) {
+          amplify.publish(z.event.WebApp.NOTIFICATION.NOTIFY, messageEntity, undefined, conversationEntity);
+        }
+      }
+
+      // Check if event needs to be un-archived
+      if (previouslyArchived) {
+        // Add to check for unarchive at the end of stream handling
+        if (eventFromStream) {
+          return (this.conversations_with_new_events[conversationEntity.id] = conversationEntity);
+        }
+
+        if (eventFromWebSocket && conversationEntity.should_unarchive()) {
+          return this.unarchive_conversation(conversationEntity, 'event from WebSocket');
+        }
+      }
+    }
   }
 
   /**
@@ -2671,15 +2677,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * A message or ping received in a conversation.
    *
    * @private
-   * @param {Conversation} conversation_et - Conversation to add the event to
-   * @param {Object} event_json - JSON data of 'conversation.message-add' or 'conversation.knock' event
+   * @param {Conversation} conversationEntity - Conversation to add the event to
+   * @param {Object} eventJson - JSON data of 'conversation.message-add' or 'conversation.knock' event
    * @returns {Promise} Resolves when event was handled
    */
-  _on_add_event(conversation_et, event_json) {
-    return this._add_event_to_conversation(event_json, conversation_et).then(message_et => ({
-      conversation_et: conversation_et,
-      message_et: message_et,
-    }));
+  _onAddEvent(conversationEntity, eventJson) {
+    return this._add_event_to_conversation(eventJson, conversationEntity).then(messageEntity => {
+      return {conversationEntity, messageEntity};
+    });
   }
 
   /**
@@ -2752,9 +2757,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const initial_timestamp = _.isNaN(eventTimestamp) ? this.getLatestEventTimestamp(true) : eventTimestamp;
         return this.map_conversations(eventData, initial_timestamp);
       })
-      .then(conversation_et => this.update_participating_user_ets(conversation_et))
-      .then(conversation_et => this.save_conversation(conversation_et))
-      .then(conversation_et => this._prepare_conversation_create_notification(conversation_et));
+      .then(conversationEntity => this.update_participating_user_ets(conversationEntity))
+      .then(conversationEntity => this.save_conversation(conversationEntity))
+      .then(conversationEntity => this._prepareConversationCreateNotification(conversationEntity));
   }
 
   /**
@@ -2775,13 +2780,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const event_data = event_json.data;
 
     event_data.user_ids.forEach(user_id => {
-      if (user_id !== this.user_repository.self().id && !conversation_et.participating_user_ids().includes(user_id)) {
+      if (user_id !== this.selfUser().id && !conversation_et.participating_user_ids().includes(user_id)) {
         conversation_et.participating_user_ids.push(user_id);
       }
     });
 
     // Self user joins again
-    const self_user_rejoins = event_data.user_ids.includes(this.user_repository.self().id);
+    const self_user_rejoins = event_data.user_ids.includes(this.selfUser().id);
     if (self_user_rejoins) {
       conversation_et.status(z.conversation.ConversationStatus.CURRENT_MEMBER);
     }
@@ -2790,7 +2795,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(() => this._add_event_to_conversation(event_json, conversation_et))
       .then(message_et => {
         this.verification_state_handler.on_member_joined(conversation_et, event_data.user_ids);
-        return {conversation_et: conversation_et, message_et: message_et};
+        return {conversationEntity: conversation_et, messageEntity: message_et};
       });
   }
 
@@ -2803,7 +2808,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when the event was handled
    */
   _on_member_leave(conversation_et, event_json) {
-    const self_user_id = this.user_repository.self().id;
+    const self_user_id = this.selfUser().id;
     const {data: event_data, from} = event_json;
 
     const is_from_self = from === self_user_id;
@@ -2845,7 +2850,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
             this.archive_conversation(conversation_et);
           }
 
-          return {conversation_et: conversation_et, message_et: message_et};
+          return {conversationEntity: conversation_et, messageEntity: message_et};
         });
     }
   }
@@ -2867,7 +2872,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_CONVERSATION);
     }
 
-    const isFromSelf = !this.user_repository.self() || from === this.user_repository.self().id;
+    const isFromSelf = !this.selfUser() || from === this.selfUser().id;
     if (!isFromSelf) {
       throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_USER);
     }
@@ -2916,7 +2921,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       })
       .then(updated_event_json => {
         if (updated_event_json) {
-          return this._on_add_event(conversation_et, updated_event_json);
+          return this._onAddEvent(conversation_et, updated_event_json);
         }
       })
       .catch(error => {
@@ -2947,7 +2952,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           }
 
           if (event_data.status === z.assets.AssetTransferState.UPLOAD_FAILED) {
-            const from_self = event_json.from === this.user_repository.self().id;
+            const from_self = event_json.from === this.selfUser().id;
             const upload_failed = event_data.reason === z.assets.AssetUploadFailedReason.FAILED;
 
             if (from_self && upload_failed) {
@@ -2974,10 +2979,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
         if (event) {
           conversation_et.remove_message_by_id(event_json.id);
 
-          return this._on_add_event(conversation_et, event).then(({message_et}) => {
-            const first_asset = message_et.get_first_asset();
+          return this._onAddEvent(conversation_et, event).then(({messageEntity}) => {
+            const first_asset = messageEntity.get_first_asset();
             if (first_asset.is_image() || first_asset.status() === z.assets.AssetTransferState.UPLOADED) {
-              return {conversation_et: conversation_et, message_et: message_et};
+              return {conversationEntity: conversation_et, messageEntity};
             }
           });
         }
@@ -3006,7 +3011,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_USER);
         }
 
-        const is_from_self = from === this.user_repository.self().id;
+        const is_from_self = from === this.selfUser().id;
         if (!is_from_self) {
           return this._add_delete_message(conversation_et.id, event_id, time, message_to_delete_et);
         }
@@ -3040,7 +3045,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_CONVERSATION);
         }
 
-        const isFromSelf = !this.user_repository.self() || from === this.user_repository.self().id;
+        const isFromSelf = !this.selfUser() || from === this.selfUser().id;
         if (!isFromSelf) {
           throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_USER);
         }
@@ -3092,7 +3097,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
           return this._update_user_ets(message_et).then(updated_message_et => {
             this.conversation_service.update_message_in_db(updated_message_et, changes, conversation_et.id);
-            return this._prepare_reaction_notification(conversation_et, updated_message_et, event_json);
+            return this._prepareReactionNotification(conversation_et, updated_message_et, event_json);
           });
         }
       })
@@ -3111,14 +3116,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * A conversation was renamed.
    *
    * @private
-   * @param {Conversation} conversation_et - Conversation entity that will be renamed
-   * @param {Object} event_json - JSON data of 'conversation.rename' event
+   * @param {Conversation} conversationEntity - Conversation entity that will be renamed
+   * @param {Object} eventJson - JSON data of 'conversation.rename' event
    * @returns {Promise} Resolves when the event was handled
    */
-  _on_rename(conversation_et, event_json) {
-    return this._add_event_to_conversation(event_json, conversation_et).then(message_et => {
-      this.conversation_mapper.update_properties(conversation_et, event_json.data);
-      return {conversation_et: conversation_et, message_et: message_et};
+  _onRename(conversationEntity, eventJson) {
+    return this._add_event_to_conversation(eventJson, conversationEntity).then(messageEntity => {
+      this.conversation_mapper.update_properties(conversationEntity, eventJson.data);
+      return {conversationEntity, messageEntity};
     });
   }
 
@@ -3192,43 +3197,50 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
-   * Forward the 'conversation.create' event to the SystemNotification repository for browser and audio notifications.
+   * Forward the 'conversation.create' event to the Notification repository for browser and audio notifications.
    *
    * @private
-   * @param {Conversation} conversation_et - Conversation that was created
+   * @param {Conversation} conversationEntity - Conversation that was created
    * @returns {Promise} Resolves when the notification was prepared
    */
-  _prepare_conversation_create_notification(conversation_et) {
-    return this.user_repository.get_user_by_id(conversation_et.creator).then(user_et => {
-      const message_et = new z.entity.MemberMessage();
-      message_et.user(user_et);
-      message_et.member_message_type = z.message.SystemMessageType.CONVERSATION_CREATE;
-      return {conversation_et: conversation_et, message_et: message_et};
-    });
-  }
+  _prepareConversationCreateNotification(conversationEntity) {
+    const createdBySelf = conversationEntity.creator === this.selfUser().id;
 
-  /**
-   * Forward the reaction event to the SystemNotification repository for browser and audio notifications.
-   *
-   * @private
-   * @param {Conversation} conversation_et - Conversation that event was received in
-   * @param {Message} message_et - Message that has been reacted upon
-   * @param {Object} event_json -] JSON data of received reaction event
-   * @returns {Promise} Resolves when the notification was prepared
-   */
-  _prepare_reaction_notification(conversation_et, message_et, event_json) {
-    const {data: event_data, from} = event_json;
-
-    if (event_data.reaction && message_et.from === this.user_repository.self().id) {
-      return this.user_repository.get_user_by_id(from).then(user_et => {
-        const reaction_message_et = new z.entity.Message(message_et.id, z.message.SuperType.REACTION);
-        reaction_message_et.user(user_et);
-        reaction_message_et.reaction = event_data.reaction;
-        return {conversation_et: conversation_et, message_et: reaction_message_et};
+    if (!createdBySelf) {
+      return this.user_repository.get_user_by_id(conversationEntity.creator).then(userEntity => {
+        const messageEntity = new z.entity.MemberMessage();
+        messageEntity.user(userEntity);
+        messageEntity.member_message_type = z.message.SystemMessageType.CONVERSATION_CREATE;
+        return {conversationEntity, messageEntity};
       });
     }
 
-    return Promise.resolve({conversation_et: conversation_et});
+    return Promise.resolve({conversationEntity});
+  }
+
+  /**
+   * Forward the reaction event to the Notification repository for browser and audio notifications.
+   *
+   * @private
+   * @param {Conversation} conversationEntity - Conversation that event was received in
+   * @param {Message} messageEntity - Message that has been reacted upon
+   * @param {Object} eventJson -] JSON data of received reaction event
+   * @returns {Promise} Resolves when the notification was prepared
+   */
+  _prepareReactionNotification(conversationEntity, messageEntity, eventJson) {
+    const {data: event_data, from} = eventJson;
+
+    const messageFromSelf = messageEntity.from === this.selfUser().id;
+    if (messageFromSelf && event_data.reaction) {
+      return this.user_repository.get_user_by_id(from).then(userEntity => {
+        const reactionMessageEntity = new z.entity.Message(messageEntity.id, z.message.SuperType.REACTION);
+        reactionMessageEntity.user(userEntity);
+        reactionMessageEntity.reaction = event_data.reaction;
+        return {conversationEntity, messageEntity: reactionMessageEntity};
+      });
+    }
+
+    return Promise.resolve({conversationEntity});
   }
 
   /**

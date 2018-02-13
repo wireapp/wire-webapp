@@ -85,7 +85,6 @@ user-input {
   outline: none;
 
   &:invalid {
-    .accent-color();
     box-shadow: none;
   }
 
@@ -95,8 +94,7 @@ user-input {
     }
     .label-xs();
     color: fade(#fff, 40%);
-    text-align: center;
-    margin-left: -24px;
+    padding-left: 8px;
   }
 
   // hack for chrome to fix line height issue

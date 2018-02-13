@@ -41,7 +41,7 @@ z.components.ServiceList = class ServiceList {
 
     this.avatarSize = this.isCompactMode
       ? z.components.ParticipantAvatar.SIZE.LARGE
-      : z.components.ParticipantAvatar.SIZE.MEDIUM;
+      : z.components.ParticipantAvatar.SIZE.SMALL;
 
     this.cssClasses = ko.pureComputed(() => {
       if (this.isCompactMode) {

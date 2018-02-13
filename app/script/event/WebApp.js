@@ -88,6 +88,7 @@ z.event.WebApp = {
     ASSET: {
       CANCEL: 'wire.webapp.conversation.asset.cancel',
     },
+    CREATE_GROUP: 'wire.webapp.conversation.create_group',
     DEBUG: 'wire.webapp.conversation.debug',
     DETAIL_VIEW: {
       SHOW: 'wire.webapp.conversation.detail_view.show',
@@ -126,7 +127,6 @@ z.event.WebApp = {
       SEND: 'wire.webapp.extionsions.giphy.send',
       SHOW: 'wire.webapp.extionsions.giphy.show',
     },
-    SHOW: 'wire.webapp.extionsions.show',
   },
   LEFT: {
     FADE_IN: 'wire.webapp.left.fade_in',
@@ -146,6 +146,13 @@ z.event.WebApp = {
     SCROLL: 'wire.webapp.list.scroll',
   },
   LOADED: 'wire.webapp.loaded', // todo: deprecated - remove when user base of wrappers version >= 2.12 is large enough
+  NOTIFICATION: {
+    CLICK: 'wire.webapp.notification.click',
+    NOTIFY: 'wire.webapp.notification.notify',
+    PERMISSION_STATE: 'wire.webapp.notification.permissionState',
+    REMOVE_READ: 'wire.webapp.notification.remove_read',
+    SHOW: 'wire.webapp.notification.show',
+  },
   PENDING: {
     SHOW: 'wire.webapp.pending.show',
   },
@@ -170,7 +177,6 @@ z.event.WebApp = {
       EMOJI: {
         REPLACE_INLINE: 'wire.webapp.properties.update.emoji.replace_inline',
       },
-      HAS_CREATED_CONVERSATION: 'wire.webapp.properties.update.has_created_conversation',
       NOTIFICATIONS: 'wire.webapp.properties.update.notifications',
       PREVIEWS: {
         SEND: 'wire.webapp.properties.update.previews.send',
@@ -207,11 +213,7 @@ z.event.WebApp = {
     SAVE_ENTITY: 'wire.webapp.storage.save_entity',
   },
   SYSTEM_NOTIFICATION: {
-    CLICK: 'wire.webapp.system_notification.click',
-    NOTIFY: 'wire.webapp.system_notification.notify',
-    PERMISSION_STATE: 'wire.webapp.system_notification.permission_state',
-    REMOVE_READ: 'wire.webapp.system_notification.remove_read',
-    SHOW: 'wire.webapp.system_notification.show',
+    CLICK: 'wire.webapp.notification.click', // todo: deprecated - remove when user base of wrappers version >= 3.2 is large enough
   },
   TAKEOVER: {
     DISMISS: 'wire.webapp.takeover.dismiss',

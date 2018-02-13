@@ -512,7 +512,7 @@ z.user.UserRepository = class UserRepository {
             break;
         }
 
-        amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, connection_et, message_et);
+        amplify.publish(z.event.WebApp.NOTIFICATION.NOTIFY, message_et, connection_et);
       });
     }
   }
@@ -783,8 +783,9 @@ z.user.UserRepository = class UserRepository {
    * @returns {Array<z.entity.User>} Matching users
    */
   search_for_connected_users(query, is_handle) {
+    const excludedEmojis = Array.from(query).filter(char => EMOJI_UNICODE_RANGES.includes(char));
     return this.connected_users()
-      .filter(user_et => user_et.matches(query, is_handle))
+      .filter(user_et => user_et.matches(query, is_handle, excludedEmojis))
       .sort((user_a, user_b) => {
         if (is_handle) {
           return z.util.StringUtil.sort_by_priority(user_a.username(), user_b.username(), query);

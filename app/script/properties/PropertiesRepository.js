@@ -140,9 +140,6 @@ z.properties.PropertiesRepository = class PropertiesRepository {
             case z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING:
               amplify.publish(z.util.Logger.prototype.LOG_ON_DEBUG, updatedPreference);
               break;
-            case z.properties.PROPERTIES_TYPE.HAS_CREATED_CONVERSATION:
-              amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.HAS_CREATED_CONVERSATION, updatedPreference);
-              break;
             case z.properties.PROPERTIES_TYPE.NOTIFICATIONS:
               amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.NOTIFICATIONS, updatedPreference);
               break;

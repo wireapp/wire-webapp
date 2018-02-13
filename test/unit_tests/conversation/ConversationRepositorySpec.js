@@ -668,27 +668,27 @@ describe('ConversationRepository', () => {
     });
 
     describe('"conversation.create"', () => {
-      let conversation_id = null;
-      let create_event = null;
+      let conversationId = null;
+      let createEvent = null;
 
       beforeEach(() => {
         spyOn(TestFactory.conversation_repository, '_onCreate').and.callThrough();
         spyOn(TestFactory.conversation_repository, 'map_conversations').and.returnValue(true);
         spyOn(TestFactory.conversation_repository, 'update_participating_user_ets').and.returnValue(true);
         spyOn(TestFactory.conversation_repository, 'save_conversation').and.returnValue(true);
-        spyOn(TestFactory.conversation_repository, '_prepare_conversation_create_notification').and.returnValue(true);
+        spyOn(TestFactory.conversation_repository, '_prepareConversationCreateNotification').and.returnValue(true);
 
-        conversation_id = z.util.create_random_uuid();
-        create_event = {conversation: conversation_id, data: {}, type: z.event.Backend.CONVERSATION.CREATE};
+        conversationId = z.util.create_random_uuid();
+        createEvent = {conversation: conversationId, data: {}, type: z.event.Backend.CONVERSATION.CREATE};
       });
 
       it('should process create event for a new conversation created locally', done => {
         TestFactory.conversation_repository
-          .onConversationEvent(create_event)
+          .onConversationEvent(createEvent)
           .then(() => {
             expect(TestFactory.conversation_repository._onCreate).toHaveBeenCalled();
-            expect(TestFactory.conversation_repository.map_conversations).toHaveBeenCalledWith(create_event.data, 1);
-            expect(TestFactory.conversation_repository._prepare_conversation_create_notification).toHaveBeenCalled();
+            expect(TestFactory.conversation_repository.map_conversations).toHaveBeenCalledWith(createEvent.data, 1);
+            expect(TestFactory.conversation_repository._prepareConversationCreateNotification).toHaveBeenCalled();
             done();
           })
           .catch(done.fail);
@@ -696,17 +696,17 @@ describe('ConversationRepository', () => {
 
       it('should process create event for a new conversation created remotely', done => {
         const time = new Date();
-        create_event.time = time.toISOString();
+        createEvent.time = time.toISOString();
 
         TestFactory.conversation_repository
-          .onConversationEvent(create_event)
+          .onConversationEvent(createEvent)
           .then(() => {
             expect(TestFactory.conversation_repository._onCreate).toHaveBeenCalled();
             expect(TestFactory.conversation_repository.map_conversations).toHaveBeenCalledWith(
-              create_event.data,
+              createEvent.data,
               time.getTime()
             );
-            expect(TestFactory.conversation_repository._prepare_conversation_create_notification).toHaveBeenCalled();
+            expect(TestFactory.conversation_repository._prepareConversationCreateNotification).toHaveBeenCalled();
             done();
           })
           .catch(done.fail);

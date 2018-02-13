@@ -154,8 +154,9 @@ z.team.TeamRepository = class TeamRepository {
    * @returns {Array<z.entity.User>} Matching users
    */
   searchForTeamUsers(query, isHandle) {
+    const excludedEmojis = Array.from(query).filter(char => EMOJI_UNICODE_RANGES.includes(char));
     return this.teamUsers()
-      .filter(userEntity => userEntity.matches(query, isHandle))
+      .filter(userEntity => userEntity.matches(query, isHandle, excludedEmojis))
       .sort((userA, userB) => {
         if (isHandle) {
           return z.util.StringUtil.sort_by_priority(userA.username(), userB.username(), query);
