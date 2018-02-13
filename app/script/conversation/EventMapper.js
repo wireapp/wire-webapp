@@ -413,7 +413,7 @@ z.conversation.EventMapper = class EventMapper {
   _mapEventVerification({data: eventData}) {
     const messageEntity = new z.entity.VerificationMessage();
 
-    messageEntity.userIds(eventData.user_ids);
+    messageEntity.userIds(eventData.userIds);
     messageEntity.verification_message_type = eventData.type;
 
     return messageEntity;
