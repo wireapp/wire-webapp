@@ -20,7 +20,8 @@ class IndexedDB implements CryptoboxStore {
     PRE_KEYS: 'prekeys',
     SESSIONS: 'sessions',
   };
-  private logger: any = logdown('cryptobox.store.IndexedDB', {
+
+  private logger: any = logdown('@wireapp/cryptobox/store.IndexedDB', {
     logger: console,
     markdown: false,
   });

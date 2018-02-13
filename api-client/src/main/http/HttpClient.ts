@@ -21,16 +21,17 @@ import axios, {AxiosError, AxiosPromise, AxiosRequestConfig} from 'axios';
 import {AccessTokenStore, AuthAPI} from '../auth';
 import {ContentType} from '../http';
 import PriorityQueue from '@wireapp/queue-priority/dist/commonjs/PriorityQueue';
-import Logdown = require('logdown');
+const logdown = require('logdown');
 
 export default class HttpClient {
   private _authAPI: AuthAPI;
-  private logger: Logdown;
+  private logger: any = logdown('@wireapp/api-client/http.HttpClient', {
+    logger: console,
+    markdown: false,
+  });
   private requestQueue: PriorityQueue<number>;
 
   constructor(private baseURL: string, public accessTokenStore: AccessTokenStore) {
-    this.logger = new Logdown(this.constructor.name);
-
     this.requestQueue = new PriorityQueue({
       maxRetries: 0,
       retryDelay: 1000,

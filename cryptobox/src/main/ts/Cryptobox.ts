@@ -25,7 +25,7 @@ class Cryptobox extends EventEmitter {
   private cachedPreKeys: Array<ProteusKeys.PreKey>;
   private cachedSessions: LRUCache;
 
-  private logger: any = logdown('cryptobox.Cryptobox', {
+  private logger: any = logdown('@wireapp/cryptobox/Cryptobox', {
     logger: console,
     markdown: false,
   });

@@ -6,7 +6,7 @@ import {CryptoboxError} from '../error/';
 
 export default class Cache implements CryptoboxStore {
   private identity: ProteusKeys.IdentityKeyPair | undefined;
-  private logger: any = logdown('cryptobox.store.Cache', {
+  private logger: any = logdown('@wireapp/cryptobox/store.Cache', {
     logger: console,
     markdown: false,
   });
