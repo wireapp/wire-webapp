@@ -23,6 +23,7 @@ z.string.de.wire_windows = 'Wire für Windows';
 z.string.de.wire_linux = 'Wire für Linux';
 z.string.de.nonexistent_user = 'Gelöschte Person';
 z.string.de.and = 'und';
+z.string.de.enumerationAnd = ' und ';
 
 z.string.de.alert_upload_file_format = 'Das Bild kann nicht verwendet werden. Bitte wähle eine PNG- oder JPEG-Datei.';
 z.string.de.alert_upload_too_small = 'Das Bild kann nicht verwendet werden. Bitte wähle ein Bild mit mindestens 320 x 320 Pixeln.';

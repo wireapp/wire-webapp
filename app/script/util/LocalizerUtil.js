@@ -28,9 +28,15 @@ z.util.LocalizerUtil = {
       .map(userEntity => z.util.get_first_name(userEntity, declension))
       .sort((userNameA, userNameB) => z.util.StringUtil.sort_by_priority(userNameA, userNameB));
 
-    if (firstNames.length >= 2) {
+    const numberOfNames = firstNames.length;
+    if (numberOfNames >= 2) {
       const [secondLastName, lastName] = firstNames.splice(firstNames.length - 2, 2);
-      firstNames.push(`${secondLastName} ${z.l10n.text(z.string.and)} ${lastName}`);
+
+      const exactlyTwoNames = numberOfNames === 2;
+      const additionalNames = exactlyTwoNames
+        ? `${secondLastName} ${z.l10n.text(z.string.and)} ${lastName}`
+        : `${secondLastName}${z.l10n.text(z.string.enumerationAnd)}${lastName}`;
+      firstNames.push(additionalNames);
     }
 
     return firstNames.join(', ');
