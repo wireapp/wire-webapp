@@ -2844,8 +2844,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const creatorIsParticipant = createdByParticipant || createdBySelfUser;
         if (!creatorIsParticipant) {
           messageEntity.memberMessageType = z.message.SystemMessageType.CONVERSATION_RESUME;
-        } else if (createdByParticipant) {
-          messageEntity.userIds.push(this.selfUser().id);
         }
 
         return this._updateMessageUserEntities(messageEntity);

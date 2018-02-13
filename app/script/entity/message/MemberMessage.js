@@ -78,7 +78,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
           return this._getCaptionConnection(this.otherUser());
         case z.message.SystemMessageType.CONVERSATION_CREATE:
           if (this.name().length) {
-            return z.l10n.text(z.string.conversationCreateWith, this._generateNameString());
+            return z.l10n.text(z.string.conversationCreateWith, this._generateNameString(z.string.Declension.DATIVE));
           }
           if (this.user().is_me) {
             return z.l10n.text(z.string.conversation_create_you, this._generateNameString());
