@@ -45,6 +45,7 @@ z.service.BackendClientError = class BackendClientError extends Error {
       BAD_REQUEST: 'bad-request',
       BLACKLISTED_EMAIL: 'blacklisted-email',
       BLACKLISTED_PHONE: 'blacklisted-phone',
+      CLIENT_ERROR: 'client-error',
       CONNECTIVITY_PROBLEM: 'connectivity-problem',
       INVALID_CREDENTIALS: 'invalid-credentials',
       INVALID_EMAIL: 'invalid-email',
