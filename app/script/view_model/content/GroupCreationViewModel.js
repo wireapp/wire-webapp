@@ -163,7 +163,7 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
       const nameTooLong = trimmedNameInput.length > z.conversation.ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
       const nameTooShort = !trimmedNameInput.length;
 
-      this.nameInput(this.nameInput().slice(0, z.conversation.ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH));
+      this.nameInput(trimmedNameInput.slice(0, z.conversation.ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH));
       if (nameTooLong) {
         return this.nameError(z.l10n.text(z.string.groupCreationPreferencesErrorNameLong));
       }
