@@ -37,7 +37,7 @@ z.entity.VerificationMessage = class VerificationMessage extends z.entity.Messag
     });
 
     this.caption_user = ko.pureComputed(() => {
-      return z.util.LocalizerUtil.join_names(this.userEntities(), z.string.Declension.NOMINATIVE);
+      return z.util.LocalizerUtil.joinNames(this.userEntities(), z.string.Declension.NOMINATIVE);
     });
 
     this.caption_started_using = ko.pureComputed(() => {
