@@ -342,9 +342,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
         if (conversationEntity.hasCreationMessage && isCreationMessage) {
           const groupCreationMessageIn1to1 = conversationEntity.is_one2one() && firstMessage.isGroupCreation();
           const one2oneConnectionMessageInGroup = conversationEntity.is_group() && firstMessage.isConnection();
-          const firstMessageOfType = groupCreationMessageIn1to1 || one2oneConnectionMessageInGroup;
+          const wrongMessageTypeForConversation = groupCreationMessageIn1to1 || one2oneConnectionMessageInGroup;
 
-          if (firstMessageOfType) {
+          if (wrongMessageTypeForConversation) {
             this.delete_message(conversationEntity, firstMessage);
             conversationEntity.hasCreationMessage = false;
             isCreationMessage = false;
