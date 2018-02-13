@@ -22,7 +22,7 @@
     "gulp-typescript": "4.0.1",
     "gulp-util": "3.0.8",
     "gutil": "1.6.4",
-    "jasmine": "2.99.0",
+    "jasmine": "3.0.0",
     "karma": "1.7.0",
     "karma-chrome-launcher": "2.1.1",
     "karma-jasmine": "1.1.0",

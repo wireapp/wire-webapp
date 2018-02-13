@@ -11,7 +11,7 @@
   "devDependencies": {
     "bower": "1.8.2",
     "chai": "4.1.2",
-    "jasmine": "2.9.0",
+    "jasmine": "3.0.0",
     "rimraf": "2.6.2",
     "typescript": "2.7.1",
     "webpack": "3.11.0"
