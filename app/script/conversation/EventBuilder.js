@@ -100,13 +100,19 @@ z.conversation.EventBuilder = {
     };
   },
   buildGroupCreation(conversationEntity, timestamp = 0) {
-    const {creator: creatorId, id} = conversationEntity;
+    const {creator: creatorId, id, self: selfUser} = conversationEntity;
+
+    const userIds = conversationEntity.participating_user_ids();
+    const createdBySelf = selfUser.id === conversationEntity.creator;
+    if (!createdBySelf) {
+      userIds.push(selfUser.id);
+    }
 
     return {
       conversation: id,
       data: {
         name: conversationEntity.name(),
-        userIds: conversationEntity.participating_user_ids(),
+        userIds: userIds,
       },
       from: creatorId,
       id: z.util.create_random_uuid(),
