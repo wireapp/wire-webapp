@@ -138,6 +138,7 @@ z.event.EventRepository = class EventRepository {
 
     this.last_notification_id = ko.observable(undefined);
     this.last_event_date = ko.observable();
+    this.lastEventSource = EventRepository.SOURCE.STREAM;
 
     amplify.subscribe(z.event.WebApp.CONNECTION.ONLINE, this.recover_from_stream.bind(this));
     amplify.subscribe(z.event.WebApp.EVENT.INJECT, this.inject_event.bind(this));
@@ -489,6 +490,11 @@ z.event.EventRepository = class EventRepository {
       throw new z.event.EventError(z.event.EventError.TYPE.NO_EVENT);
     }
 
+    const isHandlingStream = this.lastEventSource === EventRepository.SOURCE.STREAM;
+    if (isHandlingStream) {
+      source = EventRepository.SOURCE.INJECTED;
+    }
+
     const {conversation: conversation_id, id = 'ID not specified', type} = event;
     if (conversation_id !== this.user_repository.self().id) {
       this.logger.info(`Injected event ID '${id}' of type '${type}'`, event);
@@ -684,7 +690,7 @@ z.event.EventRepository = class EventRepository {
         );
       }
 
-      const event_from_stream = source === z.event.EventRepository.SOURCE.STREAM;
+      const event_from_stream = source === EventRepository.SOURCE.STREAM;
       if (event_from_stream && event.time) {
         const outdated_event = this.last_event_date() >= new Date(event.time).toISOString();
 
@@ -716,8 +722,8 @@ z.event.EventRepository = class EventRepository {
   _handle_notification({payload: events, id, transient}) {
     const source = transient !== undefined ? EventRepository.SOURCE.WEB_SOCKET : EventRepository.SOURCE.STREAM;
     const is_transient_event = !!transient;
-
     this.logger.info(`Handling notification '${id}' from '${source}' containing '${events.length}' events`, events);
+    this.lastEventSource = source;
 
     if (!events.length) {
       this.logger.warn('Notification payload does not contain any events');
