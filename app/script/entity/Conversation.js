@@ -133,7 +133,7 @@ z.entity.Conversation = class Conversation {
     this.hasAdditionalMessages = ko.observable(true);
 
     this.messages_visible = ko
-      .pureComputed(() => (this.id !== '' ? this.messages().filter(messageEntity => messageEntity.visible()) : []))
+      .pureComputed(() => (!this.id ? [] : this.messages().filter(messageEntity => messageEntity.visible())))
       .extend({trackArrayChanges: true});
 
     // Calling

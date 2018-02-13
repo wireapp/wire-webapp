@@ -340,10 +340,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
         let isCreationMessage = firstMessage && firstMessage.is_member() && firstMessage.isCreation();
 
         if (conversationEntity.hasCreationMessage && isCreationMessage) {
-          const groupCreationIn1to1 = conversationEntity.is_one2one() && firstMessage.isGroupCreation();
-          const one2oneConnectionInGroup = conversationEntity.is_group() && firstMessage.isConnection();
+          const groupCreationMessageIn1to1 = conversationEntity.is_one2one() && firstMessage.isGroupCreation();
+          const one2oneConnectionMessageInGroup = conversationEntity.is_group() && firstMessage.isConnection();
+          const wrongMessageTypeForConversation = groupCreationMessageIn1to1 || one2oneConnectionMessageInGroup;
 
-          if (groupCreationIn1to1 || one2oneConnectionInGroup) {
+          if (wrongMessageTypeForConversation) {
             this.delete_message(conversationEntity, firstMessage);
             conversationEntity.hasCreationMessage = false;
             isCreationMessage = false;

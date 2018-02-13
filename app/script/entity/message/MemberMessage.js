@@ -68,16 +68,17 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
     });
 
     this.caption = ko.pureComputed(() => {
+      if (!this.hasUsers()) {
+        return '';
+      }
+
       switch (this.memberMessageType) {
         case z.message.SystemMessageType.CONNECTION_ACCEPTED:
         case z.message.SystemMessageType.CONNECTION_REQUEST:
           return this._getCaptionConnection(this.otherUser());
         case z.message.SystemMessageType.CONVERSATION_CREATE:
           if (this.name().length) {
-            const namedCreateStringId = this.userIds().length
-              ? z.string.conversationCreateWith
-              : z.string.conversationCreateWithOut;
-            return z.l10n.text(namedCreateStringId, this._generateNameString());
+            return z.l10n.text(z.string.conversationCreateWith, this._generateNameString());
           }
           if (this.user().is_me) {
             return z.l10n.text(z.string.conversation_create_you, this._generateNameString());
@@ -136,10 +137,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
   }
 
   _generateNameString(declension = z.string.Declension.ACCUSATIVE) {
-    if (this.hasUsers()) {
-      return z.util.LocalizerUtil.join_names(this.joinedUserEntities(), declension);
-    }
-    return '';
+    return z.util.LocalizerUtil.join_names(this.joinedUserEntities(), declension);
   }
 
   _getCaptionConnection(userEntity) {
