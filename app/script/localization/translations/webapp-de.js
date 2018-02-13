@@ -475,6 +475,7 @@ z.string.de.search_group_hint = 'Tippe weiter oder wähle weitere Kontakte aus, 
 z.string.de.search_connect = 'Vorschläge';
 z.string.de.search_connections = 'Kontakte';
 z.string.de.search_contacts = 'Kontakte';
+z.string.de.searchCreateGroup = 'Erstelle eine Gruppe';
 z.string.de.search_groups = 'Gruppen';
 z.string.de.search_people = 'Kontakte';
 z.string.de.search_placeholder = 'Name oder Benutzername suchen';
