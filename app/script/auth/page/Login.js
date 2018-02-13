@@ -42,6 +42,7 @@ import * as AuthSelector from '../module/selector/AuthSelector';
 import ValidationError from '../module/action/ValidationError';
 import {loginStrings} from '../../strings';
 import RuntimeUtil from '../util/RuntimeUtil';
+import * as URLUtil from '../util/urlUtil';
 
 class Login extends React.PureComponent {
   inputs = {};
@@ -89,7 +90,9 @@ class Login extends React.PureComponent {
         }
         return this.props.doLogin(login);
       })
-      .then(() => window.location.replace(`/${window.location.search}`));
+      .then(() =>
+        window.location.replace(`/${URLUtil.pathWithParams('login', `reason=login&persist=${this.state.persist}`)}`)
+      );
   };
 
   forgotPassword() {
