@@ -36,8 +36,8 @@ describe('z.conversation.EventBuilder', () => {
     event_mapper = new z.conversation.EventMapper();
   });
 
-  it('build_all_verified', () => {
-    const event = z.conversation.EventBuilder.build_all_verified(conversation_et);
+  it('buildAllVerified', () => {
+    const event = z.conversation.EventBuilder.buildAllVerified(conversation_et);
     const message_et = event_mapper.map_json_event(event, conversation_et);
     expect(message_et).toBeDefined();
     expect(message_et.super_type).toBe(z.message.SuperType.VERIFICATION);
@@ -46,9 +46,9 @@ describe('z.conversation.EventBuilder', () => {
     expect(message_et.conversation_id).toBe(conversation_et.id);
   });
 
-  it('build_degraded', () => {
+  it('buildDegraded', () => {
     const user_ids = [z.util.create_random_uuid()];
-    const event = z.conversation.EventBuilder.build_degraded(
+    const event = z.conversation.EventBuilder.buildDegraded(
       conversation_et,
       user_ids,
       z.message.VerificationMessageType.NEW_DEVICE
@@ -62,8 +62,8 @@ describe('z.conversation.EventBuilder', () => {
     expect(message_et.userIds()).toEqual(user_ids);
   });
 
-  it('build_missed', () => {
-    const event = z.conversation.EventBuilder.build_missed(conversation_et);
+  it('buildMissed', () => {
+    const event = z.conversation.EventBuilder.buildMissed(conversation_et);
     const message_et = event_mapper.map_json_event(event, conversation_et);
     expect(message_et).toBeDefined();
     expect(message_et.super_type).toBe(z.message.SuperType.MISSED);

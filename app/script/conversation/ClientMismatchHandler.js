@@ -86,7 +86,7 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
     };
 
     return Promise.all(this._mapRecipients(recipients, _removeDeletedClient, _removeDeletedUser)).then(() => {
-      this.conversationRepository.verification_state_handler.on_client_removed(Object.keys(recipients));
+      this.conversationRepository.verification_state_handler.onClientRemoved(Object.keys(recipients));
       return payload;
     });
   }
@@ -118,7 +118,7 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
         return Promise.all(this._mapRecipients(recipients, _addMissingClient));
       })
       .then(() => {
-        this.conversationRepository.verification_state_handler.on_client_add(Object.keys(recipients));
+        this.conversationRepository.verification_state_handler.onClientAdd(Object.keys(recipients));
         return payload;
       });
   }

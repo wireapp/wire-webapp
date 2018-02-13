@@ -292,7 +292,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     if (generic_message_is_too_big || external_message_is_too_big) {
       const decryption_error = new Proteus.errors.DecryptError.InvalidMessage('The received message was too big.', 300);
       return Promise.resolve(
-        z.conversation.EventBuilder.build_incoming_message_too_big(event, decryption_error, decryption_error.code)
+        z.conversation.EventBuilder.buildIncomingMessageTooBig(event, decryption_error, decryption_error.code)
       );
     }
 
@@ -473,7 +473,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     );
     this._report_decryption_failure(error, event);
 
-    return z.conversation.EventBuilder.build_unable_to_decrypt(event, error, error_code);
+    return z.conversation.EventBuilder.buildUnableToDecrypt(event, error, error_code);
   }
 
   /**

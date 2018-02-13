@@ -1098,7 +1098,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       const hasResponse = response && response.event;
       const event = hasResponse
         ? response.event
-        : z.conversation.EventBuilder.build_member_leave(conversationEntity, userId, this.timeOffset);
+        : z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, this.timeOffset);
 
       amplify.publish(z.event.WebApp.EVENT.INJECT, event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
       return event;
@@ -1115,7 +1115,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   removeMember(conversationEntity, userId) {
     return this.conversation_service.deleteMembers(conversationEntity.id, userId).then(response => {
       const event =
-        response || z.conversation.EventBuilder.build_member_leave(conversationEntity, userId, this.timeOffset);
+        response || z.conversation.EventBuilder.buildMemberLeave(conversationEntity, userId, this.timeOffset);
 
       amplify.publish(z.event.WebApp.EVENT.INJECT, event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
       return event;
@@ -1193,7 +1193,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         .filter(conversation_et => conversation_et.team_id === team_id && !conversation_et.removed_from_conversation())
         .forEach(conversation_et => {
           if (conversation_et.participating_user_ids().includes(user_id)) {
-            const member_leave_event = z.conversation.EventBuilder.build_team_member_leave(
+            const member_leave_event = z.conversation.EventBuilder.buildTeamMemberLeave(
               conversation_et,
               user_et,
               date.toISOString()
@@ -1445,7 +1445,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           token: asset_data.asset_token,
         };
 
-        const asset_add_event = z.conversation.EventBuilder.build_asset_add(conversation_et, data, this.timeOffset);
+        const asset_add_event = z.conversation.EventBuilder.buildAssetAdd(conversation_et, data, this.timeOffset);
 
         asset_add_event.id = message_id;
         asset_add_event.time = payload.time;
@@ -1965,7 +1965,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           throw new Error('Cannot send message to conversation you are not part of');
         }
 
-        const optimistic_event = z.conversation.EventBuilder.build_message_add(conversation_et, this.timeOffset);
+        const optimistic_event = z.conversation.EventBuilder.buildMessageAdd(conversation_et, this.timeOffset);
         return this.cryptography_repository.cryptography_mapper.map_generic_message(generic_message, optimistic_event);
       })
       .then(message_mapped => {
@@ -2670,7 +2670,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.filtered_conversations()
       .filter(conversation_et => !conversation_et.removed_from_conversation())
       .forEach(conversation_et => {
-        const missed_event = z.conversation.EventBuilder.build_missed(conversation_et, this.timeOffset);
+        const missed_event = z.conversation.EventBuilder.buildMissed(conversation_et, this.timeOffset);
         amplify.publish(z.event.WebApp.EVENT.INJECT, missed_event);
       });
   }
@@ -2827,6 +2827,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           conversationEntity.hasCreationMessage = true;
           const creationEvent = z.conversation.EventBuilder.buildGroupCreation(conversationEntity, initialTimestamp);
           amplify.publish(z.event.WebApp.EVENT.INJECT, creationEvent, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+          this.verification_state_handler.onConversationCreate(conversationEntity);
           return {conversationEntity};
         }
       });
@@ -2893,7 +2894,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.update_participating_user_ets(conversationEntity)
       .then(() => this._add_event_to_conversation(eventJson, conversationEntity))
       .then(messageEntity => {
-        this.verification_state_handler.on_member_joined(conversationEntity, eventData.user_ids);
+        this.verification_state_handler.onMemberJoined(conversationEntity, eventData.user_ids);
         return {conversationEntity, messageEntity};
       });
   }
@@ -2941,7 +2942,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           return this.update_participating_user_ets(conversationEntity).then(() => messageEntity);
         })
         .then(messageEntity => {
-          this.verification_state_handler.on_member_left(conversationEntity);
+          this.verification_state_handler.onMemberLeft(conversationEntity);
 
           if (isFromSelf && conversationEntity.removed_from_conversation()) {
             this.archive_conversation(conversationEntity);
@@ -3110,7 +3111,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         const is_from_self = from === this.selfUser().id;
         if (!is_from_self) {
-          return this._add_delete_message(conversation_et.id, event_id, time, message_to_delete_et);
+          return this._addDeleteMessage(conversation_et.id, event_id, time, message_to_delete_et);
         }
       })
       .then(() => {
@@ -3418,15 +3419,15 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Add delete message to conversation.
    *
    * @private
-   * @param {string} conversation_id - ID of conversation
-   * @param {string} message_id - ID of message
+   * @param {string} conversationId - ID of conversation
+   * @param {string} messageId - ID of message
    * @param {string} time - ISO 8601 formatted time string
-   * @param {Message} message_et - Message to delete
+   * @param {Message} messageEntity - Message to delete
    * @returns {undefined} No return value
    */
-  _add_delete_message(conversation_id, message_id, time, message_et) {
-    const delete_event = z.conversation.EventBuilder.build_delete(conversation_id, message_id, time, message_et);
-    amplify.publish(z.event.WebApp.EVENT.INJECT, delete_event);
+  _addDeleteMessage(conversationId, messageId, time, messageEntity) {
+    const deleteEvent = z.conversation.EventBuilder.buildDelete(conversationId, messageId, time, messageEntity);
+    amplify.publish(z.event.WebApp.EVENT.INJECT, deleteEvent);
   }
 
   //##############################################################################
