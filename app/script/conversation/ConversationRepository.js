@@ -217,14 +217,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .postConversations(userIds, groupName, this.team().id)
       .then(response => this._onCreate({conversation: response.id, data: response}))
       .then(({conversationEntity}) => conversationEntity)
-      .catch(error => {
-        const notConnected = error.label === z.service.BackendClientError.LABEL.NOT_CONNECTED;
-        if (notConnected) {
-          return this._handleUsersNotConnected(userIds);
-        }
-
-        throw error;
-      });
+      .catch(error => this._handleConversationCreateError(error, userIds));
   }
 
   /**
@@ -1032,14 +1025,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       }
 
       case z.service.BackendClientError.LABEL.TOO_MANY_MEMBERS: {
-        const openSpots = ConversationRepository.CONFIG.GROUP.MAX_SIZE - conversationEntity.getNumberOfParticipants();
-        amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.TOO_MANY_MEMBERS, {
-          data: {
-            max: ConversationRepository.CONFIG.GROUP.MAX_SIZE,
-            open_spots: Math.max(0, openSpots),
-          },
-        });
-
+        this._handleTooManyMembersError(conversationEntity.getNumberOfParticipants());
         break;
       }
 
@@ -1354,6 +1340,29 @@ z.conversation.ConversationRepository = class ConversationRepository {
       this.conversation_service.delete_conversation_from_db(conversation_et.id);
       this.delete_conversation(conversation_et.id);
     }
+  }
+
+  _handleConversationCreateError(error, userIds) {
+    switch (error.label) {
+      case z.service.BackendClientError.LABEL.CLIENT_ERROR:
+        this._handleTooManyMembersError();
+        break;
+      case z.service.BackendClientError.LABEL.NOT_CONNECTED:
+        this._handleUsersNotConnected(userIds);
+        break;
+      default:
+        throw error;
+    }
+  }
+
+  _handleTooManyMembersError(participants = 0) {
+    const openSpots = ConversationRepository.CONFIG.GROUP.MAX_SIZE - participants;
+    amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.TOO_MANY_MEMBERS, {
+      data: {
+        max: ConversationRepository.CONFIG.GROUP.MAX_SIZE,
+        open_spots: Math.max(0, openSpots),
+      },
+    });
   }
 
   _handleUsersNotConnected(userIds = []) {
