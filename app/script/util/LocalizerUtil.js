@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,9 +23,22 @@ window.z = window.z || {};
 window.z.util = z.util || {};
 
 z.util.LocalizerUtil = {
-  join_names: function(user_ets, declension = z.string.Declension.ACCUSATIVE) {
-    const first_names = user_ets.map(user_et => z.util.get_first_name(user_et, declension));
-    const names_string = first_names.join(', ');
-    return names_string.replace(/,(?=[^,]*$)/, ` ${z.l10n.text(z.string.and)}`);
+  joinNames: (userEntities, declension = z.string.Declension.ACCUSATIVE) => {
+    const firstNames = userEntities
+      .map(userEntity => z.util.get_first_name(userEntity, declension))
+      .sort((userNameA, userNameB) => z.util.StringUtil.sort_by_priority(userNameA, userNameB));
+
+    const numberOfNames = firstNames.length;
+    if (numberOfNames >= 2) {
+      const [secondLastName, lastName] = firstNames.splice(firstNames.length - 2, 2);
+
+      const exactlyTwoNames = numberOfNames === 2;
+      const additionalNames = exactlyTwoNames
+        ? `${secondLastName} ${z.l10n.text(z.string.and)} ${lastName}`
+        : `${secondLastName}${z.l10n.text(z.string.enumerationAnd)}${lastName}`;
+      firstNames.push(additionalNames);
+    }
+
+    return firstNames.join(', ');
   },
 };

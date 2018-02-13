@@ -137,7 +137,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
   }
 
   _generateNameString(declension = z.string.Declension.ACCUSATIVE) {
-    return z.util.LocalizerUtil.join_names(this.joinedUserEntities(), declension);
+    return z.util.LocalizerUtil.joinNames(this.joinedUserEntities(), declension);
   }
 
   _getCaptionConnection(userEntity) {

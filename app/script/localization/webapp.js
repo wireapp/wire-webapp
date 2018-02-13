@@ -25,6 +25,7 @@ z.string.wire_windows = 'Wire for Windows';
 z.string.wire_linux = 'Wire for Linux';
 z.string.nonexistent_user = 'Deleted User';
 z.string.and = 'and';
+z.string.enumerationAnd = ', and ';
 
 // Alert view when trying to set a profile image that's too small
 z.string.alert_upload_file_format = 'Can’t use this picture.\nPlease choose a PNG or JPEG file.';
