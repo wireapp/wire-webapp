@@ -3,7 +3,6 @@
     "@types/node": "9.3.0",
     "@wireapp/api-client": "0.3.10",
     "@wireapp/cryptobox": "7.0.5",
-    "@wireapp/protocol-messaging": "1.20.0",
     "@wireapp/store-engine": "0.1.12",
     "bazinga64": "5.0.3",
     "protobufjs": "6.8.4",
