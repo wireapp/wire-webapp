@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,8 +24,15 @@ window.z.util = z.util || {};
 
 z.util.LocalizerUtil = {
   joinNames: (userEntities, declension = z.string.Declension.ACCUSATIVE) => {
-    const firstNames = userEntities.map(userEntity => z.util.get_first_name(userEntity, declension));
-    firstNames.push(`${firstNames.pop()} ${z.l10n.text(z.string.and)} ${firstNames.pop()}`);
+    const firstNames = userEntities
+      .map(userEntity => z.util.get_first_name(userEntity, declension))
+      .sort((userNameA, userNameB) => z.util.StringUtil.sort_by_priority(userNameA, userNameB));
+
+    if (firstNames.length >= 2) {
+      const [secondLastName, lastName] = firstNames.splice(firstNames.length - 2, 2);
+      firstNames.push(`${secondLastName} ${z.l10n.text(z.string.and)} ${lastName}`);
+    }
+
     return firstNames.join(', ');
   },
 };

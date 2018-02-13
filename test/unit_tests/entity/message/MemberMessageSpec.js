@@ -42,7 +42,7 @@ describe('Message Entities', () => {
       const user_b = new z.entity.User(z.util.create_random_uuid());
       user_b.name('Jim');
       message_et.userEntities.push(user_a, user_b);
-      expect(message_et._generateNameString()).toBe('John and Jim');
+      expect(message_et._generateNameString()).toBe('Jim and John');
     });
 
     it('can return correct string for more then one users', () => {
@@ -53,7 +53,7 @@ describe('Message Entities', () => {
       const user_c = new z.entity.User(z.util.create_random_uuid());
       user_c.name('Jill');
       message_et.userEntities.push(user_a, user_b, user_c);
-      expect(message_et._generateNameString()).toBe('John, Jim and Jill');
+      expect(message_et._generateNameString()).toBe('Jill, Jim and John');
     });
 
     it('can return correct string for more then one users without sender', () => {
@@ -68,7 +68,7 @@ describe('Message Entities', () => {
       const user_c = new z.entity.User(z.util.create_random_uuid());
       user_c.name('Jill');
       message_et.userEntities.push(user_sender, user_a, user_b, user_c);
-      expect(message_et._generateNameString()).toBe('John, Jim and Jill');
+      expect(message_et._generateNameString()).toBe('Jill, Jim and John');
     });
   });
 
