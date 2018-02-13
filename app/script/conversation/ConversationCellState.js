@@ -153,7 +153,7 @@ z.conversation.ConversationCellState = (() => {
       const last_message_et = conversation_et.getLastMessage();
 
       if (last_message_et.is_member()) {
-        const user_count = last_message_et.user_ets().length;
+        const user_count = last_message_et.userEntities().length;
 
         if (last_message_et.isMemberJoin()) {
           if (user_count === 1) {
