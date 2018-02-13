@@ -239,7 +239,7 @@
           <span class="icon-plus" data-bind="visible: isMemberJoin()"></span>
         </div>
         <div class="message-header-label">
-          <!-- ko ifnot: name().length -->
+          <!-- ko if: showSenderName() -->
             <span class="label-bold" data-bind='text: senderName()'></span>
           <!-- /ko -->
           <span class="ellipsis" data-bind="text: caption()"></span>

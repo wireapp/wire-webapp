@@ -54,6 +54,11 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
       return isTeamMemberLeave ? this.name() : z.util.get_first_name(this.user());
     });
 
+    this.showSenderName = ko.pureComputed(() => {
+      const isUnnamedGroupCreation = this.isConversationCreate() && !this.name().length;
+      return isUnnamedGroupCreation || this.isMemberChange();
+    });
+
     this.otherUser = ko.pureComputed(() => {
       if (this.hasUsers()) {
         return this.userEntities()[0];
