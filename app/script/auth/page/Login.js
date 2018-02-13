@@ -180,8 +180,8 @@ class Login extends React.PureComponent {
                   ) : null}
                   {!RuntimeUtil.isDesktop() && (
                     <Checkbox
-                      onChange={event => this.setState({persist: event.target.checked})}
-                      checked={persist}
+                      onChange={event => this.setState({persist: !event.target.checked})}
+                      checked={!persist}
                       data-uie-name="check-persist"
                       style={{justifyContent: 'center'}}
                     >
