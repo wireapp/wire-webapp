@@ -79,7 +79,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.active_conversation = ko.observable();
     this.conversations = ko.observableArray([]);
 
-    this.time_offset = 0;
+    this.timeOffset = 0;
 
     this.isTeam = this.team_repository.isTeam;
     this.isTeam.subscribe(() => this.map_guest_status_self());
@@ -309,30 +309,59 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   /**
    * Get preceding messages starting with the given message.
-   * @param {Conversation} conversation_et - Respective conversation
+   * @param {Conversation} conversationEntity - Respective conversation
    * @returns {Promise} Resolves with the message
    */
-  get_preceding_messages(conversation_et) {
-    conversation_et.is_pending(true);
+  getPrecedingMessages(conversationEntity) {
+    conversationEntity.is_pending(true);
 
-    const first_message = conversation_et.get_first_message();
-    const upper_bound = first_message
-      ? new Date(first_message.timestamp())
-      : new Date(conversation_et.get_latest_timestamp(this.time_offset) + 1);
+    const firstMessageEntity = conversationEntity.getFirstMessage();
+    const upperBound = firstMessageEntity
+      ? new Date(firstMessageEntity.timestamp())
+      : new Date(conversationEntity.get_latest_timestamp(this.timeOffset) + 1);
 
     return this.conversation_service
-      .load_preceding_events_from_db(conversation_et.id, new Date(0), upper_bound, z.config.MESSAGES_FETCH_LIMIT)
-      .then(events => {
-        if (events.length < z.config.MESSAGES_FETCH_LIMIT) {
-          conversation_et.has_further_messages(false);
-        }
-
-        return this._add_events_to_conversation(events, conversation_et);
-      })
+      .load_preceding_events_from_db(conversationEntity.id, new Date(0), upperBound, z.config.MESSAGES_FETCH_LIMIT)
+      .then(events => this._addPrecedingEventsToConversation(events, conversationEntity))
       .then(mapped_messages => {
-        conversation_et.is_pending(false);
+        conversationEntity.is_pending(false);
         return mapped_messages;
       });
+  }
+
+  _addPrecedingEventsToConversation(events, conversationEntity) {
+    const hasAdditionalMessages = events.length === z.config.MESSAGES_FETCH_LIMIT;
+
+    return this._add_events_to_conversation(events, conversationEntity).then(mappedMessageEntities => {
+      conversationEntity.hasAdditionalMessages(hasAdditionalMessages);
+
+      if (!hasAdditionalMessages) {
+        const firstMessage = conversationEntity.getFirstMessage();
+        let isCreationMessage = firstMessage && firstMessage.is_member() && firstMessage.isCreation();
+
+        if (conversationEntity.hasCreationMessage && isCreationMessage) {
+          const groupCreationIn1to1 = conversationEntity.is_one2one() && firstMessage.isGroupCreation();
+          const one2oneConnectionInGroup = conversationEntity.is_group() && firstMessage.isConnection();
+
+          if (groupCreationIn1to1 || one2oneConnectionInGroup) {
+            this.delete_message(conversationEntity, firstMessage);
+            conversationEntity.hasCreationMessage = false;
+            isCreationMessage = false;
+          }
+        }
+
+        if (!conversationEntity.hasCreationMessage && !isCreationMessage) {
+          conversationEntity.creatingFirstMessage = true;
+          const creationEvent = conversationEntity.is_group()
+            ? z.conversation.EventBuilder.buildGroupCreation(conversationEntity)
+            : z.conversation.EventBuilder.build1to1Creation(conversationEntity);
+
+          amplify.publish(z.event.WebApp.EVENT.INJECT, creationEvent);
+        }
+      }
+
+      return mappedMessageEntities;
+    });
   }
 
   /**
@@ -392,7 +421,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   get_events_for_category(conversation_et, category = z.message.MessageCategory.NONE) {
     return this.conversation_service.load_events_with_category_from_db(conversation_et.id, category).then(events => {
       const message_ets = this.event_mapper.map_json_events(events, conversation_et);
-      return Promise.all(message_ets.map(message_et => this._update_user_ets(message_et)));
+      return Promise.all(message_ets.map(message_et => this._updateMessageUserEntities(message_et)));
     });
   }
 
@@ -412,7 +441,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .search_in_conversation(conversation_et.id, query)
       .then(events => {
         const message_ets = this.event_mapper.map_json_events(events, conversation_et);
-        return Promise.all(message_ets.map(message_et => this._update_user_ets(message_et)));
+        return Promise.all(message_ets.map(message_et => this._updateMessageUserEntities(message_et)));
       })
       .then(message_ets => [message_ets, query]);
   }
@@ -425,11 +454,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   _get_unread_events(conversation_et) {
-    const first_message = conversation_et.get_first_message();
+    const first_message = conversation_et.getFirstMessage();
     const lower_bound = new Date(conversation_et.last_read_timestamp());
     const upper_bound = first_message
       ? new Date(first_message.timestamp())
-      : new Date(conversation_et.get_latest_timestamp(this.time_offset) + 1);
+      : new Date(conversation_et.get_latest_timestamp(this.timeOffset) + 1);
 
     if (lower_bound < upper_bound) {
       conversation_et.is_pending(true);
@@ -922,7 +951,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   update_time_offset(time_offset) {
-    this.time_offset = time_offset;
+    this.timeOffset = time_offset;
   }
 
   /**
@@ -1057,7 +1086,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   _update_cleared_timestamp(conversation_et) {
-    const timestamp = conversation_et.get_last_known_timestamp(this.time_offset);
+    const timestamp = conversation_et.get_last_known_timestamp(this.timeOffset);
 
     if (timestamp && conversation_et.set_timestamp(timestamp, z.conversation.TIMESTAMP_TYPE.CLEARED)) {
       const message_content = new z.proto.Cleared(conversation_et.id, timestamp);
@@ -1082,7 +1111,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       const hasResponse = response && response.event;
       const event = hasResponse
         ? response.event
-        : z.conversation.EventBuilder.build_member_leave(conversationEntity, userId, this.time_offset);
+        : z.conversation.EventBuilder.build_member_leave(conversationEntity, userId, this.timeOffset);
 
       amplify.publish(z.event.WebApp.EVENT.INJECT, event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
       return event;
@@ -1099,7 +1128,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   removeMember(conversationEntity, userId) {
     return this.conversation_service.deleteMembers(conversationEntity.id, userId).then(response => {
       const event =
-        response || z.conversation.EventBuilder.build_member_leave(conversationEntity, userId, this.time_offset);
+        response || z.conversation.EventBuilder.build_member_leave(conversationEntity, userId, this.timeOffset);
 
       amplify.publish(z.event.WebApp.EVENT.INJECT, event, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
       return event;
@@ -1202,7 +1231,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     const payload = {
       otr_muted: !conversation_et.is_muted(),
-      otr_muted_ref: new Date(conversation_et.get_last_known_timestamp(this.time_offset)).toISOString(),
+      otr_muted_ref: new Date(conversation_et.get_last_known_timestamp(this.timeOffset)).toISOString(),
     };
 
     return this.conversation_service
@@ -1256,7 +1285,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       );
     }
 
-    const archive_timestamp = conversation_et.get_last_known_timestamp(this.time_offset);
+    const archive_timestamp = conversation_et.get_last_known_timestamp(this.timeOffset);
     const no_state_change = conversation_et.is_archived() === new_archive_state;
     const no_timestamp_change = conversation_et.archived_timestamp() === archive_timestamp;
     if (no_state_change && no_timestamp_change) {
@@ -1346,7 +1375,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   _update_last_read_timestamp(conversation_et) {
-    const timestamp = conversation_et.get_last_known_timestamp(this.time_offset);
+    const timestamp = conversation_et.get_last_known_timestamp(this.timeOffset);
 
     if (timestamp && conversation_et.set_timestamp(timestamp, z.conversation.TIMESTAMP_TYPE.LAST_READ)) {
       const message_content = new z.proto.LastRead(conversation_et.id, conversation_et.last_read_timestamp());
@@ -1406,7 +1435,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           token: asset_data.asset_token,
         };
 
-        const asset_add_event = z.conversation.EventBuilder.build_asset_add(conversation_et, data, this.time_offset);
+        const asset_add_event = z.conversation.EventBuilder.build_asset_add(conversation_et, data, this.timeOffset);
 
         asset_add_event.id = message_id;
         asset_add_event.time = payload.time;
@@ -1926,7 +1955,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           throw new Error('Cannot send message to conversation you are not part of');
         }
 
-        const optimistic_event = z.conversation.EventBuilder.build_message_add(conversation_et, this.time_offset);
+        const optimistic_event = z.conversation.EventBuilder.build_message_add(conversation_et, this.timeOffset);
         return this.cryptography_repository.cryptography_mapper.map_generic_message(generic_message, optimistic_event);
       })
       .then(message_mapped => {
@@ -2559,10 +2588,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
           case z.event.Backend.CONVERSATION.CREATE:
             return this._onCreate(eventJson);
           case z.event.Backend.CONVERSATION.MEMBER_JOIN:
-            return this._on_member_join(conversationEntity, eventJson);
+            return this._onMemberJoin(conversationEntity, eventJson);
           case z.event.Backend.CONVERSATION.MEMBER_LEAVE:
           case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE:
-            return this._on_member_leave(conversationEntity, eventJson);
+            return this._onMemberLeave(conversationEntity, eventJson);
           case z.event.Backend.CONVERSATION.MEMBER_UPDATE:
             return this._onMemberUpdate(conversationEntity, eventJson);
           case z.event.Backend.CONVERSATION.RENAME:
@@ -2571,12 +2600,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
             return this._on_asset_add(conversationEntity, eventJson);
           case z.event.Client.CONVERSATION.CONFIRMATION:
             return this._on_confirmation(conversationEntity, eventJson);
+          case z.event.Client.CONVERSATION.GROUP_CREATION:
+            return this._onGroupCreation(conversationEntity, eventJson);
           case z.event.Client.CONVERSATION.MESSAGE_ADD:
             return this._on_message_add(conversationEntity, eventJson);
           case z.event.Client.CONVERSATION.MESSAGE_DELETE:
             return this._on_message_deleted(conversationEntity, eventJson);
           case z.event.Client.CONVERSATION.MESSAGE_HIDDEN:
             return this._onMessageHidden(eventJson);
+          case z.event.Client.CONVERSATION.ONE2ONE_CREATION:
+            return this._on1to1Creation(conversationEntity, eventJson);
           case z.event.Client.CONVERSATION.REACTION:
             return this._on_reaction(conversationEntity, eventJson);
           default:
@@ -2627,7 +2660,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.filtered_conversations()
       .filter(conversation_et => !conversation_et.removed_from_conversation())
       .forEach(conversation_et => {
-        const missed_event = z.conversation.EventBuilder.build_missed(conversation_et, this.time_offset);
+        const missed_event = z.conversation.EventBuilder.build_missed(conversation_et, this.timeOffset);
         amplify.publish(z.event.WebApp.EVENT.INJECT, missed_event);
       });
   }
@@ -2670,6 +2703,25 @@ z.conversation.ConversationRepository = class ConversationRepository {
         } else {
           throw error;
         }
+      });
+  }
+
+  _on1to1Creation(conversationEntity, eventJson) {
+    return Promise.resolve()
+      .then(() => this.event_mapper.map_json_event(eventJson, conversationEntity))
+      .then(messageEntity => this._updateMessageUserEntities(messageEntity))
+      .then(messageEntity => {
+        if (conversationEntity && messageEntity) {
+          const firstUserEntity = conversationEntity.firstUserEntity();
+          const isOutgoingRequest = firstUserEntity && firstUserEntity.is_outgoing_request();
+          if (isOutgoingRequest) {
+            messageEntity.memberMessageType = z.message.SystemMessageType.CONNECTION_REQUEST;
+          }
+
+          conversationEntity.add_message(messageEntity);
+        }
+
+        return {conversationEntity, messageEntity};
       });
   }
 
@@ -2745,57 +2797,94 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when the event was handled
    */
   _onCreate(eventJson) {
-    return this.find_conversation_by_id(eventJson.conversation)
+    const {conversation: conversationId, data: eventData, time} = eventJson;
+    const eventTimestamp = new Date(time).getTime();
+    const initialTimestamp = _.isNaN(eventTimestamp) ? this.getLatestEventTimestamp(true) : eventTimestamp;
+
+    return this.find_conversation_by_id(conversationId)
       .catch(error => {
         const isConversationNotFound = error.type === z.conversation.ConversationError.TYPE.NOT_FOUND;
         if (!isConversationNotFound) {
           throw error;
         }
 
-        const {data: eventData, time} = eventJson;
-        const eventTimestamp = new Date(time).getTime();
-        const initial_timestamp = _.isNaN(eventTimestamp) ? this.getLatestEventTimestamp(true) : eventTimestamp;
-        return this.map_conversations(eventData, initial_timestamp);
+        return this.map_conversations(eventData, initialTimestamp);
       })
       .then(conversationEntity => this.update_participating_user_ets(conversationEntity))
       .then(conversationEntity => this.save_conversation(conversationEntity))
-      .then(conversationEntity => this._prepareConversationCreateNotification(conversationEntity));
+      .then(conversationEntity => {
+        if (conversationEntity) {
+          conversationEntity.hasCreationMessage = true;
+          const creationEvent = z.conversation.EventBuilder.buildGroupCreation(conversationEntity, initialTimestamp);
+          amplify.publish(z.event.WebApp.EVENT.INJECT, creationEvent, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
+          return {conversationEntity};
+        }
+      });
+  }
+
+  _onGroupCreation(conversationEntity, eventJson) {
+    return Promise.resolve()
+      .then(() => this.event_mapper.map_json_event(eventJson, conversationEntity))
+      .then(messageEntity => {
+        const creatorId = conversationEntity.creator;
+        const createdBySelfUser = creatorId === this.selfUser().id;
+        if (!createdBySelfUser && conversationEntity.removed_from_conversation()) {
+          messageEntity.user_ids.push(this.selfUser().id);
+        }
+
+        const creator = conversationEntity.participating_user_ids().find(userEntity => userEntity.id === creatorId);
+        if (!creator) {
+          messageEntity.memberMessageType = z.message.SystemMessageType.CONVERSATION_RESUME;
+        }
+
+        return this._updateMessageUserEntities(messageEntity);
+      })
+      .then(messageEntity => {
+        if (conversationEntity && messageEntity) {
+          conversationEntity.add_message(messageEntity);
+        }
+
+        return {conversationEntity, messageEntity};
+      });
   }
 
   /**
    * User were added to a group conversation.
    *
    * @private
-   * @param {Conversation} conversation_et - Conversation to add users to
-   * @param {Object} event_json - JSON data of 'conversation.member-join' event
+   * @param {Conversation} conversationEntity - Conversation to add users to
+   * @param {Object} eventJson - JSON data of 'conversation.member-join' event
    * @returns {Promise} Resolves when the event was handled
    */
-  _on_member_join(conversation_et, event_json) {
+  _onMemberJoin(conversationEntity, eventJson) {
     // Ignore if we join a 1to1 conversation (accept a connection request)
-    const connection_et = this.user_repository.get_connection_by_conversation_id(conversation_et.id);
-    if (connection_et && connection_et.status() === z.user.ConnectionStatus.PENDING) {
+    const connectionEntity = this.user_repository.get_connection_by_conversation_id(conversationEntity.id);
+    const isPendingConnection = connectionEntity && connectionEntity.status() === z.user.ConnectionStatus.PENDING;
+    if (isPendingConnection) {
       return Promise.resolve();
     }
 
-    const event_data = event_json.data;
+    const eventData = eventJson.data;
 
-    event_data.user_ids.forEach(user_id => {
-      if (user_id !== this.selfUser().id && !conversation_et.participating_user_ids().includes(user_id)) {
-        conversation_et.participating_user_ids.push(user_id);
+    eventData.user_ids.forEach(userId => {
+      const isSelfUser = userId === this.selfUser().id;
+      const isParticipatingUser = conversationEntity.participating_user_ids().includes(userId);
+      if (!isSelfUser && !isParticipatingUser) {
+        conversationEntity.participating_user_ids.push(userId);
       }
     });
 
     // Self user joins again
-    const self_user_rejoins = event_data.user_ids.includes(this.selfUser().id);
-    if (self_user_rejoins) {
-      conversation_et.status(z.conversation.ConversationStatus.CURRENT_MEMBER);
+    const selfUserRejoins = eventData.user_ids.includes(this.selfUser().id);
+    if (selfUserRejoins) {
+      conversationEntity.status(z.conversation.ConversationStatus.CURRENT_MEMBER);
     }
 
-    return this.update_participating_user_ets(conversation_et)
-      .then(() => this._add_event_to_conversation(event_json, conversation_et))
-      .then(message_et => {
-        this.verification_state_handler.on_member_joined(conversation_et, event_data.user_ids);
-        return {conversationEntity: conversation_et, messageEntity: message_et};
+    return this.update_participating_user_ets(conversationEntity)
+      .then(() => this._add_event_to_conversation(eventJson, conversationEntity))
+      .then(messageEntity => {
+        this.verification_state_handler.on_member_joined(conversationEntity, eventData.user_ids);
+        return {conversationEntity, messageEntity};
       });
   }
 
@@ -2803,54 +2892,53 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Members of a group conversation were removed or left.
    *
    * @private
-   * @param {Conversation} conversation_et - Conversation to remove users from
-   * @param {Object} event_json - JSON data of 'conversation.member-leave' event
+   * @param {Conversation} conversationEntity - Conversation to remove users from
+   * @param {Object} eventJson - JSON data of 'conversation.member-leave' event
    * @returns {Promise} Resolves when the event was handled
    */
-  _on_member_leave(conversation_et, event_json) {
-    const self_user_id = this.selfUser().id;
-    const {data: event_data, from} = event_json;
+  _onMemberLeave(conversationEntity, eventJson) {
+    const {data: eventData, from} = eventJson;
 
-    const is_from_self = from === self_user_id;
-    const removes_self = event_data.user_ids.includes(self_user_id);
-    const self_leaving_cleared_conversation = is_from_self && removes_self && conversation_et.is_cleared();
+    const isFromSelf = from === this.selfUser().id;
+    const removesSelfUser = eventData.userIds.includes(this.selfUser().id);
+    const selfLeavingClearedConversation = isFromSelf && removesSelfUser && conversationEntity.is_cleared();
 
-    if (removes_self) {
-      conversation_et.status(z.conversation.ConversationStatus.PAST_MEMBER);
+    if (removesSelfUser) {
+      conversationEntity.status(z.conversation.ConversationStatus.PAST_MEMBER);
 
-      if (conversation_et.call()) {
+      if (conversationEntity.call()) {
         amplify.publish(
           z.event.WebApp.CALL.STATE.LEAVE,
-          conversation_et.id,
+          conversationEntity.id,
           z.calling.enum.TERMINATION_REASON.MEMBER_LEAVE
         );
       }
     }
 
-    if (!self_leaving_cleared_conversation) {
-      return this._add_event_to_conversation(event_json, conversation_et)
-        .then(message_et => {
-          message_et
-            .user_ets()
-            .filter(user_et => !user_et.is_me)
-            .forEach(user_et => {
-              conversation_et.participating_user_ids.remove(user_et.id);
+    if (!selfLeavingClearedConversation) {
+      return this._add_event_to_conversation(eventJson, conversationEntity)
+        .then(messageEntity => {
+          messageEntity
+            .userEntities()
+            .filter(userEntity => !userEntity.is_me)
+            .forEach(userEntity => {
+              conversationEntity.participating_user_ids.remove(userEntity.id);
 
-              if (conversation_et.call()) {
-                amplify.publish(z.event.WebApp.CALL.STATE.PARTICIPANT_LEFT, conversation_et.id, user_et.id);
+              if (conversationEntity.call()) {
+                amplify.publish(z.event.WebApp.CALL.STATE.PARTICIPANT_LEFT, conversationEntity.id, userEntity.id);
               }
             });
 
-          return this.update_participating_user_ets(conversation_et).then(() => message_et);
+          return this.update_participating_user_ets(conversationEntity).then(() => messageEntity);
         })
-        .then(message_et => {
-          this.verification_state_handler.on_member_left(conversation_et);
+        .then(messageEntity => {
+          this.verification_state_handler.on_member_left(conversationEntity);
 
-          if (is_from_self && conversation_et.removed_from_conversation()) {
-            this.archive_conversation(conversation_et);
+          if (isFromSelf && conversationEntity.removed_from_conversation()) {
+            this.archive_conversation(conversationEntity);
           }
 
-          return {conversationEntity: conversation_et, messageEntity: message_et};
+          return {conversationEntity, messageEntity};
         });
     }
   }
@@ -3095,7 +3183,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
             event_json
           );
 
-          return this._update_user_ets(message_et).then(updated_message_et => {
+          return this._updateMessageUserEntities(message_et).then(updated_message_et => {
             this.conversation_service.update_message_in_db(updated_message_et, changes, conversation_et.id);
             return this._prepareReactionNotification(conversation_et, updated_message_et, event_json);
           });
@@ -3144,7 +3232,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(() => this.event_mapper.map_json_event(json, conversation_et, true))
       .then(message_et => {
         if (message_et) {
-          return this._update_user_ets(message_et);
+          return this._updateMessageUserEntities(message_et);
         }
       })
       .then(message_et => {
@@ -3169,7 +3257,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return Promise.resolve()
       .then(() => {
         const message_ets = this.event_mapper.map_json_events(events, conversation_et, true);
-        return Promise.all(message_ets.map(message_et => this._update_user_ets(message_et)));
+        return Promise.all(message_ets.map(message_et => this._updateMessageUserEntities(message_et)));
       })
       .then(message_ets => {
         if (prepend && conversation_et.messages().length) {
@@ -3194,28 +3282,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
       this.update_participating_user_ets(conversation_et);
       this._get_unread_events(conversation_et);
     }
-  }
-
-  /**
-   * Forward the 'conversation.create' event to the Notification repository for browser and audio notifications.
-   *
-   * @private
-   * @param {Conversation} conversationEntity - Conversation that was created
-   * @returns {Promise} Resolves when the notification was prepared
-   */
-  _prepareConversationCreateNotification(conversationEntity) {
-    const createdBySelf = conversationEntity.creator === this.selfUser().id;
-
-    if (!createdBySelf) {
-      return this.user_repository.get_user_by_id(conversationEntity.creator).then(userEntity => {
-        const messageEntity = new z.entity.MemberMessage();
-        messageEntity.user(userEntity);
-        messageEntity.member_message_type = z.message.SystemMessageType.CONVERSATION_CREATE;
-        return {conversationEntity, messageEntity};
-      });
-    }
-
-    return Promise.resolve({conversationEntity});
   }
 
   /**
@@ -3247,41 +3313,41 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Updates the user entities that are part of a message.
    *
    * @private
-   * @param {Message} message_et - Message to be updated
+   * @param {Message} messageEntity - Message to be updated
    * @returns {Promise} Resolves when users have been update
    */
-  _update_user_ets(message_et) {
-    return this.user_repository.get_user_by_id(message_et.from).then(user_et => {
-      message_et.user(user_et);
+  _updateMessageUserEntities(messageEntity) {
+    return this.user_repository.get_user_by_id(messageEntity.from).then(userEntity => {
+      messageEntity.user(userEntity);
 
-      if (message_et.is_member() || message_et.user_ets) {
-        return this.user_repository.get_users_by_id(message_et.user_ids()).then(user_ets => {
-          message_et.user_ets(user_ets);
-          return message_et;
+      if (messageEntity.is_member() || messageEntity.userEntities) {
+        return this.user_repository.get_users_by_id(messageEntity.userIds()).then(userEntities => {
+          messageEntity.userEntities(userEntities);
+          return messageEntity;
         });
       }
 
-      if (message_et.reactions) {
-        const user_ids = Object.keys(message_et.reactions());
+      if (messageEntity.reactions) {
+        const userIds = Object.keys(messageEntity.reactions());
 
-        message_et.reactions_user_ets.removeAll();
-        if (user_ids.length) {
-          return this.user_repository.get_users_by_id(user_ids).then(user_ets => {
-            message_et.reactions_user_ets(user_ets);
-            return message_et;
+        messageEntity.reactions_user_ets.removeAll();
+        if (userIds.length) {
+          return this.user_repository.get_users_by_id(userIds).then(userEntities => {
+            messageEntity.reactions_user_ets(userEntities);
+            return messageEntity;
           });
         }
       }
 
-      if (message_et.has_asset_text()) {
-        message_et.assets().forEach(asset_et => {
-          if (asset_et.is_text()) {
-            asset_et.theme_color = message_et.user().accent_color();
+      if (messageEntity.has_asset_text()) {
+        messageEntity.assets().forEach(assetEntity => {
+          if (assetEntity.is_text()) {
+            assetEntity.theme_color = messageEntity.user().accent_color();
           }
         });
       }
 
-      return message_et;
+      return messageEntity;
     });
   }
 

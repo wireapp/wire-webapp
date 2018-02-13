@@ -70,7 +70,7 @@ z.event.EventRepository = class EventRepository {
     this.logger = new z.util.Logger('z.event.EventRepository', z.config.LOGGER.OPTIONS);
 
     this.current_client = undefined;
-    this.time_offset = 0;
+    this.timeOffset = 0;
 
     this.notification_handling_state = ko.observable(z.event.NOTIFICATION_HANDLING_STATE.STREAM);
     this.notification_handling_state.subscribe(handling_state => {
@@ -436,10 +436,10 @@ z.event.EventRepository = class EventRepository {
     const updated_time_offset = new Date() - new Date(backend_time);
 
     if (_.isNumber(updated_time_offset)) {
-      this.time_offset = updated_time_offset;
-      amplify.publish(z.event.WebApp.EVENT.UPDATE_TIME_OFFSET, this.time_offset);
+      this.timeOffset = updated_time_offset;
+      amplify.publish(z.event.WebApp.EVENT.UPDATE_TIME_OFFSET, this.timeOffset);
       this.logger.info(
-        `Backend reported current time as '${backend_time}'. Time offset updated to '${this.time_offset}' ms`
+        `Backend reported current time as '${backend_time}'. Time offset updated to '${this.timeOffset}' ms`
       );
     }
   }
@@ -751,7 +751,7 @@ z.event.EventRepository = class EventRepository {
     const {content = {}, conversation: conversation_id, time, type} = event;
     const forced_event_types = [z.calling.enum.CALL_MESSAGE_TYPE.CANCEL, z.calling.enum.CALL_MESSAGE_TYPE.GROUP_LEAVE];
 
-    const corrected_timestamp = Date.now() - this.time_offset;
+    const corrected_timestamp = Date.now() - this.timeOffset;
     const threshold_timestamp = new Date(time).getTime() + EventRepository.CONFIG.E_CALL_EVENT_LIFETIME;
 
     const is_forced_event_type = forced_event_types.includes(content.type);

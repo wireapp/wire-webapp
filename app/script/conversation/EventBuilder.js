@@ -23,6 +23,20 @@ window.z = window.z || {};
 window.z.conversation = z.conversation || {};
 
 z.conversation.EventBuilder = (function() {
+  const _build1to1Creation = (conversationEntity, timestamp = 0) => {
+    const {creator: creatorId, id} = conversationEntity;
+    return {
+      conversation: id,
+      data: {
+        userIds: conversationEntity.participating_user_ids(),
+      },
+      from: creatorId,
+      id: z.util.create_random_uuid(),
+      time: new Date(timestamp).toISOString(),
+      type: z.event.Client.CONVERSATION.ONE2ONE_CREATION,
+    };
+  };
+
   const _build_all_verified = (conversation_et, time_offset) => {
     const {self, id} = conversation_et;
 
@@ -87,6 +101,21 @@ z.conversation.EventBuilder = (function() {
       id: message_id,
       time: new Date(deleted_message_et.timestamp()).toISOString(),
       type: z.event.Client.CONVERSATION.DELETE_EVERYWHERE,
+    };
+  };
+
+  const _buildGroupCreation = (conversationEntity, timestamp = 0) => {
+    const {creator: creatorId, id} = conversationEntity;
+    return {
+      conversation: id,
+      data: {
+        name: conversationEntity.name(),
+        userIds: conversationEntity.participating_user_ids(),
+      },
+      from: creatorId,
+      id: z.util.create_random_uuid(),
+      time: new Date(timestamp).toISOString(),
+      type: z.event.Client.CONVERSATION.GROUP_CREATION,
     };
   };
 
@@ -218,5 +247,7 @@ z.conversation.EventBuilder = (function() {
     build_unable_to_decrypt: _build_unable_to_decrypt,
     build_voice_channel_activate: _build_voice_channel_activate,
     build_voice_channel_deactivate: _build_voice_channel_deactivate,
+    build1to1Creation: _build1to1Creation,
+    buildGroupCreation: _buildGroupCreation,
   };
 })();

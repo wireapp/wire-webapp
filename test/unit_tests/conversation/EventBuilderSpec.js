@@ -59,7 +59,7 @@ describe('z.conversation.EventBuilder', () => {
     expect(message_et.verification_message_type).toBe(z.message.VerificationMessageType.NEW_DEVICE);
     expect(message_et.from).toBe(conversation_et.self.id);
     expect(message_et.conversation_id).toBe(conversation_et.id);
-    expect(message_et.user_ids()).toEqual(user_ids);
+    expect(message_et.userIds()).toEqual(user_ids);
   });
 
   it('build_missed', () => {

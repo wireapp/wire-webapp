@@ -47,13 +47,9 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
 
     this.conversation = ko.observable(new z.entity.Conversation());
     this.center_messages = ko.pureComputed(() => {
-      const [first_visible_message] = this.conversation().messages_visible();
-      if (first_visible_message && first_visible_message.is_member()) {
-        return (
-          !this.conversation().has_further_messages() &&
-          this.conversation().messages_visible().length === 1 &&
-          first_visible_message.is_connection()
-        );
+      const [firstVisibleMessage] = this.conversation().messages_visible();
+      if (firstVisibleMessage && firstVisibleMessage.is_member()) {
+        return this.conversation().messages_visible().length === 1 && firstVisibleMessage.isConnection();
       }
     });
 
@@ -63,7 +59,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
     // Store last read to show until user switches conversation
     this.conversation_last_read_timestamp = ko.observable(undefined);
 
-    // @todo We should align this with has_further_messages
+    // @todo We should align this with hasAdditionalMessages
     this.conversation_reached_bottom = false;
 
     // Store conversation to mark as read when browser gets focus
@@ -207,10 +203,10 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
         if (this.marked_message()) {
           return this.conversation_repository.get_messages_with_offset(_conversation_et, this.marked_message());
         }
-        return this.conversation_repository.get_preceding_messages(_conversation_et);
+        return this.conversation_repository.getPrecedingMessages(_conversation_et);
       })
       .then(() => {
-        const last_message = this.conversation().get_last_message();
+        const last_message = this.conversation().getLastMessage();
         if (last_message && last_message.timestamp() === this.conversation().last_event_timestamp()) {
           this.conversation_reached_bottom = true;
         }
@@ -324,12 +320,12 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
    * @returns {undefined} No return value
    */
   _pull_messages() {
-    if (!this.conversation().is_pending() && this.conversation().has_further_messages()) {
+    if (!this.conversation().is_pending() && this.conversation().hasAdditionalMessages()) {
       const inner_container = $('.messages-wrap').children()[0];
       const old_list_height = inner_container.scrollHeight;
 
       this.capture_scrolling_event = false;
-      this.conversation_repository.get_preceding_messages(this.conversation()).then(() => {
+      this.conversation_repository.getPrecedingMessages(this.conversation()).then(() => {
         const new_list_height = inner_container.scrollHeight;
         $('.messages-wrap').scrollTop(new_list_height - old_list_height);
         this.capture_scrolling_event = true;
@@ -342,7 +338,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
    * @returns {undefined} No return value
    */
   _push_messages() {
-    const last_message = this.conversation().get_last_message();
+    const last_message = this.conversation().getLastMessage();
 
     if (last_message && !this.conversation_reached_bottom) {
       this.capture_scrolling_event = false;
@@ -384,7 +380,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
 
     this.conversation().remove_messages();
     this.conversation_repository
-      .get_preceding_messages(this.conversation())
+      .getPrecedingMessages(this.conversation())
       .then(() => $('.messages-wrap').scroll_to_bottom());
   }
 

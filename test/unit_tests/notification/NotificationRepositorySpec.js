@@ -464,7 +464,7 @@ describe('z.notification.NotificationRepository', () => {
       conversation_et.from = payload.users.get.one[0].id;
       message_et = new z.entity.MemberMessage();
       message_et.user(user_et);
-      message_et.member_message_type = z.message.SystemMessageType.CONVERSATION_CREATE;
+      message_et.memberMessageType = z.message.SystemMessageType.CONVERSATION_CREATE;
 
       const expected_body = `${first_name} started a conversation`;
       verify_notification_system(done, conversation_et, message_et, expected_body);
@@ -486,7 +486,7 @@ describe('z.notification.NotificationRepository', () => {
     beforeEach(() => {
       message_et = new z.entity.MemberMessage();
       message_et.user(user_et);
-      message_et.member_message_type = z.message.SystemMessageType.NORMAL;
+      message_et.memberMessageType = z.message.SystemMessageType.NORMAL;
       other_user_et = TestFactory.user_repository.user_mapper.map_user_from_object(payload.users.get.many[1]);
     });
 
@@ -501,7 +501,7 @@ describe('z.notification.NotificationRepository', () => {
       });
 
       it('with one user being added to the conversation', done => {
-        message_et.user_ets([other_user_et]);
+        message_et.userEntities([other_user_et]);
 
         const [first_name_added] = entities.user.jane_roe.name.split(' ');
         const expected_body = `${first_name} added ${first_name_added} to the conversation`;
@@ -510,7 +510,7 @@ describe('z.notification.NotificationRepository', () => {
 
       it('with you being added to the conversation', done => {
         other_user_et.is_me = true;
-        message_et.user_ets([other_user_et]);
+        message_et.userEntities([other_user_et]);
 
         const expected_body = `${first_name} added you to the conversation`;
         verify_notification_system(done, conversation_et, message_et, expected_body);
@@ -518,7 +518,7 @@ describe('z.notification.NotificationRepository', () => {
 
       it('with multiple users being added to the conversation', done => {
         const user_ids = [entities.user.john_doe.id, entities.user.jane_roe.id];
-        message_et.user_ids(user_ids);
+        message_et.userIds(user_ids);
 
         const expected_body = `${first_name} added 2 people to the conversation`;
         verify_notification_system(done, conversation_et, message_et, expected_body);
@@ -535,7 +535,7 @@ describe('z.notification.NotificationRepository', () => {
       });
 
       it('with one user being removed from the conversation', done => {
-        message_et.user_ets([other_user_et]);
+        message_et.userEntities([other_user_et]);
 
         TestFactory.notification_repository
           .notify(message_et, undefined, conversation_et)
@@ -548,7 +548,7 @@ describe('z.notification.NotificationRepository', () => {
 
       it('with you being removed from the conversation', done => {
         other_user_et.is_me = true;
-        message_et.user_ets([other_user_et]);
+        message_et.userEntities([other_user_et]);
 
         const expected_body = `${first_name} removed you from the conversation`;
         verify_notification_system(done, conversation_et, message_et, expected_body);
@@ -556,7 +556,7 @@ describe('z.notification.NotificationRepository', () => {
 
       it('with multiple users being removed from the conversation', done => {
         const user_ets = TestFactory.user_repository.user_mapper.map_users_from_object(payload.users.get.many);
-        message_et.user_ets(user_ets);
+        message_et.userEntities(user_ets);
 
         TestFactory.notification_repository
           .notify(message_et, undefined, conversation_et)
@@ -568,7 +568,7 @@ describe('z.notification.NotificationRepository', () => {
       });
 
       it('with someone leaving the conversation by himself', done => {
-        message_et.user_ets([message_et.user()]);
+        message_et.userEntities([message_et.user()]);
 
         TestFactory.notification_repository
           .notify(message_et, undefined, conversation_et)
@@ -596,21 +596,21 @@ describe('z.notification.NotificationRepository', () => {
 
     it('if a connection request is incoming', done => {
       connection_et.status = 'pending';
-      message_et.member_message_type = z.message.SystemMessageType.CONNECTION_REQUEST;
+      message_et.memberMessageType = z.message.SystemMessageType.CONNECTION_REQUEST;
 
       const expected_body = z.string.notification_connection_request;
       verify_notification_system(done, conversation_et, message_et, expected_body, expected_title);
     });
 
     it('if your connection request was accepted', done => {
-      message_et.member_message_type = z.message.SystemMessageType.CONNECTION_ACCEPTED;
+      message_et.memberMessageType = z.message.SystemMessageType.CONNECTION_ACCEPTED;
 
       const expected_body = z.string.notification_connection_accepted;
       verify_notification_system(done, conversation_et, message_et, expected_body, expected_title);
     });
 
     it('if you are automatically connected', done => {
-      message_et.member_message_type = z.message.SystemMessageType.CONNECTION_CONNECTED;
+      message_et.memberMessageType = z.message.SystemMessageType.CONNECTION_CONNECTED;
 
       const expected_body = z.string.notification_connection_connected;
       verify_notification_system(done, conversation_et, message_et, expected_body, expected_title);

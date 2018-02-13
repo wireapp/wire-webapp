@@ -175,18 +175,11 @@ z.conversation.ConversationMapper = class ConversationMapper {
       conversation_et.last_server_timestamp(initial_timestamp);
     }
 
-    // All users that are still active
-    if (others) {
-      conversation_et.participating_user_ids(others);
-    } else {
-      const participating_user_ids = members.others
-        .filter(other => other.status === z.conversation.ConversationStatus.CURRENT_MEMBER)
-        .map(other => other.id);
+    // Active participants from database or backend payload
+    const participatingUserIds = others ? others : members.others.map(other => other.id);
+    conversation_et.participating_user_ids(participatingUserIds);
 
-      conversation_et.participating_user_ids(participating_user_ids);
-    }
-
-    // Data from IndexedDB or backend
+    // Team ID from database or backend payload
     const team_id = conversation_data.team_id ? conversation_data.team_id : conversation_data.team;
     if (team_id) {
       conversation_et.team_id = team_id;

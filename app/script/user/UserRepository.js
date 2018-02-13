@@ -495,15 +495,15 @@ z.user.UserRepository = class UserRepository {
 
         switch (connection_et.status()) {
           case z.user.ConnectionStatus.PENDING: {
-            message_et.member_message_type = z.message.SystemMessageType.CONNECTION_REQUEST;
+            message_et.memberMessageType = z.message.SystemMessageType.CONNECTION_REQUEST;
             break;
           }
 
           case z.user.ConnectionStatus.ACCEPTED: {
             if (previous_status === z.user.ConnectionStatus.SENT) {
-              message_et.member_message_type = z.message.SystemMessageType.CONNECTION_ACCEPTED;
+              message_et.memberMessageType = z.message.SystemMessageType.CONNECTION_ACCEPTED;
             } else {
-              message_et.member_message_type = z.message.SystemMessageType.CONNECTION_CONNECTED;
+              message_et.memberMessageType = z.message.SystemMessageType.CONNECTION_CONNECTED;
             }
             break;
           }

@@ -263,16 +263,16 @@ z.notification.NotificationRepository = class NotificationRepository {
    * @returns {string} Notification message body
    */
   _createBodyMemberJoin(messageEntity) {
-    const updatedOneParticipant = messageEntity.user_ets().length === 1;
+    const updatedOneParticipant = messageEntity.userEntities().length === 1;
     if (updatedOneParticipant) {
-      const [otherUserEntity] = messageEntity.user_ets();
+      const [otherUserEntity] = messageEntity.userEntities();
       const nameOfJoinedUser = z.util.get_first_name(otherUserEntity, z.string.Declension.ACCUSATIVE);
       const substitutions = {user1: messageEntity.user().first_name(), user2: nameOfJoinedUser};
 
       return z.l10n.text(z.string.notification_member_join_one, substitutions);
     }
 
-    const substitutions = {number: messageEntity.user_ids().length, user: messageEntity.user().first_name()};
+    const substitutions = {number: messageEntity.userIds().length, user: messageEntity.user().first_name()};
     return z.l10n.text(z.string.notification_member_join_many, substitutions);
   }
 
@@ -285,8 +285,8 @@ z.notification.NotificationRepository = class NotificationRepository {
    * @returns {string} Notification message body
    */
   _createBodyMemberLeave(messageEntity) {
-    const updatedOneParticipant = messageEntity.user_ets().length === 1;
-    if (updatedOneParticipant && !messageEntity.remote_user_ets().length) {
+    const updatedOneParticipant = messageEntity.userEntities().length === 1;
+    if (updatedOneParticipant && !messageEntity.remoteUserEntities().length) {
       return z.l10n.text(z.string.notification_member_leave_removed_you, messageEntity.user().first_name());
     }
   }
@@ -303,13 +303,13 @@ z.notification.NotificationRepository = class NotificationRepository {
   _createBodyMemberUpdate(messageEntity, connectionEntity, conversationEntity) {
     const isGroup = conversationEntity && conversationEntity.is_group();
 
-    switch (messageEntity.member_message_type) {
+    switch (messageEntity.memberMessageType) {
       case z.message.SystemMessageType.NORMAL:
         if (isGroup) {
-          if (messageEntity.is_member_join()) {
+          if (messageEntity.isMemberJoin()) {
             return this._createBodyMemberJoin(messageEntity);
           }
-          if (messageEntity.is_member_leave()) {
+          if (messageEntity.isMemberLeave()) {
             return this._createBodyMemberLeave(messageEntity);
           }
         }
@@ -545,7 +545,7 @@ z.notification.NotificationRepository = class NotificationRepository {
     const conversationId = this._getConversationId(connectionEntity, conversationEntity);
 
     if (messageEntity.is_member()) {
-      switch (messageEntity.member_message_type) {
+      switch (messageEntity.memberMessageType) {
         case z.message.SystemMessageType.CONNECTION_ACCEPTED:
         case z.message.SystemMessageType.CONNECTION_CONNECTED:
           return () => amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationId);

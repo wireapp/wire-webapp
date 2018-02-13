@@ -395,7 +395,7 @@ describe('ConversationRepository', () => {
     });
   });
 
-  describe('get_preceding_messages', () => {
+  describe('getPrecedingMessages', () => {
     it('gets messages which are not broken by design', done => {
       spyOn(TestFactory.user_repository, 'get_user_by_id').and.returnValue(Promise.resolve(new z.entity.User()));
 
@@ -412,7 +412,7 @@ describe('ConversationRepository', () => {
       storage_service
         .save(z.storage.StorageService.OBJECT_STORE.EVENTS, bad_message_key, bad_message)
         .catch(() => storage_service.save(z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, good_message))
-        .then(() => TestFactory.conversation_repository.get_preceding_messages(conversation_et))
+        .then(() => TestFactory.conversation_repository.getPrecedingMessages(conversation_et))
         .then(loaded_events => {
           expect(loaded_events.length).toBe(1);
           done();
@@ -675,8 +675,7 @@ describe('ConversationRepository', () => {
         spyOn(TestFactory.conversation_repository, '_onCreate').and.callThrough();
         spyOn(TestFactory.conversation_repository, 'map_conversations').and.returnValue(true);
         spyOn(TestFactory.conversation_repository, 'update_participating_user_ets').and.returnValue(true);
-        spyOn(TestFactory.conversation_repository, 'save_conversation').and.returnValue(true);
-        spyOn(TestFactory.conversation_repository, '_prepareConversationCreateNotification').and.returnValue(true);
+        spyOn(TestFactory.conversation_repository, 'save_conversation').and.returnValue(false);
 
         conversationId = z.util.create_random_uuid();
         createEvent = {conversation: conversationId, data: {}, type: z.event.Backend.CONVERSATION.CREATE};
@@ -688,7 +687,6 @@ describe('ConversationRepository', () => {
           .then(() => {
             expect(TestFactory.conversation_repository._onCreate).toHaveBeenCalled();
             expect(TestFactory.conversation_repository.map_conversations).toHaveBeenCalledWith(createEvent.data, 1);
-            expect(TestFactory.conversation_repository._prepareConversationCreateNotification).toHaveBeenCalled();
             done();
           })
           .catch(done.fail);
@@ -706,7 +704,6 @@ describe('ConversationRepository', () => {
               createEvent.data,
               time.getTime()
             );
-            expect(TestFactory.conversation_repository._prepareConversationCreateNotification).toHaveBeenCalled();
             done();
           })
           .catch(done.fail);
@@ -717,7 +714,7 @@ describe('ConversationRepository', () => {
       let member_join_event = null;
 
       beforeEach(() => {
-        spyOn(TestFactory.conversation_repository, '_on_member_join').and.callThrough();
+        spyOn(TestFactory.conversation_repository, '_onMemberJoin').and.callThrough();
         spyOn(TestFactory.conversation_repository, 'update_participating_user_ets').and.callThrough();
 
         member_join_event = {
@@ -736,7 +733,7 @@ describe('ConversationRepository', () => {
         TestFactory.conversation_repository
           .onConversationEvent(member_join_event)
           .then(() => {
-            expect(TestFactory.conversation_repository._on_member_join).toHaveBeenCalled();
+            expect(TestFactory.conversation_repository._onMemberJoin).toHaveBeenCalled();
             expect(TestFactory.conversation_repository.update_participating_user_ets).toHaveBeenCalled();
             done();
           })
@@ -753,7 +750,7 @@ describe('ConversationRepository', () => {
         TestFactory.conversation_repository
           .onConversationEvent(member_join_event)
           .then(() => {
-            expect(TestFactory.conversation_repository._on_member_join).toHaveBeenCalled();
+            expect(TestFactory.conversation_repository._onMemberJoin).toHaveBeenCalled();
             expect(TestFactory.conversation_repository.update_participating_user_ets).not.toHaveBeenCalled();
             done();
           })
