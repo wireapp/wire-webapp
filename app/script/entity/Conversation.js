@@ -49,6 +49,8 @@ z.entity.Conversation = class Conversation {
     this.participating_user_ids = ko.observableArray([]);
     this.self = undefined;
 
+    this.hasCreationMessage = false;
+
     this.firstUserEntity = ko.pureComputed(() => this.participating_user_ets()[0]);
     this.availabilityOfUser = ko.pureComputed(() => this.firstUserEntity() && this.firstUserEntity().availability());
 

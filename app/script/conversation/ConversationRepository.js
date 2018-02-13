@@ -337,19 +337,21 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
       if (!hasAdditionalMessages) {
         const firstMessage = conversationEntity.getFirstMessage();
-        let hasCreationMessage = firstMessage && firstMessage.is_member() && firstMessage.isCreation();
+        let isCreationMessage = firstMessage && firstMessage.is_member() && firstMessage.isCreation();
 
-        if (hasCreationMessage) {
+        if (conversationEntity.hasCreationMessage && isCreationMessage) {
           const groupCreationIn1to1 = conversationEntity.is_one2one() && firstMessage.isGroupCreation();
           const one2oneConnectionInGroup = conversationEntity.is_group() && firstMessage.isConnection();
 
           if (groupCreationIn1to1 || one2oneConnectionInGroup) {
             this.delete_message(conversationEntity, firstMessage);
-            hasCreationMessage = false;
+            conversationEntity.hasCreationMessage = false;
+            isCreationMessage = false;
           }
         }
 
-        if (!hasCreationMessage) {
+        if (!conversationEntity.hasCreationMessage && !isCreationMessage) {
+          conversationEntity.creatingFirstMessage = true;
           const creationEvent = conversationEntity.is_group()
             ? z.conversation.EventBuilder.buildGroupCreation(conversationEntity)
             : z.conversation.EventBuilder.build1to1Creation(conversationEntity);
@@ -419,7 +421,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   get_events_for_category(conversation_et, category = z.message.MessageCategory.NONE) {
     return this.conversation_service.load_events_with_category_from_db(conversation_et.id, category).then(events => {
       const message_ets = this.event_mapper.map_json_events(events, conversation_et);
-      return Promise.all(message_ets.map(message_et => this._update_user_ets(message_et)));
+      return Promise.all(message_ets.map(message_et => this._updateMessageUserEntities(message_et)));
     });
   }
 
@@ -439,7 +441,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .search_in_conversation(conversation_et.id, query)
       .then(events => {
         const message_ets = this.event_mapper.map_json_events(events, conversation_et);
-        return Promise.all(message_ets.map(message_et => this._update_user_ets(message_et)));
+        return Promise.all(message_ets.map(message_et => this._updateMessageUserEntities(message_et)));
       })
       .then(message_ets => [message_ets, query]);
   }
@@ -2707,7 +2709,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   _on1to1Creation(conversationEntity, eventJson) {
     return Promise.resolve()
       .then(() => this.event_mapper.map_json_event(eventJson, conversationEntity))
-      .then(messageEntity => this._update_user_ets(messageEntity))
+      .then(messageEntity => this._updateMessageUserEntities(messageEntity))
       .then(messageEntity => {
         if (conversationEntity && messageEntity) {
           const firstUserEntity = conversationEntity.firstUserEntity();
@@ -2812,12 +2814,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(conversationEntity => this.save_conversation(conversationEntity))
       .then(conversationEntity => {
         if (conversationEntity) {
-          const creationMessage = z.conversation.EventBuilder.buildGroupCreation(conversationEntity, initialTimestamp);
-          amplify.publish(
-            z.event.WebApp.EVENT.INJECT,
-            creationMessage,
-            z.event.EventRepository.SOURCE.BACKEND_RESPONSE
-          );
+          conversationEntity.hasCreationMessage = true;
+          const creationEvent = z.conversation.EventBuilder.buildGroupCreation(conversationEntity, initialTimestamp);
+          amplify.publish(z.event.WebApp.EVENT.INJECT, creationEvent, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
           return {conversationEntity};
         }
       });
@@ -2838,7 +2837,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           messageEntity.memberMessageType = z.message.SystemMessageType.CONVERSATION_RESUME;
         }
 
-        return this._update_user_ets(messageEntity);
+        return this._updateMessageUserEntities(messageEntity);
       })
       .then(messageEntity => {
         if (conversationEntity && messageEntity) {
@@ -3184,7 +3183,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
             event_json
           );
 
-          return this._update_user_ets(message_et).then(updated_message_et => {
+          return this._updateMessageUserEntities(message_et).then(updated_message_et => {
             this.conversation_service.update_message_in_db(updated_message_et, changes, conversation_et.id);
             return this._prepareReactionNotification(conversation_et, updated_message_et, event_json);
           });
@@ -3233,7 +3232,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(() => this.event_mapper.map_json_event(json, conversation_et, true))
       .then(message_et => {
         if (message_et) {
-          return this._update_user_ets(message_et);
+          return this._updateMessageUserEntities(message_et);
         }
       })
       .then(message_et => {
@@ -3258,7 +3257,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return Promise.resolve()
       .then(() => {
         const message_ets = this.event_mapper.map_json_events(events, conversation_et, true);
-        return Promise.all(message_ets.map(message_et => this._update_user_ets(message_et)));
+        return Promise.all(message_ets.map(message_et => this._updateMessageUserEntities(message_et)));
       })
       .then(message_ets => {
         if (prepend && conversation_et.messages().length) {
@@ -3314,41 +3313,41 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Updates the user entities that are part of a message.
    *
    * @private
-   * @param {Message} message_et - Message to be updated
+   * @param {Message} messageEntity - Message to be updated
    * @returns {Promise} Resolves when users have been update
    */
-  _update_user_ets(message_et) {
-    return this.user_repository.get_user_by_id(message_et.from).then(user_et => {
-      message_et.user(user_et);
+  _updateMessageUserEntities(messageEntity) {
+    return this.user_repository.get_user_by_id(messageEntity.from).then(userEntity => {
+      messageEntity.user(userEntity);
 
-      if (message_et.is_member() || message_et.user_ets) {
-        return this.user_repository.get_users_by_id(message_et.userIds()).then(user_ets => {
-          message_et.userEntities(user_ets);
-          return message_et;
+      if (messageEntity.is_member() || messageEntity.userEntities) {
+        return this.user_repository.get_users_by_id(messageEntity.userIds()).then(userEntities => {
+          messageEntity.userEntities(userEntities);
+          return messageEntity;
         });
       }
 
-      if (message_et.reactions) {
-        const user_ids = Object.keys(message_et.reactions());
+      if (messageEntity.reactions) {
+        const userIds = Object.keys(messageEntity.reactions());
 
-        message_et.reactions_user_ets.removeAll();
-        if (user_ids.length) {
-          return this.user_repository.get_users_by_id(user_ids).then(user_ets => {
-            message_et.reactions_user_ets(user_ets);
-            return message_et;
+        messageEntity.reactions_user_ets.removeAll();
+        if (userIds.length) {
+          return this.user_repository.get_users_by_id(userIds).then(userEntities => {
+            messageEntity.reactions_user_ets(userEntities);
+            return messageEntity;
           });
         }
       }
 
-      if (message_et.has_asset_text()) {
-        message_et.assets().forEach(asset_et => {
-          if (asset_et.is_text()) {
-            asset_et.theme_color = message_et.user().accent_color();
+      if (messageEntity.has_asset_text()) {
+        messageEntity.assets().forEach(assetEntity => {
+          if (assetEntity.is_text()) {
+            assetEntity.theme_color = messageEntity.user().accent_color();
           }
         });
       }
 
-      return message_et;
+      return messageEntity;
     });
   }
 

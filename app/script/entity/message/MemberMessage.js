@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,6 +54,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
       return isTeamMemberLeave ? this.name() : z.util.get_first_name(this.user());
     });
 
+    this.showNamedCreation = ko.pureComputed(() => this.isConversationCreate() && this.name().length);
     this.showSenderName = ko.pureComputed(() => {
       const isUnnamedGroupCreation = this.isConversationCreate() && !this.name().length;
       return isUnnamedGroupCreation || this.isMemberChange();
@@ -67,17 +68,16 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
     });
 
     this.caption = ko.pureComputed(() => {
-      if (!this.hasUsers()) {
-        return '';
-      }
-
       switch (this.memberMessageType) {
         case z.message.SystemMessageType.CONNECTION_ACCEPTED:
         case z.message.SystemMessageType.CONNECTION_REQUEST:
           return this._getCaptionConnection(this.otherUser());
         case z.message.SystemMessageType.CONVERSATION_CREATE:
           if (this.name().length) {
-            return z.l10n.text(z.string.conversationCreateWith, this._generateNameString());
+            const namedCreateStringId = this.userIds().length
+              ? z.string.conversationCreateWith
+              : z.string.conversationCreateWithOut;
+            return z.l10n.text(namedCreateStringId, this._generateNameString());
           }
           if (this.user().is_me) {
             return z.l10n.text(z.string.conversation_create_you, this._generateNameString());
@@ -114,10 +114,11 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
         default:
           break;
       }
+      return '';
     });
 
     this.groupCreationHeader = ko.pureComputed(() => {
-      if (this.isConversationCreate()) {
+      if (this.showNamedCreation()) {
         const groupCreationStringId = this.user().is_me
           ? z.string.conversationCreateNameYou
           : z.string.conversationCreateName;
@@ -135,7 +136,10 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
   }
 
   _generateNameString(declension = z.string.Declension.ACCUSATIVE) {
-    return z.util.LocalizerUtil.join_names(this.joinedUserEntities(), declension);
+    if (this.hasUsers()) {
+      return z.util.LocalizerUtil.join_names(this.joinedUserEntities(), declension);
+    }
+    return '';
   }
 
   _getCaptionConnection(userEntity) {

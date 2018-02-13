@@ -224,7 +224,7 @@ z.conversation.EventMapper = class EventMapper {
   _mapEventGroupCreation({data: eventData}) {
     const messageEntity = new z.entity.MemberMessage();
     messageEntity.memberMessageType = z.message.SystemMessageType.CONVERSATION_CREATE;
-    messageEntity.name(eventData.name);
+    messageEntity.name(eventData.name || '');
     messageEntity.userIds(eventData.userIds);
     return messageEntity;
   }

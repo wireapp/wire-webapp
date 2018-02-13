@@ -196,6 +196,7 @@ z.string.de.conversation_create = ' hat eine Unterhaltung mit {{users}} begonnen
 z.string.de.conversationCreateName = '{{user}} hat die Unterhaltung';
 z.string.de.conversationCreateNameYou = '{{user}} hast die Unterhaltung';
 z.string.de.conversationCreateWith = ' mit {{users}} begonnen';
+z.string.de.conversationCreateWithOut = ' ohne Personen begonnen';
 z.string.de.conversation_create_you = ' hast eine Unterhaltung mit {{users}} begonnen';
 z.string.de.conversation_device_started_using_one = ' benutzt';
 z.string.de.conversation_device_started_using_many = ' benutzen';
