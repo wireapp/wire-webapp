@@ -98,7 +98,7 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
     });
 
     this.shouldUpdateScrollbar = ko
-      .computed(() => this.selectedContacts() && this.stateIsPreferences())
+      .computed(() => this.selectedContacts() && this.stateIsPreferences() && this.contacts())
       .extend({notify: 'always', rateLimit: 500});
 
     amplify.subscribe(z.event.WebApp.CONVERSATION.CREATE_GROUP, this.showCreateGroup.bind(this));
