@@ -26,5 +26,5 @@
     "test:node": "jasmine JASMINE_CONFIG_PATH=jasmine.json"
   },
   "types": "dist/commonjs/LRUCache.d.ts",
-  "version": "2.0.2"
+  "version": "2.0.3"
 }

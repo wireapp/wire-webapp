@@ -3,7 +3,7 @@
     "@types/chai": "4.1.2",
     "@types/ed2curve": "0.2.2",
     "@types/node": "9.4.0",
-    "@wireapp/cbor": "3.0.1",
+    "@wireapp/cbor": "3.0.2",
     "ed2curve": "0.2.1",
     "libsodium-wrappers-sumo": "0.7.3"
   },
@@ -34,5 +34,5 @@
     "test:longrunning": "jasmine --config=spec/support/jasmine.longrunning.json"
   },
   "types": "dist/index.d.ts",
-  "version": "6.0.2"
+  "version": "6.0.3"
 }
