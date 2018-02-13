@@ -50,5 +50,5 @@
     "test:node": "cross-env DEBUG=@wireapp/cryptobox* jasmine --config=test/jasmine.node.json"
   },
   "types": "dist/index.d.ts",
-  "version": "7.0.2"
+  "version": "7.0.3"
 }
