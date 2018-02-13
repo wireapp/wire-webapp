@@ -19,7 +19,7 @@
     "gulp-clean": "0.4.0",
     "gulp-concat": "2.6.1",
     "gulp-eslint": "4.0.2",
-    "gulp-typescript": "3.2.4",
+    "gulp-typescript": "4.0.1",
     "gulp-util": "3.0.8",
     "gutil": "1.6.4",
     "jasmine": "2.99.0",
