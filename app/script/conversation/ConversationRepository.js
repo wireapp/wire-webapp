@@ -2908,9 +2908,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   _onMemberLeave(conversationEntity, eventJson) {
     const {data: eventData, from} = eventJson;
-
     const isFromSelf = from === this.selfUser().id;
-    const removesSelfUser = eventData.userIds.includes(this.selfUser().id);
+    const removesSelfUser = eventData.user_ids.includes(this.selfUser().id);
     const selfLeavingClearedConversation = isFromSelf && removesSelfUser && conversationEntity.is_cleared();
 
     if (removesSelfUser) {
