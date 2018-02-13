@@ -43,5 +43,5 @@
     "prepare": "yarn dist"
   },
   "types": "./dist/commonjs/index.d.ts",
-  "version": "1.0.7"
+  "version": "1.0.8"
 }
