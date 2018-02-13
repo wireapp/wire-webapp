@@ -2719,7 +2719,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           conversationEntity.add_message(messageEntity);
         }
 
-        return messageEntity;
+        return {conversationEntity, messageEntity};
       });
   }
 
@@ -2839,7 +2839,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           conversationEntity.add_message(messageEntity);
         }
 
-        return messageEntity;
+        return {conversationEntity, messageEntity};
       });
   }
 
