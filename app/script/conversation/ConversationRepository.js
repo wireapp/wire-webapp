@@ -2828,14 +2828,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(() => this.event_mapper.map_json_event(eventJson, conversationEntity))
       .then(messageEntity => {
         const creatorId = conversationEntity.creator;
-        const createdBySelfUser = creatorId === this.selfUser().id;
-        if (!createdBySelfUser && conversationEntity.removed_from_conversation()) {
-          messageEntity.user_ids.push(this.selfUser().id);
-        }
+        const createdByParticipant = !!conversationEntity.participating_user_ids().find(userId => userId === creatorId);
+        const createdBySelfUser = this.selfUser().id === creatorId && !conversationEntity.removed_from_conversation();
 
-        const creator = conversationEntity.participating_user_ids().find(userEntity => userEntity.id === creatorId);
-        if (!creator) {
+        const creatorIsParticipant = createdByParticipant || createdBySelfUser;
+        if (!creatorIsParticipant) {
           messageEntity.memberMessageType = z.message.SystemMessageType.CONVERSATION_RESUME;
+        } else if (createdByParticipant) {
+          messageEntity.userIds.push(this.selfUser().id);
         }
 
         return this._updateMessageUserEntities(messageEntity);
