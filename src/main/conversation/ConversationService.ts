@@ -1,16 +1,14 @@
 const UUID = require('pure-uuid');
 import APIClient = require('@wireapp/api-client');
 import {AxiosError} from 'axios';
-import {Context} from '@wireapp/api-client/dist/commonjs/auth/';
 import {
   ClientMismatch,
-  IncomingNotification,
   NewOTRMessage,
   OTRRecipients,
   UserClients,
-} from '@wireapp/api-client/dist/commonjs/conversation/';
-import {UserPreKeyBundleMap} from '@wireapp/api-client/dist/commonjs/user/';
-import {CryptographyService} from '../crypto/';
+} from '@wireapp/api-client/dist/commonjs/conversation/index';
+import {UserPreKeyBundleMap} from '@wireapp/api-client/dist/commonjs/user/index';
+import {CryptographyService} from '../crypto/root';
 
 export default class ConversationService {
   private clientID: string;

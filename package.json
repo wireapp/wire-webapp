@@ -31,7 +31,7 @@
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/core",
   "scripts": {
     "build": "yarn build:node && yarn build:browser",
-    "build:browser": "exit 0",
+    "build:browser": "webpack --progress",
     "build:node": "tsc",
     "clear": "rimraf dist && rimraf .tmp",
     "coverage": "istanbul cover --report html ./node_modules/jasmine/bin/jasmine.js",
