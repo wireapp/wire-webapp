@@ -3413,9 +3413,9 @@ eslint-plugin-babel@4.1.2:
   version "4.1.2"
   resolved "https://registry.yarnpkg.com/eslint-plugin-babel/-/eslint-plugin-babel-4.1.2.tgz#79202a0e35757dd92780919b2336f1fa2fe53c1e"
 
-eslint-plugin-jsdoc@3.3.1:
-  version "3.3.1"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-3.3.1.tgz#d58489523ddd76a9b93dd42d51b92609d52b6b1d"
+eslint-plugin-jsdoc@3.4.0:
+  version "3.4.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-3.4.0.tgz#18707589c15d25520065e07191effdc374b0a227"
   dependencies:
     comment-parser "^0.4.2"
     lodash "^4.17.4"
