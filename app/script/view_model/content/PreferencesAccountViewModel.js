@@ -247,7 +247,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   click_on_create() {
-    const path = `${z.l10n.text(z.string.url_website_create_team)}?pk_campaign=client&pk_kwd=desktop`;
+    const path = `${z.l10n.text(z.string.urlWebsiteCreateTeam)}?pk_campaign=client&pk_kwd=desktop`;
     z.util.safe_window_open(z.util.URLUtil.build_url(z.util.URLUtil.TYPE.WEBSITE, path));
   }
 
@@ -269,11 +269,11 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   set_picture(new_user_picture) {
     if (new_user_picture.size > z.config.MAXIMUM_IMAGE_FILE_SIZE) {
       const maximum_size_in_mb = z.config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024;
-      return this._show_upload_warning(z.l10n.text(z.string.alert_upload_too_large, maximum_size_in_mb));
+      return this._show_upload_warning(z.l10n.text(z.string.alertUploadTooLarge, maximum_size_in_mb));
     }
 
     if (!z.config.SUPPORTED_PROFILE_IMAGE_TYPES.includes(new_user_picture.type)) {
-      return this._show_upload_warning(z.l10n.text(z.string.alert_upload_file_format));
+      return this._show_upload_warning(z.l10n.text(z.string.alertUploadFileFormat));
     }
 
     const min_height = z.user.UserRepository.CONFIG.MINIMUM_PICTURE_SIZE.HEIGHT;
@@ -284,7 +284,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
         return this.user_repository.change_picture(new_user_picture);
       }
 
-      return this._show_upload_warning(z.l10n.text(z.string.alert_upload_too_small));
+      return this._show_upload_warning(z.l10n.text(z.string.alertUploadTooSmall));
     });
   }
 

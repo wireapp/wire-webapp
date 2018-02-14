@@ -658,7 +658,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
     if (message_et.is_downloadable() && !message_et.is_ephemeral()) {
       entries.push({
         click: () => message_et.download(),
-        label: z.string.conversation_context_menu_download,
+        label: z.string.conversationContextMenuDownload,
       });
     }
 
@@ -679,7 +679,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
     if (message_et.is_editable() && !this.conversation().removed_from_conversation()) {
       entries.push({
         click: () => amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.EDIT, message_et),
-        label: z.string.conversation_context_menu_edit,
+        label: z.string.conversationContextMenuEdit,
       });
     }
 
@@ -690,7 +690,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
             action: () => this.conversation_repository.delete_message(this.conversation(), message_et),
           });
         },
-        label: z.string.conversation_context_menu_delete,
+        label: z.string.conversationContextMenuDelete,
       });
     }
 
@@ -705,7 +705,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
             action: () => this.conversation_repository.delete_message_everyone(this.conversation(), message_et),
           });
         },
-        label: z.string.conversation_context_menu_delete_everyone,
+        label: z.string.conversationContextMenuDeleteEveryone,
       });
     }
 

@@ -93,7 +93,7 @@ ko.components.register('device-card', {
       <!-- ko ifnot: detailed -->
         <div class="label-xs">
           <span class="device-model" data-bind="text: model"></span>
-          <span class="text-graphite-dark" data-bind="visible: current, l10n_text: z.string.auth_limit_devices_current"></span>
+          <span class="text-graphite-dark" data-bind="visible: current, l10n_text: z.string.authLimitDevicesCurrent"></span>
         </div>
         <div class="text-graphite-dark label-xs">
           <span data-bind="l10n_text: z.string.preferences_devices_id"></span>

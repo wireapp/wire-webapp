@@ -6,7 +6,7 @@
           <div class="name popover-title ellipsis" data-bind="text: userEntity().name(), attr: {'data-uie-uid': userEntity().id, 'data-uie-value': userEntity().name()}" data-uie-name="status-user"></div>
           <div class="username popover-meta label-username" data-bind="text: userEntity().username(), attr: {'data-uie-value': userEntity().name()}" data-uie-name="status-username"></div>
           <!-- ko if: showBackButton() && $parent.groupMode() -->
-            <div class="user-profile-back-button button-icon icon-back" data-bind="click: clickOnClose, l10n_tooltip: z.string.tooltip_people_back" data-uie-name="do-back"></div>
+            <div class="user-profile-back-button button-icon icon-back" data-bind="click: clickOnClose, l10n_tooltip: z.string.tooltipPeopleBack" data-uie-name="do-back"></div>
           <!-- /ko -->
           <!-- ko if: userEntity().is_verified() -->
             <svg class="user-profile-user-verified" width="16" height="16">
@@ -68,7 +68,7 @@
 
             <!-- ko if: deviceModeIsNone() -->
               <div data-bind="text: noDeviceHeadline"></div>
-              <a data-bind="l10n_text: z.string.people_tabs_devices_learn_more, l10n_href: {type: z.util.URLUtil.TYPE.WEBSITE, path: z.string.url_website_privacy}" rel="nofollow noopener noreferrer" target="_blank" class="text-theme"></a>
+              <a data-bind="l10n_text: z.string.people_tabs_devices_learn_more, l10n_href: {type: z.util.URLUtil.TYPE.WEBSITE, path: z.string.urlWebsitePrivacy}" rel="nofollow noopener noreferrer" target="_blank" class="text-theme"></a>
             <!-- /ko -->
           </div>
         <!-- /ko -->
@@ -119,7 +119,7 @@
     <span data-bind="l10n_text: z.string.people_button_create"></span>
   </div>
   <!-- ko if: userEntity().is_connected -->
-    <div class="button-icon icon-block pull-right" data-bind="click: clickToBlock, l10n_tooltip: z.string.tooltip_people_block" data-uie-name="do-block"></div>
+    <div class="button-icon icon-block pull-right" data-bind="click: clickToBlock, l10n_tooltip: z.string.tooltipPeopleBlock" data-uie-name="do-block"></div>
   <!-- /ko -->
 </script>
 
@@ -145,12 +145,12 @@
 </script>
 
 <script type="text/html" id="user-profile-footer-connect-remove">
-  <div class="button-icon pull-left" data-bind="click: clickToSendRequest, l10n_tooltip: z.string.tooltip_people_connect" data-uie-name="do-connect">
+  <div class="button-icon pull-left" data-bind="click: clickToSendRequest, l10n_tooltip: z.string.tooltipPeopleConnect" data-uie-name="do-connect">
     <div class="button-icon icon-plus"></div>
     <span data-bind="l10n_text: z.string.people_button_connect"></span>
   </div>
   <!-- ko if: isUserRemovable -->
-    <div class="button-icon icon-minus pull-right" data-bind="click: clickToRemoveFromConversation, l10n_tooltip: z.string.tooltip_people_remove" data-uie-name="do-remove"></div>
+    <div class="button-icon icon-minus pull-right" data-bind="click: clickToRemoveFromConversation, l10n_tooltip: z.string.tooltipPeopleRemove" data-uie-name="do-remove"></div>
   <!-- /ko -->
 </script>
 
@@ -160,49 +160,49 @@
     <span data-bind="l10n_text: z.string.people_button_pending"></span>
   </div>
   <!-- ko if: isUserRemovable -->
-    <div class="button-icon icon-minus pull-right" data-bind="click: clickToRemoveFromConversation, l10n_tooltip: z.string.tooltip_people_remove" data-uie-name="do-remove"></div>
+    <div class="button-icon icon-minus pull-right" data-bind="click: clickToRemoveFromConversation, l10n_tooltip: z.string.tooltipPeopleRemove" data-uie-name="do-remove"></div>
   <!-- /ko -->
 </script>
 
 <script type="text/html" id="user-profile-footer-message-remove">
-  <div class="button-icon pull-left" data-bind="click: clickToOpenConversation, l10n_tooltip: z.string.tooltip_people_open" data-uie-name="go-conversation">
+  <div class="button-icon pull-left" data-bind="click: clickToOpenConversation, l10n_tooltip: z.string.tooltipPeopleOpen" data-uie-name="go-conversation">
     <div class="button-icon icon-chat"></div>
     <span data-bind="l10n_text: z.string.people_button_open"></span>
   </div>
   <!-- ko if: isUserRemovable -->
-    <div class="button-icon icon-minus pull-right" data-bind="click: clickToRemoveFromConversation, l10n_tooltip: z.string.tooltip_people_remove" data-uie-name="do-remove"></div>
+    <div class="button-icon icon-minus pull-right" data-bind="click: clickToRemoveFromConversation, l10n_tooltip: z.string.tooltipPeopleRemove" data-uie-name="do-remove"></div>
   <!-- /ko -->
 </script>
 
 <script type="text/html" id="user-profile-footer-message">
-  <div class="button-icon pull-left" data-bind="click: clickToOpenConversation, l10n_tooltip: z.string.tooltip_people_open" data-uie-name="go-conversation">
+  <div class="button-icon pull-left" data-bind="click: clickToOpenConversation, l10n_tooltip: z.string.tooltipPeopleOpen" data-uie-name="go-conversation">
     <div class="button-icon icon-chat"></div>
     <span data-bind="l10n_text: z.string.people_button_open"></span>
   </div>
 </script>
 
 <script type="text/html" id="user-profile-footer-unblock-remove">
-  <div class="button-icon pull-left" data-bind="click: clickToUnblock, l10n_tooltip: z.string.tooltip_people_unblock" data-uie-name="do-unblock">
+  <div class="button-icon pull-left" data-bind="click: clickToUnblock, l10n_tooltip: z.string.tooltipPeopleUnblock" data-uie-name="do-unblock">
     <div class="button-icon icon-block"></div>
     <span data-bind="l10n_text: z.string.people_button_unblock"></span>
   </div>
   <!-- ko if: isUserRemovable -->
-    <div class="button-icon icon-minus pull-right" data-bind="click: clickToRemoveFromConversation, l10n_tooltip: z.string.tooltip_people_remove" data-uie-name="do-remove"></div>
+    <div class="button-icon icon-minus pull-right" data-bind="click: clickToRemoveFromConversation, l10n_tooltip: z.string.tooltipPeopleRemove" data-uie-name="do-remove"></div>
   <!-- /ko -->
 </script>
 
 <script type="text/html" id="user-profile-footer-profile-leave">
-  <div class="button-icon pull-left" data-bind="click: clickOnShowProfile, l10n_tooltip: z.string.tooltip_people_profile" data-uie-name="go-profile">
+  <div class="button-icon pull-left" data-bind="click: clickOnShowProfile, l10n_tooltip: z.string.tooltipPeopleProfile" data-uie-name="go-profile">
     <div class="button-icon icon-people"></div>
     <span data-bind="l10n_text: z.string.people_button_profile"></span>
   </div>
   <!-- ko ifnot: conversation().removed_from_conversation -->
-    <div class="button-icon icon-minus pull-right" data-bind="click: clickToLeaveConversation, l10n_tooltip: z.string.tooltip_people_leave" data-uie-name="do-leave"></div>
+    <div class="button-icon icon-minus pull-right" data-bind="click: clickToLeaveConversation, l10n_tooltip: z.string.tooltipPeopleLeave" data-uie-name="do-leave"></div>
   <!-- /ko -->
 </script>
 
 <script type="text/html" id="user-profile-footer-profile">
-  <div class="button-icon pull-left" data-bind="click: clickOnShowProfile, l10n_tooltip: z.string.tooltip_people_profile" data-uie-name="go-profile">
+  <div class="button-icon pull-left" data-bind="click: clickOnShowProfile, l10n_tooltip: z.string.tooltipPeopleProfile" data-uie-name="go-profile">
     <i class="button-icon icon-people"></i>
     <span data-bind="l10n_text: z.string.people_button_profile"></span></div>
   </div>

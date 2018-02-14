@@ -750,25 +750,23 @@ z.util.format_time_remaining = function(time_remaining) {
 
   let title = '';
   if (moment_duration.asHours() === 1) {
-    title += `${moment_duration.hours()} ${z.l10n.text(z.string.ephememal_units_hour)}, `;
+    title += `${moment_duration.hours()} ${z.l10n.text(z.string.ephememalUnitsHour)}, `;
   } else if (moment_duration.asHours() > 1) {
-    title += `${moment_duration.hours()} ${z.l10n.text(z.string.ephememal_units_hours)}, `;
+    title += `${moment_duration.hours()} ${z.l10n.text(z.string.ephememalUnitsHours)}, `;
   }
 
   if (moment_duration.asMinutes() === 1) {
-    title += `${moment_duration.minutes()} ${z.l10n.text(z.string.ephememal_units_minute)} ${z.l10n.text(
-      z.string.and
-    )} `;
+    title += `${moment_duration.minutes()} ${z.l10n.text(z.string.ephememalUnitsMinute)} ${z.l10n.text(z.string.and)} `;
   } else if (moment_duration.asMinutes() > 1) {
-    title += `${moment_duration.minutes()} ${z.l10n.text(z.string.ephememal_units_minutes)} ${z.l10n.text(
+    title += `${moment_duration.minutes()} ${z.l10n.text(z.string.ephememalUnitsMinutes)} ${z.l10n.text(
       z.string.and
     )} `;
   }
 
   if (moment_duration.asSeconds() === 1) {
-    title += `${moment_duration.seconds()} ${z.l10n.text(z.string.ephememal_units_second)}`;
+    title += `${moment_duration.seconds()} ${z.l10n.text(z.string.ephememalUnitsSecond)}`;
   } else if (moment_duration.asSeconds() > 1) {
-    title += `${moment_duration.seconds()} ${z.l10n.text(z.string.ephememal_units_seconds)}`;
+    title += `${moment_duration.seconds()} ${z.l10n.text(z.string.ephememalUnitsSeconds)}`;
   }
 
   return title || '';

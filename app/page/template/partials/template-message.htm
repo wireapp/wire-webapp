@@ -79,7 +79,7 @@
       <div class="message-header-label">
         <span class="message-header-label-sender" data-bind='css: message.accent_color(), text: message.user().first_name()' data-uie-name="sender-name"></span>
         <!-- ko if: message.user().isBot -->
-          <span class="message-header-label-service" data-bind="l10n_text: z.string.conversation_bot_user"></span>
+          <span class="message-header-label-service" data-bind="l10n_text: z.string.conversationBotUser"></span>
         <!-- /ko -->
         <!-- ko if: was_edited() -->
           <span class="message-header-label-icon icon-edit" data-bind="attr: {title: message.display_edited_timestamp()}"></span>
@@ -219,7 +219,7 @@
       <!-- ko if: otherUser().is_outgoing_request() -->
         <div class="message-connected-cancel text-theme"
              data-bind="click: $parent.click_on_cancel_request,
-                        l10n_text: z.string.conversation_connection_cancel_request"
+                        l10n_text: z.string.conversationConnectionCancelRequest"
              data-uie-name="do-cancel-request"></div>
       <!-- /ko -->
     </div>

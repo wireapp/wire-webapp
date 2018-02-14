@@ -167,16 +167,15 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
     // Invite bubble
     this.inviteBubble = null;
-
     this.inviteHint = ko.pureComputed(() => {
       const metaKey = z.util.Environment.os.mac
-        ? z.l10n.text(z.string.invite_meta_key_mac)
-        : z.l10n.text(z.string.invite_meta_key_pc);
+        ? z.l10n.text(z.string.inviteMetaKeyMac)
+        : z.l10n.text(z.string.inviteMetaKeyPc);
 
       if (this.inviteMessageSelected()) {
-        return z.l10n.text(z.string.invite_hint_selected, metaKey);
+        return z.l10n.text(z.string.inviteHintSelected, metaKey);
       }
-      return z.l10n.text(z.string.invite_hint_unselected, metaKey);
+      return z.l10n.text(z.string.inviteHintUnselected, metaKey);
     });
     this.inviteMessage = ko.pureComputed(() => {
       if (this.selfUser()) {

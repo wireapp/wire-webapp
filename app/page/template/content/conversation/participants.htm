@@ -6,7 +6,7 @@
         <div class="participants-group">
           <div class="participants-group-header">
             <div class="name popover-title">
-              <div data-bind="visible: !isEditing(), text: conversation().display_name(), click: clickToEdit, l10n_tooltip: z.string.tooltip_people_rename" data-uie-name="status-name"></div>
+              <div data-bind="visible: !isEditing(), text: conversation().display_name(), click: clickToEdit, l10n_tooltip: z.string.tooltipPeopleRename" data-uie-name="status-name"></div>
               <textarea data-bind="visible: isEditing, value: conversation().display_name(), enter: renameConversation, hasFocus: isEditing, resize" maxlength="64" dir="auto" data-uie-name="enter-name"></textarea>
             </div>
             <span class="edit icon-edit" data-bind="visible: isEditable() && !isEditing(), click: clickToEdit"></span>
@@ -42,7 +42,7 @@
                   <label data-bind="l10n_text: addActionText"></label>
                 </div>
               <!-- /ko -->
-              <div class="button-icon icon-minus pull-right" data-bind="click: clickToLeave, l10n_tooltip: z.string.tooltip_people_leave" data-uie-name="do-leave"></div>
+              <div class="button-icon icon-minus pull-right" data-bind="click: clickToLeave, l10n_tooltip: z.string.tooltipPeopleLeave" data-uie-name="do-leave"></div>
             <!-- /ko -->
           </div>
         </div>
@@ -70,7 +70,7 @@
           <div class="participants-search-header">
             <div class="participants-search-header-row">
               <user-input class="participants-search-header-list user-list-light" params="input: searchInput, selected: selectedContacts, placeholder: z.string.people_search_placeholder" spellcheck="false"></user-input>
-              <div class="participants-search-header-close icon-close icon-button" data-bind="click: clickOnCloseAdding, l10n_tooltip: z.string.tooltip_search_close" data-uie-name="do-close"></div>
+              <div class="participants-search-header-close icon-close icon-button" data-bind="click: clickOnCloseAdding, l10n_tooltip: z.string.tooltipSearchClose" data-uie-name="do-close"></div>
             </div>
             <!-- ko if: showIntegrations() -->
               <div class="participants-search-tabs">
@@ -103,7 +103,7 @@
           <div class="participants-service-profile">
             <!-- ko if: groupMode() -->
               <div class="participants-service-profile-header">
-                <div class="participants-service-profile-back" data-bind="click: clickOnServiceBack, l10n_tooltip: z.string.tooltip_people_back" data-uie-name="do-back">
+                <div class="participants-service-profile-back" data-bind="click: clickOnServiceBack, l10n_tooltip: z.string.tooltipPeopleBack" data-uie-name="do-back">
                   <svg width="16" height="16" viewBox="0 0 16 16">
                     <path fill="#33373A" d="M4.83 9l5.24 5.24-1.41 1.41L1 8 8.66.34l1.41 1.41L4.83 7H15v2z"/>
                   </svg>

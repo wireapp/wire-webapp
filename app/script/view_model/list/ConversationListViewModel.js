@@ -108,7 +108,7 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
     });
 
     this.start_tooltip = z.l10n.text(
-      z.string.tooltip_conversations_start,
+      z.string.tooltipConversationsStart,
       z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.START)
     );
 

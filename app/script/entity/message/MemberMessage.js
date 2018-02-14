@@ -151,7 +151,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
       }
     }
 
-    return z.l10n.text(z.string.conversation_connection_accepted);
+    return z.l10n.text(z.string.conversationConnectionAccepted);
   }
 
   isConnection() {
