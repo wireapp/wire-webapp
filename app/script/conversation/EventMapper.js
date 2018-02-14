@@ -81,7 +81,7 @@ z.conversation.EventMapper = class EventMapper {
         message_et = this._mapEventMemberJoin(event, conversation_et);
         break;
       case z.event.Backend.CONVERSATION.MEMBER_LEAVE:
-        message_et = this._map_event_member_leave(event);
+        message_et = this._mapEventMemberLeave(event);
         break;
       case z.event.Backend.CONVERSATION.RENAME:
         message_et = this._map_event_rename(event);
@@ -111,7 +111,7 @@ z.conversation.EventMapper = class EventMapper {
         message_et = this._mapEvent1to1Creation(event);
         break;
       case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE:
-        message_et = this._map_event_team_member_leave(event);
+        message_et = this._mapEventTeamMemberLeave(event);
         break;
       case z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT:
       case z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG:
@@ -294,13 +294,13 @@ z.conversation.EventMapper = class EventMapper {
    * Maps JSON data of conversation.member_leave message into message entity
    *
    * @private
-   * @param {Object} event_data - Message data
+   * @param {Object} eventData - Message data
    * @returns {MemberMessage} Member message entity
    */
-  _map_event_member_leave({data: event_data}) {
-    const message_et = new z.entity.MemberMessage();
-    message_et.userIds(event_data.user_ids);
-    return message_et;
+  _mapEventMemberLeave({data: eventData}) {
+    const messageEntity = new z.entity.MemberMessage();
+    messageEntity.userIds(eventData.user_ids);
+    return messageEntity;
   }
 
   /**
@@ -378,11 +378,11 @@ z.conversation.EventMapper = class EventMapper {
    * @param {Object} event - Message data
    * @returns {MemberMessage} Member message entity
    */
-  _map_event_team_member_leave(event) {
-    const message_et = this._map_event_member_leave(event);
-    const event_data = event.data;
-    message_et.name(event_data.name || z.l10n.text(z.string.conversation_someone));
-    return message_et;
+  _mapEventTeamMemberLeave(event) {
+    const messageEntity = this._mapEventMemberLeave(event);
+    const eventData = event.data;
+    messageEntity.name(eventData.name || z.l10n.text(z.string.conversation_someone));
+    return messageEntity;
   }
 
   /**

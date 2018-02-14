@@ -139,7 +139,7 @@ z.conversation.EventBuilder = {
     return {
       conversation: id,
       data: {
-        userIds: [userId],
+        user_ids: [userId],
       },
       from: self.id,
       time: conversationEntity.get_next_iso_date(timeOffset),
@@ -174,7 +174,7 @@ z.conversation.EventBuilder = {
       conversation: conversationEntity.id,
       data: {
         name: userEntity.name(),
-        userIds: [userEntity.id],
+        user_ids: [userEntity.id],
       },
       from: userEntity.id,
       id: z.util.create_random_uuid(),

@@ -251,7 +251,7 @@ z.team.TeamRepository = class TeamRepository {
       }
 
       this.team().members.remove(member => member.id === userId);
-      amplify.publish(z.event.WebApp.TEAM.MEMBER_LEAVE, teamId, userId, new Date(time));
+      amplify.publish(z.event.WebApp.TEAM.MEMBER_LEAVE, teamId, userId, new Date(time).toISOString());
     }
   }
 

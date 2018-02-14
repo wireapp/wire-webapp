@@ -181,7 +181,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       this.set_notification_handling_state.bind(this)
     );
     amplify.subscribe(z.event.WebApp.EVENT.UPDATE_TIME_OFFSET, this.update_time_offset.bind(this));
-    amplify.subscribe(z.event.WebApp.TEAM.MEMBER_LEAVE, this.team_member_leave.bind(this));
+    amplify.subscribe(z.event.WebApp.TEAM.MEMBER_LEAVE, this.teamMemberLeave.bind(this));
     amplify.subscribe(z.event.WebApp.USER.UNBLOCKED, this.unblocked_user.bind(this));
   }
 
@@ -1190,24 +1190,22 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   /**
    * Team member was removed.
-   * @param {string} team_id - ID of team that member was removed from
-   * @param {string} user_id - ID of leaving user
-   * @param {Date} date - Date of member removal
+   * @param {string} teamId - ID of team that member was removed from
+   * @param {string} userId - ID of leaving user
+   * @param {Date} isoDate - Date of member removal
    * @returns {undefined} No return value
    */
-  team_member_leave(team_id, user_id, date) {
-    this.user_repository.get_user_by_id(user_id).then(user_et => {
+  teamMemberLeave(teamId, userId, isoDate) {
+    this.user_repository.get_user_by_id(userId).then(userEntity => {
       this.conversations()
-        .filter(conversation_et => conversation_et.team_id === team_id && !conversation_et.removed_from_conversation())
-        .forEach(conversation_et => {
-          if (conversation_et.participating_user_ids().includes(user_id)) {
-            const member_leave_event = z.conversation.EventBuilder.buildTeamMemberLeave(
-              conversation_et,
-              user_et,
-              date.toISOString()
-            );
-            amplify.publish(z.event.WebApp.EVENT.INJECT, member_leave_event);
-          }
+        .filter(conversationEntity => {
+          const conversationInTeam = conversationEntity.team_id === teamId;
+          const userIsParticipant = conversationEntity.participating_user_ids().includes(userId);
+          return conversationInTeam && userIsParticipant && !conversationEntity.removed_from_conversation();
+        })
+        .forEach(conversationEntity => {
+          const leaveEvent = z.conversation.EventBuilder.buildTeamMemberLeave(conversationEntity, userEntity, isoDate);
+          amplify.publish(z.event.WebApp.EVENT.INJECT, leaveEvent);
         });
     });
   }
