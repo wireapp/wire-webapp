@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.0.0"></a>
+# [1.0.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/compare/@wireapp/cli-client@0.1.16...@wireapp/cli-client@1.0.0) (2018-02-14)
+
+
+### Bug Fixes
+
+* **core,cli-client,cryptobox,proteus:** Explicitly declare root path to not confuse webpack ([#267](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/issues/267)) ([546e913](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/commit/546e913))
+
+
+### BREAKING CHANGES
+
+* **core,cli-client,cryptobox,proteus:** * Classes are now exported in a file called `root.ts` instead of `index.ts`
+
+
+
+
 <a name="0.1.16"></a>
 ## [0.1.16](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/compare/@wireapp/cli-client@0.1.15...@wireapp/cli-client@0.1.16) (2018-02-14)
 

@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="7.0.0"></a>
+# [7.0.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@6.0.5...@wireapp/proteus@7.0.0) (2018-02-14)
+
+
+### Bug Fixes
+
+* **core,cli-client,cryptobox,proteus:** Explicitly declare root path to not confuse webpack ([#267](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/issues/267)) ([546e913](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/commit/546e913))
+
+
+### BREAKING CHANGES
+
+* **core,cli-client,cryptobox,proteus:** * Classes are now exported in a file called `root.ts` instead of `index.ts`
+
+
+
+
 <a name="6.0.5"></a>
 ## [6.0.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@6.0.4...@wireapp/proteus@6.0.5) (2018-02-14)
 
