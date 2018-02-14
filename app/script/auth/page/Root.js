@@ -27,6 +27,7 @@ import TeamName from './TeamName';
 import CreateAccount from './CreateAccount';
 import CreatePersonalAccount from './CreatePersonalAccount';
 import ChooseHandle from './ChooseHandle';
+import ClientManager from './ClientManager';
 import Verify from './Verify';
 import {IntlProvider, addLocaleData} from 'react-intl';
 import {connect} from 'react-redux';
@@ -50,6 +51,7 @@ const Root = ({language}) => (
         <Content>
           <Switch>
             <Route exact path={ROUTE.INDEX} component={Index} />
+            <Route path={ROUTE.CLIENTS} component={ClientManager} />
             <Route path={ROUTE.CREATE_TEAM} component={TeamName} />
             <Route path={ROUTE.CREATE_TEAM_ACCOUNT} component={CreateAccount} />
             <Route path={ROUTE.CREATE_ACCOUNT} component={CreatePersonalAccount} />

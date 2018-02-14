@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,10 +21,11 @@ import BackendError from './BackendError';
 import * as ClientActionCreator from './creator/ClientActionCreator';
 
 export function doGetAllClients() {
-  return function(dispatch, getState, {core}) {
+  return function(dispatch, getState, {apiClient}) {
     dispatch(ClientActionCreator.startGetAllClients());
     return Promise.resolve()
-      .then(() => dispatch(ClientActionCreator.successfulGetAllClients(error)))
+      .then(() => apiClient.client.api.getClients())
+      .then(clients => dispatch(ClientActionCreator.successfulGetAllClients(clients)))
       .catch(error => {
         dispatch(ClientActionCreator.failedGetAllClients(error));
         throw BackendError.handle(error);

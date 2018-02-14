@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,6 +36,10 @@ class ClientManager extends React.Component {
     error: null,
   };
 
+  componentWillMount = () => {
+    this.props.doGetAllClients();
+  };
+
   logout = () => {
     this.props.doLogout();
   };
@@ -50,7 +54,9 @@ class ClientManager extends React.Component {
           style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-around', minHeight: 428}}
         >
           <H1 center>{'Remove a device'}</H1>
-          <Text center>{'Remove one of your other devices to start using Wire on this one.'}</Text>
+          <Text center style={{marginBottom: '20px'}}>
+            {'Remove one of your other devices to start using Wire on this one.'}
+          </Text>
           <ClientList clients={this.props.clients} />
           <ErrorMessage data-uie-name="error-message">{this.state.error && parseError(this.state.error)}</ErrorMessage>
           <Link onClick={this.logout} style={{alignSelf: 'center'}}>

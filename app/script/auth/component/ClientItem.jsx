@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,22 +19,56 @@
 
 import React from 'react';
 import {ContainerXS} from '@wireapp/react-ui-kit/Layout';
-import {Text} from '@wireapp/react-ui-kit/Text';
+import {Input, InputSubmitCombo, RoundIconButton} from '@wireapp/react-ui-kit/Form';
+import {Text, Line, Small} from '@wireapp/react-ui-kit/Text';
 
-function formatFingerprint(fingerprint) {
-  return fingerprint;
-}
+class ClientItem extends React.Component {
+  state = {
+    editMode: false,
+  };
 
-function ClientItem({name, fingerprint, created}) {
-  return (
-    <ContainerXS>
-      <Text bold block>
-        {name}
-      </Text>
-      <Text block>{`ID: ${formatFingerprint(fingerprint)}`}</Text>
-      <Text block>{created}</Text>
-    </ContainerXS>
-  );
+  toggleEditMode = () => this.setState({editMode: !this.state.editMode});
+
+  formatFingerprint = fingerprint =>
+    fingerprint
+      .toUpperCase()
+      .match(/.{1,2}/g)
+      .join(' ');
+
+  formatDate = dateString =>
+    new Date(dateString).toLocaleString('en-US', {
+      day: 'numeric',
+      hour: 'numeric',
+      hour12: false,
+      minute: 'numeric',
+      month: 'short',
+      weekday: 'short',
+      year: 'numeric',
+    });
+
+  render() {
+    const {name, fingerprint, created} = this.props;
+    return (
+      <ContainerXS style={this.state.editMode ? {backgroundColor: 'white', borderRadius: '10px'} : {}}>
+        <ContainerXS onClick={this.toggleEditMode} style={{margin: '0px', padding: '5px 15px'}}>
+          <Text bold block>
+            {name}
+          </Text>
+          <Small block>{`ID: ${this.formatFingerprint(fingerprint)}`}</Small>
+          <Small block>{this.formatDate(created)}</Small>
+          <Line />
+        </ContainerXS>
+        {this.state.editMode && (
+          <ContainerXS style={{margin: '-15px 0 0 0', padding: '5px'}}>
+            <InputSubmitCombo style={{marginBottom: '0'}}>
+              <Input placeholder="Password" />
+              <RoundIconButton type="submit" icon="plane" formNoValidate />
+            </InputSubmitCombo>
+          </ContainerXS>
+        )}
+      </ContainerXS>
+    );
+  }
 }
 
 export default ClientItem;

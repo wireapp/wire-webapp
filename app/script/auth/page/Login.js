@@ -43,6 +43,7 @@ import ValidationError from '../module/action/ValidationError';
 import {loginStrings} from '../../strings';
 import RuntimeUtil from '../util/RuntimeUtil';
 import * as URLUtil from '../util/urlUtil';
+import BackendError from '../module/action/BackendError';
 
 class Login extends React.PureComponent {
   inputs = {};
@@ -92,7 +93,14 @@ class Login extends React.PureComponent {
       })
       .then(() =>
         window.location.replace(`/${URLUtil.pathWithParams('login', `reason=login&persist=${this.state.persist}`)}`)
-      );
+      )
+      .catch(error => {
+        if (error.label === BackendError.LABEL.TOO_MANY_CLIENTS) {
+          this.props.history.push(ROUTE.CLIENTS);
+        } else {
+          throw error;
+        }
+      });
   };
 
   forgotPassword() {

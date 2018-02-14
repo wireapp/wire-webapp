@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,15 +36,10 @@ class ClientList extends React.Component {
       <ContainerXS
         centerText
         verticalCenter
-        style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-around', minHeight: 428}}
+        style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-around'}}
       >
         {clients.map(client => (
-          <ClientItem
-            key={client.id}
-            name={`${client.model} ${client.label}`}
-            fingerprint={client.id}
-            created={client.time}
-          />
+          <ClientItem key={client.id} name={client.model} fingerprint={client.id} created={client.time} />
         ))}
       </ContainerXS>
     );

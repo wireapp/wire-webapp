@@ -60,6 +60,10 @@ export default class BackendError extends Error {
     TOO_MANY_LOGINS: 'client-error',
   };
 
+  static CLIENT_ERRORS = {
+    TOO_MANY_CLIENTS: 'too-many-clients',
+  };
+
   static GENERAL_ERRORS = {
     ACCESS_DENIED: 'access-denied',
     BAD_REQUEST: 'bad-request',
@@ -95,6 +99,7 @@ export default class BackendError extends Error {
     return {
       ...BackendError.AUTH_ERRORS,
       ...BackendError.GENERAL_ERRORS,
+      ...BackendError.CLIENT_ERRORS,
       ...BackendError.HANDLE_ERRORS,
       ...BackendError.TEAM_ERRORS,
       ...BackendError.TEAM_INVITE_ERRORS,

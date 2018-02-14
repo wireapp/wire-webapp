@@ -23,6 +23,7 @@ const stagingWebsite = 'https://wire-website-staging.zinfra.io';
 
 export default {
   CHOOSE_HANDLE: '/choosehandle',
+  CLIENTS: '/clients',
   CREATE_ACCOUNT: '/createaccount',
   CREATE_TEAM: '/createteam',
   CREATE_TEAM_ACCOUNT: '/createteamaccount',
