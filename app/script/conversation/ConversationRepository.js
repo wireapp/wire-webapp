@@ -3661,7 +3661,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       action: reaction ? 'like' : 'unlike',
       conversation_type: z.tracking.helpers.get_conversation_type(conversation_et),
       method: button ? 'button' : 'menu',
-      reacted_to_last_message: conversation_et.get_last_message() === message_et,
+      reacted_to_last_message: conversation_et.getLastMessage() === message_et,
       type: z.tracking.helpers.get_message_type(message_et),
       user: message_et.user().is_me ? 'sender' : 'receiver',
       with_service: conversation_et.isWithBot(),
