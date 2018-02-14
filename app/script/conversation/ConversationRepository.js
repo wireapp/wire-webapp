@@ -248,7 +248,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return conversation_et;
       })
       .catch(() => {
-        const error = new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.NOT_FOUND);
+        const errorType = z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND;
+        const error = new z.conversation.ConversationError(errorType);
 
         this.fetching_conversations[conversation_id].forEach(({reject_fn}) => reject_fn(error));
         delete this.fetching_conversations[conversation_id];
@@ -552,7 +553,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return conversation_et;
       }
 
-      throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.NOT_FOUND);
+      throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND);
     });
   }
 
@@ -588,14 +589,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     return this.find_conversation_by_id(conversation_id)
       .catch(error => {
-        if (error.type === z.conversation.ConversationError.TYPE.NOT_FOUND) {
+        const isConversationNotFound = error.type === z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND;
+        if (isConversationNotFound) {
           return this.fetch_conversation_by_id(conversation_id);
         }
 
         throw error;
       })
       .catch(error => {
-        if (error.type !== z.conversation.ConversationError.TYPE.NOT_FOUND) {
+        const isConversationNotFound = error.type === z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND;
+        if (!isConversationNotFound) {
           this.logger.error(`Failed to get conversation '${conversation_id}': ${error.message}`, error);
         }
 
@@ -726,7 +729,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return this.update_participating_user_ets(conversation_et);
       })
       .catch(error => {
-        if (error.type !== z.conversation.ConversationError.TYPE.NOT_FOUND) {
+        const isConversationNotFound = error.type === z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND;
+        if (!isConversationNotFound) {
           throw error;
         }
       });
@@ -762,7 +766,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
         );
       })
       .catch(error => {
-        if (error.type === z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND) {
+        const messageNotFound = error.type === z.conversation.ConversationError.TYPE.MESSAGE_NOT_FOUND;
+        if (messageNotFound) {
           return true;
         }
 
@@ -793,7 +798,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     return this.find_conversation_by_id(conversation_id)
       .catch(error => {
-        if (error.type !== z.conversation.ConversationError.TYPE.NOT_FOUND) {
+        const isConversationNotFound = error.type === z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND;
+        if (!isConversationNotFound) {
           throw error;
         }
 
@@ -801,7 +807,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           return this.fetch_conversation_by_id(conversation_id);
         }
 
-        throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.NOT_FOUND);
+        throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND);
       })
       .then(conversation_et => {
         conversation_et.connection(connection_et);
@@ -821,7 +827,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return conversation_et;
       })
       .catch(error => {
-        if (error.type !== z.conversation.ConversationError.TYPE.NOT_FOUND) {
+        const isConversationNotFound = error.type === z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND;
+        if (!isConversationNotFound) {
           throw error;
         }
       });
@@ -895,12 +902,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   save_conversation(conversation_et) {
     return this.find_conversation_by_id(conversation_et.id).catch(error => {
-      if (error.type !== z.conversation.ConversationError.TYPE.NOT_FOUND) {
-        throw error;
+      const isConversationNotFound = error.type === z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND;
+      if (isConversationNotFound) {
+        this.conversations.push(conversation_et);
+        return this.save_conversation_state_in_db(conversation_et);
       }
 
-      this.conversations.push(conversation_et);
-      return this.save_conversation_state_in_db(conversation_et);
+      throw error;
     });
   }
 
@@ -2812,13 +2820,18 @@ z.conversation.ConversationRepository = class ConversationRepository {
     const initialTimestamp = _.isNaN(eventTimestamp) ? this.getLatestEventTimestamp(true) : eventTimestamp;
 
     return this.find_conversation_by_id(conversationId)
+      .then(conversationEntity => {
+        if (conversationEntity) {
+          throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.NO_CHANGES);
+        }
+      })
       .catch(error => {
-        const isConversationNotFound = error.type === z.conversation.ConversationError.TYPE.NOT_FOUND;
-        if (!isConversationNotFound) {
-          throw error;
+        const isConversationNotFound = error.type === z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND;
+        if (isConversationNotFound) {
+          return this.map_conversations(eventData, initialTimestamp);
         }
 
-        return this.map_conversations(eventData, initialTimestamp);
+        throw error;
       })
       .then(conversationEntity => this.update_participating_user_ets(conversationEntity))
       .then(conversationEntity => this.save_conversation(conversationEntity))
@@ -2829,6 +2842,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
           amplify.publish(z.event.WebApp.EVENT.INJECT, creationEvent, z.event.EventRepository.SOURCE.BACKEND_RESPONSE);
           this.verification_state_handler.onConversationCreate(conversationEntity);
           return {conversationEntity};
+        }
+      })
+      .catch(error => {
+        const isNoChanges = error.type === z.conversation.ConversationError.TYPE.NO_CHANGES;
+        if (!isNoChanges) {
+          throw error;
         }
       });
   }
