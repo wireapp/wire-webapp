@@ -9,8 +9,8 @@
     "@types/spark-md5": "3.0.0",
     "@types/text-encoding": "0.0.32",
     "@types/tough-cookie": "2.3.2",
-    "@wireapp/queue-priority": "0.0.25",
-    "@wireapp/store-engine": "0.1.12",
+    "@wireapp/queue-priority": "0.0.26",
+    "@wireapp/store-engine": "0.1.13",
     "axios": "0.17.1",
     "html5-websocket": "2.0.2",
     "logdown": "3.2.3",
@@ -66,5 +66,5 @@
     "watch": "webpack-dev-server --config webpack.config.js"
   },
   "types": "./dist/commonjs/Client.d.ts",
-  "version": "0.3.10"
+  "version": "0.3.11"
 }
