@@ -17,18 +17,6 @@
  *
  */
 
-import authReducer from './authReducer';
-import clientReducer from './clientReducer';
-import inviteReducer from './inviteReducer';
-import languageReducer from './languageReducer';
-import selfReducer from './selfReducer';
-
-const reducers = {
-  authState: authReducer,
-  clientState: clientReducer,
-  inviteState: inviteReducer,
-  languageState: languageReducer,
-  selfState: selfReducer,
-};
-
-export default reducers;
+export const getClients = state => state.clientState.clients || [];
+export const getClientError = state => state.clientState.error;
+export const isFetching = state => state.clientState.fetching;

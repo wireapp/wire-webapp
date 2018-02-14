@@ -17,18 +17,24 @@
  *
  */
 
-import authReducer from './authReducer';
-import clientReducer from './clientReducer';
-import inviteReducer from './inviteReducer';
-import languageReducer from './languageReducer';
-import selfReducer from './selfReducer';
+import React from 'react';
+import {ContainerXS} from '@wireapp/react-ui-kit/Layout';
+import {Text} from '@wireapp/react-ui-kit/Text';
 
-const reducers = {
-  authState: authReducer,
-  clientState: clientReducer,
-  inviteState: inviteReducer,
-  languageState: languageReducer,
-  selfState: selfReducer,
-};
+function formatFingerprint(fingerprint) {
+  return fingerprint;
+}
 
-export default reducers;
+function ClientItem({name, fingerprint, created}) {
+  return (
+    <ContainerXS>
+      <Text bold block>
+        {name}
+      </Text>
+      <Text block>{`ID: ${formatFingerprint(fingerprint)}`}</Text>
+      <Text block>{created}</Text>
+    </ContainerXS>
+  );
+}
+
+export default ClientItem;

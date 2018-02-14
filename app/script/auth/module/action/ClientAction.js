@@ -17,18 +17,17 @@
  *
  */
 
-import authReducer from './authReducer';
-import clientReducer from './clientReducer';
-import inviteReducer from './inviteReducer';
-import languageReducer from './languageReducer';
-import selfReducer from './selfReducer';
+import BackendError from './BackendError';
+import * as ClientActionCreator from './creator/ClientActionCreator';
 
-const reducers = {
-  authState: authReducer,
-  clientState: clientReducer,
-  inviteState: inviteReducer,
-  languageState: languageReducer,
-  selfState: selfReducer,
-};
-
-export default reducers;
+export function doGetAllClients() {
+  return function(dispatch, getState, {core}) {
+    dispatch(ClientActionCreator.startGetAllClients());
+    return Promise.resolve()
+      .then(() => dispatch(ClientActionCreator.successfulGetAllClients(error)))
+      .catch(error => {
+        dispatch(ClientActionCreator.failedGetAllClients(error));
+        throw BackendError.handle(error);
+      });
+  };
+}

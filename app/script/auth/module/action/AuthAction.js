@@ -23,7 +23,7 @@ import {currentLanguage, currentCurrency} from '../../localeConfig';
 import {fetchSelf} from './SelfAction';
 
 export function doLogin(login) {
-  return function(dispatch, getState, {apiClient}) {
+  return function(dispatch, getState, {core}) {
     dispatch(
       AuthActionCreator.startLogin({
         email: login.email,
@@ -32,7 +32,7 @@ export function doLogin(login) {
     );
     return Promise.resolve()
       .then(() => dispatch(doSilentLogout()))
-      .then(() => apiClient.login(login))
+      .then(() => core.login(login))
       .catch(error => {
         dispatch(AuthActionCreator.failedLogin(error));
         throw BackendError.handle(error);
@@ -41,7 +41,7 @@ export function doLogin(login) {
 }
 
 export function pushAccountRegistrationData(registration) {
-  return function(dispatch, getState, {apiClient}) {
+  return function(dispatch, getState) {
     return dispatch(AuthActionCreator.pushAccountRegistrationData(registration));
   };
 }
@@ -94,9 +94,9 @@ export function doRegisterPersonal(registration) {
 }
 
 export function doInit() {
-  return function(dispatch, getState, {apiClient}) {
+  return function(dispatch, getState, {core}) {
     dispatch(AuthActionCreator.startRefresh());
-    return apiClient
+    return core
       .init()
       .then(() => dispatch(AuthActionCreator.successfulRefresh(apiClient.accessTokenStore.accessToken)))
       .catch(error => dispatch(AuthActionCreator.failedRefresh(error)));
@@ -104,9 +104,9 @@ export function doInit() {
 }
 
 export function doLogout() {
-  return function(dispatch, getState, {apiClient}) {
+  return function(dispatch, getState, {core}) {
     dispatch(AuthActionCreator.startLogout());
-    return apiClient
+    return core
       .logout()
       .then(() => dispatch(AuthActionCreator.successfulLogout()))
       .catch(error => dispatch(AuthActionCreator.failedLogout(error)));
@@ -114,9 +114,9 @@ export function doLogout() {
 }
 
 export function doSilentLogout() {
-  return function(dispatch, getState, {apiClient}) {
+  return function(dispatch, getState, {core}) {
     dispatch(AuthActionCreator.startLogout());
-    return apiClient
+    return core
       .logout()
       .then(() => dispatch(AuthActionCreator.successfulSilentLogout()))
       .catch(error => dispatch(AuthActionCreator.failedLogout(error)));
