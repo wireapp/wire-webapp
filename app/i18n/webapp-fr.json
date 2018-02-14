@@ -52,6 +52,7 @@
   "BackendError.LABEL.OPERATION_DENIED": "Vous n'avez pas la permission nécessaire",
   "BackendError.LABEL.UNAUTHORIZED": "Une erreur s'est produite. Veuillez recharger la page et réessayer",
   "BackendError.LABEL.HANDLE_EXISTS": "Ce nom d'utilisateur est déjà pris",
+  "BackendError.LABEL.HANDLE_TOO_SHORT": "",
   "BackendError.LABEL.INVALID_HANDLE": "Ce nom d'utilisateur est invalide",
   "BackendError.LABEL.INVALID_INVITATION_CODE": "L'invitation a été révoquée ou a expiré",
   "BackendError.LABEL.NO_OTHER_OWNER": "Le dernier propriétaire ne peut pas être supprimé de l'équipe",

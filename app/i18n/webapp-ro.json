@@ -52,6 +52,7 @@
   "BackendError.LABEL.OPERATION_DENIED": "Nu ai permisiune",
   "BackendError.LABEL.UNAUTHORIZED": "Eroare neașteptată. Reîncarcă pagina și încearcă din nou mai târziu",
   "BackendError.LABEL.HANDLE_EXISTS": "Acest nume de utilizator este deja folosit",
+  "BackendError.LABEL.HANDLE_TOO_SHORT": "",
   "BackendError.LABEL.INVALID_HANDLE": "Numele de utilizator este nevalid",
   "BackendError.LABEL.INVALID_INVITATION_CODE": "Invitația a fost revocată sau a expirat",
   "BackendError.LABEL.NO_OTHER_OWNER": "Ultimul proprietar nu poate fi eliminat din echipă",
