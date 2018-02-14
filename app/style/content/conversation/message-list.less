@@ -99,11 +99,16 @@
 }
 
 .message-header-label {
-  .label-xs;
+  font-size: 12px;
+  font-weight: @font-weight-regular;
   align-items: center;
   display: flex;
   flex: 1;
   min-width: 0; // fixes ellipsis not working with flexbox (FF)
+  .message-header-sender-name {
+    font-weight: @font-weight-bold;
+    text-transform: capitalize;
+  }
 }
 
 .message-header-label-sender {
@@ -435,14 +440,16 @@
 }
 
 .message-group-creation-header {
-  font-size: @font-size-sm;
+  font-size: 12px;
   margin-left: 72px;
   padding-top: 16px;
+  font-weight: @font-weight-regular;
 }
 
 .message-group-creation-header-name {
-  font-size: @font-size-xl;
-  margin-bottom: 8px;
+  font-size: @font-size-lg;
+  font-weight: @font-weight-bold;
+  margin: 8px 0;
 }
 
 // PING MESSAGE

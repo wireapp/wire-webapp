@@ -17,12 +17,12 @@
         <span data-bind="l10n_text: z.string.tooltip_conversation_all_verified"></span>
       <!-- /ko -->
       <!-- ko if: message.verification_message_type === z.message.VerificationMessageType.UNVERIFIED -->
-        <span class="label-bold" data-bind="text: message.sender_name()"></span>
+        <span class="message-header-sender-name" data-bind="text: message.sender_name()"></span>
         <span class="ellipsis" data-bind="l10n_text: z.string.conversation_device_unverified"></span>
         <span class="ellipsis text-theme" data-bind="click: click_on_device, text: message.caption_unverified_device" data-uie-name="go-devices"></span>
       <!-- /ko -->
       <!-- ko if: message.verification_message_type === z.message.VerificationMessageType.NEW_DEVICE -->
-        <span class="label-bold" data-bind='text: message.caption_user'></span>
+        <span class="message-header-sender-name" data-bind='text: message.caption_user'></span>
         <span class="ellipsis" data-bind="text: message.caption_started_using"></span>
         <span class="ellipsis text-theme" data-bind="click: click_on_device, text: message.caption_new_device" data-uie-name="go-devices"></span>
       <!-- /ko -->
@@ -46,7 +46,7 @@
       <!-- /ko -->
     </div>
     <div class="message-header-label">
-      <span class="label-bold" data-bind='text: message.sender_name()'></span>
+      <span class="message-header-sender-name" data-bind='text: message.sender_name()'></span>
       <span class="ellipsis" data-bind="text: message.caption()"></span>
     </div>
     <div class="message-body-actions">
@@ -200,7 +200,7 @@
       </svg>
     </div>
     <div class="message-header-label">
-      <span class="label-bold" data-bind='text: message.sender_name()'></span>
+      <span class="message-header-sender-name" data-bind='text: message.sender_name()'></span>
       <span class="ellipsis" data-bind="text: caption"></span>
       <span class="ellipsis text-theme" data-bind="text: caption_device, click: click_on_device"></span>
       <hr class="message-header-line" />
@@ -240,7 +240,7 @@
         </div>
         <div class="message-header-label">
           <!-- ko if: showSenderName() -->
-            <span class="label-bold" data-bind='text: senderName()'></span>
+            <span class="message-header-sender-name" data-bind='text: senderName()'></span>
           <!-- /ko -->
           <span class="ellipsis" data-bind="text: caption()"></span>
           <hr class="message-header-line" />
@@ -277,7 +277,7 @@
       <div class="icon-ping" data-bind="css: message.get_icon_classes"></div>
     </div>
     <div class="message-header-label" data-bind="css: {'ephemeral-message-obfuscated': message.is_expired()}">
-      <span class="label-bold" data-bind='text: message.sender_name()'></span>
+      <span class="message-header-sender-name" data-bind='text: message.sender_name()'></span>
       <span class="ellipsis" data-bind="text: message.caption"></span>
     </div>
     <div class="message-body-actions">
@@ -298,7 +298,7 @@
       <span class="icon-edit"></span>
     </div>
     <div class="message-header-label">
-      <span class="label-bold" data-bind='text: message.sender_name()'></span>
+      <span class="message-header-sender-name" data-bind='text: message.sender_name()'></span>
       <span class="ellipsis" data-bind="text: message.caption()"></span>
       <hr class="message-header-line" />
     </div>
