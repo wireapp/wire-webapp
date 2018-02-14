@@ -145,7 +145,8 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
     return this.conversationRepository
       .get_conversation_by_id(conversationId)
       .catch(error => {
-        if (error.type !== z.conversation.ConversationError.TYPE.NOT_FOUND) {
+        const isConversationNotFound = error.type === z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND;
+        if (!isConversationNotFound) {
           throw error;
         }
       })
