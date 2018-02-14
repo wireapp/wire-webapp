@@ -169,14 +169,14 @@ z.conversation.EventBuilder = {
       type: z.event.Client.CONVERSATION.MISSED_MESSAGES,
     };
   },
-  buildTeamMemberLeave(conversationEntity, user_et, isoDate) {
+  buildTeamMemberLeave(conversationEntity, userEntity, isoDate) {
     return {
       conversation: conversationEntity.id,
       data: {
-        name: user_et.name(),
-        userIds: [user_et.id],
+        name: userEntity.name(),
+        userIds: [userEntity.id],
       },
-      from: user_et.id,
+      from: userEntity.id,
       id: z.util.create_random_uuid(),
       time: isoDate,
       type: z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE,
@@ -196,7 +196,7 @@ z.conversation.EventBuilder = {
     };
   },
   buildVoiceChannelActivate(callMessageEntity) {
-    const {conversationId, userId, time} = callMessageEntity;
+    const {conversation_id: conversationId, user_id: userId, time} = callMessageEntity;
 
     return {
       conversation: conversationId,
@@ -208,7 +208,11 @@ z.conversation.EventBuilder = {
     };
   },
   buildVoiceChannelDeactivate(callMessageEntity, reason, timeOffset = 0) {
-    const {conversationId, userId, time = new Date(Date.now() - timeOffset).toISOString()} = callMessageEntity;
+    const {
+      conversation_id: conversationId,
+      user_id: userId,
+      time = new Date(Date.now() - timeOffset).toISOString(),
+    } = callMessageEntity;
 
     return {
       conversation: conversationId,
