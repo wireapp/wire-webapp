@@ -618,7 +618,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
     const next_conversation_et = this.conversation_repository.get_next_conversation(
       this.conversation_repository.active_conversation()
     );
-    this.user_repository.cancel_connection_request(message_et.other_user(), next_conversation_et);
+    this.user_repository.cancel_connection_request(message_et.otherUser(), next_conversation_et);
   }
 
   click_on_like(message_et, button = true) {
