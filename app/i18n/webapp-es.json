@@ -52,6 +52,7 @@
   "BackendError.LABEL.OPERATION_DENIED": "No tienes permiso",
   "BackendError.LABEL.UNAUTHORIZED": "Algo salió mal. Vuelva a cargar la página e intente de nuevo",
   "BackendError.LABEL.HANDLE_EXISTS": "Este usuario ya está tomado",
+  "BackendError.LABEL.HANDLE_TOO_SHORT": "",
   "BackendError.LABEL.INVALID_HANDLE": "Este usuario no es válido",
   "BackendError.LABEL.INVALID_INVITATION_CODE": "La invitación ha sido revocada o ha expirado",
   "BackendError.LABEL.NO_OTHER_OWNER": "El último propietario no puede ser eliminado del equipo",

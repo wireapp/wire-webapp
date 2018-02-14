@@ -260,7 +260,6 @@ z.string.es.conversations_contacts = 'Contactos';
 z.string.es.conversations_connection_request_many = '{{number}} personas en espera';
 z.string.es.conversations_connection_request_one = '1 persona en espera';
 z.string.es.conversations_empty_conversation = 'Conversación en grupo';
-z.string.es.conversations_empty_conversation_description = 'Todo el mundo se fue';
 z.string.es.conversations_no_conversations = 'Iniciar una conversación o crear un grupo.';
 z.string.es.conversations_popover_archive = 'Archivar';
 z.string.es.conversations_popover_block = 'Bloquear';

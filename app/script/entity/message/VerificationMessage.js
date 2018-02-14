@@ -29,26 +29,26 @@ z.entity.VerificationMessage = class VerificationMessage extends z.entity.Messag
     this.affect_order(false);
     this.verification_message_type = undefined;
 
-    this.user_ets = ko.observableArray();
-    this.user_ids = ko.observableArray();
+    this.userEntities = ko.observableArray();
+    this.userIds = ko.observableArray();
 
     this.is_self_device = ko.pureComputed(() => {
-      return this.user_ids().length === 1 && this.user_ids()[0] === this.user().id;
+      return this.userIds().length === 1 && this.userIds()[0] === this.user().id;
     });
 
     this.caption_user = ko.pureComputed(() => {
-      return z.util.LocalizerUtil.join_names(this.user_ets(), z.string.Declension.NOMINATIVE);
+      return z.util.LocalizerUtil.joinNames(this.userEntities(), z.string.Declension.NOMINATIVE);
     });
 
     this.caption_started_using = ko.pureComputed(() => {
-      if (this.user_ids().length > 1) {
+      if (this.userIds().length > 1) {
         return z.l10n.text(z.string.conversation_device_started_using_many);
       }
       return z.l10n.text(z.string.conversation_device_started_using_one);
     });
 
     this.caption_new_device = ko.pureComputed(() => {
-      if (this.user_ids().length > 1) {
+      if (this.userIds().length > 1) {
         return z.l10n.text(z.string.conversation_device_new_device_many);
       }
       return z.l10n.text(z.string.conversation_device_new_device_one);
@@ -58,7 +58,7 @@ z.entity.VerificationMessage = class VerificationMessage extends z.entity.Messag
       if (this.is_self_device()) {
         return z.l10n.text(z.string.conversation_device_your_devices);
       }
-      return z.l10n.text(z.string.conversation_device_user_devices, this.user_ets()[0].first_name());
+      return z.l10n.text(z.string.conversation_device_user_devices, this.userEntities()[0].first_name());
     });
   }
 

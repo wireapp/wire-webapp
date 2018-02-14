@@ -266,7 +266,6 @@ z.string.nl.conversations_contacts = 'Contacten';
 z.string.nl.conversations_connection_request_many = '{{number}} personen wachten';
 z.string.nl.conversations_connection_request_one = '1 persoon wacht';
 z.string.nl.conversations_empty_conversation = 'Groepsgesprek';
-z.string.nl.conversations_empty_conversation_description = 'Verlaten door iedereen';
 z.string.nl.conversations_no_conversations = 'Nog geen gesprekken';
 z.string.nl.conversations_popover_archive = 'Archiveren';
 z.string.nl.conversations_popover_block = 'Blokkeren';

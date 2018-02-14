@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,159 +27,180 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
     super();
 
     this.super_type = z.message.SuperType.MEMBER;
-    this.member_message_type = z.message.SystemMessageType.NORMAL;
+    this.memberMessageType = z.message.SystemMessageType.NORMAL;
 
-    this.user_ets = ko.observableArray();
-    this.user_ids = ko.observableArray();
+    this.userEntities = ko.observableArray();
+    this.userIds = ko.observableArray();
     this.name = ko.observable('');
 
+    this.hasUsers = ko.pureComputed(() => this.userEntities().length);
+
     // Users joined the conversation without sender
-    this.joined_user_ets = ko.pureComputed(() => {
-      return this.user_ets()
-        .filter(user_et => user_et.id !== this.user().id)
-        .map(user_et => user_et);
+    this.joinedUserEntities = ko.pureComputed(() => {
+      return this.userEntities()
+        .filter(userEntity => userEntity.id !== this.user().id)
+        .map(userEntity => userEntity);
     });
 
     // Users joined the conversation without self
-    this.remote_user_ets = ko.pureComputed(() => {
-      return this.user_ets()
-        .filter(user_et => !user_et.is_me)
-        .map(user_et => user_et);
+    this.remoteUserEntities = ko.pureComputed(() => {
+      return this.userEntities()
+        .filter(userEntity => !userEntity.is_me)
+        .map(userEntity => userEntity);
     });
 
-    this.sender_name = ko.pureComputed(
-      () => {
-        const is_team_member_leave = this.type === z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE;
-        return is_team_member_leave ? this.name() : z.util.get_first_name(this.user());
-      },
-      this,
-      {deferEvaluation: true}
-    );
+    this.senderName = ko.pureComputed(() => {
+      const isTeamMemberLeave = this.type === z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE;
+      return isTeamMemberLeave ? this.name() : z.util.get_first_name(this.user());
+    });
 
-    this._generate_name_string = (declension = z.string.Declension.ACCUSATIVE) => {
-      return z.util.LocalizerUtil.join_names(this.joined_user_ets(), declension);
-    };
+    this.showNamedCreation = ko.pureComputed(() => this.isConversationCreate() && this.name().length);
+    this.showSenderName = ko.pureComputed(() => {
+      const isUnnamedGroupCreation = this.isConversationCreate() && !this.name().length;
+      return isUnnamedGroupCreation || this.isMemberChange();
+    });
 
-    this._get_caption_connection = function(user_et) {
-      if (user_et.is_blocked()) {
-        return z.l10n.text(z.string.conversationConnectionBlocked);
-      }
-
-      if (user_et.is_outgoing_request()) {
-        return '';
-      }
-
-      return z.l10n.text(z.string.conversationConnectionAccepted);
-    };
-
-    this.show_large_avatar = () => {
-      const large_avatar_types = [
-        z.message.SystemMessageType.CONNECTION_ACCEPTED,
-        z.message.SystemMessageType.CONNECTION_REQUEST,
-      ];
-      return large_avatar_types.includes(this.member_message_type);
-    };
-
-    this.other_user = ko.pureComputed(() => {
-      if (this.user_ets().length === 1) {
-        return this.user_ets()[0];
+    this.otherUser = ko.pureComputed(() => {
+      if (this.hasUsers()) {
+        return this.userEntities()[0];
       }
       return new z.entity.User();
     });
 
-    this.caption = ko.pureComputed(
-      () => {
-        if (this.user_ets().length === 0) {
-          return '';
-        }
+    this.caption = ko.pureComputed(() => {
+      if (!this.hasUsers()) {
+        return '';
+      }
 
-        switch (this.member_message_type) {
-          case z.message.SystemMessageType.CONNECTION_ACCEPTED:
-          case z.message.SystemMessageType.CONNECTION_REQUEST:
-            return this._get_caption_connection(this.other_user());
-          case z.message.SystemMessageType.CONVERSATION_CREATE:
-            if (this.user().is_me) {
-              return z.l10n.text(z.string.conversation_create_you, this._generate_name_string());
-            }
-            return z.l10n.text(z.string.conversation_create, this._generate_name_string(z.string.Declension.DATIVE));
-          case z.message.SystemMessageType.CONVERSATION_RESUME:
-            return z.l10n.text(z.string.conversation_resume, this._generate_name_string(z.string.Declension.DATIVE));
-          default:
-            break;
-        }
+      switch (this.memberMessageType) {
+        case z.message.SystemMessageType.CONNECTION_ACCEPTED:
+        case z.message.SystemMessageType.CONNECTION_REQUEST:
+          return this._getCaptionConnection(this.otherUser());
+        case z.message.SystemMessageType.CONVERSATION_CREATE:
+          if (this.name().length) {
+            return z.l10n.text(z.string.conversationCreateWith, this._generateNameString(z.string.Declension.DATIVE));
+          }
+          if (this.user().is_me) {
+            return z.l10n.text(z.string.conversation_create_you, this._generateNameString());
+          }
+          return z.l10n.text(z.string.conversation_create, this._generateNameString(z.string.Declension.DATIVE));
+        case z.message.SystemMessageType.CONVERSATION_RESUME:
+          return z.l10n.text(z.string.conversation_resume, this._generateNameString(z.string.Declension.DATIVE));
+        default:
+          break;
+      }
 
-        switch (this.type) {
-          case z.event.Backend.CONVERSATION.MEMBER_LEAVE:
-            if (this.other_user().id === this.user().id) {
-              if (this.user().is_me) {
-                return z.l10n.text(z.string.conversation_member_leave_left_you);
-              }
-              return z.l10n.text(z.string.conversation_member_leave_left);
-            }
-            if (this.user().is_me) {
-              return z.l10n.text(z.string.conversation_member_leave_removed_you, this._generate_name_string());
-            }
-            return z.l10n.text(z.string.conversation_member_leave_removed, this._generate_name_string());
-          case z.event.Backend.CONVERSATION.MEMBER_JOIN:
-            if (this.user().is_me) {
-              return z.l10n.text(z.string.conversation_member_join_you, this._generate_name_string());
-            }
-            return z.l10n.text(z.string.conversation_member_join, this._generate_name_string());
-          case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE:
-            return z.l10n.text(z.string.conversation_team_leave);
-          default:
-            break;
-        }
-      },
-      this,
-      {deferEvaluation: true}
-    );
+      switch (this.type) {
+        case z.event.Backend.CONVERSATION.MEMBER_LEAVE:
+          const senderLeft = this.otherUser().id === this.user().id;
+          if (senderLeft) {
+            const userLeftStringId = this.user().is_me
+              ? z.string.conversation_member_leave_left_you
+              : z.string.conversation_member_leave_left;
+            return z.l10n.text(userLeftStringId);
+          }
+
+          const userRemovedStringId = this.user().is_me
+            ? z.string.conversation_member_leave_removed_you
+            : z.string.conversation_member_leave_removed;
+          return z.l10n.text(userRemovedStringId, this._generateNameString());
+        case z.event.Backend.CONVERSATION.MEMBER_JOIN:
+          const userJoinedStringId = this.user().is_me
+            ? z.string.conversation_member_join_you
+            : z.string.conversation_member_join;
+
+          return z.l10n.text(userJoinedStringId, this._generateNameString());
+        case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE:
+          return z.l10n.text(z.string.conversation_team_leave);
+        default:
+          break;
+      }
+      return '';
+    });
+
+    this.groupCreationHeader = ko.pureComputed(() => {
+      if (this.showNamedCreation()) {
+        const groupCreationStringId = this.user().is_me
+          ? z.string.conversationCreateNameYou
+          : z.string.conversationCreateName;
+        return z.util.StringUtil.capitalize_first_char(z.l10n.text(groupCreationStringId, this.senderName()));
+      }
+      return '';
+    });
+    this.showLargeAvatar = () => {
+      const largeAvatarTypes = [
+        z.message.SystemMessageType.CONNECTION_ACCEPTED,
+        z.message.SystemMessageType.CONNECTION_REQUEST,
+      ];
+      return largeAvatarTypes.includes(this.memberMessageType);
+    };
   }
 
-  is_connection() {
-    return [z.message.SystemMessageType.CONNECTION_ACCEPTED, z.message.SystemMessageType.CONNECTION_REQUEST].includes(
-      this.member_message_type
-    );
+  _generateNameString(declension = z.string.Declension.ACCUSATIVE) {
+    return z.util.LocalizerUtil.joinNames(this.joinedUserEntities(), declension);
   }
 
-  is_creation() {
+  _getCaptionConnection(userEntity) {
+    if (userEntity) {
+      if (userEntity.is_blocked()) {
+        return z.l10n.text(z.string.conversation_connection_blocked);
+      }
+
+      if (userEntity.is_outgoing_request()) {
+        return '';
+      }
+    }
+
+    return z.l10n.text(z.string.conversationConnectionAccepted);
+  }
+
+  isConnection() {
+    const connectionMessageTypes = [
+      z.message.SystemMessageType.CONNECTION_ACCEPTED,
+      z.message.SystemMessageType.CONNECTION_REQUEST,
+    ];
+
+    return connectionMessageTypes.includes(this.memberMessageType);
+  }
+
+  isCreation() {
     return [
       z.message.SystemMessageType.CONNECTION_ACCEPTED,
       z.message.SystemMessageType.CONNECTION_REQUEST,
       z.message.SystemMessageType.CONVERSATION_CREATE,
       z.message.SystemMessageType.CONVERSATION_RESUME,
-    ].includes(this.member_message_type);
+    ].includes(this.memberMessageType);
   }
 
-  is_conversation_create() {
-    return this.member_message_type === z.message.SystemMessageType.CONVERSATION_CREATE;
+  isConversationCreate() {
+    return this.memberMessageType === z.message.SystemMessageType.CONVERSATION_CREATE;
   }
 
-  is_conversation_initialization() {
-    return this.is_conversation_create() || this.is_conversation_resume();
+  isConversationResume() {
+    return this.memberMessageType === z.message.SystemMessageType.CONVERSATION_RESUME;
   }
 
-  is_conversation_resume() {
-    return this.member_message_type === z.message.SystemMessageType.CONVERSATION_RESUME;
+  isGroupCreation() {
+    return this.isConversationCreate() || this.isConversationResume();
   }
 
-  is_member_change() {
-    return this.is_member_join() || this.is_member_leave() || this.is_team_member_leave();
+  isMemberChange() {
+    return this.isMemberJoin() || this.isMemberLeave() || this.isTeamMemberLeave();
   }
 
-  is_member_join() {
+  isMemberJoin() {
     return this.type === z.event.Backend.CONVERSATION.MEMBER_JOIN;
   }
 
-  is_member_leave() {
+  isMemberLeave() {
     return this.type === z.event.Backend.CONVERSATION.MEMBER_LEAVE;
   }
 
-  is_team_member_leave() {
+  isTeamMemberLeave() {
     return this.type === z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE;
   }
 
-  is_member_removal() {
-    return this.is_member_leave() || this.is_team_member_leave();
+  isMemberRemoval() {
+    return this.isMemberLeave() || this.isTeamMemberLeave();
   }
 };

@@ -49,7 +49,9 @@
 }
 
 .label-username {
-  .text-selection;
+  &:not(.label-username-notext) {
+    .text-selection;
+  }
 
   &:not(:empty)::before {
     content: '@';

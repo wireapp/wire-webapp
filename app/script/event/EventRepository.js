@@ -70,15 +70,17 @@ z.event.EventRepository = class EventRepository {
     this.logger = new z.util.Logger('z.event.EventRepository', z.config.LOGGER.OPTIONS);
 
     this.current_client = undefined;
-    this.time_offset = 0;
+    this.timeOffset = 0;
 
     this.notification_handling_state = ko.observable(z.event.NOTIFICATION_HANDLING_STATE.STREAM);
     this.notification_handling_state.subscribe(handling_state => {
       amplify.publish(z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, handling_state);
 
-      if (handling_state === z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET) {
+      const isHandlingWebSocket = handling_state === z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
+      if (isHandlingWebSocket) {
         this._handle_buffered_notifications();
-        if (this.previous_handling_state === z.event.NOTIFICATION_HANDLING_STATE.RECOVERY) {
+        const wasHandlingRecovery = this.previous_handling_state === z.event.NOTIFICATION_HANDLING_STATE.RECOVERY;
+        if (wasHandlingRecovery) {
           amplify.publish(z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.CONNECTIVITY_RECOVERY);
         }
       }
@@ -96,37 +98,32 @@ z.event.EventRepository = class EventRepository {
 
     this.notifications_queue.subscribe(notifications => {
       if (notifications.length) {
-        if (!this.notifications_blocked) {
-          const notification = this.notifications_queue()[0];
-          this.notifications_blocked = true;
-
-          return this._handle_notification(notification)
-            .catch(error => {
-              this.logger.warn(
-                `We failed to handle a notification but will continue with queue: ${error.message}`,
-                error
-              );
-            })
-            .then(() => {
-              this.notifications_blocked = false;
-              this.notifications_queue.shift();
-              this.notifications_handled++;
-
-              if (this.notifications_handled % 5 === 0 || this.notifications_handled < 5) {
-                const content = {
-                  handled: this.notifications_handled,
-                  total: this.notifications_total,
-                };
-                const progress = this.notifications_handled / this.notifications_total * 50 + 25;
-
-                amplify.publish(z.event.WebApp.APP.UPDATE_PROGRESS, progress, z.string.initDecryption, content);
-              }
-            });
+        if (this.notifications_blocked) {
+          return;
         }
-      } else if (
-        this.notifications_loaded() &&
-        this.notification_handling_state() !== z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET
-      ) {
+
+        const [notification] = this.notifications_queue();
+        this.notifications_blocked = true;
+
+        return this._handle_notification(notification)
+          .catch(error => {
+            const errorMessage = `We failed to handle a notification but will continue with queue: ${error.message}`;
+            this.logger.warn(errorMessage, error);
+          })
+          .then(() => {
+            this.notifications_blocked = false;
+            this.notifications_queue.shift();
+            this.notifications_handled++;
+
+            const isHandlingStream = this.notification_handling_state() === z.event.NOTIFICATION_HANDLING_STATE.STREAM;
+            if (isHandlingStream) {
+              this._updateProgress();
+            }
+          });
+      }
+
+      const isHandlingWebSocket = this.notification_handling_state() === z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
+      if (this.notifications_loaded() && !isHandlingWebSocket) {
         this.logger.info(`Done handling '${this.notifications_total}' notifications from the stream`);
         this.notification_handling_state(z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
         this.notifications_loaded(false);
@@ -140,7 +137,7 @@ z.event.EventRepository = class EventRepository {
     this.last_event_date = ko.observable();
 
     amplify.subscribe(z.event.WebApp.CONNECTION.ONLINE, this.recover_from_stream.bind(this));
-    amplify.subscribe(z.event.WebApp.EVENT.INJECT, this.inject_event.bind(this));
+    amplify.subscribe(z.event.WebApp.EVENT.INJECT, this.injectEvent.bind(this));
   }
 
   //##############################################################################
@@ -436,10 +433,10 @@ z.event.EventRepository = class EventRepository {
     const updated_time_offset = new Date() - new Date(backend_time);
 
     if (_.isNumber(updated_time_offset)) {
-      this.time_offset = updated_time_offset;
-      amplify.publish(z.event.WebApp.EVENT.UPDATE_TIME_OFFSET, this.time_offset);
+      this.timeOffset = updated_time_offset;
+      amplify.publish(z.event.WebApp.EVENT.UPDATE_TIME_OFFSET, this.timeOffset);
       this.logger.info(
-        `Backend reported current time as '${backend_time}'. Time offset updated to '${this.time_offset}' ms`
+        `Backend reported current time as '${backend_time}'. Time offset updated to '${this.timeOffset}' ms`
       );
     }
   }
@@ -472,6 +469,18 @@ z.event.EventRepository = class EventRepository {
     }
   }
 
+  _updateProgress() {
+    if (this.notifications_handled % 5 === 0 || this.notifications_handled < 5) {
+      const content = {
+        handled: this.notifications_handled,
+        total: this.notifications_total,
+      };
+      const progress = this.notifications_handled / this.notifications_total * 50 + 25;
+
+      amplify.publish(z.event.WebApp.APP.UPDATE_PROGRESS, progress, z.string.init_decryption, content);
+    }
+  }
+
   //##############################################################################
   // Notification/Event handling
   //##############################################################################
@@ -484,13 +493,18 @@ z.event.EventRepository = class EventRepository {
    * @param {z.event.EventRepository.SOURCE} [source=EventRepository.SOURCE.INJECTED] - Source of injection
    * @returns {undefined} No return value
    */
-  inject_event(event, source = EventRepository.SOURCE.INJECTED) {
+  injectEvent(event, source = EventRepository.SOURCE.INJECTED) {
     if (!event) {
       throw new z.event.EventError(z.event.EventError.TYPE.NO_EVENT);
     }
 
-    const {conversation: conversation_id, id = 'ID not specified', type} = event;
-    if (conversation_id !== this.user_repository.self().id) {
+    const isHandlingWebSocket = this.notification_handling_state() === z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
+    if (!isHandlingWebSocket) {
+      source = EventRepository.SOURCE.INJECTED;
+    }
+
+    const {conversation: conversationId, id = 'ID not specified', type} = event;
+    if (conversationId !== this.user_repository.self().id) {
       this.logger.info(`Injected event ID '${id}' of type '${type}'`, event);
       this._handle_event(event, source);
     }
@@ -684,7 +698,7 @@ z.event.EventRepository = class EventRepository {
         );
       }
 
-      const event_from_stream = source === z.event.EventRepository.SOURCE.STREAM;
+      const event_from_stream = source === EventRepository.SOURCE.STREAM;
       if (event_from_stream && event.time) {
         const outdated_event = this.last_event_date() >= new Date(event.time).toISOString();
 
@@ -716,7 +730,6 @@ z.event.EventRepository = class EventRepository {
   _handle_notification({payload: events, id, transient}) {
     const source = transient !== undefined ? EventRepository.SOURCE.WEB_SOCKET : EventRepository.SOURCE.STREAM;
     const is_transient_event = !!transient;
-
     this.logger.info(`Handling notification '${id}' from '${source}' containing '${events.length}' events`, events);
 
     if (!events.length) {
@@ -751,7 +764,7 @@ z.event.EventRepository = class EventRepository {
     const {content = {}, conversation: conversation_id, time, type} = event;
     const forced_event_types = [z.calling.enum.CALL_MESSAGE_TYPE.CANCEL, z.calling.enum.CALL_MESSAGE_TYPE.GROUP_LEAVE];
 
-    const corrected_timestamp = Date.now() - this.time_offset;
+    const corrected_timestamp = Date.now() - this.timeOffset;
     const threshold_timestamp = new Date(time).getTime() + EventRepository.CONFIG.E_CALL_EVENT_LIFETIME;
 
     const is_forced_event_type = forced_event_types.includes(content.type);

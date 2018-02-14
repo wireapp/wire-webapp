@@ -245,7 +245,6 @@ z.string.da.conversations_contacts = 'Kontakter';
 z.string.da.conversations_connection_request_many = '{{number}} personer venter';
 z.string.da.conversations_connection_request_one = '1 person venter';
 z.string.da.conversations_empty_conversation = 'Gruppesamtale';
-z.string.da.conversations_empty_conversation_description = 'Alle forlod gruppen';
 z.string.da.conversations_no_conversations = 'Ingen samtaler';
 z.string.da.conversations_popover_archive = 'Arkivér';
 z.string.da.conversations_popover_block = 'Blokér';

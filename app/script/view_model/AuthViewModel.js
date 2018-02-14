@@ -26,18 +26,14 @@ window.z.ViewModel = z.ViewModel || {};
 z.ViewModel.AuthViewModel = class AuthViewModel {
   static get CONFIG() {
     return {
-      ANIMATION_TIMEOUT: {
-        LONG: 2000,
-        SHORT: 500,
-      },
       FORWARDED_URL_PARAMETERS: [
-        z.auth.URLParameter.BOT_NAME,
         z.auth.URLParameter.BOT_PROVIDER,
         z.auth.URLParameter.BOT_SERVICE,
         z.auth.URLParameter.ENVIRONMENT,
         z.auth.URLParameter.LOCALE,
         z.auth.URLParameter.TRACKING,
       ],
+      RESET_TIMEOUT: 2000,
     };
   }
 
@@ -858,7 +854,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
             window.setTimeout(() => {
               $('.icon-error').fadeIn();
               this.disabled_by_animation(false);
-            }, AuthViewModel.CONFIG.ANIMATION_TIMEOUT.SHORT);
+            }, z.motion.MotionDuration.LONG);
           });
       }
     }
@@ -1024,13 +1020,13 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
     window.setTimeout(() => {
       $('.icon-check').fadeIn();
-    }, AuthViewModel.CONFIG.ANIMATION_TIMEOUT.SHORT);
+    }, z.motion.MotionDuration.LONG);
 
     window.setTimeout(() => {
       $('.icon-check').fadeOut();
       $('.icon-envelope').fadeIn();
       this.disabled_by_animation(false);
-    }, AuthViewModel.CONFIG.ANIMATION_TIMEOUT.LONG);
+    }, AuthViewModel.CONFIG.RESET_TIMEOUT);
   }
 
   _wait_for_update() {

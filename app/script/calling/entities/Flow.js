@@ -683,7 +683,7 @@ z.calling.entities.Flow = class Flow {
       this.logger.debug(`Received '${type}' (response: ${response}) message via data channel`, call_message);
     }
 
-    const call_event = z.conversation.EventBuilder.build_calling(
+    const call_event = z.conversation.EventBuilder.buildCalling(
       conversation_et,
       call_message,
       this.remote_user_id,

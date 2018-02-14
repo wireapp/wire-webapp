@@ -73,7 +73,7 @@ z.calling.CallingRepository = class CallingRepository {
       }
     });
 
-    this.time_offset = 0;
+    this.timeOffset = 0;
 
     this.calling_config = undefined;
     this.calling_config_timeout = undefined;
@@ -1141,7 +1141,7 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {undefined} No return value
    */
   inject_activate_event(call_message_et, source) {
-    const activate_event = z.conversation.EventBuilder.build_voice_channel_activate(call_message_et);
+    const activate_event = z.conversation.EventBuilder.buildVoiceChannelActivate(call_message_et);
     amplify.publish(z.event.WebApp.EVENT.INJECT, activate_event, source);
   }
 
@@ -1153,10 +1153,10 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {undefined} No return value
    */
   inject_deactivate_event(call_message_et, source, reason) {
-    const deactivate_event = z.conversation.EventBuilder.build_voice_channel_deactivate(
+    const deactivate_event = z.conversation.EventBuilder.buildVoiceChannelDeactivate(
       call_message_et,
       reason,
-      this.time_offset
+      this.timeOffset
     );
     amplify.publish(z.event.WebApp.EVENT.INJECT, deactivate_event, source);
   }
@@ -1167,7 +1167,7 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {undefined} No return value
    */
   update_time_offset(time_offset) {
-    this.time_offset = time_offset;
+    this.timeOffset = time_offset;
   }
 
   //##############################################################################

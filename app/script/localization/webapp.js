@@ -25,6 +25,7 @@ z.string.wireWindows = 'Wire for Windows';
 z.string.wireLinux = 'Wire for Linux';
 z.string.nonexistentUser = 'Deleted User';
 z.string.and = 'and';
+z.string.enumerationAnd = ', and ';
 
 // Alert view when trying to set a profile image that's too small
 z.string.alertUploadFileFormat = 'Can’t use this picture.\nPlease choose a PNG or JPEG file.';
@@ -233,6 +234,9 @@ z.string.conversationConnectionAccepted = 'Connected';
 z.string.conversationConnectionBlocked = 'Blocked';
 z.string.conversationConnectionCancelRequest = 'Cancel connection request';
 z.string.conversation_create = ' started a conversation with {{users}}';
+z.string.conversationCreateName = '{{user}} started the conversation';
+z.string.conversationCreateNameYou = '{{user}} started the conversation';
+z.string.conversationCreateWith = ' with {{users}}';
 z.string.conversation_create_you = ' started a conversation with {{users}}';
 z.string.conversation_device_started_using_one = ' started using';
 z.string.conversation_device_started_using_many = ' started using';
@@ -287,15 +291,17 @@ z.string.conversation_send_pasted_file = 'Pasted image at {{date}}';
 z.string.conversation_someone = 'Someone';
 z.string.conversation_tweet_author = ' on Twitter';
 
-// Conversation creation
-z.string.conversation_creation_preferences_action = 'Next';
-z.string.conversation_creation_preferences_header = 'Create conversation';
-z.string.conversation_creation_preferences_placeholder = 'Conversation name';
-z.string.conversation_creation_participants_action_create = 'Create';
-z.string.conversation_creation_participants_action_skip = 'Skip';
-z.string.conversation_creation_participants_header = 'Add people';
-z.string.conversation_creation_participants_header_with_counter = 'Add people ({{number}})';
-z.string.conversation_creation_participants_placeholder = 'Search by name';
+// Group creation
+z.string.groupCreationPreferencesAction = 'Next';
+z.string.groupCreationPreferencesErrorNameShort = 'At least 1 character';
+z.string.groupCreationPreferencesErrorNameLong = 'Too many characters';
+z.string.groupCreationPreferencesHeader = 'New group';
+z.string.groupCreationPreferencesPlaceholder = 'Group name';
+z.string.groupCreationParticipantsActionCreate = 'Done';
+z.string.groupCreationParticipantsActionSkip = 'Skip';
+z.string.groupCreationParticipantsHeader = 'Add people';
+z.string.groupCreationParticipantsHeaderWithCounter = 'Add people ({{number}})';
+z.string.groupCreationParticipantsPlaceholder = 'Search by name';
 
 // Collection
 z.string.collectionShowAll = 'Show all {{number}}';
@@ -317,7 +323,6 @@ z.string.conversations_contacts = 'Contacts';
 z.string.conversations_connection_request_many = '{{number}} people waiting';
 z.string.conversations_connection_request_one = '1 person waiting';
 z.string.conversations_empty_conversation = 'Group conversation';
-z.string.conversations_empty_conversation_description = 'Everyone left';
 z.string.conversations_no_conversations = 'Start a conversation or create a group.';
 z.string.conversations_popover_archive = 'Archive';
 z.string.conversations_popover_block = 'Block';
@@ -372,8 +377,6 @@ z.string.extensionsGiphyNoGifs = 'Oops, no gifs';
 z.string.extensionsGiphyRandom = 'Random';
 
 // People View
-z.string.search_open = 'Open';
-z.string.search_open_group = 'Create Group';
 z.string.people_confirm_label = 'Add people to group';
 z.string.people_people = '{{number}} People';
 z.string.people_search_placeholder = 'Search by name';
@@ -525,10 +528,10 @@ z.string.preferences_options_notifications_obfuscate_message = 'Show sender';
 z.string.preferences_options_notifications_on = 'Show sender and message';
 
 // Search
-z.string.search_group_hint = 'Keep typing or pick more people to create a group';
 z.string.search_connect = 'Connect';
 z.string.search_connections = 'Connections';
 z.string.search_contacts = 'Contacts';
+z.string.searchCreateGroup = 'Create group';
 z.string.search_groups = 'Groups';
 z.string.search_people = 'People';
 z.string.search_placeholder = 'Search by name or username';

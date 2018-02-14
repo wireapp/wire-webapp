@@ -49,6 +49,8 @@ z.entity.Conversation = class Conversation {
     this.participating_user_ids = ko.observableArray([]);
     this.self = undefined;
 
+    this.hasCreationMessage = false;
+
     this.firstUserEntity = ko.pureComputed(() => this.participating_user_ets()[0]);
     this.availabilityOfUser = ko.pureComputed(() => this.firstUserEntity() && this.firstUserEntity().availability());
 
@@ -128,31 +130,10 @@ z.entity.Conversation = class Conversation {
       })
     );
 
-    this.creation_message = undefined;
-
-    this.has_further_messages = ko.observable(true);
+    this.hasAdditionalMessages = ko.observable(true);
 
     this.messages_visible = ko
-      .pureComputed(() => {
-        if (this.id === '') {
-          return [];
-        }
-
-        const message_ets = this.messages().filter(message_et => message_et.visible());
-
-        const first_message = this.get_first_message();
-        if (
-          !this.has_further_messages() &&
-          !((first_message ? first_message.is_member() : undefined) && first_message.is_creation())
-        ) {
-          this.creation_message = this.creation_message || this._creation_message();
-
-          if (this.creation_message) {
-            message_ets.unshift(this.creation_message);
-          }
-        }
-        return message_ets;
-      })
+      .pureComputed(() => (!this.id ? [] : this.messages().filter(messageEntity => messageEntity.visible())))
       .extend({trackArrayChanges: true});
 
     // Calling
@@ -278,14 +259,14 @@ z.entity.Conversation = class Conversation {
     if (!this.unread_event_count()) {
       this.remove_messages();
       this.is_loaded(false);
-      return this.has_further_messages(true);
+      this.hasAdditionalMessages(true);
     }
   }
 
   /**
    * Set the timestamp of a given type.
    * @note This will only increment timestamps
-   * @param {string} timestamp - Timestamp to be set
+   * @param {string|number} timestamp - Timestamp to be set
    * @param {z.conversation.TIMESTAMP_TYPE} type - Type of timestamp to be updated
    * @returns {boolean|number} Timestamp value which can be 'false' (boolean) if there is no timestamp
    */
@@ -483,51 +464,6 @@ z.entity.Conversation = class Conversation {
     return messageEt;
   }
 
-  /**
-   * Creates the placeholder message after clearing a conversation.
-   * @private
-   * @note Only create the message if the group participants have been set
-   * @returns {undefined} No return value
-   */
-  _creation_message() {
-    if (this.participating_user_ets().length === 0) {
-      return undefined;
-    }
-
-    const message_et = new z.entity.MemberMessage();
-    message_et.type = z.message.SuperType.MEMBER;
-    message_et.timestamp(new Date(0));
-    message_et.user_ids(this.participating_user_ids());
-    message_et.user_ets(this.participating_user_ets().slice(0));
-
-    if ([z.conversation.ConversationType.CONNECT, z.conversation.ConversationType.ONE2ONE].includes(this.type())) {
-      if (this.firstUserEntity() && this.firstUserEntity().is_outgoing_request()) {
-        message_et.member_message_type = z.message.SystemMessageType.CONNECTION_REQUEST;
-      } else {
-        message_et.member_message_type = z.message.SystemMessageType.CONNECTION_ACCEPTED;
-      }
-    } else {
-      message_et.member_message_type = z.message.SystemMessageType.CONVERSATION_CREATE;
-      if (this.creator === this.self.id) {
-        message_et.user(this.self);
-      } else {
-        message_et.user_ets.push(this.self);
-
-        const user_et = ko.utils.arrayFirst(
-          this.participating_user_ets(),
-          current_user_et => current_user_et.id === this.creator
-        );
-
-        if (user_et) {
-          message_et.user(user_et);
-        } else {
-          message_et.member_message_type = z.message.SystemMessageType.CONVERSATION_RESUME;
-        }
-      }
-    }
-    return message_et;
-  }
-
   update_timestamp_server(time, is_backend_timestamp = false) {
     if (is_backend_timestamp) {
       const timestamp = new Date(time).getTime();
@@ -574,7 +510,7 @@ z.entity.Conversation = class Conversation {
    * Get the first message of the conversation.
    * @returns {z.entity.Message|undefined} First message entity or undefined
    */
-  get_first_message() {
+  getFirstMessage() {
     return this.messages()[0];
   }
 
@@ -582,7 +518,7 @@ z.entity.Conversation = class Conversation {
    * Get the last message of the conversation.
    * @returns {z.entity.Message|undefined} Last message entity or undefined
    */
-  get_last_message() {
+  getLastMessage() {
     return this.messages()[this.messages().length - 1];
   }
 

@@ -22,7 +22,7 @@
 // grunt test_init && grunt test_run:entity/message/MessageEntities
 
 describe('Message Entities', () => {
-  describe('generate_name_string', () => {
+  describe('generateNameString', () => {
     let message_et = null;
 
     beforeEach(() => {
@@ -32,8 +32,8 @@ describe('Message Entities', () => {
     it('can return correct string for more then one users', () => {
       const user_a = new z.entity.User(z.util.create_random_uuid());
       user_a.name('John');
-      message_et.user_ets.push(user_a);
-      expect(message_et._generate_name_string()).toBe('John');
+      message_et.userEntities.push(user_a);
+      expect(message_et._generateNameString()).toBe('John');
     });
 
     it('can return correct string for more then one users', () => {
@@ -41,8 +41,8 @@ describe('Message Entities', () => {
       user_a.name('John');
       const user_b = new z.entity.User(z.util.create_random_uuid());
       user_b.name('Jim');
-      message_et.user_ets.push(user_a, user_b);
-      expect(message_et._generate_name_string()).toBe('John and Jim');
+      message_et.userEntities.push(user_a, user_b);
+      expect(message_et._generateNameString()).toBe('Jim and John');
     });
 
     it('can return correct string for more then one users', () => {
@@ -52,8 +52,8 @@ describe('Message Entities', () => {
       user_b.name('Jim');
       const user_c = new z.entity.User(z.util.create_random_uuid());
       user_c.name('Jill');
-      message_et.user_ets.push(user_a, user_b, user_c);
-      expect(message_et._generate_name_string()).toBe('John, Jim and Jill');
+      message_et.userEntities.push(user_a, user_b, user_c);
+      expect(message_et._generateNameString()).toBe('Jill, Jim, and John');
     });
 
     it('can return correct string for more then one users without sender', () => {
@@ -67,8 +67,8 @@ describe('Message Entities', () => {
       user_b.name('Jim');
       const user_c = new z.entity.User(z.util.create_random_uuid());
       user_c.name('Jill');
-      message_et.user_ets.push(user_sender, user_a, user_b, user_c);
-      expect(message_et._generate_name_string()).toBe('John, Jim and Jill');
+      message_et.userEntities.push(user_sender, user_a, user_b, user_c);
+      expect(message_et._generateNameString()).toBe('Jill, Jim, and John');
     });
   });
 
