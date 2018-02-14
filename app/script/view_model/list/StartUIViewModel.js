@@ -112,11 +112,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
         return this.matchedUsers();
       }
 
-      if (this.isTeam()) {
-        return this.teamRepository.teamUsers();
-      }
-
-      return this.userRepository.connected_users();
+      return this.isTeam() ? this.teamRepository.teamUsers() : this.userRepository.connected_users();
     });
 
     this.matchedUsers = ko.observableArray([]);

@@ -55,11 +55,7 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
     this.activateNext = ko.pureComputed(() => this.nameInput().length);
     this.contacts = ko.pureComputed(() => {
       if (this.showContacts()) {
-        if (this.teamRepository.isTeam()) {
-          return this.teamRepository.teamUsers();
-        }
-
-        return this.userRepository.connected_users();
+        return this.teamRepository.isTeam() ? this.teamRepository.teamUsers() : this.userRepository.connected_users();
       }
 
       return [];

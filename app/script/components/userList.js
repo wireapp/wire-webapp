@@ -52,12 +52,7 @@ z.components.UserList = class UserList {
     this.isDefaultMode = this.mode === UserList.MODE.DEFAULT;
     this.isOthersMode = this.mode === UserList.MODE.OTHERS;
 
-    this.cssClasses = ko.pureComputed(() => {
-      if (this.isCompactMode) {
-        return 'search-list-sm';
-      }
-      return 'search-list-lg';
-    });
+    this.cssClasses = ko.pureComputed(() => (this.isCompactMode ? 'search-list-sm' : 'search-list-lg'));
 
     this.onUserClick = (userEntity, event) => {
       if (this.isSelectEnabled) {
