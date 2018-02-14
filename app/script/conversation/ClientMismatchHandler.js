@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -145,7 +145,8 @@ z.conversation.ClientMismatchHandler = class ClientMismatchHandler {
     return this.conversationRepository
       .get_conversation_by_id(conversationId)
       .catch(error => {
-        if (error.type !== z.conversation.ConversationError.TYPE.NOT_FOUND) {
+        const isConversationNotFound = error.type === z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND;
+        if (!isConversationNotFound) {
           throw error;
         }
       })

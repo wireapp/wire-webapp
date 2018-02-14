@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -236,7 +236,7 @@ z.string.conversationConnectionCancelRequest = 'Cancel connection request';
 z.string.conversation_create = ' started a conversation with {{users}}';
 z.string.conversationCreateName = '{{user}} started the conversation';
 z.string.conversationCreateNameYou = '{{user}} started the conversation';
-z.string.conversationCreateWith = ' with {{users}}';
+z.string.conversationCreateWith = 'with {{users}}';
 z.string.conversation_create_you = ' started a conversation with {{users}}';
 z.string.conversation_device_started_using_one = ' started using';
 z.string.conversation_device_started_using_many = ' started using';

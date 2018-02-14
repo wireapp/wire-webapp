@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -449,7 +449,7 @@ z.event.EventRepository = class EventRepository {
    * @returns {undefined} No return value
    */
   _update_last_event_date(event_date) {
-    if (event_date) {
+    if (event_date > this.last_event_date()) {
       this.last_event_date(event_date);
       this.notification_service.save_last_event_date_to_db(event_date);
     }
