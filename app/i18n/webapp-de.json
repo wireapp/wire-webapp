@@ -52,6 +52,7 @@
   "BackendError.LABEL.OPERATION_DENIED": "Fehlende Berechtigung für den Vorgang",
   "BackendError.LABEL.UNAUTHORIZED": "Etwas ist schief gelaufen. Bitte lade die Seite erneut und versuche es nochmals",
   "BackendError.LABEL.HANDLE_EXISTS": "Dieser Benutzername ist bereits vergeben",
+  "BackendError.LABEL.HANDLE_TOO_SHORT": "Bitte wähle einen Benutzernamen mit mindestens zwei Zeichen",
   "BackendError.LABEL.INVALID_HANDLE": "Dieser Benutzername ist ungültig",
   "BackendError.LABEL.INVALID_INVITATION_CODE": "Einladung wurde widerrufen oder ist abgelaufen",
   "BackendError.LABEL.NO_OTHER_OWNER": "Der letzte Besitzer kann nicht aus dem Team entfernt werden",

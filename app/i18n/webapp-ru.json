@@ -52,6 +52,7 @@
   "BackendError.LABEL.OPERATION_DENIED": "Недостаточно прав",
   "BackendError.LABEL.UNAUTHORIZED": "Что-то пошло не так. Обновите страницу и повторите попытку",
   "BackendError.LABEL.HANDLE_EXISTS": "Данное имя пользователя уже занято",
+  "BackendError.LABEL.HANDLE_TOO_SHORT": "Пожалуйста, введите имя пользователя, не менее 2 символов",
   "BackendError.LABEL.INVALID_HANDLE": "Недопустимое имя пользователя",
   "BackendError.LABEL.INVALID_INVITATION_CODE": "Приглашение отозвано или просрочено",
   "BackendError.LABEL.NO_OTHER_OWNER": "Последний владелец не может быть удален из команды",
