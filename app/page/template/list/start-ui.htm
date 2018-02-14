@@ -35,12 +35,6 @@
           <!-- /ko -->
 
           <!-- ko ifnot: showSearchResults() -->
-            <!-- ko if: showTopPeople() -->
-              <div class="start-ui-list-top-people" data-uie-name="status-top-people">
-                <span class="start-ui-list-header start-ui-list-header-top-people" data-bind="l10n_text: z.string.search_top_people"></span>
-                <top-people class="search-list-theme-black" params="users: topUsers, click: clickOnContact"></top-people>
-              </div>
-            <!-- /ko -->
             <!-- ko if: showInviteMember() -->
               <ul class="start-ui-invite-people left-list-items">
                 <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnInviteMember" data-uie-name="do-invite-member">
@@ -50,17 +44,25 @@
               </ul>
             <!-- /ko -->
             <!-- ko if: showContacts() -->
+              <ul class="start-ui-create-group left-list-items">
+                <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnCreateGroup" data-uie-name="go-create-group">
+                  <div class="left-column">
+                    <svg width="16" height="16" viewBox="0 0 16 16">
+                      <path fill="#fff" d="M8 4a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 12a2 2 0 1 1 0-4 2 2 0 0 1 0 4zM2 7a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm12 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0-6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"></path>
+                    </svg>
+                  </div>
+                  <div class="center-column" data-bind="l10n_text: z.string.searchCreateGroup"></div>
+                </li>
+              </ul>
+            <!-- /ko -->
+            <!-- ko if: showTopPeople() -->
+              <div class="start-ui-list-top-people" data-uie-name="status-top-people">
+                <span class="start-ui-list-header start-ui-list-header-top-people" data-bind="l10n_text: z.string.search_top_people"></span>
+                <top-people class="search-list-theme-black" params="users: topUsers, click: clickOnContact"></top-people>
+              </div>
+            <!-- /ko -->
+            <!-- ko if: showContacts() -->
               <div class="start-ui-list-contacts" data-uie-name="status-contacts">
-                <ul class="start-ui-create-group left-list-items">
-                  <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnCreateGroup" data-uie-name="go-create-group">
-                    <div class="left-column">
-                      <svg width="16" height="16" viewBox="0 0 16 16">
-                        <path fill="#fff" d="M8 4a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 12a2 2 0 1 1 0-4 2 2 0 0 1 0 4zM2 7a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm12 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0-6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"></path>
-                      </svg>
-                    </div>
-                    <div class="center-column" data-bind="l10n_text: z.string.search_create_group"></div>
-                  </li>
-                </ul>
                 <!-- ko ifnot: isTeam() -->
                   <span class="start-ui-list-header" data-bind="l10n_text: z.string.search_connections"></span>
                 <!-- /ko -->

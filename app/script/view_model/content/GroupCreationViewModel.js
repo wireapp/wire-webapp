@@ -44,23 +44,26 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
     this.modal = undefined;
     this.state = ko.observable(GroupCreationViewModel.STATE.DEFAULT);
 
-    this.contacts = ko.pureComputed(() => {
-      if (this.teamRepository.isTeam()) {
-        return this.teamRepository.teamUsers();
-      }
-
-      return this.userRepository.connected_users();
-    });
-
     this.isCreatingConversation = false;
+    this.method = undefined;
     this.nameError = ko.observable('');
     this.nameInput = ko.observable('');
     this.selectedContacts = ko.observableArray([]);
+    this.showContacts = ko.observable(false);
     this.participantsInput = ko.observable('');
 
-    this.nameInput.subscribe(() => this.nameError(''));
-
     this.activateNext = ko.pureComputed(() => this.nameInput().length);
+    this.contacts = ko.pureComputed(() => {
+      if (this.showContacts()) {
+        if (this.teamRepository.isTeam()) {
+          return this.teamRepository.teamUsers();
+        }
+
+        return this.userRepository.connected_users();
+      }
+
+      return [];
+    });
     this.participantsActionText = ko.pureComputed(() => {
       const stringSelector = this.selectedContacts().length
         ? z.string.groupCreationParticipantsActionCreate
@@ -73,10 +76,10 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
         : z.string.groupCreationParticipantsHeader;
       return z.l10n.text(stringSelector, {number: this.selectedContacts().length});
     });
-
     this.stateIsPreferences = ko.pureComputed(() => this.state() === GroupCreationViewModel.STATE.PREFERENCES);
     this.stateIsParticipants = ko.pureComputed(() => this.state() === GroupCreationViewModel.STATE.PARTICIPANTS);
 
+    this.nameInput.subscribe(() => this.nameError(''));
     this.stateIsPreferences.subscribe(stateIsPreference => {
       if (stateIsPreference) {
         return $(document).on('keydown.groupCreation', keyboard_event => {
@@ -87,15 +90,23 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
       }
       return $(document).off('keydown.groupCreation');
     });
+    this.stateIsParticipants.subscribe(stateIsParticipants => {
+      if (stateIsParticipants) {
+        return window.setTimeout(() => this.showContacts(true));
+      }
+      this.showContacts(false);
+    });
 
     this.shouldUpdateScrollbar = ko
-      .computed(() => this.selectedContacts() && this.stateIsPreferences())
+      .computed(() => this.selectedContacts() && this.stateIsPreferences() && this.contacts())
       .extend({notify: 'always', rateLimit: 500});
 
     amplify.subscribe(z.event.WebApp.CONVERSATION.CREATE_GROUP, this.showCreateGroup.bind(this));
   }
 
-  showCreateGroup(userEntity) {
+  showCreateGroup(method, userEntity) {
+    this.method = method;
+
     if (!this.modal) {
       this.modal = new zeta.webapp.module.Modal('#group-creation-modal', this._afterHideModal.bind(this));
       this.modal.autoclose = false;
@@ -108,6 +119,10 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
 
     this.modal.show();
     $('.group-creation-modal-teamname-input').focus();
+
+    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.OPENED_GROUP_CREATION, {
+      method: this.method,
+    });
   }
 
   clickOnBack() {
@@ -125,7 +140,13 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
       this.conversationRepository
         .createGroupConversation(this.selectedContacts(), this.nameInput())
         .then(conversationEntity => {
+          amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.GROUP_CREATION_SUCCEEDED, {
+            method: this.method,
+            with_participants: !!this.selectedContacts().length,
+          });
+
           this._hideModal();
+
           amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversationEntity);
         })
         .catch(error => {
@@ -141,7 +162,7 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
       const nameTooLong = trimmedNameInput.length > z.conversation.ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
       const nameTooShort = !trimmedNameInput.length;
 
-      this.nameInput(this.nameInput().slice(0, z.conversation.ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH));
+      this.nameInput(trimmedNameInput.slice(0, z.conversation.ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH));
       if (nameTooLong) {
         return this.nameError(z.l10n.text(z.string.groupCreationPreferencesErrorNameLong));
       }
@@ -150,7 +171,11 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
         return this.nameError(z.l10n.text(z.string.groupCreationPreferencesErrorNameShort));
       }
 
-      return this.state(GroupCreationViewModel.STATE.PARTICIPANTS);
+      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.OPENED_SELECT_PARTICIPANTS, {
+        method: this.method,
+      });
+
+      this.state(GroupCreationViewModel.STATE.PARTICIPANTS);
     }
   }
 
@@ -160,6 +185,7 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
 
   _afterHideModal() {
     this.isCreatingConversation = false;
+    this.method = undefined;
     this.nameError('');
     this.nameInput('');
     this.participantsInput('');

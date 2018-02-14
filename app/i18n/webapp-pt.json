@@ -52,6 +52,7 @@
   "BackendError.LABEL.OPERATION_DENIED": "Não tem permissão",
   "BackendError.LABEL.UNAUTHORIZED": "Ocorreu um erro. Por favor recarregue a página e tente novamente",
   "BackendError.LABEL.HANDLE_EXISTS": "Este Nome de utilizador já está em uso",
+  "BackendError.LABEL.HANDLE_TOO_SHORT": "",
   "BackendError.LABEL.INVALID_HANDLE": "Este nome de utilizador é inválido",
   "BackendError.LABEL.INVALID_INVITATION_CODE": "O convite foi revogado ou expirou",
   "BackendError.LABEL.NO_OTHER_OWNER": "O último proprietário não pode ser removido da equipa",

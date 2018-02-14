@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -154,8 +154,9 @@ z.team.TeamRepository = class TeamRepository {
    * @returns {Array<z.entity.User>} Matching users
    */
   searchForTeamUsers(query, isHandle) {
+    const excludedEmojis = Array.from(query).filter(char => EMOJI_UNICODE_RANGES.includes(char));
     return this.teamUsers()
-      .filter(userEntity => userEntity.matches(query, isHandle))
+      .filter(userEntity => userEntity.matches(query, isHandle, excludedEmojis))
       .sort((userA, userB) => {
         if (isHandle) {
           return z.util.StringUtil.sort_by_priority(userA.username(), userB.username(), query);
@@ -250,7 +251,7 @@ z.team.TeamRepository = class TeamRepository {
       }
 
       this.team().members.remove(member => member.id === userId);
-      amplify.publish(z.event.WebApp.TEAM.MEMBER_LEAVE, teamId, userId, new Date(time));
+      amplify.publish(z.event.WebApp.TEAM.MEMBER_LEAVE, teamId, userId, new Date(time).toISOString());
     }
   }
 

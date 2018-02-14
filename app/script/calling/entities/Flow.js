@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -683,7 +683,7 @@ z.calling.entities.Flow = class Flow {
       this.logger.debug(`Received '${type}' (response: ${response}) message via data channel`, call_message);
     }
 
-    const call_event = z.conversation.EventBuilder.build_calling(
+    const call_event = z.conversation.EventBuilder.buildCalling(
       conversation_et,
       call_message,
       this.remote_user_id,

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@ z.string.de.wire_windows = 'Wire für Windows';
 z.string.de.wire_linux = 'Wire für Linux';
 z.string.de.nonexistent_user = 'Gelöschte Person';
 z.string.de.and = 'und';
+z.string.de.enumerationAnd = ' und ';
 
 z.string.de.alert_upload_file_format = 'Das Bild kann nicht verwendet werden. Bitte wähle eine PNG- oder JPEG-Datei.';
 z.string.de.alert_upload_too_small = 'Das Bild kann nicht verwendet werden. Bitte wähle ein Bild mit mindestens 320 x 320 Pixeln.';
@@ -193,6 +194,9 @@ z.string.de.conversation_connection_accepted = 'Hinzugefügt';
 z.string.de.conversation_connection_blocked = 'Blockiert';
 z.string.de.conversation_connection_cancel_request = 'Kontaktanfrage abbrechen';
 z.string.de.conversation_create = ' hat eine Unterhaltung mit {{users}} begonnen';
+z.string.de.conversationCreateName = '{{user}} hat die Unterhaltung begonnen';
+z.string.de.conversationCreateNameYou = '{{user}} hast die Unterhaltung begonnen';
+z.string.de.conversationCreateWith = 'mit {{users}}';
 z.string.de.conversation_create_you = ' hast eine Unterhaltung mit {{users}} begonnen';
 z.string.de.conversation_device_started_using_one = ' benutzt';
 z.string.de.conversation_device_started_using_many = ' benutzen';
@@ -247,9 +251,17 @@ z.string.de.conversation_send_pasted_file = 'Bild eingefügt am {{date}}';
 z.string.de.conversation_someone = 'Jemand';
 z.string.de.conversation_tweet_author = ' auf Twitter';
 
-z.string.de.conversation_creation_preferences_action = 'Weiter';
-z.string.de.conversation_creation_participants_header = 'Personen hinzufügen';
-z.string.de.conversation_creation_participants_placeholder = 'Nach Namen suchen';
+// Group creation
+z.string.de.groupCreationPreferencesAction = 'Weiter';
+z.string.de.groupCreationPreferencesErrorNameShort = 'Gib mindestens ein Zeichen ein';
+z.string.de.groupCreationPreferencesErrorNameLong = 'Der eingegebene Gruppenname ist zu lang';
+z.string.de.groupCreationPreferencesHeader = 'Neue Gruppe';
+z.string.de.groupCreationPreferencesPlaceholder = 'Gruppenname';
+z.string.de.groupCreationParticipantsActionCreate = 'Fertig';
+z.string.de.groupCreationParticipantsActionSkip = 'Überspringen';
+z.string.de.groupCreationParticipantsHeader = 'Personen hinzufügen';
+z.string.de.groupCreationParticipantsHeaderWithCounter = 'Personen hinzufügen ({{number}})';
+z.string.de.groupCreationParticipantsPlaceholder = 'Nach Namen suchen';
 
 z.string.de.collection_show_all = 'Zeige alle {{number}}';
 z.string.de.collection_section_links = 'Links';
@@ -463,6 +475,7 @@ z.string.de.search_group_hint = 'Tippe weiter oder wähle weitere Kontakte aus, 
 z.string.de.search_connect = 'Vorschläge';
 z.string.de.search_connections = 'Kontakte';
 z.string.de.search_contacts = 'Kontakte';
+z.string.de.searchCreateGroup = 'Erstelle eine Gruppe';
 z.string.de.search_groups = 'Gruppen';
 z.string.de.search_people = 'Kontakte';
 z.string.de.search_placeholder = 'Name oder Benutzername suchen';

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ z.string.wire_windows = 'Wire for Windows';
 z.string.wire_linux = 'Wire for Linux';
 z.string.nonexistent_user = 'Deleted User';
 z.string.and = 'and';
+z.string.enumerationAnd = ', and ';
 
 // Alert view when trying to set a profile image that's too small
 z.string.alert_upload_file_format = 'Can’t use this picture.\nPlease choose a PNG or JPEG file.';
@@ -233,6 +234,9 @@ z.string.conversation_connection_accepted = 'Connected';
 z.string.conversation_connection_blocked = 'Blocked';
 z.string.conversation_connection_cancel_request = 'Cancel connection request';
 z.string.conversation_create = ' started a conversation with {{users}}';
+z.string.conversationCreateName = '{{user}} started the conversation';
+z.string.conversationCreateNameYou = '{{user}} started the conversation';
+z.string.conversationCreateWith = 'with {{users}}';
 z.string.conversation_create_you = ' started a conversation with {{users}}';
 z.string.conversation_device_started_using_one = ' started using';
 z.string.conversation_device_started_using_many = ' started using';
@@ -293,7 +297,7 @@ z.string.groupCreationPreferencesErrorNameShort = 'At least 1 character';
 z.string.groupCreationPreferencesErrorNameLong = 'Too many characters';
 z.string.groupCreationPreferencesHeader = 'New group';
 z.string.groupCreationPreferencesPlaceholder = 'Group name';
-z.string.groupCreationParticipantsActionCreate = 'Create';
+z.string.groupCreationParticipantsActionCreate = 'Done';
 z.string.groupCreationParticipantsActionSkip = 'Skip';
 z.string.groupCreationParticipantsHeader = 'Add people';
 z.string.groupCreationParticipantsHeaderWithCounter = 'Add people ({{number}})';
@@ -527,7 +531,7 @@ z.string.preferences_options_notifications_on = 'Show sender and message';
 z.string.search_connect = 'Connect';
 z.string.search_connections = 'Connections';
 z.string.search_contacts = 'Contacts';
-z.string.search_create_group = 'Create group';
+z.string.searchCreateGroup = 'Create group';
 z.string.search_groups = 'Groups';
 z.string.search_people = 'People';
 z.string.search_placeholder = 'Search by name or username';
