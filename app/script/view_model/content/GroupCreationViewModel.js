@@ -141,9 +141,8 @@ z.ViewModel.content.GroupCreationViewModel = class GroupCreationViewModel {
         .createGroupConversation(this.selectedContacts(), this.nameInput())
         .then(conversationEntity => {
           amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.GROUP_CREATION_SUCCEEDED, {
-            conversation_name_length: this.nameInput().length,
-            conversation_size: this.selectedContacts().length + 1,
             method: this.method,
+            with_participants: !!this.selectedContacts().length,
           });
 
           this._hideModal();
