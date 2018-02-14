@@ -1,12 +1,12 @@
-import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/';
+import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/index';
 import {Cryptobox, store} from '@wireapp/cryptobox';
 import {Decoder, Encoder} from 'bazinga64';
-import {RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/';
-import {UserPreKeyBundleMap} from '@wireapp/api-client/dist/commonjs/user/';
-import * as ProteusKeys from '@wireapp/proteus/dist/keys/';
-import * as auth from '@wireapp/api-client/dist/commonjs/auth/';
-import {SessionPayloadBundle} from '../crypto/';
-import {OTRRecipients} from '@wireapp/api-client/dist/commonjs/conversation/';
+import {RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/index';
+import {UserPreKeyBundleMap} from '@wireapp/api-client/dist/commonjs/user/index';
+import * as ProteusKeys from '@wireapp/proteus/dist/keys/root';
+import * as auth from '@wireapp/api-client/dist/commonjs/auth/index';
+import {SessionPayloadBundle} from '../crypto/root';
+import {OTRRecipients} from '@wireapp/api-client/dist/commonjs/conversation/index';
 
 export default class CryptographyService {
   public static STORES = {
@@ -84,9 +84,9 @@ export default class CryptographyService {
     const decodedPreKeyBundle: Uint8Array = Decoder.fromBase64(base64EncodedPreKey).asBytes;
     return this.cryptobox
       .encrypt(sessionId, plainText, decodedPreKeyBundle.buffer)
-      .then(encryptedPayload => Encoder.toBase64(encryptedPayload).asString)
-      .catch(error => '💣')
-      .then(encryptedPayload => ({sessionId, encryptedPayload}));
+      .then((encryptedPayload: ArrayBuffer) => Encoder.toBase64(encryptedPayload).asString)
+      .catch((error: Error) => '💣')
+      .then((encryptedPayload: string) => ({sessionId, encryptedPayload}));
   }
 
   public deleteClient(): Promise<string> {

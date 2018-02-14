@@ -16,7 +16,7 @@ module.exports = {
   },
   output: {
     filename: `${pkg.name.substr(pkg.name.indexOf('/') + 1)}.bundle.js`,
-    library: 'cryptobox',
+    library: 'core',
     path: `${__dirname}/dist`,
   },
   performance: {
@@ -25,5 +25,4 @@ module.exports = {
     maxEntrypointSize: 36000,
   },
   plugins: [new webpack.BannerPlugin(`${pkg.name} v${pkg.version}`)],
-  target: 'web',
 };

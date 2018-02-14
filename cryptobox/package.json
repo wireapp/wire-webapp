@@ -19,7 +19,6 @@
     "gulp-clean": "0.4.0",
     "gulp-concat": "2.6.1",
     "gulp-eslint": "4.0.2",
-    "gulp-typescript": "4.0.1",
     "gulp-util": "3.0.8",
     "gutil": "1.6.4",
     "jasmine": "3.0.0",
@@ -27,12 +26,10 @@
     "karma-chrome-launcher": "2.1.1",
     "karma-jasmine": "1.1.0",
     "logdown": "3.2.3",
-    "merge2": "1.2.1",
     "rimraf": "2.6.2",
     "run-sequence": "2.2.1",
     "typescript": "2.7.1",
-    "webpack": "3.11.0",
-    "yargs": "11.0.0"
+    "webpack": "3.11.0"
   },
   "files": [
     "dist",
@@ -43,12 +40,15 @@
   "name": "@wireapp/cryptobox",
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox",
   "scripts": {
+    "build": "gulp install && yarn build:node && yarn build:browser",
+    "build:browser": "webpack --progress",
+    "build:node": "tsc",
     "clear": "rimraf dist/commonjs && rimraf dist/lib",
-    "dist": "yarn clear && gulp dist --env production",
+    "dist": "yarn clear && yarn build",
     "test": "yarn dist && yarn test:node && yarn test:browser",
     "test:browser": "echo done",
     "test:node": "cross-env DEBUG=@wireapp/cryptobox* jasmine --config=test/jasmine.node.json"
   },
-  "types": "dist/index.d.ts",
+  "types": "dist/commonjs/index.d.ts",
   "version": "7.0.6"
 }

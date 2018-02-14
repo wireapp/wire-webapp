@@ -1,8 +1,8 @@
-import * as ProteusKeys from '@wireapp/proteus/dist/keys/';
-import * as ProteusSession from '@wireapp/proteus/dist/session/';
-import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine';
-import {CryptoboxStore, PersistedRecord, SerialisedRecord} from '../store/';
-import {error as storeError} from '../store/';
+import * as ProteusKeys from '@wireapp/proteus/dist/keys/root';
+import * as ProteusSession from '@wireapp/proteus/dist/session/root';
+import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine/index';
+import {CryptoboxStore, PersistedRecord, SerialisedRecord} from '../store/root';
+import {error as storeError} from '../store/root';
 
 class CryptoboxCRUDStore implements CryptoboxStore {
   constructor(private engine: CRUDEngine) {}

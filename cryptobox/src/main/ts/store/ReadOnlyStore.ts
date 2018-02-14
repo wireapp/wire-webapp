@@ -1,6 +1,6 @@
-import * as ProteusKeys from '@wireapp/proteus/dist/keys/';
-import * as ProteusSession from '@wireapp/proteus/dist/session/';
-import {CryptoboxStore} from '../store';
+import * as ProteusKeys from '@wireapp/proteus/dist/keys/root';
+import * as ProteusSession from '@wireapp/proteus/dist/session/root';
+import {CryptoboxStore} from '../store/root';
 
 /**
  * This store holds IDs of PreKeys which should be deleted.

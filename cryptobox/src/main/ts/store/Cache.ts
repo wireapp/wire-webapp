@@ -1,8 +1,8 @@
-import * as ProteusKeys from '@wireapp/proteus/dist/keys/';
-import * as ProteusSession from '@wireapp/proteus/dist/session/';
+import * as ProteusKeys from '@wireapp/proteus/dist/keys/root';
+import * as ProteusSession from '@wireapp/proteus/dist/session/root';
 const logdown = require('logdown');
-import {CryptoboxStore} from '../store/';
-import {CryptoboxError} from '../error/';
+import {CryptoboxStore} from '../store/root';
+import {CryptoboxError} from '../error/root';
 
 export default class Cache implements CryptoboxStore {
   private identity: ProteusKeys.IdentityKeyPair | undefined;

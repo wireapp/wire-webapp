@@ -1,5 +1,5 @@
-import * as ProteusKeys from '@wireapp/proteus/dist/keys/';
-import * as ProteusSession from '@wireapp/proteus/dist/session/';
+import * as ProteusKeys from '@wireapp/proteus/dist/keys/root';
+import * as ProteusSession from '@wireapp/proteus/dist/session/root';
 
 interface CryptoboxStore {
   delete_all(): Promise<boolean>;

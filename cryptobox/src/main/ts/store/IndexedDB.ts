@@ -1,10 +1,10 @@
-import * as ProteusKeys from '@wireapp/proteus/dist/keys/';
-import * as ProteusSession from '@wireapp/proteus/dist/session/';
+import * as ProteusKeys from '@wireapp/proteus/dist/keys/root';
+import * as ProteusSession from '@wireapp/proteus/dist/session/root';
 import Dexie from 'dexie';
 const logdown = require('logdown');
 import CryptoboxStore from './CryptoboxStore';
-import {error as storeError} from '../store/';
-import {SerialisedRecord} from '../store';
+import {error as storeError} from '../store/root';
+import {SerialisedRecord} from '../store/root';
 
 export interface DexieInstance extends Dexie {
   [index: string]: any;

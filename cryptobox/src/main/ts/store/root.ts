@@ -6,7 +6,7 @@ import PersistedRecord from './PersistedRecord';
 import ReadOnlyStore from './ReadOnlyStore';
 import SerialisedRecord from './SerialisedRecord';
 import SerialisedUpdate from './SerialisedUpdate';
-import * as error from './error';
+import * as error from './error/root';
 
 export {
   error,

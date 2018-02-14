@@ -17,7 +17,6 @@
  *
  */
 
-const args = require('yargs').argv;
 const assets = require('gulp-bower-assets');
 const bower = require('gulp-bower');
 const browserSync = require('browser-sync').create();
@@ -25,15 +24,9 @@ const clean = require('gulp-clean');
 const gulp = require('gulp');
 const gutil = require('gulp-util');
 const karma = require('karma');
-const merge = require('merge2');
-const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 const runSequence = require('run-sequence');
-const ts = require('gulp-typescript');
-const tsProjectNode = ts.createProject('tsconfig.json');
-const webpack = require('webpack');
 
 // Aliases
-gulp.task('b', ['build']);
 gulp.task('c', ['clean']);
 gulp.task('i', ['install']);
 gulp.task('t', ['test']);
@@ -45,41 +38,8 @@ gulp.task('clean_browser', () => gulp.src('dist/window').pipe(clean()));
 
 gulp.task('clean_node', () => gulp.src('dist/commonjs').pipe(clean()));
 
-gulp.task('build', done => {
-  runSequence('build_ts_node', 'build_ts_browser', done);
-});
-
-gulp.task('build_ts_browser', callback => {
-  const compiler = webpack(require('./webpack.config.js'));
-  const maximum = 100;
-
-  compiler.apply(
-    new ProgressPlugin((percentage, message) => {
-      console.log(`${~~(percentage * maximum)}%`, message);
-    })
-  );
-
-  compiler.run(error => {
-    if (error) {
-      throw new gutil.PluginError('webpack', error);
-    }
-
-    callback();
-  });
-});
-
-gulp.task('build_ts_node', () => {
-  const tsResult = tsProjectNode.src().pipe(tsProjectNode());
-  const disableLogging = Boolean(args.env === 'production');
-
-  gutil.log(gutil.colors.yellow(`Disable log statements: ${disableLogging}`));
-
-  return merge([tsResult.dts.pipe(gulp.dest('dist/')), tsResult.js.pipe(gulp.dest('dist/commonjs'))]);
-});
-
 gulp.task('default', ['dist'], () => {
   gulp.watch('dist/**/*.*').on('change', browserSync.reload);
-  gulp.watch('src/main/ts/**/*.*', ['build']);
 
   browserSync.init({
     port: 3636,
@@ -89,7 +49,7 @@ gulp.task('default', ['dist'], () => {
 });
 
 gulp.task('dist', done => {
-  runSequence('clean', 'install', 'build', done);
+  runSequence('clean', 'install', done);
 });
 
 gulp.task('install', ['install_bower_assets'], () => {});

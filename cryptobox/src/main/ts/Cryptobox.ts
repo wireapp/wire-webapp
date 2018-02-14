@@ -1,12 +1,12 @@
-import * as ProteusKeys from '@wireapp/proteus/dist/keys/';
-import * as ProteusMessage from '@wireapp/proteus/dist/message';
-import * as ProteusSession from '@wireapp/proteus/dist/session/';
+import * as ProteusKeys from '@wireapp/proteus/dist/keys/root';
+import * as ProteusMessage from '@wireapp/proteus/dist/message/root';
+import * as ProteusSession from '@wireapp/proteus/dist/session/root';
 import CryptoboxCRUDStore from './store/CryptoboxCRUDStore';
-import {CryptoboxError} from './error/';
+import {CryptoboxError} from './error/root';
 import CryptoboxSession from './CryptoboxSession';
 import DecryptionError from './DecryptionError';
 import InvalidPreKeyFormatError from './InvalidPreKeyFormatError';
-import {ReadOnlyStore} from './store/';
+import {ReadOnlyStore} from './store/root';
 import LRUCache from '@wireapp/lru-cache';
 import EventEmitter = require('events');
 const logdown = require('logdown');

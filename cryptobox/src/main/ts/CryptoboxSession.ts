@@ -1,7 +1,7 @@
-import * as ProteusMessage from '@wireapp/proteus/dist/message';
-import * as ProteusSession from '@wireapp/proteus/dist/session/';
+import * as ProteusMessage from '@wireapp/proteus/dist/message/root';
+import * as ProteusSession from '@wireapp/proteus/dist/session/root';
 import DecryptionError from './DecryptionError';
-import {ReadOnlyStore} from './store/';
+import {ReadOnlyStore} from './store/root';
 
 class CryptoboxSession {
   public id: string;

@@ -16,20 +16,25 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-import {IncomingNotification} from '@wireapp/api-client/dist/commonjs/conversation/';
-import {CryptographyService, GenericMessageType, PayloadBundle} from './crypto/';
-import {Context, LoginData, PreKey} from '@wireapp/api-client/dist/commonjs/auth/';
+import {IncomingNotification} from '@wireapp/api-client/dist/commonjs/conversation/index';
+import {CryptographyService, GenericMessageType, PayloadBundle} from './crypto/root';
+import {Context, LoginData, PreKey} from '@wireapp/api-client/dist/commonjs/auth/index';
 import {
   ConversationEvent,
   ConversationEventType,
   OTRMessageAdd,
-} from '@wireapp/api-client/dist/commonjs/conversation/event/';
-import {ClientClassification, ClientType, NewClient, RegisteredClient} from '@wireapp/api-client/dist/commonjs/client/';
-import {LoginSanitizer} from './auth/';
-import {RecordNotFoundError} from '@wireapp/store-engine/dist/commonjs/engine/error/';
+} from '@wireapp/api-client/dist/commonjs/conversation/event/index';
+import {
+  ClientClassification,
+  ClientType,
+  NewClient,
+  RegisteredClient,
+} from '@wireapp/api-client/dist/commonjs/client/index';
+import {LoginSanitizer} from './auth/root';
+import {RecordNotFoundError} from '@wireapp/store-engine/dist/commonjs/engine/error/index';
 import {Root} from 'protobufjs';
-import {WebSocketClient} from '@wireapp/api-client/dist/commonjs/tcp/';
-import {ConversationService} from './conversation/';
+import {WebSocketClient} from '@wireapp/api-client/dist/commonjs/tcp/index';
+import {ConversationService} from './conversation/root';
 import Client = require('@wireapp/api-client');
 import EventEmitter = require('events');
 
