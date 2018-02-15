@@ -18,5 +18,7 @@
  */
 
 export const getClients = state => state.clientState.clients || [];
+export const getPermanentClients = state => getClients(state).filter(client => client.type === 'permanent') || [];
+export const getTemporaryClients = state => getClients(state).filter(client => client.type === 'temporary') || [];
 export const getClientError = state => state.clientState.error;
 export const isFetching = state => state.clientState.fetching;

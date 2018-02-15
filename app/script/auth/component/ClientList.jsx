@@ -26,9 +26,7 @@ import * as ClientSelector from '../module/selector/ClientSelector';
 import {connect} from 'react-redux';
 
 class ClientList extends React.Component {
-  state = {
-    clients: [],
-  };
+  state = {};
 
   removeClient = (event, clientId, password) => {
     event.preventDefault();
@@ -36,14 +34,14 @@ class ClientList extends React.Component {
   };
 
   render() {
-    const {clients} = this.props;
+    const {permanentClients} = this.props;
     return (
       <ContainerXS
         centerText
         verticalCenter
         style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-around'}}
       >
-        {clients.map(client => (
+        {permanentClients.map(client => (
           <ClientItem
             key={client.id}
             name={client.model}
@@ -60,8 +58,8 @@ class ClientList extends React.Component {
 export default injectIntl(
   connect(
     state => ({
-      clients: ClientSelector.getClients(state),
       isFetching: ClientSelector.isFetching(state),
+      permanentClients: ClientSelector.getPermanentClients(state),
     }),
     {...ClientAction}
   )(ClientList)
