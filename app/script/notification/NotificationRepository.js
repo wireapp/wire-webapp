@@ -689,11 +689,13 @@ z.notification.NotificationRepository = class NotificationRepository {
    * Should hide notification.
    * @private
    * @param {z.entity.Message} messageEntity - Message entity
-   * @param {z.entity.Conversation} conversationEntity - Conversation entity
+   * @param {z.entity.Conversation} [conversationEntity] - Conversation entity
    * @returns {Promise} Resolves if the notification should be shown
    */
   _shouldShowNotification(messageEntity, conversationEntity) {
-    const inActiveConversation = this.conversationRepository.is_active_conversation(conversationEntity);
+    const inActiveConversation = conversationEntity
+      ? this.conversationRepository.is_active_conversation(conversationEntity)
+      : false;
     const inConversationView = wire.app.view.content.content_state() === z.ViewModel.content.CONTENT_STATE.CONVERSATION;
     const inMaximizedCall = this.callingRepository.joined_call() && !wire.app.view.content.multitasking.is_minimized();
 
