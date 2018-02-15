@@ -314,8 +314,6 @@ z.string.nl.extensions_giphy_message = '{{tag}} • via giphy.com';
 z.string.nl.extensions_giphy_no_gifs = 'Oeps, geen gifjes';
 z.string.nl.extensions_giphy_random = 'Random';
 
-z.string.nl.search_open = 'Openen';
-z.string.nl.search_open_group = 'Groep aanmaken';
 z.string.nl.people_confirm_label = 'Voeg Personen aan Groep toe';
 z.string.nl.people_people = '{{number}} mensen';
 z.string.nl.people_search_placeholder = 'Zoeken op naam';
@@ -365,7 +363,8 @@ z.string.nl.people_remove_message = '{{user}} zal geen berichten kunnen versture
 z.string.nl.people_unblock_headline = 'Deblokkeer?';
 z.string.nl.people_unblock_message = '{{user}} zal weer in staat zijn je te contacteren en je toe te voegen aan een groepsgesprek.';
 
-z.string.nl.people_button_add = 'Contacten toevoegen';
+z.string.nl.people_button_add = 'Toevoegen';
+z.string.nl.people_button_add_people = 'Contacten toevoegen';
 z.string.nl.people_button_block = 'Blokkeren';
 z.string.nl.people_button_cancel = 'Annuleer';
 z.string.nl.people_button_connect = 'Verbind';
@@ -455,7 +454,6 @@ z.string.nl.preferences_options_notifications_obfuscate = 'Details verbergen';
 z.string.nl.preferences_options_notifications_obfuscate_message = 'Toon zender';
 z.string.nl.preferences_options_notifications_on = 'Toon verzender en bericht';
 
-z.string.nl.search_group_hint = 'Type verder of kies meer mensen om een groep aan te maken';
 z.string.nl.search_connect = 'Verbind';
 z.string.nl.search_connections = 'Contacten';
 z.string.nl.search_contacts = 'Contacten';

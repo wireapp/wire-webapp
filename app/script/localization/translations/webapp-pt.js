@@ -69,7 +69,7 @@ z.string.pt.auth_posted_resend_action = 'Não chegou a mensagem?';
 z.string.pt.auth_posted_resend_detail = 'Verifique sua caixa de correio eletrónico e siga as instruções.';
 z.string.pt.auth_posted_resend_headline = 'Recebeu email.';
 
-z.string.pt.auth_placeholder_email = 'Email';
+z.string.pt.auth_placeholder_email = 'E-Mail';
 z.string.pt.auth_placeholder_password_put = 'Palavra-passe';
 z.string.pt.auth_placeholder_password_set = 'Palavra-passe (pelo menos 8 caracteres)';
 z.string.pt.auth_placeholder_phone = 'Telefone';
@@ -308,8 +308,6 @@ z.string.pt.extensions_giphy_message = '• {{tag}} através de giphy.com';
 z.string.pt.extensions_giphy_no_gifs = 'Oops, sem gifs';
 z.string.pt.extensions_giphy_random = 'Aleatório';
 
-z.string.pt.search_open = 'Abrir';
-z.string.pt.search_open_group = 'Criar grupo';
 z.string.pt.people_confirm_label = 'Adicionar pessoas ao grupo';
 z.string.pt.people_people = '{{number}} Pessoas';
 z.string.pt.people_search_placeholder = 'Pesquisar por nome';
@@ -357,7 +355,8 @@ z.string.pt.people_remove_message = '{{user}} não será capaz de enviar ou rece
 z.string.pt.people_unblock_headline = 'Desbloquear?';
 z.string.pt.people_unblock_message = '{{user}} será capaz de o contactar e adicioná-lo para conversas em grupo.';
 
-z.string.pt.people_button_add = 'Adicionar pessoas';
+z.string.pt.people_button_add = 'Adicionar';
+z.string.pt.people_button_add_people = 'Adicionar pessoas';
 z.string.pt.people_button_block = 'Bloquear';
 z.string.pt.people_button_cancel = 'Cancelar';
 z.string.pt.people_button_connect = 'Ligar';
@@ -446,7 +445,6 @@ z.string.pt.preferences_options_notifications_obfuscate = 'Ocultar detalhes';
 z.string.pt.preferences_options_notifications_obfuscate_message = 'Mostrar remetente';
 z.string.pt.preferences_options_notifications_on = 'Mostrar o remetente e a mensagem';
 
-z.string.pt.search_group_hint = 'Continue a escrever ou escolha mais pessoas para criar um grupo';
 z.string.pt.search_connect = 'Ligar';
 z.string.pt.search_connections = 'Ligações';
 z.string.pt.search_contacts = 'Contactos';

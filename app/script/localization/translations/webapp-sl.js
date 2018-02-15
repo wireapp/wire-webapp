@@ -297,8 +297,6 @@ z.string.sl.extensions_giphy_message = '{{tag}} • preko giphy.com';
 z.string.sl.extensions_giphy_no_gifs = 'Ups, ni najdenih gifov';
 z.string.sl.extensions_giphy_random = 'Naključno';
 
-z.string.sl.search_open = 'Odpri';
-z.string.sl.search_open_group = 'Ustvari skupino';
 z.string.sl.people_confirm_label = 'Dodaj osebe v skupino';
 z.string.sl.people_people = '{{number}} oseb';
 z.string.sl.people_search_placeholder = 'Iskanje po imenu';
@@ -346,7 +344,8 @@ z.string.sl.people_remove_message = '{{user}} ne bo mogel pošiljati ali prejeti
 z.string.sl.people_unblock_headline = 'Odblokiraj?';
 z.string.sl.people_unblock_message = '{{user}} vas ne bo mogel kontaktirati ali ponovno dodati v skupinske pogovore.';
 
-z.string.sl.people_button_add = 'Dodaj osebe';
+z.string.sl.people_button_add = 'Dodaj';
+z.string.sl.people_button_add_people = 'Dodaj osebe';
 z.string.sl.people_button_block = 'Blokiraj';
 z.string.sl.people_button_cancel = 'Prekliči';
 z.string.sl.people_button_connect = 'Poveži';
@@ -435,7 +434,6 @@ z.string.sl.preferences_options_notifications_obfuscate = 'Skrij podrobnosti';
 z.string.sl.preferences_options_notifications_obfuscate_message = 'Pokaži pošiljatelja';
 z.string.sl.preferences_options_notifications_on = 'Pokaži pošiljatelja in sporočilo';
 
-z.string.sl.search_group_hint = 'Nadaljujte s tipkanjem ali izberite več oseb za ustvaritev skupine';
 z.string.sl.search_connect = 'Poveži';
 z.string.sl.search_connections = 'Povezave';
 z.string.sl.search_contacts = 'Stiki';
