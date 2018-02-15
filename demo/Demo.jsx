@@ -17,41 +17,14 @@
  *
  */
 
-import {ArrowIcon, PlaneIcon, ProfileIcon, TeamIcon} from '@wireapp/react-ui-kit/Icon';
 import {
+  ArrowIcon,
   Bold,
-  H1,
-  H2,
-  H3,
-  H4,
-  Heading,
-  Label,
-  LabelLink,
-  Line,
-  Link,
-  Muted,
-  Paragraph,
-  Small,
-  Text,
-  Uppercase,
-} from '@wireapp/react-ui-kit/Text';
-import {
   Button,
   ButtonLink,
+  COLOR,
   Checkbox,
   CodeInput,
-  ErrorMessage,
-  Form,
-  ICON_NAME,
-  Input,
-  InputBlock,
-  InputSubmitCombo,
-  RoundIconButton,
-  Select,
-  ShakeBox,
-} from '@wireapp/react-ui-kit/Form';
-import {COLOR, Logo} from '@wireapp/react-ui-kit/Identity';
-import {
   Column,
   Columns,
   Container,
@@ -59,14 +32,41 @@ import {
   ContainerSM,
   ContainerXS,
   Content,
+  ErrorMessage,
   Footer,
+  Form,
+  H1,
+  H2,
+  H3,
+  H4,
   Header,
+  Heading,
+  ICON_NAME,
+  Input,
+  InputBlock,
+  InputSubmitCombo,
+  Label,
+  LabelLink,
+  Line,
+  Link,
+  Loading,
+  Logo,
+  Modal,
+  Muted,
+  Paragraph,
+  PlaneIcon,
+  ProfileIcon,
+  RoundIconButton,
+  Select,
+  ShakeBox,
+  Small,
   StyledApp,
-} from '@wireapp/react-ui-kit/Layout';
+  TeamIcon,
+  Text,
+  Uppercase,
+} from '@wireapp/react-ui-kit';
 import {CheckboxLabel} from '../src/Form/index';
 import Color from 'color';
-import {Loading} from '@wireapp/react-ui-kit/Progress';
-import {Modal} from '@wireapp/react-ui-kit/Modal';
 import React from 'react';
 
 let shakebox = null;
