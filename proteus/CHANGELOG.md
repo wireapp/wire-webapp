@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="7.0.1"></a>
+## [7.0.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@7.0.0...@wireapp/proteus@7.0.1) (2018-02-15)
+
+
+### Bug Fixes
+
+* **proteus:** Specifying "sodium.base64_variants.ORIGINAL" ([#272](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/issues/272)) ([1f1792e](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/commit/1f1792e))
+
+
+
+
 <a name="7.0.0"></a>
 # [7.0.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@6.0.5...@wireapp/proteus@7.0.0) (2018-02-14)
 

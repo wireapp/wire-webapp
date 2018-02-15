@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="8.0.1"></a>
+## [8.0.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@8.0.0...@wireapp/cryptobox@8.0.1) (2018-02-15)
+
+
+### Bug Fixes
+
+* **proteus:** Specifying "sodium.base64_variants.ORIGINAL" ([#272](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/issues/272)) ([1f1792e](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/commit/1f1792e))
+
+
+
+
 <a name="8.0.0"></a>
 # [8.0.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@7.0.6...@wireapp/cryptobox@8.0.0) (2018-02-14)
 
