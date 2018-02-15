@@ -247,9 +247,14 @@ z.string.et.conversation_send_pasted_file = 'Kleepis pildi kuupäeval {{date}}';
 z.string.et.conversation_someone = 'Keegi';
 z.string.et.conversation_tweet_author = ' Twitteris';
 
-z.string.et.conversation_creation_preferences_action = 'Järgmine';
-z.string.et.conversation_creation_participants_header = 'Lisa inimesi';
-z.string.et.conversation_creation_participants_placeholder = 'Otsi nime järgi';
+z.string.et.groupCreationPreferencesAction = 'Järgmine';
+z.string.et.groupCreationPreferencesHeader = 'Loo vestlus';
+z.string.et.groupCreationPreferencesPlaceholder = 'Vestluse nimi';
+z.string.et.groupCreationParticipantsActionCreate = 'Loo';
+z.string.et.groupCreationParticipantsActionSkip = 'Jäta vahele';
+z.string.et.groupCreationParticipantsHeader = 'Lisa inimesi';
+z.string.et.groupCreationParticipantsHeaderWithCounter = 'Lisa inimesi ({{number}})';
+z.string.et.groupCreationParticipantsPlaceholder = 'Otsi nime järgi';
 
 z.string.et.collection_show_all = 'Kuva kõik {{number}}';
 z.string.et.collection_section_links = 'Lingid';
@@ -315,8 +320,6 @@ z.string.et.extensions_giphy_message = '{{tag}} • via giphy.com';
 z.string.et.extensions_giphy_no_gifs = 'Ups, gif-e pole';
 z.string.et.extensions_giphy_random = 'Juhuslik';
 
-z.string.et.search_open = 'Ava';
-z.string.et.search_open_group = 'Loo grupp';
 z.string.et.people_confirm_label = 'Lisa inimesi gruppi';
 z.string.et.people_people = '{{number}} inimest';
 z.string.et.people_search_placeholder = 'Otsi nime järgi';
@@ -367,7 +370,7 @@ z.string.et.people_remove_message = '{{user}} ei saa siin vestluses sõnumeid sa
 z.string.et.people_unblock_headline = 'Eemaldad blokeeringu?';
 z.string.et.people_unblock_message = '{{user}} saab sinuga uuesti ühendust võtta ja sind grupivestlustesse lisada.';
 
-z.string.et.people_button_add = 'Lisa inimesi';
+z.string.et.people_button_add = 'Lisa';
 z.string.et.people_button_add_people = 'Lisa inimesi';
 z.string.et.people_button_block = 'Blokeeri';
 z.string.et.people_button_cancel = 'Tühista';
@@ -449,6 +452,7 @@ z.string.et.preferences_options_data = 'Kasutus- ja krahhiaruanded';
 z.string.et.preferences_options_data_checkbox = 'Saada anonüümseid andmeid';
 z.string.et.preferences_options_data_detail = 'Tee Wire paremaks, saates anonüümset infot.';
 z.string.et.preferences_options_popular = 'Publiku nõudmisel';
+z.string.et.preferences_options_emoji_replace_detail = ':-) → {{icon}}';
 z.string.et.preferences_options_emoji_replace_checkbox = 'Asenda kirjutatud emotikonid emojidega';
 z.string.et.preferences_options_previews_send_checkbox = 'Loo eelvaateid saadetavatele linkidele';
 z.string.et.preferences_options_previews_send_detail = 'Eelvaateid võidakse siiski näidata teiste inimeste linkide puhul.';
@@ -458,7 +462,6 @@ z.string.et.preferences_options_notifications_obfuscate = 'Peida üksikasjad';
 z.string.et.preferences_options_notifications_obfuscate_message = 'Kuva saatjat';
 z.string.et.preferences_options_notifications_on = 'Kuva saatjat ja sõnumit';
 
-z.string.et.search_group_hint = 'Jätka tippimist või vali veel inimesi grupi loomiseks';
 z.string.et.search_connect = 'Ühendu';
 z.string.et.search_connections = 'Ühendused';
 z.string.et.search_contacts = 'Kontaktid';

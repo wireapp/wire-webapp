@@ -307,8 +307,6 @@ z.string.pl.extensions_giphy_message = '{{tag}} • via giphy.com';
 z.string.pl.extensions_giphy_no_gifs = 'Ups, nie ma plików Gif';
 z.string.pl.extensions_giphy_random = 'Losowa kolejność';
 
-z.string.pl.search_open = 'Otwórz';
-z.string.pl.search_open_group = 'Utwórz grupę';
 z.string.pl.people_confirm_label = 'Dodaj osoby do grupy';
 z.string.pl.people_people = '{{number}} uczestników';
 z.string.pl.people_search_placeholder = 'Szukaj według nazwy';
@@ -356,7 +354,8 @@ z.string.pl.people_remove_message = '{{user}} nie będzie mógł wysyłać, ani 
 z.string.pl.people_unblock_headline = 'Odblokować?';
 z.string.pl.people_unblock_message = '{{user}} będzie mógł się z Tobą skontaktować oraz dodać do rozmowy grupowej.';
 
-z.string.pl.people_button_add = 'Dodaj osoby';
+z.string.pl.people_button_add = 'Dodaj';
+z.string.pl.people_button_add_people = 'Dodaj osoby';
 z.string.pl.people_button_block = 'Zablokuj';
 z.string.pl.people_button_cancel = 'Anuluj';
 z.string.pl.people_button_connect = 'Połącz';
@@ -445,7 +444,6 @@ z.string.pl.preferences_options_notifications_obfuscate = 'Ukryj szczegóły';
 z.string.pl.preferences_options_notifications_obfuscate_message = 'Pokaż nadawcę';
 z.string.pl.preferences_options_notifications_on = 'Pokaż nadawcę i wiadomości';
 
-z.string.pl.search_group_hint = 'Pisz dalej, lub wybierz więcej osób, aby utworzyć grupę';
 z.string.pl.search_connect = 'Połącz';
 z.string.pl.search_connections = 'Połączenia';
 z.string.pl.search_contacts = 'Kontakty';
