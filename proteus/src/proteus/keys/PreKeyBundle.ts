@@ -96,7 +96,7 @@ class PreKeyBundle {
   serialised_json(): SerialisedJSON {
     return {
       id: this.prekey_id,
-      key: sodium.to_base64(new Uint8Array(this.serialise())),
+      key: sodium.to_base64(new Uint8Array(this.serialise()), 1),
     };
   }
 

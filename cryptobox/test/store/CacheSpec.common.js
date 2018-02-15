@@ -48,8 +48,8 @@ describe('cryptobox.store.Cache', () => {
   });
 
   describe('"save_identity"', () => {
-    it('saves the local identity', done => {
-      const ikp = Proteus.keys.IdentityKeyPair.new();
+    it('saves the local identity', async done => {
+      const ikp = await Proteus.keys.IdentityKeyPair.new();
       store
         .save_identity(ikp)
         .then(identity => {

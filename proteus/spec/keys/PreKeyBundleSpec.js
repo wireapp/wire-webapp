@@ -113,7 +113,10 @@ describe('PreKeyBundle', () => {
 
       expect(serialised_pre_key_bundle_json.id).toBe(pre_key_id);
 
-      const serialised_array_buffer_view = sodium.from_base64(serialised_pre_key_bundle_json.key);
+      const serialised_array_buffer_view = sodium.from_base64(
+        serialised_pre_key_bundle_json.key,
+        sodium.base64_variants.ORIGINAL
+      );
       const serialised_array_buffer = serialised_array_buffer_view.buffer;
       const deserialised_pre_key_bundle = Proteus.keys.PreKeyBundle.deserialise(serialised_array_buffer);
 

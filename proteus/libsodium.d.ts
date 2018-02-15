@@ -22,7 +22,7 @@ declare module 'libsodium-wrappers-sumo' {
     mac: Uint8Array;
   }
 
-  interface base64_variant {
+  interface base64_variants {
     ORIGINAL: 1 | 0;
     ORIGINAL_NO_PADDING: 3 | 0;
     URLSAFE: 5 | 0;
@@ -618,7 +618,7 @@ declare module 'libsodium-wrappers-sumo' {
     key: Uint8Array,
     outputFormat?: OutputFormat
   ): string | Uint8Array;
-  function from_base64(variant?: base64_variant): Uint8Array;
+  function from_base64(input: string, variant: number): Uint8Array;
   function from_hex(input: string): string;
   function from_string(str: string): Uint8Array;
   function increment(bytes: Uint8Array): void;
@@ -639,7 +639,7 @@ declare module 'libsodium-wrappers-sumo' {
   function randombytes_uniform(upper_bound: number): number;
   function ready(): Promise<void>;
   function sodium_version_string(): string | Uint8Array;
-  function to_base64(input: string | Uint8Array, variant?: base64_variant): string;
+  function to_base64(input: string | Uint8Array, variant: number): string;
   function to_hex(input: string | Uint8Array): string;
   function to_string(bytes: Uint8Array): string;
   function unpad(buf: Uint8Array, blocksize: number): Uint8Array;
