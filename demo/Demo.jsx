@@ -32,6 +32,7 @@ import {
   ContainerSM,
   ContainerXS,
   Content,
+  DeviceIcon,
   ErrorMessage,
   Footer,
   Form,
@@ -97,6 +98,7 @@ class Demo extends React.PureComponent {
           <Loading progress={0.66} />
           <Logo scale="3" hover />
           <ProfileIcon />
+          <DeviceIcon />
           <TeamIcon />
           <ArrowIcon direction="up" />
           <PlaneIcon />
@@ -256,6 +258,7 @@ class Demo extends React.PureComponent {
                       <RoundIconButton type="submit" icon={ICON_NAME.PLANE} formNoValidate />
                       <RoundIconButton type="submit" icon={ICON_NAME.PROFILE} formNoValidate />
                       <RoundIconButton type="submit" icon={ICON_NAME.TEAM} formNoValidate />
+                      <RoundIconButton type="submit" icon={ICON_NAME.TRASH} formNoValidate />
                     </InputSubmitCombo>
                   </InputBlock>
                 </Form>

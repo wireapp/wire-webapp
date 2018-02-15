@@ -17,7 +17,7 @@
  *
  */
 
-import {ArrowIcon, CheckIcon, CloseIcon, PlaneIcon, ProfileIcon, RoundContainer, TeamIcon} from '../Icon';
+import {ArrowIcon, CheckIcon, CloseIcon, PlaneIcon, ProfileIcon, RoundContainer, TeamIcon, TrashIcon} from '../Icon';
 import {COLOR} from '../Identity';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -45,6 +45,7 @@ const ICON_NAME = {
   PLANE: 'plane',
   PROFILE: 'profile',
   TEAM: 'team',
+  TRASH: 'trash',
 };
 
 const RoundIconButton = ({icon, iconColor, iconHeight, iconWidth, ...props}) => (
@@ -67,6 +68,9 @@ const RoundIconButton = ({icon, iconColor, iconHeight, iconWidth, ...props}) => 
         case ICON_NAME.TEAM: {
           const defaultSize = 24;
           return <TeamIcon color={iconColor} height={iconHeight || defaultSize} width={iconWidth || defaultSize} />;
+        }
+        case ICON_NAME.TRASH: {
+          return <TrashIcon color={iconColor} height={iconHeight} width={iconWidth} />;
         }
         case ICON_NAME.ARROW:
         default: {
