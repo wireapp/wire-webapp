@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="1.0.0"></a>
+# [1.0.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@0.1.14...@wireapp/react-ui-kit@1.0.0) (2018-02-15)
+
+
+### Code Refactoring
+
+* **react-ui-kit:** Remove import aliases ([#257](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/257)) ([b2cb1f8](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/b2cb1f8))
+
+
+### BREAKING CHANGES
+
+* **react-ui-kit:** - Removed react-ui-kit aliases. Imports of subpackages in the form `...from '@wireapp/react-ui-kit/<subpackage>';` will not be functional anymore. Use `...from '@wireapp/react-ui-kit';` instead.
+
+
+
+
 <a name="0.1.14"></a>
 ## [0.1.14](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@0.1.13...@wireapp/react-ui-kit@0.1.14) (2018-02-15)
 
