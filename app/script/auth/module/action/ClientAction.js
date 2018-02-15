@@ -32,3 +32,29 @@ export function doGetAllClients() {
       });
   };
 }
+
+export function doRemoveClient(clientId: string, password: string) {
+  return function(dispatch, getState, {apiClient}) {
+    dispatch(ClientActionCreator.startRemoveClient());
+    return Promise.resolve()
+      .then(() => apiClient.client.api.deleteClient(clientId, password))
+      .then(clients => dispatch(ClientActionCreator.successfulRemoveClient(clientId)))
+      .catch(error => {
+        dispatch(ClientActionCreator.failedRemoveClient(error));
+        throw BackendError.handle(error);
+      });
+  };
+}
+
+export function doCreateClient(password: string) {
+  return function(dispatch, getState, {core}) {
+    dispatch(ClientActionCreator.startRemoveClient());
+    return Promise.resolve()
+      .then(() => core.deleteClient(clientId, password))
+      .then(clients => dispatch(ClientActionCreator.successfulRemoveClient(clientId)))
+      .catch(error => {
+        dispatch(ClientActionCreator.failedRemoveClient(error));
+        throw BackendError.handle(error);
+      });
+  };
+}

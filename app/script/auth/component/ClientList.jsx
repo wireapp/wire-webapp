@@ -17,7 +17,7 @@
  *
  */
 
-import {ContainerXS} from '@wireapp/react-ui-kit/Layout';
+import {ContainerXS} from '@wireapp/react-ui-kit';
 import {injectIntl} from 'react-intl';
 import React from 'react';
 import * as ClientAction from '../module/action/ClientAction';
@@ -30,6 +30,11 @@ class ClientList extends React.Component {
     clients: [],
   };
 
+  removeClient = (event, clientId, password) => {
+    event.preventDefault();
+    return this.props.doRemoveClient(clientId, password);
+  };
+
   render() {
     const {clients} = this.props;
     return (
@@ -39,7 +44,13 @@ class ClientList extends React.Component {
         style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-around'}}
       >
         {clients.map(client => (
-          <ClientItem key={client.id} name={client.model} fingerprint={client.id} created={client.time} />
+          <ClientItem
+            key={client.id}
+            name={client.model}
+            fingerprint={client.id}
+            created={client.time}
+            onClientRemoval={(event, password) => this.removeClient(event, client.id, password)}
+          />
         ))}
       </ContainerXS>
     );

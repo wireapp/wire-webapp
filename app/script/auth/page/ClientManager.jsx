@@ -17,9 +17,7 @@
  *
  */
 
-import {ContainerXS} from '@wireapp/react-ui-kit/Layout';
-import {ErrorMessage} from '@wireapp/react-ui-kit/Form';
-import {H1, Text, Link} from '@wireapp/react-ui-kit/Text';
+import {H1, Text, Link, ErrorMessage, ContainerXS} from '@wireapp/react-ui-kit';
 import {injectIntl} from 'react-intl';
 import {parseError} from '../util/errorUtil';
 import Page from './Page';

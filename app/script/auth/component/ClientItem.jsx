@@ -18,18 +18,27 @@
  */
 
 import React from 'react';
-import {ContainerXS} from '@wireapp/react-ui-kit/Layout';
-import {Input, InputSubmitCombo, RoundIconButton} from '@wireapp/react-ui-kit/Form';
-import {Text, Line, Small} from '@wireapp/react-ui-kit/Text';
+import {
+  COLOR,
+  Input,
+  InputSubmitCombo,
+  RoundIconButton,
+  ICON_NAME,
+  ContainerXS,
+  Text,
+  Line,
+  Small,
+} from '@wireapp/react-ui-kit';
 
 class ClientItem extends React.Component {
   state = {
     editMode: false,
+    password: null,
   };
 
   toggleEditMode = () => this.setState({editMode: !this.state.editMode});
 
-  formatFingerprint = fingerprint =>
+  formatFingerprint = (fingerprint = '00') =>
     fingerprint
       .toUpperCase()
       .match(/.{1,2}/g)
@@ -61,8 +70,17 @@ class ClientItem extends React.Component {
         {this.state.editMode && (
           <ContainerXS style={{margin: '-15px 0 0 0', padding: '5px'}}>
             <InputSubmitCombo style={{marginBottom: '0'}}>
-              <Input placeholder="Password" />
-              <RoundIconButton type="submit" icon="plane" formNoValidate />
+              <Input
+                placeholder="Password"
+                onChange={event => this.setState({...this.state, password: event.target.value})}
+              />
+              <RoundIconButton
+                color={COLOR.RED}
+                type="submit"
+                icon={ICON_NAME.CLOSE}
+                formNoValidate
+                onClick={event => this.props.onClientRemoval(event, this.state.password)}
+              />
             </InputSubmitCombo>
           </ContainerXS>
         )}

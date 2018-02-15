@@ -48,6 +48,27 @@ export default function clientReducer(state = initialState, action) {
         fetching: false,
       };
     }
+    case ClientActionCreator.CLIENT_REMOVE_START: {
+      return {
+        ...state,
+        fetching: true,
+      };
+    }
+    case ClientActionCreator.CLIENT_REMOVE_SUCCESS: {
+      return {
+        ...state,
+        clients: [state.clients.filter(client => client.id === action.payload)],
+        error: null,
+        fetching: false,
+      };
+    }
+    case ClientActionCreator.CLIENT_REMOVE_FAILED: {
+      return {
+        ...state,
+        error: action.payload,
+        fetching: false,
+      };
+    }
     case ClientActionCreator.CLIENT_RESET_ERROR: {
       return {...state, error: null};
     }

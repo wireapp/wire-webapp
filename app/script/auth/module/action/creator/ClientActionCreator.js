@@ -48,8 +48,8 @@ export const startRemoveClient = params => ({
   type: CLIENT_REMOVE_START,
 });
 
-export const successfulRemoveClient = client => ({
-  payload: client,
+export const successfulRemoveClient = deletedClientId => ({
+  payload: deletedClientId,
   type: CLIENT_REMOVE_SUCCESS,
 });
 

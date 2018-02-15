@@ -18,8 +18,11 @@
  */
 
 import React from 'react';
-import {Container, ContainerXS, Columns, Column} from '@wireapp/react-ui-kit/Layout';
 import {
+  Container,
+  ContainerXS,
+  Columns,
+  Column,
   Form,
   InputSubmitCombo,
   Input,
@@ -27,14 +30,16 @@ import {
   RoundIconButton,
   Checkbox,
   CheckboxLabel,
+  H1,
+  Text,
+  Link,
+  ArrowIcon,
+  COLOR,
   ErrorMessage,
-} from '@wireapp/react-ui-kit/Form';
-import {H1, Text, Link} from '@wireapp/react-ui-kit/Text';
-import {ArrowIcon} from '@wireapp/react-ui-kit/Icon';
+} from '@wireapp/react-ui-kit';
 import ROUTE from '../route';
 import {Link as RRLink} from 'react-router-dom';
 import {connect} from 'react-redux';
-import {COLOR} from '@wireapp/react-ui-kit/Identity';
 import {injectIntl} from 'react-intl';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {doLogin} from '../module/action/AuthAction';
