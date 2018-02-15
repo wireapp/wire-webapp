@@ -561,7 +561,7 @@ z.event.EventRepository = class EventRepository {
     return this._handle_event_validation(event, source)
       .then(validated_event => {
         if (z.event.EventTypeHandling.DECRYPT.includes(validated_event.type)) {
-          return this.cryptography_repository.handle_encrypted_event(event);
+          return this.cryptography_repository.handleEncryptedEvent(event);
         }
         return event;
       })

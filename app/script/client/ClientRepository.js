@@ -276,7 +276,7 @@ z.client.ClientRepository = class ClientRepository {
     const clientType = this._loadCurrentClientType();
 
     return this.cryptographyRepository
-      .generate_client_keys()
+      .generateClientKeys()
       .then(keys => this.clientService.postClients(this._createRegistrationPayload(clientType, password, keys)))
       .catch(error => {
         const tooManyClients = error.label === z.service.BackendClientError.LABEL.TOO_MANY_CLIENTS;
@@ -415,26 +415,6 @@ z.client.ClientRepository = class ClientRepository {
   //##############################################################################
 
   /**
-   * Cleanup local sessions.
-   * @note If quick_clean parameter is set to false, there will be one backend request per user that has a session.
-   * @param {boolean} [quickClean=true] - Optional value whether to check all users with local sessions or the ones with too many sessions
-   * @returns {undefined} No return value
-   */
-  cleanupClientsAndSessions(quickClean = true) {
-    const object = this.cryptographyRepository.create_user_session_map();
-
-    for (const userId in object) {
-      const clientIds = object[userId];
-      const logLevel = clientIds > 8 ? this.logger.levels.WARN : this.logger.levels.INFO;
-
-      if (!quickClean || !(clientIds.length <= 8)) {
-        this.logger.log(logLevel, `User '${user_id}' has session with '${clientIds.length}' clients locally`);
-        this._removeObsoleteClientsForUserById(user_id, clientIds);
-      }
-    }
-  }
-
-  /**
    * Delete client of a user on backend and removes it locally.
    *
    * @param {string} clientId - ID of the client that should be deleted
@@ -503,7 +483,7 @@ z.client.ClientRepository = class ClientRepository {
    */
   removeClient(userId, clientId) {
     return this.cryptographyRepository
-      .delete_session(userId, clientId)
+      .deleteSession(userId, clientId)
       .then(() => this.deleteClientFromDb(userId, clientId));
   }
 
@@ -557,37 +537,6 @@ z.client.ClientRepository = class ClientRepository {
       throw new z.client.ClientError(z.client.ClientError.TYPE.CLIENT_NOT_SET);
     }
     return z.util.Environment.electron || this.currentClient().isPermanent();
-  }
-
-  /**
-   * Remove obsolete clients and sessions for given user.
-   *
-   * @private
-   * @param {string} userId - ID of user to check clients and sessions off
-   * @param {Array<string>} clientIds - Contains IDs of local sessions for user
-   * @returns {Promise} Resolves when obsolete clients have been removed
-   */
-  _removeObsoleteClientsForUserById(userId, clientIds) {
-    return this.getClientsByUserId(userId).then(clientEntities => {
-      this.logger.info(
-        `For user '${userId}' backend found '${
-          clientEntities.length
-        }' active clients. Locally there are sessions for '${clientIds.length}' clients`,
-        {
-          clients: clientEntities,
-          sessions: clientIds,
-        }
-      );
-
-      for (const clientId of clientIds) {
-        const deleteClient = !clientEntities.find(({id}) => id === clientId);
-
-        if (deleteClient) {
-          this.logger.log(`Client '${clientId}' of user '${userId}' is obsolete and will be removed`);
-          this.removeClient(userId, clientId);
-        }
-      }
-    });
   }
 
   /**

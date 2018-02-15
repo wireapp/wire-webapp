@@ -306,9 +306,9 @@ z.main.App = class App {
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.VALIDATED_CLIENT);
         this.telemetry.add_statistic(z.telemetry.app_init.AppInitStatisticsValue.CLIENT_TYPE, client_observable().type);
 
-        this.repository.cryptography.current_client = client_observable;
+        this.repository.cryptography.currentClient = client_observable;
         this.repository.event.current_client = client_observable;
-        return this.repository.cryptography.load_cryptobox(this.service.storage.db);
+        return this.repository.cryptography.loadCryptobox(this.service.storage.db);
       })
       .then(() => {
         this.view.loading.update_progress(10);
@@ -378,7 +378,6 @@ z.main.App = class App {
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.UPDATED_CONVERSATIONS);
         this.repository.lifecycle.init();
         this.repository.audio.init(true);
-        this.repository.client.cleanupClientsAndSessions(true);
         this.repository.conversation.cleanup_conversations();
         this.logger.info('App fully loaded');
       })

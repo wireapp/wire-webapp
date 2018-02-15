@@ -1710,7 +1710,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     this.logger.info('Logging in');
 
     this._get_self_user()
-      .then(() => this.cryptography_repository.load_cryptobox(this.storageService.db))
+      .then(() => this.cryptography_repository.loadCryptobox(this.storageService.db))
       .then(() => this.client_repository.getValidLocalClient())
       .catch(error => {
         const user_missing_email = error.type === z.user.UserError.TYPE.USER_MISSING_EMAIL;
@@ -1722,7 +1722,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
         if (client_not_validated) {
           const client_et = this.client_repository.currentClient();
           this.client_repository.currentClient(undefined);
-          return this.cryptography_repository.reset_cryptobox(client_et).then(deleted_everything => {
+          return this.cryptography_repository.resetCryptobox(client_et).then(deleted_everything => {
             if (deleted_everything) {
               this.logger.info('Database was completely reset. Reinitializing storage...');
               return this.storage_repository.storageService.init(this.self_user().id);
@@ -1797,7 +1797,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
   _register_client(auto_login) {
     return this.cryptography_repository
-      .create_cryptobox(this.storageService.db)
+      .createCryptobox(this.storageService.db)
       .then(() => this.client_repository.registerClient(auto_login ? undefined : this.password()))
       .then(client_observable => {
         this.event_repository.current_client = client_observable;

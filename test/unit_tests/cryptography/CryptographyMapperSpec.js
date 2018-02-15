@@ -38,7 +38,7 @@ describe('z.cryptography.CryptographyMapper', () => {
     };
   });
 
-  describe('"map_generic_message"', () => {
+  describe('"mapGenericMessage"', () => {
     beforeAll(done => {
       z.util.protobuf
         .load_protos('ext/proto/generic-message-proto/messages.proto')
@@ -60,7 +60,7 @@ describe('z.cryptography.CryptographyMapper', () => {
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
 
       mapper
-        .map_generic_message(generic_message, event)
+        .mapGenericMessage(generic_message, event)
         .then(event_json => {
           expect(_.isObject(event_json)).toBeTruthy();
           expect(event_json.type).toBe(z.event.Client.CONVERSATION.ASSET_ADD);
@@ -86,7 +86,7 @@ describe('z.cryptography.CryptographyMapper', () => {
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
 
       mapper
-        .map_generic_message(generic_message, event)
+        .mapGenericMessage(generic_message, event)
         .then(event_json => {
           expect(_.isObject(event_json)).toBeTruthy();
           expect(event_json.type).toBe(z.event.Client.CONVERSATION.ASSET_ADD);
@@ -128,7 +128,7 @@ describe('z.cryptography.CryptographyMapper', () => {
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
 
       mapper
-        .map_generic_message(generic_message, event)
+        .mapGenericMessage(generic_message, event)
         .then(event_json => {
           expect(_.isObject(event_json)).toBeTruthy();
           expect(event_json.type).toBe(z.event.Client.CONVERSATION.ASSET_ADD);
@@ -153,7 +153,7 @@ describe('z.cryptography.CryptographyMapper', () => {
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
 
       mapper
-        .map_generic_message(generic_message, event)
+        .mapGenericMessage(generic_message, event)
         .then(event_json => {
           expect(_.isObject(event_json)).toBeTruthy();
           expect(event_json.type).toBe(z.event.Client.CONVERSATION.ASSET_ADD);
@@ -175,7 +175,7 @@ describe('z.cryptography.CryptographyMapper', () => {
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
 
       mapper
-        .map_generic_message(generic_message, event)
+        .mapGenericMessage(generic_message, event)
         .then(event_json => {
           expect(_.isObject(event_json)).toBeTruthy();
           expect(event_json.type).toBe(z.event.Client.CONVERSATION.ASSET_ADD);
@@ -209,7 +209,7 @@ describe('z.cryptography.CryptographyMapper', () => {
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
 
       mapper
-        .map_generic_message(generic_message, event)
+        .mapGenericMessage(generic_message, event)
         .then(event_json => {
           expect(_.isObject(event_json)).toBeTruthy();
           expect(event_json.type).toBe(z.event.Client.CONVERSATION.ASSET_ADD);
@@ -231,7 +231,7 @@ describe('z.cryptography.CryptographyMapper', () => {
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.AVAILABILITY, availability);
 
       mapper
-        .map_generic_message(generic_message, event)
+        .mapGenericMessage(generic_message, event)
         .then(event_json => {
           expect(_.isObject(event_json)).toBeTruthy();
           expect(event_json.type).toBe(z.event.Client.USER.AVAILABILITY);
@@ -252,7 +252,7 @@ describe('z.cryptography.CryptographyMapper', () => {
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.CLEARED, new z.proto.Cleared(conversation_id, date));
 
       mapper
-        .map_generic_message(generic_message, event)
+        .mapGenericMessage(generic_message, event)
         .then(event_json => {
           expect(_.isObject(event_json)).toBeTruthy();
           expect(event_json.type).toBe(z.event.Backend.CONVERSATION.MEMBER_UPDATE);
@@ -277,7 +277,7 @@ describe('z.cryptography.CryptographyMapper', () => {
       );
 
       mapper
-        .map_generic_message(generic_message, event)
+        .mapGenericMessage(generic_message, event)
         .then(event_json => {
           expect(_.isObject(event_json)).toBeTruthy();
           expect(event_json.type).toBe(z.event.Client.CONVERSATION.MESSAGE_HIDDEN);
@@ -298,7 +298,7 @@ describe('z.cryptography.CryptographyMapper', () => {
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.DELETED, new z.proto.MessageDelete(message_id));
 
       mapper
-        .map_generic_message(generic_message, event)
+        .mapGenericMessage(generic_message, event)
         .then(event_json => {
           expect(_.isObject(event_json)).toBeTruthy();
           expect(event_json.type).toBe(z.event.Client.CONVERSATION.MESSAGE_DELETE);
@@ -337,7 +337,7 @@ describe('z.cryptography.CryptographyMapper', () => {
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.IMAGE, image_asset);
 
       mapper
-        .map_generic_message(generic_message, event)
+        .mapGenericMessage(generic_message, event)
         .then(event_json => {
           expect(_.isObject(event_json)).toBeTruthy();
           expect(event_json.type).toBe(z.event.Client.CONVERSATION.ASSET_ADD);
@@ -376,7 +376,7 @@ describe('z.cryptography.CryptographyMapper', () => {
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
 
       mapper
-        .map_generic_message(generic_message, event)
+        .mapGenericMessage(generic_message, event)
         .then(event_json => {
           expect(_.isObject(event_json)).toBeTruthy();
           expect(event_json.type).toBe(z.event.Client.CONVERSATION.ASSET_ADD);
@@ -423,7 +423,7 @@ describe('z.cryptography.CryptographyMapper', () => {
       delete event.data.id;
 
       mapper
-        .map_generic_message(generic_message, event)
+        .mapGenericMessage(generic_message, event)
         .then(event_json => {
           expect(_.isObject(event_json)).toBeTruthy();
           expect(event_json.type).toBe(z.event.Client.CONVERSATION.ASSET_ADD);
@@ -449,7 +449,7 @@ describe('z.cryptography.CryptographyMapper', () => {
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.IMAGE, new z.proto.ImageAsset('preview'));
 
       mapper
-        .map_generic_message(generic_message, event)
+        .mapGenericMessage(generic_message, event)
         .then(done.fail)
         .catch(error => {
           expect(error instanceof z.cryptography.CryptographyError).toBeTruthy();
@@ -463,7 +463,7 @@ describe('z.cryptography.CryptographyMapper', () => {
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.KNOCK, new z.proto.Knock(false));
 
       mapper
-        .map_generic_message(generic_message, event)
+        .mapGenericMessage(generic_message, event)
         .then(event_json => {
           expect(_.isObject(event_json)).toBeTruthy();
           expect(event_json.type).toBe(z.event.Client.CONVERSATION.KNOCK);
@@ -484,7 +484,7 @@ describe('z.cryptography.CryptographyMapper', () => {
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.LAST_READ, new z.proto.LastRead(conversation_id, date));
 
       mapper
-        .map_generic_message(generic_message, event)
+        .mapGenericMessage(generic_message, event)
         .then(event_json => {
           expect(_.isObject(event_json)).toBeTruthy();
           expect(event_json.type).toBe(z.event.Backend.CONVERSATION.MEMBER_UPDATE);
@@ -507,7 +507,7 @@ describe('z.cryptography.CryptographyMapper', () => {
       );
 
       mapper
-        .map_generic_message(generic_message, event)
+        .mapGenericMessage(generic_message, event)
         .then(event_json => {
           expect(_.isObject(event_json)).toBeTruthy();
           expect(event_json.type).toBe(z.event.Client.CONVERSATION.REACTION);
@@ -527,7 +527,7 @@ describe('z.cryptography.CryptographyMapper', () => {
       generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, new z.proto.Text('Unit test'));
 
       mapper
-        .map_generic_message(generic_message, event)
+        .mapGenericMessage(generic_message, event)
         .then(event_json => {
           expect(_.isObject(event_json)).toBeTruthy();
           expect(event_json.type).toBe(z.event.Client.CONVERSATION.MESSAGE_ADD);
@@ -544,7 +544,7 @@ describe('z.cryptography.CryptographyMapper', () => {
 
     it('rejects with an error if no generic message is provided', done => {
       mapper
-        .map_generic_message(undefined, {id: 'ABC'})
+        .mapGenericMessage(undefined, {id: 'ABC'})
         .then(done.fail)
         .catch(error => {
           expect(error instanceof z.cryptography.CryptographyError).toBeTruthy();
@@ -568,7 +568,7 @@ describe('z.cryptography.CryptographyMapper', () => {
           const external_message = new z.proto.GenericMessage(z.util.create_random_uuid());
           external_message.set('external', new z.proto.External(keyBytes, sha256));
 
-          return mapper.map_generic_message(external_message, event);
+          return mapper.mapGenericMessage(external_message, event);
         })
         .then(event_json => {
           expect(event_json.data.content).toBe(plaintext);
@@ -593,7 +593,7 @@ describe('z.cryptography.CryptographyMapper', () => {
 
           external_message = new z.proto.GenericMessage(z.util.create_random_uuid());
           external_message.set('external', new z.proto.External(keyBytes, sha256));
-          return mapper.map_generic_message(external_message, event);
+          return mapper.mapGenericMessage(external_message, event);
         })
         .then(event_json => {
           expect(_.isObject(event_json)).toBeTruthy();
@@ -616,7 +616,7 @@ describe('z.cryptography.CryptographyMapper', () => {
       );
 
       mapper
-        .map_generic_message(generic_message, event)
+        .mapGenericMessage(generic_message, event)
         .then(event_json => {
           expect(_.isObject(event_json)).toBeTruthy();
           expect(event_json.type).toBe(z.event.Client.CONVERSATION.LOCATION);
@@ -639,7 +639,7 @@ describe('z.cryptography.CryptographyMapper', () => {
       generic_message.set('reaction', new z.proto.Reaction(z.message.ReactionType.LIKE, generic_message.message_id));
 
       mapper
-        .map_generic_message(generic_message, event)
+        .mapGenericMessage(generic_message, event)
         .then(event_json => {
           expect(_.isObject(event_json)).toBeTruthy();
           expect(event_json.type).toBe(z.event.Client.CONVERSATION.REACTION);
@@ -669,7 +669,7 @@ describe('z.cryptography.CryptographyMapper', () => {
       );
 
       mapper
-        .map_generic_message(generic_message, event)
+        .mapGenericMessage(generic_message, event)
         .then(event_json => {
           expect(_.isObject(event_json)).toBeTruthy();
           expect(event_json.type).toBe(z.event.Client.CALL.E_CALL);

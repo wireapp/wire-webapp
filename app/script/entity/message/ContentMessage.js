@@ -27,7 +27,6 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
     super();
 
     this.assets = ko.observableArray([]);
-    this.nonce = null;
     this.super_type = z.message.SuperType.CONTENT;
     this.replacing_message_id = null;
     this.edited_timestamp = null;

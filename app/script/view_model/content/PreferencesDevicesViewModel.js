@@ -104,7 +104,7 @@ z.ViewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewMo
 
       this._update_activation_time(this.current_client().time);
       this.displayFingerPrint(
-        z.util.zero_padding(this.cryptography_repository.get_local_fingerprint(), 16).match(/.{1,2}/g)
+        z.util.zero_padding(this.cryptography_repository.getLocalFingerprint(), 16).match(/.{1,2}/g)
       );
     }
   }

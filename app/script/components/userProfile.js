@@ -136,10 +136,10 @@ z.components.UserProfile = class UserProfile {
 
     this.selectedDeviceSubscription = this.selectedDevice.subscribe(() => {
       if (this.selectedDevice()) {
-        this.fingerprintLocal(this._formatFingerprint(this.cryptographyRepository.get_local_fingerprint()));
+        this.fingerprintLocal(this._formatFingerprint(this.cryptographyRepository.getLocalFingerprint()));
         this.fingerprintRemote([]);
         this.cryptographyRepository
-          .get_remote_fingerprint(this.userEntity().id, this.selectedDevice().id)
+          .getRemoteFingerprint(this.userEntity().id, this.selectedDevice().id)
           .then(fingerprint => this.fingerprintRemote(this._formatFingerprint(fingerprint)));
       }
     });
