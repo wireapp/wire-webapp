@@ -327,8 +327,6 @@ z.string.de.extensions_giphy_message = '{{tag}} • über giphy.com';
 z.string.de.extensions_giphy_no_gifs = 'Ups, kein GIF';
 z.string.de.extensions_giphy_random = 'Zufällig';
 
-z.string.de.search_open = 'Öffnen';
-z.string.de.search_open_group = 'Unterhaltung erstellen';
 z.string.de.people_confirm_label = 'Personen zur Gruppe hinzufügen';
 z.string.de.people_people = '{{number}} Personen';
 z.string.de.people_search_placeholder = 'Nach Namen suchen';
@@ -471,7 +469,6 @@ z.string.de.preferences_options_notifications_obfuscate = 'Details verbergen';
 z.string.de.preferences_options_notifications_obfuscate_message = 'Absendername zeigen';
 z.string.de.preferences_options_notifications_on = 'Zeige Absendername und Nachricht';
 
-z.string.de.search_group_hint = 'Tippe weiter oder wähle weitere Kontakte aus, um eine Gruppe zu erstellen';
 z.string.de.search_connect = 'Vorschläge';
 z.string.de.search_connections = 'Kontakte';
 z.string.de.search_contacts = 'Kontakte';

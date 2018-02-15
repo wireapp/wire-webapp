@@ -308,8 +308,6 @@ z.string.tr.extensions_giphy_message = '{{tag}} • giphy.com aracılığıyla';
 z.string.tr.extensions_giphy_no_gifs = 'Olamaz, hiç Gif yok';
 z.string.tr.extensions_giphy_random = 'Rastgele';
 
-z.string.tr.search_open = 'Aç';
-z.string.tr.search_open_group = 'Grup oluştur';
 z.string.tr.people_confirm_label = 'Gruba insanları ekle';
 z.string.tr.people_people = '{{number}} kişi';
 z.string.tr.people_search_placeholder = 'İsme göre ara';
@@ -357,7 +355,8 @@ z.string.tr.people_remove_message = '{{user}} bu konuşmaya mesaj gönderemeyece
 z.string.tr.people_unblock_headline = 'Engeli kaldır?';
 z.string.tr.people_unblock_message = '{{user}} sizinle tekrardan iletişim kurabilecek ve sizi grup konuşmalarına ekleyebilecek.';
 
-z.string.tr.people_button_add = 'Kişileri Ekle';
+z.string.tr.people_button_add = 'Ekle';
+z.string.tr.people_button_add_people = 'Kişileri Ekle';
 z.string.tr.people_button_block = 'Engelle';
 z.string.tr.people_button_cancel = 'İptal';
 z.string.tr.people_button_connect = 'Bağlan';
@@ -447,7 +446,6 @@ z.string.tr.preferences_options_notifications_obfuscate = 'Ayrıntıyı gizle';
 z.string.tr.preferences_options_notifications_obfuscate_message = 'Göndereni göster';
 z.string.tr.preferences_options_notifications_on = 'Göndereni ve mesajı göster';
 
-z.string.tr.search_group_hint = 'Yazmaya devam edin ya da bir grup oluşturmak için daha fazla kişi seçin';
 z.string.tr.search_connect = 'Bağlan';
 z.string.tr.search_connections = 'Bağlantılar';
 z.string.tr.search_contacts = 'Kişiler';

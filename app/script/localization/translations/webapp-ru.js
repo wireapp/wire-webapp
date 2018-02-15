@@ -246,9 +246,14 @@ z.string.ru.conversation_send_pasted_file = 'Изображение добавл
 z.string.ru.conversation_someone = 'Кто-то';
 z.string.ru.conversation_tweet_author = ' в Twitter';
 
-z.string.ru.conversation_creation_preferences_action = 'Вперед';
-z.string.ru.conversation_creation_participants_header = 'Добавить людей';
-z.string.ru.conversation_creation_participants_placeholder = 'Поиск по имени';
+z.string.ru.groupCreationPreferencesAction = 'Вперед';
+z.string.ru.groupCreationPreferencesHeader = 'Создать разговор';
+z.string.ru.groupCreationPreferencesPlaceholder = 'Название разговора';
+z.string.ru.groupCreationParticipantsActionCreate = 'Создать';
+z.string.ru.groupCreationParticipantsActionSkip = 'Пропустить';
+z.string.ru.groupCreationParticipantsHeader = 'Добавить людей';
+z.string.ru.groupCreationParticipantsHeaderWithCounter = 'Добавить людей ({{number}})';
+z.string.ru.groupCreationParticipantsPlaceholder = 'Поиск по имени';
 
 z.string.ru.collection_show_all = 'Показать все {{number}}';
 z.string.ru.collection_section_links = 'Ссылки';
@@ -314,8 +319,6 @@ z.string.ru.extensions_giphy_message = '{{tag}} • через giphy.com';
 z.string.ru.extensions_giphy_no_gifs = 'Упс, нет GIF-ок';
 z.string.ru.extensions_giphy_random = 'Случайно';
 
-z.string.ru.search_open = 'Открыть';
-z.string.ru.search_open_group = 'Создать группу';
 z.string.ru.people_confirm_label = 'Добавить пользователей в группу';
 z.string.ru.people_people = '{{number}} участника(ов)';
 z.string.ru.people_search_placeholder = 'Поиск по имени';
@@ -366,7 +369,7 @@ z.string.ru.people_remove_message = '{{user}} больше не сможет о�
 z.string.ru.people_unblock_headline = 'Разблокировать?';
 z.string.ru.people_unblock_message = '{{user}} вновь сможет связываться с вами и добавлять вас в групповые разговоры.';
 
-z.string.ru.people_button_add = 'Добавить участников';
+z.string.ru.people_button_add = 'Добавить';
 z.string.ru.people_button_add_people = 'Добавить людей';
 z.string.ru.people_button_block = 'Заблокировать';
 z.string.ru.people_button_cancel = 'Отменить';
@@ -449,6 +452,7 @@ z.string.ru.preferences_options_data_checkbox = 'Отчеты о сбоях и �
 z.string.ru.preferences_options_data_detail = 'Сделайте Wire лучше, отправляя анонимную информацию.';
 z.string.ru.preferences_options_popular = 'По многочисленным просьбам';
 z.string.ru.preferences_options_emoji_replace_checkbox = 'Заменять текстовые смайлы на эмодзи';
+z.string.ru.preferences_options_emoji_replace_detail = ':-) → {{icon}}';
 z.string.ru.preferences_options_previews_send_checkbox = 'Показывать предпросмотр ссылок, отправляемых вами';
 z.string.ru.preferences_options_previews_send_detail = 'Предпросмотр всё же может отображаться для ссылок от других людей.';
 z.string.ru.preferences_options_notifications = 'Уведомления';
@@ -457,7 +461,6 @@ z.string.ru.preferences_options_notifications_obfuscate = 'Скрывать со
 z.string.ru.preferences_options_notifications_obfuscate_message = 'Показывать имя отправителя';
 z.string.ru.preferences_options_notifications_on = 'Показывать имя отправителя и текст сообщения';
 
-z.string.ru.search_group_hint = 'Продолжите ввод или выберите больше людей для создания группы';
 z.string.ru.search_connect = 'Связаться';
 z.string.ru.search_connections = 'Контакты';
 z.string.ru.search_contacts = 'Контакты';
