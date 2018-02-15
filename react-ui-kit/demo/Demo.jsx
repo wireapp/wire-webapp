@@ -42,6 +42,7 @@ import {
   CodeInput,
   ErrorMessage,
   Form,
+  ICON_NAME,
   Input,
   InputBlock,
   InputSubmitCombo,
@@ -249,7 +250,12 @@ class Demo extends React.PureComponent {
                     <Input placeholder="InputBlock" markInvalid />
                     <InputSubmitCombo>
                       <Input placeholder="InputSubmitCombo" />
-                      <RoundIconButton type="submit" icon="plane" formNoValidate />
+                      <RoundIconButton type="submit" icon={ICON_NAME.ARROW} formNoValidate />
+                      <RoundIconButton type="submit" icon={ICON_NAME.CHECK} formNoValidate />
+                      <RoundIconButton type="submit" icon={ICON_NAME.CLOSE} formNoValidate />
+                      <RoundIconButton type="submit" icon={ICON_NAME.PLANE} formNoValidate />
+                      <RoundIconButton type="submit" icon={ICON_NAME.PROFILE} formNoValidate />
+                      <RoundIconButton type="submit" icon={ICON_NAME.TEAM} formNoValidate />
                     </InputSubmitCombo>
                   </InputBlock>
                 </Form>
