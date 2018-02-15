@@ -19,6 +19,7 @@
 
 import React from 'react';
 import {
+  DeviceIcon,
   COLOR,
   Input,
   InputSubmitCombo,
@@ -28,21 +29,16 @@ import {
   Text,
   Line,
   Small,
+  ErrorMessage,
 } from '@wireapp/react-ui-kit';
+import {parseError} from '../util/errorUtil';
 
 class ClientItem extends React.Component {
   state = {
-    editMode: false,
     password: null,
   };
 
-  toggleEditMode = () => this.setState({editMode: !this.state.editMode});
-
-  formatFingerprint = (fingerprint = '00') =>
-    fingerprint
-      .toUpperCase()
-      .match(/.{1,2}/g)
-      .join(' ');
+  formatFingerprint = (fingerprint = '') => fingerprint.toUpperCase().replace(/(..)/g, '$1 ');
 
   formatDate = dateString =>
     new Date(dateString).toLocaleString('en-US', {
@@ -56,34 +52,51 @@ class ClientItem extends React.Component {
     });
 
   render() {
-    const {name, fingerprint, created} = this.props;
+    const {selected, name, fingerprint, created} = this.props;
     return (
-      <ContainerXS style={this.state.editMode ? {backgroundColor: 'white', borderRadius: '10px'} : {}}>
-        <ContainerXS onClick={this.toggleEditMode} style={{margin: '0px', padding: '5px 15px'}}>
-          <Text bold block>
-            {name}
-          </Text>
-          <Small block>{`ID: ${this.formatFingerprint(fingerprint)}`}</Small>
-          <Small block>{this.formatDate(created)}</Small>
-          <Line />
-        </ContainerXS>
-        {this.state.editMode && (
-          <ContainerXS style={{margin: '-15px 0 0 0', padding: '5px'}}>
-            <InputSubmitCombo style={{marginBottom: '0'}}>
-              <Input
-                placeholder="Password"
-                onChange={event => this.setState({...this.state, password: event.target.value})}
-              />
-              <RoundIconButton
-                color={COLOR.RED}
-                type="submit"
-                icon={ICON_NAME.CLOSE}
-                formNoValidate
-                onClick={event => this.props.onClientRemoval(event, this.state.password)}
-              />
-            </InputSubmitCombo>
+      <ContainerXS>
+        <ContainerXS style={selected ? {backgroundColor: 'white', borderRadius: '10px'} : {}}>
+          <ContainerXS
+            onClick={this.props.onClick}
+            style={{margin: '0px', padding: '5px 15px'}}
+            data-uie-name="go-remove-device"
+          >
+            <div style={{display: 'flex', flexDirection: 'row'}}>
+              <div style={{flexBasis: '30px', margin: 'auto'}}>
+                <DeviceIcon />
+              </div>
+              <div style={{flexGrow: 1}}>
+                <Text bold block>
+                  {name}
+                </Text>
+                <Small block data-uie-name="device-id">{`ID: ${this.formatFingerprint(fingerprint)}`}</Small>
+                <Small block>{this.formatDate(created)}</Small>
+              </div>
+            </div>
+            <Line color={COLOR.GRAY} />
           </ContainerXS>
-        )}
+          {selected && (
+            <ContainerXS style={{margin: '-15px 0 0 0', padding: '5px'}}>
+              <InputSubmitCombo style={{marginBottom: '0'}}>
+                <Input
+                  placeholder="Password"
+                  type="password"
+                  onChange={event => this.setState({...this.state, password: event.target.value})}
+                  data-uie-name="remove-device-password"
+                />
+                <RoundIconButton
+                  color={COLOR.RED}
+                  type="submit"
+                  icon={ICON_NAME.TRASH}
+                  formNoValidate
+                  onClick={event => this.props.onClientRemoval(event, this.state.password)}
+                  data-uie-name="do-remove-device"
+                />
+              </InputSubmitCombo>
+            </ContainerXS>
+          )}
+        </ContainerXS>
+        <ErrorMessage data-uie-name="error-message">{parseError(this.props.error)}</ErrorMessage>
       </ContainerXS>
     );
   }

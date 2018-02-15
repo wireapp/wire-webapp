@@ -185,7 +185,7 @@ class Login extends React.PureComponent {
                         type="submit"
                         formNoValidate
                         onClick={this.handleSubmit}
-                        data-uie-name="do-next"
+                        data-uie-name="do-sign-in"
                       />
                     </InputSubmitCombo>
                   </InputBlock>
@@ -198,7 +198,7 @@ class Login extends React.PureComponent {
                     <Checkbox
                       onChange={event => this.setState({persist: !event.target.checked})}
                       checked={!persist}
-                      data-uie-name="check-persist"
+                      data-uie-name="enter-public-computer-sign-in"
                       style={{justifyContent: 'center'}}
                     >
                       <CheckboxLabel>{_(loginStrings.publicComputer)}</CheckboxLabel>
@@ -208,10 +208,14 @@ class Login extends React.PureComponent {
               </div>
               <Columns>
                 <Column>
-                  <Link onClick={this.forgotPassword}>{_(loginStrings.forgotPassword)}</Link>
+                  <Link onClick={this.forgotPassword} data-uie-name="go-forgot-password">
+                    {_(loginStrings.forgotPassword)}
+                  </Link>
                 </Column>
                 <Column>
-                  <Link href={ROUTE.PHONE_LOGIN + window.location.search}>{_(loginStrings.phoneLogin)}</Link>
+                  <Link href={ROUTE.PHONE_LOGIN + window.location.search} data-uie-name="go-sign-in-phone">
+                    {_(loginStrings.phoneLogin)}
+                  </Link>
                 </Column>
               </Columns>
             </ContainerXS>

@@ -17,23 +17,16 @@
  *
  */
 
-import {H1, Text, Link, ErrorMessage, ContainerXS} from '@wireapp/react-ui-kit';
+import {H1, Text, Link, ContainerXS} from '@wireapp/react-ui-kit';
 import {injectIntl} from 'react-intl';
-import {parseError} from '../util/errorUtil';
 import Page from './Page';
 import React from 'react';
 import * as ClientAction from '../module/action/ClientAction';
 import ClientList from '../component/ClientList';
 import * as AuthAction from '../module/action/AuthAction';
-import * as ClientSelector from '../module/selector/ClientSelector';
 import {connect} from 'react-redux';
 
 class ClientManager extends React.Component {
-  state = {
-    clients: [],
-    error: null,
-  };
-
   componentWillMount = () => {
     this.props.doGetAllClients();
   };
@@ -43,7 +36,6 @@ class ClientManager extends React.Component {
   };
 
   render() {
-    const {} = this.props;
     return (
       <Page>
         <ContainerXS
@@ -55,9 +47,8 @@ class ClientManager extends React.Component {
           <Text center style={{marginBottom: '20px'}}>
             {'Remove one of your other devices to start using Wire on this one.'}
           </Text>
-          <ClientList clients={this.props.clients} />
-          <ErrorMessage data-uie-name="error-message">{this.state.error && parseError(this.state.error)}</ErrorMessage>
-          <Link onClick={this.logout} style={{alignSelf: 'center'}}>
+          <ClientList />
+          <Link onClick={this.logout} style={{alignSelf: 'center'}} data-uie-name="go-sign-out">
             {'Log out'}
           </Link>
         </ContainerXS>
@@ -66,13 +57,4 @@ class ClientManager extends React.Component {
   }
 }
 
-export default injectIntl(
-  connect(
-    state => ({
-      clients: ClientSelector.getClients(state),
-      error: ClientSelector.getClientError(state),
-      isFetching: ClientSelector.isFetching(state),
-    }),
-    {...AuthAction, ...ClientAction}
-  )(ClientManager)
-);
+export default injectIntl(connect(null, {...AuthAction, ...ClientAction})(ClientManager));

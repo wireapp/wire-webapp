@@ -17,7 +17,7 @@
  *
  */
 
-import {ContainerXS} from '@wireapp/react-ui-kit';
+import {ContainerXS, Loading} from '@wireapp/react-ui-kit';
 import {injectIntl} from 'react-intl';
 import React from 'react';
 import * as ClientAction from '../module/action/ClientAction';
@@ -26,16 +26,28 @@ import * as ClientSelector from '../module/selector/ClientSelector';
 import {connect} from 'react-redux';
 
 class ClientList extends React.Component {
-  state = {};
+  state = {
+    currentlySelectedClient: null,
+  };
+
+  setSelectedClient = clientId => {
+    this.setState({...this.state, currentlySelectedClient: clientId});
+  };
 
   removeClient = (event, clientId, password) => {
     event.preventDefault();
     return this.props.doRemoveClient(clientId, password);
   };
 
+  isSelectedClient = clientId => clientId === this.state.currentlySelectedClient;
+
   render() {
-    const {permanentClients} = this.props;
-    return (
+    const {isFetching, permanentClients} = this.props;
+    return isFetching ? (
+      <ContainerXS centerText verticalCenter style={{justifyContent: 'center'}}>
+        <Loading />
+      </ContainerXS>
+    ) : (
       <ContainerXS
         centerText
         verticalCenter
@@ -44,9 +56,12 @@ class ClientList extends React.Component {
         {permanentClients.map(client => (
           <ClientItem
             key={client.id}
+            selected={this.isSelectedClient(client.id)}
             name={client.model}
             fingerprint={client.id}
             created={client.time}
+            error={this.isSelectedClient(client.id) && this.props.clientError}
+            onClick={event => this.setSelectedClient(client.id)}
             onClientRemoval={(event, password) => this.removeClient(event, client.id, password)}
           />
         ))}
@@ -58,6 +73,7 @@ class ClientList extends React.Component {
 export default injectIntl(
   connect(
     state => ({
+      clientError: ClientSelector.getError(state),
       isFetching: ClientSelector.isFetching(state),
       permanentClients: ClientSelector.getPermanentClients(state),
     }),
