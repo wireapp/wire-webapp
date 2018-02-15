@@ -396,7 +396,7 @@ export default class Account extends EventEmitter {
     return this.apiClient.logout().then(() => this.resetContext());
   }
 
-  private registerClient(
+  public registerClient(
     loginData: LoginData,
     clientClassification: ClientClassification = ClientClassification.DESKTOP,
     cookieLabel: string = 'default'
