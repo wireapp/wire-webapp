@@ -17,12 +17,13 @@
  *
  */
 
-export * from './ArrowIcon';
-export * from './CheckIcon';
-export * from './CloseIcon';
-export * from './DeviceIcon';
-export * from './PlaneIcon';
-export * from './ProfileIcon';
-export * from './TeamIcon';
-export * from './TrashIcon';
-export * from './RoundContainer';
+import IconHOC from './IconHOC';
+import React from 'react';
+
+const size = 16;
+const device = (
+  <path d="M11 0H1a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1h-3V1a1 1 0 0 0-1-1zm-1 5H9a1 1 0 0 0-1 1v8H2.5a.5.5 0 0 1-.5-.5v-11c0-.28.23-.5.5-.5h7c.28 0 .5.23.5.5V5zm-4 8a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm6 2a1 1 0 1 1 0-2 1 1 0 0 1 0 2z" />
+);
+const DeviceIcon = IconHOC(device, size, size);
+
+export {DeviceIcon};

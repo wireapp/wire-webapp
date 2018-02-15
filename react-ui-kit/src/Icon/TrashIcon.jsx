@@ -17,12 +17,14 @@
  *
  */
 
-export * from './ArrowIcon';
-export * from './CheckIcon';
-export * from './CloseIcon';
-export * from './DeviceIcon';
-export * from './PlaneIcon';
-export * from './ProfileIcon';
-export * from './TeamIcon';
-export * from './TrashIcon';
-export * from './RoundContainer';
+import IconHOC from './IconHOC';
+import React from 'react';
+
+const width = 14;
+const height = 16;
+const trash = (
+  <path d="M5 2H1a1 1 0 0 0-1 1v1h14V3a1 1 0 0 0-1-1H9a2 2 0 1 0-4 0zM1 6h12l-.8 8c-.11 1.1-1.09 2-2.2 2H4c-1.1 0-2.09-.89-2.2-2L1 6z" />
+);
+const TrashIcon = IconHOC(trash, width, height);
+
+export {TrashIcon};
