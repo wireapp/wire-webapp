@@ -17,7 +17,7 @@
  *
  */
 
-import {ArrowIcon, PlaneIcon, RoundContainer} from '../Icon';
+import {ArrowIcon, CheckIcon, CloseIcon, PlaneIcon, ProfileIcon, RoundContainer, TeamIcon} from '../Icon';
 import {COLOR} from '../Identity';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -38,20 +38,49 @@ const Button = RoundContainer.withComponent('button').extend`
    }
 `;
 
+const ICON_NAME = {
+  ARROW: 'arrow',
+  CHECK: 'check',
+  CLOSE: 'close',
+  PLANE: 'plane',
+  PROFILE: 'profile',
+  TEAM: 'team',
+};
+
 const RoundIconButton = ({icon, iconColor, iconHeight, iconWidth, ...props}) => (
   <Button {...props}>
-    {icon === 'plane' ? (
-      <PlaneIcon color={iconColor} height={iconHeight} width={iconWidth} style={{marginLeft: 2}} />
-    ) : (
-      <ArrowIcon color={iconColor} height={iconHeight} width={iconWidth} />
-    )}
+    {(() => {
+      switch (icon) {
+        case ICON_NAME.CHECK: {
+          return <CheckIcon color={iconColor} height={iconHeight} width={iconWidth} />;
+        }
+        case ICON_NAME.CLOSE: {
+          return <CloseIcon color={iconColor} height={iconHeight} width={iconWidth} />;
+        }
+        case ICON_NAME.PLANE: {
+          return <PlaneIcon color={iconColor} height={iconHeight} width={iconWidth} style={{marginLeft: 2}} />;
+        }
+        case ICON_NAME.PROFILE: {
+          const defaultSize = 24;
+          return <ProfileIcon color={iconColor} height={iconHeight || defaultSize} width={iconWidth || defaultSize} />;
+        }
+        case ICON_NAME.TEAM: {
+          const defaultSize = 24;
+          return <TeamIcon color={iconColor} height={iconHeight || defaultSize} width={iconWidth || defaultSize} />;
+        }
+        case ICON_NAME.ARROW:
+        default: {
+          return <ArrowIcon color={iconColor} height={iconHeight} width={iconWidth} />;
+        }
+      }
+    })()}
   </Button>
 );
 
 RoundIconButton.propTypes = {
   color: PropTypes.string,
   disabled: PropTypes.bool,
-  icon: PropTypes.oneOf(['plane', 'arrow']),
+  icon: PropTypes.oneOf(Object.values(ICON_NAME)),
   iconColor: PropTypes.string,
   iconHeight: PropTypes.number,
   iconWidth: PropTypes.number,
@@ -61,11 +90,11 @@ RoundIconButton.propTypes = {
 RoundIconButton.defaultProps = {
   color: COLOR.BLUE,
   disabled: false,
-  icon: 'arrow',
+  icon: ICON_NAME.ARROW,
   iconColor: COLOR.WHITE,
   iconHeight: null,
   iconWidth: null,
   size: 32,
 };
 
-export {RoundIconButton};
+export {RoundIconButton, ICON_NAME};
