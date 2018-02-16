@@ -100,8 +100,8 @@ z.main.App = class App {
     );
     repositories.event = new z.event.EventRepository(
       this.service.notification,
-      this.service.conversation,
       this.service.web_socket,
+      this.service.conversation,
       repositories.cryptography,
       repositories.user
     );
