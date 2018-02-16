@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,45 +22,57 @@
 window.z = window.z || {};
 window.z.components = z.components || {};
 
-z.components.UserListInputViewModel = class UserListInputViewModel {
-  constructor(params, component_info) {
+z.components.UserInput = class UserInput {
+  constructor(params, componentInfo) {
     this.dispose = this.dispose.bind(this);
 
     this.input = params.input;
-    this.selected = params.selected || ko.observableArray([]);
-    this.placeholder = params.placeholder;
-    this.on_enter = params.enter;
+    this.onEnter = params.enter;
+    this.placeholderText = params.placeholder;
+    this.selectedUsers = params.selected;
 
-    this.element = component_info.element;
-    this.input_element = $(this.element).find('.search-input');
-    this.inner_element = $(this.element).find('.search-inner');
+    this.element = componentInfo.element;
+    this.innerElement = $(this.element).find('.search-inner');
+    this.inputElement = $(this.element).find('.search-input');
 
-    this.selected_subscription = this.selected.subscribe(() => {
-      this.input('');
-      this.input_element.focus();
-      window.setTimeout(() => {
-        this.inner_element.scrollTop(this.inner_element[0].scrollHeight);
-      });
+    this.noSelectedUsers = ko.pureComputed(() => {
+      return typeof this.selectedUsers !== 'function' || !this.selectedUsers().length;
     });
 
+    if (typeof this.selectedUsers === 'function') {
+      this.selectedSubscription = this.selectedUsers.subscribe(() => {
+        if (typeof this.input === 'function') {
+          this.input('');
+        }
+
+        this.inputElement.focus();
+        window.setTimeout(() => this.innerElement.scrollTop(this.innerElement[0].scrollHeight));
+      });
+    }
+
     this.placeholder = ko.pureComputed(() => {
-      if (this.input() === '' && this.selected().length === 0) {
-        return z.l10n.text(params.placeholder);
+      const emptyInput = typeof this.input !== 'function' || !this.input().length;
+      if (emptyInput && this.noSelectedUsers()) {
+        return z.l10n.text(this.placeholderText);
       }
 
       return '';
     });
   }
 
-  on_key_press(data, keyboard_event) {
-    if (z.util.KeyboardUtil.isRemovalAction(keyboard_event) && !this.input().length) {
-      this.selected.pop();
+  onKeyDown(data, keyboardEvent) {
+    if (typeof this.selectedUsers === 'function') {
+      if (z.util.KeyboardUtil.isRemovalAction(keyboardEvent) && !this.input().length) {
+        this.selectedUsers.pop();
+      }
     }
     return true;
   }
 
   dispose() {
-    this.selected_subscription.dispose();
+    if (this.selectedSubscription) {
+      this.selectedSubscription.dispose();
+    }
   }
 };
 
@@ -70,18 +82,20 @@ ko.components.register('user-input', {
       <div class="search-inner-wrap">
         <div class="search-inner"">
           <div class="search-icon icon-search"></div>
-          <!-- ko foreach: selected -->
-            <span data-bind="text: first_name()"></span>
+          <!-- ko ifnot: noSelectedUsers-->
+            <!-- ko foreach: selectedUsers -->
+              <span data-bind="text: first_name()" data-uie-name="item-selected"></span>
+            <!-- /ko -->
           <!-- /ko -->
           <input type="text" style="display:none" /> <!-- prevent chrome from autocomplete -->
-          <input autocomplete="off" maxlength="128" required spellcheck="false" class="search-input" type="text" data-bind="textInput: input, hasFocus: true, attr: {placeholder: placeholder}, css: {'search-input-show-placeholder': placeholder}, event: {keydown: on_key_press}, enter: on_enter" data-uie-name="enter-users">
+          <input autocomplete="off" maxlength="128" required spellcheck="false" class="search-input" type="text" data-bind="textInput: input, hasFocus: true, attr: {placeholder: placeholder}, css: {'search-input-show-placeholder': placeholder}, event: {keydown: onKeyDown}, enter: onEnter" data-uie-name="enter-users">
         </div>
       </div>
     </div>
   `,
   viewModel: {
-    createViewModel(params, component_info) {
-      return new z.components.UserListInputViewModel(params, component_info);
+    createViewModel(params, componentInfo) {
+      return new z.components.UserInput(params, componentInfo);
     },
   },
 });

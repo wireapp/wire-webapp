@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -95,7 +95,7 @@ export const accountFormStrings = defineMessages({
     defaultMessage: 'I accept the <a {linkParams}>terms and conditions</a>',
   },
   submitButton: {
-    id: 'accountForm.nextButton',
+    id: 'accountForm.submitButton',
     defaultMessage: 'Next',
   },
 });
@@ -257,6 +257,10 @@ export const errorHandlerStrings = defineMessages({
     id: 'BackendError.LABEL.HANDLE_EXISTS',
     defaultMessage: 'This username is already taken',
   },
+  [BackendError.LABEL.HANDLE_TOO_SHORT]: {
+    id: 'BackendError.LABEL.HANDLE_TOO_SHORT',
+    defaultMessage: 'Please enter a username with at least 2 characters',
+  },
   [BackendError.LABEL.INVALID_HANDLE]: {
     id: 'BackendError.LABEL.INVALID_HANDLE',
     defaultMessage: 'This username is invalid',
@@ -299,6 +303,10 @@ export const errorHandlerStrings = defineMessages({
 export const validationErrorStrings = defineMessages({
   [ValidationError.FIELD.NAME.PATTERN_MISMATCH]: {
     id: 'ValidationError.FIELD.NAME.PATTERN_MISMATCH',
+    defaultMessage: 'Enter a name with at least 2 characters',
+  },
+  [ValidationError.FIELD.NAME.VALUE_MISSING]: {
+    id: 'ValidationError.FIELD.NAME.VALUE_MISSING',
     defaultMessage: 'Enter a name with at least 2 characters',
   },
   [ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH]: {

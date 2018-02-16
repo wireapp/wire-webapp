@@ -15,7 +15,7 @@
   "accountForm.emailPersonalPlaceholder": "",
   "accountForm.passwordPlaceholder": "Heslo (alespoň 8 znaků)",
   "accountForm.terms": "",
-  "accountForm.nextButton": "Další",
+  "accountForm.submitButton": "Další",
   "createAccount.nextButton": "Další",
   "invite.nextButton": "Další",
   "createAccount.headLine": "",
@@ -51,6 +51,7 @@
   "BackendError.LABEL.OPERATION_DENIED": "",
   "BackendError.LABEL.UNAUTHORIZED": "Něco se pokazilo. Prosíme, aktualizujte stránku a zkuste to znovu",
   "BackendError.LABEL.HANDLE_EXISTS": "",
+  "BackendError.LABEL.HANDLE_TOO_SHORT": "",
   "BackendError.LABEL.INVALID_HANDLE": "",
   "BackendError.LABEL.INVALID_INVITATION_CODE": "",
   "BackendError.LABEL.NO_OTHER_OWNER": "",
@@ -62,6 +63,7 @@
     "Tato e-mailová adresa je již používána. <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://support.wire.com/hc/articles/115004082129\"> Další informace</a>",
   "BackendError.unexpected": "",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Zadejte jméno s alespoň 2 znaky",
+  "ValidationError.FIELD.NAME.VALUE_MISSING": "Zadejte jméno s alespoň 2 znaky",
   "ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH": "",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": ""
 }

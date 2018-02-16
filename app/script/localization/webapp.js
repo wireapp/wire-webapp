@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ z.string.wire_windows = 'Wire for Windows';
 z.string.wire_linux = 'Wire for Linux';
 z.string.nonexistent_user = 'Deleted User';
 z.string.and = 'and';
+z.string.enumerationAnd = ', and ';
 
 // Alert view when trying to set a profile image that's too small
 z.string.alert_upload_file_format = 'Can’t use this picture.\nPlease choose a PNG or JPEG file.';
@@ -203,16 +204,13 @@ z.string.modal_remove_device_button = 'Remove device';
 z.string.modal_remove_device_headline = 'Remove "{{device}}"';
 z.string.modal_remove_device_message = 'Your password is required to remove the device.';
 // Service unavailable
-z.string.modal_service_disabled_headline = 'Adding service not possible';
-z.string.modal_service_disabled_message = 'The service is unavailable a the moment.';
+z.string.modalServiceUnavailableHeadline = 'Adding service not possible';
+z.string.modalServiceUnavailableMessage = 'The service is unavailable a the moment.';
 // Session Reset
 z.string.modal_session_reset_headline = 'The session has been reset';
 z.string.modal_session_reset_message_1 = 'If the problem is not resolved,';
 z.string.modal_session_reset_message_link = 'contact';
 z.string.modal_session_reset_message_2 = 'us.';
-// Too many bots in conversation
-z.string.modal_too_many_bots_headline = 'Adding service not possible';
-z.string.modal_too_many_bots_message = 'The bot is already part of this conversation.';
 // Too many members in conversation
 z.string.modal_too_many_members_headline = 'Full house';
 z.string.modal_too_many_members_message = 'Up to {{number1}} people can join a conversation. There is room for {{number2}} more people in here.';
@@ -236,6 +234,9 @@ z.string.conversation_connection_accepted = 'Connected';
 z.string.conversation_connection_blocked = 'Blocked';
 z.string.conversation_connection_cancel_request = 'Cancel connection request';
 z.string.conversation_create = ' started a conversation with {{users}}';
+z.string.conversationCreateName = '{{user}} started the conversation';
+z.string.conversationCreateNameYou = '{{user}} started the conversation';
+z.string.conversationCreateWith = 'with {{users}}';
 z.string.conversation_create_you = ' started a conversation with {{users}}';
 z.string.conversation_device_started_using_one = ' started using';
 z.string.conversation_device_started_using_many = ' started using';
@@ -290,6 +291,18 @@ z.string.conversation_send_pasted_file = 'Pasted image at {{date}}';
 z.string.conversation_someone = 'Someone';
 z.string.conversation_tweet_author = ' on Twitter';
 
+// Group creation
+z.string.groupCreationPreferencesAction = 'Next';
+z.string.groupCreationPreferencesErrorNameShort = 'At least 1 character';
+z.string.groupCreationPreferencesErrorNameLong = 'Too many characters';
+z.string.groupCreationPreferencesHeader = 'New group';
+z.string.groupCreationPreferencesPlaceholder = 'Group name';
+z.string.groupCreationParticipantsActionCreate = 'Done';
+z.string.groupCreationParticipantsActionSkip = 'Skip';
+z.string.groupCreationParticipantsHeader = 'Add people';
+z.string.groupCreationParticipantsHeaderWithCounter = 'Add people ({{number}})';
+z.string.groupCreationParticipantsPlaceholder = 'Search by name';
+
 // Collection
 z.string.collection_show_all = 'Show all {{number}}';
 z.string.collection_section_links = 'Links';
@@ -310,7 +323,6 @@ z.string.conversations_contacts = 'Contacts';
 z.string.conversations_connection_request_many = '{{number}} people waiting';
 z.string.conversations_connection_request_one = '1 person waiting';
 z.string.conversations_empty_conversation = 'Group conversation';
-z.string.conversations_empty_conversation_description = 'Everyone left';
 z.string.conversations_no_conversations = 'Start a conversation or create a group.';
 z.string.conversations_popover_archive = 'Archive';
 z.string.conversations_popover_block = 'Block';
@@ -365,8 +377,6 @@ z.string.extensions_giphy_no_gifs = 'Oops, no gifs';
 z.string.extensions_giphy_random = 'Random';
 
 // People View
-z.string.search_open = 'Open';
-z.string.search_open_group = 'Create Group';
 z.string.people_confirm_label = 'Add people to group';
 z.string.people_people = '{{number}} People';
 z.string.people_search_placeholder = 'Search by name';
@@ -518,10 +528,10 @@ z.string.preferences_options_notifications_obfuscate_message = 'Show sender';
 z.string.preferences_options_notifications_on = 'Show sender and message';
 
 // Search
-z.string.search_group_hint = 'Keep typing or pick more people to create a group';
 z.string.search_connect = 'Connect';
 z.string.search_connections = 'Connections';
 z.string.search_contacts = 'Contacts';
+z.string.searchCreateGroup = 'Create group';
 z.string.search_groups = 'Groups';
 z.string.search_people = 'People';
 z.string.search_placeholder = 'Search by name or username';
@@ -579,25 +589,25 @@ z.string.user_availability_busy = 'Busy';
 z.string.user_availability_none = 'None';
 
 // Browser notifications
-z.string.system_notification_asset_add = 'Shared a picture';
-z.string.system_notification_connection_accepted = 'Accepted your connection request';
-z.string.system_notification_connection_connected = 'You are now connected';
-z.string.system_notification_connection_request = 'Wants to connect';
-z.string.system_notification_conversation_create = '{{user}} started a conversation';
-z.string.system_notification_conversation_rename = '{{user}} renamed the conversation to {{name}}';
-z.string.system_notification_member_join_many = '{{user}} added {{number}} people to the conversation';
-z.string.system_notification_member_join_one = '{{user1}} added {{user2}} to the conversation';
-z.string.system_notification_member_leave_removed_you = '{{user}} removed you from the conversation';
-z.string.system_notification_obfuscated = 'Sent you a message';
-z.string.system_notification_obfuscated_title = 'Someone';
-z.string.system_notification_ping = 'Pinged';
-z.string.system_notification_reaction = '{{reaction}} your message';
-z.string.system_notification_shared_audio = 'Shared an audio message';
-z.string.system_notification_shared_file = 'Shared a file';
-z.string.system_notification_shared_location = 'Shared a location';
-z.string.system_notification_shared_video = 'Shared a video';
-z.string.system_notification_voice_channel_activate = 'Calling';
-z.string.system_notification_voice_channel_deactivate = 'Called';
+z.string.notification_asset_add = 'Shared a picture';
+z.string.notification_connection_accepted = 'Accepted your connection request';
+z.string.notification_connection_connected = 'You are now connected';
+z.string.notification_connection_request = 'Wants to connect';
+z.string.notification_conversation_create = '{{user}} started a conversation';
+z.string.notification_conversation_rename = '{{user}} renamed the conversation to {{name}}';
+z.string.notification_member_join_many = '{{user}} added {{number}} people to the conversation';
+z.string.notification_member_join_one = '{{user1}} added {{user2}} to the conversation';
+z.string.notification_member_leave_removed_you = '{{user}} removed you from the conversation';
+z.string.notification_obfuscated = 'Sent you a message';
+z.string.notification_obfuscated_title = 'Someone';
+z.string.notification_ping = 'Pinged';
+z.string.notification_reaction = '{{reaction}} your message';
+z.string.notification_shared_audio = 'Shared an audio message';
+z.string.notification_shared_file = 'Shared a file';
+z.string.notification_shared_location = 'Shared a location';
+z.string.notification_shared_video = 'Shared a video';
+z.string.notification_voice_channel_activate = 'Calling';
+z.string.notification_voice_channel_deactivate = 'Called';
 
 // Tooltips
 z.string.tooltip_conversation_all_verified = 'All fingerprints are verified';

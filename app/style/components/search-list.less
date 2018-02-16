@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -55,6 +55,8 @@
     flex: 0 0 auto;
     height: @avatar-diameter-m;
     position: relative;
+    display: flex;
+    align-items: center;
   }
 }
 
@@ -147,6 +149,30 @@
   height: @avatar-diameter-m;
   display: flex;
   align-items: center;
+}
+
+.search-list-item-select {
+  .square(24px);
+  display: block;
+  border: 2px solid fade(@graphite-dark, 64%);
+  border-radius: 12px;
+  margin: 8px 0 8px 16px;
+
+  &::before {
+    color: #fff;
+    font-size: 12px;
+    margin-left: 4px;
+    opacity: 0;
+  }
+
+  &.selected {
+    border: 2px solid @graphite-dark;
+    background-color: @graphite-dark;
+
+    &::before {
+      opacity: 1;
+    }
+  }
 }
 
 .search-list-item-guest-indicator-badge {

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -239,6 +239,9 @@ z.string.cs.conversation_send_pasted_file = 'Obrázek vložen {{date}}';
 z.string.cs.conversation_someone = 'Někdo';
 z.string.cs.conversation_tweet_author = ' na Twittru';
 
+z.string.cs.conversation_creation_preferences_action = 'Další';
+z.string.cs.conversation_creation_participants_placeholder = 'Hledat podle jména';
+
 z.string.cs.collection_show_all = 'Zobrazit všechny {{number}}';
 z.string.cs.collection_section_links = 'Odkazy';
 z.string.cs.collection_section_images = 'Obrázky';
@@ -255,7 +258,6 @@ z.string.cs.conversations_contacts = 'Kontakty';
 z.string.cs.conversations_connection_request_many = '{{number}} čekajících osob';
 z.string.cs.conversations_connection_request_one = '1 čekající osoba';
 z.string.cs.conversations_empty_conversation = 'Skupinová konverzace';
-z.string.cs.conversations_empty_conversation_description = 'Všichni opustili konverzaci';
 z.string.cs.conversations_no_conversations = 'Zatím žádné konverzace';
 z.string.cs.conversations_popover_archive = 'Archivovat';
 z.string.cs.conversations_popover_block = 'Blokovat';
@@ -304,8 +306,6 @@ z.string.cs.extensions_giphy_message = '{{tag}} • přes giphy.com';
 z.string.cs.extensions_giphy_no_gifs = 'Uups, žádné gify';
 z.string.cs.extensions_giphy_random = 'Náhodně';
 
-z.string.cs.search_open = 'Otevřít';
-z.string.cs.search_open_group = 'Vytvořit skupinu';
 z.string.cs.people_confirm_label = 'Přidat lidi do skupiny';
 z.string.cs.people_people = '{{number}} lidí';
 z.string.cs.people_search_placeholder = 'Hledat podle jména';
@@ -353,7 +353,8 @@ z.string.cs.people_remove_message = '{{user}} nebude moci odesílat nebo přijí
 z.string.cs.people_unblock_headline = 'Odblokovat?';
 z.string.cs.people_unblock_message = '{{user}} vás nebude moci kontaktovat nebo přizvat ke skupinové konverzaci.';
 
-z.string.cs.people_button_add = 'Přidat kontakty';
+z.string.cs.people_button_add = 'Přidat';
+z.string.cs.people_button_add_people = 'Přidat kontakty';
 z.string.cs.people_button_block = 'Blokovat';
 z.string.cs.people_button_cancel = 'Zrušit';
 z.string.cs.people_button_connect = 'Připojit';
@@ -441,7 +442,6 @@ z.string.cs.preferences_options_notifications_obfuscate = 'Skrýt detaily';
 z.string.cs.preferences_options_notifications_obfuscate_message = 'Zobrazit odesílatele';
 z.string.cs.preferences_options_notifications_on = 'Zobrazit odesílatele a zprávu';
 
-z.string.cs.search_group_hint = 'Pokračujte v psaní nebo vyberte více lidí pro vytvoření skupiny';
 z.string.cs.search_connect = 'Připojit';
 z.string.cs.search_connections = 'Kontakty';
 z.string.cs.search_contacts = 'Kontakty';
@@ -488,25 +488,25 @@ z.string.cs.warning_tell_me_how = 'Jak na to';
 z.string.cs.user_availability_available = 'Dostupný';
 z.string.cs.user_availability_none = 'Žádné';
 
-z.string.cs.system_notification_asset_add = 'Sdílel(a) obrázek';
-z.string.cs.system_notification_connection_accepted = 'Přijal(a) váš požadavek na připojení';
-z.string.cs.system_notification_connection_connected = 'Nyní jste připojeni';
-z.string.cs.system_notification_connection_request = 'Žádá o připojení';
-z.string.cs.system_notification_conversation_create = '{{user}} zahájil(a) rozhovor';
-z.string.cs.system_notification_conversation_rename = '{{user}} přejmenoval(a) rozhovor na {{name}}';
-z.string.cs.system_notification_member_join_many = '{{user}} přidal(a) {{number}} kontakty do konverzace';
-z.string.cs.system_notification_member_join_one = '{{user1}} přidal(a) {{user2}} do konverzace';
-z.string.cs.system_notification_member_leave_removed_you = '{{user}} tě odebral(a) z konverzace';
-z.string.cs.system_notification_obfuscated = 'Vám poslal zprávu';
-z.string.cs.system_notification_obfuscated_title = 'Někdo';
-z.string.cs.system_notification_ping = 'Pingnut';
-z.string.cs.system_notification_reaction = '{{reaction}} tvou zprávu';
-z.string.cs.system_notification_shared_audio = 'Sdílel(a) zvukovou zprávu';
-z.string.cs.system_notification_shared_file = 'Sdílel(a) soubor';
-z.string.cs.system_notification_shared_location = 'Sdílel(a) polohu';
-z.string.cs.system_notification_shared_video = 'Sdílel(a) video';
-z.string.cs.system_notification_voice_channel_activate = 'Volá';
-z.string.cs.system_notification_voice_channel_deactivate = 'Volal(a)';
+z.string.cs.notification_asset_add = 'Sdílel(a) obrázek';
+z.string.cs.notification_connection_accepted = 'Přijal(a) váš požadavek na připojení';
+z.string.cs.notification_connection_connected = 'Nyní jste připojeni';
+z.string.cs.notification_connection_request = 'Žádá o připojení';
+z.string.cs.notification_conversation_create = '{{user}} zahájil(a) rozhovor';
+z.string.cs.notification_conversation_rename = '{{user}} přejmenoval(a) rozhovor na {{name}}';
+z.string.cs.notification_member_join_many = '{{user}} přidal(a) {{number}} kontakty do konverzace';
+z.string.cs.notification_member_join_one = '{{user1}} přidal(a) {{user2}} do konverzace';
+z.string.cs.notification_member_leave_removed_you = '{{user}} tě odebral(a) z konverzace';
+z.string.cs.notification_obfuscated = 'Vám poslal zprávu';
+z.string.cs.notification_obfuscated_title = 'Někdo';
+z.string.cs.notification_ping = 'Pingnut';
+z.string.cs.notification_reaction = '{{reaction}} tvou zprávu';
+z.string.cs.notification_shared_audio = 'Sdílel(a) zvukovou zprávu';
+z.string.cs.notification_shared_file = 'Sdílel(a) soubor';
+z.string.cs.notification_shared_location = 'Sdílel(a) polohu';
+z.string.cs.notification_shared_video = 'Sdílel(a) video';
+z.string.cs.notification_voice_channel_activate = 'Volá';
+z.string.cs.notification_voice_channel_deactivate = 'Volal(a)';
 
 z.string.cs.tooltip_conversation_all_verified = 'Všechny identifikátory jsou ověřeny';
 z.string.cs.tooltip_conversation_call = 'Hovor';

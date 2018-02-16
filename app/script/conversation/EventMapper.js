@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@ z.conversation.EventMapper = class EventMapper {
    *
    * @param {Object} event - Event data
    * @param {Conversation} conversation_et - Conversation entity the event belong to
-   * @param {boolean} should_create_dummy_image - Create a dummy image
+   * @param {boolean} [should_create_dummy_image] - Create a dummy image
    * @returns {Message} Mapped message entity
    */
   map_json_event(event, conversation_et, should_create_dummy_image) {
@@ -78,19 +78,22 @@ z.conversation.EventMapper = class EventMapper {
 
     switch (event.type) {
       case z.event.Backend.CONVERSATION.MEMBER_JOIN:
-        message_et = this._map_event_member_join(event, conversation_et);
+        message_et = this._mapEventMemberJoin(event, conversation_et);
         break;
       case z.event.Backend.CONVERSATION.MEMBER_LEAVE:
-        message_et = this._map_event_member_leave(event);
+        message_et = this._mapEventMemberLeave(event);
         break;
       case z.event.Backend.CONVERSATION.RENAME:
         message_et = this._map_event_rename(event);
         break;
       case z.event.Client.CONVERSATION.ASSET_ADD:
-        message_et = this._map_event_asset_add(event, should_create_dummy_image);
+        message_et = this._mapEventAssetAdd(event, should_create_dummy_image);
         break;
       case z.event.Client.CONVERSATION.DELETE_EVERYWHERE:
         message_et = this._map_event_delete_everywhere(event);
+        break;
+      case z.event.Client.CONVERSATION.GROUP_CREATION:
+        message_et = this._mapEventGroupCreation(event);
         break;
       case z.event.Client.CONVERSATION.KNOCK:
         message_et = this._map_event_ping(event);
@@ -104,15 +107,18 @@ z.conversation.EventMapper = class EventMapper {
       case z.event.Client.CONVERSATION.MISSED_MESSAGES:
         message_et = this._map_event_missed_messages();
         break;
+      case z.event.Client.CONVERSATION.ONE2ONE_CREATION:
+        message_et = this._mapEvent1to1Creation(event);
+        break;
       case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE:
-        message_et = this._map_event_team_member_leave(event);
+        message_et = this._mapEventTeamMemberLeave(event);
         break;
       case z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT:
       case z.event.Client.CONVERSATION.INCOMING_MESSAGE_TOO_BIG:
         message_et = this._map_event_unable_to_decrypt(event);
         break;
       case z.event.Client.CONVERSATION.VERIFICATION:
-        message_et = this._map_event_verification(event);
+        message_et = this._mapEventVerification(event);
         break;
       case z.event.Client.CONVERSATION.VOICE_CHANNEL_ACTIVATE:
         message_et = this._map_event_voice_channel_activate();
@@ -159,25 +165,40 @@ z.conversation.EventMapper = class EventMapper {
   //##############################################################################
 
   /**
+   * Maps JSON data of conversation.one2one-creation message into message entity
+   *
+   * @private
+   * @param {Object} eventData - Message data
+   * @returns {ContentMessage} Member message entity
+   */
+  _mapEvent1to1Creation({data: eventData}) {
+    const messageEntity = new z.entity.MemberMessage();
+    messageEntity.memberMessageType = z.message.SystemMessageType.CONNECTION_ACCEPTED;
+    messageEntity.userIds(eventData.userIds);
+    return messageEntity;
+  }
+
+  /**
    * Maps JSON data of conversation.asset_add message into message entity
    *
    * @private
    * @param {Object} event - Message data
-   * @param {boolean} should_create_dummy_image - Create a dummy image
+   * @param {boolean} shouldCreateDummyImage - Create a dummy image
    * @returns {ContentMessage} Content message entity
    */
-  _map_event_asset_add(event, should_create_dummy_image) {
-    const event_data = event.data;
-    const message_et = new z.entity.ContentMessage();
+  _mapEventAssetAdd(event, shouldCreateDummyImage) {
+    const eventData = event.data;
+    const messageEntity = new z.entity.ContentMessage();
 
-    if (event_data.info.tag === 'medium') {
-      message_et.assets.push(this._map_asset_image(event, should_create_dummy_image));
+    const isMediumImage = eventData.info.tag === 'medium';
+    if (isMediumImage) {
+      messageEntity.assets.push(this._map_asset_image(event, shouldCreateDummyImage));
     } else {
-      message_et.assets.push(this._map_asset_file(event));
+      messageEntity.assets.push(this._map_asset_file(event));
     }
 
-    message_et.nonce = event_data.info.nonce;
-    return message_et;
+    messageEntity.nonce = eventData.info.nonce;
+    return messageEntity;
   }
 
   /**
@@ -191,6 +212,21 @@ z.conversation.EventMapper = class EventMapper {
     const message_et = new z.entity.DeleteMessage();
     message_et.deleted_timestamp = new Date(event_data.deleted_time).getTime();
     return message_et;
+  }
+
+  /**
+   *Map JSON ata of group creation event to message entity
+   *
+   * @private
+   * @param {Object} eventData - Message data
+   * @returns {MemberMessage} Member message entity
+   */
+  _mapEventGroupCreation({data: eventData}) {
+    const messageEntity = new z.entity.MemberMessage();
+    messageEntity.memberMessageType = z.message.SystemMessageType.CONVERSATION_CREATE;
+    messageEntity.name(eventData.name || '');
+    messageEntity.userIds(eventData.userIds);
+    return messageEntity;
   }
 
   /**
@@ -221,49 +257,50 @@ z.conversation.EventMapper = class EventMapper {
    *
    * @private
    * @param {Object} event - Message data
-   * @param {z.entity.Conversation} conversation_et - Conversation entity the event belong to
+   * @param {z.entity.Conversation} conversationEntity - Conversation entity the event belong to
    * @returns {MemberMessage} Member message entity
    */
-  _map_event_member_join(event, conversation_et) {
-    const {data: event_data, from} = event;
-    const message_et = new z.entity.MemberMessage();
+  _mapEventMemberJoin(event, conversationEntity) {
+    const {data: eventData, from} = event;
+    const messageEntity = new z.entity.MemberMessage();
 
-    if (
-      [z.conversation.ConversationType.CONNECT, z.conversation.ConversationType.ONE2ONE].includes(
-        conversation_et.type()
-      )
-    ) {
-      if (from === conversation_et.creator && event_data.user_ids.length === 1) {
-        message_et.member_message_type = z.message.SystemMessageType.CONNECTION_ACCEPTED;
-        event_data.user_ids = conversation_et.participating_user_ids();
+    const one2oneConversationTypes = [z.conversation.ConversationType.CONNECT, z.conversation.ConversationType.ONE2ONE];
+    const messageFromCreator = from === conversationEntity.creator;
+
+    if (one2oneConversationTypes.includes(conversationEntity.type())) {
+      const singleUserAdded = eventData.user_ids.length === 1;
+      if (messageFromCreator && singleUserAdded) {
+        messageEntity.memberMessageType = z.message.SystemMessageType.CONNECTION_ACCEPTED;
+        eventData.user_ids = conversationEntity.participating_user_ids();
       } else {
-        message_et.visible(false);
+        messageEntity.visible(false);
       }
     } else {
-      const creator_index = event_data.user_ids.indexOf(event.from);
+      const creatorIndex = eventData.user_ids.indexOf(event.from);
+      const creatorIsJoiningMember = messageFromCreator && creatorIndex !== -1;
 
-      if (from === conversation_et.creator && creator_index !== -1) {
-        event_data.user_ids.splice(creator_index, 1);
-        message_et.member_message_type = z.message.SystemMessageType.CONVERSATION_CREATE;
+      if (creatorIsJoiningMember) {
+        eventData.user_ids.splice(creatorIndex, 1);
+        messageEntity.memberMessageType = z.message.SystemMessageType.CONVERSATION_CREATE;
       }
     }
 
-    message_et.user_ids(event_data.user_ids);
+    messageEntity.userIds(eventData.user_ids);
 
-    return message_et;
+    return messageEntity;
   }
 
   /**
    * Maps JSON data of conversation.member_leave message into message entity
    *
    * @private
-   * @param {Object} event_data - Message data
+   * @param {Object} eventData - Message data
    * @returns {MemberMessage} Member message entity
    */
-  _map_event_member_leave({data: event_data}) {
-    const message_et = new z.entity.MemberMessage();
-    message_et.user_ids(event_data.user_ids);
-    return message_et;
+  _mapEventMemberLeave({data: eventData}) {
+    const messageEntity = new z.entity.MemberMessage();
+    messageEntity.userIds(eventData.user_ids);
+    return messageEntity;
   }
 
   /**
@@ -341,11 +378,11 @@ z.conversation.EventMapper = class EventMapper {
    * @param {Object} event - Message data
    * @returns {MemberMessage} Member message entity
    */
-  _map_event_team_member_leave(event) {
-    const message_et = this._map_event_member_leave(event);
-    const event_data = event.data;
-    message_et.name(event_data.name || z.l10n.text(z.string.conversation_someone));
-    return message_et;
+  _mapEventTeamMemberLeave(event) {
+    const messageEntity = this._mapEventMemberLeave(event);
+    const eventData = event.data;
+    messageEntity.name(eventData.name || z.l10n.text(z.string.conversation_someone));
+    return messageEntity;
   }
 
   /**
@@ -370,16 +407,17 @@ z.conversation.EventMapper = class EventMapper {
    * Maps JSON data of conversation.verification message into message entity
    *
    * @private
-   * @param {Object} event_data - Message data
+   * @param {Object} eventData - Message data
    * @returns {VerificationMessage} Verification message entity
    */
-  _map_event_verification({data: event_data}) {
-    const message_et = new z.entity.VerificationMessage();
+  _mapEventVerification({data: eventData}) {
+    const messageEntity = new z.entity.VerificationMessage();
 
-    message_et.user_ids(event_data.user_ids);
-    message_et.verification_message_type = event_data.type;
+    // Database can contain non-camelcased naming. For backwards compatibility reasons we handle both.
+    messageEntity.userIds(eventData.userIds || eventData.user_ids);
+    messageEntity.verification_message_type = eventData.type;
 
-    return message_et;
+    return messageEntity;
   }
   /**
    * Maps JSON data of conversation.voice-channel-activate message into message entity

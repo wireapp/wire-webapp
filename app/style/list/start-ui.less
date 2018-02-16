@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,30 +48,6 @@
 .start-ui-header-icon {
   position: absolute;
   right: 0;
-}
-
-.start-ui-header-actions {
-  height: 0;
-  overflow: hidden;
-  transition-property: height;
-  transition-timing-function: @ease-out-expo;
-  transition-duration: @animation-timing-fast;
-
-  .button {
-    padding-left: 8px;
-    padding-right: 8px;
-    transform: translateZ(0);
-  }
-
-  &.start-ui-header-actions-visible {
-    margin-top: 8px;
-    transition-duration: @animation-timing-slow;
-    height: 28px;
-  }
-}
-
-.start-ui-header-actions-last {
-  margin-left: 16px;
 }
 
 .start-ui-list-wrapper {
@@ -124,6 +100,26 @@
       opacity: 1;
       cursor: default;
     }
+  }
+}
+
+.start-ui-create-group,
+.start-ui-invite-people {
+  position: relative;
+  padding: 0;
+  margin: 0 0 -16px 0;
+  overflow: hidden;
+  .left-list-item {
+    height: 56px;
+    line-height: 56px;
+  }
+
+  .left-column {
+    width: 28px;
+  }
+
+  .center-column {
+    margin-left: 16px;
   }
 }
 

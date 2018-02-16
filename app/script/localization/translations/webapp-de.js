@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@ z.string.de.wire_windows = 'Wire für Windows';
 z.string.de.wire_linux = 'Wire für Linux';
 z.string.de.nonexistent_user = 'Gelöschte Person';
 z.string.de.and = 'und';
+z.string.de.enumerationAnd = ' und ';
 
 z.string.de.alert_upload_file_format = 'Das Bild kann nicht verwendet werden. Bitte wähle eine PNG- oder JPEG-Datei.';
 z.string.de.alert_upload_too_small = 'Das Bild kann nicht verwendet werden. Bitte wähle ein Bild mit mindestens 320 x 320 Pixeln.';
@@ -169,14 +170,12 @@ z.string.de.modal_not_connected_message_many = 'Eine der ausgewählten Personen 
 z.string.de.modal_remove_device_button = 'Gerät entfernen';
 z.string.de.modal_remove_device_headline = 'Entferne "{{device}}"';
 z.string.de.modal_remove_device_message = 'Dein Passwort wird zum Entfernen des Gerätes benötigt.';
-z.string.de.modal_service_disabled_headline = 'Hinzufügen des Dienstes nicht möglich';
-z.string.de.modal_service_disabled_message = 'Der Dienst ist derzeit nicht verfügbar.';
+z.string.de.modalServiceUnavailableHeadline = 'Hinzufügen des Dienstes nicht möglich';
+z.string.de.modalServiceUnavailableMessage = 'Der Dienst ist derzeit nicht verfügbar.';
 z.string.de.modal_session_reset_headline = 'Die Session wurde zurückgesetzt';
 z.string.de.modal_session_reset_message_1 = 'Wenn das Problem weiterhin besteht,';
 z.string.de.modal_session_reset_message_link = 'kontaktiere';
 z.string.de.modal_session_reset_message_2 = 'uns.';
-z.string.de.modal_too_many_bots_headline = 'Hinzufügen des Dienstes nicht möglich';
-z.string.de.modal_too_many_bots_message = 'Dieser Bot ist bereits teil der Unterhaltung.';
 z.string.de.modal_too_many_members_headline = 'Volles Haus';
 z.string.de.modal_too_many_members_message = 'An einer Unterhaltung für eine Gruppe können bis zu {{number1}} Personen teilnehmen. Hier ist noch Platz für {{number2}} Personen.';
 z.string.de.modal_uploads_parallel = 'Du kannst bis zu {{number}} Dateien auf einmal senden.';
@@ -195,6 +194,9 @@ z.string.de.conversation_connection_accepted = 'Hinzugefügt';
 z.string.de.conversation_connection_blocked = 'Blockiert';
 z.string.de.conversation_connection_cancel_request = 'Kontaktanfrage abbrechen';
 z.string.de.conversation_create = ' hat eine Unterhaltung mit {{users}} begonnen';
+z.string.de.conversationCreateName = '{{user}} hat die Unterhaltung begonnen';
+z.string.de.conversationCreateNameYou = '{{user}} hast die Unterhaltung begonnen';
+z.string.de.conversationCreateWith = 'mit {{users}}';
 z.string.de.conversation_create_you = ' hast eine Unterhaltung mit {{users}} begonnen';
 z.string.de.conversation_device_started_using_one = ' benutzt';
 z.string.de.conversation_device_started_using_many = ' benutzen';
@@ -204,7 +206,7 @@ z.string.de.conversation_device_user_devices = ' {{users}} Geräte';
 z.string.de.conversation_device_new_device_one = ' ein neues Gerät';
 z.string.de.conversation_device_new_device_many = ' neue Geräte';
 z.string.de.conversation_device_new_people_joined = 'Neue Personen beigetreten.';
-z.string.de.conversation_device_new_people_joined_verify = 'Überprüfe Geräte';
+z.string.de.conversation_device_new_people_joined_verify = ' Überprüfe Geräte';
 z.string.de.conversation_just_now = 'Gerade eben';
 z.string.de.conversation_location_link = 'Zeige Standort';
 z.string.de.conversation_member_join = ' hat {{users}} hinzugefügt';
@@ -249,6 +251,18 @@ z.string.de.conversation_send_pasted_file = 'Bild eingefügt am {{date}}';
 z.string.de.conversation_someone = 'Jemand';
 z.string.de.conversation_tweet_author = ' auf Twitter';
 
+// Group creation
+z.string.de.groupCreationPreferencesAction = 'Weiter';
+z.string.de.groupCreationPreferencesErrorNameShort = 'Gib mindestens ein Zeichen ein';
+z.string.de.groupCreationPreferencesErrorNameLong = 'Der eingegebene Gruppenname ist zu lang';
+z.string.de.groupCreationPreferencesHeader = 'Neue Gruppe';
+z.string.de.groupCreationPreferencesPlaceholder = 'Gruppenname';
+z.string.de.groupCreationParticipantsActionCreate = 'Fertig';
+z.string.de.groupCreationParticipantsActionSkip = 'Überspringen';
+z.string.de.groupCreationParticipantsHeader = 'Personen hinzufügen';
+z.string.de.groupCreationParticipantsHeaderWithCounter = 'Personen hinzufügen ({{number}})';
+z.string.de.groupCreationParticipantsPlaceholder = 'Nach Namen suchen';
+
 z.string.de.collection_show_all = 'Zeige alle {{number}}';
 z.string.de.collection_section_links = 'Links';
 z.string.de.collection_section_images = 'Bilder';
@@ -265,7 +279,6 @@ z.string.de.conversations_contacts = 'Kontakte';
 z.string.de.conversations_connection_request_many = '{{number}} Kontaktanfragen';
 z.string.de.conversations_connection_request_one = 'Eine Kontaktanfrage';
 z.string.de.conversations_empty_conversation = 'Gruppenunterhaltung';
-z.string.de.conversations_empty_conversation_description = 'Leere Unterhaltung';
 z.string.de.conversations_no_conversations = 'Beginne eine Unterhaltung oder erstelle eine Gruppe.';
 z.string.de.conversations_popover_archive = 'Archivieren';
 z.string.de.conversations_popover_block = 'Blockieren';
@@ -314,8 +327,6 @@ z.string.de.extensions_giphy_message = '{{tag}} • über giphy.com';
 z.string.de.extensions_giphy_no_gifs = 'Ups, kein GIF';
 z.string.de.extensions_giphy_random = 'Zufällig';
 
-z.string.de.search_open = 'Öffnen';
-z.string.de.search_open_group = 'Unterhaltung erstellen';
 z.string.de.people_confirm_label = 'Personen zur Gruppe hinzufügen';
 z.string.de.people_people = '{{number}} Personen';
 z.string.de.people_search_placeholder = 'Nach Namen suchen';
@@ -458,10 +469,10 @@ z.string.de.preferences_options_notifications_obfuscate = 'Details verbergen';
 z.string.de.preferences_options_notifications_obfuscate_message = 'Absendername zeigen';
 z.string.de.preferences_options_notifications_on = 'Zeige Absendername und Nachricht';
 
-z.string.de.search_group_hint = 'Tippe weiter oder wähle weitere Kontakte aus, um eine Gruppe zu erstellen';
 z.string.de.search_connect = 'Vorschläge';
 z.string.de.search_connections = 'Kontakte';
 z.string.de.search_contacts = 'Kontakte';
+z.string.de.searchCreateGroup = 'Erstelle eine Gruppe';
 z.string.de.search_groups = 'Gruppen';
 z.string.de.search_people = 'Kontakte';
 z.string.de.search_placeholder = 'Name oder Benutzername suchen';
@@ -515,25 +526,25 @@ z.string.de.user_availability_away = 'Abwesend';
 z.string.de.user_availability_busy = 'Beschäftigt';
 z.string.de.user_availability_none = 'Kein Status';
 
-z.string.de.system_notification_asset_add = 'Hat ein Bild geteilt';
-z.string.de.system_notification_connection_accepted = 'Hat deine Kontaktanfrage akzeptiert';
-z.string.de.system_notification_connection_connected = 'Ist jetzt ein Kontakt von dir';
-z.string.de.system_notification_connection_request = 'Möchte dich als Kontakt hinzufügen';
-z.string.de.system_notification_conversation_create = '{{user}} hat eine Unterhaltung begonnen';
-z.string.de.system_notification_conversation_rename = '{{user}} hat die Unterhaltung in {{name}} umbenannt';
-z.string.de.system_notification_member_join_many = '{{user}} hat {{number}} Kontakte zur Unterhaltung hinzugefügt';
-z.string.de.system_notification_member_join_one = '{{user1}} hat {{user2}} zur Unterhaltung hinzugefügt';
-z.string.de.system_notification_member_leave_removed_you = '{{user}} hat dich aus der Unterhaltung entfernt';
-z.string.de.system_notification_obfuscated = 'Hat dir eine Nachricht gesendet';
-z.string.de.system_notification_obfuscated_title = 'Jemand';
-z.string.de.system_notification_ping = 'Hat gepingt';
-z.string.de.system_notification_reaction = '{{reaction}} deine Nachricht';
-z.string.de.system_notification_shared_audio = 'Hat eine Audio-Nachricht geteilt';
-z.string.de.system_notification_shared_file = 'Hat eine Datei geteilt';
-z.string.de.system_notification_shared_location = 'Hat einen Standort geteilt';
-z.string.de.system_notification_shared_video = 'Hat ein Video geteilt';
-z.string.de.system_notification_voice_channel_activate = 'Ruft an';
-z.string.de.system_notification_voice_channel_deactivate = 'Hat versucht anzurufen';
+z.string.de.notification_asset_add = 'Hat ein Bild geteilt';
+z.string.de.notification_connection_accepted = 'Hat deine Kontaktanfrage akzeptiert';
+z.string.de.notification_connection_connected = 'Ist jetzt ein Kontakt von dir';
+z.string.de.notification_connection_request = 'Möchte dich als Kontakt hinzufügen';
+z.string.de.notification_conversation_create = '{{user}} hat eine Unterhaltung begonnen';
+z.string.de.notification_conversation_rename = '{{user}} hat die Unterhaltung in {{name}} umbenannt';
+z.string.de.notification_member_join_many = '{{user}} hat {{number}} Kontakte zur Unterhaltung hinzugefügt';
+z.string.de.notification_member_join_one = '{{user1}} hat {{user2}} zur Unterhaltung hinzugefügt';
+z.string.de.notification_member_leave_removed_you = '{{user}} hat dich aus der Unterhaltung entfernt';
+z.string.de.notification_obfuscated = 'Hat dir eine Nachricht gesendet';
+z.string.de.notification_obfuscated_title = 'Jemand';
+z.string.de.notification_ping = 'Hat gepingt';
+z.string.de.notification_reaction = '{{reaction}} deine Nachricht';
+z.string.de.notification_shared_audio = 'Hat eine Audio-Nachricht geteilt';
+z.string.de.notification_shared_file = 'Hat eine Datei geteilt';
+z.string.de.notification_shared_location = 'Hat einen Standort geteilt';
+z.string.de.notification_shared_video = 'Hat ein Video geteilt';
+z.string.de.notification_voice_channel_activate = 'Ruft an';
+z.string.de.notification_voice_channel_deactivate = 'Hat versucht anzurufen';
 
 z.string.de.tooltip_conversation_all_verified = 'Alle Fingerabdrücke sind überprüft';
 z.string.de.tooltip_conversation_call = 'Anruf';

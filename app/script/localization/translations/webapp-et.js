@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -169,14 +169,12 @@ z.string.et.modal_not_connected_message_many = 'Üks valitud inimestest ei soovi
 z.string.et.modal_remove_device_button = 'Eemalda seade';
 z.string.et.modal_remove_device_headline = 'Eemalda "{{device}}"';
 z.string.et.modal_remove_device_message = 'Seadme eemaldamiseks pead sisestama parooli.';
-z.string.et.modal_service_disabled_headline = 'Teenuse lisamine pole võimalik';
-z.string.et.modal_service_disabled_message = 'Teenus pole hetkel saadaval.';
+z.string.et.modalServiceUnavailableHeadline = 'Teenuse lisamine pole võimalik';
+z.string.et.modalServiceUnavailableMessage = 'Teenus pole hetkel saadaval.';
 z.string.et.modal_session_reset_headline = 'Sessioon on lähtestatud';
 z.string.et.modal_session_reset_message_1 = 'Kui probleem ei lahene,';
 z.string.et.modal_session_reset_message_link = 'kontakteeru';
 z.string.et.modal_session_reset_message_2 = 'meiega.';
-z.string.et.modal_too_many_bots_headline = 'Teenuse lisamine pole võimalik';
-z.string.et.modal_too_many_bots_message = 'See bot on juba selles vestluses.';
 z.string.et.modal_too_many_members_headline = 'Täismaja';
 z.string.et.modal_too_many_members_message = 'Kuni {{number1}} inimest saavad vestlusega liituda. Siin on ruumi veel {{number2}} inimesele.';
 z.string.et.modal_uploads_parallel = 'Sa saad ühekorraga saata kuni {{number}} faili.';
@@ -249,6 +247,15 @@ z.string.et.conversation_send_pasted_file = 'Kleepis pildi kuupäeval {{date}}';
 z.string.et.conversation_someone = 'Keegi';
 z.string.et.conversation_tweet_author = ' Twitteris';
 
+z.string.et.groupCreationPreferencesAction = 'Järgmine';
+z.string.et.groupCreationPreferencesHeader = 'Loo vestlus';
+z.string.et.groupCreationPreferencesPlaceholder = 'Vestluse nimi';
+z.string.et.groupCreationParticipantsActionCreate = 'Loo';
+z.string.et.groupCreationParticipantsActionSkip = 'Jäta vahele';
+z.string.et.groupCreationParticipantsHeader = 'Lisa inimesi';
+z.string.et.groupCreationParticipantsHeaderWithCounter = 'Lisa inimesi ({{number}})';
+z.string.et.groupCreationParticipantsPlaceholder = 'Otsi nime järgi';
+
 z.string.et.collection_show_all = 'Kuva kõik {{number}}';
 z.string.et.collection_section_links = 'Lingid';
 z.string.et.collection_section_images = 'Pildid';
@@ -265,7 +272,6 @@ z.string.et.conversations_contacts = 'Kontaktid';
 z.string.et.conversations_connection_request_many = '{{number}} inimest ootel';
 z.string.et.conversations_connection_request_one = '1 inimene on ootel';
 z.string.et.conversations_empty_conversation = 'Grupivestlus';
-z.string.et.conversations_empty_conversation_description = 'Kõik lahkusid';
 z.string.et.conversations_no_conversations = 'Alusta vestlust või loo grupp.';
 z.string.et.conversations_popover_archive = 'Arhiveeri';
 z.string.et.conversations_popover_block = 'Blokeeri';
@@ -314,8 +320,6 @@ z.string.et.extensions_giphy_message = '{{tag}} • via giphy.com';
 z.string.et.extensions_giphy_no_gifs = 'Ups, gif-e pole';
 z.string.et.extensions_giphy_random = 'Juhuslik';
 
-z.string.et.search_open = 'Ava';
-z.string.et.search_open_group = 'Loo grupp';
 z.string.et.people_confirm_label = 'Lisa inimesi gruppi';
 z.string.et.people_people = '{{number}} inimest';
 z.string.et.people_search_placeholder = 'Otsi nime järgi';
@@ -328,6 +332,7 @@ z.string.et.people_invite_button_gmail = 'Gmailist';
 z.string.et.people_invite_headline = 'Too oma sõbrad';
 z.string.et.people_service_confirm_button = 'Lisa teenus';
 z.string.et.people_service_removal_button = 'Eemalda teenus';
+z.string.et.people_service_new_conversation = 'Loo uus vestlus';
 z.string.et.people_services = 'Teenused';
 z.string.et.people_share = 'Jaga kontakte';
 z.string.et.people_tabs_details = 'Üksikasjad';
@@ -365,7 +370,7 @@ z.string.et.people_remove_message = '{{user}} ei saa siin vestluses sõnumeid sa
 z.string.et.people_unblock_headline = 'Eemaldad blokeeringu?';
 z.string.et.people_unblock_message = '{{user}} saab sinuga uuesti ühendust võtta ja sind grupivestlustesse lisada.';
 
-z.string.et.people_button_add = 'Lisa inimesi';
+z.string.et.people_button_add = 'Lisa';
 z.string.et.people_button_add_people = 'Lisa inimesi';
 z.string.et.people_button_block = 'Blokeeri';
 z.string.et.people_button_cancel = 'Tühista';
@@ -447,6 +452,7 @@ z.string.et.preferences_options_data = 'Kasutus- ja krahhiaruanded';
 z.string.et.preferences_options_data_checkbox = 'Saada anonüümseid andmeid';
 z.string.et.preferences_options_data_detail = 'Tee Wire paremaks, saates anonüümset infot.';
 z.string.et.preferences_options_popular = 'Publiku nõudmisel';
+z.string.et.preferences_options_emoji_replace_detail = ':-) → {{icon}}';
 z.string.et.preferences_options_emoji_replace_checkbox = 'Asenda kirjutatud emotikonid emojidega';
 z.string.et.preferences_options_previews_send_checkbox = 'Loo eelvaateid saadetavatele linkidele';
 z.string.et.preferences_options_previews_send_detail = 'Eelvaateid võidakse siiski näidata teiste inimeste linkide puhul.';
@@ -456,7 +462,6 @@ z.string.et.preferences_options_notifications_obfuscate = 'Peida üksikasjad';
 z.string.et.preferences_options_notifications_obfuscate_message = 'Kuva saatjat';
 z.string.et.preferences_options_notifications_on = 'Kuva saatjat ja sõnumit';
 
-z.string.et.search_group_hint = 'Jätka tippimist või vali veel inimesi grupi loomiseks';
 z.string.et.search_connect = 'Ühendu';
 z.string.et.search_connections = 'Ühendused';
 z.string.et.search_contacts = 'Kontaktid';
@@ -506,25 +511,25 @@ z.string.et.user_availability_away = 'Eemal';
 z.string.et.user_availability_busy = 'Hõivatud';
 z.string.et.user_availability_none = 'Puudub';
 
-z.string.et.system_notification_asset_add = 'Jagas pilti';
-z.string.et.system_notification_connection_accepted = 'Nõustus sinu ühendamistaotlusega';
-z.string.et.system_notification_connection_connected = 'Sa oled nüüd ühendatud';
-z.string.et.system_notification_connection_request = 'Soovib ühenduda';
-z.string.et.system_notification_conversation_create = '{{user}} alustas vestlust';
-z.string.et.system_notification_conversation_rename = '{{user}} nimetas vestluse ümber: {{name}}';
-z.string.et.system_notification_member_join_many = '{{user}} lisas vestlusesse {{number}} inimest';
-z.string.et.system_notification_member_join_one = '{{user1}} lisas vestlusesse {{user2}}';
-z.string.et.system_notification_member_leave_removed_you = '{{user}} eemaldas sind vestlusest';
-z.string.et.system_notification_obfuscated = 'Saatis sulle sõnumi';
-z.string.et.system_notification_obfuscated_title = 'Keegi';
-z.string.et.system_notification_ping = 'Pingis';
-z.string.et.system_notification_reaction = '{{reaction}} su sõnum';
-z.string.et.system_notification_shared_audio = 'Jagas häälsõnumit';
-z.string.et.system_notification_shared_file = 'Jagas faili';
-z.string.et.system_notification_shared_location = 'Jagas asukohta';
-z.string.et.system_notification_shared_video = 'Jagas videot';
-z.string.et.system_notification_voice_channel_activate = 'Helistamine';
-z.string.et.system_notification_voice_channel_deactivate = 'helistas';
+z.string.et.notification_asset_add = 'Jagas pilti';
+z.string.et.notification_connection_accepted = 'Nõustus sinu ühendamistaotlusega';
+z.string.et.notification_connection_connected = 'Sa oled nüüd ühendatud';
+z.string.et.notification_connection_request = 'Soovib ühenduda';
+z.string.et.notification_conversation_create = '{{user}} alustas vestlust';
+z.string.et.notification_conversation_rename = '{{user}} nimetas vestluse ümber: {{name}}';
+z.string.et.notification_member_join_many = '{{user}} lisas vestlusesse {{number}} inimest';
+z.string.et.notification_member_join_one = '{{user1}} lisas vestlusesse {{user2}}';
+z.string.et.notification_member_leave_removed_you = '{{user}} eemaldas sind vestlusest';
+z.string.et.notification_obfuscated = 'Saatis sulle sõnumi';
+z.string.et.notification_obfuscated_title = 'Keegi';
+z.string.et.notification_ping = 'Pingis';
+z.string.et.notification_reaction = '{{reaction}} su sõnum';
+z.string.et.notification_shared_audio = 'Jagas häälsõnumit';
+z.string.et.notification_shared_file = 'Jagas faili';
+z.string.et.notification_shared_location = 'Jagas asukohta';
+z.string.et.notification_shared_video = 'Jagas videot';
+z.string.et.notification_voice_channel_activate = 'Helistamine';
+z.string.et.notification_voice_channel_deactivate = 'helistas';
 
 z.string.et.tooltip_conversation_all_verified = 'Kõik sõrmejäljed on kinnitatud';
 z.string.et.tooltip_conversation_call = 'Kõne';

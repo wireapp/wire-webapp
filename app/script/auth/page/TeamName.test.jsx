@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,52 +22,48 @@ import {mockStore, mountWithIntl} from '../util/TestUtil';
 import TeamName from './TeamName';
 
 describe('when entering a team name', () => {
-  let store;
   let wrapper;
+
+  const initialState = {
+    authState: {
+      account: {
+        accent_id: undefined,
+        assets: undefined,
+        email: undefined,
+        email_code: undefined,
+        invitation_code: undefined,
+        label: undefined,
+        locale: undefined,
+        name: undefined,
+        password: undefined,
+        phone: undefined,
+        phone_code: undefined,
+        team: undefined,
+      },
+      error: null,
+      fetched: false,
+      fetching: false,
+      isAuthenticated: false,
+      isInTeamFlow: false,
+    },
+    languageState: {
+      language: 'en',
+    },
+  };
 
   const teamNameInput = () => wrapper.find('[data-uie-name="enter-team-name"]').first();
   const doNextButton = () => wrapper.find('[data-uie-name="do-next"]').first();
   const errorMessage = () => wrapper.find('[data-uie-name="error-message"]').first();
 
-  beforeEach(() => {
-    const state = {
-      authState: {
-        account: {
-          accent_id: undefined,
-          assets: undefined,
-          email: undefined,
-          email_code: undefined,
-          invitation_code: undefined,
-          label: undefined,
-          locale: undefined,
-          name: undefined,
-          password: undefined,
-          phone: undefined,
-          phone_code: undefined,
-          team: undefined,
-        },
-        error: null,
-        fetched: false,
-        fetching: false,
-        isAuthenticated: false,
-        isInTeamFlow: false,
-      },
-      languageState: {
-        language: 'en',
-      },
-    };
-
-    store = mockStore(state);
-    wrapper = mountWithIntl(<TeamName />, store);
-  });
-
   describe('the submit button', () => {
     it('is disabled if too few characters are entered', () => {
+      wrapper = mountWithIntl(<TeamName />, mockStore(initialState));
       expect(teamNameInput().props().required).toBe(true);
       expect(doNextButton().props().disabled).toBe(true);
     });
 
     it('is enabled when the minimum amount of characters is entered', done => {
+      wrapper = mountWithIntl(<TeamName />, mockStore(initialState));
       const expectedTeamName = 'M';
 
       expect(doNextButton().props().disabled).toBe(true);
@@ -79,6 +75,7 @@ describe('when entering a team name', () => {
     });
 
     it('is disabled if previous submit with same value failed', done => {
+      wrapper = mountWithIntl(<TeamName />, mockStore(initialState));
       const expectedTeamName = 'M';
       const expectedValidTeamName = 'My Team';
 
@@ -97,6 +94,7 @@ describe('when entering a team name', () => {
     });
 
     it('is disabled when prefilled with too few characters', done => {
+      wrapper = mountWithIntl(<TeamName />, mockStore(initialState));
       wrapper.setProps({teamName: ''});
       expect(doNextButton().props().disabled).toBe(true);
       done();
@@ -105,10 +103,26 @@ describe('when entering a team name', () => {
 
   describe('an error message', () => {
     it('appears if too few characters are entered', done => {
+      wrapper = mountWithIntl(<TeamName />, mockStore(initialState));
       const expectedTeamName = 'M';
       const expectedErrorMessage = 'Enter a name with at least 2 characters';
 
       teamNameInput().simulate('change', {target: {value: expectedTeamName}});
+      expect(teamNameInput().props().value).toBe(expectedTeamName);
+
+      doNextButton().simulate('click');
+      expect(errorMessage().text()).toBe(expectedErrorMessage);
+
+      done();
+    });
+
+    it('appears when input gets trimmed', done => {
+      wrapper = mountWithIntl(<TeamName />, mockStore(initialState));
+      const actualTeamName = '  ';
+      const expectedTeamName = '  ';
+      const expectedErrorMessage = 'Enter a name with at least 2 characters';
+
+      teamNameInput().simulate('change', {target: {value: actualTeamName}});
       expect(teamNameInput().props().value).toBe(expectedTeamName);
 
       doNextButton().simulate('click');

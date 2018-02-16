@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,10 +20,10 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.system_notification = z.system_notification || {};
+window.z.notification = z.notification || {};
 
 // Enum of notification preferences.
-z.system_notification.SystemNotificationPreference = {
+z.notification.NotificationPreference = {
   NONE: 'none',
   OBFUSCATE: 'obfuscate',
   OBFUSCATE_MESSAGE: 'obfuscate-message',

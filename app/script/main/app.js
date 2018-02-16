@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@ z.main.App = class App {
         z.auth.SIGN_OUT_REASON.CLIENT_REMOVED,
         z.auth.SIGN_OUT_REASON.SESSION_EXPIRED,
       ],
+      NOTIFICATION_CHECK: 10 * 1000,
       TABS_CHECK: {
         COOKIE_NAME: 'app_opened',
         COOKIE_TIMEOUT: 5 * 60 * 1000,
@@ -149,7 +150,7 @@ z.main.App = class App {
       repositories.conversation,
       repositories.team
     );
-    repositories.system_notification = new z.system_notification.SystemNotificationRepository(
+    repositories.notification = new z.notification.NotificationRepository(
       repositories.calling,
       repositories.conversation
     );
@@ -612,9 +613,7 @@ z.main.App = class App {
       amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS);
     }
 
-    window.setTimeout(() => {
-      return this.repository.system_notification.check_permission();
-    }, 10000);
+    window.setTimeout(() => this.repository.notification.checkPermission(), App.CONFIG.NOTIFICATION_CHECK);
 
     $('#loading-screen').remove();
     $('#wire-main').attr('data-uie-value', 'is-loaded');
@@ -634,7 +633,7 @@ z.main.App = class App {
       this.logger.info("'window.unload' was triggered, so we will tear down calls.");
       this.repository.calling.leave_call_on_unload();
       this.repository.storage.terminate('window.onunload');
-      this.repository.system_notification.clear_notifications();
+      this.repository.notification.clearNotifications();
     });
   }
 

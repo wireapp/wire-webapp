@@ -15,7 +15,7 @@
   "accountForm.emailPersonalPlaceholder": "you@email.com",
   "accountForm.passwordPlaceholder": "Пароль (минимум 8 символов)",
   "accountForm.terms": "Я принимаю <a {linkParams}>положения и условия</a>",
-  "accountForm.nextButton": "Вперед",
+  "accountForm.submitButton": "Вперед",
   "createAccount.nextButton": "Вперед",
   "invite.nextButton": "Вперед",
   "createAccount.headLine": "Настройка учетной записи",
@@ -52,6 +52,7 @@
   "BackendError.LABEL.OPERATION_DENIED": "Недостаточно прав",
   "BackendError.LABEL.UNAUTHORIZED": "Что-то пошло не так. Обновите страницу и повторите попытку",
   "BackendError.LABEL.HANDLE_EXISTS": "Данное имя пользователя уже занято",
+  "BackendError.LABEL.HANDLE_TOO_SHORT": "Пожалуйста, введите имя пользователя, не менее 2 символов",
   "BackendError.LABEL.INVALID_HANDLE": "Недопустимое имя пользователя",
   "BackendError.LABEL.INVALID_INVITATION_CODE": "Приглашение отозвано или просрочено",
   "BackendError.LABEL.NO_OTHER_OWNER": "Последний владелец не может быть удален из команды",
@@ -63,6 +64,7 @@
     "Этот адрес электронной почты уже используется. <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://support.wire.com/hc/articles/115004082129\">Подробнее</a>",
   "BackendError.unexpected": "Неожиданная ошибка ({code} {message})",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Введите имя с минимум 2 символами",
+  "ValidationError.FIELD.NAME.VALUE_MISSING": "Введите имя с минимум 2 символами",
   "ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH": "Введите пароль длиной не менее 8 символов",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": "Пожалуйста, введите правильный email"
 }

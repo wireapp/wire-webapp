@@ -15,7 +15,7 @@
   "accountForm.emailPersonalPlaceholder": "",
   "accountForm.passwordPlaceholder": "Lozinka (najmanje 8 znakova)",
   "accountForm.terms": "",
-  "accountForm.nextButton": "",
+  "accountForm.submitButton": "",
   "createAccount.nextButton": "",
   "invite.nextButton": "",
   "createAccount.headLine": "",
@@ -51,6 +51,7 @@
   "BackendError.LABEL.OPERATION_DENIED": "",
   "BackendError.LABEL.UNAUTHORIZED": "",
   "BackendError.LABEL.HANDLE_EXISTS": "",
+  "BackendError.LABEL.HANDLE_TOO_SHORT": "",
   "BackendError.LABEL.INVALID_HANDLE": "",
   "BackendError.LABEL.INVALID_INVITATION_CODE": "",
   "BackendError.LABEL.NO_OTHER_OWNER": "",
@@ -61,6 +62,7 @@
   "BackendError.LABEL.EMAIL_EXISTS": "",
   "BackendError.unexpected": "",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Unesite naziv s najmanje 2 znaka",
+  "ValidationError.FIELD.NAME.VALUE_MISSING": "Unesite naziv s najmanje 2 znaka",
   "ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH": "",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": ""
 }

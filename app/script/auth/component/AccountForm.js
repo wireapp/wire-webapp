@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -67,6 +67,7 @@ class AccountForm extends PureComponent {
     const errors = [];
     for (const inputKey of Object.keys(this.inputs)) {
       const currentInput = this.inputs[inputKey];
+      currentInput.value = currentInput.value.trim();
       if (!currentInput.checkValidity()) {
         errors.push(ValidationError.handleValidationState(currentInput.name, currentInput.validity));
       }
@@ -223,7 +224,7 @@ class AccountForm extends PureComponent {
           style={{margin: '0 auto -16px'}}
           data-uie-name="do-next"
         >
-          {submitText || _(accountFormStrings.nextButton)}
+          {submitText || _(accountFormStrings.submitButton)}
         </Button>
       </Form>
     );

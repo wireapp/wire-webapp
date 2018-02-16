@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -168,14 +168,12 @@ z.string.ru.modal_not_connected_message_many = 'Один из выбранных
 z.string.ru.modal_remove_device_button = 'Удалить устройство';
 z.string.ru.modal_remove_device_headline = 'Удалить "{{device}}"';
 z.string.ru.modal_remove_device_message = 'Для удаления устройства требуется пароль.';
-z.string.ru.modal_service_disabled_headline = 'Добавление службы невозможно';
-z.string.ru.modal_service_disabled_message = 'Эта служба недоступна в данный момент.';
+z.string.ru.modalServiceUnavailableHeadline = 'Добавление службы невозможно';
+z.string.ru.modalServiceUnavailableMessage = 'Эта служба недоступна в данный момент.';
 z.string.ru.modal_session_reset_headline = 'Сессия была сброшена';
 z.string.ru.modal_session_reset_message_1 = 'Если проблема не решена,';
 z.string.ru.modal_session_reset_message_link = 'cвяжитесь';
 z.string.ru.modal_session_reset_message_2 = 'с нами.';
-z.string.ru.modal_too_many_bots_headline = 'Добавление службы невозможно';
-z.string.ru.modal_too_many_bots_message = 'Бот уже добавлен в этот разговор.';
 z.string.ru.modal_too_many_members_headline = 'Канал переполнен';
 z.string.ru.modal_too_many_members_message = 'К разговору может присоединиться до {{number1}} человек. Здесь хватит места еще для {{number2}} человек.';
 z.string.ru.modal_uploads_parallel = 'Вы можете отправить до {{number}} файлов за раз.';
@@ -248,6 +246,15 @@ z.string.ru.conversation_send_pasted_file = 'Изображение добавл
 z.string.ru.conversation_someone = 'Кто-то';
 z.string.ru.conversation_tweet_author = ' в Twitter';
 
+z.string.ru.groupCreationPreferencesAction = 'Вперед';
+z.string.ru.groupCreationPreferencesHeader = 'Создать разговор';
+z.string.ru.groupCreationPreferencesPlaceholder = 'Название разговора';
+z.string.ru.groupCreationParticipantsActionCreate = 'Создать';
+z.string.ru.groupCreationParticipantsActionSkip = 'Пропустить';
+z.string.ru.groupCreationParticipantsHeader = 'Добавить людей';
+z.string.ru.groupCreationParticipantsHeaderWithCounter = 'Добавить людей ({{number}})';
+z.string.ru.groupCreationParticipantsPlaceholder = 'Поиск по имени';
+
 z.string.ru.collection_show_all = 'Показать все {{number}}';
 z.string.ru.collection_section_links = 'Ссылки';
 z.string.ru.collection_section_images = 'Изображения';
@@ -264,7 +271,6 @@ z.string.ru.conversations_contacts = 'Контакты';
 z.string.ru.conversations_connection_request_many = '{{number}} ожидающих';
 z.string.ru.conversations_connection_request_one = '1 человек ожидает';
 z.string.ru.conversations_empty_conversation = 'Групповой разговор';
-z.string.ru.conversations_empty_conversation_description = 'Все вышли';
 z.string.ru.conversations_no_conversations = 'Начните разговор или создайте группу.';
 z.string.ru.conversations_popover_archive = 'Архивировать';
 z.string.ru.conversations_popover_block = 'Заблокировать';
@@ -313,8 +319,6 @@ z.string.ru.extensions_giphy_message = '{{tag}} • через giphy.com';
 z.string.ru.extensions_giphy_no_gifs = 'Упс, нет GIF-ок';
 z.string.ru.extensions_giphy_random = 'Случайно';
 
-z.string.ru.search_open = 'Открыть';
-z.string.ru.search_open_group = 'Создать группу';
 z.string.ru.people_confirm_label = 'Добавить пользователей в группу';
 z.string.ru.people_people = '{{number}} участника(ов)';
 z.string.ru.people_search_placeholder = 'Поиск по имени';
@@ -327,6 +331,7 @@ z.string.ru.people_invite_button_gmail = 'Из Gmail';
 z.string.ru.people_invite_headline = 'Приведите друзей';
 z.string.ru.people_service_confirm_button = 'Добавить службу';
 z.string.ru.people_service_removal_button = 'Удалить службу';
+z.string.ru.people_service_new_conversation = 'Создать новый разговор';
 z.string.ru.people_services = 'Сервисы';
 z.string.ru.people_share = 'Поделиться контактами';
 z.string.ru.people_tabs_details = 'Подробнее';
@@ -364,7 +369,7 @@ z.string.ru.people_remove_message = '{{user}} больше не сможет о�
 z.string.ru.people_unblock_headline = 'Разблокировать?';
 z.string.ru.people_unblock_message = '{{user}} вновь сможет связываться с вами и добавлять вас в групповые разговоры.';
 
-z.string.ru.people_button_add = 'Добавить участников';
+z.string.ru.people_button_add = 'Добавить';
 z.string.ru.people_button_add_people = 'Добавить людей';
 z.string.ru.people_button_block = 'Заблокировать';
 z.string.ru.people_button_cancel = 'Отменить';
@@ -447,6 +452,7 @@ z.string.ru.preferences_options_data_checkbox = 'Отчеты о сбоях и �
 z.string.ru.preferences_options_data_detail = 'Сделайте Wire лучше, отправляя анонимную информацию.';
 z.string.ru.preferences_options_popular = 'По многочисленным просьбам';
 z.string.ru.preferences_options_emoji_replace_checkbox = 'Заменять текстовые смайлы на эмодзи';
+z.string.ru.preferences_options_emoji_replace_detail = ':-) → {{icon}}';
 z.string.ru.preferences_options_previews_send_checkbox = 'Показывать предпросмотр ссылок, отправляемых вами';
 z.string.ru.preferences_options_previews_send_detail = 'Предпросмотр всё же может отображаться для ссылок от других людей.';
 z.string.ru.preferences_options_notifications = 'Уведомления';
@@ -455,7 +461,6 @@ z.string.ru.preferences_options_notifications_obfuscate = 'Скрывать со
 z.string.ru.preferences_options_notifications_obfuscate_message = 'Показывать имя отправителя';
 z.string.ru.preferences_options_notifications_on = 'Показывать имя отправителя и текст сообщения';
 
-z.string.ru.search_group_hint = 'Продолжите ввод или выберите больше людей для создания группы';
 z.string.ru.search_connect = 'Связаться';
 z.string.ru.search_connections = 'Контакты';
 z.string.ru.search_contacts = 'Контакты';
@@ -505,25 +510,25 @@ z.string.ru.user_availability_away = 'Отошел';
 z.string.ru.user_availability_busy = 'Занят';
 z.string.ru.user_availability_none = 'Отключены';
 
-z.string.ru.system_notification_asset_add = 'Поделился(-лась) картинкой';
-z.string.ru.system_notification_connection_accepted = 'Принял(а) ваш запрос на добавление';
-z.string.ru.system_notification_connection_connected = 'Теперь в списке контактов';
-z.string.ru.system_notification_connection_request = 'Хочет связаться';
-z.string.ru.system_notification_conversation_create = '{{user}} начал разговор';
-z.string.ru.system_notification_conversation_rename = '{{user}} переименовал разговор на {{name}}';
-z.string.ru.system_notification_member_join_many = '{{user}} добавил {{number}} человек(а) в разговор';
-z.string.ru.system_notification_member_join_one = '{{user1}} добавил {{user2}} в разговор';
-z.string.ru.system_notification_member_leave_removed_you = '{{user}} удалил вас из разговора';
-z.string.ru.system_notification_obfuscated = 'Отправил(-а) Вам сообщение';
-z.string.ru.system_notification_obfuscated_title = 'Кто-то';
-z.string.ru.system_notification_ping = 'Отправил(а) пинг';
-z.string.ru.system_notification_reaction = '{{reaction}} Ваше сообщение';
-z.string.ru.system_notification_shared_audio = 'Поделился(-лась) аудио сообщением';
-z.string.ru.system_notification_shared_file = 'Поделился(-лась) файлом';
-z.string.ru.system_notification_shared_location = 'Поделился(-лась) местоположением';
-z.string.ru.system_notification_shared_video = 'Поделился(-лась) видео';
-z.string.ru.system_notification_voice_channel_activate = 'Звонит';
-z.string.ru.system_notification_voice_channel_deactivate = 'Звонил(а)';
+z.string.ru.notification_asset_add = 'Поделился(-лась) картинкой';
+z.string.ru.notification_connection_accepted = 'Принял(а) ваш запрос на добавление';
+z.string.ru.notification_connection_connected = 'Теперь в списке контактов';
+z.string.ru.notification_connection_request = 'Хочет связаться';
+z.string.ru.notification_conversation_create = '{{user}} начал разговор';
+z.string.ru.notification_conversation_rename = '{{user}} переименовал разговор на {{name}}';
+z.string.ru.notification_member_join_many = '{{user}} добавил {{number}} человек(а) в разговор';
+z.string.ru.notification_member_join_one = '{{user1}} добавил {{user2}} в разговор';
+z.string.ru.notification_member_leave_removed_you = '{{user}} удалил вас из разговора';
+z.string.ru.notification_obfuscated = 'Отправил(-а) Вам сообщение';
+z.string.ru.notification_obfuscated_title = 'Кто-то';
+z.string.ru.notification_ping = 'Отправил(а) пинг';
+z.string.ru.notification_reaction = '{{reaction}} Ваше сообщение';
+z.string.ru.notification_shared_audio = 'Поделился(-лась) аудио сообщением';
+z.string.ru.notification_shared_file = 'Поделился(-лась) файлом';
+z.string.ru.notification_shared_location = 'Поделился(-лась) местоположением';
+z.string.ru.notification_shared_video = 'Поделился(-лась) видео';
+z.string.ru.notification_voice_channel_activate = 'Звонит';
+z.string.ru.notification_voice_channel_deactivate = 'Звонил(а)';
 
 z.string.ru.tooltip_conversation_all_verified = 'Все отпечатки верифицированы';
 z.string.ru.tooltip_conversation_call = 'Звонок';

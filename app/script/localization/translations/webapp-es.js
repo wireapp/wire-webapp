@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -241,6 +241,9 @@ z.string.es.conversation_send_pasted_file = 'Imagen añadida el {{date}}';
 z.string.es.conversation_someone = 'Alguien';
 z.string.es.conversation_tweet_author = ' en Twitter';
 
+z.string.es.conversation_creation_preferences_action = 'Siguiente';
+z.string.es.conversation_creation_participants_placeholder = 'Buscar por nombre';
+
 z.string.es.collection_show_all = 'Mostrar los {{number}}';
 z.string.es.collection_section_links = 'Enlaces';
 z.string.es.collection_section_images = 'Fotos';
@@ -257,7 +260,6 @@ z.string.es.conversations_contacts = 'Contactos';
 z.string.es.conversations_connection_request_many = '{{number}} personas en espera';
 z.string.es.conversations_connection_request_one = '1 persona en espera';
 z.string.es.conversations_empty_conversation = 'Conversación en grupo';
-z.string.es.conversations_empty_conversation_description = 'Todo el mundo se fue';
 z.string.es.conversations_no_conversations = 'Iniciar una conversación o crear un grupo.';
 z.string.es.conversations_popover_archive = 'Archivar';
 z.string.es.conversations_popover_block = 'Bloquear';
@@ -306,8 +308,6 @@ z.string.es.extensions_giphy_message = '{{tag}} · vía giphy.com';
 z.string.es.extensions_giphy_no_gifs = 'Uups, no hay gifs';
 z.string.es.extensions_giphy_random = 'Aleatorio';
 
-z.string.es.search_open = 'Abrir';
-z.string.es.search_open_group = 'Crear Grupo';
 z.string.es.people_confirm_label = 'Añadir gente al grupo';
 z.string.es.people_people = '{{number}} Personas';
 z.string.es.people_search_placeholder = 'Buscar por nombre';
@@ -355,7 +355,8 @@ z.string.es.people_remove_message = '{{user}} no podrá enviar o recibir mensaje
 z.string.es.people_unblock_headline = '¿Desbloquear?';
 z.string.es.people_unblock_message = '{{user}} ahora podrá ponerse en contacto contigo o añadirte a chats de grupo.';
 
-z.string.es.people_button_add = 'Agregar personas';
+z.string.es.people_button_add = 'Agregar';
+z.string.es.people_button_add_people = 'Agregar personas';
 z.string.es.people_button_block = 'Bloquear';
 z.string.es.people_button_cancel = 'Cancelar';
 z.string.es.people_button_connect = 'Conectar';
@@ -445,7 +446,6 @@ z.string.es.preferences_options_notifications_obfuscate = 'Ocultar detalles';
 z.string.es.preferences_options_notifications_obfuscate_message = 'Mostrar remitente';
 z.string.es.preferences_options_notifications_on = 'Mostrar remitente y mensaje';
 
-z.string.es.search_group_hint = 'Seguir intentando o elegir más personas para crear un grupo';
 z.string.es.search_connect = 'Conectar';
 z.string.es.search_connections = 'Conexiones';
 z.string.es.search_contacts = 'Contactos';
@@ -494,25 +494,25 @@ z.string.es.user_availability_away = 'Ausente';
 z.string.es.user_availability_busy = 'Ocupado';
 z.string.es.user_availability_none = 'Ninguno';
 
-z.string.es.system_notification_asset_add = 'Compartió una foto';
-z.string.es.system_notification_connection_accepted = 'Aceptó tu solicitud de conexión';
-z.string.es.system_notification_connection_connected = 'Ahora está conectado';
-z.string.es.system_notification_connection_request = 'Quiere conectar';
-z.string.es.system_notification_conversation_create = '{{user}} inició una conversación';
-z.string.es.system_notification_conversation_rename = '{{user}} renombró la conversación a {{name}}';
-z.string.es.system_notification_member_join_many = '{{user}} agregó a {{number}} personas a la conversación';
-z.string.es.system_notification_member_join_one = '{{user1}} agregó a {{user2}} a la conversación';
-z.string.es.system_notification_member_leave_removed_you = '{{user}} te eliminó de la conversación';
-z.string.es.system_notification_obfuscated = 'Te envió un mensaje';
-z.string.es.system_notification_obfuscated_title = 'Alguien';
-z.string.es.system_notification_ping = 'Hizo ping';
-z.string.es.system_notification_reaction = '{{reaction}} su mensaje';
-z.string.es.system_notification_shared_audio = 'Compartió un mensaje de audio';
-z.string.es.system_notification_shared_file = 'Compartió un archivo';
-z.string.es.system_notification_shared_location = 'Compartió una ubicación';
-z.string.es.system_notification_shared_video = 'Compartió un video';
-z.string.es.system_notification_voice_channel_activate = 'Llamando';
-z.string.es.system_notification_voice_channel_deactivate = 'Llamó';
+z.string.es.notification_asset_add = 'Compartió una foto';
+z.string.es.notification_connection_accepted = 'Aceptó tu solicitud de conexión';
+z.string.es.notification_connection_connected = 'Ahora está conectado';
+z.string.es.notification_connection_request = 'Quiere conectar';
+z.string.es.notification_conversation_create = '{{user}} inició una conversación';
+z.string.es.notification_conversation_rename = '{{user}} renombró la conversación a {{name}}';
+z.string.es.notification_member_join_many = '{{user}} agregó a {{number}} personas a la conversación';
+z.string.es.notification_member_join_one = '{{user1}} agregó a {{user2}} a la conversación';
+z.string.es.notification_member_leave_removed_you = '{{user}} te eliminó de la conversación';
+z.string.es.notification_obfuscated = 'Te envió un mensaje';
+z.string.es.notification_obfuscated_title = 'Alguien';
+z.string.es.notification_ping = 'Hizo ping';
+z.string.es.notification_reaction = '{{reaction}} su mensaje';
+z.string.es.notification_shared_audio = 'Compartió un mensaje de audio';
+z.string.es.notification_shared_file = 'Compartió un archivo';
+z.string.es.notification_shared_location = 'Compartió una ubicación';
+z.string.es.notification_shared_video = 'Compartió un video';
+z.string.es.notification_voice_channel_activate = 'Llamando';
+z.string.es.notification_voice_channel_deactivate = 'Llamó';
 
 z.string.es.tooltip_conversation_all_verified = 'Todas las huellas digitales están verificadas';
 z.string.es.tooltip_conversation_call = 'Llamar';

@@ -15,7 +15,7 @@
   "accountForm.emailPersonalPlaceholder": "",
   "accountForm.passwordPlaceholder": "Hasło (musi mieć przynajmniej 8 znaków)",
   "accountForm.terms": "Akceptuję <a {linkParams}> regulamin</a>",
-  "accountForm.nextButton": "Dalej",
+  "accountForm.submitButton": "Dalej",
   "createAccount.nextButton": "Dalej",
   "invite.nextButton": "Dalej",
   "createAccount.headLine": "Skonfiguruj swoje konto",
@@ -51,8 +51,9 @@
   "BackendError.LABEL.OPERATION_DENIED": "Nie posiadasz uprawnień",
   "BackendError.LABEL.UNAUTHORIZED": "",
   "BackendError.LABEL.HANDLE_EXISTS": "Ta nazwa użytkownika jest już zajęta",
+  "BackendError.LABEL.HANDLE_TOO_SHORT": "",
   "BackendError.LABEL.INVALID_HANDLE": "Nazwa użytkownika jest nieprawidłowa",
-  "BackendError.LABEL.INVALID_INVITATION_CODE": "",
+  "BackendError.LABEL.INVALID_INVITATION_CODE": "Zaproszenia zostały wycofane lub wygasły",
   "BackendError.LABEL.NO_OTHER_OWNER": "",
   "BackendError.LABEL.NO_TEAM": "Nie znaleziono zespołu",
   "BackendError.LABEL.NO_TEAM_MEMBER": "Nie znaleziono członka zespołu",
@@ -61,6 +62,7 @@
   "BackendError.LABEL.EMAIL_EXISTS": "",
   "BackendError.unexpected": "Nieoczekiwany błąd ({code} {message})",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "Wprowadź nazwę - musi mieć co najmniej 2 znaki",
+  "ValidationError.FIELD.NAME.VALUE_MISSING": "Wprowadź nazwę - musi mieć co najmniej 2 znaki",
   "ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH": "Wprowadź hasło z co najmniej 8 znaków",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": "Proszę wprowadź poprawny adres e-mail"
 }

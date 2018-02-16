@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@ import {checkHandles} from '../module/action/UserAction';
 import {setHandle} from '../module/action/SelfAction';
 import {connect} from 'react-redux';
 import * as SelfSelector from '../module/selector/SelfSelector';
+import BackendError from '../module/action/BackendError';
 
 class ChooseHandle extends React.PureComponent {
   state = {
@@ -57,7 +58,12 @@ class ChooseHandle extends React.PureComponent {
         document.body.appendChild(link); // workaround for Firefox
         link.click();
       })
-      .catch(error => this.setState({error}));
+      .catch(error => {
+        if (error.label === BackendError.HANDLE_ERRORS.INVALID_HANDLE && this.state.handle.trim().length < 2) {
+          error.label = BackendError.HANDLE_ERRORS.HANDLE_TOO_SHORT;
+        }
+        this.setState({error});
+      });
   };
 
   render() {
@@ -82,7 +88,7 @@ class ChooseHandle extends React.PureComponent {
                 data-uie-name="enter-handle"
               />
               <RoundIconButton
-                disabled={!this.state.handle.trim() || isFetching}
+                disabled={!this.state.handle || isFetching}
                 type="submit"
                 data-uie-name="do-send-handle"
                 formNoValidate

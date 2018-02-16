@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -57,11 +57,12 @@ z.tracking.EventName = {
   },
   CONTRIBUTED: 'contributed',
   CONVERSATION: {
-    ADD_TO_GROUP_CONVERSATION: 'addContactToGroupConversation',
     CHARACTER_LIMIT_REACHED: 'conversation.character_limit_reached',
-    CREATE_GROUP_CONVERSATION: 'createGroupConversation',
     DELETED_MESSAGE: 'conversation.deleted_message',
     EDITED_MESSAGE: 'conversation.edited_message',
+    GROUP_CREATION_SUCCEEDED: 'conversation.group_creation_succeeded',
+    OPENED_GROUP_CREATION: 'conversation.opened_group_creation',
+    OPENED_SELECT_PARTICIPANTS: 'conversation.opened_select_participants',
     REACTED_TO_MESSAGE: 'conversation.reacted_to_message',
     SELECTED_MESSAGE: 'conversation.selected_message',
   },

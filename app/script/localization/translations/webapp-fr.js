@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -229,7 +229,7 @@ z.string.fr.conversation_asset_downloading = 'Téléchargement en cours…';
 z.string.fr.conversation_asset_upload_failed = 'Échec de l’envoi';
 z.string.fr.conversation_asset_upload_too_large = 'Vous pouvez envoyer des fichiers jusqu’à {{number}}';
 z.string.fr.conversation_playback_error = 'Lecture impossible';
-z.string.fr.conversation_context_menu_edit = 'Modifier';
+z.string.fr.conversation_context_menu_edit = 'Édition';
 z.string.fr.conversation_context_menu_delete = 'Supprimer pour moi';
 z.string.fr.conversation_context_menu_delete_everyone = 'Supprimer pour tout le monde';
 z.string.fr.conversation_context_menu_download = 'Télécharger';
@@ -241,6 +241,9 @@ z.string.fr.conversation_likes_caption = '{{number}} personnes';
 z.string.fr.conversation_send_pasted_file = 'Image collée le {{date}}';
 z.string.fr.conversation_someone = 'Quelqu’un';
 z.string.fr.conversation_tweet_author = ' via Twitter';
+
+z.string.fr.conversation_creation_preferences_action = 'Suivant';
+z.string.fr.conversation_creation_participants_placeholder = 'Rechercher par nom';
 
 z.string.fr.collection_show_all = 'Tout afficher ({{number}})';
 z.string.fr.collection_section_links = 'Liens';
@@ -258,14 +261,13 @@ z.string.fr.conversations_contacts = 'Contacts';
 z.string.fr.conversations_connection_request_many = '{{number}} personnes en attente';
 z.string.fr.conversations_connection_request_one = '1 personne en attente';
 z.string.fr.conversations_empty_conversation = 'Conversation de groupe';
-z.string.fr.conversations_empty_conversation_description = 'Tout le monde est parti';
 z.string.fr.conversations_no_conversations = 'Pas encore de conversation';
 z.string.fr.conversations_popover_archive = 'Archiver';
 z.string.fr.conversations_popover_block = 'Bloquer';
 z.string.fr.conversations_popover_cancel = 'Annuler la demande';
 z.string.fr.conversations_popover_clear = 'Supprimer';
 z.string.fr.conversations_popover_leave = 'Quitter';
-z.string.fr.conversations_popover_notify = 'Désactiver la sourdine';
+z.string.fr.conversations_popover_notify = 'Activer le micro';
 z.string.fr.conversations_popover_silence = 'Mettre en sourdine';
 z.string.fr.conversations_popover_unarchive = 'Restaurer';
 
@@ -307,8 +309,6 @@ z.string.fr.extensions_giphy_message = '{{tag}} • via giphy.com';
 z.string.fr.extensions_giphy_no_gifs = 'Oups, pas de gif';
 z.string.fr.extensions_giphy_random = 'Au hasard';
 
-z.string.fr.search_open = 'Ouvrir';
-z.string.fr.search_open_group = 'Créer un groupe';
 z.string.fr.people_confirm_label = 'Ajouter des personnes au groupe';
 z.string.fr.people_people = '{{number}} personne(s)';
 z.string.fr.people_search_placeholder = 'Rechercher par nom';
@@ -339,7 +339,7 @@ z.string.fr.people_tabs_services = 'Services';
 z.string.fr.people_verified = 'Vérifié';
 
 z.string.fr.people_block_headline = 'Bloquer ?';
-z.string.fr.people_block_message = '{{user}} ne pourra plus vous parler ou vous ajouter à des conversations de groupe.';
+z.string.fr.people_block_message = '{{user}} ne pourra plus vous contacter ou vous ajouter à des conversations de groupe.';
 
 z.string.fr.people_connect_headline = 'Accepter ?';
 z.string.fr.people_connect_message = 'Cela vous connectera et ouvrira la conversation avec {{user}}.';
@@ -357,6 +357,7 @@ z.string.fr.people_unblock_headline = 'Débloquer ?';
 z.string.fr.people_unblock_message = '{{user}} pourra de nouveau vous parler ou vous ajouter à des conversations de groupe.';
 
 z.string.fr.people_button_add = 'Ajouter des personnes';
+z.string.fr.people_button_add_people = 'Ajouter';
 z.string.fr.people_button_block = 'Bloquer';
 z.string.fr.people_button_cancel = 'Annuler';
 z.string.fr.people_button_connect = 'Se connecter';
@@ -413,7 +414,7 @@ z.string.fr.preferences_devices_current = 'Actuel';
 z.string.fr.preferences_devices_fingerprint = 'Empreinte';
 z.string.fr.preferences_devices_fingerprint_detail = 'Wire donne à chaque appareil une empreinte unique. Comparez-les et vérifiez vos appareils et conversations.';
 z.string.fr.preferences_devices_id = 'ID : ';
-z.string.fr.preferences_devices_remove = 'Supprimer';
+z.string.fr.preferences_devices_remove = 'Exclure';
 z.string.fr.preferences_devices_remove_cancel = 'Annuler';
 z.string.fr.preferences_devices_remove_detail = 'Supprimez ce périphérique si vous avez cessé de l’utiliser. Vous serez déconnecté de cet appareil immédiatement.';
 z.string.fr.preferences_devices_session_confirmation = 'La session a été réinitialisée.';
@@ -446,7 +447,6 @@ z.string.fr.preferences_options_notifications_obfuscate = 'Masquer les détails'
 z.string.fr.preferences_options_notifications_obfuscate_message = 'Afficher l’expéditeur';
 z.string.fr.preferences_options_notifications_on = 'Afficher l’expéditeur et le message';
 
-z.string.fr.search_group_hint = 'Continuez d’écrire ou sélectionnez plus de personnes pour créer un groupe';
 z.string.fr.search_connect = 'Se connecter';
 z.string.fr.search_connections = 'Contacts';
 z.string.fr.search_contacts = 'Contacts';
@@ -496,25 +496,25 @@ z.string.fr.user_availability_away = 'Absent(e)';
 z.string.fr.user_availability_busy = 'Occupé(e)';
 z.string.fr.user_availability_none = 'Aucune';
 
-z.string.fr.system_notification_asset_add = 'A partagé une image';
-z.string.fr.system_notification_connection_accepted = 'A accepté votre demande de connexion';
-z.string.fr.system_notification_connection_connected = 'Vous êtes connecté';
-z.string.fr.system_notification_connection_request = 'Souhaite se connecter';
-z.string.fr.system_notification_conversation_create = '{{user}} a commencé une conversation';
-z.string.fr.system_notification_conversation_rename = '{{user}} a renommé la conversation en {{name}}';
-z.string.fr.system_notification_member_join_many = '{{user}} a ajouté {{number}} personnes à la conversation';
-z.string.fr.system_notification_member_join_one = '{{user1}} a ajouté {{user2}} à la conversation';
-z.string.fr.system_notification_member_leave_removed_you = '{{user}} vous a exclu de la conversation';
-z.string.fr.system_notification_obfuscated = 'vous a envoyé un message';
-z.string.fr.system_notification_obfuscated_title = 'Quelqu’un';
-z.string.fr.system_notification_ping = 'a fait un signe';
-z.string.fr.system_notification_reaction = '{{reaction}} votre message';
-z.string.fr.system_notification_shared_audio = 'A partagé un message vocal';
-z.string.fr.system_notification_shared_file = 'A partagé un fichier';
-z.string.fr.system_notification_shared_location = 'A partagé une position';
-z.string.fr.system_notification_shared_video = 'A partagé une vidéo';
-z.string.fr.system_notification_voice_channel_activate = 'Appel en cours';
-z.string.fr.system_notification_voice_channel_deactivate = 'vous a appelé';
+z.string.fr.notification_asset_add = 'A partagé une image';
+z.string.fr.notification_connection_accepted = 'A accepté votre demande de connexion';
+z.string.fr.notification_connection_connected = 'Vous êtes connecté';
+z.string.fr.notification_connection_request = 'Souhaite se connecter';
+z.string.fr.notification_conversation_create = '{{user}} a commencé une conversation';
+z.string.fr.notification_conversation_rename = '{{user}} a renommé la conversation en {{name}}';
+z.string.fr.notification_member_join_many = '{{user}} a ajouté {{number}} personnes à la conversation';
+z.string.fr.notification_member_join_one = '{{user1}} a ajouté {{user2}} à la conversation';
+z.string.fr.notification_member_leave_removed_you = '{{user}} vous a exclu de la conversation';
+z.string.fr.notification_obfuscated = 'vous a envoyé un message';
+z.string.fr.notification_obfuscated_title = 'Quelqu’un';
+z.string.fr.notification_ping = 'a fait un signe';
+z.string.fr.notification_reaction = '{{reaction}} votre message';
+z.string.fr.notification_shared_audio = 'A partagé un message vocal';
+z.string.fr.notification_shared_file = 'A partagé un fichier';
+z.string.fr.notification_shared_location = 'A partagé une position';
+z.string.fr.notification_shared_video = 'A partagé une vidéo';
+z.string.fr.notification_voice_channel_activate = 'Appel en cours';
+z.string.fr.notification_voice_channel_deactivate = 'vous a appelé';
 
 z.string.fr.tooltip_conversation_all_verified = 'Toutes les empreintes sont vérifiées';
 z.string.fr.tooltip_conversation_call = 'Appeler';
@@ -565,7 +565,7 @@ z.string.fr.init_events = 'Chargement des messages';
 z.string.fr.init_updated_from_notifications = 'Presque terminé - Profitez de Wire';
 z.string.fr.init_progress = ' — {{number1}} sur {{number2}}';
 
-z.string.fr.ephememal_units_none = 'Désactivé';
+z.string.fr.ephememal_units_none = 'Désactiver';
 z.string.fr.ephememal_units_second = 'seconde';
 z.string.fr.ephememal_units_seconds = 'secondes';
 z.string.fr.ephememal_units_minute = 'minute';

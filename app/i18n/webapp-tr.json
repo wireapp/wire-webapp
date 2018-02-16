@@ -15,7 +15,7 @@
   "accountForm.emailPersonalPlaceholder": "",
   "accountForm.passwordPlaceholder": "Şifre (en az 8 karakter)",
   "accountForm.terms": "<a {linkParams}>şartlar ve koşulları</a> kabul ediyorum",
-  "accountForm.nextButton": "İleri",
+  "accountForm.submitButton": "İleri",
   "createAccount.nextButton": "İleri",
   "invite.nextButton": "İleri",
   "createAccount.headLine": "Hesabınızı kurun",
@@ -51,6 +51,7 @@
   "BackendError.LABEL.OPERATION_DENIED": "İzniniz yok",
   "BackendError.LABEL.UNAUTHORIZED": "Bir şeyler ters gitti. Lütfen sayfayı yenileyin ve tekrar deneyin",
   "BackendError.LABEL.HANDLE_EXISTS": "Bu kullanıcı adı zaten alınmış",
+  "BackendError.LABEL.HANDLE_TOO_SHORT": "",
   "BackendError.LABEL.INVALID_HANDLE": "Bu kullanıcı adı geçersiz",
   "BackendError.LABEL.INVALID_INVITATION_CODE": "Davet geri çevrildi veya geçerliliğini yitirdi",
   "BackendError.LABEL.NO_OTHER_OWNER": "Son sahip takımdan silinemez",
@@ -61,6 +62,7 @@
   "BackendError.LABEL.EMAIL_EXISTS": "E-posta zaten kullanılıyor. <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://support.wire.com/hc/articles/115004082129\">Daha fazla bilgi</a>",
   "BackendError.unexpected": "Beklenmeyen hata ({code} {message})",
   "ValidationError.FIELD.NAME.PATTERN_MISMATCH": "En az 2 karakterlik bir isim girin",
+  "ValidationError.FIELD.NAME.VALUE_MISSING": "En az 2 karakterlik bir isim girin",
   "ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH": "En az 8 karakterlik bir şifre seçin",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": "Lütfen geçerli bir e-posta adresi girin"
 }

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -169,14 +169,12 @@ z.string.lt.modal_not_connected_message_many = 'Vienas iš pasirinktų žmonių 
 z.string.lt.modal_remove_device_button = 'Šalinti įrenginį';
 z.string.lt.modal_remove_device_headline = 'Šalinti "{{device}}"';
 z.string.lt.modal_remove_device_message = 'Norint pašalinti įrenginį, reikalingas jūsų slaptažodis.';
-z.string.lt.modal_service_disabled_headline = 'Paslaugos pridėjimas negalimas';
-z.string.lt.modal_service_disabled_message = 'Paslauga šiuo metu negalima.';
+z.string.lt.modalServiceUnavailableHeadline = 'Paslaugos pridėjimas negalimas';
+z.string.lt.modalServiceUnavailableMessage = 'Paslauga šiuo metu negalima.';
 z.string.lt.modal_session_reset_headline = 'Seansas buvo atstatytas';
 z.string.lt.modal_session_reset_message_1 = 'Jeigu problema neišspręsta,';
 z.string.lt.modal_session_reset_message_link = 'susisiekite';
 z.string.lt.modal_session_reset_message_2 = 'su mumis.';
-z.string.lt.modal_too_many_bots_headline = 'Paslaugos pridėjimas negalimas';
-z.string.lt.modal_too_many_bots_message = 'Robotas jau yra susirašinėjime.';
 z.string.lt.modal_too_many_members_headline = 'Balso kanalas perpildytas';
 z.string.lt.modal_too_many_members_message = 'Prie pokalbio gali prisijungti iki {{number1}} žmonių. Čia yra vietos tik dar {{number2}} žmonėms.';
 z.string.lt.modal_uploads_parallel = 'Jūs vienu metu galite siųsti iki {{number}} failų.';
@@ -249,6 +247,15 @@ z.string.lt.conversation_send_pasted_file = 'Paveikslas įdėtas {{date}}';
 z.string.lt.conversation_someone = 'Kažkas';
 z.string.lt.conversation_tweet_author = ' socialiniame tinkle Twitter';
 
+z.string.lt.groupCreationPreferencesAction = 'Kitas';
+z.string.lt.groupCreationPreferencesHeader = 'Kurti susirašinėjimą';
+z.string.lt.groupCreationPreferencesPlaceholder = 'Susirašinėjimo pavadinimas';
+z.string.lt.groupCreationParticipantsActionCreate = 'Kurti';
+z.string.lt.groupCreationParticipantsActionSkip = 'Praleisti';
+z.string.lt.groupCreationParticipantsHeader = 'Pridėti žmonių';
+z.string.lt.groupCreationParticipantsHeaderWithCounter = 'Pridėti žmonių ({{number}})';
+z.string.lt.groupCreationParticipantsPlaceholder = 'Ieškokite pagal vardą';
+
 z.string.lt.collection_show_all = 'Rodyti visus {{number}}';
 z.string.lt.collection_section_links = 'Nuorodos';
 z.string.lt.collection_section_images = 'Paveikslai';
@@ -265,7 +272,6 @@ z.string.lt.conversations_contacts = 'Kontaktai';
 z.string.lt.conversations_connection_request_many = 'Laukia {{number}} žmonės';
 z.string.lt.conversations_connection_request_one = '1 asmuo laukia';
 z.string.lt.conversations_empty_conversation = 'Grupės pokalbis';
-z.string.lt.conversations_empty_conversation_description = 'Visi išėjo';
 z.string.lt.conversations_no_conversations = 'Kol kas nėra pokalbių';
 z.string.lt.conversations_popover_archive = 'Archyvuoti';
 z.string.lt.conversations_popover_block = 'Užblokuoti';
@@ -314,8 +320,6 @@ z.string.lt.extensions_giphy_message = '{{tag}} • per giphy.com';
 z.string.lt.extensions_giphy_no_gifs = 'Oi, nėra gif';
 z.string.lt.extensions_giphy_random = 'Atsitiktinis';
 
-z.string.lt.search_open = 'Atverti';
-z.string.lt.search_open_group = 'Sukurti grupę';
 z.string.lt.people_confirm_label = 'Pridėti žmones į grupę';
 z.string.lt.people_people = '{{number}} žmonių';
 z.string.lt.people_search_placeholder = 'Ieškokite pagal vardą';
@@ -328,6 +332,7 @@ z.string.lt.people_invite_button_gmail = 'Iš Gmail';
 z.string.lt.people_invite_headline = 'Pasikvieskite savo draugus';
 z.string.lt.people_service_confirm_button = 'Pridėti paslaugą';
 z.string.lt.people_service_removal_button = 'Išimti paslaugą';
+z.string.lt.people_service_new_conversation = 'Kurti naują susirašinėjimą';
 z.string.lt.people_services = 'Paslaugos';
 z.string.lt.people_share = 'Dalintis kontaktais';
 z.string.lt.people_tabs_details = 'Išsamiau';
@@ -365,7 +370,7 @@ z.string.lt.people_remove_message = '{{user}} negalės siųsti ir gauti žinutes
 z.string.lt.people_unblock_headline = 'Atblokuoti?';
 z.string.lt.people_unblock_message = '{{user}} galės ir vėl su jumis susisiekti ar pridėti jus į grupės pokalbius.';
 
-z.string.lt.people_button_add = 'Pridėti žmones';
+z.string.lt.people_button_add = 'Pridėti';
 z.string.lt.people_button_add_people = 'Pridėti žmonių';
 z.string.lt.people_button_block = 'Užblokuoti';
 z.string.lt.people_button_cancel = 'Atsisakyti';
@@ -447,6 +452,7 @@ z.string.lt.preferences_options_data = 'Naudojimosi ir strigčių ataskaitos';
 z.string.lt.preferences_options_data_checkbox = 'Naudojimosi ir strigčių ataskaitos';
 z.string.lt.preferences_options_data_detail = 'Pagerinkite „Wire“ siųsdami anoniminę informaciją.';
 z.string.lt.preferences_options_popular = 'Pagal populiarias užklausas';
+z.string.lt.preferences_options_emoji_replace_detail = ':-) → {{icon}}';
 z.string.lt.preferences_options_emoji_replace_checkbox = 'Pakeisti rašomus jaustukus jausmaženkliais';
 z.string.lt.preferences_options_previews_send_checkbox = 'Rodyti jūsų siunčiamų nuorodų peržiūras';
 z.string.lt.preferences_options_previews_send_detail = 'Kitų žmonių siunčiamų nuorodų peržiūros vis dar gali būti rodomos.';
@@ -456,7 +462,6 @@ z.string.lt.preferences_options_notifications_obfuscate = 'Slėpti išsamesnę i
 z.string.lt.preferences_options_notifications_obfuscate_message = 'Rodyti siuntėją';
 z.string.lt.preferences_options_notifications_on = 'Rodyti siuntėją ir žinutę';
 
-z.string.lt.search_group_hint = 'Tęskite rašymą arba, norėdami sukurti grupę, pasirinkite daugiau žmonių';
 z.string.lt.search_connect = 'Užmegzti kontaktą';
 z.string.lt.search_connections = 'Kontaktai';
 z.string.lt.search_contacts = 'Kontaktai';
@@ -506,25 +511,25 @@ z.string.lt.user_availability_away = 'Pasišalinęs';
 z.string.lt.user_availability_busy = 'Užsiėmęs';
 z.string.lt.user_availability_none = 'Jokių';
 
-z.string.lt.system_notification_asset_add = 'Pasidalino paveikslu';
-z.string.lt.system_notification_connection_accepted = 'Priėmė jūsų kontakto užmezgimo užklausą';
-z.string.lt.system_notification_connection_connected = 'Dabar esate užmezgę kontaktą';
-z.string.lt.system_notification_connection_request = 'Nori užmegzti kontaktą';
-z.string.lt.system_notification_conversation_create = '{{user}} pradėjo pokalbį';
-z.string.lt.system_notification_conversation_rename = '{{user}} pervadino pokalbį į {{name}}';
-z.string.lt.system_notification_member_join_many = '{{user}} pridėjo {{number}} žmones(-ių) į pokalbį';
-z.string.lt.system_notification_member_join_one = '{{user1}} pridėjo {{user2}} į pokalbį';
-z.string.lt.system_notification_member_leave_removed_you = '{{user}} pašalino jus iš pokalbio';
-z.string.lt.system_notification_obfuscated = 'Išsiuntė jums žinutę';
-z.string.lt.system_notification_obfuscated_title = 'Kažkas';
-z.string.lt.system_notification_ping = 'Patikrino ryšį';
-z.string.lt.system_notification_reaction = '{{reaction}} jūsų žinutė';
-z.string.lt.system_notification_shared_audio = 'Pasidalino garso žinute';
-z.string.lt.system_notification_shared_file = 'Pasidalino failu';
-z.string.lt.system_notification_shared_location = 'Pasidalino vieta';
-z.string.lt.system_notification_shared_video = 'Pasidalino vaizdo įrašu';
-z.string.lt.system_notification_voice_channel_activate = 'Skambina';
-z.string.lt.system_notification_voice_channel_deactivate = 'Skambino';
+z.string.lt.notification_asset_add = 'Pasidalino paveikslu';
+z.string.lt.notification_connection_accepted = 'Priėmė jūsų kontakto užmezgimo užklausą';
+z.string.lt.notification_connection_connected = 'Dabar esate užmezgę kontaktą';
+z.string.lt.notification_connection_request = 'Nori užmegzti kontaktą';
+z.string.lt.notification_conversation_create = '{{user}} pradėjo pokalbį';
+z.string.lt.notification_conversation_rename = '{{user}} pervadino pokalbį į {{name}}';
+z.string.lt.notification_member_join_many = '{{user}} pridėjo {{number}} žmones(-ių) į pokalbį';
+z.string.lt.notification_member_join_one = '{{user1}} pridėjo {{user2}} į pokalbį';
+z.string.lt.notification_member_leave_removed_you = '{{user}} pašalino jus iš pokalbio';
+z.string.lt.notification_obfuscated = 'Išsiuntė jums žinutę';
+z.string.lt.notification_obfuscated_title = 'Kažkas';
+z.string.lt.notification_ping = 'Patikrino ryšį';
+z.string.lt.notification_reaction = '{{reaction}} jūsų žinutė';
+z.string.lt.notification_shared_audio = 'Pasidalino garso žinute';
+z.string.lt.notification_shared_file = 'Pasidalino failu';
+z.string.lt.notification_shared_location = 'Pasidalino vieta';
+z.string.lt.notification_shared_video = 'Pasidalino vaizdo įrašu';
+z.string.lt.notification_voice_channel_activate = 'Skambina';
+z.string.lt.notification_voice_channel_deactivate = 'Skambino';
 
 z.string.lt.tooltip_conversation_all_verified = 'Visi kontroliniai kodai patvirtinti';
 z.string.lt.tooltip_conversation_call = 'Skambutis';

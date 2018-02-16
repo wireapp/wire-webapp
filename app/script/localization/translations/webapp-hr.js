@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2017 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -219,6 +219,8 @@ z.string.hr.conversation_send_pasted_file = 'Slika zaljepljena na {{date}}';
 z.string.hr.conversation_someone = 'Netko';
 z.string.hr.conversation_tweet_author = ' na Twitteru';
 
+z.string.hr.conversation_creation_participants_placeholder = 'Traži po imenu';
+
 z.string.hr.collection_section_links = 'Linkovi';
 z.string.hr.collection_section_images = 'Slike';
 z.string.hr.collection_section_files = 'Dokumenti';
@@ -264,8 +266,6 @@ z.string.hr.extensions_giphy_message = '• {{tag}} s giphy.com';
 z.string.hr.extensions_giphy_no_gifs = 'Ups, nema Gif-ova';
 z.string.hr.extensions_giphy_random = 'Nasumično';
 
-z.string.hr.search_open = 'Otvori';
-z.string.hr.search_open_group = 'Napravi grupu';
 z.string.hr.people_people = '{{people}} ljudi';
 z.string.hr.people_search_placeholder = 'Traži po imenu';
 z.string.hr.people_everyone_participates = 'Svi ljudi s kojima ste povezani su već u ovom razgovoru.';
@@ -309,7 +309,8 @@ z.string.hr.people_remove_message = '{{user}} neće moći slati ili primati poru
 
 z.string.hr.people_unblock_headline = 'Odblokirati?';
 
-z.string.hr.people_button_add = 'Dodaj osobe';
+z.string.hr.people_button_add = 'Dodaj';
+z.string.hr.people_button_add_people = 'Dodaj osobe';
 z.string.hr.people_button_block = 'Blokiraj';
 z.string.hr.people_button_cancel = 'Odustani';
 z.string.hr.people_button_connect = 'Poveži se';
@@ -390,7 +391,6 @@ z.string.hr.preferences_options_notifications_none = 'Isključi';
 z.string.hr.preferences_options_notifications_obfuscate = 'Sakrij detalje';
 z.string.hr.preferences_options_notifications_on = 'Prikaži pošiljatelja i poruku';
 
-z.string.hr.search_group_hint = 'Nastavi pisati ili odaberi više ljudi za stvaranje grupe';
 z.string.hr.search_connect = 'Poveži se';
 z.string.hr.search_connections = 'Veze';
 z.string.hr.search_contacts = 'Kontakti';
@@ -435,24 +435,24 @@ z.string.hr.warning_tell_me_how = 'Recite mi kako';
 z.string.hr.user_availability_available = 'Dostupno';
 z.string.hr.user_availability_none = 'Ništa';
 
-z.string.hr.system_notification_asset_add = 'Podijelila/o sliku';
-z.string.hr.system_notification_connection_accepted = 'Prihvatila/o zahtjev za vezu';
-z.string.hr.system_notification_connection_request = 'Želi se povezati';
-z.string.hr.system_notification_conversation_create = '{{user}} je započela/o razgovor';
-z.string.hr.system_notification_conversation_rename = '{{user}} je preimenovala/o razgovor u {{name}}';
-z.string.hr.system_notification_member_join_many = '{{user}} dodala/o {{number}} ljudi u razgovor';
-z.string.hr.system_notification_member_join_one = '{{user1}} dodala/o {{user2}} u razgovor';
-z.string.hr.system_notification_member_leave_removed_you = '{{user}} vas je izbrisao / izbrisala iz razgovora';
-z.string.hr.system_notification_obfuscated = 'Poslao ti je poruku';
-z.string.hr.system_notification_obfuscated_title = 'Netko';
-z.string.hr.system_notification_ping = 'Pingala/o';
-z.string.hr.system_notification_reaction = '{{reaction}} tvoju poruku';
-z.string.hr.system_notification_shared_audio = 'Podijelila/o audio poruku';
-z.string.hr.system_notification_shared_file = 'Podijelila/o datoteku';
-z.string.hr.system_notification_shared_location = 'Podijelila/o lokaciju';
-z.string.hr.system_notification_shared_video = 'Podijelila/o video';
-z.string.hr.system_notification_voice_channel_activate = 'Pozivanje';
-z.string.hr.system_notification_voice_channel_deactivate = 'Zvala/o';
+z.string.hr.notification_asset_add = 'Podijelila/o sliku';
+z.string.hr.notification_connection_accepted = 'Prihvatila/o zahtjev za vezu';
+z.string.hr.notification_connection_request = 'Želi se povezati';
+z.string.hr.notification_conversation_create = '{{user}} je započela/o razgovor';
+z.string.hr.notification_conversation_rename = '{{user}} je preimenovala/o razgovor u {{name}}';
+z.string.hr.notification_member_join_many = '{{user}} dodala/o {{number}} ljudi u razgovor';
+z.string.hr.notification_member_join_one = '{{user1}} dodala/o {{user2}} u razgovor';
+z.string.hr.notification_member_leave_removed_you = '{{user}} vas je izbrisao / izbrisala iz razgovora';
+z.string.hr.notification_obfuscated = 'Poslao ti je poruku';
+z.string.hr.notification_obfuscated_title = 'Netko';
+z.string.hr.notification_ping = 'Pingala/o';
+z.string.hr.notification_reaction = '{{reaction}} tvoju poruku';
+z.string.hr.notification_shared_audio = 'Podijelila/o audio poruku';
+z.string.hr.notification_shared_file = 'Podijelila/o datoteku';
+z.string.hr.notification_shared_location = 'Podijelila/o lokaciju';
+z.string.hr.notification_shared_video = 'Podijelila/o video';
+z.string.hr.notification_voice_channel_activate = 'Pozivanje';
+z.string.hr.notification_voice_channel_deactivate = 'Zvala/o';
 
 z.string.hr.tooltip_conversation_all_verified = 'Svi otisci su verificirani';
 z.string.hr.tooltip_conversation_call = 'Poziv';
