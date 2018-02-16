@@ -146,13 +146,6 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
       $('.group-header textarea').val(this.conversation().display_name());
     });
 
-    this.participantsBubble = new zeta.webapp.module.Bubble({
-      host_selector: '#show-participants',
-      modal: true,
-      on_hide: () => this.resetView(),
-      scroll_selector: '.messages-wrap',
-    });
-
     // @todo create a viewmodel search?
     this.addActionText = ko.pureComputed(() => {
       return this.showIntegrations() ? z.string.people_button_add : z.string.people_button_add_people;
@@ -197,7 +190,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
     amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, this.switchContent.bind(this));
     amplify.subscribe(z.event.WebApp.PEOPLE.SHOW, this.showParticipant);
-    amplify.subscribe(z.event.WebApp.PEOPLE.TOGGLE, this.toggleParticipantsBubble.bind(this));
+    amplify.subscribe(z.event.WebApp.PEOPLE.TOGGLE, this.toggleParticipantsSidebar.bind(this));
   }
 
   changeConversation(conversationEntity) {
@@ -454,5 +447,39 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     const bubble = wire.app.view.content.message_list.participant_bubble;
     const timeout = bubble && bubble.is_visible() ? z.motion.MotionDuration.LONG : 0;
     window.setTimeout(() => toggleBubble(), timeout);
+  }
+
+  toggleParticipantsSidebar(addPeople = false) {
+    const mainView = wire.app.view.main;
+    const isOpen = mainView.isRightColumnOpen();
+    const toggleSidebar = () => {
+      if (!isOpen) {
+        this.resetView();
+
+        const [userEntity] = this.participants();
+        const initialUser = userEntity && this.conversation().is_one2one() ? userEntity : undefined;
+        this.selectedParticipant(initialUser);
+
+        this.renderParticipants(true);
+      }
+
+      if (addPeople && !this.conversation().is_guest()) {
+        if (!isOpen) {
+          mainView.openRightColumn();
+          this.clickOnAddPeople();
+          return;
+        }
+
+        const isConfirmingAction = this.confirmDialog && this.confirmDialog.is_visible();
+        if (this.stateAddPeople() || isConfirmingAction) {
+          return mainView.closeRightColumn();
+        }
+
+        return this.clickOnAddPeople();
+      }
+
+      return mainView.toggleRightColumn();
+    };
+    toggleSidebar();
   }
 };

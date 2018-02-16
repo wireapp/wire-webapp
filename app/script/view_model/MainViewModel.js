@@ -28,6 +28,7 @@ z.ViewModel.MainViewModel = class MainViewModel {
     this.logger = new z.util.Logger('z.ViewModel.MainViewModel', z.config.LOGGER.OPTIONS);
 
     this.user = this.user_repository.self;
+    this.duration = 100;
 
     this.main_classes = ko.pureComputed(() => {
       if (this.user()) {
@@ -40,6 +41,7 @@ z.ViewModel.MainViewModel = class MainViewModel {
 
     this.isLeftColumnOpen = ko.observable(true);
     this.isRightColumnOpen = ko.observable(false);
+    this.resize = this.resize.bind(this);
   }
 
   openRightColumn() {
@@ -52,7 +54,15 @@ z.ViewModel.MainViewModel = class MainViewModel {
     this.isRightColumnOpen(false);
   }
 
-  resize(newWidthLeft, newWidthRight, duration = 100) {
+  toggleRightColumn() {
+    if (this.isRightColumnOpen()) {
+      this.closeRightColumn();
+    } else {
+      this.openRightColumn();
+    }
+  }
+
+  resize(newWidthLeft, newWidthRight) {
     const smoothStep = x => (x > 1 ? 1 : x < 0 ? 0 : x * x * (3 - 2 * x));
     const lerp = (v1, v2, t) => v1 + (v2 - v1) * t;
     const setStyle = (el, size) => (el.style.minWidth = el.style.flexBasis = `${size}px`);
@@ -91,6 +101,7 @@ z.ViewModel.MainViewModel = class MainViewModel {
     setStyle(rightColumn, newWidthRight || oldWidthRight);
 
     const startTime = Date.now();
+    const duration = this.duration;
     function animate() {
       const currTime = Date.now() - startTime;
       if (currTime < duration) {
