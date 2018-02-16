@@ -16,6 +16,7 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
+const pkg = require('../../package.json');
 import {IncomingNotification} from '@wireapp/api-client/dist/commonjs/conversation/index';
 import {CryptographyService, GenericMessageType, PayloadBundle} from './crypto/root';
 import {Context, LoginData, PreKey} from '@wireapp/api-client/dist/commonjs/auth/index';
@@ -27,10 +28,11 @@ import {
 import {
   ClientClassification,
   ClientType,
+  Location,
   NewClient,
   RegisteredClient,
 } from '@wireapp/api-client/dist/commonjs/client/index';
-import {LoginSanitizer} from './auth/root';
+import {LoginSanitizer, ClientInfo} from './auth/root';
 import {RecordNotFoundError} from '@wireapp/store-engine/dist/commonjs/engine/error/index';
 import {Root} from 'protobufjs';
 import {WebSocketClient} from '@wireapp/api-client/dist/commonjs/tcp/index';
@@ -398,19 +400,25 @@ export default class Account extends EventEmitter {
 
   public registerClient(
     loginData: LoginData,
-    clientClassification: ClientClassification = ClientClassification.DESKTOP,
-    cookieLabel: string = 'default'
+    clientInfo: ClientInfo = {
+      classification: ClientClassification.DESKTOP,
+      cookieLabel: 'default',
+      model: `${pkg.name} v${pkg.version}`,
+      location: {lat: 52.53269, lon: 13.402315},
+    }
   ): Promise<RegisteredClient> {
     return this.service.crypto
       .createCryptobox()
       .then((serializedPreKeys: Array<PreKey>) => {
         if (this.service.crypto.cryptobox.lastResortPreKey) {
           const newClient: NewClient = {
-            class: clientClassification,
-            cookie: cookieLabel,
+            class: clientInfo.classification,
+            cookie: clientInfo.cookieLabel,
             lastkey: this.service.crypto.cryptobox.serialize_prekey(this.service.crypto.cryptobox.lastResortPreKey),
+            location: clientInfo.location,
             password: String(loginData.password),
             prekeys: serializedPreKeys,
+            model: clientInfo.model,
             sigkeys: {
               enckey: 'Wuec0oJi9/q9VsgOil9Ds4uhhYwBT+CAUrvi/S9vcz0=',
               mackey: 'Wuec0oJi9/q9VsgOil9Ds4uhhYwBT+CAUrvi/S9vcz0=',
