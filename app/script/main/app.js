@@ -99,11 +99,11 @@ z.main.App = class App {
       repositories.cryptography
     );
     repositories.event = new z.event.EventRepository(
-      this.service.web_socket,
       this.service.notification,
+      this.service.conversation,
+      this.service.web_socket,
       repositories.cryptography,
-      repositories.user,
-      this.service.conversation
+      repositories.user
     );
     repositories.properties = new z.properties.PropertiesRepository(this.service.properties);
     repositories.connect = new z.connect.ConnectRepository(
@@ -307,13 +307,13 @@ z.main.App = class App {
         this.telemetry.add_statistic(z.telemetry.app_init.AppInitStatisticsValue.CLIENT_TYPE, client_observable().type);
 
         this.repository.cryptography.currentClient = client_observable;
-        this.repository.event.current_client = client_observable;
+        this.repository.event.currentClient = client_observable;
         return this.repository.cryptography.loadCryptobox(this.service.storage.db);
       })
       .then(() => {
         this.view.loading.update_progress(10);
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
-        this.repository.event.connect_web_socket();
+        this.repository.event.connectWebSocket();
 
         return Promise.all([this.repository.conversation.get_conversations(), this.repository.user.get_connections()]);
       })
@@ -338,7 +338,7 @@ z.main.App = class App {
         return this.repository.team.getTeam();
       })
       .then(() => this.repository.user.loadUsers())
-      .then(() => this.repository.event.initialize_from_stream())
+      .then(() => this.repository.event.initializeFromStream())
       .then(notifications_count => {
         this.telemetry.time_step(z.telemetry.app_init.AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
         this.telemetry.add_statistic(
@@ -407,7 +407,7 @@ z.main.App = class App {
       .then(() => {
         amplify.publish(z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.NO_INTERNET);
         amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECONNECT);
-        this.repository.event.reconnect_web_socket(z.event.WebSocketService.CHANGE_TRIGGER.ONLINE);
+        this.repository.event.reconnectWebSocket(z.event.WebSocketService.CHANGE_TRIGGER.ONLINE);
       });
   }
 
@@ -417,7 +417,7 @@ z.main.App = class App {
    */
   on_internet_connection_lost() {
     this.logger.warn('Internet connection lost');
-    this.repository.event.disconnect_web_socket(z.event.WebSocketService.CHANGE_TRIGGER.OFFLINE);
+    this.repository.event.disconnectWebSocket(z.event.WebSocketService.CHANGE_TRIGGER.OFFLINE);
     amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.NO_INTERNET);
   }
 
@@ -625,7 +625,7 @@ z.main.App = class App {
   _subscribe_to_unload_events() {
     $(window).on('beforeunload', () => {
       this.logger.info("'window.onbeforeunload' was triggered, so we will disconnect from the backend.");
-      this.repository.event.disconnect_web_socket(z.event.WebSocketService.CHANGE_TRIGGER.PAGE_NAVIGATION);
+      this.repository.event.disconnectWebSocket(z.event.WebSocketService.CHANGE_TRIGGER.PAGE_NAVIGATION);
     });
 
     $(window).on('unload', () => {
@@ -660,7 +660,7 @@ z.main.App = class App {
   logout(sign_out_reason, clear_data = false) {
     const _logout = () => {
       // Disconnect from our backend, end tracking and clear cached data
-      this.repository.event.disconnect_web_socket(z.event.WebSocketService.CHANGE_TRIGGER.LOGOUT);
+      this.repository.event.disconnectWebSocket(z.event.WebSocketService.CHANGE_TRIGGER.LOGOUT);
 
       // Clear Local Storage (but don't delete the cookie label if you were logged in with a permanent client)
       const do_not_delete = [z.storage.StorageKey.AUTH.SHOW_LOGIN];

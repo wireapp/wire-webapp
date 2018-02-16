@@ -75,9 +75,9 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
   }
 
   _update_device_location(location) {
-    z.location.get_location(location.lat, location.lon).then(retrieved_location => {
+    z.location.getLocation(location.lat, location.lon).then(retrieved_location => {
       if (retrieved_location) {
-        this._update_activation_location(`${retrieved_location.place}, ${retrieved_location.country_code}`);
+        this._update_activation_location(`${retrieved_location.place}, ${retrieved_location.countryCode}`);
       }
     });
   }

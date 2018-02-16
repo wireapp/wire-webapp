@@ -2562,10 +2562,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     const {conversation, data: eventData, type} = eventJson;
     const conversationId = (eventData && eventData.conversationId) || conversation;
-    this.logger.info(`»» Conversation Event: '${type}' (Source: ${eventSource})`, {
-      eventJson: JSON.stringify(eventJson),
-      eventObject: eventJson,
-    });
+    const logObject = {eventJson: JSON.stringify(eventJson), eventObject: eventJson};
+    this.logger.info(`»» Conversation Event: '${type}' (Source: ${eventSource})`, logObject);
 
     const inSelfConversation = conversationId === this.self_conversation() && this.self_conversation().id;
     if (inSelfConversation) {

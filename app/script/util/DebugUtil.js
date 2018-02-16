@@ -108,7 +108,7 @@ z.util.DebugUtil = class DebugUtil {
     };
 
     return wire.app.service.notification
-      .get_notifications(client_id, notification_id_since, 10000)
+      .getNotifications(client_id, notification_id_since, 10000)
       .then(_got_notifications);
   }
 
@@ -159,7 +159,7 @@ z.util.DebugUtil = class DebugUtil {
 
     const client_scope = remote_user_id === local_user_id ? undefined : local_client_id;
     return wire.app.service.notification
-      .get_notifications(client_scope, notification_id_since, 10000)
+      .getNotifications(client_scope, notification_id_since, 10000)
       .then(_got_notifications);
   }
 
