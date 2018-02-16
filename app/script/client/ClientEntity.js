@@ -30,27 +30,25 @@ z.client.ClientEntity = class ClientEntity {
   }
 
   constructor(isSelfClient = false) {
+    this.isSelfClient = isSelfClient;
+
     this.class = ClientEntity.CONFIG.DEFAULT_VALUE;
     this.id = '';
 
-    if (isSelfClient) {
+    if (this.isSelfClient) {
+      this.address = '';
+      this.cookie = '';
       this.label = ClientEntity.CONFIG.DEFAULT_VALUE;
       this.location = {};
       this.model = ClientEntity.CONFIG.DEFAULT_VALUE;
-      this.time = '';
+      this.time = ClientEntity.CONFIG.DEFAULT_VALUE;
       this.type = z.client.ClientType.TEMPORARY;
-    }
-
-    for (const property in payload) {
-      if (payload.hasOwnProperty(property) && payload[property] !== undefined) {
-        this[property] = payload[property];
-      }
     }
 
     // Metadata maintained by us
     this.meta = {
-      is_verified: ko.observable(false),
-      primary_key: undefined,
+      isVerified: ko.observable(false),
+      primaryKey: undefined,
     };
 
     this.session = {};
@@ -62,7 +60,7 @@ z.client.ClientEntity = class ClientEntity {
    * @returns {Object} Object containing the user ID & client ID
    */
   static dismantleUserClientId(id) {
-    const [userId, clientId] = (id ? id.split('@') : undefined) || [];
+    const [userId, clientId] = _.isString(id) ? id.split('@') : [];
     return {clientId, userId};
   }
 
@@ -101,14 +99,26 @@ z.client.ClientEntity = class ClientEntity {
    */
   toJson() {
     const jsonObject = JSON.parse(ko.toJSON(this));
+    delete jsonObject.isSelfClient;
     delete jsonObject.session;
 
-    for (const property in jsonObject) {
-      if (jsonObject.hasOwnProperty(property) && jsonObject[property] === ClientEntity.CONFIG.DEFAULT_VALUE) {
-        delete jsonObject[property];
-      }
+    z.client.ClientMapper.CONFIG.CLIENT_PAYLOAD.forEach(name => this._deleteDefaultValues(jsonObject, name));
+
+    if (this.isSelfClient) {
+      z.client.ClientMapper.CONFIG.SELF_CLIENT_PAYLOAD.forEach(name => this._deleteDefaultValues(jsonObject, name));
     }
 
+    jsonObject.meta.is_verified = jsonObject.meta.isVerified;
+    delete jsonObject.meta.isVerified;
     return jsonObject;
+  }
+
+  _deleteDefaultValues(jsonObject, memberName) {
+    if (jsonObject.hasOwnProperty(memberName)) {
+      const isDefaultValue = jsonObject[memberName] === ClientEntity.CONFIG.DEFAULT_VALUE;
+      if (isDefaultValue) {
+        delete jsonObject[memberName];
+      }
+    }
   }
 };

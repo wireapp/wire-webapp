@@ -39,7 +39,7 @@ z.components.DeviceCard = class DeviceCard {
 
     this.dataUieName = `device-card-info${this.isCurrentClient ? '-current' : ''}`;
 
-    this.activationLocation = ko.observable([]);
+    this.activationLocation = ko.observableArray([]);
 
     this._updateActivationLocation('?');
     this._updateLocation(location);
@@ -52,14 +52,15 @@ z.components.DeviceCard = class DeviceCard {
     }
   }
 
-  onClickDevice() {
+  clickOnDevice() {
     if (typeof this.click === 'function') {
       this.click(this.device);
     }
   }
 
-  _updateActivationLocation(locationName, template = z.string.preferences_devices_activated_in) {
-    const sanitizedText = z.util.StringUtil.splitAtPivotElement(template, '{{location}}', locationName);
+  _updateActivationLocation(locationName) {
+    const stringTemplate = z.string.preferences_devices_activated_in;
+    const sanitizedText = z.util.StringUtil.splitAtPivotElement(stringTemplate, '{{location}}', locationName);
     this.activationLocation(sanitizedText);
   }
 
@@ -85,7 +86,7 @@ ko.components.register('device-card', {
           <span data-bind="l10n_text: z.string.preferences_devices_id"></span>
           <span data-bind="foreach: formattedId" data-uie-name="device-id"><span class="device-id-part" data-bind="text: $data"></span></span>
         </div>
-        <div class="label-xs" data-bind="foreach: activatedIn"><span data-bind="css: {'preferences-devices-activated-bold': $data.isStyled}, text: $data.text">?</span></div>
+        <div class="label-xs" data-bind="foreach: activationLocation"><span data-bind="css: {'preferences-devices-activated-bold': $data.isStyled}, text: $data.text">?</span></div>
         <div class="label-xs" data-bind="text: z.util.format_timestamp(device.time)"></div>
       <!-- /ko -->
       <!-- ko ifnot: detailed -->

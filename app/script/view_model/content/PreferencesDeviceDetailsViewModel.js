@@ -61,14 +61,16 @@ z.ViewModel.content.PreferencesDeviceDetailsViewModel = class PreferencesDeviceD
     });
   }
 
-  _updateActivationLocation(location, template = z.string.preferences_devices_activated_in) {
-    const sanitizedText = z.util.StringUtil.splitAtPivotElement(template, '{{location}}', location);
+  _updateActivationLocation(location) {
+    const stringTemplate = z.string.preferences_devices_activated_in;
+    const sanitizedText = z.util.StringUtil.splitAtPivotElement(stringTemplate, '{{location}}', location);
     this.activationLocation(sanitizedText);
   }
 
-  _updateActivationTime(time, template = z.string.preferences_devices_activated_on) {
+  _updateActivationTime(time) {
     const formattedTime = z.util.format_timestamp(time);
-    const sanitizedText = z.util.StringUtil.splitAtPivotElement(template, '{{date}}', formattedTime);
+    const stringTemplate = z.string.preferences_devices_activated_on;
+    const sanitizedText = z.util.StringUtil.splitAtPivotElement(stringTemplate, '{{date}}', formattedTime);
     this.activationDate(sanitizedText);
   }
 
