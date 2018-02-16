@@ -25,4 +25,4 @@ interface MemberJoin extends ConversationEvent {
   type: ConversationEventType.MEMBER_JOIN;
 }
 
-export default MemberJoin;
+export {MemberJoin};

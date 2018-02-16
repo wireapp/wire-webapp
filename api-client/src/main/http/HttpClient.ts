@@ -16,14 +16,14 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-import AccessTokenData from '../auth/AccessTokenData';
+import {AccessTokenData} from '../auth/AccessTokenData';
 import axios, {AxiosError, AxiosPromise, AxiosRequestConfig} from 'axios';
 import {AccessTokenStore, AuthAPI} from '../auth';
 import {ContentType} from '../http';
 import PriorityQueue from '@wireapp/queue-priority/dist/commonjs/PriorityQueue';
 const logdown = require('logdown');
 
-export default class HttpClient {
+class HttpClient {
   private _authAPI: AuthAPI;
   private logger: any = logdown('@wireapp/api-client/http.HttpClient', {
     logger: console,
@@ -119,3 +119,5 @@ export default class HttpClient {
     return this.sendRequest(config);
   }
 }
+
+export {HttpClient};

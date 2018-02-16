@@ -21,4 +21,4 @@ interface ConversationIds {
   has_more: boolean;
 }
 
-export default ConversationIds;
+export {ConversationIds};

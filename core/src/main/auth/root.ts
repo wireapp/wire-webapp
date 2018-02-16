@@ -16,6 +16,5 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-import LoginSanitizer from './LoginSanitizer';
-
-export {LoginSanitizer};
+export * from './LoginSanitizer';
+export * from './ClientInfo';

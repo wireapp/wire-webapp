@@ -16,31 +16,18 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-import AccessTokenData from './AccessTokenData';
-import AccessTokenStore from './AccessTokenStore';
-import AuthAPI from './AuthAPI';
-import ClientPreKey from './ClientPreKey';
-import Context from './Context';
-import LoginData from './LoginData';
-import PreKey from './PreKey';
-import PreKeyBundle from './PreKeyBundle';
-import RegisterData from './RegisterData';
-
 const AUTH_ACCESS_TOKEN_KEY: string = 'access-token';
 const AUTH_COOKIE_KEY: string = 'cookie';
 const AUTH_TABLE_NAME: string = 'authentication';
 
-export {
-  AUTH_ACCESS_TOKEN_KEY,
-  AUTH_COOKIE_KEY,
-  AUTH_TABLE_NAME,
-  AccessTokenData,
-  AccessTokenStore,
-  AuthAPI,
-  ClientPreKey,
-  Context,
-  LoginData,
-  PreKey,
-  PreKeyBundle,
-  RegisterData,
-};
+export {AUTH_ACCESS_TOKEN_KEY, AUTH_COOKIE_KEY, AUTH_TABLE_NAME};
+
+export * from './AccessTokenData';
+export * from './AccessTokenStore';
+export * from './AuthAPI';
+export * from './ClientPreKey';
+export * from './Context';
+export * from './LoginData';
+export * from './PreKey';
+export * from './PreKeyBundle';
+export * from './RegisterData';

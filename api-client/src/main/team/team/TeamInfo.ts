@@ -21,4 +21,4 @@ interface TeamInfo {
   teamid: string;
 }
 
-export default TeamInfo;
+export {TeamInfo};

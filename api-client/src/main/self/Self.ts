@@ -31,4 +31,4 @@ interface Self {
   team?: string;
 }
 
-export default Self;
+export {Self};

@@ -37,4 +37,4 @@ interface PaymentData {
   trialEndsAt: number;
 }
 
-export default PaymentData;
+export {PaymentData};

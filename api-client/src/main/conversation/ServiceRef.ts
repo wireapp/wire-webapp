@@ -21,4 +21,4 @@ interface ServiceRef {
   provider: string;
 }
 
-export default ServiceRef;
+export {ServiceRef};

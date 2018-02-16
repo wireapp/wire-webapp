@@ -23,4 +23,4 @@ interface TeamInvitationChunk {
   invitations: TeamInvitation[];
 }
 
-export default TeamInvitationChunk;
+export {TeamInvitationChunk};

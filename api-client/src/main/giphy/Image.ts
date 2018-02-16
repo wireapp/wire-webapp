@@ -51,4 +51,4 @@ interface Image {
   };
 }
 
-export default Image;
+export {Image};

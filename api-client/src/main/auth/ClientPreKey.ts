@@ -23,4 +23,4 @@ interface ClientPreKey {
   prekey: PreKey;
 }
 
-export default ClientPreKey;
+export {ClientPreKey};

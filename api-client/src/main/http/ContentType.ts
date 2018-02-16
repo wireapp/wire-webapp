@@ -16,7 +16,9 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-export default class ContentType {
+class ContentType {
   public static readonly APPLICATION_JSON: string = 'application/json;charset=UTF-8';
   public static readonly APPLICATION_PROTOBUF: string = 'application/x-protobuf';
 }
+
+export {ContentType};

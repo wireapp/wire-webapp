@@ -21,4 +21,4 @@ interface ChangePassword {
   old_password?: string;
 }
 
-export default ChangePassword;
+export {ChangePassword};

@@ -23,4 +23,4 @@ interface TeamData {
   creator: string;
 }
 
-export default TeamData;
+export {TeamData};

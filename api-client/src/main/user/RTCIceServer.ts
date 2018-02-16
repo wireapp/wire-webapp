@@ -22,4 +22,4 @@ interface RTCIceServer {
   username: string;
 }
 
-export default RTCIceServer;
+export {RTCIceServer};

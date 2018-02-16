@@ -22,4 +22,4 @@ enum AssetRetentionPolicy {
   VOLATILE = 'volatile',
 }
 
-export default AssetRetentionPolicy;
+export {AssetRetentionPolicy};

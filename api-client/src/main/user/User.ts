@@ -29,4 +29,4 @@ interface User {
   service?: ServiceRef;
 }
 
-export default User;
+export {User};

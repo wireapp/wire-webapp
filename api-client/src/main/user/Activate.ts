@@ -45,4 +45,4 @@ interface Activate {
   phone?: string;
 }
 
-export default Activate;
+export {Activate};

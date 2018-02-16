@@ -21,7 +21,7 @@ import {AxiosRequestConfig, AxiosResponse} from 'axios';
 import {HttpClient} from '../http';
 import {Invitation, InvitationList, InvitationRequest} from '../invitation';
 
-export default class InvitationAPI {
+class InvitationAPI {
   constructor(private client: HttpClient) {}
 
   static get URL() {
@@ -113,3 +113,5 @@ export default class InvitationAPI {
     return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
   }
 }
+
+export {InvitationAPI};

@@ -23,4 +23,4 @@ interface TeamInvitation {
   team: string;
 }
 
-export default TeamInvitation;
+export {TeamInvitation};

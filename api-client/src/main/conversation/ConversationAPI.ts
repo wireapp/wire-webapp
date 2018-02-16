@@ -34,7 +34,7 @@ import {ConversationEvent} from './event/';
 import {ValidationError} from '../validation/';
 import {HttpClient} from '../http/';
 
-export default class ConversationAPI {
+class ConversationAPI {
   constructor(private client: HttpClient) {}
 
   static get URL() {
@@ -345,3 +345,5 @@ export default class ConversationAPI {
     return this.client.sendJSON(config).then(() => ({}));
   }
 }
+
+export {ConversationAPI};

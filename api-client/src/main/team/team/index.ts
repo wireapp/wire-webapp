@@ -16,10 +16,8 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-import NewTeamData from './NewTeamData';
-import TeamAPI from './TeamAPI';
-import TeamChunkData from './TeamChunkData';
-import TeamData from './TeamData';
-import TeamInfo from './TeamInfo';
-
-export {NewTeamData, TeamAPI, TeamChunkData, TeamData, TeamInfo};
+export * from './NewTeamData';
+export * from './TeamAPI';
+export * from './TeamChunkData';
+export * from './TeamData';
+export * from './TeamInfo';

@@ -34,9 +34,9 @@ import {
   UserPreKeyBundleMap,
   VerifyDelete,
 } from '../user';
-import UserClients from '../conversation/UserClients';
+import {UserClients} from '../conversation/UserClients';
 
-export default class UserAPI {
+class UserAPI {
   constructor(private client: HttpClient) {}
 
   static get URL() {
@@ -380,3 +380,5 @@ export default class UserAPI {
     return this.client.sendJSON(config).then(() => ({}));
   }
 }
+
+export {UserAPI};

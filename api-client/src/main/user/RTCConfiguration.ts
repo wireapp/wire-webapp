@@ -23,4 +23,4 @@ interface RTCConfiguration {
   ice_servers: RTCIceServer[];
 }
 
-export default RTCConfiguration;
+export {RTCConfiguration};

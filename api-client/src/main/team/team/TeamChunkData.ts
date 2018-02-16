@@ -16,11 +16,11 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-import TeamData from './TeamData';
+import {TeamData} from './TeamData';
 
 interface TeamChunkData {
   has_more: boolean;
   teams: TeamData[];
 }
 
-export default TeamChunkData;
+export {TeamChunkData};

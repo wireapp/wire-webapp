@@ -22,4 +22,4 @@ interface OTRRecipients {
   [userId: string]: OTRClientMap;
 }
 
-export default OTRRecipients;
+export {OTRRecipients};

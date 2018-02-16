@@ -24,4 +24,4 @@ interface CompletePasswordReset {
   phone?: string;
 }
 
-export default CompletePasswordReset;
+export {CompletePasswordReset};

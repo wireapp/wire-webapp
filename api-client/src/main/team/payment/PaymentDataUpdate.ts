@@ -24,4 +24,4 @@ interface PaymentDataUpdate {
   source?: string;
 }
 
-export default PaymentDataUpdate;
+export {PaymentDataUpdate};

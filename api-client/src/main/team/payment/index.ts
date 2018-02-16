@@ -17,24 +17,12 @@
  *
  */
 
-import InvoiceData from './InvoiceData';
-import PaymentAPI from './PaymentAPI';
-import PaymentBillingData from './PaymentBillingData';
-import PaymentData from './PaymentData';
-import PaymentDataUpdate from './PaymentDataUpdate';
-import PaymentPlan from './PaymentPlan';
-import PaymentStripeCharge from './PaymentStripeCharge';
-import PaymentStripeInvoice from './PaymentStripeInvoice';
-import PaymentStripePlan from './PaymentStripePlan';
-
-export {
-  InvoiceData,
-  PaymentAPI,
-  PaymentBillingData,
-  PaymentData,
-  PaymentDataUpdate,
-  PaymentPlan,
-  PaymentStripeCharge,
-  PaymentStripeInvoice,
-  PaymentStripePlan,
-};
+export * from './InvoiceData';
+export * from './PaymentAPI';
+export * from './PaymentBillingData';
+export * from './PaymentData';
+export * from './PaymentDataUpdate';
+export * from './PaymentPlan';
+export * from './PaymentStripeCharge';
+export * from './PaymentStripeInvoice';
+export * from './PaymentStripePlan';

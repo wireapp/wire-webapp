@@ -21,7 +21,7 @@ import {CRUDEngine} from '@wireapp/store-engine/dist/commonjs/engine';
 import {RecordNotFoundError} from '@wireapp/store-engine/dist/commonjs/engine/error';
 import EventEmitter = require('events');
 
-export default class AccessTokenStore extends EventEmitter {
+class AccessTokenStore extends EventEmitter {
   public accessToken: AccessTokenData | undefined;
 
   public static TOPIC = {
@@ -59,3 +59,5 @@ export default class AccessTokenStore extends EventEmitter {
       .then((accessToken: AccessTokenData | undefined) => (this.accessToken = accessToken));
   }
 }
+
+export {AccessTokenStore};

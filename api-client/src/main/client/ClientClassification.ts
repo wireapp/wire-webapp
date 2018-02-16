@@ -22,4 +22,4 @@ enum ClientClassification {
   TABLET = 'tablet',
 }
 
-export default ClientClassification;
+export {ClientClassification};

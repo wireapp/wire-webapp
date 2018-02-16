@@ -19,10 +19,10 @@
 import {AxiosRequestConfig, AxiosResponse} from 'axios';
 
 import {HttpClient} from '../http';
-import {NewClient, RegisteredClient} from '../client/';
+import {NewClient, RegisteredClient} from '../client/index';
 import {PreKeyBundle} from '../auth';
 
-export default class ClientAPI {
+class ClientAPI {
   constructor(private client: HttpClient) {}
 
   static get URL() {
@@ -83,3 +83,5 @@ export default class ClientAPI {
     return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
   }
 }
+
+export {ClientAPI};

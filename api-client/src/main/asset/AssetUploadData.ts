@@ -22,4 +22,4 @@ interface AssetUploadData {
   token: string;
 }
 
-export default AssetUploadData;
+export {AssetUploadData};

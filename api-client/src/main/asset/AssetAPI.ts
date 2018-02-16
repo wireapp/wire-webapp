@@ -20,11 +20,11 @@ import {AxiosResponse} from 'axios';
 import {HttpClient} from '../http';
 import {isValidKey, isValidToken} from './AssetUtil';
 import {unsafeAlphanumeric} from '../shims/node/random';
-import AssetRetentionPolicy from './AssetRetentionPolicy';
-import AssetUploadData from './AssetUploadData';
+import {AssetRetentionPolicy} from './AssetRetentionPolicy';
+import {AssetUploadData} from './AssetUploadData';
 import {base64MD5FromBuffer, concatToBuffer} from '../shims/node/buffer';
 
-export default class AssetAPI {
+class AssetAPI {
   private static ASSET_URL = '/assets/v3';
 
   constructor(private client: HttpClient) {}
@@ -94,3 +94,5 @@ export default class AssetAPI {
       .then((response: AxiosResponse) => response.data);
   }
 }
+
+export {AssetAPI};

@@ -23,4 +23,4 @@ interface InvitationList {
   invitations: Invitation[];
 }
 
-export default InvitationList;
+export {InvitationList};

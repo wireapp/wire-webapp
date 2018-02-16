@@ -29,4 +29,4 @@ enum ConversationEventType {
   TYPING = 'conversation.typing',
 }
 
-export default ConversationEventType;
+export {ConversationEventType};

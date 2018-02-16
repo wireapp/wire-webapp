@@ -22,4 +22,4 @@ interface NewTeamInvitation {
   locale: string;
 }
 
-export default NewTeamInvitation;
+export {NewTeamInvitation};

@@ -31,4 +31,4 @@ interface PaymentStripeCharge {
   status: 'succeeded' | 'pending' | 'failed';
 }
 
-export default PaymentStripeCharge;
+export {PaymentStripeCharge};

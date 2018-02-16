@@ -21,4 +21,4 @@ interface NewPasswordReset {
   phone?: string;
 }
 
-export default NewPasswordReset;
+export {NewPasswordReset};

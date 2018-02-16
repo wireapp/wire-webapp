@@ -24,4 +24,4 @@ interface IncomingNotification {
   transient: boolean;
 }
 
-export default IncomingNotification;
+export {IncomingNotification};

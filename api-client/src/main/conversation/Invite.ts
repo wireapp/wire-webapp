@@ -20,4 +20,4 @@ interface Invite {
   user: string[];
 }
 
-export default Invite;
+export {Invite};

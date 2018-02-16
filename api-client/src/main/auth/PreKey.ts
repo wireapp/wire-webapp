@@ -21,4 +21,4 @@ interface PreKey {
   key: string; // Serialized PreKey
 }
 
-export default PreKey;
+export {PreKey};

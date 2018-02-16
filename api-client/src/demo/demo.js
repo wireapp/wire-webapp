@@ -22,11 +22,11 @@ import {COLOR, Logo} from '@wireapp/react-ui-kit/Identity';
 import {ContainerXS, Content, Header, StyledApp} from '@wireapp/react-ui-kit/Layout';
 import {H1, Link, Text} from '@wireapp/react-ui-kit/Text';
 import React, {Component} from 'react';
-import {AccessTokenStore} from '../../dist/commonjs/auth/';
-import Client from '../../dist/commonjs/Client';
+import {AccessTokenStore} from '@wireapp/api-client/dist/commonjs/auth/';
+import Client from '@wireapp/api-client/dist/commonjs/Client';
 import {MemoryEngine} from '@wireapp/store-engine/dist/commonjs/engine';
 import ReactDOM from 'react-dom';
-import {WebSocketClient} from '../../dist/commonjs/tcp/';
+import {WebSocketClient} from '@wireapp/api-client/dist/commonjs/tcp/';
 
 const BACKEND_ENV = Client.BACKEND.STAGING;
 

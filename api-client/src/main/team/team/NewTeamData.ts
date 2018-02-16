@@ -16,7 +16,7 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-import MemberData from '../member/MemberData';
+import {MemberData} from '../member/MemberData';
 
 interface NewTeamData {
   members?: MemberData[];
@@ -25,4 +25,4 @@ interface NewTeamData {
   binding?: boolean;
 }
 
-export default NewTeamData;
+export {NewTeamData};

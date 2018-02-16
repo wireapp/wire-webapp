@@ -16,24 +16,7 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-import {NewTeamInvitation, TeamInvitation, TeamInvitationAPI, TeamInvitationChunk} from './invitation';
-import {MemberAPI, MemberData, PermissionsData} from './member';
-import {NewTeamData, TeamAPI, TeamChunkData, TeamData, TeamInfo} from './team';
-import {PaymentAPI, PaymentData} from './payment';
-
-export {
-  MemberAPI,
-  MemberData,
-  NewTeamData,
-  NewTeamInvitation,
-  PermissionsData,
-  TeamAPI,
-  TeamChunkData,
-  TeamData,
-  TeamInfo,
-  TeamInvitation,
-  TeamInvitationAPI,
-  TeamInvitationChunk,
-  PaymentAPI,
-  PaymentData,
-};
+export {NewTeamInvitation, TeamInvitation, TeamInvitationAPI, TeamInvitationChunk} from './invitation';
+export {MemberAPI, MemberData, PermissionsData} from './member';
+export {NewTeamData, TeamAPI, TeamChunkData, TeamData, TeamInfo} from './team';
+export {PaymentAPI, PaymentData} from './payment';

@@ -20,9 +20,9 @@ import {AxiosPromise, AxiosRequestConfig, AxiosResponse} from 'axios';
 
 import {MemberData} from '../';
 import {HttpClient} from '../../http';
-import TeamAPI from '../team/TeamAPI';
+import {TeamAPI} from '../team/TeamAPI';
 
-export default class MemberAPI {
+class MemberAPI {
   constructor(private client: HttpClient) {}
 
   static get URL() {
@@ -85,3 +85,5 @@ export default class MemberAPI {
     return this.client.sendJSON(config).then((response: AxiosResponse) => response.data);
   }
 }
+
+export {MemberAPI};

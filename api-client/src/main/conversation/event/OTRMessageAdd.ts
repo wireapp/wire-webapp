@@ -27,4 +27,4 @@ interface OTRMessageAdd extends ConversationEvent {
   type: ConversationEventType.OTR_MESSAGE_ADD;
 }
 
-export default OTRMessageAdd;
+export {OTRMessageAdd};

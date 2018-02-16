@@ -30,4 +30,4 @@ interface Conversation {
   type: 0 | 1 | 2 | 3;
 }
 
-export default Conversation;
+export {Conversation};

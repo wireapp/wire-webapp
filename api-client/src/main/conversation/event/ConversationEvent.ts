@@ -16,7 +16,7 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-import ConversationEventType from './ConversationEventType';
+import {ConversationEventType} from './ConversationEventType';
 
 interface ConversationEvent {
   conversation: string;
@@ -34,4 +34,4 @@ interface ConversationEvent {
     | ConversationEventType.TYPING;
 }
 
-export default ConversationEvent;
+export {ConversationEvent};

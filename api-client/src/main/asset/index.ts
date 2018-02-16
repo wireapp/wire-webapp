@@ -16,7 +16,5 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-import AssetAPI from './AssetAPI';
-import AssetRetentionPolicy from './AssetRetentionPolicy';
-
-export {AssetAPI, AssetRetentionPolicy};
+export * from './AssetAPI';
+export * from './AssetRetentionPolicy';
