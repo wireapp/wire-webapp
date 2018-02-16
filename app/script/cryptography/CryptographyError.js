@@ -28,31 +28,31 @@ z.cryptography.CryptographyError = class CryptographyError extends Error {
 
     this.name = this.constructor.name;
     this.stack = new Error().stack;
-    this.type = type || z.cryptography.CryptographyError.TYPE.UNKNOWN;
+    this.type = type || CryptographyError.TYPE.UNKNOWN;
 
     if (message) {
       this.message = message;
     } else {
       switch (this.type) {
-        case z.cryptography.CryptographyError.TYPE.BROKEN_EXTERNAL:
+        case CryptographyError.TYPE.BROKEN_EXTERNAL:
           this.message = 'Failed to map external message';
           break;
-        case z.cryptography.CryptographyError.TYPE.IGNORED_ASSET:
+        case CryptographyError.TYPE.IGNORED_ASSET:
           this.message = 'Ignored asset preview';
           break;
-        case z.cryptography.CryptographyError.TYPE.IGNORED_PREVIEW:
+        case CryptographyError.TYPE.IGNORED_PREVIEW:
           this.message = 'Ignored image preview';
           break;
-        case z.cryptography.CryptographyError.TYPE.NO_DATA_CONTENT:
+        case CryptographyError.TYPE.NO_DATA_CONTENT:
           this.message = 'No message data content found';
           break;
-        case z.cryptography.CryptographyError.TYPE.NO_GENERIC_MESSAGE:
+        case CryptographyError.TYPE.NO_GENERIC_MESSAGE:
           this.message = 'No GenericMessage found';
           break;
-        case z.cryptography.CryptographyError.TYPE.PREVIOUSLY_STORED:
+        case CryptographyError.TYPE.PREVIOUSLY_STORED:
           this.message = 'Message was previously stored';
           break;
-        case z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE:
+        case CryptographyError.TYPE.UNHANDLED_TYPE:
           this.message = 'Unhandled event type';
           break;
         default:
@@ -63,14 +63,14 @@ z.cryptography.CryptographyError = class CryptographyError extends Error {
 
   static get TYPE() {
     return {
-      BROKEN_EXTERNAL: 'z.cryptography.CryptographyError.TYPE.BROKEN_EXTERNAL',
-      IGNORED_ASSET: 'z.cryptography.CryptographyError.TYPE.IGNORED_ASSET',
-      IGNORED_PREVIEW: 'z.cryptography.CryptographyError.TYPE.IGNORED_PREVIEW',
-      NO_DATA_CONTENT: 'z.cryptography.CryptographyError.TYPE.NO_DATA_CONTENT',
-      NO_GENERIC_MESSAGE: 'z.cryptography.CryptographyError.TYPE.NO_GENERIC_MESSAGE',
-      PREVIOUSLY_STORED: 'z.cryptography.CryptographyError.TYPE.PREVIOUSLY_STORED',
-      UNHANDLED_TYPE: 'z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE',
-      UNKNOWN: 'z.cryptography.CryptographyError.TYPE.UNKNOWN',
+      BROKEN_EXTERNAL: 'CryptographyError.TYPE.BROKEN_EXTERNAL',
+      IGNORED_ASSET: 'CryptographyError.TYPE.IGNORED_ASSET',
+      IGNORED_PREVIEW: 'CryptographyError.TYPE.IGNORED_PREVIEW',
+      NO_DATA_CONTENT: 'CryptographyError.TYPE.NO_DATA_CONTENT',
+      NO_GENERIC_MESSAGE: 'CryptographyError.TYPE.NO_GENERIC_MESSAGE',
+      PREVIOUSLY_STORED: 'CryptographyError.TYPE.PREVIOUSLY_STORED',
+      UNHANDLED_TYPE: 'CryptographyError.TYPE.UNHANDLED_TYPE',
+      UNKNOWN: 'CryptographyError.TYPE.UNKNOWN',
     };
   }
 };

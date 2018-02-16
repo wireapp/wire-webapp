@@ -28,10 +28,10 @@ z.team.TeamError = class TeamError extends Error {
 
     this.name = this.constructor.name;
     this.stack = new Error().stack;
-    this.type = type || z.team.TeamError.TYPE.UNKNOWN;
+    this.type = type || TeamError.TYPE.UNKNOWN;
 
     switch (this.type) {
-      case z.team.TeamError.TYPE.NO_PERMISSIONS:
+      case TeamError.TYPE.NO_PERMISSIONS:
         this.message = 'No permissions provided';
         break;
       default:
@@ -41,8 +41,8 @@ z.team.TeamError = class TeamError extends Error {
 
   static get TYPE() {
     return {
-      NO_PERMISSIONS: 'z.team.TeamError.TYPE.NO_PERMISSIONS',
-      UNKNOWN: 'z.team.TeamError.TYPE.UNKNOWN',
+      NO_PERMISSIONS: 'TeamError.TYPE.NO_PERMISSIONS',
+      UNKNOWN: 'TeamError.TYPE.UNKNOWN',
     };
   }
 };
